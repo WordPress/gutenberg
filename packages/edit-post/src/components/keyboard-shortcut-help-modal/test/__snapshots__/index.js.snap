@@ -97,9 +97,9 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
           },
         },
         Object {
-          "description": "Make the selected text inline code.",
+          "description": "Add non breaking space.",
           "keyCombination": Object {
-            "character": "space",
+            "character": "SPACE",
             "modifier": "primaryShift",
           },
         },
