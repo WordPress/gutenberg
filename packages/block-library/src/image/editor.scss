@@ -24,6 +24,13 @@
 		color: currentColor;
 		background: transparent;
 
+		// Fade out the diagonal placeholder onselect.
+		svg > path {
+			opacity: 1;
+			transition: opacity 0.1s linear;
+			@include reduce-motion("transition");
+		}
+
 		// Position buttons.
 		.components-placeholder__fieldset {
 			width: auto;
@@ -51,9 +58,15 @@
 	}
 
 	// Show upload button on block selection.
-	&.is-selected .components-button.components-button {
-		opacity: 1;
-		visibility: visible;
+	&.is-selected {
+		svg > path {
+			opacity: 0;
+		}
+
+		.components-button.components-button {
+			opacity: 1;
+			visibility: visible;
+		}
 	}
 }
 
