@@ -207,7 +207,13 @@ export default function SpacingInputControl( {
 					onChange={ ( newSize ) =>
 						onChange( getNewPresetValue( newSize ) )
 					}
-					onMouseDown={ setInitialValue }
+					onMouseDown={ ( event ) => {
+						// If mouse down is near start of range set initial value to 0, which
+						// prevents the user have to drag right then left to get 0 setting.
+						if ( event?.nativeEvent?.offsetX < 35 ) {
+							setInitialValue();
+						}
+					} }
 					withInputField={ false }
 					aria-valuenow={ valueNow }
 					aria-valuetext={ spacingSizes[ valueNow ]?.name }
