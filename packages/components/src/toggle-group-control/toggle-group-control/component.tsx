@@ -44,7 +44,7 @@ function ToggleGroupControl(
 		className,
 		isAdaptiveWidth = false,
 		isBlock = false,
-		isBorderless = false,
+		__experimentalIsIconGroup = false,
 		label,
 		hideLabelFromVision = false,
 		help,
@@ -92,11 +92,11 @@ function ToggleGroupControl(
 		() =>
 			cx(
 				styles.ToggleGroupControl( { size } ),
-				! isBorderless && styles.border,
+				! __experimentalIsIconGroup && styles.border,
 				isBlock && styles.block,
 				className
 			),
-		[ className, cx, isBlock, isBorderless, size ]
+		[ className, cx, isBlock, __experimentalIsIconGroup, size ]
 	);
 	return (
 		<BaseControl help={ help }>

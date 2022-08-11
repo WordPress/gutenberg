@@ -98,11 +98,11 @@ export type ToggleGroupControlProps = Omit<
 	 */
 	isBlock?: boolean;
 	/**
-	 * Removes the outer border from the control. A good style to use with `ToggleGroupControlOptionIcon`s.
+	 * Style for use with `ToggleGroupControlOptionIcon`s.
 	 *
 	 * @default false
 	 */
-	isBorderless?: boolean;
+	__experimentalIsIconGroup?: boolean; // TODO: Refactor so this can be private
 	/**
 	 * Callback when a segment is selected.
 	 */

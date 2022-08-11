@@ -142,7 +142,7 @@ WithAriaLabel.args = {
 
 /**
  * The `<ToggleGroupControlOptionIcon>` component can be used for icon options.
- * In this case, the `isBorderless` style is preferred.
+ * In this case, the `__experimentalIsIconGroup` style is preferred.
  */
 export const WithIcons = ( props ) => {
 	const [ state, setState ] = useState();
@@ -169,7 +169,7 @@ export const WithIcons = ( props ) => {
 };
 WithIcons.args = {
 	...Default.args,
-	isBorderless: true,
+	__experimentalIsIconGroup: true,
 };
 
 export const WithReset = ( props ) => {
