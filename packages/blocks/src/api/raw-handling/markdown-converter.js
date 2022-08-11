@@ -1,27 +1,7 @@
 /**
  * External dependencies
  */
-import MarkdownIt from 'markdown-it';
-
-const md = new MarkdownIt( {
-	html: true,
-	breaks: true,
-} );
-
-// Patch the MarkdownIt parser to correct the Slack variant of the code block.
-const originalFence = md.renderer.rules.fence;
-md.renderer.rules.fence = ( tokens, idx, options, env, slf ) => {
-	const token = tokens[ idx ];
-	if ( token.info ) {
-		token.attrs = [ [ 'class', token.info ] ];
-	}
-	const html = originalFence( tokens, idx, options, env, slf );
-	return html.replace( /\n?<\/code><\/pre>\n$/, '</code></pre>\n' );
-};
-
-md.renderer.rules.s_open = () => '<del>';
-
-md.renderer.rules.s_close = () => '</del>';
+import { micromark } from 'micromark';
 
 /**
  * Corrects the Slack Markdown variant of the code block.
@@ -49,5 +29,5 @@ function slackMarkdownVariantCorrector( text ) {
  * @return {string} HTML.
  */
 export default function markdownConverter( text ) {
-	return md.render( slackMarkdownVariantCorrector( text ) ).trimEnd();
+	return micromark( slackMarkdownVariantCorrector( text ) );
 }
