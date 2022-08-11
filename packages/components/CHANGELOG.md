@@ -27,6 +27,7 @@
 -   `UnitControl`: Update unit dropdown design for the large size variant ([#42000](https://github.com/WordPress/gutenberg/pull/42000)).
 -   `BaseControl`: Add `box-sizing` reset style ([#42889](https://github.com/WordPress/gutenberg/pull/42889)).
 -   `BoxControl`: Export `applyValueToSides` util function. ([#42733](https://github.com/WordPress/gutenberg/pull/42733/)).
+-   `ColorPalette`: use index while iterating over color entries to avoid React "duplicated key" warning ([#43096](https://github.com/WordPress/gutenberg/pull/43096)).
 
 ### Internal
 
