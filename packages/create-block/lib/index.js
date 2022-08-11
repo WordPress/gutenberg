@@ -18,7 +18,6 @@ const {
 	getDefaultValues,
 	getPrompts,
 } = require( './templates' );
-const { getMessage } = require( './messaging' );
 
 const commandName = `wp-create-block`;
 program
@@ -101,7 +100,11 @@ program
 					await scaffold( pluginTemplate, answers );
 				} else {
 					log.info( '' );
-					log.info( getMessage( 'customize', plugin ) );
+					log.info(
+						plugin
+							? "Let's customize your WordPress plugin with blocks:"
+							: "Let's add a new block to your existing WordPress plugin:"
+					);
 
 					const filterOptionsProvided = ( { name } ) =>
 						! Object.keys( optionsValues ).includes( name );

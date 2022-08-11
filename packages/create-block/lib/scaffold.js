@@ -12,7 +12,6 @@ const initWPScripts = require( './init-wp-scripts' );
 const initWPEnv = require( './init-wp-env' );
 const { code, info, success } = require( './log' );
 const { writeOutputAsset, writeOutputTemplate } = require( './output' );
-const { getMessage } = require( './messaging' );
 
 module.exports = async (
 	{ blockOutputTemplates, pluginOutputTemplates, outputAssets },
@@ -50,7 +49,11 @@ module.exports = async (
 	namespace = namespace.toLowerCase();
 
 	info( '' );
-	info( getMessage( 'create', plugin, { slug } ) );
+	info(
+		plugin
+			? `Creating a new WordPress plugin in the ${ slug } directory.`
+			: `Creating a new block in the ${ slug } directory.`
+	);
 
 	const view = {
 		$schema,
@@ -125,7 +128,11 @@ module.exports = async (
 
 	info( '' );
 
-	success( getMessage( 'complete', plugin, { title, slug } ) );
+	success(
+		plugin
+			? `Done: WordPress plugin ${ title } bootstrapped in the ${ slug } directory.`
+			: `Done: Block "${ title }" bootstrapped in the ${ slug }directory.`
+	);
 
 	if ( plugin && wpScripts ) {
 		info( '' );
