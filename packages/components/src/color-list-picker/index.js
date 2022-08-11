@@ -11,7 +11,7 @@ import Button from '../button';
 import ColorPalette from '../color-palette';
 import ColorIndicator from '../color-indicator';
 import Icon from '../icon';
-import { Flex, FlexItem } from '../flex';
+import { HStack } from '../h-stack';
 
 function ColorOption( {
 	label,
@@ -28,14 +28,17 @@ function ColorOption( {
 				className="components-color-list-picker__swatch-button"
 				onClick={ () => setIsOpen( ( prev ) => ! prev ) }
 			>
-				<Flex justify="flex-start">
+				<HStack justify="flex-start" spacing={ 2 }>
 					{ value ? (
-						<ColorIndicator colorValue={ value } />
+						<ColorIndicator
+							colorValue={ value }
+							className="components-color-list-picker__swatch-color"
+						/>
 					) : (
 						<Icon icon={ swatch } />
 					) }
-					<FlexItem>{ label }</FlexItem>
-				</Flex>
+					<span>{ label }</span>
+				</HStack>
 			</Button>
 			{ isOpen && (
 				<ColorPalette
