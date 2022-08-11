@@ -21,7 +21,9 @@ describe( 'PageControl', () => {
 	} );
 
 	it( 'sets the current page when a button is clicked', async () => {
-		const user = userEvent.setup( { delay: null } );
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 		const setCurrentPage = jest.fn();
 		render(
 			<PageControl
