@@ -15,6 +15,7 @@ export default function AllInputControl( {
 	sides,
 	spacingSizes,
 	type,
+	minimumCustomValue,
 } ) {
 	const allValue = getAllRawValue( values );
 	const hasValues = isValuesDefined( values );
@@ -33,6 +34,7 @@ export default function AllInputControl( {
 			spacingSizes={ spacingSizes }
 			isMixed={ isMixed }
 			type={ type }
+			minimumCustomValue={ minimumCustomValue }
 		/>
 	);
 }

@@ -38,6 +38,7 @@ export default function SpacingInputControl( {
 	onChange,
 	isMixed = false,
 	type,
+	minimumCustomValue,
 } ) {
 	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
 		value !== undefined && ! isValueSpacingPreset( value )
@@ -181,6 +182,7 @@ export default function SpacingInputControl( {
 						}
 						value={ currentValue }
 						units={ units }
+						min={ minimumCustomValue }
 						placeholder={ allPlaceholder }
 						disableUnits={ isMixed }
 						label={ ariaLabel }

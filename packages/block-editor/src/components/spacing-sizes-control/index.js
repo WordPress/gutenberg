@@ -23,6 +23,7 @@ export default function SpacingSizesControl( {
 	sides,
 	splitOnAxis = false,
 	useSelect,
+	minimumCustomValue = 0,
 } ) {
 	const spacingSizes = [
 		{ name: 0, slug: '0', size: 0 },
@@ -63,6 +64,7 @@ export default function SpacingSizesControl( {
 		spacingSizes,
 		useSelect,
 		type: label,
+		minimumCustomValue,
 	};
 
 	return (

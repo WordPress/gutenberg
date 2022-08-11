@@ -96,7 +96,7 @@ export function getSliderValueFromPreset( presetValue, spacingSizes ) {
 		return 0;
 	}
 	const slug =
-		parseInt( presetValue, 10 ) === 0
+		parseFloat( presetValue, 10 ) === 0
 			? '0'
 			: getSpacingPresetSlug( presetValue );
 	const sliderValue = spacingSizes.findIndex( ( spacingSize ) => {

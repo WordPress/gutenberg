@@ -10,6 +10,7 @@ export default function BoxInputControls( {
 	onChange,
 	spacingSizes,
 	type,
+	minimumCustomValue,
 } ) {
 	// Filter sides if custom configuration provided, maintaining default order.
 	const filteredSides = sides?.length
@@ -36,6 +37,7 @@ export default function BoxInputControls( {
 						onChange={ createHandleOnChange( side ) }
 						spacingSizes={ spacingSizes }
 						type={ type }
+						minimumCustomValue={ minimumCustomValue }
 					/>
 				);
 			} ) }
