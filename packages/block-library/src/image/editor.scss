@@ -1,3 +1,60 @@
+// Give the featured image placeholder the appearance of a literal image placeholder.
+// @todo: this CSS is similar to that of the Site Logo. That makes it an opportunity
+// to create a new component for placeholders meant to inherit some theme styles.
+.wp-block-image.wp-block-image {
+	// Inherit border radius from style variations.
+	// @todo: this doesn't work yet, it needs for the radius and border to be applied also in the setup state.
+	// https://github.com/WordPress/gutenberg/pull/42847
+	border-radius: $radius-block-ui;
+
+	.components-placeholder,
+	.components-resizable-box__container {
+		border-radius: inherit;
+	}
+
+	// Style the placeholder.
+	.wp-block-post-featured-image__placeholder,
+	.components-placeholder {
+		// Fade out the diagonal placeholder onselect.
+		svg {
+			opacity: 0;
+			transition: opacity 0.1s linear;
+			@include reduce-motion("transition");
+		}
+
+		.components-button.components-button {
+			opacity: 1;
+			transition: opacity 0.1s linear;
+			@include reduce-motion("transition");
+		}
+
+		// Show default placeholder height when not resized.
+		min-height: 200px;
+	}
+
+	// Show controls on select.
+	&:not(.is-selected) {
+
+		.wp-block-post-featured-image__placeholder,
+		.components-placeholder {
+			color: currentColor;
+			background: transparent;
+			border: none;
+			box-shadow: none;
+		}
+
+		svg {
+			opacity: 0.4;
+		}
+
+		.components-button.components-button {
+			opacity: 0;
+			visibility: hidden;
+		}
+	}
+}
+
+
 figure.wp-block-image:not(.wp-block) {
 	margin: 0;
 }
@@ -14,13 +71,12 @@ figure.wp-block-image:not(.wp-block) {
 		display: inline;
 	}
 
-	// Shown while image is being uploaded
+	// Shown while image is being uploaded.
 	.components-spinner {
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		margin-top: -9px;
-		margin-left: -9px;
+		transform: translate(-50%, -50%);
 	}
 }
 

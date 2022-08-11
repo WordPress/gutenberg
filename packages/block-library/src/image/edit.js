@@ -8,7 +8,7 @@ import { get, has, isEmpty, omit, pick } from 'lodash';
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { withNotices } from '@wordpress/components';
+import { withNotices, Placeholder } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import {
 	BlockAlignmentControl,
@@ -27,6 +27,17 @@ import { image as icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import Image from './image';
+
+const placeholder = ( content ) => {
+	return (
+		<Placeholder
+			className="block-editor-media-placeholder"
+			withIllustration={ true }
+		>
+			{ content }
+		</Placeholder>
+	);
+};
 
 /**
  * Module constants
@@ -344,6 +355,7 @@ export function ImageEdit( {
 				onSelectURL={ onSelectURL }
 				notices={ noticeUI }
 				onError={ onUploadError }
+				placeholder={ placeholder }
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { id, src } }
