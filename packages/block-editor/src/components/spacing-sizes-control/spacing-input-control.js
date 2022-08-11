@@ -44,8 +44,6 @@ export default function SpacingInputControl( {
 		value !== undefined && ! isValueSpacingPreset( value )
 	);
 
-	const [ valueNow, setValueNow ] = useState( null );
-
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
 	} );
@@ -84,8 +82,6 @@ export default function SpacingInputControl( {
 	};
 
 	const getNewPresetValue = ( newSize, controlType ) => {
-		setValueNow( newSize );
-
 		const size = parseInt( newSize, 10 );
 
 		if ( controlType === 'selectList' ) {
@@ -215,8 +211,8 @@ export default function SpacingInputControl( {
 						}
 					} }
 					withInputField={ false }
-					aria-valuenow={ valueNow }
-					aria-valuetext={ spacingSizes[ valueNow ]?.name }
+					aria-valuenow={ currentValue }
+					aria-valuetext={ spacingSizes[ currentValue ]?.name }
 					renderTooltipContent={ customTooltipContent }
 					min={ 0 }
 					max={ spacingSizes.length - 1 }
