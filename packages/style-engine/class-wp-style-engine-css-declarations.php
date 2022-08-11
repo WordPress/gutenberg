@@ -29,8 +29,8 @@ class WP_Style_Engine_CSS_Declarations {
 	 *
 	 * @var array
 	 */
-	const VALID_CUSTOM_PROPERTIES = array(
-		'--wp--style--unstable-gallery-gap',
+	protected static $valid_custom_declarations = array(
+		'--wp--style--unstable-gallery-gap' => 'gap',
 	);
 
 	/**
@@ -142,7 +142,7 @@ class WP_Style_Engine_CSS_Declarations {
 		$filtered_value = wp_strip_all_tags( $value, true );
 
 		/**
-		 * Allows CSS custom properties starting with `--wp--`.
+		 * Allows a specific list of CSS custom properties starting with `--wp--`.
 		 *
 		 * CSS custom properties are permitted by safecss_filter_attr()
 		 * since WordPress 6.1. See: https://core.trac.wordpress.org/ticket/56353.
@@ -152,8 +152,9 @@ class WP_Style_Engine_CSS_Declarations {
 		 *
 		 * It does not need to be backported to future versions of WordPress.
 		 */
-		if ( in_array( $property, static::VALID_CUSTOM_PROPERTIES, true ) ) {
-			return "{$property}:{$spacer}{$filtered_value}";
+		if ( isset( static::$valid_custom_declarations[ $property ] ) ) {
+			return safecss_filter_attr( static::$valid_custom_declarations[ $property ] . ":{$spacer}{$value}" ) ?
+				"{$property}:{$spacer}{$value}" : '';
 		}
 
 		if ( '' !== $filtered_value ) {
