@@ -260,7 +260,7 @@ export function getStylesDeclarations(
 
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
-	const extraRules = getCSSRules( blockStyles );
+	const extraRules = getCSSRules( blockStyles, {} );
 	extraRules.forEach( ( rule ) => {
 		// Don't output padding properties if padding variables are set.
 		if (
@@ -273,6 +273,7 @@ export function getStylesDeclarations(
 		const cssProperty = rule.key.startsWith( '--' )
 			? rule.key
 			: kebabCase( rule.key );
+
 		let ruleValue = rule.value;
 		if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
 			const refPath = ruleValue.ref.split( '.' );
@@ -283,7 +284,8 @@ export function getStylesDeclarations(
 				return;
 			}
 		}
-		output.push( `${ cssProperty }: ${ compileStyleValue( ruleValue ) }` );
+
+		output.push( `${ cssProperty }: ${ rule.value }` );
 	} );
 
 	return output;

@@ -63,7 +63,7 @@ export function compileCSS( style: Style, options: StyleOptions = {} ): string {
  */
 export function getCSSRules(
 	style: Style,
-	options: StyleOptions
+	options: StyleOptions = {}
 ): GeneratedCSSRule[] {
 	const rules: GeneratedCSSRule[] = [];
 	styleDefinitions.forEach( ( definition: StyleDefinition ) => {
