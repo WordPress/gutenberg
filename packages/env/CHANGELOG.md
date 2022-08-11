@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Bug Fix
+- Fix a crash when "core" was set to `null` in a `.wp-env.json` file. We now use the latest stable WordPress version in that case. This also restores the previous behavior of `"core": null` in `.wp-env.override.json`, which was to use the default WordPress version.
+
 ### Enhancement
 - Previously, wp-env used the WordPress version provided by Docker in the WordPress image for installations which don't specify a WordPress version. Now, wp-env will find the latest stable version on WordPress.org and check out the https://github.com/WordPress/WordPress repository at the tag matching that version. In most cases, this will match what Docker provides. The benefit is that wp-env (and WordPress.org) now controls the default WordPress version rather than Docker.
 
