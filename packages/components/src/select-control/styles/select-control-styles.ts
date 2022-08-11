@@ -11,7 +11,10 @@ import { COLORS, rtl } from '../../utils';
 import type { SelectControlProps } from '../types';
 
 interface SelectProps
-	extends Pick< SelectControlProps, '__next36pxDefaultSize' | 'disabled' > {
+	extends Pick<
+		SelectControlProps,
+		'__next36pxDefaultSize' | 'disabled' | 'multiple'
+	> {
 	// Using `selectSize` instead of `size` to avoid a type conflict with the
 	// `size` HTML attribute of the `select` element.
 	selectSize?: SelectControlProps[ 'size' ];
@@ -49,22 +52,23 @@ const fontSizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
 const sizeStyles = ( {
 	__next36pxDefaultSize,
 	selectSize = 'default',
+	multiple,
 }: SelectProps ) => {
 	const sizes = {
 		default: {
-			height: 36,
+			height: multiple ? 36 * 2 : 36,
 			minHeight: 36,
 			paddingTop: 0,
 			paddingBottom: 0,
 		},
 		small: {
-			height: 24,
+			height: multiple ? 24 * 2 : 24,
 			minHeight: 24,
 			paddingTop: 0,
 			paddingBottom: 0,
 		},
 		'__unstable-large': {
-			height: 40,
+			height: multiple ? 40 * 2 : 40,
 			minHeight: 40,
 			paddingTop: 0,
 			paddingBottom: 0,
@@ -73,7 +77,7 @@ const sizeStyles = ( {
 
 	if ( ! __next36pxDefaultSize ) {
 		sizes.default = {
-			height: 30,
+			height: multiple ? 30 * 2 : 30,
 			minHeight: 30,
 			paddingTop: 0,
 			paddingBottom: 0,
@@ -88,26 +92,31 @@ const sizeStyles = ( {
 const sizePaddings = ( {
 	__next36pxDefaultSize,
 	selectSize = 'default',
+	multiple,
 }: SelectProps ) => {
+	const equalizePadding = ( paddingLeft: number, paddingRight: number ) => {
+		return multiple ? paddingLeft : paddingRight;
+	};
+
 	const sizes = {
 		default: {
 			paddingLeft: 16,
-			paddingRight: 32,
+			paddingRight: equalizePadding( 16, 32 ),
 		},
 		small: {
 			paddingLeft: 8,
-			paddingRight: 24,
+			paddingRight: equalizePadding( 8, 24 ),
 		},
 		'__unstable-large': {
 			paddingLeft: 16,
-			paddingRight: 32,
+			paddingRight: equalizePadding( 16, 32 ),
 		},
 	};
 
 	if ( ! __next36pxDefaultSize ) {
 		sizes.default = {
 			paddingLeft: 8,
-			paddingRight: 24,
+			paddingRight: equalizePadding( 8, 24 ),
 		};
 	}
 
