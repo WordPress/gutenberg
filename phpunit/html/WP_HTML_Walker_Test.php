@@ -632,6 +632,16 @@ HTML;
 
 	/**
 	 * @ticket 56299
+	 */
+	public function test_unclosed_script_tag_should_not_cause_an_infinite_loop() {
+		$w = new WP_HTML_Walker( '<script>' );
+		$w->next_tag();
+		$this->assertSame( 'script', $w->get_tag() );
+		$w->next_tag();
+	}
+
+	/**
+	 * @ticket 56299
 	 * @dataProvider data_script_state
 	 */
 	public function test_ignores_contents_of_a_script_tag( $script_then_div ) {
@@ -644,8 +654,11 @@ HTML;
 
 	public function data_script_state() {
 		return array(
-			'Simple script'                          => array(
+			'Simple script tag'                          => array(
 				'<script><span class="d-none d-md-inline">Back to notifications</span></script><div></div>'
+			),
+			'Simple uppercase script tag'                          => array(
+				'<script><span class="d-none d-md-inline">Back to notifications</span></SCRIPT><div></div>'
 			),
 			'Script with a comment opener inside should end at the next script tag closer (dash dash escaped state)' => array(
 				'<script class="d-md-none"><!--</script><div></div>-->'
@@ -666,7 +679,7 @@ HTML;
 				'<script class="d-md-none"></title></script><div></div>'
 			),
 			'Complex script with many parsing states' => array(
-				'<script class="d-md-none"><!--<script>--><script><span><!--<span><script</script>--></script><div></div>-->'
+				'<script class="d-md-none"><!--<script>--><scRipt><span><!--<span><Script</script>--></scripT><div></div>-->'
 			),
 		);
 	}
