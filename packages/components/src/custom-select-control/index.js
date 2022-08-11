@@ -149,6 +149,7 @@ export default function CustomSelectControl( {
 				</StyledLabel>
 			) }
 			<InputBaseWithBackCompatMinWidth
+				__next36pxDefaultSize={ __next36pxDefaultSize }
 				__nextUnconstrainedWidth={ __nextUnconstrainedWidth }
 				isFocused={ isOpen || isFocused }
 				__unstableInputWidth={
