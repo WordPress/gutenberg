@@ -1599,7 +1599,7 @@ export const __experimentalGetDefaultTemplateType = createSelector(
  */
 export function __experimentalGetTemplateInfo( state, template ) {
 	if ( ! template ) {
-		return {};
+		return EMPTY_OBJECT;
 	}
 
 	const { description, slug, title, area } = template;
