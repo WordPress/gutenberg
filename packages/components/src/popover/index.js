@@ -118,6 +118,13 @@ const placementToAnimationOrigin = ( placement ) => {
 	return x + ' ' + y;
 };
 
+const isTopBottomPlacement = ( placement ) =>
+	placement.trim().startsWith( 'top' ) ||
+	placement.trim().startsWith( 'bottom' );
+const hasBeforePlacement = ( placement ) =>
+	placement.trim().startsWith( 'top' ) ||
+	placement.trim().startsWith( 'left' );
+
 const Popover = (
 	{
 		range,
@@ -202,33 +209,53 @@ const Popover = (
 
 	const middleware = [
 		frameOffset || offset
-			? offsetMiddleware( ( { placement: currentPlacement } ) => {
+			? offsetMiddleware( ( middlewareArguments ) => {
 					if ( ! frameOffset ) {
 						return offset;
 					}
-
-					const isTopBottomPlacement =
-						currentPlacement.includes( 'top' ) ||
-						currentPlacement.includes( 'bottom' );
-
+					const {
+						placement: currentPlacement,
+						rects: {
+							reference: referenceRect,
+							floating: floatingRect,
+						},
+					} = middlewareArguments;
 					// The main axis should represent the gap between the
 					// floating element and the reference element. The cross
 					// axis is always perpendicular to the main axis.
-					const mainAxis = isTopBottomPlacement ? 'y' : 'x';
+					const mainAxis = isTopBottomPlacement( currentPlacement )
+						? 'y'
+						: 'x';
 					const crossAxis = mainAxis === 'x' ? 'y' : 'x';
 
 					// When the popover is before the reference, subtract the offset,
 					// of the main axis else add it.
-					const hasBeforePlacement =
-						currentPlacement.includes( 'top' ) ||
-						currentPlacement.includes( 'left' );
-					const mainAxisModifier = hasBeforePlacement ? -1 : 1;
+					const mainAxisModifier = hasBeforePlacement(
+						currentPlacement
+					)
+						? -1
+						: 1;
 					const normalizedOffset = offset ? offset : 0;
 
+					let totalOffset =
+						frameOffset[ mainAxis ] + normalizedOffset;
+					const mainDimension = mainAxis === 'y' ? 'height' : 'width';
+					if (
+						// If the reference has no height we don't need to do anything.
+						referenceRect[ mainDimension ] &&
+						referenceRect[ mainAxis ] < 0 &&
+						ownerDocument.documentElement.scrollTop <=
+							referenceRect[ mainAxis ] +
+								normalizedOffset +
+								frameOffset[ mainAxis ]
+					) {
+						totalOffset +=
+							referenceRect[ mainDimension ] +
+							floatingRect[ mainDimension ];
+					}
+
 					return {
-						mainAxis:
-							normalizedOffset +
-							frameOffset[ mainAxis ] * mainAxisModifier,
+						mainAxis: mainAxisModifier * totalOffset,
 						crossAxis: frameOffset[ crossAxis ],
 					};
 			  } )
@@ -250,7 +277,48 @@ const Popover = (
 		__unstableShift
 			? shift( {
 					crossAxis: true,
-					limiter: limitShift(),
+					limiter: limitShift( {
+						offset: ( middlewareArguments ) => {
+							// The following calculations are aimed at allowing the floating
+							// element to shift fully below the reference element, when the
+							// reference element is in a different document (i.e. an iFrame).
+							if ( ownerDocument === document ) {
+								return 0;
+							}
+							const {
+								placement: currentPlacement,
+								rects: { reference: referenceRect },
+							} = middlewareArguments;
+
+							// The main axis (according to floating UI's docs) is the "x" axis
+							// for 'top' and 'bottom' placements, and the "y" axis for 'left'
+							// and 'right' placements.
+							const mainAxis = isTopBottomPlacement(
+								currentPlacement
+							)
+								? 'x'
+								: 'y';
+							const crossAxis = mainAxis === 'x' ? 'y' : 'x';
+
+							const crossAxisModifier = hasBeforePlacement(
+								currentPlacement
+							)
+								? -1
+								: 1;
+
+							return {
+								mainAxis: -Math.min(
+									frameOffset[ mainAxis ],
+									middlewareArguments[ mainAxis ] -
+										referenceRect[ mainAxis ] -
+										frameOffset[ mainAxis ]
+								),
+								crossAxis:
+									crossAxisModifier *
+									frameOffset[ crossAxis ],
+							};
+						},
+					} ),
 					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
 			  } )
 			: undefined,
