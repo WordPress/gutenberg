@@ -35,8 +35,13 @@ export default function TemplateDetails( { template, onClose } ) {
 		postId: undefined,
 	} );
 
+	const isTemplatePart = template.type === 'wp_template_part';
+
 	// Only user-created and non-default templates can change the name.
-	const canEditTitle = template.is_custom && ! template.has_theme_file;
+	// But any user-created template part can be renamed.
+	const canEditTitle = isTemplatePart
+		? ! template.has_theme_file
+		: template.is_custom && ! template.has_theme_file;
 
 	if ( ! template ) {
 		return null;
