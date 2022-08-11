@@ -154,6 +154,7 @@ export const InputControlSuffixWrapperWithClickThrough = styled(
 	InputControlSuffixWrapper
 )`
 	position: absolute;
-	right: 0;
 	pointer-events: none;
+
+	${ rtl( { right: 0 } ) }
 `;
