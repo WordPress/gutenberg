@@ -11,7 +11,7 @@
 	display: contents;
 
 	legend {
-		padding-left: 0;
+		padding: 0;
 		grid-column: 1 / 1;
 		grid-row: 1 / 1;
 		align-self: center;
@@ -106,14 +106,6 @@
 
 	[class*="ThumbWrapper-thumbColor"] {
 		z-index: 3;
-	}
-
-	.component-spacing-sizes-control__header {
-		margin-bottom: $grid-unit-10;
-	}
-
-	.component-spacing-sizes-control__header-is-linked {
-		margin-bottom: -$grid-unit-05;
 	}
 
 	.components-spacing-sizes-control__side-label {

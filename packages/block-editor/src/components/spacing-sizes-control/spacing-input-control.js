@@ -128,6 +128,11 @@ export default function SpacingInputControl( {
 		type?.toLowerCase()
 	);
 
+	const showHint =
+		spacingSizes.length <= 9 &&
+		! showCustomValueControl &&
+		currentValueHint !== undefined;
+
 	return (
 		<>
 			{ side !== 'all' && (
@@ -136,23 +141,18 @@ export default function SpacingInputControl( {
 						{ LABELS[ side ] }
 					</Text>
 
-					{ spacingSizes.length <= 9 &&
-						! showCustomValueControl &&
-						currentValueHint !== undefined && (
-							<Text className="components-spacing-sizes-control__hint-single">
-								{ currentValueHint }
-							</Text>
-						) }
+					{ showHint && (
+						<Text className="components-spacing-sizes-control__hint-single">
+							{ currentValueHint }
+						</Text>
+					) }
 				</HStack>
 			) }
-			{ side === 'all' &&
-				spacingSizes.length <= 9 &&
-				! showCustomValueControl &&
-				currentValueHint !== undefined && (
-					<Text className="components-spacing-sizes-control__hint-all">
-						{ currentValueHint }
-					</Text>
-				) }
+			{ side === 'all' && showHint && (
+				<Text className="components-spacing-sizes-control__hint-all">
+					{ currentValueHint }
+				</Text>
+			) }
 
 			<Button
 				label={
@@ -202,13 +202,7 @@ export default function SpacingInputControl( {
 			) }
 			{ spacingSizes.length <= 9 && ! showCustomValueControl && (
 				<RangeControl
-					className={ classnames(
-						'components-spacing-sizes-control__range-control',
-						{
-							'component-spacing-sizes-control__not-set':
-								value === undefined,
-						}
-					) }
+					className="components-spacing-sizes-control__range-control"
 					value={ currentValue }
 					onChange={ ( newSize ) =>
 						onChange( getNewPresetValue( newSize ) )
