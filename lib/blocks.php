@@ -169,6 +169,8 @@ function gutenberg_reregister_core_block_types() {
 			require_once $blocks_dir . $file;
 		}
 	}
+	// TODO: Find a better way to enqueue the runtime before WP packages.
+	wp_enqueue_script( 'wp-runtime' );
 }
 
 add_action( 'init', 'gutenberg_reregister_core_block_types' );

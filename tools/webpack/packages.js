@@ -11,12 +11,15 @@ const {
 	camelCaseDash,
 } = require( '@wordpress/dependency-extraction-webpack-plugin/lib/util' );
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 
 /**
  * Internal dependencies
  */
 const { dependencies } = require( '../../package' );
 const { baseConfig, plugins, stylesTransform } = require( './shared' );
+
+const isDevelopment = baseConfig.mode !== 'development';
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
 
@@ -119,7 +122,7 @@ const vendorsCopyConfig = Object.entries( vendors ).flatMap(
 	}
 );
 
-module.exports = {
+const config = {
 	...baseConfig,
 	name: 'packages',
 	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
@@ -157,5 +160,33 @@ module.exports = {
 				.concat( bundledPackagesPhpConfig )
 				.concat( vendorsCopyConfig ),
 		} ),
+		isDevelopment && new ReactRefreshWebpackPlugin(),
 	].filter( Boolean ),
 };
+
+if ( isDevelopment ) {
+	config.optimization = {
+		...baseConfig.optimization,
+		runtimeChunk: {
+			name: 'runtime',
+		},
+	};
+	config.devServer = {
+		hot: true,
+		devMiddleware: {
+			writeToDisk: true,
+		},
+		allowedHosts: 'auto',
+		host: 'localhost',
+		port: 8887,
+		proxy: {
+			'/build': {
+				pathRewrite: {
+					'^/build': '',
+				},
+			},
+		},
+	};
+}
+
+module.exports = config;

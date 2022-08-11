@@ -238,6 +238,7 @@
 		"wd": "1.12.1",
 		"webpack": "5.65.0",
 		"webpack-bundle-analyzer": "4.4.2",
+		"webpack-dev-server": "4.4.0",
 		"worker-farm": "1.7.0"
 	},
 	"scripts": {
