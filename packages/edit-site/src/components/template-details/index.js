@@ -6,7 +6,6 @@ import {
 	Button,
 	MenuGroup,
 	MenuItem,
-	__experimentalHeading as Heading,
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -58,13 +57,14 @@ export default function TemplateDetails( { template, onClose } ) {
 				{ canEditTitle ? (
 					<EditTemplateTitle template={ template } />
 				) : (
-					<Heading
-						level={ 4 }
+					<Text
+						size={ 16 }
 						weight={ 600 }
 						className="edit-site-template-details__title"
+						as="p"
 					>
 						{ title }
-					</Heading>
+					</Text>
 				) }
 
 				{ description && (
