@@ -195,7 +195,7 @@ function getValueFromPresetVariable(
 	}
 
 	const presetObject = findInPresetsBy(
-		features,
+		features.settings,
 		blockName,
 		metadata.path,
 		'slug',
@@ -213,8 +213,8 @@ function getValueFromPresetVariable(
 
 function getValueFromCustomVariable( features, blockName, variable, path ) {
 	const result =
-		get( features, [ 'blocks', blockName, 'custom', ...path ] ) ??
-		get( features, [ 'custom', ...path ] );
+		get( features.settings, [ 'blocks', blockName, 'custom', ...path ] ) ??
+		get( features.settings, [ 'custom', ...path ] );
 	if ( ! result ) {
 		return variable;
 	}
@@ -224,7 +224,12 @@ function getValueFromCustomVariable( features, blockName, variable, path ) {
 
 export function getValueFromVariable( features, blockName, variable ) {
 	if ( ! variable || typeof variable !== 'string' ) {
-		return variable;
+		if ( variable?.ref && typeof variable?.ref === 'string' ) {
+			const refPath = variable.ref.split( '.' );
+			variable = get( features, refPath );
+		} else {
+			return variable;
+		}
 	}
 	const USER_VALUE_PREFIX = 'var:';
 	const THEME_VALUE_PREFIX = 'var(--wp--';

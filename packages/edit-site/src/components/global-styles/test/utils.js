@@ -110,7 +110,7 @@ describe( 'editor utils', () => {
 		describe( 'when provided an invalid variable', () => {
 			it( 'returns the originally provided value', () => {
 				const actual = getValueFromVariable(
-					styles.settings,
+					styles,
 					'root',
 					undefined
 				);
@@ -122,7 +122,7 @@ describe( 'editor utils', () => {
 		describe( 'when provided a preset variable', () => {
 			it( 'retrieves the correct preset value', () => {
 				const actual = getValueFromVariable(
-					styles.settings,
+					styles,
 					'root',
 					'var:preset|color|primary'
 				);
@@ -134,7 +134,7 @@ describe( 'editor utils', () => {
 		describe( 'when provided a custom variable', () => {
 			it( 'retrieves the correct custom value', () => {
 				const actual = getValueFromVariable(
-					styles.settings,
+					styles,
 					'root',
 					'var(--wp--custom--color--secondary)'
 				);
