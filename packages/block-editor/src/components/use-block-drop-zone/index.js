@@ -53,7 +53,12 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 			allowedEdges
 		);
 
-		if ( candidateDistance === undefined || distance < candidateDistance ) {
+		const isDraggedBlock = element.classList.contains( 'is-dragging' );
+
+		if (
+			! isDraggedBlock &&
+			( candidateDistance === undefined || distance < candidateDistance )
+		) {
 			// If the user is dropping to the trailing edge of the block
 			// add 1 to the index to represent dragging after.
 			// Take RTL languages into account where the left edge is
@@ -111,7 +116,8 @@ export default function useBlockDropZone( {
 		[ targetRootClientId ]
 	);
 
-	const { getBlockListSettings } = useSelect( blockEditorStore );
+	const { getBlockListSettings, getBlockInsertionPoint } =
+		useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
 
@@ -129,8 +135,14 @@ export default function useBlockDropZone( {
 			);
 
 			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
+			const { rootClientId: currentRootClientId, index: currentIndex } =
+				getBlockInsertionPoint();
 
-			if ( targetIndex !== null ) {
+			if (
+				targetIndex !== null &&
+				( currentRootClientId !== targetRootClientId ||
+					currentIndex !== targetIndex )
+			) {
 				showInsertionPoint( targetRootClientId, targetIndex );
 			}
 		}, [] ),
