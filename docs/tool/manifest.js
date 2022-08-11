@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { camelCase, upperFirst } = require( 'lodash' );
+const { pascalCase } = require( 'change-case' );
 const fs = require( 'fs' );
 const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
@@ -54,7 +54,7 @@ function getComponentManifest( paths ) {
 		const pathFragments = filePath.split( '/' );
 		const slug = pathFragments[ pathFragments.length - 2 ];
 		return {
-			title: upperFirst( camelCase( slug ) ),
+			title: pascalCase( slug ),
 			slug,
 			markdown_source: `${ baseRepoUrl }/${ filePath }`,
 			parent: 'components',
@@ -85,7 +85,7 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 				slug = 'handbook';
 			}
 		}
-		let title = upperFirst( camelCase( slug ) );
+		let title = pascalCase( slug );
 		const markdownSource = fs.readFileSync( fileName, 'utf8' );
 		const titleMarkdown = markdownSource.match( /^#\s(.+)$/m );
 		if ( titleMarkdown ) {

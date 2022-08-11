@@ -153,6 +153,7 @@ export default function TypographyPanel( { name, element } ) {
 						value={ selectedLevel }
 						onChange={ setCurrentTab }
 						isBlock
+						size="__unstable-large"
 					>
 						<ToggleGroupControlOption
 							value="heading"
@@ -192,6 +193,7 @@ export default function TypographyPanel( { name, element } ) {
 					fontFamilies={ fontFamilies }
 					value={ fontFamily }
 					onChange={ setFontFamily }
+					size="__unstable-large"
 				/>
 			) }
 			{ hasFontSizeEnabled && (
@@ -200,16 +202,21 @@ export default function TypographyPanel( { name, element } ) {
 					onChange={ setFontSize }
 					fontSizes={ fontSizes }
 					disableCustomFontSizes={ disableCustomFontSizes }
+					size="__unstable-large"
 				/>
 			) }
 			{ hasLineHeightEnabled && (
-				<Spacer marginBottom={ 6 }>
-					<LineHeightControl
-						__nextHasNoMarginBottom={ true }
-						value={ lineHeight }
-						onChange={ setLineHeight }
-					/>
-				</Spacer>
+				<div className="edit-site-typography-panel__half-width-control">
+					<Spacer marginBottom={ 6 }>
+						<LineHeightControl
+							__nextHasNoMarginBottom={ true }
+							__unstableInputWidth="auto"
+							value={ lineHeight }
+							onChange={ setLineHeight }
+							size="__unstable-large"
+						/>
+					</Spacer>
+				</div>
 			) }
 			{ hasAppearanceControl && (
 				<FontAppearanceControl
@@ -226,13 +233,19 @@ export default function TypographyPanel( { name, element } ) {
 					} }
 					hasFontStyles={ hasFontStyles }
 					hasFontWeights={ hasFontWeights }
+					size="__unstable-large"
+					__nextUnconstrainedWidth
 				/>
 			) }
 			{ hasLetterSpacingControl && (
-				<LetterSpacingControl
-					value={ letterSpacing }
-					onChange={ setLetterSpacing }
-				/>
+				<div className="edit-site-typography-panel__half-width-control">
+					<LetterSpacingControl
+						value={ letterSpacing }
+						onChange={ setLetterSpacing }
+						size="__unstable-large"
+						__unstableInputWidth="auto"
+					/>
+				</div>
 			) }
 		</PanelBody>
 	);

@@ -209,7 +209,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => null,
 				'expected_output' => array(
-					'css'          => 'font-family:Roboto,Oxygen-Sans,Ubuntu,sans-serif;font-style:italic;font-weight:800;line-height:1.3;text-decoration:underline;text-transform:uppercase;letter-spacing:2;',
+					'css'          => 'font-size:clamp(2em, 2vw, 4em);font-family:Roboto,Oxygen-Sans,Ubuntu,sans-serif;font-style:italic;font-weight:800;line-height:1.3;text-decoration:underline;text-transform:uppercase;letter-spacing:2;',
 					'declarations' => array(
 						'font-size'       => 'clamp(2em, 2vw, 4em)',
 						'font-family'     => 'Roboto,Oxygen-Sans,Ubuntu,sans-serif',
@@ -531,7 +531,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'selector' => 'article',
 			)
 		);
-		$store            = WP_Style_Engine::get_instance()::get_store( 'block-supports' );
+		$store            = WP_Style_Engine::get_store( 'block-supports' );
 		$rule             = $store->get_all_rules()['article'];
 		$this->assertSame( $generated_styles['css'], $rule->get_css() );
 	}
@@ -569,10 +569,9 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 		);
 
 		// Check that the style engine knows about the store.
-		$style_engine = WP_Style_Engine::get_instance();
-		$stored_store = $style_engine::get_store( 'test-store' );
+		$stored_store = WP_Style_Engine::get_store( 'test-store' );
 		$this->assertInstanceOf( 'WP_Style_Engine_CSS_Rules_Store', $stored_store );
-		$this->assertSame( $compiled_stylesheet, $style_engine::compile_stylesheet_from_css_rules( $stored_store->get_all_rules() ) );
+		$this->assertSame( $compiled_stylesheet, WP_Style_Engine::compile_stylesheet_from_css_rules( $stored_store->get_all_rules() ) );
 	}
 
 	/**

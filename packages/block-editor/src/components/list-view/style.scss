@@ -312,14 +312,21 @@
 		}
 	}
 
+	.block-editor-list-view-block-select-button__anchor-wrapper {
+		position: relative;
+		max-width: min(110px, 40%);
+		width: 100%;
+	}
+
 	.block-editor-list-view-block-select-button__anchor {
+		position: absolute;
+		right: 0;
+		transform: translateY(-50%);
 		background: rgba($black, 0.1);
 		border-radius: $radius-block-ui;
-		display: inline-block;
 		padding: 2px 6px;
-		max-width: min(100px, 40%);
-		overflow: hidden;
-		text-overflow: ellipsis;
+		max-width: 100%;
+		box-sizing: border-box;
 	}
 
 	&.is-selected .block-editor-list-view-block-select-button__anchor {

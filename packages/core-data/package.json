@@ -39,6 +39,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/url": "file:../url",
+		"change-case": "^4.1.2",
 		"equivalent-key-map": "^0.2.2",
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",

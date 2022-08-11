@@ -16,7 +16,10 @@
 	max-width: $sidebar-width - ( 2 * $grid-unit-20 );
 	align-items: center;
 	margin-top: $grid-unit-10;
-	margin-bottom: $grid-unit-30;
+
+	&:not(.is-next-has-no-margin-bottom) {
+		margin-bottom: $grid-unit-30;
+	}
 
 	.components-unit-control-wrapper {
 		.components-input-control__label {
