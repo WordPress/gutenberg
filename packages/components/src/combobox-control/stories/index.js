@@ -266,7 +266,7 @@ const mapCountryOption = ( country ) => ( {
 
 const countryOptions = countries.map( mapCountryOption );
 
-function CountryCodeComboboxControl( args ) {
+function Template( args ) {
 	const [ value, setValue ] = useState( null );
 
 	return (
@@ -275,15 +275,59 @@ function CountryCodeComboboxControl( args ) {
 				{ ...args }
 				value={ value }
 				onChange={ setValue }
-				label="Select a country"
-				options={ countryOptions }
 			/>
 			<p>Value: { value }</p>
 		</>
 	);
 }
-export const _default = CountryCodeComboboxControl.bind( {} );
-_default.args = {
+export const Default = Template.bind( {} );
+Default.args = {
 	__next36pxDefaultSize: false,
 	allowReset: false,
+	label: 'Select a country',
+	options: countryOptions,
+};
+
+const authorOptions = [
+	{
+		value: 'parsley',
+		label: 'Parsley Montana',
+		age: 48,
+		country: 'Germany',
+	},
+	{
+		value: 'cabbage',
+		label: 'Cabbage New York',
+		age: 44,
+		country: 'France',
+	},
+	{
+		value: 'jake',
+		label: 'Jake Weary',
+		age: 41,
+		country: 'United Kingdom',
+	},
+];
+
+/**
+ * The rendered output of each suggestion can be customized by passing a
+ * render function to the `__experimentalRenderItem` prop. (This is still an experimental feature
+ * and is subject to change.)
+ */
+export const WithCustomRenderItem = Template.bind( {} );
+WithCustomRenderItem.args = {
+	...Default.args,
+	label: 'Select an author',
+	options: authorOptions,
+	__experimentalRenderItem: ( { item } ) => {
+		const { label, age, country } = item;
+		return (
+			<div>
+				<div style={ { marginBottom: '0.2rem' } }>{ label }</div>
+				<small>
+					Age: { age }, Country: { country }
+				</small>
+			</div>
+		);
+	},
 };

@@ -27,7 +27,6 @@ class WP_Style_Engine_CSS_Rules_Store {
 	 */
 	protected static $stores = array();
 
-
 	/**
 	 * The store name.
 	 *
@@ -114,7 +113,6 @@ class WP_Style_Engine_CSS_Rules_Store {
 	 * @return WP_Style_Engine_CSS_Rule|null Returns a WP_Style_Engine_CSS_Rule object, or null if the selector is empty.
 	 */
 	public function add_rule( $selector ) {
-
 		$selector = trim( $selector );
 
 		// Bail early if there is no selector.

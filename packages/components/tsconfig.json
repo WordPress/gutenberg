@@ -72,6 +72,7 @@
 		"src/navigable-container/**/*",
 		"src/navigator/**/*",
 		"src/number-control/**/*",
+		"src/placeholder/**/*",
 		"src/popover/**/*",
 		"src/radio-control/**/*",
 		"src/range-control/**/*",
