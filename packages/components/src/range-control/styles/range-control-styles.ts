@@ -29,7 +29,7 @@ const thumbSize = 12;
 export const Root = styled.div`
 	-webkit-tap-highlight-color: transparent;
 	align-items: flex-start;
-	display: inline-flex;
+	display: flex;
 	justify-content: flex-start;
 	padding: 0;
 	position: relative;
