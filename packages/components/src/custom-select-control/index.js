@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Icon, check, chevronDown } from '@wordpress/icons';
+import { Icon, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useState } from '@wordpress/element';
 
@@ -16,7 +16,8 @@ import { useCallback, useState } from '@wordpress/element';
  */
 import { VisuallyHidden } from '../';
 import { Select as SelectControlSelect } from '../select-control/styles/select-control-styles';
-import InputBase from '../input-control/input-base';
+import SelectControlChevronDown from '../select-control/chevron-down';
+import { InputBaseWithBackCompatMinWidth } from './styles';
 import { StyledLabel } from '../base-control/styles/base-control-styles';
 
 const itemToString = ( item ) => item?.name;
@@ -147,12 +148,16 @@ export default function CustomSelectControl( {
 					{ label }
 				</StyledLabel>
 			) }
-			<InputBase
+			<InputBaseWithBackCompatMinWidth
+				__next36pxDefaultSize={ __next36pxDefaultSize }
+				__nextUnconstrainedWidth={ __nextUnconstrainedWidth }
 				isFocused={ isOpen || isFocused }
 				__unstableInputWidth={
 					__nextUnconstrainedWidth ? undefined : 'auto'
 				}
 				labelPosition={ __nextUnconstrainedWidth ? undefined : 'top' }
+				size={ size }
+				suffix={ <SelectControlChevronDown /> }
 			>
 				<SelectControlSelect
 					as="button"
@@ -164,24 +169,13 @@ export default function CustomSelectControl( {
 						// This is needed because some speech recognition software don't support `aria-labelledby`.
 						'aria-label': label,
 						'aria-labelledby': undefined,
-						className: classnames(
-							'components-custom-select-control__button',
-							{
-								'is-next-unconstrained-width':
-									__nextUnconstrainedWidth,
-							}
-						),
+						className: 'components-custom-select-control__button',
 						describedBy: getDescribedBy(),
 					} ) }
 				>
 					{ itemToString( selectedItem ) }
-					<Icon
-						icon={ chevronDown }
-						className="components-custom-select-control__button-icon"
-						size={ 18 }
-					/>
 				</SelectControlSelect>
-			</InputBase>
+			</InputBaseWithBackCompatMinWidth>
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
 				{ isOpen &&
