@@ -241,6 +241,8 @@ const Popover = (
 						frameOffset[ mainAxis ] + normalizedOffset;
 					const mainDimension = mainAxis === 'y' ? 'height' : 'width';
 					if (
+						// TODO: does this make sense only for top positioned popovers?
+						currentPlacement.startsWith( 'top' ) &&
 						// If the reference has no height we don't need to do anything.
 						referenceRect[ mainDimension ] &&
 						referenceRect[ mainAxis ] < 0 &&
