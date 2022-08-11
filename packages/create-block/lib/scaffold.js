@@ -10,7 +10,7 @@ const initBlock = require( './init-block' );
 const initPackageJSON = require( './init-package-json' );
 const initWPScripts = require( './init-wp-scripts' );
 const initWPEnv = require( './init-wp-env' );
-const { code, info, success } = require( './log' );
+const { code, info, success, error } = require( './log' );
 const { writeOutputAsset, writeOutputTemplate } = require( './output' );
 
 module.exports = async (
@@ -47,6 +47,18 @@ module.exports = async (
 ) => {
 	slug = slug.toLowerCase();
 	namespace = namespace.toLowerCase();
+
+	/**
+	 * --no-plugin relies on the used template supporting the [blockTemplatesPath property](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/#blocktemplatespath).
+	 * If the blockOutputTemplates object has no properties, we can assume that there was a custom --template passed that
+	 * doesn't support it.
+	 */
+	if ( ! plugin && Object.keys( blockOutputTemplates ) < 1 ) {
+		error(
+			'No block files found in the template. Please ensure that the template supports the blockTemplatesPath property.'
+		);
+		return;
+	}
 
 	info( '' );
 	info(
