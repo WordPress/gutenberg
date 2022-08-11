@@ -10,7 +10,7 @@ import styled from '@emotion/styled';
 import { COLORS, rtl } from '../../utils';
 import { space } from '../../ui/utils/space';
 import type { SelectControlProps } from '../types';
-import InputControlSuffixWrapper from '../..//input-control/input-suffix-wrapper';
+import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper';
 
 interface SelectProps
 	extends Pick< SelectControlProps, '__next36pxDefaultSize' | 'disabled' > {
