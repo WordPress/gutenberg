@@ -117,15 +117,24 @@ export function CustomColorPickerDropdown( {
 	popoverProps: receivedPopoverProps,
 	...props
 } ) {
-	// Open below the control point (centered aligned).
 	const popoverProps = useMemo(
 		() => ( {
 			__unstableShift: true,
-			placement: 'bottom',
-			offset: 8,
+			...( isRenderedInSidebar
+				? {
+						// When in the sidebar: open to the left (stacking)
+						placement: 'left-start',
+						offset: 20,
+						// anchor?
+				  }
+				: {
+						// Default behavior: open below the anchor
+						placement: 'bottom',
+						offset: 8,
+				  } ),
 			...receivedPopoverProps,
 		} ),
-		[ receivedPopoverProps ]
+		[ isRenderedInSidebar, receivedPopoverProps ]
 	);
 
 	return (

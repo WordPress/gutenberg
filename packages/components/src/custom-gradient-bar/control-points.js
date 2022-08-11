@@ -75,9 +75,19 @@ function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
 }
 
 function GradientColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
+	// Open the popover below the gradient control/insertion point
+	const popoverProps = useMemo(
+		() => ( {
+			placement: 'bottom',
+			offset: 8,
+		} ),
+		[]
+	);
+
 	return (
 		<CustomColorPickerDropdown
 			isRenderedInSidebar={ isRenderedInSidebar }
+			popoverProps={ popoverProps }
 			{ ...props }
 		/>
 	);
