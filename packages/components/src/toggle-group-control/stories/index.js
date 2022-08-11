@@ -25,7 +25,7 @@ export default {
 	title: 'Components (Experimental)/ToggleGroupControl',
 	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
 	argTypes: {
-		isBorderless: { control: { type: 'boolean' } },
+		__experimentalIsIconGroup: { control: { type: 'boolean' } },
 		size: {
 			control: 'select',
 			options: [ 'default', '__unstable-large' ],

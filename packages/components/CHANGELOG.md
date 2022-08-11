@@ -15,7 +15,6 @@
 
 ### Enhancements
 
--   `ToggleGroupControl`: Add `isBorderless` variant ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
 -   `ToggleGroupControlOptionIcon`: Maintain square proportions ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
 -   `FontSizePicker`: Add large size variant ([#42716](https://github.com/WordPress/gutenberg/pull/42716/)).
 -   `Popover`: tidy up code, add more comments ([#42944](https://github.com/WordPress/gutenberg/pull/42944)).
@@ -28,6 +27,7 @@
 
 ### Internal
 
+-   `ToggleGroupControl`: Add `__experimentalIsIconGroup` prop ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
 -   `Flex`, `FlexItem`, `FlexBlock`: Convert to TypeScript ([#42537](https://github.com/WordPress/gutenberg/pull/42537)).
 -   `InputControl`: Fix incorrect `size` prop passing ([#42793](https://github.com/WordPress/gutenberg/pull/42793)).
 -   `Popover`: rewrite Storybook examples using controls [#42903](https://github.com/WordPress/gutenberg/pull/42903)).
