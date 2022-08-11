@@ -13,9 +13,14 @@ export default function ToggleGroupControlOptionIcon(
 		false
 	>
 ) {
-	const { icon, ...restProps } = props;
+	const { icon, label, ...restProps } = props;
 	return (
-		<ToggleGroupControlOptionBase { ...restProps } isIcon>
+		<ToggleGroupControlOptionBase
+			{ ...restProps }
+			isIcon
+			aria-label={ label }
+			showTooltip
+		>
 			<Icon icon={ icon } />
 		</ToggleGroupControlOptionBase>
 	);

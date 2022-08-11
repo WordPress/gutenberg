@@ -24,13 +24,17 @@ export type ToggleGroupControlOptionBaseProps = {
 
 export type ToggleGroupControlOptionIconProps = Omit<
 	ToggleGroupControlOptionBaseProps,
-	'children'
+	'children' | 'showTooltip'
 > & {
 	/**
 	 * Icon displayed as the content of the option. Usually one of the icons from
 	 * the `@wordpress/icons` package, or a custom React `<svg>` icon.
 	 */
 	icon: JSX.Element;
+	/**
+	 * The text to accessibly label the icon option. Will also be shown in a tooltip.
+	 */
+	label: string;
 };
 
 export type ToggleGroupControlOptionProps = Omit<

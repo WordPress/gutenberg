@@ -156,14 +156,12 @@ export const WithIcons = ( props ) => {
 			<ToggleGroupControlOptionIcon
 				value="uppercase"
 				icon={ formatUppercase }
-				showTooltip={ true }
-				aria-label="Uppercase"
+				label="Uppercase"
 			/>
 			<ToggleGroupControlOptionIcon
 				value="lowercase"
 				icon={ formatLowercase }
-				showTooltip={ true }
-				aria-label="Lowercase"
+				label="Lowercase"
 			/>
 		</ToggleGroupControl>
 	);
