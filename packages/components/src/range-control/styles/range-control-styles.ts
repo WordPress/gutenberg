@@ -29,7 +29,7 @@ const thumbSize = 12;
 export const Root = styled.div`
 	-webkit-tap-highlight-color: transparent;
 	align-items: flex-start;
-	display: inline-flex;
+	display: flex;
 	justify-content: flex-start;
 	padding: 0;
 	position: relative;
@@ -40,8 +40,12 @@ export const Root = styled.div`
 const wrapperColor = ( { color = COLORS.ui.borderFocus }: WrapperProps ) =>
 	css( { color } );
 
-const wrapperMargin = ( { marks }: WrapperProps ) =>
-	css( { marginBottom: marks ? 16 : undefined } );
+const wrapperMargin = ( { marks, __nextHasNoMarginBottom }: WrapperProps ) => {
+	if ( ! __nextHasNoMarginBottom ) {
+		return css( { marginBottom: marks ? 16 : undefined } );
+	}
+	return '';
+};
 
 export const Wrapper = styled.div< WrapperProps >`
 	color: ${ COLORS.blue.medium.focus };
@@ -56,12 +60,14 @@ export const Wrapper = styled.div< WrapperProps >`
 `;
 
 export const BeforeIconWrapper = styled.span`
+	display: flex; // ensures the height isn't affected by line-height
 	margin-top: ${ railHeight }px;
 
 	${ rtl( { marginRight: 6 } ) }
 `;
 
 export const AfterIconWrapper = styled.span`
+	display: flex; // ensures the height isn't affected by line-height
 	margin-top: ${ railHeight }px;
 
 	${ rtl( { marginLeft: 6 } ) }

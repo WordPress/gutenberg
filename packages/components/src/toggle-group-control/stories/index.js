@@ -18,6 +18,7 @@ import {
 	ToggleGroupControlOptionIcon,
 } from '../index';
 import { View } from '../../view';
+import { HStack } from '../../h-stack';
 import Button from '../../button';
 
 export default {
@@ -26,6 +27,7 @@ export default {
 	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
 	argTypes: {
 		__experimentalIsIconGroup: { control: { type: 'boolean' } },
+		__nextHasNoMarginBottom: { control: 'boolean' },
 		size: {
 			control: 'radio',
 			options: [ 'default', '__unstable-large' ],
@@ -187,7 +189,7 @@ export const WithReset = ( props ) => {
 		/>
 	) );
 	return (
-		<View>
+		<HStack alignment="center" justify="flex-start">
 			<ToggleGroupControl
 				{ ...props }
 				onChange={ setAlignState }
@@ -200,9 +202,10 @@ export const WithReset = ( props ) => {
 			<Button onClick={ () => setAlignState( undefined ) } isTertiary>
 				Reset
 			</Button>
-		</View>
+		</HStack>
 	);
 };
 WithReset.args = {
 	...Default.args,
+	__nextHasNoMarginBottom: true,
 };
