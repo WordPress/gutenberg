@@ -216,7 +216,7 @@ class WP_HTML_Walker {
 	 *
 	 * @since 6.1.0
 	 *
-	 * @param array|string|WP_HTML_Tag_Find_Descriptor $query {
+	 * @param array|string $query {
 	 *     Which tag name to find, having which class, etc.
 	 *
 	 *     @type string|null $tag_name     Which tag to find, or `null` for "any tag."
@@ -245,22 +245,17 @@ class WP_HTML_Walker {
 				return false;
 			}
 
-			// Parse all the attributes of the current tag.
-			while ( $this->parse_next_attribute() ) {
-				// Twiddle our thumbs...
+			$this->parse_all_attributes();
+
+			if ( $this->matches() ) {
+				$already_found++;
 			}
 
 			$tag_name = $this->get_tag();
 			if ( 'title' === $tag_name || 'textarea' === $tag_name ) {
 				$this->skip_rcdata( $tag_name );
-				continue;
 			} elseif ( 'script' === $tag_name ) {
-				$this->skip_script();
-				continue;
-			}
-
-			if ( $this->matches() ) {
-				$already_found++;
+				$this->skip_script_data();
 			}
 		} while ( $already_found < $this->sought_match_offset );
 
@@ -288,24 +283,74 @@ class WP_HTML_Walker {
 			if ( 0 === strspn( $this->html, " \t\f\r\n/>", $this->parsed_bytes ) ) {
 				continue;
 			}
-			// Parse all the attributes of the tag closer.
-			while ( $this->parse_next_attribute() ) {
-				// Twiddle our thumbs...
-			}
+			$this->parse_all_attributes( false );
 		}
 	}
 
 	/**
-	 * Skips the contents of <script> tags by bailing to the end of the document.
-	 *
-	 * @TODO: This needs to implement the script states in the HTML specification
-	 *        so that we don't have to abort processing documents when we find
-	 *        script tags.
+	 * Skips the contents of <script> tags.
 	 *
 	 * @since 6.1.0
 	 */
-	private function skip_script() {
-		$this->parsed_bytes = strlen( $this->html );
+	private function skip_script_data() {
+		if ( 1 !== preg_match( '~<!--|</script[ \t\f\r\n/>]~miu', $this->html, $matches, PREG_OFFSET_CAPTURE, $this->parsed_bytes ) ) {
+			$this->parsed_bytes = strlen( $this->html );
+			return;
+		}
+		if ( '<!--' === $matches[0][0] ) {
+			$this->parsed_bytes = $matches[0][1] + 4;
+			$this->skip_script_data_escaped();
+		} else {
+			$at = $matches[0][1] + 8;
+			$this->parsed_bytes = $at;
+			$this->parse_all_attributes( false );
+		}
+	}
+
+	/**
+	 * Skips to the end of the script-data-escaped-state.
+	 *
+	 * @see https://html.spec.whatwg.org/multipage/parsing.html#script-data-escaped-state
+	 * @since 6.1.0
+	 */
+	private function skip_script_data_escaped(  ) {
+		if ( 1 !== preg_match( '~-->|</?script[ \t\f\r\n/>]~miu', $this->html, $matches, PREG_OFFSET_CAPTURE, $this->parsed_bytes ) ) {
+			$this->parsed_bytes = strlen( $this->html );
+			return;
+		}
+		if ( '-->' === $matches[0][0] ) {
+			$this->parsed_bytes = $matches[0][1] + 3;
+			$this->skip_script_data();
+		} else if ( 8 === strlen( $matches[0][0] ) ) { // <script
+			$this->parsed_bytes = $matches[0][1] + 7;
+			// Parse all the attributes of the current tag.
+			$this->parse_all_attributes( false );
+			$this->skip_script_data_double_escape();
+		} else { // </script
+			$this->parsed_bytes = $matches[0][1] + 8;
+			$this->parse_all_attributes( false );
+		}
+	}
+
+	/**
+	 * Skips to the end of the script-data-double-escape-state.
+	 *
+	 * @see https://html.spec.whatwg.org/multipage/parsing.html#script-data-escaped-state
+	 * @since 6.1.0
+	 */
+	private function skip_script_data_double_escape(  ) {
+		if ( 1 !== preg_match( '~-->|</script[ \t\f\r\n/>]~miu', $this->html, $matches, PREG_OFFSET_CAPTURE, $this->parsed_bytes ) ) {
+			$this->parsed_bytes = strlen( $this->html );
+			return;
+		}
+		if ( '-->' === $matches[0][0] ) {
+			$this->parsed_bytes = $matches[0][1] + 3;
+			$this->skip_script_data();
+		} else {
+			$this->parsed_bytes = $matches[0][1] + 8;
+			$this->parse_all_attributes( false );
+			$this->skip_script_data();
+		}
 	}
 
 	/**
@@ -419,11 +464,24 @@ class WP_HTML_Walker {
 	}
 
 	/**
-	 * Parses the next attribute.
+	 * Parses all attributes of the current tag.
 	 *
+	 * @param boolean $store Should the attributes be stored in $this->attributes?
 	 * @since 6.1.0
 	 */
-	private function parse_next_attribute() {
+	private function parse_all_attributes( $store = true ) {
+		while ( $this->parse_next_attribute( $store ) ) {
+			// Twiddle our thumbs...
+		}
+	}
+
+	/**
+	 * Parses the next attribute.
+	 *
+	 * @param boolean $store Should the attribute be stored in $this->attributes?
+	 * @since 6.1.0
+	 */
+	private function parse_next_attribute( $store = true ) {
 		$this->skip_whitespace();
 
 		/*
@@ -471,6 +529,10 @@ class WP_HTML_Walker {
 			$value_start   = $this->parsed_bytes;
 			$value_length  = 0;
 			$attribute_end = $attribute_start + $name_length;
+		}
+
+		if ( ! $store ) {
+			return true;
 		}
 
 		// If an attribute is listed many times, only use the first declaration and ignore the rest.

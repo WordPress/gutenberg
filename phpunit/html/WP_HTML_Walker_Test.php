@@ -630,11 +630,45 @@ HTML;
 		);
 	}
 
-	public function test_bales_out_when_script_tag_found() {
-		$w = new WP_HTML_Walker( '<div><script></script><span>' );
+	/**
+	 * @ticket 56299
+	 * @dataProvider data_script_state
+	 */
+	public function test_ignores_contents_of_a_script_tag( $script_then_div ) {
+		$w = new WP_HTML_Walker( $script_then_div );
+		$w->next_tag();
+		$this->assertSame( 'script', $w->get_tag() );
 		$w->next_tag();
 		$this->assertSame( 'div', $w->get_tag() );
-		$this->assertFalse( $w->next_tag() );
+	}
+
+	public function data_script_state() {
+		return array(
+			'Simple script'                          => array(
+				'<script><span class="d-none d-md-inline">Back to notifications</span></script><div></div>'
+			),
+			'Script with a comment opener inside should end at the next script tag closer (dash dash escaped state)' => array(
+				'<script class="d-md-none"><!--</script><div></div>-->'
+			),
+			'Script with a comment opener and a script tag opener inside should end two script tag closer later (double escaped state)' => array(
+				'<script class="d-md-none"><!--<script><span></script><span></span></script><div></div>-->'
+			),
+			'Script with a commented a script tag opener inside should at the next tag closer (dash dash escaped state)' => array(
+				'<script class="d-md-none"><!--<script>--><span></script><div></div>-->'
+			),
+			'Script closer with another script tag in closer attributes' => array(
+				'<script><span class="d-none d-md-inline">Back to notifications</title</span></script <script><div></div>'
+			),
+			'Script closer with attributes'          => array(
+				'<script class="d-md-none"><span class="d-none d-md-inline">Back to notifications</span></script id="test"><div></div>'
+			),
+			'Script opener with title closer inside' => array(
+				'<script class="d-md-none"></title></script><div></div>'
+			),
+			'Complex script with many parsing states' => array(
+				'<script class="d-md-none"><!--<script>--><script><span><!--<span><script</script>--></script><div></div>-->'
+			),
+		);
 	}
 
 	/**
