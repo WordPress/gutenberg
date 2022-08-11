@@ -40,6 +40,9 @@ export default function SpacingInputControl( {
 	type,
 	minimumCustomValue,
 } ) {
+	let selectListSizes = spacingSizes;
+	const showRangeControl = spacingSizes.length <= 8;
+
 	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
 		value !== undefined && ! isValueSpacingPreset( value )
 	);
@@ -48,11 +51,29 @@ export default function SpacingInputControl( {
 		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
 	} );
 
-	let currentValue;
+	let currentValue = null;
 
-	if ( isMixed ) {
-		currentValue = null;
-	} else {
+	const showCustomValueInSelectList =
+		! showRangeControl &&
+		! showCustomValueControl &&
+		value !== undefined &&
+		( ! isValueSpacingPreset( value ) ||
+			( isValueSpacingPreset( value ) && isMixed ) );
+
+	if ( showCustomValueInSelectList ) {
+		selectListSizes = [
+			...spacingSizes,
+			{
+				name: ! isMixed
+					? // translators: A custom measurement, eg. a number followed by a unit like 12px.
+					  sprintf( __( 'Custom (%s)' ), value )
+					: __( 'Mixed' ),
+				slug: 'custom',
+				size: value,
+			},
+		];
+		currentValue = selectListSizes.length - 1;
+	} else if ( ! isMixed ) {
 		currentValue = ! showCustomValueControl
 			? getSliderValueFromPreset( value, spacingSizes )
 			: getCustomValueFromPreset( value, spacingSizes );
@@ -107,7 +128,7 @@ export default function SpacingInputControl( {
 		? customTooltipContent( currentValue )
 		: __( 'Mixed' );
 
-	const options = spacingSizes.map( ( size, index ) => ( {
+	const options = selectListSizes.map( ( size, index ) => ( {
 		key: index,
 		name: size.name,
 	} ) );
@@ -125,7 +146,7 @@ export default function SpacingInputControl( {
 	);
 
 	const showHint =
-		spacingSizes.length <= 9 &&
+		showRangeControl &&
 		! showCustomValueControl &&
 		currentValueHint !== undefined;
 
@@ -196,7 +217,7 @@ export default function SpacingInputControl( {
 					/>
 				</>
 			) }
-			{ spacingSizes.length <= 9 && ! showCustomValueControl && (
+			{ showRangeControl && ! showCustomValueControl && (
 				<RangeControl
 					className="components-spacing-sizes-control__range-control"
 					value={ currentValue }
@@ -221,7 +242,7 @@ export default function SpacingInputControl( {
 					hideLabelFromVision={ true }
 				/>
 			) }
-			{ spacingSizes.length > 9 && ! showCustomValueControl && (
+			{ ! showRangeControl && ! showCustomValueControl && (
 				<CustomSelectControl
 					className="components-spacing-sizes-control__custom-select-control"
 					value={
