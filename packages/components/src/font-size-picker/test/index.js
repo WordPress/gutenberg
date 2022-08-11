@@ -205,7 +205,7 @@ describe( 'FontSizePicker', () => {
 				expect( element ).toBeInTheDocument();
 				expect( element.children[ 0 ].textContent ).toBe( 'L' );
 			} );
-			it( 'should use incremental sequence of t-shirt as labels if we have complex css', () => {
+			it( 'should use incremental sequence of t-shirt sizes as labels if we have complex css', () => {
 				const fontSizes = [
 					...options,
 					{
@@ -222,7 +222,7 @@ describe( 'FontSizePicker', () => {
 				);
 				const largeElement = screen.getByLabelText( 'Large' );
 				expect( largeElement ).toBeInTheDocument();
-				expect( largeElement.children[ 0 ].textContent ).toBe( 'L' );
+				expect( largeElement ).toHaveTextContent( 'L' );
 
 				const extraLargeElement =
 					screen.getByLabelText( 'Extra Large' );

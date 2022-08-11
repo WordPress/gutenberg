@@ -102,7 +102,7 @@ export function getToggleGroupOptions(
 		return {
 			key: slug,
 			value: size,
-			label: labelAliases[ index ] || size,
+			label: labelAliases[ index ],
 			name,
 		};
 	} );
