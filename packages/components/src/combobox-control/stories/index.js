@@ -259,6 +259,7 @@ export default {
 	component: ComboboxControl,
 	argTypes: {
 		__nextHasNoMarginBottom: { control: { type: 'boolean' } },
+		onChange: { action: 'onChange' },
 	},
 };
 
@@ -269,7 +270,7 @@ const mapCountryOption = ( country ) => ( {
 
 const countryOptions = countries.map( mapCountryOption );
 
-function Template( args ) {
+function Template( { onChange, ...args } ) {
 	const [ value, setValue ] = useState( null );
 
 	return (
@@ -277,9 +278,11 @@ function Template( args ) {
 			<ComboboxControl
 				{ ...args }
 				value={ value }
-				onChange={ setValue }
+				onChange={ ( ...changeArgs ) => {
+					setValue( ...changeArgs );
+					onChange( ...changeArgs );
+				} }
 			/>
-			<p>Value: { value }</p>
 		</>
 	);
 }
