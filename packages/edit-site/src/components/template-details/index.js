@@ -6,6 +6,7 @@ import {
 	Button,
 	MenuGroup,
 	MenuItem,
+	__experimentalVStack as VStack,
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -19,6 +20,7 @@ import { store as editSiteStore } from '../../store';
 import TemplateAreas from './template-areas';
 import EditTemplateTitle from './edit-template-title';
 import { useLink } from '../routes/link';
+import TemplatePartAreaSelector from './template-part-area-selector';
 
 export default function TemplateDetails( { template, onClose } ) {
 	const { title, description } = useSelect(
@@ -53,7 +55,7 @@ export default function TemplateDetails( { template, onClose } ) {
 
 	return (
 		<div className="edit-site-template-details">
-			<div className="edit-site-template-details__group">
+			<VStack className="edit-site-template-details__group" spacing={ 3 }>
 				{ canEditTitle ? (
 					<EditTemplateTitle template={ template } />
 				) : (
@@ -76,7 +78,11 @@ export default function TemplateDetails( { template, onClose } ) {
 						{ description }
 					</Text>
 				) }
-			</div>
+
+				{ isTemplatePart && (
+					<TemplatePartAreaSelector id={ template.id } />
+				) }
+			</VStack>
 
 			<TemplateAreas closeTemplateDetailsDropdown={ onClose } />
 
