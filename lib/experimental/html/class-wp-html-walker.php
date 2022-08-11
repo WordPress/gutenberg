@@ -253,9 +253,10 @@ class WP_HTML_Walker {
 			$tag_name = $this->get_tag();
 			if ( 'title' === $tag_name || 'textarea' === $tag_name ) {
 				$this->skip_rcdata( $tag_name );
+				continue;
 			} elseif ( 'script' === $tag_name ) {
-				$this->parsed_bytes = strlen( $this->html );
-				return false;
+				$this->skip_script();
+				continue;
 			}
 
 			if ( $this->matches() ) {
@@ -292,6 +293,19 @@ class WP_HTML_Walker {
 				// Twiddle our thumbs...
 			}
 		}
+	}
+
+	/**
+	 * Skips the contents of <script> tags by bailing to the end of the document.
+	 *
+	 * @TODO: This needs to implement the script states in the HTML specification
+	 *        so that we don't have to abort processing documents when we find
+	 *        script tags.
+	 *
+	 * @since 6.1.0
+	 */
+	private function skip_script() {
+		$this->parsed_bytes = strlen( $this->html );
 	}
 
 	/**
