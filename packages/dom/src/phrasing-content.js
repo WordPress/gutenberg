@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { omit, without } from 'lodash';
-
-/**
  * All phrasing content elements.
  *
  * @see https://www.w3.org/TR/2011/WD-html5-20110525/content-models.html#phrasing-content-0
@@ -64,9 +59,13 @@ const textContentSchema = {
 // Recursion is needed.
 // Possible: strong > em > strong.
 // Impossible: strong > strong.
-without( Object.keys( textContentSchema ), '#text', 'br' ).forEach( ( tag ) => {
-	textContentSchema[ tag ].children = omit( textContentSchema, tag );
-} );
+const excludedElements = [ '#text', 'br' ];
+Object.keys( textContentSchema )
+	.filter( ( element ) => ! excludedElements.includes( element ) )
+	.forEach( ( tag ) => {
+		const { [ tag ]: removedTag, ...restSchema } = textContentSchema;
+		textContentSchema[ tag ].children = restSchema;
+	} );
 
 /**
  * Embedded content elements.
@@ -151,24 +150,27 @@ export function getPhrasingContentSchema( context ) {
 		return phrasingContentSchema;
 	}
 
-	return omit(
-		{
-			...phrasingContentSchema,
-			// We shouldn't paste potentially sensitive information which is not
-			// visible to the user when pasted, so strip the attributes.
-			ins: { children: phrasingContentSchema.ins.children },
-			del: { children: phrasingContentSchema.del.children },
-		},
-		[
-			'u', // Used to mark misspelling. Shouldn't be pasted.
-			'abbr', // Invisible.
-			'data', // Invisible.
-			'time', // Invisible.
-			'wbr', // Invisible.
-			'bdi', // Invisible.
-			'bdo', // Invisible.
-		]
-	);
+	/**
+	 * @type {Partial<ContentSchema>}
+	 */
+	const {
+		u, // Used to mark misspelling. Shouldn't be pasted.
+		abbr, // Invisible.
+		data, // Invisible.
+		time, // Invisible.
+		wbr, // Invisible.
+		bdi, // Invisible.
+		bdo, // Invisible.
+		...remainingContentSchema
+	} = {
+		...phrasingContentSchema,
+		// We shouldn't paste potentially sensitive information which is not
+		// visible to the user when pasted, so strip the attributes.
+		ins: { children: phrasingContentSchema.ins.children },
+		del: { children: phrasingContentSchema.del.children },
+	};
+
+	return remainingContentSchema;
 }
 
 /**

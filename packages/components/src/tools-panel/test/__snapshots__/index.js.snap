@@ -5,6 +5,7 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
   display: grid;
   gap: calc( 4px * 3 );
   grid-template-columns: repeat( 2, 1fr );
+  grid-template-columns: repeat( 2, minmax(0, 1fr) );
   -webkit-column-gap: calc(4px * 4);
   column-gap: calc(4px * 4);
   row-gap: calc(4px * 6);
@@ -15,7 +16,7 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
 
 .emotion-0>div:not( :first-of-type ) {
   display: grid;
-  grid-template-columns: repeat( 2, 1fr );
+  grid-template-columns: repeat( 2, minmax(0, 1fr) );
   -webkit-column-gap: calc(4px * 4);
   column-gap: calc(4px * 4);
   row-gap: calc(4px * 6);

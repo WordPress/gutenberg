@@ -34,9 +34,6 @@ class WP_Style_Engine_CSS_Declarations {
 	 * @param array $declarations An array of declarations (property => value pairs).
 	 */
 	public function __construct( $declarations = array() ) {
-		if ( empty( $declarations ) ) {
-			return;
-		}
 		$this->add_declarations( $declarations );
 	}
 
@@ -94,12 +91,12 @@ class WP_Style_Engine_CSS_Declarations {
 	/**
 	 * Remove multiple declarations.
 	 *
-	 * @param array $declarations An array of properties.
+	 * @param array $properties An array of properties.
 	 *
 	 * @return void
 	 */
-	public function remove_declarations( $declarations = array() ) {
-		foreach ( $declarations as $property ) {
+	public function remove_declarations( $properties = array() ) {
+		foreach ( $properties as $property ) {
 			$this->remove_declaration( $property );
 		}
 	}
@@ -111,6 +108,19 @@ class WP_Style_Engine_CSS_Declarations {
 	 */
 	public function get_declarations() {
 		return $this->declarations;
+	}
+
+	/**
+	 * Filters a CSS property + value pair.
+	 *
+	 * @param string $property The CSS property.
+	 * @param string $value    The value to be filtered.
+	 * @param string $spacer   The spacer between the colon and the value. Defaults to an empty string.
+	 *
+	 * @return string The filtered declaration as a single string.
+	 */
+	protected static function filter_declaration( $property, $value, $spacer = '' ) {
+		return safecss_filter_attr( "{$property}:{$spacer}{$value}" );
 	}
 
 	/**
@@ -127,10 +137,10 @@ class WP_Style_Engine_CSS_Declarations {
 		$indent              = $should_prettify ? str_repeat( "\t", $indent_count ) : '';
 		$suffix              = $should_prettify ? ' ' : '';
 		$suffix              = $should_prettify && $indent_count > 0 ? "\n" : $suffix;
+		$spacer              = $should_prettify ? ' ' : '';
 
 		foreach ( $declarations_array as $property => $value ) {
-			$spacer               = $should_prettify ? ' ' : '';
-			$filtered_declaration = esc_html( safecss_filter_attr( "{$property}:{$spacer}{$value}" ) );
+			$filtered_declaration = static::filter_declaration( $property, $value, $spacer );
 			if ( $filtered_declaration ) {
 				$declarations_output .= "{$indent}{$filtered_declaration};$suffix";
 			}

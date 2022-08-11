@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { filterURLForDisplay } from '@wordpress/url';
+import { filterURLForDisplay, safeDecodeURIComponent } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -18,5 +18,5 @@ export function usePostURLLabel() {
 		( select ) => select( editorStore ).getCurrentPost().link,
 		[]
 	);
-	return filterURLForDisplay( postLink );
+	return filterURLForDisplay( safeDecodeURIComponent( postLink ) );
 }
