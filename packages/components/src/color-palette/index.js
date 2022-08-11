@@ -34,15 +34,9 @@ function SinglePalette( {
 	actions,
 } ) {
 	const colorOptions = useMemo( () => {
-		// In case the palette contains multiple entries with the same color value,
-		// only consider the first instance as the "selected" one.
-		const firstMatchedColorIndex = colors.findIndex(
-			( { color } ) => color === value
-		);
-
 		return colors.map( ( { color, name }, index ) => {
 			const colordColor = colord( color );
-			const isSelected = firstMatchedColorIndex === index;
+			const isSelected = value === color;
 
 			return (
 				<CircularOptionPicker.Option
@@ -66,7 +60,7 @@ function SinglePalette( {
 					}
 					style={ { backgroundColor: color, color } }
 					onClick={
-						value === color ? clearColor : () => onChange( color )
+						isSelected ? clearColor : () => onChange( color )
 					}
 					aria-label={
 						name
