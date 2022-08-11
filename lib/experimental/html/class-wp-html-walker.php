@@ -207,7 +207,7 @@ class WP_HTML_Walker {
 	 * @param string $html HTML to process.
 	 */
 	public function __construct( $html ) {
-		$this->html = $html;
+		$this->html       = $html;
 		$this->last_query = null;
 	}
 
@@ -245,7 +245,7 @@ class WP_HTML_Walker {
 				return false;
 			}
 
-			$this->parse_all_attributes();
+			$this->parse_tag_opener_attributes();
 
 			if ( $this->matches() ) {
 				$already_found++;
@@ -274,7 +274,7 @@ class WP_HTML_Walker {
 		while ( true ) {
 			// Find a potential tag closer.
 			$closer = "</{$tag_name}";
-			$at = strpos( $this->html, $closer, $this->parsed_bytes );
+			$at     = strpos( $this->html, $closer, $this->parsed_bytes );
 			if ( false === $at ) {
 				return;
 			}
@@ -283,7 +283,7 @@ class WP_HTML_Walker {
 			if ( 0 === strspn( $this->html, " \t\f\r\n/>", $this->parsed_bytes ) ) {
 				continue;
 			}
-			$this->parse_all_attributes( false );
+			$this->skip_tag_closer_attributes();
 		}
 	}
 
@@ -301,9 +301,9 @@ class WP_HTML_Walker {
 			$this->parsed_bytes = $matches[0][1] + 4;
 			$this->skip_script_data_escaped();
 		} else {
-			$at = $matches[0][1] + 8;
+			$at                 = $matches[0][1] + 8;
 			$this->parsed_bytes = $at;
-			$this->parse_all_attributes( false );
+			$this->skip_tag_closer_attributes();
 		}
 	}
 
@@ -313,7 +313,7 @@ class WP_HTML_Walker {
 	 * @see https://html.spec.whatwg.org/multipage/parsing.html#script-data-escaped-state
 	 * @since 6.1.0
 	 */
-	private function skip_script_data_escaped(  ) {
+	private function skip_script_data_escaped() {
 		if ( 1 !== preg_match( '~-->|</?script[ \t\f\r\n/>]~miu', $this->html, $matches, PREG_OFFSET_CAPTURE, $this->parsed_bytes ) ) {
 			$this->parsed_bytes = strlen( $this->html );
 			return;
@@ -321,14 +321,14 @@ class WP_HTML_Walker {
 		if ( '-->' === $matches[0][0] ) {
 			$this->parsed_bytes = $matches[0][1] + 3;
 			$this->skip_script_data();
-		} else if ( 8 === strlen( $matches[0][0] ) ) { // <script
+		} elseif ( 8 === strlen( $matches[0][0] ) ) { // <script
 			$this->parsed_bytes = $matches[0][1] + 7;
 			// Parse all the attributes of the current tag.
-			$this->parse_all_attributes( false );
+			$this->skip_tag_closer_attributes();
 			$this->skip_script_data_double_escape();
 		} else { // </script
 			$this->parsed_bytes = $matches[0][1] + 8;
-			$this->parse_all_attributes( false );
+			$this->skip_tag_closer_attributes();
 		}
 	}
 
@@ -338,7 +338,7 @@ class WP_HTML_Walker {
 	 * @see https://html.spec.whatwg.org/multipage/parsing.html#script-data-escaped-state
 	 * @since 6.1.0
 	 */
-	private function skip_script_data_double_escape(  ) {
+	private function skip_script_data_double_escape() {
 		if ( 1 !== preg_match( '~-->|</script[ \t\f\r\n/>]~miu', $this->html, $matches, PREG_OFFSET_CAPTURE, $this->parsed_bytes ) ) {
 			$this->parsed_bytes = strlen( $this->html );
 			return;
@@ -348,7 +348,7 @@ class WP_HTML_Walker {
 			$this->skip_script_data();
 		} else {
 			$this->parsed_bytes = $matches[0][1] + 8;
-			$this->parse_all_attributes( false );
+			$this->skip_tag_closer_attributes();
 			$this->skip_script_data();
 		}
 	}
@@ -385,10 +385,10 @@ class WP_HTML_Walker {
 			$tag_name_prefix_length = strspn( $html, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', $at + 1 );
 			if ( $tag_name_prefix_length > 0 ) {
 				$at++;
-				$tag_name_length        = $tag_name_prefix_length + strcspn( $html, " \t\f\r\n/>", $at + $tag_name_prefix_length );
+				$tag_name_length          = $tag_name_prefix_length + strcspn( $html, " \t\f\r\n/>", $at + $tag_name_prefix_length );
 				$this->tag_name_starts_at = $at;
-				$this->tag_name_ends_at = $at + $tag_name_length;
-				$this->parsed_bytes     = $at + $tag_name_length;
+				$this->tag_name_ends_at   = $at + $tag_name_length;
+				$this->parsed_bytes       = $at + $tag_name_length;
 				return true;
 			}
 
@@ -466,11 +466,21 @@ class WP_HTML_Walker {
 	/**
 	 * Parses all attributes of the current tag.
 	 *
-	 * @param boolean $store Should the attributes be stored in $this->attributes?
 	 * @since 6.1.0
 	 */
-	private function parse_all_attributes( $store = true ) {
-		while ( $this->parse_next_attribute( $store ) ) {
+	private function parse_tag_opener_attributes() {
+		while ( $this->parse_next_attribute( ) ) {
+			// Twiddle our thumbs...
+		}
+	}
+
+	/**
+	 * Skips all attributes of the current tag.
+	 *
+	 * @since 6.1.0
+	 */
+	private function skip_tag_closer_attributes( ) {
+		while ( $this->parse_next_attribute( 'tag-closer' ) ) {
 			// Twiddle our thumbs...
 		}
 	}
@@ -478,10 +488,10 @@ class WP_HTML_Walker {
 	/**
 	 * Parses the next attribute.
 	 *
-	 * @param boolean $store Should the attribute be stored in $this->attributes?
+	 * @param string $context tag-opener or tag-closer.
 	 * @since 6.1.0
 	 */
-	private function parse_next_attribute( $store = true ) {
+	private function parse_next_attribute( $context = 'tag-opener' ) {
 		$this->skip_whitespace();
 
 		/*
@@ -531,7 +541,7 @@ class WP_HTML_Walker {
 			$attribute_end = $attribute_start + $name_length;
 		}
 
-		if ( ! $store ) {
+		if ( $context !== 'tag-opener' ) {
 			return true;
 		}
 
