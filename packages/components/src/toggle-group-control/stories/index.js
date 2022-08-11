@@ -23,9 +23,11 @@ import Button from '../../button';
 export default {
 	component: ToggleGroupControl,
 	title: 'Components (Experimental)/ToggleGroupControl',
+	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
 	argTypes: {
+		__experimentalIsIconGroup: { control: { type: 'boolean' } },
 		size: {
-			control: 'select',
+			control: 'radio',
 			options: [ 'default', '__unstable-large' ],
 		},
 	},
@@ -138,6 +140,10 @@ WithAriaLabel.args = {
 	],
 };
 
+/**
+ * The `<ToggleGroupControlOptionIcon>` component can be used for icon options.
+ * In this case, the `__experimentalIsIconGroup` style is preferred.
+ */
 export const WithIcons = ( props ) => {
 	const [ state, setState ] = useState();
 	return (
@@ -151,20 +157,19 @@ export const WithIcons = ( props ) => {
 			<ToggleGroupControlOptionIcon
 				value="uppercase"
 				icon={ formatUppercase }
-				showTooltip={ true }
-				aria-label="Uppercase"
+				label="Uppercase"
 			/>
 			<ToggleGroupControlOptionIcon
 				value="lowercase"
 				icon={ formatLowercase }
-				showTooltip={ true }
-				aria-label="Lowercase"
+				label="Lowercase"
 			/>
 		</ToggleGroupControl>
 	);
 };
 WithIcons.args = {
 	...Default.args,
+	__experimentalIsIconGroup: true,
 };
 
 export const WithReset = ( props ) => {

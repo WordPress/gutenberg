@@ -128,21 +128,21 @@ export function useStyle( path, blockName, source = 'all' ) {
 	switch ( source ) {
 		case 'all':
 			result = getValueFromVariable(
-				mergedConfig.settings,
+				mergedConfig,
 				blockName,
 				get( userConfig, finalPath ) ?? get( baseConfig, finalPath )
 			);
 			break;
 		case 'user':
 			result = getValueFromVariable(
-				mergedConfig.settings,
+				mergedConfig,
 				blockName,
 				get( userConfig, finalPath )
 			);
 			break;
 		case 'base':
 			result = getValueFromVariable(
-				baseConfig.settings,
+				baseConfig,
 				blockName,
 				get( baseConfig, finalPath )
 			);

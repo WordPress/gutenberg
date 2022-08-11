@@ -267,13 +267,17 @@ exports[`Multi-block selection should select all from empty selection 1`] = `
 exports[`Multi-block selection should select all from empty selection 2`] = `""`;
 
 exports[`Multi-block selection should select separator (single element block) 1`] = `
-"<!-- wp:separator -->
-<hr class=\\"wp-block-separator has-alpha-channel-opacity\\"/>
-<!-- /wp:separator -->
+"<!-- wp:paragraph -->
+<p>a</p>
+<!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>a</p>
-<!-- /wp:paragraph -->"
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:separator -->
+<hr class=\\"wp-block-separator has-alpha-channel-opacity\\"/>
+<!-- /wp:separator -->"
 `;
 
 exports[`Multi-block selection should select separator (single element block) 2`] = `

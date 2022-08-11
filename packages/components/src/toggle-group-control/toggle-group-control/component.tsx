@@ -43,6 +43,7 @@ function ToggleGroupControl(
 		className,
 		isAdaptiveWidth = false,
 		isBlock = false,
+		__experimentalIsIconGroup = false,
 		label,
 		hideLabelFromVision = false,
 		help,
@@ -85,15 +86,16 @@ function ToggleGroupControl(
 		() =>
 			cx(
 				styles.ToggleGroupControl( { size } ),
+				! __experimentalIsIconGroup && styles.border,
 				isBlock && styles.block,
 				className
 			),
-		[ className, cx, isBlock, size ]
+		[ className, cx, isBlock, __experimentalIsIconGroup, size ]
 	);
 	return (
 		<BaseControl help={ help }>
 			<ToggleGroupControlContext.Provider
-				value={ { ...radio, isBlock: ! isAdaptiveWidth } }
+				value={ { ...radio, isBlock: ! isAdaptiveWidth, size } }
 			>
 				{ ! hideLabelFromVision && (
 					<div>
