@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Scans through an HTML document to find specific tags, then
  * transforms those tags by adding, removing, or updating the
@@ -293,28 +293,35 @@ class WP_HTML_Walker {
 	 * @since 6.1.0
 	 */
 	private function skip_script_data() {
-		list( $match, $offset ) = $this->strpos_first( array( '<!--', '</' ) );
-		if ( false === $match ) {
+		$at = strpos( $this->html, '<', $this->parsed_bytes );
+		if ( false === $at ) {
 			$this->parsed_bytes = strlen( $this->html );
 			return;
 		}
 
-		$this->parsed_bytes = $offset + strlen( $match );
 		if (
-			strlen( $this->html ) >= $offset + 7 &&
-			'</' === $match &&
-		     's' === strtolower( $this->html[ $offset + 2 ] ) &&
-		     'c' === strtolower( $this->html[ $offset + 3 ] ) &&
-		     'r' === strtolower( $this->html[ $offset + 4 ] ) &&
-		     'i' === strtolower( $this->html[ $offset + 5 ] ) &&
-		     'p' === strtolower( $this->html[ $offset + 6 ] ) &&
-		     't' === strtolower( $this->html[ $offset + 7 ] ) &&
-		     strspn( $this->html, " \t\f\r\n/>", $offset + 8 ) > 0
+			strlen( $this->html ) >= $at + 8 &&
+			'/' === $this->html[ $at + 1 ] &&
+			's' === strtolower( $this->html[ $at + 2 ] ) &&
+			'c' === strtolower( $this->html[ $at + 3 ] ) &&
+			'r' === strtolower( $this->html[ $at + 4 ] ) &&
+			'i' === strtolower( $this->html[ $at + 5 ] ) &&
+			'p' === strtolower( $this->html[ $at + 6 ] ) &&
+			't' === strtolower( $this->html[ $at + 7 ] ) &&
+			0 === strcspn( $this->html, " \t\f\r\n/>", $at + 8 )
 		) {
+			$this->parsed_bytes = $at + 8;
 			$this->skip_tag_closer_attributes();
-		} else if ( '<!--' === $match ) {
+		} else if (
+			strlen( $this->html ) >= $at + 4 &&
+			'!' === $this->html[ $at + 1 ] &&
+			'-' === $this->html[ $at + 2 ] &&
+			'-' === $this->html[ $at + 3 ]
+		) {
+			$this->parsed_bytes = $at + 4;
 			$this->skip_script_data_escaped();
 		} else {
+			$this->parsed_bytes = $at + 1;
 			$this->skip_script_data();
 		}
 	}
@@ -326,42 +333,51 @@ class WP_HTML_Walker {
 	 * @since 6.1.0
 	 */
 	private function skip_script_data_escaped() {
-		list( $match, $offset ) = $this->strpos_first( array( '-->', '</', '<' ) );
-		if ( false === $match ) {
+		$offset_1 = strpos( $this->html, '-->', $this->parsed_bytes );
+		$offset_2 = strpos( $this->html, '<', $this->parsed_bytes );
+		if ( false === $offset_1 && false === $offset_2 ) {
 			$this->parsed_bytes = strlen( $this->html );
 			return;
 		}
+		$at = false === $offset_1 ? $offset_2 : (
+			false === $offset_2 ? $offset_1 : min( $offset_1, $offset_2 )
+		);
 
-		$this->parsed_bytes = $offset + strlen( $match );
-		if ( '-->' === $match ){
+		if (
+			strlen( $this->html ) > $at + 3 &&
+			'-' === $this->html[ $at ]
+		) {
+			$this->parsed_bytes = $at + 3;
 			$this->skip_script_data();
 		} else if (
-			strlen( $this->html ) >= $offset + 8 &&
-			'</' === $match &&
-			's' === strtolower( $this->html[ $offset + 2 ] ) &&
-			'c' === strtolower( $this->html[ $offset + 3 ] ) &&
-			'r' === strtolower( $this->html[ $offset + 4 ] ) &&
-			'i' === strtolower( $this->html[ $offset + 5 ] ) &&
-			'p' === strtolower( $this->html[ $offset + 6 ] ) &&
-			't' === strtolower( $this->html[ $offset + 7 ] ) &&
-			strspn( $this->html, " \t\f\r\n/>", $offset + 8 ) > 0
+			strlen( $this->html ) >= $at + 8 &&
+			'/' === $this->html[ $at + 1 ] &&
+			's' === strtolower( $this->html[ $at + 2 ] ) &&
+			'c' === strtolower( $this->html[ $at + 3 ] ) &&
+			'r' === strtolower( $this->html[ $at + 4 ] ) &&
+			'i' === strtolower( $this->html[ $at + 5 ] ) &&
+			'p' === strtolower( $this->html[ $at + 6 ] ) &&
+			't' === strtolower( $this->html[ $at + 7 ] ) &&
+			0 === strcspn( $this->html, " \t\f\r\n/>", $at + 8 )
 		) {
+			$this->parsed_bytes = $at + 8;
 			$this->skip_tag_closer_attributes();
 		} else if (
-			strlen( $this->html ) >= $offset + 7 &&
-			'<' === $match &&
-			's' === strtolower( $this->html[ $offset + 1 ] ) &&
-			'c' === strtolower( $this->html[ $offset + 2 ] ) &&
-			'r' === strtolower( $this->html[ $offset + 3 ] ) &&
-			'i' === strtolower( $this->html[ $offset + 4 ] ) &&
-			'p' === strtolower( $this->html[ $offset + 5 ] ) &&
-			't' === strtolower( $this->html[ $offset + 6 ] ) &&
-			strspn( $this->html, " \t\f\r\n/>", $offset + 7 ) > 0
+			strlen( $this->html ) >= $at + 7 &&
+			's' === strtolower( $this->html[ $at + 1 ] ) &&
+			'c' === strtolower( $this->html[ $at + 2 ] ) &&
+			'r' === strtolower( $this->html[ $at + 3 ] ) &&
+			'i' === strtolower( $this->html[ $at + 4 ] ) &&
+			'p' === strtolower( $this->html[ $at + 5 ] ) &&
+			't' === strtolower( $this->html[ $at + 6 ] ) &&
+			0 === strcspn( $this->html, " \t\f\r\n/>", $at + 7 )
 		) {
+			$this->parsed_bytes = $at + 7;
 			// Parse all the attributes of the current tag.
 			$this->skip_tag_closer_attributes();
 			$this->skip_script_data_double_escape();
 		} else {
+			$this->parsed_bytes = $at + 1;
 			$this->skip_script_data_escaped();
 		}
 	}
@@ -373,50 +389,40 @@ class WP_HTML_Walker {
 	 * @since 6.1.0
 	 */
 	private function skip_script_data_double_escape() {
-		list( $match, $offset ) = $this->strpos_first( array( '-->', '</' ) );
-		if ( false === $match ) {
+		$offset_1 = strpos( $this->html, '-->', $this->parsed_bytes );
+		$offset_2 = strpos( $this->html, '<', $this->parsed_bytes );
+		if ( false === $offset_1 && false === $offset_2 ) {
 			$this->parsed_bytes = strlen( $this->html );
 			return;
 		}
+		$at = false === $offset_1 ? $offset_2 : (
+			false === $offset_2 ? $offset_1 : min( $offset_1, $offset_2 )
+		);
 
-		$this->parsed_bytes = $offset + strlen( $match );
-		if ( '-->' === $match ) {
+		if (
+			strlen( $this->html ) >= $at + 3 &&
+			'-' === $this->html[ $at ]
+		) {
+			$this->parsed_bytes = $at + 3;
 			$this->skip_script_data();
 		} else if (
-			strlen( $this->html ) >= $offset + 8 &&
-			'</' === $match &&
-			's' === strtolower( $this->html[ $offset + 2 ] ) &&
-			'c' === strtolower( $this->html[ $offset + 3 ] ) &&
-			'r' === strtolower( $this->html[ $offset + 4 ] ) &&
-			'i' === strtolower( $this->html[ $offset + 5 ] ) &&
-			'p' === strtolower( $this->html[ $offset + 6 ] ) &&
-			't' === strtolower( $this->html[ $offset + 7 ] ) &&
-			strspn( $this->html, " \t\f\r\n/>", $offset + 8 ) > 0
+			strlen( $this->html ) >= $at + 8 &&
+			'/' === $this->html[ $at + 1 ] &&
+			's' === strtolower( $this->html[ $at + 2 ] ) &&
+			'c' === strtolower( $this->html[ $at + 3 ] ) &&
+			'r' === strtolower( $this->html[ $at + 4 ] ) &&
+			'i' === strtolower( $this->html[ $at + 5 ] ) &&
+			'p' === strtolower( $this->html[ $at + 6 ] ) &&
+			't' === strtolower( $this->html[ $at + 7 ] ) &&
+			0 === strcspn( $this->html, " \t\f\r\n/>", $at + 8 )
 		) {
+			$this->parsed_bytes = $at + 8;
 			$this->skip_tag_closer_attributes();
 			$this->skip_script_data();
 		} else {
+			$this->parsed_bytes = $at + 1;
 			$this->skip_script_data_double_escape();
 		}
-	}
-
-	/**
-	 * Returns the earliest matched substring and its offset.
-	 *
-	 * @param array $substrings List of substrings to match
-	 * @return array Array with of substring and its offset.
-	 */
-	private function strpos_first( $substrings ) {
-		$first_substring = false;
-		$first_offset = false;
-		foreach ( $substrings as $substring ) {
-			$offset = strpos( $this->html, $substring, $this->parsed_bytes );
-			if ( $offset !== false && ( false === $first_offset || $offset < $first_offset ) ) {
-				$first_offset = $offset;
-				$first_substring = $substring;
-			}
-		}
-		return array( $first_substring, $first_offset );
 	}
 
 	/**
