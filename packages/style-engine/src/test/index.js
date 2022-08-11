@@ -1,16 +1,16 @@
 /**
  * Internal dependencies
  */
-import { getCSSRules, generate } from '../index';
+import { getCSSRules, compileCSS } from '../index';
 
 describe( 'generate', () => {
 	it( 'should generate empty style', () => {
-		expect( generate( {}, '.some-selector' ) ).toEqual( '' );
+		expect( compileCSS( {}, '.some-selector' ) ).toEqual( '' );
 	} );
 
 	it( 'should generate empty style with empty keys', () => {
 		expect(
-			generate( {
+			compileCSS( {
 				spacing: undefined,
 				color: undefined,
 			} )
@@ -19,7 +19,7 @@ describe( 'generate', () => {
 
 	it( 'should generate inline styles where there is no selector', () => {
 		expect(
-			generate( {
+			compileCSS( {
 				spacing: { padding: '10px', margin: '12px' },
 				color: {
 					text: '#f1f1f1',
@@ -35,7 +35,7 @@ describe( 'generate', () => {
 
 	it( 'should generate styles with an optional selector', () => {
 		expect(
-			generate(
+			compileCSS(
 				{
 					spacing: { padding: '10px', margin: '12px' },
 				},
@@ -46,7 +46,7 @@ describe( 'generate', () => {
 		).toEqual( '.some-selector { margin: 12px; padding: 10px; }' );
 
 		expect(
-			generate(
+			compileCSS(
 				{
 					color: {
 						text: '#cccccc',
@@ -85,7 +85,7 @@ describe( 'generate', () => {
 
 	it( 'should parse preset values', () => {
 		expect(
-			generate( {
+			compileCSS( {
 				color: {
 					text: 'var:preset|color|ham-sandwich',
 				},
@@ -98,7 +98,7 @@ describe( 'generate', () => {
 
 	it( 'should parse border rules', () => {
 		expect(
-			generate( {
+			compileCSS( {
 				border: {
 					color: 'var:preset|color|perky-peppermint',
 					width: '0.5em',
@@ -113,7 +113,7 @@ describe( 'generate', () => {
 
 	it( 'should parse individual border rules', () => {
 		expect(
-			generate( {
+			compileCSS( {
 				border: {
 					top: {
 						color: 'var:preset|color|sandy-beach',
