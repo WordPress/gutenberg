@@ -6,8 +6,8 @@ import { render, screen, within } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { more } from '@wordpress/icons';
 import { useResizeObserver } from '@wordpress/compose';
+import { SVG, Path } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -23,6 +23,15 @@ jest.mock( '@wordpress/compose', () => {
 	};
 } );
 
+/**
+ * Test icon that can be queried by `getByTestId`
+ */
+const testIcon = (
+	<SVG data-testid="icon">
+		<Path />
+	</SVG>
+);
+
 const Placeholder = (
 	props: Omit<
 		WordPressComponentProps< PlaceholderProps< unknown >, 'div', false >,
@@ -31,11 +40,6 @@ const Placeholder = (
 ) => <BasePlaceholder data-testid="placeholder" { ...props } />;
 
 const getPlaceholder = () => screen.getByTestId( 'placeholder' );
-
-const getLabel = () => {
-	const placeholder = getPlaceholder();
-	return placeholder.querySelector( '.components-placeholder__label' );
-};
 
 describe( 'Placeholder', () => {
 	beforeEach( () => {
@@ -53,12 +57,16 @@ describe( 'Placeholder', () => {
 
 			expect( placeholder ).toHaveClass( 'components-placeholder' );
 
-			// Test for empty label.
-			const label = getLabel();
+			// Test for empty label. When the label is empty, the only way to
+			// query the div is with `querySelector`.
+			const label = placeholder.querySelector(
+				'.components-placeholder__label'
+			);
 			expect( label ).toBeInTheDocument();
 			expect( label ).toBeEmptyDOMElement();
 
-			// Test for non existent instructions.
+			// Test for non existent instructions. When the instructions is
+			// empty, the only way to query the div is with `querySelector`.
 			const placeholderInstructions = placeholder.querySelector(
 				'.components-placeholder__instructions'
 			);
@@ -72,18 +80,25 @@ describe( 'Placeholder', () => {
 		} );
 
 		it( 'should render an Icon in the label section', () => {
-			render( <Placeholder icon={ more } /> );
-			const icon = getLabel()?.querySelector( 'svg' );
+			render( <Placeholder icon={ testIcon } /> );
 
+			const placeholder = getPlaceholder();
+			const icon = within( placeholder ).getByTestId( 'icon' );
+			expect( icon.parentNode ).toHaveClass(
+				'components-placeholder__label'
+			);
 			expect( icon ).toBeInTheDocument();
 		} );
 
 		it( 'should render a label section', () => {
 			const label = 'WordPress';
 			render( <Placeholder label={ label } /> );
-			const placeholderLabel = getLabel();
+			const placeholderLabel = screen.getByText( label );
 
-			expect( placeholderLabel ).toHaveTextContent( label );
+			expect( placeholderLabel ).toHaveClass(
+				'components-placeholder__label'
+			);
+			expect( placeholderLabel ).toBeInTheDocument();
 		} );
 
 		it( 'should display a fieldset from the children property', () => {
@@ -113,6 +128,7 @@ describe( 'Placeholder', () => {
 			render( <Placeholder className="wp-placeholder" /> );
 			const placeholder = getPlaceholder();
 
+			expect( placeholder ).toHaveClass( 'components-placeholder' );
 			expect( placeholder ).toHaveClass( 'wp-placeholder' );
 		} );
 
