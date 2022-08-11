@@ -60,12 +60,14 @@ export const Wrapper = styled.div< WrapperProps >`
 `;
 
 export const BeforeIconWrapper = styled.span`
+	display: flex; // ensures the height isn't affected by line-height
 	margin-top: ${ railHeight }px;
 
 	${ rtl( { marginRight: 6 } ) }
 `;
 
 export const AfterIconWrapper = styled.span`
+	display: flex; // ensures the height isn't affected by line-height
 	margin-top: ${ railHeight }px;
 
 	${ rtl( { marginLeft: 6 } ) }
