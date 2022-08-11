@@ -34,7 +34,7 @@
 -   `InputControl`: Fix incorrect `size` prop passing ([#42793](https://github.com/WordPress/gutenberg/pull/42793)).
 -   `Placeholder`: Convert to TypeScript ([#42990](https://github.com/WordPress/gutenberg/pull/42990)).
 -   `Popover`: rewrite Storybook examples using controls [#42903](https://github.com/WordPress/gutenberg/pull/42903)).
--   `Swatch`: Convert to TypeScript ([#42162](https://github.com/WordPress/gutenberg/pull/42162)).
+-   `Swatch`: Remove component in favor of `ColorIndicator` [#43068](https://github.com/WordPress/gutenberg/pull/43068)).
 
 ## 19.16.0 (2022-07-27)
 
