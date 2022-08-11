@@ -70,7 +70,7 @@ module.exports = async function ( outputTemplates, view ) {
 	await Promise.all(
 		Object.keys( outputTemplates ).map( async ( outputFile ) => {
 			const pathName = view.plugin
-				? join( process.cwd(), view.folderName, outputFile )
+				? join( view.folderName, outputFile )
 				: join( process.cwd(), view.slug, outputFile );
 
 			await writeOutputTemplate(
