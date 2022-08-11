@@ -51,7 +51,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: rgba($gray-700, 0.3);
+	background: rgba($gray-300, 0.75);
 	opacity: 0;
 	transition: opacity 120ms linear;
 	@include reduce-motion("transition");
