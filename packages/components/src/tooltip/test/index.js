@@ -35,10 +35,9 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			const button = screen.getByRole( 'button' );
-			expect( button.nodeName ).toBe( 'BUTTON' );
-			expect( button.childNodes ).toHaveLength( 1 );
-			expect( button ).toHaveTextContent( 'Hover Me!' );
+			expect(
+				screen.getByRole( 'button', { name: 'Hover Me!' } )
+			).toBeInTheDocument();
 		} );
 
 		it( 'should render children with additional popover when over', () => {
@@ -50,9 +49,9 @@ describe( 'Tooltip', () => {
 
 			const button = screen.getByRole( 'button' );
 			button.focus();
-			expect( button.nodeName ).toBe( 'BUTTON' );
-			expect( button.childNodes ).toHaveLength( 2 );
-			expect( button.childNodes[ 0 ] ).toHaveTextContent( 'Hover Me!' );
+			expect(
+				screen.getByRole( 'button', { name: 'Hover Me!' } )
+			).toBeInTheDocument();
 			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
 		} );
 
