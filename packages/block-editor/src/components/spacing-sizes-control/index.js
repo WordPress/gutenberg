@@ -27,7 +27,7 @@ export default function SpacingSizesControl( {
 } ) {
 	const spacingSizes = [
 		{ name: 0, slug: '0', size: 0 },
-		...useSetting( 'spacing.spacingSizes' ),
+		...( useSetting( 'spacing.spacingSizes' ) || [] ),
 	];
 
 	if ( spacingSizes.length > 8 ) {
