@@ -398,7 +398,7 @@ class WP_HTML_Walker {
 					0 === strcspn( $this->html, " \t\f\r\n/>", $at + 8 )
 				) {
 					$this->parsed_bytes = $at + 8;
-					$state              = 'unescaped';
+					$state              = 'escaped';
 				} else {
 					$this->parsed_bytes = $at + 1;
 				}
