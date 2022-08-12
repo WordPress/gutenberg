@@ -2,4 +2,6 @@
 
 ## Unreleased
 
-Initial release.
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
