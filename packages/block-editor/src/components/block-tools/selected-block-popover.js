@@ -21,7 +21,7 @@ import BlockSelectionButton from './block-selection-button';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import { store as blockEditorStore } from '../../store';
 import BlockPopover from '../block-popover';
-import useFlipBlockToolbar from './use-flip-block-toolbar';
+import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 
 function selector( select ) {
 	const {
@@ -116,7 +116,7 @@ function SelectedBlockPopover( {
 	const initialToolbarItemIndexRef = useRef();
 
 	const selectedBlockElement = useBlockElement( clientId );
-	const placement = useFlipBlockToolbar( {
+	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef.current,
 		selectedBlockElement,
 	} );
@@ -134,7 +134,7 @@ function SelectedBlockPopover( {
 			} ) }
 			__unstablePopoverSlot={ __unstablePopoverSlot }
 			__unstableContentRef={ __unstableContentRef }
-			placement={ placement }
+			{ ...popoverProps }
 		>
 			{ shouldShowContextualToolbar && (
 				<BlockContextualToolbar

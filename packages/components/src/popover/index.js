@@ -256,6 +256,7 @@ const Popover = (
 			: undefined,
 		hasArrow ? arrow( { element: arrowRef } ) : undefined,
 	].filter( ( m ) => !! m );
+
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
 	const slot = useSlot( slotName );
 
