@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -84,6 +85,10 @@ describe( 'Tooltip', () => {
 		} );
 
 		it( 'should not show popover on focus as result of mousedown', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
 			const originalOnMouseDown = jest.fn();
 			const originalOnMouseUp = jest.fn();
 			const { container } = render(
@@ -98,19 +103,23 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = screen.getByRole( 'button' );
-			fireEvent.mouseDown( button );
+			// Hovers the button and press the left mouse button
+			await user.pointer( [
+				{ target: button },
+				{ keys: '[MouseLeft]', target: button },
+			] );
 			expect( originalOnMouseDown ).toHaveBeenCalledWith(
 				expect.objectContaining( {
 					type: 'mousedown',
 				} )
 			);
 
-			button.focus();
 			const popover =
 				container.getElementsByClassName( 'components-popover' );
 			expect( popover ).toHaveLength( 0 );
 
-			fireEvent.mouseUp( button );
+			// Release the left mouse button
+			await user.pointer( [ { keys: '[/MouseLeft]', target: button } ] );
 			expect( originalOnMouseUp ).toHaveBeenCalledWith(
 				expect.objectContaining( {
 					type: 'mouseup',
@@ -118,7 +127,11 @@ describe( 'Tooltip', () => {
 			);
 		} );
 
-		it( 'should show popover on delayed mouseenter', () => {
+		it( 'should show popover on delayed mouseenter', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
 			const originalMouseEnter = jest.fn();
 			jest.useFakeTimers();
 			const { container } = render(
@@ -133,7 +146,7 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = screen.getByRole( 'button' );
-			fireEvent.mouseOver( button );
+			await user.hover( button );
 			const popoverBeforeTimeout =
 				container.getElementsByClassName( 'components-popover' );
 			expect( popoverBeforeTimeout ).toHaveLength( 0 );
@@ -150,7 +163,11 @@ describe( 'Tooltip', () => {
 			}, TOOLTIP_DELAY );
 		} );
 
-		it( 'should respect custom delay prop when showing popover', () => {
+		it( 'should respect custom delay prop when showing popover', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
 			const originalMouseEnter = jest.fn();
 			jest.useFakeTimers();
 			const { container } = render(
@@ -165,7 +182,7 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = screen.getByRole( 'button' );
-			fireEvent.mouseOver( button );
+			await user.hover( button );
 			const popoverBeforeTimeout =
 				container.getElementsByClassName( 'components-popover' );
 			expect( popoverBeforeTimeout ).toHaveLength( 0 );
@@ -187,7 +204,11 @@ describe( 'Tooltip', () => {
 			}, 2000 );
 		} );
 
-		it( 'should show tooltip when an element is disabled', () => {
+		it( 'should show tooltip when an element is disabled', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
 			const { container } = render(
 				<Tooltip text="Show helpful text here">
 					<button disabled>Click me</button>
@@ -201,7 +222,7 @@ describe( 'Tooltip', () => {
 			const eventCatcherRect = eventCatcher.getBoundingClientRect();
 			expect( buttonRect ).toEqual( eventCatcherRect );
 
-			fireEvent.mouseOver( eventCatcher );
+			await user.hover( eventCatcher );
 
 			setTimeout( () => {
 				const popover =
@@ -210,7 +231,11 @@ describe( 'Tooltip', () => {
 			}, TOOLTIP_DELAY );
 		} );
 
-		it( 'should not emit events back to children when they are disabled', () => {
+		it( 'should not emit events back to children when they are disabled', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
 			const handleClick = jest.fn();
 			const { container } = render(
 				<Tooltip text="Show helpful text here">
@@ -222,11 +247,15 @@ describe( 'Tooltip', () => {
 
 			const eventCatcher =
 				container.getElementsByClassName( 'event-catcher' )[ 0 ];
-			fireEvent.click( eventCatcher );
+			await user.click( eventCatcher );
 			expect( handleClick ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should cancel pending setIsOver on mouseleave', () => {
+		it( 'should cancel pending setIsOver on mouseleave', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
 			const originalMouseEnter = jest.fn();
 			const { container } = render(
 				<Tooltip text="Help text">
@@ -240,7 +269,7 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = screen.getByRole( 'button' );
-			fireEvent.mouseOver( button );
+			await user.hover( button );
 			setTimeout( () => {
 				const popover =
 					container.getElementsByClassName( 'components-popover' );
