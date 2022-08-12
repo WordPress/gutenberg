@@ -24,7 +24,7 @@
 }
 
 // Affect the appender of the Row and Stack variants.
-.is-layout-flex.block-editor-block-list__block .block-list-appender:only-child {
+.wp-block-group.is-layout-flex.block-editor-block-list__block > .block-list-appender:only-child {
 	gap: inherit;
 
 	&,
