@@ -78,6 +78,13 @@ $ npx @wordpress/create-block --template ./path/to/template-directory
 $ npx @wordpress/create-block --help
 ```
 
+5. No plugin mode – it is also possible to scaffold only block files into the current directory.
+
+
+```bash
+$ npx @wordpress/create-block --no-plugin
+```
+
 When you scaffold a block, you must provide at least a `slug` name, the `namespace` which usually corresponds to either the `theme` or `plugin` name. In most cases, we recommended pairing blocks with WordPress plugins rather than themes, because only using plugin ensures that all blocks still work when your theme changes.
 
 ## Available Commands
