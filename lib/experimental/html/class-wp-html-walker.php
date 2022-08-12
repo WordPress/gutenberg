@@ -336,7 +336,7 @@ class WP_HTML_Walker {
 					$this->parsed_bytes = $at + 1;
 				}
 			} elseif ( 'escaped' === $state ) {
-				$at = $this->parsed_bytes + strcspn($this->html, '-<', $this->parsed_bytes);
+				$at = $this->parsed_bytes + strcspn( $this->html, '-<', $this->parsed_bytes );
 
 				if (
 					strlen( $this->html ) > $at + 3 &&
@@ -371,12 +371,12 @@ class WP_HTML_Walker {
 					0 === strcspn( $this->html, " \t\f\r\n/>", $at + 7 )
 				) {
 					$this->parsed_bytes = $at + 7;
-					$state = 'double-escaped';
+					$state              = 'double-escaped';
 				} else {
 					$this->parsed_bytes = $at + 1;
 				}
 			} elseif ( 'double-escaped' === $state ) {
-				$at = $this->parsed_bytes + strcspn($this->html, '-<', $this->parsed_bytes);
+				$at = $this->parsed_bytes + strcspn( $this->html, '-<', $this->parsed_bytes );
 
 				if (
 					strlen( $this->html ) >= $at + 3 &&
