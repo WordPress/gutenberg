@@ -56,12 +56,10 @@ function render_block_core_cover( $attributes, $content ) {
 			$styles .= $height;
 		}
 
-		$content = preg_replace(
-			'/class=\".*?\"/',
-			'${0} style="' . $styles . '"',
-			$content,
-			1
-		);
+		$w = new WP_HTML_Walker( $content );
+		$w->next_tag();
+		$w->set_attribute( 'styles', $styles );
+		$content = (string) $w;
 	}
 
 	return $content;
