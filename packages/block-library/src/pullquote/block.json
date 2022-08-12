@@ -60,6 +60,12 @@
 				"style": true,
 				"width": true
 			}
+		},
+		"__experimentalStyle": {
+			"typography": {
+				"fontSize": "1.25rem",
+				"lineHeight": "1.6"
+			}
 		}
 	},
 	"editorStyle": "wp-block-pullquote-editor",
