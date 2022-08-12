@@ -181,6 +181,7 @@ AllPlacements.args = {
 	),
 	noArrow: false,
 	offset: 10,
+	__unstableForcePosition: true,
 };
 
 export const DynamicHeight = ( { children, ...args } ) => {
