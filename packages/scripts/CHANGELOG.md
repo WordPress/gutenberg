@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 23.7.1 (2022-08-12)
+
+### Bug Fix
+
+-   Jest Preset: Ignore `is-plain-obj` transformation ([#43179](https://github.com/WordPress/gutenberg/pull/43179)).
+
 ## 23.6.0 (2022-07-27)
 
 ### Bug Fix
