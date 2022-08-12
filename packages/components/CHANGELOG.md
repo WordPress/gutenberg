@@ -6,6 +6,10 @@
 
 -   `CustomSelectControl`: Deprecate constrained width style. Add a `__nextUnconstrainedWidth` prop to start opting into the unconstrained width that will become the default in a future version, currently scheduled to be WordPress 6.4 ([#43230](https://github.com/WordPress/gutenberg/pull/43230)).
 
+### Bug Fix
+
+-   `Popover`: fix and improve opening animation ([#43186](https://github.com/WordPress/gutenberg/pull/43186)).
+
 ### Enhancements
 
 -   `ToggleGroupControl`: Improve TypeScript documentation ([#43265](https://github.com/WordPress/gutenberg/pull/43265)).
