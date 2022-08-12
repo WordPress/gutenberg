@@ -78,11 +78,13 @@ export default function TemplateDetails( { template, onClose } ) {
 						{ description }
 					</Text>
 				) }
-
-				{ isTemplatePart && (
-					<TemplatePartAreaSelector id={ template.id } />
-				) }
 			</VStack>
+
+			{ isTemplatePart && (
+				<div className="edit-site-template-details__group">
+					<TemplatePartAreaSelector id={ template.id } />
+				</div>
+			) }
 
 			<TemplateAreas closeTemplateDetailsDropdown={ onClose } />
 
