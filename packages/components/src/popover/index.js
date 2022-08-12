@@ -405,15 +405,8 @@ const Popover = (
 			return;
 		}
 
-		const { defaultView } = ownerDocument;
-
-		defaultView.addEventListener( 'resize', update );
 		ownerDocument.addEventListener( 'scroll', update );
-
-		return () => {
-			defaultView.removeEventListener( 'resize', update );
-			ownerDocument.removeEventListener( 'scroll', update );
-		};
+		return () => ownerDocument.removeEventListener( 'scroll', update );
 	}, [ ownerDocument ] );
 
 	/** @type {false | string} */
