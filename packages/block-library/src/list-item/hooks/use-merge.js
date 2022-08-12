@@ -12,7 +12,7 @@ import useOutdentListItem from './use-outdent-list-item';
 
 import { name as listItemName } from '../block.json';
 
-export default function useMerge( clientId ) {
+export default function useMerge( clientId, onMerge ) {
 	const registry = useRegistry();
 	const {
 		getPreviousBlockClientId,
@@ -134,7 +134,7 @@ export default function useMerge( clientId ) {
 					mergeBlocks( trailingId, clientId );
 				} );
 			} else {
-				switchToDefaultBlockType( forward );
+				onMerge( forward );
 			}
 		}
 	};
