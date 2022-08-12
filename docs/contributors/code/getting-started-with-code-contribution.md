@@ -71,7 +71,7 @@ To stop the running environment:
 npm run wp-env stop
 ```
 
-If everyting went well, you should see the following message in your terminal:
+If everything went well, you should see the following message in your terminal:
 
 ```bash
 WordPress development site started at http://localhost:8888/
