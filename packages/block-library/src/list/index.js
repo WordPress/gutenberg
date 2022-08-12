@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { list as icon } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -18,24 +19,31 @@ export { metadata, name };
 
 const settings = {
 	icon,
-	// example: {
-	// 	attributes: {
-	// 		values: '<li>Alice.</li><li>The White Rabbit.</li><li>The Cheshire Cat.</li><li>The Mad Hatter.</li><li>The Queen of Hearts.</li>',
-	// 	},
-	// },
+	example: {
+		innerBlocks: [
+			{
+				name: 'core/list-item',
+				attributes: { content: __( 'Alice.' ) },
+			},
+			{
+				name: 'core/list-item',
+				attributes: { content: __( 'The White Rabbit.' ) },
+			},
+			{
+				name: 'core/list-item',
+				attributes: { content: __( 'The Cheshire Cat.' ) },
+			},
+			{
+				name: 'core/list-item',
+				attributes: { content: __( 'The Mad Hatter.' ) },
+			},
+			{
+				name: 'core/list-item',
+				attributes: { content: __( 'The Queen of Hearts.' ) },
+			},
+		],
+	},
 	transforms,
-	// merge( attributes, attributesToMerge ) {
-	// 	const { values } = attributesToMerge;
-
-	// 	if ( ! values || values === '<li></li>' ) {
-	// 		return attributes;
-	// 	}
-
-	// 	return {
-	// 		...attributes,
-	// 		values: attributes.values + values,
-	// 	};
-	// },
 	edit,
 	save,
 	deprecated,
