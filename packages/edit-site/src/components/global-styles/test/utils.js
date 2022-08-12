@@ -163,7 +163,7 @@ describe( 'editor utils', () => {
 				expect( actual ).toBe( stylesWithRefs.styles.color.text );
 			} );
 
-			it( 'returns where value is dynamic reference and reference does not exist', () => {
+			it( 'returns the originally provided value where value is dynamic reference and reference does not exist', () => {
 				const stylesWithRefs = {
 					...themeJson,
 					styles: {
@@ -181,7 +181,7 @@ describe( 'editor utils', () => {
 				expect( actual ).toBe( stylesWithRefs.styles.color.text );
 			} );
 
-			it( 'returns where value is dynamic reference', () => {
+			it( 'returns the originally provided value where value is dynamic reference', () => {
 				const stylesWithRefs = {
 					...themeJson,
 					styles: {
