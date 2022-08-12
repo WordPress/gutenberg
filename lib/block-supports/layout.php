@@ -210,7 +210,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$layout_styles,
 			array(
 				'context' => 'block-supports',
-				'enqueue' => true,
 			)
 		);
 	}

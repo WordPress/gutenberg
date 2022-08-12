@@ -58,4 +58,21 @@ test.describe( 'Group', () => {
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	test( 'can merge into group with Backspace', async ( { editor, page } ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await editor.transformBlockTo( 'core/group' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		// Confirm last paragraph is outside of group.
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+
+		// Merge the last paragraph into the group.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
