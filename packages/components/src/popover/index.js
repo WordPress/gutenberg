@@ -420,7 +420,7 @@ const Popover = (
 		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<MaybeAnimatedWrapper
-			shouldAnimate={ animate }
+			shouldAnimate={ animate && ! isExpanded }
 			placement={ computedPlacement }
 			className={ classnames( 'components-popover', className, {
 				'is-expanded': isExpanded,
