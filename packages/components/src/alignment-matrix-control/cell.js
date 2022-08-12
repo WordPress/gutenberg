@@ -8,14 +8,14 @@ import { VisuallyHidden } from '../visually-hidden';
 /**
  * Internal dependencies
  */
-import { ALIGNMENT_LABEL } from './utils';
+import { getAlignmentLabel } from './utils';
 import {
 	Cell as CellView,
 	Point,
 } from './styles/alignment-matrix-control-styles';
 
 export default function Cell( { isActive = false, value, ...props } ) {
-	const tooltipText = ALIGNMENT_LABEL[ value ];
+	const tooltipText = getAlignmentLabel( value );
 
 	return (
 		<Tooltip text={ tooltipText }>

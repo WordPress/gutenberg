@@ -11,15 +11,15 @@ export const GRID = [
 
 // Stored as map as i18n __() only accepts strings (not variables)
 export const ALIGNMENT_LABEL = {
-	'top left': ! isRTL() ? __( 'Top Left' ) : __( 'Top Right' ),
+	'top left': __( 'Top Left' ),
 	'top center': __( 'Top Center' ),
-	'top right': ! isRTL() ? __( 'Top Right' ) : __( 'Top Left' ),
-	'center left': ! isRTL() ? __( 'Center Left' ) : __( 'Center Right' ),
+	'top right': __( 'Top Right' ),
+	'center left': __( 'Center Left' ),
 	'center center': __( 'Center Center' ),
-	'center right': ! isRTL() ? __( 'Center Right' ) : __( 'Center Left' ),
-	'bottom left': ! isRTL() ? __( 'Bottom Left' ) : __( 'Bottom Right' ),
+	'center right': __( 'Center Right' ),
+	'bottom left': __( 'Bottom Left' ),
 	'bottom center': __( 'Bottom Center' ),
-	'bottom right': ! isRTL() ? __( 'Bottom Right' ) : __( 'Bottom Left' ),
+	'bottom right': __( 'Bottom Right' ),
 };
 
 // Transforms GRID into a flat Array of values.
@@ -64,4 +64,21 @@ export function getAlignmentIndex( alignment = 'center' ) {
 	const index = ALIGNMENTS.indexOf( item );
 
 	return index > -1 ? index : undefined;
+}
+
+/**
+ * Retrieves the alignment label from a value.
+ *
+ * @param {string} alignment Value to check.
+ *
+ * @return {number} The label of a matching alignment.
+ */
+export function getAlignmentLabel( alignment = 'center' ) {
+	// Swap left and right in RTL languages.
+	const newAlignment = isRTL()
+		? alignment.replace( /left|right/, ( match ) =>
+				match === 'left' ? 'right' : 'left'
+		  )
+		: alignment;
+	return ALIGNMENT_LABEL[ newAlignment ] || undefined;
 }
