@@ -135,8 +135,7 @@ describe( 'Tooltip', () => {
 			} );
 
 			const originalMouseEnter = jest.fn();
-			jest.useFakeTimers();
-			const { container } = render(
+			render(
 				<Tooltip text="Help text">
 					<button
 						onMouseEnter={ originalMouseEnter }
@@ -149,20 +148,13 @@ describe( 'Tooltip', () => {
 
 			const button = screen.getByRole( 'button' );
 			await user.hover( button );
-			const popoverBeforeTimeout =
-				container.getElementsByClassName( 'components-popover' );
-			expect( popoverBeforeTimeout ).toHaveLength( 0 );
+			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
 
-			// Force delayedSetIsOver to be called.
-			setTimeout( () => {
-				const popoverAfterTimeout =
-					container.getElementsByClassName( 'components-popover' );
-				expect( popoverAfterTimeout ).toHaveLength( 1 );
-
-				jest.runOnlyPendingTimers();
-				jest.useRealTimers();
-			}, TOOLTIP_DELAY );
+			// Wait popover to be shown.
+			expect(
+				await screen.findByText( 'Help text' )
+			).toBeInTheDocument();
 		} );
 
 		it( 'should respect custom delay prop when showing popover', async () => {
