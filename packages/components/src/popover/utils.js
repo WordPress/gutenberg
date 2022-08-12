@@ -61,10 +61,23 @@ const PLACEMENT_TO_ANIMATION_ORIGIN = {
  * @return {import('framer-motion').MotionProps} The object containing the motion props
  */
 export const placementToMotionAnimationProps = ( placement ) => {
+	const translateProp =
+		placement.startsWith( 'top' ) || placement.startsWith( 'bottom' )
+			? 'translateY'
+			: 'translateX';
+	const translateDirection =
+		placement.startsWith( 'top' ) || placement.startsWith( 'left' )
+			? 1
+			: -1;
+
 	return {
 		style: PLACEMENT_TO_ANIMATION_ORIGIN[ placement ],
-		initial: { scale: 0 },
-		animate: { scale: 1 },
+		initial: {
+			opacity: 0,
+			scale: 0,
+			[ translateProp ]: `${ 2 * translateDirection }em`,
+		},
+		animate: { opacity: 1, scale: 1, [ translateProp ]: 0 },
 		transition: { duration: 0.1, ease: [ 0, 0, 0.2, 1 ] },
 	};
 };
