@@ -188,8 +188,8 @@ const Popover = (
 	/**
 	 * Offsets the position of the popover when the anchor is inside an iframe.
 	 *
-	 * Store the offset in a ref, due to constraints with floating-ui
-	 * (see: https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions)
+	 * Store the offset in a ref, due to constraints with floating-ui:
+	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
 	 */
 	const frameOffset = useRef();
 	useLayoutEffect( () => {
