@@ -1608,7 +1608,7 @@ export const blockListSettings = ( state = {}, action ) => {
 };
 
 /**
- * Reducer returning whether the navigation mode is enabled or not.
+ * Reducer returning which mode is enabled.
  *
  * @param {string} state  Current state.
  * @param {Object} action Dispatched action.

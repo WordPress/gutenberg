@@ -72,3 +72,15 @@ function gutenberg_initialize_editor( $editor_name, $editor_script_handle, $sett
 	);
 
 }
+
+/**
+ * Sets a global JS variable used to trigger the availability of zoomed out view.
+ */
+function gutenberg_enable_zoomed_out_view() {
+	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+	if (  $gutenberg_experiments && array_key_exists( 'gutenberg-zoomed-out-view', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-library', 'window.__experimentalEnableZoomedOutView = true', 'before' );
+	}
+}
+
+add_action( 'admin_init', 'gutenberg_enable_zoomed_out_view' );

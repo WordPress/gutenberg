@@ -28,16 +28,15 @@ function InserterLibrary(
 ) {
 	const { destinationRootClientId, prioritizePatterns } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getSettings } = select(
-				blockEditorStore
-			);
+			const { getBlockRootClientId, getSettings } =
+				select( blockEditorStore );
 
 			const _rootClientId =
 				rootClientId || getBlockRootClientId( clientId ) || undefined;
 			return {
 				destinationRootClientId: _rootClientId,
-				prioritizePatterns: getSettings()
-					.__experimentalPreferPatternsOnRoot,
+				prioritizePatterns:
+					getSettings().__experimentalPreferPatternsOnRoot,
 			};
 		},
 		[ clientId, rootClientId ]

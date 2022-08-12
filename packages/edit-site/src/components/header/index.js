@@ -127,6 +127,9 @@ export default function Header( {
 	);
 	const shortLabel = ! isInserterOpen ? __( 'Add' ) : __( 'Close' );
 
+	const hasZoomedOutView =
+		window && window.__experimentalEnableZoomedOutView && isVisualMode;
+
 	return (
 		<div className="edit-site-header">
 			<NavigableToolbar
@@ -189,22 +192,25 @@ export default function Header( {
 									showIconLabels ? 'tertiary' : undefined
 								}
 							/>
-							<Button
-								className="edit-site-header-toolbar__zoom-out-view-toggle"
-								icon={ chevronUpDown }
-								isPressed={ blockEditorMode === 'zoom-out' }
-								/* translators: button label text should, if possible, be under 16 characters. */
-								label={ __( 'Zoom-out View' ) }
-								onClick={ () => {
-									setPreviewDeviceType( 'desktop' );
-									setIsListViewOpened( false );
-									__unstableSetEditorMode(
-										blockEditorMode === 'zoom-out'
-											? 'edit'
-											: 'zoom-out'
-									);
-								} }
-							/>
+							{ hasZoomedOutView && (
+								<ToolbarItem
+									as={ Button }
+									className="edit-site-header-toolbar__zoom-out-view-toggle"
+									icon={ chevronUpDown }
+									isPressed={ blockEditorMode === 'zoom-out' }
+									/* translators: button label text should, if possible, be under 16 characters. */
+									label={ __( 'Zoom-out View' ) }
+									onClick={ () => {
+										setPreviewDeviceType( 'desktop' );
+										setIsListViewOpened( false );
+										__unstableSetEditorMode(
+											blockEditorMode === 'zoom-out'
+												? 'edit'
+												: 'zoom-out'
+										);
+									} }
+								/>
+							) }
 						</>
 					) }
 				</div>
