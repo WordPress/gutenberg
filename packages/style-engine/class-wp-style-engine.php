@@ -212,6 +212,15 @@ class WP_Style_Engine {
 				'path'          => array( 'typography', 'letterSpacing' ),
 			),
 		),
+		"shadow" => array(
+			'property_keys' => array(
+				'default' => 'box-shadow',
+			),
+			'path'          => array( 'shadows' ),
+			'classnames'    => array(
+				'has-$slug-shadow' => 'box-shadow',
+			),
+		),
 	);
 
 	/**

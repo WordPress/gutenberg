@@ -1084,6 +1084,15 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			'classes'           => array(),
 			'properties'        => array( 'padding', 'margin' ),
 		),
+		array(
+			'path'              => array( 'shadows' ),
+			'prevent_override'  => false,
+			'use_default_names' => false,
+			'value_func'        => 'gutenberg_get_shadow_value',
+			'css_vars'          => '--wp--preset--shadow--$slug',
+			'classes'           => array( '.has-$slug-shadow' => 'box-shadow' ),
+			'properties'        => array( 'box-shadow' ),
+		),
 	);
 
 	/**
@@ -1142,6 +1151,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			'textDecoration' => null,
 			'textTransform'  => null,
 		),
+		'shadows' => null,
 	);
 
 	/**
