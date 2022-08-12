@@ -122,10 +122,10 @@ export function CustomColorPickerDropdown( {
 			__unstableShift: true,
 			...( isRenderedInSidebar
 				? {
-						// When in the sidebar: open to the left (stacking)
+						// When in the sidebar: open to the left (stacking),
+						// leaving the same gap as the parent popover.
 						placement: 'left-start',
-						offset: 20,
-						// anchor?
+						offset: 34,
 				  }
 				: {
 						// Default behavior: open below the anchor
