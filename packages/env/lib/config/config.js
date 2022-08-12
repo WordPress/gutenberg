@@ -246,7 +246,7 @@ async function getDefaultBaseConfig( configPath ) {
  * @param {WPConfig} config fully parsed configuration object.
  * @return {WPConfig} configuration object with overrides applied.
  */
-async function withOverrides( config ) {
+function withOverrides( config ) {
 	const workDirectoryPath = config.workDirectoryPath;
 	// Override port numbers with environment variables.
 	config.env.development.port =
