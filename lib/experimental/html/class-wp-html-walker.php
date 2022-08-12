@@ -13,6 +13,7 @@
  * @TODO: Clean up attribute token class after is_true addition
  * @TODO: Review (start,end) vs. (start,length) pairs for consistency and ease.
  * @TODO: Prune whitespace when removing classes/attributes: e.g. "a b c" -> "c" not " c"
+ * @TODO: Skip over `/` in attributes area, split attribute names by `/`
  *
  * @package WordPress
  * @subpackage HTML
