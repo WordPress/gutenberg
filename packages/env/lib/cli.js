@@ -81,7 +81,7 @@ const withSpinner =
 module.exports = function cli() {
 	// Do nothing if Docker is unavailable.
 	try {
-		execSync( 'docker info', { stdio: 'ignore' } );
+		execSync( 'docker info' );
 	} catch {
 		console.error(
 			chalk.red( 'Could not connect to Docker. Is it running?' )
