@@ -302,13 +302,11 @@ class WP_HTML_Walker {
 	 */
 	private function skip_script_data() {
 		$state = 'unescaped';
-		while ( true ) {
+		$at = $this->parsed_bytes;
+		$max = strlen( $this->html ) - 1;
+		while ( $at < $max ) {
 			if ( 'unescaped' === $state ) {
-				$at = strpos( $this->html, '<', $this->parsed_bytes );
-				if ( false === $at ) {
-					$this->parsed_bytes = strlen( $this->html );
-					return;
-				}
+				$at = $this->parsed_bytes + strcspn( $this->html, '<', $this->parsed_bytes );
 
 				if (
 					strlen( $this->html ) >= $at + 8 &&
