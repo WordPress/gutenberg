@@ -15,7 +15,7 @@ export const nonBreakingSpace = {
 	tagName: 'span',
 	className: 'nbsp',
 	edit( { value, onChange } ) {
-		function addSpace() {
+		function addNonBreakingSpace() {
 			onChange( insert( value, ' ' ) );
 		}
 
@@ -28,7 +28,7 @@ export const nonBreakingSpace = {
 			<RichTextShortcut
 				type="primaryShift"
 				character=" "
-				onUse={ addSpace }
+				onUse={ addNonBreakingSpace }
 			/>
 		);
 	},
