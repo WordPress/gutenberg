@@ -187,8 +187,12 @@ const Popover = (
 
 	/**
 	 * Offsets the position of the popover when the anchor is inside an iframe.
+	 *
+	 * Store the offset in a ref, due to constraints with floating-ui
+	 * (see: https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions)
 	 */
-	const frameOffset = useMemo( () => {
+	const frameOffset = useRef();
+	useLayoutEffect( () => {
 		const { defaultView } = ownerDocument;
 		const { frameElement } = defaultView;
 
@@ -196,14 +200,21 @@ const Popover = (
 			return undefined;
 		}
 
-		const iframeRect = frameElement.getBoundingClientRect();
-		return { x: iframeRect.left, y: iframeRect.top };
+		const updateFrameOffset = () => {
+			const iframeRect = frameElement.getBoundingClientRect();
+			frameOffset.current = { x: iframeRect.left, y: iframeRect.top };
+		};
+		updateFrameOffset();
+		defaultView.addEventListener( 'resize', updateFrameOffset );
+
+		return () =>
+			defaultView.removeEventListener( 'resize', updateFrameOffset );
 	}, [ ownerDocument ] );
 
 	const middleware = [
 		frameOffset || offset
 			? offsetMiddleware( ( { placement: currentPlacement } ) => {
-					if ( ! frameOffset ) {
+					if ( ! frameOffset.current ) {
 						return offset;
 					}
 
@@ -228,8 +239,8 @@ const Popover = (
 					return {
 						mainAxis:
 							normalizedOffset +
-							frameOffset[ mainAxis ] * mainAxisModifier,
-						crossAxis: frameOffset[ crossAxis ],
+							frameOffset.current[ mainAxis ] * mainAxisModifier,
+						crossAxis: frameOffset.current[ crossAxis ],
 					};
 			  } )
 			: undefined,
@@ -394,8 +405,15 @@ const Popover = (
 			return;
 		}
 
+		const { defaultView } = ownerDocument;
+
+		defaultView.addEventListener( 'resize', update );
 		ownerDocument.addEventListener( 'scroll', update );
-		return () => ownerDocument.removeEventListener( 'scroll', update );
+
+		return () => {
+			defaultView.removeEventListener( 'resize', update );
+			ownerDocument.removeEventListener( 'scroll', update );
+		};
 	}, [ ownerDocument ] );
 
 	/** @type {false | string} */
