@@ -677,6 +677,14 @@ HTML;
 			'<script class="d-md-none"><!--<script><span></script><span></span></script><div></div>-->',
 		);
 
+		$examples['Double escaped script with a tricky opener'] = array(
+			'<script class="d-md-none"><!--<script attr="</script>"></script>"><div></div>',
+		);
+
+		$examples['Double escaped script with a tricky closer'] = array(
+			'<script class="d-md-none"><!--<script><span></script attr="</script>"><div></div>',
+		);
+
 		$examples['Script with a commented a script tag opener inside should at the next tag closer (dash dash escaped state)'] = array(
 			'<script class="d-md-none"><!--<script>--><span></script><div></div>-->',
 		);

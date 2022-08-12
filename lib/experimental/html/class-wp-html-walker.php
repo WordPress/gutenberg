@@ -381,8 +381,6 @@ class WP_HTML_Walker {
 			0 === strcspn( $this->html, " \t\f\r\n/>", $at + 7 )
 		) {
 			$this->parsed_bytes = $at + 7;
-			// Parse all the attributes of the current tag.
-			$this->skip_tag_closer_attributes();
 			$this->skip_script_data_double_escape();
 		} else {
 			$this->parsed_bytes = $at + 1;
@@ -425,7 +423,6 @@ class WP_HTML_Walker {
 			0 === strcspn( $this->html, " \t\f\r\n/>", $at + 8 )
 		) {
 			$this->parsed_bytes = $at + 8;
-			$this->skip_tag_closer_attributes();
 			$this->skip_script_data();
 		} else {
 			$this->parsed_bytes = $at + 1;
