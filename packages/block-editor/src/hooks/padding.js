@@ -10,7 +10,10 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
-import { __experimentalUseCustomUnits as useCustomUnits } from '@wordpress/components';
+import {
+	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalBoxControl as BoxControl,
+} from '@wordpress/components';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -102,6 +105,8 @@ export function PaddingEdit( props ) {
 		setAttributes,
 	} = props;
 
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [
 			'%',
@@ -136,7 +141,18 @@ export function PaddingEdit( props ) {
 	return Platform.select( {
 		web: (
 			<>
-				<>
+				{ ( ! spacingSizes || spacingSizes?.length === 0 ) && (
+					<BoxControl
+						values={ style?.spacing?.padding }
+						onChange={ onChange }
+						label={ __( 'Padding' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+					/>
+				) }
+				{ spacingSizes?.length > 0 && (
 					<SpacingSizesControl
 						values={ style?.spacing?.padding }
 						onChange={ onChange }
@@ -146,7 +162,7 @@ export function PaddingEdit( props ) {
 						allowReset={ false }
 						splitOnAxis={ splitOnAxis }
 					/>
-				</>
+				) }
 			</>
 		),
 		native: null,
