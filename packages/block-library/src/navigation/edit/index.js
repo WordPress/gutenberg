@@ -247,6 +247,7 @@ function Navigation( {
 		status: classicMenuConversionStatus,
 		error: classicMenuConversionError,
 		value: classicMenuConversionResult,
+		classicInnerBlocks: classicMenuConversionInnerBlocks,
 	} = useConvertClassicToBlockMenu( clientId );
 
 	const isConvertingClassicMenu =
@@ -359,6 +360,8 @@ function Navigation( {
 			showClassicMenuConversionNotice(
 				__( 'Classic menu imported successfully.' )
 			);
+
+			replaceInnerBlocks( clientId, classicMenuConversionInnerBlocks );
 		}
 
 		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_ERROR ) {
@@ -370,6 +373,7 @@ function Navigation( {
 		classicMenuConversionStatus,
 		classicMenuConversionResult,
 		classicMenuConversionError,
+		classicMenuConversionInnerBlocks,
 	] );
 
 	// Spacer block needs orientation from context. This is a patch until

@@ -25,6 +25,7 @@ function useConvertClassicToBlockMenu( clientId ) {
 	const [ status, setStatus ] = useState( CLASSIC_MENU_CONVERSION_IDLE );
 	const [ value, setValue ] = useState( null );
 	const [ error, setError ] = useState( null );
+	const [ classicInnerBlocks, setClassicInnerBlocks ] = useState( null );
 
 	async function convertClassicMenuToBlockMenu( menuId, menuName ) {
 		let navigationMenu;
@@ -65,13 +66,11 @@ function useConvertClassicToBlockMenu( clientId ) {
 
 		// 2. Convert the classic items into blocks.
 		const { innerBlocks } = menuItemsToBlocks( classicMenuItems );
+		setClassicInnerBlocks( innerBlocks );
 
 		// 3. Create the `wp_navigation` Post with the blocks.
 		try {
-			navigationMenu = await createNavigationMenu(
-				menuName,
-				innerBlocks
-			);
+			navigationMenu = await createNavigationMenu( menuName, [] );
 		} catch ( err ) {
 			throw new Error(
 				sprintf(
@@ -100,7 +99,7 @@ function useConvertClassicToBlockMenu( clientId ) {
 			setValue( null );
 			setError( null );
 
-			convertClassicMenuToBlockMenu( menuId, menuName )
+			return convertClassicMenuToBlockMenu( menuId, menuName )
 				.then( ( navMenu ) => {
 					setValue( navMenu );
 					setStatus( CLASSIC_MENU_CONVERSION_SUCCESS );
@@ -130,6 +129,7 @@ function useConvertClassicToBlockMenu( clientId ) {
 		status,
 		value,
 		error,
+		classicInnerBlocks,
 	};
 }
 
