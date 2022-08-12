@@ -13,7 +13,7 @@ if ( ! function_exists( 'esc_attr' ) ) {
 }
 
 if ( ! class_exists( 'WP_UnitTestCase' ) ) {
-	class WP_UnitTestCase extends \PHPUnit\Framework\TestCase {}
+	abstract class WP_UnitTestCase extends \PHPUnit\Framework\TestCase {}
 }
 
 require_once __DIR__ . '/../../lib/experimental/html/index.php';
@@ -74,13 +74,13 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	public function test_get_attribute_returns_true_for_boolean_attribute() {
 		$w = new WP_HTML_Walker( '<div enabled class="test">Test</div>' );
-		$this->assertTrue( $w->next_tag( [ 'class_name' => 'test' ] ) );
+		$this->assertTrue( $w->next_tag( array( 'class_name' => 'test' ) ) );
 		$this->assertTrue( $w->get_attribute( 'enabled' ) );
 	}
 
 	public function test_get_attribute_returns_string_for_truthy_attributes() {
 		$w = new WP_HTML_Walker( '<div enabled=enabled checked=1 hidden="true" class="test">Test</div>' );
-		$this->assertTrue( $w->next_tag( [] ) );
+		$this->assertTrue( $w->next_tag( array() ) );
 		$this->assertSame( 'enabled', $w->get_attribute( 'enabled' ) );
 		$this->assertSame( '1', $w->get_attribute( 'checked' ) );
 		$this->assertSame( 'true', $w->get_attribute( 'hidden' ) );
@@ -471,31 +471,37 @@ HTML;
 		$this->assertTrue( $w->next_tag( 'div' ) );
 		$w->set_attribute( 'data-details', '{ "key": "value" }' );
 		$w->add_class( 'is-processed' );
-		$this->assertTrue( $w->next_tag(
-			array(
-				'tag_name'   => 'div',
-				'class_name' => 'BtnGroup',
+		$this->assertTrue(
+			$w->next_tag(
+				array(
+					'tag_name'   => 'div',
+					'class_name' => 'BtnGroup',
+				)
 			)
-		) );
+		);
 		$w->remove_class( 'BtnGroup' );
 		$w->add_class( 'button-group' );
 		$w->add_class( 'Another-Mixed-Case' );
-		$this->assertTrue( $w->next_tag(
-			array(
-				'tag_name'   => 'div',
-				'class_name' => 'BtnGroup',
+		$this->assertTrue(
+			$w->next_tag(
+				array(
+					'tag_name'   => 'div',
+					'class_name' => 'BtnGroup',
+				)
 			)
-		) );
+		);
 		$w->remove_class( 'BtnGroup' );
 		$w->add_class( 'button-group' );
 		$w->add_class( 'Another-Mixed-Case' );
-		$this->assertTrue( $w->next_tag(
-			array(
-				'tag_name'     => 'button',
-				'class_name'   => 'btn',
-				'match_offset' => 3,
+		$this->assertTrue(
+			$w->next_tag(
+				array(
+					'tag_name'     => 'button',
+					'class_name'   => 'btn',
+					'match_offset' => 3,
+				)
 			)
-		) );
+		);
 		$w->remove_attribute( 'class' );
 		$this->assertFalse( $w->next_tag( 'non-existent' ) );
 		$w->set_attribute( 'class', 'test' );
@@ -653,35 +659,44 @@ HTML;
 	}
 
 	public function data_script_state() {
-		return array(
-			'Simple script tag'                          => array(
-				'<script><span class="d-none d-md-inline">Back to notifications</span></script><div></div>'
-			),
-			'Simple uppercase script tag'                          => array(
-				'<script><span class="d-none d-md-inline">Back to notifications</span></SCRIPT><div></div>'
-			),
-			'Script with a comment opener inside should end at the next script tag closer (dash dash escaped state)' => array(
-				'<script class="d-md-none"><!--</script><div></div>-->'
-			),
-			'Script with a comment opener and a script tag opener inside should end two script tag closer later (double escaped state)' => array(
-				'<script class="d-md-none"><!--<script><span></script><span></span></script><div></div>-->'
-			),
-			'Script with a commented a script tag opener inside should at the next tag closer (dash dash escaped state)' => array(
-				'<script class="d-md-none"><!--<script>--><span></script><div></div>-->'
-			),
-			'Script closer with another script tag in closer attributes' => array(
-				'<script><span class="d-none d-md-inline">Back to notifications</title</span></script <script><div></div>'
-			),
-			'Script closer with attributes'          => array(
-				'<script class="d-md-none"><span class="d-none d-md-inline">Back to notifications</span></script id="test"><div></div>'
-			),
-			'Script opener with title closer inside' => array(
-				'<script class="d-md-none"></title></script><div></div>'
-			),
-			'Complex script with many parsing states' => array(
-				'<script class="d-md-none"><!--<script>--><scRipt><span><!--<span><Script</script>--></scripT><div></div>-->'
-			),
+		$examples = array();
+
+		$examples['Simple script tag'] = array(
+			'<script><span class="d-none d-md-inline">Back to notifications</span></script><div></div>',
 		);
+
+		$examples['Simple uppercase script tag'] = array(
+			'<script><span class="d-none d-md-inline">Back to notifications</span></SCRIPT><div></div>',
+		);
+
+		$examples['Script with a comment opener inside should end at the next script tag closer (dash dash escaped state)'] = array(
+			'<script class="d-md-none"><!--</script><div></div>-->',
+		);
+
+		$examples['Script with a comment opener and a script tag opener inside should end two script tag closer later (double escaped state)'] = array(
+			'<script class="d-md-none"><!--<script><span></script><span></span></script><div></div>-->',
+		);
+
+		$examples['Script with a commented a script tag opener inside should at the next tag closer (dash dash escaped state)'] = array(
+			'<script class="d-md-none"><!--<script>--><span></script><div></div>-->',
+		);
+
+		$examples['Script closer with another script tag in closer attributes'] = array(
+			'<script><span class="d-none d-md-inline">Back to notifications</title</span></script <script><div></div>',
+		);
+
+		$examples['Script closer with attributes'] = array(
+			'<script class="d-md-none"><span class="d-none d-md-inline">Back to notifications</span></script id="test"><div></div>',
+		);
+
+		$examples['Script opener with title closer inside'] = array(
+			'<script class="d-md-none"></title></script><div></div>',
+		);
+
+		$examples['Complex script with many parsing states'] = array(
+			'<script class="d-md-none"><!--<script>--><scRipt><span><!--<span><Script</script>--></scripT><div></div>-->',
+		);
+		return $examples;
 	}
 
 	/**
@@ -697,32 +712,37 @@ HTML;
 	}
 
 	public function data_rcdata_state() {
-		return array(
-			'Simple textarea'                          => array(
-				'<textarea><span class="d-none d-md-inline">Back to notifications</span></textarea><div></div>',
-				'textarea',
-			),
-			'Simple title'                             => array(
-				'<title><span class="d-none d-md-inline">Back to notifications</title</span></title><div></div>',
-				'title',
-			),
-			'Comment opener inside a textarea tag should be ignored' => array(
-				'<textarea class="d-md-none"><!--</textarea><div></div>-->',
-				'textarea',
-			),
-			'Textarea closer with another textarea tag in closer attributes' => array(
-				'<textarea><span class="d-none d-md-inline">Back to notifications</title</span></textarea <textarea><div></div>',
-				'textarea',
-			),
-			'Textarea closer with attributes'          => array(
-				'<textarea class="d-md-none"><span class="d-none d-md-inline">Back to notifications</span></textarea id="test"><div></div>',
-				'textarea',
-			),
-			'Textarea opener with title closer inside' => array(
-				'<textarea class="d-md-none"></title></textarea><div></div>',
-				'textarea',
-			),
+		$examples                    = array();
+		$examples['Simple textarea'] = array(
+			'<textarea><span class="d-none d-md-inline">Back to notifications</span></textarea><div></div>',
+			'textarea',
 		);
+
+		$examples['Simple title'] = array(
+			'<title><span class="d-none d-md-inline">Back to notifications</title</span></title><div></div>',
+			'title',
+		);
+
+		$examples['Comment opener inside a textarea tag should be ignored'] = array(
+			'<textarea class="d-md-none"><!--</textarea><div></div>-->',
+			'textarea',
+		);
+
+		$examples['Textarea closer with another textarea tag in closer attributes'] = array(
+			'<textarea><span class="d-none d-md-inline">Back to notifications</title</span></textarea <textarea><div></div>',
+			'textarea',
+		);
+
+		$examples['Textarea closer with attributes'] = array(
+			'<textarea class="d-md-none"><span class="d-none d-md-inline">Back to notifications</span></textarea id="test"><div></div>',
+			'textarea',
+		);
+
+		$examples['Textarea opener with title closer inside'] = array(
+			'<textarea class="d-md-none"></title></textarea><div></div>',
+			'textarea',
+		);
+		return $examples;
 	}
 
 	/**
@@ -744,163 +764,202 @@ HTML;
 
 	public function data_malformed_tag() {
 		$null_byte = chr( 0 );
-		return array(
-			'Invalid entity inside attribute value' => array(
-				'<img src="https://s0.wp.com/i/atat.png" title="&; First &lt;title&gt; is &notit;" TITLE="seoncd title" title="An Imperial &imperial; AT-AT"><span>test</span>',
-				'<img foo="bar" class="firstTag" src="https://s0.wp.com/i/atat.png" title="&; First &lt;title&gt; is &notit;" TITLE="seoncd title" title="An Imperial &imperial; AT-AT"><span class="secondTag">test</span>',
-			),
-			'HTML tag opening inside attribute value' => array(
-				'<pre id="<code" class="wp-block-code <code is poetry&gt;"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
-				'<pre foo="bar" id="<code" class="wp-block-code <code is poetry&gt; firstTag"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span class="secondTag">test</span>',
-			),
-			'HTML tag brackets in attribute values and data markup' => array(
-				'<pre id="<code-&gt;-block-&gt;" class="wp-block-code <code is poetry&gt;"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
-				'<pre foo="bar" id="<code-&gt;-block-&gt;" class="wp-block-code <code is poetry&gt; firstTag"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span class="secondTag">test</span>',
-			),
-			'Single and double quotes in attribute value' => array(
-				'<p title="Demonstrating how to use single quote (\') and double quote (&quot;)"><span>test</span>',
-				'<p foo="bar" class="firstTag" title="Demonstrating how to use single quote (\') and double quote (&quot;)"><span class="secondTag">test</span>',
-			),
-			'Unquoted attribute values' => array(
-				'<hr a=1 a=2 a=3 a=5 /><span>test</span>',
-				'<hr foo="bar" class="firstTag" a=1 a=2 a=3 a=5 /><span class="secondTag">test</span>',
-			),
-			'Double-quotes escaped in double-quote attribute value' => array(
-				'<hr title="This is a &quot;double-quote&quot;"><span>test</span>',
-				'<hr foo="bar" class="firstTag" title="This is a &quot;double-quote&quot;"><span class="secondTag">test</span>',
-			),
-			'Unquoted attribute value' => array(
-				'<hr id=code><span>test</span>',
-				'<hr foo="bar" class="firstTag" id=code><span class="secondTag">test</span>',
-			),
-			'Unquoted attribute value with tag-like value' => array(
-				'<hr id= 	<code> ><span>test</span>',
-				'<hr foo="bar" class="firstTag" id= 	<code> ><span class="secondTag">test</span>',
-			),
-			'Unquoted attribute value with tag-like value followed by tag-like data' => array(
-				'<hr id=code>><span>test</span>',
-				'<hr foo="bar" class="firstTag" id=code>><span class="secondTag">test</span>',
-			),
-			'1' => array(
-				'<hr id=&quo;code><span>test</span>',
-				'<hr foo="bar" class="firstTag" id=&quo;code><span class="secondTag">test</span>',
-			),
-			'2' => array(
-				'<hr id/test=5><span>test</span>',
-				'<hr foo="bar" class="firstTag" id/test=5><span class="secondTag">test</span>',
-			),
-			'4' => array(
-				'<hr title="<hr>"><span>test</span>',
-				'<hr foo="bar" class="firstTag" title="<hr>"><span class="secondTag">test</span>',
-			),
-			'5' => array(
-				'<hr id=>code><span>test</span>',
-				'<hr foo="bar" class="firstTag" id=>code><span class="secondTag">test</span>',
-			),
-			'6' => array(
-				'<hr id"quo="test"><span>test</span>',
-				'<hr foo="bar" class="firstTag" id"quo="test"><span class="secondTag">test</span>',
-			),
-			'7' => array(
-				'<hr id' . $null_byte . 'zero="test"><span>test</span>',
-				'<hr foo="bar" class="firstTag" id' . $null_byte . 'zero="test"><span class="secondTag">test</span>',
-			),
-			'8' => array(
-				'<hr >id="test"><span>test</span>',
-				'<hr foo="bar" class="firstTag" >id="test"><span class="secondTag">test</span>',
-			),
-			'9' => array(
-				'<hr =id="test"><span>test</span>',
-				'<hr foo="bar" class="firstTag" =id="test"><span class="secondTag">test</span>',
-			),
-			'10' => array(
-				'</><span>test</span>',
-				'</><span foo="bar" class="firstTag">test</span>',
-			),
-			'11' => array(
-				'The applicative operator <* works well in Haskell; <data-tag> is what?<span>test</span>',
-				'The applicative operator <* works well in Haskell; <data-tag foo="bar" class="firstTag"> is what?<span class="secondTag">test</span>',
-			),
-			'12' => array(
-				'<3 is a heart but <t3> is a tag.<span>test</span>',
-				'<3 is a heart but <t3 foo="bar" class="firstTag"> is a tag.<span class="secondTag">test</span>',
-			),
-			'13' => array(
-				'<?comment --><span>test</span>',
-				'<?comment --><span foo="bar" class="firstTag">test</span>',
-			),
-			'14' => array(
-				'<!-- this is a comment. no <strong>tags</strong> allowed --><span>test</span>',
-				'<!-- this is a comment. no <strong>tags</strong> allowed --><span foo="bar" class="firstTag">test</span>',
-			),
-			'15' => array(
-				'<![CDATA[This <is> a <strong id="yes">HTML Tag</strong>]]><span>test</span>',
-				'<![CDATA[This <is> a <strong id="yes">HTML Tag</strong>]]><span foo="bar" class="firstTag">test</span>',
-			),
-			'16' => array(
-				'<hr ===name="value"><span>test</span>',
-				'<hr foo="bar" class="firstTag" ===name="value"><span class="secondTag">test</span>',
-			),
-			'17' => array(
-				'<hr asdf="test"><span>test</span>',
-				'<hr foo="bar" class="firstTag" asdf="test"><span class="secondTag">test</span>',
-			),
-			'18' => array(
-				'<hr =asdf="tes"><span>test</span>',
-				'<hr foo="bar" class="firstTag" =asdf="tes"><span class="secondTag">test</span>',
-			),
-			'19' => array(
-				'<hr ==="test"><span>test</span>',
-				'<hr foo="bar" class="firstTag" ==="test"><span class="secondTag">test</span>',
-			),
-			'20' => array(
-				'<hr =><span>test</span>',
-				'<hr foo="bar" class="firstTag" =><span class="secondTag">test</span>',
-			),
-			'21' => array(
-				'<hr =5><span>test</span>',
-				'<hr foo="bar" class="firstTag" =5><span class="secondTag">test</span>',
-			),
-			'22' => array(
-				'<hr ==><span>test</span>',
-				'<hr foo="bar" class="firstTag" ==><span class="secondTag">test</span>',
-			),
-			'23' => array(
-				'<hr ===><span>test</span>',
-				'<hr foo="bar" class="firstTag" ===><span class="secondTag">test</span>',
-			),
-			'24' => array(
-				'<hr disabled><span>test</span>',
-				'<hr foo="bar" class="firstTag" disabled><span class="secondTag">test</span>',
-			),
-			'25' => array(
-				'<hr a"sdf="test"><span>test</span>',
-				'<hr foo="bar" class="firstTag" a"sdf="test"><span class="secondTag">test</span>',
-			),
-			'26' => array(
-				'<hr id=">"code<span>test</span>',
-				'<hr foo="bar" class="firstTag" id=">"code<span>test</span>',
-			),
-			'27' => array(
-				'<hr id="value>"code<span>test</span>',
-				'<hr foo="bar" class="firstTag" id="value>"code<span>test</span>',
-			),
-			'28' => array(
-				'<hr id="/>"code<span>test</span>',
-				'<hr foo="bar" class="firstTag" id="/>"code<span>test</span>',
-			),
-			'29' => array(
-				'<hr id="value/>"code<span>test</span>',
-				'<hr foo="bar" class="firstTag" id="value/>"code<span>test</span>',
-			),
-			'30' => array(
-				'<hr id   =5><span>test</span>',
-				'<hr foo="bar" class="firstTag" id   =5><span class="secondTag">test</span>',
-			),
-			'31' => array(
-				'<hr id a  =5><span>test</span>',
-				'<hr foo="bar" class="firstTag" id a  =5><span class="secondTag">test</span>',
-			),
+		$examples  = array();
+		$examples['Invalid entity inside attribute value'] = array(
+			'<img src="https://s0.wp.com/i/atat.png" title="&; First &lt;title&gt; is &notit;" TITLE="seoncd title" title="An Imperial &imperial; AT-AT"><span>test</span>',
+			'<img foo="bar" class="firstTag" src="https://s0.wp.com/i/atat.png" title="&; First &lt;title&gt; is &notit;" TITLE="seoncd title" title="An Imperial &imperial; AT-AT"><span class="secondTag">test</span>',
 		);
+
+		$examples['HTML tag opening inside attribute value'] = array(
+			'<pre id="<code" class="wp-block-code <code is poetry&gt;"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
+			'<pre foo="bar" id="<code" class="wp-block-code <code is poetry&gt; firstTag"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span class="secondTag">test</span>',
+		);
+
+		$examples['HTML tag brackets in attribute values and data markup'] = array(
+			'<pre id="<code-&gt;-block-&gt;" class="wp-block-code <code is poetry&gt;"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
+			'<pre foo="bar" id="<code-&gt;-block-&gt;" class="wp-block-code <code is poetry&gt; firstTag"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span class="secondTag">test</span>',
+		);
+
+		$examples['Single and double quotes in attribute value'] = array(
+			'<p title="Demonstrating how to use single quote (\') and double quote (&quot;)"><span>test</span>',
+			'<p foo="bar" class="firstTag" title="Demonstrating how to use single quote (\') and double quote (&quot;)"><span class="secondTag">test</span>',
+		);
+
+		$examples['Unquoted attribute values'] = array(
+			'<hr a=1 a=2 a=3 a=5 /><span>test</span>',
+			'<hr foo="bar" class="firstTag" a=1 a=2 a=3 a=5 /><span class="secondTag">test</span>',
+		);
+
+		$examples['Double-quotes escaped in double-quote attribute value'] = array(
+			'<hr title="This is a &quot;double-quote&quot;"><span>test</span>',
+			'<hr foo="bar" class="firstTag" title="This is a &quot;double-quote&quot;"><span class="secondTag">test</span>',
+		);
+
+		$examples['Unquoted attribute value'] = array(
+			'<hr id=code><span>test</span>',
+			'<hr foo="bar" class="firstTag" id=code><span class="secondTag">test</span>',
+		);
+
+		$examples['Unquoted attribute value with tag-like value'] = array(
+			'<hr id= 	<code> ><span>test</span>',
+			'<hr foo="bar" class="firstTag" id= 	<code> ><span class="secondTag">test</span>',
+		);
+
+		$examples['Unquoted attribute value with tag-like value followed by tag-like data'] = array(
+			'<hr id=code>><span>test</span>',
+			'<hr foo="bar" class="firstTag" id=code>><span class="secondTag">test</span>',
+		);
+
+		$examples['1'] = array(
+			'<hr id=&quo;code><span>test</span>',
+			'<hr foo="bar" class="firstTag" id=&quo;code><span class="secondTag">test</span>',
+		);
+
+		$examples['2'] = array(
+			'<hr id/test=5><span>test</span>',
+			'<hr foo="bar" class="firstTag" id/test=5><span class="secondTag">test</span>',
+		);
+
+		$examples['4'] = array(
+			'<hr title="<hr>"><span>test</span>',
+			'<hr foo="bar" class="firstTag" title="<hr>"><span class="secondTag">test</span>',
+		);
+
+		$examples['5'] = array(
+			'<hr id=>code><span>test</span>',
+			'<hr foo="bar" class="firstTag" id=>code><span class="secondTag">test</span>',
+		);
+
+		$examples['6'] = array(
+			'<hr id"quo="test"><span>test</span>',
+			'<hr foo="bar" class="firstTag" id"quo="test"><span class="secondTag">test</span>',
+		);
+
+		$examples['7'] = array(
+			'<hr id' . $null_byte . 'zero="test"><span>test</span>',
+			'<hr foo="bar" class="firstTag" id' . $null_byte . 'zero="test"><span class="secondTag">test</span>',
+		);
+
+		$examples['8'] = array(
+			'<hr >id="test"><span>test</span>',
+			'<hr foo="bar" class="firstTag" >id="test"><span class="secondTag">test</span>',
+		);
+
+		$examples['9'] = array(
+			'<hr =id="test"><span>test</span>',
+			'<hr foo="bar" class="firstTag" =id="test"><span class="secondTag">test</span>',
+		);
+
+		$examples['10'] = array(
+			'</><span>test</span>',
+			'</><span foo="bar" class="firstTag">test</span>',
+		);
+
+		$examples['11'] = array(
+			'The applicative operator <* works well in Haskell; <data-tag> is what?<span>test</span>',
+			'The applicative operator <* works well in Haskell; <data-tag foo="bar" class="firstTag"> is what?<span class="secondTag">test</span>',
+		);
+
+		$examples['12'] = array(
+			'<3 is a heart but <t3> is a tag.<span>test</span>',
+			'<3 is a heart but <t3 foo="bar" class="firstTag"> is a tag.<span class="secondTag">test</span>',
+		);
+
+		$examples['13'] = array(
+			'<?comment --><span>test</span>',
+			'<?comment --><span foo="bar" class="firstTag">test</span>',
+		);
+
+		$examples['14'] = array(
+			'<!-- this is a comment. no <strong>tags</strong> allowed --><span>test</span>',
+			'<!-- this is a comment. no <strong>tags</strong> allowed --><span foo="bar" class="firstTag">test</span>',
+		);
+
+		$examples['15'] = array(
+			'<![CDATA[This <is> a <strong id="yes">HTML Tag</strong>]]><span>test</span>',
+			'<![CDATA[This <is> a <strong id="yes">HTML Tag</strong>]]><span foo="bar" class="firstTag">test</span>',
+		);
+
+		$examples['16'] = array(
+			'<hr ===name="value"><span>test</span>',
+			'<hr foo="bar" class="firstTag" ===name="value"><span class="secondTag">test</span>',
+		);
+
+		$examples['17'] = array(
+			'<hr asdf="test"><span>test</span>',
+			'<hr foo="bar" class="firstTag" asdf="test"><span class="secondTag">test</span>',
+		);
+
+		$examples['18'] = array(
+			'<hr =asdf="tes"><span>test</span>',
+			'<hr foo="bar" class="firstTag" =asdf="tes"><span class="secondTag">test</span>',
+		);
+
+		$examples['19'] = array(
+			'<hr ==="test"><span>test</span>',
+			'<hr foo="bar" class="firstTag" ==="test"><span class="secondTag">test</span>',
+		);
+
+		$examples['20'] = array(
+			'<hr =><span>test</span>',
+			'<hr foo="bar" class="firstTag" =><span class="secondTag">test</span>',
+		);
+
+		$examples['21'] = array(
+			'<hr =5><span>test</span>',
+			'<hr foo="bar" class="firstTag" =5><span class="secondTag">test</span>',
+		);
+
+		$examples['22'] = array(
+			'<hr ==><span>test</span>',
+			'<hr foo="bar" class="firstTag" ==><span class="secondTag">test</span>',
+		);
+
+		$examples['23'] = array(
+			'<hr ===><span>test</span>',
+			'<hr foo="bar" class="firstTag" ===><span class="secondTag">test</span>',
+		);
+
+		$examples['24'] = array(
+			'<hr disabled><span>test</span>',
+			'<hr foo="bar" class="firstTag" disabled><span class="secondTag">test</span>',
+		);
+
+		$examples['25'] = array(
+			'<hr a"sdf="test"><span>test</span>',
+			'<hr foo="bar" class="firstTag" a"sdf="test"><span class="secondTag">test</span>',
+		);
+
+		$examples['26'] = array(
+			'<hr id=">"code<span>test</span>',
+			'<hr foo="bar" class="firstTag" id=">"code<span>test</span>',
+		);
+
+		$examples['27'] = array(
+			'<hr id="value>"code<span>test</span>',
+			'<hr foo="bar" class="firstTag" id="value>"code<span>test</span>',
+		);
+
+		$examples['28'] = array(
+			'<hr id="/>"code<span>test</span>',
+			'<hr foo="bar" class="firstTag" id="/>"code<span>test</span>',
+		);
+
+		$examples['29'] = array(
+			'<hr id="value/>"code<span>test</span>',
+			'<hr foo="bar" class="firstTag" id="value/>"code<span>test</span>',
+		);
+
+		$examples['30'] = array(
+			'<hr id   =5><span>test</span>',
+			'<hr foo="bar" class="firstTag" id   =5><span class="secondTag">test</span>',
+		);
+
+		$examples['31'] = array(
+			'<hr id a  =5><span>test</span>',
+			'<hr foo="bar" class="firstTag" id a  =5><span class="secondTag">test</span>',
+		);
+
+		return $examples;
 	}
 }

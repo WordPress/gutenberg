@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Scans through an HTML document to find specific tags, then
  * transforms those tags by adding, removing, or updating the
@@ -38,21 +38,29 @@ class WP_HTML_Walker {
 	private $html;
 
 	/**
+	 * The last query passed to next_tag().
+	 *
 	 * @var array|null
 	 */
 	private $last_query;
 
 	/**
+	 * The tag name this walker currently scans for.
+	 *
 	 * @var string|null
 	 */
 	private $sought_tag_name;
 
 	/**
+	 * The CSS class name this walker currently scans for.
+	 *
 	 * @var string|null
 	 */
 	private $sought_class_name;
 
 	/**
+	 * The match offset this walker currently scans for.
+	 *
 	 * @var int|null
 	 */
 	private $sought_match_offset;
@@ -312,7 +320,7 @@ class WP_HTML_Walker {
 		) {
 			$this->parsed_bytes = $at + 8;
 			$this->skip_tag_closer_attributes();
-		} else if (
+		} elseif (
 			strlen( $this->html ) >= $at + 4 &&
 			'!' === $this->html[ $at + 1 ] &&
 			'-' === $this->html[ $at + 2 ] &&
@@ -349,7 +357,7 @@ class WP_HTML_Walker {
 		) {
 			$this->parsed_bytes = $at + 3;
 			$this->skip_script_data();
-		} else if (
+		} elseif (
 			strlen( $this->html ) >= $at + 8 &&
 			'/' === $this->html[ $at + 1 ] &&
 			's' === strtolower( $this->html[ $at + 2 ] ) &&
@@ -362,7 +370,7 @@ class WP_HTML_Walker {
 		) {
 			$this->parsed_bytes = $at + 8;
 			$this->skip_tag_closer_attributes();
-		} else if (
+		} elseif (
 			strlen( $this->html ) >= $at + 7 &&
 			's' === strtolower( $this->html[ $at + 1 ] ) &&
 			'c' === strtolower( $this->html[ $at + 2 ] ) &&
@@ -405,7 +413,7 @@ class WP_HTML_Walker {
 		) {
 			$this->parsed_bytes = $at + 3;
 			$this->skip_script_data();
-		} else if (
+		} elseif (
 			strlen( $this->html ) >= $at + 8 &&
 			'/' === $this->html[ $at + 1 ] &&
 			's' === strtolower( $this->html[ $at + 2 ] ) &&
@@ -541,7 +549,7 @@ class WP_HTML_Walker {
 	 * @since 6.1.0
 	 */
 	private function parse_tag_opener_attributes() {
-		while ( $this->parse_next_attribute( ) ) {
+		while ( $this->parse_next_attribute() ) {
 			// Twiddle our thumbs...
 		}
 	}
@@ -551,7 +559,7 @@ class WP_HTML_Walker {
 	 *
 	 * @since 6.1.0
 	 */
-	private function skip_tag_closer_attributes( ) {
+	private function skip_tag_closer_attributes() {
 		while ( $this->parse_next_attribute( 'tag-closer' ) ) {
 			// Twiddle our thumbs...
 		}
@@ -613,7 +621,7 @@ class WP_HTML_Walker {
 			$attribute_end = $attribute_start + $name_length;
 		}
 
-		if ( $context !== 'tag-opener' ) {
+		if ( 'tag-opener' !== $context ) {
 			return true;
 		}
 
@@ -929,7 +937,7 @@ class WP_HTML_Walker {
 	 */
 	public function set_attribute( $name, $value ) {
 		$this->assert_not_closed();
-		if ( $this->tag_name_starts_at === null ) {
+		if ( null === $this->tag_name_starts_at ) {
 			return;
 		}
 
@@ -1045,7 +1053,7 @@ class WP_HTML_Walker {
 	 */
 	public function add_class( $class_name ) {
 		$this->assert_not_closed();
-		if ( $this->tag_name_starts_at !== null ) {
+		if ( null !== $this->tag_name_starts_at ) {
 			$this->classname_updates[ $class_name ] = self::ADD_CLASS;
 		}
 	}
@@ -1061,7 +1069,7 @@ class WP_HTML_Walker {
 	 */
 	public function remove_class( $class_name ) {
 		$this->assert_not_closed();
-		if ( $this->tag_name_starts_at !== null ) {
+		if ( null !== $this->tag_name_starts_at ) {
 			$this->classname_updates[ $class_name ] = self::REMOVE_CLASS;
 		}
 	}
@@ -1107,7 +1115,7 @@ class WP_HTML_Walker {
 		$this->sought_class_name   = null;
 		$this->sought_match_offset = 1;
 
-		// A single string value means "find the tag of this name."
+		// A single string value means "find the tag of this name".
 		if ( is_string( $query ) ) {
 			$this->sought_tag_name = $query;
 			return;
@@ -1147,7 +1155,7 @@ class WP_HTML_Walker {
 			 * same length then they can't be the same string values.
 			 */
 			$length = $this->tag_name_ends_at - $this->tag_name_starts_at;
-			if ( $length !== strlen( $this->sought_tag_name ) ) {
+			if ( strlen( $this->sought_tag_name ) !== $length ) {
 				return false;
 			}
 
@@ -1191,6 +1199,7 @@ class WP_HTML_Walker {
 			 * See https://html.spec.whatwg.org/#space-separated-tokens
 			 */
 			while (
+				// phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
 				false !== ( $class_at = strpos( $this->html, $this->sought_class_name, $class_at ) ) &&
 				$class_at < $class_end
 			) {
