@@ -59,11 +59,8 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 	}
 }
 
-.components-custom-gradient-picker__color-picker-popover .components-custom-gradient-picker__remove-control-point {
-	margin-left: auto;
-	margin-right: auto;
-	display: block;
-	margin-bottom: $grid-unit-10;
+.components-custom-gradient-picker__remove-control-point-wrapper {
+	padding-bottom: $grid-unit-10;
 }
 
 .components-custom-gradient-picker__inserter {

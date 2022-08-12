@@ -20,7 +20,7 @@ $ cd todo-list
 $ npm start
 ```
 
-_(requires `node` version `12.0.0` or above, and `npm` version `6.9.0` or above)_
+_(requires `node` version `14.0.0` or above, and `npm` version `6.14.4` or above)_
 
 It creates a WordPress plugin that you need to [install manually](https://wordpress.org/support/article/managing-plugins/#manual-plugin-installation).
 

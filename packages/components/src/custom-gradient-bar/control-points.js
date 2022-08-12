@@ -17,6 +17,7 @@ import { LEFT, RIGHT } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import Button from '../button';
+import { HStack } from '../h-stack';
 import { ColorPicker } from '../color-picker';
 import { VisuallyHidden } from '../visually-hidden';
 import { CustomColorPickerDropdown } from '../color-palette';
@@ -73,23 +74,16 @@ function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
 	);
 }
 
-function GradientColorPickerDropdown( {
-	isRenderedInSidebar,
-	gradientPickerDomRef,
-	...props
-} ) {
-	const popoverProps = useMemo( () => {
-		const result = {
-			className:
-				'components-custom-gradient-picker__color-picker-popover',
-			position: 'top',
-		};
-		if ( isRenderedInSidebar ) {
-			result.anchorRef = gradientPickerDomRef.current;
-			result.position = 'bottom left';
-		}
-		return result;
-	}, [ gradientPickerDomRef, isRenderedInSidebar ] );
+function GradientColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
+	// Open the popover below the gradient control/insertion point
+	const popoverProps = useMemo(
+		() => ( {
+			placement: 'bottom',
+			offset: 8,
+		} ),
+		[]
+	);
+
 	return (
 		<CustomColorPickerDropdown
 			isRenderedInSidebar={ isRenderedInSidebar }
@@ -163,7 +157,6 @@ function ControlPoints( {
 		return (
 			ignoreMarkerPosition !== initialPosition && (
 				<GradientColorPickerDropdown
-					gradientPickerDomRef={ gradientPickerDomRef }
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 					key={ index }
 					onClose={ onStopControlPointChange }
@@ -256,21 +249,25 @@ function ControlPoints( {
 								} }
 							/>
 							{ ! disableRemove && controlPoints.length > 2 && (
-								<Button
-									className="components-custom-gradient-picker__remove-control-point"
-									onClick={ () => {
-										onChange(
-											removeControlPoint(
-												controlPoints,
-												index
-											)
-										);
-										onClose();
-									} }
-									variant="link"
+								<HStack
+									className="components-custom-gradient-picker__remove-control-point-wrapper"
+									alignment="center"
 								>
-									{ __( 'Remove Control Point' ) }
-								</Button>
+									<Button
+										onClick={ () => {
+											onChange(
+												removeControlPoint(
+													controlPoints,
+													index
+												)
+											);
+											onClose();
+										} }
+										variant="link"
+									>
+										{ __( 'Remove Control Point' ) }
+									</Button>
+								</HStack>
 							) }
 						</>
 					) }
@@ -288,12 +285,10 @@ function InsertPoint( {
 	insertPosition,
 	disableAlpha,
 	__experimentalIsRenderedInSidebar,
-	gradientPickerDomRef,
 } ) {
 	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
 	return (
 		<GradientColorPickerDropdown
-			gradientPickerDomRef={ gradientPickerDomRef }
 			isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 			className="components-custom-gradient-picker__inserter"
 			onClose={ () => {
