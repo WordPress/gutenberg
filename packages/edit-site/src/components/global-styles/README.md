@@ -26,8 +26,8 @@ import { useGlobalStylesReset } from './global-styles';
 function MyComponent() {
 	const [ canReset, reset ] = useGlobalStylesReset();
 
-	return canReset 
-		? <Button onClick={ () => reset() }>Reset</Button> 
+	return canReset
+		? <Button onClick={ () => reset() }>Reset</Button>
 		: null;
 }
 ```
@@ -61,10 +61,10 @@ import { useStyle } from './global-styles';
 
 function MyComponent() {
 	// Text color for the site root.
-	const [ color, setColor ] = useStyle( 'color.text' ); 
+	const [ color, setColor ] = useStyle( 'color.text' );
 
 	// The user modified color for the core paragraph block.
-	const [ pColor, setPColor ] = useStyle( 'color.text', 'core/paragraph', 'user' ); 
+	const [ pColor, setPColor ] = useStyle( 'color.text', 'core/paragraph', 'user' );
 
 	return "Something";
 }
@@ -79,13 +79,44 @@ import { useSetting } from './global-styles';
 
 function MyComponent() {
 	// The default color palette.
-	const [ colorPalette, setColorPalette ] = useSetting( 'color.palette' ); 
+	const [ colorPalette, setColorPalette ] = useSetting( 'color.palette' );
 
 	// The base (theme + core) color palette for the paragraph block,
 	// ignoring user provided palette.
 	// If the palette is not defined for the paragraph block, the root one is returned.
-	const [ pColor, setPColor ] = useSetting( 'color.palette', 'core/paragraph', 'base' ); 
+	const [ pColor, setPColor ] = useSetting( 'color.palette', 'core/paragraph', 'base' );
 
 	return "Something";
 }
+```
+
+## GlobalStylesProvider
+
+Provides access to the Global Styles store. If you want  to interact with Global Styles data in a UI then you can wrap your controls in this component to give you access to the store:
+
+```js
+	import { GlobalStylesProvider } from './global-styles';
+
+	function MyComponent() {
+		return (
+			<GlobalStylesProvider>
+				<MyUIControls />
+			</GlobalStylesProvider>
+		);
+	}
+```
+
+The `MyUIControls` component will now have access to the Global Styles store.
+
+## useGlobalStylesReset
+
+A react hook used to reset the Global Styles settings in the client:
+
+```js
+	import { useGlobalStylesReset } from './global-styles';
+
+	const [ canReset, onReset ] = useGlobalStylesReset();
+
+	// From inside your component call:
+	onReset();
 ```
