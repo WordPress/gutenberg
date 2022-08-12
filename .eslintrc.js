@@ -85,6 +85,7 @@ module.exports = {
 							'compact',
 							'concat',
 							'countBy',
+							'deburr',
 							'defaults',
 							'defaultTo',
 							'delay',
