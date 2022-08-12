@@ -39,8 +39,13 @@ function render_block_core_site_logo( $attributes ) {
 	if ( $attributes['isLink'] && '_blank' === $attributes['linkTarget'] ) {
 		// Add the link target after the rel="home".
 		// Add an aria-label for informing that the page opens in a new tab.
-		$aria_label  = 'aria-label="' . esc_attr__( '(Home link, opens in a new tab)' ) . '"';
-		$custom_logo = str_replace( 'rel="home"', 'rel="home" target="' . esc_attr( $attributes['linkTarget'] ) . '"' . $aria_label, $custom_logo );
+		$walker = new WP_HTML_Walker( $custom_logo );
+		$walker->next_tag( 'a' );
+		if ( 'home' === $walker->get_attribute( 'rel' ) ) {
+			$walker->set_attribute( 'aria-label', '(Home link, opens in a new tab)' );
+			$walker->set_attribute( 'target', $attributes['linkTarget'] );
+		}
+		$custom_logo = (string) $walker;
 	}
 
 	$classnames = array();
