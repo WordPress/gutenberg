@@ -13,6 +13,8 @@ import {
 	limitShift,
 	size,
 } from '@floating-ui/react-dom';
+// eslint-disable-next-line no-restricted-imports
+import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -40,7 +42,7 @@ import { Path, SVG } from '@wordpress/primitives';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
-import { getAnimateClassName } from '../animate';
+import { placementToMotionAnimationProps } from './utils';
 
 /**
  * Name of slot in which popover should fill.
@@ -73,6 +75,43 @@ const ArrowTriangle = ( props ) => (
 	</SVG>
 );
 
+const MaybeAnimatedWrapper = forwardRef(
+	(
+		{
+			style: receivedInlineStyles,
+			placement,
+			shouldAnimate = false,
+			...props
+		},
+		forwardedRef
+	) => {
+		if ( shouldAnimate ) {
+			const { style: motionInlineStyles, ...otherMotionProps } =
+				placementToMotionAnimationProps( placement );
+
+			return (
+				<motion.div
+					style={ {
+						...motionInlineStyles,
+						...receivedInlineStyles,
+					} }
+					{ ...otherMotionProps }
+					{ ...props }
+					ref={ forwardedRef }
+				/>
+			);
+		}
+
+		return (
+			<div
+				style={ receivedInlineStyles }
+				{ ...props }
+				ref={ forwardedRef }
+			/>
+		);
+	}
+);
+
 const slotNameContext = createContext();
 
 const positionToPlacement = ( position ) => {
@@ -89,33 +128,6 @@ const positionToPlacement = ( position ) => {
 	}
 
 	return y;
-};
-
-const placementToAnimationOrigin = ( placement ) => {
-	const [ a, b ] = placement.split( '-' );
-
-	let x, y;
-	if ( a === 'top' || a === 'bottom' ) {
-		x = a === 'top' ? 'bottom' : 'top';
-		y = 'middle';
-		if ( b === 'start' ) {
-			y = 'left';
-		} else if ( b === 'end' ) {
-			y = 'right';
-		}
-	}
-
-	if ( a === 'left' || a === 'right' ) {
-		x = 'center';
-		y = a === 'left' ? 'right' : 'left';
-		if ( b === 'start' ) {
-			x = 'top';
-		} else if ( b === 'end' ) {
-			x = 'bottom';
-		}
-	}
-
-	return x + ' ' + y;
 };
 
 const Popover = (
@@ -411,14 +423,6 @@ const Popover = (
 		};
 	}, [ ownerDocument ] );
 
-	/** @type {false | string} */
-	const animateClassName =
-		!! animate &&
-		getAnimateClassName( {
-			type: 'appear',
-			origin: placementToAnimationOrigin( computedPlacement ),
-		} );
-
 	const mergedFloatingRef = useMergeRefs( [
 		floating,
 		dialogRef,
@@ -431,16 +435,13 @@ const Popover = (
 	let content = (
 		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div
-			className={ classnames(
-				'components-popover',
-				className,
-				animateClassName,
-				{
-					'is-expanded': isExpanded,
-					'is-alternate': isAlternate,
-				}
-			) }
+		<MaybeAnimatedWrapper
+			shouldAnimate={ animate }
+			placement={ computedPlacement }
+			className={ classnames( 'components-popover', className, {
+				'is-expanded': isExpanded,
+				'is-alternate': isAlternate,
+			} ) }
 			{ ...contentProps }
 			ref={ mergedFloatingRef }
 			{ ...dialogProps }
@@ -489,7 +490,7 @@ const Popover = (
 					<ArrowTriangle />
 				</div>
 			) }
-		</div>
+		</MaybeAnimatedWrapper>
 	);
 
 	if ( slot.ref ) {
