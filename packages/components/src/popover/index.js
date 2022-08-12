@@ -14,7 +14,7 @@ import {
 	size,
 } from '@floating-ui/react-dom';
 // eslint-disable-next-line no-restricted-imports
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -85,12 +85,15 @@ const MaybeAnimatedWrapper = forwardRef(
 		},
 		forwardedRef
 	) => {
+		// In your component
+		const shouldReduceMotion = useReducedMotion();
+
 		const { style: motionInlineStyles, ...otherMotionProps } = useMemo(
 			() => placementToMotionAnimationProps( placement ),
 			[ placement ]
 		);
 
-		if ( shouldAnimate ) {
+		if ( shouldAnimate && ! shouldReduceMotion ) {
 			return (
 				<motion.div
 					style={ {
