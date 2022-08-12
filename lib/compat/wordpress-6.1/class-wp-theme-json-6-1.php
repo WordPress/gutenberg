@@ -335,26 +335,28 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	);
 
 	/**
-	 * This converts selectors like '.wp-element-button, .wp-block-button__link'
-	 * to an array, so that the block selector is added to both parts of the selector.
+	 * Function that appends a sub-selector to a existing one.
 	 *
-	 * @param string $element The string with all the element's selectors.
-	 * @param string $selector The string we want to append to the selectors.
-	 * @param string $position The position we wand to append the selector in.
-	 * @return string element selector.
+	 * Given the compounded $selector "h1, h2, h3"
+	 * and the $to_append selector ".some-class" the result will be
+	 * "h1.some-class, h2.some-class, h3.some-class".
+	 *
+	 * @since 5.8.0
+	 * @since 6.1.0 Added append position.
+	 *
+	 * @param string $selector  Original selector.
+	 * @param string $to_append Selector to append.
+	 * @param string $position  A position sub-selector should be appended. Default: 'right'.
+	 * @return string
 	 */
-	private static function appendToSelector( $element, $selector, $position = 0 ) {
-		$element_selector = array();
-		$el_selectors     = explode( ',', $element );
-		foreach ( $el_selectors as $el_selector_item ) {
-			if ( 0 === $position ) {
-				$element_selector[] = $selector . $el_selector_item;
-			} else {
-				$element_selector[] = $el_selector_item . $selector;
-			}
+	protected static function append_to_selector( $selector, $to_append, $position = 'right' ) {
+		$new_selectors = array();
+		$selectors     = explode( ',', $selector );
+		foreach ( $selectors as $sel ) {
+			$new_selectors[] = 'right' === $position ? $sel . $to_append : $to_append . $sel;
 		}
-		$element_selector = implode( ',', $element_selector );
-		return $element_selector;
+
+		return implode( ',', $new_selectors );
 	}
 
 	/**
@@ -440,7 +442,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 						break;
 					}
 
-					$element_selector = static::appendToSelector( $el_selector, $selector . ' ', 0 );
+					$element_selector = static::append_to_selector( $el_selector, $selector . ' ', 'left' );
 				}
 				static::$blocks_metadata[ $block_name ]['elements'][ $el_name ] = $element_selector;
 			}
@@ -501,12 +503,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 						if ( isset( $theme_json['styles']['elements'][ $element ][ $pseudo_selector ] ) ) {
 
-							$element_selector = array();
-							$element_selector = static::appendToSelector( static::ELEMENTS[ $element ], $pseudo_selector, 1 );
-
 							$nodes[] = array(
 								'path'     => array( 'styles', 'elements', $element ),
-								'selector' => $element_selector,
+								'selector' => static::append_to_selector( static::ELEMENTS[ $element ], $pseudo_selector ),
 							);
 						}
 					}
@@ -590,12 +589,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 						foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
 							if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $pseudo_selector ] ) ) {
 
-								$block_selector = array();
-								$block_selector = static::appendToSelector( $selectors[ $name ]['elements'][ $element ], $pseudo_selector, 1 );
-
 								$nodes[] = array(
 									'path'     => array( 'styles', 'blocks', $name, 'elements', $element ),
-									'selector' => $block_selector,
+									'selector' => static::append_to_selector( $selectors[ $name ]['elements'][ $element ], $pseudo_selector ),
 								);
 							}
 						}
