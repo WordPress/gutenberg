@@ -4,7 +4,7 @@
 
 ### Breaking Change
 
--   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+-   Increase the minimum Node.js version to 14 and minimum npm version to 6.14.4 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
 ## 12.8.0 (2022-07-27)
 
