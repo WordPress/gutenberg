@@ -307,8 +307,7 @@ class WP_HTML_Walker {
 				$at = strpos( $this->html, '<', $this->parsed_bytes );
 				if ( false === $at ) {
 					$this->parsed_bytes = strlen( $this->html );
-
-					break;
+					return;
 				}
 
 				if (
@@ -324,7 +323,7 @@ class WP_HTML_Walker {
 				) {
 					$this->parsed_bytes = $at + 8;
 					$this->skip_tag_closer_attributes();
-					break;
+					return;
 				} elseif (
 					strlen( $this->html ) >= $at + 4 &&
 					'!' === $this->html[ $at + 1 ] &&
@@ -360,7 +359,7 @@ class WP_HTML_Walker {
 				) {
 					$this->parsed_bytes = $at + 8;
 					$this->skip_tag_closer_attributes();
-					break;
+					return;
 				} elseif (
 					strlen( $this->html ) >= $at + 7 &&
 					's' === strtolower( $this->html[ $at + 1 ] ) &&
