@@ -337,19 +337,13 @@ class WP_HTML_Walker {
 					$this->parsed_bytes = $at + 1;
 				}
 			} elseif ( 'escaped' === $state ) {
-				$offset_1 = strpos( $this->html, '-->', $this->parsed_bytes );
-				$offset_2 = strpos( $this->html, '<', $this->parsed_bytes );
-				if ( false === $offset_1 && false === $offset_2 ) {
-					$this->parsed_bytes = strlen( $this->html );
-					return;
-				}
-				$at = false === $offset_1 ? $offset_2 : (
-				false === $offset_2 ? $offset_1 : min( $offset_1, $offset_2 )
-				);
+				$at = $this->parsed_bytes + strcspn($this->html, '-<', $this->parsed_bytes);
 
 				if (
 					strlen( $this->html ) > $at + 3 &&
-					'-' === $this->html[ $at ]
+					'-' === $this->html[ $at ] &&
+					'-' === $this->html[ $at + 1 ] &&
+					'>' === $this->html[ $at + 2 ]
 				) {
 					$this->parsed_bytes = $at + 3;
 					$state              = 'unescaped';
@@ -383,19 +377,13 @@ class WP_HTML_Walker {
 					$this->parsed_bytes = $at + 1;
 				}
 			} elseif ( 'double-escaped' === $state ) {
-				$offset_1 = strpos( $this->html, '-->', $this->parsed_bytes );
-				$offset_2 = strpos( $this->html, '<', $this->parsed_bytes );
-				if ( false === $offset_1 && false === $offset_2 ) {
-					$this->parsed_bytes = strlen( $this->html );
-					return;
-				}
-				$at = false === $offset_1 ? $offset_2 : (
-				false === $offset_2 ? $offset_1 : min( $offset_1, $offset_2 )
-				);
+				$at = $this->parsed_bytes + strcspn($this->html, '-<', $this->parsed_bytes);
 
 				if (
 					strlen( $this->html ) >= $at + 3 &&
-					'-' === $this->html[ $at ]
+					'-' === $this->html[ $at ] &&
+					'-' === $this->html[ $at + 1 ] &&
+					'>' === $this->html[ $at + 2 ]
 				) {
 					$this->parsed_bytes = $at + 3;
 					$state              = 'unescaped';
