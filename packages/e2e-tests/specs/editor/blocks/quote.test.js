@@ -143,8 +143,9 @@ describe( 'Quote', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '2' );
 
-		// Expect the paragraph to be deleted.
+		// Expect the paragraph to be merged into the quote block.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
