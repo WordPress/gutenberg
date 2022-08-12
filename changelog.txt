@@ -1,5 +1,39 @@
 == Changelog ==
 
+= 13.9.0-rc.2 =
+
+
+
+## Changelog
+
+### Enhancements
+
+#### Global Styles
+- Enable alpha (opacity) in Global Styles color pickers. ([43045](https://github.com/WordPress/gutenberg/pull/43045))
+
+
+### Bug Fixes
+
+#### Site Editor
+- Fix error in compileStyleValue. ([43116](https://github.com/WordPress/gutenberg/pull/43116))
+
+#### Block Editor
+- Paste from Slack: Interpret paragraph markup. ([43114](https://github.com/WordPress/gutenberg/pull/43114))
+
+
+## First time contributors
+
+The following PRs were merged by first time contributors:
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@ellatrix @Mamaduka @ndiego
+
+
 = 13.9.0-rc.1 =
 
 
