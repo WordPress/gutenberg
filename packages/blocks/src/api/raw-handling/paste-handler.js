@@ -30,6 +30,7 @@ import htmlFormattingRemover from './html-formatting-remover';
 import brRemover from './br-remover';
 import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
+import slackParagraphCorrector from './slack-paragraph-corrector';
 
 /**
  * Browser dependencies
@@ -148,6 +149,9 @@ export function pasteHandler( {
 	if ( mode === 'INLINE' ) {
 		return filterInlineHTML( HTML, preserveWhiteSpace );
 	}
+
+	// Must be run before checking if it's inline content.
+	HTML = deepFilterHTML( HTML, [ slackParagraphCorrector ] );
 
 	// An array of HTML strings and block objects. The blocks replace matched
 	// shortcodes.
