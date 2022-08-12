@@ -1,12 +1,3 @@
-.wp-block-pullquote.has-text-align-left,
-.wp-block-pullquote.has-text-align-right,
-.wp-block[data-align="left"] > .wp-block-pullquote,
-.wp-block[data-align="right"] > .wp-block-pullquote {
-	& p {
-		font-size: 20px;
-	}
-}
-
 .wp-block-pullquote {
 	& blockquote p {
 		font-size: 28px;
