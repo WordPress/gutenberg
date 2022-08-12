@@ -16,6 +16,8 @@
  * @TODO: Skip over `/` in attributes area, split attribute names by `/`
  * @TODO: Decode HTML references/entities in class names when matching.
  *        E.g. match having class `1<"2` needs to recognize `class="1&lt;&quot;2"`.
+ * @TODO: Decode character references in `get_attribute()`
+ * @TODO: Properly escape attribute value in `set_attribute()`
  *
  * @package WordPress
  * @subpackage HTML
