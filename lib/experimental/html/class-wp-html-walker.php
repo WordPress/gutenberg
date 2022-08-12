@@ -301,132 +301,121 @@ class WP_HTML_Walker {
 	 * @since 6.1.0
 	 */
 	private function skip_script_data() {
-		$at = strpos( $this->html, '<', $this->parsed_bytes );
-		if ( false === $at ) {
-			$this->parsed_bytes = strlen( $this->html );
-			return;
-		}
+		$state = 'unescaped';
+		while ( true ) {
+			if ( 'unescaped' === $state ) {
+				$at = strpos( $this->html, '<', $this->parsed_bytes );
+				if ( false === $at ) {
+					$this->parsed_bytes = strlen( $this->html );
 
-		if (
-			strlen( $this->html ) >= $at + 8 &&
-			'/' === $this->html[ $at + 1 ] &&
-			's' === strtolower( $this->html[ $at + 2 ] ) &&
-			'c' === strtolower( $this->html[ $at + 3 ] ) &&
-			'r' === strtolower( $this->html[ $at + 4 ] ) &&
-			'i' === strtolower( $this->html[ $at + 5 ] ) &&
-			'p' === strtolower( $this->html[ $at + 6 ] ) &&
-			't' === strtolower( $this->html[ $at + 7 ] ) &&
-			0 === strcspn( $this->html, " \t\f\r\n/>", $at + 8 )
-		) {
-			$this->parsed_bytes = $at + 8;
-			$this->skip_tag_closer_attributes();
-		} elseif (
-			strlen( $this->html ) >= $at + 4 &&
-			'!' === $this->html[ $at + 1 ] &&
-			'-' === $this->html[ $at + 2 ] &&
-			'-' === $this->html[ $at + 3 ]
-		) {
-			$this->parsed_bytes = $at + 4;
-			$this->skip_script_data_escaped();
-		} else {
-			$this->parsed_bytes = $at + 1;
-			$this->skip_script_data();
-		}
-	}
+					break;
+				}
 
-	/**
-	 * Skips to the end of the script-data-escaped-state.
-	 *
-	 * @see https://html.spec.whatwg.org/multipage/parsing.html#script-data-escaped-state
-	 * @since 6.1.0
-	 */
-	private function skip_script_data_escaped() {
-		$offset_1 = strpos( $this->html, '-->', $this->parsed_bytes );
-		$offset_2 = strpos( $this->html, '<', $this->parsed_bytes );
-		if ( false === $offset_1 && false === $offset_2 ) {
-			$this->parsed_bytes = strlen( $this->html );
-			return;
-		}
-		$at = false === $offset_1 ? $offset_2 : (
-			false === $offset_2 ? $offset_1 : min( $offset_1, $offset_2 )
-		);
+				if (
+					strlen( $this->html ) >= $at + 8 &&
+					'/' === $this->html[ $at + 1 ] &&
+					's' === strtolower( $this->html[ $at + 2 ] ) &&
+					'c' === strtolower( $this->html[ $at + 3 ] ) &&
+					'r' === strtolower( $this->html[ $at + 4 ] ) &&
+					'i' === strtolower( $this->html[ $at + 5 ] ) &&
+					'p' === strtolower( $this->html[ $at + 6 ] ) &&
+					't' === strtolower( $this->html[ $at + 7 ] ) &&
+					0 === strcspn( $this->html, " \t\f\r\n/>", $at + 8 )
+				) {
+					$this->parsed_bytes = $at + 8;
+					$this->skip_tag_closer_attributes();
+					break;
+				} elseif (
+					strlen( $this->html ) >= $at + 4 &&
+					'!' === $this->html[ $at + 1 ] &&
+					'-' === $this->html[ $at + 2 ] &&
+					'-' === $this->html[ $at + 3 ]
+				) {
+					$this->parsed_bytes = $at + 4;
+					$state              = 'escaped';
+				} else {
+					$this->parsed_bytes = $at + 1;
+				}
+			} elseif ( 'escaped' === $state ) {
+				$offset_1 = strpos( $this->html, '-->', $this->parsed_bytes );
+				$offset_2 = strpos( $this->html, '<', $this->parsed_bytes );
+				if ( false === $offset_1 && false === $offset_2 ) {
+					$this->parsed_bytes = strlen( $this->html );
+					return;
+				}
+				$at = false === $offset_1 ? $offset_2 : (
+				false === $offset_2 ? $offset_1 : min( $offset_1, $offset_2 )
+				);
 
-		if (
-			strlen( $this->html ) > $at + 3 &&
-			'-' === $this->html[ $at ]
-		) {
-			$this->parsed_bytes = $at + 3;
-			$this->skip_script_data();
-		} elseif (
-			strlen( $this->html ) >= $at + 8 &&
-			'/' === $this->html[ $at + 1 ] &&
-			's' === strtolower( $this->html[ $at + 2 ] ) &&
-			'c' === strtolower( $this->html[ $at + 3 ] ) &&
-			'r' === strtolower( $this->html[ $at + 4 ] ) &&
-			'i' === strtolower( $this->html[ $at + 5 ] ) &&
-			'p' === strtolower( $this->html[ $at + 6 ] ) &&
-			't' === strtolower( $this->html[ $at + 7 ] ) &&
-			0 === strcspn( $this->html, " \t\f\r\n/>", $at + 8 )
-		) {
-			$this->parsed_bytes = $at + 8;
-			$this->skip_tag_closer_attributes();
-		} elseif (
-			strlen( $this->html ) >= $at + 7 &&
-			's' === strtolower( $this->html[ $at + 1 ] ) &&
-			'c' === strtolower( $this->html[ $at + 2 ] ) &&
-			'r' === strtolower( $this->html[ $at + 3 ] ) &&
-			'i' === strtolower( $this->html[ $at + 4 ] ) &&
-			'p' === strtolower( $this->html[ $at + 5 ] ) &&
-			't' === strtolower( $this->html[ $at + 6 ] ) &&
-			0 === strcspn( $this->html, " \t\f\r\n/>", $at + 7 )
-		) {
-			$this->parsed_bytes = $at + 7;
-			$this->skip_script_data_double_escape();
-		} else {
-			$this->parsed_bytes = $at + 1;
-			$this->skip_script_data_escaped();
-		}
-	}
+				if (
+					strlen( $this->html ) > $at + 3 &&
+					'-' === $this->html[ $at ]
+				) {
+					$this->parsed_bytes = $at + 3;
+					$state              = 'unescaped';
+				} elseif (
+					strlen( $this->html ) >= $at + 8 &&
+					'/' === $this->html[ $at + 1 ] &&
+					's' === strtolower( $this->html[ $at + 2 ] ) &&
+					'c' === strtolower( $this->html[ $at + 3 ] ) &&
+					'r' === strtolower( $this->html[ $at + 4 ] ) &&
+					'i' === strtolower( $this->html[ $at + 5 ] ) &&
+					'p' === strtolower( $this->html[ $at + 6 ] ) &&
+					't' === strtolower( $this->html[ $at + 7 ] ) &&
+					0 === strcspn( $this->html, " \t\f\r\n/>", $at + 8 )
+				) {
+					$this->parsed_bytes = $at + 8;
+					$this->skip_tag_closer_attributes();
+					break;
+				} elseif (
+					strlen( $this->html ) >= $at + 7 &&
+					's' === strtolower( $this->html[ $at + 1 ] ) &&
+					'c' === strtolower( $this->html[ $at + 2 ] ) &&
+					'r' === strtolower( $this->html[ $at + 3 ] ) &&
+					'i' === strtolower( $this->html[ $at + 4 ] ) &&
+					'p' === strtolower( $this->html[ $at + 5 ] ) &&
+					't' === strtolower( $this->html[ $at + 6 ] ) &&
+					0 === strcspn( $this->html, " \t\f\r\n/>", $at + 7 )
+				) {
+					$this->parsed_bytes = $at + 7;
+					$state = 'double-escaped';
+				} else {
+					$this->parsed_bytes = $at + 1;
+				}
+			} elseif ( 'double-escaped' === $state ) {
+				$offset_1 = strpos( $this->html, '-->', $this->parsed_bytes );
+				$offset_2 = strpos( $this->html, '<', $this->parsed_bytes );
+				if ( false === $offset_1 && false === $offset_2 ) {
+					$this->parsed_bytes = strlen( $this->html );
+					return;
+				}
+				$at = false === $offset_1 ? $offset_2 : (
+				false === $offset_2 ? $offset_1 : min( $offset_1, $offset_2 )
+				);
 
-	/**
-	 * Skips to the end of the script-data-double-escape-state.
-	 *
-	 * @see https://html.spec.whatwg.org/multipage/parsing.html#script-data-escaped-state
-	 * @since 6.1.0
-	 */
-	private function skip_script_data_double_escape() {
-		$offset_1 = strpos( $this->html, '-->', $this->parsed_bytes );
-		$offset_2 = strpos( $this->html, '<', $this->parsed_bytes );
-		if ( false === $offset_1 && false === $offset_2 ) {
-			$this->parsed_bytes = strlen( $this->html );
-			return;
-		}
-		$at = false === $offset_1 ? $offset_2 : (
-			false === $offset_2 ? $offset_1 : min( $offset_1, $offset_2 )
-		);
-
-		if (
-			strlen( $this->html ) >= $at + 3 &&
-			'-' === $this->html[ $at ]
-		) {
-			$this->parsed_bytes = $at + 3;
-			$this->skip_script_data();
-		} elseif (
-			strlen( $this->html ) >= $at + 8 &&
-			'/' === $this->html[ $at + 1 ] &&
-			's' === strtolower( $this->html[ $at + 2 ] ) &&
-			'c' === strtolower( $this->html[ $at + 3 ] ) &&
-			'r' === strtolower( $this->html[ $at + 4 ] ) &&
-			'i' === strtolower( $this->html[ $at + 5 ] ) &&
-			'p' === strtolower( $this->html[ $at + 6 ] ) &&
-			't' === strtolower( $this->html[ $at + 7 ] ) &&
-			0 === strcspn( $this->html, " \t\f\r\n/>", $at + 8 )
-		) {
-			$this->parsed_bytes = $at + 8;
-			$this->skip_script_data();
-		} else {
-			$this->parsed_bytes = $at + 1;
-			$this->skip_script_data_double_escape();
+				if (
+					strlen( $this->html ) >= $at + 3 &&
+					'-' === $this->html[ $at ]
+				) {
+					$this->parsed_bytes = $at + 3;
+					$state              = 'unescaped';
+				} elseif (
+					strlen( $this->html ) >= $at + 8 &&
+					'/' === $this->html[ $at + 1 ] &&
+					's' === strtolower( $this->html[ $at + 2 ] ) &&
+					'c' === strtolower( $this->html[ $at + 3 ] ) &&
+					'r' === strtolower( $this->html[ $at + 4 ] ) &&
+					'i' === strtolower( $this->html[ $at + 5 ] ) &&
+					'p' === strtolower( $this->html[ $at + 6 ] ) &&
+					't' === strtolower( $this->html[ $at + 7 ] ) &&
+					0 === strcspn( $this->html, " \t\f\r\n/>", $at + 8 )
+				) {
+					$this->parsed_bytes = $at + 8;
+					$state              = 'unescaped';
+				} else {
+					$this->parsed_bytes = $at + 1;
+				}
+			}
 		}
 	}
 
