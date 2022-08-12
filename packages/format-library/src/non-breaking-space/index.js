@@ -16,7 +16,7 @@ export const nonBreakingSpace = {
 	className: 'nbsp',
 	edit( { value, onChange } ) {
 		function addNonBreakingSpace() {
-			onChange( insert( value, ' ' ) );
+			onChange( insert( value, '\u00a0' ) );
 		}
 
 		// Shift + Ctrl + Space shortcut is built in on the Mac.
