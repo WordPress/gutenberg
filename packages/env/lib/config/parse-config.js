@@ -9,6 +9,7 @@ const os = require( 'os' );
  * Internal dependencies
  */
 const { ValidationError } = require( './validate-config' );
+const { getLatestWordPressVersion } = require( '../wordpress' );
 
 /**
  * @typedef {import('./config').WPServiceConfig} WPServiceConfig
@@ -32,12 +33,12 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  * @param {string} options.workDirectoryPath Path to the work directory located in ~/.wp-env.
  * @return {WPServiceConfig} Parsed environment-level configuration.
  */
-module.exports = function parseConfig( config, options ) {
+module.exports = async function parseConfig( config, options ) {
 	return {
 		port: config.port,
 		phpVersion: config.phpVersion,
 		coreSource: includeTestsPath(
-			parseSourceString( config.core, options ),
+			parseSourceString( getCoreSourceString( config.core ), options ),
 			options
 		),
 		pluginSources: config.plugins.map( ( sourceString ) =>
@@ -57,6 +58,19 @@ module.exports = function parseConfig( config, options ) {
 		),
 	};
 };
+
+async function getCoreSourceString( coreSource ) {
+	if ( coreSource ) {
+		return coreSource;
+	}
+	const wpVersion = await getLatestWordPressVersion();
+	if ( ! wpVersion ) {
+		throw new ValidationError(
+			'Could not find the latest WordPress version. There may be a network issue.'
+		);
+	}
+	return `WordPress/WordPress#${ wpVersion }`;
+}
 
 /**
  * Parses a source string into a source object.
