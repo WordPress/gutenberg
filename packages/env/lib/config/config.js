@@ -15,7 +15,6 @@ const readRawConfigFile = require( './read-raw-config-file' );
 const parseConfig = require( './parse-config' );
 const { includeTestsPath, parseSourceString } = parseConfig;
 const md5 = require( '../md5' );
-const { getLatestWordPressVersion } = require( '../wordpress' );
 
 /**
  * wp-env configuration.
@@ -85,13 +84,9 @@ module.exports = async function readConfig( configPath ) {
 	const detectedLocalConfig =
 		Object.keys( { ...baseConfig, ...overrideConfig } ).length > 0;
 
-	// If there is no local WordPress version, use the latest stable version from GitHub.
-	const coreRef =
-		! overrideConfig.core && ! baseConfig.core ? await getCoreRef() : null;
-
 	// Default configuration which is overridden by .wp-env.json files.
 	const defaultConfiguration = {
-		core: coreRef,
+		core: null, // Indicates that the latest stable version should ultimately be used.
 		phpVersion: null,
 		plugins: [],
 		themes: [],
@@ -147,23 +142,21 @@ module.exports = async function readConfig( configPath ) {
 
 	// Merge each of the specified environment-level overrides.
 	const allPorts = new Set(); // Keep track of unique ports for validation.
-	const env = allEnvs.reduce( ( result, environment ) => {
-		result[ environment ] = parseConfig(
+	const env = {};
+	for ( const envName in allEnvs ) {
+		env[ envName ] = await parseConfig(
 			validateConfig(
 				mergeWpServiceConfigs( [
-					...getEnvConfig( defaultConfiguration, environment ),
-					...getEnvConfig( baseConfig, environment ),
-					...getEnvConfig( overrideConfig, environment ),
+					...getEnvConfig( defaultConfiguration, envName ),
+					...getEnvConfig( baseConfig, envName ),
+					...getEnvConfig( overrideConfig, envName ),
 				] ),
-				environment
+				envName
 			),
-			{
-				workDirectoryPath,
-			}
+			{ workDirectoryPath }
 		);
-		allPorts.add( result[ environment ].port );
-		return result;
-	}, {} );
+		allPorts.add( env[ envName ].port );
+	}
 
 	if ( allPorts.size !== allEnvs.length ) {
 		throw new ValidationError(
@@ -183,16 +176,6 @@ module.exports = async function readConfig( configPath ) {
 		env,
 	} );
 };
-
-async function getCoreRef() {
-	const wpVersion = await getLatestWordPressVersion();
-	if ( ! wpVersion ) {
-		throw new ValidationError(
-			'Could not find the latest WordPress version. There may be a network issue.'
-		);
-	}
-	return `WordPress/WordPress#${ wpVersion }`;
-}
 
 /**
  * Deep-merges the values in the given service environment. This allows us to
@@ -281,24 +264,6 @@ async function withOverrides( config ) {
 		);
 		config.env.development.coreSource = coreSource;
 		config.env.tests.coreSource = coreSource;
-	}
-
-	// If one of the sources is STILL null after parsing every config and CLI option,
-	// set it to the latest WordPress version. This also allows one to use
-	// .wp-env.override.json to reset the coreSource to the latest version.
-	if (
-		config.env.development.coreSource === null ||
-		config.env.tests.coreSource === null
-	) {
-		const wpRef = await getCoreRef();
-		const latestParsedWpVersion = includeTestsPath(
-			parseSourceString( wpRef, { workDirectoryPath } ),
-			{ workDirectoryPath }
-		);
-		config.env.development.coreSource =
-			config.env.development.coreSource ?? latestParsedWpVersion;
-		config.env.tests.coreSource =
-			config.env.tests.coreSource ?? latestParsedWpVersion;
 	}
 
 	// Override PHP version with environment variable.
