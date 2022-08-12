@@ -56,6 +56,14 @@
 		}
 	}
 
+	&.is-reversed-on-mobile {
+		@media (max-width: #{ ($break-medium - 1) }) {
+			// Responsiveness: Reverse the order of columns on mobile, so that
+			// the rightmost column on larger screens is the first column.
+			flex-direction: column-reverse !important;
+		}
+	}
+
 	&.is-not-stacked-on-mobile {
 		flex-wrap: nowrap !important;
 
@@ -78,7 +86,6 @@
 	// Matches paragraph block padding.
 	padding: $block-bg-padding--v $block-bg-padding--h;
 }
-
 
 .wp-block-column {
 	flex-grow: 1;
