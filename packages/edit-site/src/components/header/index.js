@@ -12,7 +12,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
-import { listView, plus, external, stack } from '@wordpress/icons';
+import { listView, plus, external, chevronUpDown } from '@wordpress/icons';
 import {
 	Button,
 	ToolbarItem,
@@ -191,7 +191,7 @@ export default function Header( {
 							/>
 							<Button
 								className="edit-site-header-toolbar__zoom-out-view-toggle"
-								icon={ stack }
+								icon={ chevronUpDown }
 								isPressed={ blockEditorMode === 'zoom-out' }
 								/* translators: button label text should, if possible, be under 16 characters. */
 								label={ __( 'Zoom-out View' ) }
