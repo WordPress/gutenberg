@@ -63,7 +63,6 @@ function ListView(
 ) {
 	const { clientIdsTree, draggedClientIds, selectedClientIds } =
 		useListViewClientIds( blocks );
-	console.log({clientIdsTree});
 	const { visibleBlockCount } = useSelect(
 		( select ) => {
 			const { getGlobalBlockCount, getClientIdsOfDescendants } =
