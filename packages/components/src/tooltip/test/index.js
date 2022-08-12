@@ -42,7 +42,7 @@ describe( 'Tooltip', () => {
 		} );
 
 		it( 'should render children with additional popover when over', () => {
-			const { container } = render(
+			render(
 				<Tooltip position="bottom right" text="Help text">
 					<button>Hover Me!</button>
 				</Tooltip>
@@ -53,16 +53,12 @@ describe( 'Tooltip', () => {
 			expect( button.nodeName ).toBe( 'BUTTON' );
 			expect( button.childNodes ).toHaveLength( 2 );
 			expect( button.childNodes[ 0 ] ).toHaveTextContent( 'Hover Me!' );
-
-			const popover =
-				container.getElementsByClassName( 'components-popover' );
-			expect( popover ).toHaveLength( 1 );
-			expect( popover[ 0 ].firstChild ).toHaveTextContent( 'Help text' );
+			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
 		} );
 
 		it( 'should show popover on focus', () => {
 			const originalFocus = jest.fn();
-			const { container } = render(
+			render(
 				<Tooltip text="Help text">
 					<button
 						onMouseEnter={ originalFocus }
@@ -75,15 +71,12 @@ describe( 'Tooltip', () => {
 
 			const button = screen.getByRole( 'button' );
 			button.focus();
-
-			const popover =
-				container.getElementsByClassName( 'components-popover' );
 			expect( originalFocus ).toHaveBeenCalledWith(
 				expect.objectContaining( {
 					type: 'focus',
 				} )
 			);
-			expect( popover ).toHaveLength( 1 );
+			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
 		} );
 
 		it( 'should not show popover on focus as result of mousedown', async () => {
@@ -93,7 +86,7 @@ describe( 'Tooltip', () => {
 
 			const originalOnMouseDown = jest.fn();
 			const originalOnMouseUp = jest.fn();
-			const { container } = render(
+			render(
 				<Tooltip text="Help text">
 					<button
 						onMouseDown={ originalOnMouseDown }
@@ -116,9 +109,7 @@ describe( 'Tooltip', () => {
 				} )
 			);
 
-			const popover =
-				container.getElementsByClassName( 'components-popover' );
-			expect( popover ).toHaveLength( 0 );
+			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 
 			// Release the left mouse button
 			await user.pointer( [ { keys: '[/MouseLeft]', target: button } ] );
@@ -164,7 +155,7 @@ describe( 'Tooltip', () => {
 
 			const originalMouseEnter = jest.fn();
 			jest.useFakeTimers();
-			const { container } = render(
+			render(
 				<Tooltip text="Help text" delay={ 2000 }>
 					<button
 						onMouseEnter={ originalMouseEnter }
@@ -177,22 +168,18 @@ describe( 'Tooltip', () => {
 
 			const button = screen.getByRole( 'button' );
 			await user.hover( button );
-			const popoverBeforeTimeout =
-				container.getElementsByClassName( 'components-popover' );
-			expect( popoverBeforeTimeout ).toHaveLength( 0 );
+			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
 
 			// Popover does not yet exist after default delay, because custom delay is passed.
 			setTimeout( () => {
-				const popoverBetweenTimeout =
-					container.getElementsByClassName( 'components-popover' );
-				expect( popoverBetweenTimeout ).toHaveLength( 0 );
+				expect(
+					screen.queryByText( 'Help text' )
+				).not.toBeInTheDocument();
 			}, TOOLTIP_DELAY );
 			// Popover appears after custom delay.
 			setTimeout( () => {
-				const popoverAfterTimeout =
-					container.getElementsByClassName( 'components-popover' );
-				expect( popoverAfterTimeout ).toHaveLength( 1 );
+				expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
 				jest.runOnlyPendingTimers();
 				jest.useRealTimers();
 			}, 2000 );
@@ -219,9 +206,7 @@ describe( 'Tooltip', () => {
 			await user.hover( eventCatcher );
 
 			setTimeout( () => {
-				const popover =
-					container.getElementsByClassName( 'components-popover' );
-				expect( popover ).toHaveLength( 1 );
+				expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
 			}, TOOLTIP_DELAY );
 		} );
 
@@ -251,7 +236,7 @@ describe( 'Tooltip', () => {
 			} );
 
 			const originalMouseEnter = jest.fn();
-			const { container } = render(
+			render(
 				<Tooltip text="Help text">
 					<button
 						onMouseEnter={ originalMouseEnter }
@@ -265,9 +250,9 @@ describe( 'Tooltip', () => {
 			const button = screen.getByRole( 'button' );
 			await user.hover( button );
 			setTimeout( () => {
-				const popover =
-					container.getElementsByClassName( 'components-popover' );
-				expect( popover ).toHaveLength( 0 );
+				expect(
+					screen.queryByText( 'Help text' )
+				).not.toBeInTheDocument();
 			}, TOOLTIP_DELAY );
 		} );
 	} );
