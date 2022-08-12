@@ -85,10 +85,12 @@ const MaybeAnimatedWrapper = forwardRef(
 		},
 		forwardedRef
 	) => {
-		if ( shouldAnimate ) {
-			const { style: motionInlineStyles, ...otherMotionProps } =
-				placementToMotionAnimationProps( placement );
+		const { style: motionInlineStyles, ...otherMotionProps } = useMemo(
+			() => placementToMotionAnimationProps( placement ),
+			[ placement ]
+		);
 
+		if ( shouldAnimate ) {
 			return (
 				<motion.div
 					style={ {
