@@ -71,26 +71,24 @@ const plugins = [
 ];
 
 const stylesTransform = ( content ) => {
-	if ( mode === 'production' ) {
-		return postcss( [
-			require( 'cssnano' )( {
-				preset: [
-					'default',
-					{
-						discardComments: {
-							removeAll: true,
-						},
+	return postcss( [
+		require( 'cssnano' )( {
+			preset: [
+				'default',
+				{
+					discardComments: {
+						removeAll: true,
 					},
-				],
-			} ),
-		] )
-			.process( content, {
-				from: 'src/app.css',
-				to: 'dest/app.css',
-			} )
-			.then( ( result ) => result.css );
-	}
-	return content;
+					normalizeWhitespace: mode === 'production',
+				},
+			],
+		} ),
+	] )
+		.process( content, {
+			from: 'src/app.css',
+			to: 'dest/app.css',
+		} )
+		.then( ( result ) => result.css );
 };
 
 module.exports = {
