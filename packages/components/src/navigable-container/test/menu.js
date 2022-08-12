@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -42,7 +42,7 @@ function fireKeyDown( node, keyCode, shiftKey ) {
 describe( 'NavigableMenu', () => {
 	it( 'vertical: should navigate by up and down', () => {
 		let currentIndex = 0;
-		const { container, getByRole } = render(
+		const { container } = render(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
@@ -77,7 +77,7 @@ describe( 'NavigableMenu', () => {
 		// Navigate options.
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
 			const interaction = fireKeyDown(
-				getByRole( 'menu' ),
+				screen.getByRole( 'menu' ),
 				keyCode,
 				false
 			);
@@ -100,7 +100,7 @@ describe( 'NavigableMenu', () => {
 
 	it( 'vertical: should navigate by up and down, and stop at edges', () => {
 		let currentIndex = 0;
-		const { container, getByRole } = render(
+		const { container } = render(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
@@ -131,7 +131,7 @@ describe( 'NavigableMenu', () => {
 		// Navigate options.
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
 			const interaction = fireKeyDown(
-				getByRole( 'menu' ),
+				screen.getByRole( 'menu' ),
 				keyCode,
 				false
 			);
@@ -152,7 +152,7 @@ describe( 'NavigableMenu', () => {
 
 	it( 'horizontal: should navigate by left and right', () => {
 		let currentIndex = 0;
-		const { container, getByRole } = render(
+		const { container } = render(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
@@ -187,7 +187,7 @@ describe( 'NavigableMenu', () => {
 		// Navigate options.
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
 			const interaction = fireKeyDown(
-				getByRole( 'menu' ),
+				screen.getByRole( 'menu' ),
 				keyCode,
 				false
 			);
@@ -210,7 +210,7 @@ describe( 'NavigableMenu', () => {
 
 	it( 'horizontal: should navigate by left and right, and stop at edges', () => {
 		let currentIndex = 0;
-		const { container, getByRole } = render(
+		const { container } = render(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
@@ -241,7 +241,7 @@ describe( 'NavigableMenu', () => {
 		// Navigate options.
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
 			const interaction = fireKeyDown(
-				getByRole( 'menu' ),
+				screen.getByRole( 'menu' ),
 				keyCode,
 				false
 			);
@@ -262,7 +262,7 @@ describe( 'NavigableMenu', () => {
 
 	it( 'both: should navigate by up/down and left/right', () => {
 		let currentIndex = 0;
-		const { container, getByRole } = render(
+		const { container } = render(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
@@ -285,7 +285,10 @@ describe( 'NavigableMenu', () => {
 
 		// Navigate options.
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( getByRole( 'menu' ), keyCode );
+			const interaction = fireKeyDown(
+				screen.getByRole( 'menu' ),
+				keyCode
+			);
 			expect( currentIndex ).toBe( expectedActiveIndex );
 			expect( interaction.stopped ).toBe( expectedStop );
 		}
