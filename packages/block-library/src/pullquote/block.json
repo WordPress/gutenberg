@@ -63,7 +63,7 @@
 		},
 		"__experimentalStyle": {
 			"typography": {
-				"fontSize": "1.25rem",
+				"fontSize": "1.5em",
 				"lineHeight": "1.6"
 			}
 		}
