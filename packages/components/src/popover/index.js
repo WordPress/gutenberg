@@ -42,7 +42,7 @@ import { Path, SVG } from '@wordpress/primitives';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
-import { placementToMotionAnimationProps } from './utils';
+import { positionToPlacement, placementToMotionAnimationProps } from './utils';
 
 /**
  * Name of slot in which popover should fill.
@@ -113,22 +113,6 @@ const MaybeAnimatedWrapper = forwardRef(
 );
 
 const slotNameContext = createContext();
-
-const positionToPlacement = ( position ) => {
-	const [ x, y, z ] = position.split( ' ' );
-
-	if ( [ 'top', 'bottom' ].includes( x ) ) {
-		let suffix = '';
-		if ( ( !! z && z === 'left' ) || y === 'right' ) {
-			suffix = '-start';
-		} else if ( ( !! z && z === 'right' ) || y === 'left' ) {
-			suffix = '-end';
-		}
-		return x + suffix;
-	}
-
-	return y;
-};
 
 const Popover = (
 	{

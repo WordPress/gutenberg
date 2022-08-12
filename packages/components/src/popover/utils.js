@@ -1,7 +1,34 @@
 /**
  * @typedef {import('../animate').AppearOrigin} AppearOrigin
  * @typedef {import('@floating-ui/react-dom').Placement} FloatingUIPlacement
+ * @typedef {	'top left' | 'top center' | 'top right' | 'middle left' | 'middle center' | 'middle right' | 'bottom left' | 'bottom center' | 'bottom right' | 'bottom left' | 'bottom center' | 'bottom right' } LegacyPosition
  */
+
+/**
+ * Converts the `Popover`'s legacy "position" prop to the new "placement" prop
+ * (used by `floating-ui`).
+ *
+ * @param {LegacyPosition} position The legacy position
+ * @return {FloatingUIPlacement} The corresponding placement
+ */
+export const positionToPlacement = ( position ) => {
+	const [ x, y, z ] = position.split( ' ' );
+
+	if ( [ 'top', 'bottom' ].includes( x ) ) {
+		let suffix = '';
+		if ( ( !! z && z === 'left' ) || y === 'right' ) {
+			suffix = '-start';
+		} else if ( ( !! z && z === 'right' ) || y === 'left' ) {
+			suffix = '-end';
+		}
+
+		// @ts-expect-error More TypeScript effort would be required to reconcile `string` and `Placement` types.
+		return x + suffix;
+	}
+
+	// @ts-expect-error More TypeScript effort would be required to reconcile `string` and `Placement` types.
+	return y;
+};
 
 /**
  * @typedef AnimationOrigin
