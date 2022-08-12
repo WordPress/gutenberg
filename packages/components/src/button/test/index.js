@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
-import TestUtils from 'react-dom/test-utils';
 
 /**
  * WordPress dependencies
@@ -302,9 +301,9 @@ describe( 'Button', () => {
 		it( 'should enable access to DOM element', () => {
 			const ref = createRef();
 
-			TestUtils.renderIntoDocument( <Button ref={ ref } /> );
+			render( <Button ref={ ref } /> );
 
-			expect( ref.current.type ).toBe( 'button' );
+			expect( ref.current ).toBe( screen.getByRole( 'button' ) );
 		} );
 	} );
 
