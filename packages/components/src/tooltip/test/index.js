@@ -16,14 +16,16 @@ import { TOOLTIP_DELAY } from '../index.js';
 describe( 'Tooltip', () => {
 	describe( '#render()', () => {
 		it( 'should render children (abort) if multiple children passed', () => {
-			const { container } = render(
-				<Tooltip>
-					<div />
-					<div />
+			render(
+				<Tooltip position="bottom right" text="Help text">
+					<button>Button 1</button>
+					<button>Button 2</button>
 				</Tooltip>
 			);
 
-			expect( container.children ).toHaveLength( 2 );
+			const button = screen.getByText( 'Button 1' );
+			button.focus();
+			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 		} );
 
 		it( 'should render children', () => {
