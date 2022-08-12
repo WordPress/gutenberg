@@ -107,16 +107,3 @@ Provides access to the Global Styles store. If you want  to interact with Global
 ```
 
 The `MyUIControls` component will now have access to the Global Styles store.
-
-## useGlobalStylesReset
-
-A react hook used to reset the Global Styles settings in the client:
-
-```js
-	import { useGlobalStylesReset } from './global-styles';
-
-	const [ canReset, onReset ] = useGlobalStylesReset();
-
-	// From inside your component call:
-	onReset();
-```
