@@ -186,14 +186,6 @@ const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 const iOSOnly = ( block ) =>
 	Platform.OS === 'ios' ? block : devOnly( block );
 
-// To be removed once List V2 is released on the web editor.
-function listCheck( listBlock, blocksFlags ) {
-	if ( blocksFlags?.__experimentalEnableListBlockV2 ) {
-		listBlock.settings = listBlock?.settingsV2;
-	}
-	return listBlock;
-}
-
 // Hide the Classic block and SocialLink block
 addFilter(
 	'blocks.registerBlockType',
@@ -245,11 +237,8 @@ addFilter(
  *
  * registerCoreBlocks();
  * ```
- * @param {Object} [blocksFlags] Experimental flags
- *
- *
  */
-export const registerCoreBlocks = ( blocksFlags ) => {
+export const registerCoreBlocks = () => {
 	// When adding new blocks to this list please also consider updating /src/block-support/supported-blocks.json in the Gutenberg-Mobile repo
 	[
 		paragraph,
@@ -261,7 +250,7 @@ export const registerCoreBlocks = ( blocksFlags ) => {
 		video,
 		nextpage,
 		separator,
-		listCheck( list, blocksFlags ),
+		list,
 		listItem,
 		quote,
 		mediaText,

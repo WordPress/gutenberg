@@ -14,8 +14,7 @@ export function createListBlockFromDOMElement( listElement ) {
 		start: listElement.getAttribute( 'start' )
 			? parseInt( listElement.getAttribute( 'start' ), 10 )
 			: undefined,
-		reversed:
-			listElement.getAttribute( 'reversed' ) === true ? true : undefined,
+		reversed: listElement.hasAttribute( 'reversed' ) ? true : undefined,
 		type: listElement.getAttribute( 'type' ) ?? undefined,
 	};
 

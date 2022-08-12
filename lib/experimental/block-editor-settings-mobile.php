@@ -29,8 +29,8 @@ function gutenberg_get_block_editor_settings_mobile( $settings ) {
 		// To tell mobile that the site uses quote v2 (inner blocks).
 		// See https://github.com/WordPress/gutenberg/pull/25892.
 		$settings['__experimentalEnableQuoteBlockV2'] = true;
-		// To be set to true when the web makes quote v2 (inner blocks) the default.
-		$settings['__experimentalEnableListBlockV2'] = gutenberg_is_list_v2_enabled();
+		// To tell mobile that the site uses quote v2 (inner blocks).
+		$settings['__experimentalEnableListBlockV2'] = true;
 	}
 
 	return $settings;

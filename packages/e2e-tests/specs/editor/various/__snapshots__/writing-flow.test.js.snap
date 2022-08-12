@@ -208,7 +208,9 @@ exports[`Writing Flow should navigate empty paragraphs 1`] = `
 
 exports[`Writing Flow should not create extra line breaks in multiline value 1`] = `
 "<!-- wp:list -->
-<ul><li></li></ul>
+<ul><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->"
 `;
 

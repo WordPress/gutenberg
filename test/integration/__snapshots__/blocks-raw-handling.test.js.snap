@@ -85,7 +85,9 @@ exports[`rawHandler should convert HTML post to blocks with minimal content chan
 <!-- /wp:html -->
 
 <!-- wp:list {\\"ordered\\":true} -->
-<ol><li>Item</li></ol>
+<ol><!-- wp:list-item -->
+<li>Item</li>
+<!-- /wp:list-item --></ol>
 <!-- /wp:list -->
 
 <!-- wp:quote -->
@@ -125,11 +127,13 @@ exports[`rawHandler should convert a caption shortcode with link 1`] = `
 
 exports[`rawHandler should convert a list with attributes 1`] = `
 "<!-- wp:list {\\"ordered\\":true,\\"type\\":\\"i\\",\\"start\\":2,\\"reversed\\":true} -->
-<ol type=\\"i\\" reversed start=\\"2\\"><li>1
-        <ol start=\\"2\\" reversed=\\"\\" type=\\"i\\">
-            <li>1</li>
-        </ol>
-    </li></ol>
+<ol reversed start=\\"2\\"><!-- wp:list-item -->
+<li>1<!-- wp:list {\\"ordered\\":true,\\"type\\":\\"i\\",\\"start\\":2,\\"reversed\\":true} -->
+<ol reversed start=\\"2\\"><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ol>
 <!-- /wp:list -->"
 `;
 

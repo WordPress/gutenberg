@@ -21,7 +21,13 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'Another list item' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>A list item</li><li>Another list item</li></ul>
+<ul><!-- wp:list-item -->
+<li>A list item</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Another list item</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
@@ -38,7 +44,9 @@ test.describe( 'List', () => {
 		await page.keyboard.type( '* ' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>test</li></ul>
+<ul><!-- wp:list-item -->
+<li>test</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
@@ -53,7 +61,9 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
-<ol><li>A list item</li></ol>
+<ol><!-- wp:list-item -->
+<li>A list item</li>
+<!-- /wp:list-item --></ol>
 <!-- /wp:list -->`
 		);
 	} );
@@ -192,7 +202,9 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>I’m a list</li></ul>
+<ul><!-- wp:list-item -->
+<li>I’m a list</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
@@ -207,7 +219,9 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>test</li></ul>
+<ul><!-- wp:list-item -->
+<li>test</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
@@ -227,7 +241,13 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>one</li><li>two</li></ul>
+<ul><!-- wp:list-item -->
+<li>one</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
@@ -245,7 +265,13 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>one</li><li>two</li></ul>
+<ul><!-- wp:list-item -->
+<li>one</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
@@ -268,7 +294,13 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>one<br>...</li><li>two</li></ul>
+<ul><!-- wp:list-item -->
+<li>one<br>...</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
@@ -323,7 +355,13 @@ test.describe( 'List', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:list -->
-<ul><li>one</li><li>two</li></ul>
+<ul><!-- wp:list-item -->
+<li>one</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list --></blockquote>
 <!-- /wp:quote -->`
 		);
@@ -341,7 +379,9 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>one</li></ul>
+<ul><!-- wp:list-item -->
+<li>one</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
@@ -355,8 +395,14 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>one</li><li>two</li></ul>
-<!-- /wp:list -->`
+<ul><!-- wp:list-item -->
+<li>one</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>two</p>
+<!-- /wp:paragraph -->`
 		);
 	} );
 
@@ -374,7 +420,17 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>one</li><li></li><li>two</li></ul>
+<ul><!-- wp:list-item -->
+<li>one</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 
@@ -450,7 +506,17 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>one<ul><li>two</li><li>three</li></ul></li></ul>
+<ul><!-- wp:list-item -->
+<li>one<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>three</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
@@ -606,7 +672,9 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>a<br></li></ul>
+<ul><!-- wp:list-item -->
+<li>a<br></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
@@ -627,7 +695,17 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>a</li><li>b<br></li><li>c</li></ul>
+<ul><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>b<br></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
@@ -646,7 +724,17 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>1<ul><li>a<ul><li>i</li></ul></li></ul></li></ul>
+<ul><!-- wp:list-item -->
+<li>1<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>i</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 
@@ -655,7 +743,17 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>1<ul><li>a</li><li></li></ul></li></ul>
+<ul><!-- wp:list-item -->
+<li>1<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 
@@ -663,7 +761,17 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>1<ul><li>a</li></ul></li><li></li></ul>
+<ul><!-- wp:list-item -->
+<li>1<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 
@@ -671,7 +779,13 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>1<ul><li>a</li></ul></li></ul>
+<ul><!-- wp:list-item -->
+<li>1<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 
@@ -680,7 +794,13 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>1</li><li></li></ul>
+<ul><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 
@@ -688,7 +808,9 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>1</li></ul>
+<ul><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 

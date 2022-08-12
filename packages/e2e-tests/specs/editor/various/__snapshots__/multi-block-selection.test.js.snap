@@ -152,7 +152,9 @@ exports[`Multi-block selection should multi-select from within the list block 1`
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul><li>1</li></ul>
+<ul><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->"
 `;
 
