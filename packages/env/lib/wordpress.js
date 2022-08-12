@@ -57,7 +57,7 @@ async function configureWordPress( environment, config, spinner ) {
 		return `${ domain }:${ port }`;
 	} )();
 
-	const installCommand = `wp core install --url="${ url }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
+	const installCommand = `wp core install --url=\\"${ url }\\" --title=\\"${ config.name }\\" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
 
 	// -eo pipefail exits the command as soon as anything fails in bash.
 	const setupCommands = [ 'set -eo pipefail', installCommand ];
@@ -72,9 +72,9 @@ async function configureWordPress( environment, config, spinner ) {
 		}
 
 		// Add quotes around string values to work with multi-word strings better.
-		value = typeof value === 'string' ? `"${ value }"` : value;
+		value = typeof value === 'string' ? `\\"${ value }\\"` : value;
 		setupCommands.push(
-			`wp config set ${ key } ${ value } --anchor="define( 'WP_DEBUG',"${
+			`wp config set ${ key } ${ value } --anchor=\\"define( 'WP_DEBUG',\\"${
 				typeof value !== 'string' ? ' --raw' : ''
 			}`
 		);
@@ -111,7 +111,7 @@ async function configureWordPress( environment, config, spinner ) {
 		[
 			'sh',
 			'-c',
-			`sed -e "/^require.*wp-settings.php/d" -e "s/define( 'ABSPATH', __DIR__ . '\\/' );/define( 'ABSPATH', '\\/var\\/www\\/html\\/' );\\n\\tdefine( 'WP_DEFAULT_THEME', 'default' );/" /var/www/html/wp-config.php > /wordpress-phpunit/wp-tests-config.php`,
+			`sed -e \\"/^require.*wp-settings.php/d\\" -e \\"s/define( 'ABSPATH', __DIR__ . '\\/' );/define( 'ABSPATH', '\\/var\\/www\\/html\\/' );\\n\\tdefine( 'WP_DEFAULT_THEME', 'default' );/\\" /var/www/html/wp-config.php > /wordpress-phpunit/wp-tests-config.php`,
 		],
 		{
 			config: config.dockerComposeConfigPath,
