@@ -143,7 +143,7 @@ module.exports = async function readConfig( configPath ) {
 	// Merge each of the specified environment-level overrides.
 	const allPorts = new Set(); // Keep track of unique ports for validation.
 	const env = {};
-	for ( const envName in allEnvs ) {
+	for ( const envName of allEnvs ) {
 		env[ envName ] = await parseConfig(
 			validateConfig(
 				mergeWpServiceConfigs( [
