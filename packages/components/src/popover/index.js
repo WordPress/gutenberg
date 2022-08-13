@@ -231,11 +231,11 @@ const Popover = (
 			? undefined
 			: size( {
 					apply( sizeProps ) {
-						const { height } = sizeProps;
+						const { availableHeight } = sizeProps;
 						if ( ! refs.floating.current ) return;
 						// Reduce the height of the popover to the available space.
 						Object.assign( refs.floating.current.firstChild.style, {
-							maxHeight: `${ height }px`,
+							maxHeight: `${ availableHeight }px`,
 							overflow: 'auto',
 						} );
 					},
