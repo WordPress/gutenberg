@@ -122,12 +122,24 @@ exports[`List V2 block shows different indentation levels 1`] = `
 
 exports[`List block inserts block 1`] = `
 "<!-- wp:list -->
-<ul><li></li></ul>
+<ul><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->"
 `;
 
 exports[`List block renders a list with a few items 1`] = `
 "<!-- wp:list -->
-<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>
+<ul><!-- wp:list-item -->
+<li>Item 1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Item 2</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Item 3</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->"
 `;
