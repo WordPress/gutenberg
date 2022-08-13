@@ -180,7 +180,6 @@ test.describe( 'List', () => {
 		page,
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
-		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '* ' );
 		await expect( page.locator( '[data-type="core/list"]' ) ).toBeVisible();
 		await page.keyboard.press( 'ArrowUp' );
@@ -310,6 +309,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
+		await editor.clickBlockToolbarButton( 'Select List' );
 		await editor.transformBlockTo( 'core/paragraph' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -326,12 +326,14 @@ test.describe( 'List', () => {
 	test( 'can be converted when nested to paragraphs', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( 'two' );
+		await pageUtils.pressKeyTimes( 'ArrowUp', 5 );
 		await editor.transformBlockTo( 'core/paragraph' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -350,6 +352,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
+		await editor.clickBlockToolbarButton( 'Select List' );
 		await editor.transformBlockTo( 'core/quote' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -416,6 +419,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Enter' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -438,7 +442,9 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>one</li></ul>
+<ul><!-- wp:list-item -->
+<li>one</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
@@ -446,7 +452,9 @@ test.describe( 'List', () => {
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul><li>two</li></ul>
+<ul><!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 
@@ -459,11 +467,15 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>one</li><li></li></ul>
+<ul><!-- wp:list-item -->
+<li>one</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
 <!-- wp:list -->
-<ul><li>two</li></ul>
+<ul><!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
@@ -477,12 +489,15 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
-<ol><li>one</li></ol>
+<ol><!-- wp:list-item -->
+<li>one</li>
+<!-- /wp:list-item --></ol>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
@@ -490,7 +505,9 @@ test.describe( 'List', () => {
 <!-- /wp:paragraph -->
 
 <!-- wp:list {"ordered":true} -->
-<ol><li>two</li></ol>
+<ol><!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item --></ol>
 <!-- /wp:list -->`
 		);
 	} );
@@ -524,26 +541,34 @@ test.describe( 'List', () => {
 	test( 'should be immeadiately saved on indentation', async ( {
 		editor,
 		page,
-		pageUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'm' );
+		await editor.clickBlockToolbarButton( 'Indent' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>one<ul><li></li></ul></li></ul>
+<ul><!-- wp:list-item -->
+<li>one<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
 
 	test( 'should change the base list type', async ( { editor } ) => {
 		await editor.insertBlock( { name: 'core/list' } );
+		await editor.clickBlockToolbarButton( 'Select List' );
 		await editor.clickBlockToolbarButton( 'Ordered' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
-<ol><li></li></ol>
+<ol><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ol>
 <!-- /wp:list -->`
 		);
 	} );
@@ -551,82 +576,121 @@ test.describe( 'List', () => {
 	test( 'should change the indented list type', async ( {
 		editor,
 		page,
-		pageUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'm' );
+		await editor.clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( '1' );
-
+		await editor.clickBlockToolbarButton( 'Select List' );
 		await editor.clickBlockToolbarButton( 'Ordered' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>a<ol><li>1</li></ol></li></ul>
+<ul><!-- wp:list-item -->
+<li>a<!-- wp:list {"ordered":true} -->
+<ol><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
 
-	test( 'should indent and outdent level 1', async ( {
-		editor,
-		page,
-		pageUtils,
-	} ) => {
+	test( 'should indent and outdent level 1', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'm' );
+		await editor.clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( '1' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>a<ul><li>1</li></ul></li></ul>
+<ul><!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 
-		await pageUtils.pressKeyWithModifier( 'primaryShift', 'm' );
+		await editor.clickBlockToolbarButton( 'Outdent' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>a</li><li>1</li></ul>
+<ul><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
 
-	test( 'should indent and outdent level 2', async ( {
-		editor,
-		page,
-		pageUtils,
-	} ) => {
+	test( 'should indent and outdent level 2', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'm' );
+		await editor.clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'm' );
+		await editor.clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( 'i' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>a<ul><li>1<ul><li>i</li></ul></li></ul></li></ul>
+<ul><!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>1<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>i</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 
-		await pageUtils.pressKeyWithModifier( 'primaryShift', 'm' );
+		await editor.clickBlockToolbarButton( 'Outdent' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>a<ul><li>1</li><li>i</li></ul></li></ul>
+<ul><!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>i</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 
-		await pageUtils.pressKeyWithModifier( 'primaryShift', 'm' );
+		await editor.clickBlockToolbarButton( 'Outdent' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>a<ul><li>1</li></ul></li><li>i</li></ul>
+<ul><!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>i</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
@@ -639,24 +703,44 @@ test.describe( 'List', () => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'm' );
+		await editor.clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( 'b' );
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'm' );
+		await editor.clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( 'c' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>a<ul><li>b<ul><li>c</li></ul></li></ul></li></ul>
+<ul><!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>b<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 
-		await page.keyboard.press( 'ArrowUp' );
-		await pageUtils.pressKeyWithModifier( 'primaryShift', 'm' );
+		await pageUtils.pressKeyTimes( 'ArrowUp', 3 );
+		await editor.clickBlockToolbarButton( 'Outdent' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>a</li><li>b<ul><li>c</li></ul></li></ul>
+<ul><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>b<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
@@ -690,6 +774,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'b' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'c' );
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
 
@@ -826,19 +911,30 @@ test.describe( 'List', () => {
 	test( 'should place the caret in the right place with nested list', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' a' );
-		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeyTimes( 'ArrowUp', 3 );
 		await page.keyboard.press( 'Enter' );
 		// The caret should land in the second item.
 		await page.keyboard.type( '2' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>1</li><li>2<ul><li>a</li></ul></li></ul>
+<ul><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>2<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
@@ -856,7 +952,13 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>1</li><li> </li></ul>
+<ul><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li> </li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
@@ -900,7 +1002,17 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>1<ul><li>2</li><li>3</li></ul></li><li></li></ul>
+<ul><!-- wp:list-item -->
+<li>1<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>2</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>3</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 
@@ -915,7 +1027,17 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>1<ul><li>2</li><li>3</li></ul></li></ul>
+<ul><!-- wp:list-item -->
+<li>1<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>2</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>3</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
@@ -929,13 +1051,18 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
-			`<!-- wp:list -->
-<ul><li>2</li></ul>
-<!-- /wp:list -->`
+			`<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->`
 		);
 	} );
 
@@ -949,11 +1076,22 @@ test.describe( 'List', () => {
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '3' );
+		await editor.clickBlockToolbarButton( 'Select List' );
 		await editor.clickBlockToolbarButton( 'Ordered' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
-<ol><li>1</li><li>2</li><li>3</li></ol>
+<ol><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>2</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>3</li>
+<!-- /wp:list-item --></ol>
 <!-- /wp:list -->`
 		);
 	} );
@@ -968,11 +1106,22 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'b' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'c' );
+		await editor.clickBlockToolbarButton( 'Select List' );
 		await editor.clickBlockToolbarButton( 'Unordered' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><li>a</li><li>b</li><li>c</li></ul>
+<ul><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>b</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 	} );
