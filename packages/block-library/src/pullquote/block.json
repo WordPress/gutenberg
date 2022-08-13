@@ -11,7 +11,6 @@
 			"type": "string",
 			"source": "html",
 			"selector": "blockquote",
-			"multiline": "p",
 			"__experimentalRole": "content"
 		},
 		"citation": {

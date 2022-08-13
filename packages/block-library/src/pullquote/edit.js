@@ -52,7 +52,6 @@ function PullQuoteEdit( {
 				<BlockQuote>
 					<RichText
 						identifier="value"
-						multiline
 						value={ value }
 						onChange={ ( nextValue ) =>
 							setAttributes( {
