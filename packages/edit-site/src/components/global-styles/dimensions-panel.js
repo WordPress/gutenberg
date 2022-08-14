@@ -69,6 +69,12 @@ function useHasGap( name ) {
 	return settings && supports.includes( 'blockGap' );
 }
 
+function useHasSpacingPresets() {
+	const [ settings ] = useSetting( 'spacing.spacingSizes' );
+
+	return settings && settings.length > 0;
+}
+
 function filterValuesBySides( values, sides ) {
 	if ( ! sides ) {
 		// If no custom side configuration all sides are opted into by default.
@@ -224,6 +230,7 @@ export default function DimensionsPanel( { name } ) {
 	const showPaddingControl = useHasPadding( name );
 	const showMarginControl = useHasMargin( name );
 	const showGapControl = useHasGap( name );
+	const showSpacingPresetsControl = useHasSpacingPresets();
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units', name )[ 0 ] || [
 			'%',
@@ -347,15 +354,28 @@ export default function DimensionsPanel( { name } ) {
 					isShownByDefault={ true }
 					className="tools-panel-item-spacing"
 				>
-					<SpacingSizesControl
-						values={ paddingValues }
-						onChange={ setPaddingValues }
-						label={ __( 'Padding' ) }
-						sides={ paddingSides }
-						units={ units }
-						allowReset={ false }
-						splitOnAxis={ isAxialPadding }
-					/>
+					{ ! showSpacingPresetsControl && (
+						<BoxControl
+							values={ paddingValues }
+							onChange={ setPaddingValues }
+							label={ __( 'Padding' ) }
+							sides={ paddingSides }
+							units={ units }
+							allowReset={ false }
+							splitOnAxis={ isAxialPadding }
+						/>
+					) }
+					{ showSpacingPresetsControl && (
+						<SpacingSizesControl
+							values={ paddingValues }
+							onChange={ setPaddingValues }
+							label={ __( 'Padding' ) }
+							sides={ paddingSides }
+							units={ units }
+							allowReset={ false }
+							splitOnAxis={ isAxialPadding }
+						/>
+					) }
 				</ToolsPanelItem>
 			) }
 			{ showMarginControl && (
