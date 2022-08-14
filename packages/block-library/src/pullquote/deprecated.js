@@ -64,6 +64,16 @@ function parseBorderColor( styleString ) {
 	}
 }
 
+function multilineToInline( value ) {
+	return toHTMLString( {
+		value: replace(
+			create( { html: value, multilineTag: 'p' } ),
+			new RegExp( __UNSTABLE_LINE_SEPARATOR, 'g' ),
+			'\n'
+		),
+	} );
+}
+
 const v5 = {
 	attributes: {
 		value: {
@@ -106,14 +116,8 @@ const v5 = {
 		);
 	},
 	migrate( { value, ...attributes } ) {
-		const multilineValue = create( { html: value, multilineTag: 'p' } );
-		const inlineValue = replace(
-			multilineValue,
-			new RegExp( __UNSTABLE_LINE_SEPARATOR, 'g' ),
-			'\n'
-		);
 		return {
-			value: toHTMLString( { value: inlineValue } ),
+			value: multilineToInline( value ),
 			...attributes,
 		};
 	},
@@ -195,6 +199,7 @@ const v4 = {
 		);
 	},
 	migrate( {
+		value,
 		className,
 		mainColor,
 		customMainColor,
@@ -231,6 +236,7 @@ const v4 = {
 		}
 
 		return {
+			value: multilineToInline( value ),
 			className,
 			backgroundColor: isSolidColorStyle ? mainColor : undefined,
 			borderColor: isSolidColorStyle ? undefined : mainColor,
@@ -331,6 +337,7 @@ const v3 = {
 		);
 	},
 	migrate( {
+		value,
 		className,
 		figureStyle,
 		mainColor,
@@ -373,6 +380,7 @@ const v3 = {
 			const borderColor = parseBorderColor( figureStyle );
 			if ( borderColor ) {
 				return {
+					value: multilineToInline( value ),
 					...attributes,
 					className,
 					// Block supports: Set style.border.color if a deprecated block has `mainColor`, inline border CSS and is not a solid color style.
@@ -385,6 +393,7 @@ const v3 = {
 			}
 		}
 		return {
+			value: multilineToInline( value ),
 			className,
 			backgroundColor: isSolidColorStyle ? mainColor : undefined,
 			borderColor: isSolidColorStyle ? undefined : mainColor,
@@ -468,6 +477,7 @@ const v2 = {
 		);
 	},
 	migrate( {
+		value,
 		className,
 		mainColor,
 		customMainColor,
@@ -504,6 +514,7 @@ const v2 = {
 		}
 
 		return {
+			value: multilineToInline( value ),
 			className,
 			backgroundColor: isSolidColorStyle ? mainColor : undefined,
 			borderColor: isSolidColorStyle ? undefined : mainColor,
@@ -528,6 +539,12 @@ const v1 = {
 				) }
 			</blockquote>
 		);
+	},
+	migrate( { value, ...attributes } ) {
+		return {
+			value: multilineToInline( value ),
+			...attributes,
+		};
 	},
 };
 
@@ -556,6 +573,12 @@ const v0 = {
 				) }
 			</blockquote>
 		);
+	},
+	migrate( { value, ...attributes } ) {
+		return {
+			value: multilineToInline( value ),
+			...attributes,
+		};
 	},
 };
 

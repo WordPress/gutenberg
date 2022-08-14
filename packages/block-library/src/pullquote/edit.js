@@ -52,6 +52,7 @@ function PullQuoteEdit( {
 				<BlockQuote>
 					<RichText
 						identifier="value"
+						tagName="p"
 						value={ value }
 						onChange={ ( nextValue ) =>
 							setAttributes( {
