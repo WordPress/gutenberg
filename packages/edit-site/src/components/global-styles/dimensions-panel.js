@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -352,7 +357,9 @@ export default function DimensionsPanel( { name } ) {
 					label={ __( 'Padding' ) }
 					onDeselect={ resetPaddingValue }
 					isShownByDefault={ true }
-					className="tools-panel-item-spacing"
+					className={ classnames( {
+						'tools-panel-item-spacing': showSpacingPresetsControl,
+					} ) }
 				>
 					{ ! showSpacingPresetsControl && (
 						<BoxControl
