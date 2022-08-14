@@ -77,6 +77,13 @@ export const PRESET_METADATA = [
 			{ classSuffix: 'font-family', propertyName: 'font-family' },
 		],
 	},
+	{
+		path: [ 'spacing', 'spacingSizes' ],
+		valueKey: 'spacingSizes',
+		cssVarInfix: 'spacing',
+		valueFunc: ( { size } ) => size,
+		classes: [],
+	},
 ];
 
 const STYLE_PATH_TO_CSS_VAR_INFIX = {
