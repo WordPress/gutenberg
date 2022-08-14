@@ -59,6 +59,7 @@
 	.components-spacing-sizes-control__custom-toggle-single {
 		&.is-small.has-icon {
 			padding: 0;
+			min-width: $icon-size;
 		}
 	}
 
