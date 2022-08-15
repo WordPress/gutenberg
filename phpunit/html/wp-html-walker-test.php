@@ -86,6 +86,16 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 		$this->assertSame( 'true', $w->get_attribute( 'hidden' ) );
 	}
 
+	public function test_treats_slash_as_attribute_separator() {
+		$w = new WP_HTML_Walker( '<div a/b/c/d/e="test">Test</div>' );
+		$this->assertTrue( $w->next_tag( array() ) );
+		$this->assertTrue($w->get_attribute( 'a' ) );
+		$this->assertTrue($w->get_attribute( 'b' ) );
+		$this->assertTrue($w->get_attribute( 'c' ) );
+		$this->assertTrue($w->get_attribute( 'd' ) );
+		$this->assertSame( 'test', $w->get_attribute( 'e' ) );
+	}
+
 	/**
 	 * @ticket 56299
 	 */

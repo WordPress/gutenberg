@@ -603,7 +603,8 @@ class WP_HTML_Walker {
 	 * @since 6.1.0
 	 */
 	private function parse_next_attribute( $context = 'tag-opener' ) {
-		$this->skip_whitespace();
+		// Skip whitespace and slashes
+		$this->parsed_bytes += strspn( $this->html, " \t\f\r\n/", $this->parsed_bytes );
 
 		/*
 		 * Treat the equal sign ("=") as a part of the attribute name if it is the
