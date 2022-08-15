@@ -15,11 +15,32 @@ require __DIR__ . '/../class-wp-style-engine-css-declarations.php';
  */
 class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 	/**
+	 * Tear down after each test.
+	 */
+	public function tear_down() {
+		parent::tear_down();
+		WP_Style_Engine_CSS_Rules_Store::remove_all_stores();
+	}
+	/**
 	 * Should create a new store.
 	 */
 	public function test_create_new_store() {
 		$new_pancakes_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'pancakes-with-strawberries' );
 		$this->assertInstanceOf( 'WP_Style_Engine_CSS_Rules_Store', $new_pancakes_store );
+	}
+
+	/**
+	 * Should not create a new store with invalid $store_name.
+	 */
+	public function test_store_name_required() {
+		$not_a_store = WP_Style_Engine_CSS_Rules_Store::get_store( '' );
+		$this->assertEmpty( $not_a_store );
+
+		$also_not_a_store = WP_Style_Engine_CSS_Rules_Store::get_store( 123 );
+		$this->assertEmpty( $also_not_a_store );
+
+		$definitely_not_a_store = WP_Style_Engine_CSS_Rules_Store::get_store( null );
+		$this->assertEmpty( $definitely_not_a_store );
 	}
 
 	/**
@@ -37,13 +58,48 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Should return all previously created stores.
+	 */
+	public function test_get_stores() {
+		$burrito_store    = WP_Style_Engine_CSS_Rules_Store::get_store( 'burrito' );
+		$quesadilla_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'quesadilla' );
+		$this->assertEquals(
+			array(
+				'burrito'    => $burrito_store,
+				'quesadilla' => $quesadilla_store,
+			),
+			WP_Style_Engine_CSS_Rules_Store::get_stores()
+		);
+	}
+
+	/**
+	 * Should delete all previously created stores.
+	 */
+	public function test_remove_all_stores() {
+		$dolmades_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'dolmades' );
+		$tzatziki_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'tzatziki' );
+		$this->assertEquals(
+			array(
+				'dolmades' => $dolmades_store,
+				'tzatziki' => $tzatziki_store,
+			),
+			WP_Style_Engine_CSS_Rules_Store::get_stores()
+		);
+		WP_Style_Engine_CSS_Rules_Store::remove_all_stores();
+		$this->assertEquals(
+			array(),
+			WP_Style_Engine_CSS_Rules_Store::get_stores()
+		);
+	}
+
+	/**
 	 * Should return a stored rule.
 	 */
 	public function test_add_rule() {
 		$new_pie_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'meat-pie' );
 		$selector      = '.wp-block-sauce a:hover';
 		$store_rule    = $new_pie_store->add_rule( $selector );
-		$expected      = "$selector {}";
+		$expected      = '';
 		$this->assertEquals( $expected, $store_rule->get_css() );
 
 		$pie_declarations = array(
@@ -55,7 +111,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 		$store_rule->add_declarations( $css_declarations );
 
 		$store_rule = $new_pie_store->add_rule( $selector );
-		$expected   = "$selector {{$css_declarations->get_declarations_string()}}";
+		$expected   = "$selector{{$css_declarations->get_declarations_string()}}";
 		$this->assertEquals( $expected, $store_rule->get_css() );
 	}
 

@@ -90,8 +90,13 @@ function ListViewBlockSelectButton(
 						<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
 					</span>
 					{ blockInformation?.anchor && (
-						<span className="block-editor-list-view-block-select-button__anchor">
-							{ blockInformation.anchor }
+						<span className="block-editor-list-view-block-select-button__anchor-wrapper">
+							<Truncate
+								className="block-editor-list-view-block-select-button__anchor"
+								ellipsizeMode="auto"
+							>
+								{ blockInformation.anchor }
+							</Truncate>
 						</span>
 					) }
 					{ isLocked && (

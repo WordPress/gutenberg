@@ -4,7 +4,8 @@
 		"isValid": true,
 		"attributes": {
 			"level": 1,
-			"showPrefix": true
+			"showPrefix": true,
+			"showSearchTerm": true
 		},
 		"innerBlocks": []
 	}

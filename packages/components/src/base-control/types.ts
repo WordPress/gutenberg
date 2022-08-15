@@ -37,6 +37,5 @@ export type BaseControlProps = {
 };
 
 export type BaseControlVisualLabelProps = {
-	className?: string;
 	children: ReactNode;
 };

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,9 +12,16 @@ import * as icons from '../../';
 
 const { Icon: _Icon, ...availableIcons } = icons;
 
-export default { title: 'Icons/Icon', component: Icon };
+const meta = {
+	component: Icon,
+	title: 'Icons/Icon',
+	parameters: {
+		controls: { hideNoControlsWarning: true },
+	},
+};
+export default meta;
 
-export const _default = () => {
+export const Default = () => {
 	return (
 		<>
 			<div>
@@ -45,8 +52,8 @@ const LibraryExample = () => {
 		  )
 		: availableIcons;
 	return (
-		<div style={ { padding: '20px' } }>
-			<label htmlFor="filter-icon" style={ { paddingRight: '10px' } }>
+		<div style={ { padding: 20 } }>
+			<label htmlFor="filter-icon" style={ { paddingRight: 10 } }>
 				Filter Icons
 			</label>
 			<input
@@ -57,20 +64,29 @@ const LibraryExample = () => {
 				placeholder="Icon name"
 				onChange={ ( event ) => setFilter( event.target.value ) }
 			/>
-			{ Object.entries( filteredIcons ).map( ( [ name, icon ] ) => {
-				return (
-					<div
-						key={ name }
-						style={ { display: 'flex', alignItems: 'center' } }
-					>
-						<strong style={ { width: '120px' } }>{ name }</strong>
-
-						<Icon icon={ icon } />
-						<Icon icon={ icon } size={ 36 } />
-						<Icon icon={ icon } size={ 48 } />
-					</div>
-				);
-			} ) }
+			<div style={ { marginTop: 20 } }>
+				<div
+					style={ {
+						display: 'inline-grid',
+						alignItems: 'center',
+						gap: 4,
+						gridTemplateColumns: 'auto 24px 36px 48px',
+					} }
+				>
+					{ Object.entries( filteredIcons ).map(
+						( [ name, icon ] ) => {
+							return (
+								<Fragment key={ name }>
+									<strong>{ name }</strong>
+									<Icon icon={ icon } />
+									<Icon icon={ icon } size={ 36 } />
+									<Icon icon={ icon } size={ 48 } />
+								</Fragment>
+							);
+						}
+					) }
+				</div>
+			</div>
 		</div>
 	);
 };

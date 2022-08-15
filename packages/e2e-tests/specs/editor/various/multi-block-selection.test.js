@@ -907,11 +907,16 @@ describe( 'Multi-block selection', () => {
 
 	it( 'should select separator (single element block)', async () => {
 		await clickBlockAppender();
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/hr' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'a' );
-		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowRight' );
+		await pressKeyWithModifier( 'shift', 'ArrowDown' );
+		await pressKeyWithModifier( 'shift', 'ArrowDown' );
 
 		// Test setup.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -921,7 +926,7 @@ describe( 'Multi-block selection', () => {
 		// Ensure selection is in the correct place.
 		await page.keyboard.type( '&' );
 
-		// Expect two blocks with "&" in between.
+		// Expect a paragraph with "&".
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -995,5 +1000,23 @@ describe( 'Multi-block selection', () => {
 			);
 			expect( selectedBlocks.length ).toBe( 2 );
 		} );
+	} );
+
+	it( 'should select by dragging into separator', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await insertBlock( 'Separator' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		const [ paragraph, hr ] = await page.$$( '[data-type]' );
+		const coord1 = await paragraph.clickablePoint();
+		const coord2 = await hr.clickablePoint();
+
+		await page.mouse.move( coord1.x, coord1.y );
+		await page.mouse.down();
+		await page.mouse.move( coord2.x, coord2.y, { steps: 10 } );
+		await page.mouse.up();
+
+		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
 	} );
 } );

@@ -162,9 +162,12 @@ function PostAuthorEdit( {
 						{ authorDetails?.name || __( 'Post Author' ) }
 					</p>
 					{ showBio && (
-						<p className="wp-block-post-author__bio">
-							{ authorDetails?.description }
-						</p>
+						<p
+							className="wp-block-post-author__bio"
+							dangerouslySetInnerHTML={ {
+								__html: authorDetails?.description,
+							} }
+						/>
 					) }
 				</div>
 			</div>

@@ -11,7 +11,6 @@ import {
 	SearchControl,
 	TextHighlight,
 	__experimentalText as Text,
-	__experimentalHeading as Heading,
 	__unstableComposite as Composite,
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
@@ -191,15 +190,25 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 					>
 						<FlexItem
 							isBlock
+							as={ Button }
 							onClick={ () => {
-								const { slug, title, description } =
-									entityForSuggestions.template;
-								onSelect( { slug, title, description } );
+								const {
+									slug,
+									title,
+									description,
+									templatePrefix,
+								} = entityForSuggestions.template;
+								onSelect( {
+									slug,
+									title,
+									description,
+									templatePrefix,
+								} );
 							} }
 						>
-							<Heading level={ 5 }>
+							<Text as="span" weight={ 600 }>
 								{ entityForSuggestions.labels.all_items }
-							</Heading>
+							</Text>
 							<Text as="span">
 								{
 									// translators: The user is given the choice to set up a template for all items of a post type or taxonomy, or just a specific one.
@@ -209,13 +218,14 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 						</FlexItem>
 						<FlexItem
 							isBlock
+							as={ Button }
 							onClick={ () => {
 								setShowSearchEntities( true );
 							} }
 						>
-							<Heading level={ 5 }>
+							<Text as="span" weight={ 600 }>
 								{ entityForSuggestions.labels.singular_name }
-							</Heading>
+							</Text>
 							<Text as="span">
 								{
 									// translators: The user is given the choice to set up a template for all items of a post type or taxonomy, or just a specific one.

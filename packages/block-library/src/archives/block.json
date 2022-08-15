@@ -11,6 +11,10 @@
 			"type": "boolean",
 			"default": false
 		},
+		"showLabel": {
+			"type": "boolean",
+			"default": true
+		},
 		"showPostCounts": {
 			"type": "boolean",
 			"default": false

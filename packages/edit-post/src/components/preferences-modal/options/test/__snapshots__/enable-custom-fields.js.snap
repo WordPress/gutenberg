@@ -4,6 +4,13 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
 .emotion-0 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
+  box-sizing: border-box;
+}
+
+.emotion-0 *,
+.emotion-0 *::before,
+.emotion-0 *::after {
+  box-sizing: inherit;
 }
 
 .emotion-2 {
@@ -67,6 +74,13 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
 .emotion-0 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
+  box-sizing: border-box;
+}
+
+.emotion-0 *,
+.emotion-0 *::before,
+.emotion-0 *::after {
+  box-sizing: inherit;
 }
 
 .emotion-2 {
@@ -116,6 +130,13 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
 .emotion-0 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
+  box-sizing: border-box;
+}
+
+.emotion-0 *,
+.emotion-0 *::before,
+.emotion-0 *::after {
+  box-sizing: inherit;
 }
 
 .emotion-2 {
@@ -179,6 +200,13 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
 .emotion-0 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
+  box-sizing: border-box;
+}
+
+.emotion-0 *,
+.emotion-0 *::before,
+.emotion-0 *::after {
+  box-sizing: inherit;
 }
 
 .emotion-2 {
