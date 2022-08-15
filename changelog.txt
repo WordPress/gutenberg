@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 13.9.0-rc.3 =
+
+## Changelog
+
+### Bug Fixes
+
+- Style Engine: Defensive guarding for when style does not define 'individual' property. ([43122](https://github.com/WordPress/gutenberg/pull/43122))
+
+### Code Quality
+
+- Style Engine: Tweak Declarations filtering logic slightly. ([43215](https://github.com/WordPress/gutenberg/pull/43215))
+- Style Engine: Minor tweaks. ([43111])([minor tweaks to the style engine](https://github.com/WordPress/gutenberg/pull/43111))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@andrewserong @aristath @hellofromtonya @Mamaduka
+
+
 = 13.9.0-rc.2 =
 
 
