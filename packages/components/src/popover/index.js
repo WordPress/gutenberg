@@ -194,7 +194,7 @@ const Popover = (
 	const frameOffset = useRef();
 
 	const middleware = [
-		frameOffset || offset
+		frameOffset.current || offset
 			? offsetMiddleware( ( { placement: currentPlacement } ) => {
 					if ( ! frameOffset.current ) {
 						return offset;
