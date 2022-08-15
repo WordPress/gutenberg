@@ -12,7 +12,13 @@ return array(
 	'content'    => '<!-- wp:group {"align":"full","layout":{"inherit":true}} -->
 					<div class="wp-block-group alignfull"><!-- wp:group {"align":"wide","style":{"spacing":{"padding":{"bottom":"2em","top":"4em"}}},"layout":{"type":"flex","justifyContent":"space-between"}} -->
 					<div class="wp-block-group alignwide" style="padding-top:4em;padding-bottom:2em"><!-- wp:paragraph -->
-					<p>Proudly powered by <a href="https://wordpress.org" data-type="URL" data-id="https://wordpress.org">WordPress</a></p>
+					<p>'
+					. sprintf(
+						/* translators: %s: WordPress */
+						__( 'Proudly powered by %s', 'gutenberg' ),
+						'<a href="https://wordpress.org">WordPress</a>'
+					) .
+					'</p>
 					<!-- /wp:paragraph -->
 					
 					<!-- wp:navigation {"layout":{"type":"flex","setCascadingProperties":true,"justifyContent":"right"}} -->

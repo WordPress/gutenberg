@@ -29,7 +29,13 @@ return array(
 					<!-- /wp:spacer -->
 					
 					<!-- wp:paragraph {"align":"center"} -->
-					<p class="has-text-align-center">Proudly Powered by <a href="https://wordpress.org" data-type="URL" data-id="https://wordpress.org">WordPress</a></p>
+					<p class="has-text-align-center">'
+					. sprintf(
+						/* translators: %s: WordPress */
+						__( 'Proudly powered by %s', 'gutenberg' ),
+						'<a href="https://wordpress.org">WordPress</a>'
+					) .
+					'</p>
 					<!-- /wp:paragraph --></div>
 					<!-- /wp:group -->',
 );

@@ -11,7 +11,13 @@ return array(
 	'categories' => array( 'footer' ),
 	'content'    => '<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"4em","bottom":"2em"}}},"layout":{"inherit":false}} -->
 					<div class="wp-block-group alignfull" style="padding-top:4em;padding-bottom:2em"><!-- wp:paragraph {"align":"right"} -->
-					<p class="has-text-align-right">Proudly Powered by <a href="https://wordpress.org" data-type="URL" data-id="https://wordpress.org">WordPress</a></p>
+					<p class="has-text-align-right">'
+					. sprintf(
+						/* translators: %s: WordPress */
+						__( 'Proudly powered by %s', 'gutenberg' ),
+						'<a href="https://wordpress.org">WordPress</a>'
+					) .
+					'</p>
 					<!-- /wp:paragraph --></div>
 					<!-- /wp:group -->',
 );

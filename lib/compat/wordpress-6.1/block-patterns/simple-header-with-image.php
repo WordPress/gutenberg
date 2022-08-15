@@ -23,7 +23,7 @@ return array(
 					<!-- /wp:group -->
 					
 					<!-- wp:cover {"url":"https://headerandfooterpatterns.files.wordpress.com/2022/01/5eca6-header-mountains-scaled-1.jpg","id":57,"dimRatio":0,"isDark":false,"align":"full"} -->
-					<div class="wp-block-cover alignfull is-light"><span aria-hidden="true" class="has-background-dim-0 wp-block-cover__gradient-background has-background-dim"></span><img class="wp-block-cover__image-background wp-image-57" alt="" src="https://headerandfooterpatterns.files.wordpress.com/2022/01/5eca6-header-mountains-scaled-1.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+					<div class="wp-block-cover alignfull is-light"><span aria-hidden="true" class="has-background-dim-0 wp-block-cover__gradient-background has-background-dim"></span><img class="wp-block-cover__image-background wp-image-57" alt="" src="https://headerandfooterpatterns.files.wordpress.com/2022/01/5eca6-header-mountains-scaled-1.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"' . __( 'Write title…', 'gutenberg' ) . '","fontSize":"large"} -->
 					<p class="has-text-align-center has-large-font-size"></p>
 					<!-- /wp:paragraph --></div></div>
 					<!-- /wp:cover --></div>

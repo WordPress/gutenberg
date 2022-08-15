@@ -20,11 +20,11 @@ return array(
 					<!-- wp:column -->
 					<div class="wp-block-column"><!-- wp:group {"align":"wide","style":{"spacing":{"padding":{"bottom":"0em","top":"0em"}}},"layout":{"type":"flex","justifyContent":"right"}} -->
 					<div class="wp-block-group alignwide" style="padding-top:0em;padding-bottom:0em"><!-- wp:navigation {"layout":{"type":"flex","setCascadingProperties":true,"justifyContent":"right","orientation":"vertical"}} -->
-					<!-- wp:navigation-link {"label":"About","url":"#","isTopLevelLink":true} /-->
+					<!-- wp:navigation-link {"label":"' . __( 'About', 'gutenberg' ) . '","url":"#","isTopLevelLink":true} /-->
 					
-					<!-- wp:navigation-link {"label":"Blog","url":"#","isTopLevelLink":true} /-->
+					<!-- wp:navigation-link {"label":"' . __( 'Blog', 'gutenberg' ) . '","url":"#","isTopLevelLink":true} /-->
 					
-					<!-- wp:navigation-link {"label":"Contact","url":"#","isTopLevelLink":true} /-->
+					<!-- wp:navigation-link {"label":"' . __( 'Contact', 'gutenberg' ) . '","url":"#","isTopLevelLink":true} /-->
 					<!-- /wp:navigation --></div>
 					<!-- /wp:group --></div>
 					<!-- /wp:column --></div>

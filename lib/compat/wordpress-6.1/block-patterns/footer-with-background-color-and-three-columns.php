@@ -19,7 +19,7 @@ return array(
 					
 					<!-- wp:column -->
 					<div class="wp-block-column"><!-- wp:paragraph -->
-					<p><strong>Social Media</strong></p>
+					<p><strong>' . __( 'Social Media', 'gutenberg' ) . '</strong></p>
 					<!-- /wp:paragraph -->
 					
 					<!-- wp:paragraph -->
@@ -29,18 +29,24 @@ return array(
 					
 					<!-- wp:column -->
 					<div class="wp-block-column"><!-- wp:paragraph -->
-					<p><strong>Where We Are</strong></p>
+					<p><strong>' . __( 'Where We Are', 'gutenberg' ) . '</strong></p>
 					<!-- /wp:paragraph -->
 					
 					<!-- wp:paragraph -->
-					<p>2020 Lomita Blvd, <br>Torrance, CA 90101<br>United States</p>
+					<p>' . __( '2020 Lomita Blvd, <br>Torrance, CA 90101<br>United States', 'gutenberg' ) . '</p>
 					<!-- /wp:paragraph --></div>
 					<!-- /wp:column --></div>
 					<!-- /wp:columns -->
 					
 					<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"4em","bottom":"2em"}}},"layout":{"inherit":false}} -->
 					<div class="wp-block-group alignfull" style="padding-top:4em;padding-bottom:2em"><!-- wp:paragraph {"align":"left"} -->
-					<p class="has-text-align-left">Proudly Powered by <a href="https://wordpress.org">WordPress</a></p>
+					<p class="has-text-align-left">'
+					. sprintf(
+						/* translators: %s: WordPress */
+						__( 'Proudly powered by %s', 'gutenberg' ),
+						'<a href="https://wordpress.org">WordPress</a>'
+					) .
+					'</p>
 					<!-- /wp:paragraph --></div>
 					<!-- /wp:group --></div>
 					<!-- /wp:group -->',

@@ -14,7 +14,13 @@ return array(
 					<div class="wp-block-group alignwide" style="padding-top:4em;padding-bottom:2em"><!-- wp:site-title {"style":{"typography":{"fontStyle":"normal","fontWeight":"700"}}} /-->
 					
 					<!-- wp:paragraph -->
-					<p>Proudly powered by <a href="https://wordpress.org" data-type="URL" data-id="https://wordpress.org">WordPress</a></p>
+					<p>'
+					. sprintf(
+						/* translators: %s: WordPress */
+						__( 'Proudly powered by %s', 'gutenberg' ),
+						'<a href="https://wordpress.org">WordPress</a>'
+					) .
+					'</p>
 					<!-- /wp:paragraph --></div>
 					<!-- /wp:group --></div>
 					<!-- /wp:group -->',

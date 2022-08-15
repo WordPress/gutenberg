@@ -13,7 +13,7 @@ return array(
 					<div class="wp-block-group alignfull" style="padding-top:4em;padding-bottom:2em"><!-- wp:columns {"align":"wide"} -->
 					<div class="wp-block-columns alignwide"><!-- wp:column {"width":"100%"} -->
 					<div class="wp-block-column" style="flex-basis:100%"><!-- wp:group {"align":"wide"} -->
-					<div class="wp-block-group alignwide"><!-- wp:search {"label":"Search","showLabel":false,"width":100,"widthUnit":"%","buttonText":"Search","buttonUseIcon":true} /--></div>
+					<div class="wp-block-group alignwide"><!-- wp:search {"label":"' . __( 'Search', 'gutenberg' ) . '","showLabel":false,"width":100,"widthUnit":"%","buttonText":"' . __( 'Search', 'gutenberg' ) . '","buttonUseIcon":true} /--></div>
 					<!-- /wp:group --></div>
 					<!-- /wp:column -->
 					
@@ -33,7 +33,13 @@ return array(
 					
 					<!-- wp:column -->
 					<div class="wp-block-column"><!-- wp:paragraph {"align":"right"} -->
-					<p class="has-text-align-right">Proudly powered by <a href="https://wordpress.org">WordPress</a></p>
+					<p class="has-text-align-right">'
+					. sprintf(
+						/* translators: %s: WordPress */
+						__( 'Proudly powered by %s', 'gutenberg' ),
+						'<a href="https://wordpress.org">WordPress</a>'
+					) .
+					'</p>
 					<!-- /wp:paragraph --></div>
 					<!-- /wp:column --></div>
 					<!-- /wp:columns --></div>
