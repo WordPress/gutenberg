@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
+### Bug Fix
+
+-   Jest Preset: Ignore `is-plain-obj` transformation ([#43179](https://github.com/WordPress/gutenberg/pull/43179)).
+
 ## 8.0.0 (2022-01-27)
 
 ### Breaking Changes

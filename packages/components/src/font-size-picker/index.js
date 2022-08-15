@@ -79,15 +79,9 @@ function FontSizePicker(
 			getFontSizeOptions(
 				shouldUseSelectControl,
 				fontSizes,
-				disableCustomFontSizes,
-				fontSizesContainComplexValues
+				disableCustomFontSizes
 			),
-		[
-			shouldUseSelectControl,
-			fontSizes,
-			disableCustomFontSizes,
-			fontSizesContainComplexValues,
-		]
+		[ shouldUseSelectControl, fontSizes, disableCustomFontSizes ]
 	);
 	const selectedOption = getSelectedOption( fontSizes, value );
 	const isCustomValue = selectedOption.slug === CUSTOM_FONT_SIZE;
@@ -110,6 +104,7 @@ function FontSizePicker(
 				`(${ selectedOption?.size })`
 			);
 		}
+
 		// Calculate the `hint` for toggle group control.
 		let hint = selectedOption.name;
 		if (

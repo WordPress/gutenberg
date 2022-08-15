@@ -133,22 +133,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'invalid_context'                              => array(
-				'block_styles'    => array(
-					'color'   => array(
-						'text' => 'var:preset|color|sugar',
-					),
-					'spacing' => array(
-						'padding' => '20000px',
-					),
-				),
-				'options'         => array(
-					'convert_vars_to_classnames' => true,
-					'context'                    => 'i-love-doughnuts',
-				),
-				'expected_output' => array(),
-			),
-
 			'inline_valid_box_model_style'                 => array(
 				'block_styles'    => array(
 					'spacing' => array(
@@ -511,7 +495,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
 	 * Tests adding rules to a store and retrieving a generated stylesheet.
 	 */
-	public function test_enqueue_block_styles_store() {
+	public function test_store_block_styles_using_context() {
 		$block_styles = array(
 			'spacing' => array(
 				'padding' => array(
@@ -526,7 +510,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 		$generated_styles = wp_style_engine_get_styles(
 			$block_styles,
 			array(
-				'enqueue'  => true,
 				'context'  => 'block-supports',
 				'selector' => 'article',
 			)
@@ -534,6 +517,28 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 		$store            = WP_Style_Engine::get_store( 'block-supports' );
 		$rule             = $store->get_all_rules()['article'];
 		$this->assertSame( $generated_styles['css'], $rule->get_css() );
+	}
+
+	/**
+	 * Tests adding rules to a store and retrieving a generated stylesheet.
+	 */
+	public function test_does_not_store_block_styles_without_context() {
+		$block_styles = array(
+			'typography' => array(
+				'fontSize' => '999px',
+			),
+		);
+
+		wp_style_engine_get_styles(
+			$block_styles,
+			array(
+				'selector' => '#font-size-rulez',
+			)
+		);
+
+		$all_stores = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_stores();
+
+		$this->assertEmpty( $all_stores );
 	}
 
 	/**
@@ -564,7 +569,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			$css_rules,
 			array(
 				'context' => 'test-store',
-				'enqueue' => true,
 			)
 		);
 
