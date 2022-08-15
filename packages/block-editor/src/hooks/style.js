@@ -15,10 +15,7 @@ import {
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
-import {
-	getCSSRules,
-	generate as generateStyles,
-} from '@wordpress/style-engine';
+import { getCSSRules, compileCSS } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
@@ -280,7 +277,7 @@ const withElementsStyles = createHigherOrderComponent(
 				for ( const [ elementName, elementStyles ] of Object.entries(
 					filteredElementsStyles
 				) ) {
-					const cssRule = generateStyles( elementStyles, {
+					const cssRule = compileCSS( elementStyles, {
 						// The .editor-styles-wrapper selector is required on elements styles. As it is
 						// added to all other editor styles, not providing it causes reset and global
 						// styles to override element styles because of higher specificity.
