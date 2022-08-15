@@ -38,10 +38,7 @@ module.exports = async function parseConfig( config, options ) {
 		port: config.port,
 		phpVersion: config.phpVersion,
 		coreSource: includeTestsPath(
-			parseSourceString(
-				await getCoreSourceString( config.core ),
-				options
-			),
+			await parseCoreSource( config.core, options ),
 			options
 		),
 		pluginSources: config.plugins.map( ( sourceString ) =>
@@ -62,17 +59,19 @@ module.exports = async function parseConfig( config, options ) {
 	};
 };
 
-async function getCoreSourceString( coreSource ) {
-	if ( coreSource ) {
-		return coreSource;
+async function parseCoreSource( coreSource, options ) {
+	// An empty source means we should use the latest version of WordPress.
+	if ( ! coreSource ) {
+		const wpVersion = await getLatestWordPressVersion();
+		if ( ! wpVersion ) {
+			throw new ValidationError(
+				'Could not find the latest WordPress version. There may be a network issue.'
+			);
+		}
+
+		coreSource = `WordPress/WordPress#${ wpVersion }`;
 	}
-	const wpVersion = await getLatestWordPressVersion();
-	if ( ! wpVersion ) {
-		throw new ValidationError(
-			'Could not find the latest WordPress version. There may be a network issue.'
-		);
-	}
-	return `WordPress/WordPress#${ wpVersion }`;
+	return parseSourceString( coreSource, options );
 }
 
 /**
