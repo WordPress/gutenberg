@@ -39,7 +39,7 @@ Changes placeholder children layout from flex-row to flex-column.
 
 Title of the placeholder.
 
--   Required: Yes
+-   Required: No
 
 ### `notices`: `ReactNode`
 
