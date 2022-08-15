@@ -243,8 +243,8 @@
 										"type": "string"
 									},
 									"slug": {
-										"description": "Kebab-case unique identifier for the space size preset.",
-										"type": "string"
+										"description": "Unique identifier for the space size preset.",
+										"type": "integer"
 									},
 									"size": {
 										"description": "CSS space-size value, including units.",
