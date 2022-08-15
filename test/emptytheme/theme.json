@@ -1,11 +1,11 @@
 {
 	"version": 2,
-	"styles": {
-		"color": {
-			"background": {
-				"ref": "styles.color.text"
-			},
-			"text": "green"
+	"settings": {
+		"appearanceTools": true,
+		"layout": {
+			"contentSize": "840px",
+			"wideSize": "1100px"
 		}
-	}
+	},
+	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
 }

@@ -2,9 +2,6 @@
 	"core": "WordPress/WordPress",
 	"plugins": [ "." ],
 	"themes": [ "./test/emptytheme" ],
-	"config": {
-		"WP_DEBUG": true
-	},
 	"env": {
 		"tests": {
 			"mappings": {
