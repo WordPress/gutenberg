@@ -58,10 +58,12 @@ program
 		'disable integration with `@wordpress/scripts` package'
 	)
 	.option( '--wp-env', 'enable integration with `@wordpress/env` package' )
+	.option( '--no-plugin', 'scaffold only block files' )
 	.action(
 		async (
 			slug,
 			{
+				plugin,
 				category,
 				namespace,
 				shortDescription: description,
@@ -77,6 +79,7 @@ program
 				const defaultValues = getDefaultValues( pluginTemplate );
 				const optionsValues = pickBy(
 					{
+						plugin,
 						category,
 						description,
 						namespace,
@@ -99,7 +102,9 @@ program
 				} else {
 					log.info( '' );
 					log.info(
-						"Let's customize your WordPress plugin with blocks:"
+						plugin
+							? "Let's customize your WordPress plugin with blocks:"
+							: "Let's add a new block to your existing WordPress plugin:"
 					);
 
 					const filterOptionsProvided = ( { name } ) =>
@@ -114,33 +119,39 @@ program
 					] ).filter( filterOptionsProvided );
 					const blockAnswers = await inquirer.prompt( blockPrompts );
 
-					const pluginAnswers = await inquirer
-						.prompt( {
-							type: 'confirm',
-							name: 'configurePlugin',
-							message:
-								'Do you want to customize the WordPress plugin?',
-							default: false,
-						} )
-						.then( async ( { configurePlugin } ) => {
-							if ( ! configurePlugin ) {
-								return {};
-							}
+					const pluginAnswers = plugin
+						? await inquirer
+								.prompt( {
+									type: 'confirm',
+									name: 'configurePlugin',
+									message:
+										'Do you want to customize the WordPress plugin?',
+									default: false,
+								} )
+								.then( async ( { configurePlugin } ) => {
+									if ( ! configurePlugin ) {
+										return {};
+									}
 
-							const pluginPrompts = getPrompts( pluginTemplate, [
-								'pluginURI',
-								'version',
-								'author',
-								'license',
-								'licenseURI',
-								'domainPath',
-								'updateURI',
-							] ).filter( filterOptionsProvided );
-							const result = await inquirer.prompt(
-								pluginPrompts
-							);
-							return result;
-						} );
+									const pluginPrompts = getPrompts(
+										pluginTemplate,
+										[
+											'pluginURI',
+											'version',
+											'author',
+											'license',
+											'licenseURI',
+											'domainPath',
+											'updateURI',
+										]
+									).filter( filterOptionsProvided );
+									const result = await inquirer.prompt(
+										pluginPrompts
+									);
+									return result;
+								} )
+						: {};
+
 					await scaffold( pluginTemplate, {
 						...defaultValues,
 						...optionsValues,
