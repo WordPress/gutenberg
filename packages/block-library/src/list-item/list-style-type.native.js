@@ -8,6 +8,7 @@ import { View, Text } from 'react-native';
  */
 import { Icon } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -89,9 +90,10 @@ function IconList( { fontSize, color, defaultFontSize, indentationLevel } ) {
 	);
 }
 
-export default function ListStyleType( {
+function ListStyleType( {
 	blockIndex,
 	indentationLevel,
+	getStylesFromColorScheme,
 	numberOfListItems,
 	ordered,
 	reversed,
@@ -109,9 +111,15 @@ export default function ListStyleType( {
 		style?.fontSize ? style.fontSize : defaultFontSize,
 		10
 	);
+
+	const colorWithPreferredScheme = getStylesFromColorScheme(
+		styles[ 'wp-block-list-item__list-item--default' ],
+		styles[ 'wp-block-list-item__list-item--default--dark' ]
+	);
+
 	const defaultColor = style?.baseColors?.color?.text
 		? style.baseColors.color.text
-		: styles[ 'wp-block-list-item__list-item--default' ].color;
+		: colorWithPreferredScheme.color;
 	const color = style?.color ? style.color : defaultColor;
 
 	if ( ordered ) {
@@ -137,3 +145,5 @@ export default function ListStyleType( {
 		/>
 	);
 }
+
+export default withPreferredColorScheme( ListStyleType );

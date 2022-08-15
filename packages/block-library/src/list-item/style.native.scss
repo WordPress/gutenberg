@@ -28,6 +28,11 @@
 	font-size: $editor-font-size;
 }
 
+.wp-block-list-item__list-item--default--dark {
+	color: $white;
+	font-size: $editor-font-size;
+}
+
 .wp-block-list-item__list-item-ordered--default {
 	margin-top: 2;
 }
