@@ -2,8 +2,9 @@
  * External dependencies
  */
 const inquirer = require( 'inquirer' );
+const { capitalCase } = require( 'change-case' );
 const program = require( 'commander' );
-const { pickBy, startCase } = require( 'lodash' );
+const { pickBy } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -91,7 +92,7 @@ program
 						...defaultValues,
 						slug,
 						// Transforms slug to title as a fallback.
-						title: startCase( slug ),
+						title: capitalCase( slug ),
 						...optionsValues,
 					};
 					await scaffold( pluginTemplate, answers );
