@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useState, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import {
 	Button,
 	RangeControl,
@@ -24,6 +25,7 @@ import { settings } from '@wordpress/icons';
  * Internal dependencies
  */
 import useSetting from '../use-setting';
+import { store as blockEditorStore } from '../../store';
 import {
 	LABELS,
 	getSliderValueFromPreset,
@@ -43,8 +45,15 @@ export default function SpacingInputControl( {
 	let selectListSizes = spacingSizes;
 	const showRangeControl = spacingSizes.length <= 8;
 
+	const disableCustomSpacingSizes = useSelect( ( select ) => {
+		const editorSettings = select( blockEditorStore ).getSettings();
+		return editorSettings?.disableCustomSpacingSizes;
+	} );
+
 	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
-		value !== undefined && ! isValueSpacingPreset( value )
+		! disableCustomSpacingSizes &&
+			value !== undefined &&
+			! isValueSpacingPreset( value )
 	);
 
 	const units = useCustomUnits( {
@@ -171,26 +180,28 @@ export default function SpacingInputControl( {
 				</Text>
 			) }
 
-			<Button
-				label={
-					showCustomValueControl
-						? __( 'Use size preset' )
-						: __( 'Set custom size' )
-				}
-				icon={ settings }
-				onClick={ () => {
-					setShowCustomValueControl( ! showCustomValueControl );
-				} }
-				isPressed={ showCustomValueControl }
-				isSmall
-				className={ classnames( {
-					'components-spacing-sizes-control__custom-toggle-all':
-						side === 'all',
-					'components-spacing-sizes-control__custom-toggle-single':
-						side !== 'all',
-				} ) }
-				iconSize={ 24 }
-			/>
+			{ ! disableCustomSpacingSizes && (
+				<Button
+					label={
+						showCustomValueControl
+							? __( 'Use size preset' )
+							: __( 'Set custom size' )
+					}
+					icon={ settings }
+					onClick={ () => {
+						setShowCustomValueControl( ! showCustomValueControl );
+					} }
+					isPressed={ showCustomValueControl }
+					isSmall
+					className={ classnames( {
+						'components-spacing-sizes-control__custom-toggle-all':
+							side === 'all',
+						'components-spacing-sizes-control__custom-toggle-single':
+							side !== 'all',
+					} ) }
+					iconSize={ 24 }
+				/>
+			) }
 			{ showCustomValueControl && (
 				<>
 					<UnitControl
