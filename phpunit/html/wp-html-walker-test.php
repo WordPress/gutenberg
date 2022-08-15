@@ -43,12 +43,6 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 		$this->assertSame( 'div', $w->get_tag() );
 	}
 
-	public function test_get_tag_returns_raw_open_tag_name() {
-		$w = new WP_HTML_Walker( '<DIV>Test</DIV>' );
-		$this->assertTrue( $w->next_tag( 'div' ) );
-		$this->assertSame( 'DIV', $w->get_tag() );
-	}
-
 	public function test_get_attribute_returns_null_before_finding_tags() {
 		$w = new WP_HTML_Walker( '<div class="test">Test</div>' );
 		$this->assertNull( $w->get_attribute( 'class' ) );
