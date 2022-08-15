@@ -394,11 +394,11 @@ class WP_HTML_Walker {
 			 */
 			if (
 				$at + 2 < $doc_length &&
-				'!' === $html[ $at + 1 ] &&
-				'-' === $html[ $at + 2 ] &&
-				'-' === $html[ $at + 3 ]
+				'!' === $html[ $at ] &&
+				'-' === $html[ $at + 1 ] &&
+				'-' === $html[ $at + 2 ]
 			) {
-				$at   += 4;
+				$at   += 3;
 				$state = 'unescaped' === $state ? 'escaped' : $state;
 				continue;
 			}

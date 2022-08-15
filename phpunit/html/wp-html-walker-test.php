@@ -678,7 +678,7 @@ HTML;
 		);
 
 		$examples['Script with a comment opener and a script tag opener inside should end two script tag closer later (double escaped state)'] = array(
-			'<script class="d-md-none"><!--<script><span></script><span></span></script><div></div>-->',
+			'<script class="d-md-none"><!--<script><span1></script><span2></span2></script><div></div>-->',
 		);
 
 		$examples['Double escaped script with a tricky opener'] = array(
