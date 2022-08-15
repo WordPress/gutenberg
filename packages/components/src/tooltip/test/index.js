@@ -99,45 +99,27 @@ describe( 'Tooltip', () => {
 			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
 		} );
 
-		it( 'should not show popover on focus as result of mousedown', async () => {
+		it( 'should not show popover on focus as result of mouse click', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
+			jest.useFakeTimers();
 
-			const originalOnMouseDown = jest.fn();
-			const originalOnMouseUp = jest.fn();
 			render(
 				<Tooltip text="Help text">
-					<button
-						onMouseDown={ originalOnMouseDown }
-						onMouseUp={ originalOnMouseUp }
-					>
-						Hover Me!
-					</button>
+					<button>Hover Me!</button>
 				</Tooltip>
 			);
 
 			const button = screen.getByRole( 'button' );
-			// Hovers the button and press the left mouse button
-			await user.pointer( [
-				{ target: button },
-				{ keys: '[MouseLeft]', target: button },
-			] );
-			expect( originalOnMouseDown ).toHaveBeenCalledWith(
-				expect.objectContaining( {
-					type: 'mousedown',
-				} )
-			);
-
-			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
-
-			// Release the left mouse button
-			await user.pointer( [ { keys: '[/MouseLeft]', target: button } ] );
-			expect( originalOnMouseUp ).toHaveBeenCalledWith(
-				expect.objectContaining( {
-					type: 'mouseup',
-				} )
-			);
+			await user.click( button );
+			setTimeout( () => {
+				expect(
+					screen.queryByText( 'Help text' )
+				).not.toBeInTheDocument();
+				jest.runOnlyPendingTimers();
+				jest.useRealTimers();
+			}, TOOLTIP_DELAY );
 		} );
 
 		it( 'should show popover on delayed mouseenter', async () => {
