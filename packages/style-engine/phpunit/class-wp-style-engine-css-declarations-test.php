@@ -150,6 +150,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	public function test_remove_unsafe_properties_and_values() {
 		$input_declarations = array(
 			'color'        => 'url("https://wordpress.org")',
+			'font-size'    => '<red/>',
 			'margin-right' => '10em',
 			'potato'       => 'uppercase',
 		);
