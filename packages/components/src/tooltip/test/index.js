@@ -59,12 +59,7 @@ describe( 'Tooltip', () => {
 			const originalFocus = jest.fn();
 			render(
 				<Tooltip text="Help text">
-					<button
-						onMouseEnter={ originalFocus }
-						onFocus={ originalFocus }
-					>
-						Hover Me!
-					</button>
+					<button onFocus={ originalFocus }>Hover Me!</button>
 				</Tooltip>
 			);
 
