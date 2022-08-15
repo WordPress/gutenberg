@@ -17,7 +17,7 @@ describe( 'Tooltip', () => {
 	describe( '#render()', () => {
 		it( 'should render children (abort) if multiple children passed', () => {
 			render(
-				<Tooltip position="bottom right" text="Help text">
+				<Tooltip text="Help text">
 					<button>Button 1</button>
 					<button>Button 2</button>
 				</Tooltip>
@@ -30,7 +30,7 @@ describe( 'Tooltip', () => {
 
 		it( 'should render children', () => {
 			render(
-				<Tooltip position="bottom right" text="Help text">
+				<Tooltip text="Help text">
 					<button>Hover Me!</button>
 				</Tooltip>
 			);
@@ -42,7 +42,7 @@ describe( 'Tooltip', () => {
 
 		it( 'should render children with additional popover when over', () => {
 			render(
-				<Tooltip position="bottom right" text="Help text">
+				<Tooltip text="Help text">
 					<button>Hover Me!</button>
 				</Tooltip>
 			);
