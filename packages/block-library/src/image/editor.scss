@@ -1,53 +1,18 @@
-// Give the featured image placeholder the appearance of a literal image placeholder.
-// @todo: this CSS is similar to that of the Site Logo. That makes it an opportunity
-// to create a new component for placeholders meant to inherit some theme styles.
+// Provide special styling for the placeholder.
+// @todo: this particular minimal style of placeholder could be componentized further.
 .wp-block-image.wp-block-image {
-	// Inherit border radius from style variations.
-	// @todo: this doesn't work yet, it needs for the radius and border to be applied also in the setup state.
-	// https://github.com/WordPress/gutenberg/pull/42847
-	border-radius: $radius-block-ui;
+	// Show legacy Placeholder style on-select.
+	&.is-selected .components-placeholder {
+		// Block UI appearance.
+		color: $gray-900;
+		background-color: $white;
+		box-shadow: inset 0 0 0 $border-width $gray-900;
+		border: none;
 
-	.components-placeholder,
-	.components-resizable-box__container {
-		border-radius: inherit;
-	}
+		// @todo: this should eventually be overridden by a custom border-radius set in the inspector.
+		border-radius: $radius-block-ui;
 
-	// Style the placeholder.
-	.wp-block-post-featured-image__placeholder,
-	.components-placeholder {
-		// Fade out the diagonal placeholder onselect.
-		svg {
-			opacity: 0;
-			transition: opacity 0.1s linear;
-			@include reduce-motion("transition");
-		}
-
-		.components-button.components-button {
-			opacity: 1;
-			transition: opacity 0.1s linear;
-			@include reduce-motion("transition");
-		}
-
-		// Show default placeholder height when not resized.
-		min-height: 200px;
-	}
-
-	// Show controls on select.
-	&:not(.is-selected) {
-
-		.wp-block-post-featured-image__placeholder,
-		.components-placeholder {
-			color: currentColor;
-			background: transparent;
-			border: none;
-			box-shadow: none;
-		}
-
-		svg {
-			opacity: 0.4;
-		}
-
-		.components-button.components-button {
+		> svg {
 			opacity: 0;
 			visibility: hidden;
 		}
