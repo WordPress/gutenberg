@@ -177,7 +177,6 @@
 	display: flex;
 	box-shadow: none;
 	background: none;
-	border: none;
 	min-width: 100px;
 
 	.components-placeholder__fieldset {
@@ -196,6 +195,10 @@
 		opacity: 1;
 		visibility: visible;
 	}
+
+	// By painting the borders here, we enable them to be replaced by the Border control.
+	border: $border-width dashed currentColor;
+	overflow: hidden;
 }
 
 // Position the spinner.
@@ -206,17 +209,15 @@
 }
 
 .components-placeholder__illustration {
-	border-radius: inherit;
-	border: $border-width dashed currentColor;
-	box-sizing: border-box;
+	box-sizing: content-box;
 	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 	width: 100%;
 	height: 100%;
 	stroke: currentColor;
 	stroke-dasharray: 3;
-	opacity: 0.4;
+	border-width: inherit;
+	border-style: inherit;
 }
