@@ -24,7 +24,7 @@ import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 const SUPPORTED_TYPES = [ 'archive', 'search' ];
 
 export default function QueryTitleEdit( {
-	attributes: { type, level, textAlign, showPrefix. showSearchTerm },
+	attributes: { type, level, textAlign, showPrefix, showSearchTerm },
 	setAttributes,
 } ) {
 	const TagName = `h${ level }`;
