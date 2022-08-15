@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blocks",
-	"version": "11.13.0",
+	"version": "11.14.0",
 	"description": "Block API for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -47,6 +47,7 @@
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"rememo": "^4.0.0",
+		"remove-accents": "^0.4.2",
 		"showdown": "^1.9.1",
 		"simple-html-tokenizer": "^0.5.7",
 		"uuid": "^8.3.0"

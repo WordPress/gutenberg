@@ -120,7 +120,11 @@ class WP_Style_Engine_CSS_Declarations {
 	 * @return string The filtered declaration as a single string.
 	 */
 	protected static function filter_declaration( $property, $value, $spacer = '' ) {
-		return safecss_filter_attr( "{$property}:{$spacer}{$value}" );
+		$filtered_value = wp_strip_all_tags( $value, true );
+		if ( '' !== $filtered_value ) {
+			return safecss_filter_attr( "{$property}:{$spacer}{$filtered_value}" );
+		}
+		return '';
 	}
 
 	/**
