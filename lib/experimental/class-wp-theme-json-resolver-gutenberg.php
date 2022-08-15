@@ -185,6 +185,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 		}
 		// Generate the default spacing sizes presets.
 		$result->set_spacing_sizes();
+		$result->resolve_dynamic_references();
 
 		return $result;
 	}

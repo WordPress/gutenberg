@@ -670,6 +670,33 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		return $stylesheet;
 	}
 
+	public function resolve_dynamic_references() {
+		$blocks_metadata = static::get_blocks_metadata();
+		$style_nodes     = static::get_style_nodes( $this->theme_json, $blocks_metadata );
+		$properties      = static::PROPERTIES_METADATA;
+		foreach ( $style_nodes as $metadata ) {
+			$node = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			foreach ( $properties as $css_property => $value_path ) {
+				$value = _wp_array_get( $node, $value_path, '' );
+				if ( is_array( $value ) && array_key_exists( 'ref', $value ) ) {
+					$ref_value_path = explode( '.', $value['ref'] );
+					$ref_value      = _wp_array_get( $this->theme_json, $ref_value_path );
+					// Only use the ref value if we find anything.
+					if ( ! empty( $ref_value ) && is_string( $ref_value ) ) {
+						$path_to_ref = array_merge( $metadata['path'], $value_path );
+						_wp_array_set( $this->theme_json, $path_to_ref, $ref_value );
+					}
+
+					if ( is_array( $ref_value ) && array_key_exists( 'ref', $ref_value ) ) {
+						$path_string      = wp_json_encode( $ref_value_path );
+						$ref_value_string = wp_json_encode( $ref_value );
+						_doing_it_wrong( 'get_property_value', "Your theme.json file uses a dynamic value (${ref_value_string}) for the path at ${path_string}. However, the value at ${path_string} is also a dynamic value (pointing to ${ref_value['ref']}) and pointing to another dynamic value is not supported. Please update ${path_string} to point directly to ${ref_value['ref']}.", '6.1.0' );
+					}
+				}
+			}
+		}
+	}
+
 	/**
 	 * Gets the CSS rules for a particular block from theme.json.
 	 *
@@ -947,24 +974,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 */
 	protected static function get_property_value( $styles, $path, $theme_json = null ) {
 		$value = _wp_array_get( $styles, $path, '' );
-
-		// This converts references to a path to the value at that path
-		// where the values is an array with a "ref" key, pointing to a path.
-		// For example: { "ref": "style.color.background" } => "#fff".
-		if ( is_array( $value ) && array_key_exists( 'ref', $value ) ) {
-			$value_path = explode( '.', $value['ref'] );
-			$ref_value  = _wp_array_get( $theme_json, $value_path );
-			// Only use the ref value if we find anything.
-			if ( ! empty( $ref_value ) && is_string( $ref_value ) ) {
-				$value = $ref_value;
-			}
-
-			if ( is_array( $ref_value ) && array_key_exists( 'ref', $ref_value ) ) {
-				$path_string      = json_encode( $path );
-				$ref_value_string = json_encode( $ref_value );
-				_doing_it_wrong( 'get_property_value', "Your theme.json file uses a dynamic value (${ref_value_string}) for the path at ${path_string}. However, the value at ${path_string} is also a dynamic value (pointing to ${ref_value['ref']}) and pointing to another dynamic value is not supported. Please update ${path_string} to point directly to ${ref_value['ref']}.", '6.1.0' );
-			}
-		}
 
 		if ( '' === $value || is_array( $value ) ) {
 			return $value;
