@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 and minimum npm version to 6.14.4 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
+## 23.7.1 (2022-08-12)
+
+### Bug Fix
+
+-   Jest Preset: Ignore `is-plain-obj` transformation ([#43179](https://github.com/WordPress/gutenberg/pull/43179)).
+
+## 23.6.0 (2022-07-27)
+
 ### Bug Fix
 
 -   Fix the incorrect exit error code when status missing in `webpack` call for `build` and `start` commands ([#42396](https://github.com/WordPress/gutenberg/pull/42396)).

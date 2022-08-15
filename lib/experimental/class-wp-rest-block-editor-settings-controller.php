@@ -162,6 +162,12 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 					'context'     => array( 'mobile' ),
 				),
 
+				'__experimentalEnableListBlockV2'        => array(
+					'description' => __( 'Whether the V2 of the list block that uses inner blocks should be enabled.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'mobile' ),
+				),
+
 				'alignWide'                              => array(
 					'description' => __( 'Enable/Disable Wide/Full Alignments.', 'gutenberg' ),
 					'type'        => 'boolean',
@@ -200,6 +206,12 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 
 				'disableCustomGradients'                 => array(
 					'description' => __( 'Disables custom font size.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
+				),
+
+				'disableLayoutStyles'                    => array(
+					'description' => __( 'Disables output of layout styles.', 'gutenberg' ),
 					'type'        => 'boolean',
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
 				),
@@ -283,6 +295,11 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 				'spacingScale'                           => array(
 					'description' => __( 'Active theme spacing scale.', 'gutenberg' ),
 					'type'        => 'array',
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
+				),
+				'disableCustomSpacingSizes'              => array(
+					'description' => __( 'Disables custom spacing sizes.', 'gutenberg' ),
+					'type'        => 'boolean',
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
 				),
 			),

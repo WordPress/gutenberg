@@ -27,7 +27,7 @@ import {
 	__experimentalLayoutStyle as LayoutStyle,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableIframe as Iframe,
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	__experimentalRecursionProvider as RecursionProvider,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { Button, __unstableMotion as motion } from '@wordpress/components';
@@ -118,13 +118,15 @@ export default function VisualEditor( { styles } ) {
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
-	const { themeSupportsLayout, assets } = useSelect( ( select ) => {
-		const _settings = select( blockEditorStore ).getSettings();
-		return {
-			themeSupportsLayout: _settings.supportsLayout,
-			assets: _settings.__unstableResolvedAssets,
-		};
-	}, [] );
+	const { themeHasDisabledLayoutStyles, themeSupportsLayout, assets } =
+		useSelect( ( select ) => {
+			const _settings = select( blockEditorStore ).getSettings();
+			return {
+				themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
+				themeSupportsLayout: _settings.supportsLayout,
+				assets: _settings.__unstableResolvedAssets,
+			};
+		}, [] );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
@@ -172,11 +174,6 @@ export default function VisualEditor( { styles } ) {
 	] );
 
 	const blockSelectionClearerRef = useBlockSelectionClearer();
-
-	const [ , RecursionProvider ] = useNoRecursiveRenders(
-		wrapperUniqueId,
-		wrapperBlockName
-	);
 
 	const layout = useMemo( () => {
 		if ( isTemplateMode ) {
@@ -241,13 +238,17 @@ export default function VisualEditor( { styles } ) {
 						assets={ assets }
 						style={ { paddingBottom } }
 					>
-						{ themeSupportsLayout && ! isTemplateMode && (
-							<LayoutStyle
-								selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
-								layout={ defaultLayout }
-								layoutDefinitions={ defaultLayout?.definitions }
-							/>
-						) }
+						{ themeSupportsLayout &&
+							! themeHasDisabledLayoutStyles &&
+							! isTemplateMode && (
+								<LayoutStyle
+									selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
+									layout={ defaultLayout }
+									layoutDefinitions={
+										defaultLayout?.definitions
+									}
+								/>
+							) }
 						{ ! isTemplateMode && (
 							<div
 								className="edit-post-visual-editor__post-title-wrapper"
@@ -256,7 +257,10 @@ export default function VisualEditor( { styles } ) {
 								<PostTitle ref={ titleRef } />
 							</div>
 						) }
-						<RecursionProvider>
+						<RecursionProvider
+							blockName={ wrapperBlockName }
+							uniqueId={ wrapperUniqueId }
+						>
 							<BlockList
 								className={
 									isTemplateMode

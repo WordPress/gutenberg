@@ -179,11 +179,11 @@ export default function BorderPanel( { name } ) {
 					<BorderBoxControl
 						colors={ colors }
 						enableAlpha={ true }
+						enableStyle={ showBorderStyle }
 						onChange={ onBorderChange }
-						showStyle={ showBorderStyle }
-						value={ border }
-						popoverPlacement="left-start"
 						popoverOffset={ 40 }
+						popoverPlacement="left-start"
+						value={ border }
 						__experimentalHasMultipleOrigins={ true }
 						__experimentalIsRenderedInSidebar={ true }
 					/>

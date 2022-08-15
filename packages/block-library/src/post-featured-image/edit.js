@@ -9,6 +9,7 @@ import {
 	PanelBody,
 	Placeholder,
 	Button,
+	TextControl,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -53,7 +54,8 @@ function PostFeaturedImageDisplay( {
 	context: { postId, postType: postTypeSlug, queryId },
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	const { isLink, height, width, scale, sizeSlug } = attributes;
+	const { isLink, height, width, scale, sizeSlug, rel, linkTarget } =
+		attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postTypeSlug,
@@ -128,6 +130,26 @@ function PostFeaturedImageDisplay( {
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
 					/>
+					{ isLink && (
+						<>
+							<ToggleControl
+								label={ __( 'Open in new tab' ) }
+								onChange={ ( value ) =>
+									setAttributes( {
+										linkTarget: value ? '_blank' : '_self',
+									} )
+								}
+								checked={ linkTarget === '_blank' }
+							/>
+							<TextControl
+								label={ __( 'Link rel' ) }
+								value={ rel }
+								onChange={ ( newRel ) =>
+									setAttributes( { rel: newRel } )
+								}
+							/>
+						</>
+					) }
 				</PanelBody>
 			</InspectorControls>
 		</>

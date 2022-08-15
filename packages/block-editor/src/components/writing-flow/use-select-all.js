@@ -19,7 +19,7 @@ import { store as blockEditorStore } from '../../store';
 export default function useSelectAll() {
 	const { getBlockOrder, getSelectedBlockClientIds, getBlockRootClientId } =
 		useSelect( blockEditorStore );
-	const { multiSelect } = useDispatch( blockEditorStore );
+	const { multiSelect, selectBlock } = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
 
 	return useRefEffect( ( node ) => {
@@ -53,6 +53,7 @@ export default function useSelectAll() {
 			const lastClientId = last( blockClientIds );
 
 			if ( firstClientId === lastClientId ) {
+				selectBlock( firstClientId );
 				return;
 			}
 

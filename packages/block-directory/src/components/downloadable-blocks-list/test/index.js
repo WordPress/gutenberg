@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -44,14 +44,14 @@ describe( 'DownloadableBlocksList', () => {
 		} );
 
 		it( 'should render plugins items into the list', () => {
-			const { getAllByRole } = render(
+			render(
 				<DownloadableBlocksList
 					items={ items }
 					onSelect={ jest.fn() }
 					onHover={ jest.fn() }
 				/>
 			);
-			const downloadableBlocks = getAllByRole( 'option' );
+			const downloadableBlocks = screen.getAllByRole( 'option' );
 
 			expect( downloadableBlocks ).toHaveLength( items.length );
 		} );

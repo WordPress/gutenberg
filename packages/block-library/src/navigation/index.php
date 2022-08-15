@@ -472,6 +472,12 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			return '';
 		}
 
+		// Only published posts are valid. If this is changed then a corresponding change
+		// must also be implemented in `use-navigation-menu.js`.
+		if ( 'publish' !== $navigation_post->post_status ) {
+			return '';
+		}
+
 		$nav_menu_name = $navigation_post->post_title;
 
 		if ( isset( $seen_menu_names[ $nav_menu_name ] ) ) {

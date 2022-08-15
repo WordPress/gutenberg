@@ -90,58 +90,6 @@ _Returns_
 
 -   `Object`: Action object.
 
-### receiveAutosaves
-
-Returns an action object used in signalling that the autosaves for a
-post have been received.
-
-_Parameters_
-
--   _postId_ `number`: The id of the post that is parent to the autosave.
--   _autosaves_ `Array|Object`: An array of autosaves or singular autosave object.
-
-_Returns_
-
--   `Object`: Action object.
-
-### receiveCurrentTheme
-
-Returns an action object used in signalling that the current theme has been received.
-
-_Parameters_
-
--   _currentTheme_ `Object`: The current theme.
-
-_Returns_
-
--   `Object`: Action object.
-
-### receiveCurrentUser
-
-Returns an action used in signalling that the current user has been received.
-
-_Parameters_
-
--   _currentUser_ `Object`: Current user object.
-
-_Returns_
-
--   `Object`: Action object.
-
-### receiveEmbedPreview
-
-Returns an action object used in signalling that the preview data for
-a given URl has been received.
-
-_Parameters_
-
--   _url_ `string`: URL to preview the embed for.
--   _preview_ `*`: Preview data.
-
-_Returns_
-
--   `Object`: Action object.
-
 ### receiveEntityRecords
 
 Returns an action object used in signalling that entity records have been received.
@@ -178,33 +126,6 @@ Returns an action object used in signalling that Upload permissions have been re
 _Parameters_
 
 -   _hasUploadPermissions_ `boolean`: Does the user have permission to upload files?
-
-_Returns_
-
--   `Object`: Action object.
-
-### receiveUserPermission
-
-Returns an action object used in signalling that the current user has
-permission to perform an action on a REST resource.
-
-_Parameters_
-
--   _key_ `string`: A key that represents the action and REST resource.
--   _isAllowed_ `boolean`: Whether or not the user can perform the action.
-
-_Returns_
-
--   `Object`: Action object.
-
-### receiveUserQuery
-
-Returns an action object used in signalling that authors have been received.
-
-_Parameters_
-
--   _queryID_ `string`: Query ID.
--   _users_ `Array|Object`: Users received.
 
 _Returns_
 
@@ -487,7 +408,7 @@ _Parameters_
 -   _kind_ `K`: Entity kind.
 -   _name_ `N`: Entity name.
 -   _key_ `KeyOf< R >`: Record's key
--   _query_ Optional query.
+-   _query_ Optional query. If requesting specific fields, fields must always include the ID.
 
 _Returns_
 
@@ -536,7 +457,7 @@ _Parameters_
 -   _state_ `State`: State tree
 -   _kind_ `K`: Entity kind.
 -   _name_ `N`: Entity name.
--   _query_ Optional terms query.
+-   _query_ Optional terms query. If requesting specific fields, fields must always include the ID.
 
 _Returns_
 
@@ -842,6 +763,57 @@ function PageTitleDisplay( { id } ) {
 In the above example, when `PageTitleDisplay` is rendered into an
 application, the page and the resolution details will be retrieved from
 the store state using `getEntityRecord()`, or resolved if missing.
+
+```js
+import { useState } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { TextControl } from '@wordpress/components';
+import { store as noticeStore } from '@wordpress/notices';
+import { useEntityRecord } from '@wordpress/core-data';
+
+function PageRenameForm( { id } ) {
+	const page = useEntityRecord( 'postType', 'page', id );
+	const [ title, setTitle ] = useState( () => page.record.title.rendered );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticeStore );
+
+	if ( page.isResolving ) {
+		return 'Loading...';
+	}
+
+	async function onRename( event ) {
+		event.preventDefault();
+		page.edit( { title } );
+		try {
+			await page.save();
+			createSuccessNotice( __( 'Page renamed.' ), {
+				type: 'snackbar',
+			} );
+		} catch ( error ) {
+			createErrorNotice( error.message, { type: 'snackbar' } );
+		}
+	}
+
+	return (
+		<form onSubmit={ onRename }>
+			<TextControl
+				label={ __( 'Name' ) }
+				value={ title }
+				onChange={ setTitle }
+			/>
+			<button type="submit">{ __( 'Save' ) }</button>
+		</form>
+	);
+}
+
+// Rendered in the application:
+// <PageRenameForm id={ 1 } />
+```
+
+In the above example, updating and saving the page title is handled
+via the `edit()` and `save()` mutation helpers provided by
+`useEntityRecord()`;
 
 _Parameters_
 

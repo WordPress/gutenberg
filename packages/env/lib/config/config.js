@@ -15,6 +15,7 @@ const readRawConfigFile = require( './read-raw-config-file' );
 const parseConfig = require( './parse-config' );
 const { includeTestsPath, parseSourceString } = parseConfig;
 const md5 = require( '../md5' );
+const { getLatestWordPressVersion } = require( '../wordpress' );
 
 /**
  * wp-env configuration.
@@ -33,7 +34,7 @@ const md5 = require( '../md5' );
  * Base-level config for any particular environment. (development/tests/etc)
  *
  * @typedef WPServiceConfig
- * @property {?WPSource}                 coreSource    The WordPress installation to load in the environment.
+ * @property {WPSource}                  coreSource    The WordPress installation to load in the environment.
  * @property {WPSource[]}                pluginSources Plugins to load in the environment.
  * @property {WPSource[]}                themeSources  Themes to load in the environment.
  * @property {number}                    port          The port to use.
@@ -68,34 +69,6 @@ module.exports = async function readConfig( configPath ) {
 		md5( configPath )
 	);
 
-	// Default configuration which is overridden by .wp-env.json files.
-	const defaultConfiguration = {
-		core: null,
-		phpVersion: null,
-		plugins: [],
-		themes: [],
-		port: 8888,
-		mappings: {},
-		config: {
-			WP_DEBUG: true,
-			SCRIPT_DEBUG: true,
-			WP_ENVIRONMENT_TYPE: 'local',
-			WP_PHP_BINARY: 'php',
-			WP_TESTS_EMAIL: 'admin@example.org',
-			WP_TESTS_TITLE: 'Test Blog',
-			WP_TESTS_DOMAIN: 'http://localhost',
-			WP_SITEURL: 'http://localhost',
-			WP_HOME: 'http://localhost',
-		},
-		env: {
-			development: {}, // No overrides needed, but it should exist.
-			tests: {
-				config: { WP_DEBUG: false, SCRIPT_DEBUG: false },
-				port: 8889,
-			},
-		},
-	};
-
 	// The specified base configuration from .wp-env.json or from the local
 	// source type which was automatically detected.
 	const baseConfig =
@@ -111,6 +84,46 @@ module.exports = async function readConfig( configPath ) {
 
 	const detectedLocalConfig =
 		Object.keys( { ...baseConfig, ...overrideConfig } ).length > 0;
+
+	// If there is no local WordPress version, use the latest stable version from GitHub.
+	let coreRef;
+	if ( ! overrideConfig.core && ! baseConfig.core ) {
+		const wpVersion = await getLatestWordPressVersion();
+		if ( ! wpVersion ) {
+			throw new ValidationError(
+				'Could not find the latest WordPress version. There may be a network issue.'
+			);
+		}
+		coreRef = `WordPress/WordPress#${ wpVersion }`;
+	}
+
+	// Default configuration which is overridden by .wp-env.json files.
+	const defaultConfiguration = {
+		core: coreRef,
+		phpVersion: null,
+		plugins: [],
+		themes: [],
+		port: 8888,
+		mappings: {},
+		config: {
+			WP_DEBUG: true,
+			SCRIPT_DEBUG: true,
+			WP_ENVIRONMENT_TYPE: 'local',
+			WP_PHP_BINARY: 'php',
+			WP_TESTS_EMAIL: 'admin@example.org',
+			WP_TESTS_TITLE: 'Test Blog',
+			WP_TESTS_DOMAIN: 'localhost',
+			WP_SITEURL: 'http://localhost',
+			WP_HOME: 'http://localhost',
+		},
+		env: {
+			development: {}, // No overrides needed, but it should exist.
+			tests: {
+				config: { WP_DEBUG: false, SCRIPT_DEBUG: false },
+				port: 8889,
+			},
+		},
+	};
 
 	// A quick validation before merging on a service by service level allows us
 	// to check the root configuration options and provide more helpful errors.
@@ -297,7 +310,6 @@ function withOverrides( config ) {
 	};
 
 	// Update wp config options to include the correct port number in the URL.
-	updateEnvUrl( 'WP_TESTS_DOMAIN' );
 	updateEnvUrl( 'WP_SITEURL' );
 	updateEnvUrl( 'WP_HOME' );
 
