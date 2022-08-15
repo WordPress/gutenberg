@@ -3,7 +3,8 @@
 /**
  * External dependencies
  */
-import { camelCase, isEmpty, mapKeys, pick, pickBy } from 'lodash';
+import { camelCase } from 'change-case';
+import { isEmpty, mapKeys, pick, pickBy } from 'lodash';
 
 /**
  * WordPress dependencies

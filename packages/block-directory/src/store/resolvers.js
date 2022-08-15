@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { camelCase, mapKeys } from 'lodash';
+import { camelCase } from 'change-case';
+import { mapKeys } from 'lodash';
 
 /**
  * WordPress dependencies
