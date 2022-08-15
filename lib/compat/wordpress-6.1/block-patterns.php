@@ -199,7 +199,7 @@ function gutenberg_register_core_block_patterns() {
 			'left-aligned-footer',
 			'logo-navigation-and-social-icons',
 			'right-aligned-footer',
-			'sample-page',
+			'simple-header',
 			'simple-header-inside-image',
 			'simple-header-with-background-color',
 			'simple-header-with-image',
