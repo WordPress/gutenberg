@@ -26,13 +26,6 @@
 	background-color: $white;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
-
-	&.has-illustration {
-		background: none;
-		border: none;
-		box-shadow: none;
-		min-width: 100px;
-	}
 }
 
 .components-placeholder__error,
@@ -175,8 +168,39 @@
 	}
 }
 
-// Style the placeholder illustration.
+
+/**
+ * Dashed style placeholders
+ */
+
+// @todo
+// These styles are only applied after the has-illustration gets added.
+// This is mainly an issue in terms of Site Logo which has a brief flash of the square placeholder.
+.components-placeholder.has-illustration {
+	color: inherit;
+	border-radius: inherit;
+	display: flex;
+	box-shadow: none;
+	background: none;
+	border: none;
+	min-width: 100px;
+
+	// Show placeholder buttons on block selection.
+	.components-button {
+		visibility: hidden;
+		opacity: 0;
+		transition: opacity 0.1s linear;
+		@include reduce-motion("transition");
+	}
+
+	.is-selected > & .components-button {
+		opacity: 1;
+		visibility: visible;
+	}
+}
+
 .components-placeholder__illustration {
+	border-radius: inherit;
 	border: $border-width dashed currentColor;
 	box-sizing: border-box;
 	position: absolute;
