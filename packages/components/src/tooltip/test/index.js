@@ -40,7 +40,7 @@ describe( 'Tooltip', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should render children with additional popover when over', () => {
+		it( 'should render children with additional popover when focused', () => {
 			render(
 				<Tooltip text="Help text">
 					<button>Hover Me!</button>
@@ -53,6 +53,32 @@ describe( 'Tooltip', () => {
 				screen.getByRole( 'button', { name: 'Hover Me!' } )
 			).toBeInTheDocument();
 			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
+		} );
+
+		it( 'should render children with additional popover when hovered', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+			jest.useFakeTimers();
+
+			render(
+				<Tooltip text="Help text">
+					<button>Hover Me!</button>
+				</Tooltip>
+			);
+
+			const button = screen.getByRole( 'button' );
+			await user.hover( button );
+
+			expect(
+				screen.getByRole( 'button', { name: 'Hover Me!' } )
+			).toBeInTheDocument();
+
+			setTimeout( () => {
+				expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
+				jest.runOnlyPendingTimers();
+				jest.useRealTimers();
+			}, TOOLTIP_DELAY );
 		} );
 
 		it( 'should show popover on focus', () => {
@@ -120,6 +146,7 @@ describe( 'Tooltip', () => {
 			} );
 
 			const originalMouseEnter = jest.fn();
+			jest.useFakeTimers();
 			render(
 				<Tooltip text="Help text">
 					<button
@@ -136,10 +163,11 @@ describe( 'Tooltip', () => {
 			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
 
-			// Wait popover to be shown.
-			expect(
-				await screen.findByText( 'Help text' )
-			).toBeInTheDocument();
+			setTimeout( () => {
+				expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
+				jest.runOnlyPendingTimers();
+				jest.useRealTimers();
+			}, TOOLTIP_DELAY );
 		} );
 
 		it( 'should respect custom delay prop when showing popover', async () => {
