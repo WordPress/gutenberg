@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -67,6 +72,12 @@ function useHasGap( name ) {
 	const [ settings ] = useSetting( 'spacing.blockGap', name );
 
 	return settings && supports.includes( 'blockGap' );
+}
+
+function useHasSpacingPresets() {
+	const [ settings ] = useSetting( 'spacing.spacingSizes' );
+
+	return settings && settings.length > 0;
 }
 
 function filterValuesBySides( values, sides ) {
@@ -224,6 +235,7 @@ export default function DimensionsPanel( { name } ) {
 	const showPaddingControl = useHasPadding( name );
 	const showMarginControl = useHasMargin( name );
 	const showGapControl = useHasGap( name );
+	const showSpacingPresetsControl = useHasSpacingPresets();
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units', name )[ 0 ] || [
 			'%',
@@ -345,17 +357,32 @@ export default function DimensionsPanel( { name } ) {
 					label={ __( 'Padding' ) }
 					onDeselect={ resetPaddingValue }
 					isShownByDefault={ true }
-					className="tools-panel-item-spacing"
+					className={ classnames( {
+						'tools-panel-item-spacing': showSpacingPresetsControl,
+					} ) }
 				>
-					<SpacingSizesControl
-						values={ paddingValues }
-						onChange={ setPaddingValues }
-						label={ __( 'Padding' ) }
-						sides={ paddingSides }
-						units={ units }
-						allowReset={ false }
-						splitOnAxis={ isAxialPadding }
-					/>
+					{ ! showSpacingPresetsControl && (
+						<BoxControl
+							values={ paddingValues }
+							onChange={ setPaddingValues }
+							label={ __( 'Padding' ) }
+							sides={ paddingSides }
+							units={ units }
+							allowReset={ false }
+							splitOnAxis={ isAxialPadding }
+						/>
+					) }
+					{ showSpacingPresetsControl && (
+						<SpacingSizesControl
+							values={ paddingValues }
+							onChange={ setPaddingValues }
+							label={ __( 'Padding' ) }
+							sides={ paddingSides }
+							units={ units }
+							allowReset={ false }
+							splitOnAxis={ isAxialPadding }
+						/>
+					) }
 				</ToolsPanelItem>
 			) }
 			{ showMarginControl && (
