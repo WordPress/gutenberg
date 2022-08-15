@@ -132,6 +132,7 @@ module.exports = {
 							'reverse',
 							'size',
 							'snakeCase',
+							'startCase',
 							'startsWith',
 							'stubFalse',
 							'stubTrue',
