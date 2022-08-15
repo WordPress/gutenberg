@@ -140,6 +140,7 @@ module.exports = {
 							'toString',
 							'trim',
 							'truncate',
+							'uniqBy',
 							'uniqueId',
 							'uniqWith',
 							'values',
