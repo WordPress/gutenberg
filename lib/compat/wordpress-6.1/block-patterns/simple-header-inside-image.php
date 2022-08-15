@@ -27,7 +27,7 @@ return array(
 					<!-- /wp:column --></div>
 					<!-- /wp:columns -->
 					
-					<!-- wp:spacer {"height":480} -->
+					<!-- wp:spacer {"height":"480px"} -->
 					<div style="height:480px" aria-hidden="true" class="wp-block-spacer"></div>
 					<!-- /wp:spacer --></div></div>
 					<!-- /wp:cover --></div>

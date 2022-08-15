@@ -14,7 +14,7 @@ return array(
 					
 					<!-- wp:site-tagline {"textAlign":"center"} /-->
 					
-					<!-- wp:spacer {"height":8} -->
+					<!-- wp:spacer {"height":"8px"} -->
 					<div style="height:8px" aria-hidden="true" class="wp-block-spacer"></div>
 					<!-- /wp:spacer -->
 					
@@ -24,7 +24,7 @@ return array(
 					<!-- wp:social-link {"url":"#","service":"twitter"} /--></ul>
 					<!-- /wp:social-links -->
 					
-					<!-- wp:spacer {"height":8} -->
+					<!-- wp:spacer {"height":"8px"} -->
 					<div style="height:8px" aria-hidden="true" class="wp-block-spacer"></div>
 					<!-- /wp:spacer -->
 					
