@@ -108,7 +108,7 @@ DropdownSelector.args = {
 	...Default.args,
 	__experimentalExpandOnFocus: true,
 	__experimentalAutoSelectFirstMatch: true,
-};  
+};
 
 /**
  * The rendered output of each suggestion can be customized by passing a
