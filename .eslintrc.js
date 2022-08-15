@@ -89,6 +89,7 @@ module.exports = {
 							'defaults',
 							'defaultTo',
 							'delay',
+							'difference',
 							'differenceWith',
 							'dropRight',
 							'each',
