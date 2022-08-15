@@ -6,7 +6,7 @@
  */
 
 return array(
-	'title'      => _x( 'Footer with search, site title, and credit line', 'Block pattern title' ),
+	'title'      => _x( 'Footer with search, site title, and credit line', 'Block pattern title', 'gutenberg' ),
 	'blockTypes' => array( 'core/template-part/footer' ),
 	'categories' => array( 'footer' ),
 	'content'    => '<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"4em","bottom":"2em"}}},"layout":{"inherit":true}} -->

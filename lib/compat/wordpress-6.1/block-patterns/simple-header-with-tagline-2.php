@@ -6,7 +6,7 @@
  */
 
 return array(
-	'title'      => _x( 'Simple header with tagline', 'Block pattern title' ),
+	'title'      => _x( 'Simple header with tagline', 'Block pattern title', 'gutenberg' ),
 	'blockTypes' => array( 'core/template-part/header' ),
 	'categories' => array( 'header' ),
 	'content'    => '<!-- wp:group {"align":"full","layout":{"inherit":true}} -->

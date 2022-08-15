@@ -6,7 +6,7 @@
  */
 
 return array(
-	'title'      => _x( 'Centered logo in navigation', 'Block pattern title' ),
+	'title'      => _x( 'Centered logo in navigation', 'Block pattern title', 'gutenberg' ),
 	'blockTypes' => array( 'core/template-part/header' ),
 	'categories' => array( 'header' ),
 	'content'    => '<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"2em","bottom":"4em"}}},"layout":{"type":"flex","justifyContent":"center"}} -->

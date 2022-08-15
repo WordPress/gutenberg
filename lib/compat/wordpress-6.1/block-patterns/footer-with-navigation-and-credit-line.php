@@ -6,7 +6,7 @@
  */
 
 return array(
-	'title'      => _x( 'Footer with navigation and credit line', 'Block pattern title' ),
+	'title'      => _x( 'Footer with navigation and credit line', 'Block pattern title', 'gutenberg' ),
 	'blockTypes' => array( 'core/template-part/footer' ),
 	'categories' => array( 'footer' ),
 	'content'    => '<!-- wp:group {"align":"full","layout":{"inherit":true}} -->

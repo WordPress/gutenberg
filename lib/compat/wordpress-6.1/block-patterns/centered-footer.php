@@ -6,7 +6,7 @@
  */
 
 return array(
-	'title'      => _x( 'Centered footer', 'Block pattern title' ),
+	'title'      => _x( 'Centered footer', 'Block pattern title', 'gutenberg' ),
 	'blockTypes' => array( 'core/template-part/footer' ),
 	'categories' => array( 'footer' ),
 	'content'    => '<!-- wp:group {"align":"full"} -->

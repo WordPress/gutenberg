@@ -6,7 +6,7 @@
  */
 
 return array(
-	'title'      => _x( 'Header with Large Font Size', 'Block pattern title' ),
+	'title'      => _x( 'Header with Large Font Size', 'Block pattern title', 'gutenberg' ),
 	'blockTypes' => array( 'core/template-part/header' ),
 	'categories' => array( 'header' ),
 	'content'    => '<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"space-between"}} -->

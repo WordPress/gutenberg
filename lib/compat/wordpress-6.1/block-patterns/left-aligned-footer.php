@@ -6,7 +6,7 @@
  */
 
 return array(
-	'title'      => _x( 'Left-aligned footer', 'Block pattern title' ),
+	'title'      => _x( 'Left-aligned footer', 'Block pattern title', 'gutenberg' ),
 	'blockTypes' => array( 'core/template-part/footer' ),
 	'categories' => array( 'footer' ),
 	'content'    => '<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"4em","bottom":"2em"}}},"layout":{"inherit":false}} -->

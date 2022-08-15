@@ -6,7 +6,7 @@
  */
 
 return array(
-	'title'      => _x( 'Footer with background color and three columns', 'Block pattern title' ),
+	'title'      => _x( 'Footer with background color and three columns', 'Block pattern title', 'gutenberg' ),
 	'blockTypes' => array( 'core/template-part/footer' ),
 	'categories' => array( 'footer' ),
 	'content'    => '<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"4em","bottom":"2em"}},"elements":{"link":{"color":{"text":"var:preset|color|background"}}}},"backgroundColor":"foreground","textColor":"background","layout":{"inherit":false}} -->

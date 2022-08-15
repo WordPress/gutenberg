@@ -6,7 +6,7 @@
  */
 
 return array(
-	'title'      => _x( 'Logo, navigation, and social icons', 'Block pattern title' ),
+	'title'      => _x( 'Logo, navigation, and social icons', 'Block pattern title', 'gutenberg' ),
 	'blockTypes' => array( 'core/template-part/header' ),
 	'categories' => array( 'header' ),
 	'content'    => '<!-- wp:group {"align":"full","layout":{"inherit":true}} -->
