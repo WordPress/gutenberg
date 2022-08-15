@@ -3,9 +3,9 @@
  */
 import flex from './flex';
 import flow from './flow';
-import column from './column';
+import constrained from './constrained';
 
-const layoutTypes = [ flow, flex, column ];
+const layoutTypes = [ flow, flex, constrained ];
 
 /**
  * Retrieves a layout type by name.

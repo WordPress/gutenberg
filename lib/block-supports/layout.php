@@ -66,7 +66,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				);
 			}
 		}
-	} elseif ( 'column' === $layout_type ) {
+	} elseif ( 'constrained' === $layout_type ) {
 		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : '';
 		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : '';
 
@@ -294,7 +294,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	// Set the correct layout type for blocks using legacy content width.
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] ) {
-		$used_layout['type'] = 'column';
+		$used_layout['type'] = 'constrained';
 	}
 
 	if ( $use_global_padding ) {

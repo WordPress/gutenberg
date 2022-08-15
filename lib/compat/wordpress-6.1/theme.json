@@ -234,10 +234,10 @@
 						}
 					]
 				},
-				"column": {
-					"name": "column",
-					"slug": "column",
-					"className": "is-layout-column",
+				"constrained": {
+					"name": "constrained",
+					"slug": "constrained",
+					"className": "is-layout-constrained",
 					"baseStyles": [
 						{
 							"selector": " > .alignleft",

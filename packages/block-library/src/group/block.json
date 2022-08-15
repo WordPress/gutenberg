@@ -19,7 +19,7 @@
 		"layout": {
 			"type": "object",
 			"default": {
-				"type": "column"
+				"type": "constrained"
 			}
 		}
 	},

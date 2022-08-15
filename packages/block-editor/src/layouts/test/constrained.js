@@ -1,13 +1,13 @@
 /**
  * Internal dependencies
  */
-import column from '../column';
+import constrained from '../constrained';
 
 describe( 'getLayoutStyle', () => {
 	it( 'should return an empty string if no non-default params are provided', () => {
 		const expected = '';
 
-		const result = column.getLayoutStyle( {
+		const result = constrained.getLayoutStyle( {
 			selector: '.my-container',
 			layout: {},
 			style: {},

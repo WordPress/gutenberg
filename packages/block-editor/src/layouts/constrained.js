@@ -19,8 +19,8 @@ import { getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
 
 export default {
-	name: 'column',
-	label: __( 'Column' ),
+	name: 'constrained',
+	label: __( 'Constrained' ),
 	inspectorControls: function DefaultLayoutInspectorControls( {
 		layout,
 		onChange,
@@ -174,7 +174,7 @@ export default {
 			output += getBlockGapCSS(
 				selector,
 				layoutDefinitions,
-				'column',
+				'constrained',
 				blockGapValue
 			);
 		}

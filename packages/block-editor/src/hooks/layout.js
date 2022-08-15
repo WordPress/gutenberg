@@ -110,13 +110,13 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 	// Only show the inherit toggle if it's supported,
 	// a default theme layout is set (e.g. one that provides `contentSize` and/or `wideSize` values),
-	// and either the default / flow or the column layout type is in use, as the toggle switches from one to the other.
+	// and either the default / flow or the constrained layout type is in use, as the toggle switches from one to the other.
 	const showInheritToggle = !! (
 		allowInheriting &&
 		!! defaultThemeLayout &&
 		( ! layout?.type ||
 			layout?.type === 'default' ||
-			layout?.type === 'column' ||
+			layout?.type === 'constrained' ||
 			layout?.inherit )
 	);
 
@@ -128,18 +128,18 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	} = usedLayout;
 	/**
 	 * `themeSupportsLayout` is only relevant to the `default/flow` or
-	 * `column` layouts and it should not be taken into account when other
+	 * `constrained` layouts and it should not be taken into account when other
 	 * `layout` types are used.
 	 */
 	if (
-		( type === 'default' || type === 'column' ) &&
+		( type === 'default' || type === 'constrained' ) &&
 		! themeSupportsLayout
 	) {
 		return null;
 	}
 	const layoutType = getLayoutType( type );
 
-	const columnType = getLayoutType( 'column' );
+	const constrainedType = getLayoutType( 'constrained' );
 
 	const onChangeType = ( newType ) =>
 		setAttributes( { layout: { type: newType } } );
@@ -157,7 +157,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 									'Inner blocks respect content width'
 								) }
 								checked={
-									layoutType?.name === 'column' ||
+									layoutType?.name === 'constrained' ||
 									!! inherit ||
 									!! contentSize
 								}
@@ -165,15 +165,17 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 									setAttributes( {
 										layout: {
 											type:
-												layoutType?.name === 'column'
+												layoutType?.name ===
+												'constrained'
 													? 'default'
-													: 'column',
+													: 'constrained',
 										},
 									} )
 								}
 							/>
 							<p className="block-editor-hooks__layout-controls-helptext">
-								{ !! inherit || layoutType?.name === 'column'
+								{ !! inherit ||
+								layoutType?.name === 'constrained'
 									? __(
 											'Nested blocks use theme content width with options for full and wide widths.'
 									  )
@@ -198,8 +200,8 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 							layoutBlockSupport={ layoutBlockSupport }
 						/>
 					) }
-					{ columnType && !! contentSize && (
-						<columnType.inspectorControls
+					{ constrainedType && !! contentSize && (
+						<constrainedType.inspectorControls
 							layout={ usedLayout }
 							onChange={ onChangeLayout }
 							layoutBlockSupport={ layoutBlockSupport }
@@ -309,7 +311,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const { default: defaultBlockLayout } =
 			getBlockSupport( name, layoutBlockSupportKey ) || {};
 		const usedLayout = layout?.inherit
-			? { ...layout, type: 'column' }
+			? { ...layout, type: 'constrained' }
 			: layout || defaultBlockLayout || {};
 		const layoutClasses = hasLayoutBlockSupport
 			? useLayoutClasses( usedLayout, defaultThemeLayout?.definitions )
