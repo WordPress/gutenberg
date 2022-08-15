@@ -154,7 +154,7 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 		);
 		await input.type( url );
 
-		const suggestionPath = `//button[contains(@class, 'block-editor-link-control__search-item') and contains(@class, '${ typeClasses[ type ] }')]/span/span[@class='block-editor-link-control__search-item-title']/mark[text()="${ url }"]`;
+		const suggestionPath = `//button[contains(@class, 'block-editor-link-control__search-item') and contains(@class, '${ typeClasses[ type ] }') and contains(., "${ url }")]`;
 
 		// Wait for the autocomplete suggestion item to appear.
 		await page.waitForXPath( suggestionPath );
@@ -548,6 +548,8 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 				await insertBlock( 'Navigation' );
 				await selectClassicMenu( 'Test Menu 1' );
 
+				await page.waitForNetworkIdle();
+
 				// Wait for the appender so that we know the navigation menu was created.
 				await page.waitForSelector(
 					'nav[aria-label="Block: Navigation"] button[aria-label="Add block"]'
@@ -586,6 +588,8 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 		await createNewPost();
 		await insertBlock( 'Navigation' );
 
+		await showBlockToolbar();
+
 		const navigationSelector = await page.waitForXPath(
 			"//button[text()='Select Menu']"
 		);
@@ -595,6 +599,8 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			'//button[contains(., "Create new menu")]'
 		);
 		createNewMenuButton.click();
+
+		await page.waitForNetworkIdle();
 
 		// Await "success" notice.
 		await page.waitForXPath(
@@ -678,6 +684,8 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 		);
 		createNewMenuButton.click();
 
+		await page.waitForNetworkIdle();
+
 		// Await "success" notice.
 		await page.waitForXPath(
 			'//div[@class="components-snackbar__content"][contains(text(), "Navigation Menu successfully created.")]'
@@ -757,6 +765,8 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 		);
 		createNewMenuButton.click();
 
+		await page.waitForNetworkIdle();
+
 		// Await "success" notice.
 		await page.waitForXPath(
 			'//div[@class="components-snackbar__content"][contains(text(), "Navigation Menu successfully created.")]'
@@ -819,6 +829,8 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			'//button[contains(., "Create new menu")]'
 		);
 		createNewMenuButton.click();
+
+		await page.waitForNetworkIdle();
 
 		// Await "success" notice.
 		await page.waitForXPath(
@@ -927,6 +939,8 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 		);
 		createNewMenuButton.click();
 
+		await page.waitForNetworkIdle();
+
 		// Await "success" notice.
 		await page.waitForXPath(
 			'//div[@class="components-snackbar__content"][contains(text(), "Navigation Menu successfully created.")]'
@@ -983,6 +997,8 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 				'//button[contains(., "Create new menu")]'
 			);
 			createNewMenuButton.click();
+
+			await page.waitForNetworkIdle();
 
 			// Await "success" notice.
 			await page.waitForXPath(
@@ -1130,6 +1146,8 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			);
 			createNewMenuButton.click();
 
+			await page.waitForNetworkIdle();
+
 			// Await "success" notice.
 			await page.waitForXPath(
 				'//div[@class="components-snackbar__content"][contains(text(), "Navigation Menu successfully created.")]'
@@ -1178,6 +1196,8 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			);
 			newCreateNewMenuButton.click();
 
+			await page.waitForNetworkIdle();
+
 			// Await "success" notice.
 			await page.waitForXPath(
 				'//div[@class="components-snackbar__content"][contains(text(), "Navigation Menu successfully created.")]'
@@ -1212,6 +1232,8 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			'//button[contains(., "Create new menu")]'
 		);
 		createNewMenuButton.click();
+
+		await page.waitForNetworkIdle();
 
 		// Await "success" notice.
 		await page.waitForXPath(
@@ -1298,6 +1320,8 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			);
 			createNewMenuButton.click();
 
+			await page.waitForNetworkIdle();
+
 			// Await "success" notice.
 			await page.waitForXPath(
 				'//div[@class="components-snackbar__content"][contains(text(), "Navigation Menu successfully created.")]'
@@ -1334,6 +1358,8 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 				'//button[contains(., "Create new menu")]'
 			);
 			createNewMenuButton.click();
+
+			await page.waitForNetworkIdle();
 
 			// Await "success" notice.
 			await page.waitForXPath(
@@ -1386,15 +1412,14 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			await createNewPost();
 			await insertBlock( 'Navigation' );
 
-			const navigationSelector = await page.waitForXPath(
-				"//button[text()='Select Menu']"
-			);
-			navigationSelector.click();
+			await clickBlockToolbarButton( 'Select Menu' );
 
 			const createNewMenuButton = await page.waitForXPath(
 				'//button[contains(., "Create new menu")]'
 			);
 			createNewMenuButton.click();
+
+			await page.waitForNetworkIdle();
 
 			// Await "success" notice.
 			await page.waitForXPath(
@@ -1614,6 +1639,8 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 				'//button[contains(., "Create new menu")]'
 			);
 			createNewMenuButton.click();
+
+			await page.waitForNetworkIdle();
 
 			// Await "success" notice.
 			await page.waitForXPath(

@@ -30,6 +30,8 @@ exports[`Navigation Placeholder menu selector actions allows a navigation block 
 <!-- /wp:navigation-submenu -->"
 `;
 
+exports[`Navigation Placeholder menu selector actions creates an empty navigation block when the selected existing menu is also empty 1`] = `""`;
+
 exports[`Navigation allows an empty navigation block to be created and manually populated using a mixture of internal and external links 1`] = `
 "<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"url\\":\\"https://wordpress.org\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->
 
