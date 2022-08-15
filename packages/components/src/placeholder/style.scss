@@ -105,11 +105,6 @@
 	width: 100%;
 }
 
-.components-placeholder__preview img {
-	margin: 3%;
-	width: 50%;
-}
-
 .components-placeholder__fieldset .components-button {
 	margin-right: $grid-unit-15;
 	margin-bottom: $grid-unit-15; // If buttons wrap we need vertical space between.
@@ -185,6 +180,10 @@
 	border: none;
 	min-width: 100px;
 
+	.components-placeholder__fieldset {
+		width: auto;
+	}
+
 	// Show placeholder buttons on block selection.
 	.components-button {
 		visibility: hidden;
@@ -197,6 +196,13 @@
 		opacity: 1;
 		visibility: visible;
 	}
+}
+
+// Position the spinner.
+// @todo these rules should ideally live with the spinner component itself.
+.components-placeholder__preview {
+	display: flex;
+	justify-content: center;
 }
 
 .components-placeholder__illustration {
