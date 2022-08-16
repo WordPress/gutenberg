@@ -163,7 +163,7 @@ export default function ColorGradientSettingsDropdown( {
 								className="block-editor-tools-panel-color-gradient-settings__dropdown"
 								renderToggle={ renderToggle( toggleSettings ) }
 								renderContent={ () => (
-									<DropdownContentWrapper paddingSize="medium">
+									<DropdownContentWrapper paddingSize="none">
 										<div className="block-editor-panel-color-gradient-settings__dropdown-content">
 											<ColorGradientControl
 												{ ...controlProps }

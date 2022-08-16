@@ -30,6 +30,20 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Should not create a new store with invalid $store_name.
+	 */
+	public function test_store_name_required() {
+		$not_a_store = WP_Style_Engine_CSS_Rules_Store::get_store( '' );
+		$this->assertEmpty( $not_a_store );
+
+		$also_not_a_store = WP_Style_Engine_CSS_Rules_Store::get_store( 123 );
+		$this->assertEmpty( $also_not_a_store );
+
+		$definitely_not_a_store = WP_Style_Engine_CSS_Rules_Store::get_store( null );
+		$this->assertEmpty( $definitely_not_a_store );
+	}
+
+	/**
 	 * Should return previously created store when the same selector key is passed.
 	 */
 	public function test_get_store() {

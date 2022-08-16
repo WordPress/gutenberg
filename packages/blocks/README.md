@@ -370,27 +370,6 @@ _Returns_
 
 -   `Array`: Block settings.
 
-### getBlockVariations
-
-Returns an array with the variations of a given block type.
-
-_Parameters_
-
--   _blockName_ `string`: Name of block (example: “core/columns”).
--   _scope_ `[WPBlockVariationScope]`: Block variation scope name.
-
-_Returns_
-
--   `(WPBlockVariation[]|void)`: Block variations.
-
-### getCategories
-
-Returns all the block categories.
-
-_Returns_
-
--   `WPBlockCategory[]`: Block categories.
-
 ### getChildBlockNames
 
 Returns an array with the child blocks of a given block.
@@ -685,6 +664,25 @@ _Returns_
 
 Registers a new block collection to group blocks in the same namespace in the inserter.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { registerBlockCollection, registerBlockType } from '@wordpress/blocks';
+
+// Register the collection.
+registerBlockCollection( 'my-collection', {
+	title: __( 'Custom Collection' ),
+} );
+
+// Register a block in the same namespace to add it to the collection.
+registerBlockType( 'my-collection/block-name', {
+	title: __( 'My First Block' ),
+	edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
+	save: () => <div>'Hello from the saved content!</div>,
+} );
+```
+
 _Parameters_
 
 -   _namespace_ `string`: The namespace to group blocks by in the inserter; corresponds to the block namespace.
@@ -696,6 +694,31 @@ _Parameters_
 
 Registers a new block style variation for the given block.
 
+For more information on connecting the styles with CSS [the official documentation](/docs/reference-guides/block-api/block-styles.md#styles)
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { registerBlockStyle } from '@wordpress/blocks';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	return (
+		<Button
+			onClick={ () => {
+				registerBlockStyle( 'core/quote', {
+					name: 'fancy-quote',
+					label: __( 'Fancy Quote' ),
+				} );
+			} }
+		>
+			{ __( 'Add a new block style for core/quote' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
 -   _blockName_ `string`: Name of block (example: “core/latest-posts”).
@@ -706,6 +729,21 @@ _Parameters_
 Registers a new block provided a unique name and an object defining its
 behavior. Once registered, the block is made available as an option to any
 editor interface where blocks are implemented.
+
+For more in-depth information on registering a custom block see the [Create a block tutorial](docs/how-to-guides/block-tutorial/README.md)
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { registerBlockType } from '@wordpress/blocks';
+
+registerBlockType( 'namespace/block-name', {
+	title: __( 'My First Block' ),
+	edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
+	save: () => <div>Hello from the saved content!</div>,
+} );
+```
 
 _Parameters_
 
@@ -719,6 +757,32 @@ _Returns_
 ### registerBlockVariation
 
 Registers a new block variation for the given block type.
+
+For more information on block variations see [the official documentation ](/docs/reference-guides/block-api/block-variations.md)
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { registerBlockVariation } from '@wordpress/blocks';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	return (
+		<Button
+			onClick={ () => {
+				registerBlockVariation( 'core/embed', {
+					name: 'custom',
+					title: __( 'My Custom Embed' ),
+					attributes: { providerNameSlug: 'custom' },
+				} );
+			} }
+		>
+			__( 'Add a custom variation for core/embed' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 
@@ -766,6 +830,37 @@ _Returns_
 
 Sets the block categories.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { store as blocksStore, setCategories } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	// Retrieve the list of current categories.
+	const blockCategories = useSelect(
+		( select ) => select( blocksStore ).getCategories(),
+		[]
+	);
+
+	return (
+		<Button
+			onClick={ () => {
+				// Add a custom category to the existing list.
+				setCategories( [
+					...blockCategories,
+					{ title: 'Custom Category', slug: 'custom-category' },
+				] );
+			} }
+		>
+			{ __( 'Add a new custom block category' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
 -   _categories_ `WPBlockCategory[]`: Block categories.
@@ -773,6 +868,20 @@ _Parameters_
 ### setDefaultBlockName
 
 Assigns the default block name.
+
+_Usage_
+
+```js
+import { setDefaultBlockName } from '@wordpress/blocks';
+
+const ExampleComponent = () => {
+	return (
+		<Button onClick={ () => setDefaultBlockName( 'core/heading' ) }>
+			{ __( 'Set the default block to Heading' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 
@@ -789,6 +898,20 @@ _Parameters_
 ### setGroupingBlockName
 
 Assigns name of block for handling block grouping interactions.
+
+_Usage_
+
+```js
+import { setGroupingBlockName } from '@wordpress/blocks';
+
+const ExampleComponent = () => {
+	return (
+		<Button onClick={ () => setGroupingBlockName( 'core/columns' ) }>
+			{ __( 'Set the default block to Heading' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 
@@ -849,6 +972,26 @@ _Returns_
 
 Unregisters a block style variation for the given block.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { unregisterBlockStyle } from '@wordpress/blocks';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	return (
+		<Button
+			onClick={ () => {
+				unregisterBlockStyle( 'core/quote', 'plain' );
+			} }
+		>
+			{ __( 'Remove the "Plain" block style for core/quote' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
 -   _blockName_ `string`: Name of block (example: “core/latest-posts”).
@@ -857,6 +1000,23 @@ _Parameters_
 ### unregisterBlockType
 
 Unregisters a block.
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { unregisterBlockType } from '@wordpress/blocks';
+
+const ExampleComponent = () => {
+	return (
+		<Button
+			onClick={ () => unregisterBlockType( 'my-collection/block-name' ) }
+		>
+			{ __( 'Unregister my custom block.' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 
@@ -870,6 +1030,26 @@ _Returns_
 
 Unregisters a block variation defined for the given block type.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { unregisterBlockVariation } from '@wordpress/blocks';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	return (
+		<Button
+			onClick={ () => {
+				unregisterBlockVariation( 'core/embed', 'youtube' );
+			} }
+		>
+			{ __( 'Remove the YouTube variation from core/embed' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
 -   _blockName_ `string`: Name of the block (example: “core/columns”).
@@ -878,6 +1058,26 @@ _Parameters_
 ### updateCategory
 
 Updates a category.
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { updateCategory } from '@wordpress/blocks';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	return (
+		<Button
+			onClick={ () => {
+				updateCategory( 'text', { title: __( 'Written Word' ) } );
+			} }
+		>
+			{ __( 'Update Text category title' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 

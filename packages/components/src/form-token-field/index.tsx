@@ -34,6 +34,7 @@ import { TokensAndInputWrapperFlex } from './styles';
 import SuggestionsList from './suggestions-list';
 import type { FormTokenFieldProps, TokenItem } from './types';
 import { FlexItem } from '../flex';
+import { StyledLabel } from '../base-control/styles/base-control-styles';
 
 const identity = ( value: string ) => value;
 
@@ -72,6 +73,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			remove: __( 'Remove item' ),
 			__experimentalInvalid: __( 'Invalid item' ),
 		},
+		__experimentalRenderItem,
 		__experimentalExpandOnFocus = false,
 		__experimentalValidateInput = () => true,
 		__experimentalShowHowTo = true,
@@ -659,12 +661,12 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div { ...tokenFieldProps }>
-			<label
+			<StyledLabel
 				htmlFor={ `components-form-token-input-${ instanceId }` }
 				className="components-form-token-field__label"
 			>
 				{ label }
-			</label>
+			</StyledLabel>
 			<div
 				ref={ tokensAndInput }
 				className={ classes }
@@ -692,6 +694,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 						scrollIntoView={ selectedSuggestionScroll }
 						onHover={ onSuggestionHovered }
 						onSelect={ onSuggestionSelected }
+						__experimentalRenderItem={ __experimentalRenderItem }
 					/>
 				) }
 			</div>

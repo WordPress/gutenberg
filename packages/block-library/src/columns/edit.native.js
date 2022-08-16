@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { View, Dimensions } from 'react-native';
-import { times, map, delay } from 'lodash';
+import { times, map } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -496,7 +496,9 @@ const ColumnsEdit = ( props ) => {
 
 	useEffect( () => {
 		if ( isSelected && isDefaultColumns ) {
-			delay( () => setIsVisible( true ), 100 );
+			const revealTimeout = setTimeout( () => setIsVisible( true ), 100 );
+
+			return () => clearTimeout( revealTimeout );
 		}
 	}, [] );
 

@@ -21,6 +21,11 @@
 	border-radius: $radius-block-ui;
 }
 
+.edit-site-typography-panel__half-width-control {
+	width: calc((100% - #{$grid-unit-30}) / 2);
+}
+
+.edit-site-global-styles-screen-heading-color,
 .edit-site-global-styles-screen-typography {
 	margin: $grid-unit-20;
 }
@@ -71,12 +76,6 @@
 .edit-site-screen-link-color__control,
 .edit-site-screen-button-color__control {
 	padding: $grid-unit-20;
-}
-
-.edit-site-screen-background-color__control {
-	.block-editor-color-gradient-control__tab-panel {
-		padding: $grid-unit-20;
-	}
 }
 
 .edit-site-global-styles-variations_item {

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
@@ -30,6 +29,7 @@ import Button from '../button';
 import { FlexBlock, FlexItem } from '../flex';
 import withFocusOutside from '../higher-order/with-focus-outside';
 import { useControlledValue } from '../utils/hooks';
+import { normalizeTextString } from '../utils/strings';
 
 const noop = () => {};
 
@@ -59,6 +59,7 @@ function ComboboxControl( {
 	messages = {
 		selected: __( 'Item selected.' ),
 	},
+	__experimentalRenderItem,
 } ) {
 	const [ value, setValue ] = useControlledValue( {
 		value: valueProp,
@@ -82,11 +83,9 @@ function ComboboxControl( {
 	const matchingSuggestions = useMemo( () => {
 		const startsWithMatch = [];
 		const containsMatch = [];
-		const match = removeAccents( inputValue.toLocaleLowerCase() );
+		const match = normalizeTextString( inputValue );
 		options.forEach( ( option ) => {
-			const index = removeAccents( option.label )
-				.toLocaleLowerCase()
-				.indexOf( match );
+			const index = normalizeTextString( option.label ).indexOf( match );
 			if ( index === 0 ) {
 				startsWithMatch.push( option );
 			} else if ( index > 0 ) {
@@ -285,6 +284,9 @@ function ComboboxControl( {
 							onHover={ setSelectedSuggestion }
 							onSelect={ onSuggestionSelected }
 							scrollIntoView
+							__experimentalRenderItem={
+								__experimentalRenderItem
+							}
 						/>
 					) }
 				</div>

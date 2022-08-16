@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "19.16.0",
+	"version": "19.17.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -53,6 +53,7 @@
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/warning": "file:../warning",
+		"change-case": "^4.1.2",
 		"classnames": "^2.3.1",
 		"colord": "^2.7.0",
 		"date-fns": "^2.28.0",
