@@ -23,6 +23,7 @@ import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
 import BlockSettingsMenu from '../block-settings-menu';
 import { BlockLockToolbar } from '../block-lock';
 import { BlockGroupToolbar } from '../convert-to-group-buttons';
+import BlockEditVisuallyButton from '../block-edit-visually-button';
 import { useShowMoversGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
@@ -159,6 +160,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 					</__unstableBlockNameContext.Provider>
 				</>
 			) }
+			<BlockEditVisuallyButton clientIds={ blockClientIds } />
 			<BlockSettingsMenu clientIds={ blockClientIds } />
 		</div>
 	);
