@@ -806,7 +806,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'expected_output' => array(
 					array(
 						'name' => 'Medium',
-						'slug' => 50,
+						'slug' => '50',
 						'size' => '4rem',
 					),
 				),
@@ -823,12 +823,12 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'expected_output' => array(
 					array(
 						'name' => 'Medium',
-						'slug' => 50,
+						'slug' => '50',
 						'size' => '4rem',
 					),
 					array(
 						'name' => 'Large',
-						'slug' => 60,
+						'slug' => '60',
 						'size' => '5.5rem',
 					),
 				),
@@ -845,17 +845,17 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'expected_output' => array(
 					array(
 						'name' => 'Small',
-						'slug' => 40,
+						'slug' => '40',
 						'size' => '2.5rem',
 					),
 					array(
 						'name' => 'Medium',
-						'slug' => 50,
+						'slug' => '50',
 						'size' => '4rem',
 					),
 					array(
 						'name' => 'Large',
-						'slug' => 60,
+						'slug' => '60',
 						'size' => '5.5rem',
 					),
 				),
@@ -872,22 +872,22 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'expected_output' => array(
 					array(
 						'name' => 'Small',
-						'slug' => 40,
+						'slug' => '40',
 						'size' => '2.5rem',
 					),
 					array(
 						'name' => 'Medium',
-						'slug' => 50,
+						'slug' => '50',
 						'size' => '4rem',
 					),
 					array(
 						'name' => 'Large',
-						'slug' => 60,
+						'slug' => '60',
 						'size' => '5.5rem',
 					),
 					array(
 						'name' => 'X-Large',
-						'slug' => 70,
+						'slug' => '70',
 						'size' => '7rem',
 					),
 				),
@@ -904,27 +904,27 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'expected_output' => array(
 					array(
 						'name' => 'Small',
-						'slug' => 40,
+						'slug' => '40',
 						'size' => '2.5rem',
 					),
 					array(
 						'name' => 'Medium',
-						'slug' => 50,
+						'slug' => '50',
 						'size' => '5rem',
 					),
 					array(
 						'name' => 'Large',
-						'slug' => 60,
+						'slug' => '60',
 						'size' => '7.5rem',
 					),
 					array(
 						'name' => 'X-Large',
-						'slug' => 70,
+						'slug' => '70',
 						'size' => '10rem',
 					),
 					array(
 						'name' => '2X-Large',
-						'slug' => 80,
+						'slug' => '80',
 						'size' => '12.5rem',
 					),
 				),
@@ -941,27 +941,27 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'expected_output' => array(
 					array(
 						'name' => 'X-Small',
-						'slug' => 30,
+						'slug' => '30',
 						'size' => '0.67rem',
 					),
 					array(
 						'name' => 'Small',
-						'slug' => 40,
+						'slug' => '40',
 						'size' => '1rem',
 					),
 					array(
 						'name' => 'Medium',
-						'slug' => 50,
+						'slug' => '50',
 						'size' => '1.5rem',
 					),
 					array(
 						'name' => 'Large',
-						'slug' => 60,
+						'slug' => '60',
 						'size' => '2.25rem',
 					),
 					array(
 						'name' => 'X-Large',
-						'slug' => 70,
+						'slug' => '70',
 						'size' => '3.38rem',
 					),
 				),
@@ -978,27 +978,27 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'expected_output' => array(
 					array(
 						'name' => 'X-Small',
-						'slug' => 30,
+						'slug' => '30',
 						'size' => '0.09rem',
 					),
 					array(
 						'name' => 'Small',
-						'slug' => 40,
+						'slug' => '40',
 						'size' => '0.38rem',
 					),
 					array(
 						'name' => 'Medium',
-						'slug' => 50,
+						'slug' => '50',
 						'size' => '1.5rem',
 					),
 					array(
 						'name' => 'Large',
-						'slug' => 60,
+						'slug' => '60',
 						'size' => '6rem',
 					),
 					array(
 						'name' => 'X-Large',
-						'slug' => 70,
+						'slug' => '70',
 						'size' => '24rem',
 					),
 				),
