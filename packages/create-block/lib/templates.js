@@ -225,6 +225,9 @@ const getDefaultValues = ( pluginTemplate ) => {
 const getPrompts = ( pluginTemplate, keys ) => {
 	const defaultValues = getDefaultValues( pluginTemplate );
 	return keys.map( ( promptName ) => {
+		if ( promptName === 'variant' ) {
+			prompts[ promptName ].choices = pluginTemplate.variants;
+		}
 		return {
 			...prompts[ promptName ],
 			default: defaultValues[ promptName ],

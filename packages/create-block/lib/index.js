@@ -114,6 +114,7 @@ program
 						! Object.keys( optionsValues ).includes( name );
 					const blockPrompts = getPrompts( pluginTemplate, [
 						'slug',
+						'variant',
 						'namespace',
 						'title',
 						'description',
