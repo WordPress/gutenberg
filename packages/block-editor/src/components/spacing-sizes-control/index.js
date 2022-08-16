@@ -43,7 +43,7 @@ export default function SpacingSizesControl( {
 	const hasOneSide = sides?.length === 1;
 
 	const [ isLinked, setIsLinked ] = useState(
-		! hasInitialValue || ! isValuesMixed( inputValues ) || hasOneSide
+		! hasInitialValue || ! isValuesMixed( inputValues, sides ) || hasOneSide
 	);
 
 	const toggleLinked = () => {
