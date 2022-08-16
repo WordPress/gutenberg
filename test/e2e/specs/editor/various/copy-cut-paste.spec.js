@@ -416,4 +416,21 @@ test.describe( 'Copy/cut/paste', () => {
 			await page.evaluate( () => document.activeElement.innerHTML )
 		).toMatchSnapshot();
 	} );
+
+	test( 'should paste single line in post title with existing content', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pageUtils.setClipboardData( {
+			html: '<span style="border: 1px solid black">x</span>',
+		} );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( 'y' );
+		expect(
+			await page.evaluate( () => document.activeElement.innerHTML )
+		).toBe( 'axyb' );
+	} );
 } );
