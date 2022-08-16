@@ -189,7 +189,7 @@ async function selectClassicMenu( optionText ) {
 	const navigationSelector = await page.waitForXPath(
 		"//button[text()='Select Menu']"
 	);
-	navigationSelector.click();
+	await navigationSelector.click();
 
 	const theOption = await page.waitForXPath(
 		'//button[contains(., "' + optionText + '")]'
@@ -454,12 +454,12 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			const navigationSelector = await page.waitForXPath(
 				"//button[text()='Select Menu']"
 			);
-			navigationSelector.click();
+			await navigationSelector.click();
 
 			const createNewMenuButton = await page.waitForXPath(
 				'//button[contains(., "Create new menu")]'
 			);
-			createNewMenuButton.click();
+			await createNewMenuButton.click();
 
 			// Check for the spinner to be present whilst loading.
 			await navBlock.waitForSelector( '.components-spinner' );
@@ -486,12 +486,12 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 				const navigationSelector = await page.waitForXPath(
 					"//button[text()='Select Menu']"
 				);
-				navigationSelector.click();
+				await navigationSelector.click();
 
 				const createNewMenuButton = await page.waitForXPath(
 					'//button[contains(., "Create new menu")]'
 				);
-				createNewMenuButton.click();
+				await createNewMenuButton.click();
 
 				// Wait for Navigation creation to complete.
 				await page.waitForXPath(
@@ -565,7 +565,7 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 				const navigationSelector = await page.waitForXPath(
 					"//button[text()='Select Menu']"
 				);
-				navigationSelector.click();
+				await navigationSelector.click();
 
 				await page.waitForXPath(
 					'//button[contains(., "Create new menu")]'
@@ -593,12 +593,12 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 		const navigationSelector = await page.waitForXPath(
 			"//button[text()='Select Menu']"
 		);
-		navigationSelector.click();
+		await navigationSelector.click();
 
 		const createNewMenuButton = await page.waitForXPath(
 			'//button[contains(., "Create new menu")]'
 		);
-		createNewMenuButton.click();
+		await createNewMenuButton.click();
 
 		await page.waitForNetworkIdle();
 
@@ -677,12 +677,12 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 		const navigationSelector = await page.waitForXPath(
 			"//button[text()='Select Menu']"
 		);
-		navigationSelector.click();
+		await navigationSelector.click();
 
 		const createNewMenuButton = await page.waitForXPath(
 			'//button[contains(., "Create new menu")]'
 		);
-		createNewMenuButton.click();
+		await createNewMenuButton.click();
 
 		await page.waitForNetworkIdle();
 
@@ -758,12 +758,12 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 		const navigationSelector = await page.waitForXPath(
 			"//button[text()='Select Menu']"
 		);
-		navigationSelector.click();
+		await navigationSelector.click();
 
 		const createNewMenuButton = await page.waitForXPath(
 			'//button[contains(., "Create new menu")]'
 		);
-		createNewMenuButton.click();
+		await createNewMenuButton.click();
 
 		await page.waitForNetworkIdle();
 
@@ -823,12 +823,12 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 		const navigationSelector = await page.waitForXPath(
 			"//button[text()='Select Menu']"
 		);
-		navigationSelector.click();
+		await navigationSelector.click();
 
 		const createNewMenuButton = await page.waitForXPath(
 			'//button[contains(., "Create new menu")]'
 		);
-		createNewMenuButton.click();
+		await createNewMenuButton.click();
 
 		await page.waitForNetworkIdle();
 
@@ -932,12 +932,12 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 		const navigationSelector = await page.waitForXPath(
 			"//button[text()='Select Menu']"
 		);
-		navigationSelector.click();
+		await navigationSelector.click();
 
 		const createNewMenuButton = await page.waitForXPath(
 			'//button[contains(., "Create new menu")]'
 		);
-		createNewMenuButton.click();
+		await createNewMenuButton.click();
 
 		await page.waitForNetworkIdle();
 
@@ -991,12 +991,12 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			const navigationSelector = await page.waitForXPath(
 				"//button[text()='Select Menu']"
 			);
-			navigationSelector.click();
+			await navigationSelector.click();
 
 			const createNewMenuButton = await page.waitForXPath(
 				'//button[contains(., "Create new menu")]'
 			);
-			createNewMenuButton.click();
+			await createNewMenuButton.click();
 
 			await page.waitForNetworkIdle();
 
@@ -1139,12 +1139,12 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			const navigationSelector = await page.waitForXPath(
 				"//button[text()='Select Menu']"
 			);
-			navigationSelector.click();
+			await navigationSelector.click();
 
 			const createNewMenuButton = await page.waitForXPath(
 				'//button[contains(., "Create new menu")]'
 			);
-			createNewMenuButton.click();
+			await createNewMenuButton.click();
 
 			await page.waitForNetworkIdle();
 
@@ -1189,12 +1189,12 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			const newNavigationSelector = await page.waitForXPath(
 				"//button[text()='Select Menu']"
 			);
-			newNavigationSelector.click();
+			await newNavigationSelector.click();
 
 			const newCreateNewMenuButton = await page.waitForXPath(
 				'//button[contains(., "Create new menu")]'
 			);
-			newCreateNewMenuButton.click();
+			await newCreateNewMenuButton.click();
 
 			await page.waitForNetworkIdle();
 
@@ -1226,12 +1226,12 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 		const navigationSelector = await page.waitForXPath(
 			"//button[text()='Select Menu']"
 		);
-		navigationSelector.click();
+		await navigationSelector.click();
 
 		const createNewMenuButton = await page.waitForXPath(
 			'//button[contains(., "Create new menu")]'
 		);
-		createNewMenuButton.click();
+		await createNewMenuButton.click();
 
 		await page.waitForNetworkIdle();
 
@@ -1287,7 +1287,42 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 	it( 'loads the frontend script only once even when multiple navigation blocks are present', async () => {
 		await createNewPost();
 		await insertBlock( 'Navigation' );
+
+		const navigationSelector = await page.waitForXPath(
+			"//button[text()='Select Menu']"
+		);
+		await navigationSelector.click();
+
+		const createNewMenuButton = await page.waitForXPath(
+			'//button[contains(., "Create new menu")]'
+		);
+		await createNewMenuButton.click();
+
+		await page.waitForNetworkIdle();
+
+		// Await "success" notice.
+		await page.waitForXPath(
+			'//div[@class="components-snackbar__content"][contains(text(), "Navigation Menu successfully created.")]'
+		);
+
 		await insertBlock( 'Navigation' );
+
+		const newNavigationSelector = await page.waitForXPath(
+			"//button[text()='Select Menu']"
+		);
+		await newNavigationSelector.click();
+
+		const newCreateNewMenuButton = await page.waitForXPath(
+			'//button[contains(., "Create new menu")]'
+		);
+		await newCreateNewMenuButton.click();
+
+		await page.waitForNetworkIdle();
+
+		// Await "success" notice.
+		await page.waitForXPath(
+			'//div[@class="components-snackbar__content"][contains(text(), "Navigation Menu successfully created.")]'
+		);
 
 		const previewPage = await openPreviewPage();
 		await previewPage.bringToFront();
@@ -1313,12 +1348,12 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			const navigationSelector = await page.waitForXPath(
 				"//button[text()='Select Menu']"
 			);
-			navigationSelector.click();
+			await navigationSelector.click();
 
 			const createNewMenuButton = await page.waitForXPath(
 				'//button[contains(., "Create new menu")]'
 			);
-			createNewMenuButton.click();
+			await createNewMenuButton.click();
 
 			await page.waitForNetworkIdle();
 
@@ -1352,12 +1387,12 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			const navigationSelector = await page.waitForXPath(
 				"//button[text()='Select Menu']"
 			);
-			navigationSelector.click();
+			await navigationSelector.click();
 
 			const createNewMenuButton = await page.waitForXPath(
 				'//button[contains(., "Create new menu")]'
 			);
-			createNewMenuButton.click();
+			await createNewMenuButton.click();
 
 			await page.waitForNetworkIdle();
 
@@ -1417,7 +1452,7 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			const createNewMenuButton = await page.waitForXPath(
 				'//button[contains(., "Create new menu")]'
 			);
-			createNewMenuButton.click();
+			await createNewMenuButton.click();
 
 			await page.waitForNetworkIdle();
 
@@ -1610,7 +1645,7 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			const navigationSelector = await page.waitForXPath(
 				"//button[text()='Select Menu']"
 			);
-			navigationSelector.click();
+			await navigationSelector.click();
 
 			await page.waitForXPath(
 				'//button[@aria-checked="true"][contains(., "Second Example Navigation")]'
@@ -1628,17 +1663,15 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 
 			await insertBlock( 'Navigation' );
 
-			await waitForBlock( 'Navigation' );
-
 			const navigationSelector = await page.waitForXPath(
 				"//button[text()='Select Menu']"
 			);
-			navigationSelector.click();
+			await navigationSelector.click();
 
 			const createNewMenuButton = await page.waitForXPath(
 				'//button[contains(., "Create new menu")]'
 			);
-			createNewMenuButton.click();
+			await createNewMenuButton.click();
 
 			await page.waitForNetworkIdle();
 
@@ -1674,7 +1707,7 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			const navigationSelector = await page.waitForXPath(
 				"//button[text()='Select Menu']"
 			);
-			navigationSelector.click();
+			await navigationSelector.click();
 
 			const theOption = await page.waitForXPath(
 				"//button[@aria-checked='false'][contains(., 'First navigation')]"
