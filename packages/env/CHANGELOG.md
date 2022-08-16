@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.2.0 (2022-08-16)
+
 ### Enhancement
 -   Query parameters can now be used in .zip source URLs.
 
