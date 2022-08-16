@@ -1965,7 +1965,7 @@ describe( 'Controlling link title text', () => {
 	it( 'should not show a means to alter the link title text by default', async () => {
 		render( <LinkControl value={ selectedLink } forceIsEditingLink /> );
 
-		expect( screen.queryByRole( 'textbox', { name: 'Text' } ) ).toBeFalsy();
+		expect( screen.queryByRole( 'textbox', { name: 'Text' } ) ).not.toBeInTheDocument();
 	} );
 
 	it.each( [ null, undefined, '   ' ] )(
