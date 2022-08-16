@@ -13,7 +13,7 @@ import {
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 
-// Version of the file block with the translated aria-label.
+// Version of the file block without PR#43050 removing the translated aria-label.
 const v2 = {
 	attributes: {
 		id: {
