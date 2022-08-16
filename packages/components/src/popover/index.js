@@ -364,7 +364,7 @@ const Popover = (
 			refs.floating.current,
 			update
 		);
-	}, [ anchorRef, anchorRect, getAnchorRect ] );
+	}, [ anchorRef, anchorRect, getAnchorRect, update ] );
 
 	// This is only needed for a smooth transition when moving blocks.
 	useLayoutEffect( () => {
@@ -377,7 +377,7 @@ const Popover = (
 		return () => {
 			observer.disconnect();
 		};
-	}, [ __unstableObserveElement ] );
+	}, [ __unstableObserveElement, update ] );
 
 	// If the reference element is in a different ownerDocument (e.g. iFrame),
 	// we need to manually update the floating's position as the reference's owner
@@ -409,7 +409,7 @@ const Popover = (
 				defaultView.removeEventListener( 'resize', updateFrameOffset );
 			}
 		};
-	}, [ ownerDocument ] );
+	}, [ ownerDocument, update ] );
 
 	const mergedFloatingRef = useMergeRefs( [
 		floating,
