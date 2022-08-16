@@ -205,7 +205,11 @@ function GalleryEdit( props ) {
 
 		return {
 			...pickRelevantMediaFiles( image, sizeSlug ),
-			...getHrefAndDestination( image, linkTo ),
+			...getHrefAndDestination(
+				image,
+				linkTo,
+				imageAttributes?.linkDestination
+			),
 			...newLinkTarget,
 			className: newClassName,
 			sizeSlug,
