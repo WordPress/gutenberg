@@ -234,10 +234,12 @@ const getPrompts = ( pluginTemplate, keys ) => {
 
 const getTemplateVariantVars = ( variants, variant ) => {
 	const variantTypes = {};
-	for ( const variantName of variants ) {
-		const key =
-			variantName.charAt( 0 ).toUpperCase() + variantName.slice( 1 );
-		variantTypes[ `is${ key }` ] = variant === variantName ?? false;
+	if ( variants ) {
+		for ( const variantName of variants ) {
+			const key =
+				variantName.charAt( 0 ).toUpperCase() + variantName.slice( 1 );
+			variantTypes[ `is${ key }` ] = variant === variantName ?? false;
+		}
 	}
 	return variantTypes;
 };
