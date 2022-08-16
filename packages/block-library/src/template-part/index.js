@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { startCase } from 'lodash';
+import { capitalCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -41,7 +41,8 @@ export const settings = {
 		}
 
 		return (
-			decodeEntities( entity.title?.rendered ) || startCase( entity.slug )
+			decodeEntities( entity.title?.rendered ) ||
+			capitalCase( entity.slug )
 		);
 	},
 	edit,

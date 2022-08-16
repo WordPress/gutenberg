@@ -1,14 +1,7 @@
 /**
  * External dependencies
  */
-const {
-	groupBy,
-	escapeRegExp,
-	uniq,
-	flow,
-	sortBy,
-	uniqBy,
-} = require( 'lodash' );
+const { groupBy, escapeRegExp, uniq, flow, sortBy } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
@@ -838,7 +831,17 @@ function sortByUsername( items ) {
  * @return {IssuesListForRepoResponseItem[]} The list of pull requests unique per user.
  */
 function getUniqueByUsername( items ) {
-	return uniqBy( items, ( item ) => item.user.login );
+	/**
+	 * @type {IssuesListForRepoResponseItem[]} List of pull requests.
+	 */
+	const EMPTY_PR_LIST = [];
+
+	return items.reduce( ( acc, item ) => {
+		if ( ! acc.some( ( i ) => i.user.login === item.user.login ) ) {
+			acc.push( item );
+		}
+		return acc;
+	}, EMPTY_PR_LIST );
 }
 
 /**

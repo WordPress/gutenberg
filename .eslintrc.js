@@ -79,6 +79,7 @@ module.exports = {
 					{
 						name: 'lodash',
 						importNames: [
+							'camelCase',
 							'capitalize',
 							'chunk',
 							'clamp',
@@ -131,6 +132,7 @@ module.exports = {
 							'reverse',
 							'size',
 							'snakeCase',
+							'startCase',
 							'startsWith',
 							'stubFalse',
 							'stubTrue',
@@ -140,6 +142,7 @@ module.exports = {
 							'toString',
 							'trim',
 							'truncate',
+							'uniqBy',
 							'uniqueId',
 							'uniqWith',
 							'values',
