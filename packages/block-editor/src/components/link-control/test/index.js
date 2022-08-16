@@ -1594,10 +1594,6 @@ describe( 'Addition Settings UI', () => {
 			},
 		];
 
-		const customSettingsLabelsText = customSettings.map(
-			( setting ) => setting.title
-		);
-
 		const LinkControlConsumer = () => {
 			const [ link ] = useState( selectedLink );
 
@@ -1611,34 +1607,18 @@ describe( 'Addition Settings UI', () => {
 
 		render( <LinkControlConsumer /> );
 
-		// Grab the elements using user perceivable DOM queries.
-		const settingsFieldset = screen.getByRole( 'group', {
-			name: 'Currently selected link settings',
-		} );
-		const settingControlsLabels = Array.from(
-			settingsFieldset.querySelectorAll( 'label' )
-		);
-		const settingControlsInputs = settingControlsLabels.map( ( label ) => {
-			return settingsFieldset.querySelector(
-				`#${ label.getAttribute( 'for' ) }`
-			);
-		} );
+		expect( screen.queryAllByRole( 'checkbox' ) ).toHaveLength( 2 );
 
-		const settingControlLabelsText = Array.from(
-			settingControlsLabels
-		).map( ( label ) => label.innerHTML );
-
-		// Check we have the correct number of controls.
-		expect( settingControlsLabels ).toHaveLength( 2 );
-
-		// Check the labels match.
-		expect( settingControlLabelsText ).toEqual(
-			expect.arrayContaining( customSettingsLabelsText )
-		);
-
-		// Assert the default "checked" states match the expected.
-		expect( settingControlsInputs[ 0 ] ).not.toBeChecked();
-		expect( settingControlsInputs[ 1 ] ).toBeChecked();
+		expect(
+			screen.getByRole( 'checkbox', {
+				name: customSettings[ 0 ].title,
+			} )
+		).not.toBeChecked();
+		expect(
+			screen.getByRole( 'checkbox', {
+				name: customSettings[ 1 ].title,
+			} )
+		).toBeChecked();
 	} );
 } );
 
