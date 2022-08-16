@@ -552,6 +552,14 @@ describe( 'readConfig', () => {
 					},
 					{
 						type: 'zip',
+						url: 'https://www.example.com/test/path/to/gutenberg.8.1.0.zip?auth=thisIsAString&token=secondString',
+						path: expect.stringMatching(
+							/^(\/|\\).*gutenberg.8.1.0$/
+						),
+						basename: 'gutenberg.8.1.0',
+					},
+					{
+						type: 'zip',
 						url: 'https://www.example.com/test/path/to/twentytwenty.zip',
 						path: expect.stringMatching(
 							/^(\/|\\).*twentytwenty$/
