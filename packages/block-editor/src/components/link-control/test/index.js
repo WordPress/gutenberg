@@ -1539,15 +1539,8 @@ describe( 'Addition Settings UI', () => {
 
 		const { container } = render( <LinkControlConsumer /> );
 
-		const newTabSettingLabel = Array.from(
-			container.querySelectorAll( 'label' )
-		).find(
-			( label ) =>
-				label.innerHTML &&
-				label.innerHTML.includes( expectedSettingText )
-		);
-
-		expect( newTabSettingLabel ).not.toBeUndefined(); // find() returns "undefined" if not found.
+		const newTabSettingLabel = screen.getByText( expectedSettingText );
+		expect( newTabSettingLabel ).toBeVisible();
 
 		const newTabSettingLabelForAttr =
 			newTabSettingLabel.getAttribute( 'for' );
