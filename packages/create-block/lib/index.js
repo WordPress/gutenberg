@@ -115,7 +115,6 @@ program
 					const blockPrompts = getPrompts( pluginTemplate, [
 						'slug',
 						'namespace',
-
 						'title',
 						'description',
 						'dashicon',

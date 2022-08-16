@@ -16,7 +16,9 @@
 
 -   Added prompt to continue when minimum system requirements not met ([#42151](https://github.com/WordPress/gutenberg/pull/42151)).
 
--	Introduce `--is-dynamic` flag to allow creation of dynamic blocks if the template supports it. ([#41289](https://github.com/WordPress/gutenberg/pull/41289)).
+### New Feature
+
+-   Introduce `--is-dynamic` flag to allow creation of dynamic blocks if the template supports it ([#41289](https://github.com/WordPress/gutenberg/pull/41289)).
 
 ## 3.3.0 (2022-06-01)
 
