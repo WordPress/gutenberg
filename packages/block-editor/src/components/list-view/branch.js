@@ -110,7 +110,7 @@ function ListViewBranch( props ) {
 		},
 		[ parentId ]
 	);
-	const processedBlocks = useMemo( () => {
+	const filteredBlocks = useMemo( () => {
 		if ( isContentLocked ) {
 			return getIdsTreeFlat( blocks ).filter( Boolean );
 		}
@@ -118,17 +118,17 @@ function ListViewBranch( props ) {
 	}, [ isContentLocked, blocks ] );
 	const { expandedState, draggedClientIds } = useListViewContext();
 
-	const blockCount = processedBlocks.length;
+	const blockCount = filteredBlocks.length;
 	let nextPosition = listPosition;
 
 	return (
 		<>
-			{ processedBlocks.map( ( block, index ) => {
+			{ filteredBlocks.map( ( block, index ) => {
 				const { clientId, innerBlocks } = block;
 
 				if ( index > 0 ) {
 					nextPosition += countBlocks(
-						processedBlocks[ index - 1 ],
+						filteredBlocks[ index - 1 ],
 						expandedState,
 						draggedClientIds,
 						isExpanded
