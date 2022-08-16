@@ -33,7 +33,7 @@ export const positionToPlacement = ( position ) => {
 /**
  * @typedef AnimationOrigin
  * @type {Object}
- * @property {number} originX A number between 0 and 1 (in RTL direction, 0 is left, 0.5 is center, and 1 is right)
+ * @property {number} originX A number between 0 and 1 (in CSS logical properties jargon, 0 is "start", 0.5 is "center", and 1 is "end")
  * @property {number} originY A number between 0 and 1 (0 is top, 0.5 is center, and 1 is bottom)
  */
 
