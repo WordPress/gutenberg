@@ -75,16 +75,6 @@ const countReducer =
 		return count + 1;
 	};
 
-function getIdsTreeFlat( blocks ) {
-	return blocks.reduce( ( result, { clientId, innerBlocks } ) => {
-		return [
-			...result,
-			{ clientId, innerBlocks: [] },
-			...getIdsTreeFlat( innerBlocks ),
-		];
-	}, [] );
-}
-
 function ListViewBranch( props ) {
 	const {
 		parentId,
@@ -110,9 +100,16 @@ function ListViewBranch( props ) {
 		},
 		[ parentId ]
 	);
+	const flattenBlockTree = ( result, { clientId, innerBlocks } ) => {
+		return [
+			...result,
+			{ clientId, innerBlocks: [] },
+			...innerBlocks.reduce( flattenBlockTree, [] ),
+		];
+	};
 	const filteredBlocks = useMemo( () => {
 		if ( isContentLocked ) {
-			return getIdsTreeFlat( blocks ).filter( Boolean );
+			return blocks.reduce( flattenBlockTree, [] ).filter( Boolean );
 		}
 		return blocks.filter( Boolean );
 	}, [ isContentLocked, blocks ] );
