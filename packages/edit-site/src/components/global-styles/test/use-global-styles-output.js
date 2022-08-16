@@ -756,5 +756,57 @@ describe( 'global styles renderer', () => {
 				'font-family: sans-serif',
 			] );
 		} );
+
+		it( 'Should resolve dynamic references', () => {
+			const blockStylesWithRef = {
+				color: {
+					background: {
+						ref: 'styles.color.text',
+					},
+					text: 'king-crimson',
+				},
+			};
+			const tree = {
+				styles: blockStylesWithRef,
+			};
+			expect(
+				getStylesDeclarations(
+					blockStylesWithRef,
+					'.wp-selector',
+					true,
+					tree
+				)
+			).toEqual( [
+				'color: king-crimson',
+				'background-color: king-crimson',
+			] );
+		} );
+
+		it( 'Should skip dynamic references that point to other dynamic references', () => {
+			const blockStylesWithRef = {
+				spacing: {
+					padding: {
+						ref: 'styles.spacing.margin',
+					},
+					margin: {
+						ref: 'styles.typography.letterSpacing',
+					},
+				},
+				typography: {
+					letterSpacing: '20px',
+				},
+			};
+			const tree = {
+				styles: blockStylesWithRef,
+			};
+			expect(
+				getStylesDeclarations(
+					blockStylesWithRef,
+					'.wp-selector',
+					false,
+					tree
+				)
+			).toEqual( [ 'margin: 20px', 'letter-spacing: 20px' ] );
+		} );
 	} );
 } );

@@ -238,18 +238,9 @@ function getValueFromCustomVariable( features, blockName, variable, path ) {
  * @return {string|*|{ref}} The value of the CSS var, if found. If not found, the passed variable argument.
  */
 export function getValueFromVariable( features, blockName, variable ) {
+	variable = resolveDynamicRef( variable, features );
 	if ( ! variable || typeof variable !== 'string' ) {
-		if ( variable?.ref && typeof variable?.ref === 'string' ) {
-			const refPath = variable.ref.split( '.' );
-			variable = get( features, refPath );
-			// Presence of another ref indicates a reference to another dynamic value.
-			// Pointing to another dynamic value is not supported.
-			if ( ! variable || !! variable?.ref ) {
-				return variable;
-			}
-		} else {
-			return variable;
-		}
+		return variable;
 	}
 	const USER_VALUE_PREFIX = 'var:';
 	const THEME_VALUE_PREFIX = 'var(--wp--';
@@ -320,4 +311,25 @@ export function scopeSelector( scope, selector ) {
 	} );
 
 	return selectorsScoped.join( ', ' );
+}
+
+/**
+ * Attempts a lookup of the theme.json tree to fetch the value of dynamic ref.
+ * This function exists until the style engine supports ref resolution.
+ *
+ * @param {string|*} styleValue An incoming style value.
+ * @param {Object}   tree       GlobalStylesContext config, e.g., user, base or merged. Represents the theme.json tree.
+ * @return {string|*} The value of the dynamic ref, if found. If not found, `false`.
+ */
+export function resolveDynamicRef( styleValue, tree ) {
+	const ref = get( styleValue, [ 'ref' ], false );
+	if ( typeof ref === 'string' ) {
+		const resolvedValue = get( tree, ref.split( '.' ) );
+		// Presence of another ref indicates a reference to another dynamic value.
+		// Pointing to another dynamic value is not supported.
+		if ( !! resolvedValue && ! resolvedValue?.ref ) {
+			return resolvedValue;
+		}
+	}
+	return styleValue;
 }

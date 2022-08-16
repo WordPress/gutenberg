@@ -32,7 +32,12 @@ import {
 /**
  * Internal dependencies
  */
-import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
+import {
+	PRESET_METADATA,
+	ROOT_BLOCK_SELECTOR,
+	scopeSelector,
+	resolveDynamicRef,
+} from './utils';
 import { GlobalStylesContext } from './context';
 import { useSetting } from './hooks';
 
@@ -208,11 +213,21 @@ export function getStylesDeclarations(
 				return declarations;
 			}
 			const pathToValue = value;
-			if ( first( pathToValue ) === 'elements' || useEngine ) {
+			let styleValue = get( blockStyles, pathToValue, false );
+
+			if (
+				first( pathToValue ) === 'elements' ||
+				// The style engine cannoresolveDynamicReft handle dynamic refs yet.
+				( useEngine && ! styleValue?.ref )
+			) {
 				return declarations;
 			}
 
-			const styleValue = get( blockStyles, pathToValue );
+			styleValue = resolveDynamicRef( styleValue, tree );
+			// If get() finds no style value or the ref points to another ref (invalid), return.
+			if ( styleValue === false || !! styleValue?.ref ) {
+				return declarations;
+			}
 
 			// Root-level padding styles don't currently support strings with CSS shorthand values.
 			// This may change: https://github.com/WordPress/gutenberg/issues/40132.
@@ -226,30 +241,30 @@ export function getStylesDeclarations(
 			if ( !! properties && typeof styleValue !== 'string' ) {
 				Object.entries( properties ).forEach( ( entry ) => {
 					const [ name, prop ] = entry;
-
-					if ( ! get( styleValue, [ prop ], false ) ) {
+					const propStyleValue = get( styleValue, [ prop ], false );
+					if ( ! propStyleValue ) {
 						// Do not create a declaration
 						// for sub-properties that don't have any value.
-						return;
+						return declarations;
 					}
 
 					const cssProperty = name.startsWith( '--' )
 						? name
 						: kebabCase( name );
+
 					declarations.push(
 						`${ cssProperty }: ${ compileStyleValue(
-							get( styleValue, [ prop ] )
+							propStyleValue
 						) }`
 					);
 				} );
-			} else if ( get( blockStyles, pathToValue, false ) ) {
+			} else {
 				const cssProperty = key.startsWith( '--' )
 					? key
 					: kebabCase( key );
+
 				declarations.push(
-					`${ cssProperty }: ${ compileStyleValue(
-						get( blockStyles, pathToValue )
-					) }`
+					`${ cssProperty }: ${ compileStyleValue( styleValue ) }`
 				);
 			}
 
@@ -274,18 +289,9 @@ export function getStylesDeclarations(
 			? rule.key
 			: kebabCase( rule.key );
 
-		let ruleValue = rule.value;
-		if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
-			const refPath = ruleValue.ref.split( '.' );
-			ruleValue = get( tree, refPath );
-			// Presence of another ref indicates a reference to another dynamic value.
-			// Pointing to another dynamic value is not supported.
-			if ( ! ruleValue || !! ruleValue?.ref ) {
-				return;
-			}
+		if ( typeof rule.value === 'string' ) {
+			output.push( `${ cssProperty }: ${ rule.value }` );
 		}
-
-		output.push( `${ cssProperty }: ${ ruleValue }` );
 	} );
 
 	return output;
