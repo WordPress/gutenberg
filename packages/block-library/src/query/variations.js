@@ -34,9 +34,7 @@ const variations = [
 	{
 		name: 'posts-list',
 		title: __( 'Posts List' ),
-		description: __(
-			'Display a list of your most recent posts, excluding sticky posts.'
-		),
+		description: __( 'Display a list of your posts.' ),
 		icon: postList,
 		attributes: {
 			query: {
@@ -52,6 +50,8 @@ const variations = [
 				inherit: false,
 			},
 		},
+		isActive: ( blockAttributes ) =>
+			blockAttributes.query.postType === 'post',
 		scope: [ 'inserter' ],
 	},
 	{
