@@ -22,6 +22,7 @@ module.exports = {
 			html: false,
 		},
 	},
+	variants: [ 'static' ],
 	pluginTemplatesPath: join( __dirname, 'plugin-templates' ),
 	blockTemplatesPath: join( __dirname, 'block-templates' ),
 	assetsPath: join( __dirname, 'assets' ),
