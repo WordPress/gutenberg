@@ -14,15 +14,6 @@
 	&.alignleft,
 	&.alignright {
 		max-width: $content-width * 0.5;
-
-		p {
-			font-size: 1.25em;
-		}
-	}
-
-	p {
-		font-size: 1.75em;
-		line-height: 1.6;
 	}
 
 	cite,

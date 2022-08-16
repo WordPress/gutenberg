@@ -2,7 +2,8 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { deburr, filter, flow, get, includes, map, some } from 'lodash';
+import removeAccents from 'remove-accents';
+import { filter, flow, get, includes, map, some } from 'lodash';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
@@ -688,7 +689,7 @@ export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 	const getNormalizedSearchTerm = flow( [
 		// Disregard diacritics.
 		//  Input: "média"
-		deburr,
+		( term ) => removeAccents( term ?? '' ),
 
 		// Lowercase.
 		//  Input: "MEDIA"
