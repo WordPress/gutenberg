@@ -208,9 +208,7 @@ describe( 'getEntityRecords', () => {
 		} );
 
 		// The record should have been received.
-		expect(
-			dispatch.__unstableAcquireStoreLock
-		).toHaveBeenCalledWith(
+		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledWith(
 			'core',
 			[ 'entities', 'records', 'root', 'postType' ],
 			{ exclusive: false }

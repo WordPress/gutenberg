@@ -104,17 +104,15 @@ class EditorPage {
 			if ( ! firstBlockVisible || ! lastBlockVisible ) {
 				return lastElementFound;
 			}
-			const firstBlockAccessibilityId = await firstBlockVisible.getAttribute(
-				this.accessibilityIdKey
-			);
+			const firstBlockAccessibilityId =
+				await firstBlockVisible.getAttribute( this.accessibilityIdKey );
 			const firstBlockRowMatch = /Row (\d+)\./.exec(
 				firstBlockAccessibilityId
 			);
 			const firstBlockRow =
 				firstBlockRowMatch && Number( firstBlockRowMatch[ 1 ] );
-			const lastBlockAccessibilityId = await lastBlockVisible.getAttribute(
-				this.accessibilityIdKey
-			);
+			const lastBlockAccessibilityId =
+				await lastBlockVisible.getAttribute( this.accessibilityIdKey );
 			const lastBlockRowMatch = /Row (\d+)\./.exec(
 				lastBlockAccessibilityId
 			);
@@ -163,9 +161,8 @@ class EditorPage {
 	}
 
 	async addParagraphBlockByTappingEmptyAreaBelowLastBlock() {
-		const emptyAreaBelowLastBlock = await this.driver.elementByAccessibilityId(
-			'Add paragraph block'
-		);
+		const emptyAreaBelowLastBlock =
+			await this.driver.elementByAccessibilityId( 'Add paragraph block' );
 		await emptyAreaBelowLastBlock.click();
 	}
 

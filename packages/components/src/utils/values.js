@@ -88,9 +88,8 @@ export function isValueNumeric( value, locale = window.navigator.language ) {
 		}
 	}
 
-	const [ delimiterRegexp, decimalRegexp ] = getDelimiterAndDecimalRegex(
-		locale
-	);
+	const [ delimiterRegexp, decimalRegexp ] =
+		getDelimiterAndDecimalRegex( locale );
 	const valueToCheck =
 		typeof value === 'string'
 			? value

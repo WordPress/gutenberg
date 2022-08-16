@@ -24,6 +24,12 @@ function gutenberg_get_default_block_template_types( $default_template_types ) {
 			'description' => __( 'The default template for displaying any single post or attachment.', 'gutenberg' ),
 		);
 	}
+	if ( isset( $default_template_types['category'] ) ) {
+		$default_template_types['category'] = array(
+			'title'       => _x( 'Category', 'Template name', 'gutenberg' ),
+			'description' => __( 'Displays latest posts from a single post category.', 'gutenberg' ),
+		);
+	}
 	return $default_template_types;
 }
 add_filter( 'default_template_types', 'gutenberg_get_default_block_template_types', 10 );
@@ -290,3 +296,63 @@ function gutenberg_build_block_template_result_from_post( $post ) {
 	}
 	return $template;
 }
+
+/**
+ * Helper function to get the Template Hierarchy for a given slug.
+ * We need to Handle special cases here like `front-page`, `singular` and `archive` templates.
+ *
+ * Noting that we always add `index` as the last fallback template.
+ *
+ * @param string  $slug            The template slug to be created.
+ * @param boolean $is_custom       Indicates if a template is custom or part of the template hierarchy.
+ * @param string  $template_prefix The template prefix for the created template. This is used to extract the main template type ex. in `taxonomy-books` we extract the `taxonomy`.
+ *
+ * @return array<string> The template hierarchy.
+ */
+function get_template_hierarchy( $slug, $is_custom = false, $template_prefix = '' ) {
+	if ( 'index' === $slug ) {
+		return array( 'index' );
+	}
+	if ( $is_custom ) {
+		return array( 'page', 'singular', 'index' );
+	}
+	if ( 'front-page' === $slug ) {
+		return array( 'front-page', 'home', 'index' );
+	}
+	$template_hierarchy = array( $slug );
+	// Most default templates don't have `$template_prefix` assigned.
+	if ( $template_prefix ) {
+		list($type) = explode( '-', $template_prefix );
+		// We need these checks because we always add the `$slug` above.
+		if ( ! in_array( $template_prefix, array( $slug, $type ), true ) ) {
+			$template_hierarchy[] = $template_prefix;
+		}
+		if ( $slug !== $type ) {
+			$template_hierarchy[] = $type;
+		}
+	}
+	// Handle `archive` template.
+	if (
+		str_starts_with( $slug, 'author' ) ||
+		str_starts_with( $slug, 'taxonomy' ) ||
+		str_starts_with( $slug, 'category' ) ||
+		str_starts_with( $slug, 'tag' ) ||
+		'date' === $slug
+	) {
+		$template_hierarchy[] = 'archive';
+	}
+	// Handle `single` template.
+	if ( 'attachment' === $slug ) {
+		$template_hierarchy[] = 'single';
+	}
+	// Handle `singular` template.
+	if (
+		str_starts_with( $slug, 'single' ) ||
+		str_starts_with( $slug, 'page' ) ||
+		'attachment' === $slug
+	) {
+		$template_hierarchy[] = 'singular';
+	}
+	$template_hierarchy[] = 'index';
+	return $template_hierarchy;
+};

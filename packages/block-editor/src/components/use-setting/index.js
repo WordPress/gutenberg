@@ -128,9 +128,10 @@ export default function useSetting( path ) {
 				clientId, // The current block is added last, so it overwrites any ancestor.
 			];
 			candidates.forEach( ( candidateClientId ) => {
-				const candidateBlockName = select(
-					blockEditorStore
-				).getBlockName( candidateClientId );
+				const candidateBlockName =
+					select( blockEditorStore ).getBlockName(
+						candidateClientId
+					);
 				if (
 					hasBlockSupport(
 						candidateBlockName,
@@ -138,9 +139,10 @@ export default function useSetting( path ) {
 						false
 					)
 				) {
-					const candidateAtts = select(
-						blockEditorStore
-					).getBlockAttributes( candidateClientId );
+					const candidateAtts =
+						select( blockEditorStore ).getBlockAttributes(
+							candidateClientId
+						);
 					const candidateResult =
 						get(
 							candidateAtts,

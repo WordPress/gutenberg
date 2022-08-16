@@ -88,7 +88,7 @@ export const settings = {
 	transforms,
 };
 
-// importing this file includes side effects. This is whitelisted in block-library/package.json under sideEffects
+// importing this file includes side effects. This is added in block-library/package.json under sideEffects
 addFilter(
 	'blocks.registerBlockType',
 	'core/navigation-link',

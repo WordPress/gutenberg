@@ -20,12 +20,8 @@ const layouts = {
 };
 
 function BlockGroupToolbar() {
-	const {
-		blocksSelection,
-		clientIds,
-		groupingBlockName,
-		isGroupable,
-	} = useConvertToGroupButtonProps();
+	const { blocksSelection, clientIds, groupingBlockName, isGroupable } =
+		useConvertToGroupButtonProps();
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 
 	const { canRemove, variations } = useSelect(

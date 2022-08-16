@@ -43,7 +43,12 @@
 	},
 	"supports": {
 		"anchor": true,
-		"align": true
+		"align": true,
+		"__experimentalStyle": {
+			"spacing": {
+				"margin": "0 0 1em 0"
+			}
+		}
 	},
 	"editorStyle": "wp-block-audio-editor",
 	"style": "wp-block-audio"

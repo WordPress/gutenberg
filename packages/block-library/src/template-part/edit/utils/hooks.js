@@ -28,9 +28,8 @@ import { createTemplatePartId } from './create-template-part-id';
  */
 export function useAlternativeTemplateParts( area, excludedId ) {
 	const { templateParts, isResolving } = useSelect( ( select ) => {
-		const { getEntityRecords, isResolving: _isResolving } = select(
-			coreStore
-		);
+		const { getEntityRecords, isResolving: _isResolving } =
+			select( coreStore );
 		const query = { per_page: -1 };
 		return {
 			templateParts: getEntityRecords(
@@ -144,10 +143,12 @@ export function useTemplatePartArea( area ) {
 		( select ) => {
 			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
 			// Blocks can be loaded into a *non-post* block editor.
-			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			const definedAreas = select(
-				'core/editor'
-			).__experimentalGetDefaultTemplatePartAreas();
+			/* eslint-disable @wordpress/data-no-store-string-literals */
+			const definedAreas =
+				select(
+					'core/editor'
+				).__experimentalGetDefaultTemplatePartAreas();
+			/* eslint-enable @wordpress/data-no-store-string-literals */
 
 			const selectedArea = find( definedAreas, { area } );
 			const defaultArea = find( definedAreas, { area: 'uncategorized' } );

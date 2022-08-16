@@ -3,7 +3,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap, isEmpty, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -34,6 +33,16 @@ function mergeProps( defaultProps = {}, props = {} ) {
 	return mergedProps;
 }
 
+/**
+ * Whether the argument is a function.
+ *
+ * @param {*} maybeFunc The argument to check.
+ * @return {boolean} True if the argument is a function, false otherwise.
+ */
+function isFunction( maybeFunc ) {
+	return typeof maybeFunc === 'function';
+}
+
 function DropdownMenu( dropdownMenuProps ) {
 	const {
 		children,
@@ -49,13 +58,13 @@ function DropdownMenu( dropdownMenuProps ) {
 		noIcons,
 	} = dropdownMenuProps;
 
-	if ( isEmpty( controls ) && ! isFunction( children ) ) {
+	if ( ! controls?.length && ! isFunction( children ) ) {
 		return null;
 	}
 
 	// Normalize controls to nested array of objects (sets of controls)
 	let controlSets;
-	if ( ! isEmpty( controls ) ) {
+	if ( controls?.length ) {
 		controlSets = controls;
 		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
 			controlSets = [ controlSets ];
@@ -136,7 +145,7 @@ function DropdownMenu( dropdownMenuProps ) {
 				return (
 					<NavigableMenu { ...mergedMenuProps } role="menu">
 						{ isFunction( children ) ? children( props ) : null }
-						{ flatMap( controlSets, ( controlSet, indexOfSet ) =>
+						{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
 							controlSet.map( ( control, indexOfControl ) => (
 								<Button
 									key={ [

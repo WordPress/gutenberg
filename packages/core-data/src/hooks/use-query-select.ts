@@ -102,34 +102,36 @@ const enrichSelectors = memoize( ( ( selectors ) => {
 			continue;
 		}
 		Object.defineProperty( resolvers, selectorName, {
-			get: () => ( ...args: unknown[] ) => {
-				const { getIsResolving, hasFinishedResolution } = selectors;
-				const isResolving = !! getIsResolving( selectorName, args );
-				const hasResolved =
-					! isResolving &&
-					hasFinishedResolution( selectorName, args );
-				const data = selectors[ selectorName ]( ...args );
+			get:
+				() =>
+				( ...args: unknown[] ) => {
+					const { getIsResolving, hasFinishedResolution } = selectors;
+					const isResolving = !! getIsResolving( selectorName, args );
+					const hasResolved =
+						! isResolving &&
+						hasFinishedResolution( selectorName, args );
+					const data = selectors[ selectorName ]( ...args );
 
-				let status;
-				if ( isResolving ) {
-					status = Status.Resolving;
-				} else if ( hasResolved ) {
-					if ( data ) {
-						status = Status.Success;
+					let status;
+					if ( isResolving ) {
+						status = Status.Resolving;
+					} else if ( hasResolved ) {
+						if ( data ) {
+							status = Status.Success;
+						} else {
+							status = Status.Error;
+						}
 					} else {
-						status = Status.Error;
+						status = Status.Idle;
 					}
-				} else {
-					status = Status.Idle;
-				}
 
-				return {
-					data,
-					status,
-					isResolving,
-					hasResolved,
-				};
-			},
+					return {
+						data,
+						status,
+						isResolving,
+						hasResolved,
+					};
+				},
 		} );
 	}
 	return resolvers;

@@ -49,9 +49,8 @@ class FlakyTestsReporter {
 			}
 			case 'passed': {
 				if ( this.failingTestCaseResults.has( testTitle ) ) {
-					const failingResults = this.failingTestCaseResults.get(
-						testTitle
-					);
+					const failingResults =
+						this.failingTestCaseResults.get( testTitle );
 
 					await fs.writeFile(
 						`flaky-tests/${ filenamify( testTitle ) }.json`,

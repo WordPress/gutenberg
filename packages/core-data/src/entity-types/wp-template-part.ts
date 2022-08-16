@@ -10,6 +10,7 @@ import type {
 } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
+import type { DefaultContextOf } from './index';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
@@ -89,6 +90,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type WpTemplatePart< C extends Context > = OmitNevers<
-	_BaseEntityRecords.WpTemplatePart< C >
->;
+export type WpTemplatePart<
+	C extends Context = DefaultContextOf< 'postType', 'wp_template_part' >
+> = OmitNevers< _BaseEntityRecords.WpTemplatePart< C > >;

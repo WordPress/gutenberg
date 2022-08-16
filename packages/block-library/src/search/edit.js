@@ -14,7 +14,7 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 	store as blockEditorStore,
-	__experimentalElementButtonClassName,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
@@ -80,9 +80,8 @@ export default function SearchEdit( {
 
 	const insertedInNavigationBlock = useSelect(
 		( select ) => {
-			const { getBlockParentsByBlockName, wasBlockJustInserted } = select(
-				blockEditorStore
-			);
+			const { getBlockParentsByBlockName, wasBlockJustInserted } =
+				select( blockEditorStore );
 			return (
 				!! getBlockParentsByBlockName( clientId, 'core/navigation' )
 					?.length && wasBlockJustInserted( clientId )
@@ -90,9 +89,8 @@ export default function SearchEdit( {
 		},
 		[ clientId ]
 	);
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	useEffect( () => {
 		if ( ! insertedInNavigationBlock ) return;
 		// This side-effect should not create an undo level.
@@ -243,7 +241,7 @@ export default function SearchEdit( {
 			colorProps.className,
 			isButtonPositionInside ? undefined : borderProps.className,
 			buttonUseIcon ? 'has-icon' : undefined,
-			__experimentalElementButtonClassName
+			__experimentalGetElementClassName( 'button' )
 		);
 		const buttonStyles = {
 			...colorProps.style,
@@ -418,12 +416,8 @@ export default function SearchEdit( {
 
 			if ( typeof borderRadius === 'object' ) {
 				// Individual corner border radii present.
-				const {
-					topLeft,
-					topRight,
-					bottomLeft,
-					bottomRight,
-				} = borderRadius;
+				const { topLeft, topRight, bottomLeft, bottomRight } =
+					borderRadius;
 
 				return {
 					...styles,

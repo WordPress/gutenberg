@@ -66,9 +66,8 @@ export function CheckboxControl(
 	}
 
 	const [ showCheckedIcon, setShowCheckedIcon ] = useState( false );
-	const [ showIndeterminateIcon, setShowIndeterminateIcon ] = useState(
-		false
-	);
+	const [ showIndeterminateIcon, setShowIndeterminateIcon ] =
+		useState( false );
 
 	// Run the following callback every time the `ref` (and the additional
 	// dependencies) change.

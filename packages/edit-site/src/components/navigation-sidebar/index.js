@@ -18,10 +18,8 @@ export const {
 	Slot: NavigationPanelPreviewSlot,
 } = createSlotFill( 'EditSiteNavigationPanelPreview' );
 
-const {
-	Fill: NavigationSidebarFill,
-	Slot: NavigationSidebarSlot,
-} = createSlotFill( 'EditSiteNavigationSidebar' );
+const { Fill: NavigationSidebarFill, Slot: NavigationSidebarSlot } =
+	createSlotFill( 'EditSiteNavigationSidebar' );
 
 function NavigationSidebar( { isDefaultOpen = false, activeTemplateType } ) {
 	const isDesktopViewport = useViewportMatch( 'medium' );

@@ -38,7 +38,6 @@ import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 import { store as editSiteStore } from '../../store';
 import BlockInspectorButton from './block-inspector-button';
-import EditTemplatePartMenuButton from '../edit-template-part-menu-button';
 import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
 
@@ -51,12 +50,8 @@ const LAYOUT = {
 export default function BlockEditor( { setIsInserterOpen } ) {
 	const { storedSettings, templateType, templateId, page } = useSelect(
 		( select ) => {
-			const {
-				getSettings,
-				getEditedPostType,
-				getEditedPostId,
-				getPage,
-			} = select( editSiteStore );
+			const { getSettings, getEditedPostType, getEditedPostId, getPage } =
+				select( editSiteStore );
 
 			return {
 				storedSettings: getSettings( setIsInserterOpen ),
@@ -78,9 +73,8 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
 		( select ) => ( {
 			restBlockPatterns: select( coreStore ).getBlockPatterns(),
-			restBlockPatternCategories: select(
-				coreStore
-			).getBlockPatternCategories(),
+			restBlockPatternCategories:
+				select( coreStore ).getBlockPatternCategories(),
 		} ),
 		[]
 	);
@@ -160,7 +154,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
-			<EditTemplatePartMenuButton />
 			<TemplatePartConverter />
 			<__experimentalLinkControl.ViewerFill>
 				{ useCallback(

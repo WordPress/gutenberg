@@ -64,7 +64,9 @@ function useFocusReturn( onFocusReturn ) {
 			if ( onFocusReturnRef.current ) {
 				onFocusReturnRef.current();
 			} else {
-				/** @type {null | HTMLElement} */ ( focusedBeforeMount.current )?.focus();
+				/** @type {null | HTMLElement} */ (
+					focusedBeforeMount.current
+				)?.focus();
 			}
 		}
 	}, [] );

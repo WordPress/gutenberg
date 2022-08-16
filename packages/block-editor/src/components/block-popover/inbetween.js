@@ -154,7 +154,10 @@ function BlockPopoverInbetween( {
 
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
 
-	if ( ! previousElement || ! nextElement || ! isVisible ) {
+	// If there's either a previous or a next element, show the inbetween popover.
+	// Note that drag and drop uses the inbetween popover to show the drop indicator
+	// before the first block and after the last block.
+	if ( ( ! previousElement && ! nextElement ) || ! isVisible ) {
 		return null;
 	}
 
@@ -172,7 +175,7 @@ function BlockPopoverInbetween( {
 			getAnchorRect={ getAnchorRect }
 			focusOnMount={ false }
 			// Render in the old slot if needed for backward compatibility,
-			// otherwise render in place (not in the the default popover slot).
+			// otherwise render in place (not in the default popover slot).
 			__unstableSlotName={ __unstablePopoverSlot || null }
 			// Forces a remount of the popover when its position changes
 			// This makes sure the popover doesn't animate from its previous position.
@@ -180,6 +183,7 @@ function BlockPopoverInbetween( {
 			{ ...props }
 			className={ classnames(
 				'block-editor-block-popover',
+				'block-editor-block-popover__inbetween',
 				props.className
 			) }
 			__unstableForcePosition

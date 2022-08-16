@@ -2,12 +2,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop, omit } from 'lodash';
+import { omit } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import Notice from './';
+
+const noop = () => {};
 
 /**
  * Renders a list of notices.

@@ -184,7 +184,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
   <div
     className="editor-post-publish-panel__content"
   >
-    <Spinner />
+    <ForwardRef(UnforwardedSpinner) />
   </div>
   <div
     className="editor-post-publish-panel__footer"

@@ -24,7 +24,7 @@ import {
 	formatOutdentRTL,
 } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
-import { useCallback, useEffect } from '@wordpress/element';
+import { useCallback, useEffect, Platform } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -32,8 +32,10 @@ import deprecated from '@wordpress/deprecated';
  */
 import OrderedListSettings from '../ordered-list-settings';
 import { migrateToListV2 } from './migrate';
+import TagName from './tag-name';
 
 const TEMPLATE = [ [ 'core/list-item' ] ];
+const NATIVE_MARGIN_SPACING = 8;
 
 /**
  * At the moment, deprecations don't handle create blocks from attributes
@@ -45,9 +47,8 @@ const TEMPLATE = [ [ 'core/list-item' ] ];
  */
 function useMigrateOnLoad( attributes, clientId ) {
 	const registry = useRegistry();
-	const { updateBlockAttributes, replaceInnerBlocks } = useDispatch(
-		blockEditorStore
-	);
+	const { updateBlockAttributes, replaceInnerBlocks } =
+		useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		// As soon as the block is loaded, migrate it to the new version.
@@ -74,9 +75,8 @@ function useMigrateOnLoad( attributes, clientId ) {
 function useOutdentList( clientId ) {
 	const { canOutdent } = useSelect(
 		( innerSelect ) => {
-			const { getBlockRootClientId, getBlock } = innerSelect(
-				blockEditorStore
-			);
+			const { getBlockRootClientId, getBlock } =
+				innerSelect( blockEditorStore );
 			const parentId = getBlockRootClientId( clientId );
 			return {
 				canOutdent:
@@ -87,9 +87,8 @@ function useOutdentList( clientId ) {
 		[ clientId ]
 	);
 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
-	const { getBlockRootClientId, getBlockAttributes, getBlock } = useSelect(
-		blockEditorStore
-	);
+	const { getBlockRootClientId, getBlockAttributes, getBlock } =
+		useSelect( blockEditorStore );
 
 	return [
 		canOutdent,
@@ -129,16 +128,21 @@ function IndentUI( { clientId } ) {
 	);
 }
 
-function Edit( { attributes, setAttributes, clientId } ) {
-	const blockProps = useBlockProps();
+function Edit( { attributes, setAttributes, clientId, style } ) {
+	const blockProps = useBlockProps( {
+		...( Platform.isNative && { style } ),
+	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list-item' ],
 		template: TEMPLATE,
 		templateInsertUpdatesSelection: true,
+		...( Platform.isNative && {
+			marginVertical: NATIVE_MARGIN_SPACING,
+			marginHorizontal: NATIVE_MARGIN_SPACING,
+		} ),
 	} );
 	useMigrateOnLoad( attributes, clientId );
 	const { ordered, reversed, start } = attributes;
-	const TagName = ordered ? 'ol' : 'ul';
 
 	const controls = (
 		<BlockControls group="block">
@@ -167,6 +171,7 @@ function Edit( { attributes, setAttributes, clientId } ) {
 	return (
 		<>
 			<TagName
+				ordered={ ordered }
 				reversed={ reversed }
 				start={ start }
 				{ ...innerBlocksProps }

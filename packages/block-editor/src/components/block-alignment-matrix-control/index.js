@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -12,6 +8,8 @@ import {
 	Dropdown,
 	__experimentalAlignmentMatrixControl as AlignmentMatrixControl,
 } from '@wordpress/components';
+
+const noop = () => {};
 
 function BlockAlignmentMatrixControl( props ) {
 	const {

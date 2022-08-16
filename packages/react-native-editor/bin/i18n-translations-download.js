@@ -114,9 +114,8 @@ const fetchTranslations = ( { plugin, pluginDir, usedStrings } ) => {
 					// Detect potential missing strings from translations
 					missingTranslations = Object.values( usedStrings ).reduce(
 						( result, { string, platforms } ) => {
-							const stringExists = !! languageResult.response[
-								string
-							];
+							const stringExists =
+								!! languageResult.response[ string ];
 							const isMissingString =
 								! stringExists && platforms.includes( 'web' );
 
@@ -131,9 +130,8 @@ const fetchTranslations = ( { plugin, pluginDir, usedStrings } ) => {
 					// Detect potential native-only strings that are already included in translations
 					extraTranslations = Object.values( usedStrings ).reduce(
 						( result, { string, platforms } ) => {
-							const stringExists = !! languageResult.response[
-								string
-							];
+							const stringExists =
+								!! languageResult.response[ string ];
 							const isNativeTranslationIncluded =
 								! platforms.includes( 'web' ) && stringExists;
 

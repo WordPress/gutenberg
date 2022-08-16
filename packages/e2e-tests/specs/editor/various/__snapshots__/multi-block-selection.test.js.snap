@@ -146,22 +146,6 @@ exports[`Multi-block selection should handle Enter across blocks 2`] = `
 <!-- /wp:heading -->"
 `;
 
-exports[`Multi-block selection should merge into quote with correct selection 1`] = `
-"<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>1[</p></blockquote>
-<!-- /wp:quote -->
-
-<!-- wp:paragraph -->
-<p>]2</p>
-<!-- /wp:paragraph -->"
-`;
-
-exports[`Multi-block selection should merge into quote with correct selection 2`] = `
-"<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>1</p><p>&amp;2</p></blockquote>
-<!-- /wp:quote -->"
-`;
-
 exports[`Multi-block selection should multi-select from within the list block 1`] = `
 "<!-- wp:paragraph -->
 <p>1</p>
@@ -283,13 +267,17 @@ exports[`Multi-block selection should select all from empty selection 1`] = `
 exports[`Multi-block selection should select all from empty selection 2`] = `""`;
 
 exports[`Multi-block selection should select separator (single element block) 1`] = `
-"<!-- wp:separator -->
-<hr class=\\"wp-block-separator has-alpha-channel-opacity\\"/>
-<!-- /wp:separator -->
+"<!-- wp:paragraph -->
+<p>a</p>
+<!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>a</p>
-<!-- /wp:paragraph -->"
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:separator -->
+<hr class=\\"wp-block-separator has-alpha-channel-opacity\\"/>
+<!-- /wp:separator -->"
 `;
 
 exports[`Multi-block selection should select separator (single element block) 2`] = `

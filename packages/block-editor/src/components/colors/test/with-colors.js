@@ -9,7 +9,7 @@ import { shallow, mount } from 'enzyme';
 import { createCustomColorsHOC } from '../with-colors';
 
 describe( 'createCustomColorsHOC', () => {
-	it( 'provides the the wrapped component with color values and setter functions as props', () => {
+	it( 'provides the wrapped component with color values and setter functions as props', () => {
 		const withCustomColors = createCustomColorsHOC( [
 			{ name: 'Red', slug: 'red', color: 'ff0000' },
 		] );
@@ -28,13 +28,13 @@ describe( 'createCustomColorsHOC', () => {
 		const withCustomColors = createCustomColorsHOC( [
 			{ name: 'Red', slug: 'red', color: 'ff0000' },
 		] );
-		const EnhancedComponent = withCustomColors(
-			'backgroundColor'
-		)( ( props ) => (
-			<button onClick={ () => props.setBackgroundColor( 'ff0000' ) }>
-				Test Me
-			</button>
-		) );
+		const EnhancedComponent = withCustomColors( 'backgroundColor' )(
+			( props ) => (
+				<button onClick={ () => props.setBackgroundColor( 'ff0000' ) }>
+					Test Me
+				</button>
+			)
+		);
 
 		const setAttributes = jest.fn();
 
@@ -56,13 +56,13 @@ describe( 'createCustomColorsHOC', () => {
 		const withCustomColors = createCustomColorsHOC( [
 			{ name: 'Red', slug: 'red', color: 'ff0000' },
 		] );
-		const EnhancedComponent = withCustomColors(
-			'backgroundColor'
-		)( ( props ) => (
-			<button onClick={ () => props.setBackgroundColor( '000000' ) }>
-				Test Me
-			</button>
-		) );
+		const EnhancedComponent = withCustomColors( 'backgroundColor' )(
+			( props ) => (
+				<button onClick={ () => props.setBackgroundColor( '000000' ) }>
+					Test Me
+				</button>
+			)
+		);
 
 		const setAttributes = jest.fn();
 

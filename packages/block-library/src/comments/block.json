@@ -1,7 +1,7 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
-	"name": "core/comments-query-loop",
+	"name": "core/comments",
 	"title": "Comments",
 	"category": "theme",
 	"description": "An advanced block that allows displaying post comments using different visual configurations.",
@@ -10,6 +10,10 @@
 		"tagName": {
 			"type": "string",
 			"default": "div"
+		},
+		"legacy": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
@@ -25,5 +29,6 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-comments-editor"
+	"editorStyle": "wp-block-comments-editor",
+	"usesContext": [ "postId", "postType" ]
 }

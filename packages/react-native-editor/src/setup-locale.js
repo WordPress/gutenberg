@@ -22,6 +22,8 @@ export default (
 	pluginTranslations = []
 ) => {
 	const setDomainLocaleData = ( { getTranslation, domain = 'default' } ) => {
+		// Lowercase the locale value as translation filenames are also lowercased.
+		locale = locale?.toLowerCase();
 		let translations = getTranslation( locale );
 		if ( locale && ! translations ) {
 			// Try stripping out the regional

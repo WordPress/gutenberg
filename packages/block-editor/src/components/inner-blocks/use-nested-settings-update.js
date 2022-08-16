@@ -49,16 +49,13 @@ export default function useNestedSettingsUpdate(
 
 	const { blockListSettings, parentLock } = useSelect(
 		( select ) => {
-			const rootClientId = select(
-				blockEditorStore
-			).getBlockRootClientId( clientId );
+			const rootClientId =
+				select( blockEditorStore ).getBlockRootClientId( clientId );
 			return {
-				blockListSettings: select(
-					blockEditorStore
-				).getBlockListSettings( clientId ),
-				parentLock: select( blockEditorStore ).getTemplateLock(
-					rootClientId
-				),
+				blockListSettings:
+					select( blockEditorStore ).getBlockListSettings( clientId ),
+				parentLock:
+					select( blockEditorStore ).getTemplateLock( rootClientId ),
 			};
 		},
 		[ clientId ]

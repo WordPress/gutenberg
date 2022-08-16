@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { camelCase, nth, upperFirst } = require( 'lodash' );
+const { pascalCase } = require( 'change-case' );
 const fs = require( 'fs' );
 const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
@@ -51,9 +51,10 @@ function getPackageManifest( packageFolderNames ) {
  */
 function getComponentManifest( paths ) {
 	return paths.map( ( filePath ) => {
-		const slug = nth( filePath.split( '/' ), -2 );
+		const pathFragments = filePath.split( '/' );
+		const slug = pathFragments[ pathFragments.length - 2 ];
 		return {
-			title: upperFirst( camelCase( slug ) ),
+			title: pascalCase( slug ),
 			slug,
 			markdown_source: `${ baseRepoUrl }/${ filePath }`,
 			parent: 'components',
@@ -70,17 +71,21 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 	items.forEach( ( obj ) => {
 		const fileName = Object.keys( obj )[ 0 ];
 		const children = obj[ fileName ];
+		const fileNameFragments = fileName.split( '/' );
 
-		let slug = nth( fileName.split( '/' ), -1 ).replace( '.md', '' );
+		let slug = fileNameFragments[ fileNameFragments.length - 1 ].replace(
+			'.md',
+			''
+		);
 		if ( 'readme' === slug.toLowerCase() ) {
-			slug = nth( fileName.split( '/' ), -2 );
+			slug = fileNameFragments[ fileNameFragments.length - 2 ];
 
 			// Special case - the root 'docs' readme needs the 'handbook' slug.
 			if ( parent === null && 'docs' === slug ) {
 				slug = 'handbook';
 			}
 		}
-		let title = upperFirst( camelCase( slug ) );
+		let title = pascalCase( slug );
 		const markdownSource = fs.readFileSync( fileName, 'utf8' );
 		const titleMarkdown = markdownSource.match( /^#\s(.+)$/m );
 		if ( titleMarkdown ) {

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find, reverse } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -16,13 +11,13 @@ import {
 	isRTL,
 } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { isInSameBlock } from '../../utils/dom';
+import { getBlockClientId } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -89,7 +84,7 @@ export function getClosestTabbable(
 	let focusableNodes = focus.focusable.find( containerElement );
 
 	if ( isReverse ) {
-		focusableNodes = reverse( focusableNodes );
+		focusableNodes.reverse();
 	}
 
 	// Consider as candidates those focusables after the current target. It's
@@ -130,18 +125,18 @@ export function getClosestTabbable(
 		return true;
 	}
 
-	return find( focusableNodes, isTabCandidate );
+	return focusableNodes.find( isTabCandidate );
 }
 
 export default function useArrowNav() {
 	const {
-		getSelectedBlockClientId,
+		getMultiSelectedBlocksStartClientId,
 		getMultiSelectedBlocksEndClientId,
-		getPreviousBlockClientId,
-		getNextBlockClientId,
 		getSettings,
 		hasMultiSelection,
+		__unstableIsFullySelected,
 	} = useSelect( blockEditorStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	return useRefEffect( ( node ) => {
 		// Here a DOMRect is stored while moving the caret vertically so
 		// vertical position of the start position can be restored. This is to
@@ -152,26 +147,13 @@ export default function useArrowNav() {
 			verticalRect = null;
 		}
 
-		/**
-		 * Returns true if the given target field is the last in its block which
-		 * can be considered for tab transition. For example, in a block with
-		 * two text fields, this would return true when reversing from the first
-		 * of the two fields, but false when reversing from the second.
-		 *
-		 * @param {Element} target    Currently focused text field.
-		 * @param {boolean} isReverse True if considering as the first field.
-		 *
-		 * @return {boolean} Whether field is at edge for tab transition.
-		 */
-		function isTabbableEdge( target, isReverse ) {
+		function isClosestTabbableABlock( target, isReverse ) {
 			const closestTabbable = getClosestTabbable(
 				target,
 				isReverse,
 				node
 			);
-			return (
-				! closestTabbable || ! isInSameBlock( target, closestTabbable )
-			);
+			return closestTabbable && getBlockClientId( closestTabbable );
 		}
 
 		function onKeyDown( event ) {
@@ -191,7 +173,35 @@ export default function useArrowNav() {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
+			// If there is a multi-selection, the arrow keys should collapse the
+			// selection to the start or end of the selection.
 			if ( hasMultiSelection() ) {
+				// Only handle if we have a full selection (not a native partial
+				// selection).
+				if ( ! __unstableIsFullySelected() ) {
+					return;
+				}
+
+				if ( event.defaultPrevented ) {
+					return;
+				}
+
+				if ( ! isNav ) {
+					return;
+				}
+
+				if ( isShift ) {
+					return;
+				}
+
+				event.preventDefault();
+
+				if ( isReverse ) {
+					selectBlock( getMultiSelectedBlocksStartClientId() );
+				} else {
+					selectBlock( getMultiSelectedBlocksEndClientId(), -1 );
+				}
+
 				return;
 			}
 
@@ -228,22 +238,10 @@ export default function useArrowNav() {
 			// next, which is the exact reverse of LTR.
 			const isReverseDir = isRTL( target ) ? ! isReverse : isReverse;
 			const { keepCaretInsideBlock } = getSettings();
-			const selectedBlockClientId = getSelectedBlockClientId();
 
 			if ( isShift ) {
-				const selectionEndClientId = getMultiSelectedBlocksEndClientId();
-				const selectionBeforeEndClientId = getPreviousBlockClientId(
-					selectionEndClientId || selectedBlockClientId
-				);
-				const selectionAfterEndClientId = getNextBlockClientId(
-					selectionEndClientId || selectedBlockClientId
-				);
-
 				if (
-					// Ensure that there is a target block.
-					( ( isReverse && selectionBeforeEndClientId ) ||
-						( ! isReverse && selectionAfterEndClientId ) ) &&
-					isTabbableEdge( target, isReverse ) &&
+					isClosestTabbableABlock( target, isReverse ) &&
 					isNavEdge( target, isReverse )
 				) {
 					node.contentEditable = true;

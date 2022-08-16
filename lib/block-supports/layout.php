@@ -34,13 +34,13 @@ function gutenberg_register_layout_support( $block_type ) {
  * @param string  $gap_value                     The block gap value to apply.
  * @param boolean $should_skip_gap_serialization Whether to skip applying the user-defined value set in the editor.
  * @param string  $fallback_gap_value            The block gap value to apply.
+ * @param array   $block_spacing                 Custom spacing set on the block.
  *
  * @return string                                CSS style.
  */
-function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em' ) {
-	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
-
-	$style = '';
+function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null ) {
+	$layout_type   = isset( $layout['type'] ) ? $layout['type'] : 'default';
+	$layout_styles = array();
 	if ( 'default' === $layout_type ) {
 		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : '';
 		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : '';
@@ -54,26 +54,75 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
 
 		if ( $content_size || $wide_size ) {
-			$style  = "$selector > :where(:not(.alignleft):not(.alignright)) {";
-			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
-			$style .= 'margin-left: auto !important;';
-			$style .= 'margin-right: auto !important;';
-			$style .= '}';
+			array_push(
+				$layout_styles,
+				array(
+					'selector'     => "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
+					'declarations' => array(
+						'max-width'    => $all_max_width_value,
+						'margin-left'  => 'auto !important',
+						'margin-right' => 'auto !important',
+					),
+				),
+				array(
+					'selector'     => "$selector > .alignwide",
+					'declarations' => array( 'max-width' => $wide_max_width_value ),
+				),
+				array(
+					'selector'     => "$selector .alignfull",
+					'declarations' => array( 'max-width' => 'none' ),
+				)
+			);
 
-			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
-			$style .= "$selector .alignfull { max-width: none; }";
+			if ( isset( $block_spacing ) ) {
+				$block_spacing_values = gutenberg_style_engine_get_styles(
+					array(
+						'spacing' => $block_spacing,
+					)
+				);
+
+				// Handle negative margins for alignfull children of blocks with custom padding set.
+				// They're added separately because padding might only be set on one side.
+				if ( isset( $block_spacing_values['declarations']['padding-right'] ) ) {
+					$padding_right   = $block_spacing_values['declarations']['padding-right'];
+					$layout_styles[] = array(
+						'selector'     => "$selector > .alignfull",
+						'declarations' => array( 'margin-right' => "calc($padding_right * -1)" ),
+					);
+				}
+				if ( isset( $block_spacing_values['declarations']['padding-left'] ) ) {
+					$padding_left    = $block_spacing_values['declarations']['padding-left'];
+					$layout_styles[] = array(
+						'selector'     => "$selector > .alignfull",
+						'declarations' => array( 'margin-left' => "calc($padding_left * -1)" ),
+					);
+				}
+			}
 		}
 
-		$style .= "$selector > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }";
-		$style .= "$selector > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }";
-		$style .= "$selector > .aligncenter { margin-left: auto !important; margin-right: auto !important; }";
 		if ( $has_block_gap_support ) {
 			if ( is_array( $gap_value ) ) {
 				$gap_value = isset( $gap_value['top'] ) ? $gap_value['top'] : null;
 			}
-			$gap_style = $gap_value && ! $should_skip_gap_serialization ? $gap_value : 'var( --wp--style--block-gap )';
-			$style    .= "$selector > * { margin-block-start: 0; margin-block-end: 0; }";
-			$style    .= "$selector > * + * { margin-block-start: $gap_style; margin-block-end: 0; }";
+			if ( $gap_value && ! $should_skip_gap_serialization ) {
+				array_push(
+					$layout_styles,
+					array(
+						'selector'     => "$selector > *",
+						'declarations' => array(
+							'margin-block-start' => '0',
+							'margin-block-end'   => '0',
+						),
+					),
+					array(
+						'selector'     => "$selector$selector > * + *",
+						'declarations' => array(
+							'margin-block-start' => $gap_value,
+							'margin-block-end'   => '0',
+						),
+					)
+				);
+			}
 		}
 	} elseif ( 'flex' === $layout_type ) {
 		$layout_orientation = isset( $layout['orientation'] ) ? $layout['orientation'] : 'horizontal';
@@ -94,26 +143,27 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$justify_content_options += array( 'space-between' => 'space-between' );
 		}
 
-		$flex_wrap_options = array( 'wrap', 'nowrap' );
-		$flex_wrap         = ! empty( $layout['flexWrap'] ) && in_array( $layout['flexWrap'], $flex_wrap_options, true ) ?
-			$layout['flexWrap'] :
-			'wrap';
+		if ( ! empty( $layout['flexWrap'] ) && 'nowrap' === $layout['flexWrap'] ) {
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'flex-wrap' => 'nowrap' ),
+			);
+		}
 
-		$style  = "$selector {";
-		$style .= 'display: flex;';
 		if ( $has_block_gap_support ) {
 			if ( is_array( $gap_value ) ) {
 				$gap_row    = isset( $gap_value['top'] ) ? $gap_value['top'] : $fallback_gap_value;
 				$gap_column = isset( $gap_value['left'] ) ? $gap_value['left'] : $fallback_gap_value;
 				$gap_value  = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
 			}
-			$gap_style = $gap_value && ! $should_skip_gap_serialization ? $gap_value : "var( --wp--style--block-gap, $fallback_gap_value )";
-			$style    .= "gap: $gap_style;";
-		} else {
-			$style .= "gap: $fallback_gap_value;";
+			if ( $gap_value && ! $should_skip_gap_serialization ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'gap' => $gap_value ),
+				);
+			}
 		}
 
-		$style .= "flex-wrap: $flex_wrap;";
 		if ( 'horizontal' === $layout_orientation ) {
 			/**
 			 * Add this style only if is not empty for backwards compatibility,
@@ -121,28 +171,50 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 * by custom css.
 			 */
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
-				$style .= "justify-content: {$justify_content_options[ $layout['justifyContent'] ]};";
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'justify-content' => $justify_content_options[ $layout['justifyContent'] ] ),
+				);
 			}
 
 			if ( ! empty( $layout['verticalAlignment'] ) && array_key_exists( $layout['verticalAlignment'], $vertical_alignment_options ) ) {
-				$style .= "align-items: {$vertical_alignment_options[ $layout['verticalAlignment'] ]};";
-			} else {
-				$style .= 'align-items: center;';
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'align-items' => $vertical_alignment_options[ $layout['verticalAlignment'] ] ),
+				);
 			}
 		} else {
-			$style .= 'flex-direction: column;';
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'flex-direction' => 'column' ),
+			);
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
-				$style .= "align-items: {$justify_content_options[ $layout['justifyContent'] ]};";
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'align-items' => $justify_content_options[ $layout['justifyContent'] ] ),
+				);
 			} else {
-				$style .= 'align-items: flex-start;';
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'align-items' => 'flex-start' ),
+				);
 			}
 		}
-		$style .= '}';
-
-		$style .= "$selector > * { margin: 0; }";
 	}
 
-	return $style;
+	if ( ! empty( $layout_styles ) ) {
+		// Add to the style engine store to enqueue and render layout styles.
+		// Return compiled layout styles to retain backwards compatibility.
+		// Since https://github.com/WordPress/gutenberg/pull/42452 we no longer call wp_enqueue_block_support_styles in this block supports file.
+		return gutenberg_style_engine_get_stylesheet_from_css_rules(
+			$layout_styles,
+			array(
+				'context' => 'block-supports',
+			)
+		);
+	}
+
+	return '';
 }
 
 /**
@@ -160,47 +232,94 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$block_gap             = gutenberg_get_global_settings( array( 'spacing', 'blockGap' ) );
-	$default_layout        = gutenberg_get_global_settings( array( 'layout' ) );
-	$has_block_gap_support = isset( $block_gap ) ? null !== $block_gap : false;
-	$default_block_layout  = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
-	$used_layout           = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
+	$block_gap              = gutenberg_get_global_settings( array( 'spacing', 'blockGap' ) );
+	$global_layout_settings = gutenberg_get_global_settings( array( 'layout' ) );
+	$has_block_gap_support  = isset( $block_gap ) ? null !== $block_gap : false;
+	$default_block_layout   = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
+	$used_layout            = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
-		if ( ! $default_layout ) {
+		if ( ! $global_layout_settings ) {
 			return $block_content;
 		}
-		$used_layout = $default_layout;
+		$used_layout = $global_layout_settings;
 	}
 
-	$class_name = wp_unique_id( 'wp-container-' );
-	$gap_value  = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
-	// Skip if gap value contains unsupported characters.
-	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
-	// because we only want to match against the value, not the CSS attribute.
-	if ( is_array( $gap_value ) ) {
-		foreach ( $gap_value as $key => $value ) {
-			$gap_value[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
-		}
+	$class_names        = array();
+	$layout_definitions = _wp_array_get( $global_layout_settings, array( 'definitions' ), array() );
+	$block_classname    = wp_get_block_default_classname( $block['blockName'] );
+	$container_class    = wp_unique_id( 'wp-container-' );
+	$layout_classname   = '';
+	$use_global_padding = gutenberg_get_global_settings( array( 'useRootPaddingAwareAlignments' ) ) && ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] );
+
+	if ( $use_global_padding ) {
+		$class_names[] = 'has-global-padding';
+	}
+
+	// The following section was added to reintroduce a small set of layout classnames that were
+	// removed in the 5.9 release (https://github.com/WordPress/gutenberg/issues/38719). It is
+	// not intended to provide an extended set of classes to match all block layout attributes
+	// here.
+	if ( ! empty( $block['attrs']['layout']['orientation'] ) ) {
+		$class_names[] = 'is-' . sanitize_title( $block['attrs']['layout']['orientation'] );
+	}
+
+	if ( ! empty( $block['attrs']['layout']['justifyContent'] ) ) {
+		$class_names[] = 'is-content-justification-' . sanitize_title( $block['attrs']['layout']['justifyContent'] );
+	}
+
+	if ( ! empty( $block['attrs']['layout']['flexWrap'] ) && 'nowrap' === $block['attrs']['layout']['flexWrap'] ) {
+		$class_names[] = 'is-nowrap';
+	}
+
+	// Get classname for layout type.
+	if ( isset( $used_layout['type'] ) ) {
+		$layout_classname = _wp_array_get( $layout_definitions, array( $used_layout['type'], 'className' ), '' );
 	} else {
-		$gap_value = $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
+		$layout_classname = _wp_array_get( $layout_definitions, array( 'default', 'className' ), '' );
 	}
 
-	$fallback_gap_value = _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', '__experimentalDefault' ), '0.5em' );
+	if ( $layout_classname && is_string( $layout_classname ) ) {
+		$class_names[] = sanitize_title( $layout_classname );
+	}
 
-	// If a block's block.json skips serialization for spacing or spacing.blockGap,
-	// don't apply the user-defined value to the styles.
-	$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
-	$style                         = gutenberg_get_layout_style( ".$class_name", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value );
+	// Only generate Layout styles if the theme has not opted-out.
+	// Attribute-based Layout classnames are output in all cases.
+	if ( ! current_theme_supports( 'disable-layout-styles' ) ) {
+
+		$gap_value = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
+		// Skip if gap value contains unsupported characters.
+		// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
+		// because we only want to match against the value, not the CSS attribute.
+		if ( is_array( $gap_value ) ) {
+			foreach ( $gap_value as $key => $value ) {
+				$gap_value[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
+			}
+		} else {
+			$gap_value = $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
+		}
+
+		$fallback_gap_value = _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', '__experimentalDefault' ), '0.5em' );
+		$block_spacing      = _wp_array_get( $block, array( 'attrs', 'style', 'spacing' ), null );
+
+		// If a block's block.json skips serialization for spacing or spacing.blockGap,
+		// don't apply the user-defined value to the styles.
+		$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
+		$style                         = gutenberg_get_layout_style( ".$block_classname.$container_class", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value, $block_spacing );
+
+		// Only add container class and enqueue block support styles if unique styles were generated.
+		if ( ! empty( $style ) ) {
+			$class_names[] = $container_class;
+		}
+	}
+
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
 		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="' . esc_attr( $class_name ) . ' ',
+		'class="' . esc_attr( implode( ' ', $class_names ) ) . ' ',
 		$block_content,
 		1
 	);
-
-	gutenberg_enqueue_block_support_styles( $style );
 
 	return $content;
 }

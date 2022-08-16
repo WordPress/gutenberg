@@ -110,12 +110,10 @@ function getTypeLiteralPropertyTypeAnnotations( typeAnnotation ) {
  * @param {babelTypes.TSTypeLiteral} typeAnnotation
  */
 function getTypeLiteralTypeAnnotation( typeAnnotation ) {
-	const callProperties = getTypeLiteralCallSignatureDeclarationTypeAnnotations(
-		typeAnnotation
-	);
-	const indexers = getTypeLiteralIndexSignatureTypeAnnotations(
-		typeAnnotation
-	);
+	const callProperties =
+		getTypeLiteralCallSignatureDeclarationTypeAnnotations( typeAnnotation );
+	const indexers =
+		getTypeLiteralIndexSignatureTypeAnnotations( typeAnnotation );
 	const properties = getTypeLiteralPropertyTypeAnnotations( typeAnnotation );
 
 	return `{ ${ callProperties }${ properties }${ indexers }}`;

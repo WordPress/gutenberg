@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import {
@@ -23,6 +18,8 @@ import serialize, {
 	renderAttributes,
 	renderStyle,
 } from '../serialize';
+
+const noop = () => {};
 
 describe( 'serialize()', () => {
 	it( 'should allow only valid attribute names', () => {

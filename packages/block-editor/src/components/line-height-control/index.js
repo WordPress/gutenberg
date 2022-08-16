@@ -21,6 +21,7 @@ const LineHeightControl = ( {
 	/** Start opting into the new margin-free styles that will become the default in a future version. */
 	__nextHasNoMarginBottom = false,
 	__unstableInputWidth = '60px',
+	...otherProps
 } ) => {
 	const isDefined = isLineHeightDefined( lineHeight );
 
@@ -75,8 +76,7 @@ const LineHeightControl = ( {
 			{
 				since: '6.0',
 				version: '6.4',
-				hint:
-					'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version',
+				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version',
 			}
 		);
 	}
@@ -90,6 +90,7 @@ const LineHeightControl = ( {
 			style={ deprecatedStyles }
 		>
 			<NumberControl
+				{ ...otherProps }
 				__unstableInputWidth={ __unstableInputWidth }
 				__unstableStateReducer={ stateReducer }
 				onChange={ onChange }

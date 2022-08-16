@@ -58,9 +58,8 @@ const DefaultTemplate: ComponentStory< typeof FormTokenField > = ( {
 	);
 };
 
-export const Default: ComponentStory<
-	typeof FormTokenField
-> = DefaultTemplate.bind( {} );
+export const Default: ComponentStory< typeof FormTokenField > =
+	DefaultTemplate.bind( {} );
 Default.args = {
 	label: 'Type a continent',
 	suggestions: continents,
@@ -101,4 +100,18 @@ export const Async: ComponentStory< typeof FormTokenField > = ( {
 Async.args = {
 	label: 'Type a continent',
 	suggestions: continents,
+};
+
+/**
+ * The rendered output of each suggestion can be customized by passing a
+ * render function to the `__experimentalRenderItem` prop. (This is still an experimental feature
+ * and is subject to change.)
+ */
+export const WithCustomRenderItem: ComponentStory< typeof FormTokenField > =
+	DefaultTemplate.bind( {} );
+WithCustomRenderItem.args = {
+	...Default.args,
+	__experimentalRenderItem: ( { item } ) => (
+		<div>{ `${ item } — a nice place to visit` }</div>
+	),
 };

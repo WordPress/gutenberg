@@ -32,9 +32,9 @@ const transformationCategories = {
 };
 
 export const transformationCategory = ( blockName ) => {
-	const found = Object.entries(
-		transformationCategories
-	).find( ( [ , value ] ) => value.includes( blockName ) );
+	const found = Object.entries( transformationCategories ).find(
+		( [ , value ] ) => value.includes( blockName )
+	);
 	if ( ! found ) {
 		return [];
 	}

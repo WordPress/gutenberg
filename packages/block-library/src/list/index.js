@@ -15,14 +15,13 @@ import settingsV2 from './v2';
 
 const { name } = metadata;
 
-export { metadata, name };
+export { metadata, name, settingsV2 };
 
 const settingsV1 = {
 	icon,
 	example: {
 		attributes: {
-			values:
-				'<li>Alice.</li><li>The White Rabbit.</li><li>The Cheshire Cat.</li><li>The Mad Hatter.</li><li>The Queen of Hearts.</li>',
+			values: '<li>Alice.</li><li>The White Rabbit.</li><li>The Cheshire Cat.</li><li>The Mad Hatter.</li><li>The Queen of Hearts.</li>',
 		},
 	},
 	transforms,

@@ -245,9 +245,10 @@ const config = {
 							[ 'viewScript', 'script', 'editorScript' ].forEach(
 								( key ) => {
 									if ( Array.isArray( blockJson[ key ] ) ) {
-										blockJson[ key ] = blockJson[ key ].map(
-											convertExtension
-										);
+										blockJson[ key ] =
+											blockJson[ key ].map(
+												convertExtension
+											);
 									} else if (
 										typeof blockJson[ key ] === 'string'
 									) {

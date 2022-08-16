@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { act, fireEvent, render } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -12,14 +12,14 @@ describe( 'FocalPointPicker', () => {
 	describe( 'focus and blur', () => {
 		let firedDragEnd;
 		let firedDrag;
-		const { getByRole, unmount } = render(
+		const { unmount } = render(
 			<Picker
 				onChange={ () => {} }
 				onDragEnd={ () => ( firedDragEnd = true ) }
 				onDrag={ () => ( firedDrag = true ) }
 			/>
 		);
-		const dragArea = getByRole( 'button' );
+		const dragArea = screen.getByRole( 'button' );
 		fireEvent.mouseDown( dragArea );
 		const gainedFocus = dragArea.ownerDocument.activeElement === dragArea;
 
@@ -47,8 +47,8 @@ describe( 'FocalPointPicker', () => {
 			events.forEach( ( name ) => {
 				handlers[ name ] = ( ...all ) => eventLogger( name, all );
 			} );
-			const { getByRole } = render( <Picker { ...handlers } /> );
-			const dragArea = getByRole( 'button' );
+			render( <Picker { ...handlers } /> );
+			const dragArea = screen.getByRole( 'button' );
 			act( () => {
 				fireEvent.mouseDown( dragArea );
 				fireEvent.mouseMove( dragArea );
@@ -66,7 +66,7 @@ describe( 'FocalPointPicker', () => {
 		it( 'should allow value altering', async () => {
 			const spyChange = jest.fn();
 			const spy = jest.fn();
-			const { getByRole } = render(
+			render(
 				<Picker
 					value={ { x: 0.25, y: 0.25 } }
 					onChange={ spyChange }
@@ -77,7 +77,7 @@ describe( 'FocalPointPicker', () => {
 				/>
 			);
 			// Click and press arrow up
-			const dragArea = getByRole( 'button' );
+			const dragArea = screen.getByRole( 'button' );
 			act( () => {
 				fireEvent.mouseDown( dragArea );
 				fireEvent.keyDown( dragArea, { charCode: 0, keyCode: 38 } );
@@ -92,20 +92,20 @@ describe( 'FocalPointPicker', () => {
 
 	describe( 'controllability', () => {
 		it( 'should update value from props', () => {
-			const { rerender, getByRole } = render(
+			const { rerender } = render(
 				<Picker value={ { x: 0.25, y: 0.5 } } />
 			);
-			const xInput = getByRole( 'spinbutton', { name: 'Left' } );
+			const xInput = screen.getByRole( 'spinbutton', { name: 'Left' } );
 			rerender( <Picker value={ { x: 0.93, y: 0.5 } } /> );
 			expect( xInput.value ).toBe( '93' );
 		} );
 		it( 'call onChange with the expected values', async () => {
 			const spyChange = jest.fn();
-			const { getByRole } = render(
+			render(
 				<Picker value={ { x: 0.14, y: 0.62 } } onChange={ spyChange } />
 			);
 			// Click and press arrow up
-			const dragArea = getByRole( 'button' );
+			const dragArea = screen.getByRole( 'button' );
 			act( () => {
 				fireEvent.mouseDown( dragArea );
 				fireEvent.keyDown( dragArea, { charCode: 0, keyCode: 38 } );

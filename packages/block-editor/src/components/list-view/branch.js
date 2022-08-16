@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { compact } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { memo } from '@wordpress/element';
@@ -56,29 +51,28 @@ function countBlocks(
 	}
 	return 1;
 }
-const countReducer = (
-	expandedState,
-	draggedClientIds,
-	isExpandedByDefault
-) => ( count, block ) => {
-	const isDragged = draggedClientIds?.includes( block.clientId );
-	if ( isDragged ) {
-		return count;
-	}
-	const isExpanded = expandedState[ block.clientId ] ?? isExpandedByDefault;
-	if ( isExpanded && block.innerBlocks.length > 0 ) {
-		return (
-			count +
-			countBlocks(
-				block,
-				expandedState,
-				draggedClientIds,
-				isExpandedByDefault
-			)
-		);
-	}
-	return count + 1;
-};
+const countReducer =
+	( expandedState, draggedClientIds, isExpandedByDefault ) =>
+	( count, block ) => {
+		const isDragged = draggedClientIds?.includes( block.clientId );
+		if ( isDragged ) {
+			return count;
+		}
+		const isExpanded =
+			expandedState[ block.clientId ] ?? isExpandedByDefault;
+		if ( isExpanded && block.innerBlocks.length > 0 ) {
+			return (
+				count +
+				countBlocks(
+					block,
+					expandedState,
+					draggedClientIds,
+					isExpandedByDefault
+				)
+			);
+		}
+		return count + 1;
+	};
 
 function ListViewBranch( props ) {
 	const {
@@ -96,7 +90,7 @@ function ListViewBranch( props ) {
 
 	const { expandedState, draggedClientIds } = useListViewContext();
 
-	const filteredBlocks = compact( blocks );
+	const filteredBlocks = blocks.filter( Boolean );
 	const blockCount = filteredBlocks.length;
 	let nextPosition = listPosition;
 

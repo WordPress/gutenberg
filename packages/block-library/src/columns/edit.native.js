@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { View, Dimensions } from 'react-native';
-import { dropRight, times, map, compact, delay } from 'lodash';
+import { times, map } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -347,14 +347,12 @@ const ColumnsEditContainerWrapper = withDispatch(
 		updateColumns( previousColumns, newColumns ) {
 			const { clientId } = ownProps;
 			const { replaceInnerBlocks } = dispatch( blockEditorStore );
-			const { getBlocks, getBlockAttributes } = registry.select(
-				blockEditorStore
-			);
+			const { getBlocks, getBlockAttributes } =
+				registry.select( blockEditorStore );
 
 			let innerBlocks = getBlocks( clientId );
-			const hasExplicitWidths = hasExplicitPercentColumnWidths(
-				innerBlocks
-			);
+			const hasExplicitWidths =
+				hasExplicitPercentColumnWidths( innerBlocks );
 
 			// Redistribute available width for existing inner blocks.
 			const isAddingColumn = newColumns > previousColumns;
@@ -394,9 +392,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 				];
 			} else {
 				// The removed column will be the last of the inner blocks.
-				innerBlocks = dropRight(
-					innerBlocks,
-					previousColumns - newColumns
+				innerBlocks = innerBlocks.slice(
+					0,
+					-( previousColumns - newColumns )
 				);
 
 				if ( hasExplicitWidths ) {
@@ -414,12 +412,10 @@ const ColumnsEditContainerWrapper = withDispatch(
 		},
 		onAddNextColumn: () => {
 			const { clientId } = ownProps;
-			const { replaceInnerBlocks, selectBlock } = dispatch(
-				blockEditorStore
-			);
-			const { getBlocks, getBlockAttributes } = registry.select(
-				blockEditorStore
-			);
+			const { replaceInnerBlocks, selectBlock } =
+				dispatch( blockEditorStore );
+			const { getBlocks, getBlockAttributes } =
+				registry.select( blockEditorStore );
 
 			// Get verticalAlignment from Columns block to set the same to new Column.
 			const { verticalAlignment } = getBlockAttributes( clientId );
@@ -478,7 +474,7 @@ const ColumnsEdit = ( props ) => {
 
 			return {
 				columnCount: getBlockCount( clientId ),
-				isDefaultColumns: ! compact( isContentEmpty ).length,
+				isDefaultColumns: ! isContentEmpty.filter( Boolean ).length,
 				innerWidths: innerColumnsWidths,
 				hasParents: !! parents.length,
 				parentBlockAlignment: getBlockAttributes( parents[ 0 ] )?.align,
@@ -500,7 +496,9 @@ const ColumnsEdit = ( props ) => {
 
 	useEffect( () => {
 		if ( isSelected && isDefaultColumns ) {
-			delay( () => setIsVisible( true ), 100 );
+			const revealTimeout = setTimeout( () => setIsVisible( true ), 100 );
+
+			return () => clearTimeout( revealTimeout );
 		}
 	}, [] );
 

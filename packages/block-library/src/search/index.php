@@ -80,20 +80,23 @@ function render_block_core_search( $attributes ) {
 	}
 
 	if ( $show_button ) {
+		$button_classes         = array();
 		$button_internal_markup = '';
-		$button_classes         = $color_classes;
-		$aria_label             = '';
+		if ( ! empty( $color_classes ) ) {
+			$button_classes[] = $color_classes;
+		}
+		$aria_label = '';
 
-		if ( ! $is_button_inside ) {
-			$button_classes .= ' ' . $border_color_classes;
+		if ( ! $is_button_inside && ! empty( $border_color_classes ) ) {
+			$button_classes[] = $border_color_classes;
 		}
 		if ( ! $use_icon_button ) {
 			if ( ! empty( $attributes['buttonText'] ) ) {
 				$button_internal_markup = wp_kses_post( $attributes['buttonText'] );
 			}
 		} else {
-			$aria_label      = sprintf( 'aria-label="%s"', esc_attr( wp_strip_all_tags( $attributes['buttonText'] ) ) );
-			$button_classes .= ' has-icon';
+			$aria_label       = sprintf( 'aria-label="%s"', esc_attr( wp_strip_all_tags( $attributes['buttonText'] ) ) );
+			$button_classes[] = 'has-icon';
 
 			$button_internal_markup =
 				'<svg class="search-icon" viewBox="0 0 24 24" width="24" height="24">
@@ -102,11 +105,10 @@ function render_block_core_search( $attributes ) {
 		}
 
 		// Include the button element class.
-		$button_classes .= ' ' . WP_Theme_JSON_GUTENBERG::__EXPERIMENTAL_ELEMENT_BUTTON_CLASS_NAME;
-
-		$button_markup = sprintf(
+		$button_classes[] = WP_Theme_JSON_Gutenberg::get_element_class_name( 'button' );
+		$button_markup    = sprintf(
 			'<button type="submit" class="wp-block-search__button %s" %s %s>%s</button>',
-			esc_attr( $button_classes ),
+			esc_attr( implode( ' ', $button_classes ) ),
 			$inline_styles['button'],
 			$aria_label,
 			$button_internal_markup

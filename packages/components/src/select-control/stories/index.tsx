@@ -34,9 +34,8 @@ export default meta;
 const SelectControlWithState: ComponentStory< typeof SelectControl > = (
 	args
 ) => {
-	const [ selection, setSelection ] = useState<
-		ComponentProps< typeof SelectControl >[ 'value' ]
-	>();
+	const [ selection, setSelection ] =
+		useState< ComponentProps< typeof SelectControl >[ 'value' ] >();
 
 	return (
 		<SelectControl

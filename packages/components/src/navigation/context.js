@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createContext, useContext } from '@wordpress/element';
@@ -12,6 +7,8 @@ import { createContext, useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { ROOT_MENU } from './constants';
+
+const noop = () => {};
 
 export const NavigationContext = createContext( {
 	activeItem: undefined,

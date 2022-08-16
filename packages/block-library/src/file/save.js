@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import {
 	RichText,
 	useBlockProps,
-	__experimentalElementButtonClassName,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -74,7 +74,7 @@ export default function save( { attributes } ) {
 						href={ href }
 						className={ classnames(
 							'wp-block-file__button',
-							__experimentalElementButtonClassName
+							__experimentalGetElementClassName( 'button' )
 						) }
 						download={ true }
 						aria-describedby={ describedById }

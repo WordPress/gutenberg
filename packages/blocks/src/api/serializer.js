@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
+import { isEmpty, reduce, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -142,7 +142,8 @@ export function getSaveElement(
 	let element = save( { attributes, innerBlocks } );
 
 	if (
-		isObject( element ) &&
+		element !== null &&
+		typeof element === 'object' &&
 		hasFilter( 'blocks.getSaveContent.extraProps' ) &&
 		! ( blockType.apiVersion > 1 )
 	) {
@@ -319,7 +320,7 @@ export function getCommentDelimitedContent(
 		: '';
 
 	// Strip core blocks of their namespace prefix.
-	const blockName = startsWith( rawBlockName, 'core/' )
+	const blockName = rawBlockName?.startsWith( 'core/' )
 		? rawBlockName.slice( 5 )
 		: rawBlockName;
 
@@ -340,8 +341,8 @@ export function getCommentDelimitedContent(
  * Returns the content of a block, including comment delimiters, determining
  * serialized attributes and content form from the current state of the block.
  *
- * @param {WPBlock}                      block   Block instance.
- * @param {WPBlockSerializationOptions}  options Serialization options.
+ * @param {WPBlock}                     block   Block instance.
+ * @param {WPBlockSerializationOptions} options Serialization options.
  *
  * @return {string} Serialized block.
  */
@@ -361,6 +362,10 @@ export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
 	}
 
 	const blockType = getBlockType( blockName );
+	if ( ! blockType ) {
+		return saveContent;
+	}
+
 	const saveAttributes = getCommentAttributes( blockType, block.attributes );
 	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
 }

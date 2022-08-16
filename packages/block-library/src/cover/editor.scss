@@ -69,19 +69,6 @@
 		right: 0;
 		bottom: 0;
 		left: 0;
-
-		// Style the placeholder illustration.
-		.components-placeholder__illustration {
-			position: absolute;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			stroke: currentColor;
-			stroke-dasharray: 3;
-			opacity: 0.4;
-		}
-
-		border: $border-width dashed currentColor;
 	}
 
 }

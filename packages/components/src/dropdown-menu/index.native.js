@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap, isEmpty, isFunction } from 'lodash';
 import { Platform } from 'react-native';
 /**
  * WordPress dependencies
@@ -34,6 +33,16 @@ function mergeProps( defaultProps = {}, props = {} ) {
 	return mergedProps;
 }
 
+/**
+ * Whether the argument is a function.
+ *
+ * @param {*} maybeFunc The argument to check.
+ * @return {boolean} True if the argument is a function, false otherwise.
+ */
+function isFunction( maybeFunc ) {
+	return typeof maybeFunc === 'function';
+}
+
 function DropdownMenu( {
 	children,
 	className,
@@ -43,13 +52,13 @@ function DropdownMenu( {
 	popoverProps,
 	toggleProps,
 } ) {
-	if ( isEmpty( controls ) && ! isFunction( children ) ) {
+	if ( ! controls?.length && ! isFunction( children ) ) {
 		return null;
 	}
 
 	// Normalize controls to nested array of objects (sets of controls)
 	let controlSets;
-	if ( ! isEmpty( controls ) ) {
+	if ( controls?.length ) {
 		controlSets = controls;
 		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
 			controlSets = [ controlSets ];
@@ -121,8 +130,7 @@ function DropdownMenu( {
 							title={ label }
 							style={ { paddingLeft: 0, paddingRight: 0 } }
 						>
-							{ flatMap(
-								controlSets,
+							{ controlSets?.flatMap(
 								( controlSet, indexOfSet ) =>
 									controlSet.map(
 										( control, indexOfControl ) => (

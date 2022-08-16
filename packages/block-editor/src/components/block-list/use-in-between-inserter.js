@@ -27,9 +27,8 @@ export function useInBetweenInserter() {
 		getSelectedBlockClientIds,
 		getTemplateLock,
 	} = useSelect( blockEditorStore );
-	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
-		blockEditorStore
-	);
+	const { showInsertionPoint, hideInsertionPoint } =
+		useDispatch( blockEditorStore );
 
 	return useRefEffect(
 		( node ) => {

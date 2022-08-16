@@ -246,10 +246,8 @@ describe( 'Embed block', () => {
 		it( 'sets a valid URL when dismissing edit URL modal', async () => {
 			const expectedURL = 'https://twitter.com/notnownikki';
 
-			const {
-				getByPlaceholderText,
-				getByTestId,
-			} = await insertEmbedBlock();
+			const { getByPlaceholderText, getByTestId } =
+				await insertEmbedBlock();
 
 			// Wait for edit URL modal to be visible.
 			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
@@ -336,11 +334,8 @@ describe( 'Embed block', () => {
 		it( 'sets a valid URL when dismissing edit URL modal', async () => {
 			const expectedURL = 'https://twitter.com/notnownikki';
 
-			const {
-				getByPlaceholderText,
-				getByTestId,
-				getByText,
-			} = await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
+			const { getByPlaceholderText, getByTestId, getByText } =
+				await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
 
 			// Edit URL.
 			fireEvent.press( getByText( 'ADD LINK' ) );
@@ -412,10 +407,8 @@ describe( 'Embed block', () => {
 
 	describe( 'edit URL', () => {
 		it( 'keeps the previous URL if no URL is set', async () => {
-			const {
-				getByA11yLabel,
-				getByTestId,
-			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+			const { getByA11yLabel, getByTestId } =
+				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press(
@@ -437,11 +430,8 @@ describe( 'Embed block', () => {
 			const initialURL = 'https://twitter.com/notnownikki';
 			const expectedURL = 'https://www.youtube.com/watch?v=lXMskKTw3Bc';
 
-			const {
-				getByA11yLabel,
-				getByDisplayValue,
-				getByTestId,
-			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+			const { getByA11yLabel, getByDisplayValue, getByTestId } =
+				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press(
@@ -673,10 +663,8 @@ describe( 'Embed block', () => {
 			'Full width',
 		].forEach( ( alignmentOption ) =>
 			it( `sets ${ alignmentOption } option`, async () => {
-				const {
-					getByA11yLabel,
-					getByText,
-				} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+				const { getByA11yLabel, getByText } =
+					await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 				// Open alignment options.
 				fireEvent.press(
@@ -743,10 +731,8 @@ describe( 'Embed block', () => {
 				);
 			} );
 
-			const {
-				getByA11yLabel,
-				getByText,
-			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+			const { getByA11yLabel, getByText } =
+				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Convert embed to link.
 			fireEvent.press( getByText( 'More options' ) );
@@ -955,11 +941,8 @@ describe( 'Embed block', () => {
 	describe( 'insert via slash inserter', () => {
 		it( 'insert generic embed block', async () => {
 			const embedBlockSlashInserter = '/Embed';
-			const {
-				getByPlaceholderText,
-				getByA11yLabel,
-				getByText,
-			} = await initializeEditor( { initialHtml: EMPTY_PARAGRAPH_HTML } );
+			const { getByPlaceholderText, getByA11yLabel, getByText } =
+				await initializeEditor( { initialHtml: EMPTY_PARAGRAPH_HTML } );
 
 			const paragraphText = getByPlaceholderText( 'Start writing…' );
 			fireEvent( paragraphText, 'focus' );
@@ -997,13 +980,10 @@ describe( 'Embed block', () => {
 		MOST_USED_PROVIDERS.forEach( ( { title } ) =>
 			it( `inserts ${ title } embed block`, async () => {
 				const embedBlockSlashInserter = `/${ title }`;
-				const {
-					getByPlaceholderText,
-					getByA11yLabel,
-					getByText,
-				} = await initializeEditor( {
-					initialHtml: EMPTY_PARAGRAPH_HTML,
-				} );
+				const { getByPlaceholderText, getByA11yLabel, getByText } =
+					await initializeEditor( {
+						initialHtml: EMPTY_PARAGRAPH_HTML,
+					} );
 
 				const paragraphText = getByPlaceholderText( 'Start writing…' );
 				fireEvent( paragraphText, 'focus' );
@@ -1043,10 +1023,8 @@ describe( 'Embed block', () => {
 	it( 'sets block caption', async () => {
 		const expectedCaption = 'Caption';
 
-		const {
-			getByPlaceholderText,
-			getByDisplayValue,
-		} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+		const { getByPlaceholderText, getByDisplayValue } =
+			await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 		// Set a caption.
 		const captionField = getByPlaceholderText( 'Add caption' );
@@ -1087,10 +1065,8 @@ describe( 'Embed block', () => {
 
 	describe( 'block settings', () => {
 		it( 'toggles resize for smaller devices media settings', async () => {
-			const {
-				getByA11yLabel,
-				getByText,
-			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+			const { getByA11yLabel, getByText } =
+				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press(
@@ -1106,10 +1082,8 @@ describe( 'Embed block', () => {
 		} );
 
 		it( 'does not show media settings panel if responsive is not supported', async () => {
-			const {
-				getByA11yLabel,
-				getByText,
-			} = await initializeWithEmbedBlock( WP_EMBED_HTML );
+			const { getByA11yLabel, getByText } =
+				await initializeWithEmbedBlock( WP_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press(

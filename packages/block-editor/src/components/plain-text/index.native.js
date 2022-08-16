@@ -99,12 +99,8 @@ export default class PlainText extends Component {
 	}
 
 	render() {
-		const {
-			style,
-			__experimentalVersion,
-			onFocus,
-			...otherProps
-		} = this.props;
+		const { style, __experimentalVersion, onFocus, ...otherProps } =
+			this.props;
 		const textStyles = [
 			style || styles[ 'block-editor-plain-text' ],
 			this.getFontSize(),

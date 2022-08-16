@@ -397,7 +397,8 @@ const deprecated = [
 			const blockquoteClasses =
 				textColor || customTextColor
 					? classnames( 'has-text-color', {
-							[ blockquoteTextColorClass ]: blockquoteTextColorClass,
+							[ blockquoteTextColorClass ]:
+								blockquoteTextColorClass,
 					  } )
 					: undefined;
 			const blockquoteStyle = blockquoteTextColorClass

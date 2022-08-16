@@ -1,17 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	last,
-	take,
-	clone,
-	uniq,
-	map,
-	difference,
-	each,
-	identity,
-	some,
-} from 'lodash';
+import { last, clone, uniq, map, some } from 'lodash';
 import classnames from 'classnames';
 import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
 
@@ -40,8 +30,13 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  */
 import Token from './token';
 import TokenInput from './token-input';
+import { TokensAndInputWrapperFlex } from './styles';
 import SuggestionsList from './suggestions-list';
 import type { FormTokenFieldProps, TokenItem } from './types';
+import { FlexItem } from '../flex';
+import { StyledLabel } from '../base-control/styles/base-control-styles';
+
+const identity = ( value: string ) => value;
 
 /**
  * A `FormTokenField` is a field similar to the tags and categories fields in the interim editor chrome,
@@ -78,9 +73,11 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			remove: __( 'Remove item' ),
 			__experimentalInvalid: __( 'Invalid item' ),
 		},
+		__experimentalRenderItem,
 		__experimentalExpandOnFocus = false,
 		__experimentalValidateInput = () => true,
 		__experimentalShowHowTo = true,
+		__next36pxDefaultSize = false,
 	} = props;
 
 	const instanceId = useInstanceId( FormTokenField );
@@ -90,12 +87,10 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	const [ inputOffsetFromEnd, setInputOffsetFromEnd ] = useState( 0 );
 	const [ isActive, setIsActive ] = useState( false );
 	const [ isExpanded, setIsExpanded ] = useState( false );
-	const [ selectedSuggestionIndex, setSelectedSuggestionIndex ] = useState(
-		-1
-	);
-	const [ selectedSuggestionScroll, setSelectedSuggestionScroll ] = useState(
-		false
-	);
+	const [ selectedSuggestionIndex, setSelectedSuggestionIndex ] =
+		useState( -1 );
+	const [ selectedSuggestionScroll, setSelectedSuggestionScroll ] =
+		useState( false );
 
 	const prevSuggestions = usePrevious< string[] >( suggestions );
 	const prevValue = usePrevious< ( string | TokenItem )[] >( value );
@@ -480,11 +475,13 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		} );
 
 		if ( match.length === 0 ) {
-			_suggestions = difference( _suggestions, normalizedValue );
+			_suggestions = _suggestions.filter(
+				( suggestion ) => ! normalizedValue.includes( suggestion )
+			);
 		} else {
 			match = match.toLocaleLowerCase();
 
-			each( _suggestions, ( suggestion ) => {
+			_suggestions.forEach( ( suggestion ) => {
 				const index = suggestion.toLocaleLowerCase().indexOf( match );
 				if ( normalizedValue.indexOf( suggestion ) === -1 ) {
 					if ( index === 0 ) {
@@ -498,7 +495,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			_suggestions = startsWithMatch.concat( containsMatch );
 		}
 
-		return take( _suggestions, _maxSuggestions );
+		return _suggestions.slice( 0, _maxSuggestions );
 	}
 
 	function getSelectedSuggestion() {
@@ -529,9 +526,8 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 
 	function updateSuggestions( resetSelectedSuggestion = true ) {
 		const inputHasMinimumChars = incompleteTokenValue.trim().length > 1;
-		const matchingSuggestions = getMatchingSuggestions(
-			incompleteTokenValue
-		);
+		const matchingSuggestions =
+			getMatchingSuggestions( incompleteTokenValue );
 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
 
 		setIsExpanded(
@@ -579,28 +575,35 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		const termsCount = tokens.length;
 
 		return (
-			<Token
-				key={ 'token-' + _value }
-				value={ _value }
-				status={ status }
-				title={ typeof token !== 'string' ? token.title : undefined }
-				displayTransform={ displayTransform }
-				onClickRemove={ onTokenClickRemove }
-				isBorderless={
-					( typeof token !== 'string' && token.isBorderless ) ||
-					isBorderless
-				}
-				onMouseEnter={
-					typeof token !== 'string' ? token.onMouseEnter : undefined
-				}
-				onMouseLeave={
-					typeof token !== 'string' ? token.onMouseLeave : undefined
-				}
-				disabled={ 'error' !== status && disabled }
-				messages={ messages }
-				termsCount={ termsCount }
-				termPosition={ termPosition }
-			/>
+			<FlexItem key={ 'token-' + _value }>
+				<Token
+					value={ _value }
+					status={ status }
+					title={
+						typeof token !== 'string' ? token.title : undefined
+					}
+					displayTransform={ displayTransform }
+					onClickRemove={ onTokenClickRemove }
+					isBorderless={
+						( typeof token !== 'string' && token.isBorderless ) ||
+						isBorderless
+					}
+					onMouseEnter={
+						typeof token !== 'string'
+							? token.onMouseEnter
+							: undefined
+					}
+					onMouseLeave={
+						typeof token !== 'string'
+							? token.onMouseLeave
+							: undefined
+					}
+					disabled={ 'error' !== status && disabled }
+					messages={ messages }
+					termsCount={ termsCount }
+					termPosition={ termPosition }
+				/>
+			</FlexItem>
 		);
 	}
 
@@ -660,12 +663,12 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div { ...tokenFieldProps }>
-			<label
+			<StyledLabel
 				htmlFor={ `components-form-token-input-${ instanceId }` }
 				className="components-form-token-field__label"
 			>
 				{ label }
-			</label>
+			</StyledLabel>
 			<div
 				ref={ tokensAndInput }
 				className={ classes }
@@ -673,7 +676,16 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 				onMouseDown={ onContainerTouched }
 				onTouchStart={ onContainerTouched }
 			>
-				{ renderTokensAndInput() }
+				<TokensAndInputWrapperFlex
+					justify="flex-start"
+					align="center"
+					gap={ 1 }
+					wrap={ true }
+					__next36pxDefaultSize={ __next36pxDefaultSize }
+					hasTokens={ !! value.length }
+				>
+					{ renderTokensAndInput() }
+				</TokensAndInputWrapperFlex>
 				{ isExpanded && (
 					<SuggestionsList
 						instanceId={ instanceId }
@@ -684,6 +696,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 						scrollIntoView={ selectedSuggestionScroll }
 						onHover={ onSuggestionHovered }
 						onSelect={ onSuggestionSelected }
+						__experimentalRenderItem={ __experimentalRenderItem }
 					/>
 				) }
 			</div>

@@ -55,11 +55,8 @@ describe( 'Text color', () => {
 	} );
 
 	it( 'allows toggling the highlight color feature to type new text', async () => {
-		const {
-			getByA11yLabel,
-			getByTestId,
-			getByA11yHint,
-		} = await initializeEditor();
+		const { getByA11yLabel, getByTestId, getByA11yHint } =
+			await initializeEditor();
 
 		// Wait for the editor placeholder
 		const paragraphPlaceholder = await waitFor( () =>

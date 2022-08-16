@@ -58,8 +58,7 @@ describe( 'actions', () => {
 		links: {
 			'wp:install-plugin': [
 				{
-					href:
-						'https://example.com/wp-json/wp/v2/plugins?slug=waves',
+					href: 'https://example.com/wp-json/wp/v2/plugins?slug=waves',
 				},
 			],
 		},

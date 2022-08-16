@@ -10,7 +10,7 @@ import namesPlugin from 'colord/plugins/names';
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useEffect, useRef } from '@wordpress/element';
-import { Spinner } from '@wordpress/components';
+import { Placeholder, Spinner } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import {
 	withColors,
@@ -24,7 +24,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isBlobURL } from '@wordpress/blob';
-import { SVG, Path } from '@wordpress/primitives';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -46,18 +45,6 @@ import CoverPlaceholder from './cover-placeholder';
 import ResizableCover from './resizable-cover';
 
 extend( [ namesPlugin ] );
-
-const placeholderIllustration = (
-	<SVG
-		className="components-placeholder__illustration"
-		fill="none"
-		xmlns="http://www.w3.org/2000/svg"
-		viewBox="0 0 60 60"
-		preserveAspectRatio="none"
-	>
-		<Path vectorEffect="non-scaling-stroke" d="M60 60 0 0" />
-	</SVG>
-);
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -133,9 +120,8 @@ function CoverEdit( {
 		? IMAGE_BACKGROUND_TYPE
 		: attributes.backgroundType;
 
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
 	const onSelectMedia = attributesFromMedia( setAttributes, dimRatio );
@@ -225,23 +211,45 @@ function CoverEdit( {
 		overlayColor,
 	};
 
+	const toggleUseFeaturedImage = () => {
+		setAttributes( {
+			id: undefined,
+			url: undefined,
+			useFeaturedImage: ! useFeaturedImage,
+			dimRatio: dimRatio === 100 ? 50 : dimRatio,
+			backgroundType: useFeaturedImage
+				? IMAGE_BACKGROUND_TYPE
+				: undefined,
+		} );
+	};
+
+	const blockControls = (
+		<CoverBlockControls
+			attributes={ attributes }
+			setAttributes={ setAttributes }
+			onSelectMedia={ onSelectMedia }
+			currentSettings={ currentSettings }
+			toggleUseFeaturedImage={ toggleUseFeaturedImage }
+		/>
+	);
+
+	const inspectorControls = (
+		<CoverInspectorControls
+			attributes={ attributes }
+			setAttributes={ setAttributes }
+			clientId={ clientId }
+			setOverlayColor={ setOverlayColor }
+			coverRef={ ref }
+			currentSettings={ currentSettings }
+			toggleUseFeaturedImage={ toggleUseFeaturedImage }
+		/>
+	);
+
 	if ( ! useFeaturedImage && ! hasInnerBlocks && ! hasBackground ) {
 		return (
 			<>
-				<CoverBlockControls
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					onSelectMedia={ onSelectMedia }
-					currentSettings={ currentSettings }
-				/>
-				<CoverInspectorControls
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					clientId={ clientId }
-					setOverlayColor={ setOverlayColor }
-					coverRef={ ref }
-					currentSettings={ currentSettings }
-				/>
+				{ blockControls }
+				{ inspectorControls }
 				<div
 					{ ...blockProps }
 					className={ classnames(
@@ -255,6 +263,7 @@ function CoverEdit( {
 						style={ {
 							minHeight: minHeightWithUnit || undefined,
 						} }
+						toggleUseFeaturedImage={ toggleUseFeaturedImage }
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
@@ -292,29 +301,16 @@ function CoverEdit( {
 			'is-transient': isUploadingMedia,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
-			'has-custom-content-position': ! isContentPositionCenter(
-				contentPosition
-			),
+			'has-custom-content-position':
+				! isContentPositionCenter( contentPosition ),
 		},
 		getPositionClassName( contentPosition )
 	);
 
 	return (
 		<>
-			<CoverBlockControls
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				onSelectMedia={ onSelectMedia }
-				currentSettings={ currentSettings }
-			/>
-			<CoverInspectorControls
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				clientId={ clientId }
-				setOverlayColor={ setOverlayColor }
-				coverRef={ ref }
-				currentSettings={ currentSettings }
-			/>
+			{ blockControls }
+			{ inspectorControls }
 			<div
 				{ ...blockProps }
 				className={ classnames( classes, blockProps.className ) }
@@ -360,9 +356,10 @@ function CoverEdit( {
 				) }
 
 				{ ! url && useFeaturedImage && (
-					<div className="wp-block-cover__image--placeholder-image">
-						{ placeholderIllustration }
-					</div>
+					<Placeholder
+						className="wp-block-cover__image--placeholder-image"
+						withIllustration={ true }
+					/>
 				) }
 
 				{ url &&
@@ -402,6 +399,7 @@ function CoverEdit( {
 					disableMediaButtons
 					onSelectMedia={ onSelectMedia }
 					onError={ onUploadError }
+					toggleUseFeaturedImage={ toggleUseFeaturedImage }
 				/>
 				<div { ...innerBlocksProps } />
 			</div>

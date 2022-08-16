@@ -36,7 +36,9 @@ describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		await page.click( childParagraphSelector );
 		await openGlobalBlockInserter();
 		await expect(
-			( await getAllBlockInserterItemTitles() ).length
+			(
+				await getAllBlockInserterItemTitles()
+			 ).length
 		).toBeGreaterThan( 20 );
 	} );
 

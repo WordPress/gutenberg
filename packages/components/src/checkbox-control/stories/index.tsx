@@ -53,9 +53,8 @@ const DefaultTemplate: ComponentStory< typeof CheckboxControl > = ( {
 	);
 };
 
-export const Default: ComponentStory<
-	typeof CheckboxControl
-> = DefaultTemplate.bind( {} );
+export const Default: ComponentStory< typeof CheckboxControl > =
+	DefaultTemplate.bind( {} );
 Default.args = {
 	label: 'Is author',
 	help: 'Is the user an author or not?',

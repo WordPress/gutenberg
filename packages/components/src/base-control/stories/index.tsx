@@ -35,9 +35,8 @@ const BaseControlWithTextarea: ComponentStory< typeof BaseControl > = ( {
 	);
 };
 
-export const Default: ComponentStory<
-	typeof BaseControl
-> = BaseControlWithTextarea.bind( {} );
+export const Default: ComponentStory< typeof BaseControl > =
+	BaseControlWithTextarea.bind( {} );
 Default.args = {
 	__nextHasNoMarginBottom: true,
 	id: 'textarea-default-1',
@@ -61,6 +60,7 @@ WithHelpText.args = {
 export const WithVisualLabel: ComponentStory< typeof BaseControl > = (
 	props
 ) => {
+	// @ts-expect-error - Unclear how to fix, see also https://github.com/WordPress/gutenberg/pull/39468#discussion_r827150516
 	BaseControl.VisualLabel.displayName = 'BaseControl.VisualLabel';
 
 	return (

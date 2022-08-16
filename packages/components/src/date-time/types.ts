@@ -76,6 +76,13 @@ export type DatePickerProps = {
 	 * dot on the day of the event.
 	 */
 	events?: DatePickerEvent[];
+
+	/**
+	 * The day that the week should start on. 0 for Sunday, 1 for Monday, etc.
+	 *
+	 * @default 0
+	 */
+	startOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
 };
 
 export type DateTimePickerProps = Omit< DatePickerProps, 'onChange' > &

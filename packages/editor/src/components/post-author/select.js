@@ -18,9 +18,8 @@ function PostAuthorSelect() {
 	const { editPost } = useDispatch( editorStore );
 	const { postAuthor, authors } = useSelect( ( select ) => {
 		return {
-			postAuthor: select( editorStore ).getEditedPostAttribute(
-				'author'
-			),
+			postAuthor:
+				select( editorStore ).getEditedPostAttribute( 'author' ),
 			authors: select( coreStore ).getUsers( AUTHORS_QUERY ),
 		};
 	}, [] );

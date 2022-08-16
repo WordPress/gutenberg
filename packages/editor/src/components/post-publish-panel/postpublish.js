@@ -163,11 +163,8 @@ class PostPublishPanelPostpublish extends Component {
 }
 
 export default withSelect( ( select ) => {
-	const {
-		getEditedPostAttribute,
-		getCurrentPost,
-		isCurrentPostScheduled,
-	} = select( editorStore );
+	const { getEditedPostAttribute, getCurrentPost, isCurrentPostScheduled } =
+		select( editorStore );
 	const { getPostType } = select( coreStore );
 
 	return {

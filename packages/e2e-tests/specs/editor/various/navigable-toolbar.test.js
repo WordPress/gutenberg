@@ -20,9 +20,8 @@ describe.each( [
 
 		await page.evaluate( ( _isUnifiedToolbar ) => {
 			const { select, dispatch } = wp.data;
-			const isCurrentlyUnified = select(
-				'core/edit-post'
-			).isFeatureActive( 'fixedToolbar' );
+			const isCurrentlyUnified =
+				select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' );
 			if ( isCurrentlyUnified !== _isUnifiedToolbar ) {
 				dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
 			}

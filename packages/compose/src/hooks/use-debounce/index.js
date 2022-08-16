@@ -27,11 +27,10 @@ import { useEffect } from '@wordpress/element';
  */
 export default function useDebounce( fn, wait, options ) {
 	/* eslint-enable jsdoc/valid-types */
-	const debounced = useMemoOne( () => debounce( fn, wait, options ), [
-		fn,
-		wait,
-		options,
-	] );
+	const debounced = useMemoOne(
+		() => debounce( fn, wait, options ),
+		[ fn, wait, options ]
+	);
 	useEffect( () => () => debounced.cancel(), [ debounced ] );
 	return debounced;
 }

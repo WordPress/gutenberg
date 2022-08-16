@@ -57,7 +57,8 @@ export const _default = () => {
 		size: select(
 			'Item 1: size',
 			{
-				'unset (defaults to the value set on the <ItemGroup> parent)': PROP_UNSET,
+				'unset (defaults to the value set on the <ItemGroup> parent)':
+					PROP_UNSET,
 				small: 'small',
 				medium: 'medium',
 				large: 'large',

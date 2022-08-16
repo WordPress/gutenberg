@@ -33,8 +33,7 @@ const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
  */
 export default withSelect( ( select ) => {
 	return {
-		selectedBlockClientId: select(
-			blockEditorStore
-		).getBlockSelectionStart(),
+		selectedBlockClientId:
+			select( blockEditorStore ).getBlockSelectionStart(),
 	};
 } )( SkipToSelectedBlock );

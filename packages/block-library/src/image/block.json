@@ -84,9 +84,20 @@
 			"background": false
 		},
 		"__experimentalBorder": {
+			"color": true,
 			"radius": true,
+			"width": true,
+			"__experimentalSelector": "img, .wp-block-image__crop-area",
+			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
-				"radius": true
+				"color": true,
+				"radius": true,
+				"width": true
+			}
+		},
+		"__experimentalStyle": {
+			"spacing": {
+				"margin": "0 0 1em 0"
 			}
 		}
 	},

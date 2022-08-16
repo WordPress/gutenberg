@@ -53,6 +53,16 @@
 	}
 }
 
+.block-editor-block-lock-modal__template-lock {
+	border-top: $border-width solid $gray-300;
+	margin-top: $grid-unit-20;
+	padding: $grid-unit-15 0;
+
+	.components-base-control__field {
+		margin: 0;
+	}
+}
+
 .block-editor-block-lock-modal__actions {
 	margin-top: $grid-unit-30;
 }

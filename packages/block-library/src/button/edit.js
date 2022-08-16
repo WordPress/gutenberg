@@ -25,7 +25,7 @@ import {
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	__experimentalLinkControl as LinkControl,
-	__experimentalElementButtonClassName,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
@@ -75,15 +75,8 @@ function ButtonEdit( props ) {
 		onReplace,
 		mergeBlocks,
 	} = props;
-	const {
-		linkTarget,
-		placeholder,
-		rel,
-		style,
-		text,
-		url,
-		width,
-	} = attributes;
+	const { linkTarget, placeholder, rel, style, text, url, width } =
+		attributes;
 	const onSetLinkRel = useCallback(
 		( value ) => {
 			setAttributes( { rel: value } );
@@ -157,7 +150,8 @@ function ButtonEdit( props ) {
 			<div
 				{ ...blockProps }
 				className={ classnames( blockProps.className, {
-					[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+					[ `has-custom-width wp-block-button__width-${ width }` ]:
+						width,
 					[ `has-custom-font-size` ]: blockProps.style.fontSize,
 				} ) }
 			>
@@ -178,7 +172,7 @@ function ButtonEdit( props ) {
 							// provided via block support.
 							'no-border-radius': style?.border?.radius === 0,
 						},
-						__experimentalElementButtonClassName
+						__experimentalGetElementClassName( 'button' )
 					) }
 					style={ {
 						...borderProps.style,
@@ -227,6 +221,7 @@ function ButtonEdit( props ) {
 					anchorRef={ ref?.current }
 					focusOnMount={ isEditingURL ? 'firstElement' : false }
 					__unstableSlotName={ '__unstable-block-tools-after' }
+					__unstableShift
 				>
 					<LinkControl
 						className="wp-block-navigation-link__inline-link-input"

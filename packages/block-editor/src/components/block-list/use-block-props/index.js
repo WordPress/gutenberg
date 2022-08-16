@@ -62,9 +62,12 @@ export function useBlockProps(
 	props = {},
 	{ __unstableIsHtml, __unstableIsDisabled = false } = {}
 ) {
-	const { clientId, className, wrapperProps = {}, isAligned } = useContext(
-		BlockListBlockContext
-	);
+	const {
+		clientId,
+		className,
+		wrapperProps = {},
+		isAligned,
+	} = useContext( BlockListBlockContext );
 	const {
 		index,
 		mode,

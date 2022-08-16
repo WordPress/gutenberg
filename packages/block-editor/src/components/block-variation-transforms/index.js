@@ -99,12 +99,10 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const { activeBlockVariation, variations } = useSelect(
 		( select ) => {
-			const { getActiveBlockVariation, getBlockVariations } = select(
-				blocksStore
-			);
-			const { getBlockName, getBlockAttributes } = select(
-				blockEditorStore
-			);
+			const { getActiveBlockVariation, getBlockVariations } =
+				select( blocksStore );
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
 			const name = blockClientId && getBlockName( blockClientId );
 			return {
 				activeBlockVariation: getActiveBlockVariation(

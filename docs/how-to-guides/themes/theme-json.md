@@ -25,6 +25,7 @@ WordPress 5.8 comes with [a new mechanism](https://make.wordpress.org/core/2021/
     - The naming schema of CSS Custom Properties
     - Why using -- as a separator?
     - How settings under "custom" create new CSS Custom Properties
+    - Why does it take so long to update the styles in the browser?
 
 ## Rationale
 
@@ -148,6 +149,7 @@ This specification is the same for the three different origins that use this for
 ```
 
 ### Version
+
 This field describes the format of the `theme.json` file. The current version is [v2](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/), [introduced in WordPress 5.9](https://make.wordpress.org/core/2022/01/08/updates-for-settings-styles-and-theme-json/). It also works with the current Gutenberg plugin.
 
 If you have used [v1](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-v1/) previously, you don’t need to update the version in the v1 file to v2, as it’ll be [migrated](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-migrations/) into v2 at runtime for you.
@@ -473,6 +475,7 @@ body {
 .wp-block-group.has-white-border-color { border-color: #444 !important; }
 
 ```
+
 {% end %}
 
 To maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. If the `theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
@@ -774,7 +777,10 @@ Each block declares which style properties it exposes via the [block supports me
 			"h3": {},
 			"h4": {},
 			"h5": {},
-			"h6": {}
+			"h6": {},
+			"heading": {},
+			"button": {},
+			"caption": {}
 		},
 		"blocks": {
 			"core/group": {
@@ -876,17 +882,48 @@ p { /* The core/paragraph opts out from the default behaviour and uses p as a se
 
 {% end %}
 
+#### Referencing a style
+
+A block can be styled using a reference to a root level style. This feature is supported by Gutenberg.
+If you register a background color for the root using styles.color.background:
+
+```JSON
+"styles": {
+		"color": {
+			"background": "var(--wp--preset--color--primary)"
+		}
+	}
+```
+
+You can use `ref: "styles.color.background"`  to re-use the style for a block:
+
+```JSON
+{
+	"color": {
+		"text": { ref: "styles.color.background" }
+	}
+}
+```
+
 #### Element styles
 
-In addition to top-level and block-level styles, there's the concept of elements that can used in both places. There's a closed set of them:
+In addition to top-level and block-level styles, there's the concept of elements that can be used in both places. There's a closed set of them:
 
-- `link`: maps to the `a` CSS selector.
+Supported by Gutenberg:
+
+- `button`: maps to the `wp-element-button` CSS class. Also maps to `wp-block-button__link` for backwards compatibility.
+- `caption`: maps to the `.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption` CSS classes.
+- `heading`: maps to all headings, the `h1 to h6` CSS selectors.
+
+Supported by WordPress:
+
 - `h1`: maps to the `h1` CSS selector.
 - `h2`: maps to the `h2` CSS selector.
 - `h3`: maps to the `h3` CSS selector.
 - `h4`: maps to the `h4` CSS selector.
 - `h5`: maps to the `h5` CSS selector.
 - `h6`: maps to the `h6` CSS selector.
+- `link`: maps to the `a` CSS selector.
 
 If they're found in the top-level the element selector will be used. If they're found within a block, the selector to be used will be the element's appended to the corresponding block.
 
@@ -962,11 +999,28 @@ h3 {
 
 {% end %}
 
+##### Element pseudo selectors
+
+Pseudo selectors `:hover`, `:focus`, `:visited` are supported by Gutenberg.
+
+```json
+"elements": {
+		"link": {
+			"color": {
+				"text": "green"
+			},
+			":hover": {
+				"color": {
+					"text": "hotpink"
+				}
+			}
+		}
+	}
+```
+
 ### customTemplates
 
-<div class="callout callout-alert">
-This field is only allowed when the Gutenberg plugin is active. In WordPress 5.8 will be ignored.
-</div>
+<div class="callout callout-alert">Supported in WordPress from version 5.9.</div>
 
 Within this field themes can list the custom templates present in the `templates` folder. For example, for a custom template named `my-custom-template.html`, the `theme.json` can declare what post types can use it and what's the title to show the user:
 
@@ -993,9 +1047,7 @@ Within this field themes can list the custom templates present in the `templates
 
 ### templateParts
 
-<div class="callout callout-alert">
-This field is only allowed when the Gutenberg plugin is active. In WordPress 5.8 will be ignored.
-</div>
+<div class="callout callout-alert">Supported in WordPress from version 5.9.</div>
 
 Within this field themes can list the template parts present in the `parts` folder. For example, for a template part named `my-template-part.html`, the `theme.json` can declare the area term for the template part entity which is responsible for rendering the corresponding block variation (Header block, Footer block, etc.) in the editor. Defining this area term in the json will allow the setting to persist across all uses of that template part entity, as opposed to a block attribute that would only affect one block. Defining area as a block attribute is not recommended as this is only used 'behind the scenes' to aid in bridging the gap between placeholder flows and entity creation.
 
@@ -1020,15 +1072,13 @@ Currently block variations exist for "header" and "footer" values of the area te
 
 ### patterns
 
-<div class="callout callout-alert">
-This field requires the Gutenberg plugin active and using the [version 2](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/) of `theme.json`.
-</div>
+<div class="callout callout-alert">Supported in WordPress from version 6.0 using [version 2](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/) of `theme.json`.</div>
 
 Within this field themes can list patterns to register from [Pattern Directory](https://wordpress.org/patterns/). The `patterns` field is an array of pattern `slugs` from the Pattern Directory. Pattern slugs can be extracted by the `url` in single pattern view at the Pattern Directory. For example in this url `https://wordpress.org/patterns/pattern/partner-logos` the slug is `partner-logos`.
 
 ```json
 {
-    "version": 2,
+	"version": 2,
 	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
 }
 ```
@@ -1146,7 +1196,7 @@ body {
 
 /* CSS classes for the preset values */
 .has-<PRESET_SLUG>-<PRESET_TYPE> { ... }
-.has-pale-pink-color { color: var(--wp--preset--color--pale-pink) !important; } 
+.has-pale-pink-color { color: var(--wp--preset--color--pale-pink) !important; }
 .has-large-font-size { font-size: var(--wp--preset--font-size--large) !important; }
 ```
 
@@ -1178,12 +1228,7 @@ As a result of this change, it’s now the block author and theme author’s res
 
 ### What is blockGap and how can I use it?
 
-blockGap adjusts the vertical margin, or gap, between blocks.
-It is also used for margins between inner blocks in columns, buttons, and social icons.
-In the editor, the control for the blockGap is called Block spacing, located in the Dimensions panel.
-
-The value you define for the blockGap style uses a CSS property, a preset, named `--wp--style--block-gap`.
-The default value is 2em.
+For blocks that contain inner blocks, such as Group, Columns, Buttons, and Social Icons, `blockGap` controls the spacing between inner blocks. Depending on the layout of the block, the `blockGap` value will be output as either a vertical margin or a `gap` value. In the editor, the control for the `blockGap` value is called _Block spacing_, located in the Dimensions panel.
 
 ```json
 {
@@ -1200,3 +1245,15 @@ The default value is 2em.
 	}
 }
 ```
+
+The setting for `blockGap` is either a boolean or `null` value and is `null` by default. This allows an extra level of control over style output. The `settings.spacing.blockGap` setting in a `theme.json` file accepts the following values:
+
+- `true`: Opt into displaying _Block spacing_ controls in the editor UI and output `blockGap` styles.
+- `false`: Opt out of displaying _Block spacing_ controls in the editor UI, with `blockGap` styles stored in `theme.json` still being rendered. This allows themes to use `blockGap` values without allowing users to make changes within the editor.
+- `null` (default): Opt out of displaying _Block spacing_ controls, _and_ prevent the output of `blockGap` styles.
+
+The value defined for the root `styles.spacing.blockGap` style is also output as a CSS property, named `--wp--style--block-gap`.
+
+### Why does it take so long to update the styles in the browser?
+
+When you are actively developing with theme.json you may notice it takes 30+ seconds for your changes to show up in the browser, this is because `theme.json` is cached. To remove this caching issue, set either [`WP_DEBUG`](https://wordpress.org/support/article/debugging-in-wordpress/#wp_debug) or [`SCRIPT_DEBUG`](https://wordpress.org/support/article/debugging-in-wordpress/#script_debug) to 'true' in your [`wp-config.php`](https://wordpress.org/support/article/editing-wp-config-php/). This tells WordPress to skip the cache and always use fresh data.

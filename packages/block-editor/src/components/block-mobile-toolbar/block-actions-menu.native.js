@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Platform, findNodeHandle } from 'react-native';
-import { partial, first, castArray, last, compact, every } from 'lodash';
+import { partial, first, castArray, last, every } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -202,7 +202,7 @@ const BlockActionsMenu = ( {
 		},
 	};
 
-	const options = compact( [
+	const options = [
 		wrapBlockMover && allOptions.backwardButton,
 		wrapBlockMover && allOptions.forwardButton,
 		wrapBlockSettings && allOptions.settings,
@@ -215,7 +215,7 @@ const BlockActionsMenu = ( {
 		canDuplicate && allOptions.duplicateButton,
 		isReusableBlockType && allOptions.convertToRegularBlocks,
 		! isLocked && allOptions.delete,
-	] );
+	].filter( Boolean );
 
 	// End early if there are no options to show.
 	if ( ! options.length ) {
@@ -386,14 +386,12 @@ export default compose(
 				clearSelectedBlock,
 			} = dispatch( blockEditorStore );
 			const { openGeneralSidebar } = dispatch( 'core/edit-post' );
-			const { getBlockSelectionEnd, getBlock } = select(
-				blockEditorStore
-			);
+			const { getBlockSelectionEnd, getBlock } =
+				select( blockEditorStore );
 			const { createSuccessNotice } = dispatch( noticesStore );
 
-			const {
-				__experimentalConvertBlockToStatic: convertBlockToStatic,
-			} = dispatch( reusableBlocksStore );
+			const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
+				dispatch( reusableBlocksStore );
 
 			return {
 				createSuccessNotice,

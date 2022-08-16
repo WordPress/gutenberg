@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import classNames from 'classnames';
 import type { ForwardedRef } from 'react';
 
@@ -17,7 +16,10 @@ import { useState, forwardRef } from '@wordpress/element';
 import InputBase from './input-base';
 import InputField from './input-field';
 import type { InputControlProps } from './types';
+import { space } from '../ui/utils/space';
 import { useDraft } from './utils';
+
+const noop = () => {};
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( InputControl );
@@ -28,6 +30,7 @@ function useUniqueId( idProp?: string ) {
 
 export function UnforwardedInputControl(
 	{
+		__next36pxDefaultSize,
 		__unstableStateReducer: stateReducer = ( state ) => state,
 		__unstableInputWidth,
 		className,
@@ -61,6 +64,7 @@ export function UnforwardedInputControl(
 
 	return (
 		<InputBase
+			__next36pxDefaultSize={ __next36pxDefaultSize }
 			__unstableInputWidth={ __unstableInputWidth }
 			className={ classes }
 			disabled={ disabled }
@@ -77,6 +81,7 @@ export function UnforwardedInputControl(
 		>
 			<InputField
 				{ ...props }
+				__next36pxDefaultSize={ __next36pxDefaultSize }
 				className="components-input-control__input"
 				disabled={ disabled }
 				id={ id }
@@ -84,6 +89,8 @@ export function UnforwardedInputControl(
 				isPressEnterToChange={ isPressEnterToChange }
 				onKeyDown={ onKeyDown }
 				onValidate={ onValidate }
+				paddingInlineStart={ prefix ? space( 2 ) : undefined }
+				paddingInlineEnd={ suffix ? space( 2 ) : undefined }
 				ref={ ref }
 				setIsFocused={ setIsFocused }
 				size={ size }

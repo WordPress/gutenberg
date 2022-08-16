@@ -112,13 +112,8 @@ const deprecated = [
 		migrate: ( attributes ) =>
 			migrateCustomColors( migrateTextAlign( attributes ) ),
 		save( { attributes } ) {
-			const {
-				align,
-				content,
-				customTextColor,
-				level,
-				textColor,
-			} = attributes;
+			const { align, content, customTextColor, level, textColor } =
+				attributes;
 			const tagName = 'h' + level;
 
 			const textClass = getColorClassName( 'color', textColor );
@@ -154,13 +149,8 @@ const deprecated = [
 		migrate: ( attributes ) =>
 			migrateCustomColors( migrateTextAlign( attributes ) ),
 		save( { attributes } ) {
-			const {
-				align,
-				content,
-				customTextColor,
-				level,
-				textColor,
-			} = attributes;
+			const { align, content, customTextColor, level, textColor } =
+				attributes;
 			const tagName = 'h' + level;
 
 			const textClass = getColorClassName( 'color', textColor );
@@ -197,13 +187,8 @@ const deprecated = [
 		migrate: ( attributes ) =>
 			migrateCustomColors( migrateTextAlign( attributes ) ),
 		save( { attributes } ) {
-			const {
-				align,
-				level,
-				content,
-				textColor,
-				customTextColor,
-			} = attributes;
+			const { align, level, content, textColor, customTextColor } =
+				attributes;
 			const tagName = 'h' + level;
 
 			const textClass = getColorClassName( 'color', textColor );

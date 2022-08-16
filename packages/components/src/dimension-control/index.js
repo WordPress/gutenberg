@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -35,7 +34,7 @@ export function DimensionControl( props ) {
 
 		if ( ! theSize || value === theSize.slug ) {
 			onChange( undefined );
-		} else if ( isFunction( onChange ) ) {
+		} else if ( typeof onChange === 'function' ) {
 			onChange( theSize.slug );
 		}
 	};

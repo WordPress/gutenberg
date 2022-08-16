@@ -18,11 +18,21 @@ import {
 	ToggleGroupControlOptionIcon,
 } from '../index';
 import { View } from '../../view';
+import { HStack } from '../../h-stack';
 import Button from '../../button';
 
 export default {
 	component: ToggleGroupControl,
 	title: 'Components (Experimental)/ToggleGroupControl',
+	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
+	argTypes: {
+		__experimentalIsIconGroup: { control: { type: 'boolean' } },
+		__nextHasNoMarginBottom: { control: 'boolean' },
+		size: {
+			control: 'radio',
+			options: [ 'default', '__unstable-large' ],
+		},
+	},
 	parameters: {
 		knobs: { disable: false },
 	},
@@ -33,7 +43,7 @@ const KNOBS_GROUPS = {
 	ToggleGroupControlOption: 'ToggleGroupControlOption',
 };
 
-const _default = ( { options } ) => {
+const _default = ( { options, ...props } ) => {
 	const [ value, setValue ] = useState( options[ 0 ].value );
 	const label = text(
 		`${ KNOBS_GROUPS.ToggleGroupControl }: label`,
@@ -87,6 +97,7 @@ const _default = ( { options } ) => {
 	return (
 		<View>
 			<ToggleGroupControl
+				{ ...props }
 				onChange={ setValue }
 				value={ value }
 				label={ label }
@@ -109,6 +120,7 @@ Default.args = {
 		{ value: 'right', label: 'Right' },
 		{ value: 'justify', label: 'Justify' },
 	],
+	size: 'default',
 };
 
 export const WithTooltip = _default.bind( {} );
@@ -130,10 +142,15 @@ WithAriaLabel.args = {
 	],
 };
 
-export const WithIcons = () => {
+/**
+ * The `<ToggleGroupControlOptionIcon>` component can be used for icon options.
+ * In this case, the `__experimentalIsIconGroup` style is preferred.
+ */
+export const WithIcons = ( props ) => {
 	const [ state, setState ] = useState();
 	return (
 		<ToggleGroupControl
+			{ ...props }
 			onChange={ setState }
 			value={ state }
 			label={ 'With icons' }
@@ -142,20 +159,22 @@ export const WithIcons = () => {
 			<ToggleGroupControlOptionIcon
 				value="uppercase"
 				icon={ formatUppercase }
-				showTooltip={ true }
-				aria-label="Uppercase"
+				label="Uppercase"
 			/>
 			<ToggleGroupControlOptionIcon
 				value="lowercase"
 				icon={ formatLowercase }
-				showTooltip={ true }
-				aria-label="Lowercase"
+				label="Lowercase"
 			/>
 		</ToggleGroupControl>
 	);
 };
+WithIcons.args = {
+	...Default.args,
+	__experimentalIsIconGroup: true,
+};
 
-export const WithReset = () => {
+export const WithReset = ( props ) => {
 	const [ alignState, setAlignState ] = useState();
 	const aligns = [ 'Left', 'Center', 'Right' ];
 	const alignOptions = aligns.map( ( key, index ) => (
@@ -170,8 +189,9 @@ export const WithReset = () => {
 		/>
 	) );
 	return (
-		<View>
+		<HStack alignment="center" justify="flex-start">
 			<ToggleGroupControl
+				{ ...props }
 				onChange={ setAlignState }
 				value={ alignState }
 				label={ 'Toggle Group Control' }
@@ -182,6 +202,10 @@ export const WithReset = () => {
 			<Button onClick={ () => setAlignState( undefined ) } isTertiary>
 				Reset
 			</Button>
-		</View>
+		</HStack>
 	);
+};
+WithReset.args = {
+	...Default.args,
+	__nextHasNoMarginBottom: true,
 };

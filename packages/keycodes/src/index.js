@@ -12,7 +12,8 @@
 /**
  * External dependencies
  */
-import { get, mapValues, includes, capitalize, xor } from 'lodash';
+import { capitalCase } from 'change-case';
+import { get, mapValues, includes, xor } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -144,6 +145,8 @@ export const SHIFT = 'shift';
  */
 export const ZERO = 48;
 
+export { isAppleOS };
+
 /**
  * Object that contains functions that return the available modifier
  * depending on platform.
@@ -230,7 +233,13 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 			/** @type {string[]} */ ( [] )
 		);
 
-		const capitalizedCharacter = capitalize( character );
+		// Symbols (`,.) are removed by the default regular expression,
+		// so override the rule to allow symbols used for shortcuts.
+		// see: https://github.com/blakeembrey/change-case#options
+		const capitalizedCharacter = capitalCase( character, {
+			stripRegexp: /[^A-Z0-9`,\.]/gi,
+		} );
+
 		return [ ...modifierKeys, capitalizedCharacter ];
 	};
 } );
@@ -292,7 +301,7 @@ export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
 		};
 
 		return [ ...modifier( _isApple ), character ]
-			.map( ( key ) => capitalize( get( replacementKeyMap, key, key ) ) )
+			.map( ( key ) => capitalCase( get( replacementKeyMap, key, key ) ) )
 			.join( isApple ? ' ' : ' + ' );
 	};
 } );
@@ -314,7 +323,9 @@ function getEventModifiers( event ) {
 	] ).filter(
 		( key ) =>
 			event[
-				/** @type {'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey'} */ ( `${ key }Key` )
+				/** @type {'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey'} */ (
+					`${ key }Key`
+				)
 			]
 	);
 }

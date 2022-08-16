@@ -17,9 +17,8 @@ export default function useBlockControlsFill( group, shareWithChildBlocks ) {
 	const { clientId } = useBlockEditContext();
 	const isParentDisplayed = useSelect(
 		( select ) => {
-			const { getBlockName, hasSelectedInnerBlock } = select(
-				blockEditorStore
-			);
+			const { getBlockName, hasSelectedInnerBlock } =
+				select( blockEditorStore );
 			const { hasBlockSupport } = select( blocksStore );
 			return (
 				shareWithChildBlocks &&

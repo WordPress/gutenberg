@@ -71,11 +71,8 @@ const DEFAULT_IOS_LONG_PRESS_MIN_DURATION =
 const BlockDraggableWrapper = ( { children, isRTL } ) => {
 	const [ draggedBlockIcon, setDraggedBlockIcon ] = useState();
 
-	const {
-		selectBlock,
-		startDraggingBlocks,
-		stopDraggingBlocks,
-	} = useDispatch( blockEditorStore );
+	const { selectBlock, startDraggingBlocks, stopDraggingBlocks } =
+		useDispatch( blockEditorStore );
 
 	const { scrollRef } = useBlockListContext();
 	const animatedScrollRef = useAnimatedRef();
@@ -112,12 +109,8 @@ const BlockDraggableWrapper = ( { children, isRTL } ) => {
 		draggingScrollHandler( event );
 	};
 
-	const {
-		onBlockDragOver,
-		onBlockDragEnd,
-		onBlockDrop,
-		targetBlockIndex,
-	} = useBlockDropZone();
+	const { onBlockDragOver, onBlockDragEnd, onBlockDrop, targetBlockIndex } =
+		useBlockDropZone();
 
 	// Stop dragging blocks if the block draggable is unmounted.
 	useEffect( () => {
@@ -316,9 +309,8 @@ const BlockDraggable = ( {
 } ) => {
 	const wasBeingDragged = useRef( false );
 	const [ isEditingText, setIsEditingText ] = useState( false );
-	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
-		false
-	);
+	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] =
+		useState( false );
 
 	const draggingAnimation = {
 		opacity: useSharedValue( 1 ),

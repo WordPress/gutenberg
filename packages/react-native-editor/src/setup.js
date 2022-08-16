@@ -60,7 +60,7 @@ const setupInitHooks = () => {
 	addAction( 'native.pre-render', 'core/react-native-editor', ( props ) => {
 		const capabilities = props.capabilities ?? {};
 		const blocksFlags = {
-			__experimentalEnableQuoteBlockV2: props?.quoteBlockV2,
+			__experimentalEnableListBlockV2: props?.listBlockV2,
 		};
 
 		registerBlocks( blocksFlags );
@@ -85,6 +85,7 @@ const setupInitHooks = () => {
 				initialData,
 				initialTitle,
 				postType,
+				hostAppNamespace,
 				featuredImageId,
 				rawStyles,
 				rawFeatures,
@@ -107,6 +108,7 @@ const setupInitHooks = () => {
 				initialHtmlModeEnabled: props.initialHtmlModeEnabled,
 				initialTitle,
 				postType,
+				hostAppNamespace,
 				featuredImageId,
 				capabilities,
 				rawStyles,

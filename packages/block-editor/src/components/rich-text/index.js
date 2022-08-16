@@ -38,6 +38,7 @@ import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
 import { useMarkPersistent } from './use-mark-persistent';
 import { usePasteHandler } from './use-paste-handler';
+import { useBeforeInputRules } from './use-before-input-rules';
 import { useInputRules } from './use-input-rules';
 import { useEnter } from './use-enter';
 import { useFormatTypes } from './use-format-types';
@@ -122,9 +123,8 @@ function RichTextWrapper(
 	const anchorRef = useRef();
 	const { clientId } = useBlockEditContext();
 	const selector = ( select ) => {
-		const { getSelectionStart, getSelectionEnd } = select(
-			blockEditorStore
-		);
+		const { getSelectionStart, getSelectionEnd } =
+			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
 
@@ -241,7 +241,11 @@ function RichTextWrapper(
 		);
 	}
 
-	const { value, onChange, ref: richTextRef } = useRichText( {
+	const {
+		value,
+		onChange,
+		ref: richTextRef,
+	} = useRichText( {
 		value: adjustedValue,
 		onChange( html, { __unstableFormats, __unstableText } ) {
 			adjustedOnChange( html );
@@ -341,6 +345,7 @@ function RichTextWrapper(
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
 					anchorRef={ anchorRef }
+					value={ value }
 				/>
 			) }
 			<TagName
@@ -355,6 +360,7 @@ function RichTextWrapper(
 					autocompleteProps.ref,
 					props.ref,
 					richTextRef,
+					useBeforeInputRules( { value, onChange } ),
 					useInputRules( {
 						value,
 						onChange,

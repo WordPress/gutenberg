@@ -48,9 +48,10 @@ export function ShortcodeEdit( props ) {
 		shortcodeContainerStyle.paddingLeft +
 		shortcodeContainerStyle.paddingRight;
 
-	const onChange = useCallback( ( text ) => setAttributes( { text } ), [
-		setAttributes,
-	] );
+	const onChange = useCallback(
+		( text ) => setAttributes( { text } ),
+		[ setAttributes ]
+	);
 
 	return (
 		<View>

@@ -33,11 +33,8 @@ export function useToolsPanelHeader(
 		return cx( styles.ToolsPanelHeading );
 	}, [ cx ] );
 
-	const {
-		menuItems,
-		hasMenuItems,
-		areAllOptionalControlsHidden,
-	} = useToolsPanelContext();
+	const { menuItems, hasMenuItems, areAllOptionalControlsHidden } =
+		useToolsPanelContext();
 
 	return {
 		...otherProps,

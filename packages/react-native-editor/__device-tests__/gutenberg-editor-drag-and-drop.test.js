@@ -32,9 +32,8 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 		const spacerBlock = await editorPage.getBlockAtPosition(
 			blockNames.spacer
 		);
-		const paragraphBlock = await editorPage.getParagraphBlockWrapperAtPosition(
-			2
-		);
+		const paragraphBlock =
+			await editorPage.getParagraphBlockWrapperAtPosition( 2 );
 
 		// Drag & drop the Spacer block after the Paragraph block
 		await dragAndDropAfterElement(
@@ -45,9 +44,8 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 
 		// Get the first block, in this case the Paragraph block
 		// and check the text value is the expected one
-		const firstBlockText = await editorPage.getTextForParagraphBlockAtPosition(
-			1
-		);
+		const firstBlockText =
+			await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( firstBlockText ).toMatch( testData.shortText );
 
 		// Remove the blocks
@@ -61,9 +59,8 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 		async () => {
 			// Add a Paragraph block
 			await editorPage.addNewBlock( blockNames.paragraph );
-			const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
-				blockNames.paragraph
-			);
+			const paragraphBlockElement =
+				await editorPage.getTextBlockAtPosition( blockNames.paragraph );
 
 			// Set clipboard text
 			await setClipboard( editorPage.driver, testData.shortText );
@@ -79,9 +76,8 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 				editorPage.driver,
 				paragraphBlockElement
 			);
-			const paragraphText = await editorPage.getTextForParagraphBlockAtPosition(
-				1
-			);
+			const paragraphText =
+				await editorPage.getTextForParagraphBlockAtPosition( 1 );
 
 			// Expect to have the pasted text in the Paragraph block
 			expect( paragraphText ).toMatch( testData.shortText );
@@ -96,9 +92,10 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 		async () => {
 			// Add a Shortcode block
 			await editorPage.addNewBlock( blockNames.shortcode );
-			const shortcodeBlockElement = await editorPage.getShortBlockTextInputAtPosition(
-				blockNames.shortcode
-			);
+			const shortcodeBlockElement =
+				await editorPage.getShortBlockTextInputAtPosition(
+					blockNames.shortcode
+				);
 
 			// Set clipboard text
 			await setClipboard( editorPage.driver, testData.shortText );
@@ -134,12 +131,10 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 		);
 
 		// Get elements for both blocks
-		const firstParagraphBlock = await editorPage.getParagraphBlockWrapperAtPosition(
-			1
-		);
-		const secondParagraphBlock = await editorPage.getParagraphBlockWrapperAtPosition(
-			2
-		);
+		const firstParagraphBlock =
+			await editorPage.getParagraphBlockWrapperAtPosition( 1 );
+		const secondParagraphBlock =
+			await editorPage.getParagraphBlockWrapperAtPosition( 2 );
 
 		// Tap on the first Paragraph block outside of the textinput
 		await clickElementOutsideOfTextInput(
@@ -155,9 +150,8 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 		);
 
 		// Get the current second Paragraph block in the editor after dragging & dropping
-		const secondBlockText = await editorPage.getTextForParagraphBlockAtPosition(
-			2
-		);
+		const secondBlockText =
+			await editorPage.getTextForParagraphBlockAtPosition( 2 );
 
 		// Expect the second Paragraph block to have the expected content
 		expect( secondBlockText ).toMatch( testData.shortText );

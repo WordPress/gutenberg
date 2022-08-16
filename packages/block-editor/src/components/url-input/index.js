@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { debounce, isFunction } from 'lodash';
+import { debounce } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
 
@@ -26,6 +26,16 @@ import { isURL } from '@wordpress/url';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+
+/**
+ * Whether the argument is a function.
+ *
+ * @param {*} maybeFunc The argument to check.
+ * @return {boolean} True if the argument is a function, false otherwise.
+ */
+function isFunction( maybeFunc ) {
+	return typeof maybeFunc === 'function';
+}
 
 class URLInput extends Component {
 	constructor( props ) {
@@ -60,10 +70,8 @@ class URLInput extends Component {
 
 	componentDidUpdate( prevProps ) {
 		const { showSuggestions, selectedSuggestion } = this.state;
-		const {
-			value,
-			__experimentalShowInitialSuggestions = false,
-		} = this.props;
+		const { value, __experimentalShowInitialSuggestions = false } =
+			this.props;
 
 		// Only have to worry about scrolling selected suggestion into view
 		// when already expanded.
@@ -122,10 +130,8 @@ class URLInput extends Component {
 
 	shouldShowInitialSuggestions() {
 		const { suggestions } = this.state;
-		const {
-			__experimentalShowInitialSuggestions = false,
-			value,
-		} = this.props;
+		const { __experimentalShowInitialSuggestions = false, value } =
+			this.props;
 		return (
 			! this.isUpdatingSuggestions &&
 			__experimentalShowInitialSuggestions &&
@@ -257,12 +263,8 @@ class URLInput extends Component {
 	}
 
 	onKeyDown( event ) {
-		const {
-			showSuggestions,
-			selectedSuggestion,
-			suggestions,
-			loading,
-		} = this.state;
+		const { showSuggestions, selectedSuggestion, suggestions, loading } =
+			this.state;
 
 		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
 		// We shouldn't preventDefault to allow block arrow keys navigation.
@@ -315,9 +317,8 @@ class URLInput extends Component {
 			return;
 		}
 
-		const suggestion = this.state.suggestions[
-			this.state.selectedSuggestion
-		];
+		const suggestion =
+			this.state.suggestions[ this.state.selectedSuggestion ];
 
 		switch ( event.keyCode ) {
 			case UP: {
@@ -590,8 +591,8 @@ export default compose(
 		}
 		const { getSettings } = select( blockEditorStore );
 		return {
-			__experimentalFetchLinkSuggestions: getSettings()
-				.__experimentalFetchLinkSuggestions,
+			__experimentalFetchLinkSuggestions:
+				getSettings().__experimentalFetchLinkSuggestions,
 		};
 	} )
 )( URLInput );

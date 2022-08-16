@@ -33,8 +33,8 @@ export class Admin {
 		this.pageUtils = pageUtils;
 	}
 
-	createNewPost = createNewPost;
-	getPageError = getPageError;
-	visitAdminPage = visitAdminPage;
-	visitSiteEditor = visitSiteEditor;
+	createNewPost = createNewPost.bind( this );
+	getPageError = getPageError.bind( this );
+	visitAdminPage = visitAdminPage.bind( this );
+	visitSiteEditor = visitSiteEditor.bind( this );
 }

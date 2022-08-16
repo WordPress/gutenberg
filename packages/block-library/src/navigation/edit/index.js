@@ -17,7 +17,8 @@ import {
 	InspectorControls,
 	BlockControls,
 	useBlockProps,
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	__experimentalRecursionProvider as RecursionProvider,
+	__experimentalUseHasRecursion as useHasRecursion,
 	store as blockEditorStore,
 	withColors,
 	PanelColorSettings,
@@ -28,7 +29,7 @@ import {
 } from '@wordpress/block-editor';
 import { EntityProvider } from '@wordpress/core-data';
 
-import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
+import { useDispatch, useRegistry } from '@wordpress/data';
 import {
 	PanelBody,
 	ToggleControl,
@@ -60,40 +61,9 @@ import useConvertClassicToBlockMenu, {
 	CLASSIC_MENU_CONVERSION_PENDING,
 	CLASSIC_MENU_CONVERSION_SUCCESS,
 } from './use-convert-classic-menu-to-block-menu';
-import useCreateNavigationMenu, {
-	CREATE_NAVIGATION_MENU_ERROR,
-	CREATE_NAVIGATION_MENU_PENDING,
-	CREATE_NAVIGATION_MENU_SUCCESS,
-} from './use-create-navigation-menu';
-
-const EMPTY_ARRAY = [];
-
-function getComputedStyle( node ) {
-	return node.ownerDocument.defaultView.getComputedStyle( node );
-}
-
-function detectColors( colorsDetectionElement, setColor, setBackground ) {
-	if ( ! colorsDetectionElement ) {
-		return;
-	}
-	setColor( getComputedStyle( colorsDetectionElement ).color );
-
-	let backgroundColorNode = colorsDetectionElement;
-	let backgroundColor = getComputedStyle( backgroundColorNode )
-		.backgroundColor;
-	while (
-		backgroundColor === 'rgba(0, 0, 0, 0)' &&
-		backgroundColorNode.parentNode &&
-		backgroundColorNode.parentNode.nodeType ===
-			backgroundColorNode.parentNode.ELEMENT_NODE
-	) {
-		backgroundColorNode = backgroundColorNode.parentNode;
-		backgroundColor = getComputedStyle( backgroundColorNode )
-			.backgroundColor;
-	}
-
-	setBackground( backgroundColor );
-}
+import useCreateNavigationMenu from './use-create-navigation-menu';
+import { useInnerBlocks } from './use-inner-blocks';
+import { detectColors } from './utils';
 
 function Navigation( {
 	attributes,
@@ -135,23 +105,28 @@ function Navigation( {
 		setAttributes( { ref: postId } );
 	};
 
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		`navigationMenu/${ ref }`
-	);
+	const recursionId = `navigationMenu/${ ref }`;
+	const hasAlreadyRendered = useHasRecursion( recursionId );
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
 	useNavigationEntities();
 
-	const [ showNavigationMenuDeleteNotice ] = useNavigationNotice( {
-		name: 'block-library/core/navigation/delete',
-	} );
+	const [ showNavigationMenuStatusNotice, hideNavigationMenuStatusNotice ] =
+		useNavigationNotice( {
+			name: 'block-library/core/navigation/status',
+		} );
+
+	const [ showClassicMenuConversionNotice, hideClassicMenuConversionNotice ] =
+		useNavigationNotice( {
+			name: 'block-library/core/navigation/classic-menu-conversion',
+		} );
 
 	const [
-		showNavigationMenuCreateNotice,
-		hideNavigationMenuCreateNotice,
+		showNavigationMenuPermissionsNotice,
+		hideNavigationMenuPermissionsNotice,
 	] = useNavigationNotice( {
-		name: 'block-library/core/navigation/create',
+		name: 'block-library/core/navigation/permissions/update',
 	} );
 
 	const {
@@ -159,29 +134,29 @@ function Navigation( {
 		status: createNavigationMenuStatus,
 		error: createNavigationMenuError,
 		value: createNavigationMenuPost,
+		isPending: isCreatingNavigationMenu,
+		isSuccess: createNavigationMenuIsSuccess,
+		isError: createNavigationMenuIsError,
 	} = useCreateNavigationMenu( clientId );
 
-	const isCreatingNavigationMenu =
-		createNavigationMenuStatus === CREATE_NAVIGATION_MENU_PENDING;
-
 	useEffect( () => {
-		hideNavigationMenuCreateNotice();
+		hideNavigationMenuStatusNotice();
 
-		if ( createNavigationMenuStatus === CREATE_NAVIGATION_MENU_PENDING ) {
+		if ( isCreatingNavigationMenu ) {
 			speak( __( `Creating Navigation Menu.` ) );
 		}
 
-		if ( createNavigationMenuStatus === CREATE_NAVIGATION_MENU_SUCCESS ) {
+		if ( createNavigationMenuIsSuccess ) {
 			setRef( createNavigationMenuPost.id );
 			selectBlock( clientId );
 
-			showNavigationMenuCreateNotice(
+			showNavigationMenuStatusNotice(
 				__( `Navigation Menu successfully created.` )
 			);
 		}
 
-		if ( createNavigationMenuStatus === CREATE_NAVIGATION_MENU_ERROR ) {
-			showNavigationMenuCreateNotice(
+		if ( createNavigationMenuIsError ) {
+			showNavigationMenuStatusNotice(
 				__( 'Failed to create Navigation Menu.' )
 			);
 		}
@@ -196,51 +171,24 @@ function Navigation( {
 		hasUncontrolledInnerBlocks,
 		uncontrolledInnerBlocks,
 		isInnerBlockSelected,
-		hasSubmenus,
-	} = useSelect(
-		( select ) => {
-			const { getBlock, getBlocks, hasSelectedInnerBlock } = select(
-				blockEditorStore
-			);
+		innerBlocks,
+	} = useInnerBlocks( clientId );
 
-			// This relies on the fact that `getBlock` won't return controlled
-			// inner blocks, while `getBlocks` does. It might be more stable to
-			// introduce a selector like `getUncontrolledInnerBlocks`, just in
-			// case `getBlock` is fixed.
-			const _uncontrolledInnerBlocks = getBlock( clientId ).innerBlocks;
-			const _hasUncontrolledInnerBlocks = !! _uncontrolledInnerBlocks?.length;
-			const _controlledInnerBlocks = _hasUncontrolledInnerBlocks
-				? EMPTY_ARRAY
-				: getBlocks( clientId );
-			const innerBlocks = _hasUncontrolledInnerBlocks
-				? _uncontrolledInnerBlocks
-				: _controlledInnerBlocks;
-
-			return {
-				hasSubmenus: !! innerBlocks.find(
-					( block ) => block.name === 'core/navigation-submenu'
-				),
-				hasUncontrolledInnerBlocks: _hasUncontrolledInnerBlocks,
-				uncontrolledInnerBlocks: _uncontrolledInnerBlocks,
-				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
-			};
-		},
-		[ clientId ]
+	const hasSubmenus = !! innerBlocks.find(
+		( block ) => block.name === 'core/navigation-submenu'
 	);
+
 	const {
 		replaceInnerBlocks,
 		selectBlock,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
-	const [
-		hasSavedUnsavedInnerBlocks,
-		setHasSavedUnsavedInnerBlocks,
-	] = useState( false );
+	const [ hasSavedUnsavedInnerBlocks, setHasSavedUnsavedInnerBlocks ] =
+		useState( false );
 
-	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
-		false
-	);
+	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] =
+		useState( false );
 
 	const [ overlayMenuPreview, setOverlayMenuPreview ] = useState( false );
 
@@ -258,6 +206,9 @@ function Navigation( {
 		isResolvingCanUserCreateNavigationMenu,
 		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
+
+	const navMenuResolvedButMissing =
+		hasResolvedNavigationMenus && isNavigationMenuMissing;
 
 	// Attempt to retrieve and prioritize any existing navigation menu unless
 	// a specific ref is allocated or the user is explicitly creating a new menu. The aim is
@@ -280,10 +231,9 @@ function Navigation( {
 	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
 
 	const {
-		convert,
+		convert: convertClassicMenu,
 		status: classicMenuConversionStatus,
 		error: classicMenuConversionError,
-		value: classicMenuConversionResult,
 	} = useConvertClassicToBlockMenu( clientId );
 
 	const isConvertingClassicMenu =
@@ -335,10 +285,8 @@ function Navigation( {
 				'no-wrap': flexWrap === 'nowrap',
 				'is-responsive': 'never' !== overlayMenu,
 				'has-text-color': !! textColor.color || !! textColor?.class,
-				[ getColorClassName(
-					'color',
-					textColor?.slug
-				) ]: !! textColor?.slug,
+				[ getColorClassName( 'color', textColor?.slug ) ]:
+					!! textColor?.slug,
 				'has-background':
 					!! backgroundColor.color || backgroundColor.class,
 				[ getColorClassName(
@@ -357,29 +305,6 @@ function Navigation( {
 		{ __unstableIsDisabled: hasBlockOverlay }
 	);
 
-	const overlayClassnames = classnames( {
-		'has-text-color':
-			!! overlayTextColor.color || !! overlayTextColor?.class,
-		[ getColorClassName(
-			'color',
-			overlayTextColor?.slug
-		) ]: !! overlayTextColor?.slug,
-		'has-background':
-			!! overlayBackgroundColor.color || overlayBackgroundColor?.class,
-		[ getColorClassName(
-			'background-color',
-			overlayBackgroundColor?.slug
-		) ]: !! overlayBackgroundColor?.slug,
-	} );
-
-	const overlayStyles = {
-		color: ! overlayTextColor?.slug && overlayTextColor?.color,
-		backgroundColor:
-			! overlayBackgroundColor?.slug &&
-			overlayBackgroundColor?.color &&
-			overlayBackgroundColor.color,
-	};
-
 	// Turn on contrast checker for web only since it's not supported on mobile yet.
 	const enableContrastChecking = Platform.OS === 'web';
 
@@ -391,41 +316,29 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
-	const [
-		showClassicMenuConversionErrorNotice,
-		hideClassicMenuConversionErrorNotice,
-	] = useNavigationNotice( {
-		name: 'block-library/core/navigation/classic-menu-conversion/error',
-	} );
-
-	function handleUpdateMenu( menuId ) {
+	const handleUpdateMenu = ( menuId ) => {
 		setRef( menuId );
 		selectBlock( clientId );
-	}
+	};
 
 	useEffect( () => {
+		hideClassicMenuConversionNotice();
 		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING ) {
 			speak( __( 'Classic menu importing.' ) );
 		}
 
-		if (
-			classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_SUCCESS &&
-			classicMenuConversionResult
-		) {
-			handleUpdateMenu( classicMenuConversionResult?.id );
-			hideClassicMenuConversionErrorNotice();
-			speak( __( 'Classic menu imported successfully.' ) );
+		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_SUCCESS ) {
+			showClassicMenuConversionNotice(
+				__( 'Classic menu imported successfully.' )
+			);
 		}
 
 		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_ERROR ) {
-			showClassicMenuConversionErrorNotice( classicMenuConversionError );
-			speak( __( 'Classic menu import failed.' ) );
+			showClassicMenuConversionNotice(
+				__( 'Classic menu import failed.' )
+			);
 		}
-	}, [
-		classicMenuConversionStatus,
-		classicMenuConversionResult,
-		classicMenuConversionError,
-	] );
+	}, [ classicMenuConversionStatus, classicMenuConversionError ] );
 
 	// Spacer block needs orientation from context. This is a patch until
 	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.
@@ -457,34 +370,23 @@ function Navigation( {
 		}
 	} );
 
-	const [ showCantEditNotice, hideCantEditNotice ] = useNavigationNotice( {
-		name: 'block-library/core/navigation/permissions/update',
-		message: __(
-			'You do not have permission to edit this Menu. Any changes made will not be saved.'
-		),
-	} );
-
-	const [ showCantCreateNotice, hideCantCreateNotice ] = useNavigationNotice(
-		{
-			name: 'block-library/core/navigation/permissions/create',
-			message: __(
-				'You do not have permission to create Navigation Menus.'
-			),
-		}
-	);
-
 	useEffect( () => {
 		if ( ! isSelected && ! isInnerBlockSelected ) {
-			hideCantEditNotice();
-			hideCantCreateNotice();
+			hideNavigationMenuPermissionsNotice();
 		}
 
 		if ( isSelected || isInnerBlockSelected ) {
 			if (
+				ref &&
+				! navMenuResolvedButMissing &&
 				hasResolvedCanUserUpdateNavigationMenu &&
 				! canUserUpdateNavigationMenu
 			) {
-				showCantEditNotice();
+				showNavigationMenuPermissionsNotice(
+					__(
+						'You do not have permission to edit this Menu. Any changes made will not be saved.'
+					)
+				);
 			}
 
 			if (
@@ -492,7 +394,11 @@ function Navigation( {
 				hasResolvedCanUserCreateNavigationMenu &&
 				! canUserCreateNavigationMenu
 			) {
-				showCantCreateNotice();
+				showNavigationMenuPermissionsNotice(
+					__(
+						'You do not have permission to create Navigation Menus.'
+					)
+				);
 			}
 		}
 	}, [
@@ -506,29 +412,8 @@ function Navigation( {
 	] );
 
 	const navigationSelectorRef = useRef();
-	const [
-		shouldFocusNavigationSelector,
-		setShouldFocusNavigationSelector,
-	] = useState( false );
-	const handleSelectNavigation = useCallback(
-		( navPostOrClassicMenu ) => {
-			if ( ! navPostOrClassicMenu ) {
-				return;
-			}
-
-			const isClassicMenu = navPostOrClassicMenu.hasOwnProperty(
-				'auto_add'
-			);
-
-			if ( isClassicMenu ) {
-				convert( navPostOrClassicMenu.id, navPostOrClassicMenu.name );
-			} else {
-				handleUpdateMenu( navPostOrClassicMenu.id );
-			}
-			setShouldFocusNavigationSelector( true );
-		},
-		[ convert, handleUpdateMenu ]
-	);
+	const [ shouldFocusNavigationSelector, setShouldFocusNavigationSelector ] =
+		useState( false );
 
 	// Focus support after menu selection.
 	useEffect( () => {
@@ -713,8 +598,8 @@ function Navigation( {
 					isOpen={ isResponsiveMenuOpen }
 					isResponsive={ 'never' !== overlayMenu }
 					isHiddenByDefault={ 'always' === overlayMenu }
-					classNames={ overlayClassnames }
-					styles={ overlayStyles }
+					overlayBackgroundColor={ overlayBackgroundColor }
+					overlayTextColor={ overlayTextColor }
 				>
 					<UnsavedInnerBlocks
 						blockProps={ blockProps }
@@ -731,7 +616,7 @@ function Navigation( {
 							// Switch to using the wp_navigation entity.
 							setRef( post.id );
 
-							showNavigationMenuCreateNotice(
+							showNavigationMenuStatusNotice(
 								__( `New Navigation Menu created.` )
 							);
 						} }
@@ -783,7 +668,20 @@ function Navigation( {
 					isResolvingCanUserCreateNavigationMenu={
 						isResolvingCanUserCreateNavigationMenu
 					}
-					onFinish={ handleSelectNavigation }
+					onSelectNavigationMenu={ ( menuId ) => {
+						handleUpdateMenu( menuId );
+						setShouldFocusNavigationSelector( true );
+					} }
+					onSelectClassicMenu={ async ( classicMenu ) => {
+						const navMenu = await convertClassicMenu(
+							classicMenu.id,
+							classicMenu.name
+						);
+						if ( navMenu ) {
+							handleUpdateMenu( navMenu.id );
+							setShouldFocusNavigationSelector( true );
+						}
+					} }
 					onCreateEmpty={ () => createNavigationMenu( '', [] ) }
 				/>
 			</TagName>
@@ -792,7 +690,7 @@ function Navigation( {
 
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
-			<RecursionProvider>
+			<RecursionProvider uniqueId={ recursionId }>
 				<BlockControls>
 					{ ! isDraftNavigationMenu && isEntityAvailable && (
 						<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
@@ -800,7 +698,22 @@ function Navigation( {
 								ref={ navigationSelectorRef }
 								currentMenuId={ ref }
 								clientId={ clientId }
-								onSelect={ handleSelectNavigation }
+								onSelectNavigationMenu={ ( menuId ) => {
+									handleUpdateMenu( menuId );
+									setShouldFocusNavigationSelector( true );
+								} }
+								onSelectClassicMenu={ async ( classicMenu ) => {
+									const navMenu = await convertClassicMenu(
+										classicMenu.id,
+										classicMenu.name
+									);
+									if ( navMenu ) {
+										handleUpdateMenu( navMenu.id );
+										setShouldFocusNavigationSelector(
+											true
+										);
+									}
+								} }
 								onCreateNew={ resetToEmptyBlock }
 								/* translators: %s: The name of a menu. */
 								actionLabel={ __( "Switch to '%s'" ) }
@@ -821,7 +734,7 @@ function Navigation( {
 								<NavigationMenuDeleteControl
 									onDelete={ ( deletedMenuTitle = '' ) => {
 										resetToEmptyBlock();
-										showNavigationMenuDeleteNotice(
+										showNavigationMenuStatusNotice(
 											sprintf(
 												// translators: %s: the name of a menu (e.g. Header navigation).
 												__(
@@ -852,8 +765,8 @@ function Navigation( {
 							isOpen={ isResponsiveMenuOpen }
 							isResponsive={ isResponsive }
 							isHiddenByDefault={ 'always' === overlayMenu }
-							classNames={ overlayClassnames }
-							styles={ overlayStyles }
+							overlayBackgroundColor={ overlayBackgroundColor }
+							overlayTextColor={ overlayTextColor }
 						>
 							{ isEntityAvailable && (
 								<NavigationInnerBlocks

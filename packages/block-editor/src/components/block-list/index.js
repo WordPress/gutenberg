@@ -36,9 +36,8 @@ function Root( { className, ...settings } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { isOutlineMode, isFocusMode, isNavigationMode } = useSelect(
 		( select ) => {
-			const { getSettings, isNavigationMode: _isNavigationMode } = select(
-				blockEditorStore
-			);
+			const { getSettings, isNavigationMode: _isNavigationMode } =
+				select( blockEditorStore );
 			const { outlineMode, focusMode } = getSettings();
 			return {
 				isOutlineMode: outlineMode,

@@ -13,6 +13,7 @@ import type {
 } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
+import type { DefaultContextOf } from './index';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
@@ -148,6 +149,5 @@ declare module './base-entity-records' {
 	}
 }
 
-export type Post< C extends Context > = OmitNevers<
-	_BaseEntityRecords.Post< C >
->;
+export type Post< C extends Context = DefaultContextOf< 'postType', 'post' > > =
+	OmitNevers< _BaseEntityRecords.Post< C > >;

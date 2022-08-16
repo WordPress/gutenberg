@@ -2,12 +2,13 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
-import { noop } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import { DotTip } from '..';
+
+const noop = () => {};
 
 describe( 'DotTip', () => {
 	it( 'should not render anything if invisible', () => {

@@ -18,6 +18,7 @@ import {
 	getSaveContent,
 	isUnmodifiedDefaultBlock,
 	serializeRawBlock,
+	switchToBlockType,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import {
@@ -56,10 +57,10 @@ function mergeWrapperProps( propsA, propsB ) {
 		...propsB,
 	};
 
-	if ( propsA && propsB && propsA.className && propsB.className ) {
+	if ( propsA?.className && propsB?.className ) {
 		newProps.className = classnames( propsA.className, propsB.className );
 	}
-	if ( propsA && propsB && propsA.style && propsB.style ) {
+	if ( propsA?.style && propsB?.style ) {
 		newProps.style = { ...propsA.style, ...propsB.style };
 	}
 
@@ -269,10 +270,10 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
 		setAttributes( newAttributes ) {
-			const { getMultiSelectedBlockClientIds } = select(
-				blockEditorStore
-			);
-			const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
+			const { getMultiSelectedBlockClientIds } =
+				select( blockEditorStore );
+			const multiSelectedBlockClientIds =
+				getMultiSelectedBlockClientIds();
 			const { clientId } = ownProps;
 			const clientIds = multiSelectedBlockClientIds.length
 				? multiSelectedBlockClientIds
@@ -291,10 +292,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
 		onMerge( forward ) {
-			const { clientId } = ownProps;
-			const { getPreviousBlockClientId, getNextBlockClientId } = select(
-				blockEditorStore
-			);
+			const { clientId, rootClientId } = ownProps;
+			const { getPreviousBlockClientId, getNextBlockClientId, getBlock } =
+				select( blockEditorStore );
 
 			if ( forward ) {
 				const nextBlockClientId = getNextBlockClientId( clientId );
@@ -302,11 +302,20 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 					mergeBlocks( clientId, nextBlockClientId );
 				}
 			} else {
-				const previousBlockClientId = getPreviousBlockClientId(
-					clientId
-				);
+				const previousBlockClientId =
+					getPreviousBlockClientId( clientId );
 				if ( previousBlockClientId ) {
 					mergeBlocks( previousBlockClientId, clientId );
+				} else if ( rootClientId ) {
+					// Attempt to "unwrap" the block contents when there's no
+					// preceding block to merge with.
+					const replacement = switchToBlockType(
+						getBlock( rootClientId ),
+						'*'
+					);
+					if ( replacement && replacement.length ) {
+						replaceBlocks( rootClientId, replacement, 0 );
+					}
 				}
 			}
 		},

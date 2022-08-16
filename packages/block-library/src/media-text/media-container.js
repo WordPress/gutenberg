@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -30,13 +29,16 @@ import icon from './media-container-icon';
  * Constants
  */
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
+const noop = () => {};
 
 export function imageFillStyles( url, focalPoint ) {
 	return url
 		? {
 				backgroundImage: `url(${ url })`,
 				backgroundPosition: focalPoint
-					? `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`
+					? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round(
+							focalPoint.y * 100
+					  ) }%`
 					: `50% 50%`,
 		  }
 		: {};

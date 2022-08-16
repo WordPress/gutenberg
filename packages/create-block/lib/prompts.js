@@ -8,7 +8,7 @@ const slug = {
 	type: 'input',
 	name: 'slug',
 	message:
-		'The block slug used for identification (also the plugin and output folder name):',
+		'The block slug used for identification (also the output folder name):',
 	validate( input ) {
 		if ( ! /^[a-z][a-z0-9\-]*$/.test( input ) ) {
 			return 'Invalid block slug specified. Block slug can contain only lowercase alphanumeric characters or dashes, and start with a letter.';
@@ -88,7 +88,8 @@ const version = {
 	message: 'The current version number of the plugin:',
 	validate( input ) {
 		// Regular expression was copied from https://semver.org.
-		const validSemVerPattern = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
+		const validSemVerPattern =
+			/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
 		if ( ! validSemVerPattern.test( input ) ) {
 			return 'Invalid Semantic Version provided. Visit https://regex101.com/r/vkijKf/1/ to discover all valid patterns.';
 		}

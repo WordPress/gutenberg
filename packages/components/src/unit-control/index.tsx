@@ -160,15 +160,13 @@ function UnforwardedUnitControl(
 			refParsedQuantity.current = undefined;
 			return;
 		}
-		const [
-			validParsedQuantity,
-			validParsedUnit,
-		] = getValidParsedQuantityAndUnit(
-			event.currentTarget.value,
-			units,
-			parsedQuantity,
-			unit
-		);
+		const [ validParsedQuantity, validParsedUnit ] =
+			getValidParsedQuantityAndUnit(
+				event.currentTarget.value,
+				units,
+				parsedQuantity,
+				unit
+			);
 
 		refParsedQuantity.current = validParsedQuantity;
 

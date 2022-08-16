@@ -28,9 +28,10 @@ export const SidebarInspectorFill = InspectorFill;
 export function SidebarComplementaryAreaFills() {
 	const { sidebar, isEditorSidebarOpened, hasBlockSelection } = useSelect(
 		( select ) => {
-			const _sidebar = select(
-				interfaceStore
-			).getActiveComplementaryArea( STORE_NAME );
+			const _sidebar =
+				select( interfaceStore ).getActiveComplementaryArea(
+					STORE_NAME
+				);
 			const _isEditorSidebarOpened = [
 				SIDEBAR_BLOCK,
 				SIDEBAR_TEMPLATE,
@@ -38,9 +39,8 @@ export function SidebarComplementaryAreaFills() {
 			return {
 				sidebar: _sidebar,
 				isEditorSidebarOpened: _isEditorSidebarOpened,
-				hasBlockSelection: !! select(
-					blockEditorStore
-				).getBlockSelectionStart(),
+				hasBlockSelection:
+					!! select( blockEditorStore ).getBlockSelectionStart(),
 			};
 		},
 		[]

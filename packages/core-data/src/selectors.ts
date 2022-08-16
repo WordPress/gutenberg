@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { set, map, find, get, filter, compact } from 'lodash';
+import { set, map, find, get, filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -116,9 +116,12 @@ const EMPTY_OBJECT = {};
  * @return Whether a request is in progress for an embed preview.
  */
 export const isRequestingEmbedPreview = createRegistrySelector(
-	( select ) => ( state: State, url: string ): boolean => {
-		return select( STORE_NAME ).isResolving( 'getEmbedPreview', [ url ] );
-	}
+	( select ) =>
+		( state: State, url: string ): boolean => {
+			return select( STORE_NAME ).isResolving( 'getEmbedPreview', [
+				url,
+			] );
+		}
 );
 
 /**
@@ -293,7 +296,8 @@ interface GetEntityRecord {
  * @param  kind  Entity kind.
  * @param  name  Entity name.
  * @param  key   Record's key
- * @param  query Optional query.
+ * @param  query Optional query. If requesting specific
+ *               fields, fields must always include the ID.
  *
  * @return Record.
  */
@@ -523,7 +527,8 @@ interface GetEntityRecords {
  * @param  state State tree
  * @param  kind  Entity kind.
  * @param  name  Entity name.
- * @param  query Optional terms query.
+ * @param  query Optional terms query. If requesting specific
+ *               fields, fields must always include the ID.
  *
  * @return Records.
  */
@@ -569,14 +574,16 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 		const {
 			entities: { records },
 		} = state;
-		const dirtyRecords = [];
+		const dirtyRecords: DirtyEntityRecord[] = [];
 		( Object.keys( records ) as Kind[] ).forEach(
 			< K extends Kind >( kind: K ) => {
 				( Object.keys( records[ kind ] ) as Name[] ).forEach(
 					< N extends Name >( name: N ) => {
-						const primaryKeys = ( Object.keys(
-							records[ kind ][ name ].edits
-						) as KeyOf< K, N >[] ).filter(
+						const primaryKeys = (
+							Object.keys(
+								records[ kind ][ name ].edits
+							) as KeyOf< K, N >[]
+						 ).filter(
 							( primaryKey ) =>
 								// The entity record must exist (not be deleted),
 								// and it must have edits.
@@ -610,11 +617,9 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 								dirtyRecords.push( {
 									// We avoid using primaryKey because it's transformed into a string
 									// when it's used as an object key.
-									key:
-										entityRecord[
-											entityConfig.key ||
-												DEFAULT_ENTITY_KEY
-										],
+									key: entityRecord[
+										entityConfig.key || DEFAULT_ENTITY_KEY
+									],
 									title:
 										entityConfig?.getTitle?.(
 											entityRecord
@@ -646,14 +651,16 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 		const {
 			entities: { records },
 		} = state;
-		const recordsBeingSaved = [];
+		const recordsBeingSaved: DirtyEntityRecord[] = [];
 		( Object.keys( records ) as Kind[] ).forEach(
 			< K extends Kind >( kind: K ) => {
 				( Object.keys( records[ kind ] ) as Name[] ).forEach(
 					< N extends Name >( name: N ) => {
-						const primaryKeys = ( Object.keys(
-							records[ kind ][ name ].saving
-						) as KeyOf< K, N >[] ).filter( ( primaryKey ) =>
+						const primaryKeys = (
+							Object.keys(
+								records[ kind ][ name ].saving
+							) as KeyOf< K, N >[]
+						 ).filter( ( primaryKey ) =>
 							isSavingEntityRecord(
 								state,
 								kind,
@@ -678,11 +685,9 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 								recordsBeingSaved.push( {
 									// We avoid using primaryKey because it's transformed into a string
 									// when it's used as an object key.
-									key:
-										entityRecord[
-											entityConfig.key ||
-												DEFAULT_ENTITY_KEY
-										],
+									key: entityRecord[
+										entityConfig.key || DEFAULT_ENTITY_KEY
+									],
 									title:
 										entityConfig?.getTitle?.(
 											entityRecord
@@ -1112,7 +1117,7 @@ export function canUser(
 	resource: string,
 	id?: GenericRecordKey
 ): boolean | undefined {
-	const key = compact( [ action, resource, id ] ).join( '/' );
+	const key = [ action, resource, id ].filter( Boolean ).join( '/' );
 	return get( state, [ 'userPermissions', key ] );
 }
 
@@ -1200,16 +1205,17 @@ export function getAutosave(
  * @return True if the REST request was completed. False otherwise.
  */
 export const hasFetchedAutosaves = createRegistrySelector(
-	( select ) => (
-		state: State,
-		postType: string,
-		postId: GenericRecordKey
-	): boolean => {
-		return select( STORE_NAME ).hasFinishedResolution( 'getAutosaves', [
-			postType,
-			postId,
-		] );
-	}
+	( select ) =>
+		(
+			state: State,
+			postType: string,
+			postId: GenericRecordKey
+		): boolean => {
+			return select( STORE_NAME ).hasFinishedResolution( 'getAutosaves', [
+				postType,
+				postId,
+			] );
+		}
 );
 
 /**

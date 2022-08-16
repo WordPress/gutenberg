@@ -46,8 +46,7 @@ ruleTester.run( 'no-unsafe-wp-apis', rule, {
 			options,
 		},
 		{
-			code:
-				"import { feature, __experimentalSafe } from '@wordpress/package';",
+			code: "import { feature, __experimentalSafe } from '@wordpress/package';",
 			options,
 		},
 		{
@@ -81,8 +80,7 @@ See https://developer.wordpress.org/block-editor/contributors/develop/coding-gui
 			],
 		},
 		{
-			code:
-				"import { feature, __experimentalSafe } from '@wordpress/unsafe';",
+			code: "import { feature, __experimentalSafe } from '@wordpress/unsafe';",
 			options,
 			errors: [
 				{
@@ -93,8 +91,7 @@ See https://developer.wordpress.org/block-editor/contributors/develop/coding-gui
 			],
 		},
 		{
-			code:
-				"import s, { __experimentalUnsafe } from '@wordpress/package';",
+			code: "import s, { __experimentalUnsafe } from '@wordpress/package';",
 			options,
 			errors: [
 				{

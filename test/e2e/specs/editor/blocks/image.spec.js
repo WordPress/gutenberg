@@ -415,8 +415,11 @@ test.describe( 'Image', () => {
 		).toBeHidden();
 
 		// Assert that the image is edited.
+		await expect
+			.poll( async () => imageBlockUtils.getDataURL( image ) )
+			.not.toBe( initialImageDataURL );
+
 		const updatedImageDataURL = await imageBlockUtils.getDataURL( image );
-		expect( initialImageDataURL ).not.toEqual( updatedImageDataURL );
 
 		expect(
 			snapshotDiff( initialImageDataURL, updatedImageDataURL )

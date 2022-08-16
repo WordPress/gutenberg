@@ -88,39 +88,40 @@ export default function UnsavedInnerBlocks( {
 		__experimentalDirectInsert: shouldDirectInsert,
 	} );
 
-	const {
-		isSaving,
-		draftNavigationMenus,
-		hasResolvedDraftNavigationMenus,
-	} = useSelect(
-		( select ) => {
-			if ( isDisabled ) {
-				return EMPTY_OBJECT;
-			}
+	const { isSaving, draftNavigationMenus, hasResolvedDraftNavigationMenus } =
+		useSelect(
+			( select ) => {
+				if ( isDisabled ) {
+					return EMPTY_OBJECT;
+				}
 
-			const {
-				getEntityRecords,
-				hasFinishedResolution,
-				isSavingEntityRecord,
-			} = select( coreStore );
+				const {
+					getEntityRecords,
+					hasFinishedResolution,
+					isSavingEntityRecord,
+				} = select( coreStore );
 
-			return {
-				isSaving: isSavingEntityRecord( 'postType', 'wp_navigation' ),
-				draftNavigationMenus: getEntityRecords( ...DRAFT_MENU_PARAMS ),
-				hasResolvedDraftNavigationMenus: hasFinishedResolution(
-					'getEntityRecords',
-					DRAFT_MENU_PARAMS
-				),
-			};
-		},
-		[ isDisabled ]
-	);
+				return {
+					isSaving: isSavingEntityRecord(
+						'postType',
+						'wp_navigation'
+					),
+					draftNavigationMenus: getEntityRecords(
+						...DRAFT_MENU_PARAMS
+					),
+					hasResolvedDraftNavigationMenus: hasFinishedResolution(
+						'getEntityRecords',
+						DRAFT_MENU_PARAMS
+					),
+				};
+			},
+			[ isDisabled ]
+		);
 
 	const { hasResolvedNavigationMenus, navigationMenus } = useNavigationMenu();
 
-	const { create: createNavigationMenu } = useCreateNavigationMenu(
-		clientId
-	);
+	const { create: createNavigationMenu } =
+		useCreateNavigationMenu( clientId );
 
 	// Automatically save the uncontrolled blocks.
 	useEffect( () => {

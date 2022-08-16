@@ -27,8 +27,7 @@ describe( 'Migrate list block', () => {
 
 	it( 'should migrate the values attribute to inner blocks', () => {
 		const [ updatedAttributes, updatedInnerBlocks ] = migrateToListV2( {
-			values:
-				'<li>test</li><li>test</li><li>test<ol><li>test test</li><li>test est eesssss</li></ol></li>',
+			values: '<li>test</li><li>test</li><li>test<ol><li>test test</li><li>test est eesssss</li></ol></li>',
 			ordered: false,
 		} );
 

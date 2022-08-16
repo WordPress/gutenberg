@@ -40,13 +40,16 @@ function ToggleGroupControl(
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
+		__nextHasNoMarginBottom = false,
 		className,
 		isAdaptiveWidth = false,
 		isBlock = false,
+		__experimentalIsIconGroup = false,
 		label,
 		hideLabelFromVision = false,
 		help,
 		onChange = noop,
+		size = 'default',
 		value,
 		children,
 		...otherProps
@@ -83,17 +86,20 @@ function ToggleGroupControl(
 	const classes = useMemo(
 		() =>
 			cx(
-				styles.ToggleGroupControl,
+				styles.ToggleGroupControl( { size } ),
+				! __experimentalIsIconGroup && styles.border,
 				isBlock && styles.block,
-				'medium',
 				className
 			),
-		[ className, cx, isBlock ]
+		[ className, cx, isBlock, __experimentalIsIconGroup, size ]
 	);
 	return (
-		<BaseControl help={ help }>
+		<BaseControl
+			help={ help }
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+		>
 			<ToggleGroupControlContext.Provider
-				value={ { ...radio, isBlock: ! isAdaptiveWidth } }
+				value={ { ...radio, isBlock: ! isAdaptiveWidth, size } }
 			>
 				{ ! hideLabelFromVision && (
 					<div>

@@ -65,11 +65,8 @@ function PostSwitchToDraftButton( {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const {
-			isSavingPost,
-			isCurrentPostPublished,
-			isCurrentPostScheduled,
-		} = select( editorStore );
+		const { isSavingPost, isCurrentPostPublished, isCurrentPostScheduled } =
+			select( editorStore );
 		return {
 			isSaving: isSavingPost(),
 			isPublished: isCurrentPostPublished(),

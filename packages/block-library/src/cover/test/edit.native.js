@@ -493,13 +493,10 @@ describe( 'color settings', () => {
 	} );
 
 	it( 'clears the selected overlay color and mantains the inner blocks', async () => {
-		const {
-			getByTestId,
-			getByA11yLabel,
-			getByText,
-		} = await initializeEditor( {
-			initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
-		} );
+		const { getByTestId, getByA11yLabel, getByText } =
+			await initializeEditor( {
+				initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
+			} );
 
 		// Wait for the block to be created.
 		const coverBlock = await waitFor( () =>

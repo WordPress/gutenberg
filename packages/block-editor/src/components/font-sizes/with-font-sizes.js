@@ -78,9 +78,8 @@ export default ( ...fontSizeNames ) => {
 								customFontSizeAttributeName,
 								fontSizeAttributeName
 							) => {
-								const upperFirstFontSizeAttributeName = upperFirst(
-									fontSizeAttributeName
-								);
+								const upperFirstFontSizeAttributeName =
+									upperFirst( fontSizeAttributeName );
 								settersAccumulator[
 									`set${ upperFirstFontSizeAttributeName }`
 								] = this.createSetFontSize(

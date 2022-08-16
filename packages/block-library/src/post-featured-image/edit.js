@@ -9,6 +9,7 @@ import {
 	PanelBody,
 	Placeholder,
 	Button,
+	TextControl,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -20,7 +21,6 @@ import {
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
-import { SVG, Path } from '@wordpress/primitives';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -28,24 +28,18 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import DimensionControls from './dimension-controls';
 
-const placeholderIllustration = (
-	<SVG
-		className="components-placeholder__illustration"
-		fill="none"
-		xmlns="http://www.w3.org/2000/svg"
-		viewBox="0 0 60 60"
-		preserveAspectRatio="none"
-	>
-		<Path vectorEffect="non-scaling-stroke" d="M60 60 0 0" />
-	</SVG>
-);
-
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-const placeholderChip = (
-	<div className="wp-block-post-featured-image__placeholder">
-		{ placeholderIllustration }
-	</div>
-);
+
+const placeholder = ( content ) => {
+	return (
+		<Placeholder
+			className="block-editor-media-placeholder"
+			withIllustration={ true }
+		>
+			{ content }
+		</Placeholder>
+	);
+};
 
 function getMediaSourceUrlBySizeSlug( media, slug ) {
 	return (
@@ -60,7 +54,8 @@ function PostFeaturedImageDisplay( {
 	context: { postId, postType: postTypeSlug, queryId },
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	const { isLink, height, width, scale, sizeSlug } = attributes;
+	const { isLink, height, width, scale, sizeSlug, rel, linkTarget } =
+		attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postTypeSlug,
@@ -101,15 +96,6 @@ function PostFeaturedImageDisplay( {
 		style: { width, height },
 	} );
 
-	const placeholder = ( content ) => {
-		return (
-			<Placeholder className="block-editor-media-placeholder">
-				{ placeholderIllustration }
-				{ content }
-			</Placeholder>
-		);
-	};
-
 	const onSelectImage = ( value ) => {
 		if ( value?.id ) {
 			setFeaturedImage( value.id );
@@ -144,6 +130,26 @@ function PostFeaturedImageDisplay( {
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
 					/>
+					{ isLink && (
+						<>
+							<ToggleControl
+								label={ __( 'Open in new tab' ) }
+								onChange={ ( value ) =>
+									setAttributes( {
+										linkTarget: value ? '_blank' : '_self',
+									} )
+								}
+								checked={ linkTarget === '_blank' }
+							/>
+							<TextControl
+								label={ __( 'Link rel' ) }
+								value={ rel }
+								onChange={ ( newRel ) =>
+									setAttributes( { rel: newRel } )
+								}
+							/>
+						</>
+					) }
 				</PanelBody>
 			</InspectorControls>
 		</>
@@ -153,7 +159,7 @@ function PostFeaturedImageDisplay( {
 		return (
 			<>
 				{ controls }
-				<div { ...blockProps }>{ placeholderChip }</div>
+				<div { ...blockProps }>{ placeholder() }</div>
 			</>
 		);
 	}
@@ -187,7 +193,7 @@ function PostFeaturedImageDisplay( {
 	} else {
 		// We have a Featured image so show a Placeholder if is loading.
 		image = ! media ? (
-			placeholderChip
+			placeholder()
 		) : (
 			<img
 				src={ mediaUrl }
@@ -232,7 +238,7 @@ function PostFeaturedImageDisplay( {
 export default function PostFeaturedImageEdit( props ) {
 	const blockProps = useBlockProps();
 	if ( ! props.context?.postId ) {
-		return <div { ...blockProps }>{ placeholderChip }</div>;
+		return <div { ...blockProps }>{ placeholder() }</div>;
 	}
 	return <PostFeaturedImageDisplay { ...props } />;
 }

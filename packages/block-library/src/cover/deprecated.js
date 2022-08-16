@@ -233,9 +233,8 @@ const v10 = {
 				'is-light': ! isDark,
 				'has-parallax': hasParallax,
 				'is-repeated': isRepeated,
-				'has-custom-content-position': ! isContentPositionCenter(
-					contentPosition
-				),
+				'has-custom-content-position':
+					! isContentPositionCenter( contentPosition ),
 			},
 			getPositionClassName( contentPosition )
 		);
@@ -368,9 +367,8 @@ const v9 = {
 				'is-light': ! isDark,
 				'has-parallax': hasParallax,
 				'is-repeated': isRepeated,
-				'has-custom-content-position': ! isContentPositionCenter(
-					contentPosition
-				),
+				'has-custom-content-position':
+					! isContentPositionCenter( contentPosition ),
 			},
 			getPositionClassName( contentPosition )
 		);
@@ -500,9 +498,8 @@ const v8 = {
 				'is-light': ! isDark,
 				'has-parallax': hasParallax,
 				'is-repeated': isRepeated,
-				'has-custom-content-position': ! isContentPositionCenter(
-					contentPosition
-				),
+				'has-custom-content-position':
+					! isContentPositionCenter( contentPosition ),
 			},
 			getPositionClassName( contentPosition )
 		);
@@ -654,9 +651,8 @@ const v7 = {
 				'is-repeated': isRepeated,
 				'has-background-gradient': gradient || customGradient,
 				[ gradientClass ]: ! url && gradientClass,
-				'has-custom-content-position': ! isContentPositionCenter(
-					contentPosition
-				),
+				'has-custom-content-position':
+					! isContentPositionCenter( contentPosition ),
 			},
 			getPositionClassName( contentPosition )
 		);
@@ -806,9 +802,8 @@ const v6 = {
 				'is-repeated': isRepeated,
 				'has-background-gradient': gradient || customGradient,
 				[ gradientClass ]: ! url && gradientClass,
-				'has-custom-content-position': ! isContentPositionCenter(
-					contentPosition
-				),
+				'has-custom-content-position':
+					! isContentPositionCenter( contentPosition ),
 			},
 			getPositionClassName( contentPosition )
 		);

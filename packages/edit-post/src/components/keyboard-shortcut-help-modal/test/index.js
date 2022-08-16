@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import { shallow } from 'enzyme';
 
 /**
  * Internal dependencies
  */
 import { KeyboardShortcutHelpModal } from '../index';
+
+const noop = () => {};
 
 describe( 'KeyboardShortcutHelpModal', () => {
 	it( 'should match snapshot when the modal is active', () => {
