@@ -68,6 +68,7 @@ export default function LinkPreview( {
 				'is-preview': true,
 				'is-error': isEmptyURL,
 			} ) }
+			role="option"
 		>
 			<div className="block-editor-link-control__search-item-top">
 				<span className="block-editor-link-control__search-item-header">
