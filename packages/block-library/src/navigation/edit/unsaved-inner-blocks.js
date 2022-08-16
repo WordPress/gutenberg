@@ -63,7 +63,8 @@ export default function UnsavedInnerBlocks( {
 	// from the original inner blocks from the post content then the
 	// user has made changes to the inner blocks. At this point the inner
 	// blocks can be considered "dirty".
-	const innerBlocksAreDirty = blocks !== originalBlocks.current;
+	const innerBlocksAreDirty =
+		!! originalBlocks.current && blocks !== originalBlocks.current;
 
 	const shouldDirectInsert = useMemo(
 		() =>
