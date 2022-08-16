@@ -238,7 +238,8 @@ const getTemplateVariantVars = ( variants, variant ) => {
 		for ( const variantName of variants ) {
 			const key =
 				variantName.charAt( 0 ).toUpperCase() + variantName.slice( 1 );
-			variantTypes[ `is${ key }` ] = variant === variantName ?? false;
+			variantTypes[ `is${ key }Variant` ] =
+				variant === variantName ?? false;
 		}
 	}
 	return variantTypes;
