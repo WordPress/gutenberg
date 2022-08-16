@@ -26,52 +26,79 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	const HTML_WITH_CLASSES = '<div class="main with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>';
 	const HTML_MALFORMED    = '<div><span class="d-md-none" Notifications</span><span class="d-none d-md-inline">Back to notifications</span></div>';
 
+	/**
+	 * @ticket 56299
+	 */
 	public function test_get_tag_returns_null_before_finding_tags() {
 		$w = new WP_HTML_Walker( '<div>Test</div>' );
 		$this->assertNull( $w->get_tag() );
 	}
 
+	/**
+	 * @ticket 56299
+	 */
 	public function test_get_tag_returns_null_when_not_in_open_tag() {
 		$w = new WP_HTML_Walker( '<div>Test</div>' );
 		$this->assertFalse( $w->next_tag( 'p' ) );
 		$this->assertNull( $w->get_tag() );
 	}
 
+	/**
+	 * @ticket 56299
+	 */
 	public function test_get_tag_returns_open_tag_name() {
 		$w = new WP_HTML_Walker( '<div>Test</div>' );
 		$this->assertTrue( $w->next_tag( 'div' ) );
 		$this->assertSame( 'div', $w->get_tag() );
 	}
 
+	/**
+	 * @ticket 56299
+	 */
 	public function test_get_attribute_returns_null_before_finding_tags() {
 		$w = new WP_HTML_Walker( '<div class="test">Test</div>' );
 		$this->assertNull( $w->get_attribute( 'class' ) );
 	}
 
+	/**
+	 * @ticket 56299
+	 */
 	public function test_get_attribute_returns_null_when_not_in_open_tag() {
 		$w = new WP_HTML_Walker( '<div class="test">Test</div>' );
 		$this->assertFalse( $w->next_tag( 'p' ) );
 		$this->assertNull( $w->get_attribute( 'class' ) );
 	}
 
+	/**
+	 * @ticket 56299
+	 */
 	public function test_get_attribute_returns_null_when_attribute_missing() {
 		$w = new WP_HTML_Walker( '<div class="test">Test</div>' );
 		$this->assertTrue( $w->next_tag( 'div' ) );
 		$this->assertNull( $w->get_attribute( 'test-id' ) );
 	}
 
+	/**
+	 * @ticket 56299
+	 */
 	public function test_get_attribute_returns_attribute_value() {
 		$w = new WP_HTML_Walker( '<div class="test">Test</div>' );
 		$this->assertTrue( $w->next_tag( 'div' ) );
 		$this->assertSame( 'test', $w->get_attribute( 'class' ) );
 	}
 
+	/**
+	 * @ticket 56299
+	 */
 	public function test_get_attribute_returns_true_for_boolean_attribute() {
 		$w = new WP_HTML_Walker( '<div enabled class="test">Test</div>' );
 		$this->assertTrue( $w->next_tag( array( 'class_name' => 'test' ) ) );
 		$this->assertTrue( $w->get_attribute( 'enabled' ) );
 	}
 
+	/**
+	 * @ticket 56299
+	 */
 	public function test_get_attribute_returns_string_for_truthy_attributes() {
 		$w = new WP_HTML_Walker( '<div enabled=enabled checked=1 hidden="true" class="test">Test</div>' );
 		$this->assertTrue( $w->next_tag( array() ) );
@@ -80,13 +107,16 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 		$this->assertSame( 'true', $w->get_attribute( 'hidden' ) );
 	}
 
+	/**
+	 * @ticket 56299
+	 */
 	public function test_treats_slash_as_attribute_separator() {
 		$w = new WP_HTML_Walker( '<div a/b/c/d/e="test">Test</div>' );
 		$this->assertTrue( $w->next_tag( array() ) );
-		$this->assertTrue($w->get_attribute( 'a' ) );
-		$this->assertTrue($w->get_attribute( 'b' ) );
-		$this->assertTrue($w->get_attribute( 'c' ) );
-		$this->assertTrue($w->get_attribute( 'd' ) );
+		$this->assertTrue( $w->get_attribute( 'a' ) );
+		$this->assertTrue( $w->get_attribute( 'b' ) );
+		$this->assertTrue( $w->get_attribute( 'c' ) );
+		$this->assertTrue( $w->get_attribute( 'd' ) );
 		$this->assertSame( 'test', $w->get_attribute( 'e' ) );
 	}
 

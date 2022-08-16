@@ -603,7 +603,7 @@ class WP_HTML_Walker {
 	 * @since 6.1.0
 	 */
 	private function parse_next_attribute( $context = 'tag-opener' ) {
-		// Skip whitespace and slashes
+		// Skip whitespace and slashes.
 		$this->parsed_bytes += strspn( $this->html, " \t\f\r\n/", $this->parsed_bytes );
 
 		/*
