@@ -1353,9 +1353,7 @@ describe( 'Selecting links', () => {
 				// Simulate selecting the first of the search suggestions.
 				await user.click( firstSearchSuggestion );
 
-				const currentLink = container.querySelector(
-					'.block-editor-link-control__search-item.is-current'
-				);
+				const currentLink = getCurrentLink();
 				const currentLinkAnchor = currentLink.querySelector(
 					`[href="${ selectedLink.url }"]`
 				);
@@ -1454,9 +1452,7 @@ describe( 'Selecting links', () => {
 				triggerEnter( searchInput );
 
 				// Check that the suggestion selected via is now shown as selected.
-				const currentLink = container.querySelector(
-					'.block-editor-link-control__search-item.is-current'
-				);
+				const currentLink = getCurrentLink();
 				const currentLinkAnchor = currentLink.querySelector(
 					`[href="${ selectedLink.url }"]`
 				);
