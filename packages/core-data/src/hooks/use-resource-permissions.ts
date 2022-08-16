@@ -72,7 +72,7 @@ type ResourcePermissionsResolution< IdType > = [
  * @return Entity records data.
  * @template IdType
  */
-export default function __experimentalUseResourcePermissions< IdType = void >(
+export default function useResourcePermissions< IdType = void >(
 	resource: string,
 	id?: IdType
 ): ResourcePermissionsResolution< IdType > {

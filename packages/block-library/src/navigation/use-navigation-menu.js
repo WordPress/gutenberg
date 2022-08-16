@@ -3,7 +3,7 @@
  */
 import {
 	store as coreStore,
-	__experimentalUseResourcePermissions as useResourcePermissions,
+	useResourcePermissions,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
