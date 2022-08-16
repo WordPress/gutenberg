@@ -397,10 +397,10 @@ const Popover = (
 			updateFrameOffset = () => {
 				const iframeRect = frameElement.getBoundingClientRect();
 				frameOffset.current = { x: iframeRect.left, y: iframeRect.top };
+				update();
 			};
 			updateFrameOffset();
 			defaultView.addEventListener( 'resize', updateFrameOffset );
-			update();
 		}
 
 		return () => {
