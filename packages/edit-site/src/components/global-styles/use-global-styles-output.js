@@ -260,7 +260,7 @@ export function getStylesDeclarations(
 
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
-	const extraRules = getCSSRules( blockStyles, {} );
+	const extraRules = getCSSRules( blockStyles );
 	extraRules.forEach( ( rule ) => {
 		// Don't output padding properties if padding variables are set.
 		if (
@@ -285,7 +285,7 @@ export function getStylesDeclarations(
 			}
 		}
 
-		output.push( `${ cssProperty }: ${ rule.value }` );
+		output.push( `${ cssProperty }: ${ ruleValue }` );
 	} );
 
 	return output;
