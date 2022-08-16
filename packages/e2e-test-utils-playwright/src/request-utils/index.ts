@@ -136,7 +136,6 @@ class RequestUtils {
 	deleteAllMedia = deleteAllMedia.bind( this );
 	createUser = createUser.bind( this );
 	deleteUser = deleteUser.bind( this );
-	// getUserID = getUserID.bind( this );
 }
 
 export type { StorageState };
