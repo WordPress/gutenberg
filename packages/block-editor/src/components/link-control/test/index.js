@@ -707,23 +707,20 @@ describe( 'Default search suggestions', () => {
 	it( 'should display a list of initial search suggestions when there is no search value or suggestions', async () => {
 		const expectedResultsLength = 3; // Set within `LinkControl`.
 
-		const { container } = render( <LinkControl showInitialSuggestions /> );
+		render( <LinkControl showInitialSuggestions /> );
 
 		await eventLoopTick();
 
-		// Search Input UI.
-		const searchInput = getURLInput();
-
-		const searchResultsWrapper = screen.queryByRole( 'listbox' );
-		const initialSearchResultElements = screen.queryAllByRole( 'option' );
-
-		const searchResultsLabel = container.querySelector(
-			`#${ searchResultsWrapper.getAttribute( 'aria-labelledby' ) }`
-		);
+		expect(
+			screen.queryByRole( 'listbox', {
+				name: 'Recently updated',
+			} )
+		).toBeVisible();
 
 		// Verify input has no value has default suggestions should only show
 		// when this does not have a value.
-		expect( searchInput ).toHaveValue( '' );
+		// Search Input UI.
+		expect( getURLInput() ).toHaveValue( '' );
 
 		// Ensure only called once as a guard against potential infinite
 		// re-render loop within `componentDidUpdate` calling `updateSuggestions`
@@ -731,11 +728,9 @@ describe( 'Default search suggestions', () => {
 		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
 
 		// Verify the search results already display the initial suggestions.
-		expect( initialSearchResultElements ).toHaveLength(
+		expect( screen.queryAllByRole( 'option' ) ).toHaveLength(
 			expectedResultsLength
 		);
-
-		expect( searchResultsLabel ).toHaveTextContent( 'Recently updated' );
 	} );
 
 	it( 'should not display initial suggestions when input value is present', async () => {
@@ -814,11 +809,11 @@ describe( 'Default search suggestions', () => {
 		// Check the input is empty now.
 		expect( searchInput ).toHaveValue( '' );
 
-		const searchResultLabel = container.querySelector(
-			'.block-editor-link-control__search-results-label'
-		);
-
-		expect( searchResultLabel ).toHaveTextContent( 'Recently updated' );
+		expect(
+			screen.queryByRole( 'listbox', {
+				name: 'Recently updated',
+			} )
+		).toBeVisible();
 
 		expect( searchResultElements ).toHaveLength( 3 );
 	} );
@@ -1484,16 +1479,11 @@ describe( 'Selecting links', () => {
 
 			await eventLoopTick();
 
-			const searchResultsWrapper =
-				container.querySelector( '[role="listbox"]' );
-
-			const searchResultsLabel = container.querySelector(
-				`#${ searchResultsWrapper.getAttribute( 'aria-labelledby' ) }`
-			);
-
-			expect( searchResultsLabel.innerHTML ).toEqual(
-				'Recently updated'
-			);
+			expect(
+				screen.queryByRole( 'listbox', {
+					name: 'Recently updated',
+				} )
+			).toBeVisible();
 
 			// Search Input UI.
 			const searchInput = getURLInput();
