@@ -117,8 +117,8 @@ function getCurrentLink() {
  *
  * @param {Element} element Element to trigger the event on.
  */
-async function triggerArrowUp( element ) {
-	await fireEvent.keyDown( element, {
+function triggerArrowUp( element ) {
+	fireEvent.keyDown( element, {
 		key: 'ArrowUp',
 		keyCode: 38,
 	} );
@@ -139,8 +139,8 @@ async function triggerArrowUp( element ) {
  *
  * @param {Element} element Element to trigger the event on.
  */
-async function triggerArrowDown( element ) {
-	await fireEvent.keyDown( element, {
+function triggerArrowDown( element ) {
+	fireEvent.keyDown( element, {
 		key: 'ArrowDown',
 		keyCode: 40,
 	} );
@@ -161,8 +161,8 @@ async function triggerArrowDown( element ) {
  *
  * @param {Element} element Element to trigger the event on.
  */
-async function triggerEnter( element ) {
-	await fireEvent.keyDown( element, {
+function triggerEnter( element ) {
+	fireEvent.keyDown( element, {
 		key: 'Enter',
 		keyCode: 13,
 	} );
@@ -207,7 +207,7 @@ describe( 'Basic rendering', () => {
 		const searchInput = getURLInput();
 
 		// Simulate searching for a term.
-		await searchInput.focus();
+		searchInput.focus();
 		await user.keyboard( searchTerm );
 
 		expect( screen.queryByText( '://' ) ).not.toBeInTheDocument();
@@ -343,7 +343,7 @@ describe( 'Searching for a link', () => {
 		const searchInput = getURLInput();
 
 		// Simulate searching for a term.
-		await searchInput.focus();
+		searchInput.focus();
 		await user.keyboard( searchTerm );
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
@@ -379,7 +379,7 @@ describe( 'Searching for a link', () => {
 		const searchInput = getURLInput();
 
 		// Simulate searching for a term.
-		await searchInput.focus();
+		searchInput.focus();
 		await user.keyboard( searchTerm );
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
@@ -417,7 +417,7 @@ describe( 'Searching for a link', () => {
 		const searchInput = getURLInput();
 
 		// Simulate searching for a term.
-		await searchInput.focus();
+		searchInput.focus();
 		await user.keyboard( searchTerm );
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
@@ -460,7 +460,7 @@ describe( 'Searching for a link', () => {
 		const searchInput = getURLInput();
 
 		// Simulate searching for a term.
-		await searchInput.focus();
+		searchInput.focus();
 		await user.keyboard( 'anything' );
 
 		const searchResultElements = getSearchResults( container );
@@ -485,7 +485,7 @@ describe( 'Searching for a link', () => {
 			const searchInput = getURLInput();
 
 			// Simulate searching for a term.
-			await searchInput.focus();
+			searchInput.focus();
 			await user.keyboard( searchTerm );
 
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
@@ -519,7 +519,7 @@ describe( 'Searching for a link', () => {
 		const searchInput = getURLInput();
 
 		// Simulate searching for a term.
-		await searchInput.focus();
+		searchInput.focus();
 		await user.keyboard( 'couldbeurlorentitysearchterm' );
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
@@ -549,7 +549,7 @@ describe( 'Manual link entry', () => {
 			const searchInput = getURLInput();
 
 			// Simulate searching for a term.
-			await searchInput.focus();
+			searchInput.focus();
 			await user.keyboard( searchTerm );
 
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
@@ -590,7 +590,7 @@ describe( 'Manual link entry', () => {
 				expect( submitButton ).toBeDisabled();
 				expect( submitButton ).toBeVisible();
 
-				await searchInput.focus();
+				searchInput.focus();
 				if ( searchString.length ) {
 					// Simulate searching for a term.
 					await user.keyboard( searchString );
@@ -634,7 +634,7 @@ describe( 'Manual link entry', () => {
 				expect( submitButton ).toBeVisible();
 
 				// Simulate searching for a term.
-				await searchInput.focus();
+				searchInput.focus();
 				if ( searchString.length ) {
 					// Simulate searching for a term.
 					await user.keyboard( searchString );
@@ -676,7 +676,7 @@ describe( 'Manual link entry', () => {
 				const searchInput = getURLInput();
 
 				// Simulate searching for a term.
-				await searchInput.focus();
+				searchInput.focus();
 				await user.keyboard( searchTerm );
 
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
@@ -758,7 +758,7 @@ describe( 'Default search suggestions', () => {
 		await user.click( currentLinkBtn );
 
 		const searchInput = getURLInput();
-		await searchInput.focus();
+		searchInput.focus();
 
 		await eventLoopTick();
 
@@ -788,7 +788,7 @@ describe( 'Default search suggestions', () => {
 		searchInput = getURLInput();
 
 		// Simulate searching for a term.
-		await searchInput.focus();
+		searchInput.focus();
 		await user.keyboard( searchTerm );
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
@@ -899,7 +899,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			const searchInput = getURLInput();
 
 			// Simulate searching for a term.
-			await searchInput.focus();
+			searchInput.focus();
 			await user.keyboard( entityNameText );
 
 			await eventLoopTick();
@@ -969,7 +969,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const searchInput = getURLInput();
 
 		// Simulate searching for a term.
-		await searchInput.focus();
+		searchInput.focus();
 		await user.keyboard( 'Some new page to create' );
 
 		await eventLoopTick();
@@ -1024,7 +1024,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const searchInput = getURLInput();
 
 		// Simulate searching for a term.
-		await searchInput.focus();
+		searchInput.focus();
 		await user.keyboard( entityNameText );
 
 		await eventLoopTick();
@@ -1038,12 +1038,12 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		)[ 0 ];
 
 		// Step down into the search results, highlighting the first result item.
-		await triggerArrowDown( searchInput );
+		triggerArrowDown( searchInput );
 
-		await createButton.focus();
+		createButton.focus();
 		await user.keyboard( '[Enter]' );
 
-		await searchInput.focus();
+		searchInput.focus();
 		await user.keyboard( '[Enter]' );
 
 		await eventLoopTick();
@@ -1070,7 +1070,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const searchInput = getURLInput();
 
 		// Simulate searching for a term.
-		await searchInput.focus();
+		searchInput.focus();
 		await user.keyboard( entityNameText );
 
 		await eventLoopTick();
@@ -1160,7 +1160,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				const searchInput = getURLInput();
 
 				// Simulate searching for a term.
-				await searchInput.focus();
+				searchInput.focus();
 				await user.keyboard( inputText );
 
 				await eventLoopTick();
@@ -1199,7 +1199,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			searchInput = getURLInput();
 
 			// Simulate searching for a term.
-			await searchInput.focus();
+			searchInput.focus();
 			await user.keyboard( searchText );
 
 			await eventLoopTick();
@@ -1341,7 +1341,7 @@ describe( 'Selecting links', () => {
 				const searchInput = getURLInput();
 
 				// Simulate searching for a term.
-				await searchInput.focus();
+				searchInput.focus();
 				await user.keyboard( searchTerm );
 
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
@@ -1405,14 +1405,14 @@ describe( 'Selecting links', () => {
 				const searchInput = getURLInput();
 
 				// Simulate searching for a term.
-				await searchInput.focus();
+				searchInput.focus();
 				await user.keyboard( searchTerm );
 
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 				await eventLoopTick();
 
 				// Step down into the search results, highlighting the first result item.
-				await triggerArrowDown( searchInput );
+				triggerArrowDown( searchInput );
 
 				const searchResultElements = getSearchResults( container );
 
@@ -1431,7 +1431,7 @@ describe( 'Selecting links', () => {
 				// Only entity searches contain more than 1 suggestion.
 				if ( type === 'entity' ) {
 					// Check we can go down again using the down arrow.
-					await triggerArrowDown( searchInput );
+					triggerArrowDown( searchInput );
 
 					selectedSearchResultElement = container.querySelector(
 						'[role="option"][aria-selected="true"]'
@@ -1444,7 +1444,7 @@ describe( 'Selecting links', () => {
 					);
 
 					// Check we can go back up via up arrow.
-					await triggerArrowUp( searchInput );
+					triggerArrowUp( searchInput );
 
 					selectedSearchResultElement = container.querySelector(
 						'[role="option"][aria-selected="true"]'
@@ -1458,7 +1458,7 @@ describe( 'Selecting links', () => {
 				}
 
 				// Submit the selected item as the current link.
-				await triggerEnter( searchInput );
+				triggerEnter( searchInput );
 
 				// Check that the suggestion selected via is now shown as selected.
 				const currentLink = container.querySelector(
@@ -1501,7 +1501,7 @@ describe( 'Selecting links', () => {
 			const searchInput = getURLInput();
 
 			// Step down into the search results, highlighting the first result item.
-			await triggerArrowDown( searchInput );
+			triggerArrowDown( searchInput );
 
 			await eventLoopTick();
 
@@ -1520,7 +1520,7 @@ describe( 'Selecting links', () => {
 			);
 
 			// Check we can go down again using the down arrow.
-			await triggerArrowDown( searchInput );
+			triggerArrowDown( searchInput );
 
 			selectedSearchResultElement = container.querySelector(
 				'[role="option"][aria-selected="true"]'
@@ -1532,7 +1532,7 @@ describe( 'Selecting links', () => {
 			);
 
 			// Check we can go back up via up arrow.
-			await triggerArrowUp( searchInput );
+			triggerArrowUp( searchInput );
 
 			selectedSearchResultElement = container.querySelector(
 				'[role="option"][aria-selected="true"]'
@@ -1658,7 +1658,7 @@ describe( 'Post types', () => {
 		const searchInput = getURLInput();
 
 		// Simulate searching for a term.
-		await searchInput.focus();
+		searchInput.focus();
 		await user.keyboard( searchTerm );
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
@@ -1687,7 +1687,7 @@ describe( 'Post types', () => {
 			const searchInput = getURLInput();
 
 			// Simulate searching for a term.
-			await searchInput.focus();
+			searchInput.focus();
 			await user.keyboard( searchTerm );
 
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
@@ -2074,7 +2074,7 @@ describe( 'Controlling link title text', () => {
 
 		const textInput = screen.queryByRole( 'textbox', { name: 'Text' } );
 
-		await textInput.focus();
+		textInput.focus();
 		await userEvent.clear( textInput );
 		await user.keyboard( textValue );
 
@@ -2111,12 +2111,12 @@ describe( 'Controlling link title text', () => {
 
 		expect( textInput ).toBeVisible();
 
-		await textInput.focus();
+		textInput.focus();
 		await userEvent.clear( textInput );
 		await user.keyboard( textValue );
 
 		// Attempt to submit the empty search value in the input.
-		await triggerEnter( textInput );
+		triggerEnter( textInput );
 
 		expect( mockOnChange ).toHaveBeenCalledWith(
 			expect.objectContaining( {
