@@ -1609,17 +1609,12 @@ describe( 'Addition Settings UI', () => {
 			);
 		};
 
-		const { container } = render( <LinkControlConsumer /> );
+		render( <LinkControlConsumer /> );
 
 		// Grab the elements using user perceivable DOM queries.
-		const settingsLegend = Array.from(
-			container.querySelectorAll( 'legend' )
-		).find(
-			( legend ) =>
-				legend.innerHTML &&
-				legend.innerHTML.includes( 'Currently selected link settings' )
-		);
-		const settingsFieldset = settingsLegend.closest( 'fieldset' );
+		const settingsFieldset = screen.getByRole( 'group', {
+			name: 'Currently selected link settings',
+		} );
 		const settingControlsLabels = Array.from(
 			settingsFieldset.querySelectorAll( 'label' )
 		);
