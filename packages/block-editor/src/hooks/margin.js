@@ -28,6 +28,11 @@ import {
 } from './dimensions';
 import { cleanEmptyObject } from './utils';
 import BlockPopover from '../components/block-popover';
+import SpacingSizesControl from '../components/spacing-sizes-control';
+import {
+	getSpacingPresetCssVar,
+	isValueSpacingPreset,
+} from '../components/spacing-sizes-control/utils';
 
 /**
  * Determines if there is margin support.
@@ -101,6 +106,8 @@ export function MarginEdit( props ) {
 		setAttributes,
 	} = props;
 
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [
 			'%',
@@ -135,15 +142,28 @@ export function MarginEdit( props ) {
 	return Platform.select( {
 		web: (
 			<>
-				<BoxControl
-					values={ style?.spacing?.margin }
-					onChange={ onChange }
-					label={ __( 'Margin' ) }
-					sides={ sides }
-					units={ units }
-					allowReset={ false }
-					splitOnAxis={ splitOnAxis }
-				/>
+				{ ( ! spacingSizes || spacingSizes?.length === 0 ) && (
+					<BoxControl
+						values={ style?.spacing?.margin }
+						onChange={ onChange }
+						label={ __( 'Margin' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+					/>
+				) }
+				{ spacingSizes?.length > 0 && (
+					<SpacingSizesControl
+						values={ style?.spacing?.margin }
+						onChange={ onChange }
+						label={ __( 'Margin' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ false }
+					/>
+				) }
 			</>
 		),
 		native: null,
@@ -154,10 +174,18 @@ export function MarginVisualizer( { clientId, attributes } ) {
 	const margin = attributes?.style?.spacing?.margin;
 	const style = useMemo( () => {
 		return {
-			borderTopWidth: margin?.top ?? 0,
-			borderRightWidth: margin?.right ?? 0,
-			borderBottomWidth: margin?.bottom ?? 0,
-			borderLeftWidth: margin?.left ?? 0,
+			borderTopWidth: isValueSpacingPreset( margin?.top )
+				? getSpacingPresetCssVar( margin?.top )
+				: margin?.top,
+			borderRightWidth: isValueSpacingPreset( margin?.right )
+				? getSpacingPresetCssVar( margin?.right )
+				: margin?.right,
+			borderBottomWidth: isValueSpacingPreset( margin?.bottom )
+				? getSpacingPresetCssVar( margin?.bottom )
+				: margin?.bottom,
+			borderLeftWidth: isValueSpacingPreset( margin?.left )
+				? getSpacingPresetCssVar( margin?.left )
+				: margin?.left,
 			top: margin?.top ? `-${ margin.top }` : 0,
 			right: margin?.right ? `-${ margin.right }` : 0,
 			bottom: margin?.bottom ? `-${ margin.bottom }` : 0,

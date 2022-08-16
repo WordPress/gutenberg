@@ -435,16 +435,32 @@ export default function DimensionsPanel( { name } ) {
 					label={ __( 'Margin' ) }
 					onDeselect={ resetMarginValue }
 					isShownByDefault={ true }
+					className={ classnames( {
+						'tools-panel-item-spacing': showSpacingPresetsControl,
+					} ) }
 				>
-					<BoxControl
-						values={ marginValues }
-						onChange={ setMarginValues }
-						label={ __( 'Margin' ) }
-						sides={ marginSides }
-						units={ units }
-						allowReset={ false }
-						splitOnAxis={ isAxialMargin }
-					/>
+					{ ! showSpacingPresetsControl && (
+						<BoxControl
+							values={ marginValues }
+							onChange={ setMarginValues }
+							label={ __( 'Margin' ) }
+							sides={ marginSides }
+							units={ units }
+							allowReset={ false }
+							splitOnAxis={ isAxialMargin }
+						/>
+					) }
+					{ showSpacingPresetsControl && (
+						<SpacingSizesControl
+							values={ marginValues }
+							onChange={ setMarginValues }
+							label={ __( 'Margin' ) }
+							sides={ marginSides }
+							units={ units }
+							allowReset={ false }
+							splitOnAxis={ isAxialMargin }
+						/>
+					) }
 				</ToolsPanelItem>
 			) }
 			{ showGapControl && (
