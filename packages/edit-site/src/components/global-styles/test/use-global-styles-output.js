@@ -777,8 +777,8 @@ describe( 'global styles renderer', () => {
 					tree
 				)
 			).toEqual( [
-				'color: king-crimson',
 				'background-color: king-crimson',
+				'color: king-crimson',
 			] );
 		} );
 
