@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { memo, useMemo } from '@wordpress/element';
+import { memo } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -107,12 +108,27 @@ function ListViewBranch( props ) {
 			...innerBlocks.reduce( flattenBlockTree, [] ),
 		];
 	};
-	const filteredBlocks = useMemo( () => {
-		if ( isContentLocked ) {
-			return blocks.reduce( flattenBlockTree, [] ).filter( Boolean );
-		}
-		return blocks.filter( Boolean );
-	}, [ isContentLocked, blocks ] );
+	const hasContentRoleAttribute =
+		( select ) =>
+		( { clientId } ) => {
+			const name = select( blockEditorStore ).getBlockName( clientId );
+			const hasContentRole =
+				select( blocksStore ).__unstableIsContentBlock( name );
+			return hasContentRole;
+		};
+
+	const filteredBlocks = useSelect(
+		( select ) => {
+			if ( isContentLocked ) {
+				return blocks
+					.reduce( flattenBlockTree, [] )
+					.filter( hasContentRoleAttribute( select ) )
+					.filter( Boolean );
+			}
+			return blocks.filter( Boolean );
+		},
+		[ isContentLocked, blocks ]
+	);
 	const { expandedState, draggedClientIds } = useListViewContext();
 
 	const blockCount = filteredBlocks.length;
