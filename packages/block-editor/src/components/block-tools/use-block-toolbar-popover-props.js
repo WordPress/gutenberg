@@ -14,14 +14,19 @@ import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-
 // By default the toolbar sets the `shift` prop. If the user scrolls the page
 // down the toolbar will stay on screen by adopting a sticky position at the
 // top of the viewport.
-const DEFAULT_PROPS = { __unstableForcePosition: true, __unstableShift: true };
+const DEFAULT_PROPS = {
+	__unstableResize: false,
+	__unstableFlip: false,
+	__unstableShift: true,
+};
 
 // When there isn't enough height between the top of the block and the editor
 // canvas, the `shift` prop is set to `false`, as it will cause the block to be
-// obscured. The `flip` behavior is enabled (by setting `forcePosition` to
-// `false`), which positions the toolbar below the block.
+// obscured. The `flip` behavior is enabled, which positions the toolbar below
+// the block.
 const RESTRICTED_HEIGHT_PROPS = {
-	__unstableForcePosition: false,
+	__unstableResize: false,
+	__unstableFlip: true,
 	__unstableShift: false,
 };
 

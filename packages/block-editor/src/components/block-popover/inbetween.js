@@ -186,7 +186,8 @@ function BlockPopoverInbetween( {
 				'block-editor-block-popover__inbetween',
 				props.className
 			) }
-			__unstableForcePosition
+			__unstableResize={ false }
+			__unstableFlip={ false }
 		>
 			<div style={ style }>{ children }</div>
 		</Popover>
