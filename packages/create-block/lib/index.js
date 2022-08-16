@@ -59,7 +59,7 @@ program
 	)
 	.option( '--wp-env', 'enable integration with `@wordpress/env` package' )
 	.option( '--no-plugin', 'scaffold only block files' )
-	.option( '--is-dynamic', 'makes the block dynamic' )
+	.option( '--variant <variant>', 'the variant of the template to use' )
 	.action(
 		async (
 			slug,
@@ -72,7 +72,7 @@ program
 				title,
 				wpScripts,
 				wpEnv,
-				isDynamic,
+				variant,
 			}
 		) => {
 			await checkSystemRequirements( engines );
@@ -88,7 +88,7 @@ program
 						title,
 						wpScripts,
 						wpEnv,
-						isDynamic,
+						variant,
 					},
 					( value ) => value !== undefined
 				);

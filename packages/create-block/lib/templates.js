@@ -44,6 +44,7 @@ const predefinedPluginTemplates = {
 				html: false,
 			},
 		},
+		variants: [ 'static', 'dynamic' ],
 	},
 };
 
@@ -100,6 +101,7 @@ const configToTemplate = async ( {
 	blockTemplatesPath,
 	defaultValues = {},
 	assetsPath,
+	variants,
 	...deprecated
 } ) => {
 	if ( defaultValues === null || typeof defaultValues !== 'object' ) {
@@ -129,6 +131,7 @@ const configToTemplate = async ( {
 		defaultValues,
 		outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
 		pluginOutputTemplates: await getOutputTemplates( pluginTemplatesPath ),
+		variants,
 	};
 };
 
@@ -229,8 +232,19 @@ const getPrompts = ( pluginTemplate, keys ) => {
 	} );
 };
 
+const getTemplateVariantVars = ( variants, variant ) => {
+	const variantTypes = {};
+	for ( const variantName of variants ) {
+		const key =
+			variantName.charAt( 0 ).toUpperCase() + variantName.slice( 1 );
+		variantTypes[ `is${ key }` ] = variant === variantName ?? false;
+	}
+	return variantTypes;
+};
+
 module.exports = {
 	getPluginTemplate,
 	getDefaultValues,
 	getPrompts,
+	getTemplateVariantVars,
 };

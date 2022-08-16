@@ -12,9 +12,10 @@ const initWPScripts = require( './init-wp-scripts' );
 const initWPEnv = require( './init-wp-env' );
 const { code, info, success, error } = require( './log' );
 const { writeOutputAsset, writeOutputTemplate } = require( './output' );
+const { getTemplateVariantVars } = require( './templates' );
 
 module.exports = async (
-	{ blockOutputTemplates, pluginOutputTemplates, outputAssets },
+	{ blockOutputTemplates, pluginOutputTemplates, outputAssets, variants },
 	{
 		$schema,
 		apiVersion,
@@ -43,12 +44,11 @@ module.exports = async (
 		editorScript,
 		editorStyle,
 		style,
-		isDynamic,
+		variant,
 	}
 ) => {
 	slug = slug.toLowerCase();
 	namespace = namespace.toLowerCase();
-
 	/**
 	 * --no-plugin relies on the used template supporting the [blockTemplatesPath property](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/#blocktemplatespath).
 	 * If the blockOutputTemplates object has no properties, we can assume that there was a custom --template passed that
@@ -100,7 +100,7 @@ module.exports = async (
 		editorScript,
 		editorStyle,
 		style,
-		isDynamic,
+		...getTemplateVariantVars( variants, variant ),
 	};
 
 	if ( plugin ) {
