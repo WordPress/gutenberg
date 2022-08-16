@@ -99,9 +99,12 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		$content     .= '<li class="' . esc_attr( $post_classes ) . '">' . $block_content . '</li>';
 	}
 
-	if ( ! $use_global_query ) {
-		wp_reset_postdata();
-	}
+	/*
+	 * Use this function to restore the context of the template tags
+	 * from a secondary query loop back to the main query loop.
+	 * Since we use two custom loops, it's safest to always restore.
+	*/
+	wp_reset_postdata();
 
 	return sprintf(
 		'<ul %1$s>%2$s</ul>',
