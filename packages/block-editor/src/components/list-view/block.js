@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
+import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
@@ -40,7 +40,6 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
 
 function ListViewBlock( {
-	renderOnlyContentBlocks,
 	block,
 	isDragged,
 	isSelected,
@@ -68,17 +67,9 @@ function ListViewBlock( {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const { blockName, shouldRender } = useSelect(
-		( select ) => {
-			const name = select( blockEditorStore ).getBlockName( clientId );
-			return {
-				blockName: name,
-				shouldRender:
-					! renderOnlyContentBlocks ||
-					select( blocksStore ).__unstableIsContentBlock( name ),
-			};
-		},
-		[ clientId, renderOnlyContentBlocks ]
+	const blockName = useSelect(
+		( select ) => select( blockEditorStore ).getBlockName( clientId ),
+		[ clientId ]
 	);
 
 	// When a block hides its toolbar it also hides the block settings menu,
@@ -181,10 +172,6 @@ function ListViewBlock( {
 		},
 		[ clientId, expand, collapse, isExpanded ]
 	);
-
-	if ( ! shouldRender ) {
-		return null;
-	}
 
 	let colSpan;
 	if ( hasRenderedMovers ) {

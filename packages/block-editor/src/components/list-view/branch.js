@@ -178,7 +178,6 @@ function ListViewBranch( props ) {
 					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 						{ showBlock && (
 							<ListViewBlock
-								renderOnlyContentBlocks={ isContentLocked }
 								block={ block }
 								selectBlock={ selectBlock }
 								isSelected={ isSelected }
