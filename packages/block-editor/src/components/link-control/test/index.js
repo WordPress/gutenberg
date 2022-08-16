@@ -102,6 +102,10 @@ function getCurrentLink() {
 	return screen.queryByLabelText( 'Currently selected' );
 }
 
+function getSelectedResultElement() {
+	return screen.queryByRole( 'option', { selected: true } );
+}
+
 /**
  * Workaround to trigger an arrow up keypress event.
  *
@@ -1419,9 +1423,7 @@ describe( 'Selecting links', () => {
 				const firstSearchSuggestion = searchResultElements[ 0 ];
 				const secondSearchSuggestion = searchResultElements[ 1 ];
 
-				let selectedSearchResultElement = container.querySelector(
-					'[role="option"][aria-selected="true"]'
-				);
+				let selectedSearchResultElement = getSelectedResultElement();
 
 				// We should have highlighted the first item using the keyboard.
 				expect( selectedSearchResultElement ).toEqual(
@@ -1433,10 +1435,7 @@ describe( 'Selecting links', () => {
 					// Check we can go down again using the down arrow.
 					triggerArrowDown( searchInput );
 
-					selectedSearchResultElement = screen.queryByRole(
-						'option',
-						{ selected: true }
-					);
+					selectedSearchResultElement = getSelectedResultElement();
 
 					// We should have highlighted the first item using the keyboard
 					// eslint-disable-next-line jest/no-conditional-expect
@@ -1447,9 +1446,7 @@ describe( 'Selecting links', () => {
 					// Check we can go back up via up arrow.
 					triggerArrowUp( searchInput );
 
-					selectedSearchResultElement = container.querySelector(
-						'[role="option"][aria-selected="true"]'
-					);
+					selectedSearchResultElement = getSelectedResultElement();
 
 					// We should be back to highlighting the first search result again
 					// eslint-disable-next-line jest/no-conditional-expect
@@ -1511,9 +1508,7 @@ describe( 'Selecting links', () => {
 			const firstSearchSuggestion = searchResultElements[ 0 ];
 			const secondSearchSuggestion = searchResultElements[ 1 ];
 
-			let selectedSearchResultElement = container.querySelector(
-				'[role="option"][aria-selected="true"]'
-			);
+			let selectedSearchResultElement = getSelectedResultElement();
 
 			// We should have highlighted the first item using the keyboard.
 			expect( selectedSearchResultElement ).toEqual(
@@ -1523,9 +1518,7 @@ describe( 'Selecting links', () => {
 			// Check we can go down again using the down arrow.
 			triggerArrowDown( searchInput );
 
-			selectedSearchResultElement = container.querySelector(
-				'[role="option"][aria-selected="true"]'
-			);
+			selectedSearchResultElement = getSelectedResultElement();
 
 			// We should have highlighted the first item using the keyboard.
 			expect( selectedSearchResultElement ).toEqual(
@@ -1535,9 +1528,7 @@ describe( 'Selecting links', () => {
 			// Check we can go back up via up arrow.
 			triggerArrowUp( searchInput );
 
-			selectedSearchResultElement = container.querySelector(
-				'[role="option"][aria-selected="true"]'
-			);
+			selectedSearchResultElement = getSelectedResultElement();
 
 			// We should be back to highlighting the first search result again.
 			expect( selectedSearchResultElement ).toEqual(
@@ -1966,7 +1957,9 @@ describe( 'Controlling link title text', () => {
 	it( 'should not show a means to alter the link title text by default', async () => {
 		render( <LinkControl value={ selectedLink } forceIsEditingLink /> );
 
-		expect( screen.queryByRole( 'textbox', { name: 'Text' } ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'textbox', { name: 'Text' } )
+		).not.toBeInTheDocument();
 	} );
 
 	it.each( [ null, undefined, '   ' ] )(
