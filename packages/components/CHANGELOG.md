@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `ComboboxControl`: Normalize hyphen-like characters to an ASCII hyphen ([#42942](https://github.com/WordPress/gutenberg/pull/42942)).
+-   `FormTokenField`: Refactor away from `_.difference()` ([#43224](https://github.com/WordPress/gutenberg/pull/43224/)).
 
 ### Internal
 
@@ -46,6 +47,7 @@
 -   `BoxControl`: Export `applyValueToSides` util function. ([#42733](https://github.com/WordPress/gutenberg/pull/42733/)).
 -   `ColorPalette`: use index while iterating over color entries to avoid React "duplicated key" warning ([#43096](https://github.com/WordPress/gutenberg/pull/43096)).
 -   `AnglePickerControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#43160](https://github.com/WordPress/gutenberg/pull/43160/)).
+-   `ComboboxControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#43165](https://github.com/WordPress/gutenberg/pull/43165/)).
 
 ### Internal
 

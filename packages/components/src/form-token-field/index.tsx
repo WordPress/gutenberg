@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { last, clone, uniq, map, difference, some } from 'lodash';
+import { last, clone, uniq, map, some } from 'lodash';
 import classnames from 'classnames';
 import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
 
@@ -475,7 +475,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		} );
 
 		if ( match.length === 0 ) {
-			_suggestions = difference( _suggestions, normalizedValue );
+			_suggestions = _suggestions.filter(
+				( suggestion ) => ! normalizedValue.includes( suggestion )
+			);
 		} else {
 			match = match.toLocaleLowerCase();
 
