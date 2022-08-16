@@ -231,10 +231,9 @@ function Navigation( {
 	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
 
 	const {
-		convert,
+		convert: convertClassicMenu,
 		status: classicMenuConversionStatus,
 		error: classicMenuConversionError,
-		value: classicMenuConversionResult,
 	} = useConvertClassicToBlockMenu( clientId );
 
 	const isConvertingClassicMenu =
@@ -328,11 +327,7 @@ function Navigation( {
 			speak( __( 'Classic menu importing.' ) );
 		}
 
-		if (
-			classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_SUCCESS &&
-			classicMenuConversionResult
-		) {
-			handleUpdateMenu( classicMenuConversionResult?.id );
+		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_SUCCESS ) {
 			showClassicMenuConversionNotice(
 				__( 'Classic menu imported successfully.' )
 			);
@@ -343,11 +338,7 @@ function Navigation( {
 				__( 'Classic menu import failed.' )
 			);
 		}
-	}, [
-		classicMenuConversionStatus,
-		classicMenuConversionResult,
-		classicMenuConversionError,
-	] );
+	}, [ classicMenuConversionStatus, classicMenuConversionError ] );
 
 	// Spacer block needs orientation from context. This is a patch until
 	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.
@@ -681,9 +672,15 @@ function Navigation( {
 						handleUpdateMenu( menuId );
 						setShouldFocusNavigationSelector( true );
 					} }
-					onSelectClassicMenu={ ( classicMenu ) => {
-						convert( classicMenu.id, classicMenu.name );
-						setShouldFocusNavigationSelector( true );
+					onSelectClassicMenu={ async ( classicMenu ) => {
+						const navMenu = await convertClassicMenu(
+							classicMenu.id,
+							classicMenu.name
+						);
+						if ( navMenu ) {
+							handleUpdateMenu( navMenu.id );
+							setShouldFocusNavigationSelector( true );
+						}
 					} }
 					onCreateEmpty={ () => createNavigationMenu( '', [] ) }
 				/>
@@ -705,9 +702,17 @@ function Navigation( {
 									handleUpdateMenu( menuId );
 									setShouldFocusNavigationSelector( true );
 								} }
-								onSelectClassicMenu={ ( classicMenu ) => {
-									convert( classicMenu.id, classicMenu.name );
-									setShouldFocusNavigationSelector( true );
+								onSelectClassicMenu={ async ( classicMenu ) => {
+									const navMenu = await convertClassicMenu(
+										classicMenu.id,
+										classicMenu.name
+									);
+									if ( navMenu ) {
+										handleUpdateMenu( navMenu.id );
+										setShouldFocusNavigationSelector(
+											true
+										);
+									}
 								} }
 								onCreateNew={ resetToEmptyBlock }
 								/* translators: %s: The name of a menu. */

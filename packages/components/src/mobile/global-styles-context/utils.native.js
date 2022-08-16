@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { find, get, camelCase, has } from 'lodash';
+import { camelCase } from 'change-case';
+import { find, get, has } from 'lodash';
 import { Dimensions } from 'react-native';
 
 /**
