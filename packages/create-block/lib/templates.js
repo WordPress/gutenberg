@@ -236,11 +236,21 @@ const getTemplateVariantVars = ( variants, variant ) => {
 	const variantTypes = {};
 	if ( variants ) {
 		const chosenVariant = variant ?? variants[ 0 ]; // If no variant is passed, use the first in the array as the default
-		for ( const variantName of variants ) {
-			const key =
-				variantName.charAt( 0 ).toUpperCase() + variantName.slice( 1 );
-			variantTypes[ `is${ key }Variant` ] =
-				chosenVariant === variantName ?? false;
+
+		if ( variants.includes( chosenVariant ) ) {
+			for ( const variantName of variants ) {
+				const key =
+					variantName.charAt( 0 ).toUpperCase() +
+					variantName.slice( 1 );
+				variantTypes[ `is${ key }Variant` ] =
+					chosenVariant === variantName ?? false;
+			}
+		} else {
+			throw new CLIError(
+				`"${ chosenVariant }" is not a valid variant for this template. Available variants are: ${ variants.join(
+					', '
+				) }`
+			);
 		}
 	}
 	return variantTypes;
