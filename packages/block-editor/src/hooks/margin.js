@@ -29,10 +29,7 @@ import {
 import { cleanEmptyObject } from './utils';
 import BlockPopover from '../components/block-popover';
 import SpacingSizesControl from '../components/spacing-sizes-control';
-import {
-	getSpacingPresetCssVar,
-	isValueSpacingPreset,
-} from '../components/spacing-sizes-control/utils';
+import { getCustomValueFromPreset } from '../components/spacing-sizes-control/utils';
 
 /**
  * Determines if there is margin support.
@@ -172,24 +169,31 @@ export function MarginEdit( props ) {
 
 export function MarginVisualizer( { clientId, attributes } ) {
 	const margin = attributes?.style?.spacing?.margin;
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+
 	const style = useMemo( () => {
+		const marginTop = margin?.top
+			? getCustomValueFromPreset( margin?.top, spacingSizes )
+			: 0;
+		const marginRight = margin?.right
+			? getCustomValueFromPreset( margin?.right, spacingSizes )
+			: 0;
+		const marginBottom = margin?.bottom
+			? getCustomValueFromPreset( margin?.bottom, spacingSizes )
+			: 0;
+		const marginLeft = margin?.left
+			? getCustomValueFromPreset( margin?.left, spacingSizes )
+			: 0;
+
 		return {
-			borderTopWidth: isValueSpacingPreset( margin?.top )
-				? getSpacingPresetCssVar( margin?.top )
-				: margin?.top,
-			borderRightWidth: isValueSpacingPreset( margin?.right )
-				? getSpacingPresetCssVar( margin?.right )
-				: margin?.right,
-			borderBottomWidth: isValueSpacingPreset( margin?.bottom )
-				? getSpacingPresetCssVar( margin?.bottom )
-				: margin?.bottom,
-			borderLeftWidth: isValueSpacingPreset( margin?.left )
-				? getSpacingPresetCssVar( margin?.left )
-				: margin?.left,
-			top: margin?.top ? `-${ margin.top }` : 0,
-			right: margin?.right ? `-${ margin.right }` : 0,
-			bottom: margin?.bottom ? `-${ margin.bottom }` : 0,
-			left: margin?.left ? `-${ margin.left }` : 0,
+			borderTopWidth: marginTop,
+			borderRightWidth: marginRight,
+			borderBottomWidth: marginBottom,
+			borderLeftWidth: marginLeft,
+			top: marginTop !== 0 ? `-${ marginTop }` : 0,
+			right: marginRight !== 0 ? `-${ marginRight }` : 0,
+			bottom: marginBottom !== 0 ? `-${ marginBottom }` : 0,
+			left: marginLeft !== 0 ? `-${ marginLeft }` : 0,
 		};
 	}, [ margin ] );
 
