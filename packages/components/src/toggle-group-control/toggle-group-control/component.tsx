@@ -35,7 +35,7 @@ import * as styles from './styles';
 
 const noop = () => {};
 
-function ToggleGroupControl(
+function UnconnectedToggleGroupControl(
 	props: WordPressComponentProps< ToggleGroupControlProps, 'input' >,
 	forwardedRef: ForwardedRef< any >
 ) {
@@ -139,7 +139,6 @@ function ToggleGroupControl(
  * wrap. For items with longer labels, you can consider a `SelectControl` or a
  * `CustomSelectControl` component instead.
  *
- * @example
  * ```jsx
  * import {
  *   __experimentalToggleGroupControl as ToggleGroupControl,
@@ -156,9 +155,9 @@ function ToggleGroupControl(
  * }
  * ```
  */
-const ConnectedToggleGroupControl = contextConnect(
-	ToggleGroupControl,
+export const ToggleGroupControl = contextConnect(
+	UnconnectedToggleGroupControl,
 	'ToggleGroupControl'
 );
 
-export default ConnectedToggleGroupControl;
+export default ToggleGroupControl;
