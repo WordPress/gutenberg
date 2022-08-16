@@ -1433,8 +1433,9 @@ describe( 'Selecting links', () => {
 					// Check we can go down again using the down arrow.
 					triggerArrowDown( searchInput );
 
-					selectedSearchResultElement = container.querySelector(
-						'[role="option"][aria-selected="true"]'
+					selectedSearchResultElement = screen.queryByRole(
+						'option',
+						{ selected: true }
 					);
 
 					// We should have highlighted the first item using the keyboard
