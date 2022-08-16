@@ -533,7 +533,7 @@ class WP_Style_Engine {
 
 		if ( 'spacingStyles' === $layout_prop ) {
 			// TODO: Convert $style_value from array to string if it's an array.
-			if ( $should_skip_css_vars ) {
+			if ( ! $should_skip_css_vars ) {
 				// Set a CSS var if there is a valid preset value.
 				if ( is_string( $value ) && strpos( $value, 'var:' ) !== false && ! $should_skip_css_vars && ! empty( $individual_property_definition['css_vars'] ) ) {
 					$value = static::get_css_var_value( $value, $individual_property_definition['css_vars'] );
