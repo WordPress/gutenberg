@@ -37,7 +37,7 @@ class WP_Style_Engine_Processor {
 	 *
 	 * @param WP_Style_Engine_CSS_Rules_Store $store The store to add.
 	 *
-	 * @return WP_Style_Engine_Processor
+	 * @return WP_Style_Engine_Processor Returns the object to allow chaining methods.
 	 */
 	public function add_store( WP_Style_Engine_CSS_Rules_Store $store ) {
 		$this->stores[ $store->get_name() ] = $store;
@@ -50,7 +50,7 @@ class WP_Style_Engine_Processor {
 	 *
 	 * @param WP_Style_Engine_CSS_Rule|WP_Style_Engine_CSS_Rule[] $css_rules A single, or an array of, WP_Style_Engine_CSS_Rule objects from a store or otherwise.
 	 *
-	 * @return WP_Style_Engine_Processor
+	 * @return WP_Style_Engine_Processor Returns the object to allow chaining methods.
 	 */
 	public function add_rules( $css_rules ) {
 		if ( ! is_array( $css_rules ) ) {

@@ -43,7 +43,7 @@ class WP_Style_Engine_CSS_Declarations {
 	 * @param string $property The CSS property.
 	 * @param string $value    The CSS value.
 	 *
-	 * @return WP_Style_Engine_CSS_Declarations
+	 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
 	 */
 	public function add_declaration( $property, $value ) {
 
@@ -71,7 +71,7 @@ class WP_Style_Engine_CSS_Declarations {
 	 *
 	 * @param string $property The CSS property.
 	 *
-	 * @return WP_Style_Engine_CSS_Declarations
+	 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
 	 */
 	public function remove_declaration( $property ) {
 		unset( $this->declarations[ $property ] );
@@ -83,7 +83,7 @@ class WP_Style_Engine_CSS_Declarations {
 	 *
 	 * @param array $declarations An array of declarations.
 	 *
-	 * @return WP_Style_Engine_CSS_Declarations
+	 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
 	 */
 	public function add_declarations( $declarations ) {
 		foreach ( $declarations as $property => $value ) {
@@ -97,7 +97,7 @@ class WP_Style_Engine_CSS_Declarations {
 	 *
 	 * @param array $properties An array of properties.
 	 *
-	 * @return WP_Style_Engine_CSS_Declarations
+	 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
 	 */
 	public function remove_declarations( $properties = array() ) {
 		foreach ( $properties as $property ) {
