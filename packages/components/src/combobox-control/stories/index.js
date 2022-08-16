@@ -280,7 +280,7 @@ function Template( { onChange, ...args } ) {
 				value={ value }
 				onChange={ ( ...changeArgs ) => {
 					setValue( ...changeArgs );
-					onChange( ...changeArgs );
+					onChange?.( ...changeArgs );
 				} }
 			/>
 		</>
