@@ -400,6 +400,7 @@ const Popover = (
 			};
 			updateFrameOffset();
 			defaultView.addEventListener( 'resize', updateFrameOffset );
+			update();
 		}
 
 		return () => {
