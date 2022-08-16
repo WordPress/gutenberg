@@ -9,6 +9,7 @@
 
 ### Internal
 
+-   Update `floating-ui` to the latest version ([#43206](https://github.com/WordPress/gutenberg/pull/43206)).
 -   `DateTimePicker`, `TimePicker`, `DatePicker`: Switch from `moment` to `date-fns` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
 -   `DatePicker`: Switch from `react-dates` to `use-lilius` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
 -   `convertLTRToRTL()`: Refactor away from `_.mapKeys()` ([#43258](https://github.com/WordPress/gutenberg/pull/43258/)).
@@ -35,7 +36,7 @@
 ### Enhancements
 
 -   `ToggleGroupControlOptionIcon`: Maintain square proportions ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
--   `ToggleGroupControlOptionIcon`: Add a required `label` prop so the button is always accessibly labeled. Also removes `showTooltip` from the accepted prop types, as the tooltip will now always be shown.  ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
+-   `ToggleGroupControlOptionIcon`: Add a required `label` prop so the button is always accessibly labeled. Also removes `showTooltip` from the accepted prop types, as the tooltip will now always be shown. ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
 -   `SelectControl`, `CustomSelectControl`: Refresh and refactor chevron down icon ([#42962](https://github.com/WordPress/gutenberg/pull/42962)).
 -   `FontSizePicker`: Add large size variant ([#42716](https://github.com/WordPress/gutenberg/pull/42716/)).
 -   `Popover`: tidy up code, add more comments ([#42944](https://github.com/WordPress/gutenberg/pull/42944)).
