@@ -63,6 +63,7 @@ export default function UnsavedInnerBlocks( {
 	// from the original inner blocks from the post content then the
 	// user has made changes to the inner blocks. At this point the inner
 	// blocks can be considered "dirty".
+	// We also make sure the current innerBlocks had a chance to be set.
 	const innerBlocksAreDirty =
 		!! originalBlocks.current && blocks !== originalBlocks.current;
 
