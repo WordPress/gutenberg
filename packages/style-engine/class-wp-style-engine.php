@@ -451,7 +451,7 @@ class WP_Style_Engine {
 			$css_declarations[ $style_property_keys['default'] ] = $style_value;
 		}
 
-		return new WP_Style_Engine_CSS_Rule( $selector, $css_declarations );
+		return array( new WP_Style_Engine_CSS_Rule( $selector, $css_declarations ) );
 	}
 
 	/**
@@ -502,7 +502,7 @@ class WP_Style_Engine {
 			}
 		}
 
-		return new WP_Style_Engine_CSS_Rule( $selector, $css_declarations );
+		return array( new WP_Style_Engine_CSS_Rule( $selector, $css_declarations ) );
 	}
 
 	/**
@@ -573,24 +573,32 @@ class WP_Style_Engine {
 	}
 
 	/**
-	 * Returns compiled CSS from css_declarations.
+	 * Returns compiled CSS from an array of CSS declarations, or a rule object.
 	 *
-	 * @param array  $css_declarations An array of parsed CSS property => CSS value pairs.
-	 * @param string $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+	 * @param array  $css_declarations_or_rule An array of parsed CSS property => CSS value pairs, or a rule object.
+	 * @param string $css_selector             When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 	 *
 	 * @return string A compiled CSS string.
 	 */
-	public static function compile_css( $css_declarations, $css_selector ) {
-		if ( empty( $css_declarations ) || ! is_array( $css_declarations ) ) {
+	public static function compile_css( $css_declarations_or_rule, $css_selector = '' ) {
+		if ( empty( $css_declarations_or_rule ) ) {
+			return '';
+		}
+
+		if ( $css_declarations_or_rule instanceof WP_Style_Engine_CSS_Rule ) {
+			return $css_declarations_or_rule->get_css( false );
+		}
+
+		if ( ! is_array( $css_declarations_or_rule ) ) {
 			return '';
 		}
 
 		// Return an entire rule if there is a selector.
-		if ( $css_selector ) {
-			$css_rule = new WP_Style_Engine_CSS_Rule( $css_selector, $css_declarations );
+		if ( ! empty( $css_selector ) ) {
+			$css_rule = new WP_Style_Engine_CSS_Rule( $css_selector, $css_declarations_or_rule );
 			return $css_rule->get_css();
 		}
-		$css_declarations = new WP_Style_Engine_CSS_Declarations( $css_declarations );
+		$css_declarations = new WP_Style_Engine_CSS_Declarations( $css_declarations_or_rule );
 
 		return $css_declarations->get_declarations_string();
 	}
@@ -657,26 +665,25 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 	}
 
 	if ( ! empty( $parsed_styles['rules'] ) ) {
-		$styles_output['css']   = WP_Style_Engine::compile_css( $parsed_styles['declarations'], $options['selector'] );
+		$styles_output['css']   = '';
 		$styles_output['rules'] = $parsed_styles['rules'];
 
 		// TODO: Still need to output declarations?
 		$styles_output['declarations'] = array();
 
-		error_log( 'parsed styles declarations' );
-		error_log( $parsed_styles['declarations'], true );
+		foreach ( $styles_output['rules'] as $rule ) {
+			if ( $rule instanceof WP_Style_Engine_CSS_Rule ) {
+				$styles_output['css'] .= WP_Style_Engine::compile_css( $rule, $options['selector'] );
 
-		if ( ! empty( $options['context'] ) ) {
-			foreach ( $styles_output['rules'] as $rule ) {
-				if ( $rule instanceof WP_Style_Engine_CSS_Rule ) {
+				if ( ! empty( $options['context'] ) ) {
 					WP_Style_Engine::store_css_rule(
 						$options['context'],
 						$rule->get_selector(),
 						$rule->get_declarations()
 					);
 				}
-				// $style_engine::store_css_rule( $options['context'], $options['selector'], $parsed_styles['rules'] );
 			}
+			// $style_engine::store_css_rule( $options['context'], $options['selector'], $parsed_styles['rules'] );
 		}
 	}
 

@@ -124,4 +124,20 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 
 		$this->assertSame( $expected, $css_rule->get_css( true ) );
 	}
+
+	/**
+	 * Should generate declarations string without braces when no selector is provided.
+	 */
+	public function test_get_css_without_selector() {
+		$selector           = '';
+		$input_declarations = array(
+			'margin-top' => '10px',
+			'font-size'  => '2rem',
+		);
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+		$css_rule           = new WP_Style_Engine_CSS_Rule( $selector, $css_declarations );
+		$expected           = "{$css_declarations->get_declarations_string()}";
+
+		$this->assertSame( $expected, $css_rule->get_css() );
+	}
 }

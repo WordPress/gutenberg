@@ -109,17 +109,24 @@ class WP_Style_Engine_CSS_Rule {
 	 * @return string
 	 */
 	public function get_css( $should_prettify = false, $indent_count = 0 ) {
+		// Do not prettify inline styles.
+		if ( empty( $this->get_selector() ) ) {
+			$should_prettify = false;
+		}
+
+		$selector            = $should_prettify ? str_replace( ',', ",\n", $this->get_selector() ) : $this->get_selector();
 		$rule_indent         = $should_prettify ? str_repeat( "\t", $indent_count ) : '';
 		$declarations_indent = $should_prettify ? $indent_count + 1 : 0;
 		$new_line            = $should_prettify ? "\n" : '';
 		$space               = $should_prettify ? ' ' : '';
-		$selector            = $should_prettify ? str_replace( ',', ",\n", $this->get_selector() ) : $this->get_selector();
 		$css_declarations    = $this->declarations->get_declarations_string( $should_prettify, $declarations_indent );
+		$opening_brace       = ! empty( $selector ) ? '{' : '';
+		$closing_brace       = ! empty( $selector ) ? '}' : '';
 
 		if ( empty( $css_declarations ) ) {
 			return '';
 		}
 
-		return "{$rule_indent}{$selector}{$space}{{$new_line}{$css_declarations}{$new_line}{$rule_indent}}";
+		return "{$rule_indent}{$selector}{$space}{$opening_brace}{$new_line}{$css_declarations}{$new_line}{$rule_indent}{$closing_brace}";
 	}
 }
