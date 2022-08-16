@@ -111,7 +111,7 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 	}
 
 	const zipFields = sourceString.match(
-		/^https?:\/\/([^\s$.?#].[^\s]*)\.zip$/
+		/^https?:\/\/([^\s$.?#].[^\s]*)\.zip(\?.+)?$/
 	);
 
 	if ( zipFields ) {
