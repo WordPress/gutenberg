@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.1.1 (2022-08-16)
+
 ### Bug Fix
 -   Fix a crash when "core" was set to `null` in a `.wp-env.json` file. We now use the latest stable WordPress version in that case. This also restores the previous behavior of `"core": null` in `.wp-env.override.json`, which was to use the latest stable WordPress version.
 
