@@ -44,6 +44,7 @@ class WP_HTML_Walker {
 	/**
 	 * The last query passed to next_tag().
 	 *
+	 * @since 6.1.0
 	 * @var array|null
 	 */
 	private $last_query;
@@ -51,6 +52,7 @@ class WP_HTML_Walker {
 	/**
 	 * The tag name this walker currently scans for.
 	 *
+	 * @since 6.1.0
 	 * @var string|null
 	 */
 	private $sought_tag_name;
@@ -58,6 +60,7 @@ class WP_HTML_Walker {
 	/**
 	 * The CSS class name this walker currently scans for.
 	 *
+	 * @since 6.1.0
 	 * @var string|null
 	 */
 	private $sought_class_name;
@@ -65,6 +68,7 @@ class WP_HTML_Walker {
 	/**
 	 * The match offset this walker currently scans for.
 	 *
+	 * @since 6.1.0
 	 * @var int|null
 	 */
 	private $sought_match_offset;
@@ -905,11 +909,15 @@ class WP_HTML_Walker {
 	 *     $w->get_attribute( 'class' ) === null;
 	 * </code>
 	 *
+	 * @since 6.1.0
+	 *
 	 * @param string $name Name of attribute whose value is requested.
 	 * @return string|true|null Value of attribute or `null` if not available.
 	 *                          Boolean attributes return `true`.
+	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function get_attribute( $name ) {
+		$this->assert_not_closed();
 		if ( null === $this->tag_name_starts_at ) {
 			return null;
 		}
@@ -941,9 +949,13 @@ class WP_HTML_Walker {
 	 *     $w->get_tag() === null;
 	 * </code>
 	 *
+	 * @since 6.1.0
+	 *
 	 * @return string|null Name of current tag in input HTML, or `null` if none currently open.
+	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function get_tag() {
+		$this->assert_not_closed();
 		return null !== $this->tag_name_starts_at
 			? strtolower( substr( $this->html, $this->tag_name_starts_at, $this->tag_name_ends_at - $this->tag_name_starts_at ) )
 			: null;

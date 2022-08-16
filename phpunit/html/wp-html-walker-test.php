@@ -444,6 +444,8 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	public function data_parser_methods() {
 		return array(
 			array( 'next_tag', array( 'div' ) ),
+			array( 'get_tag', array() ),
+			array( 'get_attribute', array( 'id' ) ),
 			array( 'set_attribute', array( 'id', 'test' ) ),
 			array( 'remove_attribute', array( 'id' ) ),
 			array( 'add_class', array( 'main' ) ),
@@ -692,6 +694,15 @@ HTML;
 		$this->assertSame( 'div', $w->get_tag() );
 	}
 
+	/**
+	 * Data provider for test_ignores_contents_of_a_script_tag().
+	 *
+	 * @return array {
+	 *     @type array {
+	 *         @type string $script_then_div The HTML snippet containing script and div tags.
+	 *     }
+	 * }
+	 */
 	public function data_script_state() {
 		$examples = array();
 
@@ -757,6 +768,16 @@ HTML;
 		$this->assertSame( 'div', $w->get_tag() );
 	}
 
+	/**
+	 * Data provider for test_ignores_contents_of_a_rcdata_tag().
+	 *
+	 * @return array {
+	 *     @type array {
+	 *         @type string $rcdata_then_div The HTML snippet containing RCDATA and div tags.
+	 *         @type string $rcdata_tag      The RCDATA tag.
+	 *     }
+	 * }
+	 */
 	public function data_rcdata_state() {
 		$examples                    = array();
 		$examples['Simple textarea'] = array(
@@ -800,7 +821,7 @@ HTML;
 		$w->next_tag();
 		$w->set_attribute( 'foo', 'bar' );
 		$w->add_class( 'firstTag' );
-		$w->next_tag( 'span' );
+		$w->next_tag();
 		$w->add_class( 'secondTag' );
 		$this->assertSame(
 			$html_expected,
@@ -808,6 +829,16 @@ HTML;
 		);
 	}
 
+	/**
+	 * Data provider for test_updates_when_malformed_tag().
+	 *
+	 * @return array {
+	 *     @type array {
+	 *         @type string $html_input    The input HTML snippet.
+	 *         @type string $html_expected The expected HTML snippet after processing.
+	 *     }
+	 * }
+	 */
 	public function data_malformed_tag() {
 		$null_byte = chr( 0 );
 		$examples  = array();
@@ -818,12 +849,12 @@ HTML;
 
 		$examples['HTML tag opening inside attribute value'] = array(
 			'<pre id="<code" class="wp-block-code <code is poetry&gt;"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
-			'<pre foo="bar" id="<code" class="wp-block-code <code is poetry&gt; firstTag"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span class="secondTag">test</span>',
+			'<pre foo="bar" id="<code" class="wp-block-code <code is poetry&gt; firstTag"><code class="secondTag">This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
 		);
 
 		$examples['HTML tag brackets in attribute values and data markup'] = array(
 			'<pre id="<code-&gt;-block-&gt;" class="wp-block-code <code is poetry&gt;"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
-			'<pre foo="bar" id="<code-&gt;-block-&gt;" class="wp-block-code <code is poetry&gt; firstTag"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span class="secondTag">test</span>',
+			'<pre foo="bar" id="<code-&gt;-block-&gt;" class="wp-block-code <code is poetry&gt; firstTag"><code class="secondTag">This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
 		);
 
 		$examples['Single and double quotes in attribute value'] = array(
@@ -976,32 +1007,27 @@ HTML;
 			'<hr foo="bar" class="firstTag" a"sdf="test"><span class="secondTag">test</span>',
 		);
 
-		$examples['26'] = array(
-			'<hr id=">"code<span>test</span>',
-			'<hr foo="bar" class="firstTag" id=">"code<span>test</span>',
+		$examples['Multiple unclosed tags treated as a single tag'] = array(
+			'<hr id=">"code
+<hr id="value>"code
+<hr id="/>"code
+<hr id="value/>"code
+/>
+<span>test</span>',
+			'<hr foo="bar" class="firstTag" id=">"code
+<hr id="value>"code
+<hr id="/>"code
+<hr id="value/>"code
+/>
+<span class="secondTag">test</span>',
 		);
 
 		$examples['27'] = array(
-			'<hr id="value>"code<span>test</span>',
-			'<hr foo="bar" class="firstTag" id="value>"code<span>test</span>',
-		);
-
-		$examples['28'] = array(
-			'<hr id="/>"code<span>test</span>',
-			'<hr foo="bar" class="firstTag" id="/>"code<span>test</span>',
-		);
-
-		$examples['29'] = array(
-			'<hr id="value/>"code<span>test</span>',
-			'<hr foo="bar" class="firstTag" id="value/>"code<span>test</span>',
-		);
-
-		$examples['30'] = array(
 			'<hr id   =5><span>test</span>',
 			'<hr foo="bar" class="firstTag" id   =5><span class="secondTag">test</span>',
 		);
 
-		$examples['31'] = array(
+		$examples['28'] = array(
 			'<hr id a  =5><span>test</span>',
 			'<hr foo="bar" class="firstTag" id a  =5><span class="secondTag">test</span>',
 		);
