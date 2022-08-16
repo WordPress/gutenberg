@@ -18,9 +18,9 @@ import './style.scss';
  * Internal dependencies
  */
 import Edit from './edit';
-{{^isDynamic}}
+{{#isStaticVariant}}
 import save from './save';
-{{/isDynamic}}
+{{/isStaticVariant}}
 import metadata from './block.json';
 
 /**
@@ -33,10 +33,10 @@ registerBlockType( metadata.name, {
 	 * @see ./edit.js
 	 */
 	edit: Edit,
-	{{^isDynamic}}
+	{{#isStaticVariant}}
 	/**
 	 * @see ./save.js
 	 */
 	save,
-	{{/isDynamic}}
+	{{/isStaticVariant}}
 } );
