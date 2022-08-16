@@ -80,7 +80,7 @@ export function getSpacingPresetSlug( value ) {
 
 	const slug = value.match( /var:preset\|spacing\|(.+)/ );
 
-	return slug ? parseInt( slug[ 1 ], 10 ) : undefined;
+	return slug ? slug[ 1 ] : undefined;
 }
 
 /**
@@ -100,7 +100,7 @@ export function getSliderValueFromPreset( presetValue, spacingSizes ) {
 			? '0'
 			: getSpacingPresetSlug( presetValue );
 	const sliderValue = spacingSizes.findIndex( ( spacingSize ) => {
-		return parseInt( spacingSize.slug, 10 ) === slug;
+		return spacingSize.slug === slug;
 	} );
 
 	// Returning NaN rather than undefined as undefined makes range control thumb sit in center

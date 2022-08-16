@@ -244,7 +244,7 @@
 									},
 									"slug": {
 										"description": "Unique identifier for the space size preset.",
-										"type": "integer"
+										"type": "string"
 									},
 									"size": {
 										"description": "CSS space-size value, including units.",
