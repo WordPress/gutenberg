@@ -152,20 +152,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			);
 		}
 
-		if ( $has_block_gap_support ) {
-			if ( is_array( $gap_value ) ) {
-				$gap_row    = isset( $gap_value['top'] ) ? $gap_value['top'] : $fallback_gap_value;
-				$gap_column = isset( $gap_value['left'] ) ? $gap_value['left'] : $fallback_gap_value;
-				$gap_value  = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
-			}
-			if ( $gap_value && ! $should_skip_gap_serialization ) {
-				$layout_styles[] = array(
-					'selector'     => $selector,
-					'declarations' => array( 'gap' => $gap_value ),
-				);
-			}
-		}
-
 		if ( 'horizontal' === $layout_orientation ) {
 			/**
 			 * Add this style only if is not empty for backwards compatibility,
