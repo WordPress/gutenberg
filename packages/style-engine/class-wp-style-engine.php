@@ -288,6 +288,10 @@ class WP_Style_Engine {
 		if ( empty( $store_name ) || empty( $css_selector ) || empty( $css_declarations ) ) {
 			return;
 		}
+
+		// error_log( 'we got here' );
+		// error_log( print_r( $css_declarations, true ) );
+
 		static::get_store( $store_name )->add_rule( $css_selector )->add_declarations( $css_declarations );
 	}
 
@@ -324,6 +328,7 @@ class WP_Style_Engine {
 		}
 
 		$css_declarations = array();
+		$rules            = array();
 		$classnames       = array();
 
 		// Collect CSS and classnames.
@@ -341,13 +346,16 @@ class WP_Style_Engine {
 				$classnames       = array_merge( $classnames, static::get_classnames( $style_value, $style_definition ) );
 
 				// TODO: Instead of just grabbing declarations, can these be rules? Block spacing will require separate selectors.
-				$css_declarations = array_merge( $css_declarations, static::get_css_declarations( $style_value, $style_definition, $options ) );
+				// $css_declarations = array_merge( $css_declarations, static::get_css_declarations( $style_value, $style_definition, $options ) );
+
+				$rules = array_merge( $rules, static::get_css_rules( $style_value, $style_definition, $options ) );
 			}
 		}
 
 		return array(
 			'classnames'   => $classnames,
 			'declarations' => $css_declarations,
+			'rules'        => $rules,
 		);
 	}
 
@@ -394,15 +402,16 @@ class WP_Style_Engine {
 	 * @param array<string> $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
 	 * @param array         $options          Option values, typically provided by `parse_block_styles`.
 	 *
-	 * @return array        An array of CSS definitions, e.g., array( "$property" => "$value" ).
+	 * @return array        An array of rule objects.
 	 */
-	protected static function get_css_declarations( $style_value, $style_definition, $options = array() ) {
+	protected static function get_css_rules( $style_value, $style_definition, $options = array() ) {
 		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
 
 		if ( isset( $style_definition['value_func'] ) && is_callable( $style_definition['value_func'] ) ) {
 			return call_user_func( $style_definition['value_func'], $style_value, $style_definition, $options );
 		}
 
+		$selector            = isset( $options['selector'] ) ? $options['selector'] : null;
 		$css_declarations    = array();
 		$style_property_keys = $style_definition['property_keys'];
 
@@ -442,7 +451,7 @@ class WP_Style_Engine {
 			$css_declarations[ $style_property_keys['default'] ] = $style_value;
 		}
 
-		return $css_declarations;
+		return new WP_Style_Engine_CSS_Rule( $selector, $css_declarations );
 	}
 
 	/**
@@ -461,6 +470,7 @@ class WP_Style_Engine {
 	protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $options ) {
 		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
 
+		$selector         = isset( $options['selector'] ) ? $options['selector'] : null;
 		$css_declarations = array();
 
 		if ( ! is_array( $style_value ) || empty( $style_value ) || empty( $individual_property_definition['path'] ) ) {
@@ -491,7 +501,8 @@ class WP_Style_Engine {
 				$css_declarations[ $individual_css_property ] = $value;
 			}
 		}
-		return $css_declarations;
+
+		return new WP_Style_Engine_CSS_Rule( $selector, $css_declarations );
 	}
 
 	/**
@@ -541,6 +552,9 @@ class WP_Style_Engine {
 				// Iterate over each of the rules and substitute non-string values such as `null` with the real style value.
 				foreach ( $layout_prop_rule['rules'] as $css_property => $css_value ) {
 					$current_css_value = is_string( $css_value ) ? $css_value : $style_value;
+
+					// TODO: This is what isn't working because we can't return a rule object here.
+					// Instead, it expects declarations, which is prohibitive for how the blockGap works. Dang!
 					$rules[]           = new WP_Style_Engine_CSS_Rule(
 						sprintf(
 							'%s%s',
@@ -554,6 +568,8 @@ class WP_Style_Engine {
 				}
 			}
 		}
+
+		return $rules;
 	}
 
 	/**
@@ -640,11 +656,27 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 		return $styles_output;
 	}
 
-	if ( ! empty( $parsed_styles['declarations'] ) ) {
-		$styles_output['css']          = WP_Style_Engine::compile_css( $parsed_styles['declarations'], $options['selector'] );
-		$styles_output['declarations'] = $parsed_styles['declarations'];
+	if ( ! empty( $parsed_styles['rules'] ) ) {
+		$styles_output['css']   = WP_Style_Engine::compile_css( $parsed_styles['declarations'], $options['selector'] );
+		$styles_output['rules'] = $parsed_styles['rules'];
+
+		// TODO: Still need to output declarations?
+		$styles_output['declarations'] = array();
+
+		error_log( 'parsed styles declarations' );
+		error_log( $parsed_styles['declarations'], true );
+
 		if ( ! empty( $options['context'] ) ) {
-			WP_Style_Engine::store_css_rule( $options['context'], $options['selector'], $parsed_styles['declarations'] );
+			foreach ( $styles_output['rules'] as $rule ) {
+				if ( $rule instanceof WP_Style_Engine_CSS_Rule ) {
+					WP_Style_Engine::store_css_rule(
+						$options['context'],
+						$rule->get_selector(),
+						$rule->get_declarations()
+					);
+				}
+				// $style_engine::store_css_rule( $options['context'], $options['selector'], $parsed_styles['rules'] );
+			}
 		}
 	}
 

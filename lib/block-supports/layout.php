@@ -38,9 +38,36 @@ function gutenberg_register_layout_support( $block_type ) {
  *
  * @return string                                CSS style.
  */
-function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null ) {
+function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null, $layout_definitions = array() ) {
 	$layout_type   = isset( $layout['type'] ) ? $layout['type'] : 'default';
 	$layout_styles = array();
+
+	$rendered_style = false;
+
+	if ( $has_block_gap_support && $gap_value ) {
+		if ( is_array( $gap_value ) ) {
+			$gap_value = $gap_value['top'];
+		}
+		$result = gutenberg_style_engine_get_styles(
+			array(
+				'spacing' => array(
+					'blockGap' => $gap_value,
+				),
+			),
+			array(
+				'selector'          => $selector,
+				'context'           => 'block-supports',
+				'enqueue'           => true,
+				'layoutDefinitions' => $layout_definitions,
+				'layout'            => $layout,
+			)
+		);
+		// error_log( print_r( $result, true ) );
+		if ( ! empty( $result ) ) {
+			$rendered_style = true;
+		}
+	}
+
 	if ( 'default' === $layout_type ) {
 		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : '';
 		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : '';
@@ -97,31 +124,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 						'declarations' => array( 'margin-left' => "calc($padding_left * -1)" ),
 					);
 				}
-			}
-		}
-
-		if ( $has_block_gap_support ) {
-			if ( is_array( $gap_value ) ) {
-				$gap_value = isset( $gap_value['top'] ) ? $gap_value['top'] : null;
-			}
-			if ( $gap_value && ! $should_skip_gap_serialization ) {
-				array_push(
-					$layout_styles,
-					array(
-						'selector'     => "$selector > *",
-						'declarations' => array(
-							'margin-block-start' => '0',
-							'margin-block-end'   => '0',
-						),
-					),
-					array(
-						'selector'     => "$selector$selector > * + *",
-						'declarations' => array(
-							'margin-block-start' => $gap_value,
-							'margin-block-end'   => '0',
-						),
-					)
-				);
 			}
 		}
 	} elseif ( 'flex' === $layout_type ) {
@@ -214,6 +216,10 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		);
 	}
 
+	if ( $rendered_style ) {
+		return true;
+	}
+
 	return '';
 }
 
@@ -304,7 +310,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
 		$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
-		$style                         = gutenberg_get_layout_style( ".$block_classname.$container_class", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value, $block_spacing );
+		$style                         = gutenberg_get_layout_style( ".$block_classname.$container_class", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value, $block_spacing, $layout_definitions );
 
 		// Only add container class and enqueue block support styles if unique styles were generated.
 		if ( ! empty( $style ) ) {

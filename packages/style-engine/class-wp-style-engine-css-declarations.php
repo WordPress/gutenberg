@@ -54,8 +54,10 @@ class WP_Style_Engine_CSS_Declarations {
 			return;
 		}
 
+		// error_log( print_r( $value, true ) );
+
 		// Trim the value. If empty, bail early.
-		$value = trim( $value );
+		// $value = trim( $value );
 		if ( '' === $value ) {
 			return;
 		}
