@@ -638,14 +638,13 @@ export const toStyles = (
 			if ( duotoneSelector ) {
 				const duotoneDeclarations =
 					getStylesDeclarations( duotoneStyles );
-				if ( duotoneDeclarations.length === 0 ) {
-					return;
+				if ( duotoneDeclarations.length > 0 ) {
+					ruleset =
+						ruleset +
+						`${ duotoneSelector }{${ duotoneDeclarations.join(
+							';'
+						) };}`;
 				}
-				ruleset =
-					ruleset +
-					`${ duotoneSelector }{${ duotoneDeclarations.join(
-						';'
-					) };}`;
 			}
 
 			// Process blockGap and layout styles.
