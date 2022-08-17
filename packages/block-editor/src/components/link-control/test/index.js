@@ -88,9 +88,9 @@ function getURLInput() {
 
 function getSearchResults( container ) {
 	const input = getURLInput();
-	// The input has `aria-owns` to indicate that it owns (and is related to)
+	// The input has `aria-controls` to indicate that it owns (and is related to)
 	// the search results with `role="listbox"`.
-	const relatedSelector = input.getAttribute( 'aria-owns' );
+	const relatedSelector = input.getAttribute( 'aria-controls' );
 
 	// Select by relationship as well as role.
 	return container.querySelectorAll(
