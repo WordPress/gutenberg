@@ -200,7 +200,6 @@ function gutenberg_register_core_block_patterns() {
 			'footer-with-site-title-and-credit-line',
 			'header-with-large-font-size',
 			'left-aligned-footer',
-			'logo-navigation-and-social-icons',
 			'right-aligned-footer',
 			'simple-header',
 			'simple-header-inside-image',
