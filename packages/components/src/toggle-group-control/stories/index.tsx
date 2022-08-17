@@ -28,8 +28,6 @@ const meta: ComponentMeta< typeof ToggleGroupControl > = {
 	title: 'Components (Experimental)/ToggleGroupControl',
 	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
 	argTypes: {
-		// TODO: Should this component be non-polymorphic?
-		as: { control: { type: null } },
 		help: { control: { type: 'text' } },
 		onChange: { action: 'onChange' },
 		value: { control: { type: null } },

@@ -36,7 +36,7 @@ import * as styles from './styles';
 const noop = () => {};
 
 function UnconnectedToggleGroupControl(
-	props: WordPressComponentProps< ToggleGroupControlProps, 'input' >,
+	props: WordPressComponentProps< ToggleGroupControlProps, 'input', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
