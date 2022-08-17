@@ -192,6 +192,10 @@ const Popover = (
 		}
 
 		return documentToReturn ?? document;
+
+		// 'reference' and 'refs.floating' are refs and don't need to be listed
+		// as dependencies (see https://github.com/WordPress/gutenberg/pull/41612)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ anchorRef, anchorRect, getAnchorRect ] );
 
 	/**
