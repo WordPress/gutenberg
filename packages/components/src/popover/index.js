@@ -405,7 +405,8 @@ const Popover = (
 		ownerDocument.addEventListener( 'scroll', update );
 
 		let updateFrameOffset;
-		if ( defaultView ) {
+		const hasFrameElement = !! ownerDocument?.defaultView?.frameElement;
+		if ( hasFrameElement ) {
 			updateFrameOffset = () => {
 				frameOffset.current = getFrameOffset( ownerDocument );
 				update();
