@@ -9,6 +9,7 @@ import {
 	PinnedItems,
 } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,6 +20,7 @@ import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import WritingMenu from '../writing-menu';
 
 const MoreMenu = ( { showIconLabels } ) => {
+	const anchorRef = useRef();
 	const isLargeViewport = useViewportMatch( 'large' );
 
 	return (
@@ -27,6 +29,7 @@ const MoreMenu = ( { showIconLabels } ) => {
 				showTooltip: ! showIconLabels,
 				...( showIconLabels && { variant: 'tertiary' } ),
 			} }
+			popoverProps={ { anchorRef: anchorRef?.current?.firstChild } }
 		>
 			{ ( { onClose } ) => (
 				<>
