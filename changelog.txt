@@ -6,10 +6,21 @@
 
 ### Enhancements
 
-#### Accessibility
+#### Block Library
 
-- Shortcuts: Add Ctrl+Y for redo on Windows. ([42627](https://github.com/WordPress/gutenberg/pull/42627))
-- Change shortcut text for redo tooltip on Windows. ([42830](https://github.com/WordPress/gutenberg/pull/42830))
+- Archives: Add a control to make block's dropdown label invisible. ([43025](https://github.com/WordPress/gutenberg/pull/43025))
+- Media&Text: Add help to ImageSizeControl. ([40642](https://github.com/WordPress/gutenberg/pull/40642))
+- Navigation: Move overlay colors to the responsive wrapper. ([42875](https://github.com/WordPress/gutenberg/pull/42875))
+- Navigation: Extract navigation block utils. ([42865](https://github.com/WordPress/gutenberg/pull/42865))
+- Navigation: Fix link inheritance in overlay. ([42929](https://github.com/WordPress/gutenberg/pull/42929))
+- Post Author: Rendering html for the author description at the editor. ([42109](https://github.com/WordPress/gutenberg/pull/42109))
+- Post Featured Image: Add link target and rel attributes. ([42853](https://github.com/WordPress/gutenberg/pull/42853))
+- Post Title: Do not add `rel` attribute if empty. ([42855](https://github.com/WordPress/gutenberg/pull/42855))
+- Query Pagination: Correctly position the "next" link on the first page. ([42764](https://github.com/WordPress/gutenberg/pull/42764))
+- Query Title: Add a search title variation. ([42662](https://github.com/WordPress/gutenberg/pull/42662))
+- Quote: Unwrap on Backspace at start. ([42808](https://github.com/WordPress/gutenberg/pull/42808))
+- Search Block: Remove margins from the input. ([42959](https://github.com/WordPress/gutenberg/pull/42959))
+- Transforms: Add group unwrap. ([42685](https://github.com/WordPress/gutenberg/pull/42685))
 
 #### Components
 
@@ -33,24 +44,6 @@
 - UnitControl: Update unit dropdown design. ([42000](https://github.com/WordPress/gutenberg/pull/42000))
 - Update control labels to the new uppercase styles. ([42789](https://github.com/WordPress/gutenberg/pull/42789))
 
-#### Block Library
-
-- Archives: Add a control to make block's dropdown label invisible. ([43025](https://github.com/WordPress/gutenberg/pull/43025))
-- Media&Text: Add help to ImageSizeControl. ([40642](https://github.com/WordPress/gutenberg/pull/40642))
-- Navigation: Move overlay colors to the responsive wrapper. ([42875](https://github.com/WordPress/gutenberg/pull/42875))
-- Navigation: Extract navigation block utils. ([42865](https://github.com/WordPress/gutenberg/pull/42865))
-- Navigation: Fix link inheritance in overlay. ([42929](https://github.com/WordPress/gutenberg/pull/42929))
-- Page List: Fix indentation in PHP file. ([42852](https://github.com/WordPress/gutenberg/pull/42852))
-- Post Author: Rendering html for the author description at the editor. ([42109](https://github.com/WordPress/gutenberg/pull/42109))
-- Post Featured Image: Add link target and rel attributes. ([42853](https://github.com/WordPress/gutenberg/pull/42853))
-- Post Title: Do not add `rel` attribute if empty. ([42855](https://github.com/WordPress/gutenberg/pull/42855))
-- Query Loop: Try filters with ToolsPanel. ([42629](https://github.com/WordPress/gutenberg/pull/42629))
-- Query Pagination: Correctly position the "next" link on the first page. ([42764](https://github.com/WordPress/gutenberg/pull/42764))
-- Query Title: Add a search title variation. ([42662](https://github.com/WordPress/gutenberg/pull/42662))
-- Quote: Unwrap on Backspace at start. ([42808](https://github.com/WordPress/gutenberg/pull/42808))
-- Search Block: Remove margins from the input. ([42959](https://github.com/WordPress/gutenberg/pull/42959))
-- Transforms: Add group unwrap. ([42685](https://github.com/WordPress/gutenberg/pull/42685))
-
 #### Reusable Blocks
 
 - Make template part and reusable block creation language consistent. ([43032](https://github.com/WordPress/gutenberg/pull/43032))
@@ -59,9 +52,6 @@
 
 - Rename solid color. ([42918](https://github.com/WordPress/gutenberg/pull/42918))
 - Tab style subpixel fix. ([42892](https://github.com/WordPress/gutenberg/pull/42892))
-- Style engine: Prettify combined selectors. ([43003](https://github.com/WordPress/gutenberg/pull/43003))
-- Style engine: Prettify output. ([42909](https://github.com/WordPress/gutenberg/pull/42909))
-- Style engine: Rename global function. ([42719](https://github.com/WordPress/gutenberg/pull/42719))
 - Navigation: Try to keep :Where just for paddings. ([42967](https://github.com/WordPress/gutenberg/pull/42967))
 
 #### Global Styles
@@ -189,6 +179,11 @@
 
 - Remove i18n references from save properties. ([43035](https://github.com/WordPress/gutenberg/pull/43035))
 
+### Accessibility
+
+- Shortcuts: Add Ctrl+Y for redo on Windows. ([42627](https://github.com/WordPress/gutenberg/pull/42627))
+- Change shortcut text for redo tooltip on Windows. ([42830](https://github.com/WordPress/gutenberg/pull/42830))
+
 ### Performance
 
 - Lodash: Refactor away from `_.isMatch()`. ([42271](https://github.com/WordPress/gutenberg/pull/42271))
@@ -203,9 +198,13 @@
 
 ### Experiments
 
-- Style engine: Enqueue block support styles. ([42452](https://github.com/WordPress/gutenberg/pull/42452)) ([42880](https://github.com/WordPress/gutenberg/pull/42880))
+#### Style Engine
+- Enqueue block support styles. ([42452](https://github.com/WordPress/gutenberg/pull/42452)) ([42880](https://github.com/WordPress/gutenberg/pull/42880))
+- Prettify combined selectors. ([43003](https://github.com/WordPress/gutenberg/pull/43003))
+- Prettify output. ([42909](https://github.com/WordPress/gutenberg/pull/42909))
+- Rename global function. ([42719](https://github.com/WordPress/gutenberg/pull/42719))
 - Combine style-engine stores for block-supports. ([42970](https://github.com/WordPress/gutenberg/pull/42970))
-- Style engine: Add optimize flag and combine functions into wp\_style\_engine\_get\_stylesheet. ([42878](https://github.com/WordPress/gutenberg/pull/42878))
+- Add optimize flag and combine functions into wp\_style\_engine\_get\_stylesheet. ([42878](https://github.com/WordPress/gutenberg/pull/42878))
 
 ### Documentation
 
@@ -242,6 +241,8 @@
 - Normalize usage of Notifications in Nav block. ([42706](https://github.com/WordPress/gutenberg/pull/42706))
 - Remove duplicate speak calls from navigation block. ([43079](https://github.com/WordPress/gutenberg/pull/43079))
 - Site Title: Use home\_url instead of get\_bloginfo. ([42857](https://github.com/WordPress/gutenberg/pull/42857))
+- Page List: Fix indentation in PHP file. ([42852](https://github.com/WordPress/gutenberg/pull/42852))
+- Query Loop: Try filters with ToolsPanel. ([42629](https://github.com/WordPress/gutenberg/pull/42629))
 
 #### Site Editor
 
@@ -275,7 +276,6 @@
 - Standardize script naming in main package.json. ([42368](https://github.com/WordPress/gutenberg/pull/42368))
 
 ## First time contributors
-
 - @fellyph: Rendering html for the author description at the editor. ([42109](https://github.com/WordPress/gutenberg/pull/42109))
 - @merkys7: Fix social-link block missing 'width' and 'height' attributes. ([41373](https://github.com/WordPress/gutenberg/pull/41373))
 - @Smit2808: Added the allowedFormat details in richtext readme. ([42426](https://github.com/WordPress/gutenberg/pull/42426))
@@ -283,9 +283,7 @@
 
 ## Contributors
 
-The following contributors merged PRs in this release:
-
-@aaronrobertshaw @adamziel @andrewserong @aristath @carolinan @chad1008 @ciampo @derekblank @dougwollison @ellatrix @fellyph @geriux @getdave @glendaviesnz @hellofromtonya @ItsJonQ @jameskoster @jasmussen @jorgefilipecosta @JustinyAhin @kjohnson @Mamaduka @manzoorwanijk @matiasbenedetto @mcsf @merkys7 @mikachan @mirka @ndiego @noahtallen @ntsekouras @pavanpatil1 @pooja-muchandikar @ramonjd @ryanwelcher @SavPhill @scruffian @shimotmk @SiobhyB @Smit2808 @Soean @stokesman @t-hamano @talldan @tellthemachines @theminaldiwan @tyxla @walbo
+The following contributors merged PRs in this release: @aaronrobertshaw @adamziel @andrewserong @aristath @carolinan @chad1008 @ciampo @derekblank @dougwollison @ellatrix @fellyph @geriux @getdave @glendaviesnz @hellofromtonya @ItsJonQ @jameskoster @jasmussen @jorgefilipecosta @JustinyAhin @kjohnson @Mamaduka @manzoorwanijk @matiasbenedetto @mcsf @merkys7 @mikachan @mirka @ndiego @noahtallen @ntsekouras @pavanpatil1 @pooja-muchandikar @ramonjd @ryanwelcher @SavPhill @scruffian @shimotmk @SiobhyB @Smit2808 @Soean @stokesman @t-hamano @talldan @tellthemachines @theminaldiwan @tyxla @walbo
 
 = 13.8.2 =
 
