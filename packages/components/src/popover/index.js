@@ -195,41 +195,39 @@ const Popover = (
 	 * Store the offset in a ref, due to constraints with floating-ui:
 	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
 	 */
-	const frameOffset = useRef( getFrameOffset( referenceOwnerDocument ) );
+	const frameOffset = useRef();
 
 	const middleware = [
-		frameOffset.current || offset
-			? offsetMiddleware( ( { placement: currentPlacement } ) => {
-					if ( ! frameOffset.current ) {
-						return offset;
-					}
+		offsetMiddleware( ( { placement: currentPlacement } ) => {
+			if ( ! frameOffset.current ) {
+				return offset ?? 0;
+			}
 
-					const isTopBottomPlacement =
-						currentPlacement.includes( 'top' ) ||
-						currentPlacement.includes( 'bottom' );
+			const isTopBottomPlacement =
+				currentPlacement.includes( 'top' ) ||
+				currentPlacement.includes( 'bottom' );
 
-					// The main axis should represent the gap between the
-					// floating element and the reference element. The cross
-					// axis is always perpendicular to the main axis.
-					const mainAxis = isTopBottomPlacement ? 'y' : 'x';
-					const crossAxis = mainAxis === 'x' ? 'y' : 'x';
+			// The main axis should represent the gap between the
+			// floating element and the reference element. The cross
+			// axis is always perpendicular to the main axis.
+			const mainAxis = isTopBottomPlacement ? 'y' : 'x';
+			const crossAxis = mainAxis === 'x' ? 'y' : 'x';
 
-					// When the popover is before the reference, subtract the offset,
-					// of the main axis else add it.
-					const hasBeforePlacement =
-						currentPlacement.includes( 'top' ) ||
-						currentPlacement.includes( 'left' );
-					const mainAxisModifier = hasBeforePlacement ? -1 : 1;
-					const normalizedOffset = offset ? offset : 0;
+			// When the popover is before the reference, subtract the offset,
+			// of the main axis else add it.
+			const hasBeforePlacement =
+				currentPlacement.includes( 'top' ) ||
+				currentPlacement.includes( 'left' );
+			const mainAxisModifier = hasBeforePlacement ? -1 : 1;
+			const normalizedOffset = offset ? offset : 0;
 
-					return {
-						mainAxis:
-							normalizedOffset +
-							frameOffset.current[ mainAxis ] * mainAxisModifier,
-						crossAxis: frameOffset.current[ crossAxis ],
-					};
-			  } )
-			: undefined,
+			return {
+				mainAxis:
+					normalizedOffset +
+					frameOffset.current[ mainAxis ] * mainAxisModifier,
+				crossAxis: frameOffset.current[ crossAxis ],
+			};
+		} ),
 		__unstableForcePosition ? undefined : flip(),
 		__unstableForcePosition
 			? undefined
@@ -391,6 +389,7 @@ const Popover = (
 	// document scrolls. Also update the frame offset if the view resizes.
 	useLayoutEffect( () => {
 		if ( referenceOwnerDocument === document ) {
+			frameOffset.current = undefined;
 			return;
 		}
 
