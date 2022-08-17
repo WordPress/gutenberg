@@ -17,9 +17,7 @@ return array(
 					<!-- wp:site-title /--></div>
 					<!-- /wp:group -->
 					
-					<!-- wp:navigation {"layout":{"type":"flex","setCascadingProperties":true,"justifyContent":"right"}} -->
-					<!-- wp:page-list {"isNavigationChild":true,"showSubmenuIcon":true,"openSubmenusOnClick":false} /-->
-					<!-- /wp:navigation --></div>
+					<!-- wp:navigation {"layout":{"type":"flex","setCascadingProperties":true,"justifyContent":"right"}} /-->
 					<!-- /wp:group -->
 					
 					<!-- wp:cover {"url":"https://s.w.org/patterns/files/2022/08/5eca6-header-mountains-scaled-1.jpg","id":57,"dimRatio":0,"isDark":false,"align":"full"} -->

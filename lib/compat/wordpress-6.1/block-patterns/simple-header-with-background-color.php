@@ -17,7 +17,7 @@ return array(
 					<!-- wp:site-title {"style":{"elements":{"link":{"color":{"text":"var:preset|color|background"}}}}} /--></div>
 					<!-- /wp:group -->
 					
-					<!-- wp:navigation {"ref":31,"__unstableLocation":"primary","layout":{"type":"flex","setCascadingProperties":true,"justifyContent":"right"}} /--></div>
+					<!-- wp:navigation {"layout":{"type":"flex","setCascadingProperties":true,"justifyContent":"right"}} /--></div>
 					<!-- /wp:group --></div>
 					<!-- /wp:group -->',
 );

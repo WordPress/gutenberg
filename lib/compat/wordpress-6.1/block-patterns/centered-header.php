@@ -14,6 +14,6 @@ return array(
 					
 					<!-- wp:site-title {"textAlign":"center","fontSize":"large"} /-->
 					
-					<!-- wp:navigation {"ref":31,"layout":{"type":"flex","justifyContent":"center"}} /--></div>
+					<!-- wp:navigation {"layout":{"type":"flex","justifyContent":"center"}} /--></div>
 					<!-- /wp:group -->',
 );

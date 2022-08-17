@@ -11,10 +11,8 @@ return array(
 	'categories' => array( 'footer' ),
 	'content'    => '<!-- wp:group {"align":"full","layout":{"inherit":true}} -->
 					<div class="wp-block-group alignfull"><!-- wp:group {"align":"wide","style":{"spacing":{"padding":{"bottom":"2em","top":"4em"}}},"layout":{"type":"flex","justifyContent":"space-between"}} -->
-					<div class="wp-block-group alignwide" style="padding-top:4em;padding-bottom:2em"><!-- wp:navigation {"layout":{"type":"flex","setCascadingProperties":true,"justifyContent":"left"}} -->
-					<!-- wp:page-list {"isNavigationChild":true,"showSubmenuIcon":true,"openSubmenusOnClick":false} /-->
-					<!-- /wp:navigation -->
-					
+					<div class="wp-block-group alignwide" style="padding-top:4em;padding-bottom:2em">
+					<!-- wp:navigation {"layout":{"type":"flex","setCascadingProperties":true,"justifyContent":"left"}} /-->
 					<!-- wp:paragraph -->
 					<p>'
 					. sprintf(

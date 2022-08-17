@@ -21,9 +21,8 @@ return array(
 					'</p>
 					<!-- /wp:paragraph -->
 					
-					<!-- wp:navigation {"layout":{"type":"flex","setCascadingProperties":true,"justifyContent":"right"}} -->
-					<!-- wp:page-list {"isNavigationChild":true,"showSubmenuIcon":true,"openSubmenusOnClick":false} /-->
-					<!-- /wp:navigation --></div>
+					<!-- wp:navigation {"layout":{"type":"flex","setCascadingProperties":true,"justifyContent":"right"}} /-->
+					</div>
 					<!-- /wp:group --></div>
 					<!-- /wp:group -->',
 );
