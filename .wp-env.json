@@ -4,9 +4,6 @@
 	"themes": [ "./test/emptytheme" ],
 	"env": {
 		"tests": {
-			"config": {
-				"WP_DEBUG": true
-			},
 			"mappings": {
 				"wp-content/plugins/gutenberg": ".",
 				"wp-content/mu-plugins": "./packages/e2e-tests/mu-plugins",
