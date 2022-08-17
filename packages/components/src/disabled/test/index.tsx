@@ -4,23 +4,18 @@
 import { render } from '@testing-library/react';
 
 /**
- * WordPress dependencies
- */
-
-/**
  * Internal dependencies
  */
 import Disabled from '../';
 
 jest.mock( '@wordpress/dom', () => {
 	const focus = jest.requireActual( '../../../../dom/src' ).focus;
-
 	return {
 		focus: {
 			...focus,
 			focusable: {
 				...focus.focusable,
-				find( context, ...rest ) {
+				find( context: Element, options = { sequential: false } ) {
 					// In JSDOM, all elements have zero'd widths and height.
 					// This is a metric for focusable's `isVisible`, so find
 					// and apply an arbitrary non-zero width.
@@ -34,7 +29,7 @@ jest.mock( '@wordpress/dom', () => {
 						}
 					);
 
-					return focus.focusable.find( context, ...rest );
+					return focus.focusable.find( context, options );
 				},
 			},
 		},
@@ -65,7 +60,7 @@ describe( 'Disabled', () => {
 	} );
 
 	it( 'should cleanly un-disable via reconciliation', () => {
-		const MaybeDisable = ( { isDisabled } ) =>
+		const MaybeDisable = ( { isDisabled = true } ) =>
 			isDisabled ? (
 				<Disabled>
 					<Form />
