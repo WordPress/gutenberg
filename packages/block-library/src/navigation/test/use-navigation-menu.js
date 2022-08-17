@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createRegistry, useSuspenseSelect } from '@wordpress/data';
+import { createRegistry, useSelect, useSuspenseSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -27,8 +27,11 @@ function createRegistryWithStores() {
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
 	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
-	return mock;
+	return {
+		__esModule: true,
+		default: jest.fn(),
+		useSuspenseSelect: jest.fn(),
+	};
 } );
 
 function resolveRecords( registry, menus ) {
@@ -98,6 +101,7 @@ describe( 'useNavigationMenus', () => {
 	beforeEach( () => {
 		registry = createRegistryWithStores();
 		useSuspenseSelect.mockImplementation( ( fn ) => fn( registry.select ) );
+		useSelect.mockImplementation( ( fn ) => fn( registry.select ) );
 	} );
 
 	it( 'Should return no information when no data is resolved', () => {
