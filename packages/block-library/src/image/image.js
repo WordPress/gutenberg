@@ -17,7 +17,7 @@ import {
 	ToolbarButton,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useSuspenseSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
@@ -93,7 +93,7 @@ export default function Image( {
 	const { allowResize = true } = context;
 	const { getBlock } = useSelect( blockEditorStore );
 
-	const { image, multiImageSelection } = useSelect(
+	const { image, multiImageSelection } = useSuspenseSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
 			const { getMultiSelectedBlockClientIds, getBlockName } =
@@ -115,7 +115,7 @@ export default function Image( {
 		[ id, isSelected, clientId ]
 	);
 	const { canInsertCover, imageEditing, imageSizes, maxWidth, mediaUpload } =
-		useSelect(
+		useSuspenseSelect(
 			( select ) => {
 				const {
 					getBlockRootClientId,

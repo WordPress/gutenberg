@@ -6,7 +6,7 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -83,7 +83,7 @@ export const mapToIHasNameAndId = ( entities, path ) => {
  * @return {Object} The helper object related to post types.
  */
 export const usePostTypes = () => {
-	const postTypes = useSelect( ( select ) => {
+	const postTypes = useSuspenseSelect( ( select ) => {
 		const { getPostTypes } = select( coreStore );
 		const excludedPostTypes = [ 'attachment' ];
 		const filteredPostTypes = getPostTypes( { per_page: -1 } )?.filter(
@@ -117,7 +117,7 @@ export const usePostTypes = () => {
  * @return {Object[]} An array of the associated taxonomies.
  */
 export const useTaxonomies = ( postType ) => {
-	const taxonomies = useSelect(
+	const taxonomies = useSuspenseSelect(
 		( select ) => {
 			const { getTaxonomies } = select( coreStore );
 			const filteredTaxonomies = getTaxonomies( {

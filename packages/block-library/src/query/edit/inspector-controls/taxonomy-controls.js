@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { FormTokenField } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -35,7 +35,7 @@ const getTermIdByTermValue = ( termsMappedByName, termValue ) => {
 
 export const useTaxonomiesInfo = ( postType ) => {
 	const taxonomies = useTaxonomies( postType );
-	const taxonomiesInfo = useSelect(
+	const taxonomiesInfo = useSuspenseSelect(
 		( select ) => {
 			const { getEntityRecords } = select( coreStore );
 			const termsQuery = { context: 'view', per_page: MAX_FETCHED_TERMS };

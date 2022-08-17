@@ -8,7 +8,7 @@ import { escape, unescape } from 'lodash';
  * WordPress dependencies
  */
 import { createBlock, switchToBlockType } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSuspenseSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
 	PanelBody,
@@ -289,7 +289,7 @@ const useIsInvalidLink = ( kind, type, id ) => {
 	const isPostType =
 		kind === 'post-type' || type === 'post' || type === 'page';
 	const hasId = Number.isInteger( id );
-	const postStatus = useSelect(
+	const postStatus = useSuspenseSelect(
 		( select ) => {
 			if ( ! isPostType ) {
 				return null;
@@ -364,7 +364,7 @@ function navStripHTML( html ) {
  */
 
 function LinkControlTransforms( { clientId, replace } ) {
-	const { getBlock, blockTransforms } = useSelect(
+	const { getBlock, blockTransforms } = useSuspenseSelect(
 		( select ) => {
 			const {
 				getBlock: _getBlock,
@@ -475,7 +475,7 @@ export default function NavigationLinkEdit( {
 		isTopLevelLink,
 		isParentOfSelectedBlock,
 		hasChildren,
-	} = useSelect(
+	} = useSuspenseSelect(
 		( select ) => {
 			const {
 				getBlocks,

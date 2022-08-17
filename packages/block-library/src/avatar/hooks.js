@@ -4,7 +4,7 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore, useEntityProp } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 
 function getAvatarSizes( sizes ) {
 	const minSize = sizes ? sizes[ 0 ] : 24;
@@ -17,7 +17,7 @@ function getAvatarSizes( sizes ) {
 }
 
 function useDefaultAvatar() {
-	const { avatarURL: defaultAvatarUrl } = useSelect( ( select ) => {
+	const { avatarURL: defaultAvatarUrl } = useSuspenseSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { __experimentalDiscussionSettings } = getSettings();
 		return __experimentalDiscussionSettings;
@@ -56,7 +56,7 @@ export function useCommentAvatar( { commentId } ) {
 }
 
 export function useUserAvatar( { userId, postId, postType } ) {
-	const { authorDetails } = useSelect(
+	const { authorDetails } = useSuspenseSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getUser } = select( coreStore );
 			if ( userId ) {

@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import {
 	AlignmentControl,
@@ -28,14 +28,17 @@ export default function SiteTaglineEdit( {
 		'site',
 		'description'
 	);
-	const { canUserEdit, readOnlySiteTagLine } = useSelect( ( select ) => {
-		const { canUser, getEntityRecord } = select( coreStore );
-		const siteData = getEntityRecord( 'root', '__unstableBase' );
-		return {
-			canUserEdit: canUser( 'update', 'settings' ),
-			readOnlySiteTagLine: siteData?.description,
-		};
-	}, [] );
+	const { canUserEdit, readOnlySiteTagLine } = useSuspenseSelect(
+		( select ) => {
+			const { canUser, getEntityRecord } = select( coreStore );
+			const siteData = getEntityRecord( 'root', '__unstableBase' );
+			return {
+				canUserEdit: canUser( 'update', 'settings' ),
+				readOnlySiteTagLine: siteData?.description,
+			};
+		},
+		[]
+	);
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,

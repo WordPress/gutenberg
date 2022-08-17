@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useState, memo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockContextProvider,
@@ -239,7 +239,7 @@ export default function CommentTemplateEdit( {
 		threadCommentsDepth,
 		threadComments,
 		commentsPerPage,
-	} = useSelect( ( select ) => {
+	} = useSuspenseSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().__experimentalDiscussionSettings;
 	} );
@@ -248,7 +248,7 @@ export default function CommentTemplateEdit( {
 		postId,
 	} );
 
-	const { topLevelComments, blocks } = useSelect(
+	const { topLevelComments, blocks } = useSuspenseSelect(
 		( select ) => {
 			const { getEntityRecords } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );

@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { useEffect, Platform } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSuspenseSelect } from '@wordpress/data';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import {
 	AlignmentControl,
@@ -41,7 +41,7 @@ function HeadingEdit( {
 		style,
 	} );
 
-	const { canGenerateAnchors } = useSelect( ( select ) => {
+	const { canGenerateAnchors } = useSuspenseSelect( ( select ) => {
 		const { getGlobalBlockCount, getSettings } = select( blockEditorStore );
 		const settings = getSettings();
 

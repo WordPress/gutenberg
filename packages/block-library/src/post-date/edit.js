@@ -27,7 +27,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { edit } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 
 export default function PostDateEdit( {
 	attributes: { textAlign, format, isLink, displayType },
@@ -59,7 +59,7 @@ export default function PostDateEdit( {
 		postId
 	);
 
-	const postType = useSelect(
+	const postType = useSuspenseSelect(
 		( select ) =>
 			postTypeSlug
 				? select( coreStore ).getPostType( postTypeSlug )

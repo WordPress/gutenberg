@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSuspenseSelect, useDispatch } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
 import {
 	BlockContextProvider,
@@ -23,7 +23,7 @@ const QueryEdit = ( props ) => {
 	const [ isPatternSelectionModalOpen, setIsPatternSelectionModalOpen ] =
 		useState( false );
 	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
-	const hasInnerBlocks = useSelect(
+	const hasInnerBlocks = useSuspenseSelect(
 		( select ) =>
 			!! select( blockEditorStore ).getBlocks( clientId ).length,
 		[ clientId ]

@@ -8,7 +8,7 @@ import { map, filter } from 'lodash';
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { useState, useRef } from '@wordpress/element';
 import {
 	BlockControls,
@@ -157,7 +157,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
-	const { imageSizes, image, isContentLocked } = useSelect(
+	const { imageSizes, image, isContentLocked } = useSuspenseSelect(
 		( select ) => {
 			const { __unstableGetContentLockingParent, getSettings } =
 				select( blockEditorStore );

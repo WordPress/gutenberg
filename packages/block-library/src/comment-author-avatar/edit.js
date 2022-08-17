@@ -9,7 +9,7 @@ import {
 } from '@wordpress/block-editor';
 import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
 
 export default function Edit( {
@@ -40,7 +40,7 @@ export default function Edit( {
 	const blockProps = useBlockProps();
 	const spacingProps = useSpacingProps( attributes );
 	const maxSizeBuffer = Math.floor( maxSize * 2.5 );
-	const { avatarURL } = useSelect( ( select ) => {
+	const { avatarURL } = useSuspenseSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { __experimentalDiscussionSettings } = getSettings();
 		return __experimentalDiscussionSettings;

@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useSuspenseSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock, cloneBlock } from '@wordpress/blocks';
 
 export default function useIndentListItem( clientId ) {
-	const canIndent = useSelect(
+	const canIndent = useSuspenseSelect(
 		( select ) => select( blockEditorStore ).getBlockIndex( clientId ) > 0,
 		[ clientId ]
 	);

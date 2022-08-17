@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import {
 	AlignmentControl,
 	BlockControls,
@@ -41,7 +41,7 @@ export default function Edit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-	let displayName = useSelect(
+	let displayName = useSuspenseSelect(
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );
 

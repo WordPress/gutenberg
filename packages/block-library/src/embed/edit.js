@@ -24,7 +24,7 @@ import classnames from 'classnames';
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSuspenseSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
@@ -57,7 +57,7 @@ const EmbedEdit = ( props ) => {
 	const { invalidateResolution } = useDispatch( coreStore );
 
 	const { preview, fetching, themeSupportsResponsive, cannotEmbed } =
-		useSelect(
+		useSuspenseSelect(
 			( select ) => {
 				const {
 					getEmbedPreview,

@@ -37,7 +37,7 @@ import {
 	__experimentalImageEditor as ImageEditor,
 	__experimentalImageEditingProvider as ImageEditingProvider,
 } from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSuspenseSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { crop, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -79,7 +79,7 @@ const SiteLogo = ( {
 	const classes = classnames( 'custom-logo-link', {
 		'is-transient': isBlobURL( logoUrl ),
 	} );
-	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
+	const { imageEditing, maxWidth, title } = useSuspenseSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const siteEntities = select( coreStore ).getEditedEntityRecord(
 			'root',
@@ -367,7 +367,7 @@ export default function LogoEdit( {
 		siteIconId,
 		mediaItemData,
 		isRequestingMediaItem,
-	} = useSelect( ( select ) => {
+	} = useSuspenseSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
 		const siteSettings = getEditedEntityRecord( 'root', 'site' );

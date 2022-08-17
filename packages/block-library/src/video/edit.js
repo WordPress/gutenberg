@@ -30,7 +30,7 @@ import {
 import { useRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSuspenseSelect } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
@@ -59,7 +59,7 @@ function VideoEdit( {
 	const posterImageButton = useRef();
 	const { id, caption, controls, poster, src, tracks } = attributes;
 	const isTemporaryVideo = ! id && isBlobURL( src );
-	const mediaUpload = useSelect(
+	const mediaUpload = useSuspenseSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
 		[]
 	);

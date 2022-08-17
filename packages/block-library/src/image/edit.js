@@ -9,7 +9,7 @@ import { get, isEmpty, pick } from 'lodash';
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { Placeholder } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSuspenseSelect } from '@wordpress/data';
 import {
 	BlockAlignmentControl,
 	BlockControls,
@@ -137,8 +137,8 @@ export function ImageEdit( {
 	}, [ caption ] );
 
 	const ref = useRef();
-	const { imageDefaultSize, mediaUpload, isContentLocked } = useSelect(
-		( select ) => {
+	const { imageDefaultSize, mediaUpload, isContentLocked } =
+		useSuspenseSelect( ( select ) => {
 			const { getSettings, __unstableGetContentLockingParent } =
 				select( blockEditorStore );
 			const settings = getSettings();
@@ -148,9 +148,7 @@ export function ImageEdit( {
 				isContentLocked:
 					!! __unstableGetContentLockingParent( clientId ),
 			};
-		},
-		[]
-	);
+		}, [] );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {

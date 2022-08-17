@@ -8,7 +8,7 @@ import {
 	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 
 export default function TemplatePartInnerBlocks( {
 	postId: id,
@@ -17,7 +17,7 @@ export default function TemplatePartInnerBlocks( {
 	tagName: TagName,
 	blockProps,
 } ) {
-	const themeSupportsLayout = useSelect( ( select ) => {
+	const themeSupportsLayout = useSuspenseSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings()?.supportsLayout;
 	}, [] );

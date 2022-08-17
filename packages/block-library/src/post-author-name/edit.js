@@ -12,7 +12,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { PanelBody, ToggleControl } from '@wordpress/components';
@@ -22,7 +22,7 @@ function PostAuthorNameEdit( {
 	attributes: { textAlign, isLink, linkTarget },
 	setAttributes,
 } ) {
-	const { authorName } = useSelect(
+	const { authorName } = useSuspenseSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getUser } = select( coreStore );
 			const _authorId = getEditedEntityRecord(

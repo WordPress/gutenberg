@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -12,7 +12,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * @param {string} recordId Record's id.
  */
 export function useCanEditEntity( kind, name, recordId ) {
-	return useSelect(
+	return useSuspenseSelect(
 		( select ) =>
 			select( coreStore ).canUserEditEntityRecord( kind, name, recordId ),
 		[ kind, name, recordId ]

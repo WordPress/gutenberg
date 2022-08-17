@@ -14,7 +14,7 @@ import {
 import { ToolbarButton, Spinner, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, memo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 
 /**
@@ -101,7 +101,7 @@ export default function PageListEdit( { context, clientId } ) {
 }
 
 function useFrontPageId() {
-	return useSelect( ( select ) => {
+	return useSuspenseSelect( ( select ) => {
 		const canReadSettings = select( coreStore ).canUser(
 			'read',
 			'settings'

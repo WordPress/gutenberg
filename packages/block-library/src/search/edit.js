@@ -17,7 +17,7 @@ import {
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSuspenseSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import {
 	ToolbarDropdownMenu,
@@ -79,7 +79,7 @@ export default function SearchEdit( {
 		style,
 	} = attributes;
 
-	const insertedInNavigationBlock = useSelect(
+	const insertedInNavigationBlock = useSuspenseSelect(
 		( select ) => {
 			const { getBlockParentsByBlockName, wasBlockJustInserted } =
 				select( blockEditorStore );

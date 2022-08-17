@@ -7,7 +7,12 @@ import { castArray } from 'lodash';
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import {
+	useSelect,
+	useSuspenseSelect,
+	useDispatch,
+	useRegistry,
+} from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { cloneBlock } from '@wordpress/blocks';
 
@@ -18,7 +23,7 @@ import { name as listItemName } from '../block.json';
 
 export default function useOutdentListItem( clientId ) {
 	const registry = useRegistry();
-	const { canOutdent } = useSelect(
+	const { canOutdent } = useSuspenseSelect(
 		( innerSelect ) => {
 			const { getBlockRootClientId } = innerSelect( blockEditorStore );
 			const grandParentId = getBlockRootClientId(

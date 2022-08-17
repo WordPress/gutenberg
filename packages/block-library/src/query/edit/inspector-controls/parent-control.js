@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { FormTokenField } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
@@ -25,7 +25,7 @@ function ParentControl( { parents, postType, onChange } ) {
 	const [ value, setValue ] = useState( EMPTY_ARRAY );
 	const [ suggestions, setSuggestions ] = useState( EMPTY_ARRAY );
 	const debouncedSearch = useDebounce( setSearch, 250 );
-	const { searchResults, searchHasResolved } = useSelect(
+	const { searchResults, searchHasResolved } = useSuspenseSelect(
 		( select ) => {
 			if ( ! search ) {
 				return { searchResults: EMPTY_ARRAY, searchHasResolved: true };
@@ -53,7 +53,7 @@ function ParentControl( { parents, postType, onChange } ) {
 		},
 		[ search, parents ]
 	);
-	const currentParents = useSelect(
+	const currentParents = useSuspenseSelect(
 		( select ) => {
 			if ( ! parents?.length ) return EMPTY_ARRAY;
 			const { getEntityRecords } = select( coreStore );

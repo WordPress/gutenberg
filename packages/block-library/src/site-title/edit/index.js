@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import {
@@ -32,7 +32,7 @@ export default function SiteTitleEdit( {
 } ) {
 	const { level, textAlign, isLink, linkTarget } = attributes;
 	const [ title, setTitle ] = useEntityProp( 'root', 'site', 'title' );
-	const { canUserEdit, readOnlyTitle } = useSelect( ( select ) => {
+	const { canUserEdit, readOnlyTitle } = useSuspenseSelect( ( select ) => {
 		const { canUser, getEntityRecord } = select( coreStore );
 		const siteData = getEntityRecord( 'root', '__unstableBase' );
 		return {

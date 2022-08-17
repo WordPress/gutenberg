@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSuspenseSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import {
 	store as blockEditorStore,
@@ -9,7 +9,7 @@ import {
 } from '@wordpress/block-editor';
 
 const PatternEdit = ( { attributes, clientId } ) => {
-	const selectedPattern = useSelect(
+	const selectedPattern = useSuspenseSelect(
 		( select ) =>
 			select( blockEditorStore ).__experimentalGetParsedPattern(
 				attributes.slug

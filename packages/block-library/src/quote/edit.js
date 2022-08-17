@@ -16,7 +16,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
-import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
+import { useDispatch, useSuspenseSelect, useRegistry } from '@wordpress/data';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { Platform, useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
@@ -78,7 +78,7 @@ export default function QuoteEdit( {
 
 	useMigrateOnLoad( attributes, clientId );
 
-	const hasSelection = useSelect( ( select ) => {
+	const hasSelection = useSuspenseSelect( ( select ) => {
 		const { isBlockSelected, hasSelectedInnerBlock } =
 			select( blockEditorStore );
 		return hasSelectedInnerBlock( clientId ) || isBlockSelected( clientId );

@@ -6,7 +6,7 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import {
 	BlockSettingsMenuControls,
 	BlockTitle,
@@ -50,7 +50,7 @@ export default function TemplatePartEdit( {
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const { isResolved, innerBlocks, isMissing, area } = useSelect(
+	const { isResolved, innerBlocks, isMissing, area } = useSuspenseSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );

@@ -27,7 +27,7 @@ import {
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSuspenseSelect } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
@@ -49,7 +49,7 @@ function AudioEdit( {
 } ) {
 	const { id, autoplay, caption, loop, preload, src } = attributes;
 	const isTemporaryAudio = ! id && isBlobURL( src );
-	const mediaUpload = useSelect( ( select ) => {
+	const mediaUpload = useSuspenseSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
 	}, [] );

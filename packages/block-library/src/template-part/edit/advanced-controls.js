@@ -5,7 +5,7 @@ import { useEntityProp } from '@wordpress/core-data';
 import { SelectControl, TextControl } from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 
 export function TemplatePartAdvancedControls( {
 	tagName,
@@ -28,7 +28,7 @@ export function TemplatePartAdvancedControls( {
 		templatePartId
 	);
 
-	const { areaOptions } = useSelect( ( select ) => {
+	const { areaOptions } = useSuspenseSelect( ( select ) => {
 		// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
 		// Blocks can be loaded into a *non-post* block editor.
 		/* eslint-disable @wordpress/data-no-store-string-literals */

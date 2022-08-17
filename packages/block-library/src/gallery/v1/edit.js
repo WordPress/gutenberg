@@ -23,7 +23,7 @@ import {
 import { Platform, useEffect, useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSuspenseSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { View } from '@wordpress/primitives';
 import { store as coreStore } from '@wordpress/core-data';
@@ -83,7 +83,7 @@ function GalleryEdit( props ) {
 		useDispatch( blockEditorStore );
 
 	const { imageSizes, mediaUpload, getMedia, wasBlockJustInserted } =
-		useSelect( ( select ) => {
+		useSuspenseSelect( ( select ) => {
 			const settings = select( blockEditorStore ).getSettings();
 
 			return {

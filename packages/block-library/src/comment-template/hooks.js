@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useState, useEffect, useMemo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
@@ -35,7 +35,7 @@ export const useCommentQueryArgs = ( { postId } ) => {
 		pageComments,
 		commentsPerPage,
 		defaultCommentsPage: defaultPage,
-	} = useSelect( ( select ) => {
+	} = useSuspenseSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { __experimentalDiscussionSettings } = getSettings();
 		return __experimentalDiscussionSettings;

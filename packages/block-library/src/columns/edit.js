@@ -24,7 +24,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
+import { withDispatch, useDispatch, useSuspenseSelect } from '@wordpress/data';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
@@ -61,7 +61,7 @@ function ColumnsEditContainer( {
 } ) {
 	const { isStackedOnMobile, verticalAlignment } = attributes;
 
-	const { count } = useSelect(
+	const { count } = useSuspenseSelect(
 		( select ) => {
 			return {
 				count: select( blockEditorStore ).getBlockCount( clientId ),
@@ -224,7 +224,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 )( ColumnsEditContainer );
 
 function Placeholder( { clientId, name, setAttributes } ) {
-	const { blockType, defaultVariation, variations } = useSelect(
+	const { blockType, defaultVariation, variations } = useSuspenseSelect(
 		( select ) => {
 			const {
 				getBlockVariations,
@@ -271,7 +271,7 @@ function Placeholder( { clientId, name, setAttributes } ) {
 
 const ColumnsEdit = ( props ) => {
 	const { clientId } = props;
-	const hasInnerBlocks = useSelect(
+	const hasInnerBlocks = useSuspenseSelect(
 		( select ) =>
 			select( blockEditorStore ).getBlocks( clientId ).length > 0,
 		[ clientId ]

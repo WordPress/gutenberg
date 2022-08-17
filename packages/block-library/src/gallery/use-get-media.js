@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 const EMPTY_IMAGE_MEDIA = [];
@@ -15,7 +15,7 @@ const EMPTY_IMAGE_MEDIA = [];
  * @return {Array} An array of media info options for each gallery image.
  */
 export default function useGetMedia( innerBlockImages ) {
-	return useSelect(
+	return useSuspenseSelect(
 		( select ) => {
 			const imageIds = innerBlockImages
 				.map( ( imageBlock ) => imageBlock.attributes.id )

@@ -22,7 +22,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSuspenseSelect, useDispatch } from '@wordpress/data';
 import { isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -103,7 +103,7 @@ function CoverEdit( {
 		postId
 	);
 
-	const media = useSelect(
+	const media = useSuspenseSelect(
 		( select ) =>
 			featuredImage &&
 			select( coreStore ).getMedia( featuredImage, { context: 'view' } ),
@@ -173,7 +173,7 @@ function CoverEdit( {
 
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
 
-	const hasInnerBlocks = useSelect(
+	const hasInnerBlocks = useSuspenseSelect(
 		( select ) =>
 			select( blockEditorStore ).getBlock( clientId ).innerBlocks.length >
 			0,

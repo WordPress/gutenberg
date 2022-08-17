@@ -8,7 +8,7 @@ import {
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 
@@ -43,7 +43,7 @@ export default function QueryPaginationEdit( {
 	name,
 } ) {
 	const usedLayout = layout || getDefaultBlockLayout( name );
-	const hasNextPreviousBlocks = useSelect( ( select ) => {
+	const hasNextPreviousBlocks = useSuspenseSelect( ( select ) => {
 		const { getBlocks } = select( blockEditorStore );
 		const innerBlocks = getBlocks( clientId );
 		/**

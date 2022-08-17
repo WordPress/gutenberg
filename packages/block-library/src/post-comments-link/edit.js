@@ -13,7 +13,7 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { __, sprintf, _n } from '@wordpress/i18n';
@@ -49,7 +49,7 @@ function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
 		} );
 	}, [ postId ] );
 
-	const post = useSelect(
+	const post = useSuspenseSelect(
 		( select ) =>
 			select( coreStore ).getEditedEntityRecord(
 				'postType',

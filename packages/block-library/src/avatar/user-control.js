@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { ComboboxControl } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
 
@@ -16,7 +16,7 @@ const AUTHORS_QUERY = {
 
 function UserControl( { value, onChange } ) {
 	const [ filteredAuthorsList, setFilteredAuthorsList ] = useState();
-	const authorsList = useSelect( ( select ) => {
+	const authorsList = useSuspenseSelect( ( select ) => {
 		const { getUsers } = select( coreStore );
 		return getUsers( AUTHORS_QUERY );
 	}, [] );

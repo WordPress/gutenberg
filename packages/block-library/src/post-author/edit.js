@@ -14,7 +14,7 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSuspenseSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -25,7 +25,7 @@ function PostAuthorEdit( {
 	setAttributes,
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	const { authorId, authorDetails, authors } = useSelect(
+	const { authorId, authorDetails, authors } = useSuspenseSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getUser, getUsers } =
 				select( coreStore );

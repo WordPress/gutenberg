@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { FormTokenField } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -19,7 +19,7 @@ const AUTHORS_QUERY = {
 };
 
 function AuthorControl( { value, onChange } ) {
-	const authorsList = useSelect( ( select ) => {
+	const authorsList = useSuspenseSelect( ( select ) => {
 		const { getUsers } = select( coreStore );
 		return getUsers( AUTHORS_QUERY );
 	}, [] );

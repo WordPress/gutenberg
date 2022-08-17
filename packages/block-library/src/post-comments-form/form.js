@@ -15,7 +15,7 @@ import {
 import { Button } from '@wordpress/components';
 import { useDisabled, useInstanceId } from '@wordpress/compose';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 
 const CommentsFormPlaceholder = () => {
 	const disabledFormRef = useDisabled();
@@ -63,13 +63,13 @@ const CommentsForm = ( { postId, postType } ) => {
 
 	const isSiteEditor = postType === undefined || postId === undefined;
 
-	const { defaultCommentStatus } = useSelect(
+	const { defaultCommentStatus } = useSuspenseSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings()
 				.__experimentalDiscussionSettings
 	);
 
-	const postTypeSupportsComments = useSelect( ( select ) =>
+	const postTypeSupportsComments = useSuspenseSelect( ( select ) =>
 		postType
 			? !! select( coreStore ).getPostType( postType )?.supports.comments
 			: false

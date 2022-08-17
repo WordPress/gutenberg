@@ -17,7 +17,7 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { Spinner, TextControl } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -47,7 +47,7 @@ export default function PostTermsEdit( {
 	const { term, textAlign, separator, prefix, suffix } = attributes;
 	const { postId, postType } = context;
 
-	const selectedTerm = useSelect(
+	const selectedTerm = useSuspenseSelect(
 		( select ) => {
 			if ( ! term ) return {};
 			const { getTaxonomy } = select( coreStore );

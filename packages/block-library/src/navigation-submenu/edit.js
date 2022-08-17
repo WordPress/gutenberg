@@ -7,7 +7,7 @@ import { escape, without } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSuspenseSelect, useDispatch } from '@wordpress/data';
 import {
 	PanelBody,
 	Popover,
@@ -308,7 +308,7 @@ export default function NavigationSubmenuEdit( {
 		hasChildren,
 		selectedBlockHasChildren,
 		onlyDescendantIsEmptyLink,
-	} = useSelect(
+	} = useSuspenseSelect(
 		( select ) => {
 			const {
 				hasSelectedInnerBlock,

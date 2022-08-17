@@ -25,7 +25,7 @@ import classnames from 'classnames';
  */
 import { _x } from '@wordpress/i18n';
 import { useCallback, useState, useEffect } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSuspenseSelect } from '@wordpress/data';
 import {
 	useBlockProps,
 	store as blockEditorStore,
@@ -61,7 +61,7 @@ const EmbedEdit = ( props ) => {
 	const embedInfoByProvider = getEmbedInfoByProvider( providerNameSlug );
 	const { icon, title } = embedInfoByProvider || defaultEmbedInfo;
 
-	const { wasBlockJustInserted } = useSelect(
+	const { wasBlockJustInserted } = useSuspenseSelect(
 		( select ) => ( {
 			wasBlockJustInserted: select(
 				blockEditorStore
@@ -77,7 +77,7 @@ const EmbedEdit = ( props ) => {
 	const { invalidateResolution } = useDispatch( coreStore );
 
 	const { preview, fetching, themeSupportsResponsive, cannotEmbed } =
-		useSelect(
+		useSuspenseSelect(
 			( select ) => {
 				const {
 					getEmbedPreview,

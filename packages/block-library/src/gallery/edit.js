@@ -26,7 +26,7 @@ import {
 } from '@wordpress/block-editor';
 import { Platform, useEffect, useMemo } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSuspenseSelect, useDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { View } from '@wordpress/primitives';
 import { createBlock } from '@wordpress/blocks';
@@ -95,25 +95,29 @@ function GalleryEdit( props ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const { getBlock, getSettings, preferredStyle } = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
-		const preferredStyleVariations =
-			settings.__experimentalPreferredStyleVariations;
-		return {
-			getBlock: select( blockEditorStore ).getBlock,
-			getSettings: select( blockEditorStore ).getSettings,
-			preferredStyle: preferredStyleVariations?.value?.[ 'core/image' ],
-		};
-	}, [] );
+	const { getBlock, getSettings, preferredStyle } = useSuspenseSelect(
+		( select ) => {
+			const settings = select( blockEditorStore ).getSettings();
+			const preferredStyleVariations =
+				settings.__experimentalPreferredStyleVariations;
+			return {
+				getBlock: select( blockEditorStore ).getBlock,
+				getSettings: select( blockEditorStore ).getSettings,
+				preferredStyle:
+					preferredStyleVariations?.value?.[ 'core/image' ],
+			};
+		},
+		[]
+	);
 
-	const innerBlockImages = useSelect(
+	const innerBlockImages = useSuspenseSelect(
 		( select ) => {
 			return select( blockEditorStore ).getBlock( clientId )?.innerBlocks;
 		},
 		[ clientId ]
 	);
 
-	const wasBlockJustInserted = useSelect(
+	const wasBlockJustInserted = useSuspenseSelect(
 		( select ) => {
 			return select( blockEditorStore ).wasBlockJustInserted(
 				clientId,

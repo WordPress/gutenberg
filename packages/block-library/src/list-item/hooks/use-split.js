@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback, useRef } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { cloneBlock, createBlock } from '@wordpress/blocks';
 
@@ -13,7 +13,7 @@ export default function useSplit( clientId ) {
 	// a flag where the first execution of the callback is false (it is the before value)
 	// and the second execution is true, it is the after value.
 	const isAfter = useRef( false );
-	const { getBlock } = useSelect( blockEditorStore );
+	const { getBlock } = useSuspenseSelect( blockEditorStore );
 	return useCallback(
 		( value ) => {
 			const block = getBlock( clientId );

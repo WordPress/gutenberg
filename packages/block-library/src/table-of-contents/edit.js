@@ -22,7 +22,7 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { useDisabled } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSuspenseSelect } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { renderToString, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -57,7 +57,7 @@ export default function TableOfContentsEdit( {
 	const blockProps = useBlockProps();
 	const disabledRef = useDisabled();
 
-	const canInsertList = useSelect(
+	const canInsertList = useSuspenseSelect(
 		( select ) => {
 			const { getBlockRootClientId, canInsertBlockType } =
 				select( blockEditorStore );
@@ -75,7 +75,7 @@ export default function TableOfContentsEdit( {
 	 * The latest heading data, or null if the new data deeply equals the saved
 	 * headings attribute.
 	 *
-	 * Since useSelect forces a re-render when its return value is shallowly
+	 * Since useSuspenseSelect forces a re-render when its return value is shallowly
 	 * inequal to its prior call, we would be re-rendering this block every time
 	 * the stores change, even if the latest headings were deeply equal to the
 	 * ones saved in the block attributes.
@@ -83,10 +83,10 @@ export default function TableOfContentsEdit( {
 	 * By returning null when they're equal, we reduce that to 2 renders: one
 	 * when there are new latest headings (and so it returns them), and one when
 	 * they haven't changed (so it returns null). As long as the latest heading
-	 * data remains the same, further calls of the useSelect callback will
+	 * data remains the same, further calls of the useSuspenseSelect callback will
 	 * continue to return null, thus preventing any forced re-renders.
 	 */
-	const latestHeadings = useSelect(
+	const latestHeadings = useSuspenseSelect(
 		( select ) => {
 			const {
 				getBlockAttributes,

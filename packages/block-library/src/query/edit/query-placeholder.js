@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSuspenseSelect, useDispatch } from '@wordpress/data';
 import {
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
@@ -101,7 +101,7 @@ function QueryVariationPicker( {
 	icon,
 	label,
 } ) {
-	const { defaultVariation, scopeVariations } = useSelect(
+	const { defaultVariation, scopeVariations } = useSuspenseSelect(
 		( select ) => {
 			const {
 				getBlockVariations,

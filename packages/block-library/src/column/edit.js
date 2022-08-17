@@ -21,7 +21,7 @@ import {
 	PanelBody,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSuspenseSelect, useDispatch } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 
 function ColumnEdit( {
@@ -43,7 +43,7 @@ function ColumnEdit( {
 		],
 	} );
 
-	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
+	const { columnsIds, hasChildBlocks, rootClientId } = useSuspenseSelect(
 		( select ) => {
 			const { getBlockOrder, getBlockRootClientId } =
 				select( blockEditorStore );

@@ -24,7 +24,7 @@ import {
 	Disabled,
 	TextControl,
 } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSuspenseSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalRecursionProvider as RecursionProvider,
@@ -77,7 +77,7 @@ export default function ReusableBlockEdit( {
 		styles.spinnerDark
 	);
 
-	const { hasResolved, isEditing, isMissing } = useSelect(
+	const { hasResolved, isEditing, isMissing } = useSuspenseSelect(
 		( select ) => {
 			const persistedBlock = select( coreStore ).getEntityRecord(
 				'postType',

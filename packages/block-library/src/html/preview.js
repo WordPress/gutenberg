@@ -7,7 +7,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { SandBox } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 
 // Default styles used to unset some of the styles
 // that might be inherited from the editor style.
@@ -21,7 +21,7 @@ const DEFAULT_STYLES = `
 `;
 
 export default function HTMLEditPreview( { content, isSelected } ) {
-	const settingStyles = useSelect( ( select ) => {
+	const settingStyles = useSuspenseSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings()?.styles;
 	}, [] );
 

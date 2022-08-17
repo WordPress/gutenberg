@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSuspenseSelect, useDispatch } from '@wordpress/data';
 import {
 	MenuItem,
 	ToggleControl,
@@ -59,7 +59,7 @@ function PostFeaturedImageDisplay( {
 		postId
 	);
 
-	const { media, postType } = useSelect(
+	const { media, postType } = useSuspenseSelect(
 		( select ) => {
 			const { getMedia, getPostType } = select( coreStore );
 			return {
@@ -75,7 +75,7 @@ function PostFeaturedImageDisplay( {
 	);
 	const mediaUrl = getMediaSourceUrlBySizeSlug( media, sizeSlug );
 
-	const imageSizes = useSelect(
+	const imageSizes = useSuspenseSelect(
 		( select ) => select( blockEditorStore ).getSettings().imageSizes,
 		[]
 	);

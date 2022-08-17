@@ -11,7 +11,7 @@ import {
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -42,7 +42,7 @@ function ButtonsEdit( { attributes, className } ) {
 			'has-custom-font-size': fontSize || style?.typography?.fontSize,
 		} ),
 	} );
-	const preferredStyle = useSelect( ( select ) => {
+	const preferredStyle = useSuspenseSelect( ( select ) => {
 		const preferredStyleVariations =
 			select( blockEditorStore ).getSettings()
 				.__experimentalPreferredStyleVariations;

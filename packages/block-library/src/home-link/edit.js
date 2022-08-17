@@ -12,14 +12,14 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSuspenseSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect } from '@wordpress/element';
 
 const preventDefault = ( event ) => event.preventDefault();
 
 export default function HomeEdit( { attributes, setAttributes, context } ) {
-	const { homeUrl } = useSelect( ( select ) => {
+	const { homeUrl } = useSuspenseSelect( ( select ) => {
 		const {
 			getUnstableBase, // Site index.
 		} = select( coreStore );

@@ -1,13 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 const EMPTY_ARRAY = [];
 
 export function useInnerBlocks( clientId ) {
-	return useSelect(
+	return useSuspenseSelect(
 		( select ) => {
 			const { getBlock, getBlocks, hasSelectedInnerBlock } =
 				select( blockEditorStore );

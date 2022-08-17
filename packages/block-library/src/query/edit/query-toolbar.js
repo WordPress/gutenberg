@@ -11,7 +11,7 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { settings, list, grid } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 export default function QueryToolbar( {
@@ -22,7 +22,7 @@ export default function QueryToolbar( {
 	name,
 	clientId,
 } ) {
-	const hasPatterns = useSelect(
+	const hasPatterns = useSuspenseSelect(
 		( select ) => {
 			const {
 				getBlockRootClientId,

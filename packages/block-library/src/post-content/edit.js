@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -41,7 +41,7 @@ function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 
 function EditableContent( { layout, context = {} } ) {
 	const { postType, postId } = context;
-	const themeSupportsLayout = useSelect( ( select ) => {
+	const themeSupportsLayout = useSuspenseSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings()?.supportsLayout;
 	}, [] );

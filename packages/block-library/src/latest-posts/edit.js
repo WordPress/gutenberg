@@ -28,7 +28,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSuspenseSelect, useDispatch } from '@wordpress/data';
 import { pin, list, grid } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticeStore } from '@wordpress/notices';
@@ -96,7 +96,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		defaultImageHeight,
 		categoriesList,
 		authorList,
-	} = useSelect(
+	} = useSuspenseSelect(
 		( select ) => {
 			const { getEntityRecords, getUsers } = select( coreStore );
 			const settings = select( blockEditorStore ).getSettings();

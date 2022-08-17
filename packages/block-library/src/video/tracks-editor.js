@@ -22,7 +22,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { upload, media } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { getFilename } from '@wordpress/url';
 
@@ -188,7 +188,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 }
 
 export default function TracksEditor( { tracks = [], onChange } ) {
-	const mediaUpload = useSelect( ( select ) => {
+	const mediaUpload = useSuspenseSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
 	const [ trackBeingEdited, setTrackBeingEdited ] = useState( null );

@@ -3,7 +3,7 @@
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -13,7 +13,7 @@ import { useSelect } from '@wordpress/data';
 import { createTemplatePartId } from '../template-part/edit/utils/create-template-part-id';
 
 export default function useTemplatePartAreaLabel( clientId ) {
-	return useSelect(
+	return useSuspenseSelect(
 		( select ) => {
 			// Use the lack of a clientId as an opportunity to bypass the rest
 			// of this hook.

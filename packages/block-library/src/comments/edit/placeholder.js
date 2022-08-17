@@ -3,7 +3,7 @@
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { useDisabled } from '@wordpress/compose';
 
@@ -16,7 +16,7 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
 	let [ postTitle ] = useEntityProp( 'postType', postType, 'title', postId );
 	postTitle = postTitle || __( 'Post Title' );
 
-	const { avatarURL } = useSelect(
+	const { avatarURL } = useSuspenseSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings()
 				.__experimentalDiscussionSettings

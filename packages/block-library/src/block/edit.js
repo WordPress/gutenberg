@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSuspenseSelect } from '@wordpress/data';
 import {
 	useEntityBlockEditor,
 	useEntityProp,
@@ -39,7 +39,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	);
 	const isMissing = hasResolved && ! record;
 
-	const canRemove = useSelect(
+	const canRemove = useSuspenseSelect(
 		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
 		[ clientId ]
 	);

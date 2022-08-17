@@ -6,7 +6,7 @@ import { find, kebabCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSuspenseSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
@@ -27,7 +27,7 @@ import { createTemplatePartId } from './create-template-part-id';
  * @return {{ templateParts: Array, isResolving: boolean }} array of template parts.
  */
 export function useAlternativeTemplateParts( area, excludedId ) {
-	const { templateParts, isResolving } = useSelect( ( select ) => {
+	const { templateParts, isResolving } = useSuspenseSelect( ( select ) => {
 		const { getEntityRecords, isResolving: _isResolving } =
 			select( coreStore );
 		const query = { per_page: -1 };
@@ -78,7 +78,7 @@ export function useAlternativeTemplateParts( area, excludedId ) {
  * @return {Array} array of block patterns.
  */
 export function useAlternativeBlockPatterns( area, clientId ) {
-	return useSelect(
+	return useSuspenseSelect(
 		( select ) => {
 			const blockNameWithArea = area
 				? `core/template-part/${ area }`
@@ -139,7 +139,7 @@ export function useCreateTemplatePartFromBlocks( area, setAttributes ) {
  * @return {{icon: Object, label: string, tagName: string}} Template Part area.
  */
 export function useTemplatePartArea( area ) {
-	return useSelect(
+	return useSuspenseSelect(
 		( select ) => {
 			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
 			// Blocks can be loaded into a *non-post* block editor.

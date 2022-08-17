@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createRegistry, useSelect } from '@wordpress/data';
+import { createRegistry, useSuspenseSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -97,7 +97,7 @@ describe( 'useNavigationMenus', () => {
 	let registry;
 	beforeEach( () => {
 		registry = createRegistryWithStores();
-		useSelect.mockImplementation( ( fn ) => fn( registry.select ) );
+		useSuspenseSelect.mockImplementation( ( fn ) => fn( registry.select ) );
 	} );
 
 	it( 'Should return no information when no data is resolved', () => {
