@@ -385,7 +385,14 @@ const Popover = (
 		update,
 		placement: computedPlacement,
 		middlewareData: { arrow: arrowData = {} },
-	} = useFloating( { placement: normalizedPlacementFromProps, middleware } );
+	} = useFloating( {
+		placement: normalizedPlacementFromProps,
+		middleware,
+		whileElementsMounted: ( referenceParam, floatingParam, updateParam ) =>
+			autoUpdate( referenceParam, floatingParam, updateParam, {
+				animationFrame: true,
+			} ),
+	} );
 
 	useEffect( () => {
 		offsetRef.current = offsetProp;
@@ -407,18 +414,7 @@ const Popover = (
 		}
 
 		reference( referenceElement );
-
-		if ( ! refs.floating.current ) {
-			return;
-		}
-
-		return autoUpdate( referenceElement, refs.floating.current, update, {
-			animationFrame: true,
-		} );
-		// 'refs.floating' is a ref and doesn't need to be listed
-		// as dependency (see https://github.com/WordPress/gutenberg/pull/41612)
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ reference, referenceElement, update ] );
+	}, [ reference, referenceElement ] );
 
 	// If the reference element is in a different ownerDocument (e.g. iFrame),
 	// we need to manually update the floating's position as the reference's owner
