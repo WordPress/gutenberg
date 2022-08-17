@@ -7,5 +7,14 @@
 			"wideSize": "1100px"
 		}
 	},
+	"styles": {
+		"blocks": {
+			"core/social-links": {
+				"color": {
+					"background": "green"
+				}
+			}
+		}
+	},
 	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
 }

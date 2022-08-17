@@ -58,6 +58,7 @@
 		},
 		"color": {
 			"background": true,
+			"gradients": true,
 			"text": false,
 			"__experimentalDefaultControls": {
 				"background": false
