@@ -779,7 +779,7 @@ function PageRenameForm( { id } ) {
 
 	const setTitle = useCallback( ( title ) => {
 		page.edit( { title } );
-	}, [ page.edit ] );
+	} );
 
 	if ( page.isResolving ) {
 		return 'Loading...';
