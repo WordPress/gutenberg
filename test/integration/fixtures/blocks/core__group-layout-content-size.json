@@ -5,7 +5,7 @@
 		"attributes": {
 			"tagName": "div",
 			"layout": {
-				"type": "default"
+				"type": "constrained"
 			},
 			"align": "full",
 			"backgroundColor": "secondary"

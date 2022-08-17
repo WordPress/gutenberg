@@ -5,7 +5,7 @@
 			"align": "full",
 			"backgroundColor": "secondary",
 			"layout": {
-				"type": "default"
+				"type": "constrained"
 			}
 		},
 		"innerBlocks": [
@@ -24,13 +24,13 @@
 				"innerContent": [ "\n\t<p>Group block content.</p>\n\t" ]
 			}
 		],
-		"innerHTML": "\n<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\t\n\n\t\n\t</div>\n\t",
+		"innerHTML": "\n<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\t\n\n\t\n</div>\n",
 		"innerContent": [
 			"\n<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\t",
 			null,
 			"\n\n\t",
 			null,
-			"\n\t</div>\n\t"
+			"\n</div>\n"
 		]
 	}
 ]

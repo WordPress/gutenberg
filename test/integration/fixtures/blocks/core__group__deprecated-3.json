@@ -4,9 +4,6 @@
 		"isValid": true,
 		"attributes": {
 			"tagName": "div",
-			"layout": {
-				"type": "default"
-			},
 			"align": "full",
 			"backgroundColor": "secondary"
 		},

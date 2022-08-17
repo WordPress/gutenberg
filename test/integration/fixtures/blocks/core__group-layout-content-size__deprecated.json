@@ -4,11 +4,12 @@
 		"isValid": true,
 		"attributes": {
 			"tagName": "div",
-			"layout": {
-				"type": "default"
-			},
 			"align": "full",
-			"backgroundColor": "secondary"
+			"backgroundColor": "secondary",
+			"layout": {
+				"inherit": true,
+				"type": "constrained"
+			}
 		},
 		"innerBlocks": [
 			{
