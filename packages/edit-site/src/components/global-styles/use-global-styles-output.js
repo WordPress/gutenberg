@@ -273,6 +273,7 @@ export function getStylesDeclarations(
 		const cssProperty = rule.key.startsWith( '--' )
 			? rule.key
 			: kebabCase( rule.key );
+
 		let ruleValue = rule.value;
 		if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
 			const refPath = ruleValue.ref.split( '.' );
@@ -283,7 +284,8 @@ export function getStylesDeclarations(
 				return;
 			}
 		}
-		output.push( `${ cssProperty }: ${ compileStyleValue( ruleValue ) }` );
+
+		output.push( `${ cssProperty }: ${ ruleValue }` );
 	} );
 
 	return output;
