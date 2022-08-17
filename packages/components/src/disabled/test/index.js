@@ -7,7 +7,7 @@ import { render } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -91,40 +91,30 @@ describe( 'Disabled', () => {
 	} );
 
 	it( 'should cleanly un-disable via reconciliation', () => {
-		// If this test suddenly starts failing, it means React has become
-		// smarter about reusing children into grandfather element when the
-		// parent is dropped, so we'd need to find another way to restore
-		// original form state.
-		// Using state for this test for easier manipulation of the child props.
-		class MaybeDisable extends Component {
-			constructor() {
-				super( ...arguments );
-				this.state = { isDisabled: true };
-			}
+		const MaybeDisable = () => {
+			const [ isDisabled, setDisabled ] = useState( true );
 
-			render() {
-				return this.state.isDisabled ? (
-					<Disabled>
-						<Form />
-					</Disabled>
-				) : (
+			useEffect( () => {
+				setDisabled( false );
+			}, [] );
+
+			return isDisabled ? (
+				<Disabled>
 					<Form />
-				);
-			}
-		}
+				</Disabled>
+			) : (
+				<Form />
+			);
+		};
 
-		const wrapper = TestUtils.renderIntoDocument( <MaybeDisable /> );
-		wrapper.setState( { isDisabled: false } );
+		const { container } = render( <MaybeDisable /> );
 
-		const input = TestUtils.findRenderedDOMComponentWithTag(
-			wrapper,
-			'input'
-		);
-		const div = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'div' );
+		const input = container.querySelector( 'form input' );
+		const div = container.querySelector( 'form div' );
 
-		expect( input.hasAttribute( 'disabled' ) ).toBe( false );
-		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'true' );
-		expect( div.hasAttribute( 'tabindex' ) ).toBe( true );
+		expect( input ).not.toBeDisabled();
+		expect( div ).toHaveAttribute( 'contenteditable', 'true' );
+		expect( div ).toHaveAttribute( 'tabindex' );
 	} );
 
 	it( 'will disable or enable descendant fields based on the isDisabled prop value', () => {
