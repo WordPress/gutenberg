@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type { RefCallback } from 'react';
 
 /**
  * WordPress dependencies
