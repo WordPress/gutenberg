@@ -56,6 +56,13 @@
 				"type": "flex"
 			}
 		},
+		"color": {
+			"background": true,
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": false
+			}
+		},
 		"spacing": {
 			"blockGap": [ "horizontal", "vertical" ],
 			"margin": [ "top", "bottom" ],
