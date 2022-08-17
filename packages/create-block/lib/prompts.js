@@ -1,7 +1,17 @@
 /**
  * External dependencies
  */
-const { isEmpty, upperFirst } = require( 'lodash' );
+const { isEmpty } = require( 'lodash' );
+
+/**
+ * Capitalizes the first letter in a string.
+ *
+ * @param {string} str The string whose first letter the function will capitalize.
+ *
+ * @return {string} Capitalized string.
+ */
+const upperFirst = ( [ firstLetter, ...rest ] ) =>
+	firstLetter.toUpperCase() + rest.join( '' );
 
 // Block metadata.
 const slug = {

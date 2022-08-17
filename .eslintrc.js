@@ -147,6 +147,7 @@ module.exports = {
 							'uniqBy',
 							'uniqueId',
 							'uniqWith',
+							'upperFirst',
 							'values',
 							'words',
 							'zip',
