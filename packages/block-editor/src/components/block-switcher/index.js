@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, uniq } from 'lodash';
+import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -64,7 +64,8 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				_icon = blockInformation?.icon; // Take into account active block variations.
 			} else {
 				const isSelectionOfSameType =
-					uniq( blocks.map( ( { name } ) => name ) ).length === 1;
+					[ ...new Set( blocks.map( ( { name } ) => name ) ) ]
+						.length === 1;
 				// When selection consists of blocks of multiple types, display an
 				// appropriate icon to communicate the non-uniformity.
 				_icon = isSelectionOfSameType
