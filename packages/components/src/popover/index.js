@@ -26,6 +26,7 @@ import {
 	createContext,
 	useContext,
 	useMemo,
+	useState,
 	useCallback,
 	useEffect,
 } from '@wordpress/element';
@@ -173,7 +174,15 @@ const Popover = (
 	}
 
 	const arrowRef = useRef( null );
-	const anchorRefFallback = useRef( null );
+
+	const [ referenceElement, setReferenceElement ] = useState();
+	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
+		useState();
+	const [ referenceOwnerDocument, setReferenceOwnerDocument ] = useState();
+
+	const anchorRefFallback = useCallback( ( node ) => {
+		setFallbackReferenceElement( node );
+	}, [] );
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isExpanded = expandOnMobile && isMobileViewport;
@@ -182,28 +191,95 @@ const Popover = (
 		? positionToPlacement( position )
 		: placementProp;
 
-	const referenceOwnerDocument = useMemo( () => {
-		let documentToReturn;
-
+	// When any of the possible anchor "sources" change,
+	// recompute the reference element (real or virtual) and its owner document.
+	useLayoutEffect( () => {
+		// In floating-ui's terms:
+		// - "reference" refers to the popover's anchor element.
+		// - "floating" refers the floating popover's element.
+		// A floating element can also be positioned relative to a virtual element,
+		// instead of a real one. A virtual element is represented by an object
+		// with the `getBoundingClientRect()` function (like real elements).
+		// See https://floating-ui.com/docs/virtual-elements for more info.
+		let resultingReferenceOwnerDoc;
 		if ( anchorRef?.top ) {
-			documentToReturn = anchorRef?.top.ownerDocument;
+			resultingReferenceOwnerDoc = anchorRef?.top.ownerDocument;
 		} else if ( anchorRef?.startContainer ) {
-			documentToReturn = anchorRef.startContainer.ownerDocument;
+			resultingReferenceOwnerDoc = anchorRef.startContainer.ownerDocument;
 		} else if ( anchorRef?.current ) {
-			documentToReturn = anchorRef.current.ownerDocument;
+			resultingReferenceOwnerDoc = anchorRef.current.ownerDocument;
 		} else if ( anchorRef ) {
 			// This one should be deprecated.
-			documentToReturn = anchorRef.ownerDocument;
+			resultingReferenceOwnerDoc = anchorRef.ownerDocument;
 		} else if ( anchorRect && anchorRect?.ownerDocument ) {
-			documentToReturn = anchorRect.ownerDocument;
+			resultingReferenceOwnerDoc = anchorRect.ownerDocument;
 		} else if ( getAnchorRect ) {
-			documentToReturn = getAnchorRect(
-				anchorRefFallback.current
+			resultingReferenceOwnerDoc = getAnchorRect(
+				fallbackReferenceElement
 			)?.ownerDocument;
 		}
 
-		return documentToReturn ?? document;
-	}, [ anchorRef, anchorRect, getAnchorRect ] );
+		let resultingReferenceElement;
+		if ( anchorRef?.top ) {
+			// Create a virtual element for the ref. The expectation is that
+			// if anchorRef.top is defined, then anchorRef.bottom is defined too.
+			resultingReferenceElement = {
+				getBoundingClientRect() {
+					const topRect = anchorRef.top.getBoundingClientRect();
+					const bottomRect = anchorRef.bottom.getBoundingClientRect();
+					return new window.DOMRect(
+						topRect.x,
+						topRect.y,
+						topRect.width,
+						bottomRect.bottom - topRect.top
+					);
+				},
+			};
+		} else if ( anchorRef?.current ) {
+			// Standard React ref.
+			resultingReferenceElement = anchorRef.current;
+		} else if ( anchorRef ) {
+			// If `anchorRef` holds directly the element's value (no `current` key)
+			// This is a weird scenario and should be deprecated.
+			resultingReferenceElement = anchorRef;
+		} else if ( anchorRect ) {
+			// Create a virtual element for the ref.
+			resultingReferenceElement = {
+				getBoundingClientRect() {
+					return anchorRect;
+				},
+			};
+		} else if ( getAnchorRect ) {
+			// Create a virtual element for the ref.
+			resultingReferenceElement = {
+				getBoundingClientRect() {
+					const rect = getAnchorRect( fallbackReferenceElement );
+					return new window.DOMRect(
+						rect.x ?? rect.left,
+						rect.y ?? rect.top,
+						rect.width ?? rect.right - rect.left,
+						rect.height ?? rect.bottom - rect.top
+					);
+				},
+			};
+		} else if ( fallbackReferenceElement ) {
+			// If no explicit ref is passed via props, fall back to
+			// anchoring to the popover's parent node.
+			resultingReferenceElement = fallbackReferenceElement.parentNode;
+		}
+
+		setReferenceElement( resultingReferenceElement );
+		setReferenceOwnerDocument( resultingReferenceOwnerDoc ?? document );
+	}, [
+		anchorRef,
+		anchorRef?.top,
+		anchorRef?.bottom,
+		anchorRef?.startContainer,
+		anchorRef?.current,
+		anchorRect,
+		getAnchorRect,
+		fallbackReferenceElement,
+	] );
 
 	/**
 	 * Offsets the position of the popover when the anchor is inside an iframe.
@@ -325,98 +401,35 @@ const Popover = (
 	);
 
 	// Update the `reference`'s ref.
-	//
-	// In floating-ui's terms:
-	// - "reference" refers to the popover's anchor element.
-	// - "floating" refers the floating popover's element.
-	// A floating element can also be positioned relative to a virtual element,
-	// instead of a real one. A virtual element is represented by an object
-	// with the `getBoundingClientRect()` function (like real elements).
-	// See https://floating-ui.com/docs/virtual-elements for more info.
 	useLayoutEffect( () => {
-		let resultingReferenceRef;
-
-		if ( anchorRef?.top ) {
-			// Create a virtual element for the ref. The expectation is that
-			// if anchorRef.top is defined, then anchorRef.bottom is defined too.
-			resultingReferenceRef = {
-				getBoundingClientRect() {
-					const topRect = anchorRef.top.getBoundingClientRect();
-					const bottomRect = anchorRef.bottom.getBoundingClientRect();
-					return new window.DOMRect(
-						topRect.x,
-						topRect.y,
-						topRect.width,
-						bottomRect.bottom - topRect.top
-					);
-				},
-			};
-		} else if ( anchorRef?.current ) {
-			// Standard React ref.
-			resultingReferenceRef = anchorRef.current;
-		} else if ( anchorRef ) {
-			// If `anchorRef` holds directly the element's value (no `current` key)
-			// This is a weird scenario and should be deprecated.
-			resultingReferenceRef = anchorRef;
-		} else if ( anchorRect ) {
-			// Create a virtual element for the ref.
-			resultingReferenceRef = {
-				getBoundingClientRect() {
-					return anchorRect;
-				},
-			};
-		} else if ( getAnchorRect ) {
-			// Create a virtual element for the ref.
-			resultingReferenceRef = {
-				getBoundingClientRect() {
-					const rect = getAnchorRect( anchorRefFallback.current );
-					return new window.DOMRect(
-						rect.x ?? rect.left,
-						rect.y ?? rect.top,
-						rect.width ?? rect.right - rect.left,
-						rect.height ?? rect.bottom - rect.top
-					);
-				},
-			};
-		} else if ( anchorRefFallback.current ) {
-			// If no explicit ref is passed via props, fall back to
-			// anchoring to the popover's parent node.
-			resultingReferenceRef = anchorRefFallback.current.parentNode;
-		}
-
-		if ( ! resultingReferenceRef ) {
+		if ( ! referenceElement ) {
 			return;
 		}
 
-		reference( resultingReferenceRef );
+		reference( referenceElement );
 
 		if ( ! refs.floating.current ) {
 			return;
 		}
 
-		return autoUpdate(
-			resultingReferenceRef,
-			refs.floating.current,
-			update,
-			{
-				animationFrame: true,
-			}
-		);
-		// 'reference' and 'refs.floating' are refs and don't need to be listed
-		// as dependencies (see https://github.com/WordPress/gutenberg/pull/41612)
+		return autoUpdate( referenceElement, refs.floating.current, update, {
+			animationFrame: true,
+		} );
+		// 'refs.floating' is a ref and doesn't need to be listed
+		// as dependency (see https://github.com/WordPress/gutenberg/pull/41612)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ anchorRef, anchorRect, getAnchorRect, update ] );
+	}, [ reference, referenceElement, update ] );
 
 	// If the reference element is in a different ownerDocument (e.g. iFrame),
 	// we need to manually update the floating's position as the reference's owner
 	// document scrolls. Also update the frame offset if the view resizes.
 	useLayoutEffect( () => {
-		const referenceAndFloatingHaveSameDocument =
+		const referenceAndFloatingAreInSameDocument =
 			referenceOwnerDocument === document;
 		const hasFrameElement =
 			!! referenceOwnerDocument?.defaultView?.frameElement;
 
-		if ( referenceAndFloatingHaveSameDocument || ! hasFrameElement ) {
+		if ( referenceAndFloatingAreInSameDocument || ! hasFrameElement ) {
 			frameOffsetRef.current = undefined;
 			return;
 		}
