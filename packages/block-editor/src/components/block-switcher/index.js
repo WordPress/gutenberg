@@ -64,8 +64,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				_icon = blockInformation?.icon; // Take into account active block variations.
 			} else {
 				const isSelectionOfSameType =
-					[ ...new Set( blocks.map( ( { name } ) => name ) ) ]
-						.length === 1;
+					new Set( blocks.map( ( { name } ) => name ) ).size === 1;
 				// When selection consists of blocks of multiple types, display an
 				// appropriate icon to communicate the non-uniformity.
 				_icon = isSelectionOfSameType
