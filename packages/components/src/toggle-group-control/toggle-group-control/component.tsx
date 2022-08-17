@@ -35,8 +35,8 @@ import * as styles from './styles';
 
 const noop = () => {};
 
-function ToggleGroupControl(
-	props: WordPressComponentProps< ToggleGroupControlProps, 'input' >,
+function UnconnectedToggleGroupControl(
+	props: WordPressComponentProps< ToggleGroupControlProps, 'input', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
@@ -135,11 +135,14 @@ function ToggleGroupControl(
  * represented in horizontal segments. To render options for this control use
  * `ToggleGroupControlOption` component.
  *
+ * This component is intended for selecting a single persistent value from a set of options,
+ * similar to a how a radio button group would work. If you simply want a toggle to switch between views,
+ * use a `TabPanel` instead.
+ *
  * Only use this control when you know for sure the labels of items inside won't
  * wrap. For items with longer labels, you can consider a `SelectControl` or a
  * `CustomSelectControl` component instead.
  *
- * @example
  * ```jsx
  * import {
  *   __experimentalToggleGroupControl as ToggleGroupControl,
@@ -156,9 +159,9 @@ function ToggleGroupControl(
  * }
  * ```
  */
-const ConnectedToggleGroupControl = contextConnect(
-	ToggleGroupControl,
+export const ToggleGroupControl = contextConnect(
+	UnconnectedToggleGroupControl,
 	'ToggleGroupControl'
 );
 
-export default ConnectedToggleGroupControl;
+export default ToggleGroupControl;
