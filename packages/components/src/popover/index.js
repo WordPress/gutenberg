@@ -166,7 +166,7 @@ const Popover = (
 		? positionToPlacement( position )
 		: placementProp;
 
-	const ownerDocument = useMemo( () => {
+	const referenceOwnerDocument = useMemo( () => {
 		let documentToReturn;
 
 		if ( anchorRef?.top ) {
@@ -195,7 +195,7 @@ const Popover = (
 	 * Store the offset in a ref, due to constraints with floating-ui:
 	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
 	 */
-	const frameOffset = useRef( getFrameOffset( ownerDocument ) );
+	const frameOffset = useRef( getFrameOffset( referenceOwnerDocument ) );
 
 	const middleware = [
 		frameOffset.current || offset
@@ -390,19 +390,20 @@ const Popover = (
 	// we need to manually update the floating's position as the reference's owner
 	// document scrolls. Also update the frame offset if the view resizes.
 	useLayoutEffect( () => {
-		if ( ownerDocument === document ) {
+		if ( referenceOwnerDocument === document ) {
 			return;
 		}
 
-		const { defaultView } = ownerDocument;
+		const { defaultView } = referenceOwnerDocument;
 
-		ownerDocument.addEventListener( 'scroll', update );
+		referenceOwnerDocument.addEventListener( 'scroll', update );
 
 		let updateFrameOffset;
-		const hasFrameElement = !! ownerDocument?.defaultView?.frameElement;
+		const hasFrameElement =
+			!! referenceOwnerDocument?.defaultView?.frameElement;
 		if ( hasFrameElement ) {
 			updateFrameOffset = () => {
-				frameOffset.current = getFrameOffset( ownerDocument );
+				frameOffset.current = getFrameOffset( referenceOwnerDocument );
 				update();
 			};
 			updateFrameOffset();
@@ -410,13 +411,13 @@ const Popover = (
 		}
 
 		return () => {
-			ownerDocument.removeEventListener( 'scroll', update );
+			referenceOwnerDocument.removeEventListener( 'scroll', update );
 
 			if ( updateFrameOffset ) {
 				defaultView.removeEventListener( 'resize', updateFrameOffset );
 			}
 		};
-	}, [ ownerDocument, update ] );
+	}, [ referenceOwnerDocument, update ] );
 
 	const mergedFloatingRef = useMergeRefs( [
 		floating,
