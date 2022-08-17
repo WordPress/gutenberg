@@ -187,10 +187,6 @@ const Popover = (
 		}
 
 		return documentToReturn ?? document;
-
-		// 'reference' and 'refs.floating' are refs and don't need to be listed
-		// as dependencies (see https://github.com/WordPress/gutenberg/pull/41612)
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ anchorRef, anchorRect, getAnchorRect ] );
 
 	/**
@@ -372,6 +368,9 @@ const Popover = (
 			refs.floating.current,
 			update
 		);
+		// 'reference' and 'refs.floating' are refs and don't need to be listed
+		// as dependencies (see https://github.com/WordPress/gutenberg/pull/41612)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ anchorRef, anchorRect, getAnchorRect, update ] );
 
 	// This is only needed for a smooth transition when moving blocks.
