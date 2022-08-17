@@ -184,8 +184,8 @@
 	}
 
 	// Show placeholder buttons on block selection.
+	// Note that these can't be display: none; or visibility: hidden;, as that breaks the writing flow.
 	.components-button {
-		visibility: hidden;
 		opacity: 0;
 		transition: opacity 0.1s linear;
 		@include reduce-motion("transition");
@@ -193,7 +193,6 @@
 
 	.is-selected > & .components-button {
 		opacity: 1;
-		visibility: visible;
 	}
 
 	// By painting the borders here, we enable them to be replaced by the Border control.
