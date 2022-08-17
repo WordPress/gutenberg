@@ -18,6 +18,9 @@
 
 	table th {
 		font-weight: 400;
+	}
+
+	&:not(.has-background) th {
 		background: $gray-300;
 	}
 
@@ -25,8 +28,10 @@
 		text-decoration: underline;
 	}
 
-	table tbody,
-	table caption {
-		color: #40464d;
+	&:not(.has-text-color) {
+		tbody,
+		caption {
+			color: #40464d;
+		}
 	}
 }

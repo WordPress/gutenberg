@@ -16,7 +16,19 @@
 		}
 	},
 	"supports": {
-		"align": true
+		"align": true,
+		"color": {
+			"text": true,
+			"background": true,
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"text": false,
+				"background": true,
+				"gradients": false,
+				"link": false
+			}
+		}
 	},
 	"style": "wp-block-calendar"
 }
