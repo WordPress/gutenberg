@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Stabilized the `useResourcePermissions` hook ([#43268](https://github.com/WordPress/gutenberg/pull/43268))
+
 ## 4.13.0 (2022-08-10)
 
 ## 4.12.0 (2022-07-27)
