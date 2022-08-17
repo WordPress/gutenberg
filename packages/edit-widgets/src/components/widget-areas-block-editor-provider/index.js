@@ -33,7 +33,7 @@ export default function WidgetAreasBlockEditorProvider( {
 	children,
 	...props
 } ) {
-	const [ , { canCreate: hasUploadPermissions } ] =
+	const { canCreate: hasUploadPermissions } =
 		useResourcePermissions( 'media' );
 	const { reusableBlocks, isFixedToolbarActive, keepCaretInsideBlock } =
 		useSelect(
