@@ -65,3 +65,13 @@ export const Default: ComponentStory< typeof Disabled > = ( args ) => {
 		</Disabled>
 	);
 };
+
+export const ContentEditable: ComponentStory< typeof Disabled > = ( args ) => {
+	return (
+		<Disabled { ...args }>
+			<div contentEditable tabIndex={ 0 }>
+				contentEditable
+			</div>
+		</Disabled>
+	);
+};
