@@ -283,9 +283,7 @@ describe( 'Basic rendering', () => {
 				/>
 			);
 
-			const linkPreview = screen.queryByRole( 'option', {
-				selected: true,
-			} );
+			const linkPreview = getCurrentLink();
 
 			const isPreviewError = linkPreview.classList.contains( 'is-error' );
 			expect( isPreviewError ).toBe( true );
