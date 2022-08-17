@@ -7,7 +7,7 @@ import { render } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { Component, useState, useEffect } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -91,13 +91,7 @@ describe( 'Disabled', () => {
 	} );
 
 	it( 'should cleanly un-disable via reconciliation', () => {
-		const MaybeDisable = () => {
-			const [ isDisabled, setDisabled ] = useState( true );
-
-			useEffect( () => {
-				setDisabled( false );
-			}, [] );
-
+		const MaybeDisable = ( { isDisabled } ) => {
 			return isDisabled ? (
 				<Disabled>
 					<Form />
@@ -107,7 +101,8 @@ describe( 'Disabled', () => {
 			);
 		};
 
-		const { container } = render( <MaybeDisable /> );
+		const { container, rerender } = render( <MaybeDisable /> );
+		rerender( <MaybeDisable isDisabled={ false } /> );
 
 		const input = container.querySelector( 'form input' );
 		const div = container.querySelector( 'form div' );
