@@ -91,15 +91,14 @@ describe( 'Disabled', () => {
 	} );
 
 	it( 'should cleanly un-disable via reconciliation', () => {
-		const MaybeDisable = ( { isDisabled } ) => {
-			return isDisabled ? (
+		const MaybeDisable = ( { isDisabled } ) =>
+			isDisabled ? (
 				<Disabled>
 					<Form />
 				</Disabled>
 			) : (
 				<Form />
 			);
-		};
 
 		const { container, rerender } = render( <MaybeDisable /> );
 		rerender( <MaybeDisable isDisabled={ false } /> );
@@ -113,48 +112,24 @@ describe( 'Disabled', () => {
 	} );
 
 	it( 'will disable or enable descendant fields based on the isDisabled prop value', () => {
-		class MaybeDisable extends Component {
-			constructor() {
-				super( ...arguments );
-				this.state = { isDisabled: true };
-			}
-
-			render() {
-				return (
-					<DisabledComponent isDisabled={ this.state.isDisabled }>
-						<Form />
-					</DisabledComponent>
-				);
-			}
-		}
-
-		const wrapper = TestUtils.renderIntoDocument( <MaybeDisable /> );
-
-		const input = TestUtils.findRenderedDOMComponentWithTag(
-			wrapper,
-			'input'
+		const MaybeDisable = ( { isDisabled = true } ) => (
+			<Disabled isDisabled={ isDisabled }>
+				<Form />
+			</Disabled>
 		);
-		const div = TestUtils.scryRenderedDOMComponentsWithTag(
-			wrapper,
-			'div'
-		)[ 1 ];
 
-		expect( input.hasAttribute( 'disabled' ) ).toBe( true );
-		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'false' );
+		const { container, rerender } = render( <MaybeDisable /> );
 
-		wrapper.setState( { isDisabled: false } );
+		const input = container.querySelector( 'form input' );
+		const div = container.querySelector( 'form div' );
 
-		const input2 = TestUtils.findRenderedDOMComponentWithTag(
-			wrapper,
-			'input'
-		);
-		const div2 = TestUtils.scryRenderedDOMComponentsWithTag(
-			wrapper,
-			'div'
-		)[ 0 ];
+		expect( input ).toBeDisabled();
+		expect( div ).toHaveAttribute( 'contenteditable', 'false' );
 
-		expect( input2.hasAttribute( 'disabled' ) ).toBe( false );
-		expect( div2.getAttribute( 'contenteditable' ) ).not.toBe( 'false' );
+		rerender( <MaybeDisable isDisabled={ false } /> );
+
+		expect( input ).not.toBeDisabled();
+		expect( div ).toHaveAttribute( 'contenteditable', 'true' );
 	} );
 
 	// Ideally, we'd have two more test cases here:
