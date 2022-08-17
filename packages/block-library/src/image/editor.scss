@@ -1,31 +1,29 @@
 // Provide special styling for the placeholder.
 // @todo: this particular minimal style of placeholder could be componentized further.
 .wp-block-image.wp-block-image {
-	// Show custom Placeholder style on-select.
+	// Show Placeholder style on-select.
 	&.is-selected .components-placeholder {
 		// Block UI appearance.
 		color: $gray-900;
 		background-color: $white;
 		box-shadow: inset 0 0 0 $border-width $gray-900;
 		border: none;
-		justify-content: center;
-		align-items: center;
 
 		// @todo: this should eventually be overridden by a custom border-radius set in the inspector.
 		border-radius: $radius-block-ui;
 
-		.components-placeholder__fieldset {
-			gap: $grid-unit-15;
-		}
-
-		.components-button {
-			margin: 0;
-		}
-
 		> svg {
 			opacity: 0;
-			visibility: hidden;
 		}
+	}
+
+	// Remove the transition while we still have a legacy placeholder style.
+	// Otherwise the content jumps between the 1px placeholder border, and any inherited custom
+	// parent border that may get applied when you deselect.
+	.components-placeholder__label,
+	.components-placeholder__instructions,
+	.components-button {
+		transition: none;
 	}
 }
 

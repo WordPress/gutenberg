@@ -28,11 +28,17 @@ import { image as icon } from '@wordpress/icons';
  */
 import Image from './image';
 
+// Much of this description is duplicated from MediaPlaceholder.
 const placeholder = ( content ) => {
 	return (
 		<Placeholder
 			className="block-editor-media-placeholder"
 			withIllustration={ true }
+			icon={ icon }
+			label={ __( 'Image' ) }
+			instructions={ __(
+				'Upload an image file, pick one from your media library, or add one with a URL.'
+			) }
 		>
 			{ content }
 		</Placeholder>
