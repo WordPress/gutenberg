@@ -116,6 +116,7 @@ function NonDefaultControls( { format, onChange } ) {
 		<>
 			<BaseControl className="block-editor-date-format-picker__custom-format-select-control">
 				<CustomSelectControl
+					__nextUnconstrainedWidth
 					label={ __( 'Choose a format' ) }
 					options={ [ ...suggestedOptions, customOption ] }
 					value={

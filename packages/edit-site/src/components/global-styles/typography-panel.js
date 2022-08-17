@@ -234,7 +234,6 @@ export default function TypographyPanel( { name, element } ) {
 					hasFontStyles={ hasFontStyles }
 					hasFontWeights={ hasFontWeights }
 					size="__unstable-large"
-					__nextUnconstrainedWidth
 				/>
 			) }
 			{ hasLetterSpacingControl && (
