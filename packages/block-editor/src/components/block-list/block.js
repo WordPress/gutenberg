@@ -140,13 +140,6 @@ function BlockListBlock( {
 			tabIndex: -1,
 		};
 	}
-	console.log( {
-		clientId,
-		name,
-		hasContentLockedParent,
-		isContentBlock,
-		wrapperProps,
-	} );
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType?.getEditWrapperProps ) {
 		wrapperProps = mergeWrapperProps(
