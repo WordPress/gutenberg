@@ -39,7 +39,10 @@ import {
 } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	__experimentalUseResourcePermissions as useResourcePermissions,
+	store as coreStore,
+} from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
 
@@ -294,6 +297,11 @@ export default function NavigationSubmenuEdit( {
 	const itemLabelPlaceholder = __( 'Add text…' );
 	const ref = useRef();
 
+	const [ , { canCreate: userCanCreatePages } ] =
+		useResourcePermissions( 'pages' );
+	const [ , { canCreate: userCanCreatePosts } ] =
+		useResourcePermissions( 'posts' );
+
 	const {
 		isAtMaxNesting,
 		isTopLevelItem,
@@ -301,8 +309,6 @@ export default function NavigationSubmenuEdit( {
 		isImmediateParentOfSelectedBlock,
 		hasChildren,
 		selectedBlockHasChildren,
-		userCanCreatePages,
-		userCanCreatePosts,
 		onlyDescendantIsEmptyLink,
 	} = useSelect(
 		( select ) => {
@@ -348,14 +354,6 @@ export default function NavigationSubmenuEdit( {
 				),
 				hasChildren: !! getBlockCount( clientId ),
 				selectedBlockHasChildren: !! selectedBlockChildren?.length,
-				userCanCreatePages: select( coreStore ).canUser(
-					'create',
-					'pages'
-				),
-				userCanCreatePosts: select( coreStore ).canUser(
-					'create',
-					'posts'
-				),
 				onlyDescendantIsEmptyLink: _onlyDescendantIsEmptyLink,
 			};
 		},

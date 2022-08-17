@@ -42,7 +42,10 @@ import {
 } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	__experimentalUseResourcePermissions as useResourcePermissions,
+} from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -463,14 +466,17 @@ export default function NavigationLinkEdit( {
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
 
+	const [ , { canCreate: userCanCreatePages } ] =
+		useResourcePermissions( 'pages' );
+	const [ , { canCreate: userCanCreatePosts } ] =
+		useResourcePermissions( 'posts' );
+
 	const {
 		innerBlocks,
 		isAtMaxNesting,
 		isTopLevelLink,
 		isParentOfSelectedBlock,
 		hasChildren,
-		userCanCreatePages,
-		userCanCreatePosts,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -497,14 +503,6 @@ export default function NavigationLinkEdit( {
 					true
 				),
 				hasChildren: !! getBlockCount( clientId ),
-				userCanCreatePages: select( coreStore ).canUser(
-					'create',
-					'pages'
-				),
-				userCanCreatePosts: select( coreStore ).canUser(
-					'create',
-					'posts'
-				),
 			};
 		},
 		[ clientId ]
