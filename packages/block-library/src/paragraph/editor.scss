@@ -17,3 +17,28 @@
 		}
 	}
 }
+
+
+// Precise partial text selections.
+// @todo: For now, proof of concept. But code needs to be moved to the most appropriate place.
+// Furthermore, this code right now is likely going to affect numerous nested blocks, so
+// it will be important to scope it right!
+// To keep in mind, user-select is currently inherited to all nodes inside.
+// One solution: apply the user-select properties dynamically during selection.
+
+// Disable text selection on the main container.
+// This is necessary to ensure that we can direct the browser towards the content that's actually
+// meant to be selected.
+.block-editor-block-list__layout {
+	user-select: none;
+}
+
+// Re-enable it on Paragraphs.
+.block-editor-rich-text__editable {
+	user-select: text;
+
+	// Hide the select style pseudo element as it interferes with the style.
+	&.is-partially-selected::after {
+		display: none;
+	}
+}
