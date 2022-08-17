@@ -118,6 +118,15 @@ const MaybeAnimatedWrapper = forwardRef(
 
 const slotNameContext = createContext();
 
+const getFrameOffset = ( document ) => {
+	const frameElement = document?.defaultView?.frameElement;
+	if ( ! frameElement ) {
+		return;
+	}
+	const iframeRect = frameElement.getBoundingClientRect();
+	return { x: iframeRect.left, y: iframeRect.top };
+};
+
 const Popover = (
 	{
 		range,
@@ -191,7 +200,7 @@ const Popover = (
 	 * Store the offset in a ref, due to constraints with floating-ui:
 	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
 	 */
-	const frameOffset = useRef();
+	const frameOffset = useRef( getFrameOffset( ownerDocument ) );
 
 	const middleware = [
 		frameOffset.current || offset
@@ -388,15 +397,13 @@ const Popover = (
 		}
 
 		const { defaultView } = ownerDocument;
-		const { frameElement } = defaultView;
 
 		ownerDocument.addEventListener( 'scroll', update );
 
 		let updateFrameOffset;
-		if ( frameElement ) {
+		if ( defaultView ) {
 			updateFrameOffset = () => {
-				const iframeRect = frameElement.getBoundingClientRect();
-				frameOffset.current = { x: iframeRect.left, y: iframeRect.top };
+				frameOffset.current = getFrameOffset( ownerDocument );
 				update();
 			};
 			updateFrameOffset();
