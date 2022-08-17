@@ -18,6 +18,7 @@ import { copy } from '@wordpress/icons';
 import { BlockSwitcher, BlockSwitcherDropdownMenu } from '../';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+jest.mock( '../../block-title/use-block-display-title', () => jest.fn() );
 
 describe( 'BlockSwitcher', () => {
 	test( 'should not render block switcher without blocks', () => {
