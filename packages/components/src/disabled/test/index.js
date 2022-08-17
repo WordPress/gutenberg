@@ -2,6 +2,7 @@
  * External dependencies
  */
 import TestUtils from 'react-dom/test-utils';
+import { render } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -61,7 +62,7 @@ describe( 'Disabled', () => {
 	const Form = () => (
 		<form>
 			<input />
-			<div contentEditable tabIndex="0" />
+			<div contentEditable tabIndex={ 0 } />
 		</form>
 	);
 
@@ -75,25 +76,18 @@ describe( 'Disabled', () => {
 	}
 
 	it( 'will disable all fields', () => {
-		const wrapper = TestUtils.renderIntoDocument(
-			<DisabledComponent>
+		const { container } = render(
+			<Disabled>
 				<Form />
-			</DisabledComponent>
+			</Disabled>
 		);
 
-		const input = TestUtils.findRenderedDOMComponentWithTag(
-			wrapper,
-			'input'
-		);
-		const div = TestUtils.scryRenderedDOMComponentsWithTag(
-			wrapper,
-			'div'
-		)[ 1 ];
-
-		expect( input.hasAttribute( 'disabled' ) ).toBe( true );
-		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'false' );
-		expect( div.hasAttribute( 'tabindex' ) ).toBe( false );
-		expect( div.hasAttribute( 'disabled' ) ).toBe( false );
+		const input = container.querySelector( 'form input' );
+		const div = container.querySelector( 'form div' );
+		expect( input ).toBeDisabled();
+		expect( div ).toHaveAttribute( 'contenteditable', 'false' );
+		expect( div ).not.toHaveAttribute( 'tabindex' );
+		expect( div ).not.toHaveAttribute( 'disabled' );
 	} );
 
 	it( 'should cleanly un-disable via reconciliation', () => {
