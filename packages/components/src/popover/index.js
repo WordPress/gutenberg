@@ -42,7 +42,11 @@ import { Path, SVG } from '@wordpress/primitives';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
-import { positionToPlacement, placementToMotionAnimationProps } from './utils';
+import {
+	getFrameOffset,
+	positionToPlacement,
+	placementToMotionAnimationProps,
+} from './utils';
 
 /**
  * Name of slot in which popover should fill.
@@ -183,6 +187,10 @@ const Popover = (
 		}
 
 		return documentToReturn ?? document;
+
+		// 'reference' and 'refs.floating' are refs and don't need to be listed
+		// as dependencies (see https://github.com/WordPress/gutenberg/pull/41612)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ anchorRef, anchorRect, getAnchorRect ] );
 
 	/**
@@ -191,7 +199,7 @@ const Popover = (
 	 * Store the offset in a ref, due to constraints with floating-ui:
 	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
 	 */
-	const frameOffset = useRef();
+	const frameOffset = useRef( getFrameOffset( ownerDocument ) );
 
 	const middleware = [
 		frameOffset.current || offset
@@ -364,7 +372,7 @@ const Popover = (
 			refs.floating.current,
 			update
 		);
-	}, [ anchorRef, anchorRect, getAnchorRect ] );
+	}, [ anchorRef, anchorRect, getAnchorRect, update ] );
 
 	// This is only needed for a smooth transition when moving blocks.
 	useLayoutEffect( () => {
@@ -377,7 +385,7 @@ const Popover = (
 		return () => {
 			observer.disconnect();
 		};
-	}, [ __unstableObserveElement ] );
+	}, [ __unstableObserveElement, update ] );
 
 	// If the reference element is in a different ownerDocument (e.g. iFrame),
 	// we need to manually update the floating's position as the reference's owner
@@ -388,15 +396,15 @@ const Popover = (
 		}
 
 		const { defaultView } = ownerDocument;
-		const { frameElement } = defaultView;
 
 		ownerDocument.addEventListener( 'scroll', update );
 
 		let updateFrameOffset;
-		if ( frameElement ) {
+		const hasFrameElement = !! ownerDocument?.defaultView?.frameElement;
+		if ( hasFrameElement ) {
 			updateFrameOffset = () => {
-				const iframeRect = frameElement.getBoundingClientRect();
-				frameOffset.current = { x: iframeRect.left, y: iframeRect.top };
+				frameOffset.current = getFrameOffset( ownerDocument );
+				update();
 			};
 			updateFrameOffset();
 			defaultView.addEventListener( 'resize', updateFrameOffset );
@@ -409,7 +417,7 @@ const Popover = (
 				defaultView.removeEventListener( 'resize', updateFrameOffset );
 			}
 		};
-	}, [ ownerDocument ] );
+	}, [ ownerDocument, update ] );
 
 	const mergedFloatingRef = useMergeRefs( [
 		floating,
