@@ -241,8 +241,8 @@ class WP_Style_Engine {
 	protected static function get_css_var_value( $style_value, $css_vars ) {
 		foreach ( $css_vars as  $property_key => $css_var_pattern ) {
 			$slug = static::get_slug_from_preset_value( $style_value, $property_key );
-			if ( $slug ) {
-				return strtr( $css_var_pattern, '$slug', $slug );
+			if ( static::is_valid_style_value( $slug ) ) {
+				return 'var(' . strtr( $css_var_pattern, '$slug', $slug ) . ')';
 			}
 		}
 		return '';
