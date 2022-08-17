@@ -114,7 +114,8 @@ export type ToggleGroupControlProps = Omit<
 		 */
 		value?: ReactText;
 		/**
-		 * React children
+		 * The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControlOption` or
+		 * `ToggleGroupControlOptionIcon` components.
 		 */
 		children: ReactNode;
 		/**
