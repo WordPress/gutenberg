@@ -26,6 +26,7 @@ import {
 	createContext,
 	useContext,
 	useMemo,
+	useCallback,
 	useEffect,
 } from '@wordpress/element';
 import {
@@ -268,7 +269,7 @@ const Popover = (
 					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
 			  } )
 			: undefined,
-		hasArrow ? arrow( { element: arrowRef } ) : undefined,
+		arrow( { element: arrowRef } ),
 	].filter( ( m ) => !! m );
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
 	const slot = useSlot( slotName );
@@ -314,6 +315,14 @@ const Popover = (
 		offsetRef.current = offsetProp;
 		update();
 	}, [ offsetProp, update ] );
+
+	const arrowCallbackRef = useCallback(
+		( node ) => {
+			arrowRef.current = node;
+			update();
+		},
+		[ update ]
+	);
 
 	// Update the `reference`'s ref.
 	//
@@ -477,7 +486,7 @@ const Popover = (
 			<div className="components-popover__content">{ children }</div>
 			{ hasArrow && (
 				<div
-					ref={ arrowRef }
+					ref={ arrowCallbackRef }
 					className={ [
 						'components-popover__arrow',
 						`is-${ computedPlacement.split( '-' )[ 0 ] }`,
