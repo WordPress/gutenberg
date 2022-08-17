@@ -12,7 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useState } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { requestPreview } from '@wordpress/react-native-bridge';
-import { useSuspenseSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { BottomSheet, Icon, TextControl } from '@wordpress/components';
 import { help } from '@wordpress/icons';
@@ -34,7 +34,7 @@ const EmbedNoPreview = ( {
 	const shouldRequestReview = useRef( false );
 	const [ isSheetVisible, setIsSheetVisible ] = useState( false );
 
-	const { postType } = useSuspenseSelect( ( select ) => ( {
+	const { postType } = useSelect( ( select ) => ( {
 		postType: select( editorStore ).getEditedPostAttribute( 'type' ),
 	} ) );
 

@@ -10,7 +10,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
-import { useSuspenseSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 const name = 'core/paragraph';
 
@@ -25,7 +25,7 @@ function ParagraphBlock( {
 	clientId,
 	parentBlockAlignment,
 } ) {
-	const isRTL = useSuspenseSelect( ( select ) => {
+	const isRTL = useSelect( ( select ) => {
 		return !! select( blockEditorStore ).getSettings().isRTL;
 	}, [] );
 
