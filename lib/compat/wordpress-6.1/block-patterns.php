@@ -179,6 +179,9 @@ add_action( 'init', 'gutenberg_register_theme_block_patterns' );
 /**
  * Registers Gutenberg-bundled patterns, with a focus on headers and footers
  * for site editing.
+ *
+ * @since 6.1.0
+ * @access private
  */
 function gutenberg_register_core_block_patterns() {
 	$should_register_core_patterns = get_theme_support( 'core-block-patterns' );
