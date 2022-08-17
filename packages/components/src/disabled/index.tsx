@@ -23,7 +23,6 @@ const { Consumer, Provider } = Context;
 /**
  * `Disabled` is a component which disables descendant tabbable elements and prevents pointer interaction.
  *
- * @example
  * ```jsx
  * import { Button, Disabled, TextControl } from '@wordpress/components';
  * import { useState } from '@wordpress/element';
