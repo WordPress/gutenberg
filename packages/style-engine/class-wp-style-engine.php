@@ -242,7 +242,11 @@ class WP_Style_Engine {
 		foreach ( $css_vars as  $property_key => $css_var_pattern ) {
 			$slug = static::get_slug_from_preset_value( $style_value, $property_key );
 			if ( static::is_valid_style_value( $slug ) ) {
-				return 'var(' . strtr( $css_var_pattern, '$slug', $slug ) . ')';
+				$var = strtr(
+					$css_var_pattern,
+					array( '$slug' => $slug )
+				);
+				return "var($var)";
 			}
 		}
 		return '';
