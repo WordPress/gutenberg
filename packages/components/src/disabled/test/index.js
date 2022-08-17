@@ -20,7 +20,7 @@ jest.mock( '@wordpress/dom', () => {
 			...focus,
 			focusable: {
 				...focus.focusable,
-				find( context ) {
+				find( context, ...rest ) {
 					// In JSDOM, all elements have zero'd widths and height.
 					// This is a metric for focusable's `isVisible`, so find
 					// and apply an arbitrary non-zero width.
@@ -34,7 +34,7 @@ jest.mock( '@wordpress/dom', () => {
 						}
 					);
 
-					return focus.focusable.find( ...arguments );
+					return focus.focusable.find( context, ...rest );
 				},
 			},
 		},
@@ -42,21 +42,6 @@ jest.mock( '@wordpress/dom', () => {
 } );
 
 describe( 'Disabled', () => {
-	let MutationObserver;
-
-	beforeAll( () => {
-		MutationObserver = window.MutationObserver;
-		window.MutationObserver = function () {};
-		window.MutationObserver.prototype = {
-			observe() {},
-			disconnect() {},
-		};
-	} );
-
-	afterAll( () => {
-		window.MutationObserver = MutationObserver;
-	} );
-
 	const Form = () => (
 		<form>
 			<input />
