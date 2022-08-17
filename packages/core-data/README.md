@@ -777,9 +777,12 @@ function PageRenameForm( { id } ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticeStore );
 
-	const setTitle = useCallback( ( title ) => {
-		page.edit( { title } );
-	} );
+	const setTitle = useCallback(
+		( title ) => {
+			page.edit( { title } );
+		},
+		[ page.edit ]
+	);
 
 	if ( page.isResolving ) {
 		return 'Loading...';
