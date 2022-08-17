@@ -466,10 +466,8 @@ export default function NavigationLinkEdit( {
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
 
-	const [ , { canCreate: userCanCreatePages } ] =
-		useResourcePermissions( 'pages' );
-	const [ , { canCreate: userCanCreatePosts } ] =
-		useResourcePermissions( 'posts' );
+	const { canCreate: userCanCreatePages } = useResourcePermissions( 'pages' );
+	const { canCreate: userCanCreatePosts } = useResourcePermissions( 'posts' );
 
 	const {
 		innerBlocks,

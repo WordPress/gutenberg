@@ -50,28 +50,24 @@ describe( 'useResourcePermissions', () => {
 				<TestComponent />
 			</RegistryProvider>
 		);
-		expect( data ).toEqual( [
-			false,
-			{
-				status: 'IDLE',
-				isResolving: false,
-				canCreate: false,
-			},
-		] );
+		expect( data ).toEqual( {
+			status: 'IDLE',
+			isResolving: false,
+			hasResolved: false,
+			canCreate: false,
+		} );
 
 		// Required to make sure no updates happen outside of act()
 		await act( async () => {
 			jest.advanceTimersByTime( 1 );
 		} );
 
-		expect( data ).toEqual( [
-			true,
-			{
-				status: 'SUCCESS',
-				isResolving: false,
-				canCreate: true,
-			},
-		] );
+		expect( data ).toEqual( {
+			status: 'SUCCESS',
+			isResolving: false,
+			hasResolved: true,
+			canCreate: true,
+		} );
 	} );
 
 	it( 'retrieves the relevant permissions for a resource with a key', async () => {
@@ -85,31 +81,27 @@ describe( 'useResourcePermissions', () => {
 				<TestComponent />
 			</RegistryProvider>
 		);
-		expect( data ).toEqual( [
-			false,
-			{
-				status: 'IDLE',
-				isResolving: false,
-				canCreate: false,
-				canUpdate: false,
-				canDelete: false,
-			},
-		] );
+		expect( data ).toEqual( {
+			status: 'IDLE',
+			isResolving: false,
+			hasResolved: false,
+			canCreate: false,
+			canUpdate: false,
+			canDelete: false,
+		} );
 
 		// Required to make sure no updates happen outside of act()
 		await act( async () => {
 			jest.advanceTimersByTime( 1 );
 		} );
 
-		expect( data ).toEqual( [
-			true,
-			{
-				status: 'SUCCESS',
-				isResolving: false,
-				canCreate: true,
-				canUpdate: false,
-				canDelete: false,
-			},
-		] );
+		expect( data ).toEqual( {
+			status: 'SUCCESS',
+			isResolving: false,
+			hasResolved: true,
+			canCreate: true,
+			canUpdate: false,
+			canDelete: false,
+		} );
 	} );
 } );

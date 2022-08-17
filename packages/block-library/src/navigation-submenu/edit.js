@@ -297,10 +297,8 @@ export default function NavigationSubmenuEdit( {
 	const itemLabelPlaceholder = __( 'Add text…' );
 	const ref = useRef();
 
-	const [ , { canCreate: userCanCreatePages } ] =
-		useResourcePermissions( 'pages' );
-	const [ , { canCreate: userCanCreatePosts } ] =
-		useResourcePermissions( 'posts' );
+	const { canCreate: userCanCreatePages } = useResourcePermissions( 'pages' );
+	const { canCreate: userCanCreatePosts } = useResourcePermissions( 'posts' );
 
 	const {
 		isAtMaxNesting,
