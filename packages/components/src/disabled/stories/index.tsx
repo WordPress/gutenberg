@@ -19,6 +19,11 @@ import TextareaControl from '../../textarea-control/';
 const meta: ComponentMeta< typeof Disabled > = {
 	title: 'Components/Disabled',
 	component: Disabled,
+	argTypes: {
+		as: { control: { type: null } },
+		children: { control: { type: null } },
+		ref: { control: { type: null } },
+	},
 	parameters: {
 		controls: {
 			expanded: true,
