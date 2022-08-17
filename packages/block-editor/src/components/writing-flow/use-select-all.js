@@ -52,13 +52,19 @@ export default function useSelectAll() {
 			const firstClientId = first( blockClientIds );
 			const lastClientId = last( blockClientIds );
 
+			event.preventDefault();
+
 			if ( firstClientId === lastClientId ) {
+				// If there's any selection remaining, the copy handler will
+				// only copy the native selection.
+				event.target.ownerDocument.defaultView
+					.getSelection()
+					.removeAllRanges();
 				selectBlock( firstClientId );
 				return;
 			}
 
 			multiSelect( firstClientId, lastClientId );
-			event.preventDefault();
 		}
 
 		node.addEventListener( 'keydown', onKeyDown );
