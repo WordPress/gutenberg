@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { BaseControl, Button } from '@wordpress/components';
+import {
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+} from '@wordpress/components';
 import { formatStrikethrough, formatUnderline } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -27,32 +30,26 @@ const TEXT_DECORATIONS = [
  *
  * @return {WPElement} Text decoration control.
  */
-export default function TextDecorationControl( { value, onChange } ) {
+export default function TextDecorationControl( { value, onChange, ...props } ) {
 	return (
-		<fieldset className="block-editor-text-decoration-control">
-			<BaseControl.VisualLabel as="legend">
-				{ __( 'Decoration' ) }
-			</BaseControl.VisualLabel>
-			<div className="block-editor-text-decoration-control__buttons">
-				{ TEXT_DECORATIONS.map( ( textDecoration ) => {
-					return (
-						<Button
-							key={ textDecoration.value }
-							icon={ textDecoration.icon }
-							isSmall
-							isPressed={ textDecoration.value === value }
-							onClick={ () =>
-								onChange(
-									textDecoration.value === value
-										? undefined
-										: textDecoration.value
-								)
-							}
-							aria-label={ textDecoration.name }
-						/>
-					);
-				} ) }
-			</div>
-		</fieldset>
+		<ToggleGroupControl
+			{ ...props }
+			className="block-editor-text-decoration-control"
+			__experimentalIsIconGroup
+			label={ __( 'Decoration' ) }
+			value={ value }
+			onChange={ onChange }
+		>
+			{ TEXT_DECORATIONS.map( ( textDecoration ) => {
+				return (
+					<ToggleGroupControlOptionIcon
+						key={ textDecoration.value }
+						value={ textDecoration.value }
+						icon={ textDecoration.icon }
+						label={ textDecoration.name }
+					/>
+				);
+			} ) }
+		</ToggleGroupControl>
 	);
 }
