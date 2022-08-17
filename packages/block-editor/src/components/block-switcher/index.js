@@ -88,7 +88,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	);
 
 	const blockTitle = useBlockDisplayTitle( {
-		clientId: clientIds,
+		clientId: Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds,
 		maximumLength: 35,
 	} );
 	const isReusable = blocks.length === 1 && isReusableBlock( blocks[ 0 ] );
