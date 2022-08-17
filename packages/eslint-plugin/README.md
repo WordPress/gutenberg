@@ -44,15 +44,15 @@ There is also `recommended-with-formatting` ruleset for projects that want to en
 
 Alternatively, you can opt-in to only the more granular rulesets offered by the plugin. These include:
 
--   `custom`
--   `es5`
--   `esnext`
--   `jsdoc`
--   `jsx-a11y`
--   `react`
--   `i18n`
--   `test-e2e`
--   `test-unit`
+-   `custom` – custom rules for WordPress development.
+-   `es5` – rules for legacy ES5 environments.
+-   `esnext` – rules for ES2015+ environments.
+-   `i18n` – rules for internationalization.
+-   `jsdoc` – rules for JSDoc comments.
+-   `jsx-a11y` – rules for accessibility in JSX.
+-   `react` – rules for React components.
+-   `test-e2e` – rules for end-to-end tests written in Puppeteer.
+-   `test-unit`– rules for unit tests written in Jest.
 
 For example, if your project does not use React, you could consider extending including only the ESNext rules in your project using the following `extends` definition:
 

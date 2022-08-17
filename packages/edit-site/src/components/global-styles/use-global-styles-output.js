@@ -190,7 +190,7 @@ function flattenTree( input = {}, prefix, token ) {
  *
  * @param {boolean} useRootPaddingAlign Whether to use CSS custom properties in root selector.
  *
- * @param {Object}  tree				A theme.json tree containing layout definitions.
+ * @param {Object}  tree                A theme.json tree containing layout definitions.
  *
  * @return {Array} An array of style declarations.
  */
