@@ -42,7 +42,11 @@ import { Path, SVG } from '@wordpress/primitives';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
-import { positionToPlacement, placementToMotionAnimationProps } from './utils';
+import {
+	getFrameOffset,
+	positionToPlacement,
+	placementToMotionAnimationProps,
+} from './utils';
 
 /**
  * Name of slot in which popover should fill.
@@ -117,15 +121,6 @@ const MaybeAnimatedWrapper = forwardRef(
 );
 
 const slotNameContext = createContext();
-
-const getFrameOffset = ( document ) => {
-	const frameElement = document?.defaultView?.frameElement;
-	if ( ! frameElement ) {
-		return;
-	}
-	const iframeRect = frameElement.getBoundingClientRect();
-	return { x: iframeRect.left, y: iframeRect.top };
-};
 
 const Popover = (
 	{

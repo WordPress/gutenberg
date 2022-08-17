@@ -81,3 +81,27 @@ export const placementToMotionAnimationProps = ( placement ) => {
 		transition: { duration: 0.1, ease: [ 0, 0, 0.2, 1 ] },
 	};
 };
+
+/**
+ * @typedef FrameOffset
+ * @type {Object}
+ * @property {number} x A numerical value representing the horizontal offset of the frame.
+ * @property {number} y A numerical value representing the vertical offset of the frame.
+ */
+
+/**
+ * Returns the offset of a document's frame element.
+ *
+ * @param {Document} document A document. This will usually be the document within an iframe.
+ *
+ * @return {FrameOffset|undefined} The offset of the document's frame element,
+ *                                 or undefined if the document has no frame element.
+ */
+export const getFrameOffset = ( document ) => {
+	const frameElement = document?.defaultView?.frameElement;
+	if ( ! frameElement ) {
+		return;
+	}
+	const iframeRect = frameElement.getBoundingClientRect();
+	return { x: iframeRect.left, y: iframeRect.top };
+};
