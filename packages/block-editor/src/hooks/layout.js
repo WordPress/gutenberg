@@ -310,9 +310,10 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const { layout } = attributes;
 		const { default: defaultBlockLayout } =
 			getBlockSupport( name, layoutBlockSupportKey ) || {};
-		const usedLayout = layout?.inherit
-			? { ...layout, type: 'constrained' }
-			: layout || defaultBlockLayout || {};
+		const usedLayout =
+			layout?.inherit || layout?.contentSize || layout?.wideSize
+				? { ...layout, type: 'constrained' }
+				: layout || defaultBlockLayout || {};
 		const layoutClasses = hasLayoutBlockSupport
 			? useLayoutClasses( usedLayout, defaultThemeLayout?.definitions )
 			: null;
