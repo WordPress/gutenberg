@@ -795,7 +795,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			* If there are content and wide widths in theme.json, output them
 			* as custom properties on the body element so all blocks can use them.
 			*/
-			if ( isset( $settings['layout']['contentSize'] ) && $settings['layout']['contentSize'] || isset( $settings['layout']['wideSize'] ) && $settings['layout']['wideSize'] ) {
+			if ( isset( $settings['layout']['contentSize'] ) || isset( $settings['layout']['wideSize'] ) ) {
 				$content_size = isset( $settings['layout']['contentSize'] ) ? $settings['layout']['contentSize'] : $settings['layout']['wideSize'];
 				$content_size = static::is_safe_css_declaration( 'max-width', $content_size ) ? $content_size : 'initial';
 				$wide_size    = isset( $settings['layout']['wideSize'] ) ? $settings['layout']['wideSize'] : $settings['layout']['contentSize'];

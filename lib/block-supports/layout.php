@@ -279,18 +279,19 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$has_block_gap_support  = isset( $block_gap ) ? null !== $block_gap : false;
 	$default_block_layout   = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
 	$used_layout            = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
-	$class_names            = array();
-	$layout_definitions     = _wp_array_get( $global_layout_settings, array( 'definitions' ), array() );
-	$block_classname        = wp_get_block_default_classname( $block['blockName'] );
-	$container_class        = wp_unique_id( 'wp-container-' );
-	$layout_classname       = '';
-	$use_global_padding     = gutenberg_get_global_settings( array( 'useRootPaddingAwareAlignments' ) ) && ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] );
 
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
 		if ( ! $global_layout_settings ) {
 			return $block_content;
 		}
 	}
+
+	$class_names        = array();
+	$layout_definitions = _wp_array_get( $global_layout_settings, array( 'definitions' ), array() );
+	$block_classname    = wp_get_block_default_classname( $block['blockName'] );
+	$container_class    = wp_unique_id( 'wp-container-' );
+	$layout_classname   = '';
+	$use_global_padding = gutenberg_get_global_settings( array( 'useRootPaddingAwareAlignments' ) ) && ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] );
 
 	// Set the correct layout type for blocks using legacy content width.
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] ) {
