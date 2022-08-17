@@ -85,7 +85,6 @@ const MaybeAnimatedWrapper = forwardRef(
 		},
 		forwardedRef
 	) => {
-		// In your component
 		const shouldReduceMotion = useReducedMotion();
 
 		const { style: motionInlineStyles, ...otherMotionProps } = useMemo(
