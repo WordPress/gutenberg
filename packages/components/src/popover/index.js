@@ -195,11 +195,11 @@ const Popover = (
 	 * Store the offset in a ref, due to constraints with floating-ui:
 	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
 	 */
-	const frameOffset = useRef();
+	const frameOffsetRef = useRef();
 
 	const middleware = [
 		offsetMiddleware( ( { placement: currentPlacement } ) => {
-			if ( ! frameOffset.current ) {
+			if ( ! frameOffsetRef.current ) {
 				return offset ?? 0;
 			}
 
@@ -224,8 +224,8 @@ const Popover = (
 			return {
 				mainAxis:
 					normalizedOffset +
-					frameOffset.current[ mainAxis ] * mainAxisModifier,
-				crossAxis: frameOffset.current[ crossAxis ],
+					frameOffsetRef.current[ mainAxis ] * mainAxisModifier,
+				crossAxis: frameOffsetRef.current[ crossAxis ],
 			};
 		} ),
 		__unstableForcePosition ? undefined : flip(),
@@ -389,7 +389,7 @@ const Popover = (
 	// document scrolls. Also update the frame offset if the view resizes.
 	useLayoutEffect( () => {
 		if ( referenceOwnerDocument === document ) {
-			frameOffset.current = undefined;
+			frameOffsetRef.current = undefined;
 			return;
 		}
 
@@ -402,7 +402,9 @@ const Popover = (
 			!! referenceOwnerDocument?.defaultView?.frameElement;
 		if ( hasFrameElement ) {
 			updateFrameOffset = () => {
-				frameOffset.current = getFrameOffset( referenceOwnerDocument );
+				frameOffsetRef.current = getFrameOffset(
+					referenceOwnerDocument
+				);
 				update();
 			};
 			updateFrameOffset();
