@@ -54,7 +54,7 @@ abstract class WP_Webfonts_TestCase extends WP_UnitTestCase {
 	}
 
 	protected function get_variations( $font_family, $wp_webfonts = null ) {
-		if ( ! $wp_webfonts ) {
+		if ( ! ( $wp_webfonts instanceof WP_Webfonts ) ) {
 			$wp_webfonts = wp_webfonts();
 		}
 		return $wp_webfonts->registered[ $font_family ]->deps;
@@ -76,5 +76,37 @@ abstract class WP_Webfonts_TestCase extends WP_UnitTestCase {
 			$wp_webfonts = wp_webfonts();
 		}
 		return $property->getValue( $wp_webfonts );
+	}
+
+	/**
+	 * Sets up multiple font family and variation mocks.
+	 *
+	 * @param array       $inputs      Array of array( font-family => variations ) to setup.
+	 * @param WP_Webfonts $wp_webfonts Instance of WP_Webfonts.
+	 * @return stdClass[] Array of registered mocks.
+	 */
+	protected function setup_registration_mocks( array $inputs, WP_Webfonts $wp_webfonts ) {
+		$mocks = array();
+
+		$build_mock = function( $handle ) use ( &$mocks, $wp_webfonts ) {
+			$mock       = new stdClass();
+			$mock->deps = array();
+			// Add to each queue.
+			$mocks[ $handle ]                   = $mock;
+			$wp_webfonts->registered[ $handle ] = $mock;
+
+			return $mock;
+		};
+
+		foreach ( $inputs as $font_family => $variations ) {
+			$font_mock = $build_mock( $font_family );
+
+			foreach ( $variations as $variation_handle ) {
+				$build_mock( $variation_handle );
+				$font_mock->deps[] = $variation_handle;
+			}
+		}
+
+		return $mocks;
 	}
 }

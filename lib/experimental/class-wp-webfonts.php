@@ -115,30 +115,6 @@ class WP_Webfonts extends WP_Dependencies {
 	}
 
 	/**
-	 * Removes a font variation.
-	 *
-	 * @since 6.1.0
-	 *
-	 * @param string $font_family_handle The font family for this variation.
-	 * @param string $variation_handle   The variation's handle to remove.
-	 */
-	public function remove_variation( $font_family_handle, $variation_handle ) {
-		$this->remove( $font_family_handle );
-
-		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
-			return;
-		}
-
-		// Remove the variation as a dependency.
-		$this->registered[ $font_family_handle ]->deps = array_values(
-			array_diff(
-				$this->registered[ $font_family_handle ]->deps,
-				array( $variation_handle )
-			)
-		);
-	}
-
-	/**
 	 * Registers a variation to the given font family.
 	 *
 	 * @since 6.1.0
@@ -223,6 +199,30 @@ class WP_Webfonts extends WP_Dependencies {
 		}
 
 		return in_array( $variant_handle, $this->registered[ $font_family_handle ]->deps );
+	}
+
+	/**
+	 * Removes a font variation.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @param string $font_family_handle The font family for this variation.
+	 * @param string $variation_handle   The variation's handle to remove.
+	 */
+	public function remove_variation( $font_family_handle, $variation_handle ) {
+		$this->remove( $font_family_handle );
+
+		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
+			return;
+		}
+
+		// Remove the variation as a dependency.
+		$this->registered[ $font_family_handle ]->deps = array_values(
+			array_diff(
+				$this->registered[ $font_family_handle ]->deps,
+				array( $variation_handle )
+			)
+		);
 	}
 
 	/**

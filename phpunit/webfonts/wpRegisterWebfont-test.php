@@ -28,7 +28,7 @@ class Tests_Webfonts_WpRegisterWebfont extends WP_Webfonts_TestCase {
 	 * @param array  $expected           Expected results.
 	 */
 	public function test_register_with_mock_when_handle_given( $font_family_handle, array $variation, $expected ) {
-		$mock             = $this->set_up_mock();
+		$mock             = $this->set_up_mock( 'add_variation' );
 		$variation_handle = $expected[1];
 
 		$mock->expects( $this->once() )
