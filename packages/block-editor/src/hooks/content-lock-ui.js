@@ -14,12 +14,12 @@ import { useState, useEffect } from '@wordpress/element';
 import { store as blockEditorStore } from '../store';
 import { BlockControls } from '../components';
 
-function StopEdingAsBlockOnOutsideSelect( {
+function StopEditingAsBlocksOnOutsideSelect( {
 	clientId,
 	lock,
-	setIsTemporarlyEditingAsBlocks,
+	setIsEditingAsBlocks,
 } ) {
-	const isBlockOrDescendSelected = useSelect(
+	const isBlockOrDescendantSelected = useSelect(
 		( select ) => {
 			const { isBlockSelected, hasSelectedInnerBlock } =
 				select( blockEditorStore );
@@ -33,7 +33,7 @@ function StopEdingAsBlockOnOutsideSelect( {
 	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 	useEffect( () => {
-		if ( ! isBlockOrDescendSelected ) {
+		if ( ! isBlockOrDescendantSelected ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			updateBlockAttributes( clientId, {
 				lock: {
@@ -41,16 +41,15 @@ function StopEdingAsBlockOnOutsideSelect( {
 					content: true,
 				},
 			} );
-			setIsTemporarlyEditingAsBlocks( false );
+			setIsEditingAsBlocks( false );
 		}
-	}, [ isBlockOrDescendSelected ] );
+	}, [ isBlockOrDescendantSelected ] );
 	return null;
 }
 
 export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const [ isTemporarlyEditingAsBlocks, setIsTemporarlyEditingAsBlocks ] =
-			useState( false );
+		const [ isEditingAsBlocks, setIsEditingAsBlocks ] = useState( false );
 		const lock = useSelect(
 			( select ) =>
 				select( blockEditorStore ).getBlockAttributes( props.clientId )
@@ -62,28 +61,25 @@ export const withBlockControls = createHigherOrderComponent(
 			__unstableMarkNextChangeAsNotPersistent,
 			updateBlockAttributes,
 		} = useDispatch( blockEditorStore );
-		if ( ! isContentLocked && ! isTemporarlyEditingAsBlocks ) {
+
+		if ( ! isContentLocked && ! isEditingAsBlocks ) {
 			return <BlockEdit { ...props } />;
 		}
+
 		return (
 			<>
-				{ isTemporarlyEditingAsBlocks && ! isContentLocked && (
-					<StopEdingAsBlockOnOutsideSelect
+				{ isEditingAsBlocks && ! isContentLocked && (
+					<StopEditingAsBlocksOnOutsideSelect
 						clientId={ props.clientId }
 						lock={ lock }
-						setIsTemporarlyEditingAsBlocks={
-							setIsTemporarlyEditingAsBlocks
-						}
+						setIsEditingAsBlocks={ setIsEditingAsBlocks }
 					/>
 				) }
 				<BlockControls group="other">
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ () => {
-								if (
-									isTemporarlyEditingAsBlocks &&
-									! isContentLocked
-								) {
+								if ( isEditingAsBlocks && ! isContentLocked ) {
 									__unstableMarkNextChangeAsNotPersistent();
 									updateBlockAttributes( props.clientId, {
 										lock: {
@@ -91,7 +87,7 @@ export const withBlockControls = createHigherOrderComponent(
 											content: true,
 										},
 									} );
-									setIsTemporarlyEditingAsBlocks( false );
+									setIsEditingAsBlocks( false );
 								} else {
 									const newLock = { ...lock };
 									delete newLock.content;
@@ -99,11 +95,11 @@ export const withBlockControls = createHigherOrderComponent(
 									updateBlockAttributes( props.clientId, {
 										lock: newLock,
 									} );
-									setIsTemporarlyEditingAsBlocks( true );
+									setIsEditingAsBlocks( true );
 								}
 							} }
 						>
-							{ isTemporarlyEditingAsBlocks && ! isContentLocked
+							{ isEditingAsBlocks && ! isContentLocked
 								? __( ' Finish editing as blocks' )
 								: __( 'Edit as Blocks' ) }
 						</ToolbarButton>
