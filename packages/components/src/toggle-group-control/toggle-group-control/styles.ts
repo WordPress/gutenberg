@@ -16,8 +16,7 @@ export const ToggleGroupControl = ( {
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
 } ) => css`
 	background: ${ COLORS.ui.background };
-	border: 1px solid;
-	border-color: ${ COLORS.ui.border };
+	border: 1px solid transparent;
 	border-radius: ${ CONFIG.controlBorderRadius };
 	display: inline-flex;
 	min-width: 0;
@@ -28,15 +27,19 @@ export const ToggleGroupControl = ( {
 
 	${ toggleGroupControlSize( size ) }
 
-	&:hover {
-		border-color: ${ COLORS.ui.borderHover };
-	}
-
 	&:focus-within {
 		border-color: ${ COLORS.ui.borderFocus };
 		box-shadow: ${ CONFIG.controlBoxShadowFocus };
 		outline: none;
 		z-index: 1;
+	}
+`;
+
+export const border = css`
+	border-color: ${ COLORS.ui.border };
+
+	&:hover {
+		border-color: ${ COLORS.ui.borderHover };
 	}
 `;
 

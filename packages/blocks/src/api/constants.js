@@ -23,6 +23,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	background: {
 		value: [ 'color', 'gradient' ],
 		support: [ 'color', 'gradients' ],
+		useEngine: true,
 	},
 	backgroundColor: {
 		value: [ 'color', 'background' ],
@@ -141,6 +142,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	fontFamily: {
 		value: [ 'typography', 'fontFamily' ],
 		support: [ 'typography', '__experimentalFontFamily' ],
+		useEngine: true,
 	},
 	fontSize: {
 		value: [ 'typography', 'fontSize' ],
@@ -232,4 +234,5 @@ export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
 	'color.palette': true,
 	'typography.fontFamilies': true,
 	'typography.fontSizes': true,
+	'spacing.spacingSizes': true,
 };

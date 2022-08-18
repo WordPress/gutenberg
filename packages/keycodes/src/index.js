@@ -233,7 +233,13 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 			/** @type {string[]} */ ( [] )
 		);
 
-		const capitalizedCharacter = capitalCase( character );
+		// Symbols (`,.) are removed by the default regular expression,
+		// so override the rule to allow symbols used for shortcuts.
+		// see: https://github.com/blakeembrey/change-case#options
+		const capitalizedCharacter = capitalCase( character, {
+			stripRegexp: /[^A-Z0-9`,\.]/gi,
+		} );
+
 		return [ ...modifierKeys, capitalizedCharacter ];
 	};
 } );

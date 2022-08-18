@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import moment from 'moment';
+import { startOfMinute, format, set, setHours, setMonth } from 'date-fns';
 
 /**
  * WordPress dependencies
@@ -39,8 +39,8 @@ import {
 	PRESS_DOWN,
 	PRESS_UP,
 } from '../../input-control/reducer/actions';
-
-const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+import { inputToDate } from '../utils';
+import { TIMEZONELESS_FORMAT } from '../constants';
 
 function from12hTo24h( hours: number, isPm: boolean ) {
 	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
@@ -98,24 +98,27 @@ export function TimePicker( {
 }: TimePickerProps ) {
 	const [ date, setDate ] = useState( () =>
 		// Truncate the date at the minutes, see: #15495.
-		currentTime ? moment( currentTime ).startOf( 'minutes' ) : moment()
+		currentTime ? startOfMinute( inputToDate( currentTime ) ) : new Date()
 	);
 
 	// Reset the state when currentTime changed.
+	// TODO: useEffect() shouldn't be used like this, causes an unnecessary render
 	useEffect( () => {
 		setDate(
-			currentTime ? moment( currentTime ).startOf( 'minutes' ) : moment()
+			currentTime
+				? startOfMinute( inputToDate( currentTime ) )
+				: new Date()
 		);
 	}, [ currentTime ] );
 
 	const { day, month, year, minutes, hours, am } = useMemo(
 		() => ( {
-			day: date.format( 'DD' ),
-			month: date.format( 'MM' ),
-			year: date.format( 'YYYY' ),
-			minutes: date.format( 'mm' ),
-			hours: date.format( is12Hour ? 'hh' : 'HH' ),
-			am: Number( date.format( 'H' ) ) <= 11 ? 'AM' : 'PM',
+			day: format( date, 'dd' ),
+			month: format( date, 'MM' ),
+			year: format( date, 'yyyy' ),
+			minutes: format( date, 'mm' ),
+			hours: format( date, is12Hour ? 'hh' : 'HH' ),
+			am: format( date, 'a' ),
 		} ),
 		[ date, is12Hour ]
 	);
@@ -142,9 +145,9 @@ export function TimePicker( {
 				numberValue = from12hTo24h( numberValue, am === 'PM' );
 			}
 
-			const newDate = date.clone()[ method ]( numberValue );
+			const newDate = set( date, { [ method ]: numberValue } );
 			setDate( newDate );
-			onChange?.( newDate.format( TIMEZONELESS_FORMAT ) );
+			onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
 		};
 		return callback;
 	};
@@ -157,11 +160,12 @@ export function TimePicker( {
 
 			const parsedHours = parseInt( hours, 10 );
 
-			const newDate = date
-				.clone()
-				.hours( from12hTo24h( parsedHours, value === 'PM' ) );
+			const newDate = setHours(
+				date,
+				from12hTo24h( parsedHours, value === 'PM' )
+			);
 			setDate( newDate );
-			onChange?.( newDate.format( TIMEZONELESS_FORMAT ) );
+			onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
 		};
 	}
 
@@ -207,9 +211,9 @@ export function TimePicker( {
 					{ value: '12', label: __( 'December' ) },
 				] }
 				onChange={ ( value ) => {
-					const newDate = date.clone().month( Number( value ) - 1 );
+					const newDate = setMonth( date, Number( value ) - 1 );
 					setDate( newDate );
-					onChange?.( newDate.format( TIMEZONELESS_FORMAT ) );
+					onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
 				} }
 			/>
 		</MonthSelectWrapper>

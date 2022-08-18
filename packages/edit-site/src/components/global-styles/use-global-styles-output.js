@@ -190,12 +190,15 @@ function flattenTree( input = {}, prefix, token ) {
  *
  * @param {boolean} useRootPaddingAlign Whether to use CSS custom properties in root selector.
  *
+ * @param {Object}  tree                A theme.json tree containing layout definitions.
+ *
  * @return {Array} An array of style declarations.
  */
 export function getStylesDeclarations(
 	blockStyles = {},
 	selector = '',
-	useRootPaddingAlign
+	useRootPaddingAlign,
+	tree = {}
 ) {
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
 	const output = reduce(
@@ -270,7 +273,19 @@ export function getStylesDeclarations(
 		const cssProperty = rule.key.startsWith( '--' )
 			? rule.key
 			: kebabCase( rule.key );
-		output.push( `${ cssProperty }: ${ compileStyleValue( rule.value ) }` );
+
+		let ruleValue = rule.value;
+		if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
+			const refPath = ruleValue.ref.split( '.' );
+			ruleValue = get( tree, refPath );
+			// Presence of another ref indicates a reference to another dynamic value.
+			// Pointing to another dynamic value is not supported.
+			if ( ! ruleValue || !! ruleValue?.ref ) {
+				return;
+			}
+		}
+
+		output.push( `${ cssProperty }: ${ ruleValue }` );
 	} );
 
 	return output;
@@ -625,14 +640,13 @@ export const toStyles = (
 			if ( duotoneSelector ) {
 				const duotoneDeclarations =
 					getStylesDeclarations( duotoneStyles );
-				if ( duotoneDeclarations.length === 0 ) {
-					return;
+				if ( duotoneDeclarations.length > 0 ) {
+					ruleset =
+						ruleset +
+						`${ duotoneSelector }{${ duotoneDeclarations.join(
+							';'
+						) };}`;
 				}
-				ruleset =
-					ruleset +
-					`${ duotoneSelector }{${ duotoneDeclarations.join(
-						';'
-					) };}`;
 			}
 
 			// Process blockGap and layout styles.
@@ -654,7 +668,8 @@ export const toStyles = (
 			const declarations = getStylesDeclarations(
 				styles,
 				selector,
-				useRootPaddingAlign
+				useRootPaddingAlign,
+				tree
 			);
 			if ( declarations?.length ) {
 				ruleset =

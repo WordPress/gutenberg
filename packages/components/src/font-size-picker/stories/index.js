@@ -12,6 +12,7 @@ export default {
 	title: 'Components/FontSizePicker',
 	component: FontSizePicker,
 	argTypes: {
+		__nextHasNoMarginBottom: { control: { type: 'boolean' } },
 		initialValue: { table: { disable: true } }, // hide prop because it's not actually part of FontSizePicker
 		fallbackFontSize: {
 			description:

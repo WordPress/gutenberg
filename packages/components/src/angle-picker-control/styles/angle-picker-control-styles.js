@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
 /**
@@ -14,8 +15,16 @@ import CONFIG from '../../utils/config-values';
 const CIRCLE_SIZE = 32;
 const INNER_CIRCLE_SIZE = 3;
 
+const deprecatedBottomMargin = ( { __nextHasNoMarginBottom } ) => {
+	return ! __nextHasNoMarginBottom
+		? css`
+				margin-bottom: ${ space( 2 ) };
+		  `
+		: '';
+};
+
 export const Root = styled( Flex )`
-	margin-bottom: ${ space( 2 ) };
+	${ deprecatedBottomMargin }
 `;
 
 export const CircleRoot = styled.div`

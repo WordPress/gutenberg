@@ -21,7 +21,8 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * Note: this will effect both top level and block level elements.
 	 */
 	const VALID_ELEMENT_PSEUDO_SELECTORS = array(
-		'link' => array( ':hover', ':focus', ':active', ':visited' ),
+		'link'   => array( ':hover', ':focus', ':active', ':visited' ),
+		'button' => array( ':hover', ':focus', ':active', ':visited' ),
 	);
 
 	/**
@@ -334,6 +335,31 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	);
 
 	/**
+	 * Function that appends a sub-selector to a existing one.
+	 *
+	 * Given the compounded $selector "h1, h2, h3"
+	 * and the $to_append selector ".some-class" the result will be
+	 * "h1.some-class, h2.some-class, h3.some-class".
+	 *
+	 * @since 5.8.0
+	 * @since 6.1.0 Added append position.
+	 *
+	 * @param string $selector  Original selector.
+	 * @param string $to_append Selector to append.
+	 * @param string $position  A position sub-selector should be appended. Default: 'right'.
+	 * @return string
+	 */
+	protected static function append_to_selector( $selector, $to_append, $position = 'right' ) {
+		$new_selectors = array();
+		$selectors     = explode( ',', $selector );
+		foreach ( $selectors as $sel ) {
+			$new_selectors[] = 'right' === $position ? $sel . $to_append : $to_append . $sel;
+		}
+
+		return implode( ',', $new_selectors );
+	}
+
+	/**
 	 * Returns the metadata for each block.
 	 *
 	 * Example:
@@ -416,14 +442,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 						break;
 					}
 
-					// This converts selectors like '.wp-element-button, .wp-block-button__link'
-					// to an array, so that the block selector is added to both parts of the selector.
-					$el_selectors = explode( ',', $el_selector );
-					foreach ( $el_selectors as $el_selector_item ) {
-						$element_selector[] = $selector . ' ' . $el_selector_item;
-					}
+					$element_selector = static::append_to_selector( $el_selector, $selector . ' ', 'left' );
 				}
-				static::$blocks_metadata[ $block_name ]['elements'][ $el_name ] = implode( ',', $element_selector );
+				static::$blocks_metadata[ $block_name ]['elements'][ $el_name ] = $element_selector;
 			}
 		}
 
@@ -481,9 +502,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 					foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
 
 						if ( isset( $theme_json['styles']['elements'][ $element ][ $pseudo_selector ] ) ) {
+
 							$nodes[] = array(
 								'path'     => array( 'styles', 'elements', $element ),
-								'selector' => static::ELEMENTS[ $element ] . $pseudo_selector,
+								'selector' => static::append_to_selector( static::ELEMENTS[ $element ], $pseudo_selector ),
 							);
 						}
 					}
@@ -566,9 +588,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 					if ( array_key_exists( $element, static::VALID_ELEMENT_PSEUDO_SELECTORS ) ) {
 						foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
 							if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $pseudo_selector ] ) ) {
+
 								$nodes[] = array(
 									'path'     => array( 'styles', 'blocks', $name, 'elements', $element ),
-									'selector' => $selectors[ $name ]['elements'][ $element ] . $pseudo_selector,
+									'selector' => static::append_to_selector( $selectors[ $name ]['elements'][ $element ], $pseudo_selector ),
 								);
 							}
 						}
@@ -770,8 +793,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 
 		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
-			$block_gap_value = _wp_array_get( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ), '0.5em' );
-
 			if ( $use_root_padding ) {
 				$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
 				$block_rules .= '.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
@@ -785,8 +806,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 			$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 			if ( $has_block_gap_support ) {
-				$block_rules .= '.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }';
-				$block_rules .= ".wp-site-blocks > * + * { margin-block-start: $block_gap_value; }";
+				$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
+				$block_rules    .= '.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }';
+				$block_rules    .= ".wp-site-blocks > * + * { margin-block-start: $block_gap_value; }";
+
 				// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
 				$block_rules .= "$selector { --wp--style--block-gap: $block_gap_value; }";
 			}
@@ -1149,7 +1172,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$spacing_scale = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'spacingScale' ), array() );
 
 		if ( ! is_numeric( $spacing_scale['steps'] )
-			|| ! $spacing_scale['steps'] > 0
 			|| ! isset( $spacing_scale['mediumStep'] )
 			|| ! isset( $spacing_scale['unit'] )
 			|| ! isset( $spacing_scale['operator'] )
@@ -1161,6 +1183,11 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			if ( ! empty( $spacing_scale ) ) {
 				trigger_error( __( 'Some of the theme.json settings.spacing.spacingScale values are invalid', 'gutenberg' ), E_USER_NOTICE );
 			}
+			return null;
+		}
+
+		// If theme authors want to prevent the generation of the core spacing scale they can set their theme.json spacingScale.steps to 0.
+		if ( 0 === $spacing_scale['steps'] ) {
 			return null;
 		}
 
@@ -1281,14 +1308,14 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 					$block_gap_value = _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', '__experimentalDefault' ), null );
 				}
 			} else {
-				$block_gap_value = _wp_array_get( $node, array( 'spacing', 'blockGap' ), null );
+				$block_gap_value = static::get_property_value( $node, array( 'spacing', 'blockGap' ) );
 			}
 
 			// Support split row / column values and concatenate to a shorthand value.
 			if ( is_array( $block_gap_value ) ) {
 				if ( isset( $block_gap_value['top'] ) && isset( $block_gap_value['left'] ) ) {
-					$gap_row         = $block_gap_value['top'];
-					$gap_column      = $block_gap_value['left'];
+					$gap_row         = static::get_property_value( $node, array( 'spacing', 'blockGap', 'top' ) );
+					$gap_column      = static::get_property_value( $node, array( 'spacing', 'blockGap', 'left' ) );
 					$block_gap_value = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
 				} else {
 					// Skip outputting gap value if not all sides are provided.

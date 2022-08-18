@@ -526,6 +526,7 @@ describe( 'readConfig', () => {
 						plugins: [
 							'https://www.example.com/test/path/to/gutenberg.zip',
 							'https://www.example.com/test/path/to/gutenberg.8.1.0.zip',
+							'https://www.example.com/test/path/to/gutenberg.8.1.0.zip?auth=thisIsAString&token=secondString',
 							'https://www.example.com/test/path/to/twentytwenty.zip',
 							'https://www.example.com/test/path/to/twentytwenty.1.3.zip',
 							'https://example.com/twentytwenty.1.3.zip',
@@ -545,6 +546,14 @@ describe( 'readConfig', () => {
 					{
 						type: 'zip',
 						url: 'https://www.example.com/test/path/to/gutenberg.8.1.0.zip',
+						path: expect.stringMatching(
+							/^(\/|\\).*gutenberg.8.1.0$/
+						),
+						basename: 'gutenberg.8.1.0',
+					},
+					{
+						type: 'zip',
+						url: 'https://www.example.com/test/path/to/gutenberg.8.1.0.zip?auth=thisIsAString&token=secondString',
 						path: expect.stringMatching(
 							/^(\/|\\).*gutenberg.8.1.0$/
 						),

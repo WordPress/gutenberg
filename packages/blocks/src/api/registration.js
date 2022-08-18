@@ -3,7 +3,8 @@
 /**
  * External dependencies
  */
-import { camelCase, isEmpty, mapKeys, pick, pickBy } from 'lodash';
+import { camelCase } from 'change-case';
+import { isEmpty, pick, pickBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -171,12 +172,14 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 			}
 			continue;
 		}
-		serverSideBlockDefinitions[ blockName ] = mapKeys(
-			pickBy(
-				definitions[ blockName ],
-				( value ) => value !== null && value !== undefined
-			),
-			( value, key ) => camelCase( key )
+
+		serverSideBlockDefinitions[ blockName ] = Object.fromEntries(
+			Object.entries(
+				pickBy(
+					definitions[ blockName ],
+					( value ) => value !== null && value !== undefined
+				)
+			).map( ( [ key, value ] ) => [ camelCase( key ), value ] )
 		);
 	}
 }

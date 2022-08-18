@@ -2,11 +2,23 @@
 
 ## Unreleased
 
+## 5.2.0 (2022-08-16)
+
 ### Enhancement
-- Previously, wp-env used the WordPress version provided by Docker in the WordPress image for installations which don't specify a WordPress version. Now, wp-env will find the latest stable version on WordPress.org and check out the https://github.com/WordPress/WordPress repository at the tag matching that version. In most cases, this will match what Docker provides. The benefit is that wp-env (and WordPress.org) now controls the default WordPress version rather than Docker.
+-   Query parameters can now be used in .zip source URLs.
+
+## 5.1.1 (2022-08-16)
 
 ### Bug Fix
-- Downloading a default WordPress version also resolves a bug where the wrong WordPress test files were used if no core source was specified in wp-env.json. The current trunk test files were downloaded rather than the stable version. Now, the test files will match the default stable version.
+-   Fix a crash when "core" was set to `null` in a `.wp-env.json` file. We now use the latest stable WordPress version in that case. This also restores the previous behavior of `"core": null` in `.wp-env.override.json`, which was to use the latest stable WordPress version.
+
+## 5.1.0 (2022-08-10)
+
+### Enhancement
+-   Previously, wp-env used the WordPress version provided by Docker in the WordPress image for installations which don't specify a WordPress version. Now, wp-env will find the latest stable version on WordPress.org and check out the https://github.com/WordPress/WordPress repository at the tag matching that version. In most cases, this will match what Docker provides. The benefit is that wp-env (and WordPress.org) now controls the default WordPress version rather than Docker.
+
+### Bug Fix
+-   Downloading a default WordPress version also resolves a bug where the wrong WordPress test files were used if no core source was specified in wp-env.json. The current trunk test files were downloaded rather than the stable version. Now, the test files will match the default stable version.
 
 ## 5.0.0 (2022-07-27)
 

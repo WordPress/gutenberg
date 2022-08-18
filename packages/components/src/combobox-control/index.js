@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
@@ -30,6 +29,7 @@ import Button from '../button';
 import { FlexBlock, FlexItem } from '../flex';
 import withFocusOutside from '../higher-order/with-focus-outside';
 import { useControlledValue } from '../utils/hooks';
+import { normalizeTextString } from '../utils/strings';
 
 const noop = () => {};
 
@@ -46,6 +46,8 @@ const DetectOutside = withFocusOutside(
 );
 
 function ComboboxControl( {
+	/** Start opting into the new margin-free styles that will become the default in a future version. */
+	__nextHasNoMarginBottom = false,
 	__next36pxDefaultSize,
 	value: valueProp,
 	label,
@@ -83,11 +85,9 @@ function ComboboxControl( {
 	const matchingSuggestions = useMemo( () => {
 		const startsWithMatch = [];
 		const containsMatch = [];
-		const match = removeAccents( inputValue.toLocaleLowerCase() );
+		const match = normalizeTextString( inputValue );
 		options.forEach( ( option ) => {
-			const index = removeAccents( option.label )
-				.toLocaleLowerCase()
-				.indexOf( match );
+			const index = normalizeTextString( option.label ).indexOf( match );
 			if ( index === 0 ) {
 				startsWithMatch.push( option );
 			} else if ( index > 0 ) {
@@ -222,6 +222,7 @@ function ComboboxControl( {
 	return (
 		<DetectOutside onFocusOutside={ onFocusOutside }>
 			<BaseControl
+				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 				className={ classnames(
 					className,
 					'components-combobox-control'

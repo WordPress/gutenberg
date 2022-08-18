@@ -14,7 +14,7 @@ Display a date archive of your posts. ([Source](https://github.com/WordPress/gut
 
 -	**Name:** core/archives
 -	**Category:** widgets
--	**Supports:** align, ~~html~~
+-	**Supports:** align, spacing (margin, padding), ~~html~~
 -	**Attributes:** displayAsDropdown, showLabel, showPostCounts, type
 
 ## Audio
@@ -23,7 +23,7 @@ Embed a simple audio player. ([Source](https://github.com/WordPress/gutenberg/tr
 
 -	**Name:** core/audio
 -	**Category:** media
--	**Supports:** align, anchor
+-	**Supports:** align, anchor, spacing (margin, padding)
 -	**Attributes:** autoplay, caption, id, loop, preload, src
 
 ## Avatar
@@ -77,7 +77,7 @@ Display a list of all categories. ([Source](https://github.com/WordPress/gutenbe
 
 -	**Name:** core/categories
 -	**Category:** widgets
--	**Supports:** align, ~~html~~
+-	**Supports:** align, typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** displayAsDropdown, showEmpty, showHierarchy, showOnlyTopLevel, showPostCounts
 
 ## Code
@@ -95,7 +95,7 @@ A single column within a columns block. ([Source](https://github.com/WordPress/g
 
 -	**Name:** core/column
 -	**Category:** text
--	**Supports:** anchor, color (background, gradients, link, text), spacing (blockGap, padding), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, color (background, gradients, link, text), spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** allowedBlocks, templateLock, verticalAlignment, width
 
 ## Columns
@@ -104,7 +104,7 @@ Display content in multiple columns, with blocks added to each column. ([Source]
 
 -	**Name:** core/columns
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap, margin, padding), ~~html~~
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** isStackedOnMobile, verticalAlignment
 
 ## Comment Author Avatar (deprecated)
@@ -167,7 +167,7 @@ Contains the block elements used to display a comment, like the title, date, aut
 
 -	**Name:** core/comment-template
 -	**Category:** design
--	**Supports:** align, ~~html~~, ~~reusable~~
+-	**Supports:** align, typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
 ## Comments
@@ -185,7 +185,7 @@ Displays a paginated navigation to next/previous set of comments, when applicabl
 
 -	**Name:** core/comments-pagination
 -	**Category:** theme
--	**Supports:** align, color (background, gradients, link, text), ~~html~~, ~~reusable~~
+-	**Supports:** align, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow
 
 ## Next Page
@@ -203,7 +203,7 @@ Displays a list of page numbers for comments pagination. ([Source](https://githu
 
 -	**Name:** core/comments-pagination-numbers
 -	**Category:** theme
--	**Supports:** ~~html~~, ~~reusable~~
+-	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
 ## Previous Page
@@ -230,7 +230,7 @@ Add an image or video with a text overlay — great for headers. ([Source](https
 
 -	**Name:** core/cover
 -	**Category:** media
--	**Supports:** align, anchor, color (~~background~~, ~~text~~), spacing (margin, padding), ~~html~~
+-	**Supports:** align, anchor, color (~~background~~, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** allowedBlocks, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, minHeight, minHeightUnit, overlayColor, templateLock, url, useFeaturedImage
 
 ## Embed
@@ -266,7 +266,7 @@ Display multiple images in a rich gallery. ([Source](https://github.com/WordPres
 
 -	**Name:** core/gallery
 -	**Category:** media
--	**Supports:** align, anchor, spacing (blockGap), units (em, px, rem, vh, vw), ~~html~~
+-	**Supports:** align, anchor, color (background, gradients, ~~text~~), spacing (blockGap), units (em, px, rem, vh, vw), ~~html~~
 -	**Attributes:** allowResize, caption, columns, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, shortCodeTransforms, sizeSlug
 
 ## Group
@@ -284,7 +284,7 @@ Introduce new sections and organize content to help visitors (and search engines
 
 -	**Name:** core/heading
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, link, text), spacing (margin), typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), spacing (margin), typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** content, level, placeholder, textAlign
 
 ## Home Link
@@ -437,7 +437,7 @@ Start with the basic building block of all narrative. ([Source](https://github.c
 
 -	**Name:** core/paragraph
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, anchor, color (background, link, text), typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** align, content, direction, dropCap, placeholder
 
 ## Pattern
@@ -528,7 +528,7 @@ Add the date of this post. ([Source](https://github.com/WordPress/gutenberg/tree
 -	**Name:** core/post-date
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** format, isLink, textAlign
+-	**Attributes:** displayType, format, isLink, textAlign
 
 ## Post Excerpt
 
