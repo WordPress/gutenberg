@@ -15,6 +15,10 @@
 		> svg {
 			opacity: 0;
 		}
+
+		.components-placeholder__illustration {
+			display: none;
+		}
 	}
 
 	// Remove the transition while we still have a legacy placeholder style.
