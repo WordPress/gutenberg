@@ -176,8 +176,17 @@
 	border-radius: inherit;
 	display: flex;
 	box-shadow: none;
-	background: none;
 	min-width: 100px;
+
+	// Blur the background so layered dashed placeholders are still visually separate.
+	// We also provide a semitransparent background so as to allow duotones to sheen through.
+	backdrop-filter: blur(100px);
+	background-color: rgba($white, 0.1);
+
+	// Invert the colors in themes deemed dark.
+	.is-dark-theme & {
+		background-color: rgba($black, 0.1);
+	}
 
 	.components-placeholder__fieldset {
 		width: auto;
