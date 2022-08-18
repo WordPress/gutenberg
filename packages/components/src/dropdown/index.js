@@ -40,6 +40,7 @@ export default function Dropdown( props ) {
 		popoverProps,
 		onClose,
 		onToggle,
+		style,
 	} = props;
 	const containerRef = useRef();
 	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
@@ -95,6 +96,7 @@ export default function Dropdown( props ) {
 			// clicked. Making this div focusable ensures such UAs will focus
 			// it and `closeIfFocusOutside` can tell if the toggle was clicked.
 			tabIndex="-1"
+			style={ style }
 		>
 			{ renderToggle( args ) }
 			{ isOpen && (
