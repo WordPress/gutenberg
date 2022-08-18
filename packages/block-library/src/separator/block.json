@@ -17,7 +17,7 @@
 		"anchor": true,
 		"align": [ "center", "wide", "full" ],
 		"color": {
-			"contrastChecker": false,
+			"__experimentalCheckContrast": false,
 			"__experimentalSkipSerialization": true,
 			"gradients": true,
 			"background": true,

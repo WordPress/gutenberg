@@ -463,7 +463,7 @@ export function ColorEdit( props ) {
 		true ===
 			getBlockSupport( props.name, [
 				COLOR_SUPPORT_KEY,
-				'contrastChecker',
+				'__experimentalCheckContrast',
 			] );
 
 	return (
