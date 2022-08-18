@@ -1,14 +1,15 @@
 /**
+ * External dependencies
+ */
+import type { ForwardedRef } from 'react';
+
+/**
  * Internal dependencies
  */
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { Flex } from '../../flex';
 import { useCardHeader } from './hook';
 import type { HeaderProps } from '../types';
-/**
- * External dependencies
- */
-import type { ForwardedRef } from 'react';
 
 function UnconnectedCardHeader(
 	props: WordPressComponentProps< HeaderProps, 'div' >,
