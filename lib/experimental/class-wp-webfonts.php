@@ -5,14 +5,16 @@ class WP_Webfonts extends WP_Dependencies {
 	/**
 	 * An array of registered providers.
 	 *
-	 * @since 6.0.0
+	 * @since X.X.X
 	 *
 	 * @var array
 	 */
 	private $providers = array();
 
 	/**
+	 * Constructor.
 	 *
+	 * @since X.X.X
 	 */
 	public function __construct() {
 		/**
@@ -28,7 +30,7 @@ class WP_Webfonts extends WP_Dependencies {
 	/**
 	 * Get the list of all registered web fonts and variations.
 	 *
-	 * @since 6.0.0
+	 * @since X.X.X
 	 *
 	 * @return strings[]
 	 */
@@ -38,6 +40,8 @@ class WP_Webfonts extends WP_Dependencies {
 
 	/**
 	 * Get the list of enqueued web fonts and variations.
+	 *
+	 * @since X.X.X
 	 *
 	 * @return array[]
 	 */

@@ -4,7 +4,7 @@
  *
  * @package    WordPress
  * @subpackage WebFonts
- * @since      6.0.0
+ * @since      X.X.X
  */
 
 if ( ! function_exists( 'wp_webfonts' ) ) {
@@ -22,6 +22,7 @@ if ( ! function_exists( 'wp_webfonts' ) ) {
 
 		if ( ! ( $wp_webfonts instanceof WP_Webfonts ) ) {
 			$wp_webfonts = new WP_Webfonts();
+			$wp_webfonts->register_provider( 'local', 'WP_Webfonts_Provider_Local' );
 		}
 
 		return $wp_webfonts;
