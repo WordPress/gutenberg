@@ -185,9 +185,9 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 
 		// Wrap font-family in quotes if it contains spaces.
 		if (
-			false !== strpos( $webfont['font-family'], ' ' ) &&
-			false === strpos( $webfont['font-family'], '"' ) &&
-			false === strpos( $webfont['font-family'], "'" )
+			str_contains( $webfont['font-family'], ' ' ) &&
+			! str_contains( $webfont['font-family'], '"' ) &&
+			! str_contains( $webfont['font-family'], "'" )
 		) {
 			$webfont['font-family'] = '"' . $webfont['font-family'] . '"';
 		}
