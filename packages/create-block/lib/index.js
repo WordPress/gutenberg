@@ -110,15 +110,24 @@ program
 
 					const filterOptionsProvided = ( { name } ) =>
 						! Object.keys( optionsValues ).includes( name );
-					const blockPrompts = getPrompts( pluginTemplate, [
-						'slug',
-						'variant',
-						'namespace',
-						'title',
-						'description',
-						'dashicon',
-						'category',
-					] ).filter( filterOptionsProvided );
+
+					const blockPrompts = getPrompts(
+						pluginTemplate,
+						[
+							'slug',
+							'variant',
+							'namespace',
+							'title',
+							'description',
+							'dashicon',
+							'category',
+						].filter( ( prompt ) => {
+							if ( prompt === 'variant' ) {
+								return pluginTemplate.variants?.length > 1;
+							}
+							return true;
+						} )
+					).filter( filterOptionsProvided );
 					const blockAnswers = await inquirer.prompt( blockPrompts );
 
 					const pluginAnswers = plugin
