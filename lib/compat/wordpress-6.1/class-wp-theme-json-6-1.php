@@ -793,8 +793,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 
 		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
-			$block_gap_value = _wp_array_get( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ), '0.5em' );
-
 			if ( $use_root_padding ) {
 				$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
 				$block_rules .= '.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
@@ -808,8 +806,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 			$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 			if ( $has_block_gap_support ) {
-				$block_rules .= '.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }';
-				$block_rules .= ".wp-site-blocks > * + * { margin-block-start: $block_gap_value; }";
+				$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
+				$block_rules    .= '.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }';
+				$block_rules    .= ".wp-site-blocks > * + * { margin-block-start: $block_gap_value; }";
+
 				// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
 				$block_rules .= "$selector { --wp--style--block-gap: $block_gap_value; }";
 			}
