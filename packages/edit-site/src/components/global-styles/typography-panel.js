@@ -148,7 +148,8 @@ export default function TypographyPanel( { name, element } ) {
 				{ element === 'heading' && (
 					<div className="edit-site-typography-panel__full-width-control">
 						<ToggleGroupControl
-							label={ __( 'Heading level' ) }
+							label={ __( 'Select heading level' ) }
+							hideLabelFromVision
 							value={ selectedLevel }
 							onChange={ setCurrentTab }
 							isBlock
