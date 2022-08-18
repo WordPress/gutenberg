@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 export const GRID = [
 	[ 'top left', 'top center', 'top right' ],
@@ -64,21 +64,4 @@ export function getAlignmentIndex( alignment = 'center' ) {
 	const index = ALIGNMENTS.indexOf( item );
 
 	return index > -1 ? index : undefined;
-}
-
-/**
- * Retrieves the alignment label from a value.
- *
- * @param {string} alignment Value to check.
- *
- * @return {number} The label of a matching alignment.
- */
-export function getAlignmentLabel( alignment = 'center' ) {
-	// Swap left and right in RTL languages.
-	const newAlignment = isRTL()
-		? alignment.replace( /left|right/, ( match ) =>
-				match === 'left' ? 'right' : 'left'
-		  )
-		: alignment;
-	return ALIGNMENT_LABEL[ newAlignment ] || undefined;
 }

@@ -38,6 +38,7 @@ export const Root = styled.div`
 
 export const Row = styled.div`
 	box-sizing: border-box;
+	direction: ltr;
 	display: grid;
 	grid-template-columns: repeat( 3, 1fr );
 `;
