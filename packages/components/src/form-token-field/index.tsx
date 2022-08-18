@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { last, clone, uniq, map, some } from 'lodash';
+import { last, clone, map, some } from 'lodash';
 import classnames from 'classnames';
 import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
 
@@ -409,12 +409,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	}
 
 	function addNewTokens( tokens: string[] ) {
-		const tokensToAdd = uniq(
-			tokens
-				.map( saveTransform )
-				.filter( Boolean )
-				.filter( ( token ) => ! valueContainsToken( token ) )
-		);
+		const tokensToAdd = [
+			...new Set(
+				tokens
+					.map( saveTransform )
+					.filter( Boolean )
+					.filter( ( token ) => ! valueContainsToken( token ) )
+			),
+		];
 
 		if ( tokensToAdd.length > 0 ) {
 			const newValue = clone( value );
