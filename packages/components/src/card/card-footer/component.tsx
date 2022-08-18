@@ -23,7 +23,6 @@ function UnconnectedCardFooter(
 /**
  * `CardFooter` renders an optional footer within a `Card`.
  *
- * @example
  * ```jsx
  * import { Card, CardBody, CardFooter } from `@wordpress/components`;
  *

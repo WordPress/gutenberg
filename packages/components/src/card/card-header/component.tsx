@@ -23,7 +23,6 @@ function UnconnectedCardHeader(
 /**
  * `CardHeader` renders an optional header within a `Card`.
  *
- * @example
  * ```jsx
  * import { Card, CardBody, CardHeader } from `@wordpress/components`;
  *

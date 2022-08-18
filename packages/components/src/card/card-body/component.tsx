@@ -29,7 +29,6 @@ function UnconnectedCardBody(
  * `CardBody` renders an optional content area for a `Card`.
  * Multiple `CardBody` components can be used within `Card` if needed.
  *
- * @example
  * ```jsx
  * import { Card, CardBody } from `@wordpress/components`;
  *

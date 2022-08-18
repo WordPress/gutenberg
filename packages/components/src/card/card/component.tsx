@@ -82,7 +82,6 @@ function UnconnectedCard(
  * `Card` also provides a convenient set of sub-components such as `CardBody`,
  * `CardHeader`, `CardFooter`, and more.
  *
- * @example
  * ```jsx
  * import {
  *   Card,
