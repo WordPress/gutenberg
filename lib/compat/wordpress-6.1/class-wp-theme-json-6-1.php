@@ -1212,7 +1212,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$below_sizes[] = array(
 				/* translators: %s: Multiple of t-shirt sizing, eg. 2X-Small */
 				'name' => $x === $steps_mid_point - 1 ? __( 'Small', 'gutenberg' ) : sprintf( __( '%sX-Small', 'gutenberg' ), strval( $x_small_count ) ),
-				'slug' => $slug,
+				'slug' => (string) $slug,
 				'size' => round( $current_step, 2 ) . $unit,
 			);
 
@@ -1231,7 +1231,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		$below_sizes[] = array(
 			'name' => __( 'Medium', 'gutenberg' ),
-			'slug' => 50,
+			'slug' => '50',
 			'size' => $spacing_scale['mediumStep'] . $unit,
 		);
 
@@ -1249,7 +1249,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$above_sizes[] = array(
 				/* translators: %s: Multiple of t-shirt sizing, eg. 2X-Large */
 				'name' => 0 === $x ? __( 'Large', 'gutenberg' ) : sprintf( __( '%sX-Large', 'gutenberg' ), strval( $x_large_count ) ),
-				'slug' => $slug,
+				'slug' => (string) $slug,
 				'size' => round( $current_step, 2 ) . $unit,
 			);
 
