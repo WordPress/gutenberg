@@ -26,6 +26,7 @@ import {
 	createContext,
 	useContext,
 	useMemo,
+	useEffect,
 } from '@wordpress/element';
 import {
 	useViewportMatch,
@@ -134,7 +135,7 @@ const Popover = (
 		isAlternate,
 		position,
 		placement: placementProp = 'bottom-start',
-		offset,
+		offset: offsetProp = 0,
 		focusOnMount = 'firstElement',
 		anchorRef,
 		anchorRect,
@@ -166,7 +167,7 @@ const Popover = (
 		? positionToPlacement( position )
 		: placementProp;
 
-	const ownerDocument = useMemo( () => {
+	const referenceOwnerDocument = useMemo( () => {
 		let documentToReturn;
 
 		if ( anchorRef?.top ) {
@@ -195,41 +196,43 @@ const Popover = (
 	 * Store the offset in a ref, due to constraints with floating-ui:
 	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
 	 */
-	const frameOffset = useRef( getFrameOffset( ownerDocument ) );
+	const frameOffsetRef = useRef( getFrameOffset( referenceOwnerDocument ) );
+	/**
+	 * Store the offset prop in a ref, due to constraints with floating-ui:
+	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
+	 */
+	const offsetRef = useRef( offsetProp );
 
 	const middleware = [
-		frameOffset.current || offset
-			? offsetMiddleware( ( { placement: currentPlacement } ) => {
-					if ( ! frameOffset.current ) {
-						return offset;
-					}
+		offsetMiddleware( ( { placement: currentPlacement } ) => {
+			if ( ! frameOffsetRef.current ) {
+				return offsetRef.current;
+			}
 
-					const isTopBottomPlacement =
-						currentPlacement.includes( 'top' ) ||
-						currentPlacement.includes( 'bottom' );
+			const isTopBottomPlacement =
+				currentPlacement.includes( 'top' ) ||
+				currentPlacement.includes( 'bottom' );
 
-					// The main axis should represent the gap between the
-					// floating element and the reference element. The cross
-					// axis is always perpendicular to the main axis.
-					const mainAxis = isTopBottomPlacement ? 'y' : 'x';
-					const crossAxis = mainAxis === 'x' ? 'y' : 'x';
+			// The main axis should represent the gap between the
+			// floating element and the reference element. The cross
+			// axis is always perpendicular to the main axis.
+			const mainAxis = isTopBottomPlacement ? 'y' : 'x';
+			const crossAxis = mainAxis === 'x' ? 'y' : 'x';
 
-					// When the popover is before the reference, subtract the offset,
-					// of the main axis else add it.
-					const hasBeforePlacement =
-						currentPlacement.includes( 'top' ) ||
-						currentPlacement.includes( 'left' );
-					const mainAxisModifier = hasBeforePlacement ? -1 : 1;
-					const normalizedOffset = offset ? offset : 0;
+			// When the popover is before the reference, subtract the offset,
+			// of the main axis else add it.
+			const hasBeforePlacement =
+				currentPlacement.includes( 'top' ) ||
+				currentPlacement.includes( 'left' );
+			const mainAxisModifier = hasBeforePlacement ? -1 : 1;
 
-					return {
-						mainAxis:
-							normalizedOffset +
-							frameOffset.current[ mainAxis ] * mainAxisModifier,
-						crossAxis: frameOffset.current[ crossAxis ],
-					};
-			  } )
-			: undefined,
+			return {
+				mainAxis:
+					offsetRef.current +
+					frameOffsetRef.current[ mainAxis ] * mainAxisModifier,
+				crossAxis: frameOffsetRef.current[ crossAxis ],
+			};
+		} ),
 		__unstableForcePosition ? undefined : flip(),
 		__unstableForcePosition
 			? undefined
@@ -292,6 +295,11 @@ const Popover = (
 		placement: computedPlacement,
 		middlewareData: { arrow: arrowData = {} },
 	} = useFloating( { placement: normalizedPlacementFromProps, middleware } );
+
+	useEffect( () => {
+		offsetRef.current = offsetProp;
+		update();
+	}, [ offsetProp, update ] );
 
 	// Update the `reference`'s ref.
 	//
@@ -390,19 +398,23 @@ const Popover = (
 	// we need to manually update the floating's position as the reference's owner
 	// document scrolls. Also update the frame offset if the view resizes.
 	useLayoutEffect( () => {
-		if ( ownerDocument === document ) {
+		if ( referenceOwnerDocument === document ) {
+			frameOffsetRef.current = undefined;
 			return;
 		}
 
-		const { defaultView } = ownerDocument;
+		const { defaultView } = referenceOwnerDocument;
 
-		ownerDocument.addEventListener( 'scroll', update );
+		referenceOwnerDocument.addEventListener( 'scroll', update );
 
 		let updateFrameOffset;
-		const hasFrameElement = !! ownerDocument?.defaultView?.frameElement;
+		const hasFrameElement =
+			!! referenceOwnerDocument?.defaultView?.frameElement;
 		if ( hasFrameElement ) {
 			updateFrameOffset = () => {
-				frameOffset.current = getFrameOffset( ownerDocument );
+				frameOffsetRef.current = getFrameOffset(
+					referenceOwnerDocument
+				);
 				update();
 			};
 			updateFrameOffset();
@@ -410,13 +422,13 @@ const Popover = (
 		}
 
 		return () => {
-			ownerDocument.removeEventListener( 'scroll', update );
+			referenceOwnerDocument.removeEventListener( 'scroll', update );
 
 			if ( updateFrameOffset ) {
 				defaultView.removeEventListener( 'resize', updateFrameOffset );
 			}
 		};
-	}, [ ownerDocument, update ] );
+	}, [ referenceOwnerDocument, update ] );
 
 	const mergedFloatingRef = useMergeRefs( [
 		floating,

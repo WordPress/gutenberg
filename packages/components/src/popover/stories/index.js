@@ -244,7 +244,7 @@ export const WithSlotOutsideIframe = ( args ) => {
 				<Iframe
 					style={ {
 						width: '100%',
-						height: '100%',
+						height: '400px',
 					} }
 				>
 					<div
@@ -258,7 +258,7 @@ export const WithSlotOutsideIframe = ( args ) => {
 								padding: '8px',
 								background: 'salmon',
 								maxWidth: '200px',
-								marginTop: '30px',
+								marginTop: '100px',
 								marginLeft: 'auto',
 								marginRight: 'auto',
 							} }
