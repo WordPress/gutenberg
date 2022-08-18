@@ -277,13 +277,6 @@ if ( ! function_exists( 'wp_print_webfonts' ) ) {
 	function wp_print_webfonts( $handles = false ) {
 		global $wp_webfonts;
 
-		/**
-		 * Fires before webfonts in the $handles queue are printed.
-		 *
-		 * @since 6.1.0
-		 */
-		do_action( 'wp_print_webfonts' );
-
 		if ( '' === $handles ) { // For 'wp_head'.
 			$handles = false;
 		}
