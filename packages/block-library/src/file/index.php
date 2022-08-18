@@ -27,7 +27,7 @@ function render_block_core_file( $attributes, $content ) {
 		$pattern,
 		function ( $matches ) {
 			$filename     = ! empty( $matches['filename'] ) ? $matches['filename'] : '';
-			$has_filename = ! empty( $filename );
+			$has_filename = ! empty( $filename ) && 'PDF embed' !== $filename;
 			$label        = $has_filename ?
 				sprintf(
 					/* translators: %s: filename. */
