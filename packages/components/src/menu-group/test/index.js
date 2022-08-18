@@ -31,7 +31,7 @@ describe( 'MenuGroup', () => {
 
 		expect(
 			screen.queryByRole( 'group', {
-				label: 'My group',
+				name: 'My group',
 			} )
 		).toBeVisible();
 	} );
