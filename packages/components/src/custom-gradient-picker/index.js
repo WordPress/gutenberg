@@ -152,10 +152,7 @@ export default function CustomGradientPicker( {
 			/>
 			<Flex
 				gap={ 3 }
-				className={ classnames(
-					'components-custom-gradient-picker__ui-line',
-					{ 'is-next-has-no-margin': __nextHasNoMargin }
-				) }
+				className="components-custom-gradient-picker__ui-line"
 			>
 				<SelectWrapper>
 					<GradientTypePicker
