@@ -8,5 +8,4 @@
 // All class files necessary for the HTML Walker.
 require_once __DIR__ . '/class-wp-html-attribute-token.php';
 require_once __DIR__ . '/class-wp-html-text-replacement.php';
-require_once __DIR__ . '/class-wp-html-walker-exception.php';
 require_once __DIR__ . '/class-wp-html-walker.php';

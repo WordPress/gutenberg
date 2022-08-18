@@ -99,6 +99,28 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
+	public function test_calling_tostring_applies_the_updates_so_far_and_keeps_the_walker_on_the_current_tag() {
+		$w = new WP_HTML_Walker( '<hr id="remove" /><div enabled class="test">Test</div><span id="span-id"></span>' );
+		$w->next_tag();
+		$w->remove_attribute( 'id' );
+
+		$w->next_tag();
+		$w->set_attribute('id', 'div-id-1');
+		$w->add_class('new_class_1');
+		$this->assertSame( '<hr  /><div id="div-id-1" enabled class="test new_class_1">Test</div><span id="span-id"></span>', (string) $w );
+
+		$w->set_attribute('id', 'div-id-2');
+		$w->add_class('new_class_2');
+		$this->assertSame( '<hr  /><div id="div-id-2" enabled class="test new_class_1 new_class_2">Test</div><span id="span-id"></span>', (string) $w );
+
+		$w->next_tag();
+		$w->remove_attribute('id');
+		$this->assertSame( '<hr  /><div id="div-id-2" enabled class="test new_class_1 new_class_2">Test</div><span ></span>', (string) $w );
+	}
+
+	/**
+	 * @ticket 56299
+	 */
 	public function test_get_attribute_returns_string_for_truthy_attributes() {
 		$w = new WP_HTML_Walker( '<div enabled=enabled checked=1 hidden="true" class="test">Test</div>' );
 		$this->assertTrue( $w->next_tag( array() ) );
@@ -403,53 +425,6 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 		$this->assertSame(
 			'<div class="set_attribute" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
 			(string) $w
-		);
-	}
-
-	/**
-	 * @ticket 56299
-	 */
-	public function test_throws_no_exception_when_updating_an_attribute_without_matching_a_tag() {
-		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
-		$w->set_attribute( 'id', 'first' );
-		$this->assertSame( self::HTML_WITH_CLASSES, (string) $w );
-	}
-
-	/**
-	 * @ticket 56299
-	 *
-	 * @dataProvider data_parser_methods
-	 */
-	public function test_interactions_with_a_closed_walker_throw_an_exception( $method, $args ) {
-		$this->expectException( WP_HTML_Walker_Exception::class );
-		$this->expectExceptionMessage( 'WP_HTML_Walker was already cast to a string' );
-
-		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
-		$w->next_tag();
-		$w->__toString(); // Force the walker to get to the end of the document.
-
-		$w->$method( ...$args );
-	}
-
-	/**
-	 * Data provider for test_interactions_with_a_closed_walker_throw_an_exception().
-	 *
-	 * @return array {
-	 *     @type array {
-	 *         @type string $method The name of the method to execute.
-	 *         @type array  $args   The arguments passed to the method.
-	 *     }
-	 * }
-	 */
-	public function data_parser_methods() {
-		return array(
-			array( 'next_tag', array( 'div' ) ),
-			array( 'get_tag', array() ),
-			array( 'get_attribute', array( 'id' ) ),
-			array( 'set_attribute', array( 'id', 'test' ) ),
-			array( 'remove_attribute', array( 'id' ) ),
-			array( 'add_class', array( 'main' ) ),
-			array( 'remove_class', array( 'main' ) ),
 		);
 	}
 

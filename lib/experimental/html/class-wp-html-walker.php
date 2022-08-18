@@ -242,10 +242,8 @@ class WP_HTML_Walker {
 	 *     @type string|null $class_name   Tag must contain this whole class name to match.
 	 * }
 	 * @return boolean Whether a tag was matched.
-	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function next_tag( $query = null ) {
-		$this->assert_not_closed();
 		$this->parse_query( $query );
 		$already_found = 0;
 
@@ -688,30 +686,11 @@ class WP_HTML_Walker {
 	}
 
 	/**
-	 * Asserts that the HTML Walker has not been closed for further lookup or modifications.
-	 *
-	 * @since 6.1.0
-	 *
-	 * @throws WP_HTML_Walker_Exception If the HTML Walker has been closed.
-	 */
-	private function assert_not_closed() {
-		if ( $this->closed ) {
-			throw new WP_HTML_Walker_Exception(
-				'This WP_HTML_Walker was already cast to a string and ' .
-				'no further lookups or updates are possible. This is because ' .
-				'the HTML parsing algorithm only moves forward and the ' .
-				'cursor is already at the end of the HTML document.'
-			);
-		}
-	}
-
-	/**
 	 * Applies attribute updates and cleans up once a tag is fully parsed.
 	 *
 	 * @since 6.1.0
 	 *
 	 * @return void
-	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	private function after_tag() {
 		$this->class_name_updates_to_attributes_updates();
@@ -729,7 +708,6 @@ class WP_HTML_Walker {
 	 * The behavior in all other cases is undefined.
 	 *
 	 * @return void
-	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 * @since 6.1.0
 	 *
 	 * @see $classname_updates
@@ -914,10 +892,8 @@ class WP_HTML_Walker {
 	 * @param string $name Name of attribute whose value is requested.
 	 * @return string|true|null Value of attribute or `null` if not available.
 	 *                          Boolean attributes return `true`.
-	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function get_attribute( $name ) {
-		$this->assert_not_closed();
 		if ( null === $this->tag_name_starts_at ) {
 			return null;
 		}
@@ -952,10 +928,8 @@ class WP_HTML_Walker {
 	 * @since 6.1.0
 	 *
 	 * @return string|null Name of current tag in input HTML, or `null` if none currently open.
-	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function get_tag() {
-		$this->assert_not_closed();
 		return null !== $this->tag_name_starts_at
 			? strtolower( substr( $this->html, $this->tag_name_starts_at, $this->tag_name_ends_at - $this->tag_name_starts_at ) )
 			: null;
@@ -972,11 +946,8 @@ class WP_HTML_Walker {
 	 *
 	 * @param string         $name  The attribute name to target.
 	 * @param string|boolean $value The new attribute value.
-	 *
-	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function set_attribute( $name, $value ) {
-		$this->assert_not_closed();
 		if ( null === $this->tag_name_starts_at ) {
 			return;
 		}
@@ -1043,12 +1014,8 @@ class WP_HTML_Walker {
 	 * @since 6.1.0
 	 *
 	 * @param string $name The attribute name to remove.
-	 *
-	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function remove_attribute( $name ) {
-		$this->assert_not_closed();
-
 		if ( ! isset( $this->attributes[ $name ] ) ) {
 			return;
 		}
@@ -1088,11 +1055,8 @@ class WP_HTML_Walker {
 	 * @since 6.1.0
 	 *
 	 * @param string $class_name The class name to add.
-	 *
-	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function add_class( $class_name ) {
-		$this->assert_not_closed();
 		if ( null !== $this->tag_name_starts_at ) {
 			$this->classname_updates[ $class_name ] = self::ADD_CLASS;
 		}
@@ -1104,11 +1068,8 @@ class WP_HTML_Walker {
 	 * @since 6.1.0
 	 *
 	 * @param string $class_name The class name to remove.
-	 *
-	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function remove_class( $class_name ) {
-		$this->assert_not_closed();
 		if ( null !== $this->tag_name_starts_at ) {
 			$this->classname_updates[ $class_name ] = self::REMOVE_CLASS;
 		}
@@ -1123,14 +1084,49 @@ class WP_HTML_Walker {
 	 * @return string The processed HTML.
 	 */
 	public function __toString() {
-		if ( ! $this->is_closed() ) {
-			$this->after_tag();
-			$this->updated_html .= substr( $this->html, $this->updated_bytes );
-			$this->parsed_bytes  = strlen( $this->html );
-			$this->closed        = true;
+		// Parsing either already finished or not started yet.
+		if ( null === $this->tag_name_ends_at ) {
+			return $this->updated_html . substr( $this->html, $this->updated_bytes );
 		}
 
-		return $this->updated_html;
+		/*
+		 * Parsing is in progress – let's apply the attribute updates without moving on to the next tag.
+		 *
+		 * In practice, it means:
+		 * 1. Applying the attributes updates to the original HTML
+		 * 2. Replacing the original HTML with the updated HTML
+		 * 3. Pointing this walker to the current tag name's end in that updated HTML
+		 */
+
+		// Find tag name's end in the updated markup.
+		$markup_updated_up_to_a_tag_name_end = $this->updated_html . substr( $this->html, $this->updated_bytes, $this->tag_name_ends_at - $this->updated_bytes );
+		$updated_tag_name_ends_at            = strlen( $markup_updated_up_to_a_tag_name_end );
+		$tag_name_length                     = $this->tag_name_ends_at - $this->tag_name_starts_at;
+		$updated_tag_name_starts_at          = $updated_tag_name_ends_at - $tag_name_length;
+
+		// Apply attributes updates.
+		$this->updated_html  = $markup_updated_up_to_a_tag_name_end;
+		$this->updated_bytes = $this->tag_name_ends_at;
+		$this->class_name_updates_to_attributes_updates();
+		$this->apply_attributes_updates();
+
+		// Replace $this->html with the updated markup.
+		$this->html = $this->updated_html . substr( $this->html, $this->updated_bytes );
+
+		// Rewind the walker to the tag name's end.
+		$this->tag_name_starts_at = $updated_tag_name_starts_at;
+		$this->tag_name_ends_at   = $updated_tag_name_ends_at;
+		$this->parsed_bytes       = $this->tag_name_ends_at;
+
+		// Restore the previous version of the updated_html as we are not finished with the current_tag yet.
+		$this->updated_html  = $markup_updated_up_to_a_tag_name_end;
+		$this->updated_bytes = $this->tag_name_ends_at;
+
+		// Parse the attributes in the updated markup.
+		$this->attributes = array();
+		$this->parse_tag_opener_attributes();
+
+		return $this->html;
 	}
 
 	/**
