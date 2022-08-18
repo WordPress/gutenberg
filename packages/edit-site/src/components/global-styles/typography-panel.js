@@ -6,6 +6,7 @@ import {
 	__experimentalFontFamilyControl as FontFamilyControl,
 	__experimentalFontAppearanceControl as FontAppearanceControl,
 	__experimentalLetterSpacingControl as LetterSpacingControl,
+	__experimentalTextTransformControl as TextTransformControl,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -65,6 +66,18 @@ function useHasLetterSpacingControl( name, element ) {
 	return supports.includes( 'letterSpacing' );
 }
 
+function useHasTextTransformControl( name, element ) {
+	const setting = useSetting( 'typography.textTransform', name )[ 0 ];
+	if ( ! setting ) {
+		return false;
+	}
+	if ( ! name && element === 'heading' ) {
+		return true;
+	}
+	const supports = getSupportedGlobalStylesPanels( name );
+	return supports.includes( 'textTransform' );
+}
+
 export default function TypographyPanel( { name, element } ) {
 	const [ selectedLevel, setCurrentTab ] = useState( 'heading' );
 	const supports = getSupportedGlobalStylesPanels( name );
@@ -89,6 +102,7 @@ export default function TypographyPanel( { name, element } ) {
 	const hasLineHeightEnabled = useHasLineHeightControl( name );
 	const hasAppearanceControl = useHasAppearanceControl( name );
 	const hasLetterSpacingControl = useHasLetterSpacingControl( name, element );
+	const hasTextTransformControl = useHasTextTransformControl( name, element );
 
 	/* Disable font size controls when the option to style all headings is selected. */
 	let hasFontSizeEnabled = supports.includes( 'fontSize' );
@@ -119,6 +133,10 @@ export default function TypographyPanel( { name, element } ) {
 	);
 	const [ letterSpacing, setLetterSpacing ] = useStyle(
 		prefix + 'typography.letterSpacing',
+		name
+	);
+	const [ textTransform, setTextTransform ] = useStyle(
+		prefix + 'typography.textTransform',
 		name
 	);
 	const [ backgroundColor ] = useStyle( prefix + 'color.background', name );
@@ -250,6 +268,14 @@ export default function TypographyPanel( { name, element } ) {
 						onChange={ setLetterSpacing }
 						size="__unstable-large"
 						__unstableInputWidth="auto"
+					/>
+				) }
+				{ hasTextTransformControl && (
+					<TextTransformControl
+						value={ textTransform }
+						onChange={ setTextTransform }
+						size="__unstable-large"
+						__nextHasNoMarginBottom
 					/>
 				) }
 			</Grid>
