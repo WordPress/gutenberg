@@ -101,6 +101,7 @@ module.exports = async (
 		editorStyle,
 		style,
 		...getTemplateVariantVars( variants, variant ),
+		...variants[ variant ],
 	};
 
 	if ( plugin ) {

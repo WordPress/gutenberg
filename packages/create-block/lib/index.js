@@ -77,7 +77,10 @@ program
 			await checkSystemRequirements( engines );
 			try {
 				const pluginTemplate = await getPluginTemplate( templateName );
-				const defaultValues = getDefaultValues( pluginTemplate );
+				const defaultValues = getDefaultValues(
+					pluginTemplate,
+					variant
+				);
 				const optionsValues = Object.fromEntries(
 					Object.entries( {
 						plugin,
@@ -114,8 +117,8 @@ program
 					const blockPrompts = getPrompts(
 						pluginTemplate,
 						[
-							'slug',
 							'variant',
+							'slug',
 							'namespace',
 							'title',
 							'description',
@@ -123,7 +126,11 @@ program
 							'category',
 						].filter( ( prompt ) => {
 							if ( prompt === 'variant' ) {
-								return pluginTemplate.variants?.length > 1;
+								const variantKeys = Object.keys(
+									pluginTemplate.variants
+								);
+
+								return variantKeys.length > 1;
 							}
 							return true;
 						} )

@@ -32,7 +32,16 @@ const predefinedPluginTemplates = {
 			style: 'file:./style.css',
 		},
 		templatesPath: join( __dirname, 'templates', 'es5' ),
-		variants: [ 'static', 'dynamic' ],
+		variants: {
+			static: {
+				slug: 'example-static-es5',
+				title: 'Example Static Block (ES5)',
+			},
+			dynamic: {
+				slug: 'example-dynamic-es5',
+				title: 'Example Dynamic Block (ES5)',
+			},
+		},
 	},
 	standard: {
 		defaultValues: {
@@ -44,7 +53,16 @@ const predefinedPluginTemplates = {
 				html: false,
 			},
 		},
-		variants: [ 'static', 'dynamic' ],
+		variants: {
+			static: {
+				slug: 'example-static-block',
+				title: 'Example Static Block',
+			},
+			dynamic: {
+				slug: 'example-dynamic-block',
+				title: 'Example Dynamic Block',
+			},
+		},
 	},
 };
 
@@ -200,7 +218,7 @@ const getPluginTemplate = async ( templateName ) => {
 	}
 };
 
-const getDefaultValues = ( pluginTemplate ) => {
+const getDefaultValues = ( pluginTemplate, variant ) => {
 	return {
 		$schema: 'https://schemas.wp.org/trunk/block.json',
 		apiVersion: 2,
@@ -219,6 +237,7 @@ const getDefaultValues = ( pluginTemplate ) => {
 		editorStyle: 'file:./index.css',
 		style: 'file:./style-index.css',
 		...pluginTemplate.defaultValues,
+		...pluginTemplate.variants[ variant ],
 	};
 };
 
@@ -226,7 +245,9 @@ const getPrompts = ( pluginTemplate, keys ) => {
 	const defaultValues = getDefaultValues( pluginTemplate );
 	return keys.map( ( promptName ) => {
 		if ( promptName === 'variant' ) {
-			prompts[ promptName ].choices = pluginTemplate.variants;
+			prompts[ promptName ].choices = Object.keys(
+				pluginTemplate.variants
+			);
 		}
 		return {
 			...prompts[ promptName ],
@@ -238,10 +259,11 @@ const getPrompts = ( pluginTemplate, keys ) => {
 const getTemplateVariantVars = ( variants, variant ) => {
 	const variantVars = {};
 	if ( variants ) {
-		const chosenVariant = variant ?? variants[ 0 ]; // If no variant is passed, use the first in the array as the default
+		const variantNames = Object.keys( variants );
+		const chosenVariant = variant ?? variantNames[ 0 ]; // If no variant is passed, use the first in the array as the default
 
-		if ( variants.includes( chosenVariant ) ) {
-			for ( const variantName of variants ) {
+		if ( variantNames.includes( chosenVariant ) ) {
+			for ( const variantName of variantNames ) {
 				const key =
 					variantName.charAt( 0 ).toUpperCase() +
 					variantName.slice( 1 );
@@ -250,7 +272,7 @@ const getTemplateVariantVars = ( variants, variant ) => {
 			}
 		} else {
 			throw new CLIError(
-				`"${ chosenVariant }" is not a valid variant for this template. Available variants are: ${ variants.join(
+				`"${ chosenVariant }" is not a valid variant for this template. Available variants are: ${ variantNames.join(
 					', '
 				) }`
 			);
