@@ -117,7 +117,7 @@ function SelectedBlockPopover( {
 
 	const selectedBlockElement = useBlockElement( clientId );
 	const popoverProps = useBlockToolbarPopoverProps( {
-		contentElement: __unstableContentRef.current,
+		contentElement: __unstableContentRef?.current,
 		selectedBlockElement,
 	} );
 

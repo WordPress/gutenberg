@@ -45,6 +45,10 @@ export default function useBlockToolbarPopoverProps( {
 	);
 
 	useEffect( () => {
+		if ( ! contentElement || ! selectedBlockElement ) {
+			return;
+		}
+
 		const updateProps = () =>
 			setProps( getProps( contentElement, selectedBlockElement ) );
 
