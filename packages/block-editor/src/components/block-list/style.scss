@@ -5,10 +5,6 @@
 }
 
 /**
- * Notices & Block Selected/Hover Styles.
- */
-
-/**
  * Cross-Block Selection
  */
 
@@ -104,8 +100,28 @@
 			border-color: var(--wp-admin-theme-color);
 		}
 	}
-}
 
+	// Ensure an accurate partial text selection.
+	// To do this, we disable text selection on the main container, then re-enable it only on the
+	// elements that actually get selected.
+	// To keep in mind: user-select is currently inherited to all nodes inside.
+	user-select: none;
+
+	// Re-enable it on components inside.
+	[class^="components-"] {
+		user-select: text;
+	}
+
+	// Re-enable it on editable items.
+	[contenteditable] {
+		user-select: text;
+
+		// Hide the select style pseudo element as it interferes with the style.
+		&.is-partially-selected::after {
+			display: none;
+		}
+	}
+}
 
 .is-block-moving-mode.block-editor-block-list__block-selection-button {
 	// Should be invisible but not unfocusable.
