@@ -1,23 +1,22 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
  */
 import Guide from '../';
-import PageControl from '../page-control';
-import Modal from '../../modal';
 
 describe( 'Guide', () => {
 	it( 'renders nothing when there are no pages', () => {
-		const wrapper = shallow( <Guide /> );
-		expect( wrapper.isEmptyRender() ).toBe( true );
+		render( <Guide pages={ [] } /> );
+		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'renders one page at a time', () => {
-		const wrapper = shallow(
+		render(
 			<Guide
 				pages={ [
 					{ content: <p>Page 1</p> },
@@ -25,11 +24,14 @@ describe( 'Guide', () => {
 				] }
 			/>
 		);
-		expect( wrapper.find( 'p' ) ).toHaveLength( 1 );
+
+		expect( screen.queryByRole( 'dialog' ) ).toBeVisible();
+		expect( screen.queryByText( 'Page 1' ) ).toBeVisible();
+		expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'hides back button and shows forward button on the first page', () => {
-		const wrapper = shallow(
+		render(
 			<Guide
 				pages={ [
 					{ content: <p>Page 1</p> },
@@ -37,20 +39,23 @@ describe( 'Guide', () => {
 				] }
 			/>
 		);
-		expect( wrapper.find( PageControl ).prop( 'currentPage' ) ).toBe( 0 );
-		expect( wrapper.find( '.components-guide__back-button' ) ).toHaveLength(
-			0
-		);
+
 		expect(
-			wrapper.find( '.components-guide__forward-button' )
-		).toHaveLength( 1 );
+			screen.queryByRole( 'button', { name: 'Previous' } )
+		).not.toBeInTheDocument();
 		expect(
-			wrapper.find( '.components-guide__finish-button' )
-		).toHaveLength( 0 );
+			screen.queryByRole( 'button', { name: 'Next' } )
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'button', { name: 'Finish' } )
+		).not.toBeInTheDocument();
 	} );
 
-	it( 'shows back button and shows finish button on the last page', () => {
-		const wrapper = shallow(
+	it( 'shows back button and shows finish button on the last page', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+		render(
 			<Guide
 				pages={ [
 					{ content: <p>Page 1</p> },
@@ -58,47 +63,76 @@ describe( 'Guide', () => {
 				] }
 			/>
 		);
-		wrapper.find( '.components-guide__forward-button' ).simulate( 'click' );
-		expect( wrapper.find( PageControl ).prop( 'currentPage' ) ).toBe( 1 );
-		expect( wrapper.find( '.components-guide__back-button' ) ).toHaveLength(
-			1
-		);
+		await user.click( screen.getByRole( 'button', { name: 'Next' } ) );
+
+		expect( screen.queryByText( 'Page 1' ) ).not.toBeInTheDocument();
+		expect( screen.queryByText( 'Page 2' ) ).toBeVisible();
+
 		expect(
-			wrapper.find( '.components-guide__forward-button' )
-		).toHaveLength( 0 );
+			screen.queryByRole( 'button', { name: 'Previous' } )
+		).toBeVisible();
 		expect(
-			wrapper.find( '.components-guide__finish-button' )
-		).toHaveLength( 1 );
+			screen.queryByRole( 'button', { name: 'Next' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Finish' } )
+		).toBeVisible();
 	} );
 
 	it( "doesn't display the page control if there is only one page", () => {
-		const wrapper = shallow(
-			<Guide pages={ [ { content: <p>Page 1</p> } ] } />
-		);
-		expect( wrapper.find( PageControl ).exists() ).toBeFalsy();
+		render( <Guide pages={ [ { content: <p>Page 1</p> } ] } /> );
+		expect(
+			screen.queryByRole( 'list', { name: 'Guide controls' } )
+		).not.toBeInTheDocument();
 	} );
 
-	it( 'calls onFinish when the finish button is clicked', () => {
+	it( 'calls onFinish when the finish button is clicked', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 		const onFinish = jest.fn();
-		const wrapper = shallow(
+		render(
 			<Guide
 				onFinish={ onFinish }
 				pages={ [ { content: <p>Page 1</p> } ] }
 			/>
 		);
-		wrapper.find( '.components-guide__finish-button' ).simulate( 'click' );
+		await user.click( screen.getByRole( 'button', { name: 'Finish' } ) );
+
 		expect( onFinish ).toHaveBeenCalled();
 	} );
 
 	it( 'calls onFinish when the modal is closed', () => {
 		const onFinish = jest.fn();
-		const wrapper = shallow(
+		render(
 			<Guide
 				onFinish={ onFinish }
 				pages={ [ { content: <p>Page 1</p> } ] }
 			/>
 		);
-		wrapper.find( Modal ).prop( 'onRequestClose' )();
+
+		/**
+		 * Workaround to trigger an Escape keypress event.
+		 *
+		 * @todo Remove this workaround in favor of userEvent.keyboard() or userEvent.type().
+		 *
+		 * This curently doesn't work:
+		 *
+		 * ```
+		 * await user.keyboard( '[Escape]' );
+		 * ```
+		 *
+		 * because the event sent has a `keyCode` of `0`.
+		 *
+		 * To fix this, we'll need to update the Modal component to work with `KeyboardEvent.code`.
+		 *
+		 * @see https://github.com/testing-library/user-event/issues/969
+		 */
+		fireEvent.keyDown( screen.getByRole( 'dialog' ), {
+			key: 'Escape',
+			keyCode: 27,
+		} );
+
 		expect( onFinish ).toHaveBeenCalled();
 	} );
 } );
