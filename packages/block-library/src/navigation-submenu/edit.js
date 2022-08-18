@@ -297,8 +297,8 @@ export default function NavigationSubmenuEdit( {
 	const itemLabelPlaceholder = __( 'Add text…' );
 	const ref = useRef();
 
-	const { canCreate: userCanCreatePages } = useResourcePermissions( 'pages' );
-	const { canCreate: userCanCreatePosts } = useResourcePermissions( 'posts' );
+	const pagesPermissions = useResourcePermissions( 'pages' );
+	const postsPermissions = useResourcePermissions( 'posts' );
 
 	const {
 		isAtMaxNesting,
@@ -422,9 +422,9 @@ export default function NavigationSubmenuEdit( {
 
 	let userCanCreate = false;
 	if ( ! type || type === 'page' ) {
-		userCanCreate = userCanCreatePages;
+		userCanCreate = pagesPermissions.canCreate;
 	} else if ( type === 'post' ) {
-		userCanCreate = userCanCreatePosts;
+		userCanCreate = postsPermissions.canCreate;
 	}
 
 	async function handleCreate( pageTitle ) {

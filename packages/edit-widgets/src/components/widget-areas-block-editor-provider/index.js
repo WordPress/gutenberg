@@ -33,8 +33,7 @@ export default function WidgetAreasBlockEditorProvider( {
 	children,
 	...props
 } ) {
-	const { canCreate: hasUploadPermissions } =
-		useResourcePermissions( 'media' );
+	const mediaPermissions = useResourcePermissions( 'media' );
 	const { reusableBlocks, isFixedToolbarActive, keepCaretInsideBlock } =
 		useSelect(
 			( select ) => ( {
@@ -61,7 +60,7 @@ export default function WidgetAreasBlockEditorProvider( {
 
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;
-		if ( hasUploadPermissions ) {
+		if ( mediaPermissions.canCreate ) {
 			mediaUploadBlockEditor = ( { onError, ...argumentsObject } ) => {
 				uploadMedia( {
 					wpAllowedMimeTypes: blockEditorSettings.allowedMimeTypes,
@@ -83,7 +82,7 @@ export default function WidgetAreasBlockEditorProvider( {
 		blockEditorSettings,
 		isFixedToolbarActive,
 		keepCaretInsideBlock,
-		hasUploadPermissions,
+		mediaPermissions.canCreate,
 		reusableBlocks,
 		setIsInserterOpened,
 	] );
