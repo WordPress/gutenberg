@@ -23,7 +23,7 @@ Embed a simple audio player. ([Source](https://github.com/WordPress/gutenberg/tr
 
 -	**Name:** core/audio
 -	**Category:** media
--	**Supports:** align, anchor
+-	**Supports:** align, anchor, spacing (margin, padding)
 -	**Attributes:** autoplay, caption, id, loop, preload, src
 
 ## Avatar
