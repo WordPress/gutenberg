@@ -34,7 +34,7 @@ const predefinedPluginTemplates = {
 		templatesPath: join( __dirname, 'templates', 'es5' ),
 		variants: [ 'static', 'dynamic' ],
 	},
-	static: {
+	standard: {
 		defaultValues: {
 			slug: 'example-block',
 			title: 'Example Block',

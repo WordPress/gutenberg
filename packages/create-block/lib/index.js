@@ -34,8 +34,8 @@ program
 	.arguments( '[slug]' )
 	.option(
 		'-t, --template <name>',
-		'project template type name; allowed values: "static", "es5", the name of an external npm package, or the path to a local directory',
-		'static'
+		'project template type name; allowed values: "standard", "es5", the name of an external npm package, or the path to a local directory',
+		'standard'
 	)
 	.option( '--namespace <value>', 'internal namespace for the block name' )
 	.option(
