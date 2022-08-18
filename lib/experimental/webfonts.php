@@ -49,15 +49,21 @@ if ( ! function_exists( 'wp_register_font_family' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wp_register_web_font_variation' ) ) {
+if ( ! function_exists( 'wp_register_webfont_variation' ) ) {
 	/**
-	 * Registers a font variation.
+	 * Registers a variation to the given font family.
 	 *
-	 * @param $font_family
-	 * @return mixed
+	 * @since X.X.X
+	 *
+	 * @param string $font_family_handle The font family's handle for this variation.
+	 * @param array  $variation          An array of variation properties to add.
+	 * @param string $variation_handle   Optional. The variation's handle. When none is provided, the
+	 *                                   handle will be dynamically generated.
+	 *                                   Default empty string.
+	 * @return string|null Variation handle on success. Else null.
 	 */
-	function wp_register_web_font_variation( $font_family, $variation_handle, $variation ) {
-		return wp_webfonts()->add_variation( $font_family, $variation_handle, $variation );
+	function wp_register_webfont_variation( $font_family_handle, array $variation, $variation_handle = '' ) {
+		return wp_webfonts()->add_variation( $font_family_handle, $variation, $variation_handle );
 	}
 }
 

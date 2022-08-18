@@ -50,22 +50,6 @@ class WP_Webfonts extends WP_Dependencies {
 	}
 
 	/**
-	 * Gets a list of all variations registered for a font family.
-	 *
-	 * @param $font_family
-	 * @return array
-	 */
-	public function get_variations( $font_family ) {
-		$font_family_handle = sanitize_title( $font_family );
-
-		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
-			return array();
-		}
-
-		return $this->registered[ $font_family_handle ]->deps;
-	}
-
-	/**
 	 * Removes a font family and all registered variations.
 	 *
 	 * @param mixed|string|string[] $font_family
@@ -84,6 +68,93 @@ class WP_Webfonts extends WP_Dependencies {
 		}
 
 		$this->remove( $font_family_handle );
+	}
+
+	/**
+	 * Registers a variation to the given font family.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param string $font_family_handle The font family's handle for this variation.
+	 * @param array  $variation          An array of variation properties to add.
+	 * @param string $variation_handle   Optional. The variation's handle. When none is provided, the
+	 *                                   handle will be dynamically generated.
+	 *                                   Default empty string.
+	 * @return string|null Variation handle on success. Else null.
+	 */
+	public function add_variation( $font_family_handle, array $variation, $variation_handle = '' ) {
+		if ( ! WP_Webfonts_Utils::is_defined( $font_family_handle ) ) {
+			trigger_error( 'Font family handle must be a non-empty string.' );
+			return null;
+		}
+
+		if ( '' !== $variation_handle && ! WP_Webfonts_Utils::is_defined( $variation_handle ) ) {
+			trigger_error( 'Variant handle must be a non-empty string.' );
+			return null;
+		}
+
+		// Register the font family when it does not yet exist.
+		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
+			if ( ! $this->add( $font_family_handle, false ) ) {
+				return null;
+			}
+		}
+
+		$variation = $this->validate_variation( $font_family_handle, $variation );
+
+		// Variation validation failed.
+		if ( ! $variation ) {
+			return null;
+		}
+
+		if ( '' === $variation_handle ) {
+			$variation_handle = WP_Webfonts_Utils::convert_variation_into_handle( $font_family_handle, $variation );
+			if ( is_null( $variation_handle ) ) {
+				return null;
+			}
+		}
+
+		// Bail out if the variant is already registered.
+		if ( $this->is_variation_registered( $font_family_handle, $variation_handle ) ) {
+			return $variation_handle;
+		}
+
+		if ( array_key_exists( 'src', $variation ) ) {
+			$result = $this->add( $variation_handle, $variation['src'] );
+		} else {
+			$result = $this->add( $variation_handle, false );
+		}
+
+		// Bail out if the registration failed.
+		if ( ! $result ) {
+			return null;
+		}
+
+		$this->add_data( $variation_handle, 'font-properties', $variation );
+
+		// Add the font variation as a dependency to the registered font family.
+		$this->add_dependency( $font_family_handle, $variation_handle );
+
+		$this->providers[ $variation['provider'] ]['fonts'][] = $variation_handle;
+
+		return $variation_handle;
+	}
+
+	/**
+	 * Checks if the variation is registered.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param string $font_family_handle The font family's handle for this variation.
+	 * @param string $variant_handle      Variation's handle.
+	 * @return bool
+	 */
+	private function is_variation_registered( $font_family_handle, $variant_handle ) {
+		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
+			return array();
+		}
+
+		return in_array( $variant_handle, $this->registered[ $font_family_handle ]->deps );
 	}
 
 	/**
@@ -109,60 +180,27 @@ class WP_Webfonts extends WP_Dependencies {
 	}
 
 	/**
-	 * Registers a variation for a font family.
+	 * Adds a variation as a dependency to the given font family.
 	 *
-	 * @param string $font_family
-	 * @param string $variation_handle
-	 * @param array  $variation
-	 */
-	public function add_variation( $font_family, $variation_handle, $variation ) {
-		$font_family_handle = sanitize_title( $font_family );
-
-		// Register the font family when it does not yet exist.
-		if ( ! isset( $this->registered[ $font_family ] ) ) {
-			$this->add( $font_family_handle, false );
-		}
-
-		$variation = $this->validate_variation( $font_family, $variation );
-
-		// Variation validation failed.
-		if ( ! $variation ) {
-			return false;
-		}
-
-		$variation_handle = $font_family_handle . '-' . $variation_handle;
-
-		if ( $variation['src'] ) {
-			$result = $this->add( $variation_handle, $variation['src'], array(), false, array( 'font-properties' => $variation ) );
-		} else {
-			$result = $this->add( $variation_handle, false, array(), false, array( 'font-properties' => $variation ) );
-		}
-
-		if ( $result ) {
-			$this->providers[ $variation['provider'] ]['fonts'][] = $variation_handle;
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Adds a variation as a dependency for the main font alias.
+	 * @since X.X.X
 	 *
-	 * @param $font_family_handle
-	 * @param $variation_handle
+	 * @param string $font_family_handle The font family's handle for this variation.
+	 * @param string $variation_handle   The variation's handle.
 	 */
-	public function add_dependency( $font_family_handle, $variation_handle ) {
+	private function add_dependency( $font_family_handle, $variation_handle ) {
 		$this->registered[ $font_family_handle ]->deps[] = $variation_handle;
 	}
 
 	/**
 	 * Validates and sanitizes a variation.
 	 *
-	 * @param $font_family
-	 * @param $variation
-	 * @return array|false|object
+	 * @since X.X.X
+	 *
+	 * @param string $font_family_handle The font family's handle for this variation.
+	 * @param array  $variation          An array of variation properties to add.
+	 * @return false|array Validated variation on success. Else, false.
 	 */
-	function validate_variation( $font_family, $variation ) {
+	private function validate_variation( $font_family_handle, $variation ) {
 		$defaults = array(
 			'provider'     => 'local',
 			'font-style'   => 'normal',
@@ -170,20 +208,20 @@ class WP_Webfonts extends WP_Dependencies {
 			'font-display' => 'fallback',
 		);
 
-		$defaults = apply_filters( 'wp_web_font_variation_defaults', $defaults );
+		$defaults = apply_filters( 'wp_webfont_variation_defaults', $defaults );
 
-		$defaults['font-family'] = $font_family;
-		$variation = wp_parse_args( $variation, $defaults );
+		$defaults['font-family'] = $font_family_handle;
+		$variation               = wp_parse_args( $variation, $defaults );
 
 		// Local fonts need a "src".
 		if ( 'local' === $variation['provider'] ) {
 			// Make sure that local fonts have 'src' defined.
 			if ( empty( $variation['src'] ) || ( ! is_string( $variation['src'] ) && ! is_array( $variation['src'] ) ) ) {
-				trigger_error( __( 'Webfont src must be a non-empty string or an array of strings.', 'gutenberg' ) );
+				trigger_error( 'Webfont src must be a non-empty string or an array of strings.' );
 				return false;
 			}
 		} elseif ( ! class_exists( $variation['provider'] ) ) {
-			trigger_error( __( 'The provider class specified does not exist.', 'gutenberg' ) );
+			trigger_error( 'The provider class specified does not exist.' );
 			return false;
 		}
 
@@ -191,7 +229,7 @@ class WP_Webfonts extends WP_Dependencies {
 		if ( ! empty( $variation['src'] ) ) {
 			foreach ( (array) $variation['src'] as $src ) {
 				if ( empty( $src ) || ! is_string( $src ) ) {
-					trigger_error( __( 'Each webfont src must be a non-empty string.', 'gutenberg' ) );
+					trigger_error( 'Each webfont src must be a non-empty string.' );
 					return false;
 				}
 			}
@@ -199,7 +237,7 @@ class WP_Webfonts extends WP_Dependencies {
 
 		// Check the font-weight.
 		if ( ! is_string( $variation['font-weight'] ) && ! is_int( $variation['font-weight'] ) ) {
-			trigger_error( __( 'Webfont font weight must be a properly formatted string or integer.', 'gutenberg' ) );
+			trigger_error( 'Webfont font-weight must be a properly formatted string or integer.' );
 			return false;
 		}
 

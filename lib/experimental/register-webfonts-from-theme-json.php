@@ -94,7 +94,7 @@ if ( ! function_exists( 'gutenberg_register_webfonts_from_theme_json' ) ) {
 			wp_register_webfont_family( $font_family_handle );
 
 			$variation_handle = sanitize_title( implode( ' ', array( $webfont['font-weight'], $webfont['font-style'] ) ) );
-			wp_register_web_font_variation( $font_family_handle, $variation_handle, $webfont );
+			wp_register_webfont_variation( $font_family_handle, $variation_handle, $webfont );
 			$to_enqueue[] = $font_family_handle;
 		}
 
