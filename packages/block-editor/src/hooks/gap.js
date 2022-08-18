@@ -14,6 +14,7 @@ import {
  * Internal dependencies
  */
 import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
+import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 import useSetting from '../components/use-setting';
 import { AXIAL_SIDES, SPACING_SUPPORT_KEY, useCustomSides } from './dimensions';
 import { cleanEmptyObject } from './utils';
@@ -54,8 +55,12 @@ export function getGapBoxControlValueFromStyle( blockGapValue ) {
 
 	const isValueString = typeof blockGapValue === 'string';
 	return {
-		top: isValueString ? blockGapValue : blockGapValue?.top,
-		left: isValueString ? blockGapValue : blockGapValue?.left,
+		top: isValueString
+			? getSpacingPresetCssVar( blockGapValue )
+			: getSpacingPresetCssVar( blockGapValue?.top ),
+		left: isValueString
+			? getSpacingPresetCssVar( blockGapValue )
+			: getSpacingPresetCssVar( blockGapValue?.left ),
 	};
 }
 

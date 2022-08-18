@@ -35,7 +35,6 @@
 		"@wordpress/url": "file:../url",
 		"change-case": "^4.1.2",
 		"form-data": "^4.0.0",
-		"lodash": "^4.17.21",
 		"node-fetch": "^2.6.0"
 	},
 	"peerDependencies": {

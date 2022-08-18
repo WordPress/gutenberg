@@ -10,6 +10,7 @@ import classnames from 'classnames';
 import { Icon, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useState } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -94,6 +95,17 @@ export default function CustomSelectControl( {
 	} );
 
 	const [ isFocused, setIsFocused ] = useState( false );
+
+	if ( ! __nextUnconstrainedWidth ) {
+		deprecated(
+			'Constrained width styles for wp.components.CustomSelectControl',
+			{
+				since: '6.1',
+				version: '6.4',
+				hint: 'Set the `__nextUnconstrainedWidth` prop to true to start opting into the new styles, which will become the default in a future version',
+			}
+		);
+	}
 
 	function getDescribedBy() {
 		if ( describedBy ) {
