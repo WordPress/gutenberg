@@ -141,6 +141,7 @@ module.exports = {
 							'sum',
 							'sumBy',
 							'take',
+							'times',
 							'toString',
 							'trim',
 							'truncate',
