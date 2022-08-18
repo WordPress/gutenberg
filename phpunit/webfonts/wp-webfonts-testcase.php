@@ -64,8 +64,8 @@ abstract class WP_Webfonts_TestCase extends WP_UnitTestCase {
 		return wp_webfonts()->queue;
 	}
 
-	protected function get_queued_before_register() {
-		return $this->get_property_value( 'queued_before_register', WP_Dependencies::class );
+	protected function get_queued_before_register( $wp_webfonts = null ) {
+		return $this->get_property_value( 'queued_before_register', WP_Dependencies::class, $wp_webfonts );
 	}
 
 	protected function get_property_value( $property_name, $class, $wp_webfonts = null ) {
@@ -101,12 +101,37 @@ abstract class WP_Webfonts_TestCase extends WP_UnitTestCase {
 		foreach ( $inputs as $font_family => $variations ) {
 			$font_mock = $build_mock( $font_family );
 
-			foreach ( $variations as $variation_handle ) {
+			foreach ( $variations as $variation_handle => $variation ) {
+				if ( ! is_string( $variation_handle ) ) {
+					$variation_handle = $variation;
+				}
 				$build_mock( $variation_handle );
 				$font_mock->deps[] = $variation_handle;
 			}
 		}
 
 		return $mocks;
+	}
+
+	/**
+	 * Register one or more font-family and its variations to set up a test.
+	 *
+	 * @param string           $font_family Font family to test.
+	 * @param array            $variations  Variations.
+	 * @param WP_Webfonts|null $wp_webfonts Optional. Instance of the WP_Webfonts.
+	 */
+	protected function setup_register( $font_family, $variations, $wp_webfonts = null ) {
+		if ( ! ( $wp_webfonts instanceof WP_Webfonts ) ) {
+			$wp_webfonts = wp_webfonts();
+		}
+
+		$wp_webfonts->add( $font_family, false );
+
+		foreach ( $variations as $variation_handle => $variation ) {
+			if ( ! is_string( $variation_handle ) ) {
+				$variation_handle = '';
+			}
+			$wp_webfonts->add_variation( $font_family, $variation, $variation_handle );
+		}
 	}
 }
