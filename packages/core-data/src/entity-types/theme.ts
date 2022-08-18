@@ -79,7 +79,7 @@ declare module './base-entity-records' {
 			 */
 			'align-wide': boolean;
 			/**
-			 * Wether appearanceTools are enabled in Global Settings
+			 * Wether appearanceTools are enabled in Global Styles
 			 */
 			'appearance-tools': boolean;
 			/**
