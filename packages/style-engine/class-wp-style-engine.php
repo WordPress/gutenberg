@@ -223,7 +223,7 @@ class WP_Style_Engine {
 	 * @return string The slug, or empty string if not found.
 	 */
 	protected static function get_slug_from_preset_value( $style_value, $property_key ) {
-		if ( is_string( $style_value ) && strpos( $style_value, "var:preset|{$property_key}|" ) !== false ) {
+		if ( is_string( $style_value ) && str_contains( $style_value, "var:preset|{$property_key}|" ) ) {
 			$index_to_splice = strrpos( $style_value, '|' ) + 1;
 			return _wp_to_kebab_case( substr( $style_value, $index_to_splice ) );
 		}
@@ -390,7 +390,7 @@ class WP_Style_Engine {
 
 		// Build CSS var values from var:? values, e.g, `var(--wp--css--rule-slug )`
 		// Check if the value is a CSS preset and there's a corresponding css_var pattern in the style definition.
-		if ( is_string( $style_value ) && strpos( $style_value, 'var:' ) !== false ) {
+		if ( is_string( $style_value ) && str_contains( $style_value, 'var:' ) ) {
 			if ( ! $should_skip_css_vars && ! empty( $style_definition['css_vars'] ) ) {
 				$css_var = static::get_css_var_value( $style_value, $style_definition['css_vars'] );
 				if ( static::is_valid_style_value( $css_var ) ) {
@@ -410,7 +410,7 @@ class WP_Style_Engine {
 			}
 
 			foreach ( $style_value as $key => $value ) {
-				if ( is_string( $value ) && strpos( $value, 'var:' ) !== false && ! $should_skip_css_vars && ! empty( $style_definition['css_vars'] ) ) {
+				if ( is_string( $value ) && str_contains( $value, 'var:' ) && ! $should_skip_css_vars && ! empty( $style_definition['css_vars'] ) ) {
 					$value = static::get_css_var_value( $value, $style_definition['css_vars'] );
 				}
 
@@ -464,7 +464,7 @@ class WP_Style_Engine {
 
 			if ( $style_definition && isset( $style_definition['property_keys']['individual'] ) ) {
 				// Set a CSS var if there is a valid preset value.
-				if ( is_string( $value ) && strpos( $value, 'var:' ) !== false && ! $should_skip_css_vars && ! empty( $individual_property_definition['css_vars'] ) ) {
+				if ( is_string( $value ) && str_contains( $value, 'var:' ) && ! $should_skip_css_vars && ! empty( $individual_property_definition['css_vars'] ) ) {
 					$value = static::get_css_var_value( $value, $individual_property_definition['css_vars'] );
 				}
 				$individual_css_property                      = sprintf( $style_definition['property_keys']['individual'], $individual_property_key );

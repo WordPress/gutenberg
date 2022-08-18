@@ -171,7 +171,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
  */
 function gutenberg_typography_get_preset_inline_style_value( $style_value, $css_property ) {
 	// If the style value is not a preset CSS variable go no further.
-	if ( empty( $style_value ) || strpos( $style_value, "var:preset|{$css_property}|" ) === false ) {
+	if ( empty( $style_value ) || ! str_contains( $style_value, "var:preset|{$css_property}|" ) ) {
 		return $style_value;
 	}
 
@@ -209,7 +209,7 @@ function gutenberg_typography_get_css_variable_inline_style( $attributes, $featu
 	}
 
 	// If we don't have a preset CSS variable, we'll assume it's a regular CSS value.
-	if ( strpos( $style_value, "var:preset|{$css_property}|" ) === false ) {
+	if ( ! str_contains( $style_value, "var:preset|{$css_property}|" ) ) {
 		return sprintf( '%s:%s;', $css_property, $style_value );
 	}
 
