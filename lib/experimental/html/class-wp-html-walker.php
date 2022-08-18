@@ -1120,7 +1120,7 @@ class WP_HTML_Walker {
 
 		// Restore the previous version of the updated_html as we are not finished with the current_tag yet.
 		$this->updated_html  = $markup_updated_up_to_a_tag_name_end;
-		$this->updated_bytes = $this->tag_name_ends_at;
+		$this->updated_bytes = $updated_tag_name_ends_at;
 
 		// Parse the attributes in the updated markup.
 		$this->attributes = array();
