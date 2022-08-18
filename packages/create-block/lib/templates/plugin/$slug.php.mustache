@@ -43,7 +43,7 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 }
 add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );
 {{/isStaticVariant}}
-{{#isDynamic}}
+{{#isDynamicVariant}}
 function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 	register_block_type(
 		__DIR__ . '/build',
@@ -68,4 +68,4 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_render_callback( $atts, $conte
 	require plugin_dir_path( __FILE__ ) . 'build/template.php';
 	return ob_get_clean();
 }
-{{/isDynamic}}
+{{/isDynamicVariant}}

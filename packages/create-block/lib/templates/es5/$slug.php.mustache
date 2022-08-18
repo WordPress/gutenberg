@@ -68,7 +68,7 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 		array(),
 		filemtime( "$dir/$style_css" )
 	);
-	{{^isDynamic}}
+	{{^isDynamicVariant}}
 	register_block_type(
 		'{{namespace}}/{{slug}}',
 		array(
@@ -77,8 +77,8 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 			'style'         => '{{namespace}}-{{slug}}-block',
 		)
 	);
-	{{/isDynamic}}
-	{{#isDynamic}}
+	{{/isDynamicVariant}}
+	{{#isDynamicVariant}}
 	register_block_type(
 		'{{namespace}}/{{slug}}',
 		array(
@@ -88,10 +88,10 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 			'render_callback' => '{{namespaceSnakeCase}}_{{slugSnakeCase}}_render_callback',
 		)
 	);
-	{{/isDynamic}}
+	{{/isDynamicVariant}}
 }
 add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );
-{{#isDynamic}}
+{{#isDynamicVariant}}
 /**
  * Render callback function
  *
@@ -106,4 +106,4 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_render_callback( $atts, $conte
 	require plugin_dir_path( __FILE__ ) . '/template.php';
 	return ob_get_clean();
 }
-{{/isDynamic}}
+{{/isDynamicVariant}}
