@@ -56,9 +56,9 @@ describe( 'Card', () => {
 			const { container: containerSquared } = render(
 				<Card isRounded={ false }>Code is Poetry</Card>
 			);
-			expect( containerRounded.firstChild ).toMatchStyleDiffSnapshot(
-				containerSquared.firstChild
-			);
+			expect(
+				containerRounded.firstElementChild
+			).toMatchStyleDiffSnapshot( containerSquared.firstElementChild );
 		} );
 
 		it( 'should show a box shadow when the elevation prop is greater than 0', () => {
