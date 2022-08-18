@@ -108,11 +108,7 @@ export default function Dropdown( props ) {
 					// This value is used to ensure that the dropdowns
 					// align with the editor header by default.
 					offset={ 13 }
-					anchorRef={
-						! hasAnchorRef
-							? containerRef?.current?.firstChild // Anchor to the rendered toggle.
-							: undefined
-					}
+					anchorRef={ ! hasAnchorRef ? containerRef : undefined }
 					{ ...popoverProps }
 					className={ classnames(
 						'components-dropdown__content',
