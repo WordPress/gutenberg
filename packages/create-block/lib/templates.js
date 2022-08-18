@@ -236,7 +236,7 @@ const getPrompts = ( pluginTemplate, keys ) => {
 };
 
 const getTemplateVariantVars = ( variants, variant ) => {
-	const variantTypes = {};
+	const variantVars = {};
 	if ( variants ) {
 		const chosenVariant = variant ?? variants[ 0 ]; // If no variant is passed, use the first in the array as the default
 
@@ -245,7 +245,7 @@ const getTemplateVariantVars = ( variants, variant ) => {
 				const key =
 					variantName.charAt( 0 ).toUpperCase() +
 					variantName.slice( 1 );
-				variantTypes[ `is${ key }Variant` ] =
+				variantVars[ `is${ key }Variant` ] =
 					chosenVariant === variantName ?? false;
 			}
 		} else {
@@ -256,7 +256,7 @@ const getTemplateVariantVars = ( variants, variant ) => {
 			);
 		}
 	}
-	return variantTypes;
+	return variantVars;
 };
 
 module.exports = {
