@@ -39,6 +39,7 @@ function render_block_core_comments( $attributes, $content, $block ) {
 		return '';
 	}
 
+	// If this isn't the legacy block, we need to render the static version of this block.
 	$is_legacy = 'core/post-comments' === $block->name || ! empty( $attributes['legacy'] );
 	if ( ! $is_legacy ) {
 		return $block->render( array( 'dynamic' => false ) );
