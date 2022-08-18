@@ -19,8 +19,8 @@ function useDeprecatedProps( {
 	elevation,
 	isElevated,
 	...otherProps
-}: CardProps ): CardProps {
-	const propsToReturn: CardProps = {
+}: CardProps ) {
+	const propsToReturn: Omit< CardProps, 'isElevated' > = {
 		...otherProps,
 	};
 	let computedElevation = elevation;
