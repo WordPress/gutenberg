@@ -36,12 +36,6 @@
 		// Show default placeholder height when not resized.
 		min-height: 200px;
 
-		// Compromise to allow the SVG to somewhat follow any border radius
-		// applied to the post featured image block and its placeholder.
-		> svg {
-			border-radius: inherit;
-		}
-
 		// The following override the default placeholder styles that remove
 		// its border so that a user selection for border color or width displays
 		// a visual border.
