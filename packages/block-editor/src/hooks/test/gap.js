@@ -27,6 +27,28 @@ describe( 'gap', () => {
 				...blockGapValue,
 			} );
 		} );
+		it( 'should unwrap var: values from a string into a CSS var() function', () => {
+			const expectedValue = {
+				top: 'var(--wp--preset--spacing--60)',
+				left: 'var(--wp--preset--spacing--60)',
+			};
+			expect(
+				getGapBoxControlValueFromStyle( 'var:preset|spacing|60' )
+			).toEqual( expectedValue );
+		} );
+		it( 'should unwrap var: values from an object into a CSS var() function', () => {
+			const expectedValue = {
+				top: 'var(--wp--preset--spacing--20)',
+				left: 'var(--wp--preset--spacing--60)',
+			};
+			const blockGapValue = {
+				top: 'var:preset|spacing|20',
+				left: 'var:preset|spacing|60',
+			};
+			expect( getGapBoxControlValueFromStyle( blockGapValue ) ).toEqual(
+				expectedValue
+			);
+		} );
 	} );
 	describe( 'getGapCSSValue()', () => {
 		it( 'should return `null` if argument is falsey', () => {

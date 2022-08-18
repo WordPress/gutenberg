@@ -377,7 +377,7 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
 	}
 
 	if ( 'core/navigation-link' === $block->name || 'core/navigation-submenu' === $block->name ) {
-		if ( $block->attributes && isset( $block->attributes['kind'] ) && 'post-type' === $block->attributes['kind'] ) {
+		if ( $block->attributes && isset( $block->attributes['kind'] ) && 'post-type' === $block->attributes['kind'] && isset( $block->attributes['id'] ) ) {
 			$post_ids[] = $block->attributes['id'];
 		}
 	}

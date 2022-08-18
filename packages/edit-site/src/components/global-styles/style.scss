@@ -21,8 +21,9 @@
 	border-radius: $radius-block-ui;
 }
 
-.edit-site-typography-panel__half-width-control {
-	width: calc((100% - #{$grid-unit-30}) / 2);
+.edit-site-typography-panel__full-width-control {
+	grid-column: 1 / -1;
+	max-width: 100%;
 }
 
 .edit-site-global-styles-screen-heading-color,

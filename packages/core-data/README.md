@@ -765,8 +765,8 @@ application, the page and the resolution details will be retrieved from
 the store state using `getEntityRecord()`, or resolved if missing.
 
 ```js
-import { useState } from '@wordpress/data';
 import { useDispatch } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { TextControl } from '@wordpress/components';
 import { store as noticeStore } from '@wordpress/notices';
@@ -774,9 +774,15 @@ import { useEntityRecord } from '@wordpress/core-data';
 
 function PageRenameForm( { id } ) {
 	const page = useEntityRecord( 'postType', 'page', id );
-	const [ title, setTitle ] = useState( () => page.record.title.rendered );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticeStore );
+
+	const setTitle = useCallback(
+		( title ) => {
+			page.edit( { title } );
+		},
+		[ page.edit ]
+	);
 
 	if ( page.isResolving ) {
 		return 'Loading...';
@@ -784,7 +790,6 @@ function PageRenameForm( { id } ) {
 
 	async function onRename( event ) {
 		event.preventDefault();
-		page.edit( { title } );
 		try {
 			await page.save();
 			createSuccessNotice( __( 'Page renamed.' ), {
@@ -799,7 +804,7 @@ function PageRenameForm( { id } ) {
 		<form onSubmit={ onRename }>
 			<TextControl
 				label={ __( 'Name' ) }
-				value={ title }
+				value={ page.editedRecord.title }
 				onChange={ setTitle }
 			/>
 			<button type="submit">{ __( 'Save' ) }</button>

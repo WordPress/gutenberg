@@ -4,7 +4,6 @@
 const inquirer = require( 'inquirer' );
 const { capitalCase } = require( 'change-case' );
 const program = require( 'commander' );
-const { pickBy } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -79,8 +78,8 @@ program
 			try {
 				const pluginTemplate = await getPluginTemplate( templateName );
 				const defaultValues = getDefaultValues( pluginTemplate );
-				const optionsValues = pickBy(
-					{
+				const optionsValues = Object.fromEntries(
+					Object.entries( {
 						plugin,
 						category,
 						description,
@@ -89,8 +88,7 @@ program
 						wpScripts,
 						wpEnv,
 						variant,
-					},
-					( value ) => value !== undefined
+					} ).filter( ( [ , value ] ) => value !== undefined )
 				);
 
 				if ( slug ) {

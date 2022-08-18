@@ -2,7 +2,6 @@
  * External dependencies
  */
 const { command } = require( 'execa' );
-const { isEmpty, omitBy } = require( 'lodash' );
 const npmPackageArg = require( 'npm-package-arg' );
 const { join } = require( 'path' );
 const writePkg = require( 'write-pkg' );
@@ -33,8 +32,8 @@ module.exports = async ( {
 
 	await writePkg(
 		cwd,
-		omitBy(
-			{
+		Object.fromEntries(
+			Object.entries( {
 				name: slug,
 				version,
 				description,
@@ -59,8 +58,7 @@ module.exports = async ( {
 					...( wpEnv && { env: 'wp-env' } ),
 					...customScripts,
 				},
-			},
-			isEmpty
+			} ).filter( ( [ , value ] ) => !! value )
 		)
 	);
 
