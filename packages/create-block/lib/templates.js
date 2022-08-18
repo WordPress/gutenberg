@@ -21,10 +21,10 @@ const prompts = require( './prompts' );
 const predefinedPluginTemplates = {
 	es5: {
 		defaultValues: {
-			slug: 'example-static-es5',
-			title: 'Example Static (ES5)',
+			slug: 'example-es5',
+			title: 'Example (ES5)',
 			description:
-				'Example static block scaffolded with Create Block tool – no build step required.',
+				'Example block scaffolded with Create Block tool – no build step required.',
 			dashicon: 'smiley',
 			wpScripts: false,
 			editorScript: 'file:./index.js',
@@ -32,13 +32,13 @@ const predefinedPluginTemplates = {
 			style: 'file:./style.css',
 		},
 		templatesPath: join( __dirname, 'templates', 'es5' ),
+		variants: [ 'static', 'dynamic' ],
 	},
 	static: {
 		defaultValues: {
-			slug: 'example-static',
-			title: 'Example Static',
-			description:
-				'Example static block scaffolded with Create Block tool.',
+			slug: 'example-block',
+			title: 'Example Block',
+			description: 'Example block scaffolded with Create Block tool.',
 			dashicon: 'smiley',
 			supports: {
 				html: false,
