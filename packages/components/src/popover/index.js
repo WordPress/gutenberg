@@ -26,6 +26,7 @@ import {
 	createContext,
 	useContext,
 	useMemo,
+	useEffect,
 } from '@wordpress/element';
 import {
 	useViewportMatch,
@@ -134,7 +135,7 @@ const Popover = (
 		isAlternate,
 		position,
 		placement: placementProp = 'bottom-start',
-		offset,
+		offset: offsetProp = 0,
 		focusOnMount = 'firstElement',
 		anchorRef,
 		anchorRect,
@@ -195,12 +196,17 @@ const Popover = (
 	 * Store the offset in a ref, due to constraints with floating-ui:
 	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
 	 */
-	const frameOffsetRef = useRef();
+	const frameOffsetRef = useRef( getFrameOffset( referenceOwnerDocument ) );
+	/**
+	 * Store the offset prop in a ref, due to constraints with floating-ui:
+	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
+	 */
+	const offsetRef = useRef( offsetProp );
 
 	const middleware = [
 		offsetMiddleware( ( { placement: currentPlacement } ) => {
 			if ( ! frameOffsetRef.current ) {
-				return offset ?? 0;
+				return offsetRef.current;
 			}
 
 			const isTopBottomPlacement =
@@ -219,11 +225,10 @@ const Popover = (
 				currentPlacement.includes( 'top' ) ||
 				currentPlacement.includes( 'left' );
 			const mainAxisModifier = hasBeforePlacement ? -1 : 1;
-			const normalizedOffset = offset ? offset : 0;
 
 			return {
 				mainAxis:
-					normalizedOffset +
+					offsetRef.current +
 					frameOffsetRef.current[ mainAxis ] * mainAxisModifier,
 				crossAxis: frameOffsetRef.current[ crossAxis ],
 			};
@@ -290,6 +295,11 @@ const Popover = (
 		placement: computedPlacement,
 		middlewareData: { arrow: arrowData = {} },
 	} = useFloating( { placement: normalizedPlacementFromProps, middleware } );
+
+	useEffect( () => {
+		offsetRef.current = offsetProp;
+		update();
+	}, [ offsetProp, update ] );
 
 	// Update the `reference`'s ref.
 	//
