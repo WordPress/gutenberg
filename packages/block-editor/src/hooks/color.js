@@ -292,7 +292,7 @@ const getLinkColorFromAttributeValue = ( colors, value ) => {
 export function ColorEdit( props ) {
 	const { name: blockName, attributes } = props;
 	// Some color settings have a special handling for deprecated flags in `useSetting`,
-	// so we can't unwrap them by doing const { ... } = useSetting('color')
+	// so we can't unwrap them by doing conwst { ... } = useSetting('color')
 	// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
 	const userPalette = useSetting( 'color.palette.custom' );
 	const themePalette = useSetting( 'color.palette.theme' );
@@ -450,13 +450,21 @@ export function ColorEdit( props ) {
 		};
 	};
 
-	const enableContrastChecking =
+	const isWebAndColorNotGradient =
 		Platform.OS === 'web' && ! gradient && ! style?.color?.gradient;
 
 	const defaultColorControls = getBlockSupport( props.name, [
 		COLOR_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
+
+	const enableContrastChecking =
+		isWebAndColorNotGradient &&
+		true ===
+			getBlockSupport( props.name, [
+				COLOR_SUPPORT_KEY,
+				'contrastChecker',
+			] );
 
 	return (
 		<ColorPanel
