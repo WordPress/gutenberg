@@ -16,11 +16,11 @@ import { LEFT, RIGHT } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import Button from '../button';
-import { HStack } from '../h-stack';
-import { ColorPicker } from '../color-picker';
-import { VisuallyHidden } from '../visually-hidden';
-import { CustomColorPickerDropdown } from '../color-palette';
+import Button from '../../button';
+import { HStack } from '../../h-stack';
+import { ColorPicker } from '../../color-picker';
+import { VisuallyHidden } from '../../visually-hidden';
+import { CustomColorPickerDropdown } from '../../color-palette';
 
 import {
 	addControlPoint,
