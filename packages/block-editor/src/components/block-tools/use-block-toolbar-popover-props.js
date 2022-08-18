@@ -27,6 +27,15 @@ function getProps( contentElement, selectedBlockElement ) {
 	return RESTRICTED_HEIGHT_PROPS;
 }
 
+/**
+ * Determines the desired popover positioning behavior, returning a set of appropriate props.
+ *
+ * @param {Object}  elements
+ * @param {Element} elements.contentElement       The DOM element that represents the editor content or canvas.
+ * @param {Element} elements.selectedBlockElement The DOM element that represents the first selected block.
+ *
+ * @return {Object} The popover props used to determine the position of the toolbar.
+ */
 export default function useBlockToolbarPopoverProps( {
 	contentElement,
 	selectedBlockElement,
@@ -39,8 +48,12 @@ export default function useBlockToolbarPopoverProps( {
 		const updateProps = () =>
 			setProps( getProps( contentElement, selectedBlockElement ) );
 
-		const view = contentElement?.ownerDocument?.defaultView;
+		// Update whenever the content or selectedBlock elements change.
+		updateProps();
 
+		// Update on window resize - wrapping can change the amount of space
+		// above a block, and result in the toolbar position needing to change.
+		const view = contentElement?.ownerDocument?.defaultView;
 		view?.addEventHandler?.( 'resize', updateProps );
 
 		return () => {
