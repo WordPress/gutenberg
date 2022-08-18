@@ -157,7 +157,7 @@ function Example(
 A couple of good examples of how hooks are used for composition are:
 
 - the `Card` component, which builds on top of the `Surface` component by [calling the `useSurface` hook inside its own hook](/packages/components/src/card/card/hook.ts);
-- the `HStack` component, which builds on top of the `Flex` component and [calls the `useFlex` hook inside its own hook](/packages/components/src/h-stack/hook.js).
+- the `HStack` component, which builds on top of the `Flex` component and [calls the `useFlex` hook inside its own hook](/packages/components/src/h-stack/hook.tsx).
 
 <!-- ## API Consinstency
 
@@ -262,7 +262,7 @@ An example of how this is used can be found in the [`Card` component family](/pa
 
 ```jsx
 //=========================================================================
-// Simplified snippet from `packages/components/src/card/card/hook.js`
+// Simplified snippet from `packages/components/src/card/card/hook.ts`
 //=========================================================================
 import { useContextSystem } from '../../ui/context';
 
@@ -276,7 +276,7 @@ export function useCard( props ) {
 }
 
 //=========================================================================
-// Simplified snippet from `packages/components/src/card/card/component.js`
+// Simplified snippet from `packages/components/src/card/card/component.ts`
 //=========================================================================
 import { contextConnect, ContextSystemProvider } from '../../ui/context';
 
@@ -301,7 +301,7 @@ function Card( props, forwardedRef ) {
 	}, [ isBorderless, size ] );
 
 	return (
-		{ /* Write additional values to the Context System */ }
+		/* Write additional values to the Context System */
 		<ContextSystemProvider value={ contextProviderValue }>
 			{ /* [...] */ }
 		</ContextSystemProvider>
@@ -516,7 +516,7 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 	5. Extend existing components’ props if possible, especially when a component internally forwards its props to another component in the package.
 	6. If the component forwards its `...restProps` to an underlying element/component, you should use the `WordPressComponentProps` type for the component's props:
 
-		```jsx
+		```tsx
 		import type { WordPressComponentProps } from '../ui/context';
 		import type { ComponentOwnProps } from './types';
 
@@ -533,7 +533,7 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 
 	7. If the component doesn't forwards its ref yet, wrap the component in a `forwardRed` call. Alternatively, if you want to take advantage of the [Context system](#context-system), you can use the `contextConnect` utility function (which also takes care of adding ref forwarding)
 
-		```jsx
+		```tsx
 		// With `forwardRef`
 		import type { ForwardedRef } from 'react';
 		import { forwardRef } from '@wordpress/element';
@@ -554,7 +554,7 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 		export default MyComponent;
 		```
 
-		```jsx
+		```tsx
 		// With `contextConnect`
 		import type { ForwardedRef } from 'react';
 		import {
