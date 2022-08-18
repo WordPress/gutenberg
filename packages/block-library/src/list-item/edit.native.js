@@ -89,6 +89,12 @@ export default function ListItemEdit( {
 		useCompactList: true,
 	} );
 
+	// Add 0.62 hex opacity to baseColor text (e.g. #FFFFFF9E)
+	// or fallback to sensible default color
+	const defaultPlaceholderTextColor = style?.baseColors?.color?.text
+		? style.baseColors.color.text + '9E'
+		: '#87a6bc';
+
 	const onSplit = useSplit( clientId );
 	const onMerge = useMerge( clientId );
 	const onLayout = useCallback( ( { nativeEvent } ) => {
@@ -128,6 +134,7 @@ export default function ListItemEdit( {
 						}
 						value={ content }
 						placeholder={ placeholder || __( 'List' ) }
+						placeholderTextColor={ defaultPlaceholderTextColor }
 						onSplit={ onSplit }
 						onMerge={ onMerge }
 						onReplace={ ( blocks, ...args ) => {
