@@ -23,7 +23,7 @@ return array(
 					<!-- /wp:paragraph -->
 					
 					<!-- wp:paragraph -->
-					<p><a href="#">' . __( 'Facebook', 'default' ) . '</a><br><a href="#">' . __( 'Instagram', 'default' ) . '</a><br><a href="#">' . __( 'Twitter', 'default' ) . '</a></p>
+					<p><a href="#">' . __( 'Facebook', 'gutenberg' ) . '</a><br><a href="#">' . __( 'Instagram', 'gutenberg' ) . '</a><br><a href="#">' . __( 'Twitter', 'gutenberg' ) . '</a></p>
 					<!-- /wp:paragraph --></div>
 					<!-- /wp:column -->
 					
