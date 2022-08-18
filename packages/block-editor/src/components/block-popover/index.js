@@ -53,7 +53,7 @@ export default function BlockPopover( {
 		<Popover
 			ref={ popoverScrollRef }
 			animate={ false }
-			placement="top-start"
+			position="top right left"
 			focusOnMount={ false }
 			anchorRef={ anchorRef }
 			// Render in the old slot if needed for backward compatibility,
