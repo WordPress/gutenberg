@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -24,17 +29,26 @@ const TEXT_DECORATIONS = [
 /**
  * Control to facilitate text decoration selections.
  *
- * @param {Object}   props          Component props.
- * @param {string}   props.value    Currently selected text decoration.
- * @param {Function} props.onChange Handles change in text decoration selection.
+ * @param {Object}   props             Component props.
+ * @param {string}   props.value       Currently selected text decoration.
+ * @param {Function} props.onChange    Handles change in text decoration selection.
+ * @param {string}   [props.className] Additional class name to apply.
  *
  * @return {WPElement} Text decoration control.
  */
-export default function TextDecorationControl( { value, onChange, ...props } ) {
+export default function TextDecorationControl( {
+	value,
+	onChange,
+	className,
+	...props
+} ) {
 	return (
 		<ToggleGroupControl
 			{ ...props }
-			className="block-editor-text-decoration-control"
+			className={ classnames(
+				'block-editor-text-decoration-control',
+				className
+			) }
 			__experimentalIsIconGroup
 			label={ __( 'Decoration' ) }
 			value={ value }
