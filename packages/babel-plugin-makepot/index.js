@@ -36,7 +36,6 @@ const { po } = require( 'gettext-parser' );
 const {
 	pick,
 	reduce,
-	uniq,
 	forEach,
 	sortBy,
 	isEqual,
@@ -347,8 +346,8 @@ module.exports = () => {
 												memo[ msgctxt ][ msgid ]
 											)
 										) {
-											translation.comments.reference =
-												uniq(
+											translation.comments.reference = [
+												...new Set(
 													[
 														memo[ msgctxt ][ msgid ]
 															.comments.reference,
@@ -357,7 +356,8 @@ module.exports = () => {
 													]
 														.join( '\n' )
 														.split( '\n' )
-												).join( '\n' );
+												),
+											].join( '\n' );
 										}
 
 										memo[ msgctxt ][ msgid ] = translation;
