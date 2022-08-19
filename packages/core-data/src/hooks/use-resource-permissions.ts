@@ -80,7 +80,7 @@ type ResourcePermissionsResolution< IdType > = [
  *     canUpdate,
  *     canDelete,
  *     isResolving
- *   } = useResourcePermissions( 'page', pageId );
+ *   } = useResourcePermissions( 'pages', pageId );
  *
  *   if ( isResolving ) {
  *     return 'Loading ...';

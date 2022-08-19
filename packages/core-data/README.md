@@ -908,7 +908,7 @@ import { useResourcePermissions } from '@wordpress/core-data';
 
 function Page( { pageId } ) {
 	const { canCreate, canUpdate, canDelete, isResolving } =
-		useResourcePermissions( 'page', pageId );
+		useResourcePermissions( 'pages', pageId );
 
 	if ( isResolving ) {
 		return 'Loading ...';
