@@ -103,8 +103,8 @@ function get_block_core_post_featured_image_border_attributes( $attributes ) {
 
 	$border_attributes = gutenberg_style_engine_get_styles( array( 'border' => $border_styles ) );
 	return array(
-		'class' => $border_attributes['classnames'],
-		'style' => $border_attributes['css'],
+		'class' => array_key_exists( 'classnames', $border_attributes ) ? $border_attributes['classnames'] : '',
+		'style' => array_key_exists( 'css', $border_attributes ) ? $border_attributes['css'] : '',
 	);
 }
 
