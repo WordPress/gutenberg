@@ -105,16 +105,16 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 		$w->remove_attribute( 'id' );
 
 		$w->next_tag();
-		$w->set_attribute('id', 'div-id-1');
-		$w->add_class('new_class_1');
+		$w->set_attribute( 'id', 'div-id-1' );
+		$w->add_class( 'new_class_1' );
 		$this->assertSame( '<hr  /><div id="div-id-1" enabled class="test new_class_1">Test</div><span id="span-id"></span>', (string) $w );
 
-		$w->set_attribute('id', 'div-id-2');
-		$w->add_class('new_class_2');
+		$w->set_attribute( 'id', 'div-id-2' );
+		$w->add_class( 'new_class_2' );
 		$this->assertSame( '<hr  /><div id="div-id-2" enabled class="test new_class_1 new_class_2">Test</div><span id="span-id"></span>', (string) $w );
 
 		$w->next_tag();
-		$w->remove_attribute('id');
+		$w->remove_attribute( 'id' );
 		$this->assertSame( '<hr  /><div id="div-id-2" enabled class="test new_class_1 new_class_2">Test</div><span ></span>', (string) $w );
 	}
 
