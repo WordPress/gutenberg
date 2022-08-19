@@ -22,9 +22,6 @@ const G2 = {
 		200: '#e0e0e0', // Used sparingly for light borders.
 		100: '#f0f0f0', // Used for light gray backgrounds.
 	},
-	mediumGray: {
-		text: '#757575',
-	},
 	lightGray: {
 		ui: '#949494',
 		secondary: '#ccc',
@@ -90,7 +87,6 @@ const UI = {
 // to extract the correct type defs here.
 export const COLORS = Object.assign( {}, BASE, {
 	darkGray: DARK_GRAY,
-	mediumGray: G2.mediumGray,
 	/**
 	 * The main gray color object (since Apr 16, 2022).
 	 *
