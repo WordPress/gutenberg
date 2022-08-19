@@ -95,8 +95,8 @@ function ListViewBranch( props ) {
 		( select ) => {
 			return !! (
 				parentId &&
-				select( blockEditorStore ).getBlockAttributes( parentId )?.lock
-					?.content
+				select( blockEditorStore ).getTemplateLock( parentId ) ===
+					'noContent'
 			);
 		},
 		[ parentId ]
