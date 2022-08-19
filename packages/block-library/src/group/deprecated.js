@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -31,8 +30,12 @@ const migrateAttributes = ( attributes ) => {
 	if ( attributes.customBackgroundColor ) {
 		style.color.background = attributes.customBackgroundColor;
 	}
+
+	const { customTextColor, customBackgroundColor, ...restAttributes } =
+		attributes;
+
 	return {
-		...omit( attributes, [ 'customTextColor', 'customBackgroundColor' ] ),
+		...restAttributes,
 		style,
 	};
 };
