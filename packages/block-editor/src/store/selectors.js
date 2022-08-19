@@ -1434,10 +1434,6 @@ export function getTemplateLock( state, rootClientId ) {
 		return state.settings.templateLock;
 	}
 
-	if ( getBlockAttributes( state, rootClientId ).lock?.content === true ) {
-		return 'all';
-	}
-
 	const blockListSettings = getBlockListSettings( state, rootClientId );
 	if ( ! blockListSettings ) {
 		return null;
