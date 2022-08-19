@@ -11,12 +11,29 @@ import { useEffect, useState } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 
+// By default the toolbar sets the `shift` prop. If the user scrolls the page
+// down the toolbar will stay on screen by adopting a sticky position at the
+// top of the viewport.
 const DEFAULT_PROPS = { __unstableForcePosition: true, __unstableShift: true };
+
+// When there isn't enough height between the top of the block and the editor
+// canvas, the `shift` prop is set to `false`, as it will cause the block to be
+// obscured. The `flip` behavior is enabled (by setting `forcePosition` to
+// `false`), which positions the toolbar below the block.
 const RESTRICTED_HEIGHT_PROPS = {
 	__unstableForcePosition: false,
 	__unstableShift: false,
 };
 
+/**
+ * Get the popover props for the block toolbar, determined by the space at the top of the canvas and the toolbar height.
+ *
+ * @param {Element} contentElement       The DOM element that represents the editor content or canvas.
+ * @param {Element} selectedBlockElement The clientId of the first selected block.
+ * @param {number}  toolbarHeight        The height of the toolbar in pixels.
+ *
+ * @return {Object} The popover props used to determine the position of the toolbar.
+ */
 function getProps( contentElement, selectedBlockElement, toolbarHeight ) {
 	if ( ! contentElement || ! selectedBlockElement ) {
 		return DEFAULT_PROPS;
@@ -29,8 +46,6 @@ function getProps( contentElement, selectedBlockElement, toolbarHeight ) {
 		return DEFAULT_PROPS;
 	}
 
-	// When there's not enough space at the top of the canvas for the toolbar,
-	// enable flipping and disable shifting.
 	return RESTRICTED_HEIGHT_PROPS;
 }
 
@@ -61,8 +76,6 @@ export default function useBlockToolbarPopoverProps( {
 		setToolbarHeight( popoverNode.offsetHeight );
 	}, [] );
 
-	// Update the toolbar position if the window resizes, or the
-	// selected element changes.
 	useEffect( () => {
 		if ( ! contentElement || ! selectedBlockElement ) {
 			return;
@@ -74,12 +87,19 @@ export default function useBlockToolbarPopoverProps( {
 			);
 
 		updateProps();
+
+		// Update the toolbar props on viewport resize.
 		const view = contentElement?.ownerDocument?.defaultView;
 		view?.addEventHandler?.( 'resize', updateProps );
 
 		return () => {
 			view?.removeEventHandler?.( 'resize', updateProps );
 		};
+
+		// The deps will update the toolbar props if:
+		// - The content or the selected block element changes.
+		// - The block is moved (its index changes).
+		// - The height of the toolbar changes.
 	}, [ contentElement, selectedBlockElement, blockIndex, toolbarHeight ] );
 
 	return {
