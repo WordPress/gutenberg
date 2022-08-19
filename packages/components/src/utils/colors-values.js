@@ -68,9 +68,6 @@ const LIGHT_GRAY = {
 // Some are from https://make.wordpress.org/design/handbook/foundations/colors/.
 
 const BLUE = {
-	wordpress: {
-		700: '#00669b',
-	},
 	medium: {
 		900: '#006589',
 		800: '#00739c',
@@ -92,8 +89,8 @@ const ALERT = {
 };
 
 const ADMIN = {
-	theme: `var( --wp-admin-theme-color, ${ BLUE.wordpress[ 700 ] })`,
-	themeDark10: `var( --wp-admin-theme-color-darker-10, ${ BLUE.medium.focus })`,
+	theme: 'var( --wp-admin-theme-color, #007cba)',
+	themeDark10: 'var( --wp-admin-theme-color-darker-10, #006ba1)',
 };
 
 // Namespaced values for raw colors hex codes.
