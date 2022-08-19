@@ -264,7 +264,16 @@ The settings section has the following structure:
 			"blockGap": null,
 			"margin": false,
 			"padding": false,
-			"units": [ "px", "em", "rem", "vh", "vw" ]
+			"customSpacingSize": true,
+			"units": [ "px", "em", "rem", "vh", "vw" ],
+			"spacingScale": {
+				"operator": "*",
+				"increment": 1.5,
+				"steps": 7,
+				"mediumStep": 1.5,
+				"unit": "rem"
+			},
+			"spacingSizes": []
 		},
 		"typography": {
 			"customFontSize": true,
@@ -336,7 +345,17 @@ The following presets can be defined via `theme.json`:
 - `color.gradients`: generates a single class and custom property per preset value.
 - `color.palette`:
     - generates 3 classes per preset value: color, background-color, and border-color.
-    - generates a single custom property per preset value
+    - generates a single custom property per preset value.
+- `spacing.spacingScale`: used to generate an array of spacing preset sizes for use with padding, margin, and gap settings.
+    - `operator`: specifies how to calculate the steps with either `*` for multiplier, or `+` for sum.
+    - `increment`: the amount to increment each step by. Core by default uses a 'perfect 5th' multiplier of `1.5`.
+    - `steps`: the number of steps to generate in the spacing scale. The default is 7. To prevent the generation of the spacing presets, and to disable the related UI, this can be set to `0`.
+    - `mediumStep`: the steps in the scale are generated descending and ascending from a medium step, so this should be the size value of the medium space, without the unit. The default medium step is `1.5rem` so the mediumStep value is `1.5`.
+    - `unit`: the unit the scale uses, eg. `px, rem, em, %`. The default is `rem`.
+- `spacing.spacingSizes`: themes can choose to include a static `spacing.spacingSizes` array of spacing preset sizes if they have a sequence of sizes that can't be generated via an increment or mulitplier. 
+    - `name`: a human readable name for the size, eg. `Small, Medium, Large`.
+    - `slug`: the machine readable name. In order to provide the best cross site/theme compatibility the slugs should be in the format, "10","20","30","40","50","60", with "50" representing the `Medium` size value.
+    - `size`: the size, including the unit, eg. `1.5rem`. It is possible to include fluid values like `clamp(2rem, 10vw, 20rem)`. 
 - `typography.fontSizes`: generates a single class and custom property per preset value.
 - `typography.fontFamilies`: generates a single custom property per preset value.
 
@@ -411,6 +430,32 @@ The naming schema for the classes and the custom properties is as follows:
 				},
 			]
 		},
+		"spacing": {
+			"spacingScale": {
+				"operator": "*",
+				"increment": 1.5,
+				"steps": 7,
+				"mediumStep": 1.5,
+				"unit": "rem"
+			},
+			"spacingSizes": [
+				{
+					"slug": "40",
+					"size": "1rem",
+					"name": "Small"
+				},
+				{
+					"slug": "50",
+					"size": "1.5rem",
+					"name": "Medium"
+				},
+				{
+					"slug": "60",
+					"size": "2rem",
+					"name": "Large"
+				},
+			]
+		},
 		"blocks": {
 			"core/group": {
 				"color": {
@@ -446,6 +491,13 @@ body {
 	--wp--preset--font-size--big: 32;
 	--wp--preset--font-family--helvetica-arial: Helvetica Neue, Helvetica, Arial, sans-serif;
 	--wp--preset--font-family--system: -apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Oxygen-Sans,Ubuntu,Cantarell, \"Helvetica Neue\",sans-serif;
+	--wp--preset--spacing--20: 0.44rem;
+	--wp--preset--spacing--30: 0.67rem;
+	--wp--preset--spacing--40: 1rem;
+	--wp--preset--spacing--50: 1.5rem;
+	--wp--preset--spacing--60: 2.25rem;
+	--wp--preset--spacing--70: 3.38rem;
+	--wp--preset--spacing--80: 5.06rem;
 }
 
 /* Block-level custom properties (bounded to the group block) */
