@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import TabPanel from '../';
+import TabPanel from '..';
 
 const setupUser = () =>
 	userEvent.setup( {
@@ -81,7 +81,7 @@ describe( 'TabPanel', () => {
 			<TabPanel
 				initialTabName="beta"
 				tabs={ TABS }
-				children={ () => {} }
+				children={ () => undefined }
 			/>
 		);
 		const selectedTab = screen.getByRole( 'tab', { selected: true } );
@@ -96,7 +96,7 @@ describe( 'TabPanel', () => {
 			<TabPanel
 				activeClass={ activeClass }
 				tabs={ TABS }
-				children={ () => {} }
+				children={ () => undefined }
 			/>
 		);
 		expect( getSelectedTab() ).toHaveClass( activeClass );
@@ -117,7 +117,7 @@ describe( 'TabPanel', () => {
 	} );
 
 	it( "should apply the tab's `className` to the tab button", () => {
-		render( <TabPanel tabs={ TABS } children={ () => {} } /> );
+		render( <TabPanel tabs={ TABS } children={ () => undefined } /> );
 
 		expect( screen.getByRole( 'tab', { name: 'Alpha' } ) ).toHaveClass(
 			'alpha-class'
