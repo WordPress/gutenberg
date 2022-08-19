@@ -57,20 +57,27 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 				return;
 			}
 
-			let animationFrame = null;
+			let timeoutId = null;
 
 			function resizeHeight() {
-				if ( ! animationFrame ) {
+				if ( ! timeoutId ) {
 					// Throttle the updates on animation frame.
-					animationFrame = iframe.contentWindow.requestAnimationFrame(
-						() => {
-							setHeight(
-								iframe.contentDocument.documentElement
-									.scrollHeight
-							);
-							animationFrame = null;
+					timeoutId = iframe.contentWindow.setTimeout( () => {
+						const { readyState } = iframe.contentDocument;
+
+						// Continue deferring the timeout until the document is ready.
+						// Only then will it have a height.
+						if (
+							readyState !== 'interactive' &&
+							readyState !== 'complete'
+						) {
+							resizeHeight();
+							return;
 						}
-					);
+
+						setHeight( iframe.contentDocument.body.scrollHeight );
+						timeoutId = null;
+					}, 100 );
 				}
 			}
 
@@ -84,9 +91,7 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 				);
 				// Observing the <html> rather than the <body> because the latter
 				// gets destroyed and remounted after initialization in <Iframe>.
-				resizeObserver.observe(
-					iframe.contentDocument.documentElement
-				);
+				resizeObserver.observe( iframe.contentDocument.body );
 
 				resizeHeight();
 			}
@@ -97,7 +102,7 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 			registerObserver();
 
 			return () => {
-				iframe.contentWindow?.cancelAnimationFrame( animationFrame );
+				iframe.contentWindow?.clearTimeout( timeoutId );
 				resizeObserver?.disconnect();
 				iframe.removeEventListener( 'load', registerObserver );
 			};
@@ -153,7 +158,7 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 			} }
 		>
 			<Iframe
-				style={ enableResizing ? undefined : deviceStyles }
+				style={ enableResizing ? { height } : deviceStyles }
 				head={
 					<>
 						<EditorStyles styles={ settings.styles } />
