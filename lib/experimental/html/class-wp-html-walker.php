@@ -860,7 +860,7 @@ class WP_HTML_Walker {
 	}
 
 	/**
-	 * Sort function to arrange objects with a start property in asending order.
+	 * Sort function to arrange objects with a start property in ascending order.
 	 *
 	 * @since 6.1.0
 	 *
