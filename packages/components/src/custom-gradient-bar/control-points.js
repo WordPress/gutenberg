@@ -59,10 +59,6 @@ function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
 						'is-active': isOpen,
 					}
 				) }
-				style={ {
-					left: `${ position }%`,
-					transform: 'translateX( -50% )',
-				} }
 				{ ...additionalProps }
 			/>
 			<VisuallyHidden id={ descriptionId }>
@@ -74,7 +70,11 @@ function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
 	);
 }
 
-function GradientColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
+function GradientColorPickerDropdown( {
+	isRenderedInSidebar,
+	className,
+	...props
+} ) {
 	// Open the popover below the gradient control/insertion point
 	const popoverProps = useMemo(
 		() => ( {
@@ -84,10 +84,16 @@ function GradientColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
 		[]
 	);
 
+	const mergedClassName = classnames(
+		'components-custom-gradient-picker__control-point-dropdown',
+		className
+	);
+
 	return (
 		<CustomColorPickerDropdown
 			isRenderedInSidebar={ isRenderedInSidebar }
 			popoverProps={ popoverProps }
+			className={ mergedClassName }
 			{ ...props }
 		/>
 	);
@@ -271,6 +277,10 @@ function ControlPoints( {
 							) }
 						</>
 					) }
+					style={ {
+						left: `${ point.position }%`,
+						transform: 'translateX( -50% )',
+					} }
 				/>
 			)
 		);
@@ -307,16 +317,8 @@ function InsertPoint( {
 						}
 						onToggle();
 					} }
-					className="components-custom-gradient-picker__insert-point"
+					className="components-custom-gradient-picker__insert-point-dropdown"
 					icon={ plus }
-					style={
-						insertPosition !== null
-							? {
-									left: `${ insertPosition }%`,
-									transform: 'translateX( -50% )',
-							  }
-							: undefined
-					}
 				/>
 			) }
 			renderContent={ () => (
@@ -344,6 +346,14 @@ function InsertPoint( {
 					} }
 				/>
 			) }
+			style={
+				insertPosition !== null
+					? {
+							left: `${ insertPosition }%`,
+							transform: 'translateX( -50% )',
+					  }
+					: undefined
+			}
 		/>
 	);
 }
