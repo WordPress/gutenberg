@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { merge } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { rgba } from './colors';
@@ -21,11 +16,6 @@ const G2 = {
 		300: '#ddd', // Used for most borders.
 		200: '#e0e0e0', // Used sparingly for light borders.
 		100: '#f0f0f0', // Used for light gray backgrounds.
-	},
-	lightGray: {
-		ui: '#949494',
-		secondary: '#ccc',
-		tertiary: '#e7e8e9',
 	},
 };
 
@@ -94,7 +84,7 @@ export const COLORS = Object.assign( {}, BASE, {
 	 * please prefer this `gray` object in the meantime.
 	 */
 	gray: G2.gray,
-	lightGray: merge( {}, LIGHT_GRAY, G2.lightGray ),
+	lightGray: LIGHT_GRAY,
 	alert: ALERT,
 	ui: UI,
 } );
