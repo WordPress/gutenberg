@@ -11,10 +11,10 @@ export interface User {
 export interface UserData {
 	username: string;
 	email: string;
-	firstName: string;
-	lastName: string;
-	password: string;
-	roles: string[];
+	firstName?: string;
+	lastName?: string;
+	password?: string;
+	roles?: string[];
 }
 
 /**
