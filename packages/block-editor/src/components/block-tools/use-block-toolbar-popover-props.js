@@ -3,7 +3,7 @@
  */
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -76,17 +76,23 @@ export default function useBlockToolbarPopoverProps( {
 		setToolbarHeight( popoverNode.offsetHeight );
 	}, [] );
 
+	const updateProps = useCallback(
+		() =>
+			setProps(
+				getProps( contentElement, selectedBlockElement, toolbarHeight )
+			),
+		[ contentElement, selectedBlockElement, toolbarHeight ]
+	);
+
+	// Update props when the block is moved. This also ensures the props are
+	// correct on initial mount.
+	useEffect( updateProps, [ blockIndex ] );
+
+	// Update props when the viewport is resized or the block is resized.
 	useEffect( () => {
 		if ( ! contentElement || ! selectedBlockElement ) {
 			return;
 		}
-
-		const updateProps = () =>
-			setProps(
-				getProps( contentElement, selectedBlockElement, toolbarHeight )
-			);
-
-		updateProps();
 
 		// Update the toolbar props on viewport resize.
 		const contentView = contentElement?.ownerDocument?.defaultView;
@@ -107,12 +113,7 @@ export default function useBlockToolbarPopoverProps( {
 				resizeObserver.disconnect();
 			}
 		};
-
-		// The deps will update the toolbar props if:
-		// - The content or the selected block element changes.
-		// - The block is moved (its index changes).
-		// - The height of the toolbar changes.
-	}, [ contentElement, selectedBlockElement, blockIndex, toolbarHeight ] );
+	}, [ updateProps, contentElement, selectedBlockElement ] );
 
 	return {
 		...props,
