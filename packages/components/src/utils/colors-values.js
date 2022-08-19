@@ -21,7 +21,6 @@ const DARK_GRAY = {
 	500: '#555d66', // Use this most of the time for dark items.
 	300: '#6c7781', // Lightest gray that can be used for AA text contrast.
 	150: '#8d96a0', // Lightest gray that can be used for AA non-text contrast.
-	placeholder: rgba( GRAY[ 900 ], 0.62 ),
 };
 
 const LIGHT_GRAY = {
@@ -30,7 +29,6 @@ const LIGHT_GRAY = {
 	400: '#e8eaeb', // Good for "readonly" input fields and special text selection.
 	300: '#edeff0',
 	200: '#f3f4f5',
-	placeholder: rgba( white, 0.65 ),
 };
 
 // Additional colors.
@@ -58,6 +56,10 @@ const UI = {
 	borderDisabled: GRAY[ 400 ],
 	textDisabled: DARK_GRAY[ 150 ],
 	textDark: white,
+
+	// Matches @wordpress/base-styles
+	darkGrayPlaceholder: rgba( GRAY[ 900 ], 0.62 ),
+	lightGrayPlaceholder: rgba( white, 0.65 ),
 };
 
 export const COLORS = {
