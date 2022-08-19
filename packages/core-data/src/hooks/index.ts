@@ -6,4 +6,7 @@ export {
 	default as useEntityRecords,
 	__experimentalUseEntityRecords,
 } from './use-entity-records';
-export { default as useResourcePermissions } from './use-resource-permissions';
+export {
+	default as useResourcePermissions,
+	__experimentalUseResourcePermissions,
+} from './use-resource-permissions';

@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 import { store as coreStore } from '../';
@@ -143,4 +148,15 @@ export default function useResourcePermissions< IdType = void >(
 		},
 		[ resource, id ]
 	);
+}
+
+export function __experimentalUseResourcePermissions(
+	resource: string,
+	id?: IdType
+) {
+	deprecated( `wp.data.__experimentalUseResourcePermissions`, {
+		alternative: 'wp.data.useResourcePermissions',
+		since: '6.1',
+	} );
+	return useResourcePermissions( resource, id );
 }
