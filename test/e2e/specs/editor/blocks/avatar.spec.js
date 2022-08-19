@@ -63,16 +63,12 @@ test.describe( 'Avatar', () => {
 			'.components-combobox-control__input'
 		);
 
-		await expect( userInput ).toBeVisible();
-
 		// Set new user.
 		await userInput.click();
 
 		const newUser = userComboBox.locator(
 			'role=option[name="' + username + '"]'
 		);
-
-		await expect( newUser ).toBeVisible();
 
 		await newUser.click();
 
