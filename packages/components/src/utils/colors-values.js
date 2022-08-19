@@ -9,7 +9,6 @@ import { merge } from 'lodash';
 import { rgba } from './colors';
 
 const BASE = {
-	black: '#000',
 	white: '#fff',
 };
 
@@ -17,7 +16,6 @@ const G2 = {
 	blue: {
 		medium: {
 			focus: '#007cba',
-			focusDark: '#fff',
 		},
 	},
 	gray: {
@@ -53,31 +51,6 @@ const DARK_GRAY = {
 	placeholder: rgba( G2.gray[ 900 ], 0.62 ),
 };
 
-const DARK_OPACITY = {
-	900: rgba( '#000510', 0.9 ),
-	800: rgba( '#00000a', 0.85 ),
-	700: rgba( '#06060b', 0.8 ),
-	600: rgba( '#000913', 0.75 ),
-	500: rgba( '#0a1829', 0.7 ),
-	400: rgba( '#0a1829', 0.65 ),
-	300: rgba( '#0e1c2e', 0.62 ),
-	200: rgba( '#162435', 0.55 ),
-	100: rgba( '#223443', 0.5 ),
-	backgroundFill: rgba( DARK_GRAY[ 700 ], 0.7 ),
-};
-
-const DARK_OPACITY_LIGHT = {
-	900: rgba( '#304455', 0.45 ),
-	800: rgba( '#425863', 0.4 ),
-	700: rgba( '#667886', 0.35 ),
-	600: rgba( '#7b86a2', 0.3 ),
-	500: rgba( '#9197a2', 0.25 ),
-	400: rgba( '#95959c', 0.2 ),
-	300: rgba( '#829493', 0.15 ),
-	200: rgba( '#8b8b96', 0.1 ),
-	100: rgba( '#747474', 0.05 ),
-};
-
 const LIGHT_GRAY = {
 	900: '#a2aab2',
 	800: '#b5bcc2',
@@ -91,28 +64,12 @@ const LIGHT_GRAY = {
 	placeholder: rgba( BASE.white, 0.65 ),
 };
 
-const LIGHT_OPACITY_LIGHT = {
-	900: rgba( BASE.white, 0.5 ),
-	800: rgba( BASE.white, 0.45 ),
-	700: rgba( BASE.white, 0.4 ),
-	600: rgba( BASE.white, 0.35 ),
-	500: rgba( BASE.white, 0.3 ),
-	400: rgba( BASE.white, 0.25 ),
-	300: rgba( BASE.white, 0.2 ),
-	200: rgba( BASE.white, 0.15 ),
-	100: rgba( BASE.white, 0.1 ),
-	backgroundFill: rgba( LIGHT_GRAY[ 300 ], 0.8 ),
-};
-
 // Additional colors.
 // Some are from https://make.wordpress.org/design/handbook/foundations/colors/.
 
 const BLUE = {
 	wordpress: {
 		700: '#00669b',
-	},
-	dark: {
-		900: '#0071a1',
 	},
 	medium: {
 		900: '#006589',
@@ -124,7 +81,6 @@ const BLUE = {
 		300: '#66c6e4',
 		200: '#bfe7f3',
 		100: '#e5f5fa',
-		highlight: '#b3e7fe',
 		focus: '#007cba',
 	},
 };
@@ -149,19 +105,14 @@ const UI = {
 	borderHover: G2.gray[ 700 ],
 	borderFocus: ADMIN.themeDark10,
 	borderDisabled: G2.gray[ 400 ],
-	borderLight: G2.gray[ 300 ],
-	label: DARK_GRAY[ 500 ],
 	textDisabled: DARK_GRAY[ 150 ],
 	textDark: BASE.white,
-	textLight: BASE.black,
 };
 
 // Using Object.assign instead of { ...spread } syntax helps TypeScript
 // to extract the correct type defs here.
 export const COLORS = Object.assign( {}, BASE, {
 	darkGray: DARK_GRAY,
-	darkOpacity: DARK_OPACITY,
-	darkOpacityLight: DARK_OPACITY_LIGHT,
 	mediumGray: G2.mediumGray,
 	/**
 	 * The main gray color object (since Apr 16, 2022).
@@ -171,7 +122,6 @@ export const COLORS = Object.assign( {}, BASE, {
 	 */
 	gray: G2.gray,
 	lightGray: merge( {}, LIGHT_GRAY, G2.lightGray ),
-	lightGrayLight: LIGHT_OPACITY_LIGHT,
 	blue: merge( {}, BLUE, G2.blue ),
 	alert: ALERT,
 	admin: ADMIN,
