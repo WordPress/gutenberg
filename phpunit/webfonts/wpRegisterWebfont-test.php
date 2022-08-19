@@ -17,7 +17,7 @@ class Tests_Webfonts_WpRegisterWebfont extends WP_Webfonts_TestCase {
 	/**
 	 * Unit test for registering a variation with a variation handle given.
 	 *
-	 * @dataProvider data_register
+	 * @dataProvider data_with_valid_input
 	 *
 	 * @param string $font_family_handle Font family for this variation.
 	 * @param array  $variation          Web font to test.
@@ -42,7 +42,7 @@ class Tests_Webfonts_WpRegisterWebfont extends WP_Webfonts_TestCase {
 	/**
 	 * Integration test for registering a variation when the font family was previously registered.
 	 *
-	 * @dataProvider data_register
+	 * @dataProvider data_with_valid_input
 	 *
 	 * @param string $font_family_handle Font family for this variation.
 	 * @param array  $variation          Web font to test.
@@ -58,7 +58,7 @@ class Tests_Webfonts_WpRegisterWebfont extends WP_Webfonts_TestCase {
 	/**
 	 * Integration test for testing the font family is registered during the variation registration process.
 	 *
-	 * @dataProvider data_register_with_deprecated_structure
+	 * @dataProvider data_with_deprecated_structure
 	 *
 	 * @param array $variation Web font to test.
 	 * @param array $expected  Expected results.
@@ -73,7 +73,7 @@ class Tests_Webfonts_WpRegisterWebfont extends WP_Webfonts_TestCase {
 	/**
 	 * Integration test to ensure registration does not automatically enqueue.
 	 *
-	 * @dataProvider data_register
+	 * @dataProvider data_with_valid_input
 	 *
 	 * @param string $font_family_handle Font family handle.
 	 * @param array  $variation          Variation.
@@ -90,7 +90,7 @@ class Tests_Webfonts_WpRegisterWebfont extends WP_Webfonts_TestCase {
 	 *
 	 * @return array
 	 */
-	public function data_register() {
+	public function data_with_valid_input() {
 		return array(
 			'Source Serif Pro' => array(
 				'font_family' => 'source-serif-pro',
@@ -122,7 +122,7 @@ class Tests_Webfonts_WpRegisterWebfont extends WP_Webfonts_TestCase {
 	}
 
 	/**
-	 * @dataProvider data_register_with_deprecated_structure
+	 * @dataProvider data_with_deprecated_structure
 	 *
 	 * @covers WP_Webfonts::add_variation
 	 *
