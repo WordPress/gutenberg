@@ -3,9 +3,7 @@
  */
 import { rgba } from './colors';
 
-const BASE = {
-	white: '#fff',
-};
+const white = '#fff';
 
 const G2 = {
 	gray: {
@@ -43,7 +41,7 @@ const LIGHT_GRAY = {
 	300: '#edeff0',
 	200: '#f3f4f5',
 	100: '#f8f9f9',
-	placeholder: rgba( BASE.white, 0.65 ),
+	placeholder: rgba( white, 0.65 ),
 };
 
 // Additional colors.
@@ -63,19 +61,17 @@ const ADMIN = {
 // Namespaced values for raw colors hex codes.
 const UI = {
 	theme: ADMIN.theme,
-	background: BASE.white,
+	background: white,
 	backgroundDisabled: LIGHT_GRAY[ 200 ],
 	border: G2.gray[ 700 ],
 	borderHover: G2.gray[ 700 ],
 	borderFocus: ADMIN.themeDark10,
 	borderDisabled: G2.gray[ 400 ],
 	textDisabled: DARK_GRAY[ 150 ],
-	textDark: BASE.white,
+	textDark: white,
 };
 
-// Using Object.assign instead of { ...spread } syntax helps TypeScript
-// to extract the correct type defs here.
-export const COLORS = Object.assign( {}, BASE, {
+export const COLORS = {
 	darkGray: DARK_GRAY,
 	/**
 	 * The main gray color object (since Apr 16, 2022).
@@ -85,8 +81,9 @@ export const COLORS = Object.assign( {}, BASE, {
 	 */
 	gray: G2.gray,
 	lightGray: LIGHT_GRAY,
+	white,
 	alert: ALERT,
 	ui: UI,
-} );
+};
 
 export default COLORS;
