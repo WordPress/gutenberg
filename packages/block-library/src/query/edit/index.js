@@ -4,9 +4,10 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import {
 	BlockControls,
+	BlockContextProvider,
 	InspectorControls,
 	useBlockProps,
 	useSetting,
@@ -236,6 +237,14 @@ const QueryEdit = ( props ) => {
 			selectBlock( queryClientIds[ 0 ] );
 		}
 	};
+	// When we preview Query Loop blocks we should prefer the current
+	// block's postType, which is passed through block context.
+	const blockPreviewContext = useMemo(
+		() => ( {
+			previewPostType: attributes.query.postType,
+		} ),
+		[ attributes.query.postType ]
+	);
 	return (
 		<>
 			<Component
@@ -253,11 +262,13 @@ const QueryEdit = ( props ) => {
 						setIsPatternSelectionModalOpen( false )
 					}
 				>
-					<BlockPatternSetup
-						blockName={ name }
-						clientId={ clientId }
-						onBlockPatternSelect={ onBlockPatternSelect }
-					/>
+					<BlockContextProvider value={ blockPreviewContext }>
+						<BlockPatternSetup
+							blockName={ name }
+							clientId={ clientId }
+							onBlockPatternSelect={ onBlockPatternSelect }
+						/>
+					</BlockContextProvider>
 				</Modal>
 			) }
 		</>

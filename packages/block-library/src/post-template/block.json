@@ -12,7 +12,8 @@
 		"query",
 		"queryContext",
 		"displayLayout",
-		"templateSlug"
+		"templateSlug",
+		"previewPostType"
 	],
 	"supports": {
 		"reusable": false,
