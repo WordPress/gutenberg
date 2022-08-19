@@ -72,14 +72,17 @@ const UI = {
 };
 
 export const COLORS = {
+	/**
+	 * @deprecated Try to use `gray` instead.
+	 */
 	darkGray: DARK_GRAY,
 	/**
-	 * The main gray color object (since Apr 16, 2022).
-	 *
-	 * We are in the process of simplifying the colors in this file,
-	 * please prefer this `gray` object in the meantime.
+	 * The main gray color object.
 	 */
 	gray: GRAY,
+	/**
+	 * @deprecated Try to use `gray` instead.
+	 */
 	lightGray: LIGHT_GRAY,
 	white,
 	alert: ALERT,
