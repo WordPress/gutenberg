@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 
@@ -10,14 +11,13 @@ import { useEffect, useState } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 
-const TOOLBAR_HEIGHT = 72;
 const DEFAULT_PROPS = { __unstableForcePosition: true, __unstableShift: true };
 const RESTRICTED_HEIGHT_PROPS = {
 	__unstableForcePosition: false,
 	__unstableShift: false,
 };
 
-function getProps( contentElement, selectedBlockElement ) {
+function getProps( contentElement, selectedBlockElement, toolbarHeight ) {
 	if ( ! contentElement || ! selectedBlockElement ) {
 		return DEFAULT_PROPS;
 	}
@@ -25,7 +25,7 @@ function getProps( contentElement, selectedBlockElement ) {
 	const blockRect = selectedBlockElement.getBoundingClientRect();
 	const contentRect = contentElement.getBoundingClientRect();
 
-	if ( blockRect.top - contentRect.top > TOOLBAR_HEIGHT ) {
+	if ( blockRect.top - contentRect.top > toolbarHeight ) {
 		return DEFAULT_PROPS;
 	}
 
@@ -48,18 +48,18 @@ export default function useBlockToolbarPopoverProps( {
 	clientId,
 } ) {
 	const selectedBlockElement = useBlockElement( clientId );
+	const [ toolbarHeight, setToolbarHeight ] = useState( 0 );
 	const [ props, setProps ] = useState(
-		getProps( contentElement, selectedBlockElement )
+		getProps( contentElement, selectedBlockElement, toolbarHeight )
 	);
 	const blockIndex = useSelect(
 		( select ) => select( blockEditorStore ).getBlockIndex( clientId ),
 		[ clientId ]
 	);
 
-	// Update the toolbar position if the block moves.
-	useEffect( () => {
-		setProps( getProps( contentElement, selectedBlockElement ) );
-	}, [ blockIndex ] );
+	const popoverRef = useRefEffect( ( popoverNode ) => {
+		setToolbarHeight( popoverNode.offsetHeight );
+	}, [] );
 
 	// Update the toolbar position if the window resizes, or the
 	// selected element changes.
@@ -69,7 +69,9 @@ export default function useBlockToolbarPopoverProps( {
 		}
 
 		const updateProps = () =>
-			setProps( getProps( contentElement, selectedBlockElement ) );
+			setProps(
+				getProps( contentElement, selectedBlockElement, toolbarHeight )
+			);
 
 		updateProps();
 		const view = contentElement?.ownerDocument?.defaultView;
@@ -78,7 +80,10 @@ export default function useBlockToolbarPopoverProps( {
 		return () => {
 			view?.removeEventHandler?.( 'resize', updateProps );
 		};
-	}, [ contentElement, selectedBlockElement ] );
+	}, [ contentElement, selectedBlockElement, blockIndex, toolbarHeight ] );
 
-	return props;
+	return {
+		...props,
+		ref: popoverRef,
+	};
 }
