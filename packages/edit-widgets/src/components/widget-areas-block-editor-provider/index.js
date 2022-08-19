@@ -7,7 +7,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useEntityBlockEditor,
 	store as coreStore,
-	__experimentalUseResourcePermissions as useResourcePermissions,
+	useResourcePermissions,
 } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import {

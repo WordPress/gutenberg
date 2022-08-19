@@ -40,7 +40,7 @@ import {
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
 import {
-	__experimentalUseResourcePermissions as useResourcePermissions,
+	useResourcePermissions,
 	store as coreStore,
 } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';

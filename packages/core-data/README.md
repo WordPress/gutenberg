@@ -903,6 +903,31 @@ function PagesList() {
 // <PagesList />
 ```
 
+```js
+import { useResourcePermissions } from '@wordpress/core-data';
+
+function Page( { pageId } ) {
+	const { canCreate, canUpdate, canDelete, isResolving } =
+		useResourcePermissions( 'page', pageId );
+
+	if ( isResolving ) {
+		return 'Loading ...';
+	}
+
+	return (
+		<div>
+			{ canCreate ? <button>+ Create a new page</button> : false }
+			{ canUpdate ? <button>Edit page</button> : false }
+			{ canDelete ? <button>Delete page</button> : false }
+			// ...
+		</div>
+	);
+}
+
+// Rendered in the application:
+// <Page pageId={ 15 } />
+```
+
 In the above example, when `PagesList` is rendered into an
 application, the appropriate permissions and the resolution details will be retrieved from
 the store state using `canUser()`, or resolved if missing.

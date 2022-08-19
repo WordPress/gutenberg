@@ -44,7 +44,7 @@ import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import {
 	store as coreStore,
-	__experimentalUseResourcePermissions as useResourcePermissions,
+	useResourcePermissions,
 } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 
