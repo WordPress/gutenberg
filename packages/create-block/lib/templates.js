@@ -241,13 +241,20 @@ const getDefaultValues = ( pluginTemplate, variant ) => {
 	};
 };
 
-const getPrompts = ( pluginTemplate, keys ) => {
+const getPrompts = ( pluginTemplate, keys, variant ) => {
 	const defaultValues = getDefaultValues( pluginTemplate );
+	const variantData = pluginTemplate.variants[ variant ] ?? false;
 	return keys.map( ( promptName ) => {
 		if ( promptName === 'variant' ) {
 			prompts[ promptName ].choices = Object.keys(
 				pluginTemplate.variants
 			);
+		}
+		if ( variantData && variantData[ promptName ] ) {
+			return {
+				...prompts[ promptName ],
+				default: variantData[ promptName ],
+			};
 		}
 		return {
 			...prompts[ promptName ],

@@ -114,27 +114,29 @@ program
 					const filterOptionsProvided = ( { name } ) =>
 						! Object.keys( optionsValues ).includes( name );
 
+					// Get the variant prompt first. This will help get the default values
+					const variantPrompt =
+						Object.keys( pluginTemplate.variants )?.length > 1
+							? getPrompts( pluginTemplate, [ 'variant' ] )
+							: false;
+
+					const variantSelection = variantPrompt
+						? await inquirer.prompt( variantPrompt )
+						: false;
+
 					const blockPrompts = getPrompts(
 						pluginTemplate,
 						[
-							'variant',
 							'slug',
 							'namespace',
 							'title',
 							'description',
 							'dashicon',
 							'category',
-						].filter( ( prompt ) => {
-							if ( prompt === 'variant' ) {
-								const variantKeys = Object.keys(
-									pluginTemplate.variants
-								);
-
-								return variantKeys.length > 1;
-							}
-							return true;
-						} )
+						],
+						variantSelection.variant
 					).filter( filterOptionsProvided );
+
 					const blockAnswers = await inquirer.prompt( blockPrompts );
 
 					const pluginAnswers = plugin
@@ -174,6 +176,7 @@ program
 						...defaultValues,
 						...optionsValues,
 						...blockAnswers,
+						...variantSelection,
 						...pluginAnswers,
 					} );
 				}
