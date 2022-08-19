@@ -28,6 +28,17 @@ class WP_Webfonts extends WP_Dependencies {
 	}
 
 	/**
+	 * Get the list of registered providers.
+	 *
+	 * @since X.X.X
+	 *
+	 * @return WP_Webfonts_Provider[] All registered providers, each keyed by their unique ID.
+	 */
+	public function get_providers() {
+		return $this->providers;
+	}
+
+	/**
 	 * Get the list of all registered font families and their variations.
 	 *
 	 * @since X.X.X
@@ -353,17 +364,6 @@ class WP_Webfonts extends WP_Dependencies {
 			'fonts' => array(),
 		);
 		return true;
-	}
-
-	/**
-	 * Get the list of providers.
-	 *
-	 * @since 6.0.0
-	 *
-	 * @return WP_Webfonts_Provider[] All registered providers, each keyed by their unique ID.
-	 */
-	public function get_providers() {
-		return $this->providers;
 	}
 
 	/**

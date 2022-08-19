@@ -436,6 +436,48 @@ trait WP_Webfonts_Tests_Datasets {
 	 *
 	 * @return array
 	 */
+	public function data_get_providers() {
+		$local = array(
+			'local' => array(
+				'class' => WP_Webfonts_Provider_Local::class,
+				'fonts' => array(),
+			),
+		);
+		$mock  = array(
+			'mock' => array(
+				'class' => Mock_Provider::class,
+				'fonts' => array(),
+			),
+		);
+
+		return array(
+			'local provider'           => array(
+				'providers' => array(
+					'local' => WP_Webfonts_Provider_Local::class,
+				),
+				'expected'  => $local,
+			),
+			'mock provider'            => array(
+				'providers' => array(
+					'mock' => Mock_Provider::class,
+				),
+				'expected'  => $mock,
+			),
+			'local and mock providers' => array(
+				'providers' => array(
+					'local' => WP_Webfonts_Provider_Local::class,
+					'mock'  => Mock_Provider::class,
+				),
+				'expected'  => array_merge( $local, $mock ),
+			),
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
 	public function data_enqueue() {
 		return array(
 			'1 font-family'   => array(

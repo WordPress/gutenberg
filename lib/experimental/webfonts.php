@@ -250,7 +250,7 @@ if ( ! function_exists( 'wp_get_webfont_providers' ) ) {
 	 * process its specific font service (i.e. local or remote)
 	 * and how to generate the `@font-face` styles for its service.
 	 *
-	 * @since 6.0.0
+	 * @since X.X.X
 	 *
 	 * @return WP_Webfonts_Provider[] All registered providers, each keyed by their unique ID.
 	 */
