@@ -5,16 +5,14 @@ import { rgba } from './colors';
 
 const white = '#fff';
 
-const G2 = {
-	gray: {
-		900: '#1e1e1e',
-		700: '#757575', // Meets 4.6:1 text contrast against white.
-		600: '#949494', // Meets 3:1 UI or large text contrast against white.
-		400: '#ccc',
-		300: '#ddd', // Used for most borders.
-		200: '#e0e0e0', // Used sparingly for light borders.
-		100: '#f0f0f0', // Used for light gray backgrounds.
-	},
+const GRAY = {
+	900: '#1e1e1e',
+	700: '#757575', // Meets 4.6:1 text contrast against white.
+	600: '#949494', // Meets 3:1 UI or large text contrast against white.
+	400: '#ccc',
+	300: '#ddd', // Used for most borders.
+	200: '#e0e0e0', // Used sparingly for light borders.
+	100: '#f0f0f0', // Used for light gray backgrounds.
 };
 
 const DARK_GRAY = {
@@ -28,7 +26,7 @@ const DARK_GRAY = {
 	200: '#7e8993',
 	150: '#8d96a0', // Lightest gray that can be used for AA non-text contrast.
 	100: '#8f98a1',
-	placeholder: rgba( G2.gray[ 900 ], 0.62 ),
+	placeholder: rgba( GRAY[ 900 ], 0.62 ),
 };
 
 const LIGHT_GRAY = {
@@ -63,10 +61,10 @@ const UI = {
 	theme: ADMIN.theme,
 	background: white,
 	backgroundDisabled: LIGHT_GRAY[ 200 ],
-	border: G2.gray[ 700 ],
-	borderHover: G2.gray[ 700 ],
+	border: GRAY[ 700 ],
+	borderHover: GRAY[ 700 ],
 	borderFocus: ADMIN.themeDark10,
-	borderDisabled: G2.gray[ 400 ],
+	borderDisabled: GRAY[ 400 ],
 	textDisabled: DARK_GRAY[ 150 ],
 	textDark: white,
 };
@@ -79,7 +77,7 @@ export const COLORS = {
 	 * We are in the process of simplifying the colors in this file,
 	 * please prefer this `gray` object in the meantime.
 	 */
-	gray: G2.gray,
+	gray: GRAY,
 	lightGray: LIGHT_GRAY,
 	white,
 	alert: ALERT,
