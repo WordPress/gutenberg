@@ -18,29 +18,18 @@ const GRAY = {
 };
 
 const DARK_GRAY = {
-	900: '#191e23',
-	800: '#23282d',
-	700: '#32373c',
-	600: '#40464d',
 	500: '#555d66', // Use this most of the time for dark items.
-	400: '#606a73',
 	300: '#6c7781', // Lightest gray that can be used for AA text contrast.
-	200: '#7e8993',
 	150: '#8d96a0', // Lightest gray that can be used for AA non-text contrast.
-	100: '#8f98a1',
 	placeholder: rgba( GRAY[ 900 ], 0.62 ),
 };
 
 const LIGHT_GRAY = {
-	900: '#a2aab2',
 	800: '#b5bcc2',
-	700: '#ccd0d4',
 	600: '#d7dade',
-	500: '#e2e4e7', // Good for "grayed" items and borders.
 	400: '#e8eaeb', // Good for "readonly" input fields and special text selection.
 	300: '#edeff0',
 	200: '#f3f4f5',
-	100: '#f8f9f9',
 	placeholder: rgba( white, 0.65 ),
 };
 
