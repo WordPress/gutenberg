@@ -5,8 +5,10 @@ import { rgba } from './colors';
 
 const white = '#fff';
 
+// Matches the grays in @wordpress/base-styles _colors.scss
 const GRAY = {
 	900: '#1e1e1e',
+	800: '#2f2f2f',
 	700: '#757575', // Meets 4.6:1 text contrast against white.
 	600: '#949494', // Meets 3:1 UI or large text contrast against white.
 	400: '#ccc',
