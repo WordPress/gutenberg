@@ -71,22 +71,50 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 	/**
 	 * Registers a list of web fonts and variations.
 	 *
-	 * @param $webfonts
-	 * @return array
+	 * @since 6.1.0
+	 *
+	 * @param array[] $webfonts Web fonts to be registered.
+	 * @return string[] The font family handle of the registered web fonts.
 	 */
-	function wp_register_webfonts( $webfonts, $enqueue = false ) {
+	function wp_register_webfonts( array $webfonts ) {
 		$registered = array();
 
 		foreach ( $webfonts as $font_family => $variations ) {
-			wp_register_font_family( $font_family );
-
-			foreach ( $variations as $variation_handle => $variation ) {
-				$registered[] = wp_register_web_font_variation( $font_family, $variation_handle, $variation );
-
-				if ( $enqueue ) {
-					wp_enqueue_web_font( $variation_handle );
+			/*
+			 * Handle the deprecated web font's structure but alert developers
+			 * to modify their web font structure to group and key by font family.
+			 *
+			 * Note: This code block will not be backported to Core.
+			 */
+			if ( ! WP_Webfonts_Utils::is_defined( $font_family ) ) {
+				_doing_it_wrong(
+					__FUNCTION__,
+					__( 'Variations must be grouped and keyed by their font family.', 'gutenberg' ),
+					'6.1.0'
+				);
+				$font_family_handle = wp_register_webfont( $variations );
+				if ( ! $font_family_handle ) {
+					continue;
 				}
+				$registered[ $font_family_handle ] = true;
+				continue;
+			} // end of code block for deprecated web fonts structure.
+
+			$font_family_handle = wp_register_font_family( $font_family );
+			if ( ! $font_family_handle ) {
+				continue;
 			}
+
+			// Register each of the variations for this font family.
+			foreach ( $variations as $handle => $variation ) {
+				wp_register_webfont(
+					$variation,
+					$font_family_handle,
+					WP_Webfonts_Utils::is_defined( $handle ) ? $handle : ''
+				);
+			}
+
+			$registered[] = $font_family_handle;
 		}
 
 		return $registered;
