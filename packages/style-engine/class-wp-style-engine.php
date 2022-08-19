@@ -314,8 +314,6 @@ class WP_Style_Engine {
 			return $parsed_styles;
 		}
 
-		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
-
 		// Collect CSS and classnames.
 		foreach ( static::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group_key => $definition_group_style ) {
 			if ( empty( $block_styles[ $definition_group_key ] ) ) {
@@ -329,7 +327,7 @@ class WP_Style_Engine {
 				}
 
 				$parsed_styles['classnames']   = array_merge( $parsed_styles['classnames'], static::get_classnames( $style_value, $style_definition ) );
-				$parsed_styles['declarations'] = array_merge( $parsed_styles['declarations'], static::get_css_declarations( $style_value, $style_definition, $should_skip_css_vars ) );
+				$parsed_styles['declarations'] = array_merge( $parsed_styles['declarations'], static::get_css_declarations( $style_value, $style_definition, $options ) );
 			}
 		}
 
@@ -376,17 +374,20 @@ class WP_Style_Engine {
 	 *
 	 * @param array         $style_value          A single raw style value from the generate() $block_styles array.
 	 * @param array<string> $style_definition     A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
-	 * @param boolean       $should_skip_css_vars Whether to skip compiling CSS var values.
+	 * @param array         $options              array(
+	 *     'convert_vars_to_classnames' => (boolean) Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
+	 * );.
 	 *
 	 * @return array        An array of CSS definitions, e.g., array( "$property" => "$value" ).
 	 */
-	protected static function get_css_declarations( $style_value, $style_definition, $should_skip_css_vars = false ) {
+	protected static function get_css_declarations( $style_value, $style_definition, $options ) {
 		if ( isset( $style_definition['value_func'] ) && is_callable( $style_definition['value_func'] ) ) {
-			return call_user_func( $style_definition['value_func'], $style_value, $style_definition, $should_skip_css_vars );
+			return call_user_func( $style_definition['value_func'], $style_value, $style_definition, $options );
 		}
 
-		$css_declarations    = array();
-		$style_property_keys = $style_definition['property_keys'];
+		$css_declarations     = array();
+		$style_property_keys  = $style_definition['property_keys'];
+		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
 
 		// Build CSS var values from var:? values, e.g, `var(--wp--css--rule-slug )`
 		// Check if the value is a CSS preset and there's a corresponding css_var pattern in the style definition.
@@ -435,13 +436,15 @@ class WP_Style_Engine {
 	 * "border-{top|right|bottom|left}-{color|width|style}: {value};" or,
 	 * "border-image-{outset|source|width|repeat|slice}: {value};"
 	 *
-	 * @param array   $style_value                    A single raw Gutenberg style attributes value for a CSS property.
-	 * @param array   $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
-	 * @param boolean $should_skip_css_vars           Whether to skip compiling CSS var values.
+	 * @param array $style_value                    A single raw Gutenberg style attributes value for a CSS property.
+	 * @param array $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * @param array $options                        array(
+	 *     'convert_vars_to_classnames' => (boolean) Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
+	 * );.
 	 *
 	 * @return array An array of CSS definitions, e.g., array( "$property" => "$value" ).
 	 */
-	protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $should_skip_css_vars ) {
+	protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $options ) {
 		if ( ! is_array( $style_value ) || empty( $style_value ) || empty( $individual_property_definition['path'] ) ) {
 			return array();
 		}
@@ -451,8 +454,9 @@ class WP_Style_Engine {
 		// The second item in $individual_property_definition['path'] array refers to the individual property marker, e.g., "top".
 		$definition_group_key    = $individual_property_definition['path'][0];
 		$individual_property_key = $individual_property_definition['path'][1];
+		$should_skip_css_vars    = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
+		$css_declarations        = array();
 
-		$css_declarations = array();
 		foreach ( $style_value as $css_property => $value ) {
 			if ( empty( $value ) ) {
 				continue;
