@@ -29,11 +29,11 @@ return array(
 					
 					<!-- wp:column -->
 					<div class="wp-block-column"><!-- wp:paragraph -->
-					<p><strong>' . __( 'Where We Are', 'gutenberg' ) . '</strong></p>
+					<p><strong>' . _x( 'Where We Are', 'sample content', 'gutenberg' ) . '</strong></p>
 					<!-- /wp:paragraph -->
 					
 					<!-- wp:paragraph -->
-					<p>' . __( '2020 Lomita Blvd, <br>Torrance, CA 90101<br>United States', 'gutenberg' ) . '</p>
+					<p>' . _x( '2020 Lomita Blvd, <br>Torrance, CA 90101<br>United States', 'sample content', 'gutenberg' ) . '</p>
 					<!-- /wp:paragraph --></div>
 					<!-- /wp:column --></div>
 					<!-- /wp:columns -->
