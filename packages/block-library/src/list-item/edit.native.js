@@ -14,6 +14,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
 
@@ -89,11 +90,16 @@ export default function ListItemEdit( {
 		useCompactList: true,
 	} );
 
+	const placeholderWithPreferredScheme = usePreferredColorSchemeStyle(
+		styles[ 'wp-block-list-item__list-item-placeholder' ],
+		styles[ 'wp-block-list-item__list-item-placeholder--dark' ]
+	);
+
 	// Add 0.62 hex opacity to baseColor text (e.g. #FFFFFF9E)
-	// or fallback to sensible default color
+	// or fallback to default color from stylesheet ($gray, $gray-50)
 	const defaultPlaceholderTextColor = style?.baseColors?.color?.text
 		? style.baseColors.color.text + '9E'
-		: '#87a6bc';
+		: placeholderWithPreferredScheme.color;
 
 	const onSplit = useSplit( clientId );
 	const onMerge = useMerge( clientId );
