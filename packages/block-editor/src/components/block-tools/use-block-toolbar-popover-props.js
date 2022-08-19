@@ -3,7 +3,7 @@
  */
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -76,21 +76,44 @@ export default function useBlockToolbarPopoverProps( {
 		setToolbarHeight( popoverNode.offsetHeight );
 	}, [] );
 
+	const updateProps = useCallback(
+		() =>
+			setProps(
+				getProps( contentElement, selectedBlockElement, toolbarHeight )
+			),
+		[ contentElement, selectedBlockElement, toolbarHeight ]
+	);
+
+	// Update on initial mount.
+	useEffect( () => updateProps, [ updateProps ] );
+
+	// Update popover props whenever the block is moved, since this can reduce
+	// the height above the block.
+	useEffect( updateProps, [ blockIndex, updateProps ] );
+
+	// Update popover props if the toolbar height changes for any reason.
+	useEffect( updateProps, [ toolbarHeight, updateProps ] );
+
+	// Update popover props if the viewport resizes, since content flow can
+	// change the space above a block.
 	useEffect( () => {
-		if ( ! contentElement || ! selectedBlockElement ) {
+		if ( ! contentElement ) {
 			return;
 		}
 
-		const updateProps = () =>
-			setProps(
-				getProps( contentElement, selectedBlockElement, toolbarHeight )
-			);
-
-		updateProps();
-
 		// Update the toolbar props on viewport resize.
 		const view = contentElement?.ownerDocument?.defaultView;
-		view?.addEventHandler?.( 'resize', updateProps );
+		return () => view?.removeEventHandler?.( 'resize', updateProps );
+	}, [ contentElement, updateProps ] );
+
+	// Update popover props if the block resizes.
+	useEffect( () => {
+		if ( ! selectedBlockElement ) {
+			return;
+		}
+
+		// Update the toolbar props on viewport resize.
+		const view = selectedBlockElement?.ownerDocument?.defaultView;
 
 		// Update the toolbar props on block resize.
 		let resizeObserver;
@@ -100,18 +123,11 @@ export default function useBlockToolbarPopoverProps( {
 		}
 
 		return () => {
-			view?.removeEventHandler?.( 'resize', updateProps );
-
 			if ( resizeObserver ) {
 				resizeObserver.disconnect();
 			}
 		};
-
-		// The deps will update the toolbar props if:
-		// - The content or the selected block element changes.
-		// - The block is moved (its index changes).
-		// - The height of the toolbar changes.
-	}, [ contentElement, selectedBlockElement, blockIndex, toolbarHeight ] );
+	}, [ selectedBlockElement, updateProps ] );
 
 	return {
 		...props,
