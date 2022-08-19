@@ -1,7 +1,14 @@
 /**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 
 const TOOLBAR_HEIGHT = 72;
 const DEFAULT_PROPS = { __unstableForcePosition: true, __unstableShift: true };
@@ -31,19 +38,31 @@ function getProps( contentElement, selectedBlockElement ) {
  * Determines the desired popover positioning behavior, returning a set of appropriate props.
  *
  * @param {Object}  elements
- * @param {Element} elements.contentElement       The DOM element that represents the editor content or canvas.
- * @param {Element} elements.selectedBlockElement The DOM element that represents the first selected block.
+ * @param {Element} elements.contentElement The DOM element that represents the editor content or canvas.
+ * @param {string}  elements.clientId       The clientId of the first selected block.
  *
  * @return {Object} The popover props used to determine the position of the toolbar.
  */
 export default function useBlockToolbarPopoverProps( {
 	contentElement,
-	selectedBlockElement,
+	clientId,
 } ) {
+	const selectedBlockElement = useBlockElement( clientId );
 	const [ props, setProps ] = useState(
 		getProps( contentElement, selectedBlockElement )
 	);
+	const blockIndex = useSelect(
+		( select ) => select( blockEditorStore ).getBlockIndex( clientId ),
+		[ clientId ]
+	);
 
+	// Update the toolbar position if the block moves.
+	useEffect( () => {
+		setProps( getProps( contentElement, selectedBlockElement ) );
+	}, [ blockIndex ] );
+
+	// Update the toolbar position if the window resizes, or the
+	// selected element changes.
 	useEffect( () => {
 		if ( ! contentElement || ! selectedBlockElement ) {
 			return;
@@ -52,11 +71,7 @@ export default function useBlockToolbarPopoverProps( {
 		const updateProps = () =>
 			setProps( getProps( contentElement, selectedBlockElement ) );
 
-		// Update whenever the content or selectedBlock elements change.
 		updateProps();
-
-		// Update on window resize - wrapping can change the amount of space
-		// above a block, and result in the toolbar position needing to change.
 		const view = contentElement?.ownerDocument?.defaultView;
 		view?.addEventHandler?.( 'resize', updateProps );
 

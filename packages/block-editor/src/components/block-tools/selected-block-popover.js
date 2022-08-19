@@ -16,7 +16,6 @@ import { useViewportMatch } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockSelectionButton from './block-selection-button';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import { store as blockEditorStore } from '../../store';
@@ -115,10 +114,9 @@ function SelectedBlockPopover( {
 	// to it when re-mounting.
 	const initialToolbarItemIndexRef = useRef();
 
-	const selectedBlockElement = useBlockElement( clientId );
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,
-		selectedBlockElement,
+		clientId,
 	} );
 
 	if ( ! shouldShowBreadcrumb && ! shouldShowContextualToolbar ) {
