@@ -62,6 +62,7 @@
 -   `Tooltip`: Refactor away from `_.includes()` ([#43518](https://github.com/WordPress/gutenberg/pull/43518/)).
 -   `TreeGrid`: Refactor away from `_.includes()` ([#43518](https://github.com/WordPress/gutenberg/pull/43518/)).
 -   `FormTokenField`: use `KeyboardEvent.code`, refactor tests to modern RTL and `user-event` ([#43442](https://github.com/WordPress/gutenberg/pull/43442/)).
+-   `DropdownMenu`: use KeyboardEvent.code, refactor tests to model RTL and user-event ([#43439](https://github.com/WordPress/gutenberg/pull/43439/)).
 
 ### Experimental
 
