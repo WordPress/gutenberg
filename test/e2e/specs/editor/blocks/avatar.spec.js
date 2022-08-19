@@ -41,8 +41,6 @@ test.describe( 'Avatar', () => {
 			'role=document[name="Block: Avatar"i]'
 		);
 
-		await expect( avatarBlock ).toBeVisible();
-
 		const avatarImage = avatarBlock.locator( 'img' );
 
 		await expect( avatarImage ).toBeVisible();
