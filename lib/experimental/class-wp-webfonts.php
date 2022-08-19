@@ -52,11 +52,11 @@ class WP_Webfonts extends WP_Dependencies {
 	/**
 	 * Removes a font family and all registered variations.
 	 *
-	 * @param mixed|string|string[] $font_family
+	 * @since X.X.X
+	 *
+	 * @param string $font_family_handle The font family to remove.
 	 */
-	function remove_family( $font_family ) {
-		$font_family_handle = sanitize_title( $font_family );
-
+	public function remove_font_family( $font_family_handle ) {
 		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
 			return;
 		}

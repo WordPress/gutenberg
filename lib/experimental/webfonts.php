@@ -179,12 +179,16 @@ if ( ! function_exists( 'wp_enqueue_webfont_variations' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wp_deregister_web_font_family' ) ) {
+if ( ! function_exists( 'wp_deregister_font_family' ) ) {
 	/**
-	 * Unregisters an entire font family and all variations.
+	 * Deregisters a font family and all of its registered variations.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param string $font_family_handle The font family to remove.
 	 */
-	function wp_deregister_web_font_family( $font_family ) {
-		wp_webfonts()->remove_family( $font_family );
+	function wp_deregister_font_family( $font_family_handle ) {
+		wp_webfonts()->remove_font_family( $font_family_handle );
 	}
 }
 
