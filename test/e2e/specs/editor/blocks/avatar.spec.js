@@ -75,7 +75,5 @@ test.describe( 'Avatar', () => {
 		const newSrc = await avatarImage.getAttribute( 'src' );
 
 		expect( newSrc ).not.toBe( originalSrc );
-
-		await expect( userInput ).toBeVisible();
 	} );
 } );
