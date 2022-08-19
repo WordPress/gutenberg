@@ -42,6 +42,8 @@ describe( 'FocalPointPicker', () => {
 
 			const draggableArea = screen.getByRole( 'button' );
 
+			// `user-event` is not capable of testing drag interactions properly.
+			// we could consider using playwright instead.
 			fireEvent.mouseDown( draggableArea );
 
 			expect( mockOnDrag ).not.toHaveBeenCalled();
@@ -69,6 +71,8 @@ describe( 'FocalPointPicker', () => {
 
 			const dragArea = screen.getByRole( 'button' );
 
+			// `user-event` is not capable of testing drag interactions properly.
+			// we could consider using playwright instead.
 			fireEvent.mouseDown( dragArea );
 			fireEvent.mouseMove( dragArea );
 			fireEvent.mouseUp( dragArea );
