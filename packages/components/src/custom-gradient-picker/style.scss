@@ -1,15 +1,20 @@
 $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 16px handles inside, that leaves 32px padding, half of which is 1å6.
 
+.components-custom-gradient-picker {
+	&:not(.is-next-has-no-margin) {
+		margin-top: $grid-unit-15;
+		margin-bottom: $grid-unit-30;
+	}
+}
+
 .components-custom-gradient-picker__gradient-bar:not(.has-gradient) {
 	opacity: 0.4;
 }
 
 .components-custom-gradient-picker__gradient-bar {
 	border-radius: $radius-block-ui;
-	margin-top: $grid-unit-15;
 	width: 100%;
 	height: $grid-unit-60;
-	margin-bottom: $grid-unit-20+$grid-unit-05;
 
 	.components-custom-gradient-picker__markers-container {
 		position: relative;
@@ -84,15 +89,6 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 	flex: 0 auto;
 	width: 20px;
 	height: 20px;
-}
-
-.components-custom-gradient-picker .components-custom-gradient-picker__ui-line {
-	margin-bottom: $grid-unit-20;
-
-	.components-base-control.components-angle-picker,
-	.components-base-control.components-custom-gradient-picker__type-picker {
-		margin-bottom: 0;
-	}
 }
 
 .components-custom-gradient-picker .components-custom-gradient-picker__toolbar {
