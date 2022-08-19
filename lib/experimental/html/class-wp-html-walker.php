@@ -224,7 +224,6 @@ class WP_HTML_Walker {
 	 */
 	public function __construct( $html ) {
 		$this->html       = $html;
-		$this->last_query = null;
 	}
 
 	/**
