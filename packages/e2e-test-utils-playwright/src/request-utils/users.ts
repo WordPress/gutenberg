@@ -17,6 +17,15 @@ export interface UserData {
 	roles?: string[];
 }
 
+export interface UserRequestData {
+	username: string;
+	email: string;
+	first_name?: string;
+	last_name?: string;
+	password?: string;
+	roles?: string[];
+}
+
 /**
  * List all users.
  *
@@ -43,17 +52,31 @@ async function listUsers( this: RequestUtils ) {
  * @param  user User data to create.
  */
 async function createUser( this: RequestUtils, user: UserData ) {
+	const userData: UserRequestData = {
+		username: user.username,
+		email: user.email,
+	};
+
+	if ( user.firstName ) {
+		userData.first_name = user.firstName;
+	}
+
+	if ( user.lastName ) {
+		userData.last_name = user.lastName;
+	}
+
+	if ( user.password ) {
+		userData.password = user.password;
+	}
+
+	if ( user.roles ) {
+		userData.roles = user.roles;
+	}
+
 	const response = await this.rest< User >( {
 		method: 'POST',
 		path: '/wp/v2/users',
-		data: {
-			username: user.username,
-			email: user.email,
-			first_name: user.firstName,
-			last_name: user.lastName,
-			password: user.password,
-			roles: user.roles,
-		},
+		data: userData,
 	} );
 
 	return response;
