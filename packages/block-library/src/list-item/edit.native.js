@@ -99,7 +99,7 @@ export default function ListItemEdit( {
 	// or fallback to default color from stylesheet ($gray, $gray-50)
 	const defaultPlaceholderTextColor = style?.baseColors?.color?.text
 		? style.baseColors.color.text + '9E'
-		: placeholderWithPreferredScheme.color;
+		: placeholderWithPreferredScheme?.color;
 
 	const onSplit = useSplit( clientId );
 	const onMerge = useMerge( clientId );
