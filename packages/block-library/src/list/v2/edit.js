@@ -139,6 +139,7 @@ function Edit( { attributes, setAttributes, clientId, style } ) {
 		...( Platform.isNative && {
 			marginVertical: NATIVE_MARGIN_SPACING,
 			marginHorizontal: NATIVE_MARGIN_SPACING,
+			useCompactList: true,
 		} ),
 	} );
 	useMigrateOnLoad( attributes, clientId );
