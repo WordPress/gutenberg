@@ -89,14 +89,14 @@ async function deleteUser( this: RequestUtils, userId: number ) {
  * @param  this
  */
 async function deleteAllUsers( this: RequestUtils ) {
-	const users = await this.listUsers();
+	const users = await listUsers.bind( this )();
 
 	// The users endpoint doesn't support batch request yet.
 	const responses = await Promise.all(
-		users.map( ( user ) => this.deleteUser( user.id ) )
+		users.map( ( user: User ) => deleteUser.bind( this )( user.id ) )
 	);
 
 	return responses;
 }
 
-export { listUsers, createUser, deleteAllUsers, deleteUser };
+export { createUser, deleteAllUsers };
