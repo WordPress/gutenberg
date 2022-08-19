@@ -161,13 +161,14 @@ export function getAllRawValue( values = {} ) {
  * Checks to determine if values are mixed.
  *
  * @param {Object} values Box values.
+ * @param {Array}  sides  Sides that values relate to.
  *
  * @return {boolean} Whether values are mixed.
  */
-export function isValuesMixed( values = {} ) {
+export function isValuesMixed( values = {}, sides = ALL_SIDES ) {
 	return (
 		( Object.values( values ).length >= 1 &&
-			Object.values( values ).length < 4 ) ||
+			Object.values( values ).length < sides.length ) ||
 		new Set( Object.values( values ) ).size > 1
 	);
 }
