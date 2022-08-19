@@ -1,179 +1,132 @@
 /**
  * External dependencies
  */
-import TestUtils from 'react-dom/test-utils';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
  */
 import TabPanel from '../';
 
-/**
- * WordPress dependencies
- */
-import { Component } from '@wordpress/element';
+const setupUser = () =>
+	userEvent.setup( {
+		advanceTimers: jest.advanceTimersByTime,
+	} );
+
+const TABS = [
+	{
+		name: 'alpha',
+		title: 'Alpha',
+		className: 'alpha-class',
+	},
+	{
+		name: 'beta',
+		title: 'Beta',
+		className: 'beta-class',
+	},
+	{
+		name: 'gamma',
+		title: 'Gamma',
+		className: 'gamma-class',
+	},
+];
+
+const getSelectedTab = () => screen.getByRole( 'tab', { selected: true } );
 
 describe( 'TabPanel', () => {
-	const getElementByClass = ( wrapper, className ) => {
-		return TestUtils.findRenderedDOMComponentWithClass(
-			wrapper,
-			className
+	it( 'should render a tabpanel, and clicking should change tabs', async () => {
+		const user = setupUser();
+
+		render(
+			<TabPanel
+				tabs={ TABS }
+				children={ ( tab ) => `${ tab.name } panel` }
+			/>
 		);
-	};
 
-	const getElementsByClass = ( wrapper, className ) => {
-		return TestUtils.scryRenderedDOMComponentsWithClass(
-			wrapper,
-			className
+		expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+		expect( screen.getByRole( 'tabpanel' ) ).toHaveTextContent(
+			'alpha panel'
 		);
-	};
 
-	const elementClick = ( element ) => {
-		TestUtils.Simulate.click( element );
-	};
+		await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
 
-	// This is needed because TestUtils does not accept a stateless component.
-	// anything run through a HOC ends up as a stateless component.
-	const getTestComponent = ( WrappedComponent, props ) => {
-		class TestComponent extends Component {
-			render() {
-				return <WrappedComponent { ...props } />;
-			}
-		}
-		return <TestComponent />;
-	};
+		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+		expect( screen.getByRole( 'tabpanel' ) ).toHaveTextContent(
+			'beta panel'
+		);
 
-	describe( 'basic rendering', () => {
-		it( 'should render a tabpanel, and clicking should change tabs', () => {
-			const props = {
-				className: 'test-panel',
-				activeClass: 'active-tab',
-				tabs: [
-					{
-						name: 'alpha',
-						title: 'Alpha',
-						className: 'alpha',
-					},
-					{
-						name: 'beta',
-						title: 'Beta',
-						className: 'beta',
-					},
-					{
-						name: 'gamma',
-						title: 'Gamma',
-						className: 'gamma',
-					},
-				],
-				children: ( tab ) => {
-					return (
-						<p tabIndex="0" className={ tab.name + '-view' }>
-							{ tab.name }
-						</p>
-					);
-				},
-			};
+		await user.click( screen.getByRole( 'tab', { name: 'Gamma' } ) );
 
-			let wrapper;
-			TestUtils.act( () => {
-				wrapper = TestUtils.renderIntoDocument(
-					getTestComponent( TabPanel, props )
-				);
-			} );
+		expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+		expect( screen.getByRole( 'tabpanel' ) ).toHaveTextContent(
+			'gamma panel'
+		);
 
-			const alphaTab = getElementByClass( wrapper, 'alpha' );
-			const betaTab = getElementByClass( wrapper, 'beta' );
-			const gammaTab = getElementByClass( wrapper, 'gamma' );
+		await user.click(
+			screen.getByRole( 'tab', {
+				name: 'Alpha',
+			} )
+		);
 
-			const getAlphaViews = () =>
-				getElementsByClass( wrapper, 'alpha-view' );
-			const getBetaViews = () =>
-				getElementsByClass( wrapper, 'beta-view' );
-			const getGammaViews = () =>
-				getElementsByClass( wrapper, 'gamma-view' );
-
-			const getActiveTab = () =>
-				getElementByClass( wrapper, 'active-tab' );
-			const getActiveView = () =>
-				getElementByClass(
-					wrapper,
-					'components-tab-panel__tab-content'
-				).firstChild.textContent;
-
-			expect( getActiveTab().innerHTML ).toBe( 'Alpha' );
-			expect( getAlphaViews() ).toHaveLength( 1 );
-			expect( getBetaViews() ).toHaveLength( 0 );
-			expect( getGammaViews() ).toHaveLength( 0 );
-			expect( getActiveView() ).toBe( 'alpha' );
-
-			elementClick( betaTab );
-
-			expect( getActiveTab().innerHTML ).toBe( 'Beta' );
-			expect( getAlphaViews() ).toHaveLength( 0 );
-			expect( getBetaViews() ).toHaveLength( 1 );
-			expect( getGammaViews() ).toHaveLength( 0 );
-			expect( getActiveView() ).toBe( 'beta' );
-
-			elementClick( betaTab );
-
-			expect( getActiveTab().innerHTML ).toBe( 'Beta' );
-			expect( getAlphaViews() ).toHaveLength( 0 );
-			expect( getBetaViews() ).toHaveLength( 1 );
-			expect( getGammaViews() ).toHaveLength( 0 );
-			expect( getActiveView() ).toBe( 'beta' );
-
-			elementClick( gammaTab );
-
-			expect( getActiveTab().innerHTML ).toBe( 'Gamma' );
-			expect( getAlphaViews() ).toHaveLength( 0 );
-			expect( getBetaViews() ).toHaveLength( 0 );
-			expect( getGammaViews() ).toHaveLength( 1 );
-			expect( getActiveView() ).toBe( 'gamma' );
-
-			elementClick( alphaTab );
-
-			expect( getActiveTab().innerHTML ).toBe( 'Alpha' );
-			expect( getAlphaViews() ).toHaveLength( 1 );
-			expect( getBetaViews() ).toHaveLength( 0 );
-			expect( getGammaViews() ).toHaveLength( 0 );
-			expect( getActiveView() ).toBe( 'alpha' );
-		} );
+		expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+		expect( screen.getByRole( 'tabpanel' ) ).toHaveTextContent(
+			'alpha panel'
+		);
 	} );
 
 	it( 'should render with a tab initially selected by prop initialTabIndex', () => {
-		const props = {
-			className: 'test-panel',
-			activeClass: 'active-tab',
-			initialTabName: 'beta',
-			tabs: [
-				{
-					name: 'alpha',
-					title: 'Alpha',
-					className: 'alpha',
-				},
-				{
-					name: 'beta',
-					title: 'Beta',
-					className: 'beta',
-				},
-			],
-			children: ( tab ) => {
-				return (
-					<p tabIndex="0" className={ tab.name + '-view' }>
-						{ tab.name }
-					</p>
-				);
-			},
-		};
+		render(
+			<TabPanel
+				initialTabName="beta"
+				tabs={ TABS }
+				children={ () => {} }
+			/>
+		);
+		const selectedTab = screen.getByRole( 'tab', { selected: true } );
+		expect( selectedTab ).toHaveTextContent( 'Beta' );
+	} );
 
-		let wrapper;
-		TestUtils.act( () => {
-			wrapper = TestUtils.renderIntoDocument(
-				getTestComponent( TabPanel, props )
-			);
-		} );
+	it( 'should apply the `activeClass` to the selected tab', async () => {
+		const user = setupUser();
+		const activeClass = 'my-active-tab';
 
-		const getActiveTab = () => getElementByClass( wrapper, 'active-tab' );
-		expect( getActiveTab().innerHTML ).toBe( 'Beta' );
+		render(
+			<TabPanel
+				activeClass={ activeClass }
+				tabs={ TABS }
+				children={ () => {} }
+			/>
+		);
+		expect( getSelectedTab() ).toHaveClass( activeClass );
+		screen
+			.getAllByRole( 'tab', { selected: false } )
+			.forEach( ( unselectedTab ) => {
+				expect( unselectedTab ).not.toHaveClass( activeClass );
+			} );
+
+		await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
+
+		expect( getSelectedTab() ).toHaveClass( activeClass );
+		screen
+			.getAllByRole( 'tab', { selected: false } )
+			.forEach( ( unselectedTab ) => {
+				expect( unselectedTab ).not.toHaveClass( activeClass );
+			} );
+	} );
+
+	it( "should apply the tab's `className` to the tab button", () => {
+		render( <TabPanel tabs={ TABS } children={ () => {} } /> );
+
+		expect( screen.getByRole( 'tab', { name: 'Alpha' } ) ).toHaveClass(
+			'alpha-class'
+		);
+		expect( screen.getByRole( 'tab', { name: 'Beta' } ) ).toHaveClass(
+			'beta-class'
+		);
+		expect( screen.getByRole( 'tab', { name: 'Gamma' } ) ).toHaveClass(
+			'gamma-class'
+		);
 	} );
 } );
