@@ -6,7 +6,6 @@ import { Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { DOWN } from '@wordpress/keycodes';
 import { BottomSheet, PanelBody } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { menu } from '@wordpress/icons';
@@ -77,7 +76,7 @@ function DropdownMenu( {
 			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event ) => {
-					if ( ! isOpen && event.keyCode === DOWN ) {
+					if ( ! isOpen && event.code === 'ArrowDown' ) {
 						event.preventDefault();
 						onToggle();
 					}
