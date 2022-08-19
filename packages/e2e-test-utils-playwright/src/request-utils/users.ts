@@ -67,13 +67,6 @@ async function createUser( this: RequestUtils, user: UserData ) {
  * @param  userId The ID of the user.
  */
 async function deleteUser( this: RequestUtils, userId: number ) {
-	// Do not delete main user account.
-	if ( userId === 1 ) {
-		return new Promise( ( resolve ) => {
-			resolve( true );
-		} );
-	}
-
 	const response = await this.rest( {
 		method: 'DELETE',
 		path: `/wp/v2/users/${ userId }`,
@@ -93,7 +86,10 @@ async function deleteAllUsers( this: RequestUtils ) {
 
 	// The users endpoint doesn't support batch request yet.
 	const responses = await Promise.all(
-		users.map( ( user: User ) => deleteUser.bind( this )( user.id ) )
+		users
+			// Do not delete root user.
+			.filter( ( user: User ) => user.id !== 1 )
+			.map( ( user: User ) => deleteUser.bind( this )( user.id ) )
 	);
 
 	return responses;
