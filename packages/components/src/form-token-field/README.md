@@ -60,6 +60,7 @@ The `value` property is handled in a manner similar to controlled form component
 -   `__experimentalExpandOnFocus` - If true, the suggestions list will be always expanded when the input field has the focus.
 -   `__experimentalShowHowTo` - If false, the text on how to use the select (ie: _Separate with commas or the Enter key._) will be hidden.
 -   `__experimentalValidateInput` - If passed, all introduced values will be validated before being added as tokens.
+-   `__experimentalAutoSelectFirstMatch` - If true, the select the first matching suggestion when the user presses the Enter key (or space when tokenizeOnSpace is true).
 
 ## Usage
 
