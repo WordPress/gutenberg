@@ -17,7 +17,7 @@ class Tests_Blocks_RenderComments extends WP_UnitTestCase {
 	 */
 	protected static $post_with_comments_disabled;
 
-	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+	public static function wpSetUpBeforeClass() {
 		$args                              = array(
 			'comment_status' => 'closed',
 		);
