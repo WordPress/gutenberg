@@ -12,10 +12,13 @@ export default function useNavigationMenu( ref ) {
 
 	return useSelect(
 		( select ) => {
-			const [
-				hasResolvedPermissions,
-				{ canCreate, canUpdate, canDelete, isResolving },
-			] = permissions;
+			const {
+				canCreate,
+				canUpdate,
+				canDelete,
+				isResolving,
+				hasResolved,
+			} = permissions;
 
 			const {
 				navigationMenus,
@@ -44,16 +47,16 @@ export default function useNavigationMenu( ref ) {
 
 				canUserCreateNavigationMenu: canCreate,
 				isResolvingCanUserCreateNavigationMenu: isResolving,
-				hasResolvedCanUserCreateNavigationMenu: hasResolvedPermissions,
+				hasResolvedCanUserCreateNavigationMenu: hasResolved,
 
 				canUserUpdateNavigationMenu: canUpdate,
 				hasResolvedCanUserUpdateNavigationMenu: ref
-					? hasResolvedPermissions
+					? hasResolved
 					: undefined,
 
 				canUserDeleteNavigationMenu: canDelete,
 				hasResolvedCanUserDeleteNavigationMenu: ref
-					? hasResolvedPermissions
+					? hasResolved
 					: undefined,
 			};
 		},
