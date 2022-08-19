@@ -614,7 +614,10 @@ function Navigation( {
 								setShouldFocusNavigationSelector( true );
 							} }
 							onSelectClassicMenu={ ( classicMenu ) => {
-								convert( classicMenu.id, classicMenu.name );
+								convertClassicMenu(
+									classicMenu.id,
+									classicMenu.name
+								);
 								setShouldFocusNavigationSelector( true );
 							} }
 							onCreateNew={ () => createNavigationMenu( '', [] ) }
@@ -675,7 +678,10 @@ function Navigation( {
 								setShouldFocusNavigationSelector( true );
 							} }
 							onSelectClassicMenu={ ( classicMenu ) => {
-								convert( classicMenu.id, classicMenu.name );
+								convertClassicMenu(
+									classicMenu.id,
+									classicMenu.name
+								);
 								setShouldFocusNavigationSelector( true );
 							} }
 							onCreateNew={ () => createNavigationMenu( '', [] ) }
