@@ -141,42 +141,46 @@ class WP_Webfonts extends WP_Dependencies {
 	}
 
 	/**
+	 * Removes a variation.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param string $font_family_handle The font family for this variation.
+	 * @param string $variation_handle   The variation's handle to remove.
+	 */
+	public function remove_variation( $font_family_handle, $variation_handle ) {
+		if ( isset( $this->registered[ $variation_handle ] ) ) {
+			$this->remove( $variation_handle );
+		}
+
+		if ( ! $this->is_variation_registered( $font_family_handle, $variation_handle ) ) {
+			return;
+		}
+
+		// Remove the variation as a dependency from its font family.
+		$this->registered[ $font_family_handle ]->deps = array_values(
+			array_diff(
+				$this->registered[ $font_family_handle ]->deps,
+				array( $variation_handle )
+			)
+		);
+	}
+
+	/**
 	 * Checks if the variation is registered.
 	 *
 	 * @since X.X.X
 	 *
 	 * @param string $font_family_handle The font family's handle for this variation.
-	 * @param string $variant_handle      Variation's handle.
-	 * @return bool
+	 * @param string $variation_handle   Variation's handle.
+	 * @return bool True when registered to the given font family. Else false.
 	 */
-	private function is_variation_registered( $font_family_handle, $variant_handle ) {
+	private function is_variation_registered( $font_family_handle, $variation_handle ) {
 		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
-			return array();
+			return false;
 		}
 
-		return in_array( $variant_handle, $this->registered[ $font_family_handle ]->deps );
-	}
-
-	/**
-	 * Removes a variation.
-	 *
-	 * @param $font_family
-	 * @param $variation_handle
-	 */
-	function remove_variation( $font_family, $variation_handle ) {
-		$font_family_handle = sanitize_title( $font_family );
-
-		$this->remove( $variation_handle );
-
-		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
-			return;
-		}
-
-		// Remove the variation as a dependency.
-		$this->registered[ $font_family_handle ]->deps = array_values( array_diff(
-			$this->registered[ $font_family_handle ]->deps,
-			array( $variation_handle )
-		) );
+		return in_array( $variation_handle, $this->registered[ $font_family_handle ]->deps, true );
 	}
 
 	/**
