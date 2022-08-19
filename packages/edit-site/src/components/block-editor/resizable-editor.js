@@ -61,7 +61,7 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 
 			function resizeHeight() {
 				if ( ! timeoutId ) {
-					// Throttle the updates on animation frame.
+					// Throttle the updates on timeout.
 					timeoutId = iframe.contentWindow.setTimeout( () => {
 						const { readyState } = iframe.contentDocument;
 
