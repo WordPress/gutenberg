@@ -36,6 +36,33 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 	protected $id = 'local';
 
 	/**
+	 * Holds a string which contains the type attribute for style tag.
+	 *
+	 * If the active theme does not declare HTML5 support for 'style',
+	 * then it initializes as `type='text/css'`.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @var string
+	 */
+	private $type_attr = '';
+
+	/**
+	 * Constructor.
+	 *
+	 * @since 6.1.0
+	 */
+	public function __construct() {
+		if (
+			function_exists( 'is_admin' ) && ! is_admin()
+			&&
+			function_exists( 'current_theme_supports' ) && ! current_theme_supports( 'html5', 'style' )
+		) {
+			$this->type_attr = " type='text/css'";
+		}
+	}
+
+	/**
 	 * Gets the `@font-face` CSS styles for locally-hosted font files.
 	 *
 	 * This method does the following processing tasks:
@@ -81,7 +108,7 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 	 * }
 	 * </code>
 	 *
-	 * @since 6.0.0
+	 * @since X.X.X
 	 *
 	 * @return string The `@font-face` CSS.
 	 */
@@ -95,6 +122,12 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 			// Build the @font-face CSS for this webfont.
 			$css .= '@font-face{' . $this->build_font_face_css( $webfont ) . '}';
 		}
+
+		$css = sprintf(
+			"<style id='wp-webfonts-local'%s>\n%s\n</style>\n",
+			$this->type_attr,
+			$css
+		);
 
 		return $css;
 	}

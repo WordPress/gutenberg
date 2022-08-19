@@ -6,7 +6,7 @@
  *
  * @package    WordPress
  * @subpackage WebFonts
- * @since      6.0.0
+ * @since      X.X.X
  */
 
 if ( class_exists( 'WP_Webfonts_Provider' ) ) {
@@ -30,14 +30,14 @@ if ( class_exists( 'WP_Webfonts_Provider' ) ) {
  * into styles (in a performant way for the provider service
  * it manages).
  *
- * @since 6.0.0
+ * @since X.X.X
  */
 abstract class WP_Webfonts_Provider {
 
 	/**
 	 * Webfonts to be processed.
 	 *
-	 * @since 6.0.0
+	 * @since X.X.X
 	 *
 	 * @var array[]
 	 */
@@ -49,7 +49,7 @@ abstract class WP_Webfonts_Provider {
 	 * The API's Controller passes this provider's webfonts
 	 * for processing here in the provider.
 	 *
-	 * @since 6.0.0
+	 * @since X.X.X
 	 *
 	 * @param array[] $webfonts Registered webfonts.
 	 */
@@ -64,9 +64,18 @@ abstract class WP_Webfonts_Provider {
 	 * needed `@font-face` CSS for all of its webfonts. Specifics of how
 	 * this processing is done is contained in each provider.
 	 *
-	 * @since 6.0.0
+	 * @since X.X.X
 	 *
 	 * @return string The `@font-face` CSS.
 	 */
 	abstract public function get_css();
+
+	/**
+	 * Prints the generated styles.
+	 *
+	 * @since X.X.X
+	 */
+	public function print_styles() {
+		echo $this->get_css();
+	}
 }

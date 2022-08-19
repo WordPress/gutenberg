@@ -7,7 +7,7 @@
  */
 
 /**
- * @group  webfonts
+ * @group webfonts
  */
 class Tests_Webfonts_WpWebfontsProviderLocal extends WP_UnitTestCase {
 	private $provider;

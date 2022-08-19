@@ -12,6 +12,25 @@ class WP_Webfonts extends WP_Dependencies {
 	private $providers = array();
 
 	/**
+	 * The flipped $to_do array of web font handles.
+	 *
+	 * Used for a faster lookup of the web font handles.
+	 *
+	 * @since X.X.X
+	 *
+	 * @var string[]
+	 */
+	private $to_do_keyed_handles;
+
+	/**
+	 * Array of provider instances, keyed by provider ID.
+	 *
+	 * @since X.X.X
+	 *
+	 * @var array
+	 */
+	private $provider_instances = array();
+	/**
 	 * Constructor.
 	 *
 	 * @since X.X.X
@@ -218,6 +237,7 @@ class WP_Webfonts extends WP_Dependencies {
 	private function validate_variation( $font_family_handle, $variation ) {
 		$defaults = array(
 			'provider'     => 'local',
+			'font-family'  => $font_family_handle,
 			'font-style'   => 'normal',
 			'font-weight'  => '400',
 			'font-display' => 'fallback',
@@ -235,8 +255,11 @@ class WP_Webfonts extends WP_Dependencies {
 				trigger_error( 'Webfont src must be a non-empty string or an array of strings.' );
 				return false;
 			}
-		} elseif ( ! class_exists( $variation['provider'] ) ) {
-			trigger_error( 'The provider class specified does not exist.' );
+		} elseif ( ! isset( $this->providers[ $variation['provider'] ] ) ) {
+			trigger_error( sprintf( 'The provider "%s" is not registered', $variation['provider'] ) );
+			return false;
+		} elseif ( ! class_exists( $this->providers[ $variation['provider'] ]['class'] ) ) {
+			trigger_error( sprintf( 'The provider class "%s" does not exist', $variation['provider'] ) );
 			return false;
 		}
 
@@ -291,58 +314,210 @@ class WP_Webfonts extends WP_Dependencies {
 	}
 
 	/**
-	 * Generate styles for webfonts.
+	 * Processes the items and dependencies.
 	 *
-	 * @since 6.0.0
+	 * Processes the items passed to it or the queue, and their dependencies.
 	 *
-	 * @param array[] $webfonts_by_provider Webfonts organized by provider.
-	 * @return string $styles Generated styles.
+	 * @since X.X.X
+	 *
+	 * @param string|string[]|false $handles Optional. Items to be processed: queue (false),
+	 *                                       single item (string), or multiple items (array of strings).
+	 *                                       Default false.
+	 * @param int|false             $group   Optional. Group level: level (int), no group (false).
+	 *
+	 * @return array|string[] Array of web font handles that have been processed.
+	 *                        An empty array if none were processed.
 	 */
-	public function do_item( $handle, $group = false ) {
-		if ( ! parent::do_item( $handle ) ) {
+	public function do_items( $handles = false, $group = false ) {
+		$handles = $this->prep_handles_for_printing( $handles );
+		if ( empty( $handles ) ) {
+			return $this->done;
+		}
+
+		$this->all_deps( $handles );
+		if ( empty( $this->to_do ) ) {
+			return $this->done;
+		}
+
+		$this->to_do_keyed_handles = array_flip( $this->to_do );
+
+		foreach ( $this->get_providers() as $provider_id => $provider ) {
+			// Alert and skip if the provider class does not exist.
+			if ( ! class_exists( $provider['class'] ) ) {
+				/* translators: %s is the provider name. */
+				trigger_error(
+					sprintf(
+						'Class "%s" not found for "%s" web font provider',
+						$provider['class'],
+						$provider_id
+					)
+				);
+				continue;
+			}
+
+			$this->do_item( $provider_id, $group );
+		}
+
+		return $this->done;
+	}
+
+	/**
+	 * Prepares the given handles for printing.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param string|string[]|bool $handles Handles to prepare.
+	 * @return array Array of handles.
+	 */
+	private function prep_handles_for_printing( $handles = false ) {
+		if ( false !== $handles ) {
+			$handles = $this->validate_handles( $handles );
+			// Bail out when invalid.
+			if ( null === $handles ) {
+				return array();
+			}
+		}
+
+		// Use the enqueued queue.
+		if ( empty( $handles ) ) {
+			if ( empty( $this->queue ) ) {
+				trigger_error( 'No web fonts are enqueued for printing' );
+
+				return array();
+			}
+			$handles = $this->queue;
+		}
+
+		return $handles;
+	}
+
+	/**
+	 * Validates handle(s) to ensure each is a non-empty string.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param mixed $handles Handle or handles to be validated.
+	 * @return string[]|null Array of handles on success. Else null.
+	 */
+	private function validate_handles( $handles ) {
+		// Validate each element is a non-empty string handle.
+		$handles = array_filter(
+			(array) $handles,
+			static function( $handle ) {
+				return is_string( $handle ) && ! empty( $handle );
+			}
+		);
+
+		if ( empty( $handles ) ) {
+			trigger_error( 'Handles must be a non-empty string or array of non-empty strings' );
+			return null;
+		}
+
+		return $handles;
+	}
+
+	/**
+	 * Invokes each provider to process and print its styles.
+	 *
+	 * @since X.X.X
+	 *
+	 * @see WP_Dependencies::do_item()
+	 *
+	 * @param string    $provider_id The font family to process.
+	 * @param int|false $group       Not used.
+	 * @return bool
+	 */
+	public function do_item( $provider_id, $group = false ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		// Bail out if the provider is not registered.
+		if ( ! isset( $this->providers[ $provider_id ] ) ) {
 			return false;
 		}
 
-		$styles    = '';
-		$providers = $this->get_providers();
-
-		$obj = $this->registered[ $handle ];
-
-		/*
-		 * Loop through each of the providers to get the CSS for their respective webfonts
-		 * to incrementally generate the collective styles for all of them.
-		 */
-		foreach ( $providers as $provider_id => $provider ) {
-			// Bail out if the provider class does not exist.
-			if ( ! class_exists( $provider['class'] ) ) {
-				/* translators: %s is the provider name. */
-				trigger_error( sprintf( __( 'Webfont provider "%s" is not registered.', 'gutenberg' ), $provider_id ) );
-				continue;
-			}
-
-			$fonts = $this->get_enqueued_fonts_for_provider( $provider_id );
-
-			// If there are no registered webfonts for this provider, skip it.
-			if ( empty( $fonts ) ) {
-				continue;
-			}
-
-			$provider_fonts = array();
-
-			foreach ( $fonts as $font_handle ) {
-				$provider_fonts[ $font_handle ] = $this->get_data( $font_handle, 'font-properties' );
-			}
-
-			/*
-			 * Process the webfonts by first passing them to the provider via `set_webfonts()`
-			 * and then getting the CSS from the provider.
-			 */
-			$provider = new $provider['class']();
-			$provider->set_webfonts( $provider_fonts );
-			$styles .= $provider->get_css();
+		$font_handles = $this->get_enqueued_fonts_for_provider( $provider_id );
+		if ( empty( $font_handles ) ) {
+			return false;
 		}
 
-		return $styles;
+		$properties_by_font = $this->get_font_properties_for_provider( $font_handles );
+		if ( empty( $properties_by_font ) ) {
+			return false;
+		}
+
+		// Invoke provider to print its styles.
+		if ( isset( $this->provider_instances[ $provider_id ] ) ) {
+			$provider = $this->provider_instances[ $provider_id ];
+		} else {
+			$provider = new $this->providers[ $provider_id ]['class']();
+			// Store the instance.
+			$this->provider_instances[ $provider_id ] = $provider;
+		}
+		$provider->set_webfonts( $properties_by_font );
+		$provider->print_styles();
+
+		// Clean up.
+		$this->update_queues_for_printed_fonts( $font_handles );
+
+		return true;
+	}
+
+	/**
+	 * Retrieves a list of enqueued web font variations for a provider.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param string $provider_id Provider's unique ID.
+	 * @return array[] Webfonts organized by providers.
+	 */
+	private function get_enqueued_fonts_for_provider( $provider_id ) {
+		$providers = $this->get_providers();
+
+		if ( empty( $providers[ $provider_id ] ) ) {
+			return array();
+		}
+
+		return array_intersect(
+			$providers[ $provider_id ]['fonts'],
+			$this->to_do
+		);
+	}
+
+	/**
+	 * Gets a list of font properties for each of the given font handles.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param array $font_handles Font handles to get properties.
+	 * @return array A list of fonts with each font's properties.
+	 */
+	private function get_font_properties_for_provider( array $font_handles ) {
+		$font_properties = array();
+
+		foreach ( $font_handles as $font_handle ) {
+			$properties = $this->get_data( $font_handle, 'font-properties' );
+			if ( ! $properties ) {
+				continue;
+			}
+			$font_properties[ $font_handle ] = $properties;
+		}
+
+		return $font_properties;
+	}
+
+	/**
+	 * Update queues for the given printed fonts.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param array $font_handles Font handles to get properties.
+	 */
+	private function update_queues_for_printed_fonts( array $font_handles ) {
+		foreach ( $font_handles as $font_handle ) {
+			$this->done[] = $font_handle;
+			unset(
+				$this->to_do[ $this->to_do_keyed_handles[ $font_handle ] ],
+				$this->to_do_keyed_handles[ $font_handle ]
+			);
+		}
 	}
 
 	/**
@@ -365,23 +540,4 @@ class WP_Webfonts extends WP_Dependencies {
 		);
 		return true;
 	}
-
-	/**
-	 * Retrieves a list of enqueued web font variations for a provider.
-	 *
-	 * @return array[] Webfonts organized by providers.
-	 */
-	private function get_enqueued_fonts_for_provider( $provider ) {
-		$providers = $this->get_providers();
-
-		if ( empty( $providers[ $provider ] ) ) {
-			return array();
-		}
-
-		return array_intersect(
-			$providers[ $provider ]['fonts'],
-			$this->get_enqueued()
-		);
-	}
-
 }

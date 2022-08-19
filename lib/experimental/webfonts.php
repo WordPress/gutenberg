@@ -260,15 +260,19 @@ if ( ! function_exists( 'wp_get_webfont_providers' ) ) {
 }
 
 if ( ! function_exists( 'wp_print_webfonts' ) ) {
+	/**
+	 * Invokes each provider to process and print its styles.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param string|string[]|false $handles Optional. Items to be processed: queue (false),
+	 *                                       single item (string), or multiple items (array of strings).
+	 *                                       Default false.
+	 * @return array|string[] Array of web font handles that have been processed.
+	 *                        An empty array if none were processed.
+	 */
 	function wp_print_webfonts( $handles = false ) {
 		global $wp_webfonts;
-
-		/**
-		 * Fires before webfonts in the $handles queue are printed.
-		 *
-		 * @since X.X.X
-		 */
-		do_action( 'wp_print_webfonts' );
 
 		if ( '' === $handles ) { // For 'wp_head'.
 			$handles = false;
@@ -286,14 +290,8 @@ if ( ! function_exists( 'wp_print_webfonts' ) ) {
 	}
 }
 
-
-
-
-
-
-
-
-
+add_action( 'admin_print_styles', 'wp_print_webfonts' );
+add_action( 'wp_head', 'wp_print_webfonts' );
 
 /**
  * Add webfonts mime types.

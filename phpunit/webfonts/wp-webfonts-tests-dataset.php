@@ -278,7 +278,7 @@ trait WP_Webfonts_Tests_Datasets {
 				),
 			),
 			'provider does not exist'         => array(
-				'expected'           => 'The provider class specified does not exist.',
+				'expected'           => 'The provider "doesnotexit" is not registered',
 				'font_family_handle' => 'merriweather',
 				'variation'          => array(
 					'provider'    => 'doesnotexit',
@@ -540,6 +540,219 @@ trait WP_Webfonts_Tests_Datasets {
 		);
 	}
 
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_print_enqueued() {
+		$providers          = $this->get_provider_definitions();
+		$mock_fonts         = $this->get_registered_mock_fonts();
+		$mock_font_handles  = $this->get_handles_for_provider( $mock_fonts, 'mock' );
+		$local_fonts        = $this->get_registered_local_fonts();
+		$local_font_handles = $this->get_handles_for_provider( $local_fonts, 'local' );
+		$font_faces         = $this->get_registered_fonts_css();
+
+		$all_variation_handles = array_merge( $mock_font_handles, $local_font_handles );
+		$setup_all             = array(
+			'provider'         => array(
+				'local' => $providers['local'],
+				'mock'  => $providers['mock'],
+			),
+			'provider_handles' => array(
+				'local' => $local_font_handles,
+				'mock'  => $mock_font_handles,
+			),
+			'registered'       => array_merge( $mock_fonts, $local_fonts ),
+		);
+
+		return array(
+
+			// One provider registered with multiple fonts.
+
+			'print font2 for mock provider'             => array(
+				'setup'           => array(
+					'provider'         => array( 'mock' => $providers['mock'] ),
+					'provider_handles' => array( 'mock' => $mock_font_handles ),
+					'registered'       => $mock_fonts,
+					'enqueued'         => array( 'font2' ),
+				),
+				'expected_done'   => array( 'font2-200-900-normal', 'font2-200-900-italic' ),
+				'expected_output' => sprintf(
+					'<mock id="wp-webfonts-mock" attr="some-attr">%s; %s</mock>\n',
+					$font_faces['font2-200-900-normal'],
+					$font_faces['font2-200-900-italic']
+				),
+			),
+			'print all fonts for mock provider'         => array(
+				'setup'           => array(
+					'provider'         => array( 'mock' => $providers['mock'] ),
+					'provider_handles' => array( 'mock' => $mock_font_handles ),
+					'registered'       => $mock_fonts,
+					'enqueued'         => array( 'font1', 'font2', 'font3' ),
+				),
+				'expected_done'   => $mock_font_handles,
+				'expected_output' => sprintf(
+					'<mock id="wp-webfonts-mock" attr="some-attr">%s; %s; %s; %s; %s; %s</mock>\n',
+					$font_faces['font1-300-normal'],
+					$font_faces['font1-300-italic'],
+					$font_faces['font1-900-normal'],
+					$font_faces['font2-200-900-normal'],
+					$font_faces['font2-200-900-italic'],
+					$font_faces['font3-bold-normal']
+				),
+			),
+			'print merriweather for local provider'     => array(
+				'setup'           => array(
+					'provider'         => array( 'local' => $providers['local'] ),
+					'provider_handles' => array( 'local' => $local_font_handles ),
+					'registered'       => $local_fonts,
+					'enqueued'         => array( 'merriweather' ),
+				),
+				'expected_done'   => array( 'merriweather-200-900-normal' ),
+				'expected_output' => sprintf(
+					"<style id='wp-webfonts-local' type='text/css'>\n%s\n</style>\n",
+					$font_faces['merriweather-200-900-normal']
+				),
+			),
+			'print Source Serif Pro for local provider' => array(
+				'setup'           => array(
+					'provider'         => array( 'local' => $providers['local'] ),
+					'provider_handles' => array( 'local' => $local_font_handles ),
+					'registered'       => $local_fonts,
+					'enqueued'         => array( 'Source Serif Pro' ),
+				),
+				'expected_done'   => array( 'Source Serif Pro-300-normal', 'Source Serif Pro-900-italic' ),
+				'expected_output' => sprintf(
+					"<style id='wp-webfonts-local' type='text/css'>\n%s%s\n</style>\n",
+					$font_faces['Source Serif Pro-300-normal'],
+					$font_faces['Source Serif Pro-900-italic']
+				),
+			),
+			'print all fonts for local provider'        => array(
+				'setup'           => array(
+					'provider'         => array( 'local' => $providers['local'] ),
+					'provider_handles' => array( 'local' => $local_font_handles ),
+					'registered'       => $local_fonts,
+					'enqueued'         => $local_font_handles,
+				),
+				'expected_done'   => array( 'merriweather-200-900-normal', 'Source Serif Pro-300-normal', 'Source Serif Pro-900-italic' ),
+				'expected_output' => sprintf(
+					"<style id='wp-webfonts-local' type='text/css'>\n%s%s%s\n</style>\n",
+					$font_faces['merriweather-200-900-normal'],
+					$font_faces['Source Serif Pro-300-normal'],
+					$font_faces['Source Serif Pro-900-italic']
+				),
+			),
+
+			// All providers registered with multiple fonts.
+
+			'print font1 when all providers registered' => array(
+				'setup'           => array_merge( $setup_all, array( 'enqueued' => array( 'font1' ) ) ),
+				'expected_done'   => array( 'font1-300-normal', 'font1-300-italic', 'font1-900-normal' ),
+				'expected_output' => sprintf(
+					'<mock id="wp-webfonts-mock" attr="some-attr">%s; %s; %s</mock>\n',
+					$font_faces['font1-300-normal'],
+					$font_faces['font1-300-italic'],
+					$font_faces['font1-900-normal']
+				),
+			),
+			'print all mock fonts when all providers registered' => array(
+				'setup'           => array_merge( $setup_all, array( 'enqueued' => array( 'font1', 'font2', 'font3' ) ) ),
+				'expected_done'   => $mock_font_handles,
+				'expected_output' => sprintf(
+					'<mock id="wp-webfonts-mock" attr="some-attr">%s; %s; %s; %s; %s; %s</mock>\n',
+					$font_faces['font1-300-normal'],
+					$font_faces['font1-300-italic'],
+					$font_faces['font1-900-normal'],
+					$font_faces['font2-200-900-normal'],
+					$font_faces['font2-200-900-italic'],
+					$font_faces['font3-bold-normal']
+				),
+			),
+			'print merriweather when all providers registered' => array(
+				'setup'           => array_merge( $setup_all, array( 'enqueued' => array( 'merriweather' ) ) ),
+				'expected_done'   => array( 'merriweather-200-900-normal' ),
+				'expected_output' => sprintf(
+					"<style id='wp-webfonts-local' type='text/css'>\n%s\n</style>\n",
+					$font_faces['merriweather-200-900-normal']
+				),
+			),
+			'print all local fonts when all providers registered' => array(
+				'setup'           => array_merge( $setup_all, array( 'enqueued' => $local_font_handles ) ),
+				'expected_done'   => array( 'merriweather-200-900-normal', 'Source Serif Pro-300-normal', 'Source Serif Pro-900-italic' ),
+				'expected_output' => sprintf(
+					"<style id='wp-webfonts-local' type='text/css'>\n%s%s%s\n</style>\n",
+					$font_faces['merriweather-200-900-normal'],
+					$font_faces['Source Serif Pro-300-normal'],
+					$font_faces['Source Serif Pro-900-italic']
+				),
+			),
+
+			'print all fonts for all providers'         => array(
+				'setup'           => array_merge( $setup_all, array( 'enqueued' => $all_variation_handles ) ),
+				'expected_done'   => $all_variation_handles,
+				'expected_output' =>
+					sprintf(
+						"<style id='wp-webfonts-local' type='text/css'>\n%s%s%s\n</style>\n",
+						$font_faces['merriweather-200-900-normal'],
+						$font_faces['Source Serif Pro-300-normal'],
+						$font_faces['Source Serif Pro-900-italic']
+					) .
+					sprintf(
+						'<mock id="wp-webfonts-mock" attr="some-attr">%s; %s; %s; %s; %s; %s</mock>\n',
+						$font_faces['font1-300-normal'],
+						$font_faces['font1-300-italic'],
+						$font_faces['font1-900-normal'],
+						$font_faces['font2-200-900-normal'],
+						$font_faces['font2-200-900-italic'],
+						$font_faces['font3-bold-normal']
+					),
+			),
+
+			// Specific variations enqueued.
+			// Validates that only these specific variations print once.
+
+			'specific variation: 1 local'               => array(
+				'setup'           => array_merge( $setup_all, array( 'enqueued' => array( 'merriweather-200-900-normal' ) ) ),
+				'expected_done'   => array( 'merriweather-200-900-normal' ),
+				'expected_output' => sprintf(
+					"<style id='wp-webfonts-local' type='text/css'>\n%s\n</style>\n",
+					$font_faces['merriweather-200-900-normal']
+				),
+			),
+			'specific variation: 1 local from different font families' => array(
+				'setup'           => array_merge( $setup_all, array( 'enqueued' => array( 'merriweather-200-900-normal', 'Source Serif Pro-900-italic' ) ) ),
+				'expected_done'   => array( 'merriweather-200-900-normal', 'Source Serif Pro-900-italic' ),
+				'expected_output' => sprintf(
+					"<style id='wp-webfonts-local' type='text/css'>\n%s%s\n</style>\n",
+					$font_faces['merriweather-200-900-normal'],
+					$font_faces['Source Serif Pro-900-italic']
+				),
+			),
+			'specific variation: 1 local and 1 mock'    => array(
+				'setup'           => array_merge( $setup_all, array( 'enqueued' => array( 'merriweather-200-900-normal', 'font2-200-900-normal' ) ) ),
+				'expected_done'   => array( 'merriweather-200-900-normal', 'font2-200-900-normal' ),
+				'expected_output' => sprintf(
+					"<style id='wp-webfonts-local' type='text/css'>\n%s\n</style>\n" .
+					'<mock id="wp-webfonts-mock" attr="some-attr">%s</mock>\n',
+					$font_faces['merriweather-200-900-normal'],
+					$font_faces['font2-200-900-normal']
+				),
+			),
+			'specific variation: 1 mock and 1 local'    => array(
+				'setup'           => array_merge( $setup_all, array( 'enqueued' => array( 'font2-200-900-normal', 'Source Serif Pro-300-normal' ) ) ),
+				'expected_done'   => array( 'font2-200-900-normal', 'Source Serif Pro-300-normal' ),
+				'expected_output' => sprintf(
+					"<style id='wp-webfonts-local' type='text/css'>\n%s\n</style>\n" .
+					'<mock id="wp-webfonts-mock" attr="some-attr">%s</mock>\n',
+					$font_faces['Source Serif Pro-300-normal'],
+					$font_faces['font2-200-900-normal']
+				),
+			),
+		);
+	}
+
 	protected function get_data_registry() {
 		return array(
 			'lato'             => array(),
@@ -581,6 +794,186 @@ trait WP_Webfonts_Tests_Datasets {
 				'my-font-900-normal' => array(
 					'font-weight' => '900',
 					'src'         => 'https://example.com/assets/fonts/my-font.ttf.woff2',
+				),
+			),
+		);
+	}
+
+	/**
+	 * Gets the provider definitions.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param string $provider_id Optional. Provider ID to get. Default empty string.
+	 * @return array
+	 */
+	protected function get_provider_definitions( $provider_id = '' ) {
+		$providers = array(
+			'mock'  => array(
+				'id'    => 'mock',
+				'class' => Mock_Provider::class,
+			),
+			'local' => array(
+				'id'    => 'local',
+				'class' => WP_Webfonts_Provider_Local::class,
+			),
+		);
+
+		if ( '' === $provider_id ) {
+			return $providers;
+		}
+
+		if ( isset( $providers[ $provider_id ] ) ) {
+			return $providers[ $provider_id ];
+		}
+
+		return array(
+			'id'    => $provider_id,
+			'class' => '',
+		);
+	}
+
+	/**
+	 * Gets web font definitions for both local and mock providers.
+	 *
+	 * @since X.X.X
+	 *
+	 * @return array|string[][][]
+	 */
+	protected function get_registered_fonts() {
+		return array_merge(
+			$this->get_registered_local_fonts(),
+			$this->get_registered_mock_fonts()
+		);
+	}
+
+	/**
+	 * Returns an array of font-face styles that matches the font definitions
+	 * in get_registered_local_fonts() and get_registered_mock_fonts().
+	 *
+	 * @since X.X.X
+	 *
+	 * @return string[]
+	 */
+	protected function get_registered_fonts_css() {
+		return array(
+			'merriweather-200-900-normal' => <<<CSS
+@font-face{font-family:Merriweather;font-style:normal;font-weight:200 900;font-display:fallback;font-stretch:normal;src:local(Merriweather), url('https://example.com/assets/fonts/merriweather.ttf.woff2') format('woff2');}
+CSS
+		,
+			'Source Serif Pro-300-normal' => <<<CSS
+@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:300;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');}
+CSS
+		,
+			'Source Serif Pro-900-italic' => <<<CSS
+@font-face{font-family:"Source Serif Pro";font-style:italic;font-weight:900;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2') format('woff2');}
+CSS
+		,
+			'font1-300-normal'            => 'font1-300-normal',
+			'font1-300-italic'            => 'font1-300-italic',
+			'font1-900-normal'            => 'font1-900-normal',
+			'font2-200-900-normal'        => 'font2-200-900-normal',
+			'font2-200-900-italic'        => 'font2-200-900-italic',
+			'font3-bold-normal'           => 'font3-bold-normal',
+		);
+	}
+
+	/**
+	 * Gets web font definitions for local provider.
+	 *
+	 * @since X.X.X
+	 *
+	 * @return string[][][]
+	 */
+	protected function get_registered_local_fonts() {
+		return array(
+			'lato'             => array(),
+			'merriweather'     => array(
+				'merriweather-200-900-normal' => array(
+					'provider'     => 'local',
+					'font-family'  => 'Merriweather',
+					'font-style'   => 'normal',
+					'font-weight'  => '200 900',
+					'font-display' => 'fallback',
+					'font-stretch' => 'normal',
+					'src'          => 'https://example.com/assets/fonts/merriweather.ttf.woff2',
+				),
+			),
+			'Source Serif Pro' => array(
+				'Source Serif Pro-300-normal' => array(
+					'provider'     => 'local',
+					'font-family'  => 'Source Serif Pro',
+					'font-style'   => 'normal',
+					'font-weight'  => '300',
+					'font-display' => 'fallback',
+					'font-stretch' => 'normal',
+					'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
+					'font-display' => 'fallback',
+				),
+				'Source Serif Pro-900-italic' => array(
+					'provider'     => 'local',
+					'font-family'  => 'Source Serif Pro',
+					'font-style'   => 'italic',
+					'font-weight'  => '900',
+					'font-display' => 'fallback',
+					'font-stretch' => 'normal',
+					'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2',
+					'font-display' => 'fallback',
+				),
+			),
+		);
+	}
+
+	/**
+	 * Gets web font definitions for mock provider.
+	 *
+	 * @since X.X.X
+	 *
+	 * @return string[][][]
+	 */
+	protected function get_registered_mock_fonts() {
+		return array(
+			'font1' => array(
+				'font1-300-normal' => array(
+					'provider'     => 'mock',
+					'font-weight'  => '300',
+					'font-style'   => 'normal',
+					'font-display' => 'fallback',
+				),
+				'font1-300-italic' => array(
+					'provider'     => 'mock',
+					'font-weight'  => '300',
+					'font-style'   => 'italic',
+					'font-display' => 'fallback',
+				),
+				'font1-900-normal' => array(
+					'provider'     => 'mock',
+					'font-weight'  => '900',
+					'font-style'   => 'normal',
+					'font-display' => 'fallback',
+				),
+			),
+			'font2' => array(
+				'font2-200-900-normal' => array(
+					'provider'     => 'mock',
+					'font-weight'  => '200 900',
+					'font-style'   => 'normal',
+					'font-display' => 'fallback',
+				),
+				'font2-200-900-italic' => array(
+					'provider'     => 'mock',
+					'font-weight'  => '200 900',
+					'font-style'   => 'italic',
+					'font-display' => 'fallback',
+				),
+			),
+			'font3' => array(
+				'font3-bold-normal' => array(
+					'provider'     => 'mock',
+					'font-weight'  => 'bold',
+					'font-style'   => 'normal',
+					'font-display' => 'fallback',
+					'font-stretch' => 'normal',
 				),
 			),
 		);

@@ -21,6 +21,13 @@ abstract class WP_Webfonts_TestCase extends WP_UnitTestCase {
 	 */
 	private $old_wp_webfonts;
 
+	/**
+	 * Reflection data store for non-public property access.
+	 *
+	 * @var ReflectionProperty[]
+	 */
+	protected $property = array();
+
 	public function set_up() {
 		parent::set_up();
 
@@ -29,20 +36,26 @@ abstract class WP_Webfonts_TestCase extends WP_UnitTestCase {
 	}
 
 	public function tear_down() {
+		$this->property         = array();
 		$GLOBALS['wp_webfonts'] = $this->old_wp_webfonts;
 		parent::tear_down();
 	}
 
 	protected function set_up_mock( $method ) {
-		if ( is_string( $method ) ) {
-			$method = array( $method );
-		}
-		$mock = $this->getMockBuilder( WP_Webfonts::class )->setMethods( $method )->getMock();
+		$mock = $this->setup_object_mock( $method, WP_Webfonts::class );
 
 		// Set the global.
 		$GLOBALS['wp_webfonts'] = $mock;
 
 		return $mock;
+	}
+
+	protected function setup_object_mock( $method, $class ) {
+		if ( is_string( $method ) ) {
+			$method = array( $method );
+		}
+
+		return $this->getMockBuilder( $class )->setMethods( $method )->getMock();
 	}
 
 	protected function get_registered_handles() {
@@ -57,6 +70,7 @@ abstract class WP_Webfonts_TestCase extends WP_UnitTestCase {
 		if ( ! ( $wp_webfonts instanceof WP_Webfonts ) ) {
 			$wp_webfonts = wp_webfonts();
 		}
+
 		return $wp_webfonts->registered[ $font_family ]->deps;
 	}
 
@@ -68,14 +82,49 @@ abstract class WP_Webfonts_TestCase extends WP_UnitTestCase {
 		return $this->get_property_value( 'queued_before_register', WP_Dependencies::class, $wp_webfonts );
 	}
 
-	protected function get_property_value( $property_name, $class, $wp_webfonts = null ) {
+	protected function get_reflection_property( $property_name, $class = 'WP_Webfonts' ) {
 		$property = new ReflectionProperty( $class, $property_name );
 		$property->setAccessible( true );
+
+		return $property;
+	}
+
+	protected function get_property_value( $property_name, $class, $wp_webfonts = null ) {
+		$property = $this->get_reflection_property( $property_name, $class );
 
 		if ( ! $wp_webfonts ) {
 			$wp_webfonts = wp_webfonts();
 		}
+
 		return $property->getValue( $wp_webfonts );
+	}
+
+	protected function setup_property( $class, $property_name ) {
+		$key = $this->get_property_key( $class, $property_name );
+
+		if ( ! isset( $this->property[ $key ] ) ) {
+			$this->property[ $key ] = new ReflectionProperty( $class, 'providers' );
+			$this->property[ $key ]->setAccessible( true );
+		}
+
+		return $this->property[ $key ];
+	}
+
+	protected function get_property_key( $class, $property_name ) {
+		return $class . '::$' . $property_name;
+	}
+
+	/**
+	 * Opens the accessibility to access the given private or protected method.
+	 *
+	 * @param string $method_name Name of the method to open.
+	 * @return ReflectionMethod Instance of the method, ie to invoke it in the test.
+	 */
+	protected function get_reflection_method( $method_name ) {
+		$method = new ReflectionMethod( WP_Webfonts::class, $method_name );
+		$method->setAccessible( true );
+
+		return $method;
 	}
 
 	/**
@@ -88,7 +137,7 @@ abstract class WP_Webfonts_TestCase extends WP_UnitTestCase {
 	protected function setup_registration_mocks( array $inputs, WP_Webfonts $wp_webfonts ) {
 		$mocks = array();
 
-		$build_mock = function( $handle ) use ( &$mocks, $wp_webfonts ) {
+		$build_mock = function ( $handle ) use ( &$mocks, $wp_webfonts ) {
 			$mock       = new stdClass();
 			$mock->deps = array();
 			// Add to each queue.
@@ -105,8 +154,9 @@ abstract class WP_Webfonts_TestCase extends WP_UnitTestCase {
 				if ( ! is_string( $variation_handle ) ) {
 					$variation_handle = $variation;
 				}
-				$build_mock( $variation_handle );
-				$font_mock->deps[] = $variation_handle;
+				$variation_mock        = $build_mock( $variation_handle );
+				$variation_mock->extra = array( 'font-properties' => $variation );
+				$font_mock->deps[]     = $variation_handle;
 			}
 		}
 
@@ -133,5 +183,56 @@ abstract class WP_Webfonts_TestCase extends WP_UnitTestCase {
 			}
 			$wp_webfonts->add_variation( $font_family, $variation, $variation_handle );
 		}
+	}
+
+	/**
+	 * Sets up the WP_Webfonts::$provider property.
+	 *
+	 * @param WP_Webfonts  $wp_webfonts  Instance of WP_Webfonts.
+	 * @param string|array $provider     Provider ID when string. Else provider definition with 'id' and 'class' keys.
+	 * @param array        $font_handles Optional. Font handles for this provider.
+	 */
+	protected function setup_provider_property_mock( WP_Webfonts $wp_webfonts, $provider, array $font_handles = array() ) {
+		if ( is_string( $provider ) ) {
+			$provider = $this->get_provider_definitions( $provider );
+		}
+
+		$property  = $this->setup_property( WP_Webfonts::class, 'providers' );
+		$providers = $property->getValue( $wp_webfonts );
+
+		if ( ! isset( $providers[ $provider['id'] ] ) ) {
+			$providers[ $provider['id'] ] = array(
+				'class' => $provider['class'],
+				'fonts' => $font_handles,
+			);
+		} else {
+			$providers[ $provider['id'] ] = array_merge( $font_handles, $providers[ $provider['id'] ]['fonts'] );
+		}
+
+		$property->setValue( $wp_webfonts, $providers );
+	}
+
+	/**
+	 * Gets the variation handles for the provider from the given fonts.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param array  $fonts       Fonts definitions keyed by font family.
+	 * @param string $provider_id Provider ID.
+	 * @return array|string[] Array of handles on success. Else empty array.
+	 */
+	protected function get_handles_for_provider( array $fonts, $provider_id ) {
+		$handles = array();
+
+		foreach ( $fonts as $variations ) {
+			foreach ( $variations as $variation_handle => $variation ) {
+				if ( $provider_id !== $variation['provider'] ) {
+					continue;
+				}
+				$handles[] = $variation_handle;
+			}
+		}
+
+		return $handles;
 	}
 }
