@@ -20,13 +20,17 @@ if ( ! function_exists( 'gutenberg_register_webfonts_from_theme_json' ) ) {
 			foreach ( $variations as $variation ) {
 
 				// Sanity check: Skip if fontFamilies are not defined in the variation.
-				if ( empty( $variation['settings'] ) || empty( $variation['settings']['typography'] ) || empty( $variation['settings']['typography']['fontFamilies'] ) ) {
+				if (
+					empty( $variation['settings'] ) ||
+					empty( $variation['settings']['typography'] ) ||
+					empty( $variation['settings']['typography']['fontFamilies'] )
+				) {
 					continue;
 				}
 
 				// Merge the variation settings with the global settings.
-				$settings['typography'] = empty( $settings['typography'] ) ? array() : $settings['typography'];
-				$settings['typography']['fontFamilies'] = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies'];
+				$settings['typography']                          = empty( $settings['typography'] ) ? array() : $settings['typography'];
+				$settings['typography']['fontFamilies']          = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies'];
 				$settings['typography']['fontFamilies']['theme'] = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies']['theme'];
 				$settings['typography']['fontFamilies']['theme'] = array_merge( $settings['typography']['fontFamilies']['theme'], $variation['settings']['typography']['fontFamilies']['theme'] );
 
@@ -41,6 +45,7 @@ if ( ! function_exists( 'gutenberg_register_webfonts_from_theme_json' ) ) {
 		}
 
 		$webfonts = array();
+		$handles  = array();
 
 		// Look for fontFamilies.
 		foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
@@ -74,33 +79,34 @@ if ( ! function_exists( 'gutenberg_register_webfonts_from_theme_json' ) ) {
 
 					// Convert keys to kebab-case.
 					foreach ( $font_face as $property => $value ) {
-						$kebab_case = _wp_to_kebab_case( $property );
+						$kebab_case               = _wp_to_kebab_case( $property );
 						$font_face[ $kebab_case ] = $value;
 						if ( $kebab_case !== $property ) {
 							unset( $font_face[ $property ] );
 						}
 					}
 
-					$webfonts[] = $font_face;
+					$font_family = WP_Webfonts_Utils::get_font_family_from_variation( $font_face );
+					if ( empty( $font_family_handle ) ) {
+						$font_family = $font_family['slug'];
+					}
+					$font_family_handle = WP_Webfonts_Utils::convert_font_family_into_handle( $font_family );
+					if ( is_null( $font_family_handle ) ) {
+						_doing_it_wrong( __FUNCTION__, __( 'Font family not defined in the variation or "slug".', 'gutenberg' ), '6.1.0' );
+					}
+
+					$handles[] = $font_family_handle;
+					if ( ! array_key_exists( $font_family_handle, $webfonts ) ) {
+						$webfonts[ $font_family_handle ] = array();
+					}
+
+					$webfonts[ $font_family_handle ][] = $font_face;
 				}
 			}
 		}
 
-		$to_enqueue = array();
-
-		foreach ( $webfonts as $webfont ) {
-			$font_family_handle = sanitize_title( $webfont['font-family'] );
-
-			wp_register_webfont_family( $font_family_handle );
-
-			$variation_handle = sanitize_title( implode( ' ', array( $webfont['font-weight'], $webfont['font-style'] ) ) );
-			wp_register_webfont_variation( $font_family_handle, $variation_handle, $webfont );
-			$to_enqueue[] = $font_family_handle;
-		}
-
-		foreach ( $to_enqueue as $font_family ) {
-			wp_webfonts()->enqueue( $font_family );
-		}
+		wp_register_webfonts( $webfonts );
+		wp_enqueue_webfont( $handles );
 	}
 }
 
@@ -112,9 +118,13 @@ if ( ! function_exists( 'gutenberg_add_registered_webfonts_to_theme_json' ) ) {
 	 * @return array The global styles with missing fonts data.
 	 */
 	function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
-		$font_families_registered = wp_webfonts()->get_all_webfonts();
+		$font_families_registered = wp_webfonts()->get_registered();
 		$font_families_from_theme = array();
-		if ( ! empty( $data['settings'] ) && ! empty( $data['settings']['typography'] ) && ! empty( $data['settings']['typography']['fontFamilies'] ) ) {
+		if (
+			! empty( $data['settings'] ) &&
+			! empty( $data['settings']['typography'] ) &&
+			! empty( $data['settings']['typography']['fontFamilies'] )
+		) {
 			$font_families_from_theme = $data['settings']['typography']['fontFamilies'];
 		}
 
@@ -127,12 +137,14 @@ if ( ! function_exists( 'gutenberg_add_registered_webfonts_to_theme_json' ) ) {
 		$get_families = static function ( $families_data ) {
 			$families = array();
 			foreach ( $families_data as $family ) {
-				$families[] = WP_Webfonts::get_font_slug( $family );
+				$families[] = WP_Webfonts_Utils::convert_font_family_into_handle( $family );
 			}
 
-			// Micro-optimization: Use array_flip( array_flip( $array ) )
-			// instead of array_unique( $array ) because it's faster.
-			// The result is the same.
+			/*
+			 * Micro-optimization: Use array_flip( array_flip( $array ) )
+			 * instead of array_unique( $array ) because it's faster.
+			 * The result is the same.
+			 */
 			return array_flip( array_flip( $families ) );
 		};
 
@@ -158,8 +170,8 @@ if ( ! function_exists( 'gutenberg_add_registered_webfonts_to_theme_json' ) ) {
 
 		foreach ( $to_add as $slug ) {
 			$font_faces_for_family = $font_families_registered[ $slug ];
-			$family_name = $font_faces_for_family[0]['font-family'];
-			$font_faces = array();
+			$family_name           = $font_faces_for_family[0]['font-family'];
+			$font_faces            = array();
 
 			foreach ( $font_faces_for_family as $font_face ) {
 				$camel_cased = array( 'origin' => 'gutenberg_wp_webfonts_api' );
