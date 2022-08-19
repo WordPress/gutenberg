@@ -100,7 +100,6 @@ export const COLORS = Object.assign( {}, BASE, {
 	gray: G2.gray,
 	lightGray: merge( {}, LIGHT_GRAY, G2.lightGray ),
 	alert: ALERT,
-	admin: ADMIN,
 	ui: UI,
 } );
 
