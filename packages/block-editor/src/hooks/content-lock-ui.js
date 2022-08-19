@@ -16,7 +16,6 @@ import { BlockControls } from '../components';
 
 function StopEditingAsBlocksOnOutsideSelect( {
 	clientId,
-	lock,
 	setIsEditingAsBlocks,
 } ) {
 	const isBlockOrDescendantSelected = useSelect(
@@ -36,10 +35,7 @@ function StopEditingAsBlocksOnOutsideSelect( {
 		if ( ! isBlockOrDescendantSelected ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			updateBlockAttributes( clientId, {
-				lock: {
-					...lock,
-					content: true,
-				},
+				templateLock: 'noContent',
 			} );
 			setIsEditingAsBlocks( false );
 		}
@@ -50,13 +46,12 @@ function StopEditingAsBlocksOnOutsideSelect( {
 export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const [ isEditingAsBlocks, setIsEditingAsBlocks ] = useState( false );
-		const lock = useSelect(
+		const templateLock = useSelect(
 			( select ) =>
-				select( blockEditorStore ).getBlockAttributes( props.clientId )
-					.lock,
+				select( blockEditorStore ).getTemplateLock( props.clientId ),
 			[ props.clientId ]
 		);
-		const isContentLocked = lock?.content === true;
+		const isContentLocked = templateLock === 'noContent';
 		const {
 			__unstableMarkNextChangeAsNotPersistent,
 			updateBlockAttributes,
@@ -71,7 +66,6 @@ export const withBlockControls = createHigherOrderComponent(
 				{ isEditingAsBlocks && ! isContentLocked && (
 					<StopEditingAsBlocksOnOutsideSelect
 						clientId={ props.clientId }
-						lock={ lock }
 						setIsEditingAsBlocks={ setIsEditingAsBlocks }
 					/>
 				) }
@@ -82,18 +76,13 @@ export const withBlockControls = createHigherOrderComponent(
 								if ( isEditingAsBlocks && ! isContentLocked ) {
 									__unstableMarkNextChangeAsNotPersistent();
 									updateBlockAttributes( props.clientId, {
-										lock: {
-											...lock,
-											content: true,
-										},
+										templateLock: 'noContent',
 									} );
 									setIsEditingAsBlocks( false );
 								} else {
-									const newLock = { ...lock };
-									delete newLock.content;
 									__unstableMarkNextChangeAsNotPersistent();
 									updateBlockAttributes( props.clientId, {
-										lock: newLock,
+										templateLock: undefined,
 									} );
 									setIsEditingAsBlocks( true );
 								}
