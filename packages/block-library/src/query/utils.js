@@ -13,12 +13,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { cloneBlock } from '@wordpress/blocks';
 
 /**
- * @typedef TransformedBlocksFromPattern
- * @property {WPBlock[]} newBlocks      The cloned/transformed blocks.
- * @property {string[]}  queryClientIds All the Query Loop clients from `newBlocks`.
- */
-
-/**
  * @typedef IHasNameAndId
  * @property {string|number} id   The entity's id.
  * @property {string}        name The entity's name.
@@ -145,7 +139,7 @@ export const useTaxonomies = ( postType ) => {
  *
  * @param {WPBlock[]}        blocks               The list of blocks to look through and transform(mutate).
  * @param {Record<string,*>} queryBlockAttributes The existing Query Loop's attributes.
- * @return {TransformedBlocksFromPattern} The first found Query Loop's clientId.
+ * @return {{ newBlocks: WPBlock[], queryClientIds: string[] }} An object with the cloned/transformed blocks and all the Query Loop clients from these blocks.
  */
 export const getTransformedBlocksFromPattern = (
 	blocks,
