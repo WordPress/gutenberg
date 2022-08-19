@@ -77,7 +77,7 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 
 						setHeight( iframe.contentDocument.body.scrollHeight );
 						timeoutId = null;
-					}, 100 );
+					}, 40 );
 				}
 			}
 
