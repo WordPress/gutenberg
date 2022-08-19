@@ -38,7 +38,7 @@ test.describe( 'Avatar', () => {
 		const username = 'Gravatar Gravatar';
 
 		const avatarBlock = page.locator(
-			'role=document[name="Block: Avatar"]'
+			'role=document[name="Block: Avatar"i]'
 		);
 
 		await expect( avatarBlock ).toBeVisible();
