@@ -13,11 +13,6 @@ const BASE = {
 };
 
 const G2 = {
-	blue: {
-		medium: {
-			focus: '#007cba',
-		},
-	},
 	gray: {
 		900: '#1e1e1e',
 		700: '#757575', // Meets 4.6:1 text contrast against white.
@@ -67,21 +62,6 @@ const LIGHT_GRAY = {
 // Additional colors.
 // Some are from https://make.wordpress.org/design/handbook/foundations/colors/.
 
-const BLUE = {
-	medium: {
-		900: '#006589',
-		800: '#00739c',
-		700: '#007fac',
-		600: '#008dbe',
-		500: '#00a0d2',
-		400: '#33b3db',
-		300: '#66c6e4',
-		200: '#bfe7f3',
-		100: '#e5f5fa',
-		focus: '#007cba',
-	},
-};
-
 const ALERT = {
 	yellow: '#f0b849',
 	red: '#d94f4f',
@@ -119,7 +99,6 @@ export const COLORS = Object.assign( {}, BASE, {
 	 */
 	gray: G2.gray,
 	lightGray: merge( {}, LIGHT_GRAY, G2.lightGray ),
-	blue: merge( {}, BLUE, G2.blue ),
 	alert: ALERT,
 	admin: ADMIN,
 	ui: UI,
