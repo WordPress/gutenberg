@@ -46,6 +46,8 @@ const DetectOutside = withFocusOutside(
 );
 
 function ComboboxControl( {
+	/** Start opting into the new margin-free styles that will become the default in a future version. */
+	__nextHasNoMarginBottom = false,
 	__next36pxDefaultSize,
 	value: valueProp,
 	label,
@@ -220,6 +222,7 @@ function ComboboxControl( {
 	return (
 		<DetectOutside onFocusOutside={ onFocusOutside }>
 			<BaseControl
+				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 				className={ classnames(
 					className,
 					'components-combobox-control'

@@ -10,7 +10,6 @@ import {
 	some,
 	find,
 	filter,
-	mapKeys,
 	orderBy,
 } from 'lodash';
 import createSelector from 'rememo';
@@ -2078,9 +2077,11 @@ export const getBlockTransformItems = createSelector(
 			)
 			.map( buildBlockTypeTransformItem );
 
-		const itemsByName = mapKeys(
-			blockTypeTransformItems,
-			( { name } ) => name
+		const itemsByName = Object.fromEntries(
+			Object.entries( blockTypeTransformItems ).map( ( [ , value ] ) => [
+				value.name,
+				value,
+			] )
 		);
 
 		// Consider unwraping the highest priority.

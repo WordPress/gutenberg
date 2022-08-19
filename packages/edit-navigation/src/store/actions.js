@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { difference } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -128,10 +123,15 @@ const batchSaveMenuItems =
 		);
 
 		// Delete menu items.
-		const deletedIds = difference(
-			oldMenuItems.map( ( { id } ) => id ),
-			blocksTreeToList( navBlockAfterUpdates ).map( getRecordIdFromBlock )
-		);
+		const deletedIds = oldMenuItems
+			.map( ( { id } ) => id )
+			.filter(
+				( id ) =>
+					! blocksTreeToList( navBlockAfterUpdates )
+						.map( getRecordIdFromBlock )
+						.includes( id )
+			);
+
 		await dispatch( batchDeleteMenuItems( deletedIds ) );
 
 		return navBlockAfterUpdates;

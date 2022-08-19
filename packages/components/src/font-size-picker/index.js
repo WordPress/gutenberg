@@ -32,6 +32,7 @@ import {
 	CUSTOM_FONT_SIZE,
 } from './utils';
 import { VStack } from '../v-stack';
+import { HStack } from '../h-stack';
 
 // This conditional is needed to maintain the spacing before the slider in the `withSlider` case.
 const MaybeVStack = ( { __nextHasNoMarginBottom, children } ) =>
@@ -140,42 +141,33 @@ function FontSizePicker(
 	return (
 		<fieldset className={ baseClassName } { ...( ref ? {} : { ref } ) }>
 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
-			<Flex
-				justify="space-between"
-				className={ `${ baseClassName }__header` }
-			>
-				<FlexItem>
-					<BaseControl.VisualLabel>
-						{ __( 'Size' ) }
-						{ headerHint && (
-							<span
-								className={ `${ baseClassName }__header__hint` }
-							>
-								{ headerHint }
-							</span>
-						) }
-					</BaseControl.VisualLabel>
-				</FlexItem>
+			<HStack className={ `${ baseClassName }__header` }>
+				<BaseControl.VisualLabel>
+					{ __( 'Size' ) }
+					{ headerHint && (
+						<span className={ `${ baseClassName }__header__hint` }>
+							{ headerHint }
+						</span>
+					) }
+				</BaseControl.VisualLabel>
 				{ ! disableCustomFontSizes && (
-					<FlexItem>
-						<Button
-							label={
-								showCustomValueControl
-									? __( 'Use size preset' )
-									: __( 'Set custom size' )
-							}
-							icon={ settings }
-							onClick={ () => {
-								setShowCustomValueControl(
-									! showCustomValueControl
-								);
-							} }
-							isPressed={ showCustomValueControl }
-							isSmall
-						/>
-					</FlexItem>
+					<Button
+						label={
+							showCustomValueControl
+								? __( 'Use size preset' )
+								: __( 'Set custom size' )
+						}
+						icon={ settings }
+						onClick={ () => {
+							setShowCustomValueControl(
+								! showCustomValueControl
+							);
+						} }
+						isPressed={ showCustomValueControl }
+						isSmall
+					/>
 				) }
-			</Flex>
+			</HStack>
 			<MaybeVStack __nextHasNoMarginBottom={ __nextHasNoMarginBottom }>
 				<div
 					className={ classNames( `${ baseClassName }__controls`, {

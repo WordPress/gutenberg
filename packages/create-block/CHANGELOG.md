@@ -6,6 +6,10 @@
 
 -   Increase the minimum Node.js version to 14 and minimum npm version to 6.14.4 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
+### New Feature
+
+-   Add `--no-plugin` flag to allow scaffolding of a block in an existing plugin ([#41642](https://github.com/WordPress/gutenberg/pull/41642))
+
 ## 3.6.0 (2022-07-13)
 
 ### Enhancement

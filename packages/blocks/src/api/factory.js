@@ -9,7 +9,6 @@ import {
 	filter,
 	first,
 	has,
-	uniq,
 	isEmpty,
 	map,
 } from 'lodash';
@@ -348,10 +347,12 @@ export function getPossibleBlockTransformations( blocks ) {
 	const blockTypesForToTransforms =
 		getBlockTypesForPossibleToTransforms( blocks );
 
-	return uniq( [
-		...blockTypesForFromTransforms,
-		...blockTypesForToTransforms,
-	] );
+	return [
+		...new Set( [
+			...blockTypesForFromTransforms,
+			...blockTypesForToTransforms,
+		] ),
+	];
 }
 
 /**

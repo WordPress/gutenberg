@@ -105,6 +105,13 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				$gap_value = isset( $gap_value['top'] ) ? $gap_value['top'] : null;
 			}
 			if ( $gap_value && ! $should_skip_gap_serialization ) {
+				// Get spacing CSS variable from preset value if provided.
+				if ( is_string( $gap_value ) && str_contains( $gap_value, 'var:preset|spacing|' ) ) {
+					$index_to_splice = strrpos( $gap_value, '|' ) + 1;
+					$slug            = _wp_to_kebab_case( substr( $gap_value, $index_to_splice ) );
+					$gap_value       = "var(--wp--preset--spacing--$slug)";
+				}
+
 				array_push(
 					$layout_styles,
 					array(
@@ -150,12 +157,22 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			);
 		}
 
-		if ( $has_block_gap_support ) {
-			if ( is_array( $gap_value ) ) {
-				$gap_row    = isset( $gap_value['top'] ) ? $gap_value['top'] : $fallback_gap_value;
-				$gap_column = isset( $gap_value['left'] ) ? $gap_value['left'] : $fallback_gap_value;
-				$gap_value  = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
+		if ( $has_block_gap_support && isset( $gap_value ) ) {
+			$combined_gap_value = '';
+			$gap_sides          = is_array( $gap_value ) ? array( 'top', 'left' ) : array( 'top' );
+
+			foreach ( $gap_sides as $gap_side ) {
+				$process_value = is_string( $gap_value ) ? $gap_value : _wp_array_get( $gap_value, array( $gap_side ), $fallback_gap_value );
+				// Get spacing CSS variable from preset value if provided.
+				if ( is_string( $process_value ) && str_contains( $process_value, 'var:preset|spacing|' ) ) {
+					$index_to_splice = strrpos( $process_value, '|' ) + 1;
+					$slug            = _wp_to_kebab_case( substr( $process_value, $index_to_splice ) );
+					$process_value   = "var(--wp--preset--spacing--$slug)";
+				}
+				$combined_gap_value .= "$process_value ";
 			}
+			$gap_value = trim( $combined_gap_value );
+
 			if ( $gap_value && ! $should_skip_gap_serialization ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,

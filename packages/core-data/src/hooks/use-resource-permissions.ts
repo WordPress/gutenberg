@@ -81,14 +81,12 @@ export default function __experimentalUseResourcePermissions< IdType = void >(
 			const { canUser } = resolve( coreStore );
 			const create = canUser( 'create', resource );
 			if ( ! id ) {
-				return [
-					create.hasResolved,
-					{
-						status: create.status,
-						isResolving: create.isResolving,
-						canCreate: create.hasResolved && create.data,
-					},
-				];
+				return {
+					status: create.status,
+					isResolving: create.isResolving,
+					hasResolved: create.hasResolved,
+					canCreate: create.hasResolved && create.data,
+				};
 			}
 
 			const update = canUser( 'update', resource, id );
@@ -104,16 +102,14 @@ export default function __experimentalUseResourcePermissions< IdType = void >(
 			} else if ( hasResolved ) {
 				status = Status.Success;
 			}
-			return [
+			return {
+				status,
+				isResolving,
 				hasResolved,
-				{
-					status,
-					isResolving,
-					canCreate: hasResolved && create.data,
-					canUpdate: hasResolved && update.data,
-					canDelete: hasResolved && _delete.data,
-				},
-			];
+				canCreate: hasResolved && create.data,
+				canUpdate: hasResolved && update.data,
+				canDelete: hasResolved && _delete.data,
+			};
 		},
 		[ resource, id ]
 	);
