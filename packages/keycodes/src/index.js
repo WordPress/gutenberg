@@ -372,6 +372,12 @@ export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 			key = String.fromCharCode( event.keyCode ).toLowerCase();
 		}
 
+		// Replace some characters to match the key indicated
+		// by the shortcut when a modifier key is pressed.
+		if ( event.shiftKey && character.length === 1 ) {
+			key = key.replace( '<', ',' );
+		}
+
 		// For backwards compatibility.
 		if ( character === 'del' ) {
 			character = 'delete';
