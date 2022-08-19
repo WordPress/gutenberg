@@ -28,7 +28,7 @@ class WP_Webfonts extends WP_Dependencies {
 	}
 
 	/**
-	 * Get the list of all registered web fonts and variations.
+	 * Get the list of all registered font families and their variations.
 	 *
 	 * @since X.X.X
 	 *

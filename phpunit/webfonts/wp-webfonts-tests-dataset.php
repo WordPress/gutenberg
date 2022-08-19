@@ -298,11 +298,11 @@ trait WP_Webfonts_Tests_Datasets {
 	}
 
 	/**
-	 * Data provider.
+	 * Data provider for testing one or more font families with varying number of variations.
 	 *
 	 * @return array
 	 */
-	public function data_deregister() {
+	public function data_one_to_many_font_families_and_zero_to_many_variations() {
 		return array(
 			'one family family no variations'           => array(
 				'font_family' => 'lato',
