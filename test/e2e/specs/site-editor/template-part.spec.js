@@ -300,4 +300,34 @@ test.describe( 'Template Part', () => {
 
 		await expect( paragraph ).toBeVisible();
 	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/42226.
+	test( 'has an editor with a resizable box and iframe height that matches the content height', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//header',
+			postType: 'wp_template_part',
+		} );
+
+		// Ensure content has loaded before testing heights.
+		await editor.canvas.waitForLoadState( 'networkidle' );
+
+		const blockList = editor.canvas.locator(
+			'.edit-site-block-editor__block-list'
+		);
+		const iframe = await editor.canvas.frameElement();
+		const resizableBox = page.locator(
+			'.components-resizable-box__container'
+		);
+
+		const blockListRect = await blockList.boundingBox();
+		const iframeRect = await iframe.boundingBox();
+		const resizableBoxRect = await resizableBox.boundingBox();
+
+		expect( iframeRect.height ).toBe( blockListRect.height );
+		expect( resizableBoxRect.height ).toBe( blockListRect.height );
+	} );
 } );
