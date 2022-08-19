@@ -93,6 +93,38 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wp_register_webfont' ) ) {
+	/**
+	 * Registers a single web font.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param array  $variation          Array of variation properties to be registered.
+	 * @param string $font_family_handle Optional. Font family handle for the given variation.
+	 *                                   Default empty string.
+	 * @param string $variation_handle   Optional. Handle for the variation to register.
+	 * @return string|null The font family slug if successfully registered. Else null.
+	 */
+	function wp_register_webfont( array $variation, $font_family_handle = '', $variation_handle = '' ) {
+		// When font family's handle is not passed, attempt to get it from the variation.
+		if ( ! WP_Webfonts_Utils::is_defined( $font_family_handle ) ) {
+			$font_family = WP_Webfonts_Utils::get_font_family_from_variation( $variation );
+			if ( $font_family ) {
+				$font_family_handle = WP_Webfonts_Utils::convert_font_family_into_handle( $font_family );
+			}
+		}
+
+		if ( empty( $font_family_handle ) ) {
+			trigger_error( 'Font family handle must be a non-empty string.' );
+			return null;
+		}
+
+		return wp_webfonts()->add_variation( $font_family_handle, $variation, $variation_handle )
+			? $font_family_handle
+			: null;
+	}
+}
+
 if ( ! function_exists( 'wp_enqueue_web_font' ) ) {
 	/**
 	 * Enqueues a web font family and all variations.
