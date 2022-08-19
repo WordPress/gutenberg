@@ -53,22 +53,14 @@ test.describe( 'Avatar', () => {
 
 		await expect( blockInspectorControls ).toBeVisible();
 
-		const userComboBox = blockInspectorControls.locator(
-			'.components-combobox-control'
-		);
-
-		await expect( userComboBox ).toBeVisible();
-
-		const userInput = userComboBox.locator(
-			'.components-combobox-control__input'
+		const userInput = page.locator(
+			'role=region[name="Editor settings"i] >> role=combobox[name="User"i]'
 		);
 
 		// Set new user.
 		await userInput.click();
 
-		const newUser = userComboBox.locator(
-			'role=option[name="' + username + '"]'
-		);
+		const newUser = page.locator( 'role=option[name="' + username + '"]' );
 
 		await newUser.click();
 
