@@ -89,18 +89,19 @@ export default function useBlockToolbarPopoverProps( {
 		updateProps();
 
 		// Update the toolbar props on viewport resize.
-		const view = contentElement?.ownerDocument?.defaultView;
-		view?.addEventHandler?.( 'resize', updateProps );
+		const contentView = contentElement?.ownerDocument?.defaultView;
+		contentView?.addEventHandler?.( 'resize', updateProps );
 
 		// Update the toolbar props on block resize.
 		let resizeObserver;
-		if ( view.ResizeObserver ) {
-			resizeObserver = new view.ResizeObserver( updateProps );
+		const blockView = selectedBlockElement?.ownerDocument?.defaultView;
+		if ( blockView.ResizeObserver ) {
+			resizeObserver = new blockView.ResizeObserver( updateProps );
 			resizeObserver.observe( selectedBlockElement );
 		}
 
 		return () => {
-			view?.removeEventHandler?.( 'resize', updateProps );
+			contentView?.removeEventHandler?.( 'resize', updateProps );
 
 			if ( resizeObserver ) {
 				resizeObserver.disconnect();
