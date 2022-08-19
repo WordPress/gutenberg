@@ -67,7 +67,7 @@ function gutenberg_block_type_metadata_view_script( $settings, $metadata ) {
 		! isset( $metadata['viewScript'] ) ||
 		! empty( $settings['view_script'] ) ||
 		! isset( $metadata['file'] ) ||
-		strpos( $metadata['file'], gutenberg_dir_path() ) !== 0
+		! str_starts_with( $metadata['file'], gutenberg_dir_path() )
 	) {
 		return $settings;
 	}
