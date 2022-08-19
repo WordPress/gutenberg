@@ -5,16 +5,21 @@ import { rgba } from './colors';
 
 const white = '#fff';
 
-// Matches the grays in @wordpress/base-styles _colors.scss
+// Matches the grays in @wordpress/base-styles
 const GRAY = {
 	900: '#1e1e1e',
 	800: '#2f2f2f',
-	700: '#757575', // Meets 4.6:1 text contrast against white.
-	600: '#949494', // Meets 3:1 UI or large text contrast against white.
+	/** Meets 4.6:1 text contrast against white. */
+	700: '#757575',
+	/** Meets 3:1 UI or large text contrast against white. */
+	600: '#949494',
 	400: '#ccc',
-	300: '#ddd', // Used for most borders.
-	200: '#e0e0e0', // Used sparingly for light borders.
-	100: '#f0f0f0', // Used for light gray backgrounds.
+	/** Used for most borders. */
+	300: '#ddd',
+	/** Used sparingly for light borders. */
+	200: '#e0e0e0',
+	/** Used for light gray backgrounds. */
+	100: '#f0f0f0',
 };
 
 const DARK_GRAY = {
@@ -31,30 +36,28 @@ const LIGHT_GRAY = {
 	200: '#f3f4f5',
 };
 
-// Additional colors.
-// Some are from https://make.wordpress.org/design/handbook/foundations/colors/.
-
+// Matches @wordpress/base-styles
 const ALERT = {
 	yellow: '#f0b849',
 	red: '#d94f4f',
 	green: '#4ab866',
 };
 
+// Matches @wordpress/base-styles
 const ADMIN = {
 	theme: 'var( --wp-admin-theme-color, #007cba)',
 	themeDark10: 'var( --wp-admin-theme-color-darker-10, #006ba1)',
 };
 
-// Namespaced values for raw colors hex codes.
 const UI = {
 	theme: ADMIN.theme,
 	background: white,
-	backgroundDisabled: LIGHT_GRAY[ 200 ],
+	backgroundDisabled: LIGHT_GRAY[ 200 ], // TODO: Replace with WordPress gray
 	border: GRAY[ 700 ],
 	borderHover: GRAY[ 700 ],
 	borderFocus: ADMIN.themeDark10,
 	borderDisabled: GRAY[ 400 ],
-	textDisabled: DARK_GRAY[ 150 ],
+	textDisabled: DARK_GRAY[ 150 ], // TODO: Replace with WordPress gray
 	textDark: white,
 
 	// Matches @wordpress/base-styles
