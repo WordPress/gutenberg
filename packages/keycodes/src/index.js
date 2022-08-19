@@ -358,7 +358,7 @@ export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 			( mod ) => ! mods.includes( mod )
 		);
 
-		if ( new Set( [ ...modsDiff, ...eventModsDiff ] ).size > 0 ) {
+		if ( modsDiff.length > 0 || eventModsDiff.length > 0 ) {
 			return false;
 		}
 

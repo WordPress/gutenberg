@@ -420,7 +420,7 @@ export const isEqualAttributesOfName = {
 			( c ) => ! actualPieces.includes( c )
 		);
 
-		return new Set( [ ...actualDiff, ...expectedDiff ] ).size === 0;
+		return actualDiff.length === 0 && expectedDiff.length === 0;
 	},
 	style: ( actual, expected ) => {
 		return isEqual( ...[ actual, expected ].map( getStyleProperties ) );
