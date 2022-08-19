@@ -338,7 +338,7 @@ Create a bulleted or numbered list. ([Source](https://github.com/WordPress/guten
 
 -	**Name:** core/list
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** ordered, placeholder, reversed, start, type, values
 
 ## List item
