@@ -22,6 +22,7 @@
 -   `ToggleGroupControl`: Improve TypeScript documentation ([#43265](https://github.com/WordPress/gutenberg/pull/43265)).
 -   `ComboboxControl`: Normalize hyphen-like characters to an ASCII hyphen ([#42942](https://github.com/WordPress/gutenberg/pull/42942)).
 -   `FormTokenField`: Refactor away from `_.difference()` ([#43224](https://github.com/WordPress/gutenberg/pull/43224/)).
+-   `ConfirmDialog`: replace (almost) every usage of `fireEvent` with `@testing-library/user-event`  ([#43429](https://github.com/WordPress/gutenberg/pull/43429/)).
 
 ### Internal
 
@@ -35,7 +36,7 @@
 -   `contextConnect`: Refactor away from `_.uniq()` ([#43330](https://github.com/WordPress/gutenberg/pull/43330/)).
 -   `ColorPalette`: Refactor away from `_.uniq()` ([#43330](https://github.com/WordPress/gutenberg/pull/43330/)).
 -   `Guide`: Refactor away from `_.times()` ([#43374](https://github.com/WordPress/gutenberg/pull/43374/)).
--   `Modal`: use `KeyboardEvent.code` instead of deprecated `KeyboardEvent.keyCode`  ([#43429](https://github.com/WordPress/gutenberg/pull/43429/)).
+-   `Modal`: use `KeyboardEvent.code` instead of deprecated `KeyboardEvent.keyCode`. improve unit tests ([#43429](https://github.com/WordPress/gutenberg/pull/43429/)).
 
 ### Experimental
 -   `FormTokenField`: add `__experimentalAutoSelectFirstMatch` prop to auto select the first matching suggestion on typing ([#42527](https://github.com/WordPress/gutenberg/pull/42527/)).
