@@ -96,23 +96,31 @@ describe( 'Tooltip', () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
-			jest.useFakeTimers();
+			const mockOnFocus = jest.fn();
 
 			render(
 				<Tooltip text="Help text">
-					<button>Hover Me!</button>
+					<button onFocus={ mockOnFocus }>Hover Me!</button>
 				</Tooltip>
 			);
 
-			const button = screen.getByRole( 'button' );
+			const button = screen.getByRole( 'button', { text: 'Hover Me!' } );
+			expect( button ).toBeInTheDocument();
+
 			await user.click( button );
-			setTimeout( () => {
-				expect(
-					screen.queryByText( 'Help text' )
-				).not.toBeInTheDocument();
-				jest.runOnlyPendingTimers();
-				jest.useRealTimers();
-			}, TOOLTIP_DELAY );
+
+			// Tooltip hasn't appeared yet
+			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
+
+			act( () => jest.advanceTimersByTime( TOOLTIP_DELAY ) );
+
+			// Tooltip still hasn't appeared yet, even though the component was focused
+			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
+			expect( mockOnFocus ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: 'focus',
+				} )
+			);
 		} );
 
 		it( 'should respect custom delay prop when showing tooltip', async () => {
