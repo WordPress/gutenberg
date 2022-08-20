@@ -128,30 +128,27 @@ describe( 'Disabled', () => {
 		}
 
 		test( "lets components know that they're disabled via context", () => {
-			const { container } = render(
+			render(
 				<Disabled>
 					<DisabledStatus />
 				</Disabled>
 			);
 
-			const wrapperElement = container.querySelector( 'p' );
-			expect( wrapperElement ).toHaveTextContent( 'Disabled' );
+			expect( screen.getByText( 'Disabled' ) ).toBeInTheDocument();
 		} );
 
 		test( "lets components know that they're not disabled via context when isDisabled is false", () => {
-			const { container } = render(
+			render(
 				<Disabled isDisabled={ false }>
 					<DisabledStatus />
 				</Disabled>
 			);
-			const wrapperElement = container.querySelector( 'p' );
-			expect( wrapperElement ).toHaveTextContent( 'Not disabled' );
+			expect( screen.getByText( 'Not disabled' ) ).toBeInTheDocument();
 		} );
 
 		test( "lets components know that they're not disabled via context", () => {
-			const { container } = render( <DisabledStatus /> );
-			const wrapperElement = container.querySelector( 'p' );
-			expect( wrapperElement ).toHaveTextContent( 'Not disabled' );
+			render( <DisabledStatus /> );
+			expect( screen.getByText( 'Not disabled' ) ).toBeInTheDocument();
 		} );
 	} );
 } );
