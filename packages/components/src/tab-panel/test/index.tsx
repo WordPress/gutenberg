@@ -37,43 +37,31 @@ const getSelectedTab = () => screen.getByRole( 'tab', { selected: true } );
 describe( 'TabPanel', () => {
 	it( 'should render a tabpanel, and clicking should change tabs', async () => {
 		const user = setupUser();
+		const panelRenderFunction = jest.fn();
 
-		render(
-			<TabPanel
-				tabs={ TABS }
-				children={ ( tab ) => `${ tab.name } panel` }
-			/>
-		);
+		render( <TabPanel tabs={ TABS } children={ panelRenderFunction } /> );
 
 		expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
-		expect( screen.getByRole( 'tabpanel' ) ).toHaveTextContent(
-			'alpha panel'
-		);
+		expect(
+			screen.getByRole( 'tabpanel', { name: 'Alpha' } )
+		).toBeInTheDocument();
+		expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 0 ] );
 
 		await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
 
 		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
-		expect( screen.getByRole( 'tabpanel' ) ).toHaveTextContent(
-			'beta panel'
-		);
+		expect(
+			screen.getByRole( 'tabpanel', { name: 'Beta' } )
+		).toBeInTheDocument();
+		expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 1 ] );
 
-		await user.click( screen.getByRole( 'tab', { name: 'Gamma' } ) );
-
-		expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
-		expect( screen.getByRole( 'tabpanel' ) ).toHaveTextContent(
-			'gamma panel'
-		);
-
-		await user.click(
-			screen.getByRole( 'tab', {
-				name: 'Alpha',
-			} )
-		);
+		await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
 
 		expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
-		expect( screen.getByRole( 'tabpanel' ) ).toHaveTextContent(
-			'alpha panel'
-		);
+		expect(
+			screen.getByRole( 'tabpanel', { name: 'Alpha' } )
+		).toBeInTheDocument();
+		expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 0 ] );
 	} );
 
 	it( 'should render with a tab initially selected by prop initialTabIndex', () => {
