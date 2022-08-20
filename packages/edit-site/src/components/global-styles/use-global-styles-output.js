@@ -10,7 +10,6 @@ import {
 	pickBy,
 	reduce,
 	set,
-	startsWith,
 } from 'lodash';
 
 /**
@@ -22,7 +21,7 @@ import {
 	getBlockTypes,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState, useContext } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
 import {
 	__unstablePresetDuotoneFilter as PresetDuotoneFilter,
@@ -50,7 +49,8 @@ function compileStyleValue( uncompiledValue ) {
 	const VARIABLE_REFERENCE_PREFIX = 'var:';
 	const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
 	const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
-	if ( startsWith( uncompiledValue, VARIABLE_REFERENCE_PREFIX ) ) {
+
+	if ( uncompiledValue?.startsWith?.( VARIABLE_REFERENCE_PREFIX ) ) {
 		const variable = uncompiledValue
 			.slice( VARIABLE_REFERENCE_PREFIX.length )
 			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
@@ -190,12 +190,15 @@ function flattenTree( input = {}, prefix, token ) {
  *
  * @param {boolean} useRootPaddingAlign Whether to use CSS custom properties in root selector.
  *
+ * @param {Object}  tree                A theme.json tree containing layout definitions.
+ *
  * @return {Array} An array of style declarations.
  */
 export function getStylesDeclarations(
 	blockStyles = {},
 	selector = '',
-	useRootPaddingAlign
+	useRootPaddingAlign,
+	tree = {}
 ) {
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
 	const output = reduce(
@@ -270,7 +273,19 @@ export function getStylesDeclarations(
 		const cssProperty = rule.key.startsWith( '--' )
 			? rule.key
 			: kebabCase( rule.key );
-		output.push( `${ cssProperty }: ${ compileStyleValue( rule.value ) }` );
+
+		let ruleValue = rule.value;
+		if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
+			const refPath = ruleValue.ref.split( '.' );
+			ruleValue = get( tree, refPath );
+			// Presence of another ref indicates a reference to another dynamic value.
+			// Pointing to another dynamic value is not supported.
+			if ( ! ruleValue || !! ruleValue?.ref ) {
+				return;
+			}
+		}
+
+		output.push( `${ cssProperty }: ${ ruleValue }` );
 	} );
 
 	return output;
@@ -625,14 +640,13 @@ export const toStyles = (
 			if ( duotoneSelector ) {
 				const duotoneDeclarations =
 					getStylesDeclarations( duotoneStyles );
-				if ( duotoneDeclarations.length === 0 ) {
-					return;
+				if ( duotoneDeclarations.length > 0 ) {
+					ruleset =
+						ruleset +
+						`${ duotoneSelector }{${ duotoneDeclarations.join(
+							';'
+						) };}`;
 				}
-				ruleset =
-					ruleset +
-					`${ duotoneSelector }{${ duotoneDeclarations.join(
-						';'
-					) };}`;
 			}
 
 			// Process blockGap and layout styles.
@@ -654,7 +668,8 @@ export const toStyles = (
 			const declarations = getStylesDeclarations(
 				styles,
 				selector,
-				useRootPaddingAlign
+				useRootPaddingAlign,
+				tree
 			);
 			if ( declarations?.length ) {
 				ruleset =
@@ -789,9 +804,6 @@ export const getBlockSelectors = ( blockTypes ) => {
 };
 
 export function useGlobalStylesOutput() {
-	const [ stylesheets, setStylesheets ] = useState( [] );
-	const [ settings, setSettings ] = useState( {} );
-	const [ svgFilters, setSvgFilters ] = useState( {} );
 	const { merged: mergedConfig } = useContext( GlobalStylesContext );
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
@@ -801,9 +813,9 @@ export function useGlobalStylesOutput() {
 		return !! getSettings().disableLayoutStyles;
 	} );
 
-	useEffect( () => {
+	return useMemo( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
-			return;
+			return [];
 		}
 
 		const blockSelectors = getBlockSelectors( getBlockTypes() );
@@ -819,7 +831,7 @@ export function useGlobalStylesOutput() {
 			disableLayoutStyles
 		);
 		const filters = toSvgFilters( mergedConfig, blockSelectors );
-		setStylesheets( [
+		const stylesheets = [
 			{
 				css: customProperties,
 				isGlobalStyles: true,
@@ -828,15 +840,13 @@ export function useGlobalStylesOutput() {
 				css: globalStyles,
 				isGlobalStyles: true,
 			},
-		] );
-		setSettings( mergedConfig.settings );
-		setSvgFilters( filters );
+		];
+
+		return [ stylesheets, mergedConfig.settings, filters ];
 	}, [
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
 		mergedConfig,
 		disableLayoutStyles,
 	] );
-
-	return [ stylesheets, settings, svgFilters, hasBlockGapSupport ];
 }

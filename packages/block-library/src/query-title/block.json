@@ -16,6 +16,14 @@
 		"level": {
 			"type": "number",
 			"default": 1
+		},
+		"showPrefix": {
+			"type": "boolean",
+			"default": true
+		},
+		"showSearchTerm": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {

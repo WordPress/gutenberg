@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { find, startsWith, get, camelCase, has } from 'lodash';
+import { camelCase } from 'change-case';
+import { find, get, has } from 'lodash';
 import { Dimensions } from 'react-native';
 
 /**
@@ -104,7 +105,7 @@ export function getBlockColors(
 
 	// Custom colors.
 	Object.entries( blockStyleAttributes ).forEach( ( [ key, value ] ) => {
-		const isCustomColor = startsWith( value, '#' );
+		const isCustomColor = value?.startsWith?.( '#' );
 		let styleKey = key;
 
 		if ( BLOCK_STYLE_ATTRIBUTES_MAPPING[ styleKey ] ) {

@@ -24,7 +24,7 @@
 }
 
 // Affect the appender of the Row and Stack variants.
-.is-layout-flex.block-editor-block-list__block .block-list-appender:only-child {
+.wp-block-group.is-layout-flex.block-editor-block-list__block > .block-list-appender:only-child {
 	gap: inherit;
 
 	&,
@@ -42,14 +42,39 @@
 		border: $border-width dashed currentColor;
 		opacity: 0.4;
 		border-radius: $radius-block-ui;
-		flex: 1;
+		flex: 1 0 $grid-unit-60;
 		pointer-events: none;
-		min-height: $grid-unit-60;
+		min-height: $grid-unit-60 - $border-width - $border-width;
 	}
 
 	// Let the parent be selectable in the placeholder area.
 	pointer-events: none;
 	.block-editor-inserter {
 		pointer-events: all;
+	}
+}
+
+// Show an unselected empty group button as a dashed outline instead of the appender button.
+// This effectively adds a selectable-to-delete state.
+.is-layout-flow.block-editor-block-list__block:not(.is-selected) {
+	> .block-list-appender:only-child {
+		pointer-events: none;
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			border: $border-width dashed currentColor;
+			opacity: 0.4;
+			border-radius: $radius-block-ui;
+			pointer-events: none;
+		}
+
+		.block-editor-inserter {
+			visibility: hidden;
+		}
 	}
 }

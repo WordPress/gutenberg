@@ -2,7 +2,6 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -35,15 +34,16 @@ function SinglePalette( {
 	actions,
 } ) {
 	const colorOptions = useMemo( () => {
-		return map( colors, ( { color, name } ) => {
+		return colors.map( ( { color, name }, index ) => {
 			const colordColor = colord( color );
+			const isSelected = value === color;
 
 			return (
 				<CircularOptionPicker.Option
-					key={ color }
-					isSelected={ value === color }
+					key={ `${ color }-${ index }` }
+					isSelected={ isSelected }
 					selectedIconProps={
-						value === color
+						isSelected
 							? {
 									fill:
 										colordColor.contrast() >
@@ -60,7 +60,7 @@ function SinglePalette( {
 					}
 					style={ { backgroundColor: color, color } }
 					onClick={
-						value === color ? clearColor : () => onChange( color )
+						isSelected ? clearColor : () => onChange( color )
 					}
 					aria-label={
 						name
@@ -112,19 +112,35 @@ function MultiplePalettes( {
 	);
 }
 
-export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
+export function CustomColorPickerDropdown( {
+	isRenderedInSidebar,
+	popoverProps: receivedPopoverProps,
+	...props
+} ) {
+	const popoverProps = useMemo(
+		() => ( {
+			__unstableShift: true,
+			...( isRenderedInSidebar
+				? {
+						// When in the sidebar: open to the left (stacking),
+						// leaving the same gap as the parent popover.
+						placement: 'left-start',
+						offset: 34,
+				  }
+				: {
+						// Default behavior: open below the anchor
+						placement: 'bottom',
+						offset: 8,
+				  } ),
+			...receivedPopoverProps,
+		} ),
+		[ isRenderedInSidebar, receivedPopoverProps ]
+	);
+
 	return (
 		<Dropdown
 			contentClassName="components-color-palette__custom-color-dropdown-content"
-			popoverProps={
-				isRenderedInSidebar
-					? {
-							placement: 'left-start',
-							offset: 20,
-							__unstableShift: true,
-					  }
-					: undefined
-			}
+			popoverProps={ popoverProps }
 			{ ...props }
 		/>
 	);

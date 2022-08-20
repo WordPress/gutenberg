@@ -377,7 +377,7 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
 	}
 
 	if ( 'core/navigation-link' === $block->name || 'core/navigation-submenu' === $block->name ) {
-		if ( $block->attributes && isset( $block->attributes['kind'] ) && 'post-type' === $block->attributes['kind'] ) {
+		if ( $block->attributes && isset( $block->attributes['kind'] ) && 'post-type' === $block->attributes['kind'] && isset( $block->attributes['id'] ) ) {
 			$post_ids[] = $block->attributes['id'];
 		}
 	}
@@ -469,6 +469,12 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	if ( array_key_exists( 'ref', $attributes ) ) {
 		$navigation_post = get_post( $attributes['ref'] );
 		if ( ! isset( $navigation_post ) ) {
+			return '';
+		}
+
+		// Only published posts are valid. If this is changed then a corresponding change
+		// must also be implemented in `use-navigation-menu.js`.
+		if ( 'publish' !== $navigation_post->post_status ) {
 			return '';
 		}
 

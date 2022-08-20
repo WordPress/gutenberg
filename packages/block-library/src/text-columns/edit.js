@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, times } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -55,7 +55,7 @@ export default function TextColumnsEdit( { attributes, setAttributes } ) {
 					className: `align${ width } columns-${ columns }`,
 				} ) }
 			>
-				{ times( columns, ( index ) => {
+				{ Array.from( { length: columns } ).map( ( _, index ) => {
 					return (
 						<div
 							className="wp-block-column"

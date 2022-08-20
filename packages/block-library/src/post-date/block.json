@@ -16,6 +16,10 @@
 		"isLink": {
 			"type": "boolean",
 			"default": false
+		},
+		"displayType": {
+			"type": "string",
+			"default": "date"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
@@ -37,6 +41,7 @@
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true

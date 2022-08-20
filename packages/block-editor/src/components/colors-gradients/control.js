@@ -113,6 +113,12 @@ function ColorGradientControlInner( {
 		),
 	};
 
+	const renderPanelType = ( type ) => (
+		<div className="block-editor-color-gradient-control__panel">
+			{ tabPanels[ type ] }
+		</div>
+	);
+
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom
@@ -142,15 +148,13 @@ function ColorGradientControlInner( {
 									: !! canChooseAColor && TAB_COLOR.value
 							}
 						>
-							{ ( tab ) => (
-								<div className="block-editor-color-gradient-control__tab-panel">
-									{ tabPanels[ tab.value ] }
-								</div>
-							) }
+							{ ( tab ) => renderPanelType( tab.value ) }
 						</TabPanel>
 					) }
-					{ ! canChooseAGradient && tabPanels[ TAB_COLOR.value ] }
-					{ ! canChooseAColor && tabPanels[ TAB_GRADIENT.value ] }
+					{ ! canChooseAGradient &&
+						renderPanelType( TAB_COLOR.value ) }
+					{ ! canChooseAColor &&
+						renderPanelType( TAB_GRADIENT.value ) }
 				</VStack>
 			</fieldset>
 		</BaseControl>

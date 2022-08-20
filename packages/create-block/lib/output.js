@@ -13,11 +13,9 @@ const writeOutputAsset = async ( inputFile, outputFile, view ) => {
 };
 
 const writeOutputTemplate = async ( inputFile, outputFile, view ) => {
-	// Output files can have names that depend on the slug provided.
-	const outputFilePath = join(
-		view.slug,
-		outputFile.replace( /\$slug/g, view.slug )
-	);
+	const outputFilePath = view.plugin
+		? join( view.slug, outputFile.replace( /\$slug/g, view.slug ) )
+		: outputFile;
 	await makeDir( dirname( outputFilePath ) );
 	writeFile( outputFilePath, render( inputFile, view ) );
 };

@@ -51,14 +51,10 @@ class WP_Style_Engine_CSS_Rule {
 	 *
 	 * @param string $selector The CSS selector.
 	 *
-	 * @return WP_Style_Engine_CSS_Rule|void Returns the object to allow chaining of methods.
+	 * @return WP_Style_Engine_CSS_Rule Returns the object to allow chaining of methods.
 	 */
 	public function set_selector( $selector ) {
-		if ( empty( $selector ) ) {
-			return;
-		}
 		$this->selector = $selector;
-
 		return $this;
 	}
 
@@ -74,11 +70,11 @@ class WP_Style_Engine_CSS_Rule {
 		$is_declarations_object = ! is_array( $declarations );
 		$declarations_array     = $is_declarations_object ? $declarations->get_declarations() : $declarations;
 
-		if ( null === $this->declarations && $is_declarations_object ) {
-			$this->declarations = $declarations;
-			return $this;
-		}
 		if ( null === $this->declarations ) {
+			if ( $is_declarations_object ) {
+				$this->declarations = $declarations;
+				return $this;
+			}
 			$this->declarations = new WP_Style_Engine_CSS_Declarations( $declarations_array );
 		}
 		$this->declarations->add_declarations( $declarations_array );

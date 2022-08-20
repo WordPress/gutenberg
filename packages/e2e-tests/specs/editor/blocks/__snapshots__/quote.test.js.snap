@@ -114,6 +114,10 @@ exports[`Quote can be split at the end 2`] = `
 "<!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
 <p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->"
 `;

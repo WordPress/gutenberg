@@ -705,12 +705,12 @@ describe( 'global styles renderer', () => {
 			expect(
 				getStylesDeclarations( blockStyles, 'body', true )
 			).toEqual( [
-				'font-family: sans-serif',
 				'--wp--style--root--padding-top: 33px',
 				'--wp--style--root--padding-right: 33px',
 				'--wp--style--root--padding-bottom: 33px',
 				'--wp--style--root--padding-left: 33px',
 				'background-color: var(--wp--preset--color--light-green-cyan)',
+				'font-family: sans-serif',
 			] );
 		} );
 
@@ -718,12 +718,12 @@ describe( 'global styles renderer', () => {
 			expect(
 				getStylesDeclarations( blockStyles, 'body', false )
 			).toEqual( [
-				'font-family: sans-serif',
 				'background-color: var(--wp--preset--color--light-green-cyan)',
 				'padding-top: 33px',
 				'padding-right: 33px',
 				'padding-bottom: 33px',
 				'padding-left: 33px',
+				'font-family: sans-serif',
 			] );
 		} );
 
@@ -735,12 +735,12 @@ describe( 'global styles renderer', () => {
 					true
 				)
 			).toEqual( [
-				'font-family: sans-serif',
 				'background-color: var(--wp--preset--color--light-green-cyan)',
 				'padding-top: 33px',
 				'padding-right: 33px',
 				'padding-bottom: 33px',
 				'padding-left: 33px',
+				'font-family: sans-serif',
 			] );
 		} );
 	} );

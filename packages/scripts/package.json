@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "23.6.0",
+	"version": "23.7.2",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,8 +19,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12.13",
-		"npm": ">=6.9"
+		"node": ">=14",
+		"npm": ">=6.14.4"
 	},
 	"files": [
 		"bin",
