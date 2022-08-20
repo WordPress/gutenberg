@@ -223,30 +223,58 @@ describe( 'Tooltip', () => {
 			expect( onClickMock ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should cancel pending setIsOver on mouseleave', async () => {
+		it( 'should not show tooltip if the mouse leaves the anchor before the tooltip has shown', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
 
-			const originalMouseEnter = jest.fn();
+			const MOUSE_LEAVE_DELAY = TOOLTIP_DELAY - 200;
+			const onMouseEnterMock = jest.fn();
+			const onMouseLeaveMock = jest.fn();
+
 			render(
-				<Tooltip text="Help text">
-					<button
-						onMouseEnter={ originalMouseEnter }
-						onFocus={ originalMouseEnter }
-					>
-						Hover Me!
-					</button>
-				</Tooltip>
+				<>
+					<Tooltip text="Help text">
+						<button
+							onMouseEnter={ onMouseEnterMock }
+							onMouseLeave={ onMouseLeaveMock }
+						>
+							Hover Me!
+						</button>
+					</Tooltip>
+					<button>Hover me instead!</button>
+				</>
 			);
 
-			const button = screen.getByRole( 'button' );
-			await user.hover( button );
-			setTimeout( () => {
-				expect(
-					screen.queryByText( 'Help text' )
-				).not.toBeInTheDocument();
-			}, TOOLTIP_DELAY );
+			const externalButton = screen.getByRole( 'button', {
+				name: 'Hover me instead!',
+			} );
+			const tooltipButton = screen.getByRole( 'button', {
+				name: 'Hover Me!',
+			} );
+
+			await user.hover( tooltipButton );
+
+			// Tooltip hasn't appeared yet
+			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
+			expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
+
+			// Advance time by MOUSE_LEAVE_DELAY time
+			act( () => jest.advanceTimersByTime( MOUSE_LEAVE_DELAY ) );
+
+			// Hover the other button, meaning that the mouse will leave the tooltip anchor
+			await user.hover( externalButton );
+
+			// Tooltip still hasn't appeared yet
+			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
+			expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
+			expect( onMouseLeaveMock ).toHaveBeenCalledTimes( 1 );
+
+			// Advance time again, so that we reach the full TOOLTIP_DELAY time
+			act( () => jest.advanceTimersByTime( TOOLTIP_DELAY ) );
+
+			// Tooltip won't show, since the mouse has left the anchor
+			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 		} );
 	} );
 } );
