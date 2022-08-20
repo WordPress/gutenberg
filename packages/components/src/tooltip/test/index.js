@@ -38,6 +38,7 @@ describe( 'Tooltip', () => {
 			expect(
 				screen.getByRole( 'button', { name: 'Hover Me!' } )
 			).toBeInTheDocument();
+			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 		} );
 
 		it( 'should render children with additional tooltip when focused', () => {
