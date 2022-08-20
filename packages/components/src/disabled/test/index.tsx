@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -24,6 +24,7 @@ jest.mock( '@wordpress/dom', () => {
 							Object.defineProperties( element, {
 								offsetWidth: {
 									get: () => 1,
+									configurable: true,
 								},
 							} );
 						}
@@ -38,7 +39,7 @@ jest.mock( '@wordpress/dom', () => {
 
 describe( 'Disabled', () => {
 	const Form = () => (
-		<form>
+		<form title="form">
 			<input />
 			<div title="edit my content" contentEditable tabIndex={ 0 } />
 		</form>
@@ -108,11 +109,34 @@ describe( 'Disabled', () => {
 	// Ideally, we'd have two more test cases here:
 	//
 	//  - it( 'will disable all fields on component render change' )
-	//  - it( 'will disable all fields on sneaky DOM manipulation' )
 	//
-	// Alas, JSDOM does not support MutationObserver:
-	//
-	//  https://github.com/jsdom/jsdom/issues/639
+	it( 'will disable all fields on sneaky DOM manipulation', async () => {
+		render(
+			<Disabled>
+				<Form />
+			</Disabled>
+		);
+
+		const form = screen.getByTitle( 'form' );
+		form.insertAdjacentHTML(
+			'beforeend',
+			'<input title="sneaky input" />'
+		);
+		form.insertAdjacentHTML(
+			'beforeend',
+			'<div title="sneaky editable content" contentEditable tabIndex={ 0 } />'
+		);
+		const sneakyInput = screen.getByTitle( 'sneaky input' );
+		const sneakyEditable = screen.getByTitle( 'sneaky editable content' );
+
+		await waitFor( () => expect( sneakyInput ).toBeDisabled() );
+		await waitFor( () =>
+			expect( sneakyEditable ).toHaveAttribute(
+				'contenteditable',
+				'false'
+			)
+		);
+	} );
 
 	describe( 'Consumer', () => {
 		function DisabledStatus() {
