@@ -177,18 +177,30 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			const button = screen.getByRole( 'button' );
+			const button = screen.getByRole( 'button', { name: 'Click me' } );
+			expect( button ).toBeInTheDocument();
+			expect( button ).toBeDisabled();
+
+			// Note: this is testing for implementation details,
+			// but couldn't find a better way.
 			const buttonRect = button.getBoundingClientRect();
-			const eventCatcher =
-				container.getElementsByClassName( 'event-catcher' )[ 0 ];
+			const eventCatcher = container.querySelector( '.event-catcher' );
 			const eventCatcherRect = eventCatcher.getBoundingClientRect();
 			expect( buttonRect ).toEqual( eventCatcherRect );
 
 			await user.hover( eventCatcher );
 
-			setTimeout( () => {
-				expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
-			}, TOOLTIP_DELAY );
+			// Tooltip hasn't appeared yet
+			expect(
+				screen.queryByText( 'Show helpful text here' )
+			).not.toBeInTheDocument();
+
+			act( () => jest.advanceTimersByTime( TOOLTIP_DELAY ) );
+
+			// Tooltip shows after the delay
+			expect(
+				screen.getByText( 'Show helpful text here' )
+			).toBeInTheDocument();
 		} );
 
 		it( 'should not emit events back to children when they are disabled', async () => {
