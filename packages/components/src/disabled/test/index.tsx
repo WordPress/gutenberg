@@ -148,7 +148,7 @@ describe( 'Disabled', () => {
 			expect( wrapperElement ).toHaveTextContent( 'Not disabled' );
 		} );
 
-		test( "lets components know that they're not disabled via context", () => {
+		test( "lets components know that they're not disabled via context when the Disabled component is not rendered at all", () => {
 			const { container } = render( <DisabledStatus /> );
 			const wrapperElement = container.querySelector( 'p' );
 			expect( wrapperElement ).toHaveTextContent( 'Not disabled' );
