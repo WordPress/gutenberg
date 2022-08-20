@@ -128,36 +128,42 @@ describe( 'Tooltip', () => {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
 
-			const originalMouseEnter = jest.fn();
-			jest.useFakeTimers();
+			const TEST_DELAY = TOOLTIP_DELAY * 2;
+			const mockOnMouseEnter = jest.fn();
+			const mockOnFocus = jest.fn();
+
 			render(
-				<Tooltip text="Help text" delay={ 2000 }>
+				<Tooltip text="Help text" delay={ TEST_DELAY }>
 					<button
-						onMouseEnter={ originalMouseEnter }
-						onFocus={ originalMouseEnter }
+						onMouseEnter={ mockOnMouseEnter }
+						onFocus={ mockOnFocus }
 					>
 						<span>Hover Me!</span>
 					</button>
 				</Tooltip>
 			);
 
-			const button = screen.getByRole( 'button' );
-			await user.hover( button );
-			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
-			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
+			const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
+			expect( button ).toBeInTheDocument();
 
-			// Tooltip does not yet exist after default delay, because custom delay is passed.
-			setTimeout( () => {
-				expect(
-					screen.queryByText( 'Help text' )
-				).not.toBeInTheDocument();
-			}, TOOLTIP_DELAY );
-			// Tooltip appears after custom delay.
-			setTimeout( () => {
-				expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
-				jest.runOnlyPendingTimers();
-				jest.useRealTimers();
-			}, 2000 );
+			await user.hover( button );
+
+			// Tooltip hasn't appeared yet
+			expect( mockOnMouseEnter ).toHaveBeenCalledTimes( 1 );
+
+			// Advance by the usual TOOLTIP_DELAY
+			act( () => jest.advanceTimersByTime( TOOLTIP_DELAY ) );
+
+			// Tooltip hasn't appeared yet after the usual delay
+			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
+
+			// Advance time again, so that we reach the full TEST_DELAY time
+			act( () => jest.advanceTimersByTime( TEST_DELAY - TOOLTIP_DELAY ) );
+
+			// Tooltip shows after TEST_DELAY time
+			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
+
+			expect( mockOnFocus ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should show tooltip when an element is disabled', async () => {
