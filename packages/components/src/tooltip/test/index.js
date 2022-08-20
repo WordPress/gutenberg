@@ -115,36 +115,6 @@ describe( 'Tooltip', () => {
 			}, TOOLTIP_DELAY );
 		} );
 
-		it( 'should show tooltip on delayed mouseenter', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-
-			const originalMouseEnter = jest.fn();
-			jest.useFakeTimers();
-			render(
-				<Tooltip text="Help text">
-					<button
-						onMouseEnter={ originalMouseEnter }
-						onFocus={ originalMouseEnter }
-					>
-						<span>Hover Me!</span>
-					</button>
-				</Tooltip>
-			);
-
-			const button = screen.getByRole( 'button' );
-			await user.hover( button );
-			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
-			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
-
-			setTimeout( () => {
-				expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
-				jest.runOnlyPendingTimers();
-				jest.useRealTimers();
-			}, TOOLTIP_DELAY );
-		} );
-
 		it( 'should respect custom delay prop when showing tooltip', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
