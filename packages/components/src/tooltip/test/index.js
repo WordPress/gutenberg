@@ -42,18 +42,29 @@ describe( 'Tooltip', () => {
 		} );
 
 		it( 'should render children with additional tooltip when focused', () => {
+			const mockOnFocus = jest.fn();
+
 			render(
 				<Tooltip text="Help text">
-					<button>Hover Me!</button>
+					<button onFocus={ mockOnFocus }>Hover Me!</button>
 				</Tooltip>
 			);
 
-			const button = screen.getByRole( 'button' );
+			const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
+			expect( button ).toBeInTheDocument();
+
+			// Before focus, the tooltip is not shown.
+			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
+
 			button.focus();
-			expect(
-				screen.getByRole( 'button', { name: 'Hover Me!' } )
-			).toBeInTheDocument();
+
+			// Tooltip is shown after focusing the anchor.
 			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
+			expect( mockOnFocus ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: 'focus',
+				} )
+			);
 		} );
 
 		it( 'should render children with additional tooltip when hovered', async () => {
@@ -80,24 +91,6 @@ describe( 'Tooltip', () => {
 				jest.runOnlyPendingTimers();
 				jest.useRealTimers();
 			}, TOOLTIP_DELAY );
-		} );
-
-		it( 'should show tooltip on focus', () => {
-			const originalFocus = jest.fn();
-			render(
-				<Tooltip text="Help text">
-					<button onFocus={ originalFocus }>Hover Me!</button>
-				</Tooltip>
-			);
-
-			const button = screen.getByRole( 'button' );
-			button.focus();
-			expect( originalFocus ).toHaveBeenCalledWith(
-				expect.objectContaining( {
-					type: 'focus',
-				} )
-			);
-			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
 		} );
 
 		it( 'should not show tooltip on focus as result of mouse click', async () => {
