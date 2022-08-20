@@ -146,7 +146,7 @@ describe( 'Disabled', () => {
 			expect( screen.getByText( 'Not disabled' ) ).toBeInTheDocument();
 		} );
 
-		test( "lets components know that they're not disabled via context", () => {
+		test( "lets components know that they're not disabled via context when the Disabled component is not rendered at all", () => {
 			render( <DisabledStatus /> );
 			expect( screen.getByText( 'Not disabled' ) ).toBeInTheDocument();
 		} );
