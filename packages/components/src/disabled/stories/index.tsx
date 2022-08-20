@@ -22,7 +22,6 @@ const meta: ComponentMeta< typeof Disabled > = {
 	argTypes: {
 		as: { control: { type: null } },
 		children: { control: { type: null } },
-		ref: { control: { type: null } },
 	},
 	parameters: {
 		controls: {
