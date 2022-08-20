@@ -212,10 +212,10 @@ describe( 'Tooltip', () => {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
 
-			const handleClick = jest.fn();
+			const onClickMock = jest.fn();
 			const { container } = render(
 				<Tooltip text="Show helpful text here">
-					<button disabled onClick={ handleClick }>
+					<button disabled onClick={ onClickMock }>
 						Click me
 					</button>
 				</Tooltip>
@@ -224,7 +224,7 @@ describe( 'Tooltip', () => {
 			const eventCatcher =
 				container.getElementsByClassName( 'event-catcher' )[ 0 ];
 			await user.click( eventCatcher );
-			expect( handleClick ).not.toHaveBeenCalled();
+			expect( onClickMock ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should cancel pending setIsOver on mouseleave', async () => {
