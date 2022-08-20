@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -40,19 +40,19 @@ describe( 'Disabled', () => {
 	const Form = () => (
 		<form>
 			<input />
-			<div contentEditable tabIndex={ 0 } />
+			<div title="edit my content" contentEditable tabIndex={ 0 } />
 		</form>
 	);
 
 	it( 'will disable all fields', () => {
-		const { container } = render(
+		render(
 			<Disabled>
 				<Form />
 			</Disabled>
 		);
 
-		const input = container.querySelector( 'form input' );
-		const div = container.querySelector( 'form div' );
+		const input = screen.getByRole( 'textbox' );
+		const div = screen.getByTitle( 'edit my content' );
 		expect( input ).toBeDisabled();
 		expect( div ).toHaveAttribute( 'contenteditable', 'false' );
 		expect( div ).not.toHaveAttribute( 'tabindex' );
@@ -69,11 +69,11 @@ describe( 'Disabled', () => {
 				<Form />
 			);
 
-		const { container, rerender } = render( <MaybeDisable /> );
+		const { rerender } = render( <MaybeDisable /> );
 		rerender( <MaybeDisable isDisabled={ false } /> );
 
-		const input = container.querySelector( 'form input' );
-		const div = container.querySelector( 'form div' );
+		const input = screen.getByRole( 'textbox' );
+		const div = screen.getByTitle( 'edit my content' );
 
 		expect( input ).not.toBeDisabled();
 		expect( div ).toHaveAttribute( 'contenteditable', 'true' );
@@ -87,10 +87,10 @@ describe( 'Disabled', () => {
 			</Disabled>
 		);
 
-		const { container, rerender } = render( <MaybeDisable /> );
+		const { rerender } = render( <MaybeDisable /> );
 
-		const input = container.querySelector( 'form input' );
-		const div = container.querySelector( 'form div' );
+		const input = screen.getByRole( 'textbox' );
+		const div = screen.getByTitle( 'edit my content' );
 
 		expect( input ).toBeDisabled();
 		expect( div ).toHaveAttribute( 'contenteditable', 'false' );
