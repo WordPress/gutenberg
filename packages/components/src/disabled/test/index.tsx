@@ -52,11 +52,11 @@ describe( 'Disabled', () => {
 		);
 
 		const input = screen.getByRole( 'textbox' );
-		const contenteditable = screen.getByTitle( 'edit my content' );
+		const contentEditable = screen.getByTitle( 'edit my content' );
 		expect( input ).toBeDisabled();
-		expect( contenteditable ).toHaveAttribute( 'contenteditable', 'false' );
-		expect( contenteditable ).not.toHaveAttribute( 'tabindex' );
-		expect( contenteditable ).not.toHaveAttribute( 'disabled' );
+		expect( contentEditable ).toHaveAttribute( 'contenteditable', 'false' );
+		expect( contentEditable ).not.toHaveAttribute( 'tabindex' );
+		expect( contentEditable ).not.toHaveAttribute( 'disabled' );
 	} );
 
 	it( 'should cleanly un-disable via reconciliation', () => {
@@ -70,14 +70,18 @@ describe( 'Disabled', () => {
 			);
 
 		const { rerender } = render( <MaybeDisable /> );
-		rerender( <MaybeDisable isDisabled={ false } /> );
 
 		const input = screen.getByRole( 'textbox' );
-		const contenteditable = screen.getByTitle( 'edit my content' );
+		const contentEditable = screen.getByTitle( 'edit my content' );
+
+		expect( input ).toBeDisabled();
+		expect( contentEditable ).toHaveAttribute( 'contenteditable', 'false' );
+
+		rerender( <MaybeDisable isDisabled={ false } /> );
 
 		expect( input ).not.toBeDisabled();
-		expect( contenteditable ).toHaveAttribute( 'contenteditable', 'true' );
-		expect( contenteditable ).toHaveAttribute( 'tabindex' );
+		expect( contentEditable ).toHaveAttribute( 'contenteditable', 'true' );
+		expect( contentEditable ).toHaveAttribute( 'tabindex' );
 	} );
 
 	it( 'will disable or enable descendant fields based on the isDisabled prop value', () => {
@@ -90,15 +94,15 @@ describe( 'Disabled', () => {
 		const { rerender } = render( <MaybeDisable /> );
 
 		const input = screen.getByRole( 'textbox' );
-		const contenteditable = screen.getByTitle( 'edit my content' );
+		const contentEditable = screen.getByTitle( 'edit my content' );
 
 		expect( input ).toBeDisabled();
-		expect( contenteditable ).toHaveAttribute( 'contenteditable', 'false' );
+		expect( contentEditable ).toHaveAttribute( 'contenteditable', 'false' );
 
 		rerender( <MaybeDisable isDisabled={ false } /> );
 
 		expect( input ).not.toBeDisabled();
-		expect( contenteditable ).toHaveAttribute( 'contenteditable', 'true' );
+		expect( contentEditable ).toHaveAttribute( 'contenteditable', 'true' );
 	} );
 
 	// Ideally, we'd have two more test cases here:
