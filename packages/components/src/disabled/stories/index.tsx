@@ -69,6 +69,9 @@ export const Default: ComponentStory< typeof Disabled > = ( args ) => {
 		</Disabled>
 	);
 };
+Default.args = {
+	isDisabled: true,
+};
 
 export const ContentEditable: ComponentStory< typeof Disabled > = ( args ) => {
 	return (
@@ -78,4 +81,7 @@ export const ContentEditable: ComponentStory< typeof Disabled > = ( args ) => {
 			</div>
 		</Disabled>
 	);
+};
+ContentEditable.args = {
+	isDisabled: true,
 };
