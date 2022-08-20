@@ -52,11 +52,11 @@ describe( 'Disabled', () => {
 		);
 
 		const input = screen.getByRole( 'textbox' );
-		const div = screen.getByTitle( 'edit my content' );
+		const contenteditable = screen.getByTitle( 'edit my content' );
 		expect( input ).toBeDisabled();
-		expect( div ).toHaveAttribute( 'contenteditable', 'false' );
-		expect( div ).not.toHaveAttribute( 'tabindex' );
-		expect( div ).not.toHaveAttribute( 'disabled' );
+		expect( contenteditable ).toHaveAttribute( 'contenteditable', 'false' );
+		expect( contenteditable ).not.toHaveAttribute( 'tabindex' );
+		expect( contenteditable ).not.toHaveAttribute( 'disabled' );
 	} );
 
 	it( 'should cleanly un-disable via reconciliation', () => {
@@ -73,11 +73,11 @@ describe( 'Disabled', () => {
 		rerender( <MaybeDisable isDisabled={ false } /> );
 
 		const input = screen.getByRole( 'textbox' );
-		const div = screen.getByTitle( 'edit my content' );
+		const contenteditable = screen.getByTitle( 'edit my content' );
 
 		expect( input ).not.toBeDisabled();
-		expect( div ).toHaveAttribute( 'contenteditable', 'true' );
-		expect( div ).toHaveAttribute( 'tabindex' );
+		expect( contenteditable ).toHaveAttribute( 'contenteditable', 'true' );
+		expect( contenteditable ).toHaveAttribute( 'tabindex' );
 	} );
 
 	it( 'will disable or enable descendant fields based on the isDisabled prop value', () => {
@@ -90,15 +90,15 @@ describe( 'Disabled', () => {
 		const { rerender } = render( <MaybeDisable /> );
 
 		const input = screen.getByRole( 'textbox' );
-		const div = screen.getByTitle( 'edit my content' );
+		const contenteditable = screen.getByTitle( 'edit my content' );
 
 		expect( input ).toBeDisabled();
-		expect( div ).toHaveAttribute( 'contenteditable', 'false' );
+		expect( contenteditable ).toHaveAttribute( 'contenteditable', 'false' );
 
 		rerender( <MaybeDisable isDisabled={ false } /> );
 
 		expect( input ).not.toBeDisabled();
-		expect( div ).toHaveAttribute( 'contenteditable', 'true' );
+		expect( contenteditable ).toHaveAttribute( 'contenteditable', 'true' );
 	} );
 
 	// Ideally, we'd have two more test cases here:
