@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -71,7 +71,6 @@ describe( 'Tooltip', () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
-			jest.useFakeTimers();
 
 			render(
 				<Tooltip text="Help text">
@@ -79,18 +78,18 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			const button = screen.getByRole( 'button' );
+			const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
+			expect( button ).toBeInTheDocument();
+
 			await user.hover( button );
 
-			expect(
-				screen.getByRole( 'button', { name: 'Hover Me!' } )
-			).toBeInTheDocument();
+			// Tooltip hasn't appeared yet
+			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 
-			setTimeout( () => {
-				expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
-				jest.runOnlyPendingTimers();
-				jest.useRealTimers();
-			}, TOOLTIP_DELAY );
+			act( () => jest.advanceTimersByTime( TOOLTIP_DELAY ) );
+
+			// Tooltip shows after the delay
+			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
 		} );
 
 		it( 'should not show tooltip on focus as result of mouse click', async () => {
