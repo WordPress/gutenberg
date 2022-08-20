@@ -15,7 +15,7 @@ import { TOOLTIP_DELAY } from '../index.js';
 
 describe( 'Tooltip', () => {
 	describe( '#render()', () => {
-		it( 'should render children (abort) if multiple children passed', () => {
+		it( 'should not render the tooltip if multiple children are passed', () => {
 			render(
 				<Tooltip text="Help text">
 					<button>Button 1</button>
@@ -40,7 +40,7 @@ describe( 'Tooltip', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should render children with additional popover when focused', () => {
+		it( 'should render children with additional tooltip when focused', () => {
 			render(
 				<Tooltip text="Help text">
 					<button>Hover Me!</button>
@@ -55,7 +55,7 @@ describe( 'Tooltip', () => {
 			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
 		} );
 
-		it( 'should render children with additional popover when hovered', async () => {
+		it( 'should render children with additional tooltip when hovered', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
@@ -81,7 +81,7 @@ describe( 'Tooltip', () => {
 			}, TOOLTIP_DELAY );
 		} );
 
-		it( 'should show popover on focus', () => {
+		it( 'should show tooltip on focus', () => {
 			const originalFocus = jest.fn();
 			render(
 				<Tooltip text="Help text">
@@ -99,7 +99,7 @@ describe( 'Tooltip', () => {
 			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
 		} );
 
-		it( 'should not show popover on focus as result of mouse click', async () => {
+		it( 'should not show tooltip on focus as result of mouse click', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
@@ -122,7 +122,7 @@ describe( 'Tooltip', () => {
 			}, TOOLTIP_DELAY );
 		} );
 
-		it( 'should show popover on delayed mouseenter', async () => {
+		it( 'should show tooltip on delayed mouseenter', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
@@ -152,7 +152,7 @@ describe( 'Tooltip', () => {
 			}, TOOLTIP_DELAY );
 		} );
 
-		it( 'should respect custom delay prop when showing popover', async () => {
+		it( 'should respect custom delay prop when showing tooltip', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
@@ -175,13 +175,13 @@ describe( 'Tooltip', () => {
 			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
 
-			// Popover does not yet exist after default delay, because custom delay is passed.
+			// Tooltip does not yet exist after default delay, because custom delay is passed.
 			setTimeout( () => {
 				expect(
 					screen.queryByText( 'Help text' )
 				).not.toBeInTheDocument();
 			}, TOOLTIP_DELAY );
-			// Popover appears after custom delay.
+			// Tooltip appears after custom delay.
 			setTimeout( () => {
 				expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
 				jest.runOnlyPendingTimers();
