@@ -40,6 +40,18 @@
 		"spacing": {
 			"margin": true,
 			"padding": true
+		},
+		"typography": {
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontFamily": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-tag-cloud-editor"

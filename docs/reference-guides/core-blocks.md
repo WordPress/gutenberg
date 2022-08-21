@@ -797,7 +797,7 @@ A cloud of your most used tags. ([Source](https://github.com/WordPress/gutenberg
 
 -	**Name:** core/tag-cloud
 -	**Category:** widgets
--	**Supports:** align, spacing (margin, padding), ~~html~~
+-	**Supports:** align, spacing (margin, padding), typography (lineHeight), ~~html~~
 -	**Attributes:** largestFontSize, numberOfTags, showTagCounts, smallestFontSize, taxonomy
 
 ## Template Part
