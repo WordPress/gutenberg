@@ -479,12 +479,13 @@ describe( 'RichText', () => {
 		await pressKeyWithModifier( 'primary', 'a' );
 		// Select the parent list item.
 		await pressKeyWithModifier( 'primary', 'a' );
+		// Select all the parent list item text.
+		await pressKeyWithModifier( 'primary', 'a' );
 		// Select the entire list.
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'c' );
 
-		// Collapse the selection to the end.
-		await insertBlock( 'Paragraph' );
+		await page.keyboard.press( 'Enter' );
 
 		// Paste paragraph contents.
 		await pressKeyWithModifier( 'primary', 'v' );

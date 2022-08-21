@@ -85,9 +85,11 @@ export function useFocusFirstElement( clientId ) {
 		const { ownerDocument } = ref.current;
 
 		// Do not focus the block if it already contains the active element.
-		if ( ref.current.contains( ownerDocument.activeElement ) ) {
+		if ( isInsideRootBlock( ref.current, ownerDocument.activeElement ) ) {
 			return;
 		}
+
+		ownerDocument.defaultView.getSelection().removeAllRanges();
 
 		// Find all tabbables within node.
 		const textInputs = focus.tabbable
