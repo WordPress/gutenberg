@@ -570,21 +570,23 @@ describe( 'Writing Flow', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should allow selecting entire list with longer last item', async () => {
+	it( 'should extend selection into paragraph for list with longer last item', async () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '* b' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'cd' );
+
+		// Selects part of the first list item, although invisible.
 		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		// Extends selection into the first paragraph
 		await pressKeyWithModifier( 'shift', 'ArrowUp' );
 
-		// Ensure multi selection is not triggered and selection stays within
-		// the list.
+		// Mixed selection, so all content will be removed.
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toBe( '' );
 	} );
 
 	it( 'should not have a dead zone between blocks (lower)', async () => {

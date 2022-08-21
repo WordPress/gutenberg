@@ -400,12 +400,12 @@ test.describe( 'List', () => {
 			`<!-- wp:list -->
 <ul><!-- wp:list-item -->
 <li>one</li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list -->
+<!-- /wp:list-item -->
 
-<!-- wp:paragraph -->
-<p>two</p>
-<!-- /wp:paragraph -->`
+<!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
 		);
 	} );
 
@@ -469,6 +469,10 @@ test.describe( 'List', () => {
 			`<!-- wp:list -->
 <ul><!-- wp:list-item -->
 <li>one</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
