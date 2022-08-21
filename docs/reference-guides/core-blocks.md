@@ -581,7 +581,7 @@ Displays the title of a post, page, or any other content-type. ([Source](https:/
 
 -	**Name:** core/post-title
 -	**Category:** theme
--	**Supports:** align (full, wide), color (background, gradients, link, text), spacing (margin), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** isLink, level, linkTarget, rel, textAlign
 
 ## Preformatted
