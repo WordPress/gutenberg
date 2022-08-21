@@ -313,7 +313,7 @@ const ConnectedCard = contextConnect( Card, 'Card' );
 export default ConnectedCard;
 
 //=========================================================================
-// Simplified snippet from `packages/components/src/card/card-body/hook.js`
+// Simplified snippet from `packages/components/src/card/card-body/hook.ts`
 //=========================================================================
 import { useContextSystem } from '../../ui/context';
 
