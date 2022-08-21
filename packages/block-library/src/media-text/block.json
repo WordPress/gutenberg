@@ -97,6 +97,10 @@
 				"background": true,
 				"text": true
 			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
 		}
 	},
 	"editorStyle": "wp-block-media-text-editor",
