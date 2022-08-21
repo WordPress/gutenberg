@@ -19,8 +19,9 @@
 		"align": true,
 		"color": {
 			"link": true,
-			"background": false,
+			"__experimentalSkipSerialization": [ "text", "background" ],
 			"__experimentalDefaultControls": {
+				"background": true,
 				"text": true
 			}
 		}

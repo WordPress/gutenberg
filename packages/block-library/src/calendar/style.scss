@@ -10,13 +10,14 @@
 	table {
 		width: 100%;
 		border-collapse: collapse;
+
+		// Keep the hard-coded header background color for backward compatibility.
+		&:not(.has-text-color):not(.has-background) th {
+			background: $gray-300;
+		}
 	}
 
 	thead {
 		border-bottom: 3px solid;
-	}
-
-	a {
-		text-decoration: underline;
 	}
 }
