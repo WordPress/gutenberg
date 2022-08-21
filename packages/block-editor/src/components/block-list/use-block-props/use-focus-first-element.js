@@ -89,8 +89,6 @@ export function useFocusFirstElement( clientId ) {
 			return;
 		}
 
-		ownerDocument.defaultView.getSelection().removeAllRanges();
-
 		// Find all tabbables within node.
 		const textInputs = focus.tabbable
 			.find( ref.current )

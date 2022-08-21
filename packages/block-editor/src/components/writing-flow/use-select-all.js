@@ -46,7 +46,12 @@ export default function useSelectAll() {
 			// If we have selected all sibling nested blocks, try selecting up a
 			// level. See: https://github.com/WordPress/gutenberg/pull/31859/
 			if ( selectedClientIds.length === blockClientIds.length ) {
-				selectBlock( rootClientId );
+				if ( rootClientId ) {
+					node.ownerDocument.defaultView
+						.getSelection()
+						.removeAllRanges();
+					selectBlock( rootClientId );
+				}
 				return;
 			}
 

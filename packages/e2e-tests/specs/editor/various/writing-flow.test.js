@@ -580,8 +580,10 @@ describe( 'Writing Flow', () => {
 
 		// Selects part of the first list item, although invisible.
 		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		// Extends selection into the first paragraph
 		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 
 		// Mixed selection, so all content will be removed.
 		await page.keyboard.press( 'Backspace' );
