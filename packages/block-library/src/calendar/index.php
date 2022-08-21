@@ -83,7 +83,7 @@ add_action( 'init', 'register_block_core_calendar' );
  * @return string Style HTML attribute.
  */
 function styles_for_block_core_calendar( $attributes ) {
-	$table_styles   = array();
+	$table_styles = array();
 
 	// Add color styles.
 	$has_text_color = ! empty( $attributes['style']['color']['text'] );
