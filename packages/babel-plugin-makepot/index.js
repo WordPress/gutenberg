@@ -197,17 +197,9 @@ function isSameTranslation( a, b ) {
  * @return {Array} Sorted translations.
  */
 function sortByReference( translations = [] ) {
-	return [ ...translations ].sort( ( a, b ) => {
-		const referenceA = a.comments.reference;
-		const referenceB = b.comments.reference;
-		if ( referenceA < referenceB ) {
-			return -1;
-		}
-		if ( referenceA > referenceB ) {
-			return 1;
-		}
-		return 0;
-	} );
+	return [ ...translations ].sort( ( a, b ) =>
+		a.comments.reference.localeCompare( b.comments.reference )
+	);
 }
 
 module.exports = () => {

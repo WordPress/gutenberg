@@ -823,17 +823,9 @@ function getContributorPropsMarkdownList( ftcPRs ) {
  * @return {IssuesListForRepoResponseItem[]} The sorted list of pull requests.
  */
 function sortByUsername( items ) {
-	return [ ...items ].sort( ( a, b ) => {
-		const usernameA = a.user.login.toLowerCase();
-		const usernameB = b.user.login.toLowerCase();
-		if ( usernameA < usernameB ) {
-			return -1;
-		}
-		if ( usernameA > usernameB ) {
-			return 1;
-		}
-		return 0;
-	} );
+	return [ ...items ].sort( ( a, b ) =>
+		a.user.login.toLowerCase().localeCompare( b.user.login.toLowerCase() )
+	);
 }
 
 /**

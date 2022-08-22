@@ -165,17 +165,7 @@ const registerBlockVariations = ( block ) => {
 	}
 
 	[ ...settings.variations ]
-		.sort( ( a, b ) => {
-			const variationA = a.title;
-			const variationB = b.title;
-			if ( variationA < variationB ) {
-				return -1;
-			}
-			if ( variationA > variationB ) {
-				return 1;
-			}
-			return 0;
-		} )
+		.sort( ( a, b ) => a.title.localeCompare( b.title ) )
 		.forEach( ( v ) => {
 			registerBlockType( `${ name }-${ v.name }`, {
 				...metadata,

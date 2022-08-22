@@ -134,15 +134,7 @@ function usePageData() {
 		// https://core.trac.wordpress.org/ticket/39037
 		const sortedPages = [ ...( pages ?? [] ) ].sort( ( a, b ) => {
 			if ( a.menu_order === b.menu_order ) {
-				const titleA = a.title.rendered;
-				const titleB = b.title.rendered;
-				if ( titleA < titleB ) {
-					return -1;
-				}
-				if ( titleA > titleB ) {
-					return 1;
-				}
-				return 0;
+				return a.title.rendered.localeCompare( b.title.rendered );
 			}
 			return a.menu_order - b.menu_order;
 		} );
