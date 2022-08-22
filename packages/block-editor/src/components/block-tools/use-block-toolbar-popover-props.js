@@ -29,7 +29,7 @@ const RESTRICTED_HEIGHT_PROPS = {
  * Get the popover props for the block toolbar, determined by the space at the top of the canvas and the toolbar height.
  *
  * @param {Element} contentElement       The DOM element that represents the editor content or canvas.
- * @param {Element} selectedBlockElement The clientId of the first selected block.
+ * @param {Element} selectedBlockElement The outer DOM element of the first selected block.
  * @param {number}  toolbarHeight        The height of the toolbar in pixels.
  *
  * @return {Object} The popover props used to determine the position of the toolbar.
