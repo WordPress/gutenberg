@@ -121,10 +121,12 @@ export default function useSetting( path ) {
 
 			let result;
 			const normalizedPath = removeCustomPrefixes( path );
+			const blockParentIds =
+				select( blockEditorStore ).getBlockParents( clientId );
 
 			// 1. Take settings from the block instance or its ancestors.
 			const candidates = [
-				...select( blockEditorStore ).getBlockParents( clientId ),
+				...blockParentIds,
 				clientId, // The current block is added last, so it overwrites any ancestor.
 			];
 			candidates.forEach( ( candidateClientId ) => {
@@ -154,6 +156,33 @@ export default function useSetting( path ) {
 					}
 				}
 			} );
+
+			// Take settings from parent nesting settings.
+			const isHeadingColorText =
+				blockName === 'core/heading' && path === 'color.palette.theme';
+
+			const parents =
+				select( blockEditorStore ).getBlocksByClientId(
+					blockParentIds
+				);
+			const hasMediaTextParent = parents.some(
+				( block ) => block.name === 'core/media-text'
+			);
+
+			if ( isHeadingColorText && hasMediaTextParent ) {
+				result = [
+					{
+						slug: 'layer-accent-blue',
+						color: 'var(--wp--custom--layer--accent--blue)',
+						name: 'blue accent',
+					},
+					{
+						slug: 'layer-accent-orange',
+						color: 'var(--wp--custom--layer--accent--orange)',
+						name: 'orange accent',
+					},
+				];
+			}
 
 			// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
 			const settings = select( blockEditorStore ).getSettings();
