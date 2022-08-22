@@ -27,6 +27,7 @@
 
 ### Internal
 
+-   `Tooltip`: Refactor tests to `@testing-library/react` ([#43061](https://github.com/WordPress/gutenberg/pull/43061)).
 -   Update `floating-ui` to the latest version ([#43206](https://github.com/WordPress/gutenberg/pull/43206)).
 -   `DateTimePicker`, `TimePicker`, `DatePicker`: Switch from `moment` to `date-fns` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
 -   `DatePicker`: Switch from `react-dates` to `use-lilius` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
