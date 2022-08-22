@@ -3,7 +3,7 @@
 		"name": "core/pullquote",
 		"isValid": true,
 		"attributes": {
-			"value": "<p>Paragraph <strong>one</strong></p><p>Paragraph two</p>",
+			"value": "Paragraph <strong>one</strong><br>Paragraph two",
 			"citation": "by whomever"
 		},
 		"innerBlocks": []
