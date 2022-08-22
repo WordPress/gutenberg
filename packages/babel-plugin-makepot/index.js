@@ -33,15 +33,7 @@
  */
 
 const { po } = require( 'gettext-parser' );
-const {
-	pick,
-	reduce,
-	forEach,
-	sortBy,
-	isEqual,
-	merge,
-	isEmpty,
-} = require( 'lodash' );
+const { pick, reduce, forEach, isEqual, merge, isEmpty } = require( 'lodash' );
 const { relative, sep } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
@@ -196,6 +188,28 @@ function isSameTranslation( a, b ) {
 	);
 }
 
+/**
+ * Sorts multiple translation objects by their reference.
+ * The reference is where they occur, in the format `file:line`.
+ *
+ * @param {Array} translations Array of translations to sort.
+ *
+ * @return {Array} Sorted translations.
+ */
+function sortByReference( translations = [] ) {
+	return [ ...translations ].sort( ( a, b ) => {
+		const referenceA = a.comments.reference;
+		const referenceB = b.comments.reference;
+		if ( referenceA < referenceB ) {
+			return -1;
+		}
+		if ( referenceA > referenceB ) {
+			return 1;
+		}
+		return 0;
+	} );
+}
+
 module.exports = () => {
 	const strings = {};
 	let nplurals = 2,
@@ -323,9 +337,8 @@ module.exports = () => {
 						( memo, file ) => {
 							for ( const context in strings[ file ] ) {
 								// Within the same file, sort translations by line.
-								const sortedTranslations = sortBy(
-									strings[ file ][ context ],
-									'comments.reference'
+								const sortedTranslations = sortByReference(
+									strings[ file ][ context ]
 								);
 
 								forEach(

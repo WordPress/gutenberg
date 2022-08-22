@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { groupBy, escapeRegExp, flow, sortBy } = require( 'lodash' );
+const { groupBy, escapeRegExp, flow } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
@@ -823,7 +823,17 @@ function getContributorPropsMarkdownList( ftcPRs ) {
  * @return {IssuesListForRepoResponseItem[]} The sorted list of pull requests.
  */
 function sortByUsername( items ) {
-	return sortBy( items, ( item ) => item.user.login.toLowerCase() );
+	return [ ...items ].sort( ( a, b ) => {
+		const usernameA = a.user.login.toLowerCase();
+		const usernameB = b.user.login.toLowerCase();
+		if ( usernameA < usernameB ) {
+			return -1;
+		}
+		if ( usernameA > usernameB ) {
+			return 1;
+		}
+		return 0;
+	} );
 }
 
 /**
