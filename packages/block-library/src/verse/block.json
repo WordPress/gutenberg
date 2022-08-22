@@ -44,6 +44,7 @@
 			}
 		},
 		"spacing": {
+			"margin": true,
 			"padding": true
 		}
 	},

@@ -42,6 +42,31 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 	$layout_type   = isset( $layout['type'] ) ? $layout['type'] : 'default';
 	$layout_styles = array();
 	if ( 'default' === $layout_type ) {
+		if ( $has_block_gap_support ) {
+			if ( is_array( $gap_value ) ) {
+				$gap_value = isset( $gap_value['top'] ) ? $gap_value['top'] : null;
+			}
+			if ( $gap_value && ! $should_skip_gap_serialization ) {
+				array_push(
+					$layout_styles,
+					array(
+						'selector'     => "$selector > *",
+						'declarations' => array(
+							'margin-block-start' => '0',
+							'margin-block-end'   => '0',
+						),
+					),
+					array(
+						'selector'     => "$selector$selector > * + *",
+						'declarations' => array(
+							'margin-block-start' => $gap_value,
+							'margin-block-end'   => '0',
+						),
+					)
+				);
+			}
+		}
+	} elseif ( 'constrained' === $layout_type ) {
 		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : '';
 		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : '';
 
@@ -254,11 +279,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$has_block_gap_support  = isset( $block_gap ) ? null !== $block_gap : false;
 	$default_block_layout   = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
 	$used_layout            = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
+
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
 		if ( ! $global_layout_settings ) {
 			return $block_content;
 		}
-		$used_layout = $global_layout_settings;
 	}
 
 	$class_names        = array();
@@ -267,6 +292,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$container_class    = wp_unique_id( 'wp-container-' );
 	$layout_classname   = '';
 	$use_global_padding = gutenberg_get_global_settings( array( 'useRootPaddingAwareAlignments' ) ) && ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] );
+
+	// Set the correct layout type for blocks using legacy content width.
+	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] ) {
+		$used_layout['type'] = 'constrained';
+	}
 
 	if ( $use_global_padding ) {
 		$class_names[] = 'has-global-padding';
