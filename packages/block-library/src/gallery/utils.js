@@ -30,7 +30,7 @@ export function getHrefAndDestination(
 ) {
 	// Gutenberg and WordPress use different constants so if image_default_link_type
 	// option is set we need to map from the WP Core values.
-	switch ( galleryDestination || imageDestination ) {
+	switch ( imageDestination ? imageDestination : galleryDestination ) {
 		case LINK_DESTINATION_MEDIA_WP_CORE:
 		case LINK_DESTINATION_MEDIA:
 			return {
