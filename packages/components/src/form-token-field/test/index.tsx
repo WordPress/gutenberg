@@ -1081,7 +1081,7 @@ describe( 'FormTokenField', () => {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
 
-			const suggestions = [ 'Aluminum', 'Silver', 'Gold' ];
+			const suggestions = [ 'Aluminum', 'Silver', 'Bronze' ];
 
 			const { rerender } = render( <FormTokenFieldWithState /> );
 
@@ -1097,6 +1097,49 @@ describe( 'FormTokenField', () => {
 			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
 				'Silver',
 			] );
+		} );
+
+		it( 'should automatically select the first matching suggestions when the `__experimentalAutoSelectFirstMatch` prop is set to `true`', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const suggestions = [ 'Walnut', 'Hazelnut', 'Pecan' ];
+
+			const { rerender } = render(
+				<FormTokenFieldWithState suggestions={ suggestions } />
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Type "nut", which will match "Walnut" and "Hazelnut".
+			await user.type( input, 'nut' );
+
+			const suggestionList = screen.getByRole( 'listbox' );
+
+			expectVisibleSuggestionsToBe( suggestionList, [
+				'Walnut',
+				'Hazelnut',
+			] );
+
+			expect(
+				within( suggestionList ).queryByRole( 'option', {
+					selected: true,
+				} )
+			).not.toBeInTheDocument();
+
+			rerender(
+				<FormTokenFieldWithState
+					__experimentalAutoSelectFirstMatch={ true }
+					suggestions={ suggestions }
+				/>
+			);
+
+			expect(
+				within( suggestionList ).getByRole( 'option', {
+					selected: true,
+				} )
+			).toHaveAccessibleName( 'Walnut' );
 		} );
 	} );
 

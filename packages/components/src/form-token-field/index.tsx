@@ -116,6 +116,11 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ incompleteTokenValue ] );
 
+	useEffect( () => {
+		updateSuggestions();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ __experimentalAutoSelectFirstMatch ] );
+
 	if ( disabled && isActive ) {
 		setIsActive( false );
 		setIncompleteTokenValue( '' );
