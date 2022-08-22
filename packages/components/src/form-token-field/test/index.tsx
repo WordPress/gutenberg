@@ -13,6 +13,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import fixtures from './lib/fixtures';
 import FormTokenField from '../';
 
 const FormTokenFieldWithState = ( {
@@ -648,18 +649,6 @@ describe( 'FormTokenField', () => {
 	} );
 
 	describe( 'displayTransform', () => {
-		const textUnescapedTokens = [ 'a   b', 'i <3 tags', '1&2&3&4' ];
-		const textEscapedTokens = [
-			'a   b',
-			'i &lt;3 tags',
-			'1&amp;2&amp;3&amp;4',
-		];
-		const htmlEscapedTokens = [
-			'a&nbsp;&nbsp;&nbsp;b',
-			'i&nbsp;&lt;3&nbsp;tags',
-			'1&amp;2&amp;3&amp;4',
-		];
-
 		function unescapeAndFormatSpaces( str: string ) {
 			const nbsp = String.fromCharCode( 160 );
 			const escaped = new DOMParser().parseFromString( str, 'text/html' );
@@ -671,13 +660,13 @@ describe( 'FormTokenField', () => {
 		it( 'should allow to pass a function that renders tokens with escaped special characters correctly', async () => {
 			render(
 				<FormTokenFieldWithState
-					initialValue={ textEscapedTokens }
+					initialValue={ fixtures.specialTokens.textEscaped }
 					displayTransform={ unescapeAndFormatSpaces }
 				/>
 			);
 
 			// This is hacky, but it's a way we can check exactly the output HTML
-			htmlEscapedTokens.forEach( ( tokenHtml ) => {
+			fixtures.specialTokens.htmlEscaped.forEach( ( tokenHtml ) => {
 				screen.getByText( ( _, node: Element | null ) => {
 					if ( node === null ) {
 						return false;
@@ -698,13 +687,13 @@ describe( 'FormTokenField', () => {
 			// through unescaped to the HTML.
 			render(
 				<FormTokenFieldWithState
-					initialValue={ textUnescapedTokens }
+					initialValue={ fixtures.specialTokens.textUnescaped }
 					displayTransform={ unescapeAndFormatSpaces }
 				/>
 			);
 
 			// This is hacky, but it's a way we can check exactly the output HTML
-			htmlEscapedTokens.forEach( ( tokenHtml ) => {
+			fixtures.specialTokens.htmlUnescaped.forEach( ( tokenHtml ) => {
 				screen.getByText( ( _, node: Element | null ) => {
 					if ( node === null ) {
 						return false;
