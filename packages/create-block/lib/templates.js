@@ -22,7 +22,7 @@ const predefinedPluginTemplates = {
 	es5: {
 		defaultValues: {
 			slug: 'example-static-es5',
-			title: 'Example Static Block (ES5)',
+			title: 'Example Static (ES5)',
 			description:
 				'Example block scaffolded with Create Block tool – no build step required.',
 			dashicon: 'smiley',
@@ -36,14 +36,14 @@ const predefinedPluginTemplates = {
 			static: {},
 			dynamic: {
 				slug: 'example-dynamic-es5',
-				title: 'Example Dynamic Block (ES5)',
+				title: 'Example Dynamic (ES5)',
 			},
 		},
 	},
 	standard: {
 		defaultValues: {
-			slug: 'example-static-block',
-			title: 'Example Static Block',
+			slug: 'example-static',
+			title: 'Example Static',
 			description: 'Example block scaffolded with Create Block tool.',
 			dashicon: 'smiley',
 			supports: {
@@ -53,8 +53,8 @@ const predefinedPluginTemplates = {
 		variants: {
 			static: {},
 			dynamic: {
-				slug: 'example-dynamic-block',
-				title: 'Example Dynamic Block',
+				slug: 'example-dynamic',
+				title: 'Example Dynamic',
 			},
 		},
 	},
