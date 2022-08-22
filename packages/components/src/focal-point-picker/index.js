@@ -45,18 +45,29 @@ export default function FocalPointPicker( {
 	},
 } ) {
 	const [ point, setPoint ] = useState( valueProp );
-	// Tracks the internal point value when it’s yet to be propagated.
-	const refPoint = useRef();
-	const keepPoint = ( value ) => {
-		setPoint( value );
-		refPoint.current = value;
-	};
-	const sendPoint = ( value = refPoint.current ) => {
-		onChange?.( value );
-		refPoint.current = undefined;
-	};
-	// Uses the internal point if it is held or else the value from props.
-	const { x, y } = refPoint.current !== undefined ? point : valueProp;
+
+	const { startDrag, endDrag, isDragging } = useDragging( {
+		onDragStart: ( event ) => {
+			dragAreaRef.current.focus();
+			const value = getValueWithinDragArea( event );
+			onDragStart?.( value, event );
+			setPoint( value );
+		},
+		onDragMove: ( event ) => {
+			// Prevents text-selection when dragging.
+			event.preventDefault();
+			const value = getValueWithinDragArea( event );
+			onDrag?.( value, event );
+			setPoint( value );
+		},
+		onDragEnd: ( event ) => {
+			onDragEnd?.( event );
+			onChange?.( point );
+		},
+	} );
+
+	// Uses the internal point while dragging or else the value from props.
+	const { x, y } = isDragging ? point : valueProp;
 
 	const dragAreaRef = useRef();
 	const [ bounds, setBounds ] = useState( INITIAL_BOUNDS );
@@ -80,26 +91,6 @@ export default function FocalPointPicker( {
 
 	// Updates the bounds to cover cases of unspecified media or load failures.
 	useIsomorphicLayoutEffect( () => void refUpdateBounds.current(), [] );
-
-	const { startDrag, endDrag, isDragging } = useDragging( {
-		onDragStart: ( event ) => {
-			dragAreaRef.current.focus();
-			const value = getValueWithinDragArea( event );
-			onDragStart?.( value, event );
-			keepPoint( value );
-		},
-		onDragMove: ( event ) => {
-			// Prevents text-selection when dragging.
-			event.preventDefault();
-			const value = getValueWithinDragArea( event );
-			onDrag?.( value, event );
-			keepPoint( value );
-		},
-		onDragEnd: ( event ) => {
-			onDragEnd?.( event );
-			sendPoint();
-		},
-	} );
 
 	const getValueWithinDragArea = ( { clientX, clientY, shiftKey } ) => {
 		const { top, left } = dragAreaRef.current.getBoundingClientRect();
@@ -139,7 +130,7 @@ export default function FocalPointPicker( {
 			code === 'ArrowUp' || code === 'ArrowLeft' ? -1 * step : step;
 		const axis = code === 'ArrowUp' || code === 'ArrowDown' ? 'y' : 'x';
 		value[ axis ] = parseFloat( value[ axis ] ) + delta;
-		sendPoint( getFinalValue( value ) );
+		onChange?.( getFinalValue( value ) );
 	};
 
 	const focalPointPosition = {
@@ -190,7 +181,7 @@ export default function FocalPointPicker( {
 			<Controls
 				point={ { x, y } }
 				onChange={ ( value ) => {
-					sendPoint( getFinalValue( value ) );
+					onChange?.( getFinalValue( value ) );
 				} }
 			/>
 		</BaseControl>
