@@ -137,7 +137,7 @@ const updateURI = {
 const variant = {
 	type: 'list',
 	name: 'variant',
-	message: 'The template variant to use for this block.',
+	message: 'The template variant to use for this block:',
 	choices: [],
 };
 
