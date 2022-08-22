@@ -99,10 +99,8 @@ const expectVisibleSuggestionsToBe = (
 };
 
 // TODO:
-// - tokens as objects?
 // - suggestions:
 //   - update message (a11y)
-//   - suggestions as objects
 //   - async?
 //   - __experimentalRenderItem
 //   - __experimentalAutoSelectFirstMatch
@@ -1033,8 +1031,118 @@ describe( 'FormTokenField', () => {
 		} );
 	} );
 
+	describe( 'tokens as objects', () => {
+		it( 'should accept tokens in their object format', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const onChangeSpy = jest.fn();
+
+			const { rerender } = render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					__experimentalExpandOnFocus={ true }
+					initialValue={ [
+						{ value: 'Italy' },
+						{ value: 'Switzerland' },
+					] }
+				/>
+			);
+
+			expectTokensToBeInTheDocument( [ 'Italy', 'Switzerland' ] );
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'Italy[Enter]' );
+
+			expect( onChangeSpy ).not.toHaveBeenCalled();
+
+			rerender(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					__experimentalExpandOnFocus={ true }
+					initialValue={ [
+						{ value: 'Italy' },
+						{ value: 'Switzerland' },
+					] }
+					suggestions={ [ 'Italy', 'Switzerland', 'Sweden' ] }
+				/>
+			);
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Sweden',
+			] );
+		} );
+
+		it( 'should trigger mouse callbacks if set on tokens', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const onMouseEnterSpy = jest.fn();
+			const onMouseLeaveSpy = jest.fn();
+
+			render(
+				<FormTokenFieldWithState
+					initialValue={ [
+						{
+							value: 'Germany',
+							onMouseEnter: onMouseEnterSpy,
+							onMouseLeave: onMouseLeaveSpy,
+						},
+						{ value: 'Liechtenstein' },
+						{ value: 'Austria' },
+					] }
+				/>
+			);
+
+			// Move mouse over the 'Germany' token, then over 'Austria', then over
+			// 'Liechtenstein'. The mouse-related callbacks should fire only for
+			// the 'Germany' token, since they are not defined for other tokens.
+			await user.hover( screen.getByText( 'Germany', { exact: true } ) );
+
+			expect( onMouseEnterSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onMouseLeaveSpy ).not.toHaveBeenCalled();
+
+			await user.hover( screen.getByText( 'Austria', { exact: true } ) );
+
+			expect( onMouseEnterSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onMouseLeaveSpy ).toHaveBeenCalledTimes( 1 );
+
+			await user.hover(
+				screen.getByText( 'Liechtenstein', { exact: true } )
+			);
+
+			expect( onMouseEnterSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onMouseLeaveSpy ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should add an accessible `title` to a token when specified', () => {
+			render(
+				<FormTokenFieldWithState
+					initialValue={ [
+						{ value: 'France' },
+						{ value: 'Spain', title: 'España' },
+					] }
+				/>
+			);
+
+			expect( screen.queryByTitle( 'France' ) ).not.toBeInTheDocument();
+			expect( screen.getByTitle( 'España' ) ).toBeVisible();
+		} );
+
+		it( 'should be still used to filter out duplicate suggestions', () => {
+			render(
+				<FormTokenFieldWithState
+					__experimentalExpandOnFocus={ true }
+					initialValue={ [ { value: 'France' }, { value: 'Spain' } ] }
+				/>
+			);
+		} );
+	} );
+
 	describe( 'saveTransform', () => {
-		it.only( "by default, it should trim the input's value from extra white spaces before attempting to add it as a token", async () => {
+		it( "by default, it should trim the input's value from extra white spaces before attempting to add it as a token", async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
