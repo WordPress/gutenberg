@@ -443,14 +443,14 @@
 .block-editor-iframe__body {
 	background: $white;
 	transition: all 0.3s;
-}
 
-.block-editor-iframe__body.is-zoomed-out {
-	transform-origin: top center;
-	transform: scale(0.45);
-	margin-bottom: -70%;
-}
+	&.is-zoomed-out {
+		transform-origin: top center;
+		transform: scale(0.45);
+		margin-bottom: -70%;
 
-.block-editor-iframe__body.is-zoomed-out > .block-list-appender {
-	display: none;
+		> .block-list-appender {
+			display: none;
+		}
+	}
 }

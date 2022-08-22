@@ -288,9 +288,11 @@ function Iframe(
 							<head ref={ headRef }>
 								{ head }
 								<style>
-									{ isZoomedOut
-										? `html { transition: padding 0.3s; background: #2f2f2f; padding: 100px 0; }`
-										: `html { transition: padding 0.3s; }` }
+									{ `html { transition: padding 0.3s, background 0.3s; ${
+										isZoomedOut
+											? `background: #2f2f2f; padding: 100px 0;`
+											: ''
+									} }` }
 								</style>
 							</head>
 							<body
