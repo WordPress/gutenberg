@@ -18,7 +18,6 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import fixtures from './lib/fixtures';
 import FormTokenField from '../';
 
 const FormTokenFieldWithState = ( {
@@ -97,6 +96,12 @@ const expectVisibleSuggestionsToBe = (
 		);
 	} );
 };
+
+function unescapeAndFormatSpaces( str: string ) {
+	const nbsp = String.fromCharCode( 160 );
+	const escaped = new DOMParser().parseFromString( str, 'text/html' );
+	return escaped.documentElement.textContent?.replace( / /g, nbsp ) ?? '';
+}
 
 // TODO:
 // - suggestions:
@@ -1377,14 +1382,6 @@ describe( 'FormTokenField', () => {
 	} );
 
 	describe( 'displayTransform', () => {
-		function unescapeAndFormatSpaces( str: string ) {
-			const nbsp = String.fromCharCode( 160 );
-			const escaped = new DOMParser().parseFromString( str, 'text/html' );
-			return (
-				escaped.documentElement.textContent?.replace( / /g, nbsp ) ?? ''
-			);
-		}
-
 		it( 'should allow to modify the text rendered in the browser for each token', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
@@ -1482,13 +1479,21 @@ describe( 'FormTokenField', () => {
 		it( 'should allow to pass a function that renders tokens with escaped special characters correctly', async () => {
 			render(
 				<FormTokenFieldWithState
-					initialValue={ fixtures.specialTokens.textEscaped }
+					initialValue={ [
+						'a   b',
+						'i &lt;3 tags',
+						'1&amp;2&amp;3&amp;4',
+					] }
 					displayTransform={ unescapeAndFormatSpaces }
 				/>
 			);
 
 			// This is hacky, but it's a way we can check exactly the output HTML
-			fixtures.specialTokens.htmlEscaped.forEach( ( tokenHtml ) => {
+			[
+				'a&nbsp;&nbsp;&nbsp;b',
+				'i&nbsp;&lt;3&nbsp;tags',
+				'1&amp;2&amp;3&amp;4',
+			].forEach( ( tokenHtml ) => {
 				screen.getByText( ( _, node: Element | null ) => {
 					if ( node === null ) {
 						return false;
@@ -1509,13 +1514,17 @@ describe( 'FormTokenField', () => {
 			// through unescaped to the HTML.
 			render(
 				<FormTokenFieldWithState
-					initialValue={ fixtures.specialTokens.textUnescaped }
+					initialValue={ [ 'a   b', 'i <3 tags', '1&2&3&4' ] }
 					displayTransform={ unescapeAndFormatSpaces }
 				/>
 			);
 
 			// This is hacky, but it's a way we can check exactly the output HTML
-			fixtures.specialTokens.htmlUnescaped.forEach( ( tokenHtml ) => {
+			[
+				'a&nbsp;&nbsp;&nbsp;b',
+				'i&nbsp;&lt;3&nbsp;tags',
+				'1&amp;2&amp;3&amp;4',
+			].forEach( ( tokenHtml ) => {
 				screen.getByText( ( _, node: Element | null ) => {
 					if ( node === null ) {
 						return false;
