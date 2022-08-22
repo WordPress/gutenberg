@@ -450,16 +450,15 @@ export function ColorEdit( props ) {
 		};
 	};
 
-	const isWebAndColorNotGradient =
-		Platform.OS === 'web' && ! gradient && ! style?.color?.gradient;
-
 	const defaultColorControls = getBlockSupport( props.name, [
 		COLOR_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
 
 	const enableContrastChecking =
-		isWebAndColorNotGradient &&
+		Platform.OS === 'web' &&
+		! gradient &&
+		! style?.color?.gradient &&
 		// Contrast checking is enabled by default.
 		// Deactivating it requires `__experimentalCheckContrast` to have
 		// an explicit value of `false`.
