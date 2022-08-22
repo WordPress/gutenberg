@@ -20,7 +20,10 @@ async function getCommits( file ) {
 
 const prRegex = /\(#([0-9]+)\)$/;
 const ghRoot = 'https://github.com/WordPress/gutenberg/commits/trunk/';
-const backportDirectories = [ 'lib/compat/wordpress-6.1/' ];
+const backportDirectories = [
+	'lib/block-supports/',
+	'lib/compat/wordpress-6.1/',
+];
 
 backportDirectories.forEach( async ( backportDir ) => {
 	console.log( `### ${ backportDir }\n` );
