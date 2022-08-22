@@ -10,11 +10,6 @@ import {
 	symbolFilled as symbolFilledIcon,
 } from '@wordpress/icons';
 
-/**
- * Internal dependencies
- */
-import InserterItem from './inserter-item';
-
 function getTemplatePartIcon( iconName ) {
 	if ( 'header' === iconName ) {
 		return headerIcon;
@@ -48,20 +43,13 @@ export function enhanceTemplatePartVariations( settings, name ) {
 			return entity?.area === variationAttributes.area;
 		};
 
-		const variations = settings.variations.map( ( variation ) => {
-			const inserterItem =
-				variation.name === 'header' || variation.name === 'footer'
-					? InserterItem
-					: undefined;
-			return {
-				...variation,
-				inserterItem,
-				...( ! variation.isActive && { isActive } ),
-				...( typeof variation.icon === 'string' && {
-					icon: getTemplatePartIcon( variation.icon ),
-				} ),
-			};
-		} );
+		const variations = settings.variations.map( ( variation ) => ( {
+			...variation,
+			...( ! variation.isActive && { isActive } ),
+			...( typeof variation.icon === 'string' && {
+				icon: getTemplatePartIcon( variation.icon ),
+			} ),
+		} ) );
 
 		return {
 			...settings,

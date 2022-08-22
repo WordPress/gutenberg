@@ -23,7 +23,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { createTemplatePartPostData, useTemplatePartArea } from './utils';
 import TemplatePartSelection from './template-part-selection';
 
-export default function TemplatePartInserterItem( props ) {
+export default function TemplatePartCustomInserterItem( props ) {
 	const [ isSaving, setIsSaving ] = useState( false );
 	const { rootClientId, item, onSelect } = props;
 	const { saveEntityRecord } = useDispatch( coreStore );

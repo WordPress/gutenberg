@@ -2,12 +2,14 @@
  * Internal dependencies
  */
 import InserterListItemBase from './base';
+import { useCustomInserterItems } from '../inserter/custom-inserter-items-context';
 
 export default function InserterListItem( props ) {
-	const { inserterItem: InserterItem } = props.item;
+	const customInserterItems = useCustomInserterItems();
+	const CustomInserterItem = customInserterItems[ props.item.id ];
 
-	if ( InserterItem ) {
-		return <InserterItem { ...props } />;
+	if ( CustomInserterItem ) {
+		return <CustomInserterItem { ...props } />;
 	}
 
 	return <InserterListItemBase { ...props } />;

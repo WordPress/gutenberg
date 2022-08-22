@@ -8,9 +8,11 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import InserterMenu from './menu';
+import { CustomInserterItemsProvider } from './custom-inserter-items-context';
 import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
+const EMPTY_ARRAY = [];
 
 function InserterLibrary(
 	{
@@ -19,6 +21,7 @@ function InserterLibrary(
 		isAppender,
 		showInserterHelpPanel,
 		showMostUsedBlocks = false,
+		__experimentalCustomInserterItems = EMPTY_ARRAY,
 		__experimentalInsertionIndex,
 		__experimentalFilterValue,
 		onSelect = noop,
@@ -38,18 +41,22 @@ function InserterLibrary(
 	);
 
 	return (
-		<InserterMenu
-			onSelect={ onSelect }
-			rootClientId={ destinationRootClientId }
-			clientId={ clientId }
-			isAppender={ isAppender }
-			showInserterHelpPanel={ showInserterHelpPanel }
-			showMostUsedBlocks={ showMostUsedBlocks }
-			__experimentalInsertionIndex={ __experimentalInsertionIndex }
-			__experimentalFilterValue={ __experimentalFilterValue }
-			shouldFocusBlock={ shouldFocusBlock }
-			ref={ ref }
-		/>
+		<CustomInserterItemsProvider
+			value={ __experimentalCustomInserterItems }
+		>
+			<InserterMenu
+				onSelect={ onSelect }
+				rootClientId={ destinationRootClientId }
+				clientId={ clientId }
+				isAppender={ isAppender }
+				showInserterHelpPanel={ showInserterHelpPanel }
+				showMostUsedBlocks={ showMostUsedBlocks }
+				__experimentalInsertionIndex={ __experimentalInsertionIndex }
+				__experimentalFilterValue={ __experimentalFilterValue }
+				shouldFocusBlock={ shouldFocusBlock }
+				ref={ ref }
+			/>
+		</CustomInserterItemsProvider>
 	);
 }
 

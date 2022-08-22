@@ -16,6 +16,7 @@ import { useEffect, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
+import TemplatePartCustomInserterItem from '../template-part-custom-inserter-item';
 
 export default function InserterSidebar() {
 	const { setIsInserterOpened } = useDispatch( editSiteStore );
@@ -57,6 +58,12 @@ export default function InserterSidebar() {
 					__experimentalInsertionIndex={
 						insertionPoint.insertionIndex
 					}
+					__experimentalCustomInserterItems={ {
+						'core/template-part/header':
+							TemplatePartCustomInserterItem,
+						'core/template-part/footer':
+							TemplatePartCustomInserterItem,
+					} }
 					__experimentalFilterValue={ insertionPoint.filterValue }
 					ref={ libraryRef }
 				/>

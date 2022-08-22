@@ -1796,7 +1796,6 @@ const getItemFromVariation = ( state, item ) => ( variation ) => {
 		innerBlocks: variation.innerBlocks,
 		keywords: variation.keywords || item.keywords,
 		frecency: calculateFrecency( time, count ),
-		inserterItem: variation.inserterItem,
 	};
 };
 
@@ -1880,7 +1879,6 @@ const buildBlockTypeItem =
 			variations: inserterVariations,
 			example: blockType.example,
 			utility: 1, // Deprecated.
-			inserterItem: blockType.inserterItem,
 		};
 	};
 
