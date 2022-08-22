@@ -35,7 +35,7 @@ function gutenberg_register_layout_support( $block_type ) {
  * @param boolean $should_skip_gap_serialization Whether to skip applying the user-defined value set in the editor.
  * @param string  $fallback_gap_value            The block gap value to apply.
  * @param array   $block_spacing                 Custom spacing set on the block.
- * @param boolean $should_enqueue              Whether to enqueue the styles for rendering.
+ * @param boolean $should_enqueue                Whether to enqueue the styles for rendering.
  *
  * @return string                                CSS style.
  */
@@ -224,12 +224,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		// Add to the style engine store to enqueue and render layout styles.
 		// Return compiled layout styles to retain backwards compatibility.
 		// Since https://github.com/WordPress/gutenberg/pull/42452 we no longer call wp_enqueue_block_support_styles in this block supports file.
-		$stylesheet_options = $should_enqueue ? array(
-			'context' => 'block-supports',
-		) : null;
 		return gutenberg_style_engine_get_stylesheet_from_css_rules(
 			$layout_styles,
-			$stylesheet_options
+			$should_enqueue ? array(
+				'context' => 'block-supports',
+			) : null
 		);
 	}
 
