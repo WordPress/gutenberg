@@ -142,7 +142,7 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 		} ),
 	} );
 	useMigrateOnLoad( attributes, clientId );
-	const { ordered, reversed, start } = attributes;
+	const { ordered, type, reversed, start } = attributes;
 
 	const controls = (
 		<BlockControls group="block">
@@ -174,6 +174,7 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 				ordered={ ordered }
 				reversed={ reversed }
 				start={ start }
+				type={ type }
 				{ ...innerBlocksProps }
 			/>
 			{ controls }

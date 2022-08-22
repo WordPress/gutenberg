@@ -4,13 +4,13 @@
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { ordered, reversed, start } = attributes;
+	const { ordered, type, reversed, start } = attributes;
 	const TagName = ordered ? 'ol' : 'ul';
 	return (
 		<TagName
 			reversed={ reversed }
 			start={ start }
-			{ ...useBlockProps.save() }
+			{ ...useBlockProps.save( { type, reversed, start } ) }
 		>
 			<InnerBlocks.Content />
 		</TagName>
