@@ -447,7 +447,6 @@
 	&.is-zoomed-out {
 		transform-origin: top center;
 		transform: scale(0.45);
-		margin-bottom: -70%;
 
 		> .block-list-appender {
 			display: none;

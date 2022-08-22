@@ -14,7 +14,11 @@ import {
 	useReducer,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import {
+	useResizeObserver,
+	useMergeRefs,
+	useRefEffect,
+} from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 
 /**
@@ -194,6 +198,8 @@ function Iframe(
 	const scripts = useParsedAssets( assets?.scripts );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
+	const [ contentResizeListener, { height: contentHeight } ] =
+		useResizeObserver();
 	const setRef = useRefEffect( ( node ) => {
 		function setDocumentIfReady() {
 			const { contentDocument, ownerDocument } = node;
@@ -305,7 +311,19 @@ function Iframe(
 										'is-zoomed-out': isZoomedOut,
 									}
 								) }
+								style={
+									isZoomedOut
+										? {
+												// This is the remaining percentage from the scaling down
+												// of the iframe body(`scale(0.45)`).
+												marginBottom: `-${
+													contentHeight * 0.55
+												}px`,
+										  }
+										: {}
+								}
 							>
+								{ contentResizeListener }
 								{ /*
 								 * This is a wrapper for the extra styles and scripts
 								 * rendered imperatively by cloning the parent,
