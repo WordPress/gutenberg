@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
-import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -171,15 +170,21 @@ export class FocalPointPicker extends Component {
 		this.props.onDragEnd?.( event );
 	}
 	onKeyDown( event ) {
-		const { keyCode, shiftKey } = event;
-		if ( ! [ UP, DOWN, LEFT, RIGHT ].includes( keyCode ) ) return;
+		const { code, shiftKey } = event;
+		if (
+			! [ 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight' ].includes(
+				code
+			)
+		)
+			return;
 
 		event.preventDefault();
 
 		const next = { ...this.state.percentages };
 		const step = shiftKey ? 0.1 : 0.01;
-		const delta = keyCode === UP || keyCode === LEFT ? -1 * step : step;
-		const axis = keyCode === UP || keyCode === DOWN ? 'y' : 'x';
+		const delta =
+			code === 'ArrowUp' || code === 'ArrowLeft' ? -1 * step : step;
+		const axis = code === 'ArrowUp' || code === 'ArrowDown' ? 'y' : 'x';
 		const value = parseFloat( next[ axis ] ) + delta;
 
 		next[ axis ] = roundClamp( value, 0, 1, step );

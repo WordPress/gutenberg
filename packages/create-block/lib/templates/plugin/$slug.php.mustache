@@ -37,7 +37,35 @@
  *
  * @see https://developer.wordpress.org/reference/functions/register_block_type/
  */
+{{#isStaticVariant}}
 function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 	register_block_type( __DIR__ . '/build' );
 }
 add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );
+{{/isStaticVariant}}
+{{#isDynamicVariant}}
+function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
+	register_block_type(
+		__DIR__ . '/build',
+		array(
+			'render_callback' => '{{namespaceSnakeCase}}_{{slugSnakeCase}}_render_callback',
+		)
+	);
+}
+add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );
+
+/**
+ * Render callback function
+ *
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The block content.
+ * @param WP_Block $block      Block instance.
+ *
+ * @return string The rendered output.
+ */
+function {{namespaceSnakeCase}}_{{slugSnakeCase}}_render_callback( $atts, $content, $block) {
+	ob_start();
+	require plugin_dir_path( __FILE__ ) . 'build/template.php';
+	return ob_get_clean();
+}
+{{/isDynamicVariant}}

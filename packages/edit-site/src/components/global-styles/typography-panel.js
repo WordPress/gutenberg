@@ -144,7 +144,7 @@ export default function TypographyPanel( { name, element } ) {
 			>
 				Aa
 			</div>
-			<Grid columns={ 2 }>
+			<Grid columns={ 2 } rowGap={ 16 } columnGap={ 8 }>
 				{ element === 'heading' && (
 					<div className="edit-site-typography-panel__full-width-control">
 						<ToggleGroupControl
