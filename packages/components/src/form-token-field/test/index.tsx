@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import {
+	render,
+	screen,
+	within,
+	getDefaultNormalizer,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
 
@@ -49,12 +54,22 @@ const expectTokensToBeInTheDocument = ( tokensText: string[] ) => {
 		// - one with the format "tokenName", which is visible but hidden to
 		//   assistive technology.
 		const assistiveTechnologyToken = screen.getByText(
-			`${ tokenText } (${ tokenIndex + 1 } of ${ tokensArray.length })`
+			`${ tokenText } (${ tokenIndex + 1 } of ${ tokensArray.length })`,
+			{
+				normalizer: getDefaultNormalizer( {
+					collapseWhitespace: false,
+					trim: false,
+				} ),
+			}
 		);
 		// The "exact" flag is necessary in order no to match the element
 		//  used for assistive technology.
 		const visibleToken = screen.getByText( tokenText, {
 			exact: true,
+			normalizer: getDefaultNormalizer( {
+				collapseWhitespace: false,
+				trim: false,
+			} ),
 		} );
 
 		expect( assistiveTechnologyToken ).toBeInTheDocument();
@@ -84,7 +99,6 @@ const expectVisibleSuggestionsToBe = (
 };
 
 // TODO:
-// - combobox "Add item" name
 // - tokens as objects?
 // - suggestions:
 //   - update message (a11y)
@@ -140,6 +154,52 @@ describe( 'FormTokenField', () => {
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'orange' ] );
 			expectTokensToBeInTheDocument( [ 'orange' ] );
+		} );
+
+		it( 'should add a token with the input value when pressing the space key and the `tokenizeOnSpace` prop is `true`', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const onChangeSpy = jest.fn();
+
+			const { rerender } = render(
+				<FormTokenFieldWithState onChange={ onChangeSpy } />
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Add 'dragon fruit' token by typing it and pressing enter to tokenize it.
+			await user.type( input, 'dragon fruit[Enter]' );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'dragon fruit' ] );
+			expectTokensToBeInTheDocument( [ 'dragon fruit' ] );
+
+			rerender(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					tokenizeOnSpace={ true }
+				/>
+			);
+
+			// Add 'dragon fruit' token by typing it and pressing enter to tokenize it,
+			// this time two separate tokens should be added
+			await user.type( input, 'dragon fruit[Enter]' );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
+			expect( onChangeSpy ).toHaveBeenNthCalledWith( 2, [
+				'dragon fruit',
+				'dragon',
+			] );
+			expect( onChangeSpy ).toHaveBeenNthCalledWith( 3, [
+				'dragon fruit',
+				'dragon',
+				'fruit',
+			] );
+			expectTokensToBeInTheDocument( [
+				'dragon fruit',
+				'dragon',
+				'fruit',
+			] );
 		} );
 
 		it( "should not add a token with the input's value when pressing the tab key", async () => {
@@ -974,6 +1034,72 @@ describe( 'FormTokenField', () => {
 	} );
 
 	describe( 'saveTransform', () => {
+		it.only( "by default, it should trim the input's value from extra white spaces before attempting to add it as a token", async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const onChangeSpy = jest.fn();
+
+			const { rerender } = render(
+				<FormTokenFieldWithState
+					initialValue={ [ 'potato' ] }
+					onChange={ onChangeSpy }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Press enter on an empty input, no token gets added
+			await user.type( input, '[Enter]' );
+			expect( onChangeSpy ).not.toHaveBeenCalled();
+			expectTokensToBeInTheDocument( [ 'potato' ] );
+
+			// Add the "carrot" token - white space gets trimmed
+			await user.type( input, '  carrot   [Enter]' );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeSpy ).toHaveBeenCalledWith( [
+				'potato',
+				'carrot',
+			] );
+			expectTokensToBeInTheDocument( [ 'potato', 'carrot' ] );
+
+			// Press enter on an input containing a duplicate token but surrounded by
+			// white space, no token gets added
+			await user.type( input, '  potato   [Enter]' );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+			expectTokensToBeInTheDocument( [ 'potato', 'carrot' ] );
+
+			// Press enter on an input containing only spaces, no token gets added
+			await user.type( input, '    [Enter]' );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+			expectTokensToBeInTheDocument( [ 'potato', 'carrot' ] );
+
+			rerender(
+				<FormTokenFieldWithState
+					initialValue={ [ 'potato' ] }
+					onChange={ onChangeSpy }
+					saveTransform={ ( text: string ) => text }
+				/>
+			);
+
+			// If a custom `saveTransform` function is passed, it will be the new
+			// function's duty to trim the whitespace if necessary.
+			await user.clear( input );
+			await user.type( input, '  parnsnip   [Enter]' );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
+			expect( onChangeSpy ).toHaveBeenCalledWith( [
+				'potato',
+				'carrot',
+				'  parnsnip   ',
+			] );
+			expectTokensToBeInTheDocument( [
+				'potato',
+				'carrot',
+				'  parnsnip   ',
+			] );
+		} );
+
 		it( "should allow to modify the input's value when saving it as a token", async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
@@ -1273,96 +1399,6 @@ describe( 'FormTokenField', () => {
 			await user.type( input, 'Cranberry[Enter]' );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
 			expectTokensToBeInTheDocument( [ 'cherry', 'Cranberry' ] );
-		} );
-	} );
-
-	describe( 'white space', () => {
-		it( "should trim the input's value from extra white spaces before attempting to add it as a token", async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-
-			const onChangeSpy = jest.fn();
-
-			render(
-				<FormTokenFieldWithState
-					initialValue={ [ 'potato' ] }
-					onChange={ onChangeSpy }
-				/>
-			);
-
-			const input = screen.getByRole( 'combobox' );
-
-			// Press enter on an empty input, no token gets added
-			await user.type( input, '[Enter]' );
-			expect( onChangeSpy ).not.toHaveBeenCalled();
-			expectTokensToBeInTheDocument( [ 'potato' ] );
-
-			// Add the "carrot" token - white space gets trimmed
-			await user.type( input, '  carrot   [Enter]' );
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
-			expect( onChangeSpy ).toHaveBeenCalledWith( [
-				'potato',
-				'carrot',
-			] );
-			expectTokensToBeInTheDocument( [ 'potato', 'carrot' ] );
-
-			// Press enter on an input containing a duplicate token but surrounded by
-			// white space, no token gets added
-			await user.type( input, '  potato   [Enter]' );
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
-			expectTokensToBeInTheDocument( [ 'potato', 'carrot' ] );
-
-			// Press enter on an input containing only spaces, no token gets added
-			await user.type( input, '    [Enter]' );
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
-			expectTokensToBeInTheDocument( [ 'potato', 'carrot' ] );
-		} );
-
-		it( 'should add a token with the input value when pressing the space key and the `tokenizeOnSpace` prop is `true`', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-
-			const onChangeSpy = jest.fn();
-
-			const { rerender } = render(
-				<FormTokenFieldWithState onChange={ onChangeSpy } />
-			);
-
-			const input = screen.getByRole( 'combobox' );
-
-			// Add 'dragon fruit' token by typing it and pressing enter to tokenize it.
-			await user.type( input, 'dragon fruit[Enter]' );
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
-			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'dragon fruit' ] );
-			expectTokensToBeInTheDocument( [ 'dragon fruit' ] );
-
-			rerender(
-				<FormTokenFieldWithState
-					onChange={ onChangeSpy }
-					tokenizeOnSpace={ true }
-				/>
-			);
-
-			// Add 'dragon fruit' token by typing it and pressing enter to tokenize it,
-			// this time two separate tokens should be added
-			await user.type( input, 'dragon fruit[Enter]' );
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
-			expect( onChangeSpy ).toHaveBeenNthCalledWith( 2, [
-				'dragon fruit',
-				'dragon',
-			] );
-			expect( onChangeSpy ).toHaveBeenNthCalledWith( 3, [
-				'dragon fruit',
-				'dragon',
-				'fruit',
-			] );
-			expectTokensToBeInTheDocument( [
-				'dragon fruit',
-				'dragon',
-				'fruit',
-			] );
 		} );
 	} );
 
