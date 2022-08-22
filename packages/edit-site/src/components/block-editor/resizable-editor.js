@@ -61,7 +61,9 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 
 			function resizeHeight() {
 				if ( ! timeoutId ) {
-					// Throttle the updates on timeout.
+					// Throttle the updates on timeout. This code previously
+					// used `requestAnimationFrame`, but that seems to not
+					// always work before an iframe is ready.
 					timeoutId = iframe.contentWindow.setTimeout( () => {
 						const { readyState } = iframe.contentDocument;
 
@@ -77,7 +79,9 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 
 						setHeight( iframe.contentDocument.body.scrollHeight );
 						timeoutId = null;
-					}, 40 );
+
+						// 30 frames per second.
+					}, 1000 / 30 );
 				}
 			}
 
@@ -89,8 +93,9 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 				resizeObserver = new iframe.contentWindow.ResizeObserver(
 					resizeHeight
 				);
-				// Observing the <html> rather than the <body> because the latter
-				// gets destroyed and remounted after initialization in <Iframe>.
+
+				// Observe the body, since the `html` element seems to always
+				// have a height of `100%`.
 				resizeObserver.observe( iframe.contentDocument.body );
 
 				resizeHeight();
