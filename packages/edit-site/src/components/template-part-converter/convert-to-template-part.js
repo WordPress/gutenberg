@@ -32,9 +32,10 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const { canCreate } = useSelect( ( select ) => {
-		const settings = select( editSiteStore ).getSettings();
+		const { supportsTemplatePartsMode } =
+			select( editSiteStore ).getSettings();
 		return {
-			canCreate: ! settings?.supportsTemplatePartsMode,
+			canCreate: ! supportsTemplatePartsMode,
 		};
 	}, [] );
 

@@ -14,10 +14,11 @@ import { store as editSiteStore } from '../../store';
 export default function Header( { templateType } ) {
 	const { canCreate, postType } = useSelect(
 		( select ) => {
-			const settings = select( editSiteStore ).getSettings();
+			const { supportsTemplatePartsMode } =
+				select( editSiteStore ).getSettings();
 			return {
 				postType: select( coreStore ).getPostType( templateType ),
-				canCreate: ! settings?.supportsTemplatePartsMode,
+				canCreate: ! supportsTemplatePartsMode,
 			};
 		},
 		[ templateType ]
