@@ -1,21 +1,8 @@
 /**
  * WordPress dependencies
  */
-/**
- * External dependencies
- */
-import { flatMap } from 'lodash';
-
-/**
- * WordPress dependencies
- */
-import { createBlock, switchToBlockType } from '@wordpress/blocks';
-import {
-	__UNSTABLE_LINE_SEPARATOR,
-	create,
-	split,
-	toHTMLString,
-} from '@wordpress/rich-text';
+import { createBlock } from '@wordpress/blocks';
+import { create, split, toHTMLString } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -44,7 +31,7 @@ function getListContentSchema( { phrasingContentSchema } ) {
 }
 
 function getListContentFlat( blocks ) {
-	return flatMap( blocks, ( { name, attributes, innerBlocks = [] } ) => {
+	return blocks.flatMap( ( { name, attributes, innerBlocks = [] } ) => {
 		if ( name === 'core/list-item' ) {
 			return [ attributes.content, ...getListContentFlat( innerBlocks ) ];
 		}
@@ -80,26 +67,6 @@ const transforms = {
 						anchor: blockAttributes.anchor,
 					},
 					childBlocks
-				);
-			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/quote', 'core/pullquote' ],
-			transform: ( { value, anchor } ) => {
-				return createBlock(
-					'core/list',
-					{
-						anchor,
-					},
-					split(
-						create( { html: value, multilineTag: 'p' } ),
-						__UNSTABLE_LINE_SEPARATOR
-					).map( ( result ) => {
-						return createBlock( 'core/list-item', {
-							content: toHTMLString( { value: result } ),
-						} );
-					} )
 				);
 			},
 		},
@@ -144,19 +111,6 @@ const transforms = {
 					createBlock( block, {
 						content,
 					} )
-				);
-			},
-		} ) ),
-		...[ 'core/quote', 'core/pullquote' ].map( ( block ) => ( {
-			type: 'block',
-			blocks: [ block ],
-			transform: ( attributes, innerBlocks ) => {
-				return switchToBlockType(
-					switchToBlockType(
-						createBlock( 'core/list', attributes, innerBlocks ),
-						'core/paragraph'
-					),
-					block
 				);
 			},
 		} ) ),

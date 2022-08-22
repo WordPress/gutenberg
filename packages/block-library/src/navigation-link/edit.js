@@ -42,7 +42,10 @@ import {
 } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	useResourcePermissions,
+} from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -312,7 +315,7 @@ const useIsInvalidLink = ( kind, type, id ) => {
 	return [ isInvalid, isDraft ];
 };
 
-const useMissingText = ( type ) => {
+function getMissingText( type ) {
 	let missingText = '';
 
 	switch ( type ) {
@@ -338,7 +341,7 @@ const useMissingText = ( type ) => {
 	}
 
 	return missingText;
-};
+}
 
 /**
  * Removes HTML from a given string.
@@ -463,14 +466,15 @@ export default function NavigationLinkEdit( {
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
 
+	const pagesPermissions = useResourcePermissions( 'pages' );
+	const postsPermissions = useResourcePermissions( 'posts' );
+
 	const {
 		innerBlocks,
 		isAtMaxNesting,
 		isTopLevelLink,
 		isParentOfSelectedBlock,
 		hasChildren,
-		userCanCreatePages,
-		userCanCreatePosts,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -497,14 +501,6 @@ export default function NavigationLinkEdit( {
 					true
 				),
 				hasChildren: !! getBlockCount( clientId ),
-				userCanCreatePages: select( coreStore ).canUser(
-					'create',
-					'pages'
-				),
-				userCanCreatePosts: select( coreStore ).canUser(
-					'create',
-					'posts'
-				),
 			};
 		},
 		[ clientId ]
@@ -606,9 +602,9 @@ export default function NavigationLinkEdit( {
 
 	let userCanCreate = false;
 	if ( ! type || type === 'page' ) {
-		userCanCreate = userCanCreatePages;
+		userCanCreate = pagesPermissions.canCreate;
 	} else if ( type === 'post' ) {
-		userCanCreate = userCanCreatePosts;
+		userCanCreate = postsPermissions.canCreate;
 	}
 
 	async function handleCreate( pageTitle ) {
@@ -682,7 +678,7 @@ export default function NavigationLinkEdit( {
 		'wp-block-navigation-link__placeholder': ! url || isInvalid || isDraft,
 	} );
 
-	const missingText = useMissingText( type, isInvalid, isDraft );
+	const missingText = getMissingText( type );
 	/* translators: Whether the navigation link is Invalid or a Draft. */
 	const placeholderText = `(${
 		isInvalid ? __( 'Invalid' ) : __( 'Draft' )

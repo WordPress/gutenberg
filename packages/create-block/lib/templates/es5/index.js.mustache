@@ -16,14 +16,14 @@
 	/**
 	 * Retrieves the translation of text.
 	 *
-	 * @see https://developer.wordpress.org/block-editor/packages/packages-i18n/
+	 * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-i18n/
 	 */
 	var __ = wp.i18n.__;
 
 	/**
 	 * This hook is used to mark the block wrapper element.
 	 *
-	 * @see https://developer.wordpress.org/block-editor/packages/packages-block-editor/#useBlockProps
+	 * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
 	 */
 	var useBlockProps = wp.blockEditor.useBlockProps;
 
@@ -84,7 +84,7 @@
 		 * The edit function describes the structure of your block in the context of the editor.
 		 * This represents what the editor will render when the block is used.
 		 *
-		 * @see https://developer.wordpress.org/block-editor/developers/block-api/block-edit-save/#edit
+		 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#edit
 		 *
 		 * @return {WPElement} Element to render.
 		 */
@@ -100,7 +100,7 @@
 		 * The save function defines the way in which the different attributes should be combined
 		 * into the final markup, which is then serialized by the block editor into `post_content`.
 		 *
-		 * @see https://developer.wordpress.org/block-editor/developers/block-api/block-edit-save/#save
+		 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#save
 		 *
 		 * @return {WPElement} Element to render.
 		 */
@@ -108,7 +108,7 @@
 			return el(
 				'p',
 				useBlockProps.save(),
-				__( '{{title}} – hello from the saved content!', '{{textdomain}}' )
+				'{{title}} – hello from the saved content!',
 			);
 		},
 	} );

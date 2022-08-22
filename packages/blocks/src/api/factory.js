@@ -9,7 +9,6 @@ import {
 	filter,
 	first,
 	has,
-	uniq,
 	isEmpty,
 	map,
 } from 'lodash';
@@ -210,6 +209,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	// a Grouping block.
 	if (
 		! isMultiBlock &&
+		direction === 'from' &&
 		isContainerGroupBlock( sourceBlock.name ) &&
 		isContainerGroupBlock( transform.blockName )
 	) {
@@ -347,10 +347,12 @@ export function getPossibleBlockTransformations( blocks ) {
 	const blockTypesForToTransforms =
 		getBlockTypesForPossibleToTransforms( blocks );
 
-	return uniq( [
-		...blockTypesForFromTransforms,
-		...blockTypesForToTransforms,
-	] );
+	return [
+		...new Set( [
+			...blockTypesForFromTransforms,
+			...blockTypesForToTransforms,
+		] ),
+	];
 }
 
 /**
@@ -490,8 +492,7 @@ export function switchToBlockType( blocks, name ) {
 			transformationsTo,
 			( t ) =>
 				t.type === 'block' &&
-				( isWildcardBlockTransform( t ) ||
-					t.blocks.indexOf( name ) !== -1 ) &&
+				t.blocks.indexOf( name ) !== -1 &&
 				( ! isMultiBlock || t.isMultiBlock ) &&
 				maybeCheckTransformIsMatch( t, blocksArray )
 		) ||
@@ -555,9 +556,16 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
-	const hasSwitchedBlock =
-		name === '*' ||
-		some( transformationResults, ( result ) => result.name === name );
+	// When unwrapping blocks (`switchToBlockType( wrapperblocks, '*' )`), do
+	// not run filters on the unwrapped blocks. They shoud remain as they are.
+	if ( name === '*' ) {
+		return transformationResults;
+	}
+
+	const hasSwitchedBlock = some(
+		transformationResults,
+		( result ) => result.name === name
+	);
 
 	// Ensure that at least one block object returned by the transformation has
 	// the expected "destination" block type.

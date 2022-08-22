@@ -3,7 +3,6 @@
  */
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const { join } = require( 'path' );
-const { flatMap } = require( 'lodash' );
 
 /**
  * WordPress dependencies
@@ -37,6 +36,9 @@ const bundledPackagesPhpConfig = [
 		to: 'build/style-engine/',
 		replaceClasses: [
 			'WP_Style_Engine_CSS_Declarations',
+			'WP_Style_Engine_CSS_Rules_Store',
+			'WP_Style_Engine_CSS_Rule',
+			'WP_Style_Engine_Processor',
 			'WP_Style_Engine',
 		],
 	},
@@ -102,9 +104,8 @@ const vendors = {
 		'react-dom/umd/react-dom.production.min.js',
 	],
 };
-const vendorsCopyConfig = flatMap(
-	vendors,
-	( [ devFilename, prodFilename ], key ) => {
+const vendorsCopyConfig = Object.entries( vendors ).flatMap(
+	( [ key, [ devFilename, prodFilename ] ] ) => {
 		return [
 			{
 				from: `node_modules/${ devFilename }`,

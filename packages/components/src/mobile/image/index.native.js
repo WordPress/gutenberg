@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Image, Text, View } from 'react-native';
+import { Image as RNImage, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 /**
@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/components';
 import { image as icon } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -37,6 +37,7 @@ const ImageComponent = ( {
 	height: imageHeight,
 	highlightSelected = true,
 	isSelected,
+	shouldUseFastImage,
 	isUploadFailed,
 	isUploadInProgress,
 	mediaPickerOptions,
@@ -54,10 +55,18 @@ const ImageComponent = ( {
 	const [ imageData, setImageData ] = useState( null );
 	const [ containerSize, setContainerSize ] = useState( null );
 
+	// Disabled for Android due to https://github.com/WordPress/gutenberg/issues/43149
+	const Image =
+		! shouldUseFastImage || Platform.isAndroid ? RNImage : FastImage;
+	const imageResizeMode =
+		! shouldUseFastImage || Platform.isAndroid
+			? resizeMode
+			: FastImage.resizeMode[ resizeMode ];
+
 	useEffect( () => {
 		let isCurrent = true;
 		if ( url ) {
-			Image.getSize( url, ( imgWidth, imgHeight ) => {
+			RNImage.getSize( url, ( imgWidth, imgHeight ) => {
 				if ( ! isCurrent ) {
 					return;
 				}
@@ -152,6 +161,9 @@ const ImageComponent = ( {
 			opacity: isUploadInProgress ? 0.3 : 1,
 			height: containerSize?.height,
 		},
+		! resizeMode && {
+			aspectRatio: imageData?.aspectRatio,
+		},
 		focalPoint && styles.focalPoint,
 		focalPoint &&
 			getImageWithFocalPointStyles(
@@ -211,16 +223,13 @@ const ImageComponent = ( {
 					</View>
 				) : (
 					<View style={ focalPoint && styles.focalPointContent }>
-						<FastImage
-							{ ...( ! resizeMode && {
-								aspectRatio: imageData?.aspectRatio,
-							} ) }
+						<Image
 							style={ imageStyles }
 							source={ { uri: url } }
 							{ ...( ! focalPoint && {
 								resizeMethod: 'scale',
 							} ) }
-							resizeMode={ FastImage.resizeMode[ resizeMode ] }
+							resizeMode={ imageResizeMode }
 						/>
 					</View>
 				) }

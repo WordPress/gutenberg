@@ -12,7 +12,14 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 
-function QueryPlaceholder( { clientId, name, setAttributes, icon, label } ) {
+function QueryPlaceholder( {
+	clientId,
+	name,
+	attributes,
+	setAttributes,
+	icon,
+	label,
+} ) {
 	const { defaultVariation, scopeVariations } = useSelect(
 		( select ) => {
 			const {
@@ -39,7 +46,15 @@ function QueryPlaceholder( { clientId, name, setAttributes, icon, label } ) {
 				variations={ scopeVariations }
 				onSelect={ ( nextVariation = defaultVariation ) => {
 					if ( nextVariation.attributes ) {
-						setAttributes( nextVariation.attributes );
+						setAttributes( {
+							...nextVariation.attributes,
+							query: {
+								...nextVariation.attributes.query,
+								postType:
+									attributes.query.postType ||
+									nextVariation.attributes.query.postType,
+							},
+						} );
 					}
 					if ( nextVariation.innerBlocks ) {
 						replaceInnerBlocks(

@@ -165,4 +165,7 @@ module.exports = {
 	blockShortcodeContainer: {
 		padding: 12,
 	},
+	'wp-block-list-item__list-item--default': {
+		fontSize: 16,
+	},
 };

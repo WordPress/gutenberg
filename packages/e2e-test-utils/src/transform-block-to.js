@@ -30,8 +30,5 @@ export async function transformBlockTo( name ) {
 	await insertButton.evaluate( ( element ) => element.scrollIntoView() );
 	await insertButton.click();
 
-	// Wait for the transformed block to appear.
-	const BLOCK_SELECTOR = '.block-editor-block-list__block';
-	const BLOCK_NAME_SELECTOR = `[data-title="${ name }"]`;
-	await page.waitForSelector( `${ BLOCK_SELECTOR }${ BLOCK_NAME_SELECTOR }` );
+	await page.evaluate( () => new Promise( requestIdleCallback ) );
 }

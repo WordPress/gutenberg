@@ -76,7 +76,7 @@ export type ControlledRangeValue = number | '' | null;
 
 export type RangeControlProps< IconProps = unknown > = Pick<
 	BaseControlProps,
-	'hideLabelFromVision' | 'help'
+	'hideLabelFromVision' | 'help' | '__nextHasNoMarginBottom'
 > &
 	MarksProps & {
 		/**
@@ -88,7 +88,7 @@ export type RangeControlProps< IconProps = unknown > = Pick<
 		 */
 		afterIcon?: IconType< IconProps >;
 		/**
-		 * If this property is true, a button to reset the the slider is
+		 * If this property is true, a button to reset the slider is
 		 * rendered.
 		 *
 		 * @default false
@@ -119,7 +119,9 @@ export type RangeControlProps< IconProps = unknown > = Pick<
 		 */
 		icon?: string;
 		/**
-		 * If no value exists this prop contains the slider starting position.
+		 * The slider starting position, used when no `value` is passed.
+		 * The `initialPosition` will be clamped between the provided `min`
+		 * and `max` prop values.
 		 */
 		initialPosition?: number;
 		/**
@@ -241,7 +243,10 @@ export type InputRangeProps = {
 	value?: number | '';
 };
 
-export type WrapperProps = {
+export type WrapperProps = Pick<
+	BaseControlProps,
+	'__nextHasNoMarginBottom'
+> & {
 	color?: CSSProperties[ 'color' ];
 	marks?: RangeMarks;
 };

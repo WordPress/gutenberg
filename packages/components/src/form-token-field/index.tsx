@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { last, clone, uniq, map, difference, some } from 'lodash';
+import { last, clone, map, some } from 'lodash';
 import classnames from 'classnames';
 import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
 
@@ -34,6 +34,7 @@ import { TokensAndInputWrapperFlex } from './styles';
 import SuggestionsList from './suggestions-list';
 import type { FormTokenFieldProps, TokenItem } from './types';
 import { FlexItem } from '../flex';
+import { StyledLabel } from '../base-control/styles/base-control-styles';
 
 const identity = ( value: string ) => value;
 
@@ -72,10 +73,12 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			remove: __( 'Remove item' ),
 			__experimentalInvalid: __( 'Invalid item' ),
 		},
+		__experimentalRenderItem,
 		__experimentalExpandOnFocus = false,
 		__experimentalValidateInput = () => true,
 		__experimentalShowHowTo = true,
 		__next36pxDefaultSize = false,
+		__experimentalAutoSelectFirstMatch = false,
 	} = props;
 
 	const instanceId = useInstanceId( FormTokenField );
@@ -407,12 +410,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	}
 
 	function addNewTokens( tokens: string[] ) {
-		const tokensToAdd = uniq(
-			tokens
-				.map( saveTransform )
-				.filter( Boolean )
-				.filter( ( token ) => ! valueContainsToken( token ) )
-		);
+		const tokensToAdd = [
+			...new Set(
+				tokens
+					.map( saveTransform )
+					.filter( Boolean )
+					.filter( ( token ) => ! valueContainsToken( token ) )
+			),
+		];
 
 		if ( tokensToAdd.length > 0 ) {
 			const newValue = clone( value );
@@ -473,7 +478,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		} );
 
 		if ( match.length === 0 ) {
-			_suggestions = difference( _suggestions, normalizedValue );
+			_suggestions = _suggestions.filter(
+				( suggestion ) => ! normalizedValue.includes( suggestion )
+			);
 		} else {
 			match = match.toLocaleLowerCase();
 
@@ -532,8 +539,17 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		);
 
 		if ( resetSelectedSuggestion ) {
-			setSelectedSuggestionIndex( -1 );
-			setSelectedSuggestionScroll( false );
+			if (
+				__experimentalAutoSelectFirstMatch &&
+				inputHasMinimumChars &&
+				hasMatchingSuggestions
+			) {
+				setSelectedSuggestionIndex( 0 );
+				setSelectedSuggestionScroll( true );
+			} else {
+				setSelectedSuggestionIndex( -1 );
+				setSelectedSuggestionScroll( false );
+			}
 		}
 
 		if ( inputHasMinimumChars ) {
@@ -659,12 +675,12 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div { ...tokenFieldProps }>
-			<label
+			<StyledLabel
 				htmlFor={ `components-form-token-input-${ instanceId }` }
 				className="components-form-token-field__label"
 			>
 				{ label }
-			</label>
+			</StyledLabel>
 			<div
 				ref={ tokensAndInput }
 				className={ classes }
@@ -692,6 +708,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 						scrollIntoView={ selectedSuggestionScroll }
 						onHover={ onSuggestionHovered }
 						onSelect={ onSuggestionSelected }
+						__experimentalRenderItem={ __experimentalRenderItem }
 					/>
 				) }
 			</div>

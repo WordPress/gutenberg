@@ -1,16 +1,16 @@
 /**
  * Internal dependencies
  */
-import { getCSSRules, generate } from '../index';
+import { getCSSRules, compileCSS } from '../index';
 
 describe( 'generate', () => {
 	it( 'should generate empty style', () => {
-		expect( generate( {}, '.some-selector' ) ).toEqual( '' );
+		expect( compileCSS( {}, '.some-selector' ) ).toEqual( '' );
 	} );
 
 	it( 'should generate empty style with empty keys', () => {
 		expect(
-			generate( {
+			compileCSS( {
 				spacing: undefined,
 				color: undefined,
 			} )
@@ -19,7 +19,7 @@ describe( 'generate', () => {
 
 	it( 'should generate inline styles where there is no selector', () => {
 		expect(
-			generate( {
+			compileCSS( {
 				spacing: { padding: '10px', margin: '12px' },
 				color: {
 					text: '#f1f1f1',
@@ -35,7 +35,7 @@ describe( 'generate', () => {
 
 	it( 'should generate styles with an optional selector', () => {
 		expect(
-			generate(
+			compileCSS(
 				{
 					spacing: { padding: '10px', margin: '12px' },
 				},
@@ -46,11 +46,13 @@ describe( 'generate', () => {
 		).toEqual( '.some-selector { margin: 12px; padding: 10px; }' );
 
 		expect(
-			generate(
+			compileCSS(
 				{
 					color: {
 						text: '#cccccc',
 						background: '#111111',
+						gradient:
+							'linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%)',
 					},
 					spacing: {
 						padding: { top: '10px', bottom: '5px' },
@@ -77,13 +79,13 @@ describe( 'generate', () => {
 				}
 			)
 		).toEqual(
-			'.some-selector { color: #cccccc; background-color: #111111; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; text-decoration: line-through; text-transform: uppercase; }'
+			".some-selector { color: #cccccc; background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%); background-color: #111111; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; text-decoration: line-through; text-transform: uppercase; }"
 		);
 	} );
 
 	it( 'should parse preset values', () => {
 		expect(
-			generate( {
+			compileCSS( {
 				color: {
 					text: 'var:preset|color|ham-sandwich',
 				},
@@ -96,7 +98,7 @@ describe( 'generate', () => {
 
 	it( 'should parse border rules', () => {
 		expect(
-			generate( {
+			compileCSS( {
 				border: {
 					color: 'var:preset|color|perky-peppermint',
 					width: '0.5em',
@@ -111,7 +113,7 @@ describe( 'generate', () => {
 
 	it( 'should parse individual border rules', () => {
 		expect(
-			generate( {
+			compileCSS( {
 				border: {
 					top: {
 						color: 'var:preset|color|sandy-beach',
@@ -202,6 +204,8 @@ describe( 'getCSSRules', () => {
 					color: {
 						text: '#dddddd',
 						background: '#555555',
+						gradient:
+							'linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%)',
 					},
 					spacing: {
 						padding: { top: '10px', bottom: '5px' },
@@ -230,6 +234,11 @@ describe( 'getCSSRules', () => {
 			},
 			{
 				selector: '.some-selector',
+				key: 'background',
+				value: 'linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%)',
+			},
+			{
+				selector: '.some-selector',
 				key: 'backgroundColor',
 				value: '#555555',
 			},
@@ -252,6 +261,11 @@ describe( 'getCSSRules', () => {
 				selector: '.some-selector',
 				key: 'paddingBottom',
 				value: '5px',
+			},
+			{
+				key: 'fontFamily',
+				selector: '.some-selector',
+				value: "'Helvetica Neue',sans-serif",
 			},
 			{
 				key: 'fontSize',

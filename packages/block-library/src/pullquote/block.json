@@ -40,10 +40,12 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontStyle": true,
+			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
-			"__experimentalLetterSpacing": true,
+			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true,
 				"fontAppearance": true
@@ -59,6 +61,12 @@
 				"radius": true,
 				"style": true,
 				"width": true
+			}
+		},
+		"__experimentalStyle": {
+			"typography": {
+				"fontSize": "1.5em",
+				"lineHeight": "1.6"
 			}
 		}
 	},

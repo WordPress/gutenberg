@@ -198,7 +198,7 @@
 		"parent": "data-basics"
 	},
 	{
-		"title": "Part 4: Building a _Create page_ form",
+		"title": "Part 4: Building a Create page form",
 		"slug": "4-building-a-create-page-form",
 		"markdown_source": "../docs/how-to-guides/data-basics/4-building-a-create-page-form.md",
 		"parent": "data-basics"
@@ -462,19 +462,19 @@
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Filter Reference",
+		"title": "Hooks Reference",
 		"slug": "filters",
 		"markdown_source": "../docs/reference-guides/filters/README.md",
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Block Filters",
+		"title": "Block Hooks",
 		"slug": "block-filters",
 		"markdown_source": "../docs/reference-guides/filters/block-filters.md",
 		"parent": "filters"
 	},
 	{
-		"title": "Editor Filters",
+		"title": "Editor Hooks",
 		"slug": "editor-filters",
 		"markdown_source": "../docs/reference-guides/filters/editor-filters.md",
 		"parent": "filters"
@@ -1872,9 +1872,9 @@
 		"parent": "data"
 	},
 	{
-		"title": "Block Types Data",
-		"slug": "data-core-blocks",
-		"markdown_source": "../docs/reference-guides/data/data-core-blocks.md",
+		"title": "Block directory",
+		"slug": "data-core-block-directory",
+		"markdown_source": "../docs/reference-guides/data/data-core-block-directory.md",
 		"parent": "data"
 	},
 	{
@@ -1884,15 +1884,45 @@
 		"parent": "data"
 	},
 	{
-		"title": "The Post Editor’s Data",
-		"slug": "data-core-editor",
-		"markdown_source": "../docs/reference-guides/data/data-core-editor.md",
+		"title": "Block Types Data",
+		"slug": "data-core-blocks",
+		"markdown_source": "../docs/reference-guides/data/data-core-blocks.md",
+		"parent": "data"
+	},
+	{
+		"title": "Customize Widgets",
+		"slug": "data-core-customize-widgets",
+		"markdown_source": "../docs/reference-guides/data/data-core-customize-widgets.md",
 		"parent": "data"
 	},
 	{
 		"title": "The Editor’s UI Data",
 		"slug": "data-core-edit-post",
 		"markdown_source": "../docs/reference-guides/data/data-core-edit-post.md",
+		"parent": "data"
+	},
+	{
+		"title": "Edit Site",
+		"slug": "data-core-edit-site",
+		"markdown_source": "../docs/reference-guides/data/data-core-edit-site.md",
+		"parent": "data"
+	},
+	{
+		"title": "Edit Widgets",
+		"slug": "data-core-edit-widgets",
+		"markdown_source": "../docs/reference-guides/data/data-core-edit-widgets.md",
+		"parent": "data"
+	},
+	{
+		"title": "The Post Editor’s Data",
+		"slug": "data-core-editor",
+		"markdown_source": "../docs/reference-guides/data/data-core-editor.md",
+		"parent": "data"
+	},
+	{
+		"title": "The Keyboard Shortcuts Data",
+		"slug": "data-core-keyboard-shortcuts",
+		"markdown_source": "../docs/reference-guides/data/data-core-keyboard-shortcuts.md",
 		"parent": "data"
 	},
 	{
@@ -1905,6 +1935,24 @@
 		"title": "The NUX (New User Experience) Data",
 		"slug": "data-core-nux",
 		"markdown_source": "../docs/reference-guides/data/data-core-nux.md",
+		"parent": "data"
+	},
+	{
+		"title": "Preferences",
+		"slug": "data-core-preferences",
+		"markdown_source": "../docs/reference-guides/data/data-core-preferences.md",
+		"parent": "data"
+	},
+	{
+		"title": "Reusable blocks",
+		"slug": "data-core-reusable-blocks",
+		"markdown_source": "../docs/reference-guides/data/data-core-reusable-blocks.md",
+		"parent": "data"
+	},
+	{
+		"title": "Rich Text",
+		"slug": "data-core-rich-text",
+		"markdown_source": "../docs/reference-guides/data/data-core-rich-text.md",
 		"parent": "data"
 	},
 	{
@@ -2068,6 +2116,12 @@
 		"slug": "release",
 		"markdown_source": "../docs/contributors/code/release.md",
 		"parent": "code"
+	},
+	{
+		"title": "Cherry-picking automation",
+		"slug": "auto-cherry-picking",
+		"markdown_source": "../docs/contributors/code/auto-cherry-picking.md",
+		"parent": "release"
 	},
 	{
 		"title": "React Native mobile editor",

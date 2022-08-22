@@ -53,7 +53,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 			prefix={
 				<Spacer
 					as={ Text }
-					marginLeft={ space( 3.5 ) }
+					marginLeft={ space( 4 ) }
 					color={ COLORS.ui.theme }
 					lineHeight={ 1 }
 				>
@@ -65,6 +65,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 			maxLength={ enableAlpha ? 9 : 7 }
 			label={ __( 'Hex color' ) }
 			hideLabelFromVision
+			size="__unstable-large"
 			__unstableStateReducer={ stateReducer }
 			__unstableInputWidth="9em"
 		/>

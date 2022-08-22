@@ -49,13 +49,22 @@ const layoutBlockSupportKey = '__experimentalLayout';
  *
  * @return { Array } Array of CSS classname strings.
  */
-function getLayoutClasses( layout, layoutDefinitions ) {
+function useLayoutClasses( layout, layoutDefinitions ) {
+	const rootPaddingAlignment = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().__experimentalFeatures
+			?.useRootPaddingAwareAlignments;
+	}, [] );
 	const layoutClassnames = [];
 
 	if ( layoutDefinitions?.[ layout?.type || 'default' ]?.className ) {
 		layoutClassnames.push(
 			layoutDefinitions?.[ layout?.type || 'default' ]?.className
 		);
+	}
+
+	if ( ( layout?.inherit || layout?.contentSize ) && rootPaddingAlignment ) {
+		layoutClassnames.push( 'has-global-padding' );
 	}
 
 	if ( layout?.orientation ) {
@@ -136,7 +145,9 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 								checked={ ! inherit }
 								onChange={ () =>
 									setAttributes( {
-										layout: { inherit: ! inherit },
+										layout: {
+											inherit: ! inherit,
+										},
 									} )
 								}
 							/>
@@ -253,10 +264,16 @@ export const withInspectorControls = createHigherOrderComponent(
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
-		const shouldRenderLayoutStyles = hasBlockSupport(
+		const hasLayoutBlockSupport = hasBlockSupport(
 			name,
 			layoutBlockSupportKey
 		);
+		const disableLayoutStyles = useSelect( ( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			return !! getSettings().disableLayoutStyles;
+		} );
+		const shouldRenderLayoutStyles =
+			hasLayoutBlockSupport && ! disableLayoutStyles;
 		const id = useInstanceId( BlockListBlock );
 		const defaultThemeLayout = useSetting( 'layout' ) || {};
 		const element = useContext( BlockList.__unstableElementContext );
@@ -266,8 +283,8 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const usedLayout = layout?.inherit
 			? defaultThemeLayout
 			: layout || defaultBlockLayout || {};
-		const layoutClasses = shouldRenderLayoutStyles
-			? getLayoutClasses( usedLayout, defaultThemeLayout?.definitions )
+		const layoutClasses = hasLayoutBlockSupport
+			? useLayoutClasses( usedLayout, defaultThemeLayout?.definitions )
 			: null;
 		const selector = `.${ getBlockDefaultClassName(
 			name
