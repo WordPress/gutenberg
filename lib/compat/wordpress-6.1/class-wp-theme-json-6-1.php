@@ -807,28 +807,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$block_rules .= '}';
 		}
 
-		// 2. Generate and append the rules that use the general selector.
-		$block_rules .= static::to_ruleset( $selector, $declarations );
-
-		// 3. Generate and append the rules that use the duotone selector.
-		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
-			$selector_duotone = static::scope_selector( $block_metadata['selector'], $block_metadata['duotone'] );
-			$block_rules     .= static::to_ruleset( $selector_duotone, $declarations_duotone );
-		}
-
-		// 4. Generate Layout block gap styles.
-		if (
-			static::ROOT_BLOCK_SELECTOR !== $selector &&
-			! empty( $block_metadata['name'] )
-		) {
-			$block_rules .= $this->get_layout_styles( $block_metadata );
-		}
-
-		// 5. Generate and append the feature level rulesets.
-		foreach ( $feature_declarations as $feature_selector => $individual_feature_declarations ) {
-			$block_rules .= static::to_ruleset( $feature_selector, $individual_feature_declarations );
-		}
-
 		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
 
 			if ( $use_root_padding ) {
