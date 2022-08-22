@@ -110,24 +110,36 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 	// Only show the inherit toggle if it's supported,
 	// a default theme layout is set (e.g. one that provides `contentSize` and/or `wideSize` values),
-	// and that the default / flow layout type is in use, as this is the only one that supports inheritance.
+	// and either the default / flow or the constrained layout type is in use, as the toggle switches from one to the other.
 	const showInheritToggle = !! (
 		allowInheriting &&
 		!! defaultThemeLayout &&
-		( ! layout?.type || layout?.type === 'default' || layout?.inherit )
+		( ! layout?.type ||
+			layout?.type === 'default' ||
+			layout?.type === 'constrained' ||
+			layout?.inherit )
 	);
 
 	const usedLayout = layout || defaultBlockLayout || {};
-	const { inherit = false, type = 'default' } = usedLayout;
+	const {
+		inherit = false,
+		type = 'default',
+		contentSize = null,
+	} = usedLayout;
 	/**
-	 * `themeSupportsLayout` is only relevant to the `default/flow`
-	 * layout and it should not be taken into account when other
+	 * `themeSupportsLayout` is only relevant to the `default/flow` or
+	 * `constrained` layouts and it should not be taken into account when other
 	 * `layout` types are used.
 	 */
-	if ( type === 'default' && ! themeSupportsLayout ) {
+	if (
+		( type === 'default' || type === 'constrained' ) &&
+		! themeSupportsLayout
+	) {
 		return null;
 	}
 	const layoutType = getLayoutType( type );
+
+	const constrainedType = getLayoutType( 'constrained' );
 
 	const onChangeType = ( newType ) =>
 		setAttributes( { layout: { type: newType } } );
@@ -141,18 +153,29 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 					{ showInheritToggle && (
 						<>
 							<ToggleControl
-								label={ __( 'Inner blocks use full width' ) }
-								checked={ ! inherit }
+								label={ __(
+									'Inner blocks respect content width'
+								) }
+								checked={
+									layoutType?.name === 'constrained' ||
+									!! inherit ||
+									!! contentSize
+								}
 								onChange={ () =>
 									setAttributes( {
 										layout: {
-											inherit: ! inherit,
+											type:
+												layoutType?.name ===
+												'constrained'
+													? 'default'
+													: 'constrained',
 										},
 									} )
 								}
 							/>
 							<p className="block-editor-hooks__layout-controls-helptext">
-								{ !! inherit
+								{ !! inherit ||
+								layoutType?.name === 'constrained'
 									? __(
 											'Nested blocks use theme content width with options for full and wide widths.'
 									  )
@@ -170,8 +193,15 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 						/>
 					) }
 
-					{ ! inherit && layoutType && (
+					{ layoutType && layoutType.name !== 'default' && (
 						<layoutType.inspectorControls
+							layout={ usedLayout }
+							onChange={ onChangeLayout }
+							layoutBlockSupport={ layoutBlockSupport }
+						/>
+					) }
+					{ constrainedType && !! contentSize && (
+						<constrainedType.inspectorControls
 							layout={ usedLayout }
 							onChange={ onChangeLayout }
 							layoutBlockSupport={ layoutBlockSupport }
@@ -280,9 +310,10 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const { layout } = attributes;
 		const { default: defaultBlockLayout } =
 			getBlockSupport( name, layoutBlockSupportKey ) || {};
-		const usedLayout = layout?.inherit
-			? defaultThemeLayout
-			: layout || defaultBlockLayout || {};
+		const usedLayout =
+			layout?.inherit || layout?.contentSize || layout?.wideSize
+				? { ...layout, type: 'constrained' }
+				: layout || defaultBlockLayout || {};
 		const layoutClasses = hasLayoutBlockSupport
 			? useLayoutClasses( usedLayout, defaultThemeLayout?.definitions )
 			: null;
