@@ -99,7 +99,7 @@ function gutenberg_template_parts_screen_init( $hook ) {
 		'defaultTemplateTypes'      => $indexed_template_types,
 		'defaultTemplatePartAreas'  => get_allowed_block_template_part_areas(),
 		'supportsLayout'            => WP_Theme_JSON_Resolver::theme_has_support(),
-		'supportsTemplatePartsMode' => current_theme_supports( 'block-template-parts' ),
+		'supportsTemplatePartsMode' => ! wp_is_block_theme() && current_theme_supports( 'block-template-parts' ),
 		'__unstableHomeTemplate'    => gutenberg_resolve_home_template(),
 	);
 
