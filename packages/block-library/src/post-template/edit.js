@@ -89,6 +89,7 @@ export default function PostTemplateEdit( {
 		queryContext = [ { page: 1 } ],
 		templateSlug,
 		displayLayout: { type: layoutType = 'flex', columns = 1 } = {},
+		previewPostType,
 	},
 } ) {
 	const [ { page } ] = queryContext;
@@ -156,8 +157,11 @@ export default function PostTemplateEdit( {
 					postType = query.postType;
 				}
 			}
+			// When we preview Query Loop blocks we should prefer the current
+			// block's postType, which is passed through block context.
+			const usedPostType = previewPostType || postType;
 			return {
-				posts: getEntityRecords( 'postType', postType, query ),
+				posts: getEntityRecords( 'postType', usedPostType, query ),
 				blocks: getBlocks( clientId ),
 			};
 		},
@@ -177,6 +181,7 @@ export default function PostTemplateEdit( {
 			templateSlug,
 			taxQuery,
 			parents,
+			previewPostType,
 		]
 	);
 	const blockContexts = useMemo(

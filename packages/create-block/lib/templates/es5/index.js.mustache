@@ -94,8 +94,7 @@
 				useBlockProps(),
 				__( '{{title}} – hello from the editor!', '{{textdomain}}' )
 			);
-		},
-
+		}{{#isStaticVariant}},
 		/**
 		 * The save function defines the way in which the different attributes should be combined
 		 * into the final markup, which is then serialized by the block editor into `post_content`.
@@ -111,6 +110,7 @@
 				'{{title}} – hello from the saved content!',
 			);
 		},
+		{{/isStaticVariant}}
 	} );
 }(
 	window.wp

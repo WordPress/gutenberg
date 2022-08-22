@@ -101,11 +101,15 @@ function get_block_core_post_featured_image_border_attributes( $attributes ) {
 		);
 	}
 
-	$border_attributes = gutenberg_style_engine_get_styles( array( 'border' => $border_styles ) );
-	return array(
-		'class' => $border_attributes['classnames'],
-		'style' => $border_attributes['css'],
-	);
+	$styles     = gutenberg_style_engine_get_styles( array( 'border' => $border_styles ) );
+	$attributes = array();
+	if ( ! empty( $styles['classnames'] ) ) {
+		$attributes['class'] = $styles['classnames'];
+	}
+	if ( ! empty( $styles['css'] ) ) {
+		$attributes['style'] = $styles['css'];
+	}
+	return $attributes;
 }
 
 /**

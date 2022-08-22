@@ -580,6 +580,7 @@ export const toStyles = (
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 	const useRootPaddingAlign = tree?.settings?.useRootPaddingAwareAlignments;
+	const { contentSize, wideSize } = tree?.settings?.layout || {};
 
 	/*
 	 * Reset default browser margin on the root body element.
@@ -589,12 +590,22 @@ export const toStyles = (
 	 * user-generated values take precedence in the CSS cascade.
 	 * @link https://github.com/WordPress/gutenberg/issues/36147.
 	 */
-	let ruleset = 'body {margin: 0;}';
+	let ruleset = 'body {margin: 0;';
+
+	if ( contentSize ) {
+		ruleset += ` --wp--style--global--content-size: ${ contentSize };`;
+	}
+
+	if ( wideSize ) {
+		ruleset += ` --wp--style--global--wide-size: ${ wideSize };`;
+	}
 
 	if ( useRootPaddingAlign ) {
-		ruleset =
-			'body { margin: 0; padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) } .has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); } .has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); } .has-global-padding > .alignfull > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+		ruleset +=
+			'padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) } .has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); } .has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); } .has-global-padding > .alignfull > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left);';
 	}
+
+	ruleset += '}';
 
 	nodesWithStyles.forEach(
 		( {

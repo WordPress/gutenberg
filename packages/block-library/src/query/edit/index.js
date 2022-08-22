@@ -2,11 +2,12 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as blocksStore, cloneBlock } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import {
 	BlockControls,
+	BlockContextProvider,
 	InspectorControls,
 	useBlockProps,
 	useSetting,
@@ -30,7 +31,7 @@ import QueryToolbar from './query-toolbar';
 import QueryInspectorControls from './inspector-controls';
 import QueryPlaceholder from './query-placeholder';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
-import { getFirstQueryClientIdFromBlocks } from '../utils';
+import { getTransformedBlocksFromPattern } from '../utils';
 
 const TEMPLATE = [ [ 'core/post-template' ] ];
 export function QueryContent( {
@@ -177,6 +178,7 @@ function QueryPatternSetup( {
 			<QueryPlaceholder
 				clientId={ clientId }
 				name={ name }
+				attributes={ attributes }
 				setAttributes={ setAttributes }
 				icon={ icon }
 				label={ label }
@@ -215,7 +217,7 @@ function QueryPatternSetup( {
 }
 
 const QueryEdit = ( props ) => {
-	const { clientId, name } = props;
+	const { clientId, name, attributes } = props;
 	const [ isPatternSelectionModalOpen, setIsPatternSelectionModalOpen ] =
 		useState( false );
 	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
@@ -226,14 +228,23 @@ const QueryEdit = ( props ) => {
 	);
 	const Component = hasInnerBlocks ? QueryContent : QueryPatternSetup;
 	const onBlockPatternSelect = ( blocks ) => {
-		const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
-		const firstQueryClientId =
-			getFirstQueryClientIdFromBlocks( clonedBlocks );
-		replaceBlock( clientId, clonedBlocks );
-		if ( firstQueryClientId ) {
-			selectBlock( firstQueryClientId );
+		const { newBlocks, queryClientIds } = getTransformedBlocksFromPattern(
+			blocks,
+			attributes
+		);
+		replaceBlock( clientId, newBlocks );
+		if ( queryClientIds[ 0 ] ) {
+			selectBlock( queryClientIds[ 0 ] );
 		}
 	};
+	// When we preview Query Loop blocks we should prefer the current
+	// block's postType, which is passed through block context.
+	const blockPreviewContext = useMemo(
+		() => ( {
+			previewPostType: attributes.query.postType,
+		} ),
+		[ attributes.query.postType ]
+	);
 	return (
 		<>
 			<Component
@@ -251,11 +262,13 @@ const QueryEdit = ( props ) => {
 						setIsPatternSelectionModalOpen( false )
 					}
 				>
-					<BlockPatternSetup
-						blockName={ name }
-						clientId={ clientId }
-						onBlockPatternSelect={ onBlockPatternSelect }
-					/>
+					<BlockContextProvider value={ blockPreviewContext }>
+						<BlockPatternSetup
+							blockName={ name }
+							clientId={ clientId }
+							onBlockPatternSelect={ onBlockPatternSelect }
+						/>
+					</BlockContextProvider>
 				</Modal>
 			) }
 		</>
