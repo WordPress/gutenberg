@@ -85,8 +85,9 @@ export default function useBlockToolbarPopoverProps( {
 	);
 
 	// Update props when the block is moved. This also ensures the props are
-	// correct on initial mount.
-	useEffect( updateProps, [ blockIndex ] );
+	// correct on initial mount, and when the selected block or content element
+	// changes (since the callback ref will update).
+	useEffect( updateProps, [ blockIndex, updateProps ] );
 
 	// Update props when the viewport is resized or the block is resized.
 	useEffect( () => {
