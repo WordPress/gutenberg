@@ -6,6 +6,7 @@ import {
 	screen,
 	within,
 	getDefaultNormalizer,
+	waitFor,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
@@ -102,13 +103,6 @@ function unescapeAndFormatSpaces( str: string ) {
 	const escaped = new DOMParser().parseFromString( str, 'text/html' );
 	return escaped.documentElement.textContent?.replace( / /g, nbsp ) ?? '';
 }
-
-// TODO:
-// - suggestions:
-//   - update message (a11y)
-//   - __experimentalRenderItem
-//   - __experimentalAutoSelectFirstMatch
-// - RTL support
 
 describe( 'FormTokenField', () => {
 	describe( 'basic usage', () => {
@@ -1141,6 +1135,37 @@ describe( 'FormTokenField', () => {
 				} )
 			).toHaveAccessibleName( 'Walnut' );
 		} );
+
+		it( 'should allow to render custom suggestion items via the `__experimentalRenderItem` prop', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const suggestions = [ 'Wood', 'Stone', 'Metal' ];
+
+			render(
+				<FormTokenFieldWithState
+					suggestions={ suggestions }
+					__experimentalRenderItem={ ( { item } ) => (
+						<>Suggestion: { item }</>
+					) }
+				/>
+			);
+
+			// Type "woo". Matching suggestion will be "Wood"
+			await user.type( screen.getByRole( 'combobox' ), 'woo' );
+
+			// The `__experimentalRenderItem` only affects the rendered suggestion,
+			// but doesn't change the underlying data `value`, nor the value
+			// displayed in the added token.
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Suggestion: Wood',
+			] );
+
+			await user.keyboard( '[ArrowDown][Enter]' );
+
+			expectTokensToBeInTheDocument( [ 'Wood' ] );
+		} );
 	} );
 
 	describe( 'tokens as objects', () => {
@@ -1942,6 +1967,53 @@ describe( 'FormTokenField', () => {
 			expect(
 				screen.getByText( customMessages.__experimentalInvalid )
 			).toHaveAttribute( 'aria-live', 'assertive' );
+		} );
+
+		it( 'should announce to assistive technology the result of the matching of the search text against the list of suggestions', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			render(
+				<FormTokenFieldWithState
+					suggestions={ [ 'Donkey', 'Horse', 'Dog' ] }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// No matching suggestions.
+			await user.type( input, 'cat' );
+
+			await waitFor( () =>
+				expect( screen.getByText( 'No results.' ) ).toHaveAttribute(
+					'aria-live',
+					'assertive'
+				)
+			);
+
+			// "Donkey" and "Dog" matching
+			await user.clear( input );
+			await user.type( input, 'do' );
+
+			await waitFor( () =>
+				expect(
+					screen.getByText(
+						'2 results found, use up and down arrow keys to navigate.'
+					)
+				).toHaveAttribute( 'aria-live', 'assertive' )
+			);
+
+			// Only "Donkey" matches
+			await user.type( input, 'nk' );
+
+			await waitFor( () =>
+				expect(
+					screen.getByText(
+						'1 result found, use up and down arrow keys to navigate.'
+					)
+				).toHaveAttribute( 'aria-live', 'assertive' )
+			);
 		} );
 
 		it( 'should update the label for the "delete" button of a token', async () => {
