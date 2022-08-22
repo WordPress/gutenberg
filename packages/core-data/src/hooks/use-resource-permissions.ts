@@ -2,24 +2,26 @@
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { store as coreStore } from '../';
 import { Status } from './constants';
-import useQuerySelect from './use-query-select';
 
 interface GlobalResourcePermissionsResolution {
 	/** Can the current user create new resources of this type? */
 	canCreate: boolean;
 }
+
 interface SpecificResourcePermissionsResolution {
 	/** Can the current user update resources of this type? */
 	canUpdate: boolean;
 	/** Can the current user delete resources of this type? */
 	canDelete: boolean;
 }
+
 interface ResolutionDetails {
 	/** Resolution status */
 	status: Status;
@@ -111,48 +113,108 @@ export default function useResourcePermissions< IdType = void >(
 	resource: string,
 	id?: IdType
 ): ResourcePermissionsResolution< IdType > {
-	return useQuerySelect(
-		( resolve ) => {
-			const { canUser } = resolve( coreStore );
-			const create = canUser( 'create', resource );
+	return useSelect(
+		( select ) => {
+			const lazyCanCreate = lazyCanUser( select, 'create', resource );
 			if ( ! id ) {
+				const lazyPerms = [ lazyCanCreate ];
 				return {
-					status: create.status,
-					isResolving: create.isResolving,
-					hasResolved: create.hasResolved,
-					canCreate: create.hasResolved && create.data,
+					get canCreate() {
+						return lazyCanCreate.resolve();
+					},
+					isResolving: isResolving( lazyPerms ),
+					hasResolved: hasResolved( lazyPerms ),
+					status: getStatus( lazyPerms ),
 				};
 			}
 
-			const update = canUser( 'update', resource, id );
-			const _delete = canUser( 'delete', resource, id );
-			const isResolving =
-				create.isResolving || update.isResolving || _delete.isResolving;
-			const hasResolved =
-				create.hasResolved && update.hasResolved && _delete.hasResolved;
+			const lazyCanRead = lazyCanUser( select, 'read', resource, id );
+			const lazyCanUpdate = lazyCanUser( select, 'update', resource, id );
+			const lazyCanDelete = lazyCanUser( select, 'delete', resource, id );
+			const lazyPerms = [
+				lazyCanCreate,
+				lazyCanRead,
+				lazyCanUpdate,
+				lazyCanDelete,
+			];
 
-			let status = Status.Idle;
-			if ( isResolving ) {
-				status = Status.Resolving;
-			} else if ( hasResolved ) {
-				status = Status.Success;
-			}
 			return {
-				status,
-				isResolving,
-				hasResolved,
-				canCreate: hasResolved && create.data,
-				canUpdate: hasResolved && update.data,
-				canDelete: hasResolved && _delete.data,
+				get canRead() {
+					return lazyCanRead.resolve();
+				},
+				get canCreate() {
+					return lazyCanCreate.resolve();
+				},
+				get canUpdate() {
+					return lazyCanUpdate.resolve();
+				},
+				get canDelete() {
+					return lazyCanDelete.resolve();
+				},
+				isResolving: isResolving( lazyPerms ),
+				hasResolved: hasResolved( lazyPerms ),
+				status: getStatus( lazyPerms ),
 			};
 		},
 		[ resource, id ]
 	);
 }
 
+/**
+ * Returns a lazy permission getter to prevent immediate resolution of
+ * each possible permission.
+ *
+ * @param  select
+ * @param  permission
+ * @param  resource
+ * @param  id
+ */
+const lazyCanUser = (
+	select: Function,
+	permission: string,
+	resource: string,
+	id?: unknown
+) => {
+	const args: unknown[] = [ permission, resource ];
+	if ( id ) {
+		args.push( id );
+	}
+	const isResolving =
+		select( coreStore ).getIsResolving( 'canUser', args ) === true;
+	const hasResolved =
+		select( coreStore ).hasFinishedResolution( 'canUser', args ) === true;
+	return {
+		resolve: () => select( coreStore ).canUser( ...args ) === true,
+		isResolving,
+		hasResolved,
+	};
+};
+
+const isResolving = ( lazyPermissions ) => {
+	return (
+		lazyPermissions.filter( ( item ) => true === item.isResolving ).length >
+		0
+	);
+};
+const hasResolved = ( lazyPermissions ) => {
+	return (
+		lazyPermissions.filter( ( item ) => true === item.hasResolved )
+			.length === lazyPermissions.length
+	);
+};
+
+const getStatus = ( lazyPermissions ) => {
+	if ( isResolving( lazyPermissions ) ) {
+		return Status.Resolving;
+	} else if ( hasResolved( lazyPermissions ) ) {
+		return Status.Success;
+	}
+	return Status.Idle;
+};
+
 export function __experimentalUseResourcePermissions(
 	resource: string,
-	id?: IdType
+	id?: unknown
 ) {
 	deprecated( `wp.data.__experimentalUseResourcePermissions`, {
 		alternative: 'wp.data.useResourcePermissions',
