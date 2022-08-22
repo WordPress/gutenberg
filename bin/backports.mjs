@@ -35,7 +35,7 @@ backportDirectories.forEach( async ( backportDir ) => {
 			continue;
 		}
 
-		console.log( `- ${ file }` );
+		console.log( `- [${ file }](${ ghRoot }${ path })` );
 		const log = await getCommits( path );
 
 		const prs = log.map(
