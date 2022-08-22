@@ -22,7 +22,7 @@
  */
 async function getMilestoneByTitle( octokit, owner, repo, title ) {
 	const responses = octokit.paginate.iterator(
-		octokit.issues.listMilestones,
+		octokit.rest.issues.listMilestones,
 		{ owner, repo }
 	);
 
@@ -58,15 +58,18 @@ async function getIssuesByMilestone(
 	state,
 	closedSince
 ) {
-	const responses = octokit.paginate.iterator( octokit.issues.listForRepo, {
-		owner,
-		repo,
-		milestone,
-		state,
-		...( closedSince && {
-			since: closedSince,
-		} ),
-	} );
+	const responses = octokit.paginate.iterator(
+		octokit.rest.issues.listForRepo,
+		{
+			owner,
+			repo,
+			milestone,
+			state,
+			...( closedSince && {
+				since: closedSince,
+			} ),
+		}
+	);
 
 	/**
 	 * @type {Issue[]}

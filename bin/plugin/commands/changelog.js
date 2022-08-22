@@ -598,10 +598,12 @@ function getFeatureEntry( issue, featureName ) {
  *                                                            milestone.
  */
 async function getLatestReleaseInSeries( octokit, owner, repo, series ) {
-	const releaseOptions = await octokit.repos.listReleases.endpoint.merge( {
-		owner,
-		repo,
-	} );
+	const releaseOptions = await octokit.rest.repos.listReleases.endpoint.merge(
+		{
+			owner,
+			repo,
+		}
+	);
 
 	let latestReleaseForMilestone;
 
