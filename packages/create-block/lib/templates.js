@@ -24,7 +24,7 @@ const predefinedPluginTemplates = {
 			slug: 'example-static-es5',
 			title: 'Example Static (ES5)',
 			description:
-				'Example static block scaffolded with Create Block tool – no build step required.',
+				'Example block scaffolded with Create Block tool – no build step required.',
 			dashicon: 'smiley',
 			wpScripts: false,
 			editorScript: 'file:./index.js',
@@ -32,16 +32,29 @@ const predefinedPluginTemplates = {
 			style: 'file:./style.css',
 		},
 		templatesPath: join( __dirname, 'templates', 'es5' ),
+		variants: {
+			static: {},
+			dynamic: {
+				slug: 'example-dynamic-es5',
+				title: 'Example Dynamic (ES5)',
+			},
+		},
 	},
-	static: {
+	standard: {
 		defaultValues: {
 			slug: 'example-static',
 			title: 'Example Static',
-			description:
-				'Example static block scaffolded with Create Block tool.',
+			description: 'Example block scaffolded with Create Block tool.',
 			dashicon: 'smiley',
 			supports: {
 				html: false,
+			},
+		},
+		variants: {
+			static: {},
+			dynamic: {
+				slug: 'example-dynamic',
+				title: 'Example Dynamic',
 			},
 		},
 	},
@@ -100,6 +113,7 @@ const configToTemplate = async ( {
 	blockTemplatesPath,
 	defaultValues = {},
 	assetsPath,
+	variants,
 	...deprecated
 } ) => {
 	if ( defaultValues === null || typeof defaultValues !== 'object' ) {
@@ -129,6 +143,7 @@ const configToTemplate = async ( {
 		defaultValues,
 		outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
 		pluginOutputTemplates: await getOutputTemplates( pluginTemplatesPath ),
+		variants,
 	};
 };
 
@@ -197,7 +212,7 @@ const getPluginTemplate = async ( templateName ) => {
 	}
 };
 
-const getDefaultValues = ( pluginTemplate ) => {
+const getDefaultValues = ( pluginTemplate, variant ) => {
 	return {
 		$schema: 'https://schemas.wp.org/trunk/block.json',
 		apiVersion: 2,
@@ -216,12 +231,25 @@ const getDefaultValues = ( pluginTemplate ) => {
 		editorStyle: 'file:./index.css',
 		style: 'file:./style-index.css',
 		...pluginTemplate.defaultValues,
+		...pluginTemplate.variants[ variant ],
 	};
 };
 
-const getPrompts = ( pluginTemplate, keys ) => {
+const getPrompts = ( pluginTemplate, keys, variant ) => {
 	const defaultValues = getDefaultValues( pluginTemplate );
+	const variantData = pluginTemplate.variants[ variant ] ?? false;
 	return keys.map( ( promptName ) => {
+		if ( promptName === 'variant' ) {
+			prompts[ promptName ].choices = Object.keys(
+				pluginTemplate.variants
+			);
+		}
+		if ( variantData && variantData[ promptName ] ) {
+			return {
+				...prompts[ promptName ],
+				default: variantData[ promptName ],
+			};
+		}
 		return {
 			...prompts[ promptName ],
 			default: defaultValues[ promptName ],
@@ -229,8 +257,34 @@ const getPrompts = ( pluginTemplate, keys ) => {
 	} );
 };
 
+const getTemplateVariantVars = ( variants, variant ) => {
+	const variantVars = {};
+	if ( variants ) {
+		const variantNames = Object.keys( variants );
+		const chosenVariant = variant ?? variantNames[ 0 ]; // If no variant is passed, use the first in the array as the default
+
+		if ( variantNames.includes( chosenVariant ) ) {
+			for ( const variantName of variantNames ) {
+				const key =
+					variantName.charAt( 0 ).toUpperCase() +
+					variantName.slice( 1 );
+				variantVars[ `is${ key }Variant` ] =
+					chosenVariant === variantName ?? false;
+			}
+		} else {
+			throw new CLIError(
+				`"${ chosenVariant }" is not a valid variant for this template. Available variants are: ${ variantNames.join(
+					', '
+				) }`
+			);
+		}
+	}
+	return variantVars;
+};
+
 module.exports = {
 	getPluginTemplate,
 	getDefaultValues,
 	getPrompts,
+	getTemplateVariantVars,
 };

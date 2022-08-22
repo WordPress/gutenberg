@@ -23,6 +23,7 @@ module.exports = async ( {
 	npmDependencies,
 	npmDevDependencies,
 	customScripts,
+	isDynamicVariant,
 } ) => {
 	const cwd = join( process.cwd(), slug );
 
@@ -42,13 +43,17 @@ module.exports = async ( {
 				main: wpScripts && 'build/index.js',
 				scripts: {
 					...( wpScripts && {
-						build: 'wp-scripts build',
+						build: isDynamicVariant
+							? 'wp-scripts build --webpack-copy-php'
+							: 'wp-scripts build',
 						format: 'wp-scripts format',
 						'lint:css': 'wp-scripts lint-style',
 						'lint:js': 'wp-scripts lint-js',
 						'packages-update': 'wp-scripts packages-update',
 						'plugin-zip': 'wp-scripts plugin-zip',
-						start: 'wp-scripts start',
+						start: isDynamicVariant
+							? 'wp-scripts start --webpack-copy-php'
+							: 'wp-scripts start',
 					} ),
 					...( wpEnv && { env: 'wp-env' } ),
 					...customScripts,
