@@ -12,10 +12,9 @@ const initWPScripts = require( './init-wp-scripts' );
 const initWPEnv = require( './init-wp-env' );
 const { code, info, success, error } = require( './log' );
 const { writeOutputAsset, writeOutputTemplate } = require( './output' );
-const { getTemplateVariantVars } = require( './templates' );
 
 module.exports = async (
-	{ blockOutputTemplates, pluginOutputTemplates, outputAssets, variants },
+	{ blockOutputTemplates, pluginOutputTemplates, outputAssets },
 	{
 		$schema,
 		apiVersion,
@@ -44,7 +43,7 @@ module.exports = async (
 		editorScript,
 		editorStyle,
 		style,
-		variant,
+		variantVars,
 	}
 ) => {
 	slug = slug.toLowerCase();
@@ -100,8 +99,7 @@ module.exports = async (
 		editorScript,
 		editorStyle,
 		style,
-		...getTemplateVariantVars( variants, variant ),
-		...variants[ variant ],
+		...variantVars,
 	};
 
 	if ( plugin ) {

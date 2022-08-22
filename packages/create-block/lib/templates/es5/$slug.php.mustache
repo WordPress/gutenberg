@@ -68,32 +68,24 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 		array(),
 		filemtime( "$dir/$style_css" )
 	);
-	{{^isDynamicVariant}}
+
 	register_block_type(
 		'{{namespace}}/{{slug}}',
 		array(
 			'editor_script' => '{{namespace}}-{{slug}}-block-editor',
 			'editor_style'  => '{{namespace}}-{{slug}}-block-editor',
 			'style'         => '{{namespace}}-{{slug}}-block',
-		)
-	);
-	{{/isDynamicVariant}}
-	{{#isDynamicVariant}}
-	register_block_type(
-		'{{namespace}}/{{slug}}',
-		array(
-			'editor_script'   => '{{namespace}}-{{slug}}-block-editor',
-			'editor_style'    => '{{namespace}}-{{slug}}-block-editor',
-			'style'           => '{{namespace}}-{{slug}}-block',
+			{{#isDynamicVariant}}
 			'render_callback' => '{{namespaceSnakeCase}}_{{slugSnakeCase}}_render_callback',
+			{{/isDynamicVariant}}
 		)
 	);
-	{{/isDynamicVariant}}
 }
 add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );
 {{#isDynamicVariant}}
+
 /**
- * Render callback function
+ * Render callback function.
  *
  * @param array    $attributes The block attributes.
  * @param string   $content    The block content.
@@ -101,7 +93,7 @@ add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );
  *
  * @return string The rendered output.
  */
-function {{namespaceSnakeCase}}_{{slugSnakeCase}}_render_callback( $atts, $content, $block) {
+function {{namespaceSnakeCase}}_{{slugSnakeCase}}_render_callback( $attributes, $content, $block ) {
 	ob_start();
 	require plugin_dir_path( __FILE__ ) . '/template.php';
 	return ob_get_clean();
