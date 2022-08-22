@@ -24,6 +24,6 @@ describe( 'PostPendingStatusCheck', () => {
 				status
 			</PostPendingStatusCheck>
 		);
-		expect( screen.queryByText( 'status' ) ).toBeVisible();
+		expect( screen.getByText( 'status' ) ).toBeVisible();
 	} );
 } );

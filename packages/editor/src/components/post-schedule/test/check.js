@@ -22,6 +22,6 @@ describe( 'PostScheduleCheck', () => {
 		render(
 			<PostScheduleCheck hasPublishAction={ true }>yes</PostScheduleCheck>
 		);
-		expect( screen.queryByText( 'yes' ) ).toBeVisible();
+		expect( screen.getByText( 'yes' ) ).toBeVisible();
 	} );
 } );

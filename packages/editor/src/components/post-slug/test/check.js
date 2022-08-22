@@ -12,6 +12,6 @@ describe( 'PostSlugCheck', () => {
 	it( 'should render control', () => {
 		render( <PostSlugCheck>slug</PostSlugCheck> );
 
-		expect( screen.queryByText( 'slug' ) ).toBeVisible();
+		expect( screen.getByText( 'slug' ) ).toBeVisible();
 	} );
 } );

@@ -19,7 +19,7 @@ describe( 'PostVisibilityCheck', () => {
 			/>
 		);
 		expect( screen.queryByText( 'yes' ) ).not.toBeInTheDocument();
-		expect( screen.queryByText( 'no' ) ).toBeVisible();
+		expect( screen.getByText( 'no' ) ).toBeVisible();
 	} );
 
 	it( 'should render if the user has the correct capability', () => {
@@ -30,6 +30,6 @@ describe( 'PostVisibilityCheck', () => {
 			/>
 		);
 		expect( screen.queryByText( 'no' ) ).not.toBeInTheDocument();
-		expect( screen.queryByText( 'yes' ) ).toBeVisible();
+		expect( screen.getByText( 'yes' ) ).toBeVisible();
 	} );
 } );

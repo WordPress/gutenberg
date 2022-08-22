@@ -36,6 +36,6 @@ describe( 'PostLastRevisionCheck', () => {
 			</PostLastRevisionCheck>
 		);
 
-		expect( screen.queryByText( 'Children' ) ).toBeVisible();
+		expect( screen.getByText( 'Children' ) ).toBeVisible();
 	} );
 } );

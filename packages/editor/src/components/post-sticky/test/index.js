@@ -37,6 +37,6 @@ describe( 'PostSticky', () => {
 				Can Toggle Sticky
 			</PostStickyCheck>
 		);
-		expect( screen.queryByText( 'Can Toggle Sticky' ) ).toBeVisible();
+		expect( screen.getByText( 'Can Toggle Sticky' ) ).toBeVisible();
 	} );
 } );
