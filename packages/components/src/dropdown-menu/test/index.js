@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -65,11 +65,13 @@ describe( 'DropdownMenu', () => {
 
 		await user.keyboard( '[ArrowDown]' );
 
-		await waitFor( () =>
-			expect( screen.getByRole( 'menu' ) ).toBeVisible()
-		);
+		let menu;
+		await waitFor( () => {
+			menu = screen.getByRole( 'menu' );
+			return expect( menu ).toBeVisible();
+		} );
 
-		expect( screen.getAllByRole( 'menuitem' ) ).toHaveLength(
+		expect( within( menu ).getAllByRole( 'menuitem' ) ).toHaveLength(
 			controls.length
 		);
 	} );
@@ -90,12 +92,14 @@ describe( 'DropdownMenu', () => {
 
 		await user.keyboard( '[ArrowDown]' );
 
-		await waitFor( () =>
-			expect( screen.getByRole( 'menu' ) ).toBeVisible()
-		);
+		let menu;
+		await waitFor( () => {
+			menu = screen.getByRole( 'menu' );
+			return expect( menu ).toBeVisible();
+		} );
 
 		// Clicking the menu item will close the dropdown menu
-		await user.click( screen.getByRole( 'menuitem' ) );
+		await user.click( within( menu ).getByRole( 'menuitem' ) );
 
 		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 	} );
