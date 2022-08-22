@@ -605,12 +605,15 @@ function Navigation( {
 								handleUpdateMenu( menuId );
 								setShouldFocusNavigationSelector( true );
 							} }
-							onSelectClassicMenu={ ( classicMenu ) => {
-								convertClassicMenu(
+							onSelectClassicMenu={ async ( classicMenu ) => {
+								const navMenu = await convertClassicMenu(
 									classicMenu.id,
 									classicMenu.name
 								);
-								setShouldFocusNavigationSelector( true );
+								if ( navMenu ) {
+									handleUpdateMenu( navMenu.id );
+									setShouldFocusNavigationSelector( true );
+								}
 							} }
 							onCreateNew={ () => createNavigationMenu( '', [] ) }
 							/* translators: %s: The name of a menu. */
@@ -669,12 +672,15 @@ function Navigation( {
 								handleUpdateMenu( menuId );
 								setShouldFocusNavigationSelector( true );
 							} }
-							onSelectClassicMenu={ ( classicMenu ) => {
-								convertClassicMenu(
+							onSelectClassicMenu={ async ( classicMenu ) => {
+								const navMenu = await convertClassicMenu(
 									classicMenu.id,
 									classicMenu.name
 								);
-								setShouldFocusNavigationSelector( true );
+								if ( navMenu ) {
+									handleUpdateMenu( navMenu.id );
+									setShouldFocusNavigationSelector( true );
+								}
 							} }
 							onCreateNew={ () => createNavigationMenu( '', [] ) }
 							/* translators: %s: The name of a menu. */

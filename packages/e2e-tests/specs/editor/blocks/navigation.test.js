@@ -194,7 +194,7 @@ async function selectClassicMenu( optionText ) {
 	const theOption = await page.waitForXPath(
 		'//button[contains(., "' + optionText + '")]'
 	);
-	theOption.click();
+	await theOption.click();
 
 	await page.waitForResponse(
 		( response ) =>
