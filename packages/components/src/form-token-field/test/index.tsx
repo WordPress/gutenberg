@@ -101,10 +101,8 @@ const expectVisibleSuggestionsToBe = (
 // TODO:
 // - suggestions:
 //   - update message (a11y)
-//   - async?
 //   - __experimentalRenderItem
 //   - __experimentalAutoSelectFirstMatch
-//   - escape suggestions text
 // - RTL support
 
 describe( 'FormTokenField', () => {
@@ -980,7 +978,7 @@ describe( 'FormTokenField', () => {
 			] );
 		} );
 
-		it( 'will show, at most, a number of suggestions equals to the value of the `maxSuggestions` prop', async () => {
+		it( 'should show, at most, a number of suggestions equals to the value of the `maxSuggestions` prop', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
@@ -1028,6 +1026,72 @@ describe( 'FormTokenField', () => {
 				screen.getByRole( 'listbox' ),
 				suggestions.slice( 0, 3 )
 			);
+		} );
+
+		it( 'should match the search text against the unescaped values of suggestions with special characters (including spaces)', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			render(
+				<FormTokenFieldWithState
+					displayTransform={ unescapeAndFormatSpaces }
+					suggestions={ [
+						'<3',
+						'Stuff & Things',
+						'Tags & Stuff',
+						'Tags & Stuff 2',
+					] }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Should match against the escaped value
+			await user.type( input, '& S' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Tags & Stuff',
+				'Tags & Stuff 2',
+			] );
+
+			// Should match against the escaped value
+			await user.clear( input );
+			await user.type( input, 's &' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Tags & Stuff',
+				'Tags & Stuff 2',
+			] );
+
+			// Should not match against the escaped value
+			await user.clear( input );
+			await user.type( input, 'amp' );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should re-render if suggestions change', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const suggestions = [ 'Aluminum', 'Silver', 'Gold' ];
+
+			const { rerender } = render( <FormTokenFieldWithState /> );
+
+			// Type "sil", but there are no suggestions.
+			await user.type( screen.getByRole( 'combobox' ), 'sil' );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+
+			// When suggestions change, the "sil" text is matched against the new
+			// suggestions, which results in the "Silver" suggestion being shown.
+			rerender( <FormTokenFieldWithState suggestions={ suggestions } /> );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Silver',
+			] );
 		} );
 	} );
 
