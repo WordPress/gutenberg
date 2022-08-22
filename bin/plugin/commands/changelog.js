@@ -2,7 +2,7 @@
  * External dependencies
  */
 const { groupBy, escapeRegExp, flow, sortBy } = require( 'lodash' );
-const Octokit = require( '@octokit/rest' );
+const { Octokit } = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
 
@@ -21,10 +21,13 @@ const manifest = require( '../../../package.json' );
 
 const UNKNOWN_FEATURE_FALLBACK_NAME = 'Uncategorized';
 
-/** @typedef {import('@octokit/rest')} GitHub */
-/** @typedef {import('@octokit/rest').IssuesListForRepoResponseItem} IssuesListForRepoResponseItem */
-/** @typedef {import('@octokit/rest').IssuesListMilestonesForRepoResponseItem} OktokitIssuesListMilestonesForRepoResponseItem */
-/** @typedef {import('@octokit/rest').ReposListReleasesResponseItem} ReposListReleasesResponseItem */
+/** @typedef {import('@octokit/rest').Octokit} GitHub */
+
+/* eslint-disable jsdoc/valid-types */
+/** @typedef {import('@octokit/openapi-types').components["schemas"]["issue"]} Issue */
+/** @typedef {import('@octokit/openapi-types').components["schemas"]["release"]} Release */
+
+/* eslint-enable jsdoc/valid-types */
 
 /**
  * @typedef WPChangelogCommandOptions
@@ -48,7 +51,7 @@ const UNKNOWN_FEATURE_FALLBACK_NAME = 'Uncategorized';
  * Changelog normalization function, returning a string to use as title, or
  * undefined if entry should be omitted.
  *
- * @typedef {(text:string,issue:IssuesListForRepoResponseItem)=>string|undefined} WPChangelogNormalization
+ * @typedef {(text:string,issue:Issue)=>string|undefined} WPChangelogNormalization
  */
 
 /**
@@ -266,7 +269,7 @@ function getTypesByTitle( title ) {
  * Returns a type label for a given issue object, or a default if type cannot
  * be determined.
  *
- * @param {IssuesListForRepoResponseItem} issue Issue object.
+ * @param {Issue} issue Issue object.
  *
  * @return {string} Type label.
  */
@@ -291,7 +294,7 @@ function getIssueType( issue ) {
  * Returns the most appropriate feature category for the given issue based
  * on a basic heuristic.
  *
- * @param {IssuesListForRepoResponseItem} issue Issue object.
+ * @param {Issue} issue Issue object.
  *
  * @return {string} the feature name.
  */
@@ -510,7 +513,7 @@ const TITLE_NORMALIZATIONS = [
  * applied, or undefined to indicate that the entry should be omitted.
  *
  * @param {string}                        title Original title.
- * @param {IssuesListForRepoResponseItem} issue Issue object.
+ * @param {Issue} issue Issue object.
  *
  * @return {string|undefined} Normalized title.
  */
@@ -531,7 +534,7 @@ function getNormalizedTitle( title, issue ) {
  * Returns a formatted changelog list item entry for a given issue object, or undefined
  * if entry should be omitted.
  *
- * @param {IssuesListForRepoResponseItem} issue Issue object.
+ * @param {Issue} issue Issue object.
  *
  * @return {string=} Formatted changelog entry, or undefined to omit.
  */
@@ -565,7 +568,7 @@ function getFormattedItemDescription( title, number, url ) {
  * Returns a formatted changelog entry for a given issue object and matching feature name, or undefined
  * if entry should be omitted.
  *
- * @param {IssuesListForRepoResponseItem} issue       Issue object.
+ * @param {Issue} issue       Issue object.
  * @param {string}                        featureName Feature name.
  *
  * @return {string=} Formatted changelog entry, or undefined to omit.
@@ -590,7 +593,7 @@ function getFeatureEntry( issue, featureName ) {
  * @param {string} repo    Repository name.
  * @param {string} series  Gutenberg release series (e.g. '6.7' or '9.8').
  *
- * @return {Promise<ReposListReleasesResponseItem|undefined>} Promise resolving to pull
+ * @return {Promise<Release|undefined>} Promise resolving to pull
  *                                                            requests for the given
  *                                                            milestone.
  */
@@ -626,7 +629,7 @@ async function getLatestReleaseInSeries( octokit, owner, repo, series ) {
  * @param {GitHub}              octokit  GitHub REST client.
  * @param {WPChangelogSettings} settings Changelog settings.
  *
- * @return {Promise<IssuesListForRepoResponseItem[]>} Promise resolving to array of
+ * @return {Promise<Issue[]>} Promise resolving to array of
  *                                            pull requests.
  */
 async function fetchAllPullRequests( octokit, settings ) {
@@ -678,7 +681,7 @@ async function fetchAllPullRequests( octokit, settings ) {
 /**
  * Formats the changelog string for a given list of pull requests.
  *
- * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ * @param {Issue[]} pullRequests List of pull requests.
  *
  * @return {string} The formatted changelog string.
  */
@@ -754,7 +757,7 @@ function getChangelog( pullRequests ) {
  * Sorts the feature groups by the feature which contains the greatest number of PRs
  * ready for output into the changelog.
  *
- * @param {Object.<string, IssuesListForRepoResponseItem[]>} featureGroups feature specific PRs keyed by feature name.
+ * @param {Object.<string, Issue[]>} featureGroups feature specific PRs keyed by feature name.
  * @return {string[]} sorted list of feature names.
  */
 function sortFeatureGroups( featureGroups ) {
@@ -780,9 +783,9 @@ function sortFeatureGroups( featureGroups ) {
  * Returns a list of PRs created by first time contributors based on the Github
  * label associated with the PR. Also filters out any "bots".
  *
- * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ * @param {Issue[]} pullRequests List of pull requests.
  *
- * @return {IssuesListForRepoResponseItem[]} pullRequests List of first time contributor PRs.
+ * @return {Issue[]} pullRequests List of first time contributor PRs.
  */
 function getFirstTimeContributorPRs( pullRequests ) {
 	return pullRequests.filter( ( pr ) => {
@@ -796,7 +799,7 @@ function getFirstTimeContributorPRs( pullRequests ) {
  * Creates a set of markdown formatted list items for each first time contributor
  * and their associated PR.
  *
- * @param {IssuesListForRepoResponseItem[]} ftcPRs List of first time contributor PRs.
+ * @param {Issue[]} ftcPRs List of first time contributor PRs.
  *
  * @return {string} The formatted markdown list of contributors and their PRs.
  */
@@ -819,8 +822,8 @@ function getContributorPropsMarkdownList( ftcPRs ) {
 /**
  * Sorts a given Issue/PR by the username of the user who created.
  *
- * @param {IssuesListForRepoResponseItem[]} items List of pull requests.
- * @return {IssuesListForRepoResponseItem[]} The sorted list of pull requests.
+ * @param {Issue[]} items List of pull requests.
+ * @return {Issue[]} The sorted list of pull requests.
  */
 function sortByUsername( items ) {
 	return sortBy( items, ( item ) => item.user.login.toLowerCase() );
@@ -829,12 +832,12 @@ function sortByUsername( items ) {
 /**
  * Removes duplicate PRs by the username of the user who created.
  *
- * @param {IssuesListForRepoResponseItem[]} items List of pull requests.
- * @return {IssuesListForRepoResponseItem[]} The list of pull requests unique per user.
+ * @param {Issue[]} items List of pull requests.
+ * @return {Issue[]} The list of pull requests unique per user.
  */
 function getUniqueByUsername( items ) {
 	/**
-	 * @type {IssuesListForRepoResponseItem[]} List of pull requests.
+	 * @type {Issue[]} List of pull requests.
 	 */
 	const EMPTY_PR_LIST = [];
 
@@ -850,8 +853,8 @@ function getUniqueByUsername( items ) {
  * Excludes users who should not be included in the changelog.
  * Typically this is "bot" users.
  *
- * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
- * @return {IssuesListForRepoResponseItem[]} The list of filtered pull requests.
+ * @param {Issue[]} pullRequests List of pull requests.
+ * @return {Issue[]} The list of filtered pull requests.
  */
 function skipCreatedByBots( pullRequests ) {
 	return pullRequests.filter(
@@ -862,7 +865,7 @@ function skipCreatedByBots( pullRequests ) {
 /**
  * Produces the formatted markdown for the contributor props seciton.
  *
- * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ * @param {Issue[]} pullRequests List of pull requests.
  *
  * @return {string} The formatted props section.
  */
@@ -886,7 +889,7 @@ function getContributorProps( pullRequests ) {
 
 /**
  *
- * @param {IssuesListForRepoResponseItem[]} pullRequests List of first time contributor PRs.
+ * @param {Issue[]} pullRequests List of first time contributor PRs.
  * @return {string} The formatted markdown list of contributor usernames.
  */
 function getContributorsMarkdownList( pullRequests ) {
@@ -902,7 +905,7 @@ function getContributorsMarkdownList( pullRequests ) {
  * Produces the formatted markdown for the full time contributors section of
  * the changelog output.
  *
- * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ * @param {Issue[]} pullRequests List of pull requests.
  *
  * @return {string} The formatted contributors section.
  */
