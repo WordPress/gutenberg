@@ -42,7 +42,7 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 				nextClientId={ blockOrder[ index + 1 ] }
 				__unstableContentRef={ __unstableContentRef }
 			>
-				<div className="block-editor-block-list__insertion-point-inserter">
+				<div className="block-editor-block-list__insertion-point-inserter is-with-inserter">
 					<Inserter
 						position="bottom center"
 						clientId={ blockOrder[ index + 1 ] }

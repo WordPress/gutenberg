@@ -22,8 +22,7 @@
 
 	// Enable pointer events for the toolbar's content.
 	&:not(.block-editor-block-popover__inbetween) .components-popover__content {
-		// check if rebase ok
-		div > * {
+		* {
 			pointer-events: all;
 		}
 	}
@@ -40,7 +39,6 @@
 	}
 
 	// Re-enable pointer events when the inbetween inserter has a '+' button.
-	//
 	// Needs specificity, do not simplify.
 	.is-with-inserter {
 		pointer-events: all;
@@ -48,12 +46,5 @@
 		* {
 			pointer-events: all;
 		}
-	}
-}
-
-.block-editor-block-popover__inbetween-container {
-	pointer-events: none !important;
-	> div > * {
-		pointer-events: all;
 	}
 }
