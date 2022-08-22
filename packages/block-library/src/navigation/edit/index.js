@@ -207,6 +207,9 @@ function Navigation( {
 		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
 
+	const navMenuResolvedButMissing =
+		hasResolvedNavigationMenus && isNavigationMenuMissing;
+
 	// Attempt to retrieve and prioritize any existing navigation menu unless
 	// a specific ref is allocated or the user is explicitly creating a new menu. The aim is
 	// for the block to "just work" from a user perspective using existing data.
@@ -228,10 +231,9 @@ function Navigation( {
 	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
 
 	const {
-		convert,
+		convert: convertClassicMenu,
 		status: classicMenuConversionStatus,
 		error: classicMenuConversionError,
-		value: classicMenuConversionResult,
 	} = useConvertClassicToBlockMenu( clientId );
 
 	const isConvertingClassicMenu =
@@ -325,28 +327,18 @@ function Navigation( {
 			speak( __( 'Classic menu importing.' ) );
 		}
 
-		if (
-			classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_SUCCESS &&
-			classicMenuConversionResult
-		) {
-			handleUpdateMenu( classicMenuConversionResult?.id );
+		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_SUCCESS ) {
 			showClassicMenuConversionNotice(
 				__( 'Classic menu imported successfully.' )
 			);
-			speak( __( 'Classic menu imported successfully.' ) );
 		}
 
 		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_ERROR ) {
 			showClassicMenuConversionNotice(
 				__( 'Classic menu import failed.' )
 			);
-			speak( __( 'Classic menu import failed.' ) );
 		}
-	}, [
-		classicMenuConversionStatus,
-		classicMenuConversionResult,
-		classicMenuConversionError,
-	] );
+	}, [ classicMenuConversionStatus, classicMenuConversionError ] );
 
 	// Spacer block needs orientation from context. This is a patch until
 	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.
@@ -386,6 +378,7 @@ function Navigation( {
 		if ( isSelected || isInnerBlockSelected ) {
 			if (
 				ref &&
+				! navMenuResolvedButMissing &&
 				hasResolvedCanUserUpdateNavigationMenu &&
 				! canUserUpdateNavigationMenu
 			) {
@@ -421,24 +414,6 @@ function Navigation( {
 	const navigationSelectorRef = useRef();
 	const [ shouldFocusNavigationSelector, setShouldFocusNavigationSelector ] =
 		useState( false );
-	const handleSelectNavigation = useCallback(
-		( navPostOrClassicMenu ) => {
-			if ( ! navPostOrClassicMenu ) {
-				return;
-			}
-
-			const isClassicMenu =
-				navPostOrClassicMenu.hasOwnProperty( 'auto_add' );
-
-			if ( isClassicMenu ) {
-				convert( navPostOrClassicMenu.id, navPostOrClassicMenu.name );
-			} else {
-				handleUpdateMenu( navPostOrClassicMenu.id );
-			}
-			setShouldFocusNavigationSelector( true );
-		},
-		[ convert, handleUpdateMenu ]
-	);
 
 	// Focus support after menu selection.
 	useEffect( () => {
@@ -693,7 +668,20 @@ function Navigation( {
 					isResolvingCanUserCreateNavigationMenu={
 						isResolvingCanUserCreateNavigationMenu
 					}
-					onFinish={ handleSelectNavigation }
+					onSelectNavigationMenu={ ( menuId ) => {
+						handleUpdateMenu( menuId );
+						setShouldFocusNavigationSelector( true );
+					} }
+					onSelectClassicMenu={ async ( classicMenu ) => {
+						const navMenu = await convertClassicMenu(
+							classicMenu.id,
+							classicMenu.name
+						);
+						if ( navMenu ) {
+							handleUpdateMenu( navMenu.id );
+							setShouldFocusNavigationSelector( true );
+						}
+					} }
 					onCreateEmpty={ () => createNavigationMenu( '', [] ) }
 				/>
 			</TagName>
@@ -710,7 +698,22 @@ function Navigation( {
 								ref={ navigationSelectorRef }
 								currentMenuId={ ref }
 								clientId={ clientId }
-								onSelect={ handleSelectNavigation }
+								onSelectNavigationMenu={ ( menuId ) => {
+									handleUpdateMenu( menuId );
+									setShouldFocusNavigationSelector( true );
+								} }
+								onSelectClassicMenu={ async ( classicMenu ) => {
+									const navMenu = await convertClassicMenu(
+										classicMenu.id,
+										classicMenu.name
+									);
+									if ( navMenu ) {
+										handleUpdateMenu( navMenu.id );
+										setShouldFocusNavigationSelector(
+											true
+										);
+									}
+								} }
 								onCreateNew={ resetToEmptyBlock }
 								/* translators: %s: The name of a menu. */
 								actionLabel={ __( "Switch to '%s'" ) }

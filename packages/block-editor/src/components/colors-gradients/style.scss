@@ -15,6 +15,12 @@ $swatch-gap: 12px;
 	min-width: 0;
 }
 
+.block-editor-color-gradient-control__tabs {
+	.block-editor-color-gradient-control__panel {
+		padding: $grid-unit-20;
+	}
+}
+
 .block-editor-panel-color-gradient-settings.block-editor-panel-color-gradient-settings {
 	&,
 	& > div:not(:first-of-type) {
@@ -41,7 +47,13 @@ $swatch-gap: 12px;
 }
 
 .block-editor-panel-color-gradient-settings__dropdown-content {
-	width: ( $swatch-size * 6 ) + ( $swatch-gap * 5 ); // Ensure the popover perfectly wraps the swatches.
+	.block-editor-color-gradient-control__panel {
+		$panelPadding: $grid-unit-20;
+
+		// Ensure the popover perfectly wraps the swatches.
+		width: ( $swatch-size * 6 ) + ( $swatch-gap * 5 ) + ( $panelPadding * 2 );
+		padding: $panelPadding;
+	}
 }
 
 .block-editor-panel-color-gradient-settings__color-indicator {
@@ -112,8 +124,4 @@ $swatch-gap: 12px;
 	.component-color-indicator {
 		flex-shrink: 0;
 	}
-}
-
-.block-editor-color-gradient-control__tab-panel {
-	padding-top: $grid-unit-10;
 }

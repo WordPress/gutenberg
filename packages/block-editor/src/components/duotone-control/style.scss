@@ -18,10 +18,6 @@ $swatch-columns: math.floor(math.div($popover-width + $swatch-gap - 2 * $popover
 		padding: 0;
 	}
 
-	.components-custom-gradient-picker__gradient-bar {
-		margin: $grid-unit-20 0 $grid-unit-15;
-	}
-
 	.components-circular-option-picker__swatches {
 		display: grid;
 		grid-template-columns: repeat($swatch-columns, $swatch-size);

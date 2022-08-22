@@ -216,6 +216,7 @@ export function SocialLinksEdit( props ) {
 					__experimentalIsRenderedInSidebar
 					title={ __( 'Color' ) }
 					colorSettings={ colorSettings }
+					enableAlpha
 				>
 					{ ! logosOnly && (
 						<ContrastChecker

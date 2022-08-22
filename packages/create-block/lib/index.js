@@ -2,8 +2,8 @@
  * External dependencies
  */
 const inquirer = require( 'inquirer' );
+const { capitalCase } = require( 'change-case' );
 const program = require( 'commander' );
-const { pickBy, startCase } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -57,10 +57,12 @@ program
 		'disable integration with `@wordpress/scripts` package'
 	)
 	.option( '--wp-env', 'enable integration with `@wordpress/env` package' )
+	.option( '--no-plugin', 'scaffold only block files' )
 	.action(
 		async (
 			slug,
 			{
+				plugin,
 				category,
 				namespace,
 				shortDescription: description,
@@ -74,16 +76,16 @@ program
 			try {
 				const pluginTemplate = await getPluginTemplate( templateName );
 				const defaultValues = getDefaultValues( pluginTemplate );
-				const optionsValues = pickBy(
-					{
+				const optionsValues = Object.fromEntries(
+					Object.entries( {
+						plugin,
 						category,
 						description,
 						namespace,
 						title,
 						wpScripts,
 						wpEnv,
-					},
-					( value ) => value !== undefined
+					} ).filter( ( [ , value ] ) => value !== undefined )
 				);
 
 				if ( slug ) {
@@ -91,14 +93,16 @@ program
 						...defaultValues,
 						slug,
 						// Transforms slug to title as a fallback.
-						title: startCase( slug ),
+						title: capitalCase( slug ),
 						...optionsValues,
 					};
 					await scaffold( pluginTemplate, answers );
 				} else {
 					log.info( '' );
 					log.info(
-						"Let's customize your WordPress plugin with blocks:"
+						plugin
+							? "Let's customize your WordPress plugin with blocks:"
+							: "Let's add a new block to your existing WordPress plugin:"
 					);
 
 					const filterOptionsProvided = ( { name } ) =>
@@ -113,33 +117,39 @@ program
 					] ).filter( filterOptionsProvided );
 					const blockAnswers = await inquirer.prompt( blockPrompts );
 
-					const pluginAnswers = await inquirer
-						.prompt( {
-							type: 'confirm',
-							name: 'configurePlugin',
-							message:
-								'Do you want to customize the WordPress plugin?',
-							default: false,
-						} )
-						.then( async ( { configurePlugin } ) => {
-							if ( ! configurePlugin ) {
-								return {};
-							}
+					const pluginAnswers = plugin
+						? await inquirer
+								.prompt( {
+									type: 'confirm',
+									name: 'configurePlugin',
+									message:
+										'Do you want to customize the WordPress plugin?',
+									default: false,
+								} )
+								.then( async ( { configurePlugin } ) => {
+									if ( ! configurePlugin ) {
+										return {};
+									}
 
-							const pluginPrompts = getPrompts( pluginTemplate, [
-								'pluginURI',
-								'version',
-								'author',
-								'license',
-								'licenseURI',
-								'domainPath',
-								'updateURI',
-							] ).filter( filterOptionsProvided );
-							const result = await inquirer.prompt(
-								pluginPrompts
-							);
-							return result;
-						} );
+									const pluginPrompts = getPrompts(
+										pluginTemplate,
+										[
+											'pluginURI',
+											'version',
+											'author',
+											'license',
+											'licenseURI',
+											'domainPath',
+											'updateURI',
+										]
+									).filter( filterOptionsProvided );
+									const result = await inquirer.prompt(
+										pluginPrompts
+									);
+									return result;
+								} )
+						: {};
+
 					await scaffold( pluginTemplate, {
 						...defaultValues,
 						...optionsValues,

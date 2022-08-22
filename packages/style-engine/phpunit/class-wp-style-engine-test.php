@@ -133,22 +133,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'invalid_context'                              => array(
-				'block_styles'    => array(
-					'color'   => array(
-						'text' => 'var:preset|color|sugar',
-					),
-					'spacing' => array(
-						'padding' => '20000px',
-					),
-				),
-				'options'         => array(
-					'convert_vars_to_classnames' => true,
-					'context'                    => 'i-love-doughnuts',
-				),
-				'expected_output' => array(),
-			),
-
 			'inline_valid_box_model_style'                 => array(
 				'block_styles'    => array(
 					'spacing' => array(
@@ -209,7 +193,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => null,
 				'expected_output' => array(
-					'css'          => 'font-family:Roboto,Oxygen-Sans,Ubuntu,sans-serif;font-style:italic;font-weight:800;line-height:1.3;text-decoration:underline;text-transform:uppercase;letter-spacing:2;',
+					'css'          => 'font-size:clamp(2em, 2vw, 4em);font-family:Roboto,Oxygen-Sans,Ubuntu,sans-serif;font-style:italic;font-weight:800;line-height:1.3;text-decoration:underline;text-transform:uppercase;letter-spacing:2;',
 					'declarations' => array(
 						'font-size'       => 'clamp(2em, 2vw, 4em)',
 						'font-family'     => 'Roboto,Oxygen-Sans,Ubuntu,sans-serif',
@@ -511,7 +495,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
 	 * Tests adding rules to a store and retrieving a generated stylesheet.
 	 */
-	public function test_enqueue_block_styles_store() {
+	public function test_store_block_styles_using_context() {
 		$block_styles = array(
 			'spacing' => array(
 				'padding' => array(
@@ -526,14 +510,35 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 		$generated_styles = wp_style_engine_get_styles(
 			$block_styles,
 			array(
-				'enqueue'  => true,
 				'context'  => 'block-supports',
 				'selector' => 'article',
 			)
 		);
-		$store            = WP_Style_Engine::get_instance()::get_store( 'block-supports' );
+		$store            = WP_Style_Engine::get_store( 'block-supports' );
 		$rule             = $store->get_all_rules()['article'];
 		$this->assertSame( $generated_styles['css'], $rule->get_css() );
+	}
+
+	/**
+	 * Tests adding rules to a store and retrieving a generated stylesheet.
+	 */
+	public function test_does_not_store_block_styles_without_context() {
+		$block_styles = array(
+			'typography' => array(
+				'fontSize' => '999px',
+			),
+		);
+
+		wp_style_engine_get_styles(
+			$block_styles,
+			array(
+				'selector' => '#font-size-rulez',
+			)
+		);
+
+		$all_stores = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_stores();
+
+		$this->assertEmpty( $all_stores );
 	}
 
 	/**
@@ -564,15 +569,13 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			$css_rules,
 			array(
 				'context' => 'test-store',
-				'enqueue' => true,
 			)
 		);
 
 		// Check that the style engine knows about the store.
-		$style_engine = WP_Style_Engine::get_instance();
-		$stored_store = $style_engine::get_store( 'test-store' );
+		$stored_store = WP_Style_Engine::get_store( 'test-store' );
 		$this->assertInstanceOf( 'WP_Style_Engine_CSS_Rules_Store', $stored_store );
-		$this->assertSame( $compiled_stylesheet, $style_engine::compile_stylesheet_from_css_rules( $stored_store->get_all_rules() ) );
+		$this->assertSame( $compiled_stylesheet, WP_Style_Engine::compile_stylesheet_from_css_rules( $stored_store->get_all_rules() ) );
 	}
 
 	/**

@@ -1,16 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	filter,
-	find,
-	get,
-	isEmpty,
-	map,
-	mapValues,
-	omit,
-	uniqBy,
-} from 'lodash';
+import { filter, find, get, isEmpty, map, mapValues, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -49,6 +40,16 @@ function keyBlockTypesByName( types ) {
 		} ),
 		{}
 	);
+}
+
+// Filter items to ensure they're unique by their name.
+function getUniqueItemsByName( items ) {
+	return items.reduce( ( acc, currentItem ) => {
+		if ( ! acc.some( ( item ) => item.name === currentItem.name ) ) {
+			acc.push( currentItem );
+		}
+		return acc;
+	}, [] );
 }
 
 /**
@@ -113,34 +114,27 @@ export function blockStyles( state = {}, action ) {
 				...state,
 				...mapValues(
 					keyBlockTypesByName( action.blockTypes ),
-					( blockType ) => {
-						return uniqBy(
-							[
-								...get( blockType, [ 'styles' ], [] ).map(
-									( style ) => ( {
-										...style,
-										source: 'block',
-									} )
-								),
-								...get( state, [ blockType.name ], [] ).filter(
-									( { source } ) => 'block' !== source
-								),
-							],
-							( style ) => style.name
-						);
-					}
+					( blockType ) =>
+						getUniqueItemsByName( [
+							...get( blockType, [ 'styles' ], [] ).map(
+								( style ) => ( {
+									...style,
+									source: 'block',
+								} )
+							),
+							...get( state, [ blockType.name ], [] ).filter(
+								( { source } ) => 'block' !== source
+							),
+						] )
 				),
 			};
 		case 'ADD_BLOCK_STYLES':
 			return {
 				...state,
-				[ action.blockName ]: uniqBy(
-					[
-						...get( state, [ action.blockName ], [] ),
-						...action.styles,
-					],
-					( style ) => style.name
-				),
+				[ action.blockName ]: getUniqueItemsByName( [
+					...get( state, [ action.blockName ], [] ),
+					...action.styles,
+				] ),
 			};
 		case 'REMOVE_BLOCK_STYLES':
 			return {
@@ -171,33 +165,27 @@ export function blockVariations( state = {}, action ) {
 				...mapValues(
 					keyBlockTypesByName( action.blockTypes ),
 					( blockType ) => {
-						return uniqBy(
-							[
-								...get( blockType, [ 'variations' ], [] ).map(
-									( variation ) => ( {
-										...variation,
-										source: 'block',
-									} )
-								),
-								...get( state, [ blockType.name ], [] ).filter(
-									( { source } ) => 'block' !== source
-								),
-							],
-							( variation ) => variation.name
-						);
+						return getUniqueItemsByName( [
+							...get( blockType, [ 'variations' ], [] ).map(
+								( variation ) => ( {
+									...variation,
+									source: 'block',
+								} )
+							),
+							...get( state, [ blockType.name ], [] ).filter(
+								( { source } ) => 'block' !== source
+							),
+						] );
 					}
 				),
 			};
 		case 'ADD_BLOCK_VARIATIONS':
 			return {
 				...state,
-				[ action.blockName ]: uniqBy(
-					[
-						...get( state, [ action.blockName ], [] ),
-						...action.variations,
-					],
-					( variation ) => variation.name
-				),
+				[ action.blockName ]: getUniqueItemsByName( [
+					...get( state, [ action.blockName ], [] ),
+					...action.variations,
+				] ),
 			};
 		case 'REMOVE_BLOCK_VARIATIONS':
 			return {

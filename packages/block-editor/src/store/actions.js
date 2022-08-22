@@ -1002,7 +1002,7 @@ export const __unstableExpandSelection =
  */
 export const mergeBlocks =
 	( firstBlockClientId, secondBlockClientId ) =>
-	( { select, dispatch } ) => {
+	( { registry, select, dispatch } ) => {
 		const blocks = [ firstBlockClientId, secondBlockClientId ];
 		dispatch( { type: 'MERGE_BLOCKS', blocks } );
 
@@ -1010,13 +1010,41 @@ export const mergeBlocks =
 		const blockA = select.getBlock( clientIdA );
 		const blockAType = getBlockType( blockA.name );
 
-		// Only focus the previous block if it's not mergeable.
+		if ( ! blockAType ) return;
+
+		const blockB = select.getBlock( clientIdB );
+
 		if ( blockAType && ! blockAType.merge ) {
-			dispatch.selectBlock( blockA.clientId );
+			// If there's no merge function defined, attempt merging inner
+			// blocks.
+			const blocksWithTheSameType = switchToBlockType(
+				blockB,
+				blockAType.name
+			);
+			// Only focus the previous block if it's not mergeable.
+			if ( blocksWithTheSameType?.length !== 1 ) {
+				dispatch.selectBlock( blockA.clientId );
+				return;
+			}
+			const [ blockWithSameType ] = blocksWithTheSameType;
+			if ( blockWithSameType.innerBlocks.length < 1 ) {
+				dispatch.selectBlock( blockA.clientId );
+				return;
+			}
+			registry.batch( () => {
+				dispatch.insertBlocks(
+					blockWithSameType.innerBlocks,
+					undefined,
+					clientIdA
+				);
+				dispatch.removeBlock( clientIdB );
+				dispatch.selectBlock(
+					blockWithSameType.innerBlocks[ 0 ].clientId
+				);
+			} );
 			return;
 		}
 
-		const blockB = select.getBlock( clientIdB );
 		const blockBType = getBlockType( blockB.name );
 		const { clientId, attributeKey, offset } = select.getSelectionStart();
 		const selectedBlockType =
