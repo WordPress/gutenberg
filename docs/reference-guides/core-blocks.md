@@ -833,7 +833,7 @@ Insert poetry. Use special spacing formats. Or quote song lyrics. ([Source](http
 
 -	**Name:** core/verse
 -	**Category:** text
--	**Supports:** anchor, color (background, gradients, link, text), spacing (padding), typography (fontSize, lineHeight)
+-	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** content, textAlign
 
 ## Video
