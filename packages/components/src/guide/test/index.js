@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -102,7 +102,10 @@ describe( 'Guide', () => {
 		expect( onFinish ).toHaveBeenCalled();
 	} );
 
-	it( 'calls onFinish when the modal is closed', () => {
+	it( 'calls onFinish when the modal is closed', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 		const onFinish = jest.fn();
 		render(
 			<Guide
@@ -111,27 +114,7 @@ describe( 'Guide', () => {
 			/>
 		);
 
-		/**
-		 * Workaround to trigger an Escape keypress event.
-		 *
-		 * @todo Remove this workaround in favor of userEvent.keyboard() or userEvent.type().
-		 *
-		 * This curently doesn't work:
-		 *
-		 * ```
-		 * await user.keyboard( '[Escape]' );
-		 * ```
-		 *
-		 * because the event sent has a `keyCode` of `0`.
-		 *
-		 * To fix this, we'll need to update the Modal component to work with `KeyboardEvent.code`.
-		 *
-		 * @see https://github.com/testing-library/user-event/issues/969
-		 */
-		fireEvent.keyDown( screen.getByRole( 'dialog' ), {
-			key: 'Escape',
-			keyCode: 27,
-		} );
+		await user.keyboard( '[Escape]' );
 
 		expect( onFinish ).toHaveBeenCalled();
 	} );
