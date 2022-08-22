@@ -112,7 +112,8 @@
 		user-select: text;
 	}
 
-	// Re-enable it on editable items.
+	// Re-enable it on editable items and a few others.
+	.block-editor-block-list__block,
 	[contenteditable] {
 		user-select: text;
 
