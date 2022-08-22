@@ -7,6 +7,18 @@
  */
 
 class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
+	/**
+	 * Clean up global scope.
+	 *
+	 * @global WP_Scripts $wp_scripts
+	 * @global WP_Styles $wp_styles
+	 */
+	public function clean_up_global_scope() {
+		global $wp_styles;
+		$wp_styles = null;
+		parent::clean_up_global_scope();
+	}
+
 	function set_up() {
 		parent::set_up();
 		$this->theme_root     = realpath( __DIR__ . '/../data/themedir1' );
@@ -100,5 +112,53 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$expected      = '<figure class="wp-block-image alignright size-full is-style-round my-custom-classname"><img src="/my-image.jpg"/></figure>';
 
 		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_content, $block ) );
+	}
+
+	/**
+	 * Tests that layout CSS is enqueued.
+	 */
+	public function test_should_not_enqueue_stored_styles() {
+		global $wp_styles;
+		gutenberg_get_layout_style(
+			'.tested',
+			array(
+				'type'        => 'default',
+				'contentSize' => '800px',
+				'wideSize'    => '1000px',
+			),
+			true,
+			null,
+			false,
+			'0.5em',
+			null,
+			false
+		);
+		gutenberg_enqueue_stored_styles();
+
+		$this->assertNull( $wp_styles );
+	}
+
+	/**
+	 * Tests that layout CSS is enqueued.
+	 */
+	public function test_enqueue_stored_layout_styles() {
+		global $wp_styles;
+		$layout_styles = gutenberg_get_layout_style(
+			'.test',
+			array(
+				'type'        => 'default',
+				'contentSize' => '800px',
+				'wideSize'    => '1000px',
+			),
+			true,
+			null,
+			false,
+			'0.5em',
+			null,
+			true
+		);
+		gutenberg_enqueue_stored_styles();
+
+		$this->assertEquals( array( $layout_styles ), $wp_styles->get_data( 'core-block-supports', 'after' ) );
 	}
 }
