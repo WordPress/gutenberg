@@ -5,10 +5,13 @@ import SimpleGit from 'simple-git';
 import { dirname, join as pathJoin } from 'path';
 import { fileURLToPath } from 'url';
 import { promises as fsPromises } from 'fs';
+import { Octokit } from '@octokit/rest';
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) );
 
 const simpleGit = SimpleGit( dirname( __dirname ) );
+
+const octokit = new Octokit();
 
 async function getCommits( file ) {
 	const options = {
@@ -25,7 +28,7 @@ const backportDirectories = [
 	'lib/compat/wordpress-6.1/',
 ];
 
-backportDirectories.forEach( async ( backportDir ) => {
+for ( const backportDir of backportDirectories ) {
 	console.log( `### ${ backportDir }\n` );
 	const files = await fsPromises.readdir( backportDir );
 	for ( const file of files ) {
@@ -38,11 +41,27 @@ backportDirectories.forEach( async ( backportDir ) => {
 		console.log( `- [${ file }](${ ghRoot }${ path })` );
 		const log = await getCommits( path );
 
-		const prs = log.map(
+		const prNumbers = log.map(
 			( { message } ) => message.match( prRegex )?.[ 1 ]
 		);
-		prs.forEach( ( pr ) => {
-			console.log( `  - #${ pr }` );
-		} );
+
+		const authors = new Set();
+		for ( const prNumber of prNumbers ) {
+			if ( ! prNumber ) {
+				continue;
+			}
+			const pr = await octokit.pulls.get( {
+				owner: 'WordPress',
+				repo: 'gutenberg',
+				pull_number: prNumber,
+			} );
+			authors.add( pr.data.user.login );
+			console.log( `  - #${ prNumber }` );
+		}
+
+		const byline = [ ...authors ]
+			.map( ( author ) => `@${ author }` )
+			.join( ' ' );
+		console.log( byline );
 	}
-} );
+}
