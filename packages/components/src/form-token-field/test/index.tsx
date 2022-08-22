@@ -87,7 +87,6 @@ const expectVisibleSuggestionsToBe = (
 // - combobox "Add item" name
 // - tokens as objects?
 // - suggestions:
-//   - maxSuggestions
 //   - saveTransform
 //   - update message (a11y)
 //   - suggestions as objects
@@ -585,6 +584,390 @@ describe( 'FormTokenField', () => {
 		} );
 	} );
 
+	describe( 'suggestions', () => {
+		it( 'should not render suggestions in its default state', () => {
+			render(
+				<FormTokenFieldWithState
+					suggestions={ [ 'Red', 'Magenta', 'Vermilion' ] }
+				/>
+			);
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should render suggestions when receiving focus if the `__experimentalExpandOnFocus` prop is set to `true`', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const onFocusSpy = jest.fn();
+
+			const suggestions = [ 'Cobalt', 'Blue', 'Octane' ];
+
+			render(
+				<>
+					<FormTokenFieldWithState
+						onFocus={ onFocusSpy }
+						suggestions={ suggestions }
+						__experimentalExpandOnFocus={ true }
+					/>
+				</>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+
+			// Click the input, focusing it.
+			await user.click( input );
+
+			const suggestionList = screen.getByRole( 'listbox' );
+
+			expect( onFocusSpy ).toHaveBeenCalledTimes( 1 );
+			expect( suggestionList ).toBeVisible();
+
+			expect(
+				within( suggestionList ).getAllByRole( 'option' )
+			).toHaveLength( suggestions.length );
+
+			// Minimum length limitations don't affect the search text when the
+			// `__experimentalExpandOnFocus` is `true`
+			await user.keyboard( 'c' );
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Cobalt',
+				'Octane',
+			] );
+		} );
+
+		it( 'should not render suggestions if the text input is not matching any of the suggestions', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const suggestions = [ 'White', 'Pearl', 'Alabaster' ];
+
+			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Type 'Snow' which doesn't match any of the suggestions
+			await user.type( input, 'Snow' );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should render the matching suggestions only if the text input has the minimum length', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const suggestions = [ 'Yellow', 'Canary', 'Gold', 'Blonde' ];
+
+			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Despite 'l' matches some suggestions, the search text needs to be
+			// at least 2 characters
+			await user.type( input, '   l   ' );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+
+			// The trimmed search text is now 2 characters long (`lo`), which is
+			// enough to show matching suggestions ('Yellow' and 'Blonde')
+			await user.type( input, '[ArrowLeft][ArrowLeft][ArrowLeft]o' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Yellow',
+				'Blonde',
+			] );
+		} );
+
+		it( 'should not render a matching suggestion if a token with the same value has already been added', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
+
+			render(
+				<FormTokenFieldWithState
+					suggestions={ suggestions }
+					initialValue={ [ 'Green' ] }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Despite 'ee' matches both the "Green" and "Seaweed", "Green" won't be
+			// displayed because there's already a token with the same value
+			await user.type( input, 'ee' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Seaweed',
+			] );
+		} );
+
+		it( 'should allow the user to use the keyboard to navigate and select suggestions (which are marked with the `aria-selected` attribute)', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const onChangeSpy = jest.fn();
+
+			const suggestions = [
+				'Pink',
+				'Salmon',
+				'Flamingo',
+				'Carnation',
+				'Neon',
+			];
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					suggestions={ suggestions }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Typing "on" will show the "Salmon", "Carnation" and "Neon" suggestions
+			await user.type( input, 'on' );
+
+			const suggestionList = screen.getByRole( 'listbox' );
+
+			expectVisibleSuggestionsToBe( suggestionList, [
+				'Salmon',
+				'Carnation',
+				'Neon',
+			] );
+
+			// Currently, none of the suggestions are selected
+			expect(
+				within( suggestionList ).queryAllByRole( 'option', {
+					selected: true,
+				} )
+			).toHaveLength( 0 );
+
+			// Pressing the down arrow will select "Salmon"
+			await user.keyboard( '[ArrowDown]' );
+
+			expect(
+				within( suggestionList ).getByRole( 'option', {
+					selected: true,
+				} )
+			).toHaveAccessibleName( 'Salmon' );
+
+			// Pressing the up arrow will select "Neon" (the selection wraps around
+			// the list)
+			await user.keyboard( '[ArrowUp]' );
+
+			expect(
+				within( suggestionList ).getByRole( 'option', {
+					selected: true,
+				} )
+			).toHaveAccessibleName( 'Neon' );
+
+			// Pressing the down arrow twice will select "Carnation" (the selection
+			// wraps around the list)
+			await user.keyboard( '[ArrowDown][ArrowDown]' );
+
+			expect(
+				within( suggestionList ).getByRole( 'option', {
+					selected: true,
+				} )
+			).toHaveAccessibleName( 'Carnation' );
+
+			// Pressing enter will add "Carnation" as a token and close the suggestion list
+			await user.keyboard( '[Enter]' );
+
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Carnation' ] );
+			expectTokensToBeInTheDocument( [ 'Carnation' ] );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should allow the user to use the mouse to navigate and select suggestions (which are marked with the `aria-selected` attribute)', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const onChangeSpy = jest.fn();
+
+			const suggestions = [ 'Tiger', 'Tangerine', 'Orange' ];
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					suggestions={ suggestions }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Typing "er" will show the "Tiger" and "Tangerine" suggestions
+			await user.type( input, 'er' );
+
+			const suggestionList = screen.getByRole( 'listbox' );
+			expectVisibleSuggestionsToBe( suggestionList, [
+				'Tiger',
+				'Tangerine',
+			] );
+
+			// Currently, none of the suggestions are selected
+			expect(
+				within( suggestionList ).queryAllByRole( 'option', {
+					selected: true,
+				} )
+			).toHaveLength( 0 );
+
+			const tigerOption = within( suggestionList ).getByRole( 'option', {
+				name: 'Tiger',
+			} );
+			const tangerineOption = within( suggestionList ).getByRole(
+				'option',
+				{
+					name: 'Tangerine',
+				}
+			);
+
+			// Hovering over each option will mark it as selected (via the
+			// `aria-selected` attribute)
+			await user.hover( tigerOption );
+
+			expect( tigerOption ).toHaveAttribute( 'aria-selected', 'true' );
+			expect( tangerineOption ).toHaveAttribute(
+				'aria-selected',
+				'false'
+			);
+
+			await user.hover( tangerineOption );
+
+			expect( tigerOption ).toHaveAttribute( 'aria-selected', 'false' );
+			expect( tangerineOption ).toHaveAttribute(
+				'aria-selected',
+				'true'
+			);
+
+			// Clicking an option will add it as a token and close the list
+			await user.click( tangerineOption );
+
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Tangerine' ] );
+			expectTokensToBeInTheDocument( [ 'Tangerine' ] );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should hide the suggestion list when the Escape key is pressed', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const onChangeSpy = jest.fn();
+
+			const suggestions = [ 'Black', 'Ash', 'Onyx', 'Ebony' ];
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					suggestions={ suggestions }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Typing "ony" will show the "Onyx" and "Ebony" suggestions
+			await user.type( input, 'ony' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Onyx',
+				'Ebony',
+			] );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			// Pressing the ESC key will close the suggestion list
+			await user.keyboard( '[Escape]' );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+			expect( onChangeSpy ).not.toHaveBeenCalled();
+		} );
+
+		it( 'matches the search text with the suggestions in a case-insensitive way', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const suggestions = [ 'Cinnamon', 'Tawny', 'Mocha' ];
+
+			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Because text-matching is case-insensitive, "mo" matches both
+			// "Mocha" and "Cinnamon"
+			await user.type( input, 'mo' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Mocha',
+				'Cinnamon',
+			] );
+		} );
+
+		it( 'will show, at most, a number of suggestions equals to the value of the `maxSuggestions` prop', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const suggestions = [
+				'Ablaze',
+				'Ability',
+				'Abandon',
+				'Abdomen',
+				'Abdicate',
+				'Abortive',
+				'Abundance',
+				'Abashedly',
+				'Abominable',
+				'Absolutely',
+				'Absorption',
+				'Abnormality',
+			];
+
+			const { rerender } = render(
+				<FormTokenFieldWithState suggestions={ suggestions } />
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Because text-matching is case-insensitive, "Ab" matches all suggestions
+			await user.type( input, 'Ab' );
+
+			// By default, `maxSuggestions` has a value of 100, which means that
+			// all matching suggestions will be shown.
+			expectVisibleSuggestionsToBe(
+				screen.getByRole( 'listbox' ),
+				suggestions
+			);
+
+			rerender(
+				<FormTokenFieldWithState
+					suggestions={ suggestions }
+					maxSuggestions={ 3 }
+				/>
+			);
+
+			// Only the first 3 suggestions are shown, as per the `maxSuggestions` prop
+			expectVisibleSuggestionsToBe(
+				screen.getByRole( 'listbox' ),
+				suggestions.slice( 0, 3 )
+			);
+		} );
+	} );
+
 	describe( 'saveTransform', () => {
 		it( "should allow to modify the input's value when saving it as a token", async () => {
 			const user = userEvent.setup( {
@@ -653,61 +1036,6 @@ describe( 'FormTokenField', () => {
 	} );
 
 	describe( 'displayTransform', () => {
-		function unescapeAndFormatSpaces( str: string ) {
-			const nbsp = String.fromCharCode( 160 );
-			const escaped = new DOMParser().parseFromString( str, 'text/html' );
-			return (
-				escaped.documentElement.textContent?.replace( / /g, nbsp ) ?? ''
-			);
-		}
-
-		it( 'should allow to pass a function that renders tokens with escaped special characters correctly', async () => {
-			render(
-				<FormTokenFieldWithState
-					initialValue={ fixtures.specialTokens.textEscaped }
-					displayTransform={ unescapeAndFormatSpaces }
-				/>
-			);
-
-			// This is hacky, but it's a way we can check exactly the output HTML
-			fixtures.specialTokens.htmlEscaped.forEach( ( tokenHtml ) => {
-				screen.getByText( ( _, node: Element | null ) => {
-					if ( node === null ) {
-						return false;
-					}
-
-					// console.log( { tokenHtml, innerHTML: node.innerHTML } );
-					return node.innerHTML === tokenHtml;
-				} );
-			} );
-		} );
-
-		it( 'should allow to pass a function that renders tokens with special characters correctly', async () => {
-			// This test is not as realistic as the previous one: if a WP site
-			// contains tag names with special characters, the API will always
-			// return the tag names already escaped.  However, this is still
-			// worth testing, so we can be sure that token values with
-			// dangerous characters in them don't have these characters carried
-			// through unescaped to the HTML.
-			render(
-				<FormTokenFieldWithState
-					initialValue={ fixtures.specialTokens.textUnescaped }
-					displayTransform={ unescapeAndFormatSpaces }
-				/>
-			);
-
-			// This is hacky, but it's a way we can check exactly the output HTML
-			fixtures.specialTokens.htmlUnescaped.forEach( ( tokenHtml ) => {
-				screen.getByText( ( _, node: Element | null ) => {
-					if ( node === null ) {
-						return false;
-					}
-
-					return node.innerHTML === tokenHtml;
-				} );
-			} );
-		} );
-
 		it( 'should allow to modify the text rendered in the browser for each token', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
@@ -1236,337 +1564,60 @@ describe( 'FormTokenField', () => {
 		} );
 	} );
 
-	describe( 'suggestions', () => {
-		it( 'should not render suggestions in its default state', () => {
+	describe( 'special characters', () => {
+		function unescapeAndFormatSpaces( str: string ) {
+			const nbsp = String.fromCharCode( 160 );
+			const escaped = new DOMParser().parseFromString( str, 'text/html' );
+			return (
+				escaped.documentElement.textContent?.replace( / /g, nbsp ) ?? ''
+			);
+		}
+
+		it( 'should allow to pass a function that renders tokens with escaped special characters correctly', async () => {
 			render(
 				<FormTokenFieldWithState
-					suggestions={ [ 'Red', 'Magenta', 'Vermilion' ] }
+					initialValue={ fixtures.specialTokens.textEscaped }
+					displayTransform={ unescapeAndFormatSpaces }
 				/>
 			);
 
-			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+			// This is hacky, but it's a way we can check exactly the output HTML
+			fixtures.specialTokens.htmlEscaped.forEach( ( tokenHtml ) => {
+				screen.getByText( ( _, node: Element | null ) => {
+					if ( node === null ) {
+						return false;
+					}
+
+					// console.log( { tokenHtml, innerHTML: node.innerHTML } );
+					return node.innerHTML === tokenHtml;
+				} );
+			} );
 		} );
 
-		it( 'should render suggestions when receiving focus if the `__experimentalExpandOnFocus` prop is set to `true`', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-
-			const onFocusSpy = jest.fn();
-
-			const suggestions = [ 'Cobalt', 'Blue', 'Octane' ];
-
-			render(
-				<>
-					<FormTokenFieldWithState
-						onFocus={ onFocusSpy }
-						suggestions={ suggestions }
-						__experimentalExpandOnFocus={ true }
-					/>
-				</>
-			);
-
-			const input = screen.getByRole( 'combobox' );
-
-			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
-
-			// Click the input, focusing it.
-			await user.click( input );
-
-			const suggestionList = screen.getByRole( 'listbox' );
-
-			expect( onFocusSpy ).toHaveBeenCalledTimes( 1 );
-			expect( suggestionList ).toBeVisible();
-
-			expect(
-				within( suggestionList ).getAllByRole( 'option' )
-			).toHaveLength( suggestions.length );
-
-			// Minimum length limitations don't affect the search text when the
-			// `__experimentalExpandOnFocus` is `true`
-			await user.keyboard( 'c' );
-			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
-				'Cobalt',
-				'Octane',
-			] );
-		} );
-
-		it( 'should not render suggestions if the text input is not matching any of the suggestions', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-
-			const suggestions = [ 'White', 'Pearl', 'Alabaster' ];
-
-			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
-
-			const input = screen.getByRole( 'combobox' );
-
-			// Type 'Snow' which doesn't match any of the suggestions
-			await user.type( input, 'Snow' );
-
-			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
-		} );
-
-		it( 'should render the matching suggestions only if the text input has the minimum length', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-
-			const suggestions = [ 'Yellow', 'Canary', 'Gold', 'Blonde' ];
-
-			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
-
-			const input = screen.getByRole( 'combobox' );
-
-			// Despite 'l' matches some suggestions, the search text needs to be
-			// at least 2 characters
-			await user.type( input, '   l   ' );
-
-			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
-
-			// The trimmed search text is now 2 characters long (`lo`), which is
-			// enough to show matching suggestions ('Yellow' and 'Blonde')
-			await user.type( input, '[ArrowLeft][ArrowLeft][ArrowLeft]o' );
-
-			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
-				'Yellow',
-				'Blonde',
-			] );
-		} );
-
-		it( 'should not render a matching suggestion if a token with the same value has already been added', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-
-			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
-
+		it( 'should allow to pass a function that renders tokens with special characters correctly', async () => {
+			// This test is not as realistic as the previous one: if a WP site
+			// contains tag names with special characters, the API will always
+			// return the tag names already escaped.  However, this is still
+			// worth testing, so we can be sure that token values with
+			// dangerous characters in them don't have these characters carried
+			// through unescaped to the HTML.
 			render(
 				<FormTokenFieldWithState
-					suggestions={ suggestions }
-					initialValue={ [ 'Green' ] }
+					initialValue={ fixtures.specialTokens.textUnescaped }
+					displayTransform={ unescapeAndFormatSpaces }
 				/>
 			);
 
-			const input = screen.getByRole( 'combobox' );
+			// This is hacky, but it's a way we can check exactly the output HTML
+			fixtures.specialTokens.htmlUnescaped.forEach( ( tokenHtml ) => {
+				screen.getByText( ( _, node: Element | null ) => {
+					if ( node === null ) {
+						return false;
+					}
 
-			// Despite 'ee' matches both the "Green" and "Seaweed", "Green" won't be
-			// displayed because there's already a token with the same value
-			await user.type( input, 'ee' );
-
-			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
-				'Seaweed',
-			] );
-		} );
-
-		it( 'should allow the user to use the keyboard to navigate and select suggestions (which are marked with the `aria-selected` attribute)', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
+					return node.innerHTML === tokenHtml;
+				} );
 			} );
-
-			const onChangeSpy = jest.fn();
-
-			const suggestions = [
-				'Pink',
-				'Salmon',
-				'Flamingo',
-				'Carnation',
-				'Neon',
-			];
-
-			render(
-				<FormTokenFieldWithState
-					onChange={ onChangeSpy }
-					suggestions={ suggestions }
-				/>
-			);
-
-			const input = screen.getByRole( 'combobox' );
-
-			// Typing "on" will show the "Salmon", "Carnation" and "Neon" suggestions
-			await user.type( input, 'on' );
-
-			const suggestionList = screen.getByRole( 'listbox' );
-
-			expectVisibleSuggestionsToBe( suggestionList, [
-				'Salmon',
-				'Carnation',
-				'Neon',
-			] );
-
-			// Currently, none of the suggestions are selected
-			expect(
-				within( suggestionList ).queryAllByRole( 'option', {
-					selected: true,
-				} )
-			).toHaveLength( 0 );
-
-			// Pressing the down arrow will select "Salmon"
-			await user.keyboard( '[ArrowDown]' );
-
-			expect(
-				within( suggestionList ).getByRole( 'option', {
-					selected: true,
-				} )
-			).toHaveAccessibleName( 'Salmon' );
-
-			// Pressing the up arrow will select "Neon" (the selection wraps around
-			// the list)
-			await user.keyboard( '[ArrowUp]' );
-
-			expect(
-				within( suggestionList ).getByRole( 'option', {
-					selected: true,
-				} )
-			).toHaveAccessibleName( 'Neon' );
-
-			// Pressing the down arrow twice will select "Carnation" (the selection
-			// wraps around the list)
-			await user.keyboard( '[ArrowDown][ArrowDown]' );
-
-			expect(
-				within( suggestionList ).getByRole( 'option', {
-					selected: true,
-				} )
-			).toHaveAccessibleName( 'Carnation' );
-
-			// Pressing enter will add "Carnation" as a token and close the suggestion list
-			await user.keyboard( '[Enter]' );
-
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
-			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Carnation' ] );
-			expectTokensToBeInTheDocument( [ 'Carnation' ] );
-
-			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
-		} );
-
-		it( 'should allow the user to use the mouse to navigate and select suggestions (which are marked with the `aria-selected` attribute)', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-
-			const onChangeSpy = jest.fn();
-
-			const suggestions = [ 'Tiger', 'Tangerine', 'Orange' ];
-
-			render(
-				<FormTokenFieldWithState
-					onChange={ onChangeSpy }
-					suggestions={ suggestions }
-				/>
-			);
-
-			const input = screen.getByRole( 'combobox' );
-
-			// Typing "er" will show the "Tiger" and "Tangerine" suggestions
-			await user.type( input, 'er' );
-
-			const suggestionList = screen.getByRole( 'listbox' );
-			expectVisibleSuggestionsToBe( suggestionList, [
-				'Tiger',
-				'Tangerine',
-			] );
-
-			// Currently, none of the suggestions are selected
-			expect(
-				within( suggestionList ).queryAllByRole( 'option', {
-					selected: true,
-				} )
-			).toHaveLength( 0 );
-
-			const tigerOption = within( suggestionList ).getByRole( 'option', {
-				name: 'Tiger',
-			} );
-			const tangerineOption = within( suggestionList ).getByRole(
-				'option',
-				{
-					name: 'Tangerine',
-				}
-			);
-
-			// Hovering over each option will mark it as selected (via the
-			// `aria-selected` attribute)
-			await user.hover( tigerOption );
-
-			expect( tigerOption ).toHaveAttribute( 'aria-selected', 'true' );
-			expect( tangerineOption ).toHaveAttribute(
-				'aria-selected',
-				'false'
-			);
-
-			await user.hover( tangerineOption );
-
-			expect( tigerOption ).toHaveAttribute( 'aria-selected', 'false' );
-			expect( tangerineOption ).toHaveAttribute(
-				'aria-selected',
-				'true'
-			);
-
-			// Clicking an option will add it as a token and close the list
-			await user.click( tangerineOption );
-
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
-			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Tangerine' ] );
-			expectTokensToBeInTheDocument( [ 'Tangerine' ] );
-
-			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
-		} );
-
-		it( 'should hide the suggestion list when the Escape key is pressed', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-
-			const onChangeSpy = jest.fn();
-
-			const suggestions = [ 'Black', 'Ash', 'Onyx', 'Ebony' ];
-
-			render(
-				<FormTokenFieldWithState
-					onChange={ onChangeSpy }
-					suggestions={ suggestions }
-				/>
-			);
-
-			const input = screen.getByRole( 'combobox' );
-
-			// Typing "ony" will show the "Onyx" and "Ebony" suggestions
-			await user.type( input, 'ony' );
-
-			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
-				'Onyx',
-				'Ebony',
-			] );
-
-			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
-
-			// Pressing the ESC key will close the suggestion list
-			await user.keyboard( '[Escape]' );
-
-			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
-			expect( onChangeSpy ).not.toHaveBeenCalled();
-		} );
-
-		it( 'matches the search text with the suggestions in a case-insensitive way', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-
-			const suggestions = [ 'Cinnamon', 'Tawny', 'Mocha' ];
-
-			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
-
-			const input = screen.getByRole( 'combobox' );
-
-			// Because text-matching is case-insensitive, "mo" matches both
-			// "Mocha" and "Cinnamon"
-			await user.type( input, 'mo' );
-
-			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
-				'Mocha',
-				'Cinnamon',
-			] );
 		} );
 	} );
 
