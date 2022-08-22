@@ -304,7 +304,7 @@ export const canUser =
 				}
 			}
 		} else {
-			retrievedActions = [ 'create' ];
+			retrievedActions = [ 'create', 'read' ];
 			resourcePath = resource;
 		}
 
