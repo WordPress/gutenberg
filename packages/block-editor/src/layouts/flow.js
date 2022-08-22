@@ -6,9 +6,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-
 import { getBlockGapCSS, getAlignmentsInfo } from './utils';
-import { getGapBoxControlValueFromStyle } from '../hooks/gap';
+import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
 
 export default {
@@ -27,9 +26,8 @@ export default {
 		hasBlockGapSupport,
 		layoutDefinitions,
 	} ) {
-		const blockGapStyleValue = getGapBoxControlValueFromStyle(
-			style?.spacing?.blockGap
-		);
+		const blockGapStyleValue = getGapCSSValue( style?.spacing?.blockGap );
+
 		// If a block's block.json skips serialization for spacing or
 		// spacing.blockGap, don't apply the user-defined value to the styles.
 		const blockGapValue =

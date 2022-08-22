@@ -15,6 +15,7 @@ import {
  */
 import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
+import SpacingSizesControl from '../components/spacing-sizes-control';
 import useSetting from '../components/use-setting';
 import { AXIAL_SIDES, SPACING_SUPPORT_KEY, useCustomSides } from './dimensions';
 import { cleanEmptyObject } from './utils';
@@ -55,12 +56,8 @@ export function getGapBoxControlValueFromStyle( blockGapValue ) {
 
 	const isValueString = typeof blockGapValue === 'string';
 	return {
-		top: isValueString
-			? getSpacingPresetCssVar( blockGapValue )
-			: getSpacingPresetCssVar( blockGapValue?.top ),
-		left: isValueString
-			? getSpacingPresetCssVar( blockGapValue )
-			: getSpacingPresetCssVar( blockGapValue?.left ),
+		top: isValueString ? blockGapValue : blockGapValue?.top,
+		left: isValueString ? blockGapValue : blockGapValue?.left,
 	};
 }
 
@@ -78,8 +75,10 @@ export function getGapCSSValue( blockGapValue, defaultValue = '0' ) {
 		return null;
 	}
 
-	const row = blockGapBoxControlValue?.top || defaultValue;
-	const column = blockGapBoxControlValue?.left || defaultValue;
+	const row =
+		getSpacingPresetCssVar( blockGapBoxControlValue?.top ) || defaultValue;
+	const column =
+		getSpacingPresetCssVar( blockGapBoxControlValue?.left ) || defaultValue;
 
 	return row === column ? row : `${ row } ${ column }`;
 }
@@ -132,6 +131,8 @@ export function GapEdit( props ) {
 		setAttributes,
 	} = props;
 
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [
 			'%',
@@ -157,6 +158,8 @@ export function GapEdit( props ) {
 		// If splitOnAxis activated we need to return a BoxControl object to the BoxControl component.
 		if ( !! next && splitOnAxis ) {
 			blockGap = { ...getGapBoxControlValueFromStyle( next ) };
+		} else if ( !! next && next.hasOwnProperty( 'all' ) ) {
+			blockGap = next.all;
 		}
 
 		const newStyle = {
@@ -200,26 +203,38 @@ export function GapEdit( props ) {
 	return Platform.select( {
 		web: (
 			<>
-				{ splitOnAxis ? (
-					<BoxControl
-						label={ __( 'Block spacing' ) }
-						min={ 0 }
-						onChange={ onChange }
-						units={ units }
-						sides={ sides }
+				{ ( ! spacingSizes || spacingSizes?.length === 0 ) &&
+					( splitOnAxis ? (
+						<BoxControl
+							label={ __( 'Block spacing' ) }
+							min={ 0 }
+							onChange={ onChange }
+							units={ units }
+							sides={ sides }
+							values={ boxControlGapValue }
+							allowReset={ false }
+							splitOnAxis={ splitOnAxis }
+						/>
+					) : (
+						<UnitControl
+							label={ __( 'Block spacing' ) }
+							__unstableInputWidth="80px"
+							min={ 0 }
+							onChange={ onChange }
+							units={ units }
+							// Default to `row` for combined values.
+							value={ boxControlGapValue }
+						/>
+					) ) }
+				{ spacingSizes?.length > 0 && (
+					<SpacingSizesControl
 						values={ boxControlGapValue }
+						onChange={ onChange }
+						label={ __( 'Block spacing' ) }
+						sides={ splitOnAxis ? sides : [ 'all' ] }
+						units={ units }
 						allowReset={ false }
 						splitOnAxis={ splitOnAxis }
-					/>
-				) : (
-					<UnitControl
-						label={ __( 'Block spacing' ) }
-						__unstableInputWidth="80px"
-						min={ 0 }
-						onChange={ onChange }
-						units={ units }
-						// Default to `row` for combined values.
-						value={ boxControlGapValue }
 					/>
 				) }
 			</>
