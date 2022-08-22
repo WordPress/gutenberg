@@ -87,7 +87,6 @@ const expectVisibleSuggestionsToBe = (
 // - combobox "Add item" name
 // - tokens as objects?
 // - suggestions:
-//   - saveTransform
 //   - update message (a11y)
 //   - suggestions as objects
 //   - async?
@@ -452,7 +451,13 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should label the input correctly via the `label` prop', () => {
-			render( <FormTokenFieldWithState label="Test label" /> );
+			const { rerender } = render( <FormTokenFieldWithState /> );
+
+			expect(
+				screen.getByRole( 'combobox', { name: 'Add item' } )
+			).toBeVisible();
+
+			rerender( <FormTokenFieldWithState label="Test label" /> );
 
 			expect(
 				screen.getByRole( 'combobox', { name: 'Test label' } )
@@ -1033,6 +1038,44 @@ describe( 'FormTokenField', () => {
 				'small jacket',
 			] );
 		} );
+
+		it( 'is applied to the search value when matching it against the list of suggestions', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const onChangeSpy = jest.fn();
+
+			const suggestions = [ 'Expensive food', 'Free food' ];
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					suggestions={ suggestions }
+					saveTransform={ ( text: string ) =>
+						text.replace( /cheap/gi, 'free' )
+					}
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// "cheap" matches the "Free food" option, since the `saveTransform`
+			// function transform "cheap" to "free"
+			await user.type( input, 'cheap' );
+
+			// But the value shown in the suggestion is still "Cheap food"
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Free food',
+			] );
+
+			// Selecting the suggestion will add the transformed value as a token,
+			// since the `saveTransform` function will be applied before tokenizing.
+			await user.keyboard( '[ArrowDown][Enter]' );
+
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeSpy ).toHaveBeenLastCalledWith( [ 'Free food' ] );
+		} );
 	} );
 
 	describe( 'displayTransform', () => {
@@ -1092,6 +1135,42 @@ describe( 'FormTokenField', () => {
 				'dark green',
 				'dark red',
 			] );
+		} );
+
+		it( "is applied to each suggestions, but doesn't influence the matching against the search value", async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const onChangeSpy = jest.fn();
+
+			const suggestions = [ 'Hot coffee', 'Hot tea' ];
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					suggestions={ suggestions }
+					displayTransform={ ( text: string ) =>
+						text.replace( /hot/gi, 'cold' )
+					}
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// The `displayTransform` function is only applied to the value
+			// rendered in the DOM, while the data behind is not modified.
+			await user.type( input, 'hot' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'cold coffee',
+				'cold tea',
+			] );
+
+			await user.keyboard( '[ArrowDown][Enter]' );
+
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeSpy ).toHaveBeenLastCalledWith( [ 'Hot coffee' ] );
 		} );
 	} );
 
