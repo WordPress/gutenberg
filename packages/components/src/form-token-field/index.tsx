@@ -86,6 +86,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	const prevValue = usePrevious< ( string | TokenItem )[] >( value );
 
 	const input = useRef< HTMLInputElement >( null );
+	const inputHasFocus = useRef( false );
 	const tokensAndInput = useRef< HTMLInputElement >( null );
 
 	const debouncedSpeak = useDebounce( speak, 500 );
@@ -130,6 +131,8 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	}
 
 	function onFocusHandler( event: FocusEvent ) {
+		inputHasFocus.current = true;
+
 		// If focus is on the input or on the container, set the isActive state to true.
 		if ( hasFocus() || event.target === tokensAndInput.current ) {
 			setIsActive( true );
@@ -149,6 +152,8 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	}
 
 	function onBlur() {
+		inputHasFocus.current = false;
+
 		if ( inputHasValidValue() ) {
 			setIsActive( false );
 		} else {
@@ -522,8 +527,10 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			getMatchingSuggestions( incompleteTokenValue );
 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
 
+		const shouldExpandIfFocuses =
+			inputHasFocus.current && __experimentalExpandOnFocus;
 		setIsExpanded(
-			__experimentalExpandOnFocus ||
+			shouldExpandIfFocuses ||
 				( inputHasMinimumChars && hasMatchingSuggestions )
 		);
 
