@@ -527,8 +527,6 @@ class BottomSheet extends Component {
 					panResponder.panHandlers.onMoveShouldSetResponderCapture
 				}
 				onAccessibilityEscape={ this.onCloseBottomSheet }
-				// We need to prevent overwriting the onDismiss prop,
-				// for this reason it is excluded from the rest object.
 				{ ...rest }
 			>
 				<KeyboardAvoidingView

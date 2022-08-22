@@ -135,10 +135,10 @@ class NavigableContainer extends Component {
 			cycle,
 			onlyBrowserTabstops,
 			forwardedRef,
-			...props
+			...restProps
 		} = this.props;
 		return (
-			<div ref={ this.bindContainer } { ...props }>
+			<div ref={ this.bindContainer } { ...restProps }>
 				{ children }
 			</div>
 		);
