@@ -758,18 +758,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 		}
 
-		/*
-		 * Reset default browser margin on the root body element.
-		 * This is set on the root selector **before** generating the ruleset
-		 * from the `theme.json`. This is to ensure that if the `theme.json` declares
-		 * `margin` in its `spacing` declaration for the `body` element then these
-		 * user-generated values take precedence in the CSS cascade.
-		 * @link https://github.com/WordPress/gutenberg/issues/36147.
-		 */
-		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
-			$block_rules .= 'body { margin: 0; }';
-		}
-
 		// 2. Generate and append the rules that use the general selector.
 		$block_rules .= static::to_ruleset( $selector, $declarations );
 
@@ -793,6 +781,34 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 
 		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
+			/*
+			* Reset default browser margin on the root body element.
+			* This is set on the root selector **before** generating the ruleset
+			* from the `theme.json`. This is to ensure that if the `theme.json` declares
+			* `margin` in its `spacing` declaration for the `body` element then these
+			* user-generated values take precedence in the CSS cascade.
+			* @link https://github.com/WordPress/gutenberg/issues/36147.
+			*/
+			$block_rules .= 'body { margin: 0;';
+
+			/*
+			* If there are content and wide widths in theme.json, output them
+			* as custom properties on the body element so all blocks can use them.
+			*/
+			if ( isset( $settings['layout']['contentSize'] ) || isset( $settings['layout']['wideSize'] ) ) {
+				$content_size = isset( $settings['layout']['contentSize'] ) ? $settings['layout']['contentSize'] : $settings['layout']['wideSize'];
+				$content_size = static::is_safe_css_declaration( 'max-width', $content_size ) ? $content_size : 'initial';
+				$wide_size    = isset( $settings['layout']['wideSize'] ) ? $settings['layout']['wideSize'] : $settings['layout']['contentSize'];
+				$wide_size    = static::is_safe_css_declaration( 'max-width', $wide_size ) ? $wide_size : 'initial';
+				$block_rules .= '--wp--style--global--content-size: ' . $content_size . ';';
+				$block_rules .= '--wp--style--global--wide-size: ' . $wide_size . ';';
+			}
+
+			$block_rules .= '}';
+		}
+
+		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
+
 			if ( $use_root_padding ) {
 				$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
 				$block_rules .= '.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
@@ -804,6 +820,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 			$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
+			$block_gap_value       = _wp_array_get( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ), '0.5em' );
 			$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 			if ( $has_block_gap_support ) {
 				$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
@@ -881,7 +898,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		foreach ( $properties as $css_property => $value_path ) {
 			$value = static::get_property_value( $styles, $value_path, $theme_json );
 
-			if ( strpos( $css_property, '--wp--style--root--' ) === 0 && ( static::ROOT_BLOCK_SELECTOR !== $selector || ! $use_root_padding ) ) {
+			if ( str_starts_with( $css_property, '--wp--style--root--' ) && ( static::ROOT_BLOCK_SELECTOR !== $selector || ! $use_root_padding ) ) {
 				continue;
 			}
 			// Root-level padding styles don't currently support strings with CSS shorthand values.
@@ -890,7 +907,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				continue;
 			}
 
-			if ( strpos( $css_property, '--wp--style--root--' ) === 0 && $use_root_padding ) {
+			if ( str_starts_with( $css_property, '--wp--style--root--' ) && $use_root_padding ) {
 				$root_variable_duplicates[] = substr( $css_property, strlen( '--wp--style--root--' ) );
 			}
 
@@ -1212,7 +1229,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$below_sizes[] = array(
 				/* translators: %s: Multiple of t-shirt sizing, eg. 2X-Small */
 				'name' => $x === $steps_mid_point - 1 ? __( 'Small', 'gutenberg' ) : sprintf( __( '%sX-Small', 'gutenberg' ), strval( $x_small_count ) ),
-				'slug' => $slug,
+				'slug' => (string) $slug,
 				'size' => round( $current_step, 2 ) . $unit,
 			);
 
@@ -1231,7 +1248,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		$below_sizes[] = array(
 			'name' => __( 'Medium', 'gutenberg' ),
-			'slug' => 50,
+			'slug' => '50',
 			'size' => $spacing_scale['mediumStep'] . $unit,
 		);
 
@@ -1249,7 +1266,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$above_sizes[] = array(
 				/* translators: %s: Multiple of t-shirt sizing, eg. 2X-Large */
 				'name' => 0 === $x ? __( 'Large', 'gutenberg' ) : sprintf( __( '%sX-Large', 'gutenberg' ), strval( $x_large_count ) ),
-				'slug' => $slug,
+				'slug' => (string) $slug,
 				'size' => round( $current_step, 2 ) . $unit,
 			);
 
@@ -1295,7 +1312,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$has_fallback_gap_support = ! $has_block_gap_support; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback gap styles support.
 		$node                     = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
 		$layout_definitions       = _wp_array_get( $this->theme_json, array( 'settings', 'layout', 'definitions' ), array() );
-		$layout_selector_pattern  = '/^[a-zA-Z0-9\-\.\ *+>]*$/'; // Allow alphanumeric classnames, spaces, wildcard, sibling, and child combinator selectors.
+		$layout_selector_pattern  = '/^[a-zA-Z0-9\-\.\ *+>:\(\)]*$/'; // Allow alphanumeric classnames, spaces, wildcard, sibling, child combinator and pseudo class selectors.
 
 		// Gap styles will only be output if the theme has block gap support, or supports a fallback gap.
 		// Default layout gap styles will be skipped for themes that do not explicitly opt-in to blockGap with a `true` or `false` value.

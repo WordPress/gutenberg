@@ -8,6 +8,7 @@ import { View, Text } from 'react-native';
  */
 import { Icon } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -109,9 +110,15 @@ export default function ListStyleType( {
 		style?.fontSize ? style.fontSize : defaultFontSize,
 		10
 	);
+
+	const colorWithPreferredScheme = usePreferredColorSchemeStyle(
+		styles[ 'wp-block-list-item__list-item--default' ],
+		styles[ 'wp-block-list-item__list-item--default--dark' ]
+	);
+
 	const defaultColor = style?.baseColors?.color?.text
 		? style.baseColors.color.text
-		: styles[ 'wp-block-list-item__list-item--default' ].color;
+		: colorWithPreferredScheme.color;
 	const color = style?.color ? style.color : defaultColor;
 
 	if ( ordered ) {

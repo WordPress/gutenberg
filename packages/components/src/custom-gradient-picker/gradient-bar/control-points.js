@@ -11,16 +11,15 @@ import { useInstanceId } from '@wordpress/compose';
 import { useEffect, useRef, useState, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
-import { LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import Button from '../button';
-import { HStack } from '../h-stack';
-import { ColorPicker } from '../color-picker';
-import { VisuallyHidden } from '../visually-hidden';
-import { CustomColorPickerDropdown } from '../color-palette';
+import Button from '../../button';
+import { HStack } from '../../h-stack';
+import { ColorPicker } from '../../color-picker';
+import { VisuallyHidden } from '../../visually-hidden';
+import { CustomColorPickerDropdown } from '../../color-palette';
 
 import {
 	addControlPoint,
@@ -59,10 +58,6 @@ function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
 						'is-active': isOpen,
 					}
 				) }
-				style={ {
-					left: `${ position }%`,
-					transform: 'translateX( -50% )',
-				} }
 				{ ...additionalProps }
 			/>
 			<VisuallyHidden id={ descriptionId }>
@@ -74,7 +69,11 @@ function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
 	);
 }
 
-function GradientColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
+function GradientColorPickerDropdown( {
+	isRenderedInSidebar,
+	className,
+	...props
+} ) {
 	// Open the popover below the gradient control/insertion point
 	const popoverProps = useMemo(
 		() => ( {
@@ -84,10 +83,16 @@ function GradientColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
 		[]
 	);
 
+	const mergedClassName = classnames(
+		'components-custom-gradient-picker__control-point-dropdown',
+		className
+	);
+
 	return (
 		<CustomColorPickerDropdown
 			isRenderedInSidebar={ isRenderedInSidebar }
 			popoverProps={ popoverProps }
+			className={ mergedClassName }
 			{ ...props }
 		/>
 	);
@@ -198,7 +203,7 @@ function ControlPoints( {
 								}
 							} }
 							onKeyDown={ ( event ) => {
-								if ( event.keyCode === LEFT ) {
+								if ( event.code === 'ArrowLeft' ) {
 									// Stop propagation of the key press event to avoid focus moving
 									// to another editor area.
 									event.stopPropagation();
@@ -212,7 +217,7 @@ function ControlPoints( {
 											)
 										)
 									);
-								} else if ( event.keyCode === RIGHT ) {
+								} else if ( event.code === 'ArrowRight' ) {
 									// Stop propagation of the key press event to avoid focus moving
 									// to another editor area.
 									event.stopPropagation();
@@ -271,6 +276,10 @@ function ControlPoints( {
 							) }
 						</>
 					) }
+					style={ {
+						left: `${ point.position }%`,
+						transform: 'translateX( -50% )',
+					} }
 				/>
 			)
 		);
@@ -307,16 +316,8 @@ function InsertPoint( {
 						}
 						onToggle();
 					} }
-					className="components-custom-gradient-picker__insert-point"
+					className="components-custom-gradient-picker__insert-point-dropdown"
 					icon={ plus }
-					style={
-						insertPosition !== null
-							? {
-									left: `${ insertPosition }%`,
-									transform: 'translateX( -50% )',
-							  }
-							: undefined
-					}
 				/>
 			) }
 			renderContent={ () => (
@@ -344,6 +345,14 @@ function InsertPoint( {
 					} }
 				/>
 			) }
+			style={
+				insertPosition !== null
+					? {
+							left: `${ insertPosition }%`,
+							transform: 'translateX( -50% )',
+					  }
+					: undefined
+			}
 		/>
 	);
 }

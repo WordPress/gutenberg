@@ -102,6 +102,14 @@ Async.args = {
 	suggestions: continents,
 };
 
+export const DropdownSelector: ComponentStory< typeof FormTokenField > =
+	DefaultTemplate.bind( {} );
+DropdownSelector.args = {
+	...Default.args,
+	__experimentalExpandOnFocus: true,
+	__experimentalAutoSelectFirstMatch: true,
+};
+
 /**
  * The rendered output of each suggestion can be customized by passing a
  * render function to the `__experimentalRenderItem` prop. (This is still an experimental feature

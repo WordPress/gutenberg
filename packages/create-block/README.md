@@ -50,6 +50,7 @@ Options:
 --no-wp-scripts              disable integration with `@wordpress/scripts` package
 --wp-env                     enable integration with `@wordpress/env` package
 -h, --help                   output usage information
+--variant                    choose a block variant as defined by the template
 ```
 
 More examples:
@@ -72,7 +73,13 @@ $ npx @wordpress/create-block --template my-template-package
 $ npx @wordpress/create-block --template ./path/to/template-directory
 ```
 
-4. Help – you need to use `npx` to output usage information.
+4. Generating a dynamic block based on the built-in template.
+
+```bash
+$ npx @wordpress/create-block --variant dynamic
+```
+
+5. Help – you need to use `npx` to output usage information.
 
 ```bash
 $ npx @wordpress/create-block --help
