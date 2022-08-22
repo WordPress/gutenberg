@@ -605,9 +605,6 @@ async function getLatestReleaseInSeries( octokit, owner, repo, series ) {
 
 	let latestReleaseForMilestone;
 
-	/**
-	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').ReposListReleasesResponse>>}
-	 */
 	const releases = octokit.paginate.iterator( releaseOptions );
 
 	for await ( const releasesPage of releases ) {
