@@ -21,8 +21,8 @@ const prompts = require( './prompts' );
 const predefinedPluginTemplates = {
 	es5: {
 		defaultValues: {
-			slug: 'example-es5',
-			title: 'Example (ES5)',
+			slug: 'example-static-es5',
+			title: 'Example Static Block (ES5)',
 			description:
 				'Example block scaffolded with Create Block tool – no build step required.',
 			dashicon: 'smiley',
@@ -33,10 +33,7 @@ const predefinedPluginTemplates = {
 		},
 		templatesPath: join( __dirname, 'templates', 'es5' ),
 		variants: {
-			static: {
-				slug: 'example-static-es5',
-				title: 'Example Static Block (ES5)',
-			},
+			static: {},
 			dynamic: {
 				slug: 'example-dynamic-es5',
 				title: 'Example Dynamic Block (ES5)',
@@ -45,8 +42,8 @@ const predefinedPluginTemplates = {
 	},
 	standard: {
 		defaultValues: {
-			slug: 'example-block',
-			title: 'Example Block',
+			slug: 'example-static-block',
+			title: 'Example Static Block',
 			description: 'Example block scaffolded with Create Block tool.',
 			dashicon: 'smiley',
 			supports: {
@@ -54,10 +51,7 @@ const predefinedPluginTemplates = {
 			},
 		},
 		variants: {
-			static: {
-				slug: 'example-static-block',
-				title: 'Example Static Block',
-			},
+			static: {},
 			dynamic: {
 				slug: 'example-dynamic-block',
 				title: 'Example Dynamic Block',
