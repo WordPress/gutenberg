@@ -312,13 +312,34 @@ export const canUser =
 			throw new Error( `'${ requestedAction }' is not a valid action.` );
 		}
 
-		let permissions;
+		let response;
 		try {
-			permissions = await checkAllowedActions( resourcePath );
+			response = await apiFetch( {
+				path: `/wp/v2/${ resourcePath }`,
+				method: 'OPTIONS',
+				parse: false,
+			} );
 		} catch ( error ) {
 			// Do nothing if our OPTIONS request comes back with an API error (4xx or
 			// 5xx). The previously determined isAllowed value will remain in the store.
 			return;
+		}
+
+		// Optional chaining operator is used here because the API requests don't
+		// return the expected result in the native version. Instead, API requests
+		// only return the result, without including response properties like the headers.
+		const allowHeader = response.headers?.get( 'allow' );
+		const allowedMethods = allowHeader?.allow || allowHeader || '';
+
+		const permissions = {};
+		const methods = {
+			create: 'POST',
+			read: 'GET',
+			update: 'PUT',
+			delete: 'DELETE',
+		};
+		for ( const [ actionName, methodName ] of Object.entries( methods ) ) {
+			permissions[ actionName ] = allowedMethods.includes( methodName );
 		}
 
 		for ( const action of retrievedActions ) {
@@ -328,32 +349,6 @@ export const canUser =
 			);
 		}
 	};
-
-const checkAllowedActions = async ( path ) => {
-	const methods = {
-		create: 'POST',
-		read: 'GET',
-		update: 'PUT',
-		delete: 'DELETE',
-	};
-	const response = await apiFetch( {
-		path: `/wp/v2/${ path }`,
-		method: 'OPTIONS',
-		parse: false,
-	} );
-
-	// Optional chaining operator is used here because the API requests don't
-	// return the expected result in the native version. Instead, API requests
-	// only return the result, without including response properties like the headers.
-	const allowHeader = response.headers?.get( 'allow' );
-	const allowedMethods = allowHeader?.allow || allowHeader || '';
-
-	const permissions = {};
-	for ( const [ actionName, methodName ] of Object.entries( methods ) ) {
-		permissions[ actionName ] = allowedMethods.includes( methodName );
-	}
-	return permissions;
-};
 
 /**
  * Checks whether the current user can perform the given action on the given
