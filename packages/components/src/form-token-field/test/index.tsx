@@ -1079,6 +1079,14 @@ describe( 'FormTokenField', () => {
 	} );
 
 	describe( 'displayTransform', () => {
+		function unescapeAndFormatSpaces( str: string ) {
+			const nbsp = String.fromCharCode( 160 );
+			const escaped = new DOMParser().parseFromString( str, 'text/html' );
+			return (
+				escaped.documentElement.textContent?.replace( / /g, nbsp ) ?? ''
+			);
+		}
+
 		it( 'should allow to modify the text rendered in the browser for each token', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
@@ -1171,6 +1179,53 @@ describe( 'FormTokenField', () => {
 
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( [ 'Hot coffee' ] );
+		} );
+
+		it( 'should allow to pass a function that renders tokens with escaped special characters correctly', async () => {
+			render(
+				<FormTokenFieldWithState
+					initialValue={ fixtures.specialTokens.textEscaped }
+					displayTransform={ unescapeAndFormatSpaces }
+				/>
+			);
+
+			// This is hacky, but it's a way we can check exactly the output HTML
+			fixtures.specialTokens.htmlEscaped.forEach( ( tokenHtml ) => {
+				screen.getByText( ( _, node: Element | null ) => {
+					if ( node === null ) {
+						return false;
+					}
+
+					// console.log( { tokenHtml, innerHTML: node.innerHTML } );
+					return node.innerHTML === tokenHtml;
+				} );
+			} );
+		} );
+
+		it( 'should allow to pass a function that renders tokens with special characters correctly', async () => {
+			// This test is not as realistic as the previous one: if a WP site
+			// contains tag names with special characters, the API will always
+			// return the tag names already escaped.  However, this is still
+			// worth testing, so we can be sure that token values with
+			// dangerous characters in them don't have these characters carried
+			// through unescaped to the HTML.
+			render(
+				<FormTokenFieldWithState
+					initialValue={ fixtures.specialTokens.textUnescaped }
+					displayTransform={ unescapeAndFormatSpaces }
+				/>
+			);
+
+			// This is hacky, but it's a way we can check exactly the output HTML
+			fixtures.specialTokens.htmlUnescaped.forEach( ( tokenHtml ) => {
+				screen.getByText( ( _, node: Element | null ) => {
+					if ( node === null ) {
+						return false;
+					}
+
+					return node.innerHTML === tokenHtml;
+				} );
+			} );
 		} );
 	} );
 
@@ -1640,63 +1695,6 @@ describe( 'FormTokenField', () => {
 			expect(
 				screen.getAllByRole( 'button', { name: customMessages.remove } )
 			).toHaveLength( 2 );
-		} );
-	} );
-
-	describe( 'special characters', () => {
-		function unescapeAndFormatSpaces( str: string ) {
-			const nbsp = String.fromCharCode( 160 );
-			const escaped = new DOMParser().parseFromString( str, 'text/html' );
-			return (
-				escaped.documentElement.textContent?.replace( / /g, nbsp ) ?? ''
-			);
-		}
-
-		it( 'should allow to pass a function that renders tokens with escaped special characters correctly', async () => {
-			render(
-				<FormTokenFieldWithState
-					initialValue={ fixtures.specialTokens.textEscaped }
-					displayTransform={ unescapeAndFormatSpaces }
-				/>
-			);
-
-			// This is hacky, but it's a way we can check exactly the output HTML
-			fixtures.specialTokens.htmlEscaped.forEach( ( tokenHtml ) => {
-				screen.getByText( ( _, node: Element | null ) => {
-					if ( node === null ) {
-						return false;
-					}
-
-					// console.log( { tokenHtml, innerHTML: node.innerHTML } );
-					return node.innerHTML === tokenHtml;
-				} );
-			} );
-		} );
-
-		it( 'should allow to pass a function that renders tokens with special characters correctly', async () => {
-			// This test is not as realistic as the previous one: if a WP site
-			// contains tag names with special characters, the API will always
-			// return the tag names already escaped.  However, this is still
-			// worth testing, so we can be sure that token values with
-			// dangerous characters in them don't have these characters carried
-			// through unescaped to the HTML.
-			render(
-				<FormTokenFieldWithState
-					initialValue={ fixtures.specialTokens.textUnescaped }
-					displayTransform={ unescapeAndFormatSpaces }
-				/>
-			);
-
-			// This is hacky, but it's a way we can check exactly the output HTML
-			fixtures.specialTokens.htmlUnescaped.forEach( ( tokenHtml ) => {
-				screen.getByText( ( _, node: Element | null ) => {
-					if ( node === null ) {
-						return false;
-					}
-
-					return node.innerHTML === tokenHtml;
-				} );
-			} );
 		} );
 	} );
 
