@@ -460,7 +460,10 @@ export function ColorEdit( props ) {
 
 	const enableContrastChecking =
 		isWebAndColorNotGradient &&
-		true ===
+		// Contrast checking is enabled by default.
+		// Deactivating it requires `__experimentalCheckContrast` to have
+		// an explicit value of `false`.
+		false !==
 			getBlockSupport( props.name, [
 				COLOR_SUPPORT_KEY,
 				'__experimentalCheckContrast',
