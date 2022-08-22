@@ -3,7 +3,7 @@
  */
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useCallback, useLayoutEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -87,10 +87,10 @@ export default function useBlockToolbarPopoverProps( {
 	// Update props when the block is moved. This also ensures the props are
 	// correct on initial mount, and when the selected block or content element
 	// changes (since the callback ref will update).
-	useEffect( updateProps, [ blockIndex, updateProps ] );
+	useLayoutEffect( updateProps, [ blockIndex, updateProps ] );
 
 	// Update props when the viewport is resized or the block is resized.
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( ! contentElement || ! selectedBlockElement ) {
 			return;
 		}
