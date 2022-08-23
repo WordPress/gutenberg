@@ -238,6 +238,7 @@ export function SocialLinksEdit( props ) {
 									onColorChange: onChange,
 									isShownByDefault: true,
 									resetAllFilter,
+									enableAlpha: true,
 								},
 							] }
 							panelId={ clientId }

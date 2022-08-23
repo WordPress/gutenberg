@@ -57,6 +57,7 @@
 			}
 		},
 		"color": {
+			"enableContrastChecker": false,
 			"background": true,
 			"gradients": true,
 			"text": false,
