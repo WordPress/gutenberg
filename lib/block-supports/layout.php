@@ -292,6 +292,29 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 }
 
 /**
+ * Adds an identifying classname to the inner block wrapper.
+ *
+ * @param array $parsed_block A parsed block object.
+ * @return array              The updated block object.
+ */
+function gutenberg_identify_inner_block_wrapper( $parsed_block ) {
+
+	if ( ! isset( $parsed_block['innerContent'][0] ) ) {
+		return $parsed_block;
+	}
+
+	$inner_class_position = strrpos( $parsed_block['innerContent'][0], 'class="' );
+
+	if ( ! $inner_class_position ) {
+		return $parsed_block;
+	}
+
+	$parsed_block['innerContent'][0] = substr_replace( $parsed_block['innerContent'][0], 'class="is-inner-block-wrapper ', $inner_class_position, strlen( 'class="' ) );
+
+	return $parsed_block;
+}
+
+/**
  * Renders the layout config to the block wrapper.
  *
  * @param  string $block_content Rendered block content.
@@ -413,15 +436,28 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	}
 
 	/*
-	 * This assumes the hook only applies to blocks with a single wrapper.
-	 * A limitation of this hook is that nested inner blocks wrappers are not yet supported.
-	 */
-	$content = preg_replace(
-		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="' . esc_attr( implode( ' ', $class_names ) ) . ' ',
-		$block_content,
-		1
-	);
+	* Ideally we'll be able to attach this class to all inner block wrappers and
+	* we won't need the condition or the fallback.
+	*/
+	if ( strpos( $block_content, 'is-inner-block-wrapper' ) ) {
+		$content = preg_replace(
+			'/' . preg_quote( 'is-inner-block-wrapper', '/' ) . '/',
+			esc_attr( implode( ' ', $class_names ) ),
+			$block_content,
+			1
+		);
+	} else {
+		/*
+		* This assumes the hook only applies to blocks with a single wrapper.
+		* A limitation of this hook is that nested inner blocks wrappers are not yet supported.
+		*/
+		$content = preg_replace(
+			'/' . preg_quote( 'class="', '/' ) . '/',
+			'class="' . esc_attr( implode( ' ', $class_names ) ) . ' ',
+			$block_content,
+			1
+		);
+	}
 
 	return $content;
 }
@@ -433,6 +469,12 @@ WP_Block_Supports::get_instance()->register(
 		'register_attribute' => 'gutenberg_register_layout_support',
 	)
 );
+
+if ( function_exists( 'wp_identify_inner_block_wrapper' ) ) {
+	remove_filter( 'render_block', 'wp_identify_inner_block_wrapper' );
+}
+add_filter( 'render_block_data', 'gutenberg_identify_inner_block_wrapper' );
+
 if ( function_exists( 'wp_render_layout_support_flag' ) ) {
 	remove_filter( 'render_block', 'wp_render_layout_support_flag' );
 }
