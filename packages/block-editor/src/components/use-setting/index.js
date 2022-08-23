@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -157,20 +157,14 @@ export default function useSetting( path ) {
 				}
 			} );
 
-			// Take settings from parent nesting settings.
-			const isHeadingColorText =
-				blockName === 'core/heading' && path === 'color.palette.theme';
+			// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
+			const settings = select( blockEditorStore ).getSettings();
 
-			const parents =
-				select( blockEditorStore ).getBlocksByClientId(
-					blockParentIds
-				);
-			const hasMediaTextParent = parents.some(
-				( block ) => block.name === 'core/media-text'
-			);
-
-			if ( isHeadingColorText && hasMediaTextParent ) {
-				result = [
+			// Mock settings in store
+			set(
+				settings,
+				`__experimentalFeatures.blocks.core/media-text.core/heading.color.palette.theme`,
+				[
 					{
 						slug: 'layer-accent-blue',
 						color: 'var(--wp--custom--layer--accent--blue)',
@@ -181,11 +175,32 @@ export default function useSetting( path ) {
 						color: 'var(--wp--custom--layer--accent--orange)',
 						name: 'orange accent',
 					},
-				];
+				]
+			);
+
+			// 2.1 Check for nested parent block settings
+			if ( result === undefined ) {
+				// Pull nested settings from parent blocks first.
+				// Needs some work:
+				//   - Can only handle one layer of nesting
+				//   - No CSS-like specificity rules for determining winner if a block is nested in multiple places
+				//   - No tests
+
+				blockParentIds.forEach( ( blockParentId ) => {
+					const parentBlockName =
+						select( blockEditorStore ).getBlockName(
+							blockParentId
+						);
+					const candidateNestedPath = `__experimentalFeatures.blocks.${ parentBlockName }.${ blockName }.${ normalizedPath }`;
+					const nestedResult = get( settings, candidateNestedPath );
+
+					if ( nestedResult !== undefined ) {
+						result = nestedResult;
+					}
+				} );
 			}
 
-			// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
-			const settings = select( blockEditorStore ).getSettings();
+			// 2.2 Default to top-level settings from the block editor store
 			if ( result === undefined ) {
 				const defaultsPath = `__experimentalFeatures.${ normalizedPath }`;
 				const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ normalizedPath }`;
