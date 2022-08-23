@@ -93,7 +93,7 @@ const EMPTY_OBJECT = {};
  * @return Whether a request is in progress for an embed preview.
  */
 export const isRequestingEmbedPreview = createRegistrySelector(
-	( select ) =>
+	( select: any ) =>
 		( state: State, url: string ): boolean => {
 			return select( STORE_NAME ).isResolving( 'getEmbedPreview', [
 				url,
@@ -433,8 +433,8 @@ export const getEntityRecords = <
 	state: State,
 	kind: string,
 	name: string,
-	query
-): EntityRecord[] => {
+	query?: EntityQuery
+): EntityRecord[] | null => {
 	// Queried data state is prepopulated for all known entities. If this is not
 	// assigned for the given parameters, then it is known to not exist.
 	const queriedState = get( state.entities.records, [
@@ -491,9 +491,11 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 						dirtyRecords.push( {
 							// We avoid using primaryKey because it's transformed into a string
 							// when it's used as an object key.
-							key: entityRecord[
-								entityConfig.key || DEFAULT_ENTITY_KEY
-							],
+							key: entityRecord
+								? entityRecord[
+										entityConfig.key || DEFAULT_ENTITY_KEY
+								  ]
+								: undefined,
 							title:
 								entityConfig?.getTitle?.( entityRecord ) || '',
 							name,
@@ -542,9 +544,11 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 						recordsBeingSaved.push( {
 							// We avoid using primaryKey because it's transformed into a string
 							// when it's used as an object key.
-							key: entityRecord[
-								entityConfig.key || DEFAULT_ENTITY_KEY
-							],
+							key: entityRecord
+								? entityRecord[
+										entityConfig.key || DEFAULT_ENTITY_KEY
+								  ]
+								: undefined,
 							title:
 								entityConfig?.getTitle?.( entityRecord ) || '',
 							name,
@@ -1116,7 +1120,7 @@ export const getReferenceByDistinctEdits = createSelector(
 export function __experimentalGetTemplateForLink(
 	state: State,
 	link: string
-): WpTemplate | null {
+): Optional< WpTemplate > | null {
 	const records = getEntityRecords< WpTemplate >(
 		state,
 		'postType',
@@ -1128,7 +1132,7 @@ export function __experimentalGetTemplateForLink(
 
 	const template = records?.length ? records[ 0 ] : null;
 	if ( template ) {
-		return getEditedEntityRecord(
+		return getEditedEntityRecord< WpTemplate, 'edit' >(
 			state,
 			'postType',
 			'wp_template',
