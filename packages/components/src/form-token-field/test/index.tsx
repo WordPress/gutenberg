@@ -222,35 +222,25 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			render( <FormTokenFieldWithState onChange={ onChangeSpy } /> );
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					initialValue={ [ 'banana', 'mango' ] }
+				/>
+			);
 
 			const input = screen.getByRole( 'combobox' );
 
-			// Add 'banana' token by typing it and pressing enter to tokenize it.
-			await user.type( input, 'banana[Enter]' );
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
-			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'banana' ] );
-			expectTokensToBeInTheDocument( [ 'banana' ] );
-
-			// Add 'mango' token by typing it and pressing enter to tokenize it.
-			await user.type( input, 'mango[Enter]' );
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
-			expect( onChangeSpy ).toHaveBeenLastCalledWith( [
-				'banana',
-				'mango',
-			] );
-			expectTokensToBeInTheDocument( [ 'banana', 'mango' ] );
-
 			// Press backspace to remove the last token ("mango")
 			await user.type( input, '[Backspace]' );
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( [ 'banana' ] );
 			expectTokensToBeInTheDocument( [ 'banana' ] );
 			expectTokensNotToBeInTheDocument( [ 'mango' ] );
 
 			// Press backspace to remove the last token ("banana")
 			await user.type( input, '[Backspace]' );
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 4 );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( [] );
 			expectTokensNotToBeInTheDocument( [ 'banana', 'mango' ] );
 		} );
@@ -306,19 +296,15 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			render( <FormTokenFieldWithState onChange={ onChangeSpy } /> );
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					initialValue={ [ 'persimmon', 'plum' ] }
+				/>
+			);
 
 			const input = screen.getByRole( 'combobox' );
-
-			// Add 'persimmon' and 'plum' tokens by typing them and pressing enter to
-			// tokenize them.
-			await user.type( input, 'persimmon[Enter]plum[Enter]' );
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
-			expect( onChangeSpy ).toHaveBeenLastCalledWith( [
-				'persimmon',
-				'plum',
-			] );
-			expectTokensToBeInTheDocument( [ 'persimmon', 'plum' ] );
+			await user.click( input );
 
 			// Currently the focus in on the input. Pressing shift+tab twice should
 			// move focus on the "remove item" button of the first token ("persimmon")
@@ -334,7 +320,7 @@ describe( 'FormTokenField', () => {
 
 			// Pressing the "space" key on the button should remove the "persimmon" item
 			await user.keyboard( '[Space]' );
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( [ 'plum' ] );
 			expectTokensToBeInTheDocument( [ 'plum' ] );
 			expectTokensNotToBeInTheDocument( [ 'persimmon' ] );
@@ -1786,10 +1772,7 @@ describe( 'FormTokenField', () => {
 			expectTokensToBeInTheDocument( [ 'sun' ] );
 
 			rerender(
-				<FormTokenFieldWithState
-					onChange={ onChangeSpy }
-					disabled
-				/>
+				<FormTokenFieldWithState onChange={ onChangeSpy } disabled />
 			);
 
 			// Try to add 'moon' token. The token is not added because of the `disabled`
