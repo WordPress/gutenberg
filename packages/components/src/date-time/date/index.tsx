@@ -220,6 +220,7 @@ export function DatePicker( {
 										nextFocusable = addWeeks( day, 1 );
 									}
 									if ( nextFocusable ) {
+										event.preventDefault();
 										setFocusable( nextFocusable );
 										if (
 											! isSameMonth(
