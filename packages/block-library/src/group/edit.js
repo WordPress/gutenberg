@@ -9,10 +9,12 @@ import {
 	InspectorControls,
 	useInnerBlocksProps,
 	useSetting,
+	__experimentalBlockVariationPicker,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
 
 const htmlElementMessages = {
 	header: __(
@@ -25,7 +27,7 @@ const htmlElementMessages = {
 		"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
 	),
 	article: __(
-		'The <article> element should represent a self contained, syndicatable portion of the document.'
+		'The <article> element should represent a self-contained, syndicatable portion of the document.'
 	),
 	aside: __(
 		"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
@@ -54,6 +56,7 @@ function GroupEdit( {
 	);
 	const defaultLayout = useSetting( 'layout' ) || {};
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
+	const showPlaceholder = ! attributes?.layout?.type && ! hasInnerBlocks;
 	const usedLayout = ! layout?.type
 		? { ...defaultLayout, ...layout, type: 'default' }
 		: { ...defaultLayout, ...layout };
@@ -99,7 +102,11 @@ function GroupEdit( {
 					help={ htmlElementMessages[ TagName ] }
 				/>
 			</InspectorControls>
-			{ layoutSupportEnabled && <TagName { ...innerBlocksProps } /> }
+			{ layoutSupportEnabled && ! showPlaceholder ? (
+				<TagName { ...innerBlocksProps } />
+			) : (
+				<Placeholder name={ name } setAttributes={ setAttributes } />
+			) }
 			{ /* Ideally this is not needed but it's there for backward compatibility reason
 				to keep this div for themes that might rely on its presence */ }
 			{ ! layoutSupportEnabled && (
@@ -108,6 +115,49 @@ function GroupEdit( {
 				</TagName>
 			) }
 		</>
+	);
+}
+
+/**
+ * Display group variations if none is selected.
+ *
+ * @param {Object}   props               Component props.
+ * @param {string}   props.name          The block's name.
+ * @param {Function} props.setAttributes Function to set block's attributes.
+ *
+ * @return {JSX.Element}                The placeholder.
+ */
+function Placeholder( { name, setAttributes } ) {
+	const { blockType, defaultVariation, variations } = useSelect(
+		( select ) => {
+			const {
+				getBlockVariations,
+				getBlockType,
+				getDefaultBlockVariation,
+			} = select( blocksStore );
+
+			return {
+				blockType: getBlockType( name ),
+				defaultVariation: getDefaultBlockVariation( name, 'block' ),
+				variations: getBlockVariations( name, 'block' ),
+			};
+		},
+		[ name ]
+	);
+	const blockProps = useBlockProps();
+
+	return (
+		<div { ...blockProps }>
+			<__experimentalBlockVariationPicker
+				icon={ blockType?.icon?.src }
+				label={ blockType?.title }
+				variations={ variations }
+				onSelect={ ( nextVariation = defaultVariation ) => {
+					setAttributes( nextVariation.attributes );
+				} }
+				allowSkip
+			/>
+		</div>
 	);
 }
 
