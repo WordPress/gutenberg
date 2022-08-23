@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useDisabled } from '@wordpress/compose';
@@ -7,10 +12,9 @@ import { createContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { disabledStyles } from './styles/disabled-styles';
+import { StyledWrapper } from './styles/disabled-styles';
 import type { DisabledProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
-import { useCx } from '../utils';
 
 const Context = createContext< boolean >( false );
 const { Consumer, Provider } = Context;
@@ -52,28 +56,20 @@ function Disabled( {
 	...props
 }: Omit< WordPressComponentProps< DisabledProps, 'div' >, 'ref' > ) {
 	const ref = useDisabled();
-	const cx = useCx();
+
 	if ( ! isDisabled ) {
-		return (
-			<Provider value={ false }>
-				<div>{ children }</div>
-			</Provider>
-		);
+		return <Provider value={ false }>{ children }</Provider>;
 	}
 
 	return (
 		<Provider value={ true }>
-			<div
+			<StyledWrapper
 				ref={ ref }
-				className={ cx(
-					disabledStyles,
-					className,
-					'components-disabled'
-				) }
+				className={ classnames( className, 'components-disabled' ) }
 				{ ...props }
 			>
 				{ children }
-			</div>
+			</StyledWrapper>
 		</Provider>
 	);
 }
