@@ -131,18 +131,6 @@ export default function useTabNav() {
 
 			const next = isShift ? focusCaptureBeforeRef : focusCaptureAfterRef;
 
-			if (
-				next.current === focusCaptureBeforeRef.current &&
-				isInSameBlock(
-					event.target,
-					focus.tabbable.findPrevious( event.target )
-				)
-			) {
-				focus.tabbable.findPrevious( event.target ).focus();
-				event.preventDefault();
-				return;
-			}
-
 			// Disable focus capturing on the focus capture element, so it
 			// doesn't refocus this block and so it allows default behaviour
 			// (moving focus to the next tabbable element).
