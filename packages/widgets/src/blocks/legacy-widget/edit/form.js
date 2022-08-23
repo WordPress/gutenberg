@@ -104,7 +104,7 @@ export default function Form( {
 				<Popover
 					focusOnMount={ false }
 					placement="right"
-					offset={ 48 }
+					offset={ 32 }
 					__unstableForcePosition
 					__unstableShift
 				>
