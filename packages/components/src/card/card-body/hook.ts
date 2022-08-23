@@ -6,44 +6,41 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
+import type { BodyProps } from '../types';
 
-/**
- * @param {import('../../ui/context').WordPressComponentProps<import('../types').FooterProps, 'div'>} props
- */
-export function useCardFooter( props ) {
+export function useCardBody(
+	props: WordPressComponentProps< BodyProps, 'div' >
+) {
 	const {
 		className,
-		justify,
-		isBorderless = false,
+		isScrollable = false,
 		isShady = false,
 		size = 'medium',
 		...otherProps
-	} = useContextSystem( props, 'CardFooter' );
+	} = useContextSystem( props, 'CardBody' );
 
 	const cx = useCx();
 
 	const classes = useMemo(
 		() =>
 			cx(
-				styles.Footer,
+				styles.Body,
 				styles.borderRadius,
-				styles.borderColor,
 				styles.cardPaddings[ size ],
-				isBorderless && styles.borderless,
 				isShady && styles.shady,
 				// This classname is added for legacy compatibility reasons.
-				'components-card__footer',
+				'components-card__body',
 				className
 			),
-		[ className, cx, isBorderless, isShady, size ]
+		[ className, cx, isShady, size ]
 	);
 
 	return {
 		...otherProps,
 		className: classes,
-		justify,
+		isScrollable,
 	};
 }

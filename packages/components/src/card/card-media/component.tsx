@@ -1,15 +1,20 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-import { contextConnect } from '../../ui/context';
-import { View } from '../../view';
-import { useCardMedia } from './hook';
+import type { ForwardedRef } from 'react';
 
 /**
- * @param {import('../../ui/context').WordPressComponentProps<{ children: import('react').ReactNode }, 'div'>} props
- * @param {import('react').ForwardedRef<any>}                                                                  forwardedRef
+ * Internal dependencies
  */
-function CardMedia( props, forwardedRef ) {
+import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import { View } from '../../view';
+import { useCardMedia } from './hook';
+import type { MediaProps } from '../types';
+
+function UnconnectedCardMedia(
+	props: WordPressComponentProps< MediaProps, 'div' >,
+	forwardedRef: ForwardedRef< any >
+) {
 	const cardMediaProps = useCardMedia( props );
 
 	return <View { ...cardMediaProps } ref={ forwardedRef } />;
@@ -32,6 +37,6 @@ function CardMedia( props, forwardedRef ) {
  * );
  * ```
  */
-const ConnectedCardMedia = contextConnect( CardMedia, 'CardMedia' );
+export const CardMedia = contextConnect( UnconnectedCardMedia, 'CardMedia' );
 
-export default ConnectedCardMedia;
+export default CardMedia;

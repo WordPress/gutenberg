@@ -79,6 +79,10 @@ declare module './base-entity-records' {
 			 */
 			'align-wide': boolean;
 			/**
+			 * Whether appearanceTools are enabled in Global Styles.
+			 */
+			'appearance-tools': boolean;
+			/**
 			 * Whether posts and comments RSS feed links are added to head.
 			 */
 			'automatic-feed-links': boolean;

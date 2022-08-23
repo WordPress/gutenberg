@@ -1,15 +1,20 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-import { contextConnect } from '../../ui/context';
-import { Flex } from '../../flex';
-import { useCardHeader } from './hook';
+import type { ForwardedRef } from 'react';
 
 /**
- * @param {import('../../ui/context').WordPressComponentProps<import('../types').HeaderProps, 'div'>} props
- * @param {import('react').ForwardedRef<any>}                                                         forwardedRef
+ * Internal dependencies
  */
-function CardHeader( props, forwardedRef ) {
+import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import { Flex } from '../../flex';
+import { useCardHeader } from './hook';
+import type { HeaderProps } from '../types';
+
+function UnconnectedCardHeader(
+	props: WordPressComponentProps< HeaderProps, 'div' >,
+	forwardedRef: ForwardedRef< any >
+) {
 	const headerProps = useCardHeader( props );
 
 	return <Flex { ...headerProps } ref={ forwardedRef } />;
@@ -18,7 +23,6 @@ function CardHeader( props, forwardedRef ) {
 /**
  * `CardHeader` renders an optional header within a `Card`.
  *
- * @example
  * ```jsx
  * import { Card, CardBody, CardHeader } from `@wordpress/components`;
  *
@@ -28,6 +32,6 @@ function CardHeader( props, forwardedRef ) {
  * </Card>
  * ```
  */
-const ConnectedCardHeader = contextConnect( CardHeader, 'CardHeader' );
+export const CardHeader = contextConnect( UnconnectedCardHeader, 'CardHeader' );
 
-export default ConnectedCardHeader;
+export default CardHeader;
