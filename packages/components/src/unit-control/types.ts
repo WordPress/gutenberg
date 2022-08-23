@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import type { CSSProperties, FocusEventHandler, SyntheticEvent } from 'react';
+import type {
+	CSSProperties,
+	FocusEventHandler,
+	ReactNode,
+	SyntheticEvent,
+} from 'react';
 
 /**
  * Internal dependencies
@@ -74,6 +79,10 @@ export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
 	> & {
 		__unstableStateReducer?: StateReducer;
 		__unstableInputWidth?: CSSProperties[ 'width' ];
+		/**
+		 * The children elements.
+		 */
+		children?: ReactNode;
 		/**
 		 * If `true`, the unit `<select>` is hidden.
 		 *
