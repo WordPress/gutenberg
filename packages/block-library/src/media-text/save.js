@@ -34,6 +34,7 @@ export default function save( { attributes } ) {
 		href,
 		linkTarget,
 		rel,
+		minHeight,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 	const newRel = isEmpty( rel ) ? undefined : rel;
@@ -87,6 +88,7 @@ export default function save( { attributes } ) {
 	}
 	const style = {
 		gridTemplateColumns,
+		minHeight,
 	};
 
 	if ( 'right' === mediaPosition ) {

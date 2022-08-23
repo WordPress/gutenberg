@@ -9,6 +9,7 @@ import { map, filter } from 'lodash';
  */
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { useInstanceId } from '@wordpress/compose';
 import { useState, useRef } from '@wordpress/element';
 import {
 	BlockControls,
@@ -16,6 +17,7 @@ import {
 	useInnerBlocksProps,
 	InspectorControls,
 	useBlockProps,
+	useSetting,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	__experimentalImageSizeControl as ImageSizeControl,
 	store as blockEditorStore,
@@ -28,6 +30,9 @@ import {
 	ToolbarButton,
 	ExternalLink,
 	FocalPointPicker,
+	__experimentalUnitControl as UnitControl,
+	__experimentalUseCustomUnits as useCustomUnits,
+	BaseControl,
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { pullLeft, pullRight } from '@wordpress/icons';
@@ -154,8 +159,12 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		mediaWidth,
 		rel,
 		verticalAlignment,
+		minHeight,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
+
+	const instanceId = useInstanceId( UnitControl );
+	const inputId = `block-media-text-height-input-${ instanceId }`;
 
 	const image = useSelect(
 		( select ) =>
@@ -164,6 +173,24 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 				: null,
 		[ isSelected, mediaId ]
 	);
+
+	const CSS_UNITS = useCustomUnits( {
+		availableUnits: useSetting( 'spacing.units' ) || [
+			'px',
+			'em',
+			'rem',
+			'vw',
+			'vh',
+		],
+		defaultValues: {
+			px: '430',
+			'%': '50',
+			em: '20',
+			rem: '20',
+			vw: '20',
+			vh: '50',
+		},
+	} );
 
 	const refMediaContainer = useRef();
 	const imperativeFocalPointPreview = ( value ) => {
@@ -205,6 +232,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	const style = {
 		gridTemplateColumns,
 		msGridColumns: gridTemplateColumns,
+		minHeight,
 	};
 	const onMediaAltChange = ( newMediaAlt ) => {
 		setAttributes( { mediaAlt: newMediaAlt } );
@@ -308,6 +336,28 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		</PanelBody>
 	);
 
+	const dimensions = (
+		<PanelBody title={ __( 'Dimensions' ) }>
+			<BaseControl
+				id={ inputId }
+				label={ __( 'Minimum height of Media & Text' ) }
+			>
+				<UnitControl
+					id={ inputId }
+					style={ { maxWidth: 80, marginTop: 8 } }
+					units={ CSS_UNITS }
+					value={ minHeight }
+					step="1"
+					isResetValueOnUnitChange
+					min={ 0 }
+					onChange={ ( value ) => {
+						setAttributes( { minHeight: value } );
+					} }
+				></UnitControl>
+			</BaseControl>
+		</PanelBody>
+	);
+
 	const blockProps = useBlockProps( {
 		className: classNames,
 		style,
@@ -320,7 +370,10 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 
 	return (
 		<>
-			<InspectorControls>{ mediaTextGeneralSettings }</InspectorControls>
+			<InspectorControls>
+				{ mediaTextGeneralSettings }
+				{ dimensions }
+			</InspectorControls>
 			<BlockControls group="block">
 				<BlockVerticalAlignmentControl
 					onChange={ onVerticalAlignmentChange }

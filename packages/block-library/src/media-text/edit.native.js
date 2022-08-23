@@ -264,6 +264,7 @@ class MediaTextEdit extends Component {
 			mediaWidth,
 			mediaType,
 			verticalAlignment,
+			minHeight,
 		} = attributes;
 		const { containerWidth, isMediaSelected } = this.state;
 
@@ -367,7 +368,7 @@ class MediaTextEdit extends Component {
 					) }
 				</BlockControls>
 				<View
-					style={ containerStyles }
+					style={ ( containerStyles, minHeight ) }
 					onLayout={ this.onLayoutChange }
 				>
 					<View
