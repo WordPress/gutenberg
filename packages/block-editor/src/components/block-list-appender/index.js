@@ -35,7 +35,7 @@ function BlockListAppender( {
 				return {
 					hideInserter:
 						!! getTemplateLock( rootClientId ) ||
-						__unstableGetEditorMode() !== 'edit',
+						__unstableGetEditorMode() === 'zoom-out',
 					canInsertDefaultBlock: canInsertBlockType(
 						getDefaultBlockName(),
 						rootClientId
