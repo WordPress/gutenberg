@@ -216,6 +216,7 @@ export default function SpacingInputControl( {
 						label={ ariaLabel }
 						hideLabelFromVision={ true }
 						className="components-spacing-sizes-control__custom-value-input"
+						style={ { gridColumn: '1' } }
 					/>
 
 					<RangeControl

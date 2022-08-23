@@ -120,11 +120,18 @@ export default {
 		const blockGapStyleValue = getGapCSSValue( style?.spacing?.blockGap );
 		// If a block's block.json skips serialization for spacing or
 		// spacing.blockGap, don't apply the user-defined value to the styles.
-		const blockGapValue =
-			blockGapStyleValue?.top &&
-			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
-				? blockGapStyleValue?.top
-				: '';
+		// const blockGapValue =
+		// 	blockGapStyleValue?.top &&
+		// 	! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
+		// 		? blockGapStyleValue?.top
+		// 		: '';
+
+		// This isn't _quite_ the right fix. We need to account for split values, and reference `top` if it's provided directly.
+		const blockGapValue = blockGapStyleValue;
+		console.log(
+			'blockGapStyleValue in constrained layout',
+			blockGapStyleValue
+		);
 
 		let output =
 			!! contentSize || !! wideSize
