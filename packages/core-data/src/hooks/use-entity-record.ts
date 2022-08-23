@@ -163,8 +163,16 @@ export default function useEntityRecord< RecordType >(
 
 	const { editedRecord, hasEdits } = useSelect(
 		( select ) => ( {
-			editedRecord: select( coreStore ).getEditedEntityRecord(),
-			hasEdits: select( coreStore ).hasEditsForEntityRecord(),
+			editedRecord: select( coreStore ).getEditedEntityRecord(
+				kind,
+				name,
+				recordId
+			),
+			hasEdits: select( coreStore ).hasEditsForEntityRecord(
+				kind,
+				name,
+				recordId
+			),
 		} ),
 		[ kind, name, recordId ]
 	);
