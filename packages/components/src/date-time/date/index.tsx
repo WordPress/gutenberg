@@ -28,6 +28,7 @@ import { useState, useRef, useEffect } from '@wordpress/element';
  */
 import type { DatePickerProps } from '../types';
 import {
+	Wrapper,
 	Navigator,
 	NavigatorHeading,
 	Calendar,
@@ -101,7 +102,7 @@ export function DatePicker( {
 	}
 
 	return (
-		<div
+		<Wrapper
 			className="components-datetime__date"
 			role="application"
 			aria-label={ __( 'Calendar' ) }
@@ -241,7 +242,7 @@ export function DatePicker( {
 					} )
 				) }
 			</Calendar>
-		</div>
+		</Wrapper>
 	);
 }
 
