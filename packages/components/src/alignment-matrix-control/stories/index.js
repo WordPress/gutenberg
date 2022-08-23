@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { Icon } from '@wordpress/icons';
 
 /**
@@ -30,8 +30,13 @@ export default {
 	},
 };
 
-const Template = ( { onChange, ...props } ) => {
+const Template = ( { defaultValue, onChange, ...props } ) => {
 	const [ value, setValue ] = useState();
+
+	// Convenience handler for Canvas view so changes are reflected
+	useEffect( () => {
+		setValue( defaultValue );
+	}, [ defaultValue ] );
 
 	return (
 		<AlignmentMatrixControl
