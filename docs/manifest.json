@@ -1410,9 +1410,369 @@
 		"parent": "packages"
 	},
 	{
+		"title": "AlignmentControl",
+		"slug": "alignment-control",
+		"markdown_source": "../packages/block-editor/src/components/alignment-control/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "Autocomplete",
+		"slug": "autocomplete",
+		"markdown_source": "../packages/block-editor/src/components/autocomplete/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockAlignmentControl",
+		"slug": "block-alignment-control",
+		"markdown_source": "../packages/block-editor/src/components/block-alignment-control/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockAlignmentMatrixControl",
+		"slug": "block-alignment-matrix-control",
+		"markdown_source": "../packages/block-editor/src/components/block-alignment-matrix-control/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockBreadcrumb",
+		"slug": "block-breadcrumb",
+		"markdown_source": "../packages/block-editor/src/components/block-breadcrumb/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockCard",
+		"slug": "block-card",
+		"markdown_source": "../packages/block-editor/src/components/block-card/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockCompare",
+		"slug": "block-compare",
+		"markdown_source": "../packages/block-editor/src/components/block-compare/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockContext",
+		"slug": "block-context",
+		"markdown_source": "../packages/block-editor/src/components/block-context/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockFullHeightAlignmentControl",
+		"slug": "block-full-height-alignment-control",
+		"markdown_source": "../packages/block-editor/src/components/block-full-height-alignment-control/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockIcon",
+		"slug": "block-icon",
+		"markdown_source": "../packages/block-editor/src/components/block-icon/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockInspector",
+		"slug": "block-inspector",
+		"markdown_source": "../packages/block-editor/src/components/block-inspector/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockMediaUpdateProgress",
+		"slug": "block-media-update-progress",
+		"markdown_source": "../packages/block-editor/src/components/block-media-update-progress/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockMover",
+		"slug": "block-mover",
+		"markdown_source": "../packages/block-editor/src/components/block-mover/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockParentSelector",
+		"slug": "block-parent-selector",
+		"markdown_source": "../packages/block-editor/src/components/block-parent-selector/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockPatternsList",
+		"slug": "block-patterns-list",
+		"markdown_source": "../packages/block-editor/src/components/block-patterns-list/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockPreview",
+		"slug": "block-preview",
+		"markdown_source": "../packages/block-editor/src/components/block-preview/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockSettingsMenuControls",
+		"slug": "block-settings-menu-controls",
+		"markdown_source": "../packages/block-editor/src/components/block-settings-menu-controls/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockSettingsMenu",
+		"slug": "block-settings-menu",
+		"markdown_source": "../packages/block-editor/src/components/block-settings-menu/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockTitle",
+		"slug": "block-title",
+		"markdown_source": "../packages/block-editor/src/components/block-title/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockToolbar",
+		"slug": "block-toolbar",
+		"markdown_source": "../packages/block-editor/src/components/block-toolbar/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockTypesList",
+		"slug": "block-types-list",
+		"markdown_source": "../packages/block-editor/src/components/block-types-list/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockVariationPicker",
+		"slug": "block-variation-picker",
+		"markdown_source": "../packages/block-editor/src/components/block-variation-picker/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockVariationTransforms",
+		"slug": "block-variation-transforms",
+		"markdown_source": "../packages/block-editor/src/components/block-variation-transforms/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockVerticalAlignmentControl",
+		"slug": "block-vertical-alignment-control",
+		"markdown_source": "../packages/block-editor/src/components/block-vertical-alignment-control/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "ButtonBlockAppender",
+		"slug": "button-block-appender",
+		"markdown_source": "../packages/block-editor/src/components/button-block-appender/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "Colors",
+		"slug": "colors",
+		"markdown_source": "../packages/block-editor/src/components/colors/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "ContrastChecker",
+		"slug": "contrast-checker",
+		"markdown_source": "../packages/block-editor/src/components/contrast-checker/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "CopyHandler",
+		"slug": "copy-handler",
+		"markdown_source": "../packages/block-editor/src/components/copy-handler/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "DateFormatPicker",
+		"slug": "date-format-picker",
+		"markdown_source": "../packages/block-editor/src/components/date-format-picker/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "EditableText",
+		"slug": "editable-text",
+		"markdown_source": "../packages/block-editor/src/components/editable-text/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "FontSizes",
+		"slug": "font-sizes",
+		"markdown_source": "../packages/block-editor/src/components/font-sizes/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "ImageSizeControl",
+		"slug": "image-size-control",
+		"markdown_source": "../packages/block-editor/src/components/image-size-control/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "InnerBlocks",
+		"slug": "inner-blocks",
+		"markdown_source": "../packages/block-editor/src/components/inner-blocks/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "InspectorControls",
+		"slug": "inspector-controls",
+		"markdown_source": "../packages/block-editor/src/components/inspector-controls/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "JustifyContentControl",
+		"slug": "justify-content-control",
+		"markdown_source": "../packages/block-editor/src/components/justify-content-control/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "LineHeightControl",
+		"slug": "line-height-control",
+		"markdown_source": "../packages/block-editor/src/components/line-height-control/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "LinkControl",
+		"slug": "link-control",
+		"markdown_source": "../packages/block-editor/src/components/link-control/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "ListView",
+		"slug": "list-view",
+		"markdown_source": "../packages/block-editor/src/components/list-view/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "MediaPlaceholder",
+		"slug": "media-placeholder",
+		"markdown_source": "../packages/block-editor/src/components/media-placeholder/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "MediaReplaceFlow",
+		"slug": "media-replace-flow",
+		"markdown_source": "../packages/block-editor/src/components/media-replace-flow/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "MediaUploadProgress",
+		"slug": "media-upload-progress",
+		"markdown_source": "../packages/block-editor/src/components/media-upload-progress/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "MediaUpload",
+		"slug": "media-upload",
+		"markdown_source": "../packages/block-editor/src/components/media-upload/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "MultiSelectionInspector",
+		"slug": "multi-selection-inspector",
+		"markdown_source": "../packages/block-editor/src/components/multi-selection-inspector/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "ObserveTyping",
+		"slug": "observe-typing",
+		"markdown_source": "../packages/block-editor/src/components/observe-typing/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "PlainText",
+		"slug": "plain-text",
+		"markdown_source": "../packages/block-editor/src/components/plain-text/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "PreviewOptions",
+		"slug": "preview-options",
+		"markdown_source": "../packages/block-editor/src/components/preview-options/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "Provider",
+		"slug": "provider",
+		"markdown_source": "../packages/block-editor/src/components/provider/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "ResponsiveBlockControl",
+		"slug": "responsive-block-control",
+		"markdown_source": "../packages/block-editor/src/components/responsive-block-control/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "RichText",
+		"slug": "rich-text",
+		"markdown_source": "../packages/block-editor/src/components/rich-text/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "SkipToSelectedBlock",
+		"slug": "skip-to-selected-block",
+		"markdown_source": "../packages/block-editor/src/components/skip-to-selected-block/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "UngroupButton",
+		"slug": "ungroup-button",
+		"markdown_source": "../packages/block-editor/src/components/ungroup-button/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "UnitControl",
+		"slug": "unit-control",
+		"markdown_source": "../packages/block-editor/src/components/unit-control/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "UrlInput",
+		"slug": "url-input",
+		"markdown_source": "../packages/block-editor/src/components/url-input/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "UrlPopover",
+		"slug": "url-popover",
+		"markdown_source": "../packages/block-editor/src/components/url-popover/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "UseBlockDisplayInformation",
+		"slug": "use-block-display-information",
+		"markdown_source": "../packages/block-editor/src/components/use-block-display-information/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "UseBlockDropZone",
+		"slug": "use-block-drop-zone",
+		"markdown_source": "../packages/block-editor/src/components/use-block-drop-zone/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "UseResizeCanvas",
+		"slug": "use-resize-canvas",
+		"markdown_source": "../packages/block-editor/src/components/use-resize-canvas/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "Warning",
+		"slug": "warning",
+		"markdown_source": "../packages/block-editor/src/components/warning/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "WritingFlow",
+		"slug": "writing-flow",
+		"markdown_source": "../packages/block-editor/src/components/writing-flow/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/block-library",
 		"slug": "packages-block-library",
 		"markdown_source": "../packages/block-library/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "Navigation",
+		"slug": "navigation",
+		"markdown_source": "../packages/block-library/src/navigation/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1434,6 +1794,18 @@
 		"parent": "packages"
 	},
 	{
+		"title": "RawHandling",
+		"slug": "raw-handling",
+		"markdown_source": "../packages/blocks/src/api/raw-handling/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "BlockContentProvider",
+		"slug": "block-content-provider",
+		"markdown_source": "../packages/blocks/src/block-content-provider/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/browserslist-config",
 		"slug": "packages-browserslist-config",
 		"markdown_source": "../packages/browserslist-config/README.md",
@@ -1452,9 +1824,99 @@
 		"parent": "packages"
 	},
 	{
+		"title": "IfCondition",
+		"slug": "if-condition",
+		"markdown_source": "../packages/compose/src/higher-order/if-condition/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "WithGlobalEvents",
+		"slug": "with-global-events",
+		"markdown_source": "../packages/compose/src/higher-order/with-global-events/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "WithInstanceId",
+		"slug": "with-instance-id",
+		"markdown_source": "../packages/compose/src/higher-order/with-instance-id/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "WithSafeTimeout",
+		"slug": "with-safe-timeout",
+		"markdown_source": "../packages/compose/src/higher-order/with-safe-timeout/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "WithState",
+		"slug": "with-state",
+		"markdown_source": "../packages/compose/src/higher-order/with-state/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "UseConstrainedTabbing",
+		"slug": "use-constrained-tabbing",
+		"markdown_source": "../packages/compose/src/hooks/use-constrained-tabbing/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "UseDialog",
+		"slug": "use-dialog",
+		"markdown_source": "../packages/compose/src/hooks/use-dialog/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "UseDragging",
+		"slug": "use-dragging",
+		"markdown_source": "../packages/compose/src/hooks/use-dragging/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "UseFocusOnMount",
+		"slug": "use-focus-on-mount",
+		"markdown_source": "../packages/compose/src/hooks/use-focus-on-mount/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "UseFocusReturn",
+		"slug": "use-focus-return",
+		"markdown_source": "../packages/compose/src/hooks/use-focus-return/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "UseFocusableIframe",
+		"slug": "use-focusable-iframe",
+		"markdown_source": "../packages/compose/src/hooks/use-focusable-iframe/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "UseInstanceId",
+		"slug": "use-instance-id",
+		"markdown_source": "../packages/compose/src/hooks/use-instance-id/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "UsePrevious",
+		"slug": "use-previous",
+		"markdown_source": "../packages/compose/src/hooks/use-previous/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/core-data",
 		"slug": "packages-core-data",
 		"markdown_source": "../packages/core-data/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "EntityTypes",
+		"slug": "entity-types",
+		"markdown_source": "../packages/core-data/src/entity-types/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "Locks",
+		"slug": "locks",
+		"markdown_source": "../packages/core-data/src/locks/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1491,6 +1953,18 @@
 		"title": "@wordpress/data",
 		"slug": "packages-data",
 		"markdown_source": "../packages/data/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "Persistence",
+		"slug": "persistence",
+		"markdown_source": "../packages/data/src/plugins/persistence/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "Plugins",
+		"slug": "plugins",
+		"markdown_source": "../packages/data/src/plugins/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1548,9 +2022,21 @@
 		"parent": "packages"
 	},
 	{
+		"title": "BrowserUrl",
+		"slug": "browser-url",
+		"markdown_source": "../packages/edit-post/src/components/browser-url/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/edit-site",
 		"slug": "packages-edit-site",
 		"markdown_source": "../packages/edit-site/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "GlobalStyles",
+		"slug": "global-styles",
+		"markdown_source": "../packages/edit-site/src/components/global-styles/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1563,6 +2049,42 @@
 		"title": "@wordpress/editor",
 		"slug": "packages-editor",
 		"markdown_source": "../packages/editor/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "Autocompleters",
+		"slug": "autocompleters",
+		"markdown_source": "../packages/editor/src/components/autocompleters/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "LocalAutosaveMonitor",
+		"slug": "local-autosave-monitor",
+		"markdown_source": "../packages/editor/src/components/local-autosave-monitor/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "PostFeaturedImage",
+		"slug": "post-featured-image",
+		"markdown_source": "../packages/editor/src/components/post-featured-image/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "PostTaxonomies",
+		"slug": "post-taxonomies",
+		"markdown_source": "../packages/editor/src/components/post-taxonomies/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "PostTypeSupportCheck",
+		"slug": "post-type-support-check",
+		"markdown_source": "../packages/editor/src/components/post-type-support-check/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "Components",
+		"slug": "components",
+		"markdown_source": "../packages/editor/src/components/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1623,6 +2145,72 @@
 		"title": "@wordpress/interface",
 		"slug": "packages-interface",
 		"markdown_source": "../packages/interface/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "ActionItem",
+		"slug": "action-item",
+		"markdown_source": "../packages/interface/src/components/action-item/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "ComplementaryAreaMoreMenuItem",
+		"slug": "complementary-area-more-menu-item",
+		"markdown_source": "../packages/interface/src/components/complementary-area-more-menu-item/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "ComplementaryAreaToggle",
+		"slug": "complementary-area-toggle",
+		"markdown_source": "../packages/interface/src/components/complementary-area-toggle/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "ComplementaryArea",
+		"slug": "complementary-area",
+		"markdown_source": "../packages/interface/src/components/complementary-area/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "MoreMenuDropdown",
+		"slug": "more-menu-dropdown",
+		"markdown_source": "../packages/interface/src/components/more-menu-dropdown/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "MoreMenuFeatureToggle",
+		"slug": "more-menu-feature-toggle",
+		"markdown_source": "../packages/interface/src/components/more-menu-feature-toggle/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "PinnedItems",
+		"slug": "pinned-items",
+		"markdown_source": "../packages/interface/src/components/pinned-items/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "PreferencesModalBaseOption",
+		"slug": "preferences-modal-base-option",
+		"markdown_source": "../packages/interface/src/components/preferences-modal-base-option/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "PreferencesModalSection",
+		"slug": "preferences-modal-section",
+		"markdown_source": "../packages/interface/src/components/preferences-modal-section/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "PreferencesModalTabs",
+		"slug": "preferences-modal-tabs",
+		"markdown_source": "../packages/interface/src/components/preferences-modal-tabs/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "PreferencesModal",
+		"slug": "preferences-modal",
+		"markdown_source": "../packages/interface/src/components/preferences-modal/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1704,6 +2292,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "DotTip",
+		"slug": "dot-tip",
+		"markdown_source": "../packages/nux/src/components/dot-tip/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/plugins",
 		"slug": "packages-plugins",
 		"markdown_source": "../packages/plugins/README.md",
@@ -1734,6 +2328,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "PreferenceToggleMenuItem",
+		"slug": "preference-toggle-menu-item",
+		"markdown_source": "../packages/preferences/src/components/preference-toggle-menu-item/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/prettier-config",
 		"slug": "packages-prettier-config",
 		"markdown_source": "../packages/prettier-config/README.md",
@@ -1746,9 +2346,57 @@
 		"parent": "packages"
 	},
 	{
+		"title": "BlockQuotation",
+		"slug": "block-quotation",
+		"markdown_source": "../packages/primitives/src/block-quotation/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "HorizontalRule",
+		"slug": "horizontal-rule",
+		"markdown_source": "../packages/primitives/src/horizontal-rule/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "Svg",
+		"slug": "svg",
+		"markdown_source": "../packages/primitives/src/svg/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "View",
+		"slug": "view",
+		"markdown_source": "../packages/primitives/src/view/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/priority-queue",
 		"slug": "packages-priority-queue",
 		"markdown_source": "../packages/priority-queue/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "AddMilestone",
+		"slug": "add-milestone",
+		"markdown_source": "../packages/project-management-automation/lib/tasks/add-milestone/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "AssignFixedIssues",
+		"slug": "assign-fixed-issues",
+		"markdown_source": "../packages/project-management-automation/lib/tasks/assign-fixed-issues/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "FirstTimeContributorAccountLink",
+		"slug": "first-time-contributor-account-link",
+		"markdown_source": "../packages/project-management-automation/lib/tasks/first-time-contributor-account-link/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "FirstTimeContributorLabel",
+		"slug": "first-time-contributor-label",
+		"markdown_source": "../packages/project-management-automation/lib/tasks/first-time-contributor-label/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1830,6 +2478,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "Fixtures",
+		"slug": "fixtures",
+		"markdown_source": "../packages/url/src/test/fixtures/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/viewport",
 		"slug": "packages-viewport",
 		"markdown_source": "../packages/viewport/README.md",
@@ -1845,6 +2499,12 @@
 		"title": "@wordpress/widgets",
 		"slug": "packages-widgets",
 		"markdown_source": "../packages/widgets/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "LegacyWidget",
+		"slug": "legacy-widget",
+		"markdown_source": "../packages/widgets/src/blocks/legacy-widget/README.md",
 		"parent": "packages"
 	},
 	{
