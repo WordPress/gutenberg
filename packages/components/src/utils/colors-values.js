@@ -65,7 +65,7 @@ const UI = {
 	lightGrayPlaceholder: rgba( white, 0.65 ),
 };
 
-export const COLORS = {
+export const COLORS = Object.freeze( {
 	/**
 	 * @deprecated Try to use `gray` instead.
 	 */
@@ -81,6 +81,6 @@ export const COLORS = {
 	white,
 	alert: ALERT,
 	ui: UI,
-};
+} );
 
 export default COLORS;
