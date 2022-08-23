@@ -323,7 +323,6 @@ export const rootEntitiesConfig = [
 				'home',
 				'name',
 				'site_icon',
-				'site_icon_url',
 				'site_logo',
 				'timezone_string',
 				'url',
