@@ -28,6 +28,8 @@ test.describe( 'Group', () => {
 			'role=listbox[name="Blocks"i] >> role=option[name="Group"i]'
 		);
 
+		await page.click( 'role=button[name="Skip"i]' );
+
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -41,6 +43,7 @@ test.describe( 'Group', () => {
 			page.locator( 'role=option[name="Group"i][selected]' )
 		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
+		await page.click( 'role=button[name="Skip"i]' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -50,6 +53,7 @@ test.describe( 'Group', () => {
 		page,
 	} ) => {
 		await editor.insertBlock( { name: 'core/group' } );
+		await page.click( 'role=button[name="Skip"i]' );
 		await page.click( 'role=button[name="Add block"i]' );
 		await page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
