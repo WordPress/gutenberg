@@ -49,6 +49,13 @@ function resolveRecords( registry, menus ) {
 	} );
 }
 
+function resolveReadPermission( registry, allowed ) {
+	const dispatch = registry.dispatch( coreStore );
+	dispatch.receiveUserPermission( 'create/navigation', allowed );
+	dispatch.startResolution( 'canUser', [ 'read', 'navigation' ] );
+	dispatch.finishResolution( 'canUser', [ 'read', 'navigation' ] );
+}
+
 function resolveCreatePermission( registry, allowed ) {
 	const dispatch = registry.dispatch( coreStore );
 	dispatch.receiveUserPermission( 'create/navigation', allowed );
@@ -105,9 +112,10 @@ describe( 'useNavigationMenus', () => {
 		} );
 	} );
 
-	it( 'Should return information about all menus when ref is missing', () => {
+	it( 'Should return information about all menus when the ref is missing', () => {
 		resolveRecords( registry, navigationMenus );
 		resolveCreatePermission( registry, true );
+		resolveReadPermission( registry, true );
 		expect( useNavigationMenu() ).toEqual( {
 			navigationMenus,
 			navigationMenu: undefined,
