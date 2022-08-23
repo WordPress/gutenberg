@@ -6,6 +6,10 @@
 
 –   Add TypeScript types to the built package (via "types": "build-types" in the package.json)
 
+### Bug Fix
+
+-   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
+
 ## 6.15.0 (2022-08-10)
 
 ## 6.14.0 (2022-07-27)
