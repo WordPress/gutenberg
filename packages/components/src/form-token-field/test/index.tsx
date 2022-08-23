@@ -628,6 +628,41 @@ describe( 'FormTokenField', () => {
 				screen.queryByPlaceholderText( 'Test placeholder' )
 			).not.toBeInTheDocument();
 		} );
+
+		it( 'should handle accents and special characters in tokens and input value', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			const onChangeSpy = jest.fn();
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					initialValue={ [ 'français', 'español', '日本', 'עברית' ] }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Add 'عربى' token by typing it and pressing enter to tokenize it.
+			await user.type( input, 'عربى[Enter]' );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeSpy ).toHaveBeenCalledWith( [
+				'français',
+				'español',
+				'日本',
+				'עברית',
+				'عربى',
+			] );
+			expectTokensToBeInTheDocument( [
+				'français',
+				'español',
+				'日本',
+				'עברית',
+				'عربى',
+			] );
+		} );
 	} );
 
 	describe( 'suggestions', () => {
