@@ -17,6 +17,18 @@ import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 
+const NoCommentsWarning = ( { style, ...props } ) => {
+	// Text decoration is stripped as it can't be reset as per other styles.
+	const { textDecoration, ...blockStyles } = style || {};
+	return (
+		<div { ...props } style={ blockStyles }>
+			<Warning>
+				{ __( 'Post Comments Count block: post not found.' ) }
+			</Warning>
+		</div>
+	);
+};
+
 export default function PostCommentsCountEdit( {
 	attributes,
 	context,
@@ -59,15 +71,11 @@ export default function PostCommentsCountEdit( {
 					} }
 				/>
 			</BlockControls>
-			<div { ...blockProps }>
-				{ postId && commentsCount !== undefined ? (
-					commentsCount
-				) : (
-					<Warning>
-						{ __( 'Post Comments Count block: post not found.' ) }
-					</Warning>
-				) }
-			</div>
+			{ postId && commentsCount !== undefined ? (
+				<div { ...blockProps }>{ commentsCount }</div>
+			) : (
+				<NoCommentsWarning { ...blockProps } />
+			) }
 		</>
 	);
 }
