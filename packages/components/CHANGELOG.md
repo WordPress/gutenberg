@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 20.0.0-next.0 (2022-08-23)
+
 ### Breaking Changes
 
 -   `CustomSelectControl`: Deprecate constrained width style. Add a `__nextUnconstrainedWidth` prop to start opting into the unconstrained width that will become the default in a future version, currently scheduled to be WordPress 6.4 ([#43230](https://github.com/WordPress/gutenberg/pull/43230)).

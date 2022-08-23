@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.12.1-next.0 (2022-08-23)
+
 ### Bug Fix
 
 -   Ensure all dependencies allow version ranges ([#43355](https://github.com/WordPress/gutenberg/pull/43355)).
