@@ -8,7 +8,7 @@
 
 ### Bug Fix
 
--   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
+-   Packages: Replace `is-plain-obj` with native functionality ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
 
 ## 1.2.0 (2022-04-21)
 
