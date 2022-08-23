@@ -39,6 +39,7 @@ export const Calendar = styled.div`
 
 export const DayOfWeek = styled.div`
 	color: ${ COLORS.gray[ 700 ] };
+	font-size: ${ CONFIG.fontSize };
 
 	&:nth-of-type( 1 ) {
 		justify-self: start;
