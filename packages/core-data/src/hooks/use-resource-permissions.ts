@@ -140,9 +140,15 @@ export default function useResourcePermissions< IdType = void >(
 			const update = canUser( 'update', resource, id );
 			const _delete = canUser( 'delete', resource, id );
 			const isResolving =
-				create.isResolving || update.isResolving || _delete.isResolving;
+				read.isResolving ||
+				create.isResolving ||
+				update.isResolving ||
+				_delete.isResolving;
 			const hasResolved =
-				create.hasResolved && update.hasResolved && _delete.hasResolved;
+				read.hasResolved &&
+				create.hasResolved &&
+				update.hasResolved &&
+				_delete.hasResolved;
 
 			let status = Status.Idle;
 			if ( isResolving ) {
