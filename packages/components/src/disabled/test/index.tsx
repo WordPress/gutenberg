@@ -106,10 +106,6 @@ describe( 'Disabled', () => {
 		expect( contentEditable ).toHaveAttribute( 'contenteditable', 'true' );
 	} );
 
-	// Ideally, we'd have two more test cases here:
-	//
-	//  - it( 'will disable all fields on component render change' )
-	//
 	it( 'will disable all fields on sneaky DOM manipulation', async () => {
 		render(
 			<Disabled>
