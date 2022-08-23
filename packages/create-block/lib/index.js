@@ -34,8 +34,8 @@ program
 	.arguments( '[slug]' )
 	.option(
 		'-t, --template <name>',
-		'project template type name; allowed values: "static", "es5", the name of an external npm package, or the path to a local directory',
-		'static'
+		'project template type name; allowed values: "standard", "es5", the name of an external npm package, or the path to a local directory',
+		'standard'
 	)
 	.option( '--namespace <value>', 'internal namespace for the block name' )
 	.option(
@@ -58,6 +58,7 @@ program
 	)
 	.option( '--wp-env', 'enable integration with `@wordpress/env` package' )
 	.option( '--no-plugin', 'scaffold only block files' )
+	.option( '--variant <variant>', 'the variant of the template to use' )
 	.action(
 		async (
 			slug,
@@ -70,12 +71,16 @@ program
 				title,
 				wpScripts,
 				wpEnv,
+				variant,
 			}
 		) => {
 			await checkSystemRequirements( engines );
 			try {
 				const pluginTemplate = await getPluginTemplate( templateName );
-				const defaultValues = getDefaultValues( pluginTemplate );
+				const defaultValues = getDefaultValues(
+					pluginTemplate,
+					variant
+				);
 				const optionsValues = Object.fromEntries(
 					Object.entries( {
 						plugin,
@@ -85,6 +90,7 @@ program
 						title,
 						wpScripts,
 						wpEnv,
+						variant,
 					} ).filter( ( [ , value ] ) => value !== undefined )
 				);
 
@@ -107,14 +113,30 @@ program
 
 					const filterOptionsProvided = ( { name } ) =>
 						! Object.keys( optionsValues ).includes( name );
-					const blockPrompts = getPrompts( pluginTemplate, [
-						'slug',
-						'namespace',
-						'title',
-						'description',
-						'dashicon',
-						'category',
-					] ).filter( filterOptionsProvided );
+
+					// Get the variant prompt first. This will help get the default values
+					const variantPrompt =
+						Object.keys( pluginTemplate.variants )?.length > 1
+							? getPrompts( pluginTemplate, [ 'variant' ] )
+							: false;
+
+					const variantSelection = variantPrompt
+						? await inquirer.prompt( variantPrompt )
+						: false;
+
+					const blockPrompts = getPrompts(
+						pluginTemplate,
+						[
+							'slug',
+							'namespace',
+							'title',
+							'description',
+							'dashicon',
+							'category',
+						],
+						variantSelection.variant
+					).filter( filterOptionsProvided );
+
 					const blockAnswers = await inquirer.prompt( blockPrompts );
 
 					const pluginAnswers = plugin
@@ -154,6 +176,7 @@ program
 						...defaultValues,
 						...optionsValues,
 						...blockAnswers,
+						...variantSelection,
 						...pluginAnswers,
 					} );
 				}

@@ -36,7 +36,9 @@ export function getCustomValueFromPreset( value, spacingSizes ) {
 	}
 
 	const slug = getSpacingPresetSlug( value );
-	const spacingSize = spacingSizes.find( ( size ) => size.slug === slug );
+	const spacingSize = spacingSizes.find(
+		( size ) => String( size.slug ) === slug
+	);
 
 	return spacingSize?.size;
 }
@@ -80,7 +82,7 @@ export function getSpacingPresetSlug( value ) {
 
 	const slug = value.match( /var:preset\|spacing\|(.+)/ );
 
-	return slug ? parseInt( slug[ 1 ], 10 ) : undefined;
+	return slug ? slug[ 1 ] : undefined;
 }
 
 /**
@@ -100,7 +102,7 @@ export function getSliderValueFromPreset( presetValue, spacingSizes ) {
 			? '0'
 			: getSpacingPresetSlug( presetValue );
 	const sliderValue = spacingSizes.findIndex( ( spacingSize ) => {
-		return spacingSize.slug === slug;
+		return String( spacingSize.slug ) === slug;
 	} );
 
 	// Returning NaN rather than undefined as undefined makes range control thumb sit in center
@@ -159,13 +161,14 @@ export function getAllRawValue( values = {} ) {
  * Checks to determine if values are mixed.
  *
  * @param {Object} values Box values.
+ * @param {Array}  sides  Sides that values relate to.
  *
  * @return {boolean} Whether values are mixed.
  */
-export function isValuesMixed( values = {} ) {
+export function isValuesMixed( values = {}, sides = ALL_SIDES ) {
 	return (
 		( Object.values( values ).length >= 1 &&
-			Object.values( values ).length < 4 ) ||
+			Object.values( values ).length < sides.length ) ||
 		new Set( Object.values( values ) ).size > 1
 	);
 }

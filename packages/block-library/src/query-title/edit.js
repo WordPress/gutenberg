@@ -24,7 +24,7 @@ import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 const SUPPORTED_TYPES = [ 'archive', 'search' ];
 
 export default function QueryTitleEdit( {
-	attributes: { type, level, textAlign, showSearchTerm },
+	attributes: { type, level, textAlign, showPrefix, showSearchTerm },
 	setAttributes,
 } ) {
 	const TagName = `h${ level }`;
@@ -45,7 +45,24 @@ export default function QueryTitleEdit( {
 	let titleElement;
 	if ( type === 'archive' ) {
 		titleElement = (
-			<TagName { ...blockProps }>{ __( 'Archive title' ) }</TagName>
+			<>
+				<InspectorControls>
+					<PanelBody title={ __( 'Settings' ) }>
+						<ToggleControl
+							label={ __( 'Show archive type in title' ) }
+							onChange={ () =>
+								setAttributes( { showPrefix: ! showPrefix } )
+							}
+							checked={ showPrefix }
+						/>
+					</PanelBody>
+				</InspectorControls>
+				<TagName { ...blockProps }>
+					{ showPrefix
+						? __( 'Archive type: Name' )
+						: __( 'Archive title' ) }
+				</TagName>
+			</>
 		);
 	}
 

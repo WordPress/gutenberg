@@ -134,8 +134,16 @@ const updateURI = {
 	message: 'A custom update URI for the plugin (optional):',
 };
 
+const variant = {
+	type: 'list',
+	name: 'variant',
+	message: 'The template variant to use for this block:',
+	choices: [],
+};
+
 module.exports = {
 	slug,
+	variant,
 	namespace,
 	title,
 	description,

@@ -134,6 +134,7 @@ module.exports = {
 							'reverse',
 							'size',
 							'snakeCase',
+							'sortBy',
 							'startCase',
 							'startsWith',
 							'stubFalse',
@@ -152,6 +153,7 @@ module.exports = {
 							'upperFirst',
 							'values',
 							'words',
+							'xor',
 							'zip',
 						],
 						message:

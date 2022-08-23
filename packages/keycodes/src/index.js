@@ -13,7 +13,7 @@
  * External dependencies
  */
 import { capitalCase } from 'change-case';
-import { get, mapValues, includes, xor } from 'lodash';
+import { get, mapValues, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -353,7 +353,12 @@ export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 		const mods = getModifiers( _isApple );
 		const eventMods = getEventModifiers( event );
 
-		if ( xor( mods, eventMods ).length ) {
+		const modsDiff = mods.filter( ( mod ) => ! eventMods.includes( mod ) );
+		const eventModsDiff = eventMods.filter(
+			( mod ) => ! mods.includes( mod )
+		);
+
+		if ( modsDiff.length > 0 || eventModsDiff.length > 0 ) {
 			return false;
 		}
 

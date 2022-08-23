@@ -57,7 +57,7 @@ describe( 'getSpacingPresetSlug', () => {
 		expect( getSpacingPresetSlug( 'default' ) ).toBe( 'default' );
 	} );
 	it( 'should return the int value of the slug portion of a valid preset var', () => {
-		expect( getSpacingPresetSlug( 'var:preset|spacing|20' ) ).toBe( 20 );
+		expect( getSpacingPresetSlug( 'var:preset|spacing|20' ) ).toBe( '20' );
 	} );
 } );
 

@@ -9,9 +9,6 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import { store as editSiteStore } from '../../../store';
 
 /**

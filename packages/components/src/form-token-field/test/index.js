@@ -396,6 +396,37 @@ describe( 'FormTokenField', () => {
 			sendKeyDown( keyCodes.enter );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
+
+		it( 'should automatically select the first matching suggestions when __experimentalAutoSelectFirstMatch is set to true', () => {
+			setUp( { __experimentalAutoSelectFirstMatch: true } );
+
+			wrapper.setState( {
+				isExpanded: true,
+			} );
+
+			expect( getSuggestionsText() ).toEqual( [] );
+
+			const searchText = 'so';
+
+			act( () => {
+				setText( searchText );
+			} );
+
+			const expectedFirstMatchTokens =
+				fixtures.matchingSuggestions[ searchText ][ 0 ];
+
+			expect( getSelectedSuggestion() ).toEqual(
+				expectedFirstMatchTokens
+			);
+
+			sendKeyDown( keyCodes.enter );
+
+			expect( wrapper.state.tokens ).toEqual( [
+				'foo',
+				'bar',
+				expectedFirstMatchTokens.join( '' ),
+			] );
+		} );
 	} );
 
 	describe( 'removing tokens', () => {

@@ -100,6 +100,10 @@ export function DimensionsPanel( props ) {
 				) }
 				{ ! isMarginDisabled && (
 					<ToolsPanelItem
+						className={ classnames( {
+							'tools-panel-item-spacing':
+								spacingSizes && spacingSizes.length > 0,
+						} ) }
 						hasValue={ () => hasMarginValue( props ) }
 						label={ __( 'Margin' ) }
 						onDeselect={ () => resetMargin( props ) }
