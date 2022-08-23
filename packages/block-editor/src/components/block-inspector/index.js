@@ -19,6 +19,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalUseNavigator as useNavigator,
+	Button,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo, useCallback, useEffect, useRef } from '@wordpress/element';
@@ -77,78 +78,22 @@ function getContentBlocks( blocks, isContentBlock ) {
 	return result;
 }
 
-function BlockInspectorNavigationEffects( { children } ) {
-	const { selectBlock } = useDispatch( blockEditorStore );
-	const { goTo, location } = useNavigator();
-	const lastLocationClientId = useRef();
-	const updatingSelectionTo = useRef();
-	const locationClientId = useMemo( () => {
-		if ( location.path.startsWith( '/block/' ) ) {
-			return location.path.substring( '/block/'.length );
-		}
-	}, [ location.path ] );
-	const selectedBlockId = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSelectedBlockClientId();
-	} );
-	// When the location changes update the selection to match the new location.
-	useEffect( () => {
-		lastLocationClientId.current = locationClientId;
-		if ( locationClientId && selectedBlockId !== locationClientId ) {
-			updatingSelectionTo.current = locationClientId;
-			selectBlock( locationClientId );
-		}
-	}, [ locationClientId ] );
-	// When the selection changes update the location to root if no selection update to match location is in progress.
-	useEffect( () => {
-		if ( updatingSelectionTo.current ) {
-			updatingSelectionTo.current = undefined;
-		} else if ( lastLocationClientId.current ) {
-			goTo( '/' );
-		}
-	}, [ selectedBlockId ] );
-
-	return children;
-}
-
 function BlockNavigationButton( { blockTypes, block, selectedBlock } ) {
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const blockType = blockTypes.find( ( { name } ) => name === block.name );
+	const isSelected =
+		selectedBlock && selectedBlock.clientId === block.clientId;
 	return (
-		<NavigatorButton
-			path={ `/block/${ block.clientId }` }
-			style={
-				selectedBlock && selectedBlock.clientId === block.clientId
-					? { color: 'var(--wp-admin-theme-color)' }
-					: {}
-			}
+		<Button
+			disabled={ isSelected }
+			style={ isSelected ? { color: 'var(--wp-admin-theme-color)' } : {} }
+			onClick={ () => selectBlock( block.clientId ) }
 		>
 			<HStack justify="flex-start">
 				<BlockIcon icon={ blockType.icon } />
 				<FlexItem>{ blockType.title }</FlexItem>
 			</HStack>
-		</NavigatorButton>
-	);
-}
-
-function BlockNavigatorScreen( { block } ) {
-	return (
-		<NavigatorScreen path={ `/block/${ block.clientId }` }>
-			<BlockInspectorSingleBlock
-				clientId={ block.clientId }
-				blockName={ block.name }
-				backButton={
-					<NavigatorBackButton
-						style={
-							// TODO: This style override is also used in ToolsPanelHeader.
-							// It should be supported out-of-the-box by Button.
-							{ minWidth: 24, padding: 0 }
-						}
-						icon={ isRTL() ? chevronRight : chevronLeft }
-						isSmall
-						aria-label={ __( 'Navigate to the previous view' ) }
-					/>
-				}
-			/>
-		</NavigatorScreen>
+		</Button>
 	);
 }
 
@@ -167,47 +112,31 @@ function BlockInspectorAbsorvedBy( { absorvedBy } ) {
 	const contentBlocks = useContentBlocks( blockTypes, block );
 	return (
 		<div className="block-editor-block-inspector">
-			<NavigatorProvider initialPath="/">
-				<BlockInspectorNavigationEffects>
-					<NavigatorScreen path="/">
-						<BlockCard { ...blockInformation } />
-						<BlockVariationTransforms
-							blockClientId={ absorvedBy }
-						/>
-						<VStack
-							spacing={ 1 }
-							padding={ 4 }
-							className="block-editor-block-inspector__block-buttons-container"
-						>
-							<h2 className="block-editor-block-card__title">
-								{ __( 'Content' ) }
-							</h2>
-							<BlockNavigationButton
-								selectedBlock={ selectedBlock }
-								block={ block }
-								blockTypes={ blockTypes }
-							/>
-							{ contentBlocks.map( ( contentBlock ) => (
-								<BlockNavigationButton
-									selectedBlock={ selectedBlock }
-									key={ contentBlock.clientId }
-									block={ contentBlock }
-									blockTypes={ blockTypes }
-								/>
-							) ) }
-						</VStack>
-					</NavigatorScreen>
-					<BlockNavigatorScreen block={ block } />
-					{ contentBlocks.map( ( contentBlock ) => {
-						return (
-							<BlockNavigatorScreen
-								key={ contentBlock.clientId }
-								block={ contentBlock }
-							/>
-						);
-					} ) }
-				</BlockInspectorNavigationEffects>
-			</NavigatorProvider>
+			<BlockCard { ...blockInformation } />
+			<BlockVariationTransforms blockClientId={ absorvedBy } />
+			<VStack
+				spacing={ 1 }
+				padding={ 4 }
+				className="block-editor-block-inspector__block-buttons-container"
+			>
+				<h2 className="block-editor-block-card__title">
+					{ __( 'Content' ) }
+				</h2>
+				<BlockNavigationButton
+					selectedBlock={ selectedBlock }
+					block={ block }
+					blockTypes={ blockTypes }
+				/>
+				{ contentBlocks.map( ( contentBlock ) => (
+					<BlockNavigationButton
+						selectedBlock={ selectedBlock }
+						key={ contentBlock.clientId }
+						d
+						block={ contentBlock }
+						blockTypes={ blockTypes }
+					/>
+				) ) }
+			</VStack>
 		</div>
 	);
 }
