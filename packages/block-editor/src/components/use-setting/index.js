@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, set } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -159,24 +159,6 @@ export default function useSetting( path ) {
 
 			// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
 			const settings = select( blockEditorStore ).getSettings();
-
-			// Mock settings in store
-			set(
-				settings,
-				`__experimentalFeatures.blocks.core/media-text.core/heading.color.palette.theme`,
-				[
-					{
-						slug: 'layer-accent-blue',
-						color: 'var(--wp--custom--layer--accent--blue)',
-						name: 'blue accent',
-					},
-					{
-						slug: 'layer-accent-orange',
-						color: 'var(--wp--custom--layer--accent--orange)',
-						name: 'orange accent',
-					},
-				]
-			);
 
 			// 2.1 Check for nested parent block settings
 			if ( result === undefined ) {
