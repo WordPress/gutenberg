@@ -58,6 +58,27 @@ class WP_Webfonts extends WP_Dependencies {
 	}
 
 	/**
+	 * Register a provider.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param string $provider_id The provider's unique ID.
+	 * @param string $class       The provider class name.
+	 * @return bool True if successfully registered, else false.
+	 */
+	public function register_provider( $provider_id, $class ) {
+		if ( empty( $provider_id ) || empty( $class ) || ! class_exists( $class ) ) {
+			return false;
+		}
+
+		$this->providers[ $provider_id ] = array(
+			'class' => $class,
+			'fonts' => array(),
+		);
+		return true;
+	}
+
+	/**
 	 * Get the list of all registered font families and their variations.
 	 *
 	 * @since X.X.X
@@ -518,26 +539,5 @@ class WP_Webfonts extends WP_Dependencies {
 				$this->to_do_keyed_handles[ $font_handle ]
 			);
 		}
-	}
-
-	/**
-	 * Register a provider.
-	 *
-	 * @since 6.0.0
-	 *
-	 * @param string $provider The provider name.
-	 * @param string $class    The provider class name.
-	 * @return bool True if successfully registered, else false.
-	 */
-	public function register_provider( $provider, $class ) {
-		if ( empty( $provider ) || empty( $class ) || ! class_exists( $class ) ) {
-			return false;
-		}
-
-		$this->providers[ $provider ] = array(
-			'class' => $class,
-			'fonts' => array(),
-		);
-		return true;
 	}
 }
