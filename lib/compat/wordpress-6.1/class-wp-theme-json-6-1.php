@@ -326,9 +326,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		'filter'     => array(
 			'duotone' => null,
 		),
-		'outline'     => array(
+		'outline'    => array(
 			'color'  => null,
-			'offset'  => null,
+			'offset' => null,
 			'style'  => null,
 			'width'  => null,
 		),
