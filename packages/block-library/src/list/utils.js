@@ -11,6 +11,7 @@ import { createBlock } from '@wordpress/blocks';
 export function createListBlockFromDOMElement( listElement ) {
 	const listAttributes = {
 		ordered: 'OL' === listElement.tagName,
+		anchor: listElement.id === '' ? undefined : listElement.id,
 		start: listElement.getAttribute( 'start' )
 			? parseInt( listElement.getAttribute( 'start' ), 10 )
 			: undefined,

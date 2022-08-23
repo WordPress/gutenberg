@@ -127,9 +127,9 @@ exports[`rawHandler should convert a caption shortcode with link 1`] = `
 
 exports[`rawHandler should convert a list with attributes 1`] = `
 "<!-- wp:list {\\"ordered\\":true,\\"type\\":\\"i\\",\\"start\\":2,\\"reversed\\":true} -->
-<ol reversed start=\\"2\\" type=\\"i\\"><!-- wp:list-item -->
+<ol type=\\"i\\" reversed start=\\"2\\"><!-- wp:list-item -->
 <li>1<!-- wp:list {\\"ordered\\":true,\\"type\\":\\"i\\",\\"start\\":2,\\"reversed\\":true} -->
-<ol reversed start=\\"2\\" type=\\"i\\"><!-- wp:list-item -->
+<ol type=\\"i\\" reversed start=\\"2\\"><!-- wp:list-item -->
 <li>1</li>
 <!-- /wp:list-item --></ol>
 <!-- /wp:list --></li>
