@@ -48,7 +48,6 @@ const wrapperMargin = ( { marks, __nextHasNoMarginBottom }: WrapperProps ) => {
 };
 
 export const Wrapper = styled.div< WrapperProps >`
-	color: ${ COLORS.blue.medium.focus };
 	display: block;
 	flex: 1;
 	position: relative;
