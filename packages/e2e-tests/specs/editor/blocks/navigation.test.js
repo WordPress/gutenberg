@@ -1681,10 +1681,7 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			);
 		} );
 
-		// Skip reason: running it in interactive works but selecting and
-		// checking for focus consistently fails in the test.
-		// eslint-disable-next-line jest/no-disabled-tests
-		it.skip( 'should always focus select menu button after item selection', async () => {
+		it( 'should always focus select menu button after item selection', async () => {
 			// Create some navigation menus to work with.
 			await createNavigationMenu( {
 				title: 'First navigation',
@@ -1712,7 +1709,7 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			const theOption = await page.waitForXPath(
 				"//button[@aria-checked='false'][contains(., 'First navigation')]"
 			);
-			theOption.click();
+			await theOption.click();
 
 			// Once the options are closed, does select menu button receive focus?
 			const selectMenuDropdown2 = await page.$(
