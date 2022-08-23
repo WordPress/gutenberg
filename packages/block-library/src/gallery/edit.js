@@ -51,7 +51,6 @@ import {
 	LINK_DESTINATION_NONE,
 } from './constants';
 import useImageSizes from './use-image-sizes';
-import useShortCodeTransform from './use-short-code-transform';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
 import GapStyles from './gap-styles';
@@ -87,14 +86,7 @@ function GalleryEdit( props ) {
 		insertBlocksAfter,
 	} = props;
 
-	const {
-		columns,
-		imageCrop,
-		linkTarget,
-		linkTo,
-		shortCodeTransforms,
-		sizeSlug,
-	} = attributes;
+	const { columns, imageCrop, linkTarget, linkTo, sizeSlug } = attributes;
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
@@ -151,6 +143,8 @@ function GalleryEdit( props ) {
 
 	useEffect( () => {
 		newImages?.forEach( ( newImage ) => {
+			// Update the images data without creating new undo levels.
+			__unstableMarkNextChangeAsNotPersistent();
 			updateBlockAttributes( newImage.clientId, {
 				...buildImageAttributes( newImage.attributes ),
 				id: newImage.id,
@@ -161,16 +155,6 @@ function GalleryEdit( props ) {
 			clearSelectedBlock();
 		}
 	}, [ newImages ] );
-
-	const shortCodeImages = useShortCodeTransform( shortCodeTransforms );
-
-	useEffect( () => {
-		if ( ! shortCodeTransforms || ! shortCodeImages ) {
-			return;
-		}
-		updateImages( shortCodeImages );
-		setAttributes( { shortCodeTransforms: undefined } );
-	}, [ shortCodeTransforms, shortCodeImages ] );
 
 	const imageSizeOptions = useImageSizes(
 		imageData,
@@ -203,13 +187,34 @@ function GalleryEdit( props ) {
 				? `is-style-${ preferredStyle }`
 				: undefined;
 		}
+
+		let newLinkTarget;
+		if ( imageAttributes.linkTarget || imageAttributes.rel ) {
+			// When transformed from image blocks, the link destination and rel attributes are inherited.
+			newLinkTarget = {
+				linkTarget: imageAttributes.linkTarget,
+				rel: imageAttributes.rel,
+			};
+		} else {
+			// When an image is added, update the link destination and rel attributes according to the gallery settings
+			newLinkTarget = getUpdatedLinkTargetSettings(
+				linkTarget,
+				attributes
+			);
+		}
+
 		return {
 			...pickRelevantMediaFiles( image, sizeSlug ),
-			...getHrefAndDestination( image, linkTo ),
-			...getUpdatedLinkTargetSettings( linkTarget, attributes ),
+			...getHrefAndDestination(
+				image,
+				linkTo,
+				imageAttributes?.linkDestination
+			),
+			...newLinkTarget,
 			className: newClassName,
-			caption: imageAttributes.caption,
 			sizeSlug,
+			caption: imageAttributes.caption || image.caption?.raw,
+			alt: imageAttributes.alt || image.alt_text,
 		};
 	}
 
@@ -429,8 +434,10 @@ function GalleryEdit( props ) {
 
 	const hasImages = !! images.length;
 	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
-	const imagesUploading = images.some(
-		( img ) => ! img.id && img.url?.indexOf( 'blob:' ) === 0
+	const imagesUploading = images.some( ( img ) =>
+		! Platform.isNative
+			? ! img.id && img.url?.indexOf( 'blob:' ) === 0
+			: img.url?.indexOf( 'file:' ) === 0
 	);
 
 	// MediaPlaceholder props are different between web and native hence, we provide a platform-specific set.
@@ -547,7 +554,9 @@ function GalleryEdit( props ) {
 					onSelect={ updateImages }
 					name={ __( 'Add' ) }
 					multiple={ true }
-					mediaIds={ images.map( ( image ) => image.id ) }
+					mediaIds={ images
+						.filter( ( image ) => image.id )
+						.map( ( image ) => image.id ) }
 					addToGallery={ hasImageIds }
 				/>
 			</BlockControls>

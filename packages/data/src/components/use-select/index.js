@@ -7,7 +7,13 @@ import { useMemoOne } from 'use-memo-one';
  * WordPress dependencies
  */
 import { createQueue } from '@wordpress/priority-queue';
-import { useRef, useCallback, useMemo, useReducer } from '@wordpress/element';
+import {
+	useRef,
+	useCallback,
+	useMemo,
+	useReducer,
+	useDebugValue,
+} from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 
@@ -54,10 +60,11 @@ const renderQueue = createQueue();
  * @example
  * ```js
  * import { useSelect } from '@wordpress/data';
+ * import { store as myCustomStore } from 'my-custom-store';
  *
  * function HammerPriceDisplay( { currency } ) {
  *   const price = useSelect( ( select ) => {
- *     return select( 'my-shop' ).getPrice( 'hammer', currency )
+ *     return select( myCustomStore ).getPrice( 'hammer', currency );
  *   }, [ currency ] );
  *   return new Intl.NumberFormat( 'en-US', {
  *     style: 'currency',
@@ -84,9 +91,10 @@ const renderQueue = createQueue();
  *
  * ```js
  * import { useSelect } from '@wordpress/data';
+ * import { store as myCustomStore } from 'my-custom-store';
  *
  * function Paste( { children } ) {
- *   const { getSettings } = useSelect( 'my-shop' );
+ *   const { getSettings } = useSelect( myCustomStore );
  *   function onPaste() {
  *     // Do something with the settings.
  *     const settings = getSettings();
@@ -245,6 +253,8 @@ export default function useSelect( mapSelect, deps ) {
 		// We're passing these in from the calling function and want to make sure we're
 		// examining every individual value inside the `deps` array.
 	}, [ registry, wrapSelect, hasMappingFunction, depsChangedFlag ] );
+
+	useDebugValue( mapOutput );
 
 	return hasMappingFunction ? mapOutput : registry.select( mapSelect );
 }

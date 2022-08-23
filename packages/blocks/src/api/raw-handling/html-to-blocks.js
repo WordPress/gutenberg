@@ -10,11 +10,13 @@ import { getRawTransforms } from './get-raw-transforms';
  * top-level tag. The HTML should be filtered to not have any text between
  * top-level tags and formatted in a way that blocks can handle the HTML.
  *
- * @param {string} html HTML to convert.
+ * @param {string}   html    HTML to convert.
+ * @param {Function} handler The handler calling htmlToBlocks: either rawHandler
+ *                           or pasteHandler.
  *
  * @return {Array} An array of blocks.
  */
-export function htmlToBlocks( html ) {
+export function htmlToBlocks( html, handler ) {
 	const doc = document.implementation.createHTMLDocument( '' );
 
 	doc.body.innerHTML = html;
@@ -36,7 +38,7 @@ export function htmlToBlocks( html ) {
 		const { transform, blockName } = rawTransform;
 
 		if ( transform ) {
-			return transform( node );
+			return transform( node, handler );
 		}
 
 		return createBlock(

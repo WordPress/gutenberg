@@ -20,6 +20,7 @@ export const TooltipContent = css`
 	outline: none;
 	transform-origin: top center;
 	transition: opacity ${ CONFIG.transitionDurationFastest } ease;
+	font-size: ${ CONFIG.fontSize };
 
 	&[data-enter] {
 		opacity: 1;

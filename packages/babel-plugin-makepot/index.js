@@ -33,16 +33,7 @@
  */
 
 const { po } = require( 'gettext-parser' );
-const {
-	pick,
-	reduce,
-	uniq,
-	forEach,
-	sortBy,
-	isEqual,
-	merge,
-	isEmpty,
-} = require( 'lodash' );
+const { pick, reduce, forEach, isEqual, merge, isEmpty } = require( 'lodash' );
 const { relative, sep } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
@@ -197,6 +188,20 @@ function isSameTranslation( a, b ) {
 	);
 }
 
+/**
+ * Sorts multiple translation objects by their reference.
+ * The reference is where they occur, in the format `file:line`.
+ *
+ * @param {Array} translations Array of translations to sort.
+ *
+ * @return {Array} Sorted translations.
+ */
+function sortByReference( translations = [] ) {
+	return [ ...translations ].sort( ( a, b ) =>
+		a.comments.reference.localeCompare( b.comments.reference )
+	);
+}
+
 module.exports = () => {
 	const strings = {};
 	let nplurals = 2,
@@ -324,9 +329,8 @@ module.exports = () => {
 						( memo, file ) => {
 							for ( const context in strings[ file ] ) {
 								// Within the same file, sort translations by line.
-								const sortedTranslations = sortBy(
-									strings[ file ][ context ],
-									'comments.reference'
+								const sortedTranslations = sortByReference(
+									strings[ file ][ context ]
 								);
 
 								forEach(
@@ -347,8 +351,8 @@ module.exports = () => {
 												memo[ msgctxt ][ msgid ]
 											)
 										) {
-											translation.comments.reference =
-												uniq(
+											translation.comments.reference = [
+												...new Set(
 													[
 														memo[ msgctxt ][ msgid ]
 															.comments.reference,
@@ -357,7 +361,8 @@ module.exports = () => {
 													]
 														.join( '\n' )
 														.split( '\n' )
-												).join( '\n' );
+												),
+											].join( '\n' );
 										}
 
 										memo[ msgctxt ][ msgid ] = translation;

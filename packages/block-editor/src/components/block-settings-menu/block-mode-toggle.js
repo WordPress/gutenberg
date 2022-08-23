@@ -22,6 +22,7 @@ export function BlockModeToggle( {
 	isCodeEditingEnabled = true,
 } ) {
 	if (
+		! blockType ||
 		! hasBlockSupport( blockType, 'html', true ) ||
 		! isCodeEditingEnabled
 	) {

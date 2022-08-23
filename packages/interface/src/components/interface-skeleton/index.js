@@ -6,9 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-/**
- * WordPress dependencies
- */
 import { forwardRef, useEffect } from '@wordpress/element';
 import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';

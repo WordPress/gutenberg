@@ -32,19 +32,26 @@ function Example() {
 
 Adjusts all margins on the inline dimension.
 
-- Required: No
-
-### `marginStart`: `number`
-
-Adjusts the inline-start margin.
-
-- Required: No
+-   Required: No
 
 ### `marginEnd`: `number`
 
 Adjusts the inline-end margin.
 
-- Required: No
+-   Required: No
+
+### `marginStart`: `number`
+
+Adjusts the inline-start margin.
+
+-   Required: No
+
+### `orientation`: `horizontal | vertical`
+
+Divider's orientation. When using inside a flex container, you may need to make sure the divider is `stretch` aligned in order for it to be visible.
+
+-   Required: No
+-   Default: `horizontal`
 
 ### Inherited props
 

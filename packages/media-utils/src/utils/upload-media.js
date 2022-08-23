@@ -1,20 +1,4 @@
 /**
- * External dependencies
- */
-import {
-	compact,
-	flatMap,
-	forEach,
-	get,
-	has,
-	includes,
-	map,
-	omit,
-	some,
-	startsWith,
-} from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
@@ -40,14 +24,18 @@ export function getMimeTypesArray( wpMimeTypesObject ) {
 	if ( ! wpMimeTypesObject ) {
 		return wpMimeTypesObject;
 	}
-	return flatMap( wpMimeTypesObject, ( mime, extensionsString ) => {
-		const [ type ] = mime.split( '/' );
-		const extensions = extensionsString.split( '|' );
-		return [
-			mime,
-			...map( extensions, ( extension ) => `${ type }/${ extension }` ),
-		];
-	} );
+	return Object.entries( wpMimeTypesObject )
+		.map( ( [ extensionsString, mime ] ) => {
+			const [ type ] = mime.split( '/' );
+			const extensions = extensionsString.split( '|' );
+			return [
+				mime,
+				...extensions.map(
+					( extension ) => `${ type }/${ extension }`
+				),
+			];
+		} )
+		.flat();
 }
 
 /**
@@ -79,9 +67,9 @@ export async function uploadMedia( {
 
 	const filesSet = [];
 	const setAndUpdateFiles = ( idx, value ) => {
-		revokeBlobURL( get( filesSet, [ idx, 'url' ] ) );
+		revokeBlobURL( filesSet[ idx ]?.url );
 		filesSet[ idx ] = value;
-		onFileChange( compact( filesSet ) );
+		onFileChange( filesSet.filter( Boolean ) );
 	};
 
 	// Allowed type specified by consumer.
@@ -89,20 +77,20 @@ export async function uploadMedia( {
 		if ( ! allowedTypes ) {
 			return true;
 		}
-		return some( allowedTypes, ( allowedType ) => {
+		return allowedTypes.some( ( allowedType ) => {
 			// If a complete mimetype is specified verify if it matches exactly the mime type of the file.
-			if ( includes( allowedType, '/' ) ) {
+			if ( allowedType.includes( '/' ) ) {
 				return allowedType === fileType;
 			}
 			// Otherwise a general mime type is used and we should verify if the file mimetype starts with it.
-			return startsWith( fileType, `${ allowedType }/` );
+			return fileType.startsWith( `${ allowedType }/` );
 		} );
 	};
 
 	// Allowed types for the current WP_User.
 	const allowedMimeTypesForUser = getMimeTypesArray( wpAllowedMimeTypes );
 	const isAllowedMimeTypeForUser = ( fileType ) => {
-		return includes( allowedMimeTypesForUser, fileType );
+		return allowedMimeTypesForUser.includes( fileType );
 	};
 
 	const validFiles = [];
@@ -189,10 +177,12 @@ export async function uploadMedia( {
 				mediaFile,
 				additionalData
 			);
+			// eslint-disable-next-line camelcase
+			const { alt_text, source_url, ...savedMediaProps } = savedMedia;
 			const mediaObject = {
-				...omit( savedMedia, [ 'alt_text', 'source_url' ] ),
+				...savedMediaProps,
 				alt: savedMedia.alt_text,
-				caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
+				caption: savedMedia.caption?.raw ?? '',
 				title: savedMedia.title.raw,
 				url: savedMedia.source_url,
 			};
@@ -201,8 +191,8 @@ export async function uploadMedia( {
 			// Reset to empty on failure.
 			setAndUpdateFiles( idx, null );
 			let message;
-			if ( has( error, [ 'message' ] ) ) {
-				message = get( error, [ 'message' ] );
+			if ( error.message ) {
+				message = error.message;
 			} else {
 				message = sprintf(
 					// translators: %s: file name
@@ -229,7 +219,11 @@ function createMediaFromFile( file, additionalData ) {
 	// Create upload payload.
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
-	forEach( additionalData, ( value, key ) => data.append( key, value ) );
+	if ( additionalData ) {
+		Object.entries( additionalData ).forEach( ( [ key, value ] ) =>
+			data.append( key, value )
+		);
+	}
 	return apiFetch( {
 		path: '/wp/v2/media',
 		body: data,

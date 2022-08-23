@@ -657,15 +657,6 @@ export class RichText extends Component {
 			return;
 		}
 
-		// Check for and discard events during quick typing. Updating the selection during quick typing isn't
-		// necessary and can cause UI lags. (see https://github.com/WordPress/gutenberg/pull/41682.)
-		if (
-			contentWithoutRootTag !== this.value &&
-			this.lastAztecEventType === 'selection change'
-		) {
-			return;
-		}
-
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = true; // Selection change event always fires after the fact.
 
@@ -1057,6 +1048,7 @@ export class RichText extends Component {
 			selectionStart,
 			selectionEnd,
 			disableSuggestions,
+			containerWidth,
 		} = this.props;
 		const { currentFontSize } = this.state;
 
@@ -1133,11 +1125,16 @@ export class RichText extends Component {
 			maxWidth && this.state.width && maxWidth - this.state.width < 10
 				? maxWidth
 				: this.state.width;
-		const containerStyles = style?.padding &&
-			style?.backgroundColor && {
-				padding: style.padding,
-				backgroundColor: style.backgroundColor,
-			};
+		const containerStyles = [
+			style?.padding &&
+				style?.backgroundColor && {
+					padding: style.padding,
+					backgroundColor: style.backgroundColor,
+				},
+			containerWidth && {
+				width: containerWidth,
+			},
+		];
 
 		const EditableView = ( props ) => {
 			this.customEditableOnKeyDown = props?.onKeyDown;

@@ -16,14 +16,14 @@
  * @return float      Value in the range [0,1].
  */
 function gutenberg_tinycolor_bound01( $n, $max ) {
-	if ( 'string' === gettype( $n ) && false !== strpos( $n, '.' ) && 1 === (float) $n ) {
+	if ( 'string' === gettype( $n ) && str_contains( $n, '.' ) && 1 === (float) $n ) {
 		$n = '100%';
 	}
 
 	$n = min( $max, max( 0, (float) $n ) );
 
 	// Automatically convert percentage into number.
-	if ( 'string' === gettype( $n ) && false !== strpos( $n, '%' ) ) {
+	if ( 'string' === gettype( $n ) && str_contains( $n, '%' ) ) {
 		$n = (int) ( $n * $max ) / 100;
 	}
 
@@ -390,7 +390,7 @@ function gutenberg_get_duotone_filter_svg( $preset ) {
 	if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
 		// Clean up the whitespace.
 		$svg = preg_replace( "/[\r\n\t ]+/", ' ', $svg );
-		$svg = preg_replace( '/> </', '><', $svg );
+		$svg = str_replace( '> <', '><', $svg );
 		$svg = trim( $svg );
 	}
 

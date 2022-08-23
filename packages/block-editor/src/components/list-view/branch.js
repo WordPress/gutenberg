@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { compact } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { memo } from '@wordpress/element';
@@ -95,7 +90,7 @@ function ListViewBranch( props ) {
 
 	const { expandedState, draggedClientIds } = useListViewContext();
 
-	const filteredBlocks = compact( blocks );
+	const filteredBlocks = blocks.filter( Boolean );
 	const blockCount = filteredBlocks.length;
 	let nextPosition = listPosition;
 

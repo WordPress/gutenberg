@@ -28,6 +28,17 @@ Setting that enables the following UI tools:
 
 ---
 
+### useRootPaddingAwareAlignments
+
+_**Note:** Since WordPress 6.1._
+
+Enables root padding (the values from `styles.spacing.padding`) to be applied to the contents of full-width blocks instead of the root block.
+
+Please note that when using this setting, `styles.spacing.padding` should always be set as an object with `top`, `right`, `bottom`, `left` values declared separately.
+
+
+---
+
 ### border
 
 Settings related to borders.
@@ -83,6 +94,9 @@ Settings related to spacing.
 | margin | boolean | false |  |
 | padding | boolean | false |  |
 | units | array | px,em,rem,vh,vw,% |  |
+| customSpacingSize | boolean | true |  |
+| spacingSizes | array |  | name, size, slug |
+| spacingScale | object |  |  |
 
 ---
 
@@ -95,12 +109,13 @@ Settings related to typography.
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
+| fluid | boolean |  |  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
 | textDecoration | boolean | true |  |
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
-| fontSizes | array |  | name, size, slug |
+| fontSizes | array |  | fluid, name, size, slug |
 | fontFamilies | array |  | fontFace, fontFamily, name, slug |
 
 ---

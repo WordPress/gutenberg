@@ -1,15 +1,7 @@
 /**
  * External dependencies
  */
-const {
-	countBy,
-	groupBy,
-	escapeRegExp,
-	uniq,
-	flow,
-	sortBy,
-	uniqBy,
-} = require( 'lodash' );
+const { groupBy, escapeRegExp, flow } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
@@ -90,7 +82,7 @@ const LABEL_TYPE_MAPPING = {
 	'[Type] Enhancement': 'Enhancements',
 	'[Type] New API': 'New APIs',
 	'[Type] Performance': 'Performance',
-	'[Type] Documentation': 'Documentation',
+	'[Type] Developer Documentation': 'Documentation',
 	'[Type] Code Quality': 'Code Quality',
 	'[Type] Security': 'Security',
 };
@@ -144,7 +136,7 @@ const LABEL_FEATURE_MAPPING = {
 	'Automated Testing': 'Testing',
 	'CSS Styling': 'CSS & Styling',
 	'developer-docs': 'Documentation',
-	'[Type] Documentation': 'Documentation',
+	'[Type] Developer Documentation': 'Documentation',
 	'Global Styles': 'Global Styles',
 	'[Type] Build Tooling': 'Build Tooling',
 	'npm Packages': 'npm Packages',
@@ -202,13 +194,15 @@ const REWORD_TERMS = {
  * @return {string[]} Type candidates.
  */
 function getTypesByLabels( labels ) {
-	return uniq(
-		labels
-			.filter( ( label ) =>
-				Object.keys( LABEL_TYPE_MAPPING ).includes( label )
-			)
-			.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
-	);
+	return [
+		...new Set(
+			labels
+				.filter( ( label ) =>
+					Object.keys( LABEL_TYPE_MAPPING ).includes( label )
+				)
+				.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
+		),
+	];
 }
 
 /**
@@ -309,7 +303,17 @@ function getIssueFeature( issue ) {
 	// 1. Prefer explicit mapping of label to feature.
 	if ( featureCandidates.length ) {
 		// Get occurances of the feature labels.
-		const featureCounts = countBy( featureCandidates );
+		const featureCounts = featureCandidates.reduce(
+			/**
+			 * @param {Record<string,number>} acc     Accumulator
+			 * @param {string}                feature Feature label
+			 */
+			( acc, feature ) => ( {
+				...acc,
+				[ feature ]: ( acc[ feature ] || 0 ) + 1,
+			} ),
+			{}
+		);
 
 		// Check which matching label occurs most often.
 		const rankedFeatures = Object.keys( featureCounts ).sort(
@@ -819,7 +823,9 @@ function getContributorPropsMarkdownList( ftcPRs ) {
  * @return {IssuesListForRepoResponseItem[]} The sorted list of pull requests.
  */
 function sortByUsername( items ) {
-	return sortBy( items, ( item ) => item.user.login.toLowerCase() );
+	return [ ...items ].sort( ( a, b ) =>
+		a.user.login.toLowerCase().localeCompare( b.user.login.toLowerCase() )
+	);
 }
 
 /**
@@ -829,7 +835,17 @@ function sortByUsername( items ) {
  * @return {IssuesListForRepoResponseItem[]} The list of pull requests unique per user.
  */
 function getUniqueByUsername( items ) {
-	return uniqBy( items, ( item ) => item.user.login );
+	/**
+	 * @type {IssuesListForRepoResponseItem[]} List of pull requests.
+	 */
+	const EMPTY_PR_LIST = [];
+
+	return items.reduce( ( acc, item ) => {
+		if ( ! acc.some( ( i ) => i.user.login === item.user.login ) ) {
+			acc.push( item );
+		}
+		return acc;
+	}, EMPTY_PR_LIST );
 }
 
 /**

@@ -8,9 +8,7 @@ import {
 	some,
 	filter,
 	first,
-	flatMap,
 	has,
-	uniq,
 	isEmpty,
 	map,
 } from 'lodash';
@@ -211,6 +209,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	// a Grouping block.
 	if (
 		! isMultiBlock &&
+		direction === 'from' &&
 		isContainerGroupBlock( sourceBlock.name ) &&
 		isContainerGroupBlock( transform.blockName )
 	) {
@@ -293,10 +292,9 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 	} );
 
 	// Build a list of block names using the possible 'to' transforms.
-	const blockNames = flatMap(
-		possibleTransforms,
-		( transformation ) => transformation.blocks
-	);
+	const blockNames = possibleTransforms
+		.map( ( transformation ) => transformation.blocks )
+		.flat();
 
 	// Map block names to block types.
 	return blockNames.map( ( name ) =>
@@ -349,10 +347,12 @@ export function getPossibleBlockTransformations( blocks ) {
 	const blockTypesForToTransforms =
 		getBlockTypesForPossibleToTransforms( blocks );
 
-	return uniq( [
-		...blockTypesForFromTransforms,
-		...blockTypesForToTransforms,
-	] );
+	return [
+		...new Set( [
+			...blockTypesForFromTransforms,
+			...blockTypesForToTransforms,
+		] ),
+	];
 }
 
 /**
@@ -402,9 +402,9 @@ export function findTransform( transforms, predicate ) {
 export function getBlockTransforms( direction, blockTypeOrName ) {
 	// When retrieving transforms for all block types, recurse into self.
 	if ( blockTypeOrName === undefined ) {
-		return flatMap( getBlockTypes(), ( { name } ) =>
-			getBlockTransforms( direction, name )
-		);
+		return getBlockTypes()
+			.map( ( { name } ) => getBlockTransforms( direction, name ) )
+			.flat();
 	}
 
 	// Validate that block type exists and has array of direction.
@@ -492,8 +492,7 @@ export function switchToBlockType( blocks, name ) {
 			transformationsTo,
 			( t ) =>
 				t.type === 'block' &&
-				( isWildcardBlockTransform( t ) ||
-					t.blocks.indexOf( name ) !== -1 ) &&
+				t.blocks.indexOf( name ) !== -1 &&
 				( ! isMultiBlock || t.isMultiBlock ) &&
 				maybeCheckTransformIsMatch( t, blocksArray )
 		) ||
@@ -557,9 +556,16 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
-	const hasSwitchedBlock =
-		name === '*' ||
-		some( transformationResults, ( result ) => result.name === name );
+	// When unwrapping blocks (`switchToBlockType( wrapperblocks, '*' )`), do
+	// not run filters on the unwrapped blocks. They shoud remain as they are.
+	if ( name === '*' ) {
+		return transformationResults;
+	}
+
+	const hasSwitchedBlock = some(
+		transformationResults,
+		( result ) => result.name === name
+	);
 
 	// Ensure that at least one block object returned by the transformation has
 	// the expected "destination" block type.

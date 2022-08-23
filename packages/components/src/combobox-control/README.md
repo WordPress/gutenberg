@@ -116,6 +116,13 @@ The current value of the input.
 -   Type: `mixed`
 -   Required: Yes
 
+#### __experimentalRenderItem
+
+Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
+
+-   Type: `Function` - `( args: { item: object } ) => ReactNode`
+-   Required: No
+
 ## Related components
 
 -   Like this component, but without a search input, the `CustomSelectControl` component.

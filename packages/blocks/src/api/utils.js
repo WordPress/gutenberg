@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, has, isString, reduce, maxBy } from 'lodash';
+import { every, has, reduce } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -75,7 +75,7 @@ export function isUnmodifiedDefaultBlock( block ) {
 export function isValidIcon( icon ) {
 	return (
 		!! icon &&
-		( isString( icon ) ||
+		( typeof icon === 'string' ||
 			isValidElement( icon ) ||
 			typeof icon === 'function' ||
 			icon instanceof Component )
@@ -101,13 +101,17 @@ export function normalizeIconObject( icon ) {
 
 	if ( has( icon, [ 'background' ] ) ) {
 		const colordBgColor = colord( icon.background );
+		const getColorContrast = ( iconColor ) =>
+			colordBgColor.contrast( iconColor );
+		const maxContrast = Math.max( ...ICON_COLORS.map( getColorContrast ) );
 
 		return {
 			...icon,
 			foreground: icon.foreground
 				? icon.foreground
-				: maxBy( ICON_COLORS, ( iconColor ) =>
-						colordBgColor.contrast( iconColor )
+				: ICON_COLORS.find(
+						( iconColor ) =>
+							getColorContrast( iconColor ) === maxContrast
 				  ),
 			shadowColor: colordBgColor.alpha( 0.3 ).toRgbString(),
 		};
@@ -126,7 +130,7 @@ export function normalizeIconObject( icon ) {
  * @return {?Object} Block type.
  */
 export function normalizeBlockType( blockTypeOrName ) {
-	if ( isString( blockTypeOrName ) ) {
+	if ( typeof blockTypeOrName === 'string' ) {
 		return getBlockType( blockTypeOrName );
 	}
 
@@ -161,7 +165,7 @@ export function getBlockLabel( blockType, attributes, context = 'visual' ) {
  * than the visual label and includes the block title and the value of the
  * `getLabel` function if it's specified.
  *
- * @param {Object}  blockType              The block type.
+ * @param {?Object} blockType              The block type.
  * @param {Object}  attributes             The values of the block's attributes.
  * @param {?number} position               The position of the block in the block list.
  * @param {string}  [direction='vertical'] The direction of the block layout.

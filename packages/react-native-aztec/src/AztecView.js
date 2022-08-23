@@ -143,7 +143,7 @@ class AztecView extends Component {
 	}
 
 	_onChange( event ) {
-		// iOS uses the the onKeyDown prop directly from native only when one of the triggerKeyCodes is entered, but
+		// iOS uses the onKeyDown prop directly from native only when one of the triggerKeyCodes is entered, but
 		// Android includes the information needed for onKeyDown in the event passed to onChange.
 		if ( Platform.OS === 'android' ) {
 			const triggersIncludeEventKeyCode =

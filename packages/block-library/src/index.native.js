@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { Platform } from 'react-native';
-import { sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -41,6 +40,7 @@ import * as mediaText from './media-text';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
+import * as listItem from './list-item';
 import * as missing from './missing';
 import * as more from './more';
 import * as nextpage from './nextpage';
@@ -75,6 +75,7 @@ export const coreBlocks = [
 	heading,
 	gallery,
 	list,
+	listItem,
 	quote,
 
 	// Register all remaining core blocks.
@@ -159,16 +160,22 @@ export const registerBlock = ( block ) => {
 const registerBlockVariations = ( block ) => {
 	const { metadata, settings, name } = block;
 
-	sortBy( settings.variations, 'title' ).forEach( ( v ) => {
-		registerBlockType( `${ name }-${ v.name }`, {
-			...metadata,
-			name: `${ name }-${ v.name }`,
-			...settings,
-			icon: v.icon(),
-			title: v.title,
-			variations: [],
+	if ( ! settings.variations ) {
+		return;
+	}
+
+	[ ...settings.variations ]
+		.sort( ( a, b ) => a.title.localeCompare( b.title ) )
+		.forEach( ( v ) => {
+			registerBlockType( `${ name }-${ v.name }`, {
+				...metadata,
+				name: `${ name }-${ v.name }`,
+				...settings,
+				icon: v.icon(),
+				title: v.title,
+				variations: [],
+			} );
 		} );
-	} );
 };
 
 // Only enable code block for development
@@ -179,12 +186,12 @@ const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 const iOSOnly = ( block ) =>
 	Platform.OS === 'ios' ? block : devOnly( block );
 
-// To be removed once Quote V2 is released on the web editor.
-function quoteCheck( quoteBlock, blocksFlags ) {
-	if ( blocksFlags?.__experimentalEnableQuoteBlockV2 ) {
-		quoteBlock.settings = quoteBlock?.settingsV2;
+// To be removed once List V2 is released on the web editor.
+function listCheck( listBlock, blocksFlags ) {
+	if ( blocksFlags?.__experimentalEnableListBlockV2 ) {
+		listBlock.settings = listBlock?.settingsV2;
 	}
-	return quoteBlock;
+	return listBlock;
 }
 
 // Hide the Classic block and SocialLink block
@@ -240,6 +247,7 @@ addFilter(
  * ```
  * @param {Object} [blocksFlags] Experimental flags
  *
+ *
  */
 export const registerCoreBlocks = ( blocksFlags ) => {
 	// When adding new blocks to this list please also consider updating /src/block-support/supported-blocks.json in the Gutenberg-Mobile repo
@@ -253,8 +261,9 @@ export const registerCoreBlocks = ( blocksFlags ) => {
 		video,
 		nextpage,
 		separator,
-		list,
-		quoteCheck( quote, blocksFlags ),
+		listCheck( list, blocksFlags ),
+		listItem,
+		quote,
 		mediaText,
 		preformatted,
 		gallery,

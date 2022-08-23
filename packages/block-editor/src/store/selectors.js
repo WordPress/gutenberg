@@ -4,14 +4,12 @@
 import {
 	castArray,
 	first,
-	isBoolean,
 	last,
 	map,
 	reduce,
 	some,
 	find,
 	filter,
-	mapKeys,
 	orderBy,
 } from 'lodash';
 import createSelector from 'rememo';
@@ -1382,7 +1380,7 @@ export function getBlockInsertionPoint( state ) {
 
 	if ( clientId ) {
 		rootClientId = getBlockRootClientId( state, clientId ) || undefined;
-		index = getBlockIndex( state, selectionEnd.clientId, rootClientId ) + 1;
+		index = getBlockIndex( state, selectionEnd.clientId ) + 1;
 	} else {
 		index = getBlockOrder( state ).length;
 	}
@@ -1445,7 +1443,7 @@ export function getTemplateLock( state, rootClientId ) {
 }
 
 const checkAllowList = ( list, item, defaultResult = null ) => {
-	if ( isBoolean( list ) ) {
+	if ( typeof list === 'boolean' ) {
 		return list;
 	}
 	if ( Array.isArray( list ) ) {
@@ -2079,9 +2077,11 @@ export const getBlockTransformItems = createSelector(
 			)
 			.map( buildBlockTypeTransformItem );
 
-		const itemsByName = mapKeys(
-			blockTypeTransformItems,
-			( { name } ) => name
+		const itemsByName = Object.fromEntries(
+			Object.entries( blockTypeTransformItems ).map( ( [ , value ] ) => [
+				value.name,
+				value,
+			] )
 		);
 
 		// Consider unwraping the highest priority.
@@ -2218,7 +2218,7 @@ export const __experimentalGetDirectInsertBlock = createSelector(
 );
 
 const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
-	if ( isBoolean( allowedBlockTypes ) ) {
+	if ( typeof allowedBlockTypes === 'boolean' ) {
 		return allowedBlockTypes;
 	}
 

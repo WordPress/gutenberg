@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { identity } from 'lodash';
 import { View, Platform, TouchableWithoutFeedback } from 'react-native';
 
 /**
@@ -35,6 +34,7 @@ import { BlockDraggableWrapper } from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
 
 export const OnCaretVerticalPositionChange = createContext();
+const identity = ( x ) => x;
 
 const stylesMemo = {};
 const getStyles = (
@@ -469,7 +469,7 @@ class EmptyListComponent extends Component {
 			renderFooterAppender,
 		} = this.props;
 
-		if ( renderFooterAppender ) {
+		if ( renderFooterAppender || renderAppender === false ) {
 			return null;
 		}
 

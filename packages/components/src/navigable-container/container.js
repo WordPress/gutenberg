@@ -1,10 +1,5 @@
 // @ts-nocheck
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component, forwardRef } from '@wordpress/element';
@@ -131,20 +126,19 @@ class NavigableContainer extends Component {
 	}
 
 	render() {
-		const { children, ...props } = this.props;
+		const {
+			children,
+			stopNavigationEvents,
+			eventToOffset,
+			onNavigate,
+			onKeyDown,
+			cycle,
+			onlyBrowserTabstops,
+			forwardedRef,
+			...restProps
+		} = this.props;
 		return (
-			<div
-				ref={ this.bindContainer }
-				{ ...omit( props, [
-					'stopNavigationEvents',
-					'eventToOffset',
-					'onNavigate',
-					'onKeyDown',
-					'cycle',
-					'onlyBrowserTabstops',
-					'forwardedRef',
-				] ) }
-			>
+			<div ref={ this.bindContainer } { ...restProps }>
 				{ children }
 			</div>
 		);

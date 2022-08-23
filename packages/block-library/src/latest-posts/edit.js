@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, includes, invoke, pickBy } from 'lodash';
+import { get, includes, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -432,11 +432,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			</BlockControls>
 			<ul { ...blockProps }>
 				{ displayPosts.map( ( post, i ) => {
-					const titleTrimmed = invoke( post, [
-						'title',
-						'rendered',
-						'trim',
-					] );
+					const titleTrimmed = post.title.rendered.trim();
 					let excerpt = post.excerpt.rendered;
 					const currentAuthor = authorList?.find(
 						( author ) => author.id === post.author

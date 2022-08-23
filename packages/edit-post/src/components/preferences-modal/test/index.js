@@ -21,13 +21,13 @@ jest.mock( '@wordpress/compose/src/hooks/use-viewport-match', () => jest.fn() );
 describe( 'EditPostPreferencesModal', () => {
 	describe( 'should match snapshot when the modal is active', () => {
 		it( 'large viewports', () => {
-			useSelect.mockImplementation( () => ( { isModalActive: true } ) );
+			useSelect.mockImplementation( () => true );
 			useViewportMatch.mockImplementation( () => true );
 			const wrapper = shallow( <EditPostPreferencesModal /> );
 			expect( wrapper ).toMatchSnapshot();
 		} );
 		it( 'small viewports', () => {
-			useSelect.mockImplementation( () => ( { isModalActive: true } ) );
+			useSelect.mockImplementation( () => true );
 			useViewportMatch.mockImplementation( () => false );
 			const wrapper = shallow( <EditPostPreferencesModal /> );
 			expect( wrapper ).toMatchSnapshot();
@@ -35,7 +35,7 @@ describe( 'EditPostPreferencesModal', () => {
 	} );
 
 	it( 'should not render when the modal is not active', () => {
-		useSelect.mockImplementation( () => ( { isModalActive: false } ) );
+		useSelect.mockImplementation( () => false );
 		const wrapper = shallow( <EditPostPreferencesModal /> );
 		expect( wrapper.isEmptyRender() ).toBe( true );
 	} );

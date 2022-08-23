@@ -29,4 +29,5 @@ module.exports = {
 	transform: {
 		'\\.[jt]sx?$': require.resolve( 'babel-jest' ),
 	},
+	transformIgnorePatterns: [ 'node_modules/(?:(?!is-plain-obj/).)*$' ],
 };

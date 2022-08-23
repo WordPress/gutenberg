@@ -9,12 +9,14 @@ import { css } from '@emotion/react';
 import { useContextSystem, WordPressComponentProps } from '../ui/context';
 import { space } from '../ui/utils/space';
 import { rtl, useCx } from '../utils';
-import type { Props } from './types';
+import type { SpacerProps } from './types';
 
 const isDefined = < T >( o: T ): o is Exclude< T, null | undefined > =>
 	typeof o !== 'undefined' && o !== null;
 
-export function useSpacer( props: WordPressComponentProps< Props, 'div' > ) {
+export function useSpacer(
+	props: WordPressComponentProps< SpacerProps, 'div' >
+) {
 	const {
 		className,
 		margin,

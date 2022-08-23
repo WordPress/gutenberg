@@ -35,10 +35,10 @@ extend( [ namesPlugin ] );
 /**
  * SVG and stylesheet needed for rendering the duotone filter.
  *
- * @param {Object} props Duotone props.
- * @param {string} props.selector Selector to apply the filter to.
- * @param {string} props.id Unique id for this duotone filter.
- * @param {string[]|"unset"} props.colors Array of RGB color strings ordered from dark to light.
+ * @param {Object}           props          Duotone props.
+ * @param {string}           props.selector Selector to apply the filter to.
+ * @param {string}           props.id       Unique id for this duotone filter.
+ * @param {string[]|"unset"} props.colors   Array of RGB color strings ordered from dark to light.
  *
  * @return {WPElement} Duotone element.
  */

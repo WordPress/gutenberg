@@ -62,7 +62,7 @@ Since a high-emphasis button commands the most attention, a layout should contai
 
 #### Text label
 
-All button types use text labels to describe the action that happens when a user taps a button. If there’s no text label, there should be an icon to signify what the button does.
+All button types use text labels to describe the action that happens when a user taps a button. If there’s no text label, there needs to be a [label](#label) added and an icon to signify what the button does.
 
 ![](https://make.wordpress.org/design/files/2019/03/do-link-button.png)
 

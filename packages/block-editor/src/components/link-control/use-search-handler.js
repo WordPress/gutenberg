@@ -6,11 +6,6 @@ import { useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
- * External dependencies
- */
-import { startsWith } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import isURLLike from './is-url-like';
@@ -38,7 +33,7 @@ export const handleDirectEntry = ( val ) => {
 		type = TEL_TYPE;
 	}
 
-	if ( startsWith( val, '#' ) ) {
+	if ( val?.startsWith( '#' ) ) {
 		type = INTERNAL_TYPE;
 	}
 

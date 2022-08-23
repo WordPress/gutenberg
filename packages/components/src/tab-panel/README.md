@@ -144,7 +144,7 @@ Optionally provide a tab name for a tab to be selected upon mounting of componen
 
 #### children
 
-A function which renders the tabviews given the selected tab. The function is passed the active tab object as an argument as defined the the tabs prop.
+A function which renders the tabviews given the selected tab. The function is passed the active tab object as an argument as defined the tabs prop.
 The element to which the tooltip should anchor.
 
 -   Type: (`Object`) => `Element`

@@ -305,6 +305,18 @@ add_theme_support( 'disable-custom-gradients' );
 
 When set, users will be restricted to the default gradients provided in the block editor or the gradients provided via the `editor-gradient-presets` theme support setting.
 
+### Disabling base layout styles
+
+_**Note:** Since WordPress 6.1._
+
+Themes can opt out of generated block layout styles that provide default structural styles for core blocks including Group, Columns, Buttons, and Social Icons. By using the following code, these themes commit to providing their own structural styling, as using this feature will result in core blocks displaying incorrectly in both the editor and site frontend:
+
+```php
+add_theme_support( 'disable-layout-styles' );
+```
+
+For themes looking to customize `blockGap` styles or block spacing, see [the developer docs on Global Settings & Styles](/docs/how-to-guides/themes/theme-json/#what-is-blockgap-and-how-can-i-use-it).
+
 ### Supporting custom line heights
 
 Some blocks like paragraph and headings support customizing the line height. Themes can enable support for this feature with the following code:
@@ -451,3 +463,16 @@ where
 - `<link-color>` is either `var(--wp--preset--color--slug)` (if the user selected a preset value) or a raw color value (if the user selected a custom value)
 
 The block will get attached the class `.wp-elements-<uuid>`.
+
+## Appearance Tools
+
+Use this setting to enable the following Global Styles settings:
+
+- border: color, radius, style, width
+- color: link
+- spacing: blockGap, margin, padding
+- typography: lineHeight
+
+```php
+add_theme_support( 'appearance-tools' );
+```

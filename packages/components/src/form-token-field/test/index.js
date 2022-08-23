@@ -162,7 +162,7 @@ describe( 'FormTokenField', () => {
 			);
 		} );
 
-		it( 'should show suggestions when when input is empty if expandOnFocus is set to true', () => {
+		it( 'should show suggestions when input is empty if expandOnFocus is set to true', () => {
 			setUp( { __experimentalExpandOnFocus: true } );
 			wrapper.setState( {
 				isExpanded: true,
@@ -395,6 +395,37 @@ describe( 'FormTokenField', () => {
 			setText( 'baz' );
 			sendKeyDown( keyCodes.enter );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
+		} );
+
+		it( 'should automatically select the first matching suggestions when __experimentalAutoSelectFirstMatch is set to true', () => {
+			setUp( { __experimentalAutoSelectFirstMatch: true } );
+
+			wrapper.setState( {
+				isExpanded: true,
+			} );
+
+			expect( getSuggestionsText() ).toEqual( [] );
+
+			const searchText = 'so';
+
+			act( () => {
+				setText( searchText );
+			} );
+
+			const expectedFirstMatchTokens =
+				fixtures.matchingSuggestions[ searchText ][ 0 ];
+
+			expect( getSelectedSuggestion() ).toEqual(
+				expectedFirstMatchTokens
+			);
+
+			sendKeyDown( keyCodes.enter );
+
+			expect( wrapper.state.tokens ).toEqual( [
+				'foo',
+				'bar',
+				expectedFirstMatchTokens.join( '' ),
+			] );
 		} );
 	} );
 

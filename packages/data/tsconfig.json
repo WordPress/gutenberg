@@ -3,7 +3,8 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"noUnusedParameters": false
+		"noUnusedParameters": false,
+		"checkJs": false
 	},
 	"references": [
 		{ "path": "../compose" },
@@ -14,9 +15,6 @@
 		{ "path": "../redux-routine" }
 	],
 	"include": [
-		"src/redux-store/metadata/**/*",
-		"src/promise-middleware.js",
-		"src/utils",
-		"src/*.ts"
+		"src/**/*"
 	]
 }

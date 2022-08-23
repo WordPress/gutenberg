@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { escape as escapeString, find, get, uniqBy } from 'lodash';
+import { escape as escapeString, find, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -86,7 +86,7 @@ function findOrCreateTerm( termName, restBase, namespace ) {
 		.then( unescapeTerm );
 }
 
-function FlatTermSelector( { slug } ) {
+export function FlatTermSelector( { slug } ) {
 	const [ values, setValues ] = useState( [] );
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 500 );
@@ -202,7 +202,15 @@ function FlatTermSelector( { slug } ) {
 			...( terms ?? [] ),
 			...( searchResults ?? [] ),
 		];
-		const uniqueTerms = uniqBy( termNames, ( term ) => term.toLowerCase() );
+		const uniqueTerms = termNames.reduce( ( acc, name ) => {
+			if (
+				! acc.some( ( n ) => n.toLowerCase() === name.toLowerCase() )
+			) {
+				acc.push( name );
+			}
+			return acc;
+		}, [] );
+
 		const newTermNames = uniqueTerms.filter(
 			( termName ) =>
 				! find( availableTerms, ( term ) =>
