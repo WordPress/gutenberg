@@ -1,3 +1,9 @@
+/**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { combineReducers as reduxCombineReducers } from 'redux';
+
 type MapOf< T > = { [ name: string ]: T };
 
 export type ActionCreator = Function | Generator;
@@ -97,3 +103,5 @@ type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
 >
 	? { [ name in keyof Selectors ]: Function }
 	: never;
+
+export type combineReducers = typeof reduxCombineReducers;
