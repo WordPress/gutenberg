@@ -18,6 +18,7 @@
 :where(.wp-block-search__button) {
 	border: 1px solid #ccc;
 	padding: 0.375em 0.625em;
+	letter-spacing: inherit;
 }
 
 .wp-block-search__inside-wrapper {
@@ -41,6 +42,7 @@
 	font-size: inherit;
 	font-family: inherit;
 	line-height: inherit;
+	letter-spacing: inherit;
 }
 
 .wp-block-search.wp-block-search__button-only {
