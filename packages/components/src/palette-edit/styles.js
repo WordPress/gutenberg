@@ -29,7 +29,7 @@ export const IndicatorStyled = styled( CircularOptionPicker.Option )`
 export const NameInputControl = styled( InputControl )`
 	${ InputControlContainer } {
 		background: ${ COLORS.gray[ 100 ] };
-		border-radius: ${ CONFIG.controlBorderRadius }};
+		border-radius: ${ CONFIG.controlBorderRadius };
 		${ Input }${ Input }${ Input }${ Input } {
 			height: ${ space( 8 ) };
 		}
@@ -95,8 +95,9 @@ export const PaletteHStackHeader = styled( HStack )`
 export const PaletteEditStyles = styled( View )`
 	&&& {
 		.components-button.has-icon {
-		min-width: 0;
-		padding: 0;
+			min-width: 0;
+			padding: 0;
+		}
 	}
 `;
 
