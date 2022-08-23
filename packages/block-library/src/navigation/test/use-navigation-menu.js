@@ -56,6 +56,13 @@ function resolveReadPermission( registry, allowed ) {
 	dispatch.finishResolution( 'canUser', [ 'read', 'navigation' ] );
 }
 
+function resolveReadRecordPermission( registry, ref, allowed ) {
+	const dispatch = registry.dispatch( coreStore );
+	dispatch.receiveUserPermission( 'create/navigation', allowed );
+	dispatch.startResolution( 'canUser', [ 'read', 'navigation', ref ] );
+	dispatch.finishResolution( 'canUser', [ 'read', 'navigation', ref ] );
+}
+
 function resolveCreatePermission( registry, allowed ) {
 	const dispatch = registry.dispatch( coreStore );
 	dispatch.receiveUserPermission( 'create/navigation', allowed );
@@ -179,6 +186,7 @@ describe( 'useNavigationMenus', () => {
 	it( 'Should return correct permissions (create, update)', () => {
 		resolveRecords( registry, navigationMenus );
 		resolveCreatePermission( registry, true );
+		resolveReadRecordPermission( registry, 1, true );
 		resolveUpdatePermission( registry, 1, true );
 		resolveDeletePermission( registry, 1, false );
 		expect( useNavigationMenu( 1 ) ).toEqual( {
@@ -202,6 +210,7 @@ describe( 'useNavigationMenus', () => {
 	it( 'Should return correct permissions (delete only)', () => {
 		resolveRecords( registry, navigationMenus );
 		resolveCreatePermission( registry, false );
+		resolveReadRecordPermission( registry, 1, false );
 		resolveUpdatePermission( registry, 1, false );
 		resolveDeletePermission( registry, 1, true );
 		expect( useNavigationMenu( 1 ) ).toEqual( {
