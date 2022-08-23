@@ -672,9 +672,10 @@ describe( 'FormTokenField', () => {
 			expect( onFocusSpy ).toHaveBeenCalledTimes( 1 );
 			expect( suggestionList ).toBeVisible();
 
-			expect(
-				within( suggestionList ).getAllByRole( 'option' )
-			).toHaveLength( suggestions.length );
+			expectVisibleSuggestionsToBe(
+				screen.getByRole( 'listbox' ),
+				suggestions
+			);
 
 			// Minimum length limitations don't affect the search text when the
 			// `__experimentalExpandOnFocus` is `true`
