@@ -1089,7 +1089,7 @@
 					"additionalProperties": false
 				},
 				"shadow": {
-					"description": "Sets the `box-shadow` CSS property.",
+					"description": "Box shadow styles.",
 					"type": "string"
 				}
 			}
