@@ -124,7 +124,12 @@ function NavigationMenuSelector(
 					{ showManageActions && hasManagePermissions && (
 						<MenuGroup label={ __( 'Tools' ) }>
 							{ canUserCreateNavigationMenu && (
-								<MenuItem onClick={ onCreateNew }>
+								<MenuItem
+									onClick={ () => {
+										onClose();
+										onCreateNew();
+									} }
+								>
 									{ __( 'Create new menu' ) }
 								</MenuItem>
 							) }
