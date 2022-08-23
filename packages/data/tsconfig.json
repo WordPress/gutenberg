@@ -15,10 +15,6 @@
 		{ "path": "../redux-routine" }
 	],
 	"include": [
-		"src/redux-store/metadata/**/*",
-		"src/promise-middleware.js",
-		"src/utils",
-		"src/*.ts",
-		"src/**/*.js"
+		"src/**/*"
 	]
 }
