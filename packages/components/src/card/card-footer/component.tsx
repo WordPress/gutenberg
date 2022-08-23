@@ -1,15 +1,20 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-import { contextConnect } from '../../ui/context';
-import { Flex } from '../../flex';
-import { useCardFooter } from './hook';
+import type { ForwardedRef } from 'react';
 
 /**
- * @param {import('../../ui/context').WordPressComponentProps<import('../types').FooterProps, 'div'>} props
- * @param {import('react').ForwardedRef<any>}                                                         forwardedRef
+ * Internal dependencies
  */
-function CardFooter( props, forwardedRef ) {
+import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import { Flex } from '../../flex';
+import { useCardFooter } from './hook';
+import type { FooterProps } from '../types';
+
+function UnconnectedCardFooter(
+	props: WordPressComponentProps< FooterProps, 'div' >,
+	forwardedRef: ForwardedRef< any >
+) {
 	const footerProps = useCardFooter( props );
 
 	return <Flex { ...footerProps } ref={ forwardedRef } />;
@@ -18,7 +23,6 @@ function CardFooter( props, forwardedRef ) {
 /**
  * `CardFooter` renders an optional footer within a `Card`.
  *
- * @example
  * ```jsx
  * import { Card, CardBody, CardFooter } from `@wordpress/components`;
  *
@@ -28,6 +32,6 @@ function CardFooter( props, forwardedRef ) {
  * </Card>
  * ```
  */
-const ConnectedCardFooter = contextConnect( CardFooter, 'CardFooter' );
+export const CardFooter = contextConnect( UnconnectedCardFooter, 'CardFooter' );
 
-export default ConnectedCardFooter;
+export default CardFooter;

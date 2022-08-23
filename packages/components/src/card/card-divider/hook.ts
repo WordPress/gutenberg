@@ -6,14 +6,14 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
+import type { DividerProps } from '../../divider';
 
-/**
- * @param {import('../../ui/context').WordPressComponentProps<import('../../divider').DividerProps, 'hr', false>} props
- */
-export function useCardDivider( props ) {
+export function useCardDivider(
+	props: WordPressComponentProps< DividerProps, 'hr', false >
+) {
 	const { className, ...otherProps } = useContextSystem(
 		props,
 		'CardDivider'
