@@ -80,7 +80,7 @@ function SelectedBlockPopover( {
 	const { stopTyping } = useDispatch( blockEditorStore );
 
 	const showEmptyBlockSideInserter =
-		! isTyping && ! editorMode === 'edit' && isEmptyDefaultBlock;
+		! isTyping && editorMode === 'edit' && isEmptyDefaultBlock;
 	const shouldShowBreadcrumb =
 		editorMode === 'navigation' || editorMode === 'zoom-out';
 	const shouldShowContextualToolbar =
