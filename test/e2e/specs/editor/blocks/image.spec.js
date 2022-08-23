@@ -216,10 +216,14 @@ test.describe( 'Image', () => {
 		await expect( image ).toBeVisible();
 		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
 
-		// Navigate to Image.
-		await pageUtils.pressKeyWithModifier( 'alt', 'F10' );
-		// Tab to formatting, Bold.
-		await page.keyboard.press( 'Tab' );
+		// Navigate to More,
+		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
+		// Link,
+		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
+		// Italic,
+		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
+		// and finally Bold.
+		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
 
 		await page.keyboard.press( 'Space' );
 		await page.keyboard.press( 'a' );
