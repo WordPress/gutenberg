@@ -1,5 +1,21 @@
 <?php
+/**
+ * Webfonts API class.
+ *
+ * @package    WordPress
+ * @subpackage WebFonts
+ * @since      X.X.X
+ */
 
+if ( class_exists( 'WP_Webfonts' ) ) {
+	return;
+}
+
+/**
+ * Class WP_Webfonts
+ *
+ * @since X.X.X
+ */
 class WP_Webfonts extends WP_Dependencies {
 
 	/**
