@@ -597,7 +597,9 @@ function Navigation( {
 			<TagName { ...blockProps }>
 				<BlockControls>
 					<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
-						{ ! isCreatingNavigationMenu && (
+						{ ! (
+							isCreatingNavigationMenu || isConvertingClassicMenu
+						) && (
 							<NavigationMenuSelector
 								ref={ null }
 								currentMenuId={ null }
@@ -670,7 +672,9 @@ function Navigation( {
 			<TagName { ...blockProps }>
 				<BlockControls>
 					<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
-						{ ! isCreatingNavigationMenu && (
+						{ ! (
+							isCreatingNavigationMenu || isConvertingClassicMenu
+						) && (
 							<NavigationMenuSelector
 								ref={ navigationSelectorRef }
 								currentMenuId={ ref }
@@ -777,7 +781,10 @@ function Navigation( {
 				<BlockControls>
 					{ ! isDraftNavigationMenu && isEntityAvailable && (
 						<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
-							{ ! isCreatingNavigationMenu && (
+							{ ! (
+								isCreatingNavigationMenu ||
+								isConvertingClassicMenu
+							) && (
 								<NavigationMenuSelector
 									ref={ navigationSelectorRef }
 									currentMenuId={ ref }
