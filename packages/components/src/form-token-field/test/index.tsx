@@ -73,7 +73,7 @@ const expectTokensToBeInTheDocument = ( tokensText: string[] ) => {
 		} );
 
 		expect( assistiveTechnologyToken ).toBeInTheDocument();
-		expect( visibleToken ).toBeInTheDocument();
+		expect( visibleToken ).toBeVisible();
 		expect( visibleToken ).toHaveAttribute( 'aria-hidden', 'true' );
 	} );
 };
@@ -106,7 +106,7 @@ function unescapeAndFormatSpaces( str: string ) {
 
 describe( 'FormTokenField', () => {
 	describe( 'basic usage', () => {
-		it( "should tokens with the input's value when pressing the enter key", async () => {
+		it( "should add tokens with the input's value when pressing the enter key", async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
@@ -567,7 +567,7 @@ describe( 'FormTokenField', () => {
 			);
 		} );
 
-		it( 'should show extra instructions when the `__experimentalShowHowTo` is `true`', () => {
+		it( 'should show extra instructions when the `__experimentalShowHowTo` prop  is set to `true`', () => {
 			const instructionsTokenizeSpace =
 				'Separate with commas, spaces, or the Enter key.';
 			const instructionsDefault =
@@ -578,25 +578,25 @@ describe( 'FormTokenField', () => {
 
 			expect( screen.getByText( instructionsDefault ) ).toBeVisible();
 
-			// The "show how to" text is used to aria-describeby the input
+			// The "show how to" text is used to aria-describedby the input
 			expect(
 				screen.getByRole( 'combobox' )
 			).toHaveAccessibleDescription( instructionsDefault );
 
-			rerender( <FormTokenFieldWithState tokenizeOnSpace={ true } /> );
+			rerender( <FormTokenFieldWithState tokenizeOnSpace /> );
 
 			expect(
 				screen.getByText( instructionsTokenizeSpace )
 			).toBeVisible();
 
-			// The "show how to" text is used to aria-describeby the input
+			// The "show how to" text is used to aria-describedby the input
 			expect(
 				screen.getByRole( 'combobox' )
 			).toHaveAccessibleDescription( instructionsTokenizeSpace );
 
 			rerender(
 				<FormTokenFieldWithState
-					tokenizeOnSpace={ true }
+					tokenizeOnSpace
 					__experimentalShowHowTo={ false }
 				/>
 			);
@@ -669,7 +669,7 @@ describe( 'FormTokenField', () => {
 					<FormTokenFieldWithState
 						onFocus={ onFocusSpy }
 						suggestions={ suggestions }
-						__experimentalExpandOnFocus={ true }
+						__experimentalExpandOnFocus
 					/>
 				</>
 			);
@@ -1124,7 +1124,7 @@ describe( 'FormTokenField', () => {
 
 			rerender(
 				<FormTokenFieldWithState
-					__experimentalAutoSelectFirstMatch={ true }
+					__experimentalAutoSelectFirstMatch
 					suggestions={ suggestions }
 				/>
 			);
@@ -1179,7 +1179,7 @@ describe( 'FormTokenField', () => {
 			const { rerender } = render(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
-					__experimentalExpandOnFocus={ true }
+					__experimentalExpandOnFocus
 					initialValue={ [
 						{ value: 'Italy' },
 						{ value: 'Switzerland' },
@@ -1198,7 +1198,7 @@ describe( 'FormTokenField', () => {
 			rerender(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
-					__experimentalExpandOnFocus={ true }
+					__experimentalExpandOnFocus
 					initialValue={ [
 						{ value: 'Italy' },
 						{ value: 'Switzerland' },
@@ -1211,7 +1211,7 @@ describe( 'FormTokenField', () => {
 			] );
 		} );
 
-		it( 'should trigger mouse callbacks if set on tokens', async () => {
+		it( 'should trigger mouse callbacks if the `onMouseEnter` and/or the `onMouseLeave` properties are set on a token data object', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
@@ -1271,7 +1271,7 @@ describe( 'FormTokenField', () => {
 		it( 'should be still used to filter out duplicate suggestions', () => {
 			render(
 				<FormTokenFieldWithState
-					__experimentalExpandOnFocus={ true }
+					__experimentalExpandOnFocus
 					initialValue={ [ { value: 'France' }, { value: 'Spain' } ] }
 				/>
 			);
@@ -1567,7 +1567,6 @@ describe( 'FormTokenField', () => {
 						return false;
 					}
 
-					// console.log( { tokenHtml, innerHTML: node.innerHTML } );
 					return node.innerHTML === tokenHtml;
 				} );
 			} );
@@ -1707,7 +1706,6 @@ describe( 'FormTokenField', () => {
 			] );
 		} );
 
-		// it( 'should not allow adding new tokens when the number of token already exceeds the value of the `maxLength` prop, while allowing the ones set before to stay as they are', () => {
 		it( "should not affect the number of tokens set via the `value` prop (ie. not caused by tokenizing the user's input)", () => {
 			render(
 				<FormTokenFieldWithState
@@ -1768,7 +1766,7 @@ describe( 'FormTokenField', () => {
 	} );
 
 	describe( 'disabled', () => {
-		it( 'should not allow adding tokens when the `disable` prop is `true`', async () => {
+		it( 'should not allow adding tokens when the `disabled` prop is `true`', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
@@ -1790,7 +1788,7 @@ describe( 'FormTokenField', () => {
 			rerender(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
-					disabled={ true }
+					disabled
 				/>
 			);
 
@@ -1812,7 +1810,7 @@ describe( 'FormTokenField', () => {
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					initialValue={ [ 'sea', 'ocean' ] }
-					disabled={ true }
+					disabled
 				/>
 			);
 

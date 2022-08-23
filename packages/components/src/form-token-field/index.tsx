@@ -173,7 +173,6 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		if ( event.defaultPrevented ) {
 			return;
 		}
-		// TODO: replace to event.code;
 		switch ( event.code ) {
 			case 'Backspace':
 				preventDefault = handleDeleteKey( deleteTokenBeforeInput );
