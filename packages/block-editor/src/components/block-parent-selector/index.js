@@ -28,14 +28,16 @@ export default function BlockParentSelector() {
 		( select ) => {
 			const {
 				getBlockName,
-				getBlockParents,
+				__unstableGetContentLockingParent,
+				getBlockRootClientId,
 				getSelectedBlockClientId,
 				getSettings,
 			} = select( blockEditorStore );
 			const { hasBlockSupport } = select( blocksStore );
 			const selectedBlockClientId = getSelectedBlockClientId();
-			const parents = getBlockParents( selectedBlockClientId );
-			const _firstParentClientId = parents[ parents.length - 1 ];
+			const _firstParentClientId =
+				__unstableGetContentLockingParent( selectedBlockClientId ) ||
+				getBlockRootClientId( selectedBlockClientId );
 			const parentBlockName = getBlockName( _firstParentClientId );
 			const _parentBlockType = getBlockType( parentBlockName );
 			const settings = getSettings();
@@ -52,6 +54,7 @@ export default function BlockParentSelector() {
 		[]
 	);
 	const blockInformation = useBlockDisplayInformation( firstParentClientId );
+	console.log({ blockInformation, firstParentClientId });
 
 	// Allows highlighting the parent block outline when focusing or hovering
 	// the parent block selector within the child.
@@ -66,7 +69,7 @@ export default function BlockParentSelector() {
 		},
 	} );
 
-	if ( shouldHide || firstParentClientId === undefined ) {
+	if ( shouldHide || ! firstParentClientId ) {
 		return null;
 	}
 

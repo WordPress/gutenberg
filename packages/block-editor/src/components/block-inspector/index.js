@@ -116,7 +116,7 @@ function BlockNavigationButton( { blockTypes, block, selectedBlock } ) {
 		<NavigatorButton
 			path={ `/block/${ block.clientId }` }
 			style={
-				selectedBlock.clientId === block.clientId
+				selectedBlock && selectedBlock.clientId === block.clientId
 					? { color: 'var(--wp-admin-theme-color)' }
 					: {}
 			}
@@ -165,11 +165,6 @@ function BlockInspectorAbsorvedBy( { absorvedBy } ) {
 	);
 	const blockInformation = useBlockDisplayInformation( absorvedBy );
 	const contentBlocks = useContentBlocks( blockTypes, block );
-	const showSelectedBlock =
-		absorvedBy !== selectedBlock.clientId &&
-		! contentBlocks.some(
-			( contentBlock ) => contentBlock.clientId === selectedBlock.clientId
-		);
 	return (
 		<div className="block-editor-block-inspector">
 			<NavigatorProvider initialPath="/">
@@ -200,19 +195,6 @@ function BlockInspectorAbsorvedBy( { absorvedBy } ) {
 									blockTypes={ blockTypes }
 								/>
 							) ) }
-							{ showSelectedBlock && (
-								<>
-									<h2 className="block-editor-block-card__title">
-										{ __( 'Selected block' ) }
-									</h2>
-									<BlockNavigationButton
-										selectedBlock={ selectedBlock }
-										block={ selectedBlock }
-										blockTypes={ blockTypes }
-									/>
-								</>
-							) }
-							;
 						</VStack>
 					</NavigatorScreen>
 					<BlockNavigatorScreen block={ block } />
@@ -224,9 +206,6 @@ function BlockInspectorAbsorvedBy( { absorvedBy } ) {
 							/>
 						);
 					} ) }
-					{ showSelectedBlock && (
-						<BlockNavigatorScreen block={ selectedBlock } />
-					) }
 				</BlockInspectorNavigationEffects>
 			</NavigatorProvider>
 		</div>
@@ -246,7 +225,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			getSelectedBlockCount,
 			getBlockName,
 			__unstableGetContentLockingParent,
-			getBlockAttributes,
+			getTemplateLock,
 		} = select( blockEditorStore );
 		const { getBlockStyles } = select( blocksStore );
 
@@ -264,10 +243,12 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
 			hasBlockStyles: blockStyles && blockStyles.length > 0,
-			absorvedBy: getBlockAttributes( _selectedBlockClientId )?.lock
-				?.content
-				? _selectedBlockClientId
-				: __unstableGetContentLockingParent( _selectedBlockClientId ),
+			absorvedBy:
+				getTemplateLock( _selectedBlockClientId ) === 'noContent'
+					? _selectedBlockClientId
+					: __unstableGetContentLockingParent(
+							_selectedBlockClientId
+					  ),
 		};
 	}, [] );
 

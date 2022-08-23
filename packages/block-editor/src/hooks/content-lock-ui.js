@@ -51,6 +51,8 @@ export const withBlockControls = createHigherOrderComponent(
 				select( blockEditorStore ).getTemplateLock( props.clientId ),
 			[ props.clientId ]
 		);
+		const { getBlockListSettings } = useSelect( blockEditorStore );
+		const { updateBlockListSettings } = useDispatch( blockEditorStore );
 		const isContentLocked = templateLock === 'noContent';
 		const {
 			__unstableMarkNextChangeAsNotPersistent,
@@ -74,12 +76,24 @@ export const withBlockControls = createHigherOrderComponent(
 						<ToolbarButton
 							onClick={ () => {
 								if ( isEditingAsBlocks && ! isContentLocked ) {
+									updateBlockListSettings( props.clientId, {
+										...getBlockListSettings(
+											props.clientId
+										),
+										templateLock: 'noContent',
+									} );
 									__unstableMarkNextChangeAsNotPersistent();
 									updateBlockAttributes( props.clientId, {
 										templateLock: 'noContent',
 									} );
 									setIsEditingAsBlocks( false );
 								} else {
+									updateBlockListSettings( props.clientId, {
+										...getBlockListSettings(
+											props.clientId
+										),
+										templateLock: false,
+									} );
 									__unstableMarkNextChangeAsNotPersistent();
 									updateBlockAttributes( props.clientId, {
 										templateLock: undefined,
@@ -89,8 +103,8 @@ export const withBlockControls = createHigherOrderComponent(
 							} }
 						>
 							{ isEditingAsBlocks && ! isContentLocked
-								? __( ' Finish editing as blocks' )
-								: __( 'Edit as Blocks' ) }
+								? __( 'Done' )
+								: __( 'Edit' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
 				</BlockControls>

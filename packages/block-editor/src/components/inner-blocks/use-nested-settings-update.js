@@ -69,7 +69,9 @@ export default function useNestedSettingsUpdate(
 		const newSettings = {
 			allowedBlocks: _allowedBlocks,
 			templateLock:
-				templateLock === undefined ? parentLock : templateLock,
+				templateLock === undefined || parentLock === 'noContent'
+					? parentLock
+					: templateLock,
 		};
 
 		// These values are not defined for RN, so only include them if they

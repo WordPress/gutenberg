@@ -3,8 +3,10 @@
  */
 import { memo } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import { store as blocksStore } from '@wordpress/blocks';
 
+/**
+ * Internal dependencies
+ */
 /**
  * Internal dependencies
  */
@@ -78,7 +80,6 @@ const countReducer =
 
 function ListViewBranch( props ) {
 	const {
-		parentId,
 		blocks,
 		selectBlock,
 		showBlockMovers,
@@ -89,6 +90,7 @@ function ListViewBranch( props ) {
 		listPosition = 0,
 		fixedListWindow,
 		isExpanded,
+		parentId,
 	} = props;
 
 	const isContentLocked = useSelect(
@@ -101,36 +103,14 @@ function ListViewBranch( props ) {
 		},
 		[ parentId ]
 	);
-	const flattenBlockTree = ( result, { clientId, innerBlocks } ) => {
-		return [
-			...result,
-			{ clientId, innerBlocks: [] },
-			...innerBlocks.reduce( flattenBlockTree, [] ),
-		];
-	};
-	const hasContentRoleAttribute =
-		( select ) =>
-		( { clientId } ) => {
-			const name = select( blockEditorStore ).getBlockName( clientId );
-			const hasContentRole =
-				select( blocksStore ).__unstableIsContentBlock( name );
-			return hasContentRole;
-		};
 
-	const filteredBlocks = useSelect(
-		( select ) => {
-			if ( isContentLocked ) {
-				return blocks
-					.reduce( flattenBlockTree, [] )
-					.filter( hasContentRoleAttribute( select ) )
-					.filter( Boolean );
-			}
-			return blocks.filter( Boolean );
-		},
-		[ isContentLocked, blocks ]
-	);
 	const { expandedState, draggedClientIds } = useListViewContext();
 
+	if ( isContentLocked ) {
+		return null;
+	}
+
+	const filteredBlocks = blocks.filter( Boolean );
 	const blockCount = filteredBlocks.length;
 	let nextPosition = listPosition;
 

@@ -2684,12 +2684,14 @@ export const __unstableGetVisibleBlocks = createSelector(
 export const __unstableGetContentLockingParent = createSelector(
 	( state, clientId ) => {
 		let current = clientId;
+		let result;
 		while ( !! state.blocks.parents[ current ] ) {
 			current = state.blocks.parents[ current ];
 			if ( getTemplateLock( state, current ) === 'noContent' ) {
-				return current;
+				result = current;
 			}
 		}
+		return result;
 	},
 	( state ) => [ state.blocks.parents, state.blocks.attributes ]
 );
