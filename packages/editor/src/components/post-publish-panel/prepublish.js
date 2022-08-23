@@ -37,9 +37,9 @@ function PostPublishPanelPrepublish( { children } ) {
 	} = useSelect( ( select ) => {
 		const { getCurrentPost, isEditedPostBeingScheduled } =
 			select( editorStore );
-		const { getEntityRecord, isResolving } = select( coreStore );
-		const siteData =
-			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+		const { getEntityRecord, getMedia, isResolving } = select( coreStore );
+		const siteData = getEntityRecord( 'root', '__unstableBase' ) || {};
+		const siteIcon = siteData.site_icon;
 
 		return {
 			hasPublishAction: get(
@@ -48,12 +48,12 @@ function PostPublishPanelPrepublish( { children } ) {
 				false
 			),
 			isBeingScheduled: isEditedPostBeingScheduled(),
-			isRequestingSiteIcon: isResolving( 'getEntityRecord', [
-				'root',
-				'__unstableBase',
-				undefined,
-			] ),
-			siteIconUrl: siteData.site_icon_url,
+			isRequestingSiteIcon: siteIcon
+				? isResolving( 'getMedia', [ siteIcon, { context: 'view' } ] )
+				: false,
+			siteIconUrl: siteIcon
+				? getMedia( siteIcon, { context: 'view' } )?.source_url
+				: null,
 			siteTitle: siteData.name,
 			siteHome: siteData.home && filterURLForDisplay( siteData.home ),
 		};

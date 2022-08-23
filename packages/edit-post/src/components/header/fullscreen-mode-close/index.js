@@ -30,20 +30,25 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 		( select ) => {
 			const { getCurrentPostType } = select( editorStore );
 			const { isFeatureActive } = select( editPostStore );
-			const { getEntityRecord, getPostType, isResolving } =
+			const { getEntityRecord, getMedia, getPostType, isResolving } =
 				select( coreStore );
-			const siteData =
-				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+			const siteIcon = getEntityRecord(
+				'root',
+				'__unstableBase'
+			)?.site_icon;
 
 			return {
 				isActive: isFeatureActive( 'fullscreenMode' ),
-				isRequestingSiteIcon: isResolving( 'getEntityRecord', [
-					'root',
-					'__unstableBase',
-					undefined,
-				] ),
+				isRequestingSiteIcon: siteIcon
+					? isResolving( 'getMedia', [
+							siteIcon,
+							{ context: 'view' },
+					  ] )
+					: false,
 				postType: getPostType( getCurrentPostType() ),
-				siteIconUrl: siteData.site_icon_url,
+				siteIconUrl: siteIcon
+					? getMedia( siteIcon, { context: 'view' } )?.source_url
+					: null,
 			};
 		},
 		[]

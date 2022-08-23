@@ -31,7 +31,10 @@ describe( 'FullscreenModeClose', () => {
 					getCurrentPostType: () => {},
 					getPostType: () => true,
 					getEntityRecord: () => ( {
-						site_icon_url: 'https://fakeUrl.com',
+						site_icon: 5,
+					} ),
+					getMedia: () => ( {
+						source_url: 'https://fakeUrl.com',
 					} ),
 				} ) );
 			} );
@@ -52,7 +55,7 @@ describe( 'FullscreenModeClose', () => {
 					getCurrentPostType: () => {},
 					getPostType: () => true,
 					getEntityRecord: () => ( {
-						site_icon_url: '',
+						site_icon: undefined,
 					} ),
 				} ) );
 			} );

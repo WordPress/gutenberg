@@ -31,7 +31,10 @@ describe( 'NavigationToggle', () => {
 				return cb( () => ( {
 					getCurrentTemplateNavigationPanelSubMenu: () => 'root',
 					getEntityRecord: () => ( {
-						site_icon_url: 'https://fakeUrl.com',
+						site_icon: 5,
+					} ),
+					getMedia: () => ( {
+						source_url: 'https://fakeUrl.com',
 					} ),
 					isResolving: () => false,
 					isNavigationOpened: () => false,
@@ -51,7 +54,7 @@ describe( 'NavigationToggle', () => {
 				return cb( () => ( {
 					getCurrentTemplateNavigationPanelSubMenu: () => 'root',
 					getEntityRecord: () => ( {
-						site_icon_url: '',
+						site_icon: undefined,
 					} ),
 					isResolving: () => false,
 					isNavigationOpened: () => false,

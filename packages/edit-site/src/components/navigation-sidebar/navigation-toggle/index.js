@@ -26,18 +26,24 @@ import { store as editSiteStore } from '../../../store';
 function NavigationToggle( { icon } ) {
 	const { isNavigationOpen, isRequestingSiteIcon, siteIconUrl } = useSelect(
 		( select ) => {
-			const { getEntityRecord, isResolving } = select( coreDataStore );
-			const siteData =
-				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+			const { getEntityRecord, getMedia, isResolving } =
+				select( coreDataStore );
+			const siteIcon = getEntityRecord(
+				'root',
+				'__unstableBase'
+			)?.site_icon;
 
 			return {
 				isNavigationOpen: select( editSiteStore ).isNavigationOpened(),
-				isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
-					'root',
-					'__unstableBase',
-					undefined,
-				] ),
-				siteIconUrl: siteData.site_icon_url,
+				isRequestingSiteIcon: siteIcon
+					? isResolving( 'getMedia', [
+							siteIcon,
+							{ context: 'view' },
+					  ] )
+					: false,
+				siteIconUrl: siteIcon
+					? getMedia( siteIcon, { context: 'view' } )?.source_url
+					: null,
 			};
 		},
 		[]
