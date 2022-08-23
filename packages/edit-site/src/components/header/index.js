@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useCallback, useRef } from '@wordpress/element';
@@ -127,8 +132,9 @@ export default function Header( {
 	);
 	const shortLabel = ! isInserterOpen ? __( 'Add' ) : __( 'Close' );
 
-	const hasZoomedOutView =
-		window && window.__experimentalEnableZoomedOutView && isVisualMode;
+	const isZoomedOutViewExperimentEnabled =
+		window?.__experimentalEnableZoomedOutView && isVisualMode;
+	const isZoomedOutView = blockEditorMode === 'zoom-out';
 
 	return (
 		<div className="edit-site-header">
@@ -177,10 +183,7 @@ export default function Header( {
 							<ToolbarItem
 								as={ Button }
 								className="edit-site-header-toolbar__list-view-toggle"
-								disabled={
-									! isVisualMode &&
-									blockEditorMode === 'zoom-out'
-								}
+								disabled={ ! isVisualMode && isZoomedOutView }
 								icon={ listView }
 								isPressed={ isListViewOpen }
 								/* translators: button label text should, if possible, be under 16 characters. */
@@ -192,19 +195,19 @@ export default function Header( {
 									showIconLabels ? 'tertiary' : undefined
 								}
 							/>
-							{ hasZoomedOutView && (
+							{ isZoomedOutViewExperimentEnabled && (
 								<ToolbarItem
 									as={ Button }
 									className="edit-site-header-toolbar__zoom-out-view-toggle"
 									icon={ chevronUpDown }
-									isPressed={ blockEditorMode === 'zoom-out' }
+									isPressed={ isZoomedOutView }
 									/* translators: button label text should, if possible, be under 16 characters. */
 									label={ __( 'Zoom-out View' ) }
 									onClick={ () => {
 										setPreviewDeviceType( 'desktop' );
 										setIsListViewOpened( false );
 										__unstableSetEditorMode(
-											blockEditorMode === 'zoom-out'
+											isZoomedOutView
 												? 'edit'
 												: 'zoom-out'
 										);
@@ -238,27 +241,34 @@ export default function Header( {
 
 			<div className="edit-site-header_end">
 				<div className="edit-site-header__actions">
-					{ ! isFocusMode && blockEditorMode !== 'zoom-out' && (
-						<PreviewOptions
-							deviceType={ deviceType }
-							setDeviceType={ setPreviewDeviceType }
+					{ ! isFocusMode && (
+						<div
+							className={ classnames(
+								'edit-site-header__actions__preview-options',
+								{ 'is-zoomed-out': isZoomedOutView }
+							) }
 						>
-							<MenuGroup>
-								<MenuItem
-									href={ settings?.siteUrl }
-									target="_blank"
-									icon={ external }
-								>
-									{ __( 'View site' ) }
-									<VisuallyHidden as="span">
-										{
-											/* translators: accessibility text */
-											__( '(opens in a new tab)' )
-										}
-									</VisuallyHidden>
-								</MenuItem>
-							</MenuGroup>
-						</PreviewOptions>
+							<PreviewOptions
+								deviceType={ deviceType }
+								setDeviceType={ setPreviewDeviceType }
+							>
+								<MenuGroup>
+									<MenuItem
+										href={ settings?.siteUrl }
+										target="_blank"
+										icon={ external }
+									>
+										{ __( 'View site' ) }
+										<VisuallyHidden as="span">
+											{
+												/* translators: accessibility text */
+												__( '(opens in a new tab)' )
+											}
+										</VisuallyHidden>
+									</MenuItem>
+								</MenuGroup>
+							</PreviewOptions>
+						</div>
 					) }
 					<SaveButton
 						openEntitiesSavedStates={ openEntitiesSavedStates }

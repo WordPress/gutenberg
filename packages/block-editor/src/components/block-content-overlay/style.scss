@@ -33,7 +33,7 @@
 
 	.block-editor-iframe__body.is-zoomed-out &::before {
 		// Unfortunately because of the vw unit, this is not always going to be exact
-		// When the scrollbar is visible, the frame exceeds the canvas by a few pixes.
+		// When the scrollbar is visible, the frame exceeds the canvas by a few pixels.
 		width: calc(100vw);
 		left: calc(( 100% - 100vw ) / 2);
 	}
