@@ -64,7 +64,7 @@ export default function useBlockToolbarPopoverProps( {
 } ) {
 	const selectedBlockElement = useBlockElement( clientId );
 	const [ toolbarHeight, setToolbarHeight ] = useState( 0 );
-	const [ props, setProps ] = useState(
+	const [ props, setProps ] = useState( () =>
 		getProps( contentElement, selectedBlockElement, toolbarHeight )
 	);
 	const blockIndex = useSelect(
