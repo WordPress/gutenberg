@@ -25,6 +25,13 @@ import { InspectorControls } from '../components';
  */
 const ANCHOR_REGEX = /[\s#]/g;
 
+const ANCHOR_SCHEMA = {
+	type: 'string',
+	source: 'attribute',
+	attribute: 'id',
+	selector: '*',
+};
+
 /**
  * Filters registered block settings, extending attributes with anchor using ID
  * of the first node.
@@ -42,12 +49,7 @@ export function addAttribute( settings ) {
 		// Gracefully handle if settings.attributes is undefined.
 		settings.attributes = {
 			...settings.attributes,
-			anchor: {
-				type: 'string',
-				source: 'attribute',
-				attribute: 'id',
-				selector: '*',
-			},
+			anchor: ANCHOR_SCHEMA,
 		};
 	}
 
@@ -115,7 +117,7 @@ export const withInspectorControl = createHigherOrderComponent(
 						 * We plan to remove scoping anchors to 'core/heading' to support
 						 * anchors for all eligble blocks. Additionally we plan to explore
 						 * leveraging InspectorAdvancedControls instead of a custom
-						 * PanelBody title. https://git.io/Jtcov
+						 * PanelBody title. https://github.com/WordPress/gutenberg/issues/28363
 						 */ }
 						{ ! isWeb && props.name === 'core/heading' && (
 							<InspectorControls>

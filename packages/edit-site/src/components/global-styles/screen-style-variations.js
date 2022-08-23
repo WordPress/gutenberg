@@ -9,7 +9,7 @@ import classnames from 'classnames';
  */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useContext } from '@wordpress/element';
+import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import {
 	__experimentalGrid as Grid,
@@ -31,6 +31,7 @@ function compareVariations( a, b ) {
 }
 
 function Variation( { variation } ) {
+	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const context = useMemo( () => {
 		return {
@@ -77,8 +78,17 @@ function Variation( { variation } ) {
 				onClick={ selectVariation }
 				onKeyDown={ selectOnEnter }
 				tabIndex="0"
+				aria-label={ variation?.title }
+				aria-current={ isActive }
+				onFocus={ () => setIsFocused( true ) }
+				onBlur={ () => setIsFocused( false ) }
 			>
-				<StylesPreview height={ 100 } />
+				<div className="edit-site-global-styles-variations_item-preview">
+					<StylesPreview
+						label={ variation?.title }
+						isFocused={ isFocused }
+					/>
+				</div>
 			</div>
 		</GlobalStylesContext.Provider>
 	);
@@ -87,20 +97,25 @@ function Variation( { variation } ) {
 function ScreenStyleVariations() {
 	const { variations } = useSelect( ( select ) => {
 		return {
-			variations: select(
-				coreStore
-			).__experimentalGetCurrentThemeGlobalStylesVariations(),
+			variations:
+				select(
+					coreStore
+				).__experimentalGetCurrentThemeGlobalStylesVariations(),
 		};
 	}, [] );
 
 	const withEmptyVariation = useMemo( () => {
 		return [
 			{
-				name: __( 'Default' ),
+				title: __( 'Default' ),
 				settings: {},
 				styles: {},
 			},
-			...variations,
+			...variations.map( ( variation ) => ( {
+				...variation,
+				settings: variation.settings ?? {},
+				styles: variation.styles ?? {},
+			} ) ),
 		];
 	}, [ variations ] );
 
@@ -108,7 +123,7 @@ function ScreenStyleVariations() {
 		<>
 			<ScreenHeader
 				back="/"
-				title={ __( 'Other styles' ) }
+				title={ __( 'Browse styles' ) }
 				description={ __(
 					'Choose a different style combination for the theme styles'
 				) }

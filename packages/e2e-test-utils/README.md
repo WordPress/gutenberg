@@ -2,7 +2,9 @@
 
 End-To-End (E2E) test utils for WordPress.
 
-_It works properly with the minimum version of Gutenberg `9.2.0` or the minimum version of WordPress `5.6.0`._
+_It works properly with the minimum version of Gutenberg `13.8.0` or the minimum version of WordPress `6.0.0`._
+
+**Note that there's currently an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate E2E tests to Playwright instead. This package is deprecated and will only accept bug fixes until fully migrated.**
 
 ## Installation
 
@@ -12,7 +14,7 @@ Install the module
 npm install @wordpress/e2e-test-utils --save-dev
 ```
 
-**Note**: This package requires Node.js 12.0.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js 14.0.0 or later. It is not compatible with older versions.
 
 ## API
 
@@ -404,6 +406,18 @@ _Returns_
 
 -   `Promise`: Promise resolving with post content markup.
 
+### getListViewBlocks
+
+Gets all block anchor nodes in the list view that match a given block name label.
+
+_Parameters_
+
+-   _blockLabel_ `string`: the label of the block as displayed in the ListView.
+
+_Returns_
+
+-   `Promise`: all the blocks anchor nodes matching the lable in the ListView.
+
 ### getOption
 
 Returns a site option, from the options admin page.
@@ -673,6 +687,10 @@ _Returns_
 
 -   `Promise`: Promise resolving when publish is complete.
 
+### resetPreferences
+
+Clears all user meta preferences.
+
 ### saveDraft
 
 Saves the post as a draft, resolving once the request is complete (once the
@@ -741,6 +759,10 @@ _Parameters_
 
 -   _setting_ `string`: The option, used to get the option by id.
 -   _value_ `string`: The value to set the option to.
+
+_Returns_
+
+-   `string`: The previous value of the option.
 
 ### setPostContent
 
@@ -853,6 +875,14 @@ Converts editor's block type.
 _Parameters_
 
 -   _name_ `string`: Block name.
+
+### trashAllComments
+
+Navigates to the comments listing screen and bulk-trashes any comments which exist.
+
+_Returns_
+
+-   `Promise`: Promise resolving once comments have been trashed.
 
 ### trashAllPosts
 

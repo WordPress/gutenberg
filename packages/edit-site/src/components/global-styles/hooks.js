@@ -20,16 +20,17 @@ import {
 import { getValueFromVariable, getPresetVariableFromValue } from './utils';
 import { GlobalStylesContext } from './context';
 
-const EMPTY_CONFIG = { isGlobalStylesUserThemeJSON: true, version: 1 };
+const EMPTY_CONFIG = { settings: {}, styles: {} };
 
 export const useGlobalStylesReset = () => {
 	const { user: config, setUserConfig } = useContext( GlobalStylesContext );
 	const canReset = !! config && ! isEqual( config, EMPTY_CONFIG );
 	return [
 		canReset,
-		useCallback( () => setUserConfig( () => EMPTY_CONFIG ), [
-			setUserConfig,
-		] ),
+		useCallback(
+			() => setUserConfig( () => EMPTY_CONFIG ),
+			[ setUserConfig ]
+		),
 	];
 };
 
@@ -127,21 +128,21 @@ export function useStyle( path, blockName, source = 'all' ) {
 	switch ( source ) {
 		case 'all':
 			result = getValueFromVariable(
-				mergedConfig.settings,
+				mergedConfig,
 				blockName,
 				get( userConfig, finalPath ) ?? get( baseConfig, finalPath )
 			);
 			break;
 		case 'user':
 			result = getValueFromVariable(
-				mergedConfig.settings,
+				mergedConfig,
 				blockName,
 				get( userConfig, finalPath )
 			);
 			break;
 		case 'base':
 			result = getValueFromVariable(
-				baseConfig.settings,
+				baseConfig,
 				blockName,
 				get( baseConfig, finalPath )
 			);
@@ -158,6 +159,7 @@ const ROOT_BLOCK_SUPPORTS = [
 	'backgroundColor',
 	'color',
 	'linkColor',
+	'buttonColor',
 	'fontFamily',
 	'fontSize',
 	'fontStyle',
@@ -166,6 +168,9 @@ const ROOT_BLOCK_SUPPORTS = [
 	'textDecoration',
 	'textTransform',
 	'padding',
+	'contentSize',
+	'wideSize',
+	'blockGap',
 ];
 
 export function getSupportedGlobalStylesPanels( name ) {
@@ -180,6 +185,21 @@ export function getSupportedGlobalStylesPanels( name ) {
 	}
 
 	const supportKeys = [];
+
+	// Check for blockGap support.
+	// Block spacing support doesn't map directly to a single style property, so needs to be handled separately.
+	// Also, only allow `blockGap` support if serialization has not been skipped, to be sure global spacing can be applied.
+	if (
+		blockType?.supports?.spacing?.blockGap &&
+		blockType?.supports?.spacing?.__experimentalSkipSerialization !==
+			true &&
+		! blockType?.supports?.spacing?.__experimentalSkipSerialization?.some?.(
+			( spacingType ) => spacingType === 'blockGap'
+		)
+	) {
+		supportKeys.push( 'blockGap' );
+	}
+
 	Object.keys( STYLE_PROPERTY ).forEach( ( styleName ) => {
 		if ( ! STYLE_PROPERTY[ styleName ].support ) {
 			return;

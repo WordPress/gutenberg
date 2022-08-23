@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { filter, map } from 'lodash';
 import TestUtils, { act } from 'react-dom/test-utils';
 import ReactDOM from 'react-dom';
 
@@ -10,7 +9,6 @@ import ReactDOM from 'react-dom';
  */
 import fixtures from './lib/fixtures';
 import TokenFieldWrapper from './lib/token-field-wrapper';
-import TokenInput from '../token-input';
 
 /**
  * Module variables
@@ -57,7 +55,7 @@ describe( 'FormTokenField', () => {
 		const textNodes = wrapperElement().querySelectorAll(
 			'.components-form-token-field__token-text span[aria-hidden]'
 		);
-		return map( textNodes, ( node ) => node.innerHTML );
+		return Array.from( textNodes ).map( ( node ) => node.innerHTML );
 	}
 
 	function getSuggestionsText( selector ) {
@@ -65,7 +63,7 @@ describe( 'FormTokenField', () => {
 			selector || '.components-form-token-field__suggestion'
 		);
 
-		return map( suggestionNodes, getSuggestionNodeText );
+		return Array.from( suggestionNodes ).map( getSuggestionNodeText );
 	}
 
 	function getSuggestionNodeText( node ) {
@@ -78,13 +76,11 @@ describe( 'FormTokenField', () => {
 		// match).
 		const div = document.createElement( 'div' );
 		div.innerHTML = node.querySelector( 'span' ).outerHTML;
-		return map(
-			filter(
-				div.firstChild.childNodes,
+		return Array.from( div.firstChild.childNodes )
+			.filter(
 				( childNode ) => childNode.nodeType !== childNode.COMMENT_NODE
-			),
-			( childNode ) => childNode.textContent
-		);
+			)
+			.map( ( childNode ) => childNode.textContent );
 	}
 
 	function getSelectedSuggestion() {
@@ -106,8 +102,9 @@ describe( 'FormTokenField', () => {
 				wrapper,
 				'components-form-token-field__input'
 			);
+
 		textInputComponent = () =>
-			TestUtils.findRenderedComponentWithType( wrapper, TokenInput );
+			TestUtils.findRenderedDOMComponentWithTag( wrapper, 'input' );
 		/* eslint-enable react/no-find-dom-node */
 		TestUtils.Simulate.focus( textInputElement() );
 	}
@@ -157,13 +154,15 @@ describe( 'FormTokenField', () => {
 				isExpanded: true,
 			} );
 			expect( getSuggestionsText() ).toEqual( [] );
-			setText( 'th' );
+			act( () => {
+				setText( 'th' );
+			} );
 			expect( getSuggestionsText() ).toEqual(
 				fixtures.matchingSuggestions.th
 			);
 		} );
 
-		it( 'should show suggestions when when input is empty if expandOnFocus is set to true', () => {
+		it( 'should show suggestions when input is empty if expandOnFocus is set to true', () => {
 			setUp( { __experimentalExpandOnFocus: true } );
 			wrapper.setState( {
 				isExpanded: true,
@@ -184,7 +183,9 @@ describe( 'FormTokenField', () => {
 			wrapper.setState( {
 				isExpanded: true,
 			} );
-			setText( 'so' );
+			act( () => {
+				setText( 'so' );
+			} );
 			expect( getSuggestionsText() ).toEqual(
 				fixtures.matchingSuggestions.so
 			);
@@ -192,11 +193,18 @@ describe( 'FormTokenField', () => {
 
 		it( 'should match against the unescaped values of suggestions with special characters', () => {
 			setUp();
-			wrapper.setState( {
-				tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
-				isExpanded: true,
+
+			act( () => {
+				wrapper.setState( {
+					tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
+					isExpanded: true,
+				} );
 			} );
-			setText( '& S' );
+
+			act( () => {
+				setText( '& S' );
+			} );
+
 			expect( getSuggestionsText() ).toEqual(
 				fixtures.specialSuggestions.matchAmpersandUnescaped
 			);
@@ -204,11 +212,15 @@ describe( 'FormTokenField', () => {
 
 		it( 'should match against the unescaped values of suggestions with special characters (including spaces)', () => {
 			setUp();
-			wrapper.setState( {
-				tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
-				isExpanded: true,
+			act( () => {
+				wrapper.setState( {
+					tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
+					isExpanded: true,
+				} );
 			} );
-			setText( 's &' );
+			act( () => {
+				setText( 's &' );
+			} );
 			expect( getSuggestionsText() ).toEqual(
 				fixtures.specialSuggestions.matchAmpersandSequence
 			);
@@ -216,10 +228,14 @@ describe( 'FormTokenField', () => {
 
 		it( 'should not match against the escaped values of suggestions with special characters', () => {
 			setUp();
-			setText( 'amp' );
-			wrapper.setState( {
-				tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
-				isExpanded: true,
+			act( () => {
+				setText( 'amp' );
+			} );
+			act( () => {
+				wrapper.setState( {
+					tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
+					isExpanded: true,
+				} );
 			} );
 			expect( getSuggestionsText() ).toEqual(
 				fixtures.specialSuggestions.matchAmpersandEscaped
@@ -231,7 +247,9 @@ describe( 'FormTokenField', () => {
 			wrapper.setState( {
 				isExpanded: true,
 			} );
-			setText( '  at  ' );
+			act( () => {
+				setText( '  at  ' );
+			} );
 			expect( getSuggestionsText() ).toEqual(
 				fixtures.matchingSuggestions.at
 			);
@@ -242,7 +260,9 @@ describe( 'FormTokenField', () => {
 			wrapper.setState( {
 				isExpanded: true,
 			} );
-			setText( 'th' );
+			act( () => {
+				setText( 'th' );
+			} );
 			expect( getSuggestionsText() ).toEqual(
 				fixtures.matchingSuggestions.th
 			);
@@ -279,23 +299,29 @@ describe( 'FormTokenField', () => {
 
 		it( 'should re-render when suggestions prop has changed', () => {
 			setUp();
-			wrapper.setState( {
-				tokenSuggestions: [],
-				isExpanded: true,
+			act( () => {
+				wrapper.setState( {
+					tokenSuggestions: [],
+					isExpanded: true,
+				} );
 			} );
 			expect( getSuggestionsText() ).toEqual( [] );
-			setText( 'so' );
+			act( () => {
+				setText( 'so' );
+			} );
 			expect( getSuggestionsText() ).toEqual( [] );
-
-			wrapper.setState( {
-				tokenSuggestions: fixtures.specialSuggestions.default,
+			act( () => {
+				wrapper.setState( {
+					tokenSuggestions: fixtures.specialSuggestions.default,
+				} );
 			} );
 			expect( getSuggestionsText() ).toEqual(
 				fixtures.matchingSuggestions.so
 			);
-
-			wrapper.setState( {
-				tokenSuggestions: [],
+			act( () => {
+				wrapper.setState( {
+					tokenSuggestions: [],
+				} );
 			} );
 			expect( getSuggestionsText() ).toEqual( [] );
 		} );
@@ -310,18 +336,22 @@ describe( 'FormTokenField', () => {
 
 		it( 'should not allow adding whitespace tokens with Tab', () => {
 			setUp();
-			setText( '   ' );
+			act( () => {
+				setText( '   ' );
+			} );
 			sendKeyDown( keyCodes.tab );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
 		it( 'should add a token when Enter pressed', () => {
 			setUp();
-			setText( 'baz' );
+			act( () => {
+				setText( 'baz' );
+			} );
 			sendKeyDown( keyCodes.enter );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar', 'baz' ] );
 			const textNode = textInputComponent();
-			expect( textNode.props.value ).toBe( '' );
+			expect( textNode.value ).toBe( '' );
 		} );
 
 		it( 'should not allow adding blank tokens with Enter', () => {
@@ -365,6 +395,37 @@ describe( 'FormTokenField', () => {
 			setText( 'baz' );
 			sendKeyDown( keyCodes.enter );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
+		} );
+
+		it( 'should automatically select the first matching suggestions when __experimentalAutoSelectFirstMatch is set to true', () => {
+			setUp( { __experimentalAutoSelectFirstMatch: true } );
+
+			wrapper.setState( {
+				isExpanded: true,
+			} );
+
+			expect( getSuggestionsText() ).toEqual( [] );
+
+			const searchText = 'so';
+
+			act( () => {
+				setText( searchText );
+			} );
+
+			const expectedFirstMatchTokens =
+				fixtures.matchingSuggestions[ searchText ][ 0 ];
+
+			expect( getSelectedSuggestion() ).toEqual(
+				expectedFirstMatchTokens
+			);
+
+			sendKeyDown( keyCodes.enter );
+
+			expect( wrapper.state.tokens ).toEqual( [
+				'foo',
+				'bar',
+				expectedFirstMatchTokens.join( '' ),
+			] );
 		} );
 	} );
 

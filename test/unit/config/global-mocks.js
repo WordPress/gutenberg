@@ -1,12 +1,7 @@
 jest.mock( '@wordpress/compose', () => {
-	const App = () => null;
 	return {
 		...jest.requireActual( '@wordpress/compose' ),
 		useViewportMatch: jest.fn(),
-		useResizeObserver: jest.fn( () => [
-			<App key={ 'mock-key' } />,
-			{ width: 700, height: 500 },
-		] ),
 	};
 } );
 
@@ -22,3 +17,5 @@ jest.mock( '@wordpress/compose', () => {
 if ( ! window.wp?.galleryBlockV2Enabled ) {
 	window.wp = { ...window.wp, galleryBlockV2Enabled: true };
 }
+
+global.ResizeObserver = require( 'resize-observer-polyfill' );

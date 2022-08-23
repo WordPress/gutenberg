@@ -2,6 +2,42 @@
 
 ## Unreleased
 
+## 5.13.0 (2022-08-10)
+
+## 5.12.0 (2022-07-27)
+
+## 5.11.0 (2022-07-13)
+
+## 5.10.0 (2022-06-29)
+
+## 5.9.0 (2022-06-15)
+
+## 5.8.0 (2022-06-01)
+
+## 5.7.0 (2022-05-18)
+
+### Bug Fix
+
+-   `useRefEffect`: Allow `void` as a valid callback return type ([#40798](https://github.com/WordPress/gutenberg/pull/40798)).
+
+### New Features
+
+-   Add `useDisabled` hook.
+
+### Internal
+
+-   Update the implementation of useResizeObserver to rely on the ResizableObserver API.
+
+## 5.6.0 (2022-05-04)
+
+## 5.5.0 (2022-04-21)
+
+## 5.4.0 (2022-04-08)
+
+## 5.3.0 (2022-03-23)
+
+## 5.2.0 (2022-03-11)
+
 ## 5.1.0 (2022-01-27)
 
 ## 5.0.0 (2021-07-29)

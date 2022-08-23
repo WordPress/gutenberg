@@ -28,9 +28,8 @@ function PostAuthorEdit( {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const { authorId, authorDetails, authors } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, getUser, getUsers } = select(
-				coreStore
-			);
+			const { getEditedEntityRecord, getUser, getUsers } =
+				select( coreStore );
 			const _authorId = getEditedEntityRecord(
 				'postType',
 				postType,
@@ -69,29 +68,31 @@ function PostAuthorEdit( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Author Settings' ) }>
-					{ ! isDescendentOfQueryLoop && !! authors?.length && (
-						<SelectControl
-							label={ __( 'Author' ) }
-							value={ authorId }
-							options={ authors.map( ( { id, name } ) => {
-								return {
-									value: id,
-									label: name,
-								};
-							} ) }
-							onChange={ ( nextAuthorId ) => {
-								editEntityRecord(
-									'postType',
-									postType,
-									postId,
-									{
-										author: nextAuthorId,
-									}
-								);
-							} }
-						/>
-					) }
+				<PanelBody title={ __( 'Settings' ) }>
+					{ !! postId &&
+						! isDescendentOfQueryLoop &&
+						!! authors?.length && (
+							<SelectControl
+								label={ __( 'Author' ) }
+								value={ authorId }
+								options={ authors.map( ( { id, name } ) => {
+									return {
+										value: id,
+										label: name,
+									};
+								} ) }
+								onChange={ ( nextAuthorId ) => {
+									editEntityRecord(
+										'postType',
+										postType,
+										postId,
+										{
+											author: nextAuthorId,
+										}
+									);
+								} }
+							/>
+						) }
 					<ToggleControl
 						label={ __( 'Show avatar' ) }
 						checked={ showAvatar }
@@ -161,9 +162,12 @@ function PostAuthorEdit( {
 						{ authorDetails?.name || __( 'Post Author' ) }
 					</p>
 					{ showBio && (
-						<p className="wp-block-post-author__bio">
-							{ authorDetails?.description }
-						</p>
+						<p
+							className="wp-block-post-author__bio"
+							dangerouslySetInnerHTML={ {
+								__html: authorDetails?.description,
+							} }
+						/>
 					) }
 				</div>
 			</div>

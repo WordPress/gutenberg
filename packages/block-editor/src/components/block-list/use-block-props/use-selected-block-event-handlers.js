@@ -24,9 +24,8 @@ export function useEventHandlers( clientId ) {
 		( select ) => select( blockEditorStore ).isBlockSelected( clientId ),
 		[ clientId ]
 	);
-	const { getBlockRootClientId, getBlockIndex } = useSelect(
-		blockEditorStore
-	);
+	const { getBlockRootClientId, getBlockIndex } =
+		useSelect( blockEditorStore );
 	const { insertDefaultBlock, removeBlock } = useDispatch( blockEditorStore );
 
 	return useRefEffect(

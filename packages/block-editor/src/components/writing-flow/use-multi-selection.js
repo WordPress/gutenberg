@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { first, last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
@@ -13,33 +8,6 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
-
-/**
- * Returns for the deepest node at the start or end of a container node. Ignores
- * any text nodes that only contain HTML formatting whitespace.
- *
- * @param {Element} node Container to search.
- * @param {string}  type 'start' or 'end'.
- */
-function getDeepestNode( node, type ) {
-	const child = type === 'start' ? 'firstChild' : 'lastChild';
-	const sibling = type === 'start' ? 'nextSibling' : 'previousSibling';
-
-	while ( node[ child ] ) {
-		node = node[ child ];
-
-		while (
-			node.nodeType === node.TEXT_NODE &&
-			/^[ \t\n]*$/.test( node.data ) &&
-			node[ sibling ]
-		) {
-			node = node[ sibling ];
-		}
-	}
-
-	return node;
-}
 
 function selector( select ) {
 	const {
@@ -48,6 +16,7 @@ function selector( select ) {
 		hasMultiSelection,
 		getSelectedBlockClientId,
 		getSelectedBlocksInitialCaretPosition,
+		__unstableIsFullySelected,
 	} = select( blockEditorStore );
 
 	return {
@@ -56,6 +25,7 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		selectedBlockClientId: getSelectedBlockClientId(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
+		isFullSelection: __unstableIsFullySelected(),
 	};
 }
 
@@ -66,11 +36,8 @@ export default function useMultiSelection() {
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
 		selectedBlockClientId,
+		isFullSelection,
 	} = useSelect( selector, [] );
-	const selectedRef = useBlockRef( selectedBlockClientId );
-	// These must be in the right DOM order.
-	const startRef = useBlockRef( first( multiSelectedBlockClientIds ) );
-	const endRef = useBlockRef( last( multiSelectedBlockClientIds ) );
 
 	/**
 	 * When the component updates, and there is multi selection, we need to
@@ -89,28 +56,6 @@ export default function useMultiSelection() {
 			}
 
 			if ( ! hasMultiSelection || isMultiSelecting ) {
-				if ( ! selectedBlockClientId || isMultiSelecting ) {
-					return;
-				}
-
-				const selection = defaultView.getSelection();
-
-				if ( selection.rangeCount && ! selection.isCollapsed ) {
-					const blockNode = selectedRef.current;
-					const {
-						startContainer,
-						endContainer,
-					} = selection.getRangeAt( 0 );
-
-					if (
-						!! blockNode &&
-						( ! blockNode.contains( startContainer ) ||
-							! blockNode.contains( endContainer ) )
-					) {
-						selection.removeAllRanges();
-					}
-				}
-
 				return;
 			}
 
@@ -120,9 +65,7 @@ export default function useMultiSelection() {
 				return;
 			}
 
-			// The block refs might not be immediately available
-			// when dragging blocks into another block.
-			if ( ! startRef.current || ! endRef.current ) {
+			if ( ! isFullSelection ) {
 				return;
 			}
 
@@ -132,24 +75,11 @@ export default function useMultiSelection() {
 			// able to select across instances immediately.
 			node.contentEditable = true;
 
-			// For some browsers, like Safari, it is important that focus happens
-			// BEFORE selection.
+			// For some browsers, like Safari, it is important that focus
+			// happens BEFORE selection removal.
 			node.focus();
 
-			const selection = defaultView.getSelection();
-			const range = ownerDocument.createRange();
-
-			// These must be in the right DOM order.
-			// The most stable way to select the whole block contents is to start
-			// and end at the deepest points.
-			const startNode = getDeepestNode( startRef.current, 'start' );
-			const endNode = getDeepestNode( endRef.current, 'end' );
-
-			range.setStartBefore( startNode );
-			range.setEndAfter( endNode );
-
-			selection.removeAllRanges();
-			selection.addRange( range );
+			defaultView.getSelection().removeAllRanges();
 		},
 		[
 			hasMultiSelection,
@@ -157,6 +87,7 @@ export default function useMultiSelection() {
 			multiSelectedBlockClientIds,
 			selectedBlockClientId,
 			initialPosition,
+			isFullSelection,
 		]
 	);
 }

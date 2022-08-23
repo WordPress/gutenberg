@@ -968,10 +968,6 @@ _Returns_
 Returns whether the pre-publish panel should be shown
 or skipped when the user clicks the "publish" button.
 
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
 _Returns_
 
 -   `boolean`: Whether the pre-publish panel should be shown or not.
@@ -1049,11 +1045,7 @@ Action that creates an undo history record.
 
 ### disablePublishSidebar
 
-Action that disables the publish sidebar.
-
-_Returns_
-
--   `Object`: Action object
+Disables the publish sidebar.
 
 ### editPost
 
@@ -1067,11 +1059,7 @@ _Parameters_
 
 ### enablePublishSidebar
 
-Action that enables the publish sidebar.
-
-_Returns_
-
--   `Object`: Action object
+Enable the publish sidebar.
 
 ### enterFormattedText
 

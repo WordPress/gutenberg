@@ -40,7 +40,7 @@ export default function FontFamilyControl( {
 	];
 	return (
 		<SelectControl
-			label={ __( 'Font family' ) }
+			label={ __( 'Font' ) }
 			options={ options }
 			value={ value }
 			onChange={ onChange }

@@ -125,3 +125,29 @@ exports[`block editor keyboard shortcuts test shortcuts handling through portals
 <p>3rd</p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`block editor keyboard shortcuts test shortcuts handling through portals in the same tree should propagate properly and duplicate selected blocks 1`] = `
+"<!-- wp:paragraph -->
+<p>1st</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2nd</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>3rd</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>1st</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2nd</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>3rd</p>
+<!-- /wp:paragraph -->"
+`;

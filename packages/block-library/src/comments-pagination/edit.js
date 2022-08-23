@@ -7,6 +7,7 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
+	Warning,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
@@ -53,6 +54,7 @@ export default function QueryPaginationEdit( {
 			].includes( innerBlock.name );
 		} );
 	}, [] );
+
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
@@ -63,6 +65,27 @@ export default function QueryPaginationEdit( {
 		],
 		__experimentalLayout: usedLayout,
 	} );
+
+	// Get the Discussion settings
+	const pageComments = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { __experimentalDiscussionSettings } = getSettings();
+		return __experimentalDiscussionSettings?.pageComments;
+	}, [] );
+
+	// If paging comments is not enabled in the Discussion Settings then hide the pagination
+	// controls. We don't want to remove them from the template so that when the user enables
+	// paging comments, the controls will be visible.
+	if ( ! pageComments ) {
+		return (
+			<Warning>
+				{ __(
+					'Comments Pagination block: paging comments is disabled in the Discussion Settings'
+				) }
+			</Warning>
+		);
+	}
+
 	return (
 		<>
 			{ hasNextPreviousBlocks && (

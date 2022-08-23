@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+–   Add TypeScript types to the built package (via "types": "build-types" in the package.json)
+
+## 6.15.0 (2022-08-10)
+
+## 6.14.0 (2022-07-27)
+
+## 6.13.0 (2022-07-13)
+
+### Enhancements
+
+-   Use `useDebugValue` in `useSelect` to better display data in React DevTools ([#42225](https://github.com/WordPress/gutenberg/pull/42225)).
+
+## 6.12.0 (2022-06-29)
+
+## 6.11.0 (2022-06-15)
+
+## 6.10.0 (2022-06-01)
+
+## 6.9.0 (2022-05-18)
+
+## 6.8.0 (2022-05-04)
+
+## 6.7.0 (2022-04-21)
+
+## 6.6.0 (2022-04-08)
+
+## 6.5.0 (2022-03-23)
+
+## 6.4.0 (2022-03-11)
+
 ## 6.3.0 (2022-02-23)
 
 ### New Features

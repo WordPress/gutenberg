@@ -4,7 +4,7 @@
 	"name": "core/group",
 	"title": "Group",
 	"category": "design",
-	"description": "Combine blocks into a group.",
+	"description": "Gather blocks in a layout container.",
 	"keywords": [ "container", "wrapper", "row", "section" ],
 	"textdomain": "default",
 	"attributes": {
@@ -15,11 +15,20 @@
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", false ]
+		},
+		"layout": {
+			"type": "object",
+			"default": {
+				"type": "constrained"
+			}
 		}
 	},
 	"supports": {
+		"__experimentalOnEnter": true,
+		"__experimentalSettings": true,
 		"align": [ "wide", "full" ],
 		"anchor": true,
+		"ariaLabel": true,
 		"html": false,
 		"color": {
 			"gradients": true,
@@ -53,10 +62,12 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontStyle": true,
+			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
-			"__experimentalLetterSpacing": true,
+			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}

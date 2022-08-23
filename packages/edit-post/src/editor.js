@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { forEach, size, map, without } from 'lodash';
+import { forEach, map, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,6 +18,7 @@ import { StrictMode, useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -38,12 +39,12 @@ function Editor( {
 		hasFixedToolbar,
 		focusMode,
 		hasReducedUI,
+		hasInlineToolbar,
 		hasThemeStyles,
 		post,
 		preferredStyleVariations,
 		hiddenBlockTypes,
 		blockTypes,
-		__experimentalLocalAutosaveInterval,
 		keepCaretInsideBlock,
 		isTemplateMode,
 		template,
@@ -51,15 +52,13 @@ function Editor( {
 		( select ) => {
 			const {
 				isFeatureActive,
-				getPreference,
 				__experimentalGetPreviewDeviceType,
 				isEditingTemplate,
 				getEditedPostTemplate,
 				getHiddenBlockTypes,
 			} = select( editPostStore );
-			const { getEntityRecord, getPostType, getEntityRecords } = select(
-				coreStore
-			);
+			const { getEntityRecord, getPostType, getEntityRecords, canUser } =
+				select( coreStore );
 			const { getEditorSettings } = select( editorStore );
 			const { getBlockTypes } = select( blocksStore );
 			const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
@@ -76,9 +75,10 @@ function Editor( {
 			} else {
 				postObject = getEntityRecord( 'postType', postType, postId );
 			}
-			const supportsTemplateMode = getEditorSettings()
-				.supportsTemplateMode;
+			const supportsTemplateMode =
+				getEditorSettings().supportsTemplateMode;
 			const isViewable = getPostType( postType )?.viewable ?? false;
+			const canEditTemplate = canUser( 'create', 'templates' );
 
 			return {
 				hasFixedToolbar:
@@ -86,19 +86,18 @@ function Editor( {
 					__experimentalGetPreviewDeviceType() !== 'Desktop',
 				focusMode: isFeatureActive( 'focusMode' ),
 				hasReducedUI: isFeatureActive( 'reducedUI' ),
+				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
 				hasThemeStyles: isFeatureActive( 'themeStyles' ),
-				preferredStyleVariations: getPreference(
+				preferredStyleVariations: select( preferencesStore ).get(
+					'core/edit-post',
 					'preferredStyleVariations'
 				),
 				hiddenBlockTypes: getHiddenBlockTypes(),
 				blockTypes: getBlockTypes(),
-				__experimentalLocalAutosaveInterval: getPreference(
-					'localAutosaveInterval'
-				),
 				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 				isTemplateMode: isEditingTemplate(),
 				template:
-					supportsTemplateMode && isViewable
+					supportsTemplateMode && isViewable && canEditTemplate
 						? getEditedPostTemplate()
 						: null,
 				post: postObject,
@@ -107,9 +106,8 @@ function Editor( {
 		[ postType, postId ]
 	);
 
-	const { updatePreferredStyleVariations, setIsInserterOpened } = useDispatch(
-		editPostStore
-	);
+	const { updatePreferredStyleVariations, setIsInserterOpened } =
+		useDispatch( editPostStore );
 
 	const editorSettings = useMemo( () => {
 		const result = {
@@ -121,7 +119,7 @@ function Editor( {
 			hasFixedToolbar,
 			focusMode,
 			hasReducedUI,
-			__experimentalLocalAutosaveInterval,
+			hasInlineToolbar,
 
 			// This is marked as experimental to give time for the quick inserter to mature.
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
@@ -132,7 +130,7 @@ function Editor( {
 		};
 
 		// Omit hidden block types if exists and non-empty.
-		if ( size( hiddenBlockTypes ) > 0 ) {
+		if ( hiddenBlockTypes.length > 0 ) {
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).
@@ -156,7 +154,6 @@ function Editor( {
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,
-		__experimentalLocalAutosaveInterval,
 		setIsInserterOpened,
 		updatePreferredStyleVariations,
 		keepCaretInsideBlock,

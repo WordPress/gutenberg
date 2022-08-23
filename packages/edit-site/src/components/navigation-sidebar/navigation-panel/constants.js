@@ -31,7 +31,7 @@ export const TEMPLATES_SECONDARY = [
 	'date',
 	'tag',
 	'attachment',
-	'single-post',
+	'single',
 	'front-page',
 ];
 
@@ -45,7 +45,7 @@ export const TEMPLATES_GENERAL = [ 'page-home' ];
 export const TEMPLATES_POSTS_PREFIXES = [
 	'post-',
 	'author-',
-	'single-post-',
+	'single-',
 	'tag-',
 ];
 

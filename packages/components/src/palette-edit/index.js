@@ -9,7 +9,10 @@ import { kebabCase } from 'lodash';
 import { useState, useRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
-import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
+import {
+	__experimentalUseFocusOutside as useFocusOutside,
+	useDebounce,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -53,11 +56,36 @@ function NameInput( { value, onChange, label } ) {
 	);
 }
 
-function getNameForPosition( position ) {
+/**
+ * Returns a temporary name for a palette item in the format "Color + id".
+ * To ensure there are no duplicate ids, this function checks all slugs for temporary names.
+ * It expects slugs to be in the format: slugPrefix + color- + number.
+ * It then sets the id component of the new name based on the incremented id of the highest existing slug id.
+ *
+ * @param {string} elements   An array of color palette items.
+ * @param {string} slugPrefix The slug prefix used to match the element slug.
+ *
+ * @return {string} A unique name for a palette item.
+ */
+export function getNameForPosition( elements, slugPrefix ) {
+	const temporaryNameRegex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
+	const position = elements.reduce( ( previousValue, currentValue ) => {
+		if ( typeof currentValue?.slug === 'string' ) {
+			const matches = currentValue?.slug.match( temporaryNameRegex );
+			if ( matches ) {
+				const id = parseInt( matches[ 1 ], 10 );
+				if ( id >= previousValue ) {
+					return id + 1;
+				}
+			}
+		}
+		return previousValue;
+	}, 1 );
+
 	return sprintf(
 		/* translators: %s: is a temporary id for a custom color */
-		__( 'Color %s ' ),
-		position + 1
+		__( 'Color %s' ),
+		position
 	);
 }
 
@@ -128,12 +156,14 @@ function Option( {
 			</HStack>
 			{ isEditing && (
 				<Popover
-					position="bottom left"
+					placement="left-start"
+					offset={ 20 }
 					className="components-palette-edit__popover"
 				>
 					{ ! isGradient && (
 						<ColorPicker
 							color={ value }
+							enableAlpha
 							onChange={ ( newColor ) =>
 								onChange( {
 									...element,
@@ -160,9 +190,10 @@ function Option( {
 	);
 }
 
-function isTemporaryElement( slugPrefix, { slug, color, gradient }, index ) {
+function isTemporaryElement( slugPrefix, { slug, color, gradient } ) {
+	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
 	return (
-		slug === slugPrefix + kebabCase( getNameForPosition( index ) ) &&
+		regex.test( slug ) &&
 		( ( !! color && color === DEFAULT_COLOR ) ||
 			( !! gradient && gradient === DEFAULT_GRADIENT ) )
 	);
@@ -190,13 +221,15 @@ function PaletteEditListView( {
 				)
 			) {
 				const newElements = elementsReference.current.filter(
-					( element, index ) =>
-						! isTemporaryElement( slugPrefix, element, index )
+					( element ) => ! isTemporaryElement( slugPrefix, element )
 				);
 				onChange( newElements.length ? newElements : undefined );
 			}
 		};
 	}, [] );
+
+	const debounceOnChange = useDebounce( onChange, 100 );
+
 	return (
 		<VStack spacing={ 3 }>
 			<ItemGroup isRounded>
@@ -212,7 +245,7 @@ function PaletteEditListView( {
 							}
 						} }
 						onChange={ ( newElement ) => {
-							onChange(
+							debounceOnChange(
 								elements.map(
 									( currentElement, currentIndex ) => {
 										if ( currentIndex === index ) {
@@ -303,8 +336,10 @@ export default function PaletteEdit( {
 							}
 							onClick={ () => {
 								const tempOptionName = getNameForPosition(
-									elementsLength
+									elements,
+									slugPrefix
 								);
+
 								onChange( [
 									...elements,
 									{

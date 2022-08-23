@@ -3,7 +3,7 @@
  */
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
-import { slice, toHTMLString } from '@wordpress/rich-text';
+import { insert, toHTMLString } from '@wordpress/rich-text';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 
@@ -12,6 +12,33 @@ import { useDispatch } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 import { preventEventDiscovery } from './prevent-event-discovery';
+import {
+	retrieveSelectedAttribute,
+	START_OF_SELECTED_AREA,
+} from '../../utils/selection';
+
+function findSelection( blocks ) {
+	let i = blocks.length;
+
+	while ( i-- ) {
+		const attributeKey = retrieveSelectedAttribute(
+			blocks[ i ].attributes
+		);
+
+		if ( attributeKey ) {
+			blocks[ i ].attributes[ attributeKey ] = blocks[ i ].attributes[
+				attributeKey
+			].replace( START_OF_SELECTED_AREA, '' );
+			return blocks[ i ].clientId;
+		}
+
+		const nestedSelection = findSelection( blocks[ i ].innerBlocks );
+
+		if ( nestedSelection ) {
+			return nestedSelection;
+		}
+	}
+}
 
 export function useInputRules( props ) {
 	const {
@@ -22,7 +49,7 @@ export function useInputRules( props ) {
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function inputRule() {
-			const { value, onReplace } = propsRef.current;
+			const { value, onReplace, selectionChange } = propsRef.current;
 
 			if ( ! onReplace ) {
 				return;
@@ -52,10 +79,11 @@ export function useInputRules( props ) {
 			}
 
 			const content = toHTMLString( {
-				value: slice( value, start, text.length ),
+				value: insert( value, START_OF_SELECTED_AREA, 0, start ),
 			} );
 			const block = transformation.transform( content );
 
+			selectionChange( findSelection( [ block ] ) );
 			onReplace( [ block ] );
 			__unstableMarkAutomaticChange();
 		}

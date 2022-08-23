@@ -31,9 +31,47 @@ Many components include CSS to add style, you will need to add in order to appea
 
 In non-WordPress projects, link to the `build-style/style.css` file directly, it is located at `node_modules/@wordpress/components/build-style/style.css`.
 
+### Popovers and Tooltips
+
+_If you're using [`Popover`](/packages/components/src/popover/README.md) or [`Tooltip`](/packages/components/src/tooltip/README.md) components outside of the editor, make sure they are rendered within a `SlotFillProvider` and with a `Popover.Slot` somewhere up the element tree._
+
+By default, the `Popover` component will render inline i.e. within its
+parent to which it should anchor. Depending upon the context in which the
+`Popover` is being consumed, this might lead to incorrect positioning. For
+example, when being nested within another popover.
+
+This issue can be solved by rendering popovers to a specific location in the DOM via the
+`Popover.Slot`. For this to work, you will need your use of the `Popover`
+component and its `Slot` to be wrapped in a [`SlotFill`](/packages/components/src/slot-fill/README.md) provider.
+
+A `Popover` is also used as the underlying mechanism to display `Tooltip` components.
+So the same considerations should be applied to them.
+
+The following example illustrates how you can wrap a component using a
+`Popover` and have those popovers render to a single location in the DOM.
+
+```jsx
+/**
+ * External dependencies
+ */
+import { Popover, SlotFillProvider } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { MyComponentWithPopover } from './my-component';
+
+const Example = () => {
+	<SlotFillProvider>
+		<MyComponentWithPopover />
+		<Popover.Slot>
+	</SlotFillProvider>
+};
+```
+
 ## Docs & examples
 
-You can browse the components docs and examples at https://wordpress.github.io/gutenberg/
+You can browse the components docs and examples at [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
 
 ## Contributing to this package
 

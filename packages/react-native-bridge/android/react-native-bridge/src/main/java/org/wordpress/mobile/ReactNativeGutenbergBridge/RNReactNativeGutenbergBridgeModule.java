@@ -1,6 +1,11 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.provider.Settings;
 
 import androidx.annotation.Nullable;
 
@@ -465,5 +470,20 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     @ReactMethod
     public void sendEventToHost(final String eventName, final ReadableMap properties) {
         mGutenbergBridgeJS2Parent.sendEventToHost(eventName, properties);
+    }
+
+    @ReactMethod
+    public void generateHapticFeedback() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            int hapticFeedbackEnabled = Settings.System.getInt(mReactContext.getContentResolver(), Settings.System.HAPTIC_FEEDBACK_ENABLED, 0);
+            if (hapticFeedbackEnabled == 0) {
+                return;
+            }
+            VibrationEffect tickEffect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK);
+            Vibrator vibrator = (Vibrator) mReactContext.getSystemService(Context.VIBRATOR_SERVICE);
+            if (vibrator != null) {
+                vibrator.vibrate(tickEffect);
+            }
+        }
     }
 }

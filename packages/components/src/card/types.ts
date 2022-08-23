@@ -6,7 +6,7 @@ import type { CSSProperties } from 'react';
 /**
  * Internal dependencies
  */
-import type { Props as SurfaceProps } from '../surface/types';
+import type { SurfaceProps } from '../surface/types';
 
 type DeprecatedSizeOptions = 'extraSmall';
 export type SizeOptions = 'xSmall' | 'small' | 'medium' | 'large';

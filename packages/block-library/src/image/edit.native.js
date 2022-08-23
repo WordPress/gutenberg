@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback } from 'react-native';
+import {
+	ActivityIndicator,
+	Image as RNImage,
+	TouchableWithoutFeedback,
+	View,
+} from 'react-native';
 import { useRoute } from '@react-navigation/native';
 
 /**
@@ -45,7 +50,7 @@ import {
 	blockSettingsScreens,
 } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { getProtocol, hasQueryArg } from '@wordpress/url';
+import { getProtocol, hasQueryArg, isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -57,6 +62,7 @@ import {
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editPostStore } from '@wordpress/edit-post';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -186,21 +192,17 @@ export class ImageEdit extends Component {
 		this.state = {
 			isCaptionSelected: false,
 			uploadStatus: UPLOAD_STATE_IDLE,
-			isAnimatedGif: false,
 		};
 
 		this.replacedFeaturedImage = false;
 
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
-			this
-		);
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
-			this
-		);
+		this.finishMediaUploadWithSuccess =
+			this.finishMediaUploadWithSuccess.bind( this );
+		this.finishMediaUploadWithFailure =
+			this.finishMediaUploadWithFailure.bind( this );
 		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
-		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
-			this
-		);
+		this.onSelectMediaUploadOption =
+			this.onSelectMediaUploadOption.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetNewTab = this.onSetNewTab.bind( this );
@@ -208,10 +210,10 @@ export class ImageEdit extends Component {
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onSetFeatured = this.onSetFeatured.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
+		this.onSelectURL = this.onSelectURL.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
-		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(
-			this
-		);
+		this.accessibilityLabelCreator =
+			this.accessibilityLabelCreator.bind( this );
 		this.setMappedAttributes = this.setMappedAttributes.bind( this );
 		this.onSizeChangeValue = this.onSizeChangeValue.bind( this );
 	}
@@ -264,17 +266,17 @@ export class ImageEdit extends Component {
 	}
 
 	componentDidUpdate( previousProps ) {
-		const {
-			image,
-			attributes,
-			setAttributes,
-			featuredImageId,
-		} = this.props;
+		const { image, attributes, setAttributes, featuredImageId } =
+			this.props;
+		const { url } = attributes;
 		if ( ! previousProps.image && image ) {
-			const url =
-				getUrlForSlug( image, attributes?.sizeSlug ) ||
-				image.source_url;
-			setAttributes( { url } );
+			if ( ! hasQueryArg( url, 'w' ) && attributes?.sizeSlug ) {
+				const updatedUrl =
+					getUrlForSlug( image, attributes.sizeSlug ) ||
+					image.source_url;
+
+				setAttributes( { url: updatedUrl } );
+			}
 		}
 
 		const { id } = attributes;
@@ -364,10 +366,6 @@ export class ImageEdit extends Component {
 
 		setAttributes( { url: payload.mediaUrl, id: payload.mediaServerId } );
 		this.setState( { uploadStatus: UPLOAD_STATE_SUCCEEDED } );
-
-		this.setState( {
-			isAnimatedGif: payload.mediaUrl.toLowerCase().includes( '.gif' ),
-		} );
 	}
 
 	finishMediaUploadWithFailure( payload ) {
@@ -434,6 +432,7 @@ export class ImageEdit extends Component {
 			id: media.id,
 			url: media.url,
 			caption: media.caption,
+			alt: media.alt,
 		};
 
 		let additionalAttributes;
@@ -464,10 +463,42 @@ export class ImageEdit extends Component {
 			...mediaAttributes,
 			...additionalAttributes,
 		} );
+	}
 
-		this.setState( {
-			isAnimatedGif: media.url.toLowerCase().includes( '.gif' ),
-		} );
+	onSelectURL( newURL ) {
+		const { createErrorNotice, imageDefaultSize, setAttributes } =
+			this.props;
+
+		if ( isURL( newURL ) ) {
+			this.setState( {
+				isFetchingImage: true,
+			} );
+
+			// Use RN's Image.getSize to determine if URL is a valid image
+			RNImage.getSize(
+				newURL,
+				() => {
+					setAttributes( {
+						url: newURL,
+						id: undefined,
+						width: undefined,
+						height: undefined,
+						sizeSlug: imageDefaultSize,
+					} );
+					this.setState( {
+						isFetchingImage: false,
+					} );
+				},
+				() => {
+					createErrorNotice( __( 'Image file not found.' ) );
+					this.setState( {
+						isFetchingImage: false,
+					} );
+				}
+			);
+		} else {
+			createErrorNotice( __( 'Invalid URL.' ) );
+		}
 	}
 
 	onFocusCaption() {
@@ -490,6 +521,14 @@ export class ImageEdit extends Component {
 					styles.iconPlaceholderDark
 				) }
 			/>
+		);
+	}
+
+	showLoadingIndicator() {
+		return (
+			<View style={ styles.image__loading }>
+				<ActivityIndicator animating />
+			</View>
 		);
 	}
 
@@ -539,7 +578,7 @@ export class ImageEdit extends Component {
 					<>
 						{ __(
 							'Describe the purpose of the image. Leave empty if the image is purely decorative.'
-						) }
+						) }{ ' ' }
 						<FooterMessageLink
 							href={
 								'https://www.w3.org/WAI/tutorials/images/decision-tree/'
@@ -615,8 +654,12 @@ export class ImageEdit extends Component {
 		);
 	}
 
+	isGif( url ) {
+		return url.toLowerCase().includes( '.gif' );
+	}
+
 	render() {
-		const { isCaptionSelected } = this.state;
+		const { isCaptionSelected, isFetchingImage } = this.state;
 		const {
 			attributes,
 			isSelected,
@@ -626,6 +669,7 @@ export class ImageEdit extends Component {
 			context,
 			featuredImageId,
 			wasBlockJustInserted,
+			shouldUseFastImage,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 		const hasImageContext = context
@@ -675,7 +719,7 @@ export class ImageEdit extends Component {
 
 		const getInspectorControls = () => (
 			<InspectorControls>
-				<PanelBody title={ __( 'Image settings' ) } />
+				<PanelBody title={ __( 'Settings' ) } />
 				<PanelBody style={ styles.panelBody }>
 					<BlockStyles clientId={ clientId } url={ url } />
 				</PanelBody>
@@ -718,9 +762,11 @@ export class ImageEdit extends Component {
 		if ( ! url ) {
 			return (
 				<View style={ styles.content }>
+					{ isFetchingImage && this.showLoadingIndicator() }
 					<MediaPlaceholder
 						allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 						onSelect={ this.onSelectMediaUploadOption }
+						onSelectURL={ this.onSelectURL }
 						icon={ this.getPlaceholderIcon() }
 						onFocus={ this.props.onFocus }
 						autoOpenMediaUpload={
@@ -748,11 +794,12 @@ export class ImageEdit extends Component {
 			context?.fixedHeight && styles.fixedHeight,
 		];
 
-		const badgeLabelShown = isFeaturedImage || this.state.isAnimatedGif;
+		const isGif = this.isGif( url );
+		const badgeLabelShown = isFeaturedImage || isGif;
 		let badgeLabelText = '';
 		if ( isFeaturedImage ) {
 			badgeLabelText = __( 'Featured' );
-		} else if ( this.state.isAnimatedGif ) {
+		} else if ( isGif ) {
 			badgeLabelText = __( 'GIF' );
 		}
 
@@ -761,7 +808,6 @@ export class ImageEdit extends Component {
 				<TouchableWithoutFeedback
 					accessible={ ! isSelected }
 					onPress={ this.onImagePressed }
-					onLongPress={ openMediaOptions }
 					disabled={ ! isSelected }
 				>
 					<View style={ styles.content }>
@@ -789,6 +835,8 @@ export class ImageEdit extends Component {
 							} ) => {
 								return (
 									<View style={ imageContainerStyles }>
+										{ isFetchingImage &&
+											this.showLoadingIndicator() }
 										<Image
 											align={
 												align && alignToFlex[ align ]
@@ -801,6 +849,9 @@ export class ImageEdit extends Component {
 											isUploadFailed={ isUploadFailed }
 											isUploadInProgress={
 												isUploadInProgress
+											}
+											shouldUseFastImage={
+												shouldUseFastImage
 											}
 											onSelectMediaUploadOption={
 												this.onSelectMediaUploadOption
@@ -841,6 +892,7 @@ export class ImageEdit extends Component {
 				allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 				isReplacingMedia={ true }
 				onSelect={ this.onSelectMediaUploadOption }
+				onSelectURL={ this.onSelectURL }
 				render={ ( { open, getMediaOptions } ) => {
 					return getImageComponent( open, getMediaOptions );
 				} }
@@ -852,16 +904,16 @@ export class ImageEdit extends Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( coreStore );
-		const { getSettings, wasBlockJustInserted } = select(
-			blockEditorStore
-		);
+		const { getSettings, wasBlockJustInserted } =
+			select( blockEditorStore );
 		const { getEditedPostAttribute } = select( 'core/editor' );
 		const {
 			attributes: { id, url },
 			isSelected,
 			clientId,
 		} = props;
-		const { imageSizes, imageDefaultSize } = getSettings();
+		const { imageSizes, imageDefaultSize, shouldUseFastImage } =
+			getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
 		const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
@@ -873,11 +925,13 @@ export default compose( [
 				isNotFileUrl &&
 				url &&
 				! hasQueryArg( url, 'w' ) );
+		const image = shouldGetMedia ? getMedia( id ) : null;
 
 		return {
-			image: shouldGetMedia ? getMedia( id ) : null,
+			image,
 			imageSizes,
 			imageDefaultSize,
+			shouldUseFastImage,
 			featuredImageId,
 			wasBlockJustInserted: wasBlockJustInserted(
 				clientId,
@@ -886,7 +940,10 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
+		const { createErrorNotice } = dispatch( noticesStore );
+
 		return {
+			createErrorNotice,
 			closeSettingsBottomSheet() {
 				dispatch( editPostStore ).closeGeneralSidebar();
 			},

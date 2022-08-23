@@ -1,0 +1,3 @@
+<!-- wp:shortcode -->
+[my-shortcode]
+<!-- /wp:shortcode -->

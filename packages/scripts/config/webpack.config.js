@@ -36,7 +36,7 @@ if ( ! browserslist.findConfig( '.' ) ) {
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 
-const copyWebPackPattens = process.env.WP_COPY_PHP_FILES_TO_DIST
+const copyWebpackPatterns = process.env.WP_COPY_PHP_FILES_TO_DIST
 	? '**/{block.json,*.php}'
 	: '**/block.json';
 
@@ -90,7 +90,7 @@ const cssLoaders = [
 const config = {
 	mode,
 	target,
-	entry: getWebpackEntryPoints(),
+	entry: getWebpackEntryPoints,
 	output: {
 		filename: '[name].js',
 		path: resolve( process.cwd(), 'build' ),
@@ -99,7 +99,7 @@ const config = {
 		alias: {
 			'lodash-es': 'lodash',
 		},
-		extensions: [ '.ts', '.tsx', '...' ],
+		extensions: [ '.jsx', '.ts', '.tsx', '...' ],
 	},
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
@@ -232,9 +232,38 @@ const config = {
 		new CopyWebpackPlugin( {
 			patterns: [
 				{
-					from: copyWebPackPattens,
-					context: 'src',
+					from: copyWebpackPatterns,
+					context: process.env.WP_SRC_DIRECTORY,
 					noErrorOnMissing: true,
+					transform( content, absoluteFrom ) {
+						const convertExtension = ( path ) => {
+							return path.replace( /\.(j|t)sx?$/, '.js' );
+						};
+
+						if ( basename( absoluteFrom ) === 'block.json' ) {
+							const blockJson = JSON.parse( content.toString() );
+							[ 'viewScript', 'script', 'editorScript' ].forEach(
+								( key ) => {
+									if ( Array.isArray( blockJson[ key ] ) ) {
+										blockJson[ key ] =
+											blockJson[ key ].map(
+												convertExtension
+											);
+									} else if (
+										typeof blockJson[ key ] === 'string'
+									) {
+										blockJson[ key ] = convertExtension(
+											blockJson[ key ]
+										);
+									}
+								}
+							);
+
+							return JSON.stringify( blockJson, null, 2 );
+						}
+
+						return content;
+					},
 				},
 			],
 		} ),

@@ -34,6 +34,7 @@ export {
 // components whose mechanisms can be shielded from the `edit` implementation
 // and just passed along.
 export { default as parse } from './parser';
+export { serializeRawBlock } from './parser/serialize-raw-block';
 export {
 	getBlockAttributes,
 	parseWithAttributeSchema,
@@ -88,7 +89,7 @@ export {
 // they will be run for all valid and invalid blocks alike. However, once a
 // block is detected as invalid -- failing the three first steps -- it is
 // adequate to spend more time determining validity before throwing a conflict.
-export { isValidBlockContent } from './validation';
+export { isValidBlockContent, validateBlock } from './validation';
 export { getCategories, setCategories, updateCategory } from './categories';
 
 // Blocks are inherently indifferent about where the data they operate with ends

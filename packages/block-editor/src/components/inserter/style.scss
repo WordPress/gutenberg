@@ -23,6 +23,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__popover.is-quick {
 	.components-popover__content {
 		border: none;
+		outline: none;
 
 		.block-editor-inserter__quick-inserter > * {
 			border-left: $border-width solid $gray-400;
@@ -310,7 +311,7 @@ $block-inserter-tabs-height: 44px;
 	border-top: $border-width solid $gray-300;
 }
 
-.block-editor-inserter__popover.is-quick > .components-popover__content > div {
+.block-editor-inserter__popover.is-quick > .components-popover__content {
 	padding: 0;
 }
 
@@ -341,7 +342,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-block-patterns-explorer {
 	&__sidebar {
 		position: absolute;
-		top: $header-height;
+		top: $header-height + $grid-unit-20;
 		left: 0;
 		bottom: 0;
 		width: $sidebar-width;

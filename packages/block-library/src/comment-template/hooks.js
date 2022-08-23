@@ -7,25 +7,20 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
 
+// This is limited by WP REST API
+const MAX_COMMENTS_PER_PAGE = 100;
+
 /**
  * Return an object with the query args needed to fetch the default page of
  * comments.
  *
- * @param {Object}  props             Hook props.
- * @param {number}  props.postId      ID of the post that contains the comments.
- * @param {number}  props.perPage     The number of comments included per page.
- * @param {string}  props.defaultPage Page shown by default (newest/oldest).
- * @param {boolean} props.inherit     Overwrite props with values from WP
- *                                    discussion settings.
+ * @param {Object} props        Hook props.
+ * @param {number} props.postId ID of the post that contains the comments.
+ *                              discussion settings.
  *
  * @return {Object} Query args to retrieve the comments.
  */
-export const useCommentQueryArgs = ( {
-	postId,
-	perPage,
-	defaultPage,
-	inherit,
-} ) => {
+export const useCommentQueryArgs = ( { postId } ) => {
 	// Initialize the query args that are not going to change.
 	const queryArgs = {
 		status: 'approve',
@@ -36,22 +31,23 @@ export const useCommentQueryArgs = ( {
 	};
 
 	// Get the Discussion settings that may be needed to query the comments.
-	const { commentsPerPage, defaultCommentsPage } = useSelect( ( select ) => {
+	const {
+		pageComments,
+		commentsPerPage,
+		defaultCommentsPage: defaultPage,
+	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { __experimentalDiscussionSettings } = getSettings();
 		return __experimentalDiscussionSettings;
 	} );
 
-	// Overwrite the received attributes if `inherit` is true.
-	if ( inherit ) {
-		perPage = commentsPerPage;
-		defaultPage = defaultCommentsPage;
-	}
-
-	// If a block props is not set, use the settings value to generate the
-	// appropriate query arg.
-	perPage = perPage || commentsPerPage;
-	defaultPage = defaultPage || defaultCommentsPage;
+	// WP REST API doesn't allow fetching more than max items limit set per single page of data.
+	// As for the editor performance is more important than completeness of data and fetching only the
+	// max allowed for single page should be enough for the purpose of design and laying out the page.
+	// Fetching over the limit would return an error here but would work with backend query.
+	const perPage = pageComments
+		? Math.min( commentsPerPage, MAX_COMMENTS_PER_PAGE )
+		: MAX_COMMENTS_PER_PAGE;
 
 	// Get the number of the default page.
 	const page = useDefaultPageIndex( {
@@ -112,9 +108,10 @@ const useDefaultPageIndex = ( { defaultPage, postId, perPage, queryArgs } ) => {
 			method: 'HEAD',
 			parse: false,
 		} ).then( ( res ) => {
+			const pages = parseInt( res.headers.get( 'X-WP-TotalPages' ) );
 			setDefaultPages( {
 				...defaultPages,
-				[ key ]: parseInt( res.headers.get( 'X-WP-TotalPages' ) ),
+				[ key ]: pages <= 1 ? 1 : pages, // If there are 0 pages, it means that there are no comments, but there is no 0th page.
 			} );
 		} );
 	}, [ defaultPage, postId, perPage, setDefaultPages ] );

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { get, includes, some, flatten, values } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,8 +11,10 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+import deprecated from '@wordpress/deprecated';
 
 const EMPTY_ARRAY = [];
+const EMPTY_OBJECT = {};
 
 /**
  * Returns the current editing mode.
@@ -22,9 +23,11 @@ const EMPTY_ARRAY = [];
  *
  * @return {string} Editing mode.
  */
-export function getEditorMode( state ) {
-	return getPreference( state, 'editorMode', 'visual' );
-}
+export const getEditorMode = createRegistrySelector(
+	( select ) => () =>
+		select( preferencesStore ).get( 'core/edit-post', 'editorMode' ) ??
+		'visual'
+);
 
 /**
  * Returns true if the editor sidebar is opened.
@@ -35,11 +38,11 @@ export function getEditorMode( state ) {
  */
 export const isEditorSidebarOpened = createRegistrySelector(
 	( select ) => () => {
-		const activeGeneralSidebar = select(
-			interfaceStore
-		).getActiveComplementaryArea( 'core/edit-post' );
-		return includes(
-			[ 'edit-post/document', 'edit-post/block' ],
+		const activeGeneralSidebar =
+			select( interfaceStore ).getActiveComplementaryArea(
+				'core/edit-post'
+			);
+		return [ 'edit-post/document', 'edit-post/block' ].includes(
 			activeGeneralSidebar
 		);
 	}
@@ -54,13 +57,13 @@ export const isEditorSidebarOpened = createRegistrySelector(
  */
 export const isPluginSidebarOpened = createRegistrySelector(
 	( select ) => () => {
-		const activeGeneralSidebar = select(
-			interfaceStore
-		).getActiveComplementaryArea( 'core/edit-post' );
+		const activeGeneralSidebar =
+			select( interfaceStore ).getActiveComplementaryArea(
+				'core/edit-post'
+			);
 		return (
 			!! activeGeneralSidebar &&
-			! includes(
-				[ 'edit-post/document', 'edit-post/block' ],
+			! [ 'edit-post/document', 'edit-post/block' ].includes(
 				activeGeneralSidebar
 			)
 		);
@@ -89,9 +92,57 @@ export const getActiveGeneralSidebarName = createRegistrySelector(
 	}
 );
 
-// The current list of preference keys that have been migrated to the
-// preferences package.
-const MIGRATED_KEYS = [ 'hiddenBlockTypes' ];
+/**
+ * Converts panels from the new preferences store format to the old format
+ * that the post editor previously used.
+ *
+ * The resultant converted data should look like this:
+ * {
+ *     panelName: {
+ *         enabled: false,
+ *         opened: true,
+ *     },
+ *     anotherPanelName: {
+ *         opened: true
+ *     },
+ * }
+ *
+ * @param {string[] | undefined} inactivePanels An array of inactive panel names.
+ * @param {string[] | undefined} openPanels     An array of open panel names.
+ *
+ * @return {Object} The converted panel data.
+ */
+function convertPanelsToOldFormat( inactivePanels, openPanels ) {
+	// First reduce the inactive panels.
+	const panelsWithEnabledState = inactivePanels?.reduce(
+		( accumulatedPanels, panelName ) => ( {
+			...accumulatedPanels,
+			[ panelName ]: {
+				enabled: false,
+			},
+		} ),
+		{}
+	);
+
+	// Then reduce the open panels, passing in the result of the previous
+	// reduction as the initial value so that both open and inactive
+	// panel state is combined.
+	const panels = openPanels?.reduce( ( accumulatedPanels, panelName ) => {
+		const currentPanelState = accumulatedPanels?.[ panelName ];
+		return {
+			...accumulatedPanels,
+			[ panelName ]: {
+				...currentPanelState,
+				opened: true,
+			},
+		};
+	}, panelsWithEnabledState ?? {} );
+
+	// The panels variable will only be set if openPanels wasn't `undefined`.
+	// If it isn't set just return `panelsWithEnabledState`, and if that isn't
+	// set return an empty object.
+	return panels ?? panelsWithEnabledState ?? EMPTY_OBJECT;
+}
 
 /**
  * Returns the preferences (these preferences are persisted locally).
@@ -100,34 +151,50 @@ const MIGRATED_KEYS = [ 'hiddenBlockTypes' ];
  *
  * @return {Object} Preferences Object.
  */
-export const getPreferences = createRegistrySelector(
-	( select ) => ( state ) => {
-		const editPostPreferences = state.preferences;
+export const getPreferences = createRegistrySelector( ( select ) => () => {
+	deprecated( `select( 'core/edit-post' ).getPreferences`, {
+		since: '6.0',
+		alternative: `select( 'core/preferences' ).get`,
+	} );
 
-		// Some preferences now exist in the preferences store.
-		// Fetch them so that they can be merged into the post
-		// editor preferences.
-		const preferenceStorePreferences = MIGRATED_KEYS.reduce(
-			( accumulatedPrefs, preferenceKey ) => {
-				const value = select( preferencesStore ).get(
-					'core/edit-post',
-					preferenceKey
-				);
-
-				return {
-					...accumulatedPrefs,
-					[ preferenceKey ]: value,
-				};
-			},
-			{}
+	// These preferences now exist in the preferences store.
+	// Fetch them so that they can be merged into the post
+	// editor preferences.
+	const preferences = [
+		'hiddenBlockTypes',
+		'editorMode',
+		'preferredStyleVariations',
+	].reduce( ( accumulatedPrefs, preferenceKey ) => {
+		const value = select( preferencesStore ).get(
+			'core/edit-post',
+			preferenceKey
 		);
 
 		return {
-			...editPostPreferences,
-			...preferenceStorePreferences,
+			...accumulatedPrefs,
+			[ preferenceKey ]: value,
 		};
-	}
-);
+	}, {} );
+
+	// Panels were a preference, but the data structure changed when the state
+	// was migrated to the preferences store. They need to be converted from
+	// the new preferences store format to old format to ensure no breaking
+	// changes for plugins.
+	const inactivePanels = select( preferencesStore ).get(
+		'core/edit-post',
+		'inactivePanels'
+	);
+	const openPanels = select( preferencesStore ).get(
+		'core/edit-post',
+		'openPanels'
+	);
+	const panels = convertPanelsToOldFormat( inactivePanels, openPanels );
+
+	return {
+		...preferences,
+		panels,
+	};
+} );
 
 /**
  *
@@ -138,11 +205,13 @@ export const getPreferences = createRegistrySelector(
  * @return {*} Preference Value.
  */
 export function getPreference( state, preferenceKey, defaultValue ) {
+	deprecated( `select( 'core/edit-post' ).getPreference`, {
+		since: '6.0',
+		alternative: `select( 'core/preferences' ).get`,
+	} );
+
 	// Avoid using the `getPreferences` registry selector where possible.
-	const isMigratedKey = MIGRATED_KEYS.includes( preferenceKey );
-	const preferences = isMigratedKey
-		? getPreferences( state )
-		: state.preferences;
+	const preferences = getPreferences( state );
 	const value = preferences[ preferenceKey ];
 	return value === undefined ? defaultValue : value;
 }
@@ -182,7 +251,7 @@ export function isPublishSidebarOpened( state ) {
  * @return {boolean} Whether or not the panel is removed.
  */
 export function isEditorPanelRemoved( state, panelName ) {
-	return includes( state.removedPanels, panelName );
+	return state.removedPanels.includes( panelName );
 }
 
 /**
@@ -194,14 +263,18 @@ export function isEditorPanelRemoved( state, panelName ) {
  *
  * @return {boolean} Whether or not the panel is enabled.
  */
-export function isEditorPanelEnabled( state, panelName ) {
-	const panels = getPreference( state, 'panels' );
-
-	return (
-		! isEditorPanelRemoved( state, panelName ) &&
-		get( panels, [ panelName, 'enabled' ], true )
-	);
-}
+export const isEditorPanelEnabled = createRegistrySelector(
+	( select ) => ( state, panelName ) => {
+		const inactivePanels = select( preferencesStore ).get(
+			'core/edit-post',
+			'inactivePanels'
+		);
+		return (
+			! isEditorPanelRemoved( state, panelName ) &&
+			! inactivePanels?.includes( panelName )
+		);
+	}
+);
 
 /**
  * Returns true if the given panel is open, or false otherwise. Panels are
@@ -212,13 +285,15 @@ export function isEditorPanelEnabled( state, panelName ) {
  *
  * @return {boolean} Whether or not the panel is open.
  */
-export function isEditorPanelOpened( state, panelName ) {
-	const panels = getPreference( state, 'panels' );
-	return (
-		get( panels, [ panelName ] ) === true ||
-		get( panels, [ panelName, 'opened' ] ) === true
-	);
-}
+export const isEditorPanelOpened = createRegistrySelector(
+	( select ) => ( state, panelName ) => {
+		const openPanels = select( preferencesStore ).get(
+			'core/edit-post',
+			'openPanels'
+		);
+		return !! openPanels?.includes( panelName );
+	}
+);
 
 /**
  * Returns true if a modal is active, or false otherwise.
@@ -291,7 +366,7 @@ export const getActiveMetaBoxLocations = createSelector(
 export function isMetaBoxLocationVisible( state, location ) {
 	return (
 		isMetaBoxLocationActive( state, location ) &&
-		some( getMetaBoxesPerLocation( state, location ), ( { id } ) => {
+		getMetaBoxesPerLocation( state, location )?.some( ( { id } ) => {
 			return isEditorPanelEnabled( state, `meta-box-${ id }` );
 		} )
 	);
@@ -332,7 +407,7 @@ export function getMetaBoxesPerLocation( state, location ) {
  */
 export const getAllMetaBoxes = createSelector(
 	( state ) => {
-		return flatten( values( state.metaBoxes.locations ) );
+		return Object.values( state.metaBoxes.locations ).flat();
 	},
 	( state ) => [ state.metaBoxes.locations ]
 );
@@ -389,11 +464,8 @@ export function isInserterOpened( state ) {
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
 export function __experimentalGetInsertionPoint( state ) {
-	const {
-		rootClientId,
-		insertionIndex,
-		filterValue,
-	} = state.blockInserterPanel;
+	const { rootClientId, insertionIndex, filterValue } =
+		state.blockInserterPanel;
 	return { rootClientId, insertionIndex, filterValue };
 }
 
@@ -437,9 +509,8 @@ export function areMetaBoxesInitialized( state ) {
  */
 export const getEditedPostTemplate = createRegistrySelector(
 	( select ) => () => {
-		const currentTemplate = select( editorStore ).getEditedPostAttribute(
-			'template'
-		);
+		const currentTemplate =
+			select( editorStore ).getEditedPostAttribute( 'template' );
 		if ( currentTemplate ) {
 			const templateWithSameSlug = select( coreStore )
 				.getEntityRecords( 'postType', 'wp_template', { per_page: -1 } )

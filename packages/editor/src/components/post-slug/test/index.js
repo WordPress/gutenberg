@@ -4,6 +4,11 @@
 import { shallow } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import { TextControl } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import { PostSlug } from '../';
@@ -13,13 +18,9 @@ describe( 'PostSlug', () => {
 		it( 'should update internal slug', () => {
 			const wrapper = shallow( <PostSlug postSlug="index" /> );
 
-			wrapper.find( 'input' ).simulate( 'change', {
-				target: {
-					value: 'single-post',
-				},
-			} );
+			wrapper.find( TextControl ).prop( 'onChange' )( 'single' );
 
-			expect( wrapper.state().editedSlug ).toEqual( 'single-post' );
+			expect( wrapper.state().editedSlug ).toEqual( 'single' );
 		} );
 
 		it( 'should update slug', () => {
@@ -28,13 +29,13 @@ describe( 'PostSlug', () => {
 				<PostSlug postSlug="index" onUpdateSlug={ onUpdateSlug } />
 			);
 
-			wrapper.find( 'input' ).simulate( 'blur', {
+			wrapper.find( TextControl ).prop( 'onBlur' )( {
 				target: {
-					value: 'single-post',
+					value: 'single',
 				},
 			} );
 
-			expect( onUpdateSlug ).toHaveBeenCalledWith( 'single-post' );
+			expect( onUpdateSlug ).toHaveBeenCalledWith( 'single' );
 		} );
 	} );
 } );

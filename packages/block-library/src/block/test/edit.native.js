@@ -74,14 +74,11 @@ describe( 'Reusable block', () => {
 			return Promise.resolve( response );
 		} );
 
-		const {
-			getByA11yLabel,
-			getByTestId,
-			getByText,
-		} = await initializeEditor( {
-			initialHtml: '',
-			capabilities: { reusableBlock: true },
-		} );
+		const { getByA11yLabel, getByTestId, getByText } =
+			await initializeEditor( {
+				initialHtml: '',
+				capabilities: { reusableBlock: true },
+			} );
 
 		// Open the inserter menu.
 		fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
@@ -146,7 +143,7 @@ describe( 'Reusable block', () => {
 	} );
 
 	// Skipped until `pointerEvents: 'none'` no longer erroneously prevents
-	// triggering `onLayout*` on the element: https://git.io/JSHZt.
+	// triggering `onLayout*` on the element: https://github.com/callstack/react-native-testing-library/issues/897.
 	it.skip( 'renders block content', async () => {
 		// We have to use different ids because entities are cached in memory.
 		const id = 4;

@@ -1,11 +1,6 @@
 /* eslint-disable react/forbid-elements */
 
 /**
- * External dependencies
- */
-import { noop, get, omit, pick } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
@@ -37,6 +32,16 @@ import {
 } from '../registration';
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../constants';
 import { store as blocksStore } from '../../store';
+
+const noop = () => {};
+const omit = ( obj, keys ) =>
+	Object.fromEntries(
+		Object.entries( obj ).filter( ( [ key ] ) => ! keys.includes( key ) )
+	);
+const pick = ( obj, keys ) =>
+	Object.fromEntries(
+		Object.entries( obj ).filter( ( [ key ] ) => keys.includes( key ) )
+	);
 
 describe( 'blocks', () => {
 	const defaultBlockSettings = {
@@ -415,6 +420,42 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		// This test can be removed once the polyfill for ancestor gets removed.
+		it( 'should apply ancestor on the client when not set on the server', () => {
+			const blockName = 'core/test-block-with-ancestor';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					category: 'widgets',
+				},
+			} );
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					ancestor: 'core/test-block-ancestor',
+					category: 'ignored',
+				},
+			} );
+
+			const blockType = {
+				title: 'block title',
+			};
+			registerBlockType( blockName, blockType );
+			expect( getBlockType( blockName ) ).toEqual( {
+				ancestor: 'core/test-block-ancestor',
+				name: blockName,
+				save: expect.any( Function ),
+				title: 'block title',
+				category: 'widgets',
+				icon: { src: BLOCK_ICON_DEFAULT },
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				keywords: [],
+				supports: {},
+				styles: [],
+				variations: [],
+			} );
+		} );
+
 		it( 'should validate the icon', () => {
 			const blockType = {
 				save: noop,
@@ -728,10 +769,7 @@ describe( 'blocks', () => {
 										styles: [],
 										variations: [],
 										save: () => null,
-										...get(
-											serverSideBlockDefinitions,
-											name
-										),
+										...serverSideBlockDefinitions[ name ],
 										...blockSettingsWithDeprecations,
 									},
 									DEPRECATED_ENTRY_KEYS

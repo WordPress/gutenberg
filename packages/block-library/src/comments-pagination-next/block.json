@@ -5,21 +5,14 @@
 	"title": "Next Page",
 	"category": "theme",
 	"parent": [ "core/comments-pagination" ],
-	"description": "Displays the next comments page link.",
+	"description": "Displays the next comment's page link.",
 	"textdomain": "default",
 	"attributes": {
 		"label": {
 			"type": "string"
 		}
 	},
-	"usesContext": [
-		"postId",
-		"comments/perPage",
-		"comments/order",
-		"comments/inherit",
-		"comments/defaultPage",
-		"comments/paginationArrow"
-	],
+	"usesContext": [ "postId", "comments/paginationArrow" ],
 	"supports": {
 		"reusable": false,
 		"html": false,
@@ -33,10 +26,12 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontStyle": true,
+			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
-			"__experimentalLetterSpacing": true,
+			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}

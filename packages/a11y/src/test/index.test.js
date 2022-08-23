@@ -112,12 +112,11 @@ describe( 'speak', () => {
 
 	describe( 'setup when the elements already exist', () => {
 		it( 'should not create the aria live regions again', () => {
-			const before = document.getElementsByClassName(
-				'a11y-speak-region'
-			).length;
+			const before =
+				document.getElementsByClassName( 'a11y-speak-region' ).length;
 			setup();
-			const after = document.getElementsByClassName( 'a11y-speak-region' )
-				.length;
+			const after =
+				document.getElementsByClassName( 'a11y-speak-region' ).length;
 
 			expect( before ).toBe( after );
 		} );

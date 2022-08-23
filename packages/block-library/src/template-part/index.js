@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { startCase } from 'lodash';
+import { capitalCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -41,13 +41,14 @@ export const settings = {
 		}
 
 		return (
-			decodeEntities( entity.title?.rendered ) || startCase( entity.slug )
+			decodeEntities( entity.title?.rendered ) ||
+			capitalCase( entity.slug )
 		);
 	},
 	edit,
 };
 
-// Importing this file includes side effects. This is whitelisted in block-library/package.json under sideEffects
+// Importing this file includes side effects. This is added in block-library/package.json under sideEffects
 addFilter(
 	'blocks.registerBlockType',
 	'core/template-part',

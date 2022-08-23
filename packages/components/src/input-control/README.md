@@ -18,7 +18,7 @@ const Example = () => {
 	return (
 		<InputControl
 			value={ value }
-			onChange={ ( nextValue ) => setValue( nextValue ) }
+			onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
 		/>
 	);
 };
@@ -105,5 +105,5 @@ Type of the input element to render. Defaults to "text".
 
 The current value of the input.
 
--   Type: `String | Number`
--   Required: Yes
+-   Type: `String`
+-   Required: No

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -97,6 +96,8 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  * @property {Function}                   renderControlBottom        Optional controls to be rendered at the bottom of the component.
  */
 
+const noop = () => {};
+
 /**
  * Renders a link control. A link control is a controlled input which maintains
  * a value associated with a link (HTML anchor element) and relevant settings
@@ -148,6 +149,9 @@ function LinkControl( {
 
 	const currentInputIsEmpty = ! currentInputValue?.trim()?.length;
 
+	const { createPage, isCreatingPage, errorMessage } =
+		useCreatePage( createSuggestion );
+
 	useEffect( () => {
 		if (
 			forceIsEditingLink !== undefined &&
@@ -185,7 +189,7 @@ function LinkControl( {
 		nextFocusTarget.focus();
 
 		isEndingEditWithFocus.current = false;
-	}, [ isEditingLink ] );
+	}, [ isEditingLink, isCreatingPage ] );
 
 	useEffect( () => {
 		/**
@@ -217,10 +221,6 @@ function LinkControl( {
 		setIsEditingLink( false );
 	}
 
-	const { createPage, isCreatingPage, errorMessage } = useCreatePage(
-		createSuggestion
-	);
-
 	const handleSelectSuggestion = ( updatedValue ) => {
 		onChange( {
 			...updatedValue,
@@ -235,6 +235,7 @@ function LinkControl( {
 			internalTextValue !== value?.title
 		) {
 			onChange( {
+				...value,
 				url: currentInputValue,
 				title: internalTextValue,
 			} );

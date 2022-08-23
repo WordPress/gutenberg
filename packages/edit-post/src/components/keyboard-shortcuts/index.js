@@ -18,15 +18,11 @@ import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
 	const { getBlockSelectionStart } = useSelect( blockEditorStore );
-	const {
-		getEditorMode,
-		isEditorSidebarOpened,
-		isListViewOpened,
-	} = useSelect( editPostStore );
+	const { getEditorMode, isEditorSidebarOpened, isListViewOpened } =
+		useSelect( editPostStore );
 	const isModeToggleDisabled = useSelect( ( select ) => {
-		const { richEditingEnabled, codeEditingEnabled } = select(
-			editorStore
-		).getEditorSettings();
+		const { richEditingEnabled, codeEditingEnabled } =
+			select( editorStore ).getEditorSettings();
 		return ! richEditingEnabled || ! codeEditingEnabled;
 	}, [] );
 

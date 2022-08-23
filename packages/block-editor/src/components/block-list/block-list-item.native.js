@@ -37,12 +37,8 @@ export class BlockListItem extends Component {
 			parentWidth,
 			blockWidth,
 		} = this.props;
-		const {
-			isFullWidth,
-			isWideWidth,
-			isWider,
-			isContainerRelated,
-		} = alignmentHelpers;
+		const { isFullWidth, isWideWidth, isWider, isContainerRelated } =
+			alignmentHelpers;
 
 		if ( isFullWidth( blockAlignment ) ) {
 			if ( ! hasParents ) {
@@ -83,12 +79,8 @@ export class BlockListItem extends Component {
 	}
 
 	getContentStyles( readableContentViewStyle ) {
-		const {
-			blockAlignment,
-			blockName,
-			hasParents,
-			parentBlockName,
-		} = this.props;
+		const { blockAlignment, blockName, hasParents, parentBlockName } =
+			this.props;
 		const { isFullWidth, isContainerRelated } = alignmentHelpers;
 
 		return [
@@ -121,6 +113,7 @@ export class BlockListItem extends Component {
 			blockWidth,
 			...restProps
 		} = this.props;
+
 		const readableContentViewStyle =
 			contentResizeMode === 'stretch' && stretchStyle;
 		const { isContainerRelated } = alignmentHelpers;
@@ -162,25 +155,20 @@ export class BlockListItem extends Component {
 	}
 
 	render() {
-		const {
-			gridProperties,
-			clientId,
-			parentWidth,
-			items,
-			blockWidth,
-		} = this.props;
+		const { parentWidth, blockWidth, isGridItem } = this.props;
 
 		if ( ! blockWidth ) {
 			return null;
 		}
 
-		if ( gridProperties ) {
+		if ( isGridItem ) {
+			const { numOfColumns, tileCount, tileIndex } = this.props;
 			return (
 				<Grid
-					numOfColumns={ gridProperties.numColumns }
-					tileCount={ items.length }
-					index={ items.indexOf( clientId ) }
 					maxWidth={ parentWidth }
+					numOfColumns={ numOfColumns }
+					tileCount={ tileCount }
+					index={ tileIndex }
 				>
 					{ this.renderContent() }
 				</Grid>

@@ -2,7 +2,19 @@
 
 ## Unreleased
 
-## 7.0.0-next.0 (2022-03-09)
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
+## 7.2.0 (2022-04-08)
+
+### Enhancement
+
+-   Changed `setOption` to use `options.php`, to allow setting any option (and to be more consistent with `getOption`). [#39502](https://github.com/WordPress/gutenberg/pull/39502)
+-   Changed `setOption` to return the changed setting's previous value (to make restoring it easier). [#39502](https://github.com/WordPress/gutenberg/pull/39502)
+-   Added a new `trashAllComments` function.
+
+## 7.0.0 (2022-03-11)
 
 ### Breaking Changes
 

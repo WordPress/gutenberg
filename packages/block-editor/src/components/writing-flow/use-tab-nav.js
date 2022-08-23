@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { focus } from '@wordpress/dom';
+import { focus, isFormElement } from '@wordpress/dom';
 import { TAB, ESCAPE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect, useMergeRefs } from '@wordpress/compose';
@@ -12,26 +12,13 @@ import { useRef } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../../store';
 
-function isFormElement( element ) {
-	const { tagName } = element;
-	return (
-		tagName === 'INPUT' ||
-		tagName === 'BUTTON' ||
-		tagName === 'SELECT' ||
-		tagName === 'TEXTAREA'
-	);
-}
-
 export default function useTabNav() {
 	const container = useRef();
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
 	const lastFocus = useRef();
-	const {
-		hasMultiSelection,
-		getSelectedBlockClientId,
-		getBlockCount,
-	} = useSelect( blockEditorStore );
+	const { hasMultiSelection, getSelectedBlockClientId, getBlockCount } =
+		useSelect( blockEditorStore );
 	const { setNavigationMode } = useDispatch( blockEditorStore );
 	const isNavigationMode = useSelect(
 		( select ) => select( blockEditorStore ).isNavigationMode(),
@@ -88,7 +75,7 @@ export default function useTabNav() {
 				return;
 			}
 
-			if ( event.keyCode === ESCAPE && ! hasMultiSelection() ) {
+			if ( event.keyCode === ESCAPE ) {
 				event.preventDefault();
 				setNavigationMode( true );
 				return;

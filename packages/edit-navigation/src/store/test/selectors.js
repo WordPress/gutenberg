@@ -9,7 +9,6 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import {
 	getNavigationPostForMenu,
 	hasResolvedNavigationPost,
-	getSelectedMenuId,
 } from '../selectors';
 import {
 	NAVIGATION_POST_KIND,
@@ -101,17 +100,5 @@ describe( 'hasResolvedNavigationPost', () => {
 		);
 
 		hasResolvedNavigationPost.registry = defaultRegistry;
-	} );
-} );
-
-describe( 'getSelectedMenuId', () => {
-	it( 'returns default selected menu ID (zero)', () => {
-		const state = {};
-		expect( getSelectedMenuId( state ) ).toBe( null );
-	} );
-
-	it( 'returns selected menu ID', () => {
-		const state = { selectedMenuId: 10 };
-		expect( getSelectedMenuId( state ) ).toBe( 10 );
 	} );
 } );

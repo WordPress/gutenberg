@@ -5,10 +5,15 @@ import { __, isRTL } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { redo as redoIcon, undo as undoIcon } from '@wordpress/icons';
-import { displayShortcut } from '@wordpress/keycodes';
+import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
+import { forwardRef } from '@wordpress/element';
 
-export default function RedoButton() {
+function RedoButton( props, ref ) {
+	const shortcut = isAppleOS()
+		? displayShortcut.primaryShift( 'z' )
+		: displayShortcut.primary( 'y' );
+
 	const hasRedo = useSelect(
 		( select ) => select( coreStore ).hasRedo(),
 		[]
@@ -16,9 +21,11 @@ export default function RedoButton() {
 	const { redo } = useDispatch( coreStore );
 	return (
 		<Button
+			{ ...props }
+			ref={ ref }
 			icon={ ! isRTL() ? redoIcon : undoIcon }
 			label={ __( 'Redo' ) }
-			shortcut={ displayShortcut.primaryShift( 'z' ) }
+			shortcut={ shortcut }
 			// If there are no undo levels we don't want to actually disable this
 			// button, because it will remove focus for keyboard users.
 			// See: https://github.com/WordPress/gutenberg/issues/3486
@@ -27,3 +34,5 @@ export default function RedoButton() {
 		/>
 	);
 }
+
+export default forwardRef( RedoButton );

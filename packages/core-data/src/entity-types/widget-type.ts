@@ -1,12 +1,13 @@
 /**
  * Internal dependencies
  */
-import { Context, OmitNevers } from './helpers';
+import type { Context, OmitNevers } from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
+import type { DefaultContextOf } from './index';
 
-declare module './base-entity-types' {
-	export namespace BaseEntityTypes {
+declare module './base-entity-records' {
+	export namespace BaseEntityRecords {
 		export interface WidgetType< C extends Context > {
 			/**
 			 * Unique slug identifying the widget type.
@@ -32,6 +33,6 @@ declare module './base-entity-types' {
 	}
 }
 
-export type WidgetType< C extends Context > = OmitNevers<
-	_BaseEntityTypes.WidgetType< C >
->;
+export type WidgetType<
+	C extends Context = DefaultContextOf< 'root', 'widgetType' >
+> = OmitNevers< _BaseEntityRecords.WidgetType< C > >;

@@ -10,13 +10,8 @@ import Cell from './cell';
 import Picker from '../picker';
 
 export default function BottomSheetPickerCell( props ) {
-	const {
-		options,
-		hideCancelButton,
-		onChangeValue,
-		value,
-		...cellProps
-	} = props;
+	const { options, hideCancelButton, onChangeValue, value, ...cellProps } =
+		props;
 
 	let picker;
 

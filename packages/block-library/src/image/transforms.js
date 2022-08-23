@@ -90,9 +90,10 @@ const transforms = {
 					node.className +
 					' ' +
 					node.querySelector( 'img' ).className;
-				const alignMatches = /(?:^|\s)align(left|center|right)(?:$|\s)/.exec(
-					className
-				);
+				const alignMatches =
+					/(?:^|\s)align(left|center|right)(?:$|\s)/.exec(
+						className
+					);
 				const anchor = node.id === '' ? undefined : node.id;
 				const align = alignMatches ? alignMatches[ 1 ] : undefined;
 				const idMatches = /(?:^|\s)wp-image-(\d+)(?:$|\s)/.exec(

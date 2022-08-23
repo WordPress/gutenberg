@@ -8,16 +8,18 @@ import {
 	FlexItem,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { Icon } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { IconWithCurrentColor } from './icon-with-current-color';
 
 function GenericNavigationButton( { icon, children, ...props } ) {
 	return (
 		<Item { ...props }>
 			{ icon && (
 				<HStack justify="flex-start">
-					<FlexItem>
-						<Icon icon={ icon } size={ 24 } />
-					</FlexItem>
+					<IconWithCurrentColor icon={ icon } size={ 24 } />
 					<FlexItem>{ children }</FlexItem>
 				</HStack>
 			) }
@@ -26,12 +28,12 @@ function GenericNavigationButton( { icon, children, ...props } ) {
 	);
 }
 
-function NavigationButton( props ) {
+function NavigationButtonAsItem( props ) {
 	return <NavigatorButton as={ GenericNavigationButton } { ...props } />;
 }
 
-function NavigationBackButton( props ) {
+function NavigationBackButtonAsItem( props ) {
 	return <NavigatorBackButton as={ GenericNavigationButton } { ...props } />;
 }
 
-export { NavigationButton, NavigationBackButton };
+export { NavigationButtonAsItem, NavigationBackButtonAsItem };

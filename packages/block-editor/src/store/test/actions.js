@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import deepFreeze from 'deep-freeze';
 
 /**
@@ -24,10 +23,10 @@ import reducer from '../reducer';
 import * as actions from '../actions';
 import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
 
+const noop = () => {};
+
 const {
 	clearSelectedBlock,
-	enterFormattedText,
-	exitFormattedText,
 	hideInsertionPoint,
 	insertBlock,
 	insertBlocks,
@@ -815,22 +814,6 @@ describe( 'actions', () => {
 		it( 'should return the STOP_DRAGGING_BLOCKS action', () => {
 			expect( stopDraggingBlocks() ).toEqual( {
 				type: 'STOP_DRAGGING_BLOCKS',
-			} );
-		} );
-	} );
-
-	describe( 'enterFormattedText', () => {
-		it( 'should return the ENTER_FORMATTED_TEXT action', () => {
-			expect( enterFormattedText() ).toEqual( {
-				type: 'ENTER_FORMATTED_TEXT',
-			} );
-		} );
-	} );
-
-	describe( 'exitFormattedText', () => {
-		it( 'should return the EXIT_FORMATTED_TEXT action', () => {
-			expect( exitFormattedText() ).toEqual( {
-				type: 'EXIT_FORMATTED_TEXT',
 			} );
 		} );
 	} );

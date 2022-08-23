@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { boolean, number, text } from '@storybook/addon-knobs';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -16,37 +11,49 @@ import NumberControl from '../';
 export default {
 	title: 'Components (Experimental)/NumberControl',
 	component: NumberControl,
-	parameters: {
-		knobs: { disable: false },
+	argTypes: {
+		size: {
+			control: {
+				type: 'select',
+				options: [ 'default', 'small', '__unstable-large' ],
+			},
+		},
+		onChange: { action: 'onChange' },
 	},
 };
 
-function Example() {
+function Template( { onChange, ...props } ) {
 	const [ value, setValue ] = useState( '0' );
-
-	const props = {
-		disabled: boolean( 'disabled', false ),
-		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
-		isPressEnterToChange: boolean( 'isPressEnterToChange', false ),
-		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
-		label: text( 'label', 'Number' ),
-		min: number( 'min', 0 ),
-		max: number( 'max', 100 ),
-		placeholder: text( 'placeholder', 0 ),
-		required: boolean( 'required', false ),
-		shiftStep: number( 'shiftStep', 10 ),
-		step: text( 'step', 1 ),
-	};
+	const [ isValidValue, setIsValidValue ] = useState( true );
 
 	return (
-		<NumberControl
-			{ ...props }
-			value={ value }
-			onChange={ ( v ) => setValue( v ) }
-		/>
+		<>
+			<NumberControl
+				{ ...props }
+				value={ value }
+				onChange={ ( v, extra ) => {
+					setValue( v );
+					setIsValidValue( extra.event.target.validity.valid );
+					onChange( v, extra );
+				} }
+			/>
+			<p>Is valid? { isValidValue ? 'Yes' : 'No' }</p>
+		</>
 	);
 }
 
-export const _default = () => {
-	return <Example />;
+export const Default = Template.bind( {} );
+Default.args = {
+	disabled: false,
+	hideLabelFromVision: false,
+	isPressEnterToChange: false,
+	isShiftStepEnabled: true,
+	label: 'Number',
+	min: 0,
+	max: 100,
+	placeholder: '0',
+	required: false,
+	shiftStep: 10,
+	size: 'default',
+	step: '1',
 };

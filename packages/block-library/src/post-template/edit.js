@@ -26,7 +26,10 @@ const TEMPLATE = [
 ];
 
 function PostTemplateInnerBlocks() {
-	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
+	const innerBlocksProps = useInnerBlocksProps(
+		{ className: 'wp-block-post' },
+		{ template: TEMPLATE }
+	);
 	return <li { ...innerBlocksProps } />;
 }
 
@@ -38,6 +41,9 @@ function PostTemplateBlockPreview( {
 } ) {
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
+		props: {
+			className: 'wp-block-post',
+		},
 	} );
 
 	const handleOnClick = () => {
@@ -78,10 +84,12 @@ export default function PostTemplateEdit( {
 			sticky,
 			inherit,
 			taxQuery,
+			parents,
 		} = {},
 		queryContext = [ { page: 1 } ],
 		templateSlug,
 		displayLayout: { type: layoutType = 'flex', columns = 1 } = {},
+		previewPostType,
 	},
 } ) {
 	const [ { page } ] = queryContext;
@@ -132,6 +140,9 @@ export default function PostTemplateEdit( {
 			if ( exclude?.length ) {
 				query.exclude = exclude;
 			}
+			if ( parents?.length ) {
+				query.parent = parents;
+			}
 			// If sticky is not set, it will return all posts in the results.
 			// If sticky is set to `only`, it will limit the results to sticky posts only.
 			// If it is anything else, it will exclude sticky posts from results. For the record the value stored is `exclude`.
@@ -146,8 +157,11 @@ export default function PostTemplateEdit( {
 					postType = query.postType;
 				}
 			}
+			// When we preview Query Loop blocks we should prefer the current
+			// block's postType, which is passed through block context.
+			const usedPostType = previewPostType || postType;
 			return {
-				posts: getEntityRecords( 'postType', postType, query ),
+				posts: getEntityRecords( 'postType', usedPostType, query ),
 				blocks: getBlocks( clientId ),
 			};
 		},
@@ -166,6 +180,8 @@ export default function PostTemplateEdit( {
 			inherit,
 			templateSlug,
 			taxQuery,
+			parents,
+			previewPostType,
 		]
 	);
 	const blockContexts = useMemo(

@@ -392,6 +392,11 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     func sendEventToHost(_ eventName: String, properties: [AnyHashable: Any]) {
         self.delegate?.gutenbergDidRequestSendEventToHost(eventName, properties: properties)
     }
+
+    @objc
+    func generateHapticFeedback() {
+        UISelectionFeedbackGenerator().selectionChanged()
+    }
 }
 
 // MARK: - RCTBridgeModule delegate

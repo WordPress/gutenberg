@@ -3,8 +3,6 @@
  */
 import { Platform } from 'react-native';
 
-import { delay } from 'lodash';
-
 import prompt from 'react-native-prompt-android';
 
 /**
@@ -39,12 +37,15 @@ export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
 export const OPTION_INSERT_FROM_URL = __( 'Insert from URL' );
+export const OPTION_WORDPRESS_MEDIA_LIBRARY = __( 'WordPress Media Library' );
 
 const URL_MEDIA_SOURCE = 'URL';
 
 const PICKER_OPENING_DELAY = 200;
 
 export class MediaUpload extends Component {
+	pickerTimeout;
+
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );
@@ -77,7 +78,13 @@ export class MediaUpload extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		clearTimeout( this.pickerTimeout );
+	}
+
 	getAllSources() {
+		const { onSelectURL } = this.props;
+
 		const cameraImageSource = {
 			id: mediaSources.deviceCamera, // ID is the value sent to native.
 			value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
@@ -124,16 +131,17 @@ export class MediaUpload extends Component {
 			id: URL_MEDIA_SOURCE,
 			value: URL_MEDIA_SOURCE,
 			label: __( 'Insert from URL' ),
-			types: [ MEDIA_TYPE_AUDIO ],
+			types: [ MEDIA_TYPE_AUDIO, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
 			icon: globe,
 		};
 
+		// Only include `urlSource` option if `onSelectURL` prop is present, in order to match the web behavior.
 		const internalSources = [
 			deviceLibrarySource,
 			cameraImageSource,
 			cameraVideoSource,
 			siteLibrarySource,
-			urlSource,
+			...( onSelectURL ? [ urlSource ] : [] ),
 		];
 
 		return internalSources.concat( this.state.otherMediaOptions );
@@ -185,7 +193,7 @@ export class MediaUpload extends Component {
 			// the delay below is required because on iOS this action sheet gets dismissed by the close event of the Inserter
 			// so this delay allows the Inserter to be closed fully before presenting action sheet.
 			if ( autoOpen && isIOS ) {
-				delay(
+				this.pickerTimeout = setTimeout(
 					() => this.picker.presentPicker(),
 					PICKER_OPENING_DELAY
 				);

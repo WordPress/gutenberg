@@ -148,6 +148,23 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should transform when typing backtick over selection', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'A selection test.' );
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowRight' );
+		await page.keyboard.type( '`' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Should undo the transform.
+		await pressKeyWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should only mutate text data on input', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );
@@ -483,28 +500,6 @@ describe( 'RichText', () => {
 
 		// Expect '1🍓'.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'should show/hide toolbar when entering/exiting format', async () => {
-		const blockToolbarSelector = '.block-editor-block-toolbar';
-		await clickBlockAppender();
-		await page.keyboard.type( '1' );
-		expect( await page.$( blockToolbarSelector ) ).toBe( null );
-		await pressKeyWithModifier( 'primary', 'b' );
-		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
-		await page.keyboard.type( '2' );
-		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
-		await pressKeyWithModifier( 'primary', 'b' );
-		expect( await page.$( blockToolbarSelector ) ).toBe( null );
-		await page.keyboard.type( '3' );
-		await page.keyboard.press( 'ArrowLeft' );
-		expect( await page.$( blockToolbarSelector ) ).toBe( null );
-		await page.keyboard.press( 'ArrowLeft' );
-		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
-		await page.keyboard.press( 'ArrowLeft' );
-		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
-		await page.keyboard.press( 'ArrowLeft' );
-		expect( await page.$( blockToolbarSelector ) ).toBe( null );
 	} );
 
 	it( 'should run input rules after composition end', async () => {

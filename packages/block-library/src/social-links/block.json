@@ -51,12 +51,13 @@
 		"__experimentalLayout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
+			"allowVerticalAlignment": false,
 			"default": {
 				"type": "flex"
 			}
 		},
 		"spacing": {
-			"blockGap": true,
+			"blockGap": [ "horizontal", "vertical" ],
 			"margin": [ "top", "bottom" ],
 			"units": [ "px", "em", "rem", "vh", "vw" ],
 			"__experimentalDefaultControls": {

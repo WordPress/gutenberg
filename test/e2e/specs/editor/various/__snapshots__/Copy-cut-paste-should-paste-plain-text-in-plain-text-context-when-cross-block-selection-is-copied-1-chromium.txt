@@ -1,0 +1,7 @@
+<!-- wp:heading -->
+<h2>Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Paragraph</p>
+<!-- /wp:paragraph -->

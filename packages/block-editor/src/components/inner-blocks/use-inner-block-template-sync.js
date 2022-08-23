@@ -40,9 +40,8 @@ export default function useInnerBlockTemplateSync(
 	templateLock,
 	templateInsertUpdatesSelection
 ) {
-	const { getSelectedBlocksInitialCaretPosition } = useSelect(
-		blockEditorStore
-	);
+	const { getSelectedBlocksInitialCaretPosition } =
+		useSelect( blockEditorStore );
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const innerBlocks = useSelect(
 		( select ) => select( blockEditorStore ).getBlocks( clientId ),

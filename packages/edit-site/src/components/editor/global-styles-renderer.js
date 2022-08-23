@@ -20,7 +20,7 @@ import { store as editSiteStore } from '../../store';
 import { useGlobalStylesOutput } from '../global-styles/use-global-styles-output';
 
 function useGlobalStylesRenderer() {
-	const [ styles, settings ] = useGlobalStylesOutput();
+	const [ styles, settings, svgFilters ] = useGlobalStylesOutput();
 	const { getSettings } = useSelect( editSiteStore );
 	const { updateSettings } = useDispatch( editSiteStore );
 
@@ -37,6 +37,7 @@ function useGlobalStylesRenderer() {
 		updateSettings( {
 			...currentStoreSettings,
 			styles: [ ...nonGlobalStyles, ...styles ],
+			svgFilters,
 			__experimentalFeatures: settings,
 		} );
 	}, [ styles, settings ] );

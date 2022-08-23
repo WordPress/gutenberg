@@ -11,6 +11,7 @@ import { useDispatch } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 import useConvertToGroupButtonProps from './use-convert-to-group-button-props';
+import BlockGroupToolbar from './toolbar';
 
 function ConvertToGroupButton( {
 	clientIds,
@@ -73,4 +74,8 @@ function ConvertToGroupButton( {
 	);
 }
 
-export { useConvertToGroupButtonProps, ConvertToGroupButton };
+export {
+	BlockGroupToolbar,
+	ConvertToGroupButton,
+	useConvertToGroupButtonProps,
+};

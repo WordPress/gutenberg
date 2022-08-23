@@ -8,21 +8,19 @@ import { isEmpty } from 'lodash';
  */
 import { useSelect } from '@wordpress/data';
 import {
-	BlockControls,
+	BlockSettingsMenuControls,
+	BlockTitle,
 	useBlockProps,
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	Warning,
 	store as blockEditorStore,
+	__experimentalRecursionProvider as RecursionProvider,
+	__experimentalUseHasRecursion as useHasRecursion,
+	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 } from '@wordpress/block-editor';
-import {
-	ToolbarGroup,
-	ToolbarButton,
-	Spinner,
-	Modal,
-} from '@wordpress/components';
+import { Spinner, Modal, MenuItem } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { useState } from '@wordpress/element';
+import { useState, createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -42,25 +40,21 @@ export default function TemplatePartEdit( {
 	attributes,
 	setAttributes,
 	clientId,
+	isSelected,
 } ) {
 	const { slug, theme, tagName, layout = {} } = attributes;
 	const templatePartId = createTemplatePartId( theme, slug );
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		templatePartId
-	);
-	const [
-		isTemplatePartSelectionOpen,
-		setIsTemplatePartSelectionOpen,
-	] = useState( false );
+	const hasAlreadyRendered = useHasRecursion( templatePartId );
+	const [ isTemplatePartSelectionOpen, setIsTemplatePartSelectionOpen ] =
+		useState( false );
 
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
 	const { isResolved, innerBlocks, isMissing, area } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution } = select(
-				coreStore
-			);
+			const { getEditedEntityRecord, hasFinishedResolution } =
+				select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
 
 			const getEntityArgs = [
@@ -95,10 +89,26 @@ export default function TemplatePartEdit( {
 	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
 	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
 	const areaObject = useTemplatePartArea( area );
-	const blockProps = useBlockProps();
+	const hasBlockOverlay = useBlockOverlayActive( clientId );
+	const blockProps = useBlockProps(
+		{
+			className: hasBlockOverlay
+				? 'block-editor-block-content-overlay'
+				: undefined,
+		},
+		{ __unstableIsDisabled: hasBlockOverlay }
+	);
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
 	const TagName = tagName || areaObject.tagName;
+
+	// The `isSelected` check ensures the `BlockSettingsMenuControls` fill
+	// doesn't render multiple times. The block controls has similar internal check.
+	const canReplace =
+		isSelected &&
+		isEntityAvailable &&
+		hasReplacements &&
+		( area === 'header' || area === 'footer' );
 
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
@@ -132,7 +142,7 @@ export default function TemplatePartEdit( {
 	}
 
 	return (
-		<RecursionProvider>
+		<RecursionProvider uniqueId={ templatePartId }>
 			<TemplatePartAdvancedControls
 				tagName={ tagName }
 				setAttributes={ setAttributes }
@@ -153,22 +163,31 @@ export default function TemplatePartEdit( {
 					/>
 				</TagName>
 			) }
-			{ isEntityAvailable && hasReplacements && (
-				<BlockControls>
-					<ToolbarGroup className="wp-block-template-part__block-control-group">
-						<ToolbarButton
-							onClick={ () =>
-								setIsTemplatePartSelectionOpen( true )
-							}
+			{ canReplace && (
+				<BlockSettingsMenuControls>
+					{ () => (
+						<MenuItem
+							onClick={ () => {
+								setIsTemplatePartSelectionOpen( true );
+							} }
 						>
-							{ __( 'Replace' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
+							{ createInterpolateElement(
+								__( 'Replace <BlockTitle />' ),
+								{
+									BlockTitle: (
+										<BlockTitle
+											clientId={ clientId }
+											maximumLength={ 25 }
+										/>
+									),
+								}
+							) }
+						</MenuItem>
+					) }
+				</BlockSettingsMenuControls>
 			) }
 			{ isEntityAvailable && (
 				<TemplatePartInnerBlocks
-					clientId={ clientId }
 					tagName={ TagName }
 					blockProps={ blockProps }
 					postId={ templatePartId }
@@ -183,7 +202,7 @@ export default function TemplatePartEdit( {
 			) }
 			{ isTemplatePartSelectionOpen && (
 				<Modal
-					className="block-editor-template-part__selection-modal"
+					overlayClassName="block-editor-template-part__selection-modal"
 					title={ sprintf(
 						// Translators: %s as template part area title ("Header", "Footer", etc.).
 						__( 'Choose a %s' ),

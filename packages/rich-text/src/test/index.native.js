@@ -161,8 +161,8 @@ describe( '<RichText/>', () => {
 					<RichText accessibilityLabel={ 'editor' } tagName="p" />
 				);
 				// Assert.
-				const actualFontSize = getByA11yLabel( 'editor' ).props
-					.fontSize;
+				const actualFontSize =
+					getByA11yLabel( 'editor' ).props.fontSize;
 				expect( actualFontSize ).toBe( expected );
 			}
 		);

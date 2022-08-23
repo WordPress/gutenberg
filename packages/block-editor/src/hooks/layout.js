@@ -2,14 +2,18 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { has } from 'lodash';
+import { has, kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockDefaultClassName,
+	getBlockSupport,
+	hasBlockSupport,
+} from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
 	Button,
@@ -31,6 +35,54 @@ import BlockList from '../components/block-list';
 import { getLayoutType, getLayoutTypes } from '../layouts';
 
 const layoutBlockSupportKey = '__experimentalLayout';
+
+/**
+ * Generates the utility classnames for the given blocks layout attributes.
+ * This method was primarily added to reintroduce classnames that were removed
+ * in the 5.9 release (https://github.com/WordPress/gutenberg/issues/38719), rather
+ * than providing an extensive list of all possible layout classes. The plan is to
+ * have the style engine generate a more extensive list of utility classnames which
+ * will then replace this method.
+ *
+ * @param { Object } layout            Layout object.
+ * @param { Object } layoutDefinitions An object containing layout definitions, stored in theme.json.
+ *
+ * @return { Array } Array of CSS classname strings.
+ */
+function useLayoutClasses( layout, layoutDefinitions ) {
+	const rootPaddingAlignment = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().__experimentalFeatures
+			?.useRootPaddingAwareAlignments;
+	}, [] );
+	const layoutClassnames = [];
+
+	if ( layoutDefinitions?.[ layout?.type || 'default' ]?.className ) {
+		layoutClassnames.push(
+			layoutDefinitions?.[ layout?.type || 'default' ]?.className
+		);
+	}
+
+	if ( ( layout?.inherit || layout?.contentSize ) && rootPaddingAlignment ) {
+		layoutClassnames.push( 'has-global-padding' );
+	}
+
+	if ( layout?.orientation ) {
+		layoutClassnames.push( `is-${ kebabCase( layout.orientation ) }` );
+	}
+
+	if ( layout?.justifyContent ) {
+		layoutClassnames.push(
+			`is-content-justification-${ kebabCase( layout.justifyContent ) }`
+		);
+	}
+
+	if ( layout?.flexWrap && layout.flexWrap === 'nowrap' ) {
+		layoutClassnames.push( 'is-nowrap' );
+	}
+
+	return layoutClassnames;
+}
 
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	const { layout } = attributes;
@@ -56,17 +108,38 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		return null;
 	}
 
+	// Only show the inherit toggle if it's supported,
+	// a default theme layout is set (e.g. one that provides `contentSize` and/or `wideSize` values),
+	// and either the default / flow or the constrained layout type is in use, as the toggle switches from one to the other.
+	const showInheritToggle = !! (
+		allowInheriting &&
+		!! defaultThemeLayout &&
+		( ! layout?.type ||
+			layout?.type === 'default' ||
+			layout?.type === 'constrained' ||
+			layout?.inherit )
+	);
+
 	const usedLayout = layout || defaultBlockLayout || {};
-	const { inherit = false, type = 'default' } = usedLayout;
+	const {
+		inherit = false,
+		type = 'default',
+		contentSize = null,
+	} = usedLayout;
 	/**
-	 * `themeSupportsLayout` is only relevant to the `default/flow`
-	 * layout and it should not be taken into account when other
+	 * `themeSupportsLayout` is only relevant to the `default/flow` or
+	 * `constrained` layouts and it should not be taken into account when other
 	 * `layout` types are used.
 	 */
-	if ( type === 'default' && ! themeSupportsLayout ) {
+	if (
+		( type === 'default' || type === 'constrained' ) &&
+		! themeSupportsLayout
+	) {
 		return null;
 	}
 	const layoutType = getLayoutType( type );
+
+	const constrainedType = getLayoutType( 'constrained' );
 
 	const onChangeType = ( newType ) =>
 		setAttributes( { layout: { type: newType } } );
@@ -77,16 +150,40 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Layout' ) }>
-					{ allowInheriting && !! defaultThemeLayout && (
-						<ToggleControl
-							label={ __( 'Inherit default layout' ) }
-							checked={ !! inherit }
-							onChange={ () =>
-								setAttributes( {
-									layout: { inherit: ! inherit },
-								} )
-							}
-						/>
+					{ showInheritToggle && (
+						<>
+							<ToggleControl
+								label={ __(
+									'Inner blocks respect content width'
+								) }
+								checked={
+									layoutType?.name === 'constrained' ||
+									!! inherit ||
+									!! contentSize
+								}
+								onChange={ () =>
+									setAttributes( {
+										layout: {
+											type:
+												layoutType?.name ===
+												'constrained'
+													? 'default'
+													: 'constrained',
+										},
+									} )
+								}
+							/>
+							<p className="block-editor-hooks__layout-controls-helptext">
+								{ !! inherit ||
+								layoutType?.name === 'constrained'
+									? __(
+											'Nested blocks use theme content width with options for full and wide widths.'
+									  )
+									: __(
+											'Nested blocks will fill the width of this container.'
+									  ) }
+							</p>
+						</>
 					) }
 
 					{ ! inherit && allowSwitching && (
@@ -96,8 +193,15 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 						/>
 					) }
 
-					{ ! inherit && layoutType && (
+					{ layoutType && layoutType.name !== 'default' && (
 						<layoutType.inspectorControls
+							layout={ usedLayout }
+							onChange={ onChangeLayout }
+							layoutBlockSupport={ layoutBlockSupport }
+						/>
+					) }
+					{ constrainedType && !! contentSize && (
+						<constrainedType.inspectorControls
 							layout={ usedLayout }
 							onChange={ onChangeLayout }
 							layoutBlockSupport={ layoutBlockSupport }
@@ -190,30 +294,71 @@ export const withInspectorControls = createHigherOrderComponent(
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
-		const shouldRenderLayoutStyles = hasBlockSupport(
+		const hasLayoutBlockSupport = hasBlockSupport(
 			name,
 			layoutBlockSupportKey
 		);
+		const disableLayoutStyles = useSelect( ( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			return !! getSettings().disableLayoutStyles;
+		} );
+		const shouldRenderLayoutStyles =
+			hasLayoutBlockSupport && ! disableLayoutStyles;
 		const id = useInstanceId( BlockListBlock );
 		const defaultThemeLayout = useSetting( 'layout' ) || {};
 		const element = useContext( BlockList.__unstableElementContext );
 		const { layout } = attributes;
 		const { default: defaultBlockLayout } =
 			getBlockSupport( name, layoutBlockSupportKey ) || {};
-		const usedLayout = layout?.inherit
-			? defaultThemeLayout
-			: layout || defaultBlockLayout || {};
-		const className = classnames( props?.className, {
-			[ `wp-container-${ id }` ]: shouldRenderLayoutStyles,
-		} );
+		const usedLayout =
+			layout?.inherit || layout?.contentSize || layout?.wideSize
+				? { ...layout, type: 'constrained' }
+				: layout || defaultBlockLayout || {};
+		const layoutClasses = hasLayoutBlockSupport
+			? useLayoutClasses( usedLayout, defaultThemeLayout?.definitions )
+			: null;
+		const selector = `.${ getBlockDefaultClassName(
+			name
+		) }.wp-container-${ id }`;
+		const blockGapSupport = useSetting( 'spacing.blockGap' );
+		const hasBlockGapSupport = blockGapSupport !== null;
+
+		// Get CSS string for the current layout type.
+		// The CSS and `style` element is only output if it is not empty.
+		let css;
+		if ( shouldRenderLayoutStyles ) {
+			const fullLayoutType = getLayoutType(
+				usedLayout?.type || 'default'
+			);
+			css = fullLayoutType?.getLayoutStyle?.( {
+				blockName: name,
+				selector,
+				layout: usedLayout,
+				layoutDefinitions: defaultThemeLayout?.definitions,
+				style: attributes?.style,
+				hasBlockGapSupport,
+			} );
+		}
+
+		// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
+		const className = classnames(
+			props?.className,
+			{
+				[ `wp-container-${ id }` ]: shouldRenderLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
+			},
+			layoutClasses
+		);
 
 		return (
 			<>
 				{ shouldRenderLayoutStyles &&
 					element &&
+					!! css &&
 					createPortal(
 						<LayoutStyle
-							selector={ `.wp-container-${ id }` }
+							blockName={ name }
+							selector={ selector }
+							css={ css }
 							layout={ usedLayout }
 							style={ attributes?.style }
 						/>,

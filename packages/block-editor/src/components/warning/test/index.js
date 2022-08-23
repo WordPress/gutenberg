@@ -18,7 +18,7 @@ describe( 'Warning', () => {
 	it( 'should have valid class', () => {
 		const wrapper = shallow( <Warning /> );
 
-		expect( wrapper.hasClass( 'block-editor-warning' ) ).toBe( true );
+		expect( wrapper.find( '.block-editor-warning' ) ).toHaveLength( 1 );
 		expect( wrapper.find( '.block-editor-warning__actions' ) ).toHaveLength(
 			0
 		);

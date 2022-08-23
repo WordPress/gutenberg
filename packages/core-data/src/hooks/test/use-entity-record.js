@@ -19,6 +19,7 @@ import useEntityRecord from '../use-entity-record';
 
 describe( 'useEntityRecord', () => {
 	let registry;
+
 	beforeEach( () => {
 		jest.useFakeTimers();
 
@@ -49,7 +50,11 @@ describe( 'useEntityRecord', () => {
 		);
 
 		expect( data ).toEqual( {
-			records: undefined,
+			edit: expect.any( Function ),
+			editedRecord: {},
+			hasEdits: false,
+			record: undefined,
+			save: expect.any( Function ),
 			hasResolved: false,
 			isResolving: false,
 			status: 'IDLE',
@@ -65,7 +70,11 @@ describe( 'useEntityRecord', () => {
 		} );
 
 		expect( data ).toEqual( {
+			edit: expect.any( Function ),
+			editedRecord: {},
+			hasEdits: false,
 			record: { hello: 'world', id: 1 },
+			save: expect.any( Function ),
 			hasResolved: true,
 			isResolving: false,
 			status: 'SUCCESS',

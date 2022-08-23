@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { times, unescape } from 'lodash';
+import { unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
-import { __experimentalUseEntityRecords as useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 
 export default function CategoriesEdit( {
 	attributes: {
@@ -25,11 +25,12 @@ export default function CategoriesEdit( {
 		showHierarchy,
 		showPostCounts,
 		showOnlyTopLevel,
+		showEmpty,
 	},
 	setAttributes,
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
-	const query = { per_page: -1, hide_empty: true, context: 'view' };
+	const query = { per_page: -1, hide_empty: ! showEmpty, context: 'view' };
 	if ( showOnlyTopLevel ) {
 		query.parent = 0;
 	}
@@ -113,7 +114,7 @@ export default function CategoriesEdit( {
 		const childCategories = getCategoriesList( id );
 		return [
 			<option key={ id }>
-				{ times( level * 3, () => '\xa0' ) }
+				{ Array.from( { length: level * 3 } ).map( () => '\xa0' ) }
 				{ renderCategoryName( name ) }
 				{ showPostCounts && ` (${ count })` }
 			</option>,
@@ -128,7 +129,7 @@ export default function CategoriesEdit( {
 	return (
 		<div { ...useBlockProps() }>
 			<InspectorControls>
-				<PanelBody title={ __( 'Categories settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						label={ __( 'Display as dropdown' ) }
 						checked={ displayAsDropdown }
@@ -143,6 +144,11 @@ export default function CategoriesEdit( {
 						label={ __( 'Show only top level categories' ) }
 						checked={ showOnlyTopLevel }
 						onChange={ toggleAttribute( 'showOnlyTopLevel' ) }
+					/>
+					<ToggleControl
+						label={ __( 'Show empty categories' ) }
+						checked={ showEmpty }
+						onChange={ toggleAttribute( 'showEmpty' ) }
 					/>
 					{ ! showOnlyTopLevel && (
 						<ToggleControl

@@ -15,10 +15,10 @@ import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordp
  * Internal dependencies
  */
 import InsertionPoint from './insertion-point';
-import BlockPopover from './block-popover';
+import SelectedBlockPopover from './selected-block-popover';
 import { store as blockEditorStore } from '../../store';
 import BlockContextualToolbar from './block-contextual-toolbar';
-import { usePopoverScroll } from './use-popover-scroll';
+import usePopoverScroll from '../block-popover/use-popover-scroll';
 
 /**
  * Renders block tools (the block toolbar, select/navigation mode toolbar, the
@@ -40,9 +40,8 @@ export default function BlockTools( {
 		[]
 	);
 	const isMatch = useShortcutEventMatch();
-	const { getSelectedBlockClientIds, getBlockRootClientId } = useSelect(
-		blockEditorStore
-	);
+	const { getSelectedBlockClientIds, getBlockRootClientId } =
+		useSelect( blockEditorStore );
 	const {
 		duplicateBlocks,
 		removeBlocks,
@@ -54,6 +53,8 @@ export default function BlockTools( {
 	} = useDispatch( blockEditorStore );
 
 	function onKeyDown( event ) {
+		if ( event.defaultPrevented ) return;
+
 		if ( isMatch( 'core/block-editor/move-up', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
@@ -92,33 +93,15 @@ export default function BlockTools( {
 				event.preventDefault();
 				insertBeforeBlock( first( clientIds ) );
 			}
-		} else if (
-			isMatch( 'core/block-editor/delete-multi-selection', event )
-		) {
-			/**
-			 * Check if the target element is a text area, input or
-			 * event.defaultPrevented and return early. In all these
-			 * cases backspace could be handled elsewhere.
-			 */
-			if (
-				[ 'INPUT', 'TEXTAREA' ].includes( event.target.nodeName ) ||
-				event.defaultPrevented
-			) {
-				return;
-			}
-			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length > 1 ) {
-				event.preventDefault();
-				removeBlocks( clientIds );
-			}
 		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length > 1 ) {
+			if ( clientIds.length ) {
 				event.preventDefault();
 				clearSelectedBlock();
 				event.target.ownerDocument.defaultView
 					.getSelection()
 					.removeAllRanges();
+				__unstableContentRef?.current.focus();
 			}
 		}
 	}
@@ -131,8 +114,10 @@ export default function BlockTools( {
 					<BlockContextualToolbar isFixed />
 				) }
 				{ /* Even if the toolbar is fixed, the block popover is still
-                 needed for navigation mode. */ }
-				<BlockPopover __unstableContentRef={ __unstableContentRef } />
+					needed for navigation and exploded mode. */ }
+				<SelectedBlockPopover
+					__unstableContentRef={ __unstableContentRef }
+				/>
 				{ /* Used for the inline rich text toolbar. */ }
 				<Popover.Slot
 					name="block-toolbar"

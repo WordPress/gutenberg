@@ -250,29 +250,24 @@ function block_core_navigation_render_submenu_icon() {
 
 
 /**
- * Finds the first non-empty `wp_navigation` Post.
+ * Finds the most recently published `wp_navigation` Post.
  *
  * @return WP_Post|null the first non-empty Navigation or null.
  */
-function block_core_navigation_get_first_non_empty_navigation() {
-	// Order and orderby args set to mirror those in `wp_get_nav_menus`
-	// see:
-	// - https://github.com/WordPress/wordpress-develop/blob/ba943e113d3b31b121f77a2d30aebe14b047c69d/src/wp-includes/nav-menu.php#L613-L619.
-	// - https://developer.wordpress.org/reference/classes/wp_query/#order-orderby-parameters.
+function block_core_navigation_get_most_recently_published_navigation() {
+	// We default to the most recently created menu.
 	$parsed_args = array(
 		'post_type'      => 'wp_navigation',
 		'no_found_rows'  => true,
-		'order'          => 'ASC',
-		'orderby'        => 'name',
+		'order'          => 'DESC',
+		'orderby'        => 'date',
 		'post_status'    => 'publish',
-		'posts_per_page' => 20, // Try the first 20 posts.
+		'posts_per_page' => 1, // get only the most recent.
 	);
 
-	$navigation_posts = new WP_Query( $parsed_args );
-	foreach ( $navigation_posts->posts as $navigation_post ) {
-		if ( has_blocks( $navigation_post ) ) {
-			return $navigation_post;
-		}
+	$navigation_post = new WP_Query( $parsed_args );
+	if ( count( $navigation_post->posts ) > 0 ) {
+		return $navigation_post->posts[0];
 	}
 
 	return null;
@@ -325,7 +320,7 @@ function block_core_navigation_get_fallback_blocks() {
 
 	// Default to a list of Pages.
 
-	$navigation_post = block_core_navigation_get_first_non_empty_navigation();
+	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
 
 	// Prefer using the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
@@ -351,6 +346,41 @@ function block_core_navigation_get_fallback_blocks() {
 }
 
 /**
+ * Iterate through all inner blocks recursively and get navigation link block's post IDs.
+ *
+ * @param WP_Block_List $inner_blocks Block list class instance.
+ *
+ * @return array Array of post IDs.
+ */
+function block_core_navigation_get_post_ids( $inner_blocks ) {
+	$post_ids = array_map( 'block_core_navigation_from_block_get_post_ids', iterator_to_array( $inner_blocks ) );
+	return array_unique( array_merge( ...$post_ids ) );
+}
+
+/**
+ * Get post IDs from a navigation link block instance.
+ *
+ * @param WP_Block $block Instance of a block.
+ *
+ * @return array Array of post IDs.
+ */
+function block_core_navigation_from_block_get_post_ids( $block ) {
+	$post_ids = array();
+
+	if ( $block->inner_blocks ) {
+		$post_ids = block_core_navigation_get_post_ids( $block->inner_blocks );
+	}
+
+	if ( 'core/navigation-link' === $block->name || 'core/navigation-submenu' === $block->name ) {
+		if ( $block->attributes && isset( $block->attributes['kind'] ) && 'post-type' === $block->attributes['kind'] && isset( $block->attributes['id'] ) ) {
+			$post_ids[] = $block->attributes['id'];
+		}
+	}
+
+	return $post_ids;
+}
+
+/**
  * Renders the `core/navigation` block on server.
  *
  * @param array    $attributes The block attributes.
@@ -361,9 +391,13 @@ function block_core_navigation_get_fallback_blocks() {
  */
 function render_block_core_navigation( $attributes, $content, $block ) {
 
+	static $seen_menu_names = array();
+
 	// Flag used to indicate whether the rendered output is considered to be
 	// a fallback (i.e. the block has no menu associated with it).
 	$is_fallback = false;
+
+	$nav_menu_name = '';
 
 	/**
 	 * Deprecated:
@@ -390,6 +424,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$should_load_view_script      = ! wp_script_is( 'wp-block-navigation-view' ) && ( $is_responsive_menu || $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] );
 	if ( $should_load_view_script ) {
 		wp_enqueue_script( 'wp-block-navigation-view' );
+	}
+
+	$should_load_modal_view_script = isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'];
+	if ( $should_load_modal_view_script ) {
+		wp_enqueue_script( 'wp-block-navigation-view-modal' );
 	}
 
 	$inner_blocks = $block->inner_blocks;
@@ -426,6 +465,20 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$navigation_post = get_post( $attributes['ref'] );
 		if ( ! isset( $navigation_post ) ) {
 			return '';
+		}
+
+		// Only published posts are valid. If this is changed then a corresponding change
+		// must also be implemented in `use-navigation-menu.js`.
+		if ( 'publish' !== $navigation_post->post_status ) {
+			return '';
+		}
+
+		$nav_menu_name = $navigation_post->post_title;
+
+		if ( isset( $seen_menu_names[ $nav_menu_name ] ) ) {
+			++$seen_menu_names[ $nav_menu_name ];
+		} else {
+			$seen_menu_names[ $nav_menu_name ] = 1;
 		}
 
 		$parsed_blocks = parse_blocks( $navigation_post->post_content );
@@ -474,6 +527,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$layout_class .= ' no-wrap';
 	}
 
+	// Manually add block support text decoration as CSS class.
+	$text_decoration       = _wp_array_get( $attributes, array( 'style', 'typography', 'textDecoration' ), null );
+	$text_decoration_class = sprintf( 'has-text-decoration-%s', $text_decoration );
+
 	$colors     = block_core_navigation_build_css_colors( $attributes );
 	$font_sizes = block_core_navigation_build_css_font_sizes( $attributes );
 	$classes    = array_merge(
@@ -481,8 +538,14 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$font_sizes['css_classes'],
 		$is_responsive_menu ? array( 'is-responsive' ) : array(),
 		$layout_class ? array( $layout_class ) : array(),
-		$is_fallback ? array( 'is-fallback' ) : array()
+		$is_fallback ? array( 'is-fallback' ) : array(),
+		$text_decoration ? array( $text_decoration_class ) : array()
 	);
+
+	$post_ids = block_core_navigation_get_post_ids( $inner_blocks );
+	if ( $post_ids ) {
+		_prime_post_caches( $post_ids, false, false );
+	}
 
 	$inner_blocks_html = '';
 	$is_list_open      = false;
@@ -508,10 +571,18 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
 
+	// If the menu name has been used previously then append an ID
+	// to the name to ensure uniqueness across a given post.
+	if ( isset( $seen_menu_names[ $nav_menu_name ] ) && $seen_menu_names[ $nav_menu_name ] > 1 ) {
+		$count         = $seen_menu_names[ $nav_menu_name ];
+		$nav_menu_name = $nav_menu_name . ' ' . ( $count );
+	}
+
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'class' => implode( ' ', $classes ),
-			'style' => $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'],
+			'class'      => implode( ' ', $classes ),
+			'style'      => $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'],
+			'aria-label' => $nav_menu_name,
 		)
 	);
 

@@ -15,13 +15,14 @@ import {
 	isLineHeightDefined,
 } from './utils';
 
-export default function LineHeightControl( {
+const LineHeightControl = ( {
 	value: lineHeight,
 	onChange,
 	/** Start opting into the new margin-free styles that will become the default in a future version. */
 	__nextHasNoMarginBottom = false,
 	__unstableInputWidth = '60px',
-} ) {
+	...otherProps
+} ) => {
 	const isDefined = isLineHeightDefined( lineHeight );
 
 	const adjustNextValue = ( nextValue, wasTypedOrPasted ) => {
@@ -37,7 +38,7 @@ export default function LineHeightControl( {
 		 * Step up/down actions can be triggered by keydowns of the up/down arrow keys,
 		 * or by clicking the spin buttons.
 		 */
-		switch ( nextValue ) {
+		switch ( `${ nextValue }` ) {
 			case `${ STEP }`:
 				// Increment by step value.
 				return BASE_DEFAULT_VALUE + STEP;
@@ -63,8 +64,8 @@ export default function LineHeightControl( {
 		const wasTypedOrPasted = [ 'insertText', 'insertFromPaste' ].includes(
 			action.payload.event.nativeEvent?.inputType
 		);
-		state.value = adjustNextValue( state.value, wasTypedOrPasted );
-		return state;
+		const value = adjustNextValue( state.value, wasTypedOrPasted );
+		return { ...state, value };
 	};
 
 	const value = isDefined ? lineHeight : RESET_VALUE;
@@ -75,8 +76,7 @@ export default function LineHeightControl( {
 			{
 				since: '6.0',
 				version: '6.4',
-				hint:
-					'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version',
+				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version',
 			}
 		);
 	}
@@ -90,6 +90,7 @@ export default function LineHeightControl( {
 			style={ deprecatedStyles }
 		>
 			<NumberControl
+				{ ...otherProps }
 				__unstableInputWidth={ __unstableInputWidth }
 				__unstableStateReducer={ stateReducer }
 				onChange={ onChange }
@@ -101,4 +102,9 @@ export default function LineHeightControl( {
 			/>
 		</div>
 	);
-}
+};
+
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/line-height-control/README.md
+ */
+export default LineHeightControl;

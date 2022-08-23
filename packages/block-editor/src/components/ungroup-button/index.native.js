@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
@@ -17,6 +12,8 @@ import { compose } from '@wordpress/compose';
  */
 import UngroupIcon from './icon';
 import { store as blockEditorStore } from '../../store';
+
+const noop = () => {};
 
 export function UngroupButton( { onConvertFromGroup, isUngroupable = false } ) {
 	if ( ! isUngroupable ) {
@@ -35,9 +32,8 @@ export function UngroupButton( { onConvertFromGroup, isUngroupable = false } ) {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlock } = select(
-			blockEditorStore
-		);
+		const { getSelectedBlockClientId, getBlock } =
+			select( blockEditorStore );
 
 		const { getGroupingBlockName } = select( blocksStore );
 

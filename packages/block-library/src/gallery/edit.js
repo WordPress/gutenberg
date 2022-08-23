@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { concat, find } from 'lodash';
+import { find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -51,9 +51,9 @@ import {
 	LINK_DESTINATION_NONE,
 } from './constants';
 import useImageSizes from './use-image-sizes';
-import useShortCodeTransform from './use-short-code-transform';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
+import GapStyles from './gap-styles';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -86,20 +86,14 @@ function GalleryEdit( props ) {
 		insertBlocksAfter,
 	} = props;
 
-	const {
-		columns,
-		imageCrop,
-		linkTarget,
-		linkTo,
-		shortCodeTransforms,
-		sizeSlug,
-	} = attributes;
+	const { columns, imageCrop, linkTarget, linkTo, sizeSlug } = attributes;
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
 		updateBlockAttributes,
-		multiSelect,
+		selectBlock,
+		clearSelectedBlock,
 	} = useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
@@ -149,31 +143,18 @@ function GalleryEdit( props ) {
 
 	useEffect( () => {
 		newImages?.forEach( ( newImage ) => {
+			// Update the images data without creating new undo levels.
+			__unstableMarkNextChangeAsNotPersistent();
 			updateBlockAttributes( newImage.clientId, {
 				...buildImageAttributes( newImage.attributes ),
 				id: newImage.id,
 				align: undefined,
 			} );
 		} );
-
-		// If new blocks added select the first of these so they scroll into view.
-		if ( newImages?.length ) {
-			multiSelect(
-				newImages[ 0 ].clientId,
-				newImages[ newImages?.length - 1 ].clientId
-			);
+		if ( newImages?.length > 0 ) {
+			clearSelectedBlock();
 		}
 	}, [ newImages ] );
-
-	const shortCodeImages = useShortCodeTransform( shortCodeTransforms );
-
-	useEffect( () => {
-		if ( ! shortCodeTransforms || ! shortCodeImages ) {
-			return;
-		}
-		updateImages( shortCodeImages );
-		setAttributes( { shortCodeTransforms: undefined } );
-	}, [ shortCodeTransforms, shortCodeImages ] );
 
 	const imageSizeOptions = useImageSizes(
 		imageData,
@@ -206,12 +187,34 @@ function GalleryEdit( props ) {
 				? `is-style-${ preferredStyle }`
 				: undefined;
 		}
+
+		let newLinkTarget;
+		if ( imageAttributes.linkTarget || imageAttributes.rel ) {
+			// When transformed from image blocks, the link destination and rel attributes are inherited.
+			newLinkTarget = {
+				linkTarget: imageAttributes.linkTarget,
+				rel: imageAttributes.rel,
+			};
+		} else {
+			// When an image is added, update the link destination and rel attributes according to the gallery settings
+			newLinkTarget = getUpdatedLinkTargetSettings(
+				linkTarget,
+				attributes
+			);
+		}
+
 		return {
-			...pickRelevantMediaFiles( imageAttributes, sizeSlug ),
-			...getHrefAndDestination( image, linkTo ),
-			...getUpdatedLinkTargetSettings( linkTarget, attributes ),
+			...pickRelevantMediaFiles( image, sizeSlug ),
+			...getHrefAndDestination(
+				image,
+				linkTo,
+				imageAttributes?.linkDestination
+			),
+			...newLinkTarget,
 			className: newClassName,
 			sizeSlug,
+			caption: imageAttributes.caption || image.caption?.raw,
+			alt: imageAttributes.alt || image.alt_text,
 		};
 	}
 
@@ -296,13 +299,19 @@ function GalleryEdit( props ) {
 			} );
 		} );
 
+		if ( newBlocks?.length > 0 ) {
+			selectBlock( newBlocks[ 0 ].clientId );
+		}
+
 		replaceInnerBlocks(
 			clientId,
-			concat( existingImageBlocks, newBlocks ).sort(
-				( a, b ) =>
-					newOrderMap[ a.attributes.id ] -
-					newOrderMap[ b.attributes.id ]
-			)
+			existingImageBlocks
+				.concat( newBlocks )
+				.sort(
+					( a, b ) =>
+						newOrderMap[ a.attributes.id ] -
+						newOrderMap[ b.attributes.id ]
+				)
 		);
 	}
 
@@ -425,8 +434,10 @@ function GalleryEdit( props ) {
 
 	const hasImages = !! images.length;
 	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
-	const imagesUploading = images.some(
-		( img ) => ! img.id && img.url?.indexOf( 'blob:' ) === 0
+	const imagesUploading = images.some( ( img ) =>
+		! Platform.isNative
+			? ! img.id && img.url?.indexOf( 'blob:' ) === 0
+			: img.url?.indexOf( 'file:' ) === 0
 	);
 
 	// MediaPlaceholder props are different between web and native hence, we provide a platform-specific set.
@@ -477,7 +488,7 @@ function GalleryEdit( props ) {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Gallery settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					{ images.length > 1 && (
 						<RangeControl
 							label={ __( 'Columns' ) }
@@ -543,11 +554,19 @@ function GalleryEdit( props ) {
 					onSelect={ updateImages }
 					name={ __( 'Add' ) }
 					multiple={ true }
-					mediaIds={ images.map( ( image ) => image.id ) }
+					mediaIds={ images
+						.filter( ( image ) => image.id )
+						.map( ( image ) => image.id ) }
 					addToGallery={ hasImageIds }
 				/>
 			</BlockControls>
 			{ noticeUI }
+			{ Platform.isWeb && (
+				<GapStyles
+					blockGap={ attributes.style?.spacing?.blockGap }
+					clientId={ clientId }
+				/>
+			) }
 			<Gallery
 				{ ...props }
 				images={ images }

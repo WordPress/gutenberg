@@ -76,7 +76,7 @@ export default function QueryPaginationEdit( {
 					</PanelBody>
 				</InspectorControls>
 			) }
-			<div { ...innerBlocksProps } />
+			<nav { ...innerBlocksProps } />
 		</>
 	);
 }

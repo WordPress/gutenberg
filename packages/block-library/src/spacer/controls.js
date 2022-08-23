@@ -8,18 +8,16 @@ import {
 	PanelBody,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
+	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { MAX_SPACER_SIZE } from './edit';
+import { MIN_SPACER_SIZE } from './constants';
 
 function DimensionInput( { label, onChange, isResizing, value = '' } ) {
-	const [ temporaryInput, setTemporaryInput ] = useState( null );
-
 	const inputId = useInstanceId( UnitControl, 'block-spacer-height-input' );
 
 	// In most contexts the spacer size cannot meaningfully be set to a
@@ -41,32 +39,27 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	} );
 
 	const handleOnChange = ( unprocessedValue ) => {
-		setTemporaryInput( null );
 		onChange( unprocessedValue );
 	};
 
-	const handleOnBlur = () => {
-		if ( temporaryInput !== null ) {
-			setTemporaryInput( null );
-		}
-	};
-
-	const inputValue = temporaryInput !== null ? temporaryInput : value;
+	// Force the unit to update to `px` when the Spacer is being resized.
+	const [ parsedQuantity, parsedUnit ] =
+		parseQuantityAndUnitFromRawValue( value );
+	const computedValue = [
+		parsedQuantity,
+		isResizing ? 'px' : parsedUnit,
+	].join( '' );
 
 	return (
 		<BaseControl label={ label } id={ inputId }>
 			<UnitControl
 				id={ inputId }
 				isResetValueOnUnitChange
-				min={ 0 }
-				max={ MAX_SPACER_SIZE }
-				onBlur={ handleOnBlur }
+				min={ MIN_SPACER_SIZE }
 				onChange={ handleOnChange }
 				style={ { maxWidth: 80 } }
-				value={ inputValue }
+				value={ computedValue }
 				units={ units }
-				// Force the unit to update to `px` when the Spacer is being resized.
-				unit={ isResizing ? 'px' : undefined }
 			/>
 		</BaseControl>
 	);
@@ -81,7 +74,7 @@ export default function SpacerControls( {
 } ) {
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Spacer settings' ) }>
+			<PanelBody title={ __( 'Settings' ) }>
 				{ orientation === 'horizontal' && (
 					<DimensionInput
 						label={ __( 'Width' ) }

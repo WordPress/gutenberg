@@ -58,7 +58,7 @@ fi
 expected=6
 actual=$( find src -maxdepth 1 -type f | wc -l )
 if [ "$expected" -ne "$actual" ]; then
-	error "Expected $expected files in the `src` directory, but found $actual."
+	error "Expected $expected files in the \`src\` directory, but found $actual."
     exit 1
 fi
 
@@ -72,7 +72,7 @@ status "Verifying build..."
 expected=5
 actual=$( find build -maxdepth 1 -type f | wc -l )
 if [ "$expected" -ne "$actual" ]; then
-	error "Expected $expected files in the `build` directory, but found $actual."
+	error "Expected $expected files in the \`build\` directory, but found $actual."
     exit 1
 fi
 

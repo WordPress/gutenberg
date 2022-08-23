@@ -68,11 +68,9 @@ function SocialLinksEdit( {
 	);
 
 	function renderPlaceholder() {
-		return [
-			...new Array( innerBlocks.length || 1 ),
-		].map( ( _, index ) => (
-			<View style={ placeholderStyle } key={ index } />
-		) );
+		return [ ...new Array( innerBlocks.length || 1 ) ].map(
+			( _, index ) => <View style={ placeholderStyle } key={ index } />
+		);
 	}
 
 	function filterInnerBlocks( blockIds ) {

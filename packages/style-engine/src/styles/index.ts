@@ -1,6 +1,14 @@
 /**
  * Internal dependencies
  */
-import padding from './padding';
+import border from './border';
+import color from './color';
+import spacing from './spacing';
+import typography from './typography';
 
-export const styleDefinitions = [ padding ];
+export const styleDefinitions = [
+	...border,
+	...color,
+	...spacing,
+	...typography,
+];

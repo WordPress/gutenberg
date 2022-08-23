@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, includes, isArray } from 'lodash';
+import { filter, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -117,12 +117,23 @@ export default withSelect( ( select ) => {
 		isMatchingSearchTerm,
 	} = select( blocksStore );
 	const { getHiddenBlockTypes } = select( editPostStore );
-	const hiddenBlockTypes = getHiddenBlockTypes();
+
+	// Some hidden blocks become unregistered
+	// by removing for instance the plugin that registered them, yet
+	// they're still remain as hidden by the user's action.
+	// We consider "hidden", blocks which were hidden and
+	// are still registered.
+	const blockTypes = getBlockTypes();
+	const hiddenBlockTypes = getHiddenBlockTypes().filter( ( hiddenBlock ) => {
+		return blockTypes.some(
+			( registeredBlock ) => registeredBlock.name === hiddenBlock
+		);
+	} );
 	const numberOfHiddenBlocks =
-		isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
+		Array.isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
 
 	return {
-		blockTypes: getBlockTypes(),
+		blockTypes,
 		categories: getCategories(),
 		hasBlockSupport,
 		isMatchingSearchTerm,

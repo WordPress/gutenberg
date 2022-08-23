@@ -9,9 +9,6 @@ jobs:
     deploy:
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' }}
-        strategy:
-            matrix:
-                node: ['14']
 
         steps:
             - name: Checkout
@@ -20,9 +17,9 @@ jobs:
                   ref: trunk
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+              uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
               with:
-                  node-version: ${{ matrix.node }}
+                  node-version-file: '.nvmrc'
                   cache: npm
 
             - name: Install Dependencies

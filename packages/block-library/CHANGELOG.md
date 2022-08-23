@@ -2,6 +2,46 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Ensure all dependencies allow version ranges ([#43355](https://github.com/WordPress/gutenberg/pull/43355)).
+
+## 7.12.0 (2022-08-10)
+
+## 7.11.0 (2022-07-27)
+
+## 7.10.0 (2022-07-13)
+
+## 7.9.0 (2022-06-29)
+
+## 7.8.0 (2022-06-15)
+
+## 7.7.0 (2022-06-01)
+
+## 7.6.0 (2022-05-18)
+
+### Enhancement
+
+-   Declare blocks as \_\_experimental in block.json to automate syncing Gutenberg packages to WordPress ([#40655](https://github.com/WordPress/gutenberg/pull/40655)).
+
+## 7.5.0 (2022-05-04)
+
+## 7.4.0 (2022-04-21)
+
+## 7.3.0 (2022-04-08)
+
+## 7.2.0 (2022-03-23)
+
+### Bug Fix
+
+-   Table block: Fix deprecation eligibility to prevent loss of named (color palette) background color ([#39445](https://github.com/WordPress/gutenberg/pull/39445)).
+
+### Enhancement
+
+-   Social Icons: Avoid loss of previously selected background color when switching back from "Logos Only" style ([#39276](https://github.com/WordPress/gutenberg/pull/39276)).
+
+## 7.1.0 (2022-03-11)
+
 ## 7.0.0 (2022-02-10)
 
 ### Breaking Change
@@ -10,6 +50,7 @@
 
 ### Bug Fix
 
+-   Gallery block: disable edit as html support ([#39318](https://github.com/WordPress/gutenberg/pull/39318)).
 -   Removed unused `@wordpress/escape-html` and `@wordpress/is-shallow-equal` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
 ## 6.1.0 (2022-01-27)

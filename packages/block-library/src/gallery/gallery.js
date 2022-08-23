@@ -6,11 +6,15 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, useInnerBlocksProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useInnerBlocksProps,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
 import { VisuallyHidden } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { View } from '@wordpress/primitives';
 
 const allowedBlocks = [ 'core/image' ];
@@ -69,26 +73,30 @@ export const Gallery = ( props ) => {
 			) }
 		>
 			{ children }
-
-			<View
-				className="blocks-gallery-media-placeholder-wrapper"
-				onClick={ removeCaptionFocus }
-			>
-				{ mediaPlaceholder }
-			</View>
+			{ isSelected && ! children && (
+				<View
+					className="blocks-gallery-media-placeholder-wrapper"
+					onClick={ removeCaptionFocus }
+				>
+					{ mediaPlaceholder }
+				</View>
+			) }
 			<RichTextVisibilityHelper
 				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
 				captionFocused={ captionFocused }
 				onFocusCaption={ onFocusCaption }
 				tagName="figcaption"
-				className="blocks-gallery-caption"
+				className={ classnames(
+					'blocks-gallery-caption',
+					__experimentalGetElementClassName( 'caption' )
+				) }
 				aria-label={ __( 'Gallery caption text' ) }
 				placeholder={ __( 'Write gallery caption…' ) }
 				value={ caption }
 				onChange={ ( value ) => setAttributes( { caption: value } ) }
 				inlineToolbar
 				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( 'core/paragraph' ) )
+					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
 				}
 			/>
 		</figure>

@@ -436,4 +436,11 @@ export function sendEventToHost( eventName, properties ) {
 	);
 }
 
+/**
+ * Generate haptic feedback.
+ */
+export function generateHapticFeedback() {
+	RNReactNativeGutenbergBridge.generateHapticFeedback();
+}
+
 export default RNReactNativeGutenbergBridge;

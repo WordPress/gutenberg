@@ -1,19 +1,20 @@
 /**
  * Internal dependencies
  */
-import {
+import type {
 	AvatarUrls,
 	Context,
 	ContextualField,
 	OmitNevers,
 	RenderedText,
 } from './helpers';
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
+import type { DefaultContextOf } from './index';
 
 export type CommentStatus = 'hold' | 'approve' | 'spam' | 'trash' | '1' | '0';
 
-declare module './base-entity-types' {
-	export namespace BaseEntityTypes {
+declare module './base-entity-records' {
+	export namespace BaseEntityRecords {
 		export interface Comment< C extends Context > {
 			/**
 			 * Unique identifier for the comment.
@@ -91,6 +92,6 @@ declare module './base-entity-types' {
 	}
 }
 
-export type Comment< C extends Context > = OmitNevers<
-	_BaseEntityTypes.Comment< C >
->;
+export type Comment<
+	C extends Context = DefaultContextOf< 'root', 'comment' >
+> = OmitNevers< _BaseEntityRecords.Comment< C > >;

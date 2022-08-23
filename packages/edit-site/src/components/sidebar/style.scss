@@ -60,6 +60,10 @@
 	grid-column: span 1;
 }
 
+.edit-site-global-styles-sidebar .components-tools-panel .span-columns {
+	grid-column: 1 / -1;
+}
+
 .edit-site-global-styles-sidebar__blocks-group {
 	padding-top: $grid-unit-30;
 	border-top: $border-width solid $gray-200;
@@ -74,15 +78,22 @@
 	padding: $grid-unit-20;
 }
 
+.edit-site-navigation-sidebar__beta,
 .edit-site-global-styles-sidebar__beta {
 	display: inline-flex;
 	margin-left: $grid-unit-10;
 	padding: 0 $grid-unit-10;
 	height: $grid-unit-30;
 	border-radius: $radius-block-ui;
-	background-color: $black;
+	background-color: $gray-900;
 	color: $white;
 	align-items: center;
 	font-size: $helptext-font-size;
 	line-height: 1;
+}
+
+// Override the `hr` styles defined in the `ComplementaryArea` component
+// from the `@wordpress/interface` package.
+.edit-site-global-styles-sidebar hr {
+	margin: 0;
 }

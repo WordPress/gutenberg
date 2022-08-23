@@ -5,12 +5,12 @@ import { SVG, Path } from '@wordpress/primitives';
 
 const dragHandle = (
 	<SVG
-		width="18"
-		height="18"
+		width="24"
+		height="24"
 		xmlns="http://www.w3.org/2000/svg"
-		viewBox="0 0 18 18"
+		viewBox="0 0 24 24"
 	>
-		<Path d="M5 4h2V2H5v2zm6-2v2h2V2h-2zm-6 8h2V8H5v2zm6 0h2V8h-2v2zm-6 6h2v-2H5v2zm6 0h2v-2h-2v2z" />
+		<Path d="M8 7h2V5H8v2zm0 6h2v-2H8v2zm0 6h2v-2H8v2zm6-14v2h2V5h-2zm0 8h2v-2h-2v2zm0 6h2v-2h-2v2z" />
 	</SVG>
 );
 

@@ -98,6 +98,7 @@ const MySelectControl = () => {
 				{ label: 'Small', value: '25%' },
 			] }
 			onChange={ ( newSize ) => setSize( newSize ) }
+			__nextHasNoMarginBottom
 		/>
 	);
 };
@@ -114,11 +115,12 @@ Render a user interface to select multiple users from a list.
 		this.setState( { users } );
 	} }
 	options={ [
-		{ value: null, label: 'Select a User', disabled: true },
+		{ value: '', label: 'Select a User', disabled: true },
 		{ value: 'a', label: 'User A' },
 		{ value: 'b', label: 'User B' },
 		{ value: 'c', label: 'User c' },
 	] }
+	__nextHasNoMarginBottom
 />
 ```
 
@@ -133,6 +135,7 @@ const [ item, setItem ] = useState( '' );
     label={ __( 'Select an item:' ) }
     value={ item } // e.g: value = 'a'
     onChange={ ( selection ) => { setItem( selection ) } }
+    __nextHasNoMarginBottom
 >
 	<optgroup label="Theropods">
 		<option value="Tyrannosaurus">Tyrannosaurus</option>
@@ -194,7 +197,7 @@ If this property is added, multiple values can be selected. The value passed sho
 An array of objects containing the following properties:
 
 -   `label`: (string) The label to be shown to the user.
--   `value`: (Object) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
+-   `value`: (string) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
 -   `disabled`: (boolean) Whether or not the option should have the disabled attribute.
 -   Type: `Array`
 -   Required: No
@@ -214,6 +217,14 @@ If multiple is false the value received is a single value with the new selected 
 
 -   Type: `function`
 -   Required: Yes
+
+### __nextHasNoMarginBottom
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
 
 ## Related components
 

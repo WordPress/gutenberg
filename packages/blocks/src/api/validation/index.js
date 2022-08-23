@@ -2,11 +2,12 @@
  * External dependencies
  */
 import { Tokenizer } from 'simple-html-tokenizer';
-import { identity, xor, fromPairs, isEqual, includes, stubTrue } from 'lodash';
+import { isEqual, includes } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -19,6 +20,12 @@ import {
 	getUnregisteredTypeHandlerName,
 } from '../registration';
 import { normalizeBlockType } from '../utils';
+
+/** @typedef {import('../parser').WPBlock} WPBlock */
+/** @typedef {import('../registration').WPBlockType} WPBlockType */
+/** @typedef {import('./logger').LoggerItem} LoggerItem */
+
+const identity = ( x ) => x;
 
 /**
  * Globally matches any consecutive whitespace
@@ -391,7 +398,7 @@ export function getStyleProperties( text ) {
 			return [ key.trim(), getNormalizedStyleValue( value.trim() ) ];
 		} );
 
-	return fromPairs( pairs );
+	return Object.fromEntries( pairs );
 }
 
 /**
@@ -403,17 +410,25 @@ export const isEqualAttributesOfName = {
 	class: ( actual, expected ) => {
 		// Class matches if members are the same, even if out of order or
 		// superfluous whitespace between.
-		return ! xor(
-			...[ actual, expected ].map( getTextPiecesSplitOnWhitespace )
-		).length;
+		const [ actualPieces, expectedPieces ] = [ actual, expected ].map(
+			getTextPiecesSplitOnWhitespace
+		);
+		const actualDiff = actualPieces.filter(
+			( c ) => ! expectedPieces.includes( c )
+		);
+		const expectedDiff = expectedPieces.filter(
+			( c ) => ! actualPieces.includes( c )
+		);
+
+		return actualDiff.length === 0 && expectedDiff.length === 0;
 	},
 	style: ( actual, expected ) => {
 		return isEqual( ...[ actual, expected ].map( getStyleProperties ) );
 	},
 	// For each boolean attribute, mere presence of attribute in both is enough
 	// to assume equivalence.
-	...fromPairs(
-		BOOLEAN_ATTRIBUTES.map( ( attribute ) => [ attribute, stubTrue ] )
+	...Object.fromEntries(
+		BOOLEAN_ATTRIBUTES.map( ( attribute ) => [ attribute, () => true ] )
 	),
 };
 
@@ -609,10 +624,9 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 	}
 
 	// Tokenize input content and reserialized save content.
-	const [ actualTokens, expectedTokens ] = [
-		actual,
-		expected,
-	].map( ( html ) => getHTMLTokens( html, logger ) );
+	const [ actualTokens, expectedTokens ] = [ actual, expected ].map(
+		( html ) => getHTMLTokens( html, logger )
+	);
 
 	// If either is malformed then stop comparing - the strings are not equivalent.
 	if ( ! actualTokens || ! expectedTokens ) {
@@ -700,19 +714,19 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
  * with assumed attributes, the content matches the original value. If block is
  * invalid, this function returns all validations issues as well.
  *
- * @param {import('../parser').WPBlock}           block           block object.
- * @param {import('../registration').WPBlockType} blockTypeOrName Block type or name.
+ * @param {WPBlock}            block                          block object.
+ * @param {WPBlockType|string} [blockTypeOrName = block.name] Block type or name, inferred from block if not given.
  *
- * @return {[boolean,Object]} validation results.
+ * @return {[boolean,Array<LoggerItem>]} validation results.
  */
-export function validateBlock( block, blockTypeOrName ) {
+export function validateBlock( block, blockTypeOrName = block.name ) {
 	const isFallbackBlock =
 		block.name === getFreeformContentHandlerName() ||
 		block.name === getUnregisteredTypeHandlerName();
 
 	// Shortcut to avoid costly validation.
 	if ( isFallbackBlock ) {
-		return [ true ];
+		return [ true, [] ];
 	}
 
 	const logger = createQueuedLogger();
@@ -755,6 +769,8 @@ export function validateBlock( block, blockTypeOrName ) {
  *
  * Logs to console in development environments when invalid.
  *
+ * @deprecated Use validateBlock instead to avoid data loss.
+ *
  * @param {string|Object} blockTypeOrName      Block type.
  * @param {Object}        attributes           Parsed block attributes.
  * @param {string}        originalBlockContent Original block content.
@@ -766,6 +782,12 @@ export function isValidBlockContent(
 	attributes,
 	originalBlockContent
 ) {
+	deprecated( 'isValidBlockContent introduces opportunity for data loss', {
+		since: '12.6',
+		plugin: 'Gutenberg',
+		alternative: 'validateBlock',
+	} );
+
 	const blockType = normalizeBlockType( blockTypeOrName );
 	const block = {
 		name: blockType.name,

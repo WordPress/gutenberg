@@ -46,7 +46,6 @@ const TEMPLATE = [
 	[
 		'core/paragraph',
 		{
-			fontSize: 'large',
 			placeholder: _x( 'Content…', 'content placeholder' ),
 		},
 	],
@@ -161,7 +160,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	const image = useSelect(
 		( select ) =>
 			mediaId && isSelected
-				? select( coreStore ).getMedia( mediaId )
+				? select( coreStore ).getMedia( mediaId, { context: 'view' } )
 				: null,
 		[ isSelected, mediaId ]
 	);
@@ -238,7 +237,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	};
 
 	const mediaTextGeneralSettings = (
-		<PanelBody title={ __( 'Media & Text settings' ) }>
+		<PanelBody title={ __( 'Settings' ) }>
 			<ToggleControl
 				label={ __( 'Stack on mobile' ) }
 				checked={ isStackedOnMobile }
@@ -294,6 +293,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					slug={ mediaSizeSlug }
 					imageSizeOptions={ imageSizeOptions }
 					isResizable={ false }
+					imageSizeHelp={ __( 'Select which image size to load.' ) }
 				/>
 			) }
 			{ mediaUrl && (
@@ -355,6 +355,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 				) }
 			</BlockControls>
 			<div { ...blockProps }>
+				{ mediaPosition === 'right' && <div { ...innerBlocksProps } /> }
 				<MediaContainer
 					className="wp-block-media-text__media"
 					onSelectMedia={ onSelectMedia }
@@ -374,7 +375,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 						mediaWidth,
 					} }
 				/>
-				<div { ...innerBlocksProps } />
+				{ mediaPosition !== 'right' && <div { ...innerBlocksProps } /> }
 			</div>
 		</>
 	);

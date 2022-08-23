@@ -8,7 +8,7 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
  */
 import migrateFontFamily from '../utils/migrate-font-family';
 
-const v1 = {
+const v0 = {
 	attributes: {
 		ordered: {
 			type: 'boolean',
@@ -76,4 +76,4 @@ const v1 = {
  *
  * See block-deprecation.md
  */
-export default [ v1 ];
+export default [ v0 ];

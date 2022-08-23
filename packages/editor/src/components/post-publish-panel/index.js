@@ -167,9 +167,8 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, { isPublishSidebarEnabled } ) => {
-		const { disablePublishSidebar, enablePublishSidebar } = dispatch(
-			editorStore
-		);
+		const { disablePublishSidebar, enablePublishSidebar } =
+			dispatch( editorStore );
 		return {
 			onTogglePublishSidebar: () => {
 				if ( isPublishSidebarEnabled ) {

@@ -11,17 +11,17 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import settingsV2 from './v2';
 
 const { name } = metadata;
 
-export { metadata, name };
+export { metadata, name, settingsV2 };
 
-export const settings = {
+const settingsV1 = {
 	icon,
 	example: {
 		attributes: {
-			values:
-				'<li>Alice.</li><li>The White Rabbit.</li><li>The Cheshire Cat.</li><li>The Mad Hatter.</li><li>The Queen of Hearts.</li>',
+			values: '<li>Alice.</li><li>The White Rabbit.</li><li>The Cheshire Cat.</li><li>The Mad Hatter.</li><li>The Queen of Hearts.</li>',
 		},
 	},
 	transforms,
@@ -41,3 +41,11 @@ export const settings = {
 	save,
 	deprecated,
 };
+
+let settings = settingsV1;
+if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	settings = window?.__experimentalEnableListBlockV2
+		? settingsV2
+		: settingsV1;
+}
+export { settings };

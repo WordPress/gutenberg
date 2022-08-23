@@ -36,11 +36,8 @@ const interfaceLabels = {
 function Interface( { blockEditorSettings } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
-	const {
-		setIsInserterOpened,
-		setIsListViewOpened,
-		closeGeneralSidebar,
-	} = useDispatch( editWidgetsStore );
+	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
+		useDispatch( editWidgetsStore );
 	const {
 		hasBlockBreadCrumbsEnabled,
 		hasSidebarEnabled,
@@ -85,11 +82,18 @@ function Interface( { blockEditorSettings } ) {
 		}
 	}, [ isInserterOpened, isListViewOpened, isHugeViewport ] );
 
+	const secondarySidebarLabel = isListViewOpened
+		? __( 'List View' )
+		: __( 'Block Library' );
+
 	const hasSecondarySidebar = isListViewOpened || isInserterOpened;
 
 	return (
 		<InterfaceSkeleton
-			labels={ interfaceLabels }
+			labels={ {
+				...interfaceLabels,
+				secondarySidebar: secondarySidebarLabel,
+			} }
 			header={ <Header /> }
 			secondarySidebar={ hasSecondarySidebar && <SecondarySidebar /> }
 			sidebar={

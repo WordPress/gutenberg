@@ -6,6 +6,7 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import { check, reset, moreVertical, plus } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 
@@ -24,11 +25,8 @@ import type {
 	ToolsPanelHeaderProps,
 } from '../types';
 
-const noop = () => {};
-
 const DefaultControlsGroup = ( {
 	items,
-	onClose,
 	toggleItem,
 }: ToolsPanelControlsGroupProps ) => {
 	if ( ! items.length ) {
@@ -38,27 +36,41 @@ const DefaultControlsGroup = ( {
 	return (
 		<MenuGroup>
 			{ items.map( ( [ label, hasValue ] ) => {
-				const icon = hasValue ? reset : check;
-				const itemLabel = hasValue
-					? sprintf(
-							// translators: %s: The name of the control being reset e.g. "Padding".
-							__( 'Reset %s' ),
-							label
-					  )
-					: undefined;
+				if ( hasValue ) {
+					return (
+						<MenuItem
+							key={ label }
+							role="menuitem"
+							icon={ reset }
+							label={ sprintf(
+								// translators: %s: The name of the control being reset e.g. "Padding".
+								__( 'Reset %s' ),
+								label
+							) }
+							onClick={ () => {
+								toggleItem( label );
+								speak(
+									sprintf(
+										// translators: %s: The name of the control being reset e.g. "Padding".
+										__( '%s reset to default' ),
+										label
+									),
+									'assertive'
+								);
+							} }
+						>
+							{ label }
+						</MenuItem>
+					);
+				}
 
 				return (
 					<MenuItem
 						key={ label }
-						icon={ icon }
-						isSelected={ true }
-						disabled={ ! hasValue }
-						label={ itemLabel }
-						onClick={ () => {
-							toggleItem( label );
-							onClose();
-						} }
 						role="menuitemcheckbox"
+						icon={ check }
+						isSelected
+						aria-disabled
 					>
 						{ label }
 					</MenuItem>
@@ -70,7 +82,6 @@ const DefaultControlsGroup = ( {
 
 const OptionalControlsGroup = ( {
 	items,
-	onClose,
 	toggleItem,
 }: ToolsPanelControlsGroupProps ) => {
 	if ( ! items.length ) {
@@ -99,8 +110,26 @@ const OptionalControlsGroup = ( {
 						isSelected={ isSelected }
 						label={ itemLabel }
 						onClick={ () => {
+							if ( isSelected ) {
+								speak(
+									sprintf(
+										// translators: %s: The name of the control being reset e.g. "Padding".
+										__( '%s hidden and reset to default' ),
+										label
+									),
+									'assertive'
+								);
+							} else {
+								speak(
+									sprintf(
+										// translators: %s: The name of the control being reset e.g. "Padding".
+										__( '%s is now visible' ),
+										label
+									),
+									'assertive'
+								);
+							}
 							toggleItem( label );
-							onClose();
 						} }
 						role="menuitemcheckbox"
 					>
@@ -135,12 +164,18 @@ const ToolsPanelHeader = (
 	const defaultItems = Object.entries( menuItems?.default || {} );
 	const optionalItems = Object.entries( menuItems?.optional || {} );
 	const dropDownMenuIcon = areAllOptionalControlsHidden ? plus : moreVertical;
-	const dropDownMenuLabelText = areAllOptionalControlsHidden
-		? _x(
-				'View and add options',
-				'Button label to reveal tool panel options'
-		  )
-		: _x( 'View options', 'Button label to reveal tool panel options' );
+	const dropDownMenuLabelText = sprintf(
+		// translators: %s: The name of the tool e.g. "Color" or "Typography".
+		_x( '%s options', 'Button label to reveal tool panel options' ),
+		labelText
+	);
+	const dropdownMenuDescriptionText = areAllOptionalControlsHidden
+		? __( 'All options are currently hidden' )
+		: undefined;
+
+	const canResetAll = [ ...defaultItems, ...optionalItems ].some(
+		( [ , isSelected ] ) => isSelected
+	);
 
 	return (
 		<HStack { ...headerProps } ref={ forwardedRef }>
@@ -152,26 +187,33 @@ const ToolsPanelHeader = (
 					icon={ dropDownMenuIcon }
 					label={ dropDownMenuLabelText }
 					menuProps={ { className: dropdownMenuClassName } }
-					toggleProps={ { isSmall: true } }
+					toggleProps={ {
+						isSmall: true,
+						describedBy: dropdownMenuDescriptionText,
+					} }
 				>
-					{ ( { onClose = noop } ) => (
+					{ () => (
 						<>
 							<DefaultControlsGroup
 								items={ defaultItems }
-								onClose={ onClose }
 								toggleItem={ toggleItem }
 							/>
 							<OptionalControlsGroup
 								items={ optionalItems }
-								onClose={ onClose }
 								toggleItem={ toggleItem }
 							/>
 							<MenuGroup>
 								<MenuItem
+									aria-disabled={ ! canResetAll }
 									variant={ 'tertiary' }
 									onClick={ () => {
-										resetAll();
-										onClose();
+										if ( canResetAll ) {
+											resetAll();
+											speak(
+												__( 'All options reset' ),
+												'assertive'
+											);
+										}
 									} }
 								>
 									{ __( 'Reset all' ) }

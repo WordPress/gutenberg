@@ -1,5 +1,5 @@
 [
-    {
+	{
 		"url": "https://api.github.com/repos/WordPress/gutenberg/issues/XXXX",
 		"repository_url": "https://api.github.com/repos/WordPress/gutenberg",
 		"labels_url": "https://api.github.com/repos/WordPress/gutenberg/issues/XXXX/labels{/name}",

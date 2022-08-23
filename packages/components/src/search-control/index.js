@@ -6,17 +6,16 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Icon, search, closeSmall } from '@wordpress/icons';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { Button } from '../';
 import BaseControl from '../base-control';
-import { useCombinedRef } from '../utils';
 
 function SearchControl(
 	{
@@ -30,10 +29,10 @@ function SearchControl(
 		help,
 		onClose,
 	},
-	ref
+	forwardedRef
 ) {
+	const searchRef = useRef();
 	const instanceId = useInstanceId( SearchControl );
-	const searchInput = useCombinedRef( ref );
 	const id = `components-search-control-${ instanceId }`;
 
 	const renderRightButton = () => {
@@ -54,7 +53,7 @@ function SearchControl(
 					label={ __( 'Reset search' ) }
 					onClick={ () => {
 						onChange( '' );
-						searchInput.current.focus();
+						searchRef.current.focus();
 					} }
 				/>
 			);
@@ -73,7 +72,7 @@ function SearchControl(
 		>
 			<div className="components-search-control__input-wrapper">
 				<input
-					ref={ searchInput }
+					ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
 					className="components-search-control__input"
 					id={ id }
 					type="search"

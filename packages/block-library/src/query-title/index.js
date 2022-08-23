@@ -9,7 +9,7 @@ import deprecated from './deprecated';
 /**
  * WordPress dependencies
  */
-import { queryTitle as icon } from '@wordpress/icons';
+import { title as icon } from '@wordpress/icons';
 
 const { name } = metadata;
 export { metadata, name };

@@ -1,7 +1,7 @@
 <?php
 /**
- * Functions to register client-side assets (scripts and stylesheets) for the
- * Gutenberg editor plugin.
+ * Functions to register client-side assets (scripts and stylesheets) specific
+ * for the Gutenberg editor plugin.
  *
  * @package gutenberg
  */
@@ -54,6 +54,12 @@ function gutenberg_url( $path ) {
  *                                    Default 'false'.
  */
 function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $ver = false, $in_footer = false ) {
+	/*
+	 * Force `wp-i18n` script to be registered in the <head> as a
+	 * temporary workaround for https://meta.trac.wordpress.org/ticket/6195.
+	 */
+	$in_footer = 'wp-i18n' === $handle ? false : $in_footer;
+
 	$script = $scripts->query( $handle, 'registered' );
 	if ( $script ) {
 		/*
@@ -66,22 +72,9 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 		$script->src  = $src;
 		$script->deps = $deps;
 		$script->ver  = $ver;
-		$script->args = $in_footer;
-
-		/*
-		 * The script's `group` designation is an indication of whether it is
-		 * to be printed in the header or footer. The behavior here defers to
-		 * the arguments as passed. Specifically, group data is not assigned
-		 * for a script unless it is designated to be printed in the footer.
-		 */
-
-		// See: `wp_register_script` .
-		unset( $script->extra['group'] );
-		if ( $in_footer ) {
-			$script->add_data( 'group', 1 );
-		}
+		$script->args = $in_footer ? 1 : null;
 	} else {
-		$scripts->add( $handle, $src, $deps, $ver, $in_footer );
+		$scripts->add( $handle, $src, $deps, $ver, ( $in_footer ? 1 : null ) );
 	}
 
 	/*
@@ -129,7 +122,7 @@ function gutenberg_override_translation_file( $file, $handle ) {
 	}
 
 	// Ignore scripts whose handle does not have the "wp-" prefix.
-	if ( 'wp-' !== substr( $handle, 0, 3 ) ) {
+	if ( ! str_starts_with( $handle, 'wp-' ) ) {
 		return $file;
 	}
 
@@ -188,37 +181,6 @@ function gutenberg_override_style( $styles, $handle, $src, $deps = array(), $ver
 	}
 	$styles->add( $handle, $src, $deps, $ver, $media );
 }
-
-/**
- * Registers vendor JavaScript files to be used as dependencies of the editor
- * and plugins.
- *
- * This function is called from a script during the plugin build process, so it
- * should not call any WordPress PHP functions.
- *
- * @since 0.1.0
- *
- * @param WP_Scripts $scripts WP_Scripts instance.
- */
-function gutenberg_register_vendor_scripts( $scripts ) {
-	$suffix = SCRIPT_DEBUG ? '' : '.min';
-
-	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
-	gutenberg_register_vendor_script(
-		$scripts,
-		'react',
-		'https://unpkg.com/react@17.0.1/umd/react' . $react_suffix . '.js',
-		// See https://github.com/pmmmwh/react-refresh-webpack-plugin/blob/main/docs/TROUBLESHOOTING.md#externalising-react.
-		SCRIPT_DEBUG ? array( 'wp-react-refresh-entry', 'wp-polyfill' ) : array( 'wp-polyfill' )
-	);
-	gutenberg_register_vendor_script(
-		$scripts,
-		'react-dom',
-		'https://unpkg.com/react-dom@17.0.1/umd/react-dom' . $react_suffix . '.js',
-		array( 'react' )
-	);
-}
-add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 
 /**
  * Registers all the WordPress packages scripts that are in the standardized
@@ -484,194 +446,3 @@ function gutenberg_register_packages_styles( $styles ) {
 	$styles->add_data( 'wp-widgets', 'rtl', 'replace' );
 }
 add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
-
-/**
- * Retrieves a unique and reasonably short and human-friendly filename for a
- * vendor script based on a URL and the script handle.
- *
- * @param  string $handle The name of the script.
- * @param  string $src    Full URL of the external script.
- *
- * @return string         Script filename suitable for local caching.
- *
- * @since 0.1.0
- */
-function gutenberg_vendor_script_filename( $handle, $src ) {
-	$filename = basename( $src );
-	$match    = preg_match(
-		'/^'
-		. '(?P<ignore>.*?)'
-		. '(?P<suffix>\.min)?'
-		. '(?P<extension>\.js)'
-		. '(?P<extra>.*)'
-		. '$/',
-		$filename,
-		$filename_pieces
-	);
-
-	$prefix = $handle;
-	$suffix = $match ? $filename_pieces['suffix'] : '';
-	$hash   = substr( md5( $src ), 0, 8 );
-
-	return "${prefix}${suffix}.${hash}.js";
-}
-
-/**
- * Registers a vendor script from a URL, preferring a locally cached version if
- * possible, or downloading it if the cached version is unavailable or
- * outdated.
- *
- * @param WP_Scripts       $scripts   WP_Scripts instance.
- * @param string           $handle    Name of the script.
- * @param string           $src       Full URL of the external script.
- * @param array            $deps      Optional. An array of registered script handles this
- *                                    script depends on.
- * @param string|bool|null $ver       Optional. String specifying script version number, if it has one, which is added to the URL
- *                                    as a query string for cache busting purposes. If version is set to false, a version
- *                                    number is automatically added equal to current installed WordPress version.
- *                                    If set to null, no version is added.
- * @param bool             $in_footer Optional. Whether to enqueue the script before </body> instead of in the <head>.
- *                                    Default 'false'.
- *
- * @since 0.1.0
- */
-function gutenberg_register_vendor_script( $scripts, $handle, $src, $deps = array(), $ver = null, $in_footer = false ) {
-	if ( defined( 'GUTENBERG_LOAD_VENDOR_SCRIPTS' ) && ! GUTENBERG_LOAD_VENDOR_SCRIPTS ) {
-		return;
-	}
-
-	$filename = gutenberg_vendor_script_filename( $handle, $src );
-
-	if ( defined( 'GUTENBERG_LIST_VENDOR_ASSETS' ) && GUTENBERG_LIST_VENDOR_ASSETS ) {
-		echo "$src|$filename\n";
-		return;
-	}
-
-	$full_path = gutenberg_dir_path() . 'vendor/' . $filename;
-
-	$needs_fetch = (
-		defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && (
-			! file_exists( $full_path ) ||
-			time() - filemtime( $full_path ) >= DAY_IN_SECONDS
-		)
-	);
-
-	if ( $needs_fetch ) {
-		// Determine whether we can write to this file.  If not, don't waste
-		// time doing a network request.
-		// @codingStandardsIgnoreStart
-
-		$is_writable = is_writable( $full_path );
-		if ( $is_writable ) {
-			$f = @fopen( $full_path, 'a' );
-			if ( ! $f ) {
-				$is_writable = false;
-			} else {
-				fclose( $f );
-			}
-		}
-
-		// @codingStandardsIgnoreEnd
-		if ( ! $is_writable ) {
-			// Failed to open the file for writing, probably due to server
-			// permissions.  Enqueue the script directly from the URL instead.
-			gutenberg_override_script( $scripts, $handle, $src, $deps, $ver, $in_footer );
-			return;
-		}
-
-		$response = wp_remote_get( $src );
-		if ( wp_remote_retrieve_response_code( $response ) === 200 ) {
-			$f = fopen( $full_path, 'w' );
-			fwrite( $f, wp_remote_retrieve_body( $response ) );
-			fclose( $f );
-		} elseif ( ! filesize( $full_path ) ) {
-			// The request failed. If the file is already cached, continue to
-			// use this file. If not, then unlink the 0 byte file, and enqueue
-			// the script directly from the URL.
-			gutenberg_override_script( $scripts, $handle, $src, $deps, $ver, $in_footer );
-			unlink( $full_path );
-			return;
-		}
-	}
-	gutenberg_override_script(
-		$scripts,
-		$handle,
-		gutenberg_url( 'vendor/' . $filename ),
-		$deps,
-		$ver,
-		$in_footer
-	);
-}
-
-/**
- * Sets the editor styles to be consumed by JS.
- */
-function gutenberg_resolve_assets() {
-	global $pagenow;
-
-	$script_handles = array();
-	$style_handles  = array(
-		'wp-block-editor',
-		'wp-block-library',
-		'wp-block-library-theme',
-		'wp-edit-blocks',
-	);
-
-	if ( 'widgets.php' === $pagenow || 'customize.php' === $pagenow ) {
-		$style_handles[] = 'wp-widgets';
-		$style_handles[] = 'wp-edit-widgets';
-	}
-
-	$block_registry = WP_Block_Type_Registry::get_instance();
-
-	foreach ( $block_registry->get_all_registered() as $block_type ) {
-		if ( ! empty( $block_type->style ) ) {
-			$style_handles[] = $block_type->style;
-		}
-
-		if ( ! empty( $block_type->editor_style ) ) {
-			$style_handles[] = $block_type->editor_style;
-		}
-
-		if ( ! empty( $block_type->script ) ) {
-			$script_handles[] = $block_type->script;
-		}
-	}
-
-	$style_handles = array_unique( $style_handles );
-	$done          = wp_styles()->done;
-
-	ob_start();
-
-	// We do not need reset styles for the iframed editor.
-	wp_styles()->done = array( 'wp-reset-editor-styles' );
-	wp_styles()->do_items( $style_handles );
-	wp_styles()->done = $done;
-
-	$styles = ob_get_clean();
-
-	$script_handles = array_unique( $script_handles );
-	$done           = wp_scripts()->done;
-
-	ob_start();
-
-	wp_scripts()->done = array();
-	wp_scripts()->do_items( $script_handles );
-	wp_scripts()->done = $done;
-
-	$scripts = ob_get_clean();
-
-	return array(
-		'styles'  => $styles,
-		'scripts' => $scripts,
-	);
-}
-
-add_filter(
-	'block_editor_settings_all',
-	function( $settings ) {
-		// In the future we can allow WP Dependency handles to be passed.
-		$settings['__unstableResolvedAssets'] = gutenberg_resolve_assets();
-		return $settings;
-	}
-);

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { truncate } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -26,14 +21,20 @@ import { store as blockEditorStore } from '../../store';
  * @example
  *
  * ```js
- * useBlockDisplayTitle( 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1', 17 );
+ * useBlockDisplayTitle( { clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1', maximumLength: 17 } );
  * ```
  *
- * @param {string} clientId Client ID of block.
- * @param {number|undefined} maximumLength The maximum length that the block title string may be before truncated.
+ * @param {Object}           props
+ * @param {string}           props.clientId      Client ID of block.
+ * @param {number|undefined} props.maximumLength The maximum length that the block title string may be before truncated.
+ * @param {string|undefined} props.context       The context to pass to `getBlockLabel`.
  * @return {?string} Block title.
  */
-export default function useBlockDisplayTitle( clientId, maximumLength ) {
+export default function useBlockDisplayTitle( {
+	clientId,
+	maximumLength,
+	context,
+} ) {
 	const { attributes, name, reusableBlockTitle } = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
@@ -68,16 +69,26 @@ export default function useBlockDisplayTitle( clientId, maximumLength ) {
 	}
 	const blockType = getBlockType( name );
 	const blockLabel = blockType
-		? getBlockLabel( blockType, attributes )
+		? getBlockLabel( blockType, attributes, context )
 		: null;
+
 	const label = reusableBlockTitle || blockLabel;
 	// Label will fallback to the title if no label is defined for the current
-	// label context. If the label is defined we prioritize it over possible
+	// label context. If the label is defined we prioritize it over a
 	// possible block variation title match.
-	if ( label && label !== blockType.title ) {
-		return maximumLength && maximumLength > 0
-			? truncate( label, { length: maximumLength } )
-			: label;
+	const blockTitle =
+		label && label !== blockType.title ? label : blockInformation.title;
+
+	if (
+		maximumLength &&
+		maximumLength > 0 &&
+		blockTitle.length > maximumLength
+	) {
+		const omission = '...';
+		return (
+			blockTitle.slice( 0, maximumLength - omission.length ) + omission
+		);
 	}
-	return blockInformation.title;
+
+	return blockTitle;
 }

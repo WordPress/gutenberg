@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { chunk } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
@@ -15,6 +10,16 @@ import apiFetch from '@wordpress/api-fetch';
  * @type {number?}
  */
 let maxItems = null;
+
+function chunk( arr, chunkSize ) {
+	const tmp = [ ...arr ];
+	const cache = [];
+	while ( tmp.length ) {
+		cache.push( tmp.splice( 0, chunkSize ) );
+	}
+
+	return cache;
+}
 
 /**
  * Default batch processor. Sends its input requests to /batch/v1.
@@ -36,6 +41,7 @@ export default async function defaultProcessor( requests ) {
 
 	const results = [];
 
+	// @ts-ignore We would have crashed or never gotten to this point if we hadn't received the maxItems count.
 	for ( const batchRequests of chunk( requests, maxItems ) ) {
 		const batchResponse = await apiFetch( {
 			path: '/batch/v1',

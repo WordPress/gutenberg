@@ -4,8 +4,8 @@
 	"name": "core/comment-date",
 	"title": "Comment Date",
 	"category": "theme",
-	"parent": [ "core/comment-template" ],
-	"description": "Add the date of this comment.",
+	"ancestor": [ "core/comment-template" ],
+	"description": "Displays the date on which the comment was posted.",
 	"textdomain": "default",
 	"attributes": {
 		"format": {
@@ -13,7 +13,7 @@
 		},
 		"isLink": {
 			"type": "boolean",
-			"default": false
+			"default": true
 		}
 	},
 	"usesContext": [ "commentId" ],
@@ -35,6 +35,7 @@
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true

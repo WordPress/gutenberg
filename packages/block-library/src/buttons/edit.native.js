@@ -49,11 +49,8 @@ export default function ButtonsEdit( {
 
 	const { isInnerButtonSelected, shouldDelete } = useSelect(
 		( select ) => {
-			const {
-				getBlockCount,
-				getBlockParents,
-				getSelectedBlockClientId,
-			} = select( blockEditorStore );
+			const { getBlockCount, getBlockParents, getSelectedBlockClientId } =
+				select( blockEditorStore );
 			const selectedBlockClientId = getSelectedBlockClientId();
 			const selectedBlockParents = getBlockParents(
 				selectedBlockClientId,
@@ -73,16 +70,15 @@ export default function ButtonsEdit( {
 	);
 
 	const preferredStyle = useSelect( ( select ) => {
-		const preferredStyleVariations = select(
-			blockEditorStore
-		).getSettings().__experimentalPreferredStyleVariations;
+		const preferredStyleVariations =
+			select( blockEditorStore ).getSettings()
+				.__experimentalPreferredStyleVariations;
 		return preferredStyleVariations?.value?.[ buttonBlockName ];
 	}, [] );
 
 	const { getBlockOrder } = useSelect( blockEditorStore );
-	const { insertBlock, removeBlock, selectBlock } = useDispatch(
-		blockEditorStore
-	);
+	const { insertBlock, removeBlock, selectBlock } =
+		useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		const { width } = sizes || {};

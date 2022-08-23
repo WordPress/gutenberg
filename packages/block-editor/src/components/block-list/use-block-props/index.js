@@ -12,7 +12,7 @@ import {
 	__unstableGetBlockProps as getBlockProps,
 	getBlockType,
 } from '@wordpress/blocks';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useDisabled } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import warning from '@wordpress/warning';
 
@@ -31,9 +31,7 @@ import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-name
 import { useFocusHandler } from './use-focus-handler';
 import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
-import { useScrollIntoView } from './use-scroll-into-view';
 import { useBlockRefProvider } from './use-block-refs';
-import { useMultiSelection } from './use-multi-selection';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { store as blockEditorStore } from '../../../store';
 
@@ -52,17 +50,24 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  * also pass any other props through this hook, and they will be merged and
  * returned.
  *
- * @param {Object}  props                    Optional. Props to pass to the element. Must contain
- *                                           the ref if one is defined.
- * @param {Object}  options                  Options for internal use only.
+ * @param {Object}  props                        Optional. Props to pass to the element. Must contain
+ *                                               the ref if one is defined.
+ * @param {Object}  options                      Options for internal use only.
  * @param {boolean} options.__unstableIsHtml
+ * @param {boolean} options.__unstableIsDisabled Whether the block should be disabled.
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
-export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
-	const { clientId, className, wrapperProps = {}, isAligned } = useContext(
-		BlockListBlockContext
-	);
+export function useBlockProps(
+	props = {},
+	{ __unstableIsHtml, __unstableIsDisabled = false } = {}
+) {
+	const {
+		clientId,
+		className,
+		wrapperProps = {},
+		isAligned,
+	} = useContext( BlockListBlockContext );
 	const {
 		index,
 		mode,
@@ -115,11 +120,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const mergedRefs = useMergeRefs( [
 		props.ref,
 		useFocusFirstElement( clientId ),
-		// Must happen after focus because we check for focus in the block.
-		useScrollIntoView( clientId ),
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
-		useMultiSelection( clientId ),
 		useEventHandlers( clientId ),
 		useNavModeExit( clientId ),
 		useIsHovered(),
@@ -130,6 +132,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			enableAnimation,
 			triggerAnimationOnChange: index,
 		} ),
+		useDisabled( { isDisabled: ! __unstableIsDisabled } ),
 	] );
 
 	const blockEditContext = useBlockEditContext();

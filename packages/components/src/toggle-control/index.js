@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { isFunction } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -32,7 +31,7 @@ export default function ToggleControl( {
 	let describedBy, helpLabel;
 	if ( help ) {
 		describedBy = id + '__help';
-		helpLabel = isFunction( help ) ? help( checked ) : help;
+		helpLabel = typeof help === 'function' ? help( checked ) : help;
 	}
 
 	return (

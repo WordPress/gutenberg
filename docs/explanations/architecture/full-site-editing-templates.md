@@ -2,10 +2,6 @@
 
 ## Template and template part flows
 
-<div class="callout callout-alert">
-This documentation is for block templates and template parts, these features are part of the Full Site Editing project releasing in WordPress 5.9.
-</div>
-
 This document will explain the internals of how templates and templates parts are rendered in the frontend and edited in the backend. For an introduction about block themes and Full site editing templates, refer to the [block theme documentation](/docs/how-to-guides/themes/block-theme-overview.md).
 
 ## Storage

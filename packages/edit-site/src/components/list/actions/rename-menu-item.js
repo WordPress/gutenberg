@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import {
 	Button,
 	Flex,
@@ -19,13 +19,10 @@ export default function RenameMenuItem( { template, onClose } ) {
 	const [ title, setTitle ] = useState( () => template.title.rendered );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
-	const { getLastEntitySaveError } = useSelect( coreStore );
-	const { editEntityRecord, saveEditedEntityRecord } = useDispatch(
-		coreStore
-	);
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
+	const { editEntityRecord, saveEditedEntityRecord } =
+		useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
 	if ( ! template.is_custom ) {
 		return null;
@@ -48,18 +45,9 @@ export default function RenameMenuItem( { template, onClose } ) {
 			await saveEditedEntityRecord(
 				'postType',
 				template.type,
-				template.id
+				template.id,
+				{ throwOnError: true }
 			);
-
-			const lastError = getLastEntitySaveError(
-				'postType',
-				template.type,
-				template.id
-			);
-
-			if ( lastError ) {
-				throw lastError;
-			}
 
 			createSuccessNotice( __( 'Entity renamed.' ), {
 				type: 'snackbar',

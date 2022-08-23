@@ -25,12 +25,19 @@ const MyImageSizeControl = () => {
 			imageHeight={ imageHeight }
 		/>
 	);
-} );
+}
 ```
 
 ## Props
 
 The component accepts the following props:
+
+### imageSizeHelp
+
+If this property is added, a help text will be generated for the image size control, using imageSizeHelp property as the content.
+
+-   Type: `String|WPElement`
+-   Required: No
 
 ### slug
 

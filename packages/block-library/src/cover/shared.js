@@ -21,10 +21,12 @@ export const VIDEO_BACKGROUND_TYPE = 'video';
 export const COVER_MIN_HEIGHT = 50;
 export const COVER_MAX_HEIGHT = 1000;
 export const COVER_DEFAULT_HEIGHT = 300;
-export function backgroundImageStyles( url ) {
-	return url ? { backgroundImage: `url(${ url })` } : {};
-}
+export const DEFAULT_FOCAL_POINT = { x: 0.5, y: 0.5 };
 export const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
+
+export function mediaPosition( { x, y } = DEFAULT_FOCAL_POINT ) {
+	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
+}
 
 export function dimRatioToClass( ratio ) {
 	return ratio === 50 || ! ratio === undefined
@@ -70,8 +72,9 @@ export function attributesFromMedia( setAttributes, dimRatio ) {
 			id: media.id,
 			alt: media?.alt,
 			backgroundType: mediaType,
+			focalPoint: undefined,
 			...( mediaType === VIDEO_BACKGROUND_TYPE
-				? { focalPoint: undefined, hasParallax: undefined }
+				? { hasParallax: undefined }
 				: {} ),
 		} );
 	};

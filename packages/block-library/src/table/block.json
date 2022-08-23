@@ -134,6 +134,10 @@
 				"text": true
 			}
 		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -156,7 +160,12 @@
 				"width": true
 			}
 		},
-		"__experimentalSelector": ".wp-block-table > table"
+		"__experimentalSelector": ".wp-block-table > table",
+		"__experimentalStyle": {
+			"spacing": {
+				"margin": "0 0 1em 0"
+			}
+		}
 	},
 	"styles": [
 		{

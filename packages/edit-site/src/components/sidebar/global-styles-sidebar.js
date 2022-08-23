@@ -37,11 +37,11 @@ export default function GlobalStylesSidebar() {
 						<DropdownMenu
 							icon={ moreVertical }
 							label={ __( 'More Global Styles Actions' ) }
-							toggleProps={ { disabled: ! canReset } }
 							controls={ [
 								{
 									title: __( 'Reset to defaults' ),
 									onClick: onReset,
+									isDisabled: ! canReset,
 								},
 								{
 									title: __( 'Welcome Guide' ),

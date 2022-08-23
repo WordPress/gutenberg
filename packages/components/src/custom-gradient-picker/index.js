@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, omit } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -12,9 +12,10 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import AnglePickerControl from '../angle-picker-control';
-import CustomGradientBar from '../custom-gradient-bar';
+import CustomGradientBar from './gradient-bar';
 import { Flex } from '../flex';
 import SelectControl from '../select-control';
+import { VStack } from '../v-stack';
 import {
 	getGradientAstWithDefault,
 	getLinearGradientRepresentation,
@@ -34,11 +35,8 @@ import {
 } from './styles/custom-gradient-picker-styles';
 
 const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
-	const angle = get(
-		gradientAST,
-		[ 'orientation', 'value' ],
-		DEFAULT_LINEAR_GRADIENT_ANGLE
-	);
+	const angle =
+		gradientAST?.orientation?.value ?? DEFAULT_LINEAR_GRADIENT_ANGLE;
 	const onAngleChange = ( newAngle ) => {
 		onChange(
 			serializeGradient( {
@@ -52,6 +50,7 @@ const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
 	};
 	return (
 		<AnglePickerControl
+			__nextHasNoMarginBottom
 			onChange={ onAngleChange }
 			labelPosition="top"
 			value={ hasGradient ? angle : '' }
@@ -74,9 +73,10 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 	};
 
 	const onSetRadialGradient = () => {
+		const { orientation, ...restGradientAST } = gradientAST;
 		onChange(
 			serializeGradient( {
-				...omit( gradientAST, [ 'orientation' ] ),
+				...restGradientAST,
 				type: 'radial-gradient',
 			} )
 		);
@@ -93,6 +93,7 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 
 	return (
 		<SelectControl
+			__nextHasNoMarginBottom
 			className="components-custom-gradient-picker__type-picker"
 			label={ __( 'Type' ) }
 			labelPosition="top"
@@ -105,6 +106,8 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 };
 
 export default function CustomGradientPicker( {
+	/** Start opting into the new margin-free styles that will become the default in a future version. */
+	__nextHasNoMargin = false,
 	value,
 	onChange,
 	__experimentalIsRenderedInSidebar,
@@ -123,7 +126,12 @@ export default function CustomGradientPicker( {
 	} ) );
 
 	return (
-		<div className="components-custom-gradient-picker">
+		<VStack
+			spacing={ 5 }
+			className={ classnames( 'components-custom-gradient-picker', {
+				'is-next-has-no-margin': __nextHasNoMargin,
+			} ) }
+		>
 			<CustomGradientBar
 				__experimentalIsRenderedInSidebar={
 					__experimentalIsRenderedInSidebar
@@ -163,6 +171,6 @@ export default function CustomGradientPicker( {
 					) }
 				</AccessoryWrapper>
 			</Flex>
-		</div>
+		</VStack>
 	);
 }

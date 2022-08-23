@@ -4,8 +4,6 @@
 import {
 	pickBy,
 	isEmpty,
-	isObject,
-	identity,
 	mapValues,
 	forEach,
 	get,
@@ -15,13 +13,24 @@ import {
 } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { getBlockSupport } from '@wordpress/blocks';
+
+const identity = ( x ) => x;
+
+/**
  * Removed falsy values from nested object.
  *
  * @param {*} object
  * @return {*} Object cleaned from falsy values
  */
 export const cleanEmptyObject = ( object ) => {
-	if ( ! isObject( object ) || Array.isArray( object ) ) {
+	if (
+		object === null ||
+		typeof object !== 'object' ||
+		Array.isArray( object )
+	) {
 		return object;
 	}
 	const cleanedNestedObjects = pickBy(
@@ -86,4 +95,25 @@ export function transformStyles(
 		}
 	} );
 	return returnBlock;
+}
+
+/**
+ * Check whether serialization of specific block support feature or set should
+ * be skipped.
+ *
+ * @param {string|Object} blockType  Block name or block type object.
+ * @param {string}        featureSet Name of block support feature set.
+ * @param {string}        feature    Name of the individual feature to check.
+ *
+ * @return {boolean} Whether serialization should occur.
+ */
+export function shouldSkipSerialization( blockType, featureSet, feature ) {
+	const support = getBlockSupport( blockType, featureSet );
+	const skipSerialization = support?.__experimentalSkipSerialization;
+
+	if ( Array.isArray( skipSerialization ) ) {
+		return skipSerialization.includes( feature );
+	}
+
+	return skipSerialization;
 }

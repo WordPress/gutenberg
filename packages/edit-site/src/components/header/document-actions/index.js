@@ -53,21 +53,23 @@ function useSecondaryText() {
 }
 
 /**
- * @param {Object}   props             Props for the DocumentActions component.
- * @param {string}   props.entityTitle The title to display.
- * @param {string}   props.entityLabel A label to use for entity-related options.
- *                                     E.g. "template" would be used for "edit
- *                                     template" and "show template details".
- * @param {boolean}  props.isLoaded    Whether the data is available.
- * @param {Function} props.children    React component to use for the
- *                                     information dropdown area. Should be a
- *                                     function which accepts dropdown props.
+ * @param {Object}   props                Props for the DocumentActions component.
+ * @param {string}   props.entityTitle    The title to display.
+ * @param {string}   props.entityLabel    A label to use for entity-related options.
+ *                                        E.g. "template" would be used for "edit
+ *                                        template" and "show template details".
+ * @param {boolean}  props.isLoaded       Whether the data is available.
+ * @param {Function} props.children       React component to use for the
+ *                                        information dropdown area. Should be a
+ *                                        function which accepts dropdown props.
+ * @param {boolean}  props.showIconLabels Whether buttons display icons or text labels.
  */
 export default function DocumentActions( {
 	entityTitle,
 	entityLabel,
 	isLoaded,
 	children: dropdownContent,
+	showIconLabels,
 } ) {
 	const { label } = useSecondaryText();
 
@@ -139,12 +141,17 @@ export default function DocumentActions( {
 								aria-expanded={ isOpen }
 								aria-haspopup="true"
 								onClick={ onToggle }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
 								label={ sprintf(
 									/* translators: %s: the entity to see details about, like "template"*/
 									__( 'Show %s details' ),
 									entityLabel
 								) }
-							/>
+							>
+								{ showIconLabels && __( 'Details' ) }
+							</Button>
 						) }
 						contentClassName="edit-site-document-actions__info-dropdown"
 						renderContent={ dropdownContent }

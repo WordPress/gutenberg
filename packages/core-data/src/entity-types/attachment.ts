@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
+import type {
 	Context,
 	ContextualField,
 	MediaType,
@@ -12,10 +12,11 @@ import {
 	PingStatus,
 } from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
+import type { DefaultContextOf } from './index';
 
-declare module './base-entity-types' {
-	export namespace BaseEntityTypes {
+declare module './base-entity-records' {
+	export namespace BaseEntityRecords {
 		export interface Attachment< C extends Context > {
 			/**
 			 * The date the post was published, in the site's timezone.
@@ -141,6 +142,6 @@ declare module './base-entity-types' {
 	}
 }
 
-export type Attachment< C extends Context > = OmitNevers<
-	_BaseEntityTypes.Attachment< C >
->;
+export type Attachment<
+	C extends Context = DefaultContextOf< 'root', 'media' >
+> = OmitNevers< _BaseEntityRecords.Attachment< C > >;

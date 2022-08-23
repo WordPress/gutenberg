@@ -28,10 +28,10 @@ import { useCallback, useRef } from '@wordpress/element';
  * @return Ref callback.
  */
 export default function useRefEffect< TElement = Node >(
-	callback: ( node: TElement ) => ( () => void ) | undefined,
+	callback: ( node: TElement ) => ( () => void ) | void,
 	dependencies: DependencyList
 ): RefCallback< TElement | null > {
-	const cleanup = useRef< ( () => void ) | undefined >();
+	const cleanup = useRef< ( () => void ) | void >();
 	return useCallback( ( node: TElement | null ) => {
 		if ( node ) {
 			cleanup.current = callback( node );

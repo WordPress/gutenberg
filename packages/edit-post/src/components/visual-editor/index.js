@@ -27,9 +27,9 @@ import {
 	__experimentalLayoutStyle as LayoutStyle,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableIframe as Iframe,
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	__experimentalRecursionProvider as RecursionProvider,
 } from '@wordpress/block-editor';
-import { useRef, useMemo } from '@wordpress/element';
+import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { Button, __unstableMotion as motion } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
@@ -85,11 +85,13 @@ function MaybeIframe( {
 export default function VisualEditor( { styles } ) {
 	const {
 		deviceType,
+		isWelcomeGuideVisible,
 		isTemplateMode,
 		wrapperBlockName,
 		wrapperUniqueId,
 	} = useSelect( ( select ) => {
 		const {
+			isFeatureActive,
 			isEditingTemplate,
 			__experimentalGetPreviewDeviceType,
 		} = select( editPostStore );
@@ -105,27 +107,30 @@ export default function VisualEditor( { styles } ) {
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
+			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
 			isTemplateMode: _isTemplateMode,
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 		};
 	}, [] );
+	const { isCleanNewPost } = useSelect( editorStore );
 	const hasMetaBoxes = useSelect(
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
-	const { themeSupportsLayout, assets } = useSelect( ( select ) => {
-		const _settings = select( blockEditorStore ).getSettings();
-		return {
-			themeSupportsLayout: _settings.supportsLayout,
-			assets: _settings.__unstableResolvedAssets,
-		};
-	}, [] );
+	const { themeHasDisabledLayoutStyles, themeSupportsLayout, assets } =
+		useSelect( ( select ) => {
+			const _settings = select( blockEditorStore ).getSettings();
+			return {
+				themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
+				themeSupportsLayout: _settings.supportsLayout,
+				assets: _settings.__unstableResolvedAssets,
+			};
+		}, [] );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
-		// We intentionally omit a 100% height here. The container is a flex item, so the 100% height is granted by default.
-		// If a percentage height is present, older browsers such as Safari 13 apply that, but do so incorrectly as the inheritance is buggy.
+		height: '100%',
 		width: '100%',
 		margin: 0,
 		display: 'flex',
@@ -170,22 +175,27 @@ export default function VisualEditor( { styles } ) {
 
 	const blockSelectionClearerRef = useBlockSelectionClearer();
 
-	const [ , RecursionProvider ] = useNoRecursiveRenders(
-		wrapperUniqueId,
-		wrapperBlockName
-	);
-
 	const layout = useMemo( () => {
 		if ( isTemplateMode ) {
 			return { type: 'default' };
 		}
 
 		if ( themeSupportsLayout ) {
-			return defaultLayout;
+			// We need to ensure support for wide and full alignments,
+			// so we add the constrained type.
+			return { ...defaultLayout, type: 'constrained' };
 		}
-
-		return undefined;
+		// Set constrained layout for classic themes so all alignments are supported.
+		return { type: 'constrained' };
 	}, [ isTemplateMode, themeSupportsLayout, defaultLayout ] );
+
+	const titleRef = useRef();
+	useEffect( () => {
+		if ( isWelcomeGuideVisible || ! isCleanNewPost() ) {
+			return;
+		}
+		titleRef?.current?.focus();
+	}, [ isWelcomeGuideVisible, isCleanNewPost ] );
 
 	return (
 		<BlockTools
@@ -230,23 +240,34 @@ export default function VisualEditor( { styles } ) {
 						assets={ assets }
 						style={ { paddingBottom } }
 					>
-						{ themeSupportsLayout && ! isTemplateMode && (
-							<LayoutStyle
-								selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
-								layout={ defaultLayout }
-							/>
-						) }
+						{ themeSupportsLayout &&
+							! themeHasDisabledLayoutStyles &&
+							! isTemplateMode && (
+								<LayoutStyle
+									selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
+									layout={ layout }
+									layoutDefinitions={
+										defaultLayout?.definitions
+									}
+								/>
+							) }
 						{ ! isTemplateMode && (
-							<div className="edit-post-visual-editor__post-title-wrapper">
-								<PostTitle />
+							<div
+								className="edit-post-visual-editor__post-title-wrapper"
+								contentEditable={ false }
+							>
+								<PostTitle ref={ titleRef } />
 							</div>
 						) }
-						<RecursionProvider>
+						<RecursionProvider
+							blockName={ wrapperBlockName }
+							uniqueId={ wrapperUniqueId }
+						>
 							<BlockList
 								className={
 									isTemplateMode
 										? 'wp-site-blocks'
-										: undefined
+										: 'is-layout-constrained' // Ensure root level blocks receive default/flow blockGap styling rules.
 								}
 								__experimentalLayout={ layout }
 							/>

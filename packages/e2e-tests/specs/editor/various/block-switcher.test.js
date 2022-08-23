@@ -28,10 +28,10 @@ describe( 'Block Switcher', () => {
 			expect.arrayContaining( [
 				'Group',
 				'Paragraph',
-				'Quote',
 				'Heading',
-				'Pullquote',
+				'Quote',
 				'Columns',
+				'Table of Contents',
 			] )
 		);
 	} );
@@ -55,8 +55,8 @@ describe( 'Block Switcher', () => {
 			expect.arrayContaining( [
 				'Group',
 				'Paragraph',
-				'Pullquote',
 				'Heading',
+				'Table of Contents',
 			] )
 		);
 	} );
@@ -71,6 +71,7 @@ describe( 'Block Switcher', () => {
 				'core/group',
 				'core/heading',
 				'core/columns',
+				'core/table-of-contents',
 			].map( ( block ) => wp.blocks.unregisterBlockType( block ) );
 		} );
 

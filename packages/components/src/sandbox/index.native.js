@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { Dimensions, Platform } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 /**
  * WordPress dependencies
  */
 import {
+	Platform,
 	renderToString,
 	memo,
 	useRef,
@@ -110,7 +111,7 @@ const style = `
 	/**
 	 * Add responsiveness to embeds with aspect ratios.
 	 *
-	 * These styles have been copied from the web version (https://git.io/JEFcX) and
+	 * These styles have been copied from the web version (https://github.com/WordPress/gutenberg/blob/7901895ca20cf61e402925e31571d659dab64721/packages/block-library/src/embed/style.scss#L42-L89) and
 	 * adapted for the native version.
 	 */
 	.wp-has-aspect-ratio.wp-block-embed__wrapper::before {
@@ -307,6 +308,7 @@ function Sandbox( {
 			style={ [
 				sandboxStyles[ 'sandbox-webview__content' ],
 				getSizeStyle(),
+				Platform.isAndroid && workaroundStyles.webView,
 			] }
 			onMessage={ checkMessageForResize }
 			scrollEnabled={ false }
@@ -316,5 +318,16 @@ function Sandbox( {
 		/>
 	);
 }
+
+const workaroundStyles = StyleSheet.create( {
+	webView: {
+		/**
+		 * The slight opacity below is a workaround for an Android crash caused from combining Android
+		 * 12's new scroll overflow behavior and webviews.
+		 * https://github.com/react-native-webview/react-native-webview/issues/1915#issuecomment-808869253
+		 */
+		opacity: 0.99,
+	},
+} );
 
 export default memo( Sandbox );

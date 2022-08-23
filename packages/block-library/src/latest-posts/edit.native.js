@@ -12,7 +12,10 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { postList as icon } from '@wordpress/icons';
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	BlockAlignmentControl,
+} from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import {
 	Icon,
@@ -35,14 +38,18 @@ class LatestPostsEdit extends Component {
 		this.state = {
 			categoriesList: [],
 		};
-		this.onSetDisplayPostContent = this.onSetDisplayPostContent.bind(
-			this
-		);
-		this.onSetDisplayPostContentRadio = this.onSetDisplayPostContentRadio.bind(
-			this
-		);
+		this.onSetDisplayPostContent =
+			this.onSetDisplayPostContent.bind( this );
+		this.onSetDisplayPostContentRadio =
+			this.onSetDisplayPostContentRadio.bind( this );
 		this.onSetExcerptLength = this.onSetExcerptLength.bind( this );
 		this.onSetDisplayPostDate = this.onSetDisplayPostDate.bind( this );
+		this.onSetDisplayFeaturedImage =
+			this.onSetDisplayFeaturedImage.bind( this );
+		this.onSetFeaturedImageAlign =
+			this.onSetFeaturedImageAlign.bind( this );
+		this.onSetAddLinkToFeaturedImage =
+			this.onSetAddLinkToFeaturedImage.bind( this );
 		this.onSetOrder = this.onSetOrder.bind( this );
 		this.onSetOrderBy = this.onSetOrderBy.bind( this );
 		this.onSetPostsToShow = this.onSetPostsToShow.bind( this );
@@ -95,6 +102,21 @@ class LatestPostsEdit extends Component {
 		setAttributes( { displayPostDate: value } );
 	}
 
+	onSetDisplayFeaturedImage( value ) {
+		const { setAttributes } = this.props;
+		setAttributes( { displayFeaturedImage: value } );
+	}
+
+	onSetAddLinkToFeaturedImage( value ) {
+		const { setAttributes } = this.props;
+		setAttributes( { addLinkToFeaturedImage: value } );
+	}
+
+	onSetFeaturedImageAlign( value ) {
+		const { setAttributes } = this.props;
+		setAttributes( { featuredImageAlign: value } );
+	}
+
 	onSetOrder( value ) {
 		const { setAttributes } = this.props;
 		setAttributes( { order: value } );
@@ -124,6 +146,9 @@ class LatestPostsEdit extends Component {
 			displayPostContentRadio,
 			excerptLength,
 			displayPostDate,
+			displayFeaturedImage,
+			featuredImageAlign,
+			addLinkToFeaturedImage,
 			order,
 			orderBy,
 			postsToShow,
@@ -166,6 +191,31 @@ class LatestPostsEdit extends Component {
 						onChange={ this.onSetDisplayPostDate }
 					/>
 				</PanelBody>
+
+				<PanelBody title={ __( 'Featured image settings' ) }>
+					<ToggleControl
+						label={ __( 'Display featured image' ) }
+						checked={ displayFeaturedImage }
+						onChange={ this.onSetDisplayFeaturedImage }
+					/>
+					{ displayFeaturedImage && (
+						<>
+							<BlockAlignmentControl
+								value={ featuredImageAlign }
+								onChange={ this.onSetFeaturedImageAlign }
+								controls={ [ 'left', 'center', 'right' ] }
+								isBottomSheetControl={ true }
+							/>
+							<ToggleControl
+								label={ __( 'Add link to featured image' ) }
+								checked={ addLinkToFeaturedImage }
+								onChange={ this.onSetAddLinkToFeaturedImage }
+								separatorType={ 'topFullWidth' }
+							/>
+						</>
+					) }
+				</PanelBody>
+
 				<PanelBody title={ __( 'Sorting and filtering' ) }>
 					<QueryControls
 						{ ...{ order, orderBy } }

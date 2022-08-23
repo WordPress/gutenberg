@@ -4,7 +4,9 @@
 		"isValid": true,
 		"attributes": {
 			"displayAsDropdown": false,
-			"showPostCounts": true
+			"showLabel": true,
+			"showPostCounts": true,
+			"type": "monthly"
 		},
 		"innerBlocks": []
 	}

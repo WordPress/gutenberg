@@ -1,12 +1,13 @@
 /**
  * Internal dependencies
  */
-import { Context, PostFormat, RenderedText, OmitNevers } from './helpers';
+import type { Context, PostFormat, RenderedText, OmitNevers } from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
+import type { DefaultContextOf } from './index';
 
-declare module './base-entity-types' {
-	export namespace BaseEntityTypes {
+declare module './base-entity-records' {
+	export namespace BaseEntityRecords {
 		export interface Theme< C extends Context > {
 			/**
 			 * The theme's stylesheet. This uniquely identifies the theme.
@@ -77,6 +78,10 @@ declare module './base-entity-types' {
 			 * Whether theme opts in to wide alignment CSS class.
 			 */
 			'align-wide': boolean;
+			/**
+			 * Whether appearanceTools are enabled in Global Styles.
+			 */
+			'appearance-tools': boolean;
 			/**
 			 * Whether posts and comments RSS feed links are added to head.
 			 */
@@ -217,6 +222,5 @@ declare module './base-entity-types' {
 	}
 }
 
-export type Theme< C extends Context > = OmitNevers<
-	_BaseEntityTypes.Theme< C >
->;
+export type Theme< C extends Context = DefaultContextOf< 'root', 'theme' > > =
+	OmitNevers< _BaseEntityRecords.Theme< C > >;

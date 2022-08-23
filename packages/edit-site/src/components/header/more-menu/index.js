@@ -14,14 +14,20 @@ import { PreferenceToggleMenuItem } from '@wordpress/preferences';
  * Internal dependencies
  */
 import KeyboardShortcutHelpModal from '../../keyboard-shortcut-help-modal';
+import EditSitePreferencesModal from '../../preferences-modal';
 import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import SiteExport from './site-export';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import CopyContentMenuItem from './copy-content-menu-item';
 import ModeSwitcher from '../mode-switcher';
 
-export default function MoreMenu() {
+export default function MoreMenu( { showIconLabels } ) {
 	const [ isModalActive, toggleModal ] = useReducer(
+		( isActive ) => ! isActive,
+		false
+	);
+
+	const [ isPreferencesModalActive, togglePreferencesModal ] = useReducer(
 		( isActive ) => ! isActive,
 		false
 	);
@@ -30,7 +36,12 @@ export default function MoreMenu() {
 
 	return (
 		<>
-			<MoreMenuDropdown>
+			<MoreMenuDropdown
+				toggleProps={ {
+					showTooltip: ! showIconLabels,
+					...( showIconLabels && { variant: 'tertiary' } ),
+				} }
+			>
 				{ ( { onClose } ) => (
 					<>
 						<MenuGroup label={ _x( 'View', 'noun' ) }>
@@ -99,12 +110,21 @@ export default function MoreMenu() {
 								fillProps={ { onClose } }
 							/>
 						</MenuGroup>
+						<MenuGroup>
+							<MenuItem onClick={ togglePreferencesModal }>
+								{ __( 'Preferences' ) }
+							</MenuItem>
+						</MenuGroup>
 					</>
 				) }
 			</MoreMenuDropdown>
 			<KeyboardShortcutHelpModal
 				isModalActive={ isModalActive }
 				toggleModal={ toggleModal }
+			/>
+			<EditSitePreferencesModal
+				isModalActive={ isPreferencesModalActive }
+				toggleModal={ togglePreferencesModal }
 			/>
 		</>
 	);

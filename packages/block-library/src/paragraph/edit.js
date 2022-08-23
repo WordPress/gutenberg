@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { __, _x, isRTL } from '@wordpress/i18n';
 import {
-	ToolbarDropdownMenu,
+	ToolbarButton,
 	ToggleControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -23,24 +23,23 @@ import {
 import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import { useOnEnter } from './use-enter';
+
 const name = 'core/paragraph';
 
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
 		isRTL() && (
-			<ToolbarDropdownMenu
-				controls={ [
-					{
-						icon: formatLtr,
-						title: _x( 'Left to right', 'editor button' ),
-						isActive: direction === 'ltr',
-						onClick() {
-							setDirection(
-								direction === 'ltr' ? undefined : 'ltr'
-							);
-						},
-					},
-				] }
+			<ToolbarButton
+				icon={ formatLtr }
+				title={ _x( 'Left to right', 'editor button' ) }
+				isActive={ direction === 'ltr' }
+				onClick={ () => {
+					setDirection( direction === 'ltr' ? undefined : 'ltr' );
+				} }
 			/>
 		)
 	);
@@ -57,6 +56,7 @@ function ParagraphBlock( {
 	const { align, content, direction, dropCap, placeholder } = attributes;
 	const isDropCapFeatureEnabled = useSetting( 'typography.dropCap' );
 	const blockProps = useBlockProps( {
+		ref: useOnEnter( { clientId, content } ),
 		className: classnames( {
 			'has-drop-cap': dropCap,
 			[ `has-text-align-${ align }` ]: align,
@@ -146,6 +146,7 @@ function ParagraphBlock( {
 				}
 				data-empty={ content ? false : true }
 				placeholder={ placeholder || __( 'Type / to choose a block' ) }
+				data-custom-placeholder={ placeholder ? true : undefined }
 				__unstableEmbedURLOnPaste
 				__unstableAllowPrefixTransformations
 			/>

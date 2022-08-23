@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { partial, noop, find } from 'lodash';
+import { partial, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,8 @@ import { useInstanceId } from '@wordpress/compose';
  */
 import { NavigableMenu } from '../navigable-container';
 import Button from '../button';
+
+const noop = () => {};
 
 const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
 	<Button

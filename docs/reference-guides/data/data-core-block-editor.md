@@ -19,6 +19,19 @@ _Returns_
 
 -   `boolean`: True if the block has controlled inner blocks.
 
+### canEditBlock
+
+Determines if the given block is allowed to be edited.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: The block client Id.
+
+_Returns_
+
+-   `boolean`: Whether the given block is allowed to be edited.
+
 ### canInsertBlocks
 
 Determines if the given blocks are allowed to be inserted into the block
@@ -47,6 +60,19 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether the given block type is allowed to be inserted.
+
+### canLockBlockType
+
+Determines if the given block type can be locked/unlocked by a user.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _nameOrType_ `(string|Object)`: Block name or type object.
+
+_Returns_
+
+-   `boolean`: Whether a given block type can be locked/unlocked.
 
 ### canMoveBlock
 
@@ -402,6 +428,7 @@ Items are returned ordered descendingly by their 'frecency'.
 _Parameters_
 
 -   _state_ `Object`: Editor state.
+-   _blocks_ `Object|Object[]`: Block object or array objects.
 -   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
@@ -423,8 +450,9 @@ _Properties_
 
 ### getClientIdsOfDescendants
 
-Returns an array containing the clientIds of all descendants
-of the blocks given.
+Returns an array containing the clientIds of all descendants of the blocks
+given. Returned ids are ordered first by the order of the ids given, then
+by the order that they appear in the editor.
 
 _Parameters_
 
@@ -437,8 +465,9 @@ _Returns_
 
 ### getClientIdsWithDescendants
 
-Returns an array containing the clientIds of the top-level blocks
-and their descendants of any depth (for nested blocks).
+Returns an array containing the clientIds of the top-level blocks and
+their descendants of any depth (for nested blocks). Ids are returned
+in the same order that they appear in the editor.
 
 _Parameters_
 
@@ -947,6 +976,19 @@ _Returns_
 
 -   `boolean`: Is Valid.
 
+### isBlockVisible
+
+Tells if the block is visible on the canvas or not.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `Object`: Client Id of the block.
+
+_Returns_
+
+-   `boolean`: True if the block is visible.
+
 ### isBlockWithinSelection
 
 Returns true if the block corresponding to the specified client ID is
@@ -965,11 +1007,9 @@ _Returns_
 
 ### isCaretWithinFormattedText
 
+> **Deprecated**
+
 Returns true if the caret is within formatted text, or false otherwise.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
 
 _Returns_
 
@@ -1121,6 +1161,8 @@ _Parameters_
 
 ### enterFormattedText
 
+> **Deprecated**
+
 Returns an action object used in signalling that the caret has entered formatted text.
 
 _Returns_
@@ -1128,6 +1170,8 @@ _Returns_
 -   `Object`: Action object.
 
 ### exitFormattedText
+
+> **Deprecated**
 
 Returns an action object used in signalling that the user caret has exited formatted text.
 
@@ -1390,7 +1434,7 @@ Action that changes the position of the user caret.
 
 _Parameters_
 
--   _clientId_ `string`: The selected block client ID.
+-   _clientId_ `string|WPSelection`: The selected block client ID.
 -   _attributeKey_ `string`: The selected block attribute key.
 -   _startOffset_ `number`: The start offset.
 -   _endOffset_ `number`: The end offset.
@@ -1424,6 +1468,14 @@ Action that enables or disables the block moving mode.
 _Parameters_
 
 -   _hasBlockMovingClientId_ `string|null`: Enable/Disable block moving mode.
+
+### setBlockVisibility
+
+Action that sets whether given blocks are visible on the canvas.
+
+_Parameters_
+
+-   _updates_ `Record<string,boolean>`: For each block's clientId, its new visibility setting.
 
 ### setHasControlledInnerBlocks
 
@@ -1462,7 +1514,7 @@ _Parameters_
 
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
 -   _index_ `?number`: Index at which block should be inserted.
--   _\_\_unstableOptions_ `Object`: Wether or not to show an inserter button.
+-   _\_\_unstableOptions_ `Object`: Whether or not to show an inserter button.
 
 _Returns_
 

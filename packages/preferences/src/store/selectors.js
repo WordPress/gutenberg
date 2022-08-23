@@ -10,5 +10,5 @@
  */
 export function get( state, scope, name ) {
 	const value = state.preferences[ scope ]?.[ name ];
-	return value ?? state.defaults[ scope ]?.[ name ];
+	return value !== undefined ? value : state.defaults[ scope ]?.[ name ];
 }

@@ -20,9 +20,10 @@ const catchException = ( command ) => {
  * Internal dependencies
  */
 const {
-	publishNpmLatestDistTag,
-	publishNpmBugfixLatestDistTag,
-	publishNpmNextDistTag,
+	publishNpmGutenbergPlugin,
+	publishNpmBugfixLatest,
+	publishNpmBugfixWordPressCore,
+	publishNpmNext,
 } = require( './commands/packages' );
 const { getReleaseChangelog } = require( './commands/changelog' );
 const { runPerformanceTests } = require( './commands/performance' );
@@ -41,20 +42,30 @@ program
 	.option( ...ciOption )
 	.option( ...repositoryPathOption )
 	.description(
-		'Publishes packages to npm (latest dist-tag, production version)'
+		'Publishes to npm packages synced from the Gutenberg plugin (latest dist-tag, production version)'
 	)
-	.action( catchException( publishNpmLatestDistTag ) );
+	.action( catchException( publishNpmGutenbergPlugin ) );
 
 program
 	.command( 'publish-npm-packages-bugfix-latest' )
 	.alias( 'npm-bugfix' )
-	.option( ...semverOption )
 	.option( ...ciOption )
 	.option( ...repositoryPathOption )
 	.description(
-		'Publishes bugfixes for packages to npm (latest dist-tag, production version)'
+		'Publishes to npm bugfixes for packages (latest dist-tag, production version)'
 	)
-	.action( catchException( publishNpmBugfixLatestDistTag ) );
+	.action( catchException( publishNpmBugfixLatest ) );
+
+program
+	.command( 'publish-npm-packages-wordpress-core' )
+	.alias( 'npm-wp' )
+	.requiredOption( '--wp-version <wpVersion>', 'WordPress version' )
+	.option( ...ciOption )
+	.option( ...repositoryPathOption )
+	.description(
+		'Publishes to npm bugfixes targeting WordPress core (wp-X.Y dist-tag, production version)'
+	)
+	.action( catchException( publishNpmBugfixWordPressCore ) );
 
 program
 	.command( 'publish-npm-packages-next' )
@@ -63,9 +74,9 @@ program
 	.option( ...ciOption )
 	.option( ...repositoryPathOption )
 	.description(
-		'Publishes packages to npm (next dist-tag, prerelease version)'
+		'Publishes to npm development version of packages (next dist-tag, prerelease version)'
 	)
-	.action( catchException( publishNpmNextDistTag ) );
+	.action( catchException( publishNpmNext ) );
 
 program
 	.command( 'release-plugin-changelog' )

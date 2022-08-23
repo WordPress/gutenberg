@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
+## 5.1.0 (2022-05-18)
+
+### Enhancements
+
+-   Added TypeScript definitions for package consumers ([#40957](https://github.com/WordPress/gutenberg/pull/40957)).
+
 ## 5.0.0 (2022-01-27)
 
 ### Breaking Changes

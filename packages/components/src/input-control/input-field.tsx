@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import { useDrag } from '@use-gesture/react';
 import type {
 	SyntheticEvent,
@@ -17,7 +16,6 @@ import type {
  * WordPress dependencies
  */
 import { forwardRef, useRef } from '@wordpress/element';
-import { UP, DOWN, ENTER, ESCAPE } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
@@ -25,8 +23,9 @@ import type { WordPressComponentProps } from '../ui/context';
 import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';
 import { useInputControlStateReducer } from './reducer/reducer';
-import { useUpdateEffect } from '../utils';
 import type { InputFieldProps } from './types';
+
+const noop = () => {};
 
 function InputField(
 	{
@@ -68,38 +67,20 @@ function InputField(
 		pressEnter,
 		pressUp,
 		reset,
-		update,
-	} = useInputControlStateReducer( stateReducer, {
-		isDragEnabled,
-		value: valueProp,
-		isPressEnterToChange,
-	} );
+	} = useInputControlStateReducer(
+		stateReducer,
+		{
+			isDragEnabled,
+			value: valueProp,
+			isPressEnterToChange,
+		},
+		onChange
+	);
 
-	const { _event, value, isDragging, isDirty } = state;
+	const { value, isDragging, isDirty } = state;
 	const wasDirtyOnBlur = useRef( false );
 
 	const dragCursor = useDragCursor( isDragging, dragDirection );
-
-	/*
-	 * Handles synchronization of external and internal value state.
-	 * If not focused and did not hold a dirty value[1] on blur
-	 * updates the value from the props. Otherwise if not holding
-	 * a dirty value[1] propagates the value and event through onChange.
-	 * [1] value is only made dirty if isPressEnterToChange is true
-	 */
-	useUpdateEffect( () => {
-		if ( valueProp === value ) {
-			return;
-		}
-		if ( ! isFocused && ! wasDirtyOnBlur.current ) {
-			update( valueProp, _event as SyntheticEvent );
-		} else if ( ! isDirty ) {
-			onChange( value, {
-				event: _event as ChangeEvent< HTMLInputElement >,
-			} );
-			wasDirtyOnBlur.current = false;
-		}
-	}, [ value, isDirty, isFocused, valueProp ] );
 
 	const handleOnBlur = ( event: FocusEvent< HTMLInputElement > ) => {
 		onBlur( event );
@@ -109,7 +90,7 @@ function InputField(
 		 * If isPressEnterToChange is set, this commits the value to
 		 * the onChange callback.
 		 */
-		if ( isPressEnterToChange && isDirty ) {
+		if ( isDirty || ! event.target.validity.valid ) {
 			wasDirtyOnBlur.current = true;
 			handleOnCommit( event );
 		}
@@ -137,19 +118,19 @@ function InputField(
 	};
 
 	const handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
-		const { keyCode } = event;
+		const { key } = event;
 		onKeyDown( event );
 
-		switch ( keyCode ) {
-			case UP:
+		switch ( key ) {
+			case 'ArrowUp':
 				pressUp( event );
 				break;
 
-			case DOWN:
+			case 'ArrowDown':
 				pressDown( event );
 				break;
 
-			case ENTER:
+			case 'Enter':
 				pressEnter( event );
 
 				if ( isPressEnterToChange ) {
@@ -158,7 +139,7 @@ function InputField(
 				}
 				break;
 
-			case ESCAPE:
+			case 'Escape':
 				if ( isPressEnterToChange && isDirty ) {
 					event.preventDefault();
 					reset( valueProp, event );
@@ -169,7 +150,18 @@ function InputField(
 
 	const dragGestureProps = useDrag< PointerEvent< HTMLInputElement > >(
 		( dragProps ) => {
-			const { distance, dragging, event } = dragProps;
+			const { distance, dragging, event, target } = dragProps;
+
+			// The `target` prop always references the `input` element while, by
+			// default, the `dragProps.event.target` property would reference the real
+			// event target (i.e. any DOM element that the pointer is hovering while
+			// dragging). Ensuring that the `target` is always the `input` element
+			// allows consumers of `InputControl` (or any higher-level control) to
+			// check the input's validity by accessing `event.target.validity.valid`.
+			dragProps.event = {
+				...dragProps.event,
+				target,
+			};
 
 			if ( ! distance ) return;
 			event.stopPropagation();

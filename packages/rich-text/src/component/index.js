@@ -19,7 +19,6 @@ import { useSelectObject } from './use-select-object';
 import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 import { useInputAndSelection } from './use-input-and-selection';
 import { useDelete } from './use-delete';
-import { useSpace } from './use-space';
 
 export function useRichText( {
 	value = '',
@@ -214,6 +213,10 @@ export function useRichText( {
 			return;
 		}
 
+		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
+			ref.current.focus();
+		}
+
 		applyFromProps();
 		hadSelectionUpdate.current = false;
 	}, [ hadSelectionUpdate.current ] );
@@ -243,7 +246,6 @@ export function useRichText( {
 			isSelected,
 			onSelectionChange,
 		} ),
-		useSpace(),
 		useRefEffect( () => {
 			applyFromProps();
 			didMount.current = true;

@@ -7,12 +7,17 @@ import {
 	TouchableWithoutFeedback,
 	Platform,
 } from 'react-native';
-import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
+
 /**
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
 import { ENTER, BACKSPACE } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import * as AztecInputState from './AztecInputState';
 
 const AztecManager = UIManager.getViewManagerConfig( 'RCTAztecView' );
 
@@ -26,9 +31,8 @@ class AztecView extends Component {
 		this._onBackspace = this._onBackspace.bind( this );
 		this._onKeyDown = this._onKeyDown.bind( this );
 		this._onChange = this._onChange.bind( this );
-		this._onHTMLContentWithCursor = this._onHTMLContentWithCursor.bind(
-			this
-		);
+		this._onHTMLContentWithCursor =
+			this._onHTMLContentWithCursor.bind( this );
 		this._onFocus = this._onFocus.bind( this );
 		this._onBlur = this._onBlur.bind( this );
 		this._onSelectionChange = this._onSelectionChange.bind( this );
@@ -127,7 +131,8 @@ class AztecView extends Component {
 
 	_onBlur( event ) {
 		this.selectionEndCaretY = null;
-		TextInputState.blurTextInput( this.aztecViewRef.current );
+
+		AztecInputState.blur( this.aztecViewRef.current );
 
 		if ( ! this.props.onBlur ) {
 			return;
@@ -138,7 +143,7 @@ class AztecView extends Component {
 	}
 
 	_onChange( event ) {
-		// iOS uses the the onKeyDown prop directly from native only when one of the triggerKeyCodes is entered, but
+		// iOS uses the onKeyDown prop directly from native only when one of the triggerKeyCodes is entered, but
 		// Android includes the information needed for onKeyDown in the event passed to onChange.
 		if ( Platform.OS === 'android' ) {
 			const triggersIncludeEventKeyCode =
@@ -179,16 +184,16 @@ class AztecView extends Component {
 	}
 
 	blur() {
-		TextInputState.blurTextInput( this.aztecViewRef.current );
+		AztecInputState.blur( this.aztecViewRef.current );
 	}
 
 	focus() {
-		TextInputState.focusTextInput( this.aztecViewRef.current );
+		AztecInputState.focus( this.aztecViewRef.current );
 	}
 
 	isFocused() {
-		const focusedField = TextInputState.currentlyFocusedInput();
-		return focusedField && focusedField === this.aztecViewRef.current;
+		const focusedElement = AztecInputState.getCurrentFocusedElement();
+		return focusedElement && focusedElement === this.aztecViewRef.current;
 	}
 
 	_onPress( event ) {
@@ -209,7 +214,6 @@ class AztecView extends Component {
 	}
 
 	render() {
-		// eslint-disable-next-line no-unused-vars
 		const { onActiveFormatsChange, ...otherProps } = this.props;
 		// `style` has to be destructured separately, without `otherProps`, because of:
 		// https://github.com/WordPress/gutenberg/issues/23611
@@ -250,5 +254,7 @@ class AztecView extends Component {
 }
 
 const RCTAztecView = requireNativeComponent( 'RCTAztecView', AztecView );
+
+AztecView.InputState = AztecInputState;
 
 export default AztecView;

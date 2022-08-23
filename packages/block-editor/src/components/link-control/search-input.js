@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, omit } from 'lodash';
+import { omit } from 'lodash';
 import classnames from 'classnames';
 /**
  * WordPress dependencies
@@ -22,6 +22,8 @@ import useSearchHandler from './use-search-handler';
 // to the fetchLinkSuggestions passed in block editor settings
 // which will cause an unintended http request.
 const noopSearchHandler = () => Promise.resolve( [] );
+
+const noop = () => {};
 
 const LinkControlSearchInput = forwardRef(
 	(

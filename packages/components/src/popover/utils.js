@@ -1,396 +1,107 @@
-// @ts-nocheck
 /**
- * WordPress dependencies
+ * @typedef {import('../animate').AppearOrigin} AppearOrigin
+ * @typedef {import('@floating-ui/react-dom').Placement} FloatingUIPlacement
+ * @typedef {	'top left' | 'top center' | 'top right' | 'middle left' | 'middle center' | 'middle right' | 'bottom left' | 'bottom center' | 'bottom right' | 'bottom left' | 'bottom center' | 'bottom right' } LegacyPosition
  */
-import { isRTL } from '@wordpress/i18n';
 
 /**
- * Module constants
- */
-const HEIGHT_OFFSET = 10; // Used by the arrow and a bit of empty space.
-
-/**
- * Utility used to compute the popover position over the xAxis
+ * Converts the `Popover`'s legacy "position" prop to the new "placement" prop
+ * (used by `floating-ui`).
  *
- * @param {Object}  anchorRect            Anchor Rect.
- * @param {Object}  contentSize           Content Size.
- * @param {string}  xAxis                 Desired xAxis.
- * @param {string}  corner                Desired corner.
- * @param {boolean} stickyBoundaryElement The boundary element to use when
- *                                        switching between sticky and normal
- *                                        position.
- * @param {string}  chosenYAxis           yAxis to be used.
- * @param {Element} boundaryElement       Boundary element.
- * @param {boolean} forcePosition         Don't adjust position based on anchor.
- * @param {boolean} forceXAlignment       Don't adjust alignment based on YAxis
- *
- * @return {Object} Popover xAxis position and constraints.
+ * @param {LegacyPosition} position The legacy position
+ * @return {FloatingUIPlacement} The corresponding placement
  */
-export function computePopoverXAxisPosition(
-	anchorRect,
-	contentSize,
-	xAxis,
-	corner,
-	stickyBoundaryElement,
-	chosenYAxis,
-	boundaryElement,
-	forcePosition,
-	forceXAlignment
-) {
-	const { width } = contentSize;
+export const positionToPlacement = ( position ) => {
+	const [ x, y, z ] = position.split( ' ' );
 
-	// Correct xAxis for RTL support.
-	if ( xAxis === 'left' && isRTL() ) {
-		xAxis = 'right';
-	} else if ( xAxis === 'right' && isRTL() ) {
-		xAxis = 'left';
-	}
-
-	if ( corner === 'left' && isRTL() ) {
-		corner = 'right';
-	} else if ( corner === 'right' && isRTL() ) {
-		corner = 'left';
-	}
-
-	// X axis alignment choices.
-	const anchorMidPoint = Math.round( anchorRect.left + anchorRect.width / 2 );
-	const centerAlignment = {
-		popoverLeft: anchorMidPoint,
-		contentWidth:
-			( anchorMidPoint - width / 2 > 0 ? width / 2 : anchorMidPoint ) +
-			( anchorMidPoint + width / 2 > window.innerWidth
-				? window.innerWidth - anchorMidPoint
-				: width / 2 ),
-	};
-
-	let leftAlignmentX = anchorRect.left;
-
-	if ( corner === 'right' ) {
-		leftAlignmentX = anchorRect.right;
-	} else if ( chosenYAxis !== 'middle' && ! forceXAlignment ) {
-		leftAlignmentX = anchorMidPoint;
-	}
-
-	let rightAlignmentX = anchorRect.right;
-
-	if ( corner === 'left' ) {
-		rightAlignmentX = anchorRect.left;
-	} else if ( chosenYAxis !== 'middle' && ! forceXAlignment ) {
-		rightAlignmentX = anchorMidPoint;
-	}
-
-	const leftAlignment = {
-		popoverLeft: leftAlignmentX,
-		contentWidth: leftAlignmentX - width > 0 ? width : leftAlignmentX,
-	};
-	const rightAlignment = {
-		popoverLeft: rightAlignmentX,
-		contentWidth:
-			rightAlignmentX + width > window.innerWidth
-				? window.innerWidth - rightAlignmentX
-				: width,
-	};
-
-	// Choosing the x axis.
-	let chosenXAxis = xAxis;
-	let contentWidth = null;
-
-	if ( ! stickyBoundaryElement && ! forcePosition ) {
-		if ( xAxis === 'center' && centerAlignment.contentWidth === width ) {
-			chosenXAxis = 'center';
-		} else if ( xAxis === 'left' && leftAlignment.contentWidth === width ) {
-			chosenXAxis = 'left';
-		} else if (
-			xAxis === 'right' &&
-			rightAlignment.contentWidth === width
-		) {
-			chosenXAxis = 'right';
-		} else {
-			chosenXAxis =
-				leftAlignment.contentWidth > rightAlignment.contentWidth
-					? 'left'
-					: 'right';
-			const chosenWidth =
-				chosenXAxis === 'left'
-					? leftAlignment.contentWidth
-					: rightAlignment.contentWidth;
-
-			// Limit width of the content to the viewport width
-			if ( width > window.innerWidth ) {
-				contentWidth = window.innerWidth;
-			}
-
-			// If we can't find any alignment options that could fit
-			// our content, then let's fallback to the center of the viewport.
-			if ( chosenWidth !== width ) {
-				chosenXAxis = 'center';
-				centerAlignment.popoverLeft = window.innerWidth / 2;
-			}
+	if ( [ 'top', 'bottom' ].includes( x ) ) {
+		let suffix = '';
+		if ( ( !! z && z === 'left' ) || y === 'right' ) {
+			suffix = '-start';
+		} else if ( ( !! z && z === 'right' ) || y === 'left' ) {
+			suffix = '-end';
 		}
+
+		// @ts-expect-error More TypeScript effort would be required to reconcile `string` and `Placement` types.
+		return x + suffix;
 	}
 
-	let popoverLeft;
-	if ( chosenXAxis === 'center' ) {
-		popoverLeft = centerAlignment.popoverLeft;
-	} else if ( chosenXAxis === 'left' ) {
-		popoverLeft = leftAlignment.popoverLeft;
-	} else {
-		popoverLeft = rightAlignment.popoverLeft;
-	}
+	// @ts-expect-error More TypeScript effort would be required to reconcile `string` and `Placement` types.
+	return y;
+};
 
-	if ( boundaryElement ) {
-		popoverLeft = Math.min(
-			popoverLeft,
-			boundaryElement.offsetLeft + boundaryElement.offsetWidth - width
-		);
+/**
+ * @typedef AnimationOrigin
+ * @type {Object}
+ * @property {number} originX A number between 0 and 1 (in CSS logical properties jargon, 0 is "start", 0.5 is "center", and 1 is "end")
+ * @property {number} originY A number between 0 and 1 (0 is top, 0.5 is center, and 1 is bottom)
+ */
 
-		// Avoid the popover being position beyond the left boundary if the
-		// direction is left to right.
-		if ( ! isRTL() ) {
-			popoverLeft = Math.max( popoverLeft, 0 );
-		}
-	}
+/** @type {Object.<FloatingUIPlacement, {originX: number, originY: number}>} */
+const PLACEMENT_TO_ANIMATION_ORIGIN = {
+	top: { originX: 0.5, originY: 1 }, // open from bottom, center
+	'top-start': { originX: 0, originY: 1 }, // open from bottom, left
+	'top-end': { originX: 1, originY: 1 }, // open from bottom, right
+	right: { originX: 0, originY: 0.5 }, // open from middle, left
+	'right-start': { originX: 0, originY: 0 }, // open from top, left
+	'right-end': { originX: 0, originY: 1 }, // open from bottom, left
+	bottom: { originX: 0.5, originY: 0 }, // open from top, center
+	'bottom-start': { originX: 0, originY: 0 }, // open from top, left
+	'bottom-end': { originX: 1, originY: 0 }, // open from top, right
+	left: { originX: 1, originY: 0.5 }, // open from middle, right
+	'left-start': { originX: 1, originY: 0 }, // open from top, right
+	'left-end': { originX: 1, originY: 1 }, // open from bottom, right
+};
+
+/**
+ * Given the floating-ui `placement`, compute the framer-motion props for the
+ * popover's entry animation.
+ *
+ * @param {FloatingUIPlacement} placement A placement string from floating ui
+ * @return {import('framer-motion').MotionProps} The object containing the motion props
+ */
+export const placementToMotionAnimationProps = ( placement ) => {
+	const translateProp =
+		placement.startsWith( 'top' ) || placement.startsWith( 'bottom' )
+			? 'translateY'
+			: 'translateX';
+	const translateDirection =
+		placement.startsWith( 'top' ) || placement.startsWith( 'left' )
+			? 1
+			: -1;
 
 	return {
-		xAxis: chosenXAxis,
-		popoverLeft,
-		contentWidth,
+		style: PLACEMENT_TO_ANIMATION_ORIGIN[ placement ],
+		initial: {
+			opacity: 0,
+			scale: 0,
+			[ translateProp ]: `${ 2 * translateDirection }em`,
+		},
+		animate: { opacity: 1, scale: 1, [ translateProp ]: 0 },
+		transition: { duration: 0.1, ease: [ 0, 0, 0.2, 1 ] },
 	};
-}
+};
 
 /**
- * Utility used to compute the popover position over the yAxis
- *
- * @param {Object}       anchorRect            Anchor Rect.
- * @param {Object}       contentSize           Content Size.
- * @param {string}       yAxis                 Desired yAxis.
- * @param {string}       corner                Desired corner.
- * @param {boolean}      stickyBoundaryElement The boundary element to use when switching between sticky
- *                                             and normal position.
- * @param {Element}      anchorRef             The anchor element.
- * @param {Element}      relativeOffsetTop     If applicable, top offset of the relative positioned
- *                                             parent container.
- * @param {boolean}      forcePosition         Don't adjust position based on anchor.
- * @param {Element|null} editorWrapper         Element that wraps the editor content. Used to access
- *                                             scroll position to determine sticky behavior.
- * @return {Object} Popover xAxis position and constraints.
+ * @typedef FrameOffset
+ * @type {Object}
+ * @property {number} x A numerical value representing the horizontal offset of the frame.
+ * @property {number} y A numerical value representing the vertical offset of the frame.
  */
-export function computePopoverYAxisPosition(
-	anchorRect,
-	contentSize,
-	yAxis,
-	corner,
-	stickyBoundaryElement,
-	anchorRef,
-	relativeOffsetTop,
-	forcePosition,
-	editorWrapper
-) {
-	const { height } = contentSize;
-
-	if ( stickyBoundaryElement ) {
-		const stickyRect = stickyBoundaryElement.getBoundingClientRect();
-		const stickyPositionTop = stickyRect.top + height - relativeOffsetTop;
-		const stickyPositionBottom =
-			stickyRect.bottom - height - relativeOffsetTop;
-
-		if ( anchorRect.top <= stickyPositionTop ) {
-			if ( editorWrapper ) {
-				// If a popover cannot be positioned above the anchor, even after scrolling, we must
-				// ensure we use the bottom position instead of the popover slot.  This prevents the
-				// popover from always restricting block content and interaction while selected if the
-				// block is near the top of the site editor.
-
-				const isRoomAboveInCanvas =
-					height + HEIGHT_OFFSET <
-					editorWrapper.scrollTop + anchorRect.top;
-				if ( ! isRoomAboveInCanvas ) {
-					return {
-						yAxis: 'bottom',
-						// If the bottom of the block is also below the bottom sticky position (ex -
-						// block is also taller than the editor window), return the bottom sticky
-						// position instead.  We do this instead of the top sticky position both to
-						// allow a smooth transition and more importantly to ensure every section of
-						// the block can be free from popover obscuration at some point in the
-						// scroll position.
-						popoverTop: Math.min(
-							anchorRect.bottom,
-							stickyPositionBottom
-						),
-					};
-				}
-			}
-			// Default sticky behavior.
-			return {
-				yAxis,
-				popoverTop: Math.min( anchorRect.bottom, stickyPositionTop ),
-			};
-		}
-	}
-
-	// Y axis alignment choices.
-	let anchorMidPoint = anchorRect.top + anchorRect.height / 2;
-
-	if ( corner === 'bottom' ) {
-		anchorMidPoint = anchorRect.bottom;
-	} else if ( corner === 'top' ) {
-		anchorMidPoint = anchorRect.top;
-	}
-
-	const middleAlignment = {
-		popoverTop: anchorMidPoint,
-		contentHeight:
-			( anchorMidPoint - height / 2 > 0 ? height / 2 : anchorMidPoint ) +
-			( anchorMidPoint + height / 2 > window.innerHeight
-				? window.innerHeight - anchorMidPoint
-				: height / 2 ),
-	};
-
-	const topAlignment = {
-		popoverTop: anchorRect.top,
-		contentHeight:
-			anchorRect.top - HEIGHT_OFFSET - height > 0
-				? height
-				: anchorRect.top - HEIGHT_OFFSET,
-	};
-	const bottomAlignment = {
-		popoverTop: anchorRect.bottom,
-		contentHeight:
-			anchorRect.bottom + HEIGHT_OFFSET + height > window.innerHeight
-				? window.innerHeight - HEIGHT_OFFSET - anchorRect.bottom
-				: height,
-	};
-
-	// Choosing the y axis.
-	let chosenYAxis = yAxis;
-	let contentHeight = null;
-
-	if ( ! stickyBoundaryElement && ! forcePosition ) {
-		if ( yAxis === 'middle' && middleAlignment.contentHeight === height ) {
-			chosenYAxis = 'middle';
-		} else if ( yAxis === 'top' && topAlignment.contentHeight === height ) {
-			chosenYAxis = 'top';
-		} else if (
-			yAxis === 'bottom' &&
-			bottomAlignment.contentHeight === height
-		) {
-			chosenYAxis = 'bottom';
-		} else {
-			chosenYAxis =
-				topAlignment.contentHeight > bottomAlignment.contentHeight
-					? 'top'
-					: 'bottom';
-			const chosenHeight =
-				chosenYAxis === 'top'
-					? topAlignment.contentHeight
-					: bottomAlignment.contentHeight;
-			contentHeight = chosenHeight !== height ? chosenHeight : null;
-		}
-	}
-
-	let popoverTop;
-	if ( chosenYAxis === 'middle' ) {
-		popoverTop = middleAlignment.popoverTop;
-	} else if ( chosenYAxis === 'top' ) {
-		popoverTop = topAlignment.popoverTop;
-	} else {
-		popoverTop = bottomAlignment.popoverTop;
-	}
-
-	return {
-		yAxis: chosenYAxis,
-		popoverTop,
-		contentHeight,
-	};
-}
 
 /**
- * Utility used to compute the popover position and the content max width/height for a popover given
- * its anchor rect and its content size.
+ * Returns the offset of a document's frame element.
  *
- * @param {Object}       anchorRect            Anchor Rect.
- * @param {Object}       contentSize           Content Size.
- * @param {string}       position              Position.
- * @param {boolean}      stickyBoundaryElement The boundary element to use when switching between
- *                                             sticky and normal position.
- * @param {Element}      anchorRef             The anchor element.
- * @param {number}       relativeOffsetTop     If applicable, top offset of the relative positioned
- *                                             parent container.
- * @param {Element}      boundaryElement       Boundary element.
- * @param {boolean}      forcePosition         Don't adjust position based on anchor.
- * @param {boolean}      forceXAlignment       Don't adjust alignment based on YAxis
- * @param {Element|null} editorWrapper         Element that wraps the editor content. Used to access
- *                                             scroll position to determine sticky behavior.
- * @return {Object} Popover position and constraints.
+ * @param {Document} document A document. This will usually be the document within an iframe.
+ *
+ * @return {FrameOffset|undefined} The offset of the document's frame element,
+ *                                 or undefined if the document has no frame element.
  */
-export function computePopoverPosition(
-	anchorRect,
-	contentSize,
-	position = 'top',
-	stickyBoundaryElement,
-	anchorRef,
-	relativeOffsetTop,
-	boundaryElement,
-	forcePosition,
-	forceXAlignment,
-	editorWrapper
-) {
-	const [ yAxis, xAxis = 'center', corner ] = position.split( ' ' );
-
-	const yAxisPosition = computePopoverYAxisPosition(
-		anchorRect,
-		contentSize,
-		yAxis,
-		corner,
-		stickyBoundaryElement,
-		anchorRef,
-		relativeOffsetTop,
-		forcePosition,
-		editorWrapper
-	);
-	const xAxisPosition = computePopoverXAxisPosition(
-		anchorRect,
-		contentSize,
-		xAxis,
-		corner,
-		stickyBoundaryElement,
-		yAxisPosition.yAxis,
-		boundaryElement,
-		forcePosition,
-		forceXAlignment
-	);
-
-	return {
-		...xAxisPosition,
-		...yAxisPosition,
-	};
-}
-
-/**
- * Offsets the given rect by the position of the iframe that contains the
- * element. If the owner document is not in an iframe then it returns with the
- * original rect. If the popover container document and the anchor document are
- * the same, the original rect will also be returned.
- *
- * @param {DOMRect}  rect          bounds of the element
- * @param {Document} ownerDocument document of the element
- * @param {Element}  container     The popover container to position.
- *
- * @return {DOMRect} offsetted bounds
- */
-export function offsetIframe( rect, ownerDocument, container ) {
-	const { defaultView } = ownerDocument;
-	const { frameElement } = defaultView;
-
-	if ( ! frameElement || ownerDocument === container.ownerDocument ) {
-		return rect;
+export const getFrameOffset = ( document ) => {
+	const frameElement = document?.defaultView?.frameElement;
+	if ( ! frameElement ) {
+		return;
 	}
-
 	const iframeRect = frameElement.getBoundingClientRect();
-	return new defaultView.DOMRect(
-		rect.left + iframeRect.left,
-		rect.top + iframeRect.top,
-		rect.width,
-		rect.height
-	);
-}
+	return { x: iframeRect.left, y: iframeRect.top };
+};

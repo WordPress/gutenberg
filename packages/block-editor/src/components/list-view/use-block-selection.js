@@ -1,16 +1,11 @@
 /**
- * External dependencies
- */
-import { difference } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
-import { UP, DOWN } from '@wordpress/keycodes';
+import { UP, DOWN, HOME, END } from '@wordpress/keycodes';
 import { store as blocksStore } from '@wordpress/blocks';
 
 /**
@@ -20,9 +15,8 @@ import { store as blockEditorStore } from '../../store';
 import { getCommonDepthClientIds } from './utils';
 
 export default function useBlockSelection() {
-	const { clearSelectedBlock, multiSelect, selectBlock } = useDispatch(
-		blockEditorStore
-	);
+	const { clearSelectedBlock, multiSelect, selectBlock } =
+		useDispatch( blockEditorStore );
 	const {
 		getBlockName,
 		getBlockParents,
@@ -49,7 +43,10 @@ export default function useBlockSelection() {
 
 			const isKeyPress =
 				event.type === 'keydown' &&
-				( event.keyCode === UP || event.keyCode === DOWN );
+				( event.keyCode === UP ||
+					event.keyCode === DOWN ||
+					event.keyCode === HOME ||
+					event.keyCode === END );
 
 			// Handle clicking on a block when no blocks are selected, and return early.
 			if (
@@ -114,15 +111,25 @@ export default function useBlockSelection() {
 			// the total number of blocks deselected is greater than one.
 			const updatedSelectedBlocks = getSelectedBlockClientIds();
 
-			const selectionDiff = difference(
-				selectedBlocks,
-				updatedSelectedBlocks
+			// If the selection is greater than 1 and the Home or End keys
+			// were used to generate the selection, then skip announcing the
+			// deselected blocks.
+			if (
+				( event.keyCode === HOME || event.keyCode === END ) &&
+				updatedSelectedBlocks.length > 1
+			) {
+				return;
+			}
+
+			const selectionDiff = selectedBlocks.filter(
+				( blockId ) => ! updatedSelectedBlocks.includes( blockId )
 			);
 
 			let label;
 			if ( selectionDiff.length === 1 ) {
-				const title = getBlockType( getBlockName( selectionDiff[ 0 ] ) )
-					?.title;
+				const title = getBlockType(
+					getBlockName( selectionDiff[ 0 ] )
+				)?.title;
 				if ( title ) {
 					label = sprintf(
 						/* translators: %s: block name */

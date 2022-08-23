@@ -37,4 +37,7 @@ function BlockIcon( { icon, showColors = false, className } ) {
 	);
 }
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-icon/README.md
+ */
 export default memo( BlockIcon );

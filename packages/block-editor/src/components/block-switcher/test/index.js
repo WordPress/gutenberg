@@ -10,7 +10,7 @@ import { useSelect } from '@wordpress/data';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { DOWN } from '@wordpress/keycodes';
 import { Button } from '@wordpress/components';
-import { stack } from '@wordpress/icons';
+import { copy } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -18,6 +18,7 @@ import { stack } from '@wordpress/icons';
 import { BlockSwitcher, BlockSwitcherDropdownMenu } from '../';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+jest.mock( '../../block-title/use-block-display-title', () => jest.fn() );
 
 describe( 'BlockSwitcher', () => {
 	test( 'should not render block switcher without blocks', () => {
@@ -131,7 +132,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 	test( 'should render disabled block switcher with multi block of different types when no transforms', () => {
 		useSelect.mockImplementation( () => ( {
 			possibleBlockTransformations: [],
-			icon: stack,
+			icon: copy,
 		} ) );
 		const wrapper = shallow(
 			<BlockSwitcherDropdownMenu

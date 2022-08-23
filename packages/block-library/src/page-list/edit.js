@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,10 +15,7 @@ import { ToolbarButton, Spinner, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import {
-	store as coreStore,
-	__experimentalUseEntityRecords as useEntityRecords,
-} from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -45,10 +41,8 @@ export default function PageListEdit( { context, clientId } ) {
 	const blockProps = useBlockProps( {
 		className: classnames( 'wp-block-page-list', {
 			'has-text-color': !! context.textColor,
-			[ getColorClassName(
-				'color',
-				context.textColor
-			) ]: !! context.textColor,
+			[ getColorClassName( 'color', context.textColor ) ]:
+				!! context.textColor,
 			'has-background': !! context.backgroundColor,
 			[ getColorClassName(
 				'background-color',
@@ -81,11 +75,9 @@ export default function PageListEdit( { context, clientId } ) {
 
 			{ hasResolvedPages && totalPages === null && (
 				<div { ...blockProps }>
-					<div { ...blockProps }>
-						<Notice status={ 'warning' } isDismissible={ false }>
-							{ __( 'Page List: Cannot retrieve Pages.' ) }
-						</Notice>
-					</div>
+					<Notice status={ 'warning' } isDismissible={ false }>
+						{ __( 'Page List: Cannot retrieve Pages.' ) }
+					</Notice>
 				</div>
 			) }
 
@@ -110,6 +102,14 @@ export default function PageListEdit( { context, clientId } ) {
 
 function useFrontPageId() {
 	return useSelect( ( select ) => {
+		const canReadSettings = select( coreStore ).canUser(
+			'read',
+			'settings'
+		);
+		if ( ! canReadSettings ) {
+			return undefined;
+		}
+
 		const site = select( coreStore ).getEntityRecord( 'root', 'site' );
 		return site?.show_on_front === 'page' && site?.page_on_front;
 	}, [] );
@@ -124,6 +124,7 @@ function usePageData() {
 			order: 'asc',
 			_fields: [ 'id', 'link', 'parent', 'title', 'menu_order' ],
 			per_page: -1,
+			context: 'view',
 		}
 	);
 
@@ -131,7 +132,12 @@ function usePageData() {
 		// TODO: Once the REST API supports passing multiple values to
 		// 'orderby', this can be removed.
 		// https://core.trac.wordpress.org/ticket/39037
-		const sortedPages = sortBy( pages, [ 'menu_order', 'title.rendered' ] );
+		const sortedPages = [ ...( pages ?? [] ) ].sort( ( a, b ) => {
+			if ( a.menu_order === b.menu_order ) {
+				return a.title.rendered.localeCompare( b.title.rendered );
+			}
+			return a.menu_order - b.menu_order;
+		} );
 		const pagesByParentId = sortedPages.reduce( ( accumulator, page ) => {
 			const { parent } = page;
 			if ( accumulator.has( parent ) ) {
@@ -196,7 +202,8 @@ const PageItems = memo( function PageItems( {
 						className={ classnames(
 							'wp-block-pages-list__item__link',
 							{
-								'wp-block-navigation-item__content': isNavigationChild,
+								'wp-block-navigation-item__content':
+									isNavigationChild,
 							}
 						) }
 						href={ page.link }
@@ -217,7 +224,8 @@ const PageItems = memo( function PageItems( {
 							) }
 						<ul
 							className={ classnames( 'submenu-container', {
-								'wp-block-navigation__submenu-container': isNavigationChild,
+								'wp-block-navigation__submenu-container':
+									isNavigationChild,
 							} ) }
 						>
 							<PageItems

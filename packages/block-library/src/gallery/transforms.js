@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, every, toString } from 'lodash';
+import { filter, every } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -144,6 +144,9 @@ const transforms = {
 
 				if ( isGalleryV2Enabled() ) {
 					const innerBlocks = validImages.map( ( image ) => {
+						// Gallery images can't currently be resized so make sure height and width are undefined.
+						image.width = undefined;
+						image.height = undefined;
 						return createBlock( 'core/image', image );
 					} );
 
@@ -160,7 +163,7 @@ const transforms = {
 				return createBlock( 'core/gallery', {
 					images: validImages.map(
 						( { id, url, alt, caption } ) => ( {
-							id: toString( id ),
+							id: id.toString(),
 							url,
 							alt,
 							caption,
@@ -182,7 +185,7 @@ const transforms = {
 					shortcode: ( { named: { ids } } ) => {
 						if ( ! isGalleryV2Enabled() ) {
 							return parseShortcodeIds( ids ).map( ( id ) => ( {
-								id: toString( id ),
+								id: id.toString(),
 							} ) );
 						}
 					},
@@ -192,16 +195,6 @@ const transforms = {
 					shortcode: ( { named: { ids } } ) => {
 						if ( ! isGalleryV2Enabled() ) {
 							return parseShortcodeIds( ids );
-						}
-					},
-				},
-				shortCodeTransforms: {
-					type: 'array',
-					shortcode: ( { named: { ids } } ) => {
-						if ( isGalleryV2Enabled() ) {
-							return parseShortcodeIds( ids ).map( ( id ) => ( {
-								id: parseInt( id ),
-							} ) );
 						}
 					},
 				},
@@ -234,6 +227,31 @@ const transforms = {
 						}
 					},
 				},
+			},
+			transform( { named: { ids, columns = 3, link } } ) {
+				const imageIds = parseShortcodeIds( ids ).map( ( id ) =>
+					parseInt( id, 10 )
+				);
+
+				let linkTo = LINK_DESTINATION_NONE;
+				if ( link === 'post' ) {
+					linkTo = LINK_DESTINATION_ATTACHMENT;
+				} else if ( link === 'file' ) {
+					linkTo = LINK_DESTINATION_MEDIA;
+				}
+
+				const galleryBlock = createBlock(
+					'core/gallery',
+					{
+						columns: parseInt( columns, 10 ),
+						linkTo,
+					},
+					imageIds.map( ( imageId ) =>
+						createBlock( 'core/image', { id: imageId } )
+					)
+				);
+
+				return galleryBlock;
 			},
 			isMatch( { named } ) {
 				return undefined !== named.ids;
@@ -287,26 +305,36 @@ const transforms = {
 						return innerBlocks.map(
 							( {
 								attributes: {
-									id,
 									url,
 									alt,
 									caption,
+									title,
+									href,
+									rel,
+									linkClass,
+									id,
 									sizeSlug: imageSizeSlug,
 									linkDestination,
-									href,
 									linkTarget,
+									anchor,
+									className,
 								},
 							} ) =>
 								createBlock( 'core/image', {
-									id,
+									align,
 									url,
 									alt,
 									caption,
-									sizeSlug: imageSizeSlug,
-									align,
-									linkDestination,
+									title,
 									href,
+									rel,
+									linkClass,
+									id,
+									sizeSlug: imageSizeSlug,
+									linkDestination,
 									linkTarget,
+									anchor,
+									className,
 								} )
 						);
 					}

@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/eslint-plugin --save-dev
 ```
 
-**Note**: This package requires `node` 12.0.0 or later, and `npm` 6.9.0 or later. It is not compatible with older versions.
+**Note**: This package requires `node` 14.0.0 or later, and `npm` 6.14.4 or later. It is not compatible with older versions.
 
 ## Usage
 
@@ -24,23 +24,35 @@ To opt-in to the default configuration, extend your own project's `.eslintrc` fi
 
 Refer to the [ESLint documentation on Shareable Configs](http://eslint.org/docs/developer-guide/shareable-configs) for more information.
 
-The `recommended` preset will include rules governing an ES2015+ environment, and includes rules from the [`eslint-plugin-jsx-a11y`](https://github.com/evcohen/eslint-plugin-jsx-a11y), [`eslint-plugin-react`](https://github.com/yannickcr/eslint-plugin-react), and [`eslint-plugin-prettier`](https://github.com/prettier/eslint-plugin-prettier) projects. It also includes an optional integration with [`@typescript-eslint/eslint-plugin`](https://github.com/typescript-eslint/typescript-eslint) that gets activated when the [`typescript`](https://www.npmjs.com/package/typescript) package is installed in the project.
+The `recommended` preset will include rules governing an ES2015+ environment, and includes rules from the [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc), [`eslint-plugin-jsx-a11y`](https://github.com/evcohen/eslint-plugin-jsx-a11y), [`eslint-plugin-react`](https://github.com/yannickcr/eslint-plugin-react), and other similar plugins.
 
-There is also `recommended-with-formatting` ruleset for projects that want to opt out from [Prettier](https://prettier.io). It has the native ESLint code formatting rules enabled instead.
+This preset offers an optional integration with the [`eslint-plugin-prettier`](https://github.com/prettier/eslint-plugin-prettier) package that runs [Prettier](https://prettier.io) code formatter and reports differences as individual ESLint issues. You can activate it by installing the [`prettier`](https://www.npmjs.com/package/prettier) package separately with:
+
+```bash
+npm install prettier --save-dev
+```
+
+Finally, this ruleset also includes an optional integration with the [`@typescript-eslint/eslint-plugin`](https://github.com/typescript-eslint/typescript-eslint) package that enables ESLint to support [TypeScript](https://www.typescriptlang.org) language. You can activate it by installing the [`typescript`](https://www.npmjs.com/package/typescript) package separately with:
+
+```bash
+npm install typescript --save-dev
+```
+
+There is also `recommended-with-formatting` ruleset for projects that want to ensure that [Prettier](https://prettier.io) and [TypeScript](https://www.typescriptlang.org) integration is never activated. This preset has the native ESLint code formatting rules enabled instead.
 
 ### Rulesets
 
 Alternatively, you can opt-in to only the more granular rulesets offered by the plugin. These include:
 
--   `custom`
--   `es5`
--   `esnext`
--   `jsdoc`
--   `jsx-a11y`
--   `react`
--   `i18n`
--   `test-e2e`
--   `test-unit`
+-   `custom` – custom rules for WordPress development.
+-   `es5` – rules for legacy ES5 environments.
+-   `esnext` – rules for ES2015+ environments.
+-   `i18n` – rules for internationalization.
+-   `jsdoc` – rules for JSDoc comments.
+-   `jsx-a11y` – rules for accessibility in JSX.
+-   `react` – rules for React components.
+-   `test-e2e` – rules for end-to-end tests written in Puppeteer.
+-   `test-unit`– rules for unit tests written in Jest.
 
 For example, if your project does not use React, you could consider extending including only the ESNext rules in your project using the following `extends` definition:
 

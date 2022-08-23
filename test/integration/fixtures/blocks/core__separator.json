@@ -2,7 +2,9 @@
 	{
 		"name": "core/separator",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"opacity": "alpha-channel"
+		},
 		"innerBlocks": []
 	}
 ]

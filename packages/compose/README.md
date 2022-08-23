@@ -79,7 +79,7 @@ name, returns the enhanced component augmented with a generated displayName.
 
 _Parameters_
 
--   _mapComponent_ `HigherOrderComponent< HOCProps >`: Function mapping component to enhanced component.
+-   _mapComponent_ `( Inner: TInner ) => TOuter`: Function mapping component to enhanced component.
 -   _modifierName_ `string`: Seed name from which to generated display name.
 
 _Returns_
@@ -105,7 +105,7 @@ const ConditionalComponent = ifCondition(
 
 _Parameters_
 
--   _predicate_ `( props: TProps ) => boolean`: Function to test condition.
+-   _predicate_ `( props: Props ) => boolean`: Function to test condition.
 
 _Returns_
 
@@ -204,6 +204,39 @@ _Parameters_
 _Returns_
 
 -   `import('lodash').DebouncedFunc<TFunc>`: Debounced function.
+
+### useDisabled
+
+In some circumstances, such as block previews, all focusable DOM elements
+(input fields, links, buttons, etc.) need to be disabled. This hook adds the
+behavior to disable nested DOM elements to the returned ref.
+
+_Usage_
+
+```js
+import { useDisabled } from '@wordpress/compose';
+const DisabledExample = () => {
+	const disabledRef = useDisabled();
+	return (
+		<div ref={ disabledRef }>
+			<a href="#">This link will have tabindex set to -1</a>
+			<input
+				placeholder="This input will have the disabled attribute added to it."
+				type="text"
+			/>
+		</div>
+	);
+};
+```
+
+_Parameters_
+
+-   _config_ `Object`: Configuration object.
+-   _config.isDisabled_ `boolean=`: Whether the element should be disabled.
+
+_Returns_
+
+-   `import('react').RefCallback<HTMLElement>`: Element Ref.
 
 ### useFocusableIframe
 
@@ -404,7 +437,7 @@ callback will be called multiple times for the same node.
 
 _Parameters_
 
--   _callback_ `( node: TElement ) => ( () => void ) | undefined`: Callback with ref as argument.
+-   _callback_ `( node: TElement ) => ( () => void ) | void`: Callback with ref as argument.
 -   _dependencies_ `DependencyList`: Dependencies of the callback.
 
 _Returns_
@@ -414,14 +447,7 @@ _Returns_
 ### useResizeObserver
 
 Hook which allows to listen the resize event of any target element when it changes sizes.
-_Note: `useResizeObserver` will report `null` until after first render_
-
-Simply a re-export of `react-resize-aware` so refer to its documentation <https://github.com/FezVrasta/react-resize-aware>
-for more details.
-
-_Related_
-
--   <https://github.com/FezVrasta/react-resize-aware>
+\_Note: `useResizeObserver` will report `null` until after first render.
 
 _Usage_
 

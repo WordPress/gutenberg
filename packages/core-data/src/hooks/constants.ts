@@ -1,5 +1,4 @@
-/* eslint-disable-next-line no-shadow */
-export enum Status {
+export const enum Status {
 	Idle = 'IDLE',
 	Resolving = 'RESOLVING',
 	Error = 'ERROR',

@@ -1,9 +1,15 @@
 /**
  * Internal dependencies
  */
-import { RenderedText, Context, ContextualField, OmitNevers } from './helpers';
+import type {
+	RenderedText,
+	Context,
+	ContextualField,
+	OmitNevers,
+} from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
+import type { DefaultContextOf } from './index';
 
 export type NavMenuItemType =
 	| 'taxonomy'
@@ -18,8 +24,8 @@ export type NavMenuItemStatus =
 	| 'private';
 export type Target = '_blank' | '';
 
-declare module './base-entity-types' {
-	export namespace BaseEntityTypes {
+declare module './base-entity-records' {
+	export namespace BaseEntityRecords {
 		export interface NavMenuItem< C extends Context > {
 			/**
 			 * The title for the object.
@@ -101,6 +107,6 @@ declare module './base-entity-types' {
 	}
 }
 
-export type NavMenuItem< C extends Context > = OmitNevers<
-	_BaseEntityTypes.NavMenuItem< C >
->;
+export type NavMenuItem<
+	C extends Context = DefaultContextOf< 'root', 'menuItem' >
+> = OmitNevers< _BaseEntityRecords.NavMenuItem< C > >;

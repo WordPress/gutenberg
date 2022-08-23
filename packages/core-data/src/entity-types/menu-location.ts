@@ -1,12 +1,13 @@
 /**
  * Internal dependencies
  */
-import { Context, OmitNevers } from './helpers';
+import type { Context, OmitNevers } from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
+import type { DefaultContextOf } from './index';
 
-declare module './base-entity-types' {
-	export namespace BaseEntityTypes {
+declare module './base-entity-records' {
+	export namespace BaseEntityRecords {
 		export interface MenuLocation< C extends Context > {
 			/**
 			 * The name of the menu location.
@@ -24,6 +25,6 @@ declare module './base-entity-types' {
 	}
 }
 
-export type MenuLocation< C extends Context > = OmitNevers<
-	_BaseEntityTypes.MenuLocation< C >
->;
+export type MenuLocation<
+	C extends Context = DefaultContextOf< 'root', 'menuLocation' >
+> = OmitNevers< _BaseEntityRecords.MenuLocation< C > >;

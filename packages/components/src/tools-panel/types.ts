@@ -148,7 +148,6 @@ export type ToolsPanelContext = {
 
 export type ToolsPanelControlsGroupProps = {
 	items: [ string, boolean ][];
-	onClose: () => void;
 	toggleItem: ( label: string ) => void;
 };
 

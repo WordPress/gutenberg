@@ -98,6 +98,7 @@ export async function disableSiteEditorWelcomeGuide() {
 				wp.data
 					.dispatch( 'core/edit-site' )
 					.toggleFeature( 'welcomeGuide' );
+				return;
 			}
 
 			wp.data
@@ -113,6 +114,7 @@ export async function disableSiteEditorWelcomeGuide() {
 				wp.data
 					.dispatch( 'core/edit-site' )
 					.toggleFeature( 'welcomeGuideStyles' );
+				return;
 			}
 			wp.data
 				.dispatch( 'core/preferences' )
@@ -246,11 +248,10 @@ export async function siteEditorNavigateSequence( labels ) {
  */
 export async function visitSiteEditor( query, skipWelcomeGuide = true ) {
 	query = addQueryArgs( '', {
-		page: 'gutenberg-edit-site',
 		...query,
 	} ).slice( 1 );
 
-	await visitAdminPage( 'themes.php', query );
+	await visitAdminPage( 'site-editor.php', query );
 	await page.waitForSelector( SELECTORS.visualEditor );
 
 	if ( skipWelcomeGuide ) {
@@ -273,7 +274,7 @@ export async function toggleGlobalStyles() {
  * @param {string} panelName Name of the panel that is going to be opened.
  */
 export async function openGlobalStylesPanel( panelName ) {
-	const selector = `//div[@aria-label="Settings"]//button[.//*[text()="${ panelName }"]]`;
+	const selector = `//div[@aria-label="Editor settings"]//button[.//*[text()="${ panelName }"]]`;
 	await ( await page.waitForXPath( selector ) ).click();
 }
 
@@ -282,6 +283,6 @@ export async function openGlobalStylesPanel( panelName ) {
  */
 export async function openPreviousGlobalStylesPanel() {
 	await page.click(
-		'div[aria-label="Settings"] button[aria-label="Navigate to the previous view"]'
+		'div[aria-label="Editor settings"] button[aria-label="Navigate to the previous view"]'
 	);
 }

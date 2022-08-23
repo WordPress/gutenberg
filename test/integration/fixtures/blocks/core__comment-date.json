@@ -3,7 +3,7 @@
 		"name": "core/comment-date",
 		"isValid": true,
 		"attributes": {
-			"isLink": false
+			"isLink": true
 		},
 		"innerBlocks": []
 	}

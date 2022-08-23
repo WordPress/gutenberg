@@ -133,12 +133,10 @@ describe( 'firstTimeContributorAccountLink', () => {
 						Promise.resolve( {
 							data: [
 								{
-									sha:
-										'4c535288a6a2b75ff23ee96c75f7d9877e919241',
+									sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
 								},
 								{
-									sha:
-										'59b07cc57adff90630fc9d5cf2317269a0f4f158',
+									sha: '59b07cc57adff90630fc9d5cf2317269a0f4f158',
 								},
 							],
 						} )
@@ -174,8 +172,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 						Promise.resolve( {
 							data: [
 								{
-									sha:
-										'4c535288a6a2b75ff23ee96c75f7d9877e919241',
+									sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
 								},
 							],
 						} )
@@ -215,8 +212,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 						Promise.resolve( {
 							data: [
 								{
-									sha:
-										'4c535288a6a2b75ff23ee96c75f7d9877e919241',
+									sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
 								},
 							],
 						} )

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray, mapValues } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { createRegistry } from '../registry';
@@ -11,7 +6,14 @@ import { createRegistrySelector } from '../factory';
 import createReduxStore from '../redux-store';
 import coreDataStore from '../store';
 
-jest.useFakeTimers( 'legacy' );
+beforeEach( () => {
+	jest.useFakeTimers( 'legacy' );
+} );
+
+afterEach( () => {
+	jest.runOnlyPendingTimers();
+	jest.useRealTimers();
+} );
 
 describe( 'createRegistry', () => {
 	let registry;
@@ -23,7 +25,7 @@ describe( 'createRegistry', () => {
 		return unsubscribe;
 	}
 	function subscribeUntil( predicates ) {
-		predicates = castArray( predicates );
+		predicates = Array.from( predicates );
 
 		return new Promise( ( resolve ) => {
 			subscribeWithUnsubscribe( () => {
@@ -546,8 +548,8 @@ describe( 'createRegistry', () => {
 
 		it( 'should run the registry selectors properly', () => {
 			const selector1 = () => 'result1';
-			const selector2 = createRegistrySelector( ( select ) => () =>
-				select( 'reducer1' ).selector1()
+			const selector2 = createRegistrySelector(
+				( select ) => () => select( 'reducer1' ).selector1()
 			);
 			registry.registerStore( 'reducer1', {
 				reducer: () => 'state1',
@@ -569,8 +571,8 @@ describe( 'createRegistry', () => {
 
 		it( 'should run the registry selector from a non-registry selector', () => {
 			const selector1 = () => 'result1';
-			const selector2 = createRegistrySelector( ( select ) => () =>
-				select( 'reducer1' ).selector1()
+			const selector2 = createRegistrySelector(
+				( select ) => () => select( 'reducer1' ).selector1()
 			);
 			const selector3 = () => selector2();
 			registry.registerStore( 'reducer1', {
@@ -649,9 +651,8 @@ describe( 'createRegistry', () => {
 			const secondListener = jest.fn();
 
 			subscribeWithUnsubscribe( firstListener );
-			const secondUnsubscribe = subscribeWithUnsubscribe(
-				secondListener
-			);
+			const secondUnsubscribe =
+				subscribeWithUnsubscribe( secondListener );
 
 			store.dispatch( { type: 'dummy' } );
 
@@ -718,7 +719,7 @@ describe( 'createRegistry', () => {
 			const listener2 = jest.fn();
 			// useSelect subscribes to the stores differently,
 			// This test ensures batching works in this case as well.
-			const unsubscribe = registry.__experimentalSubscribeStore(
+			const unsubscribe = registry.__unstableSubscribeStore(
 				'myAwesomeReducer',
 				listener2
 			);
@@ -743,16 +744,18 @@ describe( 'createRegistry', () => {
 				// representation of the object, the latter applying its
 				// function proxying.
 				expect( _registry ).toMatchObject(
-					mapValues( registry, ( value, key ) => {
-						if ( key === 'stores' ) {
-							return expect.any( Object );
-						}
-						// TODO: Remove this after namsespaces is removed.
-						if ( key === 'namespaces' ) {
-							return registry.stores;
-						}
-						return expect.any( Function );
-					} )
+					Object.fromEntries(
+						Object.entries( registry ).map( ( [ key ] ) => {
+							if ( key === 'stores' ) {
+								return [ key, expect.any( Object ) ];
+							}
+							// TODO: Remove this after namsespaces is removed.
+							if ( key === 'namespaces' ) {
+								return [ key, registry.stores ];
+							}
+							return [ key, expect.any( Function ) ];
+						} )
+					)
 				);
 
 				actualOptions = options;

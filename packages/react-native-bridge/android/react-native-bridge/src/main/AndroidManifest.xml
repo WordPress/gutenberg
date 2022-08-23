@@ -13,6 +13,9 @@
         </intent>
     </queries>
 
+    <!-- Vibrate permission required for haptic feedback -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application>
         <activity
             android:name=".GutenbergWebViewActivity"

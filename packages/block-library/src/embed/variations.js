@@ -26,6 +26,7 @@ import {
 	embedDailymotionIcon,
 	embedPinterestIcon,
 	embedWolframIcon,
+	embedPocketCastsIcon,
 } from './icons';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
@@ -217,6 +218,15 @@ const variations = [
 		attributes: { providerNameSlug: 'mixcloud', responsive: true },
 	},
 	{
+		name: 'pocketcasts',
+		title: 'Pocket Casts',
+		icon: embedPocketCastsIcon,
+		keywords: [ __( 'podcast' ), __( 'audio' ) ],
+		description: __( 'Embed a podcast player from Pocket Casts.' ),
+		patterns: [ /^https:\/\/pca.st\/\w+/i ],
+		attributes: { providerNameSlug: 'pocketcasts', responsive: true },
+	},
+	{
 		name: 'reddit',
 		title: 'Reddit',
 		icon: embedRedditIcon,
@@ -344,9 +354,9 @@ const variations = [
 	},
 	{
 		name: 'wolfram-cloud',
-		title: 'Wolfram Cloud',
+		title: 'Wolfram',
 		icon: embedWolframIcon,
-		description: __( 'Embed Wolfram Cloud notebook content.' ),
+		description: __( 'Embed Wolfram notebook content.' ),
 		patterns: [ /^https?:\/\/(www\.)?wolframcloud\.com\/obj\/.+/i ],
 		attributes: { providerNameSlug: 'wolfram-cloud', responsive: true },
 	},

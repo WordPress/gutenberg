@@ -11,16 +11,6 @@ import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
 import { buildNavigationPostId } from './utils';
 
 /**
- * Returns the selected menu ID.
- *
- * @param {Object} state Global application state.
- * @return {number} The selected menu ID.
- */
-export function getSelectedMenuId( state ) {
-	return state.selectedMenuId ?? null;
-}
-
-/**
  * Returns a "stub" navigation post reflecting the contents of menu with id=menuId. The
  * post is meant as a convenient to only exists in runtime and should never be saved. It
  * enables a convenient way of editing the navigation by using a regular post editor.

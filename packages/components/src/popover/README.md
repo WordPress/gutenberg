@@ -59,13 +59,24 @@ Set this prop to `false` to disable focus changing entirely. This should only be
 -   Required: No
 -   Default: `"firstElement"`
 
-### position
+### placement
 
-The direction in which the popover should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
+The direction in which the popover should open relative to its parent node or anchor node.
+
+The available base placements are 'top', 'right', 'bottom', 'left'.
+
+Each of these base placements has an alignment in the form -start and -end. For example, 'right-start', or 'bottom-end'. These allow you to align the tooltip to the edges of the button, rather than centering it.
 
 -   Type: `String`
 -   Required: No
--   Default: `"bottom right"`
+-   Default: `"bottom-start"`
+
+### offset
+
+The distance (in pixels) between the anchor and popover.
+
+-   Type: `Number`
+-   Required: No
 
 ### children
 
@@ -133,13 +144,7 @@ A callback function which is used to override the anchor value computation algor
 
 If you need the `DOMRect` object i.e., the position of popover to be calculated on every time, the popover re-renders, then use `getAnchorRect`.
 
-`getAnchorRect` callback function receives a reference to the popover anchor element as a function parameter and it should return a `DOMRect` object.
+`getAnchorRect` callback function receives a reference to the popover anchor element as a function parameter and it should return a `DOMRect` object. Noting that `getAnchorRect` can be called with `null`.
 
 -   Type: `Function`
 -   Required: No
-
-## Methods
-
-### refresh
-
-Calling `refresh()` will force the Popover to recalculate its size and position. This is useful when a DOM change causes the anchor node to change position.

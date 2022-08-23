@@ -23,6 +23,9 @@ describe( 'AutosaveMonitor', () => {
 	} );
 
 	afterEach( () => {
+		jest.runOnlyPendingTimers();
+		jest.useRealTimers();
+
 		setAutosaveTimerSpy.mockClear();
 	} );
 

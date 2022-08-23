@@ -9,6 +9,7 @@ import {
 	pressKeyWithModifier,
 	insertBlock,
 	clickBlockToolbarButton,
+	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
 const getActiveBlockName = async () =>
@@ -26,8 +27,8 @@ const addParagraphsAndColumnsDemo = async () => {
 		`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Columns')]`
 	);
 	await page.keyboard.press( 'Enter' );
-	await page.click( ':focus [aria-label="Two columns; equal split"]' );
-	await page.click( ':focus .block-editor-button-block-appender' );
+	await page.click( 'button[aria-label="Two columns; equal split"]' );
+	await page.click( '.block-editor-button-block-appender' );
 	await page.waitForSelector( '.block-editor-inserter__search input:focus' );
 	await page.keyboard.type( 'Paragraph' );
 	await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
@@ -281,7 +282,7 @@ describe( 'Writing Flow', () => {
 	} );
 
 	it( 'should not create extra line breaks in multiline value', async () => {
-		await insertBlock( 'Quote' );
+		await insertBlock( 'List' );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Backspace' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -628,8 +629,11 @@ describe( 'Writing Flow', () => {
 			`//button[contains(@class,'components-dropdown-menu__menu-item')]//span[contains(text(), 'Wide width')]`
 		);
 		await wideButton.click();
+		// Focus the block content
+		await page.keyboard.press( 'Tab' );
 
 		// Select the previous block.
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 
 		// Confirm correct setup.
@@ -650,13 +654,17 @@ describe( 'Writing Flow', () => {
 		const inserter = await page.$(
 			'.block-editor-block-list__insertion-point'
 		);
+		// Find the space between the inserter and the image block.
 		const inserterRect = await inserter.boundingBox();
 		const lowerInserterY = inserterRect.y + ( 2 * inserterRect.height ) / 3;
 
+		// Clicking that in-between space should select the image block.
 		await page.mouse.click( x, lowerInserterY );
 
 		const type = await page.evaluate( () =>
-			document.activeElement.getAttribute( 'data-type' )
+			document.activeElement
+				.closest( '[data-block]' )
+				.getAttribute( 'data-type' )
 		);
 
 		expect( type ).toBe( 'core/image' );
@@ -666,37 +674,19 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/table' );
 		await page.keyboard.press( 'Enter' );
-		// Move into the placeholder UI.
-		await page.keyboard.press( 'ArrowDown' );
 		// Tab to the "Create table" button.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		// Create the table.
 		await page.keyboard.press( 'Space' );
-		// Return focus after focus loss. This should be fixed.
-		await page.keyboard.press( 'Tab' );
 		// Navigate to the second cell.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( '2' );
 		// Confirm correct setup.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
-		// The content should only have one tab stop.
-		await page.keyboard.press( 'Tab' );
-		expect(
-			await page.evaluate( () =>
-				document.activeElement.getAttribute( 'aria-label' )
-			)
-		).toBe( 'Post' );
-		await pressKeyWithModifier( 'shift', 'Tab' );
-		await pressKeyWithModifier( 'shift', 'Tab' );
-		expect(
-			await page.evaluate( () =>
-				document.activeElement.getAttribute( 'aria-label' )
-			)
-		).toBe( 'Table' );
 	} );
 
-	it( 'Should unselect all blocks when hitting double escape', async () => {
+	it( 'should unselect all blocks when hitting double escape', async () => {
 		// Add demo content.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Random Paragraph' );
@@ -714,5 +704,126 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Escape' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( undefined );
+	} );
+
+	// Checks for regressions of https://github.com/WordPress/gutenberg/issues/40091.
+	it( 'does not deselect the block when selecting text outside the editor canvas', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Random Paragraph' );
+		await openDocumentSettingsSidebar();
+		const blockDescription = await page.waitForSelector(
+			'.block-editor-block-card__description'
+		);
+		const boundingBox = await blockDescription.boundingBox();
+		const startPosition = {
+			x: boundingBox.x + 10,
+			y: boundingBox.y + 8,
+		};
+		const endPosition = {
+			x: startPosition.x + 50,
+			y: startPosition.y,
+		};
+
+		await page.mouse.move( startPosition.x, startPosition.y );
+		await page.mouse.down();
+		await page.mouse.move( endPosition.x, endPosition.y );
+		await page.mouse.up();
+
+		const selectedParagraph = await page.waitForSelector(
+			'.wp-block-paragraph.is-selected'
+		);
+		expect( selectedParagraph ).toBeDefined();
+	} );
+	it( 'should prevent browser default formatting on multi selection', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'first' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'second' );
+
+		// Multi select both paragraphs.
+		await pressKeyTimes( 'ArrowLeft', 2 );
+		await page.keyboard.down( 'Shift' );
+		await pressKeyTimes( 'ArrowLeft', 2 );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.up( 'Shift' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		const paragraphs = await page.$$eval(
+			'[data-type="core/paragraph"]',
+			( nodes ) => Array.from( nodes ).map( ( node ) => node.innerHTML )
+		);
+		expect( paragraphs ).toEqual( [ 'first', 'second' ] );
+	} );
+
+	it( 'should move to the start of the first line on ArrowUp', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'a' );
+
+		async function getHeight() {
+			return await page.evaluate(
+				() => document.activeElement.offsetHeight
+			);
+		}
+
+		const height = await getHeight();
+
+		// Keep typing until the height of the element increases. We need two
+		// lines.
+		while ( height === ( await getHeight() ) ) {
+			await page.keyboard.type( 'a' );
+		}
+
+		// Move to the start of the second line.
+		await page.keyboard.press( 'ArrowLeft' );
+		// Move to the start of the first line.
+		await page.keyboard.press( 'ArrowUp' );
+		// Insert a "." for testing.
+		await page.keyboard.type( '.' );
+
+		// Expect the "." to be added at the start of the paragraph.
+		expect(
+			await page.evaluate( () =>
+				document.activeElement.getAttribute( 'data-type' )
+			)
+		).toBe( 'core/paragraph' );
+		expect(
+			await page.evaluate( () => document.activeElement.textContent )
+		).toMatch( /^\.a+$/ );
+	} );
+
+	it( 'should vertically move the caret from corner to corner', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'a' );
+
+		async function getHeight() {
+			return await page.evaluate(
+				() => document.activeElement.offsetHeight
+			);
+		}
+
+		const height = await getHeight();
+
+		// Keep typing until the height of the element increases. We need two
+		// lines.
+		while ( height === ( await getHeight() ) ) {
+			await page.keyboard.type( 'a' );
+		}
+
+		// Create a new paragraph.
+		await page.keyboard.press( 'Enter' );
+		// Move to the start of the first line.
+		await page.keyboard.press( 'ArrowUp' );
+		// Insert a "." for testing.
+		await page.keyboard.type( '.' );
+
+		// Expect the "." to be added at the start of the second line.
+		// It should not be added to the first line!
+		expect(
+			await page.evaluate( () =>
+				document.activeElement.getAttribute( 'data-type' )
+			)
+		).toBe( 'core/paragraph' );
+		expect(
+			await page.evaluate( () => document.activeElement.textContent )
+		).toMatch( /^a+\.a$/ );
 	} );
 } );

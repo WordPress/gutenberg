@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { every } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import {
@@ -44,35 +39,37 @@ describe( 'isURL', () => {
 } );
 
 describe( 'isEmail', () => {
-	it( 'returns true when given things that look like an email', () => {
-		const emails = [
-			'simple@wordpress.org',
-			'very.common@wordpress.org',
-			'disposable.style.email.with+symbol@wordpress.org',
-			'other.email-with-hyphen@wordpress.org',
-			'fully-qualified-domain@wordpress.org',
-			'user.name+tag+sorting@wordpress.org',
-			'x@wordpress.org',
-			'wordpress-indeed@strange-wordpress.org',
-			'wordpress@s.wordpress',
-		];
+	it.each( [
+		'simple@wordpress.org',
+		'very.common@wordpress.org',
+		'disposable.style.email.with+symbol@wordpress.org',
+		'other.email-with-hyphen@wordpress.org',
+		'fully-qualified-domain@wordpress.org',
+		'user.name+tag+sorting@wordpress.org',
+		'x@wordpress.org',
+		'wordpress-indeed@strange-wordpress.org',
+		'wordpress@s.wordpress',
+		'1234567890123456789012345678901234567890123456789012345678901234+x@wordpress.org',
+	] )(
+		'returns true when given things that look like an email: %s',
+		( email ) => {
+			expect( isEmail( email ) ).toBe( true );
+		}
+	);
 
-		expect( every( emails, isEmail ) ).toBe( true );
-	} );
-
-	it( "returns false when given things that don't look like an email", () => {
-		const emails = [
-			'Abc.wordpress.org',
-			'A@b@c@wordpress.org',
-			'a"b(c)d,e:f;g<h>i[jk]l@wordpress.org',
-			'just"not"right@wordpress.org',
-			'this is"notallowed@wordpress.org',
-			'this still"not\\allowed@wordpress.org',
-			'1234567890123456789012345678901234567890123456789012345678901234+x@wordpress.org',
-		];
-
-		expect( every( emails, isEmail ) ).toBe( false );
-	} );
+	it.each( [
+		'Abc.wordpress.org',
+		'A@b@c@wordpress.org',
+		'a"b(c)d,e:f;g<h>i[jk]l@wordpress.org',
+		'just"not"right@wordpress.org',
+		'this is"notallowed@wordpress.org',
+		'this still"not\\allowed@wordpress.org',
+	] )(
+		"returns false when given things that don't look like an email: %s",
+		( email ) => {
+			expect( isEmail( email ) ).toBe( false );
+		}
+	);
 } );
 
 describe( 'getProtocol', () => {
@@ -1000,6 +997,12 @@ describe( 'cleanForSlug', () => {
 		expect( cleanForSlug( 'Καλημέρα Κόσμε' ) ).toBe( 'καλημέρα-κόσμε' );
 		expect( cleanForSlug( '안녕하세요 ' ) ).toBe( '안녕하세요' );
 		expect( cleanForSlug( '繁体字 ' ) ).toBe( '繁体字' );
+	} );
+
+	it( 'Should trim multiple leading and trailing dashes', () => {
+		expect( cleanForSlug( '  -Is th@t Déjà_vu- 	' ) ).toBe(
+			'is-tht-deja_vu'
+		);
 	} );
 } );
 

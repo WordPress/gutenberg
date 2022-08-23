@@ -6,6 +6,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -46,6 +47,7 @@ function createRegistryWithStores() {
 	registry.register( coreStore );
 	registry.register( editorStore );
 	registry.register( noticesStore );
+	registry.register( preferencesStore );
 
 	// Register post type entity.
 	registry.dispatch( coreStore ).addEntities( [ postTypeConfig ] );
@@ -83,6 +85,13 @@ describe( 'Post actions', () => {
 					path.startsWith( `/wp/v2/posts/${ postId }` )
 				) {
 					return { ...post, ...data };
+				} else if (
+					// This URL is requested by the actions dispatched in this test.
+					// They are safe to ignore and are only listed here to avoid triggeringan error.
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {};
 				}
 
 				throw {
@@ -128,7 +137,7 @@ describe( 'Post actions', () => {
 			expect( notices ).toMatchObject( [
 				{
 					status: 'success',
-					content: 'Draft saved',
+					content: 'Draft saved.',
 				},
 			] );
 		} );
@@ -162,6 +171,15 @@ describe( 'Post actions', () => {
 						return { ...post, ...data };
 					} else if ( method === 'GET' ) {
 						return [];
+					}
+				} else if ( method === 'GET' ) {
+					// These URLs are requested by the actions dispatched in this test.
+					// They are safe to ignore and are only listed here to avoid triggeringan error.
+					if (
+						path.startsWith( '/wp/v2/types/post' ) ||
+						path.startsWith( `/wp/v2/posts/${ postId }` )
+					) {
+						return {};
 					}
 				}
 
@@ -239,6 +257,13 @@ describe( 'Post actions', () => {
 							...data,
 						};
 					}
+					// This URL is requested by the actions dispatched in this test.
+					// They are safe to ignore and are only listed here to avoid triggeringan error.
+				} else if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {};
 				}
 
 				throw {
@@ -324,6 +349,41 @@ describe( 'Editor actions', () => {
 				type: 'UNLOCK_POST_AUTOSAVING',
 				lockName: 'test',
 			} );
+		} );
+	} );
+
+	describe( 'enablePublishSidebar', () => {
+		it( 'enables the publish sidebar', () => {
+			const registry = createRegistryWithStores();
+
+			// Starts off as `undefined` as a default hasn't been set.
+			expect(
+				registry.select( editorStore ).isPublishSidebarEnabled()
+			).toBe( false );
+
+			registry.dispatch( editorStore ).enablePublishSidebar();
+
+			expect(
+				registry.select( editorStore ).isPublishSidebarEnabled()
+			).toBe( true );
+		} );
+	} );
+
+	describe( 'disablePublishSidebar', () => {
+		it( 'disables the publish sidebar', () => {
+			const registry = createRegistryWithStores();
+
+			// Enable it to start with so that can test it flipping from `true` to `false`.
+			registry.dispatch( editorStore ).enablePublishSidebar();
+			expect(
+				registry.select( editorStore ).isPublishSidebarEnabled()
+			).toBe( true );
+
+			registry.dispatch( editorStore ).disablePublishSidebar();
+
+			expect(
+				registry.select( editorStore ).isPublishSidebarEnabled()
+			).toBe( false );
 		} );
 	} );
 } );

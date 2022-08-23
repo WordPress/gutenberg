@@ -1,0 +1,27 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"__experimental": "list-v2",
+	"name": "core/list-item",
+	"title": "List item",
+	"category": "text",
+	"parent": [ "core/list" ],
+	"description": "Create a list item.",
+	"textdomain": "default",
+	"attributes": {
+		"placeholder": {
+			"type": "string"
+		},
+		"content": {
+			"type": "string",
+			"source": "html",
+			"selector": "li",
+			"default": "",
+			"__experimentalRole": "content"
+		}
+	},
+	"supports": {
+		"className": false,
+		"__experimentalSelector": "li"
+	}
+}

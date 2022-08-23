@@ -11,7 +11,6 @@ import {
 	map,
 	reduce,
 	some,
-	toString,
 } from 'lodash';
 
 /**
@@ -90,27 +89,22 @@ function GalleryEdit( props ) {
 	} = attributes;
 	const [ selectedImage, setSelectedImage ] = useState();
 	const [ attachmentCaptions, setAttachmentCaptions ] = useState();
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
-	const {
-		imageSizes,
-		mediaUpload,
-		getMedia,
-		wasBlockJustInserted,
-	} = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
+	const { imageSizes, mediaUpload, getMedia, wasBlockJustInserted } =
+		useSelect( ( select ) => {
+			const settings = select( blockEditorStore ).getSettings();
 
-		return {
-			imageSizes: settings.imageSizes,
-			mediaUpload: settings.mediaUpload,
-			getMedia: select( coreStore ).getMedia,
-			wasBlockJustInserted: select(
-				blockEditorStore
-			).wasBlockJustInserted( clientId, 'inserter_menu' ),
-		};
-	} );
+			return {
+				imageSizes: settings.imageSizes,
+				mediaUpload: settings.mediaUpload,
+				getMedia: select( coreStore ).getMedia,
+				wasBlockJustInserted: select(
+					blockEditorStore
+				).wasBlockJustInserted( clientId, 'inserter_menu' ),
+			};
+		} );
 
 	const resizedImages = useMemo( () => {
 		if ( isSelected ) {
@@ -231,7 +225,7 @@ function GalleryEdit( props ) {
 		// The image id in both the images and attachmentCaptions arrays is a
 		// string, so ensure comparison works correctly by converting the
 		// newImage.id to a string.
-		const newImageId = toString( newImage.id );
+		const newImageId = newImage.id.toString();
 		const currentImage = find( images, { id: newImageId } );
 		const currentImageCaption = currentImage
 			? currentImage.caption
@@ -258,7 +252,7 @@ function GalleryEdit( props ) {
 			newImages.map( ( newImage ) => ( {
 				// Store the attachmentCaption id as a string for consistency
 				// with the type of the id in the images attribute.
-				id: toString( newImage.id ),
+				id: newImage.id.toString(),
 				caption: newImage.caption,
 			} ) )
 		);
@@ -269,7 +263,7 @@ function GalleryEdit( props ) {
 				// The id value is stored in a data attribute, so when the
 				// block is parsed it's converted to a string. Converting
 				// to a string here ensures it's type is consistent.
-				id: toString( newImage.id ),
+				id: newImage.id.toString(),
 			} ) ),
 			columns: attributes.columns
 				? Math.min( newImages.length, attributes.columns )
@@ -420,7 +414,7 @@ function GalleryEdit( props ) {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Gallery settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					{ images.length > 1 && (
 						<RangeControl
 							label={ __( 'Columns' ) }

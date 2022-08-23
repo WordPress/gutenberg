@@ -2,22 +2,17 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-/**
- * Internal dependencies
- */
-import { Icon, SelectControl } from '../';
 import { __ } from '@wordpress/i18n';
-
 import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import { Icon, SelectControl } from '../';
 import sizesTable, { findSizeBySlug } from './sizes';
 
 export function DimensionControl( props ) {
@@ -35,7 +30,7 @@ export function DimensionControl( props ) {
 
 		if ( ! theSize || value === theSize.slug ) {
 			onChange( undefined );
-		} else if ( isFunction( onChange ) ) {
+		} else if ( typeof onChange === 'function' ) {
 			onChange( theSize.slug );
 		}
 	};

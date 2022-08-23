@@ -36,15 +36,16 @@ import { useBlockEditContext } from '../block-edit';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
-import { useCaretInFormat } from './use-caret-in-format';
 import { useMarkPersistent } from './use-mark-persistent';
 import { usePasteHandler } from './use-paste-handler';
+import { useBeforeInputRules } from './use-before-input-rules';
 import { useInputRules } from './use-input-rules';
 import { useEnter } from './use-enter';
 import { useFormatTypes } from './use-format-types';
 import { useRemoveBrowserShortcuts } from './use-remove-browser-shortcuts';
 import { useShortcuts } from './use-shortcuts';
 import { useInputEvents } from './use-input-events';
+import { useFirefoxCompat } from './use-firefox-compat';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
 
@@ -76,6 +77,8 @@ function removeNativeProps( props ) {
 		'minWidth',
 		'maxWidth',
 		'setRef',
+		'disableSuggestions',
+		'disableAutocorrection',
 	] );
 }
 
@@ -120,9 +123,8 @@ function RichTextWrapper(
 	const anchorRef = useRef();
 	const { clientId } = useBlockEditContext();
 	const selector = ( select ) => {
-		const { getSelectionStart, getSelectionEnd } = select(
-			blockEditorStore
-		);
+		const { getSelectionStart, getSelectionEnd } =
+			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
 
@@ -131,6 +133,7 @@ function RichTextWrapper(
 		if ( originalIsSelected === undefined ) {
 			isSelected =
 				selectionStart.clientId === clientId &&
+				selectionEnd.clientId === clientId &&
 				selectionStart.attributeKey === identifier;
 		} else if ( originalIsSelected ) {
 			isSelected = selectionStart.clientId === clientId;
@@ -171,7 +174,26 @@ function RichTextWrapper(
 
 	const onSelectionChange = useCallback(
 		( start, end ) => {
-			selectionChange( clientId, identifier, start, end );
+			const selection = {};
+			const unset = start === undefined && end === undefined;
+
+			if ( typeof start === 'number' || unset ) {
+				selection.start = {
+					clientId,
+					attributeKey: identifier,
+					offset: start,
+				};
+			}
+
+			if ( typeof end === 'number' || unset ) {
+				selection.end = {
+					clientId,
+					attributeKey: identifier,
+					offset: end,
+				};
+			}
+
+			selectionChange( selection );
 		},
 		[ clientId, identifier ]
 	);
@@ -219,7 +241,11 @@ function RichTextWrapper(
 		);
 	}
 
-	const { value, onChange, ref: richTextRef } = useRichText( {
+	const {
+		value,
+		onChange,
+		ref: richTextRef,
+	} = useRichText( {
 		value: adjustedValue,
 		onChange( html, { __unstableFormats, __unstableText } ) {
 			adjustedOnChange( html );
@@ -247,7 +273,6 @@ function RichTextWrapper(
 		onChange,
 	} );
 
-	useCaretInFormat( { value } );
 	useMarkPersistent( { html: adjustedValue, value } );
 
 	const keyboardShortcuts = useRef( new Set() );
@@ -319,7 +344,8 @@ function RichTextWrapper(
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
-					anchorRef={ anchorRef.current }
+					anchorRef={ anchorRef }
+					value={ value }
 				/>
 			) }
 			<TagName
@@ -330,15 +356,18 @@ function RichTextWrapper(
 				{ ...props }
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
+					forwardedRef,
 					autocompleteProps.ref,
 					props.ref,
 					richTextRef,
+					useBeforeInputRules( { value, onChange } ),
 					useInputRules( {
 						value,
 						onChange,
 						__unstableAllowPrefixTransformations,
 						formatTypes,
 						onReplace,
+						selectionChange,
 					} ),
 					useRemoveBrowserShortcuts(),
 					useShortcuts( keyboardShortcuts ),
@@ -370,8 +399,8 @@ function RichTextWrapper(
 						disableLineBreaks,
 						onSplitAtEnd,
 					} ),
+					useFirefoxCompat(),
 					anchorRef,
-					forwardedRef,
 				] ) }
 				contentEditable={ true }
 				suppressContentEditableWarning={ true }

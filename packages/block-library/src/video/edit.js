@@ -26,13 +26,14 @@ import {
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { useRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -61,7 +62,8 @@ function VideoEdit( {
 	const { id, caption, controls, poster, src, tracks } = attributes;
 	const isTemporaryVideo = ! id && isBlobURL( src );
 	const mediaUpload = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload
+		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
+		[]
 	);
 
 	useEffect( () => {
@@ -70,9 +72,7 @@ function VideoEdit( {
 			if ( file ) {
 				mediaUpload( {
 					filesList: [ file ],
-					onFileChange: ( [ { url } ] ) => {
-						setAttributes( { src: url } );
-					},
+					onFileChange: ( [ media ] ) => onSelectVideo( media ),
 					onError: ( message ) => {
 						noticeOperations.createErrorNotice( message );
 					},
@@ -191,7 +191,7 @@ function VideoEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Video settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<VideoCommonSettings
 						setAttributes={ setAttributes }
 						attributes={ attributes }
@@ -267,6 +267,9 @@ function VideoEdit( {
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
 						aria-label={ __( 'Video caption text' ) }
 						placeholder={ __( 'Add caption' ) }
 						value={ caption }
@@ -275,7 +278,9 @@ function VideoEdit( {
 						}
 						inlineToolbar
 						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
 						}
 					/>
 				) }

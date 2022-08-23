@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { values, noop, omit } from 'lodash';
+import { omit } from 'lodash';
 import deepFreeze from 'deep-freeze';
 
 /**
@@ -22,7 +22,6 @@ import {
 	blocks,
 	isTyping,
 	draggedBlocks,
-	isCaretWithinFormattedText,
 	selection,
 	initialPosition,
 	isMultiSelecting,
@@ -34,6 +33,8 @@ import {
 	lastBlockAttributesChange,
 	lastBlockInserted,
 } from '../reducer';
+
+const noop = () => {};
 
 describe( 'state', () => {
 	describe( 'hasSameKeys()', () => {
@@ -291,6 +292,7 @@ describe( 'state', () => {
 						chicken: '',
 					},
 					controlledInnerBlocks: {},
+					visibility: {},
 				} );
 				expect( state.tree.chicken ).not.toBe(
 					existingState.tree.chicken
@@ -372,6 +374,7 @@ describe( 'state', () => {
 						chicken: '',
 					},
 					controlledInnerBlocks: {},
+					visibility: {},
 				} );
 				expect( state.tree.chicken ).not.toBe(
 					existingState.tree.chicken
@@ -520,6 +523,7 @@ describe( 'state', () => {
 						[ newChildBlockId3 ]: 'chicken',
 					},
 					controlledInnerBlocks: {},
+					visibility: {},
 				} );
 
 				expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
@@ -628,6 +632,7 @@ describe( 'state', () => {
 						[ newChildBlockId ]: 'chicken',
 					},
 					controlledInnerBlocks: {},
+					visibility: {},
 				} );
 
 				// The block object of the parent should be updated.
@@ -649,6 +654,7 @@ describe( 'state', () => {
 				isIgnoredChange: false,
 				tree: {},
 				controlledInnerBlocks: {},
+				visibility: {},
 			} );
 		} );
 
@@ -660,7 +666,7 @@ describe( 'state', () => {
 				} );
 
 				expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
-				expect( values( state.byClientId )[ 0 ].clientId ).toBe(
+				expect( Object.values( state.byClientId )[ 0 ].clientId ).toBe(
 					'bananas'
 				);
 				expect( state.order ).toEqual( {
@@ -723,7 +729,9 @@ describe( 'state', () => {
 			} );
 
 			expect( Object.keys( state.byClientId ) ).toHaveLength( 2 );
-			expect( values( state.byClientId )[ 1 ].clientId ).toBe( 'ribs' );
+			expect( Object.values( state.byClientId )[ 1 ].clientId ).toBe(
+				'ribs'
+			);
 			expect( state.order ).toEqual( {
 				'': [ 'chicken', 'ribs' ],
 				chicken: [],
@@ -767,10 +775,12 @@ describe( 'state', () => {
 			} );
 
 			expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
-			expect( values( state.byClientId )[ 0 ].name ).toBe(
+			expect( Object.values( state.byClientId )[ 0 ].name ).toBe(
 				'core/freeform'
 			);
-			expect( values( state.byClientId )[ 0 ].clientId ).toBe( 'wings' );
+			expect( Object.values( state.byClientId )[ 0 ].clientId ).toBe(
+				'wings'
+			);
 			expect( state.order ).toEqual( {
 				'': [ 'wings' ],
 				wings: [],
@@ -924,15 +934,15 @@ describe( 'state', () => {
 			} );
 
 			expect( Object.keys( replacedState.byClientId ) ).toHaveLength( 1 );
-			expect( values( originalState.byClientId )[ 0 ].name ).toBe(
+			expect( Object.values( originalState.byClientId )[ 0 ].name ).toBe(
 				'core/test-block'
 			);
-			expect( values( replacedState.byClientId )[ 0 ].name ).toBe(
+			expect( Object.values( replacedState.byClientId )[ 0 ].name ).toBe(
 				'core/freeform'
 			);
-			expect( values( replacedState.byClientId )[ 0 ].clientId ).toBe(
-				'chicken'
-			);
+			expect(
+				Object.values( replacedState.byClientId )[ 0 ].clientId
+			).toBe( 'chicken' );
 			expect( replacedState.order ).toEqual( {
 				'': [ 'chicken' ],
 				chicken: [],
@@ -2084,6 +2094,130 @@ describe( 'state', () => {
 					expect( state.tree.child ).toBeUndefined();
 					expect( state.tree.chicken.innerBlocks ).toEqual( [] );
 				} );
+				it( 'should preserve the controlled blocks in state and re-attach them in other pieces of state(order, tree, etc..), when we replace inner blocks', () => {
+					const initialState = {
+						byClientId: {
+							'group-id': {
+								clientId: 'group-id',
+								name: 'core/group',
+								isValid: true,
+							},
+							'reusable-id': {
+								clientId: 'reusable-id',
+								name: 'core/block',
+								isValid: true,
+							},
+							'paragraph-id': {
+								clientId: 'paragraph-id',
+								name: 'core/paragraph',
+								isValid: true,
+							},
+						},
+						order: {
+							'': [ 'group-id' ],
+							'group-id': [ 'reusable-id' ],
+							'reusable-id': [ 'paragraph-id' ],
+							'paragraph-id': [],
+						},
+						controlledInnerBlocks: {
+							'reusable-id': true,
+						},
+						parents: {
+							'group-id': '',
+							'reusable-id': 'group-id',
+							'paragraph-id': 'reusable-id',
+						},
+						tree: {
+							'group-id': {
+								clientId: 'group-id',
+								name: 'core/group',
+								isValid: true,
+								innerBlocks: [
+									{
+										clientId: 'reusable-id',
+										name: 'core/block',
+										isValid: true,
+										attributes: {
+											ref: 687,
+										},
+										innerBlocks: [],
+									},
+								],
+							},
+							'reusable-id': {
+								clientId: 'reusable-id',
+								name: 'core/block',
+								isValid: true,
+								attributes: {
+									ref: 687,
+								},
+								innerBlocks: [],
+							},
+							'': {
+								innerBlocks: [
+									{
+										clientId: 'group-id',
+										name: 'core/group',
+										isValid: true,
+										innerBlocks: [
+											{
+												clientId: 'reusable-id',
+												name: 'core/block',
+												isValid: true,
+												attributes: {
+													ref: 687,
+												},
+												innerBlocks: [],
+											},
+										],
+									},
+								],
+							},
+							'paragraph-id': {
+								clientId: 'paragraph-id',
+								name: 'core/paragraph',
+								isValid: true,
+								innerBlocks: [],
+							},
+							'controlled||reusable-id': {
+								innerBlocks: [
+									{
+										clientId: 'paragraph-id',
+										name: 'core/paragraph',
+										isValid: true,
+										innerBlocks: [],
+									},
+								],
+							},
+						},
+					};
+					// We will dispatch an action that replaces the inner
+					// blocks with the same inner blocks, which contain
+					// a controlled block (`reusable-id`).
+					const action = {
+						type: 'REPLACE_INNER_BLOCKS',
+						rootClientId: 'group-id',
+						blocks: [
+							{
+								clientId: 'reusable-id',
+								name: 'core/block',
+								isValid: true,
+								attributes: {
+									ref: 687,
+								},
+								innerBlocks: [],
+							},
+						],
+						updateSelection: false,
+					};
+					const state = blocks( initialState, action );
+					expect( state.order ).toEqual(
+						expect.objectContaining( initialState.order )
+					);
+					expect( state.tree ).toEqual(
+						expect.objectContaining( initialState.tree )
+					);
+				} );
 			} );
 		} );
 	} );
@@ -2157,24 +2291,6 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( [] );
-		} );
-	} );
-
-	describe( 'isCaretWithinFormattedText()', () => {
-		it( 'should set the flag to true', () => {
-			const state = isCaretWithinFormattedText( false, {
-				type: 'ENTER_FORMATTED_TEXT',
-			} );
-
-			expect( state ).toBe( true );
-		} );
-
-		it( 'should set the flag to false', () => {
-			const state = isCaretWithinFormattedText( true, {
-				type: 'EXIT_FORMATTED_TEXT',
-			} );
-
-			expect( state ).toBe( false );
 		} );
 	} );
 

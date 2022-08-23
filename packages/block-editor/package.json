@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "8.3.0-next.e230fbab09.0",
+	"version": "9.7.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -32,7 +32,7 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@react-spring/web": "^9.2.4",
+		"@react-spring/web": "^9.4.5",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
@@ -40,6 +40,7 @@
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
+		"@wordpress/date": "file:../date",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
@@ -58,6 +59,7 @@
 		"@wordpress/url": "file:../url",
 		"@wordpress/warning": "file:../warning",
 		"@wordpress/wordcount": "file:../wordcount",
+		"change-case": "^4.1.2",
 		"classnames": "^2.3.1",
 		"colord": "^2.7.0",
 		"diff": "^4.0.2",
@@ -66,7 +68,8 @@
 		"lodash": "^4.17.21",
 		"react-autosize-textarea": "^7.1.0",
 		"react-easy-crop": "^3.0.0",
-		"rememo": "^3.0.0",
+		"rememo": "^4.0.0",
+		"remove-accents": "^0.4.2",
 		"traverse": "^0.6.6"
 	},
 	"peerDependencies": {

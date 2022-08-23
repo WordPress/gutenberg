@@ -7,7 +7,7 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { Fragment, useEffect } from '@wordpress/element';
+import { Fragment, useEffect, useRef } from '@wordpress/element';
 import {
 	BlockControls,
 	useInnerBlocksProps,
@@ -58,6 +58,7 @@ export function SocialLinksEdit( props ) {
 
 	const {
 		iconBackgroundColorValue,
+		customIconBackgroundColor,
 		iconColorValue,
 		openInNewTab,
 		showLabels,
@@ -66,18 +67,27 @@ export function SocialLinksEdit( props ) {
 	} = attributes;
 	const usedLayout = layout || getDefaultBlockLayout( name );
 
-	// Remove icon background color if logos only style selected.
-	const logosOnly =
-		attributes.className?.indexOf( 'is-style-logos-only' ) >= 0;
+	const logosOnly = attributes.className?.includes( 'is-style-logos-only' );
+
+	// Remove icon background color when logos only style is selected or
+	// restore it when any other style is selected.
+	const backgroundBackup = useRef( {} );
 	useEffect( () => {
 		if ( logosOnly ) {
+			backgroundBackup.current = {
+				iconBackgroundColor,
+				iconBackgroundColorValue,
+				customIconBackgroundColor,
+			};
 			setAttributes( {
 				iconBackgroundColor: undefined,
 				customIconBackgroundColor: undefined,
 				iconBackgroundColorValue: undefined,
 			} );
+		} else {
+			setAttributes( { ...backgroundBackup.current } );
 		}
-	}, [ logosOnly, setAttributes ] );
+	}, [ logosOnly ] );
 
 	const SocialPlaceholder = (
 		<li className="wp-block-social-links__social-placeholder">
@@ -98,6 +108,7 @@ export function SocialLinksEdit( props ) {
 	// Fallback color values are used maintain selections in case switching
 	// themes and named colors in palette do not match.
 	const className = classNames( size, {
+		'has-visible-labels': showLabels,
 		'has-icon-color': iconColor.color || iconColorValue,
 		'has-icon-background-color':
 			iconBackgroundColor.color || iconBackgroundColorValue,
@@ -205,16 +216,18 @@ export function SocialLinksEdit( props ) {
 					__experimentalIsRenderedInSidebar
 					title={ __( 'Color' ) }
 					colorSettings={ colorSettings }
-				/>
-				{ ! logosOnly && (
-					<ContrastChecker
-						{ ...{
-							textColor: iconColorValue,
-							backgroundColor: iconBackgroundColorValue,
-						} }
-						isLargeText={ false }
-					/>
-				) }
+					enableAlpha
+				>
+					{ ! logosOnly && (
+						<ContrastChecker
+							{ ...{
+								textColor: iconColorValue,
+								backgroundColor: iconBackgroundColorValue,
+							} }
+							isLargeText={ false }
+						/>
+					) }
+				</PanelColorSettings>
 			</InspectorControls>
 			<ul { ...innerBlocksProps } />
 		</Fragment>

@@ -1,12 +1,18 @@
 /**
  * Internal dependencies
  */
-import { Context, ContextualField, RenderedText, OmitNevers } from './helpers';
+import type {
+	Context,
+	ContextualField,
+	RenderedText,
+	OmitNevers,
+} from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
+import type { DefaultContextOf } from './index';
 
-declare module './base-entity-types' {
-	export namespace BaseEntityTypes {
+declare module './base-entity-records' {
+	export namespace BaseEntityRecords {
 		export interface Plugin< C extends Context > {
 			/**
 			 * The plugin file.
@@ -69,6 +75,5 @@ declare module './base-entity-types' {
 }
 
 export type PluginStatus = 'active' | 'inactive';
-export type Plugin< C extends Context > = OmitNevers<
-	_BaseEntityTypes.Plugin< C >
->;
+export type Plugin< C extends Context = DefaultContextOf< 'root', 'plugin' > > =
+	OmitNevers< _BaseEntityRecords.Plugin< C > >;

@@ -44,10 +44,6 @@ function render_block_core_site_logo( $attributes ) {
 	}
 
 	$classnames = array();
-	if ( ! empty( $attributes['className'] ) ) {
-		$classnames[] = $attributes['className'];
-	}
-
 	if ( empty( $attributes['width'] ) ) {
 		$classnames[] = 'is-default-size';
 	}
