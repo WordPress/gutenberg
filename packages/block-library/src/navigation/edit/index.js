@@ -597,29 +597,35 @@ function Navigation( {
 			<TagName { ...blockProps }>
 				<BlockControls>
 					<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
-						<NavigationMenuSelector
-							ref={ null }
-							currentMenuId={ null }
-							clientId={ clientId }
-							onSelectNavigationMenu={ ( menuId ) => {
-								handleUpdateMenu( menuId );
-								setShouldFocusNavigationSelector( true );
-							} }
-							onSelectClassicMenu={ async ( classicMenu ) => {
-								const navMenu = await convertClassicMenu(
-									classicMenu.id,
-									classicMenu.name
-								);
-								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id );
+						{ ! isCreatingNavigationMenu && (
+							<NavigationMenuSelector
+								ref={ null }
+								currentMenuId={ null }
+								clientId={ clientId }
+								onSelectNavigationMenu={ ( menuId ) => {
+									handleUpdateMenu( menuId );
 									setShouldFocusNavigationSelector( true );
+								} }
+								onSelectClassicMenu={ async ( classicMenu ) => {
+									const navMenu = await convertClassicMenu(
+										classicMenu.id,
+										classicMenu.name
+									);
+									if ( navMenu ) {
+										handleUpdateMenu( navMenu.id );
+										setShouldFocusNavigationSelector(
+											true
+										);
+									}
+								} }
+								onCreateNew={ () =>
+									createNavigationMenu( '', [] )
 								}
-							} }
-							onCreateNew={ () => createNavigationMenu( '', [] ) }
-							/* translators: %s: The name of a menu. */
-							actionLabel={ __( "Switch to '%s'" ) }
-							showManageActions
-						/>
+								/* translators: %s: The name of a menu. */
+								actionLabel={ __( "Switch to '%s'" ) }
+								showManageActions
+							/>
+						) }
 					</ToolbarGroup>
 				</BlockControls>
 				{ stylingInspectorControls }
@@ -664,29 +670,35 @@ function Navigation( {
 			<TagName { ...blockProps }>
 				<BlockControls>
 					<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
-						<NavigationMenuSelector
-							ref={ navigationSelectorRef }
-							currentMenuId={ ref }
-							clientId={ clientId }
-							onSelectNavigationMenu={ ( menuId ) => {
-								handleUpdateMenu( menuId );
-								setShouldFocusNavigationSelector( true );
-							} }
-							onSelectClassicMenu={ async ( classicMenu ) => {
-								const navMenu = await convertClassicMenu(
-									classicMenu.id,
-									classicMenu.name
-								);
-								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id );
+						{ ! isCreatingNavigationMenu && (
+							<NavigationMenuSelector
+								ref={ navigationSelectorRef }
+								currentMenuId={ ref }
+								clientId={ clientId }
+								onSelectNavigationMenu={ ( menuId ) => {
+									handleUpdateMenu( menuId );
 									setShouldFocusNavigationSelector( true );
+								} }
+								onSelectClassicMenu={ async ( classicMenu ) => {
+									const navMenu = await convertClassicMenu(
+										classicMenu.id,
+										classicMenu.name
+									);
+									if ( navMenu ) {
+										handleUpdateMenu( navMenu.id );
+										setShouldFocusNavigationSelector(
+											true
+										);
+									}
+								} }
+								onCreateNew={ () =>
+									createNavigationMenu( '', [] )
 								}
-							} }
-							onCreateNew={ () => createNavigationMenu( '', [] ) }
-							/* translators: %s: The name of a menu. */
-							actionLabel={ __( "Switch to '%s'" ) }
-							showManageActions
-						/>
+								/* translators: %s: The name of a menu. */
+								actionLabel={ __( "Switch to '%s'" ) }
+								showManageActions
+							/>
+						) }
 					</ToolbarGroup>
 				</BlockControls>
 				<Warning>
@@ -765,33 +777,40 @@ function Navigation( {
 				<BlockControls>
 					{ ! isDraftNavigationMenu && isEntityAvailable && (
 						<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
-							<NavigationMenuSelector
-								ref={ navigationSelectorRef }
-								currentMenuId={ ref }
-								clientId={ clientId }
-								onSelectNavigationMenu={ ( menuId ) => {
-									handleUpdateMenu( menuId );
-									setShouldFocusNavigationSelector( true );
-								} }
-								onSelectClassicMenu={ async ( classicMenu ) => {
-									const navMenu = await convertClassicMenu(
-										classicMenu.id,
-										classicMenu.name
-									);
-									if ( navMenu ) {
-										handleUpdateMenu( navMenu.id );
+							{ ! isCreatingNavigationMenu && (
+								<NavigationMenuSelector
+									ref={ navigationSelectorRef }
+									currentMenuId={ ref }
+									clientId={ clientId }
+									onSelectNavigationMenu={ ( menuId ) => {
+										handleUpdateMenu( menuId );
 										setShouldFocusNavigationSelector(
 											true
 										);
+									} }
+									onSelectClassicMenu={ async (
+										classicMenu
+									) => {
+										const navMenu =
+											await convertClassicMenu(
+												classicMenu.id,
+												classicMenu.name
+											);
+										if ( navMenu ) {
+											handleUpdateMenu( navMenu.id );
+											setShouldFocusNavigationSelector(
+												true
+											);
+										}
+									} }
+									onCreateNew={ () =>
+										createNavigationMenu( '', [] )
 									}
-								} }
-								onCreateNew={ () =>
-									createNavigationMenu( '', [] )
-								}
-								/* translators: %s: The name of a menu. */
-								actionLabel={ __( "Switch to '%s'" ) }
-								showManageActions
-							/>
+									/* translators: %s: The name of a menu. */
+									actionLabel={ __( "Switch to '%s'" ) }
+									showManageActions
+								/>
+							) }
 						</ToolbarGroup>
 					) }
 				</BlockControls>
