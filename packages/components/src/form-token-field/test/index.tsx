@@ -173,7 +173,7 @@ describe( 'FormTokenField', () => {
 			rerender(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
-					tokenizeOnSpace={ true }
+					tokenizeOnSpace
 				/>
 			);
 
