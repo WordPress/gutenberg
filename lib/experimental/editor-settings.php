@@ -78,8 +78,8 @@ function gutenberg_initialize_editor( $editor_name, $editor_script_handle, $sett
  */
 function gutenberg_enable_zoomed_out_view() {
 	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-	if (  $gutenberg_experiments && array_key_exists( 'gutenberg-zoomed-out-view', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-block-library', 'window.__experimentalEnableZoomedOutView = true', 'before' );
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-zoomed-out-view', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableZoomedOutView = true', 'before' );
 	}
 }
 
