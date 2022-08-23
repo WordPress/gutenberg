@@ -246,6 +246,17 @@ function CoverEdit( {
 	);
 
 	if ( ! useFeaturedImage && ! hasInnerBlocks && ! hasBackground ) {
+		const {
+			textDecoration,
+			textTransform,
+			fontSize,
+			fontWeight,
+			fontStyle,
+			lineHeight,
+			letterSpacing,
+			...styles
+		} = blockProps.style;
+
 		return (
 			<>
 				{ blockControls }
@@ -256,6 +267,7 @@ function CoverEdit( {
 						'is-placeholder',
 						blockProps.className
 					) }
+					style={ styles }
 				>
 					<CoverPlaceholder
 						onSelectMedia={ onSelectMedia }
