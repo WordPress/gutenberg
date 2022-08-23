@@ -342,6 +342,10 @@ const store = createReduxStore( 'my-shop', {
 register( store );
 ```
 
+_Type_
+
+-   `Function`
+
 _Parameters_
 
 -   _reducers_ `Object`: An object whose values correspond to different reducing functions that need to be combined into one.
