@@ -164,7 +164,6 @@ function getListViewDropTarget( blocksData, position ) {
 	// as nesting since the next block in the tree will be the first child.
 	if (
 		isDraggingBelow &&
-		candidateBlockData.canInsertDraggedBlocksAsChild &&
 		( candidateBlockData.innerBlockCount > 0 ||
 			isNestingGesture( position, candidateRect ) )
 	) {
@@ -172,13 +171,8 @@ function getListViewDropTarget( blocksData, position ) {
 			rootClientId: candidateBlockData.clientId,
 			blockIndex: 0,
 			dropPosition: 'inside',
+			canInsertBlocks: candidateBlockData.canInsertDraggedBlocksAsChild,
 		};
-	}
-
-	// If dropping as a sibling, but block cannot be inserted in
-	// this context, return early.
-	if ( ! candidateBlockData.canInsertDraggedBlocksAsSibling ) {
-		return;
 	}
 
 	const offset = isDraggingBelow ? 1 : 0;
@@ -187,6 +181,7 @@ function getListViewDropTarget( blocksData, position ) {
 		clientId: candidateBlockData.clientId,
 		blockIndex: candidateBlockData.blockIndex + offset,
 		dropPosition: candidateEdge,
+		canInsertBlocks: candidateBlockData.canInsertDraggedBlocksAsSibling,
 	};
 }
 

@@ -412,7 +412,11 @@ $block-navigation-max-indent: 8;
 
 	.block-editor-list-view-drop-indicator__line {
 		background: var(--wp-admin-theme-color);
-		height: $border-width;
+		height: $border-width-focus;
+	}
+
+	.block-editor-list-view-drop-indicator__line.is-undroppable {
+		background: $gray-200;
 	}
 }
 

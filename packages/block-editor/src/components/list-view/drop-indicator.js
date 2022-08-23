@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Popover } from '@wordpress/components';
@@ -8,7 +13,8 @@ export default function ListViewDropIndicator( {
 	listViewRef,
 	blockDropTarget,
 } ) {
-	const { rootClientId, clientId, dropPosition } = blockDropTarget || {};
+	const { rootClientId, clientId, dropPosition, canInsertBlocks } =
+		blockDropTarget || {};
 
 	const [ rootBlockElement, blockElement ] = useMemo( () => {
 		if ( ! listViewRef.current ) {
@@ -117,7 +123,12 @@ export default function ListViewDropIndicator( {
 		>
 			<div
 				style={ style }
-				className="block-editor-list-view-drop-indicator__line"
+				className={ classnames(
+					'block-editor-list-view-drop-indicator__line',
+					{
+						'is-undroppable': ! canInsertBlocks,
+					}
+				) }
 			/>
 		</Popover>
 	);
