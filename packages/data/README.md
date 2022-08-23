@@ -344,7 +344,7 @@ register( store );
 
 _Type_
 
--   `Function`
+-   `import('./types').combineReducers`
 
 _Parameters_
 
