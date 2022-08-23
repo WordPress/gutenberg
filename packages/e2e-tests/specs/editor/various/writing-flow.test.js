@@ -754,24 +754,6 @@ describe( 'Writing Flow', () => {
 		expect( paragraphs ).toEqual( [ 'first', 'second' ] );
 	} );
 
-	it( 'Allows block wrapper focus when there are no previous focus elements', async () => {
-		// Insert an image block.
-		await insertBlock( 'Image' );
-
-		// Make sure the upload button has focus.
-		const uploadButton = await page.waitForXPath(
-			'//button[contains( text(), "Upload" ) ]'
-		);
-		await expect( uploadButton ).toHaveFocus();
-
-		// Try to focus the image block wrapper.
-		await pressKeyWithModifier( 'shift', 'Tab' );
-		const getAriaLabel = await page.evaluate( () =>
-			document.activeElement?.getAttribute( 'aria-label' )
-		);
-		await expect( getAriaLabel ).toEqual( 'Block: Image' );
-	} );
-
 	it( 'Allows block settings sidebar focus when there are no next focus elements', async () => {
 		// Insert an image block.
 		await page.keyboard.press( 'Enter' );
