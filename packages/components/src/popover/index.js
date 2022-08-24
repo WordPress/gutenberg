@@ -469,6 +469,8 @@ const Popover = (
 	let content = (
 		<RootReferenceDocumentProvider
 			// Don't overwrite the root document if it's already set.
+			// This ensures only the reference document from the very
+			// root popover is provided.
 			value={ rootReferenceDocument ?? referenceOwnerDocument }
 		>
 			{
