@@ -7,6 +7,7 @@ import {
 	MenuItemsChoice,
 	DropdownMenu,
 } from '@wordpress/components';
+import { Icon, chevronUp, chevronDown } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { forwardRef, useEffect, useMemo, useState } from '@wordpress/element';
@@ -32,9 +33,21 @@ function NavigationMenuSelector(
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
 
+	const [ selectorLabel, setSelectorLabel ] = useState( '' );
+	const [ isPressed, setIsPressed ] = useState( false );
+
 	toggleProps = {
 		...toggleProps,
 		className: 'wp-block-navigation__navigation-selector-button',
+		children: (
+			<Icon
+				icon={ isPressed ? chevronUp : chevronDown }
+				className="wp-block-navigation__navigation-selector-button__icon"
+			/>
+		),
+		onClick: () => {
+			setIsPressed( ! isPressed );
+		},
 	};
 
 	actionLabel = actionLabel || createActionLabel;
@@ -47,8 +60,6 @@ function NavigationMenuSelector(
 		canUserUpdateNavigationMenu,
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
-
-	const [ selectorLabel, setSelectorLabel ] = useState( '' );
 
 	const menuChoices = useMemo( () => {
 		return (

@@ -694,6 +694,11 @@ button.wp-block-navigation-item__content {
 	border: 1px solid;
 }
 
+.wp-block-navigation__navigation-selector-button__icon {
+	position: absolute;
+	right: $grid-unit-30;
+}
+
 // Prevent scrolling of the parent content when the modal is open.
 html.has-modal-open {
 	overflow: hidden;
