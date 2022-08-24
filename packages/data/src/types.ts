@@ -50,6 +50,19 @@ export type UseSelectReturn< F extends MapSelect | StoreDescriptor< any > > =
 		? CurriedSelectorsOf< F >
 		: never;
 
+export type UseDispatchReturn< StoreNameOrDescriptor > =
+	StoreNameOrDescriptor extends StoreDescriptor< any >
+		? ActionCreatorsOf< ConfigOf< StoreNameOrDescriptor > >
+		: StoreNameOrDescriptor extends undefined
+		? DispatchFunction
+		: any;
+
+export type DispatchFunction = < StoreNameOrDescriptor >(
+	store: StoreNameOrDescriptor
+) => StoreNameOrDescriptor extends StoreDescriptor< any >
+	? ActionCreatorsOf< ConfigOf< StoreNameOrDescriptor > >
+	: any;
+
 export type MapSelect = ( select: SelectFunction ) => any;
 
 export type SelectFunction = < S >( store: S ) => CurriedSelectorsOf< S >;
@@ -91,9 +104,11 @@ export interface DataEmitter {
 
 // Type Helpers.
 
-type ActionCreatorsOf< Config extends AnyConfig > =
+export type ConfigOf< S > = S extends StoreDescriptor< infer C > ? C : never;
+
+export type ActionCreatorsOf< Config extends AnyConfig > =
 	Config extends ReduxStoreConfig< any, infer ActionCreators, any >
-		? { [ name in keyof ActionCreators ]: Function | Generator }
+		? ActionCreators
 		: never;
 
 type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
