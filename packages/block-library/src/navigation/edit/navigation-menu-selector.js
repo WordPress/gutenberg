@@ -9,7 +9,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { forwardRef, useMemo, useState } from '@wordpress/element';
+import { forwardRef, useEffect, useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -64,7 +64,7 @@ function NavigationMenuSelector(
 				};
 			} ) || []
 		);
-	}, [ currentMenuId ] );
+	}, [ currentMenuId, navigationMenus ] );
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 	const hasClassicMenus = !! classicMenus?.length;
@@ -72,6 +72,14 @@ function NavigationMenuSelector(
 	const showClassicMenus = !! canUserCreateNavigationMenu;
 	const hasManagePermissions =
 		canUserCreateNavigationMenu || canUserUpdateNavigationMenu;
+
+	useEffect( () => {
+		if ( ! ( hasNavigationMenus && hasClassicMenus ) ) {
+			setSelectorLabel( __( 'No menus. Create one?' ) );
+		} else if ( currentMenuId === null ) {
+			setSelectorLabel( __( 'Select another menu' ) );
+		}
+	}, [ currentMenuId, hasNavigationMenus, hasClassicMenus ] );
 
 	// Show the selector if:
 	// - has switch or create permissions and there are block or classic menus.

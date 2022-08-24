@@ -682,7 +682,7 @@ function Navigation( {
 					<PanelBody title={ __( 'Menu' ) }>
 						<NavigationMenuSelector
 							ref={ navigationSelectorRef }
-							currentMenuId={ ref }
+							currentMenuId={ null }
 							clientId={ clientId }
 							onSelectNavigationMenu={ ( menuId ) => {
 								handleUpdateMenu( menuId );
