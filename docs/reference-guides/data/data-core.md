@@ -60,7 +60,7 @@ _Parameters_
 
 _Returns_
 
--   `User[]`: Authors list.
+-   `ET.User[]`: Authors list.
 
 ### getAutosave
 
@@ -140,7 +140,7 @@ _Parameters_
 
 _Returns_
 
--   `User< 'edit' >`: Current user object.
+-   `undefined< 'edit' >`: Current user object.
 
 ### getEditedEntityRecord
 
@@ -155,7 +155,7 @@ _Parameters_
 
 _Returns_
 
--   `EntityRecord | undefined`: The entity record, merged with its edits.
+-   `undefined< EntityRecord > | undefined`: The entity record, merged with its edits.
 
 ### getEmbedPreview
 
@@ -411,7 +411,7 @@ _Parameters_
 
 _Returns_
 
--   `User< 'edit' >[]`: Users list.
+-   `undefined< 'edit' >[]`: Users list.
 
 ### hasEditsForEntityRecord
 

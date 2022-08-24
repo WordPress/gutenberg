@@ -18,7 +18,6 @@ import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
-import type { User, WpTemplate } from './entity-types';
 import type * as ET from './entity-types';
 
 // This is an incomplete, high-level approximation of the State type.
@@ -31,7 +30,7 @@ interface State {
 	blockPatternCategories: Array< unknown >;
 	currentGlobalStylesId: string;
 	currentTheme: string;
-	currentUser: User< 'edit' >;
+	currentUser: ET.User< 'edit' >;
 	embedPreviews: Record< string, { html: string } >;
 	entities: EntitiesState;
 	themeBaseGlobalStyles: Record< string, Object >;
@@ -64,7 +63,7 @@ interface UndoState extends Array< Object > {
 
 interface UserState {
 	queries: Record< string, EntityRecordKey[] >;
-	byId: Record< EntityRecordKey, User< 'edit' > >;
+	byId: Record< EntityRecordKey, ET.User< 'edit' > >;
 }
 
 type Optional< T > = T | undefined;
@@ -111,7 +110,7 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  *               include with request.
  * @return Authors list.
  */
-export function getAuthors( state: State, query?: EntityQuery ): User[] {
+export function getAuthors( state: State, query?: EntityQuery ): ET.User[] {
 	deprecated( "select( 'core' ).getAuthors()", {
 		since: '5.9',
 		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
@@ -131,7 +130,7 @@ export function getAuthors( state: State, query?: EntityQuery ): User[] {
  *
  * @return Current user object.
  */
-export function getCurrentUser( state: State ): User< 'edit' > {
+export function getCurrentUser( state: State ): ET.User< 'edit' > {
 	return state.currentUser;
 }
 
@@ -144,7 +143,7 @@ export function getCurrentUser( state: State ): User< 'edit' > {
  * @return Users list.
  */
 export const getUserQueryResults = createSelector(
-	( state: State, queryID: string ): User< 'edit' >[] => {
+	( state: State, queryID: string ): ET.User< 'edit' >[] => {
 		const queryResults = state.users.queries[ queryID ];
 
 		return map( queryResults, ( id ) => state.users.byId[ id ] );
@@ -665,7 +664,7 @@ export const getEditedEntityRecord = createSelector(
 		kind: string,
 		name: string,
 		recordId: EntityRecordKey
-	): EntityRecord | undefined => ( {
+	): ET.Updatable< EntityRecord > | undefined => ( {
 		...getRawEntityRecord( state, kind, name, recordId ),
 		...getEntityRecordEdits( state, kind, name, recordId ),
 	} ),
@@ -1112,8 +1111,8 @@ export const getReferenceByDistinctEdits = createSelector(
 export function __experimentalGetTemplateForLink(
 	state: State,
 	link: string
-): Optional< WpTemplate > | null {
-	const records = getEntityRecords< WpTemplate >(
+): Optional< ET.Updatable< ET.WpTemplate > > | null {
+	const records = getEntityRecords< ET.WpTemplate >(
 		state,
 		'postType',
 		'wp_template',
@@ -1122,16 +1121,15 @@ export function __experimentalGetTemplateForLink(
 		}
 	);
 
-	const template = records?.length ? records[ 0 ] : null;
-	if ( template ) {
-		return getEditedEntityRecord< WpTemplate, 'edit' >(
+	if ( records?.length ) {
+		return getEditedEntityRecord< ET.WpTemplate >(
 			state,
 			'postType',
 			'wp_template',
-			template.id
+			records[ 0 ].id
 		);
 	}
-	return template;
+	return null;
 }
 
 /**

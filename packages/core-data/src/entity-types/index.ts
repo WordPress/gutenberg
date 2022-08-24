@@ -105,5 +105,3 @@ export interface PerPackageEntityRecords< C extends Context > {
  */
 export type EntityRecord< C extends Context = 'edit' > =
 	PerPackageEntityRecords< C >[ keyof PerPackageEntityRecords< C > ];
-
-export type UpdatableEntityRecord = Updatable< EntityRecord< 'edit' > >;
