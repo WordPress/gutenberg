@@ -22,6 +22,7 @@ import { VStack } from '../v-stack';
 import { Flex, FlexItem } from '../flex';
 import { Truncate } from '../truncate';
 import { ColorHeading } from './styles';
+import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -202,11 +203,13 @@ export default function ColorPalette( {
 	const Component = showMultiplePalettes ? MultiplePalettes : SinglePalette;
 
 	const renderCustomColorPicker = () => (
-		<ColorPicker
-			color={ value }
-			onChange={ ( color ) => onChange( color ) }
-			enableAlpha={ enableAlpha }
-		/>
+		<DropdownContentWrapper paddingSize="none">
+			<ColorPicker
+				color={ value }
+				onChange={ ( color ) => onChange( color ) }
+				enableAlpha={ enableAlpha }
+			/>
+		</DropdownContentWrapper>
 	);
 
 	const colordColor = colord( value );
