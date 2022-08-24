@@ -30,15 +30,15 @@ export default {
 
 		// If a block's block.json skips serialization for spacing or
 		// spacing.blockGap, don't apply the user-defined value to the styles.
-		// const blockGapValue =
-		// 	blockGapStyleValue?.top &&
-		// 	! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
-		// 		? blockGapStyleValue?.top
-		// 		: '';
-
-		// This isn't _quite_ the right fix. We need to account for split values, and reference `top` if it's provided directly.
-		const blockGapValue = blockGapStyleValue;
-		console.log( 'blockGapStyleValue in flow layout', blockGapStyleValue );
+		let blockGapValue = '';
+		if ( ! shouldSkipSerialization( blockName, 'spacing', 'blockGap' ) ) {
+			// If an object is provided only use the 'top' value for this kind of gap.
+			if ( blockGapStyleValue?.top ) {
+				blockGapValue = getGapCSSValue( blockGapStyleValue?.top );
+			} else if ( typeof blockGapStyleValue === 'string' ) {
+				blockGapValue = getGapCSSValue( blockGapStyleValue );
+			}
+		}
 
 		let output = '';
 
