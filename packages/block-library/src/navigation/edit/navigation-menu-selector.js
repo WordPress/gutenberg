@@ -9,7 +9,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { forwardRef, useMemo } from '@wordpress/element';
+import { forwardRef, useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -48,14 +48,14 @@ function NavigationMenuSelector(
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
 
-	let selectorLabel = '';
+	const [ selectorLabel, setSelectorLabel ] = useState( '' );
 
 	const menuChoices = useMemo( () => {
 		return (
 			navigationMenus?.map( ( { id, title } ) => {
 				const label = decodeEntities( title.rendered );
 				if ( id === currentMenuId ) {
-					selectorLabel = label;
+					setSelectorLabel( label );
 				}
 				return {
 					value: id,
@@ -64,7 +64,7 @@ function NavigationMenuSelector(
 				};
 			} ) || []
 		);
-	}, [ navigationMenus ] );
+	}, [ currentMenuId ] );
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 	const hasClassicMenus = !! classicMenus?.length;
