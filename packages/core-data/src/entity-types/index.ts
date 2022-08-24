@@ -56,25 +56,25 @@ export type {
  * import type { Context } from '@wordpress/core-data';
  * // ...
  *
- * interface Order {
+ * interface Client {
  *   id: number;
- *   clientId: number;
+ *   name: string;
  *   // ...
  * }
  *
- * type OrderEntity = {
- *   kind: 'myPlugin';
- *   name: 'order';
- *   recordType: Order;
+ * interface Order< C extends Context > {
+ *   id: number;
+ *   name: string;
+ *   // ...
  * }
  *
  * declare module '@wordpress/core-data' {
- *     export interface PerPackageEntities< C extends Context > {
- *         myPlugin: OrderEntity | ClientEntity
+ *     export interface PerPackageEntityRecords< C extends Context > {
+ *         myPlugin: Client | Order<C>>
  *     }
  * }
  *
- * const c = getEntityRecord( 'myPlugin', 'order', 15 );
+ * const c = getEntityRecord<Order>( 'myPlugin', 'order', 15 );
  * // c is of the type Order
  * ```
  */
