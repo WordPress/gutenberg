@@ -47,8 +47,6 @@ export type TabPanelProps = {
 	/**
 	 * The function called when a tab has been selected.
 	 * It is passed the `tabName` as an argument.
-	 *
-	 * @default `noop`
 	 */
 	onSelect?: ( tabName: string ) => void;
 	/**

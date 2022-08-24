@@ -19,8 +19,6 @@ import type { TabButtonProps, TabPanelProps } from './types';
 import { contextConnect, WordPressComponentProps } from '../ui/context';
 import type { ForwardedRef } from 'react';
 
-const noop = () => {};
-
 const TabButton = ( {
 	tabId,
 	onClick,
@@ -48,7 +46,7 @@ function UnconnectedTabPanel(
 		initialTabName,
 		orientation = 'horizontal',
 		activeClass = 'is-active',
-		onSelect = noop,
+		onSelect,
 	}: WordPressComponentProps< TabPanelProps, 'div', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
@@ -57,7 +55,7 @@ function UnconnectedTabPanel(
 
 	const handleClick = ( tabKey: string ) => {
 		setSelected( tabKey );
-		onSelect( tabKey );
+		onSelect?.( tabKey );
 	};
 
 	const onNavigate = ( _childIndex: number, child: HTMLButtonElement ) => {
