@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ReactNode } from 'react';
+
+/**
  * Internal dependencies
  */
 import type { BaseControlProps } from '../base-control/types';
@@ -10,8 +15,12 @@ export type ToggleControlProps = Pick<
 > &
 	Pick<
 		BaseControlProps,
-		'__nextHasNoMarginBottom' | 'label' | 'help' | 'className'
+		'__nextHasNoMarginBottom' | 'help' | 'className'
 	> & {
+		/**
+		 * The label for the toggle.
+		 */
+		label: ReactNode;
 		/**
 		 * A callback function invoked when the toggle is clicked.
 		 */
