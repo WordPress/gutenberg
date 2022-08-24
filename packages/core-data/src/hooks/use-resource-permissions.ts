@@ -116,20 +116,39 @@ export default function useResourcePermissions< IdType = void >(
 			const { canUser } = resolve( coreStore );
 			const create = canUser( 'create', resource );
 			if ( ! id ) {
+				const read = canUser( 'read', resource );
+
+				const isResolving = create.isResolving || read.isResolving;
+				const hasResolved = create.hasResolved && read.hasResolved;
+				let status = Status.Idle;
+				if ( isResolving ) {
+					status = Status.Resolving;
+				} else if ( hasResolved ) {
+					status = Status.Success;
+				}
+
 				return {
-					status: create.status,
-					isResolving: create.isResolving,
-					hasResolved: create.hasResolved,
+					status,
+					isResolving,
+					hasResolved,
 					canCreate: create.hasResolved && create.data,
+					canRead: read.hasResolved && read.data,
 				};
 			}
 
+			const read = canUser( 'read', resource, id );
 			const update = canUser( 'update', resource, id );
 			const _delete = canUser( 'delete', resource, id );
 			const isResolving =
-				create.isResolving || update.isResolving || _delete.isResolving;
+				read.isResolving ||
+				create.isResolving ||
+				update.isResolving ||
+				_delete.isResolving;
 			const hasResolved =
-				create.hasResolved && update.hasResolved && _delete.hasResolved;
+				read.hasResolved &&
+				create.hasResolved &&
+				update.hasResolved &&
+				_delete.hasResolved;
 
 			let status = Status.Idle;
 			if ( isResolving ) {
@@ -141,6 +160,7 @@ export default function useResourcePermissions< IdType = void >(
 				status,
 				isResolving,
 				hasResolved,
+				canRead: hasResolved && read.data,
 				canCreate: hasResolved && create.data,
 				canUpdate: hasResolved && update.data,
 				canDelete: hasResolved && _delete.data,
@@ -152,7 +172,7 @@ export default function useResourcePermissions< IdType = void >(
 
 export function __experimentalUseResourcePermissions(
 	resource: string,
-	id?: IdType
+	id?: unknown
 ) {
 	deprecated( `wp.data.__experimentalUseResourcePermissions`, {
 		alternative: 'wp.data.useResourcePermissions',
