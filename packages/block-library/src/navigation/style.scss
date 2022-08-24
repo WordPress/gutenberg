@@ -684,6 +684,16 @@ button.wp-block-navigation-item__content {
 	}
 }
 
+.wp-block-navigation__navigation-selector {
+	width: 100%;
+	margin-bottom: $grid-unit-20;
+}
+
+.wp-block-navigation__navigation-selector-button {
+	width: 100%;
+	border: 1px solid;
+}
+
 // Prevent scrolling of the parent content when the modal is open.
 html.has-modal-open {
 	overflow: hidden;

@@ -7,9 +7,9 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useState, useEffect, useRef, Platform } from '@wordpress/element';
+import { addQueryArgs } from '@wordpress/url';
 import {
 	InspectorControls,
-	BlockControls,
 	useBlockProps,
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
@@ -20,7 +20,6 @@ import {
 	getColorClassName,
 	Warning,
 	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
-	__experimentalListView as ListView,
 } from '@wordpress/block-editor';
 import { EntityProvider } from '@wordpress/core-data';
 
@@ -30,9 +29,6 @@ import {
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-	ToolbarGroup,
 	Button,
 	Spinner,
 } from '@wordpress/components';
@@ -606,11 +602,11 @@ function Navigation( {
 	if ( hasUnsavedBlocks ) {
 		return (
 			<TagName { ...blockProps }>
-				<BlockControls>
-					<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
+				<InspectorControls>
+					<PanelBody title={ __( 'Menu' ) }>
 						<NavigationMenuSelector
-							ref={ null }
-							currentMenuId={ null }
+							ref={ navigationSelectorRef }
+							currentMenuId={ ref }
 							clientId={ clientId }
 							onSelectNavigationMenu={ ( menuId ) => {
 								handleUpdateMenu( menuId );
@@ -631,8 +627,16 @@ function Navigation( {
 							actionLabel={ __( "Switch to '%s'" ) }
 							showManageActions
 						/>
-					</ToolbarGroup>
-				</BlockControls>
+						<Button
+							variant="link"
+							href={ addQueryArgs( 'edit.php', {
+								post_type: 'wp_navigation',
+							} ) }
+						>
+							{ __( 'Manage menus' ) }
+						</Button>
+					</PanelBody>
+				</InspectorControls>
 				{ stylingInspectorControls }
 				<ResponsiveWrapper
 					id={ clientId }
@@ -674,8 +678,8 @@ function Navigation( {
 	if ( ref && isNavigationMenuMissing ) {
 		return (
 			<TagName { ...blockProps }>
-				<BlockControls>
-					<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
+				<InspectorControls>
+					<PanelBody title={ __( 'Menu' ) }>
 						<NavigationMenuSelector
 							ref={ navigationSelectorRef }
 							currentMenuId={ ref }
@@ -699,8 +703,16 @@ function Navigation( {
 							actionLabel={ __( "Switch to '%s'" ) }
 							showManageActions
 						/>
-					</ToolbarGroup>
-				</BlockControls>
+						<Button
+							variant="link"
+							href={ addQueryArgs( 'edit.php', {
+								post_type: 'wp_navigation',
+							} ) }
+						>
+							{ __( 'Manage menus' ) }
+						</Button>
+					</PanelBody>
+				</InspectorControls>
 				<Warning>
 					{ __(
 						'Navigation menu has been deleted or is unavailable. '
@@ -774,52 +786,40 @@ function Navigation( {
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider uniqueId={ recursionId }>
-				<BlockControls>
-					{ ! isDraftNavigationMenu && isEntityAvailable && (
-						<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
-							<NavigationMenuSelector
-								ref={ navigationSelectorRef }
-								currentMenuId={ ref }
-								clientId={ clientId }
-								onSelectNavigationMenu={ ( menuId ) => {
-									handleUpdateMenu( menuId );
-									setShouldFocusNavigationSelector( true );
-								} }
-								onSelectClassicMenu={ async ( classicMenu ) => {
-									const navMenu = await convertClassicMenu(
-										classicMenu.id,
-										classicMenu.name
-									);
-									if ( navMenu ) {
-										handleUpdateMenu( navMenu.id );
-										setShouldFocusNavigationSelector(
-											true
-										);
-									}
-								} }
-								onCreateNew={ () =>
-									createNavigationMenu( '', [] )
-								}
-								/* translators: %s: The name of a menu. */
-								actionLabel={ __( "Switch to '%s'" ) }
-								showManageActions
-							/>
-						</ToolbarGroup>
-					) }
-				</BlockControls>
 				<InspectorControls>
-					<ToolsPanel label={ __( 'Menu items' ) }>
-						<ToolsPanelItem
-							hasValue={ () => false }
-							label={ 'Some tool' }
-							onSelect={ () => null }
-							onDeselect={ () => null }
-							isShownByDefault={ false }
+					<PanelBody title={ __( 'Menu' ) }>
+						<NavigationMenuSelector
+							ref={ navigationSelectorRef }
+							currentMenuId={ ref }
+							clientId={ clientId }
+							onSelectNavigationMenu={ ( menuId ) => {
+								handleUpdateMenu( menuId );
+								setShouldFocusNavigationSelector( true );
+							} }
+							onSelectClassicMenu={ async ( classicMenu ) => {
+								const navMenu = await convertClassicMenu(
+									classicMenu.id,
+									classicMenu.name
+								);
+								if ( navMenu ) {
+									handleUpdateMenu( navMenu.id );
+									setShouldFocusNavigationSelector( true );
+								}
+							} }
+							onCreateNew={ () => createNavigationMenu( '', [] ) }
+							/* translators: %s: The name of a menu. */
+							actionLabel={ __( "Switch to '%s'" ) }
+							showManageActions
+						/>
+						<Button
+							variant="link"
+							href={ addQueryArgs( 'edit.php', {
+								post_type: 'wp_navigation',
+							} ) }
 						>
-							<p>What?</p>
-						</ToolsPanelItem>
-						<ListView blocks={ innerBlocks } />
-					</ToolsPanel>
+							{ __( 'Manage menus' ) }
+						</Button>
+					</PanelBody>
 				</InspectorControls>
 				{ stylingInspectorControls }
 				{ isEntityAvailable && (

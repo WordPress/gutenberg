@@ -5,11 +5,10 @@ import {
 	MenuGroup,
 	MenuItem,
 	MenuItemsChoice,
-	ToolbarDropdownMenu,
+	DropdownMenu,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { addQueryArgs } from '@wordpress/url';
 import { forwardRef, useMemo } from '@wordpress/element';
 
 /**
@@ -33,6 +32,11 @@ function NavigationMenuSelector(
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
 
+	toggleProps = {
+		...toggleProps,
+		className: 'wp-block-navigation__navigation-selector-button',
+	};
+
 	actionLabel = actionLabel || createActionLabel;
 
 	const { menus: classicMenus } = useNavigationEntities();
@@ -44,10 +48,15 @@ function NavigationMenuSelector(
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
 
+	let selectorLabel = '';
+
 	const menuChoices = useMemo( () => {
 		return (
 			navigationMenus?.map( ( { id, title } ) => {
 				const label = decodeEntities( title.rendered );
+				if ( id === currentMenuId ) {
+					selectorLabel = label;
+				}
 				return {
 					value: id,
 					label,
@@ -77,10 +86,11 @@ function NavigationMenuSelector(
 	}
 
 	return (
-		<ToolbarDropdownMenu
+		<DropdownMenu
+			className="wp-block-navigation__navigation-selector"
 			ref={ forwardedRef }
-			label={ __( 'Select Menu' ) }
-			text={ __( 'Select Menu' ) }
+			label={ selectorLabel }
+			text={ selectorLabel }
 			icon={ null }
 			toggleProps={ toggleProps }
 		>
@@ -128,18 +138,11 @@ function NavigationMenuSelector(
 									{ __( 'Create new menu' ) }
 								</MenuItem>
 							) }
-							<MenuItem
-								href={ addQueryArgs( 'edit.php', {
-									post_type: 'wp_navigation',
-								} ) }
-							>
-								{ __( 'Manage menus' ) }
-							</MenuItem>
 						</MenuGroup>
 					) }
 				</>
 			) }
-		</ToolbarDropdownMenu>
+		</DropdownMenu>
 	);
 }
 
