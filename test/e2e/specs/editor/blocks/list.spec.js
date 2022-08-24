@@ -680,6 +680,9 @@ test.describe( 'List', () => {
 <!-- /wp:list -->`
 		);
 
+		// To do: investigate why the toolbar is not showing up right after
+		// outdenting.
+		await page.keyboard.press( 'ArrowUp' );
 		await editor.clickBlockToolbarButton( 'Outdent' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
