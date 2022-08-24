@@ -6,7 +6,18 @@ import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 /**
  * Internal dependencies
  */
-import { gotoStoryId, waitForFMAnimation } from '../utils';
+import { gotoStoryId } from '../utils';
+
+const waitUntilButtonHighlightStable = async ( page ) => {
+	const handle = await page
+		.locator( '[aria-label="Font size"] > div[role=presentation]' )
+		.elementHandle();
+
+	await handle?.waitForElementState( 'visible' );
+	await handle?.waitForElementState( 'stable' );
+
+	return handle;
+};
 
 test.describe.parallel( 'FontSizePicker', () => {
 	test.beforeEach( async ( { page } ) => {
@@ -16,7 +27,8 @@ test.describe.parallel( 'FontSizePicker', () => {
 	test( 'Renders with "Normal" size by default', async ( { page } ) => {
 		const button = await page.locator( 'button[aria-label="Normal"]' );
 
-		await waitForFMAnimation( { page } );
+		await waitUntilButtonHighlightStable( page );
+
 		expect( button ).toHaveAttribute( 'aria-checked', 'true' );
 		expect( await page.screenshot() ).toMatchSnapshot();
 	} );
@@ -25,8 +37,8 @@ test.describe.parallel( 'FontSizePicker', () => {
 		const button = await page.locator( 'button[aria-label="Small"]' );
 
 		await button.click();
+		await waitUntilButtonHighlightStable( page );
 
-		await waitForFMAnimation( { page } );
 		expect( button ).toHaveAttribute( 'aria-checked', 'true' );
 		expect( await page.screenshot() ).toMatchSnapshot();
 	} );
@@ -35,8 +47,8 @@ test.describe.parallel( 'FontSizePicker', () => {
 		const button = await page.locator( 'button[aria-label="Big"]' );
 
 		await button.click();
+		await waitUntilButtonHighlightStable( page );
 
-		await waitForFMAnimation( { page } );
 		expect( button ).toHaveAttribute( 'aria-checked', 'true' );
 		expect( await page.screenshot() ).toMatchSnapshot();
 	} );
@@ -45,8 +57,8 @@ test.describe.parallel( 'FontSizePicker', () => {
 		const button = await page.locator( 'button[aria-label="Normal"]' );
 
 		await button.click();
+		await waitUntilButtonHighlightStable( page );
 
-		await waitForFMAnimation( { page } );
 		expect( button ).toHaveAttribute( 'aria-checked', 'true' );
 		expect( await page.screenshot() ).toMatchSnapshot();
 	} );
