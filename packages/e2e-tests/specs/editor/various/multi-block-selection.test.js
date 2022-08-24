@@ -398,6 +398,9 @@ describe( 'Multi-block selection', () => {
 			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Group')]`
 		);
 		await page.keyboard.press( 'Enter' );
+		await page.click(
+			'[aria-label="Skip selection and choose default block variation."]'
+		);
 
 		const groupAppender = await page.waitForSelector(
 			'.block-editor-button-block-appender'
