@@ -50,14 +50,18 @@ export type UseSelectReturn< F extends MapSelect | StoreDescriptor< any > > =
 		? CurriedSelectorsOf< F >
 		: never;
 
-export type UseDispatchReturn< S extends undefined | StoreDescriptor< any > > =
-	S extends StoreDescriptor< any >
-		? ActionCreatorsOf< ConfigOf< S > >
-		: < T >(
-				store: T
-		  ) => T extends StoreDescriptor< any >
-				? ActionCreatorsOf< ConfigOf< T > >
-				: any;
+export type UseDispatchReturn< StoreNameOrDescriptor > =
+	StoreNameOrDescriptor extends StoreDescriptor< any >
+		? ActionCreatorsOf< ConfigOf< StoreNameOrDescriptor > >
+		: StoreNameOrDescriptor extends undefined
+		? DispatchFunction
+		: any;
+
+export type DispatchFunction = < StoreNameOrDescriptor >(
+	store: StoreNameOrDescriptor
+) => StoreNameOrDescriptor extends StoreDescriptor< any >
+	? ActionCreatorsOf< ConfigOf< StoreNameOrDescriptor > >
+	: any;
 
 export type MapSelect = ( select: SelectFunction ) => any;
 
