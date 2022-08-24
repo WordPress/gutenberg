@@ -1,4 +1,4 @@
-name: 'Mark old issues as needs confirmation'
+name: 'Mark old flaky tests issues as stale'
 on:
     schedule:
         - cron: '45 1 * * *'
