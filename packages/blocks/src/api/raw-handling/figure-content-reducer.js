@@ -20,11 +20,7 @@ function isFigureContent( node, schema ) {
 		return false;
 	}
 
-	return (
-		'figure' in schema &&
-		'children' in schema.figure &&
-		tag in schema.figure.children
-	);
+	return tag in ( schema?.figure?.children ?? {} );
 }
 
 /**
@@ -38,13 +34,7 @@ function isFigureContent( node, schema ) {
 function canHaveAnchor( node, schema ) {
 	const tag = node.nodeName.toLowerCase();
 
-	return (
-		'figure' in schema &&
-		'children' in schema.figure &&
-		'a' in schema.figure.children &&
-		'children' in schema.figure.children.a &&
-		tag in schema.figure.children.a.children
-	);
+	return tag in ( schema?.figure?.children?.a?.children ?? {} );
 }
 
 /**
