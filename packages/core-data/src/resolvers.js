@@ -283,29 +283,24 @@ export const canUser =
 	async ( { dispatch, registry } ) => {
 		const { hasStartedResolution } = registry.select( STORE_NAME );
 
-		let resourcePath;
-		let retrievedActions;
-		if ( id ) {
-			retrievedActions = [ 'create', 'read', 'update', 'delete' ];
-			resourcePath = `${ resource }/${ id }`;
+		const resourcePath = id ? `${ resource }/${ id }` : resource;
+		const retrievedActions = id
+			? [ 'create', 'read', 'update', 'delete' ]
+			: [ 'create', 'read' ];
 
-			// Prevent resolving the same resource twice.
-			for ( const relatedAction of retrievedActions ) {
-				if ( relatedAction === requestedAction ) {
-					continue;
-				}
-				const isAlreadyResolving = hasStartedResolution( 'canUser', [
-					relatedAction,
-					resource,
-					id,
-				] );
-				if ( isAlreadyResolving ) {
-					return;
-				}
+		// Prevent resolving the same resource twice.
+		for ( const relatedAction of retrievedActions ) {
+			if ( relatedAction === requestedAction ) {
+				continue;
 			}
-		} else {
-			retrievedActions = [ 'create', 'read' ];
-			resourcePath = resource;
+			const isAlreadyResolving = hasStartedResolution( 'canUser', [
+				relatedAction,
+				resource,
+				id,
+			] );
+			if ( isAlreadyResolving ) {
+				return;
+			}
 		}
 
 		if ( ! retrievedActions.includes( requestedAction ) ) {

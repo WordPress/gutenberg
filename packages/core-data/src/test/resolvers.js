@@ -397,6 +397,36 @@ describe( 'canUser', () => {
 
 		registry = {
 			select: () => ( {
+				hasStartedResolution: ( _, [ action ] ) => action === 'read',
+			} ),
+		};
+
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map( [ [ 'allow', 'POST, GET' ] ] ),
+		} ) );
+
+		await canUser( 'create', 'blocks' )( { dispatch, registry } );
+		await canUser( 'read', 'blocks' )( { dispatch, registry } );
+
+		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/blocks',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'read/blocks',
+			true
+		);
+	} );
+
+	it( 'runs apiFetch only once per resource ID', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveUserPermission: jest.fn(),
+		} );
+
+		registry = {
+			select: () => ( {
 				hasStartedResolution: ( _, [ action ] ) => action === 'create',
 			} ),
 		};
