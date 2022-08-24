@@ -15,7 +15,6 @@ import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-
 // down the toolbar will stay on screen by adopting a sticky position at the
 // top of the viewport.
 const DEFAULT_PROPS = {
-	resize: false,
 	flip: false,
 	__unstableShift: true,
 };
@@ -26,7 +25,6 @@ const DEFAULT_PROPS = {
 // the block. This only happens if the block is smaller than the viewport, as
 // otherwise the toolbar will be off-screen.
 const RESTRICTED_HEIGHT_PROPS = {
-	resize: false,
 	flip: true,
 	__unstableShift: false,
 };
