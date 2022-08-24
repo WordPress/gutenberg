@@ -166,17 +166,16 @@ if ( ! function_exists( 'wp_enqueue_webfont' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wp_enqueue_web_font_variations' ) ) {
+if ( ! function_exists( 'wp_enqueue_webfont_variations' ) ) {
 	/**
 	 * Enqueues a specific set of web font variations.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param string|string[] $variation_handles Variation handle (string) or handles (array of strings).
 	 */
-	function wp_enqueue_web_font_variations( $variations ) {
-		$wp_webfonts = wp_webfonts();
-
-		// Looking to enqueue all variations of a font family.
-		foreach ( $variations as $variation ) {
-			$wp_webfonts->enqueue( $variation );
-		}
+	function wp_enqueue_webfont_variations( $variation_handles ) {
+		wp_webfonts()->enqueue( $variation_handles );
 	}
 }
 

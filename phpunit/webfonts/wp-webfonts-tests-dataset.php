@@ -439,14 +439,14 @@ trait WP_Webfonts_Tests_Datasets {
 	public function data_enqueue() {
 		return array(
 			'1 font-family'   => array(
-				'font_family'                     => 'lato',
+				'handles'                         => 'lato',
 				'expected_queue'                  => array( 'lato' ),
 				'expected_queued_before_register' => array(
 					'lato' => null,
 				),
 			),
 			'2 font families' => array(
-				'font_family'                     => array( 'merriweather', 'my-font' ),
+				'handles'                         => array( 'merriweather', 'my-font' ),
 				'expected_queue'                  => array( 'merriweather', 'my-font' ),
 				'expected_queued_before_register' => array(
 					'merriweather' => null,
@@ -454,12 +454,45 @@ trait WP_Webfonts_Tests_Datasets {
 				),
 			),
 			'3 font families' => array(
-				'font_family'                     => array( 'merriweather', 'my-font', 'Source Serif Pro' ),
+				'handles'                         => array( 'merriweather', 'my-font', 'Source Serif Pro' ),
 				'expected_queue'                  => array( 'merriweather', 'my-font', 'Source Serif Pro' ),
 				'expected_queued_before_register' => array(
 					'merriweather'     => null,
 					'my-font'          => null,
 					'Source Serif Pro' => null,
+				),
+			),
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_enqueue_variations() {
+		return array(
+			'1 variation'                               => array(
+				'handles'                         => array( 'my-font-300-normal' ),
+				'expected_queue'                  => array( 'my-font-300-normal' ),
+				'expected_queued_before_register' => array(
+					'my-font-300-normal' => null,
+				),
+			),
+			'1 variation from different font families'  => array(
+				'handles'                         => array( 'merriweather-200-900-normal', 'my-font-300-normal' ),
+				'expected_queue'                  => array( 'merriweather-200-900-normal', 'my-font-300-normal' ),
+				'expected_queued_before_register' => array(
+					'merriweather-200-900-normal' => null,
+					'my-font-300-normal'          => null,
+				),
+			),
+			'enqueue one variation and its font family' => array(
+				'handles'                         => array( 'merriweather', 'merriweather-200-900-normal' ),
+				'expected_queue'                  => array( 'merriweather', 'merriweather-200-900-normal' ),
+				'expected_queued_before_register' => array(
+					'merriweather'                => null,
+					'merriweather-200-900-normal' => null,
 				),
 			),
 		);
