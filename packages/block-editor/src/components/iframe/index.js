@@ -294,9 +294,9 @@ function Iframe(
 							<head ref={ headRef }>
 								{ head }
 								<style>
-									{ `html { transition: padding 0.3s, background 0.3s; ${
+									{ `html { transition: background 0.3s; ${
 										isZoomedOut
-											? `background: #2f2f2f; padding: 100px 0;`
+											? `background: #2f2f2f;`
 											: ''
 									} }` }
 								</style>
@@ -315,9 +315,10 @@ function Iframe(
 									isZoomedOut
 										? {
 												// This is the remaining percentage from the scaling down
-												// of the iframe body(`scale(0.45)`).
+												// of the iframe body(`scale(0.45)`). We also need to subtract
+												// the body's bottom margin.
 												marginBottom: `-${
-													contentHeight * 0.55
+													contentHeight * 0.55 - 100
 												}px`,
 										  }
 										: {}
