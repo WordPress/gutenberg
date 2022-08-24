@@ -49,9 +49,9 @@ import {
 	placementToMotionAnimationProps,
 } from './utils';
 import {
-	useRootDocumentContext,
-	RootDocumentProvider,
-} from './root-document-context';
+	useRootReferenceDocument,
+	RootReferenceDocumentProvider,
+} from './root-reference-document-context';
 
 /**
  * Name of slot in which popover should fill.
@@ -438,7 +438,7 @@ const Popover = (
 	// position. This covers cases where a popover is a child of another
 	// popover, and the first popover in the chain references an element
 	// in an iframe.
-	const rootReferenceDocument = useRootDocumentContext();
+	const rootReferenceDocument = useRootReferenceDocument();
 	useLayoutEffect( () => {
 		// Return early if the root document is the same as the owner document,
 		// as the scroll event will be listened to in other code.
@@ -467,7 +467,7 @@ const Popover = (
 	] );
 
 	let content = (
-		<RootDocumentProvider
+		<RootReferenceDocumentProvider
 			// Don't overwrite the root document if it's already set.
 			value={ rootReferenceDocument ?? referenceOwnerDocument }
 		>
@@ -533,7 +533,7 @@ const Popover = (
 					</div>
 				) }
 			</MaybeAnimatedWrapper>
-		</RootDocumentProvider>
+		</RootReferenceDocumentProvider>
 	);
 
 	if ( slot.ref ) {
