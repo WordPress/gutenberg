@@ -28,3 +28,6 @@ const CustomGradientPickerWithState = ( props ) => {
 };
 
 export const Default = CustomGradientPickerWithState.bind( {} );
+Default.args = {
+	__nextHasNoMargin: true,
+};
