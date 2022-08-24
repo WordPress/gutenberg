@@ -33,4 +33,4 @@ phpunit.xml
 phpunit-watcher.yml
 .tool-versions
 test/storybook-playwright/test-results
-test/storybook-playwright/index.spec.ts-snapshots
+test/storybook-playwright/specs/__snapshots__

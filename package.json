@@ -290,6 +290,7 @@
 		"storybook:build": "build-storybook -c ./storybook -o ./storybook/build",
 		"prestorybook:dev": "npm run build:packages",
 		"storybook:dev": "concurrently \"npm run dev:packages\" \"start-storybook -c ./storybook -p 50240\"",
+		"storybook:e2e:dev": "concurrently \"npm run dev:packages\" \"start-storybook -c test/storybook-playwright/storybook -p 50241\"",
 		"test": "npm-run-all lint test:unit",
 		"test:create-block": "bash ./bin/test-create-block.sh",
 		"test:e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
