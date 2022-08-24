@@ -158,7 +158,8 @@ export function GapEdit( props ) {
 		// If splitOnAxis activated we need to return a BoxControl object to the BoxControl component.
 		if ( !! next && splitOnAxis ) {
 			blockGap = { ...getGapBoxControlValueFromStyle( next ) };
-		} else if ( !! next && next.hasOwnProperty( 'top' ) ) {
+		} else if ( next?.hasOwnProperty( 'top' ) ) {
+			// If splitOnAxis is not enabled, treat the 'top' value as the shorthand gap value.
 			blockGap = next.top;
 		}
 
@@ -233,7 +234,7 @@ export function GapEdit( props ) {
 						values={ boxControlGapValue }
 						onChange={ onChange }
 						label={ __( 'Block spacing' ) }
-						sides={ splitOnAxis ? sides : [ 'top' ] }
+						sides={ splitOnAxis ? sides : [ 'top' ] } // Use 'top' as the shorthand property in non-axial configurations.
 						units={ units }
 						allowReset={ false }
 						splitOnAxis={ splitOnAxis }
