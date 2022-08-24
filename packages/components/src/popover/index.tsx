@@ -10,7 +10,6 @@ import {
 	autoUpdate,
 	arrow,
 	offset as offsetMiddleware,
-	limitShift,
 	size,
 	Middleware,
 } from '@floating-ui/react-dom';
@@ -67,6 +66,7 @@ import type {
 	PopoverAnchorRefReference,
 	PopoverAnchorRefTopBottom,
 } from './types';
+import { limitShift as customLimitShift } from './limit-shift';
 
 /**
  * Name of slot in which popover should fill.
@@ -338,42 +338,7 @@ const UnforwardedPopover = (
 		shouldShift
 			? shiftMiddleware( {
 					crossAxis: true,
-					limiter: limitShift( {
-						offset: ( { placement: currentPlacement } ) => {
-							// The following calculations are aimed at allowing the floating
-							// element to shift fully below the reference element, when the
-							// reference element is in a different document (i.e. an iFrame).
-							if (
-								referenceOwnerDocument === document ||
-								frameOffsetRef.current === undefined
-							) {
-								return 0;
-							}
-
-							// The main axis (according to floating UI's docs) is the "x" axis
-							// for 'top' and 'bottom' placements, and the "y" axis for 'left'
-							// and 'right' placements.
-							const mainAxis = isTopBottomPlacement(
-								currentPlacement
-							)
-								? 'x'
-								: 'y';
-							const crossAxis = mainAxis === 'x' ? 'y' : 'x';
-
-							const crossAxisModifier = hasBeforePlacement(
-								currentPlacement
-							)
-								? -1
-								: 1;
-
-							return {
-								mainAxis: -frameOffsetRef.current[ mainAxis ],
-								crossAxis:
-									crossAxisModifier *
-									frameOffsetRef.current[ crossAxis ],
-							};
-						},
-					} ),
+					limiter: customLimitShift(),
 					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
 			  } )
 			: undefined,
