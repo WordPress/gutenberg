@@ -83,6 +83,7 @@
 ### Experimental
 
 -   `FormTokenField`: add `__experimentalAutoSelectFirstMatch` prop to auto select the first matching suggestion on typing ([#42527](https://github.com/WordPress/gutenberg/pull/42527/)).
+-   `Popover`: Refactor `__unstableForcePosition` to separate `__unstableFlip` and `__unstableResize` props ([#43546](https://github.com/WordPress/gutenberg/pull/43546/)).
 
 ## 19.17.0 (2022-08-10)
 
