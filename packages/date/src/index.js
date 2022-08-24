@@ -580,6 +580,7 @@ function buildMoment( dateValue, timezone = '' ) {
 	const dateMoment = momentLib( dateValue );
 
 	if ( timezone && ! isUTCOffset( timezone ) ) {
+		// The ! isUTCOffset() check guarantees that timezone is a string.
 		return dateMoment.tz( /** @type {string} */ ( timezone ) );
 	}
 
