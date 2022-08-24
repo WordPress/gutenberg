@@ -37,28 +37,25 @@ export default function useSelectAll() {
 				return;
 			}
 
+			event.preventDefault();
+
 			const [ firstSelectedClientId ] = selectedClientIds;
 			const rootClientId = getBlockRootClientId( firstSelectedClientId );
-			let blockClientIds = getBlockOrder( rootClientId );
+			const blockClientIds = getBlockOrder( rootClientId );
 
 			// If we have selected all sibling nested blocks, try selecting up a
 			// level. See: https://github.com/WordPress/gutenberg/pull/31859/
 			if ( selectedClientIds.length === blockClientIds.length ) {
-				blockClientIds = getBlockOrder(
-					getBlockRootClientId( rootClientId )
-				);
-			}
-
-			const firstClientId = first( blockClientIds );
-			const lastClientId = last( blockClientIds );
-
-			if ( firstClientId === lastClientId ) {
-				selectBlock( firstClientId );
+				if ( rootClientId ) {
+					node.ownerDocument.defaultView
+						.getSelection()
+						.removeAllRanges();
+					selectBlock( rootClientId );
+				}
 				return;
 			}
 
-			multiSelect( firstClientId, lastClientId );
-			event.preventDefault();
+			multiSelect( first( blockClientIds ), last( blockClientIds ) );
 		}
 
 		node.addEventListener( 'keydown', onKeyDown );
