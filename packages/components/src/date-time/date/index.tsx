@@ -292,12 +292,14 @@ function Day( {
 
 	// Focus the day when it becomes focusable, e.g. because an arrow key is
 	// pressed. Only do this if focus is allowed - this stops us stealing focus
-	// from e.g. a TimePicker input. Note that isFocusAllowed is not a dep as
-	// there is no point calling focus() on an already focused element.
+	// from e.g. a TimePicker input.
 	useEffect( () => {
 		if ( ref.current && isFocusable && isFocusAllowed ) {
 			ref.current.focus();
 		}
+		// isFocusAllowed is not a dep as there is no point calling focus() on
+		// an already focused element.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ isFocusable ] );
 
 	return (
