@@ -55,6 +55,7 @@
 			}
 		},
 		"typography": {
+			"__experimentalSkipSerialization": true,
 			"fontSize": true,
 			"lineHeight": true,
 			"__experimentalFontFamily": true,

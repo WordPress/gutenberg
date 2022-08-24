@@ -51,9 +51,10 @@ function render_block_core_search( $attributes ) {
 	);
 	if ( $show_label && ! empty( $attributes['label'] ) ) {
 		$label_markup = sprintf(
-			'<label for="%1$s" class="wp-block-search__label">%2$s</label>',
+			'<label for="%1$s" class="wp-block-search__label" %2$s>%3$s</label>',
 			$input_id,
-			$label_inner_html
+			$inline_styles['label'],
+			$label_inner_html,
 		);
 	}
 
@@ -270,8 +271,10 @@ function styles_for_block_core_search( $attributes ) {
 	$wrapper_styles   = array();
 	$button_styles    = array();
 	$input_styles     = array();
+	$label_styles     = array();
 	$is_button_inside = ! empty( $attributes['buttonPosition'] ) &&
 		'button-inside' === $attributes['buttonPosition'];
+	$show_label       = ( isset( $attributes['showLabel'] ) ) && false !== $attributes['showLabel'];
 
 	// Add width styles.
 	$has_width   = ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] );
@@ -360,10 +363,92 @@ function styles_for_block_core_search( $attributes ) {
 		$button_styles[] = sprintf( 'background: %s;', $attributes['style']['color']['gradient'] );
 	}
 
+	// Add typography styles.
+	$has_font_size = ! empty( $attributes['style']['typography']['fontSize'] );
+	if ( $has_font_size ) {
+		$font_size_value = sprintf( 'font-size: %s;', esc_attr( $attributes['style']['typography']['fontSize'] ) );
+		$button_styles[] = $font_size_value;
+		$input_styles[]  = $font_size_value;
+		if ( $show_label ) {
+			$label_styles[] = $font_size_value;
+		}
+	}
+
+	$has_font_family = ! empty( $attributes['style']['typography']['fontFamily'] );
+	if ( $has_font_family ) {
+		$font_family_value = sprintf( 'font-family: %s;', esc_attr( $attributes['style']['typography']['fontFamily'] ) );
+		$button_styles[]   = $font_family_value;
+		$input_styles[]    = $font_family_value;
+		if ( $show_label ) {
+			$label_styles[] = $font_family_value;
+		}
+	}
+
+	$has_letter_spacing = ! empty( $attributes['style']['typography']['letterSpacing'] );
+	if ( $has_letter_spacing ) {
+		$letter_spacing_value = sprintf( 'letter-spacing: %s;', esc_attr( $attributes['style']['typography']['letterSpacing'] ) );
+		$button_styles[]      = $letter_spacing_value;
+		$input_styles[]       = $letter_spacing_value;
+		if ( $show_label ) {
+			$label_styles[] = $letter_spacing_value;
+		}
+	}
+
+	$has_font_weight = ! empty( $attributes['style']['typography']['fontWeight'] );
+	if ( $has_font_weight ) {
+		$font_weight_value = sprintf( 'font-weight: %s;', esc_attr( $attributes['style']['typography']['fontWeight'] ) );
+		$button_styles[]   = $font_weight_value;
+		$input_styles[]    = $font_weight_value;
+		if ( $show_label ) {
+			$label_styles[] = $font_weight_value;
+		}
+	}
+
+	$has_font_style = ! empty( $attributes['style']['typography']['fontStyle'] );
+	if ( $has_font_style ) {
+		$font_style_value = sprintf( 'font-style: %s;', esc_attr( $attributes['style']['typography']['fontStyle'] ) );
+		$button_styles[]  = $font_style_value;
+		$input_styles[]   = $font_style_value;
+		if ( $show_label ) {
+			$label_styles[] = $font_style_value;
+		}
+	}
+
+	$has_line_height = ! empty( $attributes['style']['typography']['lineHeight'] );
+	if ( $has_line_height ) {
+		$line_height_value = sprintf( 'line-height: %s;', esc_attr( $attributes['style']['typography']['lineHeight'] ) );
+		$button_styles[]   = $line_height_value;
+		$input_styles[]    = $line_height_value;
+		if ( $show_label ) {
+			$label_styles[] = $line_height_value;
+		}
+	}
+
+	$has_text_transform = ! empty( $attributes['style']['typography']['textTransform'] );
+	if ( $has_text_transform ) {
+		$text_transform_value = sprintf( 'text-transform: %s;', esc_attr( $attributes['style']['typography']['textTransform'] ) );
+		$button_styles[]      = $text_transform_value;
+		$input_styles[]       = $text_transform_value;
+		if ( $show_label ) {
+			$label_styles[] = $text_transform_value;
+		}
+	}
+
+	$has_text_decoration = ! empty( $attributes['style']['typography']['textDecoration'] );
+	if ( $has_text_decoration ) {
+		$text_decoration_value = sprintf( 'text-decoration: %s;', esc_attr( $attributes['style']['typography']['textDecoration'] ) );
+		$button_styles[]       = $text_decoration_value;
+		// Input opts out of text decoration.
+		if ( $show_label ) {
+			$label_styles[] = $text_decoration_value;
+		}
+	}
+
 	return array(
 		'input'   => ! empty( $input_styles ) ? sprintf( ' style="%s"', safecss_filter_attr( implode( ' ', $input_styles ) ) ) : '',
 		'button'  => ! empty( $button_styles ) ? sprintf( ' style="%s"', safecss_filter_attr( implode( ' ', $button_styles ) ) ) : '',
 		'wrapper' => ! empty( $wrapper_styles ) ? sprintf( ' style="%s"', safecss_filter_attr( implode( ' ', $wrapper_styles ) ) ) : '',
+		'label'   => ! empty( $label_styles ) ? sprintf( ' style="%s"', safecss_filter_attr( implode( ' ', $label_styles ) ) ) : '',
 	);
 }
 

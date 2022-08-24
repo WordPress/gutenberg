@@ -13,6 +13,7 @@ import {
 	RichText,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
+	__experimentalGetTypographyClassesAndStyles as useTypographyProps,
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
@@ -112,6 +113,7 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
+	const typographyProps = useTypographyProps( attributes );
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 	const isButtonPositionInside = 'button-inside' === buttonPosition;
@@ -208,11 +210,19 @@ export default function SearchEdit( {
 		// If the input is inside the wrapper, the wrapper gets the border color styles/classes, not the input control.
 		const textFieldClasses = classnames(
 			'wp-block-search__input',
-			isButtonPositionInside ? undefined : borderProps.className
+			isButtonPositionInside ? undefined : borderProps.className,
+			typographyProps.className
 		);
-		const textFieldStyles = isButtonPositionInside
-			? { borderRadius }
-			: borderProps.style;
+		const textFieldStyles = {
+			...{
+				...typographyProps.style,
+				// Input opts out of text decoration.
+				textDecoration: undefined,
+			},
+			...( isButtonPositionInside
+				? { borderRadius }
+				: borderProps.style ),
+		};
 
 		return (
 			<input
@@ -239,12 +249,14 @@ export default function SearchEdit( {
 		const buttonClasses = classnames(
 			'wp-block-search__button',
 			colorProps.className,
+			typographyProps.className,
 			isButtonPositionInside ? undefined : borderProps.className,
 			buttonUseIcon ? 'has-icon' : undefined,
 			__experimentalGetElementClassName( 'button' )
 		);
 		const buttonStyles = {
 			...colorProps.style,
+			...typographyProps.style,
 			...( isButtonPositionInside
 				? { borderRadius }
 				: borderProps.style ),
@@ -451,12 +463,13 @@ export default function SearchEdit( {
 
 			{ showLabel && (
 				<RichText
-					className="wp-block-search__label"
+					className={ `wp-block-search__label ${ typographyProps.className }` }
 					aria-label={ __( 'Label text' ) }
 					placeholder={ __( 'Add label…' ) }
 					withoutInteractiveFormatting
 					value={ label }
 					onChange={ ( html ) => setAttributes( { label: html } ) }
+					style={ { ...typographyProps.style } }
 				/>
 			) }
 
