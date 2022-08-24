@@ -15,6 +15,13 @@ import { useSelect } from '@wordpress/data';
 import styles from './style.scss';
 import BlockListBlock from './block';
 
+/**
+ * NOTE: This is a component currently used by the List block (V2)
+ * It only passes the needed props for this block, if other blocks will use it
+ * make sure you pass other props that might be required coming from:
+ * components/inner-blocks/index.native.js
+ */
+
 function BlockListCompact( props ) {
 	const {
 		marginHorizontal = styles.defaultBlock.marginLeft,
