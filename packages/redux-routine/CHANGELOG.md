@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.16.0 (2022-08-24)
+
 ### Bug Fix
 
 -   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
