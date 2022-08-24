@@ -9,11 +9,10 @@ import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 import { gotoStoryId } from '../utils';
 
 const waitUntilButtonHighlightStable = async ( page ) => {
-	const handle = await page
-		.locator( '[aria-label="Font size"] > div[role=presentation]' )
-		.elementHandle();
+	const handle = await page.waitForSelector(
+		'[aria-label="Font size"] > div[role=presentation]'
+	);
 
-	await handle?.waitForElementState( 'visible' );
 	await handle?.waitForElementState( 'stable' );
 
 	return handle;
