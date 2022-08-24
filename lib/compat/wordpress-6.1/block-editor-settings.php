@@ -168,6 +168,19 @@ function gutenberg_get_block_editor_settings( $settings ) {
 			);
 	}
 
+	$settings['__experimentalFeatures']['blocks']['core/media-text']['core/heading']['color']['palette']['theme'] = [
+		[
+			'slug' => 'layer-accent-blue',
+			'color' => 'var(--wp--custom--layer--accent--blue)',
+			'name' => 'blue accent',
+		],
+		[
+			'slug' => 'layer-accent-orange',
+			'color' => 'var(--wp--custom--layer--accent--orange)',
+			'name' => 'orange accent',
+		],
+	];
+
 	$settings['localAutosaveInterval'] = 15;
 	$settings['disableLayoutStyles']   = current_theme_supports( 'disable-layout-styles' );
 

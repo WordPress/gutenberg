@@ -121,10 +121,12 @@ export default function useSetting( path ) {
 
 			let result;
 			const normalizedPath = removeCustomPrefixes( path );
+			const blockParentIds =
+				select( blockEditorStore ).getBlockParents( clientId );
 
 			// 1. Take settings from the block instance or its ancestors.
 			const candidates = [
-				...select( blockEditorStore ).getBlockParents( clientId ),
+				...blockParentIds,
 				clientId, // The current block is added last, so it overwrites any ancestor.
 			];
 			candidates.forEach( ( candidateClientId ) => {
@@ -157,6 +159,30 @@ export default function useSetting( path ) {
 
 			// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
 			const settings = select( blockEditorStore ).getSettings();
+
+			// 2.1 Check for nested parent block settings
+			if ( result === undefined ) {
+				// Pull nested settings from parent blocks first.
+				// Needs some work:
+				//   - Can only handle one layer of nesting
+				//   - No CSS-like specificity rules for determining winner if a block is nested in multiple places
+				//   - No tests
+
+				blockParentIds.forEach( ( blockParentId ) => {
+					const parentBlockName =
+						select( blockEditorStore ).getBlockName(
+							blockParentId
+						);
+					const candidateNestedPath = `__experimentalFeatures.blocks.${ parentBlockName }.${ blockName }.${ normalizedPath }`;
+					const nestedResult = get( settings, candidateNestedPath );
+
+					if ( nestedResult !== undefined ) {
+						result = nestedResult;
+					}
+				} );
+			}
+
+			// 2.2 Default to top-level settings from the block editor store
 			if ( result === undefined ) {
 				const defaultsPath = `__experimentalFeatures.${ normalizedPath }`;
 				const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ normalizedPath }`;
