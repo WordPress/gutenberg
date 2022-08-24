@@ -117,9 +117,9 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 
 	return (
 		<div className={ classes }>
-			{ ! isMultiToolbar && ! displayHeaderToolbar && (
-				<BlockParentSelector />
-			) }
+			{ ! isMultiToolbar &&
+				! displayHeaderToolbar &&
+				! isContentLocked && <BlockParentSelector /> }
 			<div ref={ nodeRef } { ...showMoversGestures }>
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
 					! isContentLocked && (

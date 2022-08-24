@@ -104,7 +104,7 @@ export const withBlockControls = createHigherOrderComponent(
 						>
 							{ isEditingAsBlocks && ! isContentLocked
 								? __( 'Done' )
-								: __( 'Edit' ) }
+								: __( 'Modify' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
 				</BlockControls>

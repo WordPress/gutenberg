@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
@@ -11,19 +11,13 @@ import {
 import {
 	PanelBody,
 	__experimentalUseSlot as useSlot,
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalNavigatorButton as NavigatorButton,
-	__experimentalNavigatorBackButton as NavigatorBackButton,
 	FlexItem,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalUseNavigator as useNavigator,
 	Button,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback, useEffect, useRef } from '@wordpress/element';
-import { chevronRight, chevronLeft } from '@wordpress/icons';
+import { useMemo, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -85,8 +79,7 @@ function BlockNavigationButton( { blockTypes, block, selectedBlock } ) {
 		selectedBlock && selectedBlock.clientId === block.clientId;
 	return (
 		<Button
-			disabled={ isSelected }
-			style={ isSelected ? { color: 'var(--wp-admin-theme-color)' } : {} }
+			isPressed={ isSelected }
 			onClick={ () => selectBlock( block.clientId ) }
 		>
 			<HStack justify="flex-start">
@@ -122,16 +115,10 @@ function BlockInspectorAbsorvedBy( { absorvedBy } ) {
 				<h2 className="block-editor-block-card__title">
 					{ __( 'Content' ) }
 				</h2>
-				<BlockNavigationButton
-					selectedBlock={ selectedBlock }
-					block={ block }
-					blockTypes={ blockTypes }
-				/>
 				{ contentBlocks.map( ( contentBlock ) => (
 					<BlockNavigationButton
 						selectedBlock={ selectedBlock }
 						key={ contentBlock.clientId }
-						d
 						block={ contentBlock }
 						blockTypes={ blockTypes }
 					/>
