@@ -33,6 +33,7 @@
 -   Update `floating-ui` to the latest version ([#43206](https://github.com/WordPress/gutenberg/pull/43206)).
 -   `DateTimePicker`, `TimePicker`, `DatePicker`: Switch from `moment` to `date-fns` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
 -   `DatePicker`: Switch from `react-dates` to `use-lilius` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
+-   `DateTimePicker`: address feedback after recent refactor to `date-fns` and `use-lilius` ([#43495](https://github.com/WordPress/gutenberg/pull/43495)).
 -   `convertLTRToRTL()`: Refactor away from `_.mapKeys()` ([#43258](https://github.com/WordPress/gutenberg/pull/43258/)).
 -   `withSpokenMessages`: Update to use `@testing-library/react` ([#43273](https://github.com/WordPress/gutenberg/pull/43273)).
 -   `MenuGroup`: Refactor unit tests to use `@testing-library/react` ([#43275](https://github.com/WordPress/gutenberg/pull/43275)).
