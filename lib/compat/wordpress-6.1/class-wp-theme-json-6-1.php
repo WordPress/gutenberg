@@ -154,9 +154,11 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		// hence, the schema for blocks & elements should not have them.
 		$styles_non_top_level = static::VALID_STYLES;
 		foreach ( array_keys( $styles_non_top_level ) as $section ) {
-			foreach ( array_keys( $styles_non_top_level[ $section ] ) as $prop ) {
-				if ( 'top' === $styles_non_top_level[ $section ][ $prop ] ) {
-					unset( $styles_non_top_level[ $section ][ $prop ] );
+			if ( array_key_exists( $section, $styles_non_top_level ) && is_array( $styles_non_top_level[ $section ] ) ) {
+				foreach ( array_keys( $styles_non_top_level[ $section ] ) as $prop ) {
+					if ( 'top' === $styles_non_top_level[ $section ][ $prop ] ) {
+						unset( $styles_non_top_level[ $section ][ $prop ] );
+					}
 				}
 			}
 		}
