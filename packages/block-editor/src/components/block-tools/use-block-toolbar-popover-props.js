@@ -23,7 +23,8 @@ const DEFAULT_PROPS = {
 // When there isn't enough height between the top of the block and the editor
 // canvas, the `shift` prop is set to `false`, as it will cause the block to be
 // obscured. The `flip` behavior is enabled, which positions the toolbar below
-// the block.
+// the block. This only happens if the block is smaller than the viewport, as
+// otherwise the toolbar will be off-screen.
 const RESTRICTED_HEIGHT_PROPS = {
 	resize: false,
 	flip: true,
@@ -47,7 +48,16 @@ function getProps( contentElement, selectedBlockElement, toolbarHeight ) {
 	const blockRect = selectedBlockElement.getBoundingClientRect();
 	const contentRect = contentElement.getBoundingClientRect();
 
-	if ( blockRect.top - contentRect.top > toolbarHeight ) {
+	// The document element's clientHeight represents the viewport height.
+	const viewportHeight =
+		contentElement.ownerDocument.documentElement.clientHeight;
+
+	const hasSpaceForToolbarAbove =
+		blockRect.top - contentRect.top > toolbarHeight;
+	const isBlockTallerThanViewport =
+		blockRect.height > viewportHeight - toolbarHeight;
+
+	if ( hasSpaceForToolbarAbove || isBlockTallerThanViewport ) {
 		return DEFAULT_PROPS;
 	}
 
