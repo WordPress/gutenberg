@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty, reduce, castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -216,9 +211,8 @@ export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
  * @return {Object<string,*>} Subset of attributes for comment serialization.
  */
 export function getCommentAttributes( blockType, attributes ) {
-	return reduce(
-		blockType.attributes,
-		( accumulator, attributeSchema, key ) => {
+	return Object.entries( blockType.attributes ?? {} ).reduce(
+		( accumulator, [ key, attributeSchema ] ) => {
 			const value = attributes[ key ];
 			// Ignore undefined values.
 			if ( undefined === value ) {
@@ -315,9 +309,10 @@ export function getCommentDelimitedContent(
 	attributes,
 	content
 ) {
-	const serializedAttributes = ! isEmpty( attributes )
-		? serializeAttributes( attributes ) + ' '
-		: '';
+	const serializedAttributes =
+		attributes && Object.entries( attributes ).length
+			? serializeAttributes( attributes ) + ' '
+			: '';
 
 	// Strip core blocks of their namespace prefix.
 	const blockName = rawBlockName?.startsWith( 'core/' )
@@ -401,7 +396,8 @@ export function __unstableSerializeAndClean( blocks ) {
  * @return {string} The post content.
  */
 export default function serialize( blocks, options ) {
-	return castArray( blocks )
+	const blocksArray = Array.isArray( blocks ) ? blocks : [ blocks ];
+	return blocksArray
 		.map( ( block ) => serializeBlock( block, options ) )
 		.join( '\n\n' );
 }
