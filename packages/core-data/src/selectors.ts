@@ -71,7 +71,7 @@ type Optional< T > = T | undefined;
 /**
  * HTTP Query parameters sent with the API request to fetch the entity records.
  */
-type EntityQuery = Record< string, any >;
+type GetRecordsHttpQuery = Record< string, any >;
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -110,7 +110,10 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  *               include with request.
  * @return Authors list.
  */
-export function getAuthors( state: State, query?: EntityQuery ): ET.User[] {
+export function getAuthors(
+	state: State,
+	query?: GetRecordsHttpQuery
+): ET.User[] {
 	deprecated( "select( 'core' ).getAuthors()", {
 		since: '5.9',
 		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
@@ -242,7 +245,7 @@ export const getEntityRecord = createSelector(
 		kind: string,
 		name: string,
 		key: EntityRecordKey,
-		query?: EntityQuery
+		query?: GetRecordsHttpQuery
 	): EntityRecord | undefined => {
 		const queriedState = get( state.entities.records, [
 			kind,
@@ -366,7 +369,7 @@ export const getRawEntityRecord = createSelector(
 		kind: string,
 		name: string,
 		recordId: EntityRecordKey,
-		query?: EntityQuery
+		query?: GetRecordsHttpQuery
 	) => {
 		const context = query?.context ?? 'default';
 		return [
@@ -406,7 +409,7 @@ export function hasEntityRecords(
 	state: State,
 	kind: string,
 	name: string,
-	query?: EntityQuery
+	query?: GetRecordsHttpQuery
 ): boolean {
 	return Array.isArray( getEntityRecords( state, kind, name, query ) );
 }
@@ -430,7 +433,7 @@ export const getEntityRecords = <
 	state: State,
 	kind: string,
 	name: string,
-	query?: EntityQuery
+	query?: GetRecordsHttpQuery
 ): EntityRecord[] | null => {
 	// Queried data state is prepopulated for all known entities. If this is not
 	// assigned for the given parameters, then it is known to not exist.
@@ -673,7 +676,7 @@ export const getEditedEntityRecord = createSelector(
 		kind: string,
 		name: string,
 		recordId: EntityRecordKey,
-		query?: EntityQuery
+		query?: GetRecordsHttpQuery
 	) => {
 		const context = query?.context ?? 'default';
 		return [

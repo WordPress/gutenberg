@@ -224,7 +224,7 @@ Returns all available authors.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _query_ `EntityQuery`: Optional object of query parameters to include with request.
+-   _query_ `GetRecordsHttpQuery`: Optional object of query parameters to include with request.
 
 _Returns_
 
@@ -408,7 +408,7 @@ _Parameters_
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 -   _key_ `EntityRecordKey`: Record's key
--   _query_ `EntityQuery`: Optional query. If requesting specific fields, fields must always include the ID.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID.
 
 _Returns_
 
@@ -457,7 +457,7 @@ _Parameters_
 -   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _query_ `EntityQuery`: Optional terms query. If requesting specific fields, fields must always include the ID.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID.
 
 _Returns_
 
@@ -607,7 +607,7 @@ _Parameters_
 -   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _query_ `EntityQuery`: Optional terms query.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query.
 
 _Returns_
 
