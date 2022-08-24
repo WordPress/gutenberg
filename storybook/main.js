@@ -28,6 +28,7 @@ module.exports = {
 	features: {
 		babelModeV7: true,
 		emotionAlias: false,
+		buildStoriesJson: true,
 	},
 	// Workaround:
 	// https://github.com/storybookjs/storybook/issues/12270
