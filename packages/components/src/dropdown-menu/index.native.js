@@ -75,12 +75,6 @@ function DropdownMenu( {
 			className={ classnames( 'components-dropdown-menu', className ) }
 			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
-				const openOnArrowDown = ( event ) => {
-					if ( ! isOpen && event.code === 'ArrowDown' ) {
-						event.preventDefault();
-						onToggle();
-					}
-				};
 				const mergedToggleProps = mergeProps(
 					{
 						className: classnames(
@@ -101,12 +95,6 @@ function DropdownMenu( {
 							onToggle( event );
 							if ( mergedToggleProps.onClick ) {
 								mergedToggleProps.onClick( event );
-							}
-						} }
-						onKeyDown={ ( event ) => {
-							openOnArrowDown( event );
-							if ( mergedToggleProps.onKeyDown ) {
-								mergedToggleProps.onKeyDown( event );
 							}
 						} }
 						aria-haspopup="true"
