@@ -277,6 +277,9 @@ describe( 'Inserting blocks', () => {
 	// Check for regression of https://github.com/WordPress/gutenberg/issues/24403
 	it( 'inserts a block in proper place after having clicked `Browse All` from block appender', async () => {
 		await insertBlock( 'Group' );
+		await page.click(
+			'[aria-label="Skip selection and choose default block variation."]'
+		);
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Paragraph after group' );
 		// Click the Group first to make the appender inside it clickable.
@@ -295,6 +298,9 @@ describe( 'Inserting blocks', () => {
 		const INSERTER_SEARCH_SELECTOR =
 			'.block-editor-inserter__search input,.block-editor-inserter__search-input,input.block-editor-inserter__search';
 		await insertBlock( 'Group' );
+		await page.click(
+			'[aria-label="Skip selection and choose default block variation."]'
+		);
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Text' );
 		// Click the Group first to make the appender inside it clickable.

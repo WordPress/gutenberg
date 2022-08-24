@@ -223,7 +223,9 @@ describe( 'Order of block keyboard navigation', () => {
 	it( 'allows the block wrapper to gain focus for a group block instead of the first element', async () => {
 		// Insert a group block.
 		await insertBlock( 'Group' );
-
+		await page.click(
+			'[aria-label="Skip selection and choose default block variation."]'
+		);
 		// If active label matches, that means focus did not change from group block wrapper.
 		await expect( await getActiveLabel() ).toBe( 'Block: Group' );
 	} );

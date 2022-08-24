@@ -167,7 +167,9 @@ describe( 'Navigating the block hierarchy', () => {
 	it( 'should select the wrapper div for a group', async () => {
 		// Insert a group block.
 		await insertBlock( 'Group' );
-
+		await page.click(
+			'[aria-label="Skip selection and choose default block variation."]'
+		);
 		// Insert some random blocks.
 		// The last block shouldn't be a textual block.
 		await page.click( '.block-list-appender .block-editor-inserter' );
