@@ -31,6 +31,7 @@
 ### Internal
 
 -   `Tooltip`: Refactor tests to `@testing-library/react` ([#43061](https://github.com/WordPress/gutenberg/pull/43061)).
+-   `ClipboardButton`, `FocusableIframe`, `IsolatedEventContainer`, `withConstrainedTabbing`, `withSpokenMessages`: Improve TypeScript types ([#43579](https://github.com/WordPress/gutenberg/pull/43579)).
 -   Clean up unused and duplicate `COLORS` values ([#43445](https://github.com/WordPress/gutenberg/pull/43445)).
 -   Update `floating-ui` to the latest version ([#43206](https://github.com/WordPress/gutenberg/pull/43206)).
 -   `DateTimePicker`, `TimePicker`, `DatePicker`: Switch from `moment` to `date-fns` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
