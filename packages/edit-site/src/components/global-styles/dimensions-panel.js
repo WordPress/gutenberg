@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -11,7 +16,10 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalView as View,
 } from '@wordpress/components';
-import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
+import {
+	__experimentalUseCustomSides as useCustomSides,
+	__experimentalSpacingSizesControl as SpacingSizesControl,
+} from '@wordpress/block-editor';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 
 /**
@@ -66,6 +74,12 @@ function useHasGap( name ) {
 	return settings && supports.includes( 'blockGap' );
 }
 
+function useHasSpacingPresets() {
+	const [ settings ] = useSetting( 'spacing.spacingSizes' );
+
+	return settings && settings.length > 0;
+}
+
 function filterValuesBySides( values, sides ) {
 	if ( ! sides ) {
 		// If no custom side configuration all sides are opted into by default.
@@ -90,7 +104,7 @@ function filterValuesBySides( values, sides ) {
 }
 
 function splitStyleValue( value ) {
-	// Check for shorthand value ( a string value ).
+	// Check for shorthand value (a string value).
 	if ( value && typeof value === 'string' ) {
 		// Convert to value for individual sides for BoxControl.
 		return {
@@ -102,6 +116,25 @@ function splitStyleValue( value ) {
 	}
 
 	return value;
+}
+
+function splitGapValue( value ) {
+	// Check for shorthand value (a string value).
+	if ( value && typeof value === 'string' ) {
+		// Convert to value for individual sides for BoxControl.
+		return {
+			top: value,
+			right: value,
+			bottom: value,
+			left: value,
+		};
+	}
+
+	return {
+		...value,
+		right: value?.left,
+		bottom: value?.top,
+	};
 }
 
 // Props for managing `layout.contentSize`.
@@ -204,12 +237,29 @@ function useMarginProps( name ) {
 // Props for managing `spacing.blockGap`.
 function useBlockGapProps( name ) {
 	const [ gapValue, setGapValue ] = useStyle( 'spacing.blockGap', name );
+	const gapValues = splitGapValue( gapValue );
+	const setGapValues = ( nextBoxGapValue ) => {
+		if ( ! nextBoxGapValue ) {
+			setGapValue( null );
+		}
+		setGapValue( {
+			top: nextBoxGapValue?.top,
+			left: nextBoxGapValue?.left,
+		} );
+	};
+	const gapSides = useCustomSides( name, 'blockGap' );
+	const isAxialGap =
+		gapSides && gapSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const resetGapValue = () => setGapValue( undefined );
 	const [ userSetGapValue ] = useStyle( 'spacing.blockGap', name, 'user' );
 	const hasGapValue = () => !! userSetGapValue;
 	return {
 		gapValue,
+		gapValues,
+		gapSides,
+		isAxialGap,
 		setGapValue,
+		setGapValues,
 		resetGapValue,
 		hasGapValue,
 	};
@@ -221,6 +271,7 @@ export default function DimensionsPanel( { name } ) {
 	const showPaddingControl = useHasPadding( name );
 	const showMarginControl = useHasMargin( name );
 	const showGapControl = useHasGap( name );
+	const showSpacingPresetsControl = useHasSpacingPresets();
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units', name )[ 0 ] || [
 			'%',
@@ -268,8 +319,16 @@ export default function DimensionsPanel( { name } ) {
 	} = useMarginProps( name );
 
 	// Props for managing `spacing.blockGap`.
-	const { gapValue, setGapValue, resetGapValue, hasGapValue } =
-		useBlockGapProps( name );
+	const {
+		gapValue,
+		gapValues,
+		gapSides,
+		isAxialGap,
+		setGapValue,
+		setGapValues,
+		resetGapValue,
+		hasGapValue,
+	} = useBlockGapProps( name );
 
 	const resetAll = () => {
 		resetPaddingValue();
@@ -342,16 +401,32 @@ export default function DimensionsPanel( { name } ) {
 					label={ __( 'Padding' ) }
 					onDeselect={ resetPaddingValue }
 					isShownByDefault={ true }
+					className={ classnames( {
+						'tools-panel-item-spacing': showSpacingPresetsControl,
+					} ) }
 				>
-					<BoxControl
-						values={ paddingValues }
-						onChange={ setPaddingValues }
-						label={ __( 'Padding' ) }
-						sides={ paddingSides }
-						units={ units }
-						allowReset={ false }
-						splitOnAxis={ isAxialPadding }
-					/>
+					{ ! showSpacingPresetsControl && (
+						<BoxControl
+							values={ paddingValues }
+							onChange={ setPaddingValues }
+							label={ __( 'Padding' ) }
+							sides={ paddingSides }
+							units={ units }
+							allowReset={ false }
+							splitOnAxis={ isAxialPadding }
+						/>
+					) }
+					{ showSpacingPresetsControl && (
+						<SpacingSizesControl
+							values={ paddingValues }
+							onChange={ setPaddingValues }
+							label={ __( 'Padding' ) }
+							sides={ paddingSides }
+							units={ units }
+							allowReset={ false }
+							splitOnAxis={ isAxialPadding }
+						/>
+					) }
 				</ToolsPanelItem>
 			) }
 			{ showMarginControl && (
@@ -360,16 +435,32 @@ export default function DimensionsPanel( { name } ) {
 					label={ __( 'Margin' ) }
 					onDeselect={ resetMarginValue }
 					isShownByDefault={ true }
+					className={ classnames( {
+						'tools-panel-item-spacing': showSpacingPresetsControl,
+					} ) }
 				>
-					<BoxControl
-						values={ marginValues }
-						onChange={ setMarginValues }
-						label={ __( 'Margin' ) }
-						sides={ marginSides }
-						units={ units }
-						allowReset={ false }
-						splitOnAxis={ isAxialMargin }
-					/>
+					{ ! showSpacingPresetsControl && (
+						<BoxControl
+							values={ marginValues }
+							onChange={ setMarginValues }
+							label={ __( 'Margin' ) }
+							sides={ marginSides }
+							units={ units }
+							allowReset={ false }
+							splitOnAxis={ isAxialMargin }
+						/>
+					) }
+					{ showSpacingPresetsControl && (
+						<SpacingSizesControl
+							values={ marginValues }
+							onChange={ setMarginValues }
+							label={ __( 'Margin' ) }
+							sides={ marginSides }
+							units={ units }
+							allowReset={ false }
+							splitOnAxis={ isAxialMargin }
+						/>
+					) }
 				</ToolsPanelItem>
 			) }
 			{ showGapControl && (
@@ -379,14 +470,27 @@ export default function DimensionsPanel( { name } ) {
 					onDeselect={ resetGapValue }
 					isShownByDefault={ true }
 				>
-					<UnitControl
-						label={ __( 'Block spacing' ) }
-						__unstableInputWidth="80px"
-						min={ 0 }
-						onChange={ setGapValue }
-						units={ units }
-						value={ gapValue }
-					/>
+					{ isAxialGap ? (
+						<BoxControl
+							label={ __( 'Block spacing' ) }
+							min={ 0 }
+							onChange={ setGapValues }
+							units={ units }
+							sides={ gapSides }
+							values={ gapValues }
+							allowReset={ false }
+							splitOnAxis={ isAxialGap }
+						/>
+					) : (
+						<UnitControl
+							label={ __( 'Block spacing' ) }
+							__unstableInputWidth="80px"
+							min={ 0 }
+							onChange={ setGapValue }
+							units={ units }
+							value={ gapValue }
+						/>
+					) }
 				</ToolsPanelItem>
 			) }
 		</ToolsPanel>

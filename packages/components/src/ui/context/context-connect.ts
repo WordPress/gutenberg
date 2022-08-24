@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { uniq } from 'lodash';
 import type { ForwardedRef, ReactChild, ReactNode } from 'react';
 
 /**
@@ -70,7 +69,9 @@ export function contextConnect< P >(
 	WrappedComponent.displayName = namespace;
 
 	// @ts-ignore internal property
-	WrappedComponent[ CONNECT_STATIC_NAMESPACE ] = uniq( mergedNamespace );
+	WrappedComponent[ CONNECT_STATIC_NAMESPACE ] = [
+		...new Set( mergedNamespace ),
+	];
 
 	// @ts-ignore WordPressComponent property
 	WrappedComponent.selector = `.${ getStyledClassNameFromKey( namespace ) }`;

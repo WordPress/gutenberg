@@ -163,6 +163,7 @@ function Option( {
 					{ ! isGradient && (
 						<ColorPicker
 							color={ value }
+							enableAlpha
 							onChange={ ( newColor ) =>
 								onChange( {
 									...element,

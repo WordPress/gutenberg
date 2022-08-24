@@ -26,13 +26,6 @@
 	background-color: $white;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
-
-	&.has-illustration {
-		background: none;
-		border: none;
-		box-shadow: none;
-		min-width: 100px;
-	}
 }
 
 .components-placeholder__error,
@@ -112,11 +105,6 @@
 	width: 100%;
 }
 
-.components-placeholder__preview img {
-	margin: 3%;
-	width: 50%;
-}
-
 .components-placeholder__fieldset .components-button {
 	margin-right: $grid-unit-15;
 	margin-bottom: $grid-unit-15; // If buttons wrap we need vertical space between.
@@ -175,18 +163,75 @@
 	}
 }
 
-// Style the placeholder illustration.
-.components-placeholder__illustration {
+
+/**
+ * Dashed style placeholders
+ */
+
+// @todo
+// These styles are only applied after the has-illustration gets added.
+// This is mainly an issue in terms of Site Logo which has a brief flash of the square placeholder.
+.components-placeholder.has-illustration {
+	color: inherit;
+	display: flex;
+	box-shadow: none;
+	min-width: 100px;
+
+	// Radius fallback value.
+	border-radius: $radius-block-ui;
+
+	// Blur the background so layered dashed placeholders are still visually separate.
+	// We also provide a semitransparent background so as to allow duotones to sheen through.
+	backdrop-filter: blur(100px);
+	background-color: rgba($white, 0.1);
+
+	// Invert the colors in themes deemed dark.
+	.is-dark-theme & {
+		background-color: rgba($black, 0.1);
+	}
+
+	.components-placeholder__fieldset {
+		width: auto;
+	}
+
+	// Show placeholder buttons on block selection.
+	// Note that these can't be display: none; or visibility: hidden;, as that breaks the writing flow.
+	.components-placeholder__label,
+	.components-placeholder__instructions,
+	.components-button {
+		opacity: 0;
+		transition: opacity 0.1s linear;
+		@include reduce-motion("transition");
+	}
+
+	.is-selected > & {
+		.components-placeholder__label,
+		.components-placeholder__instructions,
+		.components-button {
+			opacity: 1;
+		}
+	}
+
+	// By painting the borders here, we enable them to be replaced by the Border control.
 	border: $border-width dashed currentColor;
-	box-sizing: border-box;
+	overflow: hidden;
+}
+
+// Position the spinner.
+// @todo these rules should ideally live with the spinner component itself.
+.components-placeholder__preview {
+	display: flex;
+	justify-content: center;
+}
+
+.components-placeholder__illustration {
+	box-sizing: content-box;
 	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 	width: 100%;
 	height: 100%;
 	stroke: currentColor;
 	stroke-dasharray: 3;
-	opacity: 0.4;
 }

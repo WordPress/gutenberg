@@ -16,6 +16,7 @@ import CircularOptionPicker from '../circular-option-picker';
 import CustomGradientPicker from '../custom-gradient-picker';
 import { VStack } from '../v-stack';
 import { ColorHeading } from '../color-palette/styles';
+import { Spacer } from '../spacer';
 
 function SingleOrigin( {
 	className,
@@ -99,6 +100,8 @@ function MultipleOrigin( {
 }
 
 export default function GradientPicker( {
+	/** Start opting into the new margin-free styles that will become the default in a future version. */
+	__nextHasNoMargin = false,
 	className,
 	gradients,
 	onChange,
@@ -116,6 +119,11 @@ export default function GradientPicker( {
 		__experimentalHasMultipleOrigins && gradients?.length
 			? MultipleOrigin
 			: SingleOrigin;
+
+	// Can be removed when deprecation period is over
+	const deprecatedMarginSpacerProps = ! __nextHasNoMargin
+		? { marginTop: 3 }
+		: {};
 
 	return (
 		<Component
@@ -137,13 +145,20 @@ export default function GradientPicker( {
 			}
 			content={
 				! disableCustomGradients && (
-					<CustomGradientPicker
-						__experimentalIsRenderedInSidebar={
-							__experimentalIsRenderedInSidebar
-						}
-						value={ value }
-						onChange={ onChange }
-					/>
+					<Spacer
+						marginTop={ gradients?.length ? 3 : 0 }
+						marginBottom={ 0 }
+						{ ...deprecatedMarginSpacerProps }
+					>
+						<CustomGradientPicker
+							__nextHasNoMargin={ __nextHasNoMargin }
+							__experimentalIsRenderedInSidebar={
+								__experimentalIsRenderedInSidebar
+							}
+							value={ value }
+							onChange={ onChange }
+						/>
+					</Spacer>
 				)
 			}
 		/>

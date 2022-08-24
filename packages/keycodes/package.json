@@ -29,6 +29,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/i18n": "file:../i18n",
+		"change-case": "^4.1.2",
 		"lodash": "^4.17.21"
 	},
 	"publishConfig": {

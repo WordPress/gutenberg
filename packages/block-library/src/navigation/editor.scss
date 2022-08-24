@@ -200,9 +200,9 @@ $color-control-label-height: 20px;
 
 // Override inner padding on default appender.
 // This should be a temporary fix, to be replaced by improvements to
-// the sibling inserter.
+// the sibling inserter. Or by the dropdown appender that is used in Group, instead of the "Button block appender".
 // See https://github.com/WordPress/gutenberg/issues/37572.
-.wp-block-navigation .block-editor-button-block-appender {
+.wp-block-navigation .wp-block + .block-list-appender .block-editor-button-block-appender {
 	background-color: $gray-900;
 	color: $white;
 
@@ -520,6 +520,7 @@ body.editor-styles-wrapper
 // so focus is applied naturally on the block container.
 // It's important the right container has focus, otherwise you can't press
 // "Delete" to remove the block.
+.wp-block-navigation__responsive-container,
 .wp-block-navigation__responsive-close {
 	@include break-small() {
 		pointer-events: none;

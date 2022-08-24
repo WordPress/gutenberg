@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { difference, omit } from 'lodash';
+import { omit } from 'lodash';
 
 /**
  * Internal dependencies
@@ -58,7 +58,10 @@ export function fixCustomClassname( blockAttributes, blockType, innerHTML ) {
 		const serialized = getSaveContent( blockType, attributesSansClassName );
 		const defaultClasses = getHTMLRootElementClasses( serialized );
 		const actualClasses = getHTMLRootElementClasses( innerHTML );
-		const customClasses = difference( actualClasses, defaultClasses );
+
+		const customClasses = actualClasses.filter(
+			( className ) => ! defaultClasses.includes( className )
+		);
 
 		if ( customClasses.length ) {
 			blockAttributes.className = customClasses.join( ' ' );

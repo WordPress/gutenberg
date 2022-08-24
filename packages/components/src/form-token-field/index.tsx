@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { last, clone, uniq, map, difference, some } from 'lodash';
+import { last, clone, map, some } from 'lodash';
 import classnames from 'classnames';
 import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
 
@@ -12,17 +12,6 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
-import {
-	BACKSPACE,
-	ENTER,
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT,
-	SPACE,
-	DELETE,
-	ESCAPE,
-} from '@wordpress/keycodes';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -78,6 +67,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__experimentalValidateInput = () => true,
 		__experimentalShowHowTo = true,
 		__next36pxDefaultSize = false,
+		__experimentalAutoSelectFirstMatch = false,
 	} = props;
 
 	const instanceId = useInstanceId( FormTokenField );
@@ -125,6 +115,11 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		updateSuggestions();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ incompleteTokenValue ] );
+
+	useEffect( () => {
+		updateSuggestions();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ __experimentalAutoSelectFirstMatch ] );
 
 	if ( disabled && isActive ) {
 		setIsActive( false );
@@ -178,35 +173,34 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		if ( event.defaultPrevented ) {
 			return;
 		}
-		// TODO: replace to event.code;
-		switch ( event.keyCode ) {
-			case BACKSPACE:
+		switch ( event.code ) {
+			case 'Backspace':
 				preventDefault = handleDeleteKey( deleteTokenBeforeInput );
 				break;
-			case ENTER:
+			case 'Enter':
 				preventDefault = addCurrentToken();
 				break;
-			case LEFT:
+			case 'ArrowLeft':
 				preventDefault = handleLeftArrowKey();
 				break;
-			case UP:
+			case 'ArrowUp':
 				preventDefault = handleUpArrowKey();
 				break;
-			case RIGHT:
+			case 'ArrowRight':
 				preventDefault = handleRightArrowKey();
 				break;
-			case DOWN:
+			case 'ArrowDown':
 				preventDefault = handleDownArrowKey();
 				break;
-			case DELETE:
+			case 'Delete':
 				preventDefault = handleDeleteKey( deleteTokenAfterInput );
 				break;
-			case SPACE:
+			case 'Space':
 				if ( tokenizeOnSpace ) {
 					preventDefault = addCurrentToken();
 				}
 				break;
-			case ESCAPE:
+			case 'Escape':
 				preventDefault = handleEscapeKey( event );
 				break;
 			default:
@@ -409,12 +403,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	}
 
 	function addNewTokens( tokens: string[] ) {
-		const tokensToAdd = uniq(
-			tokens
-				.map( saveTransform )
-				.filter( Boolean )
-				.filter( ( token ) => ! valueContainsToken( token ) )
-		);
+		const tokensToAdd = [
+			...new Set(
+				tokens
+					.map( saveTransform )
+					.filter( Boolean )
+					.filter( ( token ) => ! valueContainsToken( token ) )
+			),
+		];
 
 		if ( tokensToAdd.length > 0 ) {
 			const newValue = clone( value );
@@ -475,7 +471,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		} );
 
 		if ( match.length === 0 ) {
-			_suggestions = difference( _suggestions, normalizedValue );
+			_suggestions = _suggestions.filter(
+				( suggestion ) => ! normalizedValue.includes( suggestion )
+			);
 		} else {
 			match = match.toLocaleLowerCase();
 
@@ -528,14 +526,24 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			getMatchingSuggestions( incompleteTokenValue );
 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
 
+		const shouldExpandIfFocuses = hasFocus() && __experimentalExpandOnFocus;
 		setIsExpanded(
-			__experimentalExpandOnFocus ||
+			shouldExpandIfFocuses ||
 				( inputHasMinimumChars && hasMatchingSuggestions )
 		);
 
 		if ( resetSelectedSuggestion ) {
-			setSelectedSuggestionIndex( -1 );
-			setSelectedSuggestionScroll( false );
+			if (
+				__experimentalAutoSelectFirstMatch &&
+				inputHasMinimumChars &&
+				hasMatchingSuggestions
+			) {
+				setSelectedSuggestionIndex( 0 );
+				setSelectedSuggestionScroll( true );
+			} else {
+				setSelectedSuggestionIndex( -1 );
+				setSelectedSuggestionScroll( false );
+			}
 		}
 
 		if ( inputHasMinimumChars ) {

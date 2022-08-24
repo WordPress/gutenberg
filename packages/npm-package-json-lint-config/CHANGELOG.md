@@ -2,7 +2,15 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Packages: Replace `is-plain-obj` with native functionality ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
+
 ## 4.0.0 (2021-01-21)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
 ### Breaking Changes
 

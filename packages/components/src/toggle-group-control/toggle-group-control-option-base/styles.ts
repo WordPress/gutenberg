@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { CONFIG, COLORS, reduceMotion } from '../../utils';
+import type { ToggleGroupControlProps } from '../types';
 
 export const LabelView = styled.div`
 	display: inline-flex;
@@ -69,3 +70,20 @@ export const ButtonContentView = styled.div`
 export const separatorActive = css`
 	background: transparent;
 `;
+
+export const isIcon = ( {
+	size,
+}: {
+	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
+} ) => {
+	const iconButtonSizes = {
+		default: '30px',
+		'__unstable-large': '34px',
+	};
+
+	return css`
+		width: ${ iconButtonSizes[ size ] };
+		padding-left: 0;
+		padding-right: 0;
+	`;
+};

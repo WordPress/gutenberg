@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { WithGlobalCSS } from './decorators/with-global-css';
+import { WithMarginChecker } from './decorators/with-margin-checker';
 import { WithRTL } from './decorators/with-rtl';
 import './style.scss';
 
@@ -32,9 +33,22 @@ export const globalTypes = {
 			],
 		},
 	},
+	marginChecker: {
+		name: 'Margin Checker',
+		description:
+			'Show a div before and after the component to check for unwanted margins.',
+		defaultValue: 'hide',
+		toolbar: {
+			icon: 'collapse',
+			items: [
+				{ value: 'hide', title: 'Hide' },
+				{ value: 'show', title: 'Show' },
+			],
+		},
+	},
 };
 
-export const decorators = [ WithGlobalCSS, WithRTL ];
+export const decorators = [ WithGlobalCSS, WithMarginChecker, WithRTL ];
 
 export const parameters = {
 	controls: {

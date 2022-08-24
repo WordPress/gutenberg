@@ -28,7 +28,7 @@
 /**
  * External dependencies
  */
-import isPlainObject from 'is-plain-obj';
+import { isPlainObject } from 'is-plain-object';
 import { paramCase as kebabCase } from 'change-case';
 
 /**

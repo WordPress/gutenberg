@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { Platform } from 'react-native';
-import { sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -161,16 +160,22 @@ export const registerBlock = ( block ) => {
 const registerBlockVariations = ( block ) => {
 	const { metadata, settings, name } = block;
 
-	sortBy( settings.variations, 'title' ).forEach( ( v ) => {
-		registerBlockType( `${ name }-${ v.name }`, {
-			...metadata,
-			name: `${ name }-${ v.name }`,
-			...settings,
-			icon: v.icon(),
-			title: v.title,
-			variations: [],
+	if ( ! settings.variations ) {
+		return;
+	}
+
+	[ ...settings.variations ]
+		.sort( ( a, b ) => a.title.localeCompare( b.title ) )
+		.forEach( ( v ) => {
+			registerBlockType( `${ name }-${ v.name }`, {
+				...metadata,
+				name: `${ name }-${ v.name }`,
+				...settings,
+				icon: v.icon(),
+				title: v.title,
+				variations: [],
+			} );
 		} );
-	} );
 };
 
 // Only enable code block for development

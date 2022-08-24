@@ -21,6 +21,7 @@ import { CalendarHelp } from './styles';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { Spacer } from '../../spacer';
+import { VStack } from '../../v-stack';
 
 export { DatePicker, TimePicker };
 
@@ -63,7 +64,7 @@ function UnforwardedDateTimePicker(
 	}
 
 	return (
-		<div ref={ ref } className="components-datetime">
+		<VStack ref={ ref } className="components-datetime" spacing={ 4 }>
 			{ ! calendarHelpIsVisible && (
 				<>
 					<TimePicker
@@ -186,7 +187,7 @@ function UnforwardedDateTimePicker(
 					) }
 				</HStack>
 			) }
-		</div>
+		</VStack>
 	);
 }
 

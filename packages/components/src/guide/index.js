@@ -42,7 +42,9 @@ export default function Guide( {
 	useEffect( () => {
 		// Each time we change the current page, start from the first element of the page.
 		// This also solves any focus loss that can happen.
-		focus.tabbable.find( guideContainer.current )?.[ 0 ]?.focus();
+		if ( guideContainer.current ) {
+			focus.tabbable.find( guideContainer.current )?.[ 0 ]?.focus();
+		}
 	}, [ currentPage ] );
 
 	if ( Children.count( children ) ) {
