@@ -48,6 +48,10 @@ import {
 	positionToPlacement,
 	placementToMotionAnimationProps,
 } from './utils';
+import {
+	useRootDocumentContext,
+	RootDocumentProvider,
+} from './root-document-context';
 
 /**
  * Name of slot in which popover should fill.
@@ -394,6 +398,26 @@ const Popover = (
 		};
 	}, [ __unstableObserveElement, update ] );
 
+	const rootDocument = useRootDocumentContext();
+
+	// If the root document is scrolled trigger an update of the popover
+	// position. This covers cases where there might be that's a child of
+	// another popover, and the outermost popover references an element
+	// in an iframe.
+	useLayoutEffect( () => {
+		if (
+			! rootDocument ||
+			rootDocument === referenceOwnerDocument ||
+			rootDocument === document
+		) {
+			return;
+		}
+
+		rootDocument.addEventListener( 'scroll', update );
+
+		return () => rootDocument?.removeEventListener( 'scroll', update );
+	}, [ referenceOwnerDocument, rootDocument, update ] );
+
 	// If the reference element is in a different ownerDocument (e.g. iFrame),
 	// we need to manually update the floating's position as the reference's owner
 	// document scrolls. Also update the frame offset if the view resizes.
@@ -428,7 +452,7 @@ const Popover = (
 				defaultView.removeEventListener( 'resize', updateFrameOffset );
 			}
 		};
-	}, [ referenceOwnerDocument, update ] );
+	}, [ referenceOwnerDocument, update, rootDocument ] );
 
 	const mergedFloatingRef = useMergeRefs( [
 		floating,
@@ -436,68 +460,71 @@ const Popover = (
 		forwardedRef,
 	] );
 
-	// Disable reason: We care to capture the _bubbled_ events from inputs
-	// within popover as inferring close intent.
-
 	let content = (
-		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<MaybeAnimatedWrapper
-			shouldAnimate={ animate && ! isExpanded }
-			placement={ computedPlacement }
-			className={ classnames( 'components-popover', className, {
-				'is-expanded': isExpanded,
-				'is-alternate': isAlternate,
-			} ) }
-			{ ...contentProps }
-			ref={ mergedFloatingRef }
-			{ ...dialogProps }
-			tabIndex="-1"
-			style={
-				isExpanded
-					? undefined
-					: {
-							position: strategy,
-							left: Number.isNaN( x ) ? 0 : x,
-							top: Number.isNaN( y ) ? 0 : y,
-					  }
-			}
-		>
-			{ /* Prevents scroll on the document */ }
-			{ isExpanded && <ScrollLock /> }
-			{ isExpanded && (
-				<div className="components-popover__header">
-					<span className="components-popover__header-title">
-						{ headerTitle }
-					</span>
-					<Button
-						className="components-popover__close"
-						icon={ close }
-						onClick={ onClose }
-					/>
-				</div>
-			) }
-			<div className="components-popover__content">{ children }</div>
-			{ hasArrow && (
-				<div
-					ref={ arrowRef }
-					className={ [
-						'components-popover__arrow',
-						`is-${ computedPlacement.split( '-' )[ 0 ] }`,
-					].join( ' ' ) }
-					style={ {
-						left: Number.isFinite( arrowData?.x )
-							? `${ arrowData.x }px`
-							: '',
-						top: Number.isFinite( arrowData?.y )
-							? `${ arrowData.y }px`
-							: '',
-					} }
-				>
-					<ArrowTriangle />
-				</div>
-			) }
-		</MaybeAnimatedWrapper>
+		<RootDocumentProvider value={ rootDocument ?? referenceOwnerDocument }>
+			{
+				// Disable reason: We care to capture the _bubbled_ events from inputs
+				// within popover as inferring close intent.
+				// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+				// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+			 }
+			<MaybeAnimatedWrapper
+				shouldAnimate={ animate && ! isExpanded }
+				placement={ computedPlacement }
+				className={ classnames( 'components-popover', className, {
+					'is-expanded': isExpanded,
+					'is-alternate': isAlternate,
+				} ) }
+				{ ...contentProps }
+				ref={ mergedFloatingRef }
+				{ ...dialogProps }
+				tabIndex="-1"
+				style={
+					isExpanded
+						? undefined
+						: {
+								position: strategy,
+								left: Number.isNaN( x ) ? 0 : x,
+								top: Number.isNaN( y ) ? 0 : y,
+						  }
+				}
+			>
+				{ /* Prevents scroll on the document */ }
+				{ isExpanded && <ScrollLock /> }
+				{ isExpanded && (
+					<div className="components-popover__header">
+						<span className="components-popover__header-title">
+							{ headerTitle }
+						</span>
+						<Button
+							className="components-popover__close"
+							icon={ close }
+							onClick={ onClose }
+						/>
+					</div>
+				) }
+				<div className="components-popover__content">{ children }</div>
+				{ hasArrow && (
+					<div
+						ref={ arrowRef }
+						className={ [
+							'components-popover__arrow',
+							`is-${ computedPlacement.split( '-' )[ 0 ] }`,
+						].join( ' ' ) }
+						style={ {
+							left: Number.isFinite( arrowData?.x )
+								? `${ arrowData.x }px`
+								: '',
+							top: Number.isFinite( arrowData?.y )
+								? `${ arrowData.y }px`
+								: '',
+						} }
+					>
+						<ArrowTriangle />
+					</div>
+				) }
+			</MaybeAnimatedWrapper>
+		</RootDocumentProvider>
 	);
 
 	if ( slot.ref ) {
