@@ -680,6 +680,7 @@ describe( 'Writing Flow', () => {
 		// Create the table.
 		await page.keyboard.press( 'Space' );
 		// Navigate to the second cell.
+		await page.waitForSelector( '.wp-block-table' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( '2' );
 		// Confirm correct setup.
