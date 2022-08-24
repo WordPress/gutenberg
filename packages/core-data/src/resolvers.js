@@ -288,6 +288,10 @@ export const canUser =
 			? [ 'create', 'read', 'update', 'delete' ]
 			: [ 'create', 'read' ];
 
+		if ( ! retrievedActions.includes( requestedAction ) ) {
+			throw new Error( `'${ requestedAction }' is not a valid action.` );
+		}
+
 		// Prevent resolving the same resource twice.
 		for ( const relatedAction of retrievedActions ) {
 			if ( relatedAction === requestedAction ) {
@@ -301,10 +305,6 @@ export const canUser =
 			if ( isAlreadyResolving ) {
 				return;
 			}
-		}
-
-		if ( ! retrievedActions.includes( requestedAction ) ) {
-			throw new Error( `'${ requestedAction }' is not a valid action.` );
 		}
 
 		let response;
