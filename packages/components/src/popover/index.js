@@ -398,26 +398,6 @@ const Popover = (
 		};
 	}, [ __unstableObserveElement, update ] );
 
-	const rootDocument = useRootDocumentContext();
-
-	// If the root document is scrolled trigger an update of the popover
-	// position. This covers cases where there might be that's a child of
-	// another popover, and the outermost popover references an element
-	// in an iframe.
-	useLayoutEffect( () => {
-		if (
-			! rootDocument ||
-			rootDocument === referenceOwnerDocument ||
-			rootDocument === document
-		) {
-			return;
-		}
-
-		rootDocument.addEventListener( 'scroll', update );
-
-		return () => rootDocument?.removeEventListener( 'scroll', update );
-	}, [ referenceOwnerDocument, rootDocument, update ] );
-
 	// If the reference element is in a different ownerDocument (e.g. iFrame),
 	// we need to manually update the floating's position as the reference's owner
 	// document scrolls. Also update the frame offset if the view resizes.
@@ -452,7 +432,33 @@ const Popover = (
 				defaultView.removeEventListener( 'resize', updateFrameOffset );
 			}
 		};
-	}, [ referenceOwnerDocument, update, rootDocument ] );
+	}, [ referenceOwnerDocument, update ] );
+
+	// If the root document is scrolled trigger an update of the popover
+	// position. This covers cases where a popover is a child of another
+	// popover, and the first popover in the chain references an element
+	// in an iframe.
+	const rootReferenceDocument = useRootDocumentContext();
+	useLayoutEffect( () => {
+		// Return early if the root document is the same as the owner document,
+		// as the scroll event will be listened to in other code.
+		const isSameDocument = rootReferenceDocument === referenceOwnerDocument;
+
+		// Return early if this isn't an iframe document.
+		const isNotIframeDocument = rootReferenceDocument === document;
+
+		if (
+			! rootReferenceDocument ||
+			isSameDocument ||
+			isNotIframeDocument
+		) {
+			return;
+		}
+
+		rootReferenceDocument.addEventListener( 'scroll', update );
+		return () =>
+			rootReferenceDocument?.removeEventListener( 'scroll', update );
+	}, [ referenceOwnerDocument, rootReferenceDocument, update ] );
 
 	const mergedFloatingRef = useMergeRefs( [
 		floating,
@@ -461,7 +467,10 @@ const Popover = (
 	] );
 
 	let content = (
-		<RootDocumentProvider value={ rootDocument ?? referenceOwnerDocument }>
+		<RootDocumentProvider
+			// Don't overwrite the root document if it's already set.
+			value={ rootReferenceDocument ?? referenceOwnerDocument }
+		>
 			{
 				// Disable reason: We care to capture the _bubbled_ events from inputs
 				// within popover as inferring close intent.
