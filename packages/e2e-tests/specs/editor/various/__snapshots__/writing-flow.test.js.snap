@@ -24,16 +24,6 @@ exports[`Writing Flow Should navigate inner blocks with arrow keys 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Writing Flow should allow selecting entire list with longer last item 1`] = `
-"<!-- wp:paragraph -->
-<p>a</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:list -->
-<ul><li></li></ul>
-<!-- /wp:list -->"
-`;
-
 exports[`Writing Flow should create valid paragraph blocks when rapidly pressing Enter 1`] = `
 "<!-- wp:paragraph -->
 <p></p>
@@ -208,7 +198,9 @@ exports[`Writing Flow should navigate empty paragraphs 1`] = `
 
 exports[`Writing Flow should not create extra line breaks in multiline value 1`] = `
 "<!-- wp:list -->
-<ul><li></li></ul>
+<ul><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->"
 `;
 
