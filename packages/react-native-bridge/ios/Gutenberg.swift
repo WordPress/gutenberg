@@ -256,7 +256,7 @@ extension Gutenberg: RCTBridgeDelegate {
             return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
         }
         #endif
-        return RCTBundleURLProvider.sharedSettings()?.jsBundleURL(forBundleRoot: "index", fallbackResource: "")
+        return RCTBundleURLProvider.sharedSettings()?.jsBundleURL(forBundleRoot: "index", fallbackExtension: "")
     }
 
     public func extraModules(for bridge: RCTBridge!) -> [RCTBridgeModule]! {
