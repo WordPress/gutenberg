@@ -457,13 +457,18 @@ export default function SearchEdit( {
 		className: getBlockClassNames(),
 	} );
 
+	const labelClassnames = classnames(
+		'wp-block-search__label',
+		typographyProps.className
+	);
+
 	return (
 		<div { ...blockProps }>
 			{ controls }
 
 			{ showLabel && (
 				<RichText
-					className={ `wp-block-search__label ${ typographyProps.className }` }
+					className={ labelClassnames }
 					aria-label={ __( 'Label text' ) }
 					placeholder={ __( 'Add label…' ) }
 					withoutInteractiveFormatting

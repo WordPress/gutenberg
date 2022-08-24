@@ -54,7 +54,7 @@ function render_block_core_search( $attributes ) {
 			'<label for="%1$s" class="wp-block-search__label" %2$s>%3$s</label>',
 			$input_id,
 			$inline_styles['label'],
-			$label_inner_html,
+			$label_inner_html
 		);
 	}
 

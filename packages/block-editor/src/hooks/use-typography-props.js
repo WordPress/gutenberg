@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { kebabCase } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * Internal dependencies
@@ -21,12 +22,17 @@ import { getInlineStyles } from './style';
  * @return {Object} Typography block support derived CSS classes & styles.
  */
 export function getTypographyClassesAndStyles( attributes ) {
-	// Collect inline styles for typography.
 	const typographyStyles = attributes?.style?.typography || {};
 	const style = getInlineStyles( { typography: typographyStyles } );
-	const className = !! attributes?.fontFamily
+	const fontFamilyClassName = !! attributes?.fontFamily
 		? `has-${ kebabCase( attributes.fontFamily ) }-font-family`
 		: '';
+
+	const fontSizeClassName = !! attributes?.fontSize
+		? `has-${ kebabCase( attributes.fontSize ) }-font-size`
+		: '';
+	const className = classnames( fontFamilyClassName, fontSizeClassName );
+
 	return {
 		className,
 		style,

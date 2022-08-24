@@ -7,6 +7,7 @@ describe( 'getTypographyClassesAndStyles', () => {
 	it( 'should return styles and classes', () => {
 		const attributes = {
 			fontFamily: 'tofu',
+			fontSize: 'large',
 			style: {
 				typography: {
 					letterSpacing: '22px',
@@ -16,7 +17,7 @@ describe( 'getTypographyClassesAndStyles', () => {
 			},
 		};
 		expect( getTypographyClassesAndStyles( attributes ) ).toEqual( {
-			className: 'has-tofu-font-family',
+			className: 'has-tofu-font-family has-large-font-size',
 			style: {
 				letterSpacing: '22px',
 				fontSize: '2rem',
