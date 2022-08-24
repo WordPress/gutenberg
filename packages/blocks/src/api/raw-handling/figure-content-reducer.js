@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { has } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { isTextContent } from '@wordpress/dom';
@@ -25,7 +20,11 @@ function isFigureContent( node, schema ) {
 		return false;
 	}
 
-	return has( schema, [ 'figure', 'children', tag ] );
+	return (
+		'figure' in schema &&
+		'children' in schema.figure &&
+		tag in schema.figure.children
+	);
 }
 
 /**
@@ -39,7 +38,13 @@ function isFigureContent( node, schema ) {
 function canHaveAnchor( node, schema ) {
 	const tag = node.nodeName.toLowerCase();
 
-	return has( schema, [ 'figure', 'children', 'a', 'children', tag ] );
+	return (
+		'figure' in schema &&
+		'children' in schema.figure &&
+		'a' in schema.figure.children &&
+		'children' in schema.figure.children.a &&
+		tag in schema.figure.children.a.children
+	);
 }
 
 /**
