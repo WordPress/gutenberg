@@ -474,6 +474,42 @@ trait WP_Webfonts_Tests_Datasets {
 	}
 
 	/**
+	 * Data provider for testing removal of variations.
+	 *
+	 * @return array
+	 */
+	public function data_remove_variations() {
+		return array(
+			'Font with 1 variation'         => array(
+				'font_family'      => 'merriweather',
+				'variation_handle' => 'merriweather-200-900-normal',
+				'expected'         => array(
+					'registered'       => array(
+						'merriweather',
+						'Source Serif Pro',
+						'Source Serif Pro-300-normal',
+						'Source Serif Pro-900-italic',
+					),
+					'font_family_deps' => array(),
+				),
+			),
+			'Font with multiple variations' => array(
+				'font_family'      => 'Source Serif Pro',
+				'variation_handle' => 'Source Serif Pro-300-normal',
+				'expected'         => array(
+					'registered'       => array(
+						'merriweather',
+						'merriweather-200-900-normal',
+						'Source Serif Pro',
+						'Source Serif Pro-900-italic',
+					),
+					'font_family_deps' => array( 'Source Serif Pro-900-italic' ),
+				),
+			),
+		);
+	}
+
+	/**
 	 * Data provider.
 	 *
 	 * @return array

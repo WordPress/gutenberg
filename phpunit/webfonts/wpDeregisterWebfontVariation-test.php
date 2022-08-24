@@ -10,15 +10,58 @@ require_once __DIR__ . '/wp-webfonts-testcase.php';
 
 /**
  * @group  webfonts
+ * @group  remove_webfonts
  * @covers ::wp_deregister_webfont_variation
  * @covers WP_Webfonts::remove_variation
  */
 class Tests_Webfonts_WpDeregisterWebfontVariation extends WP_Webfonts_TestCase {
+	private $wp_webfonts;
+	private $fonts_to_register = array();
+
+	public function set_up() {
+		parent::set_up();
+		$this->wp_webfonts       = wp_webfonts();
+		$this->fonts_to_register = $this->get_registered_local_fonts();
+	}
+
+	/**
+	 * Sets up the unit test by mocking the WP_Dependencies object using stdClass and
+	 * registering each font family directly to the WP_Webfonts::$registered property
+	 * and its variations to the mocked $deps property.
+	 */
+	private function setup_unit_test() {
+		$this->setup_registration_mocks( $this->fonts_to_register, $this->wp_webfonts );
+	}
+
+	/**
+	 * Sets up the integration test by properly registering each font family and its variations
+	 * by using the WP_Webfonts::add() and WP_Webfonts::add_variation() methods.
+	 */
+	private function setup_integration_test() {
+		foreach ( $this->fonts_to_register as $font_family_handle => $variations ) {
+			$this->setup_register( $font_family_handle, $variations, $this->wp_webfonts );
+		}
+	}
+
+	/**
+	 * Testing the test setup to ensure it works.
+	 *
+	 * @dataProvider data_remove_variations
+	 *
+	 * @param string $font_family_handle Font family for the variation.
+	 * @param string $variation_handle   Variation handle to remove.
+	 */
+	public function test_mocked_setup( $font_family_handle, $variation_handle ) {
+		$this->setup_unit_test();
+
+		$this->assertArrayHasKey( $variation_handle, $this->wp_webfonts->registered, 'Variation should be in the registered queue before remval' );
+		$this->assertContains( $variation_handle, $this->wp_webfonts->registered[ $font_family_handle ]->deps, 'Variation should be in its font family deps before removal' );
+	}
 
 	/**
 	 * Unit test for deregistering a font-family's variation using mock of WP_Webfonts.
 	 *
-	 * @dataProvider data_font_family_and_variation_handle
+	 * @dataProvider data_remove_variations
 	 *
 	 * @param string $font_family_handle Font family to test.
 	 * @param string $variation_handle   Variation's handle to test.
@@ -35,63 +78,199 @@ class Tests_Webfonts_WpDeregisterWebfontVariation extends WP_Webfonts_TestCase {
 	}
 
 	/**
-	 * Integration test for enqueuing before registering a font family and all of its variations.
+	 * Unit test.
 	 *
-	 * @dataProvider data_font_family_and_variation_handle
+	 * @dataProvider data_remove_variations
 	 *
-	 * @param string $font_family_handle Font family to test.
-	 * @param string $variation_handle   Variation's handle to test.
+	 * @param string $font_family_handle Font family for the variation.
+	 * @param string $variation_handle   Variation handle to remove.
 	 */
-	public function test_should_do_nothing_when_not_registered( $font_family_handle, $variation_handle ) {
+	public function test_unit_should_do_nothing_when_variation_and_font_family_not_registered( $font_family_handle, $variation_handle ) {
+		// Set up the test.
+		unset( $this->fonts_to_register[ $font_family_handle ] );
+		$this->setup_unit_test();
+		$registered_queue = $this->wp_webfonts->registered;
+
+		// Run the tests.
+		wp_deregister_webfont_variation( $font_family_handle, $variation_handle );
+		$this->assertArrayNotHasKey( $font_family_handle, $this->wp_webfonts->registered, 'Font family should not be registered' );
+		$this->assertArrayNotHasKey( $variation_handle, $this->wp_webfonts->registered, 'Variant should not be registered' );
+		$this->assertSame( $registered_queue, $this->wp_webfonts->registered, 'Registered queue should not have changed' );
+	}
+
+	/**
+	 * Integration test.
+	 *
+	 * @dataProvider data_remove_variations
+	 *
+	 * @param string $font_family_handle Font family for the variation.
+	 * @param string $variation_handle   Variation handle to remove.
+	 */
+	public function test_should_do_nothing_when_variation_and_font_family_not_registered( $font_family_handle, $variation_handle ) {
+		// Set up the test.
+		unset( $this->fonts_to_register[ $font_family_handle ] );
+		$this->setup_integration_test();
+		$registered_queue = $this->wp_webfonts->get_registered();
+
+		// Run the tests.
+		wp_deregister_webfont_variation( $font_family_handle, $variation_handle );
+		$this->assertArrayNotHasKey( $font_family_handle, $this->wp_webfonts->registered, 'Font family should not be registered' );
+		$this->assertArrayNotHasKey( $variation_handle, $this->wp_webfonts->registered, 'Variant should not be registered' );
+		$this->assertSameSets( $registered_queue, $this->wp_webfonts->get_registered(), 'Registered queue should not have changed' );
+	}
+
+	/**
+	 * Unit test.
+	 *
+	 * @dataProvider data_remove_variations
+	 *
+	 * @param string $font_family_handle Font family for the variation.
+	 * @param string $variation_handle   Variation handle to remove.
+	 * @param array  $expected           Expected results.
+	 */
+	public function test_unit_should_only_remove_from_font_family_deps_when_variation_not_in_queue( $font_family_handle, $variation_handle, $expected ) {
+		// Set up the test.
+		$this->setup_unit_test();
+		$this->setup_remove_variation_from_registered( $variation_handle );
+
+		// Run the tests.
+		wp_deregister_webfont_variation( $font_family_handle, $variation_handle );
+		$this->assertArrayNotHasKey( $variation_handle, $this->wp_webfonts->registered, 'Variant should not be registered' );
+		$this->assertNotContains( $variation_handle, $this->wp_webfonts->registered[ $font_family_handle ]->deps, 'Variation should not be its font family deps' );
+		$this->assertSameSets( $expected['font_family_deps'], array_values( $this->wp_webfonts->registered[ $font_family_handle ]->deps ), 'Only the tested variation handle should be removed from font family deps' );
+	}
+
+	/**
+	 * Integration test.
+	 *
+	 * @dataProvider data_remove_variations
+	 *
+	 * @param string $font_family_handle Font family for the variation.
+	 * @param string $variation_handle   Variation handle to remove.
+	 * @param array  $expected           Expected results.
+	 */
+	public function test_should_only_remove_from_font_family_deps_when_variation_not_in_queue( $font_family_handle, $variation_handle, $expected ) {
+		// Set up the test.
+		$this->setup_integration_test();
+		$this->setup_remove_variation_from_registered( $variation_handle );
+
+		// Run the tests.
+		wp_deregister_webfont_variation( $font_family_handle, $variation_handle );
+		$this->assertArrayNotHasKey( $variation_handle, $this->wp_webfonts->registered, 'Variant should not be registered' );
+		$this->assertNotContains( $variation_handle, $this->wp_webfonts->registered[ $font_family_handle ]->deps, 'Variation should not be its font family deps' );
+		$this->assertSameSets( $expected['font_family_deps'], array_values( $this->wp_webfonts->registered[ $font_family_handle ]->deps ), 'Only the tested variation handle should be removed from font family deps' );
+	}
+
+	/**
+	 * Unit test.
+	 *
+	 * @dataProvider data_remove_variations
+	 *
+	 * @param string $font_family_handle Font family for the variation.
+	 * @param string $variation_handle   Variation handle to remove.
+	 * @param array  $expected           Expected results.
+	 */
+	public function test_unit_should_remove_variation_from_registered_queue_though_font_family_not_registered( $font_family_handle, $variation_handle, $expected ) {
+		// Set up the test.
+		$this->setup_unit_test();
+		$this->setup_remove_from_font_family_deps( $font_family_handle, $variation_handle );
+
+		$this->assertArrayNotHasKey( $variation_handle, array_flip( $this->wp_webfonts->registered[ $font_family_handle ]->deps ), 'Variation should not be in its font family deps before removal' );
+
 		wp_deregister_webfont_variation( $font_family_handle, $variation_handle );
 
-		$this->assertIsArray( $this->get_registered(), 'Registration queue should be an array' );
-		$this->assertEmpty( $this->get_registered(), 'Registration queue should be empty after deregistering' );
+		$this->assertNotContains( $variation_handle, $this->wp_webfonts->registered[ $font_family_handle ]->deps, 'Variation should not be its font family deps' );
+		$this->assertSameSets( $expected['font_family_deps'], array_values( $this->wp_webfonts->registered[ $font_family_handle ]->deps ), 'Only the tested variation handle should be removed from font family deps' );
 	}
 
 	/**
-	 * Data provider.
+	 * Integration test.
 	 *
-	 * @return array
+	 * @dataProvider data_remove_variations
+	 *
+	 * @param string $font_family_handle Font family for the variation.
+	 * @param string $variation_handle   Variation handle to remove.
+	 * @param array  $expected           Expected results.
 	 */
-	public function data_font_family_and_variation_handle() {
-		return array(
-			'single words name'   => array(
-				'font_family'      => 'Lato',
-				'variation_handle' => 'Lato 400 normal',
-			),
-			'multiple words name' => array(
-				'font_family'     => 'Source Sans Pro',
-				'expected_handle' => 'Source Sans Pro 400 normal',
-			),
-			'handles'             => array(
-				'font_family'     => 'source-serif-pro',
-				'expected_handle' => 'source-serif-pro-400-normal',
-			),
-		);
+	public function test_should_remove_variation_from_registered_queue_though_font_family_not_registered( $font_family_handle, $variation_handle, $expected ) {
+		// Set up the test.
+		$this->setup_integration_test();
+		$this->setup_remove_from_font_family_deps( $font_family_handle, $variation_handle );
+
+		$this->assertArrayNotHasKey( $variation_handle, array_flip( $this->wp_webfonts->registered[ $font_family_handle ]->deps ), 'Variation should not be in its font family deps before removal' );
+
+		wp_deregister_webfont_variation( $font_family_handle, $variation_handle );
+
+		$this->assertNotContains( $variation_handle, $this->wp_webfonts->registered[ $font_family_handle ]->deps, 'Variation should not be its font family deps' );
+		$this->assertSameSets( $expected['font_family_deps'], array_values( $this->wp_webfonts->registered[ $font_family_handle ]->deps ), 'Only the tested variation handle should be removed from font family deps' );
 	}
 
 	/**
-	 * Integration test for deregistering a font family and all of its variations.
+	 * Unit test.
 	 *
-	 * @dataProvider data_one_to_many_font_families_and_zero_to_many_variations
+	 * @dataProvider data_remove_variations
 	 *
-	 * @param string $font_family        Font family to test.
-	 * @param array  $inputs             Font family(ies) and variations to pre-register.
-	 * @param array  $registered_handles Expected handles after registering.
-	 * @param array  $expected           Array of expected handles.
+	 * @param string $font_family_handle Font family for the variation.
+	 * @param string $variation_handle   Variation handle to remove.
+	 * @param array  $expected           Expected results.
 	 */
-	public function test_deregister_after_registration( $font_family, array $inputs, array $registered_handles, array $expected ) {
-		foreach ( $inputs as $handle => $variations ) {
-			$this->setup_register( $handle, $variations );
+	public function test_unit_should_remove_variation_from_queue_and_font_family_deps( $font_family_handle, $variation_handle, $expected ) {
+		// Set up the test.
+		$this->setup_unit_test();
+
+		$this->assertArrayHasKey( $variation_handle, array_flip( $this->wp_webfonts->registered[ $font_family_handle ]->deps ), 'Variation should be in its font family deps before removal' );
+
+		wp_deregister_webfont_variation( $font_family_handle, $variation_handle );
+
+		$this->assertArrayNotHasKey( $variation_handle, $this->wp_webfonts->registered, 'Variation should be not be in registered queue' );
+		$this->assertNotContains( $variation_handle, $this->wp_webfonts->registered[ $font_family_handle ]->deps, 'Variation should not be its font family deps' );
+		$this->assertSameSets( $expected['font_family_deps'], array_values( $this->wp_webfonts->registered[ $font_family_handle ]->deps ), 'Only the tested variation handle should be removed from font family deps' );
+	}
+
+	/**
+	 * Integration test.
+	 *
+	 * @dataProvider data_remove_variations
+	 *
+	 * @param string $font_family_handle Font family for the variation.
+	 * @param string $variation_handle   Variation handle to remove.
+	 * @param array  $expected           Expected results.
+	 */
+	public function test_should_remove_variation_from_queue_and_font_family_deps( $font_family_handle, $variation_handle, $expected ) {
+		// Set up the test.
+		$this->setup_integration_test();
+
+		$this->assertArrayHasKey( $variation_handle, array_flip( $this->wp_webfonts->registered[ $font_family_handle ]->deps ), 'Variation should be in its font family deps before removal' );
+
+		wp_deregister_webfont_variation( $font_family_handle, $variation_handle );
+
+		$this->assertArrayNotHasKey( $variation_handle, $this->wp_webfonts->registered, 'Variation should be not be in registered queue' );
+		$this->assertNotContains( $variation_handle, $this->wp_webfonts->registered[ $font_family_handle ]->deps, 'Variation should not be its font family deps' );
+		$this->assertSameSets( $expected['font_family_deps'], array_values( $this->wp_webfonts->registered[ $font_family_handle ]->deps ), 'Only the tested variation handle should be removed from font family deps' );
+	}
+
+	/**
+	 * Remove the variation handle from the font family's deps.
+	 *
+	 * @param string $font_family_handle Font family.
+	 * @param string $variation_handle   The variation handle to remove.
+	 */
+	private function setup_remove_from_font_family_deps( $font_family_handle, $variation_handle ) {
+		foreach ( $this->wp_webfonts->registered[ $font_family_handle ]->deps as $index => $vhandle ) {
+			if ( $variation_handle !== $vhandle ) {
+				continue;
+			}
+			unset( $this->wp_webfonts->registered[ $font_family_handle ]->deps[ $index ] );
+			break;
 		}
-		// Test the before state, just to make sure.
-		$this->assertSame( $registered_handles, $this->get_registered_handles(), 'Font family and variations should be registered before deregistering' );
+	}
 
-		wp_deregister_font_family( $font_family );
-
-		// Test after deregistering.
-		$this->assertIsArray( $this->get_registered_handles(), 'Registration queue should be an array' );
-		$this->assertSame( $expected, $this->get_registered_handles(), 'Registration queue should match after deregistering' );
+	/**
+	 * Removes the variation from the WP_Webfonts::$registered queue.
+	 *
+	 * @param string $variation_handle The variation handle to remove.
+	 */
+	private function setup_remove_variation_from_registered( $variation_handle ) {
+		unset( $this->wp_webfonts->registered[ $variation_handle ] );
 	}
 }
