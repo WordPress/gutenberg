@@ -27,28 +27,6 @@ describe( 'gap', () => {
 				...blockGapValue,
 			} );
 		} );
-		it( 'should unwrap var: values from a string into a CSS var() function', () => {
-			const expectedValue = {
-				top: 'var(--wp--preset--spacing--60)',
-				left: 'var(--wp--preset--spacing--60)',
-			};
-			expect(
-				getGapBoxControlValueFromStyle( 'var:preset|spacing|60' )
-			).toEqual( expectedValue );
-		} );
-		it( 'should unwrap var: values from an object into a CSS var() function', () => {
-			const expectedValue = {
-				top: 'var(--wp--preset--spacing--20)',
-				left: 'var(--wp--preset--spacing--60)',
-			};
-			const blockGapValue = {
-				top: 'var:preset|spacing|20',
-				left: 'var:preset|spacing|60',
-			};
-			expect( getGapBoxControlValueFromStyle( blockGapValue ) ).toEqual(
-				expectedValue
-			);
-		} );
 	} );
 	describe( 'getGapCSSValue()', () => {
 		it( 'should return `null` if argument is falsey', () => {
@@ -86,16 +64,17 @@ describe( 'gap', () => {
 		} );
 
 		it( 'should unwrap var: values from a string into a CSS var() function', () => {
-			expect(
-				getGapBoxControlValueFromStyle( 'var:preset|spacing|60' )
-			).toEqual( 'var(--wp--preset--spacing--60)' );
+			expect( getGapCSSValue( 'var:preset|spacing|60' ) ).toEqual(
+				'var(--wp--preset--spacing--60)'
+			);
 		} );
+
 		it( 'should unwrap var: values from an object into a CSS var() function and return shorthand values', () => {
 			const blockGapValue = {
 				top: 'var:preset|spacing|20',
 				left: 'var:preset|spacing|60',
 			};
-			expect( getGapBoxControlValueFromStyle( blockGapValue ) ).toEqual(
+			expect( getGapCSSValue( blockGapValue ) ).toEqual(
 				'var(--wp--preset--spacing--20) var(--wp--preset--spacing--60)'
 			);
 		} );
