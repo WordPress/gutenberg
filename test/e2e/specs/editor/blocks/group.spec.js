@@ -8,7 +8,7 @@ test.describe( 'Group', () => {
 		await admin.createNewPost();
 	} );
 
-	test.only( 'can be created using the block inserter', async ( {
+	test( 'can be created using the block inserter', async ( {
 		editor,
 		page,
 	} ) => {
