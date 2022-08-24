@@ -61,7 +61,13 @@ function BlockVariationPicker( {
 			{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 			{ allowSkip && (
 				<div className="block-editor-block-variation-picker__skip">
-					<Button variant="link" onClick={ () => onSelect() }>
+					<Button
+						variant="link"
+						onClick={ () => onSelect() }
+						aria-label={ __(
+							'Skip selection and choose default block variation.'
+						) }
+					>
 						{ __( 'Skip' ) }
 					</Button>
 				</div>
