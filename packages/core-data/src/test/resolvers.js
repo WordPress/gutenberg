@@ -420,6 +420,44 @@ describe( 'canUser', () => {
 		);
 	} );
 
+	it( 'retrieves all permissions even when ID is not given', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveUserPermission: jest.fn(),
+		} );
+
+		registry = {
+			select: () => ( {
+				hasStartedResolution: ( _, [ action ] ) => action === 'read',
+			} ),
+		};
+
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map( [ [ 'allow', 'POST, GET' ] ] ),
+		} ) );
+
+		await canUser( 'create', 'blocks' )( { dispatch, registry } );
+		await canUser( 'read', 'blocks' )( { dispatch, registry } );
+		await canUser( 'update', 'blocks' )( { dispatch, registry } );
+		await canUser( 'delete', 'blocks' )( { dispatch, registry } );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/blocks',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'read/blocks',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'update/blocks',
+			false
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'delete/blocks',
+			false
+		);
+	} );
+
 	it( 'runs apiFetch only once per resource ID', async () => {
 		const dispatch = Object.assign( jest.fn(), {
 			receiveUserPermission: jest.fn(),

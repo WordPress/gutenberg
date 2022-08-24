@@ -284,9 +284,7 @@ export const canUser =
 		const { hasStartedResolution } = registry.select( STORE_NAME );
 
 		const resourcePath = id ? `${ resource }/${ id }` : resource;
-		const retrievedActions = id
-			? [ 'create', 'read', 'update', 'delete' ]
-			: [ 'create', 'read' ];
+		const retrievedActions = [ 'create', 'read', 'update', 'delete' ];
 
 		if ( ! retrievedActions.includes( requestedAction ) ) {
 			throw new Error( `'${ requestedAction }' is not a valid action.` );
