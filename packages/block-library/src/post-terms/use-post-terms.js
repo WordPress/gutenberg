@@ -30,6 +30,7 @@ export default function usePostTerms( { postId, postType, term } ) {
 				slug,
 				{
 					include: termIds,
+					per_page: -1,
 					context: 'view',
 				},
 			];
