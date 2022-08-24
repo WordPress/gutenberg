@@ -244,7 +244,7 @@ _Parameters_
 
 _Returns_
 
--   Record.
+-   `EntityRecord | undefined`: Record.
 
 ### getEntityRecordEdits
 

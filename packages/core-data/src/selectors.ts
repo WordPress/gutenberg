@@ -235,15 +235,16 @@ export function getEntityConfig(
  */
 export const getEntityRecord = createSelector(
 	<
-		EntityRecord extends ET.EntityRecord< Context >,
-		Context extends ET.Context
+		EntityRecord extends
+			| ET.EntityRecord< any >
+			| Partial< ET.EntityRecord< any > >
 	>(
 		state: State,
 		kind: string,
 		name: string,
 		key: EntityRecordKey,
 		query?: EntityQuery
-	) => {
+	): EntityRecord | undefined => {
 		const queriedState = get( state.entities.records, [
 			kind,
 			name,
@@ -272,7 +273,7 @@ export const getEntityRecord = createSelector(
 				const value = get( item, field );
 				set( filteredItem, field, value );
 			}
-			return filteredItem;
+			return filteredItem as EntityRecord;
 		}
 
 		return item;
@@ -311,10 +312,9 @@ export const getEntityRecord = createSelector(
  * @return Record.
  */
 export function __experimentalGetEntityRecordNoResolver<
-	EntityRecord extends ET.EntityRecord< Context >,
-	Context extends ET.Context
+	EntityRecord extends ET.EntityRecord< any >
 >( state: State, kind: string, name: string, key: EntityRecordKey ) {
-	return getEntityRecord< EntityRecord, Context >( state, kind, name, key );
+	return getEntityRecord< EntityRecord >( state, kind, name, key );
 }
 
 /**
@@ -329,16 +329,13 @@ export function __experimentalGetEntityRecordNoResolver<
  * @return Object with the entity's raw attributes.
  */
 export const getRawEntityRecord = createSelector(
-	<
-		EntityRecord extends ET.EntityRecord< Context >,
-		Context extends ET.Context
-	>(
+	< EntityRecord extends ET.EntityRecord< any > >(
 		state: State,
 		kind: string,
 		name: string,
 		key: EntityRecordKey
 	): EntityRecord | undefined => {
-		const record = getEntityRecord< EntityRecord, Context >(
+		const record = getEntityRecord< EntityRecord >(
 			state,
 			kind,
 			name,
@@ -427,8 +424,9 @@ export function hasEntityRecords(
  * @return Records.
  */
 export const getEntityRecords = <
-	EntityRecord extends ET.EntityRecord< Context >,
-	Context extends ET.Context = 'edit'
+	EntityRecord extends
+		| ET.EntityRecord< any >
+		| Partial< ET.EntityRecord< any > >
 >(
 	state: State,
 	kind: string,
@@ -662,10 +660,7 @@ export function hasEditsForEntityRecord(
  * @return The entity record, merged with its edits.
  */
 export const getEditedEntityRecord = createSelector(
-	<
-		EntityRecord extends ET.EntityRecord< Context >,
-		Context extends ET.Context
-	>(
+	< EntityRecord extends ET.EntityRecord< any > >(
 		state: State,
 		kind: string,
 		name: string,
@@ -1041,10 +1036,7 @@ export function getAutosaves(
  *
  * @return The autosave for the post and author.
  */
-export function getAutosave<
-	EntityRecord extends ET.EntityRecord< Context >,
-	Context extends ET.Context
->(
+export function getAutosave< EntityRecord extends ET.EntityRecord< any > >(
 	state: State,
 	postType: string,
 	postId: EntityRecordKey,
