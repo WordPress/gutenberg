@@ -17,6 +17,7 @@
 -   `Popover`: make sure offset middleware always applies the latest frame offset values ([#43329](https://github.com/WordPress/gutenberg/pull/43329/)).
 -   `Dropdown`: anchor popover to the dropdown wrapper (instead of the toggle) ([#43377](https://github.com/WordPress/gutenberg/pull/43377/)).
 -   `Guide`: Fix error when rendering with no pages ([#43380](https://github.com/WordPress/gutenberg/pull/43380/)).
+-   `Popover`: Ensure position is correct when a nested popover's parent references an element in an iframe and the iframe is scrolled ([#43544](https://github.com/WordPress/gutenberg/pull/43544/)).
 
 ### Enhancements
 
