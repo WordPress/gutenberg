@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { camelCase } from 'lodash';
-import type { BoxEdges, GenerateFunction, StyleDefinition } from '../../types';
+import type { BoxEdge, GenerateFunction, StyleDefinition } from '../../types';
 import { generateRule, generateBoxRules } from '../utils';
 
 function makeGenerateRule( path: string[] ): GenerateFunction {
@@ -10,7 +10,7 @@ function makeGenerateRule( path: string[] ): GenerateFunction {
 		generateRule( style, options, path, camelCase( path.join( ' ' ) ) );
 }
 
-function createBorderGenerateFunction( edge: BoxEdges ): GenerateFunction {
+function createBorderGenerateFunction( edge: BoxEdge ): GenerateFunction {
 	return ( style, options ) => {
 		return [ 'color', 'style', 'width' ].flatMap( ( key ) => {
 			const path = [ 'border', edge, key ];
