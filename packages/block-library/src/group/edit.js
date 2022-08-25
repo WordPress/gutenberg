@@ -124,10 +124,13 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 	);
 
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
-	const { type: layoutType = null } = layout;
+	const { type: layoutType = null, isDefault = false } = layout;
 
 	// Whether to show the variations placeholder.
-	const showPlaceholder = ! layoutType && ! hasInnerBlocks;
+	// `isDefault: true` only exists in the default layout attributes in block.json
+	// in order to identify blocks that have been inserted, programmatically or otherwise, with no changes.
+	// When a user selects a layout `isDefault` won't appear in the block's attributes.
+	const showPlaceholder = isDefault && ! hasInnerBlocks;
 
 	// Layout settings.
 	const defaultLayout = useSetting( 'layout' ) || {};
