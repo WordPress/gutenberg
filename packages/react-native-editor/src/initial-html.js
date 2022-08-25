@@ -16,7 +16,17 @@ export default `
 <!-- /wp:heading -->
 
 <!-- wp:list -->
-<ul><li>First Item</li><li>Second Item</li><li>Third Item</li></ul>
+<ul><!-- wp:list-item -->
+<li>First Item</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Second Item</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Third Item</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
 <!-- wp:heading {"level":4} -->
@@ -24,7 +34,9 @@ export default `
 <!-- /wp:heading -->
 
 <!-- wp:quote {"align":"left","className":"is-style-large"} -->
-<blockquote class="wp-block-quote has-text-align-left is-style-large"><p>"This will make running your own blog a viable alternative again."</p><cite>— <a href="https://twitter.com/azumbrunnen_/status/1019347243084800005">Adrian Zumbrunnen</a></cite></blockquote>
+<blockquote class="wp-block-quote has-text-align-left is-style-large"><!-- wp:paragraph -->
+<p>"This will make running your own blog a viable alternative again."</p>
+<!-- /wp:paragraph --><cite>— <a href="https://twitter.com/azumbrunnen_/status/1019347243084800005">Adrian Zumbrunnen</a></cite></blockquote>
 <!-- /wp:quote -->
 
 <!-- wp:pullquote -->
@@ -87,7 +99,7 @@ else:
 <h4>Video</h4>
 <!-- /wp:heading -->
 
-<!-- wp:video {"autoplay":false,"id":683,"loop":false,"muted":false,"playsInline":false,"src":"https://i.cloudup.com/YtZFJbuQCE.mov"} -->
+<!-- wp:video {"id":683} -->
 <figure class="wp-block-video"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video><figcaption class="wp-element-caption">Videos too!</figcaption></figure>
 <!-- /wp:video -->
 
@@ -98,7 +110,7 @@ else:
 <!-- wp:file /-->
 
 <!-- wp:file {"id":3,"href":"https://wordpress.org/latest.zip"} -->
-<div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button" download>Download</a></div>
+<div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button wp-element-button" download>Download</a></div>
 <!-- /wp:file -->
 
 <!-- wp:heading {"level":4} -->
@@ -115,8 +127,70 @@ else:
 <h4>Gallery</h4>
 <!-- /wp:heading -->
 
-<!-- wp:gallery {"columns":8,"className":"alignfull"} -->
-<figure class="wp-block-gallery columns-8 is-cropped alignfull"><ul class="blocks-gallery-grid"><li class="blocks-gallery-item"><figure><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon.png" alt=""/><figcaption class="blocks-gallery-item__caption">Paragraph</figcaption></figure></li><li class="blocks-gallery-item"><figure><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Heading.png" alt=""/><figcaption class="blocks-gallery-item__caption">Heading</figcaption></figure></li><li class="blocks-gallery-item"><figure><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Subheading.png" alt=""/><figcaption class="blocks-gallery-item__caption">Subheading</figcaption></figure></li><li class="blocks-gallery-item"><figure><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Quote.png" alt=""/><figcaption class="blocks-gallery-item__caption">Quote</figcaption></figure></li><li class="blocks-gallery-item"><figure><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Image.png" alt=""/><figcaption class="blocks-gallery-item__caption">Image</figcaption></figure></li><li class="blocks-gallery-item"><figure><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Gallery.png" alt=""/><figcaption class="blocks-gallery-item__caption">Gallery</figcaption></figure></li><li class="blocks-gallery-item"><figure><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Cover-Image.png" alt=""/><figcaption class="blocks-gallery-item__caption">Cover Image</figcaption></figure></li><li class="blocks-gallery-item"><figure><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Video.png" alt=""/><figcaption class="blocks-gallery-item__caption">Video</figcaption></figure></li><li class="blocks-gallery-item"><figure><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Audio.png" alt=""/><figcaption class="blocks-gallery-item__caption">Audio</figcaption></figure></li><li class="blocks-gallery-item"><figure><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Column.png" alt=""/><figcaption class="blocks-gallery-item__caption">Columns</figcaption></figure></li><li class="blocks-gallery-item"><figure><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-File.png" alt=""/><figcaption class="blocks-gallery-item__caption">File</figcaption></figure></li><li class="blocks-gallery-item"><figure><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Code.png" alt=""/><figcaption class="blocks-gallery-item__caption">Code</figcaption></figure></li><li class="blocks-gallery-item"><figure><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-List.png" alt=""/><figcaption class="blocks-gallery-item__caption">List</figcaption></figure></li><li class="blocks-gallery-item"><figure><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Button.png" alt=""/><figcaption class="blocks-gallery-item__caption">Button</figcaption></figure></li><li class="blocks-gallery-item"><figure><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Embeds.png" alt=""/><figcaption class="blocks-gallery-item__caption">Embeds</figcaption></figure></li><li class="blocks-gallery-item"><figure><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-More.png" alt=""/><figcaption class="blocks-gallery-item__caption">More</figcaption></figure></li></ul></figure>
+<!-- wp:gallery {"columns":8,"linkTo":"none","className":"alignfull"} -->
+<figure class="wp-block-gallery has-nested-images columns-8 is-cropped alignfull"><!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon.png" alt=""/><figcaption class="wp-element-caption">Paragraph</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Heading.png" alt=""/><figcaption class="wp-element-caption">Heading</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Subheading.png" alt=""/><figcaption class="wp-element-caption">Subheading</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Quote.png" alt=""/><figcaption class="wp-element-caption">Quote</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Image.png" alt=""/><figcaption class="wp-element-caption">Image</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Gallery.png" alt=""/><figcaption class="wp-element-caption">Gallery</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Cover-Image.png" alt=""/><figcaption class="wp-element-caption">Cover Image</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Video.png" alt=""/><figcaption class="wp-element-caption">Video</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Audio.png" alt=""/><figcaption class="wp-element-caption">Audio</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Column.png" alt=""/><figcaption class="wp-element-caption">Columns</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-File.png" alt=""/><figcaption class="wp-element-caption">File</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Code.png" alt=""/><figcaption class="wp-element-caption">Code</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-List.png" alt=""/><figcaption class="wp-element-caption">List</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Button.png" alt=""/><figcaption class="wp-element-caption">Button</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Embeds.png" alt=""/><figcaption class="wp-element-caption">Embeds</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-More.png" alt=""/><figcaption class="wp-element-caption">More</figcaption></figure>
+<!-- /wp:image --></figure>
 <!-- /wp:gallery -->
 
 <!-- wp:heading -->
@@ -144,7 +218,7 @@ else:
 <!-- /wp:heading -->
 
 <!-- wp:group -->
-<div id="this-is-another-anchor" class="wp-block-group"><div class="wp-block-group__inner-container"><!-- wp:paragraph -->
+<div id="this-is-another-anchor" class="wp-block-group"><!-- wp:paragraph -->
 <p>One.</p>
 <!-- /wp:paragraph -->
 
@@ -154,7 +228,7 @@ else:
 
 <!-- wp:paragraph -->
 <p>Three.</p>
-<!-- /wp:paragraph --></div></div>
+<!-- /wp:paragraph --></div>
 <!-- /wp:group -->
 
 <!-- wp:heading {"level":4} -->
@@ -206,7 +280,7 @@ else:
 <!-- /wp:heading -->
 
 <!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":890,"dimRatio":20,"overlayColor":"luminous-vivid-orange","focalPoint":{"x":"0.63","y":"0.83"},"minHeight":219} -->
-<div class="wp-block-cover has-background-dim-20 has-luminous-vivid-orange-background-color has-background-dim" style="background-image:url(https://cldup.com/cXyG__fTLN.jpg);background-position:63% 83%;min-height:219px"><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","className":"has-text-color has-very-light-gray-color","fontSize":"large"} -->
+<div class="wp-block-cover" style="min-height:219px"><span aria-hidden="true" class="wp-block-cover__background has-luminous-vivid-orange-background-color has-background-dim-20 has-background-dim"></span><img class="wp-block-cover__image-background wp-image-890" alt="" src="https://cldup.com/cXyG__fTLN.jpg" style="object-position:63% 83%" data-object-fit="cover" data-object-position="63% 83%"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","className":"has-text-color has-very-light-gray-color","fontSize":"large"} -->
 <p class="has-text-align-center has-text-color has-very-light-gray-color has-large-font-size">Cool cover</p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->
@@ -223,11 +297,11 @@ else:
 
 <!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button -->
-<div class="wp-block-button"><a class="wp-block-button__link">Solid Button</a></div>
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Solid Button</a></div>
 <!-- /wp:button -->
 
 <!-- wp:button {"gradient":"luminous-vivid-amber-to-luminous-vivid-orange"} -->
-<div class="wp-block-button"><a class="wp-block-button__link has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background has-background">Gradient Button</a></div>
+<div class="wp-block-button"><a class="wp-block-button__link has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background has-background wp-element-button">Gradient Button</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->
 
@@ -245,7 +319,7 @@ else:
 
 <!-- wp:rss /-->
 
-<!-- wp:heading {"align":"left","level":4,"className":"has-primary-background-color has-background","style":{"typography":{"lineHeight":"2.5"}}} -->
+<!-- wp:heading {"textAlign":"left","level":4,"className":"has-primary-background-color has-background","style":{"typography":{"lineHeight":"2.5"}}} -->
 <h4 class="has-text-align-left has-primary-background-color has-background" style="line-height:2.5">Heading with line-height set</h4>
 <!-- /wp:heading -->
 
