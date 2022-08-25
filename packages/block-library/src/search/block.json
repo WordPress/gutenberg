@@ -55,7 +55,7 @@
 			}
 		},
 		"typography": {
-			"__experimentalSelector": ".wp-block-search__label, input, button",
+			"__experimentalSelector": ".wp-block-search__label, .wp-block-search__input, .wp-element-button",
 			"__experimentalSkipSerialization": true,
 			"fontSize": true,
 			"lineHeight": true,
