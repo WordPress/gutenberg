@@ -10,9 +10,11 @@ import type {
 } from '@floating-ui/react-dom';
 
 /**
- * Temporary re-implementation of the `limitShift` function from `@floating-ui`
- * which, compared to the original function, also takes into account the offset
- * from the offset middleware on the main axis.
+ * Custom limiter function for the `shift` middleware.
+ * This function is mostly identical default `limitShift` from ``@floating-ui`;
+ * the only difference is that, when computing the min/max shift limits, it
+ * also takes into account the iframe offset that is added by the
+ * custom "frameOffset" middleware.
  *
  * All unexported types and functions are also from the `@floating-ui` library,
  * and have been copied to this file for convenience.
@@ -109,20 +111,28 @@ export const limitShift = (
 				? { mainAxis: rawOffset, crossAxis: 0 }
 				: { mainAxis: 0, crossAxis: 0, ...rawOffset };
 
+		// At the moment of writing, this is the only difference
+		// with the `limitShift` function from `@floating-ui`.
+		// This offset needs to be added to all min/max limits
+		// in order to make the shift-limiting work as expected.
+		const additionalFrameOffset = {
+			x: 0,
+			y: 0,
+			...middlewareData.frameOffset?.amount,
+		};
+
 		if ( checkMainAxis ) {
 			const len = mainAxis === 'y' ? 'height' : 'width';
 			const limitMin =
 				rects.reference[ mainAxis ] -
 				rects.floating[ len ] +
 				computedOffset.mainAxis +
-				// Note: the original function doesn't add the main axis offset.
-				( middlewareData.offset?.[ mainAxis ] ?? 0 );
+				additionalFrameOffset[ mainAxis ];
 			const limitMax =
 				rects.reference[ mainAxis ] +
 				rects.reference[ len ] -
 				computedOffset.mainAxis +
-				// Note: the original function doesn't add the main axis offset.
-				( middlewareData.offset?.[ mainAxis ] ?? 0 );
+				additionalFrameOffset[ mainAxis ];
 
 			if ( mainAxisCoord < limitMin ) {
 				mainAxisCoord = limitMin;
@@ -139,17 +149,19 @@ export const limitShift = (
 			const limitMin =
 				rects.reference[ crossAxis ] -
 				rects.floating[ len ] +
-				// Note: the original function only adds the cross axis offset here
-				// when `isOriginSide === true`.
-				( middlewareData.offset?.[ crossAxis ] ?? 0 ) +
-				( isOriginSide ? 0 : computedOffset.crossAxis );
+				( isOriginSide
+					? middlewareData.offset?.[ crossAxis ] ?? 0
+					: 0 ) +
+				( isOriginSide ? 0 : computedOffset.crossAxis ) +
+				additionalFrameOffset[ crossAxis ];
 			const limitMax =
 				rects.reference[ crossAxis ] +
 				rects.reference[ len ] +
-				// Note: the original function only adds the cross axis offset here
-				// when `isOriginSide === false`.
-				( middlewareData.offset?.[ crossAxis ] ?? 0 ) -
-				( isOriginSide ? computedOffset.crossAxis : 0 );
+				( isOriginSide
+					? 0
+					: middlewareData.offset?.[ crossAxis ] ?? 0 ) -
+				( isOriginSide ? computedOffset.crossAxis : 0 ) +
+				additionalFrameOffset[ crossAxis ];
 
 			if ( crossAxisCoord < limitMin ) {
 				crossAxisCoord = limitMin;

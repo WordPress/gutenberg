@@ -12,6 +12,7 @@ import {
 	offset as offsetMiddleware,
 	size,
 	Middleware,
+	MiddlewareArguments,
 } from '@floating-ui/react-dom';
 // eslint-disable-next-line no-restricted-imports
 import {
@@ -56,8 +57,6 @@ import {
 	placementToMotionAnimationProps,
 	getReferenceOwnerDocument,
 	getReferenceElement,
-	isTopBottomPlacement,
-	hasBeforePlacement,
 } from './utils';
 import type { WordPressComponentProps } from '../ui/context';
 import type {
@@ -290,32 +289,29 @@ const UnforwardedPopover = (
 	const offsetRef = useRef( offsetProp );
 
 	const middleware = [
-		offsetMiddleware( ( { placement: currentPlacement } ) => {
-			if ( ! frameOffsetRef.current ) {
-				return offsetRef.current;
-			}
+		// Custom middleware which adjusts the popover's position by taking into
+		// account the offset of the anchor's iframe (if any) compared to the page.
+		{
+			name: 'frameOffset',
+			fn( { x, y }: MiddlewareArguments ) {
+				if ( ! frameOffsetRef.current ) {
+					return {
+						x,
+						y,
+					};
+				}
 
-			// The main axis should represent the gap between the
-			// floating element and the reference element. The cross
-			// axis is always perpendicular to the main axis.
-			const mainAxis = isTopBottomPlacement( currentPlacement )
-				? 'y'
-				: 'x';
-			const crossAxis = mainAxis === 'x' ? 'y' : 'x';
-
-			// When the popover is before the reference, subtract the offset,
-			// of the main axis else add it.
-			const mainAxisModifier = hasBeforePlacement( currentPlacement )
-				? -1
-				: 1;
-
-			return {
-				mainAxis:
-					offsetRef.current +
-					frameOffsetRef.current[ mainAxis ] * mainAxisModifier,
-				crossAxis: frameOffsetRef.current[ crossAxis ],
-			};
-		} ),
+				return {
+					x: x + frameOffsetRef.current.x,
+					y: y + frameOffsetRef.current.y,
+					data: {
+						// This will be used in the customLimitShift() function.
+						amount: frameOffsetRef.current,
+					},
+				};
+			},
+		},
+		offsetMiddleware( offsetProp ),
 		computedFlipProp ? flipMiddleware() : undefined,
 		computedResizeProp
 			? size( {
