@@ -167,6 +167,9 @@ describe( 'isValuesDefined', () => {
 	it( 'should return false if values are not defined', () => {
 		expect( isValuesDefined( undefinedValues ) ).toBe( false );
 	} );
+	it( 'should return false if values is passed in as null', () => {
+		expect( isValuesDefined( null ) ).toBe( false );
+	} );
 	const definedValues = {
 		top: 'var:preset|spacing|30',
 		bottom: 'var:preset|spacing|20',
