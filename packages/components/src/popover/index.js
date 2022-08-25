@@ -177,7 +177,6 @@ const Popover = (
 
 	const arrowRef = useRef( null );
 
-	const [ referenceElement, setReferenceElement ] = useState();
 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
 		useState();
 	const [ referenceOwnerDocument, setReferenceOwnerDocument ] = useState();
@@ -192,44 +191,6 @@ const Popover = (
 	const normalizedPlacementFromProps = position
 		? positionToPlacement( position )
 		: placementProp;
-
-	// When any of the possible anchor "sources" change,
-	// recompute the reference element (real or virtual) and its owner document.
-	useLayoutEffect( () => {
-		// In floating-ui's terms:
-		// - "reference" refers to the popover's anchor element.
-		// - "floating" refers the floating popover's element.
-		// A floating element can also be positioned relative to a virtual element,
-		// instead of a real one. A virtual element is represented by an object
-		// with the `getBoundingClientRect()` function (like real elements).
-		// See https://floating-ui.com/docs/virtual-elements for more info.
-		const resultingReferenceOwnerDoc = getReferenceOwnerDocument( {
-			anchorRef,
-			anchorRect,
-			getAnchorRect,
-			fallbackReferenceElement,
-			fallbackDocument: document,
-		} );
-
-		const resultingReferenceElement = getReferenceElement( {
-			anchorRef,
-			anchorRect,
-			getAnchorRect,
-			fallbackReferenceElement,
-		} );
-
-		setReferenceElement( resultingReferenceElement );
-		setReferenceOwnerDocument( resultingReferenceOwnerDoc ?? document );
-	}, [
-		anchorRef,
-		anchorRef?.top,
-		anchorRef?.bottom,
-		anchorRef?.startContainer,
-		anchorRef?.current,
-		anchorRect,
-		getAnchorRect,
-		fallbackReferenceElement,
-	] );
 
 	/**
 	 * Offsets the position of the popover when the anchor is inside an iframe.
@@ -326,7 +287,7 @@ const Popover = (
 		y,
 		// Callback refs (not regular refs). This allows the position to be updated.
 		// when either elements change.
-		reference,
+		reference: referenceCallbackRef,
 		floating,
 		// Object with "regular" refs to both "reference" and "floating"
 		refs,
@@ -357,14 +318,37 @@ const Popover = (
 		[ update ]
 	);
 
-	// Update the `reference`'s ref.
+	// When any of the possible anchor "sources" change,
+	// recompute the reference element (real or virtual) and its owner document.
 	useLayoutEffect( () => {
-		if ( ! referenceElement ) {
-			return;
-		}
+		const resultingReferenceOwnerDoc = getReferenceOwnerDocument( {
+			anchorRef,
+			anchorRect,
+			getAnchorRect,
+			fallbackReferenceElement,
+			fallbackDocument: document,
+		} );
+		const resultingReferenceElement = getReferenceElement( {
+			anchorRef,
+			anchorRect,
+			getAnchorRect,
+			fallbackReferenceElement,
+		} );
 
-		reference( referenceElement );
-	}, [ reference, referenceElement ] );
+		referenceCallbackRef( resultingReferenceElement );
+
+		setReferenceOwnerDocument( resultingReferenceOwnerDoc );
+	}, [
+		anchorRef,
+		anchorRef?.top,
+		anchorRef?.bottom,
+		anchorRef?.startContainer,
+		anchorRef?.current,
+		anchorRect,
+		getAnchorRect,
+		fallbackReferenceElement,
+		referenceCallbackRef,
+	] );
 
 	// If the reference element is in a different ownerDocument (e.g. iFrame),
 	// we need to manually update the floating's position as the reference's owner
