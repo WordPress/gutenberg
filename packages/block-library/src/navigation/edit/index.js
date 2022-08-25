@@ -452,7 +452,7 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
-	// Set menu to published if it's a draft on site load in order to make the post dirty.
+	// Set menu to published if it's a draft on editor load in order to make the post dirty.
 	useEffect( async () => {
 		hideMenuAutoPublishDraftNotice();
 		if ( ! isDraftNavigationMenu ) return;
