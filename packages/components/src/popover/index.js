@@ -387,35 +387,28 @@ const Popover = (
 	// we need to manually update the floating's position as the reference's owner
 	// document scrolls. Also update the frame offset if the view resizes.
 	useLayoutEffect( () => {
-		if ( referenceOwnerDocument === document ) {
+		const referenceAndFloatingHaveSameDocument =
+			referenceOwnerDocument === document;
+		const hasFrameElement =
+			!! referenceOwnerDocument?.defaultView?.frameElement;
+
+		if ( referenceAndFloatingHaveSameDocument || ! hasFrameElement ) {
 			frameOffsetRef.current = undefined;
 			return;
 		}
 
 		const { defaultView } = referenceOwnerDocument;
 
-		referenceOwnerDocument.addEventListener( 'scroll', update );
+		const updateFrameOffset = () => {
+			frameOffsetRef.current = getFrameOffset( referenceOwnerDocument );
+			update();
+		};
+		defaultView.addEventListener( 'resize', updateFrameOffset );
 
-		let updateFrameOffset;
-		const hasFrameElement =
-			!! referenceOwnerDocument?.defaultView?.frameElement;
-		if ( hasFrameElement ) {
-			updateFrameOffset = () => {
-				frameOffsetRef.current = getFrameOffset(
-					referenceOwnerDocument
-				);
-				update();
-			};
-			updateFrameOffset();
-			defaultView.addEventListener( 'resize', updateFrameOffset );
-		}
+		updateFrameOffset();
 
 		return () => {
-			referenceOwnerDocument.removeEventListener( 'scroll', update );
-
-			if ( updateFrameOffset ) {
-				defaultView.removeEventListener( 'resize', updateFrameOffset );
-			}
+			defaultView.removeEventListener( 'resize', updateFrameOffset );
 		};
 	}, [ referenceOwnerDocument, update ] );
 
