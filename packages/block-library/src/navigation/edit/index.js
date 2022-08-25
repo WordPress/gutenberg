@@ -633,7 +633,6 @@ function Navigation( {
 					overlayTextColor={ overlayTextColor }
 				>
 					<UnsavedInnerBlocks
-						blockProps={ blockProps }
 						blocks={ uncontrolledInnerBlocks }
 						clientId={ clientId }
 						navigationMenus={ navigationMenus }
