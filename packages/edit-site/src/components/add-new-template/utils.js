@@ -119,7 +119,7 @@ export function usePostTypeArchiveMenuItems() {
 			postTypesWithArchives
 				?.filter(
 					( postType ) =>
-						! existingTemplates.some(
+						! ( existingTemplates || [] ).some(
 							( existingTemplate ) =>
 								existingTemplate.slug ===
 								'archive-' + postType.slug
