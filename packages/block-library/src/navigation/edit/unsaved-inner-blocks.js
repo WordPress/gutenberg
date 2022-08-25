@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { useInnerBlocksProps } from '@wordpress/block-editor';
@@ -176,18 +171,9 @@ export default function UnsavedInnerBlocks( {
 	const Wrapper = isSaving ? Disabled : 'div';
 
 	return (
-		<Wrapper className="wp-block-navigation__unsaved-changes">
-			<div
-				className={ classnames(
-					'wp-block-navigation__unsaved-changes-overlay',
-					{
-						'is-saving': isSaving,
-					}
-				) }
-			>
-				<div { ...innerBlocksProps } />
-			</div>
+		<>
+			<Wrapper { ...innerBlocksProps } />
 			{ isSaving && <Spinner /> }
-		</Wrapper>
+		</>
 	);
 }
