@@ -157,6 +157,7 @@ export function usePostTypeArchiveMenuItems() {
 						icon: postType.icon?.startsWith( 'dashicons-' )
 							? postType.icon.slice( 10 )
 							: archive,
+						templatePrefix: 'archive',
 					};
 				} ) || [],
 		[ postTypesWithArchives, existingTemplates, needsUniqueIdentifier ]
