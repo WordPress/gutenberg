@@ -1593,7 +1593,6 @@ const canInsertBlockTypeUnmemoized = (
 export const canInsertBlockType = createSelector(
 	canInsertBlockTypeUnmemoized,
 	( state, blockName, rootClientId ) => [
-		state.blocks.attributes[ rootClientId ],
 		state.blockListSettings[ rootClientId ],
 		state.blocks.byClientId[ rootClientId ],
 		state.settings.allowedBlockTypes,
