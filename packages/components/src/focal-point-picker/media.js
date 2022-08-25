@@ -1,21 +1,14 @@
 /**
- * WordPress dependencies
- */
-import { useRef, useLayoutEffect } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
 import { MediaPlaceholder } from './styles/focal-point-picker-style';
 import { isVideoType } from './utils';
 
-const noop = () => {};
-
 export default function Media( {
 	alt,
 	autoPlay,
 	src,
-	onLoad = noop,
+	onLoad,
 	mediaRef,
 	// Exposing muted prop for test rendering purposes
 	// https://github.com/testing-library/react-testing-library/issues/470
@@ -24,10 +17,10 @@ export default function Media( {
 } ) {
 	if ( ! src ) {
 		return (
-			<MediaPlaceholderElement
+			<MediaPlaceholder
 				className="components-focal-point-picker__media components-focal-point-picker__media--placeholder"
-				onLoad={ onLoad }
-				mediaRef={ mediaRef }
+				ref={ mediaRef }
+				{ ...props }
 			/>
 		);
 	}
@@ -55,21 +48,4 @@ export default function Media( {
 			src={ src }
 		/>
 	);
-}
-
-function MediaPlaceholderElement( { mediaRef, onLoad = noop, ...props } ) {
-	const onLoadRef = useRef( onLoad );
-
-	/**
-	 * This async callback mimics the onLoad (img) / onLoadedData (video) callback
-	 * for media elements. It is used in the main <FocalPointPicker /> component
-	 * to calculate the dimensions + boundaries for positioning.
-	 */
-	useLayoutEffect( () => {
-		window.requestAnimationFrame( () => {
-			onLoadRef.current();
-		} );
-	}, [] );
-
-	return <MediaPlaceholder ref={ mediaRef } { ...props } />;
 }

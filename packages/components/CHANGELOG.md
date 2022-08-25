@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Refactor `FocalPointPicker` to function component ([#39168](https://github.com/WordPress/gutenberg/pull/39168)).
+
 ## 20.0.0 (2022-08-24)
 
 ### Breaking Changes
