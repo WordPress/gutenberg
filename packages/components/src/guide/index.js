@@ -77,8 +77,12 @@ export default function Guide( {
 			onKeyDown={ ( event ) => {
 				if ( event.code === 'ArrowLeft' ) {
 					goBack();
+					// Do not scroll the modal's contents.
+					event.preventDefault();
 				} else if ( event.code === 'ArrowRight' ) {
 					goForward();
+					// Do not scroll the modal's contents.
+					event.preventDefault();
 				}
 			} }
 			ref={ guideContainer }
