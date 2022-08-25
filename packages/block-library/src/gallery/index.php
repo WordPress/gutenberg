@@ -51,8 +51,8 @@ function block_core_gallery_render( $attributes, $content ) {
 	if ( is_array( $gap ) ) {
 		foreach ( $gap as $key => $value ) {
 			// Make sure $value is a string to avoid PHP 8.1 deprecation error in preg_match() when the value is null.
-			$value       = is_string( $value ) ? $value : '';
-			$value       = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
+			$value = is_string( $value ) ? $value : '';
+			$value = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
 
 			// Get spacing CSS variable from preset value if provided.
 			if ( is_string( $value ) && str_contains( $value, 'var:preset|spacing|' ) ) {
