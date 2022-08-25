@@ -10,12 +10,10 @@ function makeGenerateRule( path: string[] ): GenerateFunction {
 		generateRule( style, options, path, camelCase( path.join( ' ' ) ) );
 }
 
-function createBorderGenerateFunction(
-	individualProperty: BoxEdges
-): GenerateFunction {
+function createBorderGenerateFunction( edge: BoxEdges ): GenerateFunction {
 	return ( style, options ) => {
 		return [ 'color', 'style', 'width' ].flatMap( ( key ) => {
-			const path = [ 'border', individualProperty, key ];
+			const path = [ 'border', edge, key ];
 			return makeGenerateRule( path )( style, options );
 		} );
 	};
