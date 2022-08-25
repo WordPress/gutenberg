@@ -1,31 +1,30 @@
 /**
  * Internal dependencies
  */
+import { camelCase } from 'lodash';
 import type {
-	BorderIndividualStyles,
 	BorderIndividualProperty,
-	GeneratedCSSRule,
 	Style,
 	StyleDefinition,
 	StyleOptions,
 } from '../../types';
-import { generateRule, generateBoxRules, upperFirst } from '../utils';
+import { generateRule, generateBoxRules } from '../utils';
 
-const color = {
+const color: StyleDefinition = {
 	name: 'color',
-	generate: (
-		style: Style,
-		options: StyleOptions,
-		path: string[] = [ 'border', 'color' ],
-		ruleKey: string = 'borderColor'
-	): GeneratedCSSRule[] => {
-		return generateRule( style, options, path, ruleKey );
+	generate: ( style, options ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'border', 'color' ],
+			'borderColor'
+		);
 	},
 };
 
-const radius = {
+const radius: StyleDefinition = {
 	name: 'radius',
-	generate: ( style: Style, options: StyleOptions ): GeneratedCSSRule[] => {
+	generate: ( style, options ) => {
 		return generateBoxRules(
 			style,
 			options,
@@ -39,35 +38,29 @@ const radius = {
 	},
 };
 
-const borderStyle = {
+const borderStyle: StyleDefinition = {
 	name: 'style',
-	generate: (
-		style: Style,
-		options: StyleOptions,
-		path: string[] = [ 'border', 'style' ],
-		ruleKey: string = 'borderStyle'
-	): GeneratedCSSRule[] => {
-		return generateRule( style, options, path, ruleKey );
+	generate: ( style, options ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'border', 'style' ],
+			'borderStyle'
+		);
 	},
 };
 
-const width = {
+const width: StyleDefinition = {
 	name: 'width',
-	generate: (
-		style: Style,
-		options: StyleOptions,
-		path: string[] = [ 'border', 'width' ],
-		ruleKey: string = 'borderWidth'
-	): GeneratedCSSRule[] => {
-		return generateRule( style, options, path, ruleKey );
+	generate: ( style, options ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'border', 'width' ],
+			'borderWidth'
+		);
 	},
 };
-
-const borderDefinitionsWithIndividualStyles: StyleDefinition[] = [
-	color,
-	borderStyle,
-	width,
-];
 
 /**
  * Returns a curried generator function with the individual border property ('top' | 'right' | 'bottom' | 'left') baked in.
@@ -79,64 +72,41 @@ const borderDefinitionsWithIndividualStyles: StyleDefinition[] = [
 const createBorderGenerateFunction =
 	( individualProperty: BorderIndividualProperty ) =>
 	( style: Style, options: StyleOptions ) => {
-		const styleValue:
-			| BorderIndividualStyles< typeof individualProperty >
-			| undefined = style?.border?.[ individualProperty ];
-
-		if ( ! styleValue ) {
-			return [];
-		}
-
-		return borderDefinitionsWithIndividualStyles.reduce(
-			(
-				acc: GeneratedCSSRule[],
-				borderDefinition: StyleDefinition
-			): GeneratedCSSRule[] => {
-				const key = borderDefinition.name;
-				if (
-					styleValue.hasOwnProperty( key ) &&
-					typeof borderDefinition.generate === 'function'
-				) {
-					const ruleKey = `border${ upperFirst(
-						individualProperty
-					) }${ upperFirst( key ) }`;
-					acc.push(
-						...borderDefinition.generate(
-							style,
-							options,
-							[ 'border', individualProperty, key ],
-							ruleKey
-						)
-					);
-				}
-				return acc;
-			},
-			[]
-		);
+		return [ 'color', 'style', 'width' ].flatMap( ( key ) => {
+			const path = [ 'border', individualProperty, key ];
+			return generateRule(
+				style,
+				options,
+				path,
+				camelCase( path.join( ' ' ) )
+			);
+		} );
 	};
 
-const borderTop = {
+const borderTop: StyleDefinition = {
 	name: 'borderTop',
 	generate: createBorderGenerateFunction( 'top' ),
 };
 
-const borderRight = {
+const borderRight: StyleDefinition = {
 	name: 'borderRight',
 	generate: createBorderGenerateFunction( 'right' ),
 };
 
-const borderBottom = {
+const borderBottom: StyleDefinition = {
 	name: 'borderBottom',
 	generate: createBorderGenerateFunction( 'bottom' ),
 };
 
-const borderLeft = {
+const borderLeft: StyleDefinition = {
 	name: 'borderLeft',
 	generate: createBorderGenerateFunction( 'left' ),
 };
 
 export default [
-	...borderDefinitionsWithIndividualStyles,
+	color,
+	borderStyle,
+	width,
 	radius,
 	borderTop,
 	borderRight,
