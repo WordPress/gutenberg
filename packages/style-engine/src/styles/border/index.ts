@@ -9,7 +9,7 @@ import { generateRule, generateBoxRules, camelCaseJoin } from '../utils';
  *
  * @param path An array of strings representing the path to the style value in the style object.
  *
- * @returns A function that generates CSS rules.
+ * @return A function that generates CSS rules.
  */
 function createBorderGenerateFunction( path: string[] ): GenerateFunction {
 	return ( style, options ) =>
@@ -21,7 +21,7 @@ function createBorderGenerateFunction( path: string[] ): GenerateFunction {
  *
  * @param edge The edge to create CSS rules for.
  *
- * @returns A function that generates CSS rules.
+ * @return A function that generates CSS rules.
  */
 function createBorderEdgeGenerateFunction( edge: BoxEdge ): GenerateFunction {
 	return ( style, options ) => {

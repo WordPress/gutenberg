@@ -132,7 +132,8 @@ export function getCSSVarFromStyleValue( styleValue: string ): string {
  *
  * @return String with the first letter capitalized.
  */
-export function upperFirst( [ firstLetter, ...rest ]: string ): string {
+export function upperFirst( string: string ): string {
+	const [ firstLetter, ...rest ] = string;
 	return firstLetter.toUpperCase() + rest.join( '' );
 }
 
@@ -143,6 +144,7 @@ export function upperFirst( [ firstLetter, ...rest ]: string ): string {
  *
  * @return camelCase string.
  */
-export function camelCaseJoin( [ firstItem, ...rest ]: string[] ): string {
+export function camelCaseJoin( strings: string[] ): string {
+	const [ firstItem, ...rest ] = strings;
 	return firstItem.toLowerCase() + rest.map( upperFirst ).join( '' );
 }
