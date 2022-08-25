@@ -78,7 +78,7 @@ registerFormatType( 'my-custom-format/sample-output', {
 } );
 ```
 
-Let's check that everything is working as expected. Build and reload and then select a paragraph block. Confirm the new button was added to the format toolbar.
+Let's check that everything is working as expected. Build and reload and then select any block containing text like for example the paragraph block. Confirm the new button was added to the format toolbar.
 
 ![Toolbar with custom button](https://developer.wordpress.org/files/2021/12/format-api-toolbar.png)
 
@@ -131,7 +131,7 @@ Use the `className` option when registering to add your own custom class to the 
 
 ### Step 4: Show the button only for specific blocks (Optional)
 
-By default, the button is rendered on every rich text toolbar (image captions, buttons, paragraphs, etc). You can render the button only on blocks of a certain type by using `wp.data.select`.
+By default, the button is rendered on every rich text toolbar (image captions, buttons, paragraphs, etc). You can render the button only on blocks of a certain type by using [the data API](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#api).
 
 Here is an example that only shows the button for Paragraph blocks:
 
