@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { useInnerBlocksProps } from '@wordpress/block-editor';
@@ -42,7 +37,6 @@ const ALLOWED_BLOCKS = [
 ];
 
 export default function UnsavedInnerBlocks( {
-	blockProps,
 	blocks,
 	clientId,
 	hasSavedUnsavedInnerBlocks,
@@ -83,12 +77,17 @@ export default function UnsavedInnerBlocks( {
 	const isDisabled = useContext( Disabled.Context );
 	const savingLock = useRef( false );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		renderAppender: hasSelection ? undefined : false,
-		allowedBlocks: ALLOWED_BLOCKS,
-		__experimentalDefaultBlock: DEFAULT_BLOCK,
-		__experimentalDirectInsert: shouldDirectInsert,
-	} );
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'wp-block-navigation__container',
+		},
+		{
+			renderAppender: hasSelection ? undefined : false,
+			allowedBlocks: ALLOWED_BLOCKS,
+			__experimentalDefaultBlock: DEFAULT_BLOCK,
+			__experimentalDirectInsert: shouldDirectInsert,
+		}
+	);
 
 	const { isSaving, draftNavigationMenus, hasResolvedDraftNavigationMenus } =
 		useSelect(
@@ -172,18 +171,9 @@ export default function UnsavedInnerBlocks( {
 	const Wrapper = isSaving ? Disabled : 'div';
 
 	return (
-		<Wrapper className="wp-block-navigation__unsaved-changes">
-			<div
-				className={ classnames(
-					'wp-block-navigation__unsaved-changes-overlay',
-					{
-						'is-saving': isSaving,
-					}
-				) }
-			>
-				<div { ...innerBlocksProps } />
-			</div>
+		<>
+			<Wrapper { ...innerBlocksProps } />
 			{ isSaving && <Spinner /> }
-		</Wrapper>
+		</>
 	);
 }
