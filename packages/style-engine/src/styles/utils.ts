@@ -128,11 +128,11 @@ export function getCSSVarFromStyleValue( styleValue: string ): string {
 /**
  * Capitalizes the first letter in a string.
  *
- * @param {string} str The string whose first letter the function will capitalize.
+ * @param string The string whose first letter the function will capitalize.
  *
- * @return string A CSS var value.
+ * @return String with the first letter capitalized.
  */
-export function upperFirst( [ firstLetter, ...rest ]: string ) {
+export function upperFirst( [ firstLetter, ...rest ]: string ): string {
 	return firstLetter.toUpperCase() + rest.join( '' );
 }
 
