@@ -2692,5 +2692,9 @@ export const __unstableGetContentLockingParent = createSelector(
 		}
 		return result;
 	},
-	( state ) => [ state.blocks.parents, state.blocks.attributes ]
+	( state ) => [ state.blocks.parents, state.blockListSettings ]
 );
+
+export function __unstableGetTemporarilyEditingAsBlocks( state ) {
+	return state.temporarilyEditingAsBlocks;
+}
