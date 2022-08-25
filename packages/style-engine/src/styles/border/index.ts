@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { camelCase } from 'lodash';
+import { camelCase } from 'change-case';
 
 /**
  * Internal dependencies
