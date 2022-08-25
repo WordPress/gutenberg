@@ -9,7 +9,7 @@ import { camelCase } from 'change-case';
 import type { BoxEdge, GenerateFunction, StyleDefinition } from '../../types';
 import { generateRule, generateBoxRules } from '../utils';
 
-function createBorderGenerateRule( path: string[] ): GenerateFunction {
+function createBorderGenerateFunction( path: string[] ): GenerateFunction {
 	return ( style, options ) =>
 		generateRule( style, options, path, camelCase( path.join( ' ' ) ) );
 }
@@ -18,14 +18,14 @@ function createBorderEdgeGenerateFunction( edge: BoxEdge ): GenerateFunction {
 	return ( style, options ) => {
 		return [ 'color', 'style', 'width' ].flatMap( ( key ) => {
 			const path = [ 'border', edge, key ];
-			return createBorderGenerateRule( path )( style, options );
+			return createBorderGenerateFunction( path )( style, options );
 		} );
 	};
 }
 
 const color: StyleDefinition = {
 	name: 'color',
-	generate: createBorderGenerateRule( [ 'border', 'color' ] ),
+	generate: createBorderGenerateFunction( [ 'border', 'color' ] ),
 };
 
 const radius: StyleDefinition = {
@@ -46,12 +46,12 @@ const radius: StyleDefinition = {
 
 const borderStyle: StyleDefinition = {
 	name: 'style',
-	generate: createBorderGenerateRule( [ 'border', 'style' ] ),
+	generate: createBorderGenerateFunction( [ 'border', 'style' ] ),
 };
 
 const width: StyleDefinition = {
 	name: 'width',
-	generate: createBorderGenerateRule( [ 'border', 'width' ] ),
+	generate: createBorderGenerateFunction( [ 'border', 'width' ] ),
 };
 
 const borderTop: StyleDefinition = {
