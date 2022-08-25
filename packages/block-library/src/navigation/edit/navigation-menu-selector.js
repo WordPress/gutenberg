@@ -85,12 +85,12 @@ function NavigationMenuSelector(
 		canUserCreateNavigationMenu || canUserUpdateNavigationMenu;
 
 	useEffect( () => {
-		if ( ! ( hasNavigationMenus && hasClassicMenus ) ) {
+		if ( ! hasNavigationMenus ) {
 			setSelectorLabel( __( 'No menus. Create one?' ) );
 		} else if ( currentMenuId === null ) {
 			setSelectorLabel( __( 'Select another menu' ) );
 		}
-	}, [ currentMenuId, hasNavigationMenus, hasClassicMenus ] );
+	}, [ currentMenuId, hasNavigationMenus ] );
 
 	// Show the selector if:
 	// - has switch or create permissions and there are block or classic menus.
