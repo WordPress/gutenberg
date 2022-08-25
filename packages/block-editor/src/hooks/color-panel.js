@@ -37,7 +37,7 @@ export default function ColorPanel( {
 		}
 		setDetectedColor( getComputedStyle( ref.current ).color );
 
-		const firstLinkElement = ref.current?.querySelector( 'a' );
+		const firstLinkElement = ref.current?.querySelector( ':scope > a' );
 		if ( firstLinkElement && !! firstLinkElement.innerText ) {
 			setDetectedLinkColor( getComputedStyle( firstLinkElement ).color );
 		}
