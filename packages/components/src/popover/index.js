@@ -49,6 +49,8 @@ import {
 	getFrameOffset,
 	positionToPlacement,
 	placementToMotionAnimationProps,
+	getReferenceOwnerDocument,
+	getReferenceElement,
 } from './utils';
 
 /**
@@ -201,72 +203,20 @@ const Popover = (
 		// instead of a real one. A virtual element is represented by an object
 		// with the `getBoundingClientRect()` function (like real elements).
 		// See https://floating-ui.com/docs/virtual-elements for more info.
-		let resultingReferenceOwnerDoc;
-		if ( anchorRef?.top ) {
-			resultingReferenceOwnerDoc = anchorRef?.top.ownerDocument;
-		} else if ( anchorRef?.startContainer ) {
-			resultingReferenceOwnerDoc = anchorRef.startContainer.ownerDocument;
-		} else if ( anchorRef?.current ) {
-			resultingReferenceOwnerDoc = anchorRef.current.ownerDocument;
-		} else if ( anchorRef ) {
-			// This one should be deprecated.
-			resultingReferenceOwnerDoc = anchorRef.ownerDocument;
-		} else if ( anchorRect && anchorRect?.ownerDocument ) {
-			resultingReferenceOwnerDoc = anchorRect.ownerDocument;
-		} else if ( getAnchorRect ) {
-			resultingReferenceOwnerDoc = getAnchorRect(
-				fallbackReferenceElement
-			)?.ownerDocument;
-		}
+		const resultingReferenceOwnerDoc = getReferenceOwnerDocument( {
+			anchorRef,
+			anchorRect,
+			getAnchorRect,
+			fallbackReferenceElement,
+			fallbackDocument: document,
+		} );
 
-		let resultingReferenceElement;
-		if ( anchorRef?.top ) {
-			// Create a virtual element for the ref. The expectation is that
-			// if anchorRef.top is defined, then anchorRef.bottom is defined too.
-			resultingReferenceElement = {
-				getBoundingClientRect() {
-					const topRect = anchorRef.top.getBoundingClientRect();
-					const bottomRect = anchorRef.bottom.getBoundingClientRect();
-					return new window.DOMRect(
-						topRect.x,
-						topRect.y,
-						topRect.width,
-						bottomRect.bottom - topRect.top
-					);
-				},
-			};
-		} else if ( anchorRef?.current ) {
-			// Standard React ref.
-			resultingReferenceElement = anchorRef.current;
-		} else if ( anchorRef ) {
-			// If `anchorRef` holds directly the element's value (no `current` key)
-			// This is a weird scenario and should be deprecated.
-			resultingReferenceElement = anchorRef;
-		} else if ( anchorRect ) {
-			// Create a virtual element for the ref.
-			resultingReferenceElement = {
-				getBoundingClientRect() {
-					return anchorRect;
-				},
-			};
-		} else if ( getAnchorRect ) {
-			// Create a virtual element for the ref.
-			resultingReferenceElement = {
-				getBoundingClientRect() {
-					const rect = getAnchorRect( fallbackReferenceElement );
-					return new window.DOMRect(
-						rect.x ?? rect.left,
-						rect.y ?? rect.top,
-						rect.width ?? rect.right - rect.left,
-						rect.height ?? rect.bottom - rect.top
-					);
-				},
-			};
-		} else if ( fallbackReferenceElement ) {
-			// If no explicit ref is passed via props, fall back to
-			// anchoring to the popover's parent node.
-			resultingReferenceElement = fallbackReferenceElement.parentNode;
-		}
+		const resultingReferenceElement = getReferenceElement( {
+			anchorRef,
+			anchorRect,
+			getAnchorRect,
+			fallbackReferenceElement,
+		} );
 
 		setReferenceElement( resultingReferenceElement );
 		setReferenceOwnerDocument( resultingReferenceOwnerDoc ?? document );
