@@ -4,21 +4,21 @@
 import type { CSSProperties } from 'react';
 
 type BoxVariants = 'margin' | 'padding' | undefined;
-export type Box< T extends BoxVariants = undefined > = {
+export interface Box< T extends BoxVariants = undefined > {
 	top?: CSSProperties[ T extends undefined ? 'top' : `${ T }Top` ];
 	right?: CSSProperties[ T extends undefined ? 'right' : `${ T }Right` ];
 	bottom?: CSSProperties[ T extends undefined ? 'bottom' : `${ T }Bottom` ];
 	left?: CSSProperties[ T extends undefined ? 'left' : `${ T }Left` ];
-};
+}
 
 export type BoxEdge = 'top' | 'right' | 'bottom' | 'left';
 
 // `T` is one of the values in `BorderIndividualProperty`. The expected CSSProperties key is something like `borderTopColor`.
-export type BorderIndividualStyles< T extends BoxEdge > = {
+export interface BorderIndividualStyles< T extends BoxEdge > {
 	color?: CSSProperties[ `border${ Capitalize< T > }Color` ];
 	style?: CSSProperties[ `border${ Capitalize< T > }Style` ];
 	width?: CSSProperties[ `border${ Capitalize< T > }Width` ];
-};
+}
 
 export interface Style {
 	border?: {
@@ -66,16 +66,19 @@ export interface Style {
 	};
 }
 
-export type CssRulesKeys = { default: string; individual: string };
+export interface CssRulesKeys {
+	default: string;
+	individual: string;
+}
 
-export type StyleOptions = {
+export interface StyleOptions {
 	/**
 	 * CSS selector for the generated style.
 	 */
 	selector?: string;
-};
+}
 
-export type GeneratedCSSRule = {
+export interface GeneratedCSSRule {
 	selector?: string;
 	value: string;
 	/**
@@ -83,7 +86,7 @@ export type GeneratedCSSRule = {
 	 * E.g. `paddingTop` instead of `padding-top`.
 	 */
 	key: string;
-};
+}
 
 export interface GenerateFunction {
 	( style: Style, options: StyleOptions ): GeneratedCSSRule[];
