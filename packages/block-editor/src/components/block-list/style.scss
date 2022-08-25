@@ -192,7 +192,9 @@
 		bottom: 0;
 		left: 0;
 		border-radius: $radius-block-ui;
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) transparent;
+		box-shadow: 0 0 0 0 transparent;
+		transition: box-shadow 0.1s linear;
+		@include reduce-motion("transition");
 	}
 
 	// Warnings

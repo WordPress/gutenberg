@@ -7,8 +7,12 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, createRef } from '@wordpress/element';
-import { withInstanceId } from '@wordpress/compose';
+import { useEffect, useRef, useState } from '@wordpress/element';
+import {
+	__experimentalUseDragging as useDragging,
+	useInstanceId,
+	useIsomorphicLayoutEffect,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -22,154 +26,99 @@ import {
 	MediaWrapper,
 	MediaContainer,
 } from './styles/focal-point-picker-style';
-import { roundClamp } from '../utils/math';
 import { INITIAL_BOUNDS } from './utils';
+import { useUpdateEffect } from '../utils/hooks';
 
-export class FocalPointPicker extends Component {
-	constructor( props ) {
-		super( ...arguments );
+const GRID_OVERLAY_TIMEOUT = 600;
 
-		this.state = {
-			isDragging: false,
-			bounds: INITIAL_BOUNDS,
-			percentages: props.value,
-		};
+export default function FocalPointPicker( {
+	autoPlay = true,
+	className,
+	help,
+	label,
+	onChange,
+	onDrag,
+	onDragEnd,
+	onDragStart,
+	resolvePoint,
+	url,
+	value: valueProp = {
+		x: 0.5,
+		y: 0.5,
+	},
+} ) {
+	const [ point, setPoint ] = useState( valueProp );
+	const [ showGridOverlay, setShowGridOverlay ] = useState( false );
 
-		this.containerRef = createRef();
-		this.mediaRef = createRef();
+	const { startDrag, endDrag, isDragging } = useDragging( {
+		onDragStart: ( event ) => {
+			dragAreaRef.current.focus();
+			const value = getValueWithinDragArea( event );
+			onDragStart?.( value, event );
+			setPoint( value );
+		},
+		onDragMove: ( event ) => {
+			// Prevents text-selection when dragging.
+			event.preventDefault();
+			const value = getValueWithinDragArea( event );
+			onDrag?.( value, event );
+			setPoint( value );
+		},
+		onDragEnd: ( event ) => {
+			onDragEnd?.( event );
+			onChange?.( point );
+		},
+	} );
 
-		this.onMouseDown = this.startDrag.bind( this );
-		this.onMouseUp = this.stopDrag.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
-		this.onMouseMove = this.doDrag.bind( this );
-		this.ifDraggingStop = () => {
-			if ( this.state.isDragging ) {
-				this.stopDrag();
-			}
-		};
-		this.onChangeAtControls = ( value ) => {
-			this.updateValue( value, () => {
-				this.props.onChange( this.state.percentages );
-			} );
-		};
+	// Uses the internal point while dragging or else the value from props.
+	const { x, y } = isDragging ? point : valueProp;
 
-		this.updateBounds = this.updateBounds.bind( this );
-		this.updateValue = this.updateValue.bind( this );
-	}
-	componentDidMount() {
-		const { defaultView } = this.containerRef.current.ownerDocument;
-		defaultView.addEventListener( 'resize', this.updateBounds );
-
-		/*
-		 * Set initial bound values.
-		 *
-		 * This is necessary for Safari:
-		 * https://github.com/WordPress/gutenberg/issues/25814
-		 */
-		this.updateBounds();
-	}
-	componentDidUpdate( prevProps ) {
-		if ( prevProps.url !== this.props.url ) {
-			this.ifDraggingStop();
-		}
-		/*
-		 * Handles cases where the incoming value changes.
-		 * An example is the values resetting based on an UNDO action.
-		 */
-		const {
-			isDragging,
-			percentages: { x, y },
-		} = this.state;
-		const { value } = this.props;
-		if ( ! isDragging && ( value.x !== x || value.y !== y ) ) {
-			this.setState( { percentages: this.props.value } );
-		}
-	}
-	componentWillUnmount() {
-		const { defaultView } = this.containerRef.current.ownerDocument;
-		defaultView.removeEventListener( 'resize', this.updateBounds );
-		this.ifDraggingStop();
-	}
-	calculateBounds() {
-		const bounds = INITIAL_BOUNDS;
-
-		if ( ! this.mediaRef.current ) {
-			return bounds;
-		}
-
-		// Prevent division by zero when updateBounds runs in componentDidMount
-		if (
-			this.mediaRef.current.clientWidth === 0 ||
-			this.mediaRef.current.clientHeight === 0
-		) {
-			return bounds;
-		}
-
-		const dimensions = {
-			width: this.mediaRef.current.clientWidth,
-			height: this.mediaRef.current.clientHeight,
-		};
-
-		const pickerDimensions = this.pickerDimensions();
-
-		const widthRatio = pickerDimensions.width / dimensions.width;
-		const heightRatio = pickerDimensions.height / dimensions.height;
-
-		if ( heightRatio >= widthRatio ) {
-			bounds.width = bounds.right = pickerDimensions.width;
-			bounds.height = dimensions.height * widthRatio;
-			bounds.top = ( pickerDimensions.height - bounds.height ) / 2;
-			bounds.bottom = bounds.top + bounds.height;
-		} else {
-			bounds.height = bounds.bottom = pickerDimensions.height;
-			bounds.width = dimensions.width * heightRatio;
-			bounds.left = ( pickerDimensions.width - bounds.width ) / 2;
-			bounds.right = bounds.left + bounds.width;
-		}
-		return bounds;
-	}
-	updateValue( nextValue = {}, callback ) {
-		const resolvedValue =
-			this.props.resolvePoint?.( nextValue ) ?? nextValue;
-
-		const { x, y } = resolvedValue;
-
-		const nextPercentage = {
-			x: parseFloat( x ).toFixed( 2 ),
-			y: parseFloat( y ).toFixed( 2 ),
-		};
-
-		this.setState( { percentages: nextPercentage }, callback );
-	}
-	updateBounds() {
-		this.setState( {
-			bounds: this.calculateBounds(),
-		} );
-	}
-	startDrag( event ) {
-		event.persist();
-		this.containerRef.current.focus();
-		this.setState( { isDragging: true } );
-		const { ownerDocument } = this.containerRef.current;
-		ownerDocument.addEventListener( 'mouseup', this.onMouseUp );
-		ownerDocument.addEventListener( 'mousemove', this.onMouseMove );
-		const value = this.getValueFromPoint(
-			{ x: event.pageX, y: event.pageY },
-			event.shiftKey
+	const dragAreaRef = useRef();
+	const [ bounds, setBounds ] = useState( INITIAL_BOUNDS );
+	const refUpdateBounds = useRef( () => {
+		const { clientWidth: width, clientHeight: height } =
+			dragAreaRef.current;
+		// Falls back to initial bounds if the ref has no size. Since styles
+		// give the drag area dimensions even when the media has not loaded
+		// this should only happen in unit tests (jsdom).
+		setBounds(
+			width > 0 && height > 0 ? { width, height } : { ...INITIAL_BOUNDS }
 		);
-		this.updateValue( value );
-		this.props.onDragStart?.( value, event );
-	}
-	stopDrag( event ) {
-		const { ownerDocument } = this.containerRef.current;
-		ownerDocument.removeEventListener( 'mouseup', this.onMouseUp );
-		ownerDocument.removeEventListener( 'mousemove', this.onMouseMove );
-		this.setState( { isDragging: false }, () => {
-			this.props.onChange( this.state.percentages );
-		} );
-		this.props.onDragEnd?.( event );
-	}
-	onKeyDown( event ) {
+	} );
+
+	useEffect( () => {
+		const updateBounds = refUpdateBounds.current;
+		const { defaultView } = dragAreaRef.current.ownerDocument;
+		defaultView.addEventListener( 'resize', updateBounds );
+		return () => defaultView.removeEventListener( 'resize', updateBounds );
+	}, [] );
+
+	// Updates the bounds to cover cases of unspecified media or load failures.
+	useIsomorphicLayoutEffect( () => void refUpdateBounds.current(), [] );
+
+	const getValueWithinDragArea = ( { clientX, clientY, shiftKey } ) => {
+		const { top, left } = dragAreaRef.current.getBoundingClientRect();
+		let nextX = ( clientX - left ) / bounds.width;
+		let nextY = ( clientY - top ) / bounds.height;
+		// Enables holding shift to jump values by 10%.
+		if ( shiftKey ) {
+			nextX = Math.round( nextX / 0.1 ) * 0.1;
+			nextY = Math.round( nextY / 0.1 ) * 0.1;
+		}
+		return getFinalValue( { x: nextX, y: nextY } );
+	};
+
+	const getFinalValue = ( value ) => {
+		const resolvedValue = resolvePoint?.( value ) ?? value;
+		resolvedValue.x = Math.max( 0, Math.min( resolvedValue.x, 1 ) );
+		resolvedValue.y = Math.max( 0, Math.min( resolvedValue.y, 1 ) );
+		return {
+			x: parseFloat( resolvedValue.x ).toFixed( 2 ),
+			y: parseFloat( resolvedValue.y ).toFixed( 2 ),
+		};
+	};
+
+	const arrowKeyStep = ( event ) => {
 		const { code, shiftKey } = event;
 		if (
 			! [ 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight' ].includes(
@@ -179,166 +128,75 @@ export class FocalPointPicker extends Component {
 			return;
 
 		event.preventDefault();
-
-		const next = { ...this.state.percentages };
+		const value = { x, y };
 		const step = shiftKey ? 0.1 : 0.01;
 		const delta =
 			code === 'ArrowUp' || code === 'ArrowLeft' ? -1 * step : step;
 		const axis = code === 'ArrowUp' || code === 'ArrowDown' ? 'y' : 'x';
-		const value = parseFloat( next[ axis ] ) + delta;
+		value[ axis ] = parseFloat( value[ axis ] ) + delta;
+		onChange?.( getFinalValue( value ) );
+	};
 
-		next[ axis ] = roundClamp( value, 0, 1, step );
+	const focalPointPosition = {
+		left: x * bounds.width,
+		top: y * bounds.height,
+	};
 
-		this.updateValue( next, () => {
-			this.props.onChange( this.state.percentages );
-		} );
-	}
-	doDrag( event ) {
-		// Prevents text-selection when dragging.
-		event.preventDefault();
-		const value = this.getValueFromPoint(
-			{ x: event.pageX, y: event.pageY },
-			event.shiftKey
-		);
-		this.updateValue( value );
-		this.props.onDrag?.( value, event );
-	}
-	getValueFromPoint( point, byTenths ) {
-		const { bounds } = this.state;
+	const classes = classnames(
+		'components-focal-point-picker-control',
+		className
+	);
 
-		const pickerDimensions = this.pickerDimensions();
-		const relativePoint = {
-			left: point.x - pickerDimensions.left,
-			top: point.y - pickerDimensions.top,
-		};
+	const instanceId = useInstanceId( FocalPointPicker );
+	const id = `inspector-focal-point-picker-control-${ instanceId }`;
 
-		const left = Math.max(
-			bounds.left,
-			Math.min( relativePoint.left, bounds.right )
-		);
-		const top = Math.max(
-			bounds.top,
-			Math.min( relativePoint.top, bounds.bottom )
-		);
+	useUpdateEffect( () => {
+		setShowGridOverlay( true );
+		const timeout = window.setTimeout( () => {
+			setShowGridOverlay( false );
+		}, GRID_OVERLAY_TIMEOUT );
 
-		let nextX =
-			( left - bounds.left ) /
-			( pickerDimensions.width - bounds.left * 2 );
-		let nextY =
-			( top - bounds.top ) / ( pickerDimensions.height - bounds.top * 2 );
+		return () => window.clearTimeout( timeout );
+	}, [ x, y ] );
 
-		// Enables holding shift to jump values by 10%
-		const step = byTenths ? 0.1 : 0.01;
-
-		nextX = roundClamp( nextX, 0, 1, step );
-		nextY = roundClamp( nextY, 0, 1, step );
-
-		return { x: nextX, y: nextY };
-	}
-	pickerDimensions() {
-		const containerNode = this.containerRef.current;
-
-		if ( ! containerNode ) {
-			return {
-				width: 0,
-				height: 0,
-				left: 0,
-				top: 0,
-			};
-		}
-
-		const { clientHeight, clientWidth } = containerNode;
-		const { top, left } = containerNode.getBoundingClientRect();
-
-		return {
-			width: clientWidth,
-			height: clientHeight,
-			top: top + document.body.scrollTop,
-			left,
-		};
-	}
-	iconCoordinates() {
-		const {
-			bounds,
-			percentages: { x, y },
-		} = this.state;
-
-		if ( bounds.left === undefined || bounds.top === undefined ) {
-			return {
-				left: '50%',
-				top: '50%',
-			};
-		}
-
-		const { width, height } = this.pickerDimensions();
-		return {
-			left: x * ( width - bounds.left * 2 ) + bounds.left,
-			top: y * ( height - bounds.top * 2 ) + bounds.top,
-		};
-	}
-	render() {
-		const { autoPlay, className, help, instanceId, label, url } =
-			this.props;
-		const { bounds, isDragging, percentages } = this.state;
-		const iconCoordinates = this.iconCoordinates();
-
-		const classes = classnames(
-			'components-focal-point-picker-control',
-			className
-		);
-
-		const id = `inspector-focal-point-picker-control-${ instanceId }`;
-
-		return (
-			<BaseControl
-				label={ label }
-				id={ id }
-				help={ help }
-				className={ classes }
-			>
-				<MediaWrapper className="components-focal-point-picker-wrapper">
-					<MediaContainer
-						className="components-focal-point-picker"
-						onKeyDown={ this.onKeyDown }
-						onMouseDown={ this.onMouseDown }
-						onBlur={ this.ifDraggingStop }
-						ref={ this.containerRef }
-						role="button"
-						tabIndex="-1"
-					>
-						<Grid
-							bounds={ bounds }
-							value={ percentages.x + percentages.y }
-						/>
-						<Media
-							alt={ __( 'Media preview' ) }
-							autoPlay={ autoPlay }
-							mediaRef={ this.mediaRef }
-							onLoad={ this.updateBounds }
-							src={ url }
-						/>
-						<FocalPoint
-							coordinates={ iconCoordinates }
-							isDragging={ isDragging }
-						/>
-					</MediaContainer>
-				</MediaWrapper>
-				<Controls
-					percentages={ percentages }
-					onChange={ this.onChangeAtControls }
-				/>
-			</BaseControl>
-		);
-	}
+	return (
+		<BaseControl
+			label={ label }
+			id={ id }
+			help={ help }
+			className={ classes }
+		>
+			<MediaWrapper className="components-focal-point-picker-wrapper">
+				<MediaContainer
+					className="components-focal-point-picker"
+					onKeyDown={ arrowKeyStep }
+					onMouseDown={ startDrag }
+					onBlur={ () => {
+						if ( isDragging ) endDrag();
+					} }
+					ref={ dragAreaRef }
+					role="button"
+					tabIndex="-1"
+				>
+					<Grid bounds={ bounds } showOverlay={ showGridOverlay } />
+					<Media
+						alt={ __( 'Media preview' ) }
+						autoPlay={ autoPlay }
+						onLoad={ refUpdateBounds.current }
+						src={ url }
+					/>
+					<FocalPoint
+						{ ...focalPointPosition }
+						isDragging={ isDragging }
+					/>
+				</MediaContainer>
+			</MediaWrapper>
+			<Controls
+				point={ { x, y } }
+				onChange={ ( value ) => {
+					onChange?.( getFinalValue( value ) );
+				} }
+			/>
+		</BaseControl>
+	);
 }
-
-FocalPointPicker.defaultProps = {
-	autoPlay: true,
-	value: {
-		x: 0.5,
-		y: 0.5,
-	},
-	url: null,
-};
-
-export default withInstanceId( FocalPointPicker );

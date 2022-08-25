@@ -290,10 +290,7 @@ export const registerCoreBlocks = (
 export const __experimentalRegisterExperimentalCoreBlocks = process.env
 	.IS_GUTENBERG_PLUGIN
 	? ( { enableFSEBlocks } = {} ) => {
-			const enabledExperiments = [
-				window.__experimentalEnableListBlockV2 ? 'list-v2' : null,
-				enableFSEBlocks ? 'fse' : null,
-			];
+			const enabledExperiments = [ enableFSEBlocks ? 'fse' : null ];
 			getAllBlocks()
 				.filter( ( { metadata } ) =>
 					isBlockMetadataExperimental( metadata )
