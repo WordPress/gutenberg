@@ -1,9 +1,6 @@
 /**
  * WordPress dependencies
  */
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Register block type hooks', () => {
@@ -25,7 +22,7 @@ test.describe( 'Register block type hooks', () => {
 
 		expect(
 			page.locator(
-				'.block-editor-block-types-list[aria-label="Widgets"] > .editor-block-list-item-paragraph'
+				'role=listbox[name="Widgets"i] >> role=option[name="Paragraph"i]'
 			)
 		).toBeDefined();
 	} );
