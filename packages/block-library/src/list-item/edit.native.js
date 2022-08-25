@@ -86,7 +86,7 @@ export default function ListItemEdit( {
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list' ],
-		renderAppender: false,
+		useCompactList: true,
 	} );
 
 	const onSplit = useSplit( clientId );
