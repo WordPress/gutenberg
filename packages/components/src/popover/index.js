@@ -143,7 +143,6 @@ const Popover = (
 		expandOnMobile,
 		onFocusOutside,
 		__unstableSlotName = SLOT_NAME,
-		__unstableObserveElement,
 		__unstableForcePosition = false,
 		__unstableShift = false,
 		...contentProps
@@ -383,19 +382,6 @@ const Popover = (
 		// as dependencies (see https://github.com/WordPress/gutenberg/pull/41612)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ anchorRef, anchorRect, getAnchorRect, update ] );
-
-	// This is only needed for a smooth transition when moving blocks.
-	useLayoutEffect( () => {
-		if ( ! __unstableObserveElement ) {
-			return;
-		}
-		const observer = new window.MutationObserver( update );
-		observer.observe( __unstableObserveElement, { attributes: true } );
-
-		return () => {
-			observer.disconnect();
-		};
-	}, [ __unstableObserveElement, update ] );
 
 	// If the reference element is in a different ownerDocument (e.g. iFrame),
 	// we need to manually update the floating's position as the reference's owner
