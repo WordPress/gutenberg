@@ -111,7 +111,7 @@ export default function ListItemEdit( {
 
 	const styleWithPlaceholderOpacity = {
 		...style,
-		...( style.color && {
+		...( style?.color && {
 			placeholderColor: style.color + OPACITY,
 		} ),
 	};
