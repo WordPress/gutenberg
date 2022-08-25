@@ -97,8 +97,10 @@ export default function ListItemEdit( {
 		styles[ 'wp-block-list-item__list-item-placeholder--dark' ]
 	);
 
+	const currentTextColor = style?.color || style?.baseColors?.color?.text;
+
 	const defaultPlaceholderTextColor = style?.baseColors?.color?.text
-		? styles.color || style.baseColors.color.text
+		? currentTextColor
 		: defaultPlaceholderFromScheme?.color;
 
 	// Add hex opacity to default placeholder text color and style object
