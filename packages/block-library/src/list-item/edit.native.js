@@ -85,21 +85,32 @@ export default function ListItemEdit( {
 	const blockProps = useBlockProps( {
 		...( hasInnerBlocks && styles[ 'wp-block-list-item__nested-blocks' ] ),
 	} );
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list' ],
 		useCompactList: true,
 	} );
 
-	const placeholderWithPreferredScheme = usePreferredColorSchemeStyle(
+	// Set default placeholder text color from light/dark scheme or base colors
+	const defaultPlaceholderFromScheme = usePreferredColorSchemeStyle(
 		styles[ 'wp-block-list-item__list-item-placeholder' ],
 		styles[ 'wp-block-list-item__list-item-placeholder--dark' ]
 	);
 
-	// Add 0.62 hex opacity to baseColor text (e.g. #FFFFFF9E)
-	// or fallback to default color from stylesheet ($gray, $gray-50)
 	const defaultPlaceholderTextColor = style?.baseColors?.color?.text
-		? style.baseColors.color.text + '9E'
-		: placeholderWithPreferredScheme?.color;
+		? styles.color || style.baseColors.color.text
+		: defaultPlaceholderFromScheme?.color;
+
+	// Add hex opacity to default placeholder text color and style object
+	const defaultPlaceholderTextColorWithOpacity =
+		defaultPlaceholderTextColor + '9e';
+
+	const styleWithPlaceholderOpacity = {
+		...style,
+		...( style.color && {
+			placeholderColor: style.color + '9e',
+		} ),
+	};
 
 	const onSplit = useSplit( clientId );
 	const onMerge = useMerge( clientId );
@@ -140,13 +151,15 @@ export default function ListItemEdit( {
 						}
 						value={ content }
 						placeholder={ placeholder || __( 'List' ) }
-						placeholderTextColor={ defaultPlaceholderTextColor }
+						placeholderTextColor={
+							defaultPlaceholderTextColorWithOpacity
+						}
 						onSplit={ onSplit }
 						onMerge={ onMerge }
 						onReplace={ ( blocks, ...args ) => {
 							onReplace( convertToListItems( blocks ), ...args );
 						} }
-						style={ style }
+						style={ styleWithPlaceholderOpacity }
 						deleteEnter={ true }
 						containerWidth={ contentWidth }
 					/>
