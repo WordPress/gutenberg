@@ -135,3 +135,14 @@ export function getCSSVarFromStyleValue( styleValue: string ): string {
 export function upperFirst( [ firstLetter, ...rest ]: string ) {
 	return firstLetter.toUpperCase() + rest.join( '' );
 }
+
+/**
+ * Converts an array of strings into a camelCase string.
+ *
+ * @param strings The strings to join into a camelCase string.
+ *
+ * @return camelCase string.
+ */
+export function camelCaseJoin( [ firstItem, ...rest ]: string[] ): string {
+	return firstItem.toLowerCase() + rest.map( upperFirst ).join( '' );
+}

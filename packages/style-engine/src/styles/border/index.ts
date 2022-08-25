@@ -1,17 +1,12 @@
 /**
- * External dependencies
- */
-import { camelCase } from 'change-case';
-
-/**
  * Internal dependencies
  */
 import type { BoxEdge, GenerateFunction, StyleDefinition } from '../../types';
-import { generateRule, generateBoxRules } from '../utils';
+import { generateRule, generateBoxRules, camelCaseJoin } from '../utils';
 
 function createBorderGenerateFunction( path: string[] ): GenerateFunction {
 	return ( style, options ) =>
-		generateRule( style, options, path, camelCase( path.join( ' ' ) ) );
+		generateRule( style, options, path, camelCaseJoin( path ) );
 }
 
 function createBorderEdgeGenerateFunction( edge: BoxEdge ): GenerateFunction {
