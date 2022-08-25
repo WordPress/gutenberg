@@ -34,7 +34,7 @@ export function generateRule(
 	options: StyleOptions,
 	path: string[],
 	ruleKey: string
-) {
+): GeneratedCSSRule[] {
 	const styleValue: string | undefined = get( style, path );
 
 	return styleValue
