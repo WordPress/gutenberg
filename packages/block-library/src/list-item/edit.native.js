@@ -27,6 +27,8 @@ import { IndentUI } from './edit.js';
 import styles from './style.scss';
 import ListStyleType from './list-style-type';
 
+const OPACITY = '9e';
+
 export default function ListItemEdit( {
 	attributes,
 	setAttributes,
@@ -99,18 +101,18 @@ export default function ListItemEdit( {
 
 	const currentTextColor = style?.color || style?.baseColors?.color?.text;
 
-	const defaultPlaceholderTextColor = style?.baseColors?.color?.text
+	const defaultPlaceholderTextColor = currentTextColor
 		? currentTextColor
 		: defaultPlaceholderFromScheme?.color;
 
 	// Add hex opacity to default placeholder text color and style object
 	const defaultPlaceholderTextColorWithOpacity =
-		defaultPlaceholderTextColor + '9e';
+		defaultPlaceholderTextColor + OPACITY;
 
 	const styleWithPlaceholderOpacity = {
 		...style,
 		...( style.color && {
-			placeholderColor: style.color + '9e',
+			placeholderColor: style.color + OPACITY,
 		} ),
 	};
 
