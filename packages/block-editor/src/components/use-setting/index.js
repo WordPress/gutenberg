@@ -166,7 +166,6 @@ export default function useSetting( path ) {
 				// Needs some work:
 				//   - Can only handle one layer of nesting
 				//   - No CSS-like specificity rules for determining winner if a block is nested in multiple places
-				//   - No tests
 
 				blockParentIds.forEach( ( blockParentId ) => {
 					const parentBlockName =
