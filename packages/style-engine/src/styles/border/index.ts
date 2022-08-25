@@ -5,23 +5,23 @@ import { camelCase } from 'lodash';
 import type { BoxEdge, GenerateFunction, StyleDefinition } from '../../types';
 import { generateRule, generateBoxRules } from '../utils';
 
-function makeGenerateRule( path: string[] ): GenerateFunction {
+function createBorderGenerateRule( path: string[] ): GenerateFunction {
 	return ( style, options ) =>
 		generateRule( style, options, path, camelCase( path.join( ' ' ) ) );
 }
 
-function createBorderGenerateFunction( edge: BoxEdge ): GenerateFunction {
+function createBorderEdgeGenerateFunction( edge: BoxEdge ): GenerateFunction {
 	return ( style, options ) => {
 		return [ 'color', 'style', 'width' ].flatMap( ( key ) => {
 			const path = [ 'border', edge, key ];
-			return makeGenerateRule( path )( style, options );
+			return createBorderGenerateRule( path )( style, options );
 		} );
 	};
 }
 
 const color: StyleDefinition = {
 	name: 'color',
-	generate: makeGenerateRule( [ 'border', 'color' ] ),
+	generate: createBorderGenerateRule( [ 'border', 'color' ] ),
 };
 
 const radius: StyleDefinition = {
@@ -42,32 +42,32 @@ const radius: StyleDefinition = {
 
 const borderStyle: StyleDefinition = {
 	name: 'style',
-	generate: makeGenerateRule( [ 'border', 'style' ] ),
+	generate: createBorderGenerateRule( [ 'border', 'style' ] ),
 };
 
 const width: StyleDefinition = {
 	name: 'width',
-	generate: makeGenerateRule( [ 'border', 'width' ] ),
+	generate: createBorderGenerateRule( [ 'border', 'width' ] ),
 };
 
 const borderTop: StyleDefinition = {
 	name: 'borderTop',
-	generate: createBorderGenerateFunction( 'top' ),
+	generate: createBorderEdgeGenerateFunction( 'top' ),
 };
 
 const borderRight: StyleDefinition = {
 	name: 'borderRight',
-	generate: createBorderGenerateFunction( 'right' ),
+	generate: createBorderEdgeGenerateFunction( 'right' ),
 };
 
 const borderBottom: StyleDefinition = {
 	name: 'borderBottom',
-	generate: createBorderGenerateFunction( 'bottom' ),
+	generate: createBorderEdgeGenerateFunction( 'bottom' ),
 };
 
 const borderLeft: StyleDefinition = {
 	name: 'borderLeft',
-	generate: createBorderGenerateFunction( 'left' ),
+	generate: createBorderEdgeGenerateFunction( 'left' ),
 };
 
 export default [
