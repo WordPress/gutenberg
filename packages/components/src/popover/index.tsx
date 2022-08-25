@@ -34,7 +34,6 @@ import {
 	useMemo,
 	useState,
 	useCallback,
-	useEffect,
 } from '@wordpress/element';
 import {
 	useViewportMatch,
@@ -282,11 +281,6 @@ const UnforwardedPopover = (
 	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
 	 */
 	const frameOffsetRef = useRef( getFrameOffset( referenceOwnerDocument ) );
-	/**
-	 * Store the offset prop in a ref, due to constraints with floating-ui:
-	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
-	 */
-	const offsetRef = useRef( offsetProp );
 
 	const middleware = [
 		// Custom middleware which adjusts the popover's position by taking into
@@ -389,11 +383,6 @@ const UnforwardedPopover = (
 				animationFrame: true,
 			} ),
 	} );
-
-	useEffect( () => {
-		offsetRef.current = offsetProp;
-		update();
-	}, [ offsetProp, update ] );
 
 	const arrowCallbackRef = useCallback(
 		( node ) => {
