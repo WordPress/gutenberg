@@ -131,7 +131,7 @@ Use the `className` option when registering to add your own custom class to the 
 
 ### Step 4: Show the button only for specific blocks (Optional)
 
-By default, the button is rendered on every rich text toolbar (image captions, buttons, paragraphs, etc). You can render the button only on blocks of a certain type by using [the data API](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#api).
+By default, the button is rendered on every rich text toolbar (image captions, buttons, paragraphs, etc). You can render the button only on blocks of a certain type by using [the data API](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data).
 
 Here is an example that only shows the button for Paragraph blocks:
 
