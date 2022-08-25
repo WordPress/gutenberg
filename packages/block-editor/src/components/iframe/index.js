@@ -294,9 +294,9 @@ function Iframe(
 							<head ref={ headRef }>
 								{ head }
 								<style>
-									{ `html { transition: background 0.3s; ${
+									{ `html { transition: background 5s; ${
 										isZoomedOut
-											? `background: #2f2f2f;`
+											? 'background: #2f2f2f; transition: background 0s;'
 											: ''
 									} }` }
 								</style>
