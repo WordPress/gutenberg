@@ -61,7 +61,6 @@ export const ControlWrapper = styled( Flex )`
 
 export const GridView = styled.div`
 	left: 50%;
-	opacity: 0;
 	overflow: hidden;
 	pointer-events: none;
 	position: absolute;
@@ -70,11 +69,7 @@ export const GridView = styled.div`
 	transition: opacity 120ms linear;
 	z-index: 1;
 
-	${ ( { isActive } ) =>
-		isActive &&
-		`
-		opacity: 1;
-	` }
+	opacity: ${ ( { showOverlay } ) => ( showOverlay ? 1 : 0 ) };
 `;
 
 export const GridLine = styled.div`

@@ -27,6 +27,9 @@ import {
 	MediaContainer,
 } from './styles/focal-point-picker-style';
 import { INITIAL_BOUNDS } from './utils';
+import { useUpdateEffect } from '../utils/hooks';
+
+const GRID_OVERLAY_TIMEOUT = 600;
 
 export default function FocalPointPicker( {
 	autoPlay = true,
@@ -45,6 +48,7 @@ export default function FocalPointPicker( {
 	},
 } ) {
 	const [ point, setPoint ] = useState( valueProp );
+	const [ showGridOverlay, setShowGridOverlay ] = useState( false );
 
 	const { startDrag, endDrag, isDragging } = useDragging( {
 		onDragStart: ( event ) => {
@@ -146,6 +150,15 @@ export default function FocalPointPicker( {
 	const instanceId = useInstanceId( FocalPointPicker );
 	const id = `inspector-focal-point-picker-control-${ instanceId }`;
 
+	useUpdateEffect( () => {
+		setShowGridOverlay( true );
+		const timeout = window.setTimeout( () => {
+			setShowGridOverlay( false );
+		}, GRID_OVERLAY_TIMEOUT );
+
+		return () => window.clearTimeout( timeout );
+	}, [ x, y ] );
+
 	return (
 		<BaseControl
 			label={ label }
@@ -165,7 +178,7 @@ export default function FocalPointPicker( {
 					role="button"
 					tabIndex="-1"
 				>
-					<Grid bounds={ bounds } value={ `${ x }${ y }` } />
+					<Grid bounds={ bounds } showOverlay={ showGridOverlay } />
 					<Media
 						alt={ __( 'Media preview' ) }
 						autoPlay={ autoPlay }
