@@ -374,7 +374,10 @@ const Popover = (
 		return autoUpdate(
 			resultingReferenceRef,
 			refs.floating.current,
-			update
+			update,
+			{
+				animationFrame: true,
+			}
 		);
 		// 'reference' and 'refs.floating' are refs and don't need to be listed
 		// as dependencies (see https://github.com/WordPress/gutenberg/pull/41612)
