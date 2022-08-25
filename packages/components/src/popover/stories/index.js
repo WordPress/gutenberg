@@ -73,8 +73,8 @@ export default {
 			options: AVAILABLE_POSITIONS,
 		},
 		__unstableSlotName: { control: { type: null } },
-		__unstableResize: { control: { type: 'boolean' } },
-		__unstableFlip: { control: { type: 'boolean' } },
+		resize: { control: { type: 'boolean' } },
+		flip: { control: { type: 'boolean' } },
 		__unstableShift: { control: { type: 'boolean' } },
 	},
 };
@@ -181,8 +181,8 @@ AllPlacements.args = {
 	),
 	noArrow: false,
 	offset: 10,
-	__unstableResize: false,
-	__unstableFlip: false,
+	resize: false,
+	flip: false,
 };
 
 export const DynamicHeight = ( { children, ...args } ) => {

@@ -66,8 +66,8 @@ function BlockPopover(
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the default popover slot).
 			__unstableSlotName={ __unstablePopoverSlot || null }
-			__unstableResize={ false }
-			__unstableFlip={ false }
+			resize={ false }
+			flip={ false }
 			__unstableShift
 			{ ...props }
 			className={ classnames(
