@@ -11,12 +11,13 @@ export type Box< T extends BoxVariants = undefined > = {
 	left?: CSSProperties[ T extends undefined ? 'left' : `${ T }Left` ];
 };
 
-export type BorderIndividualProperty = 'top' | 'right' | 'bottom' | 'left';
+export type BoxEdges = 'top' | 'right' | 'bottom' | 'left';
+
 // `T` is one of the values in `BorderIndividualProperty`. The expected CSSProperties key is something like `borderTopColor`.
-export type BorderIndividualStyles< T extends BorderIndividualProperty > = {
-	color?: CSSProperties[ `border${ Capitalize< string & T > }Color` ];
-	style?: CSSProperties[ `border${ Capitalize< string & T > }Style` ];
-	width?: CSSProperties[ `border${ Capitalize< string & T > }Width` ];
+export type BorderIndividualStyles< T extends BoxEdges > = {
+	color?: CSSProperties[ `border${ Capitalize< T > }Color` ];
+	style?: CSSProperties[ `border${ Capitalize< T > }Style` ];
+	width?: CSSProperties[ `border${ Capitalize< T > }Width` ];
 };
 
 export interface Style {
