@@ -2,23 +2,18 @@
  * Internal dependencies
  */
 import { camelCase } from 'lodash';
-import type {
-	BorderIndividualProperty,
-	Style,
-	StyleDefinition,
-	StyleOptions,
-} from '../../types';
+import type { BoxEdges, GenerateFunction, StyleDefinition } from '../../types';
 import { generateRule, generateBoxRules } from '../utils';
 
-function makeGenerateRule( path: string[] ) {
-	return ( style: Style, options: StyleOptions ) =>
+function makeGenerateRule( path: string[] ): GenerateFunction {
+	return ( style, options ) =>
 		generateRule( style, options, path, camelCase( path.join( ' ' ) ) );
 }
 
 function createBorderGenerateFunction(
-	individualProperty: BorderIndividualProperty
-) {
-	return ( style: Style, options: StyleOptions ) => {
+	individualProperty: BoxEdges
+): GenerateFunction {
+	return ( style, options ) => {
 		return [ 'color', 'style', 'width' ].flatMap( ( key ) => {
 			const path = [ 'border', individualProperty, key ];
 			return makeGenerateRule( path )( style, options );

@@ -84,7 +84,11 @@ export type GeneratedCSSRule = {
 	key: string;
 };
 
+export interface GenerateFunction {
+	( style: Style, options: StyleOptions ): GeneratedCSSRule[];
+}
+
 export interface StyleDefinition {
 	name: string;
-	generate?: ( style: Style, options: StyleOptions ) => GeneratedCSSRule[];
+	generate?: GenerateFunction;
 }
