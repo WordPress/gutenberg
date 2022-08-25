@@ -10,16 +10,25 @@ import type {
 } from '../../types';
 import { generateRule, generateBoxRules } from '../utils';
 
+function makeGenerateRule( path: string[] ) {
+	return ( style: Style, options: StyleOptions ) =>
+		generateRule( style, options, path, camelCase( path.join( ' ' ) ) );
+}
+
+function createBorderGenerateFunction(
+	individualProperty: BorderIndividualProperty
+) {
+	return ( style: Style, options: StyleOptions ) => {
+		return [ 'color', 'style', 'width' ].flatMap( ( key ) => {
+			const path = [ 'border', individualProperty, key ];
+			return makeGenerateRule( path )( style, options );
+		} );
+	};
+}
+
 const color: StyleDefinition = {
 	name: 'color',
-	generate: ( style, options ) => {
-		return generateRule(
-			style,
-			options,
-			[ 'border', 'color' ],
-			'borderColor'
-		);
-	},
+	generate: makeGenerateRule( [ 'border', 'color' ] ),
 };
 
 const radius: StyleDefinition = {
@@ -40,48 +49,13 @@ const radius: StyleDefinition = {
 
 const borderStyle: StyleDefinition = {
 	name: 'style',
-	generate: ( style, options ) => {
-		return generateRule(
-			style,
-			options,
-			[ 'border', 'style' ],
-			'borderStyle'
-		);
-	},
+	generate: makeGenerateRule( [ 'border', 'style' ] ),
 };
 
 const width: StyleDefinition = {
 	name: 'width',
-	generate: ( style, options ) => {
-		return generateRule(
-			style,
-			options,
-			[ 'border', 'width' ],
-			'borderWidth'
-		);
-	},
+	generate: makeGenerateRule( [ 'border', 'width' ] ),
 };
-
-/**
- * Returns a curried generator function with the individual border property ('top' | 'right' | 'bottom' | 'left') baked in.
- *
- * @param  individualProperty Individual border property ('top' | 'right' | 'bottom' | 'left').
- *
- * @return StyleDefinition[ 'generate' ]
- */
-const createBorderGenerateFunction =
-	( individualProperty: BorderIndividualProperty ) =>
-	( style: Style, options: StyleOptions ) => {
-		return [ 'color', 'style', 'width' ].flatMap( ( key ) => {
-			const path = [ 'border', individualProperty, key ];
-			return generateRule(
-				style,
-				options,
-				path,
-				camelCase( path.join( ' ' ) )
-			);
-		} );
-	};
 
 const borderTop: StyleDefinition = {
 	name: 'borderTop',
