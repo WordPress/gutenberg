@@ -72,41 +72,35 @@ export const withBlockControls = createHigherOrderComponent(
 					/>
 				) }
 				<BlockControls group="other">
-					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ () => {
-								if ( isEditingAsBlocks && ! isContentLocked ) {
-									updateBlockListSettings( props.clientId, {
-										...getBlockListSettings(
-											props.clientId
-										),
-										templateLock: 'noContent',
-									} );
-									__unstableMarkNextChangeAsNotPersistent();
-									updateBlockAttributes( props.clientId, {
-										templateLock: 'noContent',
-									} );
-									setIsEditingAsBlocks( false );
-								} else {
-									updateBlockListSettings( props.clientId, {
-										...getBlockListSettings(
-											props.clientId
-										),
-										templateLock: false,
-									} );
-									__unstableMarkNextChangeAsNotPersistent();
-									updateBlockAttributes( props.clientId, {
-										templateLock: undefined,
-									} );
-									setIsEditingAsBlocks( true );
-								}
-							} }
-						>
-							{ isEditingAsBlocks && ! isContentLocked
-								? __( 'Done' )
-								: __( 'Modify' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
+					<ToolbarButton
+						onClick={ () => {
+							if ( isEditingAsBlocks && ! isContentLocked ) {
+								updateBlockListSettings( props.clientId, {
+									...getBlockListSettings( props.clientId ),
+									templateLock: 'noContent',
+								} );
+								__unstableMarkNextChangeAsNotPersistent();
+								updateBlockAttributes( props.clientId, {
+									templateLock: 'noContent',
+								} );
+								setIsEditingAsBlocks( false );
+							} else {
+								updateBlockListSettings( props.clientId, {
+									...getBlockListSettings( props.clientId ),
+									templateLock: false,
+								} );
+								__unstableMarkNextChangeAsNotPersistent();
+								updateBlockAttributes( props.clientId, {
+									templateLock: undefined,
+								} );
+								setIsEditingAsBlocks( true );
+							}
+						} }
+					>
+						{ isEditingAsBlocks && ! isContentLocked
+							? __( 'Done' )
+							: __( 'Modify' ) }
+					</ToolbarButton>
 				</BlockControls>
 				<BlockEdit { ...props } />
 			</>
