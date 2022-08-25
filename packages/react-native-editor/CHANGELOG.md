@@ -11,6 +11,13 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.81.1
+-   [*] List block v2: Fix text color inconsistencies with list items [#43244]
+-   [*] Use default placeholder text color for native List Item [#43353]
+-   [**] Add BlockListCompact [#43431]
+-   [*] Fix dynamic React Native version [#43058]
+-   [**] Disable FastImage on Android [#43322]
+
 ## 1.81.0
 -   [***] List block V2 [#42702]
 
