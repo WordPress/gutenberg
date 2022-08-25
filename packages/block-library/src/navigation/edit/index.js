@@ -428,6 +428,8 @@ function Navigation( {
 		ref,
 	] );
 
+	const hasManagePermissions =
+		canUserCreateNavigationMenu || canUserUpdateNavigationMenu;
 	const navigationSelectorRef = useRef();
 	const [ shouldFocusNavigationSelector, setShouldFocusNavigationSelector ] =
 		useState( false );
@@ -625,16 +627,17 @@ function Navigation( {
 							onCreateNew={ () => createNavigationMenu( '', [] ) }
 							/* translators: %s: The name of a menu. */
 							actionLabel={ __( "Switch to '%s'" ) }
-							showManageActions
 						/>
-						<Button
-							variant="link"
-							href={ addQueryArgs( 'edit.php', {
-								post_type: 'wp_navigation',
-							} ) }
-						>
-							{ __( 'Manage menus' ) }
-						</Button>
+						{ hasManagePermissions && (
+							<Button
+								variant="link"
+								href={ addQueryArgs( 'edit.php', {
+									post_type: 'wp_navigation',
+								} ) }
+							>
+								{ __( 'Manage menus' ) }
+							</Button>
+						) }
 					</PanelBody>
 				</InspectorControls>
 				{ stylingInspectorControls }
@@ -701,16 +704,17 @@ function Navigation( {
 							onCreateNew={ () => createNavigationMenu( '', [] ) }
 							/* translators: %s: The name of a menu. */
 							actionLabel={ __( "Switch to '%s'" ) }
-							showManageActions
 						/>
-						<Button
-							variant="link"
-							href={ addQueryArgs( 'edit.php', {
-								post_type: 'wp_navigation',
-							} ) }
-						>
-							{ __( 'Manage menus' ) }
-						</Button>
+						{ hasManagePermissions && (
+							<Button
+								variant="link"
+								href={ addQueryArgs( 'edit.php', {
+									post_type: 'wp_navigation',
+								} ) }
+							>
+								{ __( 'Manage menus' ) }
+							</Button>
+						) }
 					</PanelBody>
 				</InspectorControls>
 				<Warning>
@@ -809,16 +813,17 @@ function Navigation( {
 							onCreateNew={ () => createNavigationMenu( '', [] ) }
 							/* translators: %s: The name of a menu. */
 							actionLabel={ __( "Switch to '%s'" ) }
-							showManageActions
 						/>
-						<Button
-							variant="link"
-							href={ addQueryArgs( 'edit.php', {
-								post_type: 'wp_navigation',
-							} ) }
-						>
-							{ __( 'Manage menus' ) }
-						</Button>
+						{ hasManagePermissions && (
+							<Button
+								variant="link"
+								href={ addQueryArgs( 'edit.php', {
+									post_type: 'wp_navigation',
+								} ) }
+							>
+								{ __( 'Manage menus' ) }
+							</Button>
+						) }
 					</PanelBody>
 				</InspectorControls>
 				{ stylingInspectorControls }

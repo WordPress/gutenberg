@@ -24,7 +24,6 @@ function NavigationMenuSelector(
 		onSelectNavigationMenu,
 		onSelectClassicMenu,
 		onCreateNew,
-		showManageActions = false,
 		actionLabel,
 		toggleProps = {},
 	},
@@ -98,7 +97,7 @@ function NavigationMenuSelector(
 	const showSelectMenus =
 		( ( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
 			( hasNavigationMenus || hasClassicMenus ) ) ||
-		( hasManagePermissions && showManageActions );
+		hasManagePermissions;
 
 	if ( ! showSelectMenus ) {
 		return null;
@@ -150,7 +149,7 @@ function NavigationMenuSelector(
 						</MenuGroup>
 					) }
 
-					{ showManageActions && hasManagePermissions && (
+					{ hasManagePermissions && (
 						<MenuGroup label={ __( 'Tools' ) }>
 							{ canUserCreateNavigationMenu && (
 								<MenuItem onClick={ onCreateNew }>
