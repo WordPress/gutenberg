@@ -115,6 +115,14 @@ function RichTextWrapper(
 	},
 	forwardedRef
 ) {
+	if ( multiline ) {
+		deprecated( 'wp.blockEditor.RichText multiline prop', {
+			since: '14.1',
+			alternative: 'nested blocks (InnerBlocks)',
+			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/nested-blocks-inner-blocks/',
+		} );
+	}
+
 	const instanceId = useInstanceId( RichTextWrapper );
 
 	identifier = identifier || instanceId;
