@@ -69,6 +69,9 @@ function gutenberg_test_cpt_locking() {
 					'core/group',
 					array(
 						'templateLock' => false,
+						'layout'       => array(
+							'type' => 'constrained',
+						),
 					),
 					array(
 						array(
