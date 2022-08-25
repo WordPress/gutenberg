@@ -40,11 +40,11 @@ import type { WordPressComponentProps } from '../ui/context';
  * ```
  */
 export function CheckboxControl(
-	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
-	// ref forwarding to CheckboxControl.
-	props: Omit<
-		WordPressComponentProps< CheckboxControlProps, 'input', false >,
-		'ref'
+	props: WordPressComponentProps<
+		CheckboxControlProps,
+		'input',
+		false,
+		false
 	>
 ) {
 	const {
