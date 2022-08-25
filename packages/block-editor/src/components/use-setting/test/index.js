@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { cloneDeep } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -14,9 +9,64 @@ import { useSelect } from '@wordpress/data';
 import useSetting from '..';
 import * as BlockEditContext from '../../block-edit/context';
 
+// useSelect() mock functions for blockEditorStore
+jest.mock( '@wordpress/data/src/components/use-select' );
+
+let selectMock = {};
+
+useSelect.mockImplementation( ( callback ) => callback( () => selectMock ) );
+
+const mockSettings = ( settings ) => {
+	selectMock.getSettings = () => ( {
+		__experimentalFeatures: settings,
+	} );
+};
+
+const mockBlockParent = (
+	childClientId,
+	{ clientId: parentBlockClientId, name: parentBlockName }
+) => {
+	const previousGetBlockParents = selectMock.getBlockParents;
+
+	selectMock.getBlockParents = ( clientId ) => {
+		if ( clientId === childClientId ) {
+			return [ parentBlockClientId ];
+		}
+
+		return previousGetBlockParents( clientId );
+	};
+
+	mockBlockName( parentBlockClientId, parentBlockName );
+};
+
+const mockBlockName = ( blockClientId, blockName ) => {
+	const previousGetBlockName = selectMock.getBlockName;
+
+	selectMock.getBlockName = ( clientId ) => {
+		if ( clientId === blockClientId ) {
+			return blockName;
+		}
+
+		return previousGetBlockName( clientId );
+	};
+};
+
+const mockCurrentBlockContext = (
+	blockContext = { name: '', isSelected: false }
+) => {
+	jest.spyOn( BlockEditContext, 'useBlockEditContext' ).mockReturnValue(
+		blockContext
+	);
+};
+
 describe( 'useSetting', () => {
 	beforeEach( () => {
-		selectMock = cloneDeep( selectMockDefaults );
+		selectMock = {
+			getSettings: () => ( {} ),
+			getBlockParents: () => [],
+			getBlockName: () => '',
+		};
+
 		mockCurrentBlockContext( {} );
 	} );
 
@@ -104,59 +154,3 @@ describe( 'useSetting', () => {
 		expect( useSetting( 'color.text' ) ).toBe( true );
 	} );
 } );
-
-// useSelect() mock functions for blockEditorStore
-jest.mock( '@wordpress/data/src/components/use-select' );
-
-const selectMockDefaults = {
-	getSettings: () => ( {} ),
-	getBlockParents: () => [],
-	getBlockName: () => '',
-};
-
-let selectMock = {};
-
-useSelect.mockImplementation( ( callback ) => callback( () => selectMock ) );
-
-const mockSettings = ( settings ) => {
-	selectMock.getSettings = () => ( {
-		__experimentalFeatures: settings,
-	} );
-};
-
-const mockBlockParent = (
-	childClientId,
-	{ clientId: parentBlockClientId, name: parentBlockName }
-) => {
-	const previousGetBlockParents = selectMock.getBlockParents;
-
-	selectMock.getBlockParents = ( clientId ) => {
-		if ( clientId === childClientId ) {
-			return [ parentBlockClientId ];
-		}
-
-		return previousGetBlockParents( clientId );
-	};
-
-	mockBlockName( parentBlockClientId, parentBlockName );
-};
-
-const mockBlockName = ( blockClientId, blockName ) => {
-	const previousGetBlockName = selectMock.getBlockName;
-
-	selectMock.getBlockName = ( clientId ) => {
-		if ( clientId === blockClientId ) {
-			return blockName;
-		}
-
-		return previousGetBlockName( clientId );
-	};
-};
-
-const mockCurrentBlockContext = (
-	blockContext = { name: '', isSelected: false }
-) => {
-	jest.spyOn( BlockEditContext, 'useBlockEditContext' ).mockReturnValue(
-		blockContext
-	);
-};
