@@ -33,14 +33,15 @@ export type WordPressComponentProps<
 export type WordPressComponent<
 	T extends React.ElementType,
 	O,
-	IsPolymorphic extends boolean
+	IsPolymorphic extends boolean = true,
+	ForwardsRef extends boolean = true
 > = {
 	< TT extends React.ElementType >(
-		props: WordPressComponentProps< O, TT, IsPolymorphic > &
+		props: WordPressComponentProps< O, TT, IsPolymorphic, ForwardsRef > &
 			( IsPolymorphic extends true ? { as: TT } : {} )
 	): JSX.Element | null;
 	(
-		props: WordPressComponentProps< O, T, IsPolymorphic >
+		props: WordPressComponentProps< O, T, IsPolymorphic, ForwardsRef >
 	): JSX.Element | null;
 	displayName?: string;
 	/**
@@ -55,6 +56,6 @@ export type WordPressComponent<
 };
 
 export type WordPressComponentFromProps< Props > =
-	Props extends WordPressComponentProps< infer P, infer T, infer I >
-		? WordPressComponent< T, P, I >
+	Props extends WordPressComponentProps< infer P, infer T, infer I, infer F >
+		? WordPressComponent< T, P, I, F >
 		: never;
