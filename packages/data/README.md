@@ -749,11 +749,11 @@ const SaleButton = ( { children } ) => {
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `[string|StoreDescriptor]`: Optionally provide the name of the store or its descriptor from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
+-   _storeNameOrDescriptor_ `[StoreNameOrDescriptor]`: Optionally provide the name of the store or its descriptor from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
 
 _Returns_
 
--   `Function`: A custom react hook.
+-   `UseDispatchReturn<StoreNameOrDescriptor>`: A custom react hook.
 
 ### useRegistry
 

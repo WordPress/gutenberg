@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "9.7.0",
+	"version": "9.8.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

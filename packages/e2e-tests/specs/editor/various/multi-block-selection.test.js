@@ -331,6 +331,9 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.up( 'Shift' );
 		await transformBlockTo( 'Group' );
 
+		// Confirm setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
 		// Click the first paragraph in the first Group block while pressing `shift` key.
 		const firstParagraph = await page.waitForXPath( "//p[text()='first']" );
 		await page.keyboard.down( 'Shift' );
@@ -676,6 +679,10 @@ describe( 'Multi-block selection', () => {
 
 		await pressKeyWithModifier( 'primary', 'a' );
 
+		await page.waitForSelector( '[data-type="core/column"].is-selected' );
+
+		await pressKeyWithModifier( 'primary', 'a' );
+
 		await page.waitForSelector(
 			'[data-type="core/column"].is-multi-selected'
 		);
@@ -699,6 +706,7 @@ describe( 'Multi-block selection', () => {
 		// Confirm correct setup: a paragraph and a list.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
+		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'a' );
 

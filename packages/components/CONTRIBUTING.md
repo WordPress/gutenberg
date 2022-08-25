@@ -480,7 +480,7 @@ component-family-name/
 
 Given a component folder (e.g. `packages/components/src/unit-control`):
 
-1. Add the folder to `tsconfig.json`, if it isn’t already.
+1. Remove the folder from the exclude list in `tsconfig.json`, if it isn’t already.
 2. Remove any `// @ts-nocheck` comments in the folder, if any.
 3. Rename `*.js{x}` files to `*.ts{x}` (except stories and unit tests).
 4. Run `npm run dev` and take note of all the errors (your IDE should also flag them).
@@ -504,7 +504,7 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 			}
 			```
 
-		3. Add the folders to the `tsconfig.json` file.
+		3. Remove the folders from the exclude list in the `tsconfig.json` file.
 		4. If you’re still getting errors about a component’s props, the easiest way is to slightly refactor this component and perform the props destructuring inside the component’s body (as opposed as in the function signature) — this is to prevent TypeScript from inferring the types of these props.
 		5. Continue with the refactor of the current component (and take care of the refactor of the dependent components at a later stage).
 6. Create a new `types.ts` file.
