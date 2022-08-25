@@ -1,7 +1,11 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
 import { camelCase } from 'lodash';
+
+/**
+ * Internal dependencies
+ */
 import type { BoxEdge, GenerateFunction, StyleDefinition } from '../../types';
 import { generateRule, generateBoxRules } from '../utils';
 
