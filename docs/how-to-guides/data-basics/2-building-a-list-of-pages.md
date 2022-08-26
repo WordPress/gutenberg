@@ -53,7 +53,7 @@ wp.data.select( 'core' ).getEntityRecords( 'postType', 'page' )
 
 If you run that following snippet in your browser’s dev tools, you will see it returns `null`. Why? The pages are only requested by the `getEntityRecords` resolver after first running the _selector_. If you wait a moment and re-run it, it will return the list of all pages.
 
-*Note: To run this type of command directly make sure you're browser is displaying an instance of the block editor (any page will do). Otherwise the `select( 'core' )` function won't be available, and you'll get an error.*
+*Note: To run this type of command directly make sure your browser is displaying an instance of the block editor (any page will do). Otherwise the `select( 'core' )` function won't be available, and you'll get an error.*
 
 Similarly, the `MyFirstApp` component needs to re-run the selector once the data is available. That’s exactly what the `useSelect` hook does:
 
