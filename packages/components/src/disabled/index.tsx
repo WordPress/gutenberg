@@ -54,7 +54,7 @@ function Disabled( {
 	children,
 	isDisabled = true,
 	...props
-}: WordPressComponentProps< DisabledProps, 'div', true, false > ) {
+}: WordPressComponentProps< DisabledProps, 'div' > ) {
 	const ref = useDisabled();
 
 	if ( ! isDisabled ) {

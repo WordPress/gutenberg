@@ -42,7 +42,7 @@ import type { RadioControlProps } from './types';
  * ```
  */
 export function RadioControl(
-	props: WordPressComponentProps< RadioControlProps, 'input', false, false >
+	props: WordPressComponentProps< RadioControlProps, 'input', false >
 ) {
 	const {
 		label,

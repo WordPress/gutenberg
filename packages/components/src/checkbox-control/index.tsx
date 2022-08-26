@@ -40,12 +40,7 @@ import type { WordPressComponentProps } from '../ui/context';
  * ```
  */
 export function CheckboxControl(
-	props: WordPressComponentProps<
-		CheckboxControlProps,
-		'input',
-		false,
-		false
-	>
+	props: WordPressComponentProps< CheckboxControlProps, 'input', false >
 ) {
 	const {
 		label,

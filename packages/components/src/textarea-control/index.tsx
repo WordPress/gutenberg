@@ -40,12 +40,7 @@ import type { WordPressComponentProps } from '../ui/context';
  * ```
  */
 export function TextareaControl(
-	props: WordPressComponentProps<
-		TextareaControlProps,
-		'textarea',
-		false,
-		false
-	>
+	props: WordPressComponentProps< TextareaControlProps, 'textarea', false >
 ) {
 	const {
 		label,

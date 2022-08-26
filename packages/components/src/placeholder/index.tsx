@@ -42,7 +42,6 @@ export function Placeholder< IconProps = unknown >(
 	props: WordPressComponentProps<
 		PlaceholderProps< IconProps >,
 		'div',
-		false,
 		false
 	>
 ) {
