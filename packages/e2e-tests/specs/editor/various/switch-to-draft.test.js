@@ -62,13 +62,11 @@ async function scheduleTestPost( postType, viewport ) {
 	}
 	// Set a publish date for the next month.
 	await page.click( '.edit-post-post-schedule__toggle' );
-	await page.click(
-		'*[aria-label="Move forward to switch to the next month."]'
-	);
+	await page.click( '*[aria-label="View next month"]' );
 
 	await (
 		await page.$x(
-			'//*[@role="application"][@aria-label="Calendar"]//td[@role="button"]/*[text() = "15"]'
+			'//*[@role="application"][@aria-label="Calendar"]//button[text()="15"]'
 		)
 	 )[ 0 ].click();
 

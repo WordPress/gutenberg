@@ -27,7 +27,6 @@ class WP_Style_Engine_CSS_Rules_Store {
 	 */
 	protected static $stores = array();
 
-
 	/**
 	 * The store name.
 	 *
@@ -47,9 +46,12 @@ class WP_Style_Engine_CSS_Rules_Store {
 	 *
 	 * @param string $store_name The name of the store.
 	 *
-	 * @return WP_Style_Engine_CSS_Rules_Store
+	 * @return WP_Style_Engine_CSS_Rules_Store|void
 	 */
 	public static function get_store( $store_name = 'default' ) {
+		if ( ! is_string( $store_name ) || empty( $store_name ) ) {
+			return;
+		}
 		if ( ! isset( static::$stores[ $store_name ] ) ) {
 			static::$stores[ $store_name ] = new static();
 			// Set the store name.
@@ -111,10 +113,9 @@ class WP_Style_Engine_CSS_Rules_Store {
 	 *
 	 * @param string $selector The CSS selector.
 	 *
-	 * @return WP_Style_Engine_CSS_Rule|null Returns a WP_Style_Engine_CSS_Rule object, or null if the selector is empty.
+	 * @return WP_Style_Engine_CSS_Rule|void Returns a WP_Style_Engine_CSS_Rule object, or null if the selector is empty.
 	 */
 	public function add_rule( $selector ) {
-
 		$selector = trim( $selector );
 
 		// Bail early if there is no selector.

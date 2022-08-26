@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { Platform } from 'react-native';
-import { sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -161,16 +160,22 @@ export const registerBlock = ( block ) => {
 const registerBlockVariations = ( block ) => {
 	const { metadata, settings, name } = block;
 
-	sortBy( settings.variations, 'title' ).forEach( ( v ) => {
-		registerBlockType( `${ name }-${ v.name }`, {
-			...metadata,
-			name: `${ name }-${ v.name }`,
-			...settings,
-			icon: v.icon(),
-			title: v.title,
-			variations: [],
+	if ( ! settings.variations ) {
+		return;
+	}
+
+	[ ...settings.variations ]
+		.sort( ( a, b ) => a.title.localeCompare( b.title ) )
+		.forEach( ( v ) => {
+			registerBlockType( `${ name }-${ v.name }`, {
+				...metadata,
+				name: `${ name }-${ v.name }`,
+				...settings,
+				icon: v.icon(),
+				title: v.title,
+				variations: [],
+			} );
 		} );
-	} );
 };
 
 // Only enable code block for development
@@ -180,14 +185,6 @@ const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 // eslint-disable-next-line no-unused-vars
 const iOSOnly = ( block ) =>
 	Platform.OS === 'ios' ? block : devOnly( block );
-
-// To be removed once List V2 is released on the web editor.
-function listCheck( listBlock, blocksFlags ) {
-	if ( blocksFlags?.__experimentalEnableListBlockV2 ) {
-		listBlock.settings = listBlock?.settingsV2;
-	}
-	return listBlock;
-}
 
 // Hide the Classic block and SocialLink block
 addFilter(
@@ -240,11 +237,8 @@ addFilter(
  *
  * registerCoreBlocks();
  * ```
- * @param {Object} [blocksFlags] Experimental flags
- *
- *
  */
-export const registerCoreBlocks = ( blocksFlags ) => {
+export const registerCoreBlocks = () => {
 	// When adding new blocks to this list please also consider updating /src/block-support/supported-blocks.json in the Gutenberg-Mobile repo
 	[
 		paragraph,
@@ -256,7 +250,7 @@ export const registerCoreBlocks = ( blocksFlags ) => {
 		video,
 		nextpage,
 		separator,
-		listCheck( list, blocksFlags ),
+		list,
 		listItem,
 		quote,
 		mediaText,

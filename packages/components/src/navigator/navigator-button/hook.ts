@@ -7,9 +7,6 @@ import { escapeAttribute } from '@wordpress/escape-html';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import Button from '../../button';
 import useNavigator from '../use-navigator';

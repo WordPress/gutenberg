@@ -175,3 +175,48 @@ function gutenberg_register_theme_block_patterns() {
 }
 remove_action( 'init', '_register_theme_block_patterns' );
 add_action( 'init', 'gutenberg_register_theme_block_patterns' );
+
+/**
+ * Registers Gutenberg-bundled patterns, with a focus on headers and footers
+ * for site editing.
+ *
+ * @since 6.1.0
+ * @access private
+ */
+function gutenberg_register_core_block_patterns() {
+	$should_register_core_patterns = get_theme_support( 'core-block-patterns' );
+
+	if ( $should_register_core_patterns ) {
+		$core_block_patterns = array(
+			'centered-footer',
+			'centered-footer-with-social-links',
+			'centered-header',
+			'centered-logo-in-navigation',
+			'footer-with-background-color-and-three-columns',
+			'footer-with-credit-line-and-navigation',
+			'footer-with-large-font-size',
+			'footer-with-navigation-and-credit-line',
+			'footer-with-search-site-title-and-credit-line',
+			'footer-with-site-title-and-credit-line',
+			'header-with-large-font-size',
+			'left-aligned-footer',
+			'right-aligned-footer',
+			'simple-header',
+			'simple-header-inside-image',
+			'simple-header-with-background-color',
+			'simple-header-with-image',
+			'simple-header-with-tagline',
+			'simple-header-with-tagline-2',
+			'site-title-and-menu-button',
+			'site-title-and-vertical-navigation',
+		);
+
+		foreach ( $core_block_patterns as $core_block_pattern ) {
+			register_block_pattern(
+				'core/' . $core_block_pattern,
+				require __DIR__ . '/block-patterns/' . $core_block_pattern . '.php'
+			);
+		}
+	}
+}
+add_action( 'init', 'gutenberg_register_core_block_patterns' );

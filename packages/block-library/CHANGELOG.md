@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 7.13.0 (2022-08-24)
+
+### Bug Fix
+
+-   Ensure all dependencies allow version ranges ([#43355](https://github.com/WordPress/gutenberg/pull/43355)).
+
+## 7.12.0 (2022-08-10)
+
 ## 7.11.0 (2022-07-27)
 
 ## 7.10.0 (2022-07-13)
@@ -16,7 +24,7 @@
 
 ### Enhancement
 
--   Declare blocks as __experimental in block.json to automate syncing Gutenberg packages to WordPress ([#40655](https://github.com/WordPress/gutenberg/pull/40655)).
+-   Declare blocks as \_\_experimental in block.json to automate syncing Gutenberg packages to WordPress ([#40655](https://github.com/WordPress/gutenberg/pull/40655)).
 
 ## 7.5.0 (2022-05-04)
 

@@ -8,10 +8,17 @@ import type { RadioStateReturn } from 'reakit';
 /**
  * Internal dependencies
  */
+import type { BaseControlProps } from '../base-control/types';
 import type { FormElementProps } from '../utils/types';
 
 export type ToggleGroupControlOptionBaseProps = {
 	children: ReactNode;
+	/**
+	 * Style the option as an icon option.
+	 *
+	 * @default false
+	 */
+	isIcon?: boolean;
 	value: ReactText;
 	/**
 	 * Whether to display a Tooltip for the control option. If set to `true`, the tooltip will
@@ -22,20 +29,24 @@ export type ToggleGroupControlOptionBaseProps = {
 	showTooltip?: boolean;
 };
 
-export type ToggleGroupControlOptionIconProps = Omit<
+export type ToggleGroupControlOptionIconProps = Pick<
 	ToggleGroupControlOptionBaseProps,
-	'children'
+	'value'
 > & {
 	/**
 	 * Icon displayed as the content of the option. Usually one of the icons from
 	 * the `@wordpress/icons` package, or a custom React `<svg>` icon.
 	 */
 	icon: JSX.Element;
+	/**
+	 * The text to accessibly label the icon option. Will also be shown in a tooltip.
+	 */
+	label: string;
 };
 
-export type ToggleGroupControlOptionProps = Omit<
+export type ToggleGroupControlOptionProps = Pick<
 	ToggleGroupControlOptionBaseProps,
-	'children'
+	'value' | 'showTooltip'
 > & {
 	/**
 	 * Label for the option. If needed, the `aria-label` prop can be used in addition
@@ -64,62 +75,66 @@ export type WithToolTipProps = {
 export type ToggleGroupControlProps = Omit<
 	FormElementProps< any >,
 	'defaultValue'
-> & {
-	/**
-	 * Label for the form element.
-	 */
-	label: string;
-	/**
-	 * If true, the label will only be visible to screen readers.
-	 *
-	 * @default false
-	 */
-	hideLabelFromVision?: boolean;
-	/**
-	 * Determines if segments should be rendered with equal widths.
-	 *
-	 * @default false
-	 */
-	isAdaptiveWidth?: boolean;
-	/**
-	 * Renders `ToggleGroupControl` as a (CSS) block element.
-	 *
-	 * @default false
-	 */
-	isBlock?: boolean;
-	/**
-	 * Callback when a segment is selected.
-	 */
-	onChange?: ( value: ReactText | undefined ) => void;
-	/**
-	 * The value of `ToggleGroupControl`
-	 */
-	value?: ReactText;
-	/**
-	 * React children
-	 */
-	children: ReactNode;
-	/**
-	 * If this property is added, a help text will be generated
-	 * using help property as the content.
-	 */
-	help?: ReactNode;
-	/**
-	 * The size variant of the control.
-	 *
-	 * @default 'default'
-	 */
-	size?: 'default' | '__unstable-large';
-};
+> &
+	Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > & {
+		/**
+		 * Label for the form element.
+		 */
+		label: string;
+		/**
+		 * If true, the label will only be visible to screen readers.
+		 *
+		 * @default false
+		 */
+		hideLabelFromVision?: boolean;
+		/**
+		 * Determines if segments should be rendered with equal widths.
+		 *
+		 * @default false
+		 */
+		isAdaptiveWidth?: boolean;
+		/**
+		 * Renders `ToggleGroupControl` as a (CSS) block element.
+		 *
+		 * @default false
+		 */
+		isBlock?: boolean;
+		/**
+		 * Style for use with `ToggleGroupControlOptionIcon`s.
+		 *
+		 * @default false
+		 */
+		__experimentalIsIconGroup?: boolean; // TODO: Refactor so this can be private
+		/**
+		 * Callback when a segment is selected.
+		 */
+		onChange?: ( value: ReactText | undefined ) => void;
+		/**
+		 * The value of `ToggleGroupControl`
+		 */
+		value?: ReactText;
+		/**
+		 * The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControlOption` or
+		 * `ToggleGroupControlOptionIcon` components.
+		 */
+		children: ReactNode;
+		/**
+		 * The size variant of the control.
+		 *
+		 * @default 'default'
+		 */
+		size?: 'default' | '__unstable-large';
+	};
 
-export type ToggleGroupControlContextProps = RadioStateReturn & {
-	/**
-	 * Renders `ToggleGroupControl` as a (CSS) block element.
-	 *
-	 * @default false
-	 */
-	isBlock?: boolean;
-};
+export type ToggleGroupControlContextProps = RadioStateReturn &
+	Pick< ToggleGroupControlProps, 'size' > & {
+		/**
+		 * Renders `ToggleGroupControl` as a (CSS) block element.
+		 *
+		 * @default false
+		 */
+		isBlock?: boolean;
+	};
 
 export type ToggleGroupControlBackdropProps = {
 	containerRef: MutableRefObject< HTMLElement | undefined >;

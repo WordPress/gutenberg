@@ -59,11 +59,8 @@ const gutenbergSetup = () => {
 const setupInitHooks = () => {
 	addAction( 'native.pre-render', 'core/react-native-editor', ( props ) => {
 		const capabilities = props.capabilities ?? {};
-		const blocksFlags = {
-			__experimentalEnableListBlockV2: props?.listBlockV2,
-		};
 
-		registerBlocks( blocksFlags );
+		registerBlocks();
 
 		// Unregister non-supported blocks by capabilities
 		if (
@@ -121,12 +118,12 @@ const setupInitHooks = () => {
 };
 
 let blocksRegistered = false;
-const registerBlocks = ( blocksFlags ) => {
+const registerBlocks = () => {
 	if ( blocksRegistered ) {
 		return;
 	}
 
-	registerCoreBlocks( blocksFlags );
+	registerCoreBlocks();
 
 	blocksRegistered = true;
 };

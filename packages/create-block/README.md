@@ -20,7 +20,7 @@ $ cd todo-list
 $ npm start
 ```
 
-_(requires `node` version `12.0.0` or above, and `npm` version `6.9.0` or above)_
+_(requires `node` version `14.0.0` or above, and `npm` version `6.14.4` or above)_
 
 It creates a WordPress plugin that you need to [install manually](https://wordpress.org/support/article/managing-plugins/#manual-plugin-installation).
 
@@ -41,6 +41,7 @@ Options:
 ```bash
 -V, --version                output the version number
 -t, --template <name>        project template type name; allowed values: "static" (default), "es5", the name of an external npm package, or the path to a local directory
+--no-plugin                  scaffold block files only
 --namespace <value>          internal namespace for the block name
 --title <value>              display title for the block and the WordPress plugin
 --short-description <value>  short description for the block and the WordPress plugin
@@ -49,6 +50,7 @@ Options:
 --no-wp-scripts              disable integration with `@wordpress/scripts` package
 --wp-env                     enable integration with `@wordpress/env` package
 -h, --help                   output usage information
+--variant                    choose a block variant as defined by the template
 ```
 
 More examples:
@@ -71,10 +73,23 @@ $ npx @wordpress/create-block --template my-template-package
 $ npx @wordpress/create-block --template ./path/to/template-directory
 ```
 
-4. Help – you need to use `npx` to output usage information.
+4. Generating a dynamic block based on the built-in template.
+
+```bash
+$ npx @wordpress/create-block --variant dynamic
+```
+
+5. Help – you need to use `npx` to output usage information.
 
 ```bash
 $ npx @wordpress/create-block --help
+```
+
+5. No plugin mode – it is also possible to scaffold only block files into the current directory.
+
+
+```bash
+$ npx @wordpress/create-block --no-plugin
 ```
 
 When you scaffold a block, you must provide at least a `slug` name, the `namespace` which usually corresponds to either the `theme` or `plugin` name. In most cases, we recommended pairing blocks with WordPress plugins rather than themes, because only using plugin ensures that all blocks still work when your theme changes.

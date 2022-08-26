@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { difference } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
@@ -126,9 +121,8 @@ export default function useBlockSelection() {
 				return;
 			}
 
-			const selectionDiff = difference(
-				selectedBlocks,
-				updatedSelectedBlocks
+			const selectionDiff = selectedBlocks.filter(
+				( blockId ) => ! updatedSelectedBlocks.includes( blockId )
 			);
 
 			let label;
