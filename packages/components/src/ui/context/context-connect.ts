@@ -16,16 +16,18 @@ import { CONNECT_STATIC_NAMESPACE } from './constants';
 import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
 import type { WordPressComponentFromProps } from '.';
 
-type AcceptsTwoArgs< F extends ( ...args: any ) => any > =
-	Parameters< F >[ 'length' ] extends 2 ? {} : never;
+type AcceptsTwoArgs<
+	F extends ( ...args: any ) => any,
+	ErrorMessage = never
+> = Parameters< F >[ 'length' ] extends 2 ? {} : ErrorMessage;
+
+type ContextConnectOptions = {
+	forwardsRef?: boolean;
+};
 
 /**
  * Forwards ref (React.ForwardRef) and "Connects" (or registers) a component
  * within the Context system under a specified namespace.
- *
- * This is an (experimental) evolution of the initial connect() HOC.
- * The hope is that we can improve render performance by removing functional
- * component wrappers.
  *
  * @param  Component The component to register into the Context system.
  * @param  namespace The namespace to register the component under.
@@ -34,12 +36,44 @@ type AcceptsTwoArgs< F extends ( ...args: any ) => any > =
 export function contextConnect<
 	C extends ( props: any, ref: ForwardedRef< any > ) => JSX.Element | null
 >(
-	Component: C & AcceptsTwoArgs< C >,
+	Component: C &
+		AcceptsTwoArgs<
+			C,
+			'Warning: Your component function does not take a ref as the second argument. Did you mean to use `contextConnectWithoutRef`?'
+		>,
 	namespace: string
+) {
+	return _contextConnect( Component, namespace, { forwardsRef: true } );
+}
+
+/**
+ * "Connects" (or registers) a component within the Context system under a specified namespace.
+ * Does not forward a ref.
+ *
+ * @param  Component The component to register into the Context system.
+ * @param  namespace The namespace to register the component under.
+ * @return The connected WordPressComponent
+ */
+export function contextConnectWithoutRef(
+	Component: ( props: any ) => JSX.Element | null,
+	namespace: string
+) {
+	return _contextConnect( Component, namespace );
+}
+
+// This is an (experimental) evolution of the initial connect() HOC.
+// The hope is that we can improve render performance by removing functional
+// component wrappers.
+function _contextConnect<
+	C extends ( props: any, ref: ForwardedRef< any > ) => JSX.Element | null
+>(
+	Component: C,
+	namespace: string,
+	options?: ContextConnectOptions
 ): WordPressComponentFromProps< Parameters< C >[ 0 ] > {
-	const WrappedComponent = forwardRef< any, Parameters< C >[ 0 ] >(
-		Component
-	);
+	const WrappedComponent = options?.forwardsRef
+		? forwardRef< any, Parameters< C >[ 0 ] >( Component )
+		: Component;
 
 	if ( typeof namespace === 'undefined' ) {
 		warn( 'contextConnect: Please provide a namespace' );
@@ -60,11 +94,10 @@ export function contextConnect<
 		mergedNamespace = [ ...mergedNamespace, namespace ];
 	}
 
-	WrappedComponent.displayName = namespace;
-
 	// @ts-expect-error
 	return Object.assign( WrappedComponent, {
 		[ CONNECT_STATIC_NAMESPACE ]: [ ...new Set( mergedNamespace ) ],
+		displayName: namespace,
 		selector: `.${ getStyledClassNameFromKey( namespace ) }`,
 	} );
 }
