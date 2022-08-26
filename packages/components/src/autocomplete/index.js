@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { escapeRegExp, find } from 'lodash';
+import { find } from 'lodash';
 import removeAccents from 'remove-accents';
 
 /**
@@ -34,6 +34,7 @@ import { speak } from '@wordpress/a11y';
  * Internal dependencies
  */
 import { getAutoCompleterUI } from './autocompleter-ui';
+import { escapeRegExp } from '../utils/strings';
 
 /**
  * A raw completer option.
