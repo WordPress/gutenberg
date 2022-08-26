@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import { useState, useEffect, Children, useRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
-import { LEFT, RIGHT } from '@wordpress/keycodes';
 import { focus } from '@wordpress/dom';
 
 /**
@@ -76,10 +75,14 @@ export default function Guide( {
 			contentLabel={ contentLabel }
 			onRequestClose={ onFinish }
 			onKeyDown={ ( event ) => {
-				if ( event.keyCode === LEFT ) {
+				if ( event.code === 'ArrowLeft' ) {
 					goBack();
-				} else if ( event.keyCode === RIGHT ) {
+					// Do not scroll the modal's contents.
+					event.preventDefault();
+				} else if ( event.code === 'ArrowRight' ) {
 					goForward();
+					// Do not scroll the modal's contents.
+					event.preventDefault();
 				}
 			} }
 			ref={ guideContainer }

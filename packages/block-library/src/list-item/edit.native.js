@@ -14,6 +14,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
 
@@ -25,6 +26,8 @@ import { convertToListItems } from './utils';
 import { IndentUI } from './edit.js';
 import styles from './style.scss';
 import ListStyleType from './list-style-type';
+
+const OPACITY = '9e';
 
 export default function ListItemEdit( {
 	attributes,
@@ -84,10 +87,34 @@ export default function ListItemEdit( {
 	const blockProps = useBlockProps( {
 		...( hasInnerBlocks && styles[ 'wp-block-list-item__nested-blocks' ] ),
 	} );
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list' ],
-		renderAppender: false,
+		useCompactList: true,
 	} );
+
+	// Set default placeholder text color from light/dark scheme or base colors
+	const defaultPlaceholderFromScheme = usePreferredColorSchemeStyle(
+		styles[ 'wp-block-list-item__list-item-placeholder' ],
+		styles[ 'wp-block-list-item__list-item-placeholder--dark' ]
+	);
+
+	const currentTextColor = style?.color || style?.baseColors?.color?.text;
+
+	const defaultPlaceholderTextColor = currentTextColor
+		? currentTextColor
+		: defaultPlaceholderFromScheme?.color;
+
+	// Add hex opacity to default placeholder text color and style object
+	const defaultPlaceholderTextColorWithOpacity =
+		defaultPlaceholderTextColor + OPACITY;
+
+	const styleWithPlaceholderOpacity = {
+		...style,
+		...( style?.color && {
+			placeholderColor: style.color + OPACITY,
+		} ),
+	};
 
 	const onSplit = useSplit( clientId );
 	const onMerge = useMerge( clientId );
@@ -128,12 +155,15 @@ export default function ListItemEdit( {
 						}
 						value={ content }
 						placeholder={ placeholder || __( 'List' ) }
+						placeholderTextColor={
+							defaultPlaceholderTextColorWithOpacity
+						}
 						onSplit={ onSplit }
 						onMerge={ onMerge }
 						onReplace={ ( blocks, ...args ) => {
 							onReplace( convertToListItems( blocks ), ...args );
 						} }
-						style={ style }
+						style={ styleWithPlaceholderOpacity }
 						deleteEnter={ true }
 						containerWidth={ contentWidth }
 					/>

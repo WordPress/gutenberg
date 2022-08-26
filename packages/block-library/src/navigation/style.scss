@@ -468,8 +468,11 @@ button.wp-block-navigation-item__content {
 		flex-direction: column;
 		background-color: inherit;
 
-		// Use em units to apply padding, so themes can more easily style this in various ways.
-		padding: 2rem;
+		// Try to inherit any root paddings set, so the X can align to a top-right aligned menu.
+		padding-top: var(--wp--style--root--padding-top, 2rem);
+		padding-right: var(--wp--style--root--padding-right, 2rem);
+		padding-bottom: var(--wp--style--root--padding-bottom, 2rem);
+		padding-left: var(--wp--style--root--padding-left, 2rem);
 
 		// Allow modal to scroll.
 		overflow: auto;
@@ -613,6 +616,7 @@ button.wp-block-navigation-item__content {
 	border: none;
 	margin: 0;
 	padding: 0;
+	text-transform: inherit;
 
 	svg {
 		fill: currentColor;
@@ -645,6 +649,11 @@ button.wp-block-navigation-item__content {
 // The menu adds wrapping containers.
 .wp-block-navigation__responsive-close {
 	width: 100%;
+
+	// Try to inherit wide-width when defined, so the X can align to a top-right aligned menu.
+	max-width: var(--wp--style--global--wide-size, 100%);
+	margin-left: auto;
+	margin-right: auto;
 
 	// This element is not keyboard accessible, and is focusable only using the mouse.
 	// It is part of the MicroModal library that adds a scrim outside of a modal dialog that is not fullscreen,

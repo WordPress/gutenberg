@@ -152,7 +152,9 @@ exports[`Multi-block selection should multi-select from within the list block 1`
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul><li>1</li></ul>
+<ul><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->"
 `;
 
@@ -246,6 +248,28 @@ exports[`Multi-block selection should preserve dragged selection on move 1`] = `
 <!-- wp:paragraph -->
 <p>1</p>
 <!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should properly select multiple blocks if selected nested blocks belong to different parent 1`] = `
+"<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
+<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
+<p>first</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>group</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
+<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
+<p>second</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>group</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->"
 `;
 
 exports[`Multi-block selection should return original focus after failed multi selection attempt 1`] = `
