@@ -617,7 +617,7 @@ Contains the block elements used to render content when no query results are fou
 
 -	**Name:** core/query-no-results
 -	**Category:** theme
--	**Supports:** align, color (background, gradients, link, text), ~~html~~, ~~reusable~~
+-	**Supports:** align, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
 ## Pagination
