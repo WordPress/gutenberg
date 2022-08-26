@@ -68,6 +68,8 @@
 -   `TreeGrid`: Refactor away from `_.includes()` ([#43518](https://github.com/WordPress/gutenberg/pull/43518/)).
 -   `FormTokenField`: use `KeyboardEvent.code`, refactor tests to modern RTL and `user-event` ([#43442](https://github.com/WordPress/gutenberg/pull/43442/)).
 -   `DropdownMenu`: use `KeyboardEvent.code`, refactor tests to model RTL and `user-event` ([#43439](https://github.com/WordPress/gutenberg/pull/43439/)).
+-   `Autocomplete`: Refactor away from `_.escapeRegExp()` ([#43629](https://github.com/WordPress/gutenberg/pull/43629/)).
+-   `TextHighlight`: Refactor away from `_.escapeRegExp()` ([#43629](https://github.com/WordPress/gutenberg/pull/43629/)).
 
 ### Experimental
 
