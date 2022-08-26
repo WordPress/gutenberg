@@ -38,7 +38,7 @@ export function contextConnect< P >(
 		warn( 'contextConnect: Please provide a namespace' );
 	}
 
-	// @ts-ignore internal property
+	// @ts-expect-error internal property
 	let mergedNamespace = WrappedComponent[ CONNECT_STATIC_NAMESPACE ] || [
 		namespace,
 	];
@@ -55,16 +55,11 @@ export function contextConnect< P >(
 
 	WrappedComponent.displayName = namespace;
 
-	// @ts-ignore internal property
-	WrappedComponent[ CONNECT_STATIC_NAMESPACE ] = [
-		...new Set( mergedNamespace ),
-	];
-
-	// @ts-ignore WordPressComponent property
-	WrappedComponent.selector = `.${ getStyledClassNameFromKey( namespace ) }`;
-
-	// @ts-ignore
-	return WrappedComponent;
+	// @ts-expect-error
+	return Object.assign( WrappedComponent, {
+		[ CONNECT_STATIC_NAMESPACE ]: [ ...new Set( mergedNamespace ) ],
+		selector: `.${ getStyledClassNameFromKey( namespace ) }`,
+	} );
 }
 
 /**
