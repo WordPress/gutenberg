@@ -183,6 +183,13 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$schema_settings_blocks = array();
 		foreach ( $valid_block_names as $block ) {
 			$schema_settings_blocks[ $block ]           = static::VALID_SETTINGS;
+			foreach ( $valid_block_names as $subBlock ) {
+				if ( $block === $subBlock ) {
+					continue;
+				} else {
+					$schema_settings_blocks[ $block ][ $subBlock ] = static::VALID_SETTINGS;
+				}
+			}
 			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 		}
