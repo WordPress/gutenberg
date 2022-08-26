@@ -44,6 +44,7 @@ function PagesList( { hasResolved, pages } ) {
 						<td>
 							<div className="form-buttons">
 								<PageEditButton pageId={ page.id } />
+								{/* ↓ This is the only change in the PagesList component */}
 								<DeletePageButton pageId={ page.id }/>
 							</div>
 						</td>
