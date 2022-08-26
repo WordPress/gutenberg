@@ -1,9 +1,5 @@
 export default `
 <!-- wp:heading -->
-<h2>Text Blocks</h2>
-<!-- /wp:heading -->
-
-<!-- wp:heading -->
 <h2 id="this-is-an-anchor">What is Gutenberg?</h2>
 <!-- /wp:heading -->
 
@@ -11,8 +7,8 @@ export default `
 <p><strong>Bold</strong> <em>Italic</em> <s>Striked</s> Superscript<sup>(1)</sup> Subscript<sub>(2)</sub> <a href="http://www.wordpress.org" target="_blank" rel="noreferrer noopener">Link</a></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":4} -->
-<h4>List</h4>
+<!-- wp:heading {"textAlign":"left","level":4,"className":"has-primary-background-color has-background","style":{"typography":{"lineHeight":"2.5"}}} -->
+<h4 class="has-text-align-left has-primary-background-color has-background" style="line-height:2.5">Heading with line-height set</h4>
 <!-- /wp:heading -->
 
 <!-- wp:list -->
@@ -29,10 +25,6 @@ export default `
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
-<!-- wp:heading {"level":4} -->
-<h4>Quote</h4>
-<!-- /wp:heading -->
-
 <!-- wp:quote {"align":"left","className":"is-style-large"} -->
 <blockquote class="wp-block-quote has-text-align-left is-style-large"><!-- wp:paragraph -->
 <p>"This will make running your own blog a viable alternative again."</p>
@@ -43,26 +35,14 @@ export default `
 <figure class="wp-block-pullquote"><blockquote><p>One of the hardest things to do in technology is disrupt yourself.</p><cite>Matt Mullenweg</cite></blockquote></figure>
 <!-- /wp:pullquote -->
 
-<!-- wp:heading {"level":4} -->
-<h4>Style Paragraph</h4>
-<!-- /wp:heading -->
-
 <!-- wp:paragraph {"dropCap":true,"className":"custom-class-1 custom-class-2 has-background has-vivid-red-background-color","fontSize":"large"} -->
 <p class="has-drop-cap custom-class-1 custom-class-2 has-background has-vivid-red-background-color has-large-font-size">
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tempor tincidunt sapien, quis dictum orci sollicitudin quis. Proin sed elit id est pulvinar feugiat vitae eget dolor. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:heading {"level":4} -->
-<h4>Pre formatted</h4>
-<!-- /wp:heading -->
-
 <!-- wp:preformatted -->
 <pre class="wp-block-preformatted">Some <em>preformatted</em> text...<br>And more!</pre>
 <!-- /wp:preformatted -->
-
-<!-- wp:heading {"level":4} -->
-<h4>Code</h4>
-<!-- /wp:heading -->
 
 <!-- wp:code -->
 <pre class="wp-block-code"><code>if name == "World":
@@ -71,21 +51,9 @@ else:
     return "Hello Pony"</code></pre>
 <!-- /wp:code -->
 
-<!-- wp:heading {"level":4} -->
-<h4>Verse</h4>
-<!-- /wp:heading -->
-
 <!-- wp:verse {"textAlign":"center"} -->
 <pre class="wp-block-verse has-text-align-center">Come<br>Home.</pre>
 <!-- /wp:verse -->
-
-<!-- wp:heading -->
-<h2>Media</h2>
-<!-- /wp:heading -->
-
-<!-- wp:heading {"level":4} -->
-<h4>Images</h4>
-<!-- /wp:heading -->
 
 <!-- wp:image -->
 <figure class="wp-block-image"><img alt=""/></figure>
@@ -95,17 +63,9 @@ else:
 <figure class="wp-block-image"><img src="https://cldup.com/cXyG__fTLN.jpg" alt=""/><figcaption class="wp-element-caption">Mountain</figcaption></figure>
 <!-- /wp:image -->
 
-<!-- wp:heading {"level":4} -->
-<h4>Video</h4>
-<!-- /wp:heading -->
-
 <!-- wp:video {"id":683} -->
 <figure class="wp-block-video"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video><figcaption class="wp-element-caption">Videos too!</figcaption></figure>
 <!-- /wp:video -->
-
-<!-- wp:heading {"level":4} -->
-<h4>File</h4>
-<!-- /wp:heading -->
 
 <!-- wp:file /-->
 
@@ -113,19 +73,11 @@ else:
 <div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button wp-element-button" download>Download</a></div>
 <!-- /wp:file -->
 
-<!-- wp:heading {"level":4} -->
-<h4>Audio</h4>
-<!-- /wp:heading -->
-
 <!-- wp:audio /-->
 
 <!-- wp:audio {"id":5} -->
 <figure class="wp-block-audio"><audio controls src="https://cldup.com/59IrU0WJtq.mp3"></audio></figure>
 <!-- /wp:audio -->
-
-<!-- wp:heading {"level":4} -->
-<h4>Gallery</h4>
-<!-- /wp:heading -->
 
 <!-- wp:gallery {"columns":8,"linkTo":"none","className":"alignfull"} -->
 <figure class="wp-block-gallery has-nested-images columns-8 is-cropped alignfull"><!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
@@ -193,10 +145,6 @@ else:
 <!-- /wp:image --></figure>
 <!-- /wp:gallery -->
 
-<!-- wp:heading -->
-<h2>Separators</h2>
-<!-- /wp:heading -->
-
 <!-- wp:nextpage -->
 <!--nextpage-->
 <!-- /wp:nextpage -->
@@ -208,14 +156,6 @@ else:
 <!-- wp:spacer -->
 <div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->
-
-<!-- wp:heading -->
-<h2>Layout</h2>
-<!-- /wp:heading -->
-
-<!-- wp:heading {"level":4} -->
-<h4>Group</h4>
-<!-- /wp:heading -->
 
 <!-- wp:group -->
 <div id="this-is-another-anchor" class="wp-block-group"><!-- wp:paragraph -->
@@ -230,10 +170,6 @@ else:
 <p>Three.</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
-
-<!-- wp:heading {"level":4} -->
-<h4>Columns</h4>
-<!-- /wp:heading -->
 
 <!-- wp:columns {"className":"gutenberg-landing\u002d\u002ddevelopers-columns has-2-columns"} -->
 <div class="wp-block-columns gutenberg-landing--developers-columns has-2-columns"><!-- wp:column -->
@@ -265,19 +201,11 @@ else:
 <!-- /wp:column --></div>
 <!-- /wp:columns -->
 
-<!-- wp:heading {"level":4} -->
-<h4>Media Text</h4>
-<!-- /wp:heading -->
-
 <!-- wp:media-text {"isStackedOnMobile":false,"className":"is-stacked-on-mobile"} -->
 <div class="wp-block-media-text alignwide is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"className":"has-large-font-size"} -->
 <p class="has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->
-
-<!-- wp:heading {"level":4} -->
-<h4>Cover</h4>
-<!-- /wp:heading -->
 
 <!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":890,"dimRatio":20,"overlayColor":"luminous-vivid-orange","focalPoint":{"x":"0.63","y":"0.83"},"minHeight":219} -->
 <div class="wp-block-cover" style="min-height:219px"><span aria-hidden="true" class="wp-block-cover__background has-luminous-vivid-orange-background-color has-background-dim-20 has-background-dim"></span><img class="wp-block-cover__image-background wp-image-890" alt="" src="https://cldup.com/cXyG__fTLN.jpg" style="object-position:63% 83%" data-object-fit="cover" data-object-position="63% 83%"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","className":"has-text-color has-very-light-gray-color","fontSize":"large"} -->
@@ -285,15 +213,7 @@ else:
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->
 
-<!-- wp:heading -->
-<h2>Dynamic Blocks</h2>
-<!-- /wp:heading -->
-
 <!-- wp:latest-posts {"displayPostContent":true,"displayPostDate":true} /-->
-
-<!-- wp:heading -->
-<h2>Buttons</h2>
-<!-- /wp:heading -->
 
 <!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button -->
@@ -305,23 +225,11 @@ else:
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->
 
-<!-- wp:heading -->
-<h2>Legacy</h2>
-<!-- /wp:heading -->
-
 <!-- wp:shortcode -->
 [youtube https://www.youtube.com/watch?v=ssfHW5lwFZg]
 <!-- /wp:shortcode -->
 
-<!-- wp:heading -->
-<h2>Unsupported</h2>
-<!-- /wp:heading -->
-
 <!-- wp:rss /-->
-
-<!-- wp:heading {"textAlign":"left","level":4,"className":"has-primary-background-color has-background","style":{"typography":{"lineHeight":"2.5"}}} -->
-<h4 class="has-text-align-left has-primary-background-color has-background" style="line-height:2.5">Heading with line-height set</h4>
-<!-- /wp:heading -->
 
 <!-- wp:paragraph -->
 <p>This block is used in initial HTML e2e tests and should be kept as the last block.</p>
