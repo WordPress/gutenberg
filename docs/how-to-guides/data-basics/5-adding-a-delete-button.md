@@ -43,10 +43,8 @@ function PagesList( { hasResolved, pages } ) {
 						<td>{ decodeEntities( page.title.rendered ) }</td>
 						<td>
 							<div className="form-buttons">
-								<EditPageButton pageId={ page.id } />
-								{/* ↓ This is the only change in the PagesList component */}
+								<PageEditButton pageId={ page.id } />
 								<DeletePageButton pageId={ page.id }/>
-								{/* ↑ This is the only change in the PagesList component */}
 							</div>
 						</td>
 					</tr>
@@ -285,7 +283,7 @@ function DeletePageButton( { pageId } ) {
 Great! `DeletePageButton` is now fully aware of errors. Let's see that error message in action. We'll trigger an invalid delete and let it fail. One way to do this is to multiply the `pageId` by a large number:
 
 ```js
-export function DeletePageButton( { pageId, onCancel, onSaveFinished } ) {
+function DeletePageButton( { pageId, onCancel, onSaveFinished } ) {
 	pageId = pageId * 1000;
 	// ...
 }
@@ -447,4 +445,4 @@ function DeletePageButton( { pageId } ) {
 ## What's next?
 
 * **Previous part:** [Building a *Create page form*](/docs/how-to-guides/data-basics/4-building-a-create-page-form.md)
-* (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/09-code-data-basics-esnext) in the gutenberg-examples repository
+* (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/non-block-examples/09-code-data-basics-esnext) in the gutenberg-examples repository
