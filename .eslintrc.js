@@ -102,6 +102,7 @@ module.exports = {
 							'flatten',
 							'flattenDeep',
 							'fromPairs',
+							'has',
 							'identity',
 							'invoke',
 							'isArray',
