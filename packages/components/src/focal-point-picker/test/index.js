@@ -137,7 +137,7 @@ describe( 'FocalPointPicker', () => {
 			render(
 				<Picker value={ { x: 0.14, y: 0.62 } } onChange={ spyChange } />
 			);
-			// Click and press arrow up
+			// Focus and press arrow up
 			const dragArea = screen.getByRole( 'button' );
 
 			await user.click( dragArea );

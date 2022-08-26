@@ -74,6 +74,7 @@ const Template = ( { onChange, ...props } ) => {
 
 export const Default = Template.bind( {} );
 Default.args = {
+	__nextHasNoMargin: true,
 	gradients: GRADIENTS,
 };
 

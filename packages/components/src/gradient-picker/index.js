@@ -8,6 +8,7 @@ import { map } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -119,6 +120,14 @@ export default function GradientPicker( {
 		__experimentalHasMultipleOrigins && gradients?.length
 			? MultipleOrigin
 			: SingleOrigin;
+
+	if ( ! __nextHasNoMargin ) {
+		deprecated( 'Outer margin styles for wp.components.GradientPicker', {
+			since: '6.1',
+			version: '6.4',
+			hint: 'Set the `__nextHasNoMargin` prop to true to start opting into the new styles, which will become the default in a future version',
+		} );
+	}
 
 	// Can be removed when deprecation period is over
 	const deprecatedMarginSpacerProps = ! __nextHasNoMargin
