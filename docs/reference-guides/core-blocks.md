@@ -158,7 +158,7 @@ Displays a link to reply to a comment. ([Source](https://github.com/WordPress/gu
 
 -	**Name:** core/comment-reply-link
 -	**Category:** theme
--	**Supports:** color (background, gradients, link, ~~text~~), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, link, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
 ## Comment Template
