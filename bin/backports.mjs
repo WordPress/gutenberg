@@ -7,16 +7,26 @@ import { fileURLToPath } from 'url';
 import { promises as fsPromises } from 'fs';
 import Octokit from '@octokit/rest';
 
+/**
+ * Internal dependencies
+ */
+import { getPreviousMajorVersion } from './plugin/lib/version.js';
+
 const __dirname = dirname( fileURLToPath( import.meta.url ) );
 
 const simpleGit = SimpleGit( dirname( __dirname ) );
-
 const octokit = new Octokit();
+
+const wpVersion = '6.1';
+const previousWpVersion = getPreviousMajorVersion( wpVersion ).replace(
+	/\.0$/,
+	''
+);
 
 async function getCommits( file ) {
 	const options = {
 		file,
-		from: 'wp/6.0',
+		from: `wp/${ previousWpVersion }`,
 		to: 'HEAD',
 	};
 	const log = await simpleGit.log( options );
@@ -28,7 +38,7 @@ const ghTreeRoot = 'https://github.com/WordPress/gutenberg/tree/trunk/';
 const ghCommitsRoot = 'https://github.com/WordPress/gutenberg/commits/trunk/';
 const backportDirectories = [
 	'lib/block-supports/',
-	'lib/compat/wordpress-6.1/',
+	`lib/compat/wordpress-${ wpVersion }/`,
 ];
 
 for ( const backportDir of backportDirectories ) {
