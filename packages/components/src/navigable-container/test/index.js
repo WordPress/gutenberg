@@ -53,6 +53,9 @@ const originalGetClientRects = window.HTMLElement.prototype.getClientRects;
 
 describe( 'NavigableMenu and TabbableContainer', () => {
 	beforeAll( () => {
+		// Mocking `getClientRects()` is necessary to pass a check performed by
+		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
+		// from the `@wordpress/dom` package.
 		window.HTMLElement.prototype.getClientRects = function () {
 			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
 		};
