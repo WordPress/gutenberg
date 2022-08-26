@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -117,5 +117,142 @@ describe( 'Guide', () => {
 		await user.keyboard( '[Escape]' );
 
 		expect( onFinish ).toHaveBeenCalled();
+	} );
+
+	describe( 'page navigation', () => {
+		it( 'renders an empty list when there are no pages', () => {
+			render( <Guide pages={ [] } /> );
+			expect(
+				screen.queryByRole( 'list', {
+					name: 'Guide controls',
+				} )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', {
+					name: /page \d of \d/i,
+				} )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'renders a button for each page', () => {
+			render(
+				<Guide
+					pages={ [
+						{ content: <p>Page 1</p> },
+						{ content: <p>Page 2</p> },
+						{ content: <p>Page 3</p> },
+						{ content: <p>Page 4</p> },
+					] }
+				/>
+			);
+			const listContainer = screen.getByRole( 'list', {
+				name: 'Guide controls',
+			} );
+			expect(
+				within( listContainer ).getAllByRole( 'button', {
+					name: /page \d of \d/i,
+				} )
+			).toHaveLength( 4 );
+		} );
+
+		it( 'sets the current page when a button is clicked', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			render(
+				<Guide
+					pages={ [
+						{ content: <p>Page 1</p> },
+						{ content: <p>Page 2</p> },
+						{ content: <p>Page 3</p> },
+					] }
+				/>
+			);
+
+			expect( screen.getByText( 'Page 1' ) ).toBeVisible();
+			expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Page 3' ) ).not.toBeInTheDocument();
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Page 2 of 3' } )
+			);
+
+			expect( screen.getByText( 'Page 2' ) ).toBeVisible();
+			expect( screen.queryByText( 'Page 1' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Page 3' ) ).not.toBeInTheDocument();
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Page 3 of 3' } )
+			);
+
+			expect( screen.getByText( 'Page 3' ) ).toBeVisible();
+			expect( screen.queryByText( 'Page 1' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Page 1 of 3' } )
+			);
+
+			expect( screen.getByText( 'Page 1' ) ).toBeVisible();
+			expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Page 3' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'allows navigating through the pages with the left and right arrows', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			render(
+				<Guide
+					pages={ [
+						{ content: <p>Page 1</p> },
+						{ content: <p>Page 2</p> },
+						{ content: <p>Page 3</p> },
+					] }
+				/>
+			);
+
+			expect( screen.getByText( 'Page 1' ) ).toBeVisible();
+			expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Page 3' ) ).not.toBeInTheDocument();
+
+			await user.keyboard( '[ArrowLeft]' );
+
+			expect( screen.getByText( 'Page 1' ) ).toBeVisible();
+			expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Page 3' ) ).not.toBeInTheDocument();
+
+			await user.keyboard( '[ArrowRight]' );
+
+			expect( screen.getByText( 'Page 2' ) ).toBeVisible();
+			expect( screen.queryByText( 'Page 1' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Page 3' ) ).not.toBeInTheDocument();
+
+			await user.keyboard( '[ArrowRight]' );
+
+			expect( screen.getByText( 'Page 3' ) ).toBeVisible();
+			expect( screen.queryByText( 'Page 1' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
+
+			await user.keyboard( '[ArrowRight]' );
+
+			expect( screen.getByText( 'Page 3' ) ).toBeVisible();
+			expect( screen.queryByText( 'Page 1' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
+
+			await user.keyboard( '[ArrowLeft]' );
+
+			expect( screen.getByText( 'Page 2' ) ).toBeVisible();
+			expect( screen.queryByText( 'Page 1' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Page 3' ) ).not.toBeInTheDocument();
+
+			await user.keyboard( '[ArrowLeft]' );
+
+			expect( screen.getByText( 'Page 1' ) ).toBeVisible();
+			expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Page 3' ) ).not.toBeInTheDocument();
+		} );
 	} );
 } );
