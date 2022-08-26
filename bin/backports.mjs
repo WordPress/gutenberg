@@ -22,14 +22,15 @@ async function getCommits( file ) {
 }
 
 const prRegex = /\(#([0-9]+)\)$/;
-const ghRoot = 'https://github.com/WordPress/gutenberg/commits/trunk/';
+const ghTreeRoot = 'https://github.com/WordPress/gutenberg/tree/trunk/';
+const ghCommitsRoot = 'https://github.com/WordPress/gutenberg/commits/trunk/';
 const backportDirectories = [
 	'lib/block-supports/',
 	'lib/compat/wordpress-6.1/',
 ];
 
 for ( const backportDir of backportDirectories ) {
-	console.log( `### ${ backportDir }\n` );
+	console.log( `### [${ backportDir }](${ ghTreeRoot }${ backportDir })\n` );
 	const files = await fsPromises.readdir( backportDir );
 	for ( const file of files ) {
 		const path = pathJoin( backportDir, file );
@@ -38,7 +39,7 @@ for ( const backportDir of backportDirectories ) {
 			continue;
 		}
 
-		console.log( `- [${ file }](${ ghRoot }${ path })` );
+		console.log( `- [${ file }](${ ghCommitsRoot }${ path })` );
 		const log = await getCommits( path );
 
 		const prNumbers = log.map(
