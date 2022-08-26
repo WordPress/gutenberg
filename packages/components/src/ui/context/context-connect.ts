@@ -6,7 +6,7 @@ import type { ForwardedRef, ReactChild, ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import { forwardRef, memo } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import warn from '@wordpress/warning';
 
 /**
@@ -15,11 +15,6 @@ import warn from '@wordpress/warning';
 import { CONNECT_STATIC_NAMESPACE } from './constants';
 import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
 import type { WordPressComponentFromProps } from '.';
-
-type ContextConnectOptions = {
-	/** Defaults to `false`. */
-	memo?: boolean;
-};
 
 /**
  * Forwards ref (React.ForwardRef) and "Connects" (or registers) a component
@@ -31,21 +26,13 @@ type ContextConnectOptions = {
  *
  * @param  Component The component to register into the Context system.
  * @param  namespace The namespace to register the component under.
- * @param  options
  * @return The connected WordPressComponent
  */
 export function contextConnect< P >(
 	Component: ( props: P, ref: ForwardedRef< any > ) => JSX.Element | null,
-	namespace: string,
-	options: ContextConnectOptions = {}
+	namespace: string
 ): WordPressComponentFromProps< P > {
-	const { memo: memoProp = false } = options;
-
-	let WrappedComponent = forwardRef( Component );
-	if ( memoProp ) {
-		// @ts-ignore
-		WrappedComponent = memo( WrappedComponent );
-	}
+	const WrappedComponent = forwardRef< any, P >( Component );
 
 	if ( typeof namespace === 'undefined' ) {
 		warn( 'contextConnect: Please provide a namespace' );
