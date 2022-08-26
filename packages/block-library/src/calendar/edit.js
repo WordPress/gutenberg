@@ -33,7 +33,7 @@ const getYearMonth = memoize( ( date ) => {
 	};
 } );
 
-export default function CalendarEdit( { attributes } ) {
+export default function CalendarEdit() {
 	const blockProps = useBlockProps();
 	const { date, hasPosts, hasPostsResolved } = useSelect( ( select ) => {
 		const { getEntityRecords, hasFinishedResolution } = select( coreStore );
@@ -95,7 +95,7 @@ export default function CalendarEdit( { attributes } ) {
 			<Disabled>
 				<ServerSideRender
 					block="core/calendar"
-					attributes={ { ...attributes, ...getYearMonth( date ) } }
+					attributes={ { ...getYearMonth( date ) } }
 				/>
 			</Disabled>
 		</div>
