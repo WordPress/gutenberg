@@ -105,13 +105,7 @@
 	// To do this, we disable text selection on the main container, then re-enable it only on the
 	// elements that actually get selected.
 	// To keep in mind: user-select is currently inherited to all nodes inside.
-
-	// This is a hack to only disable user-select when blocks are selected inside.
-	// @todo: We shouldn't be targetting the label, this is only a POC. Should be replaced with a class.
-	//user-select: none;
-	[aria-label="Multiple selected blocks"] & {
-		user-select: none;
-	}
+	user-select: none;
 
 	// Re-enable it on components inside.
 	[class^="components-"] {
