@@ -118,7 +118,7 @@ function RichTextWrapper(
 	if ( multiline ) {
 		deprecated( 'wp.blockEditor.RichText multiline prop', {
 			since: '6.1',
-			version: '6.2',
+			version: '6.3',
 			alternative: 'nested blocks (InnerBlocks)',
 			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/nested-blocks-inner-blocks/',
 		} );
