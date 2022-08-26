@@ -491,7 +491,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		if ( isset( $theme_json['styles']['elements'] ) ) {
 			foreach ( self::ELEMENTS as $element => $selector ) {
-				if ( ! isset( $theme_json['styles']['elements'][ $element ] ) ) {
+				if ( ! isset( $theme_json['styles']['elements'][ $element ] ) || empty( static::ELEMENTS[ $element ] ) ) {
 					continue;
 				}
 
