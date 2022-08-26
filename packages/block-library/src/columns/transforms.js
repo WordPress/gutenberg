@@ -29,9 +29,23 @@ const transforms = {
 					createBlocksFromInnerBlocksTemplate( innerBlocksTemplate )
 				);
 			},
-			isMatch: ( { length: selectedBlocksLength } ) =>
-				selectedBlocksLength &&
-				selectedBlocksLength <= MAXIMUM_SELECTED_BLOCKS,
+			isMatch: ( { length: selectedBlocksLength }, block ) => {
+				// If a user is trying to transform a single Columns block, skip
+				// the transformation. Enabling this functiontionality creates
+				// nested Columns blocks resulting in an unintuitive user experience.
+				// Multiple Columns blocks can still be transformed.
+				if (
+					block.length === 1 &&
+					block[ 0 ].name === 'core/columns'
+				) {
+					return false;
+				}
+
+				return (
+					selectedBlocksLength &&
+					selectedBlocksLength <= MAXIMUM_SELECTED_BLOCKS
+				);
+			},
 		},
 		{
 			type: 'block',
