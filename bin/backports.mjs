@@ -39,6 +39,7 @@ const ghCommitsRoot = 'https://github.com/WordPress/gutenberg/commits/trunk/';
 const backportDirectories = [
 	'lib/block-supports/',
 	`lib/compat/wordpress-${ wpVersion }/`,
+	'lib/experimental/',
 ];
 
 for ( const backportDir of backportDirectories ) {
