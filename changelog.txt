@@ -1,5 +1,30 @@
 == Changelog ==
 
+= 14.0.0-rc.2 =
+
+
+
+## Changelog
+
+### Enhancements
+
+#### Block Library
+- List: Use nested blocks. ([42711](https://github.com/WordPress/gutenberg/pull/42711))
+
+
+## First time contributors
+
+The following PRs were merged by first time contributors:
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@ellatrix
+
+
 = 14.0.0-rc.1 =
 
 
