@@ -202,7 +202,7 @@
 	}
 }
 
-@mixin dashed-placeholder-style() {
+@mixin placeholder-style() {
 	border: $border-width dashed currentColor;
 	border-radius: $radius-block-ui;
 }

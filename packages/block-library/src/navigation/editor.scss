@@ -291,9 +291,7 @@ $color-control-label-height: 20px;
 		bottom: 0;
 		left: 0;
 		pointer-events: none;
-
-		// Dashed placeholder style.
-		@include dashed-placeholder-style();
+		@include placeholder-style();
 
 		// Inherit border radius from style variations.
 		border-radius: inherit;

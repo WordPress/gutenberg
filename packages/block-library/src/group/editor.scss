@@ -42,9 +42,7 @@
 		flex: 1 0 $grid-unit-60;
 		pointer-events: none;
 		min-height: $grid-unit-60 - $border-width - $border-width;
-
-		// Dashed placeholder style.
-		@include dashed-placeholder-style();
+		@include placeholder-style();
 	}
 
 	// Let the parent be selectable in the placeholder area.

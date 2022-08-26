@@ -210,8 +210,7 @@
 	}
 
 	// By painting the borders here, we enable them to be replaced by the Border control.
-	// Dashed placeholder style.
-	@include dashed-placeholder-style();
+	@include placeholder-style();
 	overflow: hidden;
 }
 
