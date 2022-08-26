@@ -121,20 +121,21 @@ function splitStyleValue( value ) {
 function splitGapValue( value ) {
 	// Check for shorthand value (a string value).
 	if ( value && typeof value === 'string' ) {
-		// Convert to value for individual sides for BoxControl.
+		// If the value is a string, treat it as a single side (top) for the spacing controls.
 		return {
 			top: value,
-			right: value,
-			bottom: value,
-			left: value,
 		};
 	}
 
-	return {
-		...value,
-		right: value?.left,
-		bottom: value?.top,
-	};
+	if ( value ) {
+		return {
+			...value,
+			right: value?.left,
+			bottom: value?.top,
+		};
+	}
+
+	return value;
 }
 
 // Props for managing `layout.contentSize`.
@@ -238,21 +239,26 @@ function useMarginProps( name ) {
 function useBlockGapProps( name ) {
 	const [ gapValue, setGapValue ] = useStyle( 'spacing.blockGap', name );
 	const gapValues = splitGapValue( gapValue );
-	const setGapValues = ( nextBoxGapValue ) => {
-		if ( ! nextBoxGapValue ) {
-			setGapValue( null );
-		}
-		setGapValue( {
-			top: nextBoxGapValue?.top,
-			left: nextBoxGapValue?.left,
-		} );
-	};
 	const gapSides = useCustomSides( name, 'blockGap' );
 	const isAxialGap =
 		gapSides && gapSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const resetGapValue = () => setGapValue( undefined );
 	const [ userSetGapValue ] = useStyle( 'spacing.blockGap', name, 'user' );
 	const hasGapValue = () => !! userSetGapValue;
+	const setGapValues = ( nextBoxGapValue ) => {
+		if ( ! nextBoxGapValue ) {
+			setGapValue( null );
+		}
+		// If axial gap is not enabled, treat the 'top' value as the shorthand gap value.
+		if ( ! isAxialGap && nextBoxGapValue?.hasOwnProperty( 'top' ) ) {
+			setGapValue( nextBoxGapValue.top );
+		} else {
+			setGapValue( {
+				top: nextBoxGapValue?.top,
+				left: nextBoxGapValue?.left,
+			} );
+		}
+	};
 	return {
 		gapValue,
 		gapValues,
@@ -469,26 +475,41 @@ export default function DimensionsPanel( { name } ) {
 					label={ __( 'Block spacing' ) }
 					onDeselect={ resetGapValue }
 					isShownByDefault={ true }
+					className={ classnames( {
+						'tools-panel-item-spacing': showSpacingPresetsControl,
+					} ) }
 				>
-					{ isAxialGap ? (
-						<BoxControl
+					{ ! showSpacingPresetsControl &&
+						( isAxialGap ? (
+							<BoxControl
+								label={ __( 'Block spacing' ) }
+								min={ 0 }
+								onChange={ setGapValues }
+								units={ units }
+								sides={ gapSides }
+								values={ gapValues }
+								allowReset={ false }
+								splitOnAxis={ isAxialGap }
+							/>
+						) : (
+							<UnitControl
+								label={ __( 'Block spacing' ) }
+								__unstableInputWidth="80px"
+								min={ 0 }
+								onChange={ setGapValue }
+								units={ units }
+								value={ gapValue }
+							/>
+						) ) }
+					{ showSpacingPresetsControl && (
+						<SpacingSizesControl
 							label={ __( 'Block spacing' ) }
 							min={ 0 }
 							onChange={ setGapValues }
-							units={ units }
-							sides={ gapSides }
+							sides={ isAxialGap ? gapSides : [ 'top' ] } // Use 'top' as the shorthand property in non-axial configurations.
 							values={ gapValues }
 							allowReset={ false }
 							splitOnAxis={ isAxialGap }
-						/>
-					) : (
-						<UnitControl
-							label={ __( 'Block spacing' ) }
-							__unstableInputWidth="80px"
-							min={ 0 }
-							onChange={ setGapValue }
-							units={ units }
-							value={ gapValue }
 						/>
 					) }
 				</ToolsPanelItem>

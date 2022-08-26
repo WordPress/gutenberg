@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import combineReducers from 'turbo-combine-reducers';
+import turboCombineReducers from 'turbo-combine-reducers';
 
 /**
  * Internal dependencies
@@ -43,6 +43,7 @@ export { plugins };
  * The combineReducers helper function turns an object whose values are different
  * reducing functions into a single reducing function you can pass to registerReducer.
  *
+ * @type  {import('./types').combineReducers}
  * @param {Object} reducers An object whose values correspond to different reducing
  *                          functions that need to be combined into one.
  *
@@ -77,7 +78,7 @@ export { plugins };
  * @return {Function} A reducer that invokes every reducer inside the reducers
  *                    object, and constructs a state object with the same shape.
  */
-export { combineReducers };
+export const combineReducers = turboCombineReducers;
 
 /**
  * Given a store descriptor, returns an object of the store's selectors.

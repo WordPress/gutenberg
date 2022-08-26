@@ -1,8 +1,4 @@
 // @ts-nocheck
-/**
- * External dependencies
- */
-import { includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -35,11 +31,11 @@ export function NavigableMenu(
 			previous = [ LEFT, UP ];
 		}
 
-		if ( includes( next, keyCode ) ) {
+		if ( next.includes( keyCode ) ) {
 			return 1;
-		} else if ( includes( previous, keyCode ) ) {
+		} else if ( previous.includes( keyCode ) ) {
 			return -1;
-		} else if ( includes( [ DOWN, UP, LEFT, RIGHT ], keyCode ) ) {
+		} else if ( [ DOWN, UP, LEFT, RIGHT ].includes( keyCode ) ) {
 			// Key press should be handled, e.g. have event propagation and
 			// default behavior handled by NavigableContainer but not result
 			// in an offset.

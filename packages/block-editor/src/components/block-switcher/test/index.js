@@ -8,7 +8,6 @@ import { shallow, mount } from 'enzyme';
  */
 import { useSelect } from '@wordpress/data';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-import { DOWN } from '@wordpress/keycodes';
 import { Button } from '@wordpress/components';
 import { copy } from '@wordpress/icons';
 
@@ -180,7 +179,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 			const onToggleStub = jest.fn();
 			const mockKeyDown = {
 				preventDefault: () => {},
-				keyCode: DOWN,
+				code: 'ArrowDown',
 			};
 
 			afterEach( () => {
