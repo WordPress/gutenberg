@@ -16,6 +16,8 @@ const octokit = new Octokit();
 async function getCommits( file ) {
 	const options = {
 		file,
+		from: 'wp/6.0',
+		to: 'HEAD',
 	};
 	const log = await simpleGit.log( options );
 	return log.all;
