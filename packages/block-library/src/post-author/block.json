@@ -27,6 +27,10 @@
 		"isLink": {
 			"type": "boolean",
 			"default": false
+		},
+		"linkTarget": {
+			"type": "string",
+			"default": "_self"
 		}
 	},
 	"usesContext": [ "postType", "postId", "queryId" ],

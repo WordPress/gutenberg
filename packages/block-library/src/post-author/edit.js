@@ -47,7 +47,8 @@ function PostAuthorEdit( {
 
 	const { editEntityRecord } = useDispatch( coreStore );
 
-	const { textAlign, showAvatar, showBio, byline, isLink } = attributes;
+	const { textAlign, showAvatar, showBio, byline, isLink, linkTarget } =
+		attributes;
 	const avatarSizes = [];
 	const authorName = authorDetails?.name || __( 'Post Author' );
 	if ( authorDetails ) {
@@ -124,6 +125,17 @@ function PostAuthorEdit( {
 						checked={ isLink }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 					/>
+					{ isLink && (
+						<ToggleControl
+							label={ __( 'Open in new tab' ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									linkTarget: value ? '_blank' : '_self',
+								} )
+							}
+							checked={ linkTarget === '_blank' }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 
@@ -165,7 +177,12 @@ function PostAuthorEdit( {
 					) }
 					<p className="wp-block-post-author__name">
 						{ isLink ? (
-							<a href={ authorDetails?.link }>{ authorName }</a>
+							<a
+								href="#post-author-pseudo-link"
+								onClick={ ( event ) => event.preventDefault() }
+							>
+								{ authorName }
+							</a>
 						) : (
 							authorName
 						) }
