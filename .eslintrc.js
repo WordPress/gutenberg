@@ -83,6 +83,7 @@ module.exports = {
 							'capitalize',
 							'chunk',
 							'clamp',
+							'cloneDeep',
 							'compact',
 							'concat',
 							'countBy',

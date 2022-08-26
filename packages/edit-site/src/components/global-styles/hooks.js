@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, cloneDeep, set, isEqual } from 'lodash';
+import { get, set, isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -48,7 +48,7 @@ export function useSetting( path, blockName, source = 'all' ) {
 
 	const setSetting = ( newValue ) => {
 		setUserConfig( ( currentConfig ) => {
-			const newUserConfig = cloneDeep( currentConfig );
+			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
 			const pathToSet = PATHS_WITH_MERGE[ path ]
 				? fullPath + '.custom'
 				: fullPath;
@@ -109,7 +109,7 @@ export function useStyle( path, blockName, source = 'all' ) {
 
 	const setStyle = ( newValue ) => {
 		setUserConfig( ( currentConfig ) => {
-			const newUserConfig = cloneDeep( currentConfig );
+			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
 			set(
 				newUserConfig,
 				finalPath,
