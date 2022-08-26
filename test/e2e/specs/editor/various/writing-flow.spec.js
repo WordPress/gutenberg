@@ -14,15 +14,99 @@ test.describe( 'Writing Flow', () => {
 		await admin.createNewPost();
 	} );
 
-	test.fixme(
-		'Should navigate inner blocks with arrow keys',
-		async () => {}
-	);
+	test( 'Should navigate inner blocks with arrow keys', async ( {
+		editor,
+		page,
+		writingFlowUtils,
+	} ) => {
+		// Assertions are made both against the active DOM element and the
+		// editor state, in order to protect against potential disparities.
+		//
+		// See: https://github.com/WordPress/gutenberg/issues/18928
+		let activeElementText;
 
-	test.fixme(
-		'Should navigate between inner and root blocks in navigation mode',
-		async () => {}
-	);
+		await writingFlowUtils.addDemoContent();
+
+		// Arrow up into nested context focuses last text input.
+		await page.keyboard.press( 'ArrowUp' );
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/paragraph' );
+		activeElementText = await page.evaluate(
+			() => document.activeElement.textContent
+		);
+		expect( activeElementText ).toBe( '2nd col' );
+
+		// Arrow up in inner blocks should navigate through (1) column wrapper,
+		// (2) text fields.
+		await page.keyboard.press( 'ArrowUp' );
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/column' );
+		await page.keyboard.press( 'ArrowUp' );
+		const activeElementBlockType = await page.evaluate( () =>
+			document.activeElement.getAttribute( 'data-type' )
+		);
+		expect( activeElementBlockType ).toBe( 'core/columns' );
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/columns' );
+
+		// Arrow up from focused (columns) block wrapper exits nested context
+		// to prior text input.
+		await page.keyboard.press( 'ArrowUp' );
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/paragraph' );
+		activeElementText = await page.evaluate(
+			() => document.activeElement.textContent
+		);
+		expect( activeElementText ).toBe( 'First paragraph' );
+
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	test( 'Should navigate between inner and root blocks in navigation mode', async ( {
+		page,
+		writingFlowUtils,
+	} ) => {
+		await writingFlowUtils.addDemoContent();
+
+		// Switch to navigation mode.
+		await page.keyboard.press( 'Escape' );
+		// Arrow up to Columns block.
+		await page.keyboard.press( 'ArrowUp' );
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/columns' );
+		// Arrow right into Column block.
+		await page.keyboard.press( 'ArrowRight' );
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/column' );
+		// Arrow down to reach second Column block.
+		await page.keyboard.press( 'ArrowDown' );
+		// Arrow right again into Paragraph block.
+		await page.keyboard.press( 'ArrowRight' );
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/paragraph' );
+		// Arrow left back to Column block.
+		await page.keyboard.press( 'ArrowLeft' );
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/column' );
+		// Arrow left back to Columns block.
+		await page.keyboard.press( 'ArrowLeft' );
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/columns' );
+		// Arrow up to first paragraph.
+		await page.keyboard.press( 'ArrowUp' );
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/paragraph' );
+	} );
 
 	test( 'should navigate around inline boundaries', async ( {
 		editor,
@@ -888,5 +972,33 @@ class WritingFlowUtils {
 				window.wp.data.select( 'core/block-editor' ).getSelectedBlock()
 					?.name
 		);
+	}
+
+	async addDemoContent() {
+		await this.page.keyboard.press( 'Enter' );
+		await this.page.keyboard.type( 'First paragraph' );
+		await this.page.keyboard.press( 'Enter' );
+		await this.page.keyboard.type( '/columns' );
+		await this.page.keyboard.press( 'Enter' );
+		await this.page.click( '[aria-label="Two columns; equal split"]' );
+		await this.page.click( 'role=button[name="Add block"i]' );
+		await this.page.click(
+			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
+		);
+		await this.page.keyboard.type( '1st col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "1st" instead of "First" here.
+
+		await this.page.focus( '[aria-label="Block: Column (2 of 2)"]' );
+		await this.page.click( 'role=button[name="Add block"i]' );
+		await this.page.click(
+			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
+		);
+		await this.page.keyboard.type( '2nd col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "2nd" instead of "Second" here.
+
+		await this.page.keyboard.press( 'Escape' ); // Enter navigation mode.
+		await this.page.keyboard.press( 'ArrowLeft' ); // Move to the column block.
+		await this.page.keyboard.press( 'ArrowLeft' ); // Move to the columns block.
+		await this.page.keyboard.press( 'Enter' ); // Enter edit mode with the columns block selected.
+		await this.page.keyboard.press( 'Enter' ); // Creates a paragraph after the columns block.
+		await this.page.keyboard.type( 'Second paragraph' );
 	}
 }
