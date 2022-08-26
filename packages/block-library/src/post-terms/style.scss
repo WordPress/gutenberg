@@ -1,3 +1,5 @@
 .wp-block-post-terms__separator {
 	white-space: pre-wrap;
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 }
