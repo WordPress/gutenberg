@@ -162,12 +162,12 @@ export default function useSetting( path ) {
 
 			// 2.1 Check for block-specific settings from block editor store
 			if ( result === undefined && blockName !== '' ) {
-				const candidateBlockNames = candidates.map(
-					( candidateClientId ) =>
-						select( blockEditorStore ).getBlockName(
-							candidateClientId
-						)
-				);
+				const candidateBlockNames = [
+					...blockParentIds.map( ( parentId ) =>
+						select( blockEditorStore ).getBlockName( parentId )
+					),
+					blockName,
+				];
 
 				const settingsValuesByDepth = new Map();
 
@@ -211,10 +211,9 @@ export default function useSetting( path ) {
 				findNestedSettings( candidateBlockSettings );
 
 				if ( settingsValuesByDepth.size > 0 ) {
-					const maxDepth =
-						settingsValuesByDepth.size > 0
-							? Math.max( ...settingsValuesByDepth.keys() )
-							: 0;
+					const maxDepth = Math.max(
+						...settingsValuesByDepth.keys()
+					);
 					const settingsAtMaxDepth =
 						settingsValuesByDepth.get( maxDepth );
 

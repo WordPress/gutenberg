@@ -22,21 +22,27 @@ const mockSettings = ( settings ) => {
 	} );
 };
 
+let blockParentMap = {};
+
 const mockBlockParent = (
 	childClientId,
-	{ clientId: parentBlockClientId, name: parentBlockName }
+	{ clientId: parentClientId, name: parentName }
 ) => {
-	const previousGetBlockParents = selectMock.getBlockParents;
+	mockBlockName( parentClientId, parentName );
+
+	blockParentMap[ childClientId ] = parentClientId;
 
 	selectMock.getBlockParents = ( clientId ) => {
-		if ( clientId === childClientId ) {
-			return [ parentBlockClientId ];
+		const parents = [];
+		let current = clientId;
+
+		while ( !! blockParentMap[ current ] ) {
+			current = blockParentMap[ current ];
+			parents.push( current );
 		}
 
-		return previousGetBlockParents( clientId );
+		return parents;
 	};
-
-	mockBlockName( parentBlockClientId, parentBlockName );
 };
 
 const mockBlockName = ( blockClientId, blockName ) => {
@@ -54,6 +60,10 @@ const mockBlockName = ( blockClientId, blockName ) => {
 const mockCurrentBlockContext = (
 	blockContext = { name: '', isSelected: false }
 ) => {
+	if ( blockContext.name !== '' && blockContext.clientID !== undefined ) {
+		mockBlockName( blockContext.clientID, blockContext.name );
+	}
+
 	jest.spyOn( BlockEditContext, 'useBlockEditContext' ).mockReturnValue(
 		blockContext
 	);
@@ -68,6 +78,8 @@ describe( 'useSetting', () => {
 		};
 
 		mockCurrentBlockContext( {} );
+
+		blockParentMap = {};
 	} );
 
 	it( 'uses theme setting', () => {
@@ -122,7 +134,7 @@ describe( 'useSetting', () => {
 		expect( useSetting( 'color.text' ) ).toBe( false );
 	} );
 
-	it( 'uses 1-layer deep nested block setting', () => {
+	it( 'uses 2-layer deep nested block setting', () => {
 		mockSettings( {
 			color: {
 				text: false,
@@ -132,6 +144,107 @@ describe( 'useSetting', () => {
 					color: {
 						text: false,
 					},
+					'core/child-block': {
+						color: {
+							text: true,
+						},
+					},
+				},
+			},
+		} );
+
+		mockCurrentBlockContext( {
+			name: 'core/child-block',
+			clientId: 'client-id-child-block',
+		} );
+
+		mockBlockParent( 'client-id-child-block', {
+			name: 'core/parent-block',
+			clientId: 'client-id-parent-block',
+		} );
+
+		expect( useSetting( 'color.text' ) ).toBe( true );
+	} );
+
+	it( 'uses 3-layer deep nested block setting', () => {
+		mockSettings( {
+			color: {
+				text: false,
+			},
+			blocks: {
+				'core/grandparent-block': {
+					'core/parent-block': {
+						'core/child-block': {
+							color: {
+								text: true,
+							},
+						},
+					},
+				},
+			},
+		} );
+
+		mockCurrentBlockContext( {
+			name: 'core/child-block',
+			clientId: 'client-id-child-block',
+		} );
+
+		mockBlockParent( 'client-id-child-block', {
+			name: 'core/parent-block',
+			clientId: 'client-id-parent-block',
+		} );
+
+		mockBlockParent( 'client-id-parent-block', {
+			name: 'core/grandparent-block',
+			clientId: 'client-id-grandparent-block',
+		} );
+
+		expect( useSetting( 'color.text' ) ).toBe( true );
+	} );
+
+	it( 'uses grandparent 2-layer deep nested block setting', () => {
+		mockSettings( {
+			color: {
+				text: false,
+			},
+			blocks: {
+				'core/grandparent-block': {
+					'core/child-block': {
+						color: {
+							text: true,
+						},
+					},
+				},
+			},
+		} );
+
+		mockCurrentBlockContext( {
+			name: 'core/child-block',
+			clientId: 'client-id-child-block',
+		} );
+
+		mockBlockParent( 'client-id-child-block', {
+			name: 'core/parent-block',
+			clientId: 'client-id-parent-block',
+		} );
+
+		mockBlockParent( 'client-id-parent-block', {
+			name: 'core/grandparent-block',
+			clientId: 'client-id-grandparent-block',
+		} );
+
+		expect( useSetting( 'color.text' ) ).toBe( true );
+	} );
+
+	it( 'uses more specific nested block setting', () => {
+		mockSettings( {
+			blocks: {
+				'core/child-block': {
+					color: {
+						text: false,
+					},
+				},
+				'core/parent-block': {
 					'core/child-block': {
 						color: {
 							text: true,
