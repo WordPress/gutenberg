@@ -16,6 +16,9 @@ import { CONNECT_STATIC_NAMESPACE } from './constants';
 import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
 import type { WordPressComponentFromProps } from '.';
 
+type AcceptsTwoArgs< F extends ( ...args: any ) => any > =
+	Parameters< F >[ 'length' ] extends 2 ? {} : never;
+
 /**
  * Forwards ref (React.ForwardRef) and "Connects" (or registers) a component
  * within the Context system under a specified namespace.
@@ -28,11 +31,15 @@ import type { WordPressComponentFromProps } from '.';
  * @param  namespace The namespace to register the component under.
  * @return The connected WordPressComponent
  */
-export function contextConnect< P >(
-	Component: ( props: P, ref: ForwardedRef< any > ) => JSX.Element | null,
+export function contextConnect<
+	C extends ( props: any, ref: ForwardedRef< any > ) => JSX.Element | null
+>(
+	Component: C & AcceptsTwoArgs< C >,
 	namespace: string
-): WordPressComponentFromProps< P > {
-	const WrappedComponent = forwardRef< any, P >( Component );
+): WordPressComponentFromProps< Parameters< C >[ 0 ] > {
+	const WrappedComponent = forwardRef< any, Parameters< C >[ 0 ] >(
+		Component
+	);
 
 	if ( typeof namespace === 'undefined' ) {
 		warn( 'contextConnect: Please provide a namespace' );
