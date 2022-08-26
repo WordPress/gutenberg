@@ -63,7 +63,10 @@ export type DispatchFunction = < StoreNameOrDescriptor >(
 	? ActionCreatorsOf< ConfigOf< StoreNameOrDescriptor > >
 	: any;
 
-export type MapSelect = ( select: SelectFunction, registry: DataRegistry ) => any;
+export type MapSelect = (
+	select: SelectFunction,
+	registry: DataRegistry
+) => any;
 
 export type SelectFunction = < S >( store: S ) => CurriedSelectorsOf< S >;
 
