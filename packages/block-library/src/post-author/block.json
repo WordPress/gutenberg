@@ -24,8 +24,9 @@
 		"byline": {
 			"type": "string"
 		},
-		"linked": {
-			"type": "boolean"
+		"isLink": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [ "postType", "postId", "queryId" ],

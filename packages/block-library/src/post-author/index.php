@@ -29,7 +29,7 @@ function render_block_core_post_author( $attributes, $content, $block ) {
 		$attributes['avatarSize']
 	) : null;
 
-	$link        = ! empty( $attributes['linked'] ) ? get_author_posts_url( $author_id ) : '';
+	$link        = ! empty( $attributes['isLink'] ) ? get_author_posts_url( $author_id ) : '';
 	$author_name = $link ? '<a href="' . $link . '">' . get_the_author_meta( 'display_name', $author_id ) . '</a>' : get_the_author_meta( 'display_name', $author_id );
 	
 	$byline  = ! empty( $attributes['byline'] ) ? $attributes['byline'] : false;
