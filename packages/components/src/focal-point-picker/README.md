@@ -18,10 +18,6 @@ const Example = () => {
 	} );
 
 	const url = '/path/to/image';
-	const dimensions = {
-		width: 400,
-		height: 100,
-	};
 
 	/* Example function to render the CSS styles based on Focal Point Picker value */
 	const style = {
@@ -33,9 +29,10 @@ const Example = () => {
 		<>
 			<FocalPointPicker
 				url={ url }
-				dimensions={ dimensions }
 				value={ focalPoint }
-				onChange={ ( focalPoint ) => setFocalPoint( { focalPoint } ) }
+				onDragStart={ setFocalPoint }
+				onDrag={ setFocalPoint }
+				onChange={ setFocalPoint }
 			/>
 			<div style={ style } />
 		</>
