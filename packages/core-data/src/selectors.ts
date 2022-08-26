@@ -24,7 +24,7 @@ import type * as ET from './entity-types';
 // It makes the selectors slightly more safe, but is intended to evolve
 // into a more detailed representation over time.
 // See https://github.com/WordPress/gutenberg/pull/40025#discussion_r865410589 for more context.
-interface State {
+export interface State {
 	autosaves: Record< string | number, Array< unknown > >;
 	blockPatterns: Array< unknown >;
 	blockPatternCategories: Array< unknown >;
