@@ -83,14 +83,10 @@ test.describe( 'block mover', () => {
 		await page.focus( 'text=Second Paragraph' );
 		await editor.showBlockToolbar();
 
-		// Ensure no block mover exists when only one block exists on the page.
-		const moveDownButton = page.locator(
-			'role=toolbar[name="Block tools"i] >> role=button[name="Move down"i]'
-		);
+		// Ensure the up button is disabled.
 		const moveUpButton = page.locator(
 			'role=toolbar[name="Block tools"i] >> role=button[name="Move up"i]'
 		);
-		await expect( moveDownButton ).toBeHidden();
-		await expect( moveUpButton ).toBeHidden();
+		await expect( moveUpButton ).toBeDisabled();
 	} );
 } );
