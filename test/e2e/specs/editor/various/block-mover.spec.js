@@ -60,4 +60,37 @@ test.describe( 'block mover', () => {
 		await expect( moveDownButton ).toBeHidden();
 		await expect( moveUpButton ).toBeHidden();
 	} );
+
+	test.only( 'should hide block mover when blocks above it are locked', async ( {
+		editor,
+		page,
+	} ) => {
+		// Create a single block on the page and lock it
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First Paragraph' },
+		} );
+		await editor.clickBlockOptionsMenuItem( 'Lock' );
+		await page.click( 'role=checkbox[name="Disable movement"]' );
+		await page.click( 'role=button[name="Apply"]' );
+
+		// Add a second block
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second Paragraph' },
+		} );
+		// Select a block so the block mover has the possibility of being rendered.
+		await page.focus( 'text=Second Paragraph' );
+		await editor.showBlockToolbar();
+
+		// Ensure no block mover exists when only one block exists on the page.
+		const moveDownButton = page.locator(
+			'role=toolbar[name="Block tools"i] >> role=button[name="Move down"i]'
+		);
+		const moveUpButton = page.locator(
+			'role=toolbar[name="Block tools"i] >> role=button[name="Move up"i]'
+		);
+		await expect( moveDownButton ).toBeHidden();
+		await expect( moveUpButton ).toBeHidden();
+	} );
 } );
