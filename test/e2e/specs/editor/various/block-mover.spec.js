@@ -61,7 +61,7 @@ test.describe( 'block mover', () => {
 		await expect( moveUpButton ).toBeHidden();
 	} );
 
-	test.only( 'should hide block mover when blocks above it are locked', async ( {
+	test( 'should hide block mover when blocks above it are locked', async ( {
 		editor,
 		page,
 	} ) => {
