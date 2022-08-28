@@ -45,7 +45,16 @@ export default function GradientPalettePanel( { name } ) {
 		'color.defaultGradients',
 		name
 	);
-	const [ duotonePalette ] = useSetting( 'color.duotone' ) || [];
+
+	const [ defaultDuotone ] = useSetting( 'color.duotone.default' ) || [];
+	const [ themeDuotone ] = useSetting( 'color.duotone.theme' ) || [];
+	const [ defaultDuotoneEnabled ] = useSetting( 'color.defaultDuotone' );
+
+	const duotonePalette = [
+		...( themeDuotone || [] ),
+		...( defaultDuotone && defaultDuotoneEnabled ? defaultDuotone : [] ),
+	];
+
 	return (
 		<VStack
 			className="edit-site-global-styles-gradient-palette-panel"
@@ -80,17 +89,19 @@ export default function GradientPalettePanel( { name } ) {
 				) }
 				slugPrefix="custom-"
 			/>
-			<div>
-				<Subtitle>{ __( 'Duotone' ) }</Subtitle>
-				<Spacer margin={ 3 } />
-				<DuotonePicker
-					duotonePalette={ duotonePalette }
-					disableCustomDuotone={ true }
-					disableCustomColors={ true }
-					clearable={ false }
-					onChange={ noop }
-				/>
-			</div>
+			{ !! duotonePalette && !! duotonePalette.length && (
+				<div>
+					<Subtitle>{ __( 'Duotone' ) }</Subtitle>
+					<Spacer margin={ 3 } />
+					<DuotonePicker
+						duotonePalette={ duotonePalette }
+						disableCustomDuotone={ true }
+						disableCustomColors={ true }
+						clearable={ false }
+						onChange={ noop }
+					/>
+				</div>
+			) }
 		</VStack>
 	);
 }
