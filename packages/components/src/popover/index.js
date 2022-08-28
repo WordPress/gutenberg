@@ -146,7 +146,7 @@ const Popover = (
 		flip = true,
 		resize = true,
 		__unstableShift = false,
-		__unstableForcePosition = false,
+		__unstableForcePosition,
 		...contentProps
 	},
 	forwardedRef
@@ -158,7 +158,7 @@ const Popover = (
 		} );
 	}
 
-	if ( __unstableForcePosition ) {
+	if ( __unstableForcePosition !== undefined ) {
 		deprecated( '__unstableForcePosition prop in Popover component', {
 			since: '6.1',
 			version: '6.3',
@@ -167,8 +167,8 @@ const Popover = (
 
 		// Back-compat, set the `flip` and `resize` props
 		// to `false` to replicate `__unstableForcePosition`.
-		flip = false;
-		resize = false;
+		flip = ! __unstableForcePosition;
+		resize = ! __unstableForcePosition;
 	}
 
 	const arrowRef = useRef( null );
