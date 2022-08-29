@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, cloneDeep, set, isEqual, has } from 'lodash';
+import { get, cloneDeep, set, isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -128,21 +128,21 @@ export function useStyle( path, blockName, source = 'all' ) {
 	switch ( source ) {
 		case 'all':
 			result = getValueFromVariable(
-				mergedConfig.settings,
+				mergedConfig,
 				blockName,
 				get( userConfig, finalPath ) ?? get( baseConfig, finalPath )
 			);
 			break;
 		case 'user':
 			result = getValueFromVariable(
-				mergedConfig.settings,
+				mergedConfig,
 				blockName,
 				get( userConfig, finalPath )
 			);
 			break;
 		case 'base':
 			result = getValueFromVariable(
-				baseConfig.settings,
+				baseConfig,
 				blockName,
 				get( baseConfig, finalPath )
 			);
@@ -170,6 +170,7 @@ const ROOT_BLOCK_SUPPORTS = [
 	'padding',
 	'contentSize',
 	'wideSize',
+	'blockGap',
 ];
 
 export function getSupportedGlobalStylesPanels( name ) {
@@ -209,10 +210,8 @@ export function getSupportedGlobalStylesPanels( name ) {
 		// unset, we still enable it.
 		if ( STYLE_PROPERTY[ styleName ].requiresOptOut ) {
 			if (
-				has(
-					blockType.supports,
-					STYLE_PROPERTY[ styleName ].support[ 0 ]
-				) &&
+				STYLE_PROPERTY[ styleName ].support[ 0 ] in
+					blockType.supports &&
 				get(
 					blockType.supports,
 					STYLE_PROPERTY[ styleName ].support

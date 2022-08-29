@@ -58,7 +58,7 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 	$first_element = $html_element_matches[0][0];
 	// If the first HTML element has a class attribute just add the new class
 	// as we do on layout and duotone.
-	if ( strpos( $first_element, 'class="' ) !== false ) {
+	if ( str_contains( $first_element, 'class="' ) ) {
 		$content = preg_replace(
 			'/' . preg_quote( 'class="', '/' ) . '/',
 			'class="' . $class_name . ' ',
@@ -92,9 +92,6 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 
 	/*
 	* For now we only care about link color.
-	* This code in the future when we have a public API
-	* should take advantage of WP_Theme_JSON_Gutenberg::compute_style_properties
-	* and work for any element and style.
 	*/
 	$skip_link_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
 
@@ -109,7 +106,6 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 		array(
 			'selector' => ".$class_name a",
 			'context'  => 'block-supports',
-			'enqueue'  => true,
 		)
 	);
 

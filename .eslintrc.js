@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-const { escapeRegExp } = require( 'lodash' );
 const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
 
@@ -17,7 +16,8 @@ const { version } = require( './package' );
  * @type {string}
  */
 const majorMinorRegExp =
-	escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.\\d+)?';
+	version.replace( /\.\d+$/, '' ).replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' ) +
+	'(\\.\\d+)?';
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -79,16 +79,22 @@ module.exports = {
 					{
 						name: 'lodash',
 						importNames: [
+							'camelCase',
+							'capitalize',
 							'chunk',
 							'clamp',
 							'compact',
 							'concat',
 							'countBy',
+							'deburr',
 							'defaults',
 							'defaultTo',
+							'delay',
+							'difference',
 							'differenceWith',
 							'dropRight',
 							'each',
+							'escapeRegExp',
 							'extend',
 							'findIndex',
 							'findKey',
@@ -97,6 +103,7 @@ module.exports = {
 							'flatten',
 							'flattenDeep',
 							'fromPairs',
+							'has',
 							'identity',
 							'invoke',
 							'isArray',
@@ -114,6 +121,8 @@ module.exports = {
 							'keyBy',
 							'keys',
 							'lowerCase',
+							'mapKeys',
+							'maxBy',
 							'memoize',
 							'negate',
 							'noop',
@@ -127,17 +136,27 @@ module.exports = {
 							'reverse',
 							'size',
 							'snakeCase',
+							'sortBy',
+							'startCase',
+							'startsWith',
 							'stubFalse',
 							'stubTrue',
 							'sum',
 							'sumBy',
 							'take',
+							'times',
 							'toString',
 							'trim',
 							'truncate',
+							'uniq',
+							'uniqBy',
 							'uniqueId',
 							'uniqWith',
+							'upperFirst',
 							'values',
+							'words',
+							'xor',
+							'zip',
 						],
 						message:
 							'This Lodash method is not recommended. Please use native functionality instead. If using `memoize`, please use `memize` instead.',

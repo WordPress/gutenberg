@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { camelCase, find, get, includes, map, mapKeys, uniq } from 'lodash';
+import { camelCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -57,7 +57,9 @@ export const getEntityRecord =
 	( kind, name, key = '', query ) =>
 	async ( { select, dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.name === name && config.kind === kind
+		);
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 			return;
 		}
@@ -75,11 +77,13 @@ export const getEntityRecord =
 				// the ID.
 				query = {
 					...query,
-					_fields: uniq( [
-						...( getNormalizedCommaSeparable( query._fields ) ||
-							[] ),
-						entityConfig.key || DEFAULT_ENTITY_KEY,
-					] ).join(),
+					_fields: [
+						...new Set( [
+							...( getNormalizedCommaSeparable( query._fields ) ||
+								[] ),
+							entityConfig.key || DEFAULT_ENTITY_KEY,
+						] ),
+					].join(),
 				};
 			}
 
@@ -139,7 +143,9 @@ export const getEntityRecords =
 	( kind, name, query = {} ) =>
 	async ( { dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.name === name && config.kind === kind
+		);
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 			return;
 		}
@@ -157,11 +163,13 @@ export const getEntityRecords =
 				// the ID.
 				query = {
 					...query,
-					_fields: uniq( [
-						...( getNormalizedCommaSeparable( query._fields ) ||
-							[] ),
-						entityConfig.key || DEFAULT_ENTITY_KEY,
-					] ).join(),
+					_fields: [
+						...new Set( [
+							...( getNormalizedCommaSeparable( query._fields ) ||
+								[] ),
+							entityConfig.key || DEFAULT_ENTITY_KEY,
+						] ),
+					].join(),
 				};
 			}
 
@@ -307,7 +315,8 @@ export const canUser =
 		// only return the result, without including response properties like the headers.
 		const allowHeader = response.headers?.get( 'allow' );
 		const key = [ action, resource, id ].filter( Boolean ).join( '/' );
-		const isAllowed = includes( allowHeader, method );
+		const isAllowed =
+			allowHeader?.includes?.( method ) || allowHeader?.allow === method;
 		dispatch.receiveUserPermission( key, isAllowed );
 	};
 
@@ -323,7 +332,9 @@ export const canUserEditEntityRecord =
 	( kind, name, recordId ) =>
 	async ( { dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.name === name && config.kind === kind
+		);
 		if ( ! entityConfig ) {
 			return;
 		}
@@ -427,13 +438,9 @@ export const __experimentalGetCurrentGlobalStylesId =
 			'theme',
 			{ status: 'active' }
 		);
-		const globalStylesURL = get( activeThemes, [
-			0,
-			'_links',
-			'wp:user-global-styles',
-			0,
-			'href',
-		] );
+		const globalStylesURL =
+			activeThemes?.[ 0 ]?._links?.[ 'wp:user-global-styles' ]?.[ 0 ]
+				?.href;
 		if ( globalStylesURL ) {
 			const globalStylesObject = await apiFetch( {
 				url: globalStylesURL,
@@ -476,8 +483,13 @@ export const getBlockPatterns =
 		const restPatterns = await apiFetch( {
 			path: '/wp/v2/block-patterns/patterns',
 		} );
-		const patterns = map( restPatterns, ( pattern ) =>
-			mapKeys( pattern, ( value, key ) => camelCase( key ) )
+		const patterns = restPatterns?.map( ( pattern ) =>
+			Object.fromEntries(
+				Object.entries( pattern ).map( ( [ key, value ] ) => [
+					camelCase( key ),
+					value,
+				] )
+			)
 		);
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
 	};

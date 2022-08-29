@@ -27,10 +27,11 @@ import {
 	useOutdentListItem,
 	useSplit,
 	useMerge,
+	useCopy,
 } from './hooks';
 import { convertToListItems } from './utils';
 
-function IndentUI( { clientId } ) {
+export function IndentUI( { clientId } ) {
 	const [ canIndent, indentListItem ] = useIndentListItem( clientId );
 	const [ canOutdent, outdentListItem ] = useOutdentListItem( clientId );
 
@@ -61,7 +62,7 @@ export default function ListItemEdit( {
 	clientId,
 } ) {
 	const { placeholder, content } = attributes;
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( { ref: useCopy( clientId ) } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list' ],
 	} );

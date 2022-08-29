@@ -234,6 +234,66 @@
 						}
 					]
 				},
+				"constrained": {
+					"name": "constrained",
+					"slug": "constrained",
+					"className": "is-layout-constrained",
+					"baseStyles": [
+						{
+							"selector": " > .alignleft",
+							"rules": {
+								"float": "left",
+								"margin-inline-start": "0",
+								"margin-inline-end": "2em"
+							}
+						},
+						{
+							"selector": " > .alignright",
+							"rules": {
+								"float": "right",
+								"margin-inline-start": "2em",
+								"margin-inline-end": "0"
+							}
+						},
+						{
+							"selector": " > .aligncenter",
+							"rules": {
+								"margin-left": "auto !important",
+								"margin-right": "auto !important"
+							}
+						},
+						{
+							"selector": " > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
+							"rules": {
+								"max-width": "var(--wp--style--global--content-size)",
+								"margin-left": "auto !important",
+								"margin-right": "auto !important"
+							}
+						},
+						{
+							"selector": " > .alignwide",
+							"rules": {
+								"max-width": "var(--wp--style--global--wide-size)"
+							}
+						}
+					],
+					"spacingStyles": [
+						{
+							"selector": " > *",
+							"rules": {
+								"margin-block-start": "0",
+								"margin-block-end": "0"
+							}
+						},
+						{
+							"selector": " > * + *",
+							"rules": {
+								"margin-block-start": null,
+								"margin-block-end": "0"
+							}
+						}
+					]
+				},
 				"flex": {
 					"name": "flex",
 					"slug": "flex",
@@ -269,12 +329,12 @@
 			"blockGap": null,
 			"margin": false,
 			"padding": false,
-			"customSpacingSizes": true,
+			"customSpacingSize": true,
 			"units": [ "px", "em", "rem", "vh", "vw", "%" ],
 			"spacingScale": {
 				"operator": "*",
 				"increment": 1.5,
-				"steps": 10,
+				"steps": 7,
 				"mediumStep": 1.5,
 				"unit": "rem"
 			}

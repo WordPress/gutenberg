@@ -65,6 +65,7 @@ $arrow-triangle-base-size: 14px;
 	width: $arrow-triangle-base-size;
 	height: $arrow-triangle-base-size;
 	pointer-events: none;
+	display: flex;
 
 	// Thin line that helps to make sure that the underlying
 	// popover__content's outline is fully overlapped by the
@@ -73,9 +74,9 @@ $arrow-triangle-base-size: 14px;
 		content: "";
 		position: absolute;
 		top: -1px;
-		left: 0;
+		left: 1px;
 		height: 2px;
-		width: 100%;
+		right: 1px;
 		background-color: $white;
 	}
 
@@ -103,9 +104,8 @@ $arrow-triangle-base-size: 14px;
 }
 
 .components-popover__triangle {
-	position: absolute;
-	height: 100%;
-	width: 100%;
+	display: block;
+	flex: 1;
 }
 
 .components-popover__triangle-bg {

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
@@ -33,6 +38,7 @@ import {
 	resetPadding,
 	useIsPaddingDisabled,
 } from './padding';
+import useSetting from '../components/use-setting';
 
 export const SPACING_SUPPORT_KEY = 'spacing';
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
@@ -51,6 +57,7 @@ export function DimensionsPanel( props ) {
 	const isMarginDisabled = useIsMarginDisabled( props );
 	const isDisabled = useIsDimensionsDisabled( props );
 	const isSupported = hasDimensionsSupport( props.name );
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
 
 	if ( isDisabled || ! isSupported ) {
 		return null;
@@ -72,11 +79,16 @@ export function DimensionsPanel( props ) {
 		},
 	} );
 
+	const spacingClassnames = classnames( {
+		'tools-panel-item-spacing': spacingSizes && spacingSizes.length > 0,
+	} );
+
 	return (
 		<>
 			<InspectorControls __experimentalGroup="dimensions">
 				{ ! isPaddingDisabled && (
 					<ToolsPanelItem
+						className={ spacingClassnames }
 						hasValue={ () => hasPaddingValue( props ) }
 						label={ __( 'Padding' ) }
 						onDeselect={ () => resetPadding( props ) }
@@ -89,6 +101,7 @@ export function DimensionsPanel( props ) {
 				) }
 				{ ! isMarginDisabled && (
 					<ToolsPanelItem
+						className={ spacingClassnames }
 						hasValue={ () => hasMarginValue( props ) }
 						label={ __( 'Margin' ) }
 						onDeselect={ () => resetMargin( props ) }
@@ -101,6 +114,7 @@ export function DimensionsPanel( props ) {
 				) }
 				{ ! isGapDisabled && (
 					<ToolsPanelItem
+						className={ spacingClassnames }
 						hasValue={ () => hasGapValue( props ) }
 						label={ __( 'Block spacing' ) }
 						onDeselect={ () => resetGap( props ) }
