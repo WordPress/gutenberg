@@ -177,9 +177,6 @@
 	box-shadow: none;
 	min-width: 100px;
 
-	// Radius fallback value.
-	border-radius: $radius-block-ui;
-
 	// Blur the background so layered dashed placeholders are still visually separate.
 	// We also provide a semitransparent background so as to allow duotones to sheen through.
 	backdrop-filter: blur(100px);
@@ -213,7 +210,7 @@
 	}
 
 	// By painting the borders here, we enable them to be replaced by the Border control.
-	border: $border-width dashed currentColor;
+	@include placeholder-style();
 	overflow: hidden;
 }
 

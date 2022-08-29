@@ -290,9 +290,8 @@ $color-control-label-height: 20px;
 		right: 0;
 		bottom: 0;
 		left: 0;
-		border: $border-width dashed currentColor;
-		opacity: 0.4;
 		pointer-events: none;
+		@include placeholder-style();
 
 		// Inherit border radius from style variations.
 		border-radius: inherit;
@@ -300,7 +299,6 @@ $color-control-label-height: 20px;
 
 	> svg {
 		fill: currentColor;
-		opacity: 0.4;
 	}
 }
 

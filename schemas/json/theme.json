@@ -1113,7 +1113,6 @@
 				}
 			]
 		},
-
 		"stylesElementsPropertiesComplete": {
 			"type": "object",
 			"properties": {
@@ -1168,6 +1167,9 @@
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
 				"caption": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"cite": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			},
@@ -1475,6 +1477,9 @@
 				{
 					"properties": {
 						"appearanceTools": {},
+						"useRootPaddingAwareAlignments": {
+							"$ref": "#/definitions/settingsPropertiesUseRootPaddingAwareAlignments/properties/useRootPaddingAwareAlignments"
+						},
 						"color": {},
 						"layout": {},
 						"spacing": {},

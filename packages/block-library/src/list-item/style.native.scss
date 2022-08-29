@@ -47,3 +47,11 @@
 .wp-block-list-item__list-item-container {
 	margin-right: 8;
 }
+
+.wp-block-list-item__list-item-placeholder {
+	color: $gray;
+}
+
+.wp-block-list-item__list-item-placeholder--dark {
+	color: $gray-50;
+}

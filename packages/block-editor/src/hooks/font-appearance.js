@@ -58,6 +58,7 @@ export function FontAppearanceEdit( props ) {
 			hasFontStyles={ hasFontStyles }
 			hasFontWeights={ hasFontWeights }
 			value={ { fontStyle, fontWeight } }
+			size="__unstable-large"
 		/>
 	);
 }

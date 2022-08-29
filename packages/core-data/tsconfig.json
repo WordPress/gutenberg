@@ -4,15 +4,18 @@
 		"rootDir": "src",
 		"declarationDir": "build-types",
 		"noUnusedParameters": false,
-		"checkJs": false
+		"checkJs": false,
+		"noImplicitAny": false
 	},
 	"references": [
-		{ "path": "../compose" },
+		{ "path": "../api-fetch" },
+		{ "path": "../data" },
 		{ "path": "../deprecated" },
 		{ "path": "../element" },
+		{ "path": "../html-entities" },
+		{ "path": "../i18n" },
 		{ "path": "../is-shallow-equal" },
-		{ "path": "../priority-queue" },
-		{ "path": "../redux-routine" }
+		{ "path": "../url" }
 	],
 	"include": [ "src/**/*" ]
 }
