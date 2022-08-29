@@ -23,6 +23,13 @@ const userList = [
 	{ userName: 'buddytheelf', firstName: 'Buddy', lastName: 'Elf' },
 ];
 
+/**
+ * Use instead of `it` within a `describe.each` block to conditionally run a test.
+ *
+ * @param {string}   testName  - The name of the test that should be run.
+ * @param {boolean}  condition - An expression or function that resolves to a boolean value determing if a test should run.
+ * @param {Function} cb        - The test callback (normally the second argument to an `it` statement).
+ */
 const itif = ( testName, condition, cb ) => {
 	if ( condition() ) {
 		// Because this is a helper function and not a test.
