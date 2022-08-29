@@ -16,13 +16,14 @@ import {
  * Internal dependencies
  */
 import CommentsForm from './form';
+import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
 export default function PostCommentsFormEdit( {
 	attributes,
 	context,
 	setAttributes,
 } ) {
-	const { textAlign } = attributes;
+	const { textAlign, headingLevel } = attributes;
 	const { postId, postType } = context;
 
 	const blockProps = useBlockProps( {
@@ -40,9 +41,19 @@ export default function PostCommentsFormEdit( {
 						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
+				<HeadingLevelDropdown
+					selectedLevel={ headingLevel }
+					onChange={ ( newHeadingLevel ) =>
+						setAttributes( { headingLevel: newHeadingLevel } )
+					}
+				/>
 			</BlockControls>
 			<div { ...blockProps }>
-				<CommentsForm postId={ postId } postType={ postType } />
+				<CommentsForm
+					headingLevel={ headingLevel }
+					postId={ postId }
+					postType={ postType }
+				/>
 			</div>
 		</>
 	);
