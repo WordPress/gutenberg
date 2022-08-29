@@ -53,10 +53,7 @@ const getLabel = ( labelText ) => screen.getByText( labelText );
 const getInput = ( name ) => screen.getByRole( 'combobox', { name } );
 const getOption = ( name ) => screen.getByRole( 'option', { name } );
 const getAllOptions = () => screen.getAllByRole( 'option' );
-const getTargetOption = ( options, index ) => {
-	const searchString = options[ index ].label.substring( 0, 11 );
-	return { searchString, ...options[ index ] };
-};
+const getOptionSearchString = ( option ) => option.label.substring( 0, 11 );
 const setupUser = () =>
 	userEvent.setup( {
 		advanceTimers: jest.advanceTimersByTime,
@@ -138,7 +135,7 @@ describe.each( [
 
 	it( 'should select the correct option via click events', async () => {
 		const user = setupUser();
-		const targetOption = getTargetOption( timezones, 2 );
+		const targetOption = timezones[ 2 ];
 		const onChangeSpy = jest.fn();
 		render(
 			<Component
@@ -163,7 +160,7 @@ describe.each( [
 	it( 'should select the correct option via keypress events', async () => {
 		const user = setupUser();
 		const targetIndex = 4;
-		const targetOption = getTargetOption( timezones, targetIndex );
+		const targetOption = timezones[ targetIndex ];
 		const onChangeSpy = jest.fn();
 		render(
 			<Component
@@ -192,7 +189,7 @@ describe.each( [
 
 	it( 'should select the correct option from a search', async () => {
 		const user = setupUser();
-		const targetOption = getTargetOption( timezones, 13 );
+		const targetOption = timezones[ 13 ];
 		const onChangeSpy = jest.fn();
 		render(
 			<Component
@@ -207,7 +204,7 @@ describe.each( [
 		await user.tab();
 
 		// Type enough characters to ensure a predictable search result
-		await user.keyboard( targetOption.searchString );
+		await user.keyboard( getOptionSearchString( targetOption ) );
 
 		// Pressing Enter/Return selects the currently focused option
 		await user.keyboard( '{Enter}' );
@@ -219,7 +216,7 @@ describe.each( [
 
 	it( 'should render aria-live announcement upon selection', async () => {
 		const user = setupUser();
-		const targetOption = getTargetOption( timezones, 9 );
+		const targetOption = timezones[ 9 ];
 		const onChangeSpy = jest.fn();
 		render(
 			<Component
@@ -233,7 +230,7 @@ describe.each( [
 		await user.tab();
 
 		// Type enough characters to ensure a predictable search result
-		await user.keyboard( targetOption.searchString );
+		await user.keyboard( getOptionSearchString( targetOption ) );
 
 		// Pressing Enter/Return selects the currently focused option
 		await user.keyboard( '{Enter}' );
@@ -248,7 +245,7 @@ describe.each( [
 	it( 'should process multiple entries in a single session', async () => {
 		const user = setupUser();
 		const unmatchedString = 'Mordor';
-		const targetOption = getTargetOption( timezones, 6 );
+		const targetOption = timezones[ 6 ];
 		const onChangeSpy = jest.fn();
 		render(
 			<Component
@@ -289,12 +286,13 @@ describe.each( [
 		} );
 
 		// Run a second search with a valid string.
-		await user.keyboard( targetOption.searchString );
+		const searchString = getOptionSearchString( targetOption );
+		await user.keyboard( searchString );
 		const validSearchRenderedOptions = getAllOptions();
 
 		// Find option that match the search string.
 		const matches = timezones.filter( ( option ) =>
-			option.label.includes( targetOption.searchString )
+			option.label.includes( searchString )
 		);
 
 		// Confirm the rendered options match the provided dataset based on the current string.
