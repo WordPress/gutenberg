@@ -27,7 +27,7 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 		$classes .= ' has-text-align-' . $attributes['textAlign'];
 	}
 
-	$heading = 'h2';
+	$heading = 'h3';
 	if ( isset( $attributes['headingLevel'] ) ) {
 		$heading = 'h' . $attributes['headingLevel'];
 	}
