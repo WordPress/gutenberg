@@ -7,6 +7,7 @@
 -   Remove unused `normalizeArrowKey` utility function ([#43640](https://github.com/WordPress/gutenberg/pull/43640/)).
 -   Refactor `FocalPointPicker` to function component ([#39168](https://github.com/WordPress/gutenberg/pull/39168)).
 -   `Guide`: use `code` instead of `keyCode` for keyboard events ([#43604](https://github.com/WordPress/gutenberg/pull/43604/)).
+-   `Navigation`: use `code` instead of `keyCode` for keyboard events ([#43644](https://github.com/WordPress/gutenberg/pull/43644/)).
 
 ## 20.0.0 (2022-08-24)
 
