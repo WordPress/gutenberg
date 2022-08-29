@@ -143,7 +143,6 @@ const Popover = (
 		expandOnMobile,
 		onFocusOutside,
 		__unstableSlotName = SLOT_NAME,
-		__unstableObserveElement,
 		__unstableForcePosition = false,
 		__unstableShift = false,
 		...contentProps
@@ -374,59 +373,42 @@ const Popover = (
 		return autoUpdate(
 			resultingReferenceRef,
 			refs.floating.current,
-			update
+			update,
+			{
+				animationFrame: true,
+			}
 		);
 		// 'reference' and 'refs.floating' are refs and don't need to be listed
 		// as dependencies (see https://github.com/WordPress/gutenberg/pull/41612)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ anchorRef, anchorRect, getAnchorRect, update ] );
 
-	// This is only needed for a smooth transition when moving blocks.
-	useLayoutEffect( () => {
-		if ( ! __unstableObserveElement ) {
-			return;
-		}
-		const observer = new window.MutationObserver( update );
-		observer.observe( __unstableObserveElement, { attributes: true } );
-
-		return () => {
-			observer.disconnect();
-		};
-	}, [ __unstableObserveElement, update ] );
-
 	// If the reference element is in a different ownerDocument (e.g. iFrame),
 	// we need to manually update the floating's position as the reference's owner
 	// document scrolls. Also update the frame offset if the view resizes.
 	useLayoutEffect( () => {
-		if ( referenceOwnerDocument === document ) {
+		const referenceAndFloatingHaveSameDocument =
+			referenceOwnerDocument === document;
+		const hasFrameElement =
+			!! referenceOwnerDocument?.defaultView?.frameElement;
+
+		if ( referenceAndFloatingHaveSameDocument || ! hasFrameElement ) {
 			frameOffsetRef.current = undefined;
 			return;
 		}
 
 		const { defaultView } = referenceOwnerDocument;
 
-		referenceOwnerDocument.addEventListener( 'scroll', update );
+		const updateFrameOffset = () => {
+			frameOffsetRef.current = getFrameOffset( referenceOwnerDocument );
+			update();
+		};
+		defaultView.addEventListener( 'resize', updateFrameOffset );
 
-		let updateFrameOffset;
-		const hasFrameElement =
-			!! referenceOwnerDocument?.defaultView?.frameElement;
-		if ( hasFrameElement ) {
-			updateFrameOffset = () => {
-				frameOffsetRef.current = getFrameOffset(
-					referenceOwnerDocument
-				);
-				update();
-			};
-			updateFrameOffset();
-			defaultView.addEventListener( 'resize', updateFrameOffset );
-		}
+		updateFrameOffset();
 
 		return () => {
-			referenceOwnerDocument.removeEventListener( 'scroll', update );
-
-			if ( updateFrameOffset ) {
-				defaultView.removeEventListener( 'resize', updateFrameOffset );
-			}
+			defaultView.removeEventListener( 'resize', updateFrameOffset );
 		};
 	}, [ referenceOwnerDocument, update ] );
 
