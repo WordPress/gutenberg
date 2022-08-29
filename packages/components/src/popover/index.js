@@ -94,11 +94,20 @@ const MaybeAnimatedWrapper = forwardRef(
 		},
 		forwardedRef
 	) => {
+		// When animating, animate only once (i.e. when the popover is opened), and
+		// do not animate on subsequent prop changes (as it conflicts with
+		// floating-ui's positioning updates).
+		const [ hasAnimatedOnce, setHasAnimatedOnce ] = useState( false );
 		const shouldReduceMotion = useReducedMotion();
 
 		const { style: motionInlineStyles, ...otherMotionProps } = useMemo(
 			() => placementToMotionAnimationProps( placement ),
 			[ placement ]
+		);
+
+		const onAnimationComplete = useCallback(
+			() => setHasAnimatedOnce( true ),
+			[]
 		);
 
 		if ( shouldAnimate && ! shouldReduceMotion ) {
@@ -109,6 +118,10 @@ const MaybeAnimatedWrapper = forwardRef(
 						...receivedInlineStyles,
 					} }
 					{ ...otherMotionProps }
+					onAnimationComplete={ onAnimationComplete }
+					animate={
+						hasAnimatedOnce ? false : otherMotionProps.animate
+					}
 					{ ...props }
 					ref={ forwardedRef }
 				/>
