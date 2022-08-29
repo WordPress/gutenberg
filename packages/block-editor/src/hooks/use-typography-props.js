@@ -10,7 +10,7 @@ import classnames from 'classnames';
 import { getInlineStyles } from './style';
 
 // This utility is intended to assist where the serialization of the typography
-// block support is being skipped for a block but the spacing related CSS
+// block support is being skipped for a block but the typography related CSS
 // styles still need to be generated so they can be applied to inner elements.
 
 /**
