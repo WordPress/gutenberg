@@ -75,7 +75,7 @@ To find out more about contributing to this package or Gutenberg as a whole, ple
 
     Then add `blinkingParagraph` to the list in the `getAllBlocks()` function.
 
-    If it's experimental, add the following property to `block. json`:
+    If it's experimental, add the following property to `block.json`:
 
     ```json
     {
