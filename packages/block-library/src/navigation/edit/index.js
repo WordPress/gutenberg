@@ -135,6 +135,10 @@ function Navigation( {
 		isError: createNavigationMenuIsError,
 	} = useCreateNavigationMenu( clientId );
 
+	const createUntitledEmptyNavigationMenu = () => {
+		createNavigationMenu( '' );
+	};
+
 	useEffect( () => {
 		hideNavigationMenuStatusNotice();
 
@@ -143,8 +147,7 @@ function Navigation( {
 		}
 
 		if ( createNavigationMenuIsSuccess ) {
-			setRef( createNavigationMenuPost.id );
-			selectBlock( clientId );
+			handleUpdateMenu( createNavigationMenuPost.id, true );
 
 			showNavigationMenuStatusNotice(
 				__( `Navigation Menu successfully created.` )
@@ -157,7 +160,6 @@ function Navigation( {
 			);
 		}
 	}, [
-		createNavigationMenu,
 		createNavigationMenuStatus,
 		createNavigationMenuError,
 		createNavigationMenuPost,
@@ -193,7 +195,6 @@ function Navigation( {
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
 		navigationMenus,
-		navigationMenu,
 		canUserUpdateNavigationMenu,
 		hasResolvedCanUserUpdateNavigationMenu,
 		canUserDeleteNavigationMenu,
@@ -241,8 +242,6 @@ function Navigation( {
 	}, [ navigationMenus ] );
 
 	const navRef = useRef();
-
-	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
 
 	const {
 		convert: convertClassicMenu,
@@ -333,9 +332,11 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
-	const handleUpdateMenu = ( menuId ) => {
+	const handleUpdateMenu = ( menuId, focusNavigationBlock = false ) => {
 		setRef( menuId );
-		selectBlock( clientId );
+		if ( focusNavigationBlock ) {
+			selectBlock( clientId );
+		}
 	};
 
 	useEffect( () => {
@@ -430,27 +431,6 @@ function Navigation( {
 
 	const hasManagePermissions =
 		canUserCreateNavigationMenu || canUserUpdateNavigationMenu;
-	const navigationSelectorRef = useRef();
-	const [ shouldFocusNavigationSelector, setShouldFocusNavigationSelector ] =
-		useState( false );
-
-	// Focus support after menu selection.
-	useEffect( () => {
-		if (
-			isDraftNavigationMenu ||
-			! isEntityAvailable ||
-			! shouldFocusNavigationSelector
-		) {
-			return;
-		}
-		navigationSelectorRef?.current?.focus();
-		setShouldFocusNavigationSelector( false );
-	}, [
-		isDraftNavigationMenu,
-		isEntityAvailable,
-		shouldFocusNavigationSelector,
-	] );
-
 	const isResponsive = 'never' !== overlayMenu;
 
 	const overlayMenuPreviewClasses = classnames(
@@ -607,12 +587,10 @@ function Navigation( {
 				<InspectorControls>
 					<PanelBody title={ __( 'Menu' ) }>
 						<NavigationMenuSelector
-							ref={ navigationSelectorRef }
 							currentMenuId={ ref }
 							clientId={ clientId }
 							onSelectNavigationMenu={ ( menuId ) => {
 								handleUpdateMenu( menuId );
-								setShouldFocusNavigationSelector( true );
 							} }
 							onSelectClassicMenu={ async ( classicMenu ) => {
 								const navMenu = await convertClassicMenu(
@@ -620,11 +598,10 @@ function Navigation( {
 									classicMenu.name
 								);
 								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id );
-									setShouldFocusNavigationSelector( true );
+									handleUpdateMenu( navMenu.id, true );
 								}
 							} }
-							onCreateNew={ () => createNavigationMenu( '', [] ) }
+							onCreateNew={ createUntitledEmptyNavigationMenu }
 							/* translators: %s: The name of a menu. */
 							actionLabel={ __( "Switch to '%s'" ) }
 						/>
@@ -684,12 +661,10 @@ function Navigation( {
 				<InspectorControls>
 					<PanelBody title={ __( 'Menu' ) }>
 						<NavigationMenuSelector
-							ref={ navigationSelectorRef }
 							currentMenuId={ null }
 							clientId={ clientId }
 							onSelectNavigationMenu={ ( menuId ) => {
 								handleUpdateMenu( menuId );
-								setShouldFocusNavigationSelector( true );
 							} }
 							onSelectClassicMenu={ async ( classicMenu ) => {
 								const navMenu = await convertClassicMenu(
@@ -697,11 +672,10 @@ function Navigation( {
 									classicMenu.name
 								);
 								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id );
-									setShouldFocusNavigationSelector( true );
+									handleUpdateMenu( navMenu.id, true );
 								}
 							} }
-							onCreateNew={ () => createNavigationMenu( '', [] ) }
+							onCreateNew={ createUntitledEmptyNavigationMenu }
 							/* translators: %s: The name of a menu. */
 							actionLabel={ __( "Switch to '%s'" ) }
 						/>
@@ -722,7 +696,7 @@ function Navigation( {
 						'Navigation menu has been deleted or is unavailable. '
 					) }
 					<Button
-						onClick={ () => createNavigationMenu( '', [] ) }
+						onClick={ createUntitledEmptyNavigationMenu }
 						variant="link"
 					>
 						{ __( 'Create a new menu?' ) }
@@ -769,7 +743,6 @@ function Navigation( {
 					}
 					onSelectNavigationMenu={ ( menuId ) => {
 						handleUpdateMenu( menuId );
-						setShouldFocusNavigationSelector( true );
 					} }
 					onSelectClassicMenu={ async ( classicMenu ) => {
 						const navMenu = await convertClassicMenu(
@@ -777,11 +750,10 @@ function Navigation( {
 							classicMenu.name
 						);
 						if ( navMenu ) {
-							handleUpdateMenu( navMenu.id );
-							setShouldFocusNavigationSelector( true );
+							handleUpdateMenu( navMenu.id, true );
 						}
 					} }
-					onCreateEmpty={ () => createNavigationMenu( '', [] ) }
+					onCreateEmpty={ createUntitledEmptyNavigationMenu }
 				/>
 			</TagName>
 		);
@@ -793,12 +765,10 @@ function Navigation( {
 				<InspectorControls>
 					<PanelBody title={ __( 'Menu' ) }>
 						<NavigationMenuSelector
-							ref={ navigationSelectorRef }
 							currentMenuId={ ref }
 							clientId={ clientId }
 							onSelectNavigationMenu={ ( menuId ) => {
 								handleUpdateMenu( menuId );
-								setShouldFocusNavigationSelector( true );
 							} }
 							onSelectClassicMenu={ async ( classicMenu ) => {
 								const navMenu = await convertClassicMenu(
@@ -806,11 +776,10 @@ function Navigation( {
 									classicMenu.name
 								);
 								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id );
-									setShouldFocusNavigationSelector( true );
+									handleUpdateMenu( navMenu.id, true );
 								}
 							} }
-							onCreateNew={ () => createNavigationMenu( '', [] ) }
+							onCreateNew={ createUntitledEmptyNavigationMenu }
 							/* translators: %s: The name of a menu. */
 							actionLabel={ __( "Switch to '%s'" ) }
 						/>

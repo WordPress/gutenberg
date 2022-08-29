@@ -10,7 +10,7 @@ import {
 import { Icon, chevronUp, chevronDown } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { forwardRef, useEffect, useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,17 +18,14 @@ import { forwardRef, useEffect, useMemo, useState } from '@wordpress/element';
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
 
-function NavigationMenuSelector(
-	{
-		currentMenuId,
-		onSelectNavigationMenu,
-		onSelectClassicMenu,
-		onCreateNew,
-		actionLabel,
-		toggleProps = {},
-	},
-	forwardedRef
-) {
+function NavigationMenuSelector( {
+	currentMenuId,
+	onSelectNavigationMenu,
+	onSelectClassicMenu,
+	onCreateNew,
+	actionLabel,
+	toggleProps = {},
+} ) {
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
 
@@ -106,20 +103,18 @@ function NavigationMenuSelector(
 	return (
 		<DropdownMenu
 			className="wp-block-navigation__navigation-selector"
-			ref={ forwardedRef }
 			label={ selectorLabel }
 			text={ selectorLabel }
 			icon={ null }
 			toggleProps={ toggleProps }
 		>
-			{ ( { onClose } ) => (
+			{ () => (
 				<>
 					{ showNavigationMenus && hasNavigationMenus && (
 						<MenuGroup label={ __( 'Menus' ) }>
 							<MenuItemsChoice
 								value={ currentMenuId }
 								onSelect={ ( menuId ) => {
-									onClose();
 									onSelectNavigationMenu( menuId );
 								} }
 								choices={ menuChoices }
@@ -133,7 +128,6 @@ function NavigationMenuSelector(
 								return (
 									<MenuItem
 										onClick={ () => {
-											onClose();
 											onSelectClassicMenu( menu );
 										} }
 										key={ menu.id }
@@ -164,4 +158,4 @@ function NavigationMenuSelector(
 	);
 }
 
-export default forwardRef( NavigationMenuSelector );
+export default NavigationMenuSelector;
