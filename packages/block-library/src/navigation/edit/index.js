@@ -470,7 +470,7 @@ function Navigation( {
 						>
 							{ hasIcon && (
 								<>
-									<OverlayMenuIcon />
+									<OverlayMenuIcon icon={ icon } />
 									<Icon icon={ close } />
 								</>
 							) }
