@@ -103,7 +103,6 @@ require __DIR__ . '/experimental/class-wp-webfonts.php';
 require __DIR__ . '/experimental/class-wp-webfonts-provider.php';
 require __DIR__ . '/experimental/class-wp-webfonts-provider-local.php';
 require __DIR__ . '/experimental/webfonts.php';
-require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/navigation-page.php';
 

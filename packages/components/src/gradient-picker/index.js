@@ -8,6 +8,7 @@ import { map } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -16,6 +17,7 @@ import CircularOptionPicker from '../circular-option-picker';
 import CustomGradientPicker from '../custom-gradient-picker';
 import { VStack } from '../v-stack';
 import { ColorHeading } from '../color-palette/styles';
+import { Spacer } from '../spacer';
 
 function SingleOrigin( {
 	className,
@@ -99,6 +101,8 @@ function MultipleOrigin( {
 }
 
 export default function GradientPicker( {
+	/** Start opting into the new margin-free styles that will become the default in a future version. */
+	__nextHasNoMargin = false,
 	className,
 	gradients,
 	onChange,
@@ -116,6 +120,19 @@ export default function GradientPicker( {
 		__experimentalHasMultipleOrigins && gradients?.length
 			? MultipleOrigin
 			: SingleOrigin;
+
+	if ( ! __nextHasNoMargin ) {
+		deprecated( 'Outer margin styles for wp.components.GradientPicker', {
+			since: '6.1',
+			version: '6.4',
+			hint: 'Set the `__nextHasNoMargin` prop to true to start opting into the new styles, which will become the default in a future version',
+		} );
+	}
+
+	// Can be removed when deprecation period is over
+	const deprecatedMarginSpacerProps = ! __nextHasNoMargin
+		? { marginTop: 3 }
+		: {};
 
 	return (
 		<Component
@@ -137,13 +154,20 @@ export default function GradientPicker( {
 			}
 			content={
 				! disableCustomGradients && (
-					<CustomGradientPicker
-						__experimentalIsRenderedInSidebar={
-							__experimentalIsRenderedInSidebar
-						}
-						value={ value }
-						onChange={ onChange }
-					/>
+					<Spacer
+						marginTop={ gradients?.length ? 3 : 0 }
+						marginBottom={ 0 }
+						{ ...deprecatedMarginSpacerProps }
+					>
+						<CustomGradientPicker
+							__nextHasNoMargin={ __nextHasNoMargin }
+							__experimentalIsRenderedInSidebar={
+								__experimentalIsRenderedInSidebar
+							}
+							value={ value }
+							onChange={ onChange }
+						/>
+					</Spacer>
 				)
 			}
 		/>

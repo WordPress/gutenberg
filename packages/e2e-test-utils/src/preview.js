@@ -1,8 +1,3 @@
-/**
- * External dependencies
- */
-import { last } from 'lodash';
-
 /** @typedef {import('puppeteer-core').Page} Page */
 
 /**
@@ -29,6 +24,6 @@ export async function openPreviewPage( editorPage = page ) {
 		openTabs = await browser.pages();
 	}
 
-	const previewPage = last( openTabs );
+	const previewPage = openTabs[ openTabs.length - 1 ];
 	return previewPage;
 }

@@ -13,6 +13,7 @@ import { WP_ADMIN_USER, WP_BASE_URL } from '../config';
 import type { User } from './login';
 import { login } from './login';
 import { listMedia, uploadMedia, deleteMedia, deleteAllMedia } from './media';
+import { createUser, deleteAllUsers } from './users';
 import { setupRest, rest, getMaxBatchSize, batchRest } from './rest';
 import { getPluginsMap, activatePlugin, deactivatePlugin } from './plugins';
 import { deleteAllTemplates } from './templates';
@@ -22,7 +23,6 @@ import { createComment, deleteAllComments } from './comments';
 import { createPost, deleteAllPosts } from './posts';
 import { resetPreferences } from './preferences';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
-import { createUser, deleteUser } from './users';
 
 interface StorageState {
 	cookies: Cookie[];
@@ -135,7 +135,7 @@ class RequestUtils {
 	deleteMedia = deleteMedia.bind( this );
 	deleteAllMedia = deleteAllMedia.bind( this );
 	createUser = createUser.bind( this );
-	deleteUser = deleteUser.bind( this );
+	deleteAllUsers = deleteAllUsers.bind( this );
 }
 
 export type { StorageState };

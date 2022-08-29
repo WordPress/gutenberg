@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { upperFirst, camelCase, map, find, get, startCase } from 'lodash';
+import { capitalCase, pascalCase } from 'change-case';
+import { map, find, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -457,7 +458,9 @@ async function loadPostTypeEntities() {
 			getTitle: ( record ) =>
 				record?.title?.rendered ||
 				record?.title ||
-				( isTemplate ? startCase( record.slug ) : String( record.id ) ),
+				( isTemplate
+					? capitalCase( record.slug ?? '' )
+					: String( record.id ) ),
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 			__unstable_rest_base: postType.rest_base,
 		};
@@ -511,12 +514,11 @@ export const getMethodName = (
 	usePlural = false
 ) => {
 	const entityConfig = find( rootEntitiesConfig, { kind, name } );
-	const kindPrefix = kind === 'root' ? '' : upperFirst( camelCase( kind ) );
-	const nameSuffix =
-		upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
+	const kindPrefix = kind === 'root' ? '' : pascalCase( kind );
+	const nameSuffix = pascalCase( name ) + ( usePlural ? 's' : '' );
 	const suffix =
 		usePlural && 'plural' in entityConfig! && entityConfig?.plural
-			? upperFirst( camelCase( entityConfig.plural ) )
+			? pascalCase( entityConfig.plural )
 			: nameSuffix;
 	return `${ prefix }${ kindPrefix }${ suffix }`;
 };

@@ -36,15 +36,21 @@ class WP_Style_Engine_Processor {
 	 * Add a store to the processor.
 	 *
 	 * @param WP_Style_Engine_CSS_Rules_Store $store The store to add.
+	 *
+	 * @return WP_Style_Engine_Processor Returns the object to allow chaining methods.
 	 */
 	public function add_store( WP_Style_Engine_CSS_Rules_Store $store ) {
 		$this->stores[ $store->get_name() ] = $store;
+
+		return $this;
 	}
 
 	/**
 	 * Adds rules to be processed.
 	 *
 	 * @param WP_Style_Engine_CSS_Rule|WP_Style_Engine_CSS_Rule[] $css_rules A single, or an array of, WP_Style_Engine_CSS_Rule objects from a store or otherwise.
+	 *
+	 * @return WP_Style_Engine_Processor Returns the object to allow chaining methods.
 	 */
 	public function add_rules( $css_rules ) {
 		if ( ! is_array( $css_rules ) ) {
@@ -58,6 +64,8 @@ class WP_Style_Engine_Processor {
 			}
 			$this->css_rules[ $rule->get_selector() ] = $rule;
 		}
+
+		return $this;
 	}
 
 	/**
@@ -73,7 +81,7 @@ class WP_Style_Engine_Processor {
 	public function get_css( $options = array() ) {
 		$defaults = array(
 			'optimize' => true,
-			'prettify' => false,
+			'prettify' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
 		);
 		$options  = wp_parse_args( $options, $defaults );
 
@@ -128,7 +136,8 @@ class WP_Style_Engine_Processor {
 				unset( $this->css_rules[ $key ] );
 			}
 			// Create a new rule with the combined selectors.
-			$this->css_rules[ implode( ',', $duplicates ) ] = new WP_Style_Engine_CSS_Rule( implode( ',', $duplicates ), $declarations );
+			$duplicate_selectors                     = implode( ',', $duplicates );
+			$this->css_rules[ $duplicate_selectors ] = new WP_Style_Engine_CSS_Rule( $duplicate_selectors, $declarations );
 		}
 	}
 }

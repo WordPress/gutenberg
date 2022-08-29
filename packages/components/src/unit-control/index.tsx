@@ -9,7 +9,6 @@ import type {
 	ChangeEvent,
 	PointerEvent,
 } from 'react';
-import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -47,6 +46,7 @@ function UnforwardedUnitControl(
 	const {
 		__unstableStateReducer: stateReducerProp,
 		autoComplete = 'off',
+		children,
 		className,
 		disabled = false,
 		disableUnits = false,
@@ -261,7 +261,7 @@ function UnforwardedUnitControl(
 			<ValueInput
 				aria-label={ label }
 				type={ isPressEnterToChange ? 'text' : 'number' }
-				{ ...omit( props, [ 'children' ] ) }
+				{ ...props }
 				autoComplete={ autoComplete }
 				className={ classes }
 				disabled={ disabled }

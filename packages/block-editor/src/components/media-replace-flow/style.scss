@@ -27,6 +27,7 @@
 
 		.block-editor-url-input {
 			padding: 0; // Cancel unnecessary default 1px padding in this case.
+			margin: 0; // Reset default LinkControl margins.
 		}
 
 		.components-base-control .components-base-control__field {

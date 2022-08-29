@@ -126,7 +126,14 @@ export const Default = ( args ) => {
 	);
 };
 Default.args = {
-	children: <>Popover&apos;s&nbsp;content</>,
+	children: (
+		<div style={ { width: '280px', whiteSpace: 'normal' } }>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+			eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+			ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+			aliquip ex ea commodo consequat.
+		</div>
+	),
 };
 
 /**
@@ -166,8 +173,15 @@ AllPlacements.parameters = {
 };
 AllPlacements.args = {
 	...Default.args,
+	children: (
+		<div style={ { width: '280px', whiteSpace: 'normal' } }>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+			eiusmod tempor incididunt ut labore et dolore magna aliqua.
+		</div>
+	),
 	noArrow: false,
 	offset: 10,
+	__unstableForcePosition: true,
 };
 
 export const DynamicHeight = ( { children, ...args } ) => {
@@ -230,7 +244,7 @@ export const WithSlotOutsideIframe = ( args ) => {
 				<Iframe
 					style={ {
 						width: '100%',
-						height: '100%',
+						height: '400px',
 					} }
 				>
 					<div
@@ -244,7 +258,7 @@ export const WithSlotOutsideIframe = ( args ) => {
 								padding: '8px',
 								background: 'salmon',
 								maxWidth: '200px',
-								marginTop: '30px',
+								marginTop: '100px',
 								marginLeft: 'auto',
 								marginRight: 'auto',
 							} }

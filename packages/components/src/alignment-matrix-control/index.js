@@ -75,7 +75,7 @@ export default function AlignmentMatrixControl( {
 			as={ Root }
 			className={ classes }
 			role="grid"
-			width={ width }
+			size={ width }
 		>
 			{ GRID.map( ( cells, index ) => (
 				<CompositeGroup
