@@ -168,7 +168,7 @@ function BlockPopoverInbetween( {
 
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
 
-	// This is only needed for a smoth transition when moving blocks.
+	// This is only needed for a smooth transition when moving blocks.
 	useLayoutEffect( () => {
 		if ( ! previousElement ) {
 			return;

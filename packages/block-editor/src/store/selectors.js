@@ -2725,11 +2725,11 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 		return true;
 	}
 
-	// In navigation mode, the block overly is active when
-	// the block is not selected (or one of its children selected)
-	// The same behavior is also enabled in all modes for blocks
-	// that have controlled children (reusable block, template part, navigation),
-	// unless explicitly disabled with `supports.__experimentalDisableBlockOverlay`.
+	// In navigation mode, the block overlay is active when the block is not
+	// selected (and doesn't contain a selected child). The same behavior is
+	// also enabled in all modes for blocks that have controlled children
+	// (reusable block, template part, navigation), unless explicitly disabled
+	// with `supports.__experimentalDisableBlockOverlay`.
 	const blockSupportDisable = hasBlockSupport(
 		getBlockName( state, clientId ),
 		'__experimentalDisableBlockOverlay',
