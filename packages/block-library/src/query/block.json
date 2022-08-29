@@ -37,6 +37,9 @@
 			"default": {
 				"type": "list"
 			}
+		},
+		"disabledInspectorControls": {
+			"type": "array"
 		}
 	},
 	"providesContext": {

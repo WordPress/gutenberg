@@ -9,10 +9,6 @@ import { debounce } from 'lodash';
 import {
 	PanelBody,
 	TextControl,
-	SelectControl,
-	RangeControl,
-	ToggleControl,
-	Notice,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -25,12 +21,14 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import OrderControl from './order-control';
 import AuthorControl from './author-control';
+import { Columns } from './columns';
+import { Order } from './order-control';
+import { InheritFromTemplate } from './inherit-from-template';
 import ParentControl from './parent-control';
+import { PostType } from './post-type';
 import { TaxonomyControls, useTaxonomiesInfo } from './taxonomy-controls';
-import StickyControl from './sticky-control';
-import { usePostTypes } from '../../utils';
+import { Sticky } from './sticky-control';
 
 function useIsPostTypeHierarchical( postType ) {
 	return useSelect(
@@ -42,53 +40,23 @@ function useIsPostTypeHierarchical( postType ) {
 	);
 }
 
-export default function QueryInspectorControls( {
-	attributes: { query, displayLayout },
-	setQuery,
-	setDisplayLayout,
-} ) {
+const INSPECTOR_CONTROLS = {
+	InheritFromTemplate,
+	PostType,
+	Columns,
+	Order,
+	Sticky,
+};
+
+export default function QueryInspectorControls( props ) {
 	const {
-		order,
-		orderBy,
-		author: authorIds,
-		postType,
-		sticky,
-		inherit,
-		taxQuery,
-		parents,
-	} = query;
-	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
-	const { postTypesTaxonomiesMap, postTypesSelectOptions } = usePostTypes();
+		attributes: { query, disabledInspectorControls },
+		setQuery,
+	} = props;
+
+	const { author: authorIds, postType, inherit, taxQuery, parents } = query;
 	const taxonomiesInfo = useTaxonomiesInfo( postType );
 	const isPostTypeHierarchical = useIsPostTypeHierarchical( postType );
-	useEffect( () => {
-		setShowSticky( postType === 'post' );
-	}, [ postType ] );
-	const onPostTypeChange = ( newValue ) => {
-		const updateQuery = { postType: newValue };
-		// We need to dynamically update the `taxQuery` property,
-		// by removing any not supported taxonomy from the query.
-		const supportedTaxonomies = postTypesTaxonomiesMap[ newValue ];
-		const updatedTaxQuery = Object.entries( taxQuery || {} ).reduce(
-			( accumulator, [ taxonomySlug, terms ] ) => {
-				if ( supportedTaxonomies.includes( taxonomySlug ) ) {
-					accumulator[ taxonomySlug ] = terms;
-				}
-				return accumulator;
-			},
-			{}
-		);
-		updateQuery.taxQuery = !! Object.keys( updatedTaxQuery ).length
-			? updatedTaxQuery
-			: undefined;
-
-		if ( newValue !== 'post' ) {
-			updateQuery.sticky = '';
-		}
-		// We need to reset `parents` because they are tied to each post type.
-		updateQuery.parents = [];
-		setQuery( updateQuery );
-	};
 	const [ querySearch, setQuerySearch ] = useState( query.search );
 	const onChangeDebounced = useCallback(
 		debounce( () => {
@@ -106,63 +74,13 @@ export default function QueryInspectorControls( {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
-					<ToggleControl
-						label={ __( 'Inherit query from template' ) }
-						help={ __(
-							'Toggle to use the global query context that is set with the current template, such as an archive or search. Disable to customize the settings independently.'
-						) }
-						checked={ !! inherit }
-						onChange={ ( value ) =>
-							setQuery( { inherit: !! value } )
-						}
-					/>
-					{ ! inherit && (
-						<SelectControl
-							options={ postTypesSelectOptions }
-							value={ postType }
-							label={ __( 'Post type' ) }
-							onChange={ onPostTypeChange }
-							help={ __(
-								'WordPress contains different types of content and they are divided into collections called "Post types". By default there are a few different ones such as blog posts and pages, but plugins could add more.'
-							) }
-						/>
-					) }
-					{ displayLayout?.type === 'flex' && (
-						<>
-							<RangeControl
-								label={ __( 'Columns' ) }
-								value={ displayLayout.columns }
-								onChange={ ( value ) =>
-									setDisplayLayout( { columns: value } )
-								}
-								min={ 2 }
-								max={ Math.max( 6, displayLayout.columns ) }
-							/>
-							{ displayLayout.columns > 6 && (
-								<Notice
-									status="warning"
-									isDismissible={ false }
-								>
-									{ __(
-										'This column count exceeds the recommended amount and may cause visual breakage.'
-									) }
-								</Notice>
-							) }
-						</>
-					) }
-					{ ! inherit && (
-						<OrderControl
-							{ ...{ order, orderBy } }
-							onChange={ setQuery }
-						/>
-					) }
-					{ ! inherit && showSticky && (
-						<StickyControl
-							value={ sticky }
-							onChange={ ( value ) =>
-								setQuery( { sticky: value } )
-							}
-						/>
+					{ Object.entries( INSPECTOR_CONTROLS ).map(
+						( [ key, Control ] ) =>
+							disabledInspectorControls?.includes?.(
+								key
+							) ? null : (
+								<Control { ...props } />
+							)
 					) }
 				</PanelBody>
 			</InspectorControls>
