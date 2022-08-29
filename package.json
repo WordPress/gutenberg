@@ -231,7 +231,7 @@
 		"sprintf-js": "1.1.1",
 		"style-loader": "3.2.1",
 		"terser-webpack-plugin": "5.1.4",
-		"typescript": "4.4.2",
+		"typescript": "4.7.4",
 		"uglify-js": "3.13.7",
 		"unzipper": "0.10.11",
 		"uuid": "8.3.0",

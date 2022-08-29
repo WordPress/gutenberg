@@ -31,12 +31,10 @@
 		"resolveJsonModule": true,
 
 		"typeRoots": [ "./typings", "./node_modules/@types" ],
-		"types": []
+		"types": [],
+		"moduleSuffixes": [ ".android", ".ios", ".native", "" ]
 	},
 	"exclude": [
-		"**/*.android.js",
-		"**/*.ios.js",
-		"**/*.native.js",
 		"**/benchmark",
 		"packages/*/build-*/**",
 		"packages/*/build/**",
