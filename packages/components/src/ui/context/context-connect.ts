@@ -54,10 +54,10 @@ export function contextConnect<
  * @param  namespace The namespace to register the component under.
  * @return The connected WordPressComponent
  */
-export function contextConnectWithoutRef(
-	Component: ( props: any ) => JSX.Element | null,
+export function contextConnectWithoutRef< P >(
+	Component: ( props: P ) => JSX.Element | null,
 	namespace: string
-) {
+): WordPressComponentFromProps< P, false > {
 	return _contextConnect( Component, namespace );
 }
 
