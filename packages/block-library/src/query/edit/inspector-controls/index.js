@@ -21,6 +21,7 @@ import { InspectorControls } from '@wordpress/block-editor';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -31,6 +32,9 @@ import ParentControl from './parent-control';
 import { TaxonomyControls, useTaxonomiesInfo } from './taxonomy-controls';
 import StickyControl from './sticky-control';
 import { usePostTypes } from '../../utils';
+import { name as queryLoopName } from '../../block.json';
+
+const EMPTY_ARRAY = [];
 
 function useIsPostTypeHierarchical( postType ) {
 	return useSelect(
@@ -42,11 +46,32 @@ function useIsPostTypeHierarchical( postType ) {
 	);
 }
 
+function useAllowedControls( attributes ) {
+	return useSelect(
+		( select ) =>
+			select( blocksStore ).getActiveBlockVariation(
+				queryLoopName,
+				attributes
+			)?.allowControls || EMPTY_ARRAY,
+
+		[ attributes ]
+	);
+}
+
+function isControllAllowed( allowedControls, key ) {
+	// Every controls is allowed if the list is empty or not defined.
+	if ( ! allowedControls?.length ) {
+		return true;
+	}
+	return allowedControls.includes( key );
+}
+
 export default function QueryInspectorControls( {
-	attributes: { query, displayLayout },
+	attributes,
 	setQuery,
 	setDisplayLayout,
 } ) {
+	const { query, displayLayout } = attributes;
 	const {
 		order,
 		orderBy,
@@ -57,6 +82,7 @@ export default function QueryInspectorControls( {
 		taxQuery,
 		parents,
 	} = query;
+	const allowedControls = useAllowedControls( attributes );
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
 	const { postTypesTaxonomiesMap, postTypesSelectOptions } = usePostTypes();
 	const taxonomiesInfo = useTaxonomiesInfo( postType );
@@ -116,17 +142,18 @@ export default function QueryInspectorControls( {
 							setQuery( { inherit: !! value } )
 						}
 					/>
-					{ ! inherit && (
-						<SelectControl
-							options={ postTypesSelectOptions }
-							value={ postType }
-							label={ __( 'Post type' ) }
-							onChange={ onPostTypeChange }
-							help={ __(
-								'WordPress contains different types of content and they are divided into collections called "Post types". By default there are a few different ones such as blog posts and pages, but plugins could add more.'
-							) }
-						/>
-					) }
+					{ ! inherit &&
+						isControllAllowed( allowedControls, 'postType' ) && (
+							<SelectControl
+								options={ postTypesSelectOptions }
+								value={ postType }
+								label={ __( 'Post type' ) }
+								onChange={ onPostTypeChange }
+								help={ __(
+									'WordPress contains different types of content and they are divided into collections called "Post types". By default there are a few different ones such as blog posts and pages, but plugins could add more.'
+								) }
+							/>
+						) }
 					{ displayLayout?.type === 'flex' && (
 						<>
 							<RangeControl
@@ -150,20 +177,23 @@ export default function QueryInspectorControls( {
 							) }
 						</>
 					) }
-					{ ! inherit && (
-						<OrderControl
-							{ ...{ order, orderBy } }
-							onChange={ setQuery }
-						/>
-					) }
-					{ ! inherit && showSticky && (
-						<StickyControl
-							value={ sticky }
-							onChange={ ( value ) =>
-								setQuery( { sticky: value } )
-							}
-						/>
-					) }
+					{ ! inherit &&
+						isControllAllowed( allowedControls, 'order' ) && (
+							<OrderControl
+								{ ...{ order, orderBy } }
+								onChange={ setQuery }
+							/>
+						) }
+					{ ! inherit &&
+						showSticky &&
+						isControllAllowed( allowedControls, 'sticky' ) && (
+							<StickyControl
+								value={ sticky }
+								onChange={ ( value ) =>
+									setQuery( { sticky: value } )
+								}
+							/>
+						) }
 				</PanelBody>
 			</InspectorControls>
 			{ ! inherit && (
@@ -181,58 +211,72 @@ export default function QueryInspectorControls( {
 							setQuerySearch( '' );
 						} }
 					>
-						{ !! taxonomiesInfo?.length && (
+						{ !! taxonomiesInfo?.length &&
+							isControllAllowed(
+								allowedControls,
+								'taxQuery'
+							) && (
+								<ToolsPanelItem
+									label={ __( 'Taxonomies' ) }
+									hasValue={ () =>
+										Object.values( taxQuery || {} ).some(
+											( terms ) => !! terms.length
+										)
+									}
+									onDeselect={ () =>
+										setQuery( { taxQuery: null } )
+									}
+								>
+									<TaxonomyControls
+										onChange={ setQuery }
+										query={ query }
+									/>
+								</ToolsPanelItem>
+							) }
+						{ isControllAllowed( allowedControls, 'author' ) && (
 							<ToolsPanelItem
-								label={ __( 'Taxonomies' ) }
-								hasValue={ () =>
-									Object.values( taxQuery || {} ).some(
-										( terms ) => !! terms.length
-									)
-								}
-								onDeselect={ () =>
-									setQuery( { taxQuery: null } )
-								}
+								hasValue={ () => !! authorIds }
+								label={ __( 'Authors' ) }
+								onDeselect={ () => setQuery( { author: '' } ) }
 							>
-								<TaxonomyControls
+								<AuthorControl
+									value={ authorIds }
 									onChange={ setQuery }
-									query={ query }
 								/>
 							</ToolsPanelItem>
 						) }
-						<ToolsPanelItem
-							hasValue={ () => !! authorIds }
-							label={ __( 'Authors' ) }
-							onDeselect={ () => setQuery( { author: '' } ) }
-						>
-							<AuthorControl
-								value={ authorIds }
-								onChange={ setQuery }
-							/>
-						</ToolsPanelItem>
-						<ToolsPanelItem
-							hasValue={ () => !! querySearch }
-							label={ __( 'Keyword' ) }
-							onDeselect={ () => setQuerySearch( '' ) }
-						>
-							<TextControl
+						{ isControllAllowed( allowedControls, 'search' ) && (
+							<ToolsPanelItem
+								hasValue={ () => !! querySearch }
 								label={ __( 'Keyword' ) }
-								value={ querySearch }
-								onChange={ setQuerySearch }
-							/>
-						</ToolsPanelItem>
-						{ isPostTypeHierarchical && (
-							<ToolsPanelItem
-								hasValue={ () => !! parents?.length }
-								label={ __( 'Parents' ) }
-								onDeselect={ () => setQuery( { parents: [] } ) }
+								onDeselect={ () => setQuerySearch( '' ) }
 							>
-								<ParentControl
-									parents={ parents }
-									postType={ postType }
-									onChange={ setQuery }
+								<TextControl
+									label={ __( 'Keyword' ) }
+									value={ querySearch }
+									onChange={ setQuerySearch }
 								/>
 							</ToolsPanelItem>
 						) }
+						{ isPostTypeHierarchical &&
+							! isControllAllowed(
+								allowedControls,
+								'parents'
+							) && (
+								<ToolsPanelItem
+									hasValue={ () => !! parents?.length }
+									label={ __( 'Parents' ) }
+									onDeselect={ () =>
+										setQuery( { parents: [] } )
+									}
+								>
+									<ParentControl
+										parents={ parents }
+										postType={ postType }
+										onChange={ setQuery }
+									/>
+								</ToolsPanelItem>
+							) }
 					</ToolsPanel>
 				</InspectorControls>
 			) }
