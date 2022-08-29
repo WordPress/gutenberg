@@ -8,9 +8,7 @@ import { debounce } from 'lodash';
  */
 import {
 	PanelBody,
-	TextControl,
 	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
@@ -19,14 +17,11 @@ import { useEffect, useState, useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useIsPostTypeHierarchical } from '../../utils';
-import AuthorControl from './author-control';
+import { FILTERS_CONTROLS } from './filter-controls';
 import { Columns } from './columns';
 import { Order } from './order-control';
 import { InheritFromTemplate } from './inherit-from-template';
-import ParentControl from './parent-control';
 import { PostType } from './post-type';
-import { TaxonomyControls, useTaxonomiesInfo } from './taxonomy-controls';
 import { Sticky } from './sticky-control';
 
 const INSPECTOR_CONTROLS = {
@@ -43,9 +38,7 @@ export default function QueryInspectorControls( props ) {
 		setQuery,
 	} = props;
 
-	const { author: authorIds, postType, inherit, taxQuery, parents } = query;
-	const taxonomiesInfo = useTaxonomiesInfo( postType );
-	const isPostTypeHierarchical = useIsPostTypeHierarchical( postType );
+	const { inherit } = query;
 	const [ querySearch, setQuerySearch ] = useState( query.search );
 	const onChangeDebounced = useCallback(
 		debounce( () => {
@@ -88,57 +81,13 @@ export default function QueryInspectorControls( props ) {
 							setQuerySearch( '' );
 						} }
 					>
-						{ !! taxonomiesInfo?.length && (
-							<ToolsPanelItem
-								label={ __( 'Taxonomies' ) }
-								hasValue={ () =>
-									Object.values( taxQuery || {} ).some(
-										( terms ) => !! terms.length
-									)
-								}
-								onDeselect={ () =>
-									setQuery( { taxQuery: null } )
-								}
-							>
-								<TaxonomyControls
-									onChange={ setQuery }
-									query={ query }
-								/>
-							</ToolsPanelItem>
-						) }
-						<ToolsPanelItem
-							hasValue={ () => !! authorIds }
-							label={ __( 'Authors' ) }
-							onDeselect={ () => setQuery( { author: '' } ) }
-						>
-							<AuthorControl
-								value={ authorIds }
-								onChange={ setQuery }
-							/>
-						</ToolsPanelItem>
-						<ToolsPanelItem
-							hasValue={ () => !! querySearch }
-							label={ __( 'Keyword' ) }
-							onDeselect={ () => setQuerySearch( '' ) }
-						>
-							<TextControl
-								label={ __( 'Keyword' ) }
-								value={ querySearch }
-								onChange={ setQuerySearch }
-							/>
-						</ToolsPanelItem>
-						{ isPostTypeHierarchical && (
-							<ToolsPanelItem
-								hasValue={ () => !! parents?.length }
-								label={ __( 'Parents' ) }
-								onDeselect={ () => setQuery( { parents: [] } ) }
-							>
-								<ParentControl
-									parents={ parents }
-									postType={ postType }
-									onChange={ setQuery }
-								/>
-							</ToolsPanelItem>
+						{ Object.entries( FILTERS_CONTROLS ).map(
+							( [ key, Control ] ) =>
+								disabledInspectorControls?.includes?.(
+									key
+								) ? null : (
+									<Control { ...props } />
+								)
 						) }
 					</ToolsPanel>
 				</InspectorControls>
