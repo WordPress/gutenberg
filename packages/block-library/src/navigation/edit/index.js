@@ -605,16 +605,15 @@ function Navigation( {
 							/* translators: %s: The name of a menu. */
 							actionLabel={ __( "Switch to '%s'" ) }
 						/>
-						{ hasManagePermissions && (
-							<Button
-								variant="link"
-								href={ addQueryArgs( 'edit.php', {
-									post_type: 'wp_navigation',
-								} ) }
-							>
-								{ __( 'Manage menus' ) }
-							</Button>
-						) }
+						<Button
+							variant="link"
+							disabled={ ! hasManagePermissions }
+							href={ addQueryArgs( 'edit.php', {
+								post_type: 'wp_navigation',
+							} ) }
+						>
+							{ __( 'Manage menus' ) }
+						</Button>
 					</PanelBody>
 				</InspectorControls>
 				{ stylingInspectorControls }
@@ -679,16 +678,15 @@ function Navigation( {
 							/* translators: %s: The name of a menu. */
 							actionLabel={ __( "Switch to '%s'" ) }
 						/>
-						{ hasManagePermissions && (
-							<Button
-								variant="link"
-								href={ addQueryArgs( 'edit.php', {
-									post_type: 'wp_navigation',
-								} ) }
-							>
-								{ __( 'Manage menus' ) }
-							</Button>
-						) }
+						<Button
+							variant="link"
+							disabled={ ! hasManagePermissions }
+							href={ addQueryArgs( 'edit.php', {
+								post_type: 'wp_navigation',
+							} ) }
+						>
+							{ __( 'Manage menus' ) }
+						</Button>
 					</PanelBody>
 				</InspectorControls>
 				<Warning>
@@ -783,16 +781,15 @@ function Navigation( {
 							/* translators: %s: The name of a menu. */
 							actionLabel={ __( "Switch to '%s'" ) }
 						/>
-						{ hasManagePermissions && (
-							<Button
-								variant="link"
-								href={ addQueryArgs( 'edit.php', {
-									post_type: 'wp_navigation',
-								} ) }
-							>
-								{ __( 'Manage menus' ) }
-							</Button>
-						) }
+						<Button
+							variant="link"
+							disabled={ ! hasManagePermissions }
+							href={ addQueryArgs( 'edit.php', {
+								post_type: 'wp_navigation',
+							} ) }
+						>
+							{ __( 'Manage menus' ) }
+						</Button>
 					</PanelBody>
 				</InspectorControls>
 				{ stylingInspectorControls }
