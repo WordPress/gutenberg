@@ -105,7 +105,9 @@
 	// To do this, we disable text selection on the main container, then re-enable it only on the
 	// elements that actually get selected.
 	// To keep in mind: user-select is currently inherited to all nodes inside.
-	user-select: none;
+	.has-multi-selection & {
+		user-select: none;
+	}
 
 	// Re-enable it on components inside.
 	[class^="components-"] {
