@@ -165,6 +165,8 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 			return $nodes;
 		}
 
+		$valid_block_names   = array_keys( static::get_blocks_metadata() );
+
 		foreach ( $theme_json['settings']['blocks'] as $name => $node ) {
 			$selector = null;
 			if ( isset( $selectors[ $name ]['selector'] ) ) {
@@ -178,7 +180,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 
 			// Check if any blocks are nested inside.
 			foreach ( $node as $sub_node_name => $sub_node ) {
-				if ( str_contains( $sub_node_name, '/' ) ) {
+				if ( in_array ( $sub_node_name, $valid_block_names ) ) {
 					$nodes[] = array(
 						'path'     => array( 'settings', 'blocks', $name, $sub_node_name ),
 						'selector' => null,
