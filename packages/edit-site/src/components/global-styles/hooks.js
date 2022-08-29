@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, cloneDeep, set, isEqual, has } from 'lodash';
+import { get, cloneDeep, set, isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -210,10 +210,8 @@ export function getSupportedGlobalStylesPanels( name ) {
 		// unset, we still enable it.
 		if ( STYLE_PROPERTY[ styleName ].requiresOptOut ) {
 			if (
-				has(
-					blockType.supports,
-					STYLE_PROPERTY[ styleName ].support[ 0 ]
-				) &&
+				STYLE_PROPERTY[ styleName ].support[ 0 ] in
+					blockType.supports &&
 				get(
 					blockType.supports,
 					STYLE_PROPERTY[ styleName ].support

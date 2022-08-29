@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { has, without } from 'lodash';
+import { without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -87,7 +87,7 @@ export function getValidAlignments(
  */
 export function addAttribute( settings ) {
 	// Allow blocks to specify their own attribute definition with default values if needed.
-	if ( has( settings.attributes, [ 'align', 'type' ] ) ) {
+	if ( 'type' in ( settings.attributes?.align ?? {} ) ) {
 		return settings;
 	}
 	if ( hasBlockSupport( settings, 'align' ) ) {
