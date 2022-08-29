@@ -1087,6 +1087,10 @@
 						}
 					},
 					"additionalProperties": false
+				},
+				"shadow": {
+					"description": "Box shadow styles.",
+					"type": "string"
 				}
 			}
 		},
@@ -1101,13 +1105,14 @@
 						"border": {},
 						"color": {},
 						"spacing": {},
-						"typography": {}
+						"typography": {},
+						"filter": {},
+						"shadow": {}
 					},
 					"additionalProperties": false
 				}
 			]
 		},
-
 		"stylesElementsPropertiesComplete": {
 			"type": "object",
 			"properties": {
@@ -1162,6 +1167,9 @@
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
 				"caption": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"cite": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			},
@@ -1469,6 +1477,9 @@
 				{
 					"properties": {
 						"appearanceTools": {},
+						"useRootPaddingAwareAlignments": {
+							"$ref": "#/definitions/settingsPropertiesUseRootPaddingAwareAlignments/properties/useRootPaddingAwareAlignments"
+						},
 						"color": {},
 						"layout": {},
 						"spacing": {},

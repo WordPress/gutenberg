@@ -13,6 +13,8 @@ import {
 	subWeeks,
 	addWeeks,
 	isSameMonth,
+	startOfWeek,
+	endOfWeek,
 } from 'date-fns';
 
 /**
@@ -28,6 +30,7 @@ import { useState, useRef, useEffect } from '@wordpress/element';
  */
 import type { DatePickerProps } from '../types';
 import {
+	Wrapper,
 	Navigator,
 	NavigatorHeading,
 	Calendar,
@@ -63,7 +66,7 @@ export function DatePicker( {
 	events = [],
 	isInvalidDate,
 	onMonthPreviewed,
-	startOfWeek = 0,
+	startOfWeek: weekStartsOn = 0,
 }: DatePickerProps ) {
 	const date = currentDate ? inputToDate( currentDate ) : new Date();
 
@@ -78,7 +81,7 @@ export function DatePicker( {
 	} = useLilius( {
 		selected: [ startOfDay( date ) ],
 		viewing: startOfDay( date ),
-		weekStartsOn: startOfWeek,
+		weekStartsOn,
 	} );
 
 	// Used to implement a roving tab index. Tracks the day that receives focus
@@ -101,7 +104,7 @@ export function DatePicker( {
 	}
 
 	return (
-		<div
+		<Wrapper
 			className="components-datetime__date"
 			role="application"
 			aria-label={ __( 'Calendar' ) }
@@ -218,7 +221,22 @@ export function DatePicker( {
 									if ( event.key === 'ArrowDown' ) {
 										nextFocusable = addWeeks( day, 1 );
 									}
+									if ( event.key === 'PageUp' ) {
+										nextFocusable = subMonths( day, 1 );
+									}
+									if ( event.key === 'PageDown' ) {
+										nextFocusable = addMonths( day, 1 );
+									}
+									if ( event.key === 'Home' ) {
+										nextFocusable = startOfWeek( day );
+									}
+									if ( event.key === 'End' ) {
+										nextFocusable = startOfDay(
+											endOfWeek( day )
+										);
+									}
 									if ( nextFocusable ) {
+										event.preventDefault();
 										setFocusable( nextFocusable );
 										if (
 											! isSameMonth(
@@ -241,7 +259,7 @@ export function DatePicker( {
 					} )
 				) }
 			</Calendar>
-		</div>
+		</Wrapper>
 	);
 }
 
@@ -274,12 +292,14 @@ function Day( {
 
 	// Focus the day when it becomes focusable, e.g. because an arrow key is
 	// pressed. Only do this if focus is allowed - this stops us stealing focus
-	// from e.g. a TimePicker input. Note that isFocusAllowed is not a dep as
-	// there is no point calling focus() on an already focused element.
+	// from e.g. a TimePicker input.
 	useEffect( () => {
 		if ( ref.current && isFocusable && isFocusAllowed ) {
 			ref.current.focus();
 		}
+		// isFocusAllowed is not a dep as there is no point calling focus() on
+		// an already focused element.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ isFocusable ] );
 
 	return (

@@ -4,7 +4,7 @@
 >
 > There're related documents you may be interested in: the [theme.json v1](/docs/reference-guides/theme-json-reference/theme-json-v1.md) specification and the [reference to migrate from theme.json v1 to v2](/docs/reference-guides/theme-json-reference/theme-json-migrations.md).
 
-This reference guide lists the settings and style properties defined in the theme.json schema. See the [theme.json how to guide](/docs/how-to-guides/themes/theme-json.md) for examples and guide on how to use the theme.json file in your theme. 
+This reference guide lists the settings and style properties defined in the theme.json schema. See the [theme.json how to guide](/docs/how-to-guides/themes/theme-json.md) for examples and guide on how to use the theme.json file in your theme.
 
 ## Schema
 
@@ -194,6 +194,13 @@ CSS and SVG filter styles.
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
 | duotone | string |  |
+
+---
+
+### shadow
+
+Box shadow styles.
+
 
 ---
 

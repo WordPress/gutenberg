@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 4.0.0-next.0 (2022-08-23)
+## 4.0.0 (2022-08-24)
 
 ### Breaking Change
 
@@ -11,7 +11,7 @@
 ### New Feature
 
 -   Add `--no-plugin` flag to allow scaffolding of a block in an existing plugin ([#41642](https://github.com/WordPress/gutenberg/pull/41642))
--   Introduce the `--variant` flag to allow selection of a variant as defined in the template ([#41289](https://github.com/WordPress/gutenberg/pull/41289)).
+-   Introduce the `--variant` flag to allow selection of a variant as defined in the template ([#41289](https://github.com/WordPress/gutenberg/pull/41289), [#43481](https://github.com/WordPress/gutenberg/pull/43481)).
 
 ## 3.6.0 (2022-07-13)
 

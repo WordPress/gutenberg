@@ -77,10 +77,22 @@ program
 			await checkSystemRequirements( engines );
 			try {
 				const pluginTemplate = await getPluginTemplate( templateName );
-				const defaultValues = getDefaultValues(
-					pluginTemplate,
-					variant
+				const availableVariants = Object.keys(
+					pluginTemplate.variants
 				);
+				if ( variant && ! availableVariants.includes( variant ) ) {
+					if ( ! availableVariants.length ) {
+						throw new CLIError(
+							`"${ variant }" variant was selected. This template does not have any variants!`
+						);
+					}
+					throw new CLIError(
+						`"${ variant }" is not a valid variant for this template. Available variants are: ${ availableVariants.join(
+							', '
+						) }.`
+					);
+				}
+
 				const optionsValues = Object.fromEntries(
 					Object.entries( {
 						plugin,
@@ -90,11 +102,14 @@ program
 						title,
 						wpScripts,
 						wpEnv,
-						variant,
 					} ).filter( ( [ , value ] ) => value !== undefined )
 				);
 
 				if ( slug ) {
+					const defaultValues = getDefaultValues(
+						pluginTemplate,
+						variant
+					);
 					const answers = {
 						...defaultValues,
 						slug,
@@ -111,19 +126,24 @@ program
 							: "Let's add a new block to your existing WordPress plugin:"
 					);
 
+					if ( ! variant && availableVariants.length > 1 ) {
+						const result = await inquirer.prompt( {
+							type: 'list',
+							name: 'variant',
+							message:
+								'The template variant to use for this block:',
+							choices: availableVariants,
+						} );
+						variant = result.variant;
+					}
+
+					const defaultValues = getDefaultValues(
+						pluginTemplate,
+						variant
+					);
+
 					const filterOptionsProvided = ( { name } ) =>
 						! Object.keys( optionsValues ).includes( name );
-
-					// Get the variant prompt first. This will help get the default values
-					const variantPrompt =
-						Object.keys( pluginTemplate.variants )?.length > 1
-							? getPrompts( pluginTemplate, [ 'variant' ] )
-							: false;
-
-					const variantSelection = variantPrompt
-						? await inquirer.prompt( variantPrompt )
-						: false;
-
 					const blockPrompts = getPrompts(
 						pluginTemplate,
 						[
@@ -134,9 +154,8 @@ program
 							'dashicon',
 							'category',
 						],
-						variantSelection.variant
+						variant
 					).filter( filterOptionsProvided );
-
 					const blockAnswers = await inquirer.prompt( blockPrompts );
 
 					const pluginAnswers = plugin
@@ -163,7 +182,8 @@ program
 											'licenseURI',
 											'domainPath',
 											'updateURI',
-										]
+										],
+										variant
 									).filter( filterOptionsProvided );
 									const result = await inquirer.prompt(
 										pluginPrompts
@@ -175,8 +195,8 @@ program
 					await scaffold( pluginTemplate, {
 						...defaultValues,
 						...optionsValues,
+						variant,
 						...blockAnswers,
-						...variantSelection,
 						...pluginAnswers,
 					} );
 				}

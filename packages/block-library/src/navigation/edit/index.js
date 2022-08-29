@@ -36,6 +36,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
+import { close, Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -465,15 +466,25 @@ function Navigation( {
 								setOverlayMenuPreview( ! overlayMenuPreview );
 							} }
 						>
-							{ hasIcon && <OverlayMenuIcon /> }
-							{ ! hasIcon && <span>{ __( 'Menu' ) }</span> }
+							{ hasIcon && (
+								<>
+									<OverlayMenuIcon />
+									<Icon icon={ close } />
+								</>
+							) }
+							{ ! hasIcon && (
+								<>
+									<span>{ __( 'Menu' ) }</span>
+									<span>{ __( 'Close' ) }</span>
+								</>
+							) }
 						</Button>
 					) }
 					{ overlayMenuPreview && (
 						<ToggleControl
 							label={ __( 'Show icon button' ) }
 							help={ __(
-								'Configure the visual appearance of the button opening the overlay menu.'
+								'Configure the visual appearance of the button opening and closing the overlay menu.'
 							) }
 							onChange={ ( value ) =>
 								setAttributes( { hasIcon: value } )
@@ -633,7 +644,6 @@ function Navigation( {
 					overlayTextColor={ overlayTextColor }
 				>
 					<UnsavedInnerBlocks
-						blockProps={ blockProps }
 						blocks={ uncontrolledInnerBlocks }
 						clientId={ clientId }
 						navigationMenus={ navigationMenus }

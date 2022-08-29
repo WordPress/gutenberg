@@ -202,6 +202,11 @@
 	}
 }
 
+@mixin placeholder-style() {
+	border: $border-width dashed currentColor;
+	border-radius: $radius-block-ui;
+}
+
 /**
  * Allows users to opt-out of animations via OS-level preferences.
  */
@@ -226,7 +231,6 @@
 			animation-delay: 0s;
 		}
 	}
-
 }
 
 @mixin input-control {
@@ -371,6 +375,7 @@
  * Reset default styles for JavaScript UI based pages.
  * This is a WP-admin agnostic reset
  */
+
 @mixin reset {
 	box-sizing: border-box;
 
@@ -384,6 +389,7 @@
 /**
  * Reset the WP Admin page styles for Gutenberg-like pages.
  */
+
 @mixin wp-admin-reset( $content-container ) {
 	background: $white;
 

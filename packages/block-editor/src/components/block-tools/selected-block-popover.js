@@ -20,6 +20,7 @@ import BlockSelectionButton from './block-selection-button';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import { store as blockEditorStore } from '../../store';
 import BlockPopover from '../block-popover';
+import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 
 function selector( select ) {
 	const {
@@ -113,6 +114,11 @@ function SelectedBlockPopover( {
 	// to it when re-mounting.
 	const initialToolbarItemIndexRef = useRef();
 
+	const popoverProps = useBlockToolbarPopoverProps( {
+		contentElement: __unstableContentRef?.current,
+		clientId,
+	} );
+
 	if ( ! shouldShowBreadcrumb && ! shouldShowContextualToolbar ) {
 		return null;
 	}
@@ -126,6 +132,7 @@ function SelectedBlockPopover( {
 			} ) }
 			__unstablePopoverSlot={ __unstablePopoverSlot }
 			__unstableContentRef={ __unstableContentRef }
+			{ ...popoverProps }
 		>
 			{ shouldShowContextualToolbar && (
 				<BlockContextualToolbar

@@ -4,19 +4,11 @@ $blocks-block__margin: 0.5em;
 // Prefer the link selector instead of the regular button classname
 // to support the previous markup in addition to the new one.
 .wp-block-button__link {
-	box-shadow: none;
 	cursor: pointer;
 	display: inline-block;
 	text-align: center;
 	word-break: break-word; // overflow-wrap doesn't work well if a link is wrapped in the div, so use word-break here.
 	box-sizing: border-box;
-
-	&:hover,
-	&:focus,
-	&:active,
-	&:visited {
-		color: $white;
-	}
 
 	&.aligncenter {
 		text-align: center;
@@ -32,6 +24,7 @@ $blocks-block__margin: 0.5em;
 // They are needed for backwards compatibility.
 :where(.wp-block-button__link) {
 	// This needs a low specificity so it won't override the rules from the button element if defined in theme.json.
+	box-shadow: none;
 	text-decoration: none;
 
 	// 100% causes an oval, but any explicit but really high value retains the pill shape.

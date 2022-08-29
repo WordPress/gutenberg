@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 2.0.0-next.0 (2022-08-23)
+## 2.0.0 (2022-08-24)
 
 ### Breaking Change
 

@@ -111,9 +111,9 @@ const externalTemplateExists = async ( templateName ) => {
 const configToTemplate = async ( {
 	pluginTemplatesPath,
 	blockTemplatesPath,
-	defaultValues = {},
 	assetsPath,
-	variants,
+	defaultValues = {},
+	variants = {},
 	...deprecated
 } ) => {
 	if ( defaultValues === null || typeof defaultValues !== 'object' ) {
@@ -140,9 +140,9 @@ const configToTemplate = async ( {
 		blockOutputTemplates: blockTemplatesPath
 			? await getOutputTemplates( blockTemplatesPath )
 			: {},
-		defaultValues,
-		outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
 		pluginOutputTemplates: await getOutputTemplates( pluginTemplatesPath ),
+		outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
+		defaultValues,
 		variants,
 	};
 };
@@ -231,25 +231,14 @@ const getDefaultValues = ( pluginTemplate, variant ) => {
 		editorStyle: 'file:./index.css',
 		style: 'file:./style-index.css',
 		...pluginTemplate.defaultValues,
-		...pluginTemplate.variants[ variant ],
+		...pluginTemplate.variants?.[ variant ],
+		variantVars: getVariantVars( pluginTemplate.variants, variant ),
 	};
 };
 
 const getPrompts = ( pluginTemplate, keys, variant ) => {
-	const defaultValues = getDefaultValues( pluginTemplate );
-	const variantData = pluginTemplate.variants[ variant ] ?? false;
+	const defaultValues = getDefaultValues( pluginTemplate, variant );
 	return keys.map( ( promptName ) => {
-		if ( promptName === 'variant' ) {
-			prompts[ promptName ].choices = Object.keys(
-				pluginTemplate.variants
-			);
-		}
-		if ( variantData && variantData[ promptName ] ) {
-			return {
-				...prompts[ promptName ],
-				default: variantData[ promptName ],
-			};
-		}
 		return {
 			...prompts[ promptName ],
 			default: defaultValues[ promptName ],
@@ -257,28 +246,21 @@ const getPrompts = ( pluginTemplate, keys, variant ) => {
 	} );
 };
 
-const getTemplateVariantVars = ( variants, variant ) => {
+const getVariantVars = ( variants, variant ) => {
 	const variantVars = {};
-	if ( variants ) {
-		const variantNames = Object.keys( variants );
-		const chosenVariant = variant ?? variantNames[ 0 ]; // If no variant is passed, use the first in the array as the default
-
-		if ( variantNames.includes( chosenVariant ) ) {
-			for ( const variantName of variantNames ) {
-				const key =
-					variantName.charAt( 0 ).toUpperCase() +
-					variantName.slice( 1 );
-				variantVars[ `is${ key }Variant` ] =
-					chosenVariant === variantName ?? false;
-			}
-		} else {
-			throw new CLIError(
-				`"${ chosenVariant }" is not a valid variant for this template. Available variants are: ${ variantNames.join(
-					', '
-				) }`
-			);
-		}
+	const variantNames = Object.keys( variants );
+	if ( variantNames.length === 0 ) {
+		return variantVars;
 	}
+
+	const currentVariant = variant ?? variantNames[ 0 ];
+	for ( const variantName of variantNames ) {
+		const key =
+			variantName.charAt( 0 ).toUpperCase() + variantName.slice( 1 );
+		variantVars[ `is${ key }Variant` ] =
+			currentVariant === variantName ?? false;
+	}
+
 	return variantVars;
 };
 
@@ -286,5 +268,4 @@ module.exports = {
 	getPluginTemplate,
 	getDefaultValues,
 	getPrompts,
-	getTemplateVariantVars,
 };

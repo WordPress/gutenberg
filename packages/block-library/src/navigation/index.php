@@ -610,16 +610,20 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$is_hidden_by_default ? 'always-shown' : '',
 	);
 
-	$toggle_button_icon        = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg>';
-	$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
-	$toggle_button_content     = $should_display_icon_label ? $toggle_button_icon : 'Menu';
+	$should_display_icon_label   = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
+	$toggle_button_icon          = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg>';
+	$toggle_button_content       = $should_display_icon_label ? $toggle_button_icon : __( 'Menu' );
+	$toggle_close_button_icon    = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
+	$toggle_close_button_content = $should_display_icon_label ? $toggle_close_button_icon : __( 'Close' );
+	$toggle_aria_label_open      = $should_display_icon_label ? 'aria-label="' . __( 'Open menu' ) . '"' : ''; // Open button label.
+	$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
 
 	$responsive_container_markup = sprintf(
-		'<button aria-haspopup="true" aria-label="%3$s" class="%6$s" data-micromodal-trigger="%1$s">%9$s</button>
+		'<button aria-haspopup="true" %3$s class="%6$s" data-micromodal-trigger="%1$s">%9$s</button>
 			<div class="%5$s" style="%7$s" id="%1$s">
 				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
 					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s">
-							<button aria-label="%4$s" data-micromodal-close class="wp-block-navigation__responsive-container-close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg></button>
+							<button %4$s data-micromodal-close class="wp-block-navigation__responsive-container-close">%10$s</button>
 						<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
 							%2$s
 						</div>
@@ -628,13 +632,14 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			</div>',
 		esc_attr( $modal_unique_id ),
 		$inner_blocks_html,
-		__( 'Open menu' ), // Open button label.
-		__( 'Close menu' ), // Close button label.
+		$toggle_aria_label_open,
+		$toggle_aria_label_close,
 		esc_attr( implode( ' ', $responsive_container_classes ) ),
 		esc_attr( implode( ' ', $open_button_classes ) ),
 		safecss_filter_attr( $colors['overlay_inline_styles'] ),
 		__( 'Menu' ),
-		$toggle_button_content
+		$toggle_button_content,
+		$toggle_close_button_content
 	);
 
 	return sprintf(
