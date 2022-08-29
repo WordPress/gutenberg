@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -160,33 +160,73 @@ export default function useSetting( path ) {
 			// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
 			const settings = select( blockEditorStore ).getSettings();
 
-			// 2.1 Check for nested parent block settings
-			if ( result === undefined ) {
-				// Pull nested settings from parent blocks first.
-				// Needs some work:
-				//   - Can only handle one layer of nesting
-				//   - No CSS-like specificity rules for determining winner if a block is nested in multiple places
+			// 2.1 Check for block-specific settings from block editor store
+			if ( result === undefined && blockName !== '' ) {
+				const candidateBlockNames = [
+					...blockParentIds.map( ( parentId ) =>
+						select( blockEditorStore ).getBlockName( parentId )
+					),
+					blockName,
+				];
 
-				blockParentIds.forEach( ( blockParentId ) => {
-					const parentBlockName =
-						select( blockEditorStore ).getBlockName(
-							blockParentId
+				const settingsValuesByDepth = new Map();
+
+				const findNestedSettings = ( settingsValue, depth = 1 ) => {
+					for ( const [
+						propertyKey,
+						propertyValue,
+					] of Object.entries( settingsValue ) ) {
+						const nestedSettingsValue = get(
+							propertyValue,
+							normalizedPath
 						);
-					const candidateNestedPath = `__experimentalFeatures.blocks.${ parentBlockName }.${ blockName }.${ normalizedPath }`;
-					const nestedResult = get( settings, candidateNestedPath );
 
-					if ( nestedResult !== undefined ) {
-						result = nestedResult;
+						if (
+							propertyKey === blockName &&
+							nestedSettingsValue !== undefined
+						) {
+							// Store these block settings with the current depth as a key
+							const settingsAtDepth =
+								settingsValuesByDepth.get( depth ) ?? [];
+							settingsAtDepth.push( nestedSettingsValue );
+
+							settingsValuesByDepth.set( depth, settingsAtDepth );
+						} else if (
+							candidateBlockNames.includes( propertyKey )
+						) {
+							findNestedSettings( propertyValue, depth + 1 );
+						}
 					}
-				} );
+				};
+
+				const blockSettings = get(
+					settings,
+					'__experimentalFeatures.blocks',
+					{}
+				);
+				const candidateBlockSettings = pick(
+					blockSettings,
+					candidateBlockNames
+				);
+				findNestedSettings( candidateBlockSettings );
+
+				if ( settingsValuesByDepth.size > 0 ) {
+					const maxDepth = Math.max(
+						...settingsValuesByDepth.keys()
+					);
+					const settingsAtMaxDepth =
+						settingsValuesByDepth.get( maxDepth );
+
+					// If multiple nested settings share the same depth, return the last defined one
+					result =
+						settingsAtMaxDepth[ settingsAtMaxDepth.length - 1 ];
+				}
 			}
 
 			// 2.2 Default to top-level settings from the block editor store
 			if ( result === undefined ) {
 				const defaultsPath = `__experimentalFeatures.${ normalizedPath }`;
-				const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ normalizedPath }`;
-				result =
-					get( settings, blockPath ) ?? get( settings, defaultsPath );
+				result = get( settings, defaultsPath );
 			}
 
 			// Return if the setting was found in either the block instance or the store.
