@@ -48,6 +48,7 @@ export function useSetting( path, blockName, source = 'all' ) {
 
 	const setSetting = ( newValue ) => {
 		setUserConfig( ( currentConfig ) => {
+			// Deep clone `currentConfig` to avoid mutating it later.
 			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
 			const pathToSet = PATHS_WITH_MERGE[ path ]
 				? fullPath + '.custom'
@@ -109,6 +110,7 @@ export function useStyle( path, blockName, source = 'all' ) {
 
 	const setStyle = ( newValue ) => {
 		setUserConfig( ( currentConfig ) => {
+			// Deep clone `currentConfig` to avoid mutating it later.
 			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
 			set(
 				newUserConfig,

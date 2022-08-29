@@ -14,6 +14,7 @@ import {
 	ROOT_LEVEL_ID,
 } from './fixtures/block-list-context.native';
 
+// Deep clone an object to avoid mutating it later.
 const cloneObject = ( obj ) => JSON.parse( JSON.stringify( obj ) );
 
 describe( 'findBlockLayoutByClientId', () => {

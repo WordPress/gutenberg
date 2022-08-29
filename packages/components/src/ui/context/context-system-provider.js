@@ -76,6 +76,7 @@ function useContextSystemBridge( { value } ) {
 	// that this should be super safe to assume that `useMemo` will only run on actual
 	// changes to the two dependencies, therefore saving us calls to `merge` and `JSON.parse/stringify`!
 	const config = useMemo( () => {
+		// Deep clone `parentContext` to avoid mutating it later.
 		return merge( JSON.parse( JSON.stringify( parentContext ) ), value );
 	}, [ parentContext, value ] );
 
