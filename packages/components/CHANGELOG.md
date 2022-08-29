@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 20.0.1-next.0 (2022-08-29)
+
 ### Bug Fix
 
 -   `Popover`: enable auto-updating every animation frame ([#43617](https://github.com/WordPress/gutenberg/pull/43617)).
