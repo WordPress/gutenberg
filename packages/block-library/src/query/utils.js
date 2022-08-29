@@ -167,3 +167,19 @@ export const getTransformedBlocksFromPattern = (
 	}
 	return { newBlocks: clonedBlocks, queryClientIds };
 };
+
+/**
+ * Checks if a particular post type is viewable and hierarchical
+ *
+ * @param {string} postType The post type.
+ * @return {boolean} `true` if the Post Type is hierarchical.
+ */
+export function useIsPostTypeHierarchical( postType ) {
+	return useSelect(
+		( select ) => {
+			const type = select( coreStore ).getPostType( postType );
+			return type?.viewable && type?.hierarchical;
+		},
+		[ postType ]
+	);
+}

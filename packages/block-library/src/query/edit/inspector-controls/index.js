@@ -15,12 +15,11 @@ import {
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { useEffect, useState, useCallback } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
+import { useIsPostTypeHierarchical } from '../../utils';
 import AuthorControl from './author-control';
 import { Columns } from './columns';
 import { Order } from './order-control';
@@ -29,16 +28,6 @@ import ParentControl from './parent-control';
 import { PostType } from './post-type';
 import { TaxonomyControls, useTaxonomiesInfo } from './taxonomy-controls';
 import { Sticky } from './sticky-control';
-
-function useIsPostTypeHierarchical( postType ) {
-	return useSelect(
-		( select ) => {
-			const type = select( coreStore ).getPostType( postType );
-			return type?.viewable && type?.hierarchical;
-		},
-		[ postType ]
-	);
-}
 
 const INSPECTOR_CONTROLS = {
 	InheritFromTemplate,
