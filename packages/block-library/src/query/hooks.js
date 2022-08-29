@@ -6,6 +6,15 @@ import { createInterpolateElement } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { InspectorControls } from '@wordpress/block-editor';
+import {
+	ToggleControl,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import InspectorControlsQueryFilters from './edit/inspector-controls/filters-slot';
 
 const CreateNewPostLink = ( {
 	attributes: { query: { postType } = {} } = {},
@@ -33,21 +42,52 @@ const CreateNewPostLink = ( {
  */
 const queryTopInspectorControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { name, isSelected } = props;
+		const {
+			name,
+			isSelected,
+			attributes: { namespace },
+		} = props;
 		if ( name !== 'core/query' || ! isSelected ) {
 			return <BlockEdit key="edit" { ...props } />;
 		}
 
+		// TODO: Remove all :).
+		const addExtraControls = namespace === 'wp/query/products';
 		return (
 			<>
 				<InspectorControls>
 					<CreateNewPostLink { ...props } />
 				</InspectorControls>
+				{ addExtraControls && (
+					<>
+						<InspectorControlsQueryFilters>
+							<TestControl { ...props } />
+						</InspectorControlsQueryFilters>
+					</>
+				) }
 				<BlockEdit key="edit" { ...props } />
 			</>
 		);
 	},
 	'withInspectorControls'
 );
+
+function TestControl( { clientId } ) {
+	return (
+		<ToolsPanelItem
+			panelId={ clientId }
+			label={ __( 'Demo control' ) }
+			hasValue={ () => false }
+			onDeselect={ () => {} }
+			resetAllFilter={ ( props ) => console.log( props ) }
+		>
+			<ToggleControl
+				label={ __( 'Get products on sale' ) }
+				checked={ false }
+				onChange={ () => {} }
+			/>
+		</ToolsPanelItem>
+	);
+}
 
 export default queryTopInspectorControls;

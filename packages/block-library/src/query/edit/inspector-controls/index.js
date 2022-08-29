@@ -13,7 +13,6 @@ import {
 	RangeControl,
 	ToggleControl,
 	Notice,
-	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -31,6 +30,7 @@ import ParentControl from './parent-control';
 import { TaxonomyControls, useTaxonomiesInfo } from './taxonomy-controls';
 import StickyControl from './sticky-control';
 import { usePostTypes } from '../../utils';
+import InspectorControlsQueryFilters from './filters-slot';
 
 function useIsPostTypeHierarchical( postType ) {
 	return useSelect(
@@ -43,6 +43,7 @@ function useIsPostTypeHierarchical( postType ) {
 }
 
 export default function QueryInspectorControls( {
+	clientId,
 	attributes: { query, displayLayout },
 	setQuery,
 	setDisplayLayout,
@@ -166,75 +167,66 @@ export default function QueryInspectorControls( {
 					) }
 				</PanelBody>
 			</InspectorControls>
+			<InspectorControls>
+				<InspectorControlsQueryFilters.Slot />
+			</InspectorControls>
 			{ ! inherit && (
-				<InspectorControls>
-					<ToolsPanel
-						className="block-library-query-toolspanel__filters"
-						label={ __( 'Filters' ) }
-						resetAll={ () => {
-							setQuery( {
-								author: '',
-								parents: [],
-								search: '',
-								taxQuery: null,
-							} );
-							setQuerySearch( '' );
-						} }
-					>
-						{ !! taxonomiesInfo?.length && (
-							<ToolsPanelItem
-								label={ __( 'Taxonomies' ) }
-								hasValue={ () =>
-									Object.values( taxQuery || {} ).some(
-										( terms ) => !! terms.length
-									)
-								}
-								onDeselect={ () =>
-									setQuery( { taxQuery: null } )
-								}
-							>
-								<TaxonomyControls
-									onChange={ setQuery }
-									query={ query }
-								/>
-							</ToolsPanelItem>
-						) }
+				<InspectorControlsQueryFilters>
+					{ !! taxonomiesInfo?.length && (
 						<ToolsPanelItem
-							hasValue={ () => !! authorIds }
-							label={ __( 'Authors' ) }
-							onDeselect={ () => setQuery( { author: '' } ) }
+							label={ __( 'Taxonomies' ) }
+							hasValue={ () =>
+								Object.values( taxQuery || {} ).some(
+									( terms ) => !! terms.length
+								)
+							}
+							onDeselect={ () => setQuery( { taxQuery: null } ) }
+							panelId={ clientId }
 						>
-							<AuthorControl
-								value={ authorIds }
+							<TaxonomyControls
+								onChange={ setQuery }
+								query={ query }
+							/>
+						</ToolsPanelItem>
+					) }
+					<ToolsPanelItem
+						hasValue={ () => !! authorIds }
+						label={ __( 'Authors' ) }
+						onDeselect={ () => setQuery( { author: '' } ) }
+						panelId={ clientId }
+					>
+						<AuthorControl
+							value={ authorIds }
+							onChange={ setQuery }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () => !! querySearch }
+						label={ __( 'Keyword' ) }
+						onDeselect={ () => setQuerySearch( '' ) }
+						panelId={ clientId }
+					>
+						<TextControl
+							label={ __( 'Keyword' ) }
+							value={ querySearch }
+							onChange={ setQuerySearch }
+						/>
+					</ToolsPanelItem>
+					{ isPostTypeHierarchical && (
+						<ToolsPanelItem
+							hasValue={ () => !! parents?.length }
+							label={ __( 'Parents' ) }
+							onDeselect={ () => setQuery( { parents: [] } ) }
+							panelId={ clientId }
+						>
+							<ParentControl
+								parents={ parents }
+								postType={ postType }
 								onChange={ setQuery }
 							/>
 						</ToolsPanelItem>
-						<ToolsPanelItem
-							hasValue={ () => !! querySearch }
-							label={ __( 'Keyword' ) }
-							onDeselect={ () => setQuerySearch( '' ) }
-						>
-							<TextControl
-								label={ __( 'Keyword' ) }
-								value={ querySearch }
-								onChange={ setQuerySearch }
-							/>
-						</ToolsPanelItem>
-						{ isPostTypeHierarchical && (
-							<ToolsPanelItem
-								hasValue={ () => !! parents?.length }
-								label={ __( 'Parents' ) }
-								onDeselect={ () => setQuery( { parents: [] } ) }
-							>
-								<ParentControl
-									parents={ parents }
-									postType={ postType }
-									onChange={ setQuery }
-								/>
-							</ToolsPanelItem>
-						) }
-					</ToolsPanel>
-				</InspectorControls>
+					) }
+				</InspectorControlsQueryFilters>
 			) }
 		</>
 	);
