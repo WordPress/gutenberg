@@ -228,6 +228,10 @@ function gutenberg_block_type_metadata_render_template( $settings, $metadata ) {
 		)
 	);
 
+	// Bail if the file does not exist.
+	if ( ! file_exists( $template_path ) ) {
+		return $settings;
+	}
 	/**
 	 * Renders the block on the server.
 	 *
