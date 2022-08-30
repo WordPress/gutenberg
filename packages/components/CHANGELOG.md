@@ -43,6 +43,7 @@
 -   `FormTokenField`: Refactor away from `_.difference()` ([#43224](https://github.com/WordPress/gutenberg/pull/43224/)).
 -   `Autocomplete`: use `KeyboardEvent.code` instead of `KeyboardEvent.keyCode` ([#43432](https://github.com/WordPress/gutenberg/pull/43432/)).
 -   `ConfirmDialog`: replace (almost) every usage of `fireEvent` with `@testing-library/user-event`  ([#43429](https://github.com/WordPress/gutenberg/pull/43429/)).
+-   `Popover`: Introduce new `flip` and `resize` props ([#43546](https://github.com/WordPress/gutenberg/pull/43546/)).
 
 ### Internal
 
@@ -83,6 +84,7 @@
 ### Experimental
 
 -   `FormTokenField`: add `__experimentalAutoSelectFirstMatch` prop to auto select the first matching suggestion on typing ([#42527](https://github.com/WordPress/gutenberg/pull/42527/)).
+-   `Popover`: Deprecate `__unstableForcePosition`, now replaced by new `flip` and `resize` props ([#43546](https://github.com/WordPress/gutenberg/pull/43546/)).
 
 ## 19.17.0 (2022-08-10)
 
