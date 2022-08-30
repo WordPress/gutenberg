@@ -602,12 +602,18 @@ function Navigation( {
 								}
 							} }
 							onCreateNew={ createUntitledEmptyNavigationMenu }
+							createNavigationMenuIsSuccess={
+								createNavigationMenuIsSuccess
+							}
 							/* translators: %s: The name of a menu. */
 							actionLabel={ __( "Switch to '%s'" ) }
 						/>
 						<Button
 							variant="link"
-							disabled={ ! hasManagePermissions }
+							disabled={
+								! hasManagePermissions ||
+								! hasResolvedNavigationMenus
+							}
 							href={ addQueryArgs( 'edit.php', {
 								post_type: 'wp_navigation',
 							} ) }
@@ -675,12 +681,18 @@ function Navigation( {
 								}
 							} }
 							onCreateNew={ createUntitledEmptyNavigationMenu }
+							createNavigationMenuIsSuccess={
+								createNavigationMenuIsSuccess
+							}
 							/* translators: %s: The name of a menu. */
 							actionLabel={ __( "Switch to '%s'" ) }
 						/>
 						<Button
 							variant="link"
-							disabled={ ! hasManagePermissions }
+							disabled={
+								! hasManagePermissions ||
+								! hasResolvedNavigationMenus
+							}
 							href={ addQueryArgs( 'edit.php', {
 								post_type: 'wp_navigation',
 							} ) }
@@ -778,12 +790,18 @@ function Navigation( {
 								}
 							} }
 							onCreateNew={ createUntitledEmptyNavigationMenu }
+							createNavigationMenuIsSuccess={
+								createNavigationMenuIsSuccess
+							}
 							/* translators: %s: The name of a menu. */
 							actionLabel={ __( "Switch to '%s'" ) }
 						/>
 						<Button
 							variant="link"
-							disabled={ ! hasManagePermissions }
+							disabled={
+								! hasManagePermissions ||
+								! hasResolvedNavigationMenus
+							}
 							href={ addQueryArgs( 'edit.php', {
 								post_type: 'wp_navigation',
 							} ) }

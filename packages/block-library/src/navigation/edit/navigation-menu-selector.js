@@ -24,6 +24,7 @@ function NavigationMenuSelector( {
 	onSelectClassicMenu,
 	onCreateNew,
 	actionLabel,
+	createNavigationMenuIsSuccess,
 	toggleProps = {},
 } ) {
 	/* translators: %s: The name of a menu. */
@@ -31,6 +32,84 @@ function NavigationMenuSelector( {
 
 	const [ selectorLabel, setSelectorLabel ] = useState( '' );
 	const [ isPressed, setIsPressed ] = useState( false );
+	const [ enableOptions, setEnableOptions ] = useState( false );
+	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
+
+	actionLabel = actionLabel || createActionLabel;
+
+	const { menus: classicMenus } = useNavigationEntities();
+
+	const {
+		navigationMenus,
+		hasResolvedNavigationMenus,
+		isNavigationMenuResolved,
+		canUserCreateNavigationMenu,
+		canSwitchNavigationMenu,
+	} = useNavigationMenu();
+
+	const menuChoices = useMemo( () => {
+		return (
+			navigationMenus?.map( ( { id, title } ) => {
+				const label = decodeEntities( title.rendered );
+				if ( id === currentMenuId && ! isCreatingMenu ) {
+					setSelectorLabel( label );
+					setEnableOptions(
+						( canSwitchNavigationMenu ||
+							canUserCreateNavigationMenu ) &&
+							hasResolvedNavigationMenus &&
+							( ! isCreatingMenu ||
+								createNavigationMenuIsSuccess )
+					);
+				}
+				return {
+					value: id,
+					label,
+					ariaLabel: sprintf( actionLabel, label ),
+				};
+			} ) || []
+		);
+	}, [
+		currentMenuId,
+		navigationMenus,
+		createNavigationMenuIsSuccess,
+		isNavigationMenuResolved,
+		hasResolvedNavigationMenus,
+	] );
+
+	const hasNavigationMenus = !! navigationMenus?.length;
+	const hasClassicMenus = !! classicMenus?.length;
+	const showNavigationMenus = !! canSwitchNavigationMenu;
+	const showClassicMenus = !! canUserCreateNavigationMenu;
+
+	useEffect( () => {
+		if ( ! hasResolvedNavigationMenus ) {
+			setSelectorLabel( __( 'Loading options …' ) );
+		} else if ( ! hasNavigationMenus && hasResolvedNavigationMenus ) {
+			setSelectorLabel( __( 'No menus. Create one?' ) );
+			setEnableOptions(
+				( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
+					hasResolvedNavigationMenus &&
+					( ! isCreatingMenu || createNavigationMenuIsSuccess )
+			);
+		} else if ( hasResolvedNavigationMenus && currentMenuId === null ) {
+			setSelectorLabel( __( 'Select another menu' ) );
+			setEnableOptions(
+				( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
+					hasResolvedNavigationMenus &&
+					( ! isCreatingMenu || createNavigationMenuIsSuccess )
+			);
+		}
+
+		if ( isCreatingMenu && createNavigationMenuIsSuccess ) {
+			setIsCreatingMenu( false );
+		}
+	}, [
+		currentMenuId,
+		hasNavigationMenus,
+		hasResolvedNavigationMenus,
+		createNavigationMenuIsSuccess,
+		isNavigationMenuResolved,
+	] );
 
 	toggleProps = {
 		...toggleProps,
@@ -44,61 +123,8 @@ function NavigationMenuSelector( {
 		onClick: () => {
 			setIsPressed( ! isPressed );
 		},
+		disabled: ! enableOptions,
 	};
-
-	actionLabel = actionLabel || createActionLabel;
-
-	const { menus: classicMenus } = useNavigationEntities();
-
-	const {
-		navigationMenus,
-		canUserCreateNavigationMenu,
-		canUserUpdateNavigationMenu,
-		canSwitchNavigationMenu,
-	} = useNavigationMenu();
-
-	const menuChoices = useMemo( () => {
-		return (
-			navigationMenus?.map( ( { id, title } ) => {
-				const label = decodeEntities( title.rendered );
-				if ( id === currentMenuId ) {
-					setSelectorLabel( label );
-				}
-				return {
-					value: id,
-					label,
-					ariaLabel: sprintf( actionLabel, label ),
-				};
-			} ) || []
-		);
-	}, [ currentMenuId, navigationMenus ] );
-
-	const hasNavigationMenus = !! navigationMenus?.length;
-	const hasClassicMenus = !! classicMenus?.length;
-	const showNavigationMenus = !! canSwitchNavigationMenu;
-	const showClassicMenus = !! canUserCreateNavigationMenu;
-	const hasManagePermissions =
-		canUserCreateNavigationMenu || canUserUpdateNavigationMenu;
-
-	useEffect( () => {
-		if ( ! hasNavigationMenus ) {
-			setSelectorLabel( __( 'No menus. Create one?' ) );
-		} else if ( currentMenuId === null ) {
-			setSelectorLabel( __( 'Select another menu' ) );
-		}
-	}, [ currentMenuId, hasNavigationMenus ] );
-
-	// Show the selector if:
-	// - has switch or create permissions and there are block or classic menus.
-	// - user has create or update permissions and component should show the menu actions.
-	const showSelectMenus =
-		( ( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
-			( hasNavigationMenus || hasClassicMenus ) ) ||
-		hasManagePermissions;
-
-	if ( ! showSelectMenus ) {
-		return null;
-	}
 
 	return (
 		<DropdownMenu
@@ -108,7 +134,7 @@ function NavigationMenuSelector( {
 			icon={ null }
 			toggleProps={ toggleProps }
 		>
-			{ () => (
+			{ ( { onClose } ) => (
 				<>
 					{ showNavigationMenus && hasNavigationMenus && (
 						<MenuGroup label={ __( 'Menus' ) }>
@@ -128,7 +154,12 @@ function NavigationMenuSelector( {
 								return (
 									<MenuItem
 										onClick={ () => {
+											setSelectorLabel(
+												__( 'Loading options …' )
+											);
+											setEnableOptions( false );
 											onSelectClassicMenu( menu );
+											onClose();
 										} }
 										key={ menu.id }
 										aria-label={ sprintf(
@@ -143,13 +174,21 @@ function NavigationMenuSelector( {
 						</MenuGroup>
 					) }
 
-					{ hasManagePermissions && (
+					{ canUserCreateNavigationMenu && (
 						<MenuGroup label={ __( 'Tools' ) }>
-							{ canUserCreateNavigationMenu && (
-								<MenuItem onClick={ onCreateNew }>
-									{ __( 'Create new menu' ) }
-								</MenuItem>
-							) }
+							<MenuItem
+								onClick={ () => {
+									onClose();
+									onCreateNew();
+									setIsCreatingMenu( true );
+									setSelectorLabel(
+										__( 'Loading options …' )
+									);
+									setEnableOptions( false );
+								} }
+							>
+								{ __( 'Create new menu' ) }
+							</MenuItem>
 						</MenuGroup>
 					) }
 				</>
