@@ -50,7 +50,7 @@ export const unescapeString = ( arg ) => {
  *
  * @param {Object} term The term object to unescape.
  *
- * @return {Object|false} Term object with name property unescaped or
+ * @return {Object|undefined} Term object with name property unescaped or
  *         undefined if the term is invalid.
  */
 export const unescapeTerm = ( term ) => {
