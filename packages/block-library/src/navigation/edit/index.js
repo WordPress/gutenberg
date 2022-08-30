@@ -61,6 +61,15 @@ import useCreateNavigationMenu from './use-create-navigation-menu';
 import { useInnerBlocks } from './use-inner-blocks';
 import { detectColors } from './utils';
 
+const navigationStorage = window.localStorage;
+
+if ( ! navigationStorage.getItem( 'nav_menus_created' ) ) {
+	navigationStorage.setItem(
+		'nav_menus_created',
+		JSON.stringify( [ ...new Map() ] )
+	);
+}
+
 function Navigation( {
 	attributes,
 	setAttributes,
@@ -100,6 +109,10 @@ function Navigation( {
 	const setRef = ( postId ) => {
 		setAttributes( { ref: postId } );
 	};
+
+	const navigationStorageMap = new Map(
+		JSON.parse( window.localStorage.getItem( 'nav_menus_created' ) )
+	);
 
 	const recursionId = `navigationMenu/${ ref }`;
 	const hasAlreadyRendered = useHasRecursion( recursionId );
@@ -632,6 +645,18 @@ function Navigation( {
 									classicMenu.id,
 									classicMenu.name
 								);
+								navigationStorageMap.set(
+									classicMenu.name,
+									classicMenu.id
+								);
+								navigationStorage.setItem(
+									'nav_menus_created',
+									JSON.stringify(
+										Array.from(
+											navigationStorageMap.entries()
+										)
+									)
+								);
 								if ( navMenu ) {
 									handleUpdateMenu( navMenu.id, {
 										focusNavigationBlock: true,
@@ -712,6 +737,18 @@ function Navigation( {
 								const navMenu = await convertClassicMenu(
 									classicMenu.id,
 									classicMenu.name
+								);
+								navigationStorageMap.set(
+									classicMenu.name,
+									classicMenu.id
+								);
+								navigationStorage.setItem(
+									'nav_menus_created',
+									JSON.stringify(
+										Array.from(
+											navigationStorageMap.entries()
+										)
+									)
 								);
 								if ( navMenu ) {
 									handleUpdateMenu( navMenu.id, {
@@ -798,6 +835,16 @@ function Navigation( {
 							classicMenu.id,
 							classicMenu.name
 						);
+						navigationStorageMap.set(
+							classicMenu.name,
+							classicMenu.id
+						);
+						navigationStorage.setItem(
+							'nav_menus_created',
+							JSON.stringify(
+								Array.from( navigationStorageMap.entries() )
+							)
+						);
 						if ( navMenu ) {
 							handleUpdateMenu( navMenu.id, {
 								focusNavigationBlock: true,
@@ -816,20 +863,33 @@ function Navigation( {
 				<InspectorControls>
 					<PanelBody title={ __( 'Menu' ) }>
 						<NavigationMenuSelector
+							ref={ navigationSelectorRef }
 							currentMenuId={ ref }
 							clientId={ clientId }
 							onSelectNavigationMenu={ ( menuId ) => {
 								handleUpdateMenu( menuId );
+								setShouldFocusNavigationSelector( true );
 							} }
 							onSelectClassicMenu={ async ( classicMenu ) => {
 								const navMenu = await convertClassicMenu(
 									classicMenu.id,
 									classicMenu.name
 								);
+								navigationStorageMap.set(
+									classicMenu.name,
+									classicMenu.id
+								);
+								navigationStorage.setItem(
+									'nav_menus_created',
+									JSON.stringify(
+										Array.from(
+											navigationStorageMap.entries()
+										)
+									)
+								);
 								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id, {
-										focusNavigationBlock: true,
-									} );
+									handleUpdateMenu( navMenu.id );
+									setShouldFocusNavigationSelector( true );
 								}
 							} }
 							onCreateNew={ createUntitledEmptyNavigationMenu }
@@ -857,7 +917,7 @@ function Navigation( {
 					</PanelBody>
 				</InspectorControls>
 				{ stylingInspectorControls }
-				{ isEntityAvailable && (
+				{ ! isDraftNavigationMenu && isEntityAvailable && (
 					<InspectorControls __experimentalGroup="advanced">
 						{ hasResolvedCanUserUpdateNavigationMenu &&
 							canUserUpdateNavigationMenu && (
