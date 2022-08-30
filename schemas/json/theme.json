@@ -8,6 +8,7 @@
 			"reference": "https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/"
 		},
 		"settingsPropertiesAppearanceTools": {
+			"type": "object",
 			"properties": {
 				"appearanceTools": {
 					"description": "Setting that enables the following UI tools:\n\n- border: color, radius, style, width\n- color: link\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
@@ -26,6 +27,7 @@
 			}
 		},
 		"settingsPropertiesBorder": {
+			"type": "object",
 			"properties": {
 				"border": {
 					"description": "Settings related to borders.",
@@ -57,6 +59,7 @@
 			}
 		},
 		"settingsPropertiesColor": {
+			"type": "object",
 			"properties": {
 				"color": {
 					"description": "Settings related to colors.",
@@ -186,6 +189,7 @@
 			}
 		},
 		"settingsPropertiesLayout": {
+			"type": "object",
 			"properties": {
 				"layout": {
 					"description": "Settings related to layout.",
@@ -205,6 +209,7 @@
 			}
 		},
 		"settingsPropertiesSpacing": {
+			"type": "object",
 			"properties": {
 				"spacing": {
 					"description": "Settings related to spacing.",
@@ -305,6 +310,7 @@
 			}
 		},
 		"settingsPropertiesTypography": {
+			"type": "object",
 			"properties": {
 				"typography": {
 					"description": "Settings related to typography.",
@@ -515,6 +521,7 @@
 			}
 		},
 		"settingsPropertiesCustom": {
+			"type": "object",
 			"properties": {
 				"custom": {
 					"description": "Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.",
@@ -570,11 +577,13 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/button": {
+					"type": "object",
 					"allOf": [
 						{
 							"$ref": "#/definitions/settingsPropertiesAppearanceTools"
 						},
 						{
+							"type": "object",
 							"properties": {
 								"border": {
 									"description": "Settings related to borders.\nGutenberg plugin required.",
