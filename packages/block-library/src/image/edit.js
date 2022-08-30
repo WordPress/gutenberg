@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, isEmpty, omit, pick } from 'lodash';
+import { get, isEmpty, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -179,7 +179,9 @@ export function ImageEdit( {
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
 		if ( captionRef.current && ! get( mediaAttributes, [ 'caption' ] ) ) {
-			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
+			const { caption: omittedCaption, ...restMediaAttributes } =
+				mediaAttributes;
+			mediaAttributes = restMediaAttributes;
 		}
 
 		let additionalAttributes;
