@@ -43,12 +43,12 @@ Please note that when using this setting, `styles.spacing.padding` should always
 
 Settings related to borders.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
-| color | boolean | false |  |
-| radius | boolean | false |  |
-| style | boolean | false |  |
-| width | boolean | false |  |
+| Property  | Type   | Default | Props  | Since  |
+| ---       | ---    | ---    |---   |---   |
+| color | boolean | false |  | 5.9 |
+| radius | boolean | false |  |  |
+| style | boolean | false |  |  |
+| width | boolean | false |  |  |
 
 ---
 
@@ -56,20 +56,20 @@ Settings related to borders.
 
 Settings related to colors.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
-| background | boolean | true |  |
-| custom | boolean | true |  |
-| customDuotone | boolean | true |  |
-| customGradient | boolean | true |  |
-| defaultDuotone | boolean | true |  |
-| defaultGradients | boolean | true |  |
-| defaultPalette | boolean | true |  |
-| duotone | array |  | colors, name, slug |
-| gradients | array |  | gradient, name, slug |
-| link | boolean | false |  |
-| palette | array |  | color, name, slug |
-| text | boolean | true |  |
+| Property  | Type   | Default | Props  | Since  |
+| ---       | ---    | ---    |---   |---   |
+| background | boolean | true |  |  |
+| custom | boolean | true |  |  |
+| customDuotone | boolean | true |  |  |
+| customGradient | boolean | true |  |  |
+| defaultDuotone | boolean | true |  |  |
+| defaultGradients | boolean | true |  |  |
+| defaultPalette | boolean | true |  |  |
+| duotone | array |  | colors, name, slug |  |
+| gradients | array |  | gradient, name, slug |  |
+| link | boolean | false |  |  |
+| palette | array |  | color, name, slug |  |
+| text | boolean | true |  |  |
 
 ---
 
@@ -77,10 +77,10 @@ Settings related to colors.
 
 Settings related to layout.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
-| contentSize | string |  |  |
-| wideSize | string |  |  |
+| Property  | Type   | Default | Props  | Since  |
+| ---       | ---    | ---    |---   |---   |
+| contentSize | string |  |  |  |
+| wideSize | string |  |  |  |
 
 ---
 
@@ -88,15 +88,15 @@ Settings related to layout.
 
 Settings related to spacing.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
-| blockGap | undefined | null |  |
-| margin | boolean | false |  |
-| padding | boolean | false |  |
-| units | array | px,em,rem,vh,vw,% |  |
-| customSpacingSize | boolean | true |  |
-| spacingSizes | array |  | name, size, slug |
-| spacingScale | object |  |  |
+| Property  | Type   | Default | Props  | Since  |
+| ---       | ---    | ---    |---   |---   |
+| blockGap | undefined | null |  |  |
+| margin | boolean | false |  |  |
+| padding | boolean | false |  |  |
+| units | array | px,em,rem,vh,vw,% |  |  |
+| customSpacingSize | boolean | true |  |  |
+| spacingSizes | array |  | name, size, slug |  |
+| spacingScale | object |  |  |  |
 
 ---
 
@@ -104,19 +104,19 @@ Settings related to spacing.
 
 Settings related to typography.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
-| customFontSize | boolean | true |  |
-| fontStyle | boolean | true |  |
-| fontWeight | boolean | true |  |
-| fluid | boolean |  |  |
-| letterSpacing | boolean | true |  |
-| lineHeight | boolean | false |  |
-| textDecoration | boolean | true |  |
-| textTransform | boolean | true |  |
-| dropCap | boolean | true |  |
-| fontSizes | array |  | fluid, name, size, slug |
-| fontFamilies | array |  | fontFace, fontFamily, name, slug |
+| Property  | Type   | Default | Props  | Since  |
+| ---       | ---    | ---    |---   |---   |
+| customFontSize | boolean | true |  |  |
+| fontStyle | boolean | true |  |  |
+| fontWeight | boolean | true |  |  |
+| fluid | boolean |  |  |  |
+| letterSpacing | boolean | true |  |  |
+| lineHeight | boolean | false |  |  |
+| textDecoration | boolean | true |  |  |
+| textTransform | boolean | true |  |  |
+| dropCap | boolean | true |  |  |
+| fontSizes | array |  | fluid, name, size, slug |  |
+| fontFamilies | array |  | fontFace, fontFamily, name, slug |  |
 
 ---
 

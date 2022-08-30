@@ -90,15 +90,16 @@ const getSettingsPropertiesMarkup = ( struct ) => {
 		return '';
 	}
 
-	let markup = '| Property  | Type   | Default | Props  |\n';
-	markup += '| ---       | ---    | ---    |---   |\n';
+	let markup = '| Property  | Type   | Default | Props  | Since  |\n';
+	markup += '| ---       | ---    | ---    |---   |---   |\n';
 	ks.forEach( ( key ) => {
 		const def = 'default' in props[ key ] ? props[ key ].default : '';
+		const since = 'since' in props[ key ] ? props[ key ].since : '';
 		const ps =
 			props[ key ].type === 'array'
 				? keys( props[ key ].items.properties ).sort().join( ', ' )
 				: '';
-		markup += `| ${ key } | ${ props[ key ].type } | ${ def } | ${ ps } |\n`;
+		markup += `| ${ key } | ${ props[ key ].type } | ${ def } | ${ ps } | ${ since } |\n`;
 	} );
 
 	return markup;
