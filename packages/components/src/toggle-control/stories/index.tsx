@@ -18,6 +18,7 @@ const meta: ComponentMeta< typeof ToggleControl > = {
 	component: ToggleControl,
 	argTypes: {
 		checked: { control: { type: null } },
+		help: { control: { type: 'text' } },
 		label: { control: { type: 'text' } },
 		onChange: { action: 'onChange' },
 	},
