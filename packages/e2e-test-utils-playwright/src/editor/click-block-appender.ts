@@ -14,8 +14,5 @@ export async function clickBlockAppender( this: Editor ) {
 		// @ts-ignore (Reason: wp isn't typed)
 		window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
 	);
-	const appender = await this.page.waitForSelector(
-		'.block-editor-default-block-appender__content'
-	);
-	await appender.click();
+	await this.page.click( 'role=button[name="Add default block"i]' );
 }
