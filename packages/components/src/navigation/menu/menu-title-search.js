@@ -3,7 +3,6 @@
  */
 import { useEffect, useRef } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -61,7 +60,7 @@ function MenuTitleSearch( {
 	};
 
 	function onKeyDown( event ) {
-		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+		if ( event.code === 'Escape' && ! event.defaultPrevented ) {
 			event.preventDefault();
 			onClose();
 		}

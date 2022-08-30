@@ -73,7 +73,6 @@ export default {
 			options: AVAILABLE_POSITIONS,
 		},
 		__unstableSlotName: { control: { type: null } },
-		__unstableObserveElement: { control: { type: null } },
 		__unstableForcePosition: { control: { type: 'boolean' } },
 		__unstableShift: { control: { type: 'boolean' } },
 	},

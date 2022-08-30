@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, has, reduce } from 'lodash';
+import { every, reduce } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -99,7 +99,7 @@ export function normalizeIconObject( icon ) {
 		return { src: icon };
 	}
 
-	if ( has( icon, [ 'background' ] ) ) {
+	if ( 'background' in icon ) {
 		const colordBgColor = colord( icon.background );
 		const getColorContrast = ( iconColor ) =>
 			colordBgColor.contrast( iconColor );
