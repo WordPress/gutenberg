@@ -326,7 +326,7 @@ function gutenberg_build_query_vars_from_query_block( $block, $page ) {
 	}
 
 	/**
-	 * Filters the arguments which will be passed to `WP_Query` for the Query Loop Block
+	 * Filters the arguments which will be passed to `WP_Query` for the Query Loop Block.
 	 *
 	 * Anything to this filter should be compatible with the `WP_Query` API to form
 	 * the query context which will be passed down to the Query Loop Block's children.
