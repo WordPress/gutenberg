@@ -1,12 +1,12 @@
-## External Project Templates
+# External Project Templates
 
 Are you looking for a way to share your project configuration? Creating an external project template hosted on npm or located in a local directory is possible. These npm packages can provide custom `.mustache` files that replace default files included in the tool for the WordPress plugin or/and the block. It's also possible to override default configuration values used during the scaffolding process.
 
-### Project Template Configuration
+## Project Template Configuration
 
 Providing the main file (`index.js` by default) for the package that returns a configuration object is mandatory. Several options allow customizing the scaffolding process.
 
-#### `pluginTemplatesPath`
+### `pluginTemplatesPath`
 
 This optional field allows overriding file templates related to **the WordPress plugin shell**. The path points to a location with template files ending with the `.mustache` extension (nested folders are also supported). When not set, the tool uses its own set of templates.
 
@@ -20,7 +20,7 @@ module.exports = {
 };
 ```
 
-#### `blockTemplatesPath`
+### `blockTemplatesPath`
 
 This optional field allows overriding file templates related to **the individual block**. The path points to a location with template files ending with the `.mustache` extension (nested folders are also supported). When not set, the tool uses its own set of templates.
 
@@ -34,7 +34,7 @@ module.exports = {
 };
 ```
 
-#### `assetsPath`
+### `assetsPath`
 
 This setting is useful when your template scaffolds a WordPress plugin that uses static assets like images or fonts, which should not be processed. It provides the path pointing to the location where assets are located. They will be copied to the `assets` subfolder in the generated plugin.
 
@@ -48,7 +48,7 @@ module.exports = {
 };
 ```
 
-#### `defaultValues`
+### `defaultValues`
 
 It is possible to override the default template configuration using the `defaultValues` field.
 
