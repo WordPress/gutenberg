@@ -153,9 +153,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 					{ showInheritToggle && (
 						<>
 							<ToggleControl
-								label={ __(
-									'Inner blocks respect content width'
-								) }
+								label={ __( 'Constrain inner blocks' ) }
 								checked={
 									layoutType?.name === 'constrained' ||
 									!! inherit ||
@@ -172,17 +170,17 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 										},
 									} )
 								}
+								help={
+									!! inherit ||
+									layoutType?.name === 'constrained'
+										? __(
+												'Nested blocks use content width with options for full and wide widths.'
+										  )
+										: __(
+												'Nested blocks will fill the width of this container. Toggle to constrain.'
+										  )
+								}
 							/>
-							<p className="block-editor-hooks__layout-controls-helptext">
-								{ !! inherit ||
-								layoutType?.name === 'constrained'
-									? __(
-											'Nested blocks use theme content width with options for full and wide widths.'
-									  )
-									: __(
-											'Nested blocks will fill the width of this container.'
-									  ) }
-							</p>
 						</>
 					) }
 
