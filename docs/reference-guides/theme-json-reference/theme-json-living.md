@@ -18,6 +18,8 @@ Code editors can pick up the schema and can provide help like tooltips, autocomp
 
 ### appearanceTools
 
+_**Note:** Since WordPress 6.0._
+
 Setting that enables the following UI tools:
 
 - border: color, radius, style, width
@@ -46,9 +48,9 @@ Settings related to borders.
 | Property  | Type   | Default | Props  | Since  |
 | ---       | ---    | ---    |---   |---   |
 | color | boolean | false |  | 5.9 |
-| radius | boolean | false |  |  |
-| style | boolean | false |  |  |
-| width | boolean | false |  |  |
+| radius | boolean | false |  | 5.9 |
+| style | boolean | false |  | 5.9 |
+| width | boolean | false |  | 5.9 |
 
 ---
 
@@ -58,18 +60,18 @@ Settings related to colors.
 
 | Property  | Type   | Default | Props  | Since  |
 | ---       | ---    | ---    |---   |---   |
-| background | boolean | true |  |  |
-| custom | boolean | true |  |  |
-| customDuotone | boolean | true |  |  |
-| customGradient | boolean | true |  |  |
-| defaultDuotone | boolean | true |  |  |
-| defaultGradients | boolean | true |  |  |
-| defaultPalette | boolean | true |  |  |
-| duotone | array |  | colors, name, slug |  |
-| gradients | array |  | gradient, name, slug |  |
-| link | boolean | false |  |  |
-| palette | array |  | color, name, slug |  |
-| text | boolean | true |  |  |
+| background | boolean | true |  | 5.9 |
+| custom | boolean | true |  | 5.8 |
+| customDuotone | boolean | true |  | 5.9 |
+| customGradient | boolean | true |  | 5.8 |
+| defaultDuotone | boolean | true |  | 6.0 |
+| defaultGradients | boolean | true |  | 5.9 |
+| defaultPalette | boolean | true |  | 5.9 |
+| duotone | array |  | colors, name, slug | 5.8 |
+| gradients | array |  | gradient, name, slug | 5.8 |
+| link | boolean | false |  | 5.8 |
+| palette | array |  | color, name, slug | 5.8 |
+| text | boolean | true |  | 5.9 |
 
 ---
 
@@ -79,8 +81,8 @@ Settings related to layout.
 
 | Property  | Type   | Default | Props  | Since  |
 | ---       | ---    | ---    |---   |---   |
-| contentSize | string |  |  |  |
-| wideSize | string |  |  |  |
+| contentSize | string |  |  | 5.8 |
+| wideSize | string |  |  | 5.8 |
 
 ---
 
@@ -90,13 +92,13 @@ Settings related to spacing.
 
 | Property  | Type   | Default | Props  | Since  |
 | ---       | ---    | ---    |---   |---   |
-| blockGap | undefined | null |  |  |
-| margin | boolean | false |  |  |
-| padding | boolean | false |  |  |
-| units | array | px,em,rem,vh,vw,% |  |  |
-| customSpacingSize | boolean | true |  |  |
-| spacingSizes | array |  | name, size, slug |  |
-| spacingScale | object |  |  |  |
+| blockGap | undefined | null |  | 5.9 |
+| margin | boolean | false |  | 5.9 |
+| padding | boolean | false |  | 5.9 |
+| units | array | px,em,rem,vh,vw,% |  | 5.8 |
+| customSpacingSize | boolean | true |  | 6.1 |
+| spacingSizes | array |  | name, size, slug | 6.1 |
+| spacingScale | object |  |  | 6.1 |
 
 ---
 
@@ -106,17 +108,17 @@ Settings related to typography.
 
 | Property  | Type   | Default | Props  | Since  |
 | ---       | ---    | ---    |---   |---   |
-| customFontSize | boolean | true |  |  |
-| fontStyle | boolean | true |  |  |
-| fontWeight | boolean | true |  |  |
-| fluid | boolean |  |  |  |
-| letterSpacing | boolean | true |  |  |
-| lineHeight | boolean | false |  |  |
-| textDecoration | boolean | true |  |  |
-| textTransform | boolean | true |  |  |
-| dropCap | boolean | true |  |  |
-| fontSizes | array |  | fluid, name, size, slug |  |
-| fontFamilies | array |  | fontFace, fontFamily, name, slug |  |
+| customFontSize | boolean | true |  | 5.8 |
+| fontStyle | boolean | true |  | 5.9 |
+| fontWeight | boolean | true |  | 5.9 |
+| fluid | boolean |  |  | 6.1 |
+| letterSpacing | boolean | true |  | 5.9 |
+| lineHeight | boolean | false |  | 5.9 |
+| textDecoration | boolean | true |  | 5.9 |
+| textTransform | boolean | true |  | 5.9 |
+| dropCap | boolean | true |  | 5.8 |
+| fontSizes | array |  | fluid, name, size, slug | 5.8 |
+| fontFamilies | array |  | fontFace, fontFamily, name, slug | 5.9 |
 
 ---
 

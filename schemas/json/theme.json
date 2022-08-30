@@ -10,7 +10,7 @@
 		"settingsPropertiesAppearanceTools": {
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- border: color, radius, style, width\n- color: link\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"description": "_**Note:** Since WordPress 6.0._\n\nSetting that enables the following UI tools:\n\n- border: color, radius, style, width\n- color: link\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
 				}
@@ -40,17 +40,20 @@
 						"radius": {
 							"description": "Allow users to set custom border radius.",
 							"type": "boolean",
-							"default": false
+							"default": false,
+							"since": "5.9"
 						},
 						"style": {
 							"description": "Allow users to set custom border styles.",
 							"type": "boolean",
-							"default": false
+							"default": false,
+							"since": "5.9"
 						},
 						"width": {
 							"description": "Allow users to set custom border widths.",
 							"type": "boolean",
-							"default": false
+							"default": false,
+							"since": "5.9"
 						}
 					},
 					"additionalProperties": false
@@ -66,41 +69,49 @@
 						"background": {
 							"description": "Allow users to set background colors.",
 							"type": "boolean",
-							"default": true
+							"default": true,
+							"since": "5.9"
 						},
 						"custom": {
 							"description": "Allow users to select custom colors.",
 							"type": "boolean",
-							"default": true
+							"default": true,
+							"since": "5.8"
 						},
 						"customDuotone": {
 							"description": "Allow users to create custom duotone filters.",
 							"type": "boolean",
-							"default": true
+							"default": true,
+							"since": "5.9"
 						},
 						"customGradient": {
 							"description": "Allow users to create custom gradients.",
 							"type": "boolean",
-							"default": true
+							"default": true,
+							"since": "5.8"
 						},
 						"defaultDuotone": {
 							"description": "Allow users to choose filters from the default duotone filter presets.",
 							"type": "boolean",
-							"default": true
+							"default": true,
+							"since": "6.0"
 						},
 						"defaultGradients": {
 							"description": "Allow users to choose colors from the default gradients.",
 							"type": "boolean",
-							"default": true
+							"default": true,
+							"since": "5.9"
 						},
 						"defaultPalette": {
 							"description": "Allow users to choose colors from the default palette.",
 							"type": "boolean",
-							"default": true
+							"default": true,
+							"since": "5.9"
 						},
 						"duotone": {
 							"description": "Duotone presets for the duotone picker.\nDoesn't generate classes or properties.",
 							"type": "array",
+							"since": "5.8",
 							"items": {
 								"type": "object",
 								"properties": {
@@ -128,6 +139,7 @@
 						"gradients": {
 							"description": "Gradient presets for the gradient picker.\nGenerates a single class (`.has-{slug}-background`) and custom property (`--wp--preset--gradient--{slug}`) per preset value.",
 							"type": "array",
+							"since": "5.8",
 							"items": {
 								"type": "object",
 								"properties": {
@@ -151,11 +163,13 @@
 						"link": {
 							"description": "Allow users to set link colors.",
 							"type": "boolean",
-							"default": false
+							"default": false,
+							"since": "5.8"
 						},
 						"palette": {
 							"description": "Color palette presets for the color picker.\nGenerates three classes (`.has-{slug}-color`, `.has-{slug}-background-color`, and `.has-{slug}-border-color`) and a single custom property (`--wp--preset--color--{slug}`) per preset value.",
 							"type": "array",
+							"since": "5.8",
 							"items": {
 								"type": "object",
 								"properties": {
@@ -179,7 +193,8 @@
 						"text": {
 							"description": "Allow users to set text colors.",
 							"type": "boolean",
-							"default": true
+							"default": true,
+							"since": "5.9"
 						}
 					},
 					"additionalProperties": false
@@ -194,11 +209,13 @@
 					"properties": {
 						"contentSize": {
 							"description": "Sets the max-width of the content.",
-							"type": "string"
+							"type": "string",
+							"since": "5.8"
 						},
 						"wideSize": {
 							"description": "Sets the max-width of wide (`.alignwide`) content.",
-							"type": "string"
+							"type": "string",
+							"since": "5.8"
 						}
 					},
 					"additionalProperties": false
@@ -217,21 +234,25 @@
 								{ "type": "boolean" },
 								{ "type": "null" }
 							],
-							"default": null
+							"default": null,
+							"since": "5.9"
 						},
 						"margin": {
 							"description": "Allow users to set a custom margin.",
 							"type": "boolean",
-							"default": false
+							"default": false,
+							"since": "5.9"
 						},
 						"padding": {
 							"description": "Allow users to set a custom padding.",
 							"type": "boolean",
-							"default": false
+							"default": false,
+							"since": "5.9"
 						},
 						"units": {
 							"description": "List of units the user can use for spacing values.",
 							"type": "array",
+							"since": "5.8",
 							"items": {
 								"type": "string"
 							},
@@ -240,11 +261,13 @@
 						"customSpacingSize": {
 							"description": "Allow users to set custom space sizes.",
 							"type": "boolean",
-							"default": true
+							"default": true,
+							"since": "6.1"
 						},
 						"spacingSizes": {
 							"description": "Space size presets for the space size selector.\nGenerates a custom property (`--wp--preset--space-size--{slug}`) per preset value.",
 							"type": "array",
+							"since": "6.1",
 							"items": {
 								"type": "object",
 								"properties": {
@@ -267,6 +290,7 @@
 						"spacingScale": {
 							"description": "Space size presets for the space size selector.\nGenerates a custom property (`--wp--preset--space-size--{slug}`) per preset value.",
 							"type": "object",
+							"since": "6.1",
 							"properties": {
 								"operator": {
 									"description": "With + or * depending on whether scale is generated by increment or mulitplier.",
@@ -314,50 +338,60 @@
 						"customFontSize": {
 							"description": "Allow users to set custom font sizes.",
 							"type": "boolean",
-							"default": true
+							"default": true,
+							"since": "5.8"
 						},
 						"fontStyle": {
 							"description": "Allow users to set custom font styles.",
 							"type": "boolean",
-							"default": true
+							"default": true,
+							"since": "5.9"
 						},
 						"fontWeight": {
 							"description": "Allow users to set custom font weights.",
 							"type": "boolean",
-							"default": true
+							"default": true,
+							"since": "5.9"
 						},
 						"fluid": {
 							"description": "Opts into fluid typography.",
-							"type": "boolean"
+							"type": "boolean",
+							"since": "6.1"
 						},
 						"letterSpacing": {
 							"description": "Allow users to set custom letter spacing.",
 							"type": "boolean",
-							"default": true
+							"default": true,
+							"since": "5.9"
 						},
 						"lineHeight": {
 							"description": "Allow users to set custom line height.",
 							"type": "boolean",
-							"default": false
+							"default": false,
+							"since": "5.9"
 						},
 						"textDecoration": {
 							"description": "Allow users to set custom text decorations.",
 							"type": "boolean",
-							"default": true
+							"default": true,
+							"since": "5.9"
 						},
 						"textTransform": {
 							"description": "Allow users to set custom text transforms.",
 							"type": "boolean",
-							"default": true
+							"default": true,
+							"since": "5.9"
 						},
 						"dropCap": {
 							"description": "Enable drop cap.",
 							"type": "boolean",
-							"default": true
+							"default": true,
+							"since": "5.8"
 						},
 						"fontSizes": {
 							"description": "Font size presets for the font size selector.\nGenerates a single class (`.has-{slug}-color`) and custom property (`--wp--preset--font-size--{slug}`) per preset value.",
 							"type": "array",
+							"since": "5.8",
 							"items": {
 								"type": "object",
 								"properties": {
@@ -395,6 +429,7 @@
 						"fontFamilies": {
 							"description": "Font family presets for the font family selector.\nGenerates a single custom property (`--wp--preset--font-family--{slug}`) per preset value.",
 							"type": "array",
+							"since": "5.9",
 							"items": {
 								"type": "object",
 								"properties": {
