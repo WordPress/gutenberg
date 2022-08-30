@@ -23,8 +23,6 @@ test.describe( 'Writing Flow', () => {
 		// editor state, in order to protect against potential disparities.
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/18928
-		let activeElementText;
-
 		await writingFlowUtils.addDemoContent();
 
 		// Arrow up into nested context focuses last text input.
@@ -32,10 +30,11 @@ test.describe( 'Writing Flow', () => {
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
-		activeElementText = await page.evaluate(
-			() => document.activeElement.textContent
-		);
-		expect( activeElementText ).toBe( '2nd col' );
+		await expect
+			.poll( () =>
+				page.evaluate( () => document.activeElement.textContent )
+			)
+			.toBe( '2nd col' );
 
 		// Arrow up in inner blocks should navigate through (1) column wrapper,
 		// (2) text fields.
@@ -58,10 +57,11 @@ test.describe( 'Writing Flow', () => {
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
-		activeElementText = await page.evaluate(
-			() => document.activeElement.textContent
-		);
-		expect( activeElementText ).toBe( 'First paragraph' );
+		await expect
+			.poll( () =>
+				page.evaluate( () => document.activeElement.textContent )
+			)
+			.toBe( 'First paragraph' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
