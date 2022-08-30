@@ -61,6 +61,7 @@ function MaybeIframe( {
 					__unstableResolvedContentStyles={
 						__unstableResolvedContentStyles
 					}
+					__unstablePrefix
 				/>
 				<WritingFlow
 					ref={ contentRef }

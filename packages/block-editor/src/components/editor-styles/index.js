@@ -13,7 +13,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import transformStyles, { transformStyle } from '../../utils/transform-styles';
+import transformStyles from '../../utils/transform-styles';
 
 const EDITOR_STYLES_SELECTOR = '.editor-styles-wrapper';
 extend( [ namesPlugin, a11yPlugin ] );
@@ -74,7 +74,15 @@ function useParsedAssets( html ) {
 	}, [ html ] );
 }
 
-function PrefixedStyle( { tagName, href, id, rel, media, textContent } ) {
+function PrefixedStyle( {
+	tagName,
+	__unstablePrefix,
+	href,
+	id,
+	rel,
+	media,
+	textContent,
+} ) {
 	const TagName = tagName.toLowerCase();
 
 	function onLoad( event ) {
@@ -106,16 +114,12 @@ function PrefixedStyle( { tagName, href, id, rel, media, textContent } ) {
 		}
 	}
 
-	const transformedStyle = useMemo(
-		() =>
-			textContent
-				? transformStyle( { css: textContent }, EDITOR_STYLES_SELECTOR )
-				: '',
-		[ textContent ]
-	);
+	if ( ! __unstablePrefix ) {
+		onLoad = null;
+	}
 
 	if ( TagName === 'style' ) {
-		return <TagName { ...{ id, onLoad } }>{ transformedStyle }</TagName>;
+		return <TagName { ...{ id, onLoad } }>{ textContent }</TagName>;
 	}
 
 	return <TagName { ...{ href, id, rel, media, onLoad } } />;
@@ -124,6 +128,7 @@ function PrefixedStyle( { tagName, href, id, rel, media, textContent } ) {
 export default function EditorStyles( {
 	styles,
 	__unstableResolvedContentStyles,
+	__unstablePrefix,
 } ) {
 	const _styles = useParsedAssets( __unstableResolvedContentStyles );
 	const transformedStyles = useMemo(
@@ -140,6 +145,7 @@ export default function EditorStyles( {
 				( { tagName, href, id, rel, media, textContent } ) => (
 					<PrefixedStyle
 						key={ id }
+						__unstablePrefix={ __unstablePrefix }
 						{ ...{
 							tagName,
 							href,

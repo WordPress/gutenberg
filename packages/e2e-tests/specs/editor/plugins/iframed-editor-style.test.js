@@ -6,9 +6,8 @@ import {
 	createNewPost,
 	deactivatePlugin,
 	insertBlock,
-	openDocumentSettingsSidebar,
-	clickButton,
 	canvas,
+	createNewTemplate,
 } from '@wordpress/e2e-test-utils';
 
 async function getComputedStyle( context ) {
@@ -33,16 +32,7 @@ describe( 'iframed editor styles', () => {
 
 		expect( await getComputedStyle( page ) ).toBe( '1px' );
 
-		await openDocumentSettingsSidebar();
-		await clickButton( 'Page' );
-		await page.click( 'button[aria-label^="Select template"]' );
-		await page.waitForSelector( 'button[aria-label="Add template"]' );
-		await page.click( 'button[aria-label="Add template"]' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.type( 'Iframed Test' );
-		await clickButton( 'Create' );
-		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
+		await createNewTemplate( 'Iframed Test' );
 		await canvas().waitForSelector( '.wp-block-paragraph' );
 
 		expect( await getComputedStyle( canvas() ) ).toBe( '1px' );
