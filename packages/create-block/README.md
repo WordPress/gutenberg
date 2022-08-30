@@ -140,3 +140,7 @@ $ npm run packages-update
 Updates WordPress packages to the latest version. [Learn more](https://github.com/WordPress/gutenberg/tree/HEAD/packages/scripts#packages-update).
 
 _Note: You don’t need to install or configure tools like [webpack](https://webpack.js.org), [Babel](https://babeljs.io) or [ESLint](https://eslint.org) yourself. They are preconfigured and hidden so that you can focus on coding._
+
+## External Project Templates
+
+[Click here](https://github.com/WordPress/gutenberg/tree/HEAD/packages/create-block/docs/external-template.md) for information on External Project Templates
