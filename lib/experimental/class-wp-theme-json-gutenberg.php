@@ -111,7 +111,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 
 			// Now back in the blocks
 			if ( $subtree === 'settings' && isset( $input[ $subtree ]['blocks'] ) ) {
-				$result['blocks'] = static::break_down_blocks( $input[ $subtree ]['blocks'], $valid_block_names, array(), $schema[ $subtree ]);
+				$result['blocks'] = static::break_down_blocks( $input[ $subtree ]['blocks'], $valid_block_names, $schema[ $subtree ]);
 			}
 
 			if ( empty( $result ) ) {
@@ -124,17 +124,13 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 		return $output;
 	}
 
-	protected static function break_down_blocks( $current_block, $valid_block_names, $result, $schema) {
+	protected static function break_down_blocks( $current_block, $valid_block_names, $schema, $result = array() ) {
 		foreach ( $current_block as $block_name => $block ) {
-			// It's valid so add it in
 			if ( in_array( $block_name, $valid_block_names, true ) ) {
-				$result[ $block_name ] = static::remove_keys_not_in_schema( $block, $schema );
-				// Break it down further if needed
-				$sub_result = static::break_down_blocks( $block, $valid_block_names, array(), $schema );
-
-				if ( ! empty($sub_result) ) {
-					array_push($result[ $block_name ], $sub_result);
-				}
+				$base_result = static::remove_keys_not_in_schema( $block, $schema );
+				$sub_result = static::break_down_blocks( $block, $valid_block_names, $schema );
+				
+				$result[ $block_name ] = array_merge( $base_result, $sub_result);
 			}
 		}
 
