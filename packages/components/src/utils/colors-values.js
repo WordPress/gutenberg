@@ -33,7 +33,6 @@ const LIGHT_GRAY = {
 	600: '#d7dade',
 	400: '#e8eaeb', // Good for "readonly" input fields and special text selection.
 	300: '#edeff0',
-	200: '#f3f4f5',
 };
 
 // Matches @wordpress/base-styles
@@ -52,7 +51,7 @@ const ADMIN = {
 const UI = {
 	theme: ADMIN.theme,
 	background: white,
-	backgroundDisabled: LIGHT_GRAY[ 200 ], // TODO: Replace with WordPress gray
+	backgroundDisabled: GRAY[ 100 ],
 	border: GRAY[ 700 ],
 	borderHover: GRAY[ 700 ],
 	borderFocus: ADMIN.themeDark10,
