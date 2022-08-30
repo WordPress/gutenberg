@@ -213,11 +213,11 @@ export function getStylesDeclarations(
 				return declarations;
 			}
 			const pathToValue = value;
-			let styleValue = get( blockStyles, pathToValue, false );
+			let styleValue = get( blockStyles, pathToValue, '' );
 
 			if (
 				first( pathToValue ) === 'elements' ||
-				// The style engine cannoresolveDynamicReft handle dynamic refs yet.
+				// The style engine cannot handle dynamic refs yet.
 				( useEngine && ! styleValue?.ref )
 			) {
 				return declarations;
@@ -225,7 +225,7 @@ export function getStylesDeclarations(
 
 			styleValue = resolveDynamicRef( styleValue, tree );
 			// If get() finds no style value or the ref points to another ref (invalid), return.
-			if ( styleValue === false || !! styleValue?.ref ) {
+			if ( styleValue === '' || !! styleValue?.ref ) {
 				return declarations;
 			}
 

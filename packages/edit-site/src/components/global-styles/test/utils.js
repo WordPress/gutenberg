@@ -182,12 +182,10 @@ describe( 'editor utils', () => {
 					ref: 'styles.color.text',
 				} );
 
-				expect( actual ).toEqual( {
-					ref: 'styles.color.text',
-				} );
+				expect( actual ).toEqual( '' );
 			} );
 
-			it( 'returns the originally provided variable where value is dynamic reference', () => {
+			it( 'returns an empty string where value is dynamic reference', () => {
 				const stylesWithRefs = {
 					...themeJson,
 					styles: {
@@ -205,9 +203,7 @@ describe( 'editor utils', () => {
 					ref: 'styles.color.text',
 				} );
 
-				expect( actual ).toEqual( {
-					ref: 'styles.color.text',
-				} );
+				expect( actual ).toEqual( '' );
 			} );
 		} );
 	} );
@@ -229,6 +225,26 @@ describe( 'editor utils', () => {
 					tree
 				)
 			).toEqual( '20px' );
+		} );
+
+		it( 'returns empty string if reference to another ref is found', () => {
+			const tree = {
+				styles: {
+					typography: {
+						letterSpacing: {
+							ref: 'styles.typography.fontSize',
+						},
+					},
+				},
+			};
+			expect(
+				resolveDynamicRef(
+					{
+						ref: 'styles.typography.letterSpacing',
+					},
+					tree
+				)
+			).toEqual( '' );
 		} );
 
 		it( 'returns the originally provided value where a value cannot be found', () => {

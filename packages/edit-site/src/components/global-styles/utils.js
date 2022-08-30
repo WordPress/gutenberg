@@ -319,7 +319,7 @@ export function scopeSelector( scope, selector ) {
  *
  * @param {string|*} styleValue An incoming style value.
  * @param {Object}   tree       GlobalStylesContext config, e.g., user, base or merged. Represents the theme.json tree.
- * @return {string|*} The value of the dynamic ref, if found. If not found, `false`.
+ * @return {string|*} The value of the dynamic ref, if found. If not found, returns `styleValue`. If a reference to another ref is found, returns an empty string.
  */
 export function resolveDynamicRef( styleValue, tree ) {
 	const ref = get( styleValue, [ 'ref' ], false );
@@ -327,7 +327,10 @@ export function resolveDynamicRef( styleValue, tree ) {
 		const resolvedValue = get( tree, ref.split( '.' ) );
 		// Presence of another ref indicates a reference to another dynamic value.
 		// Pointing to another dynamic value is not supported.
-		if ( !! resolvedValue && ! resolvedValue?.ref ) {
+		if ( !! resolvedValue?.ref ) {
+			return '';
+		}
+		if ( !! resolvedValue ) {
 			return resolvedValue;
 		}
 	}
