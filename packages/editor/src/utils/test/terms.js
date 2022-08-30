@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { buildTermsTree } from '../terms';
+import { buildTermsTree, unescapeTerm, unescapeTerms } from '../terms';
 
 describe( 'buildTermsTree()', () => {
 	it( 'Should return same array as input with null parent and empty children added if parent is never specified.', () => {
@@ -63,5 +63,46 @@ describe( 'buildTermsTree()', () => {
 		];
 		const termsTreem = buildTermsTree( input );
 		expect( termsTreem ).toEqual( output );
+	} );
+} );
+
+describe( 'unescapeTerm()', () => {
+	// unescape here means converting HTML entities to the correponding chars
+	it( 'Should unescape a term', () => {
+		const term = { name: 'Foo &amp;' };
+
+		const unescapedTerm = unescapeTerm( term );
+
+		expect( unescapedTerm ).toEqual( { name: 'Foo &' } );
+	} );
+
+	it( 'Should return undefined and not raise an exception for values of an unexpected type', () => {
+		const badTerms = [ undefined, { foo: 'bar' }, null, false, 'hay' ];
+
+		for ( const term of badTerms ) {
+			expect( () => unescapeTerm( term ) ).not.toThrowError();
+			expect( unescapeTerm( term ) ).toBeUndefined();
+		}
+	} );
+} );
+
+describe( 'unecapeTerms()', () => {
+	// unescape here means converting HTML entities to the correponding chars
+	it( 'Should unescape the terms and properly handle values of and unexpected type', () => {
+		const terms = [
+			{ name: 'Foo &amp;' },
+			{ name: 'Bar &amp;' },
+			undefined,
+			null,
+			false,
+			{ foo: 'bar' },
+		];
+
+		const escapedTerms = unescapeTerms( terms );
+
+		expect( escapedTerms ).toEqual( [
+			{ name: 'Foo &' },
+			{ name: 'Bar &' },
+		] );
 	} );
 } );

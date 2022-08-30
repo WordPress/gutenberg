@@ -50,13 +50,16 @@ export const unescapeString = ( arg ) => {
  *
  * @param {Object} term The term object to unescape.
  *
- * @return {Object} Term object with name property unescaped.
+ * @return {Object|false} Term object with name property unescaped or
+ *         undefined if the term is invalid.
  */
 export const unescapeTerm = ( term ) => {
-	return {
-		...term,
-		name: unescapeString( term.name ),
-	};
+	if ( term && term.name ) {
+		return {
+			...term,
+			name: unescapeString( term.name ),
+		};
+	}
 };
 
 /**
@@ -67,6 +70,5 @@ export const unescapeTerm = ( term ) => {
  *
  * @return {Object[]} Array of term objects unescaped.
  */
-export const unescapeTerms = ( terms ) => {
-	return terms.filter( Boolean ).map( unescapeTerm );
-};
+export const unescapeTerms = ( terms ) =>
+	terms.map( unescapeTerm ).filter( Boolean );
