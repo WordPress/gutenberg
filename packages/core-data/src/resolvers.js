@@ -309,11 +309,11 @@ export const canUser =
 		try {
 			response = await apiFetch( {
 				path: `/wp/v2/${ resourcePath }`,
-				method: 'OPTIONS',
+				method: 'HEAD',
 				parse: false,
 			} );
 		} catch ( error ) {
-			// Do nothing if our OPTIONS request comes back with an API error (4xx or
+			// Do nothing if our HEAD request comes back with an API error (4xx or
 			// 5xx). The previously determined isAllowed value will remain in the store.
 			return;
 		}
