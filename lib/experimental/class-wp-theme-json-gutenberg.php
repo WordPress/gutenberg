@@ -165,7 +165,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 			return $nodes;
 		}
 
-		$valid_block_names   = array_keys( static::get_blocks_metadata() );
+		$valid_block_names = array_keys( static::get_blocks_metadata() );
 
 		foreach ( $theme_json['settings']['blocks'] as $name => $node ) {
 			$selector = null;
@@ -178,19 +178,33 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 				'selector' => $selector,
 			);
 
-			// Check if any blocks are nested inside.
-			foreach ( $node as $sub_node_name => $sub_node ) {
-				if ( in_array ( $sub_node_name, $valid_block_names ) ) {
-					$sub_node_selector = null;
+			$flag              = true;
+			$node_to_examine   = $node;
+			$previous_selector = $selector;
+			$previous_path     = array( 'settings', 'blocks', $name );
 
-					if ( ! is_null ( $selector ) && isset ( $selectors[ $sub_node_name ][ 'selector' ] ) ) {
-						$sub_node_selector = $selectors[ $name ][ 'selector' ] . ' ' . $selectors[ $sub_node_name ][ 'selector' ];
+			while ( $flag ) {
+				$flag = false;
+
+				foreach ( $node_to_examine as $sub_node_name => $sub_node ) {
+					if ( in_array( $sub_node_name, $valid_block_names, true ) ) {
+						$sub_node_selector = null;
+
+						if ( ! is_null( $previous_selector ) && isset( $selectors[ $sub_node_name ]['selector'] ) ) {
+							$sub_node_selector = $sub_node_selector . ' ' . $selectors[ $sub_node_name ]['selector'];
+						}
+
+						array_push( $previous_path, $sub_node_name );
+
+						$nodes[] = array(
+							'path'     => $previous_path,
+							'selector' => $sub_node_selector,
+						);
+
+						$flag              = true;
+						$node_to_examine   = $sub_node;
+						$previous_selector = $sub_node_selector;
 					}
-
-					$nodes[] = array(
-						'path'     => array( 'settings', 'blocks', $name, $sub_node_name ),
-						'selector' => $sub_node_selector,
-					);
 				}
 			}
 		}
