@@ -433,7 +433,6 @@
 												},
 												"fontWeight": {
 													"description": "List of available font weights, separated by a space.",
-													"type": "string",
 													"default": "400",
 													"oneOf": [
 														{
