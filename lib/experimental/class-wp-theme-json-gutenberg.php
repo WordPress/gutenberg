@@ -85,16 +85,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 		}
 
 		$schema_styles_blocks   = array();
-		$schema_settings_blocks = array();
 		foreach ( $valid_block_names as $block ) {
-			$schema_settings_blocks[ $block ] = static::VALID_SETTINGS;
-			foreach ( $valid_block_names as $sub_block ) {
-				if ( $block === $sub_block ) {
-					continue;
-				} else {
-					$schema_settings_blocks[ $block ][ $sub_block ] = static::VALID_SETTINGS;
-				}
-			}
 			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 		}
@@ -103,7 +94,6 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 		$schema['styles']['blocks']   = $schema_styles_blocks;
 		$schema['styles']['elements'] = $schema_styles_elements;
 		$schema['settings']           = static::VALID_SETTINGS;
-		$schema['settings']['blocks'] = $schema_settings_blocks;
 
 		// Remove anything that's not present in the schema.
 		foreach ( array( 'styles', 'settings' ) as $subtree ) {
@@ -116,7 +106,13 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 				continue;
 			}
 
+			// Clean up everything save for the blocks
 			$result = static::remove_keys_not_in_schema( $input[ $subtree ], $schema[ $subtree ] );
+
+			// Now back in the blocks
+			if ( $subtree === 'settings' && isset( $input[ $subtree ]['blocks'] ) ) {
+				$result['blocks'] = static::break_down_blocks( $input[ $subtree ]['blocks'], $valid_block_names, array(), $schema[ $subtree ]);
+			}
 
 			if ( empty( $result ) ) {
 				unset( $output[ $subtree ] );
@@ -126,6 +122,23 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 		}
 
 		return $output;
+	}
+
+	protected static function break_down_blocks( $current_block, $valid_block_names, $result, $schema) {
+		foreach ( $current_block as $block_name => $block ) {
+			// It's valid so add it in
+			if ( in_array( $block_name, $valid_block_names, true ) ) {
+				$result[ $block_name ] = static::remove_keys_not_in_schema( $block, $schema );
+				// Break it down further if needed
+				$sub_result = static::break_down_blocks( $block, $valid_block_names, array(), $schema );
+
+				if ( ! empty($sub_result) ) {
+					array_push($result[ $block_name ], $sub_result);
+				}
+			}
+		}
+
+		return $result;
 	}
 
 	/**
