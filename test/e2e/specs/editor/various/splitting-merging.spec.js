@@ -144,7 +144,7 @@ test.describe( 'splitting and merging blocks', () => {
 	test( 'should not merge paragraphs if the selection is not collapsed', async ( {
 		editor,
 		page,
-		pageUtils,
+		pageUtils
 	} ) => {
 		// Regression Test: When all of a paragraph is selected, pressing
 		// backspace should delete the contents, not merge to previous.
@@ -388,7 +388,10 @@ test.describe( 'splitting and merging blocks', () => {
 
 <!-- wp:list -->
 <ul><!-- wp:list-item -->
-<li>item 1-item 2</li>
+<li>-tem 1</li>
+ <!-- /wp:list-item -->
+ <!-- wp:list-item -->
+<li>item 2</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 				);
@@ -416,7 +419,10 @@ test.describe( 'splitting and merging blocks', () => {
 
 <!-- wp:list -->
 <ul><!-- wp:list-item -->
-<li>item 1-item 2</li>
+<li>-tem 1</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>item 2</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 				);
