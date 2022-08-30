@@ -5,7 +5,7 @@
 import classnames from 'classnames';
 import {
 	useFloating,
-	flip,
+	flip as flipMiddleware,
 	shift,
 	autoUpdate,
 	arrow,
@@ -143,8 +143,10 @@ const Popover = (
 		expandOnMobile,
 		onFocusOutside,
 		__unstableSlotName = SLOT_NAME,
-		__unstableForcePosition = false,
+		flip = true,
+		resize = true,
 		__unstableShift = false,
+		__unstableForcePosition,
 		...contentProps
 	},
 	forwardedRef
@@ -154,6 +156,19 @@ const Popover = (
 			since: '6.1',
 			version: '6.3',
 		} );
+	}
+
+	if ( __unstableForcePosition !== undefined ) {
+		deprecated( '__unstableForcePosition prop in Popover component', {
+			since: '6.1',
+			version: '6.3',
+			alternative: '`flip={ false }` and  `resize={ false }`',
+		} );
+
+		// Back-compat, set the `flip` and `resize` props
+		// to `false` to replicate `__unstableForcePosition`.
+		flip = ! __unstableForcePosition;
+		resize = ! __unstableForcePosition;
 	}
 
 	const arrowRef = useRef( null );
@@ -232,10 +247,9 @@ const Popover = (
 				crossAxis: frameOffsetRef.current[ crossAxis ],
 			};
 		} ),
-		__unstableForcePosition ? undefined : flip(),
-		__unstableForcePosition
-			? undefined
-			: size( {
+		flip ? flipMiddleware() : undefined,
+		resize
+			? size( {
 					apply( sizeProps ) {
 						const { availableHeight } = sizeProps;
 						if ( ! refs.floating.current ) return;
@@ -245,7 +259,8 @@ const Popover = (
 							overflow: 'auto',
 						} );
 					},
-			  } ),
+			  } )
+			: undefined,
 		__unstableShift
 			? shift( {
 					crossAxis: true,

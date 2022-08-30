@@ -626,7 +626,7 @@ Displays a paginated navigation to next/previous set of posts, when applicable. 
 
 -	**Name:** core/query-pagination
 -	**Category:** theme
--	**Supports:** align, color (background, gradients, link, text), ~~html~~, ~~reusable~~
+-	**Supports:** align, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow
 
 ## Next Page
