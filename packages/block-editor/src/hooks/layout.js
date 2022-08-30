@@ -63,7 +63,12 @@ function useLayoutClasses( layout, layoutDefinitions ) {
 		);
 	}
 
-	if ( ( layout?.inherit || layout?.contentSize ) && rootPaddingAlignment ) {
+	if (
+		( layout?.inherit ||
+			layout?.contentSize ||
+			layout?.type === 'constrained' ) &&
+		rootPaddingAlignment
+	) {
 		layoutClassnames.push( 'has-global-padding' );
 	}
 
