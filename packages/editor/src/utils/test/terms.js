@@ -88,7 +88,7 @@ describe( 'unescapeTerm()', () => {
 
 describe( 'unecapeTerms()', () => {
 	// unescape here means converting HTML entities to the correponding chars
-	it( 'Should unescape the terms and properly handle values of and unexpected type', () => {
+	it( 'Should unescape the terms and properly handle values of an unexpected type', () => {
 		const terms = [
 			{ name: 'Foo &amp;' },
 			{ name: 'Bar &amp;' },
