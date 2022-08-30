@@ -34,7 +34,8 @@
 						"color": {
 							"description": "Allow users to set custom border colors.",
 							"type": "boolean",
-							"default": false
+							"default": false,
+							"since": "5.9"
 						},
 						"radius": {
 							"description": "Allow users to set custom border radius.",
