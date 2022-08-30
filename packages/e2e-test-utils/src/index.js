@@ -118,5 +118,6 @@ export {
 	openGlobalStylesPanel,
 	openPreviousGlobalStylesPanel,
 } from './site-editor';
+export { createNewTemplate } from './create-new-template';
 
 export * from './mocks';
