@@ -109,7 +109,10 @@ export const Default = ( args ) => {
 	};
 	const buttonRef = useRef();
 	useEffect( () => {
-		buttonRef.current?.focus();
+		buttonRef.current?.scrollIntoView?.( {
+			block: 'center',
+			inline: 'center',
+		} );
 	}, [] );
 
 	return (
