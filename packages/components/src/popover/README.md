@@ -59,7 +59,7 @@ The element that should be used by the `Popover` as its anchor. It can either be
 
 ### `anchorRect`: `DomRectWithOwnerDocument`
 
-_Note: this prop is deprecated. Please use the `anchor` prop instead._
+_Note: this prop is deprecated and will be removed in WordPress 6.3. Please use the `anchor` prop instead._
 
 An object extending a `DOMRect` with an additional optional `ownerDocument` property, used to specify a fixed popover position.
 
@@ -67,7 +67,7 @@ An object extending a `DOMRect` with an additional optional `ownerDocument` prop
 
 ### `anchorRef`: `Element | PopoverAnchorRefReference | PopoverAnchorRefTopBottom | Range`
 
-_Note: this prop is deprecated. Please use the `anchor` prop instead._
+_Note: this prop is deprecated and will be removed in WordPress 6.3. Please use the `anchor` prop instead._
 
 Used to specify a fixed popover position. It can be an `Element`, a React reference to an `element`, an object with a `top` and a `bottom` properties (both pointing to elements), or a `range`.
 
@@ -124,7 +124,7 @@ When not provided, the `onClose` callback will be called instead.
 
 ### `getAnchorRect`: `( fallbackReferenceElement: Element | null ) => DomRectWithOwnerDocument`
 
-_Note: this prop is deprecated. Please use the `anchor` prop instead._
+_Note: this prop is deprecated and will be removed in WordPress 6.3. Please use the `anchor` prop instead._
 
 A function returning the same value as the one expected by the `anchorRect` prop, used to specify a dynamic popover position.
 
@@ -192,6 +192,6 @@ Adjusts the size of the popover to prevent its contents from going out of view w
 
 ### `range`: `unknown`
 
-_Note: this prop is deprecated and has no effect on the component._
+_Note: this prop is deprecated and will be removed in WordPress 6.3. It has no effect on the component._
 
 -   Required: No
