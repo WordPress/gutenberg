@@ -7,11 +7,16 @@
 -   `Popover`: enable auto-updating every animation frame ([#43617](https://github.com/WordPress/gutenberg/pull/43617)).
 -   `Popover`: improve the component's performance and reactivity to prop changes by reworking its internals ([#43335](https://github.com/WordPress/gutenberg/pull/43335)).
 
+### Enhancements
+
+-   `ToggleControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43717](https://github.com/WordPress/gutenberg/pull/43717)). 
+
 ### Internal
 
 -   Remove unused `normalizeArrowKey` utility function ([#43640](https://github.com/WordPress/gutenberg/pull/43640/)).
 -   Refactor `FocalPointPicker` to function component ([#39168](https://github.com/WordPress/gutenberg/pull/39168)).
 -   `Guide`: use `code` instead of `keyCode` for keyboard events ([#43604](https://github.com/WordPress/gutenberg/pull/43604/)).
+-   `ToggleControl`: Convert to TypeScript and streamline CSS ([#43717](https://github.com/WordPress/gutenberg/pull/43717)). 
 -   `Navigation`: use `code` instead of `keyCode` for keyboard events ([#43644](https://github.com/WordPress/gutenberg/pull/43644/)).
 -   `ComboboxControl`: Add unit tests ([#42403](https://github.com/WordPress/gutenberg/pull/42403)).
 -   `ComboboxControl`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41417](https://github.com/WordPress/gutenberg/pull/41417))
