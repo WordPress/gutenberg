@@ -84,7 +84,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 			}
 		}
 
-		$schema_styles_blocks   = array();
+		$schema_styles_blocks = array();
 		foreach ( $valid_block_names as $block ) {
 			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
@@ -106,12 +106,12 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 				continue;
 			}
 
-			// Clean up everything save for the blocks
+			// Clean up everything save for the blocks.
 			$result = static::remove_keys_not_in_schema( $input[ $subtree ], $schema[ $subtree ] );
 
-			// Now back in the blocks
-			if ( $subtree === 'settings' && isset( $input[ $subtree ]['blocks'] ) ) {
-				$result['blocks'] = static::break_down_blocks( $input[ $subtree ]['blocks'], $valid_block_names, $schema[ $subtree ]);
+			// Now back in the blocks.
+			if ( 'settings' === $subtree && isset( $input[ $subtree ]['blocks'] ) ) {
+				$result['blocks'] = static::sanitize_blocks( $input[ $subtree ]['blocks'], $valid_block_names, $schema[ $subtree ] );
 			}
 
 			if ( empty( $result ) ) {
@@ -124,13 +124,25 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 		return $output;
 	}
 
-	protected static function break_down_blocks( $current_block, $valid_block_names, $schema, $result = array() ) {
+	/**
+	 * Sanitize the blocks section that can be found in settings and styles. This ensures
+	 * nested blocks are supported through recursion.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @param array $current_block              The current block to break down.
+	 * @param array $valid_block_names          List of valid block names.
+	 * @param array $schema                     Valid schema that is allowed for this block.
+	 * @param array $result                     The sanitized version of the block.
+	 * @return array The sanitized blocks output
+	 */
+	protected static function sanitize_blocks( $current_block, $valid_block_names, $schema, $result = array() ) {
 		foreach ( $current_block as $block_name => $block ) {
 			if ( in_array( $block_name, $valid_block_names, true ) ) {
 				$base_result = static::remove_keys_not_in_schema( $block, $schema );
-				$sub_result = static::break_down_blocks( $block, $valid_block_names, $schema );
-				
-				$result[ $block_name ] = array_merge( $base_result, $sub_result);
+				$sub_result  = static::sanitize_blocks( $block, $valid_block_names, $schema );
+
+				$result[ $block_name ] = array_merge( $base_result, $sub_result );
 			}
 		}
 
