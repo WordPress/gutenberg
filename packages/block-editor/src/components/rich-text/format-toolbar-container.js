@@ -17,28 +17,32 @@ import BlockControls from '../block-controls';
 import FormatToolbar from './format-toolbar';
 import { store as blockEditorStore } from '../../store';
 
-function InlineSelectionToolbar( { value, anchorRef, activeFormats } ) {
+function InlineSelectionToolbar( {
+	value,
+	editableContentRef,
+	activeFormats,
+} ) {
 	const lastFormat = activeFormats[ activeFormats.length - 1 ];
 	const lastFormatType = lastFormat?.type;
 	const settings = useSelect(
 		( select ) => select( richTextStore ).getFormatType( lastFormatType ),
 		[ lastFormatType ]
 	);
-	const selectionRef = useAnchorRef( {
-		ref: anchorRef,
+	const popoverAnchor = useAnchorRef( {
+		ref: editableContentRef,
 		value,
 		settings,
 	} );
 
-	return <InlineToolbar anchorRef={ selectionRef } />;
+	return <InlineToolbar popoverAnchor={ popoverAnchor } />;
 }
 
-function InlineToolbar( { anchorRef } ) {
+function InlineToolbar( { popoverAnchor } ) {
 	return (
 		<Popover
 			position="top center"
 			focusOnMount={ false }
-			anchorRef={ anchorRef }
+			anchor={ popoverAnchor }
 			className="block-editor-rich-text__inline-format-toolbar"
 			__unstableSlotName="block-toolbar"
 		>
@@ -51,14 +55,14 @@ function InlineToolbar( { anchorRef } ) {
 	);
 }
 
-const FormatToolbarContainer = ( { inline, anchorRef, value } ) => {
+const FormatToolbarContainer = ( { inline, editableContentRef, value } ) => {
 	const hasInlineToolbar = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().hasInlineToolbar,
 		[]
 	);
 
 	if ( inline ) {
-		return <InlineToolbar anchorRef={ anchorRef } />;
+		return <InlineToolbar popoverAnchor={ editableContentRef.current } />;
 	}
 
 	if ( hasInlineToolbar ) {
@@ -70,7 +74,7 @@ const FormatToolbarContainer = ( { inline, anchorRef, value } ) => {
 
 		return (
 			<InlineSelectionToolbar
-				anchorRef={ anchorRef }
+				editableContentRef={ editableContentRef }
 				value={ value }
 				activeFormats={ activeFormats }
 			/>
