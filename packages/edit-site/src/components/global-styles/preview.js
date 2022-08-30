@@ -4,6 +4,7 @@
 import {
 	__unstableIframe as Iframe,
 	__unstableEditorStyles as EditorStyles,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	__unstableMotion as motion,
@@ -12,6 +13,7 @@ import {
 } from '@wordpress/components';
 import { useReducedMotion, useResizeObserver } from '@wordpress/compose';
 import { useState, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -94,10 +96,23 @@ const StylesPreview = ( { label, isFocused } ) => {
 		return styles;
 	}, [ styles ] );
 
+	const __unstableResolvedContentStyles = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()
+				.__unstableResolvedContentStyles
+	);
+
 	return (
 		<Iframe
 			className="edit-site-global-styles-preview__iframe"
-			head={ <EditorStyles styles={ editorStyles } /> }
+			head={
+				<EditorStyles
+					styles={ editorStyles }
+					__unstableResolvedContentStyles={
+						__unstableResolvedContentStyles
+					}
+				/>
+			}
 			style={ {
 				height: normalizedHeight * ratio,
 				visibility: ! width ? 'hidden' : 'visible',
