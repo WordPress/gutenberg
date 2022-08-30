@@ -131,7 +131,7 @@ export default function GradientPicker( {
 
 	const deprecatedMarginSpacerProps = ! __nextHasNoMargin
 		? {
-				marginTop: ! gradients.length ? 3 : undefined,
+				marginTop: ! gradients?.length ? 3 : undefined,
 				marginBottom: ! clearable ? 6 : 0,
 		  }
 		: {};
@@ -139,7 +139,7 @@ export default function GradientPicker( {
 	return (
 		// Outmost Spacer wrapper can be removed when deprecation period is over
 		<Spacer marginBottom={ 0 } { ...deprecatedMarginSpacerProps }>
-			<VStack spacing={ gradients.length ? 6 : 0 }>
+			<VStack spacing={ gradients?.length ? 4 : 0 }>
 				{ ! disableCustomGradients && (
 					<CustomGradientPicker
 						__nextHasNoMargin
