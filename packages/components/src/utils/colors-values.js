@@ -22,11 +22,13 @@ const GRAY = {
 	100: '#f0f0f0',
 };
 
+// TODO: Replace usages of these with the equivalents in `GRAY`
 const DARK_GRAY = {
 	500: '#555d66', // Use this most of the time for dark items.
 	300: '#6c7781', // Lightest gray that can be used for AA text contrast.
 };
 
+// TODO: Replace usages of these with the equivalents in `GRAY`
 const LIGHT_GRAY = {
 	800: '#b5bcc2',
 	600: '#d7dade',
