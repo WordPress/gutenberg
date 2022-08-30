@@ -215,6 +215,7 @@ const Popover = (
 
 	const arrowRef = useRef( null );
 
+	const [ referenceElement, setReferenceElement ] = useState();
 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
 		useState();
 	const [ referenceOwnerDocument, setReferenceOwnerDocument ] = useState();
@@ -377,6 +378,7 @@ const Popover = (
 
 		referenceCallbackRef( resultingReferenceElement );
 
+		setReferenceElement( resultingReferenceElement );
 		setReferenceOwnerDocument( resultingReferenceOwnerDoc );
 	}, [
 		anchor,
@@ -500,7 +502,7 @@ const Popover = (
 		content = <Fill name={ slotName }>{ content }</Fill>;
 	}
 
-	if ( anchorRef || anchorRect ) {
+	if ( referenceElement && referenceElement !== fallbackReferenceElement ) {
 		return content;
 	}
 
