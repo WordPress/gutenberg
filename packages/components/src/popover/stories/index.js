@@ -47,6 +47,7 @@ export default {
 	title: 'Components/Popover',
 	component: Popover,
 	argTypes: {
+		anchor: { control: { type: null } },
 		anchorRef: { control: { type: null } },
 		anchorRect: { control: { type: null } },
 		animate: { control: { type: 'boolean' } },
