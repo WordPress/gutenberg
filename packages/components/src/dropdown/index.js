@@ -83,7 +83,10 @@ export default function Dropdown( props ) {
 	}
 
 	const args = { isOpen, onToggle: toggle, onClose: close };
-	const hasAnchorRef =
+	const hasPopoverAnchor =
+		!! popoverProps?.anchor ||
+		// Note: `anchorRef`, `getAnchorRect` and `anchorRect` are deprecated and
+		// be removed from `Popover` from WordPress 6.3
 		!! popoverProps?.anchorRef ||
 		!! popoverProps?.getAnchorRect ||
 		!! popoverProps?.anchorRect;
@@ -110,7 +113,9 @@ export default function Dropdown( props ) {
 					// This value is used to ensure that the dropdowns
 					// align with the editor header by default.
 					offset={ 13 }
-					anchorRef={ ! hasAnchorRef ? containerRef : undefined }
+					anchor={
+						! hasPopoverAnchor ? containerRef.current : undefined
+					}
 					{ ...popoverProps }
 					className={ classnames(
 						'components-dropdown__content',
