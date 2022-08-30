@@ -212,7 +212,7 @@ add_filter( 'block_type_metadata', 'gutenberg_block_type_metadata_multiple_view_
  *
  * It's used in QueryLoop, QueryPaginationNumbers and QueryPaginationNext blocks.
  *
- * `build_query_vars_from_query_block` was introduced in 5.8, for 6.0 we just need
+ * `build_query_vars_from_query_block` was introduced in 5.8, for 6.1 we just need
  * to update that function and not create a new one.
  *
  * @param WP_Block $block Block instance.
@@ -337,7 +337,7 @@ function gutenberg_build_query_vars_from_query_block( $block, $page ) {
 	 *
 	 * @param array    $query Array containing parameters for `WP_Query` as parsed by the block context.
 	 * @param WP_Block $block Block instance.
-	 * @param int      $page  Current query page.
+	 * @param int      $page  Current query's page.
 	 */
-	return apply_filters( 'query_block_query_vars', $query, $block, $page );
+	return apply_filters( 'query_loop_block_query_vars', $query, $block, $page );
 }
