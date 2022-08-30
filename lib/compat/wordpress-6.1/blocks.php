@@ -330,8 +330,14 @@ function gutenberg_build_query_vars_from_query_block( $block, $page ) {
 	 *
 	 * Anything to this filter should be compatible with the `WP_Query` API to form
 	 * the query context which will be passed down to the Query Loop Block's children.
-	 * This can help, for example, to include additional custom post types or meta queries not
+	 * This can help, for example, to include additional settings or meta queries not
 	 * directly supported by the core Query Loop Block, and extend its capabilities.
+	 *
+	 * Please note that this will only influence the query that will be rendered on the
+	 * front-end. The editor preview is not affected by this filter. Also, worth noting
+	 * that the editor preview uses the REST API, so, ideally, one should aim to provide
+	 * attributes which are also compatible with the REST API, in order to be able to
+	 * implement identical queries on both sides.
 	 *
 	 * @since 6.1.0
 	 *
