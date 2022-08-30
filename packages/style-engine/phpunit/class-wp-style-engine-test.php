@@ -83,6 +83,24 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'expected_output' => array(),
 			),
 
+			'inline_with_escaped_attributes'               => array(
+				'block_styles'    => array(
+					'color' => array(
+						'text'       => '#ffffff',
+						'background' => '#\'000000',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'color:#ffffff;000000;',
+					'declarations' => array(
+						'color'            => '#ffffff',
+						'background-color' => '#&#039;000000',
+					),
+					'classnames'   => 'has-text-color has-background',
+				),
+			),
+
 			'valid_inline_css_and_classnames_as_default_context' => array(
 				'block_styles'    => array(
 					'color'   => array(
