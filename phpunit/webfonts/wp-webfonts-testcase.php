@@ -22,6 +22,13 @@ abstract class WP_Webfonts_TestCase extends WP_UnitTestCase {
 	private $old_wp_webfonts;
 
 	/**
+	 * Current error reporting level (before a test changes it).
+	 *
+	 * @var null|int
+	 */
+	protected $error_reporting_level = null;
+
+	/**
 	 * Reflection data store for non-public property access.
 	 *
 	 * @var ReflectionProperty[]
@@ -38,6 +45,13 @@ abstract class WP_Webfonts_TestCase extends WP_UnitTestCase {
 	public function tear_down() {
 		$this->property         = array();
 		$GLOBALS['wp_webfonts'] = $this->old_wp_webfonts;
+
+		// Reset the error reporting when modified within a test.
+		if ( is_int( $this->error_reporting_level ) ) {
+			error_reporting( $this->error_reporting_level );
+			$this->error_reporting_level = null;
+		}
+
 		parent::tear_down();
 	}
 
@@ -234,5 +248,14 @@ abstract class WP_Webfonts_TestCase extends WP_UnitTestCase {
 		}
 
 		return $handles;
+	}
+
+	/**
+	 * Suppresses deprecation notices allowing a test to skip deprecations
+	 * to test notices or other specifics.
+	 */
+	protected function suppress_deprecations() {
+		$this->error_reporting_level = error_reporting();
+		error_reporting( $this->error_reporting_level & ~E_USER_DEPRECATED );
 	}
 }

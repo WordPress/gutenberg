@@ -84,21 +84,26 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 			 * Handle the deprecated web font's structure but alert developers
 			 * to modify their web font structure to group and key by font family.
 			 *
-			 * Note: This code block will not be backported to Core.
-			 */
+			 * BACKPORT NOTE: Do not backport this code block.
+			*/
 			if ( ! WP_Webfonts_Utils::is_defined( $font_family ) ) {
-				_doing_it_wrong(
-					__FUNCTION__,
-					__( 'Variations must be grouped and keyed by their font family.', 'gutenberg' ),
-					'6.1.0'
+				$font_family_handle = _gutenberg_extract_font_family_from_deprecated_webfonts_structure(
+					$variations,
+					'A deprecated web fonts array structure passed to wp_register_webfonts(). ' .
+					'Variations must be grouped and keyed by their font family.'
 				);
-				$font_family_handle = wp_register_webfont( $variations );
+				if ( ! $font_family_handle ) {
+					continue;
+				}
+
+				$font_family_handle = wp_register_webfont( $variations, $font_family_handle );
 				if ( ! $font_family_handle ) {
 					continue;
 				}
 				$registered[ $font_family_handle ] = true;
 				continue;
-			} // end of code block for deprecated web fonts structure.
+			}
+			// BACKPORT NOTE: End of the deprecated code block.
 
 			$font_family_handle = wp_register_font_family( $font_family );
 			if ( ! $font_family_handle ) {
@@ -128,18 +133,18 @@ if ( ! function_exists( 'wp_register_webfont' ) ) {
 	 * @since X.X.X
 	 *
 	 * @param array  $variation          Array of variation properties to be registered.
-	 * @param string $font_family_handle Optional. Font family handle for the given variation.
-	 *                                   Default empty string.
+	 * @param string $font_family_handle Font family handle for the given variation.
+	 *                                   Temporarily optional. Will be required when backported to Core.
 	 * @param string $variation_handle   Optional. Handle for the variation to register.
 	 * @return string|null The font family slug if successfully registered. Else null.
 	 */
 	function wp_register_webfont( array $variation, $font_family_handle = '', $variation_handle = '' ) {
 		// When font family's handle is not passed, attempt to get it from the variation.
 		if ( ! WP_Webfonts_Utils::is_defined( $font_family_handle ) ) {
-			$font_family = WP_Webfonts_Utils::get_font_family_from_variation( $variation );
-			if ( $font_family ) {
-				$font_family_handle = WP_Webfonts_Utils::convert_font_family_into_handle( $font_family );
-			}
+			$font_family_handle = _gutenberg_extract_font_family_from_deprecated_webfonts_structure(
+				$variation,
+				'Not passing the font family handle parameter to wp_register_webfont() is deprecated'
+			);
 		}
 
 		if ( empty( $font_family_handle ) ) {
@@ -309,3 +314,61 @@ add_filter(
 		return $mime_types;
 	}
 );
+
+/*
+ * Deprecated functions provided here to give extenders time to change
+ * their plugins/themes before this API is introduced into Core.
+ *
+ * BACKPORT NOTE: Do not backport these deprecated functions to Core.
+ */
+
+if ( ! function_exists( 'wp_enqueue_webfonts' ) ) {
+	/**
+	 * Enqueues a collection of font families.
+	 *
+	 * Example of how to enqueue Source Serif Pro and Roboto font families, both registered beforehand.
+	 *
+	 * <code>
+	 * wp_enqueue_webfonts(
+	 *  'Roboto',
+	 *  'Sans Serif Pro'
+	 * );
+	 * </code>
+	 *
+	 * Font families should be enqueued from the `init` hook or later.
+	 *
+	 * BACKPORT NOTE: Do not backport this function.
+	 *
+	 * @since 6.0.0
+	 * @deprecated 6.1.0 Use wp_enqueue_webfont().
+	 *
+	 * @param string[] $font_families Font family handles (array of strings).
+	 */
+	function wp_enqueue_webfonts( array $font_families ) {
+		_deprecated_function( __FUNCTION__, '6.1.0', 'wp_enqueue_webfont()' );
+
+		wp_enqueue_webfont( $font_families );
+	}
+}
+
+/**
+ * Handle the deprecated web fonts structure.
+ *
+ * BACKPORT NOTE: Do not backport this function.
+ *
+ * @access private
+ *
+ * @param array  $webfont Web font for extracting font family.
+ * @param string $message Deprecation message to throw.
+ * @return string|null The font family slug if successfully registered. Else null.
+ */
+function _gutenberg_extract_font_family_from_deprecated_webfonts_structure( array $webfont, $message ) {
+	trigger_error( $message, E_USER_DEPRECATED );
+
+	$font_family = WP_Webfonts_Utils::get_font_family_from_variation( $webfont );
+	if ( ! $font_family ) {
+		return null;
+	}
+
+	return WP_Webfonts_Utils::convert_font_family_into_handle( $font_family );
+}

@@ -556,4 +556,163 @@ class WP_Webfonts extends WP_Dependencies {
 			);
 		}
 	}
+
+	/**
+	 * Gets the font slug.
+	 *
+	 * BACKPORT NOTE: Do not backport this method.
+	 *
+	 * @since X.X.X
+	 * @deprecated Use WP_Webfonts_Utils::convert_font_family_into_handle() or WP_Webfonts_Utils::get_font_family_from_variation().
+	 *
+	 * @param array|string $to_convert The value to convert into a slug. Expected as the web font's array
+	 *                                 or a font-family as a string.
+	 * @return string|false The font slug on success, or false if the font-family cannot be determined.
+	 */
+	public static function get_font_slug( $to_convert ) {
+		_deprecated_function(
+			__METHOD__,
+			'6.1.0',
+			'Use WP_Webfonts_Utils::get_font_family_from_variation() to get the font family from an array and WP_Webfonts_Utils::convert_font_family_into_handle() to get the handle'
+		);
+
+		if ( is_array( $to_convert ) ) {
+			if ( isset( $to_convert['font-family'] ) ) {
+				$to_convert = $to_convert['font-family'];
+			} elseif ( isset( $to_convert['fontFamily'] ) ) {
+				$to_convert = $to_convert['fontFamily'];
+			} else {
+				_doing_it_wrong( __METHOD__, __( 'Could not determine the font family name.', 'gutenberg' ), '6.0.0' );
+				return false;
+			}
+		}
+
+		return sanitize_title( $to_convert );
+	}
+
+	/**
+	 * Initializes the API.
+	 *
+	 * BACKPORT NOTE: Do not backport this method.
+	 *
+	 * @since 6.0.0
+	 * @deprecated 6.1.0 Use wp_webfonts().
+	 */
+	public static function init() {
+		_deprecated_function( __METHOD__, '6.1.0', 'wp_webfonts()' );
+	}
+
+	/**
+	 * Gets the list of registered fonts.
+	 *
+	 * BACKPORT NOTE: Do not backport this method.
+	 *
+	 * @since 6.0.0
+	 * @deprecated 6.1.0 Use wp_webfonts()->get_registered().
+	 *
+	 * @return array[]
+	 */
+	public function get_registered_webfonts() {
+		_deprecated_function( __METHOD__, '6.1.0', 'wp_webfonts()->get_registered()' );
+
+		return $this->registered;
+	}
+
+	/**
+	 * Gets the list of enqueued fonts.
+	 *
+	 * BACKPORT NOTE: Do not backport this method.
+	 *
+	 * @since 6.0.0
+	 * @deprecated 6.1.0 Use wp_webfonts()->get_enqueued().
+	 *
+	 * @return array[]
+	 */
+	public function get_enqueued_webfonts() {
+		_deprecated_function( __METHOD__, '6.1.0', 'wp_webfonts()->get_enqueued()' );
+
+		return $this->queue;
+	}
+
+	/**
+	 * Gets the list of all fonts.
+	 *
+	 * BACKPORT NOTE: Do not backport this method.
+	 *
+	 * @since 6.0.0
+	 * @deprecated 6.1.0 Use wp_webfonts()->get_registered().
+	 *
+	 * @return array[]
+	 */
+	public function get_all_webfonts() {
+		_deprecated_function( __METHOD__, '6.1.0', 'wp_webfonts()->get_registered()' );
+
+		return $this->get_registered();
+	}
+
+	/**
+	 * Registers a webfont.
+	 *
+	 * BACKPORT NOTE: Do not backport this method.
+	 *
+	 * @since 6.0.0
+	 * @deprecated 6.1.0 Use wp_register_webfont().
+	 *
+	 * @param array  $webfont            Web font to register.
+	 * @param string $font_family_handle Optional. Font family handle for the given variation.
+	 *                                   Default empty string.
+	 * @param string $variation_handle   Optional. Handle for the variation to register.
+	 * @return string|false The font family slug if successfully registered, else false.
+	 */
+	public function register_webfont( array $webfont, $font_family_handle = '', $variation_handle = '' ) {
+		_deprecated_function( __METHOD__, '6.1.0', 'wp_register_webfont()' );
+
+		// When font family's handle is not passed, attempt to get it from the variation.
+		if ( ! WP_Webfonts_Utils::is_defined( $font_family_handle ) ) {
+			$font_family = WP_Webfonts_Utils::get_font_family_from_variation( $webfont );
+			if ( $font_family ) {
+				$font_family_handle = WP_Webfonts_Utils::convert_font_family_into_handle( $font_family );
+			}
+		}
+
+		if ( empty( $font_family_handle ) ) {
+			trigger_error( 'Font family handle must be a non-empty string.' );
+			return false;
+		}
+
+		return $this->add_variation( $font_family_handle, $webfont, $variation_handle )
+			? $font_family_handle
+			: false;
+	}
+
+	/**
+	 * Enqueue a font-family that has been already registered.
+	 *
+	 * BACKPORT NOTE: Do not backport this method.
+	 *
+	 * @since 6.0.0
+	 * @deprecated 6.1.0 Use wp_webfonts()->enqueue() or wp_enqueue_webfont().
+	 *
+	 * @param string $font_family_name The font family name to be enqueued.
+	 * @return bool True if successfully enqueued, else false.
+	 */
+	public function enqueue_webfont( $font_family_name ) {
+		_deprecated_function( __METHOD__, '6.1.0', 'wp_webfonts()->enqueue() or wp_enqueue_webfont()' );
+
+		$slug = $this->get_font_slug( $font_family_name );
+
+		if ( isset( $this->enqueued[ $slug ] ) ) {
+			return true;
+		}
+
+		if ( ! isset( $this->registered[ $slug ] ) ) {
+			/* translators: %s unique slug to identify the font family of the webfont */
+			_doing_it_wrong( __METHOD__, sprintf( __( 'The "%s" font family is not registered.', 'gutenberg' ), $slug ), '6.0.0' );
+
+			return false;
+		}
+
+		$this->enqueue( $slug );
+		return true;
+	}
 }

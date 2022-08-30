@@ -11,6 +11,7 @@ require_once __DIR__ . '/wp-webfonts-testcase.php';
 /**
  * @group  webfonts
  * @covers ::wp_register_webfont
+ * @covers WP_Webfonts::add_variation
  */
 class Tests_Webfonts_WpRegisterWebfont extends WP_Webfonts_TestCase {
 
@@ -58,16 +59,15 @@ class Tests_Webfonts_WpRegisterWebfont extends WP_Webfonts_TestCase {
 	/**
 	 * Integration test for testing the font family is registered during the variation registration process.
 	 *
-	 * @dataProvider data_with_deprecated_structure
+	 * @dataProvider data_with_valid_input
 	 *
-	 * @param array $variation Web font to test.
-	 * @param array $expected  Expected results.
+	 * @param string $font_family_handle Font family handle.
+	 * @param array  $variation          Variation.
+	 * @param array  $expected           Expected results.
 	 */
-	public function test_should_register_font_family( array $variation, $expected ) {
-		$font_family_handle = $expected[0];
-
-		wp_register_webfont( $variation );
-		$this->assertContains( $font_family_handle, $this->get_registered_handles() );
+	public function test_should_register_font_family( $font_family_handle, array $variation, array $expected ) {
+		wp_register_webfont( $variation, $font_family_handle );
+		$this->assertSame( $expected, $this->get_registered_handles() );
 	}
 
 	/**
@@ -124,14 +124,37 @@ class Tests_Webfonts_WpRegisterWebfont extends WP_Webfonts_TestCase {
 	/**
 	 * @dataProvider data_with_deprecated_structure
 	 *
-	 * @covers WP_Webfonts::add_variation
+	 * @param array $variation Web font to test.
+	 */
+	public function test_should_throw_deprecation_with_deprecated_structure( array $variation ) {
+		$this->expectDeprecation();
+		$this->expectDeprecationMessage( 'Not passing the font family handle parameter to wp_register_webfont() is deprecated' );
+
+		wp_register_webfont( $variation );
+	}
+
+	/**
+	 * @dataProvider data_with_deprecated_structure
 	 *
 	 * @param array $variation Web font to test.
 	 * @param array $expected  Expected results.
 	 */
-	public function test_registers_with_deprecated_structure(
-		array $variation, $expected
-	) {
+	public function test_should_extract_font_family_with_deprecated_structure( array $variation, $expected ) {
+		$this->suppress_deprecations();
+
+		$expected_handle = $expected[0];
+		$this->assertSame( $expected_handle, wp_register_webfont( $variation ), 'Registering should return the registered font family handle' );
+	}
+
+	/**
+	 * @dataProvider data_with_deprecated_structure
+	 *
+	 * @param array $variation Web font to test.
+	 * @param array $expected  Expected results.
+	 */
+	public function test_should_register_with_deprecated_structure( array $variation, $expected ) {
+		$this->suppress_deprecations();
+
 		$font_family_handle = $expected[0];
 		$this->setup_font_family( $font_family_handle );
 
@@ -142,18 +165,17 @@ class Tests_Webfonts_WpRegisterWebfont extends WP_Webfonts_TestCase {
 	/**
 	 * @dataProvider data_with_deprecated_structure
 	 *
-	 * @covers WP_Webfonts::add_variation
-	 *
 	 * @param array $variation Web font to test.
 	 * @param array $expected  Expected results.
 	 */
-	public function test_should_register_font_family_with_deprecated_structure(
-		array $variation, $expected
-	) {
+	public function test_should_register_font_family_with_deprecated_structure( array $variation, $expected ) {
+		$this->suppress_deprecations();
+
 		$font_family_handle = $expected[0];
 
 		wp_register_webfont( $variation );
 		$this->assertContains( $font_family_handle, $this->get_registered_handles() );
+		$this->assertSame( $expected, $this->get_registered_handles(), 'Registry should contain the font family and variant handles' );
 	}
 
 	/**
@@ -199,7 +221,9 @@ class Tests_Webfonts_WpRegisterWebfont extends WP_Webfonts_TestCase {
 	 * @param array  $variation          Web font to test.
 	 * @param string $expected_message   Expected notice message.
 	 */
-	public function test_should_fail_with_invalid_font_family( $font_family_handle, array $variation, $expected_message ) {
+	public function test_should_not_register_with_undefined_font_family( $font_family_handle, array $variation, $expected_message ) {
+		$this->suppress_deprecations();
+
 		$this->expectNotice();
 		$this->expectNoticeMessage( $expected_message );
 
