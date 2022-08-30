@@ -103,11 +103,7 @@ test.describe( 'splitting and merging blocks', () => {
 		);
 	} );
 
-	test( 'should delete an empty first line', async ( {
-		editor,
-		page,
-		pageUtils,
-	} ) => {
+	test( 'should delete an empty first line', async ( { editor, page } ) => {
 		// Regression Test: When a paragraph block has line break, and the first
 		// line has no text, pressing backspace at the start of the second line
 		// should remove the first.
@@ -219,7 +215,6 @@ test.describe( 'splitting and merging blocks', () => {
 	test( 'should forward delete from an empty paragraph', async ( {
 		editor,
 		page,
-		pageUtils,
 	} ) => {
 		// Regression test: Bogus nodes in a RichText container can interfere
 		// with isHorizontalEdge detection, preventing forward deletion.
@@ -243,7 +238,6 @@ test.describe( 'splitting and merging blocks', () => {
 	test( 'should remove empty paragraph block on backspace', async ( {
 		editor,
 		page,
-		pageUtils,
 	} ) => {
 		// Regression Test: In a sole empty paragraph, pressing backspace
 		// should remove the block.
@@ -260,7 +254,6 @@ test.describe( 'splitting and merging blocks', () => {
 	test( 'should remove at most one paragraph in forward direction', async ( {
 		editor,
 		page,
-		pageUtils,
 	} ) => {
 		// Regression Test: A forward delete on empty RichText previously would
 		// destroy two paragraphs on the dual-action of merge & remove.
@@ -296,7 +289,6 @@ test.describe( 'splitting and merging blocks', () => {
 	test( 'should ensure always a default block', async ( {
 		editor,
 		page,
-		pageUtils,
 	} ) => {
 		// Feature: To avoid focus loss, removal of all blocks will result in a
 		// default block insertion at the root. Pressing backspace in a new
@@ -391,12 +383,14 @@ test.describe( 'splitting and merging blocks', () => {
 				const content = await editor.getEditedPostContent();
 				expect( content ).toBe(
 					`<!-- wp:paragraph -->
-<p>hi-item 1</p>
+<p>hi</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p>item 2</p>
-<!-- /wp:paragraph -->`
+<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>item 1-item 2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
 				);
 			} );
 
@@ -417,12 +411,14 @@ test.describe( 'splitting and merging blocks', () => {
 				const content = await editor.getEditedPostContent();
 				expect( content ).toBe(
 					`<!-- wp:paragraph -->
-<p>hi-item 1</p>
+<p>hi</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p>item 2</p>
-<!-- /wp:paragraph -->`
+<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>item 1-item 2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
 				);
 			} );
 		}
