@@ -51,13 +51,23 @@ render(
 
 The component accepts the following props. Props not included in this set will be applied to the element wrapping Popover content.
 
+### `anchor`: `Element | VirtualElement`
+
+The element that should be used by the `Popover` as its anchor. It can either be an `Element` or, alternatively, a `VirtualElement` — ie. an object with the `getBoundingClientRect()` and the `ownerDocument` properties defined.
+
+-   Required: No
+
 ### `anchorRect`: `DomRectWithOwnerDocument`
+
+_Note: this prop is deprecated. Please use the `anchor` prop instead._
 
 An object extending a `DOMRect` with an additional optional `ownerDocument` property, used to specify a fixed popover position.
 
 -   Required: No
 
 ### `anchorRef`: `Element | PopoverAnchorRefReference | PopoverAnchorRefTopBottom | Range`
+
+_Note: this prop is deprecated. Please use the `anchor` prop instead._
 
 Used to specify a fixed popover position. It can be an `Element`, a React reference to an `element`, an object with a `top` and a `bottom` properties (both pointing to elements), or a `range`.
 
@@ -113,6 +123,8 @@ When not provided, the `onClose` callback will be called instead.
 -   Required: No
 
 ### `getAnchorRect`: `( fallbackReferenceElement: Element | null ) => DomRectWithOwnerDocument`
+
+_Note: this prop is deprecated. Please use the `anchor` prop instead._
 
 A function returning the same value as the one expected by the `anchorRect` prop, used to specify a dynamic popover position.
 
