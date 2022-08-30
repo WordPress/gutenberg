@@ -24,7 +24,6 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
-	"types": "types",
 	"sideEffects": [
 		"{src,build,build-module}/{index.js,store/index.js}"
 	],
@@ -33,6 +32,7 @@
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
+		"@wordpress/components": "file:../components",
 		"@wordpress/data": "file:../data",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",

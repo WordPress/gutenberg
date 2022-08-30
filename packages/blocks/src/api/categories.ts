@@ -2,13 +2,18 @@
  * WordPress dependencies
  */
 import { dispatch, select } from '@wordpress/data';
+import { Dashicon } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { store as blocksStore } from '../store';
 
-/** @typedef {import('../../types/api/').WPBlockCategory} WPBlockCategory */
+export interface WPBlockCategory {
+	slug: string;
+	title: string;
+	icon?: JSX.Element | Dashicon.Icon | null | undefined;
+}
 
 /**
  * Returns all the block categories.
@@ -18,7 +23,7 @@ import { store as blocksStore } from '../store';
  *
  * @return {WPBlockCategory[]} Block categories.
  */
-export function getCategories() {
+export function getCategories(): WPBlockCategory[] {
 	return select( blocksStore ).getCategories();
 }
 
@@ -57,7 +62,7 @@ export function getCategories() {
  * };
  * ```
  */
-export function setCategories( categories ) {
+export function setCategories( categories: readonly WPBlockCategory[] ): void {
 	dispatch( blocksStore ).setCategories( categories );
 }
 
@@ -87,6 +92,9 @@ export function setCategories( categories ) {
  * };
  * ```
  */
-export function updateCategory( slug, category ) {
+export function updateCategory(
+	slug: string,
+	category: Partial< WPBlockCategory >
+): void {
 	dispatch( blocksStore ).updateCategory( slug, category );
 }
