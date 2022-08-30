@@ -35,8 +35,9 @@ describe( 'iframed editor styles', () => {
 
 		await openDocumentSettingsSidebar();
 		await clickButton( 'Page' );
-		await clickButton( 'Template' );
-		await clickButton( 'New' );
+		await page.click( 'button[aria-label^="Select template"]' );
+		await page.waitForSelector( 'button[aria-label="Add template"]' );
+		await page.click( 'button[aria-label="Add template"]' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.type( 'Iframed Test' );

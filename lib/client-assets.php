@@ -480,7 +480,7 @@ add_filter(
 		// so we need to make an exception.
 		$settings['__unstableResolvedContentStyles'] = gutenberg_resolve_dependencies(
 			wp_styles(),
-			$settings['__experimentalContentStyles']
+			isset( $settings['__experimentalContentStyles'] ) ? $settings['__experimentalContentStyles'] : array()
 		);
 		return $settings;
 	},

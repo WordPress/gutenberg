@@ -13,7 +13,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import transformStyles from '../../utils/transform-styles';
+import transformStyles, { transformStyle } from '../../utils/transform-styles';
 
 const EDITOR_STYLES_SELECTOR = '.editor-styles-wrapper';
 extend( [ namesPlugin, a11yPlugin ] );
@@ -106,8 +106,16 @@ function PrefixedStyle( { tagName, href, id, rel, media, textContent } ) {
 		}
 	}
 
+	const transformedStyle = useMemo(
+		() =>
+			textContent
+				? transformStyle( { css: textContent }, EDITOR_STYLES_SELECTOR )
+				: '',
+		[ textContent ]
+	);
+
 	if ( TagName === 'style' ) {
-		return <TagName { ...{ id, onLoad } }>{ textContent }</TagName>;
+		return <TagName { ...{ id, onLoad } }>{ transformedStyle }</TagName>;
 	}
 
 	return <TagName { ...{ href, id, rel, media, onLoad } } />;
