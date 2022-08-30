@@ -46,9 +46,7 @@ function getPackageManifest( packageFolderNames ) {
 		// Next add any items in the docs/toc.json if found.
 		if ( fs.existsSync( join( __dirname, '..', tocPath ) ) ) {
 			const toc = require( join( __dirname, '..', tocPath ) ).values();
-			for ( const item of toc ) {
-				manifest.push( item );
-			}
+			manifest.push( ...toc );
 		}
 		return manifest;
 	}, [] );
