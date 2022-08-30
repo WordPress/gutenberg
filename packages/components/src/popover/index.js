@@ -154,6 +154,7 @@ const Popover = (
 		placement: placementProp = 'bottom-start',
 		offset: offsetProp = 0,
 		focusOnMount = 'firstElement',
+		anchor,
 		anchorRef,
 		anchorRect,
 		getAnchorRect,
@@ -186,6 +187,30 @@ const Popover = (
 		// to `false` to replicate `__unstableForcePosition`.
 		flip = ! __unstableForcePosition;
 		resize = ! __unstableForcePosition;
+	}
+
+	if ( anchorRef !== undefined ) {
+		deprecated( '`anchorRef` prop in Popover component', {
+			since: '6.1',
+			version: '6.3',
+			alternative: '`anchor` prop',
+		} );
+	}
+
+	if ( anchorRect !== undefined ) {
+		deprecated( '`anchorRect` prop in Popover component', {
+			since: '6.1',
+			version: '6.3',
+			alternative: '`anchor` prop',
+		} );
+	}
+
+	if ( getAnchorRect !== undefined ) {
+		deprecated( '`getAnchorRect` prop in Popover component', {
+			since: '6.1',
+			version: '6.3',
+			alternative: '`anchor` prop',
+		} );
 	}
 
 	const arrowRef = useRef( null );
@@ -335,6 +360,7 @@ const Popover = (
 	// recompute the reference element (real or virtual) and its owner document.
 	useLayoutEffect( () => {
 		const resultingReferenceOwnerDoc = getReferenceOwnerDocument( {
+			anchor,
 			anchorRef,
 			anchorRect,
 			getAnchorRect,
@@ -342,6 +368,7 @@ const Popover = (
 			fallbackDocument: document,
 		} );
 		const resultingReferenceElement = getReferenceElement( {
+			anchor,
 			anchorRef,
 			anchorRect,
 			getAnchorRect,
@@ -352,6 +379,7 @@ const Popover = (
 
 		setReferenceOwnerDocument( resultingReferenceOwnerDoc );
 	}, [
+		anchor,
 		anchorRef,
 		anchorRef?.top,
 		anchorRef?.bottom,

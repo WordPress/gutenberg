@@ -151,7 +151,16 @@ Set this to hide the arrow which visually indicates what the popover is anchored
 -   Required: No
 -   Default: `true`
 
+### anchor
+
+The element that should be used by the `Popover` as its anchor. It can either be an `Element` or, alternatively, a `VirtualElement` — ie. an object with the `getBoundingClientRect` function and the `ownerDocument` properties defined.
+
+-   Type: `Element | VirtualElement`
+-   Required: No
+
 ### anchorRect
+
+**Deprecated**. Please use the `anchor` prop instead.
 
 A custom `DOMRect` object at which to position the popover. `anchorRect` is used when the position (custom `DOMRect` object) of the popover needs to be fixed at one location all the time.
 
@@ -159,6 +168,8 @@ A custom `DOMRect` object at which to position the popover. `anchorRect` is used
 -   Required: No
 
 ### getAnchorRect
+
+**Deprecated**. Please use the `anchor` prop instead.
 
 A callback function which is used to override the anchor value computation algorithm. `anchorRect` will take precedence over this prop, if both are passed together.
 
