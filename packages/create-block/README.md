@@ -24,6 +24,8 @@ _(requires `node` version `14.0.0` or above, and `npm` version `6.14.4` or above
 
 It creates a WordPress plugin that you need to [install manually](https://wordpress.org/support/article/managing-plugins/#manual-plugin-installation).
 
+[Watch a video introduction to create-block on Learn.wordpress.org](https://learn.wordpress.org/tutorial/using-the-create-block-tool/)
+
 ## Usage
 
 The following command generates a project with PHP, JS, and CSS code for registering a block with a WordPress plugin.
