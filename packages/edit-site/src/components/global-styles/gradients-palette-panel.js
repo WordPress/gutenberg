@@ -46,11 +46,13 @@ export default function GradientPalettePanel( { name } ) {
 		name
 	);
 
+	const [ customDuotone ] = useSetting( 'color.duotone.custom' ) || [];
 	const [ defaultDuotone ] = useSetting( 'color.duotone.default' ) || [];
 	const [ themeDuotone ] = useSetting( 'color.duotone.theme' ) || [];
 	const [ defaultDuotoneEnabled ] = useSetting( 'color.defaultDuotone' );
 
 	const duotonePalette = [
+		...( customDuotone || [] ),
 		...( themeDuotone || [] ),
 		...( defaultDuotone && defaultDuotoneEnabled ? defaultDuotone : [] ),
 	];
