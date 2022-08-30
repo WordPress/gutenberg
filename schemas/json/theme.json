@@ -871,6 +871,7 @@
 			}
 		},
 		"stylesProperties": {
+			"type": "object",
 			"properties": {
 				"border": {
 					"description": "Border styles.",
