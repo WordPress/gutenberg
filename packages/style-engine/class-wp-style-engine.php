@@ -472,7 +472,7 @@ class WP_Style_Engine {
 					$value = static::get_css_var_value( $value, $individual_property_definition['css_vars'] );
 				}
 				$individual_css_property                      = sprintf( $style_definition['property_keys']['individual'], $individual_property_key );
-				$css_declarations[ $individual_css_property ] = esc_attr( $value );
+				$css_declarations[ $individual_css_property ] = $value;
 			}
 		}
 		return $css_declarations;
@@ -497,6 +497,7 @@ class WP_Style_Engine {
 			return $css_rule->get_css();
 		}
 
+		// There is no selector, so the assumption is a declarations string in a style attribute.
 		$css_declarations = new WP_Style_Engine_CSS_Declarations( $css_declarations );
 		return esc_attr( $css_declarations->get_declarations_string() );
 	}
