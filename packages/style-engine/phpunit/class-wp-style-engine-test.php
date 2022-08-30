@@ -92,10 +92,10 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => null,
 				'expected_output' => array(
-					'css'          => 'color:#ffffff;000000;',
+					'css'          => 'color:#ffffff;background-color:#&#039;000000;',
 					'declarations' => array(
 						'color'            => '#ffffff',
-						'background-color' => '#&#039;000000',
+						'background-color' => '#\'000000',
 					),
 					'classnames'   => 'has-text-color has-background',
 				),

@@ -395,7 +395,7 @@ class WP_Style_Engine {
 			if ( ! $should_skip_css_vars && ! empty( $style_definition['css_vars'] ) ) {
 				$css_var = static::get_css_var_value( $style_value, $style_definition['css_vars'] );
 				if ( static::is_valid_style_value( $css_var ) ) {
-					$css_declarations[ $style_property_keys['default'] ] = esc_attr( $css_var );
+					$css_declarations[ $style_property_keys['default'] ] = $css_var;
 				}
 			}
 			return $css_declarations;
@@ -418,14 +418,14 @@ class WP_Style_Engine {
 				$individual_property = sprintf( $style_property_keys['individual'], _wp_to_kebab_case( $key ) );
 
 				if ( $individual_property && static::is_valid_style_value( $value ) ) {
-					$css_declarations[ $individual_property ] = esc_attr( $value );
+					$css_declarations[ $individual_property ] = $value;
 				}
 			}
 
 			return $css_declarations;
 		}
 
-		$css_declarations[ $style_property_keys['default'] ] = esc_attr( $style_value );
+		$css_declarations[ $style_property_keys['default'] ] = $style_value;
 		return $css_declarations;
 	}
 
@@ -498,7 +498,7 @@ class WP_Style_Engine {
 		}
 
 		$css_declarations = new WP_Style_Engine_CSS_Declarations( $css_declarations );
-		return $css_declarations->get_declarations_string();
+		return esc_attr( $css_declarations->get_declarations_string() );
 	}
 
 	/**
