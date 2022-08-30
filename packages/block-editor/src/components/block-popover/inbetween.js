@@ -101,68 +101,40 @@ function BlockPopoverInbetween( {
 		return {
 			ownerDocument,
 			getBoundingClientRect() {
-				const previousRect = previousElement
+				const prevRect = previousElement
 					? previousElement.getBoundingClientRect()
 					: null;
 				const nextRect = nextElement
 					? nextElement.getBoundingClientRect()
 					: null;
 
+				let left = 0;
+				let top = 0;
+
 				if ( isVertical ) {
+					// vertical
+					top = prevRect ? prevRect.bottom : nextRect.top;
+
 					if ( isRTL() ) {
-						return {
-							top: previousRect
-								? previousRect.bottom
-								: nextRect.top,
-							left: previousRect
-								? previousRect.right
-								: nextRect.right,
-							right: previousRect
-								? previousRect.left
-								: nextRect.left,
-							bottom: nextRect
-								? nextRect.top
-								: previousRect.bottom,
-							height: 0,
-							width: 0,
-						};
+						// vertical, rtl
+						left = prevRect ? prevRect.right : nextRect.right;
+					} else {
+						// vertical, ltr
+						left = prevRect ? prevRect.left : nextRect.left;
 					}
+				} else {
+					top = prevRect ? prevRect.top : nextRect.top;
 
-					return {
-						top: previousRect ? previousRect.bottom : nextRect.top,
-						left: previousRect ? previousRect.left : nextRect.left,
-						right: previousRect
-							? previousRect.right
-							: nextRect.right,
-						bottom: nextRect ? nextRect.top : previousRect.bottom,
-						height: 0,
-						width: 0,
-					};
+					if ( isRTL() ) {
+						// non vertical, rtl
+						left = prevRect ? prevRect.left : nextRect.right;
+					} else {
+						// non vertical, ltr
+						left = prevRect ? prevRect.right : nextRect.left;
+					}
 				}
 
-				if ( isRTL() ) {
-					return {
-						top: previousRect ? previousRect.top : nextRect.top,
-						left: previousRect ? previousRect.left : nextRect.right,
-						right: nextRect ? nextRect.right : previousRect.left,
-						bottom: previousRect
-							? previousRect.bottom
-							: nextRect.bottom,
-						height: 0,
-						width: 0,
-					};
-				}
-
-				return {
-					top: previousRect ? previousRect.top : nextRect.top,
-					left: previousRect ? previousRect.right : nextRect.left,
-					right: nextRect ? nextRect.left : previousRect.right,
-					bottom: previousRect
-						? previousRect.bottom
-						: nextRect.bottom,
-					height: 0,
-					width: 0,
-				};
+				return new window.DOMRect( left, top, 0, 0 );
 			},
 		};
 	}, [ previousElement, nextElement, isVisible ] );
