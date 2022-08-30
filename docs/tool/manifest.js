@@ -31,15 +31,24 @@ const packagePaths = glob( 'packages/*/package.json' )
  * @return {Array} Manifest
  */
 function getPackageManifest( packageFolderNames ) {
-	return packageFolderNames.map( ( folderName ) => {
+	return packageFolderNames.reduce( ( manifest, folderName ) => {
 		const path = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
-		return {
-			title: `@wordpress/${ folderName }`,
-			slug: `packages-${ folderName }`,
-			markdown_source: path,
-			parent: 'packages',
-		};
-	} );
+		const tocPath = `${ baseRepoUrl }/packages/${ folderName }/toc.json`;
+		if ( fs.existsSync( join( __dirname, '..', tocPath ) ) ) {
+			const toc = require( join( __dirname, '..', tocPath ) ).values();
+			for ( const item of toc ) {
+				manifest.push( item );
+			}
+		} else {
+			manifest.push( {
+				title: `@wordpress/${ folderName }`,
+				slug: `packages-${ folderName }`,
+				markdown_source: path,
+				parent: 'packages',
+			} );
+		}
+		return manifest;
+	}, [] );
 }
 
 /**
