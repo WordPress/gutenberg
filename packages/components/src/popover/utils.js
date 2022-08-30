@@ -108,6 +108,8 @@ export const getFrameOffset = ( document ) => {
 
 export const getReferenceOwnerDocument = ( {
 	// @ts-ignore
+	anchor,
+	// @ts-ignore
 	anchorRef,
 	// @ts-ignore
 	anchorRect,
@@ -126,7 +128,9 @@ export const getReferenceOwnerDocument = ( {
 	// with the `getBoundingClientRect()` function (like real elements).
 	// See https://floating-ui.com/docs/virtual-elements for more info.
 	let resultingReferenceOwnerDoc;
-	if ( anchorRef?.top ) {
+	if ( anchor ) {
+		resultingReferenceOwnerDoc = anchor.ownerDocument;
+	} else if ( anchorRef?.top ) {
 		resultingReferenceOwnerDoc = anchorRef?.top.ownerDocument;
 	} else if ( anchorRef?.startContainer ) {
 		resultingReferenceOwnerDoc = anchorRef.startContainer.ownerDocument;
@@ -148,6 +152,8 @@ export const getReferenceOwnerDocument = ( {
 
 export const getReferenceElement = ( {
 	// @ts-ignore
+	anchor,
+	// @ts-ignore
 	anchorRef,
 	// @ts-ignore
 	anchorRect,
@@ -159,7 +165,9 @@ export const getReferenceElement = ( {
 	/** @type {import('@floating-ui/react-dom').ReferenceType | undefined} */
 	let referenceElement;
 
-	if ( anchorRef?.top ) {
+	if ( anchor ) {
+		referenceElement = anchor;
+	} else if ( anchorRef?.top ) {
 		// Create a virtual element for the ref. The expectation is that
 		// if anchorRef.top is defined, then anchorRef.bottom is defined too.
 		// Seems to be used by the block toolbar, when multiple blocks are selected
