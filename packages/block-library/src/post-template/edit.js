@@ -17,7 +17,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 
 const TEMPLATE = [
 	[ 'core/post-title' ],
@@ -95,6 +95,11 @@ export default function PostTemplateEdit( {
 	const [ { page } ] = queryContext;
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
 
+	const { records: categories } = useEntityRecords( 'taxonomy', 'category', {
+		context: 'view',
+		per_page: -1,
+	} );
+
 	const { posts, blocks } = useSelect(
 		( select ) => {
 			const { getEntityRecords, getTaxonomies } = select( coreStore );
@@ -155,6 +160,18 @@ export default function PostTemplateEdit( {
 				if ( templateSlug?.startsWith( 'archive-' ) ) {
 					query.postType = templateSlug.replace( 'archive-', '' );
 					postType = query.postType;
+				} else if (
+					templateSlug?.startsWith( 'category-' ) &&
+					!! categories
+				) {
+					const targetSlug = templateSlug.replace( 'category-', '' );
+					const categoryIds = categories
+						?.filter( ( { slug } ) => slug === targetSlug )
+						.map( ( { id } ) => id );
+					query.taxQuery = {
+						category: categoryIds,
+					};
+					taxQuery = query.taxQuery;
 				}
 			}
 			// When we preview Query Loop blocks we should prefer the current
@@ -182,6 +199,7 @@ export default function PostTemplateEdit( {
 			taxQuery,
 			parents,
 			previewPostType,
+			categories,
 		]
 	);
 	const blockContexts = useMemo(
