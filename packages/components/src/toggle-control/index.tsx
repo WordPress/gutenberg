@@ -20,6 +20,26 @@ import { HStack } from '../h-stack';
 import { useCx } from '../utils';
 import { space } from '../ui/utils/space';
 
+/**
+ * ToggleControl is used to generate a toggle user interface.
+ *
+ * ```jsx
+ * import { ToggleControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyToggleControl = () => {
+ *   const [ value, setValue ] = useState( false );
+ *
+ *   return (
+ *     <ToggleControl
+ *       label="Fixed Background"
+ *       checked={ value }
+ *       onChange={ () => setValue( ( state ) => ! state ) }
+ *     />
+ *   );
+ * };
+ * ```
+ */
 export function ToggleControl( {
 	__nextHasNoMarginBottom,
 	label,
