@@ -153,6 +153,11 @@ describe( 'useSetting', () => {
 			},
 		} );
 
+		// Mock editor structure:
+		//	core/parent-block {
+		//		core/child-block    <- current block
+		//	}
+
 		mockCurrentBlockContext( {
 			name: 'core/child-block',
 			clientId: 'client-id-child-block',
@@ -183,6 +188,13 @@ describe( 'useSetting', () => {
 				},
 			},
 		} );
+
+		// Mock editor structure:
+		//	core/grandparent-block {
+		//		core/parent-block {
+		//			core/child-block    <- current block
+		//		}
+		//	}
 
 		mockCurrentBlockContext( {
 			name: 'core/child-block',
@@ -217,6 +229,13 @@ describe( 'useSetting', () => {
 				},
 			},
 		} );
+
+		// Mock editor structure:
+		//	core/grandparent-block {
+		//		core/parent-block {
+		//			core/child-block    <- current block
+		//		}
+		//	}
 
 		mockCurrentBlockContext( {
 			name: 'core/child-block',
@@ -254,6 +273,11 @@ describe( 'useSetting', () => {
 			},
 		} );
 
+		// Mock editor structure:
+		//	core/parent-block {
+		//		core/child-block    <- current block
+		//	}
+
 		mockCurrentBlockContext( {
 			name: 'core/child-block',
 			clientId: 'client-id-child-block',
@@ -265,5 +289,87 @@ describe( 'useSetting', () => {
 		} );
 
 		expect( useSetting( 'color.text' ) ).toBe( true );
+	} );
+
+	it( 'uses correct specificity in double-layered parent block', () => {
+		mockSettings( {
+			blocks: {
+				'core/nested-block': {
+					'core/nested-block': {
+						'core/child-block': {
+							color: {
+								text: true,
+							},
+						},
+					},
+					'core/child-block': {
+						color: {
+							text: false,
+						},
+					},
+				},
+			},
+		} );
+
+		// Mock editor structure:
+		//	core/nested-block {
+		//		core/nested-block {
+		//			core/child-block    <- current block
+		//		}
+		//	}
+
+		mockCurrentBlockContext( {
+			name: 'core/child-block',
+			clientId: 'client-id-child-block',
+		} );
+
+		mockBlockParent( 'client-id-child-block', {
+			name: 'core/nested-block',
+			clientId: 'client-id-nested-block-1',
+		} );
+
+		mockBlockParent( 'client-id-nested-block-1', {
+			name: 'core/nested-block',
+			clientId: 'client-id-nested-block-2',
+		} );
+
+		expect( useSetting( 'color.text' ) ).toBe( true );
+	} );
+
+	it( 'uses correct specificity out of double-layered parent block', () => {
+		mockSettings( {
+			blocks: {
+				'core/nested-block': {
+					'core/nested-block': {
+						'core/child-block': {
+							color: {
+								text: true,
+							},
+						},
+					},
+					'core/child-block': {
+						color: {
+							text: false,
+						},
+					},
+				},
+			},
+		} );
+
+		// Mock editor structure:
+		//	core/nested-block {
+		//		core/child-block    <- current block
+		//	}
+
+		mockCurrentBlockContext( {
+			name: 'core/child-block',
+			clientId: 'client-id-child-block',
+		} );
+
+		mockBlockParent( 'client-id-child-block', {
+			name: 'core/nested-block',
+			clientId: 'client-id-nested-block',
+		} );
+		expect( useSetting( 'color.text' ) ).toBe( false );
 	} );
 } );
