@@ -35,7 +35,7 @@ async function testBlockToolbarKeyboardNavigation(
 	await expectLabelToHaveFocus( 'Move up' );
 	await page.keyboard.press( 'Tab' );
 	await expectLabelToHaveFocus( currentBlockLabel );
-	await pressKeyWithModifier( 'shift', 'Tab' );
+	await focusBlockToolbar();
 	await expectLabelToHaveFocus( 'Move up' );
 }
 
@@ -51,7 +51,7 @@ async function testGroupKeyboardNavigation(
 	await expectLabelToHaveFocus( 'Block: Group' );
 	await page.keyboard.press( 'ArrowRight' );
 	await expectLabelToHaveFocus( currentBlockLabel );
-	await pressKeyWithModifier( 'shift', 'Tab' );
+	await focusBlockToolbar();
 	await expectLabelToHaveFocus( 'Select Group' );
 	await page.keyboard.press( 'ArrowRight' );
 	await expectLabelToHaveFocus( currentBlockTitle );
@@ -125,7 +125,7 @@ describe( 'Toolbar roving tabindex', () => {
 	it( 'ensures block toolbar remembers the last focused item', async () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Paragraph' );
-		await focusBlockToolbar();
+		await pressKeyWithModifier( 'shift', 'Tab' );
 		await page.keyboard.press( 'ArrowRight' );
 		await expectLabelToHaveFocus( 'Move up' );
 		await page.keyboard.press( 'Tab' );

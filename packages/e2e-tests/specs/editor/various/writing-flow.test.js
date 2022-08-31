@@ -684,6 +684,7 @@ describe( 'Writing Flow', () => {
 		// Create the table.
 		await page.keyboard.press( 'Space' );
 		// Navigate to the second cell.
+		await page.waitForSelector( '.wp-block-table' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( '2' );
 		// Confirm correct setup.
@@ -756,6 +757,26 @@ describe( 'Writing Flow', () => {
 			( nodes ) => Array.from( nodes ).map( ( node ) => node.innerHTML )
 		);
 		expect( paragraphs ).toEqual( [ 'first', 'second' ] );
+	} );
+
+	it( 'Allows block settings sidebar focus when there are no next focus elements', async () => {
+		// Insert an image block.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '/Image' );
+		await page.keyboard.press( 'Enter' );
+
+		// Make sure the upload button has focus.
+		const uploadButton = await page.waitForXPath(
+			'//button[contains( text(), "Upload" ) ]'
+		);
+		await expect( uploadButton ).toHaveFocus();
+
+		// Try to focus the image block settings sidebar.
+		await pressKeyTimes( 'Tab', 5 );
+		const getAriaLabel = await page.evaluate( () =>
+			document.activeElement?.getAttribute( 'aria-label' )
+		);
+		await expect( getAriaLabel ).toEqual( 'Block (selected)' );
 	} );
 
 	it( 'should move to the start of the first line on ArrowUp', async () => {
