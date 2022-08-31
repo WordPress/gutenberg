@@ -113,7 +113,9 @@ function BlockListBlock( {
 			return {
 				themeSupportsLayout: getSettings().supportsLayout,
 				isContentBlock:
-					select( blocksStore ).__unstableIsContentBlock( name ),
+					select( blocksStore ).__experimentalHasContentRoleAttribute(
+						name
+					),
 				hasContentLockedParent: _hasContentLockedParent,
 				isContentLocking:
 					getTemplateLock( clientId ) === 'noContent' &&
@@ -222,8 +224,12 @@ function BlockListBlock( {
 	const value = {
 		clientId,
 		className: classnames(
-			hasContentLockedParent &&
-				( isContentBlock ? 'is-content-block' : 'is-content-locked' ),
+			{
+				'is-content-locked': isContentLocking,
+				'is-content-locked-temporarily-editing-as-blocks':
+					isTemporarilyEditingAsBlocks,
+				'is-content-block': hasContentLockedParent && isContentBlock,
+			},
 			dataAlign && themeSupportsLayout && `align${ dataAlign }`,
 			className
 		),

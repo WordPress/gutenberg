@@ -90,23 +90,25 @@ function BlockNavigationButton( { blockTypes, block, selectedBlock } ) {
 	);
 }
 
-function BlockInspectorAbsorvedBy( { absorvedBy } ) {
+function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 	const { blockTypes, block, selectedBlock } = useSelect(
 		( select ) => {
 			return {
 				blockTypes: select( blocksStore ).getBlockTypes(),
-				block: select( blockEditorStore ).getBlock( absorvedBy ),
+				block: select( blockEditorStore ).getBlock(
+					topLevelLockedBlock
+				),
 				selectedBlock: select( blockEditorStore ).getSelectedBlock(),
 			};
 		},
-		[ absorvedBy ]
+		[ topLevelLockedBlock ]
 	);
-	const blockInformation = useBlockDisplayInformation( absorvedBy );
+	const blockInformation = useBlockDisplayInformation( topLevelLockedBlock );
 	const contentBlocks = useContentBlocks( blockTypes, block );
 	return (
 		<div className="block-editor-block-inspector">
 			<BlockCard { ...blockInformation } />
-			<BlockVariationTransforms blockClientId={ absorvedBy } />
+			<BlockVariationTransforms blockClientId={ topLevelLockedBlock } />
 			<VStack
 				spacing={ 1 }
 				padding={ 4 }
@@ -134,7 +136,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		selectedBlockName,
 		selectedBlockClientId,
 		blockType,
-		absorvedBy,
+		topLevelLockedBlock,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
@@ -159,7 +161,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
 			hasBlockStyles: blockStyles && blockStyles.length > 0,
-			absorvedBy:
+			topLevelLockedBlock:
 				getTemplateLock( _selectedBlockClientId ) === 'noContent'
 					? _selectedBlockClientId
 					: __unstableGetContentLockingParent(
@@ -215,8 +217,12 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		}
 		return null;
 	}
-	if ( absorvedBy ) {
-		return <BlockInspectorAbsorvedBy absorvedBy={ absorvedBy } />;
+	if ( topLevelLockedBlock ) {
+		return (
+			<BlockInspectorLockedBlocks
+				topLevelLockedBlock={ topLevelLockedBlock }
+			/>
+		);
 	}
 	return (
 		<BlockInspectorSingleBlock

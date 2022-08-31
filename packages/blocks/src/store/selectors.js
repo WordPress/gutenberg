@@ -791,7 +791,7 @@ export const hasChildBlocksWithInserterSupport = ( state, blockName ) => {
 	} );
 };
 
-export const __unstableIsContentBlock = createSelector(
+export const __experimentalHasContentRoleAttribute = createSelector(
 	( state, blockTypeName ) => {
 		const blockType = getBlockType( state, blockTypeName );
 		return Object.entries( blockType.attributes ).some(
