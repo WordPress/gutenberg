@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-const { escapeRegExp } = require( 'lodash' );
 const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
 
@@ -17,7 +16,8 @@ const { version } = require( './package' );
  * @type {string}
  */
 const majorMinorRegExp =
-	escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.\\d+)?';
+	version.replace( /\.\d+$/, '' ).replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' ) +
+	'(\\.\\d+)?';
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -94,6 +94,7 @@ module.exports = {
 							'differenceWith',
 							'dropRight',
 							'each',
+							'escapeRegExp',
 							'extend',
 							'findIndex',
 							'findKey',
@@ -102,6 +103,7 @@ module.exports = {
 							'flatten',
 							'flattenDeep',
 							'fromPairs',
+							'has',
 							'identity',
 							'invoke',
 							'isArray',

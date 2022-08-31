@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, has, isEmpty, omit, pick } from 'lodash';
+import { get, isEmpty, omit, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -98,8 +98,8 @@ export const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
  */
 function hasDefaultSize( image, defaultSize ) {
 	return (
-		has( image, [ 'sizes', defaultSize, 'url' ] ) ||
-		has( image, [ 'media_details', 'sizes', defaultSize, 'source_url' ] )
+		'url' in ( image?.sizes?.[ defaultSize ] ?? {} ) ||
+		'source_url' in ( image?.media_details?.sizes?.[ defaultSize ] ?? {} )
 	);
 }
 

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Feature
+
+-   Made it possible to import individual blocks ([#42258](https://github.com/WordPress/gutenberg/pull/42258)). Check [README](./README.md#loading-individual-blocks) for more information.
+
 ## 7.13.0 (2022-08-24)
 
 ### Bug Fix

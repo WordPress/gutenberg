@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { has, get } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -59,7 +59,7 @@ function getMediaDetails( media, postId ) {
 		media.id,
 		postId
 	);
-	if ( has( media, [ 'media_details', 'sizes', defaultSize ] ) ) {
+	if ( defaultSize in ( media?.media_details?.sizes ?? {} ) ) {
 		return {
 			mediaWidth: media.media_details.sizes[ defaultSize ].width,
 			mediaHeight: media.media_details.sizes[ defaultSize ].height,
@@ -74,7 +74,7 @@ function getMediaDetails( media, postId ) {
 		media.id,
 		postId
 	);
-	if ( has( media, [ 'media_details', 'sizes', fallbackSize ] ) ) {
+	if ( fallbackSize in ( media?.media_details?.sizes ?? {} ) ) {
 		return {
 			mediaWidth: media.media_details.sizes[ fallbackSize ].width,
 			mediaHeight: media.media_details.sizes[ fallbackSize ].height,

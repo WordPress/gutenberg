@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { has, kebabCase } from 'lodash';
+import { kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -246,7 +246,7 @@ function LayoutTypeSwitcher( { type, onChange } ) {
  * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
-	if ( has( settings.attributes, [ 'layout', 'type' ] ) ) {
+	if ( 'type' in ( settings.attributes?.layout ?? {} ) ) {
 		return settings;
 	}
 	if ( hasBlockSupport( settings, layoutBlockSupportKey ) ) {
