@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useCallback, useMemo, createContext } from '@wordpress/element';
+import { useMemo, createContext } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
 
@@ -89,68 +89,55 @@ function BlockPopoverInbetween( {
 				? previousElement.offsetHeight
 				: nextElement.offsetHeight,
 		};
-	}, [ previousElement, nextElement, isVertical ] );
+	}, [ previousElement, nextElement, isVisible, isVertical ] );
 
-	const getAnchorRect = useCallback( () => {
+	const popoverAnchor = useMemo( () => {
 		if ( ( ! previousElement && ! nextElement ) || ! isVisible ) {
-			return {};
+			return undefined;
 		}
 
 		const { ownerDocument } = previousElement || nextElement;
 
-		const previousRect = previousElement
-			? previousElement.getBoundingClientRect()
-			: null;
-		const nextRect = nextElement
-			? nextElement.getBoundingClientRect()
-			: null;
-
-		if ( isVertical ) {
-			if ( isRTL() ) {
-				return {
-					top: previousRect ? previousRect.bottom : nextRect.top,
-					left: previousRect ? previousRect.right : nextRect.right,
-					right: previousRect ? previousRect.left : nextRect.left,
-					bottom: nextRect ? nextRect.top : previousRect.bottom,
-					height: 0,
-					width: 0,
-					ownerDocument,
-				};
-			}
-
-			return {
-				top: previousRect ? previousRect.bottom : nextRect.top,
-				left: previousRect ? previousRect.left : nextRect.left,
-				right: previousRect ? previousRect.right : nextRect.right,
-				bottom: nextRect ? nextRect.top : previousRect.bottom,
-				height: 0,
-				width: 0,
-				ownerDocument,
-			};
-		}
-
-		if ( isRTL() ) {
-			return {
-				top: previousRect ? previousRect.top : nextRect.top,
-				left: previousRect ? previousRect.left : nextRect.right,
-				right: nextRect ? nextRect.right : previousRect.left,
-				bottom: previousRect ? previousRect.bottom : nextRect.bottom,
-				height: 0,
-				width: 0,
-				ownerDocument,
-			};
-		}
-
 		return {
-			top: previousRect ? previousRect.top : nextRect.top,
-			left: previousRect ? previousRect.right : nextRect.left,
-			right: nextRect ? nextRect.left : previousRect.right,
-			bottom: previousRect ? previousRect.bottom : nextRect.bottom,
-			height: 0,
-			width: 0,
 			ownerDocument,
+			getBoundingClientRect() {
+				const prevRect = previousElement
+					? previousElement.getBoundingClientRect()
+					: null;
+				const nextRect = nextElement
+					? nextElement.getBoundingClientRect()
+					: null;
+
+				let left = 0;
+				let top = 0;
+
+				if ( isVertical ) {
+					// vertical
+					top = prevRect ? prevRect.bottom : nextRect.top;
+
+					if ( isRTL() ) {
+						// vertical, rtl
+						left = prevRect ? prevRect.right : nextRect.right;
+					} else {
+						// vertical, ltr
+						left = prevRect ? prevRect.left : nextRect.left;
+					}
+				} else {
+					top = prevRect ? prevRect.top : nextRect.top;
+
+					if ( isRTL() ) {
+						// non vertical, rtl
+						left = prevRect ? prevRect.left : nextRect.right;
+					} else {
+						// non vertical, ltr
+						left = prevRect ? prevRect.right : nextRect.left;
+					}
+				}
+
+				return new window.DOMRect( left, top, 0, 0 );
+			},
 		};
-	}, [ previousElement, nextElement ] );
+	}, [ previousElement, nextElement, isVisible, isVertical ] );
 
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
 
@@ -172,7 +159,7 @@ function BlockPopoverInbetween( {
 		<Popover
 			ref={ popoverScrollRef }
 			animate={ false }
-			getAnchorRect={ getAnchorRect }
+			anchor={ popoverAnchor }
 			focusOnMount={ false }
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the default popover slot).
