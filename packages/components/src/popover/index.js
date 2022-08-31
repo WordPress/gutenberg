@@ -449,10 +449,16 @@ const Popover = (
 					].join( ' ' ) }
 					style={ {
 						left: Number.isFinite( arrowData?.x )
-							? `${ arrowData.x }px`
+							? `${
+									arrowData.x +
+									( frameOffsetRef.current?.x ?? 0 )
+							  }px`
 							: '',
 						top: Number.isFinite( arrowData?.y )
-							? `${ arrowData.y }px`
+							? `${
+									arrowData.y +
+									( frameOffsetRef.current?.y ?? 0 )
+							  }px`
 							: '',
 					} }
 				>
