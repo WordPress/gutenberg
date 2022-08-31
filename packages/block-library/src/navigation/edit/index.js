@@ -646,7 +646,7 @@ function Navigation( {
 									classicMenu.name
 								);
 								navigationStorageMap.set(
-									classicMenu.name,
+									navMenu.id,
 									classicMenu.id
 								);
 								navigationStorage.setItem(
@@ -739,7 +739,7 @@ function Navigation( {
 									classicMenu.name
 								);
 								navigationStorageMap.set(
-									classicMenu.name,
+									navMenu.id,
 									classicMenu.id
 								);
 								navigationStorage.setItem(
@@ -835,10 +835,7 @@ function Navigation( {
 							classicMenu.id,
 							classicMenu.name
 						);
-						navigationStorageMap.set(
-							classicMenu.name,
-							classicMenu.id
-						);
+						navigationStorageMap.set( navMenu.id, classicMenu.id );
 						navigationStorage.setItem(
 							'nav_menus_created',
 							JSON.stringify(
@@ -860,6 +857,7 @@ function Navigation( {
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider uniqueId={ recursionId }>
+<<<<<<< HEAD
 				<InspectorControls>
 					<PanelBody title={ __( 'Menu' ) }>
 						<NavigationMenuSelector
@@ -884,6 +882,34 @@ function Navigation( {
 									JSON.stringify(
 										Array.from(
 											navigationStorageMap.entries()
+=======
+				<BlockControls>
+					{ ! isDraftNavigationMenu && isEntityAvailable && (
+						<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
+							<NavigationMenuSelector
+								ref={ navigationSelectorRef }
+								currentMenuId={ ref }
+								clientId={ clientId }
+								onSelectNavigationMenu={ ( menuId ) => {
+									handleUpdateMenu( menuId );
+									setShouldFocusNavigationSelector( true );
+								} }
+								onSelectClassicMenu={ async ( classicMenu ) => {
+									const navMenu = await convertClassicMenu(
+										classicMenu.id,
+										classicMenu.name
+									);
+									navigationStorageMap.set(
+										navMenu.id,
+										classicMenu.id
+									);
+									navigationStorage.setItem(
+										'nav_menus_created',
+										JSON.stringify(
+											Array.from(
+												navigationStorageMap.entries()
+											)
+>>>>>>> b82ba3f478 (Small refactor to already imported menus, still work on menu deletion)
 										)
 									)
 								);
