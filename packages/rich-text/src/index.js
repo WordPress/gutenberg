@@ -7,7 +7,7 @@ export { getActiveFormats } from './get-active-formats';
 export { getActiveObject } from './get-active-object';
 export { getTextContent } from './get-text-content';
 export { isCollapsed } from './is-collapsed';
-export { isEmpty } from './is-empty';
+export { isEmpty, isEmptyLine as __unstableIsEmptyLine } from './is-empty';
 export { join } from './join';
 export { registerFormatType } from './register-format-type';
 export { removeFormat } from './remove-format';
