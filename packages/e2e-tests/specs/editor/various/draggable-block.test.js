@@ -12,10 +12,8 @@ import {
 	clickBlockAppender,
 } from '@wordpress/e2e-test-utils';
 
-describe.skip( 'Draggable block', () => {
-	// Tests don't seem to pass if beforeAll and afterAll are used.
-	// Unsure why.
-	beforeEach( async () => {
+describe( 'Draggable block', () => {
+	beforeAll( async () => {
 		await deactivatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
@@ -24,11 +22,10 @@ describe.skip( 'Draggable block', () => {
 		// Scrolling can interfere with the drag coordinates.
 		await page.setViewport( { width: 960, height: 1024 } );
 		await waitForWindowDimensions( 960, 1024 );
-		await createNewPost();
 		await page.setDragInterception( true );
 	} );
 
-	afterEach( async () => {
+	afterAll( async () => {
 		await page.setDragInterception( false );
 
 		// Reset the viewport to normal large size.
@@ -36,6 +33,10 @@ describe.skip( 'Draggable block', () => {
 		await activatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
+	} );
+
+	beforeEach( async () => {
+		await createNewPost();
 	} );
 
 	it( 'can drag and drop to the top of a block list', async () => {
