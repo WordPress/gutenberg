@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit, unionBy } from 'lodash';
+import { unionBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -94,17 +94,19 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
 
-	const settings = useMemo(
-		() => ( {
-			...omit( storedSettings, [
-				'__experimentalAdditionalBlockPatterns',
-				'__experimentalAdditionalBlockPatternCategories',
-			] ),
+	const settings = useMemo( () => {
+		const {
+			__experimentalAdditionalBlockPatterns,
+			__experimentalAdditionalBlockPatternCategories,
+			...restStoredSettings
+		} = storedSettings;
+
+		return {
+			...restStoredSettings,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
-		} ),
-		[ storedSettings, blockPatterns, blockPatternCategories ]
-	);
+		};
+	}, [ storedSettings, blockPatterns, blockPatternCategories ] );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
