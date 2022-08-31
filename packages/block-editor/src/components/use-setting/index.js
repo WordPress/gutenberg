@@ -93,6 +93,58 @@ const removeCustomPrefixes = ( path ) => {
 	return prefixedFlags[ path ] || path;
 };
 
+const getNestedSetting = (
+	blockNamePath,
+	normalizedPath,
+	settings,
+	settingValuesByDepth,
+	depth = 1
+) => {
+	// The current block is the last block in the path.
+	const blockName = blockNamePath[ blockNamePath.length - 1 ];
+
+	for ( const [ settingKey, settingValue ] of Object.entries( settings ) ) {
+		const valueAtPath = get( settingValue, normalizedPath );
+
+		if ( settingKey === blockName && valueAtPath !== undefined ) {
+			// Store these block settings with the current depth as a key
+			const settingsAtDepth = settingValuesByDepth.get( depth ) ?? [];
+			settingsAtDepth.push( valueAtPath );
+
+			settingValuesByDepth.set( depth, settingsAtDepth );
+		} else if ( blockNamePath.includes( settingKey ) ) {
+			// Recurse into nested settings for this block
+			getNestedSetting(
+				blockNamePath,
+				normalizedPath,
+				settingValue,
+				settingValuesByDepth,
+				depth + 1
+			);
+		}
+	}
+
+	// candidates: [
+	//   "client-id-nested-block",
+	//   "client-id-child-block"
+	// ]
+
+	// Example real candidates: [ "core/columns", "core/column", "core/media-text", "core/buttons", "core/button" ]
+
+	// candidateBlockSettings: {
+	//   "core/nested-block": {
+	//     "core/nested-block": {
+	//       "core/child-block": {
+	//         "color": { "text": true }
+	//        }
+	//     },
+	//   "core/child-block": {
+	//     "color":{"text":false}
+	//    }
+	//   }
+	// }
+};
+
 /**
  * Hook that retrieves the given setting for the block instance in use.
  *
@@ -162,64 +214,40 @@ export default function useSetting( path ) {
 
 			// 2.1 Check for block-specific settings from block editor store
 			if ( result === undefined && blockName !== '' ) {
-				const candidateBlockNames = [
+				const blockNamePath = [
 					...blockParentIds.map( ( parentId ) =>
 						select( blockEditorStore ).getBlockName( parentId )
 					),
 					blockName,
 				];
 
-				const settingsValuesByDepth = new Map();
-
-				const findNestedSettings = ( settingsValue, depth = 1 ) => {
-					for ( const [
-						propertyKey,
-						propertyValue,
-					] of Object.entries( settingsValue ) ) {
-						const nestedSettingsValue = get(
-							propertyValue,
-							normalizedPath
-						);
-
-						if (
-							propertyKey === blockName &&
-							nestedSettingsValue !== undefined
-						) {
-							// Store these block settings with the current depth as a key
-							const settingsAtDepth =
-								settingsValuesByDepth.get( depth ) ?? [];
-							settingsAtDepth.push( nestedSettingsValue );
-
-							settingsValuesByDepth.set( depth, settingsAtDepth );
-						} else if (
-							candidateBlockNames.includes( propertyKey )
-						) {
-							findNestedSettings( propertyValue, depth + 1 );
-						}
-					}
-				};
-
-				const blockSettings = get(
+				const allBlockSettings = get(
 					settings,
 					'__experimentalFeatures.blocks',
 					{}
 				);
-				const candidateBlockSettings = pick(
-					blockSettings,
-					candidateBlockNames
-				);
-				findNestedSettings( candidateBlockSettings );
 
-				if ( settingsValuesByDepth.size > 0 ) {
-					const maxDepth = Math.max(
-						...settingsValuesByDepth.keys()
-					);
+				const relatedBlockSettings = pick(
+					allBlockSettings,
+					blockNamePath
+				);
+
+				const settingValuesByDepth = new Map();
+
+				getNestedSetting(
+					blockNamePath,
+					normalizedPath,
+					relatedBlockSettings,
+					settingValuesByDepth
+				);
+
+				if ( settingValuesByDepth.size > 0 ) {
+					const maxDepth = Math.max( ...settingValuesByDepth.keys() );
 					const settingsAtMaxDepth =
-						settingsValuesByDepth.get( maxDepth );
+						settingValuesByDepth.get( maxDepth );
 
 					// If multiple nested settings share the same depth, return the last defined one
-					result =
-						settingsAtMaxDepth[ settingsAtMaxDepth.length - 1 ];
+					return settingsAtMaxDepth[ settingsAtMaxDepth.length - 1 ];
 				}
 			}
 
