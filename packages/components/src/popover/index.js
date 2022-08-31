@@ -190,27 +190,27 @@ const Popover = (
 	}
 
 	if ( anchorRef !== undefined ) {
-		deprecated( '`anchorRef` prop in Popover component', {
-			since: '6.1',
-			version: '6.3',
-			alternative: '`anchor` prop',
-		} );
+		// deprecated( '`anchorRef` prop in Popover component', {
+		// 	since: '6.1',
+		// 	version: '6.3',
+		// 	alternative: '`anchor` prop',
+		// } );
 	}
 
 	if ( anchorRect !== undefined ) {
-		deprecated( '`anchorRect` prop in Popover component', {
-			since: '6.1',
-			version: '6.3',
-			alternative: '`anchor` prop',
-		} );
+		// deprecated( '`anchorRect` prop in Popover component', {
+		// 	since: '6.1',
+		// 	version: '6.3',
+		// 	alternative: '`anchor` prop',
+		// } );
 	}
 
 	if ( getAnchorRect !== undefined ) {
-		deprecated( '`getAnchorRect` prop in Popover component', {
-			since: '6.1',
-			version: '6.3',
-			alternative: '`anchor` prop',
-		} );
+		// deprecated( '`getAnchorRect` prop in Popover component', {
+		// 	since: '6.1',
+		// 	version: '6.3',
+		// 	alternative: '`anchor` prop',
+		// } );
 	}
 
 	const arrowRef = useRef( null );
