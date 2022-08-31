@@ -4,7 +4,6 @@
 import type { Context, ContextualField, OmitNevers } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
-import type { DefaultContextOf } from './index';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
@@ -76,5 +75,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type Type< C extends Context = DefaultContextOf< 'root', 'postType' > > =
-	OmitNevers< _BaseEntityRecords.Type< C > >;
+export type Type< C extends Context = 'edit' > = OmitNevers<
+	_BaseEntityRecords.Type< C >
+>;

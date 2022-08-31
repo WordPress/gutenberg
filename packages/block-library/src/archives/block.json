@@ -26,7 +26,11 @@
 	},
 	"supports": {
 		"align": true,
-		"html": false
+		"html": false,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
 	},
 	"editorStyle": "wp-block-archives-editor"
 }

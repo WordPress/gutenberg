@@ -189,7 +189,7 @@ _Parameters_
 -   _state_ `State`: Data state.
 -   _action_ `string`: Action to check. One of: 'create', 'read', 'update', 'delete'.
 -   _resource_ `string`: REST resource to check, e.g. 'media' or 'posts'.
--   _id_ `GenericRecordKey`: Optional ID of the rest resource to check.
+-   _id_ `EntityRecordKey`: Optional ID of the rest resource to check.
 
 _Returns_
 
@@ -207,9 +207,9 @@ Calling this may trigger an OPTIONS request to the REST API via the
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
--   _recordId_ `GenericRecordKey`: Record's id.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record's id.
 
 _Returns_
 
@@ -224,11 +224,11 @@ Returns all available authors.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _query_ `EntityQuery< any >`: Optional object of query parameters to include with request.
+-   _query_ `GetRecordsHttpQuery`: Optional object of query parameters to include with request.
 
 _Returns_
 
--   `User< 'edit' >[]`: Authors list.
+-   `ET.User[]`: Authors list.
 
 ### getAutosave
 
@@ -238,8 +238,8 @@ _Parameters_
 
 -   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `GenericRecordKey`: The id of the parent post.
--   _authorId_ `GenericRecordKey`: The id of the author.
+-   _postId_ `EntityRecordKey`: The id of the parent post.
+-   _authorId_ `EntityRecordKey`: The id of the author.
 
 _Returns_
 
@@ -256,7 +256,7 @@ _Parameters_
 
 -   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `GenericRecordKey`: The id of the parent post.
+-   _postId_ `EntityRecordKey`: The id of the parent post.
 
 _Returns_
 
@@ -308,7 +308,7 @@ _Parameters_
 
 _Returns_
 
--   `User< 'edit' >`: Current user object.
+-   `undefined< 'edit' >`: Current user object.
 
 ### getEditedEntityRecord
 
@@ -317,13 +317,13 @@ Returns the specified entity record, merged with its edits.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _recordId_ `KeyOf< K, N >`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
--   `EntityRecord | undefined`: The entity record, merged with its edits.
+-   `undefined< EntityRecord > | undefined`: The entity record, merged with its edits.
 
 ### getEmbedPreview
 
@@ -347,7 +347,7 @@ Returns the loaded entities for the given kind.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _kind_ `Kind`: Entity kind.
+-   _kind_ `string`: Entity kind.
 
 _Returns_
 
@@ -360,7 +360,7 @@ Returns the loaded entities for the given kind.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _kind_ `Kind`: Entity kind.
+-   _kind_ `string`: Entity kind.
 
 _Returns_
 
@@ -375,8 +375,8 @@ Returns the entity config given its kind and name.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
 
 _Returns_
 
@@ -389,8 +389,8 @@ Returns the entity config given its kind and name.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
 
 _Returns_
 
@@ -405,14 +405,14 @@ entity object if it exists and is received.
 _Parameters_
 
 -   _state_ `State`: State tree
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _key_ `KeyOf< R >`: Record's key
--   _query_ Optional query. If requesting specific fields, fields must always include the ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _key_ `EntityRecordKey`: Record's key
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID.
 
 _Returns_
 
--   Record.
+-   `EntityRecord | undefined`: Record.
 
 ### getEntityRecordEdits
 
@@ -421,9 +421,9 @@ Returns the specified entity record's edits.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _recordId_ `KeyOf< K, N >`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -440,9 +440,9 @@ They are defined in the entity's config.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _recordId_ `KeyOf< K, N >`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -455,13 +455,13 @@ Returns the Entity's records.
 _Parameters_
 
 -   _state_ `State`: State tree
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _query_ Optional terms query. If requesting specific fields, fields must always include the ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID.
 
 _Returns_
 
--   Records.
+-   `EntityRecord[] | null`: Records.
 
 ### getLastEntityDeleteError
 
@@ -470,9 +470,9 @@ Returns the specified entity record's last delete error.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
--   _recordId_ `GenericRecordKey`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -485,9 +485,9 @@ Returns the specified entity record's last save error.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
--   _recordId_ `GenericRecordKey`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -501,9 +501,9 @@ with its attributes mapped to their raw values.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _key_ `KeyOf< K, N >`: Record's key.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _key_ `EntityRecordKey`: Record's key.
 
 _Returns_
 
@@ -579,7 +579,7 @@ _Parameters_
 
 _Returns_
 
--   `User< 'edit' >[]`: Users list.
+-   `undefined< 'edit' >[]`: Users list.
 
 ### hasEditsForEntityRecord
 
@@ -589,9 +589,9 @@ and false otherwise.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _recordId_ `KeyOf< K, N >`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -605,9 +605,9 @@ or false otherwise.
 _Parameters_
 
 -   _state_ `State`: State tree
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _query_ `EntityQuery< C >`: Optional terms query.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query.
 
 _Returns_
 
@@ -621,7 +621,7 @@ _Parameters_
 
 -   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `GenericRecordKey`: The id of the parent post.
+-   _postId_ `EntityRecordKey`: The id of the parent post.
 
 _Returns_
 
@@ -660,9 +660,9 @@ Returns true if the specified entity record is autosaving, and false otherwise.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
--   _recordId_ `GenericRecordKey`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -675,9 +675,9 @@ Returns true if the specified entity record is deleting, and false otherwise.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
--   _recordId_ `GenericRecordKey`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -721,9 +721,9 @@ Returns true if the specified entity record is saving, and false otherwise.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _recordId_ `KeyOf< K, N >`: Record ID.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -765,8 +765,8 @@ application, the page and the resolution details will be retrieved from
 the store state using `getEntityRecord()`, or resolved if missing.
 
 ```js
-import { useState } from '@wordpress/data';
 import { useDispatch } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { TextControl } from '@wordpress/components';
 import { store as noticeStore } from '@wordpress/notices';
@@ -774,9 +774,15 @@ import { useEntityRecord } from '@wordpress/core-data';
 
 function PageRenameForm( { id } ) {
 	const page = useEntityRecord( 'postType', 'page', id );
-	const [ title, setTitle ] = useState( () => page.record.title.rendered );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticeStore );
+
+	const setTitle = useCallback(
+		( title ) => {
+			page.edit( { title } );
+		},
+		[ page.edit ]
+	);
 
 	if ( page.isResolving ) {
 		return 'Loading...';
@@ -784,7 +790,6 @@ function PageRenameForm( { id } ) {
 
 	async function onRename( event ) {
 		event.preventDefault();
-		page.edit( { title } );
 		try {
 			await page.save();
 			createSuccessNotice( __( 'Page renamed.' ), {
@@ -799,7 +804,7 @@ function PageRenameForm( { id } ) {
 		<form onSubmit={ onRename }>
 			<TextControl
 				label={ __( 'Name' ) }
-				value={ title }
+				value={ page.editedRecord.title }
 				onChange={ setTitle }
 			/>
 			<button type="submit">{ __( 'Save' ) }</button>
@@ -825,6 +830,10 @@ _Parameters_
 _Returns_
 
 -   `EntityRecordResolution< RecordType >`: Entity record data.
+
+_Changelog_
+
+`6.1.0` Introduced in WordPress core.
 
 ### useEntityRecords
 
@@ -869,6 +878,80 @@ _Parameters_
 _Returns_
 
 -   `EntityRecordsResolution< RecordType >`: Entity records data.
+
+_Changelog_
+
+`6.1.0` Introduced in WordPress core.
+
+### useResourcePermissions
+
+Resolves resource permissions.
+
+_Usage_
+
+```js
+import { useResourcePermissions } from '@wordpress/core-data';
+
+function PagesList() {
+	const { canCreate, isResolving } = useResourcePermissions( 'pages' );
+
+	if ( isResolving ) {
+		return 'Loading ...';
+	}
+
+	return (
+		<div>
+			{ canCreate ? <button>+ Create a new page</button> : false }
+			// ...
+		</div>
+	);
+}
+
+// Rendered in the application:
+// <PagesList />
+```
+
+```js
+import { useResourcePermissions } from '@wordpress/core-data';
+
+function Page( { pageId } ) {
+	const { canCreate, canUpdate, canDelete, isResolving } =
+		useResourcePermissions( 'pages', pageId );
+
+	if ( isResolving ) {
+		return 'Loading ...';
+	}
+
+	return (
+		<div>
+			{ canCreate ? <button>+ Create a new page</button> : false }
+			{ canUpdate ? <button>Edit page</button> : false }
+			{ canDelete ? <button>Delete page</button> : false }
+			// ...
+		</div>
+	);
+}
+
+// Rendered in the application:
+// <Page pageId={ 15 } />
+```
+
+In the above example, when `PagesList` is rendered into an
+application, the appropriate permissions and the resolution details will be retrieved from
+the store state using `canUser()`, or resolved if missing.
+
+_Parameters_
+
+-   _resource_ `string`: The resource in question, e.g. media.
+-   _id_ `IdType`: ID of a specific resource entry, if needed, e.g. 10.
+
+_Returns_
+
+-   `ResourcePermissionsResolution< IdType >`: Entity records data.
+
+_Changelog_
+
+`6.1.0` Introduced in WordPress core.
 
 <!-- END TOKEN(Autogenerated hooks|src/hooks/index.ts) -->
 

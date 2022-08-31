@@ -1,10 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`] = `
-<ColorPicker
-  color="#f00"
-  onChange={[Function]}
-/>
+<DropdownContentWrapperDiv
+  className="components-dropdown-content-wrapper"
+  data-wp-c16t={true}
+  data-wp-component="DropdownContentWrapper"
+  paddingSize="none"
+>
+  <LegacyAdapter
+    color="#f00"
+    onChange={[Function]}
+  />
+</DropdownContentWrapperDiv>
 `;
 
 exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] = `

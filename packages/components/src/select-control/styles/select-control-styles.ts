@@ -137,6 +137,9 @@ export const Select = styled.select< SelectProps >`
 		width: 100%;
 		max-width: none;
 		cursor: pointer;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
 
 		${ disabledStyles };
 		${ fontSizeStyles };

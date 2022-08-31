@@ -67,7 +67,7 @@ function gutenberg_block_type_metadata_view_script( $settings, $metadata ) {
 		! isset( $metadata['viewScript'] ) ||
 		! empty( $settings['view_script'] ) ||
 		! isset( $metadata['file'] ) ||
-		strpos( $metadata['file'], gutenberg_dir_path() ) !== 0
+		! str_starts_with( $metadata['file'], gutenberg_dir_path() )
 	) {
 		return $settings;
 	}
@@ -347,3 +347,48 @@ function gutenberg_build_query_vars_from_query_block( $block, $page ) {
 	 */
 	return apply_filters( 'query_loop_block_query_vars', $query, $block, $page );
 }
+
+/*
+ * Register render template for core blocks if handling is missing in WordPress core.
+ *
+ * @since 6.1.0
+ *
+ * @param array $settings Array of determined settings for registering a block type.
+ * @param array $metadata Metadata provided for registering a block type.
+ *
+ * @return array Array of settings for registering a block type.
+ */
+function gutenberg_block_type_metadata_render_template( $settings, $metadata ) {
+	if ( empty( $metadata['render'] ) || isset( $settings['render_callback'] ) ) {
+		return $settings;
+	}
+
+	$template_path = wp_normalize_path(
+		realpath(
+			dirname( $metadata['file'] ) . '/' .
+			remove_block_asset_path_prefix( $metadata['render'] )
+		)
+	);
+
+	// Bail if the file does not exist.
+	if ( ! file_exists( $template_path ) ) {
+		return $settings;
+	}
+	/**
+	 * Renders the block on the server.
+	 *
+	 * @param array    $attributes Block attributes.
+	 * @param string   $content    Block default content.
+	 * @param WP_Block $block      Block instance.
+	 *
+	 * @return string Returns the block content.
+	 */
+	$settings['render_callback'] = function( $attributes, $content, $block ) use ( $template_path ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		ob_start();
+		require $template_path;
+		return ob_get_clean();
+	};
+
+	return $settings;
+}
+add_filter( 'block_type_metadata_settings', 'gutenberg_block_type_metadata_render_template', 10, 2 );

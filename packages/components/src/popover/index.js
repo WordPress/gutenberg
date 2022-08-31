@@ -5,7 +5,7 @@
 import classnames from 'classnames';
 import {
 	useFloating,
-	flip,
+	flip as flipMiddleware,
 	shift,
 	autoUpdate,
 	arrow,
@@ -13,6 +13,8 @@ import {
 	limitShift,
 	size,
 } from '@floating-ui/react-dom';
+// eslint-disable-next-line no-restricted-imports
+import { motion, useReducedMotion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -24,6 +26,7 @@ import {
 	createContext,
 	useContext,
 	useMemo,
+	useEffect,
 } from '@wordpress/element';
 import {
 	useViewportMatch,
@@ -40,7 +43,11 @@ import { Path, SVG } from '@wordpress/primitives';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
-import { getAnimateClassName } from '../animate';
+import {
+	getFrameOffset,
+	positionToPlacement,
+	placementToMotionAnimationProps,
+} from './utils';
 
 /**
  * Name of slot in which popover should fill.
@@ -73,50 +80,48 @@ const ArrowTriangle = ( props ) => (
 	</SVG>
 );
 
+const MaybeAnimatedWrapper = forwardRef(
+	(
+		{
+			style: receivedInlineStyles,
+			placement,
+			shouldAnimate = false,
+			...props
+		},
+		forwardedRef
+	) => {
+		const shouldReduceMotion = useReducedMotion();
+
+		const { style: motionInlineStyles, ...otherMotionProps } = useMemo(
+			() => placementToMotionAnimationProps( placement ),
+			[ placement ]
+		);
+
+		if ( shouldAnimate && ! shouldReduceMotion ) {
+			return (
+				<motion.div
+					style={ {
+						...motionInlineStyles,
+						...receivedInlineStyles,
+					} }
+					{ ...otherMotionProps }
+					{ ...props }
+					ref={ forwardedRef }
+				/>
+			);
+		}
+
+		return (
+			<div
+				style={ receivedInlineStyles }
+				{ ...props }
+				ref={ forwardedRef }
+			/>
+		);
+	}
+);
+
 const slotNameContext = createContext();
-
-const positionToPlacement = ( position ) => {
-	const [ x, y, z ] = position.split( ' ' );
-
-	if ( [ 'top', 'bottom' ].includes( x ) ) {
-		let suffix = '';
-		if ( ( !! z && z === 'left' ) || y === 'right' ) {
-			suffix = '-start';
-		} else if ( ( !! z && z === 'right' ) || y === 'left' ) {
-			suffix = '-end';
-		}
-		return x + suffix;
-	}
-
-	return y;
-};
-
-const placementToAnimationOrigin = ( placement ) => {
-	const [ a, b ] = placement.split( '-' );
-
-	let x, y;
-	if ( a === 'top' || a === 'bottom' ) {
-		x = a === 'top' ? 'bottom' : 'top';
-		y = 'middle';
-		if ( b === 'start' ) {
-			y = 'left';
-		} else if ( b === 'end' ) {
-			y = 'right';
-		}
-	}
-
-	if ( a === 'left' || a === 'right' ) {
-		x = 'center';
-		y = a === 'left' ? 'right' : 'left';
-		if ( b === 'start' ) {
-			x = 'top';
-		} else if ( b === 'end' ) {
-			x = 'bottom';
-		}
-	}
-
-	return x + ' ' + y;
-};
 
 const Popover = (
 	{
@@ -130,7 +135,7 @@ const Popover = (
 		isAlternate,
 		position,
 		placement: placementProp = 'bottom-start',
-		offset,
+		offset: offsetProp = 0,
 		focusOnMount = 'firstElement',
 		anchorRef,
 		anchorRect,
@@ -138,9 +143,10 @@ const Popover = (
 		expandOnMobile,
 		onFocusOutside,
 		__unstableSlotName = SLOT_NAME,
-		__unstableObserveElement,
-		__unstableForcePosition = false,
+		flip = true,
+		resize = true,
 		__unstableShift = false,
+		__unstableForcePosition,
 		...contentProps
 	},
 	forwardedRef
@@ -150,6 +156,19 @@ const Popover = (
 			since: '6.1',
 			version: '6.3',
 		} );
+	}
+
+	if ( __unstableForcePosition !== undefined ) {
+		deprecated( '__unstableForcePosition prop in Popover component', {
+			since: '6.1',
+			version: '6.3',
+			alternative: '`flip={ false }` and  `resize={ false }`',
+		} );
+
+		// Back-compat, set the `flip` and `resize` props
+		// to `false` to replicate `__unstableForcePosition`.
+		flip = ! __unstableForcePosition;
+		resize = ! __unstableForcePosition;
 	}
 
 	const arrowRef = useRef( null );
@@ -162,7 +181,7 @@ const Popover = (
 		? positionToPlacement( position )
 		: placementProp;
 
-	const ownerDocument = useMemo( () => {
+	const referenceOwnerDocument = useMemo( () => {
 		let documentToReturn;
 
 		if ( anchorRef?.top ) {
@@ -191,45 +210,46 @@ const Popover = (
 	 * Store the offset in a ref, due to constraints with floating-ui:
 	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
 	 */
-	const frameOffset = useRef();
+	const frameOffsetRef = useRef( getFrameOffset( referenceOwnerDocument ) );
+	/**
+	 * Store the offset prop in a ref, due to constraints with floating-ui:
+	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
+	 */
+	const offsetRef = useRef( offsetProp );
 
 	const middleware = [
-		frameOffset.current || offset
-			? offsetMiddleware( ( { placement: currentPlacement } ) => {
-					if ( ! frameOffset.current ) {
-						return offset;
-					}
+		offsetMiddleware( ( { placement: currentPlacement } ) => {
+			if ( ! frameOffsetRef.current ) {
+				return offsetRef.current;
+			}
 
-					const isTopBottomPlacement =
-						currentPlacement.includes( 'top' ) ||
-						currentPlacement.includes( 'bottom' );
+			const isTopBottomPlacement =
+				currentPlacement.includes( 'top' ) ||
+				currentPlacement.includes( 'bottom' );
 
-					// The main axis should represent the gap between the
-					// floating element and the reference element. The cross
-					// axis is always perpendicular to the main axis.
-					const mainAxis = isTopBottomPlacement ? 'y' : 'x';
-					const crossAxis = mainAxis === 'x' ? 'y' : 'x';
+			// The main axis should represent the gap between the
+			// floating element and the reference element. The cross
+			// axis is always perpendicular to the main axis.
+			const mainAxis = isTopBottomPlacement ? 'y' : 'x';
+			const crossAxis = mainAxis === 'x' ? 'y' : 'x';
 
-					// When the popover is before the reference, subtract the offset,
-					// of the main axis else add it.
-					const hasBeforePlacement =
-						currentPlacement.includes( 'top' ) ||
-						currentPlacement.includes( 'left' );
-					const mainAxisModifier = hasBeforePlacement ? -1 : 1;
-					const normalizedOffset = offset ? offset : 0;
+			// When the popover is before the reference, subtract the offset,
+			// of the main axis else add it.
+			const hasBeforePlacement =
+				currentPlacement.includes( 'top' ) ||
+				currentPlacement.includes( 'left' );
+			const mainAxisModifier = hasBeforePlacement ? -1 : 1;
 
-					return {
-						mainAxis:
-							normalizedOffset +
-							frameOffset.current[ mainAxis ] * mainAxisModifier,
-						crossAxis: frameOffset.current[ crossAxis ],
-					};
-			  } )
-			: undefined,
-		__unstableForcePosition ? undefined : flip(),
-		__unstableForcePosition
-			? undefined
-			: size( {
+			return {
+				mainAxis:
+					offsetRef.current +
+					frameOffsetRef.current[ mainAxis ] * mainAxisModifier,
+				crossAxis: frameOffsetRef.current[ crossAxis ],
+			};
+		} ),
+		flip ? flipMiddleware() : undefined,
+		resize
+			? size( {
 					apply( sizeProps ) {
 						const { availableHeight } = sizeProps;
 						if ( ! refs.floating.current ) return;
@@ -239,7 +259,8 @@ const Popover = (
 							overflow: 'auto',
 						} );
 					},
-			  } ),
+			  } )
+			: undefined,
 		__unstableShift
 			? shift( {
 					crossAxis: true,
@@ -288,6 +309,11 @@ const Popover = (
 		placement: computedPlacement,
 		middlewareData: { arrow: arrowData = {} },
 	} = useFloating( { placement: normalizedPlacementFromProps, middleware } );
+
+	useEffect( () => {
+		offsetRef.current = offsetProp;
+		update();
+	}, [ offsetProp, update ] );
 
 	// Update the `reference`'s ref.
 	//
@@ -362,62 +388,44 @@ const Popover = (
 		return autoUpdate(
 			resultingReferenceRef,
 			refs.floating.current,
-			update
+			update,
+			{
+				animationFrame: true,
+			}
 		);
-	}, [ anchorRef, anchorRect, getAnchorRect ] );
-
-	// This is only needed for a smooth transition when moving blocks.
-	useLayoutEffect( () => {
-		if ( ! __unstableObserveElement ) {
-			return;
-		}
-		const observer = new window.MutationObserver( update );
-		observer.observe( __unstableObserveElement, { attributes: true } );
-
-		return () => {
-			observer.disconnect();
-		};
-	}, [ __unstableObserveElement ] );
+		// 'reference' and 'refs.floating' are refs and don't need to be listed
+		// as dependencies (see https://github.com/WordPress/gutenberg/pull/41612)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ anchorRef, anchorRect, getAnchorRect, update ] );
 
 	// If the reference element is in a different ownerDocument (e.g. iFrame),
 	// we need to manually update the floating's position as the reference's owner
 	// document scrolls. Also update the frame offset if the view resizes.
 	useLayoutEffect( () => {
-		if ( ownerDocument === document ) {
+		const referenceAndFloatingHaveSameDocument =
+			referenceOwnerDocument === document;
+		const hasFrameElement =
+			!! referenceOwnerDocument?.defaultView?.frameElement;
+
+		if ( referenceAndFloatingHaveSameDocument || ! hasFrameElement ) {
+			frameOffsetRef.current = undefined;
 			return;
 		}
 
-		const { defaultView } = ownerDocument;
-		const { frameElement } = defaultView;
+		const { defaultView } = referenceOwnerDocument;
 
-		ownerDocument.addEventListener( 'scroll', update );
+		const updateFrameOffset = () => {
+			frameOffsetRef.current = getFrameOffset( referenceOwnerDocument );
+			update();
+		};
+		defaultView.addEventListener( 'resize', updateFrameOffset );
 
-		let updateFrameOffset;
-		if ( frameElement ) {
-			updateFrameOffset = () => {
-				const iframeRect = frameElement.getBoundingClientRect();
-				frameOffset.current = { x: iframeRect.left, y: iframeRect.top };
-			};
-			updateFrameOffset();
-			defaultView.addEventListener( 'resize', updateFrameOffset );
-		}
+		updateFrameOffset();
 
 		return () => {
-			ownerDocument.removeEventListener( 'scroll', update );
-
-			if ( updateFrameOffset ) {
-				defaultView.removeEventListener( 'resize', updateFrameOffset );
-			}
+			defaultView.removeEventListener( 'resize', updateFrameOffset );
 		};
-	}, [ ownerDocument ] );
-
-	/** @type {false | string} */
-	const animateClassName =
-		!! animate &&
-		getAnimateClassName( {
-			type: 'appear',
-			origin: placementToAnimationOrigin( computedPlacement ),
-		} );
+	}, [ referenceOwnerDocument, update ] );
 
 	const mergedFloatingRef = useMergeRefs( [
 		floating,
@@ -431,16 +439,13 @@ const Popover = (
 	let content = (
 		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div
-			className={ classnames(
-				'components-popover',
-				className,
-				animateClassName,
-				{
-					'is-expanded': isExpanded,
-					'is-alternate': isAlternate,
-				}
-			) }
+		<MaybeAnimatedWrapper
+			shouldAnimate={ animate && ! isExpanded }
+			placement={ computedPlacement }
+			className={ classnames( 'components-popover', className, {
+				'is-expanded': isExpanded,
+				'is-alternate': isAlternate,
+			} ) }
 			{ ...contentProps }
 			ref={ mergedFloatingRef }
 			{ ...dialogProps }
@@ -489,7 +494,7 @@ const Popover = (
 					<ArrowTriangle />
 				</div>
 			) }
-		</div>
+		</MaybeAnimatedWrapper>
 	);
 
 	if ( slot.ref ) {

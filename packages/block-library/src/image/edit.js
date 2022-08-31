@@ -2,13 +2,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, has, isEmpty, omit, pick } from 'lodash';
+import { get, isEmpty, omit, pick } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { withNotices } from '@wordpress/components';
+import { withNotices, Placeholder } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import {
 	BlockAlignmentControl,
@@ -27,6 +27,23 @@ import { image as icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import Image from './image';
+
+// Much of this description is duplicated from MediaPlaceholder.
+const placeholder = ( content ) => {
+	return (
+		<Placeholder
+			className="block-editor-media-placeholder"
+			withIllustration={ true }
+			icon={ icon }
+			label={ __( 'Image' ) }
+			instructions={ __(
+				'Upload an image file, pick one from your media library, or add one with a URL.'
+			) }
+		>
+			{ content }
+		</Placeholder>
+	);
+};
 
 /**
  * Module constants
@@ -81,8 +98,8 @@ export const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
  */
 function hasDefaultSize( image, defaultSize ) {
 	return (
-		has( image, [ 'sizes', defaultSize, 'url' ] ) ||
-		has( image, [ 'media_details', 'sizes', defaultSize, 'source_url' ] )
+		'url' in ( image?.sizes?.[ defaultSize ] ?? {} ) ||
+		'source_url' in ( image?.media_details?.sizes?.[ defaultSize ] ?? {} )
 	);
 }
 
@@ -344,6 +361,7 @@ export function ImageEdit( {
 				onSelectURL={ onSelectURL }
 				notices={ noticeUI }
 				onError={ onUploadError }
+				placeholder={ placeholder }
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { id, src } }

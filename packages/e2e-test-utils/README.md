@@ -175,6 +175,14 @@ _Parameters_
 -   _object.excerpt_ `[string]`: Excerpt of the new post.
 -   _object.showWelcomeGuide_ `[boolean]`: Whether to show the welcome guide.
 
+### createNewTemplate
+
+Opens the template editor with a newly created template.
+
+_Parameters_
+
+-   _name_ `string`: Name of the template.
+
 ### createReusableBlock
 
 Creates a simple reusable block with a paragraph block.

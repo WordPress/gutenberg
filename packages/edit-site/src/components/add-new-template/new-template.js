@@ -28,7 +28,7 @@ import {
 	tag,
 	layout as customGenericTemplateIcon,
 } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -41,6 +41,7 @@ import {
 	useTaxonomiesMenuItems,
 	usePostTypeMenuItems,
 	useAuthorMenuItem,
+	usePostTypeArchiveMenuItems,
 } from './utils';
 import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
 import { useHistory } from '../routes';
@@ -88,7 +89,8 @@ export default function NewTemplate( { postType } ) {
 
 	const history = useHistory();
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const { createErrorNotice } = useDispatch( noticesStore );
+	const { createErrorNotice, createSuccessNotice } =
+		useDispatch( noticesStore );
 	const { setTemplate } = useDispatch( editSiteStore );
 
 	async function createTemplate( template, isWPSuggestion = true ) {
@@ -130,8 +132,16 @@ export default function NewTemplate( { postType } ) {
 				postId: newTemplate.id,
 				postType: newTemplate.type,
 			} );
-
-			// TODO: Add a success notice?
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: Title of the created template e.g: "Category".
+					__( '"%s" successfully created.' ),
+					title
+				),
+				{
+					type: 'snackbar',
+				}
+			);
 		} catch ( error ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
@@ -292,6 +302,7 @@ function useMissingTemplates(
 	} );
 	const missingTemplates = [
 		...enhancedMissingDefaultTemplateTypes,
+		...usePostTypeArchiveMenuItems(),
 		...postTypesMenuItems,
 		...taxonomiesMenuItems,
 	];

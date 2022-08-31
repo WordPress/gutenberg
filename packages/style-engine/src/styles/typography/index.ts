@@ -40,6 +40,18 @@ const fontWeight = {
 	},
 };
 
+const fontFamily = {
+	name: 'fontFamily',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'fontFamily' ],
+			'fontFamily'
+		);
+	},
+};
+
 const letterSpacing = {
 	name: 'letterSpacing',
 	generate: ( style: Style, options: StyleOptions ) => {
@@ -89,6 +101,7 @@ const textTransform = {
 };
 
 export default [
+	fontFamily,
 	fontSize,
 	fontStyle,
 	fontWeight,
