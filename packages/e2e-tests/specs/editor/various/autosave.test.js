@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	clearSessionStorage,
 	clickBlockAppender,
 	createNewPost,
 	getEditedPostContent,
@@ -35,10 +36,6 @@ async function sleep( durationInSeconds ) {
 	// of waiting for a given amount of time.
 	// eslint-disable-next-line no-restricted-syntax
 	await page.waitForTimeout( durationInSeconds * 1000 );
-}
-
-async function clearSessionStorage() {
-	await page.evaluate( () => window.sessionStorage.clear() );
 }
 
 async function readSessionStorageAutosave( postId ) {

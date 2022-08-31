@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
+import { clearSessionStorage } from '@wordpress/e2e-test-utils';
 
 /**
  * Internal dependencies
@@ -25,6 +26,8 @@ export async function createNewPost( {
 	excerpt,
 	showWelcomeGuide = false,
 } = {} ) {
+	await clearSessionStorage();
+
 	const query = addQueryArgs( '', {
 		post_type: postType,
 		post_title: title,
