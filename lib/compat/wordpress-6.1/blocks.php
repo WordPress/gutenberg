@@ -348,7 +348,7 @@ function gutenberg_build_query_vars_from_query_block( $block, $page ) {
 	return apply_filters( 'query_loop_block_query_vars', $query, $block, $page );
 }
 
-/*
+/**
  * Register render template for core blocks if handling is missing in WordPress core.
  *
  * @since 6.1.0
