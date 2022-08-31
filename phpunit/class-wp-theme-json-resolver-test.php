@@ -48,6 +48,103 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		return $query;
 	}
 
+	function test_theme_with_nested_block_settings() {
+		switch_theme( 'nested-block-theme' );
+
+		$actual_settings   = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_settings();
+		$expected_settings = array(
+			'color'      => array(
+				'custom'         => false,
+				'customGradient' => true,
+				'palette'        => array(
+					'theme' => array(
+						array(
+							'slug'  => 'light',
+							'name'  => 'Light',
+							'color' => '#f5f7f9',
+						),
+						array(
+							'slug'  => 'dark',
+							'name'  => 'Dark',
+							'color' => '#000',
+						),
+					),
+				),
+			),
+			'typography' => array(
+				'customFontSize' => true,
+				'lineHeight'     => false,
+			),
+			'spacing'    => array(
+				'units'   => false,
+				'padding' => false,
+			),
+			'blocks'     => array(
+				'core/paragraph'  => array(
+					'color' => array(
+						'palette' => array(
+							'theme' => array(
+								array(
+									'slug'  => 'light',
+									'name'  => 'Light',
+									'color' => '#f5f7f9',
+								),
+							),
+						),
+					),
+				),
+				'core/post-title'  => array(
+					'color' => array(
+						'palette' => array(
+							'theme' => array(
+								array(
+									'slug'  => 'light',
+									'name'  => 'Light',
+									'color' => '#f5f7f9',
+								),
+							),
+						),
+					),
+					'core/paragraph' => array(
+						'color' => array(
+							'palette' => array(
+								'theme' => array(
+									array(
+										'slug'  => 'dark',
+										'name'  => 'Dark',
+										'color' => '#000',
+									),
+								),
+							),
+						),
+						'core/image' => array(
+							'color' => array(
+								'palette' => array(
+									'theme' => array(
+										array(
+											'slug'  => 'light',
+											'name'  => 'Light',
+											'color' => '#f5f7f9',
+										),
+									),
+								),
+							),
+						)
+					),
+				),
+			),
+		);
+
+		self::recursive_ksort( $actual_settings );
+		self::recursive_ksort( $expected_settings );
+
+		// Should merge settings.
+		$this->assertSame(
+			$expected_settings,
+			$actual_settings
+		);
+	}
+
 	function test_translations_are_applied() {
 		add_filter( 'locale', array( $this, 'filter_set_locale_to_polish' ) );
 		load_textdomain( 'block-theme', realpath( __DIR__ . '/data/languages/themes/block-theme-pl_PL.mo' ) );
