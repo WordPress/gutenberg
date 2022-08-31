@@ -948,6 +948,14 @@ export function __unstableIsSelectionCollapsed( state ) {
 	);
 }
 
+export function __unstableSelectionHasUnmergeableBlock( state ) {
+	return getSelectedBlockClientIds( state ).some( ( clientId ) => {
+		const blockName = getBlockName( state, clientId );
+		const blockType = getBlockType( blockName );
+		return ! blockType.merge;
+	} );
+}
+
 /**
  * Check whether the selection is mergeable.
  *
@@ -1009,19 +1017,19 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 		? selectionStart.clientId
 		: selectionEnd.clientId;
 
-	const targetBlock = getBlock( state, targetBlockClientId );
-	const targetBlockType = getBlockType( targetBlock.name );
+	const targetBlockName = getBlockName( state, targetBlockClientId );
+	const targetBlockType = getBlockType( targetBlockName );
 
 	if ( ! targetBlockType.merge ) return false;
 
 	const blockToMerge = getBlock( state, blockToMergeClientId );
 
 	// It's mergeable if the blocks are of the same type.
-	if ( blockToMerge.name === targetBlock.name ) return true;
+	if ( blockToMerge.name === targetBlockName ) return true;
 
 	// If the blocks are of a different type, try to transform the block being
 	// merged into the same type of block.
-	const blocksToMerge = switchToBlockType( blockToMerge, targetBlock.name );
+	const blocksToMerge = switchToBlockType( blockToMerge, targetBlockName );
 
 	return blocksToMerge && blocksToMerge.length;
 }

@@ -3,19 +3,19 @@
  */
 import type * as React from 'react';
 
-/**
- * Based on https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/types.ts
- *
- * The `children` prop is being explicitely omitted since it is otherwise implicitly added
- * by `ComponentPropsWithRef`. The context is that components should require the `children`
- * prop explicitely when needed (see https://github.com/WordPress/gutenberg/pull/31817).
- */
+// Based on https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/types.ts
 export type WordPressComponentProps<
+	/** Prop types. */
 	P,
+	/** The HTML element to inherit props from. */
 	T extends React.ElementType,
+	/** Supports polymorphism through the `as` prop. */
 	IsPolymorphic extends boolean = true
 > = P &
-	Omit< React.ComponentPropsWithRef< T >, 'as' | keyof P | 'children' > &
+	// The `children` prop is being explicitly omitted since it is otherwise implicitly added
+	// by `ComponentPropsWithRef`. The context is that components should require the `children`
+	// prop explicitely when needed (see https://github.com/WordPress/gutenberg/pull/31817).
+	Omit< React.ComponentPropsWithoutRef< T >, 'as' | keyof P | 'children' > &
 	( IsPolymorphic extends true
 		? {
 				/** The HTML element or React component to render the component as. */
@@ -47,7 +47,13 @@ export type WordPressComponent<
 	selector: `.${ string }`;
 };
 
-export type WordPressComponentFromProps< Props > =
-	Props extends WordPressComponentProps< infer P, infer T, infer I >
-		? WordPressComponent< T, P, I >
-		: never;
+export type WordPressComponentFromProps<
+	Props,
+	ForwardsRef extends boolean = true
+> = Props extends WordPressComponentProps< infer P, infer T, infer I >
+	? WordPressComponent<
+			T,
+			P & ( ForwardsRef extends true ? React.RefAttributes< any > : {} ),
+			I
+	  >
+	: never;
