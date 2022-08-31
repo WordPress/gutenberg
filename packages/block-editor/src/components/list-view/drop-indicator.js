@@ -68,40 +68,41 @@ export default function ListViewDropIndicator( {
 		};
 	}, [ getDropIndicatorIndent, targetElement ] );
 
-	const getAnchorRect = useCallback( () => {
-		if ( ! targetElement ) {
-			return {};
+	const popoverAnchor = useMemo( () => {
+		const isValidDropPosition =
+			dropPosition === 'top' ||
+			dropPosition === 'bottom' ||
+			dropPosition === 'inside';
+		if ( ! targetElement || ! isValidDropPosition ) {
+			return undefined;
 		}
 
-		const ownerDocument = targetElement.ownerDocument;
-		const rect = targetElement.getBoundingClientRect();
-		const indent = getDropIndicatorIndent();
+		return {
+			ownerDocument: targetElement.ownerDocument,
+			getBoundingClientRect() {
+				const rect = targetElement.getBoundingClientRect();
+				const indent = getDropIndicatorIndent();
 
-		const anchorRect = {
-			left: rect.left + indent,
-			right: rect.right,
-			width: 0,
-			height: 0,
-			ownerDocument,
+				const left = rect.left + indent;
+				const right = rect.right;
+				let top = 0;
+				let bottom = 0;
+
+				if ( dropPosition === 'top' ) {
+					top = rect.top;
+					bottom = rect.top;
+				} else {
+					// `dropPosition` is either `bottom` or `inside`
+					top = rect.bottom;
+					bottom = rect.bottom;
+				}
+
+				const width = right - left;
+				const height = bottom - top;
+
+				return new window.DOMRect( left, top, width, height );
+			},
 		};
-
-		if ( dropPosition === 'top' ) {
-			return {
-				...anchorRect,
-				top: rect.top,
-				bottom: rect.top,
-			};
-		}
-
-		if ( dropPosition === 'bottom' || dropPosition === 'inside' ) {
-			return {
-				...anchorRect,
-				top: rect.bottom,
-				bottom: rect.bottom,
-			};
-		}
-
-		return {};
 	}, [ targetElement, dropPosition, getDropIndicatorIndent ] );
 
 	if ( ! targetElement ) {
@@ -111,7 +112,7 @@ export default function ListViewDropIndicator( {
 	return (
 		<Popover
 			animate={ false }
-			getAnchorRect={ getAnchorRect }
+			anchor={ popoverAnchor }
 			focusOnMount={ false }
 			className="block-editor-list-view-drop-indicator"
 		>
