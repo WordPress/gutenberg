@@ -27,9 +27,7 @@ import {
 	__experimentalRichText as RichText,
 	__unstableCreateElement,
 	isEmpty,
-	__unstableIsEmptyLine as isEmptyLine,
 	insert,
-	__unstableInsertLineSeparator as insertLineSeparator,
 	create,
 	replace,
 	split,
@@ -345,32 +343,20 @@ function RichTextWrapper(
 				}
 			}
 
-			if ( multiline ) {
-				if ( shiftKey ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( value, '\n' ) );
-					}
-				} else if ( canSplit && isEmptyLine( value ) ) {
-					splitValue( value );
-				} else {
-					onChange( insertLineSeparator( value ) );
-				}
-			} else {
-				const { text, start: splitStart, end: splitEnd } = value;
-				const canSplitAtEnd =
-					onSplitAtEnd &&
-					splitStart === splitEnd &&
-					splitEnd === text.length;
+			const { text, start: splitStart, end: splitEnd } = value;
+			const canSplitAtEnd =
+				onSplitAtEnd &&
+				splitStart === splitEnd &&
+				splitEnd === text.length;
 
-				if ( shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( value, '\n' ) );
-					}
-				} else if ( ! canSplit && canSplitAtEnd ) {
-					onSplitAtEnd();
-				} else if ( canSplit ) {
-					splitValue( value );
+			if ( shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
+				if ( ! disableLineBreaks ) {
+					onChange( insert( value, '\n' ) );
 				}
+			} else if ( ! canSplit && canSplitAtEnd ) {
+				onSplitAtEnd();
+			} else if ( canSplit ) {
+				splitValue( value );
 			}
 		},
 		[
