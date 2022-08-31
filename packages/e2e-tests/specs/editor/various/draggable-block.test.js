@@ -27,7 +27,7 @@ describe( 'Draggable block', () => {
 	} );
 
 	beforeEach( async () => {
-		await page.evaluate( () => window.sessionStorage.clear() );
+		// await page.evaluate( () => window.sessionStorage.clear() );
 		await createNewPost();
 	} );
 
