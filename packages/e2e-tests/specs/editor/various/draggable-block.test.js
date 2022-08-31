@@ -7,15 +7,14 @@ import {
 	deactivatePlugin,
 	activatePlugin,
 	showBlockToolbar,
-	setBrowserViewport,
 	waitForWindowDimensions,
 	clickBlockAppender,
 } from '@wordpress/e2e-test-utils';
 
-describe.skip( 'Draggable block', () => {
+describe( 'Draggable block', () => {
 	// Tests don't seem to pass if beforeAll and afterAll are used.
 	// Unsure why.
-	beforeEach( async () => {
+	beforeAll( async () => {
 		await deactivatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
@@ -24,15 +23,16 @@ describe.skip( 'Draggable block', () => {
 		// Scrolling can interfere with the drag coordinates.
 		await page.setViewport( { width: 960, height: 1024 } );
 		await waitForWindowDimensions( 960, 1024 );
-		await createNewPost();
 		await page.setDragInterception( true );
 	} );
 
-	afterEach( async () => {
-		await page.setDragInterception( false );
+	beforeEach( async () => {
+		await page.evaluate( () => window.sessionStorage.clear() );
+		await createNewPost();
+	} );
 
-		// Reset the viewport to normal large size.
-		await setBrowserViewport( 'large' );
+	afterAll( async () => {
+		await page.setDragInterception( false );
 		await activatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
