@@ -89,7 +89,7 @@ function BlockPopoverInbetween( {
 				? previousElement.offsetHeight
 				: nextElement.offsetHeight,
 		};
-	}, [ previousElement, nextElement, isVertical ] );
+	}, [ previousElement, nextElement, isVisible, isVertical ] );
 
 	const popoverAnchor = useMemo( () => {
 		if ( ( ! previousElement && ! nextElement ) || ! isVisible ) {
@@ -137,7 +137,7 @@ function BlockPopoverInbetween( {
 				return new window.DOMRect( left, top, 0, 0 );
 			},
 		};
-	}, [ previousElement, nextElement, isVisible ] );
+	}, [ previousElement, nextElement, isVisible, isVertical ] );
 
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
 
