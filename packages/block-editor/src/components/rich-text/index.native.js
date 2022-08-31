@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -746,7 +745,8 @@ ForwardedRichTextContainer.Content = ( {
 	const content = <RawHTML>{ value }</RawHTML>;
 
 	if ( Tag ) {
-		return <Tag { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
+		const { format, ...restProps } = props;
+		return <Tag { ...restProps }>{ content }</Tag>;
 	}
 
 	return content;
