@@ -84,17 +84,8 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 			}
 		}
 
-		$schema_styles_blocks   = array();
-		$schema_settings_blocks = array();
+		$schema_styles_blocks = array();
 		foreach ( $valid_block_names as $block ) {
-			$schema_settings_blocks[ $block ] = static::VALID_SETTINGS;
-			foreach ( $valid_block_names as $sub_block ) {
-				if ( $block === $sub_block ) {
-					continue;
-				} else {
-					$schema_settings_blocks[ $block ][ $sub_block ] = static::VALID_SETTINGS;
-				}
-			}
 			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 		}
@@ -103,7 +94,6 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 		$schema['styles']['blocks']   = $schema_styles_blocks;
 		$schema['styles']['elements'] = $schema_styles_elements;
 		$schema['settings']           = static::VALID_SETTINGS;
-		$schema['settings']['blocks'] = $schema_settings_blocks;
 
 		// Remove anything that's not present in the schema.
 		foreach ( array( 'styles', 'settings' ) as $subtree ) {
@@ -116,7 +106,13 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 				continue;
 			}
 
+			// Clean up everything save for the blocks.
 			$result = static::remove_keys_not_in_schema( $input[ $subtree ], $schema[ $subtree ] );
+
+			// Now back in the blocks.
+			if ( 'settings' === $subtree && isset( $input[ $subtree ]['blocks'] ) ) {
+				$result['blocks'] = static::sanitize_blocks( $input[ $subtree ]['blocks'], $valid_block_names, $schema[ $subtree ] );
+			}
 
 			if ( empty( $result ) ) {
 				unset( $output[ $subtree ] );
@@ -126,6 +122,31 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 		}
 
 		return $output;
+	}
+
+	/**
+	 * Sanitize the blocks section that can be found in settings and styles. This ensures
+	 * nested blocks are supported through recursion.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @param array $current_block              The current block to break down.
+	 * @param array $valid_block_names          List of valid block names.
+	 * @param array $schema                     Valid schema that is allowed for this block.
+	 * @param array $result                     The sanitized version of the block.
+	 * @return array The sanitized blocks output
+	 */
+	protected static function sanitize_blocks( $current_block, $valid_block_names, $schema, $result = array() ) {
+		foreach ( $current_block as $block_name => $block ) {
+			if ( in_array( $block_name, $valid_block_names, true ) ) {
+				$base_result = static::remove_keys_not_in_schema( $block, $schema );
+				$sub_result  = static::sanitize_blocks( $block, $valid_block_names, $schema );
+
+				$result[ $block_name ] = array_merge( $base_result, $sub_result );
+			}
+		}
+
+		return $result;
 	}
 
 	/**
@@ -165,28 +186,61 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 			return $nodes;
 		}
 
-		foreach ( $theme_json['settings']['blocks'] as $name => $node ) {
-			$selector = null;
-			if ( isset( $selectors[ $name ]['selector'] ) ) {
-				$selector = $selectors[ $name ]['selector'];
-			}
+		$valid_block_names = array_keys( static::get_blocks_metadata() );
 
-			$nodes[] = array(
-				'path'     => array( 'settings', 'blocks', $name ),
-				'selector' => $selector,
-			);
+		$nodes = static::get_settings_of_blocks( $selectors, null, array(), $theme_json['settings']['blocks'], $valid_block_names, $nodes );
 
-			// Check if any blocks are nested inside.
-			foreach ( $node as $sub_node_name => $sub_node ) {
-				if ( str_contains( $sub_node_name, '/' ) ) {
-					$nodes[] = array(
-						'path'     => array( 'settings', 'blocks', $name, $sub_node_name ),
-						'selector' => null,
-					);
+		return $nodes;
+	}
+
+	/**
+	 * Builds the metadata for the blocks present in the settings node, by taking into account nested blocks.
+	 * This returns in the form of:
+	 *
+	 *     [
+	 *       [
+	 *         'path'     => ['path', 'to', 'some', 'node' ],
+	 *         'selector' => 'CSS selector for some node'
+	 *       ],
+	 *       [
+	 *         'path'     => [ 'path', 'to', 'other', 'node' ],
+	 *         'selector' => 'CSS selector for other node'
+	 *       ],
+	 *     ]
+	 *
+	 * @since 6.1.0
+	 *
+	 * @param array $selectors         List of selectors per block.
+	 * @param array $current_selector  The current selector of the current block.
+	 * @param array $current_path      The current path to the block.
+	 * @param array $current_block     The current block to break down.
+	 * @param array $valid_block_names List of valid block names.
+	 * @param array $nodes             The metadata of the nodes that have been built so far.
+	 * @return array
+	 */
+	protected static function get_settings_of_blocks( $selectors, $current_selector, $current_path, $current_block, $valid_block_names, $nodes = array() ) {
+		foreach ( $current_block as $block_name => $block ) {
+			// It's not necessary to validate as the blocks have already been validated, but this is cleaner to do in order to catch a nested block.
+			if ( in_array( $block_name, $valid_block_names, true ) ) {
+
+				$selector = is_null( $current_selector ) ? null : $current_selector;
+				if ( isset( $selectors[ $block_name ]['selector'] ) ) {
+					$selector = $selector . ' ' . $selectors[ $block_name ]['selector'];
 				}
+
+				$path = empty( $current_path ) ? array( 'settings', 'blocks' ) : $current_path;
+				array_push( $path, $block_name );
+
+				$nodes[] = array(
+					'path'     => $path,
+					'selector' => $selector,
+				);
+
+				$nodes = static::get_settings_of_blocks( $selectors, $selector, $path, $block, $valid_block_names, $nodes );
 			}
 		}
 
 		return $nodes;
 	}
+
 }
