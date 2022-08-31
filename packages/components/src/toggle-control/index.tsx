@@ -16,12 +16,11 @@ import FormToggle from '../form-toggle';
 import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 import type { ToggleControlProps } from './types';
-import { contextConnect } from '../ui/context';
 import { HStack } from '../h-stack';
 import { useCx } from '../utils';
 import { space } from '../ui/utils/space';
 
-function UnconnectedToggleControl( {
+export function ToggleControl( {
 	__nextHasNoMarginBottom,
 	label,
 	checked,
@@ -74,10 +73,5 @@ function UnconnectedToggleControl( {
 		</BaseControl>
 	);
 }
-
-export const ToggleControl = contextConnect(
-	UnconnectedToggleControl,
-	'ToggleControl'
-);
 
 export default ToggleControl;
