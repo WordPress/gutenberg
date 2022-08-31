@@ -613,7 +613,7 @@ trait WP_Webfonts_Tests_Datasets {
 					'registered'       => $mock_fonts,
 					'enqueued'         => array( 'font2' ),
 				),
-				'expected_done'   => array( 'font2-200-900-normal', 'font2-200-900-italic' ),
+				'expected_done'   => array( 'font2', 'font2-200-900-normal', 'font2-200-900-italic' ),
 				'expected_output' => sprintf(
 					'<mock id="wp-webfonts-mock" attr="some-attr">%s; %s</mock>\n',
 					$font_faces['font2-200-900-normal'],
@@ -627,7 +627,17 @@ trait WP_Webfonts_Tests_Datasets {
 					'registered'       => $mock_fonts,
 					'enqueued'         => array( 'font1', 'font2', 'font3' ),
 				),
-				'expected_done'   => $mock_font_handles,
+				'expected_done'   => array(
+					'font1',
+					'font1-300-normal',
+					'font1-300-italic',
+					'font1-900-normal',
+					'font2',
+					'font2-200-900-normal',
+					'font2-200-900-italic',
+					'font3',
+					'font3-bold-normal',
+				),
 				'expected_output' => sprintf(
 					'<mock id="wp-webfonts-mock" attr="some-attr">%s; %s; %s; %s; %s; %s</mock>\n',
 					$font_faces['font1-300-normal'],
@@ -645,7 +655,7 @@ trait WP_Webfonts_Tests_Datasets {
 					'registered'       => $local_fonts,
 					'enqueued'         => array( 'merriweather' ),
 				),
-				'expected_done'   => array( 'merriweather-200-900-normal' ),
+				'expected_done'   => array( 'merriweather', 'merriweather-200-900-normal' ),
 				'expected_output' => sprintf(
 					"<style id='wp-webfonts-local' type='text/css'>\n%s\n</style>\n",
 					$font_faces['merriweather-200-900-normal']
@@ -658,7 +668,7 @@ trait WP_Webfonts_Tests_Datasets {
 					'registered'       => $local_fonts,
 					'enqueued'         => array( 'Source Serif Pro' ),
 				),
-				'expected_done'   => array( 'Source Serif Pro-300-normal', 'Source Serif Pro-900-italic' ),
+				'expected_done'   => array( 'Source Serif Pro', 'Source Serif Pro-300-normal', 'Source Serif Pro-900-italic' ),
 				'expected_output' => sprintf(
 					"<style id='wp-webfonts-local' type='text/css'>\n%s%s\n</style>\n",
 					$font_faces['Source Serif Pro-300-normal'],
@@ -670,9 +680,15 @@ trait WP_Webfonts_Tests_Datasets {
 					'provider'         => array( 'local' => $providers['local'] ),
 					'provider_handles' => array( 'local' => $local_font_handles ),
 					'registered'       => $local_fonts,
-					'enqueued'         => $local_font_handles,
+					'enqueued'         => array( 'merriweather', 'Source Serif Pro' ),
 				),
-				'expected_done'   => array( 'merriweather-200-900-normal', 'Source Serif Pro-300-normal', 'Source Serif Pro-900-italic' ),
+				'expected_done'   => array(
+					'merriweather',
+					'merriweather-200-900-normal',
+					'Source Serif Pro',
+					'Source Serif Pro-300-normal',
+					'Source Serif Pro-900-italic',
+				),
 				'expected_output' => sprintf(
 					"<style id='wp-webfonts-local' type='text/css'>\n%s%s%s\n</style>\n",
 					$font_faces['merriweather-200-900-normal'],
@@ -685,7 +701,7 @@ trait WP_Webfonts_Tests_Datasets {
 
 			'print font1 when all providers registered' => array(
 				'setup'           => array_merge( $setup_all, array( 'enqueued' => array( 'font1' ) ) ),
-				'expected_done'   => array( 'font1-300-normal', 'font1-300-italic', 'font1-900-normal' ),
+				'expected_done'   => array( 'font1', 'font1-300-normal', 'font1-300-italic', 'font1-900-normal' ),
 				'expected_output' => sprintf(
 					'<mock id="wp-webfonts-mock" attr="some-attr">%s; %s; %s</mock>\n',
 					$font_faces['font1-300-normal'],
@@ -695,7 +711,17 @@ trait WP_Webfonts_Tests_Datasets {
 			),
 			'print all mock fonts when all providers registered' => array(
 				'setup'           => array_merge( $setup_all, array( 'enqueued' => array( 'font1', 'font2', 'font3' ) ) ),
-				'expected_done'   => $mock_font_handles,
+				'expected_done'   => array(
+					'font1',
+					'font1-300-normal',
+					'font1-300-italic',
+					'font1-900-normal',
+					'font2',
+					'font2-200-900-normal',
+					'font2-200-900-italic',
+					'font3',
+					'font3-bold-normal',
+				),
 				'expected_output' => sprintf(
 					'<mock id="wp-webfonts-mock" attr="some-attr">%s; %s; %s; %s; %s; %s</mock>\n',
 					$font_faces['font1-300-normal'],
@@ -708,15 +734,21 @@ trait WP_Webfonts_Tests_Datasets {
 			),
 			'print merriweather when all providers registered' => array(
 				'setup'           => array_merge( $setup_all, array( 'enqueued' => array( 'merriweather' ) ) ),
-				'expected_done'   => array( 'merriweather-200-900-normal' ),
+				'expected_done'   => array( 'merriweather', 'merriweather-200-900-normal' ),
 				'expected_output' => sprintf(
 					"<style id='wp-webfonts-local' type='text/css'>\n%s\n</style>\n",
 					$font_faces['merriweather-200-900-normal']
 				),
 			),
 			'print all local fonts when all providers registered' => array(
-				'setup'           => array_merge( $setup_all, array( 'enqueued' => $local_font_handles ) ),
-				'expected_done'   => array( 'merriweather-200-900-normal', 'Source Serif Pro-300-normal', 'Source Serif Pro-900-italic' ),
+				'setup'           => array_merge( $setup_all, array( 'enqueued' => array( 'merriweather', 'Source Serif Pro' ) ) ),
+				'expected_done'   => array(
+					'merriweather',
+					'merriweather-200-900-normal',
+					'Source Serif Pro',
+					'Source Serif Pro-300-normal',
+					'Source Serif Pro-900-italic',
+				),
 				'expected_output' => sprintf(
 					"<style id='wp-webfonts-local' type='text/css'>\n%s%s%s\n</style>\n",
 					$font_faces['merriweather-200-900-normal'],

@@ -44,8 +44,7 @@ if ( ! function_exists( 'wp_register_font_family' ) ) {
 			return null;
 		}
 
-		$result = wp_webfonts()->add( $handle, false ) ? $handle : null;
-		return $result ? $handle : null;
+		return wp_webfonts()->add_font_family( $handle ) ? $handle : null;
 	}
 }
 

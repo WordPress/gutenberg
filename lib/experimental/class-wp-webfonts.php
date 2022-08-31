@@ -121,6 +121,26 @@ class WP_Webfonts extends WP_Dependencies {
 	 *
 	 * @since X.X.X
 	 *
+	 * @param string $font_family_handle The font family to register.
+	 * @return bool True when registered, else false.
+	 */
+	public function add_font_family( $font_family_handle ) {
+		if ( isset( $this->registered[ $font_family_handle ] ) ) {
+			return true;
+		}
+
+		$registered = $this->add( $font_family_handle, false );
+		if ( ! $registered ) {
+			return false;
+		}
+		return $this->add_data( $font_family_handle, 'is_font_family', true );
+	}
+
+	/**
+	 * Removes a font family and all registered variations.
+	 *
+	 * @since X.X.X
+	 *
 	 * @param string $font_family_handle The font family to remove.
 	 */
 	public function remove_font_family( $font_family_handle ) {
@@ -162,7 +182,7 @@ class WP_Webfonts extends WP_Dependencies {
 
 		// Register the font family when it does not yet exist.
 		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
-			if ( ! $this->add( $font_family_handle, false ) ) {
+			if ( ! $this->add_font_family( $font_family_handle ) ) {
 				return null;
 			}
 		}
@@ -198,6 +218,7 @@ class WP_Webfonts extends WP_Dependencies {
 		}
 
 		$this->add_data( $variation_handle, 'font-properties', $variation );
+		$this->add_data( $variation_handle, 'is_font_family', false );
 
 		// Add the font variation as a dependency to the registered font family.
 		$this->add_dependency( $font_family_handle, $variation_handle );
@@ -395,6 +416,8 @@ class WP_Webfonts extends WP_Dependencies {
 			$this->do_item( $provider_id, $group );
 		}
 
+		$this->process_font_families_after_printing( $handles );
+
 		return $this->done;
 	}
 
@@ -549,12 +572,71 @@ class WP_Webfonts extends WP_Dependencies {
 	 */
 	private function update_queues_for_printed_fonts( array $font_handles ) {
 		foreach ( $font_handles as $font_handle ) {
-			$this->done[] = $font_handle;
-			unset(
-				$this->to_do[ $this->to_do_keyed_handles[ $font_handle ] ],
-				$this->to_do_keyed_handles[ $font_handle ]
-			);
+			$this->set_as_done( $font_handle );
+			$this->remove_from_to_do_queues( $font_handle );
 		}
+	}
+
+	/**
+	 * Processes the font families after printing the variations.
+	 *
+	 * For each queued font family:
+	 *
+	 * a. if any of their variations were printed, the font family is added to the `done` list.
+	 * b. removes each from the to_do queues.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param array $handles Handles to process.
+	 */
+	private function process_font_families_after_printing( array $handles ) {
+		foreach ( $handles as $handle ) {
+			if (
+				! $this->get_data( $handle, 'is_font_family' ) ||
+				! isset( $this->to_do_keyed_handles[ $handle ] )
+			) {
+				continue;
+			}
+			$font_family = $this->registered[ $handle ];
+
+			// Add the font family to `done` list if any of its variations were printed.
+			if ( ! empty( $font_family->deps ) ) {
+				$processed = array_intersect( $font_family->deps, $this->done );
+				if ( ! empty( $processed ) ) {
+					$this->set_as_done( $handle );
+				}
+			}
+
+			$this->remove_from_to_do_queues( $handle );
+		}
+	}
+
+	/**
+	 * Removes the handle from the `to_do` and `to_do_keyed_handles` lists.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param string $handle Handle to remove.
+	 */
+	private function remove_from_to_do_queues( $handle ) {
+		unset(
+			$this->to_do[ $this->to_do_keyed_handles[ $handle ] ],
+			$this->to_do_keyed_handles[ $handle ]
+		);
+	}
+
+	/**
+	 * Sets the given handle to done by adding it to the `done` list.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param string $handle Handle to set as done.
+	 */
+	private function set_as_done( $handle ) {
+		if ( ! is_array( $this->done ) ) {
+			$this->done = array();
+		}
+		$this->done[] = $handle;
 	}
 
 	/**

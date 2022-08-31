@@ -151,9 +151,11 @@ abstract class WP_Webfonts_TestCase extends WP_UnitTestCase {
 	protected function setup_registration_mocks( array $inputs, WP_Webfonts $wp_webfonts ) {
 		$mocks = array();
 
-		$build_mock = function ( $handle ) use ( &$mocks, $wp_webfonts ) {
-			$mock       = new stdClass();
-			$mock->deps = array();
+		$build_mock = function ( $handle, $is_font_family = false ) use ( &$mocks, $wp_webfonts ) {
+			$mock        = new stdClass();
+			$mock->deps  = array();
+			$mock->extra = array( 'is_font_family' => $is_font_family );
+
 			// Add to each queue.
 			$mocks[ $handle ]                   = $mock;
 			$wp_webfonts->registered[ $handle ] = $mock;
@@ -162,15 +164,15 @@ abstract class WP_Webfonts_TestCase extends WP_UnitTestCase {
 		};
 
 		foreach ( $inputs as $font_family => $variations ) {
-			$font_mock = $build_mock( $font_family );
+			$font_mock = $build_mock( $font_family, true );
 
 			foreach ( $variations as $variation_handle => $variation ) {
 				if ( ! is_string( $variation_handle ) ) {
 					$variation_handle = $variation;
 				}
-				$variation_mock        = $build_mock( $variation_handle );
-				$variation_mock->extra = array( 'font-properties' => $variation );
-				$font_mock->deps[]     = $variation_handle;
+				$variation_mock                           = $build_mock( $variation_handle );
+				$variation_mock->extra['font-properties'] = $variation;
+				$font_mock->deps[]                        = $variation_handle;
 			}
 		}
 
@@ -189,7 +191,7 @@ abstract class WP_Webfonts_TestCase extends WP_UnitTestCase {
 			$wp_webfonts = wp_webfonts();
 		}
 
-		$wp_webfonts->add( $font_family, false );
+		$wp_webfonts->add_font_family( $font_family );
 
 		foreach ( $variations as $variation_handle => $variation ) {
 			if ( ! is_string( $variation_handle ) ) {

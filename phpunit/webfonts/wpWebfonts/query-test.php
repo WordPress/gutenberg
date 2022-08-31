@@ -86,6 +86,7 @@ class Tests_Webfonts_WpWebfonts_Query extends WP_Webfonts_TestCase {
 		return array(
 			'DM Sans' => array( 'DM Sans' ),
 			'roboto'  => array( 'roboto' ),
+			'my-font' => array( 'my-font' ),
 		);
 	}
 
@@ -99,12 +100,51 @@ class Tests_Webfonts_WpWebfonts_Query extends WP_Webfonts_TestCase {
 			'lato'             => array( 'lato' ),
 			'merriweather'     => array( 'merriweather' ),
 			'Source Serif Pro' => array( 'Source Serif Pro' ),
-			'my-font'          => array( 'my-font' ),
+		);
+	}
+
+	public function test_done_query_should_fail_when_no_variations() {
+		$this->wp_webfonts->register_provider( 'local', WP_Webfonts_Provider_Local::class );
+		$this->setup_registry();
+		$this->wp_webfonts->enqueue( 'lato' );
+
+		$this->wp_webfonts->do_items( 'lato' );
+
+		$this->assertFalse( $this->wp_webfonts->query( 'lato', 'done' ) );
+	}
+
+	/**
+	 * @dataProvider data_done_query
+	 *
+	 * @param string $query_handle Handle to test.
+	 */
+	public function test_done_query_should_succeed_when_registered_and_enqueued( $query_handle ) {
+		$this->wp_webfonts->register_provider( 'local', WP_Webfonts_Provider_Local::class );
+		$this->setup_registry();
+		$this->wp_webfonts->enqueue( $query_handle );
+
+		// Process the web fonts while ignoring all the printed output.
+		$this->expectOutputRegex( '`.`' );
+		$this->wp_webfonts->do_items( $query_handle );
+		$this->getActualOutput();
+
+		$this->assertTrue( $this->wp_webfonts->query( $query_handle, 'done' ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_done_query() {
+		return array(
+			'merriweather'     => array( 'merriweather' ),
+			'Source Serif Pro' => array( 'Source Serif Pro' ),
 		);
 	}
 
 	private function setup_registry() {
-		foreach ( $this->get_data_registry() as $handle => $variations ) {
+		foreach ( $this->get_registered_local_fonts() as $handle => $variations ) {
 			$this->setup_register( $handle, $variations, $this->wp_webfonts );
 		}
 	}

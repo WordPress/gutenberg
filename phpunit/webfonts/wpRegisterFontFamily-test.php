@@ -23,12 +23,11 @@ class Tests_Webfonts_WpRegisterFontFamily extends WP_Webfonts_TestCase {
 	 * @param string $expected_handle Expected registered handle.
 	 */
 	public function test_unit_register( $font_family, $expected_handle ) {
-		$mock = $this->set_up_mock( 'add' );
+		$mock = $this->set_up_mock( 'add_font_family' );
 		$mock->expects( $this->once() )
-			->method( 'add' )
+			->method( 'add_font_family' )
 			->with(
-				$this->identicalTo( $expected_handle ),
-				$this->identicalTo( false )
+				$this->identicalTo( $expected_handle )
 			)
 			->will( $this->returnValue( $expected_handle ) );
 
@@ -80,8 +79,8 @@ class Tests_Webfonts_WpRegisterFontFamily extends WP_Webfonts_TestCase {
 	 * @param string $invalid_input Invalid input to test.
 	 */
 	public function test_unit_register_fails( $invalid_input ) {
-		$mock = $this->set_up_mock( 'add' );
-		$mock->expects( $this->never() )->method( 'add' );
+		$mock = $this->set_up_mock( 'add_font_family' );
+		$mock->expects( $this->never() )->method( 'add_font_family' );
 
 		$this->assertNull( wp_register_font_family( $invalid_input ), 'Registering an invalid input should return null' );
 	}
@@ -127,7 +126,7 @@ class Tests_Webfonts_WpRegisterFontFamily extends WP_Webfonts_TestCase {
 		wp_register_font_family( $font_family );
 
 		// Attempt to re-register it.
-		$this->assertNull( wp_register_font_family( $font_family ), 'Font family should return true after registering' );
+		$this->assertSame( $expected_handle, wp_register_font_family( $font_family ), 'Font family handle should be returned after registering' );
 		$this->assertSame( array( $expected_handle ), $this->get_registered_handles(), 'The font family should only be registered once' );
 	}
 }

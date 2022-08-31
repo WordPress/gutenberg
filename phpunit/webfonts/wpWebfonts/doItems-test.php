@@ -113,7 +113,7 @@ class Tests_Webfonts_WpWebfonts_DoItems extends WP_Webfonts_TestCase {
 
 	/**
 	 * Integration test that registers providers and fonts and then enqueues before
-	 * testing the printing funtionality.
+	 * testing the printing functionality.
 	 *
 	 * @dataProvider data_print_enqueued
 	 *
@@ -122,19 +122,9 @@ class Tests_Webfonts_WpWebfonts_DoItems extends WP_Webfonts_TestCase {
 	 * @param string $expected_output Expected printed output.
 	 */
 	public function test_should_print_enqueued( $setup, $expected_done, $expected_output ) {
-		// Set up test.
-		foreach ( $setup['provider'] as $provider ) {
-			$this->wp_webfonts->register_provider( $provider['id'], $provider['class'] );
-		}
-		foreach ( $setup['registered'] as $font_family => $variations ) {
-			$this->wp_webfonts->add( $font_family, false );
-			foreach ( $variations as $variation_handle => $variation ) {
-				$this->wp_webfonts->add_variation( $font_family, $variation, $variation_handle );
-			}
-		}
-		$this->wp_webfonts->enqueue( $setup['enqueued'] );
+		$this->setup_integrated_deps( $setup );
 
-		$this->expectOutputString( $expected_output );
+		$this->expectOutputString( $expected_output, 'Printed @font-face styles should match' );
 		$actual_done = $this->wp_webfonts->do_items();
 		$this->assertSameSets( $expected_done, $actual_done, 'Printed handles should match' );
 	}
@@ -150,17 +140,8 @@ class Tests_Webfonts_WpWebfonts_DoItems extends WP_Webfonts_TestCase {
 	 * @param string $expected_output Expected printed output.
 	 */
 	public function test_should_print_handles_when_not_enqueued( $setup, $expected_done, $expected_output ) {
-		// Set up test.
-		foreach ( $setup['provider'] as $provider ) {
-			$this->wp_webfonts->register_provider( $provider['id'], $provider['class'] );
-		}
-		foreach ( $setup['registered'] as $font_family => $variations ) {
-			$this->wp_webfonts->add( $font_family, false );
-			foreach ( $variations as $variation_handle => $variation ) {
-				$this->wp_webfonts->add_variation( $font_family, $variation, $variation_handle );
-			}
-		}
-		// Do not enqueue. Instead pass the handles to WP_Webfonts::do_items().
+		$this->setup_integrated_deps( $setup, false );
+		// Do not enqueue. Instead, pass the handles to WP_Webfonts::do_items().
 		$handles = $setup['enqueued'];
 		$this->assertEmpty( $this->wp_webfonts->queue, 'No fonts should be enqueued' );
 
@@ -170,7 +151,7 @@ class Tests_Webfonts_WpWebfonts_DoItems extends WP_Webfonts_TestCase {
 	}
 
 	/**
-	 * Sets up the dependencies for the test.
+	 * Sets up the dependencies for the mocked test.
 	 *
 	 * @param array $setup Dependencies to set up.
 	 */
@@ -198,6 +179,25 @@ class Tests_Webfonts_WpWebfonts_DoItems extends WP_Webfonts_TestCase {
 		if ( ! empty( $setup['enqueued'] ) ) {
 			$queue = $this->get_reflection_property( 'queue' );
 			$queue->setValue( $this->wp_webfonts, $setup['enqueued'] );
+		}
+	}
+
+	/**
+	 * Sets up the dependencies for integration test.
+	 *
+	 * @param array $setup   Dependencies to set up.
+	 * @param bool  $enqueue Whether to enqueue. Default true.
+	 */
+	private function setup_integrated_deps( array $setup, $enqueue = true ) {
+		foreach ( $setup['provider'] as $provider ) {
+			$this->wp_webfonts->register_provider( $provider['id'], $provider['class'] );
+		}
+		foreach ( $setup['registered'] as $handle => $variations ) {
+			$this->setup_register( $handle, $variations, $this->wp_webfonts );
+		}
+
+		if ( $enqueue ) {
+			$this->wp_webfonts->enqueue( $setup['enqueued'] );
 		}
 	}
 }
