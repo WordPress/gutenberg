@@ -12,7 +12,7 @@ import {
 	clickBlockAppender,
 } from '@wordpress/e2e-test-utils';
 
-describe.skip( 'Draggable block', () => {
+describe( 'Draggable block', () => {
 	// Tests don't seem to pass if beforeAll and afterAll are used.
 	// Unsure why.
 	beforeEach( async () => {
