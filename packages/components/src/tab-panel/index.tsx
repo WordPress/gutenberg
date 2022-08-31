@@ -16,8 +16,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { NavigableMenu } from '../navigable-container';
 import Button from '../button';
 import type { TabButtonProps, TabPanelProps } from './types';
-import { contextConnect, WordPressComponentProps } from '../ui/context';
-import type { ForwardedRef } from 'react';
+import type { WordPressComponentProps } from '../ui/context';
 
 const TabButton = ( {
 	tabId,
@@ -38,18 +37,51 @@ const TabButton = ( {
 	</Button>
 );
 
-function UnconnectedTabPanel(
-	{
-		className,
-		children,
-		tabs,
-		initialTabName,
-		orientation = 'horizontal',
-		activeClass = 'is-active',
-		onSelect,
-	}: WordPressComponentProps< TabPanelProps, 'div', false >,
-	forwardedRef: ForwardedRef< any >
-) {
+/**
+ * TabPanel is an ARIA-compliant tabpanel.
+ *
+ * TabPanels organize content across different screens, data sets, and interactions.
+ * It has two sections: a list of tabs, and the view to show when tabs are chosen.
+ *
+ * ```jsx
+ * import { TabPanel } from '@wordpress/components';
+ *
+ * const onSelect = ( tabName ) => {
+ *   console.log( 'Selecting tab', tabName );
+ * };
+ *
+ * const MyTabPanel = () => (
+ *   <TabPanel
+ *     className="my-tab-panel"
+ *     activeClass="active-tab"
+ *     onSelect={ onSelect }
+ *     tabs={ [
+ *       {
+ *         name: 'tab1',
+ *         title: 'Tab 1',
+ *         className: 'tab-one',
+ *       },
+ *       {
+ *         name: 'tab2',
+ *         title: 'Tab 2',
+ *         className: 'tab-two',
+ *       },
+ *     ] }
+ *   >
+ *     { ( tab ) => <p>{ tab.title }</p> }
+ *   </TabPanel>
+ * );
+ * ```
+ */
+export function TabPanel( {
+	className,
+	children,
+	tabs,
+	initialTabName,
+	orientation = 'horizontal',
+	activeClass = 'is-active',
+	onSelect,
+}: WordPressComponentProps< TabPanelProps, 'div', false > ) {
 	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
 	const [ selected, setSelected ] = useState< string >();
 
@@ -77,7 +109,6 @@ function UnconnectedTabPanel(
 	return (
 		<div className={ className }>
 			<NavigableMenu
-				ref={ forwardedRef }
 				role="tablist"
 				orientation={ orientation }
 				onNavigate={ onNavigate }
@@ -116,43 +147,5 @@ function UnconnectedTabPanel(
 		</div>
 	);
 }
-
-/**
- * TabPanel is an ARIA-compliant tabpanel.
- *
- * TabPanels organize content across different screens, data sets, and interactions.
- * It has two sections: a list of tabs, and the view to show when tabs are chosen.
- *
- * ```jsx
- * import { TabPanel } from '@wordpress/components';
- *
- * const onSelect = ( tabName ) => {
- *   console.log( 'Selecting tab', tabName );
- * };
- *
- * const MyTabPanel = () => (
- *   <TabPanel
- *     className="my-tab-panel"
- *     activeClass="active-tab"
- *     onSelect={ onSelect }
- *     tabs={ [
- *       {
- *         name: 'tab1',
- *         title: 'Tab 1',
- *         className: 'tab-one',
- *       },
- *       {
- *         name: 'tab2',
- *         title: 'Tab 2',
- *         className: 'tab-two',
- *       },
- *     ] }
- *   >
- *     { ( tab ) => <p>{ tab.title }</p> }
- *   </TabPanel>
- * );
- * ```
- */
-export const TabPanel = contextConnect( UnconnectedTabPanel, 'TabPanel' );
 
 export default TabPanel;
