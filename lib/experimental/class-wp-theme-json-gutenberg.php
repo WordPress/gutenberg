@@ -188,7 +188,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 
 		$valid_block_names = array_keys( static::get_blocks_metadata() );
 
-		$nodes = static::get_settings_of_blocks( $selectors, null, array(), $theme_json['settings']['blocks'], $valid_block_names );
+		$nodes = static::get_settings_of_blocks( $selectors, null, array(), $theme_json['settings']['blocks'], $valid_block_names, $nodes );
 
 		return $nodes;
 	}
