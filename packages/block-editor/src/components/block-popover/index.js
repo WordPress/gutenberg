@@ -57,7 +57,7 @@ function BlockPopover(
 				// Get the biggest rectangle that encompasses completely the currently
 				// selected element and the last selected element:
 				// - for top/left coordinates, use the smaller numbers
-				// - for the bottom/right coordinates, use the larget numbers
+				// - for the bottom/right coordinates, use the largest numbers
 				const left = Math.min( selectedBCR.left, lastSelectedBCR.left );
 				const top = Math.min( selectedBCR.top, lastSelectedBCR.top );
 				const right = Math.max(
