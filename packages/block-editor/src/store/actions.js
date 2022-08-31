@@ -1673,3 +1673,17 @@ export function setBlockVisibility( updates ) {
 		updates,
 	};
 }
+
+/**
+ * Action that sets whether a block is being temporaritly edited as blocks.
+ *
+ * @param {?string} temporarilyEditingAsBlocks The block's clientId being temporaritly edited as blocks.
+ */
+export function __unstableSetTemporarilyEditingAsBlocks(
+	temporarilyEditingAsBlocks
+) {
+	return {
+		type: 'SET_TEMPORARILY_EDITING_AS_BLOCKS',
+		temporarilyEditingAsBlocks,
+	};
+}
