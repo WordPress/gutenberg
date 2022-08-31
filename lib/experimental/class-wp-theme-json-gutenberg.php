@@ -34,6 +34,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$valid_block_names` and `$valid_element_name` parameters.
+	 * @since 6.1.0 Added support for nested block settings
 	 *
 	 * @param array $input               Structure to sanitize.
 	 * @param array $valid_block_names   List of valid block names.
@@ -164,6 +165,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 	 *     ]
 	 *
 	 * @since 5.8.0
+	 * @since 6.1.0 Added support for nested block settings
 	 *
 	 * @param array $theme_json The tree to extract setting nodes from.
 	 * @param array $selectors  List of selectors per block.
@@ -188,9 +190,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 
 		$valid_block_names = array_keys( static::get_blocks_metadata() );
 
-		$nodes = static::get_settings_of_blocks( $selectors, null, array(), $theme_json['settings']['blocks'], $valid_block_names, $nodes );
-
-		return $nodes;
+		return static::get_settings_of_blocks( $selectors, $valid_block_names, $nodes, null, $theme_json['settings']['blocks'] );
 	}
 
 	/**
@@ -211,14 +211,14 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 	 * @since 6.1.0
 	 *
 	 * @param array $selectors         List of selectors per block.
-	 * @param array $current_selector  The current selector of the current block.
-	 * @param array $current_path      The current path to the block.
-	 * @param array $current_block     The current block to break down.
 	 * @param array $valid_block_names List of valid block names.
 	 * @param array $nodes             The metadata of the nodes that have been built so far.
+	 * @param array $current_selector  The current selector of the current block.
+	 * @param array $current_block     The current block to break down.
+	 * @param array $current_path      The current path to the block.
 	 * @return array
 	 */
-	protected static function get_settings_of_blocks( $selectors, $current_selector, $current_path, $current_block, $valid_block_names, $nodes = array() ) {
+	protected static function get_settings_of_blocks( $selectors, $valid_block_names, $nodes, $current_selector, $current_block, $current_path = array() ) {
 		foreach ( $current_block as $block_name => $block ) {
 			// It's not necessary to validate as the blocks have already been validated, but this is cleaner to do in order to catch a nested block.
 			if ( in_array( $block_name, $valid_block_names, true ) ) {
@@ -236,7 +236,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 					'selector' => $selector,
 				);
 
-				$nodes = static::get_settings_of_blocks( $selectors, $selector, $path, $block, $valid_block_names, $nodes );
+				$nodes = static::get_settings_of_blocks( $selectors, $valid_block_names, $nodes, $selector, $block, $path );
 			}
 		}
 
