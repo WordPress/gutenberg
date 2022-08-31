@@ -190,7 +190,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 
 		$valid_block_names = array_keys( static::get_blocks_metadata() );
 
-		return static::get_settings_of_blocks( $selectors, $valid_block_names, $nodes, null, $theme_json['settings']['blocks'] );
+		return static::get_settings_of_blocks( $selectors, $valid_block_names, $nodes, $theme_json['settings']['blocks'] );
 	}
 
 	/**
@@ -213,12 +213,12 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 	 * @param array $selectors         List of selectors per block.
 	 * @param array $valid_block_names List of valid block names.
 	 * @param array $nodes             The metadata of the nodes that have been built so far.
-	 * @param array $current_selector  The current selector of the current block.
 	 * @param array $current_block     The current block to break down.
+	 * @param array $current_selector  The current selector of the current block.
 	 * @param array $current_path      The current path to the block.
 	 * @return array
 	 */
-	protected static function get_settings_of_blocks( $selectors, $valid_block_names, $nodes, $current_selector, $current_block, $current_path = array() ) {
+	protected static function get_settings_of_blocks( $selectors, $valid_block_names, $nodes, $current_block, $current_selector = null, $current_path = array() ) {
 		foreach ( $current_block as $block_name => $block ) {
 			// It's not necessary to validate as the blocks have already been validated, but this is cleaner to do in order to catch a nested block.
 			if ( in_array( $block_name, $valid_block_names, true ) ) {
@@ -236,7 +236,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 					'selector' => $selector,
 				);
 
-				$nodes = static::get_settings_of_blocks( $selectors, $valid_block_names, $nodes, $selector, $block, $path );
+				$nodes = static::get_settings_of_blocks( $selectors, $valid_block_names, $nodes, $block, $selector, $path );
 			}
 		}
 

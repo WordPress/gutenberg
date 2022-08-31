@@ -80,7 +80,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'padding' => false,
 			),
 			'blocks'     => array(
-				'core/paragraph'  => array(
+				'core/paragraph' => array(
 					'color' => array(
 						'palette' => array(
 							'theme' => array(
@@ -93,8 +93,8 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'core/post-title'  => array(
-					'color' => array(
+				'core/columns'   => array(
+					'color'           => array(
 						'palette' => array(
 							'theme' => array(
 								array(
@@ -105,8 +105,8 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 					),
-					'core/paragraph' => array(
-						'color' => array(
+					'core/media-text' => array(
+						'color'          => array(
 							'palette' => array(
 								'theme' => array(
 									array(
@@ -117,7 +117,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 								),
 							),
 						),
-						'core/image' => array(
+						'core/paragraph' => array(
 							'color' => array(
 								'palette' => array(
 									'theme' => array(
@@ -129,7 +129,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 									),
 								),
 							),
-						)
+						),
 					),
 				),
 			),

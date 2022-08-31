@@ -17,7 +17,7 @@
 			"custom": false
 		},
 		"blocks": {
-			"core/post-title": {
+			"core/columns": {
 				"color": {
 					"palette": [
 						{
@@ -27,7 +27,7 @@
 						}
 					]
 				},
-				"core/paragraph": {
+				"core/media-text": {
 					"color": {
 						"palette": [
 							{
@@ -37,7 +37,7 @@
 							}
 						]
 					},
-					"core/image": {
+					"core/paragraph": {
 						"color": {
 							"palette": [
 								{
