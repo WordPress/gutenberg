@@ -188,48 +188,59 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 
 		$valid_block_names = array_keys( static::get_blocks_metadata() );
 
-		foreach ( $theme_json['settings']['blocks'] as $name => $node ) {
-			$selector = null;
-			if ( isset( $selectors[ $name ]['selector'] ) ) {
-				$selector = $selectors[ $name ]['selector'];
-			}
+		$nodes = static::get_settings_of_blocks( $selectors, null, array(), $theme_json['settings']['blocks'], $valid_block_names );
 
-			$nodes[] = array(
-				'path'     => array( 'settings', 'blocks', $name ),
-				'selector' => $selector,
-			);
+		return $nodes;
+	}
 
-			$flag              = true;
-			$node_to_examine   = $node;
-			$previous_selector = $selector;
-			$previous_path     = array( 'settings', 'blocks', $name );
+	/**
+	 * Builds the metadata for the blocks present in the settings node, by taking into account nested blocks.
+	 * This returns in the form of:
+	 *å
+	 *     [
+	 *       [
+	 *         'path'     => ['path', 'to', 'some', 'node' ],
+	 *         'selector' => 'CSS selector for some node'
+	 *       ],
+	 *       [
+	 *         'path'     => [ 'path', 'to', 'other', 'node' ],
+	 *         'selector' => 'CSS selector for other node'
+	 *       ],
+	 *     ]
+	 *å
+	 * @since 6.1.0
+	 *å
+	 * @param array $selectors         List of selectors per block.
+	 * @param array $current_selector  The current selector of the current block.
+	 * @param array $current_path      The current path to the block.
+	 * @param array $current_block     The current block to break down.
+	 * @param array $valid_block_names List of valid block names.
+	 * @param array $nodes             The metadata of the nodes that have been built so far.
+	 * @return array
+	 */
+	protected static function get_settings_of_blocks( $selectors, $current_selector, $current_path, $current_block, $valid_block_names, $nodes = array() ) {
+		foreach ( $current_block as $block_name => $block ) {
+			// It's not necessary to validate as the blocks have already been validated, but this is cleaner to do in order to catch a nested block.
+			if ( in_array( $block_name, $valid_block_names, true ) ) {
 
-			while ( $flag ) {
-				$flag = false;
-
-				foreach ( $node_to_examine as $sub_node_name => $sub_node ) {
-					if ( in_array( $sub_node_name, $valid_block_names, true ) ) {
-						$sub_node_selector = null;
-
-						if ( ! is_null( $previous_selector ) && isset( $selectors[ $sub_node_name ]['selector'] ) ) {
-							$sub_node_selector = $sub_node_selector . ' ' . $selectors[ $sub_node_name ]['selector'];
-						}
-
-						array_push( $previous_path, $sub_node_name );
-
-						$nodes[] = array(
-							'path'     => $previous_path,
-							'selector' => $sub_node_selector,
-						);
-
-						$flag              = true;
-						$node_to_examine   = $sub_node;
-						$previous_selector = $sub_node_selector;
-					}
+				$selector = is_null( $current_selector ) ? null : $current_selector;
+				if ( isset( $selectors[ $block_name ]['selector'] ) ) {
+					$selector = $selector . ' ' . $selectors[ $block_name ]['selector'];
 				}
+
+				$path = empty( $current_path ) ? array( 'settings', 'blocks' ) : $current_path;
+				array_push( $path, $block_name );
+
+				$nodes[] = array(
+					'path'     => $path,
+					'selector' => $selector,
+				);
+
+				$nodes = static::get_settings_of_blocks( $selectors, $selector, $path, $block, $valid_block_names, $nodes );
 			}
 		}
 
 		return $nodes;
 	}
+
 }
