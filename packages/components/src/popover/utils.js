@@ -105,3 +105,109 @@ export const getFrameOffset = ( document ) => {
 	const iframeRect = frameElement.getBoundingClientRect();
 	return { x: iframeRect.left, y: iframeRect.top };
 };
+
+export const getReferenceOwnerDocument = ( {
+	// @ts-ignore
+	anchorRef,
+	// @ts-ignore
+	anchorRect,
+	// @ts-ignore
+	getAnchorRect,
+	// @ts-ignore
+	fallbackReferenceElement,
+	// @ts-ignore
+	fallbackDocument,
+} ) => {
+	// In floating-ui's terms:
+	// - "reference" refers to the popover's anchor element.
+	// - "floating" refers the floating popover's element.
+	// A floating element can also be positioned relative to a virtual element,
+	// instead of a real one. A virtual element is represented by an object
+	// with the `getBoundingClientRect()` function (like real elements).
+	// See https://floating-ui.com/docs/virtual-elements for more info.
+	let resultingReferenceOwnerDoc;
+	if ( anchorRef?.top ) {
+		resultingReferenceOwnerDoc = anchorRef?.top.ownerDocument;
+	} else if ( anchorRef?.startContainer ) {
+		resultingReferenceOwnerDoc = anchorRef.startContainer.ownerDocument;
+	} else if ( anchorRef?.current ) {
+		resultingReferenceOwnerDoc = anchorRef.current.ownerDocument;
+	} else if ( anchorRef ) {
+		// This one should be deprecated.
+		resultingReferenceOwnerDoc = anchorRef.ownerDocument;
+	} else if ( anchorRect && anchorRect?.ownerDocument ) {
+		resultingReferenceOwnerDoc = anchorRect.ownerDocument;
+	} else if ( getAnchorRect ) {
+		resultingReferenceOwnerDoc = getAnchorRect(
+			fallbackReferenceElement
+		)?.ownerDocument;
+	}
+
+	return resultingReferenceOwnerDoc ?? fallbackDocument;
+};
+
+export const getReferenceElement = ( {
+	// @ts-ignore
+	anchorRef,
+	// @ts-ignore
+	anchorRect,
+	// @ts-ignore
+	getAnchorRect,
+	// @ts-ignore
+	fallbackReferenceElement,
+} ) => {
+	/** @type {import('@floating-ui/react-dom').ReferenceType | undefined} */
+	let referenceElement;
+
+	if ( anchorRef?.top ) {
+		// Create a virtual element for the ref. The expectation is that
+		// if anchorRef.top is defined, then anchorRef.bottom is defined too.
+		// Seems to be used by the block toolbar, when multiple blocks are selected
+		// (top and bottom blocks are used to calculate the resulting rect).
+		referenceElement = {
+			getBoundingClientRect() {
+				const topRect = anchorRef.top.getBoundingClientRect();
+				const bottomRect = anchorRef.bottom.getBoundingClientRect();
+				return new window.DOMRect(
+					topRect.x,
+					topRect.y,
+					topRect.width,
+					bottomRect.bottom - topRect.top
+				);
+			},
+		};
+	} else if ( anchorRef?.current ) {
+		// Standard React ref.
+		referenceElement = anchorRef.current;
+	} else if ( anchorRef ) {
+		// If `anchorRef` holds directly the element's value (no `current` key)
+		// This is a weird scenario and should be deprecated.
+		referenceElement = anchorRef;
+	} else if ( anchorRect ) {
+		// Create a virtual element for the ref.
+		referenceElement = {
+			getBoundingClientRect() {
+				return anchorRect;
+			},
+		};
+	} else if ( getAnchorRect ) {
+		// Create a virtual element for the ref.
+		referenceElement = {
+			getBoundingClientRect() {
+				const rect = getAnchorRect( fallbackReferenceElement );
+				return new window.DOMRect(
+					rect.x ?? rect.left,
+					rect.y ?? rect.top,
+					rect.width ?? rect.right - rect.left,
+					rect.height ?? rect.bottom - rect.top
+				);
+			},
+		};
+	} else if ( fallbackReferenceElement ) {
+		// If no explicit ref is passed via props, fall back to
+		// anchoring to the popover's parent node.
+		referenceElement = fallbackReferenceElement.parentNode;
+	}
+
+	return referenceElement;
+};

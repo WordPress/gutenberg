@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -185,16 +184,15 @@ function BlockListBlock( {
 		block = <Block { ...wrapperProps }>{ blockEdit }</Block>;
 	}
 
+	const { 'data-align': dataAlign, ...restWrapperProps } = wrapperProps ?? {};
+
 	const value = {
 		clientId,
 		className:
-			wrapperProps?.[ 'data-align' ] && themeSupportsLayout
-				? classnames(
-						className,
-						`align${ wrapperProps[ 'data-align' ] }`
-				  )
+			dataAlign && themeSupportsLayout
+				? classnames( className, `align${ dataAlign }` )
 				: className,
-		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
+		wrapperProps: restWrapperProps,
 		isAligned,
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );

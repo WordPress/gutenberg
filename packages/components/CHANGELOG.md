@@ -2,10 +2,18 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `Popover`: enable auto-updating every animation frame ([#43617](https://github.com/WordPress/gutenberg/pull/43617)).
+-   `Popover`: improve the component's performance and reactivity to prop changes by reworking its internals ([#43335](https://github.com/WordPress/gutenberg/pull/43335)).
+
 ### Internal
 
+-   Remove unused `normalizeArrowKey` utility function ([#43640](https://github.com/WordPress/gutenberg/pull/43640/)).
 -   Refactor `FocalPointPicker` to function component ([#39168](https://github.com/WordPress/gutenberg/pull/39168)).
 -   `Guide`: use `code` instead of `keyCode` for keyboard events ([#43604](https://github.com/WordPress/gutenberg/pull/43604/)).
+-   `Navigation`: use `code` instead of `keyCode` for keyboard events ([#43644](https://github.com/WordPress/gutenberg/pull/43644/)).
+-   `ComboboxControl`: Add unit tests ([#42403](https://github.com/WordPress/gutenberg/pull/42403)).
 
 ## 20.0.0 (2022-08-24)
 
@@ -37,6 +45,7 @@
 -   `FormTokenField`: Refactor away from `_.difference()` ([#43224](https://github.com/WordPress/gutenberg/pull/43224/)).
 -   `Autocomplete`: use `KeyboardEvent.code` instead of `KeyboardEvent.keyCode` ([#43432](https://github.com/WordPress/gutenberg/pull/43432/)).
 -   `ConfirmDialog`: replace (almost) every usage of `fireEvent` with `@testing-library/user-event`  ([#43429](https://github.com/WordPress/gutenberg/pull/43429/)).
+-   `Popover`: Introduce new `flip` and `resize` props ([#43546](https://github.com/WordPress/gutenberg/pull/43546/)).
 
 ### Internal
 
@@ -71,10 +80,13 @@
 -   `TreeGrid`: Refactor away from `_.includes()` ([#43518](https://github.com/WordPress/gutenberg/pull/43518/)).
 -   `FormTokenField`: use `KeyboardEvent.code`, refactor tests to modern RTL and `user-event` ([#43442](https://github.com/WordPress/gutenberg/pull/43442/)).
 -   `DropdownMenu`: use `KeyboardEvent.code`, refactor tests to model RTL and `user-event` ([#43439](https://github.com/WordPress/gutenberg/pull/43439/)).
+-   `Autocomplete`: Refactor away from `_.escapeRegExp()` ([#43629](https://github.com/WordPress/gutenberg/pull/43629/)).
+-   `TextHighlight`: Refactor away from `_.escapeRegExp()` ([#43629](https://github.com/WordPress/gutenberg/pull/43629/)).
 
 ### Experimental
 
 -   `FormTokenField`: add `__experimentalAutoSelectFirstMatch` prop to auto select the first matching suggestion on typing ([#42527](https://github.com/WordPress/gutenberg/pull/42527/)).
+-   `Popover`: Deprecate `__unstableForcePosition`, now replaced by new `flip` and `resize` props ([#43546](https://github.com/WordPress/gutenberg/pull/43546/)).
 
 ## 19.17.0 (2022-08-10)
 

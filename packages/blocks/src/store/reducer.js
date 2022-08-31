@@ -1,13 +1,18 @@
 /**
  * External dependencies
  */
-import { filter, find, get, isEmpty, map, mapValues, omit } from 'lodash';
+import { filter, find, get, isEmpty, map, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { omit } from '../api/utils';
 
 /**
  * @typedef {Object} WPBlockCategory

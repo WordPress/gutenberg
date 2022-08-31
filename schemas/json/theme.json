@@ -1113,7 +1113,6 @@
 				}
 			]
 		},
-
 		"stylesElementsPropertiesComplete": {
 			"type": "object",
 			"properties": {
@@ -1478,6 +1477,9 @@
 				{
 					"properties": {
 						"appearanceTools": {},
+						"useRootPaddingAwareAlignments": {
+							"$ref": "#/definitions/settingsPropertiesUseRootPaddingAwareAlignments/properties/useRootPaddingAwareAlignments"
+						},
 						"color": {},
 						"layout": {},
 						"spacing": {},

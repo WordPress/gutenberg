@@ -39,11 +39,10 @@ const PlaceholderIllustration = (
  * ```
  */
 export function Placeholder< IconProps = unknown >(
-	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
-	// ref forwarding to Placeholder.
-	props: Omit<
-		WordPressComponentProps< PlaceholderProps< IconProps >, 'div', false >,
-		'ref'
+	props: WordPressComponentProps<
+		PlaceholderProps< IconProps >,
+		'div',
+		false
 	>
 ) {
 	const {
