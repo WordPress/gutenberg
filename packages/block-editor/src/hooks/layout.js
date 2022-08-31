@@ -146,6 +146,9 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 	const constrainedType = getLayoutType( 'constrained' );
 
+	const displayControlsForLegacyLayouts =
+		! usedLayout.type && ( contentSize || inherit );
+
 	const onChangeType = ( newType ) =>
 		setAttributes( { layout: { type: newType } } );
 	const onChangeLayout = ( newLayout ) =>
@@ -205,7 +208,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 							layoutBlockSupport={ layoutBlockSupport }
 						/>
 					) }
-					{ constrainedType && !! contentSize && (
+					{ constrainedType && displayControlsForLegacyLayouts && (
 						<constrainedType.inspectorControls
 							layout={ usedLayout }
 							onChange={ onChangeLayout }
