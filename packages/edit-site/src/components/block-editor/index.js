@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { unionBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -80,16 +79,25 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	);
 
 	const blockPatterns = useMemo(
-		() => unionBy( settingsBlockPatterns, restBlockPatterns, 'name' ),
+		() =>
+			[
+				...( settingsBlockPatterns || [] ),
+				...( restBlockPatterns || [] ),
+			].filter(
+				( x, index, arr ) =>
+					index === arr.findIndex( ( y ) => x.name === y.name )
+			),
 		[ settingsBlockPatterns, restBlockPatterns ]
 	);
 
 	const blockPatternCategories = useMemo(
 		() =>
-			unionBy(
-				settingsBlockPatternCategories,
-				restBlockPatternCategories,
-				'name'
+			[
+				...( settingsBlockPatternCategories || [] ),
+				...( restBlockPatternCategories || [] ),
+			].filter(
+				( x, index, arr ) =>
+					index === arr.findIndex( ( y ) => x.name === y.name )
 			),
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
