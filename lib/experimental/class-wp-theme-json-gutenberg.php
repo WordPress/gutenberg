@@ -196,7 +196,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 	/**
 	 * Builds the metadata for the blocks present in the settings node, by taking into account nested blocks.
 	 * This returns in the form of:
-	 *å
+	 *
 	 *     [
 	 *       [
 	 *         'path'     => ['path', 'to', 'some', 'node' ],
@@ -207,9 +207,9 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 	 *         'selector' => 'CSS selector for other node'
 	 *       ],
 	 *     ]
-	 *å
+	 *
 	 * @since 6.1.0
-	 *å
+	 *
 	 * @param array $selectors         List of selectors per block.
 	 * @param array $current_selector  The current selector of the current block.
 	 * @param array $current_path      The current path to the block.
