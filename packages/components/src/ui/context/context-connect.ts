@@ -57,7 +57,7 @@ export function contextConnect<
 export function contextConnectWithoutRef< P >(
 	Component: ( props: P ) => JSX.Element | null,
 	namespace: string
-): WordPressComponentFromProps< P, false > {
+) {
 	return _contextConnect( Component, namespace );
 }
 
@@ -65,12 +65,16 @@ export function contextConnectWithoutRef< P >(
 // The hope is that we can improve render performance by removing functional
 // component wrappers.
 function _contextConnect<
-	C extends ( props: any, ref: ForwardedRef< any > ) => JSX.Element | null
+	C extends ( props: any, ref: ForwardedRef< any > ) => JSX.Element | null,
+	O extends ContextConnectOptions
 >(
 	Component: C,
 	namespace: string,
-	options?: ContextConnectOptions
-): WordPressComponentFromProps< Parameters< C >[ 0 ] > {
+	options?: O
+): WordPressComponentFromProps<
+	Parameters< C >[ 0 ],
+	O[ 'forwardsRef' ] extends true ? true : false
+> {
 	const WrappedComponent = options?.forwardsRef
 		? forwardRef< any, Parameters< C >[ 0 ] >( Component )
 		: Component;
