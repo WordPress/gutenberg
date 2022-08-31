@@ -64,6 +64,10 @@ _Returns_
 
 Clears the local storage.
 
+### clearSessionStorage
+
+Clears the session storage.
+
 ### clickBlockAppender
 
 Clicks the default block appender.
