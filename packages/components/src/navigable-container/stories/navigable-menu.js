@@ -31,18 +31,17 @@ export const Default = ( args ) => {
 					border: '1px solid black',
 				} }
 			>
-				<button role="menuitem">Item 1</button>
-				<button role="menuitem">Item 2</button>
+				<div role="menuitem">Item 1 (non-tabbable, non-focusable)</div>
+				<button role="menuitem">Item 2 (tabbable, focusable)</button>
 				<button role="menuitem" disabled>
-					Item 3 (disabled)
+					Item 3 (disabled, therefore non-tabbable and not-focusable)
 				</button>
-				<button role="menuitem" tabIndex={ -1 }>
-					Item 4 (non-tabbable)
-				</button>
-				<button role="menuitem" tabIndex={ 0 }>
-					Item 5
-				</button>
-				<button role="menuitem">Item 6</button>
+				<span role="menuitem" tabIndex={ -1 }>
+					Item 4 (non-tabbable, non-focusable)
+				</span>
+				<div role="menuitem" tabIndex={ 0 }>
+					Item 5 (tabbable, focusable)
+				</div>
 			</NavigableMenu>
 			<button>After navigable menu</button>
 		</>
