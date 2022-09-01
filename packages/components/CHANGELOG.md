@@ -51,6 +51,7 @@
 
 ### Enhancements
 
+-   `GradientPicker`: Show custom picker before swatches ([#43577](https://github.com/WordPress/gutenberg/pull/43577)).
 -   `CustomGradientPicker`, `GradientPicker`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43387](https://github.com/WordPress/gutenberg/pull/43387)).
 -   `ToolsPanel`: Tighten grid gaps ([#43424](https://github.com/WordPress/gutenberg/pull/43424)).
 -   `ColorPalette`: Make popover style consistent ([#43570](https://github.com/WordPress/gutenberg/pull/43570)).
