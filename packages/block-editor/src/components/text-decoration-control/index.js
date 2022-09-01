@@ -49,7 +49,7 @@ export default function TextDecorationControl( {
 				'block-editor-text-decoration-control',
 				className
 			) }
-			__experimentalIsIconGroup
+			__experimentalIsBorderless
 			label={ __( 'Decoration' ) }
 			value={ value }
 			onChange={ onChange }
