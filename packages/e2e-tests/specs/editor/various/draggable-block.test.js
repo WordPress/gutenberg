@@ -12,8 +12,6 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Draggable block', () => {
-	// Tests don't seem to pass if beforeAll and afterAll are used.
-	// Unsure why.
 	beforeAll( async () => {
 		await deactivatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
