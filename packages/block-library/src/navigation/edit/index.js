@@ -61,11 +61,9 @@ import useCreateNavigationMenu from './use-create-navigation-menu';
 import { useInnerBlocks } from './use-inner-blocks';
 import { detectColors } from './utils';
 
-const navigationStorage = window.localStorage;
-
-if ( ! navigationStorage.getItem( 'nav_menus_created' ) ) {
-	navigationStorage.setItem(
-		'nav_menus_created',
+if ( ! window.localStorage.getItem( 'classic_menus_imported' ) ) {
+	window.localStorage.setItem(
+		'classic_menus_imported',
 		JSON.stringify( [ ...new Map() ] )
 	);
 }
@@ -110,8 +108,8 @@ function Navigation( {
 		setAttributes( { ref: postId } );
 	};
 
-	const navigationStorageMap = new Map(
-		JSON.parse( window.localStorage.getItem( 'nav_menus_created' ) )
+	const importedClassicMenus = new Map(
+		JSON.parse( window.localStorage.getItem( 'classic_menus_imported' ) )
 	);
 
 	const recursionId = `navigationMenu/${ ref }`;
@@ -645,15 +643,15 @@ function Navigation( {
 									classicMenu.id,
 									classicMenu.name
 								);
-								navigationStorageMap.set(
+								importedClassicMenus.set(
 									navMenu.id,
 									classicMenu.id
 								);
-								navigationStorage.setItem(
-									'nav_menus_created',
+								window.localStorage.setItem(
+									'classic_menus_imported',
 									JSON.stringify(
 										Array.from(
-											navigationStorageMap.entries()
+											importedClassicMenus.entries()
 										)
 									)
 								);
@@ -738,15 +736,15 @@ function Navigation( {
 									classicMenu.id,
 									classicMenu.name
 								);
-								navigationStorageMap.set(
+								importedClassicMenus.set(
 									navMenu.id,
 									classicMenu.id
 								);
-								navigationStorage.setItem(
-									'nav_menus_created',
+								window.localStorage.setItem(
+									'classic_menus_imported',
 									JSON.stringify(
 										Array.from(
-											navigationStorageMap.entries()
+											importedClassicMenus.entries()
 										)
 									)
 								);
@@ -835,11 +833,11 @@ function Navigation( {
 							classicMenu.id,
 							classicMenu.name
 						);
-						navigationStorageMap.set( navMenu.id, classicMenu.id );
-						navigationStorage.setItem(
-							'nav_menus_created',
+						importedClassicMenus.set( navMenu.id, classicMenu.id );
+						window.localStorage.setItem(
+							'classic_menus_imported',
 							JSON.stringify(
-								Array.from( navigationStorageMap.entries() )
+								Array.from( importedClassicMenus.entries() )
 							)
 						);
 						if ( navMenu ) {
@@ -899,15 +897,15 @@ function Navigation( {
 										classicMenu.id,
 										classicMenu.name
 									);
-									navigationStorageMap.set(
+									importedClassicMenus.set(
 										navMenu.id,
 										classicMenu.id
 									);
-									navigationStorage.setItem(
-										'nav_menus_created',
+									window.localStorage.setItem(
+										'classic_menus_imported',
 										JSON.stringify(
 											Array.from(
-												navigationStorageMap.entries()
+												importedClassicMenus.entries()
 											)
 >>>>>>> b82ba3f478 (Small refactor to already imported menus, still work on menu deletion)
 										)

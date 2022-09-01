@@ -8,15 +8,12 @@ import {
 	DropdownMenu,
 	Button,
 	VisuallyHidden,
-	ToolbarDropdownMenu,
 } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
 import { Icon, chevronUp, chevronDown } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { addQueryArgs } from '@wordpress/url';
-import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,20 +21,16 @@ import { forwardRef } from '@wordpress/element';
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
 
-function NavigationMenuSelector(
-	{
-		currentMenuId,
-		onSelectNavigationMenu,
-		onSelectClassicMenu,
-		onCreateNew,
-		actionLabel,
-		createNavigationMenuIsSuccess,
-		createNavigationMenuIsError,
-		toggleProps = {},
-		showManageActions = false,
-	},
-	forwardedRef
-) {
+function NavigationMenuSelector( {
+	currentMenuId,
+	onSelectNavigationMenu,
+	onSelectClassicMenu,
+	onCreateNew,
+	actionLabel,
+	createNavigationMenuIsSuccess,
+	createNavigationMenuIsError,
+	toggleProps = {},
+} ) {
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
 
@@ -93,17 +86,8 @@ function NavigationMenuSelector(
 		hasResolvedNavigationMenus,
 	] );
 
-	const navigationStorageMap = new Map(
-		JSON.parse( window.localStorage.getItem( 'nav_menus_created' ) )
-	);
-	const notImportedClassicMenus = classicMenus?.filter( ( menu ) => {
-		const classicMenusImported = Array.from(
-			navigationStorageMap.values()
-		);
-		return ! classicMenusImported.includes( menu.id );
-	} );
 	const hasNavigationMenus = !! navigationMenus?.length;
-	const hasClassicMenus = !! notImportedClassicMenus?.length;
+	const hasClassicMenus = !! classicMenus?.length;
 	const showNavigationMenus = !! canSwitchNavigationMenu;
 	const showClassicMenus = !! canUserCreateNavigationMenu;
 
@@ -195,7 +179,7 @@ function NavigationMenuSelector(
 					) }
 					{ showClassicMenus && hasClassicMenus && (
 						<MenuGroup label={ __( 'Import Classic Menus' ) }>
-							{ notImportedClassicMenus?.map( ( menu ) => {
+							{ classicMenus?.map( ( menu ) => {
 								const label = decodeEntities( menu.name );
 								return (
 									<MenuItem
