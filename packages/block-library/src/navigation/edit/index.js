@@ -52,6 +52,7 @@ import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 import useNavigationNotice from './use-navigation-notice';
 import OverlayMenuIcon from './overlay-menu-icon';
+import OverlayMenuPreview from './overlay-menu-preview';
 import useConvertClassicToBlockMenu, {
 	CLASSIC_MENU_CONVERSION_ERROR,
 	CLASSIC_MENU_CONVERSION_PENDING,
@@ -92,6 +93,7 @@ function Navigation( {
 			flexWrap = 'wrap',
 		} = {},
 		hasIcon,
+		icon,
 	} = attributes;
 
 	const ref = attributes.ref;
@@ -468,7 +470,7 @@ function Navigation( {
 						>
 							{ hasIcon && (
 								<>
-									<OverlayMenuIcon />
+									<OverlayMenuIcon icon={ icon } />
 									<Icon icon={ close } />
 								</>
 							) }
@@ -481,15 +483,10 @@ function Navigation( {
 						</Button>
 					) }
 					{ overlayMenuPreview && (
-						<ToggleControl
-							label={ __( 'Show icon button' ) }
-							help={ __(
-								'Configure the visual appearance of the button opening and closing the overlay menu.'
-							) }
-							onChange={ ( value ) =>
-								setAttributes( { hasIcon: value } )
-							}
-							checked={ hasIcon }
+						<OverlayMenuPreview
+							setAttributes={ setAttributes }
+							hasIcon={ hasIcon }
+							icon={ icon }
 						/>
 					) }
 					<h3>{ __( 'Overlay Menu' ) }</h3>
@@ -638,6 +635,8 @@ function Navigation( {
 					id={ clientId }
 					onToggle={ setResponsiveMenuVisibility }
 					isOpen={ isResponsiveMenuOpen }
+					hasIcon={ hasIcon }
+					icon={ icon }
 					isResponsive={ 'never' !== overlayMenu }
 					isHiddenByDefault={ 'always' === overlayMenu }
 					overlayBackgroundColor={ overlayBackgroundColor }
@@ -845,6 +844,7 @@ function Navigation( {
 							onToggle={ setResponsiveMenuVisibility }
 							label={ __( 'Menu' ) }
 							hasIcon={ hasIcon }
+							icon={ icon }
 							isOpen={ isResponsiveMenuOpen }
 							isResponsive={ isResponsive }
 							isHiddenByDefault={ 'always' === overlayMenu }

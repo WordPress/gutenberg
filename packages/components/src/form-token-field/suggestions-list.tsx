@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
 import scrollView from 'dom-scroll-into-view';
 import classnames from 'classnames';
 import type { MouseEventHandler, ReactNode } from 'react';
@@ -114,7 +113,7 @@ export function SuggestionsList< T extends string | { value: string } >( {
 			id={ `components-form-token-suggestions-${ instanceId }` }
 			role="listbox"
 		>
-			{ map( suggestions, ( suggestion, index ) => {
+			{ suggestions.map( ( suggestion, index ) => {
 				const matchText = computeSuggestionMatch( suggestion );
 				const className = classnames(
 					'components-form-token-field__suggestion',

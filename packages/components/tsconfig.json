@@ -73,7 +73,6 @@
 		"src/sandbox",
 		"src/search-control",
 		"src/snackbar",
-		"src/toggle-control",
 		"src/toolbar",
 		"src/toolbar-button",
 		"src/toolbar-context",

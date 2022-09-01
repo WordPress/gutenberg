@@ -2687,3 +2687,22 @@ export const __unstableGetVisibleBlocks = createSelector(
 	},
 	( state ) => [ state.blocks.visibility ]
 );
+
+export const __unstableGetContentLockingParent = createSelector(
+	( state, clientId ) => {
+		let current = clientId;
+		let result;
+		while ( !! state.blocks.parents[ current ] ) {
+			current = state.blocks.parents[ current ];
+			if ( getTemplateLock( state, current ) === 'noContent' ) {
+				result = current;
+			}
+		}
+		return result;
+	},
+	( state ) => [ state.blocks.parents, state.blockListSettings ]
+);
+
+export function __unstableGetTemporarilyEditingAsBlocks( state ) {
+	return state.temporarilyEditingAsBlocks;
+}
