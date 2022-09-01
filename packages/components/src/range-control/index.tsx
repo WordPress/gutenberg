@@ -138,7 +138,8 @@ function UnforwardedRangeControl< IconProps = unknown >(
 		onChange( nextValue );
 	};
 
-	const handleOnChange = ( next: string ) => {
+	const handleOnChange = ( next?: string ) => {
+		// @ts-expect-error TODO: Investigate if this is problematic
 		let nextValue = parseFloat( next );
 		setValue( nextValue );
 
@@ -304,6 +305,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
 						step={ step }
+						// @ts-expect-error TODO: Investigate if the `null` value is necessary
 						value={ inputSliderValue }
 					/>
 				) }
