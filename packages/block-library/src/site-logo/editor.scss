@@ -39,6 +39,11 @@
 		width: 120px;
 	}
 
+	// Inherit radius.
+	.components-resizable-box__container {
+		border-radius: inherit;
+	}
+
 	// Style the placeholder.
 	.components-placeholder {
 		justify-content: center;
