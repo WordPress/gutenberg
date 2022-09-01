@@ -492,7 +492,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		if ( isset( $theme_json['styles']['elements'] ) ) {
 			foreach ( self::ELEMENTS as $element => $selector ) {
-				if ( ! isset( $theme_json['styles']['elements'][ $element ] ) ) {
+				if ( ! isset( $theme_json['styles']['elements'][ $element ] ) || ! array_key_exists( $element, static::ELEMENTS ) ) {
 					continue;
 				}
 
@@ -1345,7 +1345,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				}
 			}
 
-			if ( $block_gap_value ) {
+			if ( null !== $block_gap_value ) {
 				foreach ( $layout_definitions as $layout_definition_key => $layout_definition ) {
 					// Allow skipping default layout for themes that opt-in to block styles, but opt-out of blockGap.
 					if ( ! $has_block_gap_support && 'default' === $layout_definition_key ) {

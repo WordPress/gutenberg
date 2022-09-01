@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+–   Add TypeScript types to the built package (via "types": "build-types" in the package.json)
+
 ## 4.14.0 (2022-08-24)
 
 ### New Features

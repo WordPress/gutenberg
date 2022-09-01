@@ -37,6 +37,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 		hasReducedUI,
 		isValid,
 		isVisual,
+		isContentLocked,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -45,6 +46,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 			isBlockValid,
 			getBlockRootClientId,
 			getSettings,
+			__unstableGetContentLockingParent,
 		} = select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -65,6 +67,9 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 			),
 			isVisual: selectedBlockClientIds.every(
 				( id ) => getBlockMode( id ) === 'visual'
+			),
+			isContentLocked: !! __unstableGetContentLockingParent(
+				selectedBlockClientId
 			),
 		};
 	}, [] );
@@ -112,24 +117,27 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 
 	return (
 		<div className={ classes }>
-			{ ! isMultiToolbar && ! displayHeaderToolbar && (
-				<BlockParentSelector clientIds={ blockClientIds } />
-			) }
+			{ ! isMultiToolbar &&
+				! displayHeaderToolbar &&
+				! isContentLocked && <BlockParentSelector /> }
 			<div ref={ nodeRef } { ...showMoversGestures }>
-				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
-					<ToolbarGroup className="block-editor-block-toolbar__block-controls">
-						<BlockSwitcher clientIds={ blockClientIds } />
-						{ ! isMultiToolbar && (
-							<BlockLockToolbar
-								clientId={ blockClientIds[ 0 ] }
+				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
+					! isContentLocked && (
+						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
+							<BlockSwitcher clientIds={ blockClientIds } />
+							{ ! isMultiToolbar && (
+								<BlockLockToolbar
+									clientId={ blockClientIds[ 0 ] }
+								/>
+							) }
+							<BlockMover
+								clientIds={ blockClientIds }
+								hideDragHandle={
+									hideDragHandle || hasReducedUI
+								}
 							/>
-						) }
-						<BlockMover
-							clientIds={ blockClientIds }
-							hideDragHandle={ hideDragHandle || hasReducedUI }
-						/>
-					</ToolbarGroup>
-				) }
+						</ToolbarGroup>
+					) }
 			</div>
 			{ shouldShowVisualToolbar && isMultiToolbar && (
 				<BlockGroupToolbar />
@@ -161,7 +169,9 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 				</>
 			) }
 			<BlockEditVisuallyButton clientIds={ blockClientIds } />
-			<BlockSettingsMenu clientIds={ blockClientIds } />
+			{ ! isContentLocked && (
+				<BlockSettingsMenu clientIds={ blockClientIds } />
+			) }
 		</div>
 	);
 };

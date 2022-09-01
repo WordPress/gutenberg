@@ -144,11 +144,11 @@ export function useBlockProps(
 	}
 
 	return {
+		tabIndex: 0,
 		...wrapperProps,
 		...props,
 		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
-		tabIndex: 0,
 		role: 'document',
 		'aria-label': blockLabel,
 		'data-block': clientId,
