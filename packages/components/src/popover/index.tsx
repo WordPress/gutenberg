@@ -254,7 +254,6 @@ const UnforwardedPopover = (
 
 	const arrowRef = useRef( null );
 
-	const [ referenceElement, setReferenceElement ] = useState();
 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
 		useState< HTMLSpanElement | null >( null );
 	const [ referenceOwnerDocument, setReferenceOwnerDocument ] = useState<
@@ -430,7 +429,6 @@ const UnforwardedPopover = (
 
 		referenceCallbackRef( resultingReferenceElement );
 
-		setReferenceElement( resultingReferenceElement );
 		setReferenceOwnerDocument( resultingReferenceOwnerDoc );
 	}, [
 		anchor,
@@ -561,7 +559,7 @@ const UnforwardedPopover = (
 		content = <Fill name={ slotName }>{ content }</Fill>;
 	}
 
-	if ( referenceElement && referenceElement !== fallbackReferenceElement ) {
+	if ( anchorRef || anchorRect || anchor ) {
 		return content;
 	}
 
