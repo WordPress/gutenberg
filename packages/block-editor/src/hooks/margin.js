@@ -28,6 +28,8 @@ import {
 } from './dimensions';
 import { cleanEmptyObject } from './utils';
 import BlockPopover from '../components/block-popover';
+import SpacingSizesControl from '../components/spacing-sizes-control';
+import { getCustomValueFromPreset } from '../components/spacing-sizes-control/utils';
 
 /**
  * Determines if there is margin support.
@@ -101,6 +103,8 @@ export function MarginEdit( props ) {
 		setAttributes,
 	} = props;
 
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [
 			'%',
@@ -135,15 +139,28 @@ export function MarginEdit( props ) {
 	return Platform.select( {
 		web: (
 			<>
-				<BoxControl
-					values={ style?.spacing?.margin }
-					onChange={ onChange }
-					label={ __( 'Margin' ) }
-					sides={ sides }
-					units={ units }
-					allowReset={ false }
-					splitOnAxis={ splitOnAxis }
-				/>
+				{ ( ! spacingSizes || spacingSizes?.length === 0 ) && (
+					<BoxControl
+						values={ style?.spacing?.margin }
+						onChange={ onChange }
+						label={ __( 'Margin' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+					/>
+				) }
+				{ spacingSizes?.length > 0 && (
+					<SpacingSizesControl
+						values={ style?.spacing?.margin }
+						onChange={ onChange }
+						label={ __( 'Margin' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ false }
+					/>
+				) }
 			</>
 		),
 		native: null,
@@ -152,16 +169,31 @@ export function MarginEdit( props ) {
 
 export function MarginVisualizer( { clientId, attributes } ) {
 	const margin = attributes?.style?.spacing?.margin;
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+
 	const style = useMemo( () => {
+		const marginTop = margin?.top
+			? getCustomValueFromPreset( margin?.top, spacingSizes )
+			: 0;
+		const marginRight = margin?.right
+			? getCustomValueFromPreset( margin?.right, spacingSizes )
+			: 0;
+		const marginBottom = margin?.bottom
+			? getCustomValueFromPreset( margin?.bottom, spacingSizes )
+			: 0;
+		const marginLeft = margin?.left
+			? getCustomValueFromPreset( margin?.left, spacingSizes )
+			: 0;
+
 		return {
-			borderTopWidth: margin?.top ?? 0,
-			borderRightWidth: margin?.right ?? 0,
-			borderBottomWidth: margin?.bottom ?? 0,
-			borderLeftWidth: margin?.left ?? 0,
-			top: margin?.top ? `-${ margin.top }` : 0,
-			right: margin?.right ? `-${ margin.right }` : 0,
-			bottom: margin?.bottom ? `-${ margin.bottom }` : 0,
-			left: margin?.left ? `-${ margin.left }` : 0,
+			borderTopWidth: marginTop,
+			borderRightWidth: marginRight,
+			borderBottomWidth: marginBottom,
+			borderLeftWidth: marginLeft,
+			top: marginTop !== 0 ? `-${ marginTop }` : 0,
+			right: marginRight !== 0 ? `-${ marginRight }` : 0,
+			bottom: marginBottom !== 0 ? `-${ marginBottom }` : 0,
+			left: marginLeft !== 0 ? `-${ marginLeft }` : 0,
 		};
 	}, [ margin ] );
 

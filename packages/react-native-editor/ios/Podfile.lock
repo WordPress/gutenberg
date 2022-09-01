@@ -569,7 +569,11 @@ SPEC CHECKSUMS:
   RNReanimated: b413cc7aa3e2a740d9804cda3a9396a68f9eea7f
   RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
   RNSVG: 36a7359c428dcb7c6bce1cc546fbfebe069809b0
+<<<<<<< HEAD
   RNTAztecView: d147b75ad3ec3fd43bce60c7c4d96e93b7294090
+=======
+  RNTAztecView: a80beb06c7f139b7cbd3c2c781f9b9e7b3666747
+>>>>>>> trunk
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   WordPress-Aztec-iOS: 7d11d598f14c82c727c08b56bd35fbeb7dafb504

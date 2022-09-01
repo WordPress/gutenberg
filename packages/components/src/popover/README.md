@@ -71,6 +71,26 @@ Each of these base placements has an alignment in the form -start and -end. For 
 -   Required: No
 -   Default: `"bottom-start"`
 
+### flip
+
+Specifies whether the `Popover` should flip across its axis if there isn't space for it in the normal placement.
+
+When the using a 'top' placement, the `Popover` will switch to a 'bottom' placement. When using a 'left' placement, the popover will switch to a 'right' placement.
+
+The `Popover` will retain its alignment of 'start' or 'end' when flipping.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `true`
+
+### resize
+
+Adjusts the height of the `Popover` to prevent overflow.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `true`
+
 ### offset
 
 The distance (in pixels) between the anchor and popover.

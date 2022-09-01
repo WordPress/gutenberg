@@ -65,7 +65,7 @@ export function reinitializeEditor( target, settings ) {
 			keepCaretInsideBlock: false,
 			welcomeGuide: true,
 			welcomeGuideStyles: true,
-			shouldListViewOpenByDefault: false,
+			showListViewByDefault: false,
 		} );
 
 		// Check if the block list view should be open by default.

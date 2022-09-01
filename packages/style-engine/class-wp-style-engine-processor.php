@@ -36,15 +36,21 @@ class WP_Style_Engine_Processor {
 	 * Add a store to the processor.
 	 *
 	 * @param WP_Style_Engine_CSS_Rules_Store $store The store to add.
+	 *
+	 * @return WP_Style_Engine_Processor Returns the object to allow chaining methods.
 	 */
 	public function add_store( WP_Style_Engine_CSS_Rules_Store $store ) {
 		$this->stores[ $store->get_name() ] = $store;
+
+		return $this;
 	}
 
 	/**
 	 * Adds rules to be processed.
 	 *
 	 * @param WP_Style_Engine_CSS_Rule|WP_Style_Engine_CSS_Rule[] $css_rules A single, or an array of, WP_Style_Engine_CSS_Rule objects from a store or otherwise.
+	 *
+	 * @return WP_Style_Engine_Processor Returns the object to allow chaining methods.
 	 */
 	public function add_rules( $css_rules ) {
 		if ( ! is_array( $css_rules ) ) {
@@ -58,6 +64,8 @@ class WP_Style_Engine_Processor {
 			}
 			$this->css_rules[ $rule->get_selector() ] = $rule;
 		}
+
+		return $this;
 	}
 
 	/**
@@ -65,6 +73,7 @@ class WP_Style_Engine_Processor {
 	 *
 	 * @param array $options array(
 	 *    'optimize' => (boolean) Whether to optimize the CSS output, e.g., combine rules.
+	 *    'prettify' => (boolean) Whether to add new lines to output.
 	 * );.
 	 *
 	 * @return string The computed CSS.
@@ -72,6 +81,7 @@ class WP_Style_Engine_Processor {
 	public function get_css( $options = array() ) {
 		$defaults = array(
 			'optimize' => true,
+			'prettify' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
 		);
 		$options  = wp_parse_args( $options, $defaults );
 
@@ -88,7 +98,8 @@ class WP_Style_Engine_Processor {
 		// Build the CSS.
 		$css = '';
 		foreach ( $this->css_rules as $rule ) {
-			$css .= $rule->get_css();
+			$css .= $rule->get_css( $options['prettify'] );
+			$css .= $options['prettify'] ? "\n" : '';
 		}
 		return $css;
 	}
@@ -125,7 +136,8 @@ class WP_Style_Engine_Processor {
 				unset( $this->css_rules[ $key ] );
 			}
 			// Create a new rule with the combined selectors.
-			$this->css_rules[ implode( ',', $duplicates ) ] = new WP_Style_Engine_CSS_Rule( implode( ',', $duplicates ), $declarations );
+			$duplicate_selectors                     = implode( ',', $duplicates );
+			$this->css_rules[ $duplicate_selectors ] = new WP_Style_Engine_CSS_Rule( $duplicate_selectors, $declarations );
 		}
 	}
 }

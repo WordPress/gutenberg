@@ -42,6 +42,18 @@
 			"text": false,
 			"background": false
 		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"width": true,
+			"__experimentalSelector": "img, .block-editor-media-placeholder",
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"width": true
+			}
+		},
 		"html": false,
 		"spacing": {
 			"margin": true,

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, omit } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -69,11 +69,12 @@ export class PostPublishPanel extends Component {
 			PrePublishExtension,
 			...additionalProps
 		} = this.props;
-		const propsForPanel = omit( additionalProps, [
-			'hasPublishAction',
-			'isDirty',
-			'isPostTypeViewable',
-		] );
+		const {
+			hasPublishAction,
+			isDirty,
+			isPostTypeViewable,
+			...propsForPanel
+		} = additionalProps;
 		const isPublishedOrScheduled =
 			isPublished || ( isScheduled && isBeingScheduled );
 		const isPrePublish = ! isPublishedOrScheduled && ! isSaving;

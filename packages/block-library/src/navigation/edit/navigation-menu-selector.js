@@ -10,7 +10,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { addQueryArgs } from '@wordpress/url';
-import { forwardRef, useCallback, useMemo } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,7 +21,8 @@ import useNavigationEntities from '../use-navigation-entities';
 function NavigationMenuSelector(
 	{
 		currentMenuId,
-		onSelect,
+		onSelectNavigationMenu,
+		onSelectClassicMenu,
 		onCreateNew,
 		showManageActions = false,
 		actionLabel,
@@ -42,24 +43,6 @@ function NavigationMenuSelector(
 		canUserUpdateNavigationMenu,
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
-
-	const handleSelect = useCallback(
-		( _onClose ) => ( selectedId ) => {
-			_onClose();
-			onSelect(
-				navigationMenus?.find( ( post ) => post.id === selectedId )
-			);
-		},
-		[ navigationMenus ]
-	);
-
-	const handleSelectClassic = useCallback(
-		( _onClose, menu ) => () => {
-			_onClose();
-			onSelect( menu );
-		},
-		[]
-	);
 
 	const menuChoices = useMemo( () => {
 		return (
@@ -83,7 +66,7 @@ function NavigationMenuSelector(
 
 	// Show the selector if:
 	// - has switch or create permissions and there are block or classic menus.
-	// - user has create or update permisisons and component should show the menu actions.
+	// - user has create or update permissions and component should show the menu actions.
 	const showSelectMenus =
 		( ( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
 			( hasNavigationMenus || hasClassicMenus ) ) ||
@@ -107,7 +90,10 @@ function NavigationMenuSelector(
 						<MenuGroup label={ __( 'Menus' ) }>
 							<MenuItemsChoice
 								value={ currentMenuId }
-								onSelect={ handleSelect( onClose ) }
+								onSelect={ ( menuId ) => {
+									onClose();
+									onSelectNavigationMenu( menuId );
+								} }
 								choices={ menuChoices }
 							/>
 						</MenuGroup>
@@ -118,10 +104,10 @@ function NavigationMenuSelector(
 								const label = decodeEntities( menu.name );
 								return (
 									<MenuItem
-										onClick={ handleSelectClassic(
-											onClose,
-											menu
-										) }
+										onClick={ () => {
+											onClose();
+											onSelectClassicMenu( menu );
+										} }
 										key={ menu.id }
 										aria-label={ sprintf(
 											createActionLabel,

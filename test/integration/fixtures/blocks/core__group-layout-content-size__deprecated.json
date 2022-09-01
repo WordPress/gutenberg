@@ -1,0 +1,35 @@
+[
+	{
+		"name": "core/group",
+		"isValid": true,
+		"attributes": {
+			"tagName": "div",
+			"align": "full",
+			"backgroundColor": "secondary",
+			"layout": {
+				"inherit": true,
+				"type": "constrained"
+			}
+		},
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "This is a group block.",
+					"dropCap": false
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "Group block content.",
+					"dropCap": false
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]
