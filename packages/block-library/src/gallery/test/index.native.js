@@ -539,7 +539,7 @@ describe( 'Gallery block', () => {
 		<!-- /wp:image -->
 		
 		<!-- wp:image {"id":${ media[ 1 ].localId },"linkDestination":"attachment"} -->
-		<figure class="wp-block-image"><img src="${ media[ 1 ].localUrl }" alt="" aria-describedby="wp-image-caption-${ media[ 1 ].localId }" class="wp-image-${ media[ 1 ].localId }"/></figure>
+		<figure class="wp-block-image"><img src="${ media[ 1 ].localUrl }" alt="" class="wp-image-${ media[ 1 ].localId }"/></figure>
 		<!-- /wp:image --></figure>
 		<!-- /wp:gallery -->`,
 			numberOfItems: 2,
