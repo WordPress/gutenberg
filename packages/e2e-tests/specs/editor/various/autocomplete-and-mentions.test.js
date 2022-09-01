@@ -224,6 +224,7 @@ describe( 'Autocomplete', () => {
 		it( `should allow ${ type } selection via keypress event`, async () => {
 			const testData = {};
 			// Jean-Luc is the target because user mentions will be listed alphabetically by first + last name
+			// This may seem off by one, but that's only because the test site adds an `admin` user that ends up at the top of the list
 			// 🍒 is the target because options are listed in the order they appear in the custom completer
 			if ( type === 'mention' ) {
 				testData.triggerString = '@';
