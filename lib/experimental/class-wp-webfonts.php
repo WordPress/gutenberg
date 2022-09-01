@@ -39,7 +39,7 @@ class WP_Webfonts extends WP_Dependencies {
 	private $to_do_keyed_handles;
 
 	/**
-	 * Array of provider instances, keyed by provider ID.
+	 * Provider instance store, keyed by provider ID.
 	 *
 	 * @since X.X.X
 	 *
@@ -480,7 +480,7 @@ class WP_Webfonts extends WP_Dependencies {
 	 *
 	 * @see WP_Dependencies::do_item()
 	 *
-	 * @param string    $provider_id The font family to process.
+	 * @param string    $provider_id The provider to process.
 	 * @param int|false $group       Not used.
 	 * @return bool
 	 */
@@ -501,13 +501,7 @@ class WP_Webfonts extends WP_Dependencies {
 		}
 
 		// Invoke provider to print its styles.
-		if ( isset( $this->provider_instances[ $provider_id ] ) ) {
-			$provider = $this->provider_instances[ $provider_id ];
-		} else {
-			$provider = new $this->providers[ $provider_id ]['class']();
-			// Store the instance.
-			$this->provider_instances[ $provider_id ] = $provider;
-		}
+		$provider = $this->get_provider_instance( $provider_id );
 		$provider->set_webfonts( $properties_by_font );
 		$provider->print_styles();
 
@@ -522,7 +516,7 @@ class WP_Webfonts extends WP_Dependencies {
 	 *
 	 * @since X.X.X
 	 *
-	 * @param string $provider_id Provider's unique ID.
+	 * @param string $provider_id The provider to process.
 	 * @return array[] Webfonts organized by providers.
 	 */
 	private function get_enqueued_fonts_for_provider( $provider_id ) {
@@ -558,6 +552,21 @@ class WP_Webfonts extends WP_Dependencies {
 		}
 
 		return $font_properties;
+	}
+
+	/**
+	 * Gets the instance of the provider from the WP_Webfonts::$provider_instance store.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param string $provider_id The provider to get.
+	 * @return object Instance of the provider.
+	 */
+	private function get_provider_instance( $provider_id ) {
+		if ( ! isset( $this->provider_instances[ $provider_id ] ) ) {
+			$this->provider_instances[ $provider_id ] = new $this->providers[ $provider_id ]['class']();
+		}
+		return $this->provider_instances[ $provider_id ];
 	}
 
 	/**
