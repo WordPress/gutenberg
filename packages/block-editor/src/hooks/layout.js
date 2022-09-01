@@ -153,7 +153,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 					{ showInheritToggle && (
 						<>
 							<ToggleControl
-								label={ __( 'Constrain inner blocks' ) }
+								label={ __( 'Custom width of inner blocks' ) }
 								checked={
 									layoutType?.name === 'constrained' ||
 									!! inherit ||
