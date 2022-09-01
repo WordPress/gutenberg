@@ -1,31 +1,51 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`PostPublishButtonOrToggle should render a button when post is not (1), (2), (3), the viewport is >= medium, and the publish sidebar is disabled 1`] = `
-<WithSelect(WithDispatch(PostPublishButton))
-  isToggle={false}
-/>
+<button
+  aria-disabled="true"
+  class="components-button editor-post-publish-button editor-post-publish-button__button is-primary"
+  type="button"
+>
+  Submit for Review
+</button>
 `;
 
 exports[`PostPublishButtonOrToggle should render a button when the post is pending and cannot be published but the viewport is >= medium (3) 1`] = `
-<WithSelect(WithDispatch(PostPublishButton))
-  isToggle={false}
-/>
+<button
+  aria-disabled="true"
+  class="components-button editor-post-publish-button editor-post-publish-button__button is-primary"
+  type="button"
+>
+  Submit for Review
+</button>
 `;
 
 exports[`PostPublishButtonOrToggle should render a button when the post is published (1) 1`] = `
-<WithSelect(WithDispatch(PostPublishButton))
-  isToggle={false}
-/>
+<button
+  aria-disabled="true"
+  class="components-button editor-post-publish-button editor-post-publish-button__button is-primary"
+  type="button"
+>
+  Submit for Review
+</button>
 `;
 
 exports[`PostPublishButtonOrToggle should render a button when the post is scheduled (2) 1`] = `
-<WithSelect(WithDispatch(PostPublishButton))
-  isToggle={false}
-/>
+<button
+  aria-disabled="true"
+  class="components-button editor-post-publish-button editor-post-publish-button__button is-primary"
+  type="button"
+>
+  Submit for Review
+</button>
 `;
 
 exports[`PostPublishButtonOrToggle should render a toggle when post is not (1), (2), (3), the viewport is >= medium, and the publish sidebar is enabled 1`] = `
-<WithSelect(WithDispatch(PostPublishButton))
-  isToggle={true}
-/>
+<button
+  aria-disabled="true"
+  class="components-button editor-post-publish-panel__toggle editor-post-publish-button__button is-primary"
+  type="button"
+>
+  Publish
+</button>
 `;
