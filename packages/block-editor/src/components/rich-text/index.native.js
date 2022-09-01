@@ -659,7 +659,7 @@ function RichTextWrapper(
 					{ nestedIsSelected && hasFormats && (
 						<FormatToolbarContainer
 							inline={ inlineToolbar }
-							editableContentRef={ fallbackRef }
+							anchorRef={ fallbackRef.current }
 						/>
 					) }
 					{ nestedIsSelected && <RemoveBrowserShortcuts /> }
