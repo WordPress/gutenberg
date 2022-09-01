@@ -15,6 +15,7 @@
 ### Internal
 
 -   Remove unused `normalizeArrowKey` utility function ([#43640](https://github.com/WordPress/gutenberg/pull/43640/)).
+-   `ToggleGroupControl`: Rename `__experimentalIsIconGroup` prop to `__experimentalIsBorderless` ([#43771](https://github.com/WordPress/gutenberg/pull/43771/)).
 -   Refactor `FocalPointPicker` to function component ([#39168](https://github.com/WordPress/gutenberg/pull/39168)).
 -   `Guide`: use `code` instead of `keyCode` for keyboard events ([#43604](https://github.com/WordPress/gutenberg/pull/43604/)).
 -   `ToggleControl`: Convert to TypeScript and streamline CSS ([#43717](https://github.com/WordPress/gutenberg/pull/43717)). 
