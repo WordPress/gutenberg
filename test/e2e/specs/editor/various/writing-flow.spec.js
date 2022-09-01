@@ -797,6 +797,9 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Tab' );
 		// Create the table.
 		await page.keyboard.press( 'Space' );
+		await expect(
+			page.locator( 'role=document[name="Block: Table"i]' )
+		).toBeVisible();
 		// Navigate to the second cell.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( '2' );
@@ -980,14 +983,18 @@ class WritingFlowUtils {
 		await this.page.keyboard.press( 'Enter' );
 		await this.page.keyboard.type( '/columns' );
 		await this.page.keyboard.press( 'Enter' );
-		await this.page.click( 'role=button[name="Two columns; equal split"i]' );
+		await this.page.click(
+			'role=button[name="Two columns; equal split"i]'
+		);
 		await this.page.click( 'role=button[name="Add block"i]' );
 		await this.page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
 		);
 		await this.page.keyboard.type( '1st col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "1st" instead of "First" here.
 
-		await this.page.focus( 'role=document[name="Block: Column (2 of 2)"i]' );
+		await this.page.focus(
+			'role=document[name="Block: Column (2 of 2)"i]'
+		);
 		await this.page.click( 'role=button[name="Add block"i]' );
 		await this.page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
