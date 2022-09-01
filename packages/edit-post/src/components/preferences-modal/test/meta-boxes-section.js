@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -10,7 +10,7 @@ import { MetaBoxesSection } from '../meta-boxes-section';
 
 describe( 'MetaBoxesSection', () => {
 	it( 'does not render if there are no options', () => {
-		const wrapper = shallow(
+		render(
 			<MetaBoxesSection
 				areCustomFieldsRegistered={ false }
 				metaBoxes={ [
@@ -18,11 +18,11 @@ describe( 'MetaBoxesSection', () => {
 				] }
 			/>
 		);
-		expect( wrapper.isEmptyRender() ).toBe( true );
+		expect( screen.queryByRole( 'group' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'renders a Custom Fields option', () => {
-		const wrapper = shallow(
+		render(
 			<MetaBoxesSection
 				title="Advanced panels"
 				areCustomFieldsRegistered
@@ -31,11 +31,11 @@ describe( 'MetaBoxesSection', () => {
 				] }
 			/>
 		);
-		expect( wrapper ).toMatchSnapshot();
+		expect( screen.queryByRole( 'group' ) ).toMatchSnapshot();
 	} );
 
 	it( 'renders meta box options', () => {
-		const wrapper = shallow(
+		render(
 			<MetaBoxesSection
 				title="Advanced panels"
 				areCustomFieldsRegistered={ false }
@@ -46,11 +46,11 @@ describe( 'MetaBoxesSection', () => {
 				] }
 			/>
 		);
-		expect( wrapper ).toMatchSnapshot();
+		expect( screen.queryByRole( 'group' ) ).toMatchSnapshot();
 	} );
 
 	it( 'renders a Custom Fields option and meta box options', () => {
-		const wrapper = shallow(
+		render(
 			<MetaBoxesSection
 				title="Advanced panels"
 				areCustomFieldsRegistered
@@ -61,6 +61,6 @@ describe( 'MetaBoxesSection', () => {
 				] }
 			/>
 		);
-		expect( wrapper ).toMatchSnapshot();
+		expect( screen.queryByRole( 'group' ) ).toMatchSnapshot();
 	} );
 } );
