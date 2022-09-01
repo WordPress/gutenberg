@@ -8,8 +8,8 @@ import { get, isEmpty, pick } from 'lodash';
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { withNotices, Placeholder } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { Placeholder } from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	BlockAlignmentControl,
 	BlockControls,
@@ -22,6 +22,7 @@ import {
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -108,9 +109,7 @@ export function ImageEdit( {
 	setAttributes,
 	isSelected,
 	className,
-	noticeUI,
 	insertBlocksAfter,
-	noticeOperations,
 	onReplace,
 	context,
 	clientId,
@@ -143,9 +142,9 @@ export function ImageEdit( {
 		return pick( getSettings(), [ 'imageDefaultSize', 'mediaUpload' ] );
 	}, [] );
 
+	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 		setAttributes( {
 			src: undefined,
 			id: undefined,
@@ -361,7 +360,6 @@ export function ImageEdit( {
 				icon={ <BlockIcon icon={ icon } /> }
 				onSelect={ onSelectImage }
 				onSelectURL={ onSelectURL }
-				notices={ noticeUI }
 				onError={ onUploadError }
 				placeholder={ placeholder }
 				accept="image/*"
@@ -374,4 +372,4 @@ export function ImageEdit( {
 	);
 }
 
-export default withNotices( ImageEdit );
+export default ImageEdit;
