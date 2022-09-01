@@ -987,7 +987,7 @@ class WritingFlowUtils {
 		);
 		await this.page.keyboard.type( '1st col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "1st" instead of "First" here.
 
-		await this.page.focus( 'role=document[name="Block: Column (2 of 2)"]' );
+		await this.page.focus( 'role=document[name="Block: Column (2 of 2)"i]' );
 		await this.page.click( 'role=button[name="Add block"i]' );
 		await this.page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
