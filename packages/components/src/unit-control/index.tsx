@@ -259,7 +259,6 @@ function UnforwardedUnitControl(
 	return (
 		<Root className="components-unit-control-wrapper" style={ style }>
 			<ValueInput
-				aria-label={ label }
 				type={ isPressEnterToChange ? 'text' : 'number' }
 				{ ...props }
 				autoComplete={ autoComplete }
