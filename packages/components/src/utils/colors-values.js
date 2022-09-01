@@ -23,11 +23,6 @@ const GRAY = {
 };
 
 // TODO: Replace usages of these with the equivalents in `GRAY`
-const DARK_GRAY = {
-	300: '#6c7781', // Lightest gray that can be used for AA text contrast.
-};
-
-// TODO: Replace usages of these with the equivalents in `GRAY`
 const LIGHT_GRAY = {
 	800: '#b5bcc2',
 	600: '#d7dade',
@@ -65,10 +60,6 @@ const UI = {
 };
 
 export const COLORS = Object.freeze( {
-	/**
-	 * @deprecated Try to use `gray` instead.
-	 */
-	darkGray: DARK_GRAY,
 	/**
 	 * The main gray color object.
 	 */
