@@ -206,11 +206,8 @@ class WP_Webfonts extends WP_Dependencies {
 			return $variation_handle;
 		}
 
-		if ( array_key_exists( 'src', $variation ) ) {
-			$result = $this->add( $variation_handle, $variation['src'] );
-		} else {
-			$result = $this->add( $variation_handle, false );
-		}
+		$variation_src = array_key_exists( 'src', $variation ) ? $variation['src'] : false;
+		$result        = $this->add( $variation_handle, $variation_src );
 
 		// Bail out if the registration failed.
 		if ( ! $result ) {
