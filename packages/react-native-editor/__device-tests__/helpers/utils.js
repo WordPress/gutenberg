@@ -515,9 +515,9 @@ const waitForMediaLibrary = async ( driver ) => {
 /**
  * @param {string} driver
  * @param {string} elementLocator
- * @param {number} maxIteration - Default value is 25
+ * @param {number} maxIteration    - Default value is 25
  * @param {string} elementToReturn - Options are allElements, lastElement, firstElement. Defaults to "firstElement"
- * @param {number} iteration - Default value is 0
+ * @param {number} iteration       - Default value is 0
  * @return {string} - Returns the first element found, empty string if not found
  */
 const waitForVisible = async (
@@ -567,7 +567,7 @@ const waitForVisible = async (
 /**
  * @param {string} driver
  * @param {string} elementLocator
- * @param {number} maxIteration - Default value is 25, can be adjusted to be less to wait for element to not be visible
+ * @param {number} maxIteration    - Default value is 25, can be adjusted to be less to wait for element to not be visible
  * @param {string} elementToReturn - Options are allElements, lastElement, firstElement. Defaults to "firstElement"
  * @return {boolean} - Returns true if element is found, false otherwise
  */

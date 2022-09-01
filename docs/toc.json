@@ -251,14 +251,34 @@
 					{
 						"docs/reference-guides/data/data-core-annotations.md": []
 					},
-					{ "docs/reference-guides/data/data-core-blocks.md": [] },
+					{
+						"docs/reference-guides/data/data-core-block-directory.md": []
+					},
 					{
 						"docs/reference-guides/data/data-core-block-editor.md": []
 					},
-					{ "docs/reference-guides/data/data-core-editor.md": [] },
+					{ "docs/reference-guides/data/data-core-blocks.md": [] },
+					{
+						"docs/reference-guides/data/data-core-customize-widgets.md": []
+					},
 					{ "docs/reference-guides/data/data-core-edit-post.md": [] },
+					{ "docs/reference-guides/data/data-core-edit-site.md": [] },
+					{
+						"docs/reference-guides/data/data-core-edit-widgets.md": []
+					},
+					{ "docs/reference-guides/data/data-core-editor.md": [] },
+					{
+						"docs/reference-guides/data/data-core-keyboard-shortcuts.md": []
+					},
 					{ "docs/reference-guides/data/data-core-notices.md": [] },
 					{ "docs/reference-guides/data/data-core-nux.md": [] },
+					{
+						"docs/reference-guides/data/data-core-preferences.md": []
+					},
+					{
+						"docs/reference-guides/data/data-core-reusable-blocks.md": []
+					},
+					{ "docs/reference-guides/data/data-core-rich-text.md": [] },
 					{ "docs/reference-guides/data/data-core-viewport.md": [] }
 				]
 			}
@@ -308,7 +328,13 @@
 					{ "docs/contributors/code/grammar.md": [] },
 					{ "docs/contributors/code/scripts.md": [] },
 					{ "docs/contributors/code/managing-packages.md": [] },
-					{ "docs/contributors/code/release.md": [] },
+					{
+						"docs/contributors/code/release.md": [
+							{
+								"docs/contributors/code/auto-cherry-picking.md": []
+							}
+						]
+					},
 					{
 						"docs/contributors/code/react-native/README.md": [
 							{

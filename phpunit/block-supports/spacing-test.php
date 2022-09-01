@@ -12,15 +12,15 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 	 */
 	private $test_block_name;
 
-	function setUp() {
-		parent::setUp();
+	function set_up() {
+		parent::set_up();
 		$this->test_block_name = null;
 	}
 
-	function tearDown() {
+	function tear_down() {
 		unregister_block_type( $this->test_block_name );
 		$this->test_block_name = null;
-		parent::tearDown();
+		parent::tear_down();
 	}
 
 	function test_spacing_style_is_applied() {
@@ -62,7 +62,7 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 
 		$actual   = gutenberg_apply_spacing_support( $block_type, $block_atts );
 		$expected = array(
-			'style' => 'padding: 111px; margin-top: 1px; margin-right: 2px; margin-bottom: 3px; margin-left: 4px;',
+			'style' => 'padding:111px;margin-top:1px;margin-right:2px;margin-bottom:3px;margin-left:4px;',
 		);
 
 		$this->assertSame( $expected, $actual );
@@ -152,7 +152,7 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 
 		$actual   = gutenberg_apply_spacing_support( $block_type, $block_atts );
 		$expected = array(
-			'style' => 'padding-top: 1px; padding-right: 2px; padding-bottom: 3px; padding-left: 4px;',
+			'style' => 'padding-top:1px;padding-right:2px;padding-bottom:3px;padding-left:4px;',
 		);
 
 		$this->assertSame( $expected, $actual );

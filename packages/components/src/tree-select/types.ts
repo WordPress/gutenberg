@@ -9,6 +9,10 @@ import type { ComponentProps } from 'react';
 import type SelectControl from '../select-control';
 import type { SelectControlProps } from '../select-control/types';
 
+export type Truthy< T > = T extends false | '' | 0 | null | undefined
+	? never
+	: T;
+
 export type SelectOptions = Required<
 	ComponentProps< typeof SelectControl >
 >[ 'options' ];

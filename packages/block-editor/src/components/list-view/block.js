@@ -67,8 +67,15 @@ function ListViewBlock( {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const blockName = useSelect(
-		( select ) => select( blockEditorStore ).getBlockName( clientId ),
+	const { isContentLocked, blockName } = useSelect(
+		( select ) => {
+			const { getBlockName, getTemplateLock } =
+				select( blockEditorStore );
+			return {
+				blockName: getBlockName( clientId ),
+				isContentLocked: getTemplateLock( clientId ) === 'noContent',
+			};
+		},
 		[ clientId ]
 	);
 
@@ -210,7 +217,7 @@ function ListViewBlock( {
 			path={ path }
 			id={ `list-view-block-${ clientId }` }
 			data-block={ clientId }
-			isExpanded={ isExpanded }
+			isExpanded={ isContentLocked ? undefined : isExpanded }
 			aria-selected={ !! isSelected }
 		>
 			<TreeGridCell
@@ -219,7 +226,7 @@ function ListViewBlock( {
 				ref={ cellRef }
 				aria-label={ blockAriaLabel }
 				aria-selected={ !! isSelected }
-				aria-expanded={ isExpanded }
+				aria-expanded={ isContentLocked ? undefined : isExpanded }
 				aria-describedby={ descriptionId }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (

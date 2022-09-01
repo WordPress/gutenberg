@@ -6,8 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { useMergeRefs } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,19 +16,25 @@ import { useMemo } from '@wordpress/element';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
 
-export default function BlockPopover( {
-	clientId,
-	bottomClientId,
-	children,
-	__unstableRefreshSize,
-	__unstableCoverTarget = false,
-	__unstablePopoverSlot,
-	__unstableContentRef,
-	...props
-} ) {
+function BlockPopover(
+	{
+		clientId,
+		bottomClientId,
+		children,
+		__unstableRefreshSize,
+		__unstableCoverTarget = false,
+		__unstablePopoverSlot,
+		__unstableContentRef,
+		...props
+	},
+	ref
+) {
 	const selectedElement = useBlockElement( clientId );
 	const lastSelectedElement = useBlockElement( bottomClientId ?? clientId );
-	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
+	const mergedRefs = useMergeRefs( [
+		ref,
+		usePopoverScroll( __unstableContentRef ),
+	] );
 	const style = useMemo( () => {
 		if ( ! selectedElement || lastSelectedElement !== selectedElement ) {
 			return {};
@@ -51,7 +58,7 @@ export default function BlockPopover( {
 
 	return (
 		<Popover
-			ref={ popoverScrollRef }
+			ref={ mergedRefs }
 			animate={ false }
 			position="top right left"
 			focusOnMount={ false }
@@ -59,9 +66,8 @@ export default function BlockPopover( {
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the default popover slot).
 			__unstableSlotName={ __unstablePopoverSlot || null }
-			// Observe movement for block animations (especially horizontal).
-			__unstableObserveElement={ selectedElement }
-			__unstableForcePosition
+			resize={ false }
+			flip={ false }
 			__unstableShift
 			{ ...props }
 			className={ classnames(
@@ -74,3 +80,5 @@ export default function BlockPopover( {
 		</Popover>
 	);
 }
+
+export default forwardRef( BlockPopover );

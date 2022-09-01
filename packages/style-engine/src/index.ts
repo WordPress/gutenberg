@@ -17,12 +17,12 @@ import { styleDefinitions } from './styles';
 /**
  * Generates a stylesheet for a given style object and selector.
  *
- * @param  style   Style object.
+ * @param  style   Style object, for example, the value of a block's attributes.style object or the top level styles in theme.json
  * @param  options Options object with settings to adjust how the styles are generated.
  *
  * @return generated stylesheet.
  */
-export function generate( style: Style, options: StyleOptions ): string {
+export function compileCSS( style: Style, options: StyleOptions = {} ): string {
 	const rules = getCSSRules( style, options );
 
 	// If no selector is provided, treat generated rules as inline styles to be returned as a single string.
@@ -56,14 +56,14 @@ export function generate( style: Style, options: StyleOptions ): string {
 /**
  * Returns a JSON representation of the generated CSS rules.
  *
- * @param  style   Style object.
+ * @param  style   Style object, for example, the value of a block's attributes.style object or the top level styles in theme.json
  * @param  options Options object with settings to adjust how the styles are generated.
  *
  * @return generated styles.
  */
 export function getCSSRules(
 	style: Style,
-	options: StyleOptions
+	options: StyleOptions = {}
 ): GeneratedCSSRule[] {
 	const rules: GeneratedCSSRule[] = [];
 	styleDefinitions.forEach( ( definition: StyleDefinition ) => {

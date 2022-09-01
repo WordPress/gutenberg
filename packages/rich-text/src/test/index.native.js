@@ -9,7 +9,7 @@ import { getEditorHtml, render, initializeEditor } from 'test/helpers';
  */
 import { select } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { coreBlocks, registerBlock } from '@wordpress/block-library';
+import { coreBlocks } from '@wordpress/block-library';
 import {
 	getBlockTypes,
 	setDefaultBlockName,
@@ -60,7 +60,7 @@ describe( '<RichText/>', () => {
 	beforeAll( () => {
 		// Register Paragraph block.
 		const paragraph = coreBlocks[ 'core/paragraph' ];
-		registerBlock( paragraph );
+		paragraph.init();
 		setDefaultBlockName( paragraph.name );
 	} );
 

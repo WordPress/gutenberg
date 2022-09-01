@@ -7,7 +7,13 @@ import { useMemoOne } from 'use-memo-one';
  * WordPress dependencies
  */
 import { createQueue } from '@wordpress/priority-queue';
-import { useRef, useCallback, useMemo, useReducer } from '@wordpress/element';
+import {
+	useRef,
+	useCallback,
+	useMemo,
+	useReducer,
+	useDebugValue,
+} from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 
@@ -247,6 +253,8 @@ export default function useSelect( mapSelect, deps ) {
 		// We're passing these in from the calling function and want to make sure we're
 		// examining every individual value inside the `deps` array.
 	}, [ registry, wrapSelect, hasMappingFunction, depsChangedFlag ] );
+
+	useDebugValue( mapOutput );
 
 	return hasMappingFunction ? mapOutput : registry.select( mapSelect );
 }

@@ -34,9 +34,6 @@ class WP_Style_Engine_CSS_Declarations {
 	 * @param array $declarations An array of declarations (property => value pairs).
 	 */
 	public function __construct( $declarations = array() ) {
-		if ( empty( $declarations ) ) {
-			return;
-		}
 		$this->add_declarations( $declarations );
 	}
 
@@ -46,7 +43,7 @@ class WP_Style_Engine_CSS_Declarations {
 	 * @param string $property The CSS property.
 	 * @param string $value    The CSS value.
 	 *
-	 * @return void
+	 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
 	 */
 	public function add_declaration( $property, $value ) {
 
@@ -54,17 +51,31 @@ class WP_Style_Engine_CSS_Declarations {
 		$property = $this->sanitize_property( $property );
 		// Bail early if the property is empty.
 		if ( empty( $property ) ) {
-			return;
+			return $this;
 		}
 
 		// Trim the value. If empty, bail early.
 		$value = trim( $value );
 		if ( '' === $value ) {
-			return;
+			return $this;
 		}
 
 		// Add the declaration property/value pair.
 		$this->declarations[ $property ] = $value;
+
+		return $this;
+	}
+
+	/**
+	 * Remove a single declaration.
+	 *
+	 * @param string $property The CSS property.
+	 *
+	 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
+	 */
+	public function remove_declaration( $property ) {
+		unset( $this->declarations[ $property ] );
+		return $this;
 	}
 
 	/**
@@ -72,12 +83,27 @@ class WP_Style_Engine_CSS_Declarations {
 	 *
 	 * @param array $declarations An array of declarations.
 	 *
-	 * @return void
+	 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
 	 */
 	public function add_declarations( $declarations ) {
 		foreach ( $declarations as $property => $value ) {
 			$this->add_declaration( $property, $value );
 		}
+		return $this;
+	}
+
+	/**
+	 * Remove multiple declarations.
+	 *
+	 * @param array $properties An array of properties.
+	 *
+	 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
+	 */
+	public function remove_declarations( $properties = array() ) {
+		foreach ( $properties as $property ) {
+			$this->remove_declaration( $property );
+		}
+		return $this;
 	}
 
 	/**
@@ -90,17 +116,42 @@ class WP_Style_Engine_CSS_Declarations {
 	}
 
 	/**
+	 * Filters a CSS property + value pair.
+	 *
+	 * @param string $property The CSS property.
+	 * @param string $value    The value to be filtered.
+	 * @param string $spacer   The spacer between the colon and the value. Defaults to an empty string.
+	 *
+	 * @return string The filtered declaration as a single string.
+	 */
+	protected static function filter_declaration( $property, $value, $spacer = '' ) {
+		$filtered_value = wp_strip_all_tags( $value, true );
+		if ( '' !== $filtered_value ) {
+			return safecss_filter_attr( "{$property}:{$spacer}{$filtered_value}" );
+		}
+		return '';
+	}
+
+	/**
 	 * Filters and compiles the CSS declarations.
+	 *
+	 * @param boolean $should_prettify Whether to add spacing, new lines and indents.
+	 * @param number  $indent_count    The number of tab indents to apply to the rule. Applies if `prettify` is `true`.
 	 *
 	 * @return string The CSS declarations.
 	 */
-	public function get_declarations_string() {
+	public function get_declarations_string( $should_prettify = false, $indent_count = 0 ) {
 		$declarations_array  = $this->get_declarations();
 		$declarations_output = '';
+		$indent              = $should_prettify ? str_repeat( "\t", $indent_count ) : '';
+		$suffix              = $should_prettify ? ' ' : '';
+		$suffix              = $should_prettify && $indent_count > 0 ? "\n" : $suffix;
+		$spacer              = $should_prettify ? ' ' : '';
+
 		foreach ( $declarations_array as $property => $value ) {
-			$filtered_declaration = esc_html( safecss_filter_attr( "{$property}: {$value}" ) );
+			$filtered_declaration = static::filter_declaration( $property, $value, $spacer );
 			if ( $filtered_declaration ) {
-				$declarations_output .= $filtered_declaration . '; ';
+				$declarations_output .= "{$indent}{$filtered_declaration};$suffix";
 			}
 		}
 		return rtrim( $declarations_output );

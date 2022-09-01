@@ -7,14 +7,19 @@ export default {
 	title: 'Components/CustomSelectControl',
 	component: CustomSelectControl,
 	argTypes: {
-		__next36pxDefaultSize: {
-			control: { type: 'boolean' },
+		__next36pxDefaultSize: { control: { type: 'boolean' } },
+		size: {
+			control: {
+				type: 'radio',
+				options: [ 'small', 'default', '__unstable-large' ],
+			},
 		},
 	},
 };
 
 export const Default = CustomSelectControl.bind( {} );
 Default.args = {
+	__nextUnconstrainedWidth: true,
 	label: 'Label',
 	options: [
 		{

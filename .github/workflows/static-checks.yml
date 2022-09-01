@@ -46,7 +46,7 @@ jobs:
               run: npm run build:package-types
 
             - name: Check local changes
-              run: npm run check-local-changes
+              run: npm run other:check-local-changes
 
             - name: License compatibility
-              run: npm run check-licenses
+              run: npm run other:check-licenses

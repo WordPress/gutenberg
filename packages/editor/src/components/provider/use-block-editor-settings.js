@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, unionBy } from 'lodash';
+import { pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -41,7 +41,9 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		const isWeb = Platform.OS === 'web';
 		const { canUser, getEntityRecord } = select( coreStore );
 
-		const siteSettings = getEntityRecord( 'root', 'site' );
+		const siteSettings = canUser( 'read', 'settings' )
+			? getEntityRecord( 'root', 'site' )
+			: undefined;
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
@@ -75,16 +77,25 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 	);
 
 	const blockPatterns = useMemo(
-		() => unionBy( settingsBlockPatterns, restBlockPatterns, 'name' ),
+		() =>
+			[
+				...( settingsBlockPatterns || [] ),
+				...( restBlockPatterns || [] ),
+			].filter(
+				( x, index, arr ) =>
+					index === arr.findIndex( ( y ) => x.name === y.name )
+			),
 		[ settingsBlockPatterns, restBlockPatterns ]
 	);
 
 	const blockPatternCategories = useMemo(
 		() =>
-			unionBy(
-				settingsBlockPatternCategories,
-				restBlockPatternCategories,
-				'name'
+			[
+				...( settingsBlockPatternCategories || [] ),
+				...( restBlockPatternCategories || [] ),
+			].filter(
+				( x, index, arr ) =>
+					index === arr.findIndex( ( y ) => x.name === y.name )
 			),
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
@@ -126,7 +137,9 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'colors',
 				'disableCustomColors',
 				'disableCustomFontSizes',
+				'disableCustomSpacingSizes',
 				'disableCustomGradients',
+				'disableLayoutStyles',
 				'enableCustomLineHeight',
 				'enableCustomSpacing',
 				'enableCustomUnits',
@@ -136,6 +149,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'generateAnchors',
 				'hasFixedToolbar',
 				'hasReducedUI',
+				'hasInlineToolbar',
 				'imageDefaultSize',
 				'imageDimensions',
 				'imageEditing',

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
 import classnames from 'classnames';
 import type { ChangeEvent } from 'react';
 
@@ -43,12 +42,7 @@ import type { RadioControlProps } from './types';
  * ```
  */
 export function RadioControl(
-	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
-	// ref forwarding to RadioControl.
-	props: Omit<
-		WordPressComponentProps< RadioControlProps, 'input', false >,
-		'ref'
-	>
+	props: WordPressComponentProps< RadioControlProps, 'input', false >
 ) {
 	const {
 		label,
@@ -65,7 +59,7 @@ export function RadioControl(
 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
 		onChange( event.target.value );
 
-	if ( isEmpty( options ) ) {
+	if ( ! options?.length ) {
 		return null;
 	}
 

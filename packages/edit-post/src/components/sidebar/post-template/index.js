@@ -12,6 +12,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import PostTemplateForm from './form';
+import { store as editPostStore } from '../../../store';
 
 export default function PostTemplate() {
 	const anchorRef = useRef();
@@ -27,7 +28,11 @@ export default function PostTemplate() {
 		const hasTemplates =
 			!! settings.availableTemplates &&
 			Object.keys( settings.availableTemplates ).length > 0;
-		if ( ! hasTemplates && ! settings.supportsTemplateMode ) {
+		if ( hasTemplates ) {
+			return true;
+		}
+
+		if ( ! settings.supportsTemplateMode ) {
 			return false;
 		}
 
@@ -48,6 +53,7 @@ export default function PostTemplate() {
 				position="bottom left"
 				className="edit-post-post-template__dropdown"
 				contentClassName="edit-post-post-template__dialog"
+				focusOnMount
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<PostTemplateToggle
 						isOpen={ isOpen }
@@ -67,16 +73,14 @@ function PostTemplateToggle( { isOpen, onClick } ) {
 		const templateSlug =
 			select( editorStore ).getEditedPostAttribute( 'template' );
 
-		const settings = select( editorStore ).getEditorSettings();
-		if ( settings.availableTemplates[ templateSlug ] ) {
-			return settings.availableTemplates[ templateSlug ];
+		const { supportsTemplateMode, availableTemplates } =
+			select( editorStore ).getEditorSettings();
+		if ( ! supportsTemplateMode && availableTemplates[ templateSlug ] ) {
+			return availableTemplates[ templateSlug ];
 		}
 
-		const template = select( coreStore )
-			.getEntityRecords( 'postType', 'wp_template', { per_page: -1 } )
-			?.find( ( { slug } ) => slug === templateSlug );
-
-		return template?.title.rendered;
+		const template = select( editPostStore ).getEditedPostTemplate();
+		return template?.title ?? template?.slug;
 	}, [] );
 
 	return (

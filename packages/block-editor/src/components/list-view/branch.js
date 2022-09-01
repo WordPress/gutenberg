@@ -1,20 +1,19 @@
 /**
- * External dependencies
- */
-import { compact } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { memo } from '@wordpress/element';
-import { AsyncModeProvider } from '@wordpress/data';
+import { AsyncModeProvider, useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
 /**
  * Internal dependencies
  */
 import ListViewBlock from './block';
 import { useListViewContext } from './context';
 import { isClientIdSelected } from './utils';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
@@ -91,11 +90,27 @@ function ListViewBranch( props ) {
 		listPosition = 0,
 		fixedListWindow,
 		isExpanded,
+		parentId,
 	} = props;
+
+	const isContentLocked = useSelect(
+		( select ) => {
+			return !! (
+				parentId &&
+				select( blockEditorStore ).getTemplateLock( parentId ) ===
+					'noContent'
+			);
+		},
+		[ parentId ]
+	);
 
 	const { expandedState, draggedClientIds } = useListViewContext();
 
-	const filteredBlocks = compact( blocks );
+	if ( isContentLocked ) {
+		return null;
+	}
+
+	const filteredBlocks = blocks.filter( Boolean );
 	const blockCount = filteredBlocks.length;
 	let nextPosition = listPosition;
 
@@ -166,6 +181,7 @@ function ListViewBranch( props ) {
 						) }
 						{ hasNestedBlocks && shouldExpand && ! isDragged && (
 							<ListViewBranch
+								parentId={ clientId }
 								blocks={ innerBlocks }
 								selectBlock={ selectBlock }
 								showBlockMovers={ showBlockMovers }

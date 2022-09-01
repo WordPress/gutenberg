@@ -1,6 +1,8 @@
 /**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 import {
 	DropdownMenu,
 	MenuGroup,
@@ -24,8 +26,9 @@ import {
 	postDate,
 	search,
 	tag,
+	layout as customGenericTemplateIcon,
 } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -35,14 +38,12 @@ import AddCustomTemplateModal from './add-custom-template-modal';
 import {
 	useExistingTemplates,
 	useDefaultTemplateTypes,
-	entitiesConfig,
-	usePostTypes,
-	usePostTypePage,
-	useTaxonomies,
-	useTaxonomyCategory,
-	useTaxonomyTag,
-	useExtraTemplates,
+	useTaxonomiesMenuItems,
+	usePostTypeMenuItems,
+	useAuthorMenuItem,
+	usePostTypeArchiveMenuItems,
 } from './utils';
+import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
 import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
 
@@ -80,16 +81,33 @@ const TEMPLATE_ICONS = {
 export default function NewTemplate( { postType } ) {
 	const [ showCustomTemplateModal, setShowCustomTemplateModal ] =
 		useState( false );
-
+	const [
+		showCustomGenericTemplateModal,
+		setShowCustomGenericTemplateModal,
+	] = useState( false );
 	const [ entityForSuggestions, setEntityForSuggestions ] = useState( {} );
 
 	const history = useHistory();
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const { createErrorNotice } = useDispatch( noticesStore );
+	const { createErrorNotice, createSuccessNotice } =
+		useDispatch( noticesStore );
 	const { setTemplate } = useDispatch( editSiteStore );
-	async function createTemplate( template ) {
+
+	async function createTemplate( template, isWPSuggestion = true ) {
 		try {
-			const { title, description, slug } = template;
+			const { title, description, slug, templatePrefix } = template;
+			let templateContent = template.content;
+			// Try to find fallback content from existing templates.
+			if ( ! templateContent ) {
+				const fallbackTemplate = await apiFetch( {
+					path: addQueryArgs( '/wp/v2/templates/lookup', {
+						slug,
+						is_custom: ! isWPSuggestion,
+						template_prefix: templatePrefix,
+					} ),
+				} );
+				templateContent = fallbackTemplate.content;
+			}
 			const newTemplate = await saveEntityRecord(
 				'postType',
 				'wp_template',
@@ -99,8 +117,9 @@ export default function NewTemplate( { postType } ) {
 					slug: slug.toString(),
 					status: 'publish',
 					title,
-					// This adds a post meta field in template, that is part of `is_custom` value calculation.
-					is_wp_suggestion: true,
+					content: templateContent,
+					// This adds a post meta field in template that is part of `is_custom` value calculation.
+					is_wp_suggestion: isWPSuggestion,
 				},
 				{ throwOnError: true }
 			);
@@ -113,8 +132,16 @@ export default function NewTemplate( { postType } ) {
 				postId: newTemplate.id,
 				postType: newTemplate.type,
 			} );
-
-			// TODO: Add a success notice?
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: Title of the created template e.g: "Category".
+					__( '"%s" successfully created.' ),
+					title
+				),
+				{
+					type: 'snackbar',
+				}
+			);
 		} catch ( error ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
@@ -180,6 +207,21 @@ export default function NewTemplate( { postType } ) {
 								);
 							} ) }
 						</MenuGroup>
+						<MenuGroup>
+							<MenuItem
+								icon={ customGenericTemplateIcon }
+								iconPosition="left"
+								info={ __(
+									'Custom templates can be applied to any post or page.'
+								) }
+								key="custom-template"
+								onClick={ () =>
+									setShowCustomGenericTemplateModal( true )
+								}
+							>
+								{ __( 'Custom template' ) }
+							</MenuItem>
+						</MenuGroup>
 					</NavigableMenu>
 				) }
 			</DropdownMenu>
@@ -190,6 +232,12 @@ export default function NewTemplate( { postType } ) {
 					entityForSuggestions={ entityForSuggestions }
 				/>
 			) }
+			{ showCustomGenericTemplateModal && (
+				<AddCustomGenericTemplateModal
+					onClose={ () => setShowCustomGenericTemplateModal( false ) }
+					createTemplate={ createTemplate }
+				/>
+			) }
 		</>
 	);
 }
@@ -198,19 +246,11 @@ function useMissingTemplates(
 	setEntityForSuggestions,
 	setShowCustomTemplateModal
 ) {
-	const postTypes = usePostTypes();
-	const pagePostType = usePostTypePage();
-	const taxonomies = useTaxonomies();
-	const categoryTaxonomy = useTaxonomyCategory();
-	const tagTaxonomy = useTaxonomyTag();
-
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
-
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
 		( { slug } ) => slug
 	);
-
 	const missingDefaultTemplates = ( defaultTemplateTypes || [] ).filter(
 		( template ) =>
 			DEFAULT_TEMPLATE_SLUGS.includes( template.slug ) &&
@@ -220,33 +260,27 @@ function useMissingTemplates(
 		setShowCustomTemplateModal( true );
 		setEntityForSuggestions( _entityForSuggestions );
 	};
-	// TODO: find better names for these variables. `useExtraTemplates` returns an array of items.
-	const categoryMenuItem = useExtraTemplates(
-		categoryTaxonomy,
-		entitiesConfig.category,
-		onClickMenuItem
-	);
-	const tagMenuItem = useExtraTemplates(
-		tagTaxonomy,
-		entitiesConfig.tag,
-		onClickMenuItem
-	);
-	const pageMenuItem = useExtraTemplates(
-		pagePostType,
-		entitiesConfig.page,
-		onClickMenuItem
-	);
 	// We need to replace existing default template types with
 	// the create specific template functionality. The original
 	// info (title, description, etc.) is preserved in the
-	// `useExtraTemplates` hook.
+	// used hooks.
 	const enhancedMissingDefaultTemplateTypes = [ ...missingDefaultTemplates ];
-	[ categoryMenuItem, tagMenuItem, pageMenuItem ].forEach( ( menuItem ) => {
-		if ( ! menuItem?.length ) {
+	const { defaultTaxonomiesMenuItems, taxonomiesMenuItems } =
+		useTaxonomiesMenuItems( onClickMenuItem );
+	const { defaultPostTypesMenuItems, postTypesMenuItems } =
+		usePostTypeMenuItems( onClickMenuItem );
+
+	const authorMenuItem = useAuthorMenuItem( onClickMenuItem );
+	[
+		...defaultTaxonomiesMenuItems,
+		...defaultPostTypesMenuItems,
+		authorMenuItem,
+	].forEach( ( menuItem ) => {
+		if ( ! menuItem ) {
 			return;
 		}
 		const matchIndex = enhancedMissingDefaultTemplateTypes.findIndex(
-			( template ) => template.slug === menuItem[ 0 ].slug
+			( template ) => template.slug === menuItem.slug
 		);
 		// Some default template types might have been filtered above from
 		// `missingDefaultTemplates` because they only check for the general
@@ -254,13 +288,9 @@ function useMissingTemplates(
 		// with the check if it has available specific item to create a
 		// template for.
 		if ( matchIndex > -1 ) {
-			enhancedMissingDefaultTemplateTypes.splice(
-				matchIndex,
-				1,
-				menuItem[ 0 ]
-			);
+			enhancedMissingDefaultTemplateTypes[ matchIndex ] = menuItem;
 		} else {
-			enhancedMissingDefaultTemplateTypes.push( menuItem[ 0 ] );
+			enhancedMissingDefaultTemplateTypes.push( menuItem );
 		}
 	} );
 	// Update the sort order to match the DEFAULT_TEMPLATE_SLUGS order.
@@ -270,20 +300,11 @@ function useMissingTemplates(
 			DEFAULT_TEMPLATE_SLUGS.indexOf( template2.slug )
 		);
 	} );
-	const extraPostTypeTemplates = useExtraTemplates(
-		postTypes,
-		entitiesConfig.postType,
-		onClickMenuItem
-	);
-	const extraTaxonomyTemplates = useExtraTemplates(
-		taxonomies,
-		entitiesConfig.taxonomy,
-		onClickMenuItem
-	);
 	const missingTemplates = [
 		...enhancedMissingDefaultTemplateTypes,
-		...extraPostTypeTemplates,
-		...extraTaxonomyTemplates,
+		...usePostTypeArchiveMenuItems(),
+		...postTypesMenuItems,
+		...taxonomiesMenuItems,
 	];
 	return missingTemplates;
 }

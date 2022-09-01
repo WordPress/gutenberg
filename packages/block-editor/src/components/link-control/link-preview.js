@@ -60,7 +60,6 @@ export default function LinkPreview( {
 	return (
 		<div
 			aria-label={ __( 'Currently selected' ) }
-			aria-selected="true"
 			className={ classnames( 'block-editor-link-control__search-item', {
 				'is-current': true,
 				'is-rich': hasRichData,

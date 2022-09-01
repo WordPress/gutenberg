@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray, first, isObject, last, some } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -30,6 +25,9 @@ import {
 	retrieveSelectedAttribute,
 	START_OF_SELECTED_AREA,
 } from '../utils/selection';
+
+const castArray = ( maybeArray ) =>
+	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
 /**
  * Action which will insert a default block insert action if there
@@ -396,7 +394,7 @@ export const replaceBlocks =
 			castArray( blocks ),
 			select.getSettings()
 		);
-		const rootClientId = select.getBlockRootClientId( first( clientIds ) );
+		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
 		// Replace is valid if the new blocks can be inserted in the root block.
 		for ( let index = 0; index < blocks.length; index++ ) {
 			const block = blocks[ index ];
@@ -583,7 +581,7 @@ export const insertBlocks =
 	) =>
 	( { select, dispatch } ) => {
 		/* eslint-enable jsdoc/valid-types */
-		if ( isObject( initialPosition ) ) {
+		if ( initialPosition !== null && typeof initialPosition === 'object' ) {
 			meta = initialPosition;
 			initialPosition = 0;
 			deprecated(
@@ -1004,7 +1002,7 @@ export const __unstableExpandSelection =
  */
 export const mergeBlocks =
 	( firstBlockClientId, secondBlockClientId ) =>
-	( { select, dispatch } ) => {
+	( { registry, select, dispatch } ) => {
 		const blocks = [ firstBlockClientId, secondBlockClientId ];
 		dispatch( { type: 'MERGE_BLOCKS', blocks } );
 
@@ -1012,13 +1010,41 @@ export const mergeBlocks =
 		const blockA = select.getBlock( clientIdA );
 		const blockAType = getBlockType( blockA.name );
 
-		// Only focus the previous block if it's not mergeable.
+		if ( ! blockAType ) return;
+
+		const blockB = select.getBlock( clientIdB );
+
 		if ( blockAType && ! blockAType.merge ) {
-			dispatch.selectBlock( blockA.clientId );
+			// If there's no merge function defined, attempt merging inner
+			// blocks.
+			const blocksWithTheSameType = switchToBlockType(
+				blockB,
+				blockAType.name
+			);
+			// Only focus the previous block if it's not mergeable.
+			if ( blocksWithTheSameType?.length !== 1 ) {
+				dispatch.selectBlock( blockA.clientId );
+				return;
+			}
+			const [ blockWithSameType ] = blocksWithTheSameType;
+			if ( blockWithSameType.innerBlocks.length < 1 ) {
+				dispatch.selectBlock( blockA.clientId );
+				return;
+			}
+			registry.batch( () => {
+				dispatch.insertBlocks(
+					blockWithSameType.innerBlocks,
+					undefined,
+					clientIdA
+				);
+				dispatch.removeBlock( clientIdB );
+				dispatch.selectBlock(
+					blockWithSameType.innerBlocks[ 0 ].clientId
+				);
+			} );
 			return;
 		}
 
-		const blockB = select.getBlock( clientIdB );
 		const blockBType = getBlockType( blockB.name );
 		const { clientId, attributeKey, offset } = select.getSelectionStart();
 		const selectedBlockType =
@@ -1504,7 +1530,7 @@ export const duplicateBlocks =
 
 		// Return early if blocks don't exist.
 		const blocks = select.getBlocksByClientId( clientIds );
-		if ( some( blocks, ( block ) => ! block ) ) {
+		if ( blocks.some( ( block ) => ! block ) ) {
 			return;
 		}
 
@@ -1520,8 +1546,9 @@ export const duplicateBlocks =
 		}
 
 		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
+		const clientIdsArray = castArray( clientIds );
 		const lastSelectedIndex = select.getBlockIndex(
-			last( castArray( clientIds ) )
+			clientIdsArray[ clientIdsArray.length - 1 ]
 		);
 		const clonedBlocks = blocks.map( ( block ) =>
 			__experimentalCloneSanitizedBlock( block )
@@ -1534,8 +1561,8 @@ export const duplicateBlocks =
 		);
 		if ( clonedBlocks.length > 1 && updateSelection ) {
 			dispatch.multiSelect(
-				first( clonedBlocks ).clientId,
-				last( clonedBlocks ).clientId
+				clonedBlocks[ 0 ].clientId,
+				clonedBlocks[ clonedBlocks.length - 1 ].clientId
 			);
 		}
 		return clonedBlocks.map( ( block ) => block.clientId );
@@ -1644,5 +1671,19 @@ export function setBlockVisibility( updates ) {
 	return {
 		type: 'SET_BLOCK_VISIBILITY',
 		updates,
+	};
+}
+
+/**
+ * Action that sets whether a block is being temporaritly edited as blocks.
+ *
+ * @param {?string} temporarilyEditingAsBlocks The block's clientId being temporaritly edited as blocks.
+ */
+export function __unstableSetTemporarilyEditingAsBlocks(
+	temporarilyEditingAsBlocks
+) {
+	return {
+		type: 'SET_TEMPORARILY_EDITING_AS_BLOCKS',
+		temporarilyEditingAsBlocks,
 	};
 }
