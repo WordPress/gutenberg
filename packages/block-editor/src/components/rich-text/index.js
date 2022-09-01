@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,6 +37,7 @@ import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
 import { useMarkPersistent } from './use-mark-persistent';
 import { usePasteHandler } from './use-paste-handler';
+import { useBeforeInputRules } from './use-before-input-rules';
 import { useInputRules } from './use-input-rules';
 import { useEnter } from './use-enter';
 import { useFormatTypes } from './use-format-types';
@@ -60,25 +60,27 @@ export const inputEventContext = createContext();
  * @return {Object} Filtered props.
  */
 function removeNativeProps( props ) {
-	return omit( props, [
-		'__unstableMobileNoFocusOnMount',
-		'deleteEnter',
-		'placeholderTextColor',
-		'textAlign',
-		'selectionColor',
-		'tagsToEliminate',
-		'rootTagsToEliminate',
-		'disableEditingMenu',
-		'fontSize',
-		'fontFamily',
-		'fontWeight',
-		'fontStyle',
-		'minWidth',
-		'maxWidth',
-		'setRef',
-		'disableSuggestions',
-		'disableAutocorrection',
-	] );
+	const {
+		__unstableMobileNoFocusOnMount,
+		deleteEnter,
+		placeholderTextColor,
+		textAlign,
+		selectionColor,
+		tagsToEliminate,
+		rootTagsToEliminate,
+		disableEditingMenu,
+		fontSize,
+		fontFamily,
+		fontWeight,
+		fontStyle,
+		minWidth,
+		maxWidth,
+		setRef,
+		disableSuggestions,
+		disableAutocorrection,
+		...restProps
+	} = props;
+	return restProps;
 }
 
 function RichTextWrapper(
@@ -114,6 +116,15 @@ function RichTextWrapper(
 	},
 	forwardedRef
 ) {
+	if ( multiline ) {
+		deprecated( 'wp.blockEditor.RichText multiline prop', {
+			since: '6.1',
+			version: '6.3',
+			alternative: 'nested blocks (InnerBlocks)',
+			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/nested-blocks-inner-blocks/',
+		} );
+	}
+
 	const instanceId = useInstanceId( RichTextWrapper );
 
 	identifier = identifier || instanceId;
@@ -359,6 +370,7 @@ function RichTextWrapper(
 					autocompleteProps.ref,
 					props.ref,
 					richTextRef,
+					useBeforeInputRules( { value, onChange } ),
 					useInputRules( {
 						value,
 						onChange,
@@ -449,7 +461,8 @@ ForwardedRichTextContainer.Content = ( {
 	const content = <RawHTML>{ value }</RawHTML>;
 
 	if ( Tag ) {
-		return <Tag { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
+		const { format, ...restProps } = props;
+		return <Tag { ...restProps }>{ content }</Tag>;
 	}
 
 	return content;

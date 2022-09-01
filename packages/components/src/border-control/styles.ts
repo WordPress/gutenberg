@@ -6,7 +6,7 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { COLORS, CONFIG, rtl } from '../utils';
+import { COLORS, CONFIG, boxSizingReset, rtl } from '../utils';
 import { space } from '../ui/utils/space';
 import {
 	StyledField,
@@ -31,6 +31,7 @@ export const borderControl = css`
 	border: 0;
 	padding: 0;
 	margin: 0;
+	${ boxSizingReset }
 `;
 
 export const innerWrapper = () => css`
@@ -142,16 +143,13 @@ export const colorIndicatorWrapper = (
 	`;
 };
 
-export const borderControlPopover = css`
-	/* Remove padding from content, this will be re-added via inner elements*/
-	&& .components-popover__content {
-		padding: 0;
-		width: 264px;
-	}
-`;
+// Must equal $color-palette-circle-size from:
+// @wordpress/components/src/circular-option-picker/style.scss
+const swatchSize = 28;
+const swatchGap = 12;
 
 export const borderControlPopoverControls = css`
-	padding: ${ space( 2 ) };
+	width: ${ swatchSize * 6 + swatchGap * 5 }px;
 
 	> div:first-of-type > ${ StyledLabel } {
 		margin-bottom: 0;
@@ -174,6 +172,8 @@ export const resetButton = css`
 	/* Override button component styling */
 	&& {
 		border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
+		border-top-left-radius: 0;
+		border-top-right-radius: 0;
 		height: 46px;
 	}
 `;

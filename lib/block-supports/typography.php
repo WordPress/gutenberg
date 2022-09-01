@@ -141,7 +141,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	}
 
 	$attributes = array();
-	$styles     = gutenberg_style_engine_get_block_supports_styles(
+	$styles     = gutenberg_style_engine_get_styles(
 		array( 'typography' => $typography_block_styles ),
 		array( 'convert_vars_to_classnames' => true )
 	);
@@ -171,7 +171,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
  */
 function gutenberg_typography_get_preset_inline_style_value( $style_value, $css_property ) {
 	// If the style value is not a preset CSS variable go no further.
-	if ( empty( $style_value ) || strpos( $style_value, "var:preset|{$css_property}|" ) === false ) {
+	if ( empty( $style_value ) || ! str_contains( $style_value, "var:preset|{$css_property}|" ) ) {
 		return $style_value;
 	}
 
@@ -209,7 +209,7 @@ function gutenberg_typography_get_css_variable_inline_style( $attributes, $featu
 	}
 
 	// If we don't have a preset CSS variable, we'll assume it's a regular CSS value.
-	if ( strpos( $style_value, "var:preset|{$css_property}|" ) === false ) {
+	if ( ! str_contains( $style_value, "var:preset|{$css_property}|" ) ) {
 		return sprintf( '%s:%s;', $css_property, $style_value );
 	}
 
@@ -233,7 +233,7 @@ function gutenberg_typography_get_css_variable_inline_style( $attributes, $featu
  *      'root_size_value'  => (number) Value of root font size for rem|em <-> px conversion. Default `16`.
  *      'acceptable_units' => (array)  An array of font size units. Default `[ 'rem', 'px', 'em' ]`;
  *  );.
- * @return array An array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ]
+ * @return array An array consisting of `'value'` and `'unit'` properties.
  */
 function gutenberg_get_typography_value_and_unit( $raw_value, $options = array() ) {
 	if ( empty( $raw_value ) ) {
@@ -377,6 +377,11 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 
 	// Font sizes.
 	$fluid_font_size_settings = isset( $preset['fluid'] ) ? $preset['fluid'] : null;
+
+	// A font size has explicitly bypassed fluid calculations.
+	if ( false === $fluid_font_size_settings ) {
+		return $preset['size'];
+	}
 
 	// Try to grab explicit min and max fluid font sizes.
 	$minimum_font_size_raw = isset( $fluid_font_size_settings['min'] ) ? $fluid_font_size_settings['min'] : null;

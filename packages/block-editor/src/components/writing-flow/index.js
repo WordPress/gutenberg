@@ -51,12 +51,14 @@ export function useWritingFlow() {
 						return;
 					}
 
+					node.classList.add( 'has-multi-selection' );
 					node.setAttribute(
 						'aria-label',
 						__( 'Multiple selected blocks' )
 					);
 
 					return () => {
+						node.classList.remove( 'has-multi-selection' );
 						node.removeAttribute( 'aria-label' );
 					};
 				},

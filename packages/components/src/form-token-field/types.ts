@@ -1,7 +1,11 @@
 /**
  * External dependencies
  */
-import type { ComponentPropsWithRef, MouseEventHandler } from 'react';
+import type {
+	ComponentPropsWithRef,
+	MouseEventHandler,
+	ReactNode,
+} from 'react';
 
 type Messages = {
 	/**
@@ -154,9 +158,25 @@ export interface FormTokenFieldProps
 	 * @default false
 	 */
 	__next36pxDefaultSize?: boolean;
+	/**
+	 * If true, the select the first matching suggestion when the user presses
+	 * the Enter key (or space when tokenizeOnSpace is true).
+	 *
+	 * @default false
+	 */
+	__experimentalAutoSelectFirstMatch?: boolean;
+	/**
+	 * Custom renderer for suggestions.
+	 */
+	__experimentalRenderItem?: ( args: { item: string } ) => ReactNode;
 }
 
-export interface SuggestionsListProps< T = string | { value: string } > {
+/**
+ * `T` can be either a `string` or an object which must have a `value` prop as a string.
+ */
+export interface SuggestionsListProps<
+	T = string | ( Record< string, unknown > & { value: string } )
+> {
 	selectedIndex: number;
 	scrollIntoView: boolean;
 	match: T;
@@ -165,6 +185,7 @@ export interface SuggestionsListProps< T = string | { value: string } > {
 	suggestions: T[];
 	displayTransform: ( value: T ) => string;
 	instanceId: string | number;
+	__experimentalRenderItem?: ( args: { item: T } ) => ReactNode;
 }
 
 export interface TokenProps extends TokenItem {

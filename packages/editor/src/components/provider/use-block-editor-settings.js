@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, unionBy } from 'lodash';
+import { pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -77,16 +77,25 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 	);
 
 	const blockPatterns = useMemo(
-		() => unionBy( settingsBlockPatterns, restBlockPatterns, 'name' ),
+		() =>
+			[
+				...( settingsBlockPatterns || [] ),
+				...( restBlockPatterns || [] ),
+			].filter(
+				( x, index, arr ) =>
+					index === arr.findIndex( ( y ) => x.name === y.name )
+			),
 		[ settingsBlockPatterns, restBlockPatterns ]
 	);
 
 	const blockPatternCategories = useMemo(
 		() =>
-			unionBy(
-				settingsBlockPatternCategories,
-				restBlockPatternCategories,
-				'name'
+			[
+				...( settingsBlockPatternCategories || [] ),
+				...( restBlockPatternCategories || [] ),
+			].filter(
+				( x, index, arr ) =>
+					index === arr.findIndex( ( y ) => x.name === y.name )
 			),
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
@@ -128,7 +137,9 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'colors',
 				'disableCustomColors',
 				'disableCustomFontSizes',
+				'disableCustomSpacingSizes',
 				'disableCustomGradients',
+				'disableLayoutStyles',
 				'enableCustomLineHeight',
 				'enableCustomSpacing',
 				'enableCustomUnits',

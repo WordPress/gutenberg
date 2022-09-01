@@ -33,7 +33,8 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 			_deprecated_argument( __METHOD__, '5.9' );
 		}
 
-		if ( null === static::$theme ) {
+		// When backporting to core, remove the instanceof Gutenberg class check, as it is only required for the Gutenberg plugin.
+		if ( null === static::$theme || ! static::$theme instanceof WP_Theme_JSON_Gutenberg ) {
 			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
 			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 			$theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $theme_json_data );
@@ -91,6 +92,11 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 
 			// Classic themes without a theme.json don't support global duotone.
 			$theme_support_data['settings']['color']['defaultDuotone'] = false;
+
+			// Allow themes to enable appearance tools via theme_support.
+			if ( current_theme_supports( 'appearance-tools' ) ) {
+				$theme_support_data['settings']['appearanceTools'] = true;
+			}
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( static::$theme );

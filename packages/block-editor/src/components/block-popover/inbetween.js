@@ -154,7 +154,10 @@ function BlockPopoverInbetween( {
 
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
 
-	if ( ! previousElement || ! nextElement || ! isVisible ) {
+	// If there's either a previous or a next element, show the inbetween popover.
+	// Note that drag and drop uses the inbetween popover to show the drop indicator
+	// before the first block and after the last block.
+	if ( ( ! previousElement && ! nextElement ) || ! isVisible ) {
 		return null;
 	}
 
@@ -180,9 +183,11 @@ function BlockPopoverInbetween( {
 			{ ...props }
 			className={ classnames(
 				'block-editor-block-popover',
+				'block-editor-block-popover__inbetween',
 				props.className
 			) }
-			__unstableForcePosition
+			resize={ false }
+			flip={ false }
 		>
 			<div style={ style }>{ children }</div>
 		</Popover>

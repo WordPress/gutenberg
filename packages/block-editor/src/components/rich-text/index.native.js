@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -113,6 +112,7 @@ function RichTextWrapper(
 		setRef,
 		disableSuggestions,
 		disableAutocorrection,
+		containerWidth,
 		...props
 	},
 	forwardedRef
@@ -639,6 +639,7 @@ function RichTextWrapper(
 			setRef={ setRef }
 			disableSuggestions={ disableSuggestions }
 			disableAutocorrection={ disableAutocorrection }
+			containerWidth={ containerWidth }
 			// Props to be set on the editable container are destructured on the
 			// element itself for web (see below), but passed through rich text
 			// for native.
@@ -744,7 +745,8 @@ ForwardedRichTextContainer.Content = ( {
 	const content = <RawHTML>{ value }</RawHTML>;
 
 	if ( Tag ) {
-		return <Tag { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
+		const { format, ...restProps } = props;
+		return <Tag { ...restProps }>{ content }</Tag>;
 	}
 
 	return content;

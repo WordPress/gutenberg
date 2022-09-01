@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import type { CSSProperties, FocusEventHandler, SyntheticEvent } from 'react';
+import type {
+	CSSProperties,
+	FocusEventHandler,
+	ReactNode,
+	SyntheticEvent,
+} from 'react';
 
 /**
  * Internal dependencies
@@ -43,7 +48,7 @@ export type UnitControlOnChangeCallback = InputChangeCallback<
 	{ data?: WPUnitControlUnit }
 >;
 
-export type UnitSelectControlProps = {
+export type UnitSelectControlProps = Pick< InputControlProps, 'size' > & {
 	/**
 	 * Whether the control can be focused via keyboard navigation.
 	 *
@@ -54,12 +59,6 @@ export type UnitSelectControlProps = {
 	 * A callback function invoked when the value is changed.
 	 */
 	onChange?: UnitControlOnChangeCallback;
-	/**
-	 * Size of the control option. Supports "default" and "small".
-	 *
-	 * @default 'default'
-	 */
-	size?: SelectSize;
 	/**
 	 * Current unit.
 	 */
@@ -80,6 +79,10 @@ export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
 	> & {
 		__unstableStateReducer?: StateReducer;
 		__unstableInputWidth?: CSSProperties[ 'width' ];
+		/**
+		 * The children elements.
+		 */
+		children?: ReactNode;
 		/**
 		 * If `true`, the unit `<select>` is hidden.
 		 *

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { times, unescape } from 'lodash';
+import { unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -114,7 +114,7 @@ export default function CategoriesEdit( {
 		const childCategories = getCategoriesList( id );
 		return [
 			<option key={ id }>
-				{ times( level * 3, () => '\xa0' ) }
+				{ Array.from( { length: level * 3 } ).map( () => '\xa0' ) }
 				{ renderCategoryName( name ) }
 				{ showPostCounts && ` (${ count })` }
 			</option>,

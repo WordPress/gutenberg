@@ -207,15 +207,15 @@ describe( 'Multi-entity save flow', () => {
 			await page.keyboard.type( '...' );
 
 			await insertBlock( 'Site Tagline' );
-			// Ensure tagline is retrieved before typing.
+			// Wait for the placeholder.
 			await page.waitForXPath(
-				'//p[contains(text(), "Just another WordPress site")]'
+				'//span[@data-rich-text-placeholder="Write site tagline…"]'
 			);
 			const editableSiteTagLineSelector =
 				'.wp-block-site-tagline[contenteditable="true"]';
 			await page.waitForSelector( editableSiteTagLineSelector );
 			await page.focus( editableSiteTagLineSelector );
-			await page.keyboard.type( '...' );
+			await page.keyboard.type( 'Just another WordPress site' );
 
 			await clickButton( 'Publish' );
 			await page.waitForSelector( savePanelSelector );

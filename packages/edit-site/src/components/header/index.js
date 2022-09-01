@@ -11,8 +11,14 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
-import { listView, plus } from '@wordpress/icons';
-import { Button, ToolbarItem } from '@wordpress/components';
+import { listView, plus, external } from '@wordpress/icons';
+import {
+	Button,
+	ToolbarItem,
+	MenuGroup,
+	MenuItem,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -48,6 +54,7 @@ export default function Header( {
 		listViewShortcut,
 		isLoaded,
 		isVisualMode,
+		settings,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -56,6 +63,7 @@ export default function Header( {
 			isInserterOpened,
 			isListViewOpened,
 			getEditorMode,
+			getSettings,
 		} = select( editSiteStore );
 		const { getEditedEntityRecord } = select( coreStore );
 		const { __experimentalGetTemplateInfo: getTemplateInfo } =
@@ -79,6 +87,7 @@ export default function Header( {
 				'core/edit-site/toggle-list-view'
 			),
 			isVisualMode: getEditorMode() === 'visual',
+			settings: getSettings(),
 		};
 	}, [] );
 
@@ -168,6 +177,9 @@ export default function Header( {
 								onClick={ toggleListView }
 								shortcut={ listViewShortcut }
 								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
 							/>
 						</>
 					) }
@@ -200,14 +212,30 @@ export default function Header( {
 						<PreviewOptions
 							deviceType={ deviceType }
 							setDeviceType={ setPreviewDeviceType }
-						/>
+						>
+							<MenuGroup>
+								<MenuItem
+									href={ settings?.siteUrl }
+									target="_blank"
+									icon={ external }
+								>
+									{ __( 'View site' ) }
+									<VisuallyHidden as="span">
+										{
+											/* translators: accessibility text */
+											__( '(opens in a new tab)' )
+										}
+									</VisuallyHidden>
+								</MenuItem>
+							</MenuGroup>
+						</PreviewOptions>
 					) }
 					<SaveButton
 						openEntitiesSavedStates={ openEntitiesSavedStates }
 						isEntitiesSavedStatesOpen={ isEntitiesSavedStatesOpen }
 					/>
 					<PinnedItems.Slot scope="core/edit-site" />
-					<MoreMenu />
+					<MoreMenu showIconLabels={ showIconLabels } />
 				</div>
 			</div>
 		</div>
