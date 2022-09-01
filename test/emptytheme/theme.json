@@ -2,9 +2,59 @@
 	"version": 2,
 	"settings": {
 		"appearanceTools": true,
+		"color": {
+			"palette": [
+				{
+					"slug": "light",
+					"name": "Light",
+					"color": "#f5f7f9"
+				},
+				{
+					"slug": "dark",
+					"name": "Dark",
+					"color": "#000"
+				}
+			]
+		},
 		"layout": {
 			"contentSize": "840px",
 			"wideSize": "1100px"
+		},
+		"blocks": {
+			"core/quote": {
+				"core/heading": {
+					"color": {
+						"text": true,
+						"palette": [
+							{
+								"slug": "dark",
+								"name": "Dark",
+								"color": "#000"
+							}
+						]
+					},
+					"typography": {
+						"fontWeight": "500"
+					}
+				},
+				"core/media-text": {
+					"core/heading": {
+						"color": {
+							"text": true,
+							"palette": [
+								{
+									"slug": "light",
+									"name": "Light",
+									"color": "#f5f7f9"
+								}
+							]
+						},
+						"typography": {
+							"fontWeight": "700"
+						}
+					}
+				}
+			}
 		}
 	},
 	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
