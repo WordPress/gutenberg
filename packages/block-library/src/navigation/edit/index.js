@@ -450,6 +450,27 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
+	// Prompt the user to publish the menu they have set as a draft
+	useEffect( async () => {
+		hideMenuAutoPublishDraftNotice();
+		if ( ! isDraftNavigationMenu ) return;
+		try {
+			await editEntityRecord(
+				'postType',
+				'wp_navigation',
+				navigationMenu?.id,
+				{
+					status: 'publish',
+				},
+				{ throwOnError: true }
+			);
+		} catch {
+			showMenuAutoPublishDraftNotice(
+				__( 'Error ocurred while publishing the navigation menu.' )
+			);
+		}
+	}, [ isDraftNavigationMenu, navigationMenu ] );
+
 	const stylingInspectorControls = (
 		<InspectorControls>
 			{ hasSubmenuIndicatorSetting && (
