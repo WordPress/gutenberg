@@ -38,6 +38,9 @@ export type TabPanelProps = {
 	 * The function is passed the active tab object as an argument as defined by the tabs prop.
 	 */
 	children: ( tab: Tab ) => ReactNode;
+	/**
+	 * The class name to give to the outer container for the TabPanel.
+	 */
 	className?: string;
 	/**
 	 * The name of the tab to be selected upon mounting of component.
