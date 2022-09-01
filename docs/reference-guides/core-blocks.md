@@ -149,7 +149,7 @@ Displays a link to edit the comment in the WordPress Dashboard. This link is onl
 
 -	**Name:** core/comment-edit-link
 -	**Category:** theme
--	**Supports:** color (background, gradients, link, ~~text~~), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, link, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** linkTarget, textAlign
 
 ## Comment Reply Link
