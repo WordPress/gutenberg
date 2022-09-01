@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -10,18 +10,18 @@ import { PostScheduleCheck } from '../check';
 
 describe( 'PostScheduleCheck', () => {
 	it( "should not render anything if the user doesn't have the right capabilities", () => {
-		const wrapper = shallow(
+		render(
 			<PostScheduleCheck hasPublishAction={ false }>
 				yes
 			</PostScheduleCheck>
 		);
-		expect( wrapper.type() ).toBe( null );
+		expect( screen.queryByText( 'yes' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'should render if the user has the correct capability', () => {
-		const wrapper = shallow(
+		render(
 			<PostScheduleCheck hasPublishAction={ true }>yes</PostScheduleCheck>
 		);
-		expect( wrapper.type() ).not.toBe( null );
+		expect( screen.getByText( 'yes' ) ).toBeVisible();
 	} );
 } );

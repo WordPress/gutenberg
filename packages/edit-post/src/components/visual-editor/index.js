@@ -181,11 +181,17 @@ export default function VisualEditor( { styles } ) {
 		}
 
 		if ( themeSupportsLayout ) {
-			return defaultLayout;
+			// We need to ensure support for wide and full alignments,
+			// so we add the constrained type.
+			return { ...defaultLayout, type: 'constrained' };
 		}
-
-		return undefined;
+		// Set default layout for classic themes so all alignments are supported.
+		return { type: 'default' };
 	}, [ isTemplateMode, themeSupportsLayout, defaultLayout ] );
+
+	const blockListLayoutClass = themeSupportsLayout
+		? 'is-layout-constrained'
+		: 'is-layout-flow';
 
 	const titleRef = useRef();
 	useEffect( () => {
@@ -243,7 +249,7 @@ export default function VisualEditor( { styles } ) {
 							! isTemplateMode && (
 								<LayoutStyle
 									selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
-									layout={ defaultLayout }
+									layout={ layout }
 									layoutDefinitions={
 										defaultLayout?.definitions
 									}
@@ -265,7 +271,7 @@ export default function VisualEditor( { styles } ) {
 								className={
 									isTemplateMode
 										? 'wp-site-blocks'
-										: 'is-layout-flow' // Ensure root level blocks receive default/flow blockGap styling rules.
+										: blockListLayoutClass // Ensure root level blocks receive default/flow blockGap styling rules.
 								}
 								__experimentalLayout={ layout }
 							/>

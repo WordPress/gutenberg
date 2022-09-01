@@ -23,7 +23,6 @@ function useConvertClassicToBlockMenu( clientId ) {
 	const registry = useRegistry();
 
 	const [ status, setStatus ] = useState( CLASSIC_MENU_CONVERSION_IDLE );
-	const [ value, setValue ] = useState( null );
 	const [ error, setError ] = useState( null );
 
 	async function convertClassicMenuToBlockMenu( menuId, menuName ) {
@@ -88,47 +87,42 @@ function useConvertClassicToBlockMenu( clientId ) {
 		return navigationMenu;
 	}
 
-	const convert = useCallback(
-		( menuId, menuName ) => {
-			if ( ! menuId || ! menuName ) {
-				setError( 'Unable to convert menu. Missing menu details.' );
+	const convert = useCallback( async ( menuId, menuName ) => {
+		if ( ! menuId || ! menuName ) {
+			setError( 'Unable to convert menu. Missing menu details.' );
+			setStatus( CLASSIC_MENU_CONVERSION_ERROR );
+			return;
+		}
+
+		setStatus( CLASSIC_MENU_CONVERSION_PENDING );
+		setError( null );
+
+		return await convertClassicMenuToBlockMenu( menuId, menuName )
+			.then( ( navigationMenu ) => {
+				setStatus( CLASSIC_MENU_CONVERSION_SUCCESS );
+				return navigationMenu;
+			} )
+			.catch( ( err ) => {
+				setError( err?.message );
 				setStatus( CLASSIC_MENU_CONVERSION_ERROR );
-				return;
-			}
 
-			setStatus( CLASSIC_MENU_CONVERSION_PENDING );
-			setValue( null );
-			setError( null );
-
-			convertClassicMenuToBlockMenu( menuId, menuName )
-				.then( ( navMenu ) => {
-					setValue( navMenu );
-					setStatus( CLASSIC_MENU_CONVERSION_SUCCESS );
-				} )
-				.catch( ( err ) => {
-					setError( err?.message );
-					setStatus( CLASSIC_MENU_CONVERSION_ERROR );
-
-					// Rethrow error for debugging.
-					throw new Error(
-						sprintf(
-							// translators: %s: the name of a menu (e.g. Header navigation).
-							__( `Unable to create Navigation Menu "%s".` ),
-							menuName
-						),
-						{
-							cause: err,
-						}
-					);
-				} );
-		},
-		[ clientId ]
-	);
+				// Rethrow error for debugging.
+				throw new Error(
+					sprintf(
+						// translators: %s: the name of a menu (e.g. Header navigation).
+						__( `Unable to create Navigation Menu "%s".` ),
+						menuName
+					),
+					{
+						cause: err,
+					}
+				);
+			} );
+	}, [] );
 
 	return {
 		convert,
 		status,
-		value,
 		error,
 	};
 }

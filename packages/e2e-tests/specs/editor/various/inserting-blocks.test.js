@@ -279,6 +279,8 @@ describe( 'Inserting blocks', () => {
 		await insertBlock( 'Group' );
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Paragraph after group' );
+		// Click the Group first to make the appender inside it clickable.
+		await page.click( '[data-type="core/group"]' );
 		await page.click( '[data-type="core/group"] [aria-label="Add block"]' );
 		const browseAll = await page.waitForXPath(
 			'//button[text()="Browse all"]'
@@ -295,6 +297,8 @@ describe( 'Inserting blocks', () => {
 		await insertBlock( 'Group' );
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Text' );
+		// Click the Group first to make the appender inside it clickable.
+		await page.click( '[data-type="core/group"]' );
 		await page.click( '[data-type="core/group"] [aria-label="Add block"]' );
 		await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
 		await page.focus( INSERTER_SEARCH_SELECTOR );

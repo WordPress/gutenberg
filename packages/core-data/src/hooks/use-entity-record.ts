@@ -56,6 +56,8 @@ export interface Options {
 /**
  * Resolves the specified entity record.
  *
+ * @since 6.1.0 Introduced in WordPress core.
+ *
  * @param  kind     Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
  * @param  name     Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
  * @param  recordId ID of the requested entity record.
@@ -84,8 +86,8 @@ export interface Options {
  *
  * @example
  * ```js
- * import { useState } from '@wordpress/data';
  * import { useDispatch } from '@wordpress/data';
+ * import { useCallback } from '@wordpress/element';
  * import { __ } from '@wordpress/i18n';
  * import { TextControl } from '@wordpress/components';
  * import { store as noticeStore } from '@wordpress/notices';
@@ -93,9 +95,12 @@ export interface Options {
  *
  * function PageRenameForm( { id } ) {
  * 	const page = useEntityRecord( 'postType', 'page', id );
- * 	const [ title, setTitle ] = useState( () => page.record.title.rendered );
  * 	const { createSuccessNotice, createErrorNotice } =
  * 		useDispatch( noticeStore );
+ *
+ * 	const setTitle = useCallback( ( title ) => {
+ * 		page.edit( { title } );
+ * 	}, [ page.edit ] );
  *
  * 	if ( page.isResolving ) {
  * 		return 'Loading...';
@@ -103,7 +108,6 @@ export interface Options {
  *
  * 	async function onRename( event ) {
  * 		event.preventDefault();
- * 		page.edit( { title } );
  * 		try {
  * 			await page.save();
  * 			createSuccessNotice( __( 'Page renamed.' ), {
@@ -118,7 +122,7 @@ export interface Options {
  * 		<form onSubmit={ onRename }>
  * 			<TextControl
  * 				label={ __( 'Name' ) }
- * 				value={ title }
+ * 				value={ page.editedRecord.title }
  * 				onChange={ setTitle }
  * 			/>
  * 			<button type="submit">{ __( 'Save' ) }</button>
@@ -161,8 +165,16 @@ export default function useEntityRecord< RecordType >(
 
 	const { editedRecord, hasEdits } = useSelect(
 		( select ) => ( {
-			editedRecord: select( coreStore ).getEditedEntityRecord(),
-			hasEdits: select( coreStore ).hasEditsForEntityRecord(),
+			editedRecord: select( coreStore ).getEditedEntityRecord(
+				kind,
+				name,
+				recordId
+			),
+			hasEdits: select( coreStore ).hasEditsForEntityRecord(
+				kind,
+				name,
+				recordId
+			),
 		} ),
 		[ kind, name, recordId ]
 	);

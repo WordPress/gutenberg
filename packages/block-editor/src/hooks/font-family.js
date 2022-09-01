@@ -132,6 +132,8 @@ export function FontFamilyEdit( {
 			fontFamilies={ fontFamilies }
 			value={ value }
 			onChange={ onChange }
+			size="__unstable-large"
+			__nextHasNoMarginBottom
 		/>
 	);
 }

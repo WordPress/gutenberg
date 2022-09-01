@@ -24,11 +24,6 @@
 function render_block_core_comments( $attributes, $content, $block ) {
 	global $post;
 
-	$is_legacy = 'core/post-comments' === $block->name || ! empty( $attributes['legacy'] );
-	if ( ! $is_legacy ) {
-		return $block->render( array( 'dynamic' => false ) );
-	}
-
 	$post_id = $block->context['postId'];
 	if ( ! isset( $post_id ) ) {
 		return '';
@@ -42,6 +37,12 @@ function render_block_core_comments( $attributes, $content, $block ) {
 	// Return early if there are no comments and comments are closed.
 	if ( ! comments_open( $post_id ) && get_comments( $comment_args ) === 0 ) {
 		return '';
+	}
+
+	// If this isn't the legacy block, we need to render the static version of this block.
+	$is_legacy = 'core/post-comments' === $block->name || ! empty( $attributes['legacy'] );
+	if ( ! $is_legacy ) {
+		return $block->render( array( 'dynamic' => false ) );
 	}
 
 	$post_before = $post;

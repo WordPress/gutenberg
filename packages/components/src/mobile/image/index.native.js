@@ -1,12 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	Image as RNImage,
-	Text,
-	View,
-	useWindowDimensions,
-} from 'react-native';
+import { Image as RNImage, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 /**
@@ -16,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/components';
 import { image as icon } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { useEffect, useState, useRef, Platform } from '@wordpress/element';
+import { useEffect, useState, Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -59,14 +54,14 @@ const ImageComponent = ( {
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
 	const [ containerSize, setContainerSize ] = useState( null );
-	const [ shouldUseFallback, setShouldUseFallback ] = useState( false );
-	const { height: windowHeight, width: windowWidth } = useWindowDimensions();
-	const isLandscape = useRef( windowWidth > windowHeight );
 
-	const Image = ! shouldUseFastImage ? RNImage : FastImage;
-	const imageResizeMode = ! shouldUseFastImage
-		? resizeMode
-		: FastImage.resizeMode[ resizeMode ];
+	// Disabled for Android due to https://github.com/WordPress/gutenberg/issues/43149
+	const Image =
+		! shouldUseFastImage || Platform.isAndroid ? RNImage : FastImage;
+	const imageResizeMode =
+		! shouldUseFastImage || Platform.isAndroid
+			? resizeMode
+			: FastImage.resizeMode[ resizeMode ];
 
 	useEffect( () => {
 		let isCurrent = true;
@@ -88,21 +83,6 @@ const ImageComponent = ( {
 		}
 		return () => ( isCurrent = false );
 	}, [ url ] );
-
-	// Workaround for Android where changing the orientation breaks FastImage
-	// for now if there's any orientation changes, it will use the fallback
-	// prop to use the default Image component.
-	// https://github.com/WordPress/gutenberg/issues/42869
-	useEffect( () => {
-		if ( Platform.isAndroid && shouldUseFastImage ) {
-			const isCurrentOrientationLandscape = windowWidth > windowHeight;
-
-			if ( isLandscape.current !== isCurrentOrientationLandscape ) {
-				setShouldUseFallback( true );
-				isLandscape.current = isCurrentOrientationLandscape;
-			}
-		}
-	}, [ windowHeight, windowWidth ] );
 
 	const onContainerLayout = ( event ) => {
 		const { height, width } = event.nativeEvent.layout;
@@ -250,7 +230,6 @@ const ImageComponent = ( {
 								resizeMethod: 'scale',
 							} ) }
 							resizeMode={ imageResizeMode }
-							fallback={ shouldUseFallback }
 						/>
 					</View>
 				) }

@@ -38,7 +38,7 @@ export const useTaxonomiesInfo = ( postType ) => {
 	const taxonomiesInfo = useSelect(
 		( select ) => {
 			const { getEntityRecords } = select( coreStore );
-			const termsQuery = { per_page: MAX_FETCHED_TERMS };
+			const termsQuery = { context: 'view', per_page: MAX_FETCHED_TERMS };
 			const _taxonomiesInfo = taxonomies?.map( ( { slug, name } ) => {
 				const _terms = getEntityRecords( 'taxonomy', slug, termsQuery );
 				return {

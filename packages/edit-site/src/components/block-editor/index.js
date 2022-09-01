@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit, unionBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -80,31 +79,42 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	);
 
 	const blockPatterns = useMemo(
-		() => unionBy( settingsBlockPatterns, restBlockPatterns, 'name' ),
+		() =>
+			[
+				...( settingsBlockPatterns || [] ),
+				...( restBlockPatterns || [] ),
+			].filter(
+				( x, index, arr ) =>
+					index === arr.findIndex( ( y ) => x.name === y.name )
+			),
 		[ settingsBlockPatterns, restBlockPatterns ]
 	);
 
 	const blockPatternCategories = useMemo(
 		() =>
-			unionBy(
-				settingsBlockPatternCategories,
-				restBlockPatternCategories,
-				'name'
+			[
+				...( settingsBlockPatternCategories || [] ),
+				...( restBlockPatternCategories || [] ),
+			].filter(
+				( x, index, arr ) =>
+					index === arr.findIndex( ( y ) => x.name === y.name )
 			),
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
 
-	const settings = useMemo(
-		() => ( {
-			...omit( storedSettings, [
-				'__experimentalAdditionalBlockPatterns',
-				'__experimentalAdditionalBlockPatternCategories',
-			] ),
+	const settings = useMemo( () => {
+		const {
+			__experimentalAdditionalBlockPatterns,
+			__experimentalAdditionalBlockPatternCategories,
+			...restStoredSettings
+		} = storedSettings;
+
+		return {
+			...restStoredSettings,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
-		} ),
-		[ storedSettings, blockPatterns, blockPatternCategories ]
-	);
+		};
+	}, [ storedSettings, blockPatterns, blockPatternCategories ] );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',

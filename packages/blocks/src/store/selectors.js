@@ -2,7 +2,8 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { deburr, filter, flow, get, includes, map, some } from 'lodash';
+import removeAccents from 'remove-accents';
+import { filter, flow, get, includes, map, some } from 'lodash';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
@@ -688,7 +689,7 @@ export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 	const getNormalizedSearchTerm = flow( [
 		// Disregard diacritics.
 		//  Input: "média"
-		deburr,
+		( term ) => removeAccents( term ?? '' ),
 
 		// Lowercase.
 		//  Input: "MEDIA"
@@ -789,3 +790,13 @@ export const hasChildBlocksWithInserterSupport = ( state, blockName ) => {
 		return hasBlockSupport( state, childBlockName, 'inserter', true );
 	} );
 };
+
+export const __experimentalHasContentRoleAttribute = createSelector(
+	( state, blockTypeName ) => {
+		const blockType = getBlockType( state, blockTypeName );
+		return Object.entries( blockType.attributes ).some(
+			( [ , { __experimentalRole } ] ) => __experimentalRole === 'content'
+		);
+	},
+	( state, blockTypeName ) => [ state.blockTypes[ blockTypeName ].attributes ]
+);

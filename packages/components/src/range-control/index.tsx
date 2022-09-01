@@ -49,6 +49,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	const {
+		__nextHasNoMarginBottom = false,
 		afterIcon,
 		allowReset = false,
 		beforeIcon,
@@ -212,6 +213,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
 
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			className={ classes }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
@@ -225,6 +227,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
 					</BeforeIconWrapper>
 				) }
 				<Wrapper
+					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 					className={ wrapperClasses }
 					color={ colorProp }
 					marks={ !! marks }

@@ -6,7 +6,7 @@ import { waitIfAndroid, backspace } from './helpers/utils';
 
 describe( 'Gutenberg Editor tests for List block', () => {
 	// Prevent regression of https://github.com/wordpress-mobile/gutenberg-mobile/issues/871
-	it( 'should handle spaces in a list', async () => {
+	it.skip( 'should handle spaces in a list', async () => {
 		await editorPage.addNewBlock( blockNames.list );
 		let listBlockElement = await editorPage.getListBlockAtPosition();
 

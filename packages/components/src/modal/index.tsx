@@ -23,7 +23,6 @@ import {
 	useConstrainedTabbing,
 	useMergeRefs,
 } from '@wordpress/compose';
-import { ESCAPE } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import { close } from '@wordpress/icons';
 
@@ -101,7 +100,7 @@ function UnforwardedModal(
 	function handleEscapeKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
 		if (
 			shouldCloseOnEsc &&
-			event.keyCode === ESCAPE &&
+			event.code === 'Escape' &&
 			! event.defaultPrevented
 		) {
 			event.preventDefault();
