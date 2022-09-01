@@ -218,7 +218,7 @@ function ButtonEdit( props ) {
 						setIsEditingURL( false );
 						richTextRef.current?.focus();
 					} }
-					anchorRef={ ref?.current }
+					anchor={ ref.current }
 					focusOnMount={ isEditingURL ? 'firstElement' : false }
 					__unstableSlotName={ '__unstable-block-tools-after' }
 					__unstableShift
