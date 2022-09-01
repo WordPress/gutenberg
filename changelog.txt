@@ -1,5 +1,30 @@
 == Changelog ==
 
+= 14.0.1 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Post Editor
+- Fix layout applied to post editor on classic themes. ([43755](https://github.com/WordPress/gutenberg/pull/43755))
+
+
+## First time contributors
+
+The following PRs were merged by first time contributors:
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@tellthemachines
+
+
 = 14.0.0 =
 
 ## Changelog
