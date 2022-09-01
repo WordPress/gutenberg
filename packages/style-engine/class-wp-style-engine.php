@@ -364,7 +364,7 @@ final class WP_Style_Engine {
 		}
 
 		// Collect CSS and classnames.
-		foreach ( static::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group_key => $definition_group_style ) {
+		foreach ( WP_Style_Engine_Block_Supports::get_metadata() as $definition_group_key => $definition_group_style ) {
 			if ( empty( $block_styles[ $definition_group_key ] ) ) {
 				continue;
 			}
@@ -527,7 +527,7 @@ final class WP_Style_Engine {
 
 			// Build a path to the individual rules in definitions.
 			$style_definition_path = array( $definition_group_key, $css_property );
-			$style_definition      = _wp_array_get( static::BLOCK_STYLE_DEFINITIONS_METADATA, $style_definition_path, null );
+			$style_definition      = _wp_array_get( WP_Style_Engine_Block_Supports::get_metadata(), $style_definition_path, null );
 
 			if ( $style_definition && isset( $style_definition['property_keys']['individual'] ) ) {
 				// Set a CSS var if there is a valid preset value.
