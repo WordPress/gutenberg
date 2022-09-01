@@ -25,16 +25,15 @@ test.describe( 'Writing Flow', () => {
 		// See: https://github.com/WordPress/gutenberg/issues/18928
 		await writingFlowUtils.addDemoContent();
 
+		const activeElementLocator = page.locator( ':focus' );
+
 		// Arrow up into nested context focuses last text input.
 		await page.keyboard.press( 'ArrowUp' );
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
-		await expect
-			.poll( () =>
-				page.evaluate( () => document.activeElement.textContent )
-			)
-			.toBe( '2nd col' );
+		await expect( activeElementLocator ).toBeFocused();
+		await expect( activeElementLocator ).toHaveText( '2nd col' );
 
 		// Arrow up in inner blocks should navigate through (1) column wrapper,
 		// (2) text fields.
@@ -57,11 +56,8 @@ test.describe( 'Writing Flow', () => {
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
-		await expect
-			.poll( () =>
-				page.evaluate( () => document.activeElement.textContent )
-			)
-			.toBe( 'First paragraph' );
+		await expect( activeElementLocator ).toBeFocused();
+		await expect( activeElementLocator ).toHaveText( 'First paragraph' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
