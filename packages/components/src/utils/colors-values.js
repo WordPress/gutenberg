@@ -24,7 +24,6 @@ const GRAY = {
 
 // TODO: Replace usages of these with the equivalents in `GRAY`
 const DARK_GRAY = {
-	500: '#555d66', // Use this most of the time for dark items.
 	300: '#6c7781', // Lightest gray that can be used for AA text contrast.
 };
 
