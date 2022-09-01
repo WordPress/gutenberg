@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
@@ -77,9 +72,11 @@ export function migrateToListV2( attributes ) {
 
 	const listBlock = createListBlockFromDOMElement( list );
 
+	const { values: omittedValues, ...restAttributes } = attributes;
+
 	return [
 		{
-			...omit( attributes, [ 'values' ] ),
+			...restAttributes,
 			...listBlock.attributes,
 		},
 		listBlock.innerBlocks,

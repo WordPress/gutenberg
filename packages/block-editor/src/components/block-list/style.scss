@@ -50,7 +50,8 @@
 		}
 
 		// Provide exceptions for placeholders.
-		.components-placeholder {
+		.components-placeholder,
+		.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected) {
 			::selection {
 				background: transparent;
 			}
@@ -121,6 +122,15 @@
 	font-size: 1px;
 	height: 1px;
 	padding: 0;
+}
+
+.is-content-locked {
+	.block-editor-block-list__block {
+		pointer-events: none;
+	}
+	.is-content-block {
+		pointer-events: initial;
+	}
 }
 
 .block-editor-block-list__layout .block-editor-block-list__block {
@@ -327,6 +337,14 @@
 	.block-editor-block-list__block,
 	&.is-selected,
 	&.is-multi-selected {
+		opacity: 1;
+	}
+}
+
+.is-focus-mode .block-editor-block-list__block.is-content-locked.has-child-selected,
+.is-focus-mode .block-editor-block-list__block.is-content-locked-temporarily-editing-as-blocks.has-child-selected {
+	&,
+	& .block-editor-block-list__block {
 		opacity: 1;
 	}
 }
