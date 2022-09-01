@@ -92,8 +92,8 @@
 				"background": true,
 				"text": true,
 				"link": true
-      }
-    },
+			}
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
