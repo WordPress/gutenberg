@@ -65,6 +65,11 @@ $block-preview-height: 150px;
 	padding: 0 $grid-unit-20;
 }
 
+.edit-site-global-styles-header {
+	// Need to override the too specific bottom margin for complementary areas.
+	margin-bottom: 0 !important;
+}
+
 .edit-site-global-styles-subtitle {
 	// Need to override the too specific styles for complementary areas.
 	margin-bottom: 0 !important;
