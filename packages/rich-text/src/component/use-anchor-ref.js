@@ -30,7 +30,7 @@ import { getActiveFormat } from '../get-active-format';
  * @param {RichTextValue}          $1.value    Value to check for selection.
  * @param {RichTextFormatType}     $1.settings The format type's settings.
  *
- * @return {Element|VirtualAnchorElement|null|undefined} The active element or selection range.
+ * @return {Element|VirtualAnchorElement|undefined} The active element or selection range.
  */
 export function useAnchorRef( { ref, value, settings = {} } ) {
 	const { tagName, className, name } = settings;
@@ -67,8 +67,9 @@ export function useAnchorRef( { ref, value, settings = {} } ) {
 			element = element.parentNode;
 		}
 
-		return element.closest(
-			tagName + ( className ? '.' + className : '' )
+		return (
+			element.closest( tagName + ( className ? '.' + className : '' ) ) ??
+			undefined
 		);
 	}, [ activeFormat, value.start, value.end, tagName, className ] );
 }
