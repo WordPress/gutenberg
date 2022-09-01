@@ -42,12 +42,7 @@ import type { RadioControlProps } from './types';
  * ```
  */
 export function RadioControl(
-	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
-	// ref forwarding to RadioControl.
-	props: Omit<
-		WordPressComponentProps< RadioControlProps, 'input', false >,
-		'ref'
-	>
+	props: WordPressComponentProps< RadioControlProps, 'input', false >
 ) {
 	const {
 		label,

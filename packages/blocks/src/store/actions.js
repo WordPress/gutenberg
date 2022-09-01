@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { isPlainObject } from 'is-plain-object';
-import { castArray, omit, pick, some } from 'lodash';
+import { castArray, pick, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,7 +12,7 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { isValidIcon, normalizeIconObject } from '../api/utils';
+import { isValidIcon, normalizeIconObject, omit } from '../api/utils';
 import { DEPRECATED_ENTRY_KEYS } from '../api/constants';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import { __unstableIframe as Iframe } from '@wordpress/block-editor';
 
 /**
@@ -73,7 +73,8 @@ export default {
 			options: AVAILABLE_POSITIONS,
 		},
 		__unstableSlotName: { control: { type: null } },
-		__unstableForcePosition: { control: { type: 'boolean' } },
+		resize: { control: { type: 'boolean' } },
+		flip: { control: { type: 'boolean' } },
 		__unstableShift: { control: { type: 'boolean' } },
 	},
 };
@@ -106,18 +107,29 @@ export const Default = ( args ) => {
 	const toggleVisible = () => {
 		setIsVisible( ( state ) => ! state );
 	};
+	const buttonRef = useRef();
+	useEffect( () => {
+		buttonRef.current?.scrollIntoView?.( {
+			block: 'center',
+			inline: 'center',
+		} );
+	}, [] );
 
 	return (
 		<div
 			style={ {
-				minWidth: '600px',
-				minHeight: '600px',
+				width: '300vw',
+				height: '300vh',
 				display: 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',
 			} }
 		>
-			<Button variant="secondary" onClick={ toggleVisible }>
+			<Button
+				variant="secondary"
+				onClick={ toggleVisible }
+				ref={ buttonRef }
+			>
 				Toggle Popover
 				{ isVisible && <Popover { ...args } /> }
 			</Button>
@@ -180,7 +192,8 @@ AllPlacements.args = {
 	),
 	noArrow: false,
 	offset: 10,
-	__unstableForcePosition: true,
+	resize: false,
+	flip: false,
 };
 
 export const DynamicHeight = ( { children, ...args } ) => {
@@ -244,6 +257,8 @@ export const WithSlotOutsideIframe = ( args ) => {
 					style={ {
 						width: '100%',
 						height: '400px',
+						border: '0',
+						outline: '1px solid purple',
 					} }
 				>
 					<div

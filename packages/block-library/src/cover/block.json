@@ -73,7 +73,7 @@
 		},
 		"templateLock": {
 			"type": [ "string", "boolean" ],
-			"enum": [ "all", "insert", false ]
+			"enum": [ "all", "insert", "noContent", false ]
 		}
 	},
 	"usesContext": [ "postId", "postType" ],

@@ -2,6 +2,13 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
+import type { RefAttributes } from 'react';
+
+/**
+ * Internal dependencies
+ */
+import type { WordPressComponent } from '../ui/context/wordpress-component';
+import type { ViewProps } from './types';
 
 /**
  * `View` is a core component that renders everything in the library.
@@ -19,11 +26,13 @@ import styled from '@emotion/styled';
  * 	);
  * }
  * ```
- *
- * @type {import('../ui/context').WordPressComponent<'div', { children?: import('react').ReactNode }, true>}
  */
-// @ts-ignore
-const View = styled.div``;
+// @ts-expect-error
+export const View: WordPressComponent<
+	'div',
+	ViewProps & RefAttributes< any >
+> = styled.div``;
+
 View.selector = '.components-view';
 View.displayName = 'View';
 
