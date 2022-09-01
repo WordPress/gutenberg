@@ -16,11 +16,13 @@ import {
 } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
+	ExternalLink,
 	MenuItem,
 	PanelBody,
 	RangeControl,
 	ResizableBox,
 	Spinner,
+	TextareaControl,
 	ToggleControl,
 	ToolbarButton,
 	Placeholder,
@@ -57,7 +59,15 @@ const ACCEPT_MEDIA_STRING = 'image/*';
 
 const SiteLogo = ( {
 	alt,
-	attributes: { align, width, height, isLink, linkTarget, shouldSyncIcon },
+	attributes: {
+		blockAlt,
+		align,
+		width,
+		height,
+		isLink,
+		linkTarget,
+		shouldSyncIcon,
+	},
 	containerRef,
 	isSelected,
 	setAttributes,
@@ -114,11 +124,21 @@ const SiteLogo = ( {
 		toggleSelection( true );
 	}
 
+	function updateAlt( newAlt ) {
+		setAttributes( { blockAlt: newAlt } );
+	}
+
+	let defaultAlt = alt;
+
+	if ( blockAlt ) {
+		defaultAlt = blockAlt;
+	}
+
 	const img = (
 		<img
 			className="custom-logo"
 			src={ logoUrl }
-			alt={ alt }
+			alt={ defaultAlt }
 			onLoad={ ( event ) => {
 				setNaturalSize(
 					pick( event.target, [ 'naturalWidth', 'naturalHeight' ] )
@@ -290,6 +310,23 @@ const SiteLogo = ( {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
+					<TextareaControl
+						label={ __( 'Alt text (alternative text)' ) }
+						value={ defaultAlt }
+						onChange={ updateAlt }
+						help={
+							<>
+								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+									{ __(
+										'Describe the purpose of the image'
+									) }
+								</ExternalLink>
+								{ __(
+									'Leave empty if the image is purely decorative.'
+								) }
+							</>
+						}
+					/>
 					<RangeControl
 						label={ __( 'Image width' ) }
 						onChange={ ( newWidth ) =>
