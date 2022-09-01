@@ -5,7 +5,7 @@
 import classnames from 'classnames';
 import {
 	useFloating,
-	flip,
+	flip as flipMiddleware,
 	shift,
 	autoUpdate,
 	arrow,
@@ -26,6 +26,8 @@ import {
 	createContext,
 	useContext,
 	useMemo,
+	useState,
+	useCallback,
 	useEffect,
 } from '@wordpress/element';
 import {
@@ -47,6 +49,8 @@ import {
 	getFrameOffset,
 	positionToPlacement,
 	placementToMotionAnimationProps,
+	getReferenceOwnerDocument,
+	getReferenceElement,
 } from './utils';
 
 /**
@@ -90,11 +94,20 @@ const MaybeAnimatedWrapper = forwardRef(
 		},
 		forwardedRef
 	) => {
+		// When animating, animate only once (i.e. when the popover is opened), and
+		// do not animate on subsequent prop changes (as it conflicts with
+		// floating-ui's positioning updates).
+		const [ hasAnimatedOnce, setHasAnimatedOnce ] = useState( false );
 		const shouldReduceMotion = useReducedMotion();
 
 		const { style: motionInlineStyles, ...otherMotionProps } = useMemo(
 			() => placementToMotionAnimationProps( placement ),
 			[ placement ]
+		);
+
+		const onAnimationComplete = useCallback(
+			() => setHasAnimatedOnce( true ),
+			[]
 		);
 
 		if ( shouldAnimate && ! shouldReduceMotion ) {
@@ -105,6 +118,10 @@ const MaybeAnimatedWrapper = forwardRef(
 						...receivedInlineStyles,
 					} }
 					{ ...otherMotionProps }
+					onAnimationComplete={ onAnimationComplete }
+					animate={
+						hasAnimatedOnce ? false : otherMotionProps.animate
+					}
 					{ ...props }
 					ref={ forwardedRef }
 				/>
@@ -143,9 +160,10 @@ const Popover = (
 		expandOnMobile,
 		onFocusOutside,
 		__unstableSlotName = SLOT_NAME,
-		__unstableObserveElement,
-		__unstableForcePosition = false,
+		flip = true,
+		resize = true,
 		__unstableShift = false,
+		__unstableForcePosition,
 		...contentProps
 	},
 	forwardedRef
@@ -157,8 +175,28 @@ const Popover = (
 		} );
 	}
 
+	if ( __unstableForcePosition !== undefined ) {
+		deprecated( '__unstableForcePosition prop in Popover component', {
+			since: '6.1',
+			version: '6.3',
+			alternative: '`flip={ false }` and  `resize={ false }`',
+		} );
+
+		// Back-compat, set the `flip` and `resize` props
+		// to `false` to replicate `__unstableForcePosition`.
+		flip = ! __unstableForcePosition;
+		resize = ! __unstableForcePosition;
+	}
+
 	const arrowRef = useRef( null );
-	const anchorRefFallback = useRef( null );
+
+	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
+		useState();
+	const [ referenceOwnerDocument, setReferenceOwnerDocument ] = useState();
+
+	const anchorRefFallback = useCallback( ( node ) => {
+		setFallbackReferenceElement( node );
+	}, [] );
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isExpanded = expandOnMobile && isMobileViewport;
@@ -166,29 +204,6 @@ const Popover = (
 	const normalizedPlacementFromProps = position
 		? positionToPlacement( position )
 		: placementProp;
-
-	const referenceOwnerDocument = useMemo( () => {
-		let documentToReturn;
-
-		if ( anchorRef?.top ) {
-			documentToReturn = anchorRef?.top.ownerDocument;
-		} else if ( anchorRef?.startContainer ) {
-			documentToReturn = anchorRef.startContainer.ownerDocument;
-		} else if ( anchorRef?.current ) {
-			documentToReturn = anchorRef.current.ownerDocument;
-		} else if ( anchorRef ) {
-			// This one should be deprecated.
-			documentToReturn = anchorRef.ownerDocument;
-		} else if ( anchorRect && anchorRect?.ownerDocument ) {
-			documentToReturn = anchorRect.ownerDocument;
-		} else if ( getAnchorRect ) {
-			documentToReturn = getAnchorRect(
-				anchorRefFallback.current
-			)?.ownerDocument;
-		}
-
-		return documentToReturn ?? document;
-	}, [ anchorRef, anchorRect, getAnchorRect ] );
 
 	/**
 	 * Offsets the position of the popover when the anchor is inside an iframe.
@@ -233,10 +248,9 @@ const Popover = (
 				crossAxis: frameOffsetRef.current[ crossAxis ],
 			};
 		} ),
-		__unstableForcePosition ? undefined : flip(),
-		__unstableForcePosition
-			? undefined
-			: size( {
+		flip ? flipMiddleware() : undefined,
+		resize
+			? size( {
 					apply( sizeProps ) {
 						const { availableHeight } = sizeProps;
 						if ( ! refs.floating.current ) return;
@@ -246,7 +260,8 @@ const Popover = (
 							overflow: 'auto',
 						} );
 					},
-			  } ),
+			  } )
+			: undefined,
 		__unstableShift
 			? shift( {
 					crossAxis: true,
@@ -254,7 +269,7 @@ const Popover = (
 					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
 			  } )
 			: undefined,
-		hasArrow ? arrow( { element: arrowRef } ) : undefined,
+		arrow( { element: arrowRef } ),
 	].filter( ( m ) => !! m );
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
 	const slot = useSlot( slotName );
@@ -285,7 +300,7 @@ const Popover = (
 		y,
 		// Callback refs (not regular refs). This allows the position to be updated.
 		// when either elements change.
-		reference,
+		reference: referenceCallbackRef,
 		floating,
 		// Object with "regular" refs to both "reference" and "floating"
 		refs,
@@ -294,139 +309,86 @@ const Popover = (
 		update,
 		placement: computedPlacement,
 		middlewareData: { arrow: arrowData = {} },
-	} = useFloating( { placement: normalizedPlacementFromProps, middleware } );
+	} = useFloating( {
+		placement: normalizedPlacementFromProps,
+		middleware,
+		whileElementsMounted: ( referenceParam, floatingParam, updateParam ) =>
+			autoUpdate( referenceParam, floatingParam, updateParam, {
+				animationFrame: true,
+			} ),
+	} );
 
 	useEffect( () => {
 		offsetRef.current = offsetProp;
 		update();
 	}, [ offsetProp, update ] );
 
-	// Update the `reference`'s ref.
-	//
-	// In floating-ui's terms:
-	// - "reference" refers to the popover's anchor element.
-	// - "floating" refers the floating popover's element.
-	// A floating element can also be positioned relative to a virtual element,
-	// instead of a real one. A virtual element is represented by an object
-	// with the `getBoundingClientRect()` function (like real elements).
-	// See https://floating-ui.com/docs/virtual-elements for more info.
+	const arrowCallbackRef = useCallback(
+		( node ) => {
+			arrowRef.current = node;
+			update();
+		},
+		[ update ]
+	);
+
+	// When any of the possible anchor "sources" change,
+	// recompute the reference element (real or virtual) and its owner document.
 	useLayoutEffect( () => {
-		let resultingReferenceRef;
+		const resultingReferenceOwnerDoc = getReferenceOwnerDocument( {
+			anchorRef,
+			anchorRect,
+			getAnchorRect,
+			fallbackReferenceElement,
+			fallbackDocument: document,
+		} );
+		const resultingReferenceElement = getReferenceElement( {
+			anchorRef,
+			anchorRect,
+			getAnchorRect,
+			fallbackReferenceElement,
+		} );
 
-		if ( anchorRef?.top ) {
-			// Create a virtual element for the ref. The expectation is that
-			// if anchorRef.top is defined, then anchorRef.bottom is defined too.
-			resultingReferenceRef = {
-				getBoundingClientRect() {
-					const topRect = anchorRef.top.getBoundingClientRect();
-					const bottomRect = anchorRef.bottom.getBoundingClientRect();
-					return new window.DOMRect(
-						topRect.x,
-						topRect.y,
-						topRect.width,
-						bottomRect.bottom - topRect.top
-					);
-				},
-			};
-		} else if ( anchorRef?.current ) {
-			// Standard React ref.
-			resultingReferenceRef = anchorRef.current;
-		} else if ( anchorRef ) {
-			// If `anchorRef` holds directly the element's value (no `current` key)
-			// This is a weird scenario and should be deprecated.
-			resultingReferenceRef = anchorRef;
-		} else if ( anchorRect ) {
-			// Create a virtual element for the ref.
-			resultingReferenceRef = {
-				getBoundingClientRect() {
-					return anchorRect;
-				},
-			};
-		} else if ( getAnchorRect ) {
-			// Create a virtual element for the ref.
-			resultingReferenceRef = {
-				getBoundingClientRect() {
-					const rect = getAnchorRect( anchorRefFallback.current );
-					return new window.DOMRect(
-						rect.x ?? rect.left,
-						rect.y ?? rect.top,
-						rect.width ?? rect.right - rect.left,
-						rect.height ?? rect.bottom - rect.top
-					);
-				},
-			};
-		} else if ( anchorRefFallback.current ) {
-			// If no explicit ref is passed via props, fall back to
-			// anchoring to the popover's parent node.
-			resultingReferenceRef = anchorRefFallback.current.parentNode;
-		}
+		referenceCallbackRef( resultingReferenceElement );
 
-		if ( ! resultingReferenceRef ) {
-			return;
-		}
-
-		reference( resultingReferenceRef );
-
-		if ( ! refs.floating.current ) {
-			return;
-		}
-
-		return autoUpdate(
-			resultingReferenceRef,
-			refs.floating.current,
-			update
-		);
-		// 'reference' and 'refs.floating' are refs and don't need to be listed
-		// as dependencies (see https://github.com/WordPress/gutenberg/pull/41612)
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ anchorRef, anchorRect, getAnchorRect, update ] );
-
-	// This is only needed for a smooth transition when moving blocks.
-	useLayoutEffect( () => {
-		if ( ! __unstableObserveElement ) {
-			return;
-		}
-		const observer = new window.MutationObserver( update );
-		observer.observe( __unstableObserveElement, { attributes: true } );
-
-		return () => {
-			observer.disconnect();
-		};
-	}, [ __unstableObserveElement, update ] );
+		setReferenceOwnerDocument( resultingReferenceOwnerDoc );
+	}, [
+		anchorRef,
+		anchorRef?.top,
+		anchorRef?.bottom,
+		anchorRef?.startContainer,
+		anchorRef?.current,
+		anchorRect,
+		getAnchorRect,
+		fallbackReferenceElement,
+		referenceCallbackRef,
+	] );
 
 	// If the reference element is in a different ownerDocument (e.g. iFrame),
 	// we need to manually update the floating's position as the reference's owner
 	// document scrolls. Also update the frame offset if the view resizes.
 	useLayoutEffect( () => {
-		if ( referenceOwnerDocument === document ) {
+		const referenceAndFloatingAreInSameDocument =
+			referenceOwnerDocument === document;
+		const hasFrameElement =
+			!! referenceOwnerDocument?.defaultView?.frameElement;
+
+		if ( referenceAndFloatingAreInSameDocument || ! hasFrameElement ) {
 			frameOffsetRef.current = undefined;
 			return;
 		}
 
 		const { defaultView } = referenceOwnerDocument;
 
-		referenceOwnerDocument.addEventListener( 'scroll', update );
+		const updateFrameOffset = () => {
+			frameOffsetRef.current = getFrameOffset( referenceOwnerDocument );
+			update();
+		};
+		defaultView.addEventListener( 'resize', updateFrameOffset );
 
-		let updateFrameOffset;
-		const hasFrameElement =
-			!! referenceOwnerDocument?.defaultView?.frameElement;
-		if ( hasFrameElement ) {
-			updateFrameOffset = () => {
-				frameOffsetRef.current = getFrameOffset(
-					referenceOwnerDocument
-				);
-				update();
-			};
-			updateFrameOffset();
-			defaultView.addEventListener( 'resize', updateFrameOffset );
-		}
+		updateFrameOffset();
 
 		return () => {
-			referenceOwnerDocument.removeEventListener( 'scroll', update );
-
-			if ( updateFrameOffset ) {
-				defaultView.removeEventListener( 'resize', updateFrameOffset );
-			}
+			defaultView.removeEventListener( 'resize', updateFrameOffset );
 		};
 	}, [ referenceOwnerDocument, update ] );
 
@@ -480,17 +442,23 @@ const Popover = (
 			<div className="components-popover__content">{ children }</div>
 			{ hasArrow && (
 				<div
-					ref={ arrowRef }
+					ref={ arrowCallbackRef }
 					className={ [
 						'components-popover__arrow',
 						`is-${ computedPlacement.split( '-' )[ 0 ] }`,
 					].join( ' ' ) }
 					style={ {
 						left: Number.isFinite( arrowData?.x )
-							? `${ arrowData.x }px`
+							? `${
+									arrowData.x +
+									( frameOffsetRef.current?.x ?? 0 )
+							  }px`
 							: '',
 						top: Number.isFinite( arrowData?.y )
-							? `${ arrowData.y }px`
+							? `${
+									arrowData.y +
+									( frameOffsetRef.current?.y ?? 0 )
+							  }px`
 							: '',
 					} }
 				>

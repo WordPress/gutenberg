@@ -574,6 +574,10 @@
 					}
 				}
 			}
+		},
+		"render": {
+			"type": "string",
+			"description": "Template file loaded on the server when rendering a block."
 		}
 	},
 	"required": [ "name", "title" ],

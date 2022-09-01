@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, has, isEmpty, omit, pick } from 'lodash';
+import { get, isEmpty, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -98,8 +98,8 @@ export const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
  */
 function hasDefaultSize( image, defaultSize ) {
 	return (
-		has( image, [ 'sizes', defaultSize, 'url' ] ) ||
-		has( image, [ 'media_details', 'sizes', defaultSize, 'source_url' ] )
+		'url' in ( image?.sizes?.[ defaultSize ] ?? {} ) ||
+		'source_url' in ( image?.media_details?.sizes?.[ defaultSize ] ?? {} )
 	);
 }
 
@@ -179,7 +179,9 @@ export function ImageEdit( {
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
 		if ( captionRef.current && ! get( mediaAttributes, [ 'caption' ] ) ) {
-			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
+			const { caption: omittedCaption, ...restMediaAttributes } =
+				mediaAttributes;
+			mediaAttributes = restMediaAttributes;
 		}
 
 		let additionalAttributes;

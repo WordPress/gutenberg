@@ -139,7 +139,7 @@ export default function CustomGradientPicker( {
 
 	return (
 		<VStack
-			spacing={ 5 }
+			spacing={ 4 }
 			className={ classnames( 'components-custom-gradient-picker', {
 				'is-next-has-no-margin': __nextHasNoMargin,
 			} ) }
