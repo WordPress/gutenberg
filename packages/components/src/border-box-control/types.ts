@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { Placement, ReferenceType } from '@floating-ui/react-dom';
+
+/**
  * Internal dependencies
  */
 import type { Border, ColorProps, LabelProps } from '../border-control/types';
@@ -13,6 +18,15 @@ export type Borders = {
 export type AnyBorder = Border | Borders | undefined;
 export type BorderProp = keyof Border;
 export type BorderSide = keyof Borders;
+
+// TODO: replace with Popover actual props once the component
+// gets converted to TypeScript
+export type PopoverPartialProps = {
+	placement?: Placement;
+	offset?: number;
+	anchor?: ReferenceType;
+	__unstableShift?: boolean;
+};
 
 export type BorderBoxControlProps = ColorProps &
 	LabelProps & {
@@ -29,7 +43,7 @@ export type BorderBoxControlProps = ColorProps &
 		/**
 		 * The position of the color popovers compared to the control wrapper.
 		 */
-		popoverPlacement?: string;
+		popoverPlacement?: Placement;
 		/**
 		 * The space between the popover and the control wrapper.
 		 */
@@ -103,7 +117,7 @@ export type SplitControlsProps = ColorProps & {
 	/**
 	 * The position of the color popovers compared to the control wrapper.
 	 */
-	popoverPlacement?: string;
+	popoverPlacement?: Placement;
 	/**
 	 * The space between the popover and the control wrapper.
 	 */
