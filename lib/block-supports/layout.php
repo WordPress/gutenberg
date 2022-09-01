@@ -46,7 +46,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			if ( is_array( $gap_value ) ) {
 				$gap_value = isset( $gap_value['top'] ) ? $gap_value['top'] : null;
 			}
-			if ( $gap_value && ! $should_skip_gap_serialization ) {
+			if ( null !== $gap_value && ! $should_skip_gap_serialization ) {
 				array_push(
 					$layout_styles,
 					array(
@@ -129,7 +129,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			if ( is_array( $gap_value ) ) {
 				$gap_value = isset( $gap_value['top'] ) ? $gap_value['top'] : null;
 			}
-			if ( $gap_value && ! $should_skip_gap_serialization ) {
+			if ( null !== $gap_value && ! $should_skip_gap_serialization ) {
 				// Get spacing CSS variable from preset value if provided.
 				if ( is_string( $gap_value ) && str_contains( $gap_value, 'var:preset|spacing|' ) ) {
 					$index_to_splice = strrpos( $gap_value, '|' ) + 1;
@@ -198,7 +198,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 			$gap_value = trim( $combined_gap_value );
 
-			if ( $gap_value && ! $should_skip_gap_serialization ) {
+			if ( null !== $gap_value && ! $should_skip_gap_serialization ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
 					'declarations' => array( 'gap' => $gap_value ),
