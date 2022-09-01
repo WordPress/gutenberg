@@ -25,7 +25,7 @@ export function createListBlockFromDOMElement( listElement ) {
 			const [ nestedList, ...nodes ] = children;
 
 			const hasNestedList =
-				nestedList.tagName === 'UL' || nestedList.tagName === 'OL';
+				nestedList?.tagName === 'UL' || nestedList?.tagName === 'OL';
 			if ( ! hasNestedList ) {
 				return createBlock( 'core/list-item', {
 					content: listItem.innerHTML,
