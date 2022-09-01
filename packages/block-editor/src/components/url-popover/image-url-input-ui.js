@@ -250,7 +250,7 @@ const ImageURLInputUI = ( {
 			/>
 			{ isOpen && (
 				<URLPopover
-					anchorRef={ buttonRef }
+					anchor={ buttonRef.current }
 					onFocusOutside={ onFocusOutside() }
 					onClose={ closeLinkUI }
 					renderSettings={ () => advancedOptions }
