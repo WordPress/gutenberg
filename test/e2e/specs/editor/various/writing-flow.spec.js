@@ -980,7 +980,7 @@ class WritingFlowUtils {
 		await this.page.keyboard.press( 'Enter' );
 		await this.page.keyboard.type( '/columns' );
 		await this.page.keyboard.press( 'Enter' );
-		await this.page.click( 'role=button[name="Two columns; equal split"]' );
+		await this.page.click( 'role=button[name="Two columns; equal split"i]' );
 		await this.page.click( 'role=button[name="Add block"i]' );
 		await this.page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
