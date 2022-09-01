@@ -23,23 +23,6 @@ const userList = [
 	{ userName: 'buddytheelf', firstName: 'Buddy', lastName: 'Elf' },
 ];
 
-/**
- * Use instead of `it` within a `describe.each` block to conditionally run a test.
- *
- * @param {string}   testName  - The name of the test that should be run.
- * @param {boolean}  condition - An expression or function that resolves to a boolean value determing if a test should run.
- * @param {Function} cb        - The test callback (normally the second argument to an `it` statement).
- */
-const itif = ( testName, condition, cb ) => {
-	if ( condition() ) {
-		// Because this is a helper function and not a test.
-		// eslint-disable-next-line jest/valid-title
-		it( testName, async () => {
-			await cb();
-		} );
-	}
-};
-
 describe( 'Autocomplete', () => {
 	beforeAll( async () => {
 		for ( const user of userList ) {
@@ -71,10 +54,6 @@ describe( 'Autocomplete', () => {
 		[ 'Custom Completer', 'option' ],
 	] )( '%s', ( ...completerAndOptionType ) => {
 		const [ , type ] = completerAndOptionType;
-
-		const isNotMention = () => {
-			return type !== 'mention' ? true : false;
-		};
 
 		it( `should insert ${ type }`, async () => {
 			// Set up test data for each case
@@ -294,10 +273,8 @@ describe( 'Autocomplete', () => {
 		} );
 
 		// This test does not apply to user mentions, because they don't get disabled.
-		itif(
-			`should not insert disabled ${ type }s`,
-			isNotMention,
-			async () => {
+		if ( type !== 'mention' ) {
+			it( `should not insert disabled ${ type }s`, async () => {
 				await clickBlockAppender();
 				// The 'Grapes' option is disabled in our test plugin, so it should not insert the grapes emoji
 				await page.keyboard.type( 'Sorry, we are all out of ~g' );
@@ -306,15 +283,13 @@ describe( 'Autocomplete', () => {
 				);
 				await page.keyboard.press( 'Enter' );
 				await page.keyboard.type( ' grapes.' );
-				// This `expect` is in wrapped in the `itif` helper's callback, so it will trip the linter
-				// eslint-disable-next-line jest/no-standalone-expect
 				expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
-						"<!-- wp:paragraph -->
-						<p>Sorry, we are all out of ~g grapes.</p>
-						<!-- /wp:paragraph -->"
-						` );
-			}
-		);
+					"<!-- wp:paragraph -->
+					<p>Sorry, we are all out of ~g grapes.</p>
+					<!-- /wp:paragraph -->"
+					` );
+			} );
+		}
 
 		it( 'should allow newlines after multiple completions', async () => {
 			const testData = {};
