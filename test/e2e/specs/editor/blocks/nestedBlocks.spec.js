@@ -16,7 +16,7 @@ test.describe( 'Nested Block Settings', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'should output a quote with a heading, media-text with another heading inside', async ( {
+	test( 'should output a quote with a heading, that only allows red coloured text', async ( {
 		editor,
 		page,
 	} ) => {
