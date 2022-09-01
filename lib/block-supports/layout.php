@@ -297,7 +297,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$used_layout['type'] = 'constrained';
 	}
 
-	if ( gutenberg_get_global_settings( array( 'useRootPaddingAwareAlignments' ) ) && 'constrained' === $used_layout['type'] ) {
+	if (
+		gutenberg_get_global_settings( array( 'useRootPaddingAwareAlignments' ) ) &&
+		isset( $used_layout['type'] ) &&
+		'constrained' === $used_layout['type']
+	) {
 		$class_names[] = 'has-global-padding';
 	}
 
