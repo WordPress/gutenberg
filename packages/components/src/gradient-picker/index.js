@@ -26,7 +26,6 @@ function SingleOrigin( {
 	onChange,
 	value,
 	actions,
-	content,
 } ) {
 	const gradientOptions = useMemo( () => {
 		return map( gradients, ( { gradient, name } ) => (
@@ -60,9 +59,7 @@ function SingleOrigin( {
 			className={ className }
 			options={ gradientOptions }
 			actions={ actions }
-		>
-			{ content }
-		</CircularOptionPicker>
+		/>
 	);
 }
 
@@ -73,7 +70,6 @@ function MultipleOrigin( {
 	onChange,
 	value,
 	actions,
-	content,
 } ) {
 	return (
 		<VStack spacing={ 3 } className={ className }>
@@ -87,10 +83,7 @@ function MultipleOrigin( {
 							onChange={ onChange }
 							value={ value }
 							{ ...( gradients.length === index + 1
-								? {
-										actions,
-										content,
-								  }
+								? { actions }
 								: {} ) }
 						/>
 					</VStack>
