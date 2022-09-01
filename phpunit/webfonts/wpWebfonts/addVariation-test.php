@@ -98,7 +98,7 @@ class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Webfonts_TestCase {
 	}
 
 	/**
-	 * @dataProvider data_font_family_not_define_in_variation
+	 * @dataProvider data_font_family_handle_undefined
 	 *
 	 * @param string $font_family_handle The font family's handle for this variation.
 	 * @param array  $variation          An array of variation properties to add.
@@ -115,7 +115,7 @@ class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Webfonts_TestCase {
 	}
 
 	/**
-	 * @dataProvider data_font_family_not_define_in_variation
+	 * @dataProvider data_font_family_undefined_in_variation
 	 * @dataProvider data_unable_determine_variation_handle
 	 *
 	 * @param string $font_family_handle The font family's handle for this variation.

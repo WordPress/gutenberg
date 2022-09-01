@@ -220,7 +220,7 @@ class WP_Webfonts extends WP_Dependencies {
 			}
 		}
 
-		$variation = $this->validate_variation( $font_family_handle, $variation );
+		$variation = $this->validate_variation( $variation );
 
 		// Variation validation failed.
 		if ( ! $variation ) {
@@ -318,14 +318,16 @@ class WP_Webfonts extends WP_Dependencies {
 	 *
 	 * @since X.X.X
 	 *
-	 * @param string $font_family The font family for this variation.
-	 * @param array  $variation   An array of variation properties to add.
+	 * @param array $variation  Variation properties to add.
 	 * @return false|array Validated variation on success. Else, false.
 	 */
-	private function validate_variation( $font_family, $variation ) {
+	private function validate_variation( $variation ) {
 		$variation = wp_parse_args( $variation, $this->variation_property_defaults );
-		if ( empty( $variation['font-family'] ) ) {
-			$variation['font-family'] = $font_family;
+
+		// Check the font-family.
+		if ( empty( $variation['font-family'] ) || ! is_string( $variation['font-family'] ) ) {
+			trigger_error( 'Webfont font-family must be a non-empty string.' );
+			return false;
 		}
 
 		// Local fonts need a "src".

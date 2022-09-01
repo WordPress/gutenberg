@@ -96,6 +96,7 @@ class Tests_Webfonts_WpRegisterWebfont extends WP_Webfonts_TestCase {
 				'font_family' => 'source-serif-pro',
 				'variation'   => array(
 					'provider'     => 'local',
+					'font-family'  => 'Source Serif Pro',
 					'font-style'   => 'normal',
 					'font-weight'  => '200 900',
 					'font-stretch' => 'normal',
@@ -110,8 +111,9 @@ class Tests_Webfonts_WpRegisterWebfont extends WP_Webfonts_TestCase {
 			'Merriweather'     => array(
 				'font_family' => 'merriweather',
 				'variation'   => array(
-					'font-style' => 'italic',
-					'src'        => 'https://example.com/assets/fonts/merriweather.ttf.woff2',
+					'font-family' => 'Merriweather',
+					'font-style'  => 'italic',
+					'src'         => 'https://example.com/assets/fonts/merriweather.ttf.woff2',
 				),
 				'expected'    => array(
 					'merriweather',

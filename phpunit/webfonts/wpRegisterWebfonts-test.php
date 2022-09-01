@@ -51,6 +51,7 @@ class Tests_Webfonts_WpRegisterWebfonts extends WP_Webfonts_TestCase {
 					'source-serif-pro' => array(
 						array(
 							'provider'     => 'local',
+							'font-family'  => 'Source Serif Pro',
 							'font-style'   => 'normal',
 							'font-weight'  => '200 900',
 							'font-stretch' => 'normal',
@@ -72,6 +73,7 @@ class Tests_Webfonts_WpRegisterWebfonts extends WP_Webfonts_TestCase {
 					'Source Serif Pro' => array(
 						array(
 							'provider'     => 'local',
+							'font-family'  => 'Source Serif Pro',
 							'font-style'   => 'normal',
 							'font-weight'  => '200 900',
 							'font-stretch' => 'normal',
@@ -80,6 +82,7 @@ class Tests_Webfonts_WpRegisterWebfonts extends WP_Webfonts_TestCase {
 						),
 						array(
 							'provider'     => 'local',
+							'font-family'  => 'Source Serif Pro',
 							'font-style'   => 'italic',
 							'font-weight'  => '200 900',
 							'font-stretch' => 'normal',

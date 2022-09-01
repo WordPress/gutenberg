@@ -12,7 +12,8 @@ trait WP_Webfonts_Tests_Datasets {
 				'expected'           => 'lato-400-normal',
 				'font_family_handle' => 'lato',
 				'variation'          => array(
-					'src' => 'https://example.com/assets/fonts/lato/lato.ttf.woff2',
+					'font-family' => 'Lato',
+					'src'         => 'https://example.com/assets/fonts/lato/lato.ttf.woff2',
 				),
 			),
 
@@ -20,7 +21,8 @@ trait WP_Webfonts_Tests_Datasets {
 				'expected'           => 'my-custom-handle',
 				'font_family_handle' => 'lato',
 				'variation'          => array(
-					'src' => 'https://example.com/assets/fonts/lato/lato.ttf.woff2',
+					'font-family' => 'Lato',
+					'src'         => 'https://example.com/assets/fonts/lato/lato.ttf.woff2',
 				),
 				'variation_handle'   => 'my-custom-handle',
 			),
@@ -103,11 +105,12 @@ trait WP_Webfonts_Tests_Datasets {
 	}
 
 	/**
-	 * Data provider for testing registration of variations where the font family is not defined.
+	 * Data provider for testing registration of variations where the font family handle
+	 * is not defined.
 	 *
 	 * @return array
 	 */
-	public function data_font_family_not_define_in_variation() {
+	public function data_font_family_handle_undefined() {
 		return array(
 			'empty string font family handle' => array(
 				'font_family_handle' => '',
@@ -143,6 +146,56 @@ trait WP_Webfonts_Tests_Datasets {
 	}
 
 	/**
+	 * Data provider for testing registration of variations where the font family is not defined
+	 * in the variation.
+	 *
+	 * @return array
+	 */
+	public function data_font_family_undefined_in_variation() {
+		$message = 'Webfont font-family must be a non-empty string.';
+		return array(
+			'font-family: undefined'    => array(
+				'font_family_handle' => 'lato',
+				'variation'          => array(
+					'src' => 'https://example.com/assets/fonts/lato/lato.ttf.woff2',
+				),
+				'expected_message'   => $message,
+			),
+			'font-family: null'         => array(
+				'font_family_handle' => 'Lato',
+				'variation'          => array(
+					'provider'    => 'local',
+					'font-family' => null,
+					'font-weight' => '200',
+					'src'         => 'https://example.com/assets/fonts/lato/lato.ttf.woff2',
+				),
+				'expected_message'   => $message,
+			),
+			'font-family: non string'   => array(
+				'font_family_handle' => 'Source Serif Pro',
+				'variation'          => array(
+					'provider'     => 'local',
+					'font-family'  => 10,
+					'font-style'   => 'normal',
+					'font-weight'  => '200 900',
+					'font-stretch' => 'normal',
+					'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
+					'font-display' => 'fallback',
+				),
+				'expected_message'   => $message,
+			),
+			'font-family: empty string' => array(
+				'font_family_handle' => 'lato',
+				'variation'          => array(
+					'font-family' => '',
+					'src'         => 'https://example.com/assets/fonts/lato/lato.ttf.woff2',
+				),
+				'expected_message'   => $message,
+			),
+		);
+	}
+
+	/**
 	 * Data provider for testing when the variation's handle can't be determine from the given input.
 	 *
 	 * @return array
@@ -152,6 +205,7 @@ trait WP_Webfonts_Tests_Datasets {
 			'integer values'                               => array(
 				'font_family_handle' => 'lato',
 				'variation'          => array(
+					'font-family' => 'Lato',
 					'font-weight' => 400,
 					'font-style'  => 0,
 					'src'         => 'https://example.com/assets/fonts/lato.ttf.woff2',
@@ -161,6 +215,7 @@ trait WP_Webfonts_Tests_Datasets {
 			'with empty string font-weight and font-style' => array(
 				'font_family_handle' => 'merriweather',
 				'variation'          => array(
+					'font-family' => 'Merriweather',
 					'font-weight' => '',
 					'font-style'  => '',
 					'src'         => 'https://example.com/assets/fonts/merriweather.ttf.woff2',
@@ -170,6 +225,7 @@ trait WP_Webfonts_Tests_Datasets {
 			'integer font-weight, empty string font-style' => array(
 				'font_family'      => 'merriweather',
 				'variation'        => array(
+					'font-family' => 'Merriweather',
 					'font-weight' => 400,
 					'font-style'  => '',
 					'src'         => 'https://example.com/assets/fonts/merriweather.ttf.woff2',
@@ -179,6 +235,7 @@ trait WP_Webfonts_Tests_Datasets {
 			'empty string font-weight, integer font-style' => array(
 				'font_family'      => 'lato',
 				'variation'        => array(
+					'font-family' => 'Merriweather',
 					'font-weight' => '',
 					'font-style'  => 400,
 					'src'         => 'https://example.com/assets/fonts/lato.ttf.woff2',
@@ -195,6 +252,29 @@ trait WP_Webfonts_Tests_Datasets {
 	 */
 	public function data_invalid_variation() {
 		return array(
+			'font-family: undefined'          => array(
+				'expected'           => 'Webfont font-family must be a non-empty string.',
+				'font_family_handle' => 'lato',
+				'variation'          => array(
+					'src' => 'https://example.com/assets/fonts/lato.ttf.woff2',
+				),
+			),
+			'font-family: null'               => array(
+				'expected'           => 'Webfont font-family must be a non-empty string.',
+				'font_family_handle' => 'lato',
+				'variation'          => array(
+					'font-family' => null,
+					'src'         => 'https://example.com/assets/fonts/lato.ttf.woff2',
+				),
+			),
+			'font-family: empty string'       => array(
+				'expected'           => 'Webfont font-family must be a non-empty string.',
+				'font_family_handle' => 'lato',
+				'variation'          => array(
+					'font-family' => '',
+					'src'         => 'https://example.com/assets/fonts/lato.ttf.woff2',
+				),
+			),
 			'src: undefined'                  => array(
 				'expected'           => 'Webfont src must be a non-empty string or an array of strings.',
 				'font_family_handle' => 'lato',
@@ -229,6 +309,7 @@ trait WP_Webfonts_Tests_Datasets {
 				'font_family_handle' => 'lato',
 				'variation'          => array(
 					'provider'    => 'local',
+					'font-family' => 'Lato',
 					'font-weight' => '200',
 					'src'         => array(),
 				),
@@ -238,6 +319,7 @@ trait WP_Webfonts_Tests_Datasets {
 				'font_family_handle' => 'lato',
 				'variation'          => array(
 					'provider'    => 'local',
+					'font-family' => 'Lato',
 					'font-weight' => '200',
 					'src'         => array( '' ),
 				),
@@ -247,6 +329,7 @@ trait WP_Webfonts_Tests_Datasets {
 				'font_family_handle' => 'lato',
 				'variation'          => array(
 					'provider'    => 'local',
+					'font-family' => 'Lato',
 					'font-weight' => '200',
 					'src'         => array( null ),
 				),
@@ -256,6 +339,7 @@ trait WP_Webfonts_Tests_Datasets {
 				'font_family_handle' => 'lato',
 				'variation'          => array(
 					'provider'    => 'local',
+					'font-family' => 'Lato',
 					'font-weight' => '200',
 					'src'         => array(
 						'https://example.com/assets/fonts/merriweather.ttf.woff2',
@@ -269,6 +353,7 @@ trait WP_Webfonts_Tests_Datasets {
 				'font_family_handle' => 'lato',
 				'variation'          => array(
 					'provider'    => 'local',
+					'font-family' => 'Lato',
 					'font-weight' => '200',
 					'src'         => array(
 						'https://example.com/assets/fonts/merriweather.ttf.woff2',
@@ -282,6 +367,7 @@ trait WP_Webfonts_Tests_Datasets {
 				'font_family_handle' => 'merriweather',
 				'variation'          => array(
 					'provider'    => 'doesnotexit',
+					'font-family' => 'Merriweather',
 					'font-weight' => '200 900',
 				),
 			),
@@ -289,6 +375,7 @@ trait WP_Webfonts_Tests_Datasets {
 				'expected'           => 'Webfont font-weight must be a properly formatted string or integer.',
 				'font_family_handle' => 'merriweather',
 				'variation'          => array(
+					'font-family' => 'Merriweather',
 					'font-weight' => null,
 					'font-style'  => 'normal',
 					'src'         => 'https://example.com/assets/fonts/lato.ttf.woff2',
@@ -317,6 +404,7 @@ trait WP_Webfonts_Tests_Datasets {
 				'inputs'      => array(
 					'merriweather' => array(
 						'merriweather-200-900-normal' => array(
+							'font-family'  => 'Merriweather',
 							'font-weight'  => '200 900',
 							'font-stretch' => 'normal',
 							'src'          => 'https://example.com/assets/fonts/merriweather.ttf.woff2',
@@ -332,6 +420,7 @@ trait WP_Webfonts_Tests_Datasets {
 					'Source Serif Pro' => array(
 						'Source Serif Pro-300-normal' => array(
 							'provider'     => 'local',
+							'font-family'  => 'Source Serif Pro',
 							'font-style'   => 'normal',
 							'font-weight'  => '300',
 							'font-stretch' => 'normal',
@@ -340,6 +429,7 @@ trait WP_Webfonts_Tests_Datasets {
 						),
 						'Source Serif Pro-900-italic' => array(
 							'provider'     => 'local',
+							'font-family'  => 'Source Serif Pro',
 							'font-style'   => 'italic',
 							'font-weight'  => '900',
 							'font-stretch' => 'normal',
@@ -367,6 +457,7 @@ trait WP_Webfonts_Tests_Datasets {
 				'inputs'      => array(
 					'merriweather'     => array(
 						'merriweather-200-900-normal' => array(
+							'font-family'  => 'Merriweather',
 							'font-weight'  => '200 900',
 							'font-stretch' => 'normal',
 							'src'          => 'https://example.com/assets/fonts/merriweather.ttf.woff2',
@@ -375,6 +466,7 @@ trait WP_Webfonts_Tests_Datasets {
 					'Source Serif Pro' => array(
 						'Source Serif Pro-300-normal' => array(
 							'provider'     => 'local',
+							'font-family'  => 'Source Serif Pro',
 							'font-style'   => 'normal',
 							'font-weight'  => '300',
 							'font-stretch' => 'normal',
@@ -383,6 +475,7 @@ trait WP_Webfonts_Tests_Datasets {
 						),
 						'Source Serif Pro-900-italic' => array(
 							'provider'     => 'local',
+							'font-family'  => 'Source Serif Pro',
 							'font-style'   => 'italic',
 							'font-weight'  => '900',
 							'font-stretch' => 'normal',
@@ -392,6 +485,7 @@ trait WP_Webfonts_Tests_Datasets {
 					),
 					'my-font'          => array(
 						'my-font-300-italic' => array(
+							'font-family' => 'My Font',
 							'font-weight' => '300',
 							'src'         => 'https://example.com/assets/fonts/my-font.ttf.woff2',
 						),
@@ -826,6 +920,7 @@ trait WP_Webfonts_Tests_Datasets {
 			'lato'             => array(),
 			'merriweather'     => array(
 				'merriweather-200-900-normal' => array(
+					'font-family'  => 'Merriweather',
 					'font-weight'  => '200 900',
 					'font-stretch' => 'normal',
 					'src'          => 'https://example.com/assets/fonts/merriweather.ttf.woff2',
@@ -834,6 +929,7 @@ trait WP_Webfonts_Tests_Datasets {
 			'Source Serif Pro' => array(
 				'Source Serif Pro-300-normal' => array(
 					'provider'     => 'local',
+					'font-family'  => 'Source Serif Pro',
 					'font-style'   => 'normal',
 					'font-weight'  => '300',
 					'font-stretch' => 'normal',
@@ -842,6 +938,7 @@ trait WP_Webfonts_Tests_Datasets {
 				),
 				'Source Serif Pro-900-italic' => array(
 					'provider'     => 'local',
+					'font-family'  => 'Source Serif Pro',
 					'font-style'   => 'italic',
 					'font-weight'  => '900',
 					'font-stretch' => 'normal',
@@ -851,15 +948,18 @@ trait WP_Webfonts_Tests_Datasets {
 			),
 			'my-font'          => array(
 				'my-font-300-normal' => array(
+					'font-family' => 'My Font',
 					'font-weight' => '300',
 					'src'         => 'https://example.com/assets/fonts/my-font.ttf.woff2',
 				),
 				'my-font-300-italic' => array(
+					'font-family' => 'My Font',
 					'font-weight' => '300',
 					'font-style'  => 'italic',
 					'src'         => 'https://example.com/assets/fonts/my-font.ttf.woff2',
 				),
 				'my-font-900-normal' => array(
+					'font-family' => 'My Font',
 					'font-weight' => '900',
 					'src'         => 'https://example.com/assets/fonts/my-font.ttf.woff2',
 				),
@@ -1004,18 +1104,21 @@ CSS
 			'font1' => array(
 				'font1-300-normal' => array(
 					'provider'     => 'mock',
+					'font-family'  => 'Font 1',
 					'font-weight'  => '300',
 					'font-style'   => 'normal',
 					'font-display' => 'fallback',
 				),
 				'font1-300-italic' => array(
 					'provider'     => 'mock',
+					'font-family'  => 'Font 1',
 					'font-weight'  => '300',
 					'font-style'   => 'italic',
 					'font-display' => 'fallback',
 				),
 				'font1-900-normal' => array(
 					'provider'     => 'mock',
+					'font-family'  => 'Font 1',
 					'font-weight'  => '900',
 					'font-style'   => 'normal',
 					'font-display' => 'fallback',
@@ -1024,12 +1127,14 @@ CSS
 			'font2' => array(
 				'font2-200-900-normal' => array(
 					'provider'     => 'mock',
+					'font-family'  => 'Font 2',
 					'font-weight'  => '200 900',
 					'font-style'   => 'normal',
 					'font-display' => 'fallback',
 				),
 				'font2-200-900-italic' => array(
 					'provider'     => 'mock',
+					'font-family'  => 'Font 2',
 					'font-weight'  => '200 900',
 					'font-style'   => 'italic',
 					'font-display' => 'fallback',
@@ -1038,6 +1143,7 @@ CSS
 			'font3' => array(
 				'font3-bold-normal' => array(
 					'provider'     => 'mock',
+					'font-family'  => 'Font 3',
 					'font-weight'  => 'bold',
 					'font-style'   => 'normal',
 					'font-display' => 'fallback',
