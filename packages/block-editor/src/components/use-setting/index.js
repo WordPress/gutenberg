@@ -113,7 +113,8 @@ const removeCustomPrefixes = ( path ) => {
  *                                  setting.
  * @param {number}   depth          Optional. The current recursion depth used
  *                                  to calculate the most-nested setting.
- * @return {string}     The value for defined setting.
+ * @return {Object}                 Object with keys `depth` and `value`.
+ *                                  Destructure the `value` key for the result.
  */
 const getNestedSetting = (
 	blockNamePath,
