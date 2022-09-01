@@ -2,9 +2,39 @@
 	"version": 2,
 	"settings": {
 		"appearanceTools": true,
+		"color": {
+			"palette": [
+				{
+					"slug": "red",
+					"name": "Red",
+					"color": "#ce0808"
+				},
+				{
+					"slug": "light",
+					"name": "Light",
+					"color": "#f5f7f9"
+				}
+			]
+		},
 		"layout": {
 			"contentSize": "840px",
 			"wideSize": "1100px"
+		},
+		"blocks": {
+			"core/quote": {
+				"core/heading": {
+					"color": {
+						"text": true,
+						"palette": [
+							{
+								"slug": "red",
+								"name": "Red",
+								"color": "#ce0808"
+							}
+						]
+					}
+				}
+			}
 		}
 	},
 	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
