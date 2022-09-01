@@ -4,14 +4,6 @@
 			width: $grid-unit * 40;
 		}
 	}
-
-	.components-modal__header {
-		border-bottom: none;
-	}
-
-	.components-modal__content::before {
-		margin-bottom: $grid-unit-05;
-	}
 }
 
 .edit-post-template__modal-actions {

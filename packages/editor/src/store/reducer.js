@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { omit, isEqual } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -39,7 +34,12 @@ export function getPostRawValue( value ) {
  * @return {boolean} Whether the two objects have the same keys.
  */
 export function hasSameKeys( a, b ) {
-	return isEqual( Object.keys( a ), Object.keys( b ) );
+	const keysA = Object.keys( a ).sort();
+	const keysB = Object.keys( b ).sort();
+	return (
+		keysA.length === keysB.length &&
+		keysA.every( ( key, index ) => keysB[ index ] === key )
+	);
 }
 
 /**
@@ -184,8 +184,11 @@ export function postSavingLock( state = {}, action ) {
 		case 'LOCK_POST_SAVING':
 			return { ...state, [ action.lockName ]: true };
 
-		case 'UNLOCK_POST_SAVING':
-			return omit( state, action.lockName );
+		case 'UNLOCK_POST_SAVING': {
+			const { [ action.lockName ]: removedLockName, ...restState } =
+				state;
+			return restState;
+		}
 	}
 	return state;
 }
@@ -205,8 +208,11 @@ export function postAutosavingLock( state = {}, action ) {
 		case 'LOCK_POST_AUTOSAVING':
 			return { ...state, [ action.lockName ]: true };
 
-		case 'UNLOCK_POST_AUTOSAVING':
-			return omit( state, action.lockName );
+		case 'UNLOCK_POST_AUTOSAVING': {
+			const { [ action.lockName ]: removedLockName, ...restState } =
+				state;
+			return restState;
+		}
 	}
 	return state;
 }

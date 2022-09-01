@@ -49,6 +49,12 @@ export default function ResizableCover( {
 				onResizeStop( elt.clientHeight );
 				setIsResizing( false );
 			} }
+			__experimentalShowTooltip
+			__experimentalTooltipProps={ {
+				axis: 'y',
+				position: 'bottom',
+				isVisible: isResizing,
+			} }
 			{ ...props }
 		/>
 	);

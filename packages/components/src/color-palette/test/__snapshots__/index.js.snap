@@ -1,10 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`] = `
-<ColorPicker
-  color="#f00"
-  onChange={[Function]}
-/>
+<DropdownContentWrapperDiv
+  className="components-dropdown-content-wrapper"
+  data-wp-c16t={true}
+  data-wp-component="DropdownContentWrapper"
+  paddingSize="none"
+>
+  <LegacyAdapter
+    color="#f00"
+    onChange={[Function]}
+  />
+</DropdownContentWrapperDiv>
 `;
 
 exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] = `
@@ -357,6 +364,13 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
 
 <Dropdown
   contentClassName="components-color-palette__custom-color-dropdown-content"
+  popoverProps={
+    Object {
+      "__unstableShift": true,
+      "offset": 8,
+      "placement": "bottom",
+    }
+  }
   renderContent={[Function]}
   renderToggle={[Function]}
 >
@@ -728,6 +742,13 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         >
           <Dropdown
             contentClassName="components-color-palette__custom-color-dropdown-content"
+            popoverProps={
+              Object {
+                "__unstableShift": true,
+                "offset": 8,
+                "placement": "bottom",
+              }
+            }
             renderContent={[Function]}
             renderToggle={[Function]}
           >
@@ -957,7 +978,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 <Option
                   aria-label="Color: red"
                   isSelected={true}
-                  key="#f00"
+                  key="#f00-0"
                   onClick={[Function]}
                   selectedIconProps={
                     Object {
@@ -1060,7 +1081,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 <Option
                   aria-label="Color: white"
                   isSelected={false}
-                  key="#fff"
+                  key="#fff-1"
                   onClick={[Function]}
                   selectedIconProps={Object {}}
                   style={
@@ -1120,7 +1141,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 <Option
                   aria-label="Color: blue"
                   isSelected={false}
-                  key="#00f"
+                  key="#00f-2"
                   onClick={[Function]}
                   selectedIconProps={Object {}}
                   style={

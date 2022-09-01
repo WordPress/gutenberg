@@ -23,6 +23,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	background: {
 		value: [ 'color', 'gradient' ],
 		support: [ 'color', 'gradients' ],
+		useEngine: true,
 	},
 	backgroundColor: {
 		value: [ 'color', 'background' ],
@@ -130,9 +131,18 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'elements', 'link', 'color', 'text' ],
 		support: [ 'color', 'link' ],
 	},
+	buttonColor: {
+		value: [ 'elements', 'button', 'color', 'text' ],
+		support: [ 'color', 'button' ],
+	},
+	buttonBackgroundColor: {
+		value: [ 'elements', 'button', 'color', 'background' ],
+		support: [ 'color', 'button' ],
+	},
 	fontFamily: {
 		value: [ 'typography', 'fontFamily' ],
 		support: [ 'typography', '__experimentalFontFamily' ],
+		useEngine: true,
 	},
 	fontSize: {
 		value: [ 'typography', 'fontSize' ],
@@ -191,14 +201,22 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'typography', '__experimentalLetterSpacing' ],
 		useEngine: true,
 	},
-	'--wp--style--block-gap': {
-		value: [ 'spacing', 'blockGap' ],
-		support: [ 'spacing', 'blockGap' ],
+	'--wp--style--root--padding': {
+		value: [ 'spacing', 'padding' ],
+		support: [ 'spacing', 'padding' ],
+		properties: {
+			'--wp--style--root--padding-top': 'top',
+			'--wp--style--root--padding-right': 'right',
+			'--wp--style--root--padding-bottom': 'bottom',
+			'--wp--style--root--padding-left': 'left',
+		},
+		rootOnly: true,
 	},
 };
 
 export const __EXPERIMENTAL_ELEMENTS = {
 	link: 'a',
+	heading: 'h1, h2, h3, h4, h5, h6',
 	h1: 'h1',
 	h2: 'h2',
 	h3: 'h3',
@@ -206,6 +224,9 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	h5: 'h5',
 	h6: 'h6',
 	button: '.wp-element-button, .wp-block-button__link',
+	caption:
+		'.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption',
+	cite: 'cite',
 };
 
 export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
@@ -214,4 +235,5 @@ export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
 	'color.palette': true,
 	'typography.fontFamilies': true,
 	'typography.fontSizes': true,
+	'spacing.spacingSizes': true,
 };

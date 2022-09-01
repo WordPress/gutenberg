@@ -246,6 +246,7 @@ _Parameters_
 -   _props_ `Object`:
 -   _props.clientId_ `string`: Client ID of block.
 -   _props.maximumLength_ `number|undefined`: The maximum length that the block title string may be before truncated.
+-   _props.context_ `string|undefined`: The context to pass to `getBlockLabel`.
 
 _Returns_
 
@@ -621,10 +622,6 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
 
-_Type_
-
--   `Object`
-
 ### storeConfig
 
 Block editor data store configuration.
@@ -632,10 +629,6 @@ Block editor data store configuration.
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore>
-
-_Type_
-
--   `Object`
 
 ### ToolSelector
 

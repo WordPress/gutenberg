@@ -2,13 +2,11 @@
 	width: 100%;
 	position: relative;
 	justify-content: flex-start;
-	align-items: flex-start;
 
 	span {
 		display: block;
 		width: 45%;
 		flex-shrink: 0;
-		padding: 6px 0;
 	}
 }
 
@@ -28,6 +26,6 @@
 	}
 }
 
-.edit-post-post-schedule__dialog .components-popover__content {
-	padding: $grid-unit-20;
+.edit-post-post-schedule__dialog .block-editor-publish-date-time-picker {
+	margin: $grid-unit-10;
 }

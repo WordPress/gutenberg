@@ -6,12 +6,19 @@ import { useViewportMatch } from '@wordpress/compose';
 import {
 	ToolSelector,
 	__experimentalPreviewOptions as PreviewOptions,
+	NavigableToolbar,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
-import { listView, plus } from '@wordpress/icons';
-import { Button, ToolbarItem } from '@wordpress/components';
+import { listView, plus, external } from '@wordpress/icons';
+import {
+	Button,
+	ToolbarItem,
+	MenuGroup,
+	MenuItem,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -47,6 +54,7 @@ export default function Header( {
 		listViewShortcut,
 		isLoaded,
 		isVisualMode,
+		settings,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -55,6 +63,7 @@ export default function Header( {
 			isInserterOpened,
 			isListViewOpened,
 			getEditorMode,
+			getSettings,
 		} = select( editSiteStore );
 		const { getEditedEntityRecord } = select( coreStore );
 		const { __experimentalGetTemplateInfo: getTemplateInfo } =
@@ -78,6 +87,7 @@ export default function Header( {
 				'core/edit-site/toggle-list-view'
 			),
 			isVisualMode: getEditorMode() === 'visual',
+			settings: getSettings(),
 		};
 	}, [] );
 
@@ -105,49 +115,76 @@ export default function Header( {
 
 	const isFocusMode = templateType === 'wp_template_part';
 
+	/* translators: button label text should, if possible, be under 16 characters. */
+	const longLabel = _x(
+		'Toggle block inserter',
+		'Generic label for block inserter button'
+	);
+	const shortLabel = ! isInserterOpen ? __( 'Add' ) : __( 'Close' );
+
 	return (
 		<div className="edit-site-header">
-			<div className="edit-site-header_start">
+			<NavigableToolbar
+				className="edit-site-header_start"
+				aria-label={ __( 'Document tools' ) }
+			>
 				<div className="edit-site-header__toolbar">
-					<Button
+					<ToolbarItem
 						ref={ inserterButton }
+						as={ Button }
+						className="edit-site-header-toolbar__inserter-toggle"
 						variant="primary"
 						isPressed={ isInserterOpen }
-						className="edit-site-header-toolbar__inserter-toggle"
-						disabled={ ! isVisualMode }
 						onMouseDown={ preventDefault }
 						onClick={ openInserter }
+						disabled={ ! isVisualMode }
 						icon={ plus }
-						label={ _x(
-							'Toggle block inserter',
-							'Generic label for block inserter button'
-						) }
-					>
-						{ showIconLabels &&
-							( ! isInserterOpen ? __( 'Add' ) : __( 'Close' ) ) }
-					</Button>
+						label={ showIconLabels ? shortLabel : longLabel }
+						showTooltip={ ! showIconLabels }
+					/>
 					{ isLargeViewport && (
 						<>
 							<ToolbarItem
 								as={ ToolSelector }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
 								disabled={ ! isVisualMode }
 							/>
-							<UndoButton />
-							<RedoButton />
-							<Button
+							<ToolbarItem
+								as={ UndoButton }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
+							/>
+							<ToolbarItem
+								as={ RedoButton }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
+							/>
+							<ToolbarItem
+								as={ Button }
 								className="edit-site-header-toolbar__list-view-toggle"
-								disabled={ ! isVisualMode }
 								icon={ listView }
+								disabled={ ! isVisualMode }
 								isPressed={ isListViewOpen }
 								/* translators: button label text should, if possible, be under 16 characters. */
 								label={ __( 'List View' ) }
 								onClick={ toggleListView }
 								shortcut={ listViewShortcut }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
 							/>
 						</>
 					) }
 				</div>
-			</div>
+			</NavigableToolbar>
 
 			<div className="edit-site-header_center">
 				<DocumentActions
@@ -175,14 +212,30 @@ export default function Header( {
 						<PreviewOptions
 							deviceType={ deviceType }
 							setDeviceType={ setPreviewDeviceType }
-						/>
+						>
+							<MenuGroup>
+								<MenuItem
+									href={ settings?.siteUrl }
+									target="_blank"
+									icon={ external }
+								>
+									{ __( 'View site' ) }
+									<VisuallyHidden as="span">
+										{
+											/* translators: accessibility text */
+											__( '(opens in a new tab)' )
+										}
+									</VisuallyHidden>
+								</MenuItem>
+							</MenuGroup>
+						</PreviewOptions>
 					) }
 					<SaveButton
 						openEntitiesSavedStates={ openEntitiesSavedStates }
 						isEntitiesSavedStatesOpen={ isEntitiesSavedStatesOpen }
 					/>
 					<PinnedItems.Slot scope="core/edit-site" />
-					<MoreMenu />
+					<MoreMenu showIconLabels={ showIconLabels } />
 				</div>
 			</div>
 		</div>

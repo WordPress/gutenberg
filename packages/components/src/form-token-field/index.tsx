@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { last, clone, uniq, map, difference, identity, some } from 'lodash';
+import { last, clone, map, some } from 'lodash';
 import classnames from 'classnames';
 import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
 
@@ -12,17 +12,6 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
-import {
-	BACKSPACE,
-	ENTER,
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT,
-	SPACE,
-	DELETE,
-	ESCAPE,
-} from '@wordpress/keycodes';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -30,8 +19,13 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  */
 import Token from './token';
 import TokenInput from './token-input';
+import { TokensAndInputWrapperFlex } from './styles';
 import SuggestionsList from './suggestions-list';
 import type { FormTokenFieldProps, TokenItem } from './types';
+import { FlexItem } from '../flex';
+import { StyledLabel } from '../base-control/styles/base-control-styles';
+
+const identity = ( value: string ) => value;
 
 /**
  * A `FormTokenField` is a field similar to the tags and categories fields in the interim editor chrome,
@@ -68,9 +62,12 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			remove: __( 'Remove item' ),
 			__experimentalInvalid: __( 'Invalid item' ),
 		},
+		__experimentalRenderItem,
 		__experimentalExpandOnFocus = false,
 		__experimentalValidateInput = () => true,
 		__experimentalShowHowTo = true,
+		__next36pxDefaultSize = false,
+		__experimentalAutoSelectFirstMatch = false,
 	} = props;
 
 	const instanceId = useInstanceId( FormTokenField );
@@ -118,6 +115,11 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		updateSuggestions();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ incompleteTokenValue ] );
+
+	useEffect( () => {
+		updateSuggestions();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ __experimentalAutoSelectFirstMatch ] );
 
 	if ( disabled && isActive ) {
 		setIsActive( false );
@@ -171,35 +173,34 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		if ( event.defaultPrevented ) {
 			return;
 		}
-		// TODO: replace to event.code;
-		switch ( event.keyCode ) {
-			case BACKSPACE:
+		switch ( event.code ) {
+			case 'Backspace':
 				preventDefault = handleDeleteKey( deleteTokenBeforeInput );
 				break;
-			case ENTER:
+			case 'Enter':
 				preventDefault = addCurrentToken();
 				break;
-			case LEFT:
+			case 'ArrowLeft':
 				preventDefault = handleLeftArrowKey();
 				break;
-			case UP:
+			case 'ArrowUp':
 				preventDefault = handleUpArrowKey();
 				break;
-			case RIGHT:
+			case 'ArrowRight':
 				preventDefault = handleRightArrowKey();
 				break;
-			case DOWN:
+			case 'ArrowDown':
 				preventDefault = handleDownArrowKey();
 				break;
-			case DELETE:
+			case 'Delete':
 				preventDefault = handleDeleteKey( deleteTokenAfterInput );
 				break;
-			case SPACE:
+			case 'Space':
 				if ( tokenizeOnSpace ) {
 					preventDefault = addCurrentToken();
 				}
 				break;
-			case ESCAPE:
+			case 'Escape':
 				preventDefault = handleEscapeKey( event );
 				break;
 			default:
@@ -402,12 +403,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	}
 
 	function addNewTokens( tokens: string[] ) {
-		const tokensToAdd = uniq(
-			tokens
-				.map( saveTransform )
-				.filter( Boolean )
-				.filter( ( token ) => ! valueContainsToken( token ) )
-		);
+		const tokensToAdd = [
+			...new Set(
+				tokens
+					.map( saveTransform )
+					.filter( Boolean )
+					.filter( ( token ) => ! valueContainsToken( token ) )
+			),
+		];
 
 		if ( tokensToAdd.length > 0 ) {
 			const newValue = clone( value );
@@ -468,7 +471,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		} );
 
 		if ( match.length === 0 ) {
-			_suggestions = difference( _suggestions, normalizedValue );
+			_suggestions = _suggestions.filter(
+				( suggestion ) => ! normalizedValue.includes( suggestion )
+			);
 		} else {
 			match = match.toLocaleLowerCase();
 
@@ -521,14 +526,24 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			getMatchingSuggestions( incompleteTokenValue );
 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
 
+		const shouldExpandIfFocuses = hasFocus() && __experimentalExpandOnFocus;
 		setIsExpanded(
-			__experimentalExpandOnFocus ||
+			shouldExpandIfFocuses ||
 				( inputHasMinimumChars && hasMatchingSuggestions )
 		);
 
 		if ( resetSelectedSuggestion ) {
-			setSelectedSuggestionIndex( -1 );
-			setSelectedSuggestionScroll( false );
+			if (
+				__experimentalAutoSelectFirstMatch &&
+				inputHasMinimumChars &&
+				hasMatchingSuggestions
+			) {
+				setSelectedSuggestionIndex( 0 );
+				setSelectedSuggestionScroll( true );
+			} else {
+				setSelectedSuggestionIndex( -1 );
+				setSelectedSuggestionScroll( false );
+			}
 		}
 
 		if ( inputHasMinimumChars ) {
@@ -566,28 +581,35 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		const termsCount = tokens.length;
 
 		return (
-			<Token
-				key={ 'token-' + _value }
-				value={ _value }
-				status={ status }
-				title={ typeof token !== 'string' ? token.title : undefined }
-				displayTransform={ displayTransform }
-				onClickRemove={ onTokenClickRemove }
-				isBorderless={
-					( typeof token !== 'string' && token.isBorderless ) ||
-					isBorderless
-				}
-				onMouseEnter={
-					typeof token !== 'string' ? token.onMouseEnter : undefined
-				}
-				onMouseLeave={
-					typeof token !== 'string' ? token.onMouseLeave : undefined
-				}
-				disabled={ 'error' !== status && disabled }
-				messages={ messages }
-				termsCount={ termsCount }
-				termPosition={ termPosition }
-			/>
+			<FlexItem key={ 'token-' + _value }>
+				<Token
+					value={ _value }
+					status={ status }
+					title={
+						typeof token !== 'string' ? token.title : undefined
+					}
+					displayTransform={ displayTransform }
+					onClickRemove={ onTokenClickRemove }
+					isBorderless={
+						( typeof token !== 'string' && token.isBorderless ) ||
+						isBorderless
+					}
+					onMouseEnter={
+						typeof token !== 'string'
+							? token.onMouseEnter
+							: undefined
+					}
+					onMouseLeave={
+						typeof token !== 'string'
+							? token.onMouseLeave
+							: undefined
+					}
+					disabled={ 'error' !== status && disabled }
+					messages={ messages }
+					termsCount={ termsCount }
+					termPosition={ termPosition }
+				/>
+			</FlexItem>
 		);
 	}
 
@@ -647,12 +669,12 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div { ...tokenFieldProps }>
-			<label
+			<StyledLabel
 				htmlFor={ `components-form-token-input-${ instanceId }` }
 				className="components-form-token-field__label"
 			>
 				{ label }
-			</label>
+			</StyledLabel>
 			<div
 				ref={ tokensAndInput }
 				className={ classes }
@@ -660,7 +682,16 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 				onMouseDown={ onContainerTouched }
 				onTouchStart={ onContainerTouched }
 			>
-				{ renderTokensAndInput() }
+				<TokensAndInputWrapperFlex
+					justify="flex-start"
+					align="center"
+					gap={ 1 }
+					wrap={ true }
+					__next36pxDefaultSize={ __next36pxDefaultSize }
+					hasTokens={ !! value.length }
+				>
+					{ renderTokensAndInput() }
+				</TokensAndInputWrapperFlex>
 				{ isExpanded && (
 					<SuggestionsList
 						instanceId={ instanceId }
@@ -671,6 +702,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 						scrollIntoView={ selectedSuggestionScroll }
 						onHover={ onSuggestionHovered }
 						onSelect={ onSuggestionSelected }
+						__experimentalRenderItem={ __experimentalRenderItem }
 					/>
 				) }
 			</div>

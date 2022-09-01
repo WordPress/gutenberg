@@ -83,6 +83,13 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
           },
         },
         Object {
+          "description": "Strikethrough the selected text.",
+          "keyCombination": Object {
+            "character": "d",
+            "modifier": "access",
+          },
+        },
+        Object {
           "description": "Make the selected text inline code.",
           "keyCombination": Object {
             "character": "x",

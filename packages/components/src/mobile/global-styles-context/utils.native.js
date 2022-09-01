@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { find, startsWith, get, camelCase, has } from 'lodash';
+import { camelCase } from 'change-case';
+import { find, get } from 'lodash';
 import { Dimensions } from 'react-native';
 
 /**
@@ -32,6 +33,7 @@ const BLOCK_STYLE_ATTRIBUTES_MAPPING = {
 
 const PADDING = 12; // $solid-border-space
 const UNKNOWN_VALUE = 'undefined';
+const DEFAULT_FONT_SIZE = 16;
 
 export function getBlockPaddings(
 	mergedStyle,
@@ -103,7 +105,7 @@ export function getBlockColors(
 
 	// Custom colors.
 	Object.entries( blockStyleAttributes ).forEach( ( [ key, value ] ) => {
-		const isCustomColor = startsWith( value, '#' );
+		const isCustomColor = value?.startsWith?.( '#' );
 		let styleKey = key;
 
 		if ( BLOCK_STYLE_ATTRIBUTES_MAPPING[ styleKey ] ) {
@@ -190,7 +192,7 @@ export function getBlockTypography(
 
 export function parseStylesVariables( styles, mappedValues, customValues ) {
 	let stylesBase = styles;
-	const variables = [ 'preset', 'custom', 'var' ];
+	const variables = [ 'preset', 'custom', 'var', 'fontSize' ];
 
 	if ( ! stylesBase ) {
 		return styles;
@@ -203,6 +205,7 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 		// var:preset|color|custom-color-2
 		const regex = new RegExp( `var\\(--wp--${ variable }--(.*?)\\)`, 'g' );
 		const varRegex = /\"var:preset\|color\|(.*?)\"/gm;
+		const fontSizeRegex = /"fontSize":"(.*?)"/gm;
 
 		if ( variable === 'preset' ) {
 			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
@@ -221,7 +224,12 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 			const customValuesData = customValues ?? JSON.parse( stylesBase );
 			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
 				const path = $2.split( '--' );
-				if ( has( customValuesData, path ) ) {
+				if (
+					path.reduce(
+						( prev, curr ) => prev && prev[ curr ],
+						customValuesData
+					)
+				) {
 					return get( customValuesData, path );
 				}
 
@@ -242,6 +250,21 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 					return `"${ matchedValue?.color }"`;
 				}
 				return UNKNOWN_VALUE;
+			} );
+		}
+
+		if ( variable === 'fontSize' ) {
+			const { width, height } = Dimensions.get( 'window' );
+
+			stylesBase = stylesBase.replace( fontSizeRegex, ( _$1, $2 ) => {
+				const parsedFontSize =
+					getPxFromCssUnit( $2, {
+						width,
+						height,
+						fontSize: DEFAULT_FONT_SIZE,
+					} ) || `${ DEFAULT_FONT_SIZE }px`;
+
+				return `"fontSize":"${ parsedFontSize }"`;
 			} );
 		}
 	} );
@@ -297,7 +320,7 @@ function normalizeFontSizes( fontSizes ) {
 						{
 							width: dimensions.width,
 							height: dimensions.height,
-							fontSize: 16,
+							fontSize: DEFAULT_FONT_SIZE,
 						}
 					);
 					return fontSizeObject;

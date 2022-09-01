@@ -16,7 +16,7 @@ import {
 	useCallback,
 	useRef,
 } from '@wordpress/element';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { useCopyToClipboard } from '@wordpress/compose';
 
@@ -42,7 +42,8 @@ const POPOVER_PROPS = {
 
 function CopyMenuItem( { blocks, onCopy } ) {
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
-	const copyMenuItemLabel = _n( 'Copy block', 'Copy blocks', blocks.length );
+	const copyMenuItemLabel =
+		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy block' );
 	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
 }
 
@@ -124,7 +125,10 @@ export function BlockSettingsDropdown( {
 		[ __experimentalSelectBlock ]
 	);
 
-	const blockTitle = useBlockDisplayTitle( firstBlockClientId, 25 );
+	const blockTitle = useBlockDisplayTitle( {
+		clientId: firstBlockClientId,
+		maximumLength: 25,
+	} );
 
 	const updateSelectionAfterRemove = useCallback(
 		__experimentalSelectBlock

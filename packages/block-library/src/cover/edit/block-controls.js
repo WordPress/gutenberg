@@ -9,27 +9,22 @@ import {
 	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,
 	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { ALLOWED_MEDIA_TYPES, IMAGE_BACKGROUND_TYPE } from '../shared';
+import { ALLOWED_MEDIA_TYPES } from '../shared';
 
 export default function CoverBlockControls( {
 	attributes,
 	setAttributes,
 	onSelectMedia,
 	currentSettings,
+	toggleUseFeaturedImage,
 } ) {
-	const {
-		contentPosition,
-		id,
-		useFeaturedImage,
-		dimRatio,
-		minHeight,
-		minHeightUnit,
-	} = attributes;
+	const { contentPosition, id, useFeaturedImage, minHeight, minHeightUnit } =
+		attributes;
 	const { hasInnerBlocks, url } = currentSettings;
 
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
@@ -63,26 +58,27 @@ export default function CoverBlockControls( {
 		} );
 	};
 
-	const toggleUseFeaturedImage = () => {
-		setAttributes( {
-			id: undefined,
-			url: undefined,
-			useFeaturedImage: ! useFeaturedImage,
-			dimRatio: dimRatio === 100 ? 50 : dimRatio,
-			backgroundType: useFeaturedImage
-				? IMAGE_BACKGROUND_TYPE
-				: undefined,
-		} );
+	// Flip value horizontally to match the physical direction indicated by
+	// AlignmentMatrixControl with the logical direction indicated by cover
+	// block in RTL languages.
+	const flipHorizontalPosition = ( ltrContentPosition ) => {
+		return isRTL()
+			? ltrContentPosition.replace( /left|right/, ( match ) =>
+					match === 'left' ? 'right' : 'left'
+			  )
+			: ltrContentPosition;
 	};
+
 	return (
 		<>
 			<BlockControls group="block">
 				<BlockAlignmentMatrixControl
 					label={ __( 'Change content position' ) }
-					value={ contentPosition }
+					value={ flipHorizontalPosition( contentPosition ) }
 					onChange={ ( nextPosition ) =>
 						setAttributes( {
-							contentPosition: nextPosition,
+							contentPosition:
+								flipHorizontalPosition( nextPosition ),
 						} )
 					}
 					isDisabled={ ! hasInnerBlocks }

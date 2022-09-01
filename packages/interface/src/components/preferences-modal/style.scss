@@ -16,10 +16,6 @@
 	@media (max-width: #{ ($break-medium - 1) }) {
 		.components-modal__content {
 			padding: 0;
-
-			&::before {
-				content: none;
-			}
 		}
 	}
 }

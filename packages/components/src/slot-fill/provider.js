@@ -1,10 +1,5 @@
 // @ts-nocheck
 /**
- * External dependencies
- */
-import { without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -78,7 +73,8 @@ export default class SlotFillProvider extends Component {
 	}
 
 	unregisterFill( name, instance ) {
-		this.fills[ name ] = without( this.fills[ name ], instance );
+		this.fills[ name ] =
+			this.fills[ name ]?.filter( ( fill ) => fill !== instance ) ?? [];
 		this.forceUpdateSlot( name );
 	}
 
@@ -115,7 +111,7 @@ export default class SlotFillProvider extends Component {
 		this.listeners.push( listener );
 
 		return () => {
-			this.listeners = without( this.listeners, listener );
+			this.listeners = this.listeners.filter( ( l ) => l !== listener );
 		};
 	}
 

@@ -91,12 +91,14 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidMount() {
-		const { capabilities, locale, updateSettings } = this.props;
+		const { capabilities, locale, hostAppNamespace, updateSettings } =
+			this.props;
 
 		updateSettings( {
 			...capabilities,
 			...this.getThemeColors( this.props ),
 			locale,
+			hostAppNamespace,
 		} );
 
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
@@ -319,13 +321,7 @@ class NativeEditorProvider extends Component {
 	}
 
 	render() {
-		const {
-			children,
-			post, // eslint-disable-line no-unused-vars
-			capabilities,
-			settings,
-			...props
-		} = this.props;
+		const { children, post, capabilities, settings, ...props } = this.props;
 		const editorSettings = this.getEditorSettings( settings, capabilities );
 
 		return (

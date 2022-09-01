@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { has } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
@@ -48,7 +43,7 @@ export const setupEditor =
 			// included as part of editor setup action. Assume edited content as
 			// canonical if provided, falling back to post.
 			let content;
-			if ( has( edits, [ 'content' ] ) ) {
+			if ( 'content' in edits ) {
 				content = edits.content;
 			} else {
 				content = post.content.raw;
@@ -250,10 +245,12 @@ export const trashPost =
 			.resolveSelect( coreStore )
 			.getPostType( postTypeSlug );
 		registry.dispatch( noticesStore ).removeNotice( TRASH_POST_NOTICE_ID );
+		const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2' } =
+			postType;
 		try {
 			const post = select.getCurrentPost();
 			await apiFetch( {
-				path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
+				path: `/${ restNamespace }/${ restBase }/${ post.id }`,
 				method: 'DELETE',
 			} );
 

@@ -12,7 +12,17 @@ import {
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import { ENTER, BACKSPACE } from '@wordpress/keycodes';
+import {
+	BACKSPACE,
+	DELETE,
+	DOWN,
+	ENTER,
+	ESCAPE,
+	LEFT,
+	RIGHT,
+	SPACE,
+	UP,
+} from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -20,6 +30,19 @@ import { ENTER, BACKSPACE } from '@wordpress/keycodes';
 import * as AztecInputState from './AztecInputState';
 
 const AztecManager = UIManager.getViewManagerConfig( 'RCTAztecView' );
+
+// Used to match KeyboardEvent.code values (from the Web API) with native keycodes.
+const KEYCODES = {
+	[ BACKSPACE ]: 'Backspace',
+	[ DELETE ]: 'Delete',
+	[ DOWN ]: 'ArrowDown',
+	[ ENTER ]: 'Enter',
+	[ ESCAPE ]: 'Escape',
+	[ LEFT ]: 'ArrowLeft',
+	[ RIGHT ]: 'ArrowRight',
+	[ SPACE ]: 'Space',
+	[ UP ]: 'ArrowUp',
+};
 
 class AztecView extends Component {
 	constructor() {
@@ -75,7 +98,7 @@ class AztecView extends Component {
 
 		const { onKeyDown } = this.props;
 
-		const newEvent = { ...event, keyCode: ENTER };
+		const newEvent = { ...event, keyCode: ENTER, code: KEYCODES[ ENTER ] };
 		onKeyDown( newEvent );
 	}
 
@@ -89,6 +112,7 @@ class AztecView extends Component {
 		const newEvent = {
 			...event,
 			keyCode: BACKSPACE,
+			code: KEYCODES[ BACKSPACE ],
 			preventDefault: () => {},
 		};
 		onKeyDown( newEvent );
@@ -100,9 +124,13 @@ class AztecView extends Component {
 		}
 
 		const { onKeyDown } = this.props;
+		const { keyCode } = event.nativeEvent;
 		const newEvent = {
 			...event,
-			keyCode: event.nativeEvent.keyCode,
+			keyCode,
+			...( KEYCODES[ keyCode ] && {
+				code: KEYCODES[ keyCode ],
+			} ),
 			preventDefault: () => {},
 		};
 		onKeyDown( newEvent );
@@ -143,7 +171,7 @@ class AztecView extends Component {
 	}
 
 	_onChange( event ) {
-		// iOS uses the the onKeyDown prop directly from native only when one of the triggerKeyCodes is entered, but
+		// iOS uses the onKeyDown prop directly from native only when one of the triggerKeyCodes is entered, but
 		// Android includes the information needed for onKeyDown in the event passed to onChange.
 		if ( Platform.OS === 'android' ) {
 			const triggersIncludeEventKeyCode =
@@ -214,7 +242,6 @@ class AztecView extends Component {
 	}
 
 	render() {
-		// eslint-disable-next-line no-unused-vars
 		const { onActiveFormatsChange, ...otherProps } = this.props;
 		// `style` has to be destructured separately, without `otherProps`, because of:
 		// https://github.com/WordPress/gutenberg/issues/23611

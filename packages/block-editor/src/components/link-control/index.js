@@ -235,6 +235,7 @@ function LinkControl( {
 			internalTextValue !== value?.title
 		) {
 			onChange( {
+				...value,
 				url: currentInputValue,
 				title: internalTextValue,
 			} );

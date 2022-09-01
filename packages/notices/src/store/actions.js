@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { uniqueId } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
@@ -18,6 +13,8 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  *                               triggered by user.
  *
  */
+
+let uniqueId = 0;
 
 /**
  * Returns an action object used in signalling that a notice is to be created.
@@ -40,12 +37,33 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  *                                                             readers.
  * @param {Array<WPNoticeAction>} [options.actions]            User actions to be
  *                                                             presented with notice.
- * @param {Object}                [options.icon]               An icon displayed with the notice.
+ * @param {string}                [options.icon]               An icon displayed with the notice.
+ *                                                             Only used when type is set to `snackbar`.
  * @param {boolean}               [options.explicitDismiss]    Whether the notice includes
- *                                                             an explict dismiss button and
+ *                                                             an explicit dismiss button and
  *                                                             can't be dismissed by clicking
- *                                                             the body of the notice.
+ *                                                             the body of the notice. Only applies
+ *                                                             when type is set to `snackbar`.
  * @param {Function}              [options.onDismiss]          Called when the notice is dismissed.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *     const { createNotice } = useDispatch( noticesStore );
+ *     return (
+ *         <Button
+ *             onClick={ () => createNotice( 'success', __( 'Notice message' ) ) }
+ *         >
+ *             { __( 'Generate a success notice!' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
  *
  * @return {Object} Action object.
  */
@@ -54,7 +72,7 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
 		speak = true,
 		isDismissible = true,
 		context = DEFAULT_CONTEXT,
-		id = uniqueId( context ),
+		id = `${ context }${ ++uniqueId }`,
 		actions = [],
 		type = 'default',
 		__unstableHTML,
@@ -96,6 +114,30 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
  * @param {string} content   Notice message.
  * @param {Object} [options] Optional notice options.
  *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *     const { createSuccessNotice } = useDispatch( noticesStore );
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                 createSuccessNotice( __( 'Success!' ), {
+ *                     type: 'snackbar',
+ *                     icon: '🔥',
+ *                 } )
+ *             }
+ *         >
+ *             { __( 'Generate a snackbar success notice!' ) }
+ *        </Button>
+ *     );
+ * };
+ * ```
+ *
  * @return {Object} Action object.
  */
 export function createSuccessNotice( content, options ) {
@@ -110,6 +152,29 @@ export function createSuccessNotice( content, options ) {
  *
  * @param {string} content   Notice message.
  * @param {Object} [options] Optional notice options.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *     const { createInfoNotice } = useDispatch( noticesStore );
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                createInfoNotice( __( 'Something happened!' ), {
+ *                   isDismissible: false,
+ *                } )
+ *             }
+ *         >
+ *         { __( 'Generate a notice that cannot be dismissed.' ) }
+ *       </Button>
+ *       );
+ * };
+ *```
  *
  * @return {Object} Action object.
  */
@@ -126,6 +191,32 @@ export function createInfoNotice( content, options ) {
  * @param {string} content   Notice message.
  * @param {Object} [options] Optional notice options.
  *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *     const { createErrorNotice } = useDispatch( noticesStore );
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                 createErrorNotice( __( 'An error occurred!' ), {
+ *                     type: 'snackbar',
+ *                     explicitDismiss: true,
+ *                 } )
+ *             }
+ *         >
+ *             { __(
+ *                 'Generate an snackbar error notice with explicit dismiss button.'
+ *             ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
+ *
  * @return {Object} Action object.
  */
 export function createErrorNotice( content, options ) {
@@ -141,6 +232,33 @@ export function createErrorNotice( content, options ) {
  * @param {string} content   Notice message.
  * @param {Object} [options] Optional notice options.
  *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *     const { createWarningNotice, createInfoNotice } = useDispatch( noticesStore );
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                 createWarningNotice( __( 'Warning!' ), {
+ *                     onDismiss: () => {
+ *                         createInfoNotice(
+ *                             __( 'The warning has been dismissed!' )
+ *                         );
+ *                     },
+ *                 } )
+ *             }
+ *         >
+ *             { __( 'Generates a warning notice with onDismiss callback' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
+ *
  * @return {Object} Action object.
  */
 export function createWarningNotice( content, options ) {
@@ -153,6 +271,38 @@ export function createWarningNotice( content, options ) {
  * @param {string} id                 Notice unique identifier.
  * @param {string} [context='global'] Optional context (grouping) in which the notice is
  *                                    intended to appear. Defaults to default context.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *    const notices = useSelect( ( select ) => select( noticesStore ).getNotices() );
+ *    const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
+ *
+ *    return (
+ *         <>
+ *             <Button
+ *                 onClick={ () =>
+ *                     createWarningNotice( __( 'Warning!' ), {
+ *                         isDismissible: false,
+ *                     } )
+ *                 }
+ *             >
+ *                 { __( 'Generate a notice' ) }
+ *             </Button>
+ *             { notices.length > 0 && (
+ *                 <Button onClick={ () => removeNotice( notices[ 0 ].id ) }>
+ *                     { __( 'Remove the notice' ) }
+ *                 </Button>
+ *             ) }
+ *         </>
+ *     );
+ *};
+ * ```
  *
  * @return {Object} Action object.
  */

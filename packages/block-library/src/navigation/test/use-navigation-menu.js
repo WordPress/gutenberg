@@ -49,6 +49,20 @@ function resolveRecords( registry, menus ) {
 	} );
 }
 
+function resolveReadPermission( registry, allowed ) {
+	const dispatch = registry.dispatch( coreStore );
+	dispatch.receiveUserPermission( 'create/navigation', allowed );
+	dispatch.startResolution( 'canUser', [ 'read', 'navigation' ] );
+	dispatch.finishResolution( 'canUser', [ 'read', 'navigation' ] );
+}
+
+function resolveReadRecordPermission( registry, ref, allowed ) {
+	const dispatch = registry.dispatch( coreStore );
+	dispatch.receiveUserPermission( 'create/navigation', allowed );
+	dispatch.startResolution( 'canUser', [ 'read', 'navigation', ref ] );
+	dispatch.finishResolution( 'canUser', [ 'read', 'navigation', ref ] );
+}
+
 function resolveCreatePermission( registry, allowed ) {
 	const dispatch = registry.dispatch( coreStore );
 	dispatch.receiveUserPermission( 'create/navigation', allowed );
@@ -95,8 +109,8 @@ describe( 'useNavigationMenus', () => {
 			canUserDeleteNavigationMenu: undefined,
 			canUserUpdateNavigationMenu: undefined,
 			hasResolvedCanUserCreateNavigationMenu: false,
-			hasResolvedCanUserDeleteNavigationMenu: false,
-			hasResolvedCanUserUpdateNavigationMenu: false,
+			hasResolvedCanUserDeleteNavigationMenu: undefined,
+			hasResolvedCanUserUpdateNavigationMenu: undefined,
 			hasResolvedNavigationMenus: false,
 			isNavigationMenuMissing: true,
 			isNavigationMenuResolved: false,
@@ -105,9 +119,10 @@ describe( 'useNavigationMenus', () => {
 		} );
 	} );
 
-	it( 'Should return information about all menus when ref is missing', () => {
+	it( 'Should return information about all menus when the ref is missing', () => {
 		resolveRecords( registry, navigationMenus );
 		resolveCreatePermission( registry, true );
+		resolveReadPermission( registry, true );
 		expect( useNavigationMenu() ).toEqual( {
 			navigationMenus,
 			navigationMenu: undefined,
@@ -116,8 +131,8 @@ describe( 'useNavigationMenus', () => {
 			canUserDeleteNavigationMenu: undefined,
 			canUserUpdateNavigationMenu: undefined,
 			hasResolvedCanUserCreateNavigationMenu: true,
-			hasResolvedCanUserDeleteNavigationMenu: true,
-			hasResolvedCanUserUpdateNavigationMenu: true,
+			hasResolvedCanUserDeleteNavigationMenu: undefined,
+			hasResolvedCanUserUpdateNavigationMenu: undefined,
 			hasResolvedNavigationMenus: true,
 			isNavigationMenuMissing: true,
 			isNavigationMenuResolved: false,
@@ -171,6 +186,7 @@ describe( 'useNavigationMenus', () => {
 	it( 'Should return correct permissions (create, update)', () => {
 		resolveRecords( registry, navigationMenus );
 		resolveCreatePermission( registry, true );
+		resolveReadRecordPermission( registry, 1, true );
 		resolveUpdatePermission( registry, 1, true );
 		resolveDeletePermission( registry, 1, false );
 		expect( useNavigationMenu( 1 ) ).toEqual( {
@@ -194,6 +210,7 @@ describe( 'useNavigationMenus', () => {
 	it( 'Should return correct permissions (delete only)', () => {
 		resolveRecords( registry, navigationMenus );
 		resolveCreatePermission( registry, false );
+		resolveReadRecordPermission( registry, 1, false );
 		resolveUpdatePermission( registry, 1, false );
 		resolveDeletePermission( registry, 1, true );
 		expect( useNavigationMenu( 1 ) ).toEqual( {

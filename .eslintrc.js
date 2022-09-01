@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-const { escapeRegExp } = require( 'lodash' );
 const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
 
@@ -17,7 +16,8 @@ const { version } = require( './package' );
  * @type {string}
  */
 const majorMinorRegExp =
-	escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.\\d+)?';
+	version.replace( /\.\d+$/, '' ).replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' ) +
+	'(\\.\\d+)?';
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -79,42 +79,86 @@ module.exports = {
 					{
 						name: 'lodash',
 						importNames: [
+							'camelCase',
+							'capitalize',
 							'chunk',
 							'clamp',
+							'cloneDeep',
+							'compact',
 							'concat',
+							'countBy',
+							'deburr',
+							'defaults',
 							'defaultTo',
+							'delay',
+							'difference',
 							'differenceWith',
 							'dropRight',
 							'each',
+							'escapeRegExp',
+							'extend',
 							'findIndex',
 							'findKey',
 							'findLast',
+							'flatMap',
 							'flatten',
 							'flattenDeep',
+							'fromPairs',
+							'has',
+							'identity',
+							'invoke',
 							'isArray',
+							'isBoolean',
 							'isFinite',
 							'isFunction',
+							'isMatch',
 							'isNil',
 							'isNumber',
+							'isObject',
 							'isObjectLike',
+							'isPlainObject',
+							'isString',
 							'isUndefined',
+							'keyBy',
 							'keys',
+							'lowerCase',
+							'mapKeys',
+							'maxBy',
 							'memoize',
 							'negate',
 							'noop',
 							'nth',
+							'once',
 							'overEvery',
+							'partialRight',
 							'random',
+							'reject',
+							'repeat',
 							'reverse',
 							'size',
+							'snakeCase',
+							'sortBy',
+							'startCase',
+							'startsWith',
 							'stubFalse',
 							'stubTrue',
 							'sum',
 							'sumBy',
 							'take',
+							'times',
 							'toString',
 							'trim',
+							'truncate',
+							'unionBy',
+							'uniq',
+							'uniqBy',
+							'uniqueId',
 							'uniqWith',
+							'upperFirst',
+							'values',
+							'words',
+							'xor',
+							'zip',
 						],
 						message:
 							'This Lodash method is not recommended. Please use native functionality instead. If using `memoize`, please use `memize` instead.',
@@ -327,6 +371,12 @@ module.exports = {
 				// or in TypeScript files where params are likely already documented outside of the JSDoc.
 				'jsdoc/require-param': 'off',
 			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
+			plugins: [ 'ssr-friendly' ],
+			extends: [ 'plugin:ssr-friendly/recommended' ],
 		},
 	],
 };

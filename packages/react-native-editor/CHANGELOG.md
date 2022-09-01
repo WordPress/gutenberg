@@ -11,7 +11,32 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.81.1
+-   [*] List block v2: Fix text color inconsistencies with list items [#43244]
+-   [*] Use default placeholder text color for native List Item [#43353]
+-   [**] Add BlockListCompact [#43431]
+-   [*] Fix dynamic React Native version [#43058]
+-   [**] Disable FastImage on Android [#43322]
+
+## 1.81.0
+-   [***] List block V2 [#42702]
+
+## 1.80.1
+-   [*] Image - Workaround for Android and orientation changes [#42900]
+
+## 1.80.0
+-   [*] Add React Native FastImage [#42009]
+-   [*] Block inserter displays block collections [#42405]
+-   [*] Fix incorrect spacing within Image alt text footnote [#42504]
+-   [***] Gallery and Image block - Performance improvements [#42178]
+
+## 1.79.1
+-   [**] Fix a crash when scrolling posts containing Embed blocks (Android 12 only) [#42514]
+
+## 1.79.0
 -   [*] Add 'Insert from URL' option to Video block [#41493]
+-   [*] Image block copies the alt text from the media library when selecting an item [#41839]
+-   [*] Introduce "block recovery" option for invalid blocks [#41988]
 
 ## 1.78.1
 
