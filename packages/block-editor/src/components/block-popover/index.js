@@ -47,26 +47,39 @@ function BlockPopover(
 		};
 	}, [ selectedElement, lastSelectedElement, __unstableRefreshSize ] );
 
-	const popoverAnchor = useMemo(
-		() => ( {
+	const popoverAnchor = useMemo( () => {
+		if (
+			! selectedElement ||
+			( bottomClientId && ! lastSelectedElement )
+		) {
+			return undefined;
+		}
+
+		return {
 			getBoundingClientRect() {
 				const selectedBCR = selectedElement.getBoundingClientRect();
 				const lastSelectedBCR =
-					lastSelectedElement.getBoundingClientRect();
+					lastSelectedElement?.getBoundingClientRect();
 
 				// Get the biggest rectangle that encompasses completely the currently
 				// selected element and the last selected element:
 				// - for top/left coordinates, use the smaller numbers
 				// - for the bottom/right coordinates, use the largest numbers
-				const left = Math.min( selectedBCR.left, lastSelectedBCR.left );
-				const top = Math.min( selectedBCR.top, lastSelectedBCR.top );
+				const left = Math.min(
+					selectedBCR.left,
+					lastSelectedBCR?.left ?? Infinity
+				);
+				const top = Math.min(
+					selectedBCR.top,
+					lastSelectedBCR?.top ?? Infinity
+				);
 				const right = Math.max(
 					selectedBCR.right,
-					lastSelectedBCR.right
+					lastSelectedBCR.right ?? -Infinity
 				);
 				const bottom = Math.max(
 					selectedBCR.bottom,
-					lastSelectedBCR.bottom
+					lastSelectedBCR.bottom ?? -Infinity
 				);
 				const width = right - left;
 				const height = bottom - top;
@@ -74,9 +87,8 @@ function BlockPopover(
 				return new window.DOMRect( left, top, width, height );
 			},
 			ownerDocument: selectedElement.ownerDocument,
-		} ),
-		[ selectedElement, lastSelectedElement ]
-	);
+		};
+	}, [ bottomClientId, lastSelectedElement, selectedElement ] );
 
 	if ( ! selectedElement || ( bottomClientId && ! lastSelectedElement ) ) {
 		return null;
