@@ -132,6 +132,7 @@ function SelectedBlockPopover( {
 			} ) }
 			__unstablePopoverSlot={ __unstablePopoverSlot }
 			__unstableContentRef={ __unstableContentRef }
+			resize={ false }
 			{ ...popoverProps }
 		>
 			{ shouldShowContextualToolbar && (
