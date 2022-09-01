@@ -6,6 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+/**
+ * WordPress dependencies
+ */
 import { useState, useEffect, useRef, Platform } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import {
@@ -21,7 +24,7 @@ import {
 	Warning,
 	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 } from '@wordpress/block-editor';
-import { EntityProvider, store as coreStore } from '@wordpress/core-data';
+import { EntityProvider } from '@wordpress/core-data';
 
 import { useDispatch } from '@wordpress/data';
 import {
@@ -37,6 +40,9 @@ import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
 import { close, Icon } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
 /**
  * Internal dependencies
  */
@@ -60,13 +66,6 @@ import useConvertClassicToBlockMenu, {
 import useCreateNavigationMenu from './use-create-navigation-menu';
 import { useInnerBlocks } from './use-inner-blocks';
 import { detectColors } from './utils';
-
-if ( ! window.localStorage.getItem( 'classic_menus_imported' ) ) {
-	window.localStorage.setItem(
-		'classic_menus_imported',
-		JSON.stringify( [ ...new Map() ] )
-	);
-}
 
 function Navigation( {
 	attributes,
@@ -108,13 +107,8 @@ function Navigation( {
 		setAttributes( { ref: postId } );
 	};
 
-	const importedClassicMenus = new Map(
-		JSON.parse( window.localStorage.getItem( 'classic_menus_imported' ) )
-	);
-
 	const recursionId = `navigationMenu/${ ref }`;
 	const hasAlreadyRendered = useHasRecursion( recursionId );
-	const { editEntityRecord } = useDispatch( coreStore );
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
@@ -128,11 +122,6 @@ function Navigation( {
 	const [ showClassicMenuConversionNotice, hideClassicMenuConversionNotice ] =
 		useNavigationNotice( {
 			name: 'block-library/core/navigation/classic-menu-conversion',
-		} );
-
-	const [ showMenuAutoPublishDraftNotice, hideMenuAutoPublishDraftNotice ] =
-		useNavigationNotice( {
-			name: 'block-library/core/navigation/auto-publish-draft',
 		} );
 
 	const [
@@ -261,8 +250,6 @@ function Navigation( {
 	}, [ navigationMenus ] );
 
 	const navRef = useRef();
-
-	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
 
 	const {
 		convert: convertClassicMenu,
@@ -463,27 +450,6 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
-	// Set menu to published if it's a draft on editor load in order to make the post dirty.
-	useEffect( async () => {
-		hideMenuAutoPublishDraftNotice();
-		if ( ! isDraftNavigationMenu ) return;
-		try {
-			await editEntityRecord(
-				'postType',
-				'wp_navigation',
-				navigationMenu?.id,
-				{
-					status: 'publish',
-				},
-				{ throwOnError: true }
-			);
-		} catch {
-			showMenuAutoPublishDraftNotice(
-				__( 'Error ocurred while publishing the navigation menu.' )
-			);
-		}
-	}, [ isDraftNavigationMenu, navigationMenu ] );
-
 	const stylingInspectorControls = (
 		<InspectorControls>
 			{ hasSubmenuIndicatorSetting && (
@@ -643,18 +609,6 @@ function Navigation( {
 									classicMenu.id,
 									classicMenu.name
 								);
-								importedClassicMenus.set(
-									navMenu.id,
-									classicMenu.id
-								);
-								window.localStorage.setItem(
-									'classic_menus_imported',
-									JSON.stringify(
-										Array.from(
-											importedClassicMenus.entries()
-										)
-									)
-								);
 								if ( navMenu ) {
 									handleUpdateMenu( navMenu.id, {
 										focusNavigationBlock: true,
@@ -735,18 +689,6 @@ function Navigation( {
 								const navMenu = await convertClassicMenu(
 									classicMenu.id,
 									classicMenu.name
-								);
-								importedClassicMenus.set(
-									navMenu.id,
-									classicMenu.id
-								);
-								window.localStorage.setItem(
-									'classic_menus_imported',
-									JSON.stringify(
-										Array.from(
-											importedClassicMenus.entries()
-										)
-									)
 								);
 								if ( navMenu ) {
 									handleUpdateMenu( navMenu.id, {
@@ -833,13 +775,6 @@ function Navigation( {
 							classicMenu.id,
 							classicMenu.name
 						);
-						importedClassicMenus.set( navMenu.id, classicMenu.id );
-						window.localStorage.setItem(
-							'classic_menus_imported',
-							JSON.stringify(
-								Array.from( importedClassicMenus.entries() )
-							)
-						);
 						if ( navMenu ) {
 							handleUpdateMenu( navMenu.id, {
 								focusNavigationBlock: true,
@@ -855,65 +790,23 @@ function Navigation( {
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider uniqueId={ recursionId }>
-<<<<<<< HEAD
 				<InspectorControls>
 					<PanelBody title={ __( 'Menu' ) }>
 						<NavigationMenuSelector
-							ref={ navigationSelectorRef }
 							currentMenuId={ ref }
 							clientId={ clientId }
 							onSelectNavigationMenu={ ( menuId ) => {
 								handleUpdateMenu( menuId );
-								setShouldFocusNavigationSelector( true );
 							} }
 							onSelectClassicMenu={ async ( classicMenu ) => {
 								const navMenu = await convertClassicMenu(
 									classicMenu.id,
 									classicMenu.name
 								);
-								navigationStorageMap.set(
-									classicMenu.name,
-									classicMenu.id
-								);
-								navigationStorage.setItem(
-									'nav_menus_created',
-									JSON.stringify(
-										Array.from(
-											navigationStorageMap.entries()
-=======
-				<BlockControls>
-					{ ! isDraftNavigationMenu && isEntityAvailable && (
-						<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
-							<NavigationMenuSelector
-								ref={ navigationSelectorRef }
-								currentMenuId={ ref }
-								clientId={ clientId }
-								onSelectNavigationMenu={ ( menuId ) => {
-									handleUpdateMenu( menuId );
-									setShouldFocusNavigationSelector( true );
-								} }
-								onSelectClassicMenu={ async ( classicMenu ) => {
-									const navMenu = await convertClassicMenu(
-										classicMenu.id,
-										classicMenu.name
-									);
-									importedClassicMenus.set(
-										navMenu.id,
-										classicMenu.id
-									);
-									window.localStorage.setItem(
-										'classic_menus_imported',
-										JSON.stringify(
-											Array.from(
-												importedClassicMenus.entries()
-											)
->>>>>>> b82ba3f478 (Small refactor to already imported menus, still work on menu deletion)
-										)
-									)
-								);
 								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id );
-									setShouldFocusNavigationSelector( true );
+									handleUpdateMenu( navMenu.id, {
+										focusNavigationBlock: true,
+									} );
 								}
 							} }
 							onCreateNew={ createUntitledEmptyNavigationMenu }
@@ -941,7 +834,7 @@ function Navigation( {
 					</PanelBody>
 				</InspectorControls>
 				{ stylingInspectorControls }
-				{ ! isDraftNavigationMenu && isEntityAvailable && (
+				{ isEntityAvailable && (
 					<InspectorControls __experimentalGroup="advanced">
 						{ hasResolvedCanUserUpdateNavigationMenu &&
 							canUserUpdateNavigationMenu && (

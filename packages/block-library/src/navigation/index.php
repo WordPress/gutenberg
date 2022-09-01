@@ -471,23 +471,22 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		// must also be implemented in `use-navigation-menu.js`.
 		if ( 'publish' === $navigation_post->post_status ) {
 			$nav_menu_name = $navigation_post->post_title;
-
-			if ( isset( $seen_menu_names[ $nav_menu_name ] ) ) {
-				++$seen_menu_names[ $nav_menu_name ];
-			} else {
-				$seen_menu_names[ $nav_menu_name ] = 1;
-			}
-
-			$parsed_blocks = parse_blocks( $navigation_post->post_content );
-
-			// 'parse_blocks' includes a null block with '\n\n' as the content when
-			// it encounters whitespace. This code strips it.
-			$compacted_blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
-
-			// TODO - this uses the full navigation block attributes for the
-			// context which could be refined.
-			$inner_blocks = new WP_Block_List( $compacted_blocks, $attributes );
 		}
+		if ( isset( $seen_menu_names[ $nav_menu_name ] ) ) {
+			++$seen_menu_names[ $nav_menu_name ];
+		} else {
+			$seen_menu_names[ $nav_menu_name ] = 1;
+		}
+
+		$parsed_blocks = parse_blocks( $navigation_post->post_content );
+
+		// 'parse_blocks' includes a null block with '\n\n' as the content when
+		// it encounters whitespace. This code strips it.
+		$compacted_blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
+
+		// TODO - this uses the full navigation block attributes for the
+		// context which could be refined.
+		$inner_blocks = new WP_Block_List( $compacted_blocks, $attributes );
 	}
 
 	// If there are no inner blocks then fallback to rendering an appropriate fallback.

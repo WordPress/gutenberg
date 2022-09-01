@@ -81,7 +81,7 @@ function useConvertClassicToBlockMenu( clientId ) {
 
 			/**
 			 * Immediately trigger editEntityRecord to change the wp_navigation post status to 'publish'.
-			 * This status change causes the menu to be displayed in the frontend and set the post state as being "dirty".
+			 * This status change causes the menu to be displayed on the front of the site and sets the post state to be "dirty".
 			 * The problem being solved is if saveEditedEntityRecord was used here, the menu would be updated on the frontend and the editor _automatically_,
 			 * without user interaction.
 			 * If the user abandons the site editor without saving, there would still be a wp_navigation post created as draft.
