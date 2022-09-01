@@ -46,12 +46,45 @@ class WP_Webfonts extends WP_Dependencies {
 	 * @var array
 	 */
 	private $provider_instances = array();
+
+	/**
+	 * Variation property defaults.
+	 *
+	 * @since X.X.X
+	 *
+	 * @var array
+	 */
+	private $variation_property_defaults = array(
+		'provider'     => 'local',
+		'font-family'  => '',
+		'font-style'   => 'normal',
+		'font-weight'  => '400',
+		'font-display' => 'fallback',
+	);
+
 	/**
 	 * Constructor.
 	 *
 	 * @since X.X.X
 	 */
 	public function __construct() {
+		/**
+		 * Filters the web font variation's property defaults.
+		 *
+		 * @since X.X.X
+		 *
+		 * @param array $defaults {
+		 *     An array of required web font properties and defaults.
+		 *
+		 *     @type string $provider     The provider ID. Default 'local'.
+		 *     @type string $font-family  The font-family property. Default empty string.
+		 *     @type string $font-style   The font-style property. Default 'normal'.
+		 *     @type string $font-weight  The font-weight property. Default '400'.
+		 *     @type string $font-display The font-display property. Default 'fallback'.
+		 * }
+		 */
+		$this->variation_property_defaults = apply_filters( 'wp_webfont_variation_defaults', $this->variation_property_defaults );
+
 		/**
 		 * Fires when the WP_Webfonts instance is initialized.
 		 *
@@ -285,23 +318,15 @@ class WP_Webfonts extends WP_Dependencies {
 	 *
 	 * @since X.X.X
 	 *
-	 * @param string $font_family_handle The font family's handle for this variation.
-	 * @param array  $variation          An array of variation properties to add.
+	 * @param string $font_family The font family for this variation.
+	 * @param array  $variation   An array of variation properties to add.
 	 * @return false|array Validated variation on success. Else, false.
 	 */
-	private function validate_variation( $font_family_handle, $variation ) {
-		$defaults = array(
-			'provider'     => 'local',
-			'font-family'  => $font_family_handle,
-			'font-style'   => 'normal',
-			'font-weight'  => '400',
-			'font-display' => 'fallback',
-		);
-
-		$defaults = apply_filters( 'wp_webfont_variation_defaults', $defaults );
-
-		$defaults['font-family'] = $font_family_handle;
-		$variation               = wp_parse_args( $variation, $defaults );
+	private function validate_variation( $font_family, $variation ) {
+		$variation = wp_parse_args( $variation, $this->variation_property_defaults );
+		if ( empty( $variation['font-family'] ) ) {
+			$variation['font-family'] = $font_family;
+		}
 
 		// Local fonts need a "src".
 		if ( 'local' === $variation['provider'] ) {
