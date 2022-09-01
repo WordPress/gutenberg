@@ -5,14 +5,14 @@
 		"color": {
 			"palette": [
 				{
+					"slug": "red",
+					"name": "Red",
+					"color": "#ce0808"
+				},
+				{
 					"slug": "light",
 					"name": "Light",
 					"color": "#f5f7f9"
-				},
-				{
-					"slug": "dark",
-					"name": "Dark",
-					"color": "#000"
 				}
 			]
 		},
@@ -27,31 +27,11 @@
 						"text": true,
 						"palette": [
 							{
-								"slug": "dark",
-								"name": "Dark",
-								"color": "#000"
+								"slug": "red",
+								"name": "Red",
+								"color": "#ce0808"
 							}
 						]
-					},
-					"typography": {
-						"fontWeight": "500"
-					}
-				},
-				"core/media-text": {
-					"core/heading": {
-						"color": {
-							"text": true,
-							"palette": [
-								{
-									"slug": "light",
-									"name": "Light",
-									"color": "#f5f7f9"
-								}
-							]
-						},
-						"typography": {
-							"fontWeight": "700"
-						}
 					}
 				}
 			}

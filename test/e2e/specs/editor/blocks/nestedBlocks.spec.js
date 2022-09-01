@@ -18,6 +18,7 @@ test.describe( 'Nested Block Settings', () => {
 
 	test( 'should output a quote with a heading, media-text with another heading inside', async ( {
 		editor,
+		page,
 	} ) => {
 		// Loading it this way forces the nested block settings to be loaded, which in itself technically tests the new nested block settings code.
 		await editor.insertBlock( {
@@ -26,32 +27,30 @@ test.describe( 'Nested Block Settings', () => {
 				{
 					name: 'core/heading',
 				},
-				{
-					name: 'core/media-text',
-					innerBlocks: [
-						{
-							name: 'core/heading',
-						},
-					],
-				},
 			],
 		} );
+
+		await page.click( '[data-type="core/heading"]' );
+
+		await page.keyboard.type( 'hello' );
+
+		await page.click( 'role=button[name="Text"i]' );
+
+		await expect(
+			page.locator( "[aria-label='Color: Red']" )
+		).toBeVisible();
+
+		await expect(
+			page.locator( "[aria-label='Color: Light']" )
+		).toBeHidden();
 
 		const editedPostContent = await editor.getEditedPostContent();
 		expect( editedPostContent ).toBe(
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:heading -->
-<h2></h2>
-<!-- /wp:heading -->
-
-<!-- wp:media-text -->
-<div class="wp-block-media-text alignwide is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><!-- wp:heading -->
-<h2></h2>
-<!-- /wp:heading --></div></div>
-<!-- /wp:media-text --></blockquote>
+<h2>hello</h2>
+<!-- /wp:heading --></blockquote>
 <!-- /wp:quote -->`
 		);
-
-		//To-Do: Verify the correct style is shown for the above set of blocks.
 	} );
 } );
