@@ -93,6 +93,28 @@ const removeCustomPrefixes = ( path ) => {
 	return prefixedFlags[ path ] || path;
 };
 
+/**
+ * Find block settings nested in other block settings.
+ *
+ * Given an array of blocks names from the top level of the editor to the
+ * current block (`blockNamePath`), return the value for the deepest-nested
+ * settings value that applies to the current block.
+ *
+ * If two setting values share the same nesting depth, use the last one that
+ * occurs in settings (like CSS).
+ *
+ * @param {string[]} blockNamePath  Block names representing the path to the
+ *                                  current block from the top level of the
+ *                                  block editor.
+ * @param {string}   normalizedPath Path to the setting being retrieved.
+ * @param {Object}   settings       Object containing all block settings.
+ * @param {Object}   result         Optional. Object with keys `depth` and
+ *                                  `value` used to track current most-nested
+ *                                  setting.
+ * @param {number}   depth          Optional. The current recursion depth used
+ *                                  to calculate the most-nested setting.
+ * @return {string}     The value for defined setting.
+ */
 const getNestedSetting = (
 	blockNamePath,
 	normalizedPath,

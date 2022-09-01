@@ -258,6 +258,9 @@ describe( 'useSetting', () => {
 
 		it( 'uses more specific nested block setting', () => {
 			mockSettings( {
+				color: {
+					text: false,
+				},
 				blocks: {
 					'core/child-block': {
 						color: {
@@ -294,6 +297,9 @@ describe( 'useSetting', () => {
 
 		it( 'uses correct specificity in double-layered parent block', () => {
 			mockSettings( {
+				color: {
+					text: false,
+				},
 				blocks: {
 					'core/nested-block': {
 						'core/nested-block': {
@@ -339,18 +345,21 @@ describe( 'useSetting', () => {
 
 		it( 'uses correct specificity out of double-layered parent block', () => {
 			mockSettings( {
+				color: {
+					text: false,
+				},
 				blocks: {
 					'core/nested-block': {
 						'core/nested-block': {
 							'core/child-block': {
 								color: {
-									text: true,
+									text: false,
 								},
 							},
 						},
 						'core/child-block': {
 							color: {
-								text: false,
+								text: true,
 							},
 						},
 					},
@@ -371,11 +380,14 @@ describe( 'useSetting', () => {
 				name: 'core/nested-block',
 				clientId: 'client-id-nested-block',
 			} );
-			expect( useSetting( 'color.text' ) ).toBe( false );
+			expect( useSetting( 'color.text' ) ).toBe( true );
 		} );
 
 		it( 'ignores unrelated nested settings', () => {
 			mockSettings( {
+				color: {
+					text: false,
+				},
 				blocks: {
 					'core/unrelated-block': {
 						'core/child-block': {
@@ -398,6 +410,54 @@ describe( 'useSetting', () => {
 			mockCurrentBlockContext( {
 				name: 'core/child-block',
 				clientId: 'client-id-child-block',
+			} );
+
+			expect( useSetting( 'color.text' ) ).toBe( true );
+		} );
+
+		it( 'uses the last nested settings value at the same depth', () => {
+			mockSettings( {
+				color: {
+					text: false,
+				},
+				blocks: {
+					'core/grandparent-block': {
+						'core/child-block': {
+							color: {
+								text: false,
+							},
+						},
+					},
+					'core/parent-block': {
+						'core/child-block': {
+							color: {
+								text: true,
+							},
+						},
+					},
+				},
+			} );
+
+			// Mock editor structure:
+			//	core/grandparent-block {
+			//		core/parent-block {
+			//			core/child-block    <- current block
+			//		}
+			//	}
+
+			mockCurrentBlockContext( {
+				name: 'core/child-block',
+				clientId: 'client-id-child-block',
+			} );
+
+			mockBlockParent( 'client-id-child-block', {
+				name: 'core/parent-block',
+				clientId: 'client-id-parent-block',
+			} );
+
+			mockBlockParent( 'client-id-parent-block', {
+				name: 'core/grandparent-block',
+				clientId: 'client-id-grandparent-block',
 			} );
 
 			expect( useSetting( 'color.text' ) ).toBe( true );
