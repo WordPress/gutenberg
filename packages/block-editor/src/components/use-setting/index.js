@@ -97,7 +97,7 @@ const getNestedSetting = (
 	blockNamePath,
 	normalizedPath,
 	settings,
-	resultValuesByDepth,
+	result = { depth: 0, value: undefined },
 	depth = 1
 ) => {
 	const [ currentBlockName, ...remainingBlockNames ] = blockNamePath;
@@ -106,30 +106,29 @@ const getNestedSetting = (
 	if ( remainingBlockNames.length === 0 ) {
 		const settingValue = get( blockSettings, normalizedPath );
 
-		if ( settingValue !== undefined ) {
-			const settingsAtDepth = resultValuesByDepth.get( depth ) ?? [];
-			settingsAtDepth.push( settingValue );
-			resultValuesByDepth.set( depth, settingsAtDepth );
+		if ( settingValue !== undefined && depth >= result.depth ) {
+			result.depth = depth;
+			result.value = settingValue;
 		}
 
-		return;
+		return result;
 	} else if ( blockSettings !== undefined ) {
-		// Recurse into this block's settings.
-		getNestedSetting(
+		// Recurse into the parent block's settings
+		result = getNestedSetting(
 			remainingBlockNames,
 			normalizedPath,
 			blockSettings,
-			resultValuesByDepth,
+			result,
 			depth + 1
 		);
 	}
 
-	// Continue down the array of blocks.
-	getNestedSetting(
+	// Continue down the array of blocks
+	return getNestedSetting(
 		remainingBlockNames,
 		normalizedPath,
 		settings,
-		resultValuesByDepth,
+		result,
 		depth
 	);
 };
@@ -216,23 +215,11 @@ export default function useSetting( path ) {
 					{}
 				);
 
-				const resultValuesByDepth = new Map();
-
-				getNestedSetting(
+				( { value: result } = getNestedSetting(
 					blockNamePath,
 					normalizedPath,
-					blockSettings,
-					resultValuesByDepth
-				);
-
-				if ( resultValuesByDepth.size > 0 ) {
-					const maxDepth = Math.max( ...resultValuesByDepth.keys() );
-					const settingsAtMaxDepth =
-						resultValuesByDepth.get( maxDepth );
-
-					// If multiple nested settings share the same depth, return the last defined one
-					return settingsAtMaxDepth[ settingsAtMaxDepth.length - 1 ];
-				}
+					blockSettings
+				) );
 			}
 
 			// 2.2 Default to top-level settings from the block editor store
