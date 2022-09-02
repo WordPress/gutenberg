@@ -1,17 +1,24 @@
 /**
- * @typedef {import('../animate').AppearOrigin} AppearOrigin
- * @typedef {import('@floating-ui/react-dom').Placement} FloatingUIPlacement
- * @typedef {	'top left' | 'top center' | 'top right' | 'middle left' | 'middle center' | 'middle right' | 'bottom left' | 'bottom center' | 'bottom right' | 'bottom left' | 'bottom center' | 'bottom right' } LegacyPosition
+ * External dependencies
  */
+// eslint-disable-next-line no-restricted-imports
+import type { MotionProps } from 'framer-motion';
+
+/**
+ * Internal dependencies
+ */
+import type { PopoverProps } from './types';
 
 /**
  * Converts the `Popover`'s legacy "position" prop to the new "placement" prop
  * (used by `floating-ui`).
  *
- * @param {LegacyPosition} position The legacy position
- * @return {FloatingUIPlacement} The corresponding placement
+ * @param  position The legacy position
+ * @return The corresponding placement
  */
-export const positionToPlacement = ( position ) => {
+export const positionToPlacement = (
+	position: NonNullable< PopoverProps[ 'position' ] >
+): NonNullable< PopoverProps[ 'placement' ] > => {
 	const [ x, y, z ] = position.split( ' ' );
 
 	if ( [ 'top', 'bottom' ].includes( x ) ) {
@@ -22,12 +29,10 @@ export const positionToPlacement = ( position ) => {
 			suffix = '-end';
 		}
 
-		// @ts-expect-error More TypeScript effort would be required to reconcile `string` and `Placement` types.
-		return x + suffix;
+		return ( x + suffix ) as NonNullable< PopoverProps[ 'placement' ] >;
 	}
 
-	// @ts-expect-error More TypeScript effort would be required to reconcile `string` and `Placement` types.
-	return y;
+	return y as NonNullable< PopoverProps[ 'placement' ] >;
 };
 
 /**
@@ -37,8 +42,10 @@ export const positionToPlacement = ( position ) => {
  * @property {number} originY A number between 0 and 1 (0 is top, 0.5 is center, and 1 is bottom)
  */
 
-/** @type {Object.<FloatingUIPlacement, {originX: number, originY: number}>} */
-const PLACEMENT_TO_ANIMATION_ORIGIN = {
+const PLACEMENT_TO_ANIMATION_ORIGIN: Record<
+	NonNullable< PopoverProps[ 'placement' ] >,
+	{ originX: number; originY: number }
+> = {
 	top: { originX: 0.5, originY: 1 }, // open from bottom, center
 	'top-start': { originX: 0, originY: 1 }, // open from bottom, left
 	'top-end': { originX: 1, originY: 1 }, // open from bottom, right
@@ -57,10 +64,12 @@ const PLACEMENT_TO_ANIMATION_ORIGIN = {
  * Given the floating-ui `placement`, compute the framer-motion props for the
  * popover's entry animation.
  *
- * @param {FloatingUIPlacement} placement A placement string from floating ui
- * @return {import('framer-motion').MotionProps} The object containing the motion props
+ * @param  placement A placement string from floating ui
+ * @return The object containing the motion props
  */
-export const placementToMotionAnimationProps = ( placement ) => {
+export const placementToMotionAnimationProps = (
+	placement: NonNullable< PopoverProps[ 'placement' ] >
+): MotionProps => {
 	const translateProp =
 		placement.startsWith( 'top' ) || placement.startsWith( 'bottom' )
 			? 'translateY'
