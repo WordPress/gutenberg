@@ -694,6 +694,12 @@ button.wp-block-navigation-item__content {
 	border: 1px solid;
 }
 
+.wp-block-navigation__navigation-selector-button--createnew {
+	width: 100%;
+	border: 1px solid;
+	margin-bottom: $grid-unit-20;
+}
+
 .wp-block-navigation__navigation-selector-button__icon {
 	position: absolute;
 	right: $grid-unit-30;
