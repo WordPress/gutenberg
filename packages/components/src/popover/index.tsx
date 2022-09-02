@@ -71,9 +71,8 @@ const SLOT_NAME = 'Popover';
 // color and bordered in such a way to create an arrow-like effect.
 // Keeping the SVG's viewbox squared simplify the arrow positioning
 // calculations.
-const ArrowTriangle = ( props ) => (
+const ArrowTriangle = () => (
 	<SVG
-		{ ...props }
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox={ `0 0 100 100` }
 		className="components-popover__triangle"
