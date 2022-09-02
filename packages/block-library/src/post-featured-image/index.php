@@ -102,6 +102,10 @@ function get_block_core_post_featured_image_background_element_markup( $attribut
 		$styles_properties['border-width'] = $attributes['style']['border']['width'];
 	}
 
+	if ( $has_custom_gradient ) {
+		$styles_properties['background-image'] = $attributes['customGradient'];
+	}
+
 	$styles = '';
 
 	foreach ( $styles_properties as $style_attribute => $style_attribute_value ) {
