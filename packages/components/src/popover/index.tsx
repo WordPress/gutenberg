@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ForwardedRef, SyntheticEvent } from 'react';
+import type { ForwardedRef, SyntheticEvent, RefCallback } from 'react';
 import classnames from 'classnames';
 import {
 	useFloating,
@@ -228,12 +228,17 @@ const UnforwardedPopover = (
 	const arrowRef = useRef( null );
 
 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
-		useState();
-	const [ referenceOwnerDocument, setReferenceOwnerDocument ] = useState();
+		useState< HTMLSpanElement | null >( null );
+	const [ referenceOwnerDocument, setReferenceOwnerDocument ] = useState<
+		Document | undefined
+	>();
 
-	const anchorRefFallback = useCallback( ( node ) => {
-		setFallbackReferenceElement( node );
-	}, [] );
+	const anchorRefFallback: RefCallback< HTMLSpanElement > = useCallback(
+		( node ) => {
+			setFallbackReferenceElement( node );
+		},
+		[]
+	);
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isExpanded = expandOnMobile && isMobileViewport;
