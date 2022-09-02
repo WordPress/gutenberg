@@ -1,6 +1,6 @@
 {
 	"title": "JSON schema for WordPress block theme global settings and styles",
-	"$schema": "http://json-schema.org/draft-04/schema#",
+	"$schema": "http://json-schema.org/draft-07/schema#",
 	"definitions": {
 		"//": {
 			"explainer": "https://developer.wordpress.org/themes/advanced-topics/theme-json/",
@@ -546,25 +546,33 @@
 				{ "$ref": "#/definitions/settingsPropertiesCustom" }
 			]
 		},
-		"settingsPropertiesComplete": {
+		"settingsPropertiesNames": {
+			"enum": [
+				"appearanceTools",
+				"border",
+				"color",
+				"layout",
+				"spacing",
+				"typography",
+				"custom"
+			]
+		},
+		"settingsPropertiesNested": {
 			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/settingsProperties"
 				},
 				{
-					"properties": {
-						"appearanceTools": {},
-						"border": {},
-						"color": {},
-						"layout": {},
-						"spacing": {},
-						"typography": {},
-						"custom": {}
-					},
-					"additionalProperties": false
+					"$ref": "#/definitions/settingsBlocksPropertiesComplete"
 				}
-			]
+			],
+			"propertyNames": {
+				"anyOf": [
+					{ "$ref": "#/definitions/settingsPropertiesNames" },
+					{ "$ref": "#/definitions/settingsBlocksNames" }
+				]
+			}
 		},
 		"settingsBlocksPropertiesComplete": {
 			"type": "object",
@@ -573,13 +581,13 @@
 					"description": "Archive block. Display a monthly archive of your posts. This block has no block-level settings"
 				},
 				"core/audio": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/avatar": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/block": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/button": {
 					"type": "object",
@@ -613,246 +621,332 @@
 					]
 				},
 				"core/buttons": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/calendar": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/categories": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/code": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/column": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/columns": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/comment-author-name": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/comment-content": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/comment-date": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/comment-edit-link": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/comment-reply-link": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/comment-template": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/comments": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/cover": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/embed": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/file": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/freeform": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/gallery": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/group": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/heading": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/home-link": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/html": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/image": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/latest-comments": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/latest-posts": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/list": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/loginout": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/media-text": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/missing": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/more": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/navigation": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/navigation-link": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/nextpage": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/page-list": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/paragraph": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/post-author": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/post-comments": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/post-comments-count": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/post-comments-form": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/post-comments-link": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/post-content": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/post-date": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/post-excerpt": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/post-featured-image": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/post-navigation-link": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/post-template": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/post-terms": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/post-title": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/preformatted": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/pullquote": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/query": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/query-pagination": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/query-pagination-next": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/query-pagination-numbers": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/query-pagination-previous": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/query-title": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/quote": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/rss": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/search": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/separator": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/shortcode": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/site-logo": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/site-tagline": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/site-title": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/social-link": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/social-links": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/spacer": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/table": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/table-of-contents": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/tag-cloud": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/template-part": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/term-description": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/text-columns": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/verse": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/video": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/widget-area": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/legacy-widget": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				},
 				"core/widget-group": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				}
 			},
 			"patternProperties": {
 				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsPropertiesNested"
 				}
-			},
-			"additionalProperties": false
+			}
+		},
+		"settingsBlocksNames": {
+			"enum": [
+				"core/archives",
+				"core/audio",
+				"core/avatar",
+				"core/block",
+				"core/button",
+				"core/buttons",
+				"core/calendar",
+				"core/categories",
+				"core/code",
+				"core/column",
+				"core/columns",
+				"core/comment-author-name",
+				"core/comment-content",
+				"core/comment-date",
+				"core/comment-edit-link",
+				"core/comment-reply-link",
+				"core/comment-template",
+				"core/comments",
+				"core/cover",
+				"core/embed",
+				"core/file",
+				"core/freeform",
+				"core/gallery",
+				"core/group",
+				"core/heading",
+				"core/home-link",
+				"core/html",
+				"core/image",
+				"core/latest-comments",
+				"core/latest-posts",
+				"core/list",
+				"core/loginout",
+				"core/media-text",
+				"core/missing",
+				"core/more",
+				"core/navigation",
+				"core/navigation-link",
+				"core/nextpage",
+				"core/page-list",
+				"core/paragraph",
+				"core/post-author",
+				"core/post-comments",
+				"core/post-comments-count",
+				"core/post-comments-form",
+				"core/post-comments-link",
+				"core/post-content",
+				"core/post-date",
+				"core/post-excerpt",
+				"core/post-featured-image",
+				"core/post-navigation-link",
+				"core/post-template",
+				"core/post-terms",
+				"core/post-title",
+				"core/preformatted",
+				"core/pullquote",
+				"core/query",
+				"core/query-pagination",
+				"core/query-pagination-next",
+				"core/query-pagination-numbers",
+				"core/query-pagination-previous",
+				"core/query-title",
+				"core/quote",
+				"core/rss",
+				"core/search",
+				"core/separator",
+				"core/shortcode",
+				"core/site-logo",
+				"core/site-tagline",
+				"core/site-title",
+				"core/social-link",
+				"core/social-links",
+				"core/spacer",
+				"core/table",
+				"core/table-of-contents",
+				"core/tag-cloud",
+				"core/template-part",
+				"core/term-description",
+				"core/text-columns",
+				"core/verse",
+				"core/video",
+				"core/widget-area",
+				"core/legacy-widget",
+				"core/widget-group"
+			]
 		},
 		"settingsCustomAdditionalProperties": {
 			"type": "object",

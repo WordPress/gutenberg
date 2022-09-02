@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import Ajv from 'ajv-draft-04';
+import Ajv from 'ajv';
 
 /**
  * Internal dependencies
