@@ -125,7 +125,7 @@ function ScreenHeadingColor( { name, variation = '' } ) {
 				) }
 			/>
 			<div className="edit-site-global-styles-screen-heading-color">
-				<h4>{ __( 'Select heading level' ) }</h4>
+				<h3>{ __( 'Select heading level' ) }</h3>
 
 				<ToggleGroupControl
 					__nextHasNoMarginBottom
@@ -151,7 +151,7 @@ function ScreenHeadingColor( { name, variation = '' } ) {
 			</div>
 			{ hasTextColor && (
 				<div className="edit-site-global-styles-screen-heading-color">
-					<h4>
+					<h3>
 						{ selectedLevel === 'heading'
 							? __( 'Text color for all heading levels' )
 							: sprintf(
@@ -159,7 +159,7 @@ function ScreenHeadingColor( { name, variation = '' } ) {
 									__( 'Text color for %s' ),
 									selectedLevel.toUpperCase()
 							  ) }
-					</h4>
+					</h3>
 					<ColorGradientControl
 						className="edit-site-screen-heading-text-color__control"
 						colors={ colorsPerOrigin }
@@ -170,12 +170,13 @@ function ScreenHeadingColor( { name, variation = '' } ) {
 						colorValue={ color }
 						onColorChange={ setColor }
 						clearable={ color === userColor }
+						headingLevel={ 4 }
 					/>
 				</div>
 			) }
 			{ hasBackgroundColor && (
 				<div className="edit-site-global-styles-screen-heading-color">
-					<h4>
+					<h3>
 						{ selectedLevel === 'heading'
 							? __( 'Background color for all heading levels' )
 							: sprintf(
@@ -183,7 +184,7 @@ function ScreenHeadingColor( { name, variation = '' } ) {
 									__( 'Background color for %s' ),
 									selectedLevel.toUpperCase()
 							  ) }
-					</h4>
+					</h3>
 					<ColorGradientControl
 						className="edit-site-screen-heading-background-color__control"
 						colors={ colorsPerOrigin }
@@ -193,6 +194,7 @@ function ScreenHeadingColor( { name, variation = '' } ) {
 						showTitle={ false }
 						enableAlpha
 						__experimentalIsRenderedInSidebar
+						headingLevel={ 4 }
 						{ ...controlProps }
 					/>
 				</div>
