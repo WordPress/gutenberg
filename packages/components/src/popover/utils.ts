@@ -3,6 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import type { MotionProps } from 'framer-motion';
+import type { ReferenceType } from '@floating-ui/react-dom';
 
 /**
  * Internal dependencies
@@ -165,27 +166,28 @@ export const getReferenceOwnerDocument = ( {
 };
 
 export const getReferenceElement = ( {
-	// @ts-ignore
 	anchorRef,
-	// @ts-ignore
 	anchorRect,
-	// @ts-ignore
 	getAnchorRect,
-	// @ts-ignore
 	fallbackReferenceElement,
-} ) => {
-	/** @type {import('@floating-ui/react-dom').ReferenceType | undefined} */
-	let referenceElement;
+}: Pick< PopoverProps, 'anchorRef' | 'anchorRect' | 'getAnchorRect' > & {
+	fallbackReferenceElement: Element | null;
+} ): ReferenceType | null => {
+	let referenceElement = null;
 
-	if ( anchorRef?.top ) {
+	if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
 		// Create a virtual element for the ref. The expectation is that
 		// if anchorRef.top is defined, then anchorRef.bottom is defined too.
 		// Seems to be used by the block toolbar, when multiple blocks are selected
 		// (top and bottom blocks are used to calculate the resulting rect).
 		referenceElement = {
 			getBoundingClientRect() {
-				const topRect = anchorRef.top.getBoundingClientRect();
-				const bottomRect = anchorRef.bottom.getBoundingClientRect();
+				const topRect = (
+					anchorRef as PopoverAnchorRefTopBottom
+				 ).top.getBoundingClientRect();
+				const bottomRect = (
+					anchorRef as PopoverAnchorRefTopBottom
+				 ).bottom.getBoundingClientRect();
 				return new window.DOMRect(
 					topRect.x,
 					topRect.y,
@@ -194,13 +196,15 @@ export const getReferenceElement = ( {
 				);
 			},
 		};
-	} else if ( anchorRef?.current ) {
+	} else if (
+		( anchorRef as PopoverAnchorRefReference | undefined )?.current
+	) {
 		// Standard React ref.
-		referenceElement = anchorRef.current;
-	} else if ( anchorRef ) {
+		referenceElement = ( anchorRef as PopoverAnchorRefReference ).current;
+	} else if ( anchorRef as PopoverAnchorRefElement | undefined ) {
 		// If `anchorRef` holds directly the element's value (no `current` key)
 		// This is a weird scenario and should be deprecated.
-		referenceElement = anchorRef;
+		referenceElement = anchorRef as PopoverAnchorRefElement;
 	} else if ( anchorRect ) {
 		// Create a virtual element for the ref.
 		referenceElement = {
@@ -224,8 +228,9 @@ export const getReferenceElement = ( {
 	} else if ( fallbackReferenceElement ) {
 		// If no explicit ref is passed via props, fall back to
 		// anchoring to the popover's parent node.
-		referenceElement = fallbackReferenceElement.parentNode;
+		referenceElement = fallbackReferenceElement.parentElement;
 	}
 
-	return referenceElement;
+	// Convert any `undefined` value to `null`.
+	return referenceElement ?? null;
 };
