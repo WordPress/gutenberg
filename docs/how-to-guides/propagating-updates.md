@@ -1,4 +1,4 @@
-# Propagating updates 
+# Propagating updates for block types 
 
 This resource seeks to offer direction for those needing to provide updates to content, whether in a template for a theme, pattern, or a block over an entire site. Since each content type allows or disallows certain kind of synchronization, it's important to know what's possible before creating to make maintenance easier in the future. 
 
