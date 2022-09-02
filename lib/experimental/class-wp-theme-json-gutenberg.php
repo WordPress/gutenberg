@@ -107,10 +107,10 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 				continue;
 			}
 
-			// First clean up the everything, save for the blocks.
+			// First clean up everything, save for the blocks.
 			$result = static::remove_keys_not_in_schema( $input[ $subtree ], $schema[ $subtree ] );
 
-			// Then, clean up the blocks and append that to the result.
+			// Then, clean up blocks and append that to the result.
 			if ( 'settings' === $subtree && isset( $input[ $subtree ]['blocks'] ) ) {
 				$result['blocks'] = static::sanitize_blocks( $input[ $subtree ]['blocks'], $valid_block_names, $schema[ $subtree ] );
 			}
