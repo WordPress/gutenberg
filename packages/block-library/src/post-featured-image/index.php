@@ -19,11 +19,11 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	}
 	$post_ID = $block->context['postId'];
 
-	$is_link                   = isset( $attributes['isLink'] ) && $attributes['isLink'];
-	$size_slug                 = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
-	$post_title                = trim( strip_tags( get_the_title( $post_ID ) ) );
-	$attr                      = get_block_core_post_featured_image_border_attributes( $attributes );
-	$background_element_markup = get_block_core_post_featured_image_background_element_markup( $attributes );
+	$is_link                = isset( $attributes['isLink'] ) && $attributes['isLink'];
+	$size_slug              = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
+	$post_title             = trim( strip_tags( get_the_title( $post_ID ) ) );
+	$attr                   = get_block_core_post_featured_image_border_attributes( $attributes );
+	$overlay_element_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
 
 	if ( $is_link ) {
 		$attr['alt'] = $post_title;
@@ -43,7 +43,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	$has_width  = ! empty( $attributes['width'] );
 	$has_height = ! empty( $attributes['height'] );
 	if ( ! $has_height && ! $has_width ) {
-		return "<figure {$wrapper_attributes}>{$background_element_markup}{$featured_image}</figure>";
+		return "<figure {$wrapper_attributes}>{$overlay_element_markup}{$featured_image}</figure>";
 	}
 
 	if ( $has_width ) {
@@ -58,7 +58,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		$featured_image = str_replace( 'src=', 'style="' . esc_attr( $image_styles ) . '" src=', $featured_image );
 	}
 
-	return "<figure {$wrapper_attributes}>{$background_element_markup}{$featured_image}</figure>";
+	return "<figure {$wrapper_attributes}>{$overlay_element_markup}{$featured_image}</figure>";
 }
 
 /**
@@ -68,12 +68,12 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
  *
  * @return string HTML markup in string format.
  */
-function get_block_core_post_featured_image_background_element_markup( $attributes ) {
+function get_block_core_post_featured_image_overlay_element_markup( $attributes ) {
 	$has_dim_background  = isset( $attributes['dimRatio'] ) && $attributes['dimRatio'];
 	$has_gradient        = ( isset( $attributes['gradient'] ) && $attributes['gradient'] );
 	$has_custom_gradient = ( isset( $attributes['customGradient'] ) && $attributes['customGradient'] );
 	$class_names         = array(
-		'wp-block-post-featured-image__background',
+		'wp-block-post-featured-image__overlay',
 	);
 	$styles_properties   = array();
 

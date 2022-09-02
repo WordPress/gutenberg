@@ -338,7 +338,7 @@ function PostFeaturedImageDisplay( {
 				<span
 					aria-hidden="true"
 					className={ classnames(
-						'wp-block-post-featured-image__background',
+						'wp-block-post-featured-image__overlay',
 						dimRatioToClass( dimRatio ),
 						blockProps.className,
 						{
