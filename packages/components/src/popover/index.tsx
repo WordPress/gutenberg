@@ -12,6 +12,7 @@ import {
 	offset as offsetMiddleware,
 	limitShift,
 	size,
+	Middleware,
 } from '@floating-ui/react-dom';
 // eslint-disable-next-line no-restricted-imports
 import {
@@ -304,7 +305,9 @@ const UnforwardedPopover = (
 			  } )
 			: undefined,
 		arrow( { element: arrowRef } ),
-	].filter( ( m ) => !! m );
+	].filter(
+		( m: Middleware | undefined ): m is Middleware => m !== undefined
+	);
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
 	const slot = useSlot( slotName );
 
