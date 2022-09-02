@@ -15,6 +15,8 @@ import {
 	Placeholder,
 	Button,
 	TextControl,
+	RangeControl,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -24,6 +26,9 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
+	__experimentalUseGradient,
+	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
@@ -49,14 +54,33 @@ function PostFeaturedImageDisplay( {
 	context: { postId, postType: postTypeSlug, queryId },
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	const { isLink, height, width, scale, sizeSlug, rel, linkTarget } =
-		attributes;
+	const {
+		isLink,
+		height,
+		width,
+		scale,
+		sizeSlug,
+		rel,
+		linkTarget,
+		dimRatio,
+		overlayColor,
+	} = attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postTypeSlug,
 		'featured_media',
 		postId
 	);
+
+	const { gradientClass, gradientValue, setGradient } =
+		__experimentalUseGradient();
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+
+	const dimRatioToClass = ( ratio ) => {
+		return ratio === undefined
+			? null
+			: 'has-background-dim-' + 10 * Math.round( ratio / 10 );
+	};
 
 	const { media, postType } = useSelect(
 		( select ) => {
@@ -91,6 +115,10 @@ function PostFeaturedImageDisplay( {
 		style: { width, height },
 	} );
 	const borderProps = useBorderProps( attributes );
+	const overlayStyles = {
+		backgroundColor: overlayColor,
+		...borderProps.style,
+	};
 
 	const placeholder = ( content ) => {
 		return (
@@ -162,6 +190,65 @@ function PostFeaturedImageDisplay( {
 						</>
 					) }
 				</PanelBody>
+			</InspectorControls>
+			<InspectorControls __experimentalGroup="color">
+				<ColorGradientSettingsDropdown
+					__experimentalHasMultipleOrigins
+					__experimentalIsRenderedInSidebar
+					settings={ [
+						{
+							colorValue: overlayColor,
+							gradientValue,
+							label: __( 'Overlay' ),
+							onColorChange: ( updatedOverlayColor ) =>
+								setAttributes( {
+									overlayColor: updatedOverlayColor,
+								} ),
+							onGradientChange: setGradient,
+							isShownByDefault: true,
+							resetAllFilter: () => ( {
+								overlayColor: undefined,
+								customOverlayColor: undefined,
+								gradient: undefined,
+								customGradient: undefined,
+							} ),
+						},
+					] }
+					panelId={ clientId }
+					{ ...colorGradientSettings }
+				/>
+				<ToolsPanelItem
+					hasValue={ () => {
+						// If there's a media background the dimRatio will be
+						// defaulted to 50 whereas it will be 100 for colors.
+						return dimRatio === undefined
+							? false
+							: dimRatio !== ( mediaUrl ? 50 : 100 );
+					} }
+					label={ __( 'Overlay opacity' ) }
+					onDeselect={ () =>
+						setAttributes( { dimRatio: mediaUrl ? 50 : 100 } )
+					}
+					resetAllFilter={ () => ( {
+						dimRatio: mediaUrl ? 50 : 100,
+					} ) }
+					isShownByDefault
+					panelId={ clientId }
+				>
+					<RangeControl
+						label={ __( 'Overlay opacity' ) }
+						value={ dimRatio }
+						onChange={ ( newDimRatio ) =>
+							setAttributes( {
+								dimRatio: newDimRatio,
+							} )
+						}
+						min={ 0 }
+						max={ 100 }
+						step={ 10 }
+						required
+					/>
+				</ToolsPanelItem>
 			</InspectorControls>
 		</>
 	);
@@ -247,7 +334,26 @@ function PostFeaturedImageDisplay( {
 					</MediaReplaceFlow>
 				</BlockControls>
 			) }
-			<figure { ...blockProps }>{ image }</figure>
+			<figure { ...blockProps }>
+				<span
+					aria-hidden="true"
+					className={ classnames(
+						'wp-block-post-featured-image__background',
+						dimRatioToClass( dimRatio ),
+						blockProps.className,
+						{
+							'has-background-dim': dimRatio !== undefined,
+							'has-background-gradient': gradientValue,
+							[ gradientClass ]: gradientClass,
+						}
+					) }
+					style={ {
+						backgroundImage: gradientValue,
+						...overlayStyles,
+					} }
+				/>
+				{ image }
+			</figure>
 		</>
 	);
 }
