@@ -86,7 +86,7 @@ export const link = {
 					let endIndex = value.end;
 
 					while (
-						value.formats[ startIndex ].find(
+						value.formats[ startIndex ]?.find(
 							( format ) => format?.type === startFormat.type
 						)
 					) {
@@ -96,7 +96,7 @@ export const link = {
 					endIndex++;
 
 					while (
-						value.formats[ endIndex ].find(
+						value.formats[ endIndex ]?.find(
 							( format ) => format?.type === startFormat.type
 						)
 					) {
