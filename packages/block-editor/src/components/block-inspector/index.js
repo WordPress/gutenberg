@@ -145,22 +145,18 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			__unstableGetContentLockingParent,
 			getTemplateLock,
 		} = select( blockEditorStore );
-		const { getBlockStyles } = select( blocksStore );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
 		const _selectedBlockName =
 			_selectedBlockClientId && getBlockName( _selectedBlockClientId );
 		const _blockType =
 			_selectedBlockName && getBlockType( _selectedBlockName );
-		const blockStyles =
-			_selectedBlockName && getBlockStyles( _selectedBlockName );
 
 		return {
 			count: getSelectedBlockCount(),
 			selectedBlockClientId: _selectedBlockClientId,
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
-			hasBlockStyles: blockStyles && blockStyles.length > 0,
 			topLevelLockedBlock:
 				getTemplateLock( _selectedBlockClientId ) === 'noContent'
 					? _selectedBlockClientId
