@@ -449,6 +449,7 @@ const UnforwardedPopover = (
 
 	const mergedFloatingRef = useMergeRefs( [
 		floating,
+		// @ts-expect-error dialogRef is returned by useDialog and seems correct, but somehow it's not picked up by TypeScript
 		dialogRef,
 		forwardedRef,
 	] );
