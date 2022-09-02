@@ -14,7 +14,7 @@ import { forwardRef, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Button } from '../';
+import { Button } from '..';
 import BaseControl from '../base-control';
 
 function SearchControl(
