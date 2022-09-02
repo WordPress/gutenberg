@@ -148,8 +148,9 @@ export const getReferenceOwnerDocument = ( {
 	} else if (
 		( anchorRef as PopoverAnchorRefReference | undefined )?.current
 	) {
-		resultingReferenceOwnerDoc = ( anchorRef as PopoverAnchorRefReference )
-			.current?.ownerDocument;
+		resultingReferenceOwnerDoc = (
+			( anchorRef as PopoverAnchorRefReference ).current as Element
+		 ).ownerDocument;
 	} else if ( anchorRef as PopoverAnchorRefElement | undefined ) {
 		// This one should be deprecated.
 		resultingReferenceOwnerDoc = ( anchorRef as PopoverAnchorRefElement )
