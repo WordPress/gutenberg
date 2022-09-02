@@ -7,7 +7,13 @@ import type { MotionProps } from 'framer-motion';
 /**
  * Internal dependencies
  */
-import type { PopoverProps } from './types';
+import type {
+	PopoverProps,
+	PopoverAnchorRefElement,
+	PopoverAnchorRefReference,
+	PopoverAnchorRefTopBottom,
+	PopoverAnchorRefStartContainer,
+} from './types';
 
 /**
  * Converts the `Popover`'s legacy "position" prop to the new "placement" prop
@@ -111,17 +117,15 @@ export const getFrameOffset = (
 };
 
 export const getReferenceOwnerDocument = ( {
-	// @ts-ignore
 	anchorRef,
-	// @ts-ignore
 	anchorRect,
-	// @ts-ignore
 	getAnchorRect,
-	// @ts-ignore
 	fallbackReferenceElement,
-	// @ts-ignore
 	fallbackDocument,
-} ) => {
+}: Pick< PopoverProps, 'anchorRef' | 'anchorRect' | 'getAnchorRect' > & {
+	fallbackReferenceElement: Element | null;
+	fallbackDocument: Document;
+} ): Document => {
 	// In floating-ui's terms:
 	// - "reference" refers to the popover's anchor element.
 	// - "floating" refers the floating popover's element.
@@ -130,15 +134,25 @@ export const getReferenceOwnerDocument = ( {
 	// with the `getBoundingClientRect()` function (like real elements).
 	// See https://floating-ui.com/docs/virtual-elements for more info.
 	let resultingReferenceOwnerDoc;
-	if ( anchorRef?.top ) {
-		resultingReferenceOwnerDoc = anchorRef?.top.ownerDocument;
-	} else if ( anchorRef?.startContainer ) {
-		resultingReferenceOwnerDoc = anchorRef.startContainer.ownerDocument;
-	} else if ( anchorRef?.current ) {
-		resultingReferenceOwnerDoc = anchorRef.current.ownerDocument;
-	} else if ( anchorRef ) {
+	if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
+		resultingReferenceOwnerDoc = ( anchorRef as PopoverAnchorRefTopBottom )
+			?.top?.ownerDocument;
+	} else if (
+		( anchorRef as PopoverAnchorRefStartContainer | undefined )
+			?.startContainer
+	) {
+		resultingReferenceOwnerDoc = (
+			anchorRef as PopoverAnchorRefStartContainer
+		 ).startContainer?.ownerDocument;
+	} else if (
+		( anchorRef as PopoverAnchorRefReference | undefined )?.current
+	) {
+		resultingReferenceOwnerDoc = ( anchorRef as PopoverAnchorRefReference )
+			.current?.ownerDocument;
+	} else if ( anchorRef as PopoverAnchorRefElement | undefined ) {
 		// This one should be deprecated.
-		resultingReferenceOwnerDoc = anchorRef.ownerDocument;
+		resultingReferenceOwnerDoc = ( anchorRef as PopoverAnchorRefElement )
+			.ownerDocument;
 	} else if ( anchorRect && anchorRect?.ownerDocument ) {
 		resultingReferenceOwnerDoc = anchorRect.ownerDocument;
 	} else if ( getAnchorRect ) {
