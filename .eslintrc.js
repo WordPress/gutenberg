@@ -103,6 +103,7 @@ module.exports = {
 							'flatMap',
 							'flatten',
 							'flattenDeep',
+							'forEach',
 							'fromPairs',
 							'has',
 							'identity',
