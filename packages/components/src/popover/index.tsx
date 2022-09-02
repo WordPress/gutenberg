@@ -361,7 +361,7 @@ const UnforwardedPopover = (
 		strategy,
 		update,
 		placement: computedPlacement,
-		middlewareData: { arrow: arrowData = {} },
+		middlewareData: { arrow: arrowData },
 	} = useFloating( {
 		placement: normalizedPlacementFromProps,
 		middleware,
@@ -504,18 +504,22 @@ const UnforwardedPopover = (
 						`is-${ computedPlacement.split( '-' )[ 0 ] }`,
 					].join( ' ' ) }
 					style={ {
-						left: Number.isFinite( arrowData?.x )
-							? `${
-									arrowData.x +
-									( frameOffsetRef.current?.x ?? 0 )
-							  }px`
-							: '',
-						top: Number.isFinite( arrowData?.y )
-							? `${
-									arrowData.y +
-									( frameOffsetRef.current?.y ?? 0 )
-							  }px`
-							: '',
+						left:
+							typeof arrowData?.x !== 'undefined' &&
+							Number.isFinite( arrowData.x )
+								? `${
+										arrowData.x +
+										( frameOffsetRef.current?.x ?? 0 )
+								  }px`
+								: '',
+						top:
+							typeof arrowData?.y !== 'undefined' &&
+							Number.isFinite( arrowData.y )
+								? `${
+										arrowData.y +
+										( frameOffsetRef.current?.y ?? 0 )
+								  }px`
+								: '',
 					} }
 				>
 					<ArrowTriangle />
