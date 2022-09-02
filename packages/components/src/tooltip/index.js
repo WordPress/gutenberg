@@ -60,7 +60,7 @@ const getRegularElement = ( {
 };
 
 const addPopoverToGrandchildren = ( {
-	anchorRef,
+	anchor,
 	grandchildren,
 	isOver,
 	offset,
@@ -78,7 +78,7 @@ const addPopoverToGrandchildren = ( {
 				aria-hidden="true"
 				animate={ false }
 				offset={ offset }
-				anchorRef={ anchorRef }
+				anchor={ anchor }
 				__unstableShift
 			>
 				{ text }
@@ -253,7 +253,7 @@ function Tooltip( props ) {
 		: getRegularElement;
 
 	const popoverData = {
-		anchorRef: childRef,
+		anchor: childRef.current,
 		isOver,
 		offset: 4,
 		position,
