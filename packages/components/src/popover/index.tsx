@@ -144,7 +144,7 @@ const AnimatedWrapper = forwardRef(
 	}
 );
 
-const slotNameContext = createContext();
+const slotNameContext = createContext< string | undefined >( undefined );
 
 const UnforwardedPopover = (
 	props: Omit<
@@ -281,11 +281,16 @@ const UnforwardedPopover = (
 		computedResizeProp
 			? size( {
 					apply( sizeProps ) {
-						const { availableHeight } = sizeProps;
-						if ( ! refs.floating.current ) return;
+						const { firstElementChild } =
+							refs.floating.current ?? {};
+
+						// Only HTMLElement instances have the `style` property.
+						if ( ! ( firstElementChild instanceof HTMLElement ) )
+							return;
+
 						// Reduce the height of the popover to the available space.
-						Object.assign( refs.floating.current.firstChild.style, {
-							maxHeight: `${ availableHeight }px`,
+						Object.assign( firstElementChild.style, {
+							maxHeight: `${ sizeProps.availableHeight }px`,
 							overflow: 'auto',
 						} );
 					},
