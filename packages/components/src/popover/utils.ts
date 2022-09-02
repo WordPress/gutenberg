@@ -136,7 +136,7 @@ export const getReferenceOwnerDocument = ( {
 	let resultingReferenceOwnerDoc;
 	if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
 		resultingReferenceOwnerDoc = ( anchorRef as PopoverAnchorRefTopBottom )
-			?.top?.ownerDocument;
+			?.top.ownerDocument;
 	} else if (
 		( anchorRef as PopoverAnchorRefStartContainer | undefined )
 			?.startContainer
