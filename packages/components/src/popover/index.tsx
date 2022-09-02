@@ -14,7 +14,12 @@ import {
 	size,
 } from '@floating-ui/react-dom';
 // eslint-disable-next-line no-restricted-imports
-import { motion, useReducedMotion, MotionProps } from 'framer-motion';
+import {
+	motion,
+	useReducedMotion,
+	HTMLMotionProps,
+	MotionProps,
+} from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -53,7 +58,7 @@ import {
 	getReferenceElement,
 } from './utils';
 import type { WordPressComponentProps } from '../ui/context';
-import type { PopoverProps } from './types';
+import type { PopoverProps, AnimatedWrapperProps } from './types';
 
 /**
  * Name of slot in which popover should fill.
@@ -86,15 +91,15 @@ const ArrowTriangle = ( props ) => (
 	</SVG>
 );
 
-const MaybeAnimatedWrapper = forwardRef(
+const AnimatedWrapper = forwardRef(
 	(
 		{
 			style: receivedInlineStyles,
 			placement,
 			shouldAnimate = false,
 			...props
-		},
-		forwardedRef
+		}: HTMLMotionProps< 'div' > & AnimatedWrapperProps,
+		forwardedRef: ForwardedRef< any >
 	) => {
 		// When animating, animate only once (i.e. when the popover is opened), and
 		// do not animate on subsequent prop changes (as it conflicts with
@@ -112,27 +117,27 @@ const MaybeAnimatedWrapper = forwardRef(
 			[]
 		);
 
-		if ( shouldAnimate && ! shouldReduceMotion ) {
-			return (
-				<motion.div
-					style={ {
-						...motionInlineStyles,
-						...receivedInlineStyles,
-					} }
-					{ ...otherMotionProps }
-					onAnimationComplete={ onAnimationComplete }
-					animate={
-						hasAnimatedOnce ? false : otherMotionProps.animate
-					}
-					{ ...props }
-					ref={ forwardedRef }
-				/>
-			);
-		}
+		const computedAnimationProps: HTMLMotionProps< 'div' > =
+			shouldAnimate && ! shouldReduceMotion
+				? {
+						style: {
+							...motionInlineStyles,
+							...receivedInlineStyles,
+						},
+						...otherMotionProps,
+						onAnimationComplete,
+						animate: hasAnimatedOnce
+							? false
+							: otherMotionProps.animate,
+				  }
+				: {
+						animate: false,
+						style: receivedInlineStyles,
+				  };
 
 		return (
-			<div
-				style={ receivedInlineStyles }
+			<motion.div
+				{ ...computedAnimationProps }
 				{ ...props }
 				ref={ forwardedRef }
 			/>
@@ -427,7 +432,7 @@ const UnforwardedPopover = (
 	let content = (
 		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<MaybeAnimatedWrapper
+		<AnimatedWrapper
 			shouldAnimate={ animate && ! isExpanded }
 			placement={ computedPlacement }
 			className={ classnames( 'components-popover', className, {
@@ -437,7 +442,7 @@ const UnforwardedPopover = (
 			{ ...contentProps }
 			ref={ mergedFloatingRef }
 			{ ...dialogProps }
-			tabIndex="-1"
+			tabIndex={ -1 }
 			style={
 				isExpanded
 					? undefined
@@ -488,7 +493,7 @@ const UnforwardedPopover = (
 					<ArrowTriangle />
 				</div>
 			) }
-		</MaybeAnimatedWrapper>
+		</AnimatedWrapper>
 	);
 
 	if ( slot.ref ) {

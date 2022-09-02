@@ -16,6 +16,11 @@ type DomRectWithOwnerDocument = DOMRect & {
 	ownerDocument?: Document;
 };
 
+export type AnimatedWrapperProps = {
+	placement: Placement;
+	shouldAnimate?: boolean;
+};
+
 // TODO:
 // - add all props
 // - add deprecations, default values, descriptions
