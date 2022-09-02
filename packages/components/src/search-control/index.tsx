@@ -14,10 +14,13 @@ import { forwardRef, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Button } from '..';
+import Button from '../button';
 import BaseControl from '../base-control';
+import type { WordPressComponentProps } from '../ui/context/wordpress-component';
+import type { SearchControlProps } from './types';
+import type { ForwardedRef } from 'react';
 
-function SearchControl(
+function UnforwardedSearchControl(
 	{
 		className,
 		onChange,
@@ -28,10 +31,11 @@ function SearchControl(
 		hideLabelFromVision = true,
 		help,
 		onClose,
-	},
-	forwardedRef
+		...restProps
+	}: WordPressComponentProps< SearchControlProps, 'input', false >,
+	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
-	const searchRef = useRef();
+	const searchRef = useRef< HTMLInputElement >();
 	const instanceId = useInstanceId( SearchControl );
 	const id = `components-search-control-${ instanceId }`;
 
@@ -53,7 +57,7 @@ function SearchControl(
 					label={ __( 'Reset search' ) }
 					onClick={ () => {
 						onChange( '' );
-						searchRef.current.focus();
+						searchRef.current?.focus();
 					} }
 				/>
 			);
@@ -72,6 +76,7 @@ function SearchControl(
 		>
 			<div className="components-search-control__input-wrapper">
 				<input
+					{ ...restProps }
 					ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
 					className="components-search-control__input"
 					id={ id }
@@ -90,4 +95,25 @@ function SearchControl(
 	);
 }
 
-export default forwardRef( SearchControl );
+/**
+ * SearchControl components let users display a search control.
+ *
+ * ```jsx
+ * import { SearchControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * function MySearchControl( { className, setState } ) {
+ *   const [ searchInput, setSearchInput ] = useState( '' );
+ *
+ *   return (
+ *     <SearchControl
+ *       value={ searchInput }
+ *       onChange={ setSearchInput }
+ *     />
+ *   );
+ * }
+ * ```
+ */
+export const SearchControl = forwardRef( UnforwardedSearchControl );
+
+export default SearchControl;
