@@ -138,7 +138,6 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		self::recursive_ksort( $actual_settings );
 		self::recursive_ksort( $expected_settings );
 
-		// Should merge settings.
 		$this->assertSame(
 			$expected_settings,
 			$actual_settings
