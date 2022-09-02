@@ -190,6 +190,8 @@ const UnforwardedPopover = (
 		} );
 	}
 
+	let computedFlipProp = flip;
+	let computedResizeProp = resize;
 	if ( __unstableForcePosition !== undefined ) {
 		deprecated( '__unstableForcePosition prop in Popover component', {
 			since: '6.1',
@@ -199,8 +201,8 @@ const UnforwardedPopover = (
 
 		// Back-compat, set the `flip` and `resize` props
 		// to `false` to replicate `__unstableForcePosition`.
-		flip = ! __unstableForcePosition;
-		resize = ! __unstableForcePosition;
+		computedFlipProp = ! __unstableForcePosition;
+		computedResizeProp = ! __unstableForcePosition;
 	}
 
 	let shouldShift = shift;
@@ -275,8 +277,8 @@ const UnforwardedPopover = (
 				crossAxis: frameOffsetRef.current[ crossAxis ],
 			};
 		} ),
-		flip ? flipMiddleware() : undefined,
-		resize
+		computedFlipProp ? flipMiddleware() : undefined,
+		computedResizeProp
 			? size( {
 					apply( sizeProps ) {
 						const { availableHeight } = sizeProps;
