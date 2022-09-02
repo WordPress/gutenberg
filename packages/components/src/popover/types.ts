@@ -7,11 +7,6 @@ import type { Placement } from '@floating-ui/react-dom';
 type PositionYAxis = 'top' | 'middle' | 'bottom';
 type PositionXAxis = 'left' | 'center' | 'right';
 
-// Official type as from the README, although there are instances where:
-// - only one token is specified
-// - three space separated string are passed
-export type PopoverPosition = `${ PositionYAxis } ${ PositionXAxis }`;
-
 type DomRectWithOwnerDocument = DOMRect & {
 	ownerDocument?: Document;
 };
@@ -59,7 +54,10 @@ export type PopoverProps = {
 	offset?: number;
 	onClose?: () => void;
 	placement?: Placement;
-	position?: PopoverPosition;
+	// Official type as from the README, although there are instances where:
+	// - only one token is specified
+	// - three space separated string are passed
+	position?: `${ PositionYAxis } ${ PositionXAxis }`;
 	resize?: boolean;
 
 	// Deprecated props
