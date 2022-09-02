@@ -27,6 +27,7 @@ const md5 = require( '../md5' );
  * @property {boolean}                          detectedLocalConfig     If true, wp-env detected local config and used it.
  * @property {Object.<string, WPServiceConfig>} env                     Specific config for different environments.
  * @property {boolean}                          debug                   True if debug mode is enabled.
+ * @property {?string}                          postInstallScript       A user script to execute after WordPress is installed.
  */
 
 /**
@@ -112,15 +113,16 @@ module.exports = async function readConfig( configPath ) {
 		},
 	};
 
+	// This is mostly unused, as individual options are assigned to the individual services.
+	const rootConfig = mergeWpServiceConfigs( [
+		defaultConfiguration,
+		baseConfig,
+		overrideConfig,
+	] );
+
 	// A quick validation before merging on a service by service level allows us
 	// to check the root configuration options and provide more helpful errors.
-	validateConfig(
-		mergeWpServiceConfigs( [
-			defaultConfiguration,
-			baseConfig,
-			overrideConfig,
-		] )
-	);
+	validateConfig( rootConfig );
 
 	// A unique array of the environments specified in the config options.
 	// Needed so that we can override settings per-environment, rather than
@@ -174,6 +176,9 @@ module.exports = async function readConfig( configPath ) {
 		workDirectoryPath,
 		detectedLocalConfig,
 		env,
+		postInstallScript: rootConfig.postInstallScript
+			? path.resolve( process.cwd(), rootConfig.postInstallScript )
+			: undefined,
 	} );
 };
 

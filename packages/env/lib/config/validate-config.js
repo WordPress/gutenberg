@@ -1,4 +1,9 @@
 'use strict';
+/**
+ * External dependencies
+ */
+const fs = require( 'fs' );
+const path = require( 'path' );
 
 /**
  * @typedef {import('./config').WPServiceConfig} WPServiceConfig
@@ -81,6 +86,26 @@ function validateConfig( config, envLocation ) {
 		throw new ValidationError(
 			`Invalid .wp-env.json: "${ envPrefix }phpVersion" must be a string of the format "0.0".`
 		);
+	}
+
+	if (
+		config.postInstallScript !== undefined &&
+		typeof config.postInstallScript !== 'string'
+	) {
+		throw new ValidationError(
+			`Invalid .wp-env.json: "${ envPrefix }postInstallScript" must be a string or undefined.`
+		);
+	}
+
+	if ( config.postInstallScript ) {
+		const script = path.resolve( process.cwd(), config.postInstallScript );
+		try {
+			fs.accessSync( script, fs.constants.X_OK );
+		} catch ( e ) {
+			throw new ValidationError(
+				`Invalid .wp-env.json: the postInstallScript "${ script }" is not executable. It either does not exist or has incorrect permissions.`
+			);
+		}
 	}
 
 	return config;

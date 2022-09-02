@@ -101,7 +101,7 @@ module.exports = function cli() {
 	yargs.parserConfiguration( { 'unknown-options-as-args': true } );
 
 	yargs.command(
-		'start',
+		'start [postInstallScriptArgs..]',
 		wpGreen(
 			chalk`Starts WordPress for development on port {bold.underline ${ terminalLink(
 				'8888',
@@ -112,6 +112,11 @@ module.exports = function cli() {
 			) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After first install, use the '--update' flag to download updates to mapped sources and to re-apply WordPress configuration options.`
 		),
 		( args ) => {
+			args.positional( 'postInstallScriptArgs', {
+				type: 'array',
+				describe:
+					'Arguments to pass to a postinstall script, if one is defined.',
+			} );
 			args.option( 'update', {
 				type: 'boolean',
 				describe:

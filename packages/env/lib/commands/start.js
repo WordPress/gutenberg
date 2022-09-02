@@ -13,6 +13,7 @@ const inquirer = require( 'inquirer' );
 const sleep = util.promisify( setTimeout );
 const rimraf = util.promisify( require( 'rimraf' ) );
 const exec = util.promisify( require( 'child_process' ).exec );
+const { execFileSync } = require( 'child_process' );
 
 /**
  * Internal dependencies
@@ -39,13 +40,20 @@ const CONFIG_CACHE_KEY = 'config_checksum';
 /**
  * Starts the development server.
  *
- * @param {Object}  options
- * @param {Object}  options.spinner A CLI spinner which indicates progress.
- * @param {boolean} options.debug   True if debug mode is enabled.
- * @param {boolean} options.update  If true, update sources.
- * @param {string}  options.xdebug  The Xdebug mode to set.
+ * @param {Object}   options
+ * @param {Object}   options.spinner               A CLI spinner which indicates progress.
+ * @param {boolean}  options.debug                 True if debug mode is enabled.
+ * @param {boolean}  options.update                If true, update sources.
+ * @param {string}   options.xdebug                The Xdebug mode to set.
+ * @param {string[]} options.postInstallScriptArgs Options to pass to the optional post-install script.
  */
-module.exports = async function start( { spinner, debug, update, xdebug } ) {
+module.exports = async function start( {
+	spinner,
+	debug,
+	update,
+	xdebug,
+	postInstallScriptArgs,
+} ) {
 	spinner.text = 'Reading configuration.';
 	await checkForLegacyInstall( spinner );
 
@@ -185,6 +193,17 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 				times: 2,
 			} ),
 		] );
+
+		if ( config.postInstallScript ) {
+			spinner.info(
+				`Executing post-install script "${
+					config.postInstallScript
+				}" with args ${ JSON.stringify( postInstallScriptArgs ) }.`
+			);
+			execFileSync( config.postInstallScript, postInstallScriptArgs, {
+				stdio: 'inherit',
+			} );
+		}
 
 		// Set the cache key once everything has been configured.
 		await setCache( CONFIG_CACHE_KEY, configHash, {
