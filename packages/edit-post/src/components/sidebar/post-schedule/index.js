@@ -3,7 +3,7 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { PanelRow, Dropdown, Button } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import {
 	PostSchedule as PostScheduleForm,
 	PostScheduleCheck,
@@ -11,13 +11,23 @@ import {
 } from '@wordpress/editor';
 
 export default function PostSchedule() {
-	const anchorRef = useRef();
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when then anchor's ref updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState();
+	const rowCallbackRef = useCallback( ( node ) => {
+		// Fall back to `undefined` in case the ref is `null`.
+		setPopoverAnchor( node ?? undefined );
+	}, [] );
+
 	return (
 		<PostScheduleCheck>
-			<PanelRow className="edit-post-post-schedule" ref={ anchorRef }>
+			<PanelRow
+				className="edit-post-post-schedule"
+				ref={ rowCallbackRef }
+			>
 				<span>{ __( 'Publish' ) }</span>
 				<Dropdown
-					popoverProps={ { anchorRef } }
+					popoverProps={ { anchor: popoverAnchor } }
 					position="bottom left"
 					contentClassName="edit-post-post-schedule__dialog"
 					focusOnMount
