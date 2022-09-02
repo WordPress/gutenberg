@@ -25,11 +25,6 @@ export type PopoverAnchorRefStartContainer = {
 	startContainer: Node;
 };
 
-// TODO:
-// - add all props
-// - add deprecations, default values, descriptions
-// - sync README
-// - update places where Popover props may be reused
 export type PopoverProps = {
 	__unstableSlotName?: string;
 	__unstableShift?: boolean;
