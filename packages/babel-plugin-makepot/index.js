@@ -330,7 +330,7 @@ module.exports = () => {
 							for ( const context in strings[ file ] ) {
 								// Within the same file, sort translations by line.
 								const sortedTranslations = sortByReference(
-									strings[ file ][ context ]
+									Object.values( strings[ file ][ context ] )
 								);
 
 								forEach(
