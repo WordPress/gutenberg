@@ -31,7 +31,7 @@ describe( 'MetaBoxesSection', () => {
 				] }
 			/>
 		);
-		expect( screen.queryByRole( 'group' ) ).toMatchSnapshot();
+		expect( screen.getByRole( 'group' ) ).toMatchSnapshot();
 	} );
 
 	it( 'renders meta box options', () => {
@@ -46,7 +46,7 @@ describe( 'MetaBoxesSection', () => {
 				] }
 			/>
 		);
-		expect( screen.queryByRole( 'group' ) ).toMatchSnapshot();
+		expect( screen.getByRole( 'group' ) ).toMatchSnapshot();
 	} );
 
 	it( 'renders a Custom Fields option and meta box options', () => {
@@ -61,6 +61,6 @@ describe( 'MetaBoxesSection', () => {
 				] }
 			/>
 		);
-		expect( screen.queryByRole( 'group' ) ).toMatchSnapshot();
+		expect( screen.getByRole( 'group' ) ).toMatchSnapshot();
 	} );
 } );
