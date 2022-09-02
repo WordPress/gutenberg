@@ -5,7 +5,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import FocalPointPicker from '../';
+import FocalPointPicker from '..';
 
 export default {
 	title: 'Components/FocalPointPicker',
