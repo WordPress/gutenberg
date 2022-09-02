@@ -32,6 +32,19 @@
 		"linkTarget": {
 			"type": "string",
 			"default": "_self"
+		},
+		"overlayColor": {
+			"type": "string"
+		},
+		"dimRatio": {
+			"type": "number",
+			"default": 100
+		},
+		"gradient": {
+			"type": "string"
+		},
+		"customGradient": {
+			"type": "string"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
