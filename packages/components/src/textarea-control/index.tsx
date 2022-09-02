@@ -43,6 +43,7 @@ export function TextareaControl(
 	props: WordPressComponentProps< TextareaControlProps, 'textarea', false >
 ) {
 	const {
+		__nextHasNoMarginBottom,
 		label,
 		hideLabelFromVision,
 		value,
@@ -59,6 +60,7 @@ export function TextareaControl(
 
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }

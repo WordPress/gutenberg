@@ -149,6 +149,7 @@ module.exports = {
 							'toString',
 							'trim',
 							'truncate',
+							'unionBy',
 							'uniq',
 							'uniqBy',
 							'uniqueId',
