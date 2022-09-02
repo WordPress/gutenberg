@@ -1,7 +1,7 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
+import type { ForwardedRef } from 'react';
 import classnames from 'classnames';
 import {
 	useFloating,
@@ -14,7 +14,7 @@ import {
 	size,
 } from '@floating-ui/react-dom';
 // eslint-disable-next-line no-restricted-imports
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion, MotionProps } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -52,6 +52,8 @@ import {
 	getReferenceOwnerDocument,
 	getReferenceElement,
 } from './utils';
+import type { WordPressComponentProps } from '../ui/context';
+import type { PopoverProps } from './types';
 
 /**
  * Name of slot in which popover should fill.
@@ -140,8 +142,17 @@ const MaybeAnimatedWrapper = forwardRef(
 
 const slotNameContext = createContext();
 
-const Popover = (
-	{
+const UnforwardedPopover = (
+	props: Omit<
+		WordPressComponentProps< PopoverProps, 'div', false >,
+		// To avoid overlaps between the standard HTML attributes and the props
+		// expected by `framer-motion`, omit all framer motion props from popover
+		// props (except for `animate`, which is re-defined in `PopoverProps`).
+		keyof Omit< MotionProps, 'animate' >
+	>,
+	forwardedRef: ForwardedRef< any >
+) => {
+	const {
 		range,
 		animate = true,
 		headerTitle,
@@ -166,9 +177,8 @@ const Popover = (
 		__unstableShift,
 		__unstableForcePosition,
 		...contentProps
-	},
-	forwardedRef
-) => {
+	} = props;
+
 	if ( range ) {
 		deprecated( 'range prop in Popover component', {
 			since: '6.1',
@@ -492,7 +502,7 @@ const Popover = (
 	return <span ref={ anchorRefFallback }>{ content }</span>;
 };
 
-const PopoverContainer = forwardRef( Popover );
+const Popover = forwardRef( UnforwardedPopover );
 
 function PopoverSlot( { name = SLOT_NAME }, ref ) {
 	return (
@@ -505,7 +515,9 @@ function PopoverSlot( { name = SLOT_NAME }, ref ) {
 	);
 }
 
-PopoverContainer.Slot = forwardRef( PopoverSlot );
-PopoverContainer.__unstableSlotNameProvider = slotNameContext.Provider;
+// @ts-expect-error For Legacy Reasons
+Popover.Slot = forwardRef( PopoverSlot );
+// @ts-expect-error For Legacy Reasons
+Popover.__unstableSlotNameProvider = slotNameContext.Provider;
 
-export default PopoverContainer;
+export default Popover;
