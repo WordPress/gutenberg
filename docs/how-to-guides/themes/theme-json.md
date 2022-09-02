@@ -320,7 +320,7 @@ There's one special setting property, `appearanceTools`, which is a boolean and 
 
 #### Backward compatibility with add_theme_support
 
-To retain backward compatibility, the existing `add_theme_support` declarations that configure the block editor are retrofit in the proper categories for the top-level section. For example, if a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as setting `settings.color.custom` to `false`. If the `theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`. This is the complete list of equivalences:
+To retain backward compatibility, the existing `add_theme_support` declarations that configure the block editor are retrofit in the proper categories for the top-level section. For example, if a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as setting `settings.color.custom` to `false`. If the `theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`. This is the xcomplete list of equivalences:
 
 | add_theme_support           | theme.json setting                                        |
 | --------------------------- | --------------------------------------------------------- |
@@ -428,7 +428,7 @@ The naming schema for the classes and the custom properties is as follows:
 					"slug": "x-large",
 					"size": 46,
 					"name": "Large"
-				},
+				}
 			]
 		},
 		"spacing": {
@@ -454,7 +454,7 @@ The naming schema for the classes and the custom properties is as follows:
 					"slug": "60",
 					"size": "2rem",
 					"name": "Large"
-				},
+				}
 			]
 		},
 		"blocks": {
