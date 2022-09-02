@@ -107,7 +107,7 @@ export const placementToMotionAnimationProps = (
  * document has no frame element.
  */
 export const getFrameOffset = (
-	document: Document
+	document?: Document
 ): { x: number; y: number } | undefined => {
 	const frameElement = document?.defaultView?.frameElement;
 	if ( ! frameElement ) {
