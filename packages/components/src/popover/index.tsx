@@ -510,9 +510,13 @@ const UnforwardedPopover = (
 
 const Popover = forwardRef( UnforwardedPopover );
 
-function PopoverSlot( { name = SLOT_NAME }, ref ) {
+function PopoverSlot(
+	{ name = SLOT_NAME }: { name?: string },
+	ref: ForwardedRef< any >
+) {
 	return (
 		<Slot
+			// @ts-expect-error Need to type `SlotFill`
 			bubblesVirtually
 			name={ name }
 			className="popover-slot"
