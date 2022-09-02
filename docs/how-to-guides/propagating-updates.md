@@ -2,29 +2,35 @@
 
 This resource seeks to offer direction for those needing to provide updates to content, whether in a template for a theme, pattern, or a block over an entire site. Since each content type allows or disallows certain kind of synchronization, it's important to know what's possible before creating to make maintenance easier in the future. 
 
-## How to approach managing updates
+## Recommendations on managing updates
 
-**Establish early what content you expect to require updates**
+### Establish early what content you expect to require updates
 
-At a high level, it’s important to recognize that not every piece of content can be updated across the entire site and that the method of creation greatly impacts what’s possible. As a result, it’s critical to spend time ahead of creation determining what you expect to need updates and to put that content in the appropriate format. This will make a huge difference in terms of future maintenance. 
+At a high level, it’s important to recognize that **not every piece of content can be updated across the entire site and that the method of creation greatly impacts what’s possible**. As a result, it’s critical to spend time ahead of creation determining what you expect to need updates and to put that content in the appropriate format. This will make a huge difference in terms of future maintenance. 
 
-**Embrace theme design at the block level**
+### Embrace theme design at the block level
 
-Block theme design requires a mindset shift from the previous approach of designing large sections of a theme and controlling them via updates. While a holistic view of a design is still important when creating a custom theme project, blocks require that themers approach design on a more atomic level. This means starting from the block itself, typically through theme.json customizations. The goal is that each individual "atom" (i.e., block) can be moved around, edited, deleted, and put back together without the entire design falling apart.
+Block theme design requires a mindset shift from the previous approach of designing large sections of a theme and controlling them via updates. While a holistic view of a design is still important when creating a custom theme project, blocks require that themers approach design on a more atomic level. This means starting from the block itself, typically through theme.json customizations. **The goal is that each individual "atom" (i.e., block) can be moved around, edited, deleted, and put back together without the entire design falling apart.**
 
 The more that you approach design at the block level, the less need there is to propagate updates to things like patterns and templates across the entire site. If the atomic pieces are in place, their layout should not matter.
 
-## Overview of content types
+## Content types (and how to properly update them)
 
-**Blocks**
+### Blocks
 
-Dynamic blocks with the Save() method defining a default output is the recommended approach for blocks that you expect to change over time. The updates on any block will be automatically applied as the main HTML output will be always generated on render time by PHP code of the block. To get started on creating blocks and save time, [you can use the Create Block tool](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/).
+How to manage block updates depends on the nature of the block itself:
+- If the block depends on external data, then making it dynamic from start with the `render_callback` function is often a better choice as it provides more control.
+- If the block's structure is expected to change over time, then starting with the static block that uses `save()` method defining a default output is the recommended approach. 
 
-Generally speaking, this is the preferred approach due to the overhead involved with managing [block deprecations](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/) and the requirement to manually update existing blocks otherwise. Keep in mind that the biggest downside with dynamic blocks comes from needing to manage markup in two places. Depending on your needs and comfortability, either approach can work and it ultimately depends on the nature of the block itself. 
+Over time, it's possible to go hybrid and include also the `render_callback` that can use the output from `save` as a fallback while processing an alternate output. Keep in mind that that flexibility and controls comes at the cost of additional processing during rendering. 
 
-**Patterns**
+Another option is using static blocks that rely on managing updates with [block deprecations](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/). This will require you to manually update exist blocks.  Depending on your needs and comfortability, either approach can work. 
 
-For content that you want updated later on, do not use patterns and instead rely on reusable blocks or template parts. Patterns cannot be updated after you insert one into your site. For context, you can think of Patterns as more like sample/example/starter content. While Patterns exposed in the Inserter might evolve over time, those changes won't be automatically applied to any current useage of the pattern. Once insertered, patterns become completely detached from the original pattern unlike Reusable block or Template Part block. 
+**To get started on creating blocks and save time, [you can use the Create Block tool](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/).** 
+
+### Patterns
+
+**For content that you want updated later on, do not use patterns and instead rely on reusable blocks or template parts.** Patterns cannot be updated after you insert one into your site. For context, you can think of Patterns as more like sample/example/starter content. While Patterns exposed in the Inserter might evolve over time, those changes won't be automatically applied to any current useage of the pattern. Once insertered, patterns become completely detached from the original pattern unlike Reusable block or Template Part block. 
 
 If needed, one potential workaround for patterns with custom styles is to add a class name to the wrapping block for a pattern. For example, the following adds a themeslug-special class to a Group block:
 
@@ -38,7 +44,7 @@ If needed, one potential workaround for patterns with custom styles is to add a 
 
 It is not fool-proof because users can modify the class via the editor UI.  However, because this setting is under the "Advanced" panel it is likely to stay intact in most instances. This gives theme authors some CSS control for some pattern types, allowing them to update existing uses. However, it does not prevent users from making massive alterations that cannot be updated. 
 
-**Reusable blocks**
+### Reusable blocks
 
 As the name suggests, these blocks are inherently synced across your site. Keep in mind that there are currently limitations with relying on reusable blocks to handle certain updates since content, HTML structure, and styles will all stay in sync when updates happen. If you require more nuance than that, this is a key element to factor in and a dynamic block might be a better approach.
 
