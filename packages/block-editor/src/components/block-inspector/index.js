@@ -232,7 +232,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	);
 };
 
-const BlockInspectorSingleBlock = ( { clientId, blockName, backButton } ) => {
+const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 	const hasBlockStyles = useSelect(
 		( select ) => {
 			const { getBlockStyles } = select( blocksStore );
@@ -244,7 +244,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName, backButton } ) => {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	return (
 		<div className="block-editor-block-inspector">
-			<BlockCard backButton={ backButton } { ...blockInformation } />
+			<BlockCard { ...blockInformation } />
 			<BlockVariationTransforms blockClientId={ clientId } />
 			{ hasBlockStyles && (
 				<div>
