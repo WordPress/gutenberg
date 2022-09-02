@@ -107,10 +107,10 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 				continue;
 			}
 
-			// Clean up everything save for the blocks.
+			// First clean up the everything, save for the blocks.
 			$result = static::remove_keys_not_in_schema( $input[ $subtree ], $schema[ $subtree ] );
 
-			// Now back in the blocks.
+			// Then, clean up the blocks and append that to the result.
 			if ( 'settings' === $subtree && isset( $input[ $subtree ]['blocks'] ) ) {
 				$result['blocks'] = static::sanitize_blocks( $input[ $subtree ]['blocks'], $valid_block_names, $schema[ $subtree ] );
 			}
@@ -126,8 +126,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 	}
 
 	/**
-	 * Sanitize the blocks section that can be found in settings and styles. This ensures
-	 * nested blocks are supported through recursion.
+	 * Sanitize the blocks section that can be found in settings and styles, including nested blocks.
 	 *
 	 * @since 6.1.0
 	 *
@@ -194,8 +193,7 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 	}
 
 	/**
-	 * Builds the metadata for the blocks present in the settings node, by taking into account nested blocks.
-	 * This returns in the form of:
+	 * Builds the metadata for settings.blocks, whilst ensuring support for nested blocks. This returns in the form of:
 	 *
 	 *     [
 	 *       [
@@ -220,7 +218,6 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 	 */
 	protected static function get_settings_of_blocks( $selectors, $valid_block_names, $nodes, $current_block, $current_selector = null, $current_path = array() ) {
 		foreach ( $current_block as $block_name => $block ) {
-			// It's not necessary to validate as the blocks have already been validated, but this is cleaner to do in order to catch a nested block.
 			if ( in_array( $block_name, $valid_block_names, true ) ) {
 
 				$selector = is_null( $current_selector ) ? null : $current_selector;

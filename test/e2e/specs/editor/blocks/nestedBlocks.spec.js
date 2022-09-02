@@ -20,7 +20,6 @@ test.describe( 'Nested Block Settings', () => {
 		editor,
 		page,
 	} ) => {
-		// Loading it this way forces the nested block settings to be loaded, which in itself technically tests the new nested block settings code.
 		await editor.insertBlock( {
 			name: 'core/quote',
 			innerBlocks: [

@@ -587,6 +587,46 @@ Note that the name of the variable is created by adding `--` in between each nes
 
 #### Settings examples
 
+- Enable a specifc colour for a nested block, from the color palette:
+
+```json
+{
+	"version": 2,
+	"settings": {
+		"color": {
+			"palette": [
+				{
+					"slug": "red",
+					"name": "Red",
+					"color": "#ce0808"
+				},
+				{
+					"slug": "light",
+					"name": "Light",
+					"color": "#f5f7f9"
+				}
+			]
+		},
+		"blocks": {
+			"core/quote": {
+				"core/heading": {
+					"color": {
+						"text": true,
+						"palette": [
+							{
+								"slug": "red",
+								"name": "Red",
+								"color": "#ce0808"
+							}
+						]
+					}
+				}
+			}
+		}
+	}
+}
+```
+
 - Enable custom colors only for the paragraph block:
 
 ```json
