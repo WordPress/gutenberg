@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ForwardedRef } from 'react';
+import type { ForwardedRef, SyntheticEvent } from 'react';
 import classnames from 'classnames';
 import {
 	useFloating,
@@ -311,7 +311,10 @@ const UnforwardedPopover = (
 	let onDialogClose;
 
 	if ( onClose || onFocusOutside ) {
-		onDialogClose = ( type, event ) => {
+		onDialogClose = (
+			type: 'focus-outside' | undefined,
+			event: SyntheticEvent
+		) => {
 			// Ideally the popover should have just a single onClose prop and
 			// not three props that potentially do the same thing.
 			if ( type === 'focus-outside' && onFocusOutside ) {
@@ -325,6 +328,7 @@ const UnforwardedPopover = (
 	const [ dialogRef, dialogProps ] = useDialog( {
 		focusOnMount,
 		__unstableOnClose: onDialogClose,
+		// @ts-expect-error The __unstableOnClose property needs to be deprecated first (see https://github.com/WordPress/gutenberg/pull/27675)
 		onClose: onDialogClose,
 	} );
 
