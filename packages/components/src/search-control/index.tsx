@@ -22,6 +22,7 @@ import type { ForwardedRef } from 'react';
 
 function UnforwardedSearchControl(
 	{
+		__nextHasNoMarginBottom,
 		className,
 		onChange,
 		onKeyDown,
@@ -68,6 +69,7 @@ function UnforwardedSearchControl(
 
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			label={ label }
 			id={ id }
 			hideLabelFromVision={ hideLabelFromVision }

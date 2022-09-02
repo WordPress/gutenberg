@@ -10,7 +10,7 @@ import type { BaseControlProps } from '../base-control/types';
 
 export type SearchControlProps = Pick<
 	BaseControlProps,
-	'help' | 'hideLabelFromVision' | 'label'
+	'__nextHasNoMarginBottom' | 'help' | 'hideLabelFromVision' | 'label'
 > & {
 	/**
 	 * A function that receives the value of the input when the value is changed.
