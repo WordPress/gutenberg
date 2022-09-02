@@ -59,7 +59,14 @@ import {
 	getReferenceElement,
 } from './utils';
 import type { WordPressComponentProps } from '../ui/context';
-import type { PopoverProps, AnimatedWrapperProps } from './types';
+import type {
+	PopoverProps,
+	AnimatedWrapperProps,
+	PopoverAnchorRefElement,
+	PopoverAnchorRefReference,
+	PopoverAnchorRefTopBottom,
+	PopoverAnchorRefStartContainer,
+} from './types';
 
 /**
  * Name of slot in which popover should fill.
@@ -393,11 +400,12 @@ const UnforwardedPopover = (
 
 		setReferenceOwnerDocument( resultingReferenceOwnerDoc );
 	}, [
-		anchorRef,
-		anchorRef?.top,
-		anchorRef?.bottom,
-		anchorRef?.startContainer,
-		anchorRef?.current,
+		anchorRef as PopoverAnchorRefElement | undefined,
+		( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top,
+		( anchorRef as PopoverAnchorRefTopBottom | undefined )?.bottom,
+		( anchorRef as PopoverAnchorRefStartContainer | undefined )
+			?.startContainer,
+		( anchorRef as PopoverAnchorRefReference )?.current,
 		anchorRect,
 		getAnchorRect,
 		fallbackReferenceElement,

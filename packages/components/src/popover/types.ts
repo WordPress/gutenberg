@@ -21,6 +21,15 @@ export type AnimatedWrapperProps = {
 	shouldAnimate?: boolean;
 };
 
+export type PopoverAnchorRefElement = Element;
+export type PopoverAnchorRefReference = MutableRefObject<
+	Element | null | undefined
+>;
+export type PopoverAnchorRefTopBottom = { top?: Element; bottom?: Element };
+export type PopoverAnchorRefStartContainer = {
+	startContainer: Node | undefined;
+};
+
 // TODO:
 // - add all props
 // - add deprecations, default values, descriptions
@@ -31,17 +40,10 @@ export type PopoverProps = {
 	__unstableShift?: boolean;
 	anchorRect?: DomRectWithOwnerDocument;
 	anchorRef?:
-		| Element
-		| MutableRefObject< Element | null | undefined >
-		| {
-				top: Element | MutableRefObject< Element | null | undefined >;
-				bottom:
-					| Element
-					| MutableRefObject< Element | null | undefined >;
-		  }
-		| {
-				startContainer: Node | undefined;
-		  };
+		| PopoverAnchorRefElement
+		| PopoverAnchorRefReference
+		| PopoverAnchorRefTopBottom
+		| PopoverAnchorRefStartContainer;
 	animate?: true;
 	children: ReactNode;
 	expandOnMobile?: boolean;
