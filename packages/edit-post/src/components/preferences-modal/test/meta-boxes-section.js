@@ -31,7 +31,9 @@ describe( 'MetaBoxesSection', () => {
 				] }
 			/>
 		);
-		expect( screen.getByRole( 'group' ) ).toMatchSnapshot();
+		expect(
+			screen.getByRole( 'group', { name: 'Advanced panels' } )
+		).toMatchSnapshot();
 	} );
 
 	it( 'renders meta box options', () => {
@@ -46,7 +48,9 @@ describe( 'MetaBoxesSection', () => {
 				] }
 			/>
 		);
-		expect( screen.getByRole( 'group' ) ).toMatchSnapshot();
+		expect(
+			screen.getByRole( 'group', { name: 'Advanced panels' } )
+		).toMatchSnapshot();
 	} );
 
 	it( 'renders a Custom Fields option and meta box options', () => {
@@ -61,6 +65,8 @@ describe( 'MetaBoxesSection', () => {
 				] }
 			/>
 		);
-		expect( screen.getByRole( 'group' ) ).toMatchSnapshot();
+		expect(
+			screen.getByRole( 'group', { name: 'Advanced panels' } )
+		).toMatchSnapshot();
 	} );
 } );
