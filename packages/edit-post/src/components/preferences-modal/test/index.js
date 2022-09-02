@@ -24,19 +24,25 @@ describe( 'EditPostPreferencesModal', () => {
 			useSelect.mockImplementation( () => true );
 			useViewportMatch.mockImplementation( () => true );
 			render( <EditPostPreferencesModal /> );
-			expect( screen.getByRole( 'dialog' ) ).toMatchSnapshot();
+			expect(
+				screen.getByRole( 'dialog', { name: 'Preferences' } )
+			).toMatchSnapshot();
 		} );
 		it( 'small viewports', () => {
 			useSelect.mockImplementation( () => true );
 			useViewportMatch.mockImplementation( () => false );
 			render( <EditPostPreferencesModal /> );
-			expect( screen.getByRole( 'dialog' ) ).toMatchSnapshot();
+			expect(
+				screen.getByRole( 'dialog', { name: 'Preferences' } )
+			).toMatchSnapshot();
 		} );
 	} );
 
 	it( 'should not render when the modal is not active', () => {
 		useSelect.mockImplementation( () => false );
 		render( <EditPostPreferencesModal /> );
-		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'dialog', { name: 'Preferences' } )
+		).not.toBeInTheDocument();
 	} );
 } );
