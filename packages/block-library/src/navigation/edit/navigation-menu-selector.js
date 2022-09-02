@@ -5,15 +5,24 @@ import {
 	MenuGroup,
 	MenuItem,
 	MenuItemsChoice,
+<<<<<<< HEAD
 	DropdownMenu,
 	Button,
 	VisuallyHidden,
+=======
+	ToolbarDropdownMenu,
+>>>>>>> c9c4d2f402 (Remove prevent duplicated classic menus for another PR)
 } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
 import { Icon, chevronUp, chevronDown } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
+<<<<<<< HEAD
 import { useEffect, useMemo, useState } from '@wordpress/element';
+=======
+import { addQueryArgs } from '@wordpress/url';
+import { forwardRef, useMemo } from '@wordpress/element';
+>>>>>>> c9c4d2f402 (Remove prevent duplicated classic menus for another PR)
 
 /**
  * Internal dependencies
@@ -21,6 +30,7 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
 
+<<<<<<< HEAD
 function NavigationMenuSelector( {
 	currentMenuId,
 	onSelectNavigationMenu,
@@ -31,6 +41,20 @@ function NavigationMenuSelector( {
 	createNavigationMenuIsError,
 	toggleProps = {},
 } ) {
+=======
+function NavigationMenuSelector(
+	{
+		currentMenuId,
+		onSelectNavigationMenu,
+		onSelectClassicMenu,
+		onCreateNew,
+		showManageActions = false,
+		actionLabel,
+		toggleProps = {},
+	},
+	forwardedRef
+) {
+>>>>>>> c9c4d2f402 (Remove prevent duplicated classic menus for another PR)
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
 
@@ -51,6 +75,7 @@ function NavigationMenuSelector( {
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
 
+<<<<<<< HEAD
 	const [ currentTitle ] = useEntityProp(
 		'postType',
 		'wp_navigation',
@@ -62,14 +87,19 @@ function NavigationMenuSelector( {
 		hasResolvedNavigationMenus &&
 		! isCreatingMenu;
 
+=======
+>>>>>>> c9c4d2f402 (Remove prevent duplicated classic menus for another PR)
 	const menuChoices = useMemo( () => {
 		return (
 			navigationMenus?.map( ( { id, title } ) => {
 				const label = decodeEntities( title.rendered );
+<<<<<<< HEAD
 				if ( id === currentMenuId && ! isCreatingMenu ) {
 					setSelectorLabel( currentTitle );
 					setEnableOptions( shouldEnableMenuSelector );
 				}
+=======
+>>>>>>> c9c4d2f402 (Remove prevent duplicated classic menus for another PR)
 				return {
 					value: id,
 					label,
@@ -77,6 +107,7 @@ function NavigationMenuSelector( {
 				};
 			} ) || []
 		);
+<<<<<<< HEAD
 	}, [
 		currentTitle,
 		currentMenuId,
@@ -86,10 +117,14 @@ function NavigationMenuSelector( {
 		hasResolvedNavigationMenus,
 	] );
 
+=======
+	}, [ navigationMenus ] );
+>>>>>>> c9c4d2f402 (Remove prevent duplicated classic menus for another PR)
 	const hasNavigationMenus = !! navigationMenus?.length;
 	const hasClassicMenus = !! classicMenus?.length;
 	const showNavigationMenus = !! canSwitchNavigationMenu;
 	const showClassicMenus = !! canUserCreateNavigationMenu;
+<<<<<<< HEAD
 
 	const noMenuSelected = hasNavigationMenus && ! currentMenuId;
 	const noBlockMenus = ! hasNavigationMenus && hasResolvedNavigationMenus;
@@ -154,6 +189,21 @@ function NavigationMenuSelector( {
 				{ __( 'Create new menu' ) }
 			</Button>
 		);
+=======
+	const hasManagePermissions =
+		canUserCreateNavigationMenu || canUserUpdateNavigationMenu;
+
+	// Show the selector if:
+	// - has switch or create permissions and there are block or classic menus not previously imported.
+	// - user has create or update permissions and component should show the menu actions.
+	const showSelectMenus =
+		( ( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
+			( hasNavigationMenus || hasClassicMenus ) ) ||
+		( hasManagePermissions && showManageActions );
+
+	if ( ! showSelectMenus ) {
+		return null;
+>>>>>>> c9c4d2f402 (Remove prevent duplicated classic menus for another PR)
 	}
 
 	return (
@@ -171,6 +221,10 @@ function NavigationMenuSelector( {
 							<MenuItemsChoice
 								value={ currentMenuId }
 								onSelect={ ( menuId ) => {
+<<<<<<< HEAD
+=======
+									onClose();
+>>>>>>> c9c4d2f402 (Remove prevent duplicated classic menus for another PR)
 									onSelectNavigationMenu( menuId );
 								} }
 								choices={ menuChoices }
