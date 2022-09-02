@@ -144,7 +144,7 @@ export const getReferenceOwnerDocument = ( {
 	) {
 		resultingReferenceOwnerDoc = (
 			anchorRef as PopoverAnchorRefStartContainer
-		 ).startContainer?.ownerDocument;
+		 ).startContainer.ownerDocument;
 	} else if (
 		( anchorRef as PopoverAnchorRefReference | undefined )?.current
 	) {

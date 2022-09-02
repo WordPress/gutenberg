@@ -22,7 +22,7 @@ export type PopoverAnchorRefReference = MutableRefObject<
 >;
 export type PopoverAnchorRefTopBottom = { top: Element; bottom: Element };
 export type PopoverAnchorRefStartContainer = {
-	startContainer: Node | undefined;
+	startContainer: Node;
 };
 
 // TODO:
