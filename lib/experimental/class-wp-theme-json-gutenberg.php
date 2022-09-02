@@ -34,7 +34,6 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$valid_block_names` and `$valid_element_name` parameters.
-	 * @since 6.1.0 Added support for nested block settings
 	 *
 	 * @param array $input               Structure to sanitize.
 	 * @param array $valid_block_names   List of valid block names.
@@ -128,8 +127,6 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 	/**
 	 * Sanitize the blocks section that can be found in settings and styles, including nested blocks.
 	 *
-	 * @since 6.1.0
-	 *
 	 * @param array $current_block              The current block to break down.
 	 * @param array $valid_block_names          List of valid block names.
 	 * @param array $schema                     Valid schema that is allowed for this block.
@@ -164,7 +161,6 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 	 *     ]
 	 *
 	 * @since 5.8.0
-	 * @since 6.1.0 Added support for nested block settings
 	 *
 	 * @param array $theme_json The tree to extract setting nodes from.
 	 * @param array $selectors  List of selectors per block.
@@ -205,8 +201,6 @@ class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 	 *         'selector' => 'CSS selector for other node'
 	 *       ],
 	 *     ]
-	 *
-	 * @since 6.1.0
 	 *
 	 * @param array $selectors         List of selectors per block.
 	 * @param array $valid_block_names List of valid block names.
