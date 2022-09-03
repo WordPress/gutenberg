@@ -15,8 +15,6 @@ import {
 	Placeholder,
 	Button,
 	TextControl,
-	RangeControl,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -26,9 +24,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
-	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseGradient,
-	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
@@ -38,6 +34,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import DimensionControls from './dimension-controls';
+import OverlayControls from './overlay-controls';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -72,9 +69,7 @@ function PostFeaturedImageDisplay( {
 		postId
 	);
 
-	const { gradientClass, gradientValue, setGradient } =
-		__experimentalUseGradient();
-	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+	const { gradientClass, gradientValue } = __experimentalUseGradient();
 
 	const dimRatioToClass = ( ratio ) => {
 		return ratio === undefined
@@ -191,65 +186,11 @@ function PostFeaturedImageDisplay( {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="color">
-				<ColorGradientSettingsDropdown
-					__experimentalHasMultipleOrigins
-					__experimentalIsRenderedInSidebar
-					settings={ [
-						{
-							colorValue: overlayColor,
-							gradientValue,
-							label: __( 'Overlay' ),
-							onColorChange: ( updatedOverlayColor ) =>
-								setAttributes( {
-									overlayColor: updatedOverlayColor,
-								} ),
-							onGradientChange: setGradient,
-							isShownByDefault: true,
-							resetAllFilter: () => ( {
-								overlayColor: undefined,
-								customOverlayColor: undefined,
-								gradient: undefined,
-								customGradient: undefined,
-							} ),
-						},
-					] }
-					panelId={ clientId }
-					{ ...colorGradientSettings }
-				/>
-				<ToolsPanelItem
-					hasValue={ () => {
-						// If there's a media background the dimRatio will be
-						// defaulted to 50 whereas it will be 100 for colors.
-						return dimRatio === undefined
-							? false
-							: dimRatio !== ( mediaUrl ? 50 : 100 );
-					} }
-					label={ __( 'Overlay opacity' ) }
-					onDeselect={ () =>
-						setAttributes( { dimRatio: mediaUrl ? 50 : 100 } )
-					}
-					resetAllFilter={ () => ( {
-						dimRatio: mediaUrl ? 50 : 100,
-					} ) }
-					isShownByDefault
-					panelId={ clientId }
-				>
-					<RangeControl
-						label={ __( 'Overlay opacity' ) }
-						value={ dimRatio }
-						onChange={ ( newDimRatio ) =>
-							setAttributes( {
-								dimRatio: newDimRatio,
-							} )
-						}
-						min={ 0 }
-						max={ 100 }
-						step={ 10 }
-						required
-					/>
-				</ToolsPanelItem>
-			</InspectorControls>
+			<OverlayControls
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				clientId={ clientId }
+			/>
 		</>
 	);
 	let image;
@@ -372,6 +313,11 @@ export default function PostFeaturedImageEdit( props ) {
 					) }
 					withIllustration={ true }
 					style={ borderProps.style }
+				/>
+				<OverlayControls
+					attributes={ props.attributes }
+					setAttributes={ props.setAttributes }
+					clientId={ props.clientId }
 				/>
 			</div>
 		);
