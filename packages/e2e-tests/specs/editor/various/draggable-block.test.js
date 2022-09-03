@@ -13,9 +13,9 @@ import {
 
 describe( 'Draggable block', () => {
 	beforeAll( async () => {
-		// await deactivatePlugin(
-		// 	'gutenberg-test-plugin-disables-the-css-animations'
-		// );
+		await deactivatePlugin(
+			'gutenberg-test-plugin-disables-the-css-animations'
+		);
 
 		// Set the viewport at a larger size than normal to ensure scrolling doesn't occur.
 		// Scrolling can interfere with the drag coordinates.
@@ -30,9 +30,9 @@ describe( 'Draggable block', () => {
 
 	afterAll( async () => {
 		await page.setDragInterception( false );
-		// await activatePlugin(
-		// 	'gutenberg-test-plugin-disables-the-css-animations'
-		// );
+		await activatePlugin(
+			'gutenberg-test-plugin-disables-the-css-animations'
+		);
 	} );
 
 	it( 'can drag and drop to the top of a block list', async () => {
