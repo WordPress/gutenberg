@@ -59,7 +59,7 @@ const OverlayControls = ( { clientId, attributes, setAttributes } ) => {
 					setAttributes( { dimRatio: mediaUrl ? 50 : 100 } )
 				}
 				resetAllFilter={ () => ( {
-					dimRatio: mediaUrl ? 50 : 100,
+					dimRatio: 0,
 				} ) }
 				isShownByDefault
 				panelId={ clientId }

@@ -37,7 +37,8 @@
 			"type": "string"
 		},
 		"dimRatio": {
-			"type": "number"
+			"type": "number",
+			"default": 0
 		},
 		"gradient": {
 			"type": "string"
