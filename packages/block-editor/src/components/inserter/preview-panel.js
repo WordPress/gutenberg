@@ -4,6 +4,7 @@
 import {
 	isReusableBlock,
 	createBlock,
+	getBlockType,
 	getBlockFromExample,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
@@ -15,8 +16,11 @@ import BlockCard from '../block-card';
 import BlockPreview from '../block-preview';
 
 function InserterPreviewPanel( { item } ) {
-	const { name, title, icon, description, initialAttributes, example } = item;
+	const { name, title, icon, description, initialAttributes } = item;
 	const isReusable = isReusableBlock( item );
+	const hoveredItemBlockType = getBlockType( name );
+	const example = item.example || hoveredItemBlockType.example;
+
 	return (
 		<div className="block-editor-inserter__preview-container">
 			<div className="block-editor-inserter__preview">
@@ -27,7 +31,7 @@ function InserterPreviewPanel( { item } ) {
 							viewportWidth={ example?.viewportWidth ?? 500 }
 							blocks={
 								example
-									? getBlockFromExample( item.name, {
+									? getBlockFromExample( name, {
 											attributes: {
 												...example.attributes,
 												...initialAttributes,
