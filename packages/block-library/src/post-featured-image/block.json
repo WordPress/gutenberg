@@ -36,6 +36,9 @@
 		"overlayColor": {
 			"type": "string"
 		},
+		"customOverlayColor": {
+			"type": "string"
+		},
 		"dimRatio": {
 			"type": "number",
 			"default": 0
