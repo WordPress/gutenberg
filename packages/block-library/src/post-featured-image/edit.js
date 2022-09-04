@@ -171,7 +171,14 @@ function PostFeaturedImageDisplay( {
 		return (
 			<>
 				{ controls }
-				<div { ...blockProps }>{ placeholder() }</div>
+				<div { ...blockProps }>
+					{ placeholder() }
+					<Overlay
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						clientId={ clientId }
+					/>
+				</div>
 			</>
 		);
 	}
