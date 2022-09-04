@@ -24,7 +24,6 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
-	__experimentalUseGradient,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
@@ -34,7 +33,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import DimensionControls from './dimension-controls';
-import OverlayControls from './overlay-controls';
+import Overlay from './overlay';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -51,31 +50,14 @@ function PostFeaturedImageDisplay( {
 	context: { postId, postType: postTypeSlug, queryId },
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	const {
-		isLink,
-		height,
-		width,
-		scale,
-		sizeSlug,
-		rel,
-		linkTarget,
-		dimRatio,
-		overlayColor,
-	} = attributes;
+	const { isLink, height, width, scale, sizeSlug, rel, linkTarget } =
+		attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postTypeSlug,
 		'featured_media',
 		postId
 	);
-
-	const { gradientClass, gradientValue } = __experimentalUseGradient();
-
-	const dimRatioToClass = ( ratio ) => {
-		return ratio === undefined
-			? null
-			: 'has-background-dim-' + 10 * Math.round( ratio / 10 );
-	};
 
 	const { media, postType } = useSelect(
 		( select ) => {
@@ -110,10 +92,6 @@ function PostFeaturedImageDisplay( {
 		style: { width, height },
 	} );
 	const borderProps = useBorderProps( attributes );
-	const overlayStyles = {
-		backgroundColor: overlayColor,
-		...borderProps.style,
-	};
 
 	const placeholder = ( content ) => {
 		return (
@@ -186,11 +164,6 @@ function PostFeaturedImageDisplay( {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			<OverlayControls
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				clientId={ clientId }
-			/>
 		</>
 	);
 	let image;
@@ -276,24 +249,12 @@ function PostFeaturedImageDisplay( {
 				</BlockControls>
 			) }
 			<figure { ...blockProps }>
-				<span
-					aria-hidden="true"
-					className={ classnames(
-						'wp-block-post-featured-image__overlay',
-						dimRatioToClass( dimRatio ),
-						blockProps.className,
-						{
-							'has-background-dim': dimRatio !== undefined,
-							'has-background-gradient': gradientValue,
-							[ gradientClass ]: gradientClass,
-						}
-					) }
-					style={ {
-						backgroundImage: gradientValue,
-						...overlayStyles,
-					} }
-				/>
 				{ image }
+				<Overlay
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					clientId={ clientId }
+				/>
 			</figure>
 		</>
 	);
@@ -314,7 +275,7 @@ export default function PostFeaturedImageEdit( props ) {
 					withIllustration={ true }
 					style={ borderProps.style }
 				/>
-				<OverlayControls
+				<Overlay
 					attributes={ props.attributes }
 					setAttributes={ props.setAttributes }
 					clientId={ props.clientId }
