@@ -127,6 +127,8 @@ export type PopoverProps = {
 	onClose?: () => void;
 	/**
 	 * Used to specify the popover's position with respect to its anchor.
+	 *
+	 * @default 'bottom-start'
 	 */
 	placement?: Placement;
 	// Official type as from the README, although there are instances where:
