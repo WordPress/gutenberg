@@ -24,13 +24,7 @@ import { useBorderControlDropdown } from './hook';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
 
-import type {
-	Color,
-	ColorOrigin,
-	Colors,
-	DropdownProps,
-	PopoverProps,
-} from '../types';
+import type { Color, ColorOrigin, Colors, DropdownProps } from '../types';
 
 const noop = () => undefined;
 const getColorObject = (
@@ -188,7 +182,8 @@ const BorderControlDropdown = (
 		</Button>
 	);
 
-	const renderContent = ( { onClose }: PopoverProps ) => (
+	// TODO: update types once Dropdown component is refactored to TypeScript.
+	const renderContent = ( { onClose }: { onClose: () => void } ) => (
 		<>
 			<DropdownContentWrapper paddingSize="medium">
 				<VStack className={ popoverControlsClassName } spacing={ 6 }>
@@ -247,9 +242,7 @@ const BorderControlDropdown = (
 		<Dropdown
 			renderToggle={ renderToggle }
 			renderContent={ renderContent }
-			popoverProps={ {
-				...__unstablePopoverProps,
-			} }
+			popoverProps={ __unstablePopoverProps }
 			{ ...otherProps }
 			ref={ forwardedRef }
 		/>
