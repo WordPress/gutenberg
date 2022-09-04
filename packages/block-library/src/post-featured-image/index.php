@@ -19,11 +19,11 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	}
 	$post_ID = $block->context['postId'];
 
-	$is_link                = isset( $attributes['isLink'] ) && $attributes['isLink'];
-	$size_slug              = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
-	$post_title             = trim( strip_tags( get_the_title( $post_ID ) ) );
-	$attr                   = get_block_core_post_featured_image_border_attributes( $attributes );
-	$overlay_element_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
+	$is_link        = isset( $attributes['isLink'] ) && $attributes['isLink'];
+	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
+	$post_title     = trim( strip_tags( get_the_title( $post_ID ) ) );
+	$attr           = get_block_core_post_featured_image_border_attributes( $attributes );
+	$overlay_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
 
 	if ( $is_link ) {
 		$attr['alt'] = $post_title;
@@ -43,10 +43,10 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 			esc_attr( $link_target ),
 			$rel,
 			$featured_image,
-			$overlay_element_markup
+			$overlay_markup
 		);
 	} else {
-		$featured_image = $featured_image . $overlay_element_markup;
+		$featured_image = $featured_image . $overlay_markup;
 	}
 
 	$has_width  = ! empty( $attributes['width'] );
