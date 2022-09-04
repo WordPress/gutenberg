@@ -15,10 +15,20 @@ import FocalPointPicker from '..';
 const meta: ComponentMeta< typeof FocalPointPicker > = {
 	title: 'Components/FocalPointPicker',
 	component: FocalPointPicker,
+	argTypes: {
+		onChange: { action: 'onChange' },
+	},
+	parameters: {
+		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
+	},
 };
 export default meta;
 
-const Template: ComponentStory< typeof FocalPointPicker > = ( props ) => {
+const Template: ComponentStory< typeof FocalPointPicker > = ( {
+	onChange,
+	...props
+} ) => {
 	const [ focalPoint, setFocalPoint ] = useState( {
 		x: 0.5,
 		y: 0.5,
@@ -28,7 +38,10 @@ const Template: ComponentStory< typeof FocalPointPicker > = ( props ) => {
 		<FocalPointPicker
 			{ ...props }
 			value={ focalPoint }
-			onChange={ setFocalPoint }
+			onChange={ ( ...changeArgs ) => {
+				onChange( ...changeArgs );
+				setFocalPoint( ...changeArgs );
+			} }
 		/>
 	);
 };
