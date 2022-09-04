@@ -16,24 +16,20 @@ export type AnimatedWrapperProps = {
 	shouldAnimate?: boolean;
 };
 
-export type PopoverAnchorRefElement = Element;
 export type PopoverAnchorRefReference = MutableRefObject<
 	Element | null | undefined
 >;
 export type PopoverAnchorRefTopBottom = { top: Element; bottom: Element };
-export type PopoverAnchorRefStartContainer = {
-	startContainer: Node;
-};
 
 export type PopoverProps = {
 	__unstableSlotName?: string;
 	__unstableShift?: boolean;
 	anchorRect?: DomRectWithOwnerDocument;
 	anchorRef?:
-		| PopoverAnchorRefElement
+		| Element
 		| PopoverAnchorRefReference
 		| PopoverAnchorRefTopBottom
-		| PopoverAnchorRefStartContainer;
+		| Range;
 	animate?: true;
 	children: ReactNode;
 	expandOnMobile?: boolean;

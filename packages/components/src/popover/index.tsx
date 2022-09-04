@@ -62,10 +62,8 @@ import type { WordPressComponentProps } from '../ui/context';
 import type {
 	PopoverProps,
 	AnimatedWrapperProps,
-	PopoverAnchorRefElement,
 	PopoverAnchorRefReference,
 	PopoverAnchorRefTopBottom,
-	PopoverAnchorRefStartContainer,
 } from './types';
 
 /**
@@ -405,11 +403,10 @@ const UnforwardedPopover = (
 
 		setReferenceOwnerDocument( resultingReferenceOwnerDoc );
 	}, [
-		anchorRef as PopoverAnchorRefElement | undefined,
+		anchorRef as Element | undefined,
 		( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top,
 		( anchorRef as PopoverAnchorRefTopBottom | undefined )?.bottom,
-		( anchorRef as PopoverAnchorRefStartContainer | undefined )
-			?.startContainer,
+		( anchorRef as Range | undefined )?.startContainer,
 		( anchorRef as PopoverAnchorRefReference )?.current,
 		anchorRect,
 		getAnchorRect,

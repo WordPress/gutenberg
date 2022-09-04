@@ -10,10 +10,8 @@ import type { ReferenceType } from '@floating-ui/react-dom';
  */
 import type {
 	PopoverProps,
-	PopoverAnchorRefElement,
 	PopoverAnchorRefReference,
 	PopoverAnchorRefTopBottom,
-	PopoverAnchorRefStartContainer,
 } from './types';
 
 /**
@@ -138,23 +136,18 @@ export const getReferenceOwnerDocument = ( {
 	if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
 		resultingReferenceOwnerDoc = ( anchorRef as PopoverAnchorRefTopBottom )
 			?.top.ownerDocument;
-	} else if (
-		( anchorRef as PopoverAnchorRefStartContainer | undefined )
-			?.startContainer
-	) {
-		resultingReferenceOwnerDoc = (
-			anchorRef as PopoverAnchorRefStartContainer
-		 ).startContainer.ownerDocument;
+	} else if ( ( anchorRef as Range | undefined )?.startContainer ) {
+		resultingReferenceOwnerDoc = ( anchorRef as Range ).startContainer
+			.ownerDocument;
 	} else if (
 		( anchorRef as PopoverAnchorRefReference | undefined )?.current
 	) {
 		resultingReferenceOwnerDoc = (
 			( anchorRef as PopoverAnchorRefReference ).current as Element
 		 ).ownerDocument;
-	} else if ( anchorRef as PopoverAnchorRefElement | undefined ) {
+	} else if ( anchorRef as Element | undefined ) {
 		// This one should be deprecated.
-		resultingReferenceOwnerDoc = ( anchorRef as PopoverAnchorRefElement )
-			.ownerDocument;
+		resultingReferenceOwnerDoc = ( anchorRef as Element ).ownerDocument;
 	} else if ( anchorRect && anchorRect?.ownerDocument ) {
 		resultingReferenceOwnerDoc = anchorRect.ownerDocument;
 	} else if ( getAnchorRect ) {
@@ -202,10 +195,10 @@ export const getReferenceElement = ( {
 	) {
 		// Standard React ref.
 		referenceElement = ( anchorRef as PopoverAnchorRefReference ).current;
-	} else if ( anchorRef as PopoverAnchorRefElement | undefined ) {
+	} else if ( anchorRef as Element | undefined ) {
 		// If `anchorRef` holds directly the element's value (no `current` key)
 		// This is a weird scenario and should be deprecated.
-		referenceElement = anchorRef as PopoverAnchorRefElement;
+		referenceElement = anchorRef as Element;
 	} else if ( anchorRect ) {
 		// Create a virtual element for the ref.
 		referenceElement = {
