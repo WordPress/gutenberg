@@ -189,6 +189,10 @@
 
 	.components-placeholder__fieldset {
 		width: auto;
+
+		// Unset intrinsic margins.
+		margin-left: 0;
+		margin-right: 0;
 	}
 
 	// Show placeholder buttons on block selection.

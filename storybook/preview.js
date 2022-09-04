@@ -29,7 +29,10 @@ export const globalTypes = {
 			items: [
 				{ value: 'none', title: 'None' },
 				{ value: 'basic', title: 'Font only' },
-				{ value: 'wordpress', title: 'WordPress (common/forms)' },
+				{
+					value: 'wordpress',
+					title: 'WordPress (common, forms, dashicons)',
+				},
 			],
 		},
 	},

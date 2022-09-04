@@ -9,9 +9,10 @@ import {
 	showBlockToolbar,
 	setBrowserViewport,
 	waitForWindowDimensions,
+	clickBlockAppender,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'Draggable block', () => {
+describe.skip( 'Draggable block', () => {
 	// Tests don't seem to pass if beforeAll and afterAll are used.
 	// Unsure why.
 	beforeEach( async () => {
@@ -38,7 +39,7 @@ describe( 'Draggable block', () => {
 	} );
 
 	it( 'can drag and drop to the top of a block list', async () => {
-		await page.keyboard.press( 'Enter' );
+		await clickBlockAppender();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
@@ -80,7 +81,7 @@ describe( 'Draggable block', () => {
 	} );
 
 	it( 'can drag and drop to the bottom of a block list', async () => {
-		await page.keyboard.press( 'Enter' );
+		await clickBlockAppender();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );

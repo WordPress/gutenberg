@@ -99,7 +99,14 @@ class NavigableContainer extends Component {
 			// 'handling' the event, as voiceover will try to use arrow keys
 			// for highlighting text.
 			const targetRole = event.target.getAttribute( 'role' );
-			if ( MENU_ITEM_ROLES.includes( targetRole ) ) {
+			const targetHasMenuItemRole =
+				MENU_ITEM_ROLES.includes( targetRole );
+
+			// `preventDefault()` on tab to avoid having the browser move the focus
+			// after this component has already moved it.
+			const isTab = event.code === 'Tab';
+
+			if ( targetHasMenuItemRole || isTab ) {
 				event.preventDefault();
 			}
 		}

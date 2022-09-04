@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -61,25 +60,27 @@ export const inputEventContext = createContext();
  * @return {Object} Filtered props.
  */
 function removeNativeProps( props ) {
-	return omit( props, [
-		'__unstableMobileNoFocusOnMount',
-		'deleteEnter',
-		'placeholderTextColor',
-		'textAlign',
-		'selectionColor',
-		'tagsToEliminate',
-		'rootTagsToEliminate',
-		'disableEditingMenu',
-		'fontSize',
-		'fontFamily',
-		'fontWeight',
-		'fontStyle',
-		'minWidth',
-		'maxWidth',
-		'setRef',
-		'disableSuggestions',
-		'disableAutocorrection',
-	] );
+	const {
+		__unstableMobileNoFocusOnMount,
+		deleteEnter,
+		placeholderTextColor,
+		textAlign,
+		selectionColor,
+		tagsToEliminate,
+		rootTagsToEliminate,
+		disableEditingMenu,
+		fontSize,
+		fontFamily,
+		fontWeight,
+		fontStyle,
+		minWidth,
+		maxWidth,
+		setRef,
+		disableSuggestions,
+		disableAutocorrection,
+		...restProps
+	} = props;
+	return restProps;
 }
 
 function RichTextWrapper(
@@ -460,7 +461,8 @@ ForwardedRichTextContainer.Content = ( {
 	const content = <RawHTML>{ value }</RawHTML>;
 
 	if ( Tag ) {
-		return <Tag { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
+		const { format, ...restProps } = props;
+		return <Tag { ...restProps }>{ content }</Tag>;
 	}
 
 	return content;
