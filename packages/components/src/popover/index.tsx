@@ -532,6 +532,30 @@ const UnforwardedPopover = (
 	return <span ref={ anchorRefFallback }>{ content }</span>;
 };
 
+/**
+ * `Popover` renders its content in a floating modal. If no explicit anchor is passed via props, it anchors to its parent element by default.
+ *
+ * @example
+ * ```jsx
+ * import { Button, Popover } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyPopover = () => {
+ * 	const [ isVisible, setIsVisible ] = useState( false );
+ * 	const toggleVisible = () => {
+ * 		setIsVisible( ( state ) => ! state );
+ * 	};
+ *
+ * 	return (
+ * 		<Button variant="secondary" onClick={ toggleVisible }>
+ * 			Toggle Popover!
+ * 			{ isVisible && <Popover>Popover is toggled!</Popover> }
+ * 		</Button>
+ * 	);
+ * };
+ * ```
+ *
+ */
 export const Popover = forwardRef( UnforwardedPopover );
 
 function PopoverSlot(
