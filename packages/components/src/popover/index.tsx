@@ -532,7 +532,7 @@ const UnforwardedPopover = (
 	return <span ref={ anchorRefFallback }>{ content }</span>;
 };
 
-const Popover = forwardRef( UnforwardedPopover );
+export const Popover = forwardRef( UnforwardedPopover );
 
 function PopoverSlot(
 	{ name = SLOT_NAME }: { name?: string },
