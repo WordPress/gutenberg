@@ -324,10 +324,7 @@ const UnforwardedPopover = (
 	let onDialogClose;
 
 	if ( onClose || onFocusOutside ) {
-		onDialogClose = (
-			type: 'focus-outside' | undefined,
-			event: SyntheticEvent
-		) => {
+		onDialogClose = ( type: string | undefined, event: SyntheticEvent ) => {
 			// Ideally the popover should have just a single onClose prop and
 			// not three props that potentially do the same thing.
 			if ( type === 'focus-outside' && onFocusOutside ) {
@@ -446,7 +443,6 @@ const UnforwardedPopover = (
 
 	const mergedFloatingRef = useMergeRefs( [
 		floating,
-		// @ts-expect-error dialogRef is returned by useDialog and seems correct, but somehow it's not picked up by TypeScript
 		dialogRef,
 		forwardedRef,
 	] );
