@@ -41,7 +41,7 @@ const Overlay = ( {
 	const borderProps = useBorderProps( attributes );
 	const overlayStyles = {
 		backgroundColor: overlayColor.color,
-		backgroundImage: gradientValue ?? undefined,
+		backgroundImage: gradientValue,
 		...borderProps.style,
 	};
 
@@ -59,7 +59,7 @@ const Overlay = ( {
 						[ gradientClass ]: gradientClass,
 					}
 				) }
-				style={ { backgroundImage: gradientValue, ...overlayStyles } }
+				style={ overlayStyles }
 			/>
 			<InspectorControls __experimentalGroup="color">
 				<ColorGradientSettingsDropdown
