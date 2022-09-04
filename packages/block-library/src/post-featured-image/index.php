@@ -37,13 +37,22 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	if ( $is_link ) {
 		$link_target    = $attributes['linkTarget'];
 		$rel            = ! empty( $attributes['rel'] ) ? 'rel="' . esc_attr( $attributes['rel'] ) . '"' : '';
-		$featured_image = sprintf( '<a href="%1$s" target="%2$s" %3$s>%4$s</a>', get_the_permalink( $post_ID ), esc_attr( $link_target ), $rel, $featured_image );
+		$featured_image = sprintf(
+			'<a href="%1$s" target="%2$s" %3$s>%4$s%5$s</a>',
+			get_the_permalink( $post_ID ),
+			esc_attr( $link_target ),
+			$rel,
+			$featured_image,
+			$overlay_element_markup
+		);
+	} else {
+		$featured_image = $featured_image . $overlay_element_markup;
 	}
 
 	$has_width  = ! empty( $attributes['width'] );
 	$has_height = ! empty( $attributes['height'] );
 	if ( ! $has_height && ! $has_width ) {
-		return "<figure {$wrapper_attributes}>{$overlay_element_markup}{$featured_image}</figure>";
+		return "<figure {$wrapper_attributes}>{$featured_image}</figure>";
 	}
 
 	if ( $has_width ) {
@@ -58,7 +67,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		$featured_image = str_replace( 'src=', 'style="' . esc_attr( $image_styles ) . '" src=', $featured_image );
 	}
 
-	return "<figure {$wrapper_attributes}>{$overlay_element_markup}{$featured_image}</figure>";
+	return "<figure {$wrapper_attributes}>{$featured_image}</figure>";
 }
 
 /**
@@ -72,18 +81,25 @@ function get_block_core_post_featured_image_overlay_element_markup( $attributes 
 	$has_dim_background  = isset( $attributes['dimRatio'] ) && $attributes['dimRatio'];
 	$has_gradient        = ( isset( $attributes['gradient'] ) && $attributes['gradient'] );
 	$has_custom_gradient = ( isset( $attributes['customGradient'] ) && $attributes['customGradient'] );
+	$has_solid_overlay   = ( isset( $attributes['overlayColor'] ) && $attributes['overlayColor'] );
+	$has_custom_overlay  = ( isset( $attributes['customOverlayColor'] ) && $attributes['customOverlayColor'] );
 	$class_names         = array(
 		'wp-block-post-featured-image__overlay',
 	);
 	$styles_properties   = array();
 
-	if ( ! $has_dim_background && ! $has_gradient && ! $has_custom_gradient ) {
+	if ( ! $has_dim_background ) {
 		return '';
 	}
 
+	// Generate required classes for the element.
 	if ( $has_dim_background ) {
 		$class_names[] = 'has-background-dim';
 		$class_names[] = "has-background-dim-{$attributes['dimRatio']}";
+	}
+
+	if ( $has_solid_overlay ) {
+		$class_names[] = "has-{$attributes['overlayColor']}-background-color";
 	}
 
 	if ( $has_gradient || $has_custom_gradient ) {
@@ -94,6 +110,7 @@ function get_block_core_post_featured_image_overlay_element_markup( $attributes 
 		$class_names[] = "has-{$attributes['gradient']}-gradient-background";
 	}
 
+	// Generate required CSS properties and their values.
 	if ( ! empty( $attributes['style']['border']['radius'] ) ) {
 		$styles_properties['border-radius'] = $attributes['style']['border']['radius'];
 	}
@@ -104,6 +121,10 @@ function get_block_core_post_featured_image_overlay_element_markup( $attributes 
 
 	if ( $has_custom_gradient ) {
 		$styles_properties['background-image'] = $attributes['customGradient'];
+	}
+
+	if ( $has_custom_overlay ) {
+		$styles_properties['background-color'] = $attributes['customOverlayColor'];
 	}
 
 	$styles = '';
