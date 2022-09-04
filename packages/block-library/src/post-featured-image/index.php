@@ -79,10 +79,10 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
  */
 function get_block_core_post_featured_image_overlay_element_markup( $attributes ) {
 	$has_dim_background  = isset( $attributes['dimRatio'] ) && $attributes['dimRatio'];
-	$has_gradient        = ( isset( $attributes['gradient'] ) && $attributes['gradient'] );
-	$has_custom_gradient = ( isset( $attributes['customGradient'] ) && $attributes['customGradient'] );
-	$has_solid_overlay   = ( isset( $attributes['overlayColor'] ) && $attributes['overlayColor'] );
-	$has_custom_overlay  = ( isset( $attributes['customOverlayColor'] ) && $attributes['customOverlayColor'] );
+	$has_gradient        = isset( $attributes['gradient'] ) && $attributes['gradient'];
+	$has_custom_gradient = isset( $attributes['customGradient'] ) && $attributes['customGradient'];
+	$has_solid_overlay   = isset( $attributes['overlayColor'] ) && $attributes['overlayColor'];
+	$has_custom_overlay  = isset( $attributes['customOverlayColor'] ) && $attributes['customOverlayColor'];
 	$class_names         = array(
 		'wp-block-post-featured-image__overlay',
 	);
