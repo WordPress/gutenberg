@@ -156,6 +156,8 @@ export type PopoverProps = {
 	__unstableForcePosition?: boolean;
 	/**
 	 * _Note: this prop is deprecated and has no effect on the component._
+	 *
+	 * @deprecated
 	 */
 	range?: unknown;
 };
