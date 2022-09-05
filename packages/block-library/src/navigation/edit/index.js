@@ -238,6 +238,12 @@ function Navigation( {
 			return menuADate.getTime() < menuBDate.getTime();
 		} );
 
+		// Only autofallback to published menus.
+		const fallbackNavigationMenus = navigationMenus.filter(
+			( menu ) => menu.status === 'publish'
+		);
+		if ( fallbackNavigationMenus.length === 0 ) return;
+
 		/**
 		 *  This fallback displays (both in editor and on front)
 		 *  a list of pages only if no menu (user assigned or
@@ -246,7 +252,7 @@ function Navigation( {
 		 *  nor to be undoable, hence why it is marked as non persistent
 		 */
 		__unstableMarkNextChangeAsNotPersistent();
-		setRef( navigationMenus[ 0 ].id );
+		setRef( fallbackNavigationMenus[ 0 ].id );
 	}, [ navigationMenus ] );
 
 	const navRef = useRef();
