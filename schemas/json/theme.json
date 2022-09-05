@@ -581,7 +581,7 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/block": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/button": {
 					"type": "object",
@@ -623,7 +623,7 @@
 					]
 				},
 				"core/buttons": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/calendar": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -635,10 +635,10 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/column": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/columns": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/comment-author-name": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -656,13 +656,13 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/comment-template": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/comments": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/cover": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/embed": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -674,16 +674,16 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/gallery": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/group": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/heading": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/home-link": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/html": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -698,13 +698,13 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/list": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/loginout": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/media-text": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/missing": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -713,10 +713,10 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/navigation": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/navigation-link": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/nextpage": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -731,19 +731,19 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/post-comments": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/post-comments-count": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/post-comments-form": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/post-comments-link": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/post-content": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/post-date": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -758,7 +758,7 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/post-template": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/post-terms": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -773,25 +773,25 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/query": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/query-pagination": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/query-pagination-next": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/query-pagination-numbers": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/query-pagination-previous": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/query-title": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/quote": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/rss": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -818,7 +818,7 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/social-links": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/spacer": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -833,7 +833,7 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/template-part": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				},
 				"core/term-description": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -859,7 +859,7 @@
 			},
 			"patternProperties": {
 				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsNestedPropertiesComplete"
 				}
 			}
 		},
