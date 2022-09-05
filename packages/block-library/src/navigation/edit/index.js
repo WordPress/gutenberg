@@ -6,9 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-/**
- * WordPress dependencies
- */
 import { useState, useEffect, useRef, Platform } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import {
@@ -40,9 +37,6 @@ import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
 import { close, Icon } from '@wordpress/icons';
 
-/**
- * Internal dependencies
- */
 /**
  * Internal dependencies
  */
