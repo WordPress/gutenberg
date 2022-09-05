@@ -1,5 +1,5 @@
 .block-editor-block-inspector {
-	p {
+	p:not(.components-base-control__help) {
 		margin-top: 0;
 	}
 

@@ -2,10 +2,10 @@
 
 exports[`URLPopover matches the snapshot in its default state 1`] = `
 <ForwardRef(Popover)
-  __unstableShift={true}
   className="block-editor-url-popover"
   focusOnMount="firstElement"
   position="bottom center"
+  shift={true}
 >
   <div
     className="block-editor-url-popover__input-container"
@@ -39,10 +39,10 @@ exports[`URLPopover matches the snapshot in its default state 1`] = `
 
 exports[`URLPopover matches the snapshot when the settings are toggled open 1`] = `
 <ForwardRef(Popover)
-  __unstableShift={true}
   className="block-editor-url-popover"
   focusOnMount="firstElement"
   position="bottom center"
+  shift={true}
 >
   <div
     className="block-editor-url-popover__input-container"
@@ -83,10 +83,10 @@ exports[`URLPopover matches the snapshot when the settings are toggled open 1`] 
 
 exports[`URLPopover matches the snapshot when there are no settings 1`] = `
 <ForwardRef(Popover)
-  __unstableShift={true}
   className="block-editor-url-popover"
   focusOnMount="firstElement"
   position="bottom center"
+  shift={true}
 >
   <div
     className="block-editor-url-popover__input-container"

@@ -91,6 +91,14 @@ Adjusts the height of the `Popover` to prevent overflow.
 -   Required: No
 -   Default: `true`
 
+### shift
+
+Enables the `Popover` to shift in order to stay in view when meeting the viewport edges.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
 ### offset
 
 The distance (in pixels) between the anchor and popover.

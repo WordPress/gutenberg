@@ -82,9 +82,9 @@ function Icon< P >( {
 
 	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
 		const appliedProps = {
+			...icon.props,
 			width: size,
 			height: size,
-			...icon.props,
 			...additionalProps,
 		};
 
