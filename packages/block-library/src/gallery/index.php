@@ -104,7 +104,17 @@ function block_core_gallery_render( $attributes, $content ) {
 	// Set the CSS variable to the column value, and the `gap` property to the combined gap value.
 	$style = '.wp-block-gallery.' . $class . '{ --wp--style--unstable-gallery-gap: ' . $gap_column . '; gap: ' . $gap_value . '}';
 
-	gutenberg_enqueue_block_support_styles( $style, 11 );
+	// If we're on WordPress >= 6.1, we can use `wp_enqueue_block_support_styles`, as it supports
+	// `$priority` as its second argument. Otherwise, we have to fall back to using our
+	// `gutenberg_enqueue_block_support_styles` shim.
+	if (
+		function_exists( 'wp_enqueue_block_support_styles' ) &&
+		2 === count( ( new ReflectionFunction( 'wp_enqueue_block_support_styles' ) )->getParameters() )
+	) {
+		wp_enqueue_block_support_styles( $style, 11 );
+	} else {
+		gutenberg_enqueue_block_support_styles( $style, 11 );
+	}
 	return $content;
 }
 /**

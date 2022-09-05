@@ -75,7 +75,7 @@ export default {
 		__unstableSlotName: { control: { type: null } },
 		resize: { control: { type: 'boolean' } },
 		flip: { control: { type: 'boolean' } },
-		__unstableShift: { control: { type: 'boolean' } },
+		shift: { control: { type: 'boolean' } },
 	},
 };
 
