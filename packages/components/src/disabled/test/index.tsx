@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -146,32 +146,30 @@ describe( 'Disabled', () => {
 			</Disabled>
 		);
 
+		const getInput = () => screen.getByRole( 'textbox' );
+		const getContentEditable = () => screen.getByTitle( 'edit my content' );
+
 		const { rerender } = render( <MaybeDisable isDisabled={ false } /> );
 
-		const getInputValue = () =>
-			screen.getByRole< HTMLInputElement >( 'textbox' ).value;
+		await user.type( getInput(), 'This is input.' );
+		expect( getInput() ).toHaveValue( 'This is input.' );
 
-		const getContentEditableValue = () =>
-			screen.getByTitle( 'edit my content' ).textContent;
-
-		const input = screen.getByRole< HTMLInputElement >( 'textbox' );
-		fireEvent.change( input, { target: { value: 'This is input.' } } );
-		expect( input.value ).toBe( 'This is input.' );
-
-		const contentEditable = screen.getByTitle( 'edit my content' );
-		await user.click( contentEditable );
-		await user.keyboard( 'This is contentEditable.' );
-		expect( contentEditable.textContent ).toBe(
+		await user.type( getContentEditable(), 'This is contentEditable.' );
+		expect( getContentEditable() ).toHaveTextContent(
 			'This is contentEditable.'
 		);
 
 		rerender( <MaybeDisable isDisabled={ true } /> );
-		expect( getInputValue() ).toBe( 'This is input.' );
-		expect( getContentEditableValue() ).toBe( 'This is contentEditable.' );
+		expect( getInput() ).toHaveValue( 'This is input.' );
+		expect( getContentEditable() ).toHaveTextContent(
+			'This is contentEditable.'
+		);
 
 		rerender( <MaybeDisable isDisabled={ false } /> );
-		expect( getInputValue() ).toBe( 'This is input.' );
-		expect( getContentEditableValue() ).toBe( 'This is contentEditable.' );
+		expect( getInput() ).toHaveValue( 'This is input.' );
+		expect( getContentEditable() ).toHaveTextContent(
+			'This is contentEditable.'
+		);
 	} );
 
 	describe( 'Consumer', () => {
