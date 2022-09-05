@@ -578,7 +578,9 @@
 			"type": "object",
 			"properties": {
 				"core/archives": {
-					"description": "Archive block. Display a monthly archive of your posts. This block has no block-level settings"
+					"type": "object",
+					"description": "Archive block. Display a monthly archive of your posts. This block has no block-level settings",
+					"additionalProperties": false
 				},
 				"core/audio": {
 					"$ref": "#/definitions/settingsPropertiesNested"
