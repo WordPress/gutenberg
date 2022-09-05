@@ -95,10 +95,17 @@ export default function PostTemplateEdit( {
 	const [ { page } ] = queryContext;
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
 
-	const { records: categories } = useEntityRecords( 'taxonomy', 'category', {
-		context: 'view',
-		per_page: -1,
-	} );
+	let categorySlug = null;
+	if ( templateSlug.startsWith( 'category-' ) ) {
+		categorySlug = templateSlug.replace( 'category-', '' );
+	}
+	const { records: categories, hasResolved: hasResolvedCategories } =
+		useEntityRecords( 'taxonomy', 'category', {
+			context: 'view',
+			per_page: -1,
+			_fields: [ 'id' ],
+			slug: categorySlug,
+		} );
 
 	const { posts, blocks } = useSelect(
 		( select ) => {
@@ -160,16 +167,9 @@ export default function PostTemplateEdit( {
 				if ( templateSlug?.startsWith( 'archive-' ) ) {
 					query.postType = templateSlug.replace( 'archive-', '' );
 					postType = query.postType;
-				} else if (
-					templateSlug?.startsWith( 'category-' ) &&
-					!! categories
-				) {
-					const targetSlug = templateSlug.replace( 'category-', '' );
-					const categoryIds = categories
-						?.filter( ( { slug } ) => slug === targetSlug )
-						.map( ( { id } ) => id );
+				} else if ( !! categorySlug && hasResolvedCategories ) {
 					query.taxQuery = {
-						category: categoryIds,
+						category: categories.map( ( { id } ) => id ),
 					};
 					taxQuery = query.taxQuery;
 				}
@@ -199,7 +199,7 @@ export default function PostTemplateEdit( {
 			taxQuery,
 			parents,
 			previewPostType,
-			categories,
+			hasResolvedCategories,
 		]
 	);
 	const blockContexts = useMemo(
