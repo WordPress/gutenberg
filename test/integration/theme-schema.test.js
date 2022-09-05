@@ -8,19 +8,19 @@ import Ajv from 'ajv';
  */
 import themeSchema from '../../schemas/json/theme.json';
 
-const baseThemeJson = {
-	version: 2,
-};
-
 describe( 'theme.json schema', () => {
 	const ajv = new Ajv( {
 		// Used for matching unknown blocks without repeating core blocks names
-		// in settings.blocks and settings.styles
+		// with patternProperties in settings.blocks and settings.styles
 		allowMatchingProperties: true,
 	} );
 
-	test( 'schema valid', () => {
-		const result = ajv.validate( themeSchema, baseThemeJson ) || ajv.errors;
+	it( 'validates', async () => {
+		const result =
+			ajv.validate(
+				'http://json-schema.org/draft-07/schema#',
+				themeSchema
+			) || ajv.errors;
 
 		expect( result ).toBe( true );
 	} );
