@@ -413,7 +413,11 @@ export default function DimensionsPanel( { name, variation = '' } ) {
 	};
 
 	return (
-		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
+		<ToolsPanel
+			label={ __( 'Dimensions' ) }
+			resetAll={ resetAll }
+			headingLevel={ 3 }
+		>
 			{ ( showContentSizeControl || showWideSizeControl ) && (
 				<span className="span-columns">
 					{ __( 'Set the width of the main content area.' ) }
