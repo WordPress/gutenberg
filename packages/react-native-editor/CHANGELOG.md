@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.81.2
+-   [**] List V2 - Prevent error when list is empty [#43861]
+
 ## 1.81.1
 -   [*] List block v2: Fix text color inconsistencies with list items [#43244]
 -   [*] Use default placeholder text color for native List Item [#43353]
