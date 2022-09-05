@@ -30,8 +30,9 @@ See [Tracking: Add a Style Engine to manage rendering block styles #38167](https
 Global public function to generate styles from a single style object, e.g., the value of
 a [block's attributes.style object](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#styles)
 or
-the [top level styles in theme.json](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/)
-.
+the [top level styles in theme.json](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/).
+
+See also [Using the Style Engine to generate block supports styles.](docs/using-the-style-engine-with-block-supports.md)
 
 _Parameters_
 
@@ -82,7 +83,7 @@ print_r( $styles );
 
 /*
 array(
-    'css'                 => '.a-selector{padding:10px}'
+    'css'                 => '.a-selector{padding:100px}'
     'declarations'  => array( 'padding' => '100px' )
 )
 */
@@ -239,8 +240,8 @@ A guide to the terms and variable names referenced by the Style Engine package.
   <dd>Identifiers that describe stylistic, modifiable features of an HTML element. E.g., <code>border</code>, <code>font-size</code>, <code>width</code>...</dd>
   <dt>CSS rule</dt>
   <dd>A CSS selector followed by a CSS declarations block inside a set of curly braces. Usually found in a CSS stylesheet.</dd>
-  <dt>CSS selector</dt>
-   <dd>The first component of a CSS rule, a CSS selector is a pattern of elements, classnames or other terms that define the element to which the rule&rsquo;s CSS definitions apply. E.g., <code>p.my-cool-classname > span</code>. See <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors" target="_blank">MDN CSS selectors article</a>.</dd>
+  <dt>CSS selector (or CSS class selector)</dt>
+   <dd>The first component of a CSS rule, a CSS selector is a pattern of elements, classnames or other terms that define the element to which the rule&rsquo;s CSS definitions apply. E.g., <code>p.my-cool-classname > span</code>. A CSS selector matches HTML elements based on the contents of the "class" attribute. See <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors" target="_blank">MDN CSS selectors article</a>.</dd>
   <dt>CSS stylesheet</dt>
   <dd>A collection of CSS rules contained within a file or within an <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style" target="_blank">HTML style tag</a>.</dd>
   <dt>CSS value</dt>
