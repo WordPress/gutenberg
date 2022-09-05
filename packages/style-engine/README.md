@@ -135,9 +135,9 @@ $stylesheet = wp_style_engine_get_stylesheet_from_css_rules(
 print_r( $stylesheet ); // .wp-pumpkin, .wp-kumquat {color:orange}.wp-tomato{color:red;padding:100px}
 ```
 
-### wp_style_engine_get_stylesheet_from_store()
+### wp_style_engine_get_stylesheet_from_context()
 
-Returns compiled CSS from a store, if found.
+Returns compiled CSS from a stored context, if found.
 
 _Parameters_
 
@@ -167,8 +167,8 @@ $stylesheet = wp_style_engine_get_stylesheet_from_css_rules(
     )
 );
 
-// Later, fetch compiled rules from store.
-$stylesheet = gutenberg_style_engine_get_stylesheet_from_store( 'fruit-styles' );
+// Later, fetch compiled rules from context store.
+$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'fruit-styles' );
 print_r( $stylesheet ); // .wp-apple{color:green;}
 if ( ! empty( $stylesheet ) ) {
     wp_register_style( 'my-stylesheet', false, array(), true, true );
@@ -229,6 +229,8 @@ A guide to the terms and variable names referenced by the Style Engine package.
 <dl>
   <dt>Block style (Gutenberg internal)</dt>
   <dd>An object comprising a block's style attribute that contains a block's style values. E.g., <code>{ spacing: { margin: '10px' }, color: { ... }, ...  }</code></dd>
+  <dt>Context</dt>
+  <dd>An identifier for a group of styles that share a common origin or purpose, e.g., 'block-supports' or 'global-styles'. The context is also used as a key to fetch CSS rules from the store.</dd>
   <dt>CSS declaration or (CSS property declaration)</dt>
   <dd>A CSS property paired with a CSS value. E.g., <code>color: pink</code> </dd>
   <dt>CSS declarations block</dt>
