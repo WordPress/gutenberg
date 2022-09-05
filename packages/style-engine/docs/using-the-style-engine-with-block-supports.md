@@ -149,8 +149,3 @@ array(
 ```
 
 Read more about [global styles](https://developer.wordpress.org/block-editor/explanations/architecture/styles/#global-styles) and [preset CSS custom properties](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/#css-custom-properties-presets-custom) and [theme supports](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/).
-
-
-
-
-
