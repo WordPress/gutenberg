@@ -636,7 +636,7 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
  *
  * @return string A compiled CSS string.
  */
-function wp_style_engine_get_stylesheet_from_store( $store_name ) {
+function wp_style_engine_get_stylesheet_from_context( $store_name ) {
 	if ( ! class_exists( 'WP_Style_Engine' ) || empty( $store_name ) ) {
 		return '';
 	}
