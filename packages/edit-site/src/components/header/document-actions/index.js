@@ -19,7 +19,7 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
-import { useRef } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function getBlockDisplayText( block ) {
@@ -73,10 +73,15 @@ export default function DocumentActions( {
 } ) {
 	const { label } = useSecondaryText();
 
-	// The title ref is passed to the popover as the anchorRef so that the
-	// dropdown is centered over the whole title area rather than just one
-	// part of it.
-	const titleRef = useRef();
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when then anchor's ref updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState();
+	const titleWrapperCallbackRef = useCallback( ( node ) => {
+		// Use the title wrapper as the popover anchor so that the dropdown is
+		// centered over the whole title area rather than just one part of it.
+		// Fall back to `undefined` in case the ref is `null`.
+		setPopoverAnchor( node ?? undefined );
+	}, [] );
 
 	// Return a simple loading indicator until we have information to show.
 	if ( ! isLoaded ) {
@@ -103,7 +108,7 @@ export default function DocumentActions( {
 			} ) }
 		>
 			<div
-				ref={ titleRef }
+				ref={ titleWrapperCallbackRef }
 				className="edit-site-document-actions__title-wrapper"
 			>
 				<Text
@@ -131,7 +136,7 @@ export default function DocumentActions( {
 				{ dropdownContent && (
 					<Dropdown
 						popoverProps={ {
-							anchorRef: titleRef.current,
+							anchor: popoverAnchor,
 						} }
 						position="bottom center"
 						renderToggle={ ( { isOpen, onToggle } ) => (
