@@ -178,7 +178,7 @@ function NavigationMenuSelector( {
 						</MenuGroup>
 					) }
 					{ showClassicMenus && hasClassicMenus && (
-						<MenuGroup label={ __( 'Classic Menus' ) }>
+						<MenuGroup label={ __( 'Import Classic Menus' ) }>
 							{ classicMenus?.map( ( menu ) => {
 								const label = decodeEntities( menu.name );
 								return (

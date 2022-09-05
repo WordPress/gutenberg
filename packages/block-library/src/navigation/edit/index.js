@@ -21,7 +21,7 @@ import {
 	Warning,
 	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 } from '@wordpress/block-editor';
-import { EntityProvider } from '@wordpress/core-data';
+import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
 import { useDispatch } from '@wordpress/data';
 import {
@@ -103,6 +103,7 @@ function Navigation( {
 
 	const recursionId = `navigationMenu/${ ref }`;
 	const hasAlreadyRendered = useHasRecursion( recursionId );
+	const { editEntityRecord } = useDispatch( coreStore );
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
@@ -116,6 +117,11 @@ function Navigation( {
 	const [ showClassicMenuConversionNotice, hideClassicMenuConversionNotice ] =
 		useNavigationNotice( {
 			name: 'block-library/core/navigation/classic-menu-conversion',
+		} );
+
+	const [ showMenuAutoPublishDraftNotice, hideMenuAutoPublishDraftNotice ] =
+		useNavigationNotice( {
+			name: 'block-library/core/navigation/auto-publish-draft',
 		} );
 
 	const [
@@ -197,6 +203,7 @@ function Navigation( {
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
 		navigationMenus,
+		navigationMenu,
 		canUserUpdateNavigationMenu,
 		hasResolvedCanUserUpdateNavigationMenu,
 		canUserDeleteNavigationMenu,
@@ -232,6 +239,12 @@ function Navigation( {
 			return menuADate.getTime() < menuBDate.getTime();
 		} );
 
+		// Only autofallback to published menus.
+		const fallbackNavigationMenus = navigationMenus.filter(
+			( menu ) => menu.status === 'publish'
+		);
+		if ( fallbackNavigationMenus.length === 0 ) return;
+
 		/**
 		 *  This fallback displays (both in editor and on front)
 		 *  a list of pages only if no menu (user assigned or
@@ -240,7 +253,7 @@ function Navigation( {
 		 *  nor to be undoable, hence why it is marked as non persistent
 		 */
 		__unstableMarkNextChangeAsNotPersistent();
-		setRef( navigationMenus[ 0 ].id );
+		setRef( fallbackNavigationMenus[ 0 ].id );
 	}, [ navigationMenus ] );
 
 	const navRef = useRef();
@@ -443,6 +456,28 @@ function Navigation( {
 		'wp-block-navigation__overlay-menu-preview',
 		{ open: overlayMenuPreview }
 	);
+
+	// Prompt the user to publish the menu they have set as a draft
+	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
+	useEffect( async () => {
+		hideMenuAutoPublishDraftNotice();
+		if ( ! isDraftNavigationMenu ) return;
+		try {
+			await editEntityRecord(
+				'postType',
+				'wp_navigation',
+				navigationMenu?.id,
+				{
+					status: 'publish',
+				},
+				{ throwOnError: true }
+			);
+		} catch {
+			showMenuAutoPublishDraftNotice(
+				__( 'Error ocurred while publishing the navigation menu.' )
+			);
+		}
+	}, [ isDraftNavigationMenu, navigationMenu ] );
 
 	const stylingInspectorControls = (
 		<InspectorControls>
