@@ -9,7 +9,6 @@ import {
 	concatChildren,
 	useEffect,
 	useState,
-	useCallback,
 } from '@wordpress/element';
 import { useDebounce, useMergeRefs } from '@wordpress/compose';
 
@@ -131,11 +130,11 @@ function Tooltip( props ) {
 	// Create a reference to the Tooltip's child, to be passed to the Popover
 	// so that the Tooltip can be correctly positioned. Also, merge with the
 	// existing ref for the first child, so that its ref is preserved.
-	const childRef = useCallback( ( node ) => {
-		setPopoverAnchor( node ?? undefined );
-	}, [] );
 	const existingChildRef = Children.toArray( children )[ 0 ]?.ref;
-	const mergedChildRefs = useMergeRefs( [ childRef, existingChildRef ] );
+	const mergedChildRefs = useMergeRefs( [
+		setPopoverAnchor,
+		existingChildRef,
+	] );
 
 	const createMouseDown = ( event ) => {
 		// In firefox, the mouse down event is also fired when the select
@@ -258,7 +257,8 @@ function Tooltip( props ) {
 		: getRegularElement;
 
 	const popoverData = {
-		anchor: popoverAnchor,
+		// `anchor` should never be `null`
+		anchor: popoverAnchor ?? undefined,
 		isOver,
 		offset: 4,
 		position,
