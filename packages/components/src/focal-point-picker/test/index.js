@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import Picker from '../index.js';
+import Picker from '..';
 
 describe( 'FocalPointPicker', () => {
 	describe( 'focus and blur', () => {
