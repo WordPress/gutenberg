@@ -1,17 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	castArray,
-	first,
-	last,
-	map,
-	reduce,
-	some,
-	find,
-	filter,
-	orderBy,
-} from 'lodash';
+import { castArray, map, reduce, some, find, filter, orderBy } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -798,7 +788,7 @@ export const getMultiSelectedBlocks = createSelector(
  * @return {?string} First block client ID in the multi-selection set.
  */
 export function getFirstMultiSelectedBlockClientId( state ) {
-	return first( getMultiSelectedBlockClientIds( state ) ) || null;
+	return getMultiSelectedBlockClientIds( state )[ 0 ] || null;
 }
 
 /**
@@ -810,7 +800,8 @@ export function getFirstMultiSelectedBlockClientId( state ) {
  * @return {?string} Last block client ID in the multi-selection set.
  */
 export function getLastMultiSelectedBlockClientId( state ) {
-	return last( getMultiSelectedBlockClientIds( state ) ) || null;
+	const selectedClientIds = getMultiSelectedBlockClientIds( state );
+	return selectedClientIds[ selectedClientIds.length - 1 ] || null;
 }
 
 /**
@@ -2633,7 +2624,7 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
 		);
 		if ( entityAreaParents ) {
 			// Last parent closest/most interior.
-			return last( entityAreaParents );
+			return entityAreaParents[ entityAreaParents.length - 1 ];
 		}
 		return null;
 	},
