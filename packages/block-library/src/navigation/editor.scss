@@ -615,3 +615,23 @@ body.editor-styles-wrapper
 	// Override the default padding of ToggleGroupControlOption.
 	padding: 0 3px;
 }
+
+/**
+ * Navigation selector styles
+ */
+.wp-block-navigation__navigation-selector {
+	margin-bottom: $grid-unit-20;
+	width: 100%;
+}
+
+.wp-block-navigation__navigation-selector-button {
+	border: 1px solid;
+	justify-content: space-between;
+	width: 100%;
+}
+
+.wp-block-navigation__navigation-selector-button--createnew {
+	border: 1px solid;
+	margin-bottom: $grid-unit-20;
+	width: 100%;
+}
