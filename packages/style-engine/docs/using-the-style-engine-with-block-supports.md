@@ -2,7 +2,7 @@
 
 [Block supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) is the API that allows a block to declare support for certain features.
 
-Where a block declares support for a specific style group or property, e.g., "spacing" or "spacing.padding", the block's attributes are extended to include a style object.
+Where a block declares support for a specific style group or property, e.g., "spacing" or "spacing.padding", the block's attributes are extended to include a **style object**.
 
 For example:
 
@@ -26,7 +26,7 @@ For example:
 
 Using this object, the Style Engine can generate the classes and CSS required to style the block element.
 
-The global function `wp_style_engine_get_styles` accepts the style object as its first argument, and will output compiled CSS and an array of CSS declaration property/value pairs.
+The global function `wp_style_engine_get_styles` accepts a style object as its first argument, and will output compiled CSS and an array of CSS declaration property/value pairs.
 
 ```php
 $block_styles =  array(
@@ -51,14 +51,19 @@ array(
 Before passing the block style object to the Style Engine, it's important to take into account:
 
 1. whether the theme has elected to support a particular block style, and
-2. whether a block has elected to "skip serialization" of that particular block style, that is opt-out of automatic application of styles to the block's element in order to do via the block's internals. See the [block API documentation](https://developer.wordpress.org/block-editor/explanations/architecture/styles/#block-supports-api).
+2. whether a block has elected to "skip serialization" of that particular block style, that is, opt-out of automatic application of styles to the block's element (usually in order to do it via the block's internals). See the [block API documentation](https://developer.wordpress.org/block-editor/explanations/architecture/styles/#block-supports-api) for further information.
 
-If a block either has no support for a specific style, or skips serialization of that style, it's likely that you'd want to remove those style values from the style object.
+If a block either:
+
+- has no support for a specific style, or 
+- skips serialization of that style
+
+it's likely that you'll want to remove those style values from the style object.
 
 For example:
 
 ```php
-// Check if a block has support using [block_has_support](https://developer.wordpress.org/reference/functions/block_has_support/) 
+// Check if a block has support using block_has_support (https://developer.wordpress.org/reference/functions/block_has_support/)
 $has_padding_support = block_has_support( $block_type, array( 'spacing', 'padding' ), false ); // Returns true.
 $has_margin_support  = block_has_support( $block_type, array( 'spacing', 'margin' ), false ); // Returns false.
 
@@ -80,6 +85,7 @@ print_r( $styles );
 // Nothing, because there's no support for margin and the block skip's serialization for padding.
 array()
 */
+```
 
 ## Generating classnames from presets
 
