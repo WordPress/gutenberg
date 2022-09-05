@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { PanelRow, Dropdown, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -14,17 +14,16 @@ export default function PostURL() {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when then anchor's ref updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState();
-	const rowCallbackRef = useCallback( ( node ) => {
-		// Fall back to `undefined` in case the ref is `null`.
-		setPopoverAnchor( node ?? undefined );
-	}, [] );
 
 	return (
 		<PostURLCheck>
-			<PanelRow className="edit-post-post-url" ref={ rowCallbackRef }>
+			<PanelRow className="edit-post-post-url" ref={ setPopoverAnchor }>
 				<span>{ __( 'URL' ) }</span>
 				<Dropdown
-					popoverProps={ { anchor: popoverAnchor } }
+					popoverProps={ {
+						// `anchor` can not be `null`
+						anchor: popoverAnchor ?? undefined,
+					} }
 					position="bottom left"
 					className="edit-post-post-url__dropdown"
 					contentClassName="edit-post-post-url__dialog"

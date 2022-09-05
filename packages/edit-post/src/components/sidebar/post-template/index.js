@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { PanelRow, Dropdown, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -18,10 +18,6 @@ export default function PostTemplate() {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when then anchor's ref updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState();
-	const rowCallbackRef = useCallback( ( node ) => {
-		// Fall back to `undefined` in case the ref is `null`.
-		setPopoverAnchor( node ?? undefined );
-	}, [] );
 
 	const isVisible = useSelect( ( select ) => {
 		const postTypeSlug = select( editorStore ).getCurrentPostType();
@@ -52,10 +48,13 @@ export default function PostTemplate() {
 	}
 
 	return (
-		<PanelRow className="edit-post-post-template" ref={ rowCallbackRef }>
+		<PanelRow className="edit-post-post-template" ref={ setPopoverAnchor }>
 			<span>{ __( 'Template' ) }</span>
 			<Dropdown
-				popoverProps={ { anchor: popoverAnchor } }
+				popoverProps={ {
+					// `anchor` can not be `null`
+					anchor: popoverAnchor ?? undefined,
+				} }
 				position="bottom left"
 				className="edit-post-post-template__dropdown"
 				contentClassName="edit-post-post-template__dialog"
