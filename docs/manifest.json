@@ -1608,6 +1608,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/experiments",
+		"slug": "packages-experiments",
+		"markdown_source": "../packages/experiments/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/format-library",
 		"slug": "packages-format-library",
 		"markdown_source": "../packages/format-library/README.md",
