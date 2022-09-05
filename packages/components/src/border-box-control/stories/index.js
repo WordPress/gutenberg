@@ -85,6 +85,7 @@ Default.args = {
 		width: '1px',
 	},
 	__next36pxDefaultSize: false,
+	popoverPlacement: 'right-start',
 };
 
 const WrapperView = styled.div`
