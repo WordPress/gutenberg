@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import Ajv from 'ajv';
+import Ajv from 'ajv-draft-04';
 
 /**
  * Internal dependencies
@@ -15,13 +15,9 @@ describe( 'theme.json schema', () => {
 		allowMatchingProperties: true,
 	} );
 
-	it( 'validates', async () => {
-		const result =
-			ajv.validate(
-				'http://json-schema.org/draft-07/schema#',
-				themeSchema
-			) || ajv.errors;
+	it( 'compiles in strict mode', async () => {
+		const result = ajv.compile( themeSchema );
 
-		expect( result ).toBe( true );
+		expect( result.errors ).toBe( null );
 	} );
 } );
