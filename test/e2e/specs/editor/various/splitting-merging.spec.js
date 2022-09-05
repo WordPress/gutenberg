@@ -385,6 +385,7 @@ test.describe( 'splitting and merging blocks', () => {
 					`<!-- wp:paragraph -->
 <p>hi</p>
 <!-- /wp:paragraph -->
+
 <!-- wp:list -->
 <ul><!-- wp:list-item -->
 <li>item 1-item 2</li>
@@ -412,6 +413,7 @@ test.describe( 'splitting and merging blocks', () => {
 					`<!-- wp:paragraph -->
 <p>hi</p>
 <!-- /wp:paragraph -->
+
 <!-- wp:list -->
 <ul><!-- wp:list-item -->
 <li>-tem 1</li>
