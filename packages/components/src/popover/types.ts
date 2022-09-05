@@ -6,6 +6,7 @@ import type { Placement } from '@floating-ui/react-dom';
 
 type PositionYAxis = 'top' | 'middle' | 'bottom';
 type PositionXAxis = 'left' | 'center' | 'right';
+type PositionCorner = 'top' | 'right' | 'bottom' | 'left';
 
 type DomRectWithOwnerDocument = DOMRect & {
 	ownerDocument?: Document;
@@ -131,14 +132,13 @@ export type PopoverProps = {
 	 * @default 'bottom-start'
 	 */
 	placement?: Placement;
-	// Official type as from the README, although there are instances where:
-	// - only one token is specified
-	// - three space separated string are passed
 	/**
 	 * Legacy way to specify the popover's position with respect to its anchor.
 	 * _Note: use the `placement` prop instead when possible._
 	 */
-	position?: `${ PositionYAxis } ${ PositionXAxis }`;
+	position?:
+		| `${ PositionYAxis } ${ PositionXAxis }`
+		| `${ PositionYAxis } ${ PositionXAxis } ${ PositionCorner }`;
 	/**
 	 * Adjusts the size of the popover to prevent its contents from going out of
 	 * view when meeting the viewport edges.
