@@ -131,6 +131,7 @@ module.exports = {
 							'nth',
 							'once',
 							'overEvery',
+							'partial',
 							'partialRight',
 							'random',
 							'reject',
