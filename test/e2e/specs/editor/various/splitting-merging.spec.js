@@ -381,7 +381,16 @@ test.describe( 'splitting and merging blocks', () => {
 
 				// Check the content.
 				const content = await editor.getEditedPostContent();
-				expect( content ).toMatchSnapshot();
+				expect( content ).toBe(
+					`<!-- wp:paragraph -->
+<p>hi</p>
+<!-- /wp:paragraph -->
+<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>item 1-item 2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+				);
 			} );
 
 			test( 'on backspace', async ( { editor, page, pageUtils } ) => {
@@ -399,7 +408,20 @@ test.describe( 'splitting and merging blocks', () => {
 
 				// Check the content.
 				const content = await editor.getEditedPostContent();
-				expect( content ).toMatchSnapshot();
+				expect( content ).toBe(
+					`<!-- wp:paragraph -->
+<p>hi</p>
+<!-- /wp:paragraph -->
+<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>-tem 1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>item 2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+				);
 			} );
 		}
 	);
