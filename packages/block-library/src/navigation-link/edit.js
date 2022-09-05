@@ -844,7 +844,8 @@ export default function NavigationLinkEdit( {
 						<Popover
 							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }
-							anchorRef={ listItemRef.current }
+							// `anchor` should never be `null`
+							anchor={ listItemRef.current ?? undefined }
 							__unstableShift
 						>
 							<LinkControl
