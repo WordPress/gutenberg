@@ -16,7 +16,7 @@ import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-
 // top of the viewport.
 const DEFAULT_PROPS = {
 	flip: false,
-	__unstableShift: true,
+	shift: true,
 };
 
 // When there isn't enough height between the top of the block and the editor
@@ -26,7 +26,7 @@ const DEFAULT_PROPS = {
 // otherwise the toolbar will be off-screen.
 const RESTRICTED_HEIGHT_PROPS = {
 	flip: true,
-	__unstableShift: false,
+	shift: false,
 };
 
 /**
