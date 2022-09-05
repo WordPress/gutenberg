@@ -101,7 +101,10 @@ export default function PostDateEdit( {
 				{ date && ! isDescendentOfQueryLoop && (
 					<ToolbarGroup>
 						<Dropdown
-							popoverProps={ { anchorRef: timeRef.current } }
+							popoverProps={ {
+								// `anchor` should never be `null`
+								anchor: timeRef.current ?? undefined,
+							} }
 							renderContent={ ( { onClose } ) => (
 								<PublishDateTimePicker
 									currentDate={ date }
