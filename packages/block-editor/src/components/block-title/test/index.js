@@ -122,6 +122,7 @@ describe( 'BlockTitle', () => {
 
 		render( <BlockTitle clientId="id-name-with-label" /> );
 
+		expect( screen.queryByText( 'Test Label' ) ).not.toBeInTheDocument();
 		expect( screen.getByText( 'Reuse me!' ) ).toBeVisible();
 	} );
 
@@ -133,6 +134,7 @@ describe( 'BlockTitle', () => {
 
 		render( <BlockTitle clientId="id-name-with-label" /> );
 
+		expect( screen.queryByText( 'Test Label' ) ).not.toBeInTheDocument();
 		expect(
 			screen.getByText( 'A Custom Label like a Block Variation Label' )
 		).toBeVisible();
