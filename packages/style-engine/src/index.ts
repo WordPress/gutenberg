@@ -17,10 +17,10 @@ import { styleDefinitions } from './styles';
 /**
  * Generates a stylesheet for a given style object and selector.
  *
- * @param  style   Style object, for example, the value of a block's attributes.style object or the top level styles in theme.json
- * @param  options Options object with settings to adjust how the styles are generated.
+ * @param {Style}        style   Style object, for example, the value of a block's attributes.style object or the top level styles in theme.json
+ * @param {StyleOptions} options Options object with settings to adjust how the styles are generated.
  *
- * @return generated stylesheet.
+ * @return {string} A generated stylesheet or inline style declarations.
  */
 export function compileCSS( style: Style, options: StyleOptions = {} ): string {
 	const rules = getCSSRules( style, options );
@@ -56,10 +56,10 @@ export function compileCSS( style: Style, options: StyleOptions = {} ): string {
 /**
  * Returns a JSON representation of the generated CSS rules.
  *
- * @param  style   Style object, for example, the value of a block's attributes.style object or the top level styles in theme.json
- * @param  options Options object with settings to adjust how the styles are generated.
+ * @param {Style}        style   Style object, for example, the value of a block's attributes.style object or the top level styles in theme.json
+ * @param {StyleOptions} options Options object with settings to adjust how the styles are generated.
  *
- * @return generated styles.
+ * @return GeneratedCSSRule[] A collection of objects containing the selector, if any, the CSS property key (camelcase) and parsed CSS value.
  */
 export function getCSSRules(
 	style: Style,
