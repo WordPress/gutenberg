@@ -87,17 +87,19 @@ array()
 */
 ```
 
-## Generating classnames from presets
+## Generating classnames and CSS custom selectors from presets
 
 Many of theme.json's presets will generate both CSS custom properties and CSS rules (consisting of a selector and the CSS declarations) on the frontend.
 
 Styling a block using these presets normally involves adding the selector to the "className" attribute of the block.
 
-For styles that can have preset values, such as text color and font family, the style engine knows how to construct the classnames using the preset slug.
+For styles that can have preset values, such as text color and font family, the Style Engine knows how to construct the classnames using the preset slug.
 
-A little preparatory work is, however, required to inform the style engine about the type of style and the preset slug.
+To discern CSS values from preset values however, the Style Engine expects a special format.
 
-When a preset value is found in a block's attributes, it's necessary to place that value (or preset "slug") in the following pattern `var:preset|<PRESET_TYPE>|<PRESET_SLUG>`.
+Preset values must follow the pattern `var:preset|<PRESET_TYPE>|<PRESET_SLUG>`.
+
+When the Style Engine encounters these values, it will parse them and create a CSS value of `var(--wp--preset--font-size--small)` and/or generate a classname if required.
 
 Example:
 
@@ -125,7 +127,7 @@ array(
 */
 ```
 
-If you don't want the style engine to output the CSS custom vars as well, which you might not if you're applying both the CSS and classnames to the block element you can pass `'convert_vars_to_classnames' => true` in the option.
+If you don't want the Style Engine to output the CSS custom vars as well, which you might not if you're applying both the CSS and classnames to the block element, you can pass `'convert_vars_to_classnames' => true` in the options array.
 
 ```php
 $options = array(
