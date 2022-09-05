@@ -184,7 +184,7 @@ test.describe( 'Preview', () => {
 		// FIXME: The confirmation dialog is not named yet.
 		await page.click( 'role=dialog >> role=button[name="OK"i]' );
 
-		// Wait for the status change
+		// Wait for the status change.
 		await expect(
 			page.locator( 'role=button[name="Publish"i]' )
 		).toBeVisible();
