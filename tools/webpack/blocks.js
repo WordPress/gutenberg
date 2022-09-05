@@ -143,7 +143,11 @@ module.exports = {
 							// block will still call the core function when updates are back ported.
 							content = content.replace(
 								new RegExp( prefixFunctions.join( '|' ), 'g' ),
-								( match ) => `${ prefix }${ match }`
+								( match ) =>
+									`${ prefix }${ match.replace(
+										/^wp_/,
+										''
+									) }`
 							);
 
 							// Within content, search for any function definitions. For
