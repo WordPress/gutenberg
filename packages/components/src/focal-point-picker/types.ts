@@ -34,7 +34,7 @@ export type FocalPointPickerProps = Pick<
 	/**
 	 * Callback which is called at the end of drag operations.
 	 */
-	onDragEnd?: ( event: MouseEvent ) => void;
+	onDragEnd?: () => void;
 	/**
 	 * Callback which is called at the start of drag operations.
 	 */

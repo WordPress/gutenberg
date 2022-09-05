@@ -118,8 +118,8 @@ export function FocalPointPicker( {
 			onDrag?.( value, event );
 			setPoint( value );
 		},
-		onDragEnd: ( event ) => {
-			onDragEnd?.( event );
+		onDragEnd: () => {
+			onDragEnd?.();
 			onChange?.( point );
 		},
 	} );

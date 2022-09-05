@@ -9,10 +9,10 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 
 /**
- * @param {Object}                            props
- * @param {import('react').MouseEventHandler} props.onDragStart
- * @param {(e: MouseEvent) => void}           props.onDragMove
- * @param {(e: MouseEvent) => void}           props.onDragEnd
+ * @param {Object}                              props
+ * @param {import('react').MouseEventHandler}   props.onDragStart
+ * @param {(e: MouseEvent) => void}             props.onDragMove
+ * @param {(e: MouseEvent | undefined) => void} props.onDragEnd
  */
 export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
@@ -36,7 +36,7 @@ export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 	);
 	const endDrag = useCallback(
 		( /** @type {MouseEvent=} */ event = undefined ) => {
-			if ( eventsRef.current.onDragEnd && event ) {
+			if ( eventsRef.current.onDragEnd ) {
 				eventsRef.current.onDragEnd( event );
 			}
 			document.removeEventListener( 'mousemove', onMouseMove );
