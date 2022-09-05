@@ -39,7 +39,6 @@ class WP_Script_Loader_Test extends WP_UnitTestCase {
 			$core_styles_to_enqueue,
 			array(
 				'context' => 'block-supports',
-				'enqueue' => true,
 			)
 		);
 
@@ -59,7 +58,6 @@ class WP_Script_Loader_Test extends WP_UnitTestCase {
 			$my_styles_to_enqueue,
 			array(
 				'context' => 'my-styles',
-				'enqueue' => true,
 			)
 		);
 
