@@ -200,6 +200,7 @@ function InsertionPointPopover( {
 				<motion.div
 					variants={ lineVariants }
 					className="block-editor-block-list__insertion-point-indicator"
+					data-testid="block-list-insertion-point-indicator"
 				/>
 				{ isInserterShown && (
 					<motion.div

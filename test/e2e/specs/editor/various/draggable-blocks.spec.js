@@ -4,12 +4,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Draggable block', () => {
-	test.beforeEach( async ( { admin, page } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
-		await page.setViewportSize( {
-			width: 960,
-			height: 1024,
-		} );
 	} );
 
 	test( 'can drag and drop to the top of a block list', async ( {
@@ -33,42 +29,44 @@ test.describe( 'Draggable block', () => {
 
 		await editor.showBlockToolbar();
 
-		// The role selector doesn't work for drag handle.
 		const dragHandle = page.locator(
-			'.block-editor-block-mover__drag-handle'
+			'role=toolbar[name="Block tools"i] >> role=button[name="Drag"i][include-hidden]'
 		);
-		const firstParagraph = page.locator(
-			'role=document[name="Paragraph block"i]',
-			{
-				hasText: '1',
-			}
-		);
-		const dragHandleRect = await dragHandle.boundingBox();
-		const targetRect = await firstParagraph.boundingBox();
-
-		await page.mouse.move(
-			dragHandleRect.x + dragHandleRect.width / 2,
-			dragHandleRect.y + dragHandleRect.height / 2
-		);
+		// Hover to the center of the drag handle.
+		await dragHandle.hover();
+		// Start dragging.
 		await page.mouse.down();
+		await dragHandle.hover( {
+			// Move the dragged handle a little bit (to the top left of the handle's
+			// original location) to trigger the dragging chip to appear.
+			position: { x: 0, y: 0 },
+			// Bypass the "actionability" checks because the handle will disappear.
+			force: true,
+		} );
 
-		// Everything works up until now.
-		await page.mouse.move(
-			targetRect.x,
-			// Drag to the top half.
-			targetRect.y - targetRect.height * 0.25
-		);
-
-		// Wait for the insertion point to be visible.
 		await expect(
-			page.locator( '.block-editor-block-list__insertion-point' )
+			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
 		).toBeVisible();
 
-		await page.mouse.up();
-	} );
+		// Hover on the upper half of the paragraph block to trigger the indicator.
+		await page.hover( 'role=document[name="Paragraph block"i] >> text=1', {
+			position: { x: 0, y: 0 },
+		} );
 
-	test.fixme(
-		'can drag and drop to the bottom of a block list',
-		async () => {}
-	);
+		await expect(
+			page.locator( 'data-testid=block-list-insertion-point-indicator' )
+		).toBeVisible();
+
+		// Drop the paragraph block.
+		await page.mouse.up();
+
+		await expect.poll( editor.getEditedPostContent )
+			.toBe( `<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->` );
+	} );
 } );
