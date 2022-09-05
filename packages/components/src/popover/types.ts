@@ -31,13 +31,6 @@ export type PopoverProps = {
 	 */
 	__unstableSlotName?: string;
 	/**
-	 * Enables the `Popover` to shift in order to stay in view when meeting the
-	 * viewport edges.
-	 *
-	 * @default false
-	 */
-	__unstableShift?: boolean;
-	/**
 	 * An object extending a `DOMRect` with an additional optional `ownerDocument`
 	 * property, used to specify a fixed popover position.
 	 */
@@ -134,7 +127,7 @@ export type PopoverProps = {
 	placement?: Placement;
 	/**
 	 * Legacy way to specify the popover's position with respect to its anchor.
-	 * _Note: use the `placement` prop instead when possible._
+	 * _Note: this prop is deprecated. Use the `placement` prop instead._
 	 */
 	position?:
 		| `${ PositionYAxis } ${ PositionXAxis }`
@@ -146,6 +139,13 @@ export type PopoverProps = {
 	 * @default true
 	 */
 	resize?: boolean;
+	/**
+	 * Enables the `Popover` to shift in order to stay in view when meeting the
+	 * viewport edges.
+	 *
+	 * @default false
+	 */
+	shift?: boolean;
 
 	// Deprecated props
 	/**
@@ -156,6 +156,14 @@ export type PopoverProps = {
 	 * @deprecated
 	 */
 	__unstableForcePosition?: boolean;
+	/**
+	 * Enables the `Popover` to shift in order to stay in view when meeting the
+	 * viewport edges.
+	 * _Note: this prop is deprecated. Use the `shift` prop instead._
+	 *
+	 * @deprecated
+	 */
+	__unstableShift?: boolean;
 	/**
 	 * _Note: this prop is deprecated and has no effect on the component._
 	 *
