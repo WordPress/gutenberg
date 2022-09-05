@@ -41,7 +41,7 @@ export type PopoverProps = {
 	 * be an `Element` or, alternatively, a `VirtualElement` — ie. an object with
 	 * the `getBoundingClientRect()` and the `ownerDocument` properties defined.
 	 */
-	anchor: Element | VirtualElement;
+	anchor?: Element | VirtualElement;
 	/**
 	 * Whether the popover should animate when opening.
 	 *

@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import type { ComponentProps } from 'react';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
+import { useCallback, useState, useEffect } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -24,7 +19,10 @@ import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { useBorderBoxControl } from './hook';
 
 import type { BorderBoxControlProps } from '../types';
-import type { LabelProps } from '../../border-control/types';
+import type {
+	LabelProps,
+	BorderControlProps,
+} from '../../border-control/types';
 
 const BorderLabel = ( props: LabelProps ) => {
 	const { label, hideLabelFromVision } = props;
@@ -67,18 +65,29 @@ const BorderBoxControl = (
 		__next36pxDefaultSize = false,
 		...otherProps
 	} = useBorderBoxControl( props );
-	const containerRef = useRef();
-	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
-	const popoverProps: ComponentProps<
-		typeof BorderControl
-	>[ '__unstablePopoverProps' ] = popoverPlacement
-		? {
+
+	const [ popoverProps, setPopoverProps ] =
+		useState< BorderControlProps[ '__unstablePopoverProps' ] >();
+	const [ popoverAnchor, setPopoverAnchor ] = useState< Element >();
+
+	const containerRef = useCallback( ( node ) => {
+		setPopoverAnchor( node ?? undefined );
+	}, [] );
+
+	useEffect( () => {
+		if ( popoverPlacement ) {
+			setPopoverProps( {
 				placement: popoverPlacement,
 				offset: popoverOffset,
-				anchorRef: containerRef,
+				anchor: popoverAnchor,
 				shift: true,
-		  }
-		: undefined;
+			} );
+		} else {
+			setPopoverProps( undefined );
+		}
+	}, [ popoverPlacement, popoverOffset, popoverAnchor ] );
+
+	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
 
 	return (
 		<View className={ className } { ...otherProps } ref={ mergedRef }>
