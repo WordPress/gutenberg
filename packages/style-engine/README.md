@@ -2,11 +2,11 @@
 
 The Style Engine aims to provide a consistent API for rendering styling for blocks across both client-side and server-side applications.
 
-Initially, it will offer a single, centralized agent responsible for generating block styles, and, in later phases, to assume the responsibility of processing and rendering optimized frontend CSS.
+Initially, it will offer a single, centralized agent responsible for generating block styles, and, in later phases, it will also assume the responsibility of processing and rendering optimized frontend CSS.
 
 ## Important
 
-This package is new as of WordPress 6.0 and therefore in its infancy.
+This package is new as of WordPress 6.1 and therefore in its infancy.
 
 Upcoming tasks on the roadmap include, but are not limited to, the following:
 
