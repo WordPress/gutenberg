@@ -147,7 +147,9 @@ function Navigation( {
 		}
 
 		if ( createNavigationMenuIsSuccess ) {
-			handleUpdateMenu( createNavigationMenuPost.id, true );
+			handleUpdateMenu( createNavigationMenuPost.id, {
+				focusNavigationBlock: true,
+			} );
 
 			showNavigationMenuStatusNotice(
 				__( `Navigation Menu successfully created.` )
@@ -332,7 +334,11 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
-	const handleUpdateMenu = ( menuId, focusNavigationBlock = false ) => {
+	const handleUpdateMenu = (
+		menuId,
+		options = { focusNavigationBlock: false }
+	) => {
+		const { focusNavigationBlock } = options;
 		setRef( menuId );
 		if ( focusNavigationBlock ) {
 			selectBlock( clientId );
@@ -598,7 +604,9 @@ function Navigation( {
 									classicMenu.name
 								);
 								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id, true );
+									handleUpdateMenu( navMenu.id, {
+										focusNavigationBlock: true,
+									} );
 								}
 							} }
 							onCreateNew={ createUntitledEmptyNavigationMenu }
@@ -677,7 +685,9 @@ function Navigation( {
 									classicMenu.name
 								);
 								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id, true );
+									handleUpdateMenu( navMenu.id, {
+										focusNavigationBlock: true,
+									} );
 								}
 							} }
 							onCreateNew={ createUntitledEmptyNavigationMenu }
@@ -760,7 +770,9 @@ function Navigation( {
 							classicMenu.name
 						);
 						if ( navMenu ) {
-							handleUpdateMenu( navMenu.id, true );
+							handleUpdateMenu( navMenu.id, {
+								focusNavigationBlock: true,
+							} );
 						}
 					} }
 					onCreateEmpty={ createUntitledEmptyNavigationMenu }
@@ -786,12 +798,17 @@ function Navigation( {
 									classicMenu.name
 								);
 								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id, true );
+									handleUpdateMenu( navMenu.id, {
+										focusNavigationBlock: true,
+									} );
 								}
 							} }
 							onCreateNew={ createUntitledEmptyNavigationMenu }
 							createNavigationMenuIsSuccess={
 								createNavigationMenuIsSuccess
+							}
+							createNavigationMenuIsError={
+								createNavigationMenuIsError
 							}
 							/* translators: %s: The name of a menu. */
 							actionLabel={ __( "Switch to '%s'" ) }

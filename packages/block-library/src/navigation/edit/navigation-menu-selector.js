@@ -28,6 +28,7 @@ function NavigationMenuSelector( {
 	onCreateNew,
 	actionLabel,
 	createNavigationMenuIsSuccess,
+	createNavigationMenuIsError,
 	toggleProps = {},
 } ) {
 	/* translators: %s: The name of a menu. */
@@ -56,19 +57,18 @@ function NavigationMenuSelector( {
 		'title'
 	);
 
+	const shouldEnableMenuSelector =
+		( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
+		hasResolvedNavigationMenus &&
+		! isCreatingMenu;
+
 	const menuChoices = useMemo( () => {
 		return (
 			navigationMenus?.map( ( { id, title } ) => {
 				const label = decodeEntities( title.rendered );
 				if ( id === currentMenuId && ! isCreatingMenu ) {
 					setSelectorLabel( currentTitle );
-					setEnableOptions(
-						( canSwitchNavigationMenu ||
-							canUserCreateNavigationMenu ) &&
-							hasResolvedNavigationMenus &&
-							( ! isCreatingMenu ||
-								createNavigationMenuIsSuccess )
-					);
+					setEnableOptions( shouldEnableMenuSelector );
 				}
 				return {
 					value: id,
@@ -91,33 +91,23 @@ function NavigationMenuSelector( {
 	const showNavigationMenus = !! canSwitchNavigationMenu;
 	const showClassicMenus = !! canUserCreateNavigationMenu;
 
+	const noMenuSelected = hasNavigationMenus && ! currentMenuId;
+	const noBlockMenus = ! hasNavigationMenus && hasResolvedNavigationMenus;
+	const menuUnavailable =
+		hasResolvedNavigationMenus && currentMenuId === null;
+
 	useEffect( () => {
 		if ( ! hasResolvedNavigationMenus ) {
 			setSelectorLabel( __( 'Loading …' ) );
-		} else if ( hasNavigationMenus && ! currentMenuId ) {
-			setSelectorLabel( __( 'Select a menu' ) );
-			setEnableOptions(
-				( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
-					hasResolvedNavigationMenus &&
-					( ! isCreatingMenu || createNavigationMenuIsSuccess )
-			);
-		} else if ( ! hasNavigationMenus && hasResolvedNavigationMenus ) {
-			setSelectorLabel( __( 'No menus. Create one?' ) );
-			setEnableOptions(
-				( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
-					hasResolvedNavigationMenus &&
-					( ! isCreatingMenu || createNavigationMenuIsSuccess )
-			);
-		} else if ( hasResolvedNavigationMenus && currentMenuId === null ) {
-			setSelectorLabel( __( 'Select another menu' ) );
-			setEnableOptions(
-				( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
-					hasResolvedNavigationMenus &&
-					( ! isCreatingMenu || createNavigationMenuIsSuccess )
-			);
+		} else if ( noMenuSelected || noBlockMenus || menuUnavailable ) {
+			setSelectorLabel( __( 'Select menu' ) );
+			setEnableOptions( shouldEnableMenuSelector );
 		}
 
-		if ( isCreatingMenu && createNavigationMenuIsSuccess ) {
+		if (
+			isCreatingMenu &&
+			( createNavigationMenuIsSuccess || createNavigationMenuIsError )
+		) {
 			setIsCreatingMenu( false );
 		}
 	}, [
@@ -134,7 +124,7 @@ function NavigationMenuSelector( {
 		children: (
 			<>
 				<VisuallyHidden as="span">
-					{ __( 'Change Menu' ) }
+					{ __( 'Select Menu' ) }
 				</VisuallyHidden>
 				<Icon
 					icon={ isPressed ? chevronUp : chevronDown }
@@ -142,7 +132,7 @@ function NavigationMenuSelector( {
 				/>
 			</>
 		),
-		disabled: ! enableOptions,
+		isBusy: ! enableOptions,
 		onClick: () => {
 			setIsPressed( ! isPressed );
 		},
@@ -157,7 +147,7 @@ function NavigationMenuSelector( {
 				onClick={ () => {
 					onCreateNew();
 					setIsCreatingMenu( true );
-					setSelectorLabel( __( 'Loading options …' ) );
+					setSelectorLabel( __( 'Loading …' ) );
 					setEnableOptions( false );
 				} }
 			>
@@ -195,7 +185,7 @@ function NavigationMenuSelector( {
 									<MenuItem
 										onClick={ () => {
 											setSelectorLabel(
-												__( 'Loading options …' )
+												__( 'Loading …' )
 											);
 											setEnableOptions( false );
 											onSelectClassicMenu( menu );
@@ -221,9 +211,7 @@ function NavigationMenuSelector( {
 									onClose();
 									onCreateNew();
 									setIsCreatingMenu( true );
-									setSelectorLabel(
-										__( 'Loading options …' )
-									);
+									setSelectorLabel( __( 'Loading …' ) );
 									setEnableOptions( false );
 								} }
 							>
