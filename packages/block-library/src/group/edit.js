@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import {
 	InnerBlocks,
 	useBlockProps,
@@ -71,12 +71,13 @@ function GroupEditControls( { tagName, onSelectTagName } ) {
  * Display group variations if none is selected.
  *
  * @param {Object}   props               Component props.
+ * @param {string}   props.clientId      The block's clientId.
  * @param {string}   props.name          The block's name.
  * @param {Function} props.setAttributes Function to set block's attributes.
  *
  * @return {JSX.Element}                The placeholder.
  */
-function Placeholder( { name, setAttributes } ) {
+function Placeholder( { clientId, name, setAttributes } ) {
 	const { blockType, defaultVariation, variations } = useSelect(
 		( select ) => {
 			const {
@@ -94,7 +95,12 @@ function Placeholder( { name, setAttributes } ) {
 		[ name ]
 	);
 	const blockProps = useBlockProps();
-
+	const { selectBlock } = useDispatch( blockEditorStore );
+	// Ensure that the inserted block is selected after a Group variation is selected.
+	const updateSelection = useCallback(
+		( newClientId ) => selectBlock( newClientId, -1 ),
+		[ selectBlock ]
+	);
 	return (
 		<div { ...blockProps }>
 			<__experimentalBlockVariationPicker
@@ -103,6 +109,7 @@ function Placeholder( { name, setAttributes } ) {
 				variations={ variations }
 				onSelect={ ( nextVariation = defaultVariation ) => {
 					setAttributes( nextVariation.attributes );
+					updateSelection( clientId );
 				} }
 				allowSkip
 			/>
@@ -165,7 +172,11 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 				}
 			/>
 			{ showPlaceholder && (
-				<Placeholder name={ name } setAttributes={ setAttributes } />
+				<Placeholder
+					clientId={ clientId }
+					name={ name }
+					setAttributes={ setAttributes }
+				/>
 			) }
 			{ layoutSupportEnabled && ! showPlaceholder && (
 				<TagName { ...innerBlocksProps } />
