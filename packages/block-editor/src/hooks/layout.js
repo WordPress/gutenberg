@@ -172,7 +172,9 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 										layout: {
 											type:
 												layoutType?.name ===
-												'constrained'
+													'constrained' ||
+												!! inherit ||
+												!! contentSize
 													? 'default'
 													: 'constrained',
 										},
