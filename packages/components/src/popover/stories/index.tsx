@@ -51,7 +51,6 @@ const meta: ComponentMeta< typeof Popover > = {
 	},
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
 	},
 };
 

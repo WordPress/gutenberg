@@ -535,7 +535,6 @@ const UnforwardedPopover = (
 /**
  * `Popover` renders its content in a floating modal. If no explicit anchor is passed via props, it anchors to its parent element by default.
  *
- * @example
  * ```jsx
  * import { Button, Popover } from '@wordpress/components';
  * import { useState } from '@wordpress/element';
