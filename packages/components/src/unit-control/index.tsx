@@ -46,6 +46,7 @@ function UnforwardedUnitControl(
 	const {
 		__unstableStateReducer: stateReducerProp,
 		autoComplete = 'off',
+		// @ts-expect-error Ensure that children is omitted from restProps
 		children,
 		className,
 		disabled = false,

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { FocusEventHandler, ReactNode, SyntheticEvent } from 'react';
+import type { FocusEventHandler, SyntheticEvent } from 'react';
 
 /**
  * Internal dependencies
@@ -68,10 +68,6 @@ export type UnitSelectControlProps = Pick< InputControlProps, 'size' > & {
 
 export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
 	NumberControlProps & {
-		/**
-		 * The children elements.
-		 */
-		children?: ReactNode;
 		/**
 		 * If `true`, the unit `<select>` is hidden.
 		 *
