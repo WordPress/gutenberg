@@ -11,6 +11,10 @@
 	"supports": {
 		"reusable": false,
 		"html": false,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
