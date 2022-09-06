@@ -106,7 +106,11 @@ export function FocalPointPicker( {
 		onDragStart: ( event ) => {
 			dragAreaRef.current?.focus();
 			const value = getValueWithinDragArea( event );
+
+			// `value` can technically be undefined if getValueWithinDragArea() is
+			// called before dragAreaRef is set, but this shouldn't happen in reality.
 			if ( ! value ) return;
+
 			onDragStart?.( value, event );
 			setPoint( value );
 		},
@@ -154,6 +158,8 @@ export function FocalPointPicker( {
 	// Updates the bounds to cover cases of unspecified media or load failures.
 	useIsomorphicLayoutEffect( () => void refUpdateBounds.current(), [] );
 
+	// TODO: Consider refactoring getValueWithinDragArea() into a pure function.
+	// https://github.com/WordPress/gutenberg/pull/43872#discussion_r963455173
 	const getValueWithinDragArea = ( {
 		clientX,
 		clientY,
