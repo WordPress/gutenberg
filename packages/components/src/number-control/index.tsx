@@ -19,7 +19,6 @@ import { add, subtract, roundClamp } from '../utils/math';
 import { ensureNumber, isValueEmpty } from '../utils/values';
 import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 import type { NumberControlProps } from './types';
-import type { InputState } from '../input-control/reducer/state';
 
 function UnforwardedNumberControl(
 	{
@@ -61,125 +60,122 @@ function UnforwardedNumberControl(
 	 *
 	 * @return The updated state to apply to InputControl
 	 */
-	const numberControlStateReducer = (
-		/** State from InputControl. */
-		state: InputState,
-		/** Action triggering state change. */
-		action: inputControlActionTypes.InputAction
-	) => {
-		const nextState = { ...state };
+	const numberControlStateReducer: NumberControlProps[ '__unstableStateReducer' ] =
+		( state, action ) => {
+			const nextState = { ...state };
 
-		const { type, payload } = action;
-		const event = payload?.event;
-		const currentValue = nextState.value;
+			const { type, payload } = action;
+			const event = payload.event;
+			const currentValue = nextState.value;
 
-		/**
-		 * Handles custom UP and DOWN Keyboard events
-		 */
-		if (
-			type === inputControlActionTypes.PRESS_UP ||
-			type === inputControlActionTypes.PRESS_DOWN
-		) {
-			// @ts-expect-error TODO: Investigate if this is wrong
-			const enableShift = event.shiftKey && isShiftStepEnabled;
-
-			const incrementalValue = enableShift
-				? ensureNumber( shiftStep ) * baseStep
-				: baseStep;
-			let nextValue = isValueEmpty( currentValue )
-				? baseValue
-				: currentValue;
-
-			if ( event?.preventDefault ) {
-				event.preventDefault();
-			}
-
-			if ( type === inputControlActionTypes.PRESS_UP ) {
+			/**
+			 * Handles custom UP and DOWN Keyboard events
+			 */
+			if (
+				type === inputControlActionTypes.PRESS_UP ||
+				type === inputControlActionTypes.PRESS_DOWN
+			) {
 				// @ts-expect-error TODO: Investigate if this is wrong
-				nextValue = add( nextValue, incrementalValue );
-			}
+				const enableShift = event.shiftKey && isShiftStepEnabled;
 
-			if ( type === inputControlActionTypes.PRESS_DOWN ) {
-				// @ts-expect-error TODO: Investigate if this is wrong
-				nextValue = subtract( nextValue, incrementalValue );
-			}
+				const incrementalValue = enableShift
+					? ensureNumber( shiftStep ) * baseStep
+					: baseStep;
+				let nextValue = isValueEmpty( currentValue )
+					? baseValue
+					: currentValue;
 
-			// @ts-expect-error TODO: Investigate if this is wrong
-			nextState.value = constrainValue(
-				// @ts-expect-error TODO: Investigate if this is wrong
-				nextValue,
-				enableShift ? incrementalValue : undefined
-			);
-		}
+				if ( event?.preventDefault ) {
+					event.preventDefault();
+				}
 
-		/**
-		 * Handles drag to update events
-		 */
-		if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
-			// @ts-expect-error TODO: Investigate
-			const [ x, y ] = payload.delta;
-			// @ts-expect-error TODO: Investigate
-			const enableShift = payload.shiftKey && isShiftStepEnabled;
-			const modifier = enableShift
-				? ensureNumber( shiftStep ) * baseStep
-				: baseStep;
+				if ( type === inputControlActionTypes.PRESS_UP ) {
+					// @ts-expect-error TODO: Investigate if this is wrong
+					nextValue = add( nextValue, incrementalValue );
+				}
 
-			let directionModifier;
-			let delta;
-
-			switch ( dragDirection ) {
-				case 'n':
-					delta = y;
-					directionModifier = -1;
-					break;
-
-				case 'e':
-					delta = x;
-					directionModifier = isRTL() ? -1 : 1;
-					break;
-
-				case 's':
-					delta = y;
-					directionModifier = 1;
-					break;
-
-				case 'w':
-					delta = x;
-					directionModifier = isRTL() ? 1 : -1;
-					break;
-			}
-
-			if ( delta !== 0 ) {
-				delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
-				const distance = delta * modifier * directionModifier;
+				if ( type === inputControlActionTypes.PRESS_DOWN ) {
+					// @ts-expect-error TODO: Investigate if this is wrong
+					nextValue = subtract( nextValue, incrementalValue );
+				}
 
 				// @ts-expect-error TODO: Investigate if this is wrong
 				nextState.value = constrainValue(
 					// @ts-expect-error TODO: Investigate if this is wrong
-					add( currentValue, distance ),
-					enableShift ? modifier : undefined
+					nextValue,
+					enableShift ? incrementalValue : undefined
 				);
 			}
-		}
 
-		/**
-		 * Handles commit (ENTER key press or blur)
-		 */
-		if (
-			type === inputControlActionTypes.PRESS_ENTER ||
-			type === inputControlActionTypes.COMMIT
-		) {
-			const applyEmptyValue = required === false && currentValue === '';
+			/**
+			 * Handles drag to update events
+			 */
+			if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
+				// @ts-expect-error TODO: Investigate
+				const [ x, y ] = payload.delta;
+				// @ts-expect-error TODO: Investigate
+				const enableShift = payload.shiftKey && isShiftStepEnabled;
+				const modifier = enableShift
+					? ensureNumber( shiftStep ) * baseStep
+					: baseStep;
 
-			// @ts-expect-error TODO: Investigate if this is wrong
-			nextState.value = applyEmptyValue
-				? currentValue
-				: // @ts-expect-error TODO: Investigate if this is wrong
-				  constrainValue( currentValue );
-		}
+				let directionModifier;
+				let delta;
 
-		return nextState;
-	};
+				switch ( dragDirection ) {
+					case 'n':
+						delta = y;
+						directionModifier = -1;
+						break;
+
+					case 'e':
+						delta = x;
+						directionModifier = isRTL() ? -1 : 1;
+						break;
+
+					case 's':
+						delta = y;
+						directionModifier = 1;
+						break;
+
+					case 'w':
+						delta = x;
+						directionModifier = isRTL() ? 1 : -1;
+						break;
+				}
+
+				if ( delta !== 0 ) {
+					delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
+					const distance = delta * modifier * directionModifier;
+
+					// @ts-expect-error TODO: Investigate if this is wrong
+					nextState.value = constrainValue(
+						// @ts-expect-error TODO: Investigate if this is wrong
+						add( currentValue, distance ),
+						enableShift ? modifier : undefined
+					);
+				}
+			}
+
+			/**
+			 * Handles commit (ENTER key press or blur)
+			 */
+			if (
+				type === inputControlActionTypes.PRESS_ENTER ||
+				type === inputControlActionTypes.COMMIT
+			) {
+				const applyEmptyValue =
+					required === false && currentValue === '';
+
+				// @ts-expect-error TODO: Investigate if this is wrong
+				nextState.value = applyEmptyValue
+					? currentValue
+					: // @ts-expect-error TODO: Investigate if this is wrong
+					  constrainValue( currentValue );
+			}
+
+			return nextState;
+		};
 
 	return (
 		<Input
