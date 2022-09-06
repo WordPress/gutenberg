@@ -141,7 +141,6 @@ Used to customize the header text shown when the popover is toggled to fullscree
 Used to enable a different visual style for the popover.
 
 -   Required: No
--   Default: `"firstElement"`
 
 ### `noArrow`: `boolean`
 
