@@ -16,7 +16,7 @@ describe( 'PanelRow', () => {
 	} );
 
 	it( 'should render with the custom class name', () => {
-		const { container } = <PanelRow className="custom" />;
+		const { container } = render( <PanelRow className="custom" /> );
 
 		expect( container ).toMatchSnapshot();
 	} );
