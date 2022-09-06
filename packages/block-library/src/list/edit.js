@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -108,7 +103,7 @@ function useOutdentList( clientId ) {
 				[ newParentBlock, ...innerBlocks ]
 			);
 			// Select the last child of the list being outdent.
-			selectionChange( last( innerBlocks ).clientId );
+			selectionChange( innerBlocks[ innerBlocks.length - 1 ].clientId );
 		}, [ clientId ] ),
 	];
 }

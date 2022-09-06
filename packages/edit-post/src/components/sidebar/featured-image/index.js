@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, partial } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -66,7 +66,8 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 	const { toggleEditorPanelOpened } = dispatch( editPostStore );
 
 	return {
-		onTogglePanel: partial( toggleEditorPanelOpened, PANEL_NAME ),
+		onTogglePanel: ( ...args ) =>
+			toggleEditorPanelOpened( PANEL_NAME, ...args ),
 	};
 } );
 

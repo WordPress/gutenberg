@@ -6,7 +6,7 @@ import classnames from 'classnames';
 import {
 	useFloating,
 	flip as flipMiddleware,
-	shift,
+	shift as shiftMiddleware,
 	autoUpdate,
 	arrow,
 	offset as offsetMiddleware,
@@ -162,7 +162,8 @@ const Popover = (
 		__unstableSlotName = SLOT_NAME,
 		flip = true,
 		resize = true,
-		__unstableShift = false,
+		shift = false,
+		__unstableShift,
 		__unstableForcePosition,
 		...contentProps
 	},
@@ -186,6 +187,18 @@ const Popover = (
 		// to `false` to replicate `__unstableForcePosition`.
 		flip = ! __unstableForcePosition;
 		resize = ! __unstableForcePosition;
+	}
+
+	let shouldShift = shift;
+	if ( __unstableShift !== undefined ) {
+		deprecated( '`__unstableShift` prop in Popover component', {
+			since: '6.1',
+			version: '6.3',
+			alternative: '`shift` prop`',
+		} );
+
+		// Back-compat.
+		shouldShift = __unstableShift;
 	}
 
 	const arrowRef = useRef( null );
@@ -262,8 +275,8 @@ const Popover = (
 					},
 			  } )
 			: undefined,
-		__unstableShift
-			? shift( {
+		shouldShift
+			? shiftMiddleware( {
 					crossAxis: true,
 					limiter: limitShift(),
 					padding: 1, // Necessary to avoid flickering at the edge of the viewport.

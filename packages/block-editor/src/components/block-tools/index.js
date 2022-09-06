@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { first, last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -59,14 +54,14 @@ export default function BlockTools( {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
-				const rootClientId = getBlockRootClientId( first( clientIds ) );
+				const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 				moveBlocksUp( clientIds, rootClientId );
 			}
 		} else if ( isMatch( 'core/block-editor/move-down', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
-				const rootClientId = getBlockRootClientId( first( clientIds ) );
+				const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 				moveBlocksDown( clientIds, rootClientId );
 			}
 		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
@@ -85,13 +80,13 @@ export default function BlockTools( {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
-				insertAfterBlock( last( clientIds ) );
+				insertAfterBlock( clientIds[ clientIds.length - 1 ] );
 			}
 		} else if ( isMatch( 'core/block-editor/insert-before', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
-				insertBeforeBlock( first( clientIds ) );
+				insertBeforeBlock( clientIds[ 0 ] );
 			}
 		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
 			const clientIds = getSelectedBlockClientIds();

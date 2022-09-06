@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
 import { View } from 'react-native';
 
 /**
@@ -89,7 +88,7 @@ function TextColorEdit( {
 		[ value, colors ]
 	);
 
-	const hasColorsToChoose = ! isEmpty( colors ) || ! allowCustomControl;
+	const hasColorsToChoose = colors.length || ! allowCustomControl;
 
 	const onPressButton = useCallback( () => {
 		if ( hasColorsToChoose ) {

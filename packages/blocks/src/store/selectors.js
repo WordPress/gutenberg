@@ -794,9 +794,15 @@ export const hasChildBlocksWithInserterSupport = ( state, blockName ) => {
 export const __experimentalHasContentRoleAttribute = createSelector(
 	( state, blockTypeName ) => {
 		const blockType = getBlockType( state, blockTypeName );
+		if ( ! blockType ) {
+			return false;
+		}
+
 		return Object.entries( blockType.attributes ).some(
 			( [ , { __experimentalRole } ] ) => __experimentalRole === 'content'
 		);
 	},
-	( state, blockTypeName ) => [ state.blockTypes[ blockTypeName ].attributes ]
+	( state, blockTypeName ) => [
+		state.blockTypes[ blockTypeName ]?.attributes,
+	]
 );
