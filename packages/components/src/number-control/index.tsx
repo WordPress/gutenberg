@@ -45,7 +45,7 @@ function UnforwardedNumberControl(
 	// @ts-expect-error step should be a number but could be string
 	const baseStep = isStepAny ? 1 : parseFloat( step );
 	const baseValue = roundClamp( 0, min, max, baseStep );
-	const constrainValue = ( value: number, stepOverride?: number | null ) => {
+	const constrainValue = ( value: number, stepOverride?: number ) => {
 		// When step is "any" clamp the value, otherwise round and clamp it.
 		return isStepAny
 			? Math.min( max, Math.max( min, value ) )
@@ -110,7 +110,7 @@ function UnforwardedNumberControl(
 			nextState.value = constrainValue(
 				// @ts-expect-error TODO: Investigate if this is wrong
 				nextValue,
-				enableShift ? incrementalValue : null
+				enableShift ? incrementalValue : undefined
 			);
 		}
 
@@ -160,7 +160,7 @@ function UnforwardedNumberControl(
 				nextState.value = constrainValue(
 					// @ts-expect-error TODO: Investigate if this is wrong
 					add( currentValue, distance ),
-					enableShift ? modifier : null
+					enableShift ? modifier : undefined
 				);
 			}
 		}
