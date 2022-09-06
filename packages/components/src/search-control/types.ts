@@ -10,8 +10,14 @@ import type { BaseControlProps } from '../base-control/types';
 
 export type SearchControlProps = Pick<
 	BaseControlProps,
-	'__nextHasNoMarginBottom' | 'help' | 'hideLabelFromVision' | 'label'
+	'__nextHasNoMarginBottom' | 'help' | 'label'
 > & {
+	/**
+	 * If true, the label will only be visible to screen readers.
+	 *
+	 * @default true
+	 */
+	hideLabelFromVision?: boolean;
 	/**
 	 * A function that receives the value of the input when the value is changed.
 	 */
