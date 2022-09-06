@@ -124,7 +124,7 @@ When not provided, the `onClose` callback will be called instead.
 
 -   Required: No
 
-### `getAnchorRect`: `( fallbackReferenceElement:
+### `getAnchorRect`: `( fallbackReferenceElement: Element | null ) => DomRectWithOwnerDocument`
 
 A function returning the same value as the one expected by the `anchorRect` prop, used to specify a dynamic popover position.
 
