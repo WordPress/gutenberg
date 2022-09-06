@@ -52,11 +52,9 @@ test.describe( 'Draggable block', () => {
 		const firstParagraph = page.locator(
 			'role=document[name="Paragraph block"i] >> text=1'
 		);
-		await firstParagraph.hover( {
-			position: { x: 0, y: 0 },
-			// The block will be blocked by toolbar popover, but it will soon disappear
-			// after we start dragging.
-			force: true,
+		const firstParagraphBound = await firstParagraph.boundingBox();
+		await page.mouse.move( firstParagraphBound.x, firstParagraphBound.y, {
+			steps: 10,
 		} );
 
 		await expect(
@@ -68,7 +66,6 @@ test.describe( 'Draggable block', () => {
 		);
 		await expect( indicator ).toBeVisible();
 		// Expect the indicator to be above the first paragraph.
-		const firstParagraphBound = await firstParagraph.boundingBox();
 		await expect
 			.poll( () => indicator.boundingBox().then( ( { y } ) => y ) )
 			.toBeLessThan( firstParagraphBound.y );
@@ -123,7 +120,8 @@ test.describe( 'Draggable block', () => {
 		const secondParagraphBound = await secondParagraph.boundingBox();
 		await page.mouse.move(
 			secondParagraphBound.x,
-			secondParagraphBound.y + secondParagraphBound.height * 0.75
+			secondParagraphBound.y + secondParagraphBound.height * 0.75,
+			{ steps: 10 }
 		);
 
 		await expect(
