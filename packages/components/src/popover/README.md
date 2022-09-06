@@ -71,7 +71,7 @@ An object extending a `DOMRect` with an additional optional `ownerDocument` prop
 
 -   Required: No
 
-### `anchorRef`: `Element | Range | `"firstElement"`PopoverAnchorRefReference | PopoverAnchorRefTopBottom`
+### `anchorRef`: `Element | PopoverAnchorRefReference | PopoverAnchorRefTopBottom | Range`
 
 Used to specify a fixed popover position. It can be an `Element`, a React reference to an `element`, an object with a `top` and a `bottom` properties (both pointing to elements), or a `range`.
 
