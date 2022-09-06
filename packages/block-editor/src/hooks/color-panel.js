@@ -26,9 +26,10 @@ export default function ColorPanel( {
 	const [ detectedColor, setDetectedColor ] = useState();
 	const [ detectedLinkColor, setDetectedLinkColor ] = useState();
 	const ref = useBlockRef( clientId );
+	const definedColors = settings.filter( ( setting ) => setting?.colorValue );
 
 	useEffect( () => {
-		if ( ! enableContrastChecking ) {
+		if ( ! enableContrastChecking || ! definedColors.length ) {
 			return;
 		}
 
@@ -37,7 +38,7 @@ export default function ColorPanel( {
 		}
 		setDetectedColor( getComputedStyle( ref.current ).color );
 
-		const firstLinkElement = ref.current?.querySelector( ':scope > a' );
+		const firstLinkElement = ref.current?.querySelector( 'a' );
 		if ( firstLinkElement && !! firstLinkElement.innerText ) {
 			setDetectedLinkColor( getComputedStyle( firstLinkElement ).color );
 		}
