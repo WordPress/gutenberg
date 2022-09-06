@@ -68,7 +68,7 @@ Now that the button is in place, we can focus entirely on building the form. Thi
 Luckily, the `EditPageForm` we built in [part three](/docs/how-to-guides/data-basics/3-building-an-edit-form.md) already takes us 80% of the way there. The bulk of the user interface is already available, and we will reuse it in the `CreatePageForm`. Let’s start by extracting the form UI into a separate component:
 
 ```js
-export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	// ...
 	return (
 		<PageForm
@@ -83,7 +83,7 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	);
 }
 
-export function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving, onCancel, onSave } ) {
+function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving, onCancel, onSave } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
@@ -149,7 +149,7 @@ The `EditPageForm` updated and saved an existing entity record that lived in the
 In case of the `CreatePageForm` however, there is no pre-existing entity record. There is only an empty form. Anything that the user types is local to that form, which means we can keep track of it using the React’s `useState` hook:
 
 ```js
-export function CreatePageForm( { onCancel, onSaveFinished } ) {
+function CreatePageForm( { onCancel, onSaveFinished } ) {
 	const [title, setTitle] = useState();
 	const handleChange = ( title ) => setTitle( title );
 	return (
@@ -180,7 +180,7 @@ Triggers a POST request to the [`/wp/v2/pages` WordPress REST API](https://devel
 Now that we know more about `saveEntityRecord`, let's use it in `CreatePageForm`.
 
 ```js
-export function CreatePageForm( { onSaveFinished, onCancel } ) {
+function CreatePageForm( { onSaveFinished, onCancel } ) {
 	// ...
 	const { saveEntityRecord } = useDispatch( coreDataStore );
 	const handleSave = async () => {
@@ -206,7 +206,7 @@ export function CreatePageForm( { onSaveFinished, onCancel } ) {
 There is one more detail to address: our newly created pages are not yet picked up by the `PagesList`. Accordingly to the REST API documentation, the `/wp/v2/pages` endpoint creates (`POST` requests) pages with `status=draft` by default, but _returns_ (`GET` requests) pages with `status=publish`. The solution is to pass the `status` parameter explicitly:
 
 ```js
-export function CreatePageForm( { onSaveFinished, onCancel } ) {
+function CreatePageForm( { onSaveFinished, onCancel } ) {
 	// ...
 	const { saveEntityRecord } = useDispatch( coreDataStore );
 	const handleSave = async () => {
@@ -238,7 +238,7 @@ The `EditPageForm`  retrieved the error and progress information via the `getLas
 In `CreatePageForm` however, we do not have a `pageId`. What now? We can skip the `pageId` argument to retrieve the information about the entity record without any id – this will be the newly created one. The `useSelect` call is thus very similar to the one from `EditPageForm`:
 
 ```js
-export function CreatePageForm( { onCancel, onSaveFinished } ) {
+function CreatePageForm( { onCancel, onSaveFinished } ) {
 	// ...
 	const { lastError, isSaving } = useSelect(
 		( select ) => ( {
@@ -272,7 +272,7 @@ And that’s it! Here's what our new form looks like in action:
 Here’s everything we built in this chapter in one place:
 
 ```js
-export function CreatePageForm( { onCancel, onSaveFinished } ) {
+function CreatePageForm( { onCancel, onSaveFinished } ) {
 	const [title, setTitle] = useState();
 	const { lastError, isSaving } = useSelect(
 		( select ) => ( {
@@ -309,7 +309,7 @@ export function CreatePageForm( { onCancel, onSaveFinished } ) {
 	);
 }
 
-export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	const { page, lastError, isSaving, hasEdits } = useSelect(
 		( select ) => ( {
 			page: select( coreDataStore ).getEditedEntityRecord( 'postType', 'page', pageId ),
@@ -342,7 +342,7 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	);
 }
 
-export function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving, onCancel, onSave } ) {
+function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving, onCancel, onSave } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
@@ -389,4 +389,4 @@ All that’s left is to refresh the page and enjoy the form:
 
 * **Next part:** [Adding a delete button](/docs/how-to-guides/data-basics/5-adding-a-delete-button.md)
 * **Previous part:** [Building an edit form](/docs/how-to-guides/data-basics/3-building-an-edit-form.md)
-* (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/09-code-data-basics-esnext) in the gutenberg-examples repository
+* (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/non-block-examples/09-code-data-basics-esnext) in the gutenberg-examples repository

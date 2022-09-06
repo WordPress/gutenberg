@@ -32,7 +32,7 @@ Add a user's avatar. ([Source](https://github.com/WordPress/gutenberg/tree/trunk
 
 -	**Name:** core/avatar
 -	**Category:** theme
--	**Supports:** align, color (~~background~~, ~~text~~), spacing (margin), ~~alignWide~~, ~~html~~
+-	**Supports:** align, color (~~background~~, ~~text~~), spacing (margin, padding), ~~alignWide~~, ~~html~~
 -	**Attributes:** isLink, linkTarget, size, userId
 
 ## Reusable block
@@ -77,7 +77,7 @@ Display a list of all categories. ([Source](https://github.com/WordPress/gutenbe
 
 -	**Name:** core/categories
 -	**Category:** widgets
--	**Supports:** align, typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** displayAsDropdown, showEmpty, showHierarchy, showOnlyTopLevel, showPostCounts
 
 ## Code

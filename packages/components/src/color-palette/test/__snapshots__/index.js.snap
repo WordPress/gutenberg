@@ -366,9 +366,9 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
   contentClassName="components-color-palette__custom-color-dropdown-content"
   popoverProps={
     Object {
-      "__unstableShift": true,
       "offset": 8,
       "placement": "bottom",
+      "shift": true,
     }
   }
   renderContent={[Function]}
@@ -744,9 +744,9 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             contentClassName="components-color-palette__custom-color-dropdown-content"
             popoverProps={
               Object {
-                "__unstableShift": true,
                 "offset": 8,
                 "placement": "bottom",
+                "shift": true,
               }
             }
             renderContent={[Function]}
