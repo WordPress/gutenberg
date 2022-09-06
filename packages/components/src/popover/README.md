@@ -88,7 +88,7 @@ Whether the popover should animate when opening.
 
 The `children` elements rendered as the popover's content.
 
--   Required: No
+-   Required: Yes
 
 ### `expandOnMobile`: `boolean`
 
