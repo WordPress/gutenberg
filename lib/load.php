@@ -115,19 +115,12 @@ require __DIR__ . '/demo.php';
 require __DIR__ . '/experiments-page.php';
 
 // Copied package PHP files.
-if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-gutenberg.php' ) ) {
+if ( is_dir( __DIR__ . '/../build/style-engine' ) ) {
+	require_once __DIR__ . '/../build/style-engine/style-engine-gutenberg.php';
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-gutenberg.php';
-}
-if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-css-declarations-gutenberg.php' ) ) {
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-declarations-gutenberg.php';
-}
-if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rule-gutenberg.php' ) ) {
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rule-gutenberg.php';
-}
-if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rules-store-gutenberg.php' ) ) {
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rules-store-gutenberg.php';
-}
-if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-processor-gutenberg.php' ) ) {
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-processor-gutenberg.php';
 }
 

@@ -28,7 +28,7 @@ a [block's attributes.style object](https://developer.wordpress.org/block-editor
 or
 the [top level styles in theme.json](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/).
 
-See also [Using the Style Engine to generate block supports styles.](docs/using-the-style-engine-with-block-supports.md)
+See also [Using the Style Engine to generate block supports styles](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/using-the-style-engine-with-block-supports).
 
 _Parameters_
 
