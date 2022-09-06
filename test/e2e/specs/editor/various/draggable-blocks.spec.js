@@ -43,11 +43,15 @@ test.describe( 'Draggable block', () => {
 		await dragHandle.hover();
 		// Start dragging.
 		await page.mouse.down();
-		await dragHandle.hover( {
-			// Move the dragged handle a little bit (to the top left of the handle's
-			// original location) to trigger the dragging chip to appear.
+
+		// Move to and hover on the upper half of the paragraph block to trigger the indicator.
+		const firstParagraph = page.locator(
+			'role=document[name="Paragraph block"i] >> text=1'
+		);
+		await firstParagraph.hover( {
 			position: { x: 0, y: 0 },
-			// Bypass the "actionability" checks because the handle will disappear.
+			// The block will be blocked by toolbar popover, but it will soon disappear
+			// after we start dragging.
 			force: true,
 		} );
 
@@ -55,19 +59,15 @@ test.describe( 'Draggable block', () => {
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
 		).toBeVisible();
 
-		// Move to and hover on the upper half of the paragraph block to trigger the indicator.
-		const firstParagraph = page.locator(
-			'role=document[name="Paragraph block"i] >> text=1'
+		const indicator = page.locator(
+			'data-testid=block-list-insertion-point-indicator'
 		);
+		await expect( indicator ).toBeVisible();
+		// Expect the indicator to be above the first paragraph.
 		const firstParagraphBound = await firstParagraph.boundingBox();
-		await page.mouse.move( firstParagraphBound.x, firstParagraphBound.y );
-		await firstParagraph.hover( {
-			position: { x: 0, y: 0 },
-		} );
-
-		await expect(
-			page.locator( 'data-testid=block-list-insertion-point-indicator' )
-		).toBeVisible();
+		await expect
+			.poll( () => indicator.boundingBox().then( ( { y } ) => y ) )
+			.toBeLessThan( firstParagraphBound.y );
 
 		// Drop the paragraph block.
 		await page.mouse.up();
@@ -111,17 +111,6 @@ test.describe( 'Draggable block', () => {
 		await dragHandle.hover();
 		// Start dragging.
 		await page.mouse.down();
-		await dragHandle.hover( {
-			// Move the dragged handle a little bit (to the top left of the handle's
-			// original location) to trigger the dragging chip to appear.
-			position: { x: 0, y: 0 },
-			// Bypass the "actionability" checks because the handle will disappear.
-			force: true,
-		} );
-
-		await expect(
-			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
-		).toBeVisible();
 
 		// Move to and hover on the bottom half of the paragraph block to trigger the indicator.
 		const secondParagraph = page.locator(
@@ -129,19 +118,26 @@ test.describe( 'Draggable block', () => {
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
 		await page.mouse.move(
-			secondParagraphBound.x + secondParagraphBound.height * 0.5,
+			secondParagraphBound.x,
 			secondParagraphBound.y + secondParagraphBound.height * 0.75
 		);
-		await secondParagraph.hover( {
-			position: {
-				x: secondParagraphBound.width * 0.75,
-				y: secondParagraphBound.height * 0.75,
-			},
-		} );
 
 		await expect(
-			page.locator( 'data-testid=block-list-insertion-point-indicator' )
+			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
 		).toBeVisible();
+
+		const indicator = page.locator(
+			'data-testid=block-list-insertion-point-indicator'
+		);
+		await expect( indicator ).toBeVisible();
+		// Expect the indicator to be below the second paragraph.
+		await expect
+			.poll( () =>
+				indicator.boundingBox().then( ( { y, height } ) => y + height )
+			)
+			.toBeGreaterThan(
+				secondParagraphBound.y + secondParagraphBound.height
+			);
 
 		// Drop the paragraph block.
 		await page.mouse.up();
