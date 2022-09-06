@@ -302,10 +302,76 @@ function getWebpackEntryPoints() {
 	};
 }
 
+/**
+ * Returns the list of paths included in the `render` props by scanning the `block.json` files.
+ *
+ * @return {Array}  The list of all the `render` prop paths included in `block.json` files.
+ */
+function getRenderPropPaths() {
+	// Continue only if the source directory exists.
+	if ( ! hasProjectFile( process.env.WP_SRC_DIRECTORY ) ) {
+		log(
+			chalk.yellow(
+				`Source directory "${ process.env.WP_SRC_DIRECTORY }" was not found. Please confirm there is a "src" directory in the root or the value passed to --webpack-src-dir is correct.`
+			)
+		);
+		return {};
+	}
+
+	// Checks whether any block metadata files can be detected in the defined source directory.
+	const blockMetadataFiles = glob(
+		`${ process.env.WP_SRC_DIRECTORY }/**/block.json`,
+		{
+			absolute: true,
+		}
+	);
+
+	if ( blockMetadataFiles.length > 0 ) {
+		const srcDirectory = fromProjectRoot(
+			process.env.WP_SRC_DIRECTORY + sep
+		);
+
+		const renderPaths = [];
+		blockMetadataFiles.forEach( ( blockMetadataFile ) => {
+			const { render } = JSON.parse( readFileSync( blockMetadataFile ) );
+			if ( render && render.startsWith( 'file:' ) ) {
+				// Removes the `file:` prefix.
+				const filepath = join(
+					dirname( blockMetadataFile ),
+					render.replace( 'file:', '' )
+				);
+
+				// Takes the path without the file extension, and relative to the defined source directory.
+				if ( ! filepath.startsWith( srcDirectory ) ) {
+					log(
+						chalk.yellow(
+							`Skipping "${ render.replace(
+								'file:',
+								''
+							) }" listed in "${ blockMetadataFile.replace(
+								fromProjectRoot( sep ),
+								''
+							) }". File is located outside of the "${
+								process.env.WP_SRC_DIRECTORY
+							}" directory.`
+						)
+					);
+					return;
+				}
+				renderPaths.push( filepath );
+			}
+		} );
+		if ( Object.keys( renderPaths ).length > 0 ) {
+			return renderPaths;
+		}
+	}
+}
+
 module.exports = {
 	getJestOverrideConfigFile,
 	getWebpackArgs,
 	getWebpackEntryPoints,
+	getRenderPropPaths,
 	hasBabelConfig,
 	hasCssnanoConfig,
 	hasJestConfig,
