@@ -68,10 +68,12 @@ const BorderBoxControl = (
 
 	const [ popoverProps, setPopoverProps ] =
 		useState< BorderControlProps[ '__unstablePopoverProps' ] >();
-	const [ popoverAnchor, setPopoverAnchor ] = useState< Element >();
+	const [ popoverAnchor, setPopoverAnchor ] = useState< Element | null >(
+		null
+	);
 
 	const containerRef = useCallback( ( node ) => {
-		setPopoverAnchor( node ?? undefined );
+		setPopoverAnchor( node );
 	}, [] );
 
 	useEffect( () => {

@@ -125,7 +125,7 @@ function Tooltip( props ) {
 	const delayedSetIsOver = useDebounce( setIsOver, delay );
 	// Using internal state (instead of a ref) for the popover anchor to make sure
 	// that the component re-renders when the anchor updates.
-	const [ popoverAnchor, setPopoverAnchor ] = useState();
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 
 	// Create a reference to the Tooltip's child, to be passed to the Popover
 	// so that the Tooltip can be correctly positioned. Also, merge with the
@@ -257,8 +257,7 @@ function Tooltip( props ) {
 		: getRegularElement;
 
 	const popoverData = {
-		// `anchor` should never be `null`
-		anchor: popoverAnchor ?? undefined,
+		anchor: popoverAnchor,
 		isOver,
 		offset: 4,
 		position,

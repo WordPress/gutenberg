@@ -19,14 +19,13 @@ import { useMenuEntityProp, useSelectedMenuId } from '../../hooks';
 export default function MenuActions( { menus, isLoading } ) {
 	const [ selectedMenuId, setSelectedMenuId ] = useSelectedMenuId();
 	const [ menuName ] = useMenuEntityProp( 'name', selectedMenuId );
-	const [ popoverAnchor, setPopoverAnchor ] = useState();
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 
 	// The title ref is passed to the popover as the anchorRef so that the
 	// dropdown is centered over the whole title area rather than just one
 	// part of it.
 	const titleCallbackRef = useCallback( ( node ) => {
-		// The popover `anchor` prop can not be `null`.
-		setPopoverAnchor( node ?? undefined );
+		setPopoverAnchor( node );
 	}, [] );
 
 	if ( isLoading ) {

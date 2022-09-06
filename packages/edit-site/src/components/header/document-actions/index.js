@@ -75,12 +75,11 @@ export default function DocumentActions( {
 
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when then anchor's ref updates.
-	const [ popoverAnchor, setPopoverAnchor ] = useState();
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	const titleWrapperCallbackRef = useCallback( ( node ) => {
 		// Use the title wrapper as the popover anchor so that the dropdown is
 		// centered over the whole title area rather than just one part of it.
-		// Fall back to `undefined` in case the ref is `null`.
-		setPopoverAnchor( node ?? undefined );
+		setPopoverAnchor( node );
 	}, [] );
 
 	// Return a simple loading indicator until we have information to show.
@@ -135,9 +134,7 @@ export default function DocumentActions( {
 
 				{ dropdownContent && (
 					<Dropdown
-						popoverProps={ {
-							anchor: popoverAnchor,
-						} }
+						popoverProps={ { anchor: popoverAnchor } }
 						position="bottom center"
 						renderToggle={ ( { isOpen, onToggle } ) => (
 							<Button
