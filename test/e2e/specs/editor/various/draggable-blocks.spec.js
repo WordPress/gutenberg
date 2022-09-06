@@ -4,8 +4,15 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Draggable block', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, page } ) => {
 		await admin.createNewPost();
+		// Make the viewport large enough so that a scrollbar isn't displayed.
+		// Otherwise, the page scrolling can interfere with the test runner's
+		// ability to drop a block in the right location.
+		await page.setViewportSize( {
+			width: 960,
+			height: 1024,
+		} );
 	} );
 
 	test( 'can drag and drop to the top of a block list', async ( {
@@ -122,12 +129,12 @@ test.describe( 'Draggable block', () => {
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
 		await page.mouse.move(
-			secondParagraphBound.x,
+			secondParagraphBound.x + secondParagraphBound.height * 0.5,
 			secondParagraphBound.y + secondParagraphBound.height * 0.75
 		);
 		await secondParagraph.hover( {
 			position: {
-				x: 0,
+				x: secondParagraphBound.width * 0.75,
 				y: secondParagraphBound.height * 0.75,
 			},
 		} );
