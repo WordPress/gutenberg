@@ -17,7 +17,6 @@ import BlockPreview from '../block-preview';
 function InserterPreviewPanel( { item } ) {
 	const { name, title, icon, description, initialAttributes, example } = item;
 	const isReusable = isReusableBlock( item );
-
 	return (
 		<div className="block-editor-inserter__preview-container">
 			<div className="block-editor-inserter__preview">
