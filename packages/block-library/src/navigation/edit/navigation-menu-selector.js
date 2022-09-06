@@ -133,6 +133,8 @@ function NavigationMenuSelector( {
 			</>
 		),
 		isBusy: ! enableOptions,
+		disabled: ! enableOptions,
+		__experimentalIsFocusable: true,
 		onClick: () => {
 			setIsPressed( ! isPressed );
 		},
