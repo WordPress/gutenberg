@@ -67,7 +67,7 @@ export type UnitSelectControlProps = Pick< InputControlProps, 'size' > & {
 };
 
 export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
-	NumberControlProps & {
+	Omit< NumberControlProps, 'hideHTMLArrows' | 'suffix' | 'type' > & {
 		/**
 		 * If `true`, the unit `<select>` is hidden.
 		 *
