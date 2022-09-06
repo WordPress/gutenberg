@@ -27,7 +27,7 @@ import {
 	__experimentalLayoutStyle as LayoutStyle,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableIframe as Iframe,
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	__experimentalRecursionProvider as RecursionProvider,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { Button, __unstableMotion as motion } from '@wordpress/components';
@@ -175,22 +175,23 @@ export default function VisualEditor( { styles } ) {
 
 	const blockSelectionClearerRef = useBlockSelectionClearer();
 
-	const [ , RecursionProvider ] = useNoRecursiveRenders(
-		wrapperUniqueId,
-		wrapperBlockName
-	);
-
 	const layout = useMemo( () => {
 		if ( isTemplateMode ) {
 			return { type: 'default' };
 		}
 
 		if ( themeSupportsLayout ) {
-			return defaultLayout;
+			// We need to ensure support for wide and full alignments,
+			// so we add the constrained type.
+			return { ...defaultLayout, type: 'constrained' };
 		}
-
-		return undefined;
+		// Set default layout for classic themes so all alignments are supported.
+		return { type: 'default' };
 	}, [ isTemplateMode, themeSupportsLayout, defaultLayout ] );
+
+	const blockListLayoutClass = themeSupportsLayout
+		? 'is-layout-constrained'
+		: 'is-layout-flow';
 
 	const titleRef = useRef();
 	useEffect( () => {
@@ -248,7 +249,7 @@ export default function VisualEditor( { styles } ) {
 							! isTemplateMode && (
 								<LayoutStyle
 									selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
-									layout={ defaultLayout }
+									layout={ layout }
 									layoutDefinitions={
 										defaultLayout?.definitions
 									}
@@ -262,12 +263,15 @@ export default function VisualEditor( { styles } ) {
 								<PostTitle ref={ titleRef } />
 							</div>
 						) }
-						<RecursionProvider>
+						<RecursionProvider
+							blockName={ wrapperBlockName }
+							uniqueId={ wrapperUniqueId }
+						>
 							<BlockList
 								className={
 									isTemplateMode
 										? 'wp-site-blocks'
-										: 'is-layout-flow' // Ensure root level blocks receive default/flow blockGap styling rules.
+										: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
 								}
 								__experimentalLayout={ layout }
 							/>

@@ -16,7 +16,7 @@ You only need to install one npm module:
 npm install @wordpress/scripts --save-dev
 ```
 
-**Note**: This package requires Node.js 12.13.0 or later, and `npm` 6.9.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js 14.0.0 or later, and `npm` 6.14.4 or later. It is not compatible with older versions.
 
 ## Setup
 
@@ -410,8 +410,8 @@ This is how you execute those scripts using the presented setup:
 -   `npm run test:e2e:help` - prints all available options to configure e2e test runner.
 -   `npm run test-e2e -- --puppeteer-interactive` - runs all e2e tests interactively.
 -   `npm run test-e2e FILE_NAME -- --puppeteer-interactive` - runs one test file interactively.
--   `npm run test-e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
--   `npm run test-e2e:debug` - runs all tests interactively and enables [debugging tests](#debugging-e2e-tests).
+-   `npm run test:e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
+-   `npm run test:e2e:debug` - runs all tests interactively and enables [debugging tests](#debugging-e2e-tests).
 
 Jest will look for test files with any of the following popular naming conventions:
 

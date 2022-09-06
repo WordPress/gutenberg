@@ -77,6 +77,13 @@ export const PRESET_METADATA = [
 			{ classSuffix: 'font-family', propertyName: 'font-family' },
 		],
 	},
+	{
+		path: [ 'spacing', 'spacingSizes' ],
+		valueKey: 'size',
+		cssVarInfix: 'spacing',
+		valueFunc: ( { size } ) => size,
+		classes: [],
+	},
 ];
 
 const STYLE_PATH_TO_CSS_VAR_INFIX = {
@@ -85,6 +92,9 @@ const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'elements.link.color.text': 'color',
 	'elements.button.color.text': 'color',
 	'elements.button.backgroundColor': 'background-color',
+	'elements.heading.color': 'color',
+	'elements.heading.backgroundColor': 'background-color',
+	'elements.heading.gradient': 'gradient',
 	'color.gradient': 'gradient',
 	'typography.fontSize': 'font-size',
 	'typography.fontFamily': 'font-family',
@@ -192,7 +202,7 @@ function getValueFromPresetVariable(
 	}
 
 	const presetObject = findInPresetsBy(
-		features,
+		features.settings,
 		blockName,
 		metadata.path,
 		'slug',
@@ -210,8 +220,8 @@ function getValueFromPresetVariable(
 
 function getValueFromCustomVariable( features, blockName, variable, path ) {
 	const result =
-		get( features, [ 'blocks', blockName, 'custom', ...path ] ) ??
-		get( features, [ 'custom', ...path ] );
+		get( features.settings, [ 'blocks', blockName, 'custom', ...path ] ) ??
+		get( features.settings, [ 'custom', ...path ] );
 	if ( ! result ) {
 		return variable;
 	}
@@ -219,9 +229,27 @@ function getValueFromCustomVariable( features, blockName, variable, path ) {
 	return getValueFromVariable( features, blockName, result );
 }
 
+/**
+ * Attempts to fetch the value of a theme.json CSS variable.
+ *
+ * @param {Object}   features  GlobalStylesContext config, e.g., user, base or merged. Represents the theme.json tree.
+ * @param {string}   blockName The name of a block as represented in the styles property. E.g., 'root' for root-level, and 'core/${blockName}' for blocks.
+ * @param {string|*} variable  An incoming style value. A CSS var value is expected, but it could be any value.
+ * @return {string|*|{ref}} The value of the CSS var, if found. If not found, the passed variable argument.
+ */
 export function getValueFromVariable( features, blockName, variable ) {
 	if ( ! variable || typeof variable !== 'string' ) {
-		return variable;
+		if ( variable?.ref && typeof variable?.ref === 'string' ) {
+			const refPath = variable.ref.split( '.' );
+			variable = get( features, refPath );
+			// Presence of another ref indicates a reference to another dynamic value.
+			// Pointing to another dynamic value is not supported.
+			if ( ! variable || !! variable?.ref ) {
+				return variable;
+			}
+		} else {
+			return variable;
+		}
 	}
 	const USER_VALUE_PREFIX = 'var:';
 	const THEME_VALUE_PREFIX = 'var(--wp--';

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mapValues, forEach } from 'lodash';
+import { mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -293,10 +293,10 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 
 	function batch( callback ) {
 		emitter.pause();
-		forEach( stores, ( store ) => store.emitter.pause() );
+		Object.values( stores ).forEach( ( store ) => store.emitter.pause() );
 		callback();
 		emitter.resume();
-		forEach( stores, ( store ) => store.emitter.resume() );
+		Object.values( stores ).forEach( ( store ) => store.emitter.resume() );
 	}
 
 	let registry = {

@@ -21,7 +21,7 @@ import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import CopyContentMenuItem from './copy-content-menu-item';
 import ModeSwitcher from '../mode-switcher';
 
-export default function MoreMenu() {
+export default function MoreMenu( { showIconLabels } ) {
 	const [ isModalActive, toggleModal ] = useReducer(
 		( isActive ) => ! isActive,
 		false
@@ -36,7 +36,12 @@ export default function MoreMenu() {
 
 	return (
 		<>
-			<MoreMenuDropdown>
+			<MoreMenuDropdown
+				toggleProps={ {
+					showTooltip: ! showIconLabels,
+					...( showIconLabels && { variant: 'tertiary' } ),
+				} }
+			>
 				{ ( { onClose } ) => (
 					<>
 						<MenuGroup label={ _x( 'View', 'noun' ) }>

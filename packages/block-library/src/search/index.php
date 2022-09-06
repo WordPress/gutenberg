@@ -217,7 +217,7 @@ function apply_block_core_search_border_style( $attributes, $property, $side, &$
 	}
 
 	if ( 'color' === $property && $side ) {
-		$has_color_preset = strpos( $value, 'var:preset|color|' ) !== false;
+		$has_color_preset = str_contains( $value, 'var:preset|color|' );
 		if ( $has_color_preset ) {
 			$named_color_value = substr( $value, strrpos( $value, '|' ) + 1 );
 			$value             = sprintf( 'var(--wp--preset--color--%s)', $named_color_value );

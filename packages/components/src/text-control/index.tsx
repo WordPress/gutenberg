@@ -21,6 +21,7 @@ function UnforwardedTextControl(
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
+		__nextHasNoMarginBottom,
 		label,
 		hideLabelFromVision,
 		value,
@@ -37,6 +38,7 @@ function UnforwardedTextControl(
 
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }

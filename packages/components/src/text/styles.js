@@ -27,7 +27,7 @@ export const destructive = css`
 `;
 
 export const muted = css`
-	color: ${ COLORS.mediumGray.text };
+	color: ${ COLORS.gray[ 700 ] };
 `;
 
 export const highlighterText = css`

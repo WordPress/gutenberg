@@ -42,6 +42,31 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 	$layout_type   = isset( $layout['type'] ) ? $layout['type'] : 'default';
 	$layout_styles = array();
 	if ( 'default' === $layout_type ) {
+		if ( $has_block_gap_support ) {
+			if ( is_array( $gap_value ) ) {
+				$gap_value = isset( $gap_value['top'] ) ? $gap_value['top'] : null;
+			}
+			if ( null !== $gap_value && ! $should_skip_gap_serialization ) {
+				array_push(
+					$layout_styles,
+					array(
+						'selector'     => "$selector > *",
+						'declarations' => array(
+							'margin-block-start' => '0',
+							'margin-block-end'   => '0',
+						),
+					),
+					array(
+						'selector'     => "$selector$selector > * + *",
+						'declarations' => array(
+							'margin-block-start' => $gap_value,
+							'margin-block-end'   => '0',
+						),
+					)
+				);
+			}
+		}
+	} elseif ( 'constrained' === $layout_type ) {
 		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : '';
 		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : '';
 
@@ -104,7 +129,14 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			if ( is_array( $gap_value ) ) {
 				$gap_value = isset( $gap_value['top'] ) ? $gap_value['top'] : null;
 			}
-			if ( $gap_value && ! $should_skip_gap_serialization ) {
+			if ( null !== $gap_value && ! $should_skip_gap_serialization ) {
+				// Get spacing CSS variable from preset value if provided.
+				if ( is_string( $gap_value ) && str_contains( $gap_value, 'var:preset|spacing|' ) ) {
+					$index_to_splice = strrpos( $gap_value, '|' ) + 1;
+					$slug            = _wp_to_kebab_case( substr( $gap_value, $index_to_splice ) );
+					$gap_value       = "var(--wp--preset--spacing--$slug)";
+				}
+
 				array_push(
 					$layout_styles,
 					array(
@@ -115,7 +147,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 						),
 					),
 					array(
-						'selector'     => "$selector > * + *",
+						'selector'     => "$selector$selector > * + *",
 						'declarations' => array(
 							'margin-block-start' => $gap_value,
 							'margin-block-end'   => '0',
@@ -150,13 +182,23 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			);
 		}
 
-		if ( $has_block_gap_support ) {
-			if ( is_array( $gap_value ) ) {
-				$gap_row    = isset( $gap_value['top'] ) ? $gap_value['top'] : $fallback_gap_value;
-				$gap_column = isset( $gap_value['left'] ) ? $gap_value['left'] : $fallback_gap_value;
-				$gap_value  = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
+		if ( $has_block_gap_support && isset( $gap_value ) ) {
+			$combined_gap_value = '';
+			$gap_sides          = is_array( $gap_value ) ? array( 'top', 'left' ) : array( 'top' );
+
+			foreach ( $gap_sides as $gap_side ) {
+				$process_value = is_string( $gap_value ) ? $gap_value : _wp_array_get( $gap_value, array( $gap_side ), $fallback_gap_value );
+				// Get spacing CSS variable from preset value if provided.
+				if ( is_string( $process_value ) && str_contains( $process_value, 'var:preset|spacing|' ) ) {
+					$index_to_splice = strrpos( $process_value, '|' ) + 1;
+					$slug            = _wp_to_kebab_case( substr( $process_value, $index_to_splice ) );
+					$process_value   = "var(--wp--preset--spacing--$slug)";
+				}
+				$combined_gap_value .= "$process_value ";
 			}
-			if ( $gap_value && ! $should_skip_gap_serialization ) {
+			$gap_value = trim( $combined_gap_value );
+
+			if ( null !== $gap_value && ! $should_skip_gap_serialization ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
 					'declarations' => array( 'gap' => $gap_value ),
@@ -184,9 +226,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				);
 			}
 		} else {
-			$layout_styles[ $selector ] = array(
-				'flex-direction' => 'column',
-				'align-items'    => 'flex-start',
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'flex-direction' => 'column' ),
 			);
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
 				$layout_styles[] = array(
@@ -209,8 +251,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		return gutenberg_style_engine_get_stylesheet_from_css_rules(
 			$layout_styles,
 			array(
-				'context' => 'layout-block-supports',
-				'enqueue' => true,
+				'context' => 'block-supports',
 			)
 		);
 	}
@@ -238,11 +279,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$has_block_gap_support  = isset( $block_gap ) ? null !== $block_gap : false;
 	$default_block_layout   = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
 	$used_layout            = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
+
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
 		if ( ! $global_layout_settings ) {
 			return $block_content;
 		}
-		$used_layout = $global_layout_settings;
 	}
 
 	$class_names        = array();
@@ -250,9 +291,17 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_classname    = wp_get_block_default_classname( $block['blockName'] );
 	$container_class    = wp_unique_id( 'wp-container-' );
 	$layout_classname   = '';
-	$use_global_padding = gutenberg_get_global_settings( array( 'useRootPaddingAwareAlignments' ) ) && ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] );
 
-	if ( $use_global_padding ) {
+	// Set the correct layout type for blocks using legacy content width.
+	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] ) {
+		$used_layout['type'] = 'constrained';
+	}
+
+	if (
+		gutenberg_get_global_settings( array( 'useRootPaddingAwareAlignments' ) ) &&
+		isset( $used_layout['type'] ) &&
+		'constrained' === $used_layout['type']
+	) {
 		$class_names[] = 'has-global-padding';
 	}
 

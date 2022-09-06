@@ -463,3 +463,16 @@ where
 - `<link-color>` is either `var(--wp--preset--color--slug)` (if the user selected a preset value) or a raw color value (if the user selected a custom value)
 
 The block will get attached the class `.wp-elements-<uuid>`.
+
+## Appearance Tools
+
+Use this setting to enable the following Global Styles settings:
+
+- border: color, radius, style, width
+- color: link
+- spacing: blockGap, margin, padding
+- typography: lineHeight
+
+```php
+add_theme_support( 'appearance-tools' );
+```

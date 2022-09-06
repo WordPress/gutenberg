@@ -4,8 +4,6 @@
 import {
 	flow,
 	reduce,
-	first,
-	last,
 	omit,
 	without,
 	mapValues,
@@ -1004,13 +1002,10 @@ export const blocks = flow(
 
 			case 'MOVE_BLOCKS_UP': {
 				const { clientIds, rootClientId = '' } = action;
-				const firstClientId = first( clientIds );
+				const firstClientId = clientIds[ 0 ];
 				const subState = state[ rootClientId ];
 
-				if (
-					! subState.length ||
-					firstClientId === first( subState )
-				) {
+				if ( ! subState.length || firstClientId === subState[ 0 ] ) {
 					return state;
 				}
 
@@ -1029,11 +1024,14 @@ export const blocks = flow(
 
 			case 'MOVE_BLOCKS_DOWN': {
 				const { clientIds, rootClientId = '' } = action;
-				const firstClientId = first( clientIds );
-				const lastClientId = last( clientIds );
+				const firstClientId = clientIds[ 0 ];
+				const lastClientId = clientIds[ clientIds.length - 1 ];
 				const subState = state[ rootClientId ];
 
-				if ( ! subState.length || lastClientId === last( subState ) ) {
+				if (
+					! subState.length ||
+					lastClientId === subState[ subState.length - 1 ]
+				) {
 					return state;
 				}
 
@@ -1778,6 +1776,21 @@ export function lastBlockInserted( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the block that is eding temporarily edited as blocks.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function temporarilyEditingAsBlocks( state = '', action ) {
+	if ( action.type === 'SET_TEMPORARILY_EDITING_AS_BLOCKS' ) {
+		return action.temporarilyEditingAsBlocks;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1798,4 +1811,5 @@ export default combineReducers( {
 	automaticChangeStatus,
 	highlightedBlock,
 	lastBlockInserted,
+	temporarilyEditingAsBlocks,
 } );
