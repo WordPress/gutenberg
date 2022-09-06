@@ -51,20 +51,6 @@ render(
 
 The component accepts the following props. Props not included in this set will be applied to the element wrapping Popover content.
 
-### `__unstableSlotName`: `string`
-
-The name of the Slot in which the popover should be rendered. It should be also passed to the corresponding `PopoverSlot` component.
-
--   Required: No
--   Default: `"Popover"`
-
-### `__unstableShift`: `boolean`
-
-Enables the `Popover` to shift in order to stay in view when meeting the viewport edges.
-
--   Required: No
--   Default: `false`
-
 ### `anchorRect`: `DomRectWithOwnerDocument`
 
 An object extending a `DOMRect` with an additional optional `ownerDocument` property, used to specify a fixed popover position.
@@ -189,3 +175,9 @@ Adjusts the size of the popover to prevent its contents from going out of view w
 
 -   Required: No
 -   Default: `true`
+
+### `range`: `unknown`
+
+_Note: this prop is deprecated and has no effect on the component._
+
+-   Required: No
