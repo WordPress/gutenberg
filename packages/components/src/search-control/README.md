@@ -49,6 +49,7 @@ If this property is added, a specific placeholder will be used for the input.
 -   Type: `String`
 -   Required: No
 -   Default: `__( 'Search' )`
+
 #### value
 
 The current value of the input.
