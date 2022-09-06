@@ -16,6 +16,7 @@ export default {
 		prefix: { control: { type: 'text' } },
 		suffix: { control: { type: 'text' } },
 		type: { control: { type: 'text' } },
+		value: { control: null },
 	},
 };
 
