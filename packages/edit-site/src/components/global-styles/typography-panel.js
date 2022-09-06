@@ -10,9 +10,9 @@ import {
 import {
 	PanelBody,
 	FontSizePicker,
-	__experimentalSpacer as Spacer,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalGrid as Grid,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -144,96 +144,111 @@ export default function TypographyPanel( { name, element } ) {
 			>
 				Aa
 			</div>
-			{ element === 'heading' && (
-				<div>
-					<h4>{ __( 'Select heading level' ) }</h4>
-					<ToggleGroupControl
-						label={ __( 'Select heading level' ) }
-						hideLabelFromVision={ true }
-						value={ selectedLevel }
-						onChange={ setCurrentTab }
-						isBlock
-					>
-						<ToggleGroupControlOption
-							value="heading"
-							/* translators: 'All' refers to selecting all heading levels 
+			<Grid columns={ 2 } rowGap={ 16 } columnGap={ 8 }>
+				{ element === 'heading' && (
+					<div className="edit-site-typography-panel__full-width-control">
+						<ToggleGroupControl
+							label={ __( 'Select heading level' ) }
+							hideLabelFromVision
+							value={ selectedLevel }
+							onChange={ setCurrentTab }
+							isBlock
+							size="__unstable-large"
+							__nextHasNoMarginBottom
+						>
+							<ToggleGroupControlOption
+								value="heading"
+								/* translators: 'All' refers to selecting all heading levels 
 							and applying the same style to h1-h6. */
-							label={ __( 'All' ) }
+								label={ __( 'All' ) }
+							/>
+							<ToggleGroupControlOption
+								value="h1"
+								label={ __( 'H1' ) }
+							/>
+							<ToggleGroupControlOption
+								value="h2"
+								label={ __( 'H2' ) }
+							/>
+							<ToggleGroupControlOption
+								value="h3"
+								label={ __( 'H3' ) }
+							/>
+							<ToggleGroupControlOption
+								value="h4"
+								label={ __( 'H4' ) }
+							/>
+							<ToggleGroupControlOption
+								value="h5"
+								label={ __( 'H5' ) }
+							/>
+							<ToggleGroupControlOption
+								value="h6"
+								label={ __( 'H6' ) }
+							/>
+						</ToggleGroupControl>
+					</div>
+				) }
+				{ supports.includes( 'fontFamily' ) && (
+					<div className="edit-site-typography-panel__full-width-control">
+						<FontFamilyControl
+							fontFamilies={ fontFamilies }
+							value={ fontFamily }
+							onChange={ setFontFamily }
+							size="__unstable-large"
+							__nextHasNoMarginBottom
 						/>
-						<ToggleGroupControlOption
-							value="h1"
-							label={ __( 'H1' ) }
+					</div>
+				) }
+				{ hasFontSizeEnabled && (
+					<div className="edit-site-typography-panel__full-width-control">
+						<FontSizePicker
+							value={ fontSize }
+							onChange={ setFontSize }
+							fontSizes={ fontSizes }
+							disableCustomFontSizes={ disableCustomFontSizes }
+							size="__unstable-large"
+							__nextHasNoMarginBottom
 						/>
-						<ToggleGroupControlOption
-							value="h2"
-							label={ __( 'H2' ) }
-						/>
-						<ToggleGroupControlOption
-							value="h3"
-							label={ __( 'H3' ) }
-						/>
-						<ToggleGroupControlOption
-							value="h4"
-							label={ __( 'H4' ) }
-						/>
-						<ToggleGroupControlOption
-							value="h5"
-							label={ __( 'H5' ) }
-						/>
-						<ToggleGroupControlOption
-							value="h6"
-							label={ __( 'H6' ) }
-						/>
-					</ToggleGroupControl>
-				</div>
-			) }
-			{ supports.includes( 'fontFamily' ) && (
-				<FontFamilyControl
-					fontFamilies={ fontFamilies }
-					value={ fontFamily }
-					onChange={ setFontFamily }
-				/>
-			) }
-			{ hasFontSizeEnabled && (
-				<FontSizePicker
-					value={ fontSize }
-					onChange={ setFontSize }
-					fontSizes={ fontSizes }
-					disableCustomFontSizes={ disableCustomFontSizes }
-				/>
-			) }
-			{ hasLineHeightEnabled && (
-				<Spacer marginBottom={ 6 }>
+					</div>
+				) }
+				{ hasAppearanceControl && (
+					<FontAppearanceControl
+						value={ {
+							fontStyle,
+							fontWeight,
+						} }
+						onChange={ ( {
+							fontStyle: newFontStyle,
+							fontWeight: newFontWeight,
+						} ) => {
+							setFontStyle( newFontStyle );
+							setFontWeight( newFontWeight );
+						} }
+						hasFontStyles={ hasFontStyles }
+						hasFontWeights={ hasFontWeights }
+						size="__unstable-large"
+						__nextHasNoMarginBottom
+					/>
+				) }
+				{ hasLineHeightEnabled && (
 					<LineHeightControl
-						__nextHasNoMarginBottom={ true }
+						__nextHasNoMarginBottom
+						__unstableInputWidth="auto"
 						value={ lineHeight }
 						onChange={ setLineHeight }
+						size="__unstable-large"
 					/>
-				</Spacer>
-			) }
-			{ hasAppearanceControl && (
-				<FontAppearanceControl
-					value={ {
-						fontStyle,
-						fontWeight,
-					} }
-					onChange={ ( {
-						fontStyle: newFontStyle,
-						fontWeight: newFontWeight,
-					} ) => {
-						setFontStyle( newFontStyle );
-						setFontWeight( newFontWeight );
-					} }
-					hasFontStyles={ hasFontStyles }
-					hasFontWeights={ hasFontWeights }
-				/>
-			) }
-			{ hasLetterSpacingControl && (
-				<LetterSpacingControl
-					value={ letterSpacing }
-					onChange={ setLetterSpacing }
-				/>
-			) }
+				) }
+				{ hasLetterSpacingControl && (
+					<LetterSpacingControl
+						value={ letterSpacing }
+						onChange={ setLetterSpacing }
+						size="__unstable-large"
+						__unstableInputWidth="auto"
+					/>
+				) }
+			</Grid>
 		</PanelBody>
 	);
 }

@@ -80,7 +80,7 @@ function ListViewBlock( {
 		'__experimentalToolbar',
 		true
 	);
-	const { isLocked } = useBlockLock( clientId );
+	const { isLocked, isContentLocked } = useBlockLock( clientId );
 	const instanceId = useInstanceId( ListViewBlock );
 	const descriptionId = `list-view-block-select-button__${ instanceId }`;
 	const blockPositionDescription = getBlockPositionDescription(
@@ -210,7 +210,7 @@ function ListViewBlock( {
 			path={ path }
 			id={ `list-view-block-${ clientId }` }
 			data-block={ clientId }
-			isExpanded={ isExpanded }
+			isExpanded={ isContentLocked ? undefined : isExpanded }
 			aria-selected={ !! isSelected }
 		>
 			<TreeGridCell
@@ -219,7 +219,7 @@ function ListViewBlock( {
 				ref={ cellRef }
 				aria-label={ blockAriaLabel }
 				aria-selected={ !! isSelected }
-				aria-expanded={ isExpanded }
+				aria-expanded={ isContentLocked ? undefined : isExpanded }
 				aria-describedby={ descriptionId }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (

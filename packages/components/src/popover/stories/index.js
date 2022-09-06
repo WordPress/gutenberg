@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import { __unstableIframe as Iframe } from '@wordpress/block-editor';
 
 /**
@@ -73,9 +73,9 @@ export default {
 			options: AVAILABLE_POSITIONS,
 		},
 		__unstableSlotName: { control: { type: null } },
-		__unstableObserveElement: { control: { type: null } },
-		__unstableForcePosition: { control: { type: 'boolean' } },
-		__unstableShift: { control: { type: 'boolean' } },
+		resize: { control: { type: 'boolean' } },
+		flip: { control: { type: 'boolean' } },
+		shift: { control: { type: 'boolean' } },
 	},
 };
 
@@ -107,18 +107,29 @@ export const Default = ( args ) => {
 	const toggleVisible = () => {
 		setIsVisible( ( state ) => ! state );
 	};
+	const buttonRef = useRef();
+	useEffect( () => {
+		buttonRef.current?.scrollIntoView?.( {
+			block: 'center',
+			inline: 'center',
+		} );
+	}, [] );
 
 	return (
 		<div
 			style={ {
-				minWidth: '600px',
-				minHeight: '600px',
+				width: '300vw',
+				height: '300vh',
 				display: 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',
 			} }
 		>
-			<Button variant="secondary" onClick={ toggleVisible }>
+			<Button
+				variant="secondary"
+				onClick={ toggleVisible }
+				ref={ buttonRef }
+			>
 				Toggle Popover
 				{ isVisible && <Popover { ...args } /> }
 			</Button>
@@ -126,7 +137,14 @@ export const Default = ( args ) => {
 	);
 };
 Default.args = {
-	children: <>Popover&apos;s&nbsp;content</>,
+	children: (
+		<div style={ { width: '280px', whiteSpace: 'normal' } }>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+			eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+			ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+			aliquip ex ea commodo consequat.
+		</div>
+	),
 };
 
 /**
@@ -166,8 +184,16 @@ AllPlacements.parameters = {
 };
 AllPlacements.args = {
 	...Default.args,
+	children: (
+		<div style={ { width: '280px', whiteSpace: 'normal' } }>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+			eiusmod tempor incididunt ut labore et dolore magna aliqua.
+		</div>
+	),
 	noArrow: false,
 	offset: 10,
+	resize: false,
+	flip: false,
 };
 
 export const DynamicHeight = ( { children, ...args } ) => {
@@ -230,7 +256,9 @@ export const WithSlotOutsideIframe = ( args ) => {
 				<Iframe
 					style={ {
 						width: '100%',
-						height: '100%',
+						height: '400px',
+						border: '0',
+						outline: '1px solid purple',
 					} }
 				>
 					<div
@@ -244,7 +272,7 @@ export const WithSlotOutsideIframe = ( args ) => {
 								padding: '8px',
 								background: 'salmon',
 								maxWidth: '200px',
-								marginTop: '30px',
+								marginTop: '100px',
 								marginLeft: 'auto',
 								marginRight: 'auto',
 							} }

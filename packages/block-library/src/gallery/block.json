@@ -116,6 +116,11 @@
 				"blockGap": true
 			}
 		},
+		"color": {
+			"text": false,
+			"background": true,
+			"gradients": true
+		},
 		"__experimentalLayout": {
 			"allowSwitching": false,
 			"allowInheriting": false,

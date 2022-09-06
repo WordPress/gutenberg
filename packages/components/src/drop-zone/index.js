@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -60,12 +59,12 @@ export default function DropZoneComponent( {
 			 * From Windows Chrome 96, the `event.dataTransfer` returns both file object and HTML.
 			 * The order of the checks is important to recognise the HTML drop.
 			 */
-			if ( includes( event.dataTransfer.types, 'text/html' ) ) {
+			if ( event.dataTransfer.types.includes( 'text/html' ) ) {
 				_type = 'html';
 			} else if (
 				// Check for the types because sometimes the files themselves
 				// are only available on drop.
-				includes( event.dataTransfer.types, 'Files' ) ||
+				event.dataTransfer.types.includes( 'Files' ) ||
 				getFilesFromDataTransfer( event.dataTransfer ).length > 0
 			) {
 				_type = 'file';
