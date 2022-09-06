@@ -73,7 +73,7 @@ export type FocalPointPickerMediaProps = Pick<
 > & {
 	alt: string;
 	mediaRef?: Ref< any >;
-	onLoad?: ReactEventHandler< any >;
+	onLoad?: ReactEventHandler< HTMLVideoElement | HTMLImageElement >;
 	src: string;
 };
 
