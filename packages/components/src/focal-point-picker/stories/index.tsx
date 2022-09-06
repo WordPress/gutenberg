@@ -69,10 +69,8 @@ Snapping.args = {
 
 		const threshold = 0.05;
 
-		// @ts-expect-error: TODO: Is this parseFloat necessary?
-		let x = parseFloat( value.x );
-		// @ts-expect-error: TODO: Is this parseFloat necessary?
-		let y = parseFloat( value.y );
+		let x = value.x;
+		let y = value.y;
 
 		snapValues.x.forEach( ( snapValue ) => {
 			if ( snapValue - threshold < x && x < snapValue + threshold ) {

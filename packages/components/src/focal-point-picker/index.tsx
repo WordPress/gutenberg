@@ -190,10 +190,8 @@ export function FocalPointPicker( {
 			Math.round( n * 1e2 ) / 1e2;
 
 		return {
-			// @ts-expect-error: TODO: Is this parseFloat necessary?
-			x: roundToTwoDecimalPlaces( parseFloat( resolvedValue.x ) ),
-			// @ts-expect-error: TODO: Is this parseFloat necessary?
-			y: roundToTwoDecimalPlaces( parseFloat( resolvedValue.y ) ),
+			x: roundToTwoDecimalPlaces( resolvedValue.x ),
+			y: roundToTwoDecimalPlaces( resolvedValue.y ),
 		};
 	};
 
@@ -212,8 +210,7 @@ export function FocalPointPicker( {
 		const delta =
 			code === 'ArrowUp' || code === 'ArrowLeft' ? -1 * step : step;
 		const axis = code === 'ArrowUp' || code === 'ArrowDown' ? 'y' : 'x';
-		// @ts-expect-error: TODO: Is this parseFloat necessary?
-		value[ axis ] = parseFloat( value[ axis ] ) + delta;
+		value[ axis ] = value[ axis ] + delta;
 		onChange?.( getFinalValue( value ) );
 	};
 
