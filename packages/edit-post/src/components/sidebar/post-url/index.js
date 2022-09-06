@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { PanelRow, Dropdown, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -11,13 +11,16 @@ import {
 } from '@wordpress/editor';
 
 export default function PostURL() {
-	const anchorRef = useRef();
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when then anchor's ref updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+
 	return (
 		<PostURLCheck>
-			<PanelRow className="edit-post-post-url" ref={ anchorRef }>
+			<PanelRow className="edit-post-post-url" ref={ setPopoverAnchor }>
 				<span>{ __( 'URL' ) }</span>
 				<Dropdown
-					popoverProps={ { anchorRef } }
+					popoverProps={ { anchor: popoverAnchor } }
 					position="bottom left"
 					className="edit-post-post-url__dropdown"
 					contentClassName="edit-post-post-url__dialog"
