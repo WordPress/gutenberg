@@ -116,7 +116,7 @@ Specifying a `false` value disables the focus handling entirely (this should onl
 -   Required: No
 -   Default: `"firstElement"`
 
-### `onFocusOutside`: `( event: SyntheticEvent ) =>
+### `onFocusOutside`: `( event: SyntheticEvent ) => void`
 
 A callback invoked when the focus leaves the opened popover. This should only be provided in advanced use-cases when a popover should close under specific circumstances (for example, if the new `document.activeElement` is content of or otherwise controlling popover visibility).
 
