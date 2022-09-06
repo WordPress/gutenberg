@@ -37,7 +37,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 		$a_nice_processor->add_rules( array( $a_nice_css_rule, $a_nicer_css_rule ) );
 		$this->assertEquals(
 			'.a-nice-rule{color:var(--nice-color);background-color:purple;}.a-nicer-rule{font-family:Nice sans;font-size:1em;background-color:purple;}',
-			$a_nice_processor->get_css()
+			$a_nice_processor->get_css( array( 'prettify' => false ) )
 		);
 	}
 
@@ -109,7 +109,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 		$a_nice_renderer->add_store( $a_nice_store );
 		$this->assertEquals(
 			'.a-nice-rule{color:var(--nice-color);background-color:purple;}.a-nicer-rule{font-family:Nice sans;font-size:1em;background-color:purple;}',
-			$a_nice_renderer->get_css()
+			$a_nice_renderer->get_css( array( 'prettify' => false ) )
 		);
 	}
 
@@ -138,7 +138,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 		$an_excellent_processor->add_rules( $another_excellent_rule );
 		$this->assertEquals(
 			'.an-excellent-rule{color:var(--excellent-color);border-style:dotted;border-color:brown;}',
-			$an_excellent_processor->get_css()
+			$an_excellent_processor->get_css( array( 'prettify' => false ) )
 		);
 
 		$yet_another_excellent_rule = new WP_Style_Engine_CSS_Rule( '.an-excellent-rule' );
@@ -152,7 +152,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 		$an_excellent_processor->add_rules( $yet_another_excellent_rule );
 		$this->assertEquals(
 			'.an-excellent-rule{color:var(--excellent-color);border-style:dashed;border-color:brown;border-width:2px;}',
-			$an_excellent_processor->get_css()
+			$an_excellent_processor->get_css( array( 'prettify' => false ) )
 		);
 	}
 
@@ -189,7 +189,12 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			'.a-sweet-rule{color:var(--sweet-color);background-color:purple;}#an-even-sweeter-rule > marquee{color:var(--sweet-color);background-color:purple;}.the-sweetest-rule-of-all a{color:var(--sweet-color);background-color:purple;}',
-			$a_sweet_processor->get_css( array( 'optimize' => false ) )
+			$a_sweet_processor->get_css(
+				array(
+					'optimize' => false,
+					'prettify' => false,
+				)
+			)
 		);
 	}
 
@@ -218,7 +223,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			'.a-sweet-rule,#an-even-sweeter-rule > marquee{color:var(--sweet-color);background-color:purple;}',
-			$a_sweet_processor->get_css()
+			$a_sweet_processor->get_css( array( 'prettify' => false ) )
 		);
 	}
 		/**
@@ -240,7 +245,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			)
 		);
 		$a_lovely_processor->add_rules( $a_lovelier_rule );
-		$this->assertEquals( '.a-lovely-rule,.a-lovelier-rule{border-color:purple;}', $a_lovely_processor->get_css() );
+		$this->assertEquals( '.a-lovely-rule,.a-lovelier-rule{border-color:purple;}', $a_lovely_processor->get_css( array( 'prettify' => false ) ) );
 
 		$a_most_lovely_rule = new WP_Style_Engine_CSS_Rule(
 			'.a-most-lovely-rule',
@@ -260,7 +265,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			'.a-lovely-rule,.a-lovelier-rule,.a-most-lovely-rule,.a-perfectly-lovely-rule{border-color:purple;}',
-			$a_lovely_processor->get_css()
+			$a_lovely_processor->get_css( array( 'prettify' => false ) )
 		);
 	}
 }

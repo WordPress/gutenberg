@@ -103,7 +103,6 @@ describe( 'getToggleGroupOptions', () => {
 			{
 				slug: '5',
 				size: '5',
-				name: '5',
 			},
 		];
 		expect(
@@ -143,7 +142,7 @@ describe( 'getToggleGroupOptions', () => {
 				key: '5',
 				value: '5',
 				label: 'XXL',
-				name: '5',
+				name: 'XXL',
 			},
 		] );
 	} );

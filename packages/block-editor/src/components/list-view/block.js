@@ -67,15 +67,8 @@ function ListViewBlock( {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const { isContentLocked, blockName } = useSelect(
-		( select ) => {
-			const { getBlockName, getTemplateLock } =
-				select( blockEditorStore );
-			return {
-				blockName: getBlockName( clientId ),
-				isContentLocked: getTemplateLock( clientId ) === 'noContent',
-			};
-		},
+	const blockName = useSelect(
+		( select ) => select( blockEditorStore ).getBlockName( clientId ),
 		[ clientId ]
 	);
 
@@ -87,7 +80,7 @@ function ListViewBlock( {
 		'__experimentalToolbar',
 		true
 	);
-	const { isLocked } = useBlockLock( clientId );
+	const { isLocked, isContentLocked } = useBlockLock( clientId );
 	const instanceId = useInstanceId( ListViewBlock );
 	const descriptionId = `list-view-block-select-button__${ instanceId }`;
 	const blockPositionDescription = getBlockPositionDescription(

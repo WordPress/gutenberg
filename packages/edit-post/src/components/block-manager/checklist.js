@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { partial } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { BlockIcon } from '@wordpress/block-editor';
@@ -25,7 +20,9 @@ function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
 							</>
 						}
 						checked={ value.includes( blockType.name ) }
-						onChange={ partial( onItemChange, blockType.name ) }
+						onChange={ ( ...args ) =>
+							onItemChange( blockType.name, ...args )
+						}
 					/>
 				</li>
 			) ) }

@@ -1,16 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	first,
-	forEach,
-	get,
-	isEmpty,
-	kebabCase,
-	pickBy,
-	reduce,
-	set,
-} from 'lodash';
+import { get, isEmpty, kebabCase, pickBy, reduce, set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -208,7 +199,7 @@ export function getStylesDeclarations(
 				return declarations;
 			}
 			const pathToValue = value;
-			if ( first( pathToValue ) === 'elements' || useEngine ) {
+			if ( pathToValue[ 0 ] === 'elements' || useEngine ) {
 				return declarations;
 			}
 
@@ -457,7 +448,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 		} );
 	}
 
-	forEach( ELEMENTS, ( selector, name ) => {
+	Object.entries( ELEMENTS ).forEach( ( [ name, selector ] ) => {
 		if ( !! tree.styles?.elements[ name ] ) {
 			nodes.push( {
 				styles: tree.styles?.elements[ name ],
@@ -467,42 +458,53 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	} );
 
 	// Iterate over blocks: they can have styles & elements.
-	forEach( tree.styles?.blocks, ( node, blockName ) => {
-		const blockStyles = pickStyleKeys( node );
-		if ( !! blockStyles && !! blockSelectors?.[ blockName ]?.selector ) {
-			nodes.push( {
-				duotoneSelector: blockSelectors[ blockName ].duotoneSelector,
-				fallbackGapValue: blockSelectors[ blockName ].fallbackGapValue,
-				hasLayoutSupport: blockSelectors[ blockName ].hasLayoutSupport,
-				selector: blockSelectors[ blockName ].selector,
-				styles: blockStyles,
-				featureSelectors: blockSelectors[ blockName ].featureSelectors,
-			} );
-		}
-
-		forEach( node?.elements, ( value, elementName ) => {
+	Object.entries( tree.styles?.blocks ?? {} ).forEach(
+		( [ blockName, node ] ) => {
+			const blockStyles = pickStyleKeys( node );
 			if (
-				!! value &&
-				!! blockSelectors?.[ blockName ] &&
-				!! ELEMENTS?.[ elementName ]
+				!! blockStyles &&
+				!! blockSelectors?.[ blockName ]?.selector
 			) {
 				nodes.push( {
-					styles: value,
-					selector: blockSelectors[ blockName ].selector
-						.split( ',' )
-						.map( ( sel ) => {
-							const elementSelectors =
-								ELEMENTS[ elementName ].split( ',' );
-							return elementSelectors.map(
-								( elementSelector ) =>
-									sel + ' ' + elementSelector
-							);
-						} )
-						.join( ',' ),
+					duotoneSelector:
+						blockSelectors[ blockName ].duotoneSelector,
+					fallbackGapValue:
+						blockSelectors[ blockName ].fallbackGapValue,
+					hasLayoutSupport:
+						blockSelectors[ blockName ].hasLayoutSupport,
+					selector: blockSelectors[ blockName ].selector,
+					styles: blockStyles,
+					featureSelectors:
+						blockSelectors[ blockName ].featureSelectors,
 				} );
 			}
-		} );
-	} );
+
+			Object.entries( node?.elements ?? {} ).forEach(
+				( [ elementName, value ] ) => {
+					if (
+						!! value &&
+						!! blockSelectors?.[ blockName ] &&
+						!! ELEMENTS?.[ elementName ]
+					) {
+						nodes.push( {
+							styles: value,
+							selector: blockSelectors[ blockName ].selector
+								.split( ',' )
+								.map( ( sel ) => {
+									const elementSelectors =
+										ELEMENTS[ elementName ].split( ',' );
+									return elementSelectors.map(
+										( elementSelector ) =>
+											sel + ' ' + elementSelector
+									);
+								} )
+								.join( ',' ),
+						} );
+					}
+				}
+			);
+		}
+	);
 
 	return nodes;
 };
@@ -537,17 +539,19 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	}
 
 	// Blocks.
-	forEach( tree.settings?.blocks, ( node, blockName ) => {
-		const blockPresets = pickPresets( node );
-		const blockCustom = node.custom;
-		if ( ! isEmpty( blockPresets ) || !! blockCustom ) {
-			nodes.push( {
-				presets: blockPresets,
-				custom: blockCustom,
-				selector: blockSelectors[ blockName ].selector,
-			} );
+	Object.entries( tree.settings?.blocks ?? {} ).forEach(
+		( [ blockName, node ] ) => {
+			const blockPresets = pickPresets( node );
+			const blockCustom = node.custom;
+			if ( ! isEmpty( blockPresets ) || !! blockCustom ) {
+				nodes.push( {
+					presets: blockPresets,
+					custom: blockCustom,
+					selector: blockSelectors[ blockName ].selector,
+				} );
+			}
 		}
-	} );
+	);
 
 	return nodes;
 };

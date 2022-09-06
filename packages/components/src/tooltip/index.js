@@ -79,7 +79,7 @@ const addPopoverToGrandchildren = ( {
 				animate={ false }
 				offset={ offset }
 				anchorRef={ anchorRef }
-				__unstableShift
+				shift
 			>
 				{ text }
 				<Shortcut

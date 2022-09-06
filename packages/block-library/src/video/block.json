@@ -80,11 +80,6 @@
 		"spacing": {
 			"margin": true,
 			"padding": true
-		},
-		"__experimentalStyle": {
-			"spacing": {
-				"margin": "0 0 1em 0"
-			}
 		}
 	},
 	"editorStyle": "wp-block-video-editor",

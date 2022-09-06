@@ -107,7 +107,7 @@ export default function Form( {
 					offset={ 32 }
 					resize={ false }
 					flip={ false }
-					__unstableShift
+					shift
 				>
 					<div
 						ref={ ref }
