@@ -1,6 +1,6 @@
 # Dropdown
 
-Dropdown is a React component to render a button that opens a floating content modal when clicked. 
+Dropdown is a React component to render a button that opens a floating content modal when clicked.
 
 This component takes care of updating the state of the dropdown menu (opened/closed), handles closing the menu when clicking outside and uses render props to render the button and the content.
 
@@ -91,11 +91,13 @@ Set this to customize the text that is shown in the dropdown's header when it is
 
 ### focusOnMount
 
-By default, the _first tabbable element_ in the popover will receive focus when it mounts. This is the same as setting `focusOnMount` to `"firstElement"`. If you want to focus the container instead, you can set `focusOnMount` to `"container"`.
+By default, the _first tabbable element_ in the popover will receive focus when it mounts. This is the same as setting this prop to `"firstElement"`.
 
-Set this prop to `false` to disable focus switching entirely. This should only be set when an appropriately accessible substitute behavior exists.
+Specifying a `true` value will focus the container instead.
 
--   Type: `String` or `Boolean`
+Specifying a `false` value disables the focus handling entirely (this should only be done when an appropriately accessible substitute behavior exists).
+
+-   Type: `'firstElement' | boolean`
 -   Required: No
 -   Default: `"firstElement"`
 

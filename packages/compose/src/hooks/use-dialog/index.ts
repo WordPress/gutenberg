@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { KeyboardEvent, RefCallback, SyntheticEvent } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { useRef, useEffect, useCallback } from '@wordpress/element';
@@ -12,15 +17,26 @@ import useFocusOnMount from '../use-focus-on-mount';
 import useFocusReturn from '../use-focus-return';
 import useFocusOutside from '../use-focus-outside';
 import useMergeRefs from '../use-merge-refs';
+import type { FocusOutsideReturnValue } from '../use-focus-outside';
 
-/**
- * @typedef {import('../use-focus-on-mount').default} useFocusOnMount
- */
-/**
- * @typedef DialogOptions
- * @property {Parameters<useFocusOnMount>[0]} focusOnMount Focus on mount arguments.
- * @property {() => void}                     onClose      Function to call when the dialog is closed.
- */
+type DialogOptions = {
+	focusOnMount?: Parameters< typeof useFocusOnMount >[ 0 ];
+	onClose?: () => void;
+	/**
+	 * Use the `onClose` prop instead.
+	 *
+	 * @deprecated
+	 */
+	__unstableOnClose?: (
+		type: string | undefined,
+		event: SyntheticEvent
+	) => void;
+};
+
+type useDialogReturn = [
+	RefCallback< HTMLElement >,
+	FocusOutsideReturnValue & Pick< HTMLElement, 'tabIndex' >
+];
 
 /**
  * Returns a ref and props to apply to a dialog wrapper to enable the following behaviors:
@@ -29,13 +45,10 @@ import useMergeRefs from '../use-merge-refs';
  *  - return focus on unmount.
  *  - focus outside.
  *
- * @param {DialogOptions} options Dialog Options.
+ * @param  options Dialog Options.
  */
-function useDialog( options ) {
-	/**
-	 * @type {import('react').MutableRefObject<DialogOptions | undefined>}
-	 */
-	const currentOptions = useRef();
+function useDialog( options: DialogOptions ): useDialogReturn {
+	const currentOptions = useRef< DialogOptions | undefined >();
 	useEffect( () => {
 		currentOptions.current = options;
 	}, Object.values( options ) );
@@ -45,9 +58,7 @@ function useDialog( options ) {
 	const focusOutsideProps = useFocusOutside( ( event ) => {
 		// This unstable prop  is here only to manage backward compatibility
 		// for the Popover component otherwise, the onClose should be enough.
-		// @ts-ignore unstable property
 		if ( currentOptions.current?.__unstableOnClose ) {
-			// @ts-ignore unstable property
 			currentOptions.current.__unstableOnClose( 'focus-outside', event );
 		} else if ( currentOptions.current?.onClose ) {
 			currentOptions.current.onClose();
@@ -58,20 +69,17 @@ function useDialog( options ) {
 			return;
 		}
 
-		node.addEventListener(
-			'keydown',
-			( /** @type {KeyboardEvent} */ event ) => {
-				// Close on escape.
-				if (
-					event.keyCode === ESCAPE &&
-					! event.defaultPrevented &&
-					currentOptions.current?.onClose
-				) {
-					event.preventDefault();
-					currentOptions.current.onClose();
-				}
+		node.addEventListener( 'keydown', ( event: KeyboardEvent ) => {
+			// Close on escape.
+			if (
+				event.keyCode === ESCAPE &&
+				! event.defaultPrevented &&
+				currentOptions.current?.onClose
+			) {
+				event.preventDefault();
+				currentOptions.current.onClose();
 			}
-		);
+		} );
 	}, [] );
 
 	return [
@@ -83,7 +91,7 @@ function useDialog( options ) {
 		] ),
 		{
 			...focusOutsideProps,
-			tabIndex: '-1',
+			tabIndex: -1,
 		},
 	];
 }
