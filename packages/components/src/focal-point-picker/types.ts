@@ -46,7 +46,7 @@ export type FocalPointPickerProps = Pick<
 	 * Function which is called before internal updates to the value state.
 	 * It receives the upcoming value and may return a modified one.
 	 */
-	resolvePoint?: ( point: FocalPoint ) => FocalPoint | undefined;
+	resolvePoint?: ( point: FocalPoint ) => FocalPoint;
 	/**
 	 * URL of the image or video to be displayed.
 	 */
