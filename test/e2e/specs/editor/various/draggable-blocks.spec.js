@@ -3,16 +3,19 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+test.use( {
+	// Make the viewport large enough so that a scrollbar isn't displayed.
+	// Otherwise, the page scrolling can interfere with the test runner's
+	// ability to drop a block in the right location.
+	viewport: {
+		width: 960,
+		height: 1024,
+	},
+} );
+
 test.describe( 'Draggable block', () => {
-	test.beforeEach( async ( { admin, page } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
-		// Make the viewport large enough so that a scrollbar isn't displayed.
-		// Otherwise, the page scrolling can interfere with the test runner's
-		// ability to drop a block in the right location.
-		await page.setViewportSize( {
-			width: 960,
-			height: 1024,
-		} );
 	} );
 
 	test( 'can drag and drop to the top of a block list', async ( {
