@@ -25,6 +25,9 @@ export type SearchControlProps = Pick<
 	/**
 	 * When an `onClose` callback is provided, the search control will render a close button
 	 * that will trigger the given callback.
+	 *
+	 * Use this if you want the button to trigger your own logic to close the search field entirely,
+	 * rather than just clearing the input value.
 	 */
 	onClose?: () => void;
 	/**

@@ -18,7 +18,6 @@ const meta: ComponentMeta< typeof SearchControl > = {
 	component: SearchControl,
 	argTypes: {
 		onChange: { action: 'onChange' },
-		onClose: { action: 'onClose' },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -29,7 +28,6 @@ export default meta;
 
 const Template: ComponentStory< typeof SearchControl > = ( {
 	onChange,
-	onClose,
 	...props
 } ) => {
 	const [ value, setValue ] = useState< string >();
@@ -38,7 +36,6 @@ const Template: ComponentStory< typeof SearchControl > = ( {
 		<SearchControl
 			{ ...props }
 			value={ value }
-			onClose={ onClose }
 			onChange={ ( ...changeArgs ) => {
 				setValue( ...changeArgs );
 				onChange( ...changeArgs );
@@ -56,12 +53,14 @@ Default.args = {
 /**
  * When an `onClose` callback is provided, the search control will render a close button
  * that will trigger the given callback.
+ *
+ * Use this if you want the button to trigger your own logic to close the search field entirely,
+ * rather than just clearing the input value.
  */
 export const WithOnClose = Template.bind( {} );
 WithOnClose.args = {
 	...Default.args,
-	onClose: () => {
-		// eslint-disable-next-line no-alert
-		alert( 'The search was closed!' );
-	},
+};
+WithOnClose.argTypes = {
+	onClose: { action: 'onClose' },
 };
