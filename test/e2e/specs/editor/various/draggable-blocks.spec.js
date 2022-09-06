@@ -34,6 +34,7 @@ test.describe( 'Draggable block', () => {
 <p>2</p>
 <!-- /wp:paragraph -->` );
 
+		await page.focus( 'role=document[name="Paragraph block"i] >> text=2' );
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -90,7 +91,6 @@ test.describe( 'Draggable block', () => {
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
-		await page.keyboard.press( 'ArrowUp' );
 
 		// Confirm correct setup.
 		await expect.poll( editor.getEditedPostContent )
@@ -102,6 +102,7 @@ test.describe( 'Draggable block', () => {
 <p>2</p>
 <!-- /wp:paragraph -->` );
 
+		await page.focus( 'role=document[name="Paragraph block"i] >> text=1' );
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
