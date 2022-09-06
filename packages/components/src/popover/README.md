@@ -6,7 +6,9 @@ The behavior of the popover when it exceeds the viewport's edges can be controll
 
 ## Usage
 
-Render a Popover within the parent to which it should anchor:
+Render a Popover within the parent to which it should anchor.
+
+If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.
 
 ```jsx
 import { Button, Popover } from '@wordpress/components';
@@ -27,7 +29,36 @@ const MyPopover = () => {
 };
 ```
 
-If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.
+In order to pass an explicit anchor, you can use the `anchor` prop. When doing so, the anchor element should be stored in state rather than a plain ref to ensure reactive updating when it changes.
+
+```jsx
+import { Button, Popover } from '@wordpress/components';
+import { useState } from '@wordpress/element';
+
+const MyPopover = () => {
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the anchor's ref updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState();
+	const [ isVisible, setIsVisible ] = useState( false );
+	const toggleVisible = () => {
+		setIsVisible( ( state ) => ! state );
+	};
+
+	return (
+		<p ref={ setPopoverAnchor }>Popover s anchor</p>
+		<Button variant="secondary" onClick={ toggleVisible }>
+			Toggle Popover!
+		</Button>
+		{ isVisible && (
+			<Popover
+				anchor={ popoverAnchor }
+			>
+				Popover is toggled!
+			</Popover>
+		) }
+	);
+};
+```
 
 If you want Popover elements to render to a specific location on the page to allow style cascade to take effect, you must render a `Popover.Slot` further up the element tree:
 
@@ -54,6 +85,8 @@ The component accepts the following props. Props not included in this set will b
 ### `anchor`: `Element | VirtualElement`
 
 The element that should be used by the `Popover` as its anchor. It can either be an `Element` or, alternatively, a `VirtualElement` — ie. an object with the `getBoundingClientRect()` and the `ownerDocument` properties defined.
+
+The element should be stored in state rather than a plain ref to ensure reactive updating when it changes.
 
 -   Required: No
 
