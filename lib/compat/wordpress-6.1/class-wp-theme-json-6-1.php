@@ -968,7 +968,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string Style property value.
 	 */
 	protected static function get_property_value( $styles, $path, $theme_json = null ) {
-		$value = _wp_array_get( $styles, $path, '' );
+		$value = _wp_array_get( $styles, $path );
 
 		// This converts references to a path to the value at that path
 		// where the values is an array with a "ref" key, pointing to a path.
@@ -988,7 +988,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 		}
 
-		if ( '' === $value || is_array( $value ) ) {
+		if ( is_array( $value ) ) {
 			return $value;
 		}
 
