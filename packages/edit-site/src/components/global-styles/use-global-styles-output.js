@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { first, get, isEmpty, kebabCase, pickBy, reduce, set } from 'lodash';
+import { get, isEmpty, kebabCase, pickBy, reduce, set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -199,7 +199,7 @@ export function getStylesDeclarations(
 				return declarations;
 			}
 			const pathToValue = value;
-			if ( first( pathToValue ) === 'elements' || useEngine ) {
+			if ( pathToValue[ 0 ] === 'elements' || useEngine ) {
 				return declarations;
 			}
 
