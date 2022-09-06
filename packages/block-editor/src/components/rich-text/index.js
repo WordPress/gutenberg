@@ -354,7 +354,7 @@ function RichTextWrapper(
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
-					anchorRef={ anchorRef }
+					editableContentRef={ anchorRef }
 					value={ value }
 				/>
 			) }

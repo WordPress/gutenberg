@@ -35,7 +35,7 @@ export function getAutoCompleterUI( autocompleter ) {
 		contentRef,
 	} ) {
 		const [ items ] = useItems( filterValue );
-		const anchorRef = useAnchorRef( { ref: contentRef, value } );
+		const popoverAnchor = useAnchorRef( { ref: contentRef, value } );
 
 		useLayoutEffect( () => {
 			onChangeOptions( items );
@@ -54,7 +54,7 @@ export function getAutoCompleterUI( autocompleter ) {
 				onClose={ onReset }
 				position="top right"
 				className="components-autocomplete__popover"
-				anchorRef={ anchorRef }
+				anchor={ popoverAnchor }
 			>
 				<div
 					id={ listBoxId }
