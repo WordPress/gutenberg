@@ -8,6 +8,7 @@
 
 ### Internal
 - Move backend scripts to package ([#39736](https://github.com/WordPress/gutenberg/pull/39736)).
+- Updating docs, formatting, and separating global functions from the main class file ([#43840](https://github.com/WordPress/gutenberg/pull/43840)).
 
 ### New Feature
 - Add a WP_Style_Engine_Processor object ([#42463](https://github.com/WordPress/gutenberg/pull/42463)).
