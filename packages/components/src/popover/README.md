@@ -188,7 +188,7 @@ The element that should be used by the `Popover` as its anchor. It can either be
 
 The element should be stored in state rather than a plain ref to ensure reactive updating when it changes.
 
--   Type: `Element | VirtualElement`
+-   Type: `Element | VirtualElement | null`
 -   Required: No
 
 ### anchorRect
