@@ -96,7 +96,7 @@ export default function PostTemplateEdit( {
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
 
 	let categorySlug = null;
-	if ( templateSlug.startsWith( 'category-' ) ) {
+	if ( templateSlug?.startsWith( 'category-' ) ) {
 		categorySlug = templateSlug.replace( 'category-', '' );
 	}
 	const { records: categories, hasResolved: hasResolvedCategories } =
@@ -199,6 +199,8 @@ export default function PostTemplateEdit( {
 			taxQuery,
 			parents,
 			previewPostType,
+			categories,
+			categorySlug,
 			hasResolvedCategories,
 		]
 	);
