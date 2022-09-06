@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useState, useEffect } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -38,28 +38,26 @@ const BorderBoxControlSplitControls = (
 		...otherProps
 	} = useBorderBoxControlSplitControls( props );
 
-	const [ popoverProps, setPopoverProps ] =
-		useState< BorderControlProps[ '__unstablePopoverProps' ] >();
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState< Element | null >(
 		null
 	);
 
-	const containerRef = useCallback( ( node ) => {
-		setPopoverAnchor( node );
-	}, [] );
-
-	useEffect( () => {
-		if ( popoverPlacement ) {
-			setPopoverProps( {
-				placement: popoverPlacement,
-				offset: popoverOffset,
-				anchor: popoverAnchor,
-				shift: true,
-			} );
-		} else {
-			setPopoverProps( undefined );
-		}
-	}, [ popoverPlacement, popoverOffset, popoverAnchor ] );
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps: BorderControlProps[ '__unstablePopoverProps' ] =
+		useMemo(
+			() =>
+				popoverPlacement
+					? {
+							placement: popoverPlacement,
+							offset: popoverOffset,
+							anchor: popoverAnchor,
+							shift: true,
+					  }
+					: undefined,
+			[ popoverPlacement, popoverOffset, popoverAnchor ]
+		);
 
 	const sharedBorderControlProps = {
 		colors,
@@ -72,7 +70,7 @@ const BorderBoxControlSplitControls = (
 		__next36pxDefaultSize,
 	};
 
-	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
+	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
 
 	return (
 		<Grid { ...otherProps } ref={ mergedRef } gap={ 4 }>

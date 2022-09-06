@@ -37,7 +37,7 @@ import { useState } from '@wordpress/element';
 
 const MyPopover = () => {
 	// Use internal state instead of a ref to make sure that the component
-	// re-renders when the anchor's ref updates.
+	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState();
 	const [ isVisible, setIsVisible ] = useState( false );
 	const toggleVisible = () => {

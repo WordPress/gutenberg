@@ -7,7 +7,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useRef, useEffect, useState, useMemo } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -42,6 +43,10 @@ export default function Dropdown( props ) {
 		onToggle,
 		style,
 	} = props;
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
+		useState( null );
 	const containerRef = useRef();
 	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
 
@@ -83,7 +88,7 @@ export default function Dropdown( props ) {
 	}
 
 	const args = { isOpen, onToggle: toggle, onClose: close };
-	const hasPopoverAnchor =
+	const popoverPropsHaveAnchor =
 		!! popoverProps?.anchor ||
 		// Note: `anchorRef`, `getAnchorRect` and `anchorRect` are deprecated and
 		// be removed from `Popover` from WordPress 6.3
@@ -94,7 +99,7 @@ export default function Dropdown( props ) {
 	return (
 		<div
 			className={ classnames( 'components-dropdown', className ) }
-			ref={ containerRef }
+			ref={ useMergeRefs( [ setFallbackPopoverAnchor, containerRef ] ) }
 			// Some UAs focus the closest focusable parent when the toggle is
 			// clicked. Making this div focusable ensures such UAs will focus
 			// it and `closeIfFocusOutside` can tell if the toggle was clicked.
@@ -114,7 +119,9 @@ export default function Dropdown( props ) {
 					// align with the editor header by default.
 					offset={ 13 }
 					anchor={
-						! hasPopoverAnchor ? containerRef.current : undefined
+						! popoverPropsHaveAnchor
+							? fallbackPopoverAnchor
+							: undefined
 					}
 					{ ...popoverProps }
 					className={ classnames(
