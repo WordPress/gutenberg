@@ -16,7 +16,7 @@ import { isRTL } from '@wordpress/i18n';
 import { Input } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import { add, subtract, roundClamp } from '../utils/math';
-import { isValueEmpty } from '../utils/values';
+import { ensureNumber, isValueEmpty } from '../utils/values';
 import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 import type { NumberControlProps } from './types';
 import type { InputState } from '../input-control/reducer/state';
@@ -42,8 +42,7 @@ function UnforwardedNumberControl(
 	ref: ForwardedRef< any >
 ) {
 	const isStepAny = step === 'any';
-	// @ts-expect-error step should be a number but could be string
-	const baseStep = isStepAny ? 1 : parseFloat( step );
+	const baseStep = isStepAny ? 1 : ensureNumber( step );
 	const baseValue = roundClamp( 0, min, max, baseStep );
 	const constrainValue = ( value: number, stepOverride?: number ) => {
 		// When step is "any" clamp the value, otherwise round and clamp it.
@@ -85,8 +84,7 @@ function UnforwardedNumberControl(
 			const enableShift = event.shiftKey && isShiftStepEnabled;
 
 			const incrementalValue = enableShift
-				? // @ts-expect-error shiftStep should be a number but could be string
-				  parseFloat( shiftStep ) * baseStep
+				? ensureNumber( shiftStep ) * baseStep
 				: baseStep;
 			let nextValue = isValueEmpty( currentValue )
 				? baseValue
@@ -123,8 +121,7 @@ function UnforwardedNumberControl(
 			// @ts-expect-error TODO: Investigate
 			const enableShift = payload.shiftKey && isShiftStepEnabled;
 			const modifier = enableShift
-				? // @ts-expect-error shiftStep should be a number but could be string
-				  parseFloat( shiftStep ) * baseStep
+				? ensureNumber( shiftStep ) * baseStep
 				: baseStep;
 
 			let directionModifier;
