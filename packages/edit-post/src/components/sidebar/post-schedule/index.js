@@ -13,7 +13,7 @@ import {
 export default function PostSchedule() {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the anchor's ref updates.
-	const [ popoverAnchor, setPopoverAnchor ] = useState();
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 
 	return (
 		<PostScheduleCheck>
@@ -23,10 +23,7 @@ export default function PostSchedule() {
 			>
 				<span>{ __( 'Publish' ) }</span>
 				<Dropdown
-					popoverProps={ {
-						// `anchor` can not be `null`
-						anchor: popoverAnchor ?? undefined,
-					} }
+					popoverProps={ { anchor: popoverAnchor } }
 					position="bottom left"
 					contentClassName="edit-post-post-schedule__dialog"
 					focusOnMount

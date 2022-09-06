@@ -17,7 +17,7 @@ import { store as editPostStore } from '../../../store';
 export default function PostTemplate() {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when then anchor's ref updates.
-	const [ popoverAnchor, setPopoverAnchor ] = useState();
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 
 	const isVisible = useSelect( ( select ) => {
 		const postTypeSlug = select( editorStore ).getCurrentPostType();
@@ -51,10 +51,7 @@ export default function PostTemplate() {
 		<PanelRow className="edit-post-post-template" ref={ setPopoverAnchor }>
 			<span>{ __( 'Template' ) }</span>
 			<Dropdown
-				popoverProps={ {
-					// `anchor` can not be `null`
-					anchor: popoverAnchor ?? undefined,
-				} }
+				popoverProps={ { anchor: popoverAnchor } }
 				position="bottom left"
 				className="edit-post-post-template__dropdown"
 				contentClassName="edit-post-post-template__dialog"
