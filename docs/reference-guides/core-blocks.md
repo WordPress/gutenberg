@@ -77,7 +77,7 @@ Display a list of all categories. ([Source](https://github.com/WordPress/gutenbe
 
 -	**Name:** core/categories
 -	**Category:** widgets
--	**Supports:** align, typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** displayAsDropdown, showEmpty, showHierarchy, showOnlyTopLevel, showPostCounts
 
 ## Code
