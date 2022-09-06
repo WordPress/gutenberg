@@ -75,8 +75,9 @@ function UnforwardedNumberControl(
 				type === inputControlActionTypes.PRESS_UP ||
 				type === inputControlActionTypes.PRESS_DOWN
 			) {
-				// @ts-expect-error TODO: Investigate if this is wrong
-				const enableShift = event.shiftKey && isShiftStepEnabled;
+				const enableShift =
+					( event as KeyboardEvent | undefined )?.shiftKey &&
+					isShiftStepEnabled;
 
 				const incrementalValue = enableShift
 					? ensureNumber( shiftStep ) * baseStep
