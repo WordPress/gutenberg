@@ -112,7 +112,7 @@ function Placeholder( { clientId, name, setAttributes } ) {
 					updateSelection( clientId );
 				} }
 				instructions={ __( 'Group blocks together. Select a layout:' ) }
-				allowSkip={ false }
+				allowSkip
 			/>
 		</div>
 	);
