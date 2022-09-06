@@ -71,7 +71,7 @@ export type PopoverProps = {
 	 */
 	flip?: boolean;
 	/**
-	 * By default, the _first tabblable element_ in the popover will receive focus
+	 * By default, the _first tabbable element_ in the popover will receive focus
 	 * when it mounts. This is the same as setting this prop to `"firstElement"`.
 	 * Specifying a `false` value disables the focus handling entirely (this
 	 * should only be done when an appropriately accessible substitute behavior
