@@ -80,5 +80,5 @@ export type FocalPointPickerMediaProps = Pick<
 export type FocalPointProps = {
 	isDragging: boolean;
 	left: CSSProperties[ 'left' ];
-	top: CSSProperties[ 'left' ];
+	top: CSSProperties[ 'top' ];
 };
