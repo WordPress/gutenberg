@@ -28,7 +28,11 @@ import BlockStylesMenu from './block-styles-menu';
 import PatternTransformationsMenu from './pattern-transformations-menu';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
-export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
+export const BlockSwitcherDropdownMenu = ( {
+	clientIds,
+	blocks,
+	showIconLabels,
+} ) => {
 	const { replaceBlocks, multiSelect } = useDispatch( blockEditorStore );
 	const blockInformation = useBlockDisplayInformation( blocks[ 0 ].clientId );
 	const {
@@ -192,6 +196,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 						}
 						toggleProps={ {
 							describedBy: blockSwitcherDescription,
+							showTooltip: ! showIconLabels,
 							...toggleProps,
 						} }
 						menuProps={ { orientation: 'both' } }
@@ -242,7 +247,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	);
 };
 
-export const BlockSwitcher = ( { clientIds } ) => {
+export const BlockSwitcher = ( { clientIds, showIconLabels } ) => {
 	const blocks = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getBlocksByClientId( clientIds ),
@@ -254,7 +259,11 @@ export const BlockSwitcher = ( { clientIds } ) => {
 	}
 
 	return (
-		<BlockSwitcherDropdownMenu clientIds={ clientIds } blocks={ blocks } />
+		<BlockSwitcherDropdownMenu
+			clientIds={ clientIds }
+			blocks={ blocks }
+			showIconLabels={ showIconLabels }
+		/>
 	);
 };
 
