@@ -84,6 +84,8 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
  * @param array<string> $options array(
  *     'context' => (string|null) An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.
  *                  When set, the style engine will attempt to store the CSS rules.
+ *    'optimize' => (boolean) Whether to optimize the CSS output, e.g., combine rules.
+ *    'prettify' => (boolean) Whether to add new lines to output.
  * );.
  *
  * @return string A compiled CSS string.
@@ -117,7 +119,7 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
 		return '';
 	}
 
-	return WP_Style_Engine::compile_stylesheet_from_css_rules( $css_rule_objects );
+	return WP_Style_Engine::compile_stylesheet_from_css_rules( $css_rule_objects, $options );
 }
 
 /**
@@ -126,13 +128,17 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
  * @access public
  *
  * @param string $store_name A valid store name.
+ * @param array  $options    array(
+ *    'optimize' => (boolean) Whether to optimize the CSS output, e.g., combine rules.
+ *    'prettify' => (boolean) Whether to add new lines to output.
+ * );.
  *
  * @return string A compiled CSS string.
  */
-function wp_style_engine_get_stylesheet_from_context( $store_name ) {
+function wp_style_engine_get_stylesheet_from_context( $store_name, $options = array() ) {
 	if ( ! class_exists( 'WP_Style_Engine' ) || empty( $store_name ) ) {
 		return '';
 	}
 
-	return WP_Style_Engine::compile_stylesheet_from_css_rules( WP_Style_Engine::get_store( $store_name )->get_all_rules() );
+	return WP_Style_Engine::compile_stylesheet_from_css_rules( WP_Style_Engine::get_store( $store_name )->get_all_rules(), $options );
 }
