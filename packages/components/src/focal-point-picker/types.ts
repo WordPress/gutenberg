@@ -25,7 +25,7 @@ export type FocalPointPickerProps = Pick<
 	 *
 	 * @default true
 	 */
-	autoPlay?: boolean;
+	autoPlay?: FocalPointPickerMediaProps[ 'autoPlay' ];
 	/**
 	 * Callback which is called when the focal point changes.
 	 */
@@ -50,7 +50,7 @@ export type FocalPointPickerProps = Pick<
 	/**
 	 * URL of the image or video to be displayed.
 	 */
-	url: string;
+	url: FocalPointPickerMediaProps[ 'src' ];
 	/**
 	 * The focal point. Should be an object containing `x` and `y` params.
 	 */
