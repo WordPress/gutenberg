@@ -48,8 +48,13 @@ test.describe( 'Draggable block', () => {
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
 		).toBeVisible();
 
-		// Hover on the upper half of the paragraph block to trigger the indicator.
-		await page.hover( 'role=document[name="Paragraph block"i] >> text=1', {
+		// Move to and hover on the upper half of the paragraph block to trigger the indicator.
+		const firstParagraph = page.locator(
+			'role=document[name="Paragraph block"i] >> text=1'
+		);
+		const firstParagraphBound = await firstParagraph.boundingBox();
+		await page.mouse.move( firstParagraphBound.x, firstParagraphBound.y );
+		await firstParagraph.hover( {
 			position: { x: 0, y: 0 },
 		} );
 
@@ -111,13 +116,15 @@ test.describe( 'Draggable block', () => {
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
 		).toBeVisible();
 
-		// Hover on the upper half of the paragraph block to trigger the indicator.
+		// Move to and hover on the bottom half of the paragraph block to trigger the indicator.
 		const secondParagraph = page.locator(
 			'role=document[name="Paragraph block"i] >> text=2'
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
-
-		// Hover on the bottom half of the paragraph block to trigger the indicator.
+		await page.mouse.move(
+			secondParagraphBound.x,
+			secondParagraphBound.y + secondParagraphBound.height * 0.75
+		);
 		await secondParagraph.hover( {
 			position: {
 				x: 0,
@@ -125,9 +132,9 @@ test.describe( 'Draggable block', () => {
 			},
 		} );
 
-		// await expect(
-		// 	page.locator( 'data-testid=block-list-insertion-point-indicator' )
-		// ).toBeVisible();
+		await expect(
+			page.locator( 'data-testid=block-list-insertion-point-indicator' )
+		).toBeVisible();
 
 		// Drop the paragraph block.
 		await page.mouse.up();
