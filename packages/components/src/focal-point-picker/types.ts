@@ -38,10 +38,7 @@ export type FocalPointPickerProps = Pick<
 	/**
 	 * Callback which is called at the start of drag operations.
 	 */
-	onDragStart?: (
-		value: FocalPoint,
-		event: React.MouseEvent< Element, MouseEvent >
-	) => void;
+	onDragStart?: ( value: FocalPoint, event: React.MouseEvent ) => void;
 	/**
 	 * Function which is called before internal updates to the value state.
 	 * It receives the upcoming value and may return a modified one.
