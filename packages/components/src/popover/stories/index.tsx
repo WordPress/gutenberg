@@ -39,6 +39,7 @@ const meta: ComponentMeta< typeof Popover > = {
 	argTypes: {
 		anchorRef: { control: { type: null } },
 		anchorRect: { control: { type: null } },
+		children: { control: { type: null } },
 		focusOnMount: {
 			control: { type: 'select' },
 			options: [ 'firstElement', true, false ],
