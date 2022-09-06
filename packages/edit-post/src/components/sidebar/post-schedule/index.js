@@ -12,7 +12,7 @@ import {
 
 export default function PostSchedule() {
 	// Use internal state instead of a ref to make sure that the component
-	// re-renders when then anchor's ref updates.
+	// re-renders when the anchor's ref updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState();
 
 	return (
