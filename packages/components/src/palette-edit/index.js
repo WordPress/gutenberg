@@ -229,7 +229,7 @@ function PaletteEditListView( {
 				onChange( newElements.length ? newElements : undefined );
 			}
 		};
-	}, [] );
+	}, [ onChange, slugPrefix ] );
 
 	const debounceOnChange = useDebounce( onChange, 100 );
 
