@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
-	UnitControl as BaseUnitControl,
+	StyledUnitControl,
 	ControlWrapper,
 } from './styles/focal-point-picker-style';
 import { fractionToPercentage } from './utils';
@@ -46,7 +46,7 @@ export default function FocalPointPickerControls( {
 
 	return (
 		<ControlWrapper className="focal-point-picker__controls">
-			<UnitControl
+			<FocalPointUnitControl
 				label={ __( 'Left' ) }
 				value={ [ valueX, '%' ].join( '' ) }
 				onChange={
@@ -58,7 +58,7 @@ export default function FocalPointPickerControls( {
 				}
 				dragDirection="e"
 			/>
-			<UnitControl
+			<FocalPointUnitControl
 				label={ __( 'Top' ) }
 				value={ [ valueY, '%' ].join( '' ) }
 				onChange={
@@ -74,9 +74,9 @@ export default function FocalPointPickerControls( {
 	);
 }
 
-function UnitControl( props: UnitControlProps ) {
+function FocalPointUnitControl( props: UnitControlProps ) {
 	return (
-		<BaseUnitControl
+		<StyledUnitControl
 			className="focal-point-picker__controls-position-unit-control"
 			labelPosition="top"
 			max={ TEXTCONTROL_MAX }

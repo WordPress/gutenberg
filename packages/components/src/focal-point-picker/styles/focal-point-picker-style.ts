@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { Flex } from '../../flex';
-import BaseUnitControl from '../../unit-control';
+import UnitControl from '../../unit-control';
 import { COLORS } from '../../utils';
 import { INITIAL_BOUNDS } from '../utils';
 
@@ -50,7 +50,7 @@ export const MediaPlaceholder = styled.div`
 	width: 100%;
 `;
 
-export const UnitControl = styled( BaseUnitControl )`
+export const StyledUnitControl = styled( UnitControl )`
 	width: 100px;
 `;
 
