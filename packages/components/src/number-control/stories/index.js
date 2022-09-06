@@ -14,6 +14,7 @@ export default {
 	argTypes: {
 		onChange: { action: 'onChange' },
 		prefix: { control: { type: 'text' } },
+		step: { control: { type: 'text' } },
 		suffix: { control: { type: 'text' } },
 		type: { control: { type: 'text' } },
 		value: { control: null },
