@@ -82,7 +82,7 @@ render(
 
 The component accepts the following props. Props not included in this set will be applied to the element wrapping Popover content.
 
-### `anchor`: `Element | VirtualElement`
+### `anchor`: `Element | VirtualElement | null`
 
 The element that should be used by the `Popover` as its anchor. It can either be an `Element` or, alternatively, a `VirtualElement` — ie. an object with the `getBoundingClientRect()` and the `ownerDocument` properties defined.
 
