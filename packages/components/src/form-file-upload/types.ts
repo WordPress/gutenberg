@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentProps, InputHTMLAttributes } from 'react';
+import type { ComponentProps, InputHTMLAttributes, ReactNode } from 'react';
 
 /**
  * Internal dependencies
  */
-import type { Button } from '../button';
 import type Icon from '../icon';
 
+// TODO: Replace `children` and `icon` types with props from Button once Button is typed.
 export type FormFileUploadProps = {
 	/**
 	 * A string passed to `input` element that tells the browser which file types can be
@@ -20,7 +20,7 @@ export type FormFileUploadProps = {
 	/**
 	 * Children are passed as children of `Button`.
 	 */
-	children?: ComponentProps< typeof Button >[ 'children' ];
+	children?: ReactNode;
 	/**
 	 * The icon to render in the `Button`.
 	 */
