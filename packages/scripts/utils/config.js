@@ -315,7 +315,7 @@ function getRenderPropPaths() {
 				`Source directory "${ process.env.WP_SRC_DIRECTORY }" was not found. Please confirm there is a "src" directory in the root or the value passed to --webpack-src-dir is correct.`
 			)
 		);
-		return {};
+		return [];
 	}
 
 	// Checks whether any block metadata files can be detected in the defined source directory.
@@ -326,45 +326,40 @@ function getRenderPropPaths() {
 		}
 	);
 
-	if ( blockMetadataFiles.length > 0 ) {
-		const srcDirectory = fromProjectRoot(
-			process.env.WP_SRC_DIRECTORY + sep
-		);
+	const srcDirectory = fromProjectRoot( process.env.WP_SRC_DIRECTORY + sep );
 
-		const renderPaths = [];
-		blockMetadataFiles.forEach( ( blockMetadataFile ) => {
-			const { render } = JSON.parse( readFileSync( blockMetadataFile ) );
-			if ( render && render.startsWith( 'file:' ) ) {
-				// Removes the `file:` prefix.
-				const filepath = join(
-					dirname( blockMetadataFile ),
-					render.replace( 'file:', '' )
+	const renderPaths = blockMetadataFiles.map( ( blockMetadataFile ) => {
+		const { render } = JSON.parse( readFileSync( blockMetadataFile ) );
+		if ( render && render.startsWith( 'file:' ) ) {
+			// Removes the `file:` prefix.
+			const filepath = join(
+				dirname( blockMetadataFile ),
+				render.replace( 'file:', '' )
+			);
+
+			// Takes the path without the file extension, and relative to the defined source directory.
+			if ( ! filepath.startsWith( srcDirectory ) ) {
+				log(
+					chalk.yellow(
+						`Skipping "${ render.replace(
+							'file:',
+							''
+						) }" listed in "${ blockMetadataFile.replace(
+							fromProjectRoot( sep ),
+							''
+						) }". File is located outside of the "${
+							process.env.WP_SRC_DIRECTORY
+						}" directory.`
+					)
 				);
-
-				// Takes the path without the file extension, and relative to the defined source directory.
-				if ( ! filepath.startsWith( srcDirectory ) ) {
-					log(
-						chalk.yellow(
-							`Skipping "${ render.replace(
-								'file:',
-								''
-							) }" listed in "${ blockMetadataFile.replace(
-								fromProjectRoot( sep ),
-								''
-							) }". File is located outside of the "${
-								process.env.WP_SRC_DIRECTORY
-							}" directory.`
-						)
-					);
-					return;
-				}
-				renderPaths.push( filepath );
+				return false;
 			}
-		} );
-		if ( Object.keys( renderPaths ).length > 0 ) {
-			return renderPaths;
+			return filepath;
 		}
-	}
+		return false;
+	} );
+
+	return renderPaths.filter( ( renderPath ) => renderPath );
 }
 
 module.exports = {
