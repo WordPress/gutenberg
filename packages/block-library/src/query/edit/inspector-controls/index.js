@@ -59,8 +59,8 @@ function useAllowedControls( attributes ) {
 }
 
 function isControllAllowed( allowedControls, key ) {
-	// Every controls is allowed if the list is empty or not defined.
-	if ( ! allowedControls?.length ) {
+	// Every controls is allowed if the list is not defined.
+	if ( ! allowedControls ) {
 		return true;
 	}
 	return allowedControls.includes( key );
