@@ -476,15 +476,38 @@ _Returns_
 
 ### useAnchorRef
 
+_Note: this hook is deprecated and is scheduled to be removed in WordPress 6.3. Please use the `useAnchor` hook instead._
+
 This hook, to be used in a format type's Edit component, returns the active
-element that is formatted, or a virtual element for the selection range if
-no format is active. The returned value is meant to be used for positioning
-UI, e.g. by passing it to the `Popover` component.
+element that is formatted, or the selection range if no format is active.
+The returned value is meant to be used for positioning UI, e.g. by passing it
+to the `Popover` component.
 
 _Parameters_
 
 -   _$1_ `Object`: Named parameters.
 -   _$1.ref_ `RefObject<HTMLElement>`: React ref of the element containing the editable content.
+-   _$1.value_ `RichTextValue`: Value to check for selection.
+-   _$1.settings_ `RichTextFormatType`: The format type's settings.
+
+_Returns_
+
+-   `Element|Range`: The active element or selection range.
+
+### useAnchor
+
+This hook, to be used in a format type's Edit component, returns the active
+element that is formatted, or a virtual element for the selection range if
+no format is active. The returned value is meant to be used for positioning
+UI, e.g. by passing it to the `Popover` component via the `anchor` prop.
+
+To ensure reactive updates to the `Popover`, the `editableContentElement` should
+be stored in state rather than in a plain ref.
+
+_Parameters_
+
+-   _$1_ `Object`: Named parameters.
+-   _$1.editableContentElement_ `HTMLElement|null`: The element containing the editable content.
 -   _$1.value_ `RichTextValue`: Value to check for selection.
 -   _$1.settings_ `RichTextFormatType`: The format type's settings.
 

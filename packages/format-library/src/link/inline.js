@@ -10,7 +10,7 @@ import {
 	insert,
 	isCollapsed,
 	applyFormat,
-	useAnchorRef,
+	useAnchor,
 	removeFormat,
 	slice,
 	replace,
@@ -183,7 +183,11 @@ function InlineLinkUI( {
 		}
 	}
 
-	const popoverAnchor = useAnchorRef( { ref: contentRef, value, settings } );
+	const popoverAnchor = useAnchor( {
+		editableContentElement: contentRef.current,
+		value,
+		settings,
+	} );
 
 	// Generate a string based key that is unique to this anchor reference.
 	// This is used to force re-mount the LinkControl component to avoid

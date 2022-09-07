@@ -7,7 +7,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	isCollapsed,
 	getActiveFormats,
-	useAnchorRef,
+	useAnchor,
 	store as richTextStore,
 } from '@wordpress/rich-text';
 
@@ -21,7 +21,7 @@ import { store as blockEditorStore } from '../../store';
 
 function InlineSelectionToolbar( {
 	value,
-	editableContentRef,
+	editableContentElement,
 	activeFormats,
 } ) {
 	const lastFormat = activeFormats[ activeFormats.length - 1 ];
@@ -30,8 +30,8 @@ function InlineSelectionToolbar( {
 		( select ) => select( richTextStore ).getFormatType( lastFormatType ),
 		[ lastFormatType ]
 	);
-	const popoverAnchor = useAnchorRef( {
-		ref: editableContentRef,
+	const popoverAnchor = useAnchor( {
+		editableContentElement,
 		value,
 		settings,
 	} );
@@ -61,14 +61,18 @@ function InlineToolbar( { popoverAnchor } ) {
 	);
 }
 
-const FormatToolbarContainer = ( { inline, editableContentRef, value } ) => {
+const FormatToolbarContainer = ( {
+	inline,
+	editableContentElement,
+	value,
+} ) => {
 	const hasInlineToolbar = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().hasInlineToolbar,
 		[]
 	);
 
 	if ( inline ) {
-		return <InlineToolbar popoverAnchor={ editableContentRef.current } />;
+		return <InlineToolbar popoverAnchor={ editableContentElement } />;
 	}
 
 	if ( hasInlineToolbar ) {
@@ -80,7 +84,7 @@ const FormatToolbarContainer = ( { inline, editableContentRef, value } ) => {
 
 		return (
 			<InlineSelectionToolbar
-				editableContentRef={ editableContentRef }
+				editableContentElement={ editableContentElement }
 				value={ value }
 				activeFormats={ activeFormats }
 			/>

@@ -8,7 +8,7 @@ import { map } from 'lodash';
  * WordPress dependencies
  */
 import { useLayoutEffect } from '@wordpress/element';
-import { useAnchorRef } from '@wordpress/rich-text';
+import { useAnchor } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -35,7 +35,10 @@ export function getAutoCompleterUI( autocompleter ) {
 		contentRef,
 	} ) {
 		const [ items ] = useItems( filterValue );
-		const popoverAnchor = useAnchorRef( { ref: contentRef, value } );
+		const popoverAnchor = useAnchor( {
+			editableContentElement: contentRef.current,
+			value,
+		} );
 
 		useLayoutEffect( () => {
 			onChangeOptions( items );

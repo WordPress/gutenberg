@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -13,16 +14,10 @@ import { getActiveFormat } from '../get-active-format';
 /** @typedef {import('../create').RichTextValue} RichTextValue */
 
 /**
- * @typedef {Object} VirtualAnchorElement
- * @property {Function} getBoundingClientRect A function returning a DOMRect
- * @property {Document} ownerDocument         The element's ownerDocument
- */
-
-/**
  * This hook, to be used in a format type's Edit component, returns the active
- * element that is formatted, or a virtual element for the selection range if
- * no format is active. The returned value is meant to be used for positioning
- * UI, e.g. by passing it to the `Popover` component.
+ * element that is formatted, or the selection range if no format is active.
+ * The returned value is meant to be used for positioning UI, e.g. by passing it
+ * to the `Popover` component.
  *
  * @param {Object}                 $1          Named parameters.
  * @param {RefObject<HTMLElement>} $1.ref      React ref of the element
@@ -30,9 +25,15 @@ import { getActiveFormat } from '../get-active-format';
  * @param {RichTextValue}          $1.value    Value to check for selection.
  * @param {RichTextFormatType}     $1.settings The format type's settings.
  *
- * @return {Element|VirtualAnchorElement|undefined|null} The active element or selection range.
+ * @return {Element|Range} The active element or selection range.
  */
 export function useAnchorRef( { ref, value, settings = {} } ) {
+	deprecated( '`useAnchorRef` hook', {
+		since: '6.1',
+		version: '6.3',
+		alternative: '`useAnchor` hook',
+	} );
+
 	const { tagName, className, name } = settings;
 	const activeFormat = name ? getActiveFormat( value, name ) : undefined;
 
@@ -50,12 +51,7 @@ export function useAnchorRef( { ref, value, settings = {} } ) {
 		const range = selection.getRangeAt( 0 );
 
 		if ( ! activeFormat ) {
-			return {
-				ownerDocument: range.startContainer.ownerDocument,
-				getBoundingClientRect() {
-					return range.getBoundingClientRect();
-				},
-			};
+			return range;
 		}
 
 		let element = range.startContainer;

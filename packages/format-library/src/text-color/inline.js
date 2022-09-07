@@ -7,7 +7,7 @@ import {
 	applyFormat,
 	removeFormat,
 	getActiveFormat,
-	useAnchorRef,
+	useAnchor,
 } from '@wordpress/rich-text';
 import {
 	ColorPalette,
@@ -140,12 +140,16 @@ export default function InlineColorUI( {
 	/*
 	 As you change the text color by typing a HEX value into a field,
 	 the return value of document.getSelection jumps to the field you're editing,
-	 not the highlighted text. Given that useAnchorRef uses document.getSelection,
+	 not the highlighted text. Given that useAnchor uses document.getSelection,
 	 it will return null, since it can't find the <mark> element within the HEX input.
 	 This caches the last truthy value of the selection anchor reference.
 	 */
 	const popoverAnchor = useCachedTruthy(
-		useAnchorRef( { ref: contentRef, value, settings } )
+		useAnchor( {
+			editableContentElement: contentRef.current,
+			value,
+			settings,
+		} )
 	);
 
 	return (
