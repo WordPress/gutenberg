@@ -4,8 +4,8 @@
  *
  * @template T
  *
- * @param {T | null | undefined} value The value to check.
- * @return {value is T} Whether value is not null or undefined.
+ * @param {T} value The value to check.
+ * @return {value is Exclude<T, null | undefined>} Whether value is not null or undefined.
  */
 export function isValueDefined( value ) {
 	return value !== undefined && value !== null;
@@ -16,10 +16,8 @@ export function isValueDefined( value ) {
 /**
  * Determines if a value is empty, null, or undefined.
  *
- * @template T
- *
- * @param {T | "" | null | undefined} value The value to check.
- * @return {value is T} Whether value is empty.
+ * @param {string | number | null | undefined} value The value to check.
+ * @return {value is ("" | null | undefined)} Whether value is empty.
  */
 export function isValueEmpty( value ) {
 	const isEmptyString = value === '';
