@@ -1,5 +1,7 @@
 // The `createHigherOrderComponent` helper and helper types.
 export * from './utils/create-higher-order-component';
+// The `debounce` helper and its types.
+export * from './utils/debounce';
 
 // The `compose` and `pipe` helpers (inspired by `flowRight` and `flow` from Lodash).
 export { default as compose } from './higher-order/compose';
