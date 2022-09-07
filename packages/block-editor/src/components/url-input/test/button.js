@@ -91,10 +91,14 @@ describe( 'URLInputButton', () => {
 
 		// Type something into the URL field.
 		const urlField = screen.getByRole( 'combobox' );
-		await user.type( urlField, 'foo' );
-		await user.type( urlField, 'barbaz' );
+		const val1 = 'foo';
+		const val2 = 'barbaz';
+		await user.type( urlField, val1 );
+		await user.type( urlField, val2 );
 
-		expect( onChangeMock ).toHaveBeenCalledTimes( 9 );
+		expect( onChangeMock ).toHaveBeenCalledTimes(
+			val1.length + val2.length
+		);
 	} );
 
 	it( 'should close the form when the user clicks the `Close` button', async () => {
