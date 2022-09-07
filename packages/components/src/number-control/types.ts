@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { HTMLInputTypeAttribute, InputHTMLAttributes } from 'react';
-
-/**
  * Internal dependencies
  */
 import type { InputControlProps } from '../input-control/types';
@@ -23,7 +18,7 @@ export type NumberControlProps = Omit<
 	 *
 	 * @default true
 	 */
-	isDragEnabled?: boolean;
+	isDragEnabled?: InputControlProps[ 'isDragEnabled' ];
 	/**
 	 * If true, pressing `UP` or `DOWN` along with the `SHIFT` key will increment the
 	 * value by the `shiftStep` value.
@@ -49,7 +44,7 @@ export type NumberControlProps = Omit<
 	 *
 	 * @default false
 	 */
-	required?: boolean;
+	required?: InputControlProps[ 'required' ];
 	/**
 	 * Amount to increment by when the `SHIFT` key is held down. This shift value is
 	 * a multiplier to the `step` value. For example, if the `step` value is `5`,
@@ -66,13 +61,13 @@ export type NumberControlProps = Omit<
 	 *
 	 * @default 1
 	 */
-	step?: InputHTMLAttributes< HTMLInputElement >[ 'step' ];
+	step?: InputControlProps[ 'step' ];
 	/**
 	 * The `type` attribute of the `input` element.
 	 *
 	 * @default 'number'
 	 */
-	type?: HTMLInputTypeAttribute;
+	type?: InputControlProps[ 'type' ];
 	/**
 	 * The value of the input.
 	 */
