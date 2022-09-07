@@ -22,21 +22,28 @@ import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '../animation';
+import type { DropType, DropZoneProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
-export default function DropZoneComponent( {
+export function DropZoneComponent( {
 	className,
 	label,
 	onFilesDrop,
 	onHTMLDrop,
 	onDrop,
-} ) {
-	const [ isDraggingOverDocument, setIsDraggingOverDocument ] = useState();
-	const [ isDraggingOverElement, setIsDraggingOverElement ] = useState();
-	const [ type, setType ] = useState();
+	...restProps
+}: WordPressComponentProps< DropZoneProps, 'div', false > ) {
+	const [ isDraggingOverDocument, setIsDraggingOverDocument ] =
+		useState< boolean >();
+	const [ isDraggingOverElement, setIsDraggingOverElement ] =
+		useState< boolean >();
+	const [ type, setType ] = useState< DropType >();
 	const ref = useDropZone( {
 		onDrop( event ) {
-			const files = getFilesFromDataTransfer( event.dataTransfer );
-			const html = event.dataTransfer.getData( 'text/html' );
+			const files = event.dataTransfer
+				? getFilesFromDataTransfer( event.dataTransfer )
+				: [];
+			const html = event.dataTransfer?.getData( 'text/html' );
 
 			/**
 			 * From Windows Chrome 96, the `event.dataTransfer` returns both file object and HTML.
@@ -53,19 +60,22 @@ export default function DropZoneComponent( {
 		onDragStart( event ) {
 			setIsDraggingOverDocument( true );
 
-			let _type = 'default';
+			let _type: DropType = 'default';
 
 			/**
 			 * From Windows Chrome 96, the `event.dataTransfer` returns both file object and HTML.
 			 * The order of the checks is important to recognise the HTML drop.
 			 */
-			if ( event.dataTransfer.types.includes( 'text/html' ) ) {
+			if ( event.dataTransfer?.types.includes( 'text/html' ) ) {
 				_type = 'html';
 			} else if (
 				// Check for the types because sometimes the files themselves
 				// are only available on drop.
-				event.dataTransfer.types.includes( 'Files' ) ||
-				getFilesFromDataTransfer( event.dataTransfer ).length > 0
+				event.dataTransfer?.types.includes( 'Files' ) ||
+				( event.dataTransfer
+					? getFilesFromDataTransfer( event.dataTransfer )
+					: []
+				).length > 0
 			) {
 				_type = 'file';
 			}
@@ -74,7 +84,7 @@ export default function DropZoneComponent( {
 		},
 		onDragEnd() {
 			setIsDraggingOverDocument( false );
-			setType();
+			setType( undefined );
 		},
 		onDragEnter() {
 			setIsDraggingOverElement( true );
@@ -149,7 +159,7 @@ export default function DropZoneComponent( {
 	} );
 
 	return (
-		<div ref={ ref } className={ classes }>
+		<div { ...restProps } ref={ ref } className={ classes }>
 			{ disableMotion ? (
 				children
 			) : (
@@ -158,3 +168,5 @@ export default function DropZoneComponent( {
 		</div>
 	);
 }
+
+export default DropZoneComponent;

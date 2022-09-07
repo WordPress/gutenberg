@@ -30,7 +30,7 @@ The component accepts the following props:
 
 ### className
 
-A CSS `class` to be _appended_ after the default `components-drop-zone` class.
+A CSS `class` to give to the wrapper element.
 
 -   Type: `String`
 -   Default: `undefined`
