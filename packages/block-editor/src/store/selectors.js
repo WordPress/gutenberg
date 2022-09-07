@@ -105,7 +105,27 @@ export function getBlockAttributes( state, clientId ) {
 		return null;
 	}
 
-	return state.blocks.attributes[ clientId ];
+	const attributes = state.blocks.attributes[ clientId ];
+
+	const { deprecatedAttributes } = getBlockType(
+		getBlockName( state, clientId )
+	);
+
+	if ( deprecatedAttributes ) {
+		for ( const key in deprecatedAttributes ) {
+			if ( ! attributes.hasOwnProperty( key ) ) {
+				Object.defineProperty( attributes, key, {
+					get() {
+						return deprecatedAttributes[ key ](
+							getBlock( state, clientId )
+						);
+					},
+				} );
+			}
+		}
+	}
+
+	return attributes;
 }
 
 /**

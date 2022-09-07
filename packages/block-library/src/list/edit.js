@@ -52,14 +52,16 @@ function useMigrateOnLoad( attributes, clientId ) {
 
 	useEffect( () => {
 		// As soon as the block is loaded, migrate it to the new version.
-
-		if ( ! attributes.values ) {
+		if (
+			! attributes.hasOwnProperty( 'values' ) ||
+			Object.getOwnPropertyDescriptor( attributes, 'values' ).get
+		) {
 			return;
 		}
 
 		const [ newAttributes, newInnerBlocks ] = migrateToListV2( attributes );
 
-		deprecated( 'Value attribute on the list block', {
+		deprecated( 'Values attribute on the list block', {
 			since: '6.0',
 			version: '6.5',
 			alternative: 'inner blocks',
@@ -69,7 +71,7 @@ function useMigrateOnLoad( attributes, clientId ) {
 			updateBlockAttributes( clientId, newAttributes );
 			replaceInnerBlocks( clientId, newInnerBlocks );
 		} );
-	}, [ attributes.values ] );
+	}, [] );
 }
 
 function useOutdentList( clientId ) {

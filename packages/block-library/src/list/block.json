@@ -13,15 +13,6 @@
 			"default": false,
 			"__experimentalRole": "content"
 		},
-		"values": {
-			"type": "string",
-			"source": "html",
-			"selector": "ol,ul",
-			"multiline": "li",
-			"__unstableMultilineWrapperTags": [ "ol", "ul" ],
-			"default": "",
-			"__experimentalRole": "content"
-		},
 		"type": {
 			"type": "string"
 		},
