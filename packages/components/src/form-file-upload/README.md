@@ -1,5 +1,7 @@
 # FormFileUpload
 
+FormFileUpload is a component that allows users to select files from their local device.
+
 ## Usage
 
 ```jsx
@@ -8,7 +10,7 @@ import { FormFileUpload } from '@wordpress/components';
 const MyFormFileUpload = () => (
 	<FormFileUpload
 		accept="image/*"
-		onChange={ ( event ) => console.log( event.target.files ) }
+		onChange={ ( event ) => console.log( event.currentTarget.files ) }
 	>
 		Upload
 	</FormFileUpload>
@@ -53,6 +55,8 @@ Whether to allow multiple selection of files or not.
 ### onChange
 
 Callback function passed directly to the `input` file element.
+
+Select files will be available in `event.currentTarget.files`.
 
 -   Type: `Function`
 -   Required: Yes

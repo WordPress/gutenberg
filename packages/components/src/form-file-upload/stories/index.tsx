@@ -35,7 +35,6 @@ const Template: ComponentStory< typeof FormFileUpload > = ( props ) => {
 export const Default = Template.bind( {} );
 Default.args = {
 	children: 'Select file',
-	multiple: false,
 };
 
 export const RestrictFileTypes = Template.bind( {} );
@@ -43,7 +42,6 @@ RestrictFileTypes.args = {
 	...Default.args,
 	accept: 'image/*',
 	children: 'Select image',
-	multiple: false,
 };
 
 export const AllowMultipleFiles = Template.bind( {} );

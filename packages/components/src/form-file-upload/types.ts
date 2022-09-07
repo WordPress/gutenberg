@@ -31,6 +31,8 @@ export type FormFileUploadProps = {
 	multiple?: InputHTMLAttributes< HTMLInputElement >[ 'multiple' ];
 	/**
 	 * Callback function passed directly to the `input` file element.
+	 *
+	 * Select files will be available in `event.currentTarget.files`.
 	 */
 	onChange: InputHTMLAttributes< HTMLInputElement >[ 'onChange' ];
 	/**
