@@ -145,18 +145,6 @@
 			padding-right: $grid-unit-15;
 		}
 	}
-
-	// The post saved state button has a custom label only on small breakpoint
-	.editor-post-save-draft.editor-post-save-draft {
-		&::after {
-			content: none;
-		}
-		@include break-small {
-			&::after {
-				content: attr(aria-label);
-			}
-		}
-	}
 }
 
 .edit-post-header__dropdown {
