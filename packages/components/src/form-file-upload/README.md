@@ -78,6 +78,7 @@ This can be useful when you want to force a `change` event to fire when the user
 ### render
 
 Optional callback function used to render the UI. If passed the component does not render any UI and calls this function to render it.
+
 This function receives an object with the property `openFileDialog`. The property is a function that when called opens the browser window to upload files.
 
 -   Type: `Function`
