@@ -325,8 +325,9 @@ function Navigation( {
 	const isEntityAvailable =
 		! isNavigationMenuMissing && isNavigationMenuResolved;
 
-	// Migrate numerical ID-based ref to
-	// string slug-based ref.
+	// Migrate the numerical ID-based ref attribute to the
+	// string-based slug attribute. This action soft-deprecates
+	// usage of the ref attribute in favour of the slug attribute.
 	useEffect( () => {
 		if ( isEntityAvailable && isNumeric( ref ) ) {
 			setRef( navigationMenu?.slug );
