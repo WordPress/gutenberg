@@ -22,11 +22,6 @@ const GRAY = {
 	100: '#f0f0f0',
 };
 
-// TODO: Replace usages of these with the equivalents in `GRAY`
-const LIGHT_GRAY = {
-	800: '#b5bcc2',
-};
-
 // Matches @wordpress/base-styles
 const ALERT = {
 	yellow: '#f0b849',
@@ -61,10 +56,6 @@ export const COLORS = Object.freeze( {
 	 * The main gray color object.
 	 */
 	gray: GRAY,
-	/**
-	 * @deprecated Try to use `gray` instead.
-	 */
-	lightGray: LIGHT_GRAY,
 	white,
 	alert: ALERT,
 	ui: UI,

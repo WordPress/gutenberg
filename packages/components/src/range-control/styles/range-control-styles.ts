@@ -101,7 +101,7 @@ const trackBackgroundColor = ( { disabled, trackColor }: TrackProps ) => {
 	let background = trackColor || 'currentColor';
 
 	if ( disabled ) {
-		background = COLORS.lightGray[ 800 ];
+		background = COLORS.gray[ 400 ];
 	}
 
 	return css( { background } );
@@ -132,7 +132,7 @@ const markFill = ( { disabled, isFilled }: RangeMarkProps ) => {
 	let backgroundColor = isFilled ? 'currentColor' : COLORS.gray[ 300 ];
 
 	if ( disabled ) {
-		backgroundColor = COLORS.lightGray[ 800 ];
+		backgroundColor = COLORS.gray[ 400 ];
 	}
 
 	return css( {
@@ -171,7 +171,7 @@ export const MarkLabel = styled.span`
 const thumbColor = ( { disabled }: ThumbProps ) =>
 	disabled
 		? css`
-				background-color: ${ COLORS.lightGray[ 800 ] };
+				background-color: ${ COLORS.gray[ 400 ] };
 		  `
 		: css`
 				background-color: var( --wp-admin-theme-color );
