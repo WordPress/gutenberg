@@ -5,10 +5,26 @@
  * @package    Gutenberg
  * @subpackage style-engine
  */
-require __DIR__ . '/../class-wp-style-engine-css-rules-store.php';
-require __DIR__ . '/../class-wp-style-engine-css-rule.php';
-require __DIR__ . '/../class-wp-style-engine-css-declarations.php';
-require __DIR__ . '/../class-wp-style-engine-processor.php';
+
+// Check for the existence of Style Engine classes and methods.
+// Once the Style Engine has been migrated to Core we can remove the if statements and require imports.
+// Testing new features from the Gutenberg package may require
+// testing against `gutenberg_` and `_Gutenberg` functions and methods in the future.
+if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
+	require __DIR__ . '/../class-wp-style-engine-processor.php';
+}
+
+if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
+	require __DIR__ . '/../class-wp-style-engine-css-declarations.php';
+}
+
+if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
+	require __DIR__ . '/../class-wp-style-engine-css-rule.php';
+}
+
+if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
+	require __DIR__ . '/../class-wp-style-engine-css-rules-store.php';
+}
 
 /**
  * Tests for compiling and rendering styles from a store of CSS rules.
