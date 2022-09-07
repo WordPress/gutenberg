@@ -1,20 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import {
 	InnerBlocks,
 	useBlockProps,
 	InspectorControls,
 	useInnerBlocksProps,
 	useSetting,
-	__experimentalBlockVariationPicker,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { store as blocksStore } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import GroupPlaceHolder from './placeholder';
 
 /**
  * Render inspector controls for the Group block.
@@ -64,57 +66,6 @@ function GroupEditControls( { tagName, onSelectTagName } ) {
 				help={ htmlElementMessages[ tagName ] }
 			/>
 		</InspectorControls>
-	);
-}
-
-/**
- * Display group variations if none is selected.
- *
- * @param {Object}   props               Component props.
- * @param {string}   props.clientId      The block's clientId.
- * @param {string}   props.name          The block's name.
- * @param {Function} props.setAttributes Function to set block's attributes.
- *
- * @return {JSX.Element}                The placeholder.
- */
-function Placeholder( { clientId, name, setAttributes } ) {
-	const { blockType, defaultVariation, variations } = useSelect(
-		( select ) => {
-			const {
-				getBlockVariations,
-				getBlockType,
-				getDefaultBlockVariation,
-			} = select( blocksStore );
-
-			return {
-				blockType: getBlockType( name ),
-				defaultVariation: getDefaultBlockVariation( name, 'block' ),
-				variations: getBlockVariations( name, 'block' ),
-			};
-		},
-		[ name ]
-	);
-	const blockProps = useBlockProps();
-	const { selectBlock } = useDispatch( blockEditorStore );
-	// Ensure that the inserted block is selected after a Group variation is selected.
-	const updateSelection = useCallback(
-		( newClientId ) => selectBlock( newClientId, -1 ),
-		[ selectBlock ]
-	);
-	return (
-		<div { ...blockProps }>
-			<__experimentalBlockVariationPicker
-				icon={ blockType?.icon?.src }
-				label={ blockType?.title }
-				variations={ variations }
-				onSelect={ ( nextVariation = defaultVariation ) => {
-					setAttributes( nextVariation.attributes );
-					updateSelection( clientId );
-				} }
-				instructions={ __( 'Group blocks together. Select a layout:' ) }
-				allowSkip
-			/>
-		</div>
 	);
 }
 
@@ -173,7 +124,7 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 				}
 			/>
 			{ showPlaceholder && (
-				<Placeholder
+				<GroupPlaceHolder
 					clientId={ clientId }
 					name={ name }
 					setAttributes={ setAttributes }

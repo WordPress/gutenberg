@@ -167,8 +167,9 @@ describe( 'Navigating the block hierarchy', () => {
 	it( 'should select the wrapper div for a group', async () => {
 		// Insert a group block.
 		await insertBlock( 'Group' );
+		// Select the default, selected Group layout from the variation picker.
 		await page.click(
-			'[aria-label="Skip selection and choose default block variation."]'
+			'button[aria-label="Gather blocks in a container."]'
 		);
 		// Insert some random blocks.
 		// The last block shouldn't be a textual block.

@@ -52,3 +52,19 @@
 		pointer-events: all;
 	}
 }
+
+.wp-block-group__placeholder {
+	.components-placeholder__instructions {
+		text-align: center;
+	}
+	.block-editor-block-variation-picker__variations {
+		justify-content: center;
+	}
+	.block-editor-block-variation-picker__variations svg {
+		fill: $gray-400 !important;
+	}
+	.block-editor-block-variation-picker__variations > li {
+		margin: 0 10px;
+		width: auto;
+	}
+}

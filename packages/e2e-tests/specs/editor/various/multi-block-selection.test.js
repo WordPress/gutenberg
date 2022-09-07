@@ -398,8 +398,10 @@ describe( 'Multi-block selection', () => {
 			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Group')]`
 		);
 		await page.keyboard.press( 'Enter' );
+
+		// Select the default, selected Group layout from the variation picker.
 		await page.click(
-			'[aria-label="Skip selection and choose default block variation."]'
+			'button[aria-label="Gather blocks in a container."]'
 		);
 
 		const groupAppender = await page.waitForSelector(

@@ -17,6 +17,7 @@ function BlockVariationPicker( {
 	variations,
 	onSelect,
 	allowSkip,
+	buttonType = 'secondary',
 } ) {
 	const classes = classnames( 'block-editor-block-variation-picker', {
 		'has-many-variations': variations.length > 4,
@@ -42,8 +43,8 @@ function BlockVariationPicker( {
 				{ variations.map( ( variation ) => (
 					<li key={ variation.name }>
 						<Button
-							variant="secondary"
-							icon={ variation.icon }
+							variant={ buttonType }
+							icon={ variation.placeHolderIcon || variation.icon }
 							iconSize={ 48 }
 							onClick={ () => onSelect( variation ) }
 							className="block-editor-block-variation-picker__variation"

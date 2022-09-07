@@ -28,8 +28,9 @@ test.describe( 'Group', () => {
 			'role=listbox[name="Blocks"i] >> role=option[name="Group"i]'
 		);
 
+		// Select the default, selected Group layout from the variation picker.
 		await page.click(
-			'role=button[name="Skip selection and choose default block variation."i]'
+			'role=button[name="Gather blocks in a container."i]'
 		);
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -45,8 +46,10 @@ test.describe( 'Group', () => {
 			page.locator( 'role=option[name="Group"i][selected]' )
 		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
+
+		// Select the default, selected Group layout from the variation picker.
 		await page.click(
-			'role=button[name="Skip selection and choose default block variation."i]'
+			'role=button[name="Gather blocks in a container."i]'
 		);
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -57,8 +60,9 @@ test.describe( 'Group', () => {
 		page,
 	} ) => {
 		await editor.insertBlock( { name: 'core/group' } );
+		// Select the default, selected Group layout from the variation picker.
 		await page.click(
-			'role=button[name="Skip selection and choose default block variation."i]'
+			'role=button[name="Gather blocks in a container."i]'
 		);
 		await page.click( 'role=button[name="Add block"i]' );
 		await page.click(
