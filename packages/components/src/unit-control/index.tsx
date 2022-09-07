@@ -265,7 +265,7 @@ function UnforwardedUnitControl(
 				autoComplete={ autoComplete }
 				className={ classes }
 				disabled={ disabled }
-				disableUnits={ disableUnits }
+				hideHTMLArrows={ ! disableUnits }
 				isPressEnterToChange={ isPressEnterToChange }
 				label={ label }
 				onBlur={ handleOnBlur }
