@@ -310,11 +310,6 @@ function getWebpackEntryPoints() {
 function getRenderPropPaths() {
 	// Continue only if the source directory exists.
 	if ( ! hasProjectFile( process.env.WP_SRC_DIRECTORY ) ) {
-		log(
-			chalk.yellow(
-				`Source directory "${ process.env.WP_SRC_DIRECTORY }" was not found. Please confirm there is a "src" directory in the root or the value passed to --webpack-src-dir is correct.`
-			)
-		);
 		return [];
 	}
 
