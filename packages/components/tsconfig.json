@@ -52,7 +52,6 @@
 		"src/duotone-picker",
 		"src/focal-point-picker",
 		"src/font-size-picker",
-		"src/form-file-upload",
 		"src/gradient-picker",
 		"src/guide",
 		"src/higher-order/navigate-regions",
