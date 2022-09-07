@@ -544,6 +544,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	if (
 		defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN &&
 		array_key_exists( '__unstableLocation', $attributes ) &&
+		! array_key_exists( 'slug', $attributes ) &&
 		! array_key_exists( 'ref', $attributes ) &&
 		! empty( block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] ) )
 	) {
