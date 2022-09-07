@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Feature
+
+-   Update the default webpack config to allow `webp` image format ([#43880](https://github.com/WordPress/gutenberg/pull/43880)).
+
 ## 24.0.0 (2022-08-24)
 
 ### Breaking Change
