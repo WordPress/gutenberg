@@ -14,7 +14,11 @@ import {
 	useReducer,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import {
+	useResizeObserver,
+	useMergeRefs,
+	useRefEffect,
+} from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 
 /**
@@ -184,7 +188,7 @@ async function loadScript( head, { id, src } ) {
 }
 
 function Iframe(
-	{ contentRef, children, head, tabIndex = 0, assets, ...props },
+	{ contentRef, children, head, tabIndex = 0, assets, isZoomedOut, ...props },
 	ref
 ) {
 	const [ , forceRender ] = useReducer( () => ( {} ) );
@@ -194,6 +198,8 @@ function Iframe(
 	const scripts = useParsedAssets( assets?.scripts );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
+	const [ contentResizeListener, { height: contentHeight } ] =
+		useResizeObserver();
 	const setRef = useRefEffect( ( node ) => {
 		function setDocumentIfReady() {
 			const { contentDocument, ownerDocument } = node;
@@ -222,7 +228,6 @@ function Iframe(
 			contentDocument.dir = ownerDocument.dir;
 			documentElement.removeChild( contentDocument.head );
 			documentElement.removeChild( contentDocument.body );
-
 			return true;
 		}
 
@@ -231,6 +236,7 @@ function Iframe(
 
 		return () => node.removeEventListener( 'load', setDocumentIfReady );
 	}, [] );
+
 	const headRef = useRefEffect( ( element ) => {
 		scripts
 			.reduce(
@@ -285,14 +291,40 @@ function Iframe(
 				{ iframeDocument &&
 					createPortal(
 						<>
-							<head ref={ headRef }>{ head }</head>
+							<head ref={ headRef }>
+								{ head }
+								<style>
+									{ `html { transition: background 5s; ${
+										isZoomedOut
+											? 'background: #2f2f2f; transition: background 0s;'
+											: ''
+									} }` }
+								</style>
+							</head>
 							<body
 								ref={ bodyRef }
 								className={ classnames(
+									'block-editor-iframe__body',
 									BODY_CLASS_NAME,
-									...bodyClasses
+									...bodyClasses,
+									{
+										'is-zoomed-out': isZoomedOut,
+									}
 								) }
+								style={
+									isZoomedOut
+										? {
+												// This is the remaining percentage from the scaling down
+												// of the iframe body(`scale(0.45)`). We also need to subtract
+												// the body's bottom margin.
+												marginBottom: `-${
+													contentHeight * 0.55 - 100
+												}px`,
+										  }
+										: {}
+								}
 							>
+								{ contentResizeListener }
 								{ /*
 								 * This is a wrapper for the extra styles and scripts
 								 * rendered imperatively by cloning the parent,

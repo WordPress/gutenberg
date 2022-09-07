@@ -26,8 +26,8 @@ function listener( event ) {
  */
 export function useIsHovered() {
 	const isEnabled = useSelect( ( select ) => {
-		const { isNavigationMode, getSettings } = select( blockEditorStore );
-		return isNavigationMode() || getSettings().outlineMode;
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().outlineMode;
 	}, [] );
 
 	return useRefEffect(
