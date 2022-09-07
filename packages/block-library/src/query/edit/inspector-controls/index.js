@@ -19,9 +19,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { useEffect, useState, useCallback } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
-import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -31,40 +28,12 @@ import AuthorControl from './author-control';
 import ParentControl from './parent-control';
 import { TaxonomyControls, useTaxonomiesInfo } from './taxonomy-controls';
 import StickyControl from './sticky-control';
-import { usePostTypes } from '../../utils';
-import { name as queryLoopName } from '../../block.json';
-
-const EMPTY_ARRAY = [];
-
-function useIsPostTypeHierarchical( postType ) {
-	return useSelect(
-		( select ) => {
-			const type = select( coreStore ).getPostType( postType );
-			return type?.viewable && type?.hierarchical;
-		},
-		[ postType ]
-	);
-}
-
-function useAllowedControls( attributes ) {
-	return useSelect(
-		( select ) =>
-			select( blocksStore ).getActiveBlockVariation(
-				queryLoopName,
-				attributes
-			)?.allowControls || EMPTY_ARRAY,
-
-		[ attributes ]
-	);
-}
-
-function isControllAllowed( allowedControls, key ) {
-	// Every controls is allowed if the list is not defined.
-	if ( ! allowedControls ) {
-		return true;
-	}
-	return allowedControls.includes( key );
-}
+import {
+	usePostTypes,
+	useIsPostTypeHierarchical,
+	useAllowedControls,
+	isControllAllowed,
+} from '../../utils';
 
 export default function QueryInspectorControls( {
 	attributes,
