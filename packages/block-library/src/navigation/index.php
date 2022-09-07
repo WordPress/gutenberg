@@ -558,7 +558,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	// Load inner blocks from the navigation post.
-	if ( array_key_exists( 'ref', $attributes ) ) {
+	if ( array_key_exists( 'slug', $attributes ) || array_key_exists( 'ref', $attributes ) ) {
 
 		$base_args = array(
 			'post_type'              => 'wp_navigation',
@@ -568,18 +568,20 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			'no_found_rows'          => true,
 		);
 
-		if ( is_numeric( $attributes['ref'] ) ) {
+		// Prefer query by slug if available, falling
+		// back to Post ID.
+		if ( ! empty( $attributes['slug'] ) ) {
 			$args = array_merge(
 				$base_args,
 				array(
-					'p' => $attributes['ref'], // query by post ID
+					'name' => $attributes['slug'], // query by slug
 				)
 			);
 		} else {
 			$args = array_merge(
 				$base_args,
 				array(
-					'name' => $attributes['ref'], // query by slug
+					'p' => $attributes['ref'], // query by post ID
 				)
 			);
 		}
