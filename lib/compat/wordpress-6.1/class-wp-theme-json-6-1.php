@@ -655,11 +655,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 
 		if ( in_array( 'styles', $types, true ) ) {
+			$stylesheet .= $this->get_root_layout_rules( static::ROOT_BLOCK_SELECTOR, $style_nodes[ $root_block_key ] );
 			$stylesheet .= $this->get_block_classes( $style_nodes );
 
 			$root_block_key = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $style_nodes, 'selector' ) );
-			$stylesheet .= $this->get_additional_root_rules( static::ROOT_BLOCK_SELECTOR, $style_nodes[ $root_block_key ] );
-			var_dump( $stylesheet );
 		} elseif ( in_array( 'base-layout-styles', $types, true ) ) {
 			// Base layout styles are provided as part of `styles`, so only output separately if explicitly requested.
 			// For backwards compatibility, the Columns block is explicitly included, to support a different default gap value.
@@ -828,7 +827,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	}
 
 	/**
-	 * Outputs the additional CSS for layout rules on the root.
+	 * Outputs the CSS for layout rules on the root.
 	 * This needs to be separate from get_styles_for_block,
 	 * so that it can load later and override block rules.
 	 *
@@ -836,9 +835,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @param array $block_metadata The metadata for the root block.
 	 * @return string The additional root rules CSS.
 	 */
-	private function get_additional_root_rules( $selector, $block_metadata ) {
+	private function get_root_layout_rules( $selector, $block_metadata ) {
 		$css = '';
 
+		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 		if ( $use_root_padding ) {
 			// Top and bottom padding are applied to the outer block container.
 			$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
