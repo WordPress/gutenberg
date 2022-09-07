@@ -100,6 +100,10 @@
 				"radius": true,
 				"width": true
 			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
 		}
 	},
 	"styles": [
