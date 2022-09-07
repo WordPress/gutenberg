@@ -24,6 +24,7 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 			const values = mapValues( queries, ( query ) => query.matches );
 			dispatch( store ).setIsMatching( values );
 		},
+		0,
 		{ leading: true }
 	);
 
