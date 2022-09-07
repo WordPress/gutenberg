@@ -5,6 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -29,6 +30,8 @@ export default function SaveButton() {
 
 	const disabled = ! isDirty || isSaving;
 
+	const label = __( 'Save' );
+
 	return (
 		<Button
 			variant="primary"
@@ -37,8 +40,10 @@ export default function SaveButton() {
 			aria-expanded={ isSaveViewOpen }
 			isBusy={ isSaving }
 			onClick={ disabled ? undefined : () => setIsSaveViewOpened( true ) }
+			label={ label }
+			shortcut={ disabled ? undefined : displayShortcut.primary( 's' ) }
 		>
-			{ __( 'Save' ) }
+			{ label }
 		</Button>
 	);
 }
