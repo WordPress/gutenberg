@@ -26,7 +26,6 @@ const GRAY = {
 const LIGHT_GRAY = {
 	800: '#b5bcc2',
 	600: '#d7dade',
-	400: '#e8eaeb', // Good for "readonly" input fields and special text selection.
 };
 
 // Matches @wordpress/base-styles

@@ -76,7 +76,7 @@ const railBackgroundColor = ( { disabled, railColor }: RailProps ) => {
 	let background = railColor || '';
 
 	if ( disabled ) {
-		background = COLORS.lightGray[ 400 ];
+		background = COLORS.ui.backgroundDisabled;
 	}
 
 	return css( { background } );
