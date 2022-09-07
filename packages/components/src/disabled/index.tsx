@@ -1,8 +1,13 @@
 /**
+ * External dependencies
+ */
+import type { HTMLProps } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { useDisabled } from '@wordpress/compose';
-import { createContext } from '@wordpress/element';
+import { createContext, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,6 +19,15 @@ import { useCx } from '../utils';
 
 const Context = createContext< boolean >( false );
 const { Consumer, Provider } = Context;
+
+// Extracting this ContentWrapper component in order to make it more explicit
+// the same 'ContentWrapper' component is needed so that React can reconcile
+// the dom correctly when switching between disabled/non-disabled (instead
+// of thrashing the previous DOM and therefore losing the form fields values).
+const ContentWrapper = forwardRef<
+	HTMLDivElement,
+	HTMLProps< HTMLDivElement >
+>( ( props, ref ) => <div { ...props } ref={ ref } /> );
 
 /**
  * `Disabled` is a component which disables descendant tabbable elements and prevents pointer interaction.
@@ -56,14 +70,14 @@ function Disabled( {
 	if ( ! isDisabled ) {
 		return (
 			<Provider value={ false }>
-				<div>{ children }</div>
+				<ContentWrapper>{ children }</ContentWrapper>
 			</Provider>
 		);
 	}
 
 	return (
 		<Provider value={ true }>
-			<div
+			<ContentWrapper
 				ref={ ref }
 				className={ cx(
 					disabledStyles,
@@ -73,7 +87,7 @@ function Disabled( {
 				{ ...props }
 			>
 				{ children }
-			</div>
+			</ContentWrapper>
 		</Provider>
 	);
 }
