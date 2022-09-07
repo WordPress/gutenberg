@@ -32,30 +32,6 @@ const QUERY_DEFAULT_ATTRIBUTES = {
 
 const variations = [
 	{
-		name: 'products-list',
-		title: __( 'Products List' ),
-		description: __( 'Display a list of your products.' ),
-		attributes: {
-			query: {
-				perPage: 4,
-				pages: 1,
-				offset: 0,
-				postType: 'product',
-				order: 'desc',
-				orderBy: 'date',
-				author: '',
-				search: '',
-				sticky: 'exclude',
-				inherit: false,
-			},
-			namespace: 'wp/query/products',
-		},
-		allowControls: [ 'order', 'taxQuery', 'search' ],
-		isActive: ( blockAttributes, variationAttributes ) =>
-			blockAttributes?.namespace === variationAttributes.namespace,
-		scope: [ 'inserter' ],
-	},
-	{
 		name: 'posts-list',
 		title: __( 'Posts List' ),
 		description: __(
