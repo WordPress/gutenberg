@@ -98,10 +98,10 @@ function Navigation( {
 		icon = 'handle',
 	} = attributes;
 
-	const ref = attributes.ref;
+	const ref = attributes.slug || attributes.ref;
 
 	const setRef = ( postSlug ) => {
-		setAttributes( { ref: postSlug } );
+		setAttributes( { slug: postSlug } );
 	};
 
 	const recursionId = `navigationMenu/${ ref }`;
