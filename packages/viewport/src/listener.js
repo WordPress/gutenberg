@@ -1,11 +1,12 @@
 /**
  * External dependencies
  */
-import { reduce, debounce, mapValues } from 'lodash';
+import { reduce, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { debounce } from '@wordpress/compose';
 import { dispatch } from '@wordpress/data';
 
 /**

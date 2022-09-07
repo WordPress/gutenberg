@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import { debounce } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { useState, useLayoutEffect } from '@wordpress/element';
-import { useViewportMatch } from '@wordpress/compose';
+import { debounce, useViewportMatch } from '@wordpress/compose';
 import {
 	Button,
 	__experimentalTruncate as Truncate,
