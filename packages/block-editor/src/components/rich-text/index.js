@@ -159,6 +159,18 @@ function RichTextWrapper(
 	// retreived from the store on merge.
 	// To do: fix this somehow.
 	const { selectionStart, selectionEnd, isSelected } = useSelect( selector );
+	const canInsertEmbed = useSelect(
+		( select ) => {
+			const { canInsertBlockType, getBlockRootClientId } =
+				select( blockEditorStore );
+
+			return canInsertBlockType(
+				'core/embed',
+				getBlockRootClientId( clientId )
+			);
+		},
+		[ clientId ]
+	);
 	const { selectionChange } = useDispatch( blockEditorStore );
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
@@ -393,7 +405,8 @@ function RichTextWrapper(
 						onReplace,
 						onSplit,
 						onSplitMiddle,
-						__unstableEmbedURLOnPaste,
+						__unstableEmbedURLOnPaste:
+							canInsertEmbed && __unstableEmbedURLOnPaste,
 						multilineTag,
 						preserveWhiteSpace,
 						pastePlainText,
