@@ -53,9 +53,14 @@ test.describe( 'Draggable block', () => {
 			'role=document[name="Paragraph block"i] >> text=1'
 		);
 		const firstParagraphBound = await firstParagraph.boundingBox();
-		await page.mouse.move( firstParagraphBound.x, firstParagraphBound.y, {
-			steps: 10,
-		} );
+		// Call the move function twice to make sure the `dragOver` event is sent.
+		// @see https://github.com/microsoft/playwright/issues/17153
+		for ( let i = 0; i < 2; i += 1 ) {
+			await page.mouse.move(
+				firstParagraphBound.x,
+				firstParagraphBound.y
+			);
+		}
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -118,11 +123,14 @@ test.describe( 'Draggable block', () => {
 			'role=document[name="Paragraph block"i] >> text=2'
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
-		await page.mouse.move(
-			secondParagraphBound.x,
-			secondParagraphBound.y + secondParagraphBound.height * 0.75,
-			{ steps: 10 }
-		);
+		// Call the move function twice to make sure the `dragOver` event is sent.
+		// @see https://github.com/microsoft/playwright/issues/17153
+		for ( let i = 0; i < 2; i += 1 ) {
+			await page.mouse.move(
+				secondParagraphBound.x,
+				secondParagraphBound.y + secondParagraphBound.height * 0.75
+			);
+		}
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
