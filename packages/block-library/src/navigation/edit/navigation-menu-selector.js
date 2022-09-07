@@ -143,9 +143,10 @@ function NavigationMenuSelector( {
 	if ( ! hasNavigationMenus && ! hasClassicMenus ) {
 		return (
 			<Button
-				{ ...toggleProps }
 				className="wp-block-navigation__navigation-selector-button--createnew"
+				isBusy={ ! enableOptions }
 				disabled={ ! enableOptions }
+				__experimentalIsFocusable
 				onClick={ () => {
 					onCreateNew();
 					setIsCreatingMenu( true );
