@@ -50,7 +50,7 @@ Prompt visitors to take action with a button-style link. ([Source](https://githu
 
 -	**Name:** core/button
 -	**Category:** design
--	**Supports:** align, anchor, color (background, gradients, text), spacing (padding), typography (fontSize), ~~alignWide~~, ~~reusable~~
+-	**Supports:** align, anchor, color (background, gradients, text), spacing (padding), typography (fontSize, lineHeight), ~~alignWide~~, ~~reusable~~
 -	**Attributes:** backgroundColor, gradient, linkTarget, placeholder, rel, text, textColor, title, url, width
 
 ## Buttons
@@ -59,7 +59,7 @@ Prompt visitors to take action with a group of button-style links. ([Source](htt
 
 -	**Name:** core/buttons
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, spacing (blockGap, margin)
+-	**Supports:** align (full, wide), anchor, spacing (blockGap, margin), typography (fontSize, lineHeight)
 -	**Attributes:** 
 
 ## Calendar
