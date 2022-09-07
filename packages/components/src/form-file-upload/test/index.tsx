@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import FormFileUpload from '../';
+import FormFileUpload from '..';
 
 /**
  * Browser dependencies
@@ -32,7 +32,11 @@ describe( 'FormFileUpload', () => {
 	} );
 
 	it( 'should show an Icon Button and a hidden input', () => {
-		render( <FormFileUpload>My Upload Button</FormFileUpload> );
+		render(
+			<FormFileUpload onChange={ () => {} }>
+				My Upload Button
+			</FormFileUpload>
+		);
 
 		const button = screen.getByText( 'My Upload Button' );
 		const input = screen.getByTestId( 'form-file-upload-input' );
@@ -76,7 +80,7 @@ describe( 'FormFileUpload', () => {
 
 		render(
 			<FormFileUpload
-				onClick={ jest.fn( ( e ) => ( e.target.value = '' ) ) }
+				onClick={ jest.fn( ( e ) => ( e.currentTarget.value = '' ) ) }
 				onChange={ onChange }
 			>
 				My Upload Button

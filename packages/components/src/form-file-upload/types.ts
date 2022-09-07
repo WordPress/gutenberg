@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentProps, InputHTMLAttributes, KeyboardEvent } from 'react';
+import type { ComponentProps, InputHTMLAttributes } from 'react';
 
 /**
  * Internal dependencies
@@ -57,7 +57,5 @@ export type FormFileUploadProps = {
 	 * This function receives an object with the property `openFileDialog`.
 	 * The property is a function that when called opens the browser window to upload files.
 	 */
-	render?: ( arg: {
-		openFileDialog: ( event: KeyboardEvent< HTMLButtonElement > ) => void;
-	} ) => void;
+	render?: ( arg: { openFileDialog: () => void } ) => void;
 };
