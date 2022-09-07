@@ -42,7 +42,7 @@ export const MediaContainer = styled.div`
 `;
 
 export const MediaPlaceholder = styled.div`
-	background: ${ COLORS.lightGray[ 300 ] };
+	background: ${ COLORS.gray[ 100 ] };
 	box-sizing: border-box;
 	height: ${ INITIAL_BOUNDS.height }px;
 	max-width: 280px;

@@ -113,7 +113,7 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 			${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
 
 			&:not(:disabled):hover {
-				background-color: ${ COLORS.lightGray[ 300 ] };
+				background-color: ${ COLORS.gray[ 100 ] };
 			}
 
 			&:focus {
