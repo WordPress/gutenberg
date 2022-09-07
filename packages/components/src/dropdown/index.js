@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState, useMemo } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
