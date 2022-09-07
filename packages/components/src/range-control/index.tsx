@@ -139,7 +139,8 @@ function UnforwardedRangeControl< IconProps = unknown >(
 	};
 
 	const handleOnChange = ( next?: string ) => {
-		// @ts-expect-error TODO: Investigate if this is problematic
+		// @ts-expect-error TODO: Investigate if it's problematic for setValue() to
+		// potentially receive a NaN when next is undefined.
 		let nextValue = parseFloat( next );
 		setValue( nextValue );
 

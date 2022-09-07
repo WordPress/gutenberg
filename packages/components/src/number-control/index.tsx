@@ -91,18 +91,18 @@ function UnforwardedNumberControl(
 				}
 
 				if ( type === inputControlActionTypes.PRESS_UP ) {
-					// @ts-expect-error TODO: Investigate if this is wrong
+					// @ts-expect-error TODO: isValueEmpty() needs to be typed properly
 					nextValue = add( nextValue, incrementalValue );
 				}
 
 				if ( type === inputControlActionTypes.PRESS_DOWN ) {
-					// @ts-expect-error TODO: Investigate if this is wrong
+					// @ts-expect-error TODO: isValueEmpty() needs to be typed properly
 					nextValue = subtract( nextValue, incrementalValue );
 				}
 
-				// @ts-expect-error TODO: Investigate if this is wrong
+				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
 				nextState.value = constrainValue(
-					// @ts-expect-error TODO: Investigate if this is wrong
+					// @ts-expect-error TODO: isValueEmpty() needs to be typed properly
 					nextValue,
 					enableShift ? incrementalValue : undefined
 				);
@@ -112,9 +112,9 @@ function UnforwardedNumberControl(
 			 * Handles drag to update events
 			 */
 			if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
-				// @ts-expect-error TODO: Investigate
+				// @ts-expect-error TODO: See if reducer actions can be typed better
 				const [ x, y ] = payload.delta;
-				// @ts-expect-error TODO: Investigate
+				// @ts-expect-error TODO: See if reducer actions can be typed better
 				const enableShift = payload.shiftKey && isShiftStepEnabled;
 				const modifier = enableShift
 					? ensureNumber( shiftStep ) * baseStep
@@ -149,9 +149,9 @@ function UnforwardedNumberControl(
 					delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
 					const distance = delta * modifier * directionModifier;
 
-					// @ts-expect-error TODO: Investigate if this is wrong
+					// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
 					nextState.value = constrainValue(
-						// @ts-expect-error TODO: Investigate if this is wrong
+						// @ts-expect-error TODO: isValueEmpty() needs to be typed properly
 						add( currentValue, distance ),
 						enableShift ? modifier : undefined
 					);
@@ -168,10 +168,10 @@ function UnforwardedNumberControl(
 				const applyEmptyValue =
 					required === false && currentValue === '';
 
-				// @ts-expect-error TODO: Investigate if this is wrong
+				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
 				nextState.value = applyEmptyValue
 					? currentValue
-					: // @ts-expect-error TODO: Investigate if this is wrong
+					: // @ts-expect-error TODO: isValueEmpty() needs to be typed properly
 					  constrainValue( currentValue );
 			}
 
@@ -194,7 +194,7 @@ function UnforwardedNumberControl(
 			required={ required }
 			step={ step }
 			type={ typeProp }
-			// @ts-expect-error TODO: Resolve discrepancy
+			// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
 			value={ valueProp }
 			__unstableStateReducer={ ( state, action ) => {
 				const baseState = numberControlStateReducer( state, action );
