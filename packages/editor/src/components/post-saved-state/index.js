@@ -151,9 +151,7 @@ export default function PostSavedState( {
 					: undefined
 			}
 			onClick={ isDisabled ? undefined : () => savePost() }
-			shortcut={
-				isSavedState ? undefined : displayShortcut.primary( 's' )
-			}
+			shortcut={ isDisabled ? undefined : displayShortcut.primary( 's' ) }
 			variant="tertiary"
 			icon={ isLargeViewport ? undefined : cloudUpload }
 			label={ text }
