@@ -25,7 +25,6 @@ const GRAY = {
 // TODO: Replace usages of these with the equivalents in `GRAY`
 const LIGHT_GRAY = {
 	800: '#b5bcc2',
-	600: '#d7dade',
 };
 
 // Matches @wordpress/base-styles

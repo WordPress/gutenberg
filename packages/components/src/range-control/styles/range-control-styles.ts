@@ -83,7 +83,7 @@ const railBackgroundColor = ( { disabled, railColor }: RailProps ) => {
 };
 
 export const Rail = styled.span`
-	background-color: ${ COLORS.lightGray[ 600 ] };
+	background-color: ${ COLORS.gray[ 300 ] };
 	left: 0;
 	pointer-events: none;
 	right: 0;
@@ -129,7 +129,7 @@ export const MarksWrapper = styled.span`
 `;
 
 const markFill = ( { disabled, isFilled }: RangeMarkProps ) => {
-	let backgroundColor = isFilled ? 'currentColor' : COLORS.lightGray[ 600 ];
+	let backgroundColor = isFilled ? 'currentColor' : COLORS.gray[ 300 ];
 
 	if ( disabled ) {
 		backgroundColor = COLORS.lightGray[ 800 ];
@@ -152,12 +152,12 @@ export const Mark = styled.span`
 
 const markLabelFill = ( { isFilled }: RangeMarkProps ) => {
 	return css( {
-		color: isFilled ? COLORS.gray[ 700 ] : COLORS.lightGray[ 600 ],
+		color: isFilled ? COLORS.gray[ 700 ] : COLORS.gray[ 300 ],
 	} );
 };
 
 export const MarkLabel = styled.span`
-	color: ${ COLORS.lightGray[ 600 ] };
+	color: ${ COLORS.gray[ 300 ] };
 	left: 0;
 	font-size: 11px;
 	position: absolute;
