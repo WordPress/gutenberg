@@ -43,6 +43,9 @@
 -   `NavigatorButton`: updated to satisfy `react/exhaustive-deps` eslint rule ([#42051](https://github.com/WordPress/gutenberg/pull/42051))
 -   `TabPanel`: Refactor away from `_.partial()` ([#43895](https://github.com/WordPress/gutenberg/pull/43895/)).
 -   `Panel`: Refactor tests to `@testing-library/react` ([#43896](https://github.com/WordPress/gutenberg/pull/43896)).
+-   `Popover`: refactor to TypeScript ([#43823](https://github.com/WordPress/gutenberg/pull/43823/)).
+-   `BorderControl` and `BorderBoxControl`: replace temporary types with `Popover`'s types ([#43823](https://github.com/WordPress/gutenberg/pull/43823/)).
+-   `DimensionControl`: Refactor tests to `@testing-library/react` ([#43916](https://github.com/WordPress/gutenberg/pull/43916)).
 
 ## 20.0.0 (2022-08-24)
 

@@ -91,6 +91,7 @@ function ListViewBranch( props ) {
 		fixedListWindow,
 		isExpanded,
 		parentId,
+		shouldShowInnerBlocks = true,
 	} = props;
 
 	const isContentLocked = useSelect(
@@ -138,9 +139,10 @@ function ListViewBranch( props ) {
 						: `${ position }`;
 				const hasNestedBlocks = !! innerBlocks?.length;
 
-				const shouldExpand = hasNestedBlocks
-					? expandedState[ clientId ] ?? isExpanded
-					: undefined;
+				const shouldExpand =
+					hasNestedBlocks && shouldShowInnerBlocks
+						? expandedState[ clientId ] ?? isExpanded
+						: undefined;
 
 				const isDragged = !! draggedClientIds?.includes( clientId );
 

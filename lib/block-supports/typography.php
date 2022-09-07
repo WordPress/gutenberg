@@ -53,6 +53,12 @@ function gutenberg_register_typography_support( $block_type ) {
 			'type' => 'string',
 		);
 	}
+
+	if ( $has_font_family_support && ! array_key_exists( 'fontFamily', $block_type->attributes ) ) {
+		$block_type->attributes['fontFamily'] = array(
+			'type' => 'string',
+		);
+	}
 }
 
 /**
