@@ -190,7 +190,7 @@ test.describe( 'Preview', () => {
 		).toBeVisible();
 
 		const previewToggle = page.locator(
-			'role=button[name="View"i][expanded=true]'
+			'role=button[name="View"i][expanded]'
 		);
 
 		// Close "View" dropdown if open.
