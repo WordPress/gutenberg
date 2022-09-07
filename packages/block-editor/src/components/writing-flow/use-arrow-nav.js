@@ -101,6 +101,20 @@ export function getClosestTabbable(
 	}
 
 	function isTabCandidate( node ) {
+		// Skip if the current node is the only child.
+		if ( node.children.length === 1 && node.firstElementChild === target ) {
+			return;
+		}
+
+		// Skip if there's only one child that is content editable (and thus a
+		// better candidate).
+		if (
+			node.children.length === 1 &&
+			node.firstElementChild.getAttribute( 'contenteditable' ) === 'true'
+		) {
+			return;
+		}
+
 		// Not a candidate if the node is not tabbable.
 		if ( ! focus.tabbable.isTabbableIndex( node ) ) {
 			return false;
