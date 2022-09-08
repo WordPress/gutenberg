@@ -40,7 +40,7 @@ export default function EditSiteApp( { reboot, homeTemplate } ) {
 				{ ( { params } ) => {
 					const isListPage = getIsListPage( params );
 
-					// The existence of `'front-page` supersedes very other settings.
+					// The existence of a 'front-page' supersedes every other setting.
 					const homeTemplateType =
 						params.postId?.includes( 'front-page' ) ||
 						params.postId === homeTemplate?.postId
