@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests the Style Engine class and associated functionality.
+ * Tests the Style Engine global functions that interact with the WP_Style_Engine class.
  *
  * @package    Gutenberg
  * @subpackage style-engine
@@ -50,6 +50,8 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 * Tests generating block styles and classnames based on various manifestations of the $block_styles argument.
 	 *
 	 * @covers ::wp_style_engine_get_styles
+	 * @covers WP_Style_Engine::parse_block_styles
+	 * @covers WP_Style_Engine::compile_css
 	 *
 	 * @dataProvider data_wp_style_engine_get_styles
 	 *
@@ -140,28 +142,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'margin'       => '111px',
 					),
 					'classnames'   => 'has-text-color has-texas-flood-color has-border-color has-cool-caramel-border-color',
-				),
-			),
-
-			'valid_inline_css_and_classnames_with_context' => array(
-				'block_styles'    => array(
-					'color'   => array(
-						'text' => 'var:preset|color|little-lamb',
-					),
-					'spacing' => array(
-						'margin' => '20px',
-					),
-				),
-				'options'         => array(
-					'convert_vars_to_classnames' => true,
-					'context'                    => 'block-supports',
-				),
-				'expected_output' => array(
-					'css'          => 'margin:20px;',
-					'declarations' => array(
-						'margin' => '20px',
-					),
-					'classnames'   => 'has-text-color has-little-lamb-color',
 				),
 			),
 
@@ -525,9 +505,10 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that passing no context does not store styles.
+	 * Tests adding rules to a store and retrieving a generated stylesheet.
 	 *
 	 * @covers ::wp_style_engine_get_styles
+	 * @covers WP_Style_Engine::store_css_rule
 	 */
 	public function test_should_store_block_styles_using_context() {
 		$block_styles = array(
@@ -617,6 +598,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 * Tests returning a generated stylesheet from a set of rules.
 	 *
 	 * @covers ::wp_style_engine_get_stylesheet_from_css_rules
+	 * @covers WP_Style_Engine::compile_stylesheet_from_css_rules
 	 */
 	public function test_should_return_stylesheet_from_css_rules() {
 		$css_rules = array(
@@ -657,6 +639,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 * Tests that incoming styles are deduped and merged.
 	 *
 	 * @covers ::wp_style_engine_get_stylesheet_from_css_rules
+	 * @covers WP_Style_Engine::compile_stylesheet_from_css_rules
 	 */
 	public function test_should_dedupe_and_merge_css_rules() {
 		$css_rules = array(
