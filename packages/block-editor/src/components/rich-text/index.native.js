@@ -113,6 +113,7 @@ function RichTextWrapper(
 		disableSuggestions,
 		disableAutocorrection,
 		containerWidth,
+		onEnter: onCustomEnter,
 		...props
 	},
 	forwardedRef
@@ -342,6 +343,10 @@ function RichTextWrapper(
 					] );
 					__unstableMarkAutomaticChange();
 				}
+			}
+
+			if ( onCustomEnter ) {
+				onCustomEnter();
 			}
 
 			if ( multiline ) {
