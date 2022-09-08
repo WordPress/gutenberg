@@ -43,7 +43,7 @@ class WP_Style_Engine_Processor {
 		if ( ! $store instanceof WP_Style_Engine_CSS_Rules_Store ) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( '$store must be an instance of WP_Style_Engine_CSS_Rules_Store' ),
+				__( '$store must be an instance of WP_Style_Engine_CSS_Rules_Store', 'default' ),
 				'6.1.0'
 			);
 			return $this;
