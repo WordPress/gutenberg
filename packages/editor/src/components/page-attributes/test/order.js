@@ -28,7 +28,7 @@ describe( 'PageAttributesOrder', () => {
 
 		render( <PageAttributesOrder onUpdateOrder={ onUpdateOrder } /> );
 
-		const input = screen.getByRole( 'spinbutton' );
+		const input = screen.getByRole( 'spinbutton', { name: 'Order' } );
 		await user.type( input, 'bad', typeOptions );
 		await user.type( input, '----+++', typeOptions );
 		await user.type( input, '-', typeOptions );
@@ -49,7 +49,7 @@ describe( 'PageAttributesOrder', () => {
 			<PageAttributesOrder order={ 4 } onUpdateOrder={ onUpdateOrder } />
 		);
 
-		const input = screen.getByRole( 'spinbutton' );
+		const input = screen.getByRole( 'spinbutton', { name: 'Order' } );
 
 		await user.type( input, '0', typeOptions );
 
@@ -65,7 +65,11 @@ describe( 'PageAttributesOrder', () => {
 
 		render( <PageAttributesOrder onUpdateOrder={ onUpdateOrder } /> );
 
-		await user.type( screen.getByRole( 'spinbutton' ), '4', typeOptions );
+		await user.type(
+			screen.getByRole( 'spinbutton', { name: 'Order' } ),
+			'4',
+			typeOptions
+		);
 
 		expect( onUpdateOrder ).toHaveBeenCalledWith( 4 );
 	} );
@@ -79,7 +83,11 @@ describe( 'PageAttributesOrder', () => {
 
 		render( <PageAttributesOrder onUpdateOrder={ onUpdateOrder } /> );
 
-		await user.type( screen.getByRole( 'spinbutton' ), '-1', typeOptions );
+		await user.type(
+			screen.getByRole( 'spinbutton', { name: 'Order' } ),
+			'-1',
+			typeOptions
+		);
 
 		expect( onUpdateOrder ).toHaveBeenCalledWith( -1 );
 	} );
