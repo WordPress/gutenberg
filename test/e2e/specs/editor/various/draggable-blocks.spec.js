@@ -199,7 +199,7 @@ test.describe( 'Draggable block', () => {
 		// Start dragging.
 		await page.mouse.down();
 
-		// Move to and hover on the bottom half of the paragraph block to trigger the indicator.
+		// Move to and hover on the left half of the paragraph block to trigger the indicator.
 		const firstParagraph = page.locator(
 			'role=document[name="Paragraph block"i] >> text=1'
 		);
@@ -221,7 +221,7 @@ test.describe( 'Draggable block', () => {
 			'data-testid=block-list-insertion-point-indicator'
 		);
 		await expect( indicator ).toBeVisible();
-		// Expect the indicator to be below the second paragraph.
+		// Expect the indicator to be to the left of the first paragraph.
 		await expect
 			.poll( () => indicator.boundingBox().then( ( { x } ) => x ) )
 			.toBeLessThan( firstParagraphBound.x );
@@ -278,7 +278,7 @@ test.describe( 'Draggable block', () => {
 		// Start dragging.
 		await page.mouse.down();
 
-		// Move to and hover on the bottom half of the paragraph block to trigger the indicator.
+		// Move to and hover on the right half of the paragraph block to trigger the indicator.
 		const secondParagraph = page.locator(
 			'role=document[name="Paragraph block"i] >> text=2'
 		);
@@ -300,7 +300,7 @@ test.describe( 'Draggable block', () => {
 			'data-testid=block-list-insertion-point-indicator'
 		);
 		await expect( indicator ).toBeVisible();
-		// Expect the indicator to be below the second paragraph.
+		// Expect the indicator to be to the right of the second paragraph.
 		await expect
 			.poll( () =>
 				indicator.boundingBox().then( ( { x, width } ) => x + width )
