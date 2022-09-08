@@ -1,6 +1,9 @@
 /**
  * WordPress dependencies
  */
+/**
+ * WordPress dependencies
+ */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Query block', () => {
@@ -26,13 +29,13 @@ test.describe( 'Query block', () => {
 			//  * Ensure that carousel is working by checking slider css classes
 			//  * and navigating to the next pattern.
 			//  */
-			expect(
+			await expect(
 				page.locator(
 					'li.pattern-slide.active-slide[aria-label="Query Test 1"]'
 				)
 			).toBeVisible();
 			await page.click( 'role=button[name="Next pattern"i]' );
-			expect(
+			await expect(
 				page.locator(
 					'li.pattern-slide.active-slide[aria-label="Query Test 2"]'
 				)
@@ -51,11 +54,10 @@ test.describe( 'Query block', () => {
 			 * `query` makes used of `instanceId` so it's not very reliable.
 			 * This should be revisited.
 			 */
-			expect(
-				page
-					.locator( '[aria-label="Block: Post Date"] >> nth=0' )
+			await expect(
+				page.locator( '[aria-label="Block: Post Date"] >> nth=0' )
 			).toBeVisible();
-			expect(
+			await expect(
 				page.locator( '[aria-label="Block: Post Title"] >> nth=0' )
 			).toBeVisible();
 		} );
@@ -67,7 +69,7 @@ test.describe( 'Query block', () => {
 			await page.click( 'role=button[name="Choose"i]' );
 
 			// Wait for patterns setup to be loaded.
-			expect(
+			await expect(
 				page.locator(
 					'.block-editor-block-pattern-setup__display-controls'
 				)
@@ -89,10 +91,10 @@ test.describe( 'Query block', () => {
 			 * `query` makes used of `instanceId` so it's not very reliable.
 			 * This should be revisited.
 			 */
-			expect(
+			await expect(
 				page.locator( '[aria-label="Block: Post Date"] >> nth=0' )
 			).toBeVisible();
-			expect(
+			await expect(
 				page.locator( '[aria-label="Block: Post Title"] >> nth=0' )
 			).toBeVisible();
 		} );
