@@ -98,8 +98,8 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
  *
  *     @type string|null $context  An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.
  *                                 When set, the style engine will attempt to store the CSS rules.
- *     @type boolean     $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
- *     @type boolean     $prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
+ *     @type bool        $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
+ *     @type bool        $prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
  * }
  *
  * @return string A compiled CSS string.
@@ -146,8 +146,8 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
  * @param array  $options {
  *     Optional. An array of options. Default empty array.
  *
- *     @type boolean $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
- *     @type boolean $prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
+ *     @type bool $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
+ *     @type bool $prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
  * }
  *
  * @return string A compiled CSS string.

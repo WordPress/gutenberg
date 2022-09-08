@@ -258,7 +258,7 @@ class WP_Style_Engine {
 	 *
 	 * @param string? $style_value  A single css preset value.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	protected static function is_valid_style_value( $style_value ) {
 		return '0' === $style_value || ! empty( $style_value );
@@ -520,8 +520,8 @@ class WP_Style_Engine {
 	 * @param array                      $options   {
 	 *     Optional. An array of options. Default empty array.
 	 *
-	 *     @type boolean     $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
-	 *     @type boolean     $prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
+	 *     @type bool $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
+	 *     @type bool $prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
 	 * }
 	 *
 	 * @return string A compiled stylesheet from stored CSS rules.

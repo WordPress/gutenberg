@@ -217,12 +217,12 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 		$this->assertSame(
 			'margin:10em 10em 20em 1px;font-family:Happy Font serif;',
 			$css_declarations->get_declarations_string(),
-			'Output after removing CSS declaration via `remove_declaration()` does not match expectations'
+			'Output after removing "color" declaration via `remove_declaration()` does not match expectations'
 		);
 	}
 
 	/**
-	 * Tests removing multiple declarations.
+	 * Tests that multiple declarations are removed.
 	 *
 	 * @covers ::remove_declarations
 	 */
@@ -244,7 +244,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 		$this->assertSame(
 			'font-family:Happy Font serif;',
 			$css_declarations->get_declarations_string(),
-			'Output after removing multiple CSS declaration via `remove_declarations()` does not match expectations'
+			'Output after removing "color" and "margin" declarations via `remove_declarations()` does not match expectations'
 		);
 	}
 }

@@ -135,8 +135,8 @@ class WP_Style_Engine_CSS_Declarations {
 	/**
 	 * Filters and compiles the CSS declarations.
 	 *
-	 * @param boolean $should_prettify Whether to add spacing, new lines and indents.
-	 * @param number  $indent_count    The number of tab indents to apply to the rule. Applies if `prettify` is `true`.
+	 * @param bool   $should_prettify Whether to add spacing, new lines and indents.
+	 * @param number $indent_count    The number of tab indents to apply to the rule. Applies if `prettify` is `true`.
 	 *
 	 * @return string The CSS declarations.
 	 */
