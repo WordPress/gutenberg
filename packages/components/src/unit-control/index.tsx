@@ -46,6 +46,7 @@ function UnforwardedUnitControl(
 	const {
 		__unstableStateReducer: stateReducerProp,
 		autoComplete = 'off',
+		// @ts-expect-error Ensure that children is omitted from restProps
 		children,
 		className,
 		disabled = false,
@@ -259,7 +260,6 @@ function UnforwardedUnitControl(
 	return (
 		<Root className="components-unit-control-wrapper" style={ style }>
 			<ValueInput
-				aria-label={ label }
 				type={ isPressEnterToChange ? 'text' : 'number' }
 				{ ...props }
 				autoComplete={ autoComplete }
