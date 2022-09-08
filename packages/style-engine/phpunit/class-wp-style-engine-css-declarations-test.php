@@ -92,23 +92,75 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that values are escaped and run the CSS through safecss_filter_attr().
+	 * Test that values with HTML tags are escaped, and CSS properties are run through safecss_filter_attr().
 	 *
+	 * @covers ::get_declarations_string
 	 * @covers ::filter_declaration
 	 */
-	public function test_should_remove_unsafe_properties_and_values() {
-		$input_declarations = array(
-			'color'        => 'url("https://wordpress.org")',
+	public function test_should_strip_html_tags_andremove_unsafe_css_properties() {
+		$input_declarations         = array(
 			'font-size'    => '<red/>',
-			'margin-right' => '10em',
 			'padding'      => '</style>',
 			'potato'       => 'uppercase',
+			'cheese'       => '10px',
+			'margin-right' => '10em',
 		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+		$css_declarations           = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+		$safe_style_css_mock_action = new MockAction();
+
+		// filter_declaration() is called in get_declarations_string().
+		add_filter( 'safe_style_css', array( $safe_style_css_mock_action, 'filter' ) );
+		$css_declarations_string = $css_declarations->get_declarations_string();
+
+		$this->assertSame(
+			3, // Values with HTML tags are removed first by wp_strip_all_tags().
+			$safe_style_css_mock_action->get_call_count(),
+			'"safe_style_css" filters were not applied to CSS declaration properties.'
+		);
 
 		$this->assertSame(
 			'margin-right:10em;',
-			$css_declarations->get_declarations_string()
+			$css_declarations_string,
+			'Unallowed CSS properties or values with HTML tags were not removed.'
+		);
+	}
+
+
+	/**
+	 * Tests that calc, clamp, min, max, and minmax CSS functions are allowed.
+	 *
+	 * @covers ::get_declarations_string
+	 * @covers ::filter_declaration
+	 */
+	public function test_should_allow_css_functions_and_strip_unsafe_css_values() {
+		$input_declarations                        = array(
+			'background'       => 'var(--wp--preset--color--primary, 10px)', // Simple var().
+			'font-size'        => 'clamp(36.00rem, calc(32.00rem + 10.00vw), 40.00rem)', // Nested clamp().
+			'width'            => 'min(150vw, 100px)',
+			'min-width'        => 'max(150vw, 100px)',
+			'max-width'        => 'minmax(400px, 50%)',
+			'padding'          => 'calc(80px * -1)',
+			'background-image' => 'url("https://wordpress.org")',
+			'line-height'      => 'url("https://wordpress.org")',
+			'margin'           => 'illegalfunction(30px)',
+		);
+		$css_declarations                          = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+		$safecss_filter_attr_allow_css_mock_action = new MockAction();
+
+		// filter_declaration() is called in get_declarations_string().
+		add_filter( 'safecss_filter_attr_allow_css', array( $safecss_filter_attr_allow_css_mock_action, 'filter' ) );
+		$css_declarations_string = $css_declarations->get_declarations_string();
+
+		$this->assertSame(
+			9,
+			$safecss_filter_attr_allow_css_mock_action->get_call_count(),
+			'"safecss_filter_attr_allow_css" filters were not applied to CSS declaration values.'
+		);
+
+		$this->assertSame(
+			'background:var(--wp--preset--color--primary, 10px);font-size:clamp(36.00rem, calc(32.00rem + 10.00vw), 40.00rem);width:min(150vw, 100px);min-width:max(150vw, 100px);max-width:minmax(400px, 50%);padding:calc(80px * -1);background-image:url("https://wordpress.org");',
+			$css_declarations_string,
+			'Unsafe values were not removed'
 		);
 	}
 
@@ -165,32 +217,6 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 				'should_prettify' => true,
 				'indent_count'    => 2,
 			),
-		);
-	}
-
-	/**
-	 * Tests that calc, clamp, min, max, and minmax CSS functions are allowed.
-	 *
-	 * @covers ::filter_declaration
-	 * @covers ::get_declarations_string
-	 */
-	public function test_should_allow_css_functions() {
-		$input_declarations = array(
-			'background'       => 'var(--wp--preset--color--primary, 10px)', // Simple var().
-			'font-size'        => 'clamp(36.00rem, calc(32.00rem + 10.00vw), 40.00rem)', // Nested clamp().
-			'width'            => 'min(150vw, 100px)',
-			'min-width'        => 'max(150vw, 100px)',
-			'max-width'        => 'minmax(400px, 50%)',
-			'padding'          => 'calc(80px * -1)',
-			'background-image' => 'url("https://wordpress.org")',
-			'line-height'      => 'url("https://wordpress.org")',
-			'margin'           => 'illegalfunction(30px)',
-		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
-
-		$this->assertSame(
-			'background:var(--wp--preset--color--primary, 10px);font-size:clamp(36.00rem, calc(32.00rem + 10.00vw), 40.00rem);width:min(150vw, 100px);min-width:max(150vw, 100px);max-width:minmax(400px, 50%);padding:calc(80px * -1);background-image:url("https://wordpress.org");',
-			$css_declarations->get_declarations_string()
 		);
 	}
 
