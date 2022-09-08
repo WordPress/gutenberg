@@ -29,6 +29,7 @@
 
 ### Internal
 
+-   Fix TypeScript types for `isValueDefined()` and `isValueEmpty()` utility functions ([#43983](https://github.com/WordPress/gutenberg/pull/43983)).
 -   `RadioControl`: Clean up styles to use less custom CSS ([#43868](https://github.com/WordPress/gutenberg/pull/43868)).
 -   Remove unused `normalizeArrowKey` utility function ([#43640](https://github.com/WordPress/gutenberg/pull/43640/)).
 -   `SearchControl`: Convert to TypeScript ([#43871](https://github.com/WordPress/gutenberg/pull/43871)).
