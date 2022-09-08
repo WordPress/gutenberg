@@ -29,15 +29,12 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 3);
   -webkit-box-pack: start;
   -ms-flex-pack: start;
   -webkit-justify-content: flex-start;
   justify-content: flex-start;
   width: 100%;
-}
-
-.emotion-4>*+*:not( marquee ) {
-  margin-left: calc(4px * 3);
 }
 
 .emotion-4>* {
@@ -128,15 +125,12 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 3);
   -webkit-box-pack: start;
   -ms-flex-pack: start;
   -webkit-justify-content: flex-start;
   justify-content: flex-start;
   width: 100%;
-}
-
-.emotion-4>*+*:not( marquee ) {
-  margin-left: calc(4px * 3);
 }
 
 .emotion-4>* {
@@ -213,15 +207,12 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 3);
   -webkit-box-pack: start;
   -ms-flex-pack: start;
   -webkit-justify-content: flex-start;
   justify-content: flex-start;
   width: 100%;
-}
-
-.emotion-4>*+*:not( marquee ) {
-  margin-left: calc(4px * 3);
 }
 
 .emotion-4>* {
@@ -312,15 +303,12 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 3);
   -webkit-box-pack: start;
   -ms-flex-pack: start;
   -webkit-justify-content: flex-start;
   justify-content: flex-start;
   width: 100%;
-}
-
-.emotion-4>*+*:not( marquee ) {
-  margin-left: calc(4px * 3);
 }
 
 .emotion-4>* {
