@@ -234,12 +234,13 @@ function Iframe(
 			contentDocument.dir = ownerDocument.dir;
 			documentElement.removeChild( contentDocument.head );
 			documentElement.removeChild( contentDocument.body );
-			contentDocument.addEventListener(
+
+			iFrameDocument.addEventListener(
 				'dragover',
 				preventFileDropDefault,
 				false
 			);
-			contentDocument.addEventListener(
+			iFrameDocument.addEventListener(
 				'drop',
 				preventFileDropDefault,
 				false
