@@ -655,10 +655,12 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 
 		if ( in_array( 'styles', $types, true ) ) {
-			$stylesheet .= $this->get_root_layout_rules( static::ROOT_BLOCK_SELECTOR, $style_nodes[ $root_block_key ] );
-			$stylesheet .= $this->get_block_classes( $style_nodes );
-
 			$root_block_key = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $style_nodes, 'selector' ) );
+
+			if ( ! empty( $root_block_key ) ) {
+				$stylesheet .= $this->get_root_layout_rules( static::ROOT_BLOCK_SELECTOR, $style_nodes[ $root_block_key ] );
+			}
+			$stylesheet .= $this->get_block_classes( $style_nodes );
 		} elseif ( in_array( 'base-layout-styles', $types, true ) ) {
 			// Base layout styles are provided as part of `styles`, so only output separately if explicitly requested.
 			// For backwards compatibility, the Columns block is explicitly included, to support a different default gap value.
@@ -796,33 +798,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$block_rules .= static::to_ruleset( $feature_selector, $individual_feature_declarations );
 		}
 
-		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
-			/*
-			* Reset default browser margin on the root body element.
-			* This is set on the root selector **before** generating the ruleset
-			* from the `theme.json`. This is to ensure that if the `theme.json` declares
-			* `margin` in its `spacing` declaration for the `body` element then these
-			* user-generated values take precedence in the CSS cascade.
-			* @link https://github.com/WordPress/gutenberg/issues/36147.
-			*/
-			$block_rules .= 'body { margin: 0;';
-
-			/*
-			* If there are content and wide widths in theme.json, output them
-			* as custom properties on the body element so all blocks can use them.
-			*/
-			if ( isset( $settings['layout']['contentSize'] ) || isset( $settings['layout']['wideSize'] ) ) {
-				$content_size = isset( $settings['layout']['contentSize'] ) ? $settings['layout']['contentSize'] : $settings['layout']['wideSize'];
-				$content_size = static::is_safe_css_declaration( 'max-width', $content_size ) ? $content_size : 'initial';
-				$wide_size    = isset( $settings['layout']['wideSize'] ) ? $settings['layout']['wideSize'] : $settings['layout']['contentSize'];
-				$wide_size    = static::is_safe_css_declaration( 'max-width', $wide_size ) ? $wide_size : 'initial';
-				$block_rules .= '--wp--style--global--content-size: ' . $content_size . ';';
-				$block_rules .= '--wp--style--global--wide-size: ' . $wide_size . ';';
-			}
-
-			$block_rules .= '}';
-		}
-
 		return $block_rules;
 	}
 
@@ -837,6 +812,31 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 */
 	private function get_root_layout_rules( $selector, $block_metadata ) {
 		$css = '';
+
+		/*
+		* Reset default browser margin on the root body element.
+		* This is set on the root selector **before** generating the ruleset
+		* from the `theme.json`. This is to ensure that if the `theme.json` declares
+		* `margin` in its `spacing` declaration for the `body` element then these
+		* user-generated values take precedence in the CSS cascade.
+		* @link https://github.com/WordPress/gutenberg/issues/36147.
+		*/
+		$css .= 'body { margin: 0;';
+
+		/*
+		* If there are content and wide widths in theme.json, output them
+		* as custom properties on the body element so all blocks can use them.
+		*/
+		if ( isset( $settings['layout']['contentSize'] ) || isset( $settings['layout']['wideSize'] ) ) {
+			$content_size = isset( $settings['layout']['contentSize'] ) ? $settings['layout']['contentSize'] : $settings['layout']['wideSize'];
+			$content_size = static::is_safe_css_declaration( 'max-width', $content_size ) ? $content_size : 'initial';
+			$wide_size    = isset( $settings['layout']['wideSize'] ) ? $settings['layout']['wideSize'] : $settings['layout']['contentSize'];
+			$wide_size    = static::is_safe_css_declaration( 'max-width', $wide_size ) ? $wide_size : 'initial';
+			$css .= '--wp--style--global--content-size: ' . $content_size . ';';
+			$css .= '--wp--style--global--wide-size: ' . $wide_size . ';';
+		}
+
+		$css .= '}';
 
 		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 		if ( $use_root_padding ) {
