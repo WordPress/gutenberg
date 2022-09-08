@@ -37,7 +37,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test creating a new store on instantiation.
+	 * Tests creating a new store on instantiation.
 	 *
 	 * @covers ::__construct
 	 */

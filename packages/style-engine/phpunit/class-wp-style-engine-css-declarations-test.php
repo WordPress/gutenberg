@@ -92,7 +92,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that values with HTML tags are escaped, and CSS properties are run through safecss_filter_attr().
+	 * Tests that values with HTML tags are escaped, and CSS properties are run through safecss_filter_attr().
 	 *
 	 * @covers ::get_declarations_string
 	 * @covers ::filter_declaration

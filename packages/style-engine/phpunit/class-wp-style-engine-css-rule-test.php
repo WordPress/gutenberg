@@ -45,7 +45,7 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that declaration properties are deduplicated.
+	 * Tests that declaration properties are deduplicated.
 	 *
 	 * @covers ::add_declarations
 	 * @covers ::get_css
@@ -66,7 +66,7 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that declarations can be added to existing rules.
+	 * Tests that declarations can be added to existing rules.
 	 *
 	 * @covers ::add_declarations
 	 * @covers ::get_css
@@ -84,7 +84,7 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test setting a selector to a rule.
+	 * Tests setting a selector to a rule.
 	 *
 	 * @covers ::set_selector
 	 */
