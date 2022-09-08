@@ -14,10 +14,9 @@ describe( 'PostPublishButton', () => {
 		it( 'should be true if post is currently saving', () => {
 			render( <PostPublishButton isPublishable isSaveable isSaving /> );
 
-			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
-				'aria-disabled',
-				'true'
-			);
+			expect(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
 		it( 'should be true if forceIsSaving is true', () => {
@@ -25,10 +24,9 @@ describe( 'PostPublishButton', () => {
 				<PostPublishButton isPublishable isSaveable forceIsSaving />
 			);
 
-			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
-				'aria-disabled',
-				'true'
-			);
+			expect(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
 		it( 'should be true if post is not publishable and not forceIsDirty', () => {
@@ -40,19 +38,17 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
-				'aria-disabled',
-				'true'
-			);
+			expect(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
 		it( 'should be true if post is not saveable', () => {
 			render( <PostPublishButton isPublishable isSaveable={ false } /> );
 
-			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
-				'aria-disabled',
-				'true'
-			);
+			expect(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
 		it( 'should be true if post saving is locked', () => {
@@ -64,10 +60,9 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
-				'aria-disabled',
-				'true'
-			);
+			expect(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
 		it( 'should be false if post is saveable but not publishable and forceIsDirty is true', () => {
@@ -79,19 +74,17 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
-				'aria-disabled',
-				'false'
-			);
+			expect(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			).toHaveAttribute( 'aria-disabled', 'false' );
 		} );
 
 		it( 'should be false if post is publishave and saveable', () => {
 			render( <PostPublishButton isPublishable isSaveable /> );
 
-			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
-				'aria-disabled',
-				'false'
-			);
+			expect(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			).toHaveAttribute( 'aria-disabled', 'false' );
 		} );
 	} );
 
@@ -112,7 +105,9 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			await user.click( screen.getByRole( 'button' ) );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			);
 
 			expect( onStatusChange ).toHaveBeenCalledWith( 'pending' );
 		} );
@@ -134,7 +129,9 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			await user.click( screen.getByRole( 'button' ) );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			);
 
 			expect( onStatusChange ).toHaveBeenCalledWith( 'future' );
 		} );
@@ -156,7 +153,9 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			await user.click( screen.getByRole( 'button' ) );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			);
 
 			expect( onStatusChange ).toHaveBeenCalledWith( 'private' );
 		} );
@@ -177,7 +176,9 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			await user.click( screen.getByRole( 'button' ) );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			);
 
 			expect( onStatusChange ).toHaveBeenCalledWith( 'publish' );
 		} );
@@ -200,7 +201,9 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			await user.click( screen.getByRole( 'button' ) );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			);
 
 			expect( onStatusChange ).toHaveBeenCalledWith( 'publish' );
 			expect( onSave ).toHaveBeenCalled();
@@ -210,6 +213,8 @@ describe( 'PostPublishButton', () => {
 	it( 'should have save modifier class', () => {
 		render( <PostPublishButton isSaving isPublished /> );
 
-		expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-busy' );
+		expect(
+			screen.getByRole( 'button', { name: 'Submit for Review' } )
+		).toHaveClass( 'is-busy' );
 	} );
 } );
