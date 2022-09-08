@@ -97,22 +97,40 @@ export default function QueryInspectorControls( {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
+	const showInheritControl = isControllAllowed( allowedControls, 'inherit' );
+	const showPostTypeControl =
+		! inherit && isControllAllowed( allowedControls, 'postType' );
+	const showColumnsControl = displayLayout?.type === 'flex';
+	const showOrderControl =
+		! inherit && isControllAllowed( allowedControls, 'order' );
+	const showStickyControl =
+		! inherit &&
+		showSticky &&
+		isControllAllowed( allowedControls, 'sticky' );
+	const showSettingsPanel =
+		showInheritControl ||
+		showPostTypeControl ||
+		showColumnsControl ||
+		showOrderControl ||
+		showStickyControl;
 	return (
 		<>
-			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<ToggleControl
-						label={ __( 'Inherit query from template' ) }
-						help={ __(
-							'Toggle to use the global query context that is set with the current template, such as an archive or search. Disable to customize the settings independently.'
+			{ showSettingsPanel && (
+				<InspectorControls>
+					<PanelBody title={ __( 'Settings' ) }>
+						{ showInheritControl && (
+							<ToggleControl
+								label={ __( 'Inherit query from template' ) }
+								help={ __(
+									'Toggle to use the global query context that is set with the current template, such as an archive or search. Disable to customize the settings independently.'
+								) }
+								checked={ !! inherit }
+								onChange={ ( value ) =>
+									setQuery( { inherit: !! value } )
+								}
+							/>
 						) }
-						checked={ !! inherit }
-						onChange={ ( value ) =>
-							setQuery( { inherit: !! value } )
-						}
-					/>
-					{ ! inherit &&
-						isControllAllowed( allowedControls, 'postType' ) && (
+						{ showPostTypeControl && (
 							<SelectControl
 								options={ postTypesSelectOptions }
 								value={ postType }
@@ -123,39 +141,36 @@ export default function QueryInspectorControls( {
 								) }
 							/>
 						) }
-					{ displayLayout?.type === 'flex' && (
-						<>
-							<RangeControl
-								label={ __( 'Columns' ) }
-								value={ displayLayout.columns }
-								onChange={ ( value ) =>
-									setDisplayLayout( { columns: value } )
-								}
-								min={ 2 }
-								max={ Math.max( 6, displayLayout.columns ) }
-							/>
-							{ displayLayout.columns > 6 && (
-								<Notice
-									status="warning"
-									isDismissible={ false }
-								>
-									{ __(
-										'This column count exceeds the recommended amount and may cause visual breakage.'
-									) }
-								</Notice>
-							) }
-						</>
-					) }
-					{ ! inherit &&
-						isControllAllowed( allowedControls, 'order' ) && (
+						{ showColumnsControl && (
+							<>
+								<RangeControl
+									label={ __( 'Columns' ) }
+									value={ displayLayout.columns }
+									onChange={ ( value ) =>
+										setDisplayLayout( { columns: value } )
+									}
+									min={ 2 }
+									max={ Math.max( 6, displayLayout.columns ) }
+								/>
+								{ displayLayout.columns > 6 && (
+									<Notice
+										status="warning"
+										isDismissible={ false }
+									>
+										{ __(
+											'This column count exceeds the recommended amount and may cause visual breakage.'
+										) }
+									</Notice>
+								) }
+							</>
+						) }
+						{ showOrderControl && (
 							<OrderControl
 								{ ...{ order, orderBy } }
 								onChange={ setQuery }
 							/>
 						) }
-					{ ! inherit &&
-						showSticky &&
-						isControllAllowed( allowedControls, 'sticky' ) && (
+						{ showStickyControl && (
 							<StickyControl
 								value={ sticky }
 								onChange={ ( value ) =>
@@ -163,8 +178,9 @@ export default function QueryInspectorControls( {
 								}
 							/>
 						) }
-				</PanelBody>
-			</InspectorControls>
+					</PanelBody>
+				</InspectorControls>
+			) }
 			{ ! inherit && (
 				<InspectorControls>
 					<ToolsPanel
