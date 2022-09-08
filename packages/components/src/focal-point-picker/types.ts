@@ -69,7 +69,7 @@ export type FocalPointPickerMediaProps = Pick<
 	'autoPlay' | 'muted'
 > & {
 	alt: string;
-	mediaRef?: Ref< any >;
+	mediaRef?: Ref< HTMLDivElement | HTMLVideoElement | HTMLImageElement >;
 	onLoad?: ReactEventHandler< HTMLVideoElement | HTMLImageElement >;
 	src: string;
 };

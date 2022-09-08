@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { Ref } from 'react';
+
+/**
  * Internal dependencies
  */
 import { MediaPlaceholder } from './styles/focal-point-picker-style';
@@ -20,7 +25,7 @@ export default function Media( {
 		return (
 			<MediaPlaceholder
 				className="components-focal-point-picker__media components-focal-point-picker__media--placeholder"
-				ref={ mediaRef }
+				ref={ mediaRef as Ref< HTMLDivElement > }
 				{ ...props }
 			/>
 		);
@@ -36,7 +41,7 @@ export default function Media( {
 			loop
 			muted={ muted }
 			onLoadedData={ onLoad }
-			ref={ mediaRef }
+			ref={ mediaRef as Ref< HTMLVideoElement > }
 			src={ src }
 		/>
 	) : (
@@ -45,7 +50,7 @@ export default function Media( {
 			alt={ alt }
 			className="components-focal-point-picker__media components-focal-point-picker__media--image"
 			onLoad={ onLoad }
-			ref={ mediaRef }
+			ref={ mediaRef as Ref< HTMLImageElement > }
 			src={ src }
 		/>
 	);
