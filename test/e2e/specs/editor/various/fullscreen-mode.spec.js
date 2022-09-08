@@ -23,7 +23,7 @@ test.describe( 'Full Screen', () => {
 
 		// Choose Full Screen Mode
 		await page
-			.locator( 'text=Fullscreen modeWork without distraction⇧⌥⌘F' )
+			.locator( 'text=/Fullscreen modeWork without distraction/' )
 			.click();
 
 		// Validate Fullscreen
