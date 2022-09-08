@@ -657,7 +657,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		if ( in_array( 'styles', $types, true ) ) {
 			$root_block_key = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $style_nodes, 'selector' ) );
 
-			if ( ! empty( $root_block_key ) ) {
+			if ( false !== $root_block_key ) {
 				$stylesheet .= $this->get_root_layout_rules( static::ROOT_BLOCK_SELECTOR, $style_nodes[ $root_block_key ] );
 			}
 			$stylesheet .= $this->get_block_classes( $style_nodes );
@@ -811,7 +811,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string The additional root rules CSS.
 	 */
 	private function get_root_layout_rules( $selector, $block_metadata ) {
-		$css = '';
+		$css              = '';
+		$settings         = _wp_array_get( $this->theme_json, array( 'settings' ) );
+		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 
 		/*
 		* Reset default browser margin on the root body element.
@@ -838,7 +840,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		$css .= '}';
 
-		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 		if ( $use_root_padding ) {
 			// Top and bottom padding are applied to the outer block container.
 			$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
