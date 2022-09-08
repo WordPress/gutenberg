@@ -66,7 +66,9 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
         <div
           class="components-panel__body post-publish-panel__postpublish-header is-opened"
         >
-          <a>
+          <a
+            href="https://wordpress.local/sample-page/"
+          >
             (no title)
           </a>
            
@@ -95,14 +97,14 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
                   class="components-base-control__label emotion-4 emotion-5"
                   for="inspector-text-control-0"
                 >
-                  undefined address
+                  post address
                 </label>
                 <input
                   class="components-text-control__input"
                   id="inspector-text-control-0"
                   readonly=""
                   type="text"
-                  value="undefined"
+                  value="https://wordpress.local/sample-page/"
                 />
               </div>
             </div>
@@ -120,9 +122,9 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
           <div
             class="post-publish-panel__postpublish-buttons"
           >
-            <button
+            <a
               class="components-button is-primary"
-              type="button"
+              href="https://wordpress.local/sample-page/"
             />
             <a
               class="components-button is-secondary"
@@ -230,7 +232,9 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
         <div
           class="components-panel__body post-publish-panel__postpublish-header is-opened"
         >
-          <a>
+          <a
+            href="https://wordpress.local/sample-page/"
+          >
             (no title)
           </a>
            
@@ -259,14 +263,14 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
                   class="components-base-control__label emotion-4 emotion-5"
                   for="inspector-text-control-1"
                 >
-                  undefined address
+                  post address
                 </label>
                 <input
                   class="components-text-control__input"
                   id="inspector-text-control-1"
                   readonly=""
                   type="text"
-                  value="undefined"
+                  value="https://wordpress.local/sample-page/"
                 />
               </div>
             </div>
@@ -284,9 +288,9 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
           <div
             class="post-publish-panel__postpublish-buttons"
           >
-            <button
+            <a
               class="components-button is-primary"
-              type="button"
+              href="https://wordpress.local/sample-page/"
             />
             <a
               class="components-button is-secondary"

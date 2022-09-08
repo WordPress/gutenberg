@@ -4,11 +4,28 @@
 import { render } from '@testing-library/react';
 
 /**
+ * WordPress dependencies
+ */
+import { select } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
  * Internal dependencies
  */
 import { PostPublishPanel } from '../index';
 
 describe( 'PostPublishPanel', () => {
+	jest.spyOn( select( coreStore ), 'getPostType' ).mockReturnValue( {
+		labels: {
+			singular_name: 'post',
+		},
+	} );
+
+	jest.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
+		link: 'https://wordpress.local/sample-page/',
+	} );
+
 	it( 'should render the pre-publish panel if the post is not saving, published or scheduled', () => {
 		const { container } = render(
 			<PostPublishPanel
