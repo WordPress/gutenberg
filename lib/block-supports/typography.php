@@ -53,6 +53,12 @@ function gutenberg_register_typography_support( $block_type ) {
 			'type' => 'string',
 		);
 	}
+
+	if ( $has_font_family_support && ! array_key_exists( 'fontFamily', $block_type->attributes ) ) {
+		$block_type->attributes['fontFamily'] = array(
+			'type' => 'string',
+		);
+	}
 }
 
 /**
@@ -228,11 +234,13 @@ function gutenberg_typography_get_css_variable_inline_style( $attributes, $featu
  * @access private
  *
  * @param string $raw_value Raw size value from theme.json.
- * @param array  $options    array(
- *      'coerce_to'        => (string) Coerce the value to rem or px. Default `'rem'`.
- *      'root_size_value'  => (number) Value of root font size for rem|em <-> px conversion. Default `16`.
- *      'acceptable_units' => (array)  An array of font size units. Default `[ 'rem', 'px', 'em' ]`;
- *  );.
+ * @param array  $options   {
+ *     Optional. An associative array of options. Default is empty array.
+ *
+ *     @type string        $coerce_to        Coerce the value to rem or px. Default `'rem'`.
+ *     @type int           $root_size_value  Value of root font size for rem|em <-> px conversion. Default `16`.
+ *     @type array<string> $acceptable_units An array of font size units. Default `[ 'rem', 'px', 'em' ]`;
+ * }
  * @return array An array consisting of `'value'` and `'unit'` properties.
  */
 function gutenberg_get_typography_value_and_unit( $raw_value, $options = array() ) {
@@ -283,13 +291,15 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
  *
  * @access private
  *
- * @param array $args array(
- *     'maximum_viewport_width' => (string) Maximum size up to which type will have fluidity.
- *     'minimum_viewport_width' => (string) Minimum viewport size from which type will have fluidity.
- *     'maximum_font_size'      => (string) Maximum font size for any clamp() calculation.
- *     'minimum_font_size'      => (string) Minimum font size for any clamp() calculation.
- *     'scale_factor'           => (number) A scale factor to determine how fast a font scales within boundaries.
- * );.
+ * @param array $args {
+ *     Optional. An associative array of values to calculate a fluid formula for font size. Default is empty array.
+ *
+ *     @type string $maximum_viewport_width Maximum size up to which type will have fluidity.
+ *     @type string $minimum_viewport_width Minimum viewport size from which type will have fluidity.
+ *     @type string $maximum_font_size      Maximum font size for any clamp() calculation.
+ *     @type string $minimum_font_size      Minimum font size for any clamp() calculation.
+ *     @type int    $scale_factor           A scale factor to determine how fast a font scales within boundaries.
+ * }
  * @return string|null A font-size value using clamp().
  */
 function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
@@ -355,8 +365,15 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
  * Returns a font-size value based on a given font-size preset.
  * Takes into account fluid typography parameters and attempts to return a css formula depending on available, valid values.
  *
- * @param array   $preset                      fontSizes preset value as seen in theme.json.
- * @param boolean $should_use_fluid_typography An override to switch fluid typography "on". Can be used for unit testing.
+ * @param array $preset                     {
+ *     Required. fontSizes preset value as seen in theme.json.
+ *
+ *     @type string $name Name of the font size preset.
+ *     @type string $slug Kebab-case unique identifier for the font size preset.
+ *     @type string $size CSS font-size value, including units where applicable.
+ * }
+ * @param bool  $should_use_fluid_typography An override to switch fluid typography "on". Can be used for unit testing. Default is `false`.
+ *
  * @return string Font-size value.
  */
 function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_typography = false ) {

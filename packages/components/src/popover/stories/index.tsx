@@ -1,7 +1,13 @@
 /**
+ * External dependencies
+ */
+import type { ComponentStory, ComponentMeta } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useState, useRef, useEffect } from '@wordpress/element';
+// @ts-expect-error The `@wordpress/block-editor` is not typed
 import { __unstableIframe as Iframe } from '@wordpress/block-editor';
 
 /**
@@ -9,26 +15,10 @@ import { __unstableIframe as Iframe } from '@wordpress/block-editor';
  */
 import Button from '../../button';
 import { Provider as SlotFillProvider } from '../../slot-fill';
-import Popover from '../';
+import { Popover } from '..';
+import type { PopoverProps } from '../types';
 
-// Format: "[yAxis] [xAxis]"
-// Valid yAxis values: 'top', 'middle', 'bottom'
-// Valid xAxis values: 'left', 'center', 'right'
-const AVAILABLE_POSITIONS = [
-	'top left',
-	'top center',
-	'top right',
-	'middle left',
-	'middle center',
-	'middle right',
-	'bottom left',
-	'bottom center',
-	'bottom right',
-];
-
-// Follows floating UI's conventions
-// See https://floating-ui.com/docs/computePosition#placement
-const AVAILABLE_PLACEMENTS = [
+const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
 	'top',
 	'top-start',
 	'top-end',
@@ -43,43 +33,30 @@ const AVAILABLE_PLACEMENTS = [
 	'left-end',
 ];
 
-export default {
+const meta: ComponentMeta< typeof Popover > = {
 	title: 'Components/Popover',
 	component: Popover,
 	argTypes: {
 		anchorRef: { control: { type: null } },
 		anchorRect: { control: { type: null } },
-		animate: { control: { type: 'boolean' } },
 		children: { control: { type: null } },
-		className: { control: { type: 'text' } },
-		expandOnMobile: { control: { type: 'boolean' } },
 		focusOnMount: {
 			control: { type: 'select' },
-			options: [ 'firstElement', 'container', false ],
+			options: [ 'firstElement', true, false ],
 		},
 		getAnchorRect: { control: { type: null } },
-		headerTitle: { control: { type: 'text' } },
-		isAlternate: { control: { type: 'boolean' } },
-		noArrow: { control: { type: 'boolean' } },
-		onClose: { control: { type: null } },
-		offset: { control: { type: 'number' } },
-		onFocusOutside: { control: { type: null } },
-		placement: {
-			control: { type: 'select' },
-			options: AVAILABLE_PLACEMENTS,
-		},
-		position: {
-			control: { type: 'select' },
-			options: AVAILABLE_POSITIONS,
-		},
+		onClose: { action: 'onClose' },
+		onFocusOutside: { action: 'onFocusOutside' },
 		__unstableSlotName: { control: { type: null } },
-		resize: { control: { type: 'boolean' } },
-		flip: { control: { type: 'boolean' } },
-		shift: { control: { type: 'boolean' } },
+	},
+	parameters: {
+		controls: { expanded: true },
 	},
 };
 
-const PopoverWithAnchor = ( args ) => {
+export default meta;
+
+const PopoverWithAnchor = ( args: PopoverProps ) => {
 	const anchorRef = useRef( null );
 
 	return (
@@ -102,12 +79,12 @@ const PopoverWithAnchor = ( args ) => {
 	);
 };
 
-export const Default = ( args ) => {
+export const Default: ComponentStory< typeof Popover > = ( args ) => {
 	const [ isVisible, setIsVisible ] = useState( false );
 	const toggleVisible = () => {
 		setIsVisible( ( state ) => ! state );
 	};
-	const buttonRef = useRef();
+	const buttonRef = useRef< HTMLButtonElement | undefined >();
 	useEffect( () => {
 		buttonRef.current?.scrollIntoView?.( {
 			block: 'center',
@@ -147,11 +124,10 @@ Default.args = {
 	),
 };
 
-/**
- * Resize / scroll the viewport to test the behavior of the popovers when they
- * reach the viewport boundaries.
- */
-export const AllPlacements = ( { children, ...args } ) => (
+export const AllPlacements: ComponentStory< typeof Popover > = ( {
+	children,
+	...args
+} ) => (
 	<div
 		style={ {
 			minWidth: '600px',
@@ -196,7 +172,10 @@ AllPlacements.args = {
 	flip: false,
 };
 
-export const DynamicHeight = ( { children, ...args } ) => {
+export const DynamicHeight: ComponentStory< typeof Popover > = ( {
+	children,
+	...args
+} ) => {
 	const [ height, setHeight ] = useState( 200 );
 	const increase = () => setHeight( height + 100 );
 	const decrease = () => setHeight( height - 100 );
@@ -245,13 +224,16 @@ DynamicHeight.args = {
 	children: 'Content with dynamic height',
 };
 
-export const WithSlotOutsideIframe = ( args ) => {
+export const WithSlotOutsideIframe: ComponentStory< typeof Popover > = (
+	args
+) => {
 	const anchorRef = useRef( null );
 	const slotName = 'popover-with-slot-outside-iframe';
 
 	return (
 		<SlotFillProvider>
 			<div>
+				{ /* @ts-expect-error Slot is not currently typed on Popover */ }
 				<Popover.Slot name={ slotName } />
 				<Iframe
 					style={ {

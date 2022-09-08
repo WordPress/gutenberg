@@ -13,7 +13,6 @@ import {
 	Disabled,
 	PanelBody,
 	Spinner,
-	withNotices,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -31,9 +30,10 @@ import {
 import { useRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -48,13 +48,11 @@ const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 function VideoEdit( {
 	isSelected,
-	noticeUI,
 	attributes,
 	className,
 	setAttributes,
 	insertBlocksAfter,
 	onReplace,
-	noticeOperations,
 } ) {
 	const instanceId = useInstanceId( VideoEdit );
 	const videoPlayer = useRef();
@@ -73,9 +71,7 @@ function VideoEdit( {
 				mediaUpload( {
 					filesList: [ file ],
 					onFileChange: ( [ media ] ) => onSelectVideo( media ),
-					onError: ( message ) => {
-						noticeOperations.createErrorNotice( message );
-					},
+					onError: onUploadError,
 					allowedTypes: ALLOWED_MEDIA_TYPES,
 				} );
 			}
@@ -126,9 +122,9 @@ function VideoEdit( {
 		}
 	}
 
+	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
 	const classes = classnames( className, {
@@ -149,7 +145,6 @@ function VideoEdit( {
 					accept="video/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
-					notices={ noticeUI }
 					onError={ onUploadError }
 				/>
 			</div>
@@ -289,4 +284,4 @@ function VideoEdit( {
 	);
 }
 
-export default withNotices( VideoEdit );
+export default VideoEdit;

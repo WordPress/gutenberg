@@ -203,7 +203,7 @@ const config = {
 				type: 'asset/inline',
 			},
 			{
-				test: /\.(bmp|png|jpe?g|gif)$/i,
+				test: /\.(bmp|png|jpe?g|gif|webp)$/i,
 				type: 'asset/resource',
 				generator: {
 					filename: 'images/[name].[hash:8][ext]',

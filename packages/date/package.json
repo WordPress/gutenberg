@@ -27,6 +27,7 @@
 	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
+		"@wordpress/deprecated": "file:../deprecated",
 		"moment": "^2.22.1",
 		"moment-timezone": "^0.5.31"
 	},

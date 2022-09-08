@@ -22,7 +22,7 @@ import {
  */
 import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
 import { arrowLeft, arrowRight } from '@wordpress/icons';
-import { dateI18n, __experimentalGetSettings } from '@wordpress/date';
+import { dateI18n, getSettings } from '@wordpress/date';
 import { useState, useRef, useEffect } from '@wordpress/element';
 
 /**
@@ -322,7 +322,7 @@ function Day( {
 }
 
 function getDayLabel( date: Date, isSelected: boolean, numEvents: number ) {
-	const { formats } = __experimentalGetSettings();
+	const { formats } = getSettings();
 	const localizedDate = dateI18n(
 		formats.date,
 		date,
