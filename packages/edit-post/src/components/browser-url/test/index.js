@@ -66,9 +66,9 @@ describe( 'BrowserURL', () => {
 
 		rerender( <BrowserURL postId={ 1 } postStatus="draft" /> );
 
-		rerender( <BrowserURL postId={ 1 } postStatus="draft" /> );
-
 		replaceStateSpy.mockReset();
+
+		rerender( <BrowserURL postId={ 1 } postStatus="draft" /> );
 
 		expect( replaceStateSpy ).not.toHaveBeenCalled();
 	} );
