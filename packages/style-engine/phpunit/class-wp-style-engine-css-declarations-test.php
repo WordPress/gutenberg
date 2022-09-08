@@ -113,82 +113,58 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that css declarations are compiled into a css declarations block string.
+	 * Tests that CSS declarations are compiled into a CSS declarations block string.
 	 *
 	 * @covers ::get_declarations_string
+	 *
+	 * @dataProvider data_should_compile_css_declarations_to_css_declarations_string
+	 *
+	 * @param string $expected        The expected declarations block string.
+	 * @param bool   $should_prettify Optional. Whether to pretty the string. Default false.
+	 * @param int    $indent_count    Optional. The number of tab indents. Default false.
 	 */
-	public function test_should_generate_css_declarations_string() {
+	public function test_should_compile_css_declarations_to_css_declarations_string( $expected, $should_prettify = false, $indent_count = 0 ) {
 		$input_declarations = array(
 			'color'                  => 'red',
 			'border-top-left-radius' => '99px',
 			'text-decoration'        => 'underline',
 		);
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
-
 		$this->assertSame(
-			'color:red;border-top-left-radius:99px;text-decoration:underline;',
-			$css_declarations->get_declarations_string()
+			$expected,
+			$css_declarations->get_declarations_string( $should_prettify, $indent_count )
 		);
 	}
 
 	/**
-	 * Tests that inline css declarations are compiled into a prettified css declarations block string.
+	 * Data provider for test_should_compile_css_declarations_to_css_declarations_string().
 	 *
-	 * @covers ::get_declarations_string
+	 * @return array
 	 */
-	public function test_should_generate_prettified_css_declarations_string() {
-		$input_declarations = array(
-			'color'                  => 'red',
-			'border-top-left-radius' => '99px',
-			'text-decoration'        => 'underline',
-		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
-
-		$this->assertSame(
-			'color: red; border-top-left-radius: 99px; text-decoration: underline;',
-			$css_declarations->get_declarations_string( true )
-		);
-	}
-
-	/**
-	 * Tests that inline css declarations are compiled into a prettified css declarations block string with new lines and indents.
-	 *
-	 * @covers ::get_declarations_string
-	 */
-	public function test_should_generate_prettified_css_declarations_string_with_new_lines_and_indents() {
-		$input_declarations = array(
-			'color'                  => 'red',
-			'border-top-left-radius' => '99px',
-			'text-decoration'        => 'underline',
-		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
-
-		$this->assertSame(
-			'	color: red;
-	border-top-left-radius: 99px;
-	text-decoration: underline;',
-			$css_declarations->get_declarations_string( true, 1 )
-		);
-	}
-
-	/**
-	 * Tests that inline css declarations are compiled into a prettified css declarations block string with extra indents.
-	 *
-	 * @covers ::get_declarations_string
-	 */
-	public function test_should_generate_prettified_with_extra_indents_css_declarations_string() {
-		$input_declarations = array(
-			'color'                  => 'red',
-			'border-top-left-radius' => '99px',
-			'text-decoration'        => 'underline',
-		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
-
-		$this->assertSame(
-			'		color: red;
-		border-top-left-radius: 99px;
-		text-decoration: underline;',
-			$css_declarations->get_declarations_string( true, 2 )
+	public function data_should_compile_css_declarations_to_css_declarations_string() {
+		return array(
+			'unprettified, no indent'  => array(
+				'expected' => 'color:red;border-top-left-radius:99px;text-decoration:underline;',
+			),
+			'unprettified, one indent' => array(
+				'expected'        => 'color:red;border-top-left-radius:99px;text-decoration:underline;',
+				'should_prettify' => false,
+				'indent_count'    => 1,
+			),
+			'prettified, no indent'    => array(
+				'expected'        => 'color: red; border-top-left-radius: 99px; text-decoration: underline;',
+				'should_prettify' => true,
+			),
+			'prettified, one indent'   => array(
+				'expected'        => "\tcolor: red;\n\tborder-top-left-radius: 99px;\n\ttext-decoration: underline;",
+				'should_prettify' => true,
+				'indent_count'    => 1,
+			),
+			'prettified, two indents'  => array(
+				'expected'        => "\t\tcolor: red;\n\t\tborder-top-left-radius: 99px;\n\t\ttext-decoration: underline;",
+				'should_prettify' => true,
+				'indent_count'    => 2,
+			),
 		);
 	}
 

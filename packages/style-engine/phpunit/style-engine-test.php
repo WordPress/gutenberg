@@ -51,10 +51,18 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 *
 	 * @covers ::wp_style_engine_get_styles
 	 *
-	 * @dataProvider data_get_styles_fixtures
+	 * @dataProvider data_wp_style_engine_get_styles
 	 *
 	 * @param array  $block_styles    The incoming block styles object.
-	 * @param array  $options         Style engine options.
+	 * @param array  $options         {
+	 *     An array of options to pass to `wp_style_engine_get_styles()`.
+	 *
+	 *     @type string|null $context                    An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is `null`.
+	 *                                                   When set, the style engine will attempt to store the CSS rules, where a selector is also passed.
+	 *     @type bool        $convert_vars_to_classnames Whether to skip converting incoming CSS var patterns, e.g., `var:preset|<PRESET_TYPE>|<PRESET_SLUG>`, to var( --wp--preset--* ) values. Default `false`.
+	 *     @type string      $selector                   Optional. When a selector is passed, the value of `$css` in the return value will comprise a full CSS rule `$selector { ...$css_declarations }`,
+	 *                                                   otherwise, the value will be a concatenated string of CSS declarations.
+	 * }
 	 * @param string $expected_output The expected output.
 	 */
 	public function test_wp_style_engine_get_styles( $block_styles, $options, $expected_output ) {
@@ -63,11 +71,11 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Data provider for test_generate_get_styles().
+	 * Data provider for test_wp_style_engine_get_styles().
 	 *
 	 * @return array
 	 */
-	public function data_get_styles_fixtures() {
+	public function data_wp_style_engine_get_styles() {
 		return array(
 			'default_return_value'                         => array(
 				'block_styles'    => array(),
