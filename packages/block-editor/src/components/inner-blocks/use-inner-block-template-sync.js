@@ -69,13 +69,6 @@ export default function useInnerBlockTemplateSync(
 					template
 				);
 
-				// This ensures the "initialPosition" doesn't change when applying the template
-				// If we're supposed to focus the block, we'll focus the first inner block
-				// otherwise, we won't apply any auto-focus.
-				// This ensures for instance that the focus stays in the inserter when inserting the "buttons" block.
-				const previousInitialPosition =
-					getSelectedBlocksInitialCaretPosition();
-
 				if ( ! isEqual( nextBlocks, innerBlocks ) ) {
 					// There's an implicit dependency between useInnerBlockTemplateSync and useNestedSettingsUpdate
 					// The former needs to happen after the latter and since the latter is using microtasks to batch updates (performance optimization),
@@ -87,9 +80,12 @@ export default function useInnerBlockTemplateSync(
 							nextBlocks,
 							innerBlocks.length === 0 &&
 								templateInsertUpdatesSelection &&
-								nextBlocks.length !== 0 &&
-								previousInitialPosition !== null,
-							previousInitialPosition
+								nextBlocks.length !== 0,
+							// This ensures the "initialPosition" doesn't change when applying the template
+							// If we're supposed to focus the block, we'll focus the first inner block
+							// otherwise, we won't apply any auto-focus.
+							// This ensures for instance that the focus stays in the inserter when inserting the "buttons" block.
+							getSelectedBlocksInitialCaretPosition()
 						);
 					} );
 				}
