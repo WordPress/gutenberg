@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Feature
+
+-   Update webpack configuration for the `build` and `start` commands to automatically copy PHP files listed in the `render` field of `block.json` files from the source to the build folder ([#43917](https://github.com/WordPress/gutenberg/pull/43917)).
+
 ## 24.0.0 (2022-08-24)
 
 ### Breaking Change
