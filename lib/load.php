@@ -91,6 +91,7 @@ require __DIR__ . '/compat/wordpress-6.1/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.1/date-settings.php';
 require __DIR__ . '/compat/wordpress-6.1/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.1/edit-form-blocks.php';
+require __DIR__ . '/compat/wordpress-6.1/template-parts-screen.php';
 require __DIR__ . '/compat/wordpress-6.1/theme.php';
 
 // Experimental features.
