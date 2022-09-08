@@ -32,7 +32,7 @@ import {
 	usePostTypes,
 	useIsPostTypeHierarchical,
 	useAllowedControls,
-	isControllAllowed,
+	isControlAllowed,
 } from '../../utils';
 
 export default function QueryInspectorControls( {
@@ -97,16 +97,16 @@ export default function QueryInspectorControls( {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
-	const showInheritControl = isControllAllowed( allowedControls, 'inherit' );
+	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
-		! inherit && isControllAllowed( allowedControls, 'postType' );
+		! inherit && isControlAllowed( allowedControls, 'postType' );
 	const showColumnsControl = displayLayout?.type === 'flex';
 	const showOrderControl =
-		! inherit && isControllAllowed( allowedControls, 'order' );
+		! inherit && isControlAllowed( allowedControls, 'order' );
 	const showStickyControl =
 		! inherit &&
 		showSticky &&
-		isControllAllowed( allowedControls, 'sticky' );
+		isControlAllowed( allowedControls, 'sticky' );
 	const showSettingsPanel =
 		showInheritControl ||
 		showPostTypeControl ||
@@ -197,10 +197,7 @@ export default function QueryInspectorControls( {
 						} }
 					>
 						{ !! taxonomiesInfo?.length &&
-							isControllAllowed(
-								allowedControls,
-								'taxQuery'
-							) && (
+							isControlAllowed( allowedControls, 'taxQuery' ) && (
 								<ToolsPanelItem
 									label={ __( 'Taxonomies' ) }
 									hasValue={ () =>
@@ -218,7 +215,7 @@ export default function QueryInspectorControls( {
 									/>
 								</ToolsPanelItem>
 							) }
-						{ isControllAllowed( allowedControls, 'author' ) && (
+						{ isControlAllowed( allowedControls, 'author' ) && (
 							<ToolsPanelItem
 								hasValue={ () => !! authorIds }
 								label={ __( 'Authors' ) }
@@ -230,7 +227,7 @@ export default function QueryInspectorControls( {
 								/>
 							</ToolsPanelItem>
 						) }
-						{ isControllAllowed( allowedControls, 'search' ) && (
+						{ isControlAllowed( allowedControls, 'search' ) && (
 							<ToolsPanelItem
 								hasValue={ () => !! querySearch }
 								label={ __( 'Keyword' ) }
@@ -244,7 +241,7 @@ export default function QueryInspectorControls( {
 							</ToolsPanelItem>
 						) }
 						{ isPostTypeHierarchical &&
-							! isControllAllowed(
+							! isControlAllowed(
 								allowedControls,
 								'parents'
 							) && (

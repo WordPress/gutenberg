@@ -166,7 +166,7 @@ export function useAllowedControls( attributes ) {
 		[ attributes ]
 	);
 }
-export function isControllAllowed( allowedControls, key ) {
+export function isControlAllowed( allowedControls, key ) {
 	// Every controls is allowed if the list is not defined.
 	if ( ! allowedControls ) {
 		return true;
