@@ -97,7 +97,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	 * @covers ::get_declarations_string
 	 * @covers ::filter_declaration
 	 */
-	public function test_should_strip_html_tags_andremove_unsafe_css_properties() {
+	public function test_should_strip_html_tags_and_remove_unsafe_css_properties() {
 		$input_declarations         = array(
 			'font-size'    => '<red/>',
 			'padding'      => '</style>',
