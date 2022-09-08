@@ -29,7 +29,6 @@ test.describe( 'Compatibility with classic editor', () => {
 		await page.keyboard.type( 'Random Link' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '</a> ' );
-
 		// Publish Post
 		await editor.publishPost();
 
