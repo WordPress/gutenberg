@@ -228,6 +228,11 @@
 							"type": "boolean",
 							"default": false
 						},
+						"width": {
+							"description": "Allow users to set a custom width.",
+							"type": "boolean",
+							"default": true
+						},
 						"units": {
 							"description": "List of units the user can use for spacing values.",
 							"type": "array",

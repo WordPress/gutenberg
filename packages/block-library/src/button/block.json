@@ -80,7 +80,8 @@
 			"padding": [ "horizontal", "vertical" ],
 			"__experimentalDefaultControls": {
 				"padding": true
-			}
+			},
+			"width": true
 		},
 		"__experimentalBorder": {
 			"radius": true,

@@ -1181,6 +1181,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			'margin'            => null,
 			'padding'           => null,
 			'units'             => null,
+			'width'             => null,
 		),
 		'typography'                    => array(
 			'fluid'          => null,

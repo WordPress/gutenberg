@@ -93,6 +93,7 @@ Settings related to spacing.
 | blockGap | undefined | null |  |
 | margin | boolean | false |  |
 | padding | boolean | false |  |
+| width | boolean | true |  |
 | units | array | px,em,rem,vh,vw,% |  |
 | customSpacingSize | boolean | true |  |
 | spacingSizes | array |  | name, size, slug |

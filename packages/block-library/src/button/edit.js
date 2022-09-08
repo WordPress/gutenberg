@@ -21,6 +21,7 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	useSetting,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
@@ -125,6 +126,7 @@ function ButtonEdit( props ) {
 	const isURLSet = !! url;
 	const opensInNewTab = linkTarget === '_blank';
 
+	const isWidthPanelEnabled = false !== useSetting( 'spacing.width' );
 	function startEditing( event ) {
 		event.preventDefault();
 		setIsEditingURL( true );
@@ -244,12 +246,14 @@ function ButtonEdit( props ) {
 					/>
 				</Popover>
 			) }
-			<InspectorControls>
-				<WidthPanel
-					selectedWidth={ width }
-					setAttributes={ setAttributes }
-				/>
-			</InspectorControls>
+			{ isWidthPanelEnabled && (
+				<InspectorControls>
+					<WidthPanel
+						selectedWidth={ width }
+						setAttributes={ setAttributes }
+					/>
+				</InspectorControls>
+			) }
 			<InspectorControls __experimentalGroup="advanced">
 				<TextControl
 					label={ __( 'Link rel' ) }
