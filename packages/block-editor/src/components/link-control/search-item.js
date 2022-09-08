@@ -9,7 +9,44 @@ import classnames from 'classnames';
 import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { Button, TextHighlight } from '@wordpress/components';
-import { Icon, globe } from '@wordpress/icons';
+import {
+	Icon,
+	globe,
+	page,
+	tag,
+	postList,
+	category,
+	file,
+} from '@wordpress/icons';
+
+function SearchItemIcon( { isURL, suggestion } ) {
+	let icon = null;
+
+	if ( isURL ) {
+		icon = globe;
+	} else if ( suggestion.type === 'post' ) {
+		icon = postList;
+	} else if ( suggestion.type === 'page' ) {
+		icon = page;
+	} else if ( suggestion.type === 'post_tag' ) {
+		icon = tag;
+	} else if ( suggestion.type === 'category' ) {
+		icon = category;
+	} else if ( suggestion.type === 'attachment' ) {
+		icon = file;
+	}
+
+	if ( icon ) {
+		return (
+			<Icon
+				className="block-editor-link-control__search-item-icon"
+				icon={ icon }
+			/>
+		);
+	}
+
+	return null;
+}
 
 export const LinkControlSearchItem = ( {
 	itemProps,
@@ -30,12 +67,7 @@ export const LinkControlSearchItem = ( {
 				'is-entity': ! isURL,
 			} ) }
 		>
-			{ isURL && (
-				<Icon
-					className="block-editor-link-control__search-item-icon"
-					icon={ globe }
-				/>
-			) }
+			<SearchItemIcon suggestion={ suggestion } isURL={ isURL } />
 
 			<span className="block-editor-link-control__search-item-header">
 				<span className="block-editor-link-control__search-item-title">
