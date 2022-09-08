@@ -8,6 +8,7 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import { getInlineStyles } from './style';
+import { getFontSizeClass } from '../components/font-sizes';
 
 // This utility is intended to assist where the serialization of the typography
 // block support is being skipped for a block but the typography related CSS
@@ -28,10 +29,10 @@ export function getTypographyClassesAndStyles( attributes ) {
 		? `has-${ kebabCase( attributes.fontFamily ) }-font-family`
 		: '';
 
-	const fontSizeClassName = !! attributes?.fontSize
-		? `has-${ kebabCase( attributes.fontSize ) }-font-size`
-		: '';
-	const className = classnames( fontFamilyClassName, fontSizeClassName );
+	const className = classnames(
+		fontFamilyClassName,
+		getFontSizeClass( attributes?.fontSize )
+	);
 
 	return {
 		className,

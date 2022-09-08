@@ -138,7 +138,12 @@ function render_block_core_search( $attributes ) {
 		$inline_styles['wrapper'],
 		$input_markup . $query_params_markup . $button_markup
 	);
-	$wrapper_attributes   = get_block_wrapper_attributes( array( 'class' => $classnames ) );
+	$wrapper_attributes   = get_block_wrapper_attributes(
+		array(
+			'class' => $classnames,
+			'style' => get_typography_styles_for_block_core_search( $attributes ),
+		)
+	);
 
 	return sprintf(
 		'<form role="search" method="get" action="%s" %s>%s</form>',
@@ -378,79 +383,8 @@ function styles_for_block_core_search( $attributes ) {
 		$button_styles[] = sprintf( 'background: %s;', $attributes['style']['color']['gradient'] );
 	}
 
-	// Add typography styles.
-	$has_font_size = ! empty( $attributes['style']['typography']['fontSize'] );
-	if ( $has_font_size ) {
-		$font_size_value = sprintf( 'font-size: %s;', esc_attr( $attributes['style']['typography']['fontSize'] ) );
-		$button_styles[] = $font_size_value;
-		$input_styles[]  = $font_size_value;
-		if ( $show_label ) {
-			$label_styles[] = $font_size_value;
-		}
-	}
-
-	$has_font_family = ! empty( $attributes['style']['typography']['fontFamily'] );
-	if ( $has_font_family ) {
-		$font_family_value = sprintf( 'font-family: %s;', esc_attr( $attributes['style']['typography']['fontFamily'] ) );
-		$button_styles[]   = $font_family_value;
-		$input_styles[]    = $font_family_value;
-		if ( $show_label ) {
-			$label_styles[] = $font_family_value;
-		}
-	}
-
-	$has_letter_spacing = ! empty( $attributes['style']['typography']['letterSpacing'] );
-	if ( $has_letter_spacing ) {
-		$letter_spacing_value = sprintf( 'letter-spacing: %s;', esc_attr( $attributes['style']['typography']['letterSpacing'] ) );
-		$button_styles[]      = $letter_spacing_value;
-		$input_styles[]       = $letter_spacing_value;
-		if ( $show_label ) {
-			$label_styles[] = $letter_spacing_value;
-		}
-	}
-
-	$has_font_weight = ! empty( $attributes['style']['typography']['fontWeight'] );
-	if ( $has_font_weight ) {
-		$font_weight_value = sprintf( 'font-weight: %s;', esc_attr( $attributes['style']['typography']['fontWeight'] ) );
-		$button_styles[]   = $font_weight_value;
-		$input_styles[]    = $font_weight_value;
-		if ( $show_label ) {
-			$label_styles[] = $font_weight_value;
-		}
-	}
-
-	$has_font_style = ! empty( $attributes['style']['typography']['fontStyle'] );
-	if ( $has_font_style ) {
-		$font_style_value = sprintf( 'font-style: %s;', esc_attr( $attributes['style']['typography']['fontStyle'] ) );
-		$button_styles[]  = $font_style_value;
-		$input_styles[]   = $font_style_value;
-		if ( $show_label ) {
-			$label_styles[] = $font_style_value;
-		}
-	}
-
-	$has_line_height = ! empty( $attributes['style']['typography']['lineHeight'] );
-	if ( $has_line_height ) {
-		$line_height_value = sprintf( 'line-height: %s;', esc_attr( $attributes['style']['typography']['lineHeight'] ) );
-		$button_styles[]   = $line_height_value;
-		$input_styles[]    = $line_height_value;
-		if ( $show_label ) {
-			$label_styles[] = $line_height_value;
-		}
-	}
-
-	$has_text_transform = ! empty( $attributes['style']['typography']['textTransform'] );
-	if ( $has_text_transform ) {
-		$text_transform_value = sprintf( 'text-transform: %s;', esc_attr( $attributes['style']['typography']['textTransform'] ) );
-		$button_styles[]      = $text_transform_value;
-		$input_styles[]       = $text_transform_value;
-		if ( $show_label ) {
-			$label_styles[] = $text_transform_value;
-		}
-	}
-
-	$has_text_decoration = ! empty( $attributes['style']['typography']['textDecoration'] );
-	if ( $has_text_decoration ) {
+	// Typography text-decoration is only applied to the label and button.
+	if ( ! empty( $attributes['style']['typography']['textDecoration'] ) ) {
 		$text_decoration_value = sprintf( 'text-decoration: %s;', esc_attr( $attributes['style']['typography']['textDecoration'] ) );
 		$button_styles[]       = $text_decoration_value;
 		// Input opts out of text decoration.
@@ -488,6 +422,49 @@ function get_typography_classes_for_block_core_search( $attributes ) {
 	}
 
 	return implode( ' ', $typography_classes );
+}
+
+/**
+ * Returns typography styles to be included in an HTML style tag.
+ * This excludes text-decoration, which is applied only to the label and button elements of the search block.
+ *
+ * @param array $attributes The block attributes.
+ *
+ * @return string A string of typography CSS declarations.
+ */
+function get_typography_styles_for_block_core_search( $attributes ) {
+	$typography_styles = array();
+
+	// Add typography styles.
+	if ( ! empty( $attributes['style']['typography']['fontSize'] ) ) {
+		$typography_styles[] = sprintf( 'font-size: %s;', esc_attr( $attributes['style']['typography']['fontSize'] ) );
+	}
+
+	if ( ! empty( $attributes['style']['typography']['fontFamily'] ) ) {
+		$typography_styles[] = sprintf( 'font-family: %s;', esc_attr( $attributes['style']['typography']['fontFamily'] ) );
+	}
+
+	if ( ! empty( $attributes['style']['typography']['letterSpacing'] ) ) {
+		$typography_styles[] = sprintf( 'letter-spacing: %s;', esc_attr( $attributes['style']['typography']['letterSpacing'] ) );
+	}
+
+	if ( ! empty( $attributes['style']['typography']['fontWeight'] ) ) {
+		$typography_styles[] = sprintf( 'font-weight: %s;', esc_attr( $attributes['style']['typography']['fontWeight'] ) );
+	}
+
+	if ( ! empty( $attributes['style']['typography']['fontStyle'] ) ) {
+		$typography_styles[] = sprintf( 'font-style: %s;', esc_attr( $attributes['style']['typography']['fontStyle'] ) );
+	}
+
+	if ( ! empty( $attributes['style']['typography']['lineHeight'] ) ) {
+		$typography_styles[] = sprintf( 'line-height: %s;', esc_attr( $attributes['style']['typography']['lineHeight'] ) );
+	}
+
+	if ( ! empty( $attributes['style']['typography']['textTransform'] ) ) {
+		$typography_styles[] = sprintf( 'text-transform: %s;', esc_attr( $attributes['style']['typography']['textTransform'] ) );
+	}
+
+	return implode( '', $typography_styles );
 }
 
 /**

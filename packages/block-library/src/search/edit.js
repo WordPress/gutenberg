@@ -13,7 +13,7 @@ import {
 	RichText,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
-	__experimentalGetTypographyClassesAndStyles as useTypographyProps,
+	getTypographyClassesAndStyles as useTypographyProps,
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
@@ -214,11 +214,6 @@ export default function SearchEdit( {
 			typographyProps.className
 		);
 		const textFieldStyles = {
-			...{
-				...typographyProps.style,
-				// Input opts out of text decoration.
-				textDecoration: undefined,
-			},
 			...( isButtonPositionInside
 				? { borderRadius }
 				: borderProps.style ),
@@ -256,7 +251,7 @@ export default function SearchEdit( {
 		);
 		const buttonStyles = {
 			...colorProps.style,
-			...typographyProps.style,
+			textDecoration: typographyProps.style?.textDecoration,
 			...( isButtonPositionInside
 				? { borderRadius }
 				: borderProps.style ),
@@ -403,18 +398,21 @@ export default function SearchEdit( {
 		radius ? `calc(${ radius } + ${ DEFAULT_INNER_PADDING })` : undefined;
 
 	const getWrapperStyles = () => {
-		const styles = isButtonPositionInside
-			? borderProps.style
-			: {
-					borderRadius: borderProps.style?.borderRadius,
-					borderTopLeftRadius: borderProps.style?.borderTopLeftRadius,
-					borderTopRightRadius:
-						borderProps.style?.borderTopRightRadius,
-					borderBottomLeftRadius:
-						borderProps.style?.borderBottomLeftRadius,
-					borderBottomRightRadius:
-						borderProps.style?.borderBottomRightRadius,
-			  };
+		const styles = {
+			...( isButtonPositionInside
+				? borderProps.style
+				: {
+						borderRadius: borderProps.style?.borderRadius,
+						borderTopLeftRadius:
+							borderProps.style?.borderTopLeftRadius,
+						borderTopRightRadius:
+							borderProps.style?.borderTopRightRadius,
+						borderBottomLeftRadius:
+							borderProps.style?.borderBottomLeftRadius,
+						borderBottomRightRadius:
+							borderProps.style?.borderBottomRightRadius,
+				  } ),
+		};
 
 		const isNonZeroBorderRadius =
 			borderRadius !== undefined && parseInt( borderRadius, 10 ) !== 0;
@@ -455,6 +453,13 @@ export default function SearchEdit( {
 
 	const blockProps = useBlockProps( {
 		className: getBlockClassNames(),
+		style: {
+			...{
+				...typographyProps.style,
+				// Input opts out of text decoration.
+				textDecoration: undefined,
+			},
+		},
 	} );
 
 	const labelClassnames = classnames(
@@ -474,7 +479,9 @@ export default function SearchEdit( {
 					withoutInteractiveFormatting
 					value={ label }
 					onChange={ ( html ) => setAttributes( { label: html } ) }
-					style={ { ...typographyProps.style } }
+					style={ {
+						textDecoration: typographyProps.style?.textDecoration,
+					} }
 				/>
 			) }
 

@@ -1,3 +1,15 @@
+.wp-block-search__label,
+.wp-block-search__input,
+.wp-block-search__button {
+	font-size: inherit;
+	font-family: inherit;
+	line-height: inherit;
+	letter-spacing: inherit;
+	font-style: inherit;
+	text-transform: inherit;
+	text-decoration: inherit;
+}
+
 .wp-block-search__button {
 	margin-left: 0.625em;
 	word-break: normal;
@@ -38,9 +50,7 @@
 	margin-right: 0;
 	min-width: 3em;
 	border: 1px solid #949494;
-	font-size: inherit;
-	font-family: inherit;
-	line-height: inherit;
+	text-decoration: unset;
 }
 
 .wp-block-search.wp-block-search__button-only {
