@@ -190,15 +190,6 @@ test.describe( 'Preview', () => {
 			page.locator( 'role=button[name="Publish"i]' )
 		).toBeVisible();
 
-		const previewToggle = page.locator(
-			'role=button[name="View"i][expanded]'
-		);
-
-		// Close "View" dropdown if open.
-		if ( await previewToggle.isVisible() ) {
-			await previewToggle.click();
-		}
-
 		// Change the title.
 		await editorPage.type( 'role=textbox[name="Add title"i]', ' Draft' );
 
