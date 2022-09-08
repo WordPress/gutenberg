@@ -256,20 +256,6 @@ export const Input = styled.input< InputProps >`
 	}
 `;
 
-const labelMargin = ( {
-	labelPosition,
-}: {
-	labelPosition?: LabelPosition;
-} ) => {
-	let marginBottom = 8;
-
-	if ( labelPosition === 'edge' || labelPosition === 'side' ) {
-		marginBottom = 0;
-	}
-
-	return css( { marginTop: 0, marginRight: 0, marginBottom, marginLeft: 0 } );
-};
-
 const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 	&&& {
 		${ baseLabelTypography };
@@ -281,7 +267,6 @@ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 		max-width: 100%;
 		z-index: 1;
 
-		${ labelMargin }
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
