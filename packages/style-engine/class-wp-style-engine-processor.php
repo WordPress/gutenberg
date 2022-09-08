@@ -19,7 +19,7 @@ if ( class_exists( 'WP_Style_Engine_Processor' ) ) {
 class WP_Style_Engine_Processor {
 
 	/**
-	 * The Style-Engine Store objects
+	 * A collection of Style Engine Store objects.
 	 *
 	 * @var WP_Style_Engine_CSS_Rules_Store[]
 	 */
