@@ -21,6 +21,12 @@ export type FocalPointPickerProps = Pick<
 	'help' | 'hideLabelFromVision' | 'label'
 > & {
 	/**
+	 * Start opting into the new margin-free styles that will become the default in a future version.
+	 *
+	 * @default false
+	 */
+	__nextHasNoMarginBottom?: boolean;
+	/**
 	 * Autoplays HTML5 video. This only applies to video sources (`url`).
 	 *
 	 * @default true
@@ -55,6 +61,7 @@ export type FocalPointPickerProps = Pick<
 };
 
 export type FocalPointPickerControlsProps = {
+	__nextHasNoMarginBottom?: boolean;
 	onChange?: ( value: FocalPoint ) => void;
 	point?: FocalPoint;
 };
