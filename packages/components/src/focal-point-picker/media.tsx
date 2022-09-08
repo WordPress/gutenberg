@@ -3,6 +3,7 @@
  */
 import { MediaPlaceholder } from './styles/focal-point-picker-style';
 import { isVideoType } from './utils';
+import type { FocalPointPickerMediaProps } from './types';
 
 export default function Media( {
 	alt,
@@ -14,7 +15,7 @@ export default function Media( {
 	// https://github.com/testing-library/react-testing-library/issues/470
 	muted = true,
 	...props
-} ) {
+}: FocalPointPickerMediaProps ) {
 	if ( ! src ) {
 		return (
 			<MediaPlaceholder

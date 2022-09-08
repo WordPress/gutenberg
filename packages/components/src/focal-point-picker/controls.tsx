@@ -11,6 +11,11 @@ import {
 	ControlWrapper,
 } from './styles/focal-point-picker-style';
 import { fractionToPercentage } from './utils';
+import type {
+	UnitControlProps,
+	UnitControlOnChangeCallback,
+} from '../unit-control/types';
+import type { FocalPointAxis, FocalPointPickerControlsProps } from './types';
 
 const TEXTCONTROL_MIN = 0;
 const TEXTCONTROL_MAX = 100;
@@ -22,11 +27,16 @@ export default function FocalPointPickerControls( {
 		x: 0.5,
 		y: 0.5,
 	},
-} ) {
+}: FocalPointPickerControlsProps ) {
 	const valueX = fractionToPercentage( point.x );
 	const valueY = fractionToPercentage( point.y );
 
-	const handleChange = ( value, axis ) => {
+	const handleChange = (
+		value: Parameters< UnitControlOnChangeCallback >[ 0 ],
+		axis: FocalPointAxis
+	) => {
+		if ( value === undefined ) return;
+
 		const num = parseInt( value, 10 );
 
 		if ( ! isNaN( num ) ) {
@@ -39,20 +49,32 @@ export default function FocalPointPickerControls( {
 			<UnitControl
 				label={ __( 'Left' ) }
 				value={ [ valueX, '%' ].join( '' ) }
-				onChange={ ( next ) => handleChange( next, 'x' ) }
+				onChange={
+					( ( next ) =>
+						handleChange(
+							next,
+							'x'
+						) ) as UnitControlOnChangeCallback
+				}
 				dragDirection="e"
 			/>
 			<UnitControl
 				label={ __( 'Top' ) }
 				value={ [ valueY, '%' ].join( '' ) }
-				onChange={ ( next ) => handleChange( next, 'y' ) }
+				onChange={
+					( ( next ) =>
+						handleChange(
+							next,
+							'y'
+						) ) as UnitControlOnChangeCallback
+				}
 				dragDirection="s"
 			/>
 		</ControlWrapper>
 	);
 }
 
-function UnitControl( props ) {
+function UnitControl( props: UnitControlProps ) {
 	return (
 		<BaseUnitControl
 			className="focal-point-picker__controls-position-unit-control"

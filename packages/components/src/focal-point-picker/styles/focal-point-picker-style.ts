@@ -69,7 +69,8 @@ export const GridView = styled.div`
 	transition: opacity 120ms linear;
 	z-index: 1;
 
-	opacity: ${ ( { showOverlay } ) => ( showOverlay ? 1 : 0 ) };
+	opacity: ${ ( { showOverlay }: { showOverlay?: boolean } ) =>
+		showOverlay ? 1 : 0 };
 `;
 
 export const GridLine = styled.div`

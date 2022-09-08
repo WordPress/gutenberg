@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -7,12 +12,13 @@ import { useState } from '@wordpress/element';
  */
 import FocalPointPicker from '..';
 
-export default {
+const meta: ComponentMeta< typeof FocalPointPicker > = {
 	title: 'Components/FocalPointPicker',
 	component: FocalPointPicker,
 };
+export default meta;
 
-const Example = ( props ) => {
+const Template: ComponentStory< typeof FocalPointPicker > = ( props ) => {
 	const [ focalPoint, setFocalPoint ] = useState( {
 		x: 0.5,
 		y: 0.5,
@@ -20,41 +26,41 @@ const Example = ( props ) => {
 
 	return (
 		<FocalPointPicker
+			{ ...props }
 			value={ focalPoint }
 			onChange={ setFocalPoint }
-			{ ...props }
 		/>
 	);
 };
 
-export const _default = () => {
-	return <Example />;
+export const Default = Template.bind( {} );
+
+export const Image = Template.bind( {} );
+Image.args = {
+	...Default.args,
+	url: 'https://i0.wp.com/themes.svn.wordpress.org/twentytwenty/1.3/screenshot.png?w=572&strip=al',
 };
 
-export const image = () => {
-	const url =
-		'https://i0.wp.com/themes.svn.wordpress.org/twentytwenty/1.3/screenshot.png?w=572&strip=al';
-
-	return <Example url={ url } />;
+export const Video = Template.bind( {} );
+Video.args = {
+	...Default.args,
+	url: 'https://interactive-examples.mdn.mozilla.net/media/examples/flower.webm',
 };
 
-export const video = () => {
-	const url =
-		'https://interactive-examples.mdn.mozilla.net/media/examples/flower.webm';
+export const Snapping = Template.bind( {} );
+Snapping.args = {
+	...Default.args,
+	resolvePoint: ( value ) => {
+		const snapValues = {
+			x: [ 0, 0.33, 0.66, 1 ],
+			y: [ 0, 0.33, 0.66, 1 ],
+		};
 
-	return <Example url={ url } />;
-};
+		const threshold = 0.05;
 
-export const snapping = () => {
-	const snapValues = {
-		x: [ 0, 0.33, 0.66, 1 ],
-		y: [ 0, 0.33, 0.66, 1 ],
-	};
-
-	const threshold = 0.05;
-
-	const maybeSnapFocalPoint = ( value ) => {
+		// @ts-expect-error: TODO: Is this parseFloat necessary?
 		let x = parseFloat( value.x );
+		// @ts-expect-error: TODO: Is this parseFloat necessary?
 		let y = parseFloat( value.y );
 
 		snapValues.x.forEach( ( snapValue ) => {
@@ -70,7 +76,5 @@ export const snapping = () => {
 		} );
 
 		return { x, y };
-	};
-
-	return <Example resolvePoint={ maybeSnapFocalPoint } />;
+	},
 };
