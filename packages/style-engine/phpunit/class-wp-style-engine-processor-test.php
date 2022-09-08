@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests the Style Engine Renderer class.
+ * Tests the Style Engine Processor class.
  *
  * @package    Gutenberg
  * @subpackage style-engine
@@ -28,12 +28,17 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
 
 /**
  * Tests for compiling and rendering styles from a store of CSS rules.
+ *
+ * @coversDefaultClass WP_Style_Engine_Processor
  */
 class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	/**
-	 * Should compile CSS rules.
+	 * Tests adding rules and returning compiled CSS rules.
+	 *
+	 * @covers ::add_rules
+	 * @covers ::get_css
 	 */
-	public function test_return_rules_as_css() {
+	public function test_should_return_rules_as_compiled_css() {
 		$a_nice_css_rule = new WP_Style_Engine_CSS_Rule( '.a-nice-rule' );
 		$a_nice_css_rule->add_declarations(
 			array(
@@ -58,9 +63,11 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should compile CSS rules.
+	 * Tests compiling CSS rules and formatting them with new lines and indents.
+	 *
+	 * @covers ::get_css
 	 */
-	public function test_return_prettified_rules_as_css() {
+	public function test_should_return_prettified_css_rules() {
 		$a_wonderful_css_rule = new WP_Style_Engine_CSS_Rule( '.a-wonderful-rule' );
 		$a_wonderful_css_rule->add_declarations(
 			array(
@@ -104,9 +111,11 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should compile CSS rules from the store.
+	 * Tests adding a store and compiling CSS rules from that store.
+	 *
+	 * @covers ::add_store
 	 */
-	public function test_return_store_rules_as_css() {
+	public function test_should_return_store_rules_as_css() {
 		$a_nice_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'nice' );
 		$a_nice_store->add_rule( '.a-nice-rule' )->add_declarations(
 			array(
@@ -130,9 +139,12 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should merge CSS declarations.
+	 * Tests that CSS declarations are merged and deduped in the final CSS rules output.
+	 *
+	 * @covers ::add_rules
+	 * @covers ::get_css
 	 */
-	public function test_dedupe_and_merge_css_declarations() {
+	public function test_should_dedupe_and_merge_css_declarations() {
 		$an_excellent_rule      = new WP_Style_Engine_CSS_Rule( '.an-excellent-rule' );
 		$an_excellent_processor = new WP_Style_Engine_Processor();
 		$an_excellent_rule->add_declarations(
@@ -173,9 +185,11 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should print out uncombined selectors duplicate CSS rules.
+	 * Tests printing out 'unoptimized' CSS, that is, uncombined selectors and duplicate CSS rules.
+	 *
+	 * @covers ::get_css
 	 */
-	public function test_output_verbose_css_rules() {
+	public function test_should_not_optimize_css_output() {
 		$a_sweet_rule = new WP_Style_Engine_CSS_Rule(
 			'.a-sweet-rule',
 			array(
@@ -215,9 +229,11 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should combine duplicate CSS rules.
+	 * Tests that 'optimized' CSS is output, that is, that duplicate CSS rules are combined under their corresponding selectors.
+	 *
+	 * @covers ::get_css
 	 */
-	public function test_combine_css_rules() {
+	public function test_should_optimize_css_output_by_default() {
 		$a_sweet_rule = new WP_Style_Engine_CSS_Rule(
 			'.a-sweet-rule',
 			array(
@@ -242,10 +258,13 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			$a_sweet_processor->get_css( array( 'prettify' => false ) )
 		);
 	}
-		/**
-		 * Should combine and store CSS rules.
-		 */
-	public function test_combine_previously_added_css_rules() {
+
+	/**
+	 * Tests that incoming CSS rules are merged with existing CSS rules.
+	 *
+	 * @covers ::add_rules
+	 */
+	public function test_should_combine_previously_added_css_rules() {
 		$a_lovely_processor = new WP_Style_Engine_Processor();
 		$a_lovely_rule      = new WP_Style_Engine_CSS_Rule(
 			'.a-lovely-rule',

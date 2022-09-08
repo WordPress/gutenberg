@@ -15,13 +15,17 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 }
 
 /**
- * Tests for registering, storing and generating CSS declarations.
+ * Tests registering, storing and generating CSS declarations.
+ *
+ * @coversDefaultClass WP_Style_Engine_CSS_Declarations
  */
 class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	/**
-	 * Should set declarations on instantiation.
+	 * Tests setting declarations on instantiation.
+	 *
+	 * @covers ::__construct
 	 */
-	public function test_instantiate_with_declarations() {
+	public function test_should_instantiate_with_declarations() {
 		$input_declarations = array(
 			'margin-top' => '10px',
 			'font-size'  => '2rem',
@@ -31,9 +35,12 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should add declarations.
+	 * Tests that declarations are added.
+	 *
+	 * @covers ::add_declarations
+	 * @covers ::add_declaration
 	 */
-	public function test_add_declarations() {
+	public function test_should_add_declarations() {
 		$input_declarations = array(
 			'padding' => '20px',
 			'color'   => 'var(--wp--preset--elbow-patches)',
@@ -44,9 +51,12 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should add declarations.
+	 * Tests that new declarations are added to existing declarations.
+	 *
+	 * @covers ::add_declarations
+	 * @covers ::add_declaration
 	 */
-	public function test_add_a_single_declaration() {
+	public function test_should_add_new_declarations_to_existing() {
 		$input_declarations = array(
 			'border-width'     => '1%',
 			'background-color' => 'var(--wp--preset--english-mustard)',
@@ -60,9 +70,12 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should sanitize properties before storing.
+	 * Tests that properties are sanitized before storing.
+	 *
+	 * @covers ::filter_declaration
+	 * @covers ::sanitize_property
 	 */
-	public function test_sanitize_properties() {
+	public function test_should_sanitize_properties() {
 		$input_declarations = array(
 			'^--wp--style--sleepy-potato$' => '40px',
 			'<background-//color>'         => 'var(--wp--preset--english-mustard)',
@@ -79,81 +92,11 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should compile css declarations into a css declarations block string.
+	 * Test that values are escaped and run the CSS through safecss_filter_attr().
+	 *
+	 * @covers ::filter_declaration
 	 */
-	public function test_generate_css_declarations_string() {
-		$input_declarations = array(
-			'color'                  => 'red',
-			'border-top-left-radius' => '99px',
-			'text-decoration'        => 'underline',
-		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
-
-		$this->assertSame(
-			'color:red;border-top-left-radius:99px;text-decoration:underline;',
-			$css_declarations->get_declarations_string()
-		);
-	}
-
-	/**
-	 * Should compile css declarations into a prettified css declarations block string.
-	 */
-	public function test_generate_prettified_css_declarations_string() {
-		$input_declarations = array(
-			'color'                  => 'red',
-			'border-top-left-radius' => '99px',
-			'text-decoration'        => 'underline',
-		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
-
-		$this->assertSame(
-			'color: red; border-top-left-radius: 99px; text-decoration: underline;',
-			$css_declarations->get_declarations_string( true )
-		);
-	}
-
-	/**
-	 * Should compile css declarations into a prettified and indented css declarations block string.
-	 */
-	public function test_generate_prettified_with_indent_css_declarations_string() {
-		$input_declarations = array(
-			'color'                  => 'red',
-			'border-top-left-radius' => '99px',
-			'text-decoration'        => 'underline',
-		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
-
-		$this->assertSame(
-			'	color: red;
-	border-top-left-radius: 99px;
-	text-decoration: underline;',
-			$css_declarations->get_declarations_string( true, 1 )
-		);
-	}
-
-	/**
-	 * Should compile css declarations into a css declarations block string.
-	 */
-	public function test_generate_prettified_with_more_indents_css_declarations_string() {
-		$input_declarations = array(
-			'color'                  => 'red',
-			'border-top-left-radius' => '99px',
-			'text-decoration'        => 'underline',
-		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
-
-		$this->assertSame(
-			'		color: red;
-		border-top-left-radius: 99px;
-		text-decoration: underline;',
-			$css_declarations->get_declarations_string( true, 2 )
-		);
-	}
-
-	/**
-	 * Should escape values and run the CSS through safecss_filter_attr.
-	 */
-	public function test_remove_unsafe_properties_and_values() {
+	public function test_should_remove_unsafe_properties_and_values() {
 		$input_declarations = array(
 			'color'        => 'url("https://wordpress.org")',
 			'font-size'    => '<red/>',
@@ -170,9 +113,92 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should allow calc, clamp, min, max, and minmax CSS functions.
+	 * Tests that css declarations are compiled into a css declarations block string.
+	 *
+	 * @covers ::get_declarations_string
 	 */
-	public function test_allow_particular_css_functions() {
+	public function test_should_generate_css_declarations_string() {
+		$input_declarations = array(
+			'color'                  => 'red',
+			'border-top-left-radius' => '99px',
+			'text-decoration'        => 'underline',
+		);
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+
+		$this->assertSame(
+			'color:red;border-top-left-radius:99px;text-decoration:underline;',
+			$css_declarations->get_declarations_string()
+		);
+	}
+
+	/**
+	 * Tests that inline css declarations are compiled into a prettified css declarations block string.
+	 *
+	 * @covers ::get_declarations_string
+	 */
+	public function test_should_generate_prettified_css_declarations_string() {
+		$input_declarations = array(
+			'color'                  => 'red',
+			'border-top-left-radius' => '99px',
+			'text-decoration'        => 'underline',
+		);
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+
+		$this->assertSame(
+			'color: red; border-top-left-radius: 99px; text-decoration: underline;',
+			$css_declarations->get_declarations_string( true )
+		);
+	}
+
+	/**
+	 * Tests that inline css declarations are compiled into a prettified css declarations block string with new lines and indents.
+	 *
+	 * @covers ::get_declarations_string
+	 */
+	public function test_should_generate_prettified_css_declarations_string_with_new_lines_and_indents() {
+		$input_declarations = array(
+			'color'                  => 'red',
+			'border-top-left-radius' => '99px',
+			'text-decoration'        => 'underline',
+		);
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+
+		$this->assertSame(
+			'	color: red;
+	border-top-left-radius: 99px;
+	text-decoration: underline;',
+			$css_declarations->get_declarations_string( true, 1 )
+		);
+	}
+
+	/**
+	 * Tests that inline css declarations are compiled into a prettified css declarations block string with extra indents.
+	 *
+	 * @covers ::get_declarations_string
+	 */
+	public function test_should_generate_prettified_with_extra_indents_css_declarations_string() {
+		$input_declarations = array(
+			'color'                  => 'red',
+			'border-top-left-radius' => '99px',
+			'text-decoration'        => 'underline',
+		);
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+
+		$this->assertSame(
+			'		color: red;
+		border-top-left-radius: 99px;
+		text-decoration: underline;',
+			$css_declarations->get_declarations_string( true, 2 )
+		);
+	}
+
+	/**
+	 * Tests that calc, clamp, min, max, and minmax CSS functions are allowed.
+	 *
+	 * @covers ::filter_declaration
+	 * @covers ::get_declarations_string
+	 */
+	public function test_should_allow_css_functions() {
 		$input_declarations = array(
 			'background'       => 'var(--wp--preset--color--primary, 10px)', // Simple var().
 			'font-size'        => 'clamp(36.00rem, calc(32.00rem + 10.00vw), 40.00rem)', // Nested clamp().
@@ -193,9 +219,11 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should remove a declaration
+	 * Tests removing a single declaration.
+	 *
+	 * @covers ::remove_declaration
 	 */
-	public function test_remove_declaration() {
+	public function test_should_remove_single_declaration() {
 		$input_declarations = array(
 			'color'       => 'tomato',
 			'margin'      => '10em 10em 20em 1px',
@@ -216,9 +244,11 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should remove declarations
+	 * Tests removing multiple declarations.
+	 *
+	 * @covers ::remove_declarations
 	 */
-	public function test_remove_declarations() {
+	public function test_should_remove_multiple_declarations() {
 		$input_declarations = array(
 			'color'       => 'cucumber',
 			'margin'      => '10em 10em 20em 1px',

@@ -20,20 +20,24 @@
  * // Returns `array( 'css' => 'color: #cccccc', 'declarations' => array( 'color' => '#cccccc' ), 'classnames' => 'has-color' )`.
  *
  * @access public
+ * @since 6.1.0
  *
- * @param array                 $block_styles The style object.
- * @param array<string|boolean> $options      array(
- *     'context' => (string|null) An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.
- *                  When set, the style engine will attempt to store the CSS rules, where a selector is also passed.
- *     'convert_vars_to_classnames' => (boolean) Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
- *     'selector'                   => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
- * );.
+ * @param array $block_styles The style object.
+ * @param array $options {
+ *     Optional. An array of options. Default empty array.
  *
- * @return array<string|array> array(
- *     'css'          => (string) A CSS ruleset or declarations block formatted to be placed in an HTML `style` attribute or tag.
- *     'declarations' => (array) An array of property/value pairs representing parsed CSS declarations.
- *     'classnames'   => (string) Classnames separated by a space.
- * );
+ *     @type string|null $context                    An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is `null`.
+ *                                                   When set, the style engine will attempt to store the CSS rules, where a selector is also passed.
+ *     @type bool        $convert_vars_to_classnames Whether to skip converting incoming CSS var patterns, e.g., `var:preset|<PRESET_TYPE>|<PRESET_SLUG>`, to var( --wp--preset--* ) values. Default `false`.
+ *     @type string      $selector                   Optional. When a selector is passed, the value of `$css` in the return value will comprise a full CSS rule `$selector { ...$css_declarations }`,
+ *                                                   otherwise, the value will be a concatenated string of CSS declarations.
+ * }
+ *
+ * @return array {
+ *     @type string                $css          A CSS ruleset or declarations block formatted to be placed in an HTML `style` attribute or tag.
+ *     @type array<string, string> $declarations An array of property/value pairs representing parsed CSS declarations.
+ *     @type string                $classnames   Classnames separated by a space.
+ * }
  */
 function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 	if ( ! class_exists( 'WP_Style_Engine' ) ) {
@@ -71,22 +75,32 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 
 /**
  * Returns compiled CSS from a collection of selectors and declarations.
- * This won't add to any store, but is useful for returning a compiled style sheet from any CSS selector + declarations combos.
+ * Useful for returning a compiled stylesheet from any collection of  CSS selector + declarations.
+ *
+ * Example usage:
+ * $css_rules = array( array( 'selector' => '.elephant-are-cool', 'declarations' => array( 'color' => 'gray', 'width' => '3em' ) ) );
+ * $css       = wp_style_engine_get_stylesheet_from_css_rules( $css_rules );
+ * // Returns `.elephant-are-cool{color:gray;width:3em}`.
  *
  * @access public
+ * @since 6.1.0
  *
- * @param array<array>  $css_rules array(
- *      array(
- *          'selector'    => (string) A CSS selector.
- *          declarations' => (boolean) An array of CSS definitions, e.g., array( "$property" => "$value" ).
- *      )
- *  );.
- * @param array<string> $options array(
- *     'context' => (string|null) An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.
- *                  When set, the style engine will attempt to store the CSS rules.
- *    'optimize' => (boolean) Whether to optimize the CSS output, e.g., combine rules.
- *    'prettify' => (boolean) Whether to add new lines to output.
- * );.
+ * @param array $css_rules {
+ *     Required. A collection of CSS rules.
+ *
+ *     @type array ...$0 {
+ *         @type string                $selector     A CSS selector.
+ *         @type array<string, string> $declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+ *     }
+ * }
+ * @param array $options {
+ *     Optional. An array of options. Default empty array.
+ *
+ *     @type string|null $context  An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.
+ *                                 When set, the style engine will attempt to store the CSS rules.
+ *     @type boolean     $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
+ *     @type boolean     $prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
+ * }
  *
  * @return string A compiled CSS string.
  */
@@ -126,19 +140,22 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
  * Returns compiled CSS from a store, if found.
  *
  * @access public
+ * @since 6.1.0
  *
- * @param string $store_name A valid store name.
- * @param array  $options    array(
- *    'optimize' => (boolean) Whether to optimize the CSS output, e.g., combine rules.
- *    'prettify' => (boolean) Whether to add new lines to output.
- * );.
+ * @param string $context A valid context name, corresponding to an existing store key.
+ * @param array  $options {
+ *     Optional. An array of options. Default empty array.
+ *
+ *     @type boolean $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
+ *     @type boolean $prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
+ * }
  *
  * @return string A compiled CSS string.
  */
-function wp_style_engine_get_stylesheet_from_context( $store_name, $options = array() ) {
-	if ( ! class_exists( 'WP_Style_Engine' ) || empty( $store_name ) ) {
+function wp_style_engine_get_stylesheet_from_context( $context, $options = array() ) {
+	if ( ! class_exists( 'WP_Style_Engine' ) || empty( $context ) ) {
 		return '';
 	}
 
-	return WP_Style_Engine::compile_stylesheet_from_css_rules( WP_Style_Engine::get_store( $store_name )->get_all_rules(), $options );
+	return WP_Style_Engine::compile_stylesheet_from_css_rules( WP_Style_Engine::get_store( $context )->get_all_rules(), $options );
 }

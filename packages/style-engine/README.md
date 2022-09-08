@@ -129,7 +129,7 @@ $stylesheet = wp_style_engine_get_stylesheet_from_css_rules(
         'context'  => 'block-supports', // Indicates that these styles should be stored with block supports CSS.
     )
 );
-print_r( $stylesheet ); // .wp-pumpkin, .wp-kumquat {color:orange}.wp-tomato{color:red;padding:100px}
+print_r( $stylesheet ); // .wp-pumpkin,.wp-kumquat{color:orange}.wp-tomato{color:red;padding:100px}
 ```
 
 ### wp_style_engine_get_stylesheet_from_context()
