@@ -240,7 +240,7 @@ export function FocalPointPicker( {
 	return (
 		<BaseControl
 			{ ...restProps }
-			__nextHasNoMarginBottom
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			label={ label }
 			id={ id }
 			help={ help }
@@ -273,6 +273,7 @@ export function FocalPointPicker( {
 			</MediaWrapper>
 			<Controls
 				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+				hasHelpText={ !! help }
 				point={ { x, y } }
 				onChange={ ( value ) => {
 					onChange?.( getFinalValue( value ) );

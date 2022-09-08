@@ -58,11 +58,20 @@ export const StyledUnitControl = styled( UnitControl )`
 
 const deprecatedBottomMargin = ( {
 	__nextHasNoMarginBottom,
-}: Pick< FocalPointPickerControlsProps, '__nextHasNoMarginBottom' > ) => {
+}: FocalPointPickerControlsProps ) => {
 	return ! __nextHasNoMarginBottom
 		? css`
-				margin-bottom: 8px; // margin from BaseControl
-				padding-bottom: 1em; // padding from ControlWrapper
+				padding-bottom: 1em;
+		  `
+		: undefined;
+};
+
+const extraHelpTextMargin = ( {
+	hasHelpText = false,
+}: FocalPointPickerControlsProps ) => {
+	return hasHelpText
+		? css`
+				padding-bottom: 1em;
 		  `
 		: undefined;
 };
@@ -71,6 +80,7 @@ export const ControlWrapper = styled( Flex )`
 	max-width: 320px;
 	padding-top: 1em;
 
+	${ extraHelpTextMargin }
 	${ deprecatedBottomMargin }
 `;
 

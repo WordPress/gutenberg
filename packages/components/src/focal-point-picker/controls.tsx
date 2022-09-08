@@ -23,6 +23,7 @@ const noop = () => {};
 
 export default function FocalPointPickerControls( {
 	__nextHasNoMarginBottom,
+	hasHelpText,
 	onChange = noop,
 	point = {
 		x: 0.5,
@@ -49,6 +50,7 @@ export default function FocalPointPickerControls( {
 		<ControlWrapper
 			className="focal-point-picker__controls"
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			hasHelpText={ hasHelpText }
 		>
 			<FocalPointUnitControl
 				label={ __( 'Left' ) }

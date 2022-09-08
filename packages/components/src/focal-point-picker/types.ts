@@ -62,6 +62,11 @@ export type FocalPointPickerProps = Pick<
 
 export type FocalPointPickerControlsProps = {
 	__nextHasNoMarginBottom?: boolean;
+	/**
+	 * A bit of extra bottom margin will be added if a `help` text
+	 * needs to be rendered under it.
+	 */
+	hasHelpText: boolean;
 	onChange?: ( value: FocalPoint ) => void;
 	point?: FocalPoint;
 };
