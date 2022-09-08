@@ -39,6 +39,7 @@ import {
 import {
 	useViewportMatch,
 	useMergeRefs,
+	useRefEffect,
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
@@ -230,6 +231,9 @@ const UnforwardedPopover = (
 	const [ referenceOwnerDocument, setReferenceOwnerDocument ] = useState<
 		Document | undefined
 	>();
+	const [ floatingOwnerDocument, setFloatingOwnerDocument ] = useState<
+		Document | undefined
+	>();
 
 	const anchorRefFallback: RefCallback< HTMLSpanElement > = useCallback(
 		( node ) => {
@@ -416,10 +420,12 @@ const UnforwardedPopover = (
 	// document scrolls. Also update the frame offset if the view resizes.
 	useLayoutEffect( () => {
 		if (
-			// reference and floating are in the same document
+			// Reference and root documents are the same.
 			referenceOwnerDocument === document ||
-			// the reference's document has a view (i.e. window)
-			// and a frame element (ie. it's an iframe)
+			// Reference and floating are in the same document.
+			referenceOwnerDocument === floatingOwnerDocument ||
+			// The reference's document has no view (i.e. window)
+			// or frame element (ie. it's an iframe).
 			! referenceOwnerDocument?.defaultView?.frameElement
 		) {
 			frameOffsetRef.current = undefined;
@@ -439,12 +445,18 @@ const UnforwardedPopover = (
 		return () => {
 			defaultView.removeEventListener( 'resize', updateFrameOffset );
 		};
-	}, [ referenceOwnerDocument, update ] );
+	}, [ referenceOwnerDocument, floatingOwnerDocument, update ] );
+
+	const updateFloatingOwnerDocument = useRefEffect( ( node ) => {
+		setFloatingOwnerDocument( node.ownerDocument ?? undefined );
+		return () => setFloatingOwnerDocument( undefined );
+	}, [] );
 
 	const mergedFloatingRef = useMergeRefs( [
 		floating,
 		dialogRef,
 		forwardedRef,
+		updateFloatingOwnerDocument,
 	] );
 
 	// Disable reason: We care to capture the _bubbled_ events from inputs
