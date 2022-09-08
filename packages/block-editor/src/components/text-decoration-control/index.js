@@ -10,10 +10,15 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
-import { formatStrikethrough, formatUnderline } from '@wordpress/icons';
+import { formatStrikethrough, formatUnderline, reset } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 const TEXT_DECORATIONS = [
+	{
+		name: __( 'None' ),
+		value: 'none',
+		icon: reset,
+	},
 	{
 		name: __( 'Underline' ),
 		value: 'underline',
