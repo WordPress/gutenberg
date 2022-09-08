@@ -15,6 +15,10 @@ import FocalPointPicker from '..';
 const meta: ComponentMeta< typeof FocalPointPicker > = {
 	title: 'Components/FocalPointPicker',
 	component: FocalPointPicker,
+	argTypes: {
+		help: { control: 'text' },
+		label: { control: 'text' },
+	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
