@@ -39,7 +39,6 @@ import {
 import {
 	useViewportMatch,
 	useMergeRefs,
-	useRefEffect,
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
@@ -231,9 +230,6 @@ const UnforwardedPopover = (
 	const [ referenceOwnerDocument, setReferenceOwnerDocument ] = useState<
 		Document | undefined
 	>();
-	const [ floatingOwnerDocument, setFloatingOwnerDocument ] = useState<
-		Document | undefined
-	>();
 
 	const anchorRefFallback: RefCallback< HTMLSpanElement > = useCallback(
 		( node ) => {
@@ -423,7 +419,7 @@ const UnforwardedPopover = (
 			// Reference and root documents are the same.
 			referenceOwnerDocument === document ||
 			// Reference and floating are in the same document.
-			referenceOwnerDocument === floatingOwnerDocument ||
+			referenceOwnerDocument === refs?.floating?.current?.ownerDocument ||
 			// The reference's document has no view (i.e. window)
 			// or frame element (ie. it's not an iframe).
 			! referenceOwnerDocument?.defaultView?.frameElement
@@ -445,18 +441,12 @@ const UnforwardedPopover = (
 		return () => {
 			defaultView.removeEventListener( 'resize', updateFrameOffset );
 		};
-	}, [ referenceOwnerDocument, floatingOwnerDocument, update ] );
-
-	const updateFloatingOwnerDocument = useRefEffect( ( node ) => {
-		setFloatingOwnerDocument( node.ownerDocument ?? undefined );
-		return () => setFloatingOwnerDocument( undefined );
-	}, [] );
+	}, [ referenceOwnerDocument, update ] );
 
 	const mergedFloatingRef = useMergeRefs( [
 		floating,
 		dialogRef,
 		forwardedRef,
-		updateFloatingOwnerDocument,
 	] );
 
 	// Disable reason: We care to capture the _bubbled_ events from inputs
