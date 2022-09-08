@@ -1,6 +1,8 @@
 # Popover
 
-Popover is a React component to render a floating content modal. It is similar in purpose to a tooltip, but renders content of any sort, not only simple text. It anchors itself to its parent node, optionally by a specified direction. If the popover exceeds the bounds of the page in the direction it opens, its position will be flipped automatically.
+`Popover` renders its content in a floating modal. If no explicit anchor is passed via props, it anchors to its parent element by default.
+
+The behavior of the popover when it exceeds the viewport's edges can be controlled via its props.
 
 ## Usage
 
@@ -49,102 +51,135 @@ render(
 
 The component accepts the following props. Props not included in this set will be applied to the element wrapping Popover content.
 
-### focusOnMount
+### `anchorRect`: `DomRectWithOwnerDocument`
 
-By default, the _first tabblable element_ in the popover will receive focus when it mounts. This is the same as setting `focusOnMount` to `"firstElement"`. If you want to focus the container instead, you can set `focusOnMount` to `"container"`.
+An object extending a `DOMRect` with an additional optional `ownerDocument` property, used to specify a fixed popover position.
 
-Set this prop to `false` to disable focus changing entirely. This should only be set when an appropriately accessible substitute behavior exists.
-
--   Type: `String` or `Boolean`
--   Required: No
--   Default: `"firstElement"`
-
-### placement
-
-The direction in which the popover should open relative to its parent node or anchor node.
-
-The available base placements are 'top', 'right', 'bottom', 'left'.
-
-Each of these base placements has an alignment in the form -start and -end. For example, 'right-start', or 'bottom-end'. These allow you to align the tooltip to the edges of the button, rather than centering it.
-
--   Type: `String`
--   Required: No
--   Default: `"bottom-start"`
-
-### offset
-
-The distance (in pixels) between the anchor and popover.
-
--   Type: `Number`
 -   Required: No
 
-### children
+### `anchorRef`: `Element | PopoverAnchorRefReference | PopoverAnchorRefTopBottom | Range`
 
-The content to be displayed within the popover.
+Used to specify a fixed popover position. It can be an `Element`, a React reference to an `element`, an object with a `top` and a `bottom` properties (both pointing to elements), or a `range`.
 
--   Type: `Element`
--   Required: Yes
-
-### className
-
-An optional additional class name to apply to the rendered popover.
-
--   Type: `String`
 -   Required: No
 
-### onClose
+### `animate`: `boolean`
 
-A callback invoked when the popover should be closed.
+Whether the popover should animate when opening.
 
--   Type: `Function`
--   Required: No
-
-### onFocusOutside
-
-A callback invoked when the focus leaves the opened popover. This should only be provided in advanced use-cases when a Popover should close under specific circumstances; for example, if the new `document.activeElement` is content of or otherwise controlling Popover visibility.
-
-Defaults to `onClose` when not provided.
-
--   Type: `Function`
--   Required: No
-
-### expandOnMobile
-
-Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to avoid this behavior.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
-### headerTitle
-
-Set this to customize the text that is shown in popover's header when it is fullscreen on mobile.
-
--   Type: `String`
--   Required: No
-
-### noArrow
-
-Set this to hide the arrow which visually indicates what the popover is anchored to. Note that the arrow will not display if `position` is set to `"middle center"`.
-
--   Type: `Boolean`
 -   Required: No
 -   Default: `true`
 
-### anchorRect
+### `children`: `ReactNode`
 
-A custom `DOMRect` object at which to position the popover. `anchorRect` is used when the position (custom `DOMRect` object) of the popover needs to be fixed at one location all the time.
+The `children` elements rendered as the popover's content.
 
--   Type: `DOMRect`
+-   Required: Yes
+
+### `expandOnMobile`: `boolean`
+
+Show the popover fullscreen on mobile viewports.
+
 -   Required: No
 
-### getAnchorRect
+### `flip`: `boolean`
 
-A callback function which is used to override the anchor value computation algorithm. `anchorRect` will take precedence over this prop, if both are passed together.
+Specifies whether the popover should flip across its axis if there isn't space for it in the normal placement.
 
-If you need the `DOMRect` object i.e., the position of popover to be calculated on every time, the popover re-renders, then use `getAnchorRect`.
+When the using a 'top' placement, the popover will switch to a 'bottom' placement. When using a 'left' placement, the popover will switch to a `right' placement.
 
-`getAnchorRect` callback function receives a reference to the popover anchor element as a function parameter and it should return a `DOMRect` object. Noting that `getAnchorRect` can be called with `null`.
+The popover will retain its alignment of 'start' or 'end' when flipping.
 
--   Type: `Function`
+-   Required: No
+-   Default: `true`
+
+### `focusOnMount`: `'firstElement' | boolean`
+
+By default, the _first tabbable element_ in the popover will receive focus when it mounts. This is the same as setting this prop to `"firstElement"`.
+
+Specifying a `true` value will focus the container instead.
+
+Specifying a `false` value disables the focus handling entirely (this should only be done when an appropriately accessible substitute behavior exists).
+
+-   Required: No
+-   Default: `"firstElement"`
+
+### `onFocusOutside`: `( event: SyntheticEvent ) => void`
+
+A callback invoked when the focus leaves the opened popover. This should only be provided in advanced use-cases when a popover should close under specific circumstances (for example, if the new `document.activeElement` is content of or otherwise controlling popover visibility).
+
+When not provided, the `onClose` callback will be called instead.
+
+-   Required: No
+
+### `getAnchorRect`: `( fallbackReferenceElement: Element | null ) => DomRectWithOwnerDocument`
+
+A function returning the same value as the one expected by the `anchorRect` prop, used to specify a dynamic popover position.
+
+-   Required: No
+
+### `headerTitle`: `string`
+
+Used to customize the header text shown when the popover is toggled to fullscreen on mobile viewports (see the `expandOnMobile` prop).
+
+-   Required: No
+
+### `isAlternate`: `boolean`
+
+Used to enable a different visual style for the popover.
+
+-   Required: No
+
+### `noArrow`: `boolean`
+
+Used to show/hide the arrow that points at the popover's anchor.
+
+-   Required: No
+-   Default: `true`
+
+### `offset`: `number`
+
+The distance (in px) between the anchor and the popover.
+
+-   Required: No
+
+### `onClose`: `() => void`
+
+A callback invoked when the popover should be closed.
+
+-   Required: No
+
+### `placement`: `'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'`
+
+Used to specify the popover's position with respect to its anchor.
+
+-   Required: No
+-   Default: `"bottom-start"`
+
+### `position`: `[yAxis] [xAxis] [optionalCorner]`
+
+_Note: use the `placement` prop instead when possible._
+
+Legacy way to specify the popover's position with respect to its anchor.
+
+Possible values:
+
+- `yAxis`: `'top' | 'middle' | 'bottom'`
+- `xAxis`: `'left' | 'center' | 'right'`
+- `corner`: `'top' | 'right' | 'bottom' | 'left'`
+
+
+-   Required: No
+
+### `resize`: `boolean`
+
+Adjusts the size of the popover to prevent its contents from going out of view when meeting the viewport edges.
+
+-   Required: No
+-   Default: `true`
+
+### `range`: `unknown`
+
+_Note: this prop is deprecated and has no effect on the component._
+
 -   Required: No

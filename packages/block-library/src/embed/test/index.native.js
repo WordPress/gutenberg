@@ -29,7 +29,6 @@ import { requestPreview } from '@wordpress/react-native-bridge';
  */
 import * as paragraph from '../../paragraph';
 import * as embed from '..';
-import { registerBlock } from '../..';
 
 // Override modal mock to prevent unmounting it when is not visible.
 // This is required to be able to trigger onClose and onDismiss events when
@@ -130,6 +129,10 @@ const mockEmbedResponses = ( mockedResponses ) => {
 			] );
 		}
 
+		if ( path.startsWith( '/wp/v2/block-patterns/categories' ) ) {
+			return Promise.resolve( [] );
+		}
+
 		const matchedEmbedResponse = mockedResponses.find(
 			( mockedResponse ) =>
 				path ===
@@ -180,8 +183,8 @@ const initializeWithEmbedBlock = async ( initialHtml, selectBlock = true ) => {
 beforeAll( () => {
 	// Paragraph block needs to be registered because by default a paragraph
 	// block is added to empty posts.
-	registerBlock( paragraph );
-	registerBlock( embed );
+	paragraph.init();
+	embed.init();
 	setDefaultBlockName( paragraph.name );
 } );
 
@@ -699,6 +702,9 @@ describe( 'Embed block', () => {
 						response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
 					}
 				}
+				if ( path.startsWith( '/wp/v2/block-patterns/categories' ) ) {
+					response = [];
+				}
 				return Promise.resolve( response );
 			} );
 
@@ -725,6 +731,9 @@ describe( 'Embed block', () => {
 		it( 'converts to link if preview request failed', async () => {
 			// Return bad response for requests to oembed endpoint.
 			fetchRequest.mockImplementation( ( { path } ) => {
+				if ( path.startsWith( '/wp/v2/block-patterns/categories' ) ) {
+					return Promise.resolve( [] );
+				}
 				const isEmbedRequest = path.startsWith( '/oembed/1.0/proxy' );
 				return Promise.resolve(
 					isEmbedRequest ? MOCK_BAD_WORDPRESS_RESPONSE : {}
@@ -762,6 +771,10 @@ describe( 'Embed block', () => {
 					response = MOCK_BAD_WORDPRESS_RESPONSE;
 				} else if ( matchesPath( successURL ) ) {
 					response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
+				} else if (
+					path.startsWith( '/wp/v2/block-patterns/categories' )
+				) {
+					response = [];
 				}
 
 				return Promise.resolve( response );
@@ -1049,6 +1062,9 @@ describe( 'Embed block', () => {
 	it( 'displays cannot embed on the placeholder if preview data is null', async () => {
 		// Return null response for requests to oembed endpoint.
 		fetchRequest.mockImplementation( ( { path } ) => {
+			if ( path.startsWith( '/wp/v2/block-patterns/categories' ) ) {
+				return Promise.resolve( [] );
+			}
 			const isEmbedRequest = path.startsWith( '/oembed/1.0/proxy' );
 			return Promise.resolve( isEmbedRequest ? EMBED_NULL_RESPONSE : {} );
 		} );

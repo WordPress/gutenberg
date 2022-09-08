@@ -49,6 +49,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	const {
+		__nextHasNoMarginBottom = false,
 		afterIcon,
 		allowReset = false,
 		beforeIcon,
@@ -137,7 +138,9 @@ function UnforwardedRangeControl< IconProps = unknown >(
 		onChange( nextValue );
 	};
 
-	const handleOnChange = ( next: string ) => {
+	const handleOnChange = ( next?: string ) => {
+		// @ts-expect-error TODO: Investigate if it's problematic for setValue() to
+		// potentially receive a NaN when next is undefined.
 		let nextValue = parseFloat( next );
 		setValue( nextValue );
 
@@ -212,6 +215,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
 
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			className={ classes }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
@@ -225,6 +229,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
 					</BeforeIconWrapper>
 				) }
 				<Wrapper
+					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 					className={ wrapperClasses }
 					color={ colorProp }
 					marks={ !! marks }
@@ -301,6 +306,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
 						step={ step }
+						// @ts-expect-error TODO: Investigate if the `null` value is necessary
 						value={ inputSliderValue }
 					/>
 				) }

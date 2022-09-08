@@ -63,7 +63,7 @@ describe( 'Icon', () => {
 		expect( wrapper.prop( 'height' ) ).toBe( 24 );
 	} );
 
-	it( 'renders an svg element and passes the size as its width and height', () => {
+	it( 'renders an svg element and override its width and height', () => {
 		const wrapper = shallow(
 			<Icon
 				icon={
@@ -75,8 +75,8 @@ describe( 'Icon', () => {
 			/>
 		);
 
-		expect( wrapper.prop( 'width' ) ).toBe( 64 );
-		expect( wrapper.prop( 'height' ) ).toBe( 64 );
+		expect( wrapper.prop( 'width' ) ).toBe( 32 );
+		expect( wrapper.prop( 'height' ) ).toBe( 32 );
 	} );
 
 	it( 'renders an svg element and does not override width and height if already specified', () => {

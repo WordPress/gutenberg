@@ -28,7 +28,11 @@ describe( 'FontSizePicker', () => {
 			);
 
 			render(
-				<FontSizePicker value={ fontSize } onChange={ setFontSize } />
+				<FontSizePicker
+					value={ fontSize }
+					onChange={ setFontSize }
+					__nextHasNoMarginBottom
+				/>
 			);
 
 			const unitSelect = getUnitSelect();
@@ -52,7 +56,11 @@ describe( 'FontSizePicker', () => {
 			);
 
 			render(
-				<FontSizePicker value={ fontSize } onChange={ setFontSize } />
+				<FontSizePicker
+					value={ fontSize }
+					onChange={ setFontSize }
+					__nextHasNoMarginBottom
+				/>
 			);
 
 			const unitSelect = getUnitSelect();
@@ -87,6 +95,7 @@ describe( 'FontSizePicker', () => {
 					fontSizes={ fontSizes }
 					value={ fontSize }
 					onChange={ setFontSize }
+					__nextHasNoMarginBottom
 				/>
 			);
 
@@ -123,6 +132,7 @@ describe( 'FontSizePicker', () => {
 					fontSizes={ fontSizes }
 					value={ fontSize }
 					onChange={ setFontSize }
+					__nextHasNoMarginBottom
 				/>
 			);
 
@@ -182,6 +192,7 @@ describe( 'FontSizePicker', () => {
 				<FontSizePicker
 					fontSizes={ fontSizes }
 					value={ fontSizes[ 0 ].size }
+					__nextHasNoMarginBottom
 				/>
 			);
 			// Trigger click to open the select menu and take into account
@@ -193,19 +204,20 @@ describe( 'FontSizePicker', () => {
 			expect( element ).toHaveLength( fontSizes.length + 2 );
 		} );
 		describe( 'segmented control', () => {
-			it( 'should use numeric labels for simple css values', () => {
+			it( 'should use t-shirt labels for simple css values', () => {
 				const fontSizes = [ ...options ];
 				render(
 					<FontSizePicker
 						fontSizes={ fontSizes }
 						value={ fontSizes[ 0 ].size }
+						__nextHasNoMarginBottom
 					/>
 				);
 				const element = screen.getByLabelText( 'Large' );
 				expect( element ).toBeInTheDocument();
-				expect( element.children[ 0 ].textContent ).toBe( '1.7' );
+				expect( element.children[ 0 ].textContent ).toBe( 'L' );
 			} );
-			it( 'should use incremental sequence of numbers as labels if we have complex css', () => {
+			it( 'should use incremental sequence of t-shirt sizes as labels if we have complex css', () => {
 				const fontSizes = [
 					...options,
 					{
@@ -218,11 +230,19 @@ describe( 'FontSizePicker', () => {
 					<FontSizePicker
 						fontSizes={ fontSizes }
 						value={ fontSizes[ 0 ].size }
+						__nextHasNoMarginBottom
 					/>
 				);
-				const element = screen.getByLabelText( 'Large' );
-				expect( element ).toBeInTheDocument();
-				expect( element.children[ 0 ].textContent ).toBe( '3' );
+				const largeElement = screen.getByLabelText( 'Large' );
+				expect( largeElement ).toBeInTheDocument();
+				expect( largeElement ).toHaveTextContent( 'L' );
+
+				const extraLargeElement =
+					screen.getByLabelText( 'Extra Large' );
+				expect( extraLargeElement ).toBeInTheDocument();
+				expect( extraLargeElement.children[ 0 ].textContent ).toBe(
+					'XL'
+				);
 			} );
 		} );
 	} );

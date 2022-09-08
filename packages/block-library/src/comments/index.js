@@ -6,6 +6,7 @@ import { postComments as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import deprecated from './deprecated';
 import edit from './edit';
@@ -20,3 +21,5 @@ export const settings = {
 	save,
 	deprecated,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

@@ -30,6 +30,20 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Should not create a new store with invalid $store_name.
+	 */
+	public function test_store_name_required() {
+		$not_a_store = WP_Style_Engine_CSS_Rules_Store::get_store( '' );
+		$this->assertEmpty( $not_a_store );
+
+		$also_not_a_store = WP_Style_Engine_CSS_Rules_Store::get_store( 123 );
+		$this->assertEmpty( $also_not_a_store );
+
+		$definitely_not_a_store = WP_Style_Engine_CSS_Rules_Store::get_store( null );
+		$this->assertEmpty( $definitely_not_a_store );
+	}
+
+	/**
 	 * Should return previously created store when the same selector key is passed.
 	 */
 	public function test_get_store() {
@@ -85,7 +99,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 		$new_pie_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'meat-pie' );
 		$selector      = '.wp-block-sauce a:hover';
 		$store_rule    = $new_pie_store->add_rule( $selector );
-		$expected      = "$selector {}";
+		$expected      = '';
 		$this->assertEquals( $expected, $store_rule->get_css() );
 
 		$pie_declarations = array(
@@ -97,7 +111,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 		$store_rule->add_declarations( $css_declarations );
 
 		$store_rule = $new_pie_store->add_rule( $selector );
-		$expected   = "$selector {{$css_declarations->get_declarations_string()}}";
+		$expected   = "$selector{{$css_declarations->get_declarations_string()}}";
 		$this->assertEquals( $expected, $store_rule->get_css() );
 	}
 

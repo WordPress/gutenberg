@@ -43,8 +43,13 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
 }
 
 .emotion-6 {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-transform: uppercase;
   display: inline-block;
   margin-bottom: calc(4px * 2);
+  padding: 0;
 }
 
 .emotion-8 {
@@ -147,99 +152,103 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
           </div>
         </legend>
         <div
-          className="components-flex components-h-stack components-v-stack emotion-8 emotion-5"
-          data-wp-c16t={true}
-          data-wp-component="VStack"
+          className="block-editor-color-gradient-control__panel"
         >
           <div
-            className="components-dropdown"
-            tabIndex="-1"
-          >
-            <button
-              aria-expanded={false}
-              aria-haspopup="true"
-              aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
-              className="components-flex components-color-palette__custom-color emotion-10 emotion-5"
-              data-wp-c16t={true}
-              data-wp-component="Flex"
-              onClick={[Function]}
-              style={
-                Object {
-                  "background": "#f00",
-                  "color": "#000",
-                }
-              }
-            >
-              <span
-                className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-5 emotion-13 emotion-5"
-                data-wp-c16t={true}
-                data-wp-component="FlexItem"
-              >
-                red
-              </span>
-              <span
-                className="components-flex-item components-color-palette__custom-color-value emotion-15 emotion-5"
-                data-wp-c16t={true}
-                data-wp-component="FlexItem"
-              >
-                f00
-              </span>
-            </button>
-          </div>
-          <div
-            className="components-circular-option-picker"
+            className="components-flex components-h-stack components-v-stack emotion-8 emotion-5"
+            data-wp-c16t={true}
+            data-wp-component="VStack"
           >
             <div
-              className="components-circular-option-picker__swatches"
+              className="components-dropdown"
+              tabIndex="-1"
+            >
+              <button
+                aria-expanded={false}
+                aria-haspopup="true"
+                aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
+                className="components-flex components-color-palette__custom-color emotion-10 emotion-5"
+                data-wp-c16t={true}
+                data-wp-component="Flex"
+                onClick={[Function]}
+                style={
+                  Object {
+                    "background": "#f00",
+                    "color": "#000",
+                  }
+                }
+              >
+                <span
+                  className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-5 emotion-13 emotion-5"
+                  data-wp-c16t={true}
+                  data-wp-component="FlexItem"
+                >
+                  red
+                </span>
+                <span
+                  className="components-flex-item components-color-palette__custom-color-value emotion-15 emotion-5"
+                  data-wp-c16t={true}
+                  data-wp-component="FlexItem"
+                >
+                  f00
+                </span>
+              </button>
+            </div>
+            <div
+              className="components-circular-option-picker"
             >
               <div
-                className="components-circular-option-picker__option-wrapper"
+                className="components-circular-option-picker__swatches"
+              >
+                <div
+                  className="components-circular-option-picker__option-wrapper"
+                >
+                  <button
+                    aria-describedby={null}
+                    aria-label="Color: red"
+                    aria-pressed={true}
+                    className="components-button components-circular-option-picker__option is-pressed"
+                    onBlur={[Function]}
+                    onClick={[Function]}
+                    onFocus={[Function]}
+                    onMouseDown={[Function]}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    style={
+                      Object {
+                        "backgroundColor": "#f00",
+                        "color": "#f00",
+                      }
+                    }
+                    type="button"
+                  />
+                  <svg
+                    aria-hidden={true}
+                    fill="#000"
+                    focusable={false}
+                    height={24}
+                    viewBox="0 0 24 24"
+                    width={24}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div
+                className="components-circular-option-picker__custom-clear-wrapper"
               >
                 <button
                   aria-describedby={null}
-                  aria-label="Color: red"
-                  aria-pressed={true}
-                  className="components-button components-circular-option-picker__option is-pressed"
-                  onBlur={[Function]}
+                  className="components-button components-circular-option-picker__clear is-tertiary"
                   onClick={[Function]}
-                  onFocus={[Function]}
-                  onMouseDown={[Function]}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
-                  style={
-                    Object {
-                      "backgroundColor": "#f00",
-                      "color": "#f00",
-                    }
-                  }
                   type="button"
-                />
-                <svg
-                  aria-hidden={true}
-                  fill="#000"
-                  focusable={false}
-                  height={24}
-                  viewBox="0 0 24 24"
-                  width={24}
-                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <path
-                    d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
-                  />
-                </svg>
+                  Clear
+                </button>
               </div>
-            </div>
-            <div
-              className="components-circular-option-picker__custom-clear-wrapper"
-            >
-              <button
-                aria-describedby={null}
-                className="components-button components-circular-option-picker__clear is-tertiary"
-                onClick={[Function]}
-                type="button"
-              >
-                Clear
-              </button>
             </div>
           </div>
         </div>

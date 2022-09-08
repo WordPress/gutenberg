@@ -1,3 +1,40 @@
+// Provide special styling for the placeholder.
+// @todo: this particular minimal style of placeholder could be componentized further.
+.wp-block-image.wp-block-image {
+	// Show Placeholder style on-select.
+	&.is-selected .components-placeholder {
+		// Block UI appearance.
+		color: $gray-900;
+		background-color: $white;
+		box-shadow: inset 0 0 0 $border-width $gray-900;
+		border: none;
+
+		// Disable any duotone filter applied in the selected state.
+		filter: none;
+
+		// @todo: this should eventually be overridden by a custom border-radius set in the inspector.
+		border-radius: $radius-block-ui;
+
+		> svg {
+			opacity: 0;
+		}
+
+		.components-placeholder__illustration {
+			display: none;
+		}
+	}
+
+	// Remove the transition while we still have a legacy placeholder style.
+	// Otherwise the content jumps between the 1px placeholder border, and any inherited custom
+	// parent border that may get applied when you deselect.
+	.components-placeholder__label,
+	.components-placeholder__instructions,
+	.components-button {
+		transition: none;
+	}
+}
+
+
 figure.wp-block-image:not(.wp-block) {
 	margin: 0;
 }
@@ -14,13 +51,12 @@ figure.wp-block-image:not(.wp-block) {
 		display: inline;
 	}
 
-	// Shown while image is being uploaded
+	// Shown while image is being uploaded.
 	.components-spinner {
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		margin-top: -9px;
-		margin-left: -9px;
+		transform: translate(-50%, -50%);
 	}
 }
 
