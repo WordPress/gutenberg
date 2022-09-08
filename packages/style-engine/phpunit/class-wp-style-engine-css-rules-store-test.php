@@ -53,13 +53,13 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 	 */
 	public function test_should_not_create_store_without_a_store_name() {
 		$not_a_store = WP_Style_Engine_CSS_Rules_Store::get_store( '' );
-		$this->assertEmpty( $not_a_store );
+		$this->assertEmpty( $not_a_store, 'get_store() did not return an empty value with empty string as argument.' );
 
 		$also_not_a_store = WP_Style_Engine_CSS_Rules_Store::get_store( 123 );
-		$this->assertEmpty( $also_not_a_store );
+		$this->assertEmpty( $also_not_a_store, 'get_store() did not return an empty value with number as argument.' );
 
 		$definitely_not_a_store = WP_Style_Engine_CSS_Rules_Store::get_store( null );
-		$this->assertEmpty( $definitely_not_a_store );
+		$this->assertEmpty( $definitely_not_a_store, 'get_store() did not return an empty value with `null` as argument.' );
 	}
 
 	/**
@@ -71,11 +71,11 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 		$new_fish_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'fish-n-chips' );
 		$selector       = '.haddock';
 
-		$new_fish_store->add_rule( $selector )->get_selector();
-		$this->assertEquals( $selector, $new_fish_store->add_rule( $selector )->get_selector() );
+		$new_fish_store->add_rule( $selector );
+		$this->assertEquals( $selector, $new_fish_store->add_rule( $selector )->get_selector(), 'Selector string of store rule does not match expected value' );
 
 		$the_same_fish_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'fish-n-chips' );
-		$this->assertEquals( $selector, $the_same_fish_store->add_rule( $selector )->get_selector() );
+		$this->assertEquals( $selector, $the_same_fish_store->add_rule( $selector )->get_selector(), 'Selector string of existing store rule does not match expected value' );
 	}
 
 	/**
@@ -108,12 +108,14 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 				'dolmades' => $dolmades_store,
 				'tzatziki' => $tzatziki_store,
 			),
-			WP_Style_Engine_CSS_Rules_Store::get_stores()
+			WP_Style_Engine_CSS_Rules_Store::get_stores(),
+			'Return value of get_stores() does not match expectation'
 		);
 		WP_Style_Engine_CSS_Rules_Store::remove_all_stores();
 		$this->assertEquals(
 			array(),
-			WP_Style_Engine_CSS_Rules_Store::get_stores()
+			WP_Style_Engine_CSS_Rules_Store::get_stores(),
+			'Return value of get_stores() is not an empty array after remove_all_stores() called.'
 		);
 	}
 
@@ -127,7 +129,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 		$selector      = '.wp-block-sauce a:hover';
 		$store_rule    = $new_pie_store->add_rule( $selector );
 		$expected      = '';
-		$this->assertEquals( $expected, $store_rule->get_css() );
+		$this->assertEquals( $expected, $store_rule->get_css(), 'Return value of get_css() is not a empty string where a rule has no CSS declarations.' );
 
 		$pie_declarations = array(
 			'color'         => 'brown',
@@ -139,7 +141,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 
 		$store_rule = $new_pie_store->add_rule( $selector );
 		$expected   = "$selector{{$css_declarations->get_declarations_string()}}";
-		$this->assertEquals( $expected, $store_rule->get_css() );
+		$this->assertEquals( $expected, $store_rule->get_css(), 'Return value of get_css() does not match expected CSS from existing store rules.' );
 	}
 
 	/**
@@ -155,33 +157,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 			$selector => $store_rule,
 		);
 
-		$this->assertEquals( $expected, $new_pizza_store->get_all_rules() );
-
-		$pizza_declarations = array(
-			'color'         => 'red',
-			'border-color'  => 'yellow',
-			'border-radius' => '10rem',
-		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $pizza_declarations );
-		$store_rule->add_declarations( array( $css_declarations ) );
-
-		$expected = array(
-			$selector => $store_rule,
-		);
-		$this->assertEquals( $expected, $new_pizza_store->get_all_rules() );
-
-		$new_pizza_declarations = array(
-			'color'        => 'red',
-			'border-color' => 'red',
-			'font-size'    => '10rem',
-		);
-		$css_declarations       = new WP_Style_Engine_CSS_Declarations( $new_pizza_declarations );
-		$store_rule->add_declarations( array( $css_declarations ) );
-
-		$expected = array(
-			$selector => $store_rule,
-		);
-		$this->assertEquals( $expected, $new_pizza_store->get_all_rules() );
+		$this->assertEquals( $expected, $new_pizza_store->get_all_rules(), 'Return value for get_all_rules() does not match expectations.' );
 
 		$new_selector             = '.wp-block-mushroom a:hover';
 		$newer_pizza_declarations = array(
@@ -195,6 +171,6 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 			$selector     => $store_rule,
 			$new_selector => $new_store_rule,
 		);
-		$this->assertEquals( $expected, $new_pizza_store->get_all_rules() );
+		$this->assertEquals( $expected, $new_pizza_store->get_all_rules(), 'Return value for get_all_rules() does not match expectations after adding new rules to store.' );
 	}
 }

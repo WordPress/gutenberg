@@ -209,13 +209,15 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 
 		$this->assertSame(
 			'color:tomato;margin:10em 10em 20em 1px;font-family:Happy Font serif;',
-			$css_declarations->get_declarations_string()
+			$css_declarations->get_declarations_string(),
+			'CSS declarations string does not match the values of `$declarations` passed to the constructor.'
 		);
 
 		$css_declarations->remove_declaration( 'color' );
 		$this->assertSame(
 			'margin:10em 10em 20em 1px;font-family:Happy Font serif;',
-			$css_declarations->get_declarations_string()
+			$css_declarations->get_declarations_string(),
+			'Output after removing CSS declaration via `remove_declaration()` does not match expectations'
 		);
 	}
 
@@ -234,13 +236,15 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 
 		$this->assertSame(
 			'color:cucumber;margin:10em 10em 20em 1px;font-family:Happy Font serif;',
-			$css_declarations->get_declarations_string()
+			$css_declarations->get_declarations_string(),
+			'CSS declarations string does not match the values of `$declarations` passed to the constructor.'
 		);
 
 		$css_declarations->remove_declarations( array( 'color', 'margin' ) );
 		$this->assertSame(
 			'font-family:Happy Font serif;',
-			$css_declarations->get_declarations_string()
+			$css_declarations->get_declarations_string(),
+			'Output after removing multiple CSS declaration via `remove_declarations()` does not match expectations'
 		);
 	}
 }

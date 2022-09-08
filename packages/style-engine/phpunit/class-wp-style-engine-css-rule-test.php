@@ -38,10 +38,10 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
 		$css_rule           = new WP_Style_Engine_CSS_Rule( $selector, $css_declarations );
 
-		$this->assertSame( $selector, $css_rule->get_selector() );
+		$this->assertSame( $selector, $css_rule->get_selector(), 'Return value of get_selector() does not match value passed to constructor.' );
 
 		$expected = "$selector{{$css_declarations->get_declarations_string()}}";
-		$this->assertSame( $expected, $css_rule->get_css() );
+		$this->assertSame( $expected, $css_rule->get_css(), 'Value returned by get_css() does not match expected declarations string.' );
 	}
 
 	/**
@@ -92,11 +92,11 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 		$selector = '.taggart';
 		$css_rule = new WP_Style_Engine_CSS_Rule( $selector );
 
-		$this->assertSame( $selector, $css_rule->get_selector() );
+		$this->assertSame( $selector, $css_rule->get_selector(), 'Return value of get_selector() does not match value passed to constructor.' );
 
 		$css_rule->set_selector( '.law-and-order' );
 
-		$this->assertSame( '.law-and-order', $css_rule->get_selector() );
+		$this->assertSame( '.law-and-order', $css_rule->get_selector(), 'Return value of get_selector() does not match value passed to set_selector().' );
 	}
 
 	/**
