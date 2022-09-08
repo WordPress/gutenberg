@@ -425,7 +425,7 @@ const UnforwardedPopover = (
 			// Reference and floating are in the same document.
 			referenceOwnerDocument === floatingOwnerDocument ||
 			// The reference's document has no view (i.e. window)
-			// or frame element (ie. it's an iframe).
+			// or frame element (ie. it's not an iframe).
 			! referenceOwnerDocument?.defaultView?.frameElement
 		) {
 			frameOffsetRef.current = undefined;
