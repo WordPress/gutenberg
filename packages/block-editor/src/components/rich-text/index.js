@@ -332,7 +332,7 @@ function RichTextWrapper(
 	}
 
 	const TagName = tagName;
-	const content = (
+	return (
 		<>
 			{ isSelected && (
 				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
@@ -424,19 +424,6 @@ function RichTextWrapper(
 			/>
 		</>
 	);
-
-	if ( ! wrapperClassName ) {
-		return content;
-	}
-
-	deprecated( 'wp.blockEditor.RichText wrapperClassName prop', {
-		since: '5.4',
-		alternative: 'className prop or create your own wrapper div',
-		version: '6.2',
-	} );
-
-	const className = classnames( 'block-editor-rich-text', wrapperClassName );
-	return <div className={ className }>{ content }</div>;
 }
 
 const ForwardedRichTextContainer = forwardRef( RichTextWrapper );
