@@ -24,4 +24,4 @@ function ReusableBlocksMenuItems() {
 -   **Type:** `String`
 -   **Default:** `undefined`
 
-A string representing the context where the component is being included. This can be used to conditionalise certain beheaviours.
+A string representing the context where the component is being included. This can be used to conditionalize certain behaviors.
