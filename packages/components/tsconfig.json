@@ -50,7 +50,6 @@
 		"src/dimension-control",
 		"src/drop-zone",
 		"src/duotone-picker",
-		"src/focal-point-picker",
 		"src/font-size-picker",
 		"src/form-file-upload",
 		"src/gradient-picker",

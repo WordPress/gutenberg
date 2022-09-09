@@ -201,9 +201,15 @@ function Iframe(
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
 	const setRef = useRefEffect( ( node ) => {
+		let iFrameDocument;
+		// Prevent the default browser action for files dropped outside of dropzones.
+		function preventFileDropDefault( event ) {
+			event.preventDefault();
+		}
 		function setDocumentIfReady() {
 			const { contentDocument, ownerDocument } = node;
 			const { readyState, documentElement } = contentDocument;
+			iFrameDocument = contentDocument;
 
 			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
 				return false;
@@ -228,13 +234,34 @@ function Iframe(
 			contentDocument.dir = ownerDocument.dir;
 			documentElement.removeChild( contentDocument.head );
 			documentElement.removeChild( contentDocument.body );
+
+			iFrameDocument.addEventListener(
+				'dragover',
+				preventFileDropDefault,
+				false
+			);
+			iFrameDocument.addEventListener(
+				'drop',
+				preventFileDropDefault,
+				false
+			);
 			return true;
 		}
 
 		// Document set with srcDoc is not immediately ready.
 		node.addEventListener( 'load', setDocumentIfReady );
 
-		return () => node.removeEventListener( 'load', setDocumentIfReady );
+		return () => {
+			node.removeEventListener( 'load', setDocumentIfReady );
+			iFrameDocument?.removeEventListener(
+				'dragover',
+				preventFileDropDefault
+			);
+			iFrameDocument?.removeEventListener(
+				'drop',
+				preventFileDropDefault
+			);
+		};
 	}, [] );
 
 	const headRef = useRefEffect( ( element ) => {

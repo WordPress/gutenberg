@@ -456,13 +456,11 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 						$element_selector = array( $el_selector );
 						break;
 					}
-
-					$element_selector = static::append_to_selector( $el_selector, $selector . ' ', 'left' );
+					$element_selector[] = static::append_to_selector( $el_selector, $selector . ' ', 'left' );
 				}
-				static::$blocks_metadata[ $block_name ]['elements'][ $el_name ] = $element_selector;
+				static::$blocks_metadata[ $block_name ]['elements'][ $el_name ] = implode( ',', $element_selector );
 			}
 		}
-
 		return static::$blocks_metadata;
 	}
 
@@ -825,10 +823,20 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
 
 			if ( $use_root_padding ) {
+				// Top and bottom padding are applied to the outer block container.
 				$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
+				// Right and left padding are applied to the first container with `.has-global-padding` class.
 				$block_rules .= '.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+				// Nested containers with `.has-global-padding` class do not get padding.
+				$block_rules .= '.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; }';
+				// Alignfull children of the container with left and right padding have negative margins so they can still be full width.
 				$block_rules .= '.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }';
-				$block_rules .= '.has-global-padding > .alignfull > :where([class*="wp-block-"]:not(.alignfull):not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+				// The above rule is negated for alignfull children of nested containers.
+				$block_rules .= '.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }';
+				// Some of the children of alignfull blocks without content width should also get padding: text blocks and non-alignfull container blocks.
+				$block_rules .= '.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+				// The above rule also has to be negated for blocks inside nested `.has-global-padding` blocks.
+				$block_rules .= '.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0; }';
 			}
 
 			$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
@@ -978,7 +986,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string Style property value.
 	 */
 	protected static function get_property_value( $styles, $path, $theme_json = null ) {
-		$value = _wp_array_get( $styles, $path, '' );
+		$value = _wp_array_get( $styles, $path );
 
 		// This converts references to a path to the value at that path
 		// where the values is an array with a "ref" key, pointing to a path.
@@ -998,7 +1006,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 		}
 
-		if ( '' === $value || is_array( $value ) ) {
+		if ( is_array( $value ) ) {
 			return $value;
 		}
 
@@ -1355,10 +1363,11 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				}
 			}
 
-			if ( null !== $block_gap_value ) {
+			// If the block should have custom gap, add the gap styles.
+			if ( null !== $block_gap_value && false !== $block_gap_value && '' !== $block_gap_value ) {
 				foreach ( $layout_definitions as $layout_definition_key => $layout_definition ) {
-					// Allow skipping default layout for themes that opt-in to block styles, but opt-out of blockGap.
-					if ( ! $has_block_gap_support && 'default' === $layout_definition_key ) {
+					// Allow outputting fallback gap styles for flex layout type when block gap support isn't available.
+					if ( ! $has_block_gap_support && 'flex' !== $layout_definition_key ) {
 						continue;
 					}
 

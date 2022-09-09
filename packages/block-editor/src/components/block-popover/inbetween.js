@@ -48,7 +48,9 @@ function BlockPopoverInbetween( {
 				isBlockVisible,
 			} = select( blockEditorStore );
 
-			const _rootClientId = getBlockRootClientId( previousClientId );
+			const _rootClientId = getBlockRootClientId(
+				previousClientId ?? nextClientId
+			);
 			return {
 				orientation:
 					getBlockListSettings( _rootClientId )?.orientation ||
