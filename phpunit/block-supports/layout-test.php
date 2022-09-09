@@ -171,7 +171,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => '.wp-layout > *{margin-block-start:0;margin-block-end:0;}.wp-layout.wp-layout > * + *{margin-block-start:1em;margin-block-end:0;}',
 			),
-			'should_return_default_layout_with_block_gap_support_and_skip_serialization' => array(
+			'should_return_empty_value_with_block_gap_support_and_skip_serialization' => array(
 				'args'            => array(
 					'selector'                      => '.wp-layout',
 					'layout'                        => null,
@@ -303,7 +303,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => '',
 			),
-			'should_return_empty_value_for_horizontal_flex_layout_with_flex_properties' => array(
+			'should_return_rule_horizontal_flex_layout_with_flex_properties' => array(
 				'args'            => array(
 					'selector'                      => '.wp-layout',
 					'layout'                        => array(
@@ -339,7 +339,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => '.wp-layout{flex-wrap:nowrap;gap:29px;justify-content:flex-start;align-items:flex-end;}',
 			),
-			'should_return_empty_value_for_horizontal_flex_layout_with_flex_properties_and_axial_gap' => array(
+			'should_return_rule_for_horizontal_flex_layout_with_flex_properties_and_axial_gap' => array(
 				'args'            => array(
 					'selector'                      => '.wp-layout',
 					'layout'                        => array(
@@ -360,7 +360,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => '.wp-layout{flex-wrap:nowrap;gap:1px 2px;justify-content:flex-start;align-items:flex-end;}',
 			),
-			'should_return_empty_value_for_horizontal_flex_layout_with_flex_properties_gap_fallback_and_spacing' => array(
+			'should_return_rule_for_horizontal_flex_layout_with_flex_properties_gap_fallback_and_spacing' => array(
 				'args'            => array(
 					'selector'                      => '.wp-layout',
 					'layout'                        => array(
@@ -380,7 +380,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => '.wp-layout{flex-wrap:nowrap;gap:11px var(--wp--preset--spacing--40);justify-content:flex-start;align-items:flex-end;}',
 			),
-			'should_return_empty_value_for_vertical_flex_layout_with_flex_properties' => array(
+			'should_return_rule_for_vertical_flex_layout_with_flex_properties' => array(
 				'args'            => array(
 					'selector'                      => '.wp-layout',
 					'layout'                        => array(
