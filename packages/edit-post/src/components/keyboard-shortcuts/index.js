@@ -7,9 +7,10 @@ import {
 	useShortcut,
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as editorStore } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -18,13 +19,19 @@ import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
 	const { getBlockSelectionStart } = useSelect( blockEditorStore );
-	const { getEditorMode, isEditorSidebarOpened, isListViewOpened } =
-		useSelect( editPostStore );
+	const {
+		getEditorMode,
+		isEditorSidebarOpened,
+		isListViewOpened,
+		isFeatureActive,
+	} = useSelect( editPostStore );
 	const isModeToggleDisabled = useSelect( ( select ) => {
 		const { richEditingEnabled, codeEditingEnabled } =
 			select( editorStore ).getEditorSettings();
 		return ! richEditingEnabled || ! codeEditingEnabled;
 	}, [] );
+
+	const { createInfoNotice } = useDispatch( noticesStore );
 
 	const {
 		switchEditorMode,
@@ -43,6 +50,16 @@ function KeyboardShortcuts() {
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'm',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-post/toggle-distraction-free',
+			category: 'global',
+			description: __( 'Toggle disrtaction free mode.' ),
+			keyCombination: {
+				modifier: 'primaryShift',
+				character: '\\',
 			},
 		} );
 
@@ -133,6 +150,23 @@ function KeyboardShortcuts() {
 
 	useShortcut( 'core/edit-post/toggle-fullscreen', () => {
 		toggleFeature( 'fullscreenMode' );
+	} );
+
+	useShortcut( 'core/edit-post/toggle-distraction-free', () => {
+		closeGeneralSidebar();
+		setIsListViewOpened( false );
+		toggleFeature( 'reducedUI' );
+		const modeState = isFeatureActive( 'reducedUI' )
+			? __( 'on' )
+			: __( 'off' );
+		createInfoNotice(
+			// translators: Mode of distraction free can be 'on' or 'off';
+			sprintf( __( 'Distraction free mode turned %s.' ), modeState ),
+			{
+				speak: true,
+				type: 'snackbar',
+			}
+		);
 	} );
 
 	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {

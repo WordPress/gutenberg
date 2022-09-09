@@ -96,6 +96,13 @@ export default function EditPostPreferencesModal() {
 							) }
 						>
 							<EnableFeature
+								featureName="reducedUI"
+								help={ __(
+									'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
+								) }
+								label={ __( 'Distraction Free' ) }
+							/>
+							<EnableFeature
 								featureName="focusMode"
 								help={ __(
 									'Highlights the current block and fades other content.'

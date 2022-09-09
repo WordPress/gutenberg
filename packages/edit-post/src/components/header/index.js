@@ -29,7 +29,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		isPublishSidebarOpened,
 		isSaving,
 		showIconLabels,
-		hasReducedUI,
 	} = useSelect(
 		( select ) => ( {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -38,17 +37,13 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			isSaving: select( editPostStore ).isSavingMetaBoxes(),
 			showIconLabels:
 				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
-			hasReducedUI:
-				select( editPostStore ).isFeatureActive( 'reducedUI' ),
 		} ),
 		[]
 	);
 
 	const isLargeViewport = useViewportMatch( 'large' );
 
-	const classes = classnames( 'edit-post-header', {
-		'has-reduced-ui': hasReducedUI,
-	} );
+	const classes = classnames( 'edit-post-header' );
 
 	return (
 		<div className={ classes }>
