@@ -182,9 +182,9 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 		}
 
 		$result = new WP_Theme_JSON_Gutenberg();
-		$result->merge( static::get_core_data() );
-		$result->merge( static::get_block_data() );
-		$result->merge( static::get_theme_data() );
+		$result->merge( apply_filters( 'global_styles_core', static::get_core_data() ) );
+		$result->merge( apply_filters( 'global_styles_blocks', static::get_block_data() ) );
+		$result->merge( apply_filters( 'global_styles_theme', static::get_theme_data() ) );
 		if ( 'custom' === $origin ) {
 			$result->merge( static::get_user_data() );
 		}
