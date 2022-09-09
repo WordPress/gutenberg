@@ -137,10 +137,20 @@ export function ImageEdit( {
 	}, [ caption ] );
 
 	const ref = useRef();
-	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return pick( getSettings(), [ 'imageDefaultSize', 'mediaUpload' ] );
-	}, [] );
+	const { imageDefaultSize, mediaUpload, isContentLocked } = useSelect(
+		( select ) => {
+			const { getSettings, __unstableGetContentLockingParent } =
+				select( blockEditorStore );
+			const settings = getSettings();
+			return {
+				imageDefaultSize: settings.imageDefaultSize,
+				mediaUpload: settings.mediaUpload,
+				isContentLocked:
+					!! __unstableGetContentLockingParent( clientId ),
+			};
+		},
+		[]
+	);
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
@@ -346,9 +356,10 @@ export function ImageEdit( {
 					containerRef={ ref }
 					context={ context }
 					clientId={ clientId }
+					isContentLocked={ isContentLocked }
 				/>
 			) }
-			{ ! url && (
+			{ ! url && ! isContentLocked && (
 				<BlockControls group="block">
 					<BlockAlignmentControl
 						value={ align }
