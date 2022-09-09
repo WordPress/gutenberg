@@ -260,11 +260,11 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 		getBlockMode,
 		isSelectionEnabled,
 		getTemplateLock,
-		__unstableGetBlockWithoutInnerBlocks,
+		getBlock,
 		canRemoveBlock,
 		canMoveBlock,
 	} = select( blockEditorStore );
-	const block = __unstableGetBlockWithoutInnerBlocks( clientId );
+	const block = getBlock( clientId );
 	const isSelected = isBlockSelected( clientId );
 	const templateLock = getTemplateLock( rootClientId );
 	const canRemove = canRemoveBlock( clientId, rootClientId );

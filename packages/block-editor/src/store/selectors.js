@@ -138,24 +138,6 @@ export function getBlock( state, clientId ) {
 	return state.blocks.tree[ clientId ];
 }
 
-export const __unstableGetBlockWithoutInnerBlocks = createSelector(
-	( state, clientId ) => {
-		const block = state.blocks.byClientId[ clientId ];
-		if ( ! block ) {
-			return null;
-		}
-
-		return {
-			...block,
-			attributes: getBlockAttributes( state, clientId ),
-		};
-	},
-	( state, clientId ) => [
-		state.blocks.byClientId[ clientId ],
-		state.blocks.attributes[ clientId ],
-	]
-);
-
 /**
  * Returns all block objects for the current post being edited as an array in
  * the order they appear in the post. Note that this will exclude child blocks
