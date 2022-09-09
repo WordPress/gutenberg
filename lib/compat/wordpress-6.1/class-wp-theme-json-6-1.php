@@ -815,12 +815,19 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
 
 			if ( $use_root_padding ) {
+				// Top and bottom padding are applied to the outer block container.
 				$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
+				// Right and left padding are applied to the first container with `.has-global-padding` class.
 				$block_rules .= '.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+				// Nested containers with `.has-global-padding` class do not get padding.
 				$block_rules .= '.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; }';
+				// Alignfull children of the container with left and right padding have negative margins so they can still be full width.
 				$block_rules .= '.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }';
+				// The above rule is negated for alignfull children of nested containers.
 				$block_rules .= '.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }';
+				// Some of the children of alignfull blocks without content width should also get padding: text blocks and non-alignfull container blocks.
 				$block_rules .= '.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+				// The above rule also has to be negated for blocks inside nested `.has-global-padding` blocks.
 				$block_rules .= '.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0; }';
 			}
 
