@@ -321,8 +321,8 @@ export function getLayoutStyles( {
 	if ( gapValue && tree?.settings?.layout?.definitions ) {
 		Object.values( tree.settings.layout.definitions ).forEach(
 			( { className, name, spacingStyles } ) => {
-				// Allow skipping default layout for themes that opt-in to block styles, but opt-out of blockGap.
-				if ( ! hasBlockGapSupport && 'default' === name ) {
+				// Allow outputting fallback gap styles for flex layout type when block gap support isn't available.
+				if ( ! hasBlockGapSupport && 'flex' !== name ) {
 					return;
 				}
 

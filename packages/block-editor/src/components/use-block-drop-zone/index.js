@@ -92,12 +92,20 @@ export default function useBlockDropZone( {
 } = {} ) {
 	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
 
-	const isLocked = useSelect(
+	const isDisabled = useSelect(
 		( select ) => {
-			const { getTemplateLock } = select( blockEditorStore );
+			const {
+				getTemplateLock,
+				__unstableIsWithinBlockOverlay,
+				__unstableHasActiveBlockOverlayActive,
+			} = select( blockEditorStore );
 			const templateLock = getTemplateLock( targetRootClientId );
-			return [ 'all', 'noContent' ].some(
-				( lock ) => lock === templateLock
+			return (
+				[ 'all', 'noContent' ].some(
+					( lock ) => lock === templateLock
+				) ||
+				__unstableHasActiveBlockOverlayActive( targetRootClientId ) ||
+				__unstableIsWithinBlockOverlay( targetRootClientId )
 			);
 		},
 		[ targetRootClientId ]
@@ -130,7 +138,7 @@ export default function useBlockDropZone( {
 	);
 
 	return useDropZone( {
-		isDisabled: isLocked,
+		isDisabled,
 		onDrop: onBlockDrop,
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being

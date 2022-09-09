@@ -17,7 +17,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 
 const TEMPLATE = [
 	[ 'core/post-title' ],
@@ -95,6 +95,18 @@ export default function PostTemplateEdit( {
 	const [ { page } ] = queryContext;
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
 
+	let categorySlug = null;
+	if ( templateSlug?.startsWith( 'category-' ) ) {
+		categorySlug = templateSlug.replace( 'category-', '' );
+	}
+	const { records: categories, hasResolved: hasResolvedCategories } =
+		useEntityRecords( 'taxonomy', 'category', {
+			context: 'view',
+			per_page: -1,
+			_fields: [ 'id' ],
+			slug: categorySlug,
+		} );
+
 	const { posts, blocks } = useSelect(
 		( select ) => {
 			const { getEntityRecords, getTaxonomies } = select( coreStore );
@@ -155,6 +167,11 @@ export default function PostTemplateEdit( {
 				if ( templateSlug?.startsWith( 'archive-' ) ) {
 					query.postType = templateSlug.replace( 'archive-', '' );
 					postType = query.postType;
+				} else if ( !! categorySlug && hasResolvedCategories ) {
+					query.taxQuery = {
+						category: categories.map( ( { id } ) => id ),
+					};
+					taxQuery = query.taxQuery;
 				}
 			}
 			// When we preview Query Loop blocks we should prefer the current
@@ -182,6 +199,9 @@ export default function PostTemplateEdit( {
 			taxQuery,
 			parents,
 			previewPostType,
+			categories,
+			categorySlug,
+			hasResolvedCategories,
 		]
 	);
 	const blockContexts = useMemo(

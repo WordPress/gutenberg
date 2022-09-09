@@ -25,7 +25,8 @@ export const FocalPointWrapper = styled.div`
 	will-change: transform;
 	z-index: 10000;
 
-	${ ( { isDragging } ) => isDragging && 'cursor: grabbing;' }
+	${ ( { isDragging }: { isDragging: boolean } ) =>
+		isDragging && 'cursor: grabbing;' }
 `;
 
 export const PointerIconSVG = styled( SVG )`

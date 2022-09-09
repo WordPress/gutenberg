@@ -28,10 +28,61 @@ import {
 } from './styles/focal-point-picker-style';
 import { INITIAL_BOUNDS } from './utils';
 import { useUpdateEffect } from '../utils/hooks';
+import type { WordPressComponentProps } from '../ui/context/wordpress-component';
+import type {
+	FocalPoint as FocalPointType,
+	FocalPointPickerProps,
+} from './types';
+import type { KeyboardEventHandler } from 'react';
 
 const GRID_OVERLAY_TIMEOUT = 600;
 
-export default function FocalPointPicker( {
+/**
+ * Focal Point Picker is a component which creates a UI for identifying the most important visual point of an image.
+ *
+ * This component addresses a specific problem: with large background images it is common to see undesirable crops,
+ * especially when viewing on smaller viewports such as mobile phones. This component allows the selection of
+ * the point with the most important visual information and returns it as a pair of numbers between 0 and 1.
+ * This value can be easily converted into the CSS `background-position` attribute, and will ensure that the
+ * focal point is never cropped out, regardless of viewport.
+ *
+ * - Example focal point picker value: `{ x: 0.5, y: 0.1 }`
+ * - Corresponding CSS: `background-position: 50% 10%;`
+ *
+ * ```jsx
+ * import { FocalPointPicker } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const Example = () => {
+ * 	const [ focalPoint, setFocalPoint ] = useState( {
+ * 		x: 0.5,
+ * 		y: 0.5,
+ * 	} );
+ *
+ * 	const url = '/path/to/image';
+ *
+ * 	// Example function to render the CSS styles based on Focal Point Picker value
+ * 	const style = {
+ * 		backgroundImage: `url(${ url })`,
+ * 		backgroundPosition: `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`,
+ * 	};
+ *
+ * 	return (
+ * 		<>
+ * 			<FocalPointPicker
+ * 				url={ url }
+ * 				value={ focalPoint }
+ * 				onDragStart={ setFocalPoint }
+ * 				onDrag={ setFocalPoint }
+ * 				onChange={ setFocalPoint }
+ * 			/>
+ * 			<div style={ style } />
+ * 		</>
+ * 	);
+ * };
+ * ```
+ */
+export function FocalPointPicker( {
 	autoPlay = true,
 	className,
 	help,
@@ -46,14 +97,20 @@ export default function FocalPointPicker( {
 		x: 0.5,
 		y: 0.5,
 	},
-} ) {
+	...restProps
+}: WordPressComponentProps< FocalPointPickerProps, 'div', false > ) {
 	const [ point, setPoint ] = useState( valueProp );
 	const [ showGridOverlay, setShowGridOverlay ] = useState( false );
 
 	const { startDrag, endDrag, isDragging } = useDragging( {
 		onDragStart: ( event ) => {
-			dragAreaRef.current.focus();
+			dragAreaRef.current?.focus();
 			const value = getValueWithinDragArea( event );
+
+			// `value` can technically be undefined if getValueWithinDragArea() is
+			// called before dragAreaRef is set, but this shouldn't happen in reality.
+			if ( ! value ) return;
+
 			onDragStart?.( value, event );
 			setPoint( value );
 		},
@@ -61,11 +118,12 @@ export default function FocalPointPicker( {
 			// Prevents text-selection when dragging.
 			event.preventDefault();
 			const value = getValueWithinDragArea( event );
+			if ( ! value ) return;
 			onDrag?.( value, event );
 			setPoint( value );
 		},
-		onDragEnd: ( event ) => {
-			onDragEnd?.( event );
+		onDragEnd: () => {
+			onDragEnd?.();
 			onChange?.( point );
 		},
 	} );
@@ -73,9 +131,11 @@ export default function FocalPointPicker( {
 	// Uses the internal point while dragging or else the value from props.
 	const { x, y } = isDragging ? point : valueProp;
 
-	const dragAreaRef = useRef();
+	const dragAreaRef = useRef< HTMLDivElement >( null );
 	const [ bounds, setBounds ] = useState( INITIAL_BOUNDS );
 	const refUpdateBounds = useRef( () => {
+		if ( ! dragAreaRef.current ) return;
+
 		const { clientWidth: width, clientHeight: height } =
 			dragAreaRef.current;
 		// Falls back to initial bounds if the ref has no size. Since styles
@@ -88,15 +148,29 @@ export default function FocalPointPicker( {
 
 	useEffect( () => {
 		const updateBounds = refUpdateBounds.current;
+		if ( ! dragAreaRef.current ) return;
+
 		const { defaultView } = dragAreaRef.current.ownerDocument;
-		defaultView.addEventListener( 'resize', updateBounds );
-		return () => defaultView.removeEventListener( 'resize', updateBounds );
+		defaultView?.addEventListener( 'resize', updateBounds );
+		return () => defaultView?.removeEventListener( 'resize', updateBounds );
 	}, [] );
 
 	// Updates the bounds to cover cases of unspecified media or load failures.
 	useIsomorphicLayoutEffect( () => void refUpdateBounds.current(), [] );
 
-	const getValueWithinDragArea = ( { clientX, clientY, shiftKey } ) => {
+	// TODO: Consider refactoring getValueWithinDragArea() into a pure function.
+	// https://github.com/WordPress/gutenberg/pull/43872#discussion_r963455173
+	const getValueWithinDragArea = ( {
+		clientX,
+		clientY,
+		shiftKey,
+	}: {
+		clientX: number;
+		clientY: number;
+		shiftKey: boolean;
+	} ) => {
+		if ( ! dragAreaRef.current ) return;
+
 		const { top, left } = dragAreaRef.current.getBoundingClientRect();
 		let nextX = ( clientX - left ) / bounds.width;
 		let nextY = ( clientY - top ) / bounds.height;
@@ -108,17 +182,20 @@ export default function FocalPointPicker( {
 		return getFinalValue( { x: nextX, y: nextY } );
 	};
 
-	const getFinalValue = ( value ) => {
+	const getFinalValue = ( value: FocalPointType ): FocalPointType => {
 		const resolvedValue = resolvePoint?.( value ) ?? value;
 		resolvedValue.x = Math.max( 0, Math.min( resolvedValue.x, 1 ) );
 		resolvedValue.y = Math.max( 0, Math.min( resolvedValue.y, 1 ) );
+		const roundToTwoDecimalPlaces = ( n: number ) =>
+			Math.round( n * 1e2 ) / 1e2;
+
 		return {
-			x: parseFloat( resolvedValue.x ).toFixed( 2 ),
-			y: parseFloat( resolvedValue.y ).toFixed( 2 ),
+			x: roundToTwoDecimalPlaces( resolvedValue.x ),
+			y: roundToTwoDecimalPlaces( resolvedValue.y ),
 		};
 	};
 
-	const arrowKeyStep = ( event ) => {
+	const arrowKeyStep: KeyboardEventHandler< HTMLDivElement > = ( event ) => {
 		const { code, shiftKey } = event;
 		if (
 			! [ 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight' ].includes(
@@ -133,7 +210,7 @@ export default function FocalPointPicker( {
 		const delta =
 			code === 'ArrowUp' || code === 'ArrowLeft' ? -1 * step : step;
 		const axis = code === 'ArrowUp' || code === 'ArrowDown' ? 'y' : 'x';
-		value[ axis ] = parseFloat( value[ axis ] ) + delta;
+		value[ axis ] = value[ axis ] + delta;
 		onChange?.( getFinalValue( value ) );
 	};
 
@@ -161,6 +238,7 @@ export default function FocalPointPicker( {
 
 	return (
 		<BaseControl
+			{ ...restProps }
 			label={ label }
 			id={ id }
 			help={ help }
@@ -176,7 +254,7 @@ export default function FocalPointPicker( {
 					} }
 					ref={ dragAreaRef }
 					role="button"
-					tabIndex="-1"
+					tabIndex={ -1 }
 				>
 					<Grid bounds={ bounds } showOverlay={ showGridOverlay } />
 					<Media
@@ -200,3 +278,5 @@ export default function FocalPointPicker( {
 		</BaseControl>
 	);
 }
+
+export default FocalPointPicker;
