@@ -21,8 +21,6 @@ class WP_Script_Loader_Test extends WP_UnitTestCase {
 	 * Tests that stored CSS is enqueued.
 	 */
 	public function test_enqueue_stored_styles() {
-		global $wp_styles;
-
 		$core_styles_to_enqueue = array(
 			array(
 				'selector'     => '.saruman',
