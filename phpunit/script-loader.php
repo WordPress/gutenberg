@@ -13,7 +13,7 @@ class WP_Script_Loader_Test extends WP_UnitTestCase {
 	 * @global WP_Styles $wp_styles
 	 */
 	public function clean_up_global_scope() {
-		global $wp_styles;
+		global $wp_styles; // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		parent::clean_up_global_scope();
 		$wp_styles = null;
 	}
