@@ -57,8 +57,8 @@ function render_block_core_search( $attributes ) {
 		}
 		$label_markup = sprintf(
 			'<label for="%1$s" class="%2$s" %3$s>%4$s</label>',
+			esc_attr( $input_id ),
 			esc_attr( implode( ' ', $label_classes ) ),
-			$input_id,
 			$inline_styles['label'],
 			$label_inner_html
 		);
