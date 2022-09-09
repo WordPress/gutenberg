@@ -248,12 +248,13 @@ function InserterMenu(
 			{ selectedTab === 'patterns' &&
 				! filterValue &&
 				selectedPatternCategory && (
-					<BlockPatternsCategoryPanel
-						rootClientId={ destinationRootClientId }
-						onInsert={ onInsertPattern }
-						onUnset={ () => setSelectedPatternCategory( null ) }
-						category={ selectedPatternCategory }
-					/>
+					<div className="block-editor-inserter__patterns-category-panel">
+						<BlockPatternsCategoryPanel
+							rootClientId={ destinationRootClientId }
+							onInsert={ onInsertPattern }
+							category={ selectedPatternCategory }
+						/>
+					</div>
 				) }
 		</div>
 	);

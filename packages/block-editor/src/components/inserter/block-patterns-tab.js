@@ -2,18 +2,22 @@
  * WordPress dependencies
  */
 import { useMemo, useState, useCallback } from '@wordpress/element';
-import { _x, __ } from '@wordpress/i18n';
+import { _x, __, isRTL } from '@wordpress/i18n';
 import { useAsyncList, useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalHStack as HStack,
+	__experimentalNavigatorProvider as NavigatorProvider,
+	__experimentalNavigatorScreen as NavigatorScreen,
+	__experimentalNavigatorButton as NavigatorButton,
+	__experimentalNavigatorBackButton as NavigatorBackButton,
 	FlexBlock,
 	Card,
 	CardBody,
 	Button,
 } from '@wordpress/components';
-import { Icon, chevronRight } from '@wordpress/icons';
+import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -22,60 +26,8 @@ import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 
-export function BlockPatternsCategoryPanel( {
-	rootClientId,
-	onInsert,
-	category,
-	onUnset,
-} ) {
-	const isMobile = useViewportMatch( 'medium', '<' );
-
-	const [ allPatterns, , onClick ] = usePatternsState(
-		onInsert,
-		rootClientId
-	);
-
-	const currentCategoryPatterns = useMemo(
-		() =>
-			allPatterns.filter( ( pattern ) =>
-				category.name === 'uncategorized'
-					? ! pattern.categories?.length
-					: pattern.categories?.includes( category.name )
-			),
-		[ allPatterns, category ]
-	);
-
-	const currentShownPatterns = useAsyncList( currentCategoryPatterns );
-
-	if ( ! currentCategoryPatterns.length ) {
-		return null;
-	}
-
-	return (
-		<div className="block-editor-inserter__patterns-category-panel">
-			{ isMobile && (
-				<Button variant="secondary" onClick={ () => onUnset() }>
-					{ __( 'Back' ) }
-				</Button>
-			) }
-			<h3>{ category.label }</h3>
-			<p>{ category.description }</p>
-			<BlockPatternList
-				shownPatterns={ currentShownPatterns }
-				blockPatterns={ currentCategoryPatterns }
-				onClickPattern={ onClick }
-				label={ category.label }
-				orientation="vertical"
-				isDraggable
-			/>
-		</div>
-	);
-}
-
-function BlockPatternsTabs( { onSelectCategory, selectedCategory } ) {
-	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
+function usePatternsCategories() {
 	const [ allPatterns, allCategories ] = usePatternsState();
-	const isMobile = useViewportMatch( 'medium', '<' );
 
 	const hasRegisteredCategory = useCallback(
 		( pattern ) => {
@@ -122,43 +74,162 @@ function BlockPatternsTabs( { onSelectCategory, selectedCategory } ) {
 		return categories;
 	}, [ allPatterns, allCategories ] );
 
+	return populatedCategories;
+}
+
+export function BlockPatternsCategoryPanel( {
+	rootClientId,
+	onInsert,
+	category,
+} ) {
+	const [ allPatterns, , onClick ] = usePatternsState(
+		onInsert,
+		rootClientId
+	);
+
+	const currentCategoryPatterns = useMemo(
+		() =>
+			allPatterns.filter( ( pattern ) =>
+				category.name === 'uncategorized'
+					? ! pattern.categories?.length
+					: pattern.categories?.includes( category.name )
+			),
+		[ allPatterns, category ]
+	);
+
+	const currentShownPatterns = useAsyncList( currentCategoryPatterns );
+
+	if ( ! currentCategoryPatterns.length ) {
+		return null;
+	}
+
+	return (
+		<div>
+			<h3>{ category.label }</h3>
+			<p>{ category.description }</p>
+			<BlockPatternList
+				shownPatterns={ currentShownPatterns }
+				blockPatterns={ currentCategoryPatterns }
+				onClickPattern={ onClick }
+				label={ category.label }
+				orientation="vertical"
+				isDraggable
+			/>
+		</div>
+	);
+}
+
+function BlockPatternsTabs( {
+	onSelectCategory,
+	selectedCategory,
+	onInsert,
+	rootClientId,
+} ) {
+	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
+	const categories = usePatternsCategories();
+	const isMobile = useViewportMatch( 'medium', '<' );
+
 	return (
 		<>
 			<Card isBorderless>
 				<CardBody size="small">
-					<ItemGroup>
-						{ populatedCategories.map( ( category ) => (
-							<Item
-								key={ category.name }
-								onClick={ () => onSelectCategory( category ) }
-							>
-								<HStack>
-									<FlexBlock>{ category.label }</FlexBlock>
-									<Icon icon={ chevronRight } />
-								</HStack>
-							</Item>
-						) ) }
-					</ItemGroup>
-
 					{ ! isMobile && (
-						<Button
-							variant="link"
-							onClick={ () => setShowPatternsExplorer( true ) }
-							className="block-editor-inserter__patterns-explore-button"
-						>
-							{ __( 'Explore all patterns' ) }
-						</Button>
+						<>
+							<ItemGroup>
+								{ categories.map( ( category ) => (
+									<Item
+										key={ category.name }
+										onClick={ () =>
+											onSelectCategory( category )
+										}
+									>
+										<HStack>
+											<FlexBlock>
+												{ category.label }
+											</FlexBlock>
+											<Icon icon={ chevronRight } />
+										</HStack>
+									</Item>
+								) ) }
+							</ItemGroup>
+
+							<Button
+								variant="link"
+								onClick={ () =>
+									setShowPatternsExplorer( true )
+								}
+								className="block-editor-inserter__patterns-explore-button"
+							>
+								{ __( 'Explore all patterns' ) }
+							</Button>
+						</>
+					) }
+					{ isMobile && (
+						<BlockPatternsTabNavigation
+							onInsert={ onInsert }
+							rootClientId={ rootClientId }
+						/>
 					) }
 				</CardBody>
 			</Card>
 			{ showPatternsExplorer && (
 				<PatternsExplorerModal
 					initialCategory={ selectedCategory }
-					patternCategories={ populatedCategories }
+					patternCategories={ categories }
 					onModalClose={ () => setShowPatternsExplorer( false ) }
 				/>
 			) }
 		</>
+	);
+}
+
+function BlockPatternsTabNavigation( { onInsert, rootClientId } ) {
+	const categories = usePatternsCategories();
+
+	return (
+		<NavigatorProvider initialPath="/">
+			<NavigatorScreen path="/">
+				<ItemGroup>
+					{ categories.map( ( category ) => (
+						<NavigatorButton
+							key={ category.name }
+							path={ `/category/${ category.name }` }
+							as={ Item }
+							isAction
+						>
+							<HStack>
+								<FlexBlock>{ category.label }</FlexBlock>
+								<Icon
+									icon={
+										isRTL() ? chevronLeft : chevronRight
+									}
+								/>
+							</HStack>
+						</NavigatorButton>
+					) ) }
+				</ItemGroup>
+			</NavigatorScreen>
+
+			{ categories.map( ( category ) => (
+				<NavigatorScreen
+					key={ category.name }
+					path={ `/category/${ category.name }` }
+				>
+					<NavigatorBackButton
+						icon={ isRTL() ? chevronRight : chevronLeft }
+						isSmall
+						aria-label={ __( 'Navigate to the categories list' ) }
+					>
+						{ __( 'Back' ) }
+					</NavigatorBackButton>
+					<BlockPatternsCategoryPanel
+						category={ category }
+						rootClientId={ rootClientId }
+						onInsert={ onInsert }
+					/>
+				</NavigatorScreen>
+			) ) }
+		</NavigatorProvider>
 	);
 }
 
