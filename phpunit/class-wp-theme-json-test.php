@@ -1308,7 +1308,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'selector' => 'body',
 		);
 
-		$expected = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }body{padding-top: 10px;padding-right: 12px;padding-bottom: 10px;padding-left: 12px;}';
+		$expected    = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }body{padding-top: 10px;padding-right: 12px;padding-bottom: 10px;padding-left: 12px;}';
 		$root_rules  = $theme_json->get_root_layout_rules( WP_Theme_JSON::ROOT_BLOCK_SELECTOR, $metadata );
 		$style_rules = $theme_json->get_styles_for_block( $metadata );
 		$this->assertEquals( $expected, $root_rules . $style_rules );
@@ -1334,7 +1334,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'selector' => 'body',
 		);
 
-		$expected = 'body { margin: 0;--wp--style--global--content-size: 800px;--wp--style--global--wide-size: 1000px;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+		$expected    = 'body { margin: 0;--wp--style--global--content-size: 800px;--wp--style--global--wide-size: 1000px;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 		$root_rules  = $theme_json->get_root_layout_rules( WP_Theme_JSON::ROOT_BLOCK_SELECTOR, $metadata );
 		$style_rules = $theme_json->get_styles_for_block( $metadata );
 		$this->assertEquals( $expected, $root_rules . $style_rules );
