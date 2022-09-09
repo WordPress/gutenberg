@@ -410,7 +410,7 @@ Add a submenu to your navigation. ([Source](https://github.com/WordPress/gutenbe
 
 -	**Name:** core/navigation-submenu
 -	**Category:** design
--	**Supports:** ~~html~~, ~~reusable~~
+-	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** description, id, isTopLevelItem, kind, label, opensInNewTab, rel, title, type, url
 
 ## Page Break
