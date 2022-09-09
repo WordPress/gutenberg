@@ -52,5 +52,6 @@
 		}
 	},
 	"editorStyle": "wp-block-query-pagination-editor",
-	"style": "wp-block-query-pagination"
+	"style": "wp-block-query-pagination",
+	"viewScript": "file:./view.min.js"
 }

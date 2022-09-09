@@ -81,7 +81,7 @@ function render_block_core_query_pagination_numbers( $attributes, $content, $blo
 		return '';
 	}
 	return sprintf(
-		'<div %1$s>%2$s</div>',
+		'<div key="numbers" %1$s>%2$s</div>',
 		$wrapper_attributes,
 		$content
 	);

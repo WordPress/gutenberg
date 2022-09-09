@@ -18,6 +18,8 @@ function render_block_core_query_pagination( $attributes, $content ) {
 		return '';
 	}
 
+	wp_enqueue_script( 'wp-block-query-pagination-view' );
+
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'aria-label' => __( 'Pagination' ),
