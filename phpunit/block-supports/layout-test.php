@@ -321,7 +321,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => '.wp-layout{flex-wrap:nowrap;justify-content:flex-start;align-items:flex-end;}',
 			),
-			'should_return_empty_value_for_horizontal_flex_layout_with_flex_properties_and_gap' => array(
+			'should_return_rule_for_horizontal_flex_layout_with_flex_properties_and_gap' => array(
 				'args'            => array(
 					'selector'                      => '.wp-layout',
 					'layout'                        => array(
