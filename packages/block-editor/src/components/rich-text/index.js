@@ -14,11 +14,9 @@ import {
 	createContext,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { children as childrenSource } from '@wordpress/blocks';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import {
 	__unstableUseRichText as useRichText,
-	__unstableCreateElement,
 	isEmpty,
 	isCollapsed,
 	removeFormat,
@@ -168,19 +166,6 @@ function RichTextWrapper(
 	} );
 	const hasFormats =
 		! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
-	let adjustedValue = originalValue;
-	let adjustedOnChange = originalOnChange;
-
-	// Handle deprecated format.
-	if ( Array.isArray( originalValue ) ) {
-		adjustedValue = childrenSource.toHTML( originalValue );
-		adjustedOnChange = ( newValue ) =>
-			originalOnChange(
-				childrenSource.fromDOM(
-					__unstableCreateElement( document, newValue ).childNodes
-				)
-			);
-	}
 
 	const onSelectionChange = useCallback(
 		( start, end ) => {
@@ -256,9 +241,9 @@ function RichTextWrapper(
 		onChange,
 		ref: richTextRef,
 	} = useRichText( {
-		value: adjustedValue,
+		value: originalValue,
 		onChange( html, { __unstableFormats, __unstableText } ) {
-			adjustedOnChange( html );
+			originalOnChange( html );
 			Object.values( changeHandlers ).forEach( ( changeHandler ) => {
 				changeHandler( __unstableFormats, __unstableText );
 			} );
@@ -283,7 +268,7 @@ function RichTextWrapper(
 		onChange,
 	} );
 
-	useMarkPersistent( { html: adjustedValue, value } );
+	useMarkPersistent( { html: originalValue, value } );
 
 	const keyboardShortcuts = useRef( new Set() );
 	const inputEvents = useRef( new Set() );
@@ -447,11 +432,6 @@ ForwardedRichTextContainer.Content = ( {
 	multiline,
 	...props
 } ) => {
-	// Handle deprecated `children` and `node` sources.
-	if ( Array.isArray( value ) ) {
-		value = childrenSource.toHTML( value );
-	}
-
 	const MultilineTag = getMultilineTag( multiline );
 
 	if ( ! value && MultilineTag ) {

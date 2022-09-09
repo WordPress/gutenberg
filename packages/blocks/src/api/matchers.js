@@ -3,12 +3,6 @@
  */
 export { attr, prop, text, query } from 'hpq';
 
-/**
- * Internal dependencies
- */
-export { matcher as node } from './node';
-export { matcher as children } from './children';
-
 export function html( selector, multilineTag ) {
 	return ( domNode ) => {
 		let match = domNode;

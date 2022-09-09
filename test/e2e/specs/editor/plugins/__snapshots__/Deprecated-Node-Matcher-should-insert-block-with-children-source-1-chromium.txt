@@ -1,3 +1,0 @@
-<!-- wp:deprecated-children-matcher -->
-<p class="wp-block-deprecated-children-matcher">test<br/><strong>a</strong></p>
-<!-- /wp:deprecated-children-matcher -->
