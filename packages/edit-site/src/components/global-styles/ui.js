@@ -4,8 +4,11 @@
 import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
+	Button,
 } from '@wordpress/components';
 import { getBlockTypes } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
+import { shuffle } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -24,6 +27,7 @@ import ScreenHeadingColor from './screen-heading-color';
 import ScreenButtonColor from './screen-button-color';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
+import { useRandomizer } from './hooks';
 
 function GlobalStylesNavigationScreen( { className, ...props } ) {
 	return (
@@ -117,42 +121,50 @@ function ContextScreens( { name } ) {
 
 function GlobalStylesUI() {
 	const blocks = getBlockTypes();
+	const [ randomizeTheme ] = useRandomizer();
 
 	return (
-		<NavigatorProvider
-			className="edit-site-global-styles-sidebar__navigator-provider"
-			initialPath="/"
-		>
-			<GlobalStylesNavigationScreen path="/">
-				<ScreenRoot />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path="/variations">
-				<ScreenStyleVariations />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path="/blocks">
-				<ScreenBlockList />
-			</GlobalStylesNavigationScreen>
-
-			{ blocks.map( ( block ) => (
-				<GlobalStylesNavigationScreen
-					key={ 'menu-block-' + block.name }
-					path={ '/blocks/' + block.name }
-				>
-					<ScreenBlock name={ block.name } />
+		<>
+			<NavigatorProvider
+				className="edit-site-global-styles-sidebar__navigator-provider"
+				initialPath="/"
+			>
+				<GlobalStylesNavigationScreen path="/">
+					<ScreenRoot />
 				</GlobalStylesNavigationScreen>
-			) ) }
 
-			<ContextScreens />
+				<GlobalStylesNavigationScreen path="/variations">
+					<ScreenStyleVariations />
+				</GlobalStylesNavigationScreen>
 
-			{ blocks.map( ( block ) => (
-				<ContextScreens
-					key={ 'screens-block-' + block.name }
-					name={ block.name }
-				/>
-			) ) }
-		</NavigatorProvider>
+				<GlobalStylesNavigationScreen path="/blocks">
+					<ScreenBlockList />
+				</GlobalStylesNavigationScreen>
+
+				{ blocks.map( ( block ) => (
+					<GlobalStylesNavigationScreen
+						key={ 'menu-block-' + block.name }
+						path={ '/blocks/' + block.name }
+					>
+						<ScreenBlock name={ block.name } />
+					</GlobalStylesNavigationScreen>
+				) ) }
+
+				<ContextScreens />
+
+				{ blocks.map( ( block ) => (
+					<ContextScreens
+						key={ 'screens-block-' + block.name }
+						name={ block.name }
+					/>
+				) ) }
+			</NavigatorProvider>
+			<Button
+				icon={ shuffle }
+				label={ __( 'Randomize colors' ) }
+				onClick={ randomizeTheme }
+			/>
+		</>
 	);
 }
 
