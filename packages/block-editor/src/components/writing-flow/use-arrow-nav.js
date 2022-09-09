@@ -17,7 +17,7 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getBlockClientId } from '../../utils/dom';
+import { getBlockClientId, isInSameBlock } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -105,6 +105,7 @@ export function getClosestTabbable(
 		// better candidate).
 		if (
 			node.children.length === 1 &&
+			isInSameBlock( node, node.firstElementChild ) &&
 			node.firstElementChild.getAttribute( 'contenteditable' ) === 'true'
 		) {
 			return;
