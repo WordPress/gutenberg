@@ -55,6 +55,7 @@ class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
 		}
 
 		$config       = static::read_json_file( __DIR__ . '/theme.json' );
+		$config       = apply_filters( 'global_styles_default', $config );
 		$config       = static::translate( $config );
 		static::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
 

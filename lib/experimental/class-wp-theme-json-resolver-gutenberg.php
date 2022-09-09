@@ -38,6 +38,15 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
 			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 			$theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $theme_json_data );
+
+			/**
+			 * TODO:
+			 * - should webfonts be filterable as well?
+			 * - make sure the new data gets translated
+			 * - verify all the paths (with and without supports, etc)
+			 */
+			$theme_json_data = apply_filters( 'global_styles_theme', $theme_json_data );
+
 			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 
 			if ( wp_get_theme()->parent() ) {
@@ -128,6 +137,8 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 			}
 		}
 
+		apply_filters( 'global_styles_blocks', $config );
+
 		// Core here means it's the lower level part of the styles chain.
 		// It can be a core or a third-party block.
 		return new WP_Theme_JSON_Gutenberg( $config, 'core' );
@@ -182,9 +193,9 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 		}
 
 		$result = new WP_Theme_JSON_Gutenberg();
-		$result->merge( apply_filters( 'global_styles_core', static::get_core_data() ) );
-		$result->merge( apply_filters( 'global_styles_blocks', static::get_block_data() ) );
-		$result->merge( apply_filters( 'global_styles_theme', static::get_theme_data() ) );
+		$result->merge( static::get_core_data() );
+		$result->merge( static::get_block_data() );
+		$result->merge( static::get_theme_data() );
 		if ( 'custom' === $origin ) {
 			$result->merge( static::get_user_data() );
 		}
