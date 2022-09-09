@@ -655,7 +655,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 
 		if ( in_array( 'styles', $types, true ) ) {
-			$root_block_key = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $style_nodes, 'selector' ) );
+			$root_block_key = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $style_nodes, 'selector' ), true );
 
 			if ( false !== $root_block_key ) {
 				$stylesheet .= $this->get_root_layout_rules( static::ROOT_BLOCK_SELECTOR, $style_nodes[ $root_block_key ] );
@@ -805,7 +805,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * Outputs the CSS for layout rules on the root.
 	 *
 	 * @param string $selector The root node selector.
-	 * @param array $block_metadata The metadata for the root block.
+	 * @param array  $block_metadata The metadata for the root block.
 	 * @return string The additional root rules CSS.
 	 */
 	private function get_root_layout_rules( $selector, $block_metadata ) {
@@ -832,8 +832,8 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$content_size = static::is_safe_css_declaration( 'max-width', $content_size ) ? $content_size : 'initial';
 			$wide_size    = isset( $settings['layout']['wideSize'] ) ? $settings['layout']['wideSize'] : $settings['layout']['contentSize'];
 			$wide_size    = static::is_safe_css_declaration( 'max-width', $wide_size ) ? $wide_size : 'initial';
-			$css .= '--wp--style--global--content-size: ' . $content_size . ';';
-			$css .= '--wp--style--global--wide-size: ' . $wide_size . ';';
+			$css         .= '--wp--style--global--content-size: ' . $content_size . ';';
+			$css         .= '--wp--style--global--wide-size: ' . $wide_size . ';';
 		}
 
 		$css .= '}';
@@ -863,8 +863,8 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 		if ( $has_block_gap_support ) {
 			$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
-			$css    .= '.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }';
-			$css    .= ".wp-site-blocks > * + * { margin-block-start: $block_gap_value; }";
+			$css            .= '.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }';
+			$css            .= ".wp-site-blocks > * + * { margin-block-start: $block_gap_value; }";
 
 			// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
 			$css .= "$selector { --wp--style--block-gap: $block_gap_value; }";
