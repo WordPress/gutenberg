@@ -31,6 +31,8 @@ import {
 } from './hooks';
 import { convertToListItems } from './utils';
 
+const ALLOWED_BLOCKS = [ 'core/list' ];
+
 export function IndentUI( { clientId } ) {
 	const [ canIndent, indentListItem ] = useIndentListItem( clientId );
 	const [ canOutdent, outdentListItem ] = useOutdentListItem( clientId );
@@ -64,7 +66,7 @@ export default function ListItemEdit( {
 	const { placeholder, content } = attributes;
 	const blockProps = useBlockProps( { ref: useCopy( clientId ) } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: [ 'core/list' ],
+		allowedBlocks: ALLOWED_BLOCKS,
 	} );
 	const useEnterRef = useEnter( { content, clientId } );
 	const useSpaceRef = useSpace( clientId );

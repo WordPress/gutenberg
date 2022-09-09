@@ -31,6 +31,7 @@ import TagName from './tag-name';
 
 const TEMPLATE = [ [ 'core/list-item' ] ];
 const NATIVE_MARGIN_SPACING = 8;
+const ALLOWED_BLOCKS = [ 'core/list-item' ];
 
 /**
  * At the moment, deprecations don't handle create blocks from attributes
@@ -128,7 +129,7 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 		...( Platform.isNative && { style } ),
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: [ 'core/list-item' ],
+		allowedBlocks: ALLOWED_BLOCKS,
 		template: TEMPLATE,
 		templateLock: false,
 		templateInsertUpdatesSelection: true,
