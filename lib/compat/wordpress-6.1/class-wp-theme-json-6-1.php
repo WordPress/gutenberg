@@ -803,8 +803,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 	/**
 	 * Outputs the CSS for layout rules on the root.
-	 * This needs to be separate from get_styles_for_block,
-	 * so that it can load later and override block rules.
 	 *
 	 * @param string $selector The root node selector.
 	 * @param array $block_metadata The metadata for the root block.
