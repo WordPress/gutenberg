@@ -148,10 +148,6 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20 $grid-unit-20 0;
 }
 
-.block-editor-inserter__panel-header-patterns {
-	padding: $grid-unit-20 $grid-unit-20 0;
-}
-
 .block-editor-inserter__panel-content {
 	padding: $grid-unit-20;
 }
@@ -224,6 +220,35 @@ $block-inserter-tabs-height: 44px;
 
 	@include break-medium {
 		display: block;
+	}
+
+	.block-editor-block-card {
+		padding: $grid-unit-20;
+	}
+
+	.block-editor-block-card__title {
+		font-size: $default-font-size;
+	}
+}
+
+.block-editor-inserter__patterns-explore-button.is-link {
+	margin: $grid-unit-20;
+}
+
+.block-editor-inserter__patterns-category-panel {
+	background: $gray-100;
+	position: absolute;
+	padding: $grid-unit-20;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	overflow-y: auto;
+
+	@include break-medium {
+		left: 100%;
+		display: block;
+		width: 300px;
 	}
 
 	.block-editor-block-card {

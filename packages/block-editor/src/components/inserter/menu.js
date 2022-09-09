@@ -24,7 +24,9 @@ import { useSelect } from '@wordpress/data';
 import Tips from './tips';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
-import BlockPatternsTabs from './block-patterns-tab';
+import BlockPatternsTabs, {
+	BlockPatternsCategoryPanel,
+} from './block-patterns-tab';
 import ReusableBlocksTab from './reusable-blocks-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
@@ -52,6 +54,7 @@ function InserterMenu(
 	const [ hoveredItem, setHoveredItem ] = useState( null );
 	const [ selectedPatternCategory, setSelectedPatternCategory ] =
 		useState( null );
+	const [ selectedTab, setSelectedTab ] = useState( null );
 
 	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
 		useInsertionPoint( {
@@ -144,7 +147,7 @@ function InserterMenu(
 			<BlockPatternsTabs
 				rootClientId={ destinationRootClientId }
 				onInsert={ onInsertPattern }
-				onClickCategory={ onClickPatternCategory }
+				onSelectCategory={ onClickPatternCategory }
 				selectedCategory={ selectedPatternCategory }
 			/>
 		),
@@ -228,6 +231,7 @@ function InserterMenu(
 						showPatterns={ showPatterns }
 						showReusableBlocks={ hasReusableBlocks }
 						prioritizePatterns={ prioritizePatterns }
+						onSelect={ setSelectedTab }
 					>
 						{ getCurrentTab }
 					</InserterTabs>
@@ -241,6 +245,16 @@ function InserterMenu(
 			{ showInserterHelpPanel && hoveredItem && (
 				<InserterPreviewPanel item={ hoveredItem } />
 			) }
+			{ selectedTab === 'patterns' &&
+				! filterValue &&
+				selectedPatternCategory && (
+					<BlockPatternsCategoryPanel
+						rootClientId={ destinationRootClientId }
+						onInsert={ onInsertPattern }
+						onUnset={ () => setSelectedPatternCategory( null ) }
+						category={ selectedPatternCategory }
+					/>
+				) }
 		</div>
 	);
 }

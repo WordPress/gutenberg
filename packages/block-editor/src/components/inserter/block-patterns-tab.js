@@ -2,81 +2,69 @@
  * WordPress dependencies
  */
 import { useMemo, useState, useCallback } from '@wordpress/element';
-import { _x } from '@wordpress/i18n';
-import { useAsyncList } from '@wordpress/compose';
+import { _x, __ } from '@wordpress/i18n';
+import { useAsyncList, useViewportMatch } from '@wordpress/compose';
+import {
+	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as Item,
+	__experimentalHStack as HStack,
+	FlexBlock,
+	Card,
+	CardBody,
+	Button,
+} from '@wordpress/components';
+import { Icon, chevronRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import PatternInserterPanel from './pattern-panel';
 import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 
-function BlockPatternsCategory( {
+export function BlockPatternsCategoryPanel( {
 	rootClientId,
 	onInsert,
-	selectedCategory,
-	populatedCategories,
+	category,
+	onUnset,
 } ) {
+	const isMobile = useViewportMatch( 'medium', '<' );
+
 	const [ allPatterns, , onClick ] = usePatternsState(
 		onInsert,
 		rootClientId
 	);
 
-	const getPatternIndex = useCallback(
-		( pattern ) => {
-			if ( ! pattern.categories?.length ) {
-				return Infinity;
-			}
-			const indexedCategories = populatedCategories.reduce(
-				( accumulator, { name }, index ) => {
-					accumulator[ name ] = index;
-					return accumulator;
-				},
-				{}
-			);
-			return Math.min(
-				...pattern.categories.map( ( cat ) =>
-					indexedCategories[ cat ] !== undefined
-						? indexedCategories[ cat ]
-						: Infinity
-				)
-			);
-		},
-		[ populatedCategories ]
-	);
-
 	const currentCategoryPatterns = useMemo(
 		() =>
 			allPatterns.filter( ( pattern ) =>
-				selectedCategory.name === 'uncategorized'
-					? getPatternIndex( pattern ) === Infinity
-					: pattern.categories?.includes( selectedCategory.name )
+				category.name === 'uncategorized'
+					? ! pattern.categories?.length
+					: pattern.categories?.includes( category.name )
 			),
-		[ allPatterns, selectedCategory ]
+		[ allPatterns, category ]
 	);
 
-	// Ordering the patterns is important for the async rendering.
-	const orderedPatterns = useMemo( () => {
-		return currentCategoryPatterns.sort( ( a, b ) => {
-			return getPatternIndex( a ) - getPatternIndex( b );
-		} );
-	}, [ currentCategoryPatterns, getPatternIndex ] );
-
-	const currentShownPatterns = useAsyncList( orderedPatterns );
+	const currentShownPatterns = useAsyncList( currentCategoryPatterns );
 
 	if ( ! currentCategoryPatterns.length ) {
 		return null;
 	}
 
 	return (
-		<div className="block-editor-inserter__panel-content">
+		<div className="block-editor-inserter__patterns-category-panel">
+			{ isMobile && (
+				<Button variant="secondary" onClick={ () => onUnset() }>
+					{ __( 'Back' ) }
+				</Button>
+			) }
+			<h3>{ category.label }</h3>
+			<p>{ category.description }</p>
 			<BlockPatternList
 				shownPatterns={ currentShownPatterns }
 				blockPatterns={ currentCategoryPatterns }
 				onClickPattern={ onClick }
-				label={ selectedCategory.label }
+				label={ category.label }
 				orientation="vertical"
 				isDraggable
 			/>
@@ -84,14 +72,10 @@ function BlockPatternsCategory( {
 	);
 }
 
-function BlockPatternsTabs( {
-	rootClientId,
-	onInsert,
-	onClickCategory,
-	selectedCategory,
-} ) {
+function BlockPatternsTabs( { onSelectCategory, selectedCategory } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
 	const [ allPatterns, allCategories ] = usePatternsState();
+	const isMobile = useViewportMatch( 'medium', '<' );
 
 	const hasRegisteredCategory = useCallback(
 		( pattern ) => {
@@ -138,29 +122,38 @@ function BlockPatternsTabs( {
 		return categories;
 	}, [ allPatterns, allCategories ] );
 
-	const patternCategory = selectedCategory
-		? selectedCategory
-		: populatedCategories[ 0 ];
-
 	return (
 		<>
-			<PatternInserterPanel
-				selectedCategory={ patternCategory }
-				patternCategories={ populatedCategories }
-				onClickCategory={ onClickCategory }
-				openPatternExplorer={ () => setShowPatternsExplorer( true ) }
-			/>
-			{ ! showPatternsExplorer && (
-				<BlockPatternsCategory
-					rootClientId={ rootClientId }
-					onInsert={ onInsert }
-					selectedCategory={ patternCategory }
-					populatedCategories={ populatedCategories }
-				/>
-			) }
+			<Card isBorderless>
+				<CardBody size="small">
+					<ItemGroup>
+						{ populatedCategories.map( ( category ) => (
+							<Item
+								key={ category.name }
+								onClick={ () => onSelectCategory( category ) }
+							>
+								<HStack>
+									<FlexBlock>{ category.label }</FlexBlock>
+									<Icon icon={ chevronRight } />
+								</HStack>
+							</Item>
+						) ) }
+					</ItemGroup>
+
+					{ ! isMobile && (
+						<Button
+							variant="link"
+							onClick={ () => setShowPatternsExplorer( true ) }
+							className="block-editor-inserter__patterns-explore-button"
+						>
+							{ __( 'Explore all patterns' ) }
+						</Button>
+					) }
+				</CardBody>
+			</Card>
 			{ showPatternsExplorer && (
 				<PatternsExplorerModal
-					initialCategory={ patternCategory }
+					initialCategory={ selectedCategory }
 					patternCategories={ populatedCategories }
 					onModalClose={ () => setShowPatternsExplorer( false ) }
 				/>
