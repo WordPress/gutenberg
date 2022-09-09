@@ -65,9 +65,9 @@ const BlockSettingsMenuControlsSlot = ( {
 		<Slot
 			fillProps={ {
 				...fillProps,
+				context,
 				selectedBlocks,
 				selectedClientIds,
-				context,
 			} }
 		>
 			{ ( fills ) => {
