@@ -1,6 +1,16 @@
 <?php
 
-function gutenberg_merge_theme_json( $existing_data, $incoming_data, $origin ) {
+function gutenberg_merge_theme_json( $existing_data, $incoming_data, $origin = null ) {
+	if ( $origin === null && doing_filter( 'global_styles_filter_theme' ) ) {
+		$origin = 'theme';
+	}
+	if ( $origin === null && doing_filter( 'global_styles_filter_default' ) ) {
+		$origin = 'default';
+	}
+	if ( $origin === null && doing_filter( 'global_styles_filter_blocks' ) ) {
+		$origin = 'core';
+	}
+
 	$existing = new WP_Theme_JSON_Gutenberg( $existing_data, $origin );
 	$incoming = new WP_Theme_JSON_Gutenberg( $incoming_data, $origin );
 	$existing->merge( $incoming );
