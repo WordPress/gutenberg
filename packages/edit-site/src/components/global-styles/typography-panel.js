@@ -166,7 +166,12 @@ export default function TypographyPanel( { name, element } ) {
 			>
 				Aa
 			</div>
-			<Grid columns={ 2 } rowGap={ 16 } columnGap={ 8 }>
+			<Grid
+				columns={ 2 }
+				rowGap={ 16 }
+				columnGap={ 8 }
+				templateColumns="repeat(2, minmax(0, 1fr))"
+			>
 				{ element === 'heading' && (
 					<div className="edit-site-typography-panel__full-width-control">
 						<ToggleGroupControl
@@ -274,6 +279,8 @@ export default function TypographyPanel( { name, element } ) {
 					<TextTransformControl
 						value={ textTransform }
 						onChange={ setTextTransform }
+						showNone
+						isBlock
 						size="__unstable-large"
 						__nextHasNoMarginBottom
 					/>

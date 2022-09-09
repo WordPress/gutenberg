@@ -10,58 +10,60 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
+	reset,
 	formatCapitalize,
 	formatLowercase,
 	formatUppercase,
 } from '@wordpress/icons';
 
-const TEXT_TRANSFORMS = [
-	{
-		name: __( 'Uppercase' ),
-		value: 'uppercase',
-		icon: formatUppercase,
-	},
-	{
-		name: __( 'Lowercase' ),
-		value: 'lowercase',
-		icon: formatLowercase,
-	},
-	{
-		name: __( 'Capitalize' ),
-		value: 'capitalize',
-		icon: formatCapitalize,
-	},
-];
-
 /**
  * Control to facilitate text transform selections.
  *
- * @param {Object}   props          Component props.
- * @param {string}   props.value    Currently selected text transform.
- * @param {Function} props.onChange Handles change in text transform selection.
+ * @param {Object}   props            Component props.
+ * @param {string}   props.value      Currently selected text transform.
+ * @param {Function} props.onChange   Handles change in text transform selection.
+ * @param {boolean}  [props.showNone] Whether to display the 'None' option.
  *
  * @return {WPElement} Text transform control.
  */
-export default function TextTransformControl( { value, onChange, ...props } ) {
+export default function TextTransformControl( {
+	value,
+	onChange,
+	showNone,
+	...props
+} ) {
 	return (
 		<ToggleGroupControl
 			{ ...props }
 			className="block-editor-text-transform-control"
-			__experimentalIsBorderless
 			label={ __( 'Letter case' ) }
-			value={ value }
-			onChange={ onChange }
+			value={ value ?? 'none' }
+			onChange={ ( nextValue ) => {
+				onChange( nextValue === 'none' ? undefined : nextValue );
+			} }
 		>
-			{ TEXT_TRANSFORMS.map( ( textTransform ) => {
-				return (
-					<ToggleGroupControlOptionIcon
-						key={ textTransform.value }
-						value={ textTransform.value }
-						icon={ textTransform.icon }
-						label={ textTransform.name }
-					/>
-				);
-			} ) }
+			{ showNone && (
+				<ToggleGroupControlOptionIcon
+					value="none"
+					icon={ reset }
+					label={ __( 'None' ) }
+				/>
+			) }
+			<ToggleGroupControlOptionIcon
+				value="uppercase"
+				icon={ formatUppercase }
+				label={ __( 'Uppercase' ) }
+			/>
+			<ToggleGroupControlOptionIcon
+				value="lowercase"
+				icon={ formatLowercase }
+				label={ __( 'Lowercase' ) }
+			/>
+			<ToggleGroupControlOptionIcon
+				value="capitalize"
+				icon={ formatCapitalize }
+				label={ __( 'Capitalize' ) }
+			/>
 		</ToggleGroupControl>
 	);
 }
