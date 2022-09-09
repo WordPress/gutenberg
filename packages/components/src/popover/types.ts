@@ -8,9 +8,7 @@ type PositionYAxis = 'top' | 'middle' | 'bottom';
 type PositionXAxis = 'left' | 'center' | 'right';
 type PositionCorner = 'top' | 'right' | 'bottom' | 'left';
 
-type DomRectWithOwnerDocument = ReturnType<
-	Element[ 'getBoundingClientRect' ]
-> & {
+type DomRectWithOwnerDocument = DOMRect & {
 	ownerDocument?: Document;
 };
 
