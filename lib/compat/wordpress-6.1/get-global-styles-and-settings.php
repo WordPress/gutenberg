@@ -23,12 +23,12 @@ function gutenberg_add_global_styles_for_blocks() {
 			// These block styles are added on block_render.
 			// This hooks inline CSS to them so that they are loaded conditionally
 			// based on whether or not the block is used on the page.
-			if ( 0 === strpos( $metadata['name'], 'core/' ) ) {
-				$block_name = str_replace( 'core/', '', $metadata['name'] );
-				wp_add_inline_style( 'wp-block-' . $block_name, $block_css );
-			} else {
-				wp_add_inline_style( 'global-styles', $block_css );
+			$stylesheet_handle = 'global-styles';
+			if ( str_starts_with( $metadata['name'], 'core/' ) ) {
+				$block_name        = str_replace( 'core/', '', $metadata['name'] );
+				$stylesheet_handle = 'wp-block-' . $block_name;
 			}
+			wp_add_inline_style( $stylesheet_handle, $block_css );
 		}
 
 		// The likes of block element styles from theme.json do not have  $metadata['name'] set.
