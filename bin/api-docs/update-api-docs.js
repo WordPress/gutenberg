@@ -2,6 +2,7 @@
  * External dependencies
  */
 const { join, relative, resolve, sep, dirname } = require( 'path' );
+const { lstatSync } = require( 'fs' );
 const glob = require( 'fast-glob' );
 const execa = require( 'execa' );
 const { Transform } = require( 'stream' );
@@ -192,6 +193,30 @@ function findDefaultSourcePath( dir ) {
 }
 
 /**
+ * Given a directory and a relative path, return the source files at the path.
+ *
+ * If the path leads to a file, only that file will be returned in the array.
+ *
+ * If the path leads to a directory, all source files in the directory will be returned.
+ *
+ * @param {string} directory The directory from which to search.
+ * @param {string} path      A relative path.
+ *
+ * @return {string[]} Array of source file paths.
+ */
+function getSourceFilesForPath( directory, path ) {
+	const absolutePath = relative( ROOT_DIR, resolve( directory, path ) );
+	if ( lstatSync( absolutePath ).isDirectory() ) {
+		return glob
+			.sync( '*.{js,ts,tsx}', {
+				cwd: absolutePath,
+			} )
+			.map( ( fileName ) => join( absolutePath, fileName ) );
+	}
+	return [ absolutePath ];
+}
+
+/**
  * Optional process arguments for which to generate documentation.
  *
  * @type {string[]}
@@ -206,6 +231,7 @@ glob.stream( [
 	.on( 'data', async ( /** @type {WPReadmeFileData} */ data ) => {
 		const [ file, tokens ] = data;
 		const output = relative( ROOT_DIR, file );
+		const docDirectory = dirname( file );
 
 		// Each file can have more than one placeholder content to update, each
 		// represented by tokens. The docgen script updates one token at a time,
@@ -214,26 +240,34 @@ glob.stream( [
 		try {
 			for ( const [
 				token,
-				path = findDefaultSourcePath( dirname( file ) ),
+				path = findDefaultSourcePath( docDirectory ),
 			] of tokens ) {
-				await execa(
-					`"${ join(
-						__dirname,
-						'..',
-						'..',
-						'node_modules',
-						'.bin',
-						'docgen'
-					) }"`,
-					[
-						relative( ROOT_DIR, resolve( dirname( file ), path ) ),
-						`--output ${ output }`,
-						'--to-token',
-						`--use-token "${ token }"`,
-						'--ignore "/unstable|experimental/i"',
-					],
-					{ shell: true }
-				);
+				if ( path ) {
+					const sourceFiles = getSourceFilesForPath(
+						docDirectory,
+						path
+					);
+					for ( const sourceFilePath of sourceFiles ) {
+						await execa(
+							`"${ join(
+								__dirname,
+								'..',
+								'..',
+								'node_modules',
+								'.bin',
+								'docgen'
+							) }"`,
+							[
+								sourceFilePath,
+								`--output ${ output }`,
+								'--to-token',
+								`--use-token "${ token }"`,
+								'--ignore "/unstable|experimental/i"',
+							],
+							{ shell: true }
+						);
+					}
+				}
 			}
 			await execa( 'npm', [ 'run', 'format', output ], {
 				shell: true,
