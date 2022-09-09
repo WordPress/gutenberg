@@ -479,7 +479,7 @@ add_theme_support( 'appearance-tools' );
 
 ## Block Based Template Parts
 
-Block Based Template parts allow editors to edit parts of the site using blocks. This is off by default, and requires the theme to opt in by declaring support:
+Block Based Template parts allow administrators to edit parts of the site using blocks. This is off by default, and requires the theme to opt in by declaring support:
 
 ```php
 add_theme_support( 'block-template-parts' );
