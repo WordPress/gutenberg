@@ -50,6 +50,7 @@
 -   `Popover`: refactor to TypeScript ([#43823](https://github.com/WordPress/gutenberg/pull/43823/)).
 -   `BorderControl` and `BorderBoxControl`: replace temporary types with `Popover`'s types ([#43823](https://github.com/WordPress/gutenberg/pull/43823/)).
 -   `DimensionControl`: Refactor tests to `@testing-library/react` ([#43916](https://github.com/WordPress/gutenberg/pull/43916)).
+-   `PaletteEditListView`: updated to satisfy `react/exhaustive-deps` eslint rule ([#43911](https://github.com/WordPress/gutenberg/pull/43911))
 
 ## 20.0.0 (2022-08-24)
 
