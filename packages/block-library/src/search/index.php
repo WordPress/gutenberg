@@ -37,7 +37,6 @@ function render_block_core_search( $attributes ) {
 	$query_params_markup = '';
 	$inline_styles       = styles_for_block_core_search( $attributes );
 	$color_classes       = get_color_classes_for_block_core_search( $attributes );
-	$typography_classes  = get_typography_classes_for_block_core_search( $attributes );
 	$is_button_inside    = ! empty( $attributes['buttonPosition'] ) &&
 		'button-inside' === $attributes['buttonPosition'];
 	// Border color classes need to be applied to the elements that have a border color.
@@ -51,31 +50,20 @@ function render_block_core_search( $attributes ) {
 		$label_inner_html
 	);
 	if ( $show_label && ! empty( $attributes['label'] ) ) {
-		$label_classes = array( 'wp-block-search__label' );
-		if ( ! empty( $typography_classes ) ) {
-			$label_classes[] = $typography_classes;
-		}
 		$label_markup = sprintf(
-			'<label for="%1$s" class="%2$s" %3$s>%4$s</label>',
+			'<label for="%1$s" class="wp-block-search__label" %2$s>%3$s</label>',
 			esc_attr( $input_id ),
-			esc_attr( implode( ' ', $label_classes ) ),
 			$inline_styles['label'],
 			$label_inner_html
 		);
 	}
 
 	if ( $show_input ) {
-		$input_classes = array( 'wp-block-search__input' );
-		if ( $is_button_inside ) {
-			$input_classes[] = $border_color_classes;
-		}
-		if ( ! empty( $typography_classes ) ) {
-			$input_classes[] = $typography_classes;
-		}
-		$input_markup = sprintf(
+		$input_classes = ! $is_button_inside ? $border_color_classes : '';
+		$input_markup  = sprintf(
 			'<input type="search" id="%s" class="wp-block-search__input %s" name="s" value="%s" placeholder="%s" %s required />',
 			$input_id,
-			esc_attr( implode( ' ', $input_classes ) ),
+			esc_attr( $input_classes ),
 			get_search_query(),
 			esc_attr( $attributes['placeholder'] ),
 			$inline_styles['input']
@@ -93,13 +81,10 @@ function render_block_core_search( $attributes ) {
 	}
 
 	if ( $show_button ) {
-		$button_classes         = array( 'wp-block-search__button' );
+		$button_classes         = array();
 		$button_internal_markup = '';
 		if ( ! empty( $color_classes ) ) {
 			$button_classes[] = $color_classes;
-		}
-		if ( ! empty( $typography_classes ) ) {
-			$button_classes[] = $typography_classes;
 		}
 		$aria_label = '';
 
@@ -123,7 +108,7 @@ function render_block_core_search( $attributes ) {
 		// Include the button element class.
 		$button_classes[] = WP_Theme_JSON_Gutenberg::get_element_class_name( 'button' );
 		$button_markup    = sprintf(
-			'<button type="submit" class="%s" %s %s>%s</button>',
+			'<button type="submit" class="wp-block-search__button %s" %s %s>%s</button>',
 			esc_attr( implode( ' ', $button_classes ) ),
 			$inline_styles['button'],
 			$aria_label,
@@ -202,6 +187,14 @@ function classnames_for_block_core_search( $attributes ) {
 				$classnames[] = 'wp-block-search__text-button';
 			}
 		}
+	}
+
+	if ( ! empty( $attributes['fontSize'] ) ) {
+		$classnames[] = sprintf( 'has-%s-font-size', esc_attr( $attributes['fontSize'] ) );
+	}
+
+	if ( ! empty( $attributes['fontFamily'] ) ) {
+		$classnames[] = sprintf( 'has-%s-font-family', esc_attr( $attributes['fontFamily'] ) );
 	}
 
 	return implode( ' ', $classnames );
@@ -399,29 +392,6 @@ function styles_for_block_core_search( $attributes ) {
 		'wrapper' => ! empty( $wrapper_styles ) ? sprintf( ' style="%s"', safecss_filter_attr( implode( ' ', $wrapper_styles ) ) ) : '',
 		'label'   => ! empty( $label_styles ) ? sprintf( ' style="%s"', esc_attr( safecss_filter_attr( implode( ' ', $label_styles ) ) ) ) : '',
 	);
-}
-
-/**
- * Returns typography classnames depending on whether there are named font sizes/families .
- *
- * @param array $attributes The block attributes.
- *
- * @return string The typography color classnames to be applied to the block elements.
- */
-function get_typography_classes_for_block_core_search( $attributes ) {
-	$typography_classes    = array();
-	$has_named_font_family = ! empty( $attributes['style']['typography']['fontFamily'] );
-	$has_named_font_size   = ! empty( $attributes['fontSize'] );
-
-	if ( $has_named_font_size ) {
-		$typography_classes[] = sprintf( 'has-%s-font-size', esc_attr( $attributes['fontSize'] ) );
-	}
-
-	if ( $has_named_font_family ) {
-		$typography_classes[] = sprintf( 'has-%s-font-family', esc_attr( $attributes['fontSize'] ) );
-	}
-
-	return implode( ' ', $typography_classes );
 }
 
 /**
