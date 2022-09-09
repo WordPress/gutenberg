@@ -39,7 +39,7 @@ if ( ! function_exists( 'wp_style_engine_get_styles' ) ) {
  */
 class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
-	 * Tear down after each test.
+	 * Cleans up stores after each test.
 	 */
 	public function tear_down() {
 		WP_Style_Engine_CSS_Rules_Store::remove_all_stores();
@@ -69,6 +69,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 */
 	public function test_wp_style_engine_get_styles( $block_styles, $options, $expected_output ) {
 		$generated_styles = wp_style_engine_get_styles( $block_styles, $options );
+
 		$this->assertSame( $expected_output, $generated_styles );
 	}
 
@@ -531,6 +532,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 		);
 		$store            = WP_Style_Engine::get_store( 'block-supports' );
 		$rule             = $store->get_all_rules()['article'];
+
 		$this->assertSame( $generated_styles['css'], $rule->get_css() );
 	}
 
@@ -632,6 +634,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 		);
 
 		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
+
 		$this->assertSame( '.saruman{color:white;height:100px;border-style:solid;align-self:unset;}.gandalf{color:grey;height:90px;border-style:dotted;align-self:safe center;}.radagast{color:brown;height:60px;border-style:dashed;align-self:stretch;}', $compiled_stylesheet );
 	}
 
@@ -679,6 +682,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 		);
 
 		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
+
 		$this->assertSame( '.gandalf{color:white;height:190px;border-style:dotted;padding:10px;margin-bottom:100px;}.dumbledore,.rincewind{color:grey;height:90px;border-style:dotted;}', $compiled_stylesheet );
 	}
 }

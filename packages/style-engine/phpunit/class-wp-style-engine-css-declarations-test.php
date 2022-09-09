@@ -47,6 +47,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 		);
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations();
 		$css_declarations->add_declarations( $input_declarations );
+
 		$this->assertSame( $input_declarations, $css_declarations->get_declarations() );
 	}
 
@@ -66,6 +67,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 			'letter-spacing' => '1.5px',
 		);
 		$css_declarations->add_declarations( $extra_declaration );
+
 		$this->assertSame( array_merge( $input_declarations, $extra_declaration ), $css_declarations->get_declarations() );
 	}
 
@@ -182,6 +184,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 			'text-decoration'        => 'underline',
 		);
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+
 		$this->assertSame(
 			$expected,
 			$css_declarations->get_declarations_string( $should_prettify, $indent_count )
@@ -240,6 +243,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 		);
 
 		$css_declarations->remove_declaration( 'color' );
+
 		$this->assertSame(
 			'margin:10em 10em 20em 1px;font-family:Happy Font serif;',
 			$css_declarations->get_declarations_string(),
@@ -267,6 +271,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 		);
 
 		$css_declarations->remove_declarations( array( 'color', 'margin' ) );
+
 		$this->assertSame(
 			'font-family:Happy Font serif;',
 			$css_declarations->get_declarations_string(),

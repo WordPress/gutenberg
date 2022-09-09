@@ -41,6 +41,7 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 		$this->assertSame( $selector, $css_rule->get_selector(), 'Return value of get_selector() does not match value passed to constructor.' );
 
 		$expected = "$selector{{$css_declarations->get_declarations_string()}}";
+
 		$this->assertSame( $expected, $css_rule->get_css(), 'Value returned by get_css() does not match expected declarations string.' );
 	}
 
@@ -80,6 +81,7 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 		$css_rule->add_declarations( $some_more_css_declarations );
 
 		$expected = '.hill-street-blues{margin-top:10px;font-size:1rem;}';
+
 		$this->assertSame( $expected, $css_rule->get_css() );
 	}
 
