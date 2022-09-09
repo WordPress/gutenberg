@@ -27,8 +27,7 @@ function gutenberg_add_global_styles_for_blocks() {
 				$block_name = str_replace( 'core/', '', $metadata['name'] );
 				wp_add_inline_style( 'wp-block-' . $block_name, $block_css );
 			} else {
-				$block_name = str_replace( '/', '-block-', $metadata['name'] );
-				wp_add_inline_style( $block_name, $block_css );
+				wp_add_inline_style( 'global-styles', $block_css );
 			}
 		}
 
@@ -46,8 +45,12 @@ function gutenberg_add_global_styles_for_blocks() {
 				)
 			);
 			if ( isset( $result[0] ) ) {
-				$block_name = str_replace( 'core/', '', $result[0] );
-				wp_add_inline_style( 'wp-block-' . $block_name, $block_css );
+				if ( 0 === strpos( $metadata['name'], 'core/' ) ) {
+					$block_name = str_replace( 'core/', '', $result[0] );
+					wp_add_inline_style( 'wp-block-' . $block_name, $block_css );
+				} else {
+					wp_add_inline_style( 'global-styles', $block_css );
+				}
 			}
 		}
 	}
