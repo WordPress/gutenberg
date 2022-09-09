@@ -3,7 +3,11 @@
  */
 import { useMemo, useState, useCallback } from '@wordpress/element';
 import { _x, __, isRTL } from '@wordpress/i18n';
-import { useAsyncList, useViewportMatch } from '@wordpress/compose';
+import {
+	useAsyncList,
+	useViewportMatch,
+	__experimentalUseDialog as useDialog,
+} from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -77,6 +81,31 @@ function usePatternsCategories() {
 	return populatedCategories;
 }
 
+export function BlockPatternsCategoryDialog( {
+	rootClientId,
+	onInsert,
+	category,
+	onClose,
+} ) {
+	const [ ref, props ] = useDialog( {
+		onClose,
+	} );
+
+	return (
+		<div
+			ref={ ref }
+			{ ...props }
+			className="block-editor-inserter__patterns-category-panel"
+		>
+			<BlockPatternsCategoryPanel
+				rootClientId={ rootClientId }
+				onInsert={ onInsert }
+				category={ category }
+			/>
+		</div>
+	);
+}
+
 export function BlockPatternsCategoryPanel( {
 	rootClientId,
 	onInsert,
@@ -141,6 +170,11 @@ function BlockPatternsTabs( {
 										key={ category.name }
 										onClick={ () =>
 											onSelectCategory( category )
+										}
+										className={
+											category === selectedCategory
+												? 'block-editor-inserter__patterns-selected-category'
+												: null
 										}
 									>
 										<HStack>

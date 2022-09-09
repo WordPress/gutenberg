@@ -25,7 +25,7 @@ import Tips from './tips';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTabs, {
-	BlockPatternsCategoryPanel,
+	BlockPatternsCategoryDialog,
 } from './block-patterns-tab';
 import ReusableBlocksTab from './reusable-blocks-tab';
 import InserterSearchResults from './search-results';
@@ -248,13 +248,12 @@ function InserterMenu(
 			{ selectedTab === 'patterns' &&
 				! filterValue &&
 				selectedPatternCategory && (
-					<div className="block-editor-inserter__patterns-category-panel">
-						<BlockPatternsCategoryPanel
-							rootClientId={ destinationRootClientId }
-							onInsert={ onInsertPattern }
-							category={ selectedPatternCategory }
-						/>
-					</div>
+					<BlockPatternsCategoryDialog
+						rootClientId={ destinationRootClientId }
+						onInsert={ onInsertPattern }
+						category={ selectedPatternCategory }
+						onClose={ () => setSelectedPatternCategory( null ) }
+					/>
 				) }
 		</div>
 	);

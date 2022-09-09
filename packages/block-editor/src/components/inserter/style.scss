@@ -235,6 +235,10 @@ $block-inserter-tabs-height: 44px;
 	margin: $grid-unit-20;
 }
 
+.block-editor-inserter__patterns-selected-category.block-editor-inserter__patterns-selected-category {
+	background: $gray-100;
+}
+
 .block-editor-inserter__patterns-category-panel {
 	background: $gray-100;
 	position: absolute;
