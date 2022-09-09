@@ -1,8 +1,6 @@
 # E2E Test Utils
 
-Experimental End-To-End (E2E) Playwright test utils for WordPress.
-
-**This package is still experimental and breaking changes could be introduced in future minor versions (`v0.x`). Use it at your own risks.**
+End-To-End (E2E) Playwright test utils for WordPress.
 
 _It works properly with the minimum version of Gutenberg `9.2.0` or the minimum version of WordPress `5.6.0`._
 
@@ -20,7 +18,7 @@ npm install @wordpress/e2e-test-utils-playwright --save-dev
 
 ### test
 
-The extended Playwright's [test](https://playwright.dev/docs/api/class-test) module with the `admin`, `pageUtils` and the `requestUtils` fixtures.
+The extended Playwright's [test](https://playwright.dev/docs/api/class-test) module with the `admin`, `editor`, `pageUtils` and the `requestUtils` fixtures.
 
 ### expect
 
