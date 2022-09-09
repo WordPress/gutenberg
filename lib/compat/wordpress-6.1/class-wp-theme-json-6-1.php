@@ -808,7 +808,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @param array  $block_metadata The metadata for the root block.
 	 * @return string The additional root rules CSS.
 	 */
-	private function get_root_layout_rules( $selector, $block_metadata ) {
+	protected function get_root_layout_rules( $selector, $block_metadata ) {
 		$css              = '';
 		$settings         = _wp_array_get( $this->theme_json, array( 'settings' ) );
 		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
