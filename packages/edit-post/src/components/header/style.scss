@@ -52,15 +52,12 @@
 		& > .edit-post-header__settings > .interface-pinned-items {
 			display: none;
 		}
+	}
 
-		.components-editor-notices__dismissible {
-			position: absolute;
-			top: 0;
-			width: 100vw;
-			z-index: z-index(".interface-interface-skeleton__actions");
-		}
-
-
+	.components-editor-notices__dismissible {
+		position: absolute;
+		width: calc(100vw - 25px);
+		z-index: 35;
 	}
 
 }
