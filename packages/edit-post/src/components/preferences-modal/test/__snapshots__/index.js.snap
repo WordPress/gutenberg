@@ -253,7 +253,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     class="components-toggle-control__label"
                     for="inspector-toggle-control-1"
                   >
-                    Spotlight mode
+                    Distraction Free
                   </label>
                 </div>
               </div>
@@ -261,7 +261,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                 class="components-base-control__help emotion-6 emotion-7"
                 id="inspector-toggle-control-1__help"
               >
-                Highlights the current block and fades other content.
+                Reduce visual distractions by hiding the toolbar and other elements to focus on writing.
               </p>
             </div>
           </div>
@@ -299,7 +299,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     class="components-toggle-control__label"
                     for="inspector-toggle-control-2"
                   >
-                    Show button text labels
+                    Spotlight mode
                   </label>
                 </div>
               </div>
@@ -307,7 +307,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                 class="components-base-control__help emotion-6 emotion-7"
                 id="inspector-toggle-control-2__help"
               >
-                Show text instead of icons on buttons.
+                Highlights the current block and fades other content.
               </p>
             </div>
           </div>
@@ -345,7 +345,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     class="components-toggle-control__label"
                     for="inspector-toggle-control-3"
                   >
-                    Always open list view
+                    Show button text labels
                   </label>
                 </div>
               </div>
@@ -353,7 +353,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                 class="components-base-control__help emotion-6 emotion-7"
                 id="inspector-toggle-control-3__help"
               >
-                Opens the block list view sidebar by default.
+                Show text instead of icons on buttons.
               </p>
             </div>
           </div>
@@ -391,7 +391,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     class="components-toggle-control__label"
                     for="inspector-toggle-control-4"
                   >
-                    Reduce the interface
+                    Always open list view
                   </label>
                 </div>
               </div>
@@ -399,7 +399,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                 class="components-base-control__help emotion-6 emotion-7"
                 id="inspector-toggle-control-4__help"
               >
-                Compacts options and outlines in the toolbar.
+                Opens the block list view sidebar by default.
               </p>
             </div>
           </div>
@@ -437,7 +437,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     class="components-toggle-control__label"
                     for="inspector-toggle-control-5"
                   >
-                    Use theme styles
+                    Reduce the interface
                   </label>
                 </div>
               </div>
@@ -445,7 +445,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                 class="components-base-control__help emotion-6 emotion-7"
                 id="inspector-toggle-control-5__help"
               >
-                Make the editor look like your theme.
+                Compacts options and outlines in the toolbar.
               </p>
             </div>
           </div>
@@ -483,13 +483,59 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     class="components-toggle-control__label"
                     for="inspector-toggle-control-6"
                   >
-                    Display block breadcrumbs
+                    Use theme styles
                   </label>
                 </div>
               </div>
               <p
                 class="components-base-control__help emotion-6 emotion-7"
                 id="inspector-toggle-control-6__help"
+              >
+                Make the editor look like your theme.
+              </p>
+            </div>
+          </div>
+          <div
+            class="interface-preferences-modal__option"
+          >
+            <div
+              class="components-base-control components-toggle-control emotion-0 emotion-1"
+            >
+              <div
+                class="components-base-control__field emotion-2 emotion-3"
+              >
+                <div
+                  class="components-flex components-h-stack emotion-4 emotion-5"
+                  data-wp-c16t="true"
+                  data-wp-component="HStack"
+                >
+                  <span
+                    class="components-form-toggle"
+                  >
+                    <input
+                      aria-describedby="inspector-toggle-control-7__help"
+                      class="components-form-toggle__input"
+                      id="inspector-toggle-control-7"
+                      type="checkbox"
+                    />
+                    <span
+                      class="components-form-toggle__track"
+                    />
+                    <span
+                      class="components-form-toggle__thumb"
+                    />
+                  </span>
+                  <label
+                    class="components-toggle-control__label"
+                    for="inspector-toggle-control-7"
+                  >
+                    Display block breadcrumbs
+                  </label>
+                </div>
+              </div>
+              <p
+                class="components-base-control__help emotion-6 emotion-7"
+                id="inspector-toggle-control-7__help"
               >
                 Shows block breadcrumbs at the bottom of the editor.
               </p>
