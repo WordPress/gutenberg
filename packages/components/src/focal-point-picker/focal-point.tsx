@@ -12,8 +12,14 @@ import {
  * External dependencies
  */
 import classnames from 'classnames';
+import type { FocalPointProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
-export default function FocalPoint( { left = '50%', top = '50%', ...props } ) {
+export default function FocalPoint( {
+	left = '50%',
+	top = '50%',
+	...props
+}: WordPressComponentProps< FocalPointProps, 'div' > ) {
 	const classes = classnames(
 		'components-focal-point-picker__icon_container'
 	);
