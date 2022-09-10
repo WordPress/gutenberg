@@ -35,9 +35,8 @@
 	.edit-post-header {
 		position: absolute;
 		width: 100%;
-		background-color: rgba(255, 255, 255, 0);
-		border-bottom: 0 solid #fff;
-		transition: background-color 0.2s, border-bottom 0s cubic-bezier(0.25, 0.1, 0.25, 1);
+		background-color: rgba(255, 255, 255, 1);
+		border-bottom: 1px solid #e0e0e0;
 
 
 		// hide some parts
@@ -52,48 +51,6 @@
 
 		& > .edit-post-header__settings > .interface-pinned-items {
 			display: none;
-		}
-
-		& > .edit-post-header__settings > .editor-post-publish-button,
-		& > .edit-post-header__settings > .editor-post-saved-state,
-		& > .edit-post-header__settings > .editor-post-save-draft,
-		& > .edit-post-header__settings > .editor-post-switch-to-draft,
-		& > .edit-post-header__settings > .editor-post-publish-panel__toggle,
-		& > .edit-post-header__settings .interface-more-menu-dropdown {
-			position: relative;
-			top: -50px;
-			transition: top 0.2s cubic-bezier(0.7, 0, 0.84, 0);
-		}
-
-		// show the full screen toggle
-		& > div:not(.edit-post-header__settings):not(.edit-post-header__toolbar) {
-			position: absolute;
-			left: -60px;
-			transition: left 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
-		}
-
-		&:hover {
-			background-color: rgba(255, 255, 255, 1);
-			border-bottom: 1px solid #e0e0e0;
-			transition: background-color 0.4s, border-bottom 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
-
-			// show the publish button and the more button
-			> .edit-post-header__settings > .editor-post-publish-button,
-			& > .edit-post-header__settings > .editor-post-saved-state,
-			& > .edit-post-header__settings > .editor-post-save-draft,
-			& > .edit-post-header__settings > .editor-post-switch-to-draft,
-			> .edit-post-header__settings > .editor-post-publish-panel__toggle,
-			> .edit-post-header__settings .interface-more-menu-dropdown {
-				position: relative;
-				top: 0;
-				transition: top 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
-			}
-
-			& > div:first-child {
-				left: 0;
-				transition: left 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
-			}
-
 		}
 
 		.components-editor-notices__dismissible {

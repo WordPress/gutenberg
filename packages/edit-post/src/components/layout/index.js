@@ -207,6 +207,7 @@ function Layout( { styles } ) {
 			<EditorKeyboardShortcutsRegister />
 			<SettingsSidebar />
 			<InterfaceSkeleton
+				hasReducedUI={ isDistractionFree }
 				className={ className }
 				labels={ {
 					...interfaceLabels,
@@ -214,6 +215,7 @@ function Layout( { styles } ) {
 				} }
 				header={
 					<Header
+						hasReducedUI={ isDistractionFree }
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}
