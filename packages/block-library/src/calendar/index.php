@@ -40,10 +40,17 @@ function render_block_core_calendar( $attributes ) {
 		}
 	}
 
-	$inline_styles = styles_for_block_core_calendar( $attributes );
 	$color_classes = get_color_classes_for_block_core_calendar( $attributes );
+	$inline_styles = '';
 
-	$calendar = str_replace( '<table', '<table ' . $inline_styles, get_calendar( true, false ) );
+	if ( ! empty( $styles['css'] ) ) {
+		$styles = gutenberg_style_engine_get_styles( $attributes['style'] );
+		if ( ! empty( $styles['css'] ) ) {
+			$inline_styles = " style=\"${styles['css']}\"";
+		}
+	}
+
+	$calendar = str_replace( '<table', '<table' . $inline_styles, get_calendar( true, false ) );
 	$calendar = str_replace( 'class="wp-calendar-table', 'class="wp-calendar-table ' . $color_classes, $calendar );
 
 	$wrapper_attributes = get_block_wrapper_attributes();
@@ -74,30 +81,6 @@ function register_block_core_calendar() {
 }
 
 add_action( 'init', 'register_block_core_calendar' );
-
-/**
- * Builds an array of inline styles for the calendar block.
- *
- * @param  array $attributes The block attributes.
- *
- * @return string Style HTML attribute.
- */
-function styles_for_block_core_calendar( $attributes ) {
-	$table_styles = array();
-
-	// Add color styles.
-	$has_text_color = ! empty( $attributes['style']['color']['text'] );
-	if ( $has_text_color ) {
-		$table_styles[] = sprintf( 'color: %s;', esc_attr( $attributes['style']['color']['text'] ) );
-	}
-
-	$has_background_color = ! empty( $attributes['style']['color']['background'] );
-	if ( $has_background_color ) {
-		$table_styles[] = sprintf( 'background-color: %s;', esc_attr( $attributes['style']['color']['background'] ) );
-	}
-
-	return ! empty( $table_styles ) ? sprintf( 'style="%s"', safecss_filter_attr( implode( ' ', $table_styles ) ) ) : '';
-}
 
 /**
  * Returns color classnames depending on whether there are named or custom text and background colors.
