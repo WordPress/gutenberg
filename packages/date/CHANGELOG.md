@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## Deprecations
+
+-   `__experimentalGetSettings` has been renamed to `getSettings`.
+
 ## 4.16.0 (2022-08-24)
 
 ## 4.15.0 (2022-08-10)

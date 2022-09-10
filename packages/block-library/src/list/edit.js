@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -108,7 +103,7 @@ function useOutdentList( clientId ) {
 				[ newParentBlock, ...innerBlocks ]
 			);
 			// Select the last child of the list being outdent.
-			selectionChange( last( innerBlocks ).clientId );
+			selectionChange( innerBlocks[ innerBlocks.length - 1 ].clientId );
 		}, [ clientId ] ),
 	];
 }
@@ -135,6 +130,7 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list-item' ],
 		template: TEMPLATE,
+		templateLock: false,
 		templateInsertUpdatesSelection: true,
 		...( Platform.isNative && {
 			marginVertical: NATIVE_MARGIN_SPACING,

@@ -105,8 +105,9 @@ export default function Form( {
 					focusOnMount={ false }
 					placement="right"
 					offset={ 32 }
-					__unstableForcePosition
-					__unstableShift
+					resize={ false }
+					flip={ false }
+					shift
 				>
 					<div
 						ref={ ref }

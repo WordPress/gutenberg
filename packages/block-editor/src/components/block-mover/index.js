@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { first, last, castArray } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -30,13 +29,15 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 				getBlockOrder,
 				getBlockRootClientId,
 			} = select( blockEditorStore );
-			const normalizedClientIds = castArray( clientIds );
-			const firstClientId = first( normalizedClientIds );
-			const _rootClientId = getBlockRootClientId(
-				first( normalizedClientIds )
-			);
+			const normalizedClientIds = Array.isArray( clientIds )
+				? clientIds
+				: [ clientIds ];
+			const firstClientId = normalizedClientIds[ 0 ];
+			const _rootClientId = getBlockRootClientId( firstClientId );
 			const firstIndex = getBlockIndex( firstClientId );
-			const lastIndex = getBlockIndex( last( normalizedClientIds ) );
+			const lastIndex = getBlockIndex(
+				normalizedClientIds[ normalizedClientIds.length - 1 ]
+			);
 			const blockOrder = getBlockOrder( _rootClientId );
 
 			return {

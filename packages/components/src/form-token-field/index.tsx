@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { last, clone, map, some } from 'lodash';
 import classnames from 'classnames';
 import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
 
@@ -258,7 +257,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		const text = event.value;
 		const separator = tokenizeOnSpace ? /[ ,\t]+/ : /[,\t]+/;
 		const items = text.split( separator );
-		const tokenValue = last( items ) || '';
+		const tokenValue = items[ items.length - 1 ] || '';
 
 		if ( items.length > 1 ) {
 			addNewTokens( items.slice( 0, -1 ) );
@@ -413,7 +412,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		];
 
 		if ( tokensToAdd.length > 0 ) {
-			const newValue = clone( value );
+			const newValue = [ ...value ];
 			newValue.splice( getIndexOfInput(), 0, ...tokensToAdd );
 			onChange( newValue );
 		}
@@ -503,7 +502,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	}
 
 	function valueContainsToken( token: string ) {
-		return some( value, ( item ) => {
+		return value.some( ( item ) => {
 			return getTokenValue( token ) === getTokenValue( item );
 		} );
 	}
@@ -564,7 +563,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	}
 
 	function renderTokensAndInput() {
-		const components = map( value, renderToken );
+		const components = value.map( renderToken );
 		components.splice( getIndexOfInput(), 0, renderInput() );
 
 		return components;

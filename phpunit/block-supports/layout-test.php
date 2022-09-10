@@ -28,6 +28,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$GLOBALS['wp_theme_directories'] = $this->orig_theme_dir;
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
 		parent::tear_down();
 	}
 
@@ -100,5 +101,303 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$expected      = '<figure class="wp-block-image alignright size-full is-style-round my-custom-classname"><img src="/my-image.jpg"/></figure>';
 
 		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_content, $block ) );
+	}
+
+	/**
+	 * Generates the CSS corresponding to the provided layout.
+	 *
+	 * @dataProvider data_gutenberg_get_layout_style
+	 *
+	 * @covers ::gutenberg_get_layout_style
+	 *
+	 * @param array  $args {
+	 *       Arguments for the test function.
+	 *
+	 *      @type string  $selector                      CSS selector.
+	 *      @type array   $layout                        Layout object. The one that is passed has already checked the existence of default block layout.
+	 *      @type boolean $has_block_gap_support         Whether the theme has support for the block gap.
+	 *      @type string  $gap_value                     The block gap value to apply.
+	 *      @type boolean $should_skip_gap_serialization Whether to skip applying the user-defined value set in the editor.
+	 *      @type string  $fallback_gap_value            The block gap value to apply.
+	 *      @type array   $block_spacing                 Custom spacing set on the block.
+	 * }
+	 * @param string $expected_output The expected output.
+	 */
+	function test_gutenberg_get_layout_style( $args, $expected_output ) {
+		$layout_styles = gutenberg_get_layout_style( $args['selector'], $args['layout'], $args['has_block_gap_support'], $args['gap_value'], $args['should_skip_gap_serialization'], $args['fallback_gap_value'], $args['block_spacing'] );
+		$this->assertSame( $expected_output, $layout_styles );
+	}
+
+	/**
+	 * Data provider for test_gutenberg_get_layout_style().
+	 *
+	 * @return array
+	 */
+	public function data_gutenberg_get_layout_style() {
+		return array(
+			'should_return_empty_value_with_no_args'       => array(
+				'args'            => array(
+					'selector'                      => null,
+					'layout'                        => null,
+					'has_block_gap_support'         => null,
+					'gap_value'                     => null,
+					'should_skip_gap_serialization' => null,
+					'fallback_gap_value'            => null,
+					'block_spacing'                 => null,
+				),
+				'expected_output' => '',
+			),
+			'should_return_empty_value_with_only_selector' => array(
+				'args'            => array(
+					'selector'                      => '.wp-layout',
+					'layout'                        => null,
+					'has_block_gap_support'         => null,
+					'gap_value'                     => null,
+					'should_skip_gap_serialization' => null,
+					'fallback_gap_value'            => null,
+					'block_spacing'                 => null,
+				),
+				'expected_output' => '',
+			),
+			'should_return_default_layout_with_block_gap_support' => array(
+				'args'            => array(
+					'selector'                      => '.wp-layout',
+					'layout'                        => null,
+					'has_block_gap_support'         => true,
+					'gap_value'                     => '1em',
+					'should_skip_gap_serialization' => null,
+					'fallback_gap_value'            => null,
+					'block_spacing'                 => null,
+				),
+				'expected_output' => '.wp-layout > *{margin-block-start:0;margin-block-end:0;}.wp-layout.wp-layout > * + *{margin-block-start:1em;margin-block-end:0;}',
+			),
+			'should_return_empty_value_with_block_gap_support_and_skip_serialization' => array(
+				'args'            => array(
+					'selector'                      => '.wp-layout',
+					'layout'                        => null,
+					'has_block_gap_support'         => true,
+					'gap_value'                     => '1em',
+					'should_skip_gap_serialization' => true,
+					'fallback_gap_value'            => null,
+					'block_spacing'                 => null,
+				),
+				'expected_output' => '',
+			),
+			'should_return_default_layout_with_axial_block_gap_support' => array(
+				'args'            => array(
+					'selector'                      => '.wp-layout',
+					'layout'                        => null,
+					'has_block_gap_support'         => true,
+					'gap_value'                     => array( 'top' => '1em' ),
+					'should_skip_gap_serialization' => null,
+					'fallback_gap_value'            => null,
+					'block_spacing'                 => null,
+				),
+				'expected_output' => '.wp-layout > *{margin-block-start:0;margin-block-end:0;}.wp-layout.wp-layout > * + *{margin-block-start:1em;margin-block-end:0;}',
+			),
+			'should_return_constrained_layout_with_sizes'  => array(
+				'args'            => array(
+					'selector'                      => '.wp-layout',
+					'layout'                        => array(
+						'type'        => 'constrained',
+						'contentSize' => '800px',
+						'wideSize'    => '1200px',
+					),
+					'has_block_gap_support'         => null,
+					'gap_value'                     => null,
+					'should_skip_gap_serialization' => null,
+					'fallback_gap_value'            => null,
+					'block_spacing'                 => null,
+				),
+				'expected_output' => '.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:800px;margin-left:auto !important;margin-right:auto !important;}.wp-layout > .alignwide{max-width:1200px;}.wp-layout .alignfull{max-width:none;}',
+			),
+			'should_return_constrained_layout_with_sizes_and_block_spacing' => array(
+				'args'            => array(
+					'selector'                      => '.wp-layout',
+					'layout'                        => array(
+						'type'        => 'constrained',
+						'contentSize' => '800px',
+						'wideSize'    => '1200px',
+					),
+					'has_block_gap_support'         => null,
+					'gap_value'                     => null,
+					'should_skip_gap_serialization' => null,
+					'fallback_gap_value'            => null,
+					'block_spacing'                 => array(
+						'padding' => array(
+							'left'  => '20px',
+							'right' => '10px',
+						),
+					),
+				),
+				'expected_output' => '.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:800px;margin-left:auto !important;margin-right:auto !important;}.wp-layout > .alignwide{max-width:1200px;}.wp-layout .alignfull{max-width:none;}.wp-layout > .alignfull{margin-right:calc(10px * -1);margin-left:calc(20px * -1);}',
+			),
+			'should_return_constrained_layout_with_block_gap_support' => array(
+				'args'            => array(
+					'selector'                      => '.wp-layout',
+					'layout'                        => array(
+						'type' => 'constrained',
+					),
+					'has_block_gap_support'         => true,
+					'gap_value'                     => '2.5rem',
+					'should_skip_gap_serialization' => null,
+					'fallback_gap_value'            => null,
+					'block_spacing'                 => null,
+				),
+				'expected_output' => '.wp-layout > *{margin-block-start:0;margin-block-end:0;}.wp-layout.wp-layout > * + *{margin-block-start:2.5rem;margin-block-end:0;}',
+			),
+			'should_return_constrained_layout_with_axial_block_gap_support' => array(
+				'args'            => array(
+					'selector'                      => '.wp-layout',
+					'layout'                        => array(
+						'type' => 'constrained',
+					),
+					'has_block_gap_support'         => true,
+					'gap_value'                     => array( 'top' => '2.5rem' ),
+					'should_skip_gap_serialization' => null,
+					'fallback_gap_value'            => null,
+					'block_spacing'                 => null,
+				),
+				'expected_output' => '.wp-layout > *{margin-block-start:0;margin-block-end:0;}.wp-layout.wp-layout > * + *{margin-block-start:2.5rem;margin-block-end:0;}',
+			),
+			'should_return_constrained_layout_with_block_gap_support_and_spacing' => array(
+				'args'            => array(
+					'selector'                      => '.wp-layout',
+					'layout'                        => array(
+						'type' => 'constrained',
+					),
+					'has_block_gap_support'         => true,
+					'gap_value'                     => 'var:preset|spacing|50',
+					'should_skip_gap_serialization' => null,
+					'fallback_gap_value'            => null,
+					'block_spacing'                 => null,
+				),
+				'expected_output' => '.wp-layout > *{margin-block-start:0;margin-block-end:0;}.wp-layout.wp-layout > * + *{margin-block-start:var(--wp--preset--spacing--50);margin-block-end:0;}',
+			),
+			'should_return_empty_value_for_flex_layout_with_no_args' => array(
+				'args'            => array(
+					'selector'                      => '.wp-layout',
+					'layout'                        => array(
+						'type' => 'flex',
+					),
+					'has_block_gap_support'         => null,
+					'gap_value'                     => null,
+					'should_skip_gap_serialization' => null,
+					'fallback_gap_value'            => null,
+					'block_spacing'                 => null,
+				),
+				'expected_output' => '',
+			),
+			'should_return_empty_value_for_horizontal_flex_layout_with_orientation_only' => array(
+				'args'            => array(
+					'selector'                      => '.wp-layout',
+					'layout'                        => array(
+						'type'        => 'flex',
+						'orientation' => 'horizontal',
+					),
+					'has_block_gap_support'         => null,
+					'gap_value'                     => null,
+					'should_skip_gap_serialization' => null,
+					'fallback_gap_value'            => null,
+					'block_spacing'                 => null,
+				),
+				'expected_output' => '',
+			),
+			'should_return_rule_horizontal_flex_layout_with_flex_properties' => array(
+				'args'            => array(
+					'selector'                      => '.wp-layout',
+					'layout'                        => array(
+						'type'              => 'flex',
+						'orientation'       => 'horizontal',
+						'flexWrap'          => 'nowrap',
+						'justifyContent'    => 'left',
+						'verticalAlignment' => 'bottom',
+					),
+					'has_block_gap_support'         => null,
+					'gap_value'                     => null,
+					'should_skip_gap_serialization' => null,
+					'fallback_gap_value'            => null,
+					'block_spacing'                 => null,
+				),
+				'expected_output' => '.wp-layout{flex-wrap:nowrap;justify-content:flex-start;align-items:flex-end;}',
+			),
+			'should_return_rule_for_horizontal_flex_layout_with_flex_properties_and_gap' => array(
+				'args'            => array(
+					'selector'                      => '.wp-layout',
+					'layout'                        => array(
+						'type'              => 'flex',
+						'orientation'       => 'horizontal',
+						'flexWrap'          => 'nowrap',
+						'justifyContent'    => 'left',
+						'verticalAlignment' => 'bottom',
+					),
+					'has_block_gap_support'         => true,
+					'gap_value'                     => '29px',
+					'should_skip_gap_serialization' => null,
+					'fallback_gap_value'            => null,
+					'block_spacing'                 => null,
+				),
+				'expected_output' => '.wp-layout{flex-wrap:nowrap;gap:29px;justify-content:flex-start;align-items:flex-end;}',
+			),
+			'should_return_rule_for_horizontal_flex_layout_with_flex_properties_and_axial_gap' => array(
+				'args'            => array(
+					'selector'                      => '.wp-layout',
+					'layout'                        => array(
+						'type'              => 'flex',
+						'orientation'       => 'horizontal',
+						'flexWrap'          => 'nowrap',
+						'justifyContent'    => 'left',
+						'verticalAlignment' => 'bottom',
+					),
+					'has_block_gap_support'         => true,
+					'gap_value'                     => array(
+						'top'  => '1px',
+						'left' => '2px',
+					),
+					'should_skip_gap_serialization' => null,
+					'fallback_gap_value'            => null,
+					'block_spacing'                 => null,
+				),
+				'expected_output' => '.wp-layout{flex-wrap:nowrap;gap:1px 2px;justify-content:flex-start;align-items:flex-end;}',
+			),
+			'should_return_rule_for_horizontal_flex_layout_with_flex_properties_gap_fallback_and_spacing' => array(
+				'args'            => array(
+					'selector'                      => '.wp-layout',
+					'layout'                        => array(
+						'type'              => 'flex',
+						'orientation'       => 'horizontal',
+						'flexWrap'          => 'nowrap',
+						'justifyContent'    => 'left',
+						'verticalAlignment' => 'bottom',
+					),
+					'has_block_gap_support'         => true,
+					'gap_value'                     => array(
+						'left' => 'var:preset|spacing|40',
+					),
+					'should_skip_gap_serialization' => null,
+					'fallback_gap_value'            => '11px',
+					'block_spacing'                 => null,
+				),
+				'expected_output' => '.wp-layout{flex-wrap:nowrap;gap:11px var(--wp--preset--spacing--40);justify-content:flex-start;align-items:flex-end;}',
+			),
+			'should_return_rule_for_vertical_flex_layout_with_flex_properties' => array(
+				'args'            => array(
+					'selector'                      => '.wp-layout',
+					'layout'                        => array(
+						'type'              => 'flex',
+						'orientation'       => 'vertical',
+						'flexWrap'          => 'nowrap',
+						'justifyContent'    => 'left',
+						'verticalAlignment' => 'bottom',
+					),
+					'has_block_gap_support'         => null,
+					'gap_value'                     => null,
+					'should_skip_gap_serialization' => null,
+					'fallback_gap_value'            => null,
+					'block_spacing'                 => null,
+				),
+				'expected_output' => '.wp-layout{flex-wrap:nowrap;flex-direction:column;align-items:flex-start;}',
+			),
+		);
 	}
 }

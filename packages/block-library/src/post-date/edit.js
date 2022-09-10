@@ -8,10 +8,7 @@ import classnames from 'classnames';
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useRef } from '@wordpress/element';
-import {
-	dateI18n,
-	__experimentalGetSettings as getDateSettings,
-} from '@wordpress/date';
+import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import {
 	AlignmentControl,
 	BlockControls,

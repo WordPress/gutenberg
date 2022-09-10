@@ -66,10 +66,9 @@ function BlockPopover(
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the default popover slot).
 			__unstableSlotName={ __unstablePopoverSlot || null }
-			// Observe movement for block animations (especially horizontal).
-			__unstableObserveElement={ selectedElement }
-			__unstableForcePosition
-			__unstableShift
+			resize={ false }
+			flip={ false }
+			shift
 			{ ...props }
 			className={ classnames(
 				'block-editor-block-popover',

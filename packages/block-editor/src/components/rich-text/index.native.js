@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -114,6 +113,7 @@ function RichTextWrapper(
 		disableSuggestions,
 		disableAutocorrection,
 		containerWidth,
+		onEnter: onCustomEnter,
 		...props
 	},
 	forwardedRef
@@ -343,6 +343,10 @@ function RichTextWrapper(
 					] );
 					__unstableMarkAutomaticChange();
 				}
+			}
+
+			if ( onCustomEnter ) {
+				onCustomEnter();
 			}
 
 			if ( multiline ) {
@@ -746,7 +750,8 @@ ForwardedRichTextContainer.Content = ( {
 	const content = <RawHTML>{ value }</RawHTML>;
 
 	if ( Tag ) {
-		return <Tag { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
+		const { format, ...restProps } = props;
+		return <Tag { ...restProps }>{ content }</Tag>;
 	}
 
 	return content;
