@@ -40,18 +40,29 @@ function render_block_core_calendar( $attributes ) {
 		}
 	}
 
-	$color_classes = get_color_classes_for_block_core_calendar( $attributes );
+	$color_classes = array();
+
+	if ( ! empty( $attributes['textColor'] ) ) {
+		$color_classes[] = sprintf( 'has-text-color has-%s-color', $attributes['textColor'] );
+	}
+	if ( ! empty( $attributes['backgroundColor'] ) ) {
+		$color_classes[] = sprintf( 'has-background has-%s-background-color', $attributes['backgroundColor'] );
+	}
+
 	$inline_styles = '';
 
-	if ( ! empty( $styles['css'] ) ) {
+	if ( ! empty( $attributes['style'] ) ) {
 		$styles = gutenberg_style_engine_get_styles( $attributes['style'] );
 		if ( ! empty( $styles['css'] ) ) {
 			$inline_styles = " style=\"${styles['css']}\"";
 		}
+		if ( ! empty( $styles['classnames'] ) ) {
+			$color_classes[] = $styles['classnames'];
+		}
 	}
 
 	$calendar = str_replace( '<table', '<table' . $inline_styles, get_calendar( true, false ) );
-	$calendar = str_replace( 'class="wp-calendar-table', 'class="wp-calendar-table ' . $color_classes, $calendar );
+	$calendar = str_replace( 'class="wp-calendar-table', 'class="wp-calendar-table ' . implode( ' ', $color_classes ), $calendar );
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$output             = sprintf(
@@ -81,42 +92,6 @@ function register_block_core_calendar() {
 }
 
 add_action( 'init', 'register_block_core_calendar' );
-
-/**
- * Returns color classnames depending on whether there are named or custom text and background colors.
- *
- * @param array $attributes The block attributes.
- *
- * @return string The color classnames to be applied to the block elements.
- */
-function get_color_classes_for_block_core_calendar( $attributes ) {
-	$classnames = array();
-
-	// Text color.
-	$has_named_text_color  = ! empty( $attributes['textColor'] );
-	$has_custom_text_color = ! empty( $attributes['style']['color']['text'] );
-	if ( $has_named_text_color ) {
-		$classnames[] = sprintf( 'has-text-color has-%s-color', $attributes['textColor'] );
-	} elseif ( $has_custom_text_color ) {
-		// If a custom 'textColor' was selected instead of a preset, still add the generic `has-text-color` class.
-		$classnames[] = 'has-text-color';
-	}
-
-	// Background color.
-	$has_named_background_color  = ! empty( $attributes['backgroundColor'] );
-	$has_custom_background_color = ! empty( $attributes['style']['color']['background'] );
-	if (
-		$has_named_background_color ||
-		$has_custom_background_color
-	) {
-		$classnames[] = 'has-background';
-	}
-	if ( $has_named_background_color ) {
-		$classnames[] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
-	}
-
-	return implode( ' ', $classnames );
-}
 
 /**
  * Returns whether or not there are any published posts.
