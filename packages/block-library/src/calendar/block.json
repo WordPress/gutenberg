@@ -23,7 +23,8 @@
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
-			}
+			},
+			"__experimentalSelector": "table"
 		},
 		"typography": {
 			"fontSize": true,
