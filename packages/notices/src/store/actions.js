@@ -315,6 +315,49 @@ export function removeNotice( id, context = DEFAULT_CONTEXT ) {
 }
 
 /**
+ * Removes all notices from a given context. Defaults to the default context.
+ *
+ * @param {string} context The context to remove all notices from.
+ *
+ * @example
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch, useSelect } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
+ * export const ExampleComponent = () => {
+ * 	const notices = useSelect( ( select ) =>
+ * 		select( noticesStore ).getNotices()
+ * 	);
+ * 	const { removeNotices } = useDispatch( noticesStore );
+ * 	return (
+ * 		<>
+ * 			<ul>
+ * 				{ notices.map( ( notice ) => (
+ * 					<li key={ notice.id }>{ notice.content }</li>
+ * 				) ) }
+ * 			</ul>
+ * 			<Button
+ * 				onClick={ () =>
+ * 					removeAllNotices()
+ * 				}
+ * 			>
+ * 				{ __( 'Clear all notices', 'woo-gutenberg-products-block' ) }
+ * 			</Button>
+ * 		</>
+ * 	);
+ * };
+ *
+ * @return {Object} 	   Action object.
+ */
+export function removeAllNotices( context = DEFAULT_CONTEXT ) {
+	return {
+		type: 'REMOVE_ALL_NOTICES',
+		context,
+	};
+}
+
+/**
  * Returns an action object used in signalling that several notices are to be removed.
  *
  * @param {string[]} ids                List of unique notice identifiers.
