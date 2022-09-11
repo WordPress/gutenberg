@@ -313,6 +313,38 @@ _Returns_
 
 Returns an action object used in signalling that several notices are to be removed.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	const notices = useSelect( ( select ) =>
+		select( noticesStore ).getNotices()
+	);
+	const { removeNotices } = useDispatch( noticesStore );
+	return (
+		<>
+			<ul>
+				{ notices.map( ( notice ) => (
+					<li key={ notice.id }>{ notice.content }</li>
+				) ) }
+			</ul>
+			<Button
+				onClick={ () =>
+					removeNotices( notices.map( ( { id } ) => id ) )
+				}
+			>
+				{ __( 'Clear all notices' ) }
+			</Button>
+		</>
+	);
+};
+```
+
 _Parameters_
 
 -   _ids_ `string[]`: List of unique notice identifiers.
