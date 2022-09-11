@@ -1,7 +1,16 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -60,7 +69,12 @@ export default function saveV1( { attributes } ) {
 								{ ! RichText.isEmpty( image.caption ) && (
 									<RichText.Content
 										tagName="figcaption"
-										className="blocks-gallery-item__caption"
+										className={ classnames(
+											'blocks-gallery-item',
+											__experimentalGetElementClassName(
+												'caption'
+											)
+										) }
 										value={ image.caption }
 									/>
 								) }
@@ -72,7 +86,10 @@ export default function saveV1( { attributes } ) {
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content
 					tagName="figcaption"
-					className="blocks-gallery-caption"
+					className={ classnames(
+						'blocks-gallery-caption',
+						__experimentalGetElementClassName( 'caption' )
+					) }
 					value={ caption }
 				/>
 			) }

@@ -19,10 +19,8 @@ import { SIDEBAR_BLOCK } from '../sidebar/constants';
 import { STORE_NAME } from '../../store/constants';
 
 function KeyboardShortcuts( { openEntitiesSavedStates } ) {
-	const {
-		__experimentalGetDirtyEntityRecords,
-		isSavingEntityRecord,
-	} = useSelect( coreStore );
+	const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
+		useSelect( coreStore );
 	const { getEditorMode } = useSelect( editSiteStore );
 	const isListViewOpen = useSelect(
 		( select ) => select( editSiteStore ).isListViewOpened(),
@@ -36,12 +34,10 @@ function KeyboardShortcuts( { openEntitiesSavedStates } ) {
 		[]
 	);
 	const { redo, undo } = useDispatch( coreStore );
-	const { setIsListViewOpened, switchEditorMode } = useDispatch(
-		editSiteStore
-	);
-	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
-		interfaceStore
-	);
+	const { setIsListViewOpened, switchEditorMode } =
+		useDispatch( editSiteStore );
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
 
 	useShortcut( 'core/edit-site/save', ( event ) => {
 		event.preventDefault();

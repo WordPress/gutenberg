@@ -20,7 +20,7 @@ import { SVG } from '@wordpress/primitives';
 import Dashicon from '../dashicon';
 import type { IconKey as DashiconIconKey } from '../dashicon/types';
 
-type IconType< P > = DashiconIconKey | ComponentType< P > | JSX.Element;
+export type IconType< P > = DashiconIconKey | ComponentType< P > | JSX.Element;
 
 interface BaseProps< P > {
 	/**
@@ -68,10 +68,10 @@ function Icon< P >( {
 
 	if ( 'function' === typeof icon ) {
 		if ( icon.prototype instanceof Component ) {
-			return createElement( icon, ( {
+			return createElement( icon, {
 				size,
 				...additionalProps,
-			} as unknown ) as P );
+			} as unknown as P );
 		}
 
 		return ( icon as ( ...args: any[] ) => JSX.Element )( {
@@ -82,9 +82,9 @@ function Icon< P >( {
 
 	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
 		const appliedProps = {
+			...icon.props,
 			width: size,
 			height: size,
-			...icon.props,
 			...additionalProps,
 		};
 

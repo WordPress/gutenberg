@@ -156,12 +156,14 @@ function Option( {
 			</HStack>
 			{ isEditing && (
 				<Popover
-					position="bottom left"
+					placement="left-start"
+					offset={ 20 }
 					className="components-palette-edit__popover"
 				>
 					{ ! isGradient && (
 						<ColorPicker
 							color={ value }
+							enableAlpha
 							onChange={ ( newColor ) =>
 								onChange( {
 									...element,
@@ -171,16 +173,19 @@ function Option( {
 						/>
 					) }
 					{ isGradient && (
-						<CustomGradientPicker
-							__experimentalIsRenderedInSidebar
-							value={ value }
-							onChange={ ( newGradient ) =>
-								onChange( {
-									...element,
-									gradient: newGradient,
-								} )
-							}
-						/>
+						<div className="components-palette-edit__popover-gradient-picker">
+							<CustomGradientPicker
+								__nextHasNoMargin
+								__experimentalIsRenderedInSidebar
+								value={ value }
+								onChange={ ( newGradient ) =>
+									onChange( {
+										...element,
+										gradient: newGradient,
+									} )
+								}
+							/>
+						</div>
 					) }
 				</Popover>
 			) }
@@ -449,6 +454,7 @@ export default function PaletteEdit( {
 					{ ! isEditing &&
 						( isGradient ? (
 							<GradientPicker
+								__nextHasNoMargin
 								gradients={ gradients }
 								onChange={ () => {} }
 								clearable={ false }

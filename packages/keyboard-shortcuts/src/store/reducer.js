@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * Reducer returning the registered shortcuts
  *
  * @param {Object} state  Current state.
@@ -24,7 +19,8 @@ function reducer( state = {}, action ) {
 				},
 			};
 		case 'UNREGISTER_SHORTCUT':
-			return omit( state, action.name );
+			const { [ action.name ]: actionName, ...remainingState } = state;
+			return remainingState;
 	}
 
 	return state;

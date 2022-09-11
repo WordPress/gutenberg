@@ -98,6 +98,7 @@ const MySelectControl = () => {
 				{ label: 'Small', value: '25%' },
 			] }
 			onChange={ ( newSize ) => setSize( newSize ) }
+			__nextHasNoMarginBottom
 		/>
 	);
 };
@@ -119,6 +120,7 @@ Render a user interface to select multiple users from a list.
 		{ value: 'b', label: 'User B' },
 		{ value: 'c', label: 'User c' },
 	] }
+	__nextHasNoMarginBottom
 />
 ```
 
@@ -133,6 +135,7 @@ const [ item, setItem ] = useState( '' );
     label={ __( 'Select an item:' ) }
     value={ item } // e.g: value = 'a'
     onChange={ ( selection ) => { setItem( selection ) } }
+    __nextHasNoMarginBottom
 >
 	<optgroup label="Theropods">
 		<option value="Tyrannosaurus">Tyrannosaurus</option>
@@ -214,6 +217,14 @@ If multiple is false the value received is a single value with the new selected 
 
 -   Type: `function`
 -   Required: Yes
+
+### __nextHasNoMarginBottom
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
 
 ## Related components
 

@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 2.5.0 (2022-08-24)
+
+### Enhancement
+
+-   Add support to the `dynamic` variant ([#41289](https://github.com/WordPress/gutenberg/pull/41289), [#43481](https://github.com/WordPress/gutenberg/pull/43481)).
+
+## 2.3.0 (2022-06-01)
+
+### Enhancement
+
+-   Read the block name from `block.json` file in JavaScript files ([#41273](https://github.com/WordPress/gutenberg/pull/41273)).
+
+### Bug Fix
+
+-   Fix the issue with the block wrapper in the editor ([#41273](https://github.com/WordPress/gutenberg/pull/41273)).
+
 ## 2.1.0 (2022-04-21)
 
 ### Bug Fix

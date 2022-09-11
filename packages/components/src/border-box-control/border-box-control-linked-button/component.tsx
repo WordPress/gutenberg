@@ -19,11 +19,8 @@ const BorderBoxControlLinkedButton = (
 	props: WordPressComponentProps< LinkedButtonProps, 'div' >,
 	forwardedRef: React.ForwardedRef< any >
 ) => {
-	const {
-		className,
-		isLinked,
-		...buttonProps
-	} = useBorderBoxControlLinkedButton( props );
+	const { className, isLinked, ...buttonProps } =
+		useBorderBoxControlLinkedButton( props );
 	const label = isLinked ? __( 'Unlink sides' ) : __( 'Link sides' );
 
 	return (

@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+## 3.16.0 (2022-08-24)
+
+## 3.15.0 (2022-08-10)
+
+## 3.14.0 (2022-07-27)
+
+- `getRectangleFromRange` may now return `null`.
+
+## 3.13.0 (2022-07-13)
+
+## 3.12.0 (2022-06-29)
+
+## 3.11.0 (2022-06-15)
+
+## 3.10.0 (2022-06-01)
+
+## 3.9.0 (2022-05-18)
+
 ### Deprecation
 
 - Deprecate `isNumberInput`, as it is no longer used internally ([#40896](https://github.com/WordPress/gutenberg/pull/40896)).

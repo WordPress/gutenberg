@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { MenuItem, __experimentalText as Text } from '@wordpress/components';
@@ -13,6 +8,8 @@ import { check } from '@wordpress/icons';
  * Internal dependencies
  */
 import useStylesForBlocks from './use-styles-for-block';
+
+const noop = () => {};
 
 export default function BlockStylesMenuItems( { clientId, onSwitch = noop } ) {
 	const { onSelect, stylesToRender, activeStyle } = useStylesForBlocks( {

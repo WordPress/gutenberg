@@ -13,7 +13,10 @@ import BlockIcon from '../block-icon';
 export default function BlockDraggableChip( { count, icon } ) {
 	return (
 		<div className="block-editor-block-draggable-chip-wrapper">
-			<div className="block-editor-block-draggable-chip">
+			<div
+				className="block-editor-block-draggable-chip"
+				data-testid="block-draggable-chip"
+			>
 				<Flex
 					justify="center"
 					className="block-editor-block-draggable-chip__content"

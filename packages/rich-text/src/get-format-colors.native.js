@@ -15,17 +15,14 @@ export function getFormatColors( value, formats, colors ) {
 			format.forEach( ( currentFormat ) => {
 				if ( currentFormat?.type === FORMAT_TYPE ) {
 					const className = currentFormat?.attributes?.class;
-					currentFormat.attributes.style = currentFormat.attributes.style.replace(
-						/ /g,
-						''
-					);
+					currentFormat.attributes.style =
+						currentFormat.attributes.style.replace( / /g, '' );
 
 					className?.split( ' ' ).forEach( ( currentClass ) => {
 						const match = currentClass.match( REGEX_TO_MATCH );
 						if ( match ) {
-							const [ , colorSlug ] = currentClass.match(
-								REGEX_TO_MATCH
-							);
+							const [ , colorSlug ] =
+								currentClass.match( REGEX_TO_MATCH );
 							const colorObject = getColorObjectByAttributeValues(
 								colors,
 								colorSlug

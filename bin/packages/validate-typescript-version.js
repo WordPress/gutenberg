@@ -6,8 +6,8 @@ const tscDetectedVersion = require( 'typescript' ).version;
 /**
  * Internal dependencies
  */
-const tscDependencyVersion = require( '../../package.json' ).devDependencies
-	.typescript;
+const tscDependencyVersion =
+	require( '../../package.json' ).devDependencies.typescript;
 
 if ( tscDependencyVersion !== tscDetectedVersion ) {
 	console.error(

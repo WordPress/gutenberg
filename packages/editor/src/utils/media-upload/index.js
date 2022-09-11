@@ -14,6 +14,8 @@ import { uploadMedia } from '@wordpress/media-utils';
  */
 import { store as editorStore } from '../../store';
 
+const noop = () => {};
+
 /**
  * Upload a media file when the file upload button is activated.
  * Wrapper around mediaUpload() that injects the current post ID.

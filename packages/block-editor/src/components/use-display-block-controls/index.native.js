@@ -14,9 +14,8 @@ export default function useDisplayBlockControls() {
 	const { isSelected, clientId, name } = useBlockEditContext();
 	return useSelect(
 		( select ) => {
-			const { getBlockName, getBlockRootClientId } = select(
-				blockEditorStore
-			);
+			const { getBlockName, getBlockRootClientId } =
+				select( blockEditorStore );
 
 			const parentId = getBlockRootClientId( clientId );
 			const parentBlockName = getBlockName( parentId );

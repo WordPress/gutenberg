@@ -98,11 +98,11 @@ export function useBorderBoxControl(
 	const cx = useCx();
 	const classes = useMemo( () => {
 		return cx( styles.BorderBoxControl, className );
-	}, [ className ] );
+	}, [ cx, className ] );
 
 	const linkedControlClassName = useMemo( () => {
 		return cx( styles.LinkedBorderControl );
-	}, [] );
+	}, [ cx ] );
 
 	return {
 		...otherProps,

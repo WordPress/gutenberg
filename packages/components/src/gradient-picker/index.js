@@ -8,6 +8,7 @@ import { map } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -16,6 +17,7 @@ import CircularOptionPicker from '../circular-option-picker';
 import CustomGradientPicker from '../custom-gradient-picker';
 import { VStack } from '../v-stack';
 import { ColorHeading } from '../color-palette/styles';
+import { Spacer } from '../spacer';
 
 function SingleOrigin( {
 	className,
@@ -24,7 +26,6 @@ function SingleOrigin( {
 	onChange,
 	value,
 	actions,
-	content,
 } ) {
 	const gradientOptions = useMemo( () => {
 		return map( gradients, ( { gradient, name } ) => (
@@ -58,9 +59,7 @@ function SingleOrigin( {
 			className={ className }
 			options={ gradientOptions }
 			actions={ actions }
-		>
-			{ content }
-		</CircularOptionPicker>
+		/>
 	);
 }
 
@@ -71,7 +70,6 @@ function MultipleOrigin( {
 	onChange,
 	value,
 	actions,
-	content,
 } ) {
 	return (
 		<VStack spacing={ 3 } className={ className }>
@@ -85,10 +83,7 @@ function MultipleOrigin( {
 							onChange={ onChange }
 							value={ value }
 							{ ...( gradients.length === index + 1
-								? {
-										actions,
-										content,
-								  }
+								? { actions }
 								: {} ) }
 						/>
 					</VStack>
@@ -99,6 +94,8 @@ function MultipleOrigin( {
 }
 
 export default function GradientPicker( {
+	/** Start opting into the new margin-free styles that will become the default in a future version. */
+	__nextHasNoMargin = false,
 	className,
 	gradients,
 	onChange,
@@ -108,43 +105,65 @@ export default function GradientPicker( {
 	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
 } ) {
-	const clearGradient = useCallback( () => onChange( undefined ), [
-		onChange,
-	] );
+	const clearGradient = useCallback(
+		() => onChange( undefined ),
+		[ onChange ]
+	);
 	const Component =
 		__experimentalHasMultipleOrigins && gradients?.length
 			? MultipleOrigin
 			: SingleOrigin;
 
+	if ( ! __nextHasNoMargin ) {
+		deprecated( 'Outer margin styles for wp.components.GradientPicker', {
+			since: '6.1',
+			version: '6.4',
+			hint: 'Set the `__nextHasNoMargin` prop to true to start opting into the new styles, which will become the default in a future version',
+		} );
+	}
+
+	const deprecatedMarginSpacerProps = ! __nextHasNoMargin
+		? {
+				marginTop: ! gradients?.length ? 3 : undefined,
+				marginBottom: ! clearable ? 6 : 0,
+		  }
+		: {};
+
 	return (
-		<Component
-			className={ className }
-			clearable={ clearable }
-			clearGradient={ clearGradient }
-			gradients={ gradients }
-			onChange={ onChange }
-			value={ value }
-			actions={
-				clearable &&
-				( gradients?.length || ! disableCustomGradients ) && (
-					<CircularOptionPicker.ButtonAction
-						onClick={ clearGradient }
-					>
-						{ __( 'Clear' ) }
-					</CircularOptionPicker.ButtonAction>
-				)
-			}
-			content={
-				! disableCustomGradients && (
+		// Outmost Spacer wrapper can be removed when deprecation period is over
+		<Spacer marginBottom={ 0 } { ...deprecatedMarginSpacerProps }>
+			<VStack spacing={ gradients?.length ? 4 : 0 }>
+				{ ! disableCustomGradients && (
 					<CustomGradientPicker
+						__nextHasNoMargin
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
 						value={ value }
 						onChange={ onChange }
 					/>
-				)
-			}
-		/>
+				) }
+				{ ( gradients?.length || clearable ) && (
+					<Component
+						className={ className }
+						clearable={ clearable }
+						clearGradient={ clearGradient }
+						gradients={ gradients }
+						onChange={ onChange }
+						value={ value }
+						actions={
+							clearable &&
+							! disableCustomGradients && (
+								<CircularOptionPicker.ButtonAction
+									onClick={ clearGradient }
+								>
+									{ __( 'Clear' ) }
+								</CircularOptionPicker.ButtonAction>
+							)
+						}
+					/>
+				) }
+			</VStack>
+		</Spacer>
 	);
 }

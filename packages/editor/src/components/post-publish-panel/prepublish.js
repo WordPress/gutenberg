@@ -35,9 +35,8 @@ function PostPublishPanelPrepublish( { children } ) {
 		siteTitle,
 		siteHome,
 	} = useSelect( ( select ) => {
-		const { getCurrentPost, isEditedPostBeingScheduled } = select(
-			editorStore
-		);
+		const { getCurrentPost, isEditedPostBeingScheduled } =
+			select( editorStore );
 		const { getEntityRecord, isResolving } = select( coreStore );
 		const siteData =
 			getEntityRecord( 'root', '__unstableBase', undefined ) || {};

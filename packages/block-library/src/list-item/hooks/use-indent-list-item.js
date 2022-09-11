@@ -11,9 +11,8 @@ export default function useIndentListItem( clientId ) {
 		( select ) => select( blockEditorStore ).getBlockIndex( clientId ) > 0,
 		[ clientId ]
 	);
-	const { replaceBlocks, selectionChange, multiSelect } = useDispatch(
-		blockEditorStore
-	);
+	const { replaceBlocks, selectionChange, multiSelect } =
+		useDispatch( blockEditorStore );
 	const {
 		getBlock,
 		getPreviousBlockClientId,

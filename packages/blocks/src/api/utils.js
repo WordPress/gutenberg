@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, has, isFunction, isString, reduce, maxBy } from 'lodash';
+import { every, reduce } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -75,9 +75,9 @@ export function isUnmodifiedDefaultBlock( block ) {
 export function isValidIcon( icon ) {
 	return (
 		!! icon &&
-		( isString( icon ) ||
+		( typeof icon === 'string' ||
 			isValidElement( icon ) ||
-			isFunction( icon ) ||
+			typeof icon === 'function' ||
 			icon instanceof Component )
 	);
 }
@@ -99,15 +99,19 @@ export function normalizeIconObject( icon ) {
 		return { src: icon };
 	}
 
-	if ( has( icon, [ 'background' ] ) ) {
+	if ( 'background' in icon ) {
 		const colordBgColor = colord( icon.background );
+		const getColorContrast = ( iconColor ) =>
+			colordBgColor.contrast( iconColor );
+		const maxContrast = Math.max( ...ICON_COLORS.map( getColorContrast ) );
 
 		return {
 			...icon,
 			foreground: icon.foreground
 				? icon.foreground
-				: maxBy( ICON_COLORS, ( iconColor ) =>
-						colordBgColor.contrast( iconColor )
+				: ICON_COLORS.find(
+						( iconColor ) =>
+							getColorContrast( iconColor ) === maxContrast
 				  ),
 			shadowColor: colordBgColor.alpha( 0.3 ).toRgbString(),
 		};
@@ -126,7 +130,7 @@ export function normalizeIconObject( icon ) {
  * @return {?Object} Block type.
  */
 export function normalizeBlockType( blockTypeOrName ) {
-	if ( isString( blockTypeOrName ) ) {
+	if ( typeof blockTypeOrName === 'string' ) {
 		return getBlockType( blockTypeOrName );
 	}
 
@@ -161,7 +165,7 @@ export function getBlockLabel( blockType, attributes, context = 'visual' ) {
  * than the visual label and includes the block title and the value of the
  * `getLabel` function if it's specified.
  *
- * @param {Object}  blockType              The block type.
+ * @param {?Object} blockType              The block type.
  * @param {Object}  attributes             The values of the block's attributes.
  * @param {?number} position               The position of the block in the block list.
  * @param {string}  [direction='vertical'] The direction of the block layout.
@@ -298,5 +302,19 @@ export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
 	return attributesNames.filter(
 		( attributeName ) =>
 			attributes[ attributeName ]?.__experimentalRole === role
+	);
+}
+
+/**
+ * Return a new object with the specified keys omitted.
+ *
+ * @param {Object} object Original object.
+ * @param {Array}  keys   Keys to be omitted.
+ *
+ * @return {Object} Object with omitted keys.
+ */
+export function omit( object, keys ) {
+	return Object.fromEntries(
+		Object.entries( object ).filter( ( [ key ] ) => ! keys.includes( key ) )
 	);
 }

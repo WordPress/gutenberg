@@ -21,10 +21,8 @@ const BlockTransformationsMenu = ( {
 	onSelect,
 	blocks,
 } ) => {
-	const [
-		hoveredTransformItemName,
-		setHoveredTransformItemName,
-	] = useState();
+	const [ hoveredTransformItemName, setHoveredTransformItemName ] =
+		useState();
 	return (
 		<MenuGroup label={ __( 'Transform to' ) } className={ className }>
 			{ hoveredTransformItemName && (

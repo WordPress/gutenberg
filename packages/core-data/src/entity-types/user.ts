@@ -109,6 +109,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type User< C extends Context > = OmitNevers<
+export type User< C extends Context = 'edit' > = OmitNevers<
 	_BaseEntityRecords.User< C >
 >;

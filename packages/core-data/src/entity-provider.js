@@ -105,9 +105,8 @@ export function useEntityProp( kind, name, prop, _id ) {
 
 	const { value, fullValue } = useSelect(
 		( select ) => {
-			const { getEntityRecord, getEditedEntityRecord } = select(
-				STORE_NAME
-			);
+			const { getEntityRecord, getEditedEntityRecord } =
+				select( STORE_NAME );
 			const record = getEntityRecord( kind, name, id ); // Trigger resolver.
 			const editedRecord = getEditedEntityRecord( kind, name, id );
 			return record && editedRecord
@@ -164,9 +163,8 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		},
 		[ kind, name, id ]
 	);
-	const { __unstableCreateUndoLevel, editEntityRecord } = useDispatch(
-		STORE_NAME
-	);
+	const { __unstableCreateUndoLevel, editEntityRecord } =
+		useDispatch( STORE_NAME );
 
 	useEffect( () => {
 		// Load the blocks from the content if not already in state

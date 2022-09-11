@@ -34,6 +34,7 @@ import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { store as blockEditorStore } from '../../../store';
+import useBlockOverlayActive from '../../block-content-overlay';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -50,21 +51,20 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  * also pass any other props through this hook, and they will be merged and
  * returned.
  *
- * @param {Object}  props                        Optional. Props to pass to the element. Must contain
- *                                               the ref if one is defined.
- * @param {Object}  options                      Options for internal use only.
+ * @param {Object}  props                    Optional. Props to pass to the element. Must contain
+ *                                           the ref if one is defined.
+ * @param {Object}  options                  Options for internal use only.
  * @param {boolean} options.__unstableIsHtml
- * @param {boolean} options.__unstableIsDisabled Whether the block should be disabled.
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
-export function useBlockProps(
-	props = {},
-	{ __unstableIsHtml, __unstableIsDisabled = false } = {}
-) {
-	const { clientId, className, wrapperProps = {}, isAligned } = useContext(
-		BlockListBlockContext
-	);
+export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
+	const {
+		clientId,
+		className,
+		wrapperProps = {},
+		isAligned,
+	} = useContext( BlockListBlockContext );
 	const {
 		index,
 		mode,
@@ -111,6 +111,8 @@ export function useBlockProps(
 		[ clientId ]
 	);
 
+	const hasOverlay = useBlockOverlayActive( clientId );
+
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
@@ -129,7 +131,7 @@ export function useBlockProps(
 			enableAnimation,
 			triggerAnimationOnChange: index,
 		} ),
-		useDisabled( { isDisabled: ! __unstableIsDisabled } ),
+		useDisabled( { isDisabled: ! hasOverlay } ),
 	] );
 
 	const blockEditContext = useBlockEditContext();
@@ -141,11 +143,11 @@ export function useBlockProps(
 	}
 
 	return {
+		tabIndex: 0,
 		...wrapperProps,
 		...props,
 		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
-		tabIndex: 0,
 		role: 'document',
 		'aria-label': blockLabel,
 		'data-block': clientId,
@@ -155,6 +157,7 @@ export function useBlockProps(
 			// The wp-block className is important for editor styles.
 			classnames( 'block-editor-block-list__block', {
 				'wp-block': ! isAligned,
+				'has-block-overlay': hasOverlay,
 			} ),
 			className,
 			props.className,

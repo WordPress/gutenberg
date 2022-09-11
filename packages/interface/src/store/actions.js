@@ -24,48 +24,49 @@ export const setDefaultComplementaryArea = ( scope, area ) => ( {
  * @param {string} scope Complementary area scope.
  * @param {string} area  Area identifier.
  */
-export const enableComplementaryArea = ( scope, area ) => ( {
-	registry,
-	dispatch,
-} ) => {
-	// Return early if there's no area.
-	if ( ! area ) {
-		return;
-	}
+export const enableComplementaryArea =
+	( scope, area ) =>
+	( { registry, dispatch } ) => {
+		// Return early if there's no area.
+		if ( ! area ) {
+			return;
+		}
 
-	const isComplementaryAreaVisible = registry
-		.select( preferencesStore )
-		.get( scope, 'isComplementaryAreaVisible' );
+		const isComplementaryAreaVisible = registry
+			.select( preferencesStore )
+			.get( scope, 'isComplementaryAreaVisible' );
 
-	if ( ! isComplementaryAreaVisible ) {
-		registry
-			.dispatch( preferencesStore )
-			.set( scope, 'isComplementaryAreaVisible', true );
-	}
+		if ( ! isComplementaryAreaVisible ) {
+			registry
+				.dispatch( preferencesStore )
+				.set( scope, 'isComplementaryAreaVisible', true );
+		}
 
-	dispatch( {
-		type: 'ENABLE_COMPLEMENTARY_AREA',
-		scope,
-		area,
-	} );
-};
+		dispatch( {
+			type: 'ENABLE_COMPLEMENTARY_AREA',
+			scope,
+			area,
+		} );
+	};
 
 /**
  * Disable the complementary area.
  *
  * @param {string} scope Complementary area scope.
  */
-export const disableComplementaryArea = ( scope ) => ( { registry } ) => {
-	const isComplementaryAreaVisible = registry
-		.select( preferencesStore )
-		.get( scope, 'isComplementaryAreaVisible' );
+export const disableComplementaryArea =
+	( scope ) =>
+	( { registry } ) => {
+		const isComplementaryAreaVisible = registry
+			.select( preferencesStore )
+			.get( scope, 'isComplementaryAreaVisible' );
 
-	if ( isComplementaryAreaVisible ) {
-		registry
-			.dispatch( preferencesStore )
-			.set( scope, 'isComplementaryAreaVisible', false );
-	}
-};
+		if ( isComplementaryAreaVisible ) {
+			registry
+				.dispatch( preferencesStore )
+				.set( scope, 'isComplementaryAreaVisible', false );
+		}
+	};
 
 /**
  * Pins an item.
@@ -75,26 +76,28 @@ export const disableComplementaryArea = ( scope ) => ( { registry } ) => {
  *
  * @return {Object} Action object.
  */
-export const pinItem = ( scope, item ) => ( { registry } ) => {
-	// Return early if there's no item.
-	if ( ! item ) {
-		return;
-	}
+export const pinItem =
+	( scope, item ) =>
+	( { registry } ) => {
+		// Return early if there's no item.
+		if ( ! item ) {
+			return;
+		}
 
-	const pinnedItems = registry
-		.select( preferencesStore )
-		.get( scope, 'pinnedItems' );
+		const pinnedItems = registry
+			.select( preferencesStore )
+			.get( scope, 'pinnedItems' );
 
-	// The item is already pinned, there's nothing to do.
-	if ( pinnedItems?.[ item ] === true ) {
-		return;
-	}
+		// The item is already pinned, there's nothing to do.
+		if ( pinnedItems?.[ item ] === true ) {
+			return;
+		}
 
-	registry.dispatch( preferencesStore ).set( scope, 'pinnedItems', {
-		...pinnedItems,
-		[ item ]: true,
-	} );
-};
+		registry.dispatch( preferencesStore ).set( scope, 'pinnedItems', {
+			...pinnedItems,
+			[ item ]: true,
+		} );
+	};
 
 /**
  * Unpins an item.
@@ -102,21 +105,23 @@ export const pinItem = ( scope, item ) => ( { registry } ) => {
  * @param {string} scope Item scope.
  * @param {string} item  Item identifier.
  */
-export const unpinItem = ( scope, item ) => ( { registry } ) => {
-	// Return early if there's no item.
-	if ( ! item ) {
-		return;
-	}
+export const unpinItem =
+	( scope, item ) =>
+	( { registry } ) => {
+		// Return early if there's no item.
+		if ( ! item ) {
+			return;
+		}
 
-	const pinnedItems = registry
-		.select( preferencesStore )
-		.get( scope, 'pinnedItems' );
+		const pinnedItems = registry
+			.select( preferencesStore )
+			.get( scope, 'pinnedItems' );
 
-	registry.dispatch( preferencesStore ).set( scope, 'pinnedItems', {
-		...pinnedItems,
-		[ item ]: false,
-	} );
-};
+		registry.dispatch( preferencesStore ).set( scope, 'pinnedItems', {
+			...pinnedItems,
+			[ item ]: false,
+		} );
+	};
 
 /**
  * Returns an action object used in signalling that a feature should be toggled.

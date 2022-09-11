@@ -72,8 +72,9 @@ function useInsertionPoint( {
 				_destinationIndex = getBlockIndex( selectedBlockClientId ) + 1;
 			} else {
 				// Insert at the end of the list.
-				_destinationIndex = getBlockOrder( _destinationRootClientId )
-					.length;
+				_destinationIndex = getBlockOrder(
+					_destinationRootClientId
+				).length;
 			}
 
 			return {

@@ -135,8 +135,11 @@ export const getShorthandBorderStyle = (
 		return fallbackBorder;
 	}
 
-	const { color: fallbackColor, style: fallbackStyle, width: fallbackWidth } =
-		fallbackBorder || {};
+	const {
+		color: fallbackColor,
+		style: fallbackStyle,
+		width: fallbackWidth,
+	} = fallbackBorder || {};
 
 	const {
 		color = fallbackColor,

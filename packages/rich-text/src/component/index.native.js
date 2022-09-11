@@ -109,9 +109,8 @@ export class RichText extends Component {
 		this.debounceCreateUndoLevel = debounce( this.onCreateUndoLevel, 1000 );
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change.
 		this.onSelectionChange = this.onSelectionChange.bind( this );
-		this.onSelectionChangeFromAztec = this.onSelectionChangeFromAztec.bind(
-			this
-		);
+		this.onSelectionChangeFromAztec =
+			this.onSelectionChangeFromAztec.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.getHtmlToRender = this.getHtmlToRender.bind( this );
 		this.handleSuggestionFunc = this.handleSuggestionFunc.bind( this );
@@ -125,12 +124,10 @@ export class RichText extends Component {
 		).bind( this );
 		this.suggestionOptions = this.suggestionOptions.bind( this );
 		this.insertString = this.insertString.bind( this );
-		this.manipulateEventCounterToForceNativeToRefresh = this.manipulateEventCounterToForceNativeToRefresh.bind(
-			this
-		);
-		this.shouldDropEventFromAztec = this.shouldDropEventFromAztec.bind(
-			this
-		);
+		this.manipulateEventCounterToForceNativeToRefresh =
+			this.manipulateEventCounterToForceNativeToRefresh.bind( this );
+		this.shouldDropEventFromAztec =
+			this.shouldDropEventFromAztec.bind( this );
 		this.state = {
 			activeFormats: [],
 			selectedFormat: null,
@@ -1050,6 +1047,8 @@ export class RichText extends Component {
 			baseGlobalStyles,
 			selectionStart,
 			selectionEnd,
+			disableSuggestions,
+			containerWidth,
 		} = this.props;
 		const { currentFontSize } = this.state;
 
@@ -1126,11 +1125,16 @@ export class RichText extends Component {
 			maxWidth && this.state.width && maxWidth - this.state.width < 10
 				? maxWidth
 				: this.state.width;
-		const containerStyles = style?.padding &&
-			style?.backgroundColor && {
-				padding: style.padding,
-				backgroundColor: style.backgroundColor,
-			};
+		const containerStyles = [
+			style?.padding &&
+				style?.backgroundColor && {
+					padding: style.padding,
+					backgroundColor: style.backgroundColor,
+				},
+			containerWidth && {
+				width: containerWidth,
+			},
+		];
 
 		const EditableView = ( props ) => {
 			this.customEditableOnKeyDown = props?.onKeyDown;
@@ -1220,6 +1224,7 @@ export class RichText extends Component {
 					minWidth={ minWidth }
 					id={ this.props.id }
 					selectionColor={ this.props.selectionColor }
+					disableAutocorrection={ this.props.disableAutocorrection }
 				/>
 				{ isSelected && (
 					<>
@@ -1230,11 +1235,13 @@ export class RichText extends Component {
 							onChange={ this.onFormatChange }
 							onFocus={ () => {} }
 						/>
-						<BlockFormatControls>
-							<ToolbarButtonWithOptions
-								options={ this.suggestionOptions() }
-							/>
-						</BlockFormatControls>
+						{ ! disableSuggestions && (
+							<BlockFormatControls>
+								<ToolbarButtonWithOptions
+									options={ this.suggestionOptions() }
+								/>
+							</BlockFormatControls>
+						) }
 					</>
 				) }
 			</View>
@@ -1249,10 +1256,17 @@ RichText.defaultProps = {
 };
 
 const withFormatTypes = ( WrappedComponent ) => ( props ) => {
+	const {
+		clientId,
+		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats,
+	} = props;
 	const { formatTypes } = useFormatTypes( {
-		clientId: props.clientId,
-		identifier: props.identifier,
-		withoutInteractiveFormatting: props.withoutInteractiveFormatting,
+		clientId,
+		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats,
 	} );
 
 	return <WrappedComponent { ...props } formatTypes={ formatTypes } />;
@@ -1260,9 +1274,8 @@ const withFormatTypes = ( WrappedComponent ) => ( props ) => {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockParents, getBlock, getSettings } = select(
-			'core/block-editor'
-		);
+		const { getBlockParents, getBlock, getSettings } =
+			select( 'core/block-editor' );
 		const parents = getBlockParents( clientId, true );
 		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;
 		const parentBlockStyles = get( parentBlock, [

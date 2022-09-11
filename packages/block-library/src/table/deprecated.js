@@ -198,7 +198,8 @@ const deprecated = [
 										cellIndex
 									) => {
 										const cellClasses = classnames( {
-											[ `has-text-align-${ align }` ]: align,
+											[ `has-text-align-${ align }` ]:
+												align,
 										} );
 
 										return (
@@ -367,13 +368,8 @@ const deprecated = [
 		},
 		supports,
 		save( { attributes } ) {
-			const {
-				hasFixedLayout,
-				head,
-				body,
-				foot,
-				backgroundColor,
-			} = attributes;
+			const { hasFixedLayout, head, body, foot, backgroundColor } =
+				attributes;
 			const isEmpty = ! head.length && ! body.length && ! foot.length;
 
 			if ( isEmpty ) {

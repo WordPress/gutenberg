@@ -26,6 +26,7 @@ const {
 	hasCssnanoConfig,
 	hasPostCSSConfig,
 	getWebpackEntryPoints,
+	getRenderPropPaths,
 } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -36,9 +37,8 @@ if ( ! browserslist.findConfig( '.' ) ) {
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 
-const copyWebpackPatterns = process.env.WP_COPY_PHP_FILES_TO_DIST
-	? '**/{block.json,*.php}'
-	: '**/block.json';
+// Get paths of the `render` props included in `block.json` files
+const renderPaths = getRenderPropPaths();
 
 const cssLoaders = [
 	{
@@ -203,7 +203,7 @@ const config = {
 				type: 'asset/inline',
 			},
 			{
-				test: /\.(bmp|png|jpe?g|gif)$/i,
+				test: /\.(bmp|png|jpe?g|gif|webp)$/i,
 				type: 'asset/resource',
 				generator: {
 					filename: 'images/[name].[hash:8][ext]',
@@ -232,9 +232,49 @@ const config = {
 		new CopyWebpackPlugin( {
 			patterns: [
 				{
-					from: copyWebpackPatterns,
+					from: '**/block.json',
 					context: process.env.WP_SRC_DIRECTORY,
 					noErrorOnMissing: true,
+					transform( content, absoluteFrom ) {
+						const convertExtension = ( path ) => {
+							return path.replace( /\.(j|t)sx?$/, '.js' );
+						};
+
+						if ( basename( absoluteFrom ) === 'block.json' ) {
+							const blockJson = JSON.parse( content.toString() );
+							[ 'viewScript', 'script', 'editorScript' ].forEach(
+								( key ) => {
+									if ( Array.isArray( blockJson[ key ] ) ) {
+										blockJson[ key ] =
+											blockJson[ key ].map(
+												convertExtension
+											);
+									} else if (
+										typeof blockJson[ key ] === 'string'
+									) {
+										blockJson[ key ] = convertExtension(
+											blockJson[ key ]
+										);
+									}
+								}
+							);
+
+							return JSON.stringify( blockJson, null, 2 );
+						}
+
+						return content;
+					},
+				},
+				{
+					from: '**/*.php',
+					context: process.env.WP_SRC_DIRECTORY,
+					noErrorOnMissing: true,
+					filter: ( filepath ) => {
+						return (
+							process.env.WP_COPY_PHP_FILES_TO_DIST ||
+							renderPaths.includes( filepath )
+						);
+					},
 				},
 			],
 		} ),

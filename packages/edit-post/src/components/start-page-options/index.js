@@ -3,7 +3,7 @@
  */
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	__experimentalBlockPatternsList as BlockPatternsList,
@@ -17,17 +17,42 @@ import { store as editorStore } from '@wordpress/editor';
  */
 import { store as editPostStore } from '../../store';
 
+function useStartPatterns() {
+	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
+	// and it has no postTypes declares and the current post type is page or if
+	// the current post type is part of the postTypes declared.
+	const { blockPatternsWithPostContentBlockType, postType } = useSelect(
+		( select ) => {
+			const { __experimentalGetPatternsByBlockTypes } =
+				select( blockEditorStore );
+			const { getCurrentPostType } = select( editorStore );
+			return {
+				// get pa
+				blockPatternsWithPostContentBlockType:
+					__experimentalGetPatternsByBlockTypes(
+						'core/post-content'
+					),
+				postType: getCurrentPostType(),
+			};
+		},
+		[]
+	);
+
+	return useMemo( () => {
+		// filter patterns without postTypes declared if the current postType is page
+		// or patterns that declare the current postType in its post type array.
+		return blockPatternsWithPostContentBlockType.filter( ( pattern ) => {
+			return (
+				( postType === 'page' && ! pattern.postTypes ) ||
+				( Array.isArray( pattern.postTypes ) &&
+					pattern.postTypes.includes( postType ) )
+			);
+		} );
+	}, [ postType, blockPatternsWithPostContentBlockType ] );
+}
+
 function PatternSelection( { onChoosePattern } ) {
-	const { blockPatterns } = useSelect( ( select ) => {
-		const { __experimentalGetPatternsByBlockTypes } = select(
-			blockEditorStore
-		);
-		return {
-			blockPatterns: __experimentalGetPatternsByBlockTypes(
-				'core/post-content'
-			),
-		};
-	}, [] );
+	const blockPatterns = useStartPatterns();
 	const shownBlockPatterns = useAsyncList( blockPatterns );
 	const { resetEditorBlocks } = useDispatch( editorStore );
 	return (
@@ -52,33 +77,28 @@ export default function StartPageOptions() {
 	const [ modalState, setModalState ] = useState(
 		START_PAGE_MODAL_STATES.INITIAL
 	);
+	const blockPatterns = useStartPatterns();
+	const hasStartPattern = blockPatterns.length > 0;
 	const shouldOpenModel = useSelect(
 		( select ) => {
-			if ( modalState !== START_PAGE_MODAL_STATES.INITIAL ) {
+			if (
+				! hasStartPattern ||
+				modalState !== START_PAGE_MODAL_STATES.INITIAL
+			) {
 				return false;
 			}
-			const { __experimentalGetPatternsByBlockTypes } = select(
-				blockEditorStore
-			);
-			const {
-				getCurrentPostType,
-				getEditedPostContent,
-				isEditedPostSaveable,
-			} = select( editorStore );
-			const { isEditingTemplate, isFeatureActive } = select(
-				editPostStore
-			);
+			const { getEditedPostContent, isEditedPostSaveable } =
+				select( editorStore );
+			const { isEditingTemplate, isFeatureActive } =
+				select( editPostStore );
 			return (
-				getCurrentPostType() === 'page' &&
 				! isEditedPostSaveable() &&
 				'' === getEditedPostContent() &&
 				! isEditingTemplate() &&
-				! isFeatureActive( 'welcomeGuide' ) &&
-				__experimentalGetPatternsByBlockTypes( 'core/post-content' )
-					.length >= 1
+				! isFeatureActive( 'welcomeGuide' )
 			);
 		},
-		[ modalState ]
+		[ modalState, hasStartPattern ]
 	);
 
 	useEffect( () => {

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { includes, some, flatten, values } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,8 +23,10 @@ const EMPTY_OBJECT = {};
  *
  * @return {string} Editing mode.
  */
-export const getEditorMode = createRegistrySelector( ( select ) => () =>
-	select( preferencesStore ).get( 'core/edit-post', 'editorMode' ) ?? 'visual'
+export const getEditorMode = createRegistrySelector(
+	( select ) => () =>
+		select( preferencesStore ).get( 'core/edit-post', 'editorMode' ) ??
+		'visual'
 );
 
 /**
@@ -37,11 +38,11 @@ export const getEditorMode = createRegistrySelector( ( select ) => () =>
  */
 export const isEditorSidebarOpened = createRegistrySelector(
 	( select ) => () => {
-		const activeGeneralSidebar = select(
-			interfaceStore
-		).getActiveComplementaryArea( 'core/edit-post' );
-		return includes(
-			[ 'edit-post/document', 'edit-post/block' ],
+		const activeGeneralSidebar =
+			select( interfaceStore ).getActiveComplementaryArea(
+				'core/edit-post'
+			);
+		return [ 'edit-post/document', 'edit-post/block' ].includes(
 			activeGeneralSidebar
 		);
 	}
@@ -56,13 +57,13 @@ export const isEditorSidebarOpened = createRegistrySelector(
  */
 export const isPluginSidebarOpened = createRegistrySelector(
 	( select ) => () => {
-		const activeGeneralSidebar = select(
-			interfaceStore
-		).getActiveComplementaryArea( 'core/edit-post' );
+		const activeGeneralSidebar =
+			select( interfaceStore ).getActiveComplementaryArea(
+				'core/edit-post'
+			);
 		return (
 			!! activeGeneralSidebar &&
-			! includes(
-				[ 'edit-post/document', 'edit-post/block' ],
+			! [ 'edit-post/document', 'edit-post/block' ].includes(
 				activeGeneralSidebar
 			)
 		);
@@ -250,7 +251,7 @@ export function isPublishSidebarOpened( state ) {
  * @return {boolean} Whether or not the panel is removed.
  */
 export function isEditorPanelRemoved( state, panelName ) {
-	return includes( state.removedPanels, panelName );
+	return state.removedPanels.includes( panelName );
 }
 
 /**
@@ -365,7 +366,7 @@ export const getActiveMetaBoxLocations = createSelector(
 export function isMetaBoxLocationVisible( state, location ) {
 	return (
 		isMetaBoxLocationActive( state, location ) &&
-		some( getMetaBoxesPerLocation( state, location ), ( { id } ) => {
+		getMetaBoxesPerLocation( state, location )?.some( ( { id } ) => {
 			return isEditorPanelEnabled( state, `meta-box-${ id }` );
 		} )
 	);
@@ -406,7 +407,7 @@ export function getMetaBoxesPerLocation( state, location ) {
  */
 export const getAllMetaBoxes = createSelector(
 	( state ) => {
-		return flatten( values( state.metaBoxes.locations ) );
+		return Object.values( state.metaBoxes.locations ).flat();
 	},
 	( state ) => [ state.metaBoxes.locations ]
 );
@@ -463,11 +464,8 @@ export function isInserterOpened( state ) {
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
 export function __experimentalGetInsertionPoint( state ) {
-	const {
-		rootClientId,
-		insertionIndex,
-		filterValue,
-	} = state.blockInserterPanel;
+	const { rootClientId, insertionIndex, filterValue } =
+		state.blockInserterPanel;
 	return { rootClientId, insertionIndex, filterValue };
 }
 
@@ -511,9 +509,8 @@ export function areMetaBoxesInitialized( state ) {
  */
 export const getEditedPostTemplate = createRegistrySelector(
 	( select ) => () => {
-		const currentTemplate = select( editorStore ).getEditedPostAttribute(
-			'template'
-		);
+		const currentTemplate =
+			select( editorStore ).getEditedPostAttribute( 'template' );
 		if ( currentTemplate ) {
 			const templateWithSameSlug = select( coreStore )
 				.getEntityRecords( 'postType', 'wp_template', { per_page: -1 } )

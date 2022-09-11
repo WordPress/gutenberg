@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -17,6 +16,7 @@ import warning from '@wordpress/warning';
  */
 import { Button } from '../';
 
+const noop = () => {};
 const NOTICE_TIMEOUT = 10000;
 
 /** @typedef {import('@wordpress/element').WPElement} WPElement */

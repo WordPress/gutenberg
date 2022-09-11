@@ -28,13 +28,12 @@ import { store as blockEditorStore } from '../../../store';
 const usePatternsState = ( onInsert, rootClientId ) => {
 	const { patternCategories, patterns } = useSelect(
 		( select ) => {
-			const { __experimentalGetAllowedPatterns, getSettings } = select(
-				blockEditorStore
-			);
+			const { __experimentalGetAllowedPatterns, getSettings } =
+				select( blockEditorStore );
 			return {
 				patterns: __experimentalGetAllowedPatterns( rootClientId ),
-				patternCategories: getSettings()
-					.__experimentalBlockPatternCategories,
+				patternCategories:
+					getSettings().__experimentalBlockPatternCategories,
 			};
 		},
 		[ rootClientId ]

@@ -213,6 +213,19 @@ _Returns_
 
 -   `RichTextFormat|undefined`: Active format object of the specified type, or undefined.
 
+### getActiveFormats
+
+Gets the all format objects at the start of the selection.
+
+_Parameters_
+
+-   _value_ `RichTextValue`: Value to inspect.
+-   _EMPTY_ACTIVE_FORMATS_ `Array`: Array to return if there are no active formats.
+
+_Returns_
+
+-   `RichTextFormatList`: Active format objects.
+
 ### getActiveObject
 
 Gets the active object, if there is any.

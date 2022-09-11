@@ -64,9 +64,8 @@ WithEvents.args = {
 	],
 };
 
-export const WithInvalidDates: ComponentStory<
-	typeof DatePicker
-> = Template.bind( {} );
+export const WithInvalidDates: ComponentStory< typeof DatePicker > =
+	Template.bind( {} );
 WithInvalidDates.args = {
 	currentDate: new Date(),
 	isInvalidDate: isWeekend,

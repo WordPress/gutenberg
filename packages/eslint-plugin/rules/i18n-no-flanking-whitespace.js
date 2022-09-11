@@ -62,9 +62,8 @@ module.exports = {
 						continue;
 					}
 
-					const trimmableWhitespace = argumentString.match(
-						/^\s|\s$/
-					);
+					const trimmableWhitespace =
+						argumentString.match( /^\s|\s$/ );
 
 					if ( ! trimmableWhitespace ) {
 						continue;

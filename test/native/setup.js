@@ -18,13 +18,19 @@ global.__reanimatedWorkletInit = jest.fn();
 
 RNNativeModules.UIManager = RNNativeModules.UIManager || {};
 RNNativeModules.UIManager.RCTView = RNNativeModules.UIManager.RCTView || {};
-RNNativeModules.RNGestureHandlerModule = RNNativeModules.RNGestureHandlerModule || {
-	State: { BEGAN: 'BEGAN', FAILED: 'FAILED', ACTIVE: 'ACTIVE', END: 'END' },
-	attachGestureHandler: jest.fn(),
-	createGestureHandler: jest.fn(),
-	dropGestureHandler: jest.fn(),
-	updateGestureHandler: jest.fn(),
-};
+RNNativeModules.RNGestureHandlerModule =
+	RNNativeModules.RNGestureHandlerModule || {
+		State: {
+			BEGAN: 'BEGAN',
+			FAILED: 'FAILED',
+			ACTIVE: 'ACTIVE',
+			END: 'END',
+		},
+		attachGestureHandler: jest.fn(),
+		createGestureHandler: jest.fn(),
+		dropGestureHandler: jest.fn(),
+		updateGestureHandler: jest.fn(),
+	};
 RNNativeModules.PlatformConstants = RNNativeModules.PlatformConstants || {
 	forceTouchAvailable: false,
 };
@@ -32,11 +38,13 @@ RNNativeModules.PlatformConstants = RNNativeModules.PlatformConstants || {
 // Mock component to render with props rather than merely a string name so that
 // we may assert against it. ...args is used avoid warnings about ignoring
 // forwarded refs if React.forwardRef happens to be used.
-const mockComponent = ( element ) => ( ...args ) => {
-	const [ props ] = args;
-	const React = require( 'react' );
-	return React.createElement( element, props, props.children );
-};
+const mockComponent =
+	( element ) =>
+	( ...args ) => {
+		const [ props ] = args;
+		const React = require( 'react' );
+		return React.createElement( element, props, props.children );
+	};
 
 jest.mock( '@wordpress/element', () => {
 	return {
@@ -98,11 +106,14 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		},
 		fetchRequest: jest.fn(),
 		requestPreview: jest.fn(),
+		generateHapticFeedback: jest.fn(),
 	};
 } );
 
-jest.mock( 'react-native-modal', () => ( props ) =>
-	props.isVisible ? mockComponent( 'Modal' )( props ) : null
+jest.mock(
+	'react-native-modal',
+	() => ( props ) =>
+		props.isVisible ? mockComponent( 'Modal' )( props ) : null
 );
 
 jest.mock( 'react-native-hr', () => () => 'Hr' );

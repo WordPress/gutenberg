@@ -1,20 +1,17 @@
 /**
  * External dependencies
  */
-import moment from 'moment';
+import { toDate } from 'date-fns';
 
 /**
- * Create a Moment object from a date string. With no date supplied, default to
- * a Moment object representing now. If a null value is passed, return a null
- * value.
+ * Like date-fn's toDate, but tries to guess the format when a string is
+ * given.
  *
- * @param  [date] Date representing the currently selected
- *                date or null to signify no selection.
- * @return Moment object for selected date or null.
+ * @param  input Value to turn into a date.
  */
-export const getMomentDate = ( date?: Date | string | number | null ) => {
-	if ( null === date ) {
-		return null;
+export function inputToDate( input: Date | string | number ): Date {
+	if ( typeof input === 'string' ) {
+		return new Date( input );
 	}
-	return date ? moment( date ) : moment();
-};
+	return toDate( input );
+}

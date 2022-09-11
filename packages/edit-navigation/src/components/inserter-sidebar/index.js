@@ -24,20 +24,18 @@ const SHOW_PREVIEWS = false;
 function InserterSidebar() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
-	const {
-		navBlockClientId,
-		lastNavBlockItemIndex,
-	} = useNavigationEditorRootBlock();
+	const { navBlockClientId, lastNavBlockItemIndex } =
+		useNavigationEditorRootBlock();
 
 	const { hasInserterItems, selectedBlockClientId } = useSelect(
 		( select ) => {
 			return {
-				hasInserterItems: select( blockEditorStore ).hasInserterItems(
-					navBlockClientId
-				),
-				selectedBlockClientId: select(
-					blockEditorStore
-				).getSelectedBlock()?.clientId,
+				hasInserterItems:
+					select( blockEditorStore ).hasInserterItems(
+						navBlockClientId
+					),
+				selectedBlockClientId:
+					select( blockEditorStore ).getSelectedBlock()?.clientId,
 			};
 		},
 		[ navBlockClientId ]

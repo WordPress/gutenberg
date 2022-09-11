@@ -24,12 +24,15 @@ export function useBorderBoxControlVisualizer(
 
 	// Generate class names.
 	const cx = useCx();
+	const rtlWatchResult = rtl.watch();
 	const classes = useMemo( () => {
 		return cx(
-			styles.BorderBoxControlVisualizer( value, __next36pxDefaultSize ),
+			styles.borderBoxControlVisualizer( value, __next36pxDefaultSize ),
 			className
 		);
-	}, [ className, value, __next36pxDefaultSize, rtl.watch() ] );
+		// rtlWatchResult is needed to refresh styles when the writing direction changes
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ cx, className, value, __next36pxDefaultSize, rtlWatchResult ] );
 
 	return { ...otherProps, className: classes, value };
 }

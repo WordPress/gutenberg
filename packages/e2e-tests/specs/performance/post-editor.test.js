@@ -3,7 +3,6 @@
  */
 import { basename, join } from 'path';
 import { writeFileSync } from 'fs';
-import { sum } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -136,11 +135,8 @@ describe( 'Post Editor Performance', () => {
 		}
 		await page.tracing.stop();
 		traceResults = JSON.parse( readFile( traceFile ) );
-		const [
-			keyDownEvents,
-			keyPressEvents,
-			keyUpEvents,
-		] = getTypingEventDurations( traceResults );
+		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+			getTypingEventDurations( traceResults );
 		if (
 			keyDownEvents.length === keyPressEvents.length &&
 			keyPressEvents.length === keyUpEvents.length
@@ -161,9 +157,9 @@ describe( 'Post Editor Performance', () => {
 		await page.evaluate( () => {
 			const { createBlock } = window.wp.blocks;
 			const { dispatch } = window.wp.data;
-			const blocks = window.lodash
-				.times( 1000 )
-				.map( () => createBlock( 'core/paragraph' ) );
+			const blocks = Array.from( { length: 1000 } ).map( () =>
+				createBlock( 'core/paragraph' )
+			);
 			dispatch( 'core/block-editor' ).resetBlocks( blocks );
 		} );
 		const paragraphs = await page.$$( '.wp-block' );
@@ -226,6 +222,10 @@ describe( 'Post Editor Performance', () => {
 	} );
 
 	it( 'Searching the inserter', async () => {
+		function sum( arr ) {
+			return arr.reduce( ( a, b ) => a + b, 0 );
+		}
+
 		// Measure time to search the inserter and get results.
 		await openGlobalBlockInserter();
 		for ( let j = 0; j < 10; j++ ) {
@@ -240,11 +240,8 @@ describe( 'Post Editor Performance', () => {
 			await page.keyboard.type( 'p' );
 			await page.tracing.stop();
 			traceResults = JSON.parse( readFile( traceFile ) );
-			const [
-				keyDownEvents,
-				keyPressEvents,
-				keyUpEvents,
-			] = getTypingEventDurations( traceResults );
+			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+				getTypingEventDurations( traceResults );
 			if (
 				keyDownEvents.length === keyPressEvents.length &&
 				keyPressEvents.length === keyUpEvents.length
@@ -284,9 +281,8 @@ describe( 'Post Editor Performance', () => {
 			await page.tracing.stop();
 
 			traceResults = JSON.parse( readFile( traceFile ) );
-			const [ mouseOverEvents, mouseOutEvents ] = getHoverEventDurations(
-				traceResults
-			);
+			const [ mouseOverEvents, mouseOutEvents ] =
+				getHoverEventDurations( traceResults );
 			for ( let k = 0; k < mouseOverEvents.length; k++ ) {
 				results.inserterHover.push(
 					mouseOverEvents[ k ] + mouseOutEvents[ k ]

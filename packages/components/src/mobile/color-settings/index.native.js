@@ -68,10 +68,8 @@ const ColorSettingsMemo = memo(
 );
 function ColorSettings( props ) {
 	const route = useRoute();
-	const {
-		onHandleClosingBottomSheet,
-		shouldEnableBottomSheetMaxHeight,
-	} = useContext( BottomSheetContext );
+	const { onHandleClosingBottomSheet, shouldEnableBottomSheetMaxHeight } =
+		useContext( BottomSheetContext );
 
 	return (
 		<ColorSettingsMemo

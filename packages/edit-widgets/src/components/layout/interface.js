@@ -36,11 +36,8 @@ const interfaceLabels = {
 function Interface( { blockEditorSettings } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
-	const {
-		setIsInserterOpened,
-		setIsListViewOpened,
-		closeGeneralSidebar,
-	} = useDispatch( editWidgetsStore );
+	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
+		useDispatch( editWidgetsStore );
 	const {
 		hasBlockBreadCrumbsEnabled,
 		hasSidebarEnabled,

@@ -2,6 +2,12 @@
  * WordPress dependencies
  */
 import { ComplementaryArea } from '@wordpress/interface';
+import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../../store';
 
 /**
  * Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
@@ -69,11 +75,17 @@ import { ComplementaryArea } from '@wordpress/interface';
  * ```
  */
 export default function PluginSidebarEditSite( { className, ...props } ) {
+	const showIconLabels = useSelect(
+		( select ) => select( editSiteStore ).getSettings().showIconLabels,
+		[]
+	);
+
 	return (
 		<ComplementaryArea
 			panelClassName={ className }
 			className="edit-site-sidebar"
 			scope="core/edit-site"
+			showIconLabels={ showIconLabels }
 			{ ...props }
 		/>
 	);

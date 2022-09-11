@@ -11,10 +11,6 @@
 	"attributes": {
 		"textAlign": {
 			"type": "string"
-		},
-		"fontSize": {
-			"type": "string",
-			"default": "small"
 		}
 	},
 	"supports": {
@@ -27,6 +23,10 @@
 				"link": true
 			}
 		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -34,7 +34,11 @@
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
-			"__experimentalLetterSpacing": true
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		},
 		"html": false
 	}

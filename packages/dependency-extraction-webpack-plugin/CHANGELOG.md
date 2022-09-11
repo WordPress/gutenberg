@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 4.0.0 (2022-08-24)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
+## 3.7.0 (2022-07-13)
+
+### New Features
+
+-   Output asset files for shared chunks, too ([#41002](https://github.com/WordPress/gutenberg/pull/41002)).
+
+## 3.5.0 (2022-05-18)
+
 ### Bug Fix
 
 -   Use OpenSSL provider supported in Node 17+ when calling `crypto.createHash` ([#40503](https://github.com/WordPress/gutenberg/pull/40503)).

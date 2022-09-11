@@ -12,6 +12,7 @@ import type { BaseControlProps } from '../base-control/types';
 export interface SelectControlProps
 	extends Pick<
 			InputBaseProps,
+			| '__next36pxDefaultSize'
 			| 'disabled'
 			| 'hideLabelFromVision'
 			| 'label'
@@ -20,7 +21,7 @@ export interface SelectControlProps
 			| 'size'
 			| 'suffix'
 		>,
-		Pick< BaseControlProps, 'help' > {
+		Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > {
 	/**
 	 * If this property is added, multiple values can be selected. The value passed should be an array.
 	 *

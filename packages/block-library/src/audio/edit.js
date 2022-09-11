@@ -13,7 +13,6 @@ import {
 	SelectControl,
 	Spinner,
 	ToggleControl,
-	withNotices,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -24,12 +23,14 @@ import {
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -41,11 +42,9 @@ const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 function AudioEdit( {
 	attributes,
 	className,
-	noticeOperations,
 	setAttributes,
 	onReplace,
 	isSelected,
-	noticeUI,
 	insertBlocksAfter,
 } ) {
 	const { id, autoplay, caption, loop, preload, src } = attributes;
@@ -92,9 +91,9 @@ function AudioEdit( {
 		}
 	}
 
+	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
 	function getAutoplayHelp( checked ) {
@@ -133,7 +132,6 @@ function AudioEdit( {
 					accept="audio/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
-					notices={ noticeUI }
 					onError={ onUploadError }
 				/>
 			</div>
@@ -200,6 +198,9 @@ function AudioEdit( {
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
 						aria-label={ __( 'Audio caption text' ) }
 						placeholder={ __( 'Add caption' ) }
 						value={ caption }
@@ -218,4 +219,5 @@ function AudioEdit( {
 		</>
 	);
 }
-export default withNotices( AudioEdit );
+
+export default AudioEdit;

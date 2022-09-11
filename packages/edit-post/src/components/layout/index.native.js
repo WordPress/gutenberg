@@ -187,13 +187,12 @@ class Layout extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { __unstableIsEditorReady: isEditorReady } = select(
-			editorStore
-		);
+		const { __unstableIsEditorReady: isEditorReady } =
+			select( editorStore );
 		const { getEditorMode } = select( editPostStore );
 		const { getSettings } = select( blockEditorStore );
-		const globalStyles = getSettings()?.__experimentalGlobalStylesBaseStyles
-			?.color;
+		const globalStyles =
+			getSettings()?.__experimentalGlobalStylesBaseStyles?.color;
 
 		return {
 			isReady: isEditorReady(),

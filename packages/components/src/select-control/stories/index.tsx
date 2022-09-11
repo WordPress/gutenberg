@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import SelectControl from '..';
+import SelectControl from '../';
 
 const meta: ComponentMeta< typeof SelectControl > = {
 	title: 'Components/SelectControl',
@@ -34,9 +34,8 @@ export default meta;
 const SelectControlWithState: ComponentStory< typeof SelectControl > = (
 	args
 ) => {
-	const [ selection, setSelection ] = useState<
-		ComponentProps< typeof SelectControl >[ 'value' ]
-	>();
+	const [ selection, setSelection ] =
+		useState< ComponentProps< typeof SelectControl >[ 'value' ] >();
 
 	return (
 		<SelectControl

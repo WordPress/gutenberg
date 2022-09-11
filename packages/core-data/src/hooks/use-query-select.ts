@@ -35,6 +35,9 @@ interface QuerySelectResponse< Data > {
  * Like useSelect, but the selectors return objects containing
  * both the original data AND the resolution info.
  *
+ * @since 6.1.0 Introduced in WordPress core.
+ * @private
+ *
  * @param {Function} mapQuerySelect see useSelect
  * @param {Array}    deps           see useSelect
  *
@@ -71,7 +74,7 @@ interface QuerySelectResponse< Data > {
  *
  * @return {QuerySelectResponse} Queried data.
  */
-export default function __experimentalUseQuerySelect( mapQuerySelect, deps ) {
+export default function useQuerySelect( mapQuerySelect, deps ) {
 	return useSelect( ( select, registry ) => {
 		const resolve = ( store ) => enrichSelectors( select( store ) );
 		return mapQuerySelect( resolve, registry );
@@ -102,34 +105,36 @@ const enrichSelectors = memoize( ( ( selectors ) => {
 			continue;
 		}
 		Object.defineProperty( resolvers, selectorName, {
-			get: () => ( ...args: unknown[] ) => {
-				const { getIsResolving, hasFinishedResolution } = selectors;
-				const isResolving = !! getIsResolving( selectorName, args );
-				const hasResolved =
-					! isResolving &&
-					hasFinishedResolution( selectorName, args );
-				const data = selectors[ selectorName ]( ...args );
+			get:
+				() =>
+				( ...args: unknown[] ) => {
+					const { getIsResolving, hasFinishedResolution } = selectors;
+					const isResolving = !! getIsResolving( selectorName, args );
+					const hasResolved =
+						! isResolving &&
+						hasFinishedResolution( selectorName, args );
+					const data = selectors[ selectorName ]( ...args );
 
-				let status;
-				if ( isResolving ) {
-					status = Status.Resolving;
-				} else if ( hasResolved ) {
-					if ( data ) {
-						status = Status.Success;
+					let status;
+					if ( isResolving ) {
+						status = Status.Resolving;
+					} else if ( hasResolved ) {
+						if ( data ) {
+							status = Status.Success;
+						} else {
+							status = Status.Error;
+						}
 					} else {
-						status = Status.Error;
+						status = Status.Idle;
 					}
-				} else {
-					status = Status.Idle;
-				}
 
-				return {
-					data,
-					status,
-					isResolving,
-					hasResolved,
-				};
-			},
+					return {
+						data,
+						status,
+						isResolving,
+						hasResolved,
+					};
+				},
 		} );
 	}
 	return resolvers;

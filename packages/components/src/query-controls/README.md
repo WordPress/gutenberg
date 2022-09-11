@@ -179,7 +179,7 @@ A function that receives the new author value. If this is not specified, the aut
 
 #### onCategoryChange
 
-A function that receives the new author value. If this is not specified, the category controls are not included.
+A function that receives the new category value. If this is not specified, the category controls are not included.
 
 -   Type: `Function`
 -   Required: No

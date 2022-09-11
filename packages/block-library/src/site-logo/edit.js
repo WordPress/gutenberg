@@ -40,7 +40,6 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { crop, upload } from '@wordpress/icons';
-import { SVG, Path } from '@wordpress/primitives';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -359,7 +358,6 @@ export default function LogoEdit( {
 	isSelected,
 } ) {
 	const { width, shouldSyncIcon } = attributes;
-	const [ logoUrl, setLogoUrl ] = useState();
 	const ref = useRef();
 
 	const {
@@ -370,9 +368,8 @@ export default function LogoEdit( {
 		mediaItemData,
 		isRequestingMediaItem,
 	} = useSelect( ( select ) => {
-		const { canUser, getEntityRecord, getEditedEntityRecord } = select(
-			coreStore
-		);
+		const { canUser, getEntityRecord, getEditedEntityRecord } =
+			select( coreStore );
 		const siteSettings = getEditedEntityRecord( 'root', 'site' );
 		const siteData = getEntityRecord( 'root', '__unstableBase' );
 		const _siteLogo = siteSettings?.site_logo;
@@ -422,13 +419,7 @@ export default function LogoEdit( {
 			site_icon: newValue ?? null,
 		} );
 
-	let alt = null;
-	if ( mediaItemData ) {
-		alt = mediaItemData.alt_text;
-		if ( logoUrl !== mediaItemData.source_url ) {
-			setLogoUrl( mediaItemData.source_url );
-		}
-	}
+	const { alt_text: alt, source_url: logoUrl } = mediaItemData ?? {};
 
 	const onInitialSelectLogo = ( media ) => {
 		// Initialize the syncSiteIcon toggle. If we currently have no Site logo and no
@@ -454,7 +445,6 @@ export default function LogoEdit( {
 		if ( ! media.id && media.url ) {
 			// This is a temporary blob image.
 			setLogo( undefined );
-			setLogoUrl( media.url );
 			return;
 		}
 
@@ -463,7 +453,6 @@ export default function LogoEdit( {
 
 	const onRemoveLogo = () => {
 		setLogo( null );
-		setLogoUrl( undefined );
 		setAttributes( { width: undefined } );
 	};
 
@@ -520,20 +509,8 @@ export default function LogoEdit( {
 			<Placeholder
 				className={ placeholderClassName }
 				preview={ logoImage }
+				withIllustration={ true }
 			>
-				{
-					<SVG
-						className="components-placeholder__illustration"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-						viewBox="0 0 60 60"
-					>
-						<Path
-							vectorEffect="non-scaling-stroke"
-							d="m61 32.622-13.555-9.137-15.888 9.859a5 5 0 0 1-5.386-.073l-9.095-5.989L1 37.5"
-						/>
-					</SVG>
-				}
 				{ content }
 			</Placeholder>
 		);
@@ -556,7 +533,7 @@ export default function LogoEdit( {
 			{ !! logoUrl && logoImage }
 			{ ! logoUrl && ! canUserEdit && (
 				<Placeholder className="site-logo_placeholder">
-					{ isLoading && (
+					{ !! isLoading && (
 						<span className="components-placeholder__preview">
 							<Spinner />
 						</span>

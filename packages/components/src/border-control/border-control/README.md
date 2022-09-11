@@ -113,13 +113,6 @@ _Note: the value may be `undefined` if a user clears all border properties._
 
 - Required: Yes
 
-### `popoverContentClassName`: `string`
-
-A custom CSS class name to be assigned to the `BorderControl`'s dropdown
-popover content.
-
-- Required: No
-
 ### `shouldSanitizeBorder`: `boolean`
 
 If opted into, sanitizing the border means that if no width or color have been

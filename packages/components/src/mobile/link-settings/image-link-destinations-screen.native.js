@@ -59,8 +59,12 @@ function ImageLinkDestinationsScreen( props ) {
 	const navigation = useNavigation();
 	const route = useRoute();
 	const { url = '' } = props;
-	const { inputValue = url, imageUrl, attachmentPageUrl, linkDestination } =
-		route.params || {};
+	const {
+		inputValue = url,
+		imageUrl,
+		attachmentPageUrl,
+		linkDestination,
+	} = route.params || {};
 
 	function goToLinkPicker() {
 		navigation.navigate( blockSettingsScreens.linkPicker, {

@@ -12,6 +12,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import CheckboxControl from '..';
+import { VStack } from '../../v-stack';
 
 const meta: ComponentMeta< typeof CheckboxControl > = {
 	component: CheckboxControl,
@@ -53,9 +54,8 @@ const DefaultTemplate: ComponentStory< typeof CheckboxControl > = ( {
 	);
 };
 
-export const Default: ComponentStory<
-	typeof CheckboxControl
-> = DefaultTemplate.bind( {} );
+export const Default: ComponentStory< typeof CheckboxControl > =
+	DefaultTemplate.bind( {} );
 Default.args = {
 	label: 'Is author',
 	help: 'Is the user an author or not?',
@@ -72,7 +72,7 @@ export const Indeterminate: ComponentStory< typeof CheckboxControl > = ( {
 		Object.values( fruits ).some( Boolean ) && ! isAllChecked;
 
 	return (
-		<>
+		<VStack>
 			<CheckboxControl
 				{ ...args }
 				checked={ isAllChecked }
@@ -86,6 +86,7 @@ export const Indeterminate: ComponentStory< typeof CheckboxControl > = ( {
 				} }
 			/>
 			<CheckboxControl
+				__nextHasNoMarginBottom
 				label="Apple"
 				checked={ fruits.apple }
 				onChange={ ( apple ) =>
@@ -96,6 +97,7 @@ export const Indeterminate: ComponentStory< typeof CheckboxControl > = ( {
 				}
 			/>
 			<CheckboxControl
+				__nextHasNoMarginBottom
 				label="Orange"
 				checked={ fruits.orange }
 				onChange={ ( orange ) =>
@@ -105,9 +107,10 @@ export const Indeterminate: ComponentStory< typeof CheckboxControl > = ( {
 					} ) )
 				}
 			/>
-		</>
+		</VStack>
 	);
 };
 Indeterminate.args = {
 	label: 'Select all',
+	__nextHasNoMarginBottom: true,
 };

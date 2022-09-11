@@ -95,10 +95,8 @@ function NotEmpty( {
 	const [ hasPreview, setHasPreview ] = useState( null );
 
 	const widgetTypeId = id ?? idBase;
-	const {
-		record: widgetType,
-		hasResolved: hasResolvedWidgetType,
-	} = useEntityRecord( 'root', 'widgetType', widgetTypeId );
+	const { record: widgetType, hasResolved: hasResolvedWidgetType } =
+		useEntityRecord( 'root', 'widgetType', widgetTypeId );
 
 	const isNavigationMode = useSelect(
 		( select ) => select( blockEditorStore ).isNavigationMode(),

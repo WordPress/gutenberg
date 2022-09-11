@@ -12,11 +12,8 @@ import { getBlockClientId } from '../../utils/dom';
 
 export default function useClickSelection() {
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const {
-		isSelectionEnabled,
-		getBlockSelectionStart,
-		hasMultiSelection,
-	} = useSelect( blockEditorStore );
+	const { isSelectionEnabled, getBlockSelectionStart, hasMultiSelection } =
+		useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			function onMouseDown( event ) {

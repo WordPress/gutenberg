@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { createBlock } from '../factory';
@@ -20,6 +15,8 @@ import {
 	__experimentalSanitizeBlockAttributes,
 	__experimentalGetBlockAttributesNamesByRole,
 } from '../utils';
+
+const noop = () => {};
 
 describe( 'block helpers', () => {
 	beforeAll( () => {

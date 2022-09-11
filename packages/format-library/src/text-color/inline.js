@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useCallback, useMemo } from '@wordpress/element';
@@ -112,7 +107,7 @@ function setColors( value, name, colorSettings, colors ) {
 function ColorPicker( { name, property, value, onChange } ) {
 	const colors = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return get( getSettings(), [ 'colors' ], [] );
+		return getSettings().colors ?? [];
 	}, [] );
 	const onColorChange = useCallback(
 		( color ) => {

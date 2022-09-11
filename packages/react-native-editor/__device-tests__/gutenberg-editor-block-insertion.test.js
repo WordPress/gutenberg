@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { blockNames } from './pages/editor-page';
-import { isAndroid, swipeDown, clickMiddleOfElement } from './helpers/utils';
+import { isAndroid, clickMiddleOfElement } from './helpers/utils';
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor tests for Block insertion', () => {
@@ -39,9 +39,6 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			testData.blockInsertionHtml.toLowerCase()
 		);
 
-		// wait for the block editor to load and for accessibility ids to update
-		await editorPage.driver.sleep( 3000 );
-
 		// Workaround for now since deleting the first element causes a crash on CI for Android
 		if ( isAndroid() ) {
 			paragraphBlockElement = await editorPage.getTextBlockAtPosition(
@@ -55,8 +52,6 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			await paragraphBlockElement.click();
 			await editorPage.removeBlockAtPosition( blockNames.paragraph, 3 );
 			for ( let i = 3; i > 0; i-- ) {
-				// wait for accessibility ids to update
-				await editorPage.driver.sleep( 1000 );
 				paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 					blockNames.paragraph,
 					i,
@@ -72,8 +67,6 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			}
 		} else {
 			for ( let i = 4; i > 0; i-- ) {
-				// wait for accessibility ids to update
-				await editorPage.driver.sleep( 1000 );
 				paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 					blockNames.paragraph
 				);
@@ -102,11 +95,9 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			await editorPage.dismissKeyboard();
 		}
 
-		await swipeDown( editorPage.driver );
 		const titleElement = await editorPage.getTitleElement( {
 			autoscroll: true,
 		} );
-		await titleElement.click();
 		await titleElement.click();
 
 		await editorPage.addNewBlock( blockNames.paragraph );

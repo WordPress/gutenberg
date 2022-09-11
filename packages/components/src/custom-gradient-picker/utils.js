@@ -44,9 +44,10 @@ export function getGradientAstWithDefault( value ) {
 
 	if ( gradientAST.orientation?.type === 'directional' ) {
 		gradientAST.orientation.type = 'angular';
-		gradientAST.orientation.value = DIRECTIONAL_ORIENTATION_ANGLE_MAP[
-			gradientAST.orientation.value
-		].toString();
+		gradientAST.orientation.value =
+			DIRECTIONAL_ORIENTATION_ANGLE_MAP[
+				gradientAST.orientation.value
+			].toString();
 	}
 
 	if ( gradientAST.colorStops.some( hasUnsupportedLength ) ) {
@@ -75,7 +76,7 @@ export function getGradientAstWithControlPoints(
 			return {
 				length: {
 					type: '%',
-					value: position.toString(),
+					value: position?.toString(),
 				},
 				type: a < 1 ? 'rgba' : 'rgb',
 				value: a < 1 ? [ r, g, b, a ] : [ r, g, b ],

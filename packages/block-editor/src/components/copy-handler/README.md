@@ -8,8 +8,13 @@ Concretely, it handles the display of success messages and takes care of copying
 
 ## Table of contents
 
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
+- [Copy Handler](#copy-handler)
+	- [Table of contents](#table-of-contents)
+	- [Development guidelines](#development-guidelines)
+		- [Usage](#usage)
+		- [Props](#props)
+		- [`children`](#children)
+	- [Related components](#related-components)
 
 ## Development guidelines
 

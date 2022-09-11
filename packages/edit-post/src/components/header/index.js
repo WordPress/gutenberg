@@ -33,16 +33,13 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 	} = useSelect(
 		( select ) => ( {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			isPublishSidebarOpened: select(
-				editPostStore
-			).isPublishSidebarOpened(),
+			isPublishSidebarOpened:
+				select( editPostStore ).isPublishSidebarOpened(),
 			isSaving: select( editPostStore ).isSavingMetaBoxes(),
-			showIconLabels: select( editPostStore ).isFeatureActive(
-				'showIconLabels'
-			),
-			hasReducedUI: select( editPostStore ).isFeatureActive(
-				'reducedUI'
-			),
+			showIconLabels:
+				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
+			hasReducedUI:
+				select( editPostStore ).isFeatureActive( 'reducedUI' ),
 		} ),
 		[]
 	);

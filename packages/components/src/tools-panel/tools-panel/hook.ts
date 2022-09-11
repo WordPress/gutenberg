@@ -165,10 +165,8 @@ export function useToolsPanel(
 	// in order to later determine if the panel display is empty and handle
 	// conditional display of a plus icon to indicate the presence of further
 	// menu items.
-	const [
-		areAllOptionalControlsHidden,
-		setAreAllOptionalControlsHidden,
-	] = useState( false );
+	const [ areAllOptionalControlsHidden, setAreAllOptionalControlsHidden ] =
+		useState( false );
 
 	useEffect( () => {
 		if (
@@ -192,7 +190,12 @@ export function useToolsPanel(
 			areAllOptionalControlsHidden &&
 			styles.ToolsPanelHiddenInnerWrapper;
 
-		return cx( styles.ToolsPanel, wrapperStyle, emptyStyle, className );
+		return cx(
+			styles.ToolsPanel( DEFAULT_COLUMNS ),
+			wrapperStyle,
+			emptyStyle,
+			className
+		);
 	}, [
 		areAllOptionalControlsHidden,
 		className,

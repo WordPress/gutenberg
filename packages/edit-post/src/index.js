@@ -177,6 +177,10 @@ export function initializeEditor(
 		} );
 	}
 
+	// Prevent the default browser action for files dropped outside of dropzones.
+	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
+	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
+
 	render(
 		<Editor
 			settings={ settings }

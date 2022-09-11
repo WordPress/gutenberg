@@ -30,6 +30,16 @@ export default function useInput() {
 	} = useDispatch( blockEditorStore );
 
 	return useRefEffect( ( node ) => {
+		function onBeforeInput( event ) {
+			if ( ! hasMultiSelection() ) {
+				return;
+			}
+			// Prevent the browser to format something when we have multiselection.
+			if ( event.inputType?.startsWith( 'format' ) ) {
+				event.preventDefault();
+			}
+		}
+
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented ) {
 				return;
@@ -102,9 +112,11 @@ export default function useInput() {
 			}
 		}
 
+		node.addEventListener( 'beforeinput', onBeforeInput );
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'compositionstart', onCompositionStart );
 		return () => {
+			node.removeEventListener( 'beforeinput', onBeforeInput );
 			node.removeEventListener( 'keydown', onKeyDown );
 			node.removeEventListener( 'compositionstart', onCompositionStart );
 		};

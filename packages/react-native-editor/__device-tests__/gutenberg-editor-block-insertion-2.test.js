@@ -24,11 +24,9 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 	} );
 
 	it( 'inserts between 2 existing blocks', async () => {
-		const headingBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.heading
-		);
+		const firstBlock = await editorPage.getFirstBlockVisible();
+		await firstBlock.click();
 
-		await headingBlockElement.click();
 		await editorPage.addNewBlock( blockNames.separator );
 
 		const expectedHtml = [
