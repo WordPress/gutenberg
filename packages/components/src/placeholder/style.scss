@@ -173,31 +173,48 @@
 // This is mainly an issue in terms of Site Logo which has a brief flash of the square placeholder.
 .components-placeholder.has-illustration {
 	color: inherit;
-	border-radius: inherit;
 	display: flex;
 	box-shadow: none;
-	background: none;
 	min-width: 100px;
+
+	// Blur the background so layered dashed placeholders are still visually separate.
+	// We also provide a semitransparent background so as to allow duotones to sheen through.
+	backdrop-filter: blur(100px);
+	background-color: rgba($white, 0.1);
+
+	// Invert the colors in themes deemed dark.
+	.is-dark-theme & {
+		background-color: rgba($black, 0.1);
+	}
 
 	.components-placeholder__fieldset {
 		width: auto;
+
+		// Unset intrinsic margins.
+		margin-left: 0;
+		margin-right: 0;
 	}
 
 	// Show placeholder buttons on block selection.
+	// Note that these can't be display: none; or visibility: hidden;, as that breaks the writing flow.
+	.components-placeholder__label,
+	.components-placeholder__instructions,
 	.components-button {
-		visibility: hidden;
 		opacity: 0;
 		transition: opacity 0.1s linear;
 		@include reduce-motion("transition");
 	}
 
-	.is-selected > & .components-button {
-		opacity: 1;
-		visibility: visible;
+	.is-selected > & {
+		.components-placeholder__label,
+		.components-placeholder__instructions,
+		.components-button {
+			opacity: 1;
+		}
 	}
 
 	// By painting the borders here, we enable them to be replaced by the Border control.
-	border: $border-width dashed currentColor;
+	@include placeholder-style();
 	overflow: hidden;
 }
 
@@ -218,6 +235,4 @@
 	height: 100%;
 	stroke: currentColor;
 	stroke-dasharray: 3;
-	border-width: inherit;
-	border-style: inherit;
 }

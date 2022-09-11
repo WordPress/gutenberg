@@ -70,11 +70,11 @@ class WP_Style_Engine_CSS_Rule {
 		$is_declarations_object = ! is_array( $declarations );
 		$declarations_array     = $is_declarations_object ? $declarations->get_declarations() : $declarations;
 
-		if ( null === $this->declarations && $is_declarations_object ) {
-			$this->declarations = $declarations;
-			return $this;
-		}
 		if ( null === $this->declarations ) {
+			if ( $is_declarations_object ) {
+				$this->declarations = $declarations;
+				return $this;
+			}
 			$this->declarations = new WP_Style_Engine_CSS_Declarations( $declarations_array );
 		}
 		$this->declarations->add_declarations( $declarations_array );

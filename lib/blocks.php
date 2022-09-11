@@ -191,21 +191,22 @@ function gutenberg_register_core_block_assets( $block_name ) {
 	// else (for development or test) default to use the current time.
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
 
-	$style_path        = "build/block-library/blocks/$block_name/style.css";
-	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
+	$style_path      = "build/block-library/blocks/$block_name/";
+	$stylesheet_url  = gutenberg_url( $style_path . 'style.css' );
+	$stylesheet_path = gutenberg_dir_path() . $style_path . ( is_rtl() ? 'style-rtl.css' : 'style.css' );
 
-	if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+	if ( file_exists( $stylesheet_path ) ) {
 		wp_deregister_style( "wp-block-{$block_name}" );
 		wp_register_style(
 			"wp-block-{$block_name}",
-			gutenberg_url( $style_path ),
+			$stylesheet_url,
 			array(),
 			$default_version
 		);
 		wp_style_add_data( "wp-block-{$block_name}", 'rtl', 'replace' );
 
 		// Add a reference to the stylesheet's path to allow calculations for inlining styles in `wp_head`.
-		wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $style_path );
+		wp_style_add_data( "wp-block-{$block_name}", 'path', $stylesheet_path );
 	} else {
 		wp_register_style( "wp-block-{$block_name}", false, array() );
 	}
@@ -235,7 +236,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		// If the file exists, enqueue it.
 		if ( file_exists( gutenberg_dir_path() . $theme_style_path ) ) {
 
-			if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+			if ( file_exists( $stylesheet_path ) ) {
 				// If there is a main stylesheet for this block, append the theme styles to main styles.
 				wp_add_inline_style(
 					"wp-block-{$block_name}",
@@ -254,6 +255,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		}
 	}
 
+	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
 		wp_deregister_style( "wp-block-{$block_name}-editor" );
 		wp_register_style(

@@ -3,7 +3,7 @@
  */
 import {
 	store as coreStore,
-	__experimentalUseResourcePermissions as useResourcePermissions,
+	useResourcePermissions,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
@@ -12,10 +12,13 @@ export default function useNavigationMenu( ref ) {
 
 	return useSelect(
 		( select ) => {
-			const [
-				hasResolvedPermissions,
-				{ canCreate, canUpdate, canDelete, isResolving },
-			] = permissions;
+			const {
+				canCreate,
+				canUpdate,
+				canDelete,
+				isResolving,
+				hasResolved,
+			} = permissions;
 
 			const {
 				navigationMenus,
@@ -44,16 +47,16 @@ export default function useNavigationMenu( ref ) {
 
 				canUserCreateNavigationMenu: canCreate,
 				isResolvingCanUserCreateNavigationMenu: isResolving,
-				hasResolvedCanUserCreateNavigationMenu: hasResolvedPermissions,
+				hasResolvedCanUserCreateNavigationMenu: hasResolved,
 
 				canUserUpdateNavigationMenu: canUpdate,
 				hasResolvedCanUserUpdateNavigationMenu: ref
-					? hasResolvedPermissions
+					? hasResolved
 					: undefined,
 
 				canUserDeleteNavigationMenu: canDelete,
 				hasResolvedCanUserDeleteNavigationMenu: ref
-					? hasResolvedPermissions
+					? hasResolved
 					: undefined,
 			};
 		},
@@ -68,7 +71,7 @@ function selectNavigationMenus( select ) {
 	const args = [
 		'postType',
 		'wp_navigation',
-		{ per_page: -1, status: 'publish' },
+		{ per_page: -1, status: [ 'publish', 'draft' ] },
 	];
 	return {
 		navigationMenus: getEntityRecords( ...args ),
@@ -100,18 +103,23 @@ function selectExistingMenu( select, ref ) {
 	);
 
 	// Only published Navigation posts are considered valid.
-	// If this is changed then a corresponding change must also be made
-	// in the index.php file.
-	const isNavigationMenuPublished = editedNavigationMenu.status === 'publish';
+	// Draft Navigation posts are valid only on the editor,
+	// requiring a post update to publish to show in frontend.
+	// To achieve that, index.php must reflect this validation only for published.
+	const isNavigationMenuPublishedOrDraft =
+		editedNavigationMenu.status === 'publish' ||
+		editedNavigationMenu.status === 'draft';
 
 	return {
 		isNavigationMenuResolved: hasResolvedNavigationMenu,
 		isNavigationMenuMissing:
 			hasResolvedNavigationMenu &&
-			( ! navigationMenu || ! isNavigationMenuPublished ),
+			( ! navigationMenu || ! isNavigationMenuPublishedOrDraft ),
 
 		// getEditedEntityRecord will return the post regardless of status.
 		// Therefore if the found post is not published then we should ignore it.
-		navigationMenu: isNavigationMenuPublished ? editedNavigationMenu : null,
+		navigationMenu: isNavigationMenuPublishedOrDraft
+			? editedNavigationMenu
+			: null,
 	};
 }

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentProps } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -64,12 +69,14 @@ const BorderBoxControl = (
 	} = useBorderBoxControl( props );
 	const containerRef = useRef();
 	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
-	const popoverProps = popoverPlacement
+	const popoverProps: ComponentProps<
+		typeof BorderControl
+	>[ '__unstablePopoverProps' ] = popoverPlacement
 		? {
 				placement: popoverPlacement,
 				offset: popoverOffset,
 				anchorRef: containerRef,
-				__unstableShift: true,
+				shift: true,
 		  }
 		: undefined;
 

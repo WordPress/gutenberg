@@ -30,6 +30,7 @@ import {
 	LABELS,
 	getSliderValueFromPreset,
 	getCustomValueFromPreset,
+	getPresetValueFromCustomValue,
 	isValueSpacingPreset,
 } from './utils';
 
@@ -42,6 +43,9 @@ export default function SpacingInputControl( {
 	type,
 	minimumCustomValue,
 } ) {
+	// Treat value as a preset value if the passed in value matches the value of one of the spacingSizes.
+	value = getPresetValueFromCustomValue( value, spacingSizes );
+
 	let selectListSizes = spacingSizes;
 	const showRangeControl = spacingSizes.length <= 8;
 
@@ -216,6 +220,7 @@ export default function SpacingInputControl( {
 						label={ ariaLabel }
 						hideLabelFromVision={ true }
 						className="components-spacing-sizes-control__custom-value-input"
+						style={ { gridColumn: '1' } }
 					/>
 
 					<RangeControl

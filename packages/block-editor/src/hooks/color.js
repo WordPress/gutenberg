@@ -450,13 +450,23 @@ export function ColorEdit( props ) {
 		};
 	};
 
-	const enableContrastChecking =
-		Platform.OS === 'web' && ! gradient && ! style?.color?.gradient;
-
 	const defaultColorControls = getBlockSupport( props.name, [
 		COLOR_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
+
+	const enableContrastChecking =
+		Platform.OS === 'web' &&
+		! gradient &&
+		! style?.color?.gradient &&
+		// Contrast checking is enabled by default.
+		// Deactivating it requires `enableContrastChecker` to have
+		// an explicit value of `false`.
+		false !==
+			getBlockSupport( props.name, [
+				COLOR_SUPPORT_KEY,
+				'enableContrastChecker',
+			] );
 
 	return (
 		<ColorPanel

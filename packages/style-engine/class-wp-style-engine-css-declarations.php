@@ -43,7 +43,7 @@ class WP_Style_Engine_CSS_Declarations {
 	 * @param string $property The CSS property.
 	 * @param string $value    The CSS value.
 	 *
-	 * @return void
+	 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
 	 */
 	public function add_declaration( $property, $value ) {
 
@@ -51,17 +51,19 @@ class WP_Style_Engine_CSS_Declarations {
 		$property = $this->sanitize_property( $property );
 		// Bail early if the property is empty.
 		if ( empty( $property ) ) {
-			return;
+			return $this;
 		}
 
 		// Trim the value. If empty, bail early.
 		$value = trim( $value );
 		if ( '' === $value ) {
-			return;
+			return $this;
 		}
 
 		// Add the declaration property/value pair.
 		$this->declarations[ $property ] = $value;
+
+		return $this;
 	}
 
 	/**
@@ -69,10 +71,11 @@ class WP_Style_Engine_CSS_Declarations {
 	 *
 	 * @param string $property The CSS property.
 	 *
-	 * @return void
+	 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
 	 */
 	public function remove_declaration( $property ) {
 		unset( $this->declarations[ $property ] );
+		return $this;
 	}
 
 	/**
@@ -80,12 +83,13 @@ class WP_Style_Engine_CSS_Declarations {
 	 *
 	 * @param array $declarations An array of declarations.
 	 *
-	 * @return void
+	 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
 	 */
 	public function add_declarations( $declarations ) {
 		foreach ( $declarations as $property => $value ) {
 			$this->add_declaration( $property, $value );
 		}
+		return $this;
 	}
 
 	/**
@@ -93,12 +97,13 @@ class WP_Style_Engine_CSS_Declarations {
 	 *
 	 * @param array $properties An array of properties.
 	 *
-	 * @return void
+	 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
 	 */
 	public function remove_declarations( $properties = array() ) {
 		foreach ( $properties as $property ) {
 			$this->remove_declaration( $property );
 		}
+		return $this;
 	}
 
 	/**

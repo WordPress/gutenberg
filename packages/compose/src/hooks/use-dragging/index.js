@@ -8,11 +8,13 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
  */
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 
+// Event handlers that are triggered from `document` listeners accept a MouseEvent,
+// while those triggered from React listeners accept a React.MouseEvent.
 /**
- * @param {Object}                  props
- * @param {(e: MouseEvent) => void} props.onDragStart
- * @param {(e: MouseEvent) => void} props.onDragMove
- * @param {(e: MouseEvent) => void} props.onDragEnd
+ * @param {Object}                                  props
+ * @param {(e: import('react').MouseEvent) => void} props.onDragStart
+ * @param {(e: MouseEvent) => void}                 props.onDragMove
+ * @param {(e?: MouseEvent) => void}                props.onDragEnd
  */
 export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
@@ -28,13 +30,15 @@ export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 		eventsRef.current.onDragEnd = onDragEnd;
 	}, [ onDragStart, onDragMove, onDragEnd ] );
 
+	/** @type {(e: MouseEvent) => void} */
 	const onMouseMove = useCallback(
-		( /** @type {MouseEvent} */ event ) =>
+		( event ) =>
 			eventsRef.current.onDragMove &&
 			eventsRef.current.onDragMove( event ),
 		[]
 	);
-	const endDrag = useCallback( ( /** @type {MouseEvent} */ event ) => {
+	/** @type {(e?: MouseEvent) => void} */
+	const endDrag = useCallback( ( event ) => {
 		if ( eventsRef.current.onDragEnd ) {
 			eventsRef.current.onDragEnd( event );
 		}
@@ -42,7 +46,8 @@ export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 		document.removeEventListener( 'mouseup', endDrag );
 		setIsDragging( false );
 	}, [] );
-	const startDrag = useCallback( ( /** @type {MouseEvent} */ event ) => {
+	/** @type {(e: import('react').MouseEvent) => void} */
+	const startDrag = useCallback( ( event ) => {
 		if ( eventsRef.current.onDragStart ) {
 			eventsRef.current.onDragStart( event );
 		}

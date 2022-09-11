@@ -6,6 +6,7 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { __, sprintf } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 import { useState, useMemo, forwardRef } from '@wordpress/element';
@@ -32,6 +33,7 @@ import {
 	CUSTOM_FONT_SIZE,
 } from './utils';
 import { VStack } from '../v-stack';
+import { HStack } from '../h-stack';
 
 // This conditional is needed to maintain the spacing before the slider in the `withSlider` case.
 const MaybeVStack = ( { __nextHasNoMarginBottom, children } ) =>
@@ -57,6 +59,14 @@ function FontSizePicker(
 	},
 	ref
 ) {
+	if ( ! __nextHasNoMarginBottom ) {
+		deprecated( 'Bottom margin styles for wp.components.FontSizePicker', {
+			since: '6.1',
+			version: '6.4',
+			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
+		} );
+	}
+
 	const hasUnits = [ typeof value, typeof fontSizes?.[ 0 ]?.size ].includes(
 		'string'
 	);
@@ -140,42 +150,33 @@ function FontSizePicker(
 	return (
 		<fieldset className={ baseClassName } { ...( ref ? {} : { ref } ) }>
 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
-			<Flex
-				justify="space-between"
-				className={ `${ baseClassName }__header` }
-			>
-				<FlexItem>
-					<BaseControl.VisualLabel>
-						{ __( 'Size' ) }
-						{ headerHint && (
-							<span
-								className={ `${ baseClassName }__header__hint` }
-							>
-								{ headerHint }
-							</span>
-						) }
-					</BaseControl.VisualLabel>
-				</FlexItem>
+			<HStack className={ `${ baseClassName }__header` }>
+				<BaseControl.VisualLabel>
+					{ __( 'Size' ) }
+					{ headerHint && (
+						<span className={ `${ baseClassName }__header__hint` }>
+							{ headerHint }
+						</span>
+					) }
+				</BaseControl.VisualLabel>
 				{ ! disableCustomFontSizes && (
-					<FlexItem>
-						<Button
-							label={
-								showCustomValueControl
-									? __( 'Use size preset' )
-									: __( 'Set custom size' )
-							}
-							icon={ settings }
-							onClick={ () => {
-								setShowCustomValueControl(
-									! showCustomValueControl
-								);
-							} }
-							isPressed={ showCustomValueControl }
-							isSmall
-						/>
-					</FlexItem>
+					<Button
+						label={
+							showCustomValueControl
+								? __( 'Use size preset' )
+								: __( 'Set custom size' )
+						}
+						icon={ settings }
+						onClick={ () => {
+							setShowCustomValueControl(
+								! showCustomValueControl
+							);
+						} }
+						isPressed={ showCustomValueControl }
+						isSmall
+					/>
 				) }
-			</Flex>
+			</HStack>
 			<MaybeVStack __nextHasNoMarginBottom={ __nextHasNoMarginBottom }>
 				<div
 					className={ classNames( `${ baseClassName }__controls`, {

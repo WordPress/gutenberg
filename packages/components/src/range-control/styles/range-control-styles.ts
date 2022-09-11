@@ -48,7 +48,6 @@ const wrapperMargin = ( { marks, __nextHasNoMarginBottom }: WrapperProps ) => {
 };
 
 export const Wrapper = styled.div< WrapperProps >`
-	color: ${ COLORS.blue.medium.focus };
 	display: block;
 	flex: 1;
 	position: relative;
@@ -153,7 +152,7 @@ export const Mark = styled.span`
 
 const markLabelFill = ( { isFilled }: RangeMarkProps ) => {
 	return css( {
-		color: isFilled ? COLORS.darkGray[ 300 ] : COLORS.lightGray[ 600 ],
+		color: isFilled ? COLORS.gray[ 700 ] : COLORS.lightGray[ 600 ],
 	} );
 };
 

@@ -27,7 +27,7 @@ function InserterPreviewPanel( { item } ) {
 							viewportWidth={ example?.viewportWidth ?? 500 }
 							blocks={
 								example
-									? getBlockFromExample( item.name, {
+									? getBlockFromExample( name, {
 											attributes: {
 												...example.attributes,
 												...initialAttributes,

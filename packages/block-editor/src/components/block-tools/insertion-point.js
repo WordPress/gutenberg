@@ -200,6 +200,7 @@ function InsertionPointPopover( {
 				<motion.div
 					variants={ lineVariants }
 					className="block-editor-block-list__insertion-point-indicator"
+					data-testid="block-list-insertion-point-indicator"
 				/>
 				{ isInserterShown && (
 					<motion.div
@@ -227,15 +228,10 @@ function InsertionPointPopover( {
 	);
 }
 
-export default function InsertionPoint( { children, ...props } ) {
+export default function InsertionPoint( props ) {
 	const isVisible = useSelect( ( select ) => {
 		return select( blockEditorStore ).isBlockInsertionPointVisible();
 	}, [] );
 
-	return (
-		<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-			{ isVisible && <InsertionPointPopover { ...props } /> }
-			{ children }
-		</InsertionPointOpenRef.Provider>
-	);
+	return isVisible && <InsertionPointPopover { ...props } />;
 }

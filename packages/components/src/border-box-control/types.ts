@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import type { Border, ColorProps, LabelProps } from '../border-control/types';
+import type { PopoverProps } from '../popover/types';
 
 export type Borders = {
 	top?: Border;
@@ -29,11 +30,11 @@ export type BorderBoxControlProps = ColorProps &
 		/**
 		 * The position of the color popovers compared to the control wrapper.
 		 */
-		popoverPlacement?: string;
+		popoverPlacement?: PopoverProps[ 'placement' ];
 		/**
 		 * The space between the popover and the control wrapper.
 		 */
-		popoverOffset?: number;
+		popoverOffset?: PopoverProps[ 'offset' ];
 		/**
 		 * An object representing the current border configuration.
 		 *
@@ -103,11 +104,11 @@ export type SplitControlsProps = ColorProps & {
 	/**
 	 * The position of the color popovers compared to the control wrapper.
 	 */
-	popoverPlacement?: string;
+	popoverPlacement?: PopoverProps[ 'placement' ];
 	/**
 	 * The space between the popover and the control wrapper.
 	 */
-	popoverOffset?: number;
+	popoverOffset?: PopoverProps[ 'offset' ];
 	/**
 	 * An object representing the current border configuration. It contains
 	 * properties for each side, with each side an object reflecting the border
