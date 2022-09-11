@@ -34,6 +34,10 @@ $blocks-block__margin: 0.5em;
 	padding: calc(0.667em + 2px) calc(1.333em + 2px);
 }
 
+.wp-block-button[style*="text-decoration"] .wp-block-button__link {
+	text-decoration: inherit;
+}
+
 // Increased specificity needed to override margins.
 .wp-block-buttons > .wp-block-button {
 	&.has-custom-width {

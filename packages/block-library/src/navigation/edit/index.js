@@ -484,32 +484,36 @@ function Navigation( {
 			{ hasSubmenuIndicatorSetting && (
 				<PanelBody title={ __( 'Display' ) }>
 					{ isResponsive && (
-						<Button
-							className={ overlayMenuPreviewClasses }
-							onClick={ () => {
-								setOverlayMenuPreview( ! overlayMenuPreview );
-							} }
-						>
-							{ hasIcon && (
-								<>
-									<OverlayMenuIcon icon={ icon } />
-									<Icon icon={ close } />
-								</>
+						<>
+							<Button
+								className={ overlayMenuPreviewClasses }
+								onClick={ () => {
+									setOverlayMenuPreview(
+										! overlayMenuPreview
+									);
+								} }
+							>
+								{ hasIcon && (
+									<>
+										<OverlayMenuIcon icon={ icon } />
+										<Icon icon={ close } />
+									</>
+								) }
+								{ ! hasIcon && (
+									<>
+										<span>{ __( 'Menu' ) }</span>
+										<span>{ __( 'Close' ) }</span>
+									</>
+								) }
+							</Button>
+							{ overlayMenuPreview && (
+								<OverlayMenuPreview
+									setAttributes={ setAttributes }
+									hasIcon={ hasIcon }
+									icon={ icon }
+								/>
 							) }
-							{ ! hasIcon && (
-								<>
-									<span>{ __( 'Menu' ) }</span>
-									<span>{ __( 'Close' ) }</span>
-								</>
-							) }
-						</Button>
-					) }
-					{ overlayMenuPreview && (
-						<OverlayMenuPreview
-							setAttributes={ setAttributes }
-							hasIcon={ hasIcon }
-							icon={ icon }
-						/>
+						</>
 					) }
 					<h3>{ __( 'Overlay Menu' ) }</h3>
 					<ToggleGroupControl

@@ -31,7 +31,7 @@ function useInitialPosition( clientId ) {
 		( select ) => {
 			const {
 				getSelectedBlocksInitialCaretPosition,
-				isNavigationMode,
+				__unstableGetEditorMode,
 				isBlockSelected,
 			} = select( blockEditorStore );
 
@@ -39,7 +39,7 @@ function useInitialPosition( clientId ) {
 				return;
 			}
 
-			if ( isNavigationMode() ) {
+			if ( __unstableGetEditorMode() !== 'edit' ) {
 				return;
 			}
 
