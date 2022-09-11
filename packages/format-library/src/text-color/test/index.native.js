@@ -12,7 +12,7 @@ import {
  * WordPress dependencies
  */
 import { setDefaultBlockName, unregisterBlockType } from '@wordpress/blocks';
-import { registerBlock, coreBlocks } from '@wordpress/block-library';
+import { coreBlocks } from '@wordpress/block-library';
 
 const COLOR_PINK = '#f78da7';
 const paragraph = coreBlocks[ 'core/paragraph' ];
@@ -22,7 +22,7 @@ const TEXT_WITH_COLOR = `<!-- wp:paragraph -->
 <!-- /wp:paragraph -->`;
 
 beforeAll( () => {
-	registerBlock( paragraph );
+	paragraph.init();
 	setDefaultBlockName( paragraph.name );
 } );
 
@@ -55,11 +55,8 @@ describe( 'Text color', () => {
 	} );
 
 	it( 'allows toggling the highlight color feature to type new text', async () => {
-		const {
-			getByA11yLabel,
-			getByTestId,
-			getByA11yHint,
-		} = await initializeEditor();
+		const { getByA11yLabel, getByTestId, getByA11yHint } =
+			await initializeEditor();
 
 		// Wait for the editor placeholder
 		const paragraphPlaceholder = await waitFor( () =>
@@ -167,7 +164,7 @@ describe( 'Text color', () => {
 			initialHtml: `<!-- wp:paragraph -->
 			<p>this <span class="has-inline-color has-green-color">is</span> <span class="has-inline-color has-red-color">test</span></p>
 			<!-- /wp:paragraph -->
-			
+
 			<!-- wp:paragraph -->
 			<p><span style="color:#08a5e9" class="has-inline-color">this is a test</span></p>
 			<!-- /wp:paragraph -->`,

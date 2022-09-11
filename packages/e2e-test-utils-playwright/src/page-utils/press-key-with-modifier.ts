@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { capitalize } from 'lodash';
+import { capitalCase } from 'change-case';
 import type { Page } from '@playwright/test';
 
 /**
@@ -122,10 +122,8 @@ export async function pressKeyWithModifier(
 		shiftAlt: ( _isApple: () => boolean ) =>
 			_isApple() ? [ SHIFT, ALT ] : [ SHIFT, CTRL ],
 	};
-	const mappedModifiers = overWrittenModifiers[ modifier ](
-		isAppleOS
-	).map( ( keycode ) =>
-		keycode === CTRL ? 'Control' : capitalize( keycode )
+	const mappedModifiers = overWrittenModifiers[ modifier ]( isAppleOS ).map(
+		( keycode ) => ( keycode === CTRL ? 'Control' : capitalCase( keycode ) )
 	);
 
 	await this.page.keyboard.press(

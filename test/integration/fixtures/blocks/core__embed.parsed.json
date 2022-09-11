@@ -5,9 +5,9 @@
 			"url": "https://example.com/"
 		},
 		"innerBlocks": [],
-		"innerHTML": "\n<figure class=\"wp-block-embed\">\n    <div class=\"wp-block-embed__wrapper\">\n        https://example.com/\n    </div>\n    <figcaption>Embedded content from an example URL</figcaption>\n</figure>\n",
+		"innerHTML": "\n<figure class=\"wp-block-embed\">\n    <div class=\"wp-block-embed__wrapper\">\n        https://example.com/\n    </div>\n    <figcaption class=\"wp-element-caption\">Embedded content from an example URL</figcaption>\n</figure>\n",
 		"innerContent": [
-			"\n<figure class=\"wp-block-embed\">\n    <div class=\"wp-block-embed__wrapper\">\n        https://example.com/\n    </div>\n    <figcaption>Embedded content from an example URL</figcaption>\n</figure>\n"
+			"\n<figure class=\"wp-block-embed\">\n    <div class=\"wp-block-embed__wrapper\">\n        https://example.com/\n    </div>\n    <figcaption class=\"wp-element-caption\">Embedded content from an example URL</figcaption>\n</figure>\n"
 		]
 	}
 ]

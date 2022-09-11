@@ -30,7 +30,10 @@ export {
 	isEmptyBorder as __experimentalIsEmptyBorder,
 } from './border-box-control';
 export { BorderControl as __experimentalBorderControl } from './border-control';
-export { default as __experimentalBoxControl } from './box-control';
+export {
+	default as __experimentalBoxControl,
+	applyValueToSides as __experimentalApplyValueToSides,
+} from './box-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
 export {
@@ -66,12 +69,12 @@ export { default as Draggable } from './draggable';
 export { default as DropZone } from './drop-zone';
 export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
+export { default as __experimentalDropdownContentWrapper } from './dropdown/dropdown-content-wrapper';
 export { default as DropdownMenu } from './dropdown-menu';
 export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
 export { Elevation as __experimentalElevation } from './elevation';
 export { default as ExternalLink } from './external-link';
 export { Flex, FlexBlock, FlexItem } from './flex';
-export { Flyout as __experimentalFlyout } from './flyout';
 export { default as FocalPointPicker } from './focal-point-picker';
 export { default as FocusableIframe } from './focusable-iframe';
 export { default as FontSizePicker } from './font-size-picker';
@@ -92,6 +95,8 @@ export {
 	Item as __experimentalItem,
 } from './item-group';
 export { default as __experimentalInputControl } from './input-control';
+export { default as __experimentalInputControlPrefixWrapper } from './input-control/input-prefix-wrapper';
+export { default as __experimentalInputControlSuffixWrapper } from './input-control/input-suffix-wrapper';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MenuGroup } from './menu-group';
 export { default as MenuItem } from './menu-item';

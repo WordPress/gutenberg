@@ -174,11 +174,16 @@ const reduxStore = createStore();
 
 const boundSelectors = mapValues(
 	existingSelectors,
-	( selector ) => ( ...args ) => selector( reduxStore.getState(), ...args )
+	( selector ) =>
+		( ...args ) =>
+			selector( reduxStore.getState(), ...args )
 );
 
-const boundActions = mapValues( existingActions, ( action ) => ( ...args ) =>
-	reduxStore.dispatch( action( ...args ) )
+const boundActions = mapValues(
+	existingActions,
+	( action ) =>
+		( ...args ) =>
+			reduxStore.dispatch( action( ...args ) )
 );
 
 const genericStore = {
@@ -273,10 +278,11 @@ _Usage_
 
 ```js
 import { useSelect, AsyncModeProvider } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function BlockCount() {
 	const count = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getBlockCount();
+		return select( blockEditorStore ).getBlockCount();
 	}, [] );
 
 	return count;
@@ -336,6 +342,10 @@ const store = createReduxStore( 'my-shop', {
 register( store );
 ```
 
+_Type_
+
+-   `import('./types').combineReducers`
+
 _Parameters_
 
 -   _reducers_ `Object`: An object whose values correspond to different reducing functions that need to be combined into one.
@@ -369,11 +379,11 @@ const store = createReduxStore( 'demo', {
 _Parameters_
 
 -   _key_ `string`: Unique namespace identifier.
--   _options_ `ReduxStoreConfig`: Registered store options, with properties describing reducer, actions, selectors, and resolvers.
+-   _options_ `ReduxStoreConfig<State,Actions,Selectors>`: Registered store options, with properties describing reducer, actions, selectors, and resolvers.
 
 _Returns_
 
--   `StoreDescriptor`: Store Object.
+-   `StoreDescriptor<ReduxStoreConfig<State,Actions,Selectors>>`: Store Object.
 
 ### createRegistry
 
@@ -431,7 +441,9 @@ that allows to select data from the store's `state`, a registry selector
 has signature:
 
 ```js
-( select ) => ( state, ...selectorArgs ) => result;
+( select ) =>
+	( state, ...selectorArgs ) =>
+		result;
 ```
 
 that supports also selecting from other registered stores.
@@ -439,15 +451,18 @@ that supports also selecting from other registered stores.
 _Usage_
 
 ```js
+import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
+
 const getCurrentPostId = createRegistrySelector( ( select ) => ( state ) => {
-	return select( 'core/editor' ).getCurrentPostId();
+	return select( editorStore ).getCurrentPostId();
 } );
 
 const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
 	// calling another registry selector just like any other function
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
-	return select( 'core' ).getEntityRecordEdits(
+	return select( coreStore ).getEntityRecordEdits(
 		'postType',
 		postType,
 		postId
@@ -470,7 +485,7 @@ _Returns_
 
 ### dispatch
 
-Given the name of a registered store, returns an object of the store's action creators.
+Given a store descriptor, returns an object of the store's action creators.
 Calling an action creator will cause it to be dispatched, updating the state value accordingly.
 
 Note: Action creators returned by the dispatch will return a promise when
@@ -480,13 +495,14 @@ _Usage_
 
 ```js
 import { dispatch } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
-dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
+dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
 ```
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `string|StoreDescriptor`: Unique namespace identifier for the store or the store descriptor.
+-   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
@@ -595,22 +611,22 @@ example.
 
 ### resolveSelect
 
-Given the name of a registered store, returns an object containing the store's
-selectors pre-bound to state so that you only need to supply additional arguments,
-and modified so that they return promises that resolve to their eventual values,
-after any resolvers have ran.
+Given a store descriptor, returns an object containing the store's selectors pre-bound to state
+so that you only need to supply additional arguments, and modified so that they return promises
+that resolve to their eventual values, after any resolvers have ran.
 
 _Usage_
 
 ```js
 import { resolveSelect } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
-resolveSelect( 'my-shop' ).getPrice( 'hammer' ).then( console.log );
+resolveSelect( myCustomStore ).getPrice( 'hammer' ).then( console.log );
 ```
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `string|StoreDescriptor`: Unique namespace identifier for the store or the store descriptor.
+-   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
@@ -618,7 +634,7 @@ _Returns_
 
 ### select
 
-Given the name or descriptor of a registered store, returns an object of the store's selectors.
+Given a store descriptor, returns an object of the store's selectors.
 The selector functions are been pre-bound to pass the current state automatically.
 As a consumer, you need only pass arguments of the selector, if applicable.
 
@@ -626,13 +642,14 @@ _Usage_
 
 ```js
 import { select } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
-select( 'my-shop' ).getPrice( 'hammer' );
+select( myCustomStore ).getPrice( 'hammer' );
 ```
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `string|StoreDescriptor`: Unique namespace identifier for the store or the store descriptor.
+-   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
@@ -664,13 +681,13 @@ _Parameters_
 
 ### suspendSelect
 
-Given the name of a registered store, returns an object containing the store's
-selectors pre-bound to state so that you only need to supply additional arguments,
-and modified so that they throw promises in case the selector is not resolved yet.
+Given a store descriptor, returns an object containing the store's selectors pre-bound to state
+so that you only need to supply additional arguments, and modified so that they throw promises
+in case the selector is not resolved yet.
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `string|StoreDescriptor`: Unique namespace identifier for the store or the store descriptor.
+-   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
@@ -702,6 +719,7 @@ action.
 ```jsx
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
+import { store as myCustomStore } from 'my-custom-store';
 
 function Button( { onClick, children } ) {
 	return (
@@ -713,10 +731,10 @@ function Button( { onClick, children } ) {
 
 const SaleButton = ( { children } ) => {
 	const { stockNumber } = useSelect(
-		( select ) => select( 'my-shop' ).getStockNumber(),
+		( select ) => select( myCustomStore ).getStockNumber(),
 		[]
 	);
-	const { startSale } = useDispatch( 'my-shop' );
+	const { startSale } = useDispatch( myCustomStore );
 	const onClick = useCallback( () => {
 		const discountPercent = stockNumber > 50 ? 10 : 20;
 		startSale( discountPercent );
@@ -731,11 +749,11 @@ const SaleButton = ( { children } ) => {
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `[string|StoreDescriptor]`: Optionally provide the name of the store or its descriptor from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
+-   _storeNameOrDescriptor_ `[StoreNameOrDescriptor]`: Optionally provide the name of the store or its descriptor from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
 
 _Returns_
 
--   `Function`: A custom react hook.
+-   `UseDispatchReturn<StoreNameOrDescriptor>`: A custom react hook.
 
 ### useRegistry
 
@@ -788,11 +806,12 @@ _Usage_
 
 ```js
 import { useSelect } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 function HammerPriceDisplay( { currency } ) {
 	const price = useSelect(
 		( select ) => {
-			return select( 'my-shop' ).getPrice( 'hammer', currency );
+			return select( myCustomStore ).getPrice( 'hammer', currency );
 		},
 		[ currency ]
 	);
@@ -821,9 +840,10 @@ function because your component won't re-render on a data change.**
 
 ```js
 import { useSelect } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 function Paste( { children } ) {
-	const { getSettings } = useSelect( 'my-shop' );
+	const { getSettings } = useSelect( myCustomStore );
 	function onPaste() {
 		// Do something with the settings.
 		const settings = getSettings();
@@ -834,12 +854,12 @@ function Paste( { children } ) {
 
 _Parameters_
 
--   _mapSelect_ `Function|StoreDescriptor|string`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument. When a store key is passed, all selectors for the store will be returned. This is only meant for usage of these selectors in event callbacks, not for data needed to create the element tree.
--   _deps_ `Array`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
+-   _mapSelect_ `T`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument. When a store key is passed, all selectors for the store will be returned. This is only meant for usage of these selectors in event callbacks, not for data needed to create the element tree.
+-   _deps_ `unknown[]`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
 
 _Returns_
 
--   `Function`: A custom react hook.
+-   `UseSelectReturn<T>`: A custom react hook.
 
 ### useSuspenseSelect
 
@@ -872,9 +892,10 @@ function Button( { onClick, children } ) {
 }
 
 import { withDispatch } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 const SaleButton = withDispatch( ( dispatch, ownProps ) => {
-	const { startSale } = dispatch( 'my-shop' );
+	const { startSale } = dispatch( myCustomStore );
 	const { discountPercent } = ownProps;
 
 	return {
@@ -912,11 +933,12 @@ function Button( { onClick, children } ) {
 }
 
 import { withDispatch } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
 	// Stock number changes frequently.
-	const { getStockNumber } = select( 'my-shop' );
-	const { startSale } = dispatch( 'my-shop' );
+	const { getStockNumber } = select( myCustomStore );
+	const { startSale } = dispatch( myCustomStore );
 	return {
 		onClick() {
 			const discountPercent = getStockNumber() > 50 ? 10 : 20;
@@ -964,6 +986,7 @@ _Usage_
 
 ```js
 import { withSelect } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 function PriceDisplay( { price, currency } ) {
 	return new Intl.NumberFormat( 'en-US', {
@@ -973,7 +996,7 @@ function PriceDisplay( { price, currency } ) {
 }
 
 const HammerPriceDisplay = withSelect( ( select, ownProps ) => {
-	const { getPrice } = select( 'my-shop' );
+	const { getPrice } = select( myCustomStore );
 	const { currency } = ownProps;
 
 	return {

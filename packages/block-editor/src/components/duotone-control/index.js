@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	ColorIndicator,
 	Dropdown,
 	DuotonePicker,
 	DuotoneSwatch,
@@ -20,6 +21,16 @@ function DuotoneControl( {
 	value,
 	onChange,
 } ) {
+	let toolbarIcon;
+	if ( value === 'unset' ) {
+		toolbarIcon = (
+			<ColorIndicator className="block-editor-duotone-control__unset-indicator" />
+		);
+	} else if ( value ) {
+		toolbarIcon = <DuotoneSwatch values={ value } />;
+	} else {
+		toolbarIcon = <Icon icon={ filter } />;
+	}
 	return (
 		<Dropdown
 			popoverProps={ {
@@ -42,13 +53,7 @@ function DuotoneControl( {
 						aria-expanded={ isOpen }
 						onKeyDown={ openOnArrowDown }
 						label={ __( 'Apply duotone filter' ) }
-						icon={
-							value ? (
-								<DuotoneSwatch values={ value } />
-							) : (
-								<Icon icon={ filter } />
-							)
-						}
+						icon={ toolbarIcon }
 					/>
 				);
 			} }

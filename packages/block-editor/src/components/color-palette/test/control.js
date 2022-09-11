@@ -2,12 +2,13 @@
  * External dependencies
  */
 import { create, act } from 'react-test-renderer';
-import { noop } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import ColorPaletteControl from '../control';
+
+const noop = () => {};
 
 describe( 'ColorPaletteControl', () => {
 	it( 'matches the snapshot', async () => {

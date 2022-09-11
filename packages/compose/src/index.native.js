@@ -1,5 +1,5 @@
-// Utils.
-export { default as createHigherOrderComponent } from './utils/create-higher-order-component';
+// The `createHigherOrderComponent` helper and helper types.
+export * from './utils/create-higher-order-component';
 
 // Compose helper (aliased flowRight from Lodash)
 export { default as compose } from './higher-order/compose';
@@ -31,3 +31,4 @@ export { default as useResizeObserver } from './hooks/use-resize-observer';
 export { default as useDebounce } from './hooks/use-debounce';
 export { default as useThrottle } from './hooks/use-throttle';
 export { default as useMergeRefs } from './hooks/use-merge-refs';
+export { default as useRefEffect } from './hooks/use-ref-effect';

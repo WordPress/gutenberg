@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { escape as escapeString, find, get, uniqBy } from 'lodash';
+import { escape as escapeString, find, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,14 +13,13 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { unescapeString, unescapeTerm, unescapeTerms } from '../../utils/terms';
+import { unescapeString, unescapeTerm } from '../../utils/terms';
 import MostUsedTerms from './most-used-terms';
 
 /**
@@ -55,38 +54,28 @@ const termNamesToIds = ( names, terms ) => {
 };
 
 // Tries to create a term or fetch it if it already exists.
-function findOrCreateTerm( termName, restBase ) {
+function findOrCreateTerm( termName, restBase, namespace ) {
 	const escapedTermName = escapeString( termName );
 
 	return apiFetch( {
-		path: `/wp/v2/${ restBase }`,
+		path: `/${ namespace }/${ restBase }`,
 		method: 'POST',
 		data: { name: escapedTermName },
 	} )
 		.catch( ( error ) => {
-			const errorCode = error.code;
-			if ( errorCode === 'term_exists' ) {
-				// If the terms exist, fetch it instead of creating a new one.
-				const addRequest = apiFetch( {
-					path: addQueryArgs( `/wp/v2/${ restBase }`, {
-						...DEFAULT_QUERY,
-						search: escapedTermName,
-					} ),
-				} ).then( unescapeTerms );
-
-				return addRequest.then( ( searchResult ) => {
-					return find( searchResult, ( result ) =>
-						isSameTermName( result.name, termName )
-					);
-				} );
+			if ( error.code !== 'term_exists' ) {
+				return Promise.reject( error );
 			}
 
-			return Promise.reject( error );
+			return Promise.resolve( {
+				id: error.data.term_id,
+				name: termName,
+			} );
 		} )
 		.then( unescapeTerm );
 }
 
-function FlatTermSelector( { slug } ) {
+export function FlatTermSelector( { slug } ) {
 	const [ values, setValues ] = useState( [] );
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 500 );
@@ -100,14 +89,10 @@ function FlatTermSelector( { slug } ) {
 		hasResolvedTerms,
 	} = useSelect(
 		( select ) => {
-			const { getCurrentPost, getEditedPostAttribute } = select(
-				editorStore
-			);
-			const {
-				getEntityRecords,
-				getTaxonomy,
-				hasFinishedResolution,
-			} = select( coreStore );
+			const { getCurrentPost, getEditedPostAttribute } =
+				select( editorStore );
+			const { getEntityRecords, getTaxonomy, hasFinishedResolution } =
+				select( coreStore );
 			const post = getCurrentPost();
 			const _taxonomy = getTaxonomy( slug );
 			const _termIds = _taxonomy
@@ -206,7 +191,15 @@ function FlatTermSelector( { slug } ) {
 			...( terms ?? [] ),
 			...( searchResults ?? [] ),
 		];
-		const uniqueTerms = uniqBy( termNames, ( term ) => term.toLowerCase() );
+		const uniqueTerms = termNames.reduce( ( acc, name ) => {
+			if (
+				! acc.some( ( n ) => n.toLowerCase() === name.toLowerCase() )
+			) {
+				acc.push( name );
+			}
+			return acc;
+		}, [] );
+
 		const newTermNames = uniqueTerms.filter(
 			( termName ) =>
 				! find( availableTerms, ( term ) =>
@@ -228,9 +221,10 @@ function FlatTermSelector( { slug } ) {
 			return;
 		}
 
+		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		Promise.all(
 			newTermNames.map( ( termName ) =>
-				findOrCreateTerm( termName, taxonomy.rest_base )
+				findOrCreateTerm( termName, taxonomy.rest_base, namespace )
 			)
 		).then( ( newTerms ) => {
 			const newAvailableTerms = availableTerms.concat( newTerms );

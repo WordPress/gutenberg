@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -18,13 +18,13 @@ import { useViewportMatch } from '@wordpress/compose';
  */
 import BlockSelectionButton from './block-selection-button';
 import BlockContextualToolbar from './block-contextual-toolbar';
-import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import BlockPopover from '../block-popover';
+import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 
 function selector( select ) {
 	const {
-		isNavigationMode,
+		__unstableGetEditorMode,
 		isMultiSelecting,
 		hasMultiSelection,
 		isTyping,
@@ -32,7 +32,7 @@ function selector( select ) {
 		getLastMultiSelectedBlockClientId,
 	} = select( blockEditorStore );
 	return {
-		isNavigationMode: isNavigationMode(),
+		editorMode: __unstableGetEditorMode(),
 		isMultiSelecting: isMultiSelecting(),
 		isTyping: isTyping(),
 		hasFixedToolbar: getSettings().hasFixedToolbar,
@@ -51,7 +51,7 @@ function SelectedBlockPopover( {
 	__unstableContentRef,
 } ) {
 	const {
-		isNavigationMode,
+		editorMode,
 		isMultiSelecting,
 		isTyping,
 		hasFixedToolbar,
@@ -77,21 +77,21 @@ function SelectedBlockPopover( {
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isToolbarForced = useRef( false );
-	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const { stopTyping } = useDispatch( blockEditorStore );
 
 	const showEmptyBlockSideInserter =
-		! isTyping && ! isNavigationMode && isEmptyDefaultBlock;
-	const shouldShowBreadcrumb = isNavigationMode;
+		! isTyping && editorMode === 'edit' && isEmptyDefaultBlock;
+	const shouldShowBreadcrumb =
+		editorMode === 'navigation' || editorMode === 'zoom-out';
 	const shouldShowContextualToolbar =
-		! isNavigationMode &&
+		editorMode === 'edit' &&
 		! hasFixedToolbar &&
 		isLargeViewport &&
 		! isMultiSelecting &&
 		! showEmptyBlockSideInserter &&
 		! isTyping;
 	const canFocusHiddenToolbar =
-		! isNavigationMode &&
+		editorMode === 'edit' &&
 		! shouldShowContextualToolbar &&
 		! hasFixedToolbar &&
 		! isEmptyDefaultBlock;
@@ -115,16 +115,13 @@ function SelectedBlockPopover( {
 	// to it when re-mounting.
 	const initialToolbarItemIndexRef = useRef();
 
+	const popoverProps = useBlockToolbarPopoverProps( {
+		contentElement: __unstableContentRef?.current,
+		clientId,
+	} );
+
 	if ( ! shouldShowBreadcrumb && ! shouldShowContextualToolbar ) {
 		return null;
-	}
-
-	function onFocus() {
-		setIsInserterShown( true );
-	}
-
-	function onBlur() {
-		setIsInserterShown( false );
 	}
 
 	return (
@@ -136,32 +133,9 @@ function SelectedBlockPopover( {
 			} ) }
 			__unstablePopoverSlot={ __unstablePopoverSlot }
 			__unstableContentRef={ __unstableContentRef }
+			resize={ false }
+			{ ...popoverProps }
 		>
-			{ shouldShowContextualToolbar && (
-				<div
-					onFocus={ onFocus }
-					onBlur={ onBlur }
-					// While ideally it would be enough to capture the
-					// bubbling focus event from the Inserter, due to the
-					// characteristics of click focusing of `button`s in
-					// Firefox and Safari, it is not reliable.
-					//
-					// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
-					tabIndex={ -1 }
-					className={ classnames(
-						'block-editor-block-list__block-popover-inserter',
-						{
-							'is-visible': isInserterShown,
-						}
-					) }
-				>
-					<Inserter
-						clientId={ clientId }
-						rootClientId={ rootClientId }
-						__experimentalIsQuick
-					/>
-				</div>
-			) }
 			{ shouldShowContextualToolbar && (
 				<BlockContextualToolbar
 					// If the toolbar is being shown because of being forced

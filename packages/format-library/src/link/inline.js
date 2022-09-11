@@ -227,6 +227,7 @@ function InlineLinkUI( {
 			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
 			position="bottom center"
+			shift
 		>
 			<LinkControl
 				key={ forceRemountKey }

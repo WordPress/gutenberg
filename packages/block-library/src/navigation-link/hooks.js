@@ -9,11 +9,6 @@ import {
 	customPostType,
 } from '@wordpress/icons';
 
-/**
- * Internal dependencies
- */
-import fallbackVariations from './fallback-variations';
-
 function getIcon( variationName ) {
 	switch ( variationName ) {
 		case 'post':
@@ -32,15 +27,6 @@ function getIcon( variationName ) {
 export function enhanceNavigationLinkVariations( settings, name ) {
 	if ( name !== 'core/navigation-link' ) {
 		return settings;
-	}
-
-	// Fallback handling may be deleted after supported WP ranges understand the `variations`
-	// property when passed to register_block_type in index.php.
-	if ( ! settings.variations ) {
-		return {
-			...settings,
-			variations: fallbackVariations,
-		};
 	}
 
 	// Otherwise decorate server passed variations with an icon and isActive function.

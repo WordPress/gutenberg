@@ -15,8 +15,9 @@ import './style.scss';
 
 import Edit from './edit';
 import save from './save';
+import metadata from './block.json';
 
-registerBlockType( 'create-block/gutenpride', {
+registerBlockType( metadata.name, {
 	/**
 	 * @see ./edit.js
 	 */
@@ -38,7 +39,7 @@ The results of the edit function is what the editor will render to the editor pa
 
 The results of the save function is what the editor will insert into the **post_content** field when the post is saved. The post_content field is the field in the WordPress database used to store the content of the post.
 
-Most of the properties are set in the `block.json` file.
+Most of the properties are set in the `src/block.json` file.
 
 ```json
 {

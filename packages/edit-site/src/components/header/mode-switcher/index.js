@@ -9,9 +9,6 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import { store as editSiteStore } from '../../../store';
 
 /**
@@ -36,10 +33,10 @@ function ModeSwitcher() {
 			shortcut: select(
 				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-site/toggle-mode' ),
-			isRichEditingEnabled: select( editSiteStore ).getSettings()
-				.richEditingEnabled,
-			isCodeEditingEnabled: select( editSiteStore ).getSettings()
-				.codeEditingEnabled,
+			isRichEditingEnabled:
+				select( editSiteStore ).getSettings().richEditingEnabled,
+			isCodeEditingEnabled:
+				select( editSiteStore ).getSettings().codeEditingEnabled,
 			mode: select( editSiteStore ).getEditorMode(),
 		} ),
 		[]

@@ -28,7 +28,6 @@ import {
 import { IMAGE_BACKGROUND_TYPE } from '../shared';
 import * as paragraph from '../../paragraph';
 import * as cover from '..';
-import { registerBlock } from '../..';
 
 // Avoid errors due to mocked stylesheet files missing required selectors.
 jest.mock( '@wordpress/compose', () => ( {
@@ -84,8 +83,8 @@ beforeAll( () => {
 	);
 
 	// Register required blocks.
-	registerBlock( paragraph );
-	registerBlock( cover );
+	paragraph.init();
+	cover.init();
 	setDefaultBlockName( paragraph.name );
 } );
 
@@ -493,13 +492,10 @@ describe( 'color settings', () => {
 	} );
 
 	it( 'clears the selected overlay color and mantains the inner blocks', async () => {
-		const {
-			getByTestId,
-			getByA11yLabel,
-			getByText,
-		} = await initializeEditor( {
-			initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
-		} );
+		const { getByTestId, getByA11yLabel, getByText } =
+			await initializeEditor( {
+				initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
+			} );
 
 		// Wait for the block to be created.
 		const coverBlock = await waitFor( () =>

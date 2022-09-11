@@ -13,12 +13,14 @@ import { WP_ADMIN_USER, WP_BASE_URL } from '../config';
 import type { User } from './login';
 import { login } from './login';
 import { listMedia, uploadMedia, deleteMedia, deleteAllMedia } from './media';
+import { createUser, deleteAllUsers } from './users';
 import { setupRest, rest, getMaxBatchSize, batchRest } from './rest';
 import { getPluginsMap, activatePlugin, deactivatePlugin } from './plugins';
 import { deleteAllTemplates } from './templates';
 import { activateTheme } from './themes';
 import { deleteAllBlocks } from './blocks';
-import { deleteAllPosts } from './posts';
+import { createComment, deleteAllComments } from './comments';
+import { createPost, deleteAllPosts } from './posts';
 import { resetPreferences } from './preferences';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
 
@@ -108,25 +110,32 @@ class RequestUtils {
 		this.baseURL = baseURL;
 	}
 
-	login = login;
-	setupRest = setupRest;
-	rest = rest;
-	getMaxBatchSize = getMaxBatchSize;
-	batchRest = batchRest;
-	getPluginsMap = getPluginsMap;
-	activatePlugin = activatePlugin;
-	deactivatePlugin = deactivatePlugin;
-	activateTheme = activateTheme;
+	login = login.bind( this );
+	setupRest = setupRest.bind( this );
+	// .bind() drops the generic types. Re-casting it to keep the type signature.
+	rest = rest.bind( this ) as typeof rest;
+	getMaxBatchSize = getMaxBatchSize.bind( this );
+	// .bind() drops the generic types. Re-casting it to keep the type signature.
+	batchRest = batchRest.bind( this ) as typeof batchRest;
+	getPluginsMap = getPluginsMap.bind( this );
+	activatePlugin = activatePlugin.bind( this );
+	deactivatePlugin = deactivatePlugin.bind( this );
+	activateTheme = activateTheme.bind( this );
 	deleteAllBlocks = deleteAllBlocks;
-	deleteAllPosts = deleteAllPosts;
-	deleteAllWidgets = deleteAllWidgets;
-	addWidgetBlock = addWidgetBlock;
-	deleteAllTemplates = deleteAllTemplates;
-	resetPreferences = resetPreferences;
-	listMedia = listMedia;
-	uploadMedia = uploadMedia;
-	deleteMedia = deleteMedia;
-	deleteAllMedia = deleteAllMedia;
+	createPost = createPost.bind( this );
+	deleteAllPosts = deleteAllPosts.bind( this );
+	createComment = createComment.bind( this );
+	deleteAllComments = deleteAllComments.bind( this );
+	deleteAllWidgets = deleteAllWidgets.bind( this );
+	addWidgetBlock = addWidgetBlock.bind( this );
+	deleteAllTemplates = deleteAllTemplates.bind( this );
+	resetPreferences = resetPreferences.bind( this );
+	listMedia = listMedia.bind( this );
+	uploadMedia = uploadMedia.bind( this );
+	deleteMedia = deleteMedia.bind( this );
+	deleteAllMedia = deleteAllMedia.bind( this );
+	createUser = createUser.bind( this );
+	deleteAllUsers = deleteAllUsers.bind( this );
 }
 
 export type { StorageState };

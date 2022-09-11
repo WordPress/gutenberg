@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { uniq, compact, without } from 'lodash';
-
-/**
  * A set of tokens.
  *
  * @see https://dom.spec.whatwg.org/#domtokenlist
@@ -75,7 +70,9 @@ export default class TokenList {
 	 */
 	set value( value ) {
 		value = String( value );
-		this._valueAsArray = uniq( compact( value.split( /\s+/g ) ) );
+		this._valueAsArray = [
+			...new Set( value.split( /\s+/g ).filter( Boolean ) ),
+		];
 		this._currentValue = this._valueAsArray.join( ' ' );
 	}
 
@@ -158,7 +155,9 @@ export default class TokenList {
 	 * @param {...string} items Items to remove.
 	 */
 	remove( ...items ) {
-		this.value = without( this._valueAsArray, ...items ).join( ' ' );
+		this.value = this._valueAsArray
+			.filter( ( val ) => ! items.includes( val ) )
+			.join( ' ' );
 	}
 
 	/**

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -111,6 +110,10 @@ function RichTextWrapper(
 		maxWidth,
 		onBlur,
 		setRef,
+		disableSuggestions,
+		disableAutocorrection,
+		containerWidth,
+		onEnter: onCustomEnter,
 		...props
 	},
 	forwardedRef
@@ -340,6 +343,10 @@ function RichTextWrapper(
 					] );
 					__unstableMarkAutomaticChange();
 				}
+			}
+
+			if ( onCustomEnter ) {
+				onCustomEnter();
 			}
 
 			if ( multiline ) {
@@ -635,6 +642,9 @@ function RichTextWrapper(
 			maxWidth={ maxWidth }
 			onBlur={ onBlur }
 			setRef={ setRef }
+			disableSuggestions={ disableSuggestions }
+			disableAutocorrection={ disableAutocorrection }
+			containerWidth={ containerWidth }
 			// Props to be set on the editable container are destructured on the
 			// element itself for web (see below), but passed through rich text
 			// for native.
@@ -740,7 +750,8 @@ ForwardedRichTextContainer.Content = ( {
 	const content = <RawHTML>{ value }</RawHTML>;
 
 	if ( Tag ) {
-		return <Tag { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
+		const { format, ...restProps } = props;
+		return <Tag { ...restProps }>{ content }</Tag>;
 	}
 
 	return content;

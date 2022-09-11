@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { first, last, partial, castArray } from 'lodash';
 import { Platform } from 'react-native';
 
 /**
@@ -37,9 +36,8 @@ export const BlockMover = ( {
 } ) => {
 	const pickerRef = useRef();
 	const [ shouldPresentPicker, setShouldPresentPicker ] = useState( false );
-	const [ blockPageMoverState, setBlockPageMoverState ] = useState(
-		undefined
-	);
+	const [ blockPageMoverState, setBlockPageMoverState ] =
+		useState( undefined );
 	const showBlockPageMover = ( direction ) => () => {
 		if ( ! pickerRef.current ) {
 			setBlockPageMoverState( undefined );
@@ -150,12 +148,16 @@ export default compose(
 			getBlockRootClientId,
 			getBlockOrder,
 		} = select( blockEditorStore );
-		const normalizedClientIds = castArray( clientIds );
-		const firstClientId = first( normalizedClientIds );
+		const normalizedClientIds = Array.isArray( clientIds )
+			? clientIds
+			: [ clientIds ];
+		const firstClientId = normalizedClientIds[ 0 ];
 		const rootClientId = getBlockRootClientId( firstClientId );
 		const blockOrder = getBlockOrder( rootClientId );
 		const firstIndex = getBlockIndex( firstClientId );
-		const lastIndex = getBlockIndex( last( normalizedClientIds ) );
+		const lastIndex = getBlockIndex(
+			normalizedClientIds[ normalizedClientIds.length - 1 ]
+		);
 
 		return {
 			firstIndex,
@@ -167,19 +169,22 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {
-		const { moveBlocksDown, moveBlocksUp, moveBlocksToPosition } = dispatch(
-			blockEditorStore
-		);
+		const { moveBlocksDown, moveBlocksUp, moveBlocksToPosition } =
+			dispatch( blockEditorStore );
 		return {
-			onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
-			onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),
-			onLongMove: ( targetIndex ) =>
-				partial(
-					moveBlocksToPosition,
-					clientIds,
-					rootClientId,
-					targetIndex
-				),
+			onMoveDown: ( ...args ) =>
+				moveBlocksDown( clientIds, rootClientId, ...args ),
+			onMoveUp: ( ...args ) =>
+				moveBlocksUp( clientIds, rootClientId, ...args ),
+			onLongMove:
+				( targetIndex ) =>
+				( ...args ) =>
+					moveBlocksToPosition(
+						clientIds,
+						rootClientId,
+						targetIndex,
+						...args
+					),
 		};
 	} ),
 	withInstanceId

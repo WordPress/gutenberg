@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { switchToBlockType } from '@wordpress/blocks';
+import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { group, row, stack } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
@@ -20,22 +20,24 @@ const layouts = {
 };
 
 function BlockGroupToolbar() {
-	const {
-		blocksSelection,
-		clientIds,
-		groupingBlockName,
-		isGroupable,
-	} = useConvertToGroupButtonProps();
+	const { blocksSelection, clientIds, groupingBlockName, isGroupable } =
+		useConvertToGroupButtonProps();
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 
-	const { canRemove } = useSelect(
+	const { canRemove, variations } = useSelect(
 		( select ) => {
 			const { canRemoveBlocks } = select( blockEditorStore );
+			const { getBlockVariations } = select( blocksStore );
+
 			return {
 				canRemove: canRemoveBlocks( clientIds ),
+				variations: getBlockVariations(
+					groupingBlockName,
+					'transform'
+				),
 			};
 		},
-		[ clientIds ]
+		[ clientIds, groupingBlockName ]
 	);
 
 	const onConvertToGroup = ( layout = 'group' ) => {
@@ -63,6 +65,13 @@ function BlockGroupToolbar() {
 		return null;
 	}
 
+	const canInsertRow = !! variations.find(
+		( { name } ) => name === 'group-row'
+	);
+	const canInsertStack = !! variations.find(
+		( { name } ) => name === 'group-stack'
+	);
+
 	return (
 		<ToolbarGroup>
 			<ToolbarButton
@@ -70,16 +79,20 @@ function BlockGroupToolbar() {
 				label={ _x( 'Group', 'verb' ) }
 				onClick={ onConvertToGroup }
 			/>
-			<ToolbarButton
-				icon={ row }
-				label={ _x( 'Row', 'single horizontal line' ) }
-				onClick={ onConvertToRow }
-			/>
-			<ToolbarButton
-				icon={ stack }
-				label={ _x( 'Stack', 'verb' ) }
-				onClick={ onConvertToStack }
-			/>
+			{ canInsertRow && (
+				<ToolbarButton
+					icon={ row }
+					label={ _x( 'Row', 'single horizontal line' ) }
+					onClick={ onConvertToRow }
+				/>
+			) }
+			{ canInsertStack && (
+				<ToolbarButton
+					icon={ stack }
+					label={ _x( 'Stack', 'verb' ) }
+					onClick={ onConvertToStack }
+				/>
+			) }
 		</ToolbarGroup>
 	);
 }

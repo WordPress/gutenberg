@@ -19,6 +19,7 @@ For an example of a component that follows these requirements, take a look at [`
 - [Documentation](#documentation)
 - [README example](#README-example)
 - [Folder structure](#folder-structure)
+- [TypeScript migration guide](#refactoring-a-component-to-typescript)
 
 ## Compatibility
 
@@ -155,8 +156,8 @@ function Example(
 
 A couple of good examples of how hooks are used for composition are:
 
-- the `Card` component, which builds on top of the `Surface` component by [calling the `useSurface` hook inside its own hook](/packages/components/src/card/card/hook.js);
-- the `HStack` component, which builds on top of the `Flex` component and [calls the `useFlex` hook inside its own hook](/packages/components/src/h-stack/hook.js).
+- the `Card` component, which builds on top of the `Surface` component by [calling the `useSurface` hook inside its own hook](/packages/components/src/card/card/hook.ts);
+- the `HStack` component, which builds on top of the `Flex` component and [calls the `useFlex` hook inside its own hook](/packages/components/src/h-stack/hook.tsx).
 
 <!-- ## API Consinstency
 
@@ -261,7 +262,7 @@ An example of how this is used can be found in the [`Card` component family](/pa
 
 ```jsx
 //=========================================================================
-// Simplified snippet from `packages/components/src/card/card/hook.js`
+// Simplified snippet from `packages/components/src/card/card/hook.ts`
 //=========================================================================
 import { useContextSystem } from '../../ui/context';
 
@@ -275,7 +276,7 @@ export function useCard( props ) {
 }
 
 //=========================================================================
-// Simplified snippet from `packages/components/src/card/card/component.js`
+// Simplified snippet from `packages/components/src/card/card/component.ts`
 //=========================================================================
 import { contextConnect, ContextSystemProvider } from '../../ui/context';
 
@@ -300,7 +301,7 @@ function Card( props, forwardedRef ) {
 	}, [ isBorderless, size ] );
 
 	return (
-		{ /* Write additional values to the Context System */ }
+		/* Write additional values to the Context System */
 		<ContextSystemProvider value={ contextProviderValue }>
 			{ /* [...] */ }
 		</ContextSystemProvider>
@@ -312,7 +313,7 @@ const ConnectedCard = contextConnect( Card, 'Card' );
 export default ConnectedCard;
 
 //=========================================================================
-// Simplified snippet from `packages/components/src/card/card-body/hook.js`
+// Simplified snippet from `packages/components/src/card/card-body/hook.ts`
 //=========================================================================
 import { useContextSystem } from '../../ui/context';
 
@@ -363,7 +364,7 @@ Primary.args = {
 
 A great tool to use when writing stories is the [Storybook Controls addon](https://storybook.js.org/addons/@storybook/addon-controls). Ideally props should be exposed by using this addon, which provides a graphical UI to interact dynamically with the component without needing to write code. Avoid using [Knobs](https://storybook.js.org/addons/@storybook/addon-knobs) for new stories, as this addon is deprecated.
 
-The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](/packages/components/src/card/stories/index.js)).
+The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](/packages/components/src/card/stories/index.tsx)).
 
 Storybook can be started on a local machine by running `npm run storybook:dev`. Alternatively, the components' catalogue (up to date with the latest code on `trunk`) can be found at [wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/).
 
@@ -479,7 +480,7 @@ component-family-name/
 
 Given a component folder (e.g. `packages/components/src/unit-control`):
 
-1. Add the folder to `tsconfig.json`, if it isn’t already.
+1. Remove the folder from the exclude list in `tsconfig.json`, if it isn’t already.
 2. Remove any `// @ts-nocheck` comments in the folder, if any.
 3. Rename `*.js{x}` files to `*.ts{x}` (except stories and unit tests).
 4. Run `npm run dev` and take note of all the errors (your IDE should also flag them).
@@ -489,13 +490,48 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 		2. Resume work on this component once all dependencies have been refactored.
 	2. Alternatively:
 		1. For each of those files, add `// @ts-nocheck` at the start of the file.
-		2. Add the folders to the `tsconfig.json` file.
-		3. If you’re still getting errors about a component’s props, the easiest way is to slightly refactor this component and perform the props destructuring inside the component’s body (as opposed as in the function signature) — this is to prevent TypeScript from inferring the types of these props.
-		4. Continue with the refactor of the current component (and take care of the refactor of the dependent components at a later stage).
+		2. If the components in the ignored files are destructuring props directly from the function's arguments, move the props destructuring to the function's body (this is to avoid TypeScript errors from trying to infer the props type):
+
+			```jsx
+			// Before:
+			function MyComponent( { myProp1, myProp2, ...restProps } ) { /* ... */ }
+
+			// After:
+			function MyComponent( props ) {
+				const {  myProp1, myProp2, ...restProps } = props;
+
+				/* ... */
+			}
+			```
+
+		3. Remove the folders from the exclude list in the `tsconfig.json` file.
+		4. If you’re still getting errors about a component’s props, the easiest way is to slightly refactor this component and perform the props destructuring inside the component’s body (as opposed as in the function signature) — this is to prevent TypeScript from inferring the types of these props.
+		5. Continue with the refactor of the current component (and take care of the refactor of the dependent components at a later stage).
 6. Create a new `types.ts` file.
 7. Slowly work your way through fixing the TypeScript errors in the folder:
 	1. Try to avoid introducing any runtime changes, if possible. The aim of this refactor is to simply rewrite the component to TypeScript.
-	2. Make sure you have a **named** export for the component, not just the default export ([example](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/divider/component.tsx)). This ensures that the docgen can properly extract the types data. The naming should be so that the connected/forwarded component has the plain component name (`MyComponent`), and the raw component is prefixed (`UnconnectedMyComponent` or `UnforwardedMyComponent`). This makes the component's `displayName` look nicer in React devtools and in the autogenerated Storybook code snippets.
+	2. Extract props to `types.ts`, and use them to type components. The README can be of help when determining a prop’s type.
+	3. Use existing HTML types when possible? (e.g. `required` for an input field?)
+	4. Use the `CSSProperties` type where it makes sense.
+	5. Extend existing components’ props if possible, especially when a component internally forwards its props to another component in the package.
+	6. If the component forwards its `...restProps` to an underlying element/component, you should use the `WordPressComponentProps` type for the component's props:
+
+		```tsx
+		import type { WordPressComponentProps } from '../ui/context';
+		import type { ComponentOwnProps } from './types';
+
+		function UnconnectedMyComponent(
+			// The resulting type will include:
+			// - all props defined in `ComponentOwnProps`
+			// - all HTML props/attributes from the component specified as the second
+			//   parameter (`div` in this example)
+			// - the special `as` prop (which marks the component as polymorphic),
+			//   unless the third parameter is `false`
+			props:  WordPressComponentProps< ComponentOwnProps, 'div', true >
+		) { /* ... */ }
+		```
+
+	7. As shown in the previous examples, make sure you have a **named** export for the component, not just the default export ([example](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/divider/component.tsx)). This ensures that the docgen can properly extract the types data. The naming should be so that the connected/forwarded component has the plain component name (`MyComponent`), and the raw component is prefixed (`UnconnectedMyComponent` or `UnforwardedMyComponent`). This makes the component's `displayName` look nicer in React devtools and in the autogenerated Storybook code snippets.
 
 		```jsx
 		function UnconnectedMyComponent() { /* ... */ }
@@ -505,14 +541,9 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 		export default MyComponent;
 		```
 
-	3. Extract props to `types.ts`, and use them to type components. The README can be of help when determining a prop’s type.
-	4. Use existing HTML types when possible? (e.g. `required` for an input field?)
-	5. Use the `CSSProperties` type where it makes sense.
-	6. Extend existing components’ props if possible, especially when a component internally forwards its props to another component in the package.
-	7. Use `WordPressComponent` type if possible.
 	8. Use JSDocs syntax for each TypeScript property that is part of the public API of a component. The docs used here should be aligned with the component’s README. Add `@default` values where appropriate.
 	9. Prefer `unknown` to `any`, and in general avoid it when possible.
-8. On the component's main export, add a JSDoc comment that includes the main description and `@example` code snippet from the README ([example](https://github.com/WordPress/gutenberg/blob/943cec92f21fedcd256502ea72d9903941f3b05a/packages/components/src/unit-control/index.tsx#L290-L306))
+8. On the component's main named export, add a JSDoc comment that includes the main description and the example code snippet from the README ([example](https://github.com/WordPress/gutenberg/blob/43d9c82922619c1d1ff6b454f86f75c3157d3de6/packages/components/src/date-time/date-time/index.tsx#L193-L217)). _At the time of writing, the `@example` JSDoc keyword is not recognized by StoryBook's docgen, so please avoid using it_.
 9. Make sure that:
 	1. tests still pass;
 	2. storybook examples work as expected.

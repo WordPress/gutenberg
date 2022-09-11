@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { difference, zip } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -28,73 +23,74 @@ import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
  * @param {Object} post A navigation post to process
  * @return {Function} An action creator
  */
-export const saveNavigationPost = ( post ) => async ( {
-	registry,
-	dispatch,
-} ) => {
-	const lock = await registry
-		.dispatch( coreDataStore )
-		.__unstableAcquireStoreLock( STORE_NAME, [ 'savingMenu' ], {
-			exclusive: true,
-		} );
-	try {
-		const menuId = post.meta.menuId;
-
-		// Save menu.
-		await registry
+export const saveNavigationPost =
+	( post ) =>
+	async ( { registry, dispatch } ) => {
+		const lock = await registry
 			.dispatch( coreDataStore )
-			.saveEditedEntityRecord( 'root', 'menu', menuId, {
-				throwOnError: true,
+			.__unstableAcquireStoreLock( STORE_NAME, [ 'savingMenu' ], {
+				exclusive: true,
 			} );
+		try {
+			const menuId = post.meta.menuId;
 
-		// Save menu items.
-		const updatedBlocks = await dispatch(
-			batchSaveMenuItems( post.blocks[ 0 ], menuId )
-		);
+			// Save menu.
+			await registry
+				.dispatch( coreDataStore )
+				.saveEditedEntityRecord( 'root', 'menu', menuId, {
+					throwOnError: true,
+				} );
 
-		// Clear "stub" navigation post edits to avoid a false "dirty" state.
-		registry
-			.dispatch( coreDataStore )
-			.receiveEntityRecords(
-				NAVIGATION_POST_KIND,
-				NAVIGATION_POST_POST_TYPE,
-				post,
-				undefined
+			// Save menu items.
+			const updatedBlocks = await dispatch(
+				batchSaveMenuItems( post.blocks[ 0 ], menuId )
 			);
 
-		const updatedPost = {
-			...post,
-			blocks: [ updatedBlocks ],
-		};
-		registry
-			.dispatch( coreDataStore )
-			.receiveEntityRecords(
-				NAVIGATION_POST_KIND,
-				NAVIGATION_POST_POST_TYPE,
-				updatedPost,
-				undefined
-			);
+			// Clear "stub" navigation post edits to avoid a false "dirty" state.
+			registry
+				.dispatch( coreDataStore )
+				.receiveEntityRecords(
+					NAVIGATION_POST_KIND,
+					NAVIGATION_POST_POST_TYPE,
+					post,
+					undefined
+				);
 
-		registry
-			.dispatch( noticesStore )
-			.createSuccessNotice( __( 'Navigation saved.' ), {
+			const updatedPost = {
+				...post,
+				blocks: [ updatedBlocks ],
+			};
+			registry
+				.dispatch( coreDataStore )
+				.receiveEntityRecords(
+					NAVIGATION_POST_KIND,
+					NAVIGATION_POST_POST_TYPE,
+					updatedPost,
+					undefined
+				);
+
+			registry
+				.dispatch( noticesStore )
+				.createSuccessNotice( __( 'Navigation saved.' ), {
+					type: 'snackbar',
+				} );
+		} catch ( saveError ) {
+			const errorMessage = saveError
+				? sprintf(
+						/* translators: %s: The text of an error message (potentially untranslated). */
+						__( "Unable to save: '%s'" ),
+						saveError.message
+				  )
+				: __( 'Unable to save: An error ocurred.' );
+			registry.dispatch( noticesStore ).createErrorNotice( errorMessage, {
 				type: 'snackbar',
 			} );
-	} catch ( saveError ) {
-		const errorMessage = saveError
-			? sprintf(
-					/* translators: %s: The text of an error message (potentially untranslated). */
-					__( "Unable to save: '%s'" ),
-					saveError.message
-			  )
-			: __( 'Unable to save: An error ocurred.' );
-		registry.dispatch( noticesStore ).createErrorNotice( errorMessage, {
-			type: 'snackbar',
-		} );
-	} finally {
-		registry.dispatch( coreDataStore ).__unstableReleaseStoreLock( lock );
-	}
-};
+		} finally {
+			registry
+				.dispatch( coreDataStore )
+				.__unstableReleaseStoreLock( lock );
+		}
+	};
 
 /**
  * Executes appropriate insert, update, and delete operations to turn the current
@@ -104,38 +100,42 @@ export const saveNavigationPost = ( post ) => async ( {
  * @param {number} menuId          Menu Id to process.
  * @return {Function} An action creator
  */
-const batchSaveMenuItems = ( navigationBlock, menuId ) => async ( {
-	dispatch,
-	registry,
-} ) => {
-	// Make sure all the existing menu items are available before proceeding.
-	const oldMenuItems = await registry
-		.resolveSelect( coreDataStore )
-		.getMenuItems( { menus: menuId, per_page: -1 } );
+const batchSaveMenuItems =
+	( navigationBlock, menuId ) =>
+	async ( { dispatch, registry } ) => {
+		// Make sure all the existing menu items are available before proceeding.
+		const oldMenuItems = await registry
+			.resolveSelect( coreDataStore )
+			.getMenuItems( { menus: menuId, per_page: -1 } );
 
-	// Insert placeholders for new menu items to have an ID to work with.
-	// We need that in case these new items have any children. If so,
-	// we need to provide a parent id that we don't have yet.
-	const navBlockWithRecordIds = await dispatch(
-		batchInsertPlaceholderMenuItems( navigationBlock )
-	);
+		// Insert placeholders for new menu items to have an ID to work with.
+		// We need that in case these new items have any children. If so,
+		// we need to provide a parent id that we don't have yet.
+		const navBlockWithRecordIds = await dispatch(
+			batchInsertPlaceholderMenuItems( navigationBlock )
+		);
 
-	// Update menu items. This is separate from deleting, because there
-	// are no consistency guarantees and we don't want to delete something
-	// that was a parent node before another node takes it place.
-	const navBlockAfterUpdates = await dispatch(
-		batchUpdateMenuItems( navBlockWithRecordIds, menuId )
-	);
+		// Update menu items. This is separate from deleting, because there
+		// are no consistency guarantees and we don't want to delete something
+		// that was a parent node before another node takes it place.
+		const navBlockAfterUpdates = await dispatch(
+			batchUpdateMenuItems( navBlockWithRecordIds, menuId )
+		);
 
-	// Delete menu items.
-	const deletedIds = difference(
-		oldMenuItems.map( ( { id } ) => id ),
-		blocksTreeToList( navBlockAfterUpdates ).map( getRecordIdFromBlock )
-	);
-	await dispatch( batchDeleteMenuItems( deletedIds ) );
+		// Delete menu items.
+		const deletedIds = oldMenuItems
+			.map( ( { id } ) => id )
+			.filter(
+				( id ) =>
+					! blocksTreeToList( navBlockAfterUpdates )
+						.map( getRecordIdFromBlock )
+						.includes( id )
+			);
 
-	return navBlockAfterUpdates;
-};
+		await dispatch( batchDeleteMenuItems( deletedIds ) );
+
+		return navBlockAfterUpdates;
+	};
 
 /**
  * Creates a menu item for every block that doesn't have an associated menuItem.
@@ -144,35 +144,45 @@ const batchSaveMenuItems = ( navigationBlock, menuId ) => async ( {
  * @param {Object} navigationBlock A navigation block to find created menu items in.
  * @return {Function} An action creator
  */
-const batchInsertPlaceholderMenuItems = ( navigationBlock ) => async ( {
-	registry,
-} ) => {
-	const blocksWithoutRecordId = blocksTreeToList( navigationBlock ).filter(
-		( block ) =>
-			isBlockSupportedInNav( block ) && ! getRecordIdFromBlock( block )
-	);
+const batchInsertPlaceholderMenuItems =
+	( navigationBlock ) =>
+	async ( { registry } ) => {
+		const blocksWithoutRecordId = blocksTreeToList(
+			navigationBlock
+		).filter(
+			( block ) =>
+				isBlockSupportedInNav( block ) &&
+				! getRecordIdFromBlock( block )
+		);
 
-	const tasks = blocksWithoutRecordId.map( () => ( { saveEntityRecord } ) =>
-		saveEntityRecord( 'root', 'menuItem', {
-			title: __( 'Menu item' ),
-			url: '#placeholder',
-			menu_order: 1,
-		} )
-	);
+		const tasks = blocksWithoutRecordId.map(
+			() =>
+				( { saveEntityRecord } ) =>
+					saveEntityRecord( 'root', 'menuItem', {
+						title: __( 'Menu item' ),
+						url: '#placeholder',
+						menu_order: 1,
+					} )
+		);
 
-	const results = await registry
-		.dispatch( coreDataStore )
-		.__experimentalBatch( tasks );
+		const results = await registry
+			.dispatch( coreDataStore )
+			.__experimentalBatch( tasks );
 
-	// Return an updated navigation block with all the IDs in.
-	const blockToResult = new Map( zip( blocksWithoutRecordId, results ) );
-	return mapBlocksTree( navigationBlock, ( block ) => {
-		if ( ! blockToResult.has( block ) ) {
-			return block;
-		}
-		return addRecordIdToBlock( block, blockToResult.get( block ).id );
-	} );
-};
+		// Return an updated navigation block with all the IDs in.
+		const blockToResult = new Map(
+			blocksWithoutRecordId.map( ( block, index ) => [
+				block,
+				results[ index ],
+			] )
+		);
+		return mapBlocksTree( navigationBlock, ( block ) => {
+			if ( ! blockToResult.has( block ) ) {
+				return block;
+			}
+			return addRecordIdToBlock( block, blockToResult.get( block ).id );
+		} );
+	};
 
 /**
  * Updates every menu item where a related block has changed.
@@ -182,89 +192,96 @@ const batchInsertPlaceholderMenuItems = ( navigationBlock ) => async ( {
  * @param {number} menuId          Menu ID.
  * @return {Function} An action creator
  */
-const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
-	registry,
-} ) => {
-	const allMenuItems = blocksTreeToAnnotatedList( navigationBlock );
-	const unsupportedMenuItems = allMenuItems
-		.filter( ( { block } ) => ! isBlockSupportedInNav( block ) )
-		.map( ( { block } ) => block.name );
-	if ( unsupportedMenuItems.length ) {
-		window.console.warn(
-			sprintf(
-				// translators: %s: Name of block (i.e. core/legacy-widget)
-				__(
-					'The following blocks haven\'t been saved because they are not supported: "%s".'
-				),
-				unsupportedMenuItems.join( '", "' )
+const batchUpdateMenuItems =
+	( navigationBlock, menuId ) =>
+	async ( { registry } ) => {
+		const allMenuItems = blocksTreeToAnnotatedList( navigationBlock );
+		const unsupportedMenuItems = allMenuItems
+			.filter( ( { block } ) => ! isBlockSupportedInNav( block ) )
+			.map( ( { block } ) => block.name );
+		if ( unsupportedMenuItems.length ) {
+			window.console.warn(
+				sprintf(
+					// translators: %s: Name of block (i.e. core/legacy-widget)
+					__(
+						'The following blocks haven\'t been saved because they are not supported: "%s".'
+					),
+					unsupportedMenuItems.join( '", "' )
+				)
+			);
+		}
+		const updatedMenuItems = allMenuItems
+			// Filter out unsupported blocks.
+			.filter( ( { block } ) => isBlockSupportedInNav( block ) )
+			// Transform the blocks into menu items.
+			.map( ( { block, parentBlock, childIndex } ) =>
+				blockToMenuItem(
+					block,
+					registry
+						.select( coreDataStore )
+						.getMenuItem( getRecordIdFromBlock( block ) ),
+					getRecordIdFromBlock( parentBlock ),
+					childIndex,
+					menuId
+				)
 			)
-		);
-	}
-	const updatedMenuItems = allMenuItems
-		// Filter out unsupported blocks.
-		.filter( ( { block } ) => isBlockSupportedInNav( block ) )
-		// Transform the blocks into menu items.
-		.map( ( { block, parentBlock, childIndex } ) =>
-			blockToMenuItem(
-				block,
+			// Filter out menu items without any edits.
+			.filter( ( menuItem ) => {
+				// Update an existing entity record.
 				registry
-					.select( coreDataStore )
-					.getMenuItem( getRecordIdFromBlock( block ) ),
-				getRecordIdFromBlock( parentBlock ),
-				childIndex,
-				menuId
-			)
-		)
-		// Filter out menu items without any edits.
-		.filter( ( menuItem ) => {
-			// Update an existing entity record.
-			registry
-				.dispatch( coreDataStore )
-				.editEntityRecord( 'root', 'menuItem', menuItem.id, menuItem, {
-					undoIgnore: true,
-				} );
+					.dispatch( coreDataStore )
+					.editEntityRecord(
+						'root',
+						'menuItem',
+						menuItem.id,
+						menuItem,
+						{
+							undoIgnore: true,
+						}
+					);
 
-			return registry
+				return registry
+					.select( coreDataStore )
+					.hasEditsForEntityRecord( 'root', 'menuItem', menuItem.id );
+			} );
+
+		// Map the edited menu items to batch tasks.
+		const tasks = updatedMenuItems.map(
+			( menuItem ) =>
+				( { saveEditedEntityRecord } ) =>
+					saveEditedEntityRecord( 'root', 'menuItem', menuItem.id )
+		);
+
+		await registry.dispatch( coreDataStore ).__experimentalBatch( tasks );
+
+		// Throw on failure. @TODO failures should be thrown in core-data
+		updatedMenuItems.forEach( ( menuItem ) => {
+			const failure = registry
 				.select( coreDataStore )
-				.hasEditsForEntityRecord( 'root', 'menuItem', menuItem.id );
+				.getLastEntitySaveError( 'root', 'menuItem', menuItem.id );
+			if ( failure ) {
+				throw new Error( failure.message );
+			}
 		} );
 
-	// Map the edited menu items to batch tasks.
-	const tasks = updatedMenuItems.map(
-		( menuItem ) => ( { saveEditedEntityRecord } ) =>
-			saveEditedEntityRecord( 'root', 'menuItem', menuItem.id )
-	);
+		// Return an updated navigation block reflecting the changes persisted in the batch update.
+		return mapBlocksTree( navigationBlock, ( block ) => {
+			if ( ! isBlockSupportedInNav( block ) ) {
+				return block;
+			}
+			const updatedMenuItem = registry
+				.select( coreDataStore )
+				.getMenuItem( getRecordIdFromBlock( block ) );
 
-	await registry.dispatch( coreDataStore ).__experimentalBatch( tasks );
-
-	// Throw on failure. @TODO failures should be thrown in core-data
-	updatedMenuItems.forEach( ( menuItem ) => {
-		const failure = registry
-			.select( coreDataStore )
-			.getLastEntitySaveError( 'root', 'menuItem', menuItem.id );
-		if ( failure ) {
-			throw new Error( failure.message );
-		}
-	} );
-
-	// Return an updated navigation block reflecting the changes persisted in the batch update.
-	return mapBlocksTree( navigationBlock, ( block ) => {
-		if ( ! isBlockSupportedInNav( block ) ) {
-			return block;
-		}
-		const updatedMenuItem = registry
-			.select( coreDataStore )
-			.getMenuItem( getRecordIdFromBlock( block ) );
-
-		return addRecordIdToBlock(
-			{
-				...block,
-				attributes: menuItemToBlockAttributes( updatedMenuItem ),
-			},
-			updatedMenuItem.id
-		);
-	} );
-};
+			return addRecordIdToBlock(
+				{
+					...block,
+					attributes: menuItemToBlockAttributes( updatedMenuItem ),
+				},
+				updatedMenuItem.id
+			);
+		} );
+	};
 
 /**
  * Deletes multiple menu items.
@@ -273,24 +290,32 @@ const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
  * @param {Object} deletedIds A list of menu item ids to delete
  * @return {Function} An action creator
  */
-const batchDeleteMenuItems = ( deletedIds ) => async ( { registry } ) => {
-	const deleteBatch = deletedIds.map(
-		( id ) => async ( { deleteEntityRecord } ) => {
-			const success = await deleteEntityRecord( 'root', 'menuItem', id, {
-				force: true,
-			} );
-			// @TODO failures should be thrown in core-data
-			if ( ! success ) {
-				throw new Error( id );
-			}
-			return success;
-		}
-	);
+const batchDeleteMenuItems =
+	( deletedIds ) =>
+	async ( { registry } ) => {
+		const deleteBatch = deletedIds.map(
+			( id ) =>
+				async ( { deleteEntityRecord } ) => {
+					const success = await deleteEntityRecord(
+						'root',
+						'menuItem',
+						id,
+						{
+							force: true,
+						}
+					);
+					// @TODO failures should be thrown in core-data
+					if ( ! success ) {
+						throw new Error( id );
+					}
+					return success;
+				}
+		);
 
-	return await registry
-		.dispatch( coreDataStore )
-		.__experimentalBatch( deleteBatch );
-};
+		return await registry
+			.dispatch( coreDataStore )
+			.__experimentalBatch( deleteBatch );
+	};
 
 /**
  * Turns a recursive list of blocks into a flat list of blocks annotated with

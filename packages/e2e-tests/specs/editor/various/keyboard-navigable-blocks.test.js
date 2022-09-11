@@ -26,9 +26,6 @@ const navigateToContentEditorTop = async () => {
 };
 
 const tabThroughParagraphBlock = async ( paragraphText ) => {
-	await page.keyboard.press( 'Tab' );
-	await expect( await getActiveLabel() ).toBe( 'Add block' );
-
 	await tabThroughBlockToolbar();
 
 	await page.keyboard.press( 'Tab' );

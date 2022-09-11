@@ -58,7 +58,10 @@ function Palette( { name } ) {
 		<VStack spacing={ 3 }>
 			<Subtitle>{ __( 'Palette' ) }</Subtitle>
 			<ItemGroup isBordered isSeparated>
-				<NavigationButtonAsItem path={ screenPath }>
+				<NavigationButtonAsItem
+					path={ screenPath }
+					aria-label={ __( 'Color palettes' ) }
+				>
 					<HStack
 						direction={
 							colors.length === 0 ? 'row-reverse' : 'row'

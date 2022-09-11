@@ -1,7 +1,12 @@
 /**
+ * External dependencies
+ */
+import type { ComponentType } from 'react';
+
+/**
  * Internal dependencies
  */
-import createHigherOrderComponent from '../../utils/create-higher-order-component';
+import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 
 /**
  * Higher-order component creator, creating a new component which renders if
@@ -20,12 +25,10 @@ import createHigherOrderComponent from '../../utils/create-higher-order-componen
  *
  * @return Higher-order component.
  */
-const ifCondition = < TProps extends Record< string, any > >(
-	predicate: ( props: TProps ) => boolean
-) =>
-	createHigherOrderComponent< {} >(
-		( WrappedComponent ) => ( props ) => {
-			if ( ! predicate( props as TProps ) ) {
+function ifCondition< Props >( predicate: ( props: Props ) => boolean ) {
+	return createHigherOrderComponent(
+		( WrappedComponent: ComponentType< Props > ) => ( props: Props ) => {
+			if ( ! predicate( props ) ) {
 				return null;
 			}
 
@@ -33,5 +36,6 @@ const ifCondition = < TProps extends Record< string, any > >(
 		},
 		'ifCondition'
 	);
+}
 
 export default ifCondition;

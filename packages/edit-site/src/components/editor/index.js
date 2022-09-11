@@ -9,6 +9,7 @@ import {
 	BlockContextProvider,
 	BlockBreadcrumb,
 	BlockStyles,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	InterfaceSkeleton,
@@ -47,6 +48,17 @@ import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import useTitle from '../routes/use-title';
 
 const interfaceLabels = {
+	/* translators: accessibility text for the editor top bar landmark region. */
+	header: __( 'Editor top bar' ),
+	/* translators: accessibility text for the editor content landmark region. */
+	body: __( 'Editor content' ),
+	/* translators: accessibility text for the editor settings landmark region. */
+	sidebar: __( 'Editor settings' ),
+	/* translators: accessibility text for the editor publish landmark region. */
+	actions: __( 'Editor publish' ),
+	/* translators: accessibility text for the editor footer landmark region. */
+	footer: __( 'Editor footer' ),
+	/* translators: accessibility text for the navigation sidebar landmark region. */
 	drawer: __( 'Navigation Sidebar' ),
 };
 
@@ -66,6 +78,7 @@ function Editor( { onError } ) {
 		nextShortcut,
 		editorMode,
 		showIconLabels,
+		blockEditorMode,
 	} = useSelect( ( select ) => {
 		const {
 			isInserterOpened,
@@ -78,6 +91,7 @@ function Editor( { onError } ) {
 			getEditorMode,
 		} = select( editSiteStore );
 		const { hasFinishedResolution, getEntityRecord } = select( coreStore );
+		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
 
@@ -114,15 +128,14 @@ function Editor( { onError } ) {
 				'core/edit-site',
 				'showIconLabels'
 			),
+			blockEditorMode: __unstableGetEditorMode(),
 		};
 	}, [] );
 	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
-	const [
-		isEntitiesSavedStatesOpen,
-		setIsEntitiesSavedStatesOpen,
-	] = useState( false );
+	const [ isEntitiesSavedStatesOpen, setIsEntitiesSavedStatesOpen ] =
+		useState( false );
 	const openEntitiesSavedStates = useCallback(
 		() => setIsEntitiesSavedStatesOpen( true ),
 		[]
@@ -217,7 +230,8 @@ function Editor( { onError } ) {
 										<InterfaceSkeleton
 											labels={ {
 												...interfaceLabels,
-												secondarySidebar: secondarySidebarLabel,
+												secondarySidebar:
+													secondarySidebarLabel,
 											} }
 											className={
 												showIconLabels &&
@@ -310,11 +324,14 @@ function Editor( { onError } ) {
 												</>
 											}
 											footer={
-												<BlockBreadcrumb
-													rootLabelText={ __(
-														'Template'
-													) }
-												/>
+												blockEditorMode !==
+												'zoom-out' ? (
+													<BlockBreadcrumb
+														rootLabelText={ __(
+															'Template'
+														) }
+													/>
+												) : undefined
 											}
 											shortcuts={ {
 												previous: previousShortcut,

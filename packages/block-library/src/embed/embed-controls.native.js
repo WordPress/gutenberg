@@ -30,9 +30,8 @@ const EmbedControls = ( {
 	linkLabel,
 	onEditURL,
 } ) => {
-	const { closeGeneralSidebar: closeSettingsBottomSheet } = useDispatch(
-		editPostStore
-	);
+	const { closeGeneralSidebar: closeSettingsBottomSheet } =
+		useDispatch( editPostStore );
 
 	return (
 		<>

@@ -36,14 +36,12 @@ export default function DevicePreview() {
 			isSaving: select( editPostStore ).isSavingMetaBoxes(),
 			isPostSaveable: select( editorStore ).isEditedPostSaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),
-			deviceType: select(
-				editPostStore
-			).__experimentalGetPreviewDeviceType(),
+			deviceType:
+				select( editPostStore ).__experimentalGetPreviewDeviceType(),
 		};
 	}, [] );
-	const {
-		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-	} = useDispatch( editPostStore );
+	const { __experimentalSetPreviewDeviceType: setPreviewDeviceType } =
+		useDispatch( editPostStore );
 
 	return (
 		<PreviewOptions

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mapValues, omit } from 'lodash';
+import { mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -33,11 +33,8 @@ const migrateWithLayout = ( attributes ) => {
 		return attributes;
 	}
 
-	const {
-		itemsJustification,
-		orientation,
-		...updatedAttributes
-	} = attributes;
+	const { itemsJustification, orientation, ...updatedAttributes } =
+		attributes;
 
 	if ( itemsJustification || orientation ) {
 		Object.assign( updatedAttributes, {
@@ -555,8 +552,10 @@ const deprecated = [
 			inserter: true,
 		},
 		migrate: compose( migrateIdToRef, ( attributes ) => {
+			const { rgbTextColor, rgbBackgroundColor, ...restAttributes } =
+				attributes;
 			return {
-				...omit( attributes, [ 'rgbTextColor', 'rgbBackgroundColor' ] ),
+				...restAttributes,
 				customTextColor: attributes.textColor
 					? undefined
 					: attributes.rgbTextColor,

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,6 +18,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '../animation';
 
+const noop = () => {};
 const SNACKBAR_VARIANTS = {
 	init: {
 		height: 0,
@@ -66,6 +66,8 @@ function SnackbarList( { notices, className, children, onRemove = noop } ) {
 			{ children }
 			<AnimatePresence>
 				{ notices.map( ( notice ) => {
+					const { content, ...restNotice } = notice;
+
 					return (
 						<motion.div
 							layout={ ! isReducedMotion } // See https://www.framer.com/docs/animation/#layout-animations
@@ -81,7 +83,7 @@ function SnackbarList( { notices, className, children, onRemove = noop } ) {
 						>
 							<div className="components-snackbar-list__notice-container">
 								<Snackbar
-									{ ...omit( notice, [ 'content' ] ) }
+									{ ...restNotice }
 									onRemove={ removeNotice( notice ) }
 									listRef={ listRef }
 								>

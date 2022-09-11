@@ -9,7 +9,6 @@ import type {
 	ChangeEvent,
 	PointerEvent,
 } from 'react';
-import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -47,6 +46,8 @@ function UnforwardedUnitControl(
 	const {
 		__unstableStateReducer: stateReducerProp,
 		autoComplete = 'off',
+		// @ts-expect-error Ensure that children is omitted from restProps
+		children,
 		className,
 		disabled = false,
 		disableUnits = false,
@@ -160,15 +161,13 @@ function UnforwardedUnitControl(
 			refParsedQuantity.current = undefined;
 			return;
 		}
-		const [
-			validParsedQuantity,
-			validParsedUnit,
-		] = getValidParsedQuantityAndUnit(
-			event.currentTarget.value,
-			units,
-			parsedQuantity,
-			unit
-		);
+		const [ validParsedQuantity, validParsedUnit ] =
+			getValidParsedQuantityAndUnit(
+				event.currentTarget.value,
+				units,
+				parsedQuantity,
+				unit
+			);
 
 		refParsedQuantity.current = validParsedQuantity;
 
@@ -261,9 +260,8 @@ function UnforwardedUnitControl(
 	return (
 		<Root className="components-unit-control-wrapper" style={ style }>
 			<ValueInput
-				aria-label={ label }
 				type={ isPressEnterToChange ? 'text' : 'number' }
-				{ ...omit( props, [ 'children' ] ) }
+				{ ...props }
 				autoComplete={ autoComplete }
 				className={ classes }
 				disabled={ disabled }

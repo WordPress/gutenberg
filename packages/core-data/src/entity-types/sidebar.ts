@@ -54,6 +54,6 @@ declare module './base-entity-records' {
 
 type SidebarStatus = 'active' | 'inactive';
 
-export type Sidebar< C extends Context > = OmitNevers<
+export type Sidebar< C extends Context = 'edit' > = OmitNevers<
 	_BaseEntityRecords.Sidebar< C >
 >;

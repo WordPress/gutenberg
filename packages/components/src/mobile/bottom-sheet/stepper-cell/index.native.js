@@ -30,13 +30,11 @@ class BottomSheetStepperCell extends Component {
 
 		this.announceValue = this.announceValue.bind( this );
 		this.onDecrementValue = this.onDecrementValue.bind( this );
-		this.onDecrementValuePressIn = this.onDecrementValuePressIn.bind(
-			this
-		);
+		this.onDecrementValuePressIn =
+			this.onDecrementValuePressIn.bind( this );
 		this.onIncrementValue = this.onIncrementValue.bind( this );
-		this.onIncrementValuePressIn = this.onIncrementValuePressIn.bind(
-			this
-		);
+		this.onIncrementValuePressIn =
+			this.onIncrementValuePressIn.bind( this );
 		this.onPressOut = this.onPressOut.bind( this );
 
 		const { value, defaultValue, min } = props;

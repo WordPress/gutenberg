@@ -30,12 +30,8 @@ class MenuItem extends Component {
 	}
 
 	render() {
-		const {
-			getStylesFromColorScheme,
-			item,
-			itemWidth,
-			maxWidth,
-		} = this.props;
+		const { getStylesFromColorScheme, item, itemWidth, maxWidth } =
+			this.props;
 
 		const modalIconWrapperStyle = getStylesFromColorScheme(
 			styles.modalIconWrapper,

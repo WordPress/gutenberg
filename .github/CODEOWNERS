@@ -130,7 +130,9 @@
 /packages/env                                   @noahtallen
 
 # PHP
-/lib                                                                 @timothybjacobs @spacedmonkey
+/lib                                            @spacedmonkey
+/lib/experimental/rest-api.php                  @timothybjacobs
+/lib/experimental/class-wp-rest-*               @timothybjacobs
 /lib/experimental/class-wp-rest-block-editor-settings-controller.php @timothybjacobs @spacedmonkey @geriux
 
 # Native

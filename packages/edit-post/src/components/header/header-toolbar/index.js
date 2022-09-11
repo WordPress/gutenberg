@@ -31,9 +31,8 @@ const preventDefault = ( event ) => {
 
 function HeaderToolbar() {
 	const inserterButton = useRef();
-	const { setIsInserterOpened, setIsListViewOpened } = useDispatch(
-		editPostStore
-	);
+	const { setIsInserterOpened, setIsListViewOpened } =
+		useDispatch( editPostStore );
 	const {
 		isInserterEnabled,
 		isInserterOpened,
@@ -42,15 +41,11 @@ function HeaderToolbar() {
 		isListViewOpen,
 		listViewShortcut,
 	} = useSelect( ( select ) => {
-		const {
-			hasInserterItems,
-			getBlockRootClientId,
-			getBlockSelectionEnd,
-		} = select( blockEditorStore );
+		const { hasInserterItems, getBlockRootClientId, getBlockSelectionEnd } =
+			select( blockEditorStore );
 		const { getEditorSettings } = select( editorStore );
-		const { getEditorMode, isFeatureActive, isListViewOpened } = select(
-			editPostStore
-		);
+		const { getEditorMode, isFeatureActive, isListViewOpened } =
+			select( editPostStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		return {
@@ -100,6 +95,7 @@ function HeaderToolbar() {
 				onClick={ toggleListView }
 				shortcut={ listViewShortcut }
 				showTooltip={ ! showIconLabels }
+				variant={ showIconLabels ? 'tertiary' : undefined }
 			/>
 		</>
 	);
@@ -111,6 +107,14 @@ function HeaderToolbar() {
 			setIsInserterOpened( true );
 		}
 	}, [ isInserterOpened, setIsInserterOpened ] );
+
+	/* translators: button label text should, if possible, be under 16 characters. */
+	const longLabel = _x(
+		'Toggle block inserter',
+		'Generic label for block inserter button'
+	);
+	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
+
 	return (
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
@@ -127,17 +131,9 @@ function HeaderToolbar() {
 					onClick={ openInserter }
 					disabled={ ! isInserterEnabled }
 					icon={ plus }
-					/* translators: button label text should, if possible, be under 16
-			characters. */
-					label={ _x(
-						'Toggle block inserter',
-						'Generic label for block inserter button'
-					) }
+					label={ showIconLabels ? shortLabel : longLabel }
 					showTooltip={ ! showIconLabels }
-				>
-					{ showIconLabels &&
-						( ! isInserterOpened ? __( 'Add' ) : __( 'Close' ) ) }
-				</ToolbarItem>
+				/>
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
 						{ isLargeViewport && (

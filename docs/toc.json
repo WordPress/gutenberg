@@ -95,9 +95,16 @@
 					},
 					{
 						"docs/how-to-guides/data-basics/3-building-an-edit-form.md": []
+					},
+					{
+						"docs/how-to-guides/data-basics/4-building-a-create-page-form.md": []
+					},
+					{
+						"docs/how-to-guides/data-basics/5-adding-a-delete-button.md": []
 					}
 				]
 			},
+			{ "docs/how-to-guides/curating-the-editor-experience.md": [] },
 			{ "docs/how-to-guides/feature-flags.md": [] },
 			{ "docs/how-to-guides/format-api.md": [] },
 			{
@@ -126,6 +133,7 @@
 			},
 			{ "docs/how-to-guides/notices/README.md": [] },
 			{ "docs/how-to-guides/plugin-sidebar-0.md": [] },
+			{ "docs/how-to-guides/propagating-updates.md": [] },
 			{
 				"docs/how-to-guides/themes/README.md": [
 					{ "docs/how-to-guides/themes/block-theme-overview.md": [] },
@@ -244,14 +252,34 @@
 					{
 						"docs/reference-guides/data/data-core-annotations.md": []
 					},
-					{ "docs/reference-guides/data/data-core-blocks.md": [] },
+					{
+						"docs/reference-guides/data/data-core-block-directory.md": []
+					},
 					{
 						"docs/reference-guides/data/data-core-block-editor.md": []
 					},
-					{ "docs/reference-guides/data/data-core-editor.md": [] },
+					{ "docs/reference-guides/data/data-core-blocks.md": [] },
+					{
+						"docs/reference-guides/data/data-core-customize-widgets.md": []
+					},
 					{ "docs/reference-guides/data/data-core-edit-post.md": [] },
+					{ "docs/reference-guides/data/data-core-edit-site.md": [] },
+					{
+						"docs/reference-guides/data/data-core-edit-widgets.md": []
+					},
+					{ "docs/reference-guides/data/data-core-editor.md": [] },
+					{
+						"docs/reference-guides/data/data-core-keyboard-shortcuts.md": []
+					},
 					{ "docs/reference-guides/data/data-core-notices.md": [] },
 					{ "docs/reference-guides/data/data-core-nux.md": [] },
+					{
+						"docs/reference-guides/data/data-core-preferences.md": []
+					},
+					{
+						"docs/reference-guides/data/data-core-reusable-blocks.md": []
+					},
+					{ "docs/reference-guides/data/data-core-rich-text.md": [] },
 					{ "docs/reference-guides/data/data-core-viewport.md": [] }
 				]
 			}
@@ -301,7 +329,13 @@
 					{ "docs/contributors/code/grammar.md": [] },
 					{ "docs/contributors/code/scripts.md": [] },
 					{ "docs/contributors/code/managing-packages.md": [] },
-					{ "docs/contributors/code/release.md": [] },
+					{
+						"docs/contributors/code/release.md": [
+							{
+								"docs/contributors/code/auto-cherry-picking.md": []
+							}
+						]
+					},
 					{
 						"docs/contributors/code/react-native/README.md": [
 							{

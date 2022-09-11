@@ -49,7 +49,7 @@ document.addEventListener( 'click', function ( event ) {
 		}
 	} );
 } );
-// Close on focus outside.
+// Close on focus outside or escape key.
 document.addEventListener( 'keyup', function ( event ) {
 	const submenuBlocks = document.querySelectorAll(
 		'.wp-block-navigation-submenu'
@@ -57,6 +57,11 @@ document.addEventListener( 'keyup', function ( event ) {
 	submenuBlocks.forEach( ( block ) => {
 		if ( ! block.contains( event.target ) ) {
 			closeSubmenus( block );
+		} else if ( event.key === 'Escape' ) {
+			const toggle = block.querySelector( '[aria-expanded="true"]' );
+			closeSubmenus( block );
+			// Focus the submenu trigger so focus does not get trapped in the closed submenu.
+			toggle?.focus();
 		}
 	} );
 } );

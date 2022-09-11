@@ -25,10 +25,8 @@ window.getHTMLPostContent = () => {
 };
 
 window.insertBlock = ( blockHTML ) => {
-	const {
-		blockEditorSelect,
-		blockEditorDispatch,
-	} = window.getBlockEditorStore();
+	const { blockEditorSelect, blockEditorDispatch } =
+		window.getBlockEditorStore();
 
 	// Setup the editor with the inserted block.
 	const post = window.wp.data.select( 'core/editor' ).getCurrentPost();

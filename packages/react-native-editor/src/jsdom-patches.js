@@ -25,11 +25,8 @@ const { core } = jsdomLevel1Core.dom.level1;
 const { Node, Element, CharacterData } = core;
 
 // Exception codes.
-const {
-	NO_MODIFICATION_ALLOWED_ERR,
-	HIERARCHY_REQUEST_ERR,
-	NOT_FOUND_ERR,
-} = core;
+const { NO_MODIFICATION_ALLOWED_ERR, HIERARCHY_REQUEST_ERR, NOT_FOUND_ERR } =
+	core;
 
 /**
  * Simple recursive implementation of Node.contains method

@@ -42,20 +42,9 @@
 	left: calc(50% - #{$button-size-small * 0.5});
 }
 
-.block-editor-block-list__block-popover-inserter {
-	position: absolute;
-	top: -9999em;
-	margin-bottom: $block-padding;
-
-	&.is-visible {
-		position: static;
-	}
-}
-
 // Sibling inserter / "inbetweenserter".
 .block-editor-default-block-appender,
-.block-editor-block-list__insertion-point-inserter,
-.block-editor-block-list__block-popover-inserter {
+.block-editor-block-list__insertion-point-inserter {
 	.block-editor-inserter__toggle.components-button.has-icon {
 		// Basic look
 		background: $gray-900;
@@ -181,6 +170,11 @@
 	}
 	.block-selection-button_select-button.components-button {
 		padding: 0;
+	}
+
+	.block-editor-block-mover {
+		background: unset;
+		border: none;
 	}
 }
 

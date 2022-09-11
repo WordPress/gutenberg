@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 import {
 	InnerBlocks,
 	useBlockProps,
@@ -48,13 +49,13 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 	);
 	const defaultLayout = useSetting( 'layout' ) || {};
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
-	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const usedLayout = ! layout?.type
+		? { ...defaultLayout, ...layout, type: 'default' }
+		: { ...defaultLayout, ...layout };
 	const { type = 'default' } = usedLayout;
 	const layoutSupportEnabled = themeSupportsLayout || type !== 'default';
 
-	const blockProps = useBlockProps( {
-		className: `is-layout-${ type }`,
-	} );
+	const blockProps = useBlockProps();
 
 	const innerBlocksProps = useInnerBlocksProps(
 		layoutSupportEnabled
@@ -68,6 +69,16 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			__experimentalLayout: layoutSupportEnabled ? usedLayout : undefined,
 		}
 	);
+
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+	const { type: layoutType = null } = layout;
+	useEffect( () => {
+		if ( layoutType ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { layout: { ...layout, type: layoutType } } );
+		}
+	}, [ layoutType ] );
 
 	return (
 		<>

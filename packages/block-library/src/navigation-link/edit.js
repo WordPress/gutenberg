@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape } from 'lodash';
+import { escape, unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -42,7 +42,11 @@ import {
 } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	useResourcePermissions,
+} from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -224,24 +228,41 @@ export const updateNavigationLinkBlockAttributes = (
 	} = blockAttributes;
 
 	const {
-		title = '', // the title of any provided Post.
-		url = '',
+		title: newLabel = '', // the title of any provided Post.
+		url: newUrl = '',
 
 		opensInNewTab,
 		id,
 		kind: newKind = originalKind,
 		type: newType = originalType,
 	} = updatedValue;
-	const normalizedTitle = title.replace( /http(s?):\/\//gi, '' );
-	const normalizedURL = url.replace( /http(s?):\/\//gi, '' );
-	const escapeTitle =
-		title !== '' &&
-		normalizedTitle !== normalizedURL &&
-		originalLabel !== title;
 
-	const label = escapeTitle
-		? escape( title )
-		: originalLabel || escape( normalizedURL );
+	const newLabelWithoutHttp = newLabel.replace( /http(s?):\/\//gi, '' );
+	const newUrlWithoutHttp = newUrl.replace( /http(s?):\/\//gi, '' );
+
+	const useNewLabel =
+		newLabel &&
+		newLabel !== originalLabel &&
+		// LinkControl without the title field relies
+		// on the check below. Specifically, it assumes that
+		// the URL is the same as a title.
+		// This logic a) looks suspicious and b) should really
+		// live in the LinkControl and not here. It's a great
+		// candidate for future refactoring.
+		newLabelWithoutHttp !== newUrlWithoutHttp;
+
+	// Unfortunately this causes the escaping model to be inverted.
+	// The escaped content is stored in the block attributes (and ultimately in the database),
+	// and then the raw data is "recovered" when outputting into the DOM.
+	// It would be preferable to store the **raw** data in the block attributes and escape it in JS.
+	// Why? Because there isn't one way to escape data. Depending on the context, you need to do
+	// different transforms. It doesn't make sense to me to choose one of them for the purposes of storage.
+	// See also:
+	// - https://github.com/WordPress/gutenberg/pull/41063
+	// - https://github.com/WordPress/gutenberg/pull/18617.
+	const label = useNewLabel
+		? escape( newLabel )
+		: originalLabel || escape( newUrlWithoutHttp );
 
 	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
 	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
@@ -255,7 +276,7 @@ export const updateNavigationLinkBlockAttributes = (
 
 	setAttributes( {
 		// Passed `url` may already be encoded. To prevent double encoding, decodeURI is executed to revert to the original string.
-		...( url && { url: encodeURI( safeDecodeURI( url ) ) } ),
+		...( newUrl && { url: encodeURI( safeDecodeURI( newUrl ) ) } ),
 		...( label && { label } ),
 		...( undefined !== opensInNewTab && { opensInNewTab } ),
 		...( id && Number.isInteger( id ) && { id } ),
@@ -294,7 +315,7 @@ const useIsInvalidLink = ( kind, type, id ) => {
 	return [ isInvalid, isDraft ];
 };
 
-const useMissingText = ( type ) => {
+function getMissingText( type ) {
 	let missingText = '';
 
 	switch ( type ) {
@@ -320,7 +341,7 @@ const useMissingText = ( type ) => {
 	}
 
 	return missingText;
-};
+}
 
 /**
  * Removes HTML from a given string.
@@ -437,15 +458,16 @@ export default function NavigationLinkEdit( {
 		title: label && navStripHTML( label ), // don't allow HTML to display inside the <LinkControl>
 	};
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const {
-		replaceBlock,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
+	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const listItemRef = useRef( null );
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
+
+	const pagesPermissions = useResourcePermissions( 'pages' );
+	const postsPermissions = useResourcePermissions( 'posts' );
 
 	const {
 		innerBlocks,
@@ -453,8 +475,6 @@ export default function NavigationLinkEdit( {
 		isTopLevelLink,
 		isParentOfSelectedBlock,
 		hasChildren,
-		userCanCreatePages,
-		userCanCreatePosts,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -481,14 +501,6 @@ export default function NavigationLinkEdit( {
 					true
 				),
 				hasChildren: !! getBlockCount( clientId ),
-				userCanCreatePages: select( coreStore ).canUser(
-					'create',
-					'pages'
-				),
-				userCanCreatePosts: select( coreStore ).canUser(
-					'create',
-					'posts'
-				),
 			};
 		},
 		[ clientId ]
@@ -590,9 +602,9 @@ export default function NavigationLinkEdit( {
 
 	let userCanCreate = false;
 	if ( ! type || type === 'page' ) {
-		userCanCreate = userCanCreatePages;
+		userCanCreate = pagesPermissions.canCreate;
 	} else if ( type === 'post' ) {
-		userCanCreate = userCanCreatePosts;
+		userCanCreate = postsPermissions.canCreate;
 	}
 
 	async function handleCreate( pageTitle ) {
@@ -606,7 +618,17 @@ export default function NavigationLinkEdit( {
 		return {
 			id: page.id,
 			type: postType,
-			title: page.title.rendered,
+			// Make `title` property consistent with that in `fetchLinkSuggestions` where the `rendered` title (containing HTML entities)
+			// is also being decoded. By being consistent in both locations we avoid having to branch in the rendering output code.
+			// Ideally in the future we will update both APIs to utilise the "raw" form of the title which is better suited to edit contexts.
+			// e.g.
+			// - title.raw = "Yes & No"
+			// - title.rendered = "Yes &#038; No"
+			// - decodeEntities( title.rendered ) = "Yes & No"
+			// See:
+			// - https://github.com/WordPress/gutenberg/pull/41063
+			// - https://github.com/WordPress/gutenberg/blob/a1e1fdc0e6278457e9f4fc0b31ac6d2095f5450b/packages/core-data/src/fetch/__experimental-fetch-link-suggestions.js#L212-L218
+			title: decodeEntities( page.title.rendered ),
 			url: page.link,
 			kind: 'post-type',
 		};
@@ -638,10 +660,8 @@ export default function NavigationLinkEdit( {
 			'has-text-color': !! textColor || !! customTextColor,
 			[ getColorClassName( 'color', textColor ) ]: !! textColor,
 			'has-background': !! backgroundColor || customBackgroundColor,
-			[ getColorClassName(
-				'background-color',
-				backgroundColor
-			) ]: !! backgroundColor,
+			[ getColorClassName( 'background-color', backgroundColor ) ]:
+				!! backgroundColor,
 		} ),
 		style: {
 			color: ! textColor && customTextColor,
@@ -658,7 +678,7 @@ export default function NavigationLinkEdit( {
 		'wp-block-navigation-link__placeholder': ! url || isInvalid || isDraft,
 	} );
 
-	const missingText = useMissingText( type, isInvalid, isDraft );
+	const missingText = getMissingText( type );
 	/* translators: Whether the navigation link is Invalid or a Draft. */
 	const placeholderText = `(${
 		isInvalid ? __( 'Invalid' ) : __( 'Draft' )
@@ -795,10 +815,20 @@ export default function NavigationLinkEdit( {
 										text={ tooltipText }
 									>
 										<>
-											<span>
+											<span
+												aria-label={ __(
+													'Navigation link text'
+												) }
+											>
 												{
-													/* Trim to avoid trailing white space when the placeholder text is not present */
-													`${ label } ${ placeholderText }`.trim()
+													// Some attributes are stored in an escaped form. It's a legacy issue.
+													// Ideally they would be stored in a raw, unescaped form.
+													// Unescape is used here to "recover" the escaped characters
+													// so they display without encoding.
+													// See `updateNavigationLinkBlockAttributes` for more details.
+													`${ unescape(
+														label
+													) } ${ placeholderText }`.trim()
 												}
 											</span>
 											<span className="wp-block-navigation-link__missing_text-tooltip">
@@ -815,6 +845,7 @@ export default function NavigationLinkEdit( {
 							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }
 							anchorRef={ listItemRef.current }
+							shift
 						>
 							<LinkControl
 								hasTextControl

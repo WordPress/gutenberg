@@ -20,6 +20,8 @@ import ScreenColorPalette from './screen-color-palette';
 import ScreenBackgroundColor from './screen-background-color';
 import ScreenTextColor from './screen-text-color';
 import ScreenLinkColor from './screen-link-color';
+import ScreenHeadingColor from './screen-heading-color';
+import ScreenButtonColor from './screen-button-color';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
 
@@ -58,6 +60,18 @@ function ContextScreens( { name } ) {
 				<ScreenTypographyElement name={ name } element="link" />
 			</GlobalStylesNavigationScreen>
 
+			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/typography/heading' }
+			>
+				<ScreenTypographyElement name={ name } element="heading" />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/typography/button' }
+			>
+				<ScreenTypographyElement name={ name } element="button" />
+			</GlobalStylesNavigationScreen>
+
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors' }>
 				<ScreenColors name={ name } />
 			</GlobalStylesNavigationScreen>
@@ -80,6 +94,18 @@ function ContextScreens( { name } ) {
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/link' }>
 				<ScreenLinkColor name={ name } />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/colors/heading' }
+			>
+				<ScreenHeadingColor name={ name } />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/colors/button' }
+			>
+				<ScreenButtonColor name={ name } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>

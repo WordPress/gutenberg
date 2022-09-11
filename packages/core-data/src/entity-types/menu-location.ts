@@ -24,6 +24,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type MenuLocation< C extends Context > = OmitNevers<
+export type MenuLocation< C extends Context = 'edit' > = OmitNevers<
 	_BaseEntityRecords.MenuLocation< C >
 >;

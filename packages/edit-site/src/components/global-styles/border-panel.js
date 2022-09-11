@@ -179,21 +179,11 @@ export default function BorderPanel( { name } ) {
 					<BorderBoxControl
 						colors={ colors }
 						enableAlpha={ true }
+						enableStyle={ showBorderStyle }
 						onChange={ onBorderChange }
-						showStyle={ showBorderStyle }
+						popoverOffset={ 40 }
+						popoverPlacement="left-start"
 						value={ border }
-						popoverClassNames={ {
-							linked:
-								'edit-site-global-styles-sidebar__border-box-control__popover',
-							top:
-								'edit-site-global-styles-sidebar__border-box-control__popover-top',
-							right:
-								'edit-site-global-styles-sidebar__border-box-control__popover-right',
-							bottom:
-								'edit-site-global-styles-sidebar__border-box-control__popover-bottom',
-							left:
-								'edit-site-global-styles-sidebar__border-box-control__popover-left',
-						} }
 						__experimentalHasMultipleOrigins={ true }
 						__experimentalIsRenderedInSidebar={ true }
 					/>

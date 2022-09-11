@@ -35,6 +35,8 @@ Array [
     >
       <View
         collapsable={false}
+        handlerTag={3}
+        handlerType="LongPressGestureHandler"
         onGestureHandlerEvent={[Function]}
         onGestureHandlerStateChange={[Function]}
         style={
@@ -93,6 +95,8 @@ Array [
     >
       <View
         collapsable={false}
+        handlerTag={4}
+        handlerType="LongPressGestureHandler"
         onGestureHandlerEvent={[Function]}
         onGestureHandlerStateChange={[Function]}
         style={

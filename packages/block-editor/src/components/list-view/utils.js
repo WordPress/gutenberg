@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -27,7 +22,7 @@ export const getBlockPositionDescription = ( position, siblingCount, level ) =>
  * @return {boolean} Whether the block is in multi-selection set.
  */
 export const isClientIdSelected = ( clientId, selectedBlockClientIds ) =>
-	isArray( selectedBlockClientIds ) && selectedBlockClientIds.length
+	Array.isArray( selectedBlockClientIds ) && selectedBlockClientIds.length
 		? selectedBlockClientIds.indexOf( clientId ) !== -1
 		: selectedBlockClientIds === clientId;
 

@@ -3,7 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { toggleFormat, remove, applyFormat } from '@wordpress/rich-text';
-import { RichTextToolbarButton } from '@wordpress/block-editor';
+import {
+	RichTextToolbarButton,
+	RichTextShortcut,
+} from '@wordpress/block-editor';
 import { code as codeIcon } from '@wordpress/icons';
 
 const name = 'core/code';
@@ -51,13 +54,20 @@ export const code = {
 		}
 
 		return (
-			<RichTextToolbarButton
-				icon={ codeIcon }
-				title={ title }
-				onClick={ onClick }
-				isActive={ isActive }
-				role="menuitemcheckbox"
-			/>
+			<>
+				<RichTextShortcut
+					type="access"
+					character="x"
+					onUse={ onClick }
+				/>
+				<RichTextToolbarButton
+					icon={ codeIcon }
+					title={ title }
+					onClick={ onClick }
+					isActive={ isActive }
+					role="menuitemcheckbox"
+				/>
+			</>
 		);
 	},
 };

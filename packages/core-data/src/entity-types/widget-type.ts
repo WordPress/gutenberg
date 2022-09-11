@@ -32,6 +32,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type WidgetType< C extends Context > = OmitNevers<
+export type WidgetType< C extends Context = 'edit' > = OmitNevers<
 	_BaseEntityRecords.WidgetType< C >
 >;

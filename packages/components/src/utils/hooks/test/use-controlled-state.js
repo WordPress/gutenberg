@@ -2,12 +2,13 @@
  * External dependencies
  */
 import { render, fireEvent, screen } from '@testing-library/react';
-import { noop } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import useControlledState from '../use-controlled-state';
+
+const noop = () => {};
 
 describe( 'hooks', () => {
 	const getInput = () => screen.getByTestId( 'input' );

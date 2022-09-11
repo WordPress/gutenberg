@@ -148,6 +148,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type Post< C extends Context > = OmitNevers<
+export type Post< C extends Context = 'edit' > = OmitNevers<
 	_BaseEntityRecords.Post< C >
 >;

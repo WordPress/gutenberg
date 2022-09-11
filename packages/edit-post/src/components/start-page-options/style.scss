@@ -11,15 +11,6 @@
 	@include break-large() {
 		height: 70%;
 	}
-
-	// @todo: Consider this for a minimal modal prop.
-	.components-modal__header {
-		border-bottom: none;
-	}
-
-	.components-modal__content::before {
-		content: none;
-	}
 }
 
 // 2 column masonry layout.

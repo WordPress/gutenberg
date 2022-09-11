@@ -25,11 +25,10 @@ import { useEffect } from '@wordpress/element';
  * @return {import('lodash').DebouncedFunc<TFunc>} Throttled function.
  */
 export default function useThrottle( fn, wait, options ) {
-	const throttled = useMemoOne( () => throttle( fn, wait, options ), [
-		fn,
-		wait,
-		options,
-	] );
+	const throttled = useMemoOne(
+		() => throttle( fn, wait, options ),
+		[ fn, wait, options ]
+	);
 	useEffect( () => () => throttled.cancel(), [ throttled ] );
 	return throttled;
 }

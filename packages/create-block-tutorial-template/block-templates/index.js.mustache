@@ -20,14 +20,17 @@ import './editor.scss';
  * Internal dependencies
  */
 import Edit from './edit';
+{{#isStaticVariant}}
 import save from './save';
+{{/isStaticVariant}}
+import metadata from './block.json';
 
 /**
  * Every block starts by registering a new block type definition.
  *
  * @see https://developer.wordpress.org/block-editor/developers/block-api/#registering-a-block
  */
-registerBlockType( '{{namespace}}/{{slug}}', {
+registerBlockType( metadata.name, {
 	/**
 	 * Used to construct a preview for the block to be shown in the block inserter.
 	 */
@@ -40,8 +43,11 @@ registerBlockType( '{{namespace}}/{{slug}}', {
 	 * @see ./edit.js
 	 */
 	edit: Edit,
+	{{#isStaticVariant}}
+
 	/**
 	 * @see ./save.js
 	 */
 	save,
+	{{/isStaticVariant}}
 } );

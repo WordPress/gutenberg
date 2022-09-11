@@ -22,9 +22,8 @@ import TemplateDescription from './template-description';
 
 function TemplateTitle() {
 	const { template, isEditing, title } = useSelect( ( select ) => {
-		const { isEditingTemplate, getEditedPostTemplate } = select(
-			editPostStore
-		);
+		const { isEditingTemplate, getEditedPostTemplate } =
+			select( editPostStore );
 		const { getEditedPostAttribute } = select( editorStore );
 
 		const _isEditing = isEditingTemplate();

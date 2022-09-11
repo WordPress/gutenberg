@@ -40,10 +40,10 @@ function useSortedBlockTypes() {
 		type.push( block );
 		return blocks;
 	};
-	const {
-		core: coreItems,
-		noncore: nonCoreItems,
-	} = blockItems.reduce( groupByType, { core: [], noncore: [] } );
+	const { core: coreItems, noncore: nonCoreItems } = blockItems.reduce(
+		groupByType,
+		{ core: [], noncore: [] }
+	);
 	return [ ...coreItems, ...nonCoreItems ];
 }
 
@@ -60,8 +60,17 @@ function BlockMenuItem( { block } ) {
 		return null;
 	}
 
+	const navigationButtonLabel = sprintf(
+		// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
+		__( '%s block styles' ),
+		block.title
+	);
+
 	return (
-		<NavigationButtonAsItem path={ '/blocks/' + block.name }>
+		<NavigationButtonAsItem
+			path={ '/blocks/' + block.name }
+			aria-label={ navigationButtonLabel }
+		>
 			<HStack justify="flex-start">
 				<BlockIcon icon={ block.icon } />
 				<FlexItem>{ block.title }</FlexItem>

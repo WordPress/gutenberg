@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import classnames from 'classnames';
 import type { Ref, ForwardedRef } from 'react';
 
@@ -29,6 +28,8 @@ type ResizeTooltipProps = React.ComponentProps< typeof Root > & {
 	showPx?: boolean;
 	zIndex?: number;
 };
+
+const noop = () => {};
 
 function ResizeTooltip(
 	{
