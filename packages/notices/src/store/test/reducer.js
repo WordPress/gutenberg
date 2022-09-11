@@ -7,7 +7,7 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import reducer from '../reducer';
-import { createNotice, removeNotice, removeNotices } from '../actions';
+import { createNotice, removeNotice, removeNotices, removeAllNotices } from '../actions';
 import { getNotices } from '../selectors';
 import { DEFAULT_CONTEXT } from '../constants';
 
@@ -196,6 +196,53 @@ describe( 'reducer', () => {
 					id: 'error-message',
 					content: 'save error (2)',
 					spokenMessage: 'save error (2)',
+					__unstableHTML: undefined,
+					status: 'error',
+					isDismissible: true,
+					actions: [],
+					type: 'default',
+					icon: null,
+					explicitDismiss: false,
+					onDismiss: undefined,
+				},
+			],
+		} );
+	} );
+
+	it( 'should remove all notices', () => {
+		let action = createNotice( 'error', 'save error' );
+		const original = deepFreeze( reducer( undefined, action ) );
+
+		action = createNotice( 'success', 'successfully saved' );
+		let state = reducer( original, action );
+		state = reducer( state, removeAllNotices() );
+
+		expect( state ).toEqual( {
+			[ DEFAULT_CONTEXT ]: [],
+		} );
+	} );
+
+	it( 'should remove all notices in a given context but leave other contexts intact', () => {
+		let action = createNotice( 'error', 'save error', {
+			context: 'foo',
+			id: 'foo-error',
+		} );
+		const original = deepFreeze( reducer( undefined, action ) );
+
+		action = createNotice( 'success', 'successfully saved', {
+			context: 'bar',
+		} );
+
+		let state = reducer( original, action );
+		state = reducer( state, removeAllNotices( 'bar' ) );
+
+		expect( state ).toEqual( {
+			bar: [],
+			foo: [
+				{
+					id: 'foo-error',
+					content: 'save error',
+					spokenMessage: 'save error',
 					__unstableHTML: undefined,
 					status: 'error',
 					isDismissible: true,
