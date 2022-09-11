@@ -9,22 +9,34 @@
  * Adds global style rules to the inline style for each block.
  */
 function wp_add_global_styles_for_blocks() {
+	global $wp_styles;
+
+	// Default to "global-styles".
+	$default_handle = 'global-styles';
+
 	$tree        = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 	$block_nodes = $tree->get_styles_block_nodes();
+
 	foreach ( $block_nodes as $metadata ) {
 		$block_css = $tree->get_styles_for_block( $metadata );
 
 		if ( ! wp_should_load_separate_core_block_assets() ) {
-			wp_add_inline_style( 'global-styles', $block_css );
+			wp_add_inline_style( $default_handle, $block_css );
 			continue;
 		}
 
 		if ( isset( $metadata['name'] ) ) {
-			$block_name = str_replace( 'core/', '', $metadata['name'] );
+			$handle                  = $default_handle;
+			$block_stylesheet_handle = generate_block_asset_handle( $metadata['name'], 'style' );
+
+			if ( isset( $wp_styles->registered[ $block_stylesheet_handle ] ) ) {
+				$handle = $block_stylesheet_handle;
+			}
+
 			// These block styles are added on block_render.
 			// This hooks inline CSS to them so that they are loaded conditionally
 			// based on whether or not the block is used on the page.
-			wp_add_inline_style( 'wp-block-' . $block_name, $block_css );
+			wp_add_inline_style( $handle, $block_css );
 		}
 
 		// The likes of block element styles from theme.json do not have  $metadata['name'] set.
@@ -33,16 +45,23 @@ function wp_add_global_styles_for_blocks() {
 				array_filter(
 					$metadata['path'],
 					function ( $item ) {
-						if ( str_contains( $item, 'core/' ) ) {
+						if ( str_contains( $item, '/' ) ) {
 							return true;
 						}
 						return false;
 					}
 				)
 			);
+
 			if ( isset( $result[0] ) ) {
-				$block_name = str_replace( 'core/', '', $result[0] );
-				wp_add_inline_style( 'wp-block-' . $block_name, $block_css );
+				$handle                  = $default_handle;
+				$block_stylesheet_handle = generate_block_asset_handle( $result['0'], 'style' );
+
+				if ( isset( $wp_styles->registered[ $block_stylesheet_handle ] ) ) {
+					$handle = $block_stylesheet_handle;
+				}
+
+				wp_add_inline_style( $handle, $block_css );
 			}
 		}
 	}
