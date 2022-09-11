@@ -320,6 +320,7 @@ export function removeNotice( id, context = DEFAULT_CONTEXT ) {
  * @param {string} context The context to remove all notices from.
  *
  * @example
+ * ```js
  * import { __ } from '@wordpress/i18n';
  * import { useDispatch, useSelect } from '@wordpress/data';
  * import { store as noticesStore } from '@wordpress/notices';
@@ -347,6 +348,7 @@ export function removeNotice( id, context = DEFAULT_CONTEXT ) {
  * 		</>
  * 	);
  * };
+ * ```
  *
  * @return {Object} 	   Action object.
  */

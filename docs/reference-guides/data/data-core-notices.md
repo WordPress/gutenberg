@@ -267,35 +267,31 @@ Removes all notices from a given context. Defaults to the default context.
 
 _Usage_
 
-import { \_\_ } from '@wordpress/i18n';
+```js
+import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { Button } from '@wordpress/components';
 
 export const ExampleComponent = () => {
-const notices = useSelect( ( select ) =>
-select( noticesStore ).getNotices()
-);
-const { removeNotices } = useDispatch( noticesStore );
-return (
-\<>
-
-    		<ul>
-    			{ notices.map( ( notice ) => (
-    				<li key={ notice.id }>{ notice.content }</li>
-    			) ) }
-    		</ul>
-    		<Button
-    			onClick={ () =>
-    				removeAllNotices()
-    			}
-    		>
-    			{ __( 'Clear all notices', 'woo-gutenberg-products-block' ) }
-    		</Button>
-    	</>
-    );
-
+	const notices = useSelect( ( select ) =>
+		select( noticesStore ).getNotices()
+	);
+	const { removeNotices } = useDispatch( noticesStore );
+	return (
+		<>
+			<ul>
+				{ notices.map( ( notice ) => (
+					<li key={ notice.id }>{ notice.content }</li>
+				) ) }
+			</ul>
+			<Button onClick={ () => removeAllNotices() }>
+				{ __( 'Clear all notices', 'woo-gutenberg-products-block' ) }
+			</Button>
+		</>
+	);
 };
+```
 
 _Parameters_
 
