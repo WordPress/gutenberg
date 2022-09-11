@@ -232,4 +232,5 @@ export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
 	'color.palette': true,
 	'typography.fontFamilies': true,
 	'typography.fontSizes': true,
+	'spacing.spacingSizes': true,
 };

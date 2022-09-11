@@ -8,7 +8,7 @@ const slug = {
 	type: 'input',
 	name: 'slug',
 	message:
-		'The block slug used for identification (also the plugin and output folder name):',
+		'The block slug used for identification (also the output folder name):',
 	validate( input ) {
 		if ( ! /^[a-z][a-z0-9\-]*$/.test( input ) ) {
 			return 'Invalid block slug specified. Block slug can contain only lowercase alphanumeric characters or dashes, and start with a letter.';

@@ -971,7 +971,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 <Option
                   aria-label="Color: red"
                   isSelected={true}
-                  key="#f00"
+                  key="#f00-0"
                   onClick={[Function]}
                   selectedIconProps={
                     Object {
@@ -1074,7 +1074,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 <Option
                   aria-label="Color: white"
                   isSelected={false}
-                  key="#fff"
+                  key="#fff-1"
                   onClick={[Function]}
                   selectedIconProps={Object {}}
                   style={
@@ -1134,7 +1134,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 <Option
                   aria-label="Color: blue"
                   isSelected={false}
-                  key="#00f"
+                  key="#00f-2"
                   onClick={[Function]}
                   selectedIconProps={Object {}}
                   style={

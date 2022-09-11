@@ -187,23 +187,16 @@ const Popover = (
 
 	/**
 	 * Offsets the position of the popover when the anchor is inside an iframe.
+	 *
+	 * Store the offset in a ref, due to constraints with floating-ui:
+	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
 	 */
-	const frameOffset = useMemo( () => {
-		const { defaultView } = ownerDocument;
-		const { frameElement } = defaultView;
-
-		if ( ! frameElement || ownerDocument === document ) {
-			return undefined;
-		}
-
-		const iframeRect = frameElement.getBoundingClientRect();
-		return { x: iframeRect.left, y: iframeRect.top };
-	}, [ ownerDocument ] );
+	const frameOffset = useRef();
 
 	const middleware = [
-		frameOffset || offset
+		frameOffset.current || offset
 			? offsetMiddleware( ( { placement: currentPlacement } ) => {
-					if ( ! frameOffset ) {
+					if ( ! frameOffset.current ) {
 						return offset;
 					}
 
@@ -228,8 +221,8 @@ const Popover = (
 					return {
 						mainAxis:
 							normalizedOffset +
-							frameOffset[ mainAxis ] * mainAxisModifier,
-						crossAxis: frameOffset[ crossAxis ],
+							frameOffset.current[ mainAxis ] * mainAxisModifier,
+						crossAxis: frameOffset.current[ crossAxis ],
 					};
 			  } )
 			: undefined,
@@ -238,11 +231,11 @@ const Popover = (
 			? undefined
 			: size( {
 					apply( sizeProps ) {
-						const { height } = sizeProps;
+						const { availableHeight } = sizeProps;
 						if ( ! refs.floating.current ) return;
 						// Reduce the height of the popover to the available space.
 						Object.assign( refs.floating.current.firstChild.style, {
-							maxHeight: `${ height }px`,
+							maxHeight: `${ availableHeight }px`,
 							overflow: 'auto',
 						} );
 					},
@@ -388,14 +381,34 @@ const Popover = (
 
 	// If the reference element is in a different ownerDocument (e.g. iFrame),
 	// we need to manually update the floating's position as the reference's owner
-	// document scrolls.
+	// document scrolls. Also update the frame offset if the view resizes.
 	useLayoutEffect( () => {
 		if ( ownerDocument === document ) {
 			return;
 		}
 
+		const { defaultView } = ownerDocument;
+		const { frameElement } = defaultView;
+
 		ownerDocument.addEventListener( 'scroll', update );
-		return () => ownerDocument.removeEventListener( 'scroll', update );
+
+		let updateFrameOffset;
+		if ( frameElement ) {
+			updateFrameOffset = () => {
+				const iframeRect = frameElement.getBoundingClientRect();
+				frameOffset.current = { x: iframeRect.left, y: iframeRect.top };
+			};
+			updateFrameOffset();
+			defaultView.addEventListener( 'resize', updateFrameOffset );
+		}
+
+		return () => {
+			ownerDocument.removeEventListener( 'scroll', update );
+
+			if ( updateFrameOffset ) {
+				defaultView.removeEventListener( 'resize', updateFrameOffset );
+			}
+		};
 	}, [ ownerDocument ] );
 
 	/** @type {false | string} */

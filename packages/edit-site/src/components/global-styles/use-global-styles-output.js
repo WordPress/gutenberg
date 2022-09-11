@@ -277,6 +277,11 @@ export function getStylesDeclarations(
 		if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
 			const refPath = ruleValue.ref.split( '.' );
 			ruleValue = get( tree, refPath );
+			// Presence of another ref indicates a reference to another dynamic value.
+			// Pointing to another dynamic value is not supported.
+			if ( ! ruleValue || !! ruleValue?.ref ) {
+				return;
+			}
 		}
 		output.push( `${ cssProperty }: ${ compileStyleValue( ruleValue ) }` );
 	} );
