@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, uniqueId } from 'lodash';
+import { uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
