@@ -39,14 +39,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 			$theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $theme_json_data );
 
-			/**
-			 * TODO:
-			 * - should webfonts be filterable as well?
-			 * - make sure the new data gets translated
-			 * - verify all the paths (with and without supports, etc)
-			 */
 			$theme_json_data = apply_filters( 'global_styles_theme', $theme_json_data );
-
 			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 
 			if ( wp_get_theme()->parent() ) {
