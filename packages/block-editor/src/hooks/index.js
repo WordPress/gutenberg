@@ -16,6 +16,8 @@ import './font-size';
 import './border';
 import './layout';
 import './content-lock-ui';
+import './metadata';
+import './metadata-name';
 
 export { useCustomSides } from './dimensions';
 export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
