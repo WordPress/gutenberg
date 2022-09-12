@@ -12,32 +12,31 @@ import {
 	__experimentalTruncate as Truncate,
 	Tooltip,
 } from '@wordpress/components';
-import { forwardRef } from '@wordpress/element';
 import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
 import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { __, sprintf } from '@wordpress/i18n';
+import { forwardRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
-import useBlockDisplayInformation from '../use-block-display-information';
-import useBlockDisplayTitle from '../block-title/use-block-display-title';
+
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import useListViewImages from './use-list-view-images';
+import BlockOptionsRenameItem from './block-options-rename-item';
+
+const SINGLE_CLICK = 1;
 
 function ListViewBlockSelectButton(
 	{
 		className,
-		block: { clientId },
 		onClick,
 		onToggleExpanded,
-		tabIndex,
-		onFocus,
 		onDragStart,
 		onDragEnd,
 		draggable,
@@ -45,14 +44,17 @@ function ListViewBlockSelectButton(
 		ariaLabel,
 		ariaDescribedBy,
 		updateFocusAndSelection,
+		labelEditingMode,
+		toggleLabelEditingMode,
+		supportsBlockNaming,
+		blockTitle,
+		clientId,
+		blockInformation,
+		tabIndex,
+		onFocus,
 	},
 	ref
 ) {
-	const blockInformation = useBlockDisplayInformation( clientId );
-	const blockTitle = useBlockDisplayTitle( {
-		clientId,
-		context: 'list-view',
-	} );
 	const { isLocked } = useBlockLock( clientId );
 	const {
 		getSelectedBlockClientIds,
@@ -134,16 +136,41 @@ function ListViewBlockSelectButton(
 		}
 	}
 
+	useEffect( () => {
+		if ( ! labelEditingMode ) {
+			// Re-focus button element when existing edit mode.
+			ref?.current?.focus();
+		}
+	}, [ labelEditingMode ] );
+
 	return (
 		<>
 			<Button
+				ref={ ref }
 				className={ classnames(
+					'block-editor-list-view-block-node',
 					'block-editor-list-view-block-select-button',
 					className
 				) }
-				onClick={ onClick }
+				onClick={ ( event ) => {
+					// Avoid click delays for blocks that don't support naming interaction.
+					if ( ! supportsBlockNaming ) {
+						onClick( event );
+						return;
+					}
+
+					if ( event.detail === SINGLE_CLICK ) {
+						onClick( event );
+					}
+				} }
+				onDoubleClick={ ( event ) => {
+					event.preventDefault();
+					if ( ! supportsBlockNaming ) {
+						return;
+					}
+					toggleLabelEditingMode( true );
+				} }
 				onKeyDown={ onKeyDownHandler }
-				ref={ ref }
 				tabIndex={ tabIndex }
 				onFocus={ onFocus }
 				onDragStart={ onDragStartHandler }
@@ -162,17 +189,17 @@ function ListViewBlockSelectButton(
 				/>
 				<HStack
 					alignment="center"
-					className="block-editor-list-view-block-select-button__label-wrapper"
+					className="block-editor-list-view-block-node__label-wrapper"
 					justify="flex-start"
 					spacing={ 1 }
 				>
-					<span className="block-editor-list-view-block-select-button__title">
+					<span className="block-editor-list-view-block-node__title">
 						<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
 					</span>
 					{ blockInformation?.anchor && (
-						<span className="block-editor-list-view-block-select-button__anchor-wrapper">
+						<span className="block-editor-list-view-block-node__anchor-wrapper">
 							<Truncate
-								className="block-editor-list-view-block-select-button__anchor"
+								className="block-editor-list-view-block-node__anchor"
 								ellipsizeMode="auto"
 							>
 								{ blockInformation.anchor }
@@ -204,11 +231,19 @@ function ListViewBlockSelectButton(
 						</span>
 					) : null }
 					{ isLocked && (
-						<span className="block-editor-list-view-block-select-button__lock">
+						<span className="block-editor-list-view-block-node__lock">
 							<Icon icon={ lock } />
 						</span>
 					) }
 				</HStack>
+				{ supportsBlockNaming && (
+					<BlockOptionsRenameItem
+						clientId={ clientId }
+						onClick={ () => {
+							toggleLabelEditingMode( true );
+						} }
+					/>
+				) }
 			</Button>
 		</>
 	);

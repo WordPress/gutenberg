@@ -102,19 +102,28 @@ function ListViewBlock( {
 		level
 	);
 
-	const blockAriaLabel = isLocked
+	let blockAriaLabel = __( 'Link' );
+	if ( blockInformation ) {
+		blockAriaLabel = isLocked
+			? sprintf(
+					// translators: %s: The title of the block. This string indicates a link to select the locked block.
+					__( '%s link (locked)' ),
+					blockInformation.name || blockInformation.title
+			  )
+			: sprintf(
+					// translators: %s: The title of the block. This string indicates a link to select the block.
+					__( '%s link' ),
+					blockInformation.name || blockInformation.title
+			  );
+	}
+
+	const settingsAriaLabel = blockInformation
 		? sprintf(
 				// translators: %s: The title of the block. This string indicates a link to select the locked block.
 				__( '%s (locked)' ),
 				blockTitle
 		  )
 		: blockTitle;
-
-	const settingsAriaLabel = sprintf(
-		// translators: %s: The title of the block.
-		__( 'Options for %s' ),
-		blockTitle
-	);
 
 	const {
 		isTreeGridMounted,
