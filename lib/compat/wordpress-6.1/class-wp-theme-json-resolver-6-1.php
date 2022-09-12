@@ -55,10 +55,51 @@ class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
 		}
 
 		$config       = static::read_json_file( __DIR__ . '/theme.json' );
-		$config       = apply_filters( 'global_styles_default', $config );
 		$config       = static::translate( $config );
+		$config       = apply_filters( 'global_styles_default', $config );
 		static::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
 
 		return static::$core;
+	}
+
+	/**
+	 * Returns the user's origin config.
+	 *
+	 * @return WP_Theme_JSON_Gutenberg Entity that holds styles for user data.
+	 */
+	public static function get_user_data() {
+		if ( null !== static::$user ) {
+			return static::$user;
+		}
+
+		$config   = array();
+		$user_cpt = static::get_user_data_from_wp_global_styles( wp_get_theme() );
+
+		if ( array_key_exists( 'post_content', $user_cpt ) ) {
+			$decoded_data = json_decode( $user_cpt['post_content'], true );
+
+			$json_decoding_error = json_last_error();
+			if ( JSON_ERROR_NONE !== $json_decoding_error ) {
+				trigger_error( 'Error when decoding a theme.json schema for user data. ' . json_last_error_msg() );
+				$config = apply_filters( 'global_styles_user', $config );
+				return new WP_Theme_JSON_Gutenberg( $config, 'custom' );
+			}
+
+			// Very important to verify if the flag isGlobalStylesUserThemeJSON is true.
+			// If is not true the content was not escaped and is not safe.
+			if (
+				is_array( $decoded_data ) &&
+				isset( $decoded_data['isGlobalStylesUserThemeJSON'] ) &&
+				$decoded_data['isGlobalStylesUserThemeJSON']
+			) {
+				unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
+				$config = $decoded_data;
+			}
+		}
+
+		$config       = apply_filters( 'global_styles_user', $config );
+		static::$user = new WP_Theme_JSON_Gutenberg( $config, 'custom' );
+
+		return static::$user;
 	}
 }
