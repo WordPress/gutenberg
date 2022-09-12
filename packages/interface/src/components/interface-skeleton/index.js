@@ -103,7 +103,6 @@ function InterfaceSkeleton(
 					<motion.div
 						initial={ hasReducedUI ? 'hidden' : 'hover' }
 						whileHover="hover"
-						whileFocus="hover"
 						variants={ headerVariants }
 						transition={ { type: 'tween', delay: 0.8 } }
 						className="interface-interface-skeleton__header"
@@ -124,9 +123,11 @@ function InterfaceSkeleton(
 						{ header }
 					</div>
 				) }
-				<div className="interface-interface-skeleton__header">
-					{ editorNotices }
-				</div>
+				{ hasReducedUI && (
+					<div className="interface-interface-skeleton__header">
+						{ editorNotices }
+					</div>
+				) }
 				<div className="interface-interface-skeleton__body">
 					{ !! secondarySidebar && (
 						<div
