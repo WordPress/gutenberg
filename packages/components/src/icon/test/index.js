@@ -21,7 +21,7 @@ describe( 'Icon', () => {
 	it( 'renders nothing when icon omitted', () => {
 		render( <Icon data-testid={ testId } /> );
 
-		expect( screen.queryByTestId( testId ) ).toBeNull();
+		expect( screen.queryByTestId( testId ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'renders a dashicon by slug', () => {
