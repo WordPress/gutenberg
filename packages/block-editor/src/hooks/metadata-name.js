@@ -23,7 +23,7 @@ export function addLabelCallback( settings ) {
 	const supportsBlockNaming = hasBlockMetadataSupport(
 		settings,
 		'name',
-		false
+		false // default value
 	);
 
 	// Check whether block metadata is supported before using it.
