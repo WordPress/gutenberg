@@ -56,20 +56,32 @@ function toVdom( node ) {
 
 const wpDirectives = {};
 
+const pages = new Map();
+
+const fetchUrl = async ( url ) => {
+	const html = await window.fetch( url ).then( ( res ) => res.text() );
+	const dom = new window.DOMParser().parseFromString( html, 'text/html' );
+	return toVdom( dom.body );
+};
+
+const fetchPage = async ( url ) => {
+	if ( ! pages.has( url ) ) {
+		pages.set( url, fetchUrl( url ) );
+	}
+	return await pages.get( url );
+};
+
 wpDirectives[ 'wp-client-navigation' ] = ( { element, value } ) => {
 	if ( value ) {
+		if ( value.prefetch ) {
+			fetchPage( element.getAttribute( 'href' ) );
+		}
+
 		element.addEventListener( 'click', async ( event ) => {
 			event.preventDefault();
 
 			const url = element.getAttribute( 'href' );
-			const html = await window
-				.fetch( url )
-				.then( ( res ) => res.text() );
-			const dom = new window.DOMParser().parseFromString(
-				html,
-				'text/html'
-			);
-			const vdom = toVdom( dom.body );
+			const vdom = await fetchPage( url );
 			render( vdom, rootFragment );
 
 			window.history.pushState( {}, '', url );
@@ -103,7 +115,6 @@ options.diffed = ( vnode ) => {
 					wpDirectives[ key ]( {
 						value,
 						element,
-						props: vnode.props,
 					} );
 			}
 		}
