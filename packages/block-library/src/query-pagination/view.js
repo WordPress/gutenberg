@@ -58,15 +58,22 @@ const wpDirectives = {};
 
 const pages = new Map();
 
-const fetchUrl = async ( url ) => {
+const fetchAndVdom = async ( url ) => {
 	const html = await window.fetch( url ).then( ( res ) => res.text() );
 	const dom = new window.DOMParser().parseFromString( html, 'text/html' );
 	return toVdom( dom.body );
 };
 
+const getInitialVdom = () => {
+	const vdom = toVdom( document.body );
+	const url = window.location.pathname + window.location.search;
+	pages.set( url, Promise.resolve( vdom ) );
+	return vdom;
+};
+
 const fetchPage = async ( url ) => {
 	if ( ! pages.has( url ) ) {
-		pages.set( url, fetchUrl( url ) );
+		pages.set( url, fetchAndVdom( url ) );
 	}
 	return await pages.get( url );
 };
@@ -133,7 +140,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	);
 
 	window.requestIdleCallback( () => {
-		const vdom = toVdom( document.body );
+		const vdom = getInitialVdom();
 		hydrate( vdom, rootFragment );
 	} );
 } );
