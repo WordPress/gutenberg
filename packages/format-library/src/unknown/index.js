@@ -20,6 +20,10 @@ export const unknown = {
 			onFocus();
 		}
 
+		if ( ! isActive ) {
+			return null;
+		}
+
 		return (
 			<RichTextToolbarButton
 				icon={ help }
