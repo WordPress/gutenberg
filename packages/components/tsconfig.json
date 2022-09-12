@@ -50,7 +50,6 @@
 		"src/dimension-control",
 		"src/duotone-picker",
 		"src/font-size-picker",
-		"src/form-file-upload",
 		"src/gradient-picker",
 		"src/guide",
 		"src/higher-order/navigate-regions",
