@@ -5,10 +5,3 @@
 		margin-top: 6px;
 	}
 }
-
-/* Only apply the text align on dropdowns, not lists. */
-.wp-block-categories:has(.wp-block-categories__dropdown) {
-	&.aligncenter {
-		text-align: center;
-	}
-}
