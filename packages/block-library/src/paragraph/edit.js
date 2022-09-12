@@ -6,9 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, _x, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
-	ToolbarButton,
+	ToolbarDropdownMenu,
 	ToggleControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -21,7 +21,7 @@ import {
 	useSetting,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
-import { formatLtr } from '@wordpress/icons';
+import { formatLtr, formatRtl } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -30,18 +30,43 @@ import { useOnEnter } from './use-enter';
 
 const name = 'core/paragraph';
 
-function ParagraphRTLControl( { direction, setDirection } ) {
+const DEFAULT_DIRECTION_CONTROLS = [
+	{
+		icon: formatLtr,
+		title: __( 'Left to right' ),
+		direction: 'ltr',
+	},
+	{
+		icon: formatRtl,
+		title: __( 'Right to left' ),
+		direction: 'rtl',
+	},
+];
+
+function ParagraphDirectionControl( { direction, setDirection } ) {
+	const icon = direction === 'rtl' ? formatRtl : formatLtr;
+
 	return (
-		isRTL() && (
-			<ToolbarButton
-				icon={ formatLtr }
-				title={ _x( 'Left to right', 'editor button' ) }
-				isActive={ direction === 'ltr' }
-				onClick={ () => {
-					setDirection( direction === 'ltr' ? undefined : 'ltr' );
-				} }
-			/>
-		)
+		<ToolbarDropdownMenu
+			icon={ icon }
+			label={ __( 'Direction' ) }
+			toggleProps={ { describedBy: __( 'Change text direction' ) } }
+			popoverProps={ { position: 'bottom right', isAlternate: true } }
+			controls={ DEFAULT_DIRECTION_CONTROLS.map( ( control ) => {
+				const isActive = control.direction === direction;
+
+				return {
+					...control,
+					isActive,
+					onClick: () =>
+						setDirection(
+							direction === control.direction
+								? undefined
+								: control.direction
+						),
+				};
+			} ) }
+		/>
 	);
 }
 
@@ -73,7 +98,7 @@ function ParagraphBlock( {
 						setAttributes( { align: newAlign } )
 					}
 				/>
-				<ParagraphRTLControl
+				<ParagraphDirectionControl
 					direction={ direction }
 					setDirection={ ( newDirection ) =>
 						setAttributes( { direction: newDirection } )
