@@ -1,5 +1,20 @@
 == Changelog ==
 
+= 14.0.3 =
+
+## Changelog
+
+### Bug Fixes
+
+- Fix GitHub Actions failure due to duplicate functions. ([44052](https://github.com/WordPress/gutenberg/pull/44052))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@t-hamano
+
+
 = 14.0.2 =
 
 
