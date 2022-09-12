@@ -120,6 +120,7 @@ export default function SearchEdit( {
 	const isButtonPositionOutside = 'button-outside' === buttonPosition;
 	const hasNoButton = 'no-button' === buttonPosition;
 	const hasOnlyButton = 'button-only' === buttonPosition;
+
 	const units = useCustomUnits( {
 		availableUnits: [ '%', 'px' ],
 		defaultValues: { '%': PC_WIDTH_DEFAULT, px: PX_WIDTH_DEFAULT },
@@ -141,8 +142,7 @@ export default function SearchEdit( {
 				: undefined,
 			buttonUseIcon && ! hasNoButton
 				? 'wp-block-search__icon-button'
-				: undefined,
-			typographyProps.className
+				: undefined
 		);
 	};
 
@@ -210,11 +210,14 @@ export default function SearchEdit( {
 		// If the input is inside the wrapper, the wrapper gets the border color styles/classes, not the input control.
 		const textFieldClasses = classnames(
 			'wp-block-search__input',
-			isButtonPositionInside ? undefined : borderProps.className
+			isButtonPositionInside ? undefined : borderProps.className,
+			typographyProps.className
 		);
-		const textFieldStyles = isButtonPositionInside
-			? { borderRadius }
-			: borderProps.style;
+		const textFieldStyles = {
+			...( isButtonPositionInside
+				? { borderRadius }
+				: borderProps.style ),
+		};
 
 		return (
 			<input
@@ -241,6 +244,7 @@ export default function SearchEdit( {
 		const buttonClasses = classnames(
 			'wp-block-search__button',
 			colorProps.className,
+			typographyProps.className,
 			isButtonPositionInside ? undefined : borderProps.className,
 			buttonUseIcon ? 'has-icon' : undefined,
 			__experimentalGetElementClassName( 'button' )
@@ -458,13 +462,18 @@ export default function SearchEdit( {
 		},
 	} );
 
+	const labelClassnames = classnames(
+		'wp-block-search__label',
+		typographyProps.className
+	);
+
 	return (
 		<div { ...blockProps }>
 			{ controls }
 
 			{ showLabel && (
 				<RichText
-					className="wp-block-search__label"
+					className={ labelClassnames }
 					aria-label={ __( 'Label text' ) }
 					placeholder={ __( 'Add label…' ) }
 					withoutInteractiveFormatting
