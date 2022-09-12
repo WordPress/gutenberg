@@ -167,7 +167,8 @@ export default function useArrowNav() {
 		}
 
 		function onKeyDown( event ) {
-			const { keyCode, target } = event;
+			const { keyCode, target, shiftKey, ctrlKey, altKey, metaKey } =
+				event;
 			const isUp = keyCode === UP;
 			const isDown = keyCode === DOWN;
 			const isLeft = keyCode === LEFT;
@@ -176,10 +177,7 @@ export default function useArrowNav() {
 			const isHorizontal = isLeft || isRight;
 			const isVertical = isUp || isDown;
 			const isNav = isHorizontal || isVertical;
-			const isShift = event.shiftKey;
-			const isAlt = event.altKey;
-			const hasModifier =
-				isShift || event.ctrlKey || event.altKey || event.metaKey;
+			const hasModifier = shiftKey || ctrlKey || altKey || metaKey;
 			const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
@@ -201,7 +199,7 @@ export default function useArrowNav() {
 					return;
 				}
 
-				if ( isShift ) {
+				if ( shiftKey ) {
 					return;
 				}
 
@@ -250,7 +248,7 @@ export default function useArrowNav() {
 			const isReverseDir = isRTL( target ) ? ! isReverse : isReverse;
 			const { keepCaretInsideBlock } = getSettings();
 
-			if ( isShift ) {
+			if ( shiftKey ) {
 				if (
 					isClosestTabbableABlock( target, isReverse ) &&
 					isNavEdge( target, isReverse )
@@ -262,6 +260,9 @@ export default function useArrowNav() {
 			} else if (
 				isVertical &&
 				isVerticalEdge( target, isReverse ) &&
+				// When Alt is pressed, only intercept if the caret is also at
+				// the horizontal edge.
+				( altKey ? isHorizontalEdge( target, isReverseDir ) : true ) &&
 				! keepCaretInsideBlock
 			) {
 				const closestTabbable = getClosestTabbable(
@@ -276,8 +277,8 @@ export default function useArrowNav() {
 						closestTabbable,
 						// When Alt is pressed, place the at the horizontal edge
 						// and the furthest vertical edge.
-						isAlt ? ! isReverse : isReverse,
-						isAlt ? undefined : verticalRect
+						altKey ? ! isReverse : isReverse,
+						altKey ? undefined : verticalRect
 					);
 					event.preventDefault();
 				}
