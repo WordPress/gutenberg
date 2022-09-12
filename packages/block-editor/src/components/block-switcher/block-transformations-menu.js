@@ -73,38 +73,61 @@ const BlockTransformationsMenu = ( {
 
 	const { priorityTextTransformations, restTransformations } =
 		useGroupedTransforms( possibleBlockTransformations );
-	const needsTextTransformationsSeparator =
+	// We have to check if both content transformations(priority and rest) are set
+	// in order to create a separate MenuGroup for them.
+	const hasBothContentTransformations =
 		priorityTextTransformations.length && restTransformations.length;
+	const restTransformItems = !! restTransformations.length && (
+		<RestTransformationItems
+			restTransformations={ restTransformations }
+			onSelect={ onSelect }
+			setHoveredTransformItemName={ setHoveredTransformItemName }
+		/>
+	);
 	return (
-		<MenuGroup label={ __( 'Transform to' ) } className={ className }>
-			{ hoveredTransformItemName && (
-				<PreviewBlockPopover
-					blocks={ switchToBlockType(
-						blocks,
-						hoveredTransformItemName
-					) }
-				/>
+		<>
+			<MenuGroup label={ __( 'Transform to' ) } className={ className }>
+				{ hoveredTransformItemName && (
+					<PreviewBlockPopover
+						blocks={ switchToBlockType(
+							blocks,
+							hoveredTransformItemName
+						) }
+					/>
+				) }
+				{ priorityTextTransformations.map( ( item ) => (
+					<BlockTranformationItem
+						key={ item.name }
+						item={ item }
+						onSelect={ onSelect }
+						setHoveredTransformItemName={
+							setHoveredTransformItemName
+						}
+					/>
+				) ) }
+				{ ! hasBothContentTransformations && restTransformItems }
+			</MenuGroup>
+			{ !! hasBothContentTransformations && (
+				<MenuGroup>{ restTransformItems }</MenuGroup>
 			) }
-			{ priorityTextTransformations.map( ( item ) => (
-				<BlockTranformationItem
-					key={ item.name }
-					item={ item }
-					onSelect={ onSelect }
-					setHoveredTransformItemName={ setHoveredTransformItemName }
-				/>
-			) ) }
-			{ !! needsTextTransformationsSeparator && <hr /> }
-			{ restTransformations.map( ( item ) => (
-				<BlockTranformationItem
-					key={ item.name }
-					item={ item }
-					onSelect={ onSelect }
-					setHoveredTransformItemName={ setHoveredTransformItemName }
-				/>
-			) ) }
-		</MenuGroup>
+		</>
 	);
 };
+
+function RestTransformationItems( {
+	restTransformations,
+	onSelect,
+	setHoveredTransformItemName,
+} ) {
+	return restTransformations.map( ( item ) => (
+		<BlockTranformationItem
+			key={ item.name }
+			item={ item }
+			onSelect={ onSelect }
+			setHoveredTransformItemName={ setHoveredTransformItemName }
+		/>
+	) );
+}
 
 function BlockTranformationItem( {
 	item,
