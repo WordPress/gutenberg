@@ -21,7 +21,7 @@ describe( 'Icon', () => {
 	it( 'renders nothing when icon omitted', () => {
 		render( <Icon data-testid={ testId } /> );
 
-		expect( screen.queryByTestId( testId ) ).not.toBeInTheDocument();
+		expect( screen.queryByTestId( testId ) ).toBeNull();
 	} );
 
 	it( 'renders a dashicon by slug', () => {
@@ -35,24 +35,24 @@ describe( 'Icon', () => {
 	it( 'renders a function', () => {
 		render( <Icon icon={ () => <span data-testid={ testId } /> } /> );
 
-		expect( screen.getByTestId( testId ) ).toBeInTheDocument();
+		expect( screen.getByTestId( testId ) ).toBeVisible();
 	} );
 
 	it( 'renders an element', () => {
 		render( <Icon icon={ <span data-testid={ testId } /> } /> );
 
-		expect( screen.getByTestId( testId ) ).toBeInTheDocument();
+		expect( screen.getByTestId( testId ) ).toBeVisible();
 	} );
 
 	it( 'renders an svg element', () => {
 		render( <Icon data-testid={ testId } icon={ svg } /> );
 
-		expect( screen.getByTestId( testId ) ).toBeInTheDocument();
+		expect( screen.getByTestId( testId ) ).toBeVisible();
 	} );
 
 	it( 'renders an svg element with a default width and height of 24', () => {
 		render( <Icon data-testid={ testId } icon={ svg } /> );
-		const icon = screen.queryByTestId( testId );
+		const icon = screen.getByTestId( testId );
 
 		expect( icon ).toHaveAttribute( 'width', '24' );
 		expect( icon ).toHaveAttribute( 'height', '24' );
@@ -70,7 +70,7 @@ describe( 'Icon', () => {
 				size={ 32 }
 			/>
 		);
-		const icon = screen.queryByTestId( testId );
+		const icon = screen.getByTestId( testId );
 
 		expect( icon ).toHaveAttribute( 'width', '32' );
 		expect( icon ).toHaveAttribute( 'height', '32' );
@@ -78,7 +78,7 @@ describe( 'Icon', () => {
 
 	it( 'renders an svg element and does not override width and height if already specified', () => {
 		render( <Icon data-testid={ testId } icon={ svg } size={ 32 } /> );
-		const icon = screen.queryByTestId( testId );
+		const icon = screen.getByTestId( testId );
 
 		expect( icon ).toHaveAttribute( 'width', '32' );
 		expect( icon ).toHaveAttribute( 'height', '32' );
