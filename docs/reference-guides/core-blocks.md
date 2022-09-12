@@ -401,7 +401,7 @@ Add a page, link, or another item to your navigation. ([Source](https://github.c
 
 -	**Name:** core/navigation-link
 -	**Category:** design
--	**Supports:** ~~html~~, ~~reusable~~
+-	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** description, id, isTopLevelLink, kind, label, opensInNewTab, rel, title, type, url
 
 ## Submenu
