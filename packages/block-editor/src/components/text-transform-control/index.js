@@ -4,10 +4,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
-} from '@wordpress/components';
+import { BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	formatCapitalize,
@@ -42,26 +39,31 @@ const TEXT_TRANSFORMS = [
  *
  * @return {WPElement} Text transform control.
  */
-export default function TextTransformControl( { value, onChange, ...props } ) {
+export default function TextTransformControl( { value, onChange } ) {
 	return (
-		<ToggleGroupControl
-			{ ...props }
-			className="block-editor-text-transform-control"
-			__experimentalIsBorderless
-			label={ __( 'Letter case' ) }
-			value={ value }
-			onChange={ onChange }
-		>
-			{ TEXT_TRANSFORMS.map( ( textTransform ) => {
-				return (
-					<ToggleGroupControlOptionIcon
-						key={ textTransform.value }
-						value={ textTransform.value }
-						icon={ textTransform.icon }
-						label={ textTransform.name }
-					/>
-				);
-			} ) }
-		</ToggleGroupControl>
+		<fieldset className="block-editor-text-transform-control">
+			<BaseControl.VisualLabel as="legend">
+				{ __( 'Letter case' ) }
+			</BaseControl.VisualLabel>
+			<div className="block-editor-text-transform-control__buttons">
+				{ TEXT_TRANSFORMS.map( ( textTransform ) => {
+					return (
+						<Button
+							key={ textTransform.value }
+							icon={ textTransform.icon }
+							label={ textTransform.name }
+							isPressed={ textTransform.value === value }
+							onClick={ () => {
+								onChange(
+									textTransform.value === value
+										? undefined
+										: textTransform.value
+								);
+							} }
+						/>
+					);
+				} ) }
+			</div>
+		</fieldset>
 	);
 }
