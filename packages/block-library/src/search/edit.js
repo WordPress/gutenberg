@@ -217,6 +217,8 @@ export default function SearchEdit( {
 			...( isButtonPositionInside
 				? { borderRadius }
 				: borderProps.style ),
+			...typographyProps.style,
+			textDecoration: undefined,
 		};
 
 		return (
@@ -251,7 +253,7 @@ export default function SearchEdit( {
 		);
 		const buttonStyles = {
 			...colorProps.style,
-			textDecoration: typographyProps.style?.textDecoration,
+			...typographyProps.style,
 			...( isButtonPositionInside
 				? { borderRadius }
 				: borderProps.style ),
@@ -479,9 +481,7 @@ export default function SearchEdit( {
 					withoutInteractiveFormatting
 					value={ label }
 					onChange={ ( html ) => setAttributes( { label: html } ) }
-					style={ {
-						textDecoration: typographyProps.style?.textDecoration,
-					} }
+					style={ typographyProps.style }
 				/>
 			) }
 

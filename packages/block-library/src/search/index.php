@@ -139,10 +139,7 @@ function render_block_core_search( $attributes ) {
 		$input_markup . $query_params_markup . $button_markup
 	);
 	$wrapper_attributes   = get_block_wrapper_attributes(
-		array(
-			'class' => $classnames,
-			'style' => get_typography_styles_for_block_core_search( $attributes ),
-		)
+		array( 'class' => $classnames )
 	);
 
 	return sprintf(
@@ -383,6 +380,14 @@ function styles_for_block_core_search( $attributes ) {
 		$button_styles[] = sprintf( 'background: %s;', $attributes['style']['color']['gradient'] );
 	}
 
+	// Get typography styles to be shared across inner elements.
+	$typography_styles = get_typography_styles_for_block_core_search( $attributes );
+	if ( ! empty( $typography_styles ) ) {
+		$label_styles[] = $typography_styles;
+		$button_styles[] = $typography_styles;
+		$input_styles[] = $typography_styles;
+	}
+
 	// Typography text-decoration is only applied to the label and button.
 	if ( ! empty( $attributes['style']['typography']['textDecoration'] ) ) {
 		$text_decoration_value = sprintf( 'text-decoration: %s;', esc_attr( $attributes['style']['typography']['textDecoration'] ) );
@@ -410,7 +415,7 @@ function styles_for_block_core_search( $attributes ) {
  */
 function get_typography_classes_for_block_core_search( $attributes ) {
 	$typography_classes    = array();
-	$has_named_font_family = ! empty( $attributes['style']['typography']['fontFamily'] );
+	$has_named_font_family = ! empty( $attributes['fontFamily'] );
 	$has_named_font_size   = ! empty( $attributes['fontSize'] );
 
 	if ( $has_named_font_size ) {
@@ -418,7 +423,7 @@ function get_typography_classes_for_block_core_search( $attributes ) {
 	}
 
 	if ( $has_named_font_family ) {
-		$typography_classes[] = sprintf( 'has-%s-font-family', esc_attr( $attributes['fontSize'] ) );
+		$typography_classes[] = sprintf( 'has-%s-font-family', esc_attr( $attributes['fontFamily'] ) );
 	}
 
 	return implode( ' ', $typography_classes );
