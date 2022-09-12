@@ -394,18 +394,21 @@ export default function SearchEdit( {
 		radius ? `calc(${ radius } + ${ DEFAULT_INNER_PADDING })` : undefined;
 
 	const getWrapperStyles = () => {
-		const styles = isButtonPositionInside
-			? borderProps.style
-			: {
-					borderRadius: borderProps.style?.borderRadius,
-					borderTopLeftRadius: borderProps.style?.borderTopLeftRadius,
-					borderTopRightRadius:
-						borderProps.style?.borderTopRightRadius,
-					borderBottomLeftRadius:
-						borderProps.style?.borderBottomLeftRadius,
-					borderBottomRightRadius:
-						borderProps.style?.borderBottomRightRadius,
-			  };
+		const styles = {
+			...( isButtonPositionInside
+				? borderProps.style
+				: {
+						borderRadius: borderProps.style?.borderRadius,
+						borderTopLeftRadius:
+							borderProps.style?.borderTopLeftRadius,
+						borderTopRightRadius:
+							borderProps.style?.borderTopRightRadius,
+						borderBottomLeftRadius:
+							borderProps.style?.borderBottomLeftRadius,
+						borderBottomRightRadius:
+							borderProps.style?.borderBottomRightRadius,
+				  } ),
+		};
 
 		const isNonZeroBorderRadius =
 			borderRadius !== undefined && parseInt( borderRadius, 10 ) !== 0;
@@ -447,9 +450,11 @@ export default function SearchEdit( {
 	const blockProps = useBlockProps( {
 		className: getBlockClassNames(),
 		style: {
-			...typographyProps.style,
-			// Input opts out of text decoration.
-			textDecoration: undefined,
+			...{
+				...typographyProps.style,
+				// Input opts out of text decoration.
+				textDecoration: undefined,
+			},
 		},
 	} );
 
