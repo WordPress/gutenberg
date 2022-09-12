@@ -21,5 +21,6 @@ export { useCustomSides } from './dimensions';
 export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
 export { getColorClassesAndStyles, useColorProps } from './use-color-props';
 export { getSpacingClassesAndStyles } from './use-spacing-props';
+export { getTypographyClassesAndStyles } from './use-typography-props';
 export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';
