@@ -24,7 +24,7 @@
 				"background": true,
 				"text": true
 			},
-			"__experimentalSelector": "table"
+			"__experimentalSelector": "table, table th"
 		},
 		"typography": {
 			"fontSize": true,

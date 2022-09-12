@@ -40,29 +40,26 @@ function render_block_core_calendar( $attributes ) {
 		}
 	}
 
-	$color_classes = array();
+	$color_block_styles = array();
 
-	if ( ! empty( $attributes['textColor'] ) ) {
-		$color_classes[] = sprintf( 'has-text-color has-%s-color', $attributes['textColor'] );
-	}
-	if ( ! empty( $attributes['backgroundColor'] ) ) {
-		$color_classes[] = sprintf( 'has-background has-%s-background-color', $attributes['backgroundColor'] );
-	}
+	// Text color.
+	$preset_text_color          = array_key_exists( 'textColor', $attributes ) ? "var:preset|color|{$attributes['textColor']}" : null;
+	$custom_text_color          = _wp_array_get( $attributes, array( 'style', 'color', 'text' ), null );
+	$color_block_styles['text'] = $preset_text_color ? $preset_text_color : $custom_text_color;
 
-	$inline_styles = '';
+	// Background Color.
+	$preset_background_color          = array_key_exists( 'backgroundColor', $attributes ) ? "var:preset|color|{$attributes['backgroundColor']}" : null;
+	$custom_background_color          = _wp_array_get( $attributes, array( 'style', 'color', 'background' ), null );
+	$color_block_styles['background'] = $preset_background_color ? $preset_background_color : $custom_background_color;
 
-	if ( ! empty( $attributes['style'] ) ) {
-		$styles = gutenberg_style_engine_get_styles( $attributes['style'] );
-		if ( ! empty( $styles['css'] ) ) {
-			$inline_styles = " style=\"${styles['css']}\"";
-		}
-		if ( ! empty( $styles['classnames'] ) ) {
-			$color_classes[] = $styles['classnames'];
-		}
-	}
+	// Generate color styles and classes.
+	$styles        = gutenberg_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
+	$inline_styles = empty( $styles['css'] ) ? '' : sprintf( ' style="%s"', esc_attr( $styles['css'] ) );
+	$classnames    = empty( $styles['classnames'] ) ? '' : ' ' . esc_attr( $styles['classnames'] );
 
+ // Apply color classes and styles to the calendar.
 	$calendar = str_replace( '<table', '<table' . $inline_styles, get_calendar( true, false ) );
-	$calendar = str_replace( 'class="wp-calendar-table', 'class="wp-calendar-table ' . implode( ' ', $color_classes ), $calendar );
+	$calendar = str_replace( 'class="wp-calendar-table', 'class="wp-calendar-table' . $classnames, $calendar );
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$output             = sprintf(

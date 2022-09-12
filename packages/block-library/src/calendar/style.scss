@@ -12,8 +12,16 @@
 		border-collapse: collapse;
 
 		// Keep the hard-coded header background color for backward compatibility.
-		&:where(:not(.has-text-color):not(.has-background)) th {
+		&:where(:not(.has-background)) th {
 			background: $gray-300;
+		}
+
+		&.has-background th {
+			background-color: inherit;
+		}
+
+		&.has-text-color th {
+			color: inherit;
 		}
 	}
 }
