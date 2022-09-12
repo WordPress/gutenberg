@@ -12,7 +12,7 @@ describe( 'getTypographyClassesAndStyles', () => {
 				typography: {
 					letterSpacing: '22px',
 					fontSize: '2rem',
-					fontFamily: 'tahini',
+					textTransform: 'uppercase',
 				},
 			},
 		};
@@ -21,7 +21,7 @@ describe( 'getTypographyClassesAndStyles', () => {
 			style: {
 				letterSpacing: '22px',
 				fontSize: '2rem',
-				fontFamily: 'tahini',
+				textTransform: 'uppercase',
 			},
 		} );
 	} );
