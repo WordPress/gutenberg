@@ -137,7 +137,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 			}
 		}
 
-		apply_filters( 'global_styles_blocks', $config );
+		$config = apply_filters( 'global_styles_blocks', $config );
 
 		// Core here means it's the lower level part of the styles chain.
 		// It can be a core or a third-party block.
