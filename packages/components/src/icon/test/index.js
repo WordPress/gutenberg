@@ -1,13 +1,11 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
 import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
-import Dashicon from '../../dashicon';
 import Icon from '../';
 import { Path, SVG } from '../../';
 
@@ -19,7 +17,6 @@ describe( 'Icon', () => {
 			<Path d="M5 4v3h5.5v12h3V7H19V4z" />
 		</SVG>
 	);
-	const style = { fill: 'red' };
 
 	it( 'renders nothing when icon omitted', () => {
 		render( <Icon data-testid={ testId } /> );
@@ -94,51 +91,5 @@ describe( 'Icon', () => {
 		render( <Icon icon={ MyComponent } /> );
 
 		expect( screen.getByTestId( testId ) ).toHaveClass( className );
-	} );
-
-	describe( 'props passing', () => {
-		const MyComponent = ( props ) => (
-			<span className={ props.className } style={ props.style } />
-		);
-
-		describe.each( [
-			[ 'dashicon', { icon: 'format-image' } ],
-			[ 'dashicon element', { icon: <Dashicon icon="format-image" /> } ],
-			[ 'element', { icon: <span /> } ],
-			[ 'svg element', { icon: svg } ],
-			[ 'component', { icon: MyComponent } ],
-		] )( '%s', ( label, props ) => {
-			it.skip( 'should pass through size', () => {
-				if ( label === 'svg element' ) {
-					// Custom logic for SVG elements tested separately.
-					//
-					// See: `renders an svg element and passes the size as its width and height`
-					return;
-				}
-
-				if ( [ 'dashicon', 'dashicon element' ].includes( label ) ) {
-					// `size` prop isn't passed through, since dashicon doesn't accept it.
-					return;
-				}
-
-				const wrapper = shallow( <Icon { ...props } size={ 32 } /> );
-
-				expect( wrapper.prop( 'size' ) ).toBe( 32 );
-			} );
-
-			it( 'should pass through all other props', () => {
-				const { container } = render(
-					<Icon
-						{ ...props }
-						style={ style }
-						className={ className }
-					/>
-				);
-				const icon = container.firstChild;
-
-				expect( icon ).toHaveStyle( style );
-				expect( icon ).toHaveClass( className );
-			} );
-		} );
 	} );
 } );
