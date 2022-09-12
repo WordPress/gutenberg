@@ -367,5 +367,5 @@ if ( ! function_exists( 'get_template_hierarchy' ) ) {
 		}
 		$template_hierarchy[] = 'index';
 		return $template_hierarchy;
-	};
+	}
 }
