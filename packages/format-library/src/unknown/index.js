@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { removeFormat } from '@wordpress/rich-text';
+import { removeFormat, slice } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { help } from '@wordpress/icons';
 
@@ -20,7 +20,12 @@ export const unknown = {
 			onFocus();
 		}
 
-		if ( ! isActive ) {
+		const selectedValue = slice( value );
+		const hasUnknownFormats = selectedValue.formats.some( ( formats ) => {
+			return formats.some( ( format ) => format.type === name );
+		} );
+
+		if ( ! isActive && ! hasUnknownFormats ) {
 			return null;
 		}
 
@@ -29,7 +34,7 @@ export const unknown = {
 				icon={ help }
 				title={ title }
 				onClick={ onClick }
-				isActive={ isActive }
+				isActive={ true }
 			/>
 		);
 	},
