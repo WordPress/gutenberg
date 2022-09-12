@@ -114,6 +114,36 @@ function LinkColorItem( { name, parentMenu } ) {
 	);
 }
 
+function CaptionColorItem( { name, parentMenu } ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const hasSupport = supports.includes( 'color' );
+	const [ color ] = useStyle( 'elements.caption.color.text', name );
+	const [ bgColor ] = useStyle( 'elements.caption.color.background', name );
+
+	if ( ! hasSupport ) {
+		return null;
+	}
+
+	return (
+		<NavigationButtonAsItem
+			path={ parentMenu + '/colors/caption' }
+			aria-label={ __( 'Colors caption styles' ) }
+		>
+			<HStack justify="flex-start">
+				<ZStack isLayered={ false } offset={ -8 }>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ bgColor } />
+					</ColorIndicatorWrapper>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ color } />
+					</ColorIndicatorWrapper>
+				</ZStack>
+				<FlexItem>{ __( 'Captions' ) }</FlexItem>
+			</HStack>
+		</NavigationButtonAsItem>
+	);
+}
+
 function HeadingColorItem( { name, parentMenu } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const hasSupport = supports.includes( 'color' );
@@ -201,6 +231,10 @@ function ScreenColors( { name } ) {
 								parentMenu={ parentMenu }
 							/>
 							<LinkColorItem
+								name={ name }
+								parentMenu={ parentMenu }
+							/>
+							<CaptionColorItem
 								name={ name }
 								parentMenu={ parentMenu }
 							/>
