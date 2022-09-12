@@ -47,7 +47,7 @@ export default function TextTransformControl( { value, onChange, ...props } ) {
 		<ToggleGroupControl
 			{ ...props }
 			className="block-editor-text-transform-control"
-			__experimentalIsIconGroup
+			__experimentalIsBorderless
 			label={ __( 'Letter case' ) }
 			value={ value }
 			onChange={ onChange }

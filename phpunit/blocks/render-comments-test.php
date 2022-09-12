@@ -38,7 +38,7 @@ class Tests_Blocks_RenderComments extends WP_UnitTestCase {
 		);
 		$parsed_block  = $parsed_blocks[0];
 		$context       = array( 'postId' => self::$post_with_comments_disabled->ID );
-		$block         = new WP_Block( $parsed_block, $context, $this->registry );
+		$block         = new WP_Block( $parsed_block, $context );
 
 		$rendered = gutenberg_render_block_core_comments( $attributes, '', $block );
 		$this->assertEmpty( $rendered );

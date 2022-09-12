@@ -37,6 +37,7 @@ function InserterMenu(
 		showMostUsedBlocks,
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
+		prioritizePatterns,
 	},
 	ref
 ) {
@@ -215,6 +216,7 @@ function InserterMenu(
 						<InserterTabs
 							showPatterns={ showPatterns }
 							showReusableBlocks={ hasReusableBlocks }
+							prioritizePatterns={ prioritizePatterns }
 						>
 							{ getCurrentTab }
 						</InserterTabs>

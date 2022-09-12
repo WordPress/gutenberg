@@ -29,6 +29,7 @@ const MyFontSizePicker = () => {
 
 	return (
 		<FontSizePicker
+			__nextHasNoMarginBottom
 			fontSizes={ fontSizes }
 			value={ fontSize }
 			fallbackFontSize={ fallbackFontSize }
@@ -105,3 +106,11 @@ If `true`, a reset button will be displayed alongside the input field when a cus
 -   Type: `Boolean`
 -   Required: no
 -   Default: `true`
+
+### __nextHasNoMarginBottom
+
+Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
+
+-   Type: `Boolean`
+-   Required: no
+-   Default: `false`

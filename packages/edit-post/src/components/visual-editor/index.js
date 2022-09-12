@@ -185,9 +185,13 @@ export default function VisualEditor( { styles } ) {
 			// so we add the constrained type.
 			return { ...defaultLayout, type: 'constrained' };
 		}
-		// Set constrained layout for classic themes so all alignments are supported.
-		return { type: 'constrained' };
+		// Set default layout for classic themes so all alignments are supported.
+		return { type: 'default' };
 	}, [ isTemplateMode, themeSupportsLayout, defaultLayout ] );
+
+	const blockListLayoutClass = themeSupportsLayout
+		? 'is-layout-constrained'
+		: 'is-layout-flow';
 
 	const titleRef = useRef();
 	useEffect( () => {
@@ -267,7 +271,7 @@ export default function VisualEditor( { styles } ) {
 								className={
 									isTemplateMode
 										? 'wp-site-blocks'
-										: 'is-layout-constrained' // Ensure root level blocks receive default/flow blockGap styling rules.
+										: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
 								}
 								__experimentalLayout={ layout }
 							/>

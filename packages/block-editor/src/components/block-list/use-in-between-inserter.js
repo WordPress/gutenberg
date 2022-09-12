@@ -14,8 +14,10 @@ import { InsertionPointOpenRef } from '../block-tools/insertion-point';
 
 export function useInBetweenInserter() {
 	const openRef = useContext( InsertionPointOpenRef );
-	const hasReducedUI = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().hasReducedUI,
+	const isInBetweenInserterDisabled = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().hasReducedUI ||
+			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
 		[]
 	);
 	const {
@@ -26,13 +28,14 @@ export function useInBetweenInserter() {
 		isMultiSelecting,
 		getSelectedBlockClientIds,
 		getTemplateLock,
+		__unstableIsWithinBlockOverlay,
 	} = useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
 
 	return useRefEffect(
 		( node ) => {
-			if ( hasReducedUI ) {
+			if ( isInBetweenInserterDisabled ) {
 				return;
 			}
 
@@ -108,16 +111,11 @@ export function useInBetweenInserter() {
 
 				// Don't show the insertion point if a parent block has an "overlay"
 				// See https://github.com/WordPress/gutenberg/pull/34012#pullrequestreview-727762337
-				const parentOverlay = element.parentElement?.closest(
-					'.block-editor-block-content-overlay'
-				);
-				if ( parentOverlay ) {
-					return;
-				}
-
 				const clientId = element.id.slice( 'block-'.length );
-
-				if ( ! clientId ) {
+				if (
+					! clientId ||
+					__unstableIsWithinBlockOverlay( clientId )
+				) {
 					return;
 				}
 
@@ -126,7 +124,6 @@ export function useInBetweenInserter() {
 				if ( getSelectedBlockClientIds().includes( clientId ) ) {
 					return;
 				}
-
 				const elementRect = element.getBoundingClientRect();
 
 				if (
@@ -175,6 +172,7 @@ export function useInBetweenInserter() {
 			showInsertionPoint,
 			hideInsertionPoint,
 			getSelectedBlockClientIds,
+			isInBetweenInserterDisabled,
 		]
 	);
 }

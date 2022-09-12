@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRegistry } from '@wordpress/data';
+import { useRegistry, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -18,9 +18,16 @@ export const CLASSIC_MENU_CONVERSION_PENDING = 'pending';
 export const CLASSIC_MENU_CONVERSION_IDLE = 'idle';
 
 function useConvertClassicToBlockMenu( clientId ) {
-	const { create: createNavigationMenu } =
-		useCreateNavigationMenu( clientId );
+	/*
+	 * The wp_navigation post is created as a draft so the changes on the frontend and
+	 * the site editor are not permanent without a save interaction done by the user.
+	 */
+	const { create: createNavigationMenu } = useCreateNavigationMenu(
+		clientId,
+		'draft'
+	);
 	const registry = useRegistry();
+	const { editEntityRecord } = useDispatch( coreStore );
 
 	const [ status, setStatus ] = useState( CLASSIC_MENU_CONVERSION_IDLE );
 	const [ error, setError ] = useState( null );
@@ -70,6 +77,23 @@ function useConvertClassicToBlockMenu( clientId ) {
 			navigationMenu = await createNavigationMenu(
 				menuName,
 				innerBlocks
+			);
+
+			/**
+			 * Immediately trigger editEntityRecord to change the wp_navigation post status to 'publish'.
+			 * This status change causes the menu to be displayed on the front of the site and sets the post state to be "dirty".
+			 * The problem being solved is if saveEditedEntityRecord was used here, the menu would be updated on the frontend and the editor _automatically_,
+			 * without user interaction.
+			 * If the user abandons the site editor without saving, there would still be a wp_navigation post created as draft.
+			 */
+			await editEntityRecord(
+				'postType',
+				'wp_navigation',
+				navigationMenu.id,
+				{
+					status: 'publish',
+				},
+				{ throwOnError: true }
 			);
 		} catch ( err ) {
 			throw new Error(

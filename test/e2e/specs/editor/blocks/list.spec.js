@@ -1132,4 +1132,25 @@ test.describe( 'List', () => {
 <!-- /wp:list -->`
 		);
 	} );
+
+	test( 'can be created by pasting an empty list', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		// Open code editor
+		await pageUtils.pressKeyWithModifier( 'secondary', 'M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
+
+		// Paste empty list block
+		await pageUtils.setClipboardData( {
+			plainText:
+				'<!-- wp:list -->\n<ul><li></li></ul>\n<!-- /wp:list -->',
+		} );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+
+		// Go back to normal editor
+		await pageUtils.pressKeyWithModifier( 'secondary', 'M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
+
+		// Verify no WSOD and content is proper.
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
