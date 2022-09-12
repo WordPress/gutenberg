@@ -177,6 +177,7 @@ export default function useArrowNav() {
 			const isVertical = isUp || isDown;
 			const isNav = isHorizontal || isVertical;
 			const isShift = event.shiftKey;
+			const isAlt = event.altKey;
 			const hasModifier =
 				isShift || event.ctrlKey || event.altKey || event.metaKey;
 			const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
@@ -273,8 +274,10 @@ export default function useArrowNav() {
 				if ( closestTabbable ) {
 					placeCaretAtVerticalEdge(
 						closestTabbable,
-						isReverse,
-						verticalRect
+						// When Alt is pressed, place the at the horizontal edge
+						// and the furthest vertical edge.
+						isAlt ? ! isReverse : isReverse,
+						isAlt ? undefined : verticalRect
 					);
 					event.preventDefault();
 				}
