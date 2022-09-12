@@ -27,7 +27,7 @@ class WP_Theme_JSON_Data {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $data    Array following the theme.json specification.
+	 * @param array  $data   Array following the theme.json specification.
 	 * @param string $origin The origin of the data: default, theme, user.
 	 */
 	public function __construct( $data = array(), $origin = 'theme' ) {
