@@ -44,7 +44,7 @@ describe( 'IsolatedEventContainer', () => {
 		).toBeVisible();
 	} );
 
-	it( 'should stop mousedown event propagation', async () => {
+	it( 'should stop event propagation only for mousedown, but not for keydown', async () => {
 		const user = userEvent.setup( {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
