@@ -91,7 +91,7 @@ function AutoBlockPreview( {
 						bodyElement.style.padding =
 							__experimentalPadding + 'px';
 
-						// necessary for contentResizeListener to work.
+						// Necessary for contentResizeListener to work.
 						bodyElement.style.position = 'absolute';
 						bodyElement.style.width = '100%';
 					}, [] ) }
