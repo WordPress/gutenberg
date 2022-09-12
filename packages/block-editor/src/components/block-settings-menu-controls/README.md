@@ -19,9 +19,9 @@ function ReusableBlocksMenuItems() {
 
 ## Props
 
-### `context`
+### `displayLocation`
 
 -   **Type:** `String`
 -   **Default:** `undefined`
 
-A string representing the context where the component is being included. This can be used to conditionalize certain behaviors.
+A string representing the location where the component is being displayed within the UI. This can be used to conditionalize certain behaviors including the display of associated components.

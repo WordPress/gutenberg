@@ -28,7 +28,7 @@ const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 const BlockSettingsMenuControlsSlot = ( {
 	fillProps,
 	clientIds = null,
-	context,
+	displayLocation,
 } ) => {
 	const { selectedBlocks, selectedClientIds, canRemove } = useSelect(
 		( select ) => {
@@ -65,7 +65,7 @@ const BlockSettingsMenuControlsSlot = ( {
 		<Slot
 			fillProps={ {
 				...fillProps,
-				context,
+				displayLocation,
 				selectedBlocks,
 				selectedClientIds,
 			} }
