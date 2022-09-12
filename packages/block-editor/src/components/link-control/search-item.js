@@ -19,21 +19,21 @@ import {
 	file,
 } from '@wordpress/icons';
 
+const ICONS_MAP = {
+	post: postList,
+	page,
+	post_tag: tag,
+	category,
+	attachment: file,
+};
+
 function SearchItemIcon( { isURL, suggestion } ) {
 	let icon = null;
 
 	if ( isURL ) {
 		icon = globe;
-	} else if ( suggestion.type === 'post' ) {
-		icon = postList;
-	} else if ( suggestion.type === 'page' ) {
-		icon = page;
-	} else if ( suggestion.type === 'post_tag' ) {
-		icon = tag;
-	} else if ( suggestion.type === 'category' ) {
-		icon = category;
-	} else if ( suggestion.type === 'attachment' ) {
-		icon = file;
+	} else if ( suggestion.type in ICONS_MAP ) {
+		icon = ICONS_MAP[ suggestion.type ];
 	}
 
 	if ( icon ) {
