@@ -17,13 +17,13 @@ describe( 'IsolatedEventContainer', () => {
 		const clickHandler = jest.fn();
 		render(
 			<IsolatedEventContainer
-				data-testid="container"
+				title="Container"
 				className="test"
 				onClick={ clickHandler }
 			/>
 		);
 
-		const container = screen.getByTestId( 'container' );
+		const container = screen.getByTitle( 'Container' );
 		expect( container ).toHaveClass( 'test' );
 
 		await user.click( container );
@@ -34,13 +34,13 @@ describe( 'IsolatedEventContainer', () => {
 
 	it( 'should render children', async () => {
 		render(
-			<IsolatedEventContainer data-testid="container">
-				<p data-testid="child" />
+			<IsolatedEventContainer title="Container">
+				<p>Child</p>
 			</IsolatedEventContainer>
 		);
 
 		expect(
-			within( screen.getByTestId( 'container' ) ).getByTestId( 'child' )
+			within( screen.getByTitle( 'Container' ) ).getByText( 'Child' )
 		).toBeVisible();
 	} );
 
@@ -56,11 +56,11 @@ describe( 'IsolatedEventContainer', () => {
 				onMouseDown={ mousedownHandler }
 				onKeyDown={ keydownHandler }
 			>
-				<IsolatedEventContainer data-testid="container" />
+				<IsolatedEventContainer title="Container" />
 			</button>
 		);
 
-		const container = screen.getByTestId( 'container' );
+		const container = screen.getByTitle( 'Container' );
 
 		await user.click( container );
 		await user.keyboard( '[Enter]' );
