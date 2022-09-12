@@ -51,7 +51,7 @@ export function BlockSettingsDropdown( {
 	clientIds,
 	__experimentalSelectBlock,
 	children,
-	displayLocation,
+	__unstableDisplayLocation,
 	...props
 } ) {
 	const blockClientIds = castArray( clientIds );
@@ -290,7 +290,9 @@ export function BlockSettingsDropdown( {
 							<BlockSettingsMenuControls.Slot
 								fillProps={ { onClose } }
 								clientIds={ clientIds }
-								displayLocation={ displayLocation }
+								__unstableDisplayLocation={
+									__unstableDisplayLocation
+								}
 							/>
 							{ typeof children === 'function'
 								? children( { onClose } )
