@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { h, hydrate, render } from 'preact';
+import { h, hydrate, render, options } from 'preact';
 
 function createRootFragment( parent, replaceNode ) {
 	replaceNode = [].concat( replaceNode );
@@ -24,6 +24,8 @@ function createRootFragment( parent, replaceNode ) {
 
 const f = ( i ) => i;
 
+let rootFragment;
+
 // Convert a DOM node to a static virtual DOM node.
 function toVdom( node ) {
 	if ( node.nodeType === 3 ) {
@@ -37,7 +39,12 @@ function toVdom( node ) {
 		a = node.attributes;
 
 	for ( let i = 0; i < a.length; i++ ) {
-		props[ a[ i ].name ] = a[ i ].value;
+		if ( a[ i ].name.startsWith( 'wp-' ) ) {
+			props.wp = props.wp || {};
+			props.wp[ a[ i ].name ] = a[ i ].value;
+		} else {
+			props[ a[ i ].name ] = a[ i ].value;
+		}
 	}
 
 	return h(
@@ -47,43 +54,75 @@ function toVdom( node ) {
 	);
 }
 
+const wpDirectives = {};
+
+wpDirectives[ 'wp-client-navigation' ] = ( { element, value } ) => {
+	if ( value ) {
+		element.addEventListener( 'click', async ( event ) => {
+			event.preventDefault();
+
+			const url = element.getAttribute( 'href' );
+			const html = await window
+				.fetch( url )
+				.then( ( res ) => res.text() );
+			const dom = new window.DOMParser().parseFromString(
+				html,
+				'text/html'
+			);
+			const vdom = toVdom( dom.body );
+			render( vdom, rootFragment );
+
+			window.history.pushState( {}, '', url );
+
+			if ( value?.scroll === 'smooth' ) {
+				window.scrollTo( { top: 0, left: 0, behavior: 'smooth' } );
+			} else if ( value?.scroll !== false ) {
+				window.scrollTo( 0, 0 );
+			}
+		} );
+	}
+};
+
+// Store previous hook.
+const oldHook = options.diffed;
+const mounted = new WeakSet();
+
+// Set our own options hook.
+options.diffed = ( vnode ) => {
+	const wp = vnode.props.wp;
+	if ( wp ) {
+		const element = vnode.__e;
+		if ( ! mounted.has( element ) ) {
+			mounted.add( element );
+			for ( const key in wp ) {
+				let value = wp[ key ];
+				try {
+					value = JSON.parse( wp[ key ] );
+				} catch ( e ) {}
+				if ( wpDirectives[ key ] )
+					wpDirectives[ key ]( {
+						value,
+						element,
+						props: vnode.props,
+					} );
+			}
+		}
+	}
+
+	// Call previously defined hook if there was any
+	if ( oldHook ) {
+		oldHook( vnode );
+	}
+};
+
 document.addEventListener( 'DOMContentLoaded', () => {
-	const rootFragment = createRootFragment(
+	rootFragment = createRootFragment(
 		document.documentElement,
 		document.body
 	);
-
-	const fetchURL = async ( e ) => {
-		e.preventDefault();
-
-		// Fetch the HTML of the new page.
-		const url = e.target.href;
-		const html = await window
-			.fetch( e.target.href )
-			.then( ( d ) => d.text() );
-
-		const dom = new window.DOMParser().parseFromString( html, 'text/html' );
-		const vdom = toVdom( dom.body );
-
-		render( vdom, rootFragment );
-
-		// Change the browser URL.
-		window.history.pushState( {}, '', url );
-
-		// Scroll to the top to simulate page load. Optional.
-		// window.scrollTo( { top: 0, left: 0, behavior: 'smooth' } );
-	};
 
 	window.requestIdleCallback( () => {
 		const vdom = toVdom( document.body );
 		hydrate( vdom, rootFragment );
 	} );
-
-	const next = document.querySelector( '.wp-block-query-pagination-next' );
-	const previous = document.querySelector(
-		'.wp-block-query-pagination-previous'
-	);
-
-	next?.addEventListener( 'click', fetchURL );
-	previous?.addEventListener( 'click', fetchURL );
 } );

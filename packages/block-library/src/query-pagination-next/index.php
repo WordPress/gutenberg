@@ -48,7 +48,7 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 		$custom_query_max_pages = (int) $custom_query->max_num_pages;
 		if ( $custom_query_max_pages && $custom_query_max_pages !== $page ) {
 			$content = sprintf(
-				'<a key="next" href="%1$s" %2$s>%3$s</a>',
+				'<a key="next" wp-client-navigation=\'{"prefetch": "load", "scroll": false}\' href="%1$s" %2$s>%3$s</a>',
 				esc_url( add_query_arg( $page_key, $page + 1 ) ),
 				$wrapper_attributes,
 				$label
