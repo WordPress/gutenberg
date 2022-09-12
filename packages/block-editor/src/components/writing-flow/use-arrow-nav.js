@@ -275,8 +275,8 @@ export default function useArrowNav() {
 				if ( closestTabbable ) {
 					placeCaretAtVerticalEdge(
 						closestTabbable,
-						// When Alt is pressed, place the at the horizontal edge
-						// and the furthest vertical edge.
+						// When Alt is pressed, place the caret at the furthest
+						// horizontal edge and the furthest vertical edge.
 						altKey ? ! isReverse : isReverse,
 						altKey ? undefined : verticalRect
 					);
