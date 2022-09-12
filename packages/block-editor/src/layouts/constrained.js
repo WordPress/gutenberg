@@ -7,7 +7,14 @@ import {
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
+import {
+	Icon,
+	positionCenter,
+	stretchWide,
+	justifyLeft,
+	justifyCenter,
+	justifyRight,
+} from '@wordpress/icons';
 import { getCSSRules } from '@wordpress/style-engine';
 
 /**
@@ -25,7 +32,30 @@ export default {
 		layout,
 		onChange,
 	} ) {
-		const { wideSize, contentSize } = layout;
+		const { wideSize, contentSize, justifyContent = 'center' } = layout;
+		const onJustificationChange = ( value ) => {
+			onChange( {
+				...layout,
+				justifyContent: value,
+			} );
+		};
+		const justificationOptions = [
+			{
+				value: 'left',
+				icon: justifyLeft,
+				label: __( 'Justify items left' ),
+			},
+			{
+				value: 'center',
+				icon: justifyCenter,
+				label: __( 'Justify items center' ),
+			},
+			{
+				value: 'right',
+				icon: justifyRight,
+				label: __( 'Justify items right' ),
+			},
+		];
 		const units = useCustomUnits( {
 			availableUnits: useSetting( 'spacing.units' ) || [
 				'%',
@@ -35,7 +65,6 @@ export default {
 				'vw',
 			],
 		} );
-
 		return (
 			<>
 				<div className="block-editor-hooks__layout-controls">
@@ -102,6 +131,26 @@ export default {
 						'Customize the width for all elements that are assigned to the center or wide columns.'
 					) }
 				</p>
+				<fieldset className="block-editor-hooks__flex-layout-justification-controls">
+					<legend>{ __( 'Justification' ) }</legend>
+					<div>
+						{ justificationOptions.map(
+							( { value, icon, label } ) => {
+								return (
+									<Button
+										key={ value }
+										label={ label }
+										icon={ icon }
+										isPressed={ justifyContent === value }
+										onClick={ () =>
+											onJustificationChange( value )
+										}
+									/>
+								);
+							}
+						) }
+					</div>
+				</fieldset>
 			</>
 		);
 	},
@@ -116,7 +165,7 @@ export default {
 		hasBlockGapSupport,
 		layoutDefinitions,
 	} ) {
-		const { contentSize, wideSize } = layout;
+		const { contentSize, wideSize, justifyContent } = layout;
 		const blockGapStyleValue = getGapCSSValue( style?.spacing?.blockGap );
 
 		// If a block's block.json skips serialization for spacing or
@@ -131,6 +180,11 @@ export default {
 			}
 		}
 
+		const marginLeft =
+			justifyContent === 'left' ? '0 !important' : 'auto !important';
+		const marginRight =
+			justifyContent === 'right' ? '0 !important' : 'auto !important';
+
 		let output =
 			!! contentSize || !! wideSize
 				? `
@@ -139,8 +193,8 @@ export default {
 						'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
 					) } {
 						max-width: ${ contentSize ?? wideSize };
-						margin-left: auto !important;
-						margin-right: auto !important;
+						margin-left: ${ marginLeft };
+						margin-right: ${ marginRight }t;
 					}
 					${ appendSelectors( selector, '> .alignwide' ) }  {
 						max-width: ${ wideSize ?? contentSize };
@@ -150,6 +204,20 @@ export default {
 					}
 				`
 				: '';
+
+		if ( justifyContent === 'left' ) {
+			output += `${ appendSelectors(
+				selector,
+				'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
+			) }
+			{ margin-left: ${ marginLeft }; }`;
+		} else if ( justifyContent === 'right' ) {
+			output += `${ appendSelectors(
+				selector,
+				'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
+			) }
+			{ margin-right: ${ marginRight }; }`;
+		}
 
 		// If there is custom padding, add negative margins for alignfull blocks.
 		if ( style?.spacing?.padding ) {
