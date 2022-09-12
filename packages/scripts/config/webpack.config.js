@@ -26,6 +26,7 @@ const {
 	hasCssnanoConfig,
 	hasPostCSSConfig,
 	getWebpackEntryPoints,
+	getRenderPropPaths,
 } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -36,9 +37,8 @@ if ( ! browserslist.findConfig( '.' ) ) {
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 
-const copyWebpackPatterns = process.env.WP_COPY_PHP_FILES_TO_DIST
-	? '**/{block.json,*.php}'
-	: '**/block.json';
+// Get paths of the `render` props included in `block.json` files
+const renderPaths = getRenderPropPaths();
 
 const cssLoaders = [
 	{
@@ -232,7 +232,7 @@ const config = {
 		new CopyWebpackPlugin( {
 			patterns: [
 				{
-					from: copyWebpackPatterns,
+					from: '**/block.json',
 					context: process.env.WP_SRC_DIRECTORY,
 					noErrorOnMissing: true,
 					transform( content, absoluteFrom ) {
@@ -263,6 +263,17 @@ const config = {
 						}
 
 						return content;
+					},
+				},
+				{
+					from: '**/*.php',
+					context: process.env.WP_SRC_DIRECTORY,
+					noErrorOnMissing: true,
+					filter: ( filepath ) => {
+						return (
+							process.env.WP_COPY_PHP_FILES_TO_DIST ||
+							renderPaths.includes( filepath )
+						);
 					},
 				},
 			],
