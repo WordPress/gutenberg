@@ -31,7 +31,7 @@ export function addLabelCallback( settings ) {
 		settings.__experimentalLabel = ( attributes, { context } ) => {
 			const { metadata } = attributes;
 
-			// In the list view, use the block's name sattribute as the label.
+			// In the list view, use the block's name attribute as the label.
 			if ( context === 'list-view' && metadata?.name ) {
 				return metadata.name;
 			}
