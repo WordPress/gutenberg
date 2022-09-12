@@ -8,7 +8,7 @@
 /**
  * Adds global style rules to the inline style for each block.
  */
-function wp_add_global_styles_for_blocks() {
+function gutenberg_add_global_styles_for_blocks() {
 	$tree        = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 	$block_nodes = $tree->get_styles_block_nodes();
 	foreach ( $block_nodes as $metadata ) {

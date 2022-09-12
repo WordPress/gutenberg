@@ -416,10 +416,12 @@ const UnforwardedPopover = (
 	// document scrolls. Also update the frame offset if the view resizes.
 	useLayoutEffect( () => {
 		if (
-			// reference and floating are in the same document
+			// Reference and root documents are the same.
 			referenceOwnerDocument === document ||
-			// the reference's document has a view (i.e. window)
-			// and a frame element (ie. it's an iframe)
+			// Reference and floating are in the same document.
+			referenceOwnerDocument === refs?.floating?.current?.ownerDocument ||
+			// The reference's document has no view (i.e. window)
+			// or frame element (ie. it's not an iframe).
 			! referenceOwnerDocument?.defaultView?.frameElement
 		) {
 			frameOffsetRef.current = undefined;
