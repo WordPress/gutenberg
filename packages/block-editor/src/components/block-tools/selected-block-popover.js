@@ -36,6 +36,7 @@ function selector( select ) {
 		isMultiSelecting: isMultiSelecting(),
 		isTyping: isTyping(),
 		hasFixedToolbar: getSettings().hasFixedToolbar,
+		hasReducedUI: getSettings().hasReducedUI,
 		lastClientId: hasMultiSelection()
 			? getLastMultiSelectedBlockClientId()
 			: null,
@@ -55,6 +56,7 @@ function SelectedBlockPopover( {
 		isMultiSelecting,
 		isTyping,
 		hasFixedToolbar,
+		hasReducedUI,
 		lastClientId,
 	} = useSelect( selector, [] );
 	const isInsertionPointVisible = useSelect(
@@ -94,6 +96,7 @@ function SelectedBlockPopover( {
 		editorMode === 'edit' &&
 		! shouldShowContextualToolbar &&
 		! hasFixedToolbar &&
+		! hasReducedUI &&
 		! isEmptyDefaultBlock;
 
 	useShortcut(
