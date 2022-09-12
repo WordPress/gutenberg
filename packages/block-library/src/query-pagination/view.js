@@ -3,6 +3,8 @@
  */
 import { h, hydrate, render, options } from 'preact';
 
+// For wrapperless hydration of document.body.
+// See https://gist.github.com/developit/f4c67a2ede71dc2fab7f357f39cff28c
 function createRootFragment( parent, replaceNode ) {
 	replaceNode = [].concat( replaceNode );
 	const s = replaceNode[ replaceNode.length - 1 ].nextSibling;
@@ -22,11 +24,10 @@ function createRootFragment( parent, replaceNode ) {
 	} );
 }
 
+let rootFragment;
 const f = ( i ) => i;
 
-let rootFragment;
-
-// Convert a DOM node to a static virtual DOM node.
+// Convert DOM nodes to static virtual DOM nodes.
 function toVdom( node ) {
 	if ( node.nodeType === 3 ) {
 		return node.data;
@@ -54,23 +55,20 @@ function toVdom( node ) {
 	);
 }
 
-const wpDirectives = {};
+/* A minimalistic Router */
 
+// The cache of visited or prefetched pages.
 const pages = new Map();
 
+// Fetch a new page and convert it to a static virtual DOM.
 const fetchAndVdom = async ( url ) => {
 	const html = await window.fetch( url ).then( ( res ) => res.text() );
 	const dom = new window.DOMParser().parseFromString( html, 'text/html' );
 	return toVdom( dom.body );
 };
 
-const getInitialVdom = () => {
-	const vdom = toVdom( document.body );
-	const url = window.location.pathname + window.location.search;
-	pages.set( url, Promise.resolve( vdom ) );
-	return vdom;
-};
-
+// Retrieve a page from the cache or trigger a new fetch. We store promises to
+// avoid fetching a page if a fetching has already started.
 const fetchPage = async ( url ) => {
 	if ( ! pages.has( url ) ) {
 		pages.set( url, fetchAndVdom( url ) );
@@ -78,6 +76,16 @@ const fetchPage = async ( url ) => {
 	return await pages.get( url );
 };
 
+// Convert the initial DOM into a static virtual DOM and save it in the cache.
+const getInitialVdom = () => {
+	const vdom = toVdom( document.body );
+	const url = window.location.pathname + window.location.search;
+	pages.set( url, Promise.resolve( vdom ) );
+	return vdom;
+};
+
+// Listen to the back and forward buttons and restore the page if it's in the
+// cache.
 window.addEventListener( 'popstate', async () => {
 	const url = window.location.pathname + window.location.search;
 	if ( pages.has( url ) ) {
@@ -86,8 +94,14 @@ window.addEventListener( 'popstate', async () => {
 	}
 } );
 
+/* WordPress Directives */
+const wpDirectives = {};
+
+// The `wp-client-navigation` directive.
 wpDirectives[ 'wp-client-navigation' ] = ( { element, value } ) => {
-	if ( value ) {
+	// Don't do anything if it's falsy.
+	if ( !! value ) {
+		// Prefetch the page if it is in the directive options.
 		if ( value.prefetch ) {
 			fetchPage( element.getAttribute( 'href' ) );
 		}
@@ -95,12 +109,17 @@ wpDirectives[ 'wp-client-navigation' ] = ( { element, value } ) => {
 		element.addEventListener( 'click', async ( event ) => {
 			event.preventDefault();
 
+			// Fetch the page (or return it from cache).
 			const url = element.getAttribute( 'href' );
 			const vdom = await fetchPage( url );
+
+			// Render the new page.
 			render( vdom, rootFragment );
 
+			// Update the URL.
 			window.history.pushState( {}, '', url );
 
+			// Update the scroll, depending on the option. True by default.
 			if ( value?.scroll === 'smooth' ) {
 				window.scrollTo( { top: 0, left: 0, behavior: 'smooth' } );
 			} else if ( value?.scroll !== false ) {
@@ -110,23 +129,26 @@ wpDirectives[ 'wp-client-navigation' ] = ( { element, value } ) => {
 	}
 };
 
-// Store previous hook.
 const oldHook = options.diffed;
 const mounted = new WeakSet();
 
-// Set our own options hook.
+// Set our own options hook for the WordPress Directives.
 options.diffed = ( vnode ) => {
 	const wp = vnode.props.wp;
+	// Check if there is any directive.
 	if ( wp ) {
 		const element = vnode.__e;
+		// Check if the element has been already mounted.
 		if ( ! mounted.has( element ) ) {
 			mounted.add( element );
 			for ( const key in wp ) {
 				let value = wp[ key ];
 				try {
+					// Turn primitives into values (booleans, numbers) and parse objects.
 					value = JSON.parse( wp[ key ] );
 				} catch ( e ) {}
 				if ( wpDirectives[ key ] )
+					// For each directive, run the callback.
 					wpDirectives[ key ]( {
 						value,
 						element,
@@ -142,11 +164,13 @@ options.diffed = ( vnode ) => {
 };
 
 document.addEventListener( 'DOMContentLoaded', () => {
+	// Create the root fragment to hydrate everything.
 	rootFragment = createRootFragment(
 		document.documentElement,
 		document.body
 	);
 
+	// Wait until the CPU is idle to do the hydration.
 	window.requestIdleCallback( () => {
 		const vdom = getInitialVdom();
 		hydrate( vdom, rootFragment );
