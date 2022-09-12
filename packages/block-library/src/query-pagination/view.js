@@ -78,6 +78,14 @@ const fetchPage = async ( url ) => {
 	return await pages.get( url );
 };
 
+window.addEventListener( 'popstate', async () => {
+	const url = window.location.pathname + window.location.search;
+	if ( pages.has( url ) ) {
+		const vdom = await pages.get( url );
+		render( vdom, rootFragment );
+	}
+} );
+
 wpDirectives[ 'wp-client-navigation' ] = ( { element, value } ) => {
 	if ( value ) {
 		if ( value.prefetch ) {
