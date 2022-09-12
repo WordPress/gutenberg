@@ -7,10 +7,15 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { BaseControl, Button } from '@wordpress/components';
-import { formatStrikethrough, formatUnderline } from '@wordpress/icons';
+import { reset, formatStrikethrough, formatUnderline } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 const TEXT_DECORATIONS = [
+	{
+		name: __( 'None' ),
+		value: 'none',
+		icon: reset,
+	},
 	{
 		name: __( 'Underline' ),
 		value: 'underline',

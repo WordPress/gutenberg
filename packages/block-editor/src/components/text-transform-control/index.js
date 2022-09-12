@@ -7,12 +7,18 @@
 import { BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
+	reset,
 	formatCapitalize,
 	formatLowercase,
 	formatUppercase,
 } from '@wordpress/icons';
 
 const TEXT_TRANSFORMS = [
+	{
+		name: __( 'None' ),
+		value: 'none',
+		icon: reset,
+	},
 	{
 		name: __( 'Uppercase' ),
 		value: 'uppercase',

@@ -5,5 +5,12 @@
 
 	.block-editor-text-decoration-control__buttons {
 		padding: 2px;
+		display: flex;
+	}
+
+	.components-button.has-icon {
+		flex-basis: $button-size;
+		min-width: 0;
+		padding: 0;
 	}
 }
