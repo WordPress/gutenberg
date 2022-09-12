@@ -58,24 +58,37 @@ function ListViewBlock( {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const { clientId } = block;
+
+	const { isLocked, isContentLocked } = useBlockLock( clientId );
+	const forceSelectionContentLock = useSelect(
+		( select ) => {
+			if ( isSelected ) {
+				return false;
+			}
+			if ( ! isContentLocked ) {
+				return false;
+			}
+			return select( blockEditorStore ).hasSelectedInnerBlock(
+				clientId,
+				true
+			);
+		},
+		[ isContentLocked, clientId, isSelected ]
+	);
+
 	const isFirstSelectedBlock =
-		isSelected && selectedClientIds[ 0 ] === clientId;
+		forceSelectionContentLock ||
+		( isSelected && selectedClientIds[ 0 ] === clientId );
 	const isLastSelectedBlock =
-		isSelected &&
-		selectedClientIds[ selectedClientIds.length - 1 ] === clientId;
+		forceSelectionContentLock ||
+		( isSelected &&
+			selectedClientIds[ selectedClientIds.length - 1 ] === clientId );
 
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const { isContentLocked, blockName } = useSelect(
-		( select ) => {
-			const { getBlockName, getTemplateLock } =
-				select( blockEditorStore );
-			return {
-				blockName: getBlockName( clientId ),
-				isContentLocked: getTemplateLock( clientId ) === 'noContent',
-			};
-		},
+	const blockName = useSelect(
+		( select ) => select( blockEditorStore ).getBlockName( clientId ),
 		[ clientId ]
 	);
 
@@ -87,7 +100,6 @@ function ListViewBlock( {
 		'__experimentalToolbar',
 		true
 	);
-	const { isLocked } = useBlockLock( clientId );
 	const instanceId = useInstanceId( ListViewBlock );
 	const descriptionId = `list-view-block-select-button__${ instanceId }`;
 	const blockPositionDescription = getBlockPositionDescription(
@@ -188,7 +200,7 @@ function ListViewBlock( {
 	}
 
 	const classes = classnames( {
-		'is-selected': isSelected,
+		'is-selected': isSelected || forceSelectionContentLock,
 		'is-first-selected': isFirstSelectedBlock,
 		'is-last-selected': isLastSelectedBlock,
 		'is-branch-selected': isBranchSelected,
@@ -218,14 +230,14 @@ function ListViewBlock( {
 			id={ `list-view-block-${ clientId }` }
 			data-block={ clientId }
 			isExpanded={ isContentLocked ? undefined : isExpanded }
-			aria-selected={ !! isSelected }
+			aria-selected={ !! isSelected || forceSelectionContentLock }
 		>
 			<TreeGridCell
 				className="block-editor-list-view-block__contents-cell"
 				colSpan={ colSpan }
 				ref={ cellRef }
 				aria-label={ blockAriaLabel }
-				aria-selected={ !! isSelected }
+				aria-selected={ !! isSelected || forceSelectionContentLock }
 				aria-expanded={ isContentLocked ? undefined : isExpanded }
 				aria-describedby={ descriptionId }
 			>
@@ -290,7 +302,7 @@ function ListViewBlock( {
 			{ showBlockActions && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
-					aria-selected={ !! isSelected }
+					aria-selected={ !! isSelected || forceSelectionContentLock }
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsDropdown
