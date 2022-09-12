@@ -17,7 +17,6 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { View } from '@wordpress/primitives';
-import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -58,9 +57,7 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 
 	return (
 		<>
-			{ ( ! spacingSizes ||
-				spacingSizes?.length === 0 ||
-				Platform.isNative ) && (
+			{ ( ! spacingSizes || spacingSizes?.length === 0 ) && (
 				<BaseControl label={ label } id={ inputId }>
 					<UnitControl
 						id={ inputId }
