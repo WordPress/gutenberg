@@ -57,7 +57,7 @@ function render_block_core_calendar( $attributes ) {
 	$inline_styles = empty( $styles['css'] ) ? '' : sprintf( ' style="%s"', esc_attr( $styles['css'] ) );
 	$classnames    = empty( $styles['classnames'] ) ? '' : ' ' . esc_attr( $styles['classnames'] );
 
- // Apply color classes and styles to the calendar.
+	// Apply color classes and styles to the calendar.
 	$calendar = str_replace( '<table', '<table' . $inline_styles, get_calendar( true, false ) );
 	$calendar = str_replace( 'class="wp-calendar-table', 'class="wp-calendar-table' . $classnames, $calendar );
 
