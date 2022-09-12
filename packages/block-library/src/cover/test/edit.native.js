@@ -49,6 +49,16 @@ const COVER_BLOCK_SOLID_COLOR_HTML = `<!-- wp:cover {"overlayColor":"cyan-bluish
 <p class="has-text-align-center"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->`;
+const COVER_BLOCK_IMAGE_HTML = `<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","isDark":false} -->
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<p class="has-text-align-center has-large-font-size"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->`;
+const COVER_BLOCK_CUSTOM_HEIGHT_HTML = `<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","minHeight":20,"minHeightUnit":"vw","isDark":false} -->
+<div class="wp-block-cover is-light" style="min-height:20vw"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<p class="has-text-align-center has-large-font-size"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->`;
 
 const COLOR_PINK = '#f78da7';
 const COLOR_RED = '#cf2e2e';
@@ -289,6 +299,41 @@ describe( 'when an image is attached', () => {
 				url: undefined,
 			} )
 		);
+	} );
+
+	it( 'updates background opacity', async () => {
+		const { getByTestId, getByA11yLabel } = await initializeEditor( {
+			initialHtml: COVER_BLOCK_IMAGE_HTML,
+		} );
+
+		const coverBlock = await waitFor( () =>
+			getByA11yLabel( /Cover Block\. Row 1/ )
+		);
+		fireEvent.press( coverBlock );
+
+		// Open block settings
+		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
+		await waitFor(
+			() => getByTestId( 'block-settings-modal' ).props.isVisible
+		);
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = getByTestId( 'block-settings-modal' );
+		await waitFor( () => blockSettingsModal.props.isVisible );
+
+		// Update Opacity attribute
+		const opacityControl = getByA11yLabel( /Opacity/ );
+		fireEvent.press( within( opacityControl ).getByText( '50' ) );
+		const heightTextInput =
+			within( opacityControl ).getByDisplayValue( '50' );
+		fireEvent.changeText( heightTextInput, '20' );
+
+		// The decreasing button should be disabled
+		fireEvent( opacityControl, 'accessibilityAction', {
+			nativeEvent: { actionName: 'decrement' },
+		} );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );
 
@@ -531,5 +576,119 @@ describe( 'color settings', () => {
 		fireEvent.press( resetButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+} );
+
+describe( 'minimum height settings', () => {
+	it( 'changes the height value to 20(vw)', async () => {
+		const { getByTestId, getByA11yLabel, getByText, getByDisplayValue } =
+			await initializeEditor( {
+				initialHtml: COVER_BLOCK_IMAGE_HTML,
+			} );
+
+		const coverBlock = await waitFor( () =>
+			getByA11yLabel( /Cover Block\. Row 1/ )
+		);
+		fireEvent.press( coverBlock );
+
+		// Open block settings
+		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
+		await waitFor(
+			() => getByTestId( 'block-settings-modal' ).props.isVisible
+		);
+
+		// Set vw unit
+		fireEvent.press( getByText( 'px' ) );
+		fireEvent.press( getByText( 'Viewport width (vw)' ) );
+
+		// Update height attribute
+		fireEvent.press( getByText( '300' ) );
+		const heightTextInput = getByDisplayValue( '300' );
+		fireEvent.changeText( heightTextInput, '20' );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'changes the height value between units', async () => {
+		const { getByTestId, getByA11yLabel, getByText } =
+			await initializeEditor( {
+				initialHtml: COVER_BLOCK_CUSTOM_HEIGHT_HTML,
+			} );
+
+		const coverBlock = await waitFor( () =>
+			getByA11yLabel( /Cover Block\. Row 1/ )
+		);
+		fireEvent.press( coverBlock );
+
+		// Open block settings
+		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
+		await waitFor(
+			() => getByTestId( 'block-settings-modal' ).props.isVisible
+		);
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = getByTestId( 'block-settings-modal' );
+		await waitFor( () => blockSettingsModal.props.isVisible );
+
+		// Set the pixel unit
+		fireEvent.press( getByText( 'vw' ) );
+		fireEvent.press( getByText( 'Pixels (px)' ) );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	describe( 'disables the decrease button when reaching the minimum value', () => {
+		const testData = [
+			[ 'Pixels (px)', '50', '50' ],
+			[ 'Relative to parent font size (em)', '20', '1' ],
+			[ 'Relative to root font size (rem)', '20', '1' ],
+			[ 'Viewport width (vw)', '20', '1' ],
+			[ 'Viewport height (vh)', '20', '1' ],
+		];
+
+		test.each( testData )(
+			'for %s',
+			async ( unitName, value, minValue ) => {
+				const { getByTestId, getByA11yLabel, getByText } =
+					await initializeEditor( {
+						initialHtml: COVER_BLOCK_CUSTOM_HEIGHT_HTML,
+					} );
+
+				const coverBlock = await waitFor( () =>
+					getByA11yLabel( /Cover Block\. Row 1/ )
+				);
+				fireEvent.press( coverBlock );
+
+				// Open block settings
+				fireEvent.press( getByA11yLabel( 'Open Settings' ) );
+				await waitFor(
+					() => getByTestId( 'block-settings-modal' ).props.isVisible
+				);
+
+				// Wait for Block Settings to be visible.
+				const blockSettingsModal = getByTestId(
+					'block-settings-modal'
+				);
+				await waitFor( () => blockSettingsModal.props.isVisible );
+
+				// Set the unit name
+				fireEvent.press( getByText( 'vw' ) );
+				fireEvent.press( getByText( unitName ) );
+
+				// Update height attribute
+				const heightControl = getByA11yLabel( /Minimum height/ );
+				fireEvent.press( within( heightControl ).getByText( value ) );
+				const heightTextInput =
+					within( heightControl ).getByDisplayValue( value );
+				fireEvent.changeText( heightTextInput, minValue );
+
+				// The decreasing button should be disabled
+				fireEvent( heightControl, 'accessibilityAction', {
+					nativeEvent: { actionName: 'decrement' },
+				} );
+
+				expect( getEditorHtml() ).toMatchSnapshot();
+			}
+		);
 	} );
 } );
