@@ -38,12 +38,9 @@
 	margin-right: 0;
 	min-width: 3em;
 	border: 1px solid #949494;
-}
-
-// Higher specificity is required to prevent theme.json/global styles from
-// applying undesired text-decoration styles to the input.
-.wp-block-search input.wp-block-search__input {
-	text-decoration: unset;
+	// !important used to forcibly prevent undesired application of
+	// text-decoration styles on the input field.
+	text-decoration: unset !important;
 }
 
 .wp-block-search.wp-block-search__button-only {
