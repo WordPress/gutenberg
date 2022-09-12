@@ -1,46 +1,46 @@
 /**
  * WordPress dependencies
  */
-import {
-	clickBlockAppender,
-	createNewPost,
-	showBlockToolbar,
-} from '@wordpress/e2e-test-utils';
+/**
+ * WordPress dependencies
+ */
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-describe( 'isTyping', () => {
-	beforeEach( async () => {
-		await createNewPost();
+test.describe( 'isTyping', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
 	} );
 
-	it( 'should hide the toolbar when typing', async () => {
+	test( 'should hide the toolbar when typing', async ( { page, editor } ) => {
 		const blockToolbarSelector = '.block-editor-block-toolbar';
 
-		await clickBlockAppender();
+		await page.click( 'role=button[name="Add default block"i]' );
 
 		// Type in a paragraph.
 		await page.keyboard.type( 'Type' );
 
 		// Toolbar is hidden
-		let blockToolbar = await page.$( blockToolbarSelector );
-		expect( blockToolbar ).toBe( null );
+		await expect( page.locator( blockToolbarSelector ) ).toBeHidden();
 
 		// Moving the mouse shows the toolbar.
-		await showBlockToolbar();
+		await editor.showBlockToolbar();
 
 		// Toolbar is visible.
-		blockToolbar = await page.$( blockToolbarSelector );
-		expect( blockToolbar ).not.toBe( null );
+		expect( page.locator( blockToolbarSelector ) ).not.toBe( null );
 
 		// Typing again hides the toolbar
 		await page.keyboard.type( ' and continue' );
 
 		// Toolbar is hidden again
-		blockToolbar = await page.$( blockToolbarSelector );
-		expect( blockToolbar ).toBe( null );
+		await expect( page.locator( blockToolbarSelector ) ).toBeHidden();
 	} );
 
-	it( 'should not close the dropdown when typing in it', async () => {
+	test( 'should not close the dropdown when typing in it', async ( {
+		page,
+		editor,
+	} ) => {
 		// Adds a Dropdown with an input to all blocks.
+		const wp = '';
 		await page.evaluate( () => {
 			const { Dropdown, ToolbarButton, Fill } = wp.components;
 			const { createElement: el, Fragment } = wp.element;
@@ -80,13 +80,13 @@ describe( 'isTyping', () => {
 			);
 		} );
 
-		await clickBlockAppender();
+		await page.click( 'role=button[name="Add default block"i]' );
 
 		// Type in a paragraph.
 		await page.keyboard.type( 'Type' );
 
 		// Show Toolbar.
-		await showBlockToolbar();
+		await editor.showBlockToolbar();
 
 		// Open the dropdown.
 		await page.click( '.dropdown-open' );
@@ -95,7 +95,6 @@ describe( 'isTyping', () => {
 		await page.type( '.dropdown-input', 'Random' );
 
 		// The input should still be visible.
-		const input = await page.$( '.dropdown-input' );
-		expect( input ).not.toBe( null );
+		await expect( page.locator( '.dropdown-input' ) ).toBeVisible();
 	} );
 } );
