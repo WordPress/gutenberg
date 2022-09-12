@@ -383,9 +383,9 @@ function styles_for_block_core_search( $attributes ) {
 	// Get typography styles to be shared across inner elements.
 	$typography_styles = get_typography_styles_for_block_core_search( $attributes );
 	if ( ! empty( $typography_styles ) ) {
-		$label_styles[] = $typography_styles;
+		$label_styles [] = $typography_styles;
 		$button_styles[] = $typography_styles;
-		$input_styles[] = $typography_styles;
+		$input_styles [] = $typography_styles;
 	}
 
 	// Typography text-decoration is only applied to the label and button.
