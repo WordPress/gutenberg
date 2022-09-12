@@ -24,6 +24,10 @@ function createRootFragment( parent, replaceNode ) {
 	} );
 }
 
+// Helper function to await until the CPU is idle.
+const idle = () =>
+	new Promise( ( resolve ) => window.requestIdleCallback( resolve ) );
+
 let rootFragment;
 const f = ( i ) => i;
 
@@ -63,6 +67,7 @@ const pages = new Map();
 // Fetch a new page and convert it to a static virtual DOM.
 const fetchAndVdom = async ( url ) => {
 	const html = await window.fetch( url ).then( ( res ) => res.text() );
+	await idle();
 	const dom = new window.DOMParser().parseFromString( html, 'text/html' );
 	return toVdom( dom.body );
 };
@@ -163,7 +168,7 @@ options.diffed = ( vnode ) => {
 	}
 };
 
-document.addEventListener( 'DOMContentLoaded', () => {
+document.addEventListener( 'DOMContentLoaded', async () => {
 	// Create the root fragment to hydrate everything.
 	rootFragment = createRootFragment(
 		document.documentElement,
@@ -171,8 +176,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	);
 
 	// Wait until the CPU is idle to do the hydration.
-	window.requestIdleCallback( () => {
-		const vdom = getInitialVdom();
-		hydrate( vdom, rootFragment );
-	} );
+	await idle();
+	const vdom = getInitialVdom();
+	hydrate( vdom, rootFragment );
 } );
