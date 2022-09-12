@@ -21,5 +21,7 @@ export const useNavigationTreeMenu = ( props ) => {
 		return () => {
 			removeMenu( key );
 		};
+		// Ignore exhaustive-deps rule for now.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 };

@@ -52,6 +52,8 @@ function MenuTitleSearch( {
 			count
 		);
 		debouncedSpeak( resultsFoundMessage );
+		// Ignore exhaustive-deps rule for now.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ items, search ] );
 
 	const onClose = () => {
