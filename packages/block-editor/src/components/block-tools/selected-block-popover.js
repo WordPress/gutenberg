@@ -27,14 +27,12 @@ function selector( select ) {
 		__unstableGetEditorMode,
 		isMultiSelecting,
 		hasMultiSelection,
-		isTyping,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
 	} = select( blockEditorStore );
 	return {
 		editorMode: __unstableGetEditorMode(),
 		isMultiSelecting: isMultiSelecting(),
-		isTyping: isTyping(),
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		lastClientId: hasMultiSelection()
 			? getLastMultiSelectedBlockClientId()
@@ -50,13 +48,8 @@ function SelectedBlockPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
 } ) {
-	const {
-		editorMode,
-		isMultiSelecting,
-		isTyping,
-		hasFixedToolbar,
-		lastClientId,
-	} = useSelect( selector, [] );
+	const { editorMode, isMultiSelecting, hasFixedToolbar, lastClientId } =
+		useSelect( selector, [] );
 	const isInsertionPointVisible = useSelect(
 		( select ) => {
 			const {
@@ -80,7 +73,7 @@ function SelectedBlockPopover( {
 	const { stopTyping } = useDispatch( blockEditorStore );
 
 	const showEmptyBlockSideInserter =
-		! isTyping && editorMode === 'edit' && isEmptyDefaultBlock;
+		editorMode === 'edit' && isEmptyDefaultBlock;
 	const shouldShowBreadcrumb =
 		editorMode === 'navigation' || editorMode === 'zoom-out';
 	const shouldShowContextualToolbar =
@@ -88,8 +81,7 @@ function SelectedBlockPopover( {
 		! hasFixedToolbar &&
 		isLargeViewport &&
 		! isMultiSelecting &&
-		! showEmptyBlockSideInserter &&
-		! isTyping;
+		! showEmptyBlockSideInserter;
 	const canFocusHiddenToolbar =
 		editorMode === 'edit' &&
 		! shouldShowContextualToolbar &&
