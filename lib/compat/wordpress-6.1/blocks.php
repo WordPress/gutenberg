@@ -190,7 +190,7 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 	 * @return void
 	 */
 	function wp_enqueue_block_view_script( $block_name, $args ) {
-		return gutenberg_enqueue_block_view_script( $block_name, $args );
+		gutenberg_enqueue_block_view_script( $block_name, $args );
 	}
 }
 
