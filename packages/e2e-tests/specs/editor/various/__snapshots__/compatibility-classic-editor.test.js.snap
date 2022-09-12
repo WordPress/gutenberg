@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Compatibility with classic editor Should not apply autop when rendering blocks 1`] = `
-"<a>
-Random Link
-</a>"
-`;
