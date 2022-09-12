@@ -7,6 +7,7 @@ import {
 	useAsyncList,
 	useViewportMatch,
 	__experimentalUseDialog as useDialog,
+	useReducedMotion,
 } from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
@@ -16,6 +17,7 @@ import {
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalNavigatorButton as NavigatorButton,
 	__experimentalNavigatorBackButton as NavigatorBackButton,
+	__unstableMotion as motion,
 	FlexBlock,
 	Card,
 	CardBody,
@@ -87,14 +89,17 @@ export function BlockPatternsCategoryDialog( {
 	category,
 	onClose,
 } ) {
+	const disableMotion = useReducedMotion();
 	const [ ref, props ] = useDialog( {
 		onClose,
 	} );
 
 	return (
-		<div
+		<motion.div
 			ref={ ref }
 			{ ...props }
+			initial={ { width: disableMotion ? 300 : 0 } }
+			animate={ { width: 300 } }
 			className="block-editor-inserter__patterns-category-panel"
 		>
 			<BlockPatternsCategoryPanel
@@ -102,7 +107,7 @@ export function BlockPatternsCategoryDialog( {
 				onInsert={ onInsert }
 				category={ category }
 			/>
-		</div>
+		</motion.div>
 	);
 }
 

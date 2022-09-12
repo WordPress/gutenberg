@@ -262,6 +262,10 @@ $block-inserter-tabs-height: 44px;
 	.block-editor-block-card__title {
 		font-size: $default-font-size;
 	}
+
+	.block-editor-block-preview__container {
+		box-shadow: $shadow-popover;
+	}
 }
 
 .block-editor-inserter__preview-content {

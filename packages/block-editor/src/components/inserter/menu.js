@@ -13,6 +13,7 @@ import {
 	useMemo,
 	useImperativeHandle,
 	useRef,
+	useEffect,
 } from '@wordpress/element';
 import { VisuallyHidden, SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -55,6 +56,16 @@ function InserterMenu(
 	const [ selectedPatternCategory, setSelectedPatternCategory ] =
 		useState( null );
 	const [ selectedTab, setSelectedTab ] = useState( null );
+	const preventPatternDialogFromClosing = useRef( null );
+
+	useEffect( () => {
+		// The timeout allows us to prevent the popover from closing temporarily
+		// because of the focus loss when we click on another pattern category.
+		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+		setTimeout( () => {
+			preventPatternDialogFromClosing.current = false;
+		} );
+	} );
 
 	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
 		useInsertionPoint( {
@@ -107,6 +118,7 @@ function InserterMenu(
 	const onClickPatternCategory = useCallback(
 		( patternCategory ) => {
 			setSelectedPatternCategory( patternCategory );
+			preventPatternDialogFromClosing.current = true;
 		},
 		[ setSelectedPatternCategory ]
 	);
@@ -252,7 +264,17 @@ function InserterMenu(
 						rootClientId={ destinationRootClientId }
 						onInsert={ onInsertPattern }
 						category={ selectedPatternCategory }
-						onClose={ () => setSelectedPatternCategory( null ) }
+						onClose={ () => {
+							// The timeout allows us to prevent the popover from closing temporarily
+							// because of the focus loss when we click on another pattern category.
+							// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+							setTimeout( () => {
+								if ( preventPatternDialogFromClosing ) {
+									return;
+								}
+								setSelectedPatternCategory( null );
+							}, 10 );
+						} }
 					/>
 				) }
 		</div>
