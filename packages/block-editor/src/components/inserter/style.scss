@@ -240,9 +240,11 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__patterns-category-panel {
-	background: $gray-100;
+	background: rgba($white, 0.8);
+	backdrop-filter: blur($grid-unit-20);
+	border-left: $border-width solid $gray-200;
 	position: absolute;
-	padding: $grid-unit-20;
+	padding: $grid-unit-40;
 	top: 0;
 	left: 0;
 	height: 100%;
@@ -263,8 +265,12 @@ $block-inserter-tabs-height: 44px;
 		font-size: $default-font-size;
 	}
 
-	.block-editor-block-preview__container {
-		box-shadow: $shadow-popover;
+	h3 {
+		margin-top: 0;
+	}
+
+	.block-editor-block-patterns-list {
+		margin-top: $grid-unit-30;
 	}
 }
 

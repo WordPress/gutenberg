@@ -18,7 +18,7 @@
 		display: flex;
 		align-items: center;
 		overflow: hidden;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-block-ui + $border-width;
 		border: $border-width solid $gray-100;
 	}
 
