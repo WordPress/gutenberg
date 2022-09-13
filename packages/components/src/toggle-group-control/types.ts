@@ -110,12 +110,6 @@ export type ToggleGroupControlProps = Pick<
 	 */
 	isDeselectable?: boolean;
 	/**
-	 * Borderless style that may be preferred in some contexts.
-	 *
-	 * @default false
-	 */
-	__experimentalIsBorderless?: boolean;
-	/**
 	 * Callback when a segment is selected.
 	 */
 	onChange?: ( value: ReactText | undefined ) => void;
