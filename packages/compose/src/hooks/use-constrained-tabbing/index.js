@@ -38,10 +38,15 @@ function useConstrainedTabbing() {
 		function onKeyDown( /** @type {KeyboardEvent} */ event ) {
 			const { keyCode, shiftKey, target } = event;
 
-			if ( keyCode !== TAB ) {
+			// constrainedTabAlreadyHandled is a custom property added
+			// to event to support nested constrainted tabbing containers
+			// @ts-ignore
+			if ( keyCode !== TAB || event.constrainedTabAlreadyHandled ) {
 				return;
 			}
 
+			// @ts-ignore
+			event.constrainedTabAlreadyHandled = true;
 			const action = shiftKey ? 'findPrevious' : 'findNext';
 			const nextElement =
 				focus.tabbable[ action ](

@@ -1,13 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useState, useCallback } from '@wordpress/element';
+import {
+	useMemo,
+	useState,
+	useCallback,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
 import { _x, __, isRTL } from '@wordpress/i18n';
 import {
 	useAsyncList,
 	useViewportMatch,
 	__experimentalUseDialog as useDialog,
 	useReducedMotion,
+	useMergeRefs,
 } from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
@@ -87,14 +94,19 @@ export function BlockPatternsCategoryDialog( {
 	category,
 	onClose,
 } ) {
+	const container = useRef();
 	const disableMotion = useReducedMotion();
 	const [ ref, props ] = useDialog( {
 		onClose,
 	} );
 
+	useEffect( () => {
+		container?.current?.focus();
+	}, [ category ] );
+
 	return (
 		<motion.div
-			ref={ ref }
+			ref={ useMergeRefs( [ ref, container ] ) }
 			{ ...props }
 			initial={ { width: disableMotion ? 300 : 0 } }
 			animate={ { width: 300 } }
@@ -173,8 +185,8 @@ function BlockPatternsTabs( {
 								onClick={ () => onSelectCategory( category ) }
 								className={
 									category === selectedCategory
-										? 'block-editor-inserter__patterns-selected-category'
-										: null
+										? 'block-editor-inserter__patterns-category block-editor-inserter__patterns-selected-category'
+										: 'block-editor-inserter__patterns-category'
 								}
 							>
 								<HStack>
