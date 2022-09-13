@@ -455,7 +455,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	 * Filter navigation block $inner_blocks.
 	 * Allows modification of a navigation block menu items.
 	 *
-	 * @since 6.1.0	 
+	 * @since 6.1.0
 	 *
 	 * @param \WP_Block_List $inner_blocks
 	 */
