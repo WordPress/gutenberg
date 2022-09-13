@@ -83,6 +83,7 @@ require __DIR__ . '/compat/wordpress-6.1/blocks.php';
 require __DIR__ . '/compat/wordpress-6.1/block-editor-settings.php';
 require __DIR__ . '/compat/wordpress-6.1/persisted-preferences.php';
 require __DIR__ . '/compat/wordpress-6.1/get-global-styles-and-settings.php';
+require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-data-gutenberg.php';
 require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-6-1.php';
 require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-resolver-6-1.php';
 require __DIR__ . '/compat/wordpress-6.1/block-template-utils.php';
@@ -91,6 +92,7 @@ require __DIR__ . '/compat/wordpress-6.1/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.1/date-settings.php';
 require __DIR__ . '/compat/wordpress-6.1/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.1/edit-form-blocks.php';
+require __DIR__ . '/compat/wordpress-6.1/template-parts-screen.php';
 require __DIR__ . '/compat/wordpress-6.1/theme.php';
 
 // Experimental features.
@@ -103,7 +105,6 @@ require __DIR__ . '/experimental/class-wp-webfonts.php';
 require __DIR__ . '/experimental/class-wp-webfonts-provider.php';
 require __DIR__ . '/experimental/class-wp-webfonts-provider-local.php';
 require __DIR__ . '/experimental/webfonts.php';
-require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/navigation-page.php';
 

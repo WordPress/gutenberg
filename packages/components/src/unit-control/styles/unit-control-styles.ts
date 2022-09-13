@@ -66,7 +66,7 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
 			box-sizing: border-box;
 			padding: 2px 1px;
 			width: 20px;
-			color: ${ COLORS.darkGray[ 500 ] };
+			color: ${ COLORS.gray[ 800 ] };
 			font-size: 8px;
 			line-height: 1;
 			letter-spacing: -0.5px;
@@ -113,7 +113,7 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 			${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
 
 			&:not(:disabled):hover {
-				background-color: ${ COLORS.lightGray[ 300 ] };
+				background-color: ${ COLORS.gray[ 100 ] };
 			}
 
 			&:focus {

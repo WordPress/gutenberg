@@ -65,7 +65,7 @@ function gutenberg_enqueue_stored_styles() {
 		}
 		// Chain core store ids to signify what the styles contain.
 		$style_tag_id             .= '-' . $style_key;
-		$compiled_core_stylesheet .= gutenberg_style_engine_get_stylesheet_from_store( $style_key );
+		$compiled_core_stylesheet .= gutenberg_style_engine_get_stylesheet_from_context( $style_key );
 	}
 
 	// Combine Core styles.
@@ -81,7 +81,7 @@ function gutenberg_enqueue_stored_styles() {
 		if ( in_array( $store_name, $core_styles_keys, true ) ) {
 			continue;
 		}
-		$styles = gutenberg_style_engine_get_stylesheet_from_store( $store_name );
+		$styles = gutenberg_style_engine_get_stylesheet_from_context( $store_name );
 		if ( ! empty( $styles ) ) {
 			$key = "wp-style-engine-$store_name";
 			wp_register_style( $key, false, array(), true, true );
@@ -156,7 +156,7 @@ function gutenberg_enqueue_global_styles() {
 	wp_enqueue_style( 'global-styles' );
 
 	// add each block as an inline css.
-	wp_add_global_styles_for_blocks();
+	gutenberg_add_global_styles_for_blocks();
 }
 
 remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles' );

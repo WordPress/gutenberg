@@ -294,6 +294,48 @@ describe( 'Post actions', () => {
 			const { status } = registry.select( editorStore ).getCurrentPost();
 			expect( status ).toBe( 'trash' );
 		} );
+
+		it( 'sets deleting state', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				content: 'foo',
+				status: 'publish',
+			};
+
+			const dispatch = Object.assign( jest.fn(), {
+				savePost: jest.fn(),
+			} );
+			const select = {
+				getCurrentPostType: () => 'post',
+				getCurrentPost: () => post,
+			};
+			const registry = {
+				dispatch: () => ( {
+					removeNotice: jest.fn(),
+					createErrorNotice: jest.fn(),
+				} ),
+				resolveSelect: () => ( {
+					getPostType: () => ( {
+						rest_namespace: 'wp/v2',
+						rest_base: 'posts',
+					} ),
+				} ),
+			};
+
+			apiFetch.setFetchHandler( async () => {
+				return { ...post, status: 'trash' };
+			} );
+
+			await actions.trashPost()( { select, dispatch, registry } );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'REQUEST_POST_DELETE_START',
+			} );
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'REQUEST_POST_DELETE_FINISH',
+			} );
+		} );
 	} );
 } );
 

@@ -4,6 +4,7 @@
 import {
 	isValueSpacingPreset,
 	getCustomValueFromPreset,
+	getPresetValueFromCustomValue,
 	getSpacingPresetCssVar,
 	getSpacingPresetSlug,
 	getSliderValueFromPreset,
@@ -37,6 +38,28 @@ describe( 'getCustomValueFromPreset', () => {
 		expect(
 			getCustomValueFromPreset( 'var:preset|spacing|30', spacingSizes )
 		).toBe( undefined );
+	} );
+} );
+
+describe( 'getPresetValueFromCustomValue', () => {
+	const spacingSizes = [ { name: 'Small', slug: 20, size: '8px' } ];
+	it( 'should return original value if a string in spacing presets var format', () => {
+		expect(
+			getPresetValueFromCustomValue(
+				'var:preset|spacing|80',
+				spacingSizes
+			)
+		).toBe( 'var:preset|spacing|80' );
+	} );
+	it( 'should return value constructed from matching spacingSizes array entry if value matches sizes', () => {
+		expect( getPresetValueFromCustomValue( '8px', spacingSizes ) ).toBe(
+			'var:preset|spacing|20'
+		);
+	} );
+	it( 'should return values as-is if no matching preset in spacingSizes array', () => {
+		expect(
+			getPresetValueFromCustomValue( '1.125rem', spacingSizes )
+		).toBe( '1.125rem' );
 	} );
 } );
 
@@ -143,6 +166,9 @@ describe( 'isValuesDefined', () => {
 	};
 	it( 'should return false if values are not defined', () => {
 		expect( isValuesDefined( undefinedValues ) ).toBe( false );
+	} );
+	it( 'should return false if values is passed in as null', () => {
+		expect( isValuesDefined( null ) ).toBe( false );
 	} );
 	const definedValues = {
 		top: 'var:preset|spacing|30',

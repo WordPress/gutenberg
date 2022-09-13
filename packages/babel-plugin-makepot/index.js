@@ -33,7 +33,7 @@
  */
 
 const { po } = require( 'gettext-parser' );
-const { pick, reduce, forEach, isEqual, merge, isEmpty } = require( 'lodash' );
+const { pick, reduce, isEqual, merge, isEmpty } = require( 'lodash' );
 const { relative, sep } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
@@ -122,7 +122,7 @@ function getExtractedComment( path, _originalNodeLine ) {
 	}
 
 	let comment;
-	forEach( node.leadingComments, ( commentNode ) => {
+	Object.values( node.leadingComments ?? {} ).forEach( ( commentNode ) => {
 		let line = 0;
 		if ( commentNode && commentNode.loc && commentNode.loc.end ) {
 			line = commentNode.loc.end.line;
@@ -330,44 +330,38 @@ module.exports = () => {
 							for ( const context in strings[ file ] ) {
 								// Within the same file, sort translations by line.
 								const sortedTranslations = sortByReference(
-									strings[ file ][ context ]
+									Object.values( strings[ file ][ context ] )
 								);
 
-								forEach(
-									sortedTranslations,
-									( translation ) => {
-										const { msgctxt = '', msgid } =
-											translation;
-										if (
-											! memo.hasOwnProperty( msgctxt )
-										) {
-											memo[ msgctxt ] = {};
-										}
-
-										// Merge references if translation already exists.
-										if (
-											isSameTranslation(
-												translation,
-												memo[ msgctxt ][ msgid ]
-											)
-										) {
-											translation.comments.reference = [
-												...new Set(
-													[
-														memo[ msgctxt ][ msgid ]
-															.comments.reference,
-														translation.comments
-															.reference,
-													]
-														.join( '\n' )
-														.split( '\n' )
-												),
-											].join( '\n' );
-										}
-
-										memo[ msgctxt ][ msgid ] = translation;
+								sortedTranslations.forEach( ( translation ) => {
+									const { msgctxt = '', msgid } = translation;
+									if ( ! memo.hasOwnProperty( msgctxt ) ) {
+										memo[ msgctxt ] = {};
 									}
-								);
+
+									// Merge references if translation already exists.
+									if (
+										isSameTranslation(
+											translation,
+											memo[ msgctxt ][ msgid ]
+										)
+									) {
+										translation.comments.reference = [
+											...new Set(
+												[
+													memo[ msgctxt ][ msgid ]
+														.comments.reference,
+													translation.comments
+														.reference,
+												]
+													.join( '\n' )
+													.split( '\n' )
+											),
+										].join( '\n' );
+									}
+
+									memo[ msgctxt ][ msgid ] = translation;
+								} );
 							}
 
 							return memo;

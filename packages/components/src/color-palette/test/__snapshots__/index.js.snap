@@ -1,10 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`] = `
-<ColorPicker
-  color="#f00"
-  onChange={[Function]}
-/>
+<DropdownContentWrapperDiv
+  className="components-dropdown-content-wrapper"
+  data-wp-c16t={true}
+  data-wp-component="DropdownContentWrapper"
+  paddingSize="none"
+>
+  <LegacyAdapter
+    color="#f00"
+    onChange={[Function]}
+  />
+</DropdownContentWrapperDiv>
 `;
 
 exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] = `
@@ -23,21 +30,18 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   width: 100%;
 }
 
-.emotion-2>*+*:not( marquee ) {
-  margin-left: calc(4px * 2);
-}
-
-.emotion-3>* {
+.emotion-2>* {
   min-width: 0;
 }
 
-.emotion-4 {
+.emotion-3 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -49,35 +53,32 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   width: 100%;
 }
 
-.emotion-4>*+*:not( marquee ) {
-  margin-left: calc(4px * 2);
-}
-
-.emotion-4>* {
+.emotion-3>* {
   min-width: 0;
 }
 
-.emotion-6 {
+.emotion-5 {
   display: block;
   max-height: 100%;
   max-width: 100%;
   min-height: 0;
   min-width: 0;
+}
+
+.emotion-7 {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
 }
 
 .emotion-8 {
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-.emotion-9 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -88,14 +89,14 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
   flex: 1;
 }
 
-.emotion-11 {
+.emotion-10 {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.emotion-15 {
+.emotion-14 {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -110,7 +111,7 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
   flex: 1;
 }
 
-.emotion-19 {
+.emotion-18 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -139,7 +140,7 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
     aria-haspopup="true"
     aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
     as="button"
-    className="emotion-0 emotion-1 emotion-2 emotion-3 components-flex components-color-palette__custom-color"
+    className="emotion-0 emotion-1 emotion-2 components-flex components-color-palette__custom-color"
     data-wp-c16t={true}
     data-wp-component="Flex"
     onClick={[MockFunction]}
@@ -155,7 +156,7 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
       aria-expanded={true}
       aria-haspopup="true"
       aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
-      className="components-flex components-color-palette__custom-color emotion-4 emotion-5"
+      className="components-flex components-color-palette__custom-color emotion-3 emotion-4"
       data-wp-c16t={true}
       data-wp-component="Flex"
       onClick={[MockFunction]}
@@ -191,25 +192,25 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
               "selector": ".components-truncate",
             }
           }
-          className="emotion-6 emotion-7 emotion-8 components-flex-item components-color-palette__custom-color-name"
+          className="emotion-5 emotion-6 emotion-7 components-flex-item components-color-palette__custom-color-name"
           data-wp-c16t={true}
           data-wp-component="FlexItem"
         >
           <Noop />
           <Truncate
-            className="components-flex-item components-color-palette__custom-color-name emotion-9 emotion-5"
+            className="components-flex-item components-color-palette__custom-color-name emotion-8 emotion-4"
             data-wp-c16t={true}
             data-wp-component="FlexItem"
           >
             <View
               as="span"
-              className="emotion-11 components-truncate components-flex-item components-color-palette__custom-color-name emotion-9 emotion-5"
+              className="emotion-10 components-truncate components-flex-item components-color-palette__custom-color-name emotion-8 emotion-4"
               data-wp-c16t={true}
               data-wp-component="FlexItem"
             >
               <Noop />
               <span
-                className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-5 emotion-15 emotion-5"
+                className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-4 emotion-14 emotion-4"
                 data-wp-c16t={true}
                 data-wp-component="FlexItem"
               >
@@ -225,13 +226,13 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
       >
         <View
           as="span"
-          className="emotion-6 emotion-7 components-flex-item components-color-palette__custom-color-value"
+          className="emotion-5 emotion-6 components-flex-item components-color-palette__custom-color-value"
           data-wp-c16t={true}
           data-wp-component="FlexItem"
         >
           <Noop />
           <span
-            className="components-flex-item components-color-palette__custom-color-value emotion-19 emotion-5"
+            className="components-flex-item components-color-palette__custom-color-value emotion-18 emotion-4"
             data-wp-c16t={true}
             data-wp-component="FlexItem"
           >
@@ -260,21 +261,18 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   width: 100%;
 }
 
-.emotion-2>*+*:not( marquee ) {
-  margin-left: calc(4px * 2);
-}
-
-.emotion-3>* {
+.emotion-2>* {
   min-width: 0;
 }
 
-.emotion-4 {
+.emotion-3 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -286,35 +284,32 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   width: 100%;
 }
 
-.emotion-4>*+*:not( marquee ) {
-  margin-left: calc(4px * 2);
-}
-
-.emotion-4>* {
+.emotion-3>* {
   min-width: 0;
 }
 
-.emotion-6 {
+.emotion-5 {
   display: block;
   max-height: 100%;
   max-width: 100%;
   min-height: 0;
   min-width: 0;
+}
+
+.emotion-7 {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
 }
 
 .emotion-8 {
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-.emotion-9 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -325,14 +320,14 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
   flex: 1;
 }
 
-.emotion-11 {
+.emotion-10 {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.emotion-15 {
+.emotion-14 {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -347,7 +342,7 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
   flex: 1;
 }
 
-.emotion-19 {
+.emotion-18 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -359,9 +354,9 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
   contentClassName="components-color-palette__custom-color-dropdown-content"
   popoverProps={
     Object {
-      "__unstableShift": true,
       "offset": 8,
       "placement": "bottom",
+      "shift": true,
     }
   }
   renderContent={[Function]}
@@ -392,7 +387,7 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
         aria-haspopup="true"
         aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
         as="button"
-        className="emotion-0 emotion-1 emotion-2 emotion-3 components-flex components-color-palette__custom-color"
+        className="emotion-0 emotion-1 emotion-2 components-flex components-color-palette__custom-color"
         data-wp-c16t={true}
         data-wp-component="Flex"
         onClick={[Function]}
@@ -408,7 +403,7 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
           aria-expanded={false}
           aria-haspopup="true"
           aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
-          className="components-flex components-color-palette__custom-color emotion-4 emotion-5"
+          className="components-flex components-color-palette__custom-color emotion-3 emotion-4"
           data-wp-c16t={true}
           data-wp-component="Flex"
           onClick={[Function]}
@@ -444,25 +439,25 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
                   "selector": ".components-truncate",
                 }
               }
-              className="emotion-6 emotion-7 emotion-8 components-flex-item components-color-palette__custom-color-name"
+              className="emotion-5 emotion-6 emotion-7 components-flex-item components-color-palette__custom-color-name"
               data-wp-c16t={true}
               data-wp-component="FlexItem"
             >
               <Noop />
               <Truncate
-                className="components-flex-item components-color-palette__custom-color-name emotion-9 emotion-5"
+                className="components-flex-item components-color-palette__custom-color-name emotion-8 emotion-4"
                 data-wp-c16t={true}
                 data-wp-component="FlexItem"
               >
                 <View
                   as="span"
-                  className="emotion-11 components-truncate components-flex-item components-color-palette__custom-color-name emotion-9 emotion-5"
+                  className="emotion-10 components-truncate components-flex-item components-color-palette__custom-color-name emotion-8 emotion-4"
                   data-wp-c16t={true}
                   data-wp-component="FlexItem"
                 >
                   <Noop />
                   <span
-                    className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-5 emotion-15 emotion-5"
+                    className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-4 emotion-14 emotion-4"
                     data-wp-c16t={true}
                     data-wp-component="FlexItem"
                   >
@@ -478,13 +473,13 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
           >
             <View
               as="span"
-              className="emotion-6 emotion-7 components-flex-item components-color-palette__custom-color-value"
+              className="emotion-5 emotion-6 components-flex-item components-color-palette__custom-color-value"
               data-wp-c16t={true}
               data-wp-component="FlexItem"
             >
               <Noop />
               <span
-                className="components-flex-item components-color-palette__custom-color-value emotion-19 emotion-5"
+                className="components-flex-item components-color-palette__custom-color-value emotion-18 emotion-4"
                 data-wp-c16t={true}
                 data-wp-component="FlexItem"
               >
@@ -551,20 +546,17 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
+  gap: calc(4px * 3);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
 }
 
-.emotion-2>*+*:not( marquee ) {
-  margin-top: calc(4px * 3);
-}
-
-.emotion-3>* {
+.emotion-2>* {
   min-height: 0;
 }
 
-.emotion-4 {
+.emotion-3 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -576,20 +568,17 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
+  gap: calc(4px * 3);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
 }
 
-.emotion-4>*+*:not( marquee ) {
-  margin-top: calc(4px * 3);
-}
-
-.emotion-4>* {
+.emotion-3>* {
   min-height: 0;
 }
 
-.emotion-7 {
+.emotion-6 {
   -webkit-align-items: flex-start;
   -webkit-box-align: flex-start;
   -ms-flex-align: flex-start;
@@ -597,21 +586,18 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   width: 100%;
 }
 
-.emotion-8>*+*:not( marquee ) {
-  margin-left: calc(4px * 2);
-}
-
-.emotion-9>* {
+.emotion-7>* {
   min-width: 0;
 }
 
-.emotion-10 {
+.emotion-8 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -623,21 +609,18 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   width: 100%;
 }
 
-.emotion-10>*+*:not( marquee ) {
-  margin-left: calc(4px * 2);
-}
-
-.emotion-10>* {
+.emotion-8>* {
   min-width: 0;
 }
 
-.emotion-12 {
+.emotion-10 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -645,7 +628,18 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
   min-width: 0;
 }
 
-.emotion-14 {
+.emotion-12 {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-13 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
@@ -653,23 +647,12 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
 
 .emotion-15 {
   display: block;
-  max-height: 100%;
-  max-width: 100%;
-  min-height: 0;
-  min-width: 0;
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-.emotion-17 {
-  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.emotion-21 {
+.emotion-19 {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -684,7 +667,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
   flex: 1;
 }
 
-.emotion-25 {
+.emotion-23 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -716,14 +699,14 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
     spacing={3}
   >
     <View
-      className="emotion-0 emotion-1 emotion-2 emotion-3 components-flex components-h-stack components-v-stack"
+      className="emotion-0 emotion-1 emotion-2 components-flex components-h-stack components-v-stack"
       data-wp-c16t={true}
       data-wp-component="VStack"
       isColumn={true}
     >
       <Noop />
       <div
-        className="components-flex components-h-stack components-v-stack emotion-4 emotion-5"
+        className="components-flex components-h-stack components-v-stack emotion-3 emotion-4"
         data-wp-c16t={true}
         data-wp-component="VStack"
       >
@@ -737,9 +720,9 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             contentClassName="components-color-palette__custom-color-dropdown-content"
             popoverProps={
               Object {
-                "__unstableShift": true,
                 "offset": 8,
                 "placement": "bottom",
+                "shift": true,
               }
             }
             renderContent={[Function]}
@@ -770,7 +753,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                   aria-haspopup="true"
                   aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
                   as="button"
-                  className="emotion-0 emotion-7 emotion-8 emotion-9 components-flex components-color-palette__custom-color"
+                  className="emotion-0 emotion-6 emotion-7 components-flex components-color-palette__custom-color"
                   data-wp-c16t={true}
                   data-wp-component="Flex"
                   onClick={[Function]}
@@ -786,7 +769,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                     aria-expanded={false}
                     aria-haspopup="true"
                     aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
-                    className="components-flex components-color-palette__custom-color emotion-10 emotion-5"
+                    className="components-flex components-color-palette__custom-color emotion-8 emotion-4"
                     data-wp-c16t={true}
                     data-wp-component="Flex"
                     onClick={[Function]}
@@ -822,25 +805,25 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                             "selector": ".components-truncate",
                           }
                         }
-                        className="emotion-12 emotion-13 emotion-14 components-flex-item components-color-palette__custom-color-name"
+                        className="emotion-10 emotion-11 emotion-12 components-flex-item components-color-palette__custom-color-name"
                         data-wp-c16t={true}
                         data-wp-component="FlexItem"
                       >
                         <Noop />
                         <Truncate
-                          className="components-flex-item components-color-palette__custom-color-name emotion-15 emotion-5"
+                          className="components-flex-item components-color-palette__custom-color-name emotion-13 emotion-4"
                           data-wp-c16t={true}
                           data-wp-component="FlexItem"
                         >
                           <View
                             as="span"
-                            className="emotion-17 components-truncate components-flex-item components-color-palette__custom-color-name emotion-15 emotion-5"
+                            className="emotion-15 components-truncate components-flex-item components-color-palette__custom-color-name emotion-13 emotion-4"
                             data-wp-c16t={true}
                             data-wp-component="FlexItem"
                           >
                             <Noop />
                             <span
-                              className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-5 emotion-21 emotion-5"
+                              className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-4 emotion-19 emotion-4"
                               data-wp-c16t={true}
                               data-wp-component="FlexItem"
                             >
@@ -856,13 +839,13 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                     >
                       <View
                         as="span"
-                        className="emotion-12 emotion-13 components-flex-item components-color-palette__custom-color-value"
+                        className="emotion-10 emotion-11 components-flex-item components-color-palette__custom-color-value"
                         data-wp-c16t={true}
                         data-wp-component="FlexItem"
                       >
                         <Noop />
                         <span
-                          className="components-flex-item components-color-palette__custom-color-value emotion-25 emotion-5"
+                          className="components-flex-item components-color-palette__custom-color-value emotion-23 emotion-4"
                           data-wp-c16t={true}
                           data-wp-component="FlexItem"
                         >

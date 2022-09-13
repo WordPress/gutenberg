@@ -845,7 +845,7 @@ export default function NavigationLinkEdit( {
 							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }
 							anchorRef={ listItemRef.current }
-							__unstableShift
+							shift
 						>
 							<LinkControl
 								hasTextControl

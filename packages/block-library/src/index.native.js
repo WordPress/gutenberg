@@ -63,9 +63,7 @@ import * as buttons from './buttons';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 
-import { transformationCategory } from './transformationCategories';
-
-const ALLOWED_BLOCKS_GRADIENT_SUPPORT = [ 'core/button' ];
+import { transformationCategory } from './utils/transformation-categories';
 
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
@@ -120,38 +118,6 @@ export const coreBlocks = [
 }, {} );
 
 /**
- * Function to register an individual block.
- *
- * @param {Object} block The block to be registered.
- *
- */
-export const registerBlock = ( block ) => {
-	if ( ! block ) {
-		return;
-	}
-	const { metadata, settings, name } = block;
-	const { supports } = metadata;
-
-	registerBlockType(
-		{
-			name,
-			...metadata,
-			// Gradients support only available for blocks listed in ALLOWED_BLOCKS_GRADIENT_SUPPORT.
-			...( ! ALLOWED_BLOCKS_GRADIENT_SUPPORT.includes( name ) &&
-			supports?.color?.gradients
-				? {
-						supports: {
-							...supports,
-							color: { ...supports.color, gradients: false },
-						},
-				  }
-				: {} ),
-		},
-		settings
-	);
-};
-
-/**
  * Function to register a block variations e.g. social icons different types.
  *
  * @param {Object} block The block which variations will be registered.
@@ -185,14 +151,6 @@ const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 // eslint-disable-next-line no-unused-vars
 const iOSOnly = ( block ) =>
 	Platform.OS === 'ios' ? block : devOnly( block );
-
-// To be removed once List V2 is released on the web editor.
-function listCheck( listBlock, blocksFlags ) {
-	if ( blocksFlags?.__experimentalEnableListBlockV2 ) {
-		listBlock.settings = listBlock?.settingsV2;
-	}
-	return listBlock;
-}
 
 // Hide the Classic block and SocialLink block
 addFilter(
@@ -245,11 +203,8 @@ addFilter(
  *
  * registerCoreBlocks();
  * ```
- * @param {Object} [blocksFlags] Experimental flags
- *
- *
  */
-export const registerCoreBlocks = ( blocksFlags ) => {
+export const registerCoreBlocks = () => {
 	// When adding new blocks to this list please also consider updating /src/block-support/supported-blocks.json in the Gutenberg-Mobile repo
 	[
 		paragraph,
@@ -261,7 +216,7 @@ export const registerCoreBlocks = ( blocksFlags ) => {
 		video,
 		nextpage,
 		separator,
-		listCheck( list, blocksFlags ),
+		list,
 		listItem,
 		quote,
 		mediaText,
@@ -286,7 +241,9 @@ export const registerCoreBlocks = ( blocksFlags ) => {
 		reusableBlock,
 		search,
 		embed,
-	].forEach( registerBlock );
+	]
+		.filter( Boolean )
+		.forEach( ( { init } ) => init() );
 
 	registerBlockVariations( socialLink );
 	setDefaultBlockName( paragraph.name );
