@@ -609,7 +609,7 @@ An advanced block that allows displaying post types based on different query par
 -	**Name:** core/query
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
--	**Attributes:** displayLayout, query, queryId, tagName
+-	**Attributes:** disabledInspectorControls, displayLayout, query, queryId, tagName
 
 ## No results
 

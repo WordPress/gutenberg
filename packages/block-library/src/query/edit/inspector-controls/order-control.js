@@ -39,3 +39,16 @@ function OrderControl( { order, orderBy, onChange } ) {
 }
 
 export default OrderControl;
+
+export function Order( {
+	attributes: {
+		query: { inherit, order, orderBy },
+	},
+	setQuery,
+} ) {
+	return (
+		! inherit && (
+			<OrderControl { ...{ order, orderBy } } onChange={ setQuery } />
+		)
+	);
+}
