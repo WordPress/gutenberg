@@ -157,6 +157,8 @@ function gutenberg_enqueue_global_styles() {
 
 	// add each block as an inline css.
 	wp_add_global_styles_for_blocks();
+	// add each template part block style as inline css.
+	wp_add_global_styles_for_template_parts();
 }
 
 remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles' );

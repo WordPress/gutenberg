@@ -153,7 +153,8 @@ function render_block_core_template_part( $attributes ) {
 	} else {
 		$html_tag = esc_attr( $attributes['tagName'] );
 	}
-	$wrapper_attributes = get_block_wrapper_attributes();
+	$template_part_class = 'wp-block-template-part-' . $attributes['slug'];
+	$wrapper_attributes  = get_block_wrapper_attributes( array( 'class' => $template_part_class ) );
 
 	return "<$html_tag $wrapper_attributes>" . str_replace( ']]>', ']]&gt;', $content ) . "</$html_tag>";
 }

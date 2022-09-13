@@ -187,19 +187,26 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 		}
 
-		$schema_styles_blocks   = array();
-		$schema_settings_blocks = array();
+		$templateParts                = $input['templateParts'];
+		$schema_styles_blocks         = array();
+		$schema_settings_blocks       = array();
+		$schema_styles_template_parts = array();
 		foreach ( $valid_block_names as $block ) {
 			$schema_settings_blocks[ $block ]           = static::VALID_SETTINGS;
 			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
+			foreach ( $templateParts as $part ) {
+				$schema_styles_template_parts[ $part['name'] ]['blocks'][ $block ] = $styles_non_top_level;
+				$schema_styles_template_parts[ $part['name'] ]['elements']         = $schema_styles_elements;
+			}
 		}
 
-		$schema['styles']             = static::VALID_STYLES;
-		$schema['styles']['blocks']   = $schema_styles_blocks;
-		$schema['styles']['elements'] = $schema_styles_elements;
-		$schema['settings']           = static::VALID_SETTINGS;
-		$schema['settings']['blocks'] = $schema_settings_blocks;
+		$schema['styles']                  = static::VALID_STYLES;
+		$schema['styles']['blocks']        = $schema_styles_blocks;
+		$schema['styles']['elements']      = $schema_styles_elements;
+		$schema['styles']['templateParts'] = $schema_styles_template_parts;
+		$schema['settings']                = static::VALID_SETTINGS;
+		$schema['settings']['blocks']      = $schema_settings_blocks;
 
 		// Remove anything that's not present in the schema.
 		foreach ( array( 'styles', 'settings' ) as $subtree ) {
@@ -548,6 +555,63 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		return static::get_block_nodes( $this->theme_json );
 	}
 
+	public function get_styles_template_part_nodes() {
+		return static::get_template_part_nodes( $this->theme_json );
+	}
+
+	private static function get_template_part_nodes( $theme_json, $selectors = array() ) {
+		$selectors = empty( $selectors ) ? static::get_blocks_metadata() : $selectors;
+		$nodes     = array();
+
+		if ( ! isset( $theme_json['styles'] ) ) {
+			return $nodes;
+		}
+
+		if ( ! isset( $theme_json['styles']['templateParts'] ) ) {
+			return $nodes;
+		}
+
+		foreach ( $theme_json['styles']['templateParts'] as $part_slug => $part ) {
+			$part_root_selector = '.wp-block-template-part-' . $part_slug . ' ';
+
+			if ( isset( $part['blocks'] ) ) {
+				foreach ( $part['blocks'] as $name => $node ) {
+					$node_path = array( 'styles', 'templateParts', $part_slug, 'blocks', $name );
+					$nodes[]   = static::get_node_from_block_name( $name, $node_path, $part_root_selector );
+				}
+			}
+
+			if ( isset( $theme_json['styles']['templateParts'][ $part_slug ]['elements'] ) ) {
+				foreach ( self::ELEMENTS as $element => $selector ) {
+					if ( ! isset( $theme_json['styles']['templateParts'][ $part_slug ]['elements'][ $element ] ) || ! array_key_exists( $element, static::ELEMENTS ) ) {
+						continue;
+					}
+
+					// Handle element defaults.
+					$nodes[] = array(
+						'path'     => array( 'styles', 'templateParts', $part_slug, 'elements', $element ),
+						'selector' => static::append_to_selector( $part_root_selector, static::ELEMENTS[ $element ] ),
+					);
+
+					// Handle any pseudo selectors for the element.
+					if ( array_key_exists( $element, static::VALID_ELEMENT_PSEUDO_SELECTORS ) ) {
+						foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
+
+							if ( isset( $theme_json['styles']['templateParts'][ $part_slug ]['elements'][ $element ][ $pseudo_selector ] ) ) {
+
+								$nodes[] = array(
+									'path'     => array( 'styles', 'templateParts', $part_slug, 'elements', $element ),
+									'selector' => static::append_to_selector( $part_root_selector, static::ELEMENTS[ $element ], $pseudo_selector ),
+								);
+							}
+						}
+					}
+				}
+			}
+		}
+		return $nodes;
+	}
+
 	/**
 	 * An internal method to get the block nodes from a theme.json file.
 	 *
@@ -569,28 +633,8 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 
 		foreach ( $theme_json['styles']['blocks'] as $name => $node ) {
-			$selector = null;
-			if ( isset( $selectors[ $name ]['selector'] ) ) {
-				$selector = $selectors[ $name ]['selector'];
-			}
-
-			$duotone_selector = null;
-			if ( isset( $selectors[ $name ]['duotone'] ) ) {
-				$duotone_selector = $selectors[ $name ]['duotone'];
-			}
-
-			$feature_selectors = null;
-			if ( isset( $selectors[ $name ]['features'] ) ) {
-				$feature_selectors = $selectors[ $name ]['features'];
-			}
-
-			$nodes[] = array(
-				'name'     => $name,
-				'path'     => array( 'styles', 'blocks', $name ),
-				'selector' => $selector,
-				'duotone'  => $duotone_selector,
-				'features' => $feature_selectors,
-			);
+			$node_path = array( 'styles', 'blocks', $name );
+			$nodes[]   = static::get_node_from_block_name( $name, $node_path );
 
 			if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'] ) ) {
 				foreach ( $theme_json['styles']['blocks'][ $name ]['elements'] as $element => $node ) {
@@ -616,6 +660,34 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 
 		return $nodes;
+	}
+
+	private static function get_node_from_block_name( $block_name, $node_path, $root_selector = '' ) {
+		$selectors = empty( $selectors ) ? static::get_blocks_metadata() : $selectors;
+		$selector  = null;
+		if ( isset( $selectors[ $block_name ]['selector'] ) ) {
+			$selector = $selectors[ $block_name ]['selector'];
+		}
+
+		$duotone_selector = null;
+		if ( isset( $selectors[ $block_name ]['duotone'] ) ) {
+			$duotone_selector = $selectors[ $block_name ]['duotone'];
+		}
+
+		$feature_selectors = null;
+		if ( isset( $selectors[ $block_name ]['features'] ) ) {
+			$feature_selectors = $selectors[ $block_name ]['features'];
+		}
+
+		$node = array(
+			'name'     => $block_name,
+			'path'     => $node_path,
+			'selector' => static::append_to_selector( $selector, $root_selector, 'left' ),
+			'duotone'  => static::append_to_selector( $duotone_selector, $root_selector, 'left' ),
+			'features' => static::append_to_selector( $feature_selectors, $root_selector, 'left' ),
+		);
+
+		return $node;
 	}
 
 	/**

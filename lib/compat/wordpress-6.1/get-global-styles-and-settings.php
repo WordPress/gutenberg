@@ -48,6 +48,28 @@ function wp_add_global_styles_for_blocks() {
 	}
 }
 
+function wp_add_global_styles_for_template_parts() {
+	$tree                 = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+	$template_parts_nodes = $tree->get_styles_template_part_nodes();
+
+	foreach ( $template_parts_nodes as $metadata ) {
+		$block_css = $tree->get_styles_for_block( $metadata );
+
+		if ( isset( $metadata['name'] ) ) {
+			$block_name = str_replace( 'core/', '', $metadata['name'] );
+			// These block styles are added on block_render.
+			// This hooks inline CSS to them so that they are loaded conditionally
+			// based on whether or not the block is used on the page.
+			wp_add_inline_style( 'wp-block-' . $block_name, $block_css );
+		}
+
+		// The element styles are added to the global styles
+		if ( ! isset( $metadata['name'] ) && ! empty( $metadata['path'] ) ) {
+			wp_add_inline_style( 'global-styles', $block_css );
+		}
+	}
+}
+
 /**
  * Returns the stylesheet resulting of merging core, theme, and user data.
  *
