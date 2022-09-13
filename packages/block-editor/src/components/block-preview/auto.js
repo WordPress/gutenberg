@@ -92,6 +92,7 @@ function AutoBlockPreview( {
 							__experimentalPadding + 'px';
 
 						// Necessary for contentResizeListener to work.
+						bodyElement.style.boxSizing = 'border-box';
 						bodyElement.style.position = 'absolute';
 						bodyElement.style.width = '100%';
 					}, [] ) }
