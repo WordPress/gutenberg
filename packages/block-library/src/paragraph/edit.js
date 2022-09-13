@@ -127,9 +127,10 @@ function ParagraphBlock( {
 				<Popover
 					anchorRef={ paragraphElement }
 					animate={ false }
-					position="top right left"
+					placement="top-start"
 					focusOnMount={ false }
-					__unstableForcePosition
+					flip={ false }
+					resize={ false }
 					className="wp-block-paragraph__drop_zone"
 				>
 					<DropZone
