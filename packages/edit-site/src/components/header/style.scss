@@ -135,6 +135,15 @@ body.is-navigation-sidebar-open {
 	}
 }
 
+.edit-site-header__actions__preview-options {
+	opacity: 1;
+	transition: opacity 0.3s;
+
+	&.is-zoomed-out {
+		opacity: 0;
+	}
+}
+
 .edit-site-header__actions-more-menu {
 	margin-left: -4px;
 

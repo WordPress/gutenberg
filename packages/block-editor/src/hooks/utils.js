@@ -1,16 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	pickBy,
-	isEmpty,
-	mapValues,
-	forEach,
-	get,
-	setWith,
-	clone,
-	every,
-} from 'lodash';
+import { pickBy, isEmpty, mapValues, get, setWith, clone, every } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -77,7 +68,7 @@ export function transformStyles(
 		}
 	}
 	let returnBlock = result;
-	forEach( activeSupports, ( isActive, support ) => {
+	Object.entries( activeSupports ).forEach( ( [ support, isActive ] ) => {
 		if ( isActive ) {
 			migrationPaths[ support ].forEach( ( path ) => {
 				const styleValue = get( referenceBlockAttributes, path );

@@ -4,7 +4,7 @@
 import { DateTimePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
-import { __experimentalGetSettings as getSettings } from '@wordpress/date';
+import { getSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies

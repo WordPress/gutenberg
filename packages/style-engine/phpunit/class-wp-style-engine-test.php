@@ -612,7 +612,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules( $css_rules );
+		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
 		$this->assertSame( '.saruman{color:white;height:100px;border-style:solid;align-self:unset;}.gandalf{color:grey;height:90px;border-style:dotted;align-self:safe center;}.radagast{color:brown;height:60px;border-style:dashed;align-self:stretch;}', $compiled_stylesheet );
 	}
 
@@ -656,7 +656,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules( $css_rules );
+		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
 		$this->assertSame( '.gandalf{color:white;height:190px;border-style:dotted;padding:10px;margin-bottom:100px;}.dumbledore,.rincewind{color:grey;height:90px;border-style:dotted;}', $compiled_stylesheet );
 	}
 }

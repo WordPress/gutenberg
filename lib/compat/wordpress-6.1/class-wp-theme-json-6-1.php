@@ -66,6 +66,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		'margin-right'                      => array( 'spacing', 'margin', 'right' ),
 		'margin-bottom'                     => array( 'spacing', 'margin', 'bottom' ),
 		'margin-left'                       => array( 'spacing', 'margin', 'left' ),
+		'outline-color'                     => array( 'outline', 'color' ),
+		'outline-offset'                    => array( 'outline', 'offset' ),
+		'outline-style'                     => array( 'outline', 'style' ),
+		'outline-width'                     => array( 'outline', 'width' ),
 		'padding'                           => array( 'spacing', 'padding' ),
 		'padding-top'                       => array( 'spacing', 'padding', 'top' ),
 		'padding-right'                     => array( 'spacing', 'padding', 'right' ),
@@ -322,6 +326,12 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		'filter'     => array(
 			'duotone' => null,
 		),
+		'outline'    => array(
+			'color'  => null,
+			'offset' => null,
+			'style'  => null,
+			'width'  => null,
+		),
 		'spacing'    => array(
 			'margin'   => null,
 			'padding'  => null,
@@ -446,13 +456,11 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 						$element_selector = array( $el_selector );
 						break;
 					}
-
-					$element_selector = static::append_to_selector( $el_selector, $selector . ' ', 'left' );
+					$element_selector[] = static::append_to_selector( $el_selector, $selector . ' ', 'left' );
 				}
-				static::$blocks_metadata[ $block_name ]['elements'][ $el_name ] = $element_selector;
+				static::$blocks_metadata[ $block_name ]['elements'][ $el_name ] = implode( ',', $element_selector );
 			}
 		}
-
 		return static::$blocks_metadata;
 	}
 
@@ -647,6 +655,11 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 
 		if ( in_array( 'styles', $types, true ) ) {
+			$root_block_key = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $style_nodes, 'selector' ), true );
+
+			if ( false !== $root_block_key ) {
+				$stylesheet .= $this->get_root_layout_rules( static::ROOT_BLOCK_SELECTOR, $style_nodes[ $root_block_key ] );
+			}
 			$stylesheet .= $this->get_block_classes( $style_nodes );
 		} elseif ( in_array( 'base-layout-styles', $types, true ) ) {
 			// Base layout styles are provided as part of `styles`, so only output separately if explicitly requested.
@@ -785,60 +798,80 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$block_rules .= static::to_ruleset( $feature_selector, $individual_feature_declarations );
 		}
 
-		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
-			/*
-			* Reset default browser margin on the root body element.
-			* This is set on the root selector **before** generating the ruleset
-			* from the `theme.json`. This is to ensure that if the `theme.json` declares
-			* `margin` in its `spacing` declaration for the `body` element then these
-			* user-generated values take precedence in the CSS cascade.
-			* @link https://github.com/WordPress/gutenberg/issues/36147.
-			*/
-			$block_rules .= 'body { margin: 0;';
-
-			/*
-			* If there are content and wide widths in theme.json, output them
-			* as custom properties on the body element so all blocks can use them.
-			*/
-			if ( isset( $settings['layout']['contentSize'] ) || isset( $settings['layout']['wideSize'] ) ) {
-				$content_size = isset( $settings['layout']['contentSize'] ) ? $settings['layout']['contentSize'] : $settings['layout']['wideSize'];
-				$content_size = static::is_safe_css_declaration( 'max-width', $content_size ) ? $content_size : 'initial';
-				$wide_size    = isset( $settings['layout']['wideSize'] ) ? $settings['layout']['wideSize'] : $settings['layout']['contentSize'];
-				$wide_size    = static::is_safe_css_declaration( 'max-width', $wide_size ) ? $wide_size : 'initial';
-				$block_rules .= '--wp--style--global--content-size: ' . $content_size . ';';
-				$block_rules .= '--wp--style--global--wide-size: ' . $wide_size . ';';
-			}
-
-			$block_rules .= '}';
-		}
-
-		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
-
-			if ( $use_root_padding ) {
-				$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
-				$block_rules .= '.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
-				$block_rules .= '.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }';
-				$block_rules .= '.has-global-padding > .alignfull > :where([class*="wp-block-"]:not(.alignfull):not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
-			}
-
-			$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
-			$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
-			$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
-
-			$block_gap_value       = _wp_array_get( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ), '0.5em' );
-			$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
-			if ( $has_block_gap_support ) {
-				$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
-				$block_rules    .= '.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }';
-				$block_rules    .= ".wp-site-blocks > * + * { margin-block-start: $block_gap_value; }";
-
-				// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
-				$block_rules .= "$selector { --wp--style--block-gap: $block_gap_value; }";
-			}
-			$block_rules .= $this->get_layout_styles( $block_metadata );
-		}
-
 		return $block_rules;
+	}
+
+	/**
+	 * Outputs the CSS for layout rules on the root.
+	 *
+	 * @param string $selector The root node selector.
+	 * @param array  $block_metadata The metadata for the root block.
+	 * @return string The additional root rules CSS.
+	 */
+	public function get_root_layout_rules( $selector, $block_metadata ) {
+		$css              = '';
+		$settings         = _wp_array_get( $this->theme_json, array( 'settings' ) );
+		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
+
+		/*
+		* Reset default browser margin on the root body element.
+		* This is set on the root selector **before** generating the ruleset
+		* from the `theme.json`. This is to ensure that if the `theme.json` declares
+		* `margin` in its `spacing` declaration for the `body` element then these
+		* user-generated values take precedence in the CSS cascade.
+		* @link https://github.com/WordPress/gutenberg/issues/36147.
+		*/
+		$css .= 'body { margin: 0;';
+
+		/*
+		* If there are content and wide widths in theme.json, output them
+		* as custom properties on the body element so all blocks can use them.
+		*/
+		if ( isset( $settings['layout']['contentSize'] ) || isset( $settings['layout']['wideSize'] ) ) {
+			$content_size = isset( $settings['layout']['contentSize'] ) ? $settings['layout']['contentSize'] : $settings['layout']['wideSize'];
+			$content_size = static::is_safe_css_declaration( 'max-width', $content_size ) ? $content_size : 'initial';
+			$wide_size    = isset( $settings['layout']['wideSize'] ) ? $settings['layout']['wideSize'] : $settings['layout']['contentSize'];
+			$wide_size    = static::is_safe_css_declaration( 'max-width', $wide_size ) ? $wide_size : 'initial';
+			$css         .= '--wp--style--global--content-size: ' . $content_size . ';';
+			$css         .= '--wp--style--global--wide-size: ' . $wide_size . ';';
+		}
+
+		$css .= '}';
+
+		if ( $use_root_padding ) {
+			// Top and bottom padding are applied to the outer block container.
+			$css .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
+			// Right and left padding are applied to the first container with `.has-global-padding` class.
+			$css .= '.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+			// Nested containers with `.has-global-padding` class do not get padding.
+			$css .= '.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; }';
+			// Alignfull children of the container with left and right padding have negative margins so they can still be full width.
+			$css .= '.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }';
+			// The above rule is negated for alignfull children of nested containers.
+			$css .= '.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }';
+			// Some of the children of alignfull blocks without content width should also get padding: text blocks and non-alignfull container blocks.
+			$css .= '.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+			// The above rule also has to be negated for blocks inside nested `.has-global-padding` blocks.
+			$css .= '.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0; }';
+		}
+
+		$css .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
+		$css .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
+		$css .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+
+		$block_gap_value       = _wp_array_get( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ), '0.5em' );
+		$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
+		if ( $has_block_gap_support ) {
+			$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
+			$css            .= '.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }';
+			$css            .= ".wp-site-blocks > * + * { margin-block-start: $block_gap_value; }";
+
+			// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
+			$css .= "$selector { --wp--style--block-gap: $block_gap_value; }";
+		}
+		$css .= $this->get_layout_styles( $block_metadata );
+
+		return $css;
 	}
 
 	/**
@@ -968,7 +1001,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string Style property value.
 	 */
 	protected static function get_property_value( $styles, $path, $theme_json = null ) {
-		$value = _wp_array_get( $styles, $path, '' );
+		$value = _wp_array_get( $styles, $path );
 
 		// This converts references to a path to the value at that path
 		// where the values is an array with a "ref" key, pointing to a path.
@@ -988,7 +1021,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 		}
 
-		if ( '' === $value || is_array( $value ) ) {
+		if ( is_array( $value ) ) {
 			return $value;
 		}
 
@@ -1345,10 +1378,11 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				}
 			}
 
-			if ( null !== $block_gap_value ) {
+			// If the block should have custom gap, add the gap styles.
+			if ( null !== $block_gap_value && false !== $block_gap_value && '' !== $block_gap_value ) {
 				foreach ( $layout_definitions as $layout_definition_key => $layout_definition ) {
-					// Allow skipping default layout for themes that opt-in to block styles, but opt-out of blockGap.
-					if ( ! $has_block_gap_support && 'default' === $layout_definition_key ) {
+					// Allow outputting fallback gap styles for flex layout type when block gap support isn't available.
+					if ( ! $has_block_gap_support && 'flex' !== $layout_definition_key ) {
 						continue;
 					}
 

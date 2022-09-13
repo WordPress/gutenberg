@@ -171,6 +171,11 @@
 	.block-selection-button_select-button.components-button {
 		padding: 0;
 	}
+
+	.block-editor-block-mover {
+		background: unset;
+		border: none;
+	}
 }
 
 // Hide the popover block editor list while dragging.

@@ -68,7 +68,7 @@ function BlockPopover(
 			__unstableSlotName={ __unstablePopoverSlot || null }
 			resize={ false }
 			flip={ false }
-			__unstableShift
+			shift
 			{ ...props }
 			className={ classnames(
 				'block-editor-block-popover',

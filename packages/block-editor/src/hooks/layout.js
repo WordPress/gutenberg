@@ -143,11 +143,10 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		return null;
 	}
 	const layoutType = getLayoutType( type );
-
 	const constrainedType = getLayoutType( 'constrained' );
-
 	const displayControlsForLegacyLayouts =
 		! usedLayout.type && ( contentSize || inherit );
+	const hasContentSizeOrLegacySettings = !! inherit || !! contentSize;
 
 	const onChangeType = ( newType ) =>
 		setAttributes( { layout: { type: newType } } );
@@ -161,26 +160,27 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 					{ showInheritToggle && (
 						<>
 							<ToggleControl
+								className="block-editor-hooks__toggle-control"
 								label={ __( 'Inner blocks use content width' ) }
 								checked={
 									layoutType?.name === 'constrained' ||
-									!! inherit ||
-									!! contentSize
+									hasContentSizeOrLegacySettings
 								}
 								onChange={ () =>
 									setAttributes( {
 										layout: {
 											type:
 												layoutType?.name ===
-												'constrained'
+													'constrained' ||
+												hasContentSizeOrLegacySettings
 													? 'default'
 													: 'constrained',
 										},
 									} )
 								}
 								help={
-									!! inherit ||
-									layoutType?.name === 'constrained'
+									layoutType?.name === 'constrained' ||
+									hasContentSizeOrLegacySettings
 										? __(
 												'Nested blocks use content width with options for full and wide widths.'
 										  )
