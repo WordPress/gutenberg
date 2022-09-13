@@ -36,14 +36,24 @@ export const _default = () => {
 
 export const primary = () => {
 	const label = text( 'Label', 'Primary Button' );
+	const isBusy = boolean( 'isBusy', false );
 
-	return <Button variant="primary">{ label }</Button>;
+	return (
+		<Button isBusy={ isBusy } variant="primary">
+			{ label }
+		</Button>
+	);
 };
 
 export const secondary = () => {
 	const label = text( 'Label', 'Secondary Button' );
+	const isBusy = boolean( 'isBusy', false );
 
-	return <Button variant="secondary">{ label }</Button>;
+	return (
+		<Button isBusy={ isBusy } variant="secondary">
+			{ label }
+		</Button>
+	);
 };
 
 export const tertiary = () => {
@@ -54,11 +64,17 @@ export const tertiary = () => {
 
 export const isDestructive = () => {
 	const label = text( 'Label', 'Destructive Button' );
+	const isBusy = boolean( 'isBusy', false );
 	const isSmall = boolean( 'isSmall', false );
 	const disabled = boolean( 'disabled', false );
 
 	return (
-		<Button isDestructive isSmall={ isSmall } disabled={ disabled }>
+		<Button
+			isDestructive
+			isBusy={ isBusy }
+			isSmall={ isSmall }
+			disabled={ disabled }
+		>
 			{ label }
 		</Button>
 	);
