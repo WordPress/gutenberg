@@ -47,6 +47,7 @@ function SelectedBlockPopover( {
 	clientId,
 	rootClientId,
 	isEmptyDefaultBlock,
+	showContents, // we may need to mount an empty popover because we reuse
 	capturingClientId,
 	__unstablePopoverSlot,
 	__unstableContentRef,
@@ -139,7 +140,7 @@ function SelectedBlockPopover( {
 			resize={ false }
 			{ ...popoverProps }
 		>
-			{ shouldShowContextualToolbar && (
+			{ shouldShowContextualToolbar && showContents && (
 				<BlockContextualToolbar
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
@@ -234,10 +235,6 @@ export default function WrappedBlockPopover( {
 		isNavigationMode,
 	} = selected;
 
-	if ( isDistractionFree && ! isNavigationMode ) {
-		return null;
-	}
-
 	if ( ! name ) {
 		return null;
 	}
@@ -247,6 +244,7 @@ export default function WrappedBlockPopover( {
 			clientId={ clientId }
 			rootClientId={ rootClientId }
 			isEmptyDefaultBlock={ isEmptyDefaultBlock }
+			showContents={ ! isDistractionFree || isNavigationMode }
 			capturingClientId={ capturingClientId }
 			__unstablePopoverSlot={ __unstablePopoverSlot }
 			__unstableContentRef={ __unstableContentRef }
