@@ -24,9 +24,31 @@
 		@include break-small {
 			@for $i from 2 through 6 {
 				&.is-flex-container.columns-#{ $i } > li {
-					width: calc((100% / #{ $i }) - 1.25em + (1.25em / #{ $i }));
+					width: calc((100% / #{$i}) - 1.25em + (1.25em / #{$i}));
 				}
 			}
 		}
+	}
+}
+
+div.animation {
+	width: 20px;
+	height: 20px;
+	background: #f00;
+	position: relative;
+	animation: animate 3s infinite;
+	animation-direction: alternate;
+}
+
+@keyframes animate {
+	0% {
+		background: #f00;
+		left: 0;
+		top: 0;
+	}
+	100% {
+		background: #ff0;
+		left: 300px;
+		top: 0;
 	}
 }

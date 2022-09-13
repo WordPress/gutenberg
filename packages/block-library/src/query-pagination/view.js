@@ -178,5 +178,11 @@ document.addEventListener( 'DOMContentLoaded', async () => {
 	// Wait until the CPU is idle to do the hydration.
 	await idle();
 	const vdom = getInitialVdom();
-	hydrate( vdom, rootFragment );
+	setTimeout( () => {
+		// Delay hydration artificially to make sure the hydration doesn't destroy
+		// the nodes (animation doesn't jump).
+		hydrate( vdom, rootFragment );
+		// eslint-disable-next-line no-console
+		console.log( 'hydrated!' );
+	}, 3000 );
 } );

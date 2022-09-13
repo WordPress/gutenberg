@@ -107,7 +107,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	wp_reset_postdata();
 
 	return sprintf(
-		'<ul %1$s>%2$s</ul>',
+		'<ul %1$s>%2$s</ul><div class="animation"></div>',
 		$wrapper_attributes,
 		$content
 	);
