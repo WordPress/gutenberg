@@ -15,7 +15,10 @@ function gutenberg_add_global_styles_for_blocks() {
 		$style_handle =  'global-styles';
 		$block_style  = $tree->get_styles_for_block( $metadata );
 
-		if ( wp_should_load_separate_core_block_assets() ) {
+		if (
+			wp_should_load_separate_core_block_assets() &&
+			str_starts_with( $metadata['name'], 'core/' )
+		) {
 			$block_name   = str_replace( 'core/', '', $metadata['name'] );
 			$style_handle = 'wp-block-' . $block_name;
 		}
