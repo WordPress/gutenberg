@@ -5,21 +5,7 @@ import { SVG, Rect } from '@wordpress/primitives';
 import { Icon, menu, moreVertical, moreHorizontal } from '@wordpress/icons';
 
 export default function OverlayMenuIcon( { icon } ) {
-	if ( icon === 'handle' ) {
-		return (
-			<SVG
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 24 24"
-				width="24"
-				height="24"
-				aria-hidden="true"
-				focusable="false"
-			>
-				<Rect x="4" y="7.5" width="16" height="1.5" />
-				<Rect x="4" y="15" width="16" height="1.5" />
-			</SVG>
-		);
-	} else if ( icon === 'menu' ) {
+	if ( icon === 'menu' ) {
 		return <Icon icon={ menu } />;
 	} else if ( icon === 'more-vertical' ) {
 		return <Icon icon={ moreVertical } />;
@@ -27,5 +13,17 @@ export default function OverlayMenuIcon( { icon } ) {
 		return <Icon icon={ moreHorizontal } />;
 	}
 
-	return null;
+	return (
+		<SVG
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"
+			width="24"
+			height="24"
+			aria-hidden="true"
+			focusable="false"
+		>
+			<Rect x="4" y="7.5" width="16" height="1.5" />
+			<Rect x="4" y="15" width="16" height="1.5" />
+		</SVG>
+	);
 }
