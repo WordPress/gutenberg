@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `useInstanceId`: refactor to TypeScript ([#43790](https://github.com/WordPress/gutenberg/pull/43790)).
+
 ## 5.15.0 (2022-09-13)
 
 ### Internal
