@@ -1,6 +1,3 @@
-// Disable reason: Object and object are distinctly different types in TypeScript and we mean the lowercase object in thise case
-// but eslint wants to force us to use `Object`. See https://stackoverflow.com/questions/49464634/difference-between-object-and-object-in-typescript
-/* eslint-disable jsdoc/check-types */
 /**
  * WordPress dependencies
  */
@@ -11,8 +8,8 @@ const instanceMap = new WeakMap< object, number >();
 /**
  * Creates a new id for a given object.
  *
- * @param {object} object Object reference to create an id for.
- * @return {number} The instance id (index).
+ * @param  object Object reference to create an id for.
+ * @return The instance id (index).
  */
 function createId( object: object ): number {
 	const instances = instanceMap.get( object ) || 0;
@@ -41,10 +38,10 @@ function useInstanceId< T extends string | number >(
 /**
  * Provides a unique instance ID.
  *
- * @param {object}          object        Object reference to create an id for.
- * @param {string}          [prefix]      Prefix for the unique id.
- * @param {string | number} [preferredId] Default ID to use.
- * @return {string | number} The unique instance id.
+ * @param  object        Object reference to create an id for.
+ * @param  [prefix]      Prefix for the unique id.
+ * @param  [preferredId] Default ID to use.
+ * @return The unique instance id.
  */
 function useInstanceId(
 	object: object,
@@ -60,4 +57,3 @@ function useInstanceId(
 }
 
 export default useInstanceId;
-/* eslint-enable jsdoc/check-types */
