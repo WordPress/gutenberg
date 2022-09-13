@@ -93,7 +93,7 @@ describe( 'Columns block', () => {
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
-		it( 'removes a column block when incrementing the value', async () => {
+		it( 'removes a column block when decrementing the value', async () => {
 			const screen = await initializeEditor( {
 				initialHtml: TWO_COLUMNS_BLOCK_HTML,
 			} );
