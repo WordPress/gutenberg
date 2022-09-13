@@ -92,7 +92,7 @@ function Navigation( {
 			flexWrap = 'wrap',
 		} = {},
 		hasIcon,
-		icon,
+		icon = 'handle',
 	} = attributes;
 
 	const ref = attributes.ref;

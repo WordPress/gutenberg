@@ -7,8 +7,26 @@ import { useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../button';
+import type { WordPressComponentProps } from '../ui/context';
+import type { FormFileUploadProps } from './types';
 
-function FormFileUpload( {
+/**
+ * FormFileUpload is a component that allows users to select files from their local device.
+ *
+ * ```jsx
+ * import { FormFileUpload } from '@wordpress/components';
+ *
+ * const MyFormFileUpload = () => (
+ *   <FormFileUpload
+ *     accept="image/*"
+ *     onChange={ ( event ) => console.log( event.currentTarget.files ) }
+ *   >
+ *     Upload
+ *   </FormFileUpload>
+ * );
+ * ```
+ */
+export function FormFileUpload( {
 	accept,
 	children,
 	multiple = false,
@@ -16,10 +34,10 @@ function FormFileUpload( {
 	onClick,
 	render,
 	...props
-} ) {
-	const ref = useRef();
+}: WordPressComponentProps< FormFileUploadProps, 'button', false > ) {
+	const ref = useRef< HTMLInputElement >( null );
 	const openFileDialog = () => {
-		ref.current.click();
+		ref.current?.click();
 	};
 
 	const ui = render ? (

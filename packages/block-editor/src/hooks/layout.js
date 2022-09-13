@@ -160,6 +160,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 					{ showInheritToggle && (
 						<>
 							<ToggleControl
+								className="block-editor-hooks__toggle-control"
 								label={ __( 'Inner blocks use content width' ) }
 								checked={
 									layoutType?.name === 'constrained' ||
