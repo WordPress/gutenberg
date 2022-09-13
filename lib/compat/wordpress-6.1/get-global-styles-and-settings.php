@@ -13,10 +13,10 @@ function gutenberg_add_global_styles_for_blocks() {
 	$block_nodes = $tree->get_styles_block_nodes();
 	foreach ( $block_nodes as $metadata ) {
 		$style_handle =  'global-styles';
-		$block_css    = $tree->get_styles_for_block( $metadata );
+		$block_style  = $tree->get_styles_for_block( $metadata );
 
 		if ( ! wp_should_load_separate_core_block_assets() ) {
-			wp_add_inline_style( $style_handle, $block_css );
+			wp_add_inline_style( $style_handle, $block_style );
 			continue;
 		}
 
@@ -26,7 +26,7 @@ function gutenberg_add_global_styles_for_blocks() {
 			// These block styles are added on block_render.
 			// This hooks inline CSS to them so that they are loaded conditionally
 			// based on whether or not the block is used on the page.
-			wp_add_inline_style( $style_handle, $block_css );
+			wp_add_inline_style( $style_handle, $block_style );
 		}
 
 		// The likes of block element styles from theme.json do not have  $metadata['name'] set.
@@ -45,7 +45,7 @@ function gutenberg_add_global_styles_for_blocks() {
 			if ( isset( $result[0] ) ) {
 				$block_name   = str_replace( 'core/', '', $result[0] );
 				$style_handle = 'wp-block-' . $block_name;
-				wp_add_inline_style( $style_handle, $block_css );
+				wp_add_inline_style( $style_handle, $block_style );
 			}
 		}
 	}
