@@ -30,7 +30,6 @@ const blockViewRegex = new RegExp(
 const prefixFunctions = [
 	'build_query_vars_from_query_block',
 	'wp_enqueue_block_support_styles',
-	'wp_theme_element_class_name',
 ];
 
 /**
