@@ -8,7 +8,7 @@
 /**
  * Class to update with a theme.json structure.
  */
-class WP_Theme_JSON_Data {
+class WP_Theme_JSON_Data_Gutenberg {
 
 	/**
 	 * Container of the data to update.
@@ -22,7 +22,7 @@ class WP_Theme_JSON_Data {
 	 *
 	 * @var string
 	 */
-	private $origin = null;
+	private $origin = '';
 
 	/**
 	 * Constructor.
@@ -40,11 +40,10 @@ class WP_Theme_JSON_Data {
 	 *
 	 * @param array $new_data Array following the theme.json specification.
 	 *
-	 * @return WP_Theme_JSON_Data the modified data.
+	 * @return WP_Theme_JSON_Data_Gutenberg The own instance with access to the modified data.
 	 */
 	public function update_with( $new_data ) {
 		$this->theme_json->merge( new WP_Theme_JSON_Gutenberg( $new_data, $this->origin ) );
-
 		return $this;
 	}
 

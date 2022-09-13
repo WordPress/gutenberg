@@ -39,8 +39,14 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 			$theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $theme_json_data );
 
-			$theme_json_data = apply_filters( 'global_styles_theme', new WP_Theme_JSON_Data( $theme_json_data, 'theme' ) );
-			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data->get_data() );
+			/**
+			 * Filters the data provided by the theme for global styles & settings.
+			 *
+			 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
+			 */
+			$theme_json      = apply_filters( 'global_styles_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
+			$theme_json_data = $theme_json->get_data();
+			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 
 			if ( wp_get_theme()->parent() ) {
 				// Get parent theme.json.
@@ -130,11 +136,17 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 			}
 		}
 
-		$config = apply_filters( 'global_styles_blocks', new WP_Theme_JSON_Data( $config, 'core' ) );
+		/**
+		 * Filters the data provided by the blocks for global styles & settings.
+		 *
+		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
+		 */
+		$theme_json = apply_filters( 'global_styles_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'core' ) );
+		$config     = $theme_json->get_data();
 
 		// Core here means it's the lower level part of the styles chain.
 		// It can be a core or a third-party block.
-		return new WP_Theme_JSON_Gutenberg( $config->get_data(), 'core' );
+		return new WP_Theme_JSON_Gutenberg( $config, 'core' );
 	}
 
 	/**
