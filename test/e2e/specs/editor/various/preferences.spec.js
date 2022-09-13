@@ -1,9 +1,6 @@
 /**
  * WordPress dependencies
  */
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'preferences', () => {
@@ -16,11 +13,15 @@ test.describe( 'preferences', () => {
 	} ) => {
 		// Open by default.
 		await expect(
-			page.locator( '.edit-post-sidebar__panel-tab.is-active' )
+			page.locator( "button[aria-label='Post (selected)']" )
 		).toHaveText( 'Post' );
 
 		// Change to "Block" tab.
 		await page.click( 'role=button[name="Block"i]' );
+
+		await expect(
+			page.locator( "button[aria-label='Block (selected)']" )
+		).toHaveText( 'Block' );
 
 		// Regression test: Reload resets to document tab.
 		//
@@ -29,7 +30,7 @@ test.describe( 'preferences', () => {
 		await page.reload();
 		await page.waitForSelector( '.edit-post-layout' );
 		await expect(
-			page.locator( '.edit-post-sidebar__panel-tab.is-active' )
+			page.locator( "button[aria-label='Post (selected)']" )
 		).toHaveText( 'Post' );
 
 		// Dismiss.
