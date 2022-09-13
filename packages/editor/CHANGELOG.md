@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.16.0 (2022-09-13)
+
 ### New Features
 
 -   Add `isDeletingPost` selector to the `core/editor` store ([#44012](https://github.com/WordPress/gutenberg/pull/44012)).
