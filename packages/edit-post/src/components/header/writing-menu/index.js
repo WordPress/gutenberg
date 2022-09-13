@@ -15,8 +15,9 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as postEditorStore } from '../../../store';
 
 function WritingMenu( { onClose } ) {
-	const hasReducedUI = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().hasReducedUI,
+	const isDistractionFree = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().isDistractionFree,
 		[]
 	);
 
@@ -39,7 +40,7 @@ function WritingMenu( { onClose } ) {
 		<MenuGroup label={ _x( 'View', 'noun' ) }>
 			<PreferenceToggleMenuItem
 				scope="core/edit-post"
-				disabled={ hasReducedUI }
+				disabled={ isDistractionFree }
 				name="fixedToolbar"
 				label={ __( 'Top toolbar' ) }
 				info={ __(
@@ -50,7 +51,7 @@ function WritingMenu( { onClose } ) {
 			/>
 			<PreferenceToggleMenuItem
 				scope="core/edit-post"
-				disabled={ hasReducedUI }
+				disabled={ isDistractionFree }
 				name="focusMode"
 				label={ __( 'Spotlight mode' ) }
 				info={ __( 'Focus on one block at a time' ) }
@@ -60,7 +61,7 @@ function WritingMenu( { onClose } ) {
 			<PreferenceToggleMenuItem
 				scope="core/edit-post"
 				name="fullscreenMode"
-				disabled={ hasReducedUI }
+				disabled={ isDistractionFree }
 				label={ __( 'Fullscreen mode' ) }
 				info={ __( 'Show and hide admin UI' ) }
 				messageActivated={ __( 'Fullscreen mode activated' ) }
@@ -69,7 +70,7 @@ function WritingMenu( { onClose } ) {
 			/>
 			<PreferenceToggleMenuItem
 				scope="core/edit-post"
-				name="reducedUI"
+				name="distractionFree"
 				toggleHandler={ toggleDistractionFree }
 				label={ __( 'Toggle interface' ) }
 				info={ __( 'Work without distraction' ) }

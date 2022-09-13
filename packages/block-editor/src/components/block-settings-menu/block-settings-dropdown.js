@@ -59,7 +59,7 @@ export function BlockSettingsDropdown( {
 	const firstBlockClientId = blockClientIds[ 0 ];
 	const {
 		firstParentClientId,
-		hasReducedUI,
+		isDistractionFree,
 		onlyBlock,
 		parentBlockType,
 		previousBlockClientId,
@@ -83,7 +83,7 @@ export function BlockSettingsDropdown( {
 
 			return {
 				firstParentClientId: _firstParentClientId,
-				hasReducedUI: getSettings().hasReducedUI,
+				isDistractionFree: getSettings().isDistractionFree,
 				onlyBlock: 1 === getBlockCount(),
 				parentBlockType: getBlockType( parentBlockName ),
 				previousBlockClientId:
@@ -171,7 +171,7 @@ export function BlockSettingsDropdown( {
 	const { gestures: showParentOutlineGestures } = useShowMoversGestures( {
 		ref: selectParentButtonRef,
 		onChange( isFocused ) {
-			if ( isFocused && hasReducedUI ) {
+			if ( isFocused && isDistractionFree ) {
 				return;
 			}
 			toggleBlockHighlight( firstParentClientId, isFocused );

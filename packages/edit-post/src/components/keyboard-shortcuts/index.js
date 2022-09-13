@@ -155,8 +155,8 @@ function KeyboardShortcuts() {
 	useShortcut( 'core/edit-post/toggle-distraction-free', () => {
 		closeGeneralSidebar();
 		setIsListViewOpened( false );
-		toggleFeature( 'reducedUI' );
-		const modeState = isFeatureActive( 'reducedUI' )
+		toggleFeature( 'distractionFree' );
+		const modeState = isFeatureActive( 'distractionFree' )
 			? __( 'on' )
 			: __( 'off' );
 		createInfoNotice(

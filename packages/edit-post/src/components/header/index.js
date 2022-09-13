@@ -24,7 +24,7 @@ import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import TemplateTitle from './template-title';
 
-function Header( { setEntitiesSavedStatesCallback, hasReducedUI } ) {
+function Header( { setEntitiesSavedStatesCallback, isDistractionFree } ) {
 	const {
 		hasActiveMetaboxes,
 		isPublishSidebarOpened,
@@ -47,12 +47,12 @@ function Header( { setEntitiesSavedStatesCallback, hasReducedUI } ) {
 	const classes = classnames( 'edit-post-header' );
 
 	const slideY = {
-		hidden: hasReducedUI ? { y: '-50' } : { y: 0 },
+		hidden: isDistractionFree ? { y: '-50' } : { y: 0 },
 		hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
 	};
 
 	const slideX = {
-		hidden: hasReducedUI ? { x: '-100%' } : { x: 0 },
+		hidden: isDistractionFree ? { x: '-100%' } : { x: 0 },
 		hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
 	};
 

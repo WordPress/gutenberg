@@ -30,7 +30,7 @@ function useHTMLClass( className ) {
 
 function InterfaceSkeleton(
 	{
-		hasReducedUI,
+		isDistractionFree,
 		footer,
 		header,
 		editorNotices,
@@ -70,7 +70,7 @@ function InterfaceSkeleton(
 	const mergedLabels = { ...defaultLabels, ...labels };
 
 	const headerVariants = {
-		hidden: hasReducedUI ? { opacity: 0 } : { opacity: 1 },
+		hidden: isDistractionFree ? { opacity: 0 } : { opacity: 1 },
 		hover: {
 			opacity: 1,
 			transition: { type: 'tween', delay: 0.2, delayChildren: 0.2 },
@@ -99,9 +99,9 @@ function InterfaceSkeleton(
 				</div>
 			) }
 			<div className="interface-interface-skeleton__editor">
-				{ !! header && hasReducedUI && (
+				{ !! header && isDistractionFree && (
 					<motion.div
-						initial={ hasReducedUI ? 'hidden' : 'hover' }
+						initial={ isDistractionFree ? 'hidden' : 'hover' }
 						whileHover="hover"
 						variants={ headerVariants }
 						transition={ { type: 'tween', delay: 0.8 } }
@@ -113,7 +113,7 @@ function InterfaceSkeleton(
 						{ header }
 					</motion.div>
 				) }
-				{ !! header && ! hasReducedUI && (
+				{ !! header && ! isDistractionFree && (
 					<div
 						className="interface-interface-skeleton__header"
 						role="region"
@@ -123,7 +123,7 @@ function InterfaceSkeleton(
 						{ header }
 					</div>
 				) }
-				{ hasReducedUI && (
+				{ isDistractionFree && (
 					<div className="interface-interface-skeleton__header">
 						{ editorNotices }
 					</div>

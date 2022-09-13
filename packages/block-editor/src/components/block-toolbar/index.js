@@ -34,7 +34,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 		blockClientId,
 		blockType,
 		hasFixedToolbar,
-		hasReducedUI,
+		isDistractionFree,
 		isValid,
 		isVisual,
 		isContentLocked,
@@ -60,7 +60,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
 			hasFixedToolbar: settings.hasFixedToolbar,
-			hasReducedUI: settings.hasReducedUI,
+			isDistractionFree: settings.isDistractionFree,
 			rootClientId: blockRootClientId,
 			isValid: selectedBlockClientIds.every( ( id ) =>
 				isBlockValid( id )
@@ -82,7 +82,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 		{
 			ref: nodeRef,
 			onChange( isFocused ) {
-				if ( isFocused && hasReducedUI ) {
+				if ( isFocused && isDistractionFree ) {
 					return;
 				}
 				toggleBlockHighlight( blockClientId, isFocused );

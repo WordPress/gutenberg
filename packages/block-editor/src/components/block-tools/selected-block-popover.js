@@ -36,7 +36,7 @@ function selector( select ) {
 		isMultiSelecting: isMultiSelecting(),
 		isTyping: isTyping(),
 		hasFixedToolbar: getSettings().hasFixedToolbar,
-		hasReducedUI: getSettings().hasReducedUI,
+		isDistractionFree: getSettings().isDistractionFree,
 		lastClientId: hasMultiSelection()
 			? getLastMultiSelectedBlockClientId()
 			: null,
@@ -56,7 +56,7 @@ function SelectedBlockPopover( {
 		isMultiSelecting,
 		isTyping,
 		hasFixedToolbar,
-		hasReducedUI,
+		isDistractionFree,
 		lastClientId,
 	} = useSelect( selector, [] );
 	const isInsertionPointVisible = useSelect(
@@ -96,7 +96,7 @@ function SelectedBlockPopover( {
 		editorMode === 'edit' &&
 		! shouldShowContextualToolbar &&
 		! hasFixedToolbar &&
-		! hasReducedUI &&
+		! isDistractionFree &&
 		! isEmptyDefaultBlock;
 
 	useShortcut(
@@ -206,7 +206,7 @@ function wrapperSelector( select ) {
 		clientId,
 		rootClientId: getBlockRootClientId( clientId ),
 		name,
-		hasReducedUI: settings.hasReducedUI,
+		isDistractionFree: settings.isDistractionFree,
 		isNavigationMode: _isNavigationMode(),
 		isEmptyDefaultBlock:
 			name && isUnmodifiedDefaultBlock( { name, attributes } ),
@@ -230,11 +230,11 @@ export default function WrappedBlockPopover( {
 		name,
 		isEmptyDefaultBlock,
 		capturingClientId,
-		hasReducedUI,
+		isDistractionFree,
 		isNavigationMode,
 	} = selected;
 
-	if ( hasReducedUI && ! isNavigationMode ) {
+	if ( isDistractionFree && ! isNavigationMode ) {
 		return null;
 	}
 

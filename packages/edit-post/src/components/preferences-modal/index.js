@@ -54,9 +54,9 @@ export default function EditPostPreferencesModal() {
 			const { getEditorMode, isFeatureActive } = select( editPostStore );
 			const mode = getEditorMode();
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
-			const hasReducedUI = isFeatureActive( 'reducedUI' );
+			const isDistractionFree = isFeatureActive( 'distractionFree' );
 			return (
-				! hasReducedUI &&
+				! isDistractionFree &&
 				isLargeViewport &&
 				isRichEditingEnabled &&
 				mode === 'visual'
@@ -96,7 +96,7 @@ export default function EditPostPreferencesModal() {
 							) }
 						>
 							<EnableFeature
-								featureName="reducedUI"
+								featureName="distractionFree"
 								help={ __(
 									'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
 								) }
@@ -124,7 +124,7 @@ export default function EditPostPreferencesModal() {
 								label={ __( 'Always open list view' ) }
 							/>
 							<EnableFeature
-								featureName="reducedUI"
+								featureName="distractionFree"
 								help={ __(
 									'Compacts options and outlines in the toolbar.'
 								) }

@@ -33,7 +33,7 @@ function InsertionPointPopover( {
 		nextClientId,
 		rootClientId,
 		isInserterShown,
-		hasReducedUI,
+		isDistractionFree,
 		isNavigationMode,
 	} = useSelect( ( select ) => {
 		const {
@@ -74,7 +74,7 @@ function InsertionPointPopover( {
 					?.orientation || 'vertical',
 			rootClientId: insertionPoint.rootClientId,
 			isNavigationMode: _isNavigationMode(),
-			hasReducedUI: settings.hasReducedUI,
+			isDistractionFree: settings.isDistractionFree,
 			isInserterShown: insertionPoint?.__unstableWithInserter,
 		};
 	}, [] );
@@ -177,7 +177,7 @@ function InsertionPointPopover( {
 		},
 	};
 
-	if ( hasReducedUI && ! isNavigationMode ) {
+	if ( isDistractionFree && ! isNavigationMode ) {
 		return null;
 	}
 
