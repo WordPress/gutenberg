@@ -104,7 +104,8 @@
 		"spacing": {
 			"__experimentalSkipSerialization": true,
 			"margin": true,
-			"padding": true
+			"padding": true,
+			"__experimentalSelector": "img"
 		}
 	},
 	"styles": [
