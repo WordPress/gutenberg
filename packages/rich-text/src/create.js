@@ -68,6 +68,10 @@ function toFormat( { tagName, attributes } ) {
 			select( richTextStore ).getFormatTypeForBareElement( tagName );
 	}
 
+	if ( ! formatType ) {
+		return attributes ? { type: tagName, attributes } : { type: tagName };
+	}
+
 	if (
 		formatType.__experimentalCreatePrepareEditableTree &&
 		! formatType.__experimentalCreateOnChangeEditableValue
