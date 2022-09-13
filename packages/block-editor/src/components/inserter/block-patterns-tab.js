@@ -19,8 +19,6 @@ import {
 	__experimentalNavigatorBackButton as NavigatorBackButton,
 	__unstableMotion as motion,
 	FlexBlock,
-	Card,
-	CardBody,
 	Button,
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
@@ -165,52 +163,42 @@ function BlockPatternsTabs( {
 
 	return (
 		<>
-			<Card isBorderless>
-				<CardBody size="small">
-					{ ! isMobile && (
-						<>
-							<ItemGroup>
-								{ categories.map( ( category ) => (
-									<Item
-										key={ category.name }
-										onClick={ () =>
-											onSelectCategory( category )
-										}
-										className={
-											category === selectedCategory
-												? 'block-editor-inserter__patterns-selected-category'
-												: null
-										}
-									>
-										<HStack>
-											<FlexBlock>
-												{ category.label }
-											</FlexBlock>
-											<Icon icon={ chevronRight } />
-										</HStack>
-									</Item>
-								) ) }
-							</ItemGroup>
-
-							<Button
-								variant="link"
-								onClick={ () =>
-									setShowPatternsExplorer( true )
+			{ ! isMobile && (
+				<div className="block-editor-inserter__block-patterns-tabs-container">
+					<ItemGroup className="block-editor-inserter__block-patterns-tabs">
+						{ categories.map( ( category ) => (
+							<Item
+								key={ category.name }
+								onClick={ () => onSelectCategory( category ) }
+								className={
+									category === selectedCategory
+										? 'block-editor-inserter__patterns-selected-category'
+										: null
 								}
-								className="block-editor-inserter__patterns-explore-button"
 							>
-								{ __( 'Explore all patterns' ) }
-							</Button>
-						</>
-					) }
-					{ isMobile && (
-						<BlockPatternsTabNavigation
-							onInsert={ onInsert }
-							rootClientId={ rootClientId }
-						/>
-					) }
-				</CardBody>
-			</Card>
+								<HStack>
+									<FlexBlock>{ category.label }</FlexBlock>
+									<Icon icon={ chevronRight } />
+								</HStack>
+							</Item>
+						) ) }
+					</ItemGroup>
+
+					<Button
+						onClick={ () => setShowPatternsExplorer( true ) }
+						className="block-editor-inserter__patterns-explore-button"
+						variant="secondary"
+					>
+						{ __( 'Explore all patterns' ) }
+					</Button>
+				</div>
+			) }
+			{ isMobile && (
+				<BlockPatternsTabNavigation
+					onInsert={ onInsert }
+					rootClientId={ rootClientId }
+				/>
+			) }
 			{ showPatternsExplorer && (
 				<PatternsExplorerModal
 					initialCategory={ selectedCategory }
