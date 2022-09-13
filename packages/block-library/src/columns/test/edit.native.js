@@ -115,7 +115,7 @@ describe( 'Columns block', () => {
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
-		it( 'reaches the minimun limit of number of column blocks', async () => {
+		it( 'reaches the minimum limit of number of column blocks', async () => {
 			const screen = await initializeEditor();
 			const { getByA11yLabel, getByTestId } = screen;
 
