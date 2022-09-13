@@ -12,7 +12,7 @@ function gutenberg_add_global_styles_for_blocks() {
 	$tree        = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 	$block_nodes = $tree->get_styles_block_nodes();
 	foreach ( $block_nodes as $metadata ) {
-		$style_handle =  'global-styles';
+		$style_handle = 'global-styles';
 		$block_style  = $tree->get_styles_for_block( $metadata );
 
 		if (
