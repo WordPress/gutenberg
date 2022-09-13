@@ -33,33 +33,11 @@ const rootFocusedStyles = ( { isFocused }: RootProps ) => {
 	return css( { zIndex: 1 } );
 };
 
-const rootLabelPositionStyles = ( { labelPosition }: RootProps ) => {
-	switch ( labelPosition ) {
-		case 'top':
-			return css`
-				align-items: flex-start;
-				flex-direction: column;
-			`;
-		case 'bottom':
-			return css`
-				align-items: flex-start;
-				flex-direction: column-reverse;
-			`;
-		case 'edge':
-			return css`
-				justify-content: space-between;
-			`;
-		default:
-			return '';
-	}
-};
-
 export const Root = styled( Flex )< RootProps >`
 	position: relative;
 	border-radius: 2px;
 	padding-top: 0;
 	${ rootFocusedStyles }
-	${ rootLabelPositionStyles }
 `;
 
 const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
@@ -68,11 +46,6 @@ const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
 		: COLORS.ui.background;
 
 	return css( { backgroundColor } );
-};
-
-// Normalizes the margins from the <Flex /> (components/ui/flex/) container.
-const containerMarginStyles = ( { hideLabel }: ContainerProps ) => {
-	return hideLabel ? css( { margin: '0 !important' } ) : null;
 };
 
 const containerWidthStyles = ( {
@@ -101,7 +74,6 @@ export const Container = styled.div< ContainerProps >`
 	position: relative;
 
 	${ containerDisabledStyles }
-	${ containerMarginStyles }
 	${ containerWidthStyles }
 `;
 
@@ -256,20 +228,6 @@ export const Input = styled.input< InputProps >`
 	}
 `;
 
-const labelMargin = ( {
-	labelPosition,
-}: {
-	labelPosition?: LabelPosition;
-} ) => {
-	let marginBottom = 8;
-
-	if ( labelPosition === 'edge' || labelPosition === 'side' ) {
-		marginBottom = 0;
-	}
-
-	return css( { marginTop: 0, marginRight: 0, marginBottom, marginLeft: 0 } );
-};
-
 const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 	&&& {
 		${ baseLabelTypography };
@@ -281,7 +239,6 @@ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 		max-width: 100%;
 		z-index: 1;
 
-		${ labelMargin }
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;

@@ -556,10 +556,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			$is_list_open       = false;
 			$inner_blocks_html .= '</ul>';
 		}
-		if ( 'core/site-title' === $inner_block->name || 'core/site-logo' === $inner_block->name ) {
-			$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block->render() . '</li>';
+		$inner_block_content = $inner_block->render();
+		if ( 'core/site-title' === $inner_block->name || ( 'core/site-logo' === $inner_block->name && $inner_block_content ) ) {
+			$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
 		} else {
-			$inner_blocks_html .= $inner_block->render();
+			$inner_blocks_html .= $inner_block_content;
 		}
 	}
 

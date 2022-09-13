@@ -83,6 +83,7 @@ const GRID_OVERLAY_TIMEOUT = 600;
  * ```
  */
 export function FocalPointPicker( {
+	__nextHasNoMarginBottom,
 	autoPlay = true,
 	className,
 	help,
@@ -239,6 +240,7 @@ export function FocalPointPicker( {
 	return (
 		<BaseControl
 			{ ...restProps }
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			label={ label }
 			id={ id }
 			help={ help }
@@ -270,6 +272,8 @@ export function FocalPointPicker( {
 				</MediaContainer>
 			</MediaWrapper>
 			<Controls
+				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+				hasHelpText={ !! help }
 				point={ { x, y } }
 				onChange={ ( value ) => {
 					onChange?.( getFinalValue( value ) );
