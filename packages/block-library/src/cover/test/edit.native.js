@@ -9,6 +9,8 @@ import {
 	fireEvent,
 	waitFor,
 	within,
+	getBlock,
+	openBlockSettings,
 } from 'test/helpers';
 
 /**
@@ -41,11 +43,11 @@ jest.mock( '@wordpress/compose', () => ( {
 	) ),
 } ) );
 
-const COVER_BLOCK_PLACEHOLDER_HTML = `<!-- wp:cover -->
-<div class="wp-block-cover"><span aria-hidden="true" class="has-background-dim-100 wp-block-cover__gradient-background has-background-dim"></span><div class="wp-block-cover__inner-container"></div></div>
+const COVER_BLOCK_PLACEHOLDER_HTML = `<!-- wp:cover {"isDark":false} -->
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"></div></div>
 <!-- /wp:cover -->`;
-const COVER_BLOCK_SOLID_COLOR_HTML = `<!-- wp:cover {"overlayColor":"cyan-bluish-gray"} -->
-<div class="wp-block-cover"><span aria-hidden="true" class="has-cyan-bluish-gray-background-color has-background-dim-100 wp-block-cover__gradient-background has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
+const COVER_BLOCK_SOLID_COLOR_HTML = `<!-- wp:cover {"overlayColor":"cyan-bluish-gray","isDark":false} -->
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-cyan-bluish-gray-background-color has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
 <p class="has-text-align-center"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->`;
@@ -302,24 +304,17 @@ describe( 'when an image is attached', () => {
 	} );
 
 	it( 'updates background opacity', async () => {
-		const { getByTestId, getByA11yLabel } = await initializeEditor( {
+		const screen = await initializeEditor( {
 			initialHtml: COVER_BLOCK_IMAGE_HTML,
 		} );
+		const { getByA11yLabel } = screen;
 
-		const coverBlock = await waitFor( () =>
-			getByA11yLabel( /Cover Block\. Row 1/ )
-		);
+		// Get block
+		const coverBlock = await getBlock( screen, 'Cover' );
 		fireEvent.press( coverBlock );
 
 		// Open block settings
-		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
-		await waitFor(
-			() => getByTestId( 'block-settings-modal' ).props.isVisible
-		);
-
-		// Wait for Block Settings to be visible.
-		const blockSettingsModal = getByTestId( 'block-settings-modal' );
-		await waitFor( () => blockSettingsModal.props.isVisible );
+		await openBlockSettings( screen );
 
 		// Update Opacity attribute
 		const opacityControl = getByA11yLabel( /Opacity/ );
@@ -581,21 +576,17 @@ describe( 'color settings', () => {
 
 describe( 'minimum height settings', () => {
 	it( 'changes the height value to 20(vw)', async () => {
-		const { getByTestId, getByA11yLabel, getByText, getByDisplayValue } =
-			await initializeEditor( {
-				initialHtml: COVER_BLOCK_IMAGE_HTML,
-			} );
+		const screen = await initializeEditor( {
+			initialHtml: COVER_BLOCK_IMAGE_HTML,
+		} );
+		const { getByText, getByDisplayValue } = screen;
 
-		const coverBlock = await waitFor( () =>
-			getByA11yLabel( /Cover Block\. Row 1/ )
-		);
+		// Get block
+		const coverBlock = await getBlock( screen, 'Cover' );
 		fireEvent.press( coverBlock );
 
 		// Open block settings
-		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
-		await waitFor(
-			() => getByTestId( 'block-settings-modal' ).props.isVisible
-		);
+		await openBlockSettings( screen );
 
 		// Set vw unit
 		fireEvent.press( getByText( 'px' ) );
@@ -610,25 +601,17 @@ describe( 'minimum height settings', () => {
 	} );
 
 	it( 'changes the height value between units', async () => {
-		const { getByTestId, getByA11yLabel, getByText } =
-			await initializeEditor( {
-				initialHtml: COVER_BLOCK_CUSTOM_HEIGHT_HTML,
-			} );
+		const screen = await initializeEditor( {
+			initialHtml: COVER_BLOCK_CUSTOM_HEIGHT_HTML,
+		} );
+		const { getByText } = screen;
 
-		const coverBlock = await waitFor( () =>
-			getByA11yLabel( /Cover Block\. Row 1/ )
-		);
+		// Get block
+		const coverBlock = await getBlock( screen, 'Cover' );
 		fireEvent.press( coverBlock );
 
 		// Open block settings
-		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
-		await waitFor(
-			() => getByTestId( 'block-settings-modal' ).props.isVisible
-		);
-
-		// Wait for Block Settings to be visible.
-		const blockSettingsModal = getByTestId( 'block-settings-modal' );
-		await waitFor( () => blockSettingsModal.props.isVisible );
+		await openBlockSettings( screen );
 
 		// Set the pixel unit
 		fireEvent.press( getByText( 'vw' ) );
@@ -649,27 +632,17 @@ describe( 'minimum height settings', () => {
 		test.each( testData )(
 			'for %s',
 			async ( unitName, value, minValue ) => {
-				const { getByTestId, getByA11yLabel, getByText } =
-					await initializeEditor( {
-						initialHtml: COVER_BLOCK_CUSTOM_HEIGHT_HTML,
-					} );
+				const screen = await initializeEditor( {
+					initialHtml: COVER_BLOCK_CUSTOM_HEIGHT_HTML,
+				} );
+				const { getByA11yLabel, getByText } = screen;
 
-				const coverBlock = await waitFor( () =>
-					getByA11yLabel( /Cover Block\. Row 1/ )
-				);
+				// Get block
+				const coverBlock = await getBlock( screen, 'Cover' );
 				fireEvent.press( coverBlock );
 
 				// Open block settings
-				fireEvent.press( getByA11yLabel( 'Open Settings' ) );
-				await waitFor(
-					() => getByTestId( 'block-settings-modal' ).props.isVisible
-				);
-
-				// Wait for Block Settings to be visible.
-				const blockSettingsModal = getByTestId(
-					'block-settings-modal'
-				);
-				await waitFor( () => blockSettingsModal.props.isVisible );
+				await openBlockSettings( screen );
 
 				// Set the unit name
 				fireEvent.press( getByText( 'vw' ) );
