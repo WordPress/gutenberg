@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { uniqueId } from 'lodash';
-
+import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
@@ -36,12 +35,21 @@ export default function mediaUpload( {
 	onError = noop,
 	onFileChange,
 } ) {
-	const { getCurrentPostId, getEditorSettings } = select( editorStore );
-	const { lockPostSaving, unlockPostSaving } = dispatch( editorStore );
+	const { getCurrentPostId, getEditorSettings, isCurrentPostPublished } =
+		select( editorStore );
+	const {
+		lockPostAutosaving,
+		unlockPostAutosaving,
+		lockPostSaving,
+		unlockPostSaving,
+		disablePublishSidebar,
+		enablePublishSidebar,
+	} = dispatch( editorStore );
+
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
-	const locakKeyID = uniqueId();
+	const locakKeyID = uuid();
 	const lockKey = `image-upload-${ locakKeyID }`;
-	let postSaveLocked = false;
+	let imageIsUploading = false;
 	maxUploadFileSize =
 		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
 
@@ -50,12 +58,18 @@ export default function mediaUpload( {
 		filesList,
 		onFileChange: ( file ) => {
 			const remainingUploads = file.filter( ( f ) => ! f.id );
-			if ( ! postSaveLocked && remainingUploads ) {
-				lockPostSaving( lockKey );
-				postSaveLocked = true;
+			if ( ! imageIsUploading && remainingUploads ) {
+				lockPostAutosaving( lockKey );
+				if ( isCurrentPostPublished ) {
+					lockPostSaving( lockKey );
+				} else {
+					disablePublishSidebar();
+				}
+
+				imageIsUploading = true;
 			} else {
 				unlockPostSaving( lockKey );
-				postSaveLocked = false;
+				imageIsUploading = false;
 			}
 			onFileChange( file );
 		},
@@ -65,8 +79,13 @@ export default function mediaUpload( {
 		},
 		maxUploadFileSize,
 		onError: ( { message } ) => {
-			unlockPostSaving( lockKey );
-			postSaveLocked = false;
+			unlockPostAutosaving( lockKey );
+			if ( isCurrentPostPublished ) {
+				unlockPostSaving( lockKey );
+			} else {
+				enablePublishSidebar();
+			}
+			imageIsUploading = false;
 			onError( message );
 		},
 		wpAllowedMimeTypes,
