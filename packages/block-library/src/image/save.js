@@ -12,6 +12,7 @@ import {
 	useBlockProps,
 	__experimentalGetElementClassName,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
+	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
@@ -33,7 +34,17 @@ export default function save( { attributes } ) {
 
 	const newRel = isEmpty( rel ) ? undefined : rel;
 	const borderProps = getBorderClassesAndStyles( attributes );
-
+	const spacingProps = getSpacingClassesAndStyles( attributes );
+	const marginStyles = Object.fromEntries(
+		Object.entries( spacingProps?.style ).filter( ( [ key ] ) =>
+			key.includes( 'margin' )
+		)
+	);
+	const paddingStyles = Object.fromEntries(
+		Object.entries( spacingProps?.style ).filter( ( [ key ] ) =>
+			key.includes( 'padding' )
+		)
+	);
 	const classes = classnames( {
 		[ `align${ align }` ]: align,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
@@ -51,7 +62,7 @@ export default function save( { attributes } ) {
 			src={ url }
 			alt={ alt }
 			className={ imageClasses || undefined }
-			style={ borderProps.style }
+			style={ { ...borderProps.style, ...paddingStyles } }
 			width={ width }
 			height={ height }
 			title={ title }
@@ -83,7 +94,10 @@ export default function save( { attributes } ) {
 	);
 
 	return (
-		<figure { ...useBlockProps.save( { className: classes } ) }>
+		<figure
+			{ ...useBlockProps.save( { className: classes } ) }
+			style={ marginStyles }
+		>
 			{ figure }
 		</figure>
 	);

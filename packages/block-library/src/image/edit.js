@@ -18,6 +18,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -326,6 +327,17 @@ export function ImageEdit( {
 	);
 
 	const borderProps = useBorderProps( attributes );
+	const spacingProps = useSpacingProps( attributes );
+	const marginStyles = Object.fromEntries(
+		Object.entries( spacingProps?.style ).filter( ( [ key ] ) =>
+			key.includes( 'margin' )
+		)
+	);
+	const paddingStyles = Object.fromEntries(
+		Object.entries( spacingProps?.style ).filter( ( [ key ] ) =>
+			key.includes( 'padding' )
+		)
+	);
 
 	const classes = classnames( className, {
 		'is-transient': temporaryURL,
@@ -341,7 +353,12 @@ export function ImageEdit( {
 	} );
 
 	return (
-		<figure { ...blockProps }>
+		<figure
+			{ ...blockProps }
+			style={ {
+				...marginStyles,
+			} }
+		>
 			{ ( temporaryURL || url ) && (
 				<Image
 					temporaryURL={ temporaryURL }
@@ -357,6 +374,7 @@ export function ImageEdit( {
 					context={ context }
 					clientId={ clientId }
 					isContentLocked={ isContentLocked }
+					paddingStyles={ paddingStyles }
 				/>
 			) }
 			{ ! url && ! isContentLocked && (

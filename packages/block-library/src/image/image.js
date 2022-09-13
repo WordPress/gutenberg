@@ -70,6 +70,7 @@ export default function Image( {
 	context,
 	clientId,
 	isContentLocked,
+	paddingStyles,
 } ) {
 	const {
 		url = '',
@@ -459,7 +460,7 @@ export default function Image( {
 				} }
 				ref={ imageRef }
 				className={ borderProps.className }
-				style={ borderProps.style }
+				style={ { ...borderProps.style, ...paddingStyles } }
 			/>
 			{ temporaryURL && <Spinner /> }
 		</>
