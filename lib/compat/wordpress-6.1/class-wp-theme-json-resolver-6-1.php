@@ -61,8 +61,9 @@ class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
 		 *
 		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
-		$config       = apply_filters( 'global_styles_default', new WP_Theme_JSON_Data_Gutenberg( $config, 'default' ) );
-		static::$core = new WP_Theme_JSON_Gutenberg( $config->get_data(), 'default' );
+		$theme_json  = apply_filters( 'global_styles_default', new WP_Theme_JSON_Data_Gutenberg( $config, 'default' ) );
+		$config      = $theme_json->get_data();
+		static::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
 
 		return static::$core;
 	}
@@ -91,8 +92,9 @@ class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
 				 *
 				 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 				 */
-				$config = apply_filters( 'global_styles_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
-				return new WP_Theme_JSON_Gutenberg( $config->get_data(), 'custom' );
+				$theme_json = apply_filters( 'global_styles_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
+				$config     = $theme_json->get_data();
+				return new WP_Theme_JSON_Gutenberg( $config, 'custom' );
 			}
 
 			// Very important to verify if the flag isGlobalStylesUserThemeJSON is true.
@@ -112,8 +114,9 @@ class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
 		 *
 		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
-		$config       = apply_filters( 'global_styles_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
-		static::$user = new WP_Theme_JSON_Gutenberg( $config->get_data(), 'custom' );
+		$theme_json   = apply_filters( 'global_styles_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
+		$config       = $theme_json->get_data();
+		static::$user = new WP_Theme_JSON_Gutenberg( $config, 'custom' );
 
 		return static::$user;
 	}
