@@ -85,6 +85,13 @@ export default function PostTemplateEdit( {
 			inherit,
 			taxQuery,
 			parents,
+			pages,
+			// We gather extra query args to pass to the REST API call.
+			// This way extenders of Query Loop can add their own query args,
+			// and have accurate previews in the editor.
+			// Noting though that these args should either be supported by the
+			// REST API or be handled by custom REST filters like `rest_{$this->post_type}_query`.
+			...restQueryArgs
 		} = {},
 		queryContext = [ { page: 1 } ],
 		templateSlug,
@@ -178,7 +185,10 @@ export default function PostTemplateEdit( {
 			// block's postType, which is passed through block context.
 			const usedPostType = previewPostType || postType;
 			return {
-				posts: getEntityRecords( 'postType', usedPostType, query ),
+				posts: getEntityRecords( 'postType', usedPostType, {
+					...query,
+					...restQueryArgs,
+				} ),
 				blocks: getBlocks( clientId ),
 			};
 		},
@@ -198,6 +208,7 @@ export default function PostTemplateEdit( {
 			templateSlug,
 			taxQuery,
 			parents,
+			restQueryArgs,
 			previewPostType,
 			categories,
 			categorySlug,
