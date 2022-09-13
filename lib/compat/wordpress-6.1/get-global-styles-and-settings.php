@@ -20,34 +20,12 @@ function gutenberg_add_global_styles_for_blocks() {
 			continue;
 		}
 
-		if ( isset( $metadata['name'] ) ) {
-			$block_name   = str_replace( 'core/', '', $metadata['name'] );
-			$style_handle = 'wp-block-' . $block_name;
-			// These block styles are added on block_render.
-			// This hooks inline CSS to them so that they are loaded conditionally
-			// based on whether or not the block is used on the page.
-			wp_add_inline_style( $style_handle, $block_style );
-		}
-
-		// The likes of block element styles from theme.json do not have  $metadata['name'] set.
-		if ( ! isset( $metadata['name'] ) && ! empty( $metadata['path'] ) ) {
-			$result = array_values(
-				array_filter(
-					$metadata['path'],
-					function ( $item ) {
-						if ( str_contains( $item, 'core/' ) ) {
-							return true;
-						}
-						return false;
-					}
-				)
-			);
-			if ( isset( $result[0] ) ) {
-				$block_name   = str_replace( 'core/', '', $result[0] );
-				$style_handle = 'wp-block-' . $block_name;
-				wp_add_inline_style( $style_handle, $block_style );
-			}
-		}
+		$block_name   = str_replace( 'core/', '', $metadata['name'] );
+		$style_handle = 'wp-block-' . $block_name;
+		// These block styles are added on block_render.
+		// This hooks inline CSS to them so that they are loaded conditionally
+		// based on whether or not the block is used on the page.
+		wp_add_inline_style( $style_handle, $block_style );
 	}
 }
 
