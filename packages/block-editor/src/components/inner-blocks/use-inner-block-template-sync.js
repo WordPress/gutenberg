@@ -19,7 +19,7 @@ import { store as blockEditorStore } from '../../store';
  * This hook makes sure that a block's inner blocks stay in sync with the given
  * block "template". The template is a block hierarchy to which inner blocks must
  * conform. If the blocks get "out of sync" with the template and the template
- * is meant to be locked (e.g. templateLock = "all" or templateLock = "noContent"),
+ * is meant to be locked (e.g. templateLock = "all" or templateLock = "contentOnly"),
  * then we replace the inner blocks with the correct value after synchronizing it with the template.
  *
  * @param {string}  clientId                       The block client ID.
@@ -52,11 +52,11 @@ export default function useInnerBlockTemplateSync(
 	const existingTemplate = useRef( null );
 	useLayoutEffect( () => {
 		// Only synchronize innerBlocks with template if innerBlocks are empty
-		// or a locking "all" or "noContent" exists directly on the block.
+		// or a locking "all" or "contentOnly" exists directly on the block.
 		if (
 			innerBlocks.length === 0 ||
 			templateLock === 'all' ||
-			templateLock === 'noContent'
+			templateLock === 'contentOnly'
 		) {
 			const hasTemplateChanged = ! isEqual(
 				template,

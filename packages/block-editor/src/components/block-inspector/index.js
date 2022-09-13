@@ -158,7 +158,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
 			topLevelLockedBlock:
-				getTemplateLock( _selectedBlockClientId ) === 'noContent'
+				getTemplateLock( _selectedBlockClientId ) === 'contentOnly'
 					? _selectedBlockClientId
 					: __unstableGetContentLockingParent(
 							_selectedBlockClientId
