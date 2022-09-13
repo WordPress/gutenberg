@@ -15,13 +15,11 @@ function gutenberg_add_global_styles_for_blocks() {
 		$style_handle =  'global-styles';
 		$block_style  = $tree->get_styles_for_block( $metadata );
 
-		if ( ! wp_should_load_separate_core_block_assets() ) {
-			wp_add_inline_style( $style_handle, $block_style );
-			continue;
+		if ( wp_should_load_separate_core_block_assets() ) {
+			$block_name   = str_replace( 'core/', '', $metadata['name'] );
+			$style_handle = 'wp-block-' . $block_name;
 		}
 
-		$block_name   = str_replace( 'core/', '', $metadata['name'] );
-		$style_handle = 'wp-block-' . $block_name;
 		// These block styles are added on block_render.
 		// This hooks inline CSS to them so that they are loaded conditionally
 		// based on whether or not the block is used on the page.
