@@ -262,23 +262,27 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 /**
  * Renders the layout config to the block wrapper.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param  string   $block_content  Rendered block content.
+ * @param  array    $parsed_block   The parsed block.
+ * @param  WP_Block $block          Instance of WP_Block for the block being rendered.
+ * @return string                   Filtered block content.
  */
-function gutenberg_render_layout_support_flag( $block_content, $block ) {
-	$block_type     = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+function gutenberg_render_layout_support_flag( $block_content, $parsed_block, $block ) {
+	$block_type     = WP_Block_Type_Registry::get_instance()->get_registered( $block->name );
 	$support_layout = block_has_support( $block_type, array( '__experimentalLayout' ), false );
 
 	if ( ! $support_layout ) {
 		return $block_content;
 	}
 
+	// Use the WP_Block instance to access block attributes, since that class
+	// provides default attribute values, while the $parsed_block doesn't.
+	$attributes             = $block->attributes;
 	$block_gap              = gutenberg_get_global_settings( array( 'spacing', 'blockGap' ) );
 	$global_layout_settings = gutenberg_get_global_settings( array( 'layout' ) );
 	$has_block_gap_support  = isset( $block_gap ) ? null !== $block_gap : false;
 	$default_block_layout   = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
-	$used_layout            = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
+	$used_layout            = isset( $attributes['layout'] ) ? $attributes['layout'] : $default_block_layout;
 
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
 		if ( ! $global_layout_settings ) {
@@ -288,7 +292,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$class_names        = array();
 	$layout_definitions = _wp_array_get( $global_layout_settings, array( 'definitions' ), array() );
-	$block_classname    = wp_get_block_default_classname( $block['blockName'] );
+	$block_classname    = wp_get_block_default_classname( $block->name );
 	$container_class    = wp_unique_id( 'wp-container-' );
 	$layout_classname   = '';
 
@@ -309,15 +313,15 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// removed in the 5.9 release (https://github.com/WordPress/gutenberg/issues/38719). It is
 	// not intended to provide an extended set of classes to match all block layout attributes
 	// here.
-	if ( ! empty( $block['attrs']['layout']['orientation'] ) ) {
-		$class_names[] = 'is-' . sanitize_title( $block['attrs']['layout']['orientation'] );
+	if ( ! empty( $attributes['layout']['orientation'] ) ) {
+		$class_names[] = 'is-' . sanitize_title( $attributes['layout']['orientation'] );
 	}
 
-	if ( ! empty( $block['attrs']['layout']['justifyContent'] ) ) {
-		$class_names[] = 'is-content-justification-' . sanitize_title( $block['attrs']['layout']['justifyContent'] );
+	if ( ! empty( $attributes['layout']['justifyContent'] ) ) {
+		$class_names[] = 'is-content-justification-' . sanitize_title( $attributes['layout']['justifyContent'] );
 	}
 
-	if ( ! empty( $block['attrs']['layout']['flexWrap'] ) && 'nowrap' === $block['attrs']['layout']['flexWrap'] ) {
+	if ( ! empty( $attributes['layout']['flexWrap'] ) && 'nowrap' === $attributes['layout']['flexWrap'] ) {
 		$class_names[] = 'is-nowrap';
 	}
 
@@ -336,7 +340,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// Attribute-based Layout classnames are output in all cases.
 	if ( ! current_theme_supports( 'disable-layout-styles' ) ) {
 
-		$gap_value = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
+		$gap_value = _wp_array_get( $attributes, array( 'style', 'spacing', 'blockGap' ) );
 		// Skip if gap value contains unsupported characters.
 		// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 		// because we only want to match against the value, not the CSS attribute.
@@ -349,7 +353,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 
 		$fallback_gap_value = _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', '__experimentalDefault' ), '0.5em' );
-		$block_spacing      = _wp_array_get( $block, array( 'attrs', 'style', 'spacing' ), null );
+		$block_spacing      = _wp_array_get( $attributes, array( 'style', 'spacing' ), null );
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
@@ -384,7 +388,7 @@ WP_Block_Supports::get_instance()->register(
 if ( function_exists( 'wp_render_layout_support_flag' ) ) {
 	remove_filter( 'render_block', 'wp_render_layout_support_flag' );
 }
-add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
+add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 3 );
 
 /**
  * For themes without theme.json file, make sure
