@@ -41,12 +41,13 @@ function useConstrainedTabbing() {
 			// constrainedTabAlreadyHandled is a custom property added
 			// to event to support nested constrainted tabbing containers
 			// @ts-ignore
-			if ( keyCode !== TAB || event.constrainedTabAlreadyHandled ) {
+			if ( keyCode !== TAB ) {
 				return;
 			}
 
-			// @ts-ignore
-			event.constrainedTabAlreadyHandled = true;
+			// This let us support nested constrainted tabbing containers.
+			event.stopPropagation();
+
 			const action = shiftKey ? 'findPrevious' : 'findNext';
 			const nextElement =
 				focus.tabbable[ action ](
