@@ -4,6 +4,11 @@
 // eslint-disable-next-line no-restricted-imports
 import type { combineReducers as reduxCombineReducers } from 'redux';
 
+/**
+ * Internal dependencies
+ */
+import type { controls } from './controls';
+
 type MapOf< T > = { [ name: string ]: T };
 
 export type ActionCreator = Function | Generator;
@@ -123,3 +128,9 @@ type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
 	: never;
 
 export type combineReducers = typeof reduxCombineReducers;
+
+export type Controls = {
+	select: typeof controls.select;
+	resolveSelect: typeof controls.resolveSelect;
+	dispatch: typeof controls.dispatch;
+};
