@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.15.0 (2022-09-13)
+
 ### Internal
 
 -   `useDialog`: refactor to TypeScript ([#43823](https://github.com/WordPress/gutenberg/pull/43823)).
