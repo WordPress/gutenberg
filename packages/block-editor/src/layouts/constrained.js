@@ -2,9 +2,10 @@
  * WordPress dependencies
  */
 import {
-	Button,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -109,48 +110,28 @@ export default {
 						<Icon icon={ stretchWide } />
 					</div>
 				</div>
-				<div className="block-editor-hooks__layout-controls-reset">
-					<Button
-						variant="secondary"
-						isSmall
-						disabled={ ! contentSize && ! wideSize }
-						onClick={ () =>
-							onChange( {
-								contentSize: undefined,
-								wideSize: undefined,
-								inherit: false,
-							} )
-						}
-					>
-						{ __( 'Reset' ) }
-					</Button>
-				</div>
-
 				<p className="block-editor-hooks__layout-controls-helptext">
 					{ __(
 						'Customize the width for all elements that are assigned to the center or wide columns.'
 					) }
 				</p>
-				<fieldset className="block-editor-hooks__flex-layout-justification-controls">
-					<legend>{ __( 'Justification' ) }</legend>
-					<div>
-						{ justificationOptions.map(
-							( { value, icon, label } ) => {
-								return (
-									<Button
-										key={ value }
-										label={ label }
-										icon={ icon }
-										isPressed={ justifyContent === value }
-										onClick={ () =>
-											onJustificationChange( value )
-										}
-									/>
-								);
-							}
-						) }
-					</div>
-				</fieldset>
+				<ToggleGroupControl
+					__experimentalIsBorderless
+					label={ __( 'Justification' ) }
+					value={ justifyContent }
+					onChange={ onJustificationChange }
+				>
+					{ justificationOptions.map( ( { value, icon, label } ) => {
+						return (
+							<ToggleGroupControlOptionIcon
+								key={ value }
+								value={ value }
+								icon={ icon }
+								label={ label }
+							/>
+						);
+					} ) }
+				</ToggleGroupControl>
 			</>
 		);
 	},
