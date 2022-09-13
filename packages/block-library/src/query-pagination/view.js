@@ -24,12 +24,18 @@ function createRootFragment( parent, replaceNode ) {
 	} );
 }
 
+let rootFragment;
+
 // Helper function to await until the CPU is idle.
 const idle = () =>
 	new Promise( ( resolve ) => window.requestIdleCallback( resolve ) );
 
-let rootFragment;
-const f = ( i ) => i;
+// Helper function to rename the WordPress Directives from `wp-xx-yy` to `xxYY`.
+const renameDirective = ( s ) =>
+	s
+		.toLowerCase()
+		.replace( /^wp-/, '' )
+		.replace( /-(.)/g, ( _, chr ) => chr.toUpperCase() );
 
 // Convert DOM nodes to static virtual DOM nodes.
 function toVdom( node ) {
@@ -46,7 +52,11 @@ function toVdom( node ) {
 	for ( let i = 0; i < a.length; i++ ) {
 		if ( a[ i ].name.startsWith( 'wp-' ) ) {
 			props.wp = props.wp || {};
-			props.wp[ a[ i ].name ] = a[ i ].value;
+			let value = a[ i ].value;
+			try {
+				value = JSON.parse( value );
+			} catch ( e ) {}
+			props.wp[ renameDirective( a[ i ].name ) ] = value;
 		} else {
 			props[ a[ i ].name ] = a[ i ].value;
 		}
@@ -55,9 +65,10 @@ function toVdom( node ) {
 	return h(
 		node.localName,
 		props,
-		[].map.call( node.childNodes, toVdom ).filter( f )
+		[].map.call( node.childNodes, toVdom ).filter( exists )
 	);
 }
+const exists = ( i ) => i;
 
 /* A minimalistic Router */
 
@@ -103,70 +114,70 @@ window.addEventListener( 'popstate', async () => {
 const wpDirectives = {};
 
 // The `wp-client-navigation` directive.
-wpDirectives[ 'wp-client-navigation' ] = ( { element, value } ) => {
-	// Don't do anything if it's falsy.
-	if ( !! value ) {
+wpDirectives.clientNavigation = {
+	onDiff: ( { props } ) => {
+		const {
+			wp: { clientNavigation },
+			href,
+		} = props;
+
 		// Prefetch the page if it is in the directive options.
-		if ( value.prefetch ) {
-			fetchPage( element.getAttribute( 'href' ) );
+		if ( clientNavigation?.prefetch ) {
+			fetchPage( href );
 		}
 
-		element.addEventListener( 'click', async ( event ) => {
-			event.preventDefault();
+		// Don't do anything if it's falsy.
+		if ( !! clientNavigation ) {
+			props.onclick = async ( event ) => {
+				event.preventDefault();
 
-			// Fetch the page (or return it from cache).
-			const url = element.getAttribute( 'href' );
-			const vdom = await fetchPage( url );
+				// Fetch the page (or return it from cache).
+				const vdom = await fetchPage( href );
+				// Render the new page.
+				render( vdom, rootFragment );
 
-			// Render the new page.
-			render( vdom, rootFragment );
+				// Update the URL.
+				window.history.pushState( {}, '', href );
 
-			// Update the URL.
-			window.history.pushState( {}, '', url );
-
-			// Update the scroll, depending on the option. True by default.
-			if ( value?.scroll === 'smooth' ) {
-				window.scrollTo( { top: 0, left: 0, behavior: 'smooth' } );
-			} else if ( value?.scroll !== false ) {
-				window.scrollTo( 0, 0 );
-			}
-		} );
-	}
+				// Update the scroll, depending on the option. True by default.
+				if ( clientNavigation?.scroll === 'smooth' ) {
+					window.scrollTo( { top: 0, left: 0, behavior: 'smooth' } );
+				} else if ( clientNavigation?.scroll !== false ) {
+					window.scrollTo( 0, 0 );
+				}
+			};
+		}
+	},
 };
 
-const oldHook = options.diffed;
-const mounted = new WeakSet();
+// Preact Option Hooks. See https://preactjs.com/guide/v10/options/
+const hooks = {
+	vnode: [ 'vnode', 'onCreate' ],
+	diff: [ '__b', 'onDiff' ],
+	diffed: [ 'diffed', 'onDiffed' ],
+	unmount: [ 'unmount', 'onUnmount' ],
+	// render: [ '__r', 'onRender' ],
+	// hook: [ '__h', 'onHook' ],
+	// catchError: [ '__e', 'onCatchError' ],
+	// commit: [ '__c', 'onCommit' ],
+};
 
-// Set our own options hook for the WordPress Directives.
-options.diffed = ( vnode ) => {
-	const wp = vnode.props.wp;
-	// Check if there is any directive.
-	if ( wp ) {
-		const element = vnode.__e;
-		// Check if the element has been already mounted.
-		if ( ! mounted.has( element ) ) {
-			mounted.add( element );
-			for ( const key in wp ) {
-				let value = wp[ key ];
-				try {
-					// Turn primitives into values (booleans, numbers) and parse objects.
-					value = JSON.parse( wp[ key ] );
-				} catch ( e ) {}
-				if ( wpDirectives[ key ] )
-					// For each directive, run the callback.
-					wpDirectives[ key ]( {
-						value,
-						element,
-					} );
+// Run the directive callbacks.
+Object.entries( hooks ).forEach( ( [ name, [ key, hook ] ] ) => {
+	const old = options[ key ];
+	options[ key ] = ( vnode ) => {
+		const wp = vnode.props.wp;
+		if ( wp ) {
+			// eslint-disable-next-line no-console
+			console.log( name, vnode );
+			for ( const directive in wp ) {
+				// For each directive, run the callback.
+				wpDirectives[ directive ]?.[ hook ]?.( vnode );
 			}
 		}
-	}
-
-	// Call previously defined hook if there was any
-	if ( oldHook ) {
-		oldHook( vnode );
-	}
-};
+		if ( old ) old( vnode );
+	};
+} );
 
 document.addEventListener( 'DOMContentLoaded', async () => {
 	// Create the root fragment to hydrate everything.
@@ -178,11 +189,7 @@ document.addEventListener( 'DOMContentLoaded', async () => {
 	// Wait until the CPU is idle to do the hydration.
 	await idle();
 	const vdom = getInitialVdom();
-	setTimeout( () => {
-		// Delay hydration artificially to make sure the hydration doesn't destroy
-		// the nodes (animation doesn't jump).
-		hydrate( vdom, rootFragment );
-		// eslint-disable-next-line no-console
-		console.log( 'hydrated!' );
-	}, 3000 );
+	hydrate( vdom, rootFragment );
+	// eslint-disable-next-line no-console
+	console.log( 'hydrated!' );
 } );
