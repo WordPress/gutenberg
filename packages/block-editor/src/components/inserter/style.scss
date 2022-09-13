@@ -22,11 +22,6 @@ $block-inserter-tabs-height: 44px;
 	flex-direction: column;
 	height: 100%;
 	gap: $grid-unit-20;
-	width: auto;
-	@include break-medium {
-		width: $block-inserter-width;
-	}
-
 	&.show-as-tabs {
 		gap: 0;
 	}

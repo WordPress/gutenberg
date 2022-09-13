@@ -15,9 +15,14 @@ import {
 	useRef,
 	useEffect,
 } from '@wordpress/element';
-import { VisuallyHidden, SearchControl } from '@wordpress/components';
+import {
+	VisuallyHidden,
+	SearchControl,
+	__unstableMotion as motion,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -123,6 +128,9 @@ function InserterMenu(
 		[ setSelectedPatternCategory ]
 	);
 
+	const isMobile = useViewportMatch( 'medium', '<' );
+	const disableMotion = useReducedMotion();
+
 	const blocksTab = useMemo(
 		() => (
 			<>
@@ -201,14 +209,25 @@ function InserterMenu(
 		},
 	} ) );
 
+	const showPatternPanel =
+		selectedTab === 'patterns' && ! filterValue && selectedPatternCategory;
 	const showAsTabs = ! filterValue && ( showPatterns || hasReusableBlocks );
+
+	let inserterWidth = 'auto';
+	if ( ! isMobile && showPatternPanel ) {
+		inserterWidth = 300;
+	} else {
+		inserterWidth = 350;
+	}
 
 	return (
 		<div className="block-editor-inserter__menu">
-			<div
+			<motion.div
 				className={ classnames( 'block-editor-inserter__main-area', {
 					'show-as-tabs': showAsTabs,
 				} ) }
+				animate={ disableMotion ? {} : { width: inserterWidth } }
+				style={ disableMotion ? { width: inserterWidth } : {} }
 			>
 				<SearchControl
 					className="block-editor-inserter__search"
@@ -253,30 +272,28 @@ function InserterMenu(
 						{ blocksTab }
 					</div>
 				) }
-			</div>
+			</motion.div>
 			{ showInserterHelpPanel && hoveredItem && (
 				<InserterPreviewPanel item={ hoveredItem } />
 			) }
-			{ selectedTab === 'patterns' &&
-				! filterValue &&
-				selectedPatternCategory && (
-					<BlockPatternsCategoryDialog
-						rootClientId={ destinationRootClientId }
-						onInsert={ onInsertPattern }
-						category={ selectedPatternCategory }
-						onClose={ () => {
-							// The timeout allows us to prevent the popover from closing temporarily
-							// because of the focus loss when we click on another pattern category.
-							// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
-							setTimeout( () => {
-								if ( preventPatternDialogFromClosing ) {
-									return;
-								}
-								setSelectedPatternCategory( null );
-							}, 10 );
-						} }
-					/>
-				) }
+			{ showPatternPanel && (
+				<BlockPatternsCategoryDialog
+					rootClientId={ destinationRootClientId }
+					onInsert={ onInsertPattern }
+					category={ selectedPatternCategory }
+					onClose={ () => {
+						// The timeout allows us to prevent the popover from closing temporarily
+						// because of the focus loss when we click on another pattern category.
+						// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+						setTimeout( () => {
+							if ( preventPatternDialogFromClosing ) {
+								return;
+							}
+							setSelectedPatternCategory( null );
+						}, 10 );
+					} }
+				/>
+			) }
 		</div>
 	);
 }
