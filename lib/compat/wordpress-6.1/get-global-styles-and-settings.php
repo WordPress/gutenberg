@@ -20,9 +20,6 @@ function gutenberg_add_global_styles_for_blocks() {
 			$style_handle = 'wp-block-' . $block_name;
 		}
 
-		// These block styles are added on block_render.
-		// This hooks inline CSS to them so that they are loaded conditionally
-		// based on whether or not the block is used on the page.
 		wp_add_inline_style( $style_handle, $block_style );
 	}
 }
