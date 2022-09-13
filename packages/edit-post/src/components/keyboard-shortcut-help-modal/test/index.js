@@ -6,6 +6,7 @@ import { render, screen } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
+import { EditorKeyboardShortcutsRegister } from '@wordpress/editor';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 
 /**
@@ -19,6 +20,7 @@ describe( 'KeyboardShortcutHelpModal', () => {
 	it( 'should match snapshot when the modal is active', () => {
 		render(
 			<ShortcutProvider>
+				<EditorKeyboardShortcutsRegister />
 				<KeyboardShortcutHelpModal isModalActive toggleModal={ noop } />
 			</ShortcutProvider>
 		);
@@ -33,6 +35,7 @@ describe( 'KeyboardShortcutHelpModal', () => {
 	it( 'should not render the modal when inactive', () => {
 		render(
 			<ShortcutProvider>
+				<EditorKeyboardShortcutsRegister />
 				<KeyboardShortcutHelpModal
 					isModalActive={ false }
 					toggleModal={ noop }
