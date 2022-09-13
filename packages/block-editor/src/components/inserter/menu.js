@@ -228,6 +228,7 @@ function InserterMenu(
 				} ) }
 				animate={ disableMotion ? {} : { width: inserterWidth } }
 				style={ disableMotion ? { width: inserterWidth } : {} }
+				transition={ { duration: 0.2 } }
 			>
 				<SearchControl
 					className="block-editor-inserter__search"

@@ -99,6 +99,7 @@ export function BlockPatternsCategoryDialog( {
 			initial={ { width: disableMotion ? 300 : 0 } }
 			animate={ { width: 300 } }
 			className="block-editor-inserter__patterns-category-panel"
+			transition={ { duration: 0.2 } }
 		>
 			<BlockPatternsCategoryPanel
 				rootClientId={ rootClientId }
