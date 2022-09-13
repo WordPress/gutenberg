@@ -22,7 +22,7 @@ class WP_Theme_JSON_Data_Gutenberg {
 	 *
 	 * @var string
 	 */
-	private $origin = null;
+	private $origin = '';
 
 	/**
 	 * Constructor.
@@ -44,7 +44,6 @@ class WP_Theme_JSON_Data_Gutenberg {
 	 */
 	public function update_with( $new_data ) {
 		$this->theme_json->merge( new WP_Theme_JSON_Gutenberg( $new_data, $this->origin ) );
-
 		return $this;
 	}
 
