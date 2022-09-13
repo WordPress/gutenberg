@@ -610,7 +610,7 @@ You can also bundle CSS modules by prefixing `.module` to the extension, e.g. `s
 
 #### Using fonts and images
 
-It is possible to reference font (`woff`, `woff2`, `eot`, `ttf` and `otf`) and image (`bmp`, `png`, `jpg`, `jpeg` and `gif`) files from CSS that is controlled by webpack as explained in the previous section.
+It is possible to reference font (`woff`, `woff2`, `eot`, `ttf` and `otf`) and image (`bmp`, `png`, `jpg`, `jpeg`, `gif` and `wepb`) files from CSS that is controlled by webpack as explained in the previous section.
 
 _Example:_
 

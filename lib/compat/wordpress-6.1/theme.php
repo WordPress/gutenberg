@@ -29,3 +29,19 @@ function gutenberg_create_initial_theme_features() {
 	);
 }
 add_action( 'setup_theme', 'gutenberg_create_initial_theme_features', 0 );
+
+if ( ! function_exists( 'wp_theme_element_class_name' ) ) {
+	/**
+	 * Given an element name, returns a class name.
+	 * Alias from WP_Theme_JSON_Gutenberg::get_element_class_name.
+	 *
+	 * @param string $element The name of the element.
+	 *
+	 * @return string The name of the class.
+	 *
+	 * @since 6.1.0
+	 */
+	function wp_theme_element_class_name( $element ) {
+		return WP_Theme_JSON_Gutenberg::get_element_class_name( $element );
+	}
+}

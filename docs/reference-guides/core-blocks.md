@@ -401,7 +401,7 @@ Add a page, link, or another item to your navigation. ([Source](https://github.c
 
 -	**Name:** core/navigation-link
 -	**Category:** design
--	**Supports:** ~~html~~, ~~reusable~~
+-	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** description, id, isTopLevelLink, kind, label, opensInNewTab, rel, title, type, url
 
 ## Submenu
@@ -546,7 +546,7 @@ Display a post's featured image. ([Source](https://github.com/WordPress/gutenber
 -	**Name:** core/post-featured-image
 -	**Category:** theme
 -	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), spacing (margin, padding), ~~html~~
--	**Attributes:** height, isLink, linkTarget, rel, scale, sizeSlug, width
+-	**Attributes:** customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, rel, scale, sizeSlug, width
 
 ## Post Navigation Link
 
@@ -609,7 +609,7 @@ An advanced block that allows displaying post types based on different query par
 -	**Name:** core/query
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
--	**Attributes:** displayLayout, query, queryId, tagName
+-	**Attributes:** displayLayout, namespace, query, queryId, tagName
 
 ## No results
 
@@ -698,7 +698,7 @@ Help visitors find your content. ([Source](https://github.com/WordPress/gutenber
 
 -	**Name:** core/search
 -	**Category:** widgets
--	**Supports:** align (center, left, right), color (background, gradients, text), ~~html~~
+-	**Supports:** align (center, left, right), color (background, gradients, text), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** buttonPosition, buttonText, buttonUseIcon, label, placeholder, query, showLabel, width, widthUnit
 
 ## Separator

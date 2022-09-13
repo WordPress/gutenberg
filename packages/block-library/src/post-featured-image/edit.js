@@ -33,6 +33,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import DimensionControls from './dimension-controls';
+import Overlay from './overlay';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -170,7 +171,14 @@ function PostFeaturedImageDisplay( {
 		return (
 			<>
 				{ controls }
-				<div { ...blockProps }>{ placeholder() }</div>
+				<div { ...blockProps }>
+					{ placeholder() }
+					<Overlay
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						clientId={ clientId }
+					/>
+				</div>
 			</>
 		);
 	}
@@ -247,7 +255,14 @@ function PostFeaturedImageDisplay( {
 					</MediaReplaceFlow>
 				</BlockControls>
 			) }
-			<figure { ...blockProps }>{ image }</figure>
+			<figure { ...blockProps }>
+				{ image }
+				<Overlay
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					clientId={ clientId }
+				/>
+			</figure>
 		</>
 	);
 }
@@ -266,6 +281,11 @@ export default function PostFeaturedImageEdit( props ) {
 					) }
 					withIllustration={ true }
 					style={ borderProps.style }
+				/>
+				<Overlay
+					attributes={ props.attributes }
+					setAttributes={ props.setAttributes }
+					clientId={ props.clientId }
 				/>
 			</div>
 		);
