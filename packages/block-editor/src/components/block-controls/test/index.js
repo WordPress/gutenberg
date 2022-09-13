@@ -1,11 +1,17 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
  */
+import {
+	registerBlockType,
+	unregisterBlockType,
+	getBlockTypes,
+} from '@wordpress/blocks';
+import { SlotFillProvider } from '@wordpress/components';
 import { alignCenter, alignLeft, alignRight } from '@wordpress/icons';
 
 /**
@@ -33,15 +39,49 @@ describe( 'BlockControls', () => {
 		},
 	];
 
-	it( 'should render a dynamic toolbar of controls', () => {
-		const wrapper = shallow(
-			<BlockEdit isSelected>
-				<BlockControls controls={ controls }>
-					<p>Child</p>
-				</BlockControls>
-			</BlockEdit>
-		);
+	beforeEach( () => {
+		const edit = ( { children } ) => <>{ children }</>;
 
-		expect( wrapper ).toMatchSnapshot();
+		registerBlockType( 'core/test-block', {
+			save: () => {},
+			category: 'text',
+			title: 'block title',
+			edit,
+		} );
+
+		render(
+			<SlotFillProvider>
+				<BlockEdit name="core/test-block" isSelected>
+					<BlockControls controls={ controls }>
+						<p>Child</p>
+					</BlockControls>
+				</BlockEdit>
+				<BlockControls.Slot />
+			</SlotFillProvider>
+		);
+	} );
+
+	afterEach( () => {
+		getBlockTypes().forEach( ( block ) => {
+			unregisterBlockType( block.name );
+		} );
+	} );
+
+	it( 'should render a dynamic toolbar of controls', () => {
+		expect(
+			screen.getAllByRole( 'button', { name: /^Align [\w]+/ } )
+		).toHaveLength( controls.length );
+
+		controls.forEach( ( { title, align } ) => {
+			const control = screen.getByRole( 'button', {
+				name: title,
+			} );
+			expect( control ).toBeVisible();
+			expect( control ).toHaveAttribute( 'align', align );
+		} );
+	} );
+
+	it( 'should render its children', () => {
+		expect( screen.getByText( 'Child' ) ).toBeVisible();
 	} );
 } );
