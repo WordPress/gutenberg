@@ -46,7 +46,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 			 */
 			$theme_json      = apply_filters( 'global_styles_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
 			$theme_json_data = $theme_json->get_data();
-			static::$theme = new WP_Theme_JSON_Gutenberg( $theme_json_data );
+			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 
 			if ( wp_get_theme()->parent() ) {
 				// Get parent theme.json.
