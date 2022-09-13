@@ -216,7 +216,7 @@ function InserterMenu(
 	let inserterWidth = 'auto';
 	if ( ! isMobile && showPatternPanel ) {
 		inserterWidth = 300;
-	} else {
+	} else if ( ! isMobile ) {
 		inserterWidth = 350;
 	}
 
