@@ -28,11 +28,10 @@
 			}
 		},
 		"spacing": {
-			"blockGap": [
-				{ "__experimentalDefault": "2em" },
-				"horizontal",
-				"vertical"
-			],
+			"blockGap": {
+				"__experimentalDefault": "2em",
+				"sides": [ "horizontal", "vertical" ]
+			},
 			"margin": [ "top", "bottom" ],
 			"padding": true,
 			"__experimentalDefaultControls": {
