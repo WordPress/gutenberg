@@ -45,8 +45,8 @@ function gutenberg_add_global_styles_for_blocks() {
 				)
 			);
 			if ( isset( $result[0] ) ) {
-				if ( str_starts_with( $metadata['name'], 'core/' ) ) {
-					$block_name = str_replace( 'core/', '', $result[0] );
+				if ( str_starts_with( $result[0], 'core/' ) ) {
+					$block_name        = str_replace( 'core/', '', $result[0] );
 					$stylesheet_handle = 'wp-block-' . $block_name;
 				}
 				wp_add_inline_style( $stylesheet_handle, $block_css );
