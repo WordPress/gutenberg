@@ -242,6 +242,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__patterns-category-panel {
 	background: $gray-100;
 	border-left: $border-width solid $gray-200;
+	border-right: $border-width solid $gray-200;
 	position: absolute;
 	padding: $grid-unit-40;
 	top: 0;
