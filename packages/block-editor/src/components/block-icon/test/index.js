@@ -32,6 +32,14 @@ describe( 'BlockIcon', () => {
 		expect( container.firstChild ).toHaveClass( 'has-colors' );
 	} );
 
+	it( 'supports adding a className to the wrapper', () => {
+		const { container } = render(
+			<BlockIcon icon={ image } className="foo-bar" />
+		);
+
+		expect( container.firstChild ).toHaveClass( 'foo-bar' );
+	} );
+
 	it( 'skips adding background and foreground styles when colors are not enabled', () => {
 		const { container } = render(
 			<BlockIcon
