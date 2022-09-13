@@ -356,6 +356,7 @@ export function ImageEdit( {
 		<figure
 			{ ...blockProps }
 			style={ {
+				...blockProps.style,
 				...marginStyles,
 			} }
 		>

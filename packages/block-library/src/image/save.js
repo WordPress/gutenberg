@@ -92,12 +92,9 @@ export default function save( { attributes } ) {
 			) }
 		</>
 	);
-
+	const { style, ...props } = useBlockProps.save( { className: classes } );
 	return (
-		<figure
-			{ ...useBlockProps.save( { className: classes } ) }
-			style={ marginStyles }
-		>
+		<figure { ...props } style={ { ...style, ...marginStyles } }>
 			{ figure }
 		</figure>
 	);
