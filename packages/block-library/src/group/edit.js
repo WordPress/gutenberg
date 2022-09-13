@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import {
 	InnerBlocks,
 	useBlockProps,
@@ -69,16 +68,6 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			__experimentalLayout: layoutSupportEnabled ? usedLayout : undefined,
 		}
 	);
-
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
-	const { type: layoutType = null } = layout;
-	useEffect( () => {
-		if ( layoutType ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { layout: { ...layout, type: layoutType } } );
-		}
-	}, [ layoutType ] );
 
 	return (
 		<>
