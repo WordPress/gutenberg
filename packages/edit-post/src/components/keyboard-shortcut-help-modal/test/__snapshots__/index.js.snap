@@ -25,7 +25,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
         </h1>
       </div>
       <button
-        aria-label="Close dialog"
+        aria-label="Close"
         class="components-button has-icon"
         type="button"
       >
