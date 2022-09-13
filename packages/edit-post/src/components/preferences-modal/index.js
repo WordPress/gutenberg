@@ -48,22 +48,40 @@ export default function EditPostPreferencesModal() {
 		( select ) => select( editPostStore ).isModalActive( MODAL_NAME ),
 		[]
 	);
-	const showBlockBreadcrumbsOption = useSelect(
+	const [ showBlockBreadcrumbsOption, isDistractionFree ] = useSelect(
 		( select ) => {
 			const { getEditorSettings } = select( editorStore );
 			const { getEditorMode, isFeatureActive } = select( editPostStore );
 			const mode = getEditorMode();
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
-			const isDistractionFree = isFeatureActive( 'distractionFree' );
-			return (
-				! isDistractionFree &&
-				isLargeViewport &&
-				isRichEditingEnabled &&
-				mode === 'visual'
-			);
+			const isDistractionFreeEnabled =
+				isFeatureActive( 'distractionFree' );
+			return [
+				! isDistractionFreeEnabled &&
+					isLargeViewport &&
+					isRichEditingEnabled &&
+					mode === 'visual',
+				isDistractionFreeEnabled,
+			];
 		},
 		[ isLargeViewport ]
 	);
+
+	const {
+		closeGeneralSidebar,
+		setIsListViewOpened,
+		setIsInserterOpened,
+		setFeature,
+	} = useDispatch( editPostStore );
+
+	const toggleDistractionFree = () => {
+		setFeature( 'inlineToolbar', ! isDistractionFree );
+		setFeature( 'fixedToolbar', false );
+		setIsInserterOpened( false );
+		setIsListViewOpened( false );
+		closeGeneralSidebar();
+	};
+
 	const sections = useMemo(
 		() => [
 			{
@@ -97,6 +115,7 @@ export default function EditPostPreferencesModal() {
 						>
 							<EnableFeature
 								featureName="distractionFree"
+								onToggle={ toggleDistractionFree }
 								help={ __(
 									'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
 								) }

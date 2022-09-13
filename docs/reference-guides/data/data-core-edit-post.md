@@ -440,6 +440,15 @@ _Parameters_
 
 -   _metaBoxesPerLocation_ `Object`: Meta boxes per location.
 
+### setFeature
+
+Triggers an action used to set a feature flag to a desired state.
+
+_Parameters_
+
+-   _feature_ `string`: Feature name.
+-   _value_ `boolean`: Feature value
+
 ### setIsEditingTemplate
 
 Returns an action object used to switch to template editing.

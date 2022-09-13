@@ -19,6 +19,11 @@ import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
 	const { getBlockSelectionStart } = useSelect( blockEditorStore );
+	const isDistractionFree = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().isDistractionFree,
+		[]
+	);
 	const {
 		getEditorMode,
 		isEditorSidebarOpened,
@@ -39,8 +44,18 @@ function KeyboardShortcuts() {
 		closeGeneralSidebar,
 		toggleFeature,
 		setIsListViewOpened,
+		setIsInserterOpened,
+		setFeature,
 	} = useDispatch( editPostStore );
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
+
+	const toggleDistractionFree = () => {
+		setFeature( 'inlineToolbar', ! isDistractionFree );
+		setFeature( 'fixedToolbar', false );
+		setIsInserterOpened( false );
+		setIsListViewOpened( false );
+		closeGeneralSidebar();
+	};
 
 	useEffect( () => {
 		registerShortcut( {
@@ -155,6 +170,7 @@ function KeyboardShortcuts() {
 	useShortcut( 'core/edit-post/toggle-distraction-free', () => {
 		closeGeneralSidebar();
 		setIsListViewOpened( false );
+		toggleDistractionFree();
 		toggleFeature( 'distractionFree' );
 		const modeState = isFeatureActive( 'distractionFree' )
 			? __( 'on' )

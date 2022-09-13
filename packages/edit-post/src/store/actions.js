@@ -195,6 +195,19 @@ export const toggleFeature =
 			.toggle( 'core/edit-post', feature );
 
 /**
+ * Triggers an action used to set a feature flag to a desired state.
+ *
+ * @param {string}  feature Feature name.
+ * @param {boolean} value   Feature value
+ */
+export const setFeature =
+	( feature, value ) =>
+	( { registry } ) =>
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', feature, value );
+
+/**
  * Triggers an action used to switch editor mode.
  *
  * @param {string} mode The editor mode.

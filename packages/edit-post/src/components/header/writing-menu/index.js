@@ -21,10 +21,16 @@ function WritingMenu( { onClose } ) {
 		[]
 	);
 
-	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
-		useDispatch( postEditorStore );
+	const {
+		setIsInserterOpened,
+		setIsListViewOpened,
+		closeGeneralSidebar,
+		setFeature,
+	} = useDispatch( postEditorStore );
 
 	const toggleDistractionFree = () => {
+		setFeature( 'inlineToolbar', ! isDistractionFree );
+		setFeature( 'fixedToolbar', false );
 		setIsInserterOpened( false );
 		setIsListViewOpened( false );
 		closeGeneralSidebar();
@@ -51,7 +57,6 @@ function WritingMenu( { onClose } ) {
 			/>
 			<PreferenceToggleMenuItem
 				scope="core/edit-post"
-				disabled={ isDistractionFree }
 				name="focusMode"
 				label={ __( 'Spotlight mode' ) }
 				info={ __( 'Focus on one block at a time' ) }
@@ -61,7 +66,6 @@ function WritingMenu( { onClose } ) {
 			<PreferenceToggleMenuItem
 				scope="core/edit-post"
 				name="fullscreenMode"
-				disabled={ isDistractionFree }
 				label={ __( 'Fullscreen mode' ) }
 				info={ __( 'Show and hide admin UI' ) }
 				messageActivated={ __( 'Fullscreen mode activated' ) }
