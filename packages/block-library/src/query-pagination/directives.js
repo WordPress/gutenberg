@@ -1,39 +1,39 @@
 /**
  * External dependencies
  */
-import { options } from 'preact';
+import { h, options } from 'preact';
 
 // WordPress Directives.
 const directives = {};
 
-// Make them extensible.
+// Expose function to add directives.
 export const directive = ( name, cb ) => {
 	directives[ name ] = cb;
 };
 
-// Preact Option Hooks. See https://preactjs.com/guide/v10/options/
-const hooks = [
-	[ 'vnode', 'onCreate', 'vnode' ],
-	[ '__b', 'onDiff', 'diff' ],
-	[ 'diffed', 'onDiffed', 'diffed' ],
-	[ 'unmount', 'onUnmount', 'unmount' ],
-	[ '__r', 'onRender', 'render' ],
-	[ '__h', 'onHook', 'hook' ],
-	[ '__e', 'onCatchError', 'catchError' ],
-	[ '__c', 'onCommit', 'commit' ],
-];
+const WpDirective = ( props ) => {
+	for ( const d in props.wp ) {
+		directives[ d ]?.( props );
+	}
+	props._wrapped = true;
+	const { wp, tag, children, ...rest } = props;
+	return h( tag, rest, children );
+};
 
-// Run the directive callbacks.
-hooks.forEach( ( [ key, hook ] ) => {
-	const old = options[ key ];
-	options[ key ] = ( vnode ) => {
-		const wp = vnode.props.wp;
-		if ( wp ) {
-			for ( const d in wp ) {
-				// For each directive, run the callback.
-				directives[ d ]?.[ hook ]?.( vnode );
-			}
+const old = options.vnode;
+
+options.vnode = ( vnode ) => {
+	const wp = vnode.props.wp;
+	const wrapped = vnode.props._wrapped;
+
+	if ( wp ) {
+		if ( ! wrapped ) {
+			vnode.props.tag = vnode.type;
+			vnode.type = WpDirective;
 		}
-		if ( old ) old( vnode );
-	};
-} );
+	} else if ( wrapped ) {
+		delete vnode.props._wrapped;
+	}
+
+	if ( old ) old( vnode );
+};
