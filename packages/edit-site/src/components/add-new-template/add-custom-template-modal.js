@@ -21,6 +21,7 @@ import { useEntityRecords } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import CreatingTemplateOverlay from './creating-template-overlay';
 import { mapToIHasNameAndId } from './utils';
 
 const EMPTY_ARRAY = [];
@@ -160,7 +161,12 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 	);
 }
 
-function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
+function AddCustomTemplateModal( {
+	onClose,
+	onSelect,
+	entityForSuggestions,
+	isCreatingTemplate,
+} ) {
 	const [ showSearchEntities, setShowSearchEntities ] = useState(
 		entityForSuggestions.hasGeneralTemplate
 	);
@@ -176,8 +182,9 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
 		>
+			{ isCreatingTemplate && <CreatingTemplateOverlay /> }
 			{ ! showSearchEntities && (
-				<>
+				<div>
 					<p>
 						{ __(
 							'Select whether to create a single template for all items or a specific one.'
@@ -234,10 +241,10 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 							</Text>
 						</FlexItem>
 					</Flex>
-				</>
+				</div>
 			) }
 			{ showSearchEntities && (
-				<>
+				<div>
 					<p>
 						{ __(
 							'This template will be used only for the specific item chosen.'
@@ -247,7 +254,7 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 						entityForSuggestions={ entityForSuggestions }
 						onSelect={ onSelect }
 					/>
-				</>
+				</div>
 			) }
 		</Modal>
 	);

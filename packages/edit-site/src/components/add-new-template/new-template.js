@@ -9,7 +9,7 @@ import {
 	MenuItem,
 	NavigableMenu,
 } from '@wordpress/components';
-import { useState, useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -44,6 +44,7 @@ import {
 	usePostTypeArchiveMenuItems,
 } from './utils';
 import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
+import CreatingTemplateOverlay from './creating-template-overlay';
 import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
 
@@ -86,24 +87,19 @@ export default function NewTemplate( { postType } ) {
 		setShowCustomGenericTemplateModal,
 	] = useState( false );
 	const [ entityForSuggestions, setEntityForSuggestions ] = useState( {} );
-	const isCreatingTemplate = useRef();
+	const [ isCreatingTemplate, setIsCreatingTemplate ] = useState( false );
 
 	const history = useHistory();
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const { createErrorNotice, createSuccessNotice, createInfoNotice } =
+	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const { setTemplate } = useDispatch( editSiteStore );
 
 	async function createTemplate( template, isWPSuggestion = true ) {
-		if ( isCreatingTemplate.current ) {
+		if ( isCreatingTemplate ) {
 			return;
 		}
-		isCreatingTemplate.current = true;
-		createInfoNotice(
-			// translators: displayed right after clicking the menu item to create a new template in site editor.
-			__( 'Template creation in process.' ),
-			{ type: 'snackbar' }
-		);
+		setIsCreatingTemplate( true );
 		try {
 			const { title, description, slug, templatePrefix } = template;
 			let templateContent = template.content;
@@ -162,7 +158,7 @@ export default function NewTemplate( { postType } ) {
 				type: 'snackbar',
 			} );
 		} finally {
-			isCreatingTemplate.current = false;
+			setIsCreatingTemplate( false );
 		}
 	}
 
@@ -188,53 +184,58 @@ export default function NewTemplate( { postType } ) {
 				} }
 			>
 				{ () => (
-					<NavigableMenu className="edit-site-new-template-dropdown__popover">
-						<MenuGroup label={ postType.labels.add_new_item }>
-							{ missingTemplates.map( ( template ) => {
-								const {
-									title,
-									description,
-									slug,
-									onClick,
-									icon,
-								} = template;
-								return (
-									<MenuItem
-										icon={
-											icon ||
-											TEMPLATE_ICONS[ slug ] ||
-											post
-										}
-										iconPosition="left"
-										info={ description }
-										key={ slug }
-										onClick={ () =>
-											onClick
-												? onClick( template )
-												: createTemplate( template )
-										}
-									>
-										{ title }
-									</MenuItem>
-								);
-							} ) }
-						</MenuGroup>
-						<MenuGroup>
-							<MenuItem
-								icon={ customGenericTemplateIcon }
-								iconPosition="left"
-								info={ __(
-									'Custom templates can be applied to any post or page.'
-								) }
-								key="custom-template"
-								onClick={ () =>
-									setShowCustomGenericTemplateModal( true )
-								}
-							>
-								{ __( 'Custom template' ) }
-							</MenuItem>
-						</MenuGroup>
-					</NavigableMenu>
+					<>
+						{ isCreatingTemplate && <CreatingTemplateOverlay /> }
+						<NavigableMenu className="edit-site-new-template-dropdown__popover">
+							<MenuGroup label={ postType.labels.add_new_item }>
+								{ missingTemplates.map( ( template ) => {
+									const {
+										title,
+										description,
+										slug,
+										onClick,
+										icon,
+									} = template;
+									return (
+										<MenuItem
+											icon={
+												icon ||
+												TEMPLATE_ICONS[ slug ] ||
+												post
+											}
+											iconPosition="left"
+											info={ description }
+											key={ slug }
+											onClick={ () =>
+												onClick
+													? onClick( template )
+													: createTemplate( template )
+											}
+										>
+											{ title }
+										</MenuItem>
+									);
+								} ) }
+							</MenuGroup>
+							<MenuGroup>
+								<MenuItem
+									icon={ customGenericTemplateIcon }
+									iconPosition="left"
+									info={ __(
+										'Custom templates can be applied to any post or page.'
+									) }
+									key="custom-template"
+									onClick={ () =>
+										setShowCustomGenericTemplateModal(
+											true
+										)
+									}
+								>
+									{ __( 'Custom template' ) }
+								</MenuItem>
+							</MenuGroup>
+						</NavigableMenu>
+					</>
 				) }
 			</DropdownMenu>
 			{ showCustomTemplateModal && (
@@ -242,12 +243,14 @@ export default function NewTemplate( { postType } ) {
 					onClose={ () => setShowCustomTemplateModal( false ) }
 					onSelect={ createTemplate }
 					entityForSuggestions={ entityForSuggestions }
+					isCreatingTemplate={ isCreatingTemplate }
 				/>
 			) }
 			{ showCustomGenericTemplateModal && (
 				<AddCustomGenericTemplateModal
 					onClose={ () => setShowCustomGenericTemplateModal( false ) }
 					createTemplate={ createTemplate }
+					isCreatingTemplate={ isCreatingTemplate }
 				/>
 			) }
 		</>
