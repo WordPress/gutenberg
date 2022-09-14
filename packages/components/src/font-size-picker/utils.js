@@ -54,6 +54,18 @@ export function splitValueAndUnitFromSize( size ) {
 	return [];
 }
 
+export function getCommonSizeUnit( fontSizes ) {
+	if ( ! fontSizes.length ) {
+		return null;
+	}
+	const [ , firstUnit ] = splitValueAndUnitFromSize( fontSizes[ 0 ].size );
+	const areAllSameUnit = fontSizes.every( ( fontSize ) => {
+		const [ , unit ] = splitValueAndUnitFromSize( fontSize.size );
+		return unit === firstUnit;
+	} );
+	return areAllSameUnit ? firstUnit : null;
+}
+
 /**
  * Some themes use css vars for their font sizes, so until we
  * have the way of calculating them don't display them.
@@ -94,12 +106,16 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 		...optionsArray,
 		...( disableCustomFontSizes ? [] : [ CUSTOM_FONT_SIZE_OPTION ] ),
 	];
+	const commonUnit = getCommonSizeUnit( optionsArray );
 	return options.map( ( { slug, name, size } ) => ( {
 		key: slug,
 		name: name || capitalCase( slug ),
 		size,
 		__experimentalHint:
-			size && isSimpleCssValue( size ) && parseFloat( size ),
+			size &&
+			( commonUnit
+				? isSimpleCssValue( size ) && parseFloat( size )
+				: size ),
 	} ) );
 }
 

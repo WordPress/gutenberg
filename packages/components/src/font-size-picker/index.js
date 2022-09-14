@@ -28,7 +28,7 @@ import {
 import {
 	getFontSizeOptions,
 	getSelectedOption,
-	splitValueAndUnitFromSize,
+	getCommonSizeUnit,
 	isSimpleCssValue,
 	CUSTOM_FONT_SIZE,
 } from './utils';
@@ -80,9 +80,6 @@ function FontSizePicker(
 	 * The main font size UI displays a toggle group when the presets are less
 	 * than six and a select control when they are more.
 	 */
-	const fontSizesContainComplexValues = fontSizes.some(
-		( { size: sizeArg } ) => ! isSimpleCssValue( sizeArg )
-	);
 	const shouldUseSelectControl = fontSizes.length > 5;
 	const options = useMemo(
 		() =>
@@ -108,23 +105,13 @@ function FontSizePicker(
 		if ( isCustomValue ) {
 			return isSimpleCssValue( value ) && `(${ value })`;
 		}
+
 		if ( shouldUseSelectControl ) {
-			return (
-				isSimpleCssValue( selectedOption?.size ) &&
-				`(${ selectedOption?.size })`
-			);
+			const commonUnit = getCommonSizeUnit( fontSizes );
+			return commonUnit && `(${ commonUnit })`;
 		}
 
-		// Calculate the `hint` for toggle group control.
-		let hint = selectedOption.name;
-		if (
-			! fontSizesContainComplexValues &&
-			typeof selectedOption.size === 'string'
-		) {
-			const [ , unit ] = splitValueAndUnitFromSize( selectedOption.size );
-			hint += `(${ unit })`;
-		}
-		return hint;
+		return selectedOption.name;
 	}, [
 		showCustomValueControl,
 		selectedOption?.name,
@@ -132,7 +119,7 @@ function FontSizePicker(
 		value,
 		isCustomValue,
 		shouldUseSelectControl,
-		fontSizesContainComplexValues,
+		fontSizes,
 	] );
 
 	if ( ! options ) {
@@ -210,6 +197,7 @@ function FontSizePicker(
 									}
 								} }
 								size={ size }
+								showSelectedHint
 							/>
 						) }
 					{ ! shouldUseSelectControl && ! showCustomValueControl && (
