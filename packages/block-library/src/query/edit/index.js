@@ -56,7 +56,9 @@ export function QueryContent( {
 		return { themeSupportsLayout: getSettings()?.supportsLayout };
 	}, [] );
 	const defaultLayout = useSetting( 'layout' ) || {};
-	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const usedLayout = ! layout?.type
+		? { ...defaultLayout, ...layout, type: 'default' }
+		: { ...defaultLayout, ...layout };
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
