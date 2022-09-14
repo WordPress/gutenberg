@@ -123,7 +123,16 @@
 }
 
 .block-editor-block-list__layout .block-editor-block-list__block {
-	position: relative;
+	// Due to changes in how Safari 16 renders text selection, it has
+	// become sensitive to `position: relative;`. If it is set initially
+	// it will cause the selection to render incorrectly. It cannot be
+	// `unset` only when selected, it has to start out unset.
+	&.is-selected,
+	&.has-block-overlay,
+	&.is-multi-selected,
+	&.is-highlighted {
+		position: relative;
+	}
 
 	// Re-enable text-selection on editable blocks.
 	user-select: text;
