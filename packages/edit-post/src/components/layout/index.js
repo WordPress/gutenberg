@@ -31,7 +31,7 @@ import {
 	InterfaceSkeleton,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { Suspense, useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -239,7 +239,7 @@ function Layout( { styles } ) {
 				}
 				notices={ <EditorSnackbars /> }
 				content={
-					<Suspense fallback={ <LoadingScreen /> }>
+					<LoadingScreen>
 						<EditorNotices />
 						{ ( mode === 'text' || ! isRichEditingEnabled ) && (
 							<TextEditor />
@@ -257,7 +257,7 @@ function Layout( { styles } ) {
 							<ScrollLock />
 						) }
 						<BlockStyles.Slot scope="core/block-inspector" />
-					</Suspense>
+					</LoadingScreen>
 				}
 				footer={
 					! hasReducedUI &&

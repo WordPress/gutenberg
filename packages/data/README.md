@@ -508,6 +508,10 @@ _Returns_
 
 -   `Object`: Object containing the action creators.
 
+### LoadingScreenContext
+
+Undocumented declaration.
+
 ### plugins
 
 Object of available plugins to use with a registry.

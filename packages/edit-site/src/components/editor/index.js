@@ -1,13 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	Suspense,
-	useEffect,
-	useState,
-	useMemo,
-	useCallback,
-} from '@wordpress/element';
+import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Popover, Button, Notice } from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
@@ -265,11 +259,7 @@ function Editor( { onError } ) {
 											}
 											notices={ <EditorSnackbars /> }
 											content={
-												<Suspense
-													fallback={
-														<LoadingScreen />
-													}
-												>
+												<LoadingScreen>
 													<EditorNotices />
 													<BlockStyles.Slot scope="core/block-inspector" />
 													{ editorMode === 'visual' &&
@@ -304,7 +294,7 @@ function Editor( { onError } ) {
 															openEntitiesSavedStates
 														}
 													/>
-												</Suspense>
+												</LoadingScreen>
 											}
 											actions={
 												<>

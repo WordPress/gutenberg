@@ -22,6 +22,7 @@ export {
 export {
 	default as useSelect,
 	useSuspenseSelect,
+	LoadingScreenContext,
 } from './components/use-select';
 export { useDispatch } from './components/use-dispatch';
 export { AsyncModeProvider } from './components/async-mode-provider';

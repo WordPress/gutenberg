@@ -8,14 +8,18 @@ import { useMemoOne } from 'use-memo-one';
  */
 import { createQueue } from '@wordpress/priority-queue';
 import {
+	createContext,
 	useRef,
 	useCallback,
+	useContext,
 	useMemo,
 	useReducer,
 	useDebugValue,
 } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { useIsomorphicLayoutEffect } from '@wordpress/compose';
+
+export const LoadingScreenContext = createContext( false );
 
 /**
  * Internal dependencies
@@ -277,6 +281,8 @@ export default function useSelect( mapSelect, deps ) {
 export function useSuspenseSelect( mapSelect, deps ) {
 	const _mapSelect = useCallback( mapSelect, deps );
 
+	const loaded = useContext( LoadingScreenContext );
+
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
 
@@ -292,7 +298,11 @@ export function useSuspenseSelect( mapSelect, deps ) {
 	const wrapSelect = useCallback(
 		( callback ) =>
 			registry.__unstableMarkListeningStores(
-				() => callback( registry.suspendSelect, registry ),
+				() =>
+					callback(
+						loaded ? registry.select : registry.suspendSelect,
+						registry
+					),
 				listeningStores
 			),
 		[ registry ]
