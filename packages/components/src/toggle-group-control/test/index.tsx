@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render, fireEvent, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -125,5 +126,131 @@ describe( 'ToggleGroupControl', () => {
 		expect(
 			screen.queryByText( 'Click for Sumptuous Caponata' )
 		).not.toBeInTheDocument();
+	} );
+
+	describe( 'isDeselectable', () => {
+		describe( 'isDeselectable = false', () => {
+			it( 'should not be deselectable', async () => {
+				const mockOnChange = jest.fn();
+				const user = userEvent.setup( {
+					advanceTimers: jest.advanceTimersByTime,
+				} );
+
+				render(
+					<ToggleGroupControl
+						value="rigas"
+						label="Test"
+						onChange={ mockOnChange }
+					>
+						{ options }
+					</ToggleGroupControl>
+				);
+
+				const rigas = screen.getByRole( 'radio', {
+					name: 'R',
+					checked: true,
+				} );
+				await user.click( rigas );
+				expect( mockOnChange ).toHaveBeenCalledTimes( 0 );
+			} );
+
+			it( 'should not tab to next radio option', async () => {
+				const user = userEvent.setup( {
+					advanceTimers: jest.advanceTimersByTime,
+				} );
+
+				render(
+					<ToggleGroupControl value="rigas" label="Test">
+						{ options }
+					</ToggleGroupControl>
+				);
+
+				const rigas = screen.getByRole( 'radio', {
+					name: 'R',
+				} );
+
+				await user.tab();
+				expect( rigas ).toHaveFocus();
+
+				await user.tab();
+				expect( rigas.ownerDocument.body ).toHaveFocus();
+			} );
+		} );
+
+		describe( 'isDeselectable = true', () => {
+			it( 'should  be deselectable', async () => {
+				const mockOnChange = jest.fn();
+				const user = userEvent.setup( {
+					advanceTimers: jest.advanceTimersByTime,
+				} );
+
+				render(
+					<ToggleGroupControl
+						value="rigas"
+						label="Test"
+						onChange={ mockOnChange }
+						isDeselectable
+					>
+						{ options }
+					</ToggleGroupControl>
+				);
+
+				await user.click(
+					await screen.findByRole( 'button', {
+						name: 'R',
+						pressed: true,
+					} )
+				);
+				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+				expect( mockOnChange ).toHaveBeenCalledWith( undefined );
+				expect(
+					screen.getByRole( 'button', {
+						name: 'R',
+						pressed: false,
+					} )
+				).toBeInTheDocument();
+			} );
+
+			it( 'should tab to the next option button', async () => {
+				const user = userEvent.setup( {
+					advanceTimers: jest.advanceTimersByTime,
+				} );
+
+				render(
+					<ToggleGroupControl
+						isDeselectable
+						value="rigas"
+						label="Test"
+					>
+						{ options }
+					</ToggleGroupControl>
+				);
+
+				await user.tab();
+				expect(
+					screen.getByRole( 'button', {
+						name: 'R',
+						pressed: true,
+					} )
+				).toHaveFocus();
+
+				await user.tab();
+				expect(
+					screen.getByRole( 'button', {
+						name: 'J',
+						pressed: false,
+					} )
+				).toHaveFocus();
+
+				// Focus should not move with arrow keys
+				await user.keyboard( '{ArrowLeft}' );
+				expect(
+					screen.getByRole( 'button', {
+						name: 'J',
+						pressed: false,
+					} )
+				).toHaveFocus();
+			} );
+		} );
 	} );
 } );

@@ -97,6 +97,7 @@ function ToggleGroupControlOptionBase(
 				{ isDeselectable ? (
 					<button
 						{ ...otherButtonProps }
+						aria-pressed={ isPressed }
 						type="button"
 						className={ classes }
 						data-value={ value }
