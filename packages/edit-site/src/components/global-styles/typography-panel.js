@@ -271,14 +271,16 @@ export default function TypographyPanel( { name, element } ) {
 					/>
 				) }
 				{ hasTextTransformControl && (
-					<TextTransformControl
-						value={ textTransform }
-						onChange={ setTextTransform }
-						showNone
-						isBlock
-						size="__unstable-large"
-						__nextHasNoMarginBottom
-					/>
+					<div className="edit-site-typography-panel__full-width-control">
+						<TextTransformControl
+							value={ textTransform }
+							onChange={ setTextTransform }
+							showNone
+							isBlock
+							size="__unstable-large"
+							__nextHasNoMarginBottom
+						/>
+					</div>
 				) }
 			</Grid>
 		</PanelBody>
