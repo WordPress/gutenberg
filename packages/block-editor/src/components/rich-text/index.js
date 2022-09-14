@@ -185,9 +185,12 @@ function RichTextWrapper(
 	const onSelectionChange = useCallback(
 		( start, end ) => {
 			const selection = {};
-			const unset = start === undefined && end === undefined;
+			// Rich text passes undefined for start and end on focus.
+			const isFocus = start === undefined && end === undefined;
 
-			if ( typeof start === 'number' || unset ) {
+			// We only want to pass selection offsets when it's a number or
+			// undefined on focus.
+			if ( typeof start === 'number' || isFocus ) {
 				selection.start = {
 					clientId,
 					attributeKey: identifier,
@@ -195,7 +198,7 @@ function RichTextWrapper(
 				};
 			}
 
-			if ( typeof end === 'number' || unset ) {
+			if ( typeof end === 'number' || isFocus ) {
 				selection.end = {
 					clientId,
 					attributeKey: identifier,
