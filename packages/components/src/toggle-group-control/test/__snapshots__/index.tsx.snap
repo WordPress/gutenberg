@@ -198,7 +198,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
       class="components-toggle-group-control emotion-8 emotion-9"
       data-wp-c16t="true"
       data-wp-component="ToggleGroupControl"
-      id="toggle-group-control-1"
+      id="toggle-group-control-as-radio-1"
       role="radiogroup"
     >
       <div
@@ -212,7 +212,6 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
       />
       <div
         class="emotion-12 emotion-13"
-        data-active="true"
       >
         <button
           aria-checked="true"
@@ -221,7 +220,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
           data-value="uppercase"
           data-wp-c16t="true"
           data-wp-component="ToggleGroupControlOptionBase"
-          id="toggle-group-control-1-2"
+          id="toggle-group-control-as-radio-1-2"
           role="radio"
           tabindex="0"
         >
@@ -245,7 +244,6 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
       </div>
       <div
         class="emotion-12 emotion-13"
-        data-active="false"
       >
         <button
           aria-checked="false"
@@ -254,7 +252,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
           data-value="lowercase"
           data-wp-c16t="true"
           data-wp-component="ToggleGroupControlOptionBase"
-          id="toggle-group-control-1-3"
+          id="toggle-group-control-as-radio-1-3"
           role="radio"
           tabindex="-1"
         >
@@ -445,7 +443,7 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
       class="components-toggle-group-control emotion-8 emotion-9"
       data-wp-c16t="true"
       data-wp-component="ToggleGroupControl"
-      id="toggle-group-control-0"
+      id="toggle-group-control-as-radio-0"
       role="radiogroup"
     >
       <div
@@ -454,7 +452,6 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
       />
       <div
         class="emotion-10 emotion-11"
-        data-active="false"
       >
         <button
           aria-checked="false"
@@ -463,7 +460,7 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
           data-value="rigas"
           data-wp-c16t="true"
           data-wp-component="ToggleGroupControlOptionBase"
-          id="toggle-group-control-0-0"
+          id="toggle-group-control-as-radio-0-0"
           role="radio"
           tabindex="0"
         >
@@ -476,7 +473,6 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
       </div>
       <div
         class="emotion-10 emotion-11"
-        data-active="false"
       >
         <button
           aria-checked="false"
@@ -485,7 +481,7 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
           data-value="jack"
           data-wp-c16t="true"
           data-wp-component="ToggleGroupControlOptionBase"
-          id="toggle-group-control-0-1"
+          id="toggle-group-control-as-radio-0-1"
           role="radio"
           tabindex="-1"
         >
