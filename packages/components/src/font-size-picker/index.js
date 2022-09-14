@@ -97,7 +97,7 @@ function FontSizePicker(
 	);
 	const headerHint = useMemo( () => {
 		if ( showCustomValueControl ) {
-			return `(${ __( 'Custom' ) })`;
+			return __( 'Custom' );
 		}
 
 		// If we have a custom value that is not available in the font sizes,
