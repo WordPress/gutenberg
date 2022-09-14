@@ -195,7 +195,7 @@ const UnforwardedPopover = (
 	} = props;
 
 	if ( range ) {
-		deprecated( 'range prop in Popover component', {
+		deprecated( '`range` prop in wp.components.Popover', {
 			since: '6.1',
 			version: '6.3',
 		} );
@@ -204,7 +204,7 @@ const UnforwardedPopover = (
 	let computedFlipProp = flip;
 	let computedResizeProp = resize;
 	if ( __unstableForcePosition !== undefined ) {
-		deprecated( '__unstableForcePosition prop in Popover component', {
+		deprecated( '`__unstableForcePosition` prop wp.components.Popover', {
 			since: '6.1',
 			version: '6.3',
 			alternative: '`flip={ false }` and  `resize={ false }`',
@@ -218,7 +218,7 @@ const UnforwardedPopover = (
 
 	let shouldShift = shift;
 	if ( __unstableShift !== undefined ) {
-		deprecated( '`__unstableShift` prop in Popover component', {
+		deprecated( '`__unstableShift` prop in wp.components.Popover', {
 			since: '6.1',
 			version: '6.3',
 			alternative: '`shift` prop`',
@@ -229,7 +229,7 @@ const UnforwardedPopover = (
 	}
 
 	if ( anchorRef !== undefined ) {
-		deprecated( '`anchorRef` prop in Popover component', {
+		deprecated( '`anchorRef` prop in wp.components.Popover', {
 			since: '6.1',
 			version: '6.3',
 			alternative: '`anchor` prop',
@@ -237,7 +237,7 @@ const UnforwardedPopover = (
 	}
 
 	if ( anchorRect !== undefined ) {
-		deprecated( '`anchorRect` prop in Popover component', {
+		deprecated( '`anchorRect` prop in wp.components.Popover', {
 			since: '6.1',
 			version: '6.3',
 			alternative: '`anchor` prop',
@@ -245,7 +245,7 @@ const UnforwardedPopover = (
 	}
 
 	if ( getAnchorRect !== undefined ) {
-		deprecated( '`getAnchorRect` prop in Popover component', {
+		deprecated( '`getAnchorRect` prop in wp.components.Popover', {
 			since: '6.1',
 			version: '6.3',
 			alternative: '`anchor` prop',
