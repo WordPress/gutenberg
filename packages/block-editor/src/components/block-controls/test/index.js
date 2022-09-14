@@ -11,7 +11,7 @@ import {
 	unregisterBlockType,
 	getBlockTypes,
 } from '@wordpress/blocks';
-import { SlotFillProvider } from '@wordpress/components';
+import { SlotFillProvider, ToolbarGroup } from '@wordpress/components';
 import { alignCenter, alignLeft, alignRight } from '@wordpress/icons';
 
 /**
@@ -48,7 +48,15 @@ describe( 'BlockControls', () => {
 			title: 'block title',
 			edit,
 		} );
+	} );
 
+	afterEach( () => {
+		getBlockTypes().forEach( ( block ) => {
+			unregisterBlockType( block.name );
+		} );
+	} );
+
+	it( 'should render a dynamic toolbar of controls', () => {
 		render(
 			<SlotFillProvider>
 				<BlockEdit name="core/test-block" isSelected>
@@ -59,15 +67,7 @@ describe( 'BlockControls', () => {
 				<BlockControls.Slot />
 			</SlotFillProvider>
 		);
-	} );
 
-	afterEach( () => {
-		getBlockTypes().forEach( ( block ) => {
-			unregisterBlockType( block.name );
-		} );
-	} );
-
-	it( 'should render a dynamic toolbar of controls', () => {
 		expect(
 			screen.getAllByRole( 'button', { name: /^Align [\w]+/ } )
 		).toHaveLength( controls.length );
@@ -82,6 +82,42 @@ describe( 'BlockControls', () => {
 	} );
 
 	it( 'should render its children', () => {
+		render(
+			<SlotFillProvider>
+				<BlockEdit name="core/test-block" isSelected>
+					<BlockControls controls={ controls }>
+						<p>Child</p>
+					</BlockControls>
+				</BlockEdit>
+				<BlockControls.Slot />
+			</SlotFillProvider>
+		);
+
 		expect( screen.getByText( 'Child' ) ).toBeVisible();
+	} );
+
+	it( 'should a dynamic toolbar when passed as children', () => {
+		render(
+			<SlotFillProvider>
+				<BlockEdit name="core/test-block" isSelected>
+					<BlockControls>
+						<ToolbarGroup controls={ controls } />
+					</BlockControls>
+				</BlockEdit>
+				<BlockControls.Slot />
+			</SlotFillProvider>
+		);
+
+		expect(
+			screen.getAllByRole( 'button', { name: /^Align [\w]+/ } )
+		).toHaveLength( controls.length );
+
+		controls.forEach( ( { title, align } ) => {
+			const control = screen.getByRole( 'button', {
+				name: title,
+			} );
+			expect( control ).toBeVisible();
+			expect( control ).toHaveAttribute( 'align', align );
+		} );
 	} );
 } );
