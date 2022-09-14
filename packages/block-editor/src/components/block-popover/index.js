@@ -47,14 +47,52 @@ function BlockPopover(
 		};
 	}, [ selectedElement, lastSelectedElement, __unstableRefreshSize ] );
 
+	const popoverAnchor = useMemo( () => {
+		if (
+			! selectedElement ||
+			( bottomClientId && ! lastSelectedElement )
+		) {
+			return undefined;
+		}
+
+		return {
+			getBoundingClientRect() {
+				const selectedBCR = selectedElement.getBoundingClientRect();
+				const lastSelectedBCR =
+					lastSelectedElement?.getBoundingClientRect();
+
+				// Get the biggest rectangle that encompasses completely the currently
+				// selected element and the last selected element:
+				// - for top/left coordinates, use the smaller numbers
+				// - for the bottom/right coordinates, use the largest numbers
+				const left = Math.min(
+					selectedBCR.left,
+					lastSelectedBCR?.left ?? Infinity
+				);
+				const top = Math.min(
+					selectedBCR.top,
+					lastSelectedBCR?.top ?? Infinity
+				);
+				const right = Math.max(
+					selectedBCR.right,
+					lastSelectedBCR.right ?? -Infinity
+				);
+				const bottom = Math.max(
+					selectedBCR.bottom,
+					lastSelectedBCR.bottom ?? -Infinity
+				);
+				const width = right - left;
+				const height = bottom - top;
+
+				return new window.DOMRect( left, top, width, height );
+			},
+			ownerDocument: selectedElement.ownerDocument,
+		};
+	}, [ bottomClientId, lastSelectedElement, selectedElement ] );
+
 	if ( ! selectedElement || ( bottomClientId && ! lastSelectedElement ) ) {
 		return null;
 	}
-
-	const anchorRef = {
-		top: selectedElement,
-		bottom: lastSelectedElement,
-	};
 
 	return (
 		<Popover
@@ -62,7 +100,7 @@ function BlockPopover(
 			animate={ false }
 			position="top right left"
 			focusOnMount={ false }
-			anchorRef={ anchorRef }
+			anchor={ popoverAnchor }
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the default popover slot).
 			__unstableSlotName={ __unstablePopoverSlot || null }

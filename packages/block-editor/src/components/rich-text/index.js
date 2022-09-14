@@ -328,7 +328,7 @@ function RichTextWrapper(
 	}
 
 	function onFocus() {
-		anchorRef.current.focus();
+		anchorRef.current?.focus();
 	}
 
 	const TagName = tagName;
@@ -354,7 +354,7 @@ function RichTextWrapper(
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
-					anchorRef={ anchorRef }
+					editableContentElement={ anchorRef.current }
 					value={ value }
 				/>
 			) }

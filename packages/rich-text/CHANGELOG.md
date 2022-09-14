@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New features
+
+-   Introduced new `useAnchor` hook, which works better with the new `Popover` component APIs. The previous `useAnchorRef` hook is now marked as deprecated, and is scheduled to be removed in WordPress 6.3 ([#43691](https://github.com/WordPress/gutenberg/pull/43691)).
+
 ## 5.15.0 (2022-09-13)
 
 ## 5.14.0 (2022-08-24)
