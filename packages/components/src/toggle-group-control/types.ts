@@ -80,12 +80,6 @@ export type ToggleGroupControlProps = Pick<
 	 */
 	label: string;
 	/**
-	 * Whether multiple options can be selected at once.
-	 *
-	 * @default false
-	 */
-	multiple?: boolean;
-	/**
 	 * If true, the label will only be visible to screen readers.
 	 *
 	 * @default false
@@ -116,7 +110,7 @@ export type ToggleGroupControlProps = Pick<
 	/**
 	 * The selected value(s).
 	 */
-	value?: ReactText | ReactText[];
+	value?: ReactText;
 	/**
 	 * The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControlOption` or
 	 * `ToggleGroupControlOptionIcon` components.
