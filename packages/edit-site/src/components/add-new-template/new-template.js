@@ -9,7 +9,7 @@ import {
 	MenuItem,
 	NavigableMenu,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -86,14 +86,24 @@ export default function NewTemplate( { postType } ) {
 		setShowCustomGenericTemplateModal,
 	] = useState( false );
 	const [ entityForSuggestions, setEntityForSuggestions ] = useState( {} );
+	const isCreatingTemplate = useRef();
 
 	const history = useHistory();
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const { createErrorNotice, createSuccessNotice } =
+	const { createErrorNotice, createSuccessNotice, createInfoNotice } =
 		useDispatch( noticesStore );
 	const { setTemplate } = useDispatch( editSiteStore );
 
 	async function createTemplate( template, isWPSuggestion = true ) {
+		if ( isCreatingTemplate.current ) {
+			return;
+		}
+		isCreatingTemplate.current = true;
+		createInfoNotice(
+			// translators: displayed right after clicking the menu item to create a new template in site editor.
+			__( 'Template creation in process.' ),
+			{ type: 'snackbar' }
+		);
 		try {
 			const { title, description, slug, templatePrefix } = template;
 			let templateContent = template.content;
@@ -151,6 +161,8 @@ export default function NewTemplate( { postType } ) {
 			createErrorNotice( errorMessage, {
 				type: 'snackbar',
 			} );
+		} finally {
+			isCreatingTemplate.current = false;
 		}
 	}
 
