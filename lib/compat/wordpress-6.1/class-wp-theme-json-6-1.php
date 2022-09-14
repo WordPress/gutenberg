@@ -187,7 +187,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 		}
 
-		$templateParts                = $input['templateParts'];
+		$templateParts                = isset( $input['templateParts'] ) ? $input['templateParts'] : array();
 		$schema_styles_blocks         = array();
 		$schema_settings_blocks       = array();
 		$schema_styles_template_parts = array();
@@ -776,7 +776,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		// processed as normal.
 		$feature_declarations = array();
 
-		if ( ! empty( $block_metadata['features'] ) ) {
+		if ( ! empty( $block_metadata['features'] ) && is_array( $block_metadata['features'] ) ) {
 			foreach ( $block_metadata['features'] as $feature_name => $feature_selector ) {
 				if ( ! empty( $node[ $feature_name ] ) ) {
 					// Create temporary node containing only the feature data
