@@ -1,31 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { Spinner } from '@wordpress/components';
+import { Modal, Spinner } from '@wordpress/components';
 
 const LoadingScreen = () => (
-	<div
-		style={ {
-			position: 'fixed',
-			top: 0,
-			left: 0,
-			width: '100%',
-			height: '100%',
-			background: '#fff',
-			zIndex: 999999,
-		} }
+	<Modal
+		isFullScreen
+		isDismissible={ false }
+		onRequestClose={ () => {} }
+		__experimentalHideHeader
+		className="block-editor-loading-screen-modal"
+		overlayClassName="block-editor-loading-screen-modal-overlay"
 	>
-		<div
-			style={ {
-				display: 'flex',
-				alignItems: 'center',
-				justifyContent: 'center',
-				height: '100%',
-			} }
-		>
+		<div className="block-editor-loading-screen-wrapper">
 			<Spinner style={ { width: 64, height: 64 } } />
 		</div>
-	</div>
+	</Modal>
 );
 
 export default LoadingScreen;

@@ -1,0 +1,16 @@
+.block-editor-loading-screen-modal-overlay {
+	backdrop-filter: none;
+	background-color: rgba($white, 0.5);
+}
+
+.block-editor-loading-screen-modal {
+	background-color: transparent;
+	box-shadow: 0 0 0 transparent;
+}
+
+.block-editor-loading-screen-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+}
