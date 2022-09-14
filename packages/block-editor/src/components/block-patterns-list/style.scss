@@ -18,8 +18,9 @@
 		display: flex;
 		align-items: center;
 		overflow: hidden;
-		border-radius: $radius-block-ui + $border-width;
+		border-radius: 4px;
 		border: $border-width solid $gray-100;
+		box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
 	}
 
 	.block-editor-block-patterns-list__item-title {
