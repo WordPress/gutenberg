@@ -6,7 +6,7 @@
 			"className": "is-style-solid-color",
 			"backgroundColor": "black",
 			"textAlign": "left",
-			"value": "<p>pullquote</p>",
+			"value": "pullquote",
 			"citation": "before block supports",
 			"textColor": "white"
 		},

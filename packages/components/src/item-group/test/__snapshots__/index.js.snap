@@ -11,8 +11,8 @@ Snapshot Diff:
       role="listitem"
     >
       <div
--       class="components-item css-1uo9kmu-View-medium-item-spacedAround em57xhy0"
-+       class="components-item css-10mizr-View-large-item-spacedAround em57xhy0"
+-       class="components-item css-1uo9kmu-View-medium-item-spacedAround e19lxcc00"
++       class="components-item css-10mizr-View-large-item-spacedAround e19lxcc00"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -24,8 +24,8 @@ Snapshot Diff:
       role="listitem"
     >
       <div
--       class="components-item css-1uo9kmu-View-medium-item-spacedAround em57xhy0"
-+       class="components-item css-10mizr-View-large-item-spacedAround em57xhy0"
+-       class="components-item css-1uo9kmu-View-medium-item-spacedAround e19lxcc00"
++       class="components-item css-10mizr-View-large-item-spacedAround e19lxcc00"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -44,8 +44,8 @@ Snapshot Diff:
     role="listitem"
   >
     <div
--     class="components-item css-bsdqin-View-medium-item em57xhy0"
-+     class="components-item css-1ohjtsa-View-large-item em57xhy0"
+-     class="components-item css-bsdqin-View-medium-item e19lxcc00"
++     class="components-item css-1ohjtsa-View-large-item e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="Item"
     >
@@ -110,8 +110,8 @@ Snapshot Diff:
 
 @@ -1,17 +1,17 @@
   <div
--   class="components-item-group css-kj8mvb-View-rounded em57xhy0"
-+   class="components-item-group css-18qvw1m-View-separated-rounded em57xhy0"
+-   class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
++   class="components-item-group css-18qvw1m-View-separated-rounded e19lxcc00"
     data-wp-c16t="true"
     data-wp-component="ItemGroup"
     role="list"
@@ -121,8 +121,8 @@ Snapshot Diff:
       role="listitem"
     >
       <div
--       class="components-item css-1uo9kmu-View-medium-item-spacedAround em57xhy0"
-+       class="components-item css-bsdqin-View-medium-item em57xhy0"
+-       class="components-item css-1uo9kmu-View-medium-item-spacedAround e19lxcc00"
++       class="components-item css-bsdqin-View-medium-item e19lxcc00"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -137,8 +137,8 @@ Snapshot Diff:
 
 @@ -1,17 +1,17 @@
   <div
--   class="components-item-group css-kj8mvb-View-rounded em57xhy0"
-+   class="components-item-group css-acyoj6-View-bordered-rounded em57xhy0"
+-   class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
++   class="components-item-group css-acyoj6-View-bordered-rounded e19lxcc00"
     data-wp-c16t="true"
     data-wp-component="ItemGroup"
     role="list"
@@ -148,8 +148,8 @@ Snapshot Diff:
       role="listitem"
     >
       <div
--       class="components-item css-1uo9kmu-View-medium-item-spacedAround em57xhy0"
-+       class="components-item css-bsdqin-View-medium-item em57xhy0"
+-       class="components-item css-1uo9kmu-View-medium-item-spacedAround e19lxcc00"
++       class="components-item css-bsdqin-View-medium-item e19lxcc00"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -164,8 +164,8 @@ Snapshot Diff:
 
 @@ -1,7 +1,7 @@
   <div
--   class="components-item-group css-kj8mvb-View-rounded em57xhy0"
-+   class="components-item-group css-1mm2cvy-View em57xhy0"
+-   class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
++   class="components-item-group css-1mm2cvy-View e19lxcc00"
     data-wp-c16t="true"
     data-wp-component="ItemGroup"
     role="list"

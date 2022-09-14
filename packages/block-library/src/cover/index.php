@@ -8,8 +8,8 @@
 /**
  * Renders the `core/cover` block on server.
  *
- * @param array $attributes The block attributes.
- * @param array $content    The block rendered content.
+ * @param array  $attributes The block attributes.
+ * @param string $content    The block rendered content.
  *
  * @return string Returns the cover block markup, if useFeaturedImage is true.
  */

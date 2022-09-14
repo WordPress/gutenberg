@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, uniq } from 'lodash';
+import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,10 +28,10 @@ import { copy } from '@wordpress/icons';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
-import BlockTitle from '../block-title';
 import BlockTransformationsMenu from './block-transformations-menu';
 import BlockStylesMenu from './block-styles-menu';
 import PatternTransformationsMenu from './pattern-transformations-menu';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
 export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
@@ -41,7 +41,6 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		canRemove,
 		hasBlockStyles,
 		icon,
-		blockTitle,
 		patterns,
 	} = useSelect(
 		( select ) => {
@@ -64,7 +63,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				_icon = blockInformation?.icon; // Take into account active block variations.
 			} else {
 				const isSelectionOfSameType =
-					uniq( blocks.map( ( { name } ) => name ) ).length === 1;
+					new Set( blocks.map( ( { name } ) => name ) ).size === 1;
 				// When selection consists of blocks of multiple types, display an
 				// appropriate icon to communicate the non-uniformity.
 				_icon = isSelectionOfSameType
@@ -79,7 +78,6 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				canRemove: canRemoveBlocks( clientIds, rootClientId ),
 				hasBlockStyles: !! styles?.length,
 				icon: _icon,
-				blockTitle: getBlockType( firstBlockName )?.title,
 				patterns: __experimentalGetPatternTransformItems(
 					blocks,
 					rootClientId
@@ -89,6 +87,10 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		[ clientIds, blocks, blockInformation?.icon ]
 	);
 
+	const blockTitle = useBlockDisplayTitle( {
+		clientId: Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds,
+		maximumLength: 35,
+	} );
 	const isReusable = blocks.length === 1 && isReusableBlock( blocks[ 0 ] );
 	const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
 
@@ -119,10 +121,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 							<BlockIcon icon={ icon } showColors />
 							{ ( isReusable || isTemplate ) && (
 								<span className="block-editor-block-switcher__toggle-text">
-									<BlockTitle
-										clientId={ clientIds }
-										maximumLength={ 35 }
-									/>
+									{ blockTitle }
 								</span>
 							) }
 						</>
@@ -176,10 +175,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 								/>
 								{ ( isReusable || isTemplate ) && (
 									<span className="block-editor-block-switcher__toggle-text">
-										<BlockTitle
-											clientId={ clientIds }
-											maximumLength={ 35 }
-										/>
+										{ blockTitle }
 									</span>
 								) }
 							</>

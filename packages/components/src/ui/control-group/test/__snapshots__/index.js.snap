@@ -13,14 +13,11 @@ exports[`props should render correctly 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: -1px;
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   width: 100%;
-}
-
-.emotion-0>*+*:not( marquee ) {
-  margin-left: -1px;
 }
 
 .emotion-0>* {

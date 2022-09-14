@@ -119,20 +119,6 @@ describe( 'List V2 block', () => {
 
 		// Select List block
 		const listBlock = getByA11yLabel( /List Block\. Row 1/ );
-
-		fireEvent(
-			within( listBlock ).getByTestId( 'block-list-wrapper' ),
-			'layout',
-			{
-				nativeEvent: {
-					layout: {
-						width: 100,
-						height: 50,
-					},
-				},
-			}
-		);
-
 		fireEvent.press( listBlock );
 
 		// Select List Item block
@@ -180,61 +166,18 @@ describe( 'List V2 block', () => {
 		// Select List block
 		const listBlock = getByA11yLabel( /List Block\. Row 1/ );
 
-		fireEvent(
-			within( listBlock ).getByTestId( 'block-list-wrapper' ),
-			'layout',
-			{
-				nativeEvent: {
-					layout: {
-						width: 100,
-						height: 50,
-					},
-				},
-			}
-		);
-
 		fireEvent.press( listBlock );
 
 		// Select List Item block
 		const firstNestedLevelBlock = within( listBlock ).getByA11yLabel(
 			/List item Block\. Row 2/
 		);
-
-		fireEvent(
-			within( firstNestedLevelBlock ).getByTestId( 'block-list-wrapper' ),
-			'layout',
-			{
-				nativeEvent: {
-					layout: {
-						width: 100,
-						height: 350,
-					},
-				},
-			}
-		);
-
 		fireEvent.press( firstNestedLevelBlock );
 
 		// Select second level list
 		const secondNestedLevelBlock = within(
 			firstNestedLevelBlock
 		).getByA11yLabel( /List Block\. Row 1/ );
-
-		fireEvent(
-			within( secondNestedLevelBlock ).getByTestId(
-				'block-list-wrapper'
-			),
-			'layout',
-			{
-				nativeEvent: {
-					layout: {
-						width: 100,
-						height: 50,
-					},
-				},
-			}
-		);
-
 		fireEvent.press( secondNestedLevelBlock );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -256,20 +199,6 @@ describe( 'List V2 block', () => {
 
 		// Select List block
 		const listBlock = getByA11yLabel( /List Block\. Row 1/ );
-
-		fireEvent(
-			within( listBlock ).getByTestId( 'block-list-wrapper' ),
-			'layout',
-			{
-				nativeEvent: {
-					layout: {
-						width: 100,
-						height: 50,
-					},
-				},
-			}
-		);
-
 		fireEvent.press( listBlock );
 
 		// Select Secont List Item block
@@ -300,58 +229,17 @@ describe( 'List V2 block', () => {
 
 		// Select List block
 		const listBlock = getByA11yLabel( /List Block\. Row 1/ );
-
-		fireEvent(
-			within( listBlock ).getByTestId( 'block-list-wrapper' ),
-			'layout',
-			{
-				nativeEvent: {
-					layout: {
-						width: 100,
-						height: 50,
-					},
-				},
-			}
-		);
-
 		fireEvent.press( listBlock );
 
 		// Select List Item block
 		const firstNestedLevelBlock = within( listBlock ).getByA11yLabel(
 			/List item Block\. Row 1/
 		);
-
-		fireEvent(
-			within( firstNestedLevelBlock ).getByTestId( 'block-list-wrapper' ),
-			'layout',
-			{
-				nativeEvent: {
-					layout: {
-						width: 100,
-						height: 350,
-					},
-				},
-			}
-		);
-
 		fireEvent.press( firstNestedLevelBlock );
 
 		// Select Inner block List
 		const innerBlockList = within( firstNestedLevelBlock ).getByA11yLabel(
 			/List Block\. Row 1/
-		);
-
-		fireEvent(
-			within( innerBlockList ).getByTestId( 'block-list-wrapper' ),
-			'layout',
-			{
-				nativeEvent: {
-					layout: {
-						width: 100,
-						height: 50,
-					},
-				},
-			}
 		);
 
 		// Select nested List Item block
@@ -386,20 +274,6 @@ describe( 'List V2 block', () => {
 
 		// Select List block
 		const listBlock = getByA11yLabel( /List Block\. Row 1/ );
-
-		fireEvent(
-			within( listBlock ).getByTestId( 'block-list-wrapper' ),
-			'layout',
-			{
-				nativeEvent: {
-					layout: {
-						width: 100,
-						height: 50,
-					},
-				},
-			}
-		);
-
 		fireEvent.press( listBlock );
 
 		// Update to ordered list
@@ -428,20 +302,6 @@ describe( 'List V2 block', () => {
 
 		// Select List block
 		const listBlock = getByA11yLabel( /List Block\. Row 1/ );
-
-		fireEvent(
-			within( listBlock ).getByTestId( 'block-list-wrapper' ),
-			'layout',
-			{
-				nativeEvent: {
-					layout: {
-						width: 100,
-						height: 50,
-					},
-				},
-			}
-		);
-
 		fireEvent.press( listBlock );
 
 		// Update to ordered list
@@ -481,20 +341,6 @@ describe( 'List V2 block', () => {
 
 		// Select List block
 		const listBlock = getByA11yLabel( /List Block\. Row 1/ );
-
-		fireEvent(
-			within( listBlock ).getByTestId( 'block-list-wrapper' ),
-			'layout',
-			{
-				nativeEvent: {
-					layout: {
-						width: 100,
-						height: 50,
-					},
-				},
-			}
-		);
-
 		fireEvent.press( listBlock );
 
 		// Update to ordered list

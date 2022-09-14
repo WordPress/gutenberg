@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalGetSettings } from '@wordpress/date';
+import { getSettings } from '@wordpress/date';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __experimentalPublishDateTimePicker as PublishDateTimePicker } from '@wordpress/block-editor';
 import { useState, useMemo } from '@wordpress/element';
@@ -61,7 +61,7 @@ export default function PostSchedule( { onClose } ) {
 		[ eventsByPostType ]
 	);
 
-	const settings = __experimentalGetSettings();
+	const settings = getSettings();
 
 	// To know if the current timezone is a 12 hour time with look for "a" in the time format
 	// We also make sure this a is not escaped by a "/"

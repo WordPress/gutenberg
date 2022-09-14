@@ -1,17 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	first,
-	forEach,
-	get,
-	isEmpty,
-	kebabCase,
-	pickBy,
-	reduce,
-	set,
-	startsWith,
-} from 'lodash';
+import { get, isEmpty, kebabCase, pickBy, reduce, set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,7 +12,7 @@ import {
 	getBlockTypes,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState, useContext } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
 import {
 	__unstablePresetDuotoneFilter as PresetDuotoneFilter,
@@ -50,7 +40,8 @@ function compileStyleValue( uncompiledValue ) {
 	const VARIABLE_REFERENCE_PREFIX = 'var:';
 	const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
 	const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
-	if ( startsWith( uncompiledValue, VARIABLE_REFERENCE_PREFIX ) ) {
+
+	if ( uncompiledValue?.startsWith?.( VARIABLE_REFERENCE_PREFIX ) ) {
 		const variable = uncompiledValue
 			.slice( VARIABLE_REFERENCE_PREFIX.length )
 			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
@@ -190,12 +181,15 @@ function flattenTree( input = {}, prefix, token ) {
  *
  * @param {boolean} useRootPaddingAlign Whether to use CSS custom properties in root selector.
  *
+ * @param {Object}  tree                A theme.json tree containing layout definitions.
+ *
  * @return {Array} An array of style declarations.
  */
 export function getStylesDeclarations(
 	blockStyles = {},
 	selector = '',
-	useRootPaddingAlign
+	useRootPaddingAlign,
+	tree = {}
 ) {
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
 	const output = reduce(
@@ -205,7 +199,7 @@ export function getStylesDeclarations(
 				return declarations;
 			}
 			const pathToValue = value;
-			if ( first( pathToValue ) === 'elements' || useEngine ) {
+			if ( pathToValue[ 0 ] === 'elements' || useEngine ) {
 				return declarations;
 			}
 
@@ -270,7 +264,19 @@ export function getStylesDeclarations(
 		const cssProperty = rule.key.startsWith( '--' )
 			? rule.key
 			: kebabCase( rule.key );
-		output.push( `${ cssProperty }: ${ compileStyleValue( rule.value ) }` );
+
+		let ruleValue = rule.value;
+		if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
+			const refPath = ruleValue.ref.split( '.' );
+			ruleValue = get( tree, refPath );
+			// Presence of another ref indicates a reference to another dynamic value.
+			// Pointing to another dynamic value is not supported.
+			if ( ! ruleValue || !! ruleValue?.ref ) {
+				return;
+			}
+		}
+
+		output.push( `${ cssProperty }: ${ ruleValue }` );
 	} );
 
 	return output;
@@ -315,8 +321,8 @@ export function getLayoutStyles( {
 	if ( gapValue && tree?.settings?.layout?.definitions ) {
 		Object.values( tree.settings.layout.definitions ).forEach(
 			( { className, name, spacingStyles } ) => {
-				// Allow skipping default layout for themes that opt-in to block styles, but opt-out of blockGap.
-				if ( ! hasBlockGapSupport && 'default' === name ) {
+				// Allow outputting fallback gap styles for flex layout type when block gap support isn't available.
+				if ( ! hasBlockGapSupport && 'flex' !== name ) {
 					return;
 				}
 
@@ -442,7 +448,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 		} );
 	}
 
-	forEach( ELEMENTS, ( selector, name ) => {
+	Object.entries( ELEMENTS ).forEach( ( [ name, selector ] ) => {
 		if ( !! tree.styles?.elements[ name ] ) {
 			nodes.push( {
 				styles: tree.styles?.elements[ name ],
@@ -452,42 +458,53 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	} );
 
 	// Iterate over blocks: they can have styles & elements.
-	forEach( tree.styles?.blocks, ( node, blockName ) => {
-		const blockStyles = pickStyleKeys( node );
-		if ( !! blockStyles && !! blockSelectors?.[ blockName ]?.selector ) {
-			nodes.push( {
-				duotoneSelector: blockSelectors[ blockName ].duotoneSelector,
-				fallbackGapValue: blockSelectors[ blockName ].fallbackGapValue,
-				hasLayoutSupport: blockSelectors[ blockName ].hasLayoutSupport,
-				selector: blockSelectors[ blockName ].selector,
-				styles: blockStyles,
-				featureSelectors: blockSelectors[ blockName ].featureSelectors,
-			} );
-		}
-
-		forEach( node?.elements, ( value, elementName ) => {
+	Object.entries( tree.styles?.blocks ?? {} ).forEach(
+		( [ blockName, node ] ) => {
+			const blockStyles = pickStyleKeys( node );
 			if (
-				!! value &&
-				!! blockSelectors?.[ blockName ] &&
-				!! ELEMENTS?.[ elementName ]
+				!! blockStyles &&
+				!! blockSelectors?.[ blockName ]?.selector
 			) {
 				nodes.push( {
-					styles: value,
-					selector: blockSelectors[ blockName ].selector
-						.split( ',' )
-						.map( ( sel ) => {
-							const elementSelectors =
-								ELEMENTS[ elementName ].split( ',' );
-							return elementSelectors.map(
-								( elementSelector ) =>
-									sel + ' ' + elementSelector
-							);
-						} )
-						.join( ',' ),
+					duotoneSelector:
+						blockSelectors[ blockName ].duotoneSelector,
+					fallbackGapValue:
+						blockSelectors[ blockName ].fallbackGapValue,
+					hasLayoutSupport:
+						blockSelectors[ blockName ].hasLayoutSupport,
+					selector: blockSelectors[ blockName ].selector,
+					styles: blockStyles,
+					featureSelectors:
+						blockSelectors[ blockName ].featureSelectors,
 				} );
 			}
-		} );
-	} );
+
+			Object.entries( node?.elements ?? {} ).forEach(
+				( [ elementName, value ] ) => {
+					if (
+						!! value &&
+						!! blockSelectors?.[ blockName ] &&
+						!! ELEMENTS?.[ elementName ]
+					) {
+						nodes.push( {
+							styles: value,
+							selector: blockSelectors[ blockName ].selector
+								.split( ',' )
+								.map( ( sel ) => {
+									const elementSelectors =
+										ELEMENTS[ elementName ].split( ',' );
+									return elementSelectors.map(
+										( elementSelector ) =>
+											sel + ' ' + elementSelector
+									);
+								} )
+								.join( ',' ),
+						} );
+					}
+				}
+			);
+		}
+	);
 
 	return nodes;
 };
@@ -522,17 +539,19 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	}
 
 	// Blocks.
-	forEach( tree.settings?.blocks, ( node, blockName ) => {
-		const blockPresets = pickPresets( node );
-		const blockCustom = node.custom;
-		if ( ! isEmpty( blockPresets ) || !! blockCustom ) {
-			nodes.push( {
-				presets: blockPresets,
-				custom: blockCustom,
-				selector: blockSelectors[ blockName ].selector,
-			} );
+	Object.entries( tree.settings?.blocks ?? {} ).forEach(
+		( [ blockName, node ] ) => {
+			const blockPresets = pickPresets( node );
+			const blockCustom = node.custom;
+			if ( ! isEmpty( blockPresets ) || !! blockCustom ) {
+				nodes.push( {
+					presets: blockPresets,
+					custom: blockCustom,
+					selector: blockSelectors[ blockName ].selector,
+				} );
+			}
 		}
-	} );
+	);
 
 	return nodes;
 };
@@ -565,6 +584,7 @@ export const toStyles = (
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 	const useRootPaddingAlign = tree?.settings?.useRootPaddingAwareAlignments;
+	const { contentSize, wideSize } = tree?.settings?.layout || {};
 
 	/*
 	 * Reset default browser margin on the root body element.
@@ -574,12 +594,27 @@ export const toStyles = (
 	 * user-generated values take precedence in the CSS cascade.
 	 * @link https://github.com/WordPress/gutenberg/issues/36147.
 	 */
-	let ruleset = 'body {margin: 0;}';
+	let ruleset = 'body {margin: 0;';
+
+	if ( contentSize ) {
+		ruleset += ` --wp--style--global--content-size: ${ contentSize };`;
+	}
+
+	if ( wideSize ) {
+		ruleset += ` --wp--style--global--wide-size: ${ wideSize };`;
+	}
 
 	if ( useRootPaddingAlign ) {
-		ruleset =
-			'body { margin: 0; padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) } .has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); } .has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); } .has-global-padding > .alignfull > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+		ruleset += `padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) } 
+			.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); } 
+			.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; } 
+			.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); } 
+			.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; } 
+			.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); } 
+			.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0;`;
 	}
+
+	ruleset += '}';
 
 	nodesWithStyles.forEach(
 		( {
@@ -625,14 +660,13 @@ export const toStyles = (
 			if ( duotoneSelector ) {
 				const duotoneDeclarations =
 					getStylesDeclarations( duotoneStyles );
-				if ( duotoneDeclarations.length === 0 ) {
-					return;
+				if ( duotoneDeclarations.length > 0 ) {
+					ruleset =
+						ruleset +
+						`${ duotoneSelector }{${ duotoneDeclarations.join(
+							';'
+						) };}`;
 				}
-				ruleset =
-					ruleset +
-					`${ duotoneSelector }{${ duotoneDeclarations.join(
-						';'
-					) };}`;
 			}
 
 			// Process blockGap and layout styles.
@@ -654,7 +688,8 @@ export const toStyles = (
 			const declarations = getStylesDeclarations(
 				styles,
 				selector,
-				useRootPaddingAlign
+				useRootPaddingAlign,
+				tree
 			);
 			if ( declarations?.length ) {
 				ruleset =
@@ -789,9 +824,6 @@ export const getBlockSelectors = ( blockTypes ) => {
 };
 
 export function useGlobalStylesOutput() {
-	const [ stylesheets, setStylesheets ] = useState( [] );
-	const [ settings, setSettings ] = useState( {} );
-	const [ svgFilters, setSvgFilters ] = useState( {} );
 	const { merged: mergedConfig } = useContext( GlobalStylesContext );
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
@@ -801,9 +833,9 @@ export function useGlobalStylesOutput() {
 		return !! getSettings().disableLayoutStyles;
 	} );
 
-	useEffect( () => {
+	return useMemo( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
-			return;
+			return [];
 		}
 
 		const blockSelectors = getBlockSelectors( getBlockTypes() );
@@ -819,7 +851,7 @@ export function useGlobalStylesOutput() {
 			disableLayoutStyles
 		);
 		const filters = toSvgFilters( mergedConfig, blockSelectors );
-		setStylesheets( [
+		const stylesheets = [
 			{
 				css: customProperties,
 				isGlobalStyles: true,
@@ -828,15 +860,13 @@ export function useGlobalStylesOutput() {
 				css: globalStyles,
 				isGlobalStyles: true,
 			},
-		] );
-		setSettings( mergedConfig.settings );
-		setSvgFilters( filters );
+		];
+
+		return [ stylesheets, mergedConfig.settings, filters ];
 	}, [
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
 		mergedConfig,
 		disableLayoutStyles,
 	] );
-
-	return [ stylesheets, settings, svgFilters, hasBlockGapSupport ];
 }

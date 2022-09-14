@@ -57,13 +57,9 @@ describe( 'Scheduling', () => {
 		await createNewPost();
 
 		await page.click( '*[aria-label^="Change date"]' );
-		await page.click(
-			'*[aria-label="Move backward to switch to the previous month."]'
-		);
+		await page.click( '*[aria-label="View previous month"]' );
 		expect( await isDateTimeComponentFocused() ).toBe( true );
-		await page.click(
-			'*[aria-label="Move forward to switch to the next month."]'
-		);
+		await page.click( '*[aria-label="View next month"]' );
 		expect( await isDateTimeComponentFocused() ).toBe( true );
 	} );
 } );

@@ -28,7 +28,9 @@ export default function Actions( { template } ) {
 			{ ( { onClose } ) => (
 				<MenuGroup>
 					<MenuItem
-						info={ __( 'Restore to default state' ) }
+						info={ __(
+							'Use the template as supplied by the theme.'
+						) }
 						onClick={ () => {
 							revertTemplate( template );
 							onClose();

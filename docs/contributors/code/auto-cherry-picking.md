@@ -1,12 +1,12 @@
 # Cherry-picking automation
 
-`npm run cherry-pick` automates cherry-picking Pull Requests with a specific label into the **current branch**.
+`npm run other:cherry-pick` automates cherry-picking Pull Requests with a specific label into the **current branch**.
 
 It's especially useful for major WordPress releases as by default the script looks for merged Pull Requests with the `Backport to WP Beta/RC` label.
 
 You can also use it in different scenarios by passing a custom label as the first argument. See the Gutenberg plugin release example at the end of this document.
 
-Running `npm run cherry-pick` yields the following prompt:
+Running `npm run other:cherry-pick` yields the following prompt:
 
 ```
 You are on branch "wp/6.2".
@@ -39,12 +39,12 @@ Fetching commit IDs... Done!
 Trying to cherry-pick one by one...
 
 Cherry-picking round 1:
-   ✅  cherry-pick commit: afe9b757b4  for PR: #41198 – Site Editor: Set min-width for...
+    cherry-pick commit: afe9b757b4  for PR: #41198 – Site Editor: Set min-width for...
 Cherry-picking finished!
 
 Summary:
-   ✅  1 PRs got cherry-picked cleanly
-   ✅  0 PRs failed
+    1 PRs got cherry-picked cleanly
+    0 PRs failed
 
 About to push to origin/wp/6.2
 Do you want to proceed? (Y/n)
@@ -60,7 +60,7 @@ Either way, here's what happens once you proceed past the cherry-picking stage:
 ```
 Pushing to origin/wp/6.2
 Commenting and removing labels...
-✅ 41198: I just cherry-picked this PR to the wp/6.2 branch to get it included in the next release: afe9b757b4
+  41198: I just cherry-picked this PR to the wp/6.2 branch to get it included in the next release: afe9b757b4
 Done!
 ```
 
@@ -71,7 +71,7 @@ The commenting part is optional and only possible if you have the [`gh` console 
 Yes! Pass it as the first argument:
 
 ```
-npm run cherry-pick "Another Label"
+npm run other:cherry-pick "Another Label"
 ```
 
 ### How can I use it for a Gutenberg plugin release?
@@ -81,7 +81,7 @@ npm run cherry-pick "Another Label"
 git checkout release/X.Y
 
 # Cherry-pick all the merged PRs with a relevant backport label
-npm run cherry-pick "Backport to Gutenberg RC"
+npm run other:cherry-pick "Backport to Gutenberg RC"
 ```
 
 ### Future improvements
