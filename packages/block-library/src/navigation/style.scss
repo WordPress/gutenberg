@@ -47,7 +47,10 @@ $navigation-icon-size: 24px;
 		display: block;
 	}
 
-	.wp-block-navigation-item.has-text-color a {
+	// Increases the specificity of custom text colors so that they are not overriden
+	// by custom link colors set on a parent container block.
+	.wp-block-navigation-item.has-text-color a,
+	.wp-block-page-list.has-text-color .wp-block-navigation-item a {
 		color: inherit;
 	}
 
@@ -391,7 +394,7 @@ button.wp-block-navigation-item__content {
 	}
 }
 
-// Default background and font color.
+// Submenu default background and text color.
 .wp-block-navigation:not(.has-background) {
 	.wp-block-navigation__submenu-container {
 		// Set a background color for submenus so that they're not transparent.
@@ -399,8 +402,16 @@ button.wp-block-navigation-item__content {
 		// submenus have a default background color, this feature has regressed
 		// several times, so care needs to be taken.
 		background-color: #fff;
-		color: #000;
 		border: 1px solid rgba(0, 0, 0, 0.15);
+	}
+}
+// Set a default background color to match the white background,
+// but only if there are no custom colors.
+.wp-block-navigation:not(.has-background):not(.has-text-color) {
+	.wp-block-navigation__submenu-container {
+		.wp-block-navigation-item a {
+			color: #000;
+		}
 	}
 }
 
