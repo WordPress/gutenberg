@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { capitalCase } from 'change-case';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -91,7 +96,7 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 	];
 	return options.map( ( { slug, name, size } ) => ( {
 		key: slug,
-		name,
+		name: name || capitalCase( slug ),
 		size,
 		__experimentalHint:
 			size && isSimpleCssValue( size ) && parseFloat( size ),
