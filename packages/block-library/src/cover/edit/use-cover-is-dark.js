@@ -31,10 +31,8 @@ function retrieveFastAverageColor() {
  */
 export default function useCoverIsDark( url, dimRatio = 50, overlayColor ) {
 	const [ isDark, setIsDark ] = useState( false );
-	const isDimmedEnough = dimRatio > 50;
-	const hasMedia = !! url;
 	useEffect( () => {
-		if ( isDimmedEnough || ! hasMedia || ! elementRef.current ) {
+		if ( dimRatio > 50 || ! url || ! elementRef.current ) {
 			// If opacity is greater than 50 the dominant color is the overlay
 			// color, so use the overlay color for the dark mode computation.
 			// Additionally, fall back to using the overlay color if a
@@ -63,12 +61,6 @@ export default function useCoverIsDark( url, dimRatio = 50, overlayColor ) {
 				} )
 				.then( ( color ) => setIsDark( color.isDark ) );
 		}
-	}, [
-		hasMedia,
-		isDimmedEnough,
-		overlayColor,
-		elementRef.current,
-		setIsDark,
-	] );
+	}, [ dimRatio > 50, ! url, overlayColor, elementRef.current, setIsDark ] );
 	return isDark;
 }
