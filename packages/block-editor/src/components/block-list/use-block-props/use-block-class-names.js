@@ -33,7 +33,6 @@ export function useBlockClassNames( clientId ) {
 				getSettings,
 				hasSelectedInnerBlock,
 				isTyping,
-				__unstableIsFullySelected,
 				__unstableSelectionHasUnmergeableBlock,
 			} = select( blockEditorStore );
 			const { outlineMode } = getSettings();
@@ -53,7 +52,6 @@ export function useBlockClassNames( clientId ) {
 				'is-multi-selected': isMultiSelected,
 				'is-partially-selected':
 					isMultiSelected &&
-					! __unstableIsFullySelected() &&
 					! __unstableSelectionHasUnmergeableBlock(),
 				'is-reusable': isReusableBlock( getBlockType( name ) ),
 				'is-dragging': isDragging,
