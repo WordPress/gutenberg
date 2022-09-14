@@ -36,7 +36,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	if ( $is_link ) {
 		$link_target    = $attributes['linkTarget'];
 		$rel            = ! empty( $attributes['rel'] ) ? 'rel="' . esc_attr( $attributes['rel'] ) . '"' : '';
-		$featured_image = sprintf( '<a href="%1$s" target="%2$s" %3$s>%4$s</a>', get_the_permalink( $post_ID ), esc_attr( $link_target ), $rel, $featured_image );
+		$featured_image = sprintf( '<a wp-client-navigation=\'{"prefetch":true}\' href="%1$s" target="%2$s" %3$s>%4$s</a>', get_the_permalink( $post_ID ), esc_attr( $link_target ), $rel, $featured_image );
 	}
 
 	$has_width  = ! empty( $attributes['width'] );
