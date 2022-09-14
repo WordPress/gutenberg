@@ -26,7 +26,7 @@ export default function QueryPlaceholder( {
 	const [ isStartingBlank, setIsStartingBlank ] = useState( false );
 	const blockProps = useBlockProps();
 
-	const { blockType, allVariations, hasPatterns } = useSelect(
+	const { blockType, allVariations, hasPatterns } = useSuspenseSelect(
 		( select ) => {
 			const { getBlockVariations, getBlockType } = select( blocksStore );
 			const {
