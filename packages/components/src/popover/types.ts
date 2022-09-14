@@ -38,6 +38,9 @@ export type PopoverProps = {
 	 * The element that should be used by the popover as its anchor. It can either
 	 * be an `Element` or, alternatively, a `VirtualElement` — ie. an object with
 	 * the `getBoundingClientRect()` and the `ownerDocument` properties defined.
+	 *
+	 * **The anchor element should be stored in local state** rather than a
+	 * plain React ref to ensure reactive updating when it changes.
 	 */
 	anchor?: Element | VirtualElement | null;
 	/**

@@ -29,7 +29,7 @@ const MyPopover = () => {
 };
 ```
 
-In order to pass an explicit anchor, you can use the `anchor` prop. When doing so, the anchor element should be stored in state rather than a plain ref to ensure reactive updating when it changes.
+In order to pass an explicit anchor, you can use the `anchor` prop. When doing so, **the anchor element should be stored in local state** rather than a plain React ref to ensure reactive updating when it changes.
 
 ```jsx
 import { Button, Popover } from '@wordpress/components';
