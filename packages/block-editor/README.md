@@ -525,6 +525,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/line-height-control/README.md>
 
+### LoadingScreen
+
+Undocumented declaration.
+
 ### MediaPlaceholder
 
 _Related_

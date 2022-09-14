@@ -16,7 +16,11 @@ import {
 	store as editorStore,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { BlockBreadcrumb, BlockStyles } from '@wordpress/block-editor';
+import {
+	BlockBreadcrumb,
+	BlockStyles,
+	LoadingScreen,
+} from '@wordpress/block-editor';
 import { Button, ScrollLock, Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
@@ -27,7 +31,7 @@ import {
 	InterfaceSkeleton,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import { Suspense, useState, useEffect, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -235,7 +239,7 @@ function Layout( { styles } ) {
 				}
 				notices={ <EditorSnackbars /> }
 				content={
-					<>
+					<Suspense fallback={ <LoadingScreen /> }>
 						<EditorNotices />
 						{ ( mode === 'text' || ! isRichEditingEnabled ) && (
 							<TextEditor />
@@ -253,7 +257,7 @@ function Layout( { styles } ) {
 							<ScrollLock />
 						) }
 						<BlockStyles.Slot scope="core/block-inspector" />
-					</>
+					</Suspense>
 				}
 				footer={
 					! hasReducedUI &&
