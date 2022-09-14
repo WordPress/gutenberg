@@ -24,15 +24,12 @@ directive( 'clientNavigation', ( props ) => {
 	} );
 
 	// Don't do anything if it's falsy.
-	if ( !! clientNavigation ) {
+	if ( clientNavigation !== false ) {
 		props.onclick = async ( event ) => {
 			event.preventDefault();
 
 			// Fetch the page (or return it from cache).
 			await navigate( href );
-
-			// Update the URL.
-			window.history.pushState( {}, '', href );
 
 			// Update the scroll, depending on the option. True by default.
 			if ( clientNavigation?.scroll === 'smooth' ) {

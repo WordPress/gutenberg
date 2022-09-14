@@ -39,6 +39,13 @@ const createRootFragment = ( parent, replaceNode ) => {
 const idle = () =>
 	new Promise( ( resolve ) => window.requestIdleCallback( resolve ) );
 
+// Helper to remove domain and hash from the URL. We are only interesting in
+// caching the path and the query.
+const cleanUrl = ( url ) => {
+	const u = new URL( url, 'http://a.bc' );
+	return u.pathname + u.search;
+};
+
 // Fetch a new page and convert it to a static virtual DOM.
 const fetchPage = async ( url ) => {
 	const html = await window.fetch( url ).then( ( res ) => res.text() );
@@ -50,37 +57,36 @@ const fetchPage = async ( url ) => {
 // Prefetch a page. We store the promise to avoid triggering a second fetch for
 // a page if a fetching has already started.
 export const prefetch = ( url ) => {
+	url = cleanUrl( url );
 	if ( ! pages.has( url ) ) {
 		pages.set( url, fetchPage( url ) );
 	}
 };
 
-// Return the vdom of a page.
-const getPage = async ( url ) => {
-	prefetch( url );
-	return await pages.get( url );
-};
-
 // Navigate to a new page.
-export const navigate = async ( url ) => {
-	const vdom = await getPage( url );
+export const navigate = async ( href ) => {
+	const url = cleanUrl( href );
+	prefetch( url );
+	const vdom = await pages.get( url );
 	render( vdom, rootFragment );
+	window.history.pushState( { wp: { clientNavigation: true } }, '', href );
 };
 
 // Listen to the back and forward buttons and restore the page if it's in the
 // cache.
 window.addEventListener( 'popstate', async () => {
-	const url = window.location.pathname + window.location.search;
+	const url = cleanUrl( window.location ); // Remove hash.
 	if ( pages.has( url ) ) {
 		const vdom = await pages.get( url );
 		render( vdom, rootFragment );
+	} else {
+		window.location.reload();
 	}
 } );
 
 // Initialize the router with the initial DOM.
 document.addEventListener( 'DOMContentLoaded', async () => {
-	// We don't use the hash part because it should have the same HTML.
-	const url = window.location.pathname + window.location.search;
+	const url = cleanUrl( window.location ); // Remove hash.
 
 	// Create the root fragment to hydrate everything.
 	rootFragment = createRootFragment(
