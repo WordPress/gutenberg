@@ -143,13 +143,6 @@ export default function EditPostPreferencesModal() {
 								label={ __( 'Always open list view' ) }
 							/>
 							<EnableFeature
-								featureName="distractionFree"
-								help={ __(
-									'Compacts options and outlines in the toolbar.'
-								) }
-								label={ __( 'Reduce the interface' ) }
-							/>
-							<EnableFeature
 								featureName="themeStyles"
 								help={ __(
 									'Make the editor look like your theme.'
