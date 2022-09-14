@@ -90,6 +90,7 @@ describe( 'ColorPalette', () => {
 		);
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( onChange ).toHaveBeenCalledWith( '#fff' );
 	} );
 
 	test( 'should call onClick with undefined, when the clearButton onClick is triggered', async () => {
