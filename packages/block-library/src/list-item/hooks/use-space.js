@@ -4,7 +4,7 @@
 import { useRefEffect } from '@wordpress/compose';
 import { SPACE } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -12,8 +12,15 @@ import { useSelect } from '@wordpress/data';
 import useIndentListItem from './use-indent-list-item';
 
 export default function useSpace( clientId ) {
-	const { getSelectionStart, getSelectionEnd } =
-		useSelect( blockEditorStore );
+	const { getSelectionStart, getSelectionEnd } = useSuspenseSelect(
+		( select ) => {
+			const store = select( blockEditorStore );
+			return {
+				getSelectionStart: store.getSelectionStart,
+				getSelectionEnd: store.getSelectionEnd,
+			};
+		}
+	);
 	const [ canIndent, indentListItem ] = useIndentListItem( clientId );
 
 	return useRefEffect(

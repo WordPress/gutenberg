@@ -4,7 +4,7 @@
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useSuspenseSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { hasBlockSupport, createBlock } from '@wordpress/blocks';
 
@@ -23,7 +23,17 @@ export function useOnEnter( props ) {
 		getBlockName,
 		getBlock,
 		getNextBlockClientId,
-	} = useSelect( blockEditorStore );
+	} = useSuspenseSelect( ( select ) => {
+		const store = select( blockEditorStore );
+		return {
+			getBlockRootClientId: store.getBlockRootClientId,
+			getBlockIndex: store.getBlockIndex,
+			getBlockOrder: store.getBlockOrder,
+			getBlockName: store.getBlockName,
+			getBlock: store.getBlock,
+			getNextBlockClientId: store.getNextBlockClientId,
+		};
+	} );
 	const propsRef = useRef( props );
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {

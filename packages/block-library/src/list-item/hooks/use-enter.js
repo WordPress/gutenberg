@@ -9,7 +9,7 @@ import {
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSuspenseSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -19,8 +19,16 @@ import useOutdentListItem from './use-outdent-list-item';
 
 export default function useEnter( props ) {
 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
-	const { getBlock, getBlockRootClientId, getBlockIndex } =
-		useSelect( blockEditorStore );
+	const { getBlock, getBlockRootClientId, getBlockIndex } = useSuspenseSelect(
+		( select ) => {
+			const store = select( blockEditorStore );
+			return {
+				getBlock: store.getBlock,
+				getBlockRootClientId: store.getBlockRootClientId,
+				getBlockIndex: store.getBlockIndex,
+			};
+		}
+	);
 	const propsRef = useRef( props );
 	propsRef.current = props;
 	const [ canOutdent, outdentListItem ] = useOutdentListItem(

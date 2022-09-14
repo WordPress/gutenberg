@@ -7,12 +7,7 @@ import { castArray } from 'lodash';
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import {
-	useSelect,
-	useSuspenseSelect,
-	useDispatch,
-	useRegistry,
-} from '@wordpress/data';
+import { useSuspenseSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { cloneBlock } from '@wordpress/blocks';
 
@@ -49,7 +44,18 @@ export default function useOutdentListItem( clientId ) {
 		getSelectedBlockClientIds,
 		getBlock,
 		getBlockListSettings,
-	} = useSelect( blockEditorStore );
+	} = useSuspenseSelect( ( select ) => {
+		const store = select( blockEditorStore );
+		return {
+			getBlockRootClientId: store.getBlockRootClientId,
+			getBlockName: store.getBlockName,
+			getBlockOrder: store.getBlockOrder,
+			getBlockIndex: store.getBlockIndex,
+			getSelectedBlockClientIds: store.getSelectedBlockClientIds,
+			getBlock: store.getBlock,
+			getBlockListSettings: store.getBlockListSettings,
+		};
+	} );
 
 	function getParentListItemId( id ) {
 		const listId = getBlockRootClientId( id );

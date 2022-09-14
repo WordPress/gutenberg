@@ -15,7 +15,7 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock, getBlockSupport } from '@wordpress/blocks';
 import { useResizeObserver } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSuspenseSelect } from '@wordpress/data';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { alignmentHelpers } from '@wordpress/components';
 
@@ -47,7 +47,7 @@ export default function ButtonsEdit( {
 	const usedLayout = layout || defaultBlockLayout || {};
 	const { justifyContent } = usedLayout;
 
-	const { isInnerButtonSelected, shouldDelete } = useSelect(
+	const { isInnerButtonSelected, shouldDelete } = useSuspenseSelect(
 		( select ) => {
 			const { getBlockCount, getBlockParents, getSelectedBlockClientId } =
 				select( blockEditorStore );
@@ -69,14 +69,19 @@ export default function ButtonsEdit( {
 		[ clientId ]
 	);
 
-	const preferredStyle = useSelect( ( select ) => {
+	const preferredStyle = useSuspenseSelect( ( select ) => {
 		const preferredStyleVariations =
 			select( blockEditorStore ).getSettings()
 				.__experimentalPreferredStyleVariations;
 		return preferredStyleVariations?.value?.[ buttonBlockName ];
 	}, [] );
 
-	const { getBlockOrder } = useSelect( blockEditorStore );
+	const { getBlockOrder } = useSuspenseSelect( ( select ) => {
+		return {
+			getBlockOrder: select( blockEditorStore ).getBlockOrder,
+		};
+	}, [] );
+
 	const { insertBlock, removeBlock, selectBlock } =
 		useDispatch( blockEditorStore );
 

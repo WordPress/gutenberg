@@ -3,11 +3,18 @@
  */
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 
 export default function useCopy( clientId ) {
 	const { getBlockRootClientId, getBlockName, getBlockAttributes } =
-		useSelect( blockEditorStore );
+		useSuspenseSelect( ( select ) => {
+			const store = select( blockEditorStore );
+			return {
+				getBlockRootClientId: store.getBlockRootClientId,
+				getBlockName: store.getBlockName,
+				getBlockAttributes: store.getBlockAttributes,
+			};
+		} );
 
 	return useRefEffect( ( node ) => {
 		function onCopy( event ) {

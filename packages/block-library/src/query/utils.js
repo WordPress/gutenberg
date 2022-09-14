@@ -139,7 +139,7 @@ export const useTaxonomies = ( postType ) => {
  * @return {boolean} Whether a specific post type is hierarchical.
  */
 export function useIsPostTypeHierarchical( postType ) {
-	return useSelect(
+	return useSuspenseSelect(
 		( select ) => {
 			const type = select( coreStore ).getPostType( postType );
 			return type?.viewable && type?.hierarchical;
@@ -156,7 +156,7 @@ export function useIsPostTypeHierarchical( postType ) {
  * @return {string[]} An array of the query attributes.
  */
 export function useAllowedControls( attributes ) {
-	return useSelect(
+	return useSuspenseSelect(
 		( select ) =>
 			select( blocksStore ).getActiveBlockVariation(
 				queryLoopName,

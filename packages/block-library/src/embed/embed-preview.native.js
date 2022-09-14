@@ -16,7 +16,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { memo, useState } from '@wordpress/element';
 import { SandBox } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSuspenseSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -43,7 +43,9 @@ const EmbedPreview = ( {
 	isDefaultEmbedInfo,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
-	const { locale } = useSelect( blockEditorStore ).getSettings();
+	const { locale } = useSuspenseSelect( ( select ) => ( {
+		locale: select( blockEditorStore ).getSettings(),
+	} ) );
 
 	const wrapperStyle = styles[ 'embed-preview__wrapper' ];
 	const wrapperAlignStyle =

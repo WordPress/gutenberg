@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRegistry, useDispatch, useSelect } from '@wordpress/data';
+import { useRegistry, useDispatch, useSuspenseSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { getDefaultBlockName, switchToBlockType } from '@wordpress/blocks';
 
@@ -21,7 +21,17 @@ export default function useMerge( clientId ) {
 		getBlockRootClientId,
 		getBlockName,
 		getBlock,
-	} = useSelect( blockEditorStore );
+	} = useSuspenseSelect( ( select ) => {
+		const store = select( blockEditorStore );
+		return {
+			getPreviousBlockClientId: store.getPreviousBlockClientId,
+			getNextBlockClientId: store.getNextBlockClientId,
+			getBlockOrder: store.getBlockOrder,
+			getBlockRootClientId: store.getBlockRootClientId,
+			getBlockName: store.getBlockName,
+			getBlock: store.getBlock,
+		};
+	} );
 	const { mergeBlocks, moveBlocksToPosition, replaceBlock, selectBlock } =
 		useDispatch( blockEditorStore );
 	const [ , outdentListItem ] = useOutdentListItem( clientId );

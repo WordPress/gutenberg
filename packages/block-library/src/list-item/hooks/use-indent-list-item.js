@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { useSelect, useSuspenseSelect, useDispatch } from '@wordpress/data';
+import { useSuspenseSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock, cloneBlock } from '@wordpress/blocks';
 
@@ -20,7 +20,19 @@ export default function useIndentListItem( clientId ) {
 		getSelectionEnd,
 		hasMultiSelection,
 		getMultiSelectedBlockClientIds,
-	} = useSelect( blockEditorStore );
+	} = useSuspenseSelect( ( select ) => {
+		const store = select( blockEditorStore );
+		return {
+			getBlockRootClientId: store.getBlockRootClientId,
+			getBlock: store.getBlock,
+			getPreviousBlockClientId: store.getPreviousBlockClientId,
+			getSelectionStart: store.getSelectionStart,
+			getSelectionEnd: store.getSelectionEnd,
+			hasMultiSelection: store.hasMultiSelection,
+			getMultiSelectedBlockClientIds:
+				store.getMultiSelectedBlockClientIds,
+		};
+	} );
 	return [
 		canIndent,
 		useCallback( () => {

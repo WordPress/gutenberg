@@ -29,7 +29,7 @@ import {
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { audio as icon, replace } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSuspenseSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { isURL } from '@wordpress/url';
 
@@ -57,7 +57,7 @@ function AudioEdit( {
 		setAttributes( { id: mediaId, src: mediaUrl } );
 	};
 
-	const { wasBlockJustInserted } = useSelect( ( select ) => ( {
+	const { wasBlockJustInserted } = useSuspenseSelect( ( select ) => ( {
 		wasBlockJustInserted: select( blockEditorStore ).wasBlockJustInserted(
 			clientId,
 			'inserter_menu'
