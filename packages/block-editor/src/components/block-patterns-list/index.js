@@ -22,7 +22,11 @@ function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
 
 	return (
-		<InserterDraggableBlocks isEnabled={ isDraggable } blocks={ blocks }>
+		<InserterDraggableBlocks
+			isEnabled={ isDraggable }
+			blocks={ blocks }
+			isPattern={ !! pattern }
+		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div
 					className="block-editor-block-patterns-list__list-item"

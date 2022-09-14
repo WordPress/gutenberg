@@ -158,6 +158,7 @@ export function BlockPatternsCategoryPanel( {
 				onClickPattern={ onClick }
 				label={ category.label }
 				orientation="vertical"
+				category={ category.label }
 				isDraggable
 			/>
 		</div>
