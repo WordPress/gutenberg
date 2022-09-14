@@ -37,6 +37,7 @@ const meta: ComponentMeta< typeof Popover > = {
 	title: 'Components/Popover',
 	component: Popover,
 	argTypes: {
+		anchor: { control: { type: null } },
 		anchorRef: { control: { type: null } },
 		anchorRect: { control: { type: null } },
 		children: { control: { type: null } },
