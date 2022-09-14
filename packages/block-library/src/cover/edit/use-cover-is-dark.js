@@ -46,6 +46,9 @@ export default function useCoverIsDark(
 					// Previously the default color was white, but that changed
 					// in v6.0.0 so it has to be manually set now.
 					defaultColor: [ 255, 255, 255, 255 ],
+					// Errors that come up don't reject the promise, so error
+					// logging has to be silenced with this option.
+					silent: true,
 				} )
 				.then( ( color ) => setIsDark( color.isDark ) );
 		}
