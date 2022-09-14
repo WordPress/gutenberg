@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { forEach, without } from 'lodash';
+import { without } from 'lodash';
 
 /**
  * Class responsible for orchestrating event handling on the global window,
@@ -40,9 +40,11 @@ class Listener {
 	}
 
 	handleEvent( /** @type {any} */ event ) {
-		forEach( this.listeners[ event.type ], ( instance ) => {
-			instance.handleEvent( event );
-		} );
+		this.listeners[ event.type ]?.forEach(
+			( /** @type {any} */ instance ) => {
+				instance.handleEvent( event );
+			}
+		);
 	}
 }
 

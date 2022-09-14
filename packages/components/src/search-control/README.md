@@ -14,7 +14,7 @@ SearchControl components let users display a search control.
 
 Render a user interface to input the name of an additional css class.
 
-```js
+```jsx
 import { SearchControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
@@ -48,12 +48,14 @@ If this property is added, a specific placeholder will be used for the input.
 
 -   Type: `String`
 -   Required: No
+-   Default: `__( 'Search' )`
+
 #### value
 
 The current value of the input.
 
--   Type: `String | Number`
--   Required: Yes
+-   Type: `String`
+-   Required: No
 
 #### className
 

@@ -1,15 +1,20 @@
 $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 16px handles inside, that leaves 32px padding, half of which is 1å6.
 
+.components-custom-gradient-picker {
+	&:not(.is-next-has-no-margin) {
+		margin-top: $grid-unit-15;
+		margin-bottom: $grid-unit-30;
+	}
+}
+
 .components-custom-gradient-picker__gradient-bar:not(.has-gradient) {
 	opacity: 0.4;
 }
 
 .components-custom-gradient-picker__gradient-bar {
 	border-radius: $radius-block-ui;
-	margin-top: $grid-unit-15;
 	width: 100%;
 	height: $grid-unit-60;
-	margin-bottom: $grid-unit-20+$grid-unit-05;
 
 	.components-custom-gradient-picker__markers-container {
 		position: relative;
@@ -18,15 +23,27 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 		margin-right: auto;
 	}
 
-	.components-custom-gradient-picker__insert-point {
+	.components-custom-gradient-picker__control-point-dropdown {
+		position: absolute;
+		height: $grid-unit-20;
+		width: $grid-unit-20;
+		top: $components-custom-gradient-picker__padding;
+		// Trim any internal white spacing that would be cause d by inline positioned elements
+		display: flex;
+	}
+
+	.components-custom-gradient-picker__insert-point-dropdown {
+		position: relative;
+
+		// Same size as the .components-custom-gradient-picker__control-point-dropdown parent
+		height: inherit;
+		width: inherit;
+		min-width: $grid-unit-20;
 		border-radius: 50%;
+
 		background: $white;
 		padding: 2px;
-		top: $components-custom-gradient-picker__padding;
-		min-width: $grid-unit-20;
-		width: $grid-unit-20;
-		height: $grid-unit-20;
-		position: relative;
+
 		color: $gray-900;
 
 		svg {
@@ -36,12 +53,11 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 	}
 
 	.components-custom-gradient-picker__control-point-button {
+		// Same size as the .components-custom-gradient-picker__control-point-dropdown parent
+		height: inherit;
+		width: inherit;
 		border-radius: 50%;
-		height: $grid-unit-20;
-		width: $grid-unit-20;
 		padding: 0;
-		position: absolute;
-		top: $components-custom-gradient-picker__padding;
 
 		// Shadow and stroke.
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white, 0 0 $border-width-focus 0 rgba($black, 0.25);
@@ -59,17 +75,13 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 	}
 }
 
-.components-custom-gradient-picker__color-picker-popover .components-custom-gradient-picker__remove-control-point {
-	margin-left: auto;
-	margin-right: auto;
-	display: block;
-	margin-bottom: $grid-unit-10;
+.components-custom-gradient-picker__remove-control-point-wrapper {
+	padding-bottom: $grid-unit-10;
 }
 
 .components-custom-gradient-picker__inserter {
 	/*rtl:ignore*/
 	direction: ltr;
-	width: 100%;
 }
 
 .components-custom-gradient-picker__liner-gradient-indicator {
@@ -77,15 +89,6 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 	flex: 0 auto;
 	width: 20px;
 	height: 20px;
-}
-
-.components-custom-gradient-picker .components-custom-gradient-picker__ui-line {
-	margin-bottom: $grid-unit-20;
-
-	.components-base-control.components-angle-picker,
-	.components-base-control.components-custom-gradient-picker__type-picker {
-		margin-bottom: 0;
-	}
 }
 
 .components-custom-gradient-picker .components-custom-gradient-picker__toolbar {
@@ -104,17 +107,5 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 				border-radius: 2px;
 			}
 		}
-	}
-}
-
-// All these styles should be made generic and changed on the inputs for all components.
-.components-custom-gradient-picker {
-	.components-input-control__label {
-		line-height: 1;
-	}
-	label {
-		text-transform: uppercase;
-		font-size: 11px;
-		font-weight: 500;
 	}
 }

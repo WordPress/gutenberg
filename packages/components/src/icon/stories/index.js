@@ -13,6 +13,7 @@ import { wordpress } from '@wordpress/icons';
  * Internal dependencies
  */
 import Icon from '../';
+import { VStack } from '../../v-stack';
 
 export default {
 	title: 'Components/Icon',
@@ -106,5 +107,22 @@ export const withAnSVG = () => {
 				</SVG>
 			}
 		/>
+	);
+};
+
+/**
+ * Although it's preferred to use icons from the `@wordpress/icons` package, Dashicons are still supported,
+ * as long as you are in a context where the Dashicons stylesheet is loaded. To simulate that here,
+ * use the Global CSS Injector in the Storybook toolbar at the top and select the "WordPress" preset.
+ */
+export const withADashicon = () => {
+	return (
+		<VStack>
+			<Icon icon="wordpress" />
+			<small>
+				This won’t show an icon if the Dashicons stylesheet isn’t
+				loaded.
+			</small>
+		</VStack>
 	);
 };

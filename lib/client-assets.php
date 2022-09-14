@@ -122,7 +122,7 @@ function gutenberg_override_translation_file( $file, $handle ) {
 	}
 
 	// Ignore scripts whose handle does not have the "wp-" prefix.
-	if ( 'wp-' !== substr( $handle, 0, 3 ) ) {
+	if ( ! str_starts_with( $handle, 'wp-' ) ) {
 		return $file;
 	}
 

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { includes } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import isEmpty from './is-empty';
@@ -70,7 +65,7 @@ export default function cleanNodeList( nodeList, doc, schema, inline ) {
 						Array.from( node.attributes ).forEach( ( { name } ) => {
 							if (
 								name !== 'class' &&
-								! includes( attributes, name )
+								! attributes.includes( name )
 							) {
 								node.removeAttribute( name );
 							}

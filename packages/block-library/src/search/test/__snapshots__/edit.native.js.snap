@@ -11,7 +11,14 @@ exports[`Search Block renders block with button inside option 1`] = `
     accessibilityRole="none"
     accessible={true}
   >
-    <View>
+    <View
+      style={
+        Array [
+          undefined,
+          undefined,
+        ]
+      }
+    >
       <RCTAztecView
         accessible={true}
         activeFormats={Array []}
@@ -119,7 +126,14 @@ exports[`Search Block renders block with button inside option 1`] = `
         accessible={true}
         onLayout={[Function]}
       >
-        <View>
+        <View
+          style={
+            Array [
+              undefined,
+              undefined,
+            ]
+          }
+        >
           <RCTAztecView
             accessible={true}
             activeFormats={Array []}
@@ -191,7 +205,14 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
     accessibilityRole="none"
     accessible={true}
   >
-    <View>
+    <View
+      style={
+        Array [
+          undefined,
+          undefined,
+        ]
+      }
+    >
       <RCTAztecView
         accessible={true}
         activeFormats={Array []}
@@ -359,7 +380,14 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
         accessible={true}
         onLayout={[Function]}
       >
-        <View>
+        <View
+          style={
+            Array [
+              undefined,
+              undefined,
+            ]
+          }
+        >
           <RCTAztecView
             accessible={true}
             activeFormats={Array []}
@@ -431,7 +459,14 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
     accessibilityRole="none"
     accessible={true}
   >
-    <View>
+    <View
+      style={
+        Array [
+          undefined,
+          undefined,
+        ]
+      }
+    >
       <RCTAztecView
         accessible={true}
         activeFormats={Array []}
@@ -539,7 +574,14 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         accessible={true}
         onLayout={[Function]}
       >
-        <View>
+        <View
+          style={
+            Array [
+              undefined,
+              undefined,
+            ]
+          }
+        >
           <RCTAztecView
             accessible={true}
             activeFormats={Array []}
@@ -611,7 +653,14 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
     accessibilityRole="none"
     accessible={true}
   >
-    <View>
+    <View
+      style={
+        Array [
+          undefined,
+          undefined,
+        ]
+      }
+    >
       <RCTAztecView
         accessible={true}
         activeFormats={Array []}

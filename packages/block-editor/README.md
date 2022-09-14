@@ -474,6 +474,19 @@ _Returns_
 
 -   `string`: returns the cssUnit value in a simple px format.
 
+### getTypographyClassesAndStyles
+
+Provides the CSS class names and inline styles for a block's typography support
+attributes.
+
+_Parameters_
+
+-   _attributes_ `Object`: Block attributes.
+
+_Returns_
+
+-   `Object`: Typography block support derived CSS classes & styles.
+
 ### InnerBlocks
 
 _Related_
@@ -717,7 +730,6 @@ _Parameters_
 -   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 -   _options_ `Object`: Options for internal use only.
 -   _options.\_\_unstableIsHtml_ `boolean`:
--   _options.\_\_unstableIsDisabled_ `boolean`: Whether the block should be disabled.
 
 _Returns_
 

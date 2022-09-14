@@ -19,17 +19,13 @@ export function BorderRadiusEdit( props ) {
 	} = props;
 
 	const onChange = ( newRadius ) => {
-		let newStyle = {
+		const newStyle = cleanEmptyObject( {
 			...style,
 			border: {
 				...style?.border,
 				radius: newRadius,
 			},
-		};
-
-		if ( newRadius === undefined || newRadius === '' ) {
-			newStyle = cleanEmptyObject( newStyle );
-		}
+		} );
 
 		setAttributes( { style: newStyle } );
 	};

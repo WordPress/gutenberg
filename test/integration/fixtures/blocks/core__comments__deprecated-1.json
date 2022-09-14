@@ -74,6 +74,9 @@
 										"isValid": true,
 										"attributes": {
 											"tagName": "div",
+											"layout": {
+												"type": "flex"
+											},
 											"style": {
 												"spacing": {
 													"margin": {
@@ -81,9 +84,6 @@
 														"bottom": "0px"
 													}
 												}
-											},
-											"layout": {
-												"type": "flex"
 											}
 										},
 										"innerBlocks": [

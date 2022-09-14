@@ -95,6 +95,7 @@ function HeaderToolbar() {
 				onClick={ toggleListView }
 				shortcut={ listViewShortcut }
 				showTooltip={ ! showIconLabels }
+				variant={ showIconLabels ? 'tertiary' : undefined }
 			/>
 		</>
 	);

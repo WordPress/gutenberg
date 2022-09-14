@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, times } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -183,7 +183,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 
 				innerBlocks = [
 					...getMappedColumnWidths( innerBlocks, widths ),
-					...times( newColumns - previousColumns, () => {
+					...Array.from( {
+						length: newColumns - previousColumns,
+					} ).map( () => {
 						return createBlock( 'core/column', {
 							width: `${ newColumnWidth }%`,
 						} );
@@ -192,7 +194,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 			} else if ( isAddingColumn ) {
 				innerBlocks = [
 					...innerBlocks,
-					...times( newColumns - previousColumns, () => {
+					...Array.from( {
+						length: newColumns - previousColumns,
+					} ).map( () => {
 						return createBlock( 'core/column' );
 					} ),
 				];

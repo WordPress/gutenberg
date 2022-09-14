@@ -87,5 +87,14 @@
 	<!-- Ignore filename error since it requires WP core build process change -->
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
 		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
+		<exclude-pattern>/phpunit/*</exclude-pattern>
+	</rule>
+
+	<!-- Exclude PHPUnit tests from file and class name sniffs (for Core parity). -->
+	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+		<exclude-pattern>/phpunit/*</exclude-pattern>
+	</rule>
+	<rule ref="PEAR.NamingConventions.ValidClassName.Invalid">
+		<exclude-pattern>/phpunit/*</exclude-pattern>
 	</rule>
 </ruleset>

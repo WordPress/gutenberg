@@ -4,6 +4,9 @@
 import { forwardRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
+/**
+ * @type {import('react').MouseEventHandler<HTMLDivElement>}
+ */
 function stopPropagation( event ) {
 	event.stopPropagation();
 }

@@ -28,7 +28,11 @@ import {
 } from './dimensions';
 import { cleanEmptyObject } from './utils';
 import BlockPopover from '../components/block-popover';
-
+import SpacingSizesControl from '../components/spacing-sizes-control';
+import {
+	getSpacingPresetCssVar,
+	isValueSpacingPreset,
+} from '../components/spacing-sizes-control/utils';
 /**
  * Determines if there is padding support.
  *
@@ -101,6 +105,8 @@ export function PaddingEdit( props ) {
 		setAttributes,
 	} = props;
 
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [
 			'%',
@@ -135,15 +141,28 @@ export function PaddingEdit( props ) {
 	return Platform.select( {
 		web: (
 			<>
-				<BoxControl
-					values={ style?.spacing?.padding }
-					onChange={ onChange }
-					label={ __( 'Padding' ) }
-					sides={ sides }
-					units={ units }
-					allowReset={ false }
-					splitOnAxis={ splitOnAxis }
-				/>
+				{ ( ! spacingSizes || spacingSizes?.length === 0 ) && (
+					<BoxControl
+						values={ style?.spacing?.padding }
+						onChange={ onChange }
+						label={ __( 'Padding' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+					/>
+				) }
+				{ spacingSizes?.length > 0 && (
+					<SpacingSizesControl
+						values={ style?.spacing?.padding }
+						onChange={ onChange }
+						label={ __( 'Padding' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+					/>
+				) }
 			</>
 		),
 		native: null,
@@ -154,10 +173,18 @@ export function PaddingVisualizer( { clientId, attributes } ) {
 	const padding = attributes?.style?.spacing?.padding;
 	const style = useMemo( () => {
 		return {
-			borderTopWidth: padding?.top ?? 0,
-			borderRightWidth: padding?.right ?? 0,
-			borderBottomWidth: padding?.bottom ?? 0,
-			borderLeftWidth: padding?.left ?? 0,
+			borderTopWidth: isValueSpacingPreset( padding?.top )
+				? getSpacingPresetCssVar( padding?.top )
+				: padding?.top,
+			borderRightWidth: isValueSpacingPreset( padding?.right )
+				? getSpacingPresetCssVar( padding?.right )
+				: padding?.right,
+			borderBottomWidth: isValueSpacingPreset( padding?.bottom )
+				? getSpacingPresetCssVar( padding?.bottom )
+				: padding?.bottom,
+			borderLeftWidth: isValueSpacingPreset( padding?.left )
+				? getSpacingPresetCssVar( padding?.left )
+				: padding?.left,
 		};
 	}, [ padding ] );
 

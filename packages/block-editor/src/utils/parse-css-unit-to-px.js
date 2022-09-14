@@ -221,7 +221,7 @@ export function getPxFromCssUnit( cssUnit, options = {} ) {
 	let parsedUnit = parseUnit( cssUnit );
 
 	if ( ! parsedUnit.unit ) {
-		parsedUnit = parseUnitFunction( cssUnit, options );
+		parsedUnit = parseUnitFunction( cssUnit );
 	}
 
 	if ( isMathExpression( cssUnit ) && ! parsedUnit.unit ) {

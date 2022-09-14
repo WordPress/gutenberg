@@ -69,6 +69,7 @@ export default function Image( {
 	containerRef,
 	context,
 	clientId,
+	isContentLocked,
 } ) {
 	const {
 		url = '',
@@ -111,7 +112,7 @@ export default function Image( {
 					),
 			};
 		},
-		[ id, isSelected ]
+		[ id, isSelected, clientId ]
 	);
 	const { canInsertCover, imageEditing, imageSizes, maxWidth, mediaUpload } =
 		useSelect(
@@ -152,7 +153,10 @@ export default function Image( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
-	const isResizable = allowResize && ! ( isWideAligned && isLargeViewport );
+	const isResizable =
+		allowResize &&
+		! isContentLocked &&
+		! ( isWideAligned && isLargeViewport );
 	const imageSizeOptions = map(
 		filter( imageSizes, ( { slug } ) =>
 			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
@@ -309,10 +313,12 @@ export default function Image( {
 	const controls = (
 		<>
 			<BlockControls group="block">
-				<BlockAlignmentControl
-					value={ align }
-					onChange={ updateAlignment }
-				/>
+				{ ! isContentLocked && (
+					<BlockAlignmentControl
+						value={ align }
+						onChange={ updateAlignment }
+					/>
+				) }
 				{ ! multiImageSelection && ! isEditingImage && (
 					<ImageURLInputUI
 						url={ href || '' }

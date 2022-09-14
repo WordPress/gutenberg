@@ -4,6 +4,10 @@
 		color: $gray-700;
 	}
 
+	.components-base-control__label {
+		margin-bottom: 0;
+	}
+
 	// This button is inheriting padding and min-width.
 	// @todo: we should refactor it to not need to unset this.
 	.components-button.is-small.has-icon:not(.has-text) {
@@ -16,7 +20,10 @@
 	max-width: $sidebar-width - ( 2 * $grid-unit-20 );
 	align-items: center;
 	margin-top: $grid-unit-10;
-	margin-bottom: $grid-unit-30;
+
+	&:not(.is-next-has-no-margin-bottom) {
+		margin-bottom: $grid-unit-30;
+	}
 
 	.components-unit-control-wrapper {
 		.components-input-control__label {
@@ -24,10 +31,6 @@
 			padding-bottom: 0 !important;
 			margin-bottom: $grid-unit-10 !important;
 		}
-	}
-
-	.components-custom-select-control__button {
-		width: 100%;
 	}
 
 	// Apply the same height as the isSmall Reset button.

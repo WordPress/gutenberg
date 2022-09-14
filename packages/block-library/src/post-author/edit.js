@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { forEach } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -51,7 +50,7 @@ function PostAuthorEdit( {
 
 	const avatarSizes = [];
 	if ( authorDetails ) {
-		forEach( authorDetails.avatar_urls, ( url, size ) => {
+		Object.keys( authorDetails.avatar_urls ).forEach( ( size ) => {
 			avatarSizes.push( {
 				value: size,
 				label: `${ size } x ${ size }`,

@@ -10,6 +10,12 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { cloneBlock, store as blocksStore } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { name as queryLoopName } from './block.json';
 
 /**
  * @typedef IHasNameAndId
@@ -127,21 +133,84 @@ export const useTaxonomies = ( postType ) => {
 };
 
 /**
- * Recurses over a list of blocks and returns the first found
- * Query Loop block's clientId.
+ * Hook that returns whether a specific post type is hierarchical.
  *
- * @param {WPBlock[]} blocks The list of blocks to look through.
- * @return {string=} The first found Query Loop's clientId.
+ * @param {string} postType The post type to check.
+ * @return {boolean} Whether a specific post type is hierarchical.
  */
-export const getFirstQueryClientIdFromBlocks = ( blocks ) => {
-	const blocksQueue = [ ...blocks ];
+export function useIsPostTypeHierarchical( postType ) {
+	return useSelect(
+		( select ) => {
+			const type = select( coreStore ).getPostType( postType );
+			return type?.viewable && type?.hierarchical;
+		},
+		[ postType ]
+	);
+}
+
+/**
+ * Hook that returns the query properties' names defined by the active
+ * block variation, to determine which block's filters to show.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {string[]} An array of the query attributes.
+ */
+export function useAllowedControls( attributes ) {
+	return useSelect(
+		( select ) =>
+			select( blocksStore ).getActiveBlockVariation(
+				queryLoopName,
+				attributes
+			)?.allowControls,
+
+		[ attributes ]
+	);
+}
+export function isControlAllowed( allowedControls, key ) {
+	// Every controls is allowed if the list is not defined.
+	if ( ! allowedControls ) {
+		return true;
+	}
+	return allowedControls.includes( key );
+}
+
+/**
+ * Clones a pattern's blocks and then recurses over that list of blocks,
+ * transforming them to retain some `query` attribute properties.
+ * For now we retain the `postType` and `inherit` properties as they are
+ * fundamental for the expected functionality of the block and don't affect
+ * its design and presentation.
+ *
+ * Returns the cloned/transformed blocks and array of existing Query Loop
+ * client ids for further manipulation, in order to avoid multiple recursions.
+ *
+ * @param {WPBlock[]}        blocks               The list of blocks to look through and transform(mutate).
+ * @param {Record<string,*>} queryBlockAttributes The existing Query Loop's attributes.
+ * @return {{ newBlocks: WPBlock[], queryClientIds: string[] }} An object with the cloned/transformed blocks and all the Query Loop clients from these blocks.
+ */
+export const getTransformedBlocksFromPattern = (
+	blocks,
+	queryBlockAttributes
+) => {
+	const {
+		query: { postType, inherit },
+	} = queryBlockAttributes;
+	const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
+	const queryClientIds = [];
+	const blocksQueue = [ ...clonedBlocks ];
 	while ( blocksQueue.length > 0 ) {
 		const block = blocksQueue.shift();
 		if ( block.name === 'core/query' ) {
-			return block.clientId;
+			block.attributes.query = {
+				...block.attributes.query,
+				postType,
+				inherit,
+			};
+			queryClientIds.push( block.clientId );
 		}
 		block.innerBlocks?.forEach( ( innerBlock ) => {
 			blocksQueue.push( innerBlock );
 		} );
 	}
+	return { newBlocks: clonedBlocks, queryClientIds };
 };

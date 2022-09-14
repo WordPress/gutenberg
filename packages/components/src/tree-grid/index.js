@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
@@ -68,7 +63,7 @@ function TreeGrid(
 
 			if (
 				hasModifierKeyPressed ||
-				! includes( [ UP, DOWN, LEFT, RIGHT, HOME, END ], keyCode )
+				! [ UP, DOWN, LEFT, RIGHT, HOME, END ].includes( keyCode )
 			) {
 				return;
 			}
@@ -92,7 +87,7 @@ function TreeGrid(
 				activeRow.getAttribute( 'aria-expanded' ) === 'false' &&
 				keyCode === RIGHT;
 
-			if ( includes( [ LEFT, RIGHT ], keyCode ) ) {
+			if ( [ LEFT, RIGHT ].includes( keyCode ) ) {
 				// Calculate to the next element.
 				let nextIndex;
 				if ( keyCode === LEFT ) {
@@ -177,7 +172,7 @@ function TreeGrid(
 				// Prevent key use for anything else. This ensures Voiceover
 				// doesn't try to handle key navigation.
 				event.preventDefault();
-			} else if ( includes( [ UP, DOWN ], keyCode ) ) {
+			} else if ( [ UP, DOWN ].includes( keyCode ) ) {
 				// Calculate the rowIndex of the next row.
 				const rows = Array.from(
 					treeGridElement.querySelectorAll( '[role="row"]' )
@@ -231,7 +226,7 @@ function TreeGrid(
 				// Prevent key use for anything else. This ensures Voiceover
 				// doesn't try to handle key navigation.
 				event.preventDefault();
-			} else if ( includes( [ HOME, END ], keyCode ) ) {
+			} else if ( [ HOME, END ].includes( keyCode ) ) {
 				// Calculate the rowIndex of the next row.
 				const rows = Array.from(
 					treeGridElement.querySelectorAll( '[role="row"]' )

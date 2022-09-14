@@ -16,13 +16,13 @@ export const unstyledButton = css`
 	text-align: left;
 
 	&:hover {
-		color: ${ COLORS.admin.theme };
+		color: ${ COLORS.ui.theme };
 	}
 
 	&:focus {
 		background-color: transparent;
-		color: ${ COLORS.admin.theme };
-		border-color: ${ COLORS.admin.theme };
+		color: ${ COLORS.ui.theme };
+		border-color: ${ COLORS.ui.theme };
 		outline: 3px solid transparent;
 	}
 `;

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { has } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
@@ -17,7 +12,7 @@ import { addFilter } from '@wordpress/hooks';
  */
 export function addAttribute( settings ) {
 	// Allow blocks to specify their own attribute definition with default values if needed.
-	if ( has( settings.attributes, [ 'lock', 'type' ] ) ) {
+	if ( 'type' in ( settings.attributes?.lock ?? {} ) ) {
 		return settings;
 	}
 	// Gracefully handle if settings.attributes is undefined.

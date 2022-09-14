@@ -156,6 +156,17 @@ Attribute available in the block:
 
 Most attributes from markup will be of type `string`. Numeric attributes in HTML are still stored as strings, and are not converted automatically.
 
+_Example_: Extract the `width` attribute from an image found in the block's markup.
+
+Saved content:
+```html
+<div>
+	Block Content
+
+	<img src="https://lorempixel.com/1200/800/" width="50" />
+</div>
+```
+
 Attribute definition:
 ```js
 {
@@ -174,6 +185,17 @@ Attribute available in the block:
 ```
 
 The only exception is when checking for the existence of an attribute (for example, the `disabled` attribute on a `button`). In that case type `boolean` can be used and the stored value will be a boolean.
+
+_Example_: Extract the `disabled` attribute from a button found in the block's markup.
+
+Saved content:
+```html
+<div>
+	Block Content
+
+	<button type="button" disabled>Button</button>
+</div>
+```
 
 Attribute definition:
 ```js
@@ -195,6 +217,8 @@ Attribute available in the block:
 ### `text` source
 
 Use `text` to extract the inner text from markup. Note that HTML is returned according to the rules of [`textContent`](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent).
+
+_Example_: Extract the `content` attribute from a figcaption element found in the block's markup.
 
 Saved content:
 ```html
@@ -223,6 +247,8 @@ Attribute available in the block:
 
 Another example, using `text` as the source, and using `.my-content` class as the selector to extract text:
 
+_Example_: Extract the `content` attribute from an element with `.my-content` class found in the block's markup.
+
 Saved content:
 ```html
 <div>
@@ -250,7 +276,9 @@ Attribute available in the block:
 
 ### `html` source
 
-Use `html` to extract the inner HTML from markup. Note that text is returned according to the rules of [`innerHTML`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/innerHTML).
+Use `html` to extract the inner HTML from markup. Note that text is returned according to the rules of [`innerHTML`](https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML).
+
+_Example_: Extract the `content` attribute from a figcaption element found in the block's markup.
 
 Saved content:
 ```html
@@ -278,6 +306,20 @@ Attribute available in the block:
 ```
 
 Use the `multiline` property to extract the inner HTML of matching tag names for the use in `RichText` with the `multiline` prop.
+
+_Example_: Extract the `content` attribute from a blockquote element found in the block's markup.
+
+Saved content:
+```html
+<div>
+	Block Content
+
+	<blockquote>
+		<p>First line</p>
+		<p>Second line</p>
+	</blockquote>
+</div>
+```
 
 Attribute definition:
 ```js

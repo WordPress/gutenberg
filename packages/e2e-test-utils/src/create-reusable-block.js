@@ -19,7 +19,7 @@ export const createReusableBlock = async ( content, title ) => {
 	await page.keyboard.type( content );
 
 	await clickBlockToolbarButton( 'Options' );
-	await clickMenuItem( 'Add to Reusable blocks' );
+	await clickMenuItem( 'Create Reusable block' );
 	const nameInput = await page.waitForSelector(
 		reusableBlockNameInputSelector
 	);

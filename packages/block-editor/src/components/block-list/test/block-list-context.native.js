@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { cloneDeep } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import {
@@ -18,6 +13,9 @@ import {
 	PARAGRAPH_BLOCK_LAYOUT_DATA,
 	ROOT_LEVEL_ID,
 } from './fixtures/block-list-context.native';
+
+// Deep clone an object to avoid mutating it later.
+const cloneObject = ( obj ) => JSON.parse( JSON.stringify( obj ) );
 
 describe( 'findBlockLayoutByClientId', () => {
 	it( "finds a block's layout data at root level", () => {
@@ -66,7 +64,7 @@ describe( 'findBlockLayoutByClientId', () => {
 describe( 'deleteBlockLayoutByClientId', () => {
 	it( "deletes a block's layout data at root level", () => {
 		const { findBlockLayoutByClientId } = DEFAULT_BLOCK_LIST_CONTEXT;
-		const defaultBlockLayouts = cloneDeep( BLOCKS_LAYOUTS_DATA );
+		const defaultBlockLayouts = cloneObject( BLOCKS_LAYOUTS_DATA );
 		const currentBlockLayouts = deleteBlockLayoutByClientId(
 			defaultBlockLayouts,
 			ROOT_LEVEL_ID
@@ -82,7 +80,7 @@ describe( 'deleteBlockLayoutByClientId', () => {
 
 	it( "deletes a nested block's layout data with inner blocks", () => {
 		const { findBlockLayoutByClientId } = DEFAULT_BLOCK_LIST_CONTEXT;
-		const defaultBlockLayouts = cloneDeep( BLOCKS_LAYOUTS_DATA );
+		const defaultBlockLayouts = cloneObject( BLOCKS_LAYOUTS_DATA );
 		const currentBlockLayouts = deleteBlockLayoutByClientId(
 			defaultBlockLayouts,
 			NESTED_WITH_INNER_BLOCKS_ID
@@ -98,7 +96,7 @@ describe( 'deleteBlockLayoutByClientId', () => {
 
 	it( "deletes a deep nested block's layout data", () => {
 		const { findBlockLayoutByClientId } = DEFAULT_BLOCK_LIST_CONTEXT;
-		const defaultBlockLayouts = cloneDeep( BLOCKS_LAYOUTS_DATA );
+		const defaultBlockLayouts = cloneObject( BLOCKS_LAYOUTS_DATA );
 		const currentBlockLayouts = deleteBlockLayoutByClientId(
 			defaultBlockLayouts,
 			DEEP_NESTED_ID
@@ -120,7 +118,7 @@ describe( 'updateBlocksLayouts', () => {
 			findBlockLayoutByClientId,
 			updateBlocksLayouts,
 		} = DEFAULT_BLOCK_LIST_CONTEXT;
-		const currentBlockLayouts = cloneDeep( blocksLayouts );
+		const currentBlockLayouts = cloneObject( blocksLayouts );
 		const BLOCK_CLIENT_ID = PARAGRAPH_BLOCK_LAYOUT_DATA.clientId;
 
 		updateBlocksLayouts( currentBlockLayouts, PARAGRAPH_BLOCK_LAYOUT_DATA );
@@ -142,7 +140,7 @@ describe( 'updateBlocksLayouts', () => {
 		const { findBlockLayoutByClientId, updateBlocksLayouts } =
 			DEFAULT_BLOCK_LIST_CONTEXT;
 		const currentBlockLayouts = {
-			current: cloneDeep( BLOCKS_LAYOUTS_DATA ),
+			current: cloneObject( BLOCKS_LAYOUTS_DATA ),
 		};
 		const PARENT_BLOCK_CLIENT_ID = GROUP_BLOCK_LAYOUT_DATA.clientId;
 
@@ -181,7 +179,7 @@ describe( 'updateBlocksLayouts', () => {
 		const { findBlockLayoutByClientId, updateBlocksLayouts } =
 			DEFAULT_BLOCK_LIST_CONTEXT;
 		const currentBlockLayouts = {
-			current: cloneDeep( BLOCKS_LAYOUTS_DATA ),
+			current: cloneObject( BLOCKS_LAYOUTS_DATA ),
 		};
 
 		// Add block layout data to it's parents inner blocks
@@ -207,7 +205,7 @@ describe( 'updateBlocksLayouts', () => {
 		const { findBlockLayoutByClientId, updateBlocksLayouts } =
 			DEFAULT_BLOCK_LIST_CONTEXT;
 		const currentBlockLayouts = {
-			current: cloneDeep( BLOCKS_LAYOUTS_DATA ),
+			current: cloneObject( BLOCKS_LAYOUTS_DATA ),
 		};
 
 		updateBlocksLayouts( currentBlockLayouts, {
@@ -227,7 +225,7 @@ describe( 'updateBlocksLayouts', () => {
 		const { findBlockLayoutByClientId, updateBlocksLayouts } =
 			DEFAULT_BLOCK_LIST_CONTEXT;
 		const currentBlockLayouts = {
-			current: cloneDeep( BLOCKS_LAYOUTS_DATA ),
+			current: cloneObject( BLOCKS_LAYOUTS_DATA ),
 		};
 
 		updateBlocksLayouts( currentBlockLayouts, {

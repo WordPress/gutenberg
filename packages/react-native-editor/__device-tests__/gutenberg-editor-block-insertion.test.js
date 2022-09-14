@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { blockNames } from './pages/editor-page';
-import { isAndroid, swipeDown, clickMiddleOfElement } from './helpers/utils';
+import { isAndroid, clickMiddleOfElement } from './helpers/utils';
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor tests for Block insertion', () => {
@@ -95,11 +95,9 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			await editorPage.dismissKeyboard();
 		}
 
-		await swipeDown( editorPage.driver );
 		const titleElement = await editorPage.getTitleElement( {
 			autoscroll: true,
 		} );
-		await titleElement.click();
 		await titleElement.click();
 
 		await editorPage.addNewBlock( blockNames.paragraph );

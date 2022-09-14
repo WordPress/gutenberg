@@ -32,7 +32,10 @@ describe( 'CustomSelectControl', () => {
 				role="none"
 				onKeyDown={ onKeyDown }
 			>
-				<CustomSelectControl options={ options } />
+				<CustomSelectControl
+					options={ options }
+					__nextUnconstrainedWidth
+				/>
 			</div>
 		);
 		const toggleButton = screen.getByRole( 'button' );

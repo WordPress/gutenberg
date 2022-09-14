@@ -59,7 +59,11 @@ export const Edit = ( props ) => {
 	const generatedClassName = hasBlockSupport( blockType, 'className', true )
 		? getBlockDefaultClassName( name )
 		: null;
-	const className = classnames( generatedClassName, attributes.className );
+	const className = classnames(
+		generatedClassName,
+		attributes.className,
+		props.className
+	);
 
 	return (
 		<Component { ...props } context={ context } className={ className } />

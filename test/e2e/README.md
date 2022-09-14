@@ -62,16 +62,16 @@ We can insert as many assertions in one test as needed. It's better to make expl
 
 ```bash
 # Run all available tests.
-npm run test-e2e:playwright
+npm run test:e2e:playwright
 
 # Run in headed mode.
-npm run test-e2e:playwright -- --headed
+npm run test:e2e:playwright -- --headed
 
 # Run a single test file.
-npm run test-e2e:playwright -- <path_to_test_file> # E.g., npm run test-e2e:playwright -- site-editor/title.spec.js
+npm run test:e2e:playwright -- <path_to_test_file> # E.g., npm run test:e2e:playwright -- site-editor/title.spec.js
 
 # Debugging
-npm run test-e2e:playwright -- --debug
+npm run test:e2e:playwright -- --debug
 ```
 
 **Note**: This package requires Node.js 12.0.0 or later. It is not compatible with older versions.

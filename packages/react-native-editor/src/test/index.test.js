@@ -195,7 +195,5 @@ describe( 'Register Gutenberg', () => {
 
 		expect( blockList ).toBeVisible();
 		expect( console ).toHaveLoggedWith( 'Hermes is: true' );
-		// It's expected that some blocks are upgraded and inform about it (example: "Updated Block: core/cover")
-		expect( console ).toHaveInformed();
 	} );
 } );

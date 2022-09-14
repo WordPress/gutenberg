@@ -6,7 +6,7 @@ import { isAndroid } from './helpers/utils';
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor tests for List block', () => {
-	it( 'should be able to add a new List block', async () => {
+	it.skip( 'should be able to add a new List block', async () => {
 		await editorPage.addNewBlock( blockNames.list );
 		let listBlockElement = await editorPage.getListBlockAtPosition( 1, {
 			isEmptyBlock: true,
@@ -36,7 +36,7 @@ describe( 'Gutenberg Editor tests for List block', () => {
 	} );
 
 	// This test depends on being run immediately after 'should be able to add a new List block'
-	it( 'should update format to ordered list, using toolbar button', async () => {
+	it.skip( 'should update format to ordered list, using toolbar button', async () => {
 		let listBlockElement = await editorPage.getListBlockAtPosition();
 
 		if ( isAndroid() ) {

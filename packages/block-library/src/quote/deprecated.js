@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,11 +10,11 @@ import { createBlock, parseWithAttributeSchema } from '@wordpress/blocks';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export const migrateToQuoteV2 = ( attributes ) => {
-	const { value } = attributes;
+	const { value, ...restAttributes } = attributes;
 
 	return [
 		{
-			...omit( attributes, [ 'value' ] ),
+			...restAttributes,
 		},
 		value
 			? parseWithAttributeSchema( value, {
@@ -151,8 +150,9 @@ const v1 = {
 
 	migrate( attributes ) {
 		if ( attributes.style === 2 ) {
+			const { style, ...restAttributes } = attributes;
 			return migrateToQuoteV2( {
-				...omit( attributes, [ 'style' ] ),
+				...restAttributes,
 				className: attributes.className
 					? attributes.className + ' is-style-large'
 					: 'is-style-large',
@@ -205,8 +205,9 @@ const v0 = {
 
 	migrate( attributes ) {
 		if ( ! isNaN( parseInt( attributes.style ) ) ) {
+			const { style, ...restAttributes } = attributes;
 			return migrateToQuoteV2( {
-				...omit( attributes, [ 'style' ] ),
+				...restAttributes,
 			} );
 		}
 

@@ -16,7 +16,10 @@ export const CREATE_NAVIGATION_MENU_ERROR = 'error';
 export const CREATE_NAVIGATION_MENU_PENDING = 'pending';
 export const CREATE_NAVIGATION_MENU_IDLE = 'idle';
 
-export default function useCreateNavigationMenu( clientId ) {
+export default function useCreateNavigationMenu(
+	clientId,
+	postStatus = 'publish'
+) {
 	const [ status, setStatus ] = useState( CREATE_NAVIGATION_MENU_IDLE );
 	const [ value, setValue ] = useState( null );
 	const [ error, setError ] = useState( null );
@@ -60,7 +63,7 @@ export default function useCreateNavigationMenu( clientId ) {
 			const record = {
 				title,
 				content: serialize( blocks ),
-				status: 'publish',
+				status: postStatus,
 			};
 
 			// Return affords ability to await on this function directly

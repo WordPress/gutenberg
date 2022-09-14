@@ -394,7 +394,7 @@ function getTypeAnnotation( typeAnnotation ) {
  *
  * @param {ASTNode} token Contains either a function or a call to a function-wrapper.
  *
- * TODO: Remove the special-casing here once we're able to infer the types from TypeScript itself.
+ *                        TODO: Remove the special-casing here once we're able to infer the types from TypeScript itself.
  */
 function unwrapWrappedSelectors( token ) {
 	if ( babelTypes.isFunctionDeclaration( token ) ) {

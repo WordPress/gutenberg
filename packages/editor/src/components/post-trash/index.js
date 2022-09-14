@@ -11,10 +11,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as editorStore } from '../../store';
 
 export default function PostTrash() {
-	const { isNew, postId } = useSelect( ( select ) => {
+	const { isNew, isDeleting, postId } = useSelect( ( select ) => {
 		const store = select( editorStore );
 		return {
 			isNew: store.isEditedPostNew(),
+			isDeleting: store.isDeletingPost(),
 			postId: store.getCurrentPostId(),
 		};
 	}, [] );
@@ -29,7 +30,9 @@ export default function PostTrash() {
 			className="editor-post-trash"
 			isDestructive
 			variant="secondary"
-			onClick={ () => trashPost() }
+			isBusy={ isDeleting }
+			aria-disabled={ isDeleting }
+			onClick={ isDeleting ? undefined : () => trashPost() }
 		>
 			{ __( 'Move to trash' ) }
 		</Button>

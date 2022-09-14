@@ -48,12 +48,10 @@ function BlockAlignmentUI( {
 
 	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
 	const commonProps = {
-		popoverProps: POPOVER_PROPS,
 		icon: activeAlignmentControl
 			? activeAlignmentControl.icon
 			: defaultAlignmentControl.icon,
 		label: __( 'Align' ),
-		toggleProps: { describedBy: __( 'Change alignment' ) },
 	};
 	const extraProps = isToolbar
 		? {
@@ -70,6 +68,8 @@ function BlockAlignmentUI( {
 				} ),
 		  }
 		: {
+				toggleProps: { describedBy: __( 'Change alignment' ) },
+				popoverProps: POPOVER_PROPS,
 				children: ( { onClose } ) => {
 					return (
 						<>

@@ -6,11 +6,6 @@ import { serialize, parse, createBlock } from '@wordpress/blocks';
 import { addWidgetIdToBlock } from '@wordpress/widgets';
 
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * Convert settingId to widgetId.
  *
  * @param {string} settingId The setting id.
@@ -79,8 +74,10 @@ export function blockToWidget( block, existingWidget = null ) {
 		};
 	}
 
+	const { form, rendered, ...restExistingWidget } = existingWidget || {};
+
 	return {
-		...omit( existingWidget, [ 'form', 'rendered' ] ),
+		...restExistingWidget,
 		...widget,
 	};
 }

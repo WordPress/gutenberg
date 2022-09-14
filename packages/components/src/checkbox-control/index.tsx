@@ -40,14 +40,10 @@ import type { WordPressComponentProps } from '../ui/context';
  * ```
  */
 export function CheckboxControl(
-	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
-	// ref forwarding to CheckboxControl.
-	props: Omit<
-		WordPressComponentProps< CheckboxControlProps, 'input', false >,
-		'ref'
-	>
+	props: WordPressComponentProps< CheckboxControlProps, 'input', false >
 ) {
 	const {
+		__nextHasNoMarginBottom,
 		label,
 		className,
 		heading,
@@ -92,6 +88,7 @@ export function CheckboxControl(
 
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			label={ heading }
 			id={ id }
 			help={ help }

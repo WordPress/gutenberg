@@ -38,6 +38,14 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
 			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 			$theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $theme_json_data );
+
+			/**
+			 * Filters the data provided by the theme for global styles & settings.
+			 *
+			 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
+			 */
+			$theme_json      = apply_filters( 'global_styles_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
+			$theme_json_data = $theme_json->get_data();
 			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 
 			if ( wp_get_theme()->parent() ) {
@@ -92,6 +100,11 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 
 			// Classic themes without a theme.json don't support global duotone.
 			$theme_support_data['settings']['color']['defaultDuotone'] = false;
+
+			// Allow themes to enable appearance tools via theme_support.
+			if ( current_theme_supports( 'appearance-tools' ) ) {
+				$theme_support_data['settings']['appearanceTools'] = true;
+			}
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( static::$theme );
@@ -122,6 +135,14 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 				$config['styles']['blocks'][ $block_name ]['spacing']['blockGap'] = null;
 			}
 		}
+
+		/**
+		 * Filters the data provided by the blocks for global styles & settings.
+		 *
+		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
+		 */
+		$theme_json = apply_filters( 'global_styles_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'core' ) );
+		$config     = $theme_json->get_data();
 
 		// Core here means it's the lower level part of the styles chain.
 		// It can be a core or a third-party block.

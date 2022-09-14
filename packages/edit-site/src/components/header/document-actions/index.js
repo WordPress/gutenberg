@@ -141,6 +141,9 @@ export default function DocumentActions( {
 								aria-expanded={ isOpen }
 								aria-haspopup="true"
 								onClick={ onToggle }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
 								label={ sprintf(
 									/* translators: %s: the entity to see details about, like "template"*/
 									__( 'Show %s details' ),

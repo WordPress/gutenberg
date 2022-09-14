@@ -6,7 +6,7 @@ const fs = require( 'fs' );
 /**
  * Internal dependencies
  */
-const isBlockMetadataExperimental = require( './src/is-block-metadata-experimental' );
+const isBlockMetadataExperimental = require( './src/utils/is-block-metadata-experimental' );
 
 /**
  * Creates a babel plugin that replaces experimental block imports with

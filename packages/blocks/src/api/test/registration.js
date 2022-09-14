@@ -31,13 +31,11 @@ import {
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '../registration';
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../constants';
+import { omit } from '../utils';
 import { store as blocksStore } from '../../store';
 
 const noop = () => {};
-const omit = ( obj, keys ) =>
-	Object.fromEntries(
-		Object.entries( obj ).filter( ( [ key ] ) => ! keys.includes( key ) )
-	);
+
 const pick = ( obj, keys ) =>
 	Object.fromEntries(
 		Object.entries( obj ).filter( ( [ key ] ) => keys.includes( key ) )

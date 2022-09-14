@@ -268,10 +268,10 @@ export function BorderPanel( props ) {
 					<BorderBoxControl
 						colors={ colors }
 						enableAlpha={ true }
+						enableStyle={ isStyleSupported }
 						onChange={ onBorderChange }
-						popoverPlacement="left-start"
 						popoverOffset={ 40 }
-						showStyle={ isStyleSupported }
+						popoverPlacement="left-start"
 						value={ hydratedBorder }
 						__experimentalHasMultipleOrigins={ true }
 						__experimentalIsRenderedInSidebar={ true }

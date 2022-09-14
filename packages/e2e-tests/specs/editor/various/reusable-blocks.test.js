@@ -192,7 +192,7 @@ describe( 'Reusable blocks', () => {
 
 		// Convert block to a reusable block.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Add to Reusable blocks' );
+		await clickMenuItem( 'Create Reusable block' );
 
 		// Set title.
 		const nameInput = await page.waitForSelector(
@@ -373,7 +373,7 @@ describe( 'Reusable blocks', () => {
 
 		// Convert to reusable.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Add to Reusable blocks' );
+		await clickMenuItem( 'Create Reusable block' );
 		const nameInput = await page.waitForSelector(
 			reusableBlockNameInputSelector
 		);

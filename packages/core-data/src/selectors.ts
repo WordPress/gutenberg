@@ -18,30 +18,19 @@ import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
-import type {
-	Context,
-	DefaultContextOf,
-	EntityRecordOf,
-	KeyOf,
-	Kind,
-	KindOf,
-	Name,
-	NameOf,
-	User,
-	WpTemplate,
-} from './entity-types';
+import type * as ET from './entity-types';
 
 // This is an incomplete, high-level approximation of the State type.
 // It makes the selectors slightly more safe, but is intended to evolve
 // into a more detailed representation over time.
 // See https://github.com/WordPress/gutenberg/pull/40025#discussion_r865410589 for more context.
-interface State {
+export interface State {
 	autosaves: Record< string | number, Array< unknown > >;
 	blockPatterns: Array< unknown >;
 	blockPatternCategories: Array< unknown >;
 	currentGlobalStylesId: string;
 	currentTheme: string;
-	currentUser: User< 'edit' >;
+	currentUser: ET.User< 'edit' >;
 	embedPreviews: Record< string, { html: string } >;
 	entities: EntitiesState;
 	themeBaseGlobalStyles: Record< string, Object >;
@@ -50,19 +39,21 @@ interface State {
 	users: UserState;
 }
 
+type EntityRecordKey = string | number;
+
 interface EntitiesState {
 	config: EntityConfig[];
-	records: Record< Kind, Record< Name, EntityState< Kind, Name > > >;
+	records: Record< string, Record< string, EntityState< ET.EntityRecord > > >;
 }
 
-interface EntityState< K extends Kind, N extends Name > {
-	edits: Record< KeyOf< K, N >, Partial< EntityRecordOf< K, N > > >;
-	saving: Record< KeyOf< K, N >, { pending: boolean } >;
+interface EntityState< EntityRecord extends ET.EntityRecord > {
+	edits: Record< string, Partial< EntityRecord > >;
+	saving: Record< string, { pending: boolean } >;
 }
 
 interface EntityConfig {
-	name: Name;
-	kind: Kind;
+	name: string;
+	kind: string;
 }
 
 interface UndoState extends Array< Object > {
@@ -71,31 +62,16 @@ interface UndoState extends Array< Object > {
 }
 
 interface UserState {
-	queries: Record< string, GenericRecordKey[] >;
-	byId: Record< GenericRecordKey, User< 'edit' > >;
+	queries: Record< string, EntityRecordKey[] >;
+	byId: Record< EntityRecordKey, ET.User< 'edit' > >;
 }
 
-type GenericRecordKey = number | string;
-type EntityRecord = any;
 type Optional< T > = T | undefined;
 
 /**
  * HTTP Query parameters sent with the API request to fetch the entity records.
  */
-export type EntityQuery<
-	C extends Context,
-	WithFields extends boolean = true
-> = Omit< Record< string, any >, '_fields' > & {
-	context?: C;
-} & ( WithFields extends true
-		? {
-				/**
-				 * The requested fields. If specified, the REST API will remove from the response
-				 * any fields not on that list.
-				 */
-				_fields: string[];
-		  }
-		: {} );
+type GetRecordsHttpQuery = Record< string, any >;
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -116,7 +92,7 @@ const EMPTY_OBJECT = {};
  * @return Whether a request is in progress for an embed preview.
  */
 export const isRequestingEmbedPreview = createRegistrySelector(
-	( select ) =>
+	( select: any ) =>
 		( state: State, url: string ): boolean => {
 			return select( STORE_NAME ).isResolving( 'getEmbedPreview', [
 				url,
@@ -136,8 +112,8 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  */
 export function getAuthors(
 	state: State,
-	query?: EntityQuery< any >
-): User< 'edit' >[] {
+	query?: GetRecordsHttpQuery
+): ET.User[] {
 	deprecated( "select( 'core' ).getAuthors()", {
 		since: '5.9',
 		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
@@ -157,7 +133,7 @@ export function getAuthors(
  *
  * @return Current user object.
  */
-export function getCurrentUser( state: State ): User< 'edit' > {
+export function getCurrentUser( state: State ): ET.User< 'edit' > {
 	return state.currentUser;
 }
 
@@ -170,7 +146,7 @@ export function getCurrentUser( state: State ): User< 'edit' > {
  * @return Users list.
  */
 export const getUserQueryResults = createSelector(
-	( state: State, queryID: string ): User< 'edit' >[] => {
+	( state: State, queryID: string ): ET.User< 'edit' >[] => {
 		const queryResults = state.users.queries[ queryID ];
 
 		return map( queryResults, ( id ) => state.users.byId[ id ] );
@@ -190,7 +166,7 @@ export const getUserQueryResults = createSelector(
  *
  * @return Array of entities with config matching kind.
  */
-export function getEntitiesByKind( state: State, kind: Kind ): Array< any > {
+export function getEntitiesByKind( state: State, kind: string ): Array< any > {
 	deprecated( "wp.data.select( 'core' ).getEntitiesByKind()", {
 		since: '6.0',
 		alternative: "wp.data.select( 'core' ).getEntitiesConfig()",
@@ -206,7 +182,7 @@ export function getEntitiesByKind( state: State, kind: Kind ): Array< any > {
  *
  * @return Array of entities with config matching kind.
  */
-export function getEntitiesConfig( state: State, kind: Kind ): Array< any > {
+export function getEntitiesConfig( state: State, kind: string ): Array< any > {
 	return filter( state.entities.config, { kind } );
 }
 
@@ -220,7 +196,7 @@ export function getEntitiesConfig( state: State, kind: Kind ): Array< any > {
  *
  * @return Entity config
  */
-export function getEntity( state: State, kind: Kind, name: Name ): any {
+export function getEntity( state: State, kind: string, name: string ): any {
 	deprecated( "wp.data.select( 'core' ).getEntity()", {
 		since: '6.0',
 		alternative: "wp.data.select( 'core' ).getEntityConfig()",
@@ -237,54 +213,12 @@ export function getEntity( state: State, kind: Kind, name: Name ): any {
  *
  * @return Entity config
  */
-export function getEntityConfig( state: State, kind: Kind, name: Name ): any {
+export function getEntityConfig(
+	state: State,
+	kind: string,
+	name: string
+): any {
 	return find( state.entities.config, { kind, name } );
-}
-
-/**
- * GetEntityRecord is declared as an *interface*, but it actually describes
- * the specifies the getEntityRecord *function* signature. It may seem unusual,
- * but it's just how TypeScript implements function overloading.
- *
- * More accurately, GetEntityRecord distinguishes between two different signatures
- * the getEntityRecord selector has:
- *
- * 1. When query._fields is not given, the returned type is EntityRecordOf< K, N, C >
- * 2. When query._fields is given, the returned type is Partial<EntityRecordOf< K, N, C >>
- *
- * Unfortunately, due to a TypeScript limitation (https://github.com/microsoft/TypeScript/issues/23132)
- * we can't use a single function signature with a return type such as:
- *
- *    Fields extends undefined
- * 	    ? EntityRecordOf< K, N, C >
- * 		  : Partial< EntityRecordOf< K, N, C > >
- */
-interface GetEntityRecord {
-	<
-		R extends EntityRecordOf< K, N >,
-		C extends Context = DefaultContextOf< R >,
-		K extends Kind = KindOf< R >,
-		N extends Name = NameOf< R >
-	>(
-		state: State,
-		kind: K,
-		name: N,
-		key: KeyOf< K, N >,
-		query: EntityQuery< C, true >
-	): Partial< EntityRecordOf< K, N, C > > | null | undefined;
-
-	<
-		R extends EntityRecordOf< K, N >,
-		C extends Context = DefaultContextOf< R >,
-		K extends Kind = KindOf< R >,
-		N extends Name = NameOf< R >
-	>(
-		state: State,
-		kind: K,
-		name: N,
-		key: KeyOf< K, N >,
-		query?: EntityQuery< C, false >
-	): EntityRecordOf< K, N, C > | null | undefined;
 }
 
 /**
@@ -301,19 +235,18 @@ interface GetEntityRecord {
  *
  * @return Record.
  */
-export const getEntityRecord: GetEntityRecord = createSelector(
+export const getEntityRecord = createSelector(
 	<
-		R extends EntityRecordOf< K, N >,
-		C extends Context = DefaultContextOf< R >,
-		K extends Kind = KindOf< R >,
-		N extends Name = NameOf< R >
+		EntityRecord extends
+			| ET.EntityRecord< any >
+			| Partial< ET.EntityRecord< any > >
 	>(
 		state: State,
-		kind: K,
-		name: N,
-		key: KeyOf< R >,
-		query
-	) => {
+		kind: string,
+		name: string,
+		key: EntityRecordKey,
+		query?: GetRecordsHttpQuery
+	): EntityRecord | undefined => {
 		const queriedState = get( state.entities.records, [
 			kind,
 			name,
@@ -342,7 +275,7 @@ export const getEntityRecord: GetEntityRecord = createSelector(
 				const value = get( item, field );
 				set( filteredItem, field, value );
 			}
-			return filteredItem;
+			return filteredItem as EntityRecord;
 		}
 
 		return item;
@@ -381,10 +314,9 @@ export const getEntityRecord: GetEntityRecord = createSelector(
  * @return Record.
  */
 export function __experimentalGetEntityRecordNoResolver<
-	K extends Kind,
-	N extends Name
->( state: State, kind: K, name: N, key: KeyOf< K, N > ) {
-	return getEntityRecord( state, kind, name, key );
+	EntityRecord extends ET.EntityRecord< any >
+>( state: State, kind: string, name: string, key: EntityRecordKey ) {
+	return getEntityRecord< EntityRecord >( state, kind, name, key );
 }
 
 /**
@@ -399,13 +331,18 @@ export function __experimentalGetEntityRecordNoResolver<
  * @return Object with the entity's raw attributes.
  */
 export const getRawEntityRecord = createSelector(
-	< K extends Kind, N extends Name >(
+	< EntityRecord extends ET.EntityRecord< any > >(
 		state: State,
-		kind: K,
-		name: N,
-		key: KeyOf< K, N >
+		kind: string,
+		name: string,
+		key: EntityRecordKey
 	): EntityRecord | undefined => {
-		const record = getEntityRecord( state, kind, name, key );
+		const record = getEntityRecord< EntityRecord >(
+			state,
+			kind,
+			name,
+			key
+		);
 		return (
 			record &&
 			Object.keys( record ).reduce( ( accumulator, _key ) => {
@@ -424,15 +361,15 @@ export const getRawEntityRecord = createSelector(
 					accumulator[ _key ] = record[ _key ];
 				}
 				return accumulator;
-			}, {} )
+			}, {} as any )
 		);
 	},
 	(
 		state: State,
-		kind: Kind,
-		name: Name,
-		recordId: GenericRecordKey,
-		query?: EntityQuery< any >
+		kind: string,
+		name: string,
+		recordId: EntityRecordKey,
+		query?: GetRecordsHttpQuery
 	) => {
 		const context = query?.context ?? 'default';
 		return [
@@ -468,57 +405,13 @@ export const getRawEntityRecord = createSelector(
  *
  * @return  Whether entity records have been received.
  */
-export function hasEntityRecords<
-	R extends EntityRecordOf< K, N >,
-	C extends Context = DefaultContextOf< R >,
-	K extends Kind = KindOf< R >,
-	N extends Name = NameOf< R >
->( state: State, kind: K, name: N, query?: EntityQuery< C > ): boolean {
+export function hasEntityRecords(
+	state: State,
+	kind: string,
+	name: string,
+	query?: GetRecordsHttpQuery
+): boolean {
 	return Array.isArray( getEntityRecords( state, kind, name, query ) );
-}
-
-/**
- * GetEntityRecord is declared as an *interface*, but it actually describes
- * the specifies the getEntityRecord *function* signature. It may seem unusual,
- * but it's just how TypeScript implements function overloading.
- *
- * More accurately, GetEntityRecord distinguishes between two different signatures
- * the getEntityRecord selector has:
- *
- * 1. When query._fields is not given, the returned type is EntityRecordOf< K, N, C >[]
- * 2. When query._fields is given, the returned type is Partial<EntityRecordOf< K, N, C >>[]
- *
- * Unfortunately, due to a TypeScript limitation (https://github.com/microsoft/TypeScript/issues/23132)
- * we can't use a single function signature with a return type such as:
- *
- *    Fields extends undefined
- * 	    ? EntityRecordOf< K, N, C >[]
- * 		  : Partial< EntityRecordOf< K, N, C > >[]
- */
-interface GetEntityRecords {
-	<
-		R extends EntityRecordOf< K, N >,
-		C extends Context = DefaultContextOf< R >,
-		K extends Kind = KindOf< R >,
-		N extends Name = NameOf< R >
-	>(
-		state: State,
-		kind: K,
-		name: N,
-		query: EntityQuery< C, true >
-	): Partial< EntityRecordOf< K, N, C > >[] | null | undefined;
-
-	<
-		R extends EntityRecordOf< K, N >,
-		C extends Context = DefaultContextOf< R >,
-		K extends Kind = KindOf< R >,
-		N extends Name = NameOf< R >
-	>(
-		state: State,
-		kind: K,
-		name: N,
-		query?: EntityQuery< C, false >
-	): EntityRecordOf< K, N, C >[] | null | undefined;
 }
 
 /**
@@ -532,17 +425,16 @@ interface GetEntityRecords {
  *
  * @return Records.
  */
-export const getEntityRecords: GetEntityRecords = <
-	R extends EntityRecordOf< K, N >,
-	C extends Context = DefaultContextOf< R >,
-	K extends Kind = KindOf< R >,
-	N extends Name = NameOf< R >
+export const getEntityRecords = <
+	EntityRecord extends
+		| ET.EntityRecord< any >
+		| Partial< ET.EntityRecord< any > >
 >(
 	state: State,
-	kind: K,
-	name: N,
-	query
-) => {
+	kind: string,
+	name: string,
+	query?: GetRecordsHttpQuery
+): EntityRecord[] | null => {
 	// Queried data state is prepopulated for all known entities. If this is not
 	// assigned for the given parameters, then it is known to not exist.
 	const queriedState = get( state.entities.records, [
@@ -558,9 +450,9 @@ export const getEntityRecords: GetEntityRecords = <
 
 type DirtyEntityRecord = {
 	title: string;
-	key: GenericRecordKey;
-	name: Name;
-	kind: Kind;
+	key: EntityRecordKey;
+	name: string;
+	kind: string;
 };
 /**
  * Returns the list of dirty entity records.
@@ -575,64 +467,44 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 			entities: { records },
 		} = state;
 		const dirtyRecords: DirtyEntityRecord[] = [];
-		( Object.keys( records ) as Kind[] ).forEach(
-			< K extends Kind >( kind: K ) => {
-				( Object.keys( records[ kind ] ) as Name[] ).forEach(
-					< N extends Name >( name: N ) => {
-						const primaryKeys = (
-							Object.keys(
-								records[ kind ][ name ].edits
-							) as KeyOf< K, N >[]
-						 ).filter(
-							( primaryKey ) =>
-								// The entity record must exist (not be deleted),
-								// and it must have edits.
-								getEntityRecord(
-									state,
-									kind,
-									name,
-									primaryKey
-								) &&
-								hasEditsForEntityRecord(
-									state,
-									kind,
-									name,
-									primaryKey
-								)
-						);
-
-						if ( primaryKeys.length ) {
-							const entityConfig = getEntityConfig(
-								state,
-								kind,
-								name
-							);
-							primaryKeys.forEach( ( primaryKey ) => {
-								const entityRecord = getEditedEntityRecord(
-									state,
-									kind,
-									name,
-									primaryKey
-								);
-								dirtyRecords.push( {
-									// We avoid using primaryKey because it's transformed into a string
-									// when it's used as an object key.
-									key: entityRecord[
-										entityConfig.key || DEFAULT_ENTITY_KEY
-									],
-									title:
-										entityConfig?.getTitle?.(
-											entityRecord
-										) || '',
-									name,
-									kind,
-								} );
-							} );
-						}
-					}
+		Object.keys( records ).forEach( ( kind ) => {
+			Object.keys( records[ kind ] ).forEach( ( name ) => {
+				const primaryKeys = (
+					Object.keys( records[ kind ][ name ].edits ) as string[]
+				 ).filter(
+					( primaryKey ) =>
+						// The entity record must exist (not be deleted),
+						// and it must have edits.
+						getEntityRecord( state, kind, name, primaryKey ) &&
+						hasEditsForEntityRecord( state, kind, name, primaryKey )
 				);
-			}
-		);
+
+				if ( primaryKeys.length ) {
+					const entityConfig = getEntityConfig( state, kind, name );
+					primaryKeys.forEach( ( primaryKey ) => {
+						const entityRecord = getEditedEntityRecord(
+							state,
+							kind,
+							name,
+							primaryKey
+						);
+						dirtyRecords.push( {
+							// We avoid using primaryKey because it's transformed into a string
+							// when it's used as an object key.
+							key: entityRecord
+								? entityRecord[
+										entityConfig.key || DEFAULT_ENTITY_KEY
+								  ]
+								: undefined,
+							title:
+								entityConfig?.getTitle?.( entityRecord ) || '',
+							name,
+							kind,
+						} );
+					} );
+				}
+			} );
+		} );
 
 		return dirtyRecords;
 	},
@@ -652,55 +524,40 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 			entities: { records },
 		} = state;
 		const recordsBeingSaved: DirtyEntityRecord[] = [];
-		( Object.keys( records ) as Kind[] ).forEach(
-			< K extends Kind >( kind: K ) => {
-				( Object.keys( records[ kind ] ) as Name[] ).forEach(
-					< N extends Name >( name: N ) => {
-						const primaryKeys = (
-							Object.keys(
-								records[ kind ][ name ].saving
-							) as KeyOf< K, N >[]
-						 ).filter( ( primaryKey ) =>
-							isSavingEntityRecord(
-								state,
-								kind,
-								name,
-								primaryKey
-							)
-						);
-
-						if ( primaryKeys.length ) {
-							const entityConfig = getEntityConfig(
-								state,
-								kind,
-								name
-							);
-							primaryKeys.forEach( ( primaryKey ) => {
-								const entityRecord = getEditedEntityRecord(
-									state,
-									kind,
-									name,
-									primaryKey
-								);
-								recordsBeingSaved.push( {
-									// We avoid using primaryKey because it's transformed into a string
-									// when it's used as an object key.
-									key: entityRecord[
-										entityConfig.key || DEFAULT_ENTITY_KEY
-									],
-									title:
-										entityConfig?.getTitle?.(
-											entityRecord
-										) || '',
-									name,
-									kind,
-								} );
-							} );
-						}
-					}
+		Object.keys( records ).forEach( ( kind ) => {
+			Object.keys( records[ kind ] ).forEach( ( name ) => {
+				const primaryKeys = (
+					Object.keys( records[ kind ][ name ].saving ) as string[]
+				 ).filter( ( primaryKey ) =>
+					isSavingEntityRecord( state, kind, name, primaryKey )
 				);
-			}
-		);
+
+				if ( primaryKeys.length ) {
+					const entityConfig = getEntityConfig( state, kind, name );
+					primaryKeys.forEach( ( primaryKey ) => {
+						const entityRecord = getEditedEntityRecord(
+							state,
+							kind,
+							name,
+							primaryKey
+						);
+						recordsBeingSaved.push( {
+							// We avoid using primaryKey because it's transformed into a string
+							// when it's used as an object key.
+							key: entityRecord
+								? entityRecord[
+										entityConfig.key || DEFAULT_ENTITY_KEY
+								  ]
+								: undefined,
+							title:
+								entityConfig?.getTitle?.( entityRecord ) || '',
+							name,
+							kind,
+						} );
+					} );
+				}
+			} );
+		} );
 		return recordsBeingSaved;
 	},
 	( state ) => [ state.entities.records ]
@@ -716,11 +573,11 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
  *
  * @return The entity record's edits.
  */
-export function getEntityRecordEdits< K extends Kind, N extends Name >(
+export function getEntityRecordEdits(
 	state: State,
-	kind: K,
-	name: N,
-	recordId: KeyOf< K, N >
+	kind: string,
+	name: string,
+	recordId: EntityRecordKey
 ): Optional< any > {
 	return get( state.entities.records, [
 		kind,
@@ -745,11 +602,11 @@ export function getEntityRecordEdits< K extends Kind, N extends Name >(
  * @return The entity record's non transient edits.
  */
 export const getEntityRecordNonTransientEdits = createSelector(
-	< K extends Kind, N extends Name >(
+	(
 		state: State,
-		kind: K,
-		name: N,
-		recordId: KeyOf< K, N >
+		kind: string,
+		name: string,
+		recordId: EntityRecordKey
 	): Optional< any > => {
 		const { transientEdits } = getEntityConfig( state, kind, name ) || {};
 		const edits = getEntityRecordEdits( state, kind, name, recordId ) || {};
@@ -763,7 +620,7 @@ export const getEntityRecordNonTransientEdits = createSelector(
 			return acc;
 		}, {} );
 	},
-	( state: State, kind: Kind, name: Name, recordId: GenericRecordKey ) => [
+	( state: State, kind: string, name: string, recordId: EntityRecordKey ) => [
 		state.entities.config,
 		get( state.entities.records, [ kind, name, 'edits', recordId ] ),
 	]
@@ -780,11 +637,11 @@ export const getEntityRecordNonTransientEdits = createSelector(
  *
  * @return Whether the entity record has edits or not.
  */
-export function hasEditsForEntityRecord< K extends Kind, N extends Name >(
+export function hasEditsForEntityRecord(
 	state: State,
-	kind: K,
-	name: N,
-	recordId: KeyOf< K, N >
+	kind: string,
+	name: string,
+	recordId: EntityRecordKey
 ): boolean {
 	return (
 		isSavingEntityRecord( state, kind, name, recordId ) ||
@@ -805,21 +662,21 @@ export function hasEditsForEntityRecord< K extends Kind, N extends Name >(
  * @return The entity record, merged with its edits.
  */
 export const getEditedEntityRecord = createSelector(
-	< K extends Kind, N extends Name >(
+	< EntityRecord extends ET.EntityRecord< any > >(
 		state: State,
-		kind: K,
-		name: N,
-		recordId: KeyOf< K, N >
-	): EntityRecord | undefined => ( {
+		kind: string,
+		name: string,
+		recordId: EntityRecordKey
+	): ET.Updatable< EntityRecord > | undefined => ( {
 		...getRawEntityRecord( state, kind, name, recordId ),
 		...getEntityRecordEdits( state, kind, name, recordId ),
 	} ),
 	(
 		state: State,
-		kind: Kind,
-		name: Name,
-		recordId: GenericRecordKey,
-		query?: EntityQuery< any >
+		kind: string,
+		name: string,
+		recordId: EntityRecordKey,
+		query?: GetRecordsHttpQuery
 	) => {
 		const context = query?.context ?? 'default';
 		return [
@@ -857,9 +714,9 @@ export const getEditedEntityRecord = createSelector(
  */
 export function isAutosavingEntityRecord(
 	state: State,
-	kind: Kind,
-	name: Name,
-	recordId: GenericRecordKey
+	kind: string,
+	name: string,
+	recordId: EntityRecordKey
 ): boolean {
 	const { pending, isAutosave } = get(
 		state.entities.records,
@@ -879,15 +736,15 @@ export function isAutosavingEntityRecord(
  *
  * @return Whether the entity record is saving or not.
  */
-export function isSavingEntityRecord< K extends Kind, N extends Name >(
+export function isSavingEntityRecord(
 	state: State,
-	kind: K,
-	name: N,
-	recordId: KeyOf< K, N >
+	kind: string,
+	name: string,
+	recordId: EntityRecordKey
 ): boolean {
 	return get(
 		state.entities.records,
-		[ kind, name, 'saving', recordId as GenericRecordKey, 'pending' ],
+		[ kind, name, 'saving', recordId as EntityRecordKey, 'pending' ],
 		false
 	);
 }
@@ -904,9 +761,9 @@ export function isSavingEntityRecord< K extends Kind, N extends Name >(
  */
 export function isDeletingEntityRecord(
 	state: State,
-	kind: Kind,
-	name: Name,
-	recordId: GenericRecordKey
+	kind: string,
+	name: string,
+	recordId: EntityRecordKey
 ): boolean {
 	return get(
 		state.entities.records,
@@ -927,9 +784,9 @@ export function isDeletingEntityRecord(
  */
 export function getLastEntitySaveError(
 	state: State,
-	kind: Kind,
-	name: Name,
-	recordId: GenericRecordKey
+	kind: string,
+	name: string,
+	recordId: EntityRecordKey
 ): any {
 	return get( state.entities.records, [
 		kind,
@@ -952,9 +809,9 @@ export function getLastEntitySaveError(
  */
 export function getLastEntityDeleteError(
 	state: State,
-	kind: Kind,
-	name: Name,
-	recordId: GenericRecordKey
+	kind: string,
+	name: string,
+	recordId: EntityRecordKey
 ): any {
 	return get( state.entities.records, [
 		kind,
@@ -1115,7 +972,7 @@ export function canUser(
 	state: State,
 	action: string,
 	resource: string,
-	id?: GenericRecordKey
+	id?: EntityRecordKey
 ): boolean | undefined {
 	const key = [ action, resource, id ].filter( Boolean ).join( '/' );
 	return get( state, [ 'userPermissions', key ] );
@@ -1138,9 +995,9 @@ export function canUser(
  */
 export function canUserEditEntityRecord(
 	state: State,
-	kind: Kind,
-	name: Name,
-	recordId: GenericRecordKey
+	kind: string,
+	name: string,
+	recordId: EntityRecordKey
 ): boolean | undefined {
 	const entityConfig = getEntityConfig( state, kind, name );
 	if ( ! entityConfig ) {
@@ -1166,7 +1023,7 @@ export function canUserEditEntityRecord(
 export function getAutosaves(
 	state: State,
 	postType: string,
-	postId: GenericRecordKey
+	postId: EntityRecordKey
 ): Array< any > | undefined {
 	return state.autosaves[ postId ];
 }
@@ -1181,18 +1038,18 @@ export function getAutosaves(
  *
  * @return The autosave for the post and author.
  */
-export function getAutosave(
+export function getAutosave< EntityRecord extends ET.EntityRecord< any > >(
 	state: State,
 	postType: string,
-	postId: GenericRecordKey,
-	authorId: GenericRecordKey
+	postId: EntityRecordKey,
+	authorId: EntityRecordKey
 ): EntityRecord | undefined {
 	if ( authorId === undefined ) {
 		return;
 	}
 
 	const autosaves = state.autosaves[ postId ];
-	return find( autosaves, { author: authorId } );
+	return find( autosaves, { author: authorId } ) as EntityRecord | undefined;
 }
 
 /**
@@ -1209,7 +1066,7 @@ export const hasFetchedAutosaves = createRegistrySelector(
 		(
 			state: State,
 			postType: string,
-			postId: GenericRecordKey
+			postId: EntityRecordKey
 		): boolean => {
 			return select( STORE_NAME ).hasFinishedResolution( 'getAutosaves', [
 				postType,
@@ -1257,21 +1114,25 @@ export const getReferenceByDistinctEdits = createSelector(
 export function __experimentalGetTemplateForLink(
 	state: State,
 	link: string
-): WpTemplate< 'edit' > | null {
-	const records = getEntityRecords( state, 'postType', 'wp_template', {
-		'find-template': link,
-	} );
+): Optional< ET.Updatable< ET.WpTemplate > > | null {
+	const records = getEntityRecords< ET.WpTemplate >(
+		state,
+		'postType',
+		'wp_template',
+		{
+			'find-template': link,
+		}
+	);
 
-	const template = records?.length ? records[ 0 ] : null;
-	if ( template ) {
-		return getEditedEntityRecord(
+	if ( records?.length ) {
+		return getEditedEntityRecord< ET.WpTemplate >(
 			state,
 			'postType',
 			'wp_template',
-			template.id
+			records[ 0 ].id
 		);
 	}
-	return template;
+	return null;
 }
 
 /**

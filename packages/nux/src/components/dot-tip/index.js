@@ -48,7 +48,7 @@ export function DotTip( {
 		<Popover
 			className="nux-dot-tip"
 			position={ position }
-			focusOnMount="container"
+			focusOnMount
 			role="dialog"
 			aria-label={ __( 'Editor tips' ) }
 			onClick={ onClick }

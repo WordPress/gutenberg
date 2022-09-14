@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { first } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { toggleMoreMenu } from './toggle-more-menu';
@@ -18,10 +13,8 @@ export async function clickOnMoreMenuItem( buttonLabel ) {
 	const moreMenuContainerSelector =
 		'//*[contains(concat(" ", @class, " "), " interface-more-menu-dropdown__content ")]';
 
-	const elementToClick = first(
-		await page.$x(
-			`${ moreMenuContainerSelector }//span[contains(concat(" ", @class, " "), " components-menu-item__item ")][contains(text(), "${ buttonLabel }")]`
-		)
+	const menuItems = await page.$x(
+		`${ moreMenuContainerSelector }//span[contains(concat(" ", @class, " "), " components-menu-item__item ")][contains(text(), "${ buttonLabel }")]`
 	);
-	await elementToClick.click();
+	await menuItems[ 0 ].click();
 }

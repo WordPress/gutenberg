@@ -57,11 +57,3 @@ function gutenberg_menu() {
 	);
 }
 add_action( 'admin_menu', 'gutenberg_menu', 9 );
-
-/**
- * Outputs a WP REST API nonce.
- */
-function gutenberg_rest_nonce() {
-	exit( wp_create_nonce( 'wp_rest' ) );
-}
-add_action( 'wp_ajax_gutenberg_rest_nonce', 'gutenberg_rest_nonce' );

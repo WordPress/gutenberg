@@ -1,9 +1,6 @@
 /**
  * WordPress dependencies
  */
-/**
- * WordPress dependencies
- */
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';

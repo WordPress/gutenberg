@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -14,9 +9,8 @@ import {
 
 const migrateToTaxQuery = ( attributes ) => {
 	const { query } = attributes;
-	const newQuery = {
-		...omit( query, [ 'categoryIds', 'tagIds' ] ),
-	};
+	const { categoryIds, tagIds, ...newQuery } = query;
+
 	if ( query.categoryIds?.length || query.tagIds?.length ) {
 		newQuery.taxQuery = {
 			category: !! query.categoryIds?.length
@@ -121,8 +115,9 @@ const deprecated = [
 		},
 		migrate( attributes ) {
 			const withTaxQuery = migrateToTaxQuery( attributes );
+			const { layout, ...restWithTaxQuery } = withTaxQuery;
 			return {
-				...omit( withTaxQuery, [ 'layout' ] ),
+				...restWithTaxQuery,
 				displayLayout: withTaxQuery.layout,
 			};
 		},

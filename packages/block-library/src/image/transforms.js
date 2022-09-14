@@ -151,7 +151,10 @@ const transforms = {
 						__(
 							'If uploading to a gallery all files need to be image formats'
 						),
-						{ id: 'gallery-transform-invalid-file' }
+						{
+							id: 'gallery-transform-invalid-file',
+							type: 'snackbar',
+						}
 					);
 				}
 				return every(

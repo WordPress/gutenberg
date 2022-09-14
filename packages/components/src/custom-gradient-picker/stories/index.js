@@ -11,6 +11,9 @@ import CustomGradientPicker from '../';
 export default {
 	title: 'Components/CustomGradientPicker',
 	component: CustomGradientPicker,
+	argTypes: {
+		__nextHasNoMargin: { control: { type: 'boolean' } },
+	},
 };
 
 const CustomGradientPickerWithState = ( props ) => {
@@ -24,6 +27,7 @@ const CustomGradientPickerWithState = ( props ) => {
 	);
 };
 
-export const _default = () => {
-	return <CustomGradientPickerWithState />;
+export const Default = CustomGradientPickerWithState.bind( {} );
+Default.args = {
+	__nextHasNoMargin: true,
 };

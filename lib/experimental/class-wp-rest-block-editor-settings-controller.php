@@ -297,6 +297,11 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 					'type'        => 'array',
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
 				),
+				'disableCustomSpacingSizes'              => array(
+					'description' => __( 'Disables custom spacing sizes.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
+				),
 			),
 		);
 

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Platform, findNodeHandle } from 'react-native';
-import { partial, first, castArray, last, every } from 'lodash';
+
 /**
  * WordPress dependencies
  */
@@ -307,21 +307,25 @@ export default compose(
 			canInsertBlockType,
 			getTemplateLock,
 		} = select( blockEditorStore );
-		const normalizedClientIds = castArray( clientIds );
+		const normalizedClientIds = Array.isArray( clientIds )
+			? clientIds
+			: [ clientIds ];
 		const block = getBlock( normalizedClientIds );
 		const blockName = getBlockName( normalizedClientIds );
 		const blockType = getBlockType( blockName );
 		const blockTitle = blockType?.title;
-		const firstClientId = first( normalizedClientIds );
+		const firstClientId = normalizedClientIds[ 0 ];
 		const rootClientId = getBlockRootClientId( firstClientId );
 		const blockOrder = getBlockOrder( rootClientId );
 
 		const firstIndex = getBlockIndex( firstClientId );
-		const lastIndex = getBlockIndex( last( normalizedClientIds ) );
+		const lastIndex = getBlockIndex(
+			normalizedClientIds[ normalizedClientIds.length - 1 ]
+		);
 
 		const innerBlocks = getBlocksByClientId( clientIds );
 
-		const canDuplicate = every( innerBlocks, ( innerBlock ) => {
+		const canDuplicate = innerBlocks.every( ( innerBlock ) => {
 			return (
 				!! innerBlock &&
 				hasBlockSupport( innerBlock.name, 'multiple', true ) &&
@@ -336,9 +340,9 @@ export default compose(
 			isExactlyOneBlock && isDefaultBlock && isEmptyContent;
 		const isLocked = !! getTemplateLock( rootClientId );
 
-		const selectedBlockClientId = first( getSelectedBlockClientIds() );
+		const selectedBlockClientId = getSelectedBlockClientIds()[ 0 ];
 		const selectedBlock = selectedBlockClientId
-			? first( getBlocksByClientId( selectedBlockClientId ) )
+			? getBlocksByClientId( selectedBlockClientId )[ 0 ]
 			: undefined;
 		const selectedBlockPossibleTransformations = selectedBlock
 			? getBlockTransformItems( [ selectedBlock ], rootClientId )
@@ -406,8 +410,10 @@ export default compose(
 				duplicateBlock() {
 					return duplicateBlocks( clientIds );
 				},
-				onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
-				onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),
+				onMoveDown: ( ...args ) =>
+					moveBlocksDown( clientIds, rootClientId, ...args ),
+				onMoveUp: ( ...args ) =>
+					moveBlocksUp( clientIds, rootClientId, ...args ),
 				openGeneralSidebar: () =>
 					openGeneralSidebar( 'edit-post/block' ),
 				pasteBlock: ( clipboardBlock ) => {

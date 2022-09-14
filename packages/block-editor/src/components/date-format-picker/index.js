@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { uniq } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { _x, __ } from '@wordpress/i18n';
@@ -83,15 +78,17 @@ function NonDefaultControls( { format, onChange } ) {
 	// 2022) in German (de). The resultant array is de-duplicated as some
 	// languages will use the same format string for short, medium, and long
 	// formats.
-	const suggestedFormats = uniq( [
-		'Y-m-d',
-		_x( 'n/j/Y', 'short date format' ),
-		_x( 'n/j/Y g:i A', 'short date format with time' ),
-		_x( 'M j, Y', 'medium date format' ),
-		_x( 'M j, Y g:i A', 'medium date format with time' ),
-		_x( 'F j, Y', 'long date format' ),
-		_x( 'M j', 'short date format without the year' ),
-	] );
+	const suggestedFormats = [
+		...new Set( [
+			'Y-m-d',
+			_x( 'n/j/Y', 'short date format' ),
+			_x( 'n/j/Y g:i A', 'short date format with time' ),
+			_x( 'M j, Y', 'medium date format' ),
+			_x( 'M j, Y g:i A', 'medium date format with time' ),
+			_x( 'F j, Y', 'long date format' ),
+			_x( 'M j', 'short date format without the year' ),
+		] ),
+	];
 
 	const suggestedOptions = suggestedFormats.map(
 		( suggestedFormat, index ) => ( {
@@ -116,6 +113,7 @@ function NonDefaultControls( { format, onChange } ) {
 		<>
 			<BaseControl className="block-editor-date-format-picker__custom-format-select-control">
 				<CustomSelectControl
+					__nextUnconstrainedWidth
 					label={ __( 'Choose a format' ) }
 					options={ [ ...suggestedOptions, customOption ] }
 					value={

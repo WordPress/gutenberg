@@ -9,6 +9,7 @@ const os = require( 'os' );
  * Internal dependencies
  */
 const { ValidationError } = require( './validate-config' );
+const { getLatestWordPressVersion } = require( '../wordpress' );
 
 /**
  * @typedef {import('./config').WPServiceConfig} WPServiceConfig
@@ -32,12 +33,12 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  * @param {string} options.workDirectoryPath Path to the work directory located in ~/.wp-env.
  * @return {WPServiceConfig} Parsed environment-level configuration.
  */
-module.exports = function parseConfig( config, options ) {
+module.exports = async function parseConfig( config, options ) {
 	return {
 		port: config.port,
 		phpVersion: config.phpVersion,
 		coreSource: includeTestsPath(
-			parseSourceString( config.core, options ),
+			await parseCoreSource( config.core, options ),
 			options
 		),
 		pluginSources: config.plugins.map( ( sourceString ) =>
@@ -57,6 +58,21 @@ module.exports = function parseConfig( config, options ) {
 		),
 	};
 };
+
+async function parseCoreSource( coreSource, options ) {
+	// An empty source means we should use the latest version of WordPress.
+	if ( ! coreSource ) {
+		const wpVersion = await getLatestWordPressVersion();
+		if ( ! wpVersion ) {
+			throw new ValidationError(
+				'Could not find the latest WordPress version. There may be a network issue.'
+			);
+		}
+
+		coreSource = `WordPress/WordPress#${ wpVersion }`;
+	}
+	return parseSourceString( coreSource, options );
+}
 
 /**
  * Parses a source string into a source object.
@@ -95,7 +111,7 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 	}
 
 	const zipFields = sourceString.match(
-		/^https?:\/\/([^\s$.?#].[^\s]*)\.zip$/
+		/^https?:\/\/([^\s$.?#].[^\s]*)\.zip(\?.+)?$/
 	);
 
 	if ( zipFields ) {

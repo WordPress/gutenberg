@@ -17,7 +17,7 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { isInSameBlock } from '../../utils/dom';
+import { getBlockClientId } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -130,11 +130,8 @@ export function getClosestTabbable(
 
 export default function useArrowNav() {
 	const {
-		getSelectedBlockClientId,
 		getMultiSelectedBlocksStartClientId,
 		getMultiSelectedBlocksEndClientId,
-		getPreviousBlockClientId,
-		getNextBlockClientId,
 		getSettings,
 		hasMultiSelection,
 		__unstableIsFullySelected,
@@ -150,26 +147,13 @@ export default function useArrowNav() {
 			verticalRect = null;
 		}
 
-		/**
-		 * Returns true if the given target field is the last in its block which
-		 * can be considered for tab transition. For example, in a block with
-		 * two text fields, this would return true when reversing from the first
-		 * of the two fields, but false when reversing from the second.
-		 *
-		 * @param {Element} target    Currently focused text field.
-		 * @param {boolean} isReverse True if considering as the first field.
-		 *
-		 * @return {boolean} Whether field is at edge for tab transition.
-		 */
-		function isTabbableEdge( target, isReverse ) {
+		function isClosestTabbableABlock( target, isReverse ) {
 			const closestTabbable = getClosestTabbable(
 				target,
 				isReverse,
 				node
 			);
-			return (
-				! closestTabbable || ! isInSameBlock( target, closestTabbable )
-			);
+			return closestTabbable && getBlockClientId( closestTabbable );
 		}
 
 		function onKeyDown( event ) {
@@ -254,23 +238,10 @@ export default function useArrowNav() {
 			// next, which is the exact reverse of LTR.
 			const isReverseDir = isRTL( target ) ? ! isReverse : isReverse;
 			const { keepCaretInsideBlock } = getSettings();
-			const selectedBlockClientId = getSelectedBlockClientId();
 
 			if ( isShift ) {
-				const selectionEndClientId =
-					getMultiSelectedBlocksEndClientId();
-				const selectionBeforeEndClientId = getPreviousBlockClientId(
-					selectionEndClientId || selectedBlockClientId
-				);
-				const selectionAfterEndClientId = getNextBlockClientId(
-					selectionEndClientId || selectedBlockClientId
-				);
-
 				if (
-					// Ensure that there is a target block.
-					( ( isReverse && selectionBeforeEndClientId ) ||
-						( ! isReverse && selectionAfterEndClientId ) ) &&
-					isTabbableEdge( target, isReverse ) &&
+					isClosestTabbableABlock( target, isReverse ) &&
 					isNavEdge( target, isReverse )
 				) {
 					node.contentEditable = true;

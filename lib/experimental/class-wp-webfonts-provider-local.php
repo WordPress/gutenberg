@@ -117,7 +117,7 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 
 		foreach ( $webfont['src'] as $url ) {
 			// Add data URIs first.
-			if ( 0 === strpos( trim( $url ), 'data:' ) ) {
+			if ( str_starts_with( trim( $url ), 'data:' ) ) {
 				$src_ordered[] = array(
 					'url'    => $url,
 					'format' => 'data',
@@ -185,9 +185,9 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 
 		// Wrap font-family in quotes if it contains spaces.
 		if (
-			false !== strpos( $webfont['font-family'], ' ' ) &&
-			false === strpos( $webfont['font-family'], '"' ) &&
-			false === strpos( $webfont['font-family'], "'" )
+			str_contains( $webfont['font-family'], ' ' ) &&
+			! str_contains( $webfont['font-family'], '"' ) &&
+			! str_contains( $webfont['font-family'], "'" )
 		) {
 			$webfont['font-family'] = '"' . $webfont['font-family'] . '"';
 		}
@@ -232,7 +232,7 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 
 		foreach ( $value as $item ) {
 
-			if ( 0 === strpos( $item['url'], get_site_url() ) ) {
+			if ( str_starts_with( $item['url'], get_site_url() ) ) {
 				$item['url'] = wp_make_link_relative( $item['url'] );
 			}
 

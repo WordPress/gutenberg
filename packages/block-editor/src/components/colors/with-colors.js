@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { kebabCase, reduce, upperFirst } from 'lodash';
+import { kebabCase, reduce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,6 +19,16 @@ import {
 	getMostReadableColor,
 } from './utils';
 import useSetting from '../use-setting';
+
+/**
+ * Capitalizes the first letter in a string.
+ *
+ * @param {string} str The string whose first letter the function will capitalize.
+ *
+ * @return {string} Capitalized string.
+ */
+const upperFirst = ( [ firstLetter, ...rest ] ) =>
+	firstLetter.toUpperCase() + rest.join( '' );
 
 /**
  * Higher order component factory for injecting the `colorsArray` argument as

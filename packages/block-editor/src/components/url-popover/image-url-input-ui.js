@@ -51,6 +51,7 @@ const ImageURLInputUI = ( {
 	rel,
 } ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
+	const buttonRef = useRef( null );
 	const openLinkUI = useCallback( () => {
 		setIsOpen( true );
 	} );
@@ -245,9 +246,11 @@ const ImageURLInputUI = ( {
 				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
 				aria-expanded={ isOpen }
 				onClick={ openLinkUI }
+				ref={ buttonRef }
 			/>
 			{ isOpen && (
 				<URLPopover
+					anchorRef={ buttonRef }
 					onFocusOutside={ onFocusOutside() }
 					onClose={ closeLinkUI }
 					renderSettings={ () => advancedOptions }

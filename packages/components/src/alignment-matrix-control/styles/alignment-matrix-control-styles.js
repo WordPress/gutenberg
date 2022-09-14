@@ -13,6 +13,7 @@ export const rootBase = () => {
 	return css`
 		border-radius: 2px;
 		box-sizing: border-box;
+		direction: ltr;
 		display: grid;
 		grid-template-columns: repeat( 3, 1fr );
 		outline: none;
@@ -44,10 +45,8 @@ export const Row = styled.div`
 
 const pointActive = ( { isActive } ) => {
 	const boxShadow = isActive ? `0 0 0 2px ${ COLORS.gray[ 900 ] }` : null;
-	const pointColor = isActive ? COLORS.gray[ 900 ] : COLORS.lightGray[ 800 ];
-	const pointColorHover = isActive
-		? COLORS.gray[ 900 ]
-		: COLORS.blue.medium.focus;
+	const pointColor = isActive ? COLORS.gray[ 900 ] : COLORS.gray[ 400 ];
+	const pointColorHover = isActive ? COLORS.gray[ 900 ] : COLORS.ui.theme;
 
 	return css`
 		box-shadow: ${ boxShadow };

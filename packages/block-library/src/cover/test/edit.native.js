@@ -28,7 +28,6 @@ import {
 import { IMAGE_BACKGROUND_TYPE } from '../shared';
 import * as paragraph from '../../paragraph';
 import * as cover from '..';
-import { registerBlock } from '../..';
 
 // Avoid errors due to mocked stylesheet files missing required selectors.
 jest.mock( '@wordpress/compose', () => ( {
@@ -84,8 +83,8 @@ beforeAll( () => {
 	);
 
 	// Register required blocks.
-	registerBlock( paragraph );
-	registerBlock( cover );
+	paragraph.init();
+	cover.init();
 	setDefaultBlockName( paragraph.name );
 } );
 

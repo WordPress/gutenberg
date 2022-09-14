@@ -19,9 +19,14 @@ export default function getScrollContainer( node ) {
 	if ( node.scrollHeight > node.clientHeight ) {
 		// ...except when overflow is defined to be hidden or visible
 		const { overflowY } = getComputedStyle( node );
+
 		if ( /(auto|scroll)/.test( overflowY ) ) {
 			return node;
 		}
+	}
+
+	if ( node.ownerDocument === node.parentNode ) {
+		return node;
 	}
 
 	// Continue traversing.

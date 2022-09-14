@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -9,24 +9,19 @@ import { mount } from 'enzyme';
 import KeyboardShortcuts from '../';
 
 describe( 'KeyboardShortcuts', () => {
-	afterEach( () => {
-		while ( document.body.firstChild ) {
-			document.body.removeChild( document.body.firstChild );
-		}
-	} );
-
 	function keyPress( which, target ) {
 		[ 'keydown', 'keypress', 'keyup' ].forEach( ( eventName ) => {
 			const event = new window.Event( eventName, { bubbles: true } );
 			event.keyCode = which;
 			event.which = which;
-			target.dispatchEvent( event );
+			fireEvent( target, event );
 		} );
 	}
 
-	it( 'should capture key events', () => {
+	it( 'should capture key events', async () => {
 		const spy = jest.fn();
-		mount(
+
+		render(
 			<KeyboardShortcuts
 				shortcuts={ {
 					d: spy,
@@ -41,10 +36,8 @@ describe( 'KeyboardShortcuts', () => {
 
 	it( 'should capture key events globally', () => {
 		const spy = jest.fn();
-		const attachNode = document.createElement( 'div' );
-		document.body.appendChild( attachNode );
 
-		const wrapper = mount(
+		render(
 			<div>
 				<KeyboardShortcuts
 					bindGlobal
@@ -53,21 +46,18 @@ describe( 'KeyboardShortcuts', () => {
 					} }
 				/>
 				<textarea></textarea>
-			</div>,
-			{ attachTo: attachNode }
+			</div>
 		);
 
-		keyPress( 68, wrapper.find( 'textarea' ).getDOMNode() );
+		keyPress( 68, screen.getByRole( 'textbox' ) );
 
 		expect( spy ).toHaveBeenCalled();
 	} );
 
 	it( 'should capture key events on specific event', () => {
 		const spy = jest.fn();
-		const attachNode = document.createElement( 'div' );
-		document.body.appendChild( attachNode );
 
-		const wrapper = mount(
+		render(
 			<div>
 				<KeyboardShortcuts
 					eventName="keyup"
@@ -76,22 +66,18 @@ describe( 'KeyboardShortcuts', () => {
 					} }
 				/>
 				<textarea></textarea>
-			</div>,
-			{ attachTo: attachNode }
+			</div>
 		);
 
-		keyPress( 68, wrapper.find( 'textarea' ).getDOMNode() );
+		keyPress( 68, screen.getByRole( 'textbox' ) );
 
-		expect( spy ).toHaveBeenCalled();
 		expect( spy.mock.calls[ 0 ][ 0 ].type ).toBe( 'keyup' );
 	} );
 
 	it( 'should capture key events on children', () => {
 		const spy = jest.fn();
-		const attachNode = document.createElement( 'div' );
-		document.body.appendChild( attachNode );
 
-		const wrapper = mount(
+		render(
 			<div>
 				<KeyboardShortcuts
 					shortcuts={ {
@@ -101,18 +87,17 @@ describe( 'KeyboardShortcuts', () => {
 					<textarea></textarea>
 				</KeyboardShortcuts>
 				<textarea></textarea>
-			</div>,
-			{ attachTo: attachNode }
+			</div>
 		);
 
-		const textareas = wrapper.find( 'textarea' );
+		const textareas = screen.getAllByRole( 'textbox' );
 
 		// Outside scope
-		keyPress( 68, textareas.at( 1 ).getDOMNode() );
+		keyPress( 68, textareas[ 1 ] );
 		expect( spy ).not.toHaveBeenCalled();
 
 		// Inside scope
-		keyPress( 68, textareas.at( 0 ).getDOMNode() );
+		keyPress( 68, textareas[ 0 ] );
 		expect( spy ).toHaveBeenCalled();
 	} );
 } );

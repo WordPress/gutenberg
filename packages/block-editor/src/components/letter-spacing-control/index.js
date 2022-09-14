@@ -26,6 +26,7 @@ export default function LetterSpacingControl( {
 	value,
 	onChange,
 	__unstableInputWidth = '60px',
+	...otherProps
 } ) {
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
@@ -33,6 +34,7 @@ export default function LetterSpacingControl( {
 	} );
 	return (
 		<UnitControl
+			{ ...otherProps }
 			label={ __( 'Letter spacing' ) }
 			value={ value }
 			__unstableInputWidth={ __unstableInputWidth }

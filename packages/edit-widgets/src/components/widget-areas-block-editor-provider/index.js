@@ -4,6 +4,11 @@
 import { SlotFillProvider } from '@wordpress/components';
 import { uploadMedia } from '@wordpress/media-utils';
 import { useDispatch, useSelect } from '@wordpress/data';
+import {
+	useEntityBlockEditor,
+	store as coreStore,
+	useResourcePermissions,
+} from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import {
 	BlockEditorProvider,
@@ -18,7 +23,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
 import { store as editWidgetsStore } from '../../store';
@@ -29,36 +33,34 @@ export default function WidgetAreasBlockEditorProvider( {
 	children,
 	...props
 } ) {
-	const {
-		hasUploadPermissions,
-		reusableBlocks,
-		isFixedToolbarActive,
-		keepCaretInsideBlock,
-	} = useSelect(
-		( select ) => ( {
-			hasUploadPermissions:
-				select( coreStore ).canUser( 'create', 'media' ) ?? true,
-			widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
-			widgets: select( editWidgetsStore ).getWidgets(),
-			reusableBlocks: ALLOW_REUSABLE_BLOCKS
-				? select( coreStore ).getEntityRecords( 'postType', 'wp_block' )
-				: [],
-			isFixedToolbarActive: !! select( preferencesStore ).get(
-				'core/edit-widgets',
-				'fixedToolbar'
-			),
-			keepCaretInsideBlock: !! select( preferencesStore ).get(
-				'core/edit-widgets',
-				'keepCaretInsideBlock'
-			),
-		} ),
-		[]
-	);
+	const mediaPermissions = useResourcePermissions( 'media' );
+	const { reusableBlocks, isFixedToolbarActive, keepCaretInsideBlock } =
+		useSelect(
+			( select ) => ( {
+				widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
+				widgets: select( editWidgetsStore ).getWidgets(),
+				reusableBlocks: ALLOW_REUSABLE_BLOCKS
+					? select( coreStore ).getEntityRecords(
+							'postType',
+							'wp_block'
+					  )
+					: [],
+				isFixedToolbarActive: !! select( preferencesStore ).get(
+					'core/edit-widgets',
+					'fixedToolbar'
+				),
+				keepCaretInsideBlock: !! select( preferencesStore ).get(
+					'core/edit-widgets',
+					'keepCaretInsideBlock'
+				),
+			} ),
+			[]
+		);
 	const { setIsInserterOpened } = useDispatch( editWidgetsStore );
 
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;
-		if ( hasUploadPermissions ) {
+		if ( mediaPermissions.canCreate ) {
 			mediaUploadBlockEditor = ( { onError, ...argumentsObject } ) => {
 				uploadMedia( {
 					wpAllowedMimeTypes: blockEditorSettings.allowedMimeTypes,
@@ -80,7 +82,7 @@ export default function WidgetAreasBlockEditorProvider( {
 		blockEditorSettings,
 		isFixedToolbarActive,
 		keepCaretInsideBlock,
-		hasUploadPermissions,
+		mediaPermissions.canCreate,
 		reusableBlocks,
 		setIsInserterOpened,
 	] );

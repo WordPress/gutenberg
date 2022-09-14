@@ -39,6 +39,8 @@ const config = {
 			// that affect wp-components
 			'https://wordpress.org/gutenberg/wp-admin/css/common.min.css',
 			'https://wordpress.org/gutenberg/wp-admin/css/forms.min.css',
+			// Icon components need to support dashicons for backwards compatibility
+			'https://wordpress.org/gutenberg/wp-includes/css/dashicons.min.css',
 		],
 		// In wp-admin, these classes are added to the body element,
 		// which is used as a class scope for some relevant styles in the external

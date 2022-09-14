@@ -86,7 +86,8 @@ describe( 'Toolbar roving tabindex', () => {
 	it( 'ensures list block toolbar uses roving tabindex', async () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'List' );
-		await testBlockToolbarKeyboardNavigation( 'Block: List', 'List' );
+		await testBlockToolbarKeyboardNavigation( 'List text', 'Select List' );
+		await page.click( `[aria-label="Select List"]` );
 		await wrapCurrentBlockWithGroup( 'List' );
 		await testGroupKeyboardNavigation( 'Block: List', 'List' );
 	} );

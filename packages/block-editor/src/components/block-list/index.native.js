@@ -469,7 +469,7 @@ class EmptyListComponent extends Component {
 			renderFooterAppender,
 		} = this.props;
 
-		if ( renderFooterAppender ) {
+		if ( renderFooterAppender || renderAppender === false ) {
 			return null;
 		}
 

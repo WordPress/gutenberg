@@ -342,6 +342,10 @@ const store = createReduxStore( 'my-shop', {
 register( store );
 ```
 
+_Type_
+
+-   `import('./types').combineReducers`
+
 _Parameters_
 
 -   _reducers_ `Object`: An object whose values correspond to different reducing functions that need to be combined into one.
@@ -745,11 +749,11 @@ const SaleButton = ( { children } ) => {
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `[string|StoreDescriptor]`: Optionally provide the name of the store or its descriptor from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
+-   _storeNameOrDescriptor_ `[StoreNameOrDescriptor]`: Optionally provide the name of the store or its descriptor from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
 
 _Returns_
 
--   `Function`: A custom react hook.
+-   `UseDispatchReturn<StoreNameOrDescriptor>`: A custom react hook.
 
 ### useRegistry
 

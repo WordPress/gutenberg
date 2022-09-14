@@ -1,0 +1,122 @@
+.tools-panel-item-spacing {
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	grid-row-gap: $grid-unit-05;
+}
+
+.component-spacing-sizes-control {
+	box-sizing: border-box;
+	padding-bottom: 12px;
+	width: 100%;
+	display: contents;
+
+	legend {
+		padding: 0;
+		grid-column: 1 / 1;
+		grid-row: 1 / 1;
+		align-self: center;
+	}
+
+	.components-spacing-sizes-control__side-labels {
+		grid-column: 1 / 1;
+		min-height: 30px;
+		justify-content: left;
+	}
+
+	.components-spacing-sizes-control__hint-single {
+		margin-top: 0;
+		margin-left: 0;
+	}
+
+	.components-spacing-sizes-control__hint-single,
+	.components-spacing-sizes-control__hint-all {
+		color: $gray-700;
+		font-size: 12px;
+	}
+
+	.components-spacing-sizes-control__hint-all {
+		grid-column: 2 / 2;
+		justify-self: left;
+		grid-row: 1 / 1;
+		align-self: center;
+		margin-left: $grid-unit-05;
+	}
+
+	.components-spacing-sizes-control__custom-toggle-all {
+		grid-column: 2 / 2;
+		grid-row: 1 / 1;
+		justify-self: end;
+		margin-right: $grid-unit-05;
+		padding: 0;
+	}
+
+	.components-spacing-sizes-control__custom-toggle-single {
+		grid-column: 3 / 3;
+		justify-self: end;
+	}
+
+	.components-spacing-sizes-control__custom-toggle-all,
+	.components-spacing-sizes-control__custom-toggle-single {
+		&.is-small.has-icon {
+			padding: 0;
+			min-width: $icon-size;
+		}
+	}
+
+	.component-spacing-sizes-control__linked-button {
+		grid-column: 3 / 3;
+		grid-row: 1 / 1;
+		justify-self: end;
+	}
+
+	.components-spacing-sizes-control__custom-value-range {
+		grid-column: span 2;
+		margin-left: $grid-unit-10;
+		padding-right: $grid-unit-10;
+		height: 30px;
+	}
+
+	.components-spacing-sizes-control__custom-value-input {
+		width: 124px;
+	}
+
+	.components-spacing-sizes-control__range-control {
+		grid-column: span 3;
+		padding-right: $grid-unit-10;
+		height: 30px;
+	}
+
+	.components-range-control__wrapper {
+		margin-bottom: 0;
+	}
+
+	.components-range-control__mark {
+		height: $grid-unit-05;
+		width: 3px;
+		background-color: #fff;
+		z-index: 1;
+	}
+
+	.components-range-control__marks {
+		margin-top: 17px;
+
+		:first-child {
+			display: none;
+		}
+	}
+
+	[class*="ThumbWrapper-thumbColor"] {
+		z-index: 3;
+	}
+
+	.components-spacing-sizes-control__side-label {
+		margin-right: $grid-unit-05;
+		grid-column: 1 / 1;
+		justify-self: left;
+		font-size: 12px;
+	}
+
+	.components-spacing-sizes-control__custom-select-control {
+		grid-column: span 3;
+	}
+}

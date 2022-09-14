@@ -71,11 +71,11 @@ export type StyleOptions = {
 	/**
 	 * CSS selector for the generated style.
 	 */
-	selector: string;
+	selector?: string;
 };
 
 export type GeneratedCSSRule = {
-	selector: string;
+	selector?: string;
 	value: string;
 	/**
 	 * The CSS key in JS style attribute format, compatible with React.
@@ -88,9 +88,8 @@ export interface StyleDefinition {
 	name: string;
 	generate?: (
 		style: Style,
-		options: StyleOptions,
+		options: StyleOptions | {},
 		path?: string[],
 		ruleKey?: string
 	) => GeneratedCSSRule[];
-	getClassNames?: ( style: Style ) => string[];
 }

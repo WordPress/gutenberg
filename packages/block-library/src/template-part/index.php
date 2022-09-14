@@ -33,7 +33,7 @@ function render_block_core_template_part( $attributes ) {
 				'tax_query'      => array(
 					array(
 						'taxonomy' => 'wp_theme',
-						'field'    => 'slug',
+						'field'    => 'name',
 						'terms'    => $attributes['theme'],
 					),
 				),

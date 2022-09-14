@@ -35,7 +35,9 @@ afterAll( () => {
 } );
 
 describe( 'Editor', () => {
-	beforeAll( registerCoreBlocks );
+	beforeAll( () => {
+		registerCoreBlocks();
+	} );
 
 	it( 'detects unsupported block and sends hasUnsupportedBlocks true to native', () => {
 		RNReactNativeGutenbergBridge.editorDidMount = jest.fn();

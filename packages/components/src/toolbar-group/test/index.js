@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -33,11 +33,9 @@ describe( 'ToolbarGroup', () => {
 				},
 			];
 
-			const { getByLabelText } = render(
-				<ToolbarGroup controls={ controls } />
-			);
+			render( <ToolbarGroup controls={ controls } /> );
 
-			const toolbarButton = getByLabelText( 'WordPress' );
+			const toolbarButton = screen.getByLabelText( 'WordPress' );
 			expect( toolbarButton.getAttribute( 'aria-pressed' ) ).toBe(
 				'false'
 			);
@@ -55,11 +53,9 @@ describe( 'ToolbarGroup', () => {
 				},
 			];
 
-			const { getByLabelText } = render(
-				<ToolbarGroup controls={ controls } />
-			);
+			render( <ToolbarGroup controls={ controls } /> );
 
-			const toolbarButton = getByLabelText( 'WordPress' );
+			const toolbarButton = screen.getByLabelText( 'WordPress' );
 			expect( toolbarButton.getAttribute( 'aria-pressed' ) ).toBe(
 				'true'
 			);
@@ -84,11 +80,11 @@ describe( 'ToolbarGroup', () => {
 				],
 			];
 
-			const { container, getAllByRole } = render(
+			const { container } = render(
 				<ToolbarGroup controls={ controls } />
 			);
 
-			const buttons = getAllByRole( 'button' );
+			const buttons = screen.getAllByRole( 'button' );
 			expect( buttons ).toHaveLength( 2 );
 			expect(
 				container.querySelector( '.has-left-divider button' )
@@ -105,11 +101,9 @@ describe( 'ToolbarGroup', () => {
 					isActive: true,
 				},
 			];
-			const { getByLabelText } = render(
-				<ToolbarGroup controls={ controls } />
-			);
+			render( <ToolbarGroup controls={ controls } /> );
 
-			fireEvent.click( getByLabelText( 'WordPress' ) );
+			fireEvent.click( screen.getByLabelText( 'WordPress' ) );
 			expect( clickHandler ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );

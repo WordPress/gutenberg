@@ -192,9 +192,18 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 							isBlock
 							as={ Button }
 							onClick={ () => {
-								const { slug, title, description } =
-									entityForSuggestions.template;
-								onSelect( { slug, title, description } );
+								const {
+									slug,
+									title,
+									description,
+									templatePrefix,
+								} = entityForSuggestions.template;
+								onSelect( {
+									slug,
+									title,
+									description,
+									templatePrefix,
+								} );
 							} }
 						>
 							<Text as="span" weight={ 600 }>

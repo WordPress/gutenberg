@@ -42,6 +42,7 @@ export function LineHeightEdit( props ) {
 			__nextHasNoMarginBottom={ true }
 			value={ style?.typography?.lineHeight }
 			onChange={ onChange }
+			size="__unstable-large"
 		/>
 	);
 }

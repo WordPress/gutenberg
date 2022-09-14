@@ -3,6 +3,11 @@
 	&.is-grid {
 		padding-left: 0;
 	}
+
+	// Apply overflow for post items, so any floated featured images won't crop the focus style.
+	> li {
+		overflow: hidden;
+	}
 }
 
 .wp-block-latest-posts li a > div {

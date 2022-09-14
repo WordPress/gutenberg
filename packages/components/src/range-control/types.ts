@@ -76,7 +76,7 @@ export type ControlledRangeValue = number | '' | null;
 
 export type RangeControlProps< IconProps = unknown > = Pick<
 	BaseControlProps,
-	'hideLabelFromVision' | 'help'
+	'hideLabelFromVision' | 'help' | '__nextHasNoMarginBottom'
 > &
 	MarksProps & {
 		/**
@@ -243,7 +243,10 @@ export type InputRangeProps = {
 	value?: number | '';
 };
 
-export type WrapperProps = {
+export type WrapperProps = Pick<
+	BaseControlProps,
+	'__nextHasNoMarginBottom'
+> & {
 	color?: CSSProperties[ 'color' ];
 	marks?: RangeMarks;
 };

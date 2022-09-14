@@ -6,17 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-/**
- * Internal dependencies
- */
-import { Icon, SelectControl } from '../';
 import { __ } from '@wordpress/i18n';
-
 import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import { Icon, SelectControl } from '../';
 import sizesTable, { findSizeBySlug } from './sizes';
 
 export function DimensionControl( props ) {

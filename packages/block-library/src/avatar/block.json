@@ -29,7 +29,8 @@
 		"align": true,
 		"alignWide": false,
 		"spacing": {
-			"margin": true
+			"margin": true,
+			"padding": true
 		},
 		"__experimentalBorder": {
 			"__experimentalSkipSerialization": true,

@@ -75,6 +75,9 @@ describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 			await page.$x( `//button//span[contains(text(), 'List')]` )
 		 )[ 0 ];
 		await insertButton.click();
+		// Select the list wrapper so the image is inserable.
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
 		await insertBlock( 'Image' );
 		await closeGlobalBlockInserter();
 		await page.waitForSelector( '.product[data-number-of-children="2"]' );

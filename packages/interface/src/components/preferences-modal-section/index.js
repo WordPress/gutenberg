@@ -1,6 +1,6 @@
 const Section = ( { description, title, children } ) => (
 	<fieldset className="interface-preferences-modal__section">
-		<legend>
+		<legend className="interface-preferences-modal__section-legend">
 			<h2 className="interface-preferences-modal__section-title">
 				{ title }
 			</h2>

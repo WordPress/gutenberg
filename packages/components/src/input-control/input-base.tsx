@@ -19,7 +19,6 @@ import {
 	Root,
 	Prefix,
 	Suffix,
-	LabelWrapper,
 	getSizeConfig,
 } from './styles/input-control-styles';
 import type { InputBaseProps, LabelPosition } from './types';
@@ -91,20 +90,19 @@ export function InputBase(
 			{ ...props }
 			{ ...getUIFlexProps( labelPosition ) }
 			className={ className }
+			gap={ 2 }
 			isFocused={ isFocused }
 			labelPosition={ labelPosition }
 			ref={ ref }
 		>
-			<LabelWrapper>
-				<Label
-					className="components-input-control__label"
-					hideLabelFromVision={ hideLabelFromVision }
-					labelPosition={ labelPosition }
-					htmlFor={ id }
-				>
-					{ label }
-				</Label>
-			</LabelWrapper>
+			<Label
+				className="components-input-control__label"
+				hideLabelFromVision={ hideLabelFromVision }
+				labelPosition={ labelPosition }
+				htmlFor={ id }
+			>
+				{ label }
+			</Label>
 			<Container
 				__unstableInputWidth={ __unstableInputWidth }
 				className="components-input-control__container"

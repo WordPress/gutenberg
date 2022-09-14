@@ -155,10 +155,11 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				getBlockName,
 				isBlockSelected,
 				hasSelectedInnerBlock,
-				isNavigationMode,
+				__unstableGetEditorMode,
 			} = select( blockEditorStore );
 			const blockName = getBlockName( clientId );
-			const enableClickThrough = isNavigationMode() || isSmallScreen;
+			const enableClickThrough =
+				__unstableGetEditorMode() === 'navigation' || isSmallScreen;
 			return {
 				__experimentalCaptureToolbars: select(
 					blocksStore

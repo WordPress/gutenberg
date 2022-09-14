@@ -1,15 +1,22 @@
 /**
+ * WordPress dependencies
+ */
+import { swatch } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
-import Swatch from '../swatch';
-
+import ColorIndicator from '../color-indicator';
+import Icon from '../icon';
 import { getGradientFromCSSColors } from './utils';
 
 function DuotoneSwatch( { values } ) {
-	return (
-		<Swatch
-			fill={ values && getGradientFromCSSColors( values, '135deg' ) }
+	return values ? (
+		<ColorIndicator
+			colorValue={ getGradientFromCSSColors( values, '135deg' ) }
 		/>
+	) : (
+		<Icon icon={ swatch } />
 	);
 }
 

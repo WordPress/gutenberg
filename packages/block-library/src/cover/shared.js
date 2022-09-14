@@ -72,8 +72,9 @@ export function attributesFromMedia( setAttributes, dimRatio ) {
 			id: media.id,
 			alt: media?.alt,
 			backgroundType: mediaType,
+			focalPoint: undefined,
 			...( mediaType === VIDEO_BACKGROUND_TYPE
-				? { focalPoint: undefined, hasParallax: undefined }
+				? { hasParallax: undefined }
 				: {} ),
 		} );
 	};

@@ -1,8 +1,4 @@
 // @ts-nocheck
-/**
- * External dependencies
- */
-import { includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -83,7 +79,7 @@ const addPopoverToGrandchildren = ( {
 				animate={ false }
 				offset={ offset }
 				anchorRef={ anchorRef }
-				__unstableShift
+				shift
 			>
 				{ text }
 				<Shortcut
@@ -211,7 +207,7 @@ function Tooltip( props ) {
 			// quickly blur/mouseleave before delayedSetIsOver is called.
 			delayedSetIsOver.cancel();
 
-			const _isOver = includes( [ 'focus', 'mouseenter' ], event.type );
+			const _isOver = [ 'focus', 'mouseenter' ].includes( event.type );
 			if ( _isOver === isOver ) {
 				return;
 			}

@@ -157,9 +157,9 @@ describe( 'Post Editor Performance', () => {
 		await page.evaluate( () => {
 			const { createBlock } = window.wp.blocks;
 			const { dispatch } = window.wp.data;
-			const blocks = window.lodash
-				.times( 1000 )
-				.map( () => createBlock( 'core/paragraph' ) );
+			const blocks = Array.from( { length: 1000 } ).map( () =>
+				createBlock( 'core/paragraph' )
+			);
 			dispatch( 'core/block-editor' ).resetBlocks( blocks );
 		} );
 		const paragraphs = await page.$$( '.wp-block' );

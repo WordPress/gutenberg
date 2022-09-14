@@ -53,7 +53,7 @@ describe( 'Text', () => {
 			<Text variant="muted">Lorem ipsum.</Text>
 		);
 		expect( container.firstChild ).toHaveStyle( {
-			color: COLORS.mediumGray.text,
+			color: COLORS.gray[ 700 ],
 		} );
 	} );
 

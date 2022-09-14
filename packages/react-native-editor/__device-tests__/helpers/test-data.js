@@ -151,7 +151,9 @@ exports.separatorBlockEmpty = `<!-- wp:separator -->
 <!-- /wp:separator -->`;
 
 exports.listBlockEmpty = `<!-- wp:list -->
-<ul><li></li></ul>
+<ul><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`;
 
 exports.imageBlockEmpty = `<!-- wp:image -->

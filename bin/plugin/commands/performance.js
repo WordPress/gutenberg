@@ -177,7 +177,7 @@ async function setUpGitBranch( branch, environmentDirectory ) {
  */
 async function runTestSuite( testSuite, performanceTestDirectory ) {
 	await runShellScript(
-		`npm run test-performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
+		`npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
 		performanceTestDirectory
 	);
 	const rawResults = await readJSONFile(

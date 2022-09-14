@@ -11,9 +11,9 @@ import { __unstableGetValuesFromColors as getValuesFromColors } from './index';
 /**
  * SVG and stylesheet needed for rendering the duotone filter.
  *
- * @param {Object}   props          Duotone props.
- * @param {string}   props.selector Selector to apply the filter to.
- * @param {string}   props.id       Unique id for this duotone filter.
+ * @param {Object} props          Duotone props.
+ * @param {string} props.selector Selector to apply the filter to.
+ * @param {string} props.id       Unique id for this duotone filter.
  *
  * @return {WPElement} Duotone element.
  */
@@ -29,8 +29,8 @@ ${ selector } {
 /**
  * Stylesheet for disabling a global styles duotone filter.
  *
- * @param {Object}   props          Duotone props.
- * @param {string}   props.selector Selector to disable the filter for.
+ * @param {Object} props          Duotone props.
+ * @param {string} props.selector Selector to disable the filter for.
  *
  * @return {WPElement} Filter none style element.
  */

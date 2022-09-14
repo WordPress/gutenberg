@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { omit } from 'lodash';
 import deepFreeze from 'deep-freeze';
 
 /**
@@ -260,7 +259,8 @@ describe( 'state', () => {
 
 				const state = blocks( existingState, action );
 
-				expect( omit( state, [ 'tree' ] ) ).toEqual( {
+				const { tree, ...restState } = state;
+				expect( restState ).toEqual( {
 					isPersistentChange: true,
 					isIgnoredChange: false,
 					byClientId: {
@@ -342,7 +342,8 @@ describe( 'state', () => {
 
 				const state = blocks( existingState, action );
 
-				expect( omit( state, [ 'tree' ] ) ).toEqual( {
+				const { tree, ...restState } = state;
+				expect( restState ).toEqual( {
 					isPersistentChange: true,
 					isIgnoredChange: false,
 					byClientId: {
@@ -466,7 +467,8 @@ describe( 'state', () => {
 
 				const state = blocks( existingState, action );
 
-				expect( omit( state, [ 'tree' ] ) ).toEqual( {
+				const { tree, ...restState } = state;
+				expect( restState ).toEqual( {
 					isPersistentChange: true,
 					isIgnoredChange: false,
 					byClientId: {
@@ -603,7 +605,8 @@ describe( 'state', () => {
 
 				const state = blocks( existingState, action );
 
-				expect( omit( state, [ 'tree' ] ) ).toEqual( {
+				const { tree, ...restState } = state;
+				expect( restState ).toEqual( {
 					isPersistentChange: true,
 					isIgnoredChange: false,
 					byClientId: {

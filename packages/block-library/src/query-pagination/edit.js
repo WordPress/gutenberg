@@ -22,6 +22,11 @@ const TEMPLATE = [
 	[ 'core/query-pagination-numbers' ],
 	[ 'core/query-pagination-next' ],
 ];
+const ALLOWED_BLOCKS = [
+	'core/query-pagination-previous',
+	'core/query-pagination-numbers',
+	'core/query-pagination-next',
+];
 
 const getDefaultBlockLayout = ( blockTypeOrName ) => {
 	const layoutBlockSupportConfig = getBlockSupport(
@@ -55,11 +60,7 @@ export default function QueryPaginationEdit( {
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
-		allowedBlocks: [
-			'core/query-pagination-previous',
-			'core/query-pagination-numbers',
-			'core/query-pagination-next',
-		],
+		allowedBlocks: ALLOWED_BLOCKS,
 		__experimentalLayout: usedLayout,
 	} );
 	return (

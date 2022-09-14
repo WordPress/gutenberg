@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
-import TestUtils from 'react-dom/test-utils';
+import { render, screen } from '@testing-library/react';
+
 /**
  * WordPress dependencies
  */
@@ -12,172 +12,188 @@ import { plusCircle } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import ButtonWithForwardedRef, { Button } from '../';
-import { VisuallyHidden } from '../../visually-hidden';
+import Button from '../';
+
+jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
 
 describe( 'Button', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render a button element with only one class', () => {
-			const button = shallow( <Button /> ).find( 'button' );
-			expect( button.hasClass( 'components-button' ) ).toBe( true );
-			expect( button.hasClass( 'is-large' ) ).toBe( false );
-			expect( button.hasClass( 'is-primary' ) ).toBe( false );
-			expect( button.hasClass( 'is-pressed' ) ).toBe( false );
-			expect( button.prop( 'disabled' ) ).toBeUndefined();
-			expect( button.prop( 'aria-disabled' ) ).toBeUndefined();
-			expect( button.prop( 'type' ) ).toBe( 'button' );
-			expect( button.type() ).toBe( 'button' );
+			render( <Button /> );
+			const button = screen.getByRole( 'button' );
+
+			expect( button ).toHaveClass( 'components-button' );
+			expect( button ).not.toHaveClass( 'is-large' );
+			expect( button ).not.toHaveClass( 'is-primary' );
+			expect( button ).not.toHaveClass( 'is-pressed' );
+			expect( button ).not.toHaveAttribute( 'disabled' );
+			expect( button ).not.toHaveAttribute( 'aria-disabled' );
+			expect( button ).toHaveAttribute( 'type', 'button' );
 		} );
 
 		it( 'should render a button element with is-primary class', () => {
-			const button = shallow( <Button variant="primary" /> ).find(
-				'button'
-			);
-			expect( button.hasClass( 'is-large' ) ).toBe( false );
-			expect( button.hasClass( 'is-primary' ) ).toBe( true );
+			render( <Button variant="primary" /> );
+			const button = screen.getByRole( 'button' );
+
+			expect( button ).not.toHaveClass( 'is-large' );
+			expect( button ).toHaveClass( 'is-primary' );
 		} );
 
 		it( 'should render a button element with is-secondary and is-small class', () => {
-			const button = shallow(
-				<Button variant="secondary" isSmall />
-			).find( 'button' );
-			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
-			expect( button.hasClass( 'is-large' ) ).toBe( false );
-			expect( button.hasClass( 'is-small' ) ).toBe( true );
-			expect( button.hasClass( 'is-primary' ) ).toBe( false );
+			render( <Button variant="secondary" isSmall /> );
+			const button = screen.getByRole( 'button' );
+
+			expect( button ).toHaveClass( 'is-secondary' );
+			expect( button ).not.toHaveClass( 'is-large' );
+			expect( button ).toHaveClass( 'is-small' );
+			expect( button ).not.toHaveClass( 'is-primary' );
 		} );
 
 		it( 'should render a button element with is-tertiary class', () => {
-			const button = shallow( <Button variant="tertiary" /> ).find(
-				'button'
-			);
-			expect( button.hasClass( 'is-large' ) ).toBe( false );
-			expect( button.hasClass( 'is-primary' ) ).toBe( false );
-			expect( button.hasClass( 'is-secondary' ) ).toBe( false );
-			expect( button.hasClass( 'is-tertiary' ) ).toBe( true );
+			render( <Button variant="tertiary" /> );
+			const button = screen.getByRole( 'button' );
+
+			expect( button ).not.toHaveClass( 'is-large' );
+			expect( button ).not.toHaveClass( 'is-primary' );
+			expect( button ).not.toHaveClass( 'is-secondary' );
+			expect( button ).toHaveClass( 'is-tertiary' );
 		} );
 
 		it( 'should render a button element with is-link class', () => {
-			const button = shallow( <Button variant="link" /> ).find(
-				'button'
-			);
-			expect( button.hasClass( 'is-primary' ) ).toBe( false );
-			expect( button.hasClass( 'is-secondary' ) ).toBe( false );
-			expect( button.hasClass( 'is-tertiary' ) ).toBe( false );
-			expect( button.hasClass( 'is-link' ) ).toBe( true );
+			render( <Button variant="link" /> );
+			const button = screen.getByRole( 'button' );
+
+			expect( button ).not.toHaveClass( 'is-primary' );
+			expect( button ).not.toHaveClass( 'is-secondary' );
+			expect( button ).not.toHaveClass( 'is-tertiary' );
+			expect( button ).toHaveClass( 'is-link' );
 		} );
 
 		it( 'should render a button element with is-pressed without button class', () => {
-			const button = shallow( <Button isPressed /> ).find( 'button' );
-			expect( button.hasClass( 'is-pressed' ) ).toBe( true );
+			render( <Button isPressed /> );
+
+			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-pressed' );
 		} );
 
 		it( 'should add a disabled prop to the button', () => {
-			const button = shallow( <Button disabled /> ).find( 'button' );
-			expect( button.prop( 'disabled' ) ).toBe( true );
+			render( <Button disabled /> );
+
+			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+				'disabled'
+			);
 		} );
 
 		it( 'should add only aria-disabled attribute when disabled and isFocusable are true', () => {
-			const button = shallow(
-				<Button disabled __experimentalIsFocusable />
-			).find( 'button' );
-			expect( button.prop( 'disabled' ) ).toBe( false );
-			expect( button.prop( 'aria-disabled' ) ).toBe( true );
+			render( <Button disabled __experimentalIsFocusable /> );
+			const button = screen.getByRole( 'button' );
+
+			expect( button ).not.toHaveAttribute( 'disabled' );
+			expect( button ).toHaveAttribute( 'aria-disabled' );
 		} );
 
-		it( 'should not poss the prop target into the element', () => {
-			const button = shallow( <Button target="_blank" /> ).find(
-				'button'
+		it( 'should not pass the prop target into the element', () => {
+			render( <Button target="_blank" /> );
+
+			expect( screen.getByRole( 'button' ) ).not.toHaveAttribute(
+				'target'
 			);
-			expect( button.prop( 'target' ) ).toBeUndefined();
 		} );
 
 		it( 'should render with an additional className', () => {
-			const button = shallow( <Button className="gutenberg" /> ).find(
-				'button'
-			);
+			render( <Button className="gutenberg" /> );
 
-			expect( button.hasClass( 'gutenberg' ) ).toBe( true );
+			expect( screen.getByRole( 'button' ) ).toHaveClass( 'gutenberg' );
 		} );
 
-		it( 'should render and additional WordPress prop of value awesome', () => {
-			const button = shallow( <Button WordPress="awesome" /> ).find(
-				'button'
-			);
+		it( 'should render an additional WordPress prop of value awesome', () => {
+			render( <Button WordPress="awesome" /> );
 
-			expect( button.prop( 'WordPress' ) ).toBe( 'awesome' );
+			expect( console ).toHaveErrored();
+			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+				'wordpress',
+				'awesome'
+			);
 		} );
 
 		it( 'should render an icon button', () => {
-			const iconButton = shallow( <Button icon={ plusCircle } /> ).find(
-				'button'
-			);
-			expect( iconButton.hasClass( 'has-icon' ) ).toBe( true );
-			expect( iconButton.prop( 'aria-label' ) ).toBeUndefined();
+			render( <Button icon={ plusCircle } /> );
+			const button = screen.getByRole( 'button' );
+
+			expect( button ).toHaveClass( 'has-icon' );
+			expect( button ).not.toHaveAttribute( 'aria-label' );
 		} );
 
 		it( 'should render a Dashicon component matching the wordpress icon', () => {
-			const iconButton = shallow( <Button icon={ plusCircle } /> ).find(
-				'button'
+			render( <Button icon={ plusCircle } /> );
+
+			expect( screen.getByRole( 'button' ) ).toContainElement(
+				screen.getByTestId( 'test-icon' )
 			);
-			expect( iconButton.find( 'Icon' ).dive() ).not.toBeNull();
 		} );
 
 		it( 'should render child elements and icon', () => {
-			const iconButton = shallow(
+			render(
 				<Button
 					icon={ plusCircle }
 					children={ <p className="test">Test</p> }
 				/>
-			).find( 'button' );
-			expect( iconButton.find( 'Icon' ).dive() ).not.toBeNull();
-			expect( iconButton.find( '.test' ).shallow().text() ).toBe(
-				'Test'
 			);
+
+			expect( screen.getByRole( 'button' ) ).toContainElement(
+				screen.getByTestId( 'test-icon' )
+			);
+
+			const paragraph = screen.getByText( 'Test' );
+			expect( paragraph ).toBeVisible();
+			expect( paragraph ).toHaveClass( 'test' );
 		} );
 
-		it( 'should add an aria-label when the label property is used, with Tooltip wrapper', () => {
-			const iconButton = shallow(
-				<Button icon={ plusCircle } label="WordPress" />
-			).find( 'Tooltip' );
-			expect( iconButton.name() ).toBe( 'Tooltip' );
-			expect( iconButton.prop( 'text' ) ).toBe( 'WordPress' );
-			expect( iconButton.find( 'button' ).prop( 'aria-label' ) ).toBe(
-				'WordPress'
-			);
+		it( 'should add an aria-label when the label property is used, with Tooltip wrapper', async () => {
+			render( <Button icon={ plusCircle } label="WordPress" /> );
+
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
+
+			await screen.getByRole( 'button', { name: 'WordPress' } ).focus();
+
+			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
 		} );
 
 		it( 'should support explicit aria-label override', () => {
-			const iconButton = shallow( <Button aria-label="Custom" /> ).find(
-				'button'
+			render( <Button aria-label="Custom" /> );
+
+			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+				'aria-label',
+				'Custom'
 			);
-			expect( iconButton.prop( 'aria-label' ) ).toBe( 'Custom' );
 		} );
 
 		it( 'should support adding aria-describedby text', () => {
-			const buttonDescription = shallow(
-				<Button describedBy="Description text" />
-			)
-				.find( VisuallyHidden )
-				.shallow()
-				.text();
-			expect( buttonDescription ).toBe( 'Description text' );
+			render( <Button describedBy="Description text" /> );
+			expect(
+				screen.getByRole( 'button', {
+					description: 'Description text',
+				} )
+			).toBeVisible();
 		} );
 
-		it( 'should populate tooltip with label content for buttons without visible labels (no children)', () => {
-			const buttonTooltip = shallow(
+		it( 'should populate tooltip with label content for buttons without visible labels (no children)', async () => {
+			render(
 				<Button
 					describedBy="Description text"
 					label="Label"
 					icon={ plusCircle }
 				/>
-			).find( 'Tooltip' );
+			);
 
-			expect( buttonTooltip.prop( 'text' ) ).toBe( 'Label' );
+			expect( screen.queryByText( 'Label' ) ).not.toBeInTheDocument();
+
+			await screen.getByRole( 'button', { name: 'Label' } ).focus();
+
+			expect( screen.getByText( 'Label' ) ).toBeVisible();
 		} );
 
 		it( 'should populate tooltip with description content for buttons with visible labels (buttons with children)', () => {
-			const buttonTooltip = shallow(
+			render(
 				<Button
 					label="Label"
 					describedBy="Description text"
@@ -186,74 +202,98 @@ describe( 'Button', () => {
 				>
 					Children
 				</Button>
-			).find( 'Tooltip' );
+			);
 
-			expect( buttonTooltip.prop( 'text' ) ).toBe( 'Description text' );
+			expect(
+				screen.getByRole( 'button', {
+					description: 'Description text',
+				} )
+			).toBeVisible();
 		} );
 
-		it( 'should allow tooltip disable', () => {
-			const iconButton = shallow(
+		it( 'should allow tooltip disable', async () => {
+			render(
 				<Button
 					icon={ plusCircle }
 					label="WordPress"
 					showTooltip={ false }
 				/>
-			).find( 'button' );
-			expect( iconButton.name() ).toBe( 'button' );
-			expect( iconButton.prop( 'aria-label' ) ).toBe( 'WordPress' );
+			);
+			const button = screen.getByRole( 'button', { name: 'WordPress' } );
+
+			expect( button ).toHaveAttribute( 'aria-label', 'WordPress' );
+
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
+
+			await button.focus();
+
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 		} );
 
-		it( 'should show the tooltip for empty children', () => {
-			const iconButton = shallow(
+		it( 'should show the tooltip for empty children', async () => {
+			render(
 				<Button icon={ plusCircle } label="WordPress" children={ [] } />
-			).find( 'Tooltip' );
-			expect( iconButton.name() ).toBe( 'Tooltip' );
-			expect( iconButton.prop( 'text' ) ).toBe( 'WordPress' );
+			);
+
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
+
+			await screen.getByRole( 'button', { name: 'WordPress' } ).focus();
+
+			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
 		} );
 
-		it( 'should not show the tooltip when icon and children defined', () => {
-			const iconButton = shallow(
+		it( 'should not show the tooltip when icon and children defined', async () => {
+			render(
 				<Button icon={ plusCircle } label="WordPress">
 					Children
 				</Button>
-			).find( 'button' );
-			expect( iconButton.name() ).toBe( 'button' );
+			);
+
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
+
+			await screen.getByRole( 'button', { name: 'WordPress' } ).focus();
+
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 		} );
 
-		it( 'should force showing the tooltip even if icon and children defined', () => {
-			const iconButton = shallow(
+		it( 'should force showing the tooltip even if icon and children defined', async () => {
+			render(
 				<Button icon={ plusCircle } label="WordPress" showTooltip>
 					Children
 				</Button>
-			).find( 'Tooltip' );
-			expect( iconButton.name() ).toBe( 'Tooltip' );
+			);
+
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
+
+			await screen.getByRole( 'button', { name: 'WordPress' } ).focus();
+
+			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
 		} );
 	} );
 
 	describe( 'with href property', () => {
 		it( 'should render a link instead of a button with href prop', () => {
-			const button = shallow(
-				<Button href="https://wordpress.org/" />
-			).find( 'a' );
+			render( <Button href="https://wordpress.org/" /> );
 
-			expect( button.type() ).toBe( 'a' );
-			expect( button.prop( 'href' ) ).toBe( 'https://wordpress.org/' );
+			expect( screen.getByRole( 'link' ) ).toHaveAttribute(
+				'href',
+				'https://wordpress.org/'
+			);
 		} );
 
 		it( 'should allow for the passing of the target prop when a link is created', () => {
-			const button = shallow(
-				<Button href="https://wordpress.org/" target="_blank" />
-			).find( 'a' );
+			render( <Button href="https://wordpress.org/" target="_blank" /> );
 
-			expect( button.prop( 'target' ) ).toBe( '_blank' );
+			expect( screen.getByRole( 'link' ) ).toHaveAttribute(
+				'target',
+				'_blank'
+			);
 		} );
 
 		it( 'should become a button again when disabled is supplied', () => {
-			const button = shallow(
-				<Button href="https://wordpress.org/" disabled />
-			).find( 'button' );
+			render( <Button href="https://wordpress.org/" disabled /> );
 
-			expect( button.type() ).toBe( 'button' );
+			expect( screen.getByRole( 'button' ) ).toBeVisible();
 		} );
 	} );
 
@@ -261,38 +301,40 @@ describe( 'Button', () => {
 		it( 'should enable access to DOM element', () => {
 			const ref = createRef();
 
-			TestUtils.renderIntoDocument(
-				<ButtonWithForwardedRef ref={ ref } />
-			);
-			expect( ref.current.type ).toBe( 'button' );
+			render( <Button ref={ ref } /> );
+
+			expect( ref.current ).toBe( screen.getByRole( 'button' ) );
 		} );
 	} );
 
 	describe( 'deprecated props', () => {
 		it( 'should not break when the legacy isPrimary prop is passed', () => {
-			const button = shallow( <Button isPrimary /> ).find( 'button' );
-			expect( button.hasClass( 'is-primary' ) ).toBe( true );
+			render( <Button isPrimary /> );
+			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-primary' );
 		} );
 
 		it( 'should not break when the legacy isSecondary prop is passed', () => {
-			const button = shallow( <Button isSecondary /> ).find( 'button' );
-			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
+			render( <Button isSecondary /> );
+			expect( screen.getByRole( 'button' ) ).toHaveClass(
+				'is-secondary'
+			);
 		} );
 
 		it( 'should not break when the legacy isTertiary prop is passed', () => {
-			const button = shallow( <Button isTertiary /> ).find( 'button' );
-			expect( button.hasClass( 'is-tertiary' ) ).toBe( true );
+			render( <Button isTertiary /> );
+			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-tertiary' );
 		} );
 
 		it( 'should not break when the legacy isLink prop is passed', () => {
-			const button = shallow( <Button isLink /> ).find( 'button' );
-			expect( button.hasClass( 'is-link' ) ).toBe( true );
+			render( <Button isLink /> );
+			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-link' );
 		} );
 
 		it( 'should warn when the isDefault prop is passed', () => {
-			const button = shallow( <Button isDefault /> ).find( 'button' );
-			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
-
+			render( <Button isDefault /> );
+			expect( screen.getByRole( 'button' ) ).toHaveClass(
+				'is-secondary'
+			);
 			expect( console ).toHaveWarned();
 		} );
 	} );

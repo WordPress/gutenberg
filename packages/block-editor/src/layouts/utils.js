@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __, sprintf } from '@wordpress/i18n';
+
+/**
  * Utility to generate the proper CSS selector for layout styles.
  *
  * @param {string} selectors CSS selector, also supports multiple comma-separated selectors.
@@ -61,4 +66,33 @@ export function getBlockGapCSS(
 		} );
 	}
 	return output;
+}
+
+/**
+ * Helper method to assign contextual info to clarify
+ * alignment settings.
+ *
+ * Besides checking if `contentSize` and `wideSize` have a
+ * value, we now show this information only if their values
+ * are not a `css var`. This needs to change when parsing
+ * css variables land.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/34710#issuecomment-918000752
+ *
+ * @param {Object} layout The layout object.
+ * @return {Object} An object with contextual info per alignment.
+ */
+export function getAlignmentsInfo( layout ) {
+	const { contentSize, wideSize } = layout;
+	const alignmentInfo = {};
+	const sizeRegex = /^(?!0)\d+(px|em|rem|vw|vh|%)?$/i;
+	if ( sizeRegex.test( contentSize ) ) {
+		// translators: %s: container size (i.e. 600px etc)
+		alignmentInfo.none = sprintf( __( 'Max %s wide' ), contentSize );
+	}
+	if ( sizeRegex.test( wideSize ) ) {
+		// translators: %s: container size (i.e. 600px etc)
+		alignmentInfo.wide = sprintf( __( 'Max %s wide' ), wideSize );
+	}
+	return alignmentInfo;
 }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -26,8 +26,8 @@ describe( 'PostAuthorCheck', () => {
 			hasAssignAuthorAction: true,
 		} ) );
 
-		const wrapper = shallow( <PostAuthorCheck>authors</PostAuthorCheck> );
-		expect( wrapper.type() ).toBe( null );
+		render( <PostAuthorCheck>authors</PostAuthorCheck> );
+		expect( screen.queryByText( 'authors' ) ).not.toBeInTheDocument();
 	} );
 
 	it( "should not render anything if doesn't have author action", () => {
@@ -36,8 +36,8 @@ describe( 'PostAuthorCheck', () => {
 			hasAssignAuthorAction: false,
 		} ) );
 
-		const wrapper = shallow( <PostAuthorCheck>authors</PostAuthorCheck> );
-		expect( wrapper.type() ).toBe( null );
+		render( <PostAuthorCheck>authors</PostAuthorCheck> );
+		expect( screen.queryByText( 'authors' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'should render control', () => {
@@ -46,7 +46,7 @@ describe( 'PostAuthorCheck', () => {
 			hasAssignAuthorAction: true,
 		} ) );
 
-		const wrapper = shallow( <PostAuthorCheck>authors</PostAuthorCheck> );
-		expect( wrapper.type() ).not.toBe( null );
+		render( <PostAuthorCheck>authors</PostAuthorCheck> );
+		expect( screen.getByText( 'authors' ) ).toBeVisible();
 	} );
 } );

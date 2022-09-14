@@ -1,6 +1,8 @@
 /**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 import {
 	DropdownMenu,
 	MenuGroup,
@@ -26,7 +28,7 @@ import {
 	tag,
 	layout as customGenericTemplateIcon,
 } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -38,6 +40,8 @@ import {
 	useDefaultTemplateTypes,
 	useTaxonomiesMenuItems,
 	usePostTypeMenuItems,
+	useAuthorMenuItem,
+	usePostTypeArchiveMenuItems,
 } from './utils';
 import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
 import { useHistory } from '../routes';
@@ -85,12 +89,25 @@ export default function NewTemplate( { postType } ) {
 
 	const history = useHistory();
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const { createErrorNotice } = useDispatch( noticesStore );
+	const { createErrorNotice, createSuccessNotice } =
+		useDispatch( noticesStore );
 	const { setTemplate } = useDispatch( editSiteStore );
 
 	async function createTemplate( template, isWPSuggestion = true ) {
 		try {
-			const { title, description, slug } = template;
+			const { title, description, slug, templatePrefix } = template;
+			let templateContent = template.content;
+			// Try to find fallback content from existing templates.
+			if ( ! templateContent ) {
+				const fallbackTemplate = await apiFetch( {
+					path: addQueryArgs( '/wp/v2/templates/lookup', {
+						slug,
+						is_custom: ! isWPSuggestion,
+						template_prefix: templatePrefix,
+					} ),
+				} );
+				templateContent = fallbackTemplate.content;
+			}
 			const newTemplate = await saveEntityRecord(
 				'postType',
 				'wp_template',
@@ -100,6 +117,7 @@ export default function NewTemplate( { postType } ) {
 					slug: slug.toString(),
 					status: 'publish',
 					title,
+					content: templateContent,
 					// This adds a post meta field in template that is part of `is_custom` value calculation.
 					is_wp_suggestion: isWPSuggestion,
 				},
@@ -114,8 +132,16 @@ export default function NewTemplate( { postType } ) {
 				postId: newTemplate.id,
 				postType: newTemplate.type,
 			} );
-
-			// TODO: Add a success notice?
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: Title of the created template e.g: "Category".
+					__( '"%s" successfully created.' ),
+					title
+				),
+				{
+					type: 'snackbar',
+				}
+			);
 		} catch ( error ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
@@ -243,26 +269,30 @@ function useMissingTemplates(
 		useTaxonomiesMenuItems( onClickMenuItem );
 	const { defaultPostTypesMenuItems, postTypesMenuItems } =
 		usePostTypeMenuItems( onClickMenuItem );
-	[ ...defaultTaxonomiesMenuItems, ...defaultPostTypesMenuItems ].forEach(
-		( menuItem ) => {
-			if ( ! menuItem ) {
-				return;
-			}
-			const matchIndex = enhancedMissingDefaultTemplateTypes.findIndex(
-				( template ) => template.slug === menuItem.slug
-			);
-			// Some default template types might have been filtered above from
-			// `missingDefaultTemplates` because they only check for the general
-			// template. So here we either replace or append the item, augmented
-			// with the check if it has available specific item to create a
-			// template for.
-			if ( matchIndex > -1 ) {
-				enhancedMissingDefaultTemplateTypes[ matchIndex ] = menuItem;
-			} else {
-				enhancedMissingDefaultTemplateTypes.push( menuItem );
-			}
+
+	const authorMenuItem = useAuthorMenuItem( onClickMenuItem );
+	[
+		...defaultTaxonomiesMenuItems,
+		...defaultPostTypesMenuItems,
+		authorMenuItem,
+	].forEach( ( menuItem ) => {
+		if ( ! menuItem ) {
+			return;
 		}
-	);
+		const matchIndex = enhancedMissingDefaultTemplateTypes.findIndex(
+			( template ) => template.slug === menuItem.slug
+		);
+		// Some default template types might have been filtered above from
+		// `missingDefaultTemplates` because they only check for the general
+		// template. So here we either replace or append the item, augmented
+		// with the check if it has available specific item to create a
+		// template for.
+		if ( matchIndex > -1 ) {
+			enhancedMissingDefaultTemplateTypes[ matchIndex ] = menuItem;
+		} else {
+			enhancedMissingDefaultTemplateTypes.push( menuItem );
+		}
+	} );
 	// Update the sort order to match the DEFAULT_TEMPLATE_SLUGS order.
 	enhancedMissingDefaultTemplateTypes?.sort( ( template1, template2 ) => {
 		return (
@@ -272,6 +302,7 @@ function useMissingTemplates(
 	} );
 	const missingTemplates = [
 		...enhancedMissingDefaultTemplateTypes,
+		...usePostTypeArchiveMenuItems(),
 		...postTypesMenuItems,
 		...taxonomiesMenuItems,
 	];
