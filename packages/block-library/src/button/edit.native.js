@@ -7,7 +7,7 @@ import { View, AccessibilityInfo, Platform, Text } from 'react-native';
  * WordPress dependencies
  */
 import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
-import { useSuspenseSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import {
 	RichText,
@@ -92,7 +92,7 @@ function ButtonEdit( props ) {
 	const initialBorderRadius = props?.attributes?.style?.border?.radius;
 	const { valueUnit = 'px' } = getValueAndUnit( initialBorderRadius ) || {};
 
-	const { editorSidebarOpened, numOfButtons } = useSuspenseSelect(
+	const { editorSidebarOpened, numOfButtons } = useSelect(
 		( select ) => {
 			const { isEditorSidebarOpened } = select( editPostStore );
 			const { getBlockCount, getBlockRootClientId } =

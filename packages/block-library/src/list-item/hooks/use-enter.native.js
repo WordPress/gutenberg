@@ -7,7 +7,7 @@ import {
 	cloneBlock,
 } from '@wordpress/blocks';
 import { useRef } from '@wordpress/element';
-import { useSuspenseSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -17,7 +17,7 @@ import useOutdentListItem from './use-outdent-list-item';
 
 export default function useEnter( props, preventDefault ) {
 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
-	const { getBlock, getBlockRootClientId, getBlockIndex } = useSuspenseSelect(
+	const { getBlock, getBlockRootClientId, getBlockIndex } = useSelect(
 		( select ) => {
 			const store = select( blockEditorStore );
 			return {
