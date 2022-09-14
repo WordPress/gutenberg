@@ -2696,7 +2696,7 @@ export const __unstableGetContentLockingParent = createSelector(
 		let result;
 		while ( !! state.blocks.parents[ current ] ) {
 			current = state.blocks.parents[ current ];
-			if ( getTemplateLock( state, current ) === 'noContent' ) {
+			if ( getTemplateLock( state, current ) === 'contentOnly' ) {
 				result = current;
 			}
 		}
