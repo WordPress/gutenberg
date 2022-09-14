@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -68,7 +73,12 @@ export default function SpacingSizesControl( {
 	};
 
 	return (
-		<fieldset role="region" className="component-spacing-sizes-control">
+		<fieldset
+			role="region"
+			className={ classnames( 'component-spacing-sizes-control', {
+				'is-unlinked': ! isLinked,
+			} ) }
+		>
 			<Text as="legend">{ label }</Text>
 			{ ! hasOneSide && (
 				<LinkedButton onClick={ toggleLinked } isLinked={ isLinked } />
