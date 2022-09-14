@@ -67,7 +67,6 @@ export const block = css`
 export const BackdropView = styled.div`
 	background: ${ COLORS.gray[ 900 ] };
 	border-radius: ${ CONFIG.controlBorderRadius };
-	box-shadow: ${ CONFIG.toggleGroupControlBackdropBoxShadow };
 	left: 0;
 	position: absolute;
 	top: 2px;
