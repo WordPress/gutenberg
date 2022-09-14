@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `Notice`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44157](https://github.com/WordPress/gutenberg/pull/44157))
+
 ## 21.0.0 (2022-09-13)
 
 ### Breaking Changes
