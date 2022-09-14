@@ -22,7 +22,8 @@ import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
 import ToggleGroupControlContext from '../context';
 import { useUpdateEffect } from '../../utils/hooks';
 import type { WordPressComponentProps } from '../../ui/context';
-import type { ToggleGroupControlAsRadioProps } from '../types';
+import type { ToggleGroupControlInnerGroupProps } from '../types';
+import { HStack } from '../../h-stack';
 
 function UnforwardedToggleGroupControlAsButtonGroup(
 	{
@@ -33,7 +34,11 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		size,
 		value,
 		...otherProps
-	}: WordPressComponentProps< ToggleGroupControlAsRadioProps, 'div', false >,
+	}: WordPressComponentProps<
+		ToggleGroupControlInnerGroupProps,
+		'div',
+		false
+	>,
 	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
 	const containerRef = useRef();
@@ -88,7 +93,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 					containerWidth={ sizes.width }
 					isAdaptiveWidth={ isAdaptiveWidth }
 				/>
-				{ children }
+				<HStack spacing={ 1 }>{ children }</HStack>
 			</View>
 		</ToggleGroupControlContext.Provider>
 	);

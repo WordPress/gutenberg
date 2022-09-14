@@ -18,6 +18,15 @@ export type ToggleGroupControlOptionBaseProps = {
 	 * @default false
 	 */
 	isIcon?: boolean;
+	/**
+	 * Whether the group supports multiple selection.
+	 *
+	 * @default false
+	 */
+	isMultiple?: boolean;
+	/**
+	 * The unique key of the option.
+	 */
 	value: ReactText;
 	/**
 	 * Whether to display a Tooltip for the control option. If set to `true`, the tooltip will
@@ -137,7 +146,7 @@ export type ToggleGroupControlBackdropProps = {
 	state?: any;
 };
 
-export type ToggleGroupControlAsRadioProps = Pick<
+export type ToggleGroupControlInnerGroupProps = Pick<
 	ToggleGroupControlProps,
 	'children' | 'isAdaptiveWidth' | 'label' | 'size'
 > & {

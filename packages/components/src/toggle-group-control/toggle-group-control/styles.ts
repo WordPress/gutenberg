@@ -10,6 +10,8 @@ import styled from '@emotion/styled';
 import { CONFIG, COLORS, reduceMotion } from '../../utils';
 import type { ToggleGroupControlProps } from '../types';
 
+export const BACKDROP_BG_COLOR = COLORS.gray[ 900 ];
+
 export const ToggleGroupControl = ( {
 	isDeselectable,
 	size,
@@ -65,7 +67,7 @@ export const block = css`
 `;
 
 export const BackdropView = styled.div`
-	background: ${ COLORS.gray[ 900 ] };
+	background: ${ BACKDROP_BG_COLOR };
 	border-radius: ${ CONFIG.controlBorderRadius };
 	left: 0;
 	position: absolute;

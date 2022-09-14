@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { CONFIG, COLORS, reduceMotion } from '../../utils';
+import { BACKDROP_BG_COLOR } from '../toggle-group-control/styles';
 import type { ToggleGroupControlProps } from '../types';
 
 export const LabelView = styled.div`
@@ -24,11 +25,13 @@ export const labelBlock = css`
 export const buttonView = ( {
 	isDeselectable,
 	isIcon,
+	isMultiple,
 	isPressed,
 	size,
 }: {
 	isDeselectable?: boolean;
 	isIcon?: boolean;
+	isMultiple?: boolean;
 	isPressed?: boolean;
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
 } ) => css`
@@ -66,7 +69,12 @@ export const buttonView = ( {
 
 	${ isDeselectable && deselectable }
 	${ isIcon && isIconStyles( { size } ) }
+	${ isMultiple && isPressed && staticBackground }
 	${ isPressed && pressed }
+`;
+
+const staticBackground = css`
+	background: ${ BACKDROP_BG_COLOR };
 `;
 
 const pressed = css`
@@ -105,6 +113,7 @@ const isIconStyles = ( {
 	return css`
 		color: ${ COLORS.gray[ 900 ] };
 		width: ${ iconButtonSizes[ size ] };
+		height: ${ iconButtonSizes[ size ] };
 		padding-left: 0;
 		padding-right: 0;
 	`;

@@ -66,26 +66,33 @@ function ToggleGroupControlOptionBase(
 	const {
 		className,
 		isIcon = false,
+		isMultiple = false,
 		value,
 		children,
 		showTooltip = false,
 		...otherButtonProps
 	} = buttonProps;
 
-	const isPressed = otherContextProps.state === value;
+	const isPressed =
+		otherContextProps.state === value ||
+		otherButtonProps[ 'aria-pressed' ] === true;
 	const cx = useCx();
 	const labelViewClasses = cx( isBlock && styles.labelBlock );
 	const classes = cx(
-		styles.buttonView( { isDeselectable, isIcon, isPressed, size } ),
+		styles.buttonView( {
+			isDeselectable,
+			isIcon,
+			isMultiple,
+			isPressed,
+			size,
+		} ),
 		className
 	);
 
-	const buttonOnClick = () => {
-		if ( isDeselectable && isPressed ) {
-			otherContextProps.setState( undefined );
-		} else {
-			otherContextProps.setState( value );
-		}
+	const singleSelectButtonProps = {
+		'aria-pressed': isPressed,
+		onClick: () =>
+			otherContextProps.setState( isPressed ? undefined : value ),
 	};
 
 	return (
@@ -97,11 +104,10 @@ function ToggleGroupControlOptionBase(
 				{ isDeselectable ? (
 					<button
 						{ ...otherButtonProps }
-						aria-pressed={ isPressed }
+						{ ...( isMultiple ? {} : singleSelectButtonProps ) }
 						type="button"
 						className={ classes }
 						data-value={ value }
-						onClick={ buttonOnClick }
 						ref={ forwardedRef }
 					>
 						<ButtonContentView>{ children }</ButtonContentView>
