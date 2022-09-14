@@ -107,7 +107,7 @@ function Navigation( {
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
-	useNavigationEntities();
+	const { menus: classicMenus } = useNavigationEntities();
 
 	const [ showNavigationMenuStatusNotice, hideNavigationMenuStatusNotice ] =
 		useNavigationNotice( {
@@ -224,36 +224,54 @@ function Navigation( {
 	// than 1 exists then use the most recent.
 	// The aim is for the block to "just work" from a user perspective using existing data.
 	useEffect( () => {
-		if (
-			hasUncontrolledInnerBlocks ||
-			isCreatingNavigationMenu ||
-			ref ||
-			! navigationMenus?.length
-		) {
+		// Only autofallback to published menus.
+		const fallbackNavigationMenus = navigationMenus?.filter(
+			( menu ) => menu.status === 'publish'
+		);
+
+		if ( hasUncontrolledInnerBlocks || isCreatingNavigationMenu || ref ) {
 			return;
 		}
 
-		navigationMenus.sort( ( menuA, menuB ) => {
-			const menuADate = new Date( menuA.date );
-			const menuBDate = new Date( menuB.date );
-			return menuADate.getTime() < menuBDate.getTime();
-		} );
+		// See if we have any navigation menus
+		if ( fallbackNavigationMenus?.length ) {
+			navigationMenus.sort( ( menuA, menuB ) => {
+				const menuADate = new Date( menuA.date );
+				const menuBDate = new Date( menuB.date );
+				return menuADate.getTime() < menuBDate.getTime();
+			} );
 
-		// Only autofallback to published menus.
-		const fallbackNavigationMenus = navigationMenus.filter(
-			( menu ) => menu.status === 'publish'
-		);
-		if ( fallbackNavigationMenus.length === 0 ) return;
+			/**
+			 *  This fallback displays (both in editor and on front)
+			 *  a list of pages only if no menu (user assigned or
+			 *  automatically picked) is available.
+			 *  The fallback should not request a save (entity dirty state)
+			 *  nor to be undoable, hence why it is marked as non persistent
+			 */
+			__unstableMarkNextChangeAsNotPersistent();
+			setRef( fallbackNavigationMenus[ 0 ].id );
+		} else if ( classicMenus?.length ) {
+			// Use a classic menu fallback
 
-		/**
-		 *  This fallback displays (both in editor and on front)
-		 *  a list of pages only if no menu (user assigned or
-		 *  automatically picked) is available.
-		 *  The fallback should not request a save (entity dirty state)
-		 *  nor to be undoable, hence why it is marked as non persistent
-		 */
-		__unstableMarkNextChangeAsNotPersistent();
-		setRef( fallbackNavigationMenus[ 0 ].id );
+			// We should get the primary one.
+
+			// We should probably create this not as a draft...
+
+			// This is duplicated several times.
+			const onSelectClassicMenu = async ( classicMenu ) => {
+				const navMenu = await convertClassicMenu(
+					classicMenu.id,
+					classicMenu.name
+				);
+				if ( navMenu ) {
+					handleUpdateMenu( navMenu.id, {
+						focusNavigationBlock: true,
+					} );
+				}
+			};
+
+			onSelectClassicMenu( classicMenus[ 0 ] );
+		}
 	}, [ navigationMenus ] );
 
 	const navRef = useRef();

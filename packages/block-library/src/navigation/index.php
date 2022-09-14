@@ -248,6 +248,62 @@ function block_core_navigation_render_submenu_icon() {
 	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
 
+function block_core_navigation_get_classic_menu_fallback() {
+	$classic_nav_menus = wp_get_nav_menus();
+
+	// If menus exist.
+	if ( $classic_nav_menus && ! is_wp_error( $classic_nav_menus ) ) {
+		// Get the primary one
+		// Should this be the one at the primary location?
+		$primary_nav_menu = array_filter( $classic_nav_menus, function( $classic_menu ) {
+			return $classic_menu->slug === 'primary';
+		} );
+
+		if ( isset( $primary_nav_menu ) && count( $primary_nav_menu ) > 0 ) {
+			return current( $primary_nav_menu );
+		}
+
+		// If there's no primary one then just use the newest.
+		return $classic_nav_menus[ 0 ];
+	}
+}
+
+/**
+ * Finds the most classic navigation fallback to use.
+ *
+ * @return WP_Post|null the classic navigation post.
+ */
+function block_core_navigation_get_classic_menu_fallback_blocks() {
+	$classic_nav_menu = block_core_navigation_get_classic_menu_fallback();
+
+	$menu_items = wp_get_nav_menu_items( $classic_nav_menu->term_id, array( 'update_post_term_cache' => false ) );
+
+	// Set up the $menu_item variables.
+	_wp_menu_item_classes_by_context( $menu_items );
+
+	$sorted_menu_items = array();
+	foreach ( (array) $menu_items as $menu_item ) {
+		$sorted_menu_items[ $menu_item->menu_order ] = $menu_item;
+	}
+
+	unset( $menu_items, $menu_item );
+
+	// END: Code that already exists in wp_nav_menu().
+
+	$menu_items_by_parent_id = array();
+	foreach ( $sorted_menu_items as $menu_item ) {
+		$menu_items_by_parent_id[ $menu_item->menu_item_parent ][] = $menu_item;
+	}
+
+	$inner_blocks = gutenberg_convert_menu_items_to_blocks(
+		isset( $menu_items_by_parent_id[0] )
+			? $menu_items_by_parent_id[0]
+			: array(),
+		$menu_items_by_parent_id
+	);
+
+	return $inner_blocks;
+}
 
 /**
  * Finds the most recently published `wp_navigation` Post.
@@ -255,6 +311,7 @@ function block_core_navigation_render_submenu_icon() {
  * @return WP_Post|null the first non-empty Navigation or null.
  */
 function block_core_navigation_get_most_recently_published_navigation() {
+
 	// We default to the most recently created menu.
 	$parsed_args = array(
 		'post_type'      => 'wp_navigation',
@@ -329,6 +386,9 @@ function block_core_navigation_get_fallback_blocks() {
 		// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
 		// In this case default to the (Page List) fallback.
 		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
+	} else {
+		// See if we have any classic menus
+		$fallback_blocks = block_core_navigation_get_classic_menu_fallback_blocks();
 	}
 
 	/**
