@@ -35,41 +35,40 @@ export default function mediaUpload( {
 	onError = noop,
 	onFileChange,
 } ) {
-	const { getCurrentPostId, getEditorSettings, isCurrentPostPublished } =
-		select( editorStore );
+	const { getCurrentPostId, getEditorSettings } = select( editorStore );
 	const {
 		lockPostAutosaving,
 		unlockPostAutosaving,
 		lockPostSaving,
 		unlockPostSaving,
-		disablePublishSidebar,
-		enablePublishSidebar,
 	} = dispatch( editorStore );
 
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
-	const locakKeyID = uuid();
-	const lockKey = `image-upload-${ locakKeyID }`;
+	const lockKey = `image-upload-${ uuid() }`;
 	let imageIsUploading = false;
 	maxUploadFileSize =
 		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
+
+	const setUploadLock = () => {
+		lockPostSaving( lockKey );
+		lockPostAutosaving( lockKey );
+		imageIsUploading = true;
+	};
+
+	const clearUploadLock = () => {
+		unlockPostSaving( lockKey );
+		unlockPostAutosaving( lockKey );
+		imageIsUploading = false;
+	};
 
 	uploadMedia( {
 		allowedTypes,
 		filesList,
 		onFileChange: ( file ) => {
-			const remainingUploads = file.filter( ( f ) => ! f.id );
-			if ( ! imageIsUploading && remainingUploads ) {
-				lockPostAutosaving( lockKey );
-				if ( isCurrentPostPublished ) {
-					lockPostSaving( lockKey );
-				} else {
-					disablePublishSidebar();
-				}
-
-				imageIsUploading = true;
+			if ( ! imageIsUploading ) {
+				setUploadLock();
 			} else {
-				unlockPostSaving( lockKey );
-				imageIsUploading = false;
+				clearUploadLock();
 			}
 			onFileChange( file );
 		},
@@ -79,13 +78,7 @@ export default function mediaUpload( {
 		},
 		maxUploadFileSize,
 		onError: ( { message } ) => {
-			unlockPostAutosaving( lockKey );
-			if ( isCurrentPostPublished ) {
-				unlockPostSaving( lockKey );
-			} else {
-				enablePublishSidebar();
-			}
-			imageIsUploading = false;
+			clearUploadLock();
 			onError( message );
 		},
 		wpAllowedMimeTypes,
