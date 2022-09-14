@@ -36,7 +36,7 @@ function UnforwardedToggleGroupControlAsRadio(
 		value,
 		...otherProps
 	}: WordPressComponentProps< ToggleGroupControlAsRadioProps, 'div', false >,
-	forwardedRef: ForwardedRef< any >
+	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
 	const containerRef = useRef();
 	const [ resizeListener, sizes ] = useResizeObserver();
@@ -79,7 +79,7 @@ function UnforwardedToggleGroupControlAsRadio(
 			>
 				{ resizeListener }
 				<ToggleGroupControlBackdrop
-					{ ...radio }
+					state={ radio.state }
 					containerRef={ containerRef }
 					containerWidth={ sizes.width }
 					isAdaptiveWidth={ isAdaptiveWidth }

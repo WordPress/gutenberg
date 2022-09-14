@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ForwardedRef, ReactText } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -34,7 +34,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		value,
 		...otherProps
 	}: WordPressComponentProps< ToggleGroupControlAsRadioProps, 'div', false >,
-	forwardedRef: ForwardedRef< any >
+	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
 	const containerRef = useRef();
 	const [ resizeListener, sizes ] = useResizeObserver();
@@ -42,39 +42,40 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		ToggleGroupControlAsButtonGroup,
 		'toggle-group-control-as-button-group'
 	).toString();
-	const [ selectedValue, setSelectedValue ] = useState<
-		ReactText | undefined
-	>( value );
-	const radio = { baseId, state: selectedValue, setState: setSelectedValue };
+	const [ selectedValue, setSelectedValue ] = useState( value );
+	const groupContext = {
+		baseId,
+		state: selectedValue,
+		setState: setSelectedValue,
+	};
 	const previousValue = usePrevious( value );
 
-	// Propagate radio.state change.
+	// Propagate groupContext.state change.
 	useUpdateEffect( () => {
-		// Avoid calling onChange if radio state changed
+		// Avoid calling onChange if groupContext state changed
 		// from incoming value.
-		if ( previousValue !== radio.state ) {
-			onChange( radio.state );
+		if ( previousValue !== groupContext.state ) {
+			onChange( groupContext.state );
 		}
-	}, [ radio.state ] );
+	}, [ groupContext.state ] );
 
-	// Sync incoming value with radio.state.
+	// Sync incoming value with groupContext.state.
 	useUpdateEffect( () => {
-		if ( value !== radio.state ) {
-			radio.setState( value );
+		if ( value !== groupContext.state ) {
+			groupContext.setState( value );
 		}
 	}, [ value ] );
 
 	return (
 		<ToggleGroupControlContext.Provider
 			value={ {
-				...radio,
+				...groupContext,
 				isBlock: ! isAdaptiveWidth,
 				isDeselectable: true,
 				size,
 			} }
 		>
 			<View
-				{ ...radio }
 				aria-label={ label }
 				{ ...otherProps }
 				ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
@@ -82,7 +83,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 			>
 				{ resizeListener }
 				<ToggleGroupControlBackdrop
-					{ ...radio }
+					state={ groupContext.state }
 					containerRef={ containerRef }
 					containerWidth={ sizes.width }
 					isAdaptiveWidth={ isAdaptiveWidth }
