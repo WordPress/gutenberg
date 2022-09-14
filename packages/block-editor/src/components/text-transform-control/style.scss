@@ -4,13 +4,15 @@
 	padding: 0;
 
 	.block-editor-text-transform-control__buttons {
-		padding: 2px;
+		// 4px of padding makes the row 40px high, same as an input.
+		padding: $grid-unit-05 0;
 		display: flex;
 	}
 
 	.components-button.has-icon {
-		flex-basis: $button-size;
-		min-width: 0;
+		height: $grid-unit-40;
+		margin-right: $grid-unit-05;
+		min-width: $grid-unit-40;
 		padding: 0;
 	}
 }
