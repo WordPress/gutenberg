@@ -70,16 +70,6 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		}
 	);
 
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
-	const { type: layoutType = null } = layout;
-	useEffect( () => {
-		if ( layoutType ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { layout: { ...layout, type: layoutType } } );
-		}
-	}, [ layoutType ] );
-
 	return (
 		<>
 			<InspectorControls __experimentalGroup="advanced">
