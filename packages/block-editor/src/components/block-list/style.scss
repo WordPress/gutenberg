@@ -51,6 +51,11 @@
 		}
 	}
 
+	// Hide the selection indicator on .block-editor-block-list__layout, else Safari will show it stacked.
+	.has-multi-selection &::selection {
+		background: transparent;
+	}
+
 	.block-editor-block-list__block.is-highlighted::after {
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		outline: $border-width solid transparent;
@@ -129,7 +134,7 @@
 	// `unset` only when selected, it has to start out unset.
 	&.is-selected,
 	&.has-block-overlay,
-	&.is-multi-selected,
+	&.is-multi-selected:not(.is-partially-selected),
 	&.is-highlighted {
 		position: relative;
 	}
