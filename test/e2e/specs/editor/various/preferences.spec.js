@@ -4,23 +4,25 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'preferences', () => {
-	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
-	} );
-
 	test( 'remembers sidebar dismissal between sessions', async ( {
 		page,
+		admin,
 	} ) => {
+		await admin.createNewPost();
 		// Open by default.
 		await expect(
-			page.locator( "button[aria-label='Post (selected)']" )
+			page.locator(
+				'.components-button.edit-post-sidebar__panel-tab.is-active'
+			)
 		).toHaveText( 'Post' );
 
 		// Change to "Block" tab.
 		await page.click( 'role=button[name="Block"i]' );
 
 		await expect(
-			page.locator( "button[aria-label='Block (selected)']" )
+			page.locator(
+				'.components-button.edit-post-sidebar__panel-tab.is-active'
+			)
 		).toHaveText( 'Block' );
 
 		// Regression test: Reload resets to document tab.
@@ -30,7 +32,9 @@ test.describe( 'preferences', () => {
 		await page.reload();
 		await page.waitForSelector( '.edit-post-layout' );
 		await expect(
-			page.locator( "button[aria-label='Post (selected)']" )
+			page.locator(
+				'.components-button.edit-post-sidebar__panel-tab.is-active'
+			)
 		).toHaveText( 'Post' );
 
 		// Dismiss.
