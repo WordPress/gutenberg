@@ -31,14 +31,25 @@ function retrieveFastAverageColor() {
  */
 export default function useCoverIsDark( url, dimRatio = 50, overlayColor ) {
 	const [ isDark, setIsDark ] = useState( false );
+	const isDimmedEnough = dimRatio > 50;
+	const hasMedia = !! url;
 	useEffect( () => {
-		// If opacity is lower than 50 the dominant color is the image or video color,
-		// so use that color for the dark mode computation.
-		if ( url && dimRatio <= 50 ) {
-			const imgCrossOrigin = applyFilters(
-				'media.crossOrigin',
-				undefined,
-				url
+		if ( isDimmedEnough || ! hasMedia || ! elementRef.current ) {
+			// If opacity is greater than 50 the dominant color is the overlay
+			// color, so use the overlay color for the dark mode computation.
+			// Additionally, fall back to using the overlay color if a
+			// background image isn't present since we don't have access to the
+			// site background color for the calculations.
+			// If no overlay color exists the overlay color is black (isDark).
+			setIsDark( ! overlayColor || colord( overlayColor ).isDark() );
+		} else {
+			// If opacity is lower than 50 the dominant color is the media color,
+			// so use the average media color for the dark mode computation.
+			retrieveFastAverageColor().getColorAsync(
+				elementRef.current,
+				( color ) => {
+					setIsDark( color.isDark );
+				}
 			);
 			retrieveFastAverageColor()
 				.getColorAsync( url, {
@@ -52,24 +63,12 @@ export default function useCoverIsDark( url, dimRatio = 50, overlayColor ) {
 				} )
 				.then( ( color ) => setIsDark( color.isDark ) );
 		}
-	}, [ url, url && dimRatio <= 50, setIsDark ] );
-	useEffect( () => {
-		// If opacity is greater than 50 the dominant color is the overlay color,
-		// so use that color for the dark mode computation.
-		if ( dimRatio > 50 || ! url ) {
-			if ( ! overlayColor ) {
-				// If no overlay color exists the overlay color is black (isDark )
-				setIsDark( true );
-				return;
-			}
-			setIsDark( colord( overlayColor ).isDark() );
-		}
-	}, [ overlayColor, dimRatio > 50 || ! url, setIsDark ] );
-	useEffect( () => {
-		if ( ! url && ! overlayColor ) {
-			// Reset isDark.
-			setIsDark( false );
-		}
-	}, [ ! url && ! overlayColor, setIsDark ] );
+	}, [
+		hasMedia,
+		isDimmedEnough,
+		overlayColor,
+		elementRef.current,
+		setIsDark,
+	] );
 	return isDark;
 }
