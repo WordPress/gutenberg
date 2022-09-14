@@ -24,11 +24,8 @@
 	}
 
 	&.is-unlinked {
-		.components-spacing-sizes-control__side-label {
-			margin-left: $grid-unit-10;
-		}
 		.components-range-control.components-spacing-sizes-control__range-control {
-			margin: -$grid-unit-10 0 0 $grid-unit-10;
+			margin: -$grid-unit-10 0 0 0;
 		}
 		.components-unit-control-wrapper {
 			margin: 0 0 $grid-unit-10 $grid-unit-10;
@@ -36,14 +33,12 @@
 	}
 
 	.components-spacing-sizes-control__hint-single {
-		margin-top: 0;
-		margin-left: 0;
+		margin: 0;
 	}
 
 	.components-spacing-sizes-control__hint-single,
 	.components-spacing-sizes-control__hint-all {
 		color: $gray-700;
-		font-size: 12px;
 	}
 
 	.components-spacing-sizes-control__hint-all {
@@ -127,7 +122,7 @@
 	.components-spacing-sizes-control__side-label {
 		grid-column: 1 / 1;
 		justify-self: left;
-		font-size: 12px;
+		margin-bottom: 0;
 	}
 
 	.components-spacing-sizes-control__custom-select-control {

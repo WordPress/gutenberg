@@ -9,12 +9,12 @@ import classnames from 'classnames';
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
+	BaseControl,
 	Button,
 	RangeControl,
 	CustomSelectControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalHStack as HStack,
-	__experimentalText as Text,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
@@ -167,21 +167,21 @@ export default function SpacingInputControl( {
 		<>
 			{ side !== 'all' && (
 				<HStack className="components-spacing-sizes-control__side-labels">
-					<Text className="components-spacing-sizes-control__side-label">
+					<BaseControl.VisualLabel className="components-spacing-sizes-control__side-label">
 						{ LABELS[ side ] }
-					</Text>
+					</BaseControl.VisualLabel>
 
 					{ showHint && (
-						<Text className="components-spacing-sizes-control__hint-single">
+						<BaseControl.VisualLabel className="components-spacing-sizes-control__hint-single">
 							{ currentValueHint }
-						</Text>
+						</BaseControl.VisualLabel>
 					) }
 				</HStack>
 			) }
 			{ side === 'all' && showHint && (
-				<Text className="components-spacing-sizes-control__hint-all">
+				<BaseControl.VisualLabel className="components-spacing-sizes-control__hint-all">
 					{ currentValueHint }
-				</Text>
+				</BaseControl.VisualLabel>
 			) }
 
 			{ ! disableCustomSpacingSizes && (

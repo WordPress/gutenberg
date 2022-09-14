@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { __experimentalText as Text } from '@wordpress/components';
+import { BaseControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -79,7 +79,9 @@ export default function SpacingSizesControl( {
 				'is-unlinked': ! isLinked,
 			} ) }
 		>
-			<Text as="legend">{ label }</Text>
+			<BaseControl.VisualLabel as="legend">
+				{ label }
+			</BaseControl.VisualLabel>
 			{ ! hasOneSide && (
 				<LinkedButton onClick={ toggleLinked } isLinked={ isLinked } />
 			) }
