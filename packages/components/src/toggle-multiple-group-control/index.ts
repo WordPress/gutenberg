@@ -1,0 +1,1 @@
+export { ToggleMultipleGroupControl } from './component';

@@ -12,6 +12,7 @@ import type {
 	ToggleGroupControlProps,
 	ToggleGroupControlOptionBaseProps,
 } from '../types';
+import { BACKDROP_BG_COLOR } from '../toggle-group-control/styles';
 
 export const LabelView = styled.div`
 	display: inline-flex;
@@ -27,10 +28,11 @@ export const labelBlock = css`
 export const buttonView = ( {
 	isDeselectable,
 	isIcon,
+	isMultiple,
 	isPressed,
 	size,
 }: Pick< ToggleGroupControlProps, 'isDeselectable' | 'size' > &
-	Pick< ToggleGroupControlOptionBaseProps, 'isIcon' > & {
+	Pick< ToggleGroupControlOptionBaseProps, 'isIcon' | 'isMultiple' > & {
 		isPressed?: boolean;
 	} ) => css`
 	align-items: center;
@@ -67,7 +69,12 @@ export const buttonView = ( {
 
 	${ isDeselectable && deselectable }
 	${ isIcon && isIconStyles( { size } ) }
+	${ isMultiple && isPressed && staticBackground }
 	${ isPressed && pressed }
+`;
+
+const staticBackground = css`
+	background: ${ BACKDROP_BG_COLOR };
 `;
 
 const pressed = css`
@@ -105,6 +112,7 @@ const isIconStyles = ( {
 	return css`
 		color: ${ COLORS.gray[ 900 ] };
 		width: ${ iconButtonSizes[ size ] };
+		height: ${ iconButtonSizes[ size ] };
 		padding-left: 0;
 		padding-right: 0;
 	`;

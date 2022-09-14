@@ -23,6 +23,7 @@ import ToggleGroupControlContext from '../context';
 import { useUpdateEffect } from '../../utils/hooks';
 import type { WordPressComponentProps } from '../../ui/context';
 import type { ToggleGroupControlMainControlProps } from '../types';
+import { HStack } from '../../h-stack';
 
 function UnforwardedToggleGroupControlAsButtonGroup(
 	{
@@ -92,7 +93,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 					containerWidth={ sizes.width }
 					isAdaptiveWidth={ isAdaptiveWidth }
 				/>
-				{ children }
+				<HStack spacing={ 1 }>{ children }</HStack>
 			</View>
 		</ToggleGroupControlContext.Provider>
 	);
