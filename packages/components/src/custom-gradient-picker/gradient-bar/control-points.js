@@ -11,7 +11,6 @@ import { useInstanceId } from '@wordpress/compose';
 import { useEffect, useRef, useState, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
-import { LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -204,7 +203,7 @@ function ControlPoints( {
 								}
 							} }
 							onKeyDown={ ( event ) => {
-								if ( event.keyCode === LEFT ) {
+								if ( event.code === 'ArrowLeft' ) {
 									// Stop propagation of the key press event to avoid focus moving
 									// to another editor area.
 									event.stopPropagation();
@@ -218,7 +217,7 @@ function ControlPoints( {
 											)
 										)
 									);
-								} else if ( event.keyCode === RIGHT ) {
+								} else if ( event.code === 'ArrowRight' ) {
 									// Stop propagation of the key press event to avoid focus moving
 									// to another editor area.
 									event.stopPropagation();

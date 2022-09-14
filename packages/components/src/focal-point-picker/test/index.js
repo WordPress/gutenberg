@@ -1,40 +1,59 @@
 /**
  * External dependencies
  */
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
  */
-import Picker from '../index.js';
+import Picker from '..';
 
 describe( 'FocalPointPicker', () => {
 	describe( 'focus and blur', () => {
-		let firedDragEnd;
-		let firedDrag;
-		const { unmount } = render(
-			<Picker
-				onChange={ () => {} }
-				onDragEnd={ () => ( firedDragEnd = true ) }
-				onDrag={ () => ( firedDrag = true ) }
-			/>
-		);
-		const dragArea = screen.getByRole( 'button' );
-		fireEvent.mouseDown( dragArea );
-		const gainedFocus = dragArea.ownerDocument.activeElement === dragArea;
+		it( 'clicking the draggable area should focus it', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 
-		fireEvent.blur( dragArea );
-		fireEvent.mouseMove( dragArea );
+			const mockOnChange = jest.fn();
 
-		// cleans up as it's not automated for renders outside of test blocks
-		unmount();
+			render( <Picker onChange={ mockOnChange } /> );
 
-		it( 'should focus the draggable area', () => {
-			expect( gainedFocus ).toBe( true );
+			const draggableArea = screen.getByRole( 'button' );
+
+			await user.click( draggableArea );
+
+			expect( draggableArea ).toHaveFocus();
 		} );
 
 		it( 'should stop a drag operation when focus is lost', () => {
-			expect( firedDragEnd && ! firedDrag ).toBe( true );
+			const mockOnDrag = jest.fn();
+			const mockOnDragEnd = jest.fn();
+			const mockOnChange = jest.fn();
+
+			render(
+				<Picker
+					onChange={ mockOnChange }
+					onDrag={ mockOnDrag }
+					onDragEnd={ mockOnDragEnd }
+				/>
+			);
+
+			const draggableArea = screen.getByRole( 'button' );
+
+			// `user-event` is not capable of testing drag interactions properly.
+			// we could consider using playwright instead.
+			fireEvent.mouseDown( draggableArea );
+
+			expect( mockOnDrag ).not.toHaveBeenCalled();
+			expect( mockOnDragEnd ).not.toHaveBeenCalled();
+
+			fireEvent.blur( draggableArea );
+			fireEvent.mouseMove( draggableArea );
+
+			expect( mockOnDrag ).not.toHaveBeenCalled();
+			expect( mockOnDragEnd ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
@@ -47,13 +66,17 @@ describe( 'FocalPointPicker', () => {
 			events.forEach( ( name ) => {
 				handlers[ name ] = ( ...all ) => eventLogger( name, all );
 			} );
+
 			render( <Picker { ...handlers } /> );
+
 			const dragArea = screen.getByRole( 'button' );
-			act( () => {
-				fireEvent.mouseDown( dragArea );
-				fireEvent.mouseMove( dragArea );
-				fireEvent.mouseUp( dragArea );
-			} );
+
+			// `user-event` is not capable of testing drag interactions properly.
+			// we could consider using playwright instead.
+			fireEvent.mouseDown( dragArea );
+			fireEvent.mouseMove( dragArea );
+			fireEvent.mouseUp( dragArea );
+
 			expect(
 				events.reduce( ( last, eventName, index ) => {
 					return last && logs[ index ].name === eventName;
@@ -64,8 +87,13 @@ describe( 'FocalPointPicker', () => {
 
 	describe( 'resolvePoint handling', () => {
 		it( 'should allow value altering', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
 			const spyChange = jest.fn();
 			const spy = jest.fn();
+
 			render(
 				<Picker
 					value={ { x: 0.25, y: 0.25 } }
@@ -76,16 +104,17 @@ describe( 'FocalPointPicker', () => {
 					} }
 				/>
 			);
+
 			// Click and press arrow up
 			const dragArea = screen.getByRole( 'button' );
-			act( () => {
-				fireEvent.mouseDown( dragArea );
-				fireEvent.keyDown( dragArea, { charCode: 0, keyCode: 38 } );
-			} );
+
+			await user.click( dragArea );
+			await user.keyboard( '[ArrowUp]' );
+
 			expect( spy ).toHaveBeenCalled();
-			expect( spyChange ).toHaveBeenCalledWith( {
-				x: '0.91',
-				y: '0.42',
+			expect( spyChange ).toHaveBeenLastCalledWith( {
+				x: 0.91,
+				y: 0.42,
 			} );
 		} );
 	} );
@@ -100,20 +129,44 @@ describe( 'FocalPointPicker', () => {
 			expect( xInput.value ).toBe( '93' );
 		} );
 		it( 'call onChange with the expected values', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
 			const spyChange = jest.fn();
 			render(
 				<Picker value={ { x: 0.14, y: 0.62 } } onChange={ spyChange } />
 			);
-			// Click and press arrow up
+			// Focus and press arrow up
 			const dragArea = screen.getByRole( 'button' );
-			act( () => {
-				fireEvent.mouseDown( dragArea );
-				fireEvent.keyDown( dragArea, { charCode: 0, keyCode: 38 } );
+
+			await user.click( dragArea );
+			await user.keyboard( '[ArrowDown]' );
+
+			expect( spyChange ).toHaveBeenLastCalledWith( {
+				x: 0.14,
+				y: 0.63,
 			} );
-			expect( spyChange ).toHaveBeenCalledWith( {
-				x: '0.14',
-				y: '0.61',
-			} );
+		} );
+	} );
+
+	describe( 'value handling', () => {
+		it( 'should handle legacy string values', () => {
+			const onChangeSpy = jest.fn();
+			render(
+				<Picker
+					value={ { x: '0.1', y: '0.2' } }
+					onChange={ onChangeSpy }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Left' } ).value
+			).toBe( '10' );
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Top' } ).value
+			).toBe( '20' );
+			expect( onChangeSpy ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

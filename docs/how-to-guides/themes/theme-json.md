@@ -334,6 +334,7 @@ To retain backward compatibility, the existing `add_theme_support` declarations 
 | `editor-font-sizes`         | Provide the list of font size via `typography.fontSizes`. |
 | `editor-gradient-presets`   | Provide the list of gradients via `color.gradients`.      |
 | `experimental-link-color`   | Set `color.link` to `true`. `experimental-link-color` will be removed when the plugin requires WordPress 5.9 as the minimum version. |
+| `appearance-tools`          | Set `appearanceTools` to `true`.                          |
 
 #### Presets
 
@@ -427,7 +428,7 @@ The naming schema for the classes and the custom properties is as follows:
 					"slug": "x-large",
 					"size": 46,
 					"name": "Large"
-				},
+				}
 			]
 		},
 		"spacing": {
@@ -453,7 +454,7 @@ The naming schema for the classes and the custom properties is as follows:
 					"slug": "60",
 					"size": "2rem",
 					"name": "Large"
-				},
+				}
 			]
 		},
 		"blocks": {

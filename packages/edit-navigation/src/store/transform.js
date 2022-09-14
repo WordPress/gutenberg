@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, omit, sortBy } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -46,7 +46,8 @@ export function blockToMenuItem(
 	blockPosition,
 	menuId
 ) {
-	menuItem = omit( menuItem, 'menus', 'meta', '_links' );
+	const { menus, meta, _links, ...restMenuItem } = menuItem;
+	menuItem = restMenuItem;
 	menuItem.content = get( menuItem.content, 'raw', menuItem.content );
 
 	let attributes;
@@ -168,7 +169,9 @@ export function menuItemsToBlocks( menuItems ) {
  */
 function mapMenuItemsToBlocks( menuItems ) {
 	// The menuItem should be in menu_order sort order.
-	const sortedItems = sortBy( menuItems, 'menu_order' );
+	const sortedItems = [ ...menuItems ].sort(
+		( a, b ) => a.menu_order - b.menu_order
+	);
 
 	const blocks = sortedItems.map( ( menuItem ) => {
 		if ( menuItem.type === 'block' ) {

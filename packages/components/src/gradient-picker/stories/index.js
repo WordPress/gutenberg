@@ -74,6 +74,7 @@ const Template = ( { onChange, ...props } ) => {
 
 export const Default = Template.bind( {} );
 Default.args = {
+	__nextHasNoMargin: true,
 	gradients: GRADIENTS,
 };
 
@@ -81,4 +82,14 @@ export const WithNoExistingGradients = Template.bind( {} );
 WithNoExistingGradients.args = {
 	...Default.args,
 	gradients: [],
+};
+
+export const MultipleOrigins = Template.bind( {} );
+MultipleOrigins.args = {
+	...Default.args,
+	__experimentalHasMultipleOrigins: true,
+	gradients: [
+		{ name: 'Origin 1', gradients: GRADIENTS },
+		{ name: 'Origin 2', gradients: GRADIENTS },
+	],
 };

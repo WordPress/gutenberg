@@ -43,11 +43,11 @@ module.exports = async (
 		editorScript,
 		editorStyle,
 		style,
+		variantVars,
 	}
 ) => {
 	slug = slug.toLowerCase();
 	namespace = namespace.toLowerCase();
-
 	/**
 	 * --no-plugin relies on the used template supporting the [blockTemplatesPath property](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/#blocktemplatespath).
 	 * If the blockOutputTemplates object has no properties, we can assume that there was a custom --template passed that
@@ -99,6 +99,7 @@ module.exports = async (
 		editorScript,
 		editorStyle,
 		style,
+		...variantVars,
 	};
 
 	if ( plugin ) {
@@ -143,7 +144,7 @@ module.exports = async (
 	success(
 		plugin
 			? `Done: WordPress plugin ${ title } bootstrapped in the ${ slug } directory.`
-			: `Done: Block "${ title }" bootstrapped in the ${ slug }directory.`
+			: `Done: Block "${ title }" bootstrapped in the ${ slug } directory.`
 	);
 
 	if ( plugin && wpScripts ) {

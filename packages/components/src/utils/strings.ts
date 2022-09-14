@@ -70,3 +70,14 @@ export const normalizeTextString = ( value: string ): string => {
 		.toLocaleLowerCase()
 		.replace( ALL_UNICODE_DASH_CHARACTERS, '-' );
 };
+
+/**
+ * Escapes the RegExp special characters.
+ *
+ * @param {string} string Input string.
+ *
+ * @return {string} Regex-escaped string.
+ */
+export function escapeRegExp( string: string ): string {
+	return string.replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' );
+}

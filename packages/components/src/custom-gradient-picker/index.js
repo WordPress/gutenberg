@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -125,9 +126,20 @@ export default function CustomGradientPicker( {
 		position: parseInt( colorStop.length.value ),
 	} ) );
 
+	if ( ! __nextHasNoMargin ) {
+		deprecated(
+			'Outer margin styles for wp.components.CustomGradientPicker',
+			{
+				since: '6.1',
+				version: '6.4',
+				hint: 'Set the `__nextHasNoMargin` prop to true to start opting into the new styles, which will become the default in a future version',
+			}
+		);
+	}
+
 	return (
 		<VStack
-			spacing={ 5 }
+			spacing={ 4 }
 			className={ classnames( 'components-custom-gradient-picker', {
 				'is-next-has-no-margin': __nextHasNoMargin,
 			} ) }

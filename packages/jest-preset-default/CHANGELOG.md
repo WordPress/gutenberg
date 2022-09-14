@@ -2,9 +2,15 @@
 
 ## Unreleased
 
+## 9.0.0 (2022-08-24)
+
 ### Breaking Change
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
+### Bug Fix
+
+-   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
 
 ## 8.5.2 (2022-08-17)
 

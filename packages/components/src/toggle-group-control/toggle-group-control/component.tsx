@@ -31,6 +31,7 @@ import BaseControl from '../../base-control';
 import type { ToggleGroupControlProps } from '../types';
 import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
 import ToggleGroupControlContext from '../context';
+import { VisualLabelWrapper } from './styles';
 import * as styles from './styles';
 
 const noop = () => {};
@@ -44,7 +45,7 @@ function UnconnectedToggleGroupControl(
 		className,
 		isAdaptiveWidth = false,
 		isBlock = false,
-		__experimentalIsIconGroup = false,
+		__experimentalIsBorderless = false,
 		label,
 		hideLabelFromVision = false,
 		help,
@@ -87,11 +88,11 @@ function UnconnectedToggleGroupControl(
 		() =>
 			cx(
 				styles.ToggleGroupControl( { size } ),
-				! __experimentalIsIconGroup && styles.border,
+				! __experimentalIsBorderless && styles.border,
 				isBlock && styles.block,
 				className
 			),
-		[ className, cx, isBlock, __experimentalIsIconGroup, size ]
+		[ className, cx, isBlock, __experimentalIsBorderless, size ]
 	);
 	return (
 		<BaseControl
@@ -102,11 +103,11 @@ function UnconnectedToggleGroupControl(
 				value={ { ...radio, isBlock: ! isAdaptiveWidth, size } }
 			>
 				{ ! hideLabelFromVision && (
-					<div>
+					<VisualLabelWrapper>
 						<BaseControl.VisualLabel>
 							{ label }
 						</BaseControl.VisualLabel>
-					</div>
+					</VisualLabelWrapper>
 				) }
 				<RadioGroup
 					{ ...radio }

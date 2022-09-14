@@ -34,8 +34,8 @@ program
 	.arguments( '[slug]' )
 	.option(
 		'-t, --template <name>',
-		'project template type name; allowed values: "static", "es5", the name of an external npm package, or the path to a local directory',
-		'static'
+		'project template type name; allowed values: "standard", "es5", the name of an external npm package, or the path to a local directory',
+		'standard'
 	)
 	.option( '--namespace <value>', 'internal namespace for the block name' )
 	.option(
@@ -58,6 +58,7 @@ program
 	)
 	.option( '--wp-env', 'enable integration with `@wordpress/env` package' )
 	.option( '--no-plugin', 'scaffold only block files' )
+	.option( '--variant <variant>', 'the variant of the template to use' )
 	.action(
 		async (
 			slug,
@@ -70,12 +71,28 @@ program
 				title,
 				wpScripts,
 				wpEnv,
+				variant,
 			}
 		) => {
 			await checkSystemRequirements( engines );
 			try {
 				const pluginTemplate = await getPluginTemplate( templateName );
-				const defaultValues = getDefaultValues( pluginTemplate );
+				const availableVariants = Object.keys(
+					pluginTemplate.variants
+				);
+				if ( variant && ! availableVariants.includes( variant ) ) {
+					if ( ! availableVariants.length ) {
+						throw new CLIError(
+							`"${ variant }" variant was selected. This template does not have any variants!`
+						);
+					}
+					throw new CLIError(
+						`"${ variant }" is not a valid variant for this template. Available variants are: ${ availableVariants.join(
+							', '
+						) }.`
+					);
+				}
+
 				const optionsValues = Object.fromEntries(
 					Object.entries( {
 						plugin,
@@ -89,6 +106,10 @@ program
 				);
 
 				if ( slug ) {
+					const defaultValues = getDefaultValues(
+						pluginTemplate,
+						variant
+					);
 					const answers = {
 						...defaultValues,
 						slug,
@@ -105,16 +126,36 @@ program
 							: "Let's add a new block to your existing WordPress plugin:"
 					);
 
+					if ( ! variant && availableVariants.length > 1 ) {
+						const result = await inquirer.prompt( {
+							type: 'list',
+							name: 'variant',
+							message:
+								'The template variant to use for this block:',
+							choices: availableVariants,
+						} );
+						variant = result.variant;
+					}
+
+					const defaultValues = getDefaultValues(
+						pluginTemplate,
+						variant
+					);
+
 					const filterOptionsProvided = ( { name } ) =>
 						! Object.keys( optionsValues ).includes( name );
-					const blockPrompts = getPrompts( pluginTemplate, [
-						'slug',
-						'namespace',
-						'title',
-						'description',
-						'dashicon',
-						'category',
-					] ).filter( filterOptionsProvided );
+					const blockPrompts = getPrompts(
+						pluginTemplate,
+						[
+							'slug',
+							'namespace',
+							'title',
+							'description',
+							'dashicon',
+							'category',
+						],
+						variant
+					).filter( filterOptionsProvided );
 					const blockAnswers = await inquirer.prompt( blockPrompts );
 
 					const pluginAnswers = plugin
@@ -141,7 +182,8 @@ program
 											'licenseURI',
 											'domainPath',
 											'updateURI',
-										]
+										],
+										variant
 									).filter( filterOptionsProvided );
 									const result = await inquirer.prompt(
 										pluginPrompts
@@ -153,6 +195,7 @@ program
 					await scaffold( pluginTemplate, {
 						...defaultValues,
 						...optionsValues,
+						variant,
 						...blockAnswers,
 						...pluginAnswers,
 					} );

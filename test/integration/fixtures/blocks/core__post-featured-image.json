@@ -3,6 +3,7 @@
 		"name": "core/post-featured-image",
 		"isValid": true,
 		"attributes": {
+			"dimRatio": 0,
 			"isLink": false,
 			"scale": "cover",
 			"rel": "",
