@@ -48,7 +48,7 @@ export default function useCoverIsDark(
 					defaultColor: [ 255, 255, 255, 255 ],
 					// Errors that come up don't reject the promise, so error
 					// logging has to be silenced with this option.
-					silent: true,
+					silent: process.env.NODE_ENV === 'production',
 				} )
 				.then( ( color ) => setIsDark( color.isDark ) );
 		}
