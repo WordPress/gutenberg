@@ -15,16 +15,14 @@ export default function LinkedButton( { isLinked, ...props } ) {
 
 	return (
 		<Tooltip text={ label }>
-			<span>
-				<Button
-					{ ...props }
-					className="component-box-control__linked-button"
-					isSmall
-					icon={ isLinked ? link : linkOff }
-					iconSize={ 24 }
-					aria-label={ label }
-				/>
-			</span>
+			<Button
+				{ ...props }
+				className="component-box-control__linked-button"
+				isSmall
+				icon={ isLinked ? link : linkOff }
+				iconSize={ 24 }
+				aria-label={ label }
+			/>
 		</Tooltip>
 	);
 }
