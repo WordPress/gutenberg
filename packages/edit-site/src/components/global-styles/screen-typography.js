@@ -113,6 +113,12 @@ function ScreenTypography( { name } ) {
 							<Item
 								name={ name }
 								parentMenu={ parentMenu }
+								element="caption"
+								label={ __( 'Captions' ) }
+							/>
+							<Item
+								name={ name }
+								parentMenu={ parentMenu }
 								element="button"
 								label={ __( 'Buttons' ) }
 							/>
