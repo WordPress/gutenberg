@@ -4,7 +4,6 @@
  * External dependencies
  */
 import { View, Platform, Dimensions } from 'react-native';
-import { get, pickBy } from 'lodash';
 import memize from 'memize';
 import { colord } from 'colord';
 
@@ -228,8 +227,10 @@ export class RichText extends Component {
 
 	onFormatChange( record ) {
 		const { start = 0, end = 0, activeFormats = [] } = record;
-		const changeHandlers = pickBy( this.props, ( v, key ) =>
-			key.startsWith( 'format_on_change_functions_' )
+		const changeHandlers = Object.fromEntries(
+			Object.entries( this.props ).filter( ( [ key ] ) =>
+				key.startsWith( 'format_on_change_functions_' )
+			)
 		);
 
 		Object.values( changeHandlers ).forEach( ( changeHandler ) => {
@@ -1282,10 +1283,7 @@ export default compose( [
 			select( 'core/block-editor' );
 		const parents = getBlockParents( clientId, true );
 		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;
-		const parentBlockStyles = get( parentBlock, [
-			'attributes',
-			'childrenStyles',
-		] );
+		const parentBlockStyles = parentBlock?.attributes?.childrenStyles;
 
 		const settings = getSettings();
 		const baseGlobalStyles = settings?.__experimentalGlobalStylesBaseStyles;
