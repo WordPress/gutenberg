@@ -28,7 +28,8 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.16.0"
+		"@babel/runtime": "^7.16.0",
+		"requestidlecallback": "^0.3.0"
 	},
 	"publishConfig": {
 		"access": "public"
