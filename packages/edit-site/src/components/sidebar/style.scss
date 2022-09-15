@@ -1,0 +1,13 @@
+.edit-site-sidebar__logo {
+	display: flex;
+	align-items: center;
+	height: 60px;
+
+	.components-button {
+		color: currentColor;
+	}
+}
+
+.edit-site-sidebar__content {
+	padding: $grid-unit-20;
+}

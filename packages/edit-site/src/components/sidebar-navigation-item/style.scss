@@ -1,0 +1,17 @@
+.edit-site-sidebar-navigation-item.components-item {
+	color: $gray-200;
+
+	&:hover {
+		background: $gray-800;
+		color: $white;
+	}
+
+	&:focus {
+		color: $gray-200;
+	}
+
+	&[aria-pressed="true"] {
+		background: var(--wp-admin-theme-color);
+		color: $white;
+	}
+}

@@ -1,27 +1,20 @@
-// Developer notes: these rules are duplicated for the post editor.
-// They need to be updated in both places.
-
-.edit-site-navigation-toggle {
-	align-items: center;
-	background: $gray-900;
-	border-radius: 0;
-	display: flex;
-	position: absolute;
-	z-index: z-index(".edit-site-navigation-toggle");
+.edit-site-header-wrapper {
 	height: $header-height;
-	width: $header-height;
+	display: flex;
+	align-items: center;
 }
 
-.edit-site-navigation-toggle__button.components-button {
-	align-items: center;
+.edit-site-header__toggle.is-canvas-mode-view {
+	margin-left: $grid-unit-20;
+}
+
+.edit-site-header__toggle.is-canvas-mode-edit {
+	position: relative;
 	background: $gray-900;
-	border-radius: 0;
 	color: $white;
-	height: $header-height + $border-width;
-	width: $header-height;
-	z-index: 1;
+	height: 100%;
+	border-radius: 0;
 	margin-bottom: - $border-width;
-	min-width: $header-height;
 
 	&:hover,
 	&:active {
@@ -60,12 +53,8 @@
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) rgba($white, 0.1), inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 	}
 
-	.edit-site-navigation-toggle__site-icon {
-		width: $button-size;
-		height: $button-size;
+	.edit-site-header__toggle-icon {
 		border-radius: $radius-block-ui;
 		object-fit: cover;
-		// Compensate for the top-bar border.
-		margin-top: -($border-width);
 	}
 }

@@ -78,19 +78,6 @@
 	padding: $grid-unit-20;
 }
 
-.edit-site-navigation-sidebar__beta {
-	display: inline-flex;
-	margin-left: $grid-unit-10;
-	padding: 0 $grid-unit-10;
-	height: $grid-unit-30;
-	border-radius: $radius-block-ui;
-	background-color: $gray-900;
-	color: $white;
-	align-items: center;
-	font-size: $helptext-font-size;
-	line-height: 1;
-}
-
 // Override the `hr` styles defined in the `ComplementaryArea` component
 // from the `@wordpress/interface` package.
 .edit-site-global-styles-sidebar hr {

@@ -1,11 +1,3 @@
-html #wpadminbar {
-	display: none;
-}
-
-html.wp-toolbar {
-	padding-top: 0;
-}
-
 .edit-site-editor__toggle-save-panel {
 	z-index: z-index(".edit-site-editor__toggle-save-panel");
 	position: fixed !important; // Need to override the default relative positioning
@@ -25,20 +17,6 @@ html.wp-toolbar {
 	.interface-interface-skeleton__actions:focus-within & {
 		top: auto;
 		bottom: 0;
-	}
-}
-
-.edit-site-visual-editor {
-	position: relative;
-	height: 100%;
-	display: block;
-	overflow: hidden;
-
-	iframe {
-		display: block;
-		width: 100%;
-		height: 100%;
-		background-color: $white;
 	}
 }
 

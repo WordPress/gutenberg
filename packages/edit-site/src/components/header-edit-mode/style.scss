@@ -4,17 +4,9 @@ $header-toolbar-min-width: 335px;
 	align-items: center;
 	background-color: $white;
 	display: flex;
-	height: $header-height;
 	box-sizing: border-box;
 	width: 100%;
 	justify-content: space-between;
-
-	body.is-fullscreen-mode & {
-		padding-left: 60px;
-		transition: padding-left 20ms linear;
-		transition-delay: 80ms;
-		@include reduce-motion("transition");
-	}
 
 	.edit-site-header-edit-mode__start {
 		display: flex;
@@ -37,29 +29,6 @@ $header-toolbar-min-width: 335px;
 		// subsequently truncate child text, we set an explicit min-width.
 		// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 		min-width: 0;
-	}
-}
-
-// Keeps the document title centered when the sidebar is open
-body.is-navigation-sidebar-open {
-	.edit-site-header-edit-mode {
-		padding-left: 0;
-		transition: padding-left 20ms linear;
-		transition-delay: 0ms;
-		@include reduce-motion("transition");
-	}
-}
-
-// Centred document title on small screens with sidebar open
-@media ( max-width: #{ ($break-large - 1) } ) {
-	body.is-navigation-sidebar-open .edit-site-header-edit-mode {
-		.edit-site-header-edit-mode__inserter-toggle ~ .components-button,
-		.edit-site-header-edit-mode__end .components-button:not(.is-primary) {
-			display: none;
-		}
-		.edit-site-save-button__button {
-			margin-right: 0;
-		}
 	}
 }
 
@@ -177,7 +146,7 @@ body.is-navigation-sidebar-open {
 
 // Button text label styles
 
-.show-icon-labels .edit-site-header-edit-mode {
+.edit-site-header-edit-mode.show-icon-labels {
 	.components-button.has-icon {
 		width: auto;
 
@@ -218,7 +187,7 @@ body.is-navigation-sidebar-open {
 		padding: 0 $grid-unit-10;
 	}
 
-	.edit-site-header__start .edit-site-header__toolbar > * + * {
+	.edit-site-header-edit-mode__start .edit-site-header-edit-mode__toolbar > * + * {
 		margin-left: $grid-unit-10;
 	}
 }

@@ -3,6 +3,7 @@
 	border-collapse: collapse;
 	padding: 0;
 	margin: 0;
+	color: currentColor;
 
 	// Move upwards when in modal.
 	.components-modal__content & {
@@ -99,7 +100,7 @@
 		height: auto;
 		padding: ($grid-unit-15 * 0.5) $grid-unit-05 ($grid-unit-15 * 0.5) 0;
 		text-align: left;
-		color: $gray-900;
+		color: currentColor;
 		border-radius: $radius-block-ui;
 		position: relative;
 		white-space: nowrap;

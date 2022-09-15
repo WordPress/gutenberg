@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
@@ -18,9 +13,7 @@ import { EditorSnackbars } from '@wordpress/editor';
  */
 import useRegisterShortcuts from './use-register-shortcuts';
 import Header from './header';
-import NavigationSidebar from '../navigation-sidebar';
 import Table from './table';
-import { store as editSiteStore } from '../../store';
 import { useLocation } from '../routes';
 import useTitle from '../routes/use-title';
 
@@ -31,22 +24,16 @@ export default function List() {
 
 	useRegisterShortcuts();
 
-	const { previousShortcut, nextShortcut, isNavigationOpen } = useSelect(
-		( select ) => {
-			return {
-				previousShortcut: select(
-					keyboardShortcutsStore
-				).getAllShortcutKeyCombinations(
-					'core/edit-site/previous-region'
-				),
-				nextShortcut: select(
-					keyboardShortcutsStore
-				).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
-				isNavigationOpen: select( editSiteStore ).isNavigationOpened(),
-			};
-		},
-		[]
-	);
+	const { previousShortcut, nextShortcut } = useSelect( ( select ) => {
+		return {
+			previousShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutKeyCombinations( 'core/edit-site/previous-region' ),
+			nextShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
+		};
+	}, [] );
 
 	const postType = useSelect(
 		( select ) => select( coreStore ).getPostType( templateType ),
@@ -75,15 +62,9 @@ export default function List() {
 
 	return (
 		<InterfaceSkeleton
-			className={ classnames( 'edit-site-list', {
-				'is-navigation-open': isNavigationOpen,
-			} ) }
-			labels={ {
-				drawer: __( 'Navigation Sidebar' ),
-				...detailedRegionLabels,
-			} }
+			className="edit-site-list"
+			labels={ detailedRegionLabels }
 			header={ <Header templateType={ templateType } /> }
-			drawer={ <NavigationSidebar.Slot /> }
 			notices={ <EditorSnackbars /> }
 			content={ <Table templateType={ templateType } /> }
 			shortcuts={ {

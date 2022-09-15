@@ -10,7 +10,7 @@ import { useDispatch } from '@wordpress/data';
 import { useLocation } from '../routes';
 import { store as editSiteStore } from '../../store';
 
-export default function URLQueryController() {
+export default function useInitEditedEntityFromURL() {
 	const { setTemplate, setTemplatePart, setPage } =
 		useDispatch( editSiteStore );
 	const {
@@ -27,6 +27,4 @@ export default function URLQueryController() {
 			setTemplatePart( postId );
 		}
 	}, [ postId, postType ] );
-
-	return null;
 }
