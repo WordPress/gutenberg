@@ -57,9 +57,7 @@ function ScreenCaptionColor( { name } ) {
 				) }
 			/>
 			<div className="edit-site-global-styles-screen-caption-color">
-				<h4 className="edit-site-global-styles-section-title">
-					{ __( 'Text color' ) }
-				</h4>
+				<h4>{ __( 'Text color' ) }</h4>
 
 				<ColorGradientControl
 					className="edit-site-screen-caption-color__control"
@@ -74,9 +72,7 @@ function ScreenCaptionColor( { name } ) {
 					clearable={ captionTextColor === userCaptionTextColor }
 				/>
 
-				<h4 className="edit-site-global-styles-section-title">
-					{ __( 'Background color' ) }
-				</h4>
+				<h4>{ __( 'Background color' ) }</h4>
 
 				<ColorGradientControl
 					className="edit-site-screen-caption-color__control"
