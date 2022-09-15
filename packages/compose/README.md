@@ -2,7 +2,7 @@
 
 The `compose` package is a collection of handy [Hooks](https://reactjs.org/docs/hooks-intro.html) and [Higher Order Components](https://facebook.github.io/react/docs/higher-order-components.html) (HOCs) you can use to wrap your WordPress components and provide some basic features like: state, instance id, pure...
 
-The `compose` function is an alias to [flowRight](https://lodash.com/docs/#flowRight) from Lodash. It comes from functional programming, and allows you to compose any number of functions. You might also think of this as layering functions; `compose` will execute the last function first, then sequentially move back through the previous functions passing the result of each function upward.
+The `compose` function is inspired by [flowRight](https://lodash.com/docs/#flowRight) from Lodash and works the same way. It comes from functional programming, and allows you to compose any number of functions. You might also think of this as layering functions; `compose` will execute the last function first, then sequentially move back through the previous functions passing the result of each function upward.
 
 An example that illustrates it for two functions:
 
@@ -66,7 +66,7 @@ For more details, you can refer to each Higher Order Component's README file. [A
 Composes multiple higher-order components into a single higher-order component. Performs right-to-left function
 composition, where each successive invocation is supplied the return value of the previous.
 
-This is just a re-export of `lodash`'s `flowRight` function.
+This is inspired by `lodash`'s `flowRight` function.
 
 _Related_
 
@@ -110,6 +110,17 @@ _Parameters_
 _Returns_
 
 -   Higher-order component.
+
+### pipe
+
+Composes multiple higher-order components into a single higher-order component. Performs left-to-right function
+composition, where each successive invocation is supplied the return value of the previous.
+
+This is inspired by `lodash`'s `flow` function.
+
+_Related_
+
+-   <https://docs-lodash.com/v4/flow/>
 
 ### pure
 
