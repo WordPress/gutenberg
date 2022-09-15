@@ -34,9 +34,8 @@ function EditorProvider( {
 		return { postId: post.id, postType: post.type };
 	}, [ post.id, post.type ] );
 	const { selection, isReady } = useSelect( ( select ) => {
-		const { getEditorSelection, __unstableIsEditorReady } = select(
-			editorStore
-		);
+		const { getEditorSelection, __unstableIsEditorReady } =
+			select( editorStore );
 		return {
 			isReady: __unstableIsEditorReady(),
 			selection: getEditorSelection(),
@@ -92,7 +91,7 @@ function EditorProvider( {
 		};
 	}, [] );
 
-	// Synchronize the editor settings as they change
+	// Synchronize the editor settings as they change.
 	useEffect( () => {
 		updateEditorSettings( settings );
 	}, [ settings ] );

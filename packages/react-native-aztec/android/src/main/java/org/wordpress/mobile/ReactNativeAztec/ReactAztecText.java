@@ -18,6 +18,7 @@ import android.text.InputType;
 import android.text.Spannable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
@@ -93,6 +94,7 @@ public class ReactAztecText extends AztecText {
             put(AztecTextFormat.FORMAT_CITE, "italic");
             put(AztecTextFormat.FORMAT_STRIKETHROUGH, "strikethrough");
             put(AztecTextFormat.FORMAT_UNDERLINE, "underline");
+            put(AztecTextFormat.FORMAT_MARK, "mark");
         }
     };
 
@@ -142,6 +144,16 @@ public class ReactAztecText extends AztecText {
             }
         });
         this.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+
+        setOnLongClickListener(new OnLongClickListener() {
+                                   @Override
+                                   public boolean onLongClick(View v) {
+                                       // The long click event can make text input gain focus, which conflicts with the drag and drop gesture.
+                                       // In order to prevent this, we consume this event unless it's already focused.
+                                       return !v.isFocused();
+                                   }
+                               }
+        );
     }
 
     private void forceCaretAtStartOnTakeFocus() {
@@ -326,6 +338,9 @@ public class ReactAztecText extends AztecText {
             }
             if (currentStyle == AztecTextFormat.FORMAT_STRIKETHROUGH) {
                 formattingOptions.add("strikethrough");
+            }
+            if (currentStyle == AztecTextFormat.FORMAT_MARK) {
+                formattingOptions.add("mark");
             }
         }
 
@@ -535,6 +550,8 @@ public class ReactAztecText extends AztecText {
                     break;
                 case "underline":
                     newFormatsSet.add(AztecTextFormat.FORMAT_UNDERLINE);
+                case "mark":
+                    newFormatsSet.add(AztecTextFormat.FORMAT_MARK);
                     break;
             }
         }

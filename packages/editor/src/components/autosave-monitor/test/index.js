@@ -12,7 +12,7 @@ describe( 'AutosaveMonitor', () => {
 	let wrapper;
 	let setAutosaveTimerSpy;
 	beforeEach( () => {
-		jest.useFakeTimers();
+		jest.useFakeTimers( 'legacy' );
 		setAutosaveTimerSpy = jest.spyOn(
 			AutosaveMonitor.prototype,
 			'setAutosaveTimer'
@@ -23,6 +23,9 @@ describe( 'AutosaveMonitor', () => {
 	} );
 
 	afterEach( () => {
+		jest.runOnlyPendingTimers();
+		jest.useRealTimers();
+
 		setAutosaveTimerSpy.mockClear();
 	} );
 
@@ -36,6 +39,12 @@ describe( 'AutosaveMonitor', () => {
 	} );
 
 	describe( '#componentDidUpdate()', () => {
+		it( 'should clear and restart autosave timer when the interval changes', () => {
+			wrapper.setProps( { interval: 999 } );
+			expect( clearTimeout ).toHaveBeenCalled();
+			expect( setAutosaveTimerSpy ).toHaveBeenCalledTimes( 2 );
+		} );
+
 		it( 'should set needsAutosave=true when editReference changes', () => {
 			expect( wrapper.instance().needsAutosave ).toBe( false );
 			wrapper.setProps( {
@@ -95,9 +104,9 @@ describe( 'AutosaveMonitor', () => {
 				isAutosaveable: true,
 				interval: 5,
 			} );
-			expect( setAutosaveTimerSpy ).toHaveBeenCalledTimes( 1 );
-			wrapper.instance().autosaveTimerHandler();
 			expect( setAutosaveTimerSpy ).toHaveBeenCalledTimes( 2 );
+			wrapper.instance().autosaveTimerHandler();
+			expect( setAutosaveTimerSpy ).toHaveBeenCalledTimes( 3 );
 			expect( setTimeout ).lastCalledWith( expect.any( Function ), 5000 );
 		} );
 
@@ -106,9 +115,9 @@ describe( 'AutosaveMonitor', () => {
 				isAutosaveable: false,
 				interval: 5,
 			} );
-			expect( setAutosaveTimerSpy ).toHaveBeenCalledTimes( 1 );
-			wrapper.instance().autosaveTimerHandler();
 			expect( setAutosaveTimerSpy ).toHaveBeenCalledTimes( 2 );
+			wrapper.instance().autosaveTimerHandler();
+			expect( setAutosaveTimerSpy ).toHaveBeenCalledTimes( 3 );
 			expect( setTimeout ).lastCalledWith( expect.any( Function ), 1000 );
 		} );
 

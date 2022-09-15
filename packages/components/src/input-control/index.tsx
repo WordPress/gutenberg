@@ -1,10 +1,8 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import classNames from 'classnames';
-// eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -18,6 +16,10 @@ import { useState, forwardRef } from '@wordpress/element';
 import InputBase from './input-base';
 import InputField from './input-field';
 import type { InputControlProps } from './types';
+import { space } from '../ui/utils/space';
+import { useDraft } from './utils';
+
+const noop = () => {};
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( InputControl );
@@ -26,8 +28,9 @@ function useUniqueId( idProp?: string ) {
 	return idProp || id;
 }
 
-export function InputControl(
+export function UnforwardedInputControl(
 	{
+		__next36pxDefaultSize,
 		__unstableStateReducer: stateReducer = ( state ) => state,
 		__unstableInputWidth,
 		className,
@@ -46,15 +49,22 @@ export function InputControl(
 		value,
 		...props
 	}: InputControlProps,
-	ref: Ref< HTMLInputElement >
+	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 
 	const id = useUniqueId( idProp );
 	const classes = classNames( 'components-input-control', className );
 
+	const draftHookProps = useDraft( {
+		value,
+		onBlur: props.onBlur,
+		onChange,
+	} );
+
 	return (
 		<InputBase
+			__next36pxDefaultSize={ __next36pxDefaultSize }
 			__unstableInputWidth={ __unstableInputWidth }
 			className={ classes }
 			disabled={ disabled }
@@ -71,24 +81,46 @@ export function InputControl(
 		>
 			<InputField
 				{ ...props }
+				__next36pxDefaultSize={ __next36pxDefaultSize }
 				className="components-input-control__input"
 				disabled={ disabled }
 				id={ id }
 				isFocused={ isFocused }
 				isPressEnterToChange={ isPressEnterToChange }
-				onChange={ onChange }
 				onKeyDown={ onKeyDown }
 				onValidate={ onValidate }
+				paddingInlineStart={ prefix ? space( 2 ) : undefined }
+				paddingInlineEnd={ suffix ? space( 2 ) : undefined }
 				ref={ ref }
 				setIsFocused={ setIsFocused }
 				size={ size }
 				stateReducer={ stateReducer }
-				value={ value }
+				{ ...draftHookProps }
 			/>
 		</InputBase>
 	);
 }
 
-const ForwardedComponent = forwardRef( InputControl );
+/**
+ * InputControl components let users enter and edit text. This is an experimental component
+ * intended to (in time) merge with or replace `TextControl`.
+ *
+ * ```jsx
+ * import { __experimentalInputControl as InputControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/compose';
+ *
+ * const Example = () => {
+ *   const [ value, setValue ] = useState( '' );
+ *
+ *   return (
+ *  	<InputControl
+ *  		value={ value }
+ *  		onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
+ *  	/>
+ *   );
+ * };
+ * ```
+ */
+export const InputControl = forwardRef( UnforwardedInputControl );
 
-export default ForwardedComponent;
+export default InputControl;

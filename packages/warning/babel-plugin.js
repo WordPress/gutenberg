@@ -69,7 +69,7 @@ function babelPlugin( { types: t } ) {
 			CallExpression( path, state ) {
 				const { node } = path;
 
-				// Ignore if it's already been processed
+				// Ignore if it's already been processed.
 				if ( node[ seen ] ) {
 					return;
 				}

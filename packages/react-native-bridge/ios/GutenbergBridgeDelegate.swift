@@ -4,13 +4,15 @@ public struct MediaInfo: Encodable {
     public let type: String?
     public let title: String?
     public let caption: String?
+    public let alt: String?
 
-    public init(id: Int32?, url: String?, type: String?, caption: String? = nil, title: String? = nil) {
+    public init(id: Int32?, url: String?, type: String?, caption: String? = nil, title: String? = nil, alt: String? = nil) {
         self.id = id
         self.url = url
         self.type = type
         self.caption = caption
         self.title = title
+        self.alt = alt
     }
 }
 
@@ -18,6 +20,7 @@ public struct MediaInfo: Encodable {
 public enum Capabilities: String {
     case contactInfoBlock
     case layoutGridBlock
+    case tiledGalleryBlock
     case mediaFilesCollectionBlock
     case mentions
     case xposts
@@ -25,8 +28,11 @@ public enum Capabilities: String {
     case canEnableUnsupportedBlockEditor
     case isAudioBlockMediaUploadEnabled
     case reusableBlock
-    case editorOnboarding
-    case firstGutenbergEditorSession
+    case facebookEmbed
+    case instagramEmbed
+    case loomEmbed
+    case smartframeEmbed
+    case shouldUseFastImage
 }
 
 /// Wrapper for single block data
@@ -244,8 +250,17 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that the editor requested the block type impression counts
     func gutenbergDidRequestBlockTypeImpressions() -> [String: Int]
 
-    /// Tells the delegate the the editor requested setting the impression counts
+    /// Tells the delegate that the editor requested setting the impression counts
     func gutenbergDidRequestSetBlockTypeImpressions(_ impressions: [String: Int])
+
+    /// Tells the delegate that the editor requested to show the "Contact Support" support view.
+    func gutenbergDidRequestContactCustomerSupport()
+
+    /// Tells the delegate that the editor requested to show the "My Tickets" support view.
+    func gutenbergDidRequestGotoCustomerSupportOptions()
+
+    /// Tells the delegate the editor requested sending an event
+    func gutenbergDidRequestSendEventToHost(_ eventName: String, properties: [AnyHashable: Any])
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

@@ -41,18 +41,40 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 			providerSlug in deprecated
 				? deprecated[ providerSlug ]
 				: providerSlug;
-		// this is needed as the `responsive` attribute was passed
-		// in a different way before the refactoring to block variations
+		// This is needed as the `responsive` attribute was passed
+		// in a different way before the refactoring to block variations.
 		if ( ! [ 'amazon-kindle', 'wordpress' ].includes( providerSlug ) ) {
 			newAttributes.responsive = true;
 		}
 		name = 'core/embed';
 	}
 
-	// Convert 'core/query-loop' blocks in existing content to 'core/post-template'.
-	// TODO: Remove this check when WordPress 5.9 is released.
-	if ( name === 'core/query-loop' ) {
-		name = 'core/post-template';
+	// Convert Post Comment blocks in existing content to Comment blocks.
+	// TODO: Remove these checks when WordPress 6.0 is released.
+	if ( name === 'core/post-comment-author' ) {
+		name = 'core/comment-author-name';
+	}
+	if ( name === 'core/post-comment-content' ) {
+		name = 'core/comment-content';
+	}
+	if ( name === 'core/post-comment-date' ) {
+		name = 'core/comment-date';
+	}
+	if ( name === 'core/comments-query-loop' ) {
+		name = 'core/comments';
+		const { className = '' } = newAttributes;
+		if ( ! className.includes( 'wp-block-comments-query-loop' ) ) {
+			newAttributes.className = [
+				'wp-block-comments-query-loop',
+				className,
+			].join( ' ' );
+		}
+		// Note that we also had to add a deprecation to the block in order
+		// for the ID change to work.
+	}
+	if ( name === 'core/post-comments' ) {
+		name = 'core/comments';
+		newAttributes.legacy = true;
 	}
 
 	return [ name, newAttributes ];

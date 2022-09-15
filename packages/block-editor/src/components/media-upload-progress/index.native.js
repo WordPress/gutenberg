@@ -98,7 +98,7 @@ export class MediaUploadProgress extends Component {
 	}
 
 	addMediaUploadListener() {
-		//if we already have a subscription not worth doing it again
+		// If we already have a subscription not worth doing it again.
 		if ( this.subscriptionParentMediaUpload ) {
 			return;
 		}
@@ -122,7 +122,7 @@ export class MediaUploadProgress extends Component {
 		const progress = this.state.progress * 100;
 		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
 		const retryMessage = __(
-			'Failed to insert media.\nPlease tap for options.'
+			'Failed to insert media.\nTap for more info.'
 		);
 
 		const progressBarStyle = [
@@ -144,6 +144,7 @@ export class MediaUploadProgress extends Component {
 						<Spinner
 							progress={ progress }
 							style={ this.props.spinnerStyle }
+							testID="spinner"
 						/>
 					) }
 				</View>

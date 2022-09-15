@@ -2,13 +2,13 @@
  * External dependencies
  */
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
-const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
-const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
-const TerserPlugin = require( 'terser-webpack-plugin' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
+const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const browserslist = require( 'browserslist' );
-const fs = require( 'fs' );
-const path = require( 'path' );
+const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
+const { basename, dirname, resolve } = require( 'path' );
+const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
+const TerserPlugin = require( 'terser-webpack-plugin' );
 
 /**
  * WordPress dependencies
@@ -22,8 +22,11 @@ const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
 const {
 	fromConfigRoot,
 	hasBabelConfig,
+	hasArgInCLI,
 	hasCssnanoConfig,
 	hasPostCSSConfig,
+	getWebpackEntryPoints,
+	getRenderPropPaths,
 } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -32,23 +35,10 @@ let target = 'browserslist';
 if ( ! browserslist.findConfig( '.' ) ) {
 	target += ':' + fromConfigRoot( '.browserslistrc' );
 }
-let entry = {};
-if ( process.env.WP_ENTRY ) {
-	entry = JSON.parse( process.env.WP_ENTRY );
-} else {
-	// By default the script checks if `src/index.js` exists and sets it as an entry point.
-	// In the future we should add similar handling for `src/script.js` and `src/view.js`.
-	[ 'index' ].forEach( ( entryName ) => {
-		const filepath = path.resolve(
-			process.cwd(),
-			'src',
-			`${ entryName }.js`
-		);
-		if ( fs.existsSync( filepath ) ) {
-			entry[ entryName ] = filepath;
-		}
-	} );
-}
+const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
+
+// Get paths of the `render` props included in `block.json` files
+const renderPaths = getRenderPropPaths();
 
 const cssLoaders = [
 	{
@@ -97,29 +87,23 @@ const cssLoaders = [
 	},
 ];
 
-const getLiveReloadPort = ( inputPort ) => {
-	const parsedPort = parseInt( inputPort, 10 );
-
-	return Number.isInteger( parsedPort ) ? parsedPort : 35729;
-};
-
 const config = {
 	mode,
 	target,
-	entry,
+	entry: getWebpackEntryPoints,
 	output: {
 		filename: '[name].js',
-		path: path.resolve( process.cwd(), 'build' ),
+		path: resolve( process.cwd(), 'build' ),
 	},
 	resolve: {
 		alias: {
 			'lodash-es': 'lodash',
 		},
+		extensions: [ '.jsx', '.ts', '.tsx', '...' ],
 	},
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
-		concatenateModules:
-			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
+		concatenateModules: isProduction && ! process.env.WP_BUNDLE_ANALYZER,
 		splitChunks: {
 			cacheGroups: {
 				style: {
@@ -127,8 +111,11 @@ const config = {
 					test: /[\\/]style(\.module)?\.(sc|sa|c)ss$/,
 					chunks: 'all',
 					enforce: true,
-					name( module, chunks, cacheGroupKey ) {
-						return `${ cacheGroupKey }-${ chunks[ 0 ].name }`;
+					name( _, chunks, cacheGroupKey ) {
+						const chunkName = chunks[ 0 ].name;
+						return `${ dirname(
+							chunkName
+						) }/${ cacheGroupKey }-${ basename( chunkName ) }`;
 					},
 				},
 				default: false,
@@ -155,7 +142,7 @@ const config = {
 	module: {
 		rules: [
 			{
-				test: /\.jsx?$/,
+				test: /\.(j|t)sx?$/,
 				exclude: /node_modules/,
 				use: [
 					{
@@ -177,6 +164,12 @@ const config = {
 										'@wordpress/babel-preset-default'
 									),
 								],
+								plugins: [
+									hasReactFastRefresh &&
+										require.resolve(
+											'react-refresh/babel'
+										),
+								].filter( Boolean ),
 							} ),
 						},
 					},
@@ -200,7 +193,7 @@ const config = {
 			},
 			{
 				test: /\.svg$/,
-				issuer: /\.jsx?$/,
+				issuer: /\.(j|t)sx?$/,
 				use: [ '@svgr/webpack', 'url-loader' ],
 				type: 'javascript/auto',
 			},
@@ -210,7 +203,7 @@ const config = {
 				type: 'asset/inline',
 			},
 			{
-				test: /\.(bmp|png|jpe?g|gif)$/i,
+				test: /\.(bmp|png|jpe?g|gif|webp)$/i,
 				type: 'asset/resource',
 				generator: {
 					filename: 'images/[name].[hash:8][ext]',
@@ -232,22 +225,70 @@ const config = {
 		// https://github.com/johnagan/clean-webpack-plugin/issues/159
 		new CleanWebpackPlugin( {
 			cleanAfterEveryBuildPatterns: [ '!fonts/**', '!images/**' ],
+			// Prevent it from deleting webpack assets during builds that have
+			// multiple configurations returned in the webpack config.
+			cleanStaleWebpackAssets: false,
+		} ),
+		new CopyWebpackPlugin( {
+			patterns: [
+				{
+					from: '**/block.json',
+					context: process.env.WP_SRC_DIRECTORY,
+					noErrorOnMissing: true,
+					transform( content, absoluteFrom ) {
+						const convertExtension = ( path ) => {
+							return path.replace( /\.(j|t)sx?$/, '.js' );
+						};
+
+						if ( basename( absoluteFrom ) === 'block.json' ) {
+							const blockJson = JSON.parse( content.toString() );
+							[ 'viewScript', 'script', 'editorScript' ].forEach(
+								( key ) => {
+									if ( Array.isArray( blockJson[ key ] ) ) {
+										blockJson[ key ] =
+											blockJson[ key ].map(
+												convertExtension
+											);
+									} else if (
+										typeof blockJson[ key ] === 'string'
+									) {
+										blockJson[ key ] = convertExtension(
+											blockJson[ key ]
+										);
+									}
+								}
+							);
+
+							return JSON.stringify( blockJson, null, 2 );
+						}
+
+						return content;
+					},
+				},
+				{
+					from: '**/*.php',
+					context: process.env.WP_SRC_DIRECTORY,
+					noErrorOnMissing: true,
+					filter: ( filepath ) => {
+						return (
+							process.env.WP_COPY_PHP_FILES_TO_DIST ||
+							renderPaths.includes( filepath )
+						);
+					},
+				},
+			],
 		} ),
 		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 		// bundle content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
 		new MiniCSSExtractPlugin( { filename: '[name].css' } ),
-		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload
-		// works when running watch mode.
-		! isProduction &&
-			new LiveReloadPlugin( {
-				port: getLiveReloadPort( process.env.WP_LIVE_RELOAD_PORT ),
-			} ),
+		// React Fast Refresh.
+		hasReactFastRefresh && new ReactRefreshWebpackPlugin(),
 		// WP_NO_EXTERNALS global variable controls whether scripts' assets get
 		// generated, and the default externals set.
 		! process.env.WP_NO_EXTERNALS &&
-			new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
+			new DependencyExtractionWebpackPlugin(),
 	].filter( Boolean ),
 	stats: {
 		children: false,
@@ -259,11 +300,26 @@ if ( ! isProduction ) {
 	// See: https://webpack.js.org/configuration/devtool/#devtool.
 	config.devtool = process.env.WP_DEVTOOL || 'source-map';
 	config.module.rules.unshift( {
-		test: /\.js$/,
+		test: /\.(j|t)sx?$/,
 		exclude: [ /node_modules/ ],
 		use: require.resolve( 'source-map-loader' ),
 		enforce: 'pre',
 	} );
+	config.devServer = {
+		devMiddleware: {
+			writeToDisk: true,
+		},
+		allowedHosts: 'auto',
+		host: 'localhost',
+		port: 8887,
+		proxy: {
+			'/build': {
+				pathRewrite: {
+					'^/build': '',
+				},
+			},
+		},
+	};
 }
 
 module.exports = config;

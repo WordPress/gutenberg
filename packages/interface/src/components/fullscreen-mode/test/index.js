@@ -51,7 +51,7 @@ describe( 'FullscreenMode', () => {
 	} );
 
 	it( 'fullscreen mode to be removed from document body when component unmounted', () => {
-		// not present initially
+		// Not present initially.
 		expect( document.body.classList.contains( 'is-fullscreen-mode' ) ).toBe(
 			false
 		);
@@ -59,7 +59,7 @@ describe( 'FullscreenMode', () => {
 		act( () => {
 			mode = create( <FullscreenMode isActive /> );
 		} );
-		// present after mounting with `isActive`
+		// Present after mounting with `isActive`
 		expect( document.body.classList.contains( 'is-fullscreen-mode' ) ).toBe(
 			true
 		);
@@ -68,7 +68,7 @@ describe( 'FullscreenMode', () => {
 			mode.unmount();
 		} );
 
-		// removed after unmounting
+		// Removed after unmounting.
 		expect( document.body.classList.contains( 'is-fullscreen-mode' ) ).toBe(
 			false
 		);

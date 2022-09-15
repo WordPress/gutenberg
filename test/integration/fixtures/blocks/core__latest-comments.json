@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/latest-comments",
 		"isValid": true,
 		"attributes": {
@@ -9,7 +8,6 @@
 			"displayDate": true,
 			"displayExcerpt": true
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

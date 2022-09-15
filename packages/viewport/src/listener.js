@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { reduce, forEach, debounce, mapValues } from 'lodash';
+import { reduce, debounce, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,15 +38,17 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 	const queries = reduce(
 		breakpoints,
 		( result, width, name ) => {
-			forEach( operators, ( condition, operator ) => {
-				const list = window.matchMedia(
-					`(${ condition }: ${ width }px)`
-				);
-				list.addListener( setIsMatching );
+			Object.entries( operators ).forEach(
+				( [ operator, condition ] ) => {
+					const list = window.matchMedia(
+						`(${ condition }: ${ width }px)`
+					);
+					list.addListener( setIsMatching );
 
-				const key = [ operator, name ].join( ' ' );
-				result[ key ] = list;
-			} );
+					const key = [ operator, name ].join( ' ' );
+					result[ key ] = list;
+				}
+			);
 
 			return result;
 		},
@@ -55,7 +57,7 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 
 	window.addEventListener( 'orientationchange', setIsMatching );
 
-	// Set initial values
+	// Set initial values.
 	setIsMatching();
 	setIsMatching.flush();
 };

@@ -32,9 +32,8 @@ const useWidgetLibraryInsertionPoint = () => {
 				getBlockIndex,
 			} = select( blockEditorStore );
 
-			const insertionPoint = select(
-				editWidgetsStore
-			).__experimentalGetInsertionPoint();
+			const insertionPoint =
+				select( editWidgetsStore ).__experimentalGetInsertionPoint();
 
 			// "Browse all" in the quick inserter will set the rootClientId to the current block.
 			// Otherwise, it will just be undefined, and we'll have to handle it differently below.
@@ -57,7 +56,7 @@ const useWidgetLibraryInsertionPoint = () => {
 
 			return {
 				rootClientId,
-				insertionIndex: getBlockIndex( clientId, rootClientId ) + 1,
+				insertionIndex: getBlockIndex( clientId ) + 1,
 			};
 		},
 		[ firstRootId ]

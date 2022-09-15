@@ -12,7 +12,7 @@ Real-time discussions for development take place in `#core-editor` and `#core-js
 
 The Gutenberg project uses GitHub for managing code and tracking issues. The main repository is at: [https://github.com/WordPress/gutenberg](https://github.com/WordPress/gutenberg).
 
-Browse [the issues list](https://github.com/wordpress/gutenberg/issues) to find issues to work on. The [good first issue](https://github.com/wordpress/gutenberg/issues?q=is%3Aopen+is%3Aissue+label%3A%22Good+First+Issue%22) and [good first review](https://github.com/wordpress/gutenberg/issues?q=is%3Aopen+is%3Aissue+label%3A%22Good+First+Issue%22) labels are good starting points.
+Browse [the issues list](https://github.com/wordpress/gutenberg/issues) to find issues to work on. The [good first issue](https://github.com/wordpress/gutenberg/issues?q=is%3Aopen+is%3Aissue+label%3A%22Good+First+Issue%22) and [good first review](https://github.com/WordPress/gutenberg/pulls?q=is%3Aopen+is%3Apr+label%3A%22Good+First+Review%22) labels are good starting points.
 
 ## Contributor Resources
 
@@ -23,5 +23,5 @@ Browse [the issues list](https://github.com/wordpress/gutenberg/issues) to find 
 -   [Accessibility Testing](/docs/contributors/accessibility-testing.md) documents the process of testing accessibility in Gutenberg.
 -   [Managing Packages](/docs/contributors/code/managing-packages.md) documents the process for managing the npm packages.
 -   [Gutenberg Release Process](/docs/contributors/code/release.md) - a checklist for the different types of releases for the Gutenberg project.
--   [React Native mobile Gutenberg](/docs/contributors/code/native-mobile.md) - a guide on the React Native based mobile Gutenberg editor.
--   [React Native Integration Test Guide](/docs/contributors/code/native-mobile-integration-test-guide.md) - a guide on creating integration tests for the Gutenberg Mobile editor.
+-   [React Native mobile editor](/docs/contributors/code/react-native/README.md) - a guide on contributing to the React Native mobile editor.
+-   [React Native Integration Test Guide](/docs/contributors/code/react-native/integration-test-guide.md) - a guide on creating integration tests for the mobile editor.

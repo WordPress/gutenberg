@@ -11,6 +11,7 @@ import {
 	useBlockProps,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
@@ -82,7 +83,11 @@ export default function save( { attributes } ) {
 				<Section type="foot" rows={ foot } />
 			</table>
 			{ hasCaption && (
-				<RichText.Content tagName="figcaption" value={ caption } />
+				<RichText.Content
+					tagName="figcaption"
+					value={ caption }
+					className={ __experimentalGetElementClassName( 'caption' ) }
+				/>
 			) }
 		</figure>
 	);

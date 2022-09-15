@@ -4,7 +4,7 @@ The NUX module exposes components, and `wp.data` methods useful for onboarding a
 
 A _tip_ is a component that points to an element in the UI and contains text that explains the element's functionality. The user can dismiss a tip, in which case it never shows again. The user can also disable tips entirely. Information about tips is persisted between sessions using `localStorage`.
 
-A _guide_ allows a series of of tips to be presented to the user one by one. When a user dismisses a tip that is in a guide, the next tip in the guide is shown.
+A _guide_ allows a series of tips to be presented to the user one by one. When a user dismisses a tip that is in a guide, the next tip in the guide is shown.
 
 ## Installation
 
@@ -105,4 +105,10 @@ console.log( 'Currently showing:', guide.currentTipId );
 console.log( 'Next to show:', guide.nextTipId );
 ```
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

@@ -11,6 +11,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button, TextControl, withNotices } from '@wordpress/components';
 import { useFocusOnMount } from '@wordpress/compose';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -18,7 +19,6 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { MENU_POST_TYPE, MENU_KIND } from '../../constants';
-import { stripHTML } from '../../utils';
 
 function AddMenu( {
 	className,
@@ -53,13 +53,14 @@ function AddMenu( {
 	const createMenu = async ( event ) => {
 		event.preventDefault();
 
-		if ( ! menuName.length ) {
+		if ( ! menuName.length || isCreatingMenu ) {
 			return;
 		}
 
+		setIsCreatingMenu( true );
+
 		// Remove any existing notices.
 		removeAllNotices();
-		setIsCreatingMenu( true );
 
 		const menu = await saveMenu( { name: menuName } );
 
@@ -101,6 +102,8 @@ function AddMenu( {
 				variant="primary"
 				disabled={ ! menuName.length }
 				isBusy={ isCreatingMenu }
+				/* Button is disabled but still focusable. */
+				aria-disabled={ ! menuName.length || isCreatingMenu }
 			>
 				{ __( 'Create menu' ) }
 			</Button>

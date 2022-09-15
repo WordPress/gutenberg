@@ -1,43 +1,47 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalParseUnit as parseUnit } from '@wordpress/components';
+import { __experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue } from '@wordpress/components';
 
 /**
- * Gets the item with the highest occurrence within an array
- * https://stackoverflow.com/a/20762713
+ * Gets the (non-undefined) item with the highest occurrence within an array
+ * Based in part on: https://stackoverflow.com/a/20762713
  *
- * @param {Array<any>} arr Array of items to check.
- * @return {any}           The item with the most occurrences.
+ * Undefined values are always sorted to the end by `sort`, so this function
+ * returns the first element, to always prioritize real values over undefined
+ * values.
+ *
+ * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#description
+ *
+ * @param {Array<any>} inputArray Array of items to check.
+ * @return {any}                  The item with the most occurrences.
  */
-function mode( arr ) {
+export function mode( inputArray ) {
+	const arr = [ ...inputArray ];
 	return arr
 		.sort(
 			( a, b ) =>
-				arr.filter( ( v ) => v === a ).length -
-				arr.filter( ( v ) => v === b ).length
+				inputArray.filter( ( v ) => v === b ).length -
+				inputArray.filter( ( v ) => v === a ).length
 		)
-		.pop();
+		.shift();
 }
 
 /**
- * Returns the most common CSS unit in the radius values.
+ * Returns the most common CSS unit from the current CSS unit selections.
  *
- * @param {Object|string} values Radius values.
- * @return {string}              Most common CSS unit in values.
+ * - If a single flat border radius is set, its unit will be used
+ * - If individual corner selections, the most common of those will be used
+ * - Failing any unit selections a default of 'px' is returned.
+ *
+ * @param {Object} selectedUnits Unit selections for flat radius & each corner.
+ * @return {string} Most common CSS unit from current selections. Default: `px`.
  */
-export function getAllUnit( values = {} ) {
-	if ( typeof values === 'string' ) {
-		const [ , unit ] = parseUnit( values );
-		return unit || 'px';
-	}
-
-	const allUnits = Object.values( values ).map( ( value ) => {
-		const [ , unit ] = parseUnit( value );
-		return unit;
-	} );
-
-	return mode( allUnits );
+export function getAllUnit( selectedUnits = {} ) {
+	const { flat, ...cornerUnits } = selectedUnits;
+	return (
+		flat || mode( Object.values( cornerUnits ).filter( Boolean ) ) || 'px'
+	);
 }
 
 /**
@@ -56,19 +60,21 @@ export function getAllValue( values = {} ) {
 		return values;
 	}
 
-	const parsedValues = Object.values( values ).map( ( value ) =>
-		parseUnit( value )
+	const parsedQuantitiesAndUnits = Object.values( values ).map( ( value ) =>
+		parseQuantityAndUnitFromRawValue( value )
 	);
 
-	const allValues = parsedValues.map( ( value ) => value[ 0 ] );
-	const allUnits = parsedValues.map( ( value ) => value[ 1 ] );
+	const allValues = parsedQuantitiesAndUnits.map(
+		( value ) => value[ 0 ] ?? ''
+	);
+	const allUnits = parsedQuantitiesAndUnits.map( ( value ) => value[ 1 ] );
 
 	const value = allValues.every( ( v ) => v === allValues[ 0 ] )
 		? allValues[ 0 ]
 		: '';
 	const unit = mode( allUnits );
 
-	const allValue = value === 0 || value ? `${ value }${ unit }` : null;
+	const allValue = value === 0 || value ? `${ value }${ unit }` : undefined;
 
 	return allValue;
 }
@@ -81,7 +87,8 @@ export function getAllValue( values = {} ) {
  */
 export function hasMixedValues( values = {} ) {
 	const allValue = getAllValue( values );
-	const isMixed = isNaN( parseFloat( allValue ) );
+	const isMixed =
+		typeof values === 'string' ? false : isNaN( parseFloat( allValue ) );
 
 	return isMixed;
 }

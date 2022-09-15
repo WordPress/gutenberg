@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
 	useBlockProps,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -21,6 +21,11 @@ const TEMPLATE = [
 	[ 'core/query-pagination-previous' ],
 	[ 'core/query-pagination-numbers' ],
 	[ 'core/query-pagination-next' ],
+];
+const ALLOWED_BLOCKS = [
+	'core/query-pagination-previous',
+	'core/query-pagination-numbers',
+	'core/query-pagination-next',
 ];
 
 const getDefaultBlockLayout = ( blockTypeOrName ) => {
@@ -55,11 +60,7 @@ export default function QueryPaginationEdit( {
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
-		allowedBlocks: [
-			'core/query-pagination-previous',
-			'core/query-pagination-numbers',
-			'core/query-pagination-next',
-		],
+		allowedBlocks: ALLOWED_BLOCKS,
 		__experimentalLayout: usedLayout,
 	} );
 	return (
@@ -76,7 +77,7 @@ export default function QueryPaginationEdit( {
 					</PanelBody>
 				</InspectorControls>
 			) }
-			<div { ...innerBlocksProps } />
+			<nav { ...innerBlocksProps } />
 		</>
 	);
 }

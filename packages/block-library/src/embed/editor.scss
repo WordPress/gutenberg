@@ -9,22 +9,7 @@
 
 	&.is-loading {
 		display: flex;
-		flex-direction: column;
-		align-items: center;
 		justify-content: center;
-		padding: 1em;
-		min-height: 200px;
-		text-align: center;
-
-		// Block UI appearance.
-		border-radius: $radius-block-ui;
-		background-color: $white;
-		box-shadow: inset 0 0 0 $border-width $gray-900;
-
-		p {
-			font-family: $default-font;
-			font-size: $default-font-size;
-		}
 	}
 
 	// Stops long URLs from breaking out of the no preview available screen

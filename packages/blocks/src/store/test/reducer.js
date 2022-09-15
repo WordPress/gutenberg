@@ -12,9 +12,10 @@ import {
 	removeBlockVariations,
 } from '../actions';
 import {
-	blockVariations,
-	blockStyles,
+	unprocessedBlockTypes,
 	blockTypes,
+	blockStyles,
+	blockVariations,
 	categories,
 	defaultBlockName,
 	freeformFallbackBlockName,
@@ -22,6 +23,44 @@ import {
 	groupingBlockName,
 	DEFAULT_CATEGORIES,
 } from '../reducer';
+
+describe( 'unprocessedBlockTypes', () => {
+	it( 'should return an empty object as default state', () => {
+		expect( unprocessedBlockTypes( undefined, {} ) ).toEqual( {} );
+	} );
+
+	it( 'should add a new block type', () => {
+		const original = deepFreeze( {
+			'core/paragraph': { name: 'core/paragraph' },
+		} );
+
+		const state = unprocessedBlockTypes( original, {
+			type: 'ADD_UNPROCESSED_BLOCK_TYPE',
+			blockType: { name: 'core/code' },
+		} );
+
+		expect( state ).toEqual( {
+			'core/paragraph': { name: 'core/paragraph' },
+			'core/code': { name: 'core/code' },
+		} );
+	} );
+
+	it( 'should remove unprocessed block types', () => {
+		const original = deepFreeze( {
+			'core/paragraph': { name: 'core/paragraph' },
+			'core/code': { name: 'core/code' },
+		} );
+
+		const state = blockTypes( original, {
+			type: 'REMOVE_BLOCK_TYPES',
+			names: [ 'core/code' ],
+		} );
+
+		expect( state ).toEqual( {
+			'core/paragraph': { name: 'core/paragraph' },
+		} );
+	} );
+} );
 
 describe( 'blockTypes', () => {
 	it( 'should return an empty object as default state', () => {
@@ -62,6 +101,8 @@ describe( 'blockTypes', () => {
 } );
 
 describe( 'blockStyles', () => {
+	const blockName = 'core/image';
+
 	it( 'should return an empty object as default state', () => {
 		expect( blockStyles( undefined, {} ) ).toEqual( {} );
 	} );
@@ -71,58 +112,83 @@ describe( 'blockStyles', () => {
 
 		let state = blockStyles( original, {
 			type: 'ADD_BLOCK_STYLES',
-			blockName: 'core/image',
+			blockName,
 			styles: [ { name: 'fancy' } ],
 		} );
 
 		expect( state ).toEqual( {
-			'core/image': [ { name: 'fancy' } ],
+			[ blockName ]: [ { name: 'fancy' } ],
 		} );
 
 		state = blockStyles( state, {
 			type: 'ADD_BLOCK_STYLES',
-			blockName: 'core/image',
+			blockName,
 			styles: [ { name: 'lightbox' } ],
 		} );
 
 		expect( state ).toEqual( {
-			'core/image': [ { name: 'fancy' }, { name: 'lightbox' } ],
+			[ blockName ]: [ { name: 'fancy' }, { name: 'lightbox' } ],
 		} );
 	} );
 
-	it( 'should add block styles when adding a block', () => {
+	it( 'should prepend block styles when adding a block', () => {
 		const original = deepFreeze( {
-			'core/image': [ { name: 'fancy' } ],
+			[ blockName ]: [ { name: 'fancy' } ],
 		} );
 
 		const state = blockStyles( original, {
 			type: 'ADD_BLOCK_TYPES',
 			blockTypes: [
 				{
-					name: 'core/image',
+					name: blockName,
 					styles: [ { name: 'original' } ],
 				},
 			],
 		} );
 
 		expect( state ).toEqual( {
-			'core/image': [ { name: 'original' }, { name: 'fancy' } ],
+			[ blockName ]: [
+				{ name: 'original', source: 'block' },
+				{ name: 'fancy' },
+			],
+		} );
+	} );
+
+	it( 'should replace block styles if block type added again', () => {
+		const original = deepFreeze( {
+			[ blockName ]: [ { name: 'original', source: 'block' } ],
+		} );
+
+		const state = blockStyles( original, {
+			type: 'ADD_BLOCK_TYPES',
+			blockTypes: [
+				{
+					name: blockName,
+					styles: [ { name: 'original', value: 'replace' } ],
+				},
+			],
+		} );
+
+		expect( state ).toEqual( {
+			[ blockName ]: [
+				{ name: 'original', value: 'replace', source: 'block' },
+			],
 		} );
 	} );
 
 	it( 'should remove block styles', () => {
 		const original = deepFreeze( {
-			'core/image': [ { name: 'fancy' }, { name: 'lightbox' } ],
+			[ blockName ]: [ { name: 'fancy' }, { name: 'lightbox' } ],
 		} );
 
 		const state = blockStyles( original, {
 			type: 'REMOVE_BLOCK_STYLES',
-			blockName: 'core/image',
+			blockName,
 			styleNames: [ 'fancy' ],
 		} );
 
 		expect( state ).toEqual( {
-			'core/image': [ { name: 'lightbox' } ],
+			[ blockName ]: [ { name: 'lightbox' } ],
 		} );
 	} );
 } );
@@ -190,7 +256,10 @@ describe( 'blockVariations', () => {
 		);
 
 		expect( state ).toEqual( {
-			[ blockName ]: [ blockVariation, secondBlockVariation ],
+			[ blockName ]: [
+				{ ...blockVariation, source: 'block' },
+				secondBlockVariation,
+			],
 		} );
 	} );
 

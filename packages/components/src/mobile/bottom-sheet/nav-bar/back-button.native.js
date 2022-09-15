@@ -89,6 +89,6 @@ function DismissButton( { onPress, iosText } ) {
 }
 
 Button.Back = BackButton;
-Button.Dismiss = DismissButton; // Cancel or Close Button
+Button.Dismiss = DismissButton; // Cancel or Close Button.
 
 export default Button;

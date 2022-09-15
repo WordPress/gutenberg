@@ -1,18 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	every,
-	filter,
-	find,
-	forEach,
-	get,
-	isEmpty,
-	map,
-	reduce,
-	some,
-	toString,
-} from 'lodash';
+import { every, filter, find, get, isEmpty, map, reduce, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,10 +13,8 @@ import {
 	ToggleControl,
 	withNotices,
 	RangeControl,
-	ToolbarButton,
 } from '@wordpress/components';
 import {
-	BlockControls,
 	MediaPlaceholder,
 	InspectorControls,
 	useBlockProps,
@@ -53,7 +40,6 @@ import {
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 } from './constants';
-import UpdateGalleryModal from './update-gallery-modal';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -93,30 +79,22 @@ function GalleryEdit( props ) {
 	} = attributes;
 	const [ selectedImage, setSelectedImage ] = useState();
 	const [ attachmentCaptions, setAttachmentCaptions ] = useState();
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
-	const {
-		imageSizes,
-		mediaUpload,
-		getMedia,
-		wasBlockJustInserted,
-		__unstableGalleryWithImageBlocks,
-	} = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
+	const { imageSizes, mediaUpload, getMedia, wasBlockJustInserted } =
+		useSelect( ( select ) => {
+			const settings = select( blockEditorStore ).getSettings();
 
-		return {
-			__unstableGalleryWithImageBlocks:
-				settings.__unstableGalleryWithImageBlocks,
-			imageSizes: settings.imageSizes,
-			mediaUpload: settings.mediaUpload,
-			getMedia: select( coreStore ).getMedia,
-			wasBlockJustInserted: select(
-				blockEditorStore
-			).wasBlockJustInserted( clientId, 'inserter_menu' ),
-		};
-	} );
+			return {
+				imageSizes: settings.imageSizes,
+				mediaUpload: settings.mediaUpload,
+				getMedia: select( coreStore ).getMedia,
+				wasBlockJustInserted: select(
+					blockEditorStore
+				).wasBlockJustInserted( clientId, 'inserter_menu' ),
+			};
+		} );
 
 	const resizedImages = useMemo( () => {
 		if ( isSelected ) {
@@ -237,7 +215,7 @@ function GalleryEdit( props ) {
 		// The image id in both the images and attachmentCaptions arrays is a
 		// string, so ensure comparison works correctly by converting the
 		// newImage.id to a string.
-		const newImageId = toString( newImage.id );
+		const newImageId = newImage.id.toString();
 		const currentImage = find( images, { id: newImageId } );
 		const currentImageCaption = currentImage
 			? currentImage.caption
@@ -251,7 +229,7 @@ function GalleryEdit( props ) {
 			id: newImageId,
 		} );
 
-		// if the attachment caption is updated
+		// If the attachment caption is updated.
 		if ( attachment && attachment.caption !== newImage.caption ) {
 			return newImage.caption;
 		}
@@ -264,7 +242,7 @@ function GalleryEdit( props ) {
 			newImages.map( ( newImage ) => ( {
 				// Store the attachmentCaption id as a string for consistency
 				// with the type of the id in the images attribute.
-				id: toString( newImage.id ),
+				id: newImage.id.toString(),
 				caption: newImage.caption,
 			} ) )
 		);
@@ -275,7 +253,7 @@ function GalleryEdit( props ) {
 				// The id value is stored in a data attribute, so when the
 				// block is parsed it's converted to a string. Converting
 				// to a string here ensures it's type is consistent.
-				id: toString( newImage.id ),
+				id: newImage.id.toString(),
 			} ) ),
 			columns: attributes.columns
 				? Math.min( newImages.length, attributes.columns )
@@ -358,7 +336,7 @@ function GalleryEdit( props ) {
 			every( images, ( { url } ) => isBlobURL( url ) )
 		) {
 			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
-			forEach( images, ( { url } ) => revokeBlobURL( url ) );
+			images.forEach( ( { url } ) => revokeBlobURL( url ) );
 			mediaUpload( {
 				filesList,
 				onFileChange: onSelectImages,
@@ -368,7 +346,7 @@ function GalleryEdit( props ) {
 	}, [] );
 
 	useEffect( () => {
-		// Deselect images when deselecting the block
+		// Deselect images when deselecting the block.
 		if ( ! isSelected ) {
 			setSelectedImage();
 		}
@@ -376,7 +354,7 @@ function GalleryEdit( props ) {
 
 	useEffect( () => {
 		// linkTo attribute must be saved so blocks don't break when changing
-		// image_default_link_type in options.php
+		// image_default_link_type in options.php.
 		if ( ! linkTo ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
@@ -414,10 +392,6 @@ function GalleryEdit( props ) {
 		/>
 	);
 
-	const [ isUpdateOpen, setUpdateOpen ] = useState( false );
-	const openUpdateModal = () => setUpdateOpen( true );
-	const closeUpdateModal = () => setUpdateOpen( false );
-
 	const blockProps = useBlockProps();
 
 	if ( ! hasImages ) {
@@ -430,7 +404,7 @@ function GalleryEdit( props ) {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Gallery settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					{ images.length > 1 && (
 						<RangeControl
 							label={ __( 'Columns' ) }
@@ -466,24 +440,6 @@ function GalleryEdit( props ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			{ /* TODO: Remove platform condition when native conversion is ready */ }
-			{ Platform.isWeb && __unstableGalleryWithImageBlocks && (
-				<BlockControls group="other">
-					<ToolbarButton
-						onClick={ openUpdateModal }
-						title={ __( 'Update' ) }
-						label={ __( 'Update to the new gallery format' ) }
-					>
-						{ __( 'Update' ) }
-					</ToolbarButton>
-				</BlockControls>
-			) }
-			{ Platform.isWeb && isUpdateOpen && (
-				<UpdateGalleryModal
-					onClose={ closeUpdateModal }
-					clientId={ clientId }
-				/>
-			) }
 			{ noticeUI }
 			<Gallery
 				{ ...props }

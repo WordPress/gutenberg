@@ -2,12 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -16,6 +16,7 @@ import { imageFillStyles } from './media-container';
 import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
 
 const DEFAULT_MEDIA_WIDTH = 50;
+const noop = () => {};
 
 export default function save( { attributes } ) {
 	const {
@@ -87,6 +88,24 @@ export default function save( { attributes } ) {
 	const style = {
 		gridTemplateColumns,
 	};
+
+	if ( 'right' === mediaPosition ) {
+		return (
+			<div { ...useBlockProps.save( { className, style } ) }>
+				<div
+					{ ...useInnerBlocksProps.save( {
+						className: 'wp-block-media-text__content',
+					} ) }
+				/>
+				<figure
+					className="wp-block-media-text__media"
+					style={ backgroundStyles }
+				>
+					{ ( mediaTypeRenders[ mediaType ] || noop )() }
+				</figure>
+			</div>
+		);
+	}
 	return (
 		<div { ...useBlockProps.save( { className, style } ) }>
 			<figure
@@ -95,9 +114,11 @@ export default function save( { attributes } ) {
 			>
 				{ ( mediaTypeRenders[ mediaType ] || noop )() }
 			</figure>
-			<div className="wp-block-media-text__content">
-				<InnerBlocks.Content />
-			</div>
+			<div
+				{ ...useInnerBlocksProps.save( {
+					className: 'wp-block-media-text__content',
+				} ) }
+			/>
 		</div>
 	);
 }

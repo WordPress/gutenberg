@@ -122,8 +122,7 @@ function collectAllNodesFromObjectPropertyFunctionCalls( context, node ) {
 function getSuggest( context, callNode ) {
 	return [
 		{
-			desc:
-				'Replace literal with store definition. Import store if neccessary.',
+			desc: 'Replace literal with store definition. Import store if neccessary.',
 			fix: ( fixer ) => getFixes( fixer, context, callNode ),
 		},
 	];
@@ -198,6 +197,7 @@ function getFixes( fixer, context, callNode ) {
 module.exports = {
 	meta: {
 		type: 'problem',
+		hasSuggestions: true,
 		schema: [],
 		messages: {
 			doNotUseStringLiteral: `Do not use string literals ( '{{ argument }}' ) for accessing @wordpress/data stores. Pass the store definition instead`,
@@ -210,18 +210,17 @@ module.exports = {
 					return;
 				}
 
-				const callbackFunctionNodes = collectAllNodesFromCallbackFunctions(
-					context,
-					node
-				);
+				const callbackFunctionNodes =
+					collectAllNodesFromCallbackFunctions( context, node );
 				const directNodes = collectAllNodesFromDirectFunctionCalls(
 					context,
 					node
 				);
-				const objectPropertyCallNodes = collectAllNodesFromObjectPropertyFunctionCalls(
-					context,
-					node
-				);
+				const objectPropertyCallNodes =
+					collectAllNodesFromObjectPropertyFunctionCalls(
+						context,
+						node
+					);
 
 				const allNodes = [
 					...callbackFunctionNodes,

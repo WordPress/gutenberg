@@ -92,18 +92,28 @@ export default function useBlockDropZone( {
 } = {} ) {
 	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
 
-	const isLockedAll = useSelect(
+	const isDisabled = useSelect(
 		( select ) => {
-			const { getTemplateLock } = select( blockEditorStore );
-			return getTemplateLock( targetRootClientId ) === 'all';
+			const {
+				getTemplateLock,
+				__unstableIsWithinBlockOverlay,
+				__unstableHasActiveBlockOverlayActive,
+			} = select( blockEditorStore );
+			const templateLock = getTemplateLock( targetRootClientId );
+			return (
+				[ 'all', 'contentOnly' ].some(
+					( lock ) => lock === templateLock
+				) ||
+				__unstableHasActiveBlockOverlayActive( targetRootClientId ) ||
+				__unstableIsWithinBlockOverlay( targetRootClientId )
+			);
 		},
 		[ targetRootClientId ]
 	);
 
 	const { getBlockListSettings } = useSelect( blockEditorStore );
-	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
-		blockEditorStore
-	);
+	const { showInsertionPoint, hideInsertionPoint } =
+		useDispatch( blockEditorStore );
 
 	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
 	const throttled = useThrottle(
@@ -128,7 +138,7 @@ export default function useBlockDropZone( {
 	);
 
 	return useDropZone( {
-		isDisabled: isLockedAll,
+		isDisabled,
 		onDrop: onBlockDrop,
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being

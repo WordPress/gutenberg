@@ -16,10 +16,8 @@ import { useBoundaryStyle } from './use-boundary-style';
 import { useCopyHandler } from './use-copy-handler';
 import { useFormatBoundaries } from './use-format-boundaries';
 import { useSelectObject } from './use-select-object';
-import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 import { useInputAndSelection } from './use-input-and-selection';
 import { useDelete } from './use-delete';
-import { useSpace } from './use-space';
 
 export function useRichText( {
 	value = '',
@@ -101,6 +99,21 @@ export function useRichText( {
 
 	if ( ! record.current ) {
 		setRecordFromProps();
+		// Sometimes formats are added programmatically and we need to make
+		// sure it's persisted to the block store / markup. If these formats
+		// are not applied, they could cause inconsistencies between the data
+		// in the visual editor and the frontend. Right now, it's only relevant
+		// to the `core/text-color` format, which is applied at runtime in
+		// certain circunstances. See the `__unstableFilterAttributeValue`
+		// function in `packages/format-library/src/text-color/index.js`.
+		// @todo find a less-hacky way of solving this.
+
+		const hasRelevantInitFormat =
+			record.current?.formats[ 0 ]?.[ 0 ]?.type === 'core/text-color';
+
+		if ( hasRelevantInitFormat ) {
+			handleChangesUponInit( record.current );
+		}
 	} else if (
 		selectionStart !== record.current.start ||
 		selectionEnd !== record.current.end
@@ -153,6 +166,31 @@ export function useRichText( {
 		forceRender();
 	}
 
+	function handleChangesUponInit( newRecord ) {
+		record.current = newRecord;
+
+		_value.current = toHTMLString( {
+			value: __unstableBeforeSerialize
+				? {
+						...newRecord,
+						formats: __unstableBeforeSerialize( newRecord ),
+				  }
+				: newRecord,
+			multilineTag,
+			preserveWhiteSpace,
+		} );
+
+		const { formats, text } = newRecord;
+
+		registry.batch( () => {
+			onChange( _value.current, {
+				__unstableFormats: formats,
+				__unstableText: text,
+			} );
+		} );
+		forceRender();
+	}
+
 	function applyFromProps() {
 		setRecordFromProps();
 		applyRecord( record.current );
@@ -164,6 +202,7 @@ export function useRichText( {
 	useLayoutEffect( () => {
 		if ( didMount.current && value !== _value.current ) {
 			applyFromProps();
+			forceRender();
 		}
 	}, [ value ] );
 
@@ -171,6 +210,10 @@ export function useRichText( {
 	useLayoutEffect( () => {
 		if ( ! hadSelectionUpdate.current ) {
 			return;
+		}
+
+		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
+			ref.current.focus();
 		}
 
 		applyFromProps();
@@ -189,11 +232,6 @@ export function useRichText( {
 			handleChange,
 			multilineTag,
 		} ),
-		useIndentListItemOnSpace( {
-			multilineTag,
-			createRecord,
-			handleChange,
-		} ),
 		useInputAndSelection( {
 			record,
 			applyRecord,
@@ -202,7 +240,6 @@ export function useRichText( {
 			isSelected,
 			onSelectionChange,
 		} ),
-		useSpace(),
 		useRefEffect( () => {
 			applyFromProps();
 			didMount.current = true;

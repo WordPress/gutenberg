@@ -13,6 +13,8 @@ const {
 const {
 	getJestOverrideConfigFile,
 	getWebpackArgs,
+	getWebpackEntryPoints,
+	getRenderPropPaths,
 	hasBabelConfig,
 	hasCssnanoConfig,
 	hasJestConfig,
@@ -32,6 +34,8 @@ module.exports = {
 	getNodeArgsFromCLI,
 	getPackageProp,
 	getWebpackArgs,
+	getWebpackEntryPoints,
+	getRenderPropPaths,
 	hasArgInCLI,
 	hasBabelConfig,
 	hasCssnanoConfig,

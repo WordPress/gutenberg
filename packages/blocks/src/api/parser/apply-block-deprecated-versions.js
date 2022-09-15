@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { omit, stubFalse, castArray } from 'lodash';
+import { castArray } from 'lodash';
 
 /**
  * Internal dependencies
@@ -10,6 +10,16 @@ import { DEPRECATED_ENTRY_KEYS } from '../constants';
 import { validateBlock } from '../validation';
 import { getBlockAttributes } from './get-block-attributes';
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
+import { omit } from '../utils';
+
+/**
+ * Function that takes no arguments and always returns false.
+ *
+ * @return {boolean} Always returns false.
+ */
+function stubFalse() {
+	return false;
+}
 
 /**
  * Given a block object, returns a new copy of the block with any applicable
@@ -70,7 +80,7 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 		// Ignore the deprecation if it produces a block which is not valid.
 		let [ isValid ] = validateBlock( migratedBlock, deprecatedBlockType );
 
-		// If the migrated block is not valid intiailly, try the built-in fixes.
+		// If the migrated block is not valid initially, try the built-in fixes.
 		if ( ! isValid ) {
 			migratedBlock = applyBuiltInValidationFixes(
 				migratedBlock,
@@ -80,7 +90,7 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 		}
 
 		// An invalid block does not imply incorrect HTML but the fact block
-		// source information could be lost on reserialization.
+		// source information could be lost on re-serialization.
 		if ( ! isValid ) {
 			continue;
 		}

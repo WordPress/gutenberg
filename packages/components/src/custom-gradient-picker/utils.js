@@ -2,7 +2,8 @@
  * External dependencies
  */
 import gradientParser from 'gradient-parser';
-import tinycolor from 'tinycolor2';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
 
 /**
  * Internal dependencies
@@ -14,7 +15,9 @@ import {
 } from './constants';
 import { serializeGradient } from './serializer';
 
-export function getLinearGradientRepresentationOfARadial( gradientAST ) {
+extend( [ namesPlugin ] );
+
+export function getLinearGradientRepresentation( gradientAST ) {
 	return serializeGradient( {
 		type: 'linear-gradient',
 		orientation: HORIZONTAL_GRADIENT_ORIENTATION,
@@ -41,9 +44,10 @@ export function getGradientAstWithDefault( value ) {
 
 	if ( gradientAST.orientation?.type === 'directional' ) {
 		gradientAST.orientation.type = 'angular';
-		gradientAST.orientation.value = DIRECTIONAL_ORIENTATION_ANGLE_MAP[
-			gradientAST.orientation.value
-		].toString();
+		gradientAST.orientation.value =
+			DIRECTIONAL_ORIENTATION_ANGLE_MAP[
+				gradientAST.orientation.value
+			].toString();
 	}
 
 	if ( gradientAST.colorStops.some( hasUnsupportedLength ) ) {
@@ -68,11 +72,11 @@ export function getGradientAstWithControlPoints(
 	return {
 		...gradientAST,
 		colorStops: newControlPoints.map( ( { position, color } ) => {
-			const { r, g, b, a } = tinycolor( color ).toRgb();
+			const { r, g, b, a } = colord( color ).toRgb();
 			return {
 				length: {
 					type: '%',
-					value: position.toString(),
+					value: position?.toString(),
 				},
 				type: a < 1 ? 'rgba' : 'rgb',
 				value: a < 1 ? [ r, g, b, a ] : [ r, g, b ],

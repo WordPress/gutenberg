@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/image",
 		"isValid": true,
 		"attributes": {
@@ -11,7 +10,6 @@
 			"linkClass": "custom-link",
 			"linkDestination": "custom"
 		},
-		"innerBlocks": [],
-		"originalContent": "<figure class=\"wp-block-image\"><a class=\"custom-link\" href=\"https://wordpress.org/\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" /></a></figure>"
+		"innerBlocks": []
 	}
 ]

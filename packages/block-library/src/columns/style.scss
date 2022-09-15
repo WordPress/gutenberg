@@ -4,15 +4,15 @@
 	box-sizing: border-box;
 
 	// Responsiveness: Allow wrapping on mobile.
-	flex-wrap: wrap;
+	flex-wrap: wrap !important;
 
 	@include break-medium() {
-		flex-wrap: nowrap;
+		flex-wrap: nowrap !important;
 	}
 
-	&.has-background {
-		padding: $block-bg-padding--v $block-bg-padding--h;
-	}
+	// Ensure full vertical column stretch when alignment is not set.
+	// This overrides the Layout block support's default align-items setting of `center`.
+	align-items: initial !important;
 
 	/**
 	* All Columns Alignment
@@ -30,28 +30,10 @@
 	}
 
 	&:not(.is-not-stacked-on-mobile) > .wp-block-column {
-		@media (max-width: #{ ($break-small - 1) }) {
+		@media (max-width: #{ ($break-medium - 1) }) {
 			// Responsiveness: Show at most one columns on mobile. This must be
 			// important since the Column assigns its own width as an inline style.
 			flex-basis: 100% !important;
-		}
-
-		// Between mobile and large viewports, allow 2 columns.
-		@media (min-width: #{ ($break-small) }) and (max-width: #{ ($break-medium - 1) }) {
-			// Only add two column styling if there are two or more columns
-			&:not(:only-child) {
-				// As with mobile styles, this must be important since the Column
-				// assigns its own width as an inline style, which should take effect
-				// starting at `break-medium`.
-				flex-basis: calc(50% - calc(var(--wp--style--block-gap, 2em) / 2)) !important;
-				flex-grow: 0;
-			}
-
-			// Add space between the multiple columns. Themes can customize this if they wish to work differently.
-			// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
-			&:nth-child(even) {
-				margin-left: var(--wp--style--block-gap, 2em);
-			}
 		}
 
 		// At large viewports, show all columns horizontally.
@@ -71,35 +53,32 @@
 			&[style*="flex-basis"] {
 				flex-grow: 0;
 			}
-
-			// When columns are in a single row, add space before all except the first.
-			&:not(:first-child) {
-				margin-left: var(--wp--style--block-gap, 2em);
-			}
 		}
 	}
 
 	&.is-not-stacked-on-mobile {
-		flex-wrap: nowrap;
+		flex-wrap: nowrap !important;
 
 		> .wp-block-column {
 			// Available space should be divided equally amongst columns.
 			flex-basis: 0;
-			flex-grow: 1;
 
+			flex-grow: 1;
 			// Columns with an explicitly-assigned width should maintain their
 			// `flex-basis` width and not grow.
 			&[style*="flex-basis"] {
 				flex-grow: 0;
 			}
-
-			// When columns are in a single row, add space before all except the first.
-			&:not(:first-child) {
-				margin-left: var(--wp--style--block-gap, 2em);
-			}
 		}
 	}
 }
+
+// Add low specificity default padding to columns blocks with backgrounds.
+:where(.wp-block-columns.has-background) {
+	// Matches paragraph block padding.
+	padding: $block-bg-padding--v $block-bg-padding--h;
+}
+
 
 .wp-block-column {
 	flex-grow: 1;

@@ -19,7 +19,7 @@ export function stripFirstImage( attributes, { shortcode } ) {
 
 	let nodeToRemove = body.querySelector( 'img' );
 
-	// if an image has parents, find the topmost node to remove
+	// If an image has parents, find the topmost node to remove.
 	while (
 		nodeToRemove &&
 		nodeToRemove.parentNode &&
@@ -90,9 +90,10 @@ const transforms = {
 					node.className +
 					' ' +
 					node.querySelector( 'img' ).className;
-				const alignMatches = /(?:^|\s)align(left|center|right)(?:$|\s)/.exec(
-					className
-				);
+				const alignMatches =
+					/(?:^|\s)align(left|center|right)(?:$|\s)/.exec(
+						className
+					);
 				const anchor = node.id === '' ? undefined : node.id;
 				const align = alignMatches ? alignMatches[ 1 ] : undefined;
 				const idMatches = /(?:^|\s)wp-image-(\d+)(?:$|\s)/.exec(
@@ -136,7 +137,11 @@ const transforms = {
 			// creating a new gallery.
 			type: 'files',
 			isMatch( files ) {
+				// The following check is intended to catch non-image files when dropped together with images.
 				if (
+					files.some(
+						( file ) => file.type.indexOf( 'image/' ) === 0
+					) &&
 					files.some(
 						( file ) => file.type.indexOf( 'image/' ) !== 0
 					)
@@ -146,7 +151,10 @@ const transforms = {
 						__(
 							'If uploading to a gallery all files need to be image formats'
 						),
-						{ id: 'gallery-transform-invalid-file' }
+						{
+							id: 'gallery-transform-invalid-file',
+							type: 'snackbar',
+						}
 					);
 				}
 				return every(

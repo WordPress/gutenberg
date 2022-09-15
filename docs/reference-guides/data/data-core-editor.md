@@ -68,22 +68,6 @@ _Related_
 
 -   getAdjacentBlockClientId in core/block-editor store.
 
-### getAutosave
-
-> **Deprecated** since 5.6. Callers should use the `getAutosave( postType, postId, userId )` selector from the '@wordpress/core-data' package.
-
-Returns the current autosave, or null if one is not set (i.e. if the post
-has yet to be autosaved, or has been saved or published since the last
-autosave).
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
-
-_Returns_
-
--   `?Object`: Current autosave, if exists.
-
 ### getAutosaveAttribute
 
 > **Deprecated** since 5.6. Callers should use the `getAutosave( postType, postId, userId )` selector from the '@wordpress/core-data' package and access properties on the returned autosave object using getPostRawValue.
@@ -189,21 +173,6 @@ _Related_
 _Related_
 
 -   getBlockSelectionStart in core/block-editor store.
-
-### getBlocksForSerialization
-
-> **Deprecated** since Gutenberg 6.2.0.
-
-Returns a set of blocks which are to be used in consideration of the post's
-generated save content.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
-
-_Returns_
-
--   `WPBlock[]`: Filtered set of blocks for save.
 
 ### getClientIdsOfDescendants
 
@@ -547,29 +516,6 @@ _Related_
 
 -   getPreviousBlockClientId in core/block-editor store.
 
-### getReferenceByDistinctEdits
-
-> **Deprecated** since Gutenberg 6.5.0.
-
-Returns a new reference when edited values have changed. This is useful in
-inferring where an edit has been made between states by comparison of the
-return values using strict equality.
-
-_Usage_
-
-    const hasEditOccurred = (
-       getReferenceByDistinctEdits( beforeState ) !==
-       getReferenceByDistinctEdits( afterState )
-    );
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
-
-_Returns_
-
--   `*`: A value whose reference will change only when an edit occurs.
-
 ### getSelectedBlock
 
 _Related_
@@ -626,20 +572,6 @@ _Related_
 _Related_
 
 -   getTemplateLock in core/block-editor store.
-
-### hasAutosave
-
-> **Deprecated** since 5.6. Callers should use the `getAutosave( postType, postId, userId )` selector from the '@wordpress/core-data' package and check for a truthy value.
-
-Returns the true if there is an existing autosave, otherwise false.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `boolean`: Whether there is an existing autosave.
 
 ### hasChangedContent
 
@@ -825,6 +757,18 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether current post is scheduled to be posted.
+
+### isDeletingPost
+
+Returns true if the post is currently being deleted, or false otherwise.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `boolean`: Whether post is being deleted.
 
 ### isEditedPostAutosaveable
 
@@ -1036,10 +980,6 @@ _Returns_
 Returns whether the pre-publish panel should be shown
 or skipped when the user clicks the "publish" button.
 
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
 _Returns_
 
 -   `boolean`: Whether the pre-publish panel should be shown or not.
@@ -1094,7 +1034,7 @@ _Related_
 
 ### autosave
 
-Action generator used in signalling that the post should autosave. This
+Action that autosaves the current post. This
 includes server-side autosaving (default) and client-side (a.k.a. local)
 autosaving (e.g. on the Web, the post might be committed to Session
 Storage).
@@ -1111,21 +1051,13 @@ _Related_
 
 ### createUndoLevel
 
-Returns an action object used in signalling that undo history record should
-be created.
+> **Deprecated** Since WordPress 6.0
 
-_Returns_
-
--   `Object`: Action object.
+Action that creates an undo history record.
 
 ### disablePublishSidebar
 
-Returns an action object used in signalling that the user has disabled the
-publish sidebar.
-
-_Returns_
-
--   `Object`: Action object
+Disables the publish sidebar.
 
 ### editPost
 
@@ -1139,12 +1071,7 @@ _Parameters_
 
 ### enablePublishSidebar
 
-Returns an action object used in signalling that the user has enabled the
-publish sidebar.
-
-_Returns_
-
--   `Object`: Action object
+Enable the publish sidebar.
 
 ### enterFormattedText
 
@@ -1184,7 +1111,7 @@ _Related_
 
 ### lockPostAutosaving
 
-Returns an action object used to signal that post autosaving is locked.
+Action that locks post autosaving.
 
 _Usage_
 
@@ -1201,7 +1128,7 @@ _Returns_
 
 ### lockPostSaving
 
-Returns an action object used to signal that post saving is locked.
+Action that locks post saving.
 
 _Usage_
 
@@ -1284,12 +1211,13 @@ _Related_
 
 ### redo
 
-Returns an action object used in signalling that undo history should
-restore last popped state.
+Action that restores last popped state in undo history.
 
 ### refreshPost
 
-Action generator for handling refreshing the current post.
+> **Deprecated** Since WordPress 6.0.
+
+Action for refreshing the current post.
 
 ### removeBlock
 
@@ -1315,21 +1243,6 @@ _Related_
 
 -   replaceBlocks in core/block-editor store.
 
-### resetAutosave
-
-> **Deprecated** since 5.6. Callers should use the `receiveAutosaves( postId, autosave )` selector from the '@wordpress/core-data' package.
-
-Returns an action object used in signalling that the latest autosave of the
-post has been received, by initialization or autosave.
-
-_Parameters_
-
--   _newAutosave_ `Object`: Autosave post object.
-
-_Returns_
-
--   `Object`: Action object.
-
 ### resetBlocks
 
 _Related_
@@ -1347,20 +1260,14 @@ _Parameters_
 
 ### resetPost
 
+> **Deprecated** Since WordPress 6.0.
+
 Returns an action object used in signalling that the latest version of the
 post has been received, either by initialization or save.
 
-_Parameters_
-
--   _post_ `Object`: Post object.
-
-_Returns_
-
--   `Object`: Action object.
-
 ### savePost
 
-Action generator for saving the current post in the editor.
+Action for saving the current post in the editor.
 
 _Parameters_
 
@@ -1452,15 +1359,15 @@ _Related_
 
 ### trashPost
 
-Action generator for trashing the current post in the editor.
+Action for trashing the current post in the editor.
 
 ### undo
 
-Returns an action object used in signalling that undo history should pop.
+Action that pops a record from undo history and undoes the edit.
 
 ### unlockPostAutosaving
 
-Returns an action object used to signal that post autosaving is unlocked.
+Action that unlocks post autosaving.
 
 _Usage_
 
@@ -1477,7 +1384,7 @@ _Returns_
 
 ### unlockPostSaving
 
-Returns an action object used to signal that post saving is unlocked.
+Action that unlocks post saving.
 
 _Usage_
 
@@ -1527,7 +1434,7 @@ _Returns_
 
 ### updatePostLock
 
-Returns an action object used to lock the editor.
+Action that locks the editor.
 
 _Parameters_
 

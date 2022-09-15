@@ -4,9 +4,15 @@
 import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 
+/**
+ * @param {Object}                                 props
+ * @param {import('react').Ref<HTMLIFrameElement>} props.iframeRef
+ */
 export default function FocusableIframe( { iframeRef, ...props } ) {
+	// @ts-expect-error: Return type for useFocusableIframe() is incorrect.
 	const ref = useMergeRefs( [ iframeRef, useFocusableIframe() ] );
 	deprecated( 'wp.components.FocusableIframe', {
+		since: '5.9',
 		alternative: 'wp.compose.useFocusableIframe',
 	} );
 	// Disable reason: The rendered iframe is a pass-through component,

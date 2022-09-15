@@ -22,3 +22,32 @@
 		margin-bottom: $block-padding + $grid-unit-05;
 	}
 }
+
+// Affect the appender of the Row and Stack variants.
+.wp-block-group.is-layout-flex.block-editor-block-list__block > .block-list-appender:only-child {
+	gap: inherit;
+
+	&,
+	.block-editor-default-block-appender__content,
+	.block-editor-inserter {
+		display: inherit;
+		width: 100%;
+		flex-direction: inherit;
+		flex: 1;
+	}
+
+	&::after {
+		content: "";
+		display: flex;
+		flex: 1 0 $grid-unit-60;
+		pointer-events: none;
+		min-height: $grid-unit-60 - $border-width - $border-width;
+		@include placeholder-style();
+	}
+
+	// Let the parent be selectable in the placeholder area.
+	pointer-events: none;
+	.block-editor-inserter {
+		pointer-events: all;
+	}
+}

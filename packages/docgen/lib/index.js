@@ -3,7 +3,6 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const { last } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -11,6 +10,7 @@ const { last } = require( 'lodash' );
 const engine = require( './engine' );
 const defaultMarkdownFormatter = require( './markdown' );
 const isSymbolPrivate = require( './is-symbol-private' );
+const isSymbolIgnore = require( './is-symbol-ignore' );
 
 /**
  * Helpers functions.
@@ -59,7 +59,10 @@ const processFile = ( rootDir, inputFile ) => {
 		const result = engine(
 			relativePath,
 			data,
-			getIRFromRelativePath( rootDir, last( currentFileStack ) )
+			getIRFromRelativePath(
+				rootDir,
+				currentFileStack[ currentFileStack.length - 1 ]
+			)
 		);
 		currentFileStack.pop();
 		return result;
@@ -93,7 +96,7 @@ const runCustomFormatter = (
 const currentFileStack = [];
 
 module.exports = ( sourceFile, options ) => {
-	// Input: process CLI args, prepare files, etc
+	// Input: process CLI args, prepare files, etc.
 	const processDir = process.cwd();
 	if ( sourceFile === undefined ) {
 		process.stderr.write( '\n' );
@@ -116,10 +119,10 @@ module.exports = ( sourceFile, options ) => {
 		? path.join( processDir, options.output )
 		: inputBase + '-api.md';
 
-	// Process
+	// Process.
 	const result = processFile( processDir, sourceFile );
 	const filteredIR = result.ir.filter( ( symbol ) => {
-		if ( isSymbolPrivate( symbol ) ) {
+		if ( isSymbolPrivate( symbol ) || isSymbolIgnore( symbol ) ) {
 			return false;
 		}
 
@@ -130,7 +133,7 @@ module.exports = ( sourceFile, options ) => {
 		return true;
 	} );
 
-	// Ouput
+	// Ouput.
 	if ( result === undefined ) {
 		process.stdout.write(
 			'\nFile was processed, but contained no ES6 module exports:'

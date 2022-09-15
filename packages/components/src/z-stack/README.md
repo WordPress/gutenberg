@@ -26,16 +26,27 @@ function Example() {
 
 ### `isLayered`: `boolean`
 
-When `true`, the children are stacked on top of each other. When `false`, the children follow the normal flow of the layout. Defaults to `true`.
+Layers children elements on top of each other (first: highest z-index, last: lowest z-index).
+
+-   Required: No
+-   Default: `true`
 
 ### `isReversed`: `boolean`
 
-Reverse the layer ordering. When `true`, the first child has the lowest `z-index` and the last child has the highest `z-index`. When `false`, the first child has the highest `z-index` and the last child has the lowest `z-index`. Defaults to `false`.
+Reverse the layer ordering (first: lowest z-index, last: highest z-index).
+
+-   Required: No
+-   Default: `false`
 
 ### `offset`: `number`
 
-The amount of space between each child element. Defaults to `0`.
+The amount of space between each child element. Its value is automatically inverted (i.e. from positive to negative, and viceversa) when switching from LTR to RTL.
+
+-   Required: No
+-   Default: `0`
 
 ### `children`: `ReactNode`
 
 The children to stack.
+
+-   Required: Yes

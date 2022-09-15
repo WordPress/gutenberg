@@ -9,18 +9,22 @@ import { find, findAll } from 'puppeteer-testing-library';
  */
 import {
 	createJSONResponse,
+	createMenu,
+	deleteAllMenus,
 	pressKeyTimes,
 	pressKeyWithModifier,
+	setBrowserViewport,
 	setUpResponseMocking,
 	visitAdminPage,
+	__experimentalRest as rest,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { useExperimentalFeatures } from '../../experimental-features';
-import menuItemsFixture from './fixtures/menu-items-response-fixture.json';
+import { useExperimentalFeatures } from './experimental-features';
+import menuItemsFixture from './fixtures/menu-items-request-fixture.json';
 
 const TYPE_NAMES = {
 	post: 'post',
@@ -28,21 +32,6 @@ const TYPE_NAMES = {
 	post_tag: 'tag',
 	category: 'category',
 };
-
-const menusFixture = [
-	{
-		name: 'Test Menu 1',
-		slug: 'test-menu-1',
-	},
-	{
-		name: 'Test Menu 2',
-		slug: 'test-menu-2',
-	},
-	{
-		name: 'Test Menu 3',
-		slug: 'test-menu-3',
-	},
-];
 
 const searchFixture = [
 	{
@@ -75,15 +64,6 @@ const searchFixture = [
 
 // Matching against variations of the same URL encoded and non-encoded
 // produces the most reliable mocking.
-const REST_MENUS_ROUTES = [
-	'/__experimental/menus',
-	`rest_route=${ encodeURIComponent( '/__experimental/menus' ) }`,
-];
-const REST_MENU_ITEMS_ROUTES = [
-	'/__experimental/menu-items',
-	`rest_route=${ encodeURIComponent( '/__experimental/menu-items' ) }`,
-];
-
 const REST_SEARCH_ROUTES = [
 	'/wp/v2/search',
 	`rest_route=${ encodeURIComponent( '/wp/v2/search' ) }`,
@@ -125,23 +105,6 @@ function getEndpointMocks( matchingRoutes, responsesByMethod ) {
 	}, [] );
 }
 
-function assignMockMenuIds( menus ) {
-	return menus.length
-		? menus.map( ( menu, index ) => ( {
-				...menu,
-				id: index + 1,
-		  } ) )
-		: [];
-}
-
-function getMenuMocks( responsesByMethod ) {
-	return getEndpointMocks( REST_MENUS_ROUTES, responsesByMethod );
-}
-
-function getMenuItemMocks( responsesByMethod ) {
-	return getEndpointMocks( REST_MENU_ITEMS_ROUTES, responsesByMethod );
-}
-
 function getSearchMocks( responsesByMethod ) {
 	return getEndpointMocks( REST_SEARCH_ROUTES, responsesByMethod );
 }
@@ -157,48 +120,102 @@ async function visitNavigationEditor() {
 	await visitAdminPage( '/admin.php', query );
 }
 
+/**
+ * Get a list of the editor's current blocks for use in a snapshot.
+ *
+ * @return {string} Block HTML.
+ */
 async function getSerializedBlocks() {
-	return page.evaluate( () =>
-		wp.blocks.serialize( wp.data.select( 'core/block-editor' ).getBlocks() )
+	const blocks = await page.evaluate( () =>
+		wp.data.select( 'core/block-editor' ).getBlocks()
+	);
+	const safeBlocks = replaceUnstableBlockAttributes( blocks );
+	return page.evaluate(
+		( blocksToSerialize ) => wp.blocks.serialize( blocksToSerialize ),
+		safeBlocks
 	);
 }
 
-describe( 'Navigation editor', () => {
+/**
+ * Some block attributes contain values that are not stable from test run to
+ * test run and can't be compared with a snapshot. These are typically the
+ * ids of posts or pages that are created prior to each test run. Replace those
+ * values with their types before serializing to a snapshot.
+ *
+ * @param {Array} blocks The array of block data.
+ *
+ * @return {Array} Updated array of block data.
+ */
+function replaceUnstableBlockAttributes( blocks ) {
+	return blocks?.map( ( block ) => {
+		const id = block.attributes.id ? typeof block.attributes.id : undefined;
+		const url = block.attributes.url
+			? typeof block.attributes.url
+			: undefined;
+
+		return {
+			...block,
+			attributes: {
+				...block.attributes,
+				id,
+				url,
+			},
+			innerBlocks: replaceUnstableBlockAttributes( block.innerBlocks ),
+		};
+	} );
+}
+
+async function deleteAllLinkedResources() {
+	[ '/wp/v2/posts', '/wp/v2/pages' ].forEach( async ( path ) => {
+		const items = await rest( { path } );
+
+		for ( const item of items ) {
+			await rest( {
+				method: 'DELETE',
+				path: `${ path }/${ item.id }?force=true`,
+			} );
+		}
+	} );
+}
+
+async function openMenuActionsDropdown() {
+	const menuActionsDropdown = await page.waitForXPath(
+		'//*[@role="region"][@aria-label="Navigation top bar"]//*[@class="edit-navigation-menu-actions"]//button[@aria-expanded="false"]'
+	);
+	await menuActionsDropdown.click();
+}
+
+async function getMenuItem( menuItemName ) {
+	return await page
+		.waitForXPath(
+			`//*[@role="group"]//*[@role="menuitemradio"]/span[text()="${ menuItemName }"]`
+		)
+		.catch( ( error ) => {
+			if ( error.name !== 'TimeoutError' ) {
+				throw error;
+			} else {
+				return null;
+			}
+		} );
+}
+
+describe.skip( 'Navigation editor', () => {
 	useExperimentalFeatures( [ '#gutenberg-navigation' ] );
 
+	beforeAll( async () => {
+		await deleteAllMenus();
+		await deleteAllLinkedResources();
+	} );
+
 	afterEach( async () => {
+		await deleteAllMenus();
+		await deleteAllLinkedResources();
 		await setUpResponseMocking( [] );
 	} );
 
 	it( 'allows creation of a menu when there are no current menu items', async () => {
-		const menuPostResponse = {
-			id: 4,
-			description: '',
-			name: 'Main Menu',
-			slug: 'main-menu',
-			meta: [],
-			auto_add: false,
-		};
-
-		// Initially return nothing from the menu and menuItem endpoints
-		await setUpResponseMocking( [
-			...getMenuMocks( { GET: [] } ),
-			...getMenuItemMocks( { GET: [] } ),
-		] );
 		await visitNavigationEditor();
-
-		// Wait for the header to show that no menus are available.
-		await page.waitForXPath( '//h3[.="Create your first menu"]', {
-			visible: true,
-		} );
-
-		// Prepare the menu endpoint for creating a menu.
 		await setUpResponseMocking( [
-			...getMenuMocks( {
-				GET: [ menuPostResponse ],
-				POST: menuPostResponse,
-			} ),
-			...getMenuItemMocks( { GET: [] } ),
 			...getPagesMocks( {
 				GET: [
 					{
@@ -212,6 +229,11 @@ describe( 'Navigation editor', () => {
 				],
 			} ),
 		] );
+
+		// Wait for the header to show that no menus are available.
+		await page.waitForXPath( '//h3[.="Create your first menu"]', {
+			visible: true,
+		} );
 
 		await page.keyboard.type( 'Main Menu' );
 		const createMenuButton = await page.waitForXPath(
@@ -241,22 +263,8 @@ describe( 'Navigation editor', () => {
 	} );
 
 	it( 'allows creation of a menu when there are existing menu items', async () => {
-		const menuPostResponse = {
-			id: 4,
-			description: '',
-			name: 'New Menu',
-			slug: 'new-menu',
-			meta: [],
-			auto_add: false,
-		};
-
-		await setUpResponseMocking( [
-			...getMenuMocks( {
-				GET: assignMockMenuIds( menusFixture ),
-				POST: menuPostResponse,
-			} ),
-			...getMenuItemMocks( { GET: menuItemsFixture } ),
-		] );
+		await createMenu( { name: 'Test Menu 1' }, menuItemsFixture );
+		await createMenu( { name: 'Test Menu 2' }, menuItemsFixture );
 		await visitNavigationEditor();
 
 		// Wait for the header to show the menu name.
@@ -274,17 +282,6 @@ describe( 'Navigation editor', () => {
 		);
 		await menuNameInputLabel.click();
 
-		await setUpResponseMocking( [
-			...getMenuMocks( {
-				GET: assignMockMenuIds( [
-					...menusFixture,
-					{ name: 'New menu', slug: 'new-menu' },
-				] ),
-				POST: menuPostResponse,
-			} ),
-			...getMenuItemMocks( { GET: [] } ),
-		] );
-
 		await page.keyboard.type( 'New menu' );
 		await page.keyboard.press( 'Enter' );
 
@@ -297,11 +294,10 @@ describe( 'Navigation editor', () => {
 		expect( await getSerializedBlocks() ).toMatchSnapshot();
 	} );
 
-	it( 'displays the first menu from the REST response when at least one menu exists', async () => {
-		await setUpResponseMocking( [
-			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
-			...getMenuItemMocks( { GET: menuItemsFixture } ),
-		] );
+	it( 'displays the first created menu when at least one menu exists', async () => {
+		await createMenu( { name: 'Test Menu 1' }, menuItemsFixture );
+		await createMenu( { name: 'Test Menu 2' }, menuItemsFixture );
+
 		await visitNavigationEditor();
 
 		// Wait for the header to show the menu name.
@@ -317,10 +313,7 @@ describe( 'Navigation editor', () => {
 
 	it( 'shows the trailing block appender within the navigation block when no blocks are selected', async () => {
 		// The test requires the presence of existing menus.
-		await setUpResponseMocking( [
-			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
-			...getMenuItemMocks( { GET: menuItemsFixture } ),
-		] );
+		await createMenu( { name: 'Test Menu 1' }, menuItemsFixture );
 		await visitNavigationEditor();
 
 		// Wait for at least one block to be present on the page.
@@ -338,11 +331,23 @@ describe( 'Navigation editor', () => {
 		expect( blockListAppender ).toBeTruthy();
 	} );
 
+	it( 'has a disabled undo button when an existing menu is loaded', async () => {
+		// The test requires the presence of existing menus.
+		await createMenu( { name: 'Test Menu 1' }, menuItemsFixture );
+		await visitNavigationEditor();
+
+		// Wait for at least one block to be present on the page.
+		await page.waitForSelector( '.wp-block' );
+
+		// Check whether there's a disabled undo button.
+		const disabledUndoButton = await page.waitForSelector(
+			'button[aria-label="Undo"][aria-disabled="true"]'
+		);
+		expect( disabledUndoButton ).toBeTruthy();
+	} );
+
 	it( 'shows a submenu when a link is selected and hides it when clicking the editor to deselect it', async () => {
-		await setUpResponseMocking( [
-			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
-			...getMenuItemMocks( { GET: menuItemsFixture } ),
-		] );
+		await createMenu( { name: 'Test Menu 1' }, menuItemsFixture );
 		await visitNavigationEditor();
 
 		// Select a submenu block with nested links in a submenu.
@@ -362,7 +367,7 @@ describe( 'Navigation editor', () => {
 		} );
 		expect( submenuLinkVisible ).toBeDefined();
 
-		// click in the top left corner of the canvas.
+		// Click in the top left corner of the canvas.
 		const canvas = await page.$( '.edit-navigation-layout__content-area' );
 		const boundingBox = await canvas.boundingBox();
 		await page.mouse.click( boundingBox.x + 5, boundingBox.y + 5 );
@@ -375,8 +380,8 @@ describe( 'Navigation editor', () => {
 	} );
 
 	it( 'displays suggestions when adding a link', async () => {
+		await createMenu( { name: 'Test Menu 1' } );
 		await setUpResponseMocking( [
-			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
 			...getSearchMocks( { GET: searchFixture } ),
 		] );
 
@@ -396,11 +401,6 @@ describe( 'Navigation editor', () => {
 			'button[aria-label="Add block"]'
 		);
 		await appender.click();
-
-		const linkInserterItem = await page.waitForXPath(
-			'//button[@role="option"]//span[.="Custom Link"]'
-		);
-		await linkInserterItem.click();
 
 		await page.waitForSelector( 'input[aria-label="URL"]' );
 
@@ -432,109 +432,59 @@ describe( 'Navigation editor', () => {
 		const nameEditorSelector = '.edit-navigation-name-editor__text-control';
 		const inputSelector = `${ nameEditorSelector } input`;
 
-		beforeEach( async () => {
-			const menuPostResponse = {
-				id: 4,
-				description: '',
-				name: initialMenuName,
-				slug: 'main-menu',
-				meta: [],
-				auto_add: false,
-			};
-
-			await setUpResponseMocking( [
-				...getMenuMocks( {
-					GET: [ menuPostResponse ],
-					POST: menuPostResponse,
-				} ),
-				...getMenuItemMocks( { GET: [] } ),
-			] );
-
+		it( 'saves menu name changes', async () => {
+			await createMenu( { name: initialMenuName } );
 			await visitNavigationEditor();
 
-			// Wait for the navigation setting sidebar.
-			await page.waitForSelector( '.edit-navigation-sidebar' );
-		} );
-
-		afterEach( async () => {
-			await setUpResponseMocking( [] );
-		} );
-
-		it( 'is displayed in inspector additions', async () => {
-			const nameControl = await page.$( nameEditorSelector );
-			expect( nameControl ).toBeDefined();
-		} );
-
-		it( 'saves menu name upon clicking save button', async () => {
-			const newName = 'newName';
-			const menuPostResponse = {
-				id: 4,
-				description: '',
-				name: newName,
-				slug: 'main-menu',
-				meta: [],
-				auto_add: false,
-			};
-
-			await setUpResponseMocking( [
-				...getMenuMocks( {
-					GET: [ menuPostResponse ],
-					POST: menuPostResponse,
-				} ),
-				...getMenuItemMocks( { GET: [] } ),
-			] );
-
-			// Ensure there is focus.
-			await page.focus( inputSelector );
+			// Rename the menu and save it.
+			const newName = 'New menu';
+			await page.waitForSelector( inputSelector );
+			await page.click( inputSelector );
 			await pressKeyTimes( 'Backspace', initialMenuName.length );
 			await page.keyboard.type( newName );
-
-			const saveButton = await page.$(
-				'.edit-navigation-toolbar__save-button'
-			);
-			await saveButton.click();
+			await page.click( '.edit-navigation-toolbar__save-button' );
 			await page.waitForSelector( '.components-snackbar' );
+			await page.reload();
+
+			// Expect the header to have the new name.
 			const headerSubtitle = await page.waitForSelector(
 				'.edit-navigation-menu-actions__subtitle'
 			);
-			expect( headerSubtitle ).toBeTruthy();
 			const headerSubtitleText = await headerSubtitle.evaluate(
 				( element ) => element.innerText
 			);
 			expect( headerSubtitleText ).toBe( newName );
 		} );
 
-		it( 'does not save a menu name upon clicking save button when name is empty', async () => {
-			const menuPostResponse = {
-				id: 4,
-				description: '',
-				name: initialMenuName,
-				slug: 'main-menu',
-				meta: [],
-				auto_add: false,
-			};
+		// Flaky test, see https://github.com/WordPress/gutenberg/pull/34869#issuecomment-922711557.
+		it.skip( 'does not save a menu name upon clicking save button when name is empty', async () => {
+			await createMenu( { name: initialMenuName } );
+			await visitNavigationEditor();
 
-			await setUpResponseMocking( [
-				...getMenuMocks( {
-					GET: [ menuPostResponse ],
-					POST: menuPostResponse,
-				} ),
-				...getMenuItemMocks( { GET: [] } ),
-			] );
-
-			// Ensure there is focus.
-			await page.focus( inputSelector );
+			// Try saving a menu with an empty name.
+			await page.waitForSelector( inputSelector );
+			await page.click( inputSelector );
 			await pressKeyTimes( 'Backspace', initialMenuName.length );
-
-			const saveButton = await page.$(
-				'.edit-navigation-toolbar__save-button'
+			await page.click( '.edit-navigation-toolbar__save-button' );
+			const snackbar = await page.waitForSelector(
+				'.components-snackbar',
+				{ visible: true }
 			);
-			await saveButton.click();
-			await page.waitForSelector( '.components-snackbar' );
+			const snackbarText = await snackbar.evaluate(
+				( element ) => element.innerText
+			);
+			expect( snackbarText ).toBe(
+				"Unable to save: 'A name is required for this term.'"
+			);
+			expect( console ).toHaveErrored(
+				'Failed to load resource: the server responded with a status of 500 (Internal Server Error)'
+			);
+			await page.reload();
+
+			// Expect the header to have the old name.
 			const headerSubtitle = await page.waitForSelector(
 				'.edit-navigation-menu-actions__subtitle'
 			);
-			expect( headerSubtitle ).toBeTruthy();
 			const headerSubtitleText = await headerSubtitle.evaluate(
 				( element ) => element.innerText
 			);
@@ -544,28 +494,8 @@ describe( 'Navigation editor', () => {
 
 	describe( 'Change detections', () => {
 		beforeEach( async () => {
-			const menuPostResponse = {
-				id: 4,
-				description: '',
-				name: 'Main',
-				slug: 'main-menu',
-				meta: [],
-				auto_add: false,
-			};
-
-			await setUpResponseMocking( [
-				...getMenuMocks( {
-					GET: [ menuPostResponse ],
-					POST: menuPostResponse,
-				} ),
-				...getMenuItemMocks( { GET: [] } ),
-			] );
-
+			await createMenu( { name: 'Main' } );
 			await visitNavigationEditor();
-		} );
-
-		afterEach( async () => {
-			await setUpResponseMocking( [] );
 		} );
 
 		async function assertIsDirty( isDirty ) {
@@ -605,24 +535,8 @@ describe( 'Navigation editor', () => {
 	} );
 
 	describe( 'Sidebar inserter', () => {
-		const initialMenu = {
-			id: 4,
-			description: '',
-			name: 'Main Menu',
-			slug: 'main-menu',
-			meta: [],
-			auto_add: false,
-		};
-
 		it( 'disables inserter toggle when Navigation block is in placeholder state', async () => {
-			await setUpResponseMocking( [
-				...getMenuMocks( {
-					GET: [ initialMenu ],
-					POST: initialMenu,
-				} ),
-				...getMenuItemMocks( { GET: [] } ),
-			] );
-
+			await createMenu( { name: 'Main Menu' } );
 			await visitNavigationEditor();
 
 			// Wait for the block to be present.
@@ -631,7 +545,7 @@ describe( 'Navigation editor', () => {
 				name: 'Block: Navigation',
 			} ).toBeFound();
 
-			// Check for the placeholder state
+			// Check for the placeholder state.
 			await expect( {
 				role: 'button',
 				name: 'Start blank',
@@ -646,14 +560,7 @@ describe( 'Navigation editor', () => {
 		} );
 
 		it( 'enables inserter toggle when Navigation block is in editable state', async () => {
-			await setUpResponseMocking( [
-				...getMenuMocks( {
-					GET: [ initialMenu ],
-					POST: initialMenu,
-				} ),
-				...getMenuItemMocks( { GET: menuItemsFixture } ),
-			] );
-
+			await createMenu( { name: 'Main Menu' }, menuItemsFixture );
 			await visitNavigationEditor();
 
 			// Wait for the block to be present.
@@ -678,14 +585,7 @@ describe( 'Navigation editor', () => {
 		} );
 
 		it( 'toggles the inserter sidebar open and closed', async () => {
-			await setUpResponseMocking( [
-				...getMenuMocks( {
-					GET: [ initialMenu ],
-					POST: initialMenu,
-				} ),
-				...getMenuItemMocks( { GET: menuItemsFixture } ),
-			] );
-
+			await createMenu( { name: 'Main Menu' }, menuItemsFixture );
 			await visitNavigationEditor();
 
 			// Wait for the block to be present.
@@ -723,13 +623,9 @@ describe( 'Navigation editor', () => {
 
 		it( 'inserts items at end of Navigation block by default', async () => {
 			await setUpResponseMocking( [
-				...getMenuMocks( {
-					GET: [ initialMenu ],
-					POST: initialMenu,
-				} ),
-				...getMenuItemMocks( { GET: menuItemsFixture } ),
 				...getSearchMocks( { GET: searchFixture } ),
 			] );
+			await createMenu( { name: 'Main Menu' }, menuItemsFixture );
 
 			await visitNavigationEditor();
 
@@ -785,24 +681,170 @@ describe( 'Navigation editor', () => {
 
 			// Get the title/label of the last Nav item inside the Nav block.
 			const lastItemAttributes = await page.evaluate( () => {
-				const { getBlockOrder, getBlocks } = wp.data.select(
-					'core/block-editor'
-				);
+				const { getBlockOrder, getBlocks } =
+					wp.data.select( 'core/block-editor' );
 
 				const lockedNavigationBlock = getBlockOrder()[ 0 ];
 
 				const navItemBlocks = getBlocks( lockedNavigationBlock );
 
-				const { attributes } = navItemBlocks[
-					navItemBlocks.length - 1
-				];
+				const { attributes } =
+					navItemBlocks[ navItemBlocks.length - 1 ];
 
 				return attributes;
 			} );
 
-			// Check the last item is the one we just inserted
+			// Check the last item is the one we just inserted.
 			expect( lastItemAttributes.label ).toEqual( itemToSelect.title );
 			expect( lastItemAttributes.isTopLevelLink ).toBeTruthy();
 		} );
+	} );
+
+	describe( 'Delete menu button', () => {
+		useExperimentalFeatures( [ '#gutenberg-navigation' ] );
+
+		beforeAll( async () => {
+			await deleteAllMenus();
+			await deleteAllLinkedResources();
+		} );
+
+		afterEach( async () => {
+			await deleteAllMenus();
+			await deleteAllLinkedResources();
+		} );
+
+		afterEach( async () => {
+			await setBrowserViewport( 'large' );
+		} );
+		it.each( [ 'large', 'small' ] )(
+			`should retain menu when confirmation is canceled and the viewport is %s`,
+			async ( viewport ) => {
+				const menuName = 'Menu delete test';
+				await createMenu( { name: menuName }, menuItemsFixture );
+				await visitNavigationEditor();
+				await setBrowserViewport( viewport );
+				// Wait for the header to show the menu name.
+				await page.waitForXPath(
+					`//*[@role="region"][@aria-label="Navigation top bar"]//h2[contains(text(), "${ menuName }")]`
+				);
+
+				if ( viewport === 'small' ) {
+					const openSettingsSidebar = await page.waitForXPath(
+						'//button[@aria-label="Settings"][@aria-expanded="false"]'
+					);
+					await openSettingsSidebar.click();
+				}
+
+				const deleteMenuButton = await page.waitForXPath(
+					'//*[@role="region"][@aria-label="Navigation settings"]//button[text()="Delete menu"]'
+				);
+				await deleteMenuButton.click();
+
+				const cancelButton = await page.waitForXPath(
+					'//*[@role="dialog"]//button[text()="Cancel"]'
+				);
+				await cancelButton.click();
+
+				const menuActionsDropdown = await page.waitForXPath(
+					`//*[contains(@class,"edit-navigation-menu-actions")]//h2[text()="${ menuName }"]`
+				);
+				const currentSelectedMenu = await page.evaluate(
+					( el ) => el.textContent,
+					menuActionsDropdown
+				);
+
+				expect( currentSelectedMenu ).toBe( menuName );
+			}
+		);
+		it.each( [ 'large', 'small' ] )(
+			`should delete menu when confirmation is confirmed and there are no other menus and the viewport is %s`,
+			async ( viewport ) => {
+				const menuName = 'Menu delete test';
+				await createMenu( { name: menuName }, menuItemsFixture );
+				await visitNavigationEditor();
+				await setBrowserViewport( viewport );
+				// Wait for the header to show the menu name.
+				await page.waitForXPath(
+					`//*[@role="region"][@aria-label="Navigation top bar"]//h2[contains(text(), "${ menuName }")]`
+				);
+				if ( viewport === 'small' ) {
+					const openSettingsSidebar = await page.waitForXPath(
+						'//button[@aria-label="Settings"][@aria-expanded="false"]'
+					);
+					await openSettingsSidebar.click();
+				}
+
+				const deleteMenuButton = await page.waitForXPath(
+					'//*[@role="region"][@aria-label="Navigation settings"]//button[text()="Delete menu"]'
+				);
+				await deleteMenuButton.click();
+
+				const confirmButton = await page.waitForXPath(
+					'//*[@role="dialog"]//button[text()="OK"]'
+				);
+				await confirmButton.click();
+
+				await page.waitForXPath(
+					`//*[@role="button"][@aria-label="Dismiss this notice"]//*[text()='"${ menuName }" menu has been deleted']`
+				);
+
+				// If the "Create your first menu" prompt appears, we know there are no remaining menus,
+				// so our test menu must have been deleted successfully.
+				const createFirstMenuPrompt = await page.waitForXPath(
+					'//h3[.="Create your first menu"]',
+					{
+						visible: true,
+					}
+				);
+				const noMenusRemaining = createFirstMenuPrompt ? true : false;
+				expect( noMenusRemaining ).toBe( true );
+			}
+		);
+
+		it.each( [ 'large', 'small' ] )(
+			`should delete menu when confirmation is confirmed and there are other existing menus and the viewport is %s`,
+			async () => {
+				const menuName = 'Menu delete test';
+				await createMenu( { name: menuName }, menuItemsFixture );
+				await createMenu(
+					{ name: `${ menuName } 2` },
+					menuItemsFixture
+				);
+				await visitNavigationEditor();
+				// Wait for the header to show the menu name
+				await page.waitForXPath(
+					`//*[@role="region"][@aria-label="Navigation top bar"]//h2[contains(text(), "${ menuName }")]`
+				);
+
+				// Confirm both test menus are present
+				openMenuActionsDropdown();
+				const firstTestMenuItem = await getMenuItem( menuName );
+				const secondTestMenuItem = await getMenuItem(
+					`${ menuName } 2`
+				);
+
+				expect( firstTestMenuItem ).not.toBeNull();
+				expect( secondTestMenuItem ).not.toBeNull();
+
+				// Delete the first test menu
+				const deleteMenuButton = await page.waitForXPath(
+					'//*[@role="region"][@aria-label="Navigation settings"]//button[text()="Delete menu"]'
+				);
+				await deleteMenuButton.click();
+
+				const confirmButton = await page.waitForXPath(
+					'//*[@role="dialog"]//button[text()="OK"]'
+				);
+				await confirmButton.click();
+
+				await page.waitForXPath(
+					`//*[@role="button"][@aria-label="Dismiss this notice"]//*[text()='"${ menuName }" menu has been deleted']`
+				);
+
+				openMenuActionsDropdown();
+				const deletedTestMenuItem = await getMenuItem( menuName );
+				expect( deletedTestMenuItem ).toBeNull();
+			}
+		);
 	} );
 } );

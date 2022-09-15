@@ -104,7 +104,7 @@ describe( 'Block variations', () => {
 				'Display block breadcrumbs',
 				true
 			);
-			await toggleMoreMenu();
+			await toggleMoreMenu( 'close' );
 		} );
 
 		afterEach( async () => {
@@ -113,7 +113,7 @@ describe( 'Block variations', () => {
 				'Display block breadcrumbs',
 				false
 			);
-			await toggleMoreMenu();
+			await toggleMoreMenu( 'close' );
 		} );
 
 		const getActiveBreadcrumb = async () =>
@@ -148,6 +148,8 @@ describe( 'Block variations', () => {
 
 		it( 'should show block information when no matching variation is found', async () => {
 			await insertBlock( 'Large Quote' );
+			// Select the quote block.
+			await page.keyboard.press( 'ArrowDown' );
 			const breadcrumb = await getActiveBreadcrumb();
 			expect( breadcrumb ).toEqual( 'Quote' );
 			const navigationItem = await getFirstNavigationItem();
@@ -181,7 +183,7 @@ describe( 'Block variations', () => {
 			).toBeTruthy();
 			const description = await getBlockCardDescription();
 			expect( description ).toEqual(
-				'Start with the building block of all narrative.'
+				'Start with the basic building block of all narrative.'
 			);
 		} );
 	} );

@@ -26,15 +26,15 @@ const getMockedReusableBlock = ( id ) => ( {
     <!-- wp:heading -->
     <h2>First Reusable block</h2>
     <!-- /wp:heading -->
-    
+
     <!-- wp:paragraph -->
     <p><strong>Bold</strong> <em>Italic</em> <s>Striked</s> Superscript<sup>(1)</sup> Subscript<sub>(2)</sub> <a href="http://www.wordpress.org" target="_blank" rel="noreferrer noopener">Link</a></p>
     <!-- /wp:paragraph -->
-    
+
     !-- wp:heading {"level":4} -->
     <h4>List</h4>
     <!-- /wp:heading -->
-    
+
     <!-- wp:list -->
     <ul><li>First Item</li><li>Second Item</li><li>Third Item</li></ul>
     <!-- /wp:list -->
@@ -46,12 +46,12 @@ const getMockedReusableBlock = ( id ) => ( {
 } );
 
 beforeAll( () => {
-	// Register all core blocks
+	// Register all core blocks.
 	registerCoreBlocks();
 } );
 
 afterAll( () => {
-	// Clean up registered blocks
+	// Clean up registered blocks.
 	getBlockTypes().forEach( ( block ) => {
 		unregisterBlockType( block.name );
 	} );
@@ -70,25 +70,26 @@ describe( 'Reusable block', () => {
 				response = [ reusableBlockMock1, reusableBlockMock2 ];
 			} else if ( path.startsWith( '/wp/v2/blocks/1' ) ) {
 				response = reusableBlockMock1;
+			} else if (
+				path.startsWith( '/wp/v2/block-patterns/categories' )
+			) {
+				response = [];
 			}
 			return Promise.resolve( response );
 		} );
 
-		const {
-			getByA11yLabel,
-			getByTestId,
-			getByText,
-		} = await initializeEditor( {
-			initialHtml: '',
-			capabilities: { reusableBlock: true },
-		} );
+		const { getByA11yLabel, getByTestId, getByText } =
+			await initializeEditor( {
+				initialHtml: '',
+				capabilities: { reusableBlock: true },
+			} );
 
-		// Open the inserter menu
+		// Open the inserter menu.
 		fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
 
-		// Navigate to reusable tab
-		const reusableSegment = getByText( 'Reusable' );
-		// onLayout event is required by Segment component
+		// Navigate to reusable tab.
+		const reusableSegment = await waitFor( () => getByText( 'Reusable' ) );
+		// onLayout event is required by Segment component.
 		fireEvent( reusableSegment, 'layout', {
 			nativeEvent: {
 				layout: {
@@ -99,7 +100,7 @@ describe( 'Reusable block', () => {
 		fireEvent.press( reusableSegment );
 
 		const reusableBlockList = getByTestId( 'InserterUI-ReusableBlocks' );
-		// onScroll event used to force the FlatList to render all items
+		// onScroll event used to force the FlatList to render all items.
 		fireEvent.scroll( reusableBlockList, {
 			nativeEvent: {
 				contentOffset: { y: 0, x: 0 },
@@ -108,12 +109,12 @@ describe( 'Reusable block', () => {
 			},
 		} );
 
-		// Insert a reusable block
+		// Insert a reusable block.
 		fireEvent.press(
 			await waitFor( () => getByText( `Reusable block - 1` ) )
 		);
 
-		// Get the reusable block
+		// Get the reusable block.
 		const reusableBlock = await waitFor( () =>
 			getByA11yLabel( /Reusable block Block\. Row 1/ )
 		);
@@ -145,7 +146,9 @@ describe( 'Reusable block', () => {
 		expect( blockDeleted ).toBeDefined();
 	} );
 
-	it( 'renders block content', async () => {
+	// Skipped until `pointerEvents: 'none'` no longer erroneously prevents
+	// triggering `onLayout*` on the element: https://github.com/callstack/react-native-testing-library/issues/897.
+	it.skip( 'renders block content', async () => {
 		// We have to use different ids because entities are cached in memory.
 		const id = 4;
 		const initialHtml = `<!-- wp:block {"ref":${ id }} /-->`;

@@ -4,13 +4,13 @@
 import { blockNames } from './pages/editor-page';
 
 describe( 'Gutenberg Editor Spacer Block test', () => {
-	it( 'should be able to add an separator block', async () => {
+	it( 'should be able to add a spacer block', async () => {
 		await editorPage.addNewBlock( blockNames.spacer );
-		const separatorBlock = await editorPage.getBlockAtPosition(
+		const spacerBlock = await editorPage.getBlockAtPosition(
 			blockNames.spacer
 		);
 
-		expect( separatorBlock ).toBeTruthy();
+		expect( spacerBlock ).toBeTruthy();
 		await editorPage.removeBlockAtPosition( blockNames.spacer );
 	} );
 } );

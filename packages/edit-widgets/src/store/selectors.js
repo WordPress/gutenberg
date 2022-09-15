@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { keyBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
@@ -24,6 +19,11 @@ import {
 } from './utils';
 import { STORE_NAME as editWidgetsStoreName } from './constants';
 
+/**
+ * Returns all API widgets.
+ *
+ * @return {Object[]} API List of widgets.
+ */
 export const getWidgets = createRegistrySelector( ( select ) => () => {
 	const widgets = select( coreStore ).getEntityRecords(
 		'root',
@@ -31,7 +31,16 @@ export const getWidgets = createRegistrySelector( ( select ) => () => {
 		buildWidgetsQuery()
 	);
 
-	return keyBy( widgets, 'id' );
+	return (
+		// Key widgets by their ID.
+		widgets?.reduce(
+			( allWidgets, widget ) => ( {
+				...allWidgets,
+				[ widget.id ]: widget,
+			} ),
+			{}
+		) || {}
+	);
 } );
 
 /**
@@ -48,6 +57,11 @@ export const getWidget = createRegistrySelector(
 	}
 );
 
+/**
+ * Returns all API widget areas.
+ *
+ * @return {Object[]} API List of widget areas.
+ */
 export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
 	const query = buildWidgetAreasQuery();
 	return select( coreStore ).getEntityRecords(
@@ -89,9 +103,8 @@ export const getWidgetAreaForWidgetId = createRegistrySelector(
  */
 export const getParentWidgetAreaBlock = createRegistrySelector(
 	( select ) => ( state, clientId ) => {
-		const { getBlock, getBlockName, getBlockParents } = select(
-			blockEditorStore
-		);
+		const { getBlock, getBlockName, getBlockParents } =
+			select( blockEditorStore );
 		const blockParents = getBlockParents( clientId );
 		const widgetAreaClientId = blockParents.find(
 			( parentClientId ) =>
@@ -101,6 +114,11 @@ export const getParentWidgetAreaBlock = createRegistrySelector(
 	}
 );
 
+/**
+ * Returns all edited widget area entity records.
+ *
+ * @return {Object[]} List of edited widget area entity records.
+ */
 export const getEditedWidgetAreas = createRegistrySelector(
 	( select ) => ( state, ids ) => {
 		let widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
@@ -137,30 +155,36 @@ export const getEditedWidgetAreas = createRegistrySelector(
  * @return {Array}  List of all blocks representing reference widgets
  */
 export const getReferenceWidgetBlocks = createRegistrySelector(
-	( select ) => ( state, referenceWidgetName = null ) => {
-		const results = [];
-		const widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
-		for ( const _widgetArea of widgetAreas ) {
-			const post = select( coreStore ).getEditedEntityRecord(
-				KIND,
-				POST_TYPE,
-				buildWidgetAreaPostId( _widgetArea.id )
-			);
-			for ( const block of post.blocks ) {
-				if (
-					block.name === 'core/legacy-widget' &&
-					( ! referenceWidgetName ||
-						block.attributes?.referenceWidgetName ===
-							referenceWidgetName )
-				) {
-					results.push( block );
+	( select ) =>
+		( state, referenceWidgetName = null ) => {
+			const results = [];
+			const widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
+			for ( const _widgetArea of widgetAreas ) {
+				const post = select( coreStore ).getEditedEntityRecord(
+					KIND,
+					POST_TYPE,
+					buildWidgetAreaPostId( _widgetArea.id )
+				);
+				for ( const block of post.blocks ) {
+					if (
+						block.name === 'core/legacy-widget' &&
+						( ! referenceWidgetName ||
+							block.attributes?.referenceWidgetName ===
+								referenceWidgetName )
+					) {
+						results.push( block );
+					}
 				}
 			}
+			return results;
 		}
-		return results;
-	}
 );
 
+/**
+ * Returns true if any widget area is currently being saved.
+ *
+ * @return {boolean} True if any widget area is currently being saved. False otherwise.
+ */
 export const isSavingWidgetAreas = createRegistrySelector( ( select ) => () => {
 	const widgetAreasIds = select( editWidgetsStoreName )
 		.getWidgetAreas()
@@ -257,3 +281,14 @@ export const canInsertBlockInWidgetArea = createRegistrySelector(
 		);
 	}
 );
+
+/**
+ * Returns true if the list view is opened.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the list view is opened.
+ */
+export function isListViewOpened( state ) {
+	return state.listViewPanel;
+}

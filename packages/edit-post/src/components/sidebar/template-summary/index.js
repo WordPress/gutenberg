@@ -22,7 +22,7 @@ function TemplateSummary() {
 
 	return (
 		<PanelBody>
-			<Flex align="flex-start">
+			<Flex align="flex-start" gap="3">
 				<FlexItem>
 					<Icon icon={ layout } />
 				</FlexItem>

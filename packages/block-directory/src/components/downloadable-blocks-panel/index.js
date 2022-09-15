@@ -71,10 +71,8 @@ function DownloadableBlocksPanel( {
 
 export default compose( [
 	withSelect( ( select, { filterValue, rootClientId = null } ) => {
-		const {
-			getDownloadableBlocks,
-			isRequestingDownloadableBlocks,
-		} = select( blockDirectoryStore );
+		const { getDownloadableBlocks, isRequestingDownloadableBlocks } =
+			select( blockDirectoryStore );
 		const { canInsertBlockType } = select( blockEditorStore );
 
 		const hasPermission = select( coreStore ).canUser(

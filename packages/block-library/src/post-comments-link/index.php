@@ -27,28 +27,28 @@ function render_block_core_post_comments_link( $attributes, $content, $block ) {
 	$comments_number    = (int) get_comments_number( $block->context['postId'] );
 	$comments_link      = get_comments_link( $block->context['postId'] );
 	$post_title         = get_the_title( $block->context['postId'] );
-	$comment_text       = '';
+	$comment_html       = '';
 
 	if ( 0 === $comments_number ) {
-		$comment_text = sprintf(
+		$comment_html = sprintf(
 			/* translators: %s post title */
 			__( 'No comments<span class="screen-reader-text"> on %s</span>' ),
 			$post_title
 		);
 	} else {
-		$comment_text = sprintf(
+		$comment_html = sprintf(
 			/* translators: 1: Number of comments, 2: post title */
 			_n(
 				'%1$s comment<span class="screen-reader-text"> on %2$s</span>',
 				'%1$s comments<span class="screen-reader-text"> on %2$s</span>',
 				$comments_number
 			),
-			number_format_i18n( $comments_number ),
+			esc_html( number_format_i18n( $comments_number ) ),
 			$post_title
 		);
 	}
 
-	return "<div {$wrapper_attributes}><a href='{$comments_link}'>{$comment_text}</a></div>";
+	return '<div ' . $wrapper_attributes . '><a href=' . esc_url( $comments_link ) . '>' . $comment_html . '</a></div>';
 }
 
 /**

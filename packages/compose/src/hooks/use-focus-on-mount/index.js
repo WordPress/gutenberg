@@ -50,6 +50,11 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 			}
 		}
 
-		target.focus();
+		target.focus( {
+			// When focusing newly mounted dialogs,
+			// the position of the popover is often not right on the first render
+			// This prevents the layout shifts when focusing the dialogs.
+			preventScroll: true,
+		} );
 	}, [] );
 }

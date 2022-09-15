@@ -23,23 +23,20 @@ import wrap from './transforms/wrap';
  * @return {Array} converted rules.
  */
 const transformStyles = ( styles, wrapperClassName = '' ) => {
-	return map(
-		styles,
-		( { css, baseURL, __experimentalNoWrapper = false } ) => {
-			const transforms = [];
-			if ( wrapperClassName && ! __experimentalNoWrapper ) {
-				transforms.push( wrap( wrapperClassName ) );
-			}
-			if ( baseURL ) {
-				transforms.push( urlRewrite( baseURL ) );
-			}
-			if ( transforms.length ) {
-				return traverse( css, compose( transforms ) );
-			}
-
-			return css;
+	return map( styles, ( { css, baseURL } ) => {
+		const transforms = [];
+		if ( wrapperClassName ) {
+			transforms.push( wrap( wrapperClassName ) );
 		}
-	);
+		if ( baseURL ) {
+			transforms.push( urlRewrite( baseURL ) );
+		}
+		if ( transforms.length ) {
+			return traverse( css, compose( transforms ) );
+		}
+
+		return css;
+	} );
 };
 
 export default transformStyles;

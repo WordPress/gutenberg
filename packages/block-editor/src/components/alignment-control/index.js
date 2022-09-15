@@ -3,10 +3,15 @@
  */
 import AlignmentUI from './ui';
 
-export function AlignmentControl( props ) {
+const AlignmentControl = ( props ) => {
 	return <AlignmentUI { ...props } isToolbar={ false } />;
-}
+};
 
-export function AlignmentToolbar( props ) {
+const AlignmentToolbar = ( props ) => {
 	return <AlignmentUI { ...props } isToolbar />;
-}
+};
+
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/alignment-control/README.md
+ */
+export { AlignmentControl, AlignmentToolbar };

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { without, first, last } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { find as findFocusable } from './focusable';
@@ -74,7 +69,7 @@ function createStatefulCollapseRadioGroup() {
 		// the element which had previously been considered the chosen one.
 		if ( hasChosen ) {
 			const hadChosenElement = CHOSEN_RADIO_BY_NAME[ name ];
-			result = without( result, hadChosenElement );
+			result = result.filter( ( e ) => e !== hadChosenElement );
 		}
 
 		CHOSEN_RADIO_BY_NAME[ name ] = element;
@@ -160,15 +155,22 @@ export function find( context ) {
  *
  * @param {Element} element The focusable element before which to look. Defaults
  *                          to the active element.
+ *
+ * @return {Element|undefined} Preceding tabbable element.
  */
 export function findPrevious( element ) {
 	const focusables = findFocusable( element.ownerDocument.body );
 	const index = focusables.indexOf( element );
 
+	if ( index === -1 ) {
+		return undefined;
+	}
+
 	// Remove all focusables after and including `element`.
 	focusables.length = index;
 
-	return last( filterTabbable( focusables ) );
+	const tabbable = filterTabbable( focusables );
+	return tabbable[ tabbable.length - 1 ];
 }
 
 /**
@@ -176,15 +178,15 @@ export function findPrevious( element ) {
  *
  * @param {Element} element The focusable element after which to look. Defaults
  *                          to the active element.
+ *
+ * @return {Element|undefined} Next tabbable element.
  */
 export function findNext( element ) {
 	const focusables = findFocusable( element.ownerDocument.body );
 	const index = focusables.indexOf( element );
 
-	// Remove all focusables before and inside `element`.
-	const remaining = focusables
-		.slice( index + 1 )
-		.filter( ( node ) => ! element.contains( node ) );
+	// Remove all focusables before and including `element`.
+	const remaining = focusables.slice( index + 1 );
 
-	return first( filterTabbable( remaining ) );
+	return filterTabbable( remaining )[ 0 ];
 }

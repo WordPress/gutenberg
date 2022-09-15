@@ -27,9 +27,8 @@ const getMenusData = ( select ) => {
 export default function useNavigationEditor() {
 	const { deleteMenu: _deleteMenu } = useDispatch( coreStore );
 	const [ selectedMenuId, setSelectedMenuId ] = useSelectedMenuId();
-	const [ hasFinishedInitialLoad, setHasFinishedInitialLoad ] = useState(
-		false
-	);
+	const [ hasFinishedInitialLoad, setHasFinishedInitialLoad ] =
+		useState( false );
 	const { editedMenu, hasLoadedEditedMenu } = useMenuEntity( selectedMenuId );
 	const { menus, hasLoadedMenus } = useSelect( getMenusData, [] );
 

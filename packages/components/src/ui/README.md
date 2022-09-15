@@ -2,7 +2,7 @@
 
 This directory contains the code for next Component System.
 
-More information can be found in the original Github issue:
+More information can be found in the original GitHub issue:
 https://github.com/WordPress/gutenberg/issues/27484
 
 ## Usage

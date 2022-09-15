@@ -4,18 +4,45 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
 .emotion-0 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
+  box-sizing: border-box;
 }
 
-.emotion-2 {
-  margin-bottom: calc(4px * 2);
+.emotion-0 *,
+.emotion-0 *::before,
+.emotion-0 *::after {
+  box-sizing: inherit;
 }
 
 .components-panel__row .emotion-2 {
   margin-bottom: inherit;
 }
 
+.emotion-4 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  gap: calc(4px * 3);
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.emotion-4>* {
+  min-width: 0;
+}
+
 <div
-  className="edit-post-preferences-modal__option"
+  className="interface-preferences-modal__option"
 >
   <div
     className="components-base-control components-toggle-control emotion-0 emotion-1"
@@ -23,27 +50,33 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
     <div
       className="components-base-control__field emotion-2 emotion-3"
     >
-      <span
-        className="components-form-toggle is-checked"
+      <div
+        className="components-flex components-h-stack emotion-4 emotion-5"
+        data-wp-c16t={true}
+        data-wp-component="HStack"
       >
-        <input
-          checked={true}
-          className="components-form-toggle__input"
-          id="inspector-toggle-control-3"
-          onChange={[Function]}
-          type="checkbox"
-        />
         <span
-          className="components-form-toggle__track"
+          className="components-form-toggle is-checked"
+        >
+          <input
+            checked={true}
+            className="components-form-toggle__input"
+            id="inspector-toggle-control-3"
+            onChange={[Function]}
+            type="checkbox"
+          />
+          <span
+            className="components-form-toggle__track"
+          />
+          <span
+            className="components-form-toggle__thumb"
+          />
+        </span>
+        <label
+          className="components-toggle-control__label"
+          htmlFor="inspector-toggle-control-3"
         />
-        <span
-          className="components-form-toggle__thumb"
-        />
-      </span>
-      <label
-        className="components-toggle-control__label"
-        htmlFor="inspector-toggle-control-3"
-      />
+      </div>
     </div>
   </div>
   <p
@@ -67,18 +100,45 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
 .emotion-0 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
+  box-sizing: border-box;
 }
 
-.emotion-2 {
-  margin-bottom: calc(4px * 2);
+.emotion-0 *,
+.emotion-0 *::before,
+.emotion-0 *::after {
+  box-sizing: inherit;
 }
 
 .components-panel__row .emotion-2 {
   margin-bottom: inherit;
 }
 
+.emotion-4 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  gap: calc(4px * 3);
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.emotion-4>* {
+  min-width: 0;
+}
+
 <div
-  className="edit-post-preferences-modal__option"
+  className="interface-preferences-modal__option"
 >
   <div
     className="components-base-control components-toggle-control emotion-0 emotion-1"
@@ -86,27 +146,33 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
     <div
       className="components-base-control__field emotion-2 emotion-3"
     >
-      <span
-        className="components-form-toggle is-checked"
+      <div
+        className="components-flex components-h-stack emotion-4 emotion-5"
+        data-wp-c16t={true}
+        data-wp-component="HStack"
       >
-        <input
-          checked={true}
-          className="components-form-toggle__input"
-          id="inspector-toggle-control-0"
-          onChange={[Function]}
-          type="checkbox"
-        />
         <span
-          className="components-form-toggle__track"
+          className="components-form-toggle is-checked"
+        >
+          <input
+            checked={true}
+            className="components-form-toggle__input"
+            id="inspector-toggle-control-0"
+            onChange={[Function]}
+            type="checkbox"
+          />
+          <span
+            className="components-form-toggle__track"
+          />
+          <span
+            className="components-form-toggle__thumb"
+          />
+        </span>
+        <label
+          className="components-toggle-control__label"
+          htmlFor="inspector-toggle-control-0"
         />
-        <span
-          className="components-form-toggle__thumb"
-        />
-      </span>
-      <label
-        className="components-toggle-control__label"
-        htmlFor="inspector-toggle-control-0"
-      />
+      </div>
     </div>
   </div>
 </div>
@@ -116,18 +182,45 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
 .emotion-0 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
+  box-sizing: border-box;
 }
 
-.emotion-2 {
-  margin-bottom: calc(4px * 2);
+.emotion-0 *,
+.emotion-0 *::before,
+.emotion-0 *::after {
+  box-sizing: inherit;
 }
 
 .components-panel__row .emotion-2 {
   margin-bottom: inherit;
 }
 
+.emotion-4 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  gap: calc(4px * 3);
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.emotion-4>* {
+  min-width: 0;
+}
+
 <div
-  className="edit-post-preferences-modal__option"
+  className="interface-preferences-modal__option"
 >
   <div
     className="components-base-control components-toggle-control emotion-0 emotion-1"
@@ -135,27 +228,33 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
     <div
       className="components-base-control__field emotion-2 emotion-3"
     >
-      <span
-        className="components-form-toggle"
+      <div
+        className="components-flex components-h-stack emotion-4 emotion-5"
+        data-wp-c16t={true}
+        data-wp-component="HStack"
       >
-        <input
-          checked={false}
-          className="components-form-toggle__input"
-          id="inspector-toggle-control-2"
-          onChange={[Function]}
-          type="checkbox"
-        />
         <span
-          className="components-form-toggle__track"
+          className="components-form-toggle"
+        >
+          <input
+            checked={false}
+            className="components-form-toggle__input"
+            id="inspector-toggle-control-2"
+            onChange={[Function]}
+            type="checkbox"
+          />
+          <span
+            className="components-form-toggle__track"
+          />
+          <span
+            className="components-form-toggle__thumb"
+          />
+        </span>
+        <label
+          className="components-toggle-control__label"
+          htmlFor="inspector-toggle-control-2"
         />
-        <span
-          className="components-form-toggle__thumb"
-        />
-      </span>
-      <label
-        className="components-toggle-control__label"
-        htmlFor="inspector-toggle-control-2"
-      />
+      </div>
     </div>
   </div>
   <p
@@ -179,18 +278,45 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
 .emotion-0 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
+  box-sizing: border-box;
 }
 
-.emotion-2 {
-  margin-bottom: calc(4px * 2);
+.emotion-0 *,
+.emotion-0 *::before,
+.emotion-0 *::after {
+  box-sizing: inherit;
 }
 
 .components-panel__row .emotion-2 {
   margin-bottom: inherit;
 }
 
+.emotion-4 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  gap: calc(4px * 3);
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.emotion-4>* {
+  min-width: 0;
+}
+
 <div
-  className="edit-post-preferences-modal__option"
+  className="interface-preferences-modal__option"
 >
   <div
     className="components-base-control components-toggle-control emotion-0 emotion-1"
@@ -198,27 +324,33 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
     <div
       className="components-base-control__field emotion-2 emotion-3"
     >
-      <span
-        className="components-form-toggle"
+      <div
+        className="components-flex components-h-stack emotion-4 emotion-5"
+        data-wp-c16t={true}
+        data-wp-component="HStack"
       >
-        <input
-          checked={false}
-          className="components-form-toggle__input"
-          id="inspector-toggle-control-1"
-          onChange={[Function]}
-          type="checkbox"
-        />
         <span
-          className="components-form-toggle__track"
+          className="components-form-toggle"
+        >
+          <input
+            checked={false}
+            className="components-form-toggle__input"
+            id="inspector-toggle-control-1"
+            onChange={[Function]}
+            type="checkbox"
+          />
+          <span
+            className="components-form-toggle__track"
+          />
+          <span
+            className="components-form-toggle__thumb"
+          />
+        </span>
+        <label
+          className="components-toggle-control__label"
+          htmlFor="inspector-toggle-control-1"
         />
-        <span
-          className="components-form-toggle__thumb"
-        />
-      </span>
-      <label
-        className="components-toggle-control__label"
-        htmlFor="inspector-toggle-control-1"
-      />
+      </div>
     </div>
   </div>
 </div>

@@ -29,7 +29,7 @@ export default function useMenuLocations() {
 		const fetchMenuLocationsByName = async () => {
 			const newMenuLocationsByName = await apiFetch( {
 				method: 'GET',
-				path: '/__experimental/menu-locations',
+				path: '/wp/v2/menu-locations',
 			} );
 
 			if ( isMounted ) {

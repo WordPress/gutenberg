@@ -82,7 +82,7 @@ describe( 'useDispatch', () => {
 		expect( testAction ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'returns expected action creators from store for given store definition', () => {
+	it( 'returns expected action creators from store for given store descriptor', () => {
 		const noop = () => ( { type: '__INERT__' } );
 		const testAction = jest.fn().mockImplementation( noop );
 		registry.registerStore( 'demoStore', {

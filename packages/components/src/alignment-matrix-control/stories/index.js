@@ -1,44 +1,72 @@
 /**
- * External dependencies
- */
-import { number, select } from '@storybook/addon-knobs';
-/**
  * WordPress dependencies
  */
-import { Icon as BaseIcon } from '@wordpress/icons';
+import { useEffect, useState } from '@wordpress/element';
+import { Icon } from '@wordpress/icons';
+
 /**
  * Internal dependencies
  */
 import AlignmentMatrixControl from '../';
 import { ALIGNMENTS } from '../utils';
-
-const alignmentOptions = ALIGNMENTS.reduce( ( options, item ) => {
-	return { ...options, [ item ]: item };
-}, {} );
+import { HStack } from '../../h-stack';
 
 export default {
-	title: 'Components/AlignmentMatrixControl',
+	title: 'Components (Experimental)/AlignmentMatrixControl',
 	component: AlignmentMatrixControl,
+	subcomponents: {
+		'AlignmentMatrixControl.Icon': AlignmentMatrixControl.Icon,
+	},
+	argTypes: {
+		defaultValue: { options: ALIGNMENTS },
+		onChange: { action: 'onChange', control: { type: null } },
+		label: { control: { type: 'text' } },
+		width: { control: { type: 'number' } },
+		value: { control: { type: null } },
+	},
+	parameters: {
+		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
+	},
 };
 
-export const _default = () => {
-	const props = {
-		value: select( 'value', alignmentOptions, 'center center' ),
-	};
+const Template = ( { defaultValue, onChange, ...props } ) => {
+	const [ value, setValue ] = useState();
 
-	return <AlignmentMatrixControl { ...props } />;
-};
-
-export const icon = () => {
-	const props = {
-		value: select( 'value', alignmentOptions, 'center center' ),
-		size: number( 'size', 24 ),
-	};
+	// Convenience handler for Canvas view so changes are reflected
+	useEffect( () => {
+		setValue( defaultValue );
+	}, [ defaultValue ] );
 
 	return (
-		<BaseIcon
-			icon={ <AlignmentMatrixControl.Icon size={ props.size } /> }
+		<AlignmentMatrixControl
 			{ ...props }
+			onChange={ ( ...changeArgs ) => {
+				setValue( ...changeArgs );
+				onChange( ...changeArgs );
+			} }
+			value={ value }
 		/>
+	);
+};
+export const Default = Template.bind( {} );
+
+export const IconSubcomponent = () => {
+	return (
+		<HStack justify="flex-start">
+			<Icon
+				icon={
+					<AlignmentMatrixControl.Icon size={ 24 } value="top left" />
+				}
+			/>
+			<Icon
+				icon={
+					<AlignmentMatrixControl.Icon
+						size={ 24 }
+						value="center center"
+					/>
+				}
+			/>
+		</HStack>
 	);
 };

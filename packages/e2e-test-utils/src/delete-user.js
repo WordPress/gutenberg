@@ -23,7 +23,7 @@ export async function deleteUser( username ) {
 		return;
 	}
 
-	// Focus to unveil actions
+	// Focus to unveil actions.
 	await userLink.focus();
 
 	// Tab twice to focus 'Delete'
@@ -43,7 +43,7 @@ export async function deleteUser( username ) {
 		await deleteContentRadioButton.click();
 	}
 
-	// Confirm
+	// Confirm.
 	await Promise.all( [
 		page.click( 'input#submit' ),
 		page.waitForNavigation( { waitUntil: 'networkidle0' } ),

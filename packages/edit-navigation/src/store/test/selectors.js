@@ -9,8 +9,6 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import {
 	getNavigationPostForMenu,
 	hasResolvedNavigationPost,
-	getMenuItemForClientId,
-	getSelectedMenuId,
 } from '../selectors';
 import {
 	NAVIGATION_POST_KIND,
@@ -102,49 +100,5 @@ describe( 'hasResolvedNavigationPost', () => {
 		);
 
 		hasResolvedNavigationPost.registry = defaultRegistry;
-	} );
-} );
-
-describe( 'getMenuItemForClientId', () => {
-	it( 'gets menu item for client id', () => {
-		const getMenuItem = jest.fn( () => 'menuItem' );
-
-		const registry = {
-			select: jest.fn( () => ( {
-				getMenuItem,
-			} ) ),
-		};
-
-		const state = {
-			mapping: {
-				postId: {
-					123: 'clientId',
-				},
-			},
-		};
-
-		const defaultRegistry = getMenuItemForClientId.registry;
-		getMenuItemForClientId.registry = registry;
-
-		expect( getMenuItemForClientId( state, 'postId', 'clientId' ) ).toBe(
-			'menuItem'
-		);
-
-		expect( registry.select ).toHaveBeenCalledWith( coreDataStore );
-		expect( getMenuItem ).toHaveBeenCalledWith( '123' );
-
-		getMenuItemForClientId.registry = defaultRegistry;
-	} );
-} );
-
-describe( 'getSelectedMenuId', () => {
-	it( 'returns default selected menu ID (zero)', () => {
-		const state = {};
-		expect( getSelectedMenuId( state ) ).toBe( null );
-	} );
-
-	it( 'returns selected menu ID', () => {
-		const state = { selectedMenuId: 10 };
-		expect( getSelectedMenuId( state ) ).toBe( 10 );
 	} );
 } );

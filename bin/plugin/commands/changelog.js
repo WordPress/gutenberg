@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { countBy, groupBy, escapeRegExp, uniq } = require( 'lodash' );
+const { groupBy, flow } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
@@ -62,13 +62,6 @@ const UNKNOWN_FEATURE_FALLBACK_NAME = 'Uncategorized';
  * @type {Record<string,string>}
  */
 const LABEL_TYPE_MAPPING = {
-	'[Block] Navigation': 'Experiments',
-	'[Block] Post Comments Count': 'Experiments',
-	'[Block] Post Comments Form': 'Experiments',
-	'[Block] Post Comments': 'Experiments',
-	'[Block] Post Hierarchical Terms': 'Experiments',
-	'[Feature] Full Site Editing': 'Experiments',
-	'Global Styles': 'Experiments',
 	'[Feature] Navigation Screen': 'Experiments',
 	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
 	'[Package] Jest Puppeteer aXe': 'Tools',
@@ -89,7 +82,7 @@ const LABEL_TYPE_MAPPING = {
 	'[Type] Enhancement': 'Enhancements',
 	'[Type] New API': 'New APIs',
 	'[Type] Performance': 'Performance',
-	'[Type] Documentation': 'Documentation',
+	'[Type] Developer Documentation': 'Documentation',
 	'[Type] Code Quality': 'Code Quality',
 	'[Type] Security': 'Security',
 };
@@ -143,7 +136,7 @@ const LABEL_FEATURE_MAPPING = {
 	'Automated Testing': 'Testing',
 	'CSS Styling': 'CSS & Styling',
 	'developer-docs': 'Documentation',
-	'[Type] Documentation': 'Documentation',
+	'[Type] Developer Documentation': 'Documentation',
 	'Global Styles': 'Global Styles',
 	'[Type] Build Tooling': 'Build Tooling',
 	'npm Packages': 'npm Packages',
@@ -193,6 +186,17 @@ const REWORD_TERMS = {
 };
 
 /**
+ * Escapes the RegExp special characters.
+ *
+ * @param {string} string Input string.
+ *
+ * @return {string} Regex-escaped string.
+ */
+function escapeRegExp( string ) {
+	return string.replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' );
+}
+
+/**
  * Returns candidates based on whether the given labels
  * are part of the allowed list.
  *
@@ -201,13 +205,15 @@ const REWORD_TERMS = {
  * @return {string[]} Type candidates.
  */
 function getTypesByLabels( labels ) {
-	return uniq(
-		labels
-			.filter( ( label ) =>
-				Object.keys( LABEL_TYPE_MAPPING ).includes( label )
-			)
-			.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
-	);
+	return [
+		...new Set(
+			labels
+				.filter( ( label ) =>
+					Object.keys( LABEL_TYPE_MAPPING ).includes( label )
+				)
+				.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
+		),
+	];
 }
 
 /**
@@ -308,7 +314,17 @@ function getIssueFeature( issue ) {
 	// 1. Prefer explicit mapping of label to feature.
 	if ( featureCandidates.length ) {
 		// Get occurances of the feature labels.
-		const featureCounts = countBy( featureCandidates );
+		const featureCounts = featureCandidates.reduce(
+			/**
+			 * @param {Record<string,number>} acc     Accumulator
+			 * @param {string}                feature Feature label
+			 */
+			( acc, feature ) => ( {
+				...acc,
+				[ feature ]: ( acc[ feature ] || 0 ) + 1,
+			} ),
+			{}
+		);
 
 		// Check which matching label occurs most often.
 		const rankedFeatures = Object.keys( featureCounts ).sort(
@@ -319,7 +335,7 @@ function getIssueFeature( issue ) {
 		return rankedFeatures[ 0 ];
 	}
 
-	// 2. `[Feature]` labels
+	// 2. `[Feature]` labels.
 	const featureSpecificLabel = getFeatureSpecificLabels( labels );
 
 	if ( featureSpecificLabel ) {
@@ -523,7 +539,7 @@ function getNormalizedTitle( title, issue ) {
 }
 
 /**
- * Returns a formatted changelog entry for a given issue object, or undefined
+ * Returns a formatted changelog list item entry for a given issue object, or undefined
  * if entry should be omitted.
  *
  * @param {IssuesListForRepoResponseItem} issue Issue object.
@@ -535,7 +551,25 @@ function getEntry( issue ) {
 
 	return title === undefined
 		? title
-		: `- ${ title } ([${ issue.number }](${ issue.html_url }))`;
+		: '- ' +
+				getFormattedItemDescription(
+					title,
+					issue.number,
+					issue.html_url
+				);
+}
+
+/**
+ * Builds a formatted string of the Issue/PR title with a link
+ * to the Github URL for that item.
+ *
+ * @param {string} title  the title of the Issue/PR.
+ * @param {number} number the ID/number of the Issue/PR.
+ * @param {string} url    the URL of the Github Issue/PR.
+ * @return {string} the formatted item
+ */
+function getFormattedItemDescription( title, number, url ) {
+	return `${ title } ([${ number }](${ url }))`;
 }
 
 /**
@@ -627,6 +661,7 @@ async function fetchAllPullRequests( octokit, settings ) {
 		: undefined;
 
 	const { number } = milestone;
+
 	const issues = await getIssuesByMilestone(
 		octokit,
 		owner,
@@ -635,23 +670,8 @@ async function fetchAllPullRequests( octokit, settings ) {
 		'closed',
 		latestReleaseInSeries ? latestReleaseInSeries.published_at : undefined
 	);
-	return issues.filter( ( issue ) => issue.pull_request );
-}
 
-/**
- * Returns a promise resolving to the changelog string for given settings.
- *
- * @param {WPChangelogSettings} settings Changelog settings.
- *
- * @return {Promise<string>} Promise resolving to changelog.
- */
-async function getChangelog( settings ) {
-	const octokit = new Octokit( {
-		auth: settings.token,
-	} );
-
-	const pullRequests = await fetchAllPullRequests( octokit, settings );
-	if ( ! pullRequests.length ) {
+	if ( ! issues.length ) {
 		if ( settings.unreleased ) {
 			throw new Error(
 				'There are no unreleased pull requests associated with the milestone.'
@@ -663,7 +683,7 @@ async function getChangelog( settings ) {
 		}
 	}
 
-	return formatChangelog( pullRequests );
+	return issues.filter( ( issue ) => issue.pull_request );
 }
 
 /**
@@ -673,10 +693,13 @@ async function getChangelog( settings ) {
  *
  * @return {string} The formatted changelog string.
  */
-function formatChangelog( pullRequests ) {
-	let changelog = '';
+function getChangelog( pullRequests ) {
+	let changelog = '## Changelog\n\n';
 
-	const groupedPullRequests = groupBy( pullRequests, getIssueType );
+	const groupedPullRequests = groupBy(
+		skipCreatedByBots( pullRequests ),
+		getIssueType
+	);
 
 	const sortedGroups = Object.keys( groupedPullRequests ).sort( sortGroup );
 
@@ -748,7 +771,7 @@ function formatChangelog( pullRequests ) {
 function sortFeatureGroups( featureGroups ) {
 	return Object.keys( featureGroups ).sort(
 		( featureAName, featureBName ) => {
-			// Sort "uncategorized" items to *always* be at the top of the section
+			// Sort "uncategorized" items to *always* be at the top of the section.
 			if ( featureAName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
 				return -1;
 			} else if ( featureBName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
@@ -765,6 +788,156 @@ function sortFeatureGroups( featureGroups ) {
 }
 
 /**
+ * Returns a list of PRs created by first time contributors based on the Github
+ * label associated with the PR. Also filters out any "bots".
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ *
+ * @return {IssuesListForRepoResponseItem[]} pullRequests List of first time contributor PRs.
+ */
+function getFirstTimeContributorPRs( pullRequests ) {
+	return pullRequests.filter( ( pr ) => {
+		return pr.labels.find(
+			( { name } ) => name.toLowerCase() === 'first-time contributor'
+		);
+	} );
+}
+
+/**
+ * Creates a set of markdown formatted list items for each first time contributor
+ * and their associated PR.
+ *
+ * @param {IssuesListForRepoResponseItem[]} ftcPRs List of first time contributor PRs.
+ *
+ * @return {string} The formatted markdown list of contributors and their PRs.
+ */
+function getContributorPropsMarkdownList( ftcPRs ) {
+	return ftcPRs.reduce( ( markdownList, pr ) => {
+		const title = getNormalizedTitle( pr.title, pr ) || '';
+
+		const formattedTitle = getFormattedItemDescription(
+			title,
+			pr.number,
+			pr.pull_request.html_url
+		);
+
+		markdownList +=
+			'- ' + '@' + pr.user.login + ': ' + formattedTitle + '\n';
+		return markdownList;
+	}, '' );
+}
+
+/**
+ * Sorts a given Issue/PR by the username of the user who created.
+ *
+ * @param {IssuesListForRepoResponseItem[]} items List of pull requests.
+ * @return {IssuesListForRepoResponseItem[]} The sorted list of pull requests.
+ */
+function sortByUsername( items ) {
+	return [ ...items ].sort( ( a, b ) =>
+		a.user.login.toLowerCase().localeCompare( b.user.login.toLowerCase() )
+	);
+}
+
+/**
+ * Removes duplicate PRs by the username of the user who created.
+ *
+ * @param {IssuesListForRepoResponseItem[]} items List of pull requests.
+ * @return {IssuesListForRepoResponseItem[]} The list of pull requests unique per user.
+ */
+function getUniqueByUsername( items ) {
+	/**
+	 * @type {IssuesListForRepoResponseItem[]} List of pull requests.
+	 */
+	const EMPTY_PR_LIST = [];
+
+	return items.reduce( ( acc, item ) => {
+		if ( ! acc.some( ( i ) => i.user.login === item.user.login ) ) {
+			acc.push( item );
+		}
+		return acc;
+	}, EMPTY_PR_LIST );
+}
+
+/**
+ * Excludes users who should not be included in the changelog.
+ * Typically this is "bot" users.
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ * @return {IssuesListForRepoResponseItem[]} The list of filtered pull requests.
+ */
+function skipCreatedByBots( pullRequests ) {
+	return pullRequests.filter(
+		( pr ) => pr.user.type.toLowerCase() !== 'bot'
+	);
+}
+
+/**
+ * Produces the formatted markdown for the contributor props seciton.
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ *
+ * @return {string} The formatted props section.
+ */
+function getContributorProps( pullRequests ) {
+	const contributorsList = flow( [
+		skipCreatedByBots,
+		getFirstTimeContributorPRs,
+		getUniqueByUsername,
+		sortByUsername,
+		getContributorPropsMarkdownList,
+	] )( pullRequests );
+
+	return (
+		'## First time contributors' +
+		'\n\n' +
+		'The following PRs were merged by first time contributors:' +
+		'\n\n' +
+		contributorsList
+	);
+}
+
+/**
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of first time contributor PRs.
+ * @return {string} The formatted markdown list of contributor usernames.
+ */
+function getContributorsMarkdownList( pullRequests ) {
+	return pullRequests
+		.reduce( ( markdownList = '', pr ) => {
+			markdownList += ` @${ pr.user.login }`;
+			return markdownList;
+		}, '' )
+		.trim();
+}
+
+/**
+ * Produces the formatted markdown for the full time contributors section of
+ * the changelog output.
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ *
+ * @return {string} The formatted contributors section.
+ */
+function getContributorsList( pullRequests ) {
+	const contributorsList = flow( [
+		skipCreatedByBots,
+		getUniqueByUsername,
+		sortByUsername,
+		getContributorsMarkdownList,
+	] )( pullRequests );
+
+	return (
+		'\n\n' +
+		'## Contributors' +
+		'\n\n' +
+		'The following contributors merged PRs in this release:' +
+		'\n\n' +
+		contributorsList
+	);
+}
+
+/**
  * Generates and logs changelog for a milestone.
  *
  * @param {WPChangelogSettings} settings Changelog settings.
@@ -776,16 +949,31 @@ async function createChangelog( settings ) {
 		)
 	);
 
-	let changelog;
+	const octokit = new Octokit( {
+		auth: settings.token,
+	} );
+
+	let releaselog = '';
+
 	try {
-		changelog = await getChangelog( settings );
+		const pullRequests = await fetchAllPullRequests( octokit, settings );
+
+		const changelog = getChangelog( pullRequests );
+		const contributorProps = getContributorProps( pullRequests );
+		const contributorsList = getContributorsList( pullRequests );
+
+		releaselog = releaselog.concat(
+			changelog,
+			contributorProps,
+			contributorsList
+		);
 	} catch ( error ) {
 		if ( error instanceof Error ) {
-			changelog = formats.error( error.stack );
+			releaselog = formats.error( error.stack );
 		}
 	}
 
-	log( changelog );
+	log( releaselog );
 }
 
 /**
@@ -815,7 +1003,7 @@ async function getReleaseChangelog( options ) {
 	} );
 }
 
-/** @type {NodeJS.Module} */ ( module ).exports = {
+/** @type {NodeJS.Module} */ module.exports = {
 	reword,
 	capitalizeAfterColonSeparatedPrefix,
 	createOmitByTitlePrefix,
@@ -828,5 +1016,10 @@ async function getReleaseChangelog( options ) {
 	sortGroup,
 	getTypesByLabels,
 	getTypesByTitle,
-	formatChangelog,
+	getFormattedItemDescription,
+	getContributorProps,
+	getContributorsList,
+	getChangelog,
+	getUniqueByUsername,
+	skipCreatedByBots,
 };

@@ -103,6 +103,10 @@
 .cellRowContainer {
 	flex-direction: row;
 	align-items: center;
+	flex-shrink: 1;
+}
+
+.cellRowIcon {
 	flex-shrink: 0;
 }
 

@@ -4,8 +4,7 @@
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	InnerBlocks,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-	__experimentalBlockContentOverlay as BlockContentOverlay,
+	useInnerBlocksProps,
 	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -15,9 +14,8 @@ export default function TemplatePartInnerBlocks( {
 	postId: id,
 	hasInnerBlocks,
 	layout,
-	tagName,
+	tagName: TagName,
 	blockProps,
-	clientId,
 } ) {
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -42,11 +40,5 @@ export default function TemplatePartInnerBlocks( {
 		__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
 	} );
 
-	return (
-		<BlockContentOverlay
-			clientId={ clientId }
-			tagName={ tagName }
-			wrapperProps={ innerBlocksProps }
-		/>
-	);
+	return <TagName { ...innerBlocksProps } />;
 }

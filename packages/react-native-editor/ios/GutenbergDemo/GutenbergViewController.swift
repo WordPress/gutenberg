@@ -27,7 +27,6 @@ class GutenbergViewController: UIViewController {
         super.viewDidLoad()
         configureNavigationBar()
         gutenberg.delegate = self
-        navigationController?.navigationBar.isTranslucent = false
         registerLongPressGestureRecognizer()
 
         _ = try! FallbackJavascriptInjection(blockHTML: "Hello", userId: "1")
@@ -89,9 +88,9 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             case .image:
                 if(allowMultipleSelection) {
                     callback([MediaInfo(id: 1, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image"),
-                              MediaInfo(id: 3, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain")])
+                              MediaInfo(id: 3, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain", alt: "A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground")])
                 } else {
-                    callback([MediaInfo(id: 1, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain")])
+                    callback([MediaInfo(id: 1, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain", alt: "A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground")])
                 }
             case .video:
                 if(allowMultipleSelection) {
@@ -256,6 +255,18 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestSetBlockTypeImpressions(_ impressions: [String: Int]) -> Void {
         print("Gutenberg requested setting block type impressions to \(impressions).")
     }
+
+    func gutenbergDidRequestContactCustomerSupport() {
+        print(#function)
+    }
+
+    func gutenbergDidRequestGotoCustomerSupportOptions() {
+        print(#function)
+    }
+
+    func gutenbergDidRequestSendEventToHost(_ eventName: String, properties: [AnyHashable: Any]) -> Void {
+        print("Gutenberg requested sending '\(eventName)' event to host with propreties: \(properties).")
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {
@@ -295,6 +306,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return nil
     }
 
+    func gutenbergHostAppNamespace() -> String {
+        return "WordPress"
+    }
+
     func gutenbergFeaturedImageId() -> NSNumber? {
         return nil
     }
@@ -306,10 +321,13 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .mediaFilesCollectionBlock: true,
+            .tiledGalleryBlock: true,
             .isAudioBlockMediaUploadEnabled: true,
             .reusableBlock: false,
-            .editorOnboarding: false,
-            .firstGutenbergEditorSession: false,
+            .facebookEmbed: true,
+            .instagramEmbed: true,
+            .loomEmbed: true,
+            .smartframeEmbed: true,
         ]
     }
 
@@ -385,7 +403,7 @@ extension GutenbergViewController {
     
     var showEditorHelpAction: UIAlertAction {
         return UIAlertAction(
-            title: "Help",
+            title: "Help & Support",
             style: .default,
             handler: { [unowned self] action in
                 self.showEditorHelp()

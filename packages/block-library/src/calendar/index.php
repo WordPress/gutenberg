@@ -19,7 +19,7 @@ function render_block_core_calendar( $attributes ) {
 	// when there are no published posts on the site.
 	if ( ! block_core_calendar_has_published_posts() ) {
 		if ( is_user_logged_in() ) {
-			return '<div>' . __( 'The calendar block is hidden because there are no published posts.', 'gutenberg' ) . '</div>';
+			return '<div>' . __( 'The calendar block is hidden because there are no published posts.' ) . '</div>';
 		}
 		return '';
 	}
@@ -30,8 +30,8 @@ function render_block_core_calendar( $attributes ) {
 	if ( isset( $attributes['month'] ) && isset( $attributes['year'] ) ) {
 		$permalink_structure = get_option( 'permalink_structure' );
 		if (
-			strpos( $permalink_structure, '%monthnum%' ) !== false &&
-			strpos( $permalink_structure, '%year%' ) !== false
+			str_contains( $permalink_structure, '%monthnum%' ) &&
+			str_contains( $permalink_structure, '%year%' )
 		) {
 			// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 			$monthnum = $attributes['month'];
@@ -85,7 +85,7 @@ function block_core_calendar_has_published_posts() {
 	}
 
 	// On single sites we try our own cached option first.
-	$has_published_posts = get_option( 'gutenberg_calendar_block_has_published_posts', null );
+	$has_published_posts = get_option( 'wp_calendar_block_has_published_posts', null );
 	if ( null !== $has_published_posts ) {
 		return (bool) $has_published_posts;
 	}
@@ -103,7 +103,7 @@ function block_core_calendar_has_published_posts() {
 function block_core_calendar_update_has_published_posts() {
 	global $wpdb;
 	$has_published_posts = (bool) $wpdb->get_var( "SELECT 1 as test FROM {$wpdb->posts} WHERE post_type = 'post' AND post_status = 'publish' LIMIT 1" );
-	update_option( 'gutenberg_calendar_block_has_published_posts', $has_published_posts );
+	update_option( 'wp_calendar_block_has_published_posts', $has_published_posts );
 	return $has_published_posts;
 }
 

@@ -12,8 +12,6 @@ To follow along with this tutorial, you can [download the accompanying WordPress
 
 ## Code Syntax
 
-Code snippets are provided in "ESNext". ESNext refers to the next versions of the language standard, plus JSX syntax.
-
-Note that it is not required to use ESNext to create blocks or extend the editor, you can use classic JavaScript. However, once familiar with ESNext, developers find it is easier to read and write, thus most code examples you'll find use the ESNext syntax.
+Code snippets are provided using JSX syntax. Note it is not required to use JSX to create blocks or extend the editor, you can use plain JavaScript. However, once familiar with JSX, many developers tend find it is easier to read and write, thus most code examples you'll find use that syntax.
 
 -   [Start custom block editor tutorial](/docs/reference-guides/platform/custom-block-editor/tutorial.md)

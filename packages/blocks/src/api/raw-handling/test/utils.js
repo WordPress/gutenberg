@@ -39,6 +39,9 @@ jest.mock( '@wordpress/data', () => {
 			const mock = jest.fn();
 			return mock;
 		},
+		createRegistryControl() {
+			return jest.fn();
+		},
 	};
 } );
 

@@ -28,13 +28,7 @@ function render_block_core_widget_group( $attributes, $content, $block ) {
 	$html = '';
 
 	if ( ! empty( $attributes['title'] ) ) {
-		$title = $attributes['title'];
-	} elseif ( ! empty( $block->inner_blocks ) ) {
-		$title = $block->inner_blocks[0]->block_type->title;
-	}
-
-	if ( isset( $title ) ) {
-		$html .= $before_title . $title . $after_title;
+		$html .= $before_title . $attributes['title'] . $after_title;
 	}
 
 	$html .= '<div class="wp-widget-group__inner-blocks">';

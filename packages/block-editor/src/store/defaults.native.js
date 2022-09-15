@@ -8,6 +8,8 @@ import {
 
 const SETTINGS_DEFAULTS = {
 	...SETTINGS,
+	// Don't add the default font sizes for standard themes
+	fontSizes: undefined,
 	// FOR TESTING ONLY - Later, this will come from a REST API
 	// eslint-disable-next-line no-undef
 	__unstableGalleryWithImageBlocks: __DEV__,

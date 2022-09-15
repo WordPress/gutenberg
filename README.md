@@ -19,6 +19,8 @@ The block editor introduces a modular approach to pages and posts: each piece of
 
 The block editor first became available in December 2018, and we're still hard at work refining the experience, creating more and better blocks, and laying the groundwork for the next three phases of work. The Gutenberg plugin gives you the latest version of the block editor so you can join us in testing bleeding-edge features, start playing with blocks, and maybe get inspired to build your own.
 
+Check out the [Ways to keep up with Gutenberg & Full Site Editing (FSE)](https://make.wordpress.org/core/2020/05/20/ways-to-keep-up-with-full-site-editing-fse/)
+
 ## Getting Started
 
 Get hands on: check out the [block editor live demo](https://wordpress.org/gutenberg/) to play with a test instance of the editor.
@@ -35,13 +37,17 @@ Get hands on: check out the [block editor live demo](https://wordpress.org/guten
 
 Extending and customizing is at the heart of the WordPress platform, this is no different for the Gutenberg project. The editor and future products can be extended by third-party developers using plugins.
 
-Review the [Create a Block tutorial](/docs/getting-started/tutorials/create-block/README.md) for the fastest way to get started extending the block editor. See the [Developer Documentation](https://developer.wordpress.org/block-editor/#develop-for-the-block-editor) for extensive tutorials, documentation, and API references.
+Review the [Create a Block tutorial](/docs/getting-started/create-block/README.md) for the fastest way to get started extending the block editor. See the [Developer Documentation](https://developer.wordpress.org/block-editor/#develop-for-the-block-editor) for extensive tutorials, documentation, and API references.
 
 ### Contribute to Gutenberg
 
-Gutenberg is an open-source project and welcomes all contributors from code to design, from documentation to triage. The project is built by many contributors and volunteers and we'd love your help building it.
+Gutenberg is an open-source project and welcomes all contributors from code to design, and from documentation to triage. The project is built by many contributors and volunteers and we'd love your help building it.
 
-See the [Contributors Handbook](https://developer.wordpress.org/block-editor/contributors/) for all the details on how you can contribute. See [CONTRIBUTING.md](https://github.com/WordPress/gutenberg/blob/HEAD/CONTRIBUTING.md) for the contributing guidelines.
+See the [Contributors Handbook](https://developer.wordpress.org/block-editor/contributors/) for all the details on how you can contribute. 
+
+To get up and running quickly with **code contribution** see [Getting Started With Code Contribution](/docs/contributors/code/getting-started-with-code-contribution.md). Also check out the other resources available on the [Code Contributions](/docs/contributors/code/README.md) page.
+
+In whichever way you wish to contribute please be sure to read the [Contributing Guidelines](https://github.com/WordPress/gutenberg/blob/HEAD/CONTRIBUTING.md) first.
 
 As with all WordPress projects, we want to ensure a welcoming environment for everyone. With that in mind, all contributors are expected to follow our [Code of Conduct](https://github.com/WordPress/gutenberg/blob/HEAD/CODE_OF_CONDUCT.md).
 
@@ -49,7 +55,7 @@ As with all WordPress projects, we want to ensure a welcoming environment for ev
 
 You can join us in the `#core-editor` channel in Slack, see the [WordPress Slack page](https://make.wordpress.org/chat/) for signup information; it is free to join.
 
-**Weekly meetings** The Editor Team meets weekly on Wednesdays at 14:00 UTC in Slack. If you can not join the meeting, agenda and notes are posted to the [Make WordPress Blog](https://make.wordpress.org/core/).
+**Weekly meetings** The Editor Team meets weekly on Wednesdays at 14:00 UTC in Slack. If you can not join the meeting, [agenda](https://make.wordpress.org/core/tag/core-editor-agenda/) and [notes](https://make.wordpress.org/core/tag/core-editor-summary/) are posted to the [Make WordPress Blog](https://make.wordpress.org/core/).
 
 ## License
 

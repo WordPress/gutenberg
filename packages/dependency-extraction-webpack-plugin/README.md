@@ -17,7 +17,7 @@ Install the module
 npm install @wordpress/dependency-extraction-webpack-plugin --save-dev
 ```
 
-**Note**: This package requires Node.js 12.0.0 or later. It also requires webpack 4.8.3 and newer. It is not compatible with older versions.
+**Note**: This package requires Node.js 14.0.0 or later. It also requires webpack 4.8.3 and newer. It is not compatible with older versions.
 
 ## Usage
 
@@ -107,6 +107,13 @@ module.exports = {
 
 The output format for the generated asset file. There are two options available: 'php' or 'json'.
 
+##### `outputFilename`
+
+-   Type: string | function
+-   Default: null
+
+The filename for the generated asset file. Accepts the same values as the Webpack `output.filename` option.
+
 ##### `combineAssets`
 
 -   Type: boolean
@@ -134,6 +141,14 @@ Pass `useDefaults: false` to disable the default request handling.
 -   Default: `false`
 
 Force `wp-polyfill` to be included in each entry point's dependency list. This would be the same as adding `import '@wordpress/polyfill';` to each entry point.
+
+##### `externalizedReport`
+
+-   Type: boolean | string
+-   Default: `false`
+
+Report all externalized dependencies as an array in JSON format. It could be used for further manual or automated inspection.
+You can provide a filename, or set it to `true` to report to a default `externalized-dependencies.json`.
 
 ##### `requestToExternal`
 
@@ -218,4 +233,10 @@ $script_url = plugins_url( $script_path, __FILE__ );
 wp_enqueue_script( 'script', $script_url, $script_asset['dependencies'], $script_asset['version'] );
 ```
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

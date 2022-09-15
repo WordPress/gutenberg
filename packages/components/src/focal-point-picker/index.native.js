@@ -3,7 +3,6 @@
  */
 import { Animated, PanResponder, View } from 'react-native';
 import Video from 'react-native-video';
-import { clamp } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,10 +23,11 @@ import FocalPoint from './focal-point';
 import Tooltip from './tooltip';
 import styles from './style.scss';
 import { isVideoType } from './utils';
+import { clamp } from '../utils/math';
 
 const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 100;
-const FOCAL_POINT_UNITS = [ { default: '50', label: '%', value: '%' } ];
+const FOCAL_POINT_UNITS = [ { default: 50, label: '%', value: '%' } ];
 
 function FocalPointPicker( props ) {
 	const { focalPoint, onChange, shouldEnableBottomSheetScroll, url } = props;
@@ -40,8 +40,8 @@ function FocalPointPicker( props ) {
 	const [ videoNaturalSize, setVideoNaturalSize ] = useState( null );
 	const [ tooltipVisible, setTooltipVisible ] = useState( false );
 
-	let locationPageOffsetX = useRef().current;
-	let locationPageOffsetY = useRef().current;
+	const locationPageOffsetX = useRef();
+	const locationPageOffsetY = useRef();
 	const videoRef = useRef( null );
 
 	useEffect( () => {
@@ -53,7 +53,7 @@ function FocalPointPicker( props ) {
 		} );
 	}, [] );
 
-	// Animated coordinates for drag handle
+	// Animated coordinates for drag handle.
 	const pan = useRef( new Animated.ValueXY() ).current;
 
 	/**
@@ -67,9 +67,9 @@ function FocalPointPicker( props ) {
 				y: focalPoint.y * containerSize.height,
 			} );
 		}
-	}, [ focalPoint, containerSize ] );
+	}, [ focalPoint, containerSize, pan ] );
 
-	// Pan responder to manage drag handle interactivity
+	// Pan responder to manage drag handle interactivity.
 	const panResponder = useMemo(
 		() =>
 			PanResponder.create( {
@@ -86,28 +86,28 @@ function FocalPointPicker( props ) {
 						pageX,
 						pageY,
 					} = event.nativeEvent;
-					locationPageOffsetX = pageX - x;
-					locationPageOffsetY = pageY - y;
-					pan.setValue( { x, y } ); // Set cursor to tap location
-					pan.extractOffset(); // Set offset to current value
+					locationPageOffsetX.current = pageX - x;
+					locationPageOffsetY.current = pageY - y;
+					pan.setValue( { x, y } ); // Set cursor to tap location.
+					pan.extractOffset(); // Set offset to current value.
 				},
-				// Move cursor to match delta drag
+				// Move cursor to match delta drag.
 				onPanResponderMove: Animated.event(
 					[ null, { dx: pan.x, dy: pan.y } ],
 					{ useNativeDriver: false }
 				),
 				onPanResponderRelease: ( event ) => {
 					shouldEnableBottomSheetScroll( true );
-					pan.flattenOffset(); // Flatten offset into value
+					pan.flattenOffset(); // Flatten offset into value.
 					const { pageX, pageY } = event.nativeEvent;
 					// Ideally, x and y below are merely locationX and locationY from the
 					// nativeEvent. However, we are required to compute these relative
 					// coordinates to workaround a bug affecting Android's PanResponder.
 					// Specifically, dragging the handle outside the bounds of the image
 					// results in inaccurate locationX and locationY coordinates to be
-					// reported. https://git.io/JtWmi
-					const x = pageX - locationPageOffsetX;
-					const y = pageY - locationPageOffsetY;
+					// reported. https://github.com/facebook/react-native/issues/15290#issuecomment-435494944
+					const x = pageX - locationPageOffsetX.current;
+					const y = pageY - locationPageOffsetY.current;
 					onChange( {
 						x: clamp( x / containerSize?.width, 0, 1 ).toFixed( 2 ),
 						y: clamp( y / containerSize?.height, 0, 1 ).toFixed(
@@ -116,11 +116,11 @@ function FocalPointPicker( props ) {
 					} );
 					// Slider (child of RangeCell) is uncontrolled, so we must increment a
 					// key to re-mount and sync the pan gesture values to the sliders
-					// https://git.io/JTe4A
+					// https://github.com/callstack/react-native-slider/tree/v3.0.3#value
 					setSliderKey( ( prevState ) => prevState + 1 );
 				},
 			} ),
-		[ containerSize ]
+		[ containerSize, pan, onChange, shouldEnableBottomSheetScroll ]
 	);
 
 	const mediaBackground = usePreferredColorSchemeStyle(
@@ -193,7 +193,7 @@ function FocalPointPicker( props ) {
 		setVideoNaturalSize( { height, width } );
 		setDisplayPlaceholder( false );
 		// Avoid invisible, paused video on Android, presumably related to
-		// https://git.io/Jt6Dr
+		// https://github.com/react-native-video/react-native-video/issues/1979
 		videoRef?.current.seek( 0 );
 	};
 	const onXCoordinateChange = ( x ) =>

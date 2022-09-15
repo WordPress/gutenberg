@@ -5,7 +5,8 @@ const baseConfig = require( '@wordpress/scripts/config/jest-e2e.config' );
 
 module.exports = {
 	...baseConfig,
-	setupFiles: [ '<rootDir>/config/gutenberg-phase.js' ],
+	testMatch: [ '<rootDir>/specs/**/*.test.js' ],
+	setupFiles: [ '<rootDir>/config/is-gutenberg-plugin.js' ],
 	setupFilesAfterEnv: [
 		'<rootDir>/config/setup-test-framework.js',
 		'@wordpress/jest-console',
@@ -20,9 +21,6 @@ module.exports = {
 	reporters: [
 		...baseConfig.reporters,
 		// Report flaky tests results into artifacts for used in `report-flaky-tests` action.
-		// Currently it will only run on trunk but will roll out to all PRs when mature.
-		process.env.CI &&
-			process.env.GITHUB_EVENT_NAME !== 'pull_request' &&
-			'<rootDir>/config/flaky-tests-reporter.js',
+		process.env.CI && '<rootDir>/config/flaky-tests-reporter.js',
 	].filter( Boolean ),
 };

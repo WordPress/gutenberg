@@ -1,0 +1,12 @@
+[
+	{
+		"name": "core/comment-author-name",
+		"isValid": true,
+		"attributes": {
+			"isLink": false,
+			"linkTarget": "_self",
+			"fontFamily": "cambria-georgia"
+		},
+		"innerBlocks": []
+	}
+]

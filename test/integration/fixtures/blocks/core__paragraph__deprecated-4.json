@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/paragraph",
 		"isValid": true,
 		"attributes": {
@@ -8,7 +7,6 @@
 			"content": "... like this one, which is separate from the above and right aligned.",
 			"dropCap": false
 		},
-		"innerBlocks": [],
-		"originalContent": "<p style=\"text-align:right;\">... like this one, which is separate from the above and right aligned.</p>"
+		"innerBlocks": []
 	}
 ]

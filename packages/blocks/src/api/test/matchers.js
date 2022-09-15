@@ -23,7 +23,7 @@ describe( 'matchers', () => {
 
 		it( 'should return HTML equivalent WPElement of matched element', () => {
 			// Assumption here is that we can cleanly convert back and forth
-			// between a string and WPElement representation
+			// between a string and WPElement representation.
 			const html =
 				'<blockquote><p>A delicious sundae dessert</p></blockquote>';
 			const match = parse( html, sources.children() );
@@ -41,7 +41,7 @@ describe( 'matchers', () => {
 
 		it( 'should return HTML equivalent WPElement of matched element', () => {
 			// Assumption here is that we can cleanly convert back and forth
-			// between a string and WPElement representation
+			// between a string and WPElement representation.
 			const html =
 				'<blockquote><p>A delicious sundae dessert</p></blockquote>';
 			const match = parse( html, sources.node() );

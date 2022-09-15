@@ -9,7 +9,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import InsertionPoint, { InsertionPointOpenRef } from './insertion-point';
-import BlockPopover from './block-popover';
+import BlockPopover from './selected-block-popover';
 
 export default function BlockToolsBackCompat( { children } ) {
 	const openRef = useContext( InsertionPointOpenRef );
@@ -22,6 +22,7 @@ export default function BlockToolsBackCompat( { children } ) {
 
 	deprecated( 'wp.components.Popover.Slot name="block-toolbar"', {
 		alternative: 'wp.blockEditor.BlockTools',
+		since: '5.8',
 	} );
 
 	return (

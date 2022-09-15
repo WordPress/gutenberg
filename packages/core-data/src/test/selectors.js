@@ -24,8 +24,7 @@ import {
 	getCurrentUser,
 	getReferenceByDistinctEdits,
 } from '../selectors';
-
-// getEntityRecord and __experimentalGetEntityRecordNoResolver selectors share the same tests
+// getEntityRecord and __experimentalGetEntityRecordNoResolver selectors share the same tests.
 describe.each( [
 	[ getEntityRecord ],
 	[ __experimentalGetEntityRecordNoResolver ],
@@ -33,7 +32,7 @@ describe.each( [
 	it( 'should return undefined for unknown entity kind, name', () => {
 		const state = deepFreeze( {
 			entities: {
-				data: {
+				records: {
 					root: {
 						postType: {
 							queriedData: {
@@ -52,7 +51,7 @@ describe.each( [
 	it( 'should return undefined for unknown record’s key', () => {
 		const state = deepFreeze( {
 			entities: {
-				data: {
+				records: {
 					root: {
 						postType: {
 							queriedData: {
@@ -71,7 +70,7 @@ describe.each( [
 	it( 'should return a record by key', () => {
 		const state = deepFreeze( {
 			entities: {
-				data: {
+				records: {
 					root: {
 						postType: {
 							queriedData: {
@@ -106,7 +105,7 @@ describe.each( [
 	it( 'should return filtered item if complete item received, filtered item requested', () => {
 		const state = deepFreeze( {
 			entities: {
-				data: {
+				records: {
 					postType: {
 						post: {
 							queriedData: {
@@ -143,7 +142,7 @@ describe( 'hasEntityRecords', () => {
 	it( 'returns false if entity records have not been received', () => {
 		const state = deepFreeze( {
 			entities: {
-				data: {
+				records: {
 					root: {
 						postType: {
 							queriedData: {
@@ -160,20 +159,20 @@ describe( 'hasEntityRecords', () => {
 		expect( hasEntityRecords( state, 'root', 'postType' ) ).toBe( false );
 	} );
 
-	it( 'returns true if the entity configuration is not known', () => {
+	it( 'returns false if the entity configuration is not known', () => {
 		const state = deepFreeze( {
 			entities: {
-				data: {},
+				records: {},
 			},
 		} );
 
-		expect( hasEntityRecords( state, 'root', 'postType' ) ).toBe( true );
+		expect( hasEntityRecords( state, 'root', 'postType' ) ).toBe( false );
 	} );
 
 	it( 'returns true if entity records have been received', () => {
 		const state = deepFreeze( {
 			entities: {
-				data: {
+				records: {
 					root: {
 						postType: {
 							queriedData: {
@@ -240,7 +239,7 @@ describe( 'getRawEntityRecord', () => {
 						name: 'someName',
 					},
 				],
-				data: { ...data },
+				records: { ...data },
 			},
 		} );
 		expect(
@@ -262,7 +261,7 @@ describe( 'getRawEntityRecord', () => {
 						rawAttributes: [ 'title' ],
 					},
 				],
-				data: { ...data },
+				records: { ...data },
 			},
 		} );
 		expect(
@@ -279,7 +278,7 @@ describe( 'getEntityRecords', () => {
 	it( 'should return null by default', () => {
 		const state = deepFreeze( {
 			entities: {
-				data: {
+				records: {
 					root: {
 						postType: {
 							queriedData: {
@@ -295,20 +294,20 @@ describe( 'getEntityRecords', () => {
 		expect( getEntityRecords( state, 'root', 'postType' ) ).toBe( null );
 	} );
 
-	it( 'should return an empty array for an unknown entity configuration', () => {
+	it( 'should return null for an unknown entity configuration', () => {
 		const state = deepFreeze( {
 			entities: {
-				data: {},
+				records: {},
 			},
 		} );
 
-		expect( getEntityRecords( state, 'root', 'postType' ) ).toEqual( [] );
+		expect( getEntityRecords( state, 'root', 'postType' ) ).toBe( null );
 	} );
 
 	it( 'should return all the records', () => {
 		const state = deepFreeze( {
 			entities: {
-				data: {
+				records: {
 					root: {
 						postType: {
 							queriedData: {
@@ -344,7 +343,7 @@ describe( 'getEntityRecords', () => {
 	it( 'should return filtered items', () => {
 		const state = deepFreeze( {
 			entities: {
-				data: {
+				records: {
 					postType: {
 						post: {
 							queriedData: {
@@ -383,7 +382,7 @@ describe( 'getEntityRecords', () => {
 	it( 'should return the same instance with the same arguments', () => {
 		let state = deepFreeze( {
 			entities: {
-				data: {},
+				records: {},
 			},
 		} );
 
@@ -398,7 +397,7 @@ describe( 'getEntityRecords', () => {
 			'wp_block'
 		);
 
-		// Simulate update states
+		// Simulate update states.
 		state = { ...state };
 
 		const postTypeSecondRecords = getEntityRecords(
@@ -418,7 +417,7 @@ describe( 'getEntityRecords', () => {
 } );
 
 describe( '__experimentalGetDirtyEntityRecords', () => {
-	it( 'should return a map of objects with each raw edited entity record and its corresponding edits', () => {
+	it( 'returns a map of objects with each raw edited entity record and its corresponding edits', () => {
 		const state = deepFreeze( {
 			entities: {
 				config: [
@@ -428,7 +427,7 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 						transientEdits: { someTransientEditProperty: true },
 					},
 				],
-				data: {
+				records: {
 					someKind: {
 						someName: {
 							queriedData: {
@@ -466,6 +465,61 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 			{ kind: 'someKind', name: 'someName', key: 'someKey', title: '' },
 		] );
 	} );
+
+	it( 'excludes entity records that no longer exist', () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+						transientEdits: { someTransientEditProperty: true },
+					},
+				],
+				records: {
+					someKind: {
+						someName: {
+							queriedData: {
+								items: {
+									default: {
+										someKey: {
+											someProperty: 'somePersistedValue',
+											someRawProperty: {
+												raw: 'somePersistedRawValue',
+											},
+											id: 'someKey',
+										},
+									},
+								},
+								itemIsComplete: {
+									default: {
+										someKey: true,
+									},
+								},
+							},
+							edits: {
+								someKey: {
+									someProperty: 'someEditedValue',
+									someRawProperty: 'someEditedRawValue',
+									someTransientEditProperty:
+										'someEditedTransientEditValue',
+								},
+								deletedKey: {
+									someProperty: 'someEditedValue',
+									someRawProperty: 'someEditedRawValue',
+									someTransientEditProperty:
+										'someEditedTransientEditValue',
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect( __experimentalGetDirtyEntityRecords( state ) ).toEqual( [
+			{ kind: 'someKind', name: 'someName', key: 'someKey', title: '' },
+		] );
+	} );
 } );
 
 describe( '__experimentalGetEntitiesBeingSaved', () => {
@@ -479,7 +533,7 @@ describe( '__experimentalGetEntitiesBeingSaved', () => {
 						transientEdits: { someTransientEditProperty: true },
 					},
 				],
-				data: {
+				records: {
 					someKind: {
 						someName: {
 							queriedData: {
@@ -519,7 +573,7 @@ describe( '__experimentalGetEntitiesBeingSaved', () => {
 describe( 'getEntityRecordNonTransientEdits', () => {
 	it( 'should return an empty object when the entity does not have a loaded config.', () => {
 		const state = deepFreeze( {
-			entities: { config: [], data: {} },
+			entities: { config: [], records: {} },
 		} );
 		expect(
 			getEntityRecordNonTransientEdits(
@@ -543,11 +597,11 @@ describe( 'getEmbedPreview()', () => {
 
 		state = deepFreeze( {
 			embedPreviews: {
-				'http://example.com/': { data: 42 },
+				'http://example.com/': { records: 42 },
 			},
 		} );
 		expect( getEmbedPreview( state, 'http://example.com/' ) ).toEqual( {
-			data: 42,
+			records: 42,
 		} );
 	} );
 } );
@@ -557,8 +611,7 @@ describe( 'isPreviewEmbedFallback()', () => {
 		const state = deepFreeze( {
 			embedPreviews: {
 				'http://example.com/': {
-					html:
-						'<a href="http://example.com/">http://example.com/</a>',
+					html: '<a href="http://example.com/">http://example.com/</a>',
 				},
 			},
 		} );
@@ -599,7 +652,7 @@ describe( 'canUserEditEntityRecord', () => {
 	it( 'returns false by default', () => {
 		const state = deepFreeze( {
 			userPermissions: {},
-			entities: { data: {} },
+			entities: { records: {} },
 		} );
 		expect( canUserEditEntityRecord( state, 'postType', 'post' ) ).toBe(
 			false
@@ -620,7 +673,7 @@ describe( 'canUserEditEntityRecord', () => {
 						__unstable_rest_base: 'posts',
 					},
 				],
-				data: {
+				records: {
 					root: {
 						postType: {
 							queriedData: {

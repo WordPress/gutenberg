@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
-import { compact } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,6 +26,7 @@ const EmbedPlaceholder = ( {
 	cannotEmbed,
 	fallback,
 	tryAgain,
+	openEmbedLinkSettings,
 } ) => {
 	const containerStyle = usePreferredColorSchemeStyle(
 		styles.embed__container,
@@ -59,12 +59,19 @@ const EmbedPlaceholder = ( {
 			value: 'convertToLinkOption',
 			onSelect: fallback,
 		},
+		editLink: {
+			id: 'editLinkOption',
+			label: __( 'Edit link' ),
+			value: 'editLinkOption',
+			onSelect: openEmbedLinkSettings,
+		},
 	};
 
-	const options = compact( [
+	const options = [
 		cannotEmbed && errorPickerOptions.retry,
 		cannotEmbed && errorPickerOptions.convertToLink,
-	] );
+		cannotEmbed && errorPickerOptions.editLink,
+	].filter( Boolean );
 
 	function onPickerSelect( value ) {
 		const selectedItem = options.find( ( item ) => item.value === value );

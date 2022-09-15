@@ -7,6 +7,10 @@ import styled from '@emotion/styled';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import {
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -35,9 +39,11 @@ export const _default = () => {
 	return (
 		<PanelWrapperView>
 			<Panel>
-				<ToolsPanel label="Tools Panel" resetAll={ resetAll }>
-					<ToolsPanelItem
-						className="single-column"
+				<ToolsPanel
+					label="Tools Panel (default example)"
+					resetAll={ resetAll }
+				>
+					<SingleColumnItem
 						hasValue={ () => !! width }
 						label="Width"
 						onDeselect={ () => setWidth( undefined ) }
@@ -48,9 +54,8 @@ export const _default = () => {
 							value={ width }
 							onChange={ ( next ) => setWidth( next ) }
 						/>
-					</ToolsPanelItem>
-					<ToolsPanelItem
-						className="single-column"
+					</SingleColumnItem>
+					<SingleColumnItem
 						hasValue={ () => !! height }
 						label="Height"
 						onDeselect={ () => setHeight( undefined ) }
@@ -61,11 +66,12 @@ export const _default = () => {
 							value={ height }
 							onChange={ ( next ) => setHeight( next ) }
 						/>
-					</ToolsPanelItem>
+					</SingleColumnItem>
 					<ToolsPanelItem
 						hasValue={ () => !! minHeight }
 						label="Minimum height"
 						onDeselect={ () => setMinHeight( undefined ) }
+						isShownByDefault={ true }
 					>
 						<UnitControl
 							label="Minimum height"
@@ -77,6 +83,121 @@ export const _default = () => {
 			</Panel>
 		</PanelWrapperView>
 	);
+};
+
+export const WithNonToolsPanelItems = () => {
+	const [ height, setHeight ] = useState();
+	const [ width, setWidth ] = useState();
+
+	const resetAll = () => {
+		setHeight( undefined );
+		setWidth( undefined );
+	};
+
+	return (
+		<PanelWrapperView>
+			<Panel>
+				<ToolsPanel
+					label="ToolsPanel (with non-menu items)"
+					resetAll={ resetAll }
+				>
+					<IntroText>
+						This text illustrates not all items must be wrapped in a
+						ToolsPanelItem and represented in the panel menu.
+					</IntroText>
+					<SingleColumnItem
+						hasValue={ () => !! width }
+						label="Width"
+						onDeselect={ () => setWidth( undefined ) }
+						isShownByDefault={ true }
+					>
+						<UnitControl
+							label="Width"
+							value={ width }
+							onChange={ ( next ) => setWidth( next ) }
+						/>
+					</SingleColumnItem>
+					<SingleColumnItem
+						hasValue={ () => !! height }
+						label="Height"
+						onDeselect={ () => setHeight( undefined ) }
+						isShownByDefault={ true }
+					>
+						<UnitControl
+							label="Height"
+							value={ height }
+							onChange={ ( next ) => setHeight( next ) }
+						/>
+					</SingleColumnItem>
+				</ToolsPanel>
+			</Panel>
+		</PanelWrapperView>
+	);
+};
+
+export const WithOptionalItemsPlusIcon = ( { isShownByDefault } ) => {
+	const [ height, setHeight ] = useState();
+	const [ width, setWidth ] = useState();
+	const [ minWidth, setMinWidth ] = useState();
+
+	const resetAll = () => {
+		setHeight( undefined );
+		setWidth( undefined );
+		setMinWidth( undefined );
+	};
+
+	return (
+		<PanelWrapperView>
+			<Panel>
+				<ToolsPanel
+					label="Tools Panel (optional items only)"
+					resetAll={ resetAll }
+					key={ isShownByDefault }
+				>
+					<SingleColumnItem
+						hasValue={ () => !! minWidth }
+						label="Minimum width"
+						onDeselect={ () => setMinWidth( undefined ) }
+						isShownByDefault={ isShownByDefault }
+					>
+						<UnitControl
+							label="Minimum width"
+							value={ minWidth }
+							onChange={ ( next ) => setMinWidth( next ) }
+						/>
+					</SingleColumnItem>
+					<SingleColumnItem
+						hasValue={ () => !! width }
+						label="Width"
+						onDeselect={ () => setWidth( undefined ) }
+						isShownByDefault={ false }
+					>
+						<UnitControl
+							label="Width"
+							value={ width }
+							onChange={ ( next ) => setWidth( next ) }
+						/>
+					</SingleColumnItem>
+					<SingleColumnItem
+						hasValue={ () => !! height }
+						label="Height"
+						onDeselect={ () => setHeight( undefined ) }
+						isShownByDefault={ false }
+					>
+						<UnitControl
+							label="Height"
+							value={ height }
+							onChange={ ( next ) => setHeight( next ) }
+						/>
+					</SingleColumnItem>
+				</ToolsPanel>
+			</Panel>
+		</PanelWrapperView>
+	);
+};
+
+WithOptionalItemsPlusIcon.args = {
+	isShownByDefault: false,
 };
 
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
@@ -109,8 +230,7 @@ export const WithSlotFillItems = () => {
 	return (
 		<SlotFillProvider>
 			<ToolsPanelItems>
-				<ToolsPanelItem
-					className="single-column"
+				<SingleColumnItem
 					hasValue={ () => !! width }
 					label="Injected Width"
 					onDeselect={ () => updateAttribute( 'width', undefined ) }
@@ -124,9 +244,8 @@ export const WithSlotFillItems = () => {
 							updateAttribute( 'width', next )
 						}
 					/>
-				</ToolsPanelItem>
-				<ToolsPanelItem
-					className="single-column"
+				</SingleColumnItem>
+				<SingleColumnItem
 					hasValue={ () => !! height }
 					label="Injected Height"
 					onDeselect={ () => updateAttribute( 'height', undefined ) }
@@ -140,7 +259,7 @@ export const WithSlotFillItems = () => {
 							updateAttribute( 'height', next )
 						}
 					/>
-				</ToolsPanelItem>
+				</SingleColumnItem>
 				<ToolsPanelItem
 					hasValue={ () => true }
 					label="Item for alternate panel"
@@ -169,7 +288,200 @@ export const WithSlotFillItems = () => {
 	);
 };
 
+export const WithConditionalDefaultControl = () => {
+	const [ attributes, setAttributes ] = useState( {} );
+	const { height, scale } = attributes;
+
+	const resetAll = ( resetFilters = [] ) => {
+		let newAttributes = {};
+
+		resetFilters.forEach( ( resetFilter ) => {
+			newAttributes = {
+				...newAttributes,
+				...resetFilter( newAttributes ),
+			};
+		} );
+
+		setAttributes( newAttributes );
+	};
+
+	const updateAttribute = ( name, value ) => {
+		setAttributes( {
+			...attributes,
+			[ name ]: value,
+		} );
+	};
+
+	return (
+		<SlotFillProvider>
+			<ToolsPanelItems>
+				<SingleColumnItem
+					hasValue={ () => !! height }
+					label="Injected Height"
+					onDeselect={ () => updateAttribute( 'height', undefined ) }
+					resetAllFilter={ () => ( { height: undefined } ) }
+					panelId={ panelId }
+					isShownByDefault={ true }
+				>
+					<UnitControl
+						label="Injected Height"
+						value={ height }
+						onChange={ ( next ) =>
+							updateAttribute( 'height', next )
+						}
+					/>
+				</SingleColumnItem>
+				<ToolsPanelItem
+					hasValue={ () => !! scale }
+					label="Scale"
+					onDeselect={ () => updateAttribute( 'scale', undefined ) }
+					resetAllFilter={ () => ( { scale: undefined } ) }
+					panelId={ panelId }
+					isShownByDefault={ !! height }
+				>
+					<ToggleGroupControl
+						label="Scale"
+						value={ scale }
+						onChange={ ( next ) =>
+							updateAttribute( 'scale', next )
+						}
+						isBlock
+					>
+						<ToggleGroupControlOption value="cover" label="Cover" />
+						<ToggleGroupControlOption
+							value="contain"
+							label="Contain"
+						/>
+						<ToggleGroupControlOption value="fill" label="Fill" />
+					</ToggleGroupControl>
+				</ToolsPanelItem>
+			</ToolsPanelItems>
+			<PanelWrapperView>
+				<Panel>
+					<ToolsPanel
+						label="Tools Panel With Conditional Default via SlotFill"
+						resetAll={ resetAll }
+						panelId={ panelId }
+					>
+						<Slot />
+					</ToolsPanel>
+				</Panel>
+			</PanelWrapperView>
+		</SlotFillProvider>
+	);
+};
+
+export const WithConditionallyRenderedControl = () => {
+	const [ attributes, setAttributes ] = useState( {} );
+	const { height, scale } = attributes;
+
+	const resetAll = ( resetFilters = [] ) => {
+		let newAttributes = {};
+
+		resetFilters.forEach( ( resetFilter ) => {
+			newAttributes = {
+				...newAttributes,
+				...resetFilter( newAttributes ),
+			};
+		} );
+
+		setAttributes( newAttributes );
+	};
+
+	const updateAttribute = ( name, value ) => {
+		setAttributes( {
+			...attributes,
+			[ name ]: value,
+		} );
+	};
+
+	return (
+		<SlotFillProvider>
+			<ToolsPanelItems>
+				<SingleColumnItem
+					hasValue={ () => !! height }
+					label="Injected Height"
+					onDeselect={ () => {
+						updateAttribute( 'scale', undefined );
+						updateAttribute( 'height', undefined );
+					} }
+					resetAllFilter={ () => ( { height: undefined } ) }
+					panelId={ panelId }
+					isShownByDefault={ true }
+				>
+					<UnitControl
+						label="Injected Height"
+						value={ height }
+						onChange={ ( next ) =>
+							updateAttribute( 'height', next )
+						}
+					/>
+				</SingleColumnItem>
+				{ !! height && (
+					<ToolsPanelItem
+						hasValue={ () => !! scale }
+						label="Scale"
+						onDeselect={ () =>
+							updateAttribute( 'scale', undefined )
+						}
+						resetAllFilter={ () => ( { scale: undefined } ) }
+						panelId={ panelId }
+						isShownByDefault={ true }
+					>
+						<ToggleGroupControl
+							label="Scale"
+							value={ scale }
+							onChange={ ( next ) =>
+								updateAttribute( 'scale', next )
+							}
+							isBlock
+						>
+							<ToggleGroupControlOption
+								value="cover"
+								label="Cover"
+							/>
+							<ToggleGroupControlOption
+								value="contain"
+								label="Contain"
+							/>
+							<ToggleGroupControlOption
+								value="fill"
+								label="Fill"
+							/>
+						</ToggleGroupControl>
+					</ToolsPanelItem>
+				) }
+			</ToolsPanelItems>
+			<PanelWrapperView>
+				<Panel>
+					<ToolsPanel
+						label="Tools Panel With Conditionally Rendered Item via SlotFill"
+						resetAll={ resetAll }
+						panelId={ panelId }
+					>
+						<Slot />
+					</ToolsPanel>
+				</Panel>
+			</PanelWrapperView>
+		</SlotFillProvider>
+	);
+};
+
+export { ToolsPanelWithItemGroupSlot } from './tools-panel-with-item-group-slot';
+
 const PanelWrapperView = styled.div`
-	max-width: 260px;
+	max-width: 280px;
 	font-size: 13px;
+
+	.components-dropdown-menu__menu {
+		max-width: 220px;
+	}
+`;
+
+const SingleColumnItem = styled( ToolsPanelItem )`
+	grid-column: span 1;
+`;
+
+const IntroText = styled.div`
+	grid-column: span 2;
 `;

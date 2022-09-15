@@ -9,7 +9,10 @@ import { useState } from '@wordpress/element';
 import Radio from '../../radio';
 import RadioGroup from '../';
 
-export default { title: 'Components/RadioGroup', component: RadioGroup };
+export default {
+	title: 'Components (Experimental)/RadioGroup',
+	component: RadioGroup,
+};
 
 export const _default = () => {
 	/* eslint-disable no-restricted-syntax */

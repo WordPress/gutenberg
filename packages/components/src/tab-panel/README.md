@@ -136,7 +136,7 @@ The class to add to the active tab
 
 #### initialTabName
 
-Optionally provide a tab name for a tab to be selected upon mounting of component. If this prop is not set, the first tab will be selected by default.
+The name of the tab to be selected upon mounting of component. If this prop is not set, the first tab will be selected by default.
 
 -   Type: `String`
 -   Required: No
@@ -144,8 +144,7 @@ Optionally provide a tab name for a tab to be selected upon mounting of componen
 
 #### children
 
-A function which renders the tabviews given the selected tab. The function is passed the active tab object as an argument as defined the the tabs prop.
-The element to which the tooltip should anchor.
+A function which renders the tabviews given the selected tab. The function is passed the active tab object as an argument as defined the tabs prop.
 
 -   Type: (`Object`) => `Element`
 -   Required: Yes

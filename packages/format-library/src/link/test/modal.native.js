@@ -5,11 +5,11 @@ import ModalLinkUI from '../modal';
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render } from 'test/helpers';
 
 describe( 'LinksUI', () => {
 	it( 'LinksUI renders', () => {
-		const wrapper = shallow( <ModalLinkUI /> );
-		expect( wrapper ).toBeTruthy();
+		const screen = render( <ModalLinkUI /> );
+		expect( screen.container ).toBeTruthy();
 	} );
 } );

@@ -14,7 +14,7 @@ exports[`props should render alignLabel 1`] = `
   padding-top: calc((36px - calc(13px * 1.2)) / 2);
   padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
   padding-top: calc((36px - calc(13px * 1.2)) / 2);
-  color: #000;
+  color: #1e1e1e;
   line-height: 1.2;
   margin: 0;
   font-size: calc((13 / 13) * 13px);
@@ -72,7 +72,7 @@ exports[`props should render vertically 1`] = `
   padding-top: calc((36px - calc(13px * 1.2)) / 2);
   padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
   padding-top: calc((36px - calc(13px * 1.2)) / 2);
-  color: #000;
+  color: #1e1e1e;
   line-height: 1.2;
   margin: 0;
   font-size: calc((13 / 13) * 13px);

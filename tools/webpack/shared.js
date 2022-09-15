@@ -4,19 +4,15 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { DefinePlugin } = require( 'webpack' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
-const { compact } = require( 'lodash' );
 const postcss = require( 'postcss' );
 
 /**
  * WordPress dependencies
  */
-const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 const ReadableJsAssetsWebpackPlugin = require( '@wordpress/readable-js-assets-webpack-plugin' );
 
-const {
-	NODE_ENV: mode = 'development',
-	WP_DEVTOOL: devtool = mode === 'production' ? false : 'source-map',
-} = process.env;
+const { NODE_ENV: mode = 'development', WP_DEVTOOL: devtool = 'source-map' } =
+	process.env;
 
 const baseConfig = {
 	target: 'browserslist',
@@ -44,13 +40,13 @@ const baseConfig = {
 	},
 	mode,
 	module: {
-		rules: compact( [
-			mode !== 'production' && {
+		rules: [
+			{
 				test: /\.js$/,
 				use: require.resolve( 'source-map-loader' ),
 				enforce: 'pre',
 			},
-		] ),
+		],
 	},
 	watchOptions: {
 		ignored: [
@@ -67,12 +63,10 @@ const plugins = [
 	// content as a convenient interactive zoomable treemap.
 	process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 	new DefinePlugin( {
-		// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
-		'process.env.GUTENBERG_PHASE': JSON.stringify(
-			parseInt( process.env.npm_package_config_GUTENBERG_PHASE, 10 ) || 1
-		),
+		// Inject the `IS_GUTENBERG_PLUGIN` global, used for feature flagging.
+		'process.env.IS_GUTENBERG_PLUGIN':
+			process.env.npm_package_config_IS_GUTENBERG_PLUGIN,
 	} ),
-	new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 ];
 

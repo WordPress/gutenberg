@@ -12,6 +12,7 @@
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const { formatResultsErrors } = require( 'jest-message-util' );
+const filenamify = require( 'filenamify' );
 
 class FlakyTestsReporter {
 	constructor( globalConfig, options ) {
@@ -48,13 +49,14 @@ class FlakyTestsReporter {
 			}
 			case 'passed': {
 				if ( this.failingTestCaseResults.has( testTitle ) ) {
-					const failingResults = this.failingTestCaseResults.get(
-						testTitle
-					);
+					const failingResults =
+						this.failingTestCaseResults.get( testTitle );
 
 					await fs.writeFile(
-						`flaky-tests/${ testTitle }.json`,
+						`flaky-tests/${ filenamify( testTitle ) }.json`,
 						JSON.stringify( {
+							version: 1,
+							runner: 'jest-circus',
 							title: testTitle,
 							path: testPath,
 							results: failingResults,

@@ -19,6 +19,10 @@ module.exports = function ( api ) {
 					extensions: [ 'css', 'scss', 'sass' ],
 				},
 			],
+			path.resolve(
+				__dirname,
+				'../../node_modules/react-native-reanimated/plugin'
+			),
 		],
 		overrides: [
 			{
@@ -32,10 +36,11 @@ module.exports = function ( api ) {
 						},
 					],
 				],
-				exclude: /node_modules\/(react-native|@react-native-community|@react-navigation)/,
+				exclude:
+					/node_modules\/(react-native|@react-native-community|@react-navigation|react-native-reanimated)/,
 			},
 			{
-				// Auto-add `import { createElement } from '@wordpress/element';` when JSX is found
+				// Auto-add `import { createElement } from '@wordpress/element';` when JSX is found.
 				plugins: [
 					[
 						'@wordpress/babel-plugin-import-jsx-pragma',
@@ -47,7 +52,8 @@ module.exports = function ( api ) {
 						},
 					],
 				],
-				exclude: /node_modules\/(react-native|@react-native-community|@react-navigation)/,
+				exclude:
+					/node_modules\/(react-native|@react-native-community|@react-navigation|react-native-reanimated)/,
 			},
 		],
 		env: {

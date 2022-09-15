@@ -1,4 +1,5 @@
-.edit-post-welcome-guide {
+.edit-post-welcome-guide,
+.edit-template-welcome-guide {
 	width: 312px;
 
 	&__image {
@@ -29,5 +30,11 @@
 	&__inserter-icon {
 		margin: 0 4px;
 		vertical-align: text-top;
+	}
+}
+
+.edit-template-welcome-guide {
+	.components-button svg {
+		fill: $white;
 	}
 }

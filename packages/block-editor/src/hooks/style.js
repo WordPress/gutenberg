@@ -1,35 +1,26 @@
 /**
  * External dependencies
  */
-import {
-	first,
-	forEach,
-	get,
-	has,
-	isEmpty,
-	isString,
-	kebabCase,
-	map,
-	omit,
-	startsWith,
-} from 'lodash';
+import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
+import { useContext, useMemo, createPortal } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
 	hasBlockSupport,
-	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import { getCSSRules, compileCSS } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
  */
+import BlockList from '../components/block-list';
 import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import {
@@ -39,6 +30,7 @@ import {
 } from './typography';
 import { SPACING_SUPPORT_KEY, DimensionsPanel } from './dimensions';
 import useDisplayBlockControls from '../components/use-display-block-controls';
+import { shouldSkipSerialization } from './utils';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -50,20 +42,6 @@ const styleSupportKeys = [
 const hasStyleSupport = ( blockType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
 
-const VARIABLE_REFERENCE_PREFIX = 'var:';
-const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
-const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
-function compileStyleValue( uncompiledValue ) {
-	if ( startsWith( uncompiledValue, VARIABLE_REFERENCE_PREFIX ) ) {
-		const variable = uncompiledValue
-			.slice( VARIABLE_REFERENCE_PREFIX.length )
-			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
-			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
-		return `var(--wp--${ variable })`;
-	}
-	return uncompiledValue;
-}
-
 /**
  * Returns the inline styles to add depending on the style object
  *
@@ -73,49 +51,13 @@ function compileStyleValue( uncompiledValue ) {
  */
 export function getInlineStyles( styles = {} ) {
 	const output = {};
-	Object.keys( STYLE_PROPERTY ).forEach( ( propKey ) => {
-		const path = STYLE_PROPERTY[ propKey ].value;
-		const subPaths = STYLE_PROPERTY[ propKey ].properties;
-		// Ignore styles on elements because they are handled on the server.
-		if ( has( styles, path ) && 'elements' !== first( path ) ) {
-			// Checking if style value is a string allows for shorthand css
-			// option and backwards compatibility for border radius support.
-			const styleValue = get( styles, path );
-
-			if ( !! subPaths && ! isString( styleValue ) ) {
-				Object.entries( subPaths ).forEach( ( entry ) => {
-					const [ name, subPath ] = entry;
-					const value = get( styleValue, [ subPath ] );
-
-					if ( value ) {
-						output[ name ] = compileStyleValue( value );
-					}
-				} );
-			} else {
-				output[ propKey ] = compileStyleValue( get( styles, path ) );
-			}
-		}
+	// The goal is to move everything to server side generated engine styles
+	// This is temporary as we absorb more and more styles into the engine.
+	getCSSRules( styles ).forEach( ( rule ) => {
+		output[ rule.key ] = rule.value;
 	} );
 
 	return output;
-}
-
-function compileElementsStyles( selector, elements = {} ) {
-	return map( elements, ( styles, element ) => {
-		const elementStyles = getInlineStyles( styles );
-		if ( ! isEmpty( elementStyles ) ) {
-			return [
-				`.${ selector } ${ ELEMENTS[ element ] }{`,
-				...map(
-					elementStyles,
-					( value, property ) =>
-						`\t${ kebabCase( property ) }: ${ value };`
-				),
-				'}',
-			].join( '\n' );
-		}
-		return '';
-	} ).join( '\n' );
 }
 
 /**
@@ -130,7 +72,7 @@ function addAttribute( settings ) {
 		return settings;
 	}
 
-	// allow blocks to specify their own attribute definition with default values if needed.
+	// Allow blocks to specify their own attribute definition with default values if needed.
 	if ( ! settings.attributes.style ) {
 		Object.assign( settings.attributes, {
 			style: {
@@ -180,6 +122,19 @@ const skipSerializationPathsSave = {
 };
 
 /**
+ * A dictionary used to normalize feature names between support flags, style
+ * object properties and __experimentSkipSerialization configuration arrays.
+ *
+ * This allows not having to provide a migration for a support flag and possible
+ * backwards compatibility bridges, while still achieving consistency between
+ * the support flag and the skip serialization array.
+ *
+ * @constant
+ * @type {Record<string, string>}
+ */
+const renamedFeatures = { gradients: 'gradient' };
+
+/**
  * Override props assigned to save component to inject the CSS variables definition.
  *
  * @param {Object}                    props      Additional props applied to save element.
@@ -200,10 +155,18 @@ export function addSaveProps(
 	}
 
 	let { style } = attributes;
+	Object.entries( skipPaths ).forEach( ( [ indicator, path ] ) => {
+		const skipSerialization = getBlockSupport( blockType, indicator );
 
-	forEach( skipPaths, ( path, indicator ) => {
-		if ( getBlockSupport( blockType, indicator ) ) {
+		if ( skipSerialization === true ) {
 			style = omit( style, path );
+		}
+
+		if ( Array.isArray( skipSerialization ) ) {
+			skipSerialization.forEach( ( featureName ) => {
+				const feature = renamedFeatures[ featureName ] || featureName;
+				style = omit( style, [ [ ...path, feature ] ] );
+			} );
 		}
 	} );
 
@@ -262,9 +225,9 @@ export const withBlockControls = createHigherOrderComponent(
 			<>
 				{ shouldDisplayControls && (
 					<>
+						<ColorEdit { ...props } />
 						<TypographyPanel { ...props } />
 						<BorderPanel { ...props } />
-						<ColorEdit { ...props } />
 						<DimensionsPanel { ...props } />
 					</>
 				) }
@@ -276,37 +239,77 @@ export const withBlockControls = createHigherOrderComponent(
 );
 
 /**
- * Override the default block element to include duotone styles.
+ * Override the default block element to include elements styles.
  *
  * @param {Function} BlockListBlock Original component
  * @return {Function}                Wrapped component
  */
 const withElementsStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const elements = props.attributes.style?.elements;
-
 		const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
 			BlockListBlock
 		) }`;
-		const styles = compileElementsStyles(
-			blockElementsContainerIdentifier,
-			props.attributes.style?.elements
+
+		const skipLinkColorSerialization = shouldSkipSerialization(
+			props.name,
+			COLOR_SUPPORT_KEY,
+			'link'
 		);
+
+		const styles = useMemo( () => {
+			const rawElementsStyles = props.attributes.style?.elements;
+			const elementCssRules = [];
+			if (
+				rawElementsStyles &&
+				Object.keys( rawElementsStyles ).length > 0
+			) {
+				// Remove values based on whether serialization has been skipped for a specific style.
+				const filteredElementsStyles = {
+					...rawElementsStyles,
+					link: {
+						...rawElementsStyles.link,
+						color: ! skipLinkColorSerialization
+							? rawElementsStyles.link?.color
+							: undefined,
+					},
+				};
+
+				for ( const [ elementName, elementStyles ] of Object.entries(
+					filteredElementsStyles
+				) ) {
+					const cssRule = compileCSS( elementStyles, {
+						// The .editor-styles-wrapper selector is required on elements styles. As it is
+						// added to all other editor styles, not providing it causes reset and global
+						// styles to override element styles because of higher specificity.
+						selector: `.editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS[ elementName ] }`,
+					} );
+					if ( !! cssRule ) {
+						elementCssRules.push( cssRule );
+					}
+				}
+			}
+			return elementCssRules.length > 0 ? elementCssRules : undefined;
+		}, [ props.attributes.style?.elements ] );
+
+		const element = useContext( BlockList.__unstableElementContext );
 
 		return (
 			<>
-				{ elements && (
-					<style
-						dangerouslySetInnerHTML={ {
-							__html: styles,
-						} }
-					/>
-				) }
+				{ styles &&
+					element &&
+					createPortal(
+						<style
+							dangerouslySetInnerHTML={ {
+								__html: styles,
+							} }
+						/>,
+						element
+					) }
 
 				<BlockListBlock
 					{ ...props }
 					className={
-						elements
+						props.attributes.style?.elements
 							? classnames(
 									props.className,
 									blockElementsContainerIdentifier

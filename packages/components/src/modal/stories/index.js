@@ -16,7 +16,13 @@ import Modal from '../';
 import { useState } from '@wordpress/element';
 import { wordpress } from '@wordpress/icons';
 
-export default { title: 'Components/Modal', component: Modal };
+export default {
+	title: 'Components/Modal',
+	component: Modal,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 const ModalExample = ( props ) => {
 	const [ isOpen, setOpen ] = useState( false );
@@ -29,7 +35,23 @@ const ModalExample = ( props ) => {
 				Open Modal
 			</Button>
 			{ isOpen && (
-				<Modal { ...props } onRequestClose={ closeModal }>
+				<Modal
+					{ ...props }
+					onRequestClose={ closeModal }
+					style={ { maxWidth: '600px' } }
+				>
+					<p>
+						Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+						sed do eiusmod tempor incididunt ut labore et magna
+						aliqua. Ut enim ad minim veniam, quis nostrud
+						exercitation ullamco laboris nisi ut aliquip ex ea ea
+						commodo consequat. Duis aute irure dolor in
+						reprehenderit in voluptate velit esse cillum dolore eu
+						fugiat nulla pariatur. Excepteur sint occaecat cupidatat
+						non proident, sunt in culpa qui officia deserunt mollit
+						anim id est laborum.
+					</p>
+
 					<Button variant="secondary" onClick={ closeModal }>
 						Close Modal
 					</Button>
@@ -49,6 +71,10 @@ export const _default = () => {
 		'shouldCloseOnClickOutside',
 		true
 	);
+	const __experimentalHideHeader = boolean(
+		'__experimentalHideHeader',
+		false
+	);
 
 	const iconComponent = showIcon ? <Icon icon={ wordpress } /> : null;
 
@@ -59,6 +85,7 @@ export const _default = () => {
 		shouldCloseOnEsc,
 		shouldCloseOnClickOutside,
 		title,
+		__experimentalHideHeader,
 	};
 
 	return <ModalExample { ...modalProps } />;

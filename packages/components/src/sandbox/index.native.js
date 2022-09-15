@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { Dimensions, Platform } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 /**
  * WordPress dependencies
  */
 import {
+	Platform,
 	renderToString,
 	memo,
 	useRef,
@@ -32,8 +33,8 @@ const observeAndResizeJS = `
 		function sendResize() {
 			var clientBoundingRect = document.body.getBoundingClientRect();
 
-			// The function postMessage is exposed by the react-native-webview library 
-			// to communicate between React Native and the WebView, in this case, 
+			// The function postMessage is exposed by the react-native-webview library
+			// to communicate between React Native and the WebView, in this case,
 			// we use it for notifying resize changes.
             window.ReactNativeWebView.postMessage(JSON.stringify( {
                 action: 'resize',
@@ -109,8 +110,8 @@ const style = `
 
 	/**
 	 * Add responsiveness to embeds with aspect ratios.
-	 * 
-	 * These styles have been copied from the web version (https://git.io/JEFcX) and
+	 *
+	 * These styles have been copied from the web version (https://github.com/WordPress/gutenberg/blob/7901895ca20cf61e402925e31571d659dab64721/packages/block-library/src/embed/style.scss#L42-L89) and
 	 * adapted for the native version.
 	 */
 	.wp-has-aspect-ratio.wp-block-embed__wrapper::before {
@@ -241,7 +242,7 @@ function Sandbox( {
 	}
 
 	function checkMessageForResize( event ) {
-		// Attempt to parse the message data as JSON if passed as string
+		// Attempt to parse the message data as JSON if passed as string.
 		let data = event.nativeEvent.data || {};
 
 		if ( 'string' === typeof data ) {
@@ -270,9 +271,12 @@ function Sandbox( {
 	}
 
 	useEffect( () => {
-		Dimensions.addEventListener( 'change', onChangeDimensions );
+		const dimensionsChangeSubscription = Dimensions.addEventListener(
+			'change',
+			onChangeDimensions
+		);
 		return () => {
-			Dimensions.removeEventListener( 'change', onChangeDimensions );
+			dimensionsChangeSubscription.remove();
 		};
 	}, [] );
 
@@ -304,6 +308,7 @@ function Sandbox( {
 			style={ [
 				sandboxStyles[ 'sandbox-webview__content' ],
 				getSizeStyle(),
+				Platform.isAndroid && workaroundStyles.webView,
 			] }
 			onMessage={ checkMessageForResize }
 			scrollEnabled={ false }
@@ -313,5 +318,16 @@ function Sandbox( {
 		/>
 	);
 }
+
+const workaroundStyles = StyleSheet.create( {
+	webView: {
+		/**
+		 * The slight opacity below is a workaround for an Android crash caused from combining Android
+		 * 12's new scroll overflow behavior and webviews.
+		 * https://github.com/react-native-webview/react-native-webview/issues/1915#issuecomment-808869253
+		 */
+		opacity: 0.99,
+	},
+} );
 
 export default memo( Sandbox );

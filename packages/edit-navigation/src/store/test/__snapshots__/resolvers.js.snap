@@ -1,0 +1,68 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getNavigationPostForMenu creates a stub navigation post for menu id 1`] = `
+Object {
+  "blocks": Array [
+    Object {
+      "attributes": Object {
+        "orientation": "vertical",
+      },
+      "clientId": "client-id-3",
+      "innerBlocks": Array [
+        Object {
+          "attributes": Object {
+            "__internalRecordId": 100,
+            "className": "menu classes",
+            "description": "description",
+            "id": 123,
+            "kind": "custom",
+            "label": "wp.com",
+            "rel": "nofollow",
+            "title": "link title",
+            "type": "post",
+            "url": "http://wp.com",
+          },
+          "clientId": "client-id-0",
+          "innerBlocks": Array [],
+          "name": "core/navigation-link",
+        },
+        Object {
+          "attributes": Object {
+            "__internalRecordId": 101,
+            "id": 456,
+            "kind": "custom",
+            "label": "wp.org",
+            "opensInNewTab": true,
+            "type": "page",
+            "url": "http://wp.org",
+          },
+          "clientId": "client-id-1",
+          "innerBlocks": Array [],
+          "name": "core/navigation-link",
+        },
+        Object {
+          "attributes": Object {
+            "__internalRecordId": 102,
+            "kind": "post-type",
+            "label": "My Example Page",
+            "opensInNewTab": true,
+            "type": "custom",
+            "url": "/my-example-page/",
+          },
+          "clientId": "client-id-2",
+          "innerBlocks": Array [],
+          "name": "core/navigation-link",
+        },
+      ],
+      "name": "core/navigation",
+    },
+  ],
+  "id": "navigation-post-123",
+  "meta": Object {
+    "menuId": 123,
+  },
+  "slug": "navigation-post-123",
+  "status": "draft",
+  "type": "page",
+}
+`;

@@ -8,7 +8,7 @@ function parseUnit( cssUnit ) {
 	const match = cssUnit
 		?.trim()
 		.match(
-			/^(0?[-.]?\d+)(r?e[m|x]|v[h|w|min|max]+|p[x|t|c]|[c|m]m|%|in|ch|Q|lh)$/
+			/^(0?[-.]?\d*\.?\d+)(r?e[m|x]|v[h|w|min|max]+|p[x|t|c]|[c|m]m|%|in|ch|Q|lh)$/
 		);
 	if ( ! isNaN( cssUnit ) && ! isNaN( parseFloat( cssUnit ) ) ) {
 		return { value: parseFloat( cssUnit ), unit: 'px' };
@@ -86,7 +86,7 @@ function parseUnitFunction( cssUnit ) {
 			cssUnit = cssUnit.replace( matches[ 0 ], functionUnitValue );
 		}
 
-		// if the unit hasn't been modified or we have a single value break free.
+		// If the unit hasn't been modified or we have a single value break free.
 		if ( cssUnit === currentCssUnit || parseFloat( cssUnit ) ) {
 			break;
 		}
@@ -123,7 +123,7 @@ function evalMathExpression( cssUnit ) {
 		const parsedUnit = parseUnit( getPxFromCssUnit( unit ) );
 		if ( ! parseFloat( parsedUnit.value ) ) {
 			errorFound = true;
-			// end early since we are dealing with a null value.
+			// End early since we are dealing with a null value.
 			break;
 		}
 		cssUnit = cssUnit.replace( unit, parsedUnit.value );
@@ -131,6 +131,7 @@ function evalMathExpression( cssUnit ) {
 
 	return errorFound ? null : calculate( cssUnit ).toFixed( 0 ) + 'px';
 }
+
 /**
  * Convert a parsedUnit object to px value.
  *
@@ -170,7 +171,7 @@ function convertParsedUnitToPx( parsedUnit, options ) {
 				? setOptions.fontSize
 				: setOptions.width ) * ONE_PERCENT,
 		ch: 8, // The advance measure (width) of the glyph "0" of the element's font. Approximate
-		ex: 7.15625, // x-height of the element's font. Approximate
+		ex: 7.15625, // X-height of the element's font. Approximate.
 		lh: setOptions.lineHeight,
 	};
 
@@ -202,11 +203,12 @@ function convertParsedUnitToPx( parsedUnit, options ) {
 
 	return null;
 }
+
 /**
  * Returns the px value of a cssUnit.
  *
  * @param {string} cssUnit
- * @param {string} options
+ * @param {Object} options
  * @return {string} returns the cssUnit value in a simple px format.
  */
 export function getPxFromCssUnit( cssUnit, options = {} ) {
@@ -219,7 +221,7 @@ export function getPxFromCssUnit( cssUnit, options = {} ) {
 	let parsedUnit = parseUnit( cssUnit );
 
 	if ( ! parsedUnit.unit ) {
-		parsedUnit = parseUnitFunction( cssUnit, options );
+		parsedUnit = parseUnitFunction( cssUnit );
 	}
 
 	if ( isMathExpression( cssUnit ) && ! parsedUnit.unit ) {
@@ -228,3 +230,43 @@ export function getPxFromCssUnit( cssUnit, options = {} ) {
 
 	return convertParsedUnitToPx( parsedUnit, options );
 }
+
+// Use simple cache.
+const cache = {};
+/**
+ * Returns the px value of a cssUnit. The memoized version of getPxFromCssUnit;
+ *
+ * @param {string} cssUnit
+ * @param {Object} options
+ * @return {string} returns the cssUnit value in a simple px format.
+ */
+function memoizedGetPxFromCssUnit( cssUnit, options = {} ) {
+	const hash = cssUnit + hashOptions( options );
+
+	if ( ! cache[ hash ] ) {
+		cache[ hash ] = getPxFromCssUnit( cssUnit, options );
+	}
+	return cache[ hash ];
+}
+
+function hashOptions( options ) {
+	let hash = '';
+	if ( options.hasOwnProperty( 'fontSize' ) ) {
+		hash = ':' + options.width;
+	}
+	if ( options.hasOwnProperty( 'lineHeight' ) ) {
+		hash = ':' + options.lineHeight;
+	}
+	if ( options.hasOwnProperty( 'width' ) ) {
+		hash = ':' + options.width;
+	}
+	if ( options.hasOwnProperty( 'height' ) ) {
+		hash = ':' + options.height;
+	}
+	if ( options.hasOwnProperty( 'type' ) ) {
+		hash = ':' + options.type;
+	}
+	return hash;
+}
+
+export default memoizedGetPxFromCssUnit;

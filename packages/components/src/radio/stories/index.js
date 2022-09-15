@@ -4,7 +4,7 @@
 import RadioGroup from '../../radio-group';
 import Radio from '../';
 
-export default { title: 'Components/Radio', component: Radio };
+export default { title: 'Components (Experimental)/Radio', component: Radio };
 
 export const _default = () => {
 	// Radio components must be a descendent of a RadioGroup component.

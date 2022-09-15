@@ -250,4 +250,23 @@ describe( 'applyFormat', () => {
 		expect( result ).not.toBe( record );
 		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
 	} );
+
+	it( 'should merge equal neighbouring formats', () => {
+		const record = {
+			// Use a different reference but equal content.
+			formats: [ , , [ { ...em } ], [ { ...em } ] ],
+			text: 'test',
+		};
+		const expected = {
+			...record,
+			activeFormats: [ em ],
+			// All references should be the same.
+			formats: [ [ em ], [ em ], [ em ], [ em ] ],
+		};
+		const result = applyFormat( deepFreeze( record ), em, 0, 2 );
+
+		expect( result ).toEqual( expected );
+		expect( result ).not.toBe( record );
+		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
+	} );
 } );

@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import exportReusableBlock from './utils/export';
 import ImportDropdown from './components/import-dropdown';
 
-// Setup Export Links
+// Setup Export Links.
 document.body.addEventListener( 'click', ( event ) => {
 	if (
 		! event.target.classList.contains( 'wp-list-reusable-blocks__export' )
@@ -21,7 +21,7 @@ document.body.addEventListener( 'click', ( event ) => {
 	exportReusableBlock( event.target.dataset.id );
 } );
 
-// Setup Import Form
+// Setup Import Form.
 document.addEventListener( 'DOMContentLoaded', () => {
 	const button = document.querySelector( '.page-title-action' );
 	if ( ! button ) {

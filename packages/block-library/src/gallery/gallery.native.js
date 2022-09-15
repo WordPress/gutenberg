@@ -14,10 +14,7 @@ import styles from './gallery-styles.scss';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	BlockCaption,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-} from '@wordpress/block-editor';
+import { BlockCaption, useInnerBlocksProps } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import { mediaUploadSync } from '@wordpress/react-native-bridge';
 import { WIDE_ALIGNMENTS } from '@wordpress/components';
@@ -38,6 +35,7 @@ export const Gallery = ( props ) => {
 	const {
 		mediaPlaceholder,
 		attributes,
+		images,
 		isNarrow,
 		onBlur,
 		insertBlocksAfter,
@@ -51,11 +49,8 @@ export const Gallery = ( props ) => {
 		}
 	}, [ sizes ] );
 
-	const {
-		images,
-		align,
-		columns = defaultColumnsNumber( images.length ),
-	} = attributes;
+	const { align, columns = defaultColumnsNumber( images.length ) } =
+		attributes;
 
 	const displayedColumns = Math.min(
 		columns,
@@ -116,7 +111,7 @@ export const Gallery = ( props ) => {
 						  )
 				}
 				onFocus={ focusGalleryCaption }
-				onBlur={ onBlur } // always assign onBlur as props
+				onBlur={ onBlur } // Always assign onBlur as props.
 				insertBlocksAfter={ insertBlocksAfter }
 			/>
 		</View>

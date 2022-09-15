@@ -37,11 +37,11 @@ Given a block type, a block variation is a predefined set of its initial attribu
 **More on Blocks**
 
 -   **[Block API](/docs/reference-guides/block-api/README.md)**
--   **[Tutorial: Building A Custom Block](/docs/getting-started/tutorials/create-block/README.md)**
+-   **[Tutorial: Building A Custom Block](/docs/getting-started/create-block/README.md)**
 
 ## Reusable Blocks
 
-A reusable blocks is a block (or multiple blocks) that can be inserted and edited globally at once. If a reusable block is edited in one place, those changes are reflected across all posts and pages that that block is used. Examples of reusable blocks include a block consisting of a heading whose content and a custom color that would be appear on multiple pages of the site and sidebar widgets that would appear on every page.
+A reusable blocks is a block (or multiple blocks) that can be inserted and edited globally at once. If a reusable block is edited in one place, those changes are reflected across all posts and pages that block is used. Examples of reusable blocks include a block consisting of a heading whose content and a custom color that would be appear on multiple pages of the site and sidebar widgets that would appear on every page.
 
 Any edits to a reusable block will appear on every other use of that block, saving time from having to make the same edit on different posts.
 
@@ -57,6 +57,8 @@ While the post editor concentrates on the content of a post, the [template](/doc
 
 Note: custom post types can also be initialized with a starting `post_content` template that should not be confused with the theme template system described above.
 
-## Global Styles (in progress)
+## Global Styles
 
-Describes a set of configuration and default properties of blocks and their visual aspects. Global Styles is both an interface (which users access through the site editor) and a configuration system done through [a `theme.json` file](/docs/how-to-guides/themes/theme-json.md). This file absorbs most of the configuration aspects usually scattered through various `add_theme_support` calls to simplify communicating with the editor. It thus aims to improve declaring what settings should be enabled, what attributes are supported, what specific tools a theme offers (like a custom color palette), the available design tools present both globally and on each block, and an infrastructure that allows to enqueue only the relevant CSS based on what blocks are used on a page.
+Global Styles is both an interface (which users access through the site editor) and a configuration system done through [a `theme.json` file](/docs/how-to-guides/themes/theme-json.md). This file absorbs most of the configuration aspects usually scattered through various `add_theme_support` calls to simplify communicating with the editor. It thus aims to improve declaring what settings should be enabled, what specific tools a theme offers (like a custom color palette), the available design tools present, and an infrastructure that allows to coordinate the styles coming from WordPress, the active theme, and the user.
+
+Learn more about [Global Styles](/docs/explanations/architecture/styles.md#global-styles).

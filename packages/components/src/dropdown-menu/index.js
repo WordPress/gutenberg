@@ -1,14 +1,12 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap, isEmpty, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { DOWN } from '@wordpress/keycodes';
-import deprecated from '@wordpress/deprecated';
 import { menu } from '@wordpress/icons';
 
 /**
@@ -34,43 +32,38 @@ function mergeProps( defaultProps = {}, props = {} ) {
 	return mergedProps;
 }
 
-function DropdownMenu( {
-	children,
-	className,
-	controls,
-	icon = menu,
-	label,
-	popoverProps,
-	toggleProps,
-	menuProps,
-	disableOpenOnArrowDown = false,
-	text,
-	// The following props exist for backward compatibility.
-	menuLabel,
-	position,
-	noIcons,
-} ) {
-	if ( menuLabel ) {
-		deprecated( '`menuLabel` prop in `DropdownComponent`', {
-			since: '5.3',
-			alternative: '`menuProps` object and its `aria-label` property',
-		} );
-	}
+/**
+ * Whether the argument is a function.
+ *
+ * @param {*} maybeFunc The argument to check.
+ * @return {boolean} True if the argument is a function, false otherwise.
+ */
+function isFunction( maybeFunc ) {
+	return typeof maybeFunc === 'function';
+}
 
-	if ( position ) {
-		deprecated( '`position` prop in `DropdownComponent`', {
-			since: '5.3',
-			alternative: '`popoverProps` object and its `position` property',
-		} );
-	}
+function DropdownMenu( dropdownMenuProps ) {
+	const {
+		children,
+		className,
+		controls,
+		icon = menu,
+		label,
+		popoverProps,
+		toggleProps,
+		menuProps,
+		disableOpenOnArrowDown = false,
+		text,
+		noIcons,
+	} = dropdownMenuProps;
 
-	if ( isEmpty( controls ) && ! isFunction( children ) ) {
+	if ( ! controls?.length && ! isFunction( children ) ) {
 		return null;
 	}
 
 	// Normalize controls to nested array of objects (sets of controls)
 	let controlSets;
-	if ( ! isEmpty( controls ) ) {
+	if ( controls?.length ) {
 		controlSets = controls;
 		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
 			controlSets = [ controlSets ];
@@ -79,7 +72,6 @@ function DropdownMenu( {
 	const mergedPopoverProps = mergeProps(
 		{
 			className: 'components-dropdown-menu__popover',
-			position,
 		},
 		popoverProps
 	);
@@ -94,7 +86,7 @@ function DropdownMenu( {
 						return;
 					}
 
-					if ( ! isOpen && event.keyCode === DOWN ) {
+					if ( ! isOpen && event.code === 'ArrowDown' ) {
 						event.preventDefault();
 						onToggle();
 					}
@@ -140,7 +132,7 @@ function DropdownMenu( {
 			renderContent={ ( props ) => {
 				const mergedMenuProps = mergeProps(
 					{
-						'aria-label': menuLabel || label,
+						'aria-label': label,
 						className: classnames(
 							'components-dropdown-menu__menu',
 							{ 'no-icons': noIcons }
@@ -152,7 +144,7 @@ function DropdownMenu( {
 				return (
 					<NavigableMenu { ...mergedMenuProps } role="menu">
 						{ isFunction( children ) ? children( props ) : null }
-						{ flatMap( controlSets, ( controlSet, indexOfSet ) =>
+						{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
 							controlSet.map( ( control, indexOfControl ) => (
 								<Button
 									key={ [

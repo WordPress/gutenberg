@@ -13,7 +13,8 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import { Icon, globe } from '@wordpress/icons';
+import { Icon, globe, info, linkOff, edit } from '@wordpress/icons';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -26,6 +27,8 @@ export default function LinkPreview( {
 	value,
 	onEditClick,
 	hasRichPreviews = false,
+	hasUnlinkControl = false,
+	onRemove,
 } ) {
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;
@@ -38,15 +41,31 @@ export default function LinkPreview( {
 	const displayURL =
 		( value && filterURLForDisplay( safeDecodeURI( value.url ), 16 ) ) ||
 		'';
+
+	const displayTitle = richData?.title || value?.title || displayURL;
+
+	// url can be undefined if the href attribute is unset
+	const isEmptyURL = ! value?.url?.length;
+
+	let icon;
+
+	if ( richData?.icon ) {
+		icon = <img src={ richData?.icon } alt="" />;
+	} else if ( isEmptyURL ) {
+		icon = <Icon icon={ info } size={ 32 } />;
+	} else {
+		icon = <Icon icon={ globe } />;
+	}
+
 	return (
 		<div
 			aria-label={ __( 'Currently selected' ) }
-			aria-selected="true"
 			className={ classnames( 'block-editor-link-control__search-item', {
 				'is-current': true,
 				'is-rich': hasRichData,
 				'is-fetching': !! isFetching,
 				'is-preview': true,
+				'is-error': isEmptyURL,
 			} ) }
 		>
 			<div className="block-editor-link-control__search-item-top">
@@ -59,40 +78,56 @@ export default function LinkPreview( {
 							}
 						) }
 					>
-						{ richData?.icon ? (
-							<img src={ richData?.icon } alt="" />
-						) : (
-							<Icon icon={ globe } />
-						) }
+						{ icon }
 					</span>
 					<span className="block-editor-link-control__search-item-details">
-						<ExternalLink
-							className="block-editor-link-control__search-item-title"
-							href={ value.url }
-						>
-							{ richData?.title || value?.title || displayURL }
-						</ExternalLink>
-						{ value?.url && (
-							<span className="block-editor-link-control__search-item-info">
-								{ displayURL }
+						{ ! isEmptyURL ? (
+							<>
+								<ExternalLink
+									className="block-editor-link-control__search-item-title"
+									href={ value.url }
+								>
+									{ stripHTML( displayTitle ) }
+								</ExternalLink>
+
+								{ value?.url && (
+									<span className="block-editor-link-control__search-item-info">
+										{ displayURL }
+									</span>
+								) }
+							</>
+						) : (
+							<span className="block-editor-link-control__search-item-error-notice">
+								{ __( 'Link is empty' ) }
 							</span>
 						) }
 					</span>
 				</span>
 
 				<Button
-					variant="secondary"
-					onClick={ () => onEditClick() }
+					icon={ edit }
+					label={ __( 'Edit' ) }
 					className="block-editor-link-control__search-item-action"
-				>
-					{ __( 'Edit' ) }
-				</Button>
+					onClick={ onEditClick }
+					iconSize={ 24 }
+				/>
+				{ hasUnlinkControl && (
+					<Button
+						icon={ linkOff }
+						label={ __( 'Unlink' ) }
+						className="block-editor-link-control__search-item-action block-editor-link-control__unlink"
+						onClick={ onRemove }
+						iconSize={ 24 }
+					/>
+				) }
 				<ViewerSlot fillProps={ value } />
 			</div>
 
-			{ ( ( hasRichData &&
-				( richData?.image || richData?.description ) ) ||
-				isFetching ) && (
+			{ !! (
+				( hasRichData &&
+					( richData?.image || richData?.description ) ) ||
+				isFetching
+			) && (
 				<div className="block-editor-link-control__search-item-bottom">
 					{ ( richData?.image || isFetching ) && (
 						<div

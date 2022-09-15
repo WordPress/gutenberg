@@ -163,6 +163,7 @@ const EmbedNoPreview = ( {
 				hideHeader
 				onDismiss={ onDismissSheet }
 				onClose={ onCloseSheet }
+				testID="embed-no-preview-modal"
 			>
 				<View style={ styles[ 'embed-no-preview__container' ] }>
 					<View style={ sheetIconStyle }>

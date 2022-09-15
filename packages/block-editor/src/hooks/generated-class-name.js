@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { uniq } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
@@ -20,21 +15,23 @@ import { hasBlockSupport, getBlockDefaultClassName } from '@wordpress/blocks';
  * @return {Object} Filtered props applied to save element.
  */
 export function addGeneratedClassName( extraProps, blockType ) {
-	// Adding the generated className
+	// Adding the generated className.
 	if ( hasBlockSupport( blockType, 'className', true ) ) {
 		if ( typeof extraProps.className === 'string' ) {
 			// We have some extra classes and want to add the default classname
-			// We use uniq to prevent duplicate classnames
+			// We use uniq to prevent duplicate classnames.
 
-			extraProps.className = uniq( [
-				getBlockDefaultClassName( blockType.name ),
-				...extraProps.className.split( ' ' ),
-			] )
+			extraProps.className = [
+				...new Set( [
+					getBlockDefaultClassName( blockType.name ),
+					...extraProps.className.split( ' ' ),
+				] ),
+			]
 				.join( ' ' )
 				.trim();
 		} else {
 			// There is no string in the className variable,
-			// so we just dump the default name in there
+			// so we just dump the default name in there.
 			extraProps.className = getBlockDefaultClassName( blockType.name );
 		}
 	}

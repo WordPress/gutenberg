@@ -57,17 +57,19 @@ function AlignmentUI( {
 	}
 
 	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
-	const extraProps = isToolbar ? { isCollapsed } : {};
+	const extraProps = isToolbar
+		? { isCollapsed }
+		: {
+				toggleProps: {
+					describedBy,
+				},
+				popoverProps: POPOVER_PROPS,
+		  };
 
 	return (
 		<UIComponent
 			icon={ setIcon() }
 			label={ label }
-			toggleProps={ {
-				describedBy,
-				className: activeAlignment ? 'is-pressed' : undefined,
-			} }
-			popoverProps={ POPOVER_PROPS }
 			controls={ alignmentControls.map( ( control ) => {
 				const { align } = control;
 				const isActive = value === align;

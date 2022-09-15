@@ -1,6 +1,7 @@
 .components-button {
 	display: inline-flex;
 	text-decoration: none;
+	font-family: inherit;
 	font-weight: normal;
 	font-size: $default-font-size;
 	margin: 0;
@@ -198,6 +199,20 @@
 			color: #fff;
 			background: darken($alert-red, 20%);
 			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
+		}
+	}
+
+	&.is-destructive.is-tertiary {
+		box-shadow: none;
+
+		&:hover:not(:disabled) {
+			box-shadow: inset 0 0 0 $border-width $alert-red;
+			color: $alert-red;
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $alert-red;
+			color: $alert-red;
 		}
 	}
 

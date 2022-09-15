@@ -222,6 +222,22 @@ describe( 'attributes parsing', () => {
 			expect( value ).toBe( 10 );
 		} );
 
+		it( 'should return the comment attribute value when using multiple types', () => {
+			const value = getBlockAttribute(
+				'templateLock',
+				{
+					type: [ 'string', 'boolean' ],
+					enum: [ 'all', 'insert', false ],
+				},
+				'',
+				{
+					templateLock: false,
+				}
+			);
+
+			expect( value ).toBe( false );
+		} );
+
 		it( 'should reject type-invalid value, with default', () => {
 			const value = getBlockAttribute(
 				'number',

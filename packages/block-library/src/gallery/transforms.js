@@ -1,15 +1,13 @@
 /**
  * External dependencies
  */
-import { filter, every, toString } from 'lodash';
+import { filter, every } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
-import { select } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -24,7 +22,7 @@ import {
 	LINK_DESTINATION_ATTACHMENT as DEPRECATED_LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA as DEPRECATED_LINK_DESTINATION_MEDIA,
 } from './v1/constants';
-import { pickRelevantMediaFiles } from './shared';
+import { pickRelevantMediaFiles, isGalleryV2Enabled } from './shared';
 
 const parseShortcodeIds = ( ids ) => {
 	if ( ! ids ) {
@@ -49,9 +47,8 @@ const parseShortcodeIds = ( ids ) => {
  * @return   {Block}                 The transformed block.
  */
 function updateThirdPartyTransformToGallery( block ) {
-	const settings = select( blockEditorStore ).getSettings();
 	if (
-		settings.__unstableGalleryWithImageBlocks &&
+		isGalleryV2Enabled() &&
 		block.name === 'core/gallery' &&
 		block.attributes?.images.length > 0
 	) {
@@ -145,9 +142,11 @@ const transforms = {
 
 				const validImages = filter( attributes, ( { url } ) => url );
 
-				const settings = select( blockEditorStore ).getSettings();
-				if ( settings.__unstableGalleryWithImageBlocks ) {
+				if ( isGalleryV2Enabled() ) {
 					const innerBlocks = validImages.map( ( image ) => {
+						// Gallery images can't currently be resized so make sure height and width are undefined.
+						image.width = undefined;
+						image.height = undefined;
 						return createBlock( 'core/image', image );
 					} );
 
@@ -164,7 +163,7 @@ const transforms = {
 				return createBlock( 'core/gallery', {
 					images: validImages.map(
 						( { id, url, alt, caption } ) => ( {
-							id: toString( id ),
+							id: id.toString(),
 							url,
 							alt,
 							caption,
@@ -184,12 +183,9 @@ const transforms = {
 				images: {
 					type: 'array',
 					shortcode: ( { named: { ids } } ) => {
-						const settings = select(
-							blockEditorStore
-						).getSettings();
-						if ( ! settings.__unstableGalleryWithImageBlocks ) {
+						if ( ! isGalleryV2Enabled() ) {
 							return parseShortcodeIds( ids ).map( ( id ) => ( {
-								id: toString( id ),
+								id: id.toString(),
 							} ) );
 						}
 					},
@@ -197,24 +193,8 @@ const transforms = {
 				ids: {
 					type: 'array',
 					shortcode: ( { named: { ids } } ) => {
-						const settings = select(
-							blockEditorStore
-						).getSettings();
-						if ( ! settings.__unstableGalleryWithImageBlocks ) {
+						if ( ! isGalleryV2Enabled() ) {
 							return parseShortcodeIds( ids );
-						}
-					},
-				},
-				shortCodeTransforms: {
-					type: 'array',
-					shortcode: ( { named: { ids } } ) => {
-						const settings = select(
-							blockEditorStore
-						).getSettings();
-						if ( settings.__unstableGalleryWithImageBlocks ) {
-							return parseShortcodeIds( ids ).map( ( id ) => ( {
-								id: parseInt( id ),
-							} ) );
 						}
 					},
 				},
@@ -227,10 +207,7 @@ const transforms = {
 				linkTo: {
 					type: 'string',
 					shortcode: ( { named: { link } } ) => {
-						const settings = select(
-							blockEditorStore
-						).getSettings();
-						if ( ! settings.__unstableGalleryWithImageBlocks ) {
+						if ( ! isGalleryV2Enabled() ) {
 							switch ( link ) {
 								case 'post':
 									return DEPRECATED_LINK_DESTINATION_ATTACHMENT;
@@ -250,6 +227,31 @@ const transforms = {
 						}
 					},
 				},
+			},
+			transform( { named: { ids, columns = 3, link } } ) {
+				const imageIds = parseShortcodeIds( ids ).map( ( id ) =>
+					parseInt( id, 10 )
+				);
+
+				let linkTo = LINK_DESTINATION_NONE;
+				if ( link === 'post' ) {
+					linkTo = LINK_DESTINATION_ATTACHMENT;
+				} else if ( link === 'file' ) {
+					linkTo = LINK_DESTINATION_MEDIA;
+				}
+
+				const galleryBlock = createBlock(
+					'core/gallery',
+					{
+						columns: parseInt( columns, 10 ),
+						linkTo,
+					},
+					imageIds.map( ( imageId ) =>
+						createBlock( 'core/image', { id: imageId } )
+					)
+				);
+
+				return galleryBlock;
 			},
 			isMatch( { named } ) {
 				return undefined !== named.ids;
@@ -273,8 +275,7 @@ const transforms = {
 				);
 			},
 			transform( files ) {
-				const settings = select( blockEditorStore ).getSettings();
-				if ( settings.__unstableGalleryWithImageBlocks ) {
+				if ( isGalleryV2Enabled() ) {
 					const innerBlocks = files.map( ( file ) =>
 						createBlock( 'core/image', {
 							url: createBlobURL( file ),
@@ -299,26 +300,41 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/image' ],
 			transform: ( { align, images, ids, sizeSlug }, innerBlocks ) => {
-				const settings = select( blockEditorStore ).getSettings();
-				if ( settings.__unstableGalleryWithImageBlocks ) {
+				if ( isGalleryV2Enabled() ) {
 					if ( innerBlocks.length > 0 ) {
 						return innerBlocks.map(
 							( {
 								attributes: {
-									id,
 									url,
 									alt,
 									caption,
-									imageSizeSlug,
+									title,
+									href,
+									rel,
+									linkClass,
+									id,
+									sizeSlug: imageSizeSlug,
+									linkDestination,
+									linkTarget,
+									anchor,
+									className,
 								},
 							} ) =>
 								createBlock( 'core/image', {
-									id,
+									align,
 									url,
 									alt,
 									caption,
+									title,
+									href,
+									rel,
+									linkClass,
+									id,
 									sizeSlug: imageSizeSlug,
-									align,
+									linkDestination,
+									linkTarget,
+									anchor,
+									className,
 								} )
 						);
 					}

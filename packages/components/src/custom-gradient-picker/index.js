@@ -1,23 +1,25 @@
 /**
  * External dependencies
  */
-import { get, omit } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import AnglePickerControl from '../angle-picker-control';
-import CustomGradientBar from '../custom-gradient-bar';
+import CustomGradientBar from './gradient-bar';
 import { Flex } from '../flex';
 import SelectControl from '../select-control';
+import { VStack } from '../v-stack';
 import {
 	getGradientAstWithDefault,
-	getLinearGradientRepresentationOfARadial,
+	getLinearGradientRepresentation,
 	getGradientAstWithControlPoints,
 	getStopCssColor,
 } from './utils';
@@ -34,11 +36,8 @@ import {
 } from './styles/custom-gradient-picker-styles';
 
 const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
-	const angle = get(
-		gradientAST,
-		[ 'orientation', 'value' ],
-		DEFAULT_LINEAR_GRADIENT_ANGLE
-	);
+	const angle =
+		gradientAST?.orientation?.value ?? DEFAULT_LINEAR_GRADIENT_ANGLE;
 	const onAngleChange = ( newAngle ) => {
 		onChange(
 			serializeGradient( {
@@ -52,8 +51,9 @@ const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
 	};
 	return (
 		<AnglePickerControl
-			hideLabelFromVision
+			__nextHasNoMarginBottom
 			onChange={ onAngleChange }
+			labelPosition="top"
 			value={ hasGradient ? angle : '' }
 		/>
 	);
@@ -74,9 +74,10 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 	};
 
 	const onSetRadialGradient = () => {
+		const { orientation, ...restGradientAST } = gradientAST;
 		onChange(
 			serializeGradient( {
-				...omit( gradientAST, [ 'orientation' ] ),
+				...restGradientAST,
 				type: 'radial-gradient',
 			} )
 		);
@@ -93,24 +94,30 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 
 	return (
 		<SelectControl
+			__nextHasNoMarginBottom
 			className="components-custom-gradient-picker__type-picker"
 			label={ __( 'Type' ) }
-			labelPosition={ 'side' }
+			labelPosition="top"
 			onChange={ handleOnChange }
 			options={ GRADIENT_OPTIONS }
+			size="__unstable-large"
 			value={ hasGradient && type }
 		/>
 	);
 };
 
-export default function CustomGradientPicker( { value, onChange } ) {
+export default function CustomGradientPicker( {
+	/** Start opting into the new margin-free styles that will become the default in a future version. */
+	__nextHasNoMargin = false,
+	value,
+	onChange,
+	__experimentalIsRenderedInSidebar,
+} ) {
 	const gradientAST = getGradientAstWithDefault( value );
 	// On radial gradients the bar should display a linear gradient.
 	// On radial gradients the bar represents a slice of the gradient from the center until the outside.
-	const background =
-		gradientAST.type === 'radial-gradient'
-			? getLinearGradientRepresentationOfARadial( gradientAST )
-			: gradientAST.value;
+	// On liner gradients the bar represents the color stops from left to right independently of the angle.
+	const background = getLinearGradientRepresentation( gradientAST );
 	const hasGradient = gradientAST.value !== DEFAULT_GRADIENT;
 	// Control points color option may be hex from presets, custom colors will be rgb.
 	// The position should always be a percentage.
@@ -119,9 +126,28 @@ export default function CustomGradientPicker( { value, onChange } ) {
 		position: parseInt( colorStop.length.value ),
 	} ) );
 
+	if ( ! __nextHasNoMargin ) {
+		deprecated(
+			'Outer margin styles for wp.components.CustomGradientPicker',
+			{
+				since: '6.1',
+				version: '6.4',
+				hint: 'Set the `__nextHasNoMargin` prop to true to start opting into the new styles, which will become the default in a future version',
+			}
+		);
+	}
+
 	return (
-		<div className="components-custom-gradient-picker">
+		<VStack
+			spacing={ 4 }
+			className={ classnames( 'components-custom-gradient-picker', {
+				'is-next-has-no-margin': __nextHasNoMargin,
+			} ) }
+		>
 			<CustomGradientBar
+				__experimentalIsRenderedInSidebar={
+					__experimentalIsRenderedInSidebar
+				}
 				background={ background }
 				hasGradient={ hasGradient }
 				value={ controlPoints }
@@ -157,6 +183,6 @@ export default function CustomGradientPicker( { value, onChange } ) {
 					) }
 				</AccessoryWrapper>
 			</Flex>
-		</div>
+		</VStack>
 	);
 }

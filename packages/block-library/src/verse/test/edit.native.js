@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import renderer from 'react-test-renderer';
+import { render } from 'test/helpers';
 
 /**
  * Internal dependencies
@@ -11,7 +11,7 @@ import { metadata, settings, name } from '../index';
 /**
  * WordPress dependencies
  */
-import { RichText, BlockEdit } from '@wordpress/block-editor';
+import { BlockEdit } from '@wordpress/block-editor';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 
 const Verse = ( { clientId, ...props } ) => (
@@ -31,20 +31,17 @@ describe( 'Verse Block', () => {
 	} );
 
 	it( 'renders without crashing', () => {
-		const component = renderer.create(
-			<Verse attributes={ { content: '' } } />
-		);
+		const component = render( <Verse attributes={ { content: '' } } /> );
 		const rendered = component.toJSON();
 		expect( rendered ).toBeTruthy();
 	} );
 
 	it( 'renders given text without crashing', () => {
-		const component = renderer.create(
+		const component = render(
 			<Verse attributes={ { content: 'sample text' } } />
 		);
-		const testInstance = component.root;
-		const richText = testInstance.findByType( RichText );
-		expect( richText ).toBeTruthy();
-		expect( richText.props.value ).toBe( 'sample text' );
+		expect(
+			component.getByDisplayValue( '<pre>sample text</pre>' )
+		).toBeTruthy();
 	} );
 } );

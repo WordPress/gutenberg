@@ -132,7 +132,8 @@ function getListViewDropTarget( blocksData, position ) {
 			) {
 				candidateBlockData = previousBlockData;
 				candidateEdge = 'bottom';
-				candidateRect = previousBlockData.element.getBoundingClientRect();
+				candidateRect =
+					previousBlockData.element.getBoundingClientRect();
 			} else {
 				candidateBlockData = blockData;
 				candidateEdge = edge;
@@ -226,7 +227,7 @@ export default function useListViewDropZone() {
 					return {
 						clientId,
 						rootClientId,
-						blockIndex: getBlockIndex( clientId, rootClientId ),
+						blockIndex: getBlockIndex( clientId ),
 						element: blockElement,
 						isDraggedBlock: isBlockDrag
 							? draggedBlockClientIds.includes( clientId )

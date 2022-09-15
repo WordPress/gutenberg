@@ -1,25 +1,43 @@
 /**
  * External dependencies
  */
-import { act, create } from 'react-test-renderer';
+import { render } from 'test/helpers';
 
 /**
  * WordPress dependencies
  */
-import { MediaUploadProgress, BlockEdit } from '@wordpress/block-editor';
+import { BlockEdit } from '@wordpress/block-editor';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import {
+	subscribeMediaUpload,
+	sendMediaUpload,
+} from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
  */
 import { metadata, settings, name } from '../index';
 
+// react-native-aztec shouldn't be mocked because these tests are based on
+// snapshot testing where we want to keep the original component.
+jest.unmock( '@wordpress/react-native-aztec' );
+
+const MEDIA_UPLOAD_STATE_FAILED = 3;
+
+let uploadCallBack;
+subscribeMediaUpload.mockImplementation( ( callback ) => {
+	uploadCallBack = callback;
+} );
+sendMediaUpload.mockImplementation( ( payload ) => {
+	uploadCallBack( payload );
+} );
+
 const AudioEdit = ( { clientId, ...props } ) => (
 	<BlockEdit name={ name } clientId={ clientId || 0 } { ...props } />
 );
 
 const getTestComponentWithContent = ( attributes = {} ) => {
-	return create(
+	return render(
 		<AudioEdit attributes={ attributes } setAttributes={ jest.fn() } />
 	);
 };
@@ -53,18 +71,17 @@ describe( 'Audio block', () => {
 	} );
 
 	it( 'renders audio block error state without crashing', () => {
+		const MEDIA_ID = '1';
 		const component = getTestComponentWithContent( {
 			src: 'https://cldup.com/59IrU0WJtq.mp3',
-			id: '1',
+			id: MEDIA_ID,
 		} );
 
-		const mediaUpload = component.root.findByType( MediaUploadProgress );
-
-		act( () => {
-			mediaUpload.instance.finishMediaUploadWithFailure( {
-				mediaId: -1,
-			} );
-		} );
+		const payloadFail = {
+			state: MEDIA_UPLOAD_STATE_FAILED,
+			mediaId: MEDIA_ID,
+		};
+		sendMediaUpload( payloadFail );
 
 		const rendered = component.toJSON();
 		expect( rendered ).toMatchSnapshot();

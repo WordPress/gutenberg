@@ -6,7 +6,9 @@ module.exports = {
 		},
 	},
 	settings: {
-		'import/extensions': [ '.js', '.jsx' ],
+		react: {
+			version: 'detect',
+		},
 	},
 	plugins: [ '@wordpress', 'react', 'react-hooks' ],
 	rules: {

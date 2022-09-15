@@ -1,8 +1,16 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
-import { __, sprintf } from '@wordpress/i18n';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
@@ -17,13 +25,13 @@ export default function save( { attributes } ) {
 		previewHeight,
 	} = attributes;
 
-	const pdfEmbedLabel = RichText.isEmpty( fileName )
-		? __( 'PDF embed' )
-		: sprintf(
-				/* translators: %s: filename. */
-				__( 'Embed of %s.' ),
-				fileName
-		  );
+	const pdfEmbedLabel = RichText.isEmpty( fileName ) ? 'PDF embed' : fileName;
+
+	const hasFilename = ! RichText.isEmpty( fileName );
+
+	// Only output an `aria-describedby` when the element it's referring to is
+	// actually rendered.
+	const describedById = hasFilename ? fileId : undefined;
 
 	return (
 		href && (
@@ -42,9 +50,9 @@ export default function save( { attributes } ) {
 						/>
 					</>
 				) }
-				{ ! RichText.isEmpty( fileName ) && (
+				{ hasFilename && (
 					<a
-						id={ fileId }
+						id={ describedById }
 						href={ textLinkHref }
 						target={ textLinkTarget }
 						rel={
@@ -57,9 +65,12 @@ export default function save( { attributes } ) {
 				{ showDownloadButton && (
 					<a
 						href={ href }
-						className="wp-block-file__button"
+						className={ classnames(
+							'wp-block-file__button',
+							__experimentalGetElementClassName( 'button' )
+						) }
 						download={ true }
-						aria-describedby={ fileId }
+						aria-describedby={ describedById }
 					>
 						<RichText.Content value={ downloadButtonText } />
 					</a>

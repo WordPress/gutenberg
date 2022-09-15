@@ -1,0 +1,44 @@
+[
+	{
+		"name": "core/comments-pagination",
+		"isValid": true,
+		"attributes": {
+			"paginationArrow": "chevron",
+			"backgroundColor": "foreground",
+			"textColor": "background",
+			"style": {
+				"elements": {
+					"link": {
+						"color": {
+							"text": "var:preset|color|background"
+						}
+					}
+				}
+			}
+		},
+		"innerBlocks": [
+			{
+				"name": "core/comments-pagination-previous",
+				"isValid": true,
+				"attributes": {
+					"label": "Previous label comments"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/comments-pagination-numbers",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/comments-pagination-next",
+				"isValid": true,
+				"attributes": {
+					"label": "Next label comments"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

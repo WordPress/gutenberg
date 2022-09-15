@@ -41,6 +41,8 @@ _Note:_ A block can render at most a single `InnerBlocks` and `InnerBlocks.Conte
 
 _Note:_ Because the save step will automatically apply props to the element returned by `save`, it is important to include the wrapping `div` in the above simple example even though we are applying no props of our own. In a real-world example, you may have your own attributes to apply to the saved markup, or sibling content adjacent to the rendered nested blocks.
 
+_Note:_ Inner blocks, by default, are not visible inside a WordPress excerpt. If you wish your block to appear then it needs to be returned from the `excerpt_allowed_wrapper_blocks` filter. More details can be found on the [filter reference page](https://developer.wordpress.org/reference/hooks/excerpt_allowed_wrapper_blocks/) page, as well as the [excerpt_remove_blocks](https://developer.wordpress.org/reference/functions/excerpt_remove_blocks/) page.
+
 ## Props
 
 ### `allowedBlocks`
@@ -123,11 +125,12 @@ Template locking of `InnerBlocks` is similar to [Custom Post Type templates lock
 Template locking allows locking the `InnerBlocks` area for the current template.
 _Options:_
 
+-   `contentOnly` — prevents all operations. Additionally, the block types that don't have content are hidden from the list view and can't gain focus within the block list. Unlike the other lock types, this is not overrideable by children.
 -   `'all'` — prevents all operations. It is not possible to insert new blocks. Move existing blocks or delete them.
 -   `'insert'` — prevents inserting or removing blocks, but allows moving existing ones.
 -   `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block contains locking. ( Boolean )
 
-If locking is not set in an `InnerBlocks` area: the locking of the parent `InnerBlocks` area is used.
+If locking is not set in an `InnerBlocks` area: the locking of the parent `InnerBlocks` area is used. Note that `contentOnly` can't be overriden: it's present, the `templateLock` value of any children is ignored.
 
 If the block is a top level block: the locking of the Custom Post Type is used.
 

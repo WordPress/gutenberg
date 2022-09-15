@@ -17,9 +17,8 @@ import { store as blockEditorStore } from '../../store';
  * @return {import('react').RefCallback} Ref callback.
  */
 export function useBlockSelectionClearer() {
-	const { hasSelectedBlock, hasMultiSelection } = useSelect(
-		blockEditorStore
-	);
+	const { hasSelectedBlock, hasMultiSelection } =
+		useSelect( blockEditorStore );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
 	return useRefEffect(

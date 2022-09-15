@@ -50,12 +50,10 @@ class GalleryImage extends Component {
 		this.onSelectMedia = this.onSelectMedia.bind( this );
 
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
-			this
-		);
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
-			this
-		);
+		this.finishMediaUploadWithSuccess =
+			this.finishMediaUploadWithSuccess.bind( this );
+		this.finishMediaUploadWithFailure =
+			this.finishMediaUploadWithFailure.bind( this );
 		this.renderContent = this.renderContent.bind( this );
 
 		this.state = {
@@ -79,11 +77,8 @@ class GalleryImage extends Component {
 
 	onMediaPressed() {
 		const { id, url, isSelected } = this.props;
-		const {
-			captionSelected,
-			isUploadInProgress,
-			didUploadFail,
-		} = this.state;
+		const { captionSelected, isUploadInProgress, didUploadFail } =
+			this.state;
 
 		this.onSelectImage();
 
@@ -134,8 +129,8 @@ class GalleryImage extends Component {
 			} );
 		}
 
-		// unselect the caption so when the user selects other image and comeback
-		// the caption is not immediately selected
+		// Unselect the caption so when the user selects other image and comeback
+		// the caption is not immediately selected.
 		if (
 			this.state.captionSelected &&
 			! isSelected &&
@@ -303,12 +298,8 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const {
-			id,
-			onRemove,
-			getStylesFromColorScheme,
-			isSelected,
-		} = this.props;
+		const { id, onRemove, getStylesFromColorScheme, isSelected } =
+			this.props;
 
 		const containerStyle = getStylesFromColorScheme(
 			style.galleryImageContainer,
@@ -318,7 +309,7 @@ class GalleryImage extends Component {
 		return (
 			<TouchableWithoutFeedback
 				onPress={ this.onMediaPressed }
-				accessible={ ! isSelected } // We need only child views to be accessible after the selection
+				accessible={ ! isSelected } // We need only child views to be accessible after the selection.
 				accessibilityLabel={ this.accessibilityLabelImageContainer() } // if we don't set this explicitly it reads system provided accessibilityLabels of all child components and those include pretty technical words which don't make sense
 				accessibilityRole={ 'imagebutton' } // this makes VoiceOver to read a description of image provided by system on iOS and lets user know this is a button which conveys the message of tappablity
 			>

@@ -4,19 +4,24 @@
  * External dependencies
  */
 import { boolean, select } from '@storybook/addon-knobs';
+import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 
 /**
  * WordPress dependencies
  */
-import { typography } from '@wordpress/icons';
+import { typography, chevronRight } from '@wordpress/icons';
+import { useMemo } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import { useCx } from '../../utils';
 import { ItemGroup, Item } from '..';
 import Button from '../../button';
 import { FlexItem, FlexBlock } from '../../flex';
-import { Flyout } from '../../flyout';
+import Dropdown from '../../dropdown';
 import { HStack } from '../../h-stack';
 import Icon from '../../icon';
 import { Text } from '../../text';
@@ -26,6 +31,9 @@ import { ZStack } from '../../z-stack';
 export default {
 	component: ItemGroup,
 	title: 'Components (Experimental)/ItemGroup',
+	parameters: {
+		knobs: { disable: false },
+	},
 };
 
 // Using `unset` instead of `undefined` as Storybook seems to sometimes pass an
@@ -49,14 +57,14 @@ export const _default = () => {
 		size: select(
 			'Item 1: size',
 			{
-				'unset (defaults to the value set on the <ItemGroup> parent)': PROP_UNSET,
+				'unset (defaults to the value set on the <ItemGroup> parent)':
+					PROP_UNSET,
 				small: 'small',
 				medium: 'medium',
 				large: 'large',
 			},
 			PROP_UNSET
 		),
-		isAction: boolean( 'Item 1: isAction', true ),
 	};
 
 	// Do not pass the `size` prop when its value is `undefined`.
@@ -68,16 +76,14 @@ export const _default = () => {
 
 	return (
 		<ItemGroup style={ { width: '350px' } } { ...itemGroupProps }>
-			<Item { ...itemProps } onClick={ () => alert( 'WordPress.org' ) }>
+			<Item { ...itemProps }>Code is Poetry (no click handlers)</Item>
+			<Item onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
+			<Item onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
-				Code is Poetry — Click me!
-			</Item>
-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
+			<Item onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
 		</ItemGroup>
@@ -85,28 +91,30 @@ export const _default = () => {
 };
 
 export const dropdown = () => (
-	<Flyout
-		style={ { width: '350px' } }
-		trigger={ <Button>Open Popover</Button> }
-	>
-		<ItemGroup style={ { padding: 4 } }>
-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
-				Code is Poetry — Click me!
-			</Item>
-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
-				Code is Poetry — Click me!
-			</Item>
-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
-				Code is Poetry — Click me!
-			</Item>
-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
-				Code is Poetry — Click me!
-			</Item>
-		</ItemGroup>
-	</Flyout>
+	<Dropdown
+		renderToggle={ ( { isOpen, onToggle } ) => (
+			<Button onClick={ onToggle } aria-expanded={ isOpen }>
+				Open Popover
+			</Button>
+		) }
+		renderContent={ () => (
+			<ItemGroup style={ { minWidth: 350, padding: 4 } }>
+				<Item>Code is Poetry (no click handlers)</Item>
+				<Item onClick={ () => alert( 'WordPress.org' ) }>
+					Code is Poetry — Click me!
+				</Item>
+				<Item onClick={ () => alert( 'WordPress.org' ) }>
+					Code is Poetry — Click me!
+				</Item>
+				<Item onClick={ () => alert( 'WordPress.org' ) }>
+					Code is Poetry — Click me!
+				</Item>
+			</ItemGroup>
+		) }
+	/>
 );
 
-export const SimpleColorSwatch = ( { color, style } ) => (
+const SimpleColorSwatch = ( { color, style } ) => (
 	<div
 		style={ {
 			...style,
@@ -118,6 +126,58 @@ export const SimpleColorSwatch = ( { color, style } ) => (
 		} }
 	/>
 );
+
+const ChevronWrapper = styled( FlexItem )`
+	display: block;
+	fill: currentColor;
+	transition: transform 0.15s ease-out;
+`;
+
+const ItemWithChevron = ( {
+	children,
+	className,
+	alwaysVisible,
+	...otherProps
+} ) => {
+	const isRtlLayout = isRTL();
+	const cx = useCx();
+
+	const appearingChevron = css`
+		&:not( :hover ):not( :focus ) ${ ChevronWrapper } {
+			display: none;
+		}
+	`;
+
+	const itemClassName = useMemo(
+		() => cx( ! alwaysVisible && appearingChevron, className ),
+		[ alwaysVisible, className, cx ]
+	);
+
+	const chevronIconClassName = useMemo(
+		() =>
+			cx( css`
+				display: block;
+				fill: currentColor;
+				transform: ${ isRtlLayout ? 'scaleX( -100% )' : 'none' };
+			` ),
+		[ cx, isRtlLayout ]
+	);
+
+	return (
+		<Item { ...otherProps } className={ itemClassName }>
+			<HStack justify="flex-start">
+				<FlexBlock>{ children }</FlexBlock>
+				<ChevronWrapper>
+					<Icon
+						className={ chevronIconClassName }
+						icon={ chevronRight }
+						size={ 24 }
+					/>
+				</ChevronWrapper>
+			</HStack>
+		</Item>
+	);
+};
 
 export const complexLayouts = () => {
 	const colors = [
@@ -141,7 +201,7 @@ export const complexLayouts = () => {
 
 	return (
 		<ItemGroup isBordered isSeparated style={ { width: '250px' } }>
-			<Item isAction onClick={ () => alert( 'Color palette' ) }>
+			<Item onClick={ () => alert( 'Color palette' ) }>
 				<HStack>
 					<FlexBlock>
 						<ZStack isLayered={ false } offset={ -8 }>
@@ -156,7 +216,7 @@ export const complexLayouts = () => {
 				</HStack>
 			</Item>
 
-			<Item isAction onClick={ () => alert( 'Single color setting' ) }>
+			<Item onClick={ () => alert( 'Single color setting' ) }>
 				<HStack justify="flex-start">
 					<FlexItem
 						as={ SimpleColorSwatch }
@@ -169,10 +229,7 @@ export const complexLayouts = () => {
 				</HStack>
 			</Item>
 
-			<Item
-				isAction
-				onClick={ () => alert( 'Single typography setting' ) }
-			>
+			<Item onClick={ () => alert( 'Single typography setting' ) }>
 				<HStack justify="flex-start">
 					<FlexItem>
 						<Icon icon={ typography } size={ 24 } />
@@ -182,6 +239,31 @@ export const complexLayouts = () => {
 					</FlexItem>
 				</HStack>
 			</Item>
+
+			<ItemWithChevron onClick={ () => alert( 'Single color setting' ) }>
+				<HStack justify="flex-start">
+					<SimpleColorSwatch
+						color="#2FB63F"
+						style={ { flexShrink: 0 } }
+					/>
+
+					<Truncate>Chevron on hover and focus</Truncate>
+				</HStack>
+			</ItemWithChevron>
+
+			<ItemWithChevron
+				alwaysVisible
+				onClick={ () => alert( 'Single color setting' ) }
+			>
+				<HStack justify="flex-start">
+					<SimpleColorSwatch
+						color="#D175D0"
+						style={ { flexShrink: 0 } }
+					/>
+
+					<Truncate>Chevron always visible</Truncate>
+				</HStack>
+			</ItemWithChevron>
 		</ItemGroup>
 	);
 };

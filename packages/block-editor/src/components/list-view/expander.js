@@ -1,7 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { chevronRightSmall, Icon } from '@wordpress/icons';
+import { chevronRightSmall, chevronLeftSmall, Icon } from '@wordpress/icons';
+import { isRTL } from '@wordpress/i18n';
+
 export default function ListViewExpander( { onClick } ) {
 	return (
 		// Keyboard events are handled by TreeGrid see: components/src/tree-grid/index.js
@@ -18,7 +20,7 @@ export default function ListViewExpander( { onClick } ) {
 			onClick={ ( event ) => onClick( event, { forceToggle: true } ) }
 			aria-hidden="true"
 		>
-			<Icon icon={ chevronRightSmall } />
+			<Icon icon={ isRTL() ? chevronLeftSmall : chevronRightSmall } />
 		</span>
 	);
 }

@@ -3,6 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -10,7 +11,6 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { MENU_POST_TYPE, MENU_KIND } from '../constants';
-import { stripHTML } from '../utils';
 
 export default function useMenuNotifications( menuId ) {
 	const { createErrorNotice } = useDispatch( noticesStore );

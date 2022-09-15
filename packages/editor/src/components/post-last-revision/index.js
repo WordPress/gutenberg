@@ -5,19 +5,19 @@ import { sprintf, _n } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { backup } from '@wordpress/icons';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import PostLastRevisionCheck from './check';
-import { getWPAdminURL } from '../../utils/url';
 import { store as editorStore } from '../../store';
 
 function LastRevision( { lastRevisionId, revisionsCount } ) {
 	return (
 		<PostLastRevisionCheck>
 			<Button
-				href={ getWPAdminURL( 'revision.php', {
+				href={ addQueryArgs( 'revision.php', {
 					revision: lastRevisionId,
 					gutenberg: true,
 				} ) }
@@ -35,10 +35,8 @@ function LastRevision( { lastRevisionId, revisionsCount } ) {
 }
 
 export default withSelect( ( select ) => {
-	const {
-		getCurrentPostLastRevisionId,
-		getCurrentPostRevisionsCount,
-	} = select( editorStore );
+	const { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } =
+		select( editorStore );
 	return {
 		lastRevisionId: getCurrentPostLastRevisionId(),
 		revisionsCount: getCurrentPostRevisionsCount(),

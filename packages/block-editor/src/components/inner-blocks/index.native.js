@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { getBlockType, withBlockContentContext } from '@wordpress/blocks';
+import {
+	getBlockType,
+	__unstableGetInnerBlocksProps as getInnerBlocksProps,
+} from '@wordpress/blocks';
 import { useRef } from '@wordpress/element';
 
 /**
@@ -18,6 +21,7 @@ import getBlockContext from './get-block-context';
  * Internal dependencies
  */
 import BlockList from '../block-list';
+import BlockListCompact from '../block-list/block-list-compact';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { BlockContextProvider } from '../block-context';
@@ -93,6 +97,7 @@ function UncontrolledInnerBlocks( props ) {
 		blockWidth,
 		__experimentalLayout: layout = defaultLayout,
 		gridProperties,
+		useCompactList,
 	} = props;
 
 	const block = useSelect(
@@ -109,8 +114,10 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection
 	);
 
+	const BlockListComponent = useCompactList ? BlockListCompact : BlockList;
+
 	let blockList = (
-		<BlockList
+		<BlockListComponent
 			marginVertical={ marginVertical }
 			marginHorizontal={ marginHorizontal }
 			rootClientId={ clientId }
@@ -189,9 +196,9 @@ const InnerBlocks = ( props ) => {
 InnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
 InnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
 
-InnerBlocks.Content = withBlockContentContext( ( { BlockContent } ) => (
-	<BlockContent />
-) );
+useInnerBlocksProps.save = getInnerBlocksProps;
+
+InnerBlocks.Content = () => useInnerBlocksProps.save().children;
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md

@@ -4,10 +4,10 @@
 import { __ } from '@wordpress/i18n';
 import { Button, ExternalLink } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 export default function WelcomeGuide( { sidebar } ) {
-	const { toggleFeature } = useDispatch( interfaceStore );
+	const { toggle } = useDispatch( preferencesStore );
 
 	const isEntirelyBlockWidgets = sidebar
 		.getWidgets()
@@ -46,7 +46,7 @@ export default function WelcomeGuide( { sidebar } ) {
 				className="customize-widgets-welcome-guide__button"
 				variant="primary"
 				onClick={ () =>
-					toggleFeature( 'core/customize-widgets', 'welcomeGuide' )
+					toggle( 'core/customize-widgets', 'welcomeGuide' )
 				}
 			>
 				{ __( 'Got it' ) }

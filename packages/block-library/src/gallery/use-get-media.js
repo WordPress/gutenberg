@@ -1,9 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+
+const EMPTY_IMAGE_MEDIA = [];
 
 /**
  * Retrieves the extended media info for each gallery image from the store. This is used to
@@ -14,46 +15,24 @@ import { store as coreStore } from '@wordpress/core-data';
  * @return {Array} An array of media info options for each gallery image.
  */
 export default function useGetMedia( innerBlockImages ) {
-	const [ currentImageMedia, setCurrentImageMedia ] = useState( [] );
-
-	const imageMedia = useSelect(
+	return useSelect(
 		( select ) => {
-			if ( ! innerBlockImages?.length ) {
-				return currentImageMedia;
-			}
-
 			const imageIds = innerBlockImages
 				.map( ( imageBlock ) => imageBlock.attributes.id )
 				.filter( ( id ) => id !== undefined );
 
 			if ( imageIds.length === 0 ) {
-				return currentImageMedia;
-			}
-			const getMedia = select( coreStore ).getMedia;
-			const newImageMedia = imageIds.map( ( img ) => {
-				return getMedia( img );
-			} );
-
-			if ( newImageMedia.some( ( img ) => ! img ) ) {
-				return currentImageMedia;
+				return EMPTY_IMAGE_MEDIA;
 			}
 
-			return newImageMedia;
+			return (
+				select( coreStore ).getMediaItems( {
+					include: imageIds.join( ',' ),
+					per_page: imageIds.length,
+					orderby: 'include',
+				} ) ?? EMPTY_IMAGE_MEDIA
+			);
 		},
 		[ innerBlockImages ]
 	);
-
-	if (
-		imageMedia?.length !== currentImageMedia.length ||
-		imageMedia.some(
-			( newImage ) =>
-				! currentImageMedia.find(
-					( currentImage ) => currentImage.id === newImage.id
-				)
-		)
-	) {
-		setCurrentImageMedia( imageMedia );
-		return imageMedia;
-	}
-	return currentImageMedia;
 }

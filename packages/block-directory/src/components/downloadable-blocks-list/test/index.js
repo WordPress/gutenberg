@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,7 @@ import DownloadableBlocksList from '../';
 import { items } from '../../test/fixtures';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// This allows us to tweak the returned value on each test
+	// This allows us to tweak the returned value on each test.
 	const mock = jest.fn();
 	return mock;
 } );
@@ -44,14 +44,14 @@ describe( 'DownloadableBlocksList', () => {
 		} );
 
 		it( 'should render plugins items into the list', () => {
-			const { getAllByRole } = render(
+			render(
 				<DownloadableBlocksList
 					items={ items }
 					onSelect={ jest.fn() }
 					onHover={ jest.fn() }
 				/>
 			);
-			const downloadableBlocks = getAllByRole( 'option' );
+			const downloadableBlocks = screen.getAllByRole( 'option' );
 
 			expect( downloadableBlocks ).toHaveLength( items.length );
 		} );

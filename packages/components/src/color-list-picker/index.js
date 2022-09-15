@@ -2,19 +2,23 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { swatch } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
 import ColorPalette from '../color-palette';
-import Swatch from '../swatch';
+import ColorIndicator from '../color-indicator';
+import Icon from '../icon';
+import { HStack } from '../h-stack';
 
 function ColorOption( {
 	label,
 	value,
 	colors,
 	disableCustomColors,
+	enableAlpha,
 	onChange,
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
@@ -22,18 +26,29 @@ function ColorOption( {
 		<>
 			<Button
 				className="components-color-list-picker__swatch-button"
-				icon={ <Swatch fill={ value } /> }
 				onClick={ () => setIsOpen( ( prev ) => ! prev ) }
 			>
-				{ label }
+				<HStack justify="flex-start" spacing={ 2 }>
+					{ value ? (
+						<ColorIndicator
+							colorValue={ value }
+							className="components-color-list-picker__swatch-color"
+						/>
+					) : (
+						<Icon icon={ swatch } />
+					) }
+					<span>{ label }</span>
+				</HStack>
 			</Button>
 			{ isOpen && (
 				<ColorPalette
+					className="components-color-list-picker__color-picker"
 					colors={ colors }
 					value={ value }
 					clearable={ false }
 					onChange={ onChange }
 					disableCustomColors={ disableCustomColors }
+					enableAlpha={ enableAlpha }
 				/>
 			) }
 		</>
@@ -45,6 +60,7 @@ function ColorListPicker( {
 	labels,
 	value = [],
 	disableCustomColors,
+	enableAlpha,
 	onChange,
 } ) {
 	return (
@@ -56,6 +72,7 @@ function ColorListPicker( {
 					value={ value[ index ] }
 					colors={ colors }
 					disableCustomColors={ disableCustomColors }
+					enableAlpha={ enableAlpha }
 					onChange={ ( newColor ) => {
 						const newColors = value.slice();
 						newColors[ index ] = newColor;

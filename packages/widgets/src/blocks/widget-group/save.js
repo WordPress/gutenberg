@@ -11,7 +11,9 @@ export default function save( { attributes } ) {
 				className="widget-title"
 				value={ attributes.title }
 			/>
-			<InnerBlocks.Content />
+			<div className="wp-widget-group__inner-blocks">
+				<InnerBlocks.Content />
+			</div>
 		</>
 	);
 }

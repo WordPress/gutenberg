@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import { sortBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createBlock, parse } from '@wordpress/blocks';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Convert a flat menu item structure to a nested blocks structure.
@@ -21,7 +17,12 @@ export default function menuItemsToBlocks( menuItems ) {
 	}
 
 	const menuTree = createDataTree( menuItems );
-	return mapMenuItemsToBlocks( menuTree );
+	const blocks = mapMenuItemsToBlocks( menuTree );
+	return applyFilters(
+		'blocks.navigation.__unstableMenuItemsToBlocks',
+		blocks,
+		menuItems
+	);
 }
 
 /**
@@ -34,7 +35,9 @@ function mapMenuItemsToBlocks( menuItems ) {
 	let mapping = {};
 
 	// The menuItem should be in menu_order sort order.
-	const sortedItems = sortBy( menuItems, 'menu_order' );
+	const sortedItems = [ ...menuItems ].sort(
+		( a, b ) => a.menu_order - b.menu_order
+	);
 
 	const innerBlocks = sortedItems.map( ( menuItem ) => {
 		if ( menuItem.type === 'block' ) {
@@ -72,7 +75,7 @@ function mapMenuItemsToBlocks( menuItems ) {
 		// Create block with nested "innerBlocks".
 		const block = createBlock( blockType, attributes, nestedBlocks );
 
-		// Create mapping for menuItem -> block
+		// Create mapping for menuItem -> block.
 		mapping[ menuItem.id ] = block.clientId;
 
 		return block;
@@ -148,14 +151,15 @@ function menuItemToBlockAttributes( {
 			classes.join( ' ' ).trim() && {
 				className: classes.join( ' ' ).trim(),
 			} ),
+		/* eslint-disable camelcase */
 		...( attr_title?.length && {
 			title: attr_title,
 		} ),
-		// eslint-disable-next-line camelcase
 		...( object_id &&
 			'custom' !== object && {
 				id: object_id,
 			} ),
+		/* eslint-enable camelcase */
 		...( description?.length && {
 			description,
 		} ),
@@ -189,9 +193,10 @@ function createDataTree( dataset, id = 'id', relation = 'parent' ) {
 			...data,
 			children: [],
 		};
-	}
-	for ( const data of dataset ) {
 		if ( data[ relation ] ) {
+			hashTable[ data[ relation ] ] = hashTable[ data[ relation ] ] || {};
+			hashTable[ data[ relation ] ].children =
+				hashTable[ data[ relation ] ].children || [];
 			hashTable[ data[ relation ] ].children.push(
 				hashTable[ data[ id ] ]
 			);

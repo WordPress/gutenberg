@@ -20,11 +20,10 @@ export default function useMenuEntity( menuId ) {
 					select( coreStore ).getEditedEntityRecord(
 						...menuEntityData
 					),
-				hasLoadedEditedMenu: select(
-					coreStore
-				).hasFinishedResolution( 'getEditedEntityRecord', [
-					...menuEntityData,
-				] ),
+				hasLoadedEditedMenu: select( coreStore ).hasFinishedResolution(
+					'getEditedEntityRecord',
+					[ ...menuEntityData ]
+				),
 			};
 		},
 		[ menuId ]

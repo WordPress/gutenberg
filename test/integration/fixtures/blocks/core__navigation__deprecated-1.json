@@ -1,0 +1,27 @@
+[
+	{
+		"name": "core/navigation",
+		"isValid": true,
+		"attributes": {
+			"showSubmenuIcon": true,
+			"openSubmenusOnClick": false,
+			"overlayMenu": "mobile",
+			"layout": {
+				"type": "flex",
+				"orientation": "horizontal"
+			}
+		},
+		"innerBlocks": [
+			{
+				"name": "core/navigation-link",
+				"isValid": true,
+				"attributes": {
+					"label": "WordPress",
+					"opensInNewTab": false,
+					"url": "https://www.wordpress.org/"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

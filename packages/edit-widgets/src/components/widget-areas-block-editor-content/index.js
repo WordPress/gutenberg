@@ -11,7 +11,7 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -22,11 +22,13 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 export default function WidgetAreasBlockEditorContent( {
 	blockEditorSettings,
 } ) {
-	const hasThemeStyles = useSelect( ( select ) =>
-		select( interfaceStore ).isFeatureActive(
-			'core/edit-widgets',
-			'themeStyles'
-		)
+	const hasThemeStyles = useSelect(
+		( select ) =>
+			!! select( preferencesStore ).get(
+				'core/edit-widgets',
+				'themeStyles'
+			),
+		[]
 	);
 
 	const styles = useMemo( () => {

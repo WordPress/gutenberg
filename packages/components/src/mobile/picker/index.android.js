@@ -19,8 +19,8 @@ import styles from './styles.scss';
 
 function Separator() {
 	const separatorStyle = usePreferredColorSchemeStyle(
-		styles.separator,
-		styles.separatorDark
+		styles[ 'components-picker__separator' ],
+		styles[ 'components-picker__separator--dark' ]
 	);
 
 	return <View style={ separatorStyle } />;
@@ -64,24 +64,30 @@ export default class Picker extends Component {
 					separatorType={ 'none' }
 					onPress={ () => this.onCellPress( option.value ) }
 					disabled={ option.disabled }
-					style={ option.disabled && styles.disabled }
+					style={
+						option.disabled &&
+						styles[ 'components-picker__button--disabled' ]
+					}
 				/>
 			</Fragment>
 		) );
 	}
 
 	render() {
-		const { hideCancelButton, title } = this.props;
+		const { hideCancelButton, title, testID } = this.props;
 		const { isVisible } = this.state;
 
 		return (
 			<BottomSheet
 				isVisible={ isVisible }
 				onClose={ this.onClose }
-				style={ { paddingBottom: 20 } }
 				hideHeader
+				testID={ testID }
 			>
-				<PanelBody title={ title } style={ styles.panelBody }>
+				<PanelBody
+					title={ title }
+					style={ styles[ 'components-picker__panel' ] }
+				>
 					{ this.getOptions() }
 					{ ! hideCancelButton && (
 						<TextControl

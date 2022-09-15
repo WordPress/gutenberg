@@ -1,12 +1,10 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/post-excerpt",
 		"isValid": true,
 		"attributes": {
 			"showMoreOnNewLine": true
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

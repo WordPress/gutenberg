@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -11,12 +11,15 @@ import { useState } from '@wordpress/element';
 import { Icon, chevronRight, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { BottomSheet } from '@wordpress/components';
+import { getPxFromCssUnit } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { default as UnitControl, useCustomUnits } from '../unit-control';
 import styles from './style.scss';
+
+const DEFAULT_FONT_SIZE = 16;
 
 function FontSizePicker( {
 	fontSizes = [],
@@ -27,6 +30,12 @@ function FontSizePicker( {
 	const [ showSubSheet, setShowSubSheet ] = useState( false );
 	const navigation = useNavigation();
 
+	const { height, width } = useWindowDimensions();
+	const cssUnitOptions = { height, width, fontSize: DEFAULT_FONT_SIZE };
+	// We need to always convert to px units because the selected value
+	// could be coming from the web where it could be stored as a different unit.
+	const selectedPxValue = getPxFromCssUnit( selectedValue, cssUnitOptions );
+
 	const onChangeValue = ( value ) => {
 		return () => {
 			goBack();
@@ -35,7 +44,7 @@ function FontSizePicker( {
 	};
 
 	const selectedOption = fontSizes.find(
-		( option ) => option.size === selectedValue
+		( option ) => option.sizePx === selectedPxValue
 	) ?? { name: 'Custom' };
 
 	const goBack = () => {
@@ -65,7 +74,7 @@ function FontSizePicker( {
 									// translators: %1$s: Select control font size name e.g. Small, %2$s: Select control font size e.g. 12px
 									__( '%1$s (%2$s)' ),
 									selectedOption.name,
-									selectedValue
+									selectedPxValue
 							  )
 							: __( 'Default' )
 					}
@@ -112,7 +121,7 @@ function FontSizePicker( {
 					</BottomSheet.Cell>
 					{ fontSizes.map( ( item, index ) => {
 						// Only display a choice that we can currenly select.
-						if ( ! parseFloat( item.size ) ) {
+						if ( ! parseFloat( item.sizePx ) ) {
 							return null;
 						}
 						return (
@@ -120,13 +129,13 @@ function FontSizePicker( {
 								customActionButton
 								separatorType="none"
 								label={ item.name }
-								subLabel={ item.size }
-								onPress={ onChangeValue( item.size ) }
+								subLabel={ item.sizePx }
+								onPress={ onChangeValue( item.sizePx ) }
 								leftAlign={ true }
 								key={ index }
 								accessibilityRole={ 'button' }
 								accessibilityLabel={
-									item.size === selectedValue
+									item.sizePx === selectedValue
 										? sprintf(
 												// translators: %s: Select font size option value e.g: "Selected: Large".
 												__( 'Selected: %s' ),
@@ -139,7 +148,7 @@ function FontSizePicker( {
 								) }
 							>
 								<View>
-									{ item.size === selectedValue && (
+									{ item.sizePx === selectedPxValue && (
 										<Icon icon={ check }></Icon>
 									) }
 								</View>

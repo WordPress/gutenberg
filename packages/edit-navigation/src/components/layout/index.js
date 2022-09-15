@@ -7,6 +7,7 @@ import {
 	BlockTools,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 } from '@wordpress/block-editor';
+import { useEntityBlockEditor } from '@wordpress/core-data';
 import { Popover, SlotFillProvider, Spinner } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -17,6 +18,7 @@ import {
 } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+import { PluginArea } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -25,7 +27,6 @@ import UnselectedMenuState from './unselected-menu-state';
 import {
 	IsMenuNameControlFocusedContext,
 	useNavigationEditor,
-	useNavigationBlockEditor,
 	useMenuNotifications,
 } from '../../hooks';
 import ErrorBoundary from '../error-boundary';
@@ -37,6 +38,10 @@ import Editor from '../editor';
 import InserterSidebar from '../inserter-sidebar';
 import UnsavedChangesWarning from './unsaved-changes-warning';
 import { store as editNavigationStore } from '../../store';
+import {
+	NAVIGATION_POST_KIND,
+	NAVIGATION_POST_POST_TYPE,
+} from '../../constants';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the navigation screen top bar landmark region. */
@@ -50,9 +55,8 @@ const interfaceLabels = {
 
 export default function Layout( { blockEditorSettings } ) {
 	const contentAreaRef = useBlockSelectionClearer();
-	const [ isMenuNameControlFocused, setIsMenuNameControlFocused ] = useState(
-		false
-	);
+	const [ isMenuNameControlFocused, setIsMenuNameControlFocused ] =
+		useState( false );
 	const { saveNavigationPost } = useDispatch( editNavigationStore );
 	const savePost = () => saveNavigationPost( navigationPost );
 
@@ -68,8 +72,12 @@ export default function Layout( { blockEditorSettings } ) {
 		isMenuSelected,
 	} = useNavigationEditor();
 
-	const [ blocks, onInput, onChange ] = useNavigationBlockEditor(
-		navigationPost
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		NAVIGATION_POST_KIND,
+		NAVIGATION_POST_POST_TYPE,
+		{
+			id: navigationPost?.id,
+		}
 	);
 
 	const { hasSidebarEnabled, isInserterOpened } = useSelect(
@@ -164,7 +172,6 @@ export default function Layout( { blockEditorSettings } ) {
 														isPending={
 															! hasLoadedMenus
 														}
-														blocks={ blocks }
 													/>
 												</BlockTools>
 											</div>
@@ -193,6 +200,7 @@ export default function Layout( { blockEditorSettings } ) {
 						<UnsavedChangesWarning />
 					</BlockEditorProvider>
 					<Popover.Slot />
+					<PluginArea />
 				</SlotFillProvider>
 			</ShortcutProvider>
 		</ErrorBoundary>

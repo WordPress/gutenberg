@@ -1,7 +1,7 @@
 .customize-widgets-header {
 	@include break-medium() {
 		// Make space for the floating toolbar.
-		margin-bottom: $grid-unit-60 + $default-block-margin;
+		margin-bottom: $grid-unit-20 + $default-block-margin;
 	}
 
 	&.is-fixed-toolbar-active {

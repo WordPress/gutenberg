@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
-import { uniqWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,12 +22,17 @@ import { Icon, plusCircleFilled } from '@wordpress/icons';
  */
 import styles from './styles.scss';
 
-// remove duplicates after gallery append
+const isMediaEqual = ( media1, media2 ) =>
+	media1.id === media2.id || media1.url === media2.url;
+
+// Remove duplicates after gallery append.
 const dedupMedia = ( media ) =>
-	uniqWith(
-		media,
-		( media1, media2 ) =>
-			media1.id === media2.id || media1.url === media2.url
+	media.reduce(
+		( dedupedMedia, mediaItem ) =>
+			dedupedMedia.some( ( item ) => isMediaEqual( item, mediaItem ) )
+				? dedupedMedia
+				: [ ...dedupedMedia, mediaItem ],
+		[]
 	);
 
 function MediaPlaceholder( props ) {
@@ -53,11 +57,11 @@ function MediaPlaceholder( props ) {
 		onSelectURL,
 	} = props;
 
-	// use ref to keep media array current for callbacks during rerenders
+	// Use ref to keep media array current for callbacks during rerenders.
 	const mediaRef = useRef( value );
 	mediaRef.current = value;
 
-	// append and deduplicate media array for gallery use case
+	// Append and deduplicate media array for gallery use case.
 	const setMedia =
 		multiple && addToGallery
 			? ( selected ) =>
@@ -130,12 +134,14 @@ function MediaPlaceholder( props ) {
 			);
 		} else if ( isAppender && ! disableMediaButtons ) {
 			return (
-				<Icon
-					icon={ plusCircleFilled }
-					style={ addMediaButtonStyle }
-					color={ addMediaButtonStyle.color }
-					size={ addMediaButtonStyle.size }
-				/>
+				<View testID="media-placeholder-appender-icon">
+					<Icon
+						icon={ plusCircleFilled }
+						style={ addMediaButtonStyle }
+						color={ addMediaButtonStyle.color }
+						size={ addMediaButtonStyle.size }
+					/>
+				</View>
 			);
 		}
 	};

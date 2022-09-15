@@ -49,7 +49,10 @@ Radio groups that cannot be selected can either be given a disabled state, or be
 #### Controlled
 
 ```jsx
-import { Radio, RadioGroup } from '@wordpress/components';
+import {
+	__experimentalRadio as Radio,
+	__experimentalRadioGroup as RadioGroup,
+} from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 const MyControlledRadioRadioGroup = () => {

@@ -5,6 +5,12 @@ import {
 	ComplementaryArea,
 	ComplementaryAreaMoreMenuItem,
 } from '@wordpress/interface';
+import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../store';
 
 export default function DefaultSidebar( {
 	className,
@@ -15,7 +21,13 @@ export default function DefaultSidebar( {
 	closeLabel,
 	header,
 	headerClassName,
+	panelClassName,
 } ) {
+	const showIconLabels = useSelect(
+		( select ) => select( editSiteStore ).getSettings().showIconLabels,
+		[]
+	);
+
 	return (
 		<>
 			<ComplementaryArea
@@ -27,6 +39,8 @@ export default function DefaultSidebar( {
 				closeLabel={ closeLabel }
 				header={ header }
 				headerClassName={ headerClassName }
+				panelClassName={ panelClassName }
+				showIconLabels={ showIconLabels }
 			>
 				{ children }
 			</ComplementaryArea>

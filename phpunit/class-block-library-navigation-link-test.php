@@ -18,6 +18,10 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 	private static $pages;
 	private static $terms;
+	/**
+	 * @var array|null
+	 */
+	private $original_block_supports;
 
 	public static function wpSetUpBeforeClass() {
 
@@ -90,6 +94,21 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		}
 	}
 
+	public function set_up() {
+		parent::set_up();
+
+		$this->original_block_supports      = WP_Block_Supports::$block_to_render;
+		WP_Block_Supports::$block_to_render = array(
+			'attrs'     => array(),
+			'blockName' => '',
+		);
+	}
+
+	public function tear_down() {
+		WP_Block_Supports::$block_to_render = $this->original_block_supports;
+		parent::tear_down();
+	}
+
 	function test_returns_link_when_post_is_published() {
 		$page_id = self::$page->ID;
 
@@ -102,7 +121,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			true,
 			strpos(
-				gutenberg_render_block_core_navigation_link(
+				render_block_core_navigation_link(
 					$navigation_link_block->attributes,
 					array(),
 					$navigation_link_block
@@ -123,7 +142,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
 		$this->assertEquals(
 			'',
-			gutenberg_render_block_core_navigation_link(
+			render_block_core_navigation_link(
 				$navigation_link_block->attributes,
 				array(),
 				$navigation_link_block
@@ -143,7 +162,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			'',
-			gutenberg_render_block_core_navigation_link(
+			render_block_core_navigation_link(
 				$navigation_link_block->attributes,
 				array(),
 				$navigation_link_block
@@ -163,7 +182,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			true,
 			strpos(
-				gutenberg_render_block_core_navigation_link(
+				render_block_core_navigation_link(
 					$navigation_link_block->attributes,
 					array(),
 					$navigation_link_block
@@ -183,7 +202,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			true,
 			strpos(
-				gutenberg_render_block_core_navigation_link(
+				render_block_core_navigation_link(
 					$navigation_link_block->attributes,
 					array(),
 					$navigation_link_block
@@ -205,7 +224,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			'',
-			gutenberg_render_block_core_navigation_link(
+			render_block_core_navigation_link(
 				$navigation_link_block->attributes,
 				array(),
 				$navigation_link_block
@@ -225,7 +244,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			true,
 			strpos(
-				gutenberg_render_block_core_navigation_link(
+				render_block_core_navigation_link(
 					$navigation_link_block->attributes,
 					array(),
 					$navigation_link_block

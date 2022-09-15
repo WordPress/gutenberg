@@ -11,6 +11,8 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 import { store as blockEditorStore } from '../../store';
 import { getLayoutType } from '../../layouts';
 
+/** @typedef {import('../../selectors').WPDirectInsertBlock } WPDirectInsertBlock */
+
 /**
  * This hook is a side effect which updates the block-editor store when changes
  * happen to inner block settings. The given props are transformed into a
@@ -18,21 +20,26 @@ import { getLayoutType } from '../../layouts';
  * the block-editor store, then the store is updated with the new settings which
  * came from props.
  *
- * @param {string}   clientId        The client ID of the block to update.
- * @param {string[]} allowedBlocks   An array of block names which are permitted
- *                                   in inner blocks.
- * @param {string}   [templateLock]  The template lock specified for the inner
- *                                   blocks component. (e.g. "all")
- * @param {boolean}  captureToolbars Whether or children toolbars should be shown
- *                                   in the inner blocks component rather than on
- *                                   the child block.
- * @param {string}   orientation     The direction in which the block
- *                                   should face.
- * @param {Object}   layout          The layout object for the block container.
+ * @param {string}               clientId                   The client ID of the block to update.
+ * @param {string[]}             allowedBlocks              An array of block names which are permitted
+ *                                                          in inner blocks.
+ * @param {?WPDirectInsertBlock} __experimentalDefaultBlock The default block to insert: [ blockName, { blockAttributes } ].
+ * @param {?Function|boolean}    __experimentalDirectInsert If a default block should be inserted directly by the
+ *                                                          appender.
+ * @param {string}               [templateLock]             The template lock specified for the inner
+ *                                                          blocks component. (e.g. "all")
+ * @param {boolean}              captureToolbars            Whether or children toolbars should be shown
+ *                                                          in the inner blocks component rather than on
+ *                                                          the child block.
+ * @param {string}               orientation                The direction in which the block
+ *                                                          should face.
+ * @param {Object}               layout                     The layout object for the block container.
  */
 export default function useNestedSettingsUpdate(
 	clientId,
 	allowedBlocks,
+	__experimentalDefaultBlock,
+	__experimentalDirectInsert,
 	templateLock,
 	captureToolbars,
 	orientation,
@@ -42,16 +49,13 @@ export default function useNestedSettingsUpdate(
 
 	const { blockListSettings, parentLock } = useSelect(
 		( select ) => {
-			const rootClientId = select(
-				blockEditorStore
-			).getBlockRootClientId( clientId );
+			const rootClientId =
+				select( blockEditorStore ).getBlockRootClientId( clientId );
 			return {
-				blockListSettings: select(
-					blockEditorStore
-				).getBlockListSettings( clientId ),
-				parentLock: select( blockEditorStore ).getTemplateLock(
-					rootClientId
-				),
+				blockListSettings:
+					select( blockEditorStore ).getBlockListSettings( clientId ),
+				parentLock:
+					select( blockEditorStore ).getTemplateLock( rootClientId ),
 			};
 		},
 		[ clientId ]
@@ -65,7 +69,9 @@ export default function useNestedSettingsUpdate(
 		const newSettings = {
 			allowedBlocks: _allowedBlocks,
 			templateLock:
-				templateLock === undefined ? parentLock : templateLock,
+				templateLock === undefined || parentLock === 'contentOnly'
+					? parentLock
+					: templateLock,
 		};
 
 		// These values are not defined for RN, so only include them if they
@@ -83,6 +89,14 @@ export default function useNestedSettingsUpdate(
 			newSettings.orientation = layoutType.getOrientation( layout );
 		}
 
+		if ( __experimentalDefaultBlock !== undefined ) {
+			newSettings.__experimentalDefaultBlock = __experimentalDefaultBlock;
+		}
+
+		if ( __experimentalDirectInsert !== undefined ) {
+			newSettings.__experimentalDirectInsert = __experimentalDirectInsert;
+		}
+
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
 			updateBlockListSettings( clientId, newSettings );
 		}
@@ -90,6 +104,8 @@ export default function useNestedSettingsUpdate(
 		clientId,
 		blockListSettings,
 		_allowedBlocks,
+		__experimentalDefaultBlock,
+		__experimentalDirectInsert,
 		templateLock,
 		parentLock,
 		captureToolbars,

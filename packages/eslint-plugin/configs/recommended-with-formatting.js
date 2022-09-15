@@ -1,10 +1,7 @@
-/**
- * Internal dependencies
- */
-const { isPackageInstalled } = require( '../utils' );
+// Exclude bundled WordPress packages from the list.
+const wpPackagesRegExp = '^@wordpress/(?!(icons|interface|style-engine))';
 
 const config = {
-	parser: 'babel-eslint',
 	extends: [
 		require.resolve( './jsx-a11y.js' ),
 		require.resolve( './custom.js' ),
@@ -21,6 +18,10 @@ const config = {
 		document: true,
 		wp: 'readonly',
 	},
+	settings: {
+		'import/internal-regex': wpPackagesRegExp,
+		'import/extensions': [ '.js', '.jsx' ],
+	},
 	rules: {
 		'import/no-extraneous-dependencies': [
 			'error',
@@ -28,25 +29,15 @@ const config = {
 				peerDependencies: true,
 			},
 		],
-		'import/no-unresolved': 'error',
+		'import/no-unresolved': [
+			'error',
+			{
+				ignore: [ wpPackagesRegExp ],
+			},
+		],
 		'import/default': 'warn',
 		'import/named': 'warn',
 	},
 };
-
-if ( isPackageInstalled( 'jest' ) ) {
-	config.overrides = [
-		{
-			// Unit test files and their helpers only.
-			files: [ '**/@(test|__tests__)/**/*.js', '**/?(*.)test.js' ],
-			extends: [ require.resolve( './test-unit.js' ) ],
-		},
-		{
-			// End-to-end test files and their helpers only.
-			files: [ '**/specs/**/*.js', '**/?(*.)spec.js' ],
-			extends: [ require.resolve( './test-e2e.js' ) ],
-		},
-	];
-}
 
 module.exports = config;

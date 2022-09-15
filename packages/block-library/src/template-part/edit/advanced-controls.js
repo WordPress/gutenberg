@@ -31,10 +31,10 @@ export function TemplatePartAdvancedControls( {
 	const { areaOptions } = useSelect( ( select ) => {
 		// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
 		// Blocks can be loaded into a *non-post* block editor.
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		const definedAreas = select(
-			'core/editor'
-		).__experimentalGetDefaultTemplatePartAreas();
+		/* eslint-disable @wordpress/data-no-store-string-literals */
+		const definedAreas =
+			select( 'core/editor' ).__experimentalGetDefaultTemplatePartAreas();
+		/* eslint-enable @wordpress/data-no-store-string-literals */
 		return {
 			areaOptions: definedAreas.map( ( { label, area: _area } ) => ( {
 				label,

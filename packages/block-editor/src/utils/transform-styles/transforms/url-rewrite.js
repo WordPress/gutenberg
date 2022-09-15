@@ -28,7 +28,7 @@ function isAbsolutePath( filePath ) {
  * @return {boolean} is valid.
  */
 function isValidURL( meta ) {
-	// ignore hashes or data uris
+	// Ignore hashes or data uris.
 	if (
 		meta.value.indexOf( 'data:' ) === 0 ||
 		meta.value.indexOf( '#' ) === 0
@@ -40,7 +40,7 @@ function isValidURL( meta ) {
 		return false;
 	}
 
-	// do not handle the http/https urls if `includeRemote` is false
+	// Do not handle the http/https urls if `includeRemote` is false.
 	if ( isRemotePath( meta.value ) ) {
 		return false;
 	}

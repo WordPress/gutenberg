@@ -13,6 +13,10 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 indent_style = tab
 
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
 [*.{gradle,java,kt}]
 indent_style = space
 

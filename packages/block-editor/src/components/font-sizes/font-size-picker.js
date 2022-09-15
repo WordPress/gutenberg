@@ -21,4 +21,7 @@ function FontSizePicker( props ) {
 	);
 }
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/font-sizes/README.md
+ */
 export default FontSizePicker;

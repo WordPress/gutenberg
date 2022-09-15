@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { useMemo, RawHTML } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import {
 	AlignmentToolbar,
 	BlockControls,
@@ -16,7 +16,7 @@ import {
 	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { PanelBody, ToggleControl, Disabled } from '@wordpress/components';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -30,7 +30,7 @@ export default function PostExcerptEditor( {
 	isSelected,
 	context: { postId, postType, queryId },
 } ) {
-	const isDescendentOfQueryLoop = !! queryId;
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
 	const [
@@ -59,9 +59,16 @@ export default function PostExcerptEditor( {
 	if ( ! postType || ! postId ) {
 		return (
 			<div { ...blockProps }>
-				<Warning>
-					{ __( 'Post excerpt block: no post found.' ) }
-				</Warning>
+				<p>
+					{ __(
+						'This is the Post Excerpt block, it will display the excerpt from single posts.'
+					) }
+				</p>
+				<p>
+					{ __(
+						'If there are any Custom Post Types with support for excerpts, the Post Excerpt block can display the excerpts of those entries as well.'
+					) }
+				</p>
 			</div>
 		);
 	}
@@ -89,12 +96,12 @@ export default function PostExcerptEditor( {
 			withoutInteractiveFormatting={ true }
 		/>
 	);
+	const excerptClassName = classnames( 'wp-block-post-excerpt__excerpt', {
+		'is-inline': ! showMoreOnNewLine,
+	} );
 	const excerptContent = isEditable ? (
 		<RichText
-			className={
-				! showMoreOnNewLine &&
-				'wp-block-post-excerpt__excerpt is-inline'
-			}
+			className={ excerptClassName }
 			aria-label={ __( 'Post excerpt text' ) }
 			value={
 				rawExcerpt ||
@@ -102,14 +109,12 @@ export default function PostExcerptEditor( {
 				( isSelected ? '' : __( 'No post excerpt found' ) )
 			}
 			onChange={ setExcerpt }
+			tagName="p"
 		/>
 	) : (
-		( renderedExcerpt && (
-			<Disabled>
-				<RawHTML key="html">{ renderedExcerpt }</RawHTML>
-			</Disabled>
-		) ) ||
-		__( 'No post excerpt found' )
+		<p className={ excerptClassName }>
+			{ strippedRenderedExcerpt || __( 'No post excerpt found' ) }
+		</p>
 	);
 	return (
 		<>
@@ -122,7 +127,7 @@ export default function PostExcerptEditor( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Post Excerpt Settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						label={ __( 'Show link on new line' ) }
 						checked={ showMoreOnNewLine }

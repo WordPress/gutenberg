@@ -27,7 +27,9 @@ const ColorSettingsMemo = memo(
 		colorValue,
 		gradientValue,
 		onGradientChange,
+		onColorCleared,
 		label,
+		hideNavigation,
 	} ) => {
 		useEffect( () => {
 			shouldEnableBottomSheetMaxHeight( true );
@@ -43,7 +45,9 @@ const ColorSettingsMemo = memo(
 						colorValue,
 						gradientValue,
 						onGradientChange,
+						onColorCleared,
 						label,
+						hideNavigation,
 					} }
 				>
 					<PaletteScreen />
@@ -64,10 +68,8 @@ const ColorSettingsMemo = memo(
 );
 function ColorSettings( props ) {
 	const route = useRoute();
-	const {
-		onHandleClosingBottomSheet,
-		shouldEnableBottomSheetMaxHeight,
-	} = useContext( BottomSheetContext );
+	const { onHandleClosingBottomSheet, shouldEnableBottomSheetMaxHeight } =
+		useContext( BottomSheetContext );
 
 	return (
 		<ColorSettingsMemo

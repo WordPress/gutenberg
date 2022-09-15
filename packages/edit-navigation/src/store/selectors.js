@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { invert } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
@@ -14,16 +9,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
 import { buildNavigationPostId } from './utils';
-
-/**
- * Returns the selected menu ID.
- *
- * @param {Object} state Global application state.
- * @return {number} The selected menu ID.
- */
-export function getSelectedMenuId( state ) {
-	return state.selectedMenuId ?? null;
-}
 
 /**
  * Returns a "stub" navigation post reflecting the contents of menu with id=menuId. The
@@ -64,20 +49,6 @@ export const hasResolvedNavigationPost = createRegistrySelector(
 			NAVIGATION_POST_POST_TYPE,
 			buildNavigationPostId( menuId ),
 		] );
-	}
-);
-
-/**
- * Returns a menu item represented by the block with id clientId.
- *
- * @param {number} postId   Navigation post id
- * @param {number} clientId Block clientId
- * @return {Object|null} Menu item entity
- */
-export const getMenuItemForClientId = createRegistrySelector(
-	( select ) => ( state, postId, clientId ) => {
-		const mapping = invert( state.mapping[ postId ] );
-		return select( coreStore ).getMenuItem( mapping[ clientId ] );
 	}
 );
 

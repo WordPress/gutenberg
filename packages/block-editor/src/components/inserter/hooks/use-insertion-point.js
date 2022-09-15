@@ -64,23 +64,17 @@ function useInsertionPoint( {
 				_destinationIndex = insertionIndex;
 			} else if ( clientId ) {
 				// Insert after a specific client ID.
-				_destinationIndex = getBlockIndex(
-					clientId,
-					_destinationRootClientId
-				);
+				_destinationIndex = getBlockIndex( clientId );
 			} else if ( ! isAppender && selectedBlockClientId ) {
 				_destinationRootClientId = getBlockRootClientId(
 					selectedBlockClientId
 				);
-				_destinationIndex =
-					getBlockIndex(
-						selectedBlockClientId,
-						_destinationRootClientId
-					) + 1;
+				_destinationIndex = getBlockIndex( selectedBlockClientId ) + 1;
 			} else {
 				// Insert at the end of the list.
-				_destinationIndex = getBlockOrder( _destinationRootClientId )
-					.length;
+				_destinationIndex = getBlockOrder(
+					_destinationRootClientId
+				).length;
 			}
 
 			return {

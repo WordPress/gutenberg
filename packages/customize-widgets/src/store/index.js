@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore, registerStore } from '@wordpress/data';
+import { createReduxStore, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -14,7 +14,7 @@ import { STORE_NAME } from './constants';
 /**
  * Block editor data store configuration.
  *
- * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registering-a-store
  *
  * @type {Object}
  */
@@ -32,7 +32,4 @@ const storeConfig = {
  * @type {Object}
  */
 export const store = createReduxStore( STORE_NAME, storeConfig );
-
-// Once we build a more generic persistence plugin that works across types of stores
-// we'd be able to replace this with a register call.
-registerStore( STORE_NAME, storeConfig );
+register( store );

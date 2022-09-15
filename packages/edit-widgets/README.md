@@ -18,8 +18,6 @@ npm install @wordpress/edit-widgets
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
-
 ## How this works
 
 The new Widgets screen in WordPress admin is another block editor, just like the Post editor or the experimental site editor. Hence it will be referred often as the Widgets editor.
@@ -39,3 +37,11 @@ In order to make the experience as seamless as possible for users, the following
 -   for every available widget, a variation of the widget block is registered so that the user can see and search by the exact name of what they need
 -   all widgets that have a block equivalent (a block that fulfills the same function) can be made not available as a widget block variation via a filter
 -   all core widgets that have a block equivalent are not available as a widget block variation
+
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

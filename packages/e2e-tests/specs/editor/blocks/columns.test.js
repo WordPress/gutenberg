@@ -7,6 +7,7 @@ import {
 	insertBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
+	getListViewBlocks,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Columns', () => {
@@ -19,10 +20,9 @@ describe( 'Columns', () => {
 		await closeGlobalBlockInserter();
 		await page.click( '[aria-label="Two columns; equal split"]' );
 		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
+
 		const columnBlockMenuItem = (
-			await page.$x(
-				'//button[contains(concat(" ", @class, " "), " block-editor-list-view-block-select-button ")][text()="Column"]'
-			)
+			await getListViewBlocks( 'Column' )
 		 )[ 0 ];
 		await columnBlockMenuItem.click();
 		await openGlobalBlockInserter();

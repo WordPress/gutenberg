@@ -19,12 +19,21 @@ describe( 'Post visibility', () => {
 
 			await openDocumentSettingsSidebar();
 
-			await page.click( '.edit-post-post-visibility__toggle' );
+			await page.click( '*[aria-label^="Select visibility"]' );
 
 			const [ privateLabel ] = await page.$x(
 				'//label[text()="Private"]'
 			);
 			await privateLabel.click();
+
+			await page.waitForXPath(
+				'//*[text()="Would you like to privately publish this post now?"]'
+			);
+
+			const [ confirmButton ] = await page.$x(
+				'//*[@role="dialog"]//button[text()="OK"]'
+			);
+			await confirmButton.click();
 
 			const currentStatus = await page.evaluate( () => {
 				return wp.data
@@ -33,6 +42,42 @@ describe( 'Post visibility', () => {
 			} );
 
 			expect( currentStatus ).toBe( 'private' );
+		} );
+
+		it( `can be canceled when the viewport is ${ viewport }`, async () => {
+			await setBrowserViewport( viewport );
+
+			await createNewPost();
+
+			await openDocumentSettingsSidebar();
+
+			const initialStatus = await page.evaluate( () => {
+				return wp.data
+					.select( 'core/editor' )
+					.getEditedPostAttribute( 'status' );
+			} );
+
+			await page.click( '*[aria-label^="Select visibility"]' );
+
+			const [ privateLabel ] = await page.$x(
+				'//label[text()="Private"]'
+			);
+			await privateLabel.click();
+			await page.waitForXPath(
+				'//*[text()="Would you like to privately publish this post now?"]'
+			);
+			const cancelButton = await page.waitForXPath(
+				'//*[@role="dialog"][not(@id="wp-link-wrap")]//button[text()="Cancel"]'
+			);
+			await cancelButton.click();
+
+			const currentStatus = await page.evaluate( () => {
+				return wp.data
+					.select( 'core/editor' )
+					.getEditedPostAttribute( 'status' );
+			} );
+
+			expect( currentStatus ).toBe( initialStatus );
 		} );
 	} );
 
@@ -45,20 +90,27 @@ describe( 'Post visibility', () => {
 		await openDocumentSettingsSidebar();
 
 		// Set a publish date for the next month.
-		await page.click( '.edit-post-post-schedule__toggle' );
-		await page.click(
-			'div[aria-label="Move forward to switch to the next month."]'
-		);
+		await page.click( '*[aria-label^="Change date"]' );
+		await page.click( '*[aria-label="View next month"]' );
 		await (
 			await page.$x(
-				'//td[contains(concat(" ", @class, " "), " CalendarDay ")]/div[contains(concat(" ", @class, " "), " components-datetime__date__day ")][text() = "15"]'
+				'//*[@role="application"][@aria-label="Calendar"]//button[text()="15"]'
 			)
 		 )[ 0 ].click();
 
-		await page.click( '.edit-post-post-visibility__toggle' );
+		await page.click( '*[aria-label^="Select visibility"]' );
 
 		const [ privateLabel ] = await page.$x( '//label[text()="Private"]' );
 		await privateLabel.click();
+
+		await page.waitForXPath(
+			'//*[text()="Would you like to privately publish this post now?"]'
+		);
+
+		const [ confirmButton ] = await page.$x(
+			'//*[@role="dialog"]//button[text()="OK"]'
+		);
+		await confirmButton.click();
 
 		// Enter a title for this post.
 		await page.type( '.editor-post-title__input', ' Changed' );

@@ -21,12 +21,13 @@ export default function useClipboardBlock( destinationRootClientId ) {
 		clipboardBlock?.name,
 		destinationRootClientId
 	);
+	const blockType = getBlockType( clipboardBlock?.name );
 
-	if ( ! canAddClipboardBlock ) {
+	if ( ! canAddClipboardBlock || ! blockType ) {
 		return undefined;
 	}
 
-	const { icon, name } = getBlockType( clipboardBlock.name );
+	const { name, icon } = blockType;
 	const { attributes: initialAttributes, innerBlocks } = clipboardBlock;
 
 	return {

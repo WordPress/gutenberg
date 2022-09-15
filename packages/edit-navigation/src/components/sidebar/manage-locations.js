@@ -34,9 +34,8 @@ export default function ManageLocations( {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const openModal = () => setIsModalOpen( true );
 	const closeModal = () => setIsModalOpen( false );
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
 	const validateBatchResponse = ( batchResponse ) => {
 		if ( batchResponse.failed ) {
@@ -58,7 +57,7 @@ export default function ManageLocations( {
 				.map( ( menuLocation ) => menuLocation.name );
 
 			return {
-				path: `/__experimental/menus/${ id }`,
+				path: `/wp/v2/menus/${ id }`,
 				body: {
 					locations,
 				},

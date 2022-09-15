@@ -15,6 +15,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── .jshintignore
     ├── .eslintignore
     ├── .prettierrc.js
+    ├── .stylelintignore
     ├── .stylelintrc.json
     ├── .markdownlintignore
     ├── .npmpackagejsonlintrc.json
@@ -58,7 +59,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │   Demo post content used on the Gutenberg plugin to showcase the editor.
     │
     ├── .github/*
-    │   Config of the different Github features (issues and PR templates, CI, owners).
+    │   Config of the different GitHub features (issues and PR templates, CI, owners).
     │
     ├── bin/api-docs
     │   Tool/script used to generate the API Docs.

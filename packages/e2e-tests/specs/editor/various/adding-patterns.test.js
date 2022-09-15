@@ -7,7 +7,7 @@ import {
 	getEditedPostContent,
 } from '@wordpress/e2e-test-utils';
 
-/** @typedef {import('puppeteer').ElementHandle} ElementHandle */
+/** @typedef {import('puppeteer-core').ElementHandle} ElementHandle */
 
 describe( 'adding patterns', () => {
 	beforeEach( async () => {

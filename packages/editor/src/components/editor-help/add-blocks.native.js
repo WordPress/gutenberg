@@ -24,7 +24,7 @@ const AddBlocks = () => {
 			<View style={ styles.helpDetailContainer }>
 				<HelpDetailBodyText
 					text={ __(
-						'Add a new block at any time by tapping on the + icon in the toolbar on the bottom left. '
+						'Add a new block at any time by tapping on the + icon in the toolbar on the bottom left.'
 					) }
 				/>
 				<HelpDetailBodyText

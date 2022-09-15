@@ -16,7 +16,7 @@ register_block_pattern(
 	array(
 		'title'      => __( 'Query Test 1', 'gutenberg' ),
 		'blockTypes' => array( 'core/query' ),
-		'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true}} -->
+		'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true}} -->
 						<!-- wp:post-template -->
 						<!-- wp:post-title {"isLink":true} /-->
 						<!-- /wp:post-template -->
@@ -28,7 +28,7 @@ register_block_pattern(
 	array(
 		'title'      => __( 'Query Test 2', 'gutenberg' ),
 		'blockTypes' => array( 'core/query' ),
-		'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true}} -->
+		'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true}} -->
 						<!-- wp:post-template -->
 						<!-- wp:post-title {"isLink":true} /-->
 						<!-- wp:post-date /-->

@@ -152,7 +152,7 @@ export function getFilterMatcher( filterValue ) {
  * @param {string} props.slug Taxonomy slug.
  * @return {WPElement}        Hierarchical term selector component.
  */
-function HierarchicalTermSelector( { slug } ) {
+export function HierarchicalTermSelector( { slug } ) {
 	const [ adding, setAdding ] = useState( false );
 	const [ formName, setFormName ] = useState( '' );
 	/**
@@ -173,12 +173,10 @@ function HierarchicalTermSelector( { slug } ) {
 		taxonomy,
 	} = useSelect(
 		( select ) => {
-			const { getCurrentPost, getEditedPostAttribute } = select(
-				editorStore
-			);
-			const { getTaxonomy, getEntityRecords, isResolving } = select(
-				coreStore
-			);
+			const { getCurrentPost, getEditedPostAttribute } =
+				select( editorStore );
+			const { getTaxonomy, getEntityRecords, isResolving } =
+				select( coreStore );
 			const _taxonomy = getTaxonomy( slug );
 
 			return {
@@ -288,10 +286,10 @@ function HierarchicalTermSelector( { slug } ) {
 			return;
 		}
 
-		// check if the term we are adding already exists
+		// Check if the term we are adding already exists.
 		const existingTerm = findTerm( availableTerms, formParent, formName );
 		if ( existingTerm ) {
-			// if the term we are adding exists but is not selected select it
+			// If the term we are adding exists but is not selected select it.
 			if ( ! some( terms, ( term ) => term === existingTerm.id ) ) {
 				onUpdateTerms( [ ...terms, existingTerm.id ] );
 			}

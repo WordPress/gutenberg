@@ -36,13 +36,14 @@ const TRANSLATION_FUNCTIONS = new Set( [ '__', '_x', '_n', '_nx' ] );
  *
  * @type {RegExp}
  */
-const REGEXP_SPRINTF_PLACEHOLDER = /%(((\d+)\$)|(\(([$_a-zA-Z][$_a-zA-Z0-9]*)\)))?[ +0#-]*\d*(\.(\d+|\*))?(ll|[lhqL])?([cduxXefgsp%])/g;
-//                                    ▲         ▲                    ▲       ▲  ▲            ▲           ▲ type
-//                                    │         │                    │       │  │            └ Length (unsupported)
-//                                    │         │                    │       │  └ Precision / max width
-//                                    │         │                    │       └ Min width (unsupported)
-//                                    │         │                    └ Flags (unsupported)
-//                                    └ Index   └ Name (for named arguments)
+const REGEXP_SPRINTF_PLACEHOLDER =
+	/%(((\d+)\$)|(\(([$_a-zA-Z][$_a-zA-Z0-9]*)\)))?[ +0#-]*\d*(\.(\d+|\*))?(ll|[lhqL])?([cduxXefgsp%])/g;
+//               ▲         ▲                    ▲       ▲  ▲            ▲           ▲ type
+//               │         │                    │       │  │            └ Length (unsupported)
+//               │         │                    │       │  └ Precision / max width
+//               │         │                    │       └ Min width (unsupported)
+//               │         │                    └ Flags (unsupported)
+//               └ Index   └ Name (for named arguments)
 
 /**
  * "Unordered" means there's no position specifier: '%s', not '%2$s'.
@@ -51,7 +52,8 @@ const REGEXP_SPRINTF_PLACEHOLDER = /%(((\d+)\$)|(\(([$_a-zA-Z][$_a-zA-Z0-9]*)\))
  *
  * @type {RegExp}
  */
-const REGEXP_SPRINTF_PLACEHOLDER_UNORDERED = /(?:(?<!%)%[+-]?(?:(?:0|'.)?-?[0-9]*(?:\.(?:[ 0]|'.)?[0-9]+)?|(?:[ ])?-?[0-9]+(?:\.(?:[ 0]|'.)?[0-9]+)?)[bcdeEfFgGosuxX])/;
+const REGEXP_SPRINTF_PLACEHOLDER_UNORDERED =
+	/(?:(?<!%)%[+-]?(?:(?:0|'.)?-?[0-9]*(?:\.(?:[ 0]|'.)?[0-9]+)?|(?:[ ])?-?[0-9]+(?:\.(?:[ 0]|'.)?[0-9]+)?)[bcdeEfFgGosuxX])/;
 
 module.exports = {
 	TRANSLATION_FUNCTIONS,

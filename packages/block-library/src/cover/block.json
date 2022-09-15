@@ -1,4 +1,5 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "core/cover",
 	"title": "Cover",
@@ -8,6 +9,10 @@
 	"attributes": {
 		"url": {
 			"type": "string"
+		},
+		"useFeaturedImage": {
+			"type": "boolean",
+			"default": false
 		},
 		"id": {
 			"type": "number"
@@ -29,7 +34,7 @@
 		},
 		"dimRatio": {
 			"type": "number",
-			"default": 50
+			"default": 100
 		},
 		"overlayColor": {
 			"type": "string"
@@ -58,14 +63,27 @@
 		},
 		"contentPosition": {
 			"type": "string"
+		},
+		"isDark": {
+			"type": "boolean",
+			"default": true
+		},
+		"allowedBlocks": {
+			"type": "array"
+		},
+		"templateLock": {
+			"type": [ "string", "boolean" ],
+			"enum": [ "all", "insert", "contentOnly", false ]
 		}
 	},
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"anchor": true,
 		"align": true,
 		"html": false,
 		"spacing": {
 			"padding": true,
+			"margin": [ "top", "bottom" ],
 			"__experimentalDefaultControls": {
 				"padding": true
 			}
@@ -74,6 +92,19 @@
 			"__experimentalDuotone": "> .wp-block-cover__image-background, > .wp-block-cover__video-background",
 			"text": false,
 			"background": false
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-cover-editor",

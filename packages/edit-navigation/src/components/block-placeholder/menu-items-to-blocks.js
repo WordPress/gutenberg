@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { sortBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
@@ -11,7 +6,7 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { menuItemToBlockAttributes } from '../../store/utils';
+import { menuItemToBlockAttributes } from '../../store/transform';
 
 /**
  * Convert a flat menu item structure to a nested blocks structure.
@@ -41,7 +36,9 @@ function mapMenuItemsToBlocks( menuItems ) {
 	let mapping = {};
 
 	// The menuItem should be in menu_order sort order.
-	const sortedItems = sortBy( menuItems, 'menu_order' );
+	const sortedItems = [ ...menuItems ].sort(
+		( a, b ) => a.menu_order - b.menu_order
+	);
 
 	const innerBlocks = sortedItems.map( ( menuItem ) => {
 		const attributes = menuItemToBlockAttributes( menuItem );
@@ -67,7 +64,7 @@ function mapMenuItemsToBlocks( menuItems ) {
 			nestedBlocks
 		);
 
-		// Create mapping for menuItem -> block
+		// Create mapping for menuItem -> block.
 		mapping[ menuItem.id ] = block.clientId;
 
 		return block;
@@ -103,9 +100,10 @@ function createDataTree( dataset, id = 'id', relation = 'parent' ) {
 			...data,
 			children: [],
 		};
-	}
-	for ( const data of dataset ) {
 		if ( data[ relation ] ) {
+			hashTable[ data[ relation ] ] = hashTable[ data[ relation ] ] || {};
+			hashTable[ data[ relation ] ].children =
+				hashTable[ data[ relation ] ].children || [];
 			hashTable[ data[ relation ] ].children.push(
 				hashTable[ data[ id ] ]
 			);

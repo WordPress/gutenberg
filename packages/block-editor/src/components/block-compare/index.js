@@ -43,10 +43,10 @@ function BlockCompare( {
 	}
 
 	function getConvertedContent( convertedBlock ) {
-		// The convertor may return an array of items or a single item
+		// The convertor may return an array of items or a single item.
 		const newBlocks = castArray( convertedBlock );
 
-		// Get converted block details
+		// Get converted block details.
 		const newContent = newBlocks.map( ( item ) =>
 			getSaveContent( item.name, item.attributes, item.innerBlocks )
 		);

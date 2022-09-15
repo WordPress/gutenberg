@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -9,12 +10,8 @@ import classnames from 'classnames';
 import { Children } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
-export function MenuGroup( {
-	children,
-	className = '',
-	label,
-	hideSeparator,
-} ) {
+export function MenuGroup( props ) {
+	const { children, className = '', label, hideSeparator } = props;
 	const instanceId = useInstanceId( MenuGroup );
 
 	if ( ! Children.count( children ) ) {

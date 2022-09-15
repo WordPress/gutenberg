@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render } from 'test/helpers';
 
 /**
  * WordPress dependencies
@@ -13,18 +13,18 @@ import { useSelect } from '@wordpress/data';
  */
 import items from './fixtures';
 import BlockTypesTab from '../block-types-tab';
-import BlockTypesList from '../../block-types-list';
 
-jest.mock( '../../block-types-list' );
 jest.mock( '../hooks/use-clipboard-block' );
 jest.mock( '@wordpress/data/src/components/use-select' );
 
 const selectMock = {
+	getCategories: jest.fn().mockReturnValue( [] ),
+	getCollections: jest.fn().mockReturnValue( [] ),
 	getInserterItems: jest.fn().mockReturnValue( [] ),
 	canInsertBlockType: jest.fn(),
 	getBlockType: jest.fn(),
 	getClipboard: jest.fn(),
-	getSettings: jest.fn( () => ( {} ) ),
+	getSettings: jest.fn( () => ( { impressions: {} } ) ),
 };
 
 describe( 'BlockTypesTab component', () => {
@@ -35,11 +35,11 @@ describe( 'BlockTypesTab component', () => {
 	} );
 
 	it( 'renders without crashing', () => {
-		const component = shallow(
+		const component = render(
 			<BlockTypesTab
 				rootClientId={ 0 }
 				onSelect={ jest.fn() }
-				listProps={ {} }
+				listProps={ { contentContainerStyle: {} } }
 			/>
 		);
 		expect( component ).toBeTruthy();
@@ -52,15 +52,16 @@ describe( 'BlockTypesTab component', () => {
 			( { id, category } ) =>
 				category !== 'reusable' && id !== 'core-embed/a-paragraph-embed'
 		);
-		const component = shallow(
+		const component = render(
 			<BlockTypesTab
 				rootClientId={ 0 }
 				onSelect={ jest.fn() }
-				listProps={ {} }
+				listProps={ { contentContainerStyle: {} } }
 			/>
 		);
-		expect( component.find( BlockTypesList ).prop( 'items' ) ).toEqual(
-			blockItems
-		);
+
+		blockItems.forEach( ( item ) => {
+			expect( component.getByText( item.title ) ).toBeTruthy();
+		} );
 	} );
 } );

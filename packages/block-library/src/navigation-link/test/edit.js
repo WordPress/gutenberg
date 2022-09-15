@@ -5,8 +5,8 @@ import { updateNavigationLinkBlockAttributes } from '../edit';
 
 describe( 'edit', () => {
 	describe( 'updateNavigationLinkBlockAttributes', () => {
-		// data shapes are linked to fetchLinkSuggestions from
-		// core-data/src/fetch/__experimental-fetch-link-suggestions.js
+		// Data shapes are linked to fetchLinkSuggestions from
+		// core-data/src/fetch/__experimental-fetch-link-suggestions.js.
 		it( 'can update a post link', () => {
 			const setAttributes = jest.fn();
 			const linkSuggestion = {
@@ -160,8 +160,7 @@ describe( 'edit', () => {
 				opensInNewTab: false,
 				title: 'Portfolio Category',
 				type: 'portfolio_category',
-				url:
-					'http://wordpress.local/portfolio_category/Portfolio-category/',
+				url: 'http://wordpress.local/portfolio_category/Portfolio-category/',
 			};
 			updateNavigationLinkBlockAttributes(
 				linkSuggestion,
@@ -173,8 +172,7 @@ describe( 'edit', () => {
 				opensInNewTab: false,
 				label: 'Portfolio Category',
 				type: 'portfolio_category',
-				url:
-					'http://wordpress.local/portfolio_category/Portfolio-category/',
+				url: 'http://wordpress.local/portfolio_category/Portfolio-category/',
 			} );
 		} );
 
@@ -193,7 +191,7 @@ describe( 'edit', () => {
 				setAttributes
 			);
 			// post_format returns a slug ID value from the Search API
-			// we do not persist this ID since we expect this value to be a post or term ID
+			// we do not persist this ID since we expect this value to be a post or term ID.
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				kind: 'taxonomy',
 				opensInNewTab: false,
@@ -372,26 +370,6 @@ describe( 'edit', () => {
 					url: 'https://wordpress.org',
 				} );
 			} );
-			// https://github.com/WordPress/gutenberg/pull/18617
-			it( 'label is javascript escaped', () => {
-				const setAttributes = jest.fn();
-				const linkSuggestion = {
-					opensInNewTab: false,
-					title: '<Navigation />',
-					type: 'URL',
-					url: 'https://wordpress.local?p=1',
-				};
-				updateNavigationLinkBlockAttributes(
-					linkSuggestion,
-					setAttributes
-				);
-				expect( setAttributes ).toHaveBeenCalledWith( {
-					opensInNewTab: false,
-					label: '&lt;Navigation /&gt;',
-					kind: 'custom',
-					url: 'https://wordpress.local?p=1',
-				} );
-			} );
 			// https://github.com/WordPress/gutenberg/pull/19679
 			it( 'url when escaped is still an actual link', () => {
 				const setAttributes = jest.fn();
@@ -443,7 +421,7 @@ describe( 'edit', () => {
 					type: 'post',
 					url: 'https://wordpress.local/menu-test/',
 				} );
-				//click on the existing link control, and toggle opens new tab
+				// Click on the existing link control, and toggle opens new tab.
 				updateNavigationLinkBlockAttributes(
 					{
 						url: 'https://wordpress.local/menu-test/',
@@ -488,7 +466,7 @@ describe( 'edit', () => {
 					type: 'post',
 					url: 'https://wordpress.local/menu-test/',
 				} );
-				//click on the existing link control, and toggle opens new tab
+				// Click on the existing link control, and toggle opens new tab.
 				updateNavigationLinkBlockAttributes(
 					{
 						url: 'https://wordpress.local/foo/',

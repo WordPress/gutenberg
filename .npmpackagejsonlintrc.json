@@ -11,12 +11,7 @@
 		"prefer-no-devDependencies": "error",
 		"require-publishConfig": "error",
 		"require-repository-directory": "error",
-		"valid-values-author": [
-			"error",
-			[
-				"The WordPress Contributors"
-			]
-		],
+		"valid-values-author": [ "error", [ "The WordPress Contributors" ] ],
 		"valid-values-publishConfig": [
 			"error",
 			[

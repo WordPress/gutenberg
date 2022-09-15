@@ -42,17 +42,11 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 		min-width: auto;
 		margin-bottom: $grid-unit-10;
 		box-shadow: none;
-
-		// Block UI appearance.
-		border: $border-width solid $gray-900;
-		border-radius: $radius-block-ui;
-		background-color: $white;
+		outline: none;
 	}
 
-	.components-toolbar-group,
 	.components-toolbar {
-		// The popover already provides a border.
-		border: none;
+		border-radius: $radius-block-ui;
 	}
 
 	.components-toolbar__control,

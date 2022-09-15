@@ -19,8 +19,8 @@ import { store as blockEditorStore } from '../../store';
  * This hook makes sure that a block's inner blocks stay in sync with the given
  * block "template". The template is a block hierarchy to which inner blocks must
  * conform. If the blocks get "out of sync" with the template and the template
- * is meant to be locked (e.g. templateLock = "all"), then we replace the inner
- * blocks with the correct value after synchronizing it with the template.
+ * is meant to be locked (e.g. templateLock = "all" or templateLock = "contentOnly"),
+ * then we replace the inner blocks with the correct value after synchronizing it with the template.
  *
  * @param {string}  clientId                       The block client ID.
  * @param {Object}  template                       The template to match.
@@ -40,9 +40,8 @@ export default function useInnerBlockTemplateSync(
 	templateLock,
 	templateInsertUpdatesSelection
 ) {
-	const { getSelectedBlocksInitialCaretPosition } = useSelect(
-		blockEditorStore
-	);
+	const { getSelectedBlocksInitialCaretPosition } =
+		useSelect( blockEditorStore );
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const innerBlocks = useSelect(
 		( select ) => select( blockEditorStore ).getBlocks( clientId ),
@@ -52,9 +51,13 @@ export default function useInnerBlockTemplateSync(
 	// Maintain a reference to the previous value so we can do a deep equality check.
 	const existingTemplate = useRef( null );
 	useLayoutEffect( () => {
-		// Only synchronize innerBlocks with template if innerBlocks are empty or
-		// a locking all exists directly on the block.
-		if ( innerBlocks.length === 0 || templateLock === 'all' ) {
+		// Only synchronize innerBlocks with template if innerBlocks are empty
+		// or a locking "all" or "contentOnly" exists directly on the block.
+		if (
+			innerBlocks.length === 0 ||
+			templateLock === 'all' ||
+			templateLock === 'contentOnly'
+		) {
 			const hasTemplateChanged = ! isEqual(
 				template,
 				existingTemplate.current

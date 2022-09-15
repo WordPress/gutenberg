@@ -15,8 +15,13 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
-export default function SiteTaglineEdit( { attributes, setAttributes } ) {
+export default function SiteTaglineEdit( {
+	attributes,
+	setAttributes,
+	insertBlocksAfter,
+} ) {
 	const { textAlign } = attributes;
 	const [ siteTagline, setSiteTagline ] = useEntityProp(
 		'root',
@@ -46,6 +51,10 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 			placeholder={ __( 'Write site tagline…' ) }
 			tagName="p"
 			value={ siteTagline }
+			disableLineBreaks
+			__unstableOnSplitAtEnd={ () =>
+				insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+			}
 			{ ...blockProps }
 		/>
 	) : (

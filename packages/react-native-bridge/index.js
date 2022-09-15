@@ -23,13 +23,13 @@ export const actionButtons = {
 	missingBlockAlertActionButton: 'missing_block_alert_action_button',
 };
 
-// Console polyfill from react-native
+// Console polyfill from react-native.
 
 export function nativeLoggingHook( message, logLevel ) {
 	RNReactNativeGutenbergBridge.editorDidEmitLog( message, logLevel );
 }
 
-// Send messages
+// Send messages.
 
 export function sendNativeEditorDidLayout() {
 	// For now, this is only needed on iOS to solve layout issues with the toolbar.
@@ -40,7 +40,7 @@ export function sendNativeEditorDidLayout() {
 	}
 }
 
-// Register listeners
+// Register listeners.
 
 export function subscribeParentGetHtml( callback ) {
 	return gutenbergBridgeEvents.addListener( 'requestGetHtml', callback );
@@ -412,6 +412,35 @@ export function requestBlockTypeImpressions( callback ) {
  */
 export function setBlockTypeImpressions( impressions ) {
 	return RNReactNativeGutenbergBridge.setBlockTypeImpressions( impressions );
+}
+
+export function requestContactCustomerSupport() {
+	RNReactNativeGutenbergBridge.requestContactCustomerSupport();
+}
+
+export function requestGotoCustomerSupportOptions() {
+	RNReactNativeGutenbergBridge.requestGotoCustomerSupportOptions();
+}
+
+/**
+ * Request the host app receive an event with properties.
+ *
+ * @param {string} eventName  Name representing to the event.
+ * @param {Object} properties Key-value pairs of event properties.
+ * @return {void}
+ */
+export function sendEventToHost( eventName, properties ) {
+	return RNReactNativeGutenbergBridge.sendEventToHost(
+		eventName,
+		properties
+	);
+}
+
+/**
+ * Generate haptic feedback.
+ */
+export function generateHapticFeedback() {
+	RNReactNativeGutenbergBridge.generateHapticFeedback();
 }
 
 export default RNReactNativeGutenbergBridge;

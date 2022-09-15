@@ -1,12 +1,12 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/query-title",
 		"isValid": true,
 		"attributes": {
-			"level": 1
+			"level": 1,
+			"showPrefix": true,
+			"showSearchTerm": true
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

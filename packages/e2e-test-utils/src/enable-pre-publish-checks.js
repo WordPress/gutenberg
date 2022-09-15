@@ -13,5 +13,5 @@ export async function enablePrePublishChecks() {
 		'Include pre-publish checklist',
 		true
 	);
-	await toggleMoreMenu();
+	await toggleMoreMenu( 'close' );
 }

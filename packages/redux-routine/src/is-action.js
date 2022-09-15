@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isPlainObject, isString } from 'lodash';
+import { isPlainObject } from 'is-plain-object';
 
 /* eslint-disable jsdoc/valid-types */
 /**
@@ -12,7 +12,7 @@ import { isPlainObject, isString } from 'lodash';
  * @return {object is import('redux').AnyAction}  Whether object is an action.
  */
 export function isAction( object ) {
-	return isPlainObject( object ) && isString( object.type );
+	return isPlainObject( object ) && typeof object.type === 'string';
 }
 
 /**

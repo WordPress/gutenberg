@@ -3,15 +3,14 @@
  */
 import '@wordpress/core-data';
 import '@wordpress/format-library';
-import { render } from '@wordpress/element';
+import { dispatch } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 export { store } from './store';
 import Editor from './editor';
-
-let editorInitialized = false;
 
 /**
  * Initializes the Editor and returns a componentProvider
@@ -22,11 +21,17 @@ let editorInitialized = false;
  * @param {Object} postId   ID of the post to edit (unused right now)
  */
 export function initializeEditor( id, postType, postId ) {
-	if ( editorInitialized ) {
-		return;
-	}
+	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
+		editorMode: 'visual',
+		fixedToolbar: false,
+		fullscreenMode: true,
+		hiddenBlockTypes: [],
+		inactivePanels: [],
+		isPublishSidebarEnabled: true,
+		openPanels: [ 'post-status' ],
+		preferredStyleVariations: {},
+		welcomeGuide: true,
+	} );
 
-	editorInitialized = true;
-
-	render( <Editor postId={ postId } postType={ postType } />, id );
+	return <Editor postId={ postId } postType={ postType } />;
 }

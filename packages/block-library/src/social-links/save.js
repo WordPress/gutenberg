@@ -6,21 +6,25 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( props ) {
 	const {
-		attributes: { iconBackgroundColorValue, iconColorValue, size },
+		attributes: {
+			iconBackgroundColorValue,
+			iconColorValue,
+			showLabels,
+			size,
+		},
 	} = props;
 
 	const className = classNames( size, {
+		'has-visible-labels': showLabels,
 		'has-icon-color': iconColorValue,
 		'has-icon-background-color': iconBackgroundColorValue,
 	} );
+	const blockProps = useBlockProps.save( { className } );
+	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
 
-	return (
-		<ul { ...useBlockProps.save( { className } ) }>
-			<InnerBlocks.Content />
-		</ul>
-	);
+	return <ul { ...innerBlocksProps } />;
 }

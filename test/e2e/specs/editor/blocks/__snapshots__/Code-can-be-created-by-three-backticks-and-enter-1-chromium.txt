@@ -1,0 +1,3 @@
+<!-- wp:code -->
+<pre class="wp-block-code"><code>&lt;?php</code></pre>
+<!-- /wp:code -->

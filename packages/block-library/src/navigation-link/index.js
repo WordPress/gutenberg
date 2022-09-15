@@ -5,15 +5,16 @@ import { _x } from '@wordpress/i18n';
 import { customLink as linkIcon } from '@wordpress/icons';
 import { InnerBlocks } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
-import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import { enhanceNavigationLinkVariations } from './hooks';
+import transforms from './transforms';
 
 const { name } = metadata;
 
@@ -85,25 +86,15 @@ export const settings = {
 			},
 		},
 	],
-	transforms: {
-		to: [
-			{
-				type: 'block',
-				blocks: [ 'core/navigation-submenu' ],
-				transform: ( attributes, innerBlocks ) =>
-					createBlock(
-						'core/navigation-submenu',
-						attributes,
-						innerBlocks
-					),
-			},
-		],
-	},
+	transforms,
 };
 
-// importing this file includes side effects. This is whitelisted in block-library/package.json under sideEffects
-addFilter(
-	'blocks.registerBlockType',
-	'core/navigation-link',
-	enhanceNavigationLinkVariations
-);
+export const init = () => {
+	addFilter(
+		'blocks.registerBlockType',
+		'core/navigation-link',
+		enhanceNavigationLinkVariations
+	);
+
+	return initBlock( { name, metadata, settings } );
+};

@@ -4,7 +4,9 @@
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
+	MenuGroup,
 	MenuItem,
+	__experimentalVStack as VStack,
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -14,8 +16,11 @@ import { store as editorStore } from '@wordpress/editor';
  * Internal dependencies
  */
 import isTemplateRevertable from '../../utils/is-template-revertable';
-import { MENU_TEMPLATES } from '../navigation-sidebar/navigation-panel/constants';
 import { store as editSiteStore } from '../../store';
+import TemplateAreas from './template-areas';
+import EditTemplateTitle from './edit-template-title';
+import { useLink } from '../routes/link';
+import TemplatePartAreaSelector from './template-part-area-selector';
 
 export default function TemplateDetails( { template, onClose } ) {
 	const { title, description } = useSelect(
@@ -23,18 +28,25 @@ export default function TemplateDetails( { template, onClose } ) {
 			select( editorStore ).__experimentalGetTemplateInfo( template ),
 		[]
 	);
-	const { openNavigationPanelToMenu, revertTemplate } = useDispatch(
-		editSiteStore
-	);
+	const { revertTemplate } = useDispatch( editSiteStore );
+
+	const browseAllLinkProps = useLink( {
+		// TODO: We should update this to filter by template part's areas as well.
+		postType: template.type,
+		postId: undefined,
+	} );
+
+	const isTemplatePart = template.type === 'wp_template_part';
+
+	// Only user-created and non-default templates can change the name.
+	// But any user-created template part can be renamed.
+	const canEditTitle = isTemplatePart
+		? ! template.has_theme_file
+		: template.is_custom && ! template.has_theme_file;
 
 	if ( ! template ) {
 		return null;
 	}
-
-	const showTemplateInSidebar = () => {
-		onClose();
-		openNavigationPanelToMenu( MENU_TEMPLATES );
-	};
 
 	const revert = () => {
 		revertTemplate( template );
@@ -42,42 +54,62 @@ export default function TemplateDetails( { template, onClose } ) {
 	};
 
 	return (
-		<>
-			<div className="edit-site-template-details">
-				<Text size="body" weight={ 600 }>
-					{ title }
-				</Text>
+		<div className="edit-site-template-details">
+			<VStack className="edit-site-template-details__group" spacing={ 3 }>
+				{ canEditTitle ? (
+					<EditTemplateTitle template={ template } />
+				) : (
+					<Text
+						size={ 16 }
+						weight={ 600 }
+						className="edit-site-template-details__title"
+						as="p"
+					>
+						{ title }
+					</Text>
+				) }
 
 				{ description && (
 					<Text
 						size="body"
 						className="edit-site-template-details__description"
+						as="p"
 					>
 						{ description }
 					</Text>
 				) }
-			</div>
+			</VStack>
+
+			{ isTemplatePart && (
+				<div className="edit-site-template-details__group">
+					<TemplatePartAreaSelector id={ template.id } />
+				</div>
+			) }
+
+			<TemplateAreas closeTemplateDetailsDropdown={ onClose } />
 
 			{ isTemplateRevertable( template ) && (
-				<div className="edit-site-template-details__revert">
+				<MenuGroup className="edit-site-template-details__group edit-site-template-details__revert">
 					<MenuItem
-						info={ __( 'Restore template to theme default' ) }
+						className="edit-site-template-details__revert-button"
+						info={ __(
+							'Use the template as supplied by the theme.'
+						) }
 						onClick={ revert }
 					>
 						{ __( 'Clear customizations' ) }
 					</MenuItem>
-				</div>
+				</MenuGroup>
 			) }
 
 			<Button
 				className="edit-site-template-details__show-all-button"
-				onClick={ showTemplateInSidebar }
-				aria-label={ __(
-					'Browse all templates. This will open the template menu in the navigation side panel.'
-				) }
+				{ ...browseAllLinkProps }
 			>
-				{ __( 'Browse all templates' ) }
+				{ template?.type === 'wp_template'
+					? __( 'Browse all templates' )
+					: __( 'Browse all template parts' ) }
 			</Button>
-		</>
+		</div>
 	);
 }

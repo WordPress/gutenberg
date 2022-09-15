@@ -1,0 +1,30 @@
+[
+	{
+		"blockName": "core/cover",
+		"attrs": {
+			"overlayColor": "primary",
+			"minHeightUnit": "%"
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {
+					"align": "center",
+					"placeholder": "Write title…",
+					"fontSize": "large"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n\t\t<p class=\"has-text-align-center has-large-font-size\"></p>\n\t\t",
+				"innerContent": [
+					"\n\t\t<p class=\"has-text-align-center has-large-font-size\"></p>\n\t\t"
+				]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-cover\" style=\"min-height:undefined%\">\n\t<span aria-hidden=\"true\" class=\"wp-block-cover__background has-primary-background-color has-background-dim-100 has-background-dim\"></span>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-cover\" style=\"min-height:undefined%\">\n\t<span aria-hidden=\"true\" class=\"wp-block-cover__background has-primary-background-color has-background-dim-100 has-background-dim\"></span>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t",
+			null,
+			"\n\t</div>\n</div>\n"
+		]
+	}
+]
