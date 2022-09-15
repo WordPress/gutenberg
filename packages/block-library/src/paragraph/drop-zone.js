@@ -7,7 +7,10 @@ import {
 	__experimentalUseOnBlockDrop as useOnBlockDrop,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
+import {
+	__experimentalUseDropZone as useDropZone,
+	useReducedMotion,
+} from '@wordpress/compose';
 import {
 	Popover,
 	__unstableMotion as motion,
@@ -36,6 +39,12 @@ export default function DropZone( { paragraphElement, clientId } ) {
 			setIsVisible( false );
 		},
 	} );
+	const reducedMotion = useReducedMotion();
+
+	const animate = {
+		opacity: 1,
+		scale: 1,
+	};
 
 	return (
 		<Popover
@@ -59,9 +68,17 @@ export default function DropZone( { paragraphElement, clientId } ) {
 					{ isVisible ? (
 						<motion.div
 							key="drop-zone-foreground"
-							initial={ { opacity: 0, scale: 0.75 } }
-							animate={ { opacity: 1, scale: 1 } }
-							exit={ { opacity: 0, scale: 0.95 } }
+							initial={
+								reducedMotion
+									? animate
+									: { opacity: 0, scale: 0.75 }
+							}
+							animate={ animate }
+							exit={
+								reducedMotion
+									? animate
+									: { opacity: 0, scale: 0.95 }
+							}
 							className="wp-block-paragraph__drop-zone-foreground"
 						/>
 					) : null }
