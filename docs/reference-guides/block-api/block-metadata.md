@@ -473,7 +473,9 @@ See the [the variations documentation](/docs/reference-guides/block-api/block-va
 { "editorScript": "file:./index.js" }
 ```
 
-Block type editor script definition. It will only be enqueued in the context of the editor.
+Block type editor scripts definition. They will only be enqueued in the context of the editor.
+
+It's possible to pass a script handle registered with the [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) function, a path to a JavaScript file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
 
 _Note: An option to pass also an array of editor scripts exists since WordPress `6.1.0`._
 
@@ -488,7 +490,9 @@ _Note: An option to pass also an array of editor scripts exists since WordPress 
 { "script": "file:./script.js" }
 ```
 
-Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
+Block type frontend and editor scripts definition. They will be enqueued both in the editor and when viewing the content on the front of the site.
+
+It's possible to pass a script handle registered with the [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) function, a path to a JavaScript file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
 
 _Note: An option to pass also an array of scripts exists since WordPress `6.1.0`._
 
@@ -504,7 +508,9 @@ _Note: An option to pass also an array of scripts exists since WordPress `6.1.0`
 { "viewScript": [ "file:./view.js", "example-shared-view-script" ] }
 ```
 
-Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.
+Block type frontend scripts definition. They will be enqueued only when viewing the content on the front of the site.
+
+It's possible to pass a script handle registered with the [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) function, a path to a JavaScript file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
 
 _Note: An option to pass also an array of view scripts exists since WordPress `6.1.0`._
 
@@ -519,7 +525,9 @@ _Note: An option to pass also an array of view scripts exists since WordPress `6
 { "editorStyle": "file:./index.css" }
 ```
 
-Block type editor style definition. It will only be enqueued in the context of the editor.
+Block type editor styles definition. They will only be enqueued in the context of the editor.
+
+It's possible to pass a style handle registered with the [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/) function, a path to a CSS file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
 
 _Note: An option to pass also an array of editor styles exists since WordPress `5.9.0`._
 
@@ -534,7 +542,9 @@ _Note: An option to pass also an array of editor styles exists since WordPress `
 { "style": [ "file:./style.css", "example-shared-style" ] }
 ```
 
-Block type frontend and editor style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
+Block type frontend and editor styles definition. They will be enqueued both in the editor and when viewing the content on the front of the site.
+
+It's possible to pass a style handle registered with the [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/) function, a path to a CSS file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
 
 _Note: An option to pass also an array of styles exists since WordPress `5.9.0`._
 
