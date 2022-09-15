@@ -132,13 +132,26 @@ export function BlockPatternsCategoryPanel( {
 		rootClientId
 	);
 
+	const availableCategories = usePatternsCategories();
 	const currentCategoryPatterns = useMemo(
 		() =>
-			allPatterns.filter( ( pattern ) =>
-				category.name === 'uncategorized'
-					? ! pattern.categories?.length
-					: pattern.categories?.includes( category.name )
-			),
+			allPatterns.filter( ( pattern ) => {
+				if ( category.name !== 'uncategorized' ) {
+					return pattern.categories?.includes( category.name );
+				}
+
+				// The uncategorized category should show all the patterns without any category
+				// or with no available category.
+				const availablePatternCategories =
+					pattern.categories?.filter( ( cat ) =>
+						availableCategories.find(
+							( availableCategory ) =>
+								availableCategory.name === cat
+						)
+					) ?? [];
+
+				return availablePatternCategories.length === 0;
+			} ),
 		[ allPatterns, category ]
 	);
 
