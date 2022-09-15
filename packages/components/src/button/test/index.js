@@ -75,6 +75,29 @@ describe( 'Button', () => {
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-pressed' );
 		} );
 
+		it( 'should render a button element with has-text when children are passed', async () => {
+			render( <Button icon={ plusCircle }>Children</Button> );
+			expect( screen.getByRole( 'button' ) ).toHaveClass( 'has-text' );
+		} );
+
+		it( 'should render a button element without has-text when children are not passed', async () => {
+			render( <Button icon={ plusCircle }></Button> );
+			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+				'has-text'
+			);
+		} );
+
+		it( 'should render a button element without has-text when children are empty flagment', async () => {
+			render(
+				<Button icon={ plusCircle }>
+					<></>
+				</Button>
+			);
+			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+				'has-text'
+			);
+		} );
+
 		it( 'should add a disabled prop to the button', () => {
 			render( <Button disabled /> );
 
@@ -268,24 +291,6 @@ describe( 'Button', () => {
 			await screen.getByRole( 'button', { name: 'WordPress' } ).focus();
 
 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
-		} );
-
-		it( 'should not have has-text class when children is not defined', async () => {
-			render( <Button icon={ plusCircle }></Button> );
-			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
-				'has-text'
-			);
-		} );
-
-		it( 'should not have has-text class when children is empty flagment', async () => {
-			render(
-				<Button icon={ plusCircle }>
-					<></>
-				</Button>
-			);
-			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
-				'has-text'
-			);
 		} );
 	} );
 
