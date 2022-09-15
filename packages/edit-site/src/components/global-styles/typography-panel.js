@@ -8,11 +8,11 @@ import {
 	__experimentalLetterSpacingControl as LetterSpacingControl,
 } from '@wordpress/block-editor';
 import {
-	PanelBody,
 	FontSizePicker,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	__experimentalGrid as Grid,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -61,6 +61,127 @@ function useHasLetterSpacingControl( name ) {
 	);
 }
 
+function useFontFamily( prefix, name ) {
+	const [ fontFamily, setFontFamily ] = useStyle(
+		prefix + 'typography.fontFamily',
+		name
+	);
+	const [ userFontFamily ] = useStyle(
+		prefix + 'typography.fontFamily',
+		name,
+		'user'
+	);
+	const hasFontFamily = () => !! userFontFamily;
+	const resetFontFamily = () => setFontFamily( undefined );
+	return {
+		fontFamily,
+		setFontFamily,
+		hasFontFamily,
+		resetFontFamily,
+	};
+}
+
+function useFontSize( prefix, name ) {
+	const [ fontSize, setFontSize ] = useStyle(
+		prefix + 'typography.fontSize',
+		name
+	);
+	const [ userFontSize ] = useStyle(
+		prefix + 'typography.fontSize',
+		name,
+		'user'
+	);
+	const hasFontSize = () => !! userFontSize;
+	const resetFontSize = () => setFontSize( undefined );
+	return {
+		fontSize,
+		setFontSize,
+		hasFontSize,
+		resetFontSize,
+	};
+}
+
+function useFontAppearance( prefix, name ) {
+	const [ fontStyle, setFontStyle ] = useStyle(
+		prefix + 'typography.fontStyle',
+		name
+	);
+	const [ userFontStyle ] = useStyle(
+		prefix + 'typography.fontStyle',
+		name,
+		'user'
+	);
+	const [ fontWeight, setFontWeight ] = useStyle(
+		prefix + 'typography.fontWeight',
+		name
+	);
+	const [ userFontWeight ] = useStyle(
+		prefix + 'typography.fontWeight',
+		name,
+		'user'
+	);
+	const hasFontAppearance = () => !! userFontStyle || !! userFontWeight;
+	const resetFontAppearance = () => {
+		setFontStyle( undefined );
+		setFontWeight( undefined );
+	};
+	return {
+		fontStyle,
+		setFontStyle,
+		fontWeight,
+		setFontWeight,
+		hasFontAppearance,
+		resetFontAppearance,
+	};
+}
+
+function useLineHeight( prefix, name ) {
+	const [ lineHeight, setLineHeight ] = useStyle(
+		prefix + 'typography.lineHeight',
+		name
+	);
+	const [ userLineHeight ] = useStyle(
+		prefix + 'typography.lineHeight',
+		name,
+		'user'
+	);
+	const hasLineHeight = () => !! userLineHeight;
+	const resetLineHeight = () => setLineHeight( undefined );
+	return {
+		lineHeight,
+		setLineHeight,
+		hasLineHeight,
+		resetLineHeight,
+	};
+}
+
+function useLetterSpacing( prefix, name ) {
+	const [ letterSpacing, setLetterSpacing ] = useStyle(
+		prefix + 'typography.letterSpacing',
+		name
+	);
+	const [ userLetterSpacing ] = useStyle(
+		prefix + 'typography.letterSpacing',
+		name,
+		'user'
+	);
+	const hasLetterSpacing = () => !! userLetterSpacing;
+	const resetLetterSpacing = () => setLetterSpacing( undefined );
+	return {
+		letterSpacing,
+		setLetterSpacing,
+		hasLetterSpacing,
+		resetLetterSpacing,
+	};
+}
+
+/*
+ * @todo:
+ * - check above against what's in hooks/typogrpahy.js. maybe reset logic is
+ *   weird for some of the attributes
+ * - combine the simple ones into a single hook since the logic is the same
+ */
+
 export default function TypographyPanel( { name, element } ) {
 	const [ selectedLevel, setCurrentTab ] = useState( 'heading' );
 	const supports = getSupportedGlobalStylesPanels( name );
@@ -92,31 +213,37 @@ export default function TypographyPanel( { name, element } ) {
 		hasFontSizeEnabled = false;
 	}
 
-	const [ fontFamily, setFontFamily ] = useStyle(
-		prefix + 'typography.fontFamily',
+	const { fontFamily, setFontFamily, hasFontFamily, resetFontFamily } =
+		useFontFamily( prefix, name );
+	const { fontSize, setFontSize, hasFontSize, resetFontSize } = useFontSize(
+		prefix,
 		name
 	);
-	const [ fontSize, setFontSize ] = useStyle(
-		prefix + 'typography.fontSize',
-		name
-	);
+	const {
+		fontStyle,
+		setFontStyle,
+		fontWeight,
+		setFontWeight,
+		hasFontAppearance,
+		resetFontAppearance,
+	} = useFontAppearance( prefix, name );
+	const { lineHeight, setLineHeight, hasLineHeight, resetLineHeight } =
+		useLineHeight( prefix, name );
+	const {
+		letterSpacing,
+		setLetterSpacing,
+		hasLetterSpacing,
+		resetLetterSpacing,
+	} = useLetterSpacing( prefix, name );
 
-	const [ fontStyle, setFontStyle ] = useStyle(
-		prefix + 'typography.fontStyle',
-		name
-	);
-	const [ fontWeight, setFontWeight ] = useStyle(
-		prefix + 'typography.fontWeight',
-		name
-	);
-	const [ lineHeight, setLineHeight ] = useStyle(
-		prefix + 'typography.lineHeight',
-		name
-	);
-	const [ letterSpacing, setLetterSpacing ] = useStyle(
-		prefix + 'typography.letterSpacing',
-		name
-	);
+	const resetAll = () => {
+		resetFontFamily();
+		resetFontSize();
+		resetFontAppearance();
+		resetLineHeight();
+		resetLetterSpacing();
+	};
+
 	const [ backgroundColor ] = useStyle( prefix + 'color.background', name );
 	const [ gradientValue ] = useStyle( prefix + 'color.gradient', name );
 	const [ color ] = useStyle( prefix + 'color.text', name );
@@ -128,25 +255,25 @@ export default function TypographyPanel( { name, element } ) {
 			: {};
 
 	return (
-		<PanelBody className="edit-site-typography-panel" initialOpen={ true }>
-			<div
-				className="edit-site-typography-panel__preview"
-				style={ {
-					fontFamily: fontFamily ?? 'serif',
-					background: gradientValue ?? backgroundColor,
-					color,
-					fontSize,
-					fontStyle,
-					fontWeight,
-					letterSpacing,
-					...extraStyles,
-				} }
-			>
-				Aa
-			</div>
-			<Grid columns={ 2 } rowGap={ 16 } columnGap={ 8 }>
+		<>
+			<ToolsPanel label={ __( 'Typography' ) } resetAll={ resetAll }>
+				<div
+					className="edit-site-typography-panel__preview span-columns"
+					style={ {
+						fontFamily: fontFamily ?? 'serif',
+						background: gradientValue ?? backgroundColor,
+						color,
+						fontSize,
+						fontStyle,
+						fontWeight,
+						letterSpacing,
+						...extraStyles,
+					} }
+				>
+					Aa
+				</div>
 				{ element === 'heading' && (
-					<div className="edit-site-typography-panel__full-width-control">
+					<div className="span-columns">
 						<ToggleGroupControl
 							label={ __( 'Select heading level' ) }
 							hideLabelFromVision
@@ -190,7 +317,12 @@ export default function TypographyPanel( { name, element } ) {
 					</div>
 				) }
 				{ supports.includes( 'fontFamily' ) && (
-					<div className="edit-site-typography-panel__full-width-control">
+					<ToolsPanelItem
+						label={ __( 'Font family' ) }
+						hasValue={ hasFontFamily }
+						onDeselect={ resetFontFamily }
+						isShownByDefault
+					>
 						<FontFamilyControl
 							fontFamilies={ fontFamilies }
 							value={ fontFamily }
@@ -198,10 +330,15 @@ export default function TypographyPanel( { name, element } ) {
 							size="__unstable-large"
 							__nextHasNoMarginBottom
 						/>
-					</div>
+					</ToolsPanelItem>
 				) }
 				{ hasFontSizeEnabled && (
-					<div className="edit-site-typography-panel__full-width-control">
+					<ToolsPanelItem
+						label={ __( 'Font size' ) }
+						hasValue={ hasFontSize }
+						onDeselect={ resetFontSize }
+						isShownByDefault
+					>
 						<FontSizePicker
 							value={ fontSize }
 							onChange={ setFontSize }
@@ -210,45 +347,69 @@ export default function TypographyPanel( { name, element } ) {
 							size="__unstable-large"
 							__nextHasNoMarginBottom
 						/>
-					</div>
+					</ToolsPanelItem>
 				) }
 				{ hasAppearanceControl && (
-					<FontAppearanceControl
-						value={ {
-							fontStyle,
-							fontWeight,
-						} }
-						onChange={ ( {
-							fontStyle: newFontStyle,
-							fontWeight: newFontWeight,
-						} ) => {
-							setFontStyle( newFontStyle );
-							setFontWeight( newFontWeight );
-						} }
-						hasFontStyles={ hasFontStyles }
-						hasFontWeights={ hasFontWeights }
-						size="__unstable-large"
-						__nextHasNoMarginBottom
-					/>
+					<ToolsPanelItem
+						className="single-column"
+						label={ __( 'Appearance' ) } // TODO: Should say 'Font weight' and 'Font style' if only one is enabled
+						hasValue={ hasFontAppearance }
+						onDeselect={ resetFontAppearance }
+						isShownByDefault
+					>
+						<FontAppearanceControl
+							value={ {
+								fontStyle,
+								fontWeight,
+							} }
+							onChange={ ( {
+								fontStyle: newFontStyle,
+								fontWeight: newFontWeight,
+							} ) => {
+								setFontStyle( newFontStyle );
+								setFontWeight( newFontWeight );
+							} }
+							hasFontStyles={ hasFontStyles }
+							hasFontWeights={ hasFontWeights }
+							size="__unstable-large"
+							__nextHasNoMarginBottom
+						/>
+					</ToolsPanelItem>
 				) }
 				{ hasLineHeightEnabled && (
-					<LineHeightControl
-						__nextHasNoMarginBottom
-						__unstableInputWidth="auto"
-						value={ lineHeight }
-						onChange={ setLineHeight }
-						size="__unstable-large"
-					/>
+					<ToolsPanelItem
+						className="single-column"
+						label={ __( 'Line height' ) }
+						hasValue={ hasLineHeight }
+						onDeselect={ resetLineHeight }
+						isShownByDefault
+					>
+						<LineHeightControl
+							__nextHasNoMarginBottom
+							__unstableInputWidth="auto"
+							value={ lineHeight }
+							onChange={ setLineHeight }
+							size="__unstable-large"
+						/>
+					</ToolsPanelItem>
 				) }
 				{ hasLetterSpacingControl && (
-					<LetterSpacingControl
-						value={ letterSpacing }
-						onChange={ setLetterSpacing }
-						size="__unstable-large"
-						__unstableInputWidth="auto"
-					/>
+					<ToolsPanelItem
+						className="single-column"
+						label={ __( 'Letter spacing' ) }
+						hasValue={ hasLetterSpacing }
+						onDeselect={ resetLetterSpacing }
+						isShownByDefault
+					>
+						<LetterSpacingControl
+							value={ letterSpacing }
+							onChange={ setLetterSpacing }
+							size="__unstable-large"
+							__unstableInputWidth="auto"
+						/>
+					</ToolsPanelItem>
 				) }
-			</Grid>
-		</PanelBody>
+			</ToolsPanel>
+		</>
 	);
 }
