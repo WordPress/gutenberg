@@ -130,8 +130,16 @@ export default function useBlockDropZone( {
 
 			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
 
-			if ( targetIndex !== null ) {
-				showInsertionPoint( targetRootClientId, targetIndex );
+			const nearestBlock = blockElements[ targetIndex ];
+			if ( nearestBlock ) {
+				const previousBlock = blockElements[ targetIndex - 1 ];
+
+				if (
+					nearestBlock.dataset.empty !== 'true' &&
+					previousBlock?.dataset.empty !== 'true'
+				) {
+					showInsertionPoint( targetRootClientId, targetIndex );
+				}
 			}
 		}, [] ),
 		200

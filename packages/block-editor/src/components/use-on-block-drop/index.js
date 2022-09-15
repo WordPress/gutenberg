@@ -52,27 +52,16 @@ export function parseDropEvent( event ) {
 /**
  * A function that returns an event handler function for block drop events.
  *
- * @param {string}   targetRootClientId        The root client id where the block(s) will be inserted.
- * @param {number}   targetBlockIndex          The index where the block(s) will be inserted.
- * @param {Function} getBlockIndex             A function that gets the index of a block.
- * @param {Function} getClientIdsOfDescendants A function that gets the client ids of descendant blocks.
- * @param {Function} moveBlocksToPosition      A function that moves blocks.
- * @param {Function} insertBlocks              A function that inserts blocks.
- * @param {Function} clearSelectedBlock        A function that clears block selection.
+ * @param {Object}   options            The options object.
+ * @param {Function} options.addBlocks  A function that inserts or replaces blocks.
+ * @param {Function} options.moveBlocks A function that moves blocks.
  * @return {Function} The event handler for a block drop event.
  */
-export function onBlockDrop(
-	targetRootClientId,
-	targetBlockIndex,
-	getBlockIndex,
-	getClientIdsOfDescendants,
-	moveBlocksToPosition,
-	insertBlocks,
-	clearSelectedBlock
-) {
+export function useOnBlocksDrop( { addBlocks, moveBlocks } ) {
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+
 	return ( event ) => {
 		const {
-			srcRootClientId: sourceRootClientId,
 			srcClientIds: sourceClientIds,
 			type: dropType,
 			blocks,
@@ -84,56 +73,15 @@ export function onBlockDrop(
 			const blocksToInsert = blocks.map( ( block ) =>
 				cloneBlock( block )
 			);
-			insertBlocks(
-				blocksToInsert,
-				targetBlockIndex,
-				targetRootClientId,
-				true,
-				null
-			);
+			addBlocks( blocksToInsert, {
+				updateSelection: true,
+				initialPosition: null,
+			} );
 		}
 
 		// If the user is moving a block.
 		if ( dropType === 'block' ) {
-			const sourceBlockIndex = getBlockIndex( sourceClientIds[ 0 ] );
-
-			// If the user is dropping to the same position, return early.
-			if (
-				sourceRootClientId === targetRootClientId &&
-				sourceBlockIndex === targetBlockIndex
-			) {
-				return;
-			}
-
-			// If the user is attempting to drop a block within its own
-			// nested blocks, return early as this would create infinite
-			// recursion.
-			if (
-				sourceClientIds.includes( targetRootClientId ) ||
-				getClientIdsOfDescendants( sourceClientIds ).some(
-					( id ) => id === targetRootClientId
-				)
-			) {
-				return;
-			}
-
-			const isAtSameLevel = sourceRootClientId === targetRootClientId;
-			const draggedBlockCount = sourceClientIds.length;
-
-			// If the block is kept at the same level and moved downwards,
-			// subtract to take into account that the blocks being dragged
-			// were removed from the block list above the insertion point.
-			const insertIndex =
-				isAtSameLevel && sourceBlockIndex < targetBlockIndex
-					? targetBlockIndex - draggedBlockCount
-					: targetBlockIndex;
-
-			moveBlocksToPosition(
-				sourceClientIds,
-				sourceRootClientId,
-				targetRootClientId,
-				insertIndex
-			);
+			moveBlocks( sourceClientIds );
 		}
 	};
 }
@@ -141,23 +89,18 @@ export function onBlockDrop(
 /**
  * A function that returns an event handler function for block-related file drop events.
  *
- * @param {string}   targetRootClientId    The root client id where the block(s) will be inserted.
- * @param {number}   targetBlockIndex      The index where the block(s) will be inserted.
- * @param {boolean}  hasUploadPermissions  Whether the user has upload permissions.
- * @param {Function} updateBlockAttributes A function that updates a block's attributes.
- * @param {Function} canInsertBlockType    A function that returns checks whether a block type can be inserted.
- * @param {Function} insertBlocks          A function that inserts blocks.
+ * @param {Object}   options           The options object.
+ * @param {Function} options.addBlocks A function that insert or replace blocks.
  *
  * @return {Function} The event handler for a block-related file drop event.
  */
-export function onFilesDrop(
-	targetRootClientId,
-	targetBlockIndex,
-	hasUploadPermissions,
-	updateBlockAttributes,
-	canInsertBlockType,
-	insertBlocks
-) {
+export function useOnFilesDrop( { addBlocks } ) {
+	const hasUploadPermissions = useSelect(
+		( select ) => !! select( blockEditorStore ).getSettings().mediaUpload,
+		[]
+	);
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
 	return ( files ) => {
 		if ( ! hasUploadPermissions ) {
 			return;
@@ -166,9 +109,7 @@ export function onFilesDrop(
 		const transformation = findTransform(
 			getBlockTransforms( 'from' ),
 			( transform ) =>
-				transform.type === 'files' &&
-				canInsertBlockType( transform.blockName, targetRootClientId ) &&
-				transform.isMatch( files )
+				transform.type === 'files' && transform.isMatch( files )
 		);
 
 		if ( transformation ) {
@@ -176,7 +117,7 @@ export function onFilesDrop(
 				files,
 				updateBlockAttributes
 			);
-			insertBlocks( blocks, targetBlockIndex, targetRootClientId );
+			addBlocks( blocks );
 		}
 	};
 }
@@ -184,22 +125,17 @@ export function onFilesDrop(
 /**
  * A function that returns an event handler function for block-related HTML drop events.
  *
- * @param {string}   targetRootClientId The root client id where the block(s) will be inserted.
- * @param {number}   targetBlockIndex   The index where the block(s) will be inserted.
- * @param {Function} insertBlocks       A function that inserts blocks.
+ * @param {Object}   options           The options object.
+ * @param {Function} options.addBlocks A function that add or replace blocks.
  *
  * @return {Function} The event handler for a block-related HTML drop event.
  */
-export function onHTMLDrop(
-	targetRootClientId,
-	targetBlockIndex,
-	insertBlocks
-) {
+export function useOnHTMLDrop( { addBlocks } ) {
 	return ( HTML ) => {
 		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
 
 		if ( blocks.length ) {
-			insertBlocks( blocks, targetBlockIndex, targetRootClientId );
+			addBlocks( blocks );
 		}
 	};
 }
@@ -207,47 +143,100 @@ export function onHTMLDrop(
 /**
  * A React hook for handling block drop events.
  *
- * @param {string} targetRootClientId The root client id where the block(s) will be inserted.
- * @param {number} targetBlockIndex   The index where the block(s) will be inserted.
+ * @param {string}  targetRootClientId The root client id where the block(s) will be inserted.
+ * @param {number}  targetBlockIndex   The index where the block(s) will be inserted.
+ * @param {boolean} replace            Should replace the block at the targetBlockIndex.
  *
  * @return {Object} An object that contains the event handlers `onDrop`, `onFilesDrop` and `onHTMLDrop`.
  */
-export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
-	const hasUploadPermissions = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
-		[]
-	);
-	const { canInsertBlockType, getBlockIndex, getClientIdsOfDescendants } =
-		useSelect( blockEditorStore );
+export default function useOnBlockDrop(
+	targetRootClientId,
+	targetBlockIndex,
+	replace
+) {
 	const {
-		insertBlocks,
-		moveBlocksToPosition,
-		updateBlockAttributes,
-		clearSelectedBlock,
-	} = useDispatch( blockEditorStore );
-
-	const _onDrop = onBlockDrop(
-		targetRootClientId,
-		targetBlockIndex,
 		getBlockIndex,
 		getClientIdsOfDescendants,
-		moveBlocksToPosition,
-		insertBlocks,
-		clearSelectedBlock
-	);
-	const _onFilesDrop = onFilesDrop(
-		targetRootClientId,
-		targetBlockIndex,
-		hasUploadPermissions,
-		updateBlockAttributes,
-		canInsertBlockType,
-		insertBlocks
-	);
-	const _onHTMLDrop = onHTMLDrop(
-		targetRootClientId,
-		targetBlockIndex,
-		insertBlocks
-	);
+		getBlockOrder,
+		getBlockRootClientId,
+	} = useSelect( blockEditorStore );
+	const { insertBlocks, replaceBlocks, moveBlocksToPosition } =
+		useDispatch( blockEditorStore );
+
+	const addBlocks = (
+		blocks,
+		{ updateSelection = true, initialPosition = 0 } = {}
+	) => {
+		if ( replace ) {
+			const clientIds = getBlockOrder( targetRootClientId );
+			const clientId = clientIds[ targetBlockIndex ];
+
+			replaceBlocks( clientId, blocks, undefined, initialPosition );
+		} else {
+			insertBlocks(
+				blocks,
+				targetBlockIndex,
+				targetRootClientId,
+				updateSelection,
+				initialPosition
+			);
+		}
+	};
+
+	const moveBlocks = ( clientIds ) => {
+		const firstClientId = clientIds[ 0 ];
+		const rootClientId = getBlockRootClientId( firstClientId );
+		const sourceBlockIndex = getBlockIndex( firstClientId );
+
+		// If the user is dropping to the same position, return early.
+		if (
+			rootClientId === targetRootClientId &&
+			sourceBlockIndex === targetBlockIndex
+		) {
+			return;
+		}
+
+		// If the user is attempting to drop a block within its own
+		// nested blocks, return early as this would create infinite
+		// recursion.
+		if (
+			clientIds.includes( targetRootClientId ) ||
+			getClientIdsOfDescendants( clientIds ).includes(
+				targetRootClientId
+			)
+		) {
+			return;
+		}
+
+		const isAtSameLevel = rootClientId === targetRootClientId;
+		const draggedBlockCount = clientIds.length;
+
+		// If the block is kept at the same level and moved downwards,
+		// subtract to take into account that the blocks being dragged
+		// were removed from the block list above the insertion point.
+		const insertIndex =
+			isAtSameLevel && sourceBlockIndex < targetBlockIndex
+				? targetBlockIndex - draggedBlockCount
+				: targetBlockIndex;
+
+		moveBlocksToPosition(
+			clientIds,
+			rootClientId,
+			targetRootClientId,
+			insertIndex
+		);
+	};
+
+	const onBlocksDrop = useOnBlocksDrop( {
+		addBlocks,
+		moveBlocks,
+	} );
+	const onFilesDrop = useOnFilesDrop( {
+		addBlocks,
+	} );
+	const onHTMLDrop = useOnHTMLDrop( {
+		addBlocks,
+	} );
 
 	return ( event ) => {
 		const files = getFilesFromDataTransfer( event.dataTransfer );
@@ -258,11 +247,11 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 		 * The order of the checks is important to recognise the HTML drop.
 		 */
 		if ( html ) {
-			_onHTMLDrop( html );
+			onHTMLDrop( html );
 		} else if ( files.length ) {
-			_onFilesDrop( files );
+			onFilesDrop( files );
 		} else {
-			_onDrop( event );
+			onBlocksDrop( event );
 		}
 	};
 }

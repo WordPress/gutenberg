@@ -12,8 +12,6 @@ import {
 	ToolbarButton,
 	ToggleControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	DropZone,
-	Popover,
 } from '@wordpress/components';
 import {
 	AlignmentControl,
@@ -22,18 +20,19 @@ import {
 	RichText,
 	useBlockProps,
 	useSetting,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useDispatch } from '@wordpress/data';
-import { useMergeRefs } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	__experimentalUseDropZone as useDropZone,
+} from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
-import { createBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
  */
 import { useOnEnter } from './use-enter';
+import DropZone from './drop-zone';
 
 const name = 'core/paragraph';
 
@@ -63,13 +62,23 @@ function ParagraphBlock( {
 	const { align, content, direction, dropCap, placeholder } = attributes;
 	const isDropCapFeatureEnabled = useSetting( 'typography.dropCap' );
 	const [ paragraphElement, setParagraphElement ] = useState( null );
+	const [ isDragging, setIsDragging ] = useState( false );
 	const refCallback = ( element ) => {
 		setParagraphElement( element );
 	};
+	const draggingRef = useDropZone( {
+		onDragStart: () => {
+			setIsDragging( true );
+		},
+		onDragEnd: () => {
+			setIsDragging( false );
+		},
+	} );
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [
 			useOnEnter( { clientId, content } ),
 			refCallback,
+			draggingRef,
 		] ),
 		className: classnames( {
 			'has-drop-cap': dropCap,
@@ -77,7 +86,6 @@ function ParagraphBlock( {
 		} ),
 		style: { direction },
 	} );
-	const { replaceBlock } = useDispatch( blockEditorStore );
 
 	return (
 		<>
@@ -123,36 +131,11 @@ function ParagraphBlock( {
 					</ToolsPanelItem>
 				</InspectorControls>
 			) }
-			{ ! content && (
-				<Popover
-					anchorRef={ paragraphElement }
-					animate={ false }
-					placement="top-start"
-					focusOnMount={ false }
-					flip={ false }
-					resize={ false }
-					className="wp-block-paragraph__drop_zone"
-				>
-					<DropZone
-						style={ {
-							// TODO: Ideally we should observe the size of the paragraph block.
-							width: paragraphElement?.offsetWidth,
-							height: paragraphElement?.offsetHeight,
-						} }
-						onFilesDrop={ ( files ) => {
-							if ( files.length === 1 ) {
-								replaceBlock(
-									clientId,
-									createBlock( 'core/image', {
-										url: createBlobURL( files[ 0 ] ),
-									} )
-								);
-							}
-
-							// TODO: We can handle other file types and sizes here.
-						} }
-					/>
-				</Popover>
+			{ ! content && isDragging && (
+				<DropZone
+					clientId={ clientId }
+					paragraphElement={ paragraphElement }
+				/>
 			) }
 			<RichText
 				identifier="content"
