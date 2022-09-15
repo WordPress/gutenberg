@@ -32,7 +32,11 @@ function useConvertClassicToBlockMenu( clientId ) {
 	const [ status, setStatus ] = useState( CLASSIC_MENU_CONVERSION_IDLE );
 	const [ error, setError ] = useState( null );
 
-	async function convertClassicMenuToBlockMenu( menuId, menuName ) {
+	async function convertClassicMenuToBlockMenu(
+		menuId,
+		menuName,
+		postStatus = 'publish'
+	) {
 		let navigationMenu;
 		let classicMenuItems;
 
@@ -91,7 +95,7 @@ function useConvertClassicToBlockMenu( clientId ) {
 				'wp_navigation',
 				navigationMenu.id,
 				{
-					status: 'publish',
+					status: postStatus,
 				},
 				{ throwOnError: true }
 			);
@@ -111,7 +115,7 @@ function useConvertClassicToBlockMenu( clientId ) {
 		return navigationMenu;
 	}
 
-	const convert = useCallback( async ( menuId, menuName ) => {
+	const convert = useCallback( async ( menuId, menuName, postStatus ) => {
 		if ( ! menuId || ! menuName ) {
 			setError( 'Unable to convert menu. Missing menu details.' );
 			setStatus( CLASSIC_MENU_CONVERSION_ERROR );
@@ -121,7 +125,11 @@ function useConvertClassicToBlockMenu( clientId ) {
 		setStatus( CLASSIC_MENU_CONVERSION_PENDING );
 		setError( null );
 
-		return await convertClassicMenuToBlockMenu( menuId, menuName )
+		return await convertClassicMenuToBlockMenu(
+			menuId,
+			menuName,
+			postStatus
+		)
 			.then( ( navigationMenu ) => {
 				setStatus( CLASSIC_MENU_CONVERSION_SUCCESS );
 				return navigationMenu;

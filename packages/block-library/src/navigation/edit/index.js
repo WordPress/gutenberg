@@ -233,6 +233,27 @@ function Navigation( {
 			return;
 		}
 
+		if ( ! fallbackNavigationMenus?.length && classicMenus?.length === 1 ) {
+			// If there's only one classic menu
+			// then create a new navigation menu based on it.
+
+			// This is duplicated several times.
+			const onSelectClassicMenu = async ( classicMenu ) => {
+				const navMenu = await convertClassicMenu(
+					classicMenu.id,
+					classicMenu.name,
+					'publish'
+				);
+				if ( navMenu ) {
+					handleUpdateMenu( navMenu.id, {
+						focusNavigationBlock: true,
+					} );
+				}
+			};
+
+			onSelectClassicMenu( classicMenus[ 0 ] );
+		}
+
 		// See if we have any navigation menus
 		if ( fallbackNavigationMenus?.length ) {
 			navigationMenus.sort( ( menuA, menuB ) => {
@@ -250,27 +271,6 @@ function Navigation( {
 			 */
 			__unstableMarkNextChangeAsNotPersistent();
 			setRef( fallbackNavigationMenus[ 0 ].id );
-		} else if ( classicMenus?.length ) {
-			// Use a classic menu fallback
-
-			// We should get the primary one.
-
-			// We should probably create this not as a draft...
-
-			// This is duplicated several times.
-			const onSelectClassicMenu = async ( classicMenu ) => {
-				const navMenu = await convertClassicMenu(
-					classicMenu.id,
-					classicMenu.name
-				);
-				if ( navMenu ) {
-					handleUpdateMenu( navMenu.id, {
-						focusNavigationBlock: true,
-					} );
-				}
-			};
-
-			onSelectClassicMenu( classicMenus[ 0 ] );
 		}
 	}, [ navigationMenus ] );
 
@@ -660,7 +660,8 @@ function Navigation( {
 							onSelectClassicMenu={ async ( classicMenu ) => {
 								const navMenu = await convertClassicMenu(
 									classicMenu.id,
-									classicMenu.name
+									classicMenu.name,
+									'draft'
 								);
 								if ( navMenu ) {
 									handleUpdateMenu( navMenu.id, {

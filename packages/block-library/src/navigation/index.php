@@ -372,6 +372,29 @@ function block_core_navigation_get_fallback_blocks() {
 
 	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
 
+	// If there are no navigation posts then try to find a classic menu.
+	if ( ! $navigation_post ) {
+		// See if we have a classic menu
+		$classic_nav_menu = block_core_navigation_get_classic_menu_fallback();
+
+		// If we have a classic menu then convert it to blocks.
+		if ( $classic_nav_menu ) {
+			$classic_nav_menu_blocks = block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu );
+			$classic_nav_menu_blocks_serialized = serialize_blocks( $classic_nav_menu_blocks );
+
+			// Create a new navigation menu from the classic menu.
+			wp_insert_post( array(
+				'post_content' => $classic_nav_menu_blocks_serialized,
+				'post_title' => $classic_nav_menu->slug,
+				'post_status' => 'publish',
+				'post_type' => 'wp_navigation'
+			) );
+
+			// Fetch the navigation menus again
+			$navigation_post = block_core_navigation_get_most_recently_published_navigation();
+		}
+	}
+
 	// Prefer using the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
 		$maybe_fallback = block_core_navigation_filter_out_empty_blocks( parse_blocks( $navigation_post->post_content ) );
@@ -379,12 +402,6 @@ function block_core_navigation_get_fallback_blocks() {
 		// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
 		// In this case default to the (Page List) fallback.
 		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
-	} else {
-		// See if we have any classic menus
-		$classic_nav_menu = block_core_navigation_get_classic_menu_fallback();
-		if ( $classic_nav_menu ) {
-			$fallback_blocks = block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu );
-		}
 	}
 
 	/**
