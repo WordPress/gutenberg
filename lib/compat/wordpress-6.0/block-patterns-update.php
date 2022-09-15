@@ -155,7 +155,7 @@ function gutenberg_register_gutenberg_patterns() {
 			'title'      => _x( 'Post feed', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
-			'content'    => '<!-- wp:query {"queryId":7,"query":{"perPage":8,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"}} -->
+			'content'    => '<!-- wp:query {"query":{"perPage":8,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"}} -->
 			<div class="wp-block-query"><!-- wp:post-template -->
 			<!-- wp:group {"style":{"spacing":{"padding":{"top":"20px","right":"0px","bottom":"20px","left":"0px"}}}} -->
 			<div class="wp-block-group" style="padding-top:20px;padding-right:0px;padding-bottom:20px;padding-left:0px"><!-- wp:columns -->
@@ -189,7 +189,7 @@ function gutenberg_register_gutenberg_patterns() {
 			'title'      => _x( 'Post list cards', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
-			'content'    => '<!-- wp:query {"queryId":7,"query":{"perPage":"6","pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"wide"} -->
+			'content'    => '<!-- wp:query {"query":{"perPage":"6","pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"wide"} -->
 			<div class="wp-block-query alignwide"><!-- wp:post-template {"align":"full"} -->
 			<!-- wp:group {"style":{"border":{"radius":"0px","width":"4px"},"spacing":{"padding":{"top":"4px","right":"4px","bottom":"4px","left":"4px"}}},"borderColor":"contrast"} -->
 			<div class="wp-block-group has-border-color has-contrast-border-color" style="border-width:4px;border-radius:0px;padding-top:4px;padding-right:4px;padding-bottom:4px;padding-left:4px"><!-- wp:columns {"style":{"spacing":{"padding":{"top":"0px","right":"0px","bottom":"0px","left":"0px"}}},"backgroundColor":"base"} -->
@@ -222,7 +222,7 @@ function gutenberg_register_gutenberg_patterns() {
 <hr class="wp-block-separator has-css-opacity alignwide is-style-wide"/>
 <!-- /wp:separator -->
 
-<!-- wp:query {"queryId":7,"query":{"perPage":10,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"wide"} -->
+<!-- wp:query {"query":{"perPage":10,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"wide"} -->
 <div class="wp-block-query alignwide"><!-- wp:post-template {"align":"wide"} -->
 <!-- wp:columns {"align":"wide"} -->
 <div class="wp-block-columns alignwide"><!-- wp:column -->
@@ -269,7 +269,7 @@ function gutenberg_register_gutenberg_patterns() {
 			'title'      => _x( 'Post list cards', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
-			'content'    => '<!-- wp:query {"queryId":7,"query":{"perPage":"6","pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"wide"} -->
+			'content'    => '<!-- wp:query {"query":{"perPage":"6","pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"wide"} -->
 			<div class="wp-block-query alignwide"><!-- wp:post-template {"align":"full"} -->
 			<!-- wp:group {"style":{"border":{"radius":"0px","width":"4px"},"spacing":{"padding":{"top":"4px","right":"4px","bottom":"4px","left":"4px"}}},"borderColor":"contrast"} -->
 			<div class="wp-block-group has-border-color has-contrast-border-color" style="border-width:4px;border-radius:0px;padding-top:4px;padding-right:4px;padding-bottom:4px;padding-left:4px"><!-- wp:columns {"style":{"spacing":{"padding":{"top":"0px","right":"0px","bottom":"0px","left":"0px"}}},"backgroundColor":"base"} -->
@@ -297,7 +297,7 @@ function gutenberg_register_gutenberg_patterns() {
 			'title'      => _x( 'Two column text list', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
-			'content'    => '<!-- wp:query {"queryId":0,"query":{"perPage":5,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"full"} -->
+			'content'    => '<!-- wp:query {"query":{"perPage":5,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"full"} -->
 			<div class="wp-block-query alignfull"><!-- wp:post-template {"align":"full"} -->
 			<!-- wp:columns {"align":"wide"} -->
 			<div class="wp-block-columns alignwide"><!-- wp:column {"width":"50%","style":{"spacing":{"padding":{"top":"2em","bottom":"0em"}}}} -->
@@ -331,7 +331,7 @@ function gutenberg_register_gutenberg_patterns() {
 			'title'      => _x( 'Post list cards', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
-			'content'    => '<!-- wp:query {"queryId":7,"query":{"perPage":"6","pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"wide"} -->
+			'content'    => '<!-- wp:query {"query":{"perPage":"6","pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"wide"} -->
 			<div class="wp-block-query alignwide"><!-- wp:post-template {"align":"full"} -->
 			<!-- wp:group {"style":{"border":{"radius":"0px","width":"4px"},"spacing":{"padding":{"top":"4px","right":"4px","bottom":"4px","left":"4px"}}},"borderColor":"contrast"} -->
 			<div class="wp-block-group has-border-color has-contrast-border-color" style="border-width:4px;border-radius:0px;padding-top:4px;padding-right:4px;padding-bottom:4px;padding-left:4px"><!-- wp:columns {"style":{"spacing":{"padding":{"top":"0px","right":"0px","bottom":"0px","left":"0px"}}},"backgroundColor":"base"} -->
@@ -359,7 +359,7 @@ function gutenberg_register_gutenberg_patterns() {
 			'title'      => _x( 'Two column with tags', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
-			'content'    => '<!-- wp:query {"queryId":0,"query":{"perPage":"10","pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"wide"} -->
+			'content'    => '<!-- wp:query {"query":{"perPage":"10","pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"wide"} -->
 			<div class="wp-block-query alignwide"><!-- wp:post-template -->
 			<!-- wp:columns {"verticalAlignment":"center","align":"wide","style":{"spacing":{"padding":{"top":"0px","right":"0px","bottom":"0px","left":"0px"}}}} -->
 			<div class="wp-block-columns alignwide are-vertically-aligned-center" style="padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px"><!-- wp:column {"verticalAlignment":"center","width":"50%","style":{"spacing":{"padding":{"bottom":"0em","top":"0em"}}}} -->
@@ -388,7 +388,7 @@ function gutenberg_register_gutenberg_patterns() {
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
 			'content'    => '<!-- wp:group {"layout":{"type":"constrained"},"align":"full","style":{"spacing":{"blockGap":"0px"}}} -->
-			<div class="wp-block-group alignfull"><!-- wp:query {"queryId":7,"query":{"perPage":"1","pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"full"} -->
+			<div class="wp-block-group alignfull"><!-- wp:query {"query":{"perPage":"1","pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"full"} -->
 			<div class="wp-block-query alignfull"><!-- wp:post-template {"align":"full"} -->
 			<!-- wp:cover {"customOverlayColor":"#eef5e9","minHeight":246,"minHeightUnit":"px","contentPosition":"center center","isDark":false,"align":"full"} -->
 			<div class="wp-block-cover alignfull is-light" style="min-height:246px"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim" style="background-color:#eef5e9"></span><div class="wp-block-cover__inner-container"><!-- wp:post-title {"textAlign":"center","level":3,"textColor":"black"} /--></div></div>
@@ -396,7 +396,7 @@ function gutenberg_register_gutenberg_patterns() {
 			<!-- /wp:post-template --></div>
 			<!-- /wp:query -->
 
-			<!-- wp:query {"queryId":7,"query":{"perPage":"1","pages":0,"offset":1,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"full"} -->
+			<!-- wp:query {"query":{"perPage":"1","pages":0,"offset":1,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"full"} -->
 			<div class="wp-block-query alignfull"><!-- wp:post-template {"align":"full"} -->
 			<!-- wp:cover {"customOverlayColor":"#ffc4a3","minHeight":246,"minHeightUnit":"px","contentPosition":"center center","isDark":false,"align":"full"} -->
 			<div class="wp-block-cover alignfull is-light" style="min-height:246px"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim" style="background-color:#ffc4a3"></span><div class="wp-block-cover__inner-container"><!-- wp:post-title {"textAlign":"center","level":3,"textColor":"black"} /--></div></div>
@@ -404,7 +404,7 @@ function gutenberg_register_gutenberg_patterns() {
 			<!-- /wp:post-template --></div>
 			<!-- /wp:query -->
 
-			<!-- wp:query {"queryId":7,"query":{"perPage":"1","pages":0,"offset":2,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"full"} -->
+			<!-- wp:query {"query":{"perPage":"1","pages":0,"offset":2,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"full"} -->
 			<div class="wp-block-query alignfull"><!-- wp:post-template {"align":"full"} -->
 			<!-- wp:cover {"customOverlayColor":"#cccdbb","minHeight":246,"minHeightUnit":"px","contentPosition":"center center","isDark":false,"align":"full"} -->
 			<div class="wp-block-cover alignfull is-light" style="min-height:246px"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim" style="background-color:#cccdbb"></span><div class="wp-block-cover__inner-container"><!-- wp:post-title {"textAlign":"center","level":3,"textColor":"black"} /--></div></div>
@@ -412,7 +412,7 @@ function gutenberg_register_gutenberg_patterns() {
 			<!-- /wp:post-template --></div>
 			<!-- /wp:query -->
 
-			<!-- wp:query {"queryId":7,"query":{"perPage":"1","pages":0,"offset":3,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"full"} -->
+			<!-- wp:query {"query":{"perPage":"1","pages":0,"offset":3,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"},"align":"full"} -->
 			<div class="wp-block-query alignfull"><!-- wp:post-template {"align":"full"} -->
 			<!-- wp:cover {"customOverlayColor":"#ffedbf","minHeight":246,"minHeightUnit":"px","contentPosition":"center center","isDark":false,"align":"full"} -->
 			<div class="wp-block-cover alignfull is-light" style="min-height:246px"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim" style="background-color:#ffedbf"></span><div class="wp-block-cover__inner-container"><!-- wp:post-title {"textAlign":"center","level":3,"textColor":"black"} /--></div></div>
@@ -427,7 +427,7 @@ function gutenberg_register_gutenberg_patterns() {
 			'categories' => array( 'query' ),
 			'content'    => '<!-- wp:columns {"align":"wide"} -->
 			<div class="wp-block-columns alignwide"><!-- wp:column {"width":"66.66%"} -->
-			<div class="wp-block-column" style="flex-basis:66.66%"><!-- wp:query {"queryId":2,"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"}} -->
+			<div class="wp-block-column" style="flex-basis:66.66%"><!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"}} -->
 			<div class="wp-block-query"><!-- wp:post-template -->
 			<!-- wp:post-featured-image {"isLink":true} /-->
 
@@ -439,7 +439,7 @@ function gutenberg_register_gutenberg_patterns() {
 			<!-- /wp:column -->
 
 			<!-- wp:column -->
-			<div class="wp-block-column"><!-- wp:query {"queryId":1,"query":{"perPage":7,"pages":0,"offset":1,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list","columns":2}} -->
+			<div class="wp-block-column"><!-- wp:query {"query":{"perPage":7,"pages":0,"offset":1,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list","columns":2}} -->
 			<div class="wp-block-query"><!-- wp:post-template -->
 			<!-- wp:post-title {"isLink":true,"fontSize":"large"} /-->
 
@@ -466,7 +466,7 @@ function gutenberg_register_gutenberg_patterns() {
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
 			'content'    => '<!-- wp:group {"align":"wide","style":{"spacing":{"padding":{"top":"var:preset|spacing|30","right":"var:preset|spacing|30","bottom":"var:preset|spacing|30","left":"var:preset|spacing|30"}}},"backgroundColor":"black"} -->
-			<div class="wp-block-group alignwide has-black-background-color has-background" style="padding-top:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--30);padding-bottom:var(--wp--preset--spacing--30);padding-left:var(--wp--preset--spacing--30)"><!-- wp:query {"queryId":25,"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"}} -->
+			<div class="wp-block-group alignwide has-black-background-color has-background" style="padding-top:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--30);padding-bottom:var(--wp--preset--spacing--30);padding-left:var(--wp--preset--spacing--30)"><!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"displayLayout":{"type":"list"}} -->
 			<div class="wp-block-query"><!-- wp:post-template -->
 			<!-- wp:columns {"verticalAlignment":"center","textColor":"base"} -->
 			<div class="wp-block-columns are-vertically-aligned-center has-base-color has-text-color"><!-- wp:column {"verticalAlignment":"center","width":"20%"} -->
@@ -494,7 +494,7 @@ function gutenberg_register_gutenberg_patterns() {
 			<p class="has-base-color has-text-color has-link-color"><strong>More Posts</strong></p>
 			<!-- /wp:paragraph -->
 
-			<!-- wp:query {"queryId":14,"query":{"perPage":6,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"flex","columns":3}} -->
+			<!-- wp:query {"query":{"perPage":6,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"flex","columns":3}} -->
 			<div class="wp-block-query"><!-- wp:post-template -->
 			<!-- wp:group {"layout":{"inherit":false},"style":{"spacing":{"padding":{"top":"0px","right":"0px","bottom":"var:preset|spacing|40","left":"0px"}}}} -->
 			<div class="wp-block-group" style="padding-top:0px;padding-right:0px;padding-bottom:var(--wp--preset--spacing--40);padding-left:0px"><!-- wp:separator {"backgroundColor":"base"} -->
