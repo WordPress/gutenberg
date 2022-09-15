@@ -19,7 +19,7 @@ import {
 /**
  * Internal dependencies
  */
-import CreatingTemplateOverlay from './creating-template-overlay';
+import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 
 function AddCustomGenericTemplateModal( {
 	onClose,
@@ -58,7 +58,7 @@ function AddCustomGenericTemplateModal( {
 			} }
 			overlayClassName="edit-site-custom-generic-template__modal"
 		>
-			{ isCreatingTemplate && <CreatingTemplateOverlay /> }
+			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
 			<form onSubmit={ onCreateTemplate }>
 				<Flex align="flex-start" gap={ 8 }>
 					<FlexItem>

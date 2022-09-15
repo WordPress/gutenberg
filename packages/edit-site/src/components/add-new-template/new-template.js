@@ -44,7 +44,7 @@ import {
 	usePostTypeArchiveMenuItems,
 } from './utils';
 import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
-import CreatingTemplateOverlay from './creating-template-overlay';
+import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
 
@@ -185,7 +185,9 @@ export default function NewTemplate( { postType } ) {
 			>
 				{ () => (
 					<>
-						{ isCreatingTemplate && <CreatingTemplateOverlay /> }
+						{ isCreatingTemplate && (
+							<TemplateActionsLoadingScreen />
+						) }
 						<NavigableMenu className="edit-site-new-template-dropdown__popover">
 							<MenuGroup label={ postType.labels.add_new_item }>
 								{ missingTemplates.map( ( template ) => {

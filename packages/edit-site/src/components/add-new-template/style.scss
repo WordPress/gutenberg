@@ -159,15 +159,28 @@
 	margin-top: $grid-unit-15;
 }
 
-.edit-site-creating-template-overlay {
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(255, 255, 255, 0.8);
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	z-index: z-index(".components-modal__header");
+.edit-site-template-actions-loading-screen-modal {
+	backdrop-filter: none;
+	background-color: transparent;
+	// TODO: With this margin I can click and close, where I shouldn't be able to.
+	// Needs check if we need to have that opacity overlay in the header..
+	margin-top: $header-height;
+
+	&.is-full-screen {
+		background-color: $white;
+		box-shadow: 0 0 0 transparent;
+		min-width: 100%;
+		min-height: 100%;
+	}
+
+	&__overlay {
+		// TODO: related to the above overlay opacity in header..
+		background-color: rgba(255, 255, 255, 0.8);
+	}
+	&__content {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+	}
 }

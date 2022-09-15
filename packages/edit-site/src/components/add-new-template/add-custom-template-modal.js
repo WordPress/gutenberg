@@ -21,7 +21,7 @@ import { useEntityRecords } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import CreatingTemplateOverlay from './creating-template-overlay';
+import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 import { mapToIHasNameAndId } from './utils';
 
 const EMPTY_ARRAY = [];
@@ -182,7 +182,7 @@ function AddCustomTemplateModal( {
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
 		>
-			{ isCreatingTemplate && <CreatingTemplateOverlay /> }
+			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
 			{ ! showSearchEntities && (
 				<div>
 					<p>
