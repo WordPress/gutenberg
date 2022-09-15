@@ -17,18 +17,6 @@ const variations = [
 		icon: group,
 	},
 	{
-		name: 'group-flow',
-		title: __( 'Group' ),
-		description: __( 'Gather blocks in a container.' ),
-		attributes: { layout: { type: 'default' } },
-		scope: [ 'block' ],
-		isActive: ( blockAttributes ) =>
-			! blockAttributes.layout ||
-			! blockAttributes.layout?.type ||
-			blockAttributes.layout?.type === 'default',
-		icon: group,
-	},
-	{
 		name: 'group-row',
 		title: _x( 'Row', 'single horizontal line' ),
 		description: __( 'Arrange blocks horizontally.' ),
