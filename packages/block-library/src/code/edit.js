@@ -1,23 +1,31 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps } from '@wordpress/block-editor';
+import { Button, Tooltip } from '@wordpress/components';
+import { help } from '@wordpress/icons';
 
-export default function CodeEdit( { attributes, setAttributes, onRemove } ) {
+export default function CodeEdit() {
 	const blockProps = useBlockProps();
 	return (
-		<pre { ...blockProps }>
-			<RichText
-				tagName="code"
-				value={ attributes.content }
-				onChange={ ( content ) => setAttributes( { content } ) }
-				onRemove={ onRemove }
-				placeholder={ __( 'Write code…' ) }
-				aria-label={ __( 'Code' ) }
-				preserveWhiteSpace
-				__unstablePastePlainText
-			/>
-		</pre>
+		<div { ...blockProps }>
+			<p>Button with no children</p>
+			<Button icon={ help } label="label" variant="primary"></Button>
+
+			<p>Button with empty flagment children</p>
+			<Button icon={ help } label="label" variant="primary">
+				<></>
+			</Button>
+
+			<p>Button with Tooltip</p>
+			<Tooltip text="Tooltip!">
+				<Button icon={ help } label="label" variant="primary" />
+			</Tooltip>
+
+			<p>Should have .has-text class as in the past</p>
+			<Button icon={ help } label="label" variant="primary">
+				Push Me
+			</Button>
+		</div>
 	);
 }

@@ -269,6 +269,24 @@ describe( 'Button', () => {
 
 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
 		} );
+
+		it( 'should not have has-text class when children is not defined', async () => {
+			render( <Button icon={ plusCircle }></Button> );
+			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+				'has-text'
+			);
+		} );
+
+		it( 'should not have has-text class when children is empty flagment', async () => {
+			render(
+				<Button icon={ plusCircle }>
+					<></>
+				</Button>
+			);
+			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+				'has-text'
+			);
+		} );
 	} );
 
 	describe( 'with href property', () => {
