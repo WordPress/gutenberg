@@ -248,34 +248,27 @@ function block_core_navigation_render_submenu_icon() {
 	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
 
+/**
+ * Get the classic navigation menu to use as a fallback.
+ *
+ * @return object WP_Term The classic navigation.
+ */
 function block_core_navigation_get_classic_menu_fallback() {
 	$classic_nav_menus = wp_get_nav_menus();
 
 	// If menus exist.
-	if ( $classic_nav_menus && ! is_wp_error( $classic_nav_menus ) ) {
-		// Get the primary one
-		// Should this be the one at the primary location?
-		$primary_nav_menu = array_filter( $classic_nav_menus, function( $classic_menu ) {
-			return $classic_menu->slug === 'primary';
-		} );
-
-		if ( isset( $primary_nav_menu ) && count( $primary_nav_menu ) > 0 ) {
-			return current( $primary_nav_menu );
-		}
-
-		// If there's no primary one then just use the newest.
+	if ( $classic_nav_menus && ! is_wp_error( $classic_nav_menus ) && count( $classic_nav_menus ) === 1 ) {
+		// If there's only one classic menu then use it.
 		return $classic_nav_menus[ 0 ];
 	}
 }
 
 /**
- * Finds the most classic navigation fallback to use.
+ * Finds the classic navigation fallback to use.
  *
- * @return WP_Post|null the classic navigation post.
+ * @return array the normalized parsed blocks.
  */
-function block_core_navigation_get_classic_menu_fallback_blocks() {
-	$classic_nav_menu = block_core_navigation_get_classic_menu_fallback();
-
+function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu ) {
 	$menu_items = wp_get_nav_menu_items( $classic_nav_menu->term_id, array( 'update_post_term_cache' => false ) );
 
 	// Set up the $menu_item variables.
@@ -388,7 +381,10 @@ function block_core_navigation_get_fallback_blocks() {
 		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
 	} else {
 		// See if we have any classic menus
-		$fallback_blocks = block_core_navigation_get_classic_menu_fallback_blocks();
+		$classic_nav_menu = block_core_navigation_get_classic_menu_fallback();
+		if ( $classic_nav_menu ) {
+			$fallback_blocks = block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu );
+		}
 	}
 
 	/**
