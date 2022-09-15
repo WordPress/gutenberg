@@ -184,7 +184,7 @@ function AddCustomTemplateModal( {
 		>
 			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
 			{ ! showSearchEntities && (
-				<div>
+				<>
 					<p>
 						{ __(
 							'Select whether to create a single template for all items or a specific one.'
@@ -241,10 +241,10 @@ function AddCustomTemplateModal( {
 							</Text>
 						</FlexItem>
 					</Flex>
-				</div>
+				</>
 			) }
 			{ showSearchEntities && (
-				<div>
+				<>
 					<p>
 						{ __(
 							'This template will be used only for the specific item chosen.'
@@ -254,7 +254,7 @@ function AddCustomTemplateModal( {
 						entityForSuggestions={ entityForSuggestions }
 						onSelect={ onSelect }
 					/>
-				</div>
+				</>
 			) }
 		</Modal>
 	);

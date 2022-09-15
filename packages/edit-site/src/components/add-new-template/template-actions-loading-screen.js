@@ -14,7 +14,6 @@ export default function TemplateActionsLoadingScreen() {
 			onRequestClose={ () => {} }
 			__experimentalHideHeader
 			className={ baseCssClass }
-			overlayClassName={ `${ baseCssClass }__overlay` }
 		>
 			<div className={ `${ baseCssClass }__content` }>
 				<Spinner />

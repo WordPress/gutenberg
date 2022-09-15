@@ -162,9 +162,6 @@
 .edit-site-template-actions-loading-screen-modal {
 	backdrop-filter: none;
 	background-color: transparent;
-	// TODO: With this margin I can click and close, where I shouldn't be able to.
-	// Needs check if we need to have that opacity overlay in the header..
-	margin-top: $header-height;
 
 	&.is-full-screen {
 		background-color: $white;
@@ -173,10 +170,6 @@
 		min-height: 100%;
 	}
 
-	&__overlay {
-		// TODO: related to the above overlay opacity in header..
-		background-color: rgba(255, 255, 255, 0.8);
-	}
 	&__content {
 		display: flex;
 		align-items: center;
