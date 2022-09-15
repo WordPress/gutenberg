@@ -44,8 +44,7 @@
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/url": "file:../url",
-		"change-case": "^4.1.2",
-		"lodash": "^4.17.21"
+		"change-case": "^4.1.2"
 	},
 	"peerDependencies": {
 		"react": "^17.0.0",
