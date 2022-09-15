@@ -105,6 +105,7 @@ module.exports = {
 							'flatMap',
 							'flatten',
 							'flattenDeep',
+							'flowRight',
 							'forEach',
 							'fromPairs',
 							'has',
