@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Update templates to use the `render` field in `block.json` introduced in WordPress 6.1 ([#44185](https://github.com/WordPress/gutenberg/pull/44185)).
+
 ## 4.3.0 (2022-10-05)
 
 ## 4.2.0 (2022-09-21)

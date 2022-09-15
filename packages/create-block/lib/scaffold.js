@@ -43,6 +43,7 @@ module.exports = async (
 		editorScript,
 		editorStyle,
 		style,
+		render,
 		variantVars,
 	}
 ) => {
@@ -99,6 +100,7 @@ module.exports = async (
 		editorScript,
 		editorStyle,
 		style,
+		render,
 		...variantVars,
 	};
 
