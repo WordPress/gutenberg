@@ -13,6 +13,9 @@ const variations = [
 		isDefault: true,
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
+			! blockAttributes.layout ||
+			! blockAttributes.layout?.type ||
+			blockAttributes.layout?.type === 'default' ||
 			blockAttributes.layout?.type === 'constrained',
 		icon: group,
 	},
