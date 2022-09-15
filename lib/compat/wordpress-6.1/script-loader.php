@@ -104,7 +104,7 @@ function gutenberg_enqueue_stored_styles() {
  * @param array $nodes The nodes to filter.
  * @return array A filtered array of style nodes.
  */
-function filter_out_block_nodes( $nodes ) {
+function gutenberg_filter_out_block_nodes( $nodes ) {
 	return array_filter(
 		$nodes,
 		function( $node ) {
@@ -144,7 +144,7 @@ function gutenberg_enqueue_global_styles() {
 	 * This removes the CSS from the global-styles stylesheet and adds it to the inline CSS for each block.
 	 * This filter has to be registered before we call gutenberg_get_global_stylesheet();
 	 */
-	add_filter( 'gutenberg_get_style_nodes', 'filter_out_block_nodes', 10, 1 );
+	add_filter( 'gutenberg_get_style_nodes', 'gutenberg_filter_out_block_nodes', 10, 1 );
 
 	$stylesheet = gutenberg_get_global_stylesheet();
 	if ( empty( $stylesheet ) ) {
