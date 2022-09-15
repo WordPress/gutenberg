@@ -1,0 +1,51 @@
+.edit-site-layout {
+	background: $gray-900;
+	color: $white;
+	min-height: 100%;
+	display: flex;
+}
+
+.edit-site-layout__sidebar {
+	width: $sidebar-width;
+
+	.edit-site-layout.is-full-canvas & {
+		display: none;
+	}
+}
+
+.edit-site-layout__canvas-container {
+	flex-grow: 1;
+	padding: $grid-unit-30;
+	position: relative;
+
+	.edit-site-layout.is-full-canvas & {
+		padding: 0;
+	}
+}
+
+.edit-site-layout__canvas {
+	background: $white;
+	color: $gray-900;
+	border-radius: $radius-block-ui * 2;
+	position: absolute;
+	top: $grid-unit-30;
+	left: $grid-unit-30;
+	right: $grid-unit-30;
+	bottom: $grid-unit-30;
+	overflow-y: auto;
+
+	.edit-site-layout.is-full-canvas & {
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		border-radius: 0;
+	}
+}
+
+// This shouldn't be necessary (we should have a way to say that a skeletton is relative
+.edit-site-layout__canvas .interface-interface-skeleton {
+	position: relative !important;
+	max-height: auto !important;
+	min-height: 100% !important;
+}

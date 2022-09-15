@@ -14,9 +14,19 @@
 
 .edit-site-visual-editor {
 	position: relative;
+	height: 100%;
+	display: block;
+	overflow: hidden;
 	background-color: $gray-800;
 	// Centralize the editor horizontally (flex-direction is column).
 	align-items: center;
+
+	iframe {
+		display: block;
+		width: 100%;
+		height: 100%;
+		background-color: $white;
+	}
 
 	&.is-focus-mode {
 		padding: $grid-unit-60;

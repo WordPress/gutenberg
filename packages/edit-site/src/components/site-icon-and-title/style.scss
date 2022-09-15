@@ -1,0 +1,16 @@
+.edit-site-site-icon-and-title {
+	display: inline-flex;
+	gap: $grid-unit-20;
+	align-items: center;
+}
+
+.edit-site-site-icon-and-title-icon {
+	fill: currentColor;
+}
+
+.edit-site-site-icon-and-title-image {
+	width: $button-size;
+	height: $button-size;
+	border-radius: $radius-block-ui;
+	object-fit: cover;
+}
