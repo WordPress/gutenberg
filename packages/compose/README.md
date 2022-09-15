@@ -86,17 +86,6 @@ _Returns_
 
 -   Component class with generated display name assigned.
 
-### flow
-
-Composes multiple higher-order components into a single higher-order component. Performs left-to-right function
-composition, where each successive invocation is supplied the return value of the previous.
-
-This is inspired by `lodash`'s `flow` function.
-
-_Related_
-
--   <https://docs-lodash.com/v4/flow/>
-
 ### ifCondition
 
 Higher-order component creator, creating a new component which renders if
@@ -121,6 +110,17 @@ _Parameters_
 _Returns_
 
 -   Higher-order component.
+
+### pipe
+
+Composes multiple higher-order components into a single higher-order component. Performs left-to-right function
+composition, where each successive invocation is supplied the return value of the previous.
+
+This is inspired by `lodash`'s `flow` function.
+
+_Related_
+
+-   <https://docs-lodash.com/v4/flow/>
 
 ### pure
 

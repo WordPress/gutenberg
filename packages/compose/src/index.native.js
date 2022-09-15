@@ -1,9 +1,9 @@
 // The `createHigherOrderComponent` helper and helper types.
 export * from './utils/create-higher-order-component';
 
-// The `compose` and `flow` helpers (inspired by `flowRight` and `flow` from Lodash).
+// The `compose` and `pipe` helpers (inspired by `flowRight` and `flow` from Lodash).
 export { default as compose } from './higher-order/compose';
-export { default as flow } from './higher-order/flow';
+export { default as pipe } from './higher-order/pipe';
 
 // Higher-order components.
 export { default as ifCondition } from './higher-order/if-condition';

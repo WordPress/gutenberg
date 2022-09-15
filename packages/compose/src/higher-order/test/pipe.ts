@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import flow from '../flow';
+import pipe from '../pipe';
 
-describe( 'flow', () => {
+describe( 'pipe', () => {
 	it( 'returns the initial value if no functions are specified', () => {
-		expect( flow()( 'test' ) ).toBe( 'test' );
+		expect( pipe()( 'test' ) ).toBe( 'test' );
 	} );
 
 	it( 'executes functions left-to-right when passed as separate arguments', () => {
@@ -13,7 +13,7 @@ describe( 'flow', () => {
 		const b = ( value ) => ( value += 'b' );
 		const c = ( value ) => ( value += 'c' );
 
-		expect( flow( a, b, c )( 'test' ) ).toBe( 'testabc' );
+		expect( pipe( a, b, c )( 'test' ) ).toBe( 'testabc' );
 	} );
 
 	it( 'executes functions left-to-right when passed as a single array', () => {
@@ -21,7 +21,7 @@ describe( 'flow', () => {
 		const b = ( value ) => ( value += 'b' );
 		const c = ( value ) => ( value += 'c' );
 
-		expect( flow( [ a, b, c ] )( 'test' ) ).toBe( 'testabc' );
+		expect( pipe( [ a, b, c ] )( 'test' ) ).toBe( 'testabc' );
 	} );
 
 	it( 'executes functions left-to-right when passed as a mix of separate arguments and arrays', () => {
@@ -32,6 +32,6 @@ describe( 'flow', () => {
 		const e = ( value ) => ( value += 'e' );
 		const f = ( value ) => ( value += 'f' );
 
-		expect( flow( [ a, b ], c, [ d ], e )( 'test' ) ).toBe( 'testabcde' );
+		expect( pipe( [ a, b ], c, [ d ], e )( 'test' ) ).toBe( 'testabcde' );
 	} );
 } );

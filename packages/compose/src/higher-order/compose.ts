@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { baseFlow } from './flow';
+import { basePipe } from './pipe';
 
 /**
  * Composes multiple higher-order components into a single higher-order component. Performs right-to-left function
@@ -11,6 +11,6 @@ import { baseFlow } from './flow';
  *
  * @see https://docs-lodash.com/v4/flow-right/
  */
-const compose = baseFlow( true );
+const compose = basePipe( true );
 
 export default compose;

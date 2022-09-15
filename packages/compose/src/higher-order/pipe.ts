@@ -1,5 +1,5 @@
 /**
- * Creates a flow function.
+ * Creates a pipe function.
  *
  * Allows to choose whether to perform left-to-right or right-to-left composition.
  *
@@ -7,7 +7,7 @@
  *
  * @param {boolean} reverse True if right-to-left, false for left-to-right composition.
  */
-const baseFlow =
+const basePipe =
 	( reverse: boolean = false ) =>
 	( ...funcs: Function[] ) =>
 	( ...args: unknown[] ) => {
@@ -29,8 +29,8 @@ const baseFlow =
  *
  * @see https://docs-lodash.com/v4/flow/
  */
-const flow = baseFlow();
+const pipe = basePipe();
 
-export { baseFlow };
+export { basePipe };
 
-export default flow;
+export default pipe;
