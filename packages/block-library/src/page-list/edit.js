@@ -164,6 +164,8 @@ const PageItems = memo( function PageItems( {
 } ) {
 	const pages = pagesByParentId.get( parentId );
 	const frontPageId = useFrontPageId();
+	const isNavigationChild = 'showSubmenuIcon' in context;
+	const isSubmenuItem = depth > 0;
 
 	if ( ! pages?.length ) {
 		return [];
@@ -171,7 +173,6 @@ const PageItems = memo( function PageItems( {
 
 	return pages.map( ( page ) => {
 		const hasChildren = pagesByParentId.has( page.id );
-		const isNavigationChild = 'showSubmenuIcon' in context;
 		return (
 			<li
 				key={ page.id }
@@ -183,6 +184,16 @@ const PageItems = memo( function PageItems( {
 						! context.openSubmenusOnClick &&
 						context.showSubmenuIcon,
 					'menu-item-home': page.id === frontPageId,
+					'has-text-color':
+						!! context.overlayTextColor && isSubmenuItem,
+					[ getColorClassName( 'color', context.overlayTextColor ) ]:
+						!! context.overlayTextColor && isSubmenuItem,
+					'has-background':
+						!! context.overlayBackgroundColor && isSubmenuItem,
+					[ getColorClassName(
+						'background-color',
+						context.overlayBackgroundColor
+					) ]: !! context.overlayBackgroundColor && isSubmenuItem,
 				} ) }
 			>
 				{ hasChildren && context.openSubmenusOnClick ? (

@@ -396,7 +396,7 @@ button.wp-block-navigation-item__content {
 
 // Submenu default background and text color.
 .wp-block-navigation:not(.has-background) {
-	.wp-block-navigation__submenu-container {
+	.wp-block-navigation__submenu-container .wp-block-navigation-item:not(.has-background) {
 		// Set a background color for submenus so that they're not transparent.
 		// NOTE TO DEVS - if refactoring this code, please double-check that
 		// submenus have a default background color, this feature has regressed
@@ -404,15 +404,20 @@ button.wp-block-navigation-item__content {
 		background-color: #fff;
 		border: 1px solid rgba(0, 0, 0, 0.15);
 	}
-}
-// Set a default text color to match the white background,
-// but only if there are no custom colors.
-.wp-block-navigation:not(.has-background):not(.has-text-color) {
-	.wp-block-navigation__submenu-container {
-		.wp-block-navigation-item a {
-			color: #000;
-		}
+	// Set the text and link color to #000 if there is no custom text color.
+	.wp-block-navigation__submenu-container .wp-block-navigation-item:not(.has-text-color),
+	.wp-block-navigation__submenu-container .wp-block-navigation-item:not(.has-text-color) a {
+		color: #000;
 	}
+}
+
+// Increase the specificity of user-set colors on page-list submenus.
+.wp-block-navigation__submenu-container .wp-block-navigation-item.has-background * .wp-block-navigation-item:not(.has-background) {
+	background: inherit;
+	color: inherit;
+}
+.wp-block-navigation__submenu-container .wp-block-navigation-item.has-background * .wp-block-navigation-item:not(.has-text-color) a {
+	color: inherit;
 }
 
 // Navigation block inner container.
