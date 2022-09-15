@@ -94,7 +94,6 @@ const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'elements.button.backgroundColor': 'background-color',
 	'elements.caption.color.text': 'color',
 	'elements.caption.backgroundColor': 'background-color',
-	'elements.caption.gradient': 'gradient',
 	'elements.heading.color': 'color',
 	'elements.heading.backgroundColor': 'background-color',
 	'elements.heading.gradient': 'gradient',
