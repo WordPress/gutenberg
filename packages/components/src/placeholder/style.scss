@@ -234,5 +234,12 @@
 	width: 100%;
 	height: 100%;
 	stroke: currentColor;
-	stroke-dasharray: 3;
+	opacity: 0.25;
+}
+
+// Hide the semi-opaque background on selection
+.is-selected {
+	.components-placeholder.has-illustration::before {
+		opacity: 0;
+	}
 }
