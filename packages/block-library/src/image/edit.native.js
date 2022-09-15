@@ -581,7 +581,7 @@ export class ImageEdit extends Component {
 						moreLinkText={ __( 'What is alt text?' ) }
 					>
 						{ __(
-							'Describe the purpose of the image. Leave empty if the image is purely decorative. '
+							'Describe the purpose of the image. Leave empty if the image is purely decorative.'
 						) }
 					</HelpText>
 				}
