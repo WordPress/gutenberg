@@ -10,12 +10,22 @@ const variations = [
 		title: __( 'Group' ),
 		description: __( 'Gather blocks in a container.' ),
 		attributes: { layout: { type: 'constrained' } },
-		scope: [ 'transform' ],
+		isDefault: true,
+		scope: [ 'inserter', 'transform' ],
+		isActive: ( blockAttributes ) =>
+			blockAttributes.layout?.type === 'constrained',
+		icon: group,
+	},
+	{
+		name: 'group-flow',
+		title: __( 'Group' ),
+		description: __( 'Gather blocks in a container.' ),
+		attributes: { layout: { type: 'default' } },
+		scope: [ 'block' ],
 		isActive: ( blockAttributes ) =>
 			! blockAttributes.layout ||
 			! blockAttributes.layout?.type ||
-			blockAttributes.layout?.type === 'default' ||
-			blockAttributes.layout?.type === 'constrained',
+			blockAttributes.layout?.type === 'default',
 		icon: group,
 	},
 	{
