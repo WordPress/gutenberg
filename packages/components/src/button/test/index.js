@@ -88,7 +88,7 @@ describe( 'Button', () => {
 			);
 		} );
 
-		it( 'should render a button element without has-text when children are empty flagment', async () => {
+		it( 'should render a button element without has-text when children are empty fragment', async () => {
 			render(
 				<Button icon={ plusCircle }>
 					<></>
