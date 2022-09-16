@@ -928,9 +928,12 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * Tests generating the spacing presets array based on the spacing scale provided.
 	 *
 	 * @dataProvider data_generate_spacing_scale_fixtures
+	 *
+	 * @param array $spacing_scale   Example spacing scale definitions from the data provider.
+	 * @param array $expected_output Expected output from data provider.
 	 */
-	function test_set_spacing_sizes( $spacing_scale, $expected_output ) {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
+	function test_should_set_spacing_sizes( $spacing_scale, $expected_output ) {
+		$theme_json = new WP_Theme_JSON(
 			array(
 				'version'  => 2,
 				'settings' => array(
@@ -952,7 +955,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	function data_generate_spacing_scale_fixtures() {
 		return array(
-			'one_step_spacing_scale' => array(
+			'only one value when single step in spacing scale' => array(
 				'spacingScale'    => array(
 					'operator'   => '+',
 					'increment'  => 1.5,
@@ -968,8 +971,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 			),
-
-			'two_step_spacing_scale_should_add_step_above_medium' => array(
+			'one step above medium when two steps in spacing scale' => array(
 				'spacingScale'    => array(
 					'operator'   => '+',
 					'increment'  => 1.5,
@@ -990,8 +992,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 			),
-
-			'three_step_spacing_scale_should_add_step_above_and_below_medium' => array(
+			'one step above medium and one below when three steps in spacing scale' => array(
 				'spacingScale'    => array(
 					'operator'   => '+',
 					'increment'  => 1.5,
@@ -1017,8 +1018,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 			),
-
-			'even_step_spacing_scale_steps_should_add_extra_step_above_medium' => array(
+			'extra step added above medium when an even number of steps > 2 specified' => array(
 				'spacingScale'    => array(
 					'operator'   => '+',
 					'increment'  => 1.5,
@@ -1049,8 +1049,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 			),
-
-			'if_bottom_end_will_go_below_zero_should_add_extra_steps_above_medium_instead' => array(
+			'extra steps above medium if bottom end will go below zero' => array(
 				'spacingScale'    => array(
 					'operator'   => '+',
 					'increment'  => 2.5,
@@ -1086,8 +1085,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 			),
-
-			'multiplier_should_correctly_calculate_above_and_below_medium' => array(
+			'multiplier correctly calculated above and below medium' => array(
 				'spacingScale'    => array(
 					'operator'   => '*',
 					'increment'  => 1.5,
@@ -1123,8 +1121,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 			),
-
-			'increment_<_1_combined_with_*_operator_should_act_as_divisor_to_calculate_above_and_below_medium' => array(
+			'increment < 1 combined showing * operator acting as divisor above and below medium' => array(
 				'spacingScale'    => array(
 					'operator'   => '*',
 					'increment'  => 0.25,
@@ -1167,12 +1164,15 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * Tests generating the spacing presets array based on the spacing scale provided.
 	 *
 	 * @dataProvider data_set_spacing_sizes_when_invalid
+	 *
+	 * @param array $spacing_scale   Example spacing scale definitions from the data provider.
+	 * @param array $expected_output Expected output from data provider.
 	 */
-	public function test_set_spacing_sizes_when_invalid( $spacing_scale, $expected_output ) {
+	public function test_set_spacing_sizes_validation( $spacing_scale, $expected_output ) {
 		$this->expectNotice();
 		$this->expectNoticeMessage( 'Some of the theme.json settings.spacing.spacingScale values are invalid' );
 
-		$theme_json = new WP_Theme_JSON_Gutenberg(
+		$theme_json = new WP_Theme_JSON(
 			array(
 				'version'  => 2,
 				'settings' => array(
@@ -1194,8 +1194,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	function data_set_spacing_sizes_when_invalid() {
 		return array(
-
-			'invalid_spacing_scale_values_missing_operator' => array(
+			'spacing scale is missing operator value'   => array(
 				'spacingScale'    => array(
 					'operator'   => '',
 					'increment'  => 1.5,
@@ -1205,8 +1204,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => null,
 			),
-
-			'invalid_spacing_scale_values_non_numeric_increment' => array(
+			'spacing scale has non numeric increment'   => array(
 				'spacingScale'    => array(
 					'operator'   => '+',
 					'increment'  => 'add two to previous value',
@@ -1216,8 +1214,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => null,
 			),
-
-			'invalid_spacing_scale_values_non_numeric_steps' => array(
+			'spacing scale has non numeric steps'       => array(
 				'spacingScale'    => array(
 					'operator'   => '+',
 					'increment'  => 1.5,
@@ -1227,8 +1224,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => null,
 			),
-
-			'invalid_spacing_scale_values_non_numeric_medium_step' => array(
+			'spacing scale has non numeric medium step' => array(
 				'spacingScale'    => array(
 					'operator'   => '+',
 					'increment'  => 1.5,
@@ -1238,8 +1234,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => null,
 			),
-
-			'invalid_spacing_scale_values_missing_unit' => array(
+			'spacing scale is missing unit value'       => array(
 				'spacingScale'    => array(
 					'operator'   => '+',
 					'increment'  => 1.5,
