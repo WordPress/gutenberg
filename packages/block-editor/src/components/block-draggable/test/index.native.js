@@ -29,15 +29,6 @@ import {
 	getDraggableChip,
 } from './helpers';
 
-// Mock throttle to allow updating the dragging position on every "onDragOver" event.
-jest.mock( 'lodash', () => ( {
-	...jest.requireActual( 'lodash' ),
-	throttle: ( fn ) => {
-		fn.cancel = jest.fn();
-		return fn;
-	},
-} ) );
-
 beforeAll( () => {
 	// Register all core blocks
 	registerCoreBlocks();
