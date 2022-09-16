@@ -1270,7 +1270,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 			$below_sizes[] = array(
 				/* translators: %s: Digit to indicate multiple of sizing, eg. 2X-Small. */
-				'name' => $below_midpoint_count === $steps_mid_point - 1 ? __( 'Small' ) : sprintf( __( '%sX-Small', 'gutenberg' ), strval( $x_small_count ) ),
+				'name' => $below_midpoint_count === $steps_mid_point - 1 ? __( 'Small', 'gutenberg' ) : sprintf( __( '%sX-Small', 'gutenberg' ), strval( $x_small_count ) ),
 				'slug' => (string) $slug,
 				'size' => round( $current_step, 2 ) . $unit,
 			);
@@ -1307,7 +1307,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 			$above_sizes[] = array(
 				/* translators: %s: Digit to indicate multiple of sizing, eg. 2X-Large. */
-				'name' => 0 === $above_midpoint_count ? __( 'Large' ) : sprintf( __( '%sX-Large', 'gutenberg' ), strval( $x_large_count ) ),
+				'name' => 0 === $above_midpoint_count ? __( 'Large', 'gutenberg' ) : sprintf( __( '%sX-Large', 'gutenberg' ), strval( $x_large_count ) ),
 				'slug' => (string) $slug,
 				'size' => round( $current_step, 2 ) . $unit,
 			);
