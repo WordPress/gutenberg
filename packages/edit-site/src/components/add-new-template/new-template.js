@@ -9,7 +9,7 @@ import {
 	MenuItem,
 	NavigableMenu,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -88,12 +88,16 @@ export default function NewTemplate( { postType } ) {
 	] = useState( false );
 	const [ entityForSuggestions, setEntityForSuggestions ] = useState( {} );
 	const [ isCreatingTemplate, setIsCreatingTemplate ] = useState( false );
-
 	const history = useHistory();
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const { setTemplate } = useDispatch( editSiteStore );
+	const isMounted = useRef( false );
+	useEffect( () => {
+		isMounted.current = true;
+		return () => ( isMounted.current = false );
+	}, [] );
 
 	async function createTemplate( template, isWPSuggestion = true ) {
 		if ( isCreatingTemplate ) {
@@ -158,7 +162,9 @@ export default function NewTemplate( { postType } ) {
 				type: 'snackbar',
 			} );
 		} finally {
-			setIsCreatingTemplate( false );
+			if ( isMounted.current ) {
+				setIsCreatingTemplate( false );
+			}
 		}
 	}
 
