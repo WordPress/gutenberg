@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { LinkSettingsNavigation, ExternalLink } from '@wordpress/components';
+import { LinkSettingsNavigation } from '@wordpress/components';
 import { isURL } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -32,17 +32,9 @@ const EmbedLinkSettings = ( {
 			autoFocus,
 			autoFill: true,
 		},
-		footer: {
-			label: (
-				<ExternalLink
-					href={ __(
-						'https://wordpress.org/support/article/embeds/'
-					) }
-				>
-					{ __( 'Learn more about embeds' ) }
-				</ExternalLink>
-			),
-			separatorType: 'topFullWidth',
+		help: {
+			url: __( 'https://wordpress.org/support/article/embeds/' ),
+			moreLinkText: __( 'Learn more about embeds' ),
 		},
 	};
 

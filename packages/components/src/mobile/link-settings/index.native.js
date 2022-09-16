@@ -26,9 +26,9 @@ import { BottomSheetContext } from '../bottom-sheet/bottom-sheet-context';
 import PanelBody from '../../panel/body';
 import TextControl from '../../text-control';
 import ToggleControl from '../../toggle-control';
-import FooterMessageControl from '../../footer-message-control';
 import PanelActions from '../../panel/actions';
 import LinkRelIcon from './link-rel';
+import HelpText from '../../help-text';
 
 import styles from './style.scss';
 
@@ -303,12 +303,15 @@ function LinkSettings( {
 			<PanelBody style={ styles.linkSettingsPanel }>
 				{ getSettings() }
 			</PanelBody>
-			{ options.footer && (
+			{ options.help && (
 				<PanelBody style={ styles.linkSettingsPanel }>
-					<FooterMessageControl
-						label={ options.footer.label }
-						separatorType={ options.footer.separatorType }
-					/>
+					<HelpText
+						url={ options.help.url }
+						moreLinkText={ options.help.moreLinkText }
+						separatorType={ options.help.separatorType }
+					>
+						{ options.help.label }
+					</HelpText>
 				</PanelBody>
 			) }
 			{ actions && <PanelActions actions={ actions } /> }

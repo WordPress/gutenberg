@@ -47,7 +47,7 @@ const linkSettingsOptions = {
 		label: __( 'Link label' ),
 		placeholder: __( 'None' ),
 	},
-	footer: {
+	help: {
 		label: __( 'Briefly describe the link to help screen reader user' ),
 	},
 };
