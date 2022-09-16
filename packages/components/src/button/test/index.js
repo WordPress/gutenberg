@@ -13,6 +13,7 @@ import { plusCircle } from '@wordpress/icons';
  * Internal dependencies
  */
 import Button from '../';
+import { Tooltip } from '../../';
 
 jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
 
@@ -92,6 +93,17 @@ describe( 'Button', () => {
 				<Button icon={ plusCircle }>
 					<></>
 				</Button>
+			);
+			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+				'has-text'
+			);
+		} );
+
+		it( 'should render a button element without has-text when a button wrapped in Tooltip', async () => {
+			render(
+				<Tooltip text="Help text">
+					<Button icon={ plusCircle } />
+				</Tooltip>
 			);
 			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
 				'has-text'
