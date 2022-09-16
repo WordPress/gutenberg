@@ -241,16 +241,11 @@ function Navigation( {
 				// This is duplicated several times.
 				const onSelectClassicMenu = async ( classicMenu ) => {
 					setConvertingClassicMenu( true );
-					const navMenu = await convertClassicMenu(
+					await convertClassicMenu(
 						classicMenu.id,
 						classicMenu.name,
 						'publish'
 					);
-					if ( navMenu ) {
-						handleUpdateMenu( navMenu.id, {
-							focusNavigationBlock: true,
-						} );
-					}
 				};
 
 				onSelectClassicMenu( classicMenus[ 0 ] );
