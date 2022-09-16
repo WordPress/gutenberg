@@ -167,6 +167,14 @@ const PageItems = memo( function PageItems( {
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const isSubmenuItem = depth > 0;
 
+	// User-set custom colors for the submmenu needs to be added inline.
+	const blockProps = useBlockProps();
+	const customSumbmenuStyles = {
+		...blockProps.style,
+		color: context.customOverlayTextColor,
+		background: context.customOverlayBackgroundColor,
+	};
+
 	if ( ! pages?.length ) {
 		return [];
 	}
@@ -185,16 +193,24 @@ const PageItems = memo( function PageItems( {
 						context.showSubmenuIcon,
 					'menu-item-home': page.id === frontPageId,
 					'has-text-color':
-						!! context.overlayTextColor && isSubmenuItem,
+						( !! context.overlayTextColor && isSubmenuItem ) ||
+						( !! context.customOverlayTextColor && isSubmenuItem ),
 					[ getColorClassName( 'color', context.overlayTextColor ) ]:
 						!! context.overlayTextColor && isSubmenuItem,
 					'has-background':
-						!! context.overlayBackgroundColor && isSubmenuItem,
+						!! (
+							context.overlayBackgroundColor && isSubmenuItem
+						) ||
+						!! (
+							context.customOverlayBackgroundColor &&
+							isSubmenuItem
+						),
 					[ getColorClassName(
 						'background-color',
 						context.overlayBackgroundColor
 					) ]: !! context.overlayBackgroundColor && isSubmenuItem,
 				} ) }
+				style={ !! isSubmenuItem ? customSumbmenuStyles : undefined }
 			>
 				{ hasChildren && context.openSubmenusOnClick ? (
 					<>
