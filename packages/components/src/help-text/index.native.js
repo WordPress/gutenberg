@@ -32,6 +32,7 @@ const HelpText = ( { moreLinkText, children, url } ) => {
 						( enabled ) => enabled && Linking.openURL( url )
 					);
 				} }
+				style={ styles[ 'help-text' ] }
 			>
 				{ children }
 				{ children && url && ' ' }
