@@ -144,7 +144,9 @@ describe( 'Buttons block', () => {
 		} );
 
 		it( 'adds another button using the inserter', async () => {
-			const screen = await initializeEditor();
+			const screen = await initializeEditor( {
+				initialHtml: BUTTONS_HTML,
+			} );
 			const {
 				getByA11yLabel,
 				getByTestId,
@@ -152,11 +154,9 @@ describe( 'Buttons block', () => {
 				getByText,
 			} = screen;
 
-			// Add block
-			await addBlock( screen, 'Buttons' );
-
 			// Get block
 			const buttonsBlock = await getBlock( screen, 'Buttons' );
+			fireEvent.press( buttonsBlock );
 
 			// Trigger inner blocks layout
 			const innerBlockListWrapper = await waitFor( () =>
@@ -169,6 +169,10 @@ describe( 'Buttons block', () => {
 					},
 				},
 			} );
+
+			// Get inner button block
+			const buttonBlock = await getBlock( screen, 'Button' );
+			fireEvent.press( buttonBlock );
 
 			// Open the block inserter
 			fireEvent.press( getByA11yLabel( 'Add block' ) );
@@ -227,8 +231,8 @@ describe( 'Buttons block', () => {
 				} );
 
 				// Get inner button block
-				const columnsBlock = await getBlock( screen, 'Button' );
-				fireEvent.press( columnsBlock );
+				const buttonBlock = await getBlock( screen, 'Button' );
+				fireEvent.press( buttonBlock );
 
 				// Open block actions menu
 				const blockActionsButton = getByA11yLabel(
