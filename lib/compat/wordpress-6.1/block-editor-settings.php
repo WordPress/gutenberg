@@ -82,8 +82,8 @@ function gutenberg_get_block_editor_settings( $settings ) {
 		} else {
 			// If there is no `theme.json` file, ensure base layout styles are still available.
 			$block_classes = array(
-				'css'            => 'base-layout-styles',
-				'__unstableType' => 'base-layout',
+				'css' => 'styles',
+				'__unstableType' => 'base-styles', // setting this to something other than `theme` means that the editor will not consider these styles as part of "theme" styles.
 				'isGlobalStyles' => true,
 			);
 			$actual_css    = gutenberg_get_global_stylesheet( array( $block_classes['css'] ) );
