@@ -86,6 +86,40 @@ _Returns_
 
 -   Component class with generated display name assigned.
 
+### debounce
+
+A simplified and properly typed version of lodash's `debounce`, that
+always uses timers instead of sometimes using rAF.
+
+Creates a debounced function that delays invoking `func` until after `wait`
+milliseconds have elapsed since the last time the debounced function was
+invoked. The debounced function comes with a `cancel` method to cancel delayed
+`func` invocations and a `flush` method to immediately invoke them. Provide
+`options` to indicate whether `func` should be invoked on the leading and/or
+trailing edge of the `wait` timeout. The `func` is invoked with the last
+arguments provided to the debounced function. Subsequent calls to the debounced
+function return the result of the last `func` invocation.
+
+**Note:** If `leading` and `trailing` options are `true`, `func` is
+invoked on the trailing edge of the timeout only if the debounced function
+is invoked more than once during the `wait` timeout.
+
+If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+until the next tick, similar to `setTimeout` with a timeout of `0`.
+
+_Parameters_
+
+-   _func_ `Function`: The function to debounce.
+-   _wait_ `number`: The number of milliseconds to delay.
+-   _options_ `Partial< DebounceOptions >`: The options object.
+-   _options.leading_ `boolean`: Specify invoking on the leading edge of the timeout.
+-   _options.maxWait_ `number`: The maximum time `func` is allowed to be delayed before it's invoked.
+-   _options.trailing_ `boolean`: Specify invoking on the trailing edge of the timeout.
+
+_Returns_
+
+-   Returns the new debounced function.
+
 ### ifCondition
 
 Higher-order component creator, creating a new component which renders if
@@ -197,7 +231,7 @@ _Returns_
 
 ### useDebounce
 
-Debounces a function with Lodash's `debounce`. A new debounced function will
+Debounces a function similar to Lodash's `debounce`. A new debounced function will
 be returned and any scheduled calls cancelled if any of the arguments change,
 including the function to debounce, so please wrap functions created on
 render in components in `useCallback`.
@@ -210,11 +244,11 @@ _Parameters_
 
 -   _fn_ `TFunc`: The function to debounce.
 -   _wait_ `[number]`: The number of milliseconds to delay.
--   _options_ `[import('lodash').DebounceSettings]`: The options object.
+-   _options_ `[import('../../utils/debounce').DebounceOptions]`: The options object.
 
 _Returns_
 
--   `import('lodash').DebouncedFunc<TFunc>`: Debounced function.
+-   `import('../../utils/debounce').DebouncedFunc<TFunc>`: Debounced function.
 
 ### useDisabled
 

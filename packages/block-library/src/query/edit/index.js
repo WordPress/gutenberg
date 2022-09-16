@@ -16,19 +16,48 @@ import { __ } from '@wordpress/i18n';
  */
 import QueryContent from './query-content';
 import QueryPlaceholder from './query-placeholder';
-import { getTransformedBlocksFromPattern } from '../utils';
+import {
+	useBlockNameForPatterns,
+	getTransformedBlocksFromPattern,
+} from '../utils';
 
 const QueryEdit = ( props ) => {
-	const { clientId, name, attributes } = props;
+	const { clientId, attributes } = props;
 	const [ isPatternSelectionModalOpen, setIsPatternSelectionModalOpen ] =
 		useState( false );
-	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
 	const hasInnerBlocks = useSelect(
 		( select ) =>
 			!! select( blockEditorStore ).getBlocks( clientId ).length,
 		[ clientId ]
 	);
 	const Component = hasInnerBlocks ? QueryContent : QueryPlaceholder;
+	return (
+		<>
+			<Component
+				{ ...props }
+				openPatternSelectionModal={ () =>
+					setIsPatternSelectionModalOpen( true )
+				}
+			/>
+			{ isPatternSelectionModalOpen && (
+				<PatternSelectionModal
+					clientId={ clientId }
+					attributes={ attributes }
+					setIsPatternSelectionModalOpen={
+						setIsPatternSelectionModalOpen
+					}
+				/>
+			) }
+		</>
+	);
+};
+
+function PatternSelectionModal( {
+	clientId,
+	attributes,
+	setIsPatternSelectionModalOpen,
+} ) {
+	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
 	const onBlockPatternSelect = ( blocks ) => {
 		const { newBlocks, queryClientIds } = getTransformedBlocksFromPattern(
 			blocks,
@@ -47,34 +76,26 @@ const QueryEdit = ( props ) => {
 		} ),
 		[ attributes.query.postType ]
 	);
-	return (
-		<>
-			<Component
-				{ ...props }
-				openPatternSelectionModal={ () =>
-					setIsPatternSelectionModalOpen( true )
-				}
-			/>
-			{ isPatternSelectionModalOpen && (
-				<Modal
-					className="block-editor-query-pattern__selection-modal"
-					title={ __( 'Choose a pattern' ) }
-					closeLabel={ __( 'Cancel' ) }
-					onRequestClose={ () =>
-						setIsPatternSelectionModalOpen( false )
-					}
-				>
-					<BlockContextProvider value={ blockPreviewContext }>
-						<BlockPatternSetup
-							blockName={ name }
-							clientId={ clientId }
-							onBlockPatternSelect={ onBlockPatternSelect }
-						/>
-					</BlockContextProvider>
-				</Modal>
-			) }
-		</>
+	const blockNameForPatterns = useBlockNameForPatterns(
+		clientId,
+		attributes
 	);
-};
+	return (
+		<Modal
+			className="block-editor-query-pattern__selection-modal"
+			title={ __( 'Choose a pattern' ) }
+			closeLabel={ __( 'Cancel' ) }
+			onRequestClose={ () => setIsPatternSelectionModalOpen( false ) }
+		>
+			<BlockContextProvider value={ blockPreviewContext }>
+				<BlockPatternSetup
+					blockName={ blockNameForPatterns }
+					clientId={ clientId }
+					onBlockPatternSelect={ onBlockPatternSelect }
+				/>
+			</BlockContextProvider>
+		</Modal>
+	);
+}
 
 export default QueryEdit;

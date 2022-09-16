@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { debounce } from 'lodash';
 import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
  */
+import { debounce } from '@wordpress/compose';
 import { useLayoutEffect, useState } from '@wordpress/element';
 
 /**
