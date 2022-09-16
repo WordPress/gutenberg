@@ -233,25 +233,30 @@ function Navigation( {
 			return;
 		}
 
+		// If there's non fallback navigation menus and
+		// only one classic menu then create a new navigation menu based on it.
 		if ( ! fallbackNavigationMenus?.length && classicMenus?.length === 1 ) {
-			// If there's only one classic menu
-			// then create a new navigation menu based on it.
+			// Only create classic menus once.
+			if ( ! convertingClassicMenu ) {
+				// This is duplicated several times.
+				const onSelectClassicMenu = async ( classicMenu ) => {
+					setConvertingClassicMenu( true );
+					const navMenu = await convertClassicMenu(
+						classicMenu.id,
+						classicMenu.name,
+						'publish'
+					);
+					if ( navMenu ) {
+						handleUpdateMenu( navMenu.id, {
+							focusNavigationBlock: true,
+						} );
+					}
+				};
 
-			// This is duplicated several times.
-			const onSelectClassicMenu = async ( classicMenu ) => {
-				const navMenu = await convertClassicMenu(
-					classicMenu.id,
-					classicMenu.name,
-					'publish'
-				);
-				if ( navMenu ) {
-					handleUpdateMenu( navMenu.id, {
-						focusNavigationBlock: true,
-					} );
-				}
-			};
+				onSelectClassicMenu( classicMenus[ 0 ] );
+			}
 
-			onSelectClassicMenu( classicMenus[ 0 ] );
+			return;
 		}
 
 		// See if we have any navigation menus
@@ -359,6 +364,7 @@ function Navigation( {
 	// Turn on contrast checker for web only since it's not supported on mobile yet.
 	const enableContrastChecking = Platform.OS === 'web';
 
+	const [ convertingClassicMenu, setConvertingClassicMenu ] = useState();
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
 	const [
@@ -742,7 +748,8 @@ function Navigation( {
 							onSelectClassicMenu={ async ( classicMenu ) => {
 								const navMenu = await convertClassicMenu(
 									classicMenu.id,
-									classicMenu.name
+									classicMenu.name,
+									'draft'
 								);
 								if ( navMenu ) {
 									handleUpdateMenu( navMenu.id, {
@@ -827,7 +834,8 @@ function Navigation( {
 					onSelectClassicMenu={ async ( classicMenu ) => {
 						const navMenu = await convertClassicMenu(
 							classicMenu.id,
-							classicMenu.name
+							classicMenu.name,
+							'draft'
 						);
 						if ( navMenu ) {
 							handleUpdateMenu( navMenu.id, {
@@ -855,7 +863,8 @@ function Navigation( {
 							onSelectClassicMenu={ async ( classicMenu ) => {
 								const navMenu = await convertClassicMenu(
 									classicMenu.id,
-									classicMenu.name
+									classicMenu.name,
+									'draft'
 								);
 								if ( navMenu ) {
 									handleUpdateMenu( navMenu.id, {

@@ -80,7 +80,8 @@ function useConvertClassicToBlockMenu( clientId ) {
 		try {
 			navigationMenu = await createNavigationMenu(
 				menuName,
-				innerBlocks
+				innerBlocks,
+				postStatus
 			);
 
 			/**
