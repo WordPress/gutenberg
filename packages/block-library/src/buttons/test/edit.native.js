@@ -117,6 +117,10 @@ describe( 'Buttons block', () => {
 				},
 			} );
 
+			// Get first button
+			const firstButtonBlock = await getBlock( screen, 'Button' );
+			fireEvent.press( firstButtonBlock );
+
 			// Add another Button using the inline appender
 			const appenderButton =
 				within( buttonsBlock ).getByTestId( 'appender-button' );
