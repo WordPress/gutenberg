@@ -219,10 +219,12 @@ export const getTransformedBlocksFromPattern = (
 /**
  * Helper hook that determines if there is an active variation of the block
  * and if there are available specific patterns for this variation.
- * If there are, they are going to be suggested to the user in setup and
- * replace flow.
+ * If there are, these patterns are going to be the only ones suggested to
+ * the user in setup and replace flow, without including the default ones
+ * for Query Loop.
  *
- * If there are no patterns, the default ones for Query Loop are going to be suggested.
+ * If there are no such patterns, the default ones for Query Loop are going
+ * to be suggested.
  *
  * @param {string} clientId   The block's client ID.
  * @param {Object} attributes The block's attributes.
