@@ -167,9 +167,9 @@ const PageItems = memo( function PageItems( {
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const isSubmenuItem = depth > 0;
 
-	// User-set custom colors for the submmenu needs to be added inline.
+	// User-set custom colors for the submenu needs to be added inline.
 	const blockProps = useBlockProps();
-	const customSumbmenuStyles = {
+	const customSubmenuStyles = {
 		...blockProps.style,
 		color: context.customOverlayTextColor,
 		background: context.customOverlayBackgroundColor,
@@ -210,7 +210,7 @@ const PageItems = memo( function PageItems( {
 						context.overlayBackgroundColor
 					) ]: !! context.overlayBackgroundColor && isSubmenuItem,
 				} ) }
-				style={ !! isSubmenuItem ? customSumbmenuStyles : undefined }
+				style={ !! isSubmenuItem ? customSubmenuStyles : undefined }
 			>
 				{ hasChildren && context.openSubmenusOnClick ? (
 					<>
