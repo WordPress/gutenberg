@@ -214,12 +214,16 @@ function gutenberg_convert_menu_items_to_blocks(
 			);
 		}
 
-		$block['innerBlocks'] = gutenberg_convert_menu_items_to_blocks(
-			isset( $menu_items_by_parent_id[ $menu_item->ID ] )
-					? $menu_items_by_parent_id[ $menu_item->ID ]
+		$menu_item_id = (int) $menu_item->ID;
+
+		$block['innerContent'] = gutenberg_convert_menu_items_to_blocks(
+			isset( $menu_items_by_parent_id[ $menu_item_id ] )
+					? $menu_items_by_parent_id[ $menu_item_id ]
 					: array(),
 			$menu_items_by_parent_id
 		);
+
+		$block['innerBlocks'] = $block['innerContent'] ;
 
 		$blocks[] = $block;
 	}
