@@ -16,7 +16,9 @@ import styles from './styles.scss';
 
 const HelpText = ( { moreLinkText, children, url } ) => {
 	if ( typeof children === 'string' ) {
-		children = <Text>{ children }</Text>;
+		children = (
+			<Text style={ styles[ 'help-text__text' ] }>{ children }</Text>
+		);
 	}
 	return (
 		<View style={ styles[ 'help-text' ] }>
