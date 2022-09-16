@@ -17,6 +17,12 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 
+const animateVariants = {
+	hide: { opacity: 0, scaleY: 0.75 },
+	show: { opacity: 1, scaleY: 1 },
+	exit: { opacity: 0, scaleY: 0.9 },
+};
+
 export default function DropZone( { paragraphElement, clientId } ) {
 	const { rootClientId, blockIndex } = useSelect(
 		( select ) => {
@@ -40,11 +46,6 @@ export default function DropZone( { paragraphElement, clientId } ) {
 		},
 	} );
 	const reducedMotion = useReducedMotion();
-
-	const animate = {
-		opacity: 1,
-		scale: 1,
-	};
 
 	return (
 		<Popover
@@ -70,14 +71,14 @@ export default function DropZone( { paragraphElement, clientId } ) {
 							key="drop-zone-foreground"
 							initial={
 								reducedMotion
-									? animate
-									: { opacity: 0, scale: 0.75 }
+									? animateVariants.show
+									: animateVariants.hide
 							}
-							animate={ animate }
+							animate={ animateVariants.show }
 							exit={
 								reducedMotion
-									? animate
-									: { opacity: 0, scale: 0.95 }
+									? animateVariants.show
+									: animateVariants.exit
 							}
 							className="wp-block-paragraph__drop-zone-foreground"
 						/>
