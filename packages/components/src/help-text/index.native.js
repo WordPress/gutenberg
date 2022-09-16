@@ -16,12 +16,10 @@ import styles from './styles.scss';
 
 const HelpText = ( { moreLinkText, children, url } ) => {
 	if ( typeof children === 'string' ) {
-		children = (
-			<Text style={ styles[ 'help-text__text' ] }>{ children }</Text>
-		);
+		children = <Text>{ children }</Text>;
 	}
 	return (
-		<View>
+		<View style={ styles[ 'help-text' ] }>
 			<Text
 				accessibilityRole={ url ? 'link' : 'text' }
 				accessibilityHint={
@@ -32,7 +30,7 @@ const HelpText = ( { moreLinkText, children, url } ) => {
 						( enabled ) => enabled && Linking.openURL( url )
 					);
 				} }
-				style={ styles[ 'help-text' ] }
+				style={ styles[ 'help-text__text' ] }
 			>
 				{ children }
 				{ children && url && ' ' }

@@ -1,0 +1,11 @@
+.help-text {
+	flex-direction: row;
+	min-height: 48;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.help-text__text {
+	font-size: 12px;
+	color: $gray;
+}
