@@ -18,6 +18,8 @@ import { cloneBlock, store as blocksStore } from '@wordpress/blocks';
  */
 import { name as queryLoopName } from './block.json';
 
+const EMPTY_ARRAY = [];
+
 /**
  * @typedef IHasNameAndId
  * @property {string|number} id   The entity's id.
@@ -241,6 +243,9 @@ export function useBlockNameForPatterns( clientId, attributes ) {
 	const blockName = `${ queryLoopName }/${ activeVariationName }`;
 	const activeVariationPatterns = useSelect(
 		( select ) => {
+			if ( ! activeVariationName ) {
+				return EMPTY_ARRAY;
+			}
 			const {
 				getBlockRootClientId,
 				__experimentalGetPatternsByBlockTypes,
@@ -251,7 +256,7 @@ export function useBlockNameForPatterns( clientId, attributes ) {
 				rootClientId
 			);
 		},
-		[ clientId, blockName ]
+		[ clientId, activeVariationName ]
 	);
 	return activeVariationPatterns?.length ? blockName : queryLoopName;
 }
