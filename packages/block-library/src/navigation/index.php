@@ -299,6 +299,33 @@ function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_me
 }
 
 /**
+ * If there's a the classic menu then use it as a fallback.
+ *
+ * @return array the normalized parsed blocks.
+ */
+function block_core_navigation_maybe_use_classic_menu_fallback() {
+	// See if we have a classic menu
+	$classic_nav_menu = block_core_navigation_get_classic_menu_fallback();
+
+	// If we have a classic menu then convert it to blocks.
+	if ( $classic_nav_menu ) {
+		$classic_nav_menu_blocks = block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu );
+		$classic_nav_menu_blocks_serialized = serialize_blocks( $classic_nav_menu_blocks );
+
+		// Create a new navigation menu from the classic menu.
+		wp_insert_post( array(
+			'post_content' => $classic_nav_menu_blocks_serialized,
+			'post_title' => $classic_nav_menu->slug,
+			'post_status' => 'publish',
+			'post_type' => 'wp_navigation'
+		) );
+
+		// Fetch the most recently published navigation which will be the classic one created above.
+		return block_core_navigation_get_most_recently_published_navigation();
+	}
+}
+
+/**
  * Finds the most recently published `wp_navigation` Post.
  *
  * @return WP_Post|null the first non-empty Navigation or null.
@@ -374,25 +401,7 @@ function block_core_navigation_get_fallback_blocks() {
 
 	// If there are no navigation posts then try to find a classic menu.
 	if ( ! $navigation_post ) {
-		// See if we have a classic menu
-		$classic_nav_menu = block_core_navigation_get_classic_menu_fallback();
-
-		// If we have a classic menu then convert it to blocks.
-		if ( $classic_nav_menu ) {
-			$classic_nav_menu_blocks = block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu );
-			$classic_nav_menu_blocks_serialized = serialize_blocks( $classic_nav_menu_blocks );
-
-			// Create a new navigation menu from the classic menu.
-			wp_insert_post( array(
-				'post_content' => $classic_nav_menu_blocks_serialized,
-				'post_title' => $classic_nav_menu->slug,
-				'post_status' => 'publish',
-				'post_type' => 'wp_navigation'
-			) );
-
-			// Fetch the navigation menus again
-			$navigation_post = block_core_navigation_get_most_recently_published_navigation();
-		}
+		$navigation_post = block_core_navigation_maybe_use_classic_menu_fallback();
 	}
 
 	// Prefer using the first non-empty Navigation as fallback if available.
