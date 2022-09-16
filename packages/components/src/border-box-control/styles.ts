@@ -23,7 +23,8 @@ export const BorderBoxControlLinkedButton = (
 ) => {
 	return css`
 		flex: 0;
-		flex-basis: 36px;
+		flex-basis: 24px;
+		line-height: 0;
 		margin-top: ${ __next36pxDefaultSize ? '6px' : '3px' };
 	`;
 };

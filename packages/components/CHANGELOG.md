@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   The `LinkedButton` to unlink sides in `BoxControl`, `BorderBoxControl` and `BorderRadiusControl` have changed from a rectangular primary button to an icon-only button, with a sentence case tooltip, and default-size icon for better legibility. The `Button` component has been fixed so when `isSmall` and `icon` props are set, and no text is present, the button shape is square rather than rectangular.
+
 ### New Features
 
 -   `Popover`: added new `anchor` prop, supposed to supersede all previous anchor-related props (`anchorRef`, `anchorRect`, `getAnchorRect`). These older anchor-related props are now marked as deprecated and are scheduled to be removed in WordPress 6.3 ([#43691](https://github.com/WordPress/gutenberg/pull/43691)).
