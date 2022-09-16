@@ -177,7 +177,7 @@ if( 'my-plugin/books-list' === $block[ 'attrs' ][ 'namespace' ] ) {
 
 ### Making your custom query work on the editor side
 
-To finish up our custom variation, we might want the editor to react to changes in our custom query and display an appropriate preview accordingly. This is not required for a functioning block, but it enhables a fully integrated user experience for the consumers of your block.
+To finish up our custom variation, we might want the editor to react to changes in our custom query and display an appropriate preview accordingly. This is not required for a functioning block, but it enables a fully integrated user experience for the consumers of your block.
 
 The Query Loop block fetches its posts to show the preview using the [WordPress REST API](https://developer.wordpress.org/rest-api/). Any extra parameter added to the `query` object will be passed as a query argument to the API. This means that these extra parameters should be either supported by the REST API, or be handled by custom filters such as the [`rest_{$this->post_type}_query`](https://developer.wordpress.org/reference/hooks/rest_this-post_type_query/) filter which allows you to hook into any API request for your custom post type. Like so:
 
