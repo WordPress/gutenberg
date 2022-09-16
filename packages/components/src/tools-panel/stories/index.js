@@ -27,6 +27,7 @@ export default {
 
 export const _default = () => {
 	const [ height, setHeight ] = useState();
+	const [ maxHeight, setMaxHeight ] = useState();
 	const [ minHeight, setMinHeight ] = useState();
 	const [ width, setWidth ] = useState();
 
@@ -71,12 +72,22 @@ export const _default = () => {
 						hasValue={ () => !! minHeight }
 						label="Minimum height"
 						onDeselect={ () => setMinHeight( undefined ) }
-						isShownByDefault={ true }
 					>
 						<UnitControl
 							label="Minimum height"
 							value={ minHeight }
 							onChange={ ( next ) => setMinHeight( next ) }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () => !! maxHeight }
+						label="Maximum height"
+						onDeselect={ () => setMaxHeight( undefined ) }
+					>
+						<UnitControl
+							label="Maximum height"
+							value={ maxHeight }
+							onChange={ ( next ) => setMaxHeight( next ) }
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>

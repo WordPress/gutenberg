@@ -12,7 +12,7 @@ import {
 	Wrapper as BaseControlWrapper,
 } from '../base-control/styles/base-control-styles';
 import { LabelWrapper } from '../input-control/styles/input-control-styles';
-import { COLORS, CONFIG } from '../utils';
+import { baseLabelTypography, COLORS, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 
 const toolsPanelGrid = {
@@ -144,4 +144,33 @@ export const ToolsPanelItemPlaceholder = css`
 
 export const DropdownMenu = css`
 	min-width: 200px;
+`;
+
+// Following provides for rendering "reset" text within a MenuItem.
+export const DefaultControlsItem = css`
+	/**
+	 * This high level of specificity is needed to overcome styles for items
+	 * with no icon or shortcut.
+	 */
+	&&&&& > span {
+		display: flex;
+		/* item text plus icon min-width to match optional items. */
+		min-width: 208px;
+		justify-content: space-between;
+		padding-right: 0;
+	}
+
+	span > span:last-child {
+		flex: 0;
+		color: var( --wp-admin-theme-color-darker-10 );
+		${ baseLabelTypography }
+	}
+
+	&&[aria-disabled='true'] {
+		opacity: 1;
+
+		span > span:last-child {
+			opacity: 0.3;
+		}
+	}
 `;
