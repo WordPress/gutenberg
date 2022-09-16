@@ -434,7 +434,7 @@ describe( 'useSelect', () => {
 			);
 		} );
 
-		it( 'captures state changes before the subscription is set', () => {
+		it( 'captures state changes scheduled between render and effect', () => {
 			registry.registerStore( 'store-1', counterStore );
 
 			class ChildComponent extends Component {
