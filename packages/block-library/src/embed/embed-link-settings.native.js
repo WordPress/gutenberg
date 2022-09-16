@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	LinkSettingsNavigation,
-	FooterMessageLink,
-} from '@wordpress/components';
+import { LinkSettingsNavigation, ExternalLink } from '@wordpress/components';
 import { isURL } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -37,12 +34,13 @@ const EmbedLinkSettings = ( {
 		},
 		footer: {
 			label: (
-				<FooterMessageLink
+				<ExternalLink
 					href={ __(
 						'https://wordpress.org/support/article/embeds/'
 					) }
-					value={ __( 'Learn more about embeds' ) }
-				/>
+				>
+					{ __( 'Learn more about embeds' ) }
+				</ExternalLink>
 			),
 			separatorType: 'topFullWidth',
 		},
