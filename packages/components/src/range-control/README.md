@@ -16,8 +16,6 @@ A RangeControl for volume
 
 ### Anatomy
 
-![](https://make.wordpress.org/design/files/2018/12/rangecontrol-anatomy.png)
-
 A RangeControl can contain the following elements:
 
 1. **Rail**: The rail represents the entire surface area of the slider, from the minimum value selectable by the user to the maximum value selectable by the user. For left-to-right (LTR) languages, the minimum value appears on the far left, and the maximum value on the far right. For right-to-left (RTL) languages this orientation is reversed, with the minimum value on the far right and the maximum value on the far left.
