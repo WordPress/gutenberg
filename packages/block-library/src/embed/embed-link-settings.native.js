@@ -35,6 +35,7 @@ const EmbedLinkSettings = ( {
 		help: {
 			url: __( 'https://wordpress.org/support/article/embeds/' ),
 			moreLinkText: __( 'Learn more about embeds' ),
+			separatorType: 'topFullWidth',
 		},
 	};
 

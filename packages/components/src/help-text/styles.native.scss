@@ -9,3 +9,12 @@
 	font-size: 12px;
 	color: $gray;
 }
+
+.help-text__separator {
+	background-color: $light-gray-400;
+	height: 1px;
+}
+
+.help-text__separator--dark {
+	background-color: $gray-70;
+}
