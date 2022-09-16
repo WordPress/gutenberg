@@ -13,6 +13,12 @@
 .block-editor-block-list__layout {
 	position: relative;
 
+	// Hide selections on this element, otherwise Safari will include it stacked
+	// under your actual selection.
+	&::selection {
+		background: transparent;
+	}
+
 	// The primary indicator of selection in text is the native selection marker.
 	// When selecting multiple blocks, we provide an additional selection indicator.
 	.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected),
@@ -49,6 +55,11 @@
 				background: transparent;
 			}
 		}
+	}
+
+	// Hide the selection indicator on .block-editor-block-list__layout, else Safari will show it stacked.
+	.has-multi-selection &::selection {
+		background: transparent;
 	}
 
 	.block-editor-block-list__block.is-highlighted::after {
@@ -128,14 +139,22 @@
 	// Re-enable text-selection on editable blocks.
 	user-select: text;
 
-	// Hide the select style pseudo element as it interferes with the style.
+	// Hide the select style pseudo element as otherwise it gets shwon as "selected" in Safari.
 	&.is-partially-selected::after {
-		height: 0;
+		// By positioning this pseudo element outside the boundaries of the parent block,
+		// when partially selected it hides the pseudo element selection in Safari.
+		top: -0.5px;
+		right: -0.5px;
+		bottom: -0.5px;
+		left: -0.5px;
 	}
 
 	&.is-highlighted::after,
 	&.is-highlighted ~ .is-multi-selected::after {
-		height: auto;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
 	}
 
 	// Break long strings of text without spaces so they don't overflow the block.
