@@ -34,13 +34,9 @@ const HelpText = ( { moreLinkText, children, url } ) => {
 				} }
 			>
 				{ children }
+				{ children && url && ' ' }
 				{ url && (
-					<>
-						{ ' ' }
-						<ExternalLink href={ url }>
-							{ moreLinkText }
-						</ExternalLink>
-					</>
+					<ExternalLink href={ url }>{ moreLinkText }</ExternalLink>
 				) }
 			</Text>
 		</View>

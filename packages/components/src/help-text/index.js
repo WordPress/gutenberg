@@ -13,11 +13,9 @@ const HelpText = ( { moreLinkText, children, url } ) => {
 	return (
 		<div>
 			{ children }
+			{ children && url && ' ' }
 			{ url && (
-				<>
-					{ ' ' }
-					<ExternalLink href={ url }>{ moreLinkText }</ExternalLink>
-				</>
+				<ExternalLink href={ url }>{ moreLinkText }</ExternalLink>
 			) }
 		</div>
 	);
