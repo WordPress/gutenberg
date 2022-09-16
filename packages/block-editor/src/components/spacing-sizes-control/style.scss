@@ -19,21 +19,19 @@
 
 	.components-spacing-sizes-control__side-labels {
 		grid-column: 1 / 1;
-		min-height: 30px;
+		margin-bottom: $grid-unit-10;
 		justify-content: left;
+	}
+
+	.components-spacing-sizes-control__side-label {
+		grid-column: 1 / 1;
+		justify-self: left;
 	}
 
 	&.is-unlinked {
 		.components-range-control.components-spacing-sizes-control__range-control {
-			margin: -$grid-unit-10 0 0 0;
+			margin: -$grid-unit-10 0 $grid-unit-20 0;
 		}
-		.components-unit-control-wrapper {
-			margin: 0 0 $grid-unit-10 $grid-unit-10;
-		}
-	}
-
-	.components-spacing-sizes-control__hint-single {
-		margin: 0;
 	}
 
 	.components-spacing-sizes-control__hint-single,
@@ -82,7 +80,6 @@
 	.components-spacing-sizes-control__custom-value-range {
 		grid-column: span 2;
 		margin-left: $grid-unit-10;
-		padding-right: $grid-unit-10;
 		height: 30px;
 	}
 
@@ -92,8 +89,8 @@
 
 	.components-spacing-sizes-control__range-control {
 		grid-column: span 3;
-		padding-right: $grid-unit-10;
-		height: 36px;
+		height: 40px;
+		margin-bottom: $grid-unit-20;
 	}
 
 	.components-range-control__wrapper {
@@ -117,12 +114,6 @@
 
 	[class*="ThumbWrapper-thumbColor"] {
 		z-index: 3;
-	}
-
-	.components-spacing-sizes-control__side-label {
-		grid-column: 1 / 1;
-		justify-self: left;
-		margin-bottom: 0;
 	}
 
 	.components-spacing-sizes-control__custom-select-control {
