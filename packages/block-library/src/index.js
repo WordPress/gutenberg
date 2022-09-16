@@ -48,12 +48,14 @@ import * as cover from './cover';
 import * as details from './details';
 import * as embed from './embed';
 import * as file from './file';
+import * as form from './form';
 import * as gallery from './gallery';
 import * as group from './group';
 import * as heading from './heading';
 import * as homeLink from './home-link';
 import * as html from './html';
 import * as image from './image';
+import * as inputField from './input-field';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
@@ -150,8 +152,10 @@ const getAllBlocks = () => {
 		details,
 		embed,
 		file,
+		form,
 		group,
 		html,
+		inputField,
 		latestComments,
 		latestPosts,
 		mediaText,
