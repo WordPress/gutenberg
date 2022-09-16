@@ -193,8 +193,8 @@ function gutenberg_register_core_block_patterns() {
 		register_block_pattern_category( 'footer', array( 'label' => __( 'Footers', 'gutenberg' ) ) );
 	}
 
-	if ( ! $pattern_category_registry->is_registered( 'heading' ) ) {
-		register_block_pattern_category( 'heading', array( 'label' => __( 'Headings & Titles', 'gutenberg' ) ) );
+	if ( ! $pattern_category_registry->is_registered( 'banner' ) ) {
+		register_block_pattern_category( 'banner', array( 'label' => __( 'Banners', 'gutenberg' ) ) );
 	}
 
 	if ( $should_register_core_patterns ) {
