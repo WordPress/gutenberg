@@ -288,6 +288,12 @@ export const ExampleComponent = () => {
 			<Button onClick={ () => removeAllNotices() }>
 				{ __( 'Clear all notices', 'woo-gutenberg-products-block' ) }
 			</Button>
+			<Button onClick={ () => removeAllNotices( 'snackbar' ) }>
+				{ __(
+					'Clear all snackbar notices',
+					'woo-gutenberg-products-block'
+				) }
+			</Button>
 		</>
 	);
 };
@@ -295,6 +301,7 @@ export const ExampleComponent = () => {
 
 _Parameters_
 
+-   _noticeType_ `string`: The context to remove all notices from.
 -   _context_ `string`: The context to remove all notices from.
 
 _Returns_

@@ -245,6 +245,7 @@ describe( 'actions', () => {
 		it( 'should return action', () => {
 			expect( removeAllNotices() ).toEqual( {
 				type: 'REMOVE_ALL_NOTICES',
+				noticeType: 'default',
 				context: DEFAULT_CONTEXT,
 			} );
 		} );
@@ -252,9 +253,18 @@ describe( 'actions', () => {
 		it( 'should return action with custom context', () => {
 			const context = 'foo';
 
-			expect( removeAllNotices( context ) ).toEqual( {
+			expect( removeAllNotices( 'default', context ) ).toEqual( {
 				type: 'REMOVE_ALL_NOTICES',
+				noticeType: 'default',
 				context,
+			} );
+		} );
+
+		it( 'should return action with type', () => {
+			expect( removeAllNotices( 'snackbar' ) ).toEqual( {
+				type: 'REMOVE_ALL_NOTICES',
+				noticeType: 'snackbar',
+				context: DEFAULT_CONTEXT,
 			} );
 		} );
 	} );

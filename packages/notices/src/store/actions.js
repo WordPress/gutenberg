@@ -317,7 +317,8 @@ export function removeNotice( id, context = DEFAULT_CONTEXT ) {
 /**
  * Removes all notices from a given context. Defaults to the default context.
  *
- * @param {string} context The context to remove all notices from.
+ * @param {string} noticeType The context to remove all notices from.
+ * @param {string} context    The context to remove all notices from.
  *
  * @example
  * ```js
@@ -345,6 +346,13 @@ export function removeNotice( id, context = DEFAULT_CONTEXT ) {
  * 			>
  * 				{ __( 'Clear all notices', 'woo-gutenberg-products-block' ) }
  * 			</Button>
+ * 			<Button
+ * 				onClick={ () =>
+ * 					removeAllNotices( 'snackbar' )
+ * 				}
+ * 			>
+ * 				{ __( 'Clear all snackbar notices', 'woo-gutenberg-products-block' ) }
+ * 			</Button>
  * 		</>
  * 	);
  * };
@@ -352,9 +360,13 @@ export function removeNotice( id, context = DEFAULT_CONTEXT ) {
  *
  * @return {Object} 	   Action object.
  */
-export function removeAllNotices( context = DEFAULT_CONTEXT ) {
+export function removeAllNotices(
+	noticeType = 'default',
+	context = DEFAULT_CONTEXT
+) {
 	return {
 		type: 'REMOVE_ALL_NOTICES',
+		noticeType,
 		context,
 	};
 }
