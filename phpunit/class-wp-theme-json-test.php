@@ -933,7 +933,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * @param array $expected_output Expected output from data provider.
 	 */
 	function test_should_set_spacing_sizes( $spacing_scale, $expected_output ) {
-		$theme_json = new WP_Theme_JSON(
+		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => 2,
 				'settings' => array(
@@ -1172,7 +1172,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->expectNotice();
 		$this->expectNoticeMessage( 'Some of the theme.json settings.spacing.spacingScale values are invalid' );
 
-		$theme_json = new WP_Theme_JSON(
+		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => 2,
 				'settings' => array(
