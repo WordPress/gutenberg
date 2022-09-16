@@ -190,13 +190,12 @@ export default function useSelect( mapSelect, deps ) {
 			return;
 		}
 
-		if ( selectorRan ) {
-			latestMapOutput.current = mapOutput;
-		}
-
 		latestRegistry.current = registry;
 		latestMapSelect.current = _mapSelect;
 		latestIsAsync.current = isAsync;
+		if ( selectorRan ) {
+			latestMapOutput.current = mapOutput;
+		}
 		latestMapOutputError.current = undefined;
 	} );
 
@@ -326,13 +325,12 @@ export function useSuspenseSelect( mapSelect, deps ) {
 	}
 
 	useIsomorphicLayoutEffect( () => {
-		if ( selectorRan ) {
-			latestMapOutput.current = mapOutput;
-		}
-
 		latestRegistry.current = registry;
 		latestMapSelect.current = _mapSelect;
 		latestIsAsync.current = isAsync;
+		if ( selectorRan ) {
+			latestMapOutput.current = mapOutput;
+		}
 		latestMapOutputError.current = mapOutputError;
 	} );
 
