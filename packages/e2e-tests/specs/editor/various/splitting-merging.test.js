@@ -235,7 +235,7 @@ describe( 'splitting and merging blocks', () => {
 			await page.keyboard.type( 'item 1' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( 'item 2' );
-			await pressKeyTimes( 'ArrowUp', 5 );
+			await pressKeyTimes( 'ArrowUp', 3 );
 			await page.keyboard.press( 'Delete' );
 			// Carret should be in the first block and at the proper position.
 			await page.keyboard.type( '-' );
@@ -256,7 +256,6 @@ describe( 'splitting and merging blocks', () => {
 			await page.keyboard.type( 'item 1' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( 'item 2' );
-			await page.keyboard.press( 'ArrowUp' );
 			await page.keyboard.press( 'ArrowUp' );
 			await pressKeyTimes( 'ArrowLeft', 6 );
 			await page.keyboard.press( 'Backspace' );
