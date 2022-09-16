@@ -53,12 +53,16 @@ function useHasAppearanceControl( name ) {
 	return hasFontStyles || hasFontWeights;
 }
 
-function useHasLetterSpacingControl( name ) {
+function useHasLetterSpacingControl( name, element ) {
+	const setting = useSetting( 'typography.letterSpacing', name )[ 0 ];
+	if ( ! setting ) {
+		return false;
+	}
+	if ( ! name && element === 'heading' ) {
+		return true;
+	}
 	const supports = getSupportedGlobalStylesPanels( name );
-	return (
-		useSetting( 'typography.letterSpacing', name )[ 0 ] &&
-		supports.includes( 'letterSpacing' )
-	);
+	return supports.includes( 'letterSpacing' );
 }
 
 export default function TypographyPanel( { name, element } ) {
@@ -84,7 +88,7 @@ export default function TypographyPanel( { name, element } ) {
 		supports.includes( 'fontWeight' );
 	const hasLineHeightEnabled = useHasLineHeightControl( name );
 	const hasAppearanceControl = useHasAppearanceControl( name );
-	const hasLetterSpacingControl = useHasLetterSpacingControl( name );
+	const hasLetterSpacingControl = useHasLetterSpacingControl( name, element );
 
 	/* Disable font size controls when the option to style all headings is selected. */
 	let hasFontSizeEnabled = supports.includes( 'fontSize' );
