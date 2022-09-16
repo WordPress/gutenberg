@@ -16,7 +16,46 @@ Let's go on a journey, for example, of setting up a variation that could fit a p
 
 ### Offer sensible defaults
 
-Your first step would be to create a variation which will be set up in such a way to provide a block variation which will display by default a list of books instead of blog posts. You would start with something like this:
+Your first step would be to create a variation which will be set up in such a way to provide a block variation which will display by default a list of books instead of blog posts. The full variation code will look something like this:
+
+```js
+const MY_VARIATION_NAME = 'my-plugin/books-list';
+
+registerBlockVariation( 'core/query', {
+	name: MY_VARIATION_NAME,
+	title: 'Books List',
+	description: 'Displays a list of books',
+	isActive: ( { namespace, query } ) => {
+		return (
+			namespace === MY_VARIATION_NAME
+			&& query.postType === 'book'
+		);
+	},
+	icon: /** An SVG icon can go here*/,
+	attributes: {
+		namespace: MY_VARIATION_NAME,
+		query: {
+			perPage: 6,
+			pages: 0,
+			offset: 0,
+			postType: 'book',
+			order: 'desc',
+			orderBy: 'date',
+			author: '',
+			search: '',
+			exclude: [],
+			sticky: '',
+			inherit: false,
+		},
+	},
+	scope: [ 'inserter' ],
+	}
+);
+```
+
+If that sounds like a lot, don't fret, let's go through each of the properties here and see why they are there and what they are doing.
+
+Essentially, you would start with something like this:
 
 ```js
 registerBlockVariation( 'core/query', {
@@ -58,16 +97,21 @@ At this point, your custom variation will be virtually indistinguishable from a 
 
 There is one slight problem you might have realized after implementing this variation: while it is transparent to the user as they are inserting it, Gutenberg will still recognize the variation as a Query Loop block at its core and so, after its insertion, it will show up as a Query Loop block in the tree view of the editor, for instance.
 
-We need a way to tell the editor that this block is indeed your specific variation. This is what the `isActive` property is made for: it's a way to determine whether a certain variation is active based on the block's attributes. You might be tempted to then do something like this:
+We need a way to tell the editor that this block is indeed your specific variation. This is what the `isActive` property is made for: it's a way to determine whether a certain variation is active based on the block's attributes. You could use it like this:
 
 ```js
 {
 	/** ...variation properties */
-	isActive: [ 'postType' ],
+	isActive: ( { namespace, query } ) => {
+		return (
+			namespace === MY_VARIATION_NAME
+			&& query.postType === 'book'
+		);
+	},
 }
 ```
 
-In this way, Gutenberg will recognize the block as your variation any time the `postType` matches `book`! That's awesome, but the problem is that now Gutenberg will recognize the block as your specific variation any time the `postType` is set to `book`, which is not what we want: other plugins might want to publish variations based on the `book` post type, or we might just not want the variation to be recognized every time the user sets the type to `book` manually through the editor settings.
+You might have been tempted to only compare the `postType`: in this way, Gutenberg will recognize the block as your variation any time the `postType` matches `book`! That's awesome, but the problem is that now Gutenberg will recognize the block as your specific variation any time the `postType` is set to `book`, which is not what we want: other plugins might want to publish variations based on the `book` post type, or we might just not want the variation to be recognized every time the user sets the type to `book` manually through the editor settings.
 
 That's why the Query Loop block exposes a special attribute called `namespace`: it really doesn't do anything inside the block implementation, and it's used as an easy way for extenders to recognize and scope their own variation. So you would use it like so:
 
@@ -92,7 +136,7 @@ Even with all of this, your custom post type might have unique requirements: it 
 
 Let's say you don't use at all the `sticky` attribute in your books, so that would be totally irrelevant to the customization of your block. In order to not confuse the users as to what a setting might do, and only exposing a clear UX to them, we want this control to be unavailable. Furthermore, let's say that you don't use the `author` field at all, which generally indicates the person who has added that post to the database, instead you use a custom `bookAuthor` field. As such, not only keeping the `author` filter would be confusing, it would outright break your query.
 
-For this reason, the Query Loop block supports a property called `allowedControls` which accepts an array of keys of the controls we want to whitelist. By default, we accept all the controls, but as soon as we provide an array to this property, we want to be specific and whitelist only the controls which are going to be relevant for us!
+For this reason, the Query Loop block supports a property called `allowedControls` which accepts an array of keys of the controls we want to display on the inspector sidebar. By default, we accept all the controls, but as soon as we provide an array to this property, we want to be specific and specify only the controls which are going to be relevant for us!
 
 As of version 13.9, the following controls are available:
 
@@ -117,13 +161,15 @@ Notice that we have also disabled the `postType` control: when the user selects 
 
 ### Adding additional controls
 
-Because our plugin uses custom attributes that we need to query, we want the users of our block to be able to select those instead of the ones we have just disabled from the core inspector controls. We can do this via a [React HOC](https://reactjs.org/docs/higher-order-components.html), like so:
+Because our plugin uses custom attributes that we need to query, we want to add our own controls to allow the users to select those instead of the ones we have just disabled from the core inspector controls. We can do this via a [React HOC](https://reactjs.org/docs/higher-order-components.html) hooked into a [block filter](https://developer.wordpress.org/block-editor/reference-guides/filters/block-filters/), like so:
 
 ```jsx
 export const withBookQueryControls = ( BlockEdit ) => ( props ) => {
 	// We only want to add these controls if it is our variation,
-	// so here we can implement a logic to check for that, similiar
+	// so here we can implement a custom logic to check for that, similiar
 	// to the `isActive` function described above.
+	// The following assumes that you wrote a custom `isMyBooksVariation`
+	// function to handle that.
 	return isMyBooksVariation( props ) ? (
 		<>
 			<BlockEdit { ...props } />
@@ -174,6 +220,8 @@ if( 'my-plugin/books-list' === $block[ 'attrs' ][ 'namespace' ] ) {
 	);
 }
 ```
+
+(In the code above, we assume you have some way to access the block, for example within a [`pre_render_block`](https://developer.wordpress.org/reference/hooks/pre_render_block/) filter, but the specific solution can be different depending on the use-case, so this is not a firm recommendation).
 
 ### Making your custom query work on the editor side
 
