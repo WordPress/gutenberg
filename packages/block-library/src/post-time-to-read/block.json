@@ -16,6 +16,7 @@
 		}
 	},
 	"supports": {
-		"html": false
+		"html": false,
+		"multiple": false
 	}
 }
