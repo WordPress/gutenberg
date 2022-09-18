@@ -6,7 +6,7 @@
 	"category": "theme",
 	"description": "Time to read the post.",
 	"textdomain": "default",
-	"usesContext": [ "postType", "postId" ],
+	"usesContext": [ "postId" ],
 	"attributes": {
 		"textAlign": {
 			"type": "string"
