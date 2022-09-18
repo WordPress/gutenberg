@@ -11,21 +11,16 @@
 		font-weight: 400;
 	}
 
+	caption {
+		background-color: inherit;
+	}
+
 	table {
 		width: 100%;
 		border-collapse: collapse;
 
-		// Keep the hard-coded header background color for backward compatibility.
-		&:where(:not(.has-background)) th {
-			background: $gray-300;
-		}
-
 		&:where(:not(.has-text-color)) {
-			// Keep the hard-coded body and caption color for backward compatibility.
-			tbody,
-			caption {
-				color: #40464d;
-			}
+			color: #40464d;
 
 			// Keep the hard-coded border color for backward compatibility.
 			th,
@@ -33,5 +28,18 @@
 				border-color: $gray-300;
 			}
 		}
+
+		&.has-background th {
+			background-color: inherit;
+		}
+
+		&.has-text-color th {
+			color: inherit;
+		}
 	}
+}
+
+// Keep the hard-coded header background color for backward compatibility.
+:where(.wp-block-calendar table:not(.has-background) th) {
+	background: $gray-300;
 }
