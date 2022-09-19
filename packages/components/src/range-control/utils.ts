@@ -102,25 +102,31 @@ export function useDebouncedHoverInteraction(
 		[ timeout ]
 	);
 
-	const handleOnMouseMove = useCallback( ( event ) => {
-		onMouseMove( event );
+	const handleOnMouseMove = useCallback(
+		( event ) => {
+			onMouseMove( event );
 
-		setDebouncedTimeout( () => {
-			if ( ! show ) {
-				setShow( true );
-				onShow();
-			}
-		} );
-	}, [] );
+			setDebouncedTimeout( () => {
+				if ( ! show ) {
+					setShow( true );
+					onShow();
+				}
+			} );
+		},
+		[ onMouseMove, onShow, setDebouncedTimeout, show ]
+	);
 
-	const handleOnMouseLeave = useCallback( ( event ) => {
-		onMouseLeave( event );
+	const handleOnMouseLeave = useCallback(
+		( event ) => {
+			onMouseLeave( event );
 
-		setDebouncedTimeout( () => {
-			setShow( false );
-			onHide();
-		} );
-	}, [] );
+			setDebouncedTimeout( () => {
+				setShow( false );
+				onHide();
+			} );
+		},
+		[ onHide, onMouseLeave, setDebouncedTimeout ]
+	);
 
 	useEffect( () => {
 		return () => {
