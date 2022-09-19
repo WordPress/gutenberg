@@ -54,7 +54,7 @@ export default function useInnerBlockTemplateSync(
 	useLayoutEffect( () => {
 		// There's an implicit dependency between useInnerBlockTemplateSync and useNestedSettingsUpdate
 		// The former needs to happen after the latter and since the latter is using microtasks to batch updates (performance optimization),
-		// We need to schedule this one in a microtask as well.
+		// we need to schedule this one in a microtask as well.
 		// Exemple: If you remove queueMicrotask here, ctrl + click to insert quote block won't close the inserter.
 		window.queueMicrotask( () => {
 			// Only synchronize innerBlocks with template if innerBlocks are empty
