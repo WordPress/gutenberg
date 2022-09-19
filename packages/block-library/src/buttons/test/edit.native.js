@@ -2,7 +2,6 @@
  * External dependencies
  */
 import {
-	addBlock,
 	fireEvent,
 	waitFor,
 	getEditorHtml,
@@ -96,11 +95,10 @@ describe( 'Buttons block', () => {
 		} );
 
 		it( 'adds another button using the inline appender', async () => {
-			const screen = await initializeEditor();
+			const screen = await initializeEditor( {
+				initialHtml: BUTTONS_HTML,
+			} );
 			const { getByA11yLabel } = screen;
-
-			// Add block
-			await addBlock( screen, 'Buttons' );
 
 			// Get block
 			const buttonsBlock = await getBlock( screen, 'Buttons' );
@@ -117,9 +115,9 @@ describe( 'Buttons block', () => {
 				},
 			} );
 
-			// Get first button
-			const firstButtonBlock = await getBlock( screen, 'Button' );
-			fireEvent.press( firstButtonBlock );
+			// Get inner button block
+			const buttonBlock = await getBlock( screen, 'Button' );
+			fireEvent.press( buttonBlock );
 
 			// Add another Button using the inline appender
 			const appenderButton =
@@ -127,10 +125,9 @@ describe( 'Buttons block', () => {
 			fireEvent.press( appenderButton );
 
 			// Check for new button
-			const secondButtonBlock = await getBlock( screen, 'Button', {
-				rowIndex: 2,
-			} );
-			fireEvent.press( secondButtonBlock );
+			const secondButtonBlock = await waitFor( () =>
+				within( buttonsBlock ).getByA11yLabel( /Button Block\. Row 2/ )
+			);
 			expect( secondButtonBlock ).toBeVisible();
 
 			// Add a Paragraph block using the empty placeholder at the bottom
