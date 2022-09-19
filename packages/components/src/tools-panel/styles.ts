@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 
 /**
@@ -146,14 +147,14 @@ export const DropdownMenu = css`
 	min-width: 200px;
 `;
 
+export const ResetLabel = styled.span`
+	color: var( --wp-admin-theme-color-darker-10 );
+	margin-left: ${ space( 3 ) };
+	${ baseLabelTypography }
+`;
+
 export const DefaultControlsItem = css`
 	color: ${ COLORS.gray[ 900 ] };
-
-	span:last-child {
-		color: var( --wp-admin-theme-color-darker-10 );
-		margin-left: ${ space( 3 ) };
-		${ baseLabelTypography }
-	}
 
 	&[aria-disabled='true'] {
 		color: ${ COLORS.gray[ 700 ] };
@@ -163,7 +164,7 @@ export const DefaultControlsItem = css`
 			color: ${ COLORS.gray[ 700 ] };
 		}
 
-		span:last-child {
+		${ ResetLabel } {
 			opacity: 0.3;
 		}
 	}

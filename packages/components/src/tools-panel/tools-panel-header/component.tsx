@@ -20,6 +20,7 @@ import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { useToolsPanelHeader } from './hook';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import { ResetLabel } from '../styles';
 import type {
 	ToolsPanelControlsGroupProps,
 	ToolsPanelHeaderProps,
@@ -34,7 +35,7 @@ const DefaultControlsGroup = ( {
 		return null;
 	}
 
-	const resetSuffix = <span aria-hidden>{ __( 'Reset' ) }</span>;
+	const resetSuffix = <ResetLabel aria-hidden>{ __( 'Reset' ) }</ResetLabel>;
 
 	return (
 		<MenuGroup label={ __( 'Defaults' ) }>
