@@ -23,39 +23,12 @@ test.describe.parallel( 'FontSizePicker', () => {
 		await gotoStoryId( page, 'components-fontsizepicker--default' );
 	} );
 
-	test( 'Renders with "Normal" size by default', async ( { page } ) => {
+	// This isn't a meaningful test, just some example code to demonstrate a way to
+	// wait until a certain element has finished animating.
+	// We can remove it once we have real tests.
+	test( 'with value', async ( { page } ) => {
 		const button = await page.locator( 'button[aria-label="Normal"]' );
 
-		await waitUntilButtonHighlightStable( page );
-
-		expect( button ).toHaveAttribute( 'aria-checked', 'true' );
-		expect( await page.screenshot() ).toMatchSnapshot();
-	} );
-
-	test( 'Can change size to "Small"', async ( { page } ) => {
-		const button = await page.locator( 'button[aria-label="Small"]' );
-
-		await button.click();
-		await waitUntilButtonHighlightStable( page );
-
-		expect( button ).toHaveAttribute( 'aria-checked', 'true' );
-		expect( await page.screenshot() ).toMatchSnapshot();
-	} );
-
-	test( 'Can change size to "Big"', async ( { page } ) => {
-		const button = await page.locator( 'button[aria-label="Big"]' );
-
-		await button.click();
-		await waitUntilButtonHighlightStable( page );
-
-		expect( button ).toHaveAttribute( 'aria-checked', 'true' );
-		expect( await page.screenshot() ).toMatchSnapshot();
-	} );
-
-	test( 'Can change size back to "Normal"', async ( { page } ) => {
-		const button = await page.locator( 'button[aria-label="Normal"]' );
-
-		await button.click();
 		await waitUntilButtonHighlightStable( page );
 
 		expect( button ).toHaveAttribute( 'aria-checked', 'true' );
