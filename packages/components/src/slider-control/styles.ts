@@ -234,7 +234,7 @@ export const markLabel = ( markProps: MarkProps ) => {
 		left: 0;
 		font-size: 11px;
 		position: absolute;
-		top: 12px;
+		top: 24px;
 		transform: translateX( -50% );
 		white-space: nowrap;
 		${ markLabelFill( markProps ) };
