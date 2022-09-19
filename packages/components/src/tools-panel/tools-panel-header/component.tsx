@@ -34,7 +34,7 @@ const DefaultControlsGroup = ( {
 		return null;
 	}
 
-	const resetSuffix = <span>{ __( 'Reset' ) }</span>;
+	const resetSuffix = <span aria-hidden>{ __( 'Reset' ) }</span>;
 
 	return (
 		<MenuGroup label={ __( 'Defaults' ) }>
