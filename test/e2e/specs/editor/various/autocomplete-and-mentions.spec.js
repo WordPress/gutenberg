@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import {
-	activatePlugin,
-	deactivatePlugin,
 	createNewPost,
-	createUser,
-	deleteUser,
 	clickBlockAppender,
 	getEditedPostContent,
 	pressKeyTimes,
@@ -23,23 +19,20 @@ const userList = [
 	{ userName: 'makeitso', firstName: 'Jean-Luc', lastName: 'Picard' },
 	{ userName: 'buddytheelf', firstName: 'Buddy', lastName: 'Elf' },
 ];
-
 test.describe( 'Autocomplete', () => {
-	test.beforeAll( async () => {
+	test.beforeAll( async ( { requestUtils } ) => {
 		for ( const user of userList ) {
-			await createUser( user.userName, {
+			await requestUtils.createUser( user.userName, {
 				firstName: user.firstName,
 				lastName: user.lastName,
 			} );
 		}
-		await activatePlugin( 'gutenberg-test-autocompleter' );
+		await requestUtils.activatePlugin( 'gutenberg-test-autocompleter' );
 	} );
 
-	test.afterAll( async () => {
-		for ( const user of userList ) {
-			await deleteUser( user.userName );
-		}
-		await deactivatePlugin( 'gutenberg-test-autocompleter' );
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllUsers();
+		await requestUtils.deactivatePlugin( 'gutenberg-test-autocompleter' );
 	} );
 
 	test.beforeEach( async () => {
