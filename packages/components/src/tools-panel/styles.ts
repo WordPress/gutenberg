@@ -13,7 +13,7 @@ import {
 	Wrapper as BaseControlWrapper,
 } from '../base-control/styles/base-control-styles';
 import { LabelWrapper } from '../input-control/styles/input-control-styles';
-import { baseLabelTypography, COLORS, CONFIG } from '../utils';
+import { COLORS, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 
 const toolsPanelGrid = {
@@ -149,8 +149,11 @@ export const DropdownMenu = css`
 
 export const ResetLabel = styled.span`
 	color: var( --wp-admin-theme-color-darker-10 );
+	font-size: 11px;
+	font-weight: 500;
+	line-height: 1.4;
 	margin-left: ${ space( 3 ) };
-	${ baseLabelTypography }
+	text-transform: uppercase;
 `;
 
 export const DefaultControlsItem = css`
