@@ -48,7 +48,10 @@ export default function QueryPlaceholder( {
 	);
 
 	const matchingVariation = getMatchingVariation( attributes, allVariations );
-	const icon = matchingVariation?.icon || blockType?.icon?.src;
+	const icon =
+		matchingVariation?.icon?.src ||
+		matchingVariation?.icon ||
+		blockType?.icon?.src;
 	const label = matchingVariation?.title || blockType?.title;
 	if ( isStartingBlank ) {
 		return (
