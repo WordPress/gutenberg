@@ -11,20 +11,55 @@ import {
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const userList = [
-	{ userName: 'testuser', firstName: 'Jane', lastName: 'Doe' },
-	{ userName: 'yourfather', firstName: 'Darth', lastName: 'Vader' },
-	{ userName: 'mockingjay', firstName: 'Katniss', lastName: 'Everdeen' },
-	{ userName: 'ringbearer', firstName: 'Frodo', lastName: 'Baggins' },
-	{ userName: 'thebetterhobbit', firstName: 'Bilbo', lastName: 'Baggins' },
-	{ userName: 'makeitso', firstName: 'Jean-Luc', lastName: 'Picard' },
-	{ userName: 'buddytheelf', firstName: 'Buddy', lastName: 'Elf' },
+	{
+		username: 'testuser',
+		firstName: 'Jane',
+		lastName: 'Doe',
+		password: 'iLoVeE2EtEsTs',
+	},
+	{
+		username: 'yourfather',
+		firstName: 'Darth',
+		lastName: 'Vader',
+		password: 'padme123',
+	},
+	{
+		username: 'mockingjay',
+		firstName: 'Katniss',
+		lastName: 'Everdeen',
+		password: 'district12forlyfe',
+	},
+	{
+		username: 'ringbearer',
+		firstName: 'Frodo',
+		lastName: 'Baggins',
+		password: 'ep1cburgl@r',
+	},
+	{
+		username: 'thebetterhobbit',
+		firstName: 'Bilbo',
+		lastName: 'Baggins',
+		password: 'lostwithouts@m',
+	},
+	{
+		username: 'makeitso',
+		firstName: 'Jean-Luc',
+		lastName: 'Picard',
+		password: 'engagE!1',
+	},
+	{
+		username: 'buddytheelf',
+		firstName: 'Buddy',
+		lastName: 'Elf',
+		password: 'sm1lingsmyfavorite',
+	},
 ];
 test.describe( 'Autocomplete', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		for ( const user of userList ) {
-			await requestUtils.createUser( user.userName, {
-				firstName: user.firstName,
-				lastName: user.lastName,
+			await requestUtils.createUser( {
+				email: `${ user.username }@example.com`,
+				...user,
 			} );
 		}
 		await requestUtils.activatePlugin( 'gutenberg-test-autocompleter' );
