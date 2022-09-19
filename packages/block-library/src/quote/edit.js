@@ -59,9 +59,12 @@ const useMigrateOnLoad = ( attributes, clientId ) => {
 			alternative: 'inner blocks',
 		} );
 
-		registry.batch( () => {
-			updateBlockAttributes( clientId, newAttributes );
-			replaceInnerBlocks( clientId, newInnerBlocks );
+		// Wait for the inner blocks sync to happen.
+		window.queueMicrotask( () => {
+			registry.batch( () => {
+				updateBlockAttributes( clientId, newAttributes );
+				replaceInnerBlocks( clientId, newInnerBlocks );
+			} );
 		} );
 	}, [ attributes.value ] );
 };
