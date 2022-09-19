@@ -139,21 +139,15 @@ export default function BlockTools( {
 					__unstableContentRef={ __unstableContentRef }
 				/>
 				{ /* Used for the inline rich text toolbar. */ }
-				{ ! isTyping && (
-					<Popover.Slot
-						name="block-toolbar"
-						ref={ blockToolbarRef }
-					/>
-				) }
+
+				<Popover.Slot name="block-toolbar" ref={ blockToolbarRef } />
 				{ children }
 				{ /* Used for inline rich text popovers. */ }
-				{ ! isTyping && (
-					<Popover.Slot
-						name="__unstable-block-tools-after"
-						ref={ blockToolbarAfterRef }
-					/>
-				) }
-				{ ! isTyping && isZoomOutMode && (
+				<Popover.Slot
+					name="__unstable-block-tools-after"
+					ref={ blockToolbarAfterRef }
+				/>
+				{ isZoomOutMode && (
 					<ZoomOutModeInserters
 						__unstableContentRef={ __unstableContentRef }
 					/>
