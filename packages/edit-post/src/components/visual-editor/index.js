@@ -28,6 +28,8 @@ import {
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableIframe as Iframe,
 	__experimentalRecursionProvider as RecursionProvider,
+	useLayoutClasses,
+	useLayoutStyles,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { Button, __unstableMotion as motion } from '@wordpress/components';
@@ -35,6 +37,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -82,11 +85,23 @@ function MaybeIframe( {
 	);
 }
 
+function findPostContent( blocks ) {
+	for ( let i = 0; i < blocks.length; i++ ) {
+		if ( blocks[ i ].name === 'core/post-content' ) {
+			return blocks[ i ];
+		}
+		if ( blocks[ i ].innerBlocks.length ) {
+			return findPostContent( blocks[ i ].innerBlocks );
+		}
+	}
+}
+
 export default function VisualEditor( { styles } ) {
 	const {
 		deviceType,
 		isWelcomeGuideVisible,
 		isTemplateMode,
+		templateContent = '',
 		wrapperBlockName,
 		wrapperUniqueId,
 	} = useSelect( ( select ) => {
@@ -94,6 +109,7 @@ export default function VisualEditor( { styles } ) {
 			isFeatureActive,
 			isEditingTemplate,
 			__experimentalGetPreviewDeviceType,
+			getEditedPostTemplate,
 		} = select( editPostStore );
 		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
 		const _isTemplateMode = isEditingTemplate();
@@ -109,6 +125,7 @@ export default function VisualEditor( { styles } ) {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
 			isTemplateMode: _isTemplateMode,
+			templateContent: getEditedPostTemplate()?.content,
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 		};
@@ -122,7 +139,6 @@ export default function VisualEditor( { styles } ) {
 		themeHasDisabledLayoutStyles,
 		themeSupportsLayout,
 		assets,
-		useRootPaddingAwareAlignments,
 		isFocusMode,
 	} = useSelect( ( select ) => {
 		const _settings = select( blockEditorStore ).getSettings();
@@ -130,8 +146,6 @@ export default function VisualEditor( { styles } ) {
 			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
 			themeSupportsLayout: _settings.supportsLayout,
 			assets: _settings.__unstableResolvedAssets,
-			useRootPaddingAwareAlignments:
-				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
 			isFocusMode: _settings.focusMode,
 		};
 	}, [] );
@@ -197,11 +211,25 @@ export default function VisualEditor( { styles } ) {
 		return { type: 'default' };
 	}, [ isTemplateMode, themeSupportsLayout, defaultLayout ] );
 
-	const blockListLayoutClass = classnames( {
-		'is-layout-constrained': themeSupportsLayout,
-		'is-layout-flow': ! themeSupportsLayout,
-		'has-global-padding': useRootPaddingAwareAlignments,
-	} );
+	const templateBlocks = parse( templateContent );
+	const postContentBlock = findPostContent( templateBlocks );
+	const postContentLayoutClasses = useLayoutClasses(
+		postContentBlock?.attributes?.layout,
+		defaultLayout?.definitions
+	);
+
+	const blockListLayoutClass = classnames(
+		{
+			'is-layout-flow': ! themeSupportsLayout,
+			'wp-container-visual-editor': themeSupportsLayout,
+		},
+		postContentLayoutClasses
+	);
+
+	const postContentLayoutStyles = useLayoutStyles(
+		postContentBlock,
+		'.wp-container-visual-editor'
+	);
 
 	const titleRef = useRef();
 	useEffect( () => {
@@ -257,13 +285,24 @@ export default function VisualEditor( { styles } ) {
 						{ themeSupportsLayout &&
 							! themeHasDisabledLayoutStyles &&
 							! isTemplateMode && (
-								<LayoutStyle
-									selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
-									layout={ layout }
-									layoutDefinitions={
-										defaultLayout?.definitions
-									}
-								/>
+								<>
+									<LayoutStyle
+										selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
+										layout={ layout }
+										layoutDefinitions={
+											defaultLayout?.definitions
+										}
+									/>
+									{ postContentLayoutStyles && (
+										<LayoutStyle
+											layout={ layout }
+											css={ postContentLayoutStyles }
+											layoutDefinitions={
+												defaultLayout?.definitions
+											}
+										/>
+									) }
+								</>
 							) }
 						{ ! isTemplateMode && (
 							<div

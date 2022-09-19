@@ -766,6 +766,28 @@ _Parameters_
 -   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 -   _options_ `Object`: Optional. Inner blocks options.
 
+### useLayoutClasses
+
+Generates the utility classnames for the given blocks layout attributes.
+This method was primarily added to reintroduce classnames that were removed
+in the 5.9 release (<https://github.com/WordPress/gutenberg/issues/38719>), rather
+than providing an extensive list of all possible layout classes. The plan is to
+have the style engine generate a more extensive list of utility classnames which
+will then replace this method.
+
+_Parameters_
+
+-   _layout_ `Object`: Layout object.
+-   _layoutDefinitions_ `Object`: An object containing layout definitions, stored in theme.json.
+
+_Returns_
+
+-   `Array`: Array of CSS classname strings.
+
+### useLayoutStyles
+
+Undocumented declaration.
+
 ### useSetting
 
 Hook that retrieves the given setting for the block instance in use.

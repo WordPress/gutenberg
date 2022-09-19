@@ -49,7 +49,7 @@ const layoutBlockSupportKey = '__experimentalLayout';
  *
  * @return { Array } Array of CSS classname strings.
  */
-function useLayoutClasses( layout, layoutDefinitions ) {
+export function useLayoutClasses( layout, layoutDefinitions ) {
 	const rootPaddingAlignment = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().__experimentalFeatures
@@ -87,6 +87,24 @@ function useLayoutClasses( layout, layoutDefinitions ) {
 	}
 
 	return layoutClassnames;
+}
+
+export function useLayoutStyles( block = {}, selector ) {
+	const { attributes = {}, name } = block;
+	const { layout = {}, style = {} } = attributes;
+	const fullLayoutType = getLayoutType( layout?.type || 'default' );
+	const defaultThemeLayout = useSetting( 'layout' ) || {};
+	const blockGapSupport = useSetting( 'spacing.blockGap' );
+	const hasBlockGapSupport = blockGapSupport !== null;
+	const css = fullLayoutType?.getLayoutStyle?.( {
+		blockName: name,
+		selector,
+		layout,
+		layoutDefinitions: defaultThemeLayout?.definitions,
+		style,
+		hasBlockGapSupport,
+	} );
+	return css;
 }
 
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
