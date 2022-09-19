@@ -1435,7 +1435,7 @@ export function getTemplateLock( state, rootClientId ) {
 
 	const blockListSettings = getBlockListSettings( state, rootClientId );
 	if ( ! blockListSettings ) {
-		return null;
+		return undefined;
 	}
 
 	return blockListSettings.templateLock;

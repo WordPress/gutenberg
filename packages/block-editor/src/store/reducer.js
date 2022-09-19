@@ -1714,9 +1714,12 @@ export function automaticChangeStatus( state, action ) {
 		case 'SET_BLOCK_VISIBILITY':
 		case 'START_TYPING':
 		case 'STOP_TYPING':
+		case 'UPDATE_BLOCK_LIST_SETTINGS':
 			return state;
 	}
 
+	// TODO: This is a source of bug, as each time there's a change in timing,
+	// or a new action is added, this could break.
 	// Reset the state by default (for any action not handled).
 }
 
