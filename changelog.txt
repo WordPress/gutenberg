@@ -1,5 +1,29 @@
 == Changelog ==
 
+= 14.1.1 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+- Blocks: Fix searching of blocks when description is non-string. ([44233](https://github.com/WordPress/gutenberg/pull/44233)) Resolves an editor crash which could happen when searching for blocks.
+
+
+## First time contributors
+
+The following PRs were merged by first time contributors:
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@tyxla
+
+
 = 14.1.0 =
 
 ## Changelog
