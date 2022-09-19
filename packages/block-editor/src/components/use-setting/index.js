@@ -21,10 +21,8 @@ import { store as blockEditorStore } from '../../store';
 const blockedPaths = [ 'color', 'border', 'typography', 'spacing' ];
 
 const deprecatedFlags = {
-	'color.palette': ( settings ) =>
-		settings.colors === undefined ? undefined : settings.colors,
-	'color.gradients': ( settings ) =>
-		settings.gradients === undefined ? undefined : settings.gradients,
+	'color.palette': ( settings ) => settings.colors,
+	'color.gradients': ( settings ) => settings.gradients,
 	'color.custom': ( settings ) =>
 		settings.disableCustomColors === undefined
 			? undefined
@@ -33,8 +31,7 @@ const deprecatedFlags = {
 		settings.disableCustomGradients === undefined
 			? undefined
 			: ! settings.disableCustomGradients,
-	'typography.fontSizes': ( settings ) =>
-		settings.fontSizes === undefined ? undefined : settings.fontSizes,
+	'typography.fontSizes': ( settings ) => settings.fontSizes,
 	'typography.customFontSize': ( settings ) =>
 		settings.disableCustomFontSizes === undefined
 			? undefined
