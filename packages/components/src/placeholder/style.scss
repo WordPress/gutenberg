@@ -173,7 +173,6 @@
 // This is mainly an issue in terms of Site Logo which has a brief flash of the square placeholder.
 .components-placeholder.has-illustration {
 	color: inherit;
-	border-radius: inherit;
 	display: flex;
 	box-shadow: none;
 	min-width: 100px;
@@ -190,6 +189,10 @@
 
 	.components-placeholder__fieldset {
 		width: auto;
+
+		// Unset intrinsic margins.
+		margin-left: 0;
+		margin-right: 0;
 	}
 
 	// Show placeholder buttons on block selection.
@@ -211,7 +214,7 @@
 	}
 
 	// By painting the borders here, we enable them to be replaced by the Border control.
-	border: $border-width dashed currentColor;
+	@include placeholder-style();
 	overflow: hidden;
 }
 

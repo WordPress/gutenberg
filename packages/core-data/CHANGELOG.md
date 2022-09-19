@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 5.0.0 (2022-09-13)
+
+### Breaking Changes
+
+–   Add TypeScript types to the built package (via "types": "build-types" in the package.json)
+
+## 4.14.0 (2022-08-24)
+
 ### New Features
 
 -   Stabilized the `useResourcePermissions` hook ([#43268](https://github.com/WordPress/gutenberg/pull/43268))

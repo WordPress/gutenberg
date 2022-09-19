@@ -33,6 +33,7 @@ export const InputWithSlider = ( {
 				label={ label }
 				hideLabelFromVision
 				value={ value }
+				// @ts-expect-error TODO: Resolve discrepancy in NumberControl
 				onChange={ onChange }
 				prefix={
 					<Spacer

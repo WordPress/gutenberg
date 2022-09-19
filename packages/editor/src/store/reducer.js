@@ -142,6 +142,26 @@ export function saving( state = {}, action ) {
 }
 
 /**
+ * Reducer returning deleting post request state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function deleting( state = {}, action ) {
+	switch ( action.type ) {
+		case 'REQUEST_POST_DELETE_START':
+		case 'REQUEST_POST_DELETE_FINISH':
+			return {
+				pending: action.type === 'REQUEST_POST_DELETE_START',
+			};
+	}
+
+	return state;
+}
+
+/**
  * Post Lock State.
  *
  * @typedef {Object} PostLockState
@@ -263,6 +283,7 @@ export default combineReducers( {
 	postId,
 	postType,
 	saving,
+	deleting,
 	postLock,
 	template,
 	postSavingLock,

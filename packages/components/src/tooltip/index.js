@@ -1,8 +1,4 @@
 // @ts-nocheck
-/**
- * External dependencies
- */
-import { includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,7 +9,6 @@ import {
 	concatChildren,
 	useEffect,
 	useState,
-	useRef,
 } from '@wordpress/element';
 import { useDebounce, useMergeRefs } from '@wordpress/compose';
 
@@ -64,7 +59,7 @@ const getRegularElement = ( {
 };
 
 const addPopoverToGrandchildren = ( {
-	anchorRef,
+	anchor,
 	grandchildren,
 	isOver,
 	offset,
@@ -82,8 +77,8 @@ const addPopoverToGrandchildren = ( {
 				aria-hidden="true"
 				animate={ false }
 				offset={ offset }
-				anchorRef={ anchorRef }
-				__unstableShift
+				anchor={ anchor }
+				shift
 			>
 				{ text }
 				<Shortcut
@@ -128,13 +123,18 @@ function Tooltip( props ) {
 	const [ isMouseDown, setIsMouseDown ] = useState( false );
 	const [ isOver, setIsOver ] = useState( false );
 	const delayedSetIsOver = useDebounce( setIsOver, delay );
+	// Using internal state (instead of a ref) for the popover anchor to make sure
+	// that the component re-renders when the anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 
 	// Create a reference to the Tooltip's child, to be passed to the Popover
 	// so that the Tooltip can be correctly positioned. Also, merge with the
 	// existing ref for the first child, so that its ref is preserved.
-	const childRef = useRef( null );
 	const existingChildRef = Children.toArray( children )[ 0 ]?.ref;
-	const mergedChildRefs = useMergeRefs( [ childRef, existingChildRef ] );
+	const mergedChildRefs = useMergeRefs( [
+		setPopoverAnchor,
+		existingChildRef,
+	] );
 
 	const createMouseDown = ( event ) => {
 		// In firefox, the mouse down event is also fired when the select
@@ -211,7 +211,7 @@ function Tooltip( props ) {
 			// quickly blur/mouseleave before delayedSetIsOver is called.
 			delayedSetIsOver.cancel();
 
-			const _isOver = includes( [ 'focus', 'mouseenter' ], event.type );
+			const _isOver = [ 'focus', 'mouseenter' ].includes( event.type );
 			if ( _isOver === isOver ) {
 				return;
 			}
@@ -257,7 +257,7 @@ function Tooltip( props ) {
 		: getRegularElement;
 
 	const popoverData = {
-		anchorRef: childRef,
+		anchor: popoverAnchor,
 		isOver,
 		offset: 4,
 		position,

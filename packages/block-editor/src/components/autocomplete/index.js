@@ -32,16 +32,13 @@ const EMPTY_ARRAY = [];
 function useCompleters( { completers = EMPTY_ARRAY } ) {
 	const { name } = useBlockEditContext();
 	return useMemo( () => {
-		let filteredCompleters = completers;
+		let filteredCompleters = [ ...completers, linkAutocompleter ];
 
 		if (
 			name === getDefaultBlockName() ||
 			getBlockSupport( name, '__experimentalSlashInserter', false )
 		) {
-			filteredCompleters = filteredCompleters.concat( [
-				blockAutocompleter,
-				linkAutocompleter,
-			] );
+			filteredCompleters = [ ...filteredCompleters, blockAutocompleter ];
 		}
 
 		if ( hasFilter( 'editor.Autocomplete.completers' ) ) {

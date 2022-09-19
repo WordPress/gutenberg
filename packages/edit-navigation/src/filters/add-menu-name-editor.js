@@ -1,11 +1,12 @@
 /**
  * WordPress dependencies
  */
+import { addFilter } from '@wordpress/hooks';
+import { createHigherOrderComponent } from '@wordpress/compose';
+
 /**
  * Internal dependencies
  */
-import { addFilter } from '@wordpress/hooks';
-import { createHigherOrderComponent } from '@wordpress/compose';
 import NameDisplay from '../components/name-display';
 
 const addMenuNameEditor = createHigherOrderComponent(

@@ -85,7 +85,7 @@
 	"supports": {
 		"anchor": true,
 		"color": {
-			"__experimentalDuotone": "img",
+			"__experimentalDuotone": "img, .components-placeholder",
 			"text": false,
 			"background": false
 		},
@@ -99,11 +99,6 @@
 				"color": true,
 				"radius": true,
 				"width": true
-			}
-		},
-		"__experimentalStyle": {
-			"spacing": {
-				"margin": "0 0 1em 0"
 			}
 		}
 	},

@@ -55,6 +55,7 @@ describe( 'useResourcePermissions', () => {
 			isResolving: false,
 			hasResolved: false,
 			canCreate: false,
+			canRead: false,
 		} );
 
 		// Required to make sure no updates happen outside of act()
@@ -67,6 +68,7 @@ describe( 'useResourcePermissions', () => {
 			isResolving: false,
 			hasResolved: true,
 			canCreate: true,
+			canRead: false,
 		} );
 	} );
 
@@ -86,6 +88,7 @@ describe( 'useResourcePermissions', () => {
 			isResolving: false,
 			hasResolved: false,
 			canCreate: false,
+			canRead: false,
 			canUpdate: false,
 			canDelete: false,
 		} );
@@ -100,6 +103,7 @@ describe( 'useResourcePermissions', () => {
 			isResolving: false,
 			hasResolved: true,
 			canCreate: true,
+			canRead: false,
 			canUpdate: false,
 			canDelete: false,
 		} );

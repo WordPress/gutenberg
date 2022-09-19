@@ -12,22 +12,18 @@
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_border_support( $block_type ) {
-	// Determine if any border related features are supported.
-	$has_border_support       = block_has_support( $block_type, array( '__experimentalBorder' ) );
-	$has_border_color_support = gutenberg_has_border_feature_support( $block_type, 'color' );
-
 	// Setup attributes and styles within that if needed.
 	if ( ! $block_type->attributes ) {
 		$block_type->attributes = array();
 	}
 
-	if ( $has_border_support && ! array_key_exists( 'style', $block_type->attributes ) ) {
+	if ( block_has_support( $block_type, array( '__experimentalBorder' ) ) && ! array_key_exists( 'style', $block_type->attributes ) ) {
 		$block_type->attributes['style'] = array(
 			'type' => 'object',
 		);
 	}
 
-	if ( $has_border_color_support && ! array_key_exists( 'borderColor', $block_type->attributes ) ) {
+	if ( gutenberg_has_border_feature_support( $block_type, 'color' ) && ! array_key_exists( 'borderColor', $block_type->attributes ) ) {
 		$block_type->attributes['borderColor'] = array(
 			'type' => 'string',
 		);
@@ -48,9 +44,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$sides               = array( 'top', 'right', 'bottom', 'left' );
-	$border_block_styles = array();
-
+	$border_block_styles      = array();
 	$has_border_color_support = gutenberg_has_border_feature_support( $block_type, 'color' );
 	$has_border_width_support = gutenberg_has_border_feature_support( $block_type, 'width' );
 
@@ -106,7 +100,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 
 	// Generate styles for individual border sides.
 	if ( $has_border_color_support || $has_border_width_support ) {
-		foreach ( $sides as $side ) {
+		foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
 			$border                       = _wp_array_get( $block_attributes, array( 'style', 'border', $side ), null );
 			$border_side_values           = array(
 				'width' => isset( $border['width'] ) && ! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'width' ) ? $border['width'] : null,

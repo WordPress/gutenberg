@@ -121,6 +121,13 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 			continue;
 		}
 
+		if ( $post_type &&
+			isset( $template->post_types ) &&
+			! in_array( $post_type, $template->post_types, true )
+		) {
+			continue;
+		}
+
 		$query_result[] = $template;
 	}
 	if ( ! isset( $query['wp_id'] ) ) {
@@ -264,8 +271,8 @@ function gutenberg_build_block_template_result_from_post( $post ) {
 	$is_wp_suggestion = get_post_meta( $post->ID, 'is_wp_suggestion', true );
 
 	$theme          = $terms[0]->name;
-	$has_theme_file = wp_get_theme()->get_stylesheet() === $theme &&
-		null !== _get_block_template_file( $post->post_type, $post->post_name );
+	$template_file  = _get_block_template_file( $post->post_type, $post->post_name );
+	$has_theme_file = wp_get_theme()->get_stylesheet() === $theme && null !== $template_file;
 
 	$template                 = new WP_Block_Template();
 	$template->wp_id          = $post->ID;
@@ -288,6 +295,10 @@ function gutenberg_build_block_template_result_from_post( $post ) {
 		$template->is_custom = false;
 	}
 
+	if ( 'wp_template' === $post->post_type && $has_theme_file && isset( $template_file['postTypes'] ) ) {
+		$template->post_types = $template_file['postTypes'];
+	}
+
 	if ( 'wp_template_part' === $post->post_type ) {
 		$type_terms = get_the_terms( $post, 'wp_template_part_area' );
 		if ( ! is_wp_error( $type_terms ) && false !== $type_terms ) {
@@ -297,62 +308,64 @@ function gutenberg_build_block_template_result_from_post( $post ) {
 	return $template;
 }
 
-/**
- * Helper function to get the Template Hierarchy for a given slug.
- * We need to Handle special cases here like `front-page`, `singular` and `archive` templates.
- *
- * Noting that we always add `index` as the last fallback template.
- *
- * @param string  $slug            The template slug to be created.
- * @param boolean $is_custom       Indicates if a template is custom or part of the template hierarchy.
- * @param string  $template_prefix The template prefix for the created template. This is used to extract the main template type ex. in `taxonomy-books` we extract the `taxonomy`.
- *
- * @return array<string> The template hierarchy.
- */
-function get_template_hierarchy( $slug, $is_custom = false, $template_prefix = '' ) {
-	if ( 'index' === $slug ) {
-		return array( 'index' );
-	}
-	if ( $is_custom ) {
-		return array( 'page', 'singular', 'index' );
-	}
-	if ( 'front-page' === $slug ) {
-		return array( 'front-page', 'home', 'index' );
-	}
-	$template_hierarchy = array( $slug );
-	// Most default templates don't have `$template_prefix` assigned.
-	if ( $template_prefix ) {
-		list($type) = explode( '-', $template_prefix );
-		// We need these checks because we always add the `$slug` above.
-		if ( ! in_array( $template_prefix, array( $slug, $type ), true ) ) {
-			$template_hierarchy[] = $template_prefix;
+if ( ! function_exists( 'get_template_hierarchy' ) ) {
+	/**
+	 * Helper function to get the Template Hierarchy for a given slug.
+	 * We need to Handle special cases here like `front-page`, `singular` and `archive` templates.
+	 *
+	 * Noting that we always add `index` as the last fallback template.
+	 *
+	 * @param string  $slug            The template slug to be created.
+	 * @param boolean $is_custom       Indicates if a template is custom or part of the template hierarchy.
+	 * @param string  $template_prefix The template prefix for the created template. This is used to extract the main template type ex. in `taxonomy-books` we extract the `taxonomy`.
+	 *
+	 * @return array<string> The template hierarchy.
+	 */
+	function get_template_hierarchy( $slug, $is_custom = false, $template_prefix = '' ) {
+		if ( 'index' === $slug ) {
+			return array( 'index' );
 		}
-		if ( $slug !== $type ) {
-			$template_hierarchy[] = $type;
+		if ( $is_custom ) {
+			return array( 'page', 'singular', 'index' );
 		}
+		if ( 'front-page' === $slug ) {
+			return array( 'front-page', 'home', 'index' );
+		}
+		$template_hierarchy = array( $slug );
+		// Most default templates don't have `$template_prefix` assigned.
+		if ( $template_prefix ) {
+			list($type) = explode( '-', $template_prefix );
+			// We need these checks because we always add the `$slug` above.
+			if ( ! in_array( $template_prefix, array( $slug, $type ), true ) ) {
+				$template_hierarchy[] = $template_prefix;
+			}
+			if ( $slug !== $type ) {
+				$template_hierarchy[] = $type;
+			}
+		}
+		// Handle `archive` template.
+		if (
+			str_starts_with( $slug, 'author' ) ||
+			str_starts_with( $slug, 'taxonomy' ) ||
+			str_starts_with( $slug, 'category' ) ||
+			str_starts_with( $slug, 'tag' ) ||
+			'date' === $slug
+		) {
+			$template_hierarchy[] = 'archive';
+		}
+		// Handle `single` template.
+		if ( 'attachment' === $slug ) {
+			$template_hierarchy[] = 'single';
+		}
+		// Handle `singular` template.
+		if (
+			str_starts_with( $slug, 'single' ) ||
+			str_starts_with( $slug, 'page' ) ||
+			'attachment' === $slug
+		) {
+			$template_hierarchy[] = 'singular';
+		}
+		$template_hierarchy[] = 'index';
+		return $template_hierarchy;
 	}
-	// Handle `archive` template.
-	if (
-		str_starts_with( $slug, 'author' ) ||
-		str_starts_with( $slug, 'taxonomy' ) ||
-		str_starts_with( $slug, 'category' ) ||
-		str_starts_with( $slug, 'tag' ) ||
-		'date' === $slug
-	) {
-		$template_hierarchy[] = 'archive';
-	}
-	// Handle `single` template.
-	if ( 'attachment' === $slug ) {
-		$template_hierarchy[] = 'single';
-	}
-	// Handle `singular` template.
-	if (
-		str_starts_with( $slug, 'single' ) ||
-		str_starts_with( $slug, 'page' ) ||
-		'attachment' === $slug
-	) {
-		$template_hierarchy[] = 'singular';
-	}
-	$template_hierarchy[] = 'index';
-	return $template_hierarchy;
-};
+}

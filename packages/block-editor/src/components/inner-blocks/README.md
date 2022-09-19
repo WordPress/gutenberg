@@ -125,11 +125,12 @@ Template locking of `InnerBlocks` is similar to [Custom Post Type templates lock
 Template locking allows locking the `InnerBlocks` area for the current template.
 _Options:_
 
+-   `contentOnly` — prevents all operations. Additionally, the block types that don't have content are hidden from the list view and can't gain focus within the block list. Unlike the other lock types, this is not overrideable by children.
 -   `'all'` — prevents all operations. It is not possible to insert new blocks. Move existing blocks or delete them.
 -   `'insert'` — prevents inserting or removing blocks, but allows moving existing ones.
 -   `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block contains locking. ( Boolean )
 
-If locking is not set in an `InnerBlocks` area: the locking of the parent `InnerBlocks` area is used.
+If locking is not set in an `InnerBlocks` area: the locking of the parent `InnerBlocks` area is used. Note that `contentOnly` can't be overriden: it's present, the `templateLock` value of any children is ignored.
 
 If the block is a top level block: the locking of the Custom Post Type is used.
 

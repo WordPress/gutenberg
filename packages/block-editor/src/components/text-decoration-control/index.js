@@ -1,11 +1,21 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { BaseControl, Button } from '@wordpress/components';
-import { formatStrikethrough, formatUnderline } from '@wordpress/icons';
+import { reset, formatStrikethrough, formatUnderline } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 const TEXT_DECORATIONS = [
+	{
+		name: __( 'None' ),
+		value: 'none',
+		icon: reset,
+	},
 	{
 		name: __( 'Underline' ),
 		value: 'underline',
@@ -21,15 +31,25 @@ const TEXT_DECORATIONS = [
 /**
  * Control to facilitate text decoration selections.
  *
- * @param {Object}   props          Component props.
- * @param {string}   props.value    Currently selected text decoration.
- * @param {Function} props.onChange Handles change in text decoration selection.
+ * @param {Object}   props             Component props.
+ * @param {string}   props.value       Currently selected text decoration.
+ * @param {Function} props.onChange    Handles change in text decoration selection.
+ * @param {string}   [props.className] Additional class name to apply.
  *
  * @return {WPElement} Text decoration control.
  */
-export default function TextDecorationControl( { value, onChange } ) {
+export default function TextDecorationControl( {
+	value,
+	onChange,
+	className,
+} ) {
 	return (
-		<fieldset className="block-editor-text-decoration-control">
+		<fieldset
+			className={ classnames(
+				'block-editor-text-decoration-control',
+				className
+			) }
+		>
 			<BaseControl.VisualLabel as="legend">
 				{ __( 'Decoration' ) }
 			</BaseControl.VisualLabel>
@@ -39,16 +59,15 @@ export default function TextDecorationControl( { value, onChange } ) {
 						<Button
 							key={ textDecoration.value }
 							icon={ textDecoration.icon }
-							isSmall
+							label={ textDecoration.name }
 							isPressed={ textDecoration.value === value }
-							onClick={ () =>
+							onClick={ () => {
 								onChange(
 									textDecoration.value === value
 										? undefined
 										: textDecoration.value
-								)
-							}
-							aria-label={ textDecoration.name }
+								);
+							} }
 						/>
 					);
 				} ) }

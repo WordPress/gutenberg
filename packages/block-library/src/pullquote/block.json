@@ -10,8 +10,7 @@
 		"value": {
 			"type": "string",
 			"source": "html",
-			"selector": "blockquote",
-			"multiline": "p",
+			"selector": "p",
 			"__experimentalRole": "content"
 		},
 		"citation": {

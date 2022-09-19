@@ -5,10 +5,6 @@
 }
 
 /**
- * Notices & Block Selected/Hover Styles.
- */
-
-/**
  * Cross-Block Selection
  */
 
@@ -17,15 +13,14 @@
 .block-editor-block-list__layout {
 	position: relative;
 
-	// Select tool/navigation mode shows the default cursor until an additional click edits.
-	&.is-navigate-mode {
-		cursor: default;
+	// Hide selections on this element, otherwise Safari will include it stacked
+	// under your actual selection.
+	&::selection {
+		background: transparent;
 	}
 
 	// The primary indicator of selection in text is the native selection marker.
 	// When selecting multiple blocks, we provide an additional selection indicator.
-	&.is-navigate-mode .block-editor-block-list__block.is-selected,
-	&.is-navigate-mode .block-editor-block-list__block.is-hovered,
 	.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected),
 	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-highlighted ~ .is-multi-selected {
@@ -54,15 +49,17 @@
 		}
 
 		// Provide exceptions for placeholders.
-		.components-placeholder {
+		.components-placeholder,
+		.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected) {
 			::selection {
 				background: transparent;
 			}
 		}
 	}
 
-	&.is-navigate-mode .block-editor-block-list__block.is-hovered:not(.is-selected)::after {
-		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
+	// Hide the selection indicator on .block-editor-block-list__layout, else Safari will show it stacked.
+	.has-multi-selection &::selection {
+		background: transparent;
 	}
 
 	.block-editor-block-list__block.is-highlighted::after {
@@ -104,8 +101,20 @@
 			border-color: var(--wp-admin-theme-color);
 		}
 	}
-}
 
+	// Ensure an accurate partial text selection.
+	// To do this, we disable text selection on the main container, then re-enable it only on the
+	// elements that actually get selected.
+	// To keep in mind: user-select is currently inherited to all nodes inside.
+	.has-multi-selection & {
+		user-select: none;
+	}
+
+	// Re-enable it on components inside.
+	[class^="components-"] {
+		user-select: text;
+	}
+}
 
 .is-block-moving-mode.block-editor-block-list__block-selection-button {
 	// Should be invisible but not unfocusable.
@@ -115,8 +124,38 @@
 	padding: 0;
 }
 
+.is-content-locked {
+	.block-editor-block-list__block {
+		pointer-events: none;
+	}
+	.is-content-block {
+		pointer-events: initial;
+	}
+}
+
 .block-editor-block-list__layout .block-editor-block-list__block {
 	position: relative;
+
+	// Re-enable text-selection on editable blocks.
+	user-select: text;
+
+	// Hide the select style pseudo element as otherwise it gets shwon as "selected" in Safari.
+	&.is-partially-selected::after {
+		// By positioning this pseudo element outside the boundaries of the parent block,
+		// when partially selected it hides the pseudo element selection in Safari.
+		top: -0.5px;
+		right: -0.5px;
+		bottom: -0.5px;
+		left: -0.5px;
+	}
+
+	&.is-highlighted::after,
+	&.is-highlighted ~ .is-multi-selected::after {
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+	}
 
 	// Break long strings of text without spaces so they don't overflow the block.
 	overflow-wrap: break-word;
@@ -192,7 +231,9 @@
 		bottom: 0;
 		left: 0;
 		border-radius: $radius-block-ui;
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) transparent;
+		box-shadow: 0 0 0 0 transparent;
+		transition: box-shadow 0.1s linear;
+		@include reduce-motion("transition");
 	}
 
 	// Warnings
@@ -308,6 +349,14 @@
 	}
 }
 
+.is-focus-mode .block-editor-block-list__block.is-content-locked.has-child-selected,
+.is-focus-mode .block-editor-block-list__block.is-content-locked-temporarily-editing-as-blocks.has-child-selected {
+	&,
+	& .block-editor-block-list__block {
+		opacity: 1;
+	}
+}
+
 .wp-block[data-align="left"] > *,
 .wp-block[data-align="right"] > *,
 .wp-block.alignleft,
@@ -406,5 +455,25 @@
 		// any blocks that come after them. Resetting the margin to `auto`
 		// solves this.
 		margin-bottom: auto;
+	}
+}
+
+/** Zoom Out mode styles **/
+.block-editor-iframe__body {
+	transition: all 0.3s;
+	transform-origin: top center;
+
+	&.is-zoomed-out {
+		margin: 100px 0;
+		transform: scale(0.45);
+
+		// Add a bit more space between the top level blocks.
+		.wp-site-blocks > * + * {
+			margin-block-start: 2.5rem;
+		}
+
+		> .block-list-appender {
+			display: none;
+		}
 	}
 }

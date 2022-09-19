@@ -758,6 +758,18 @@ _Returns_
 
 -   `boolean`: Whether current post is scheduled to be posted.
 
+### isDeletingPost
+
+Returns true if the post is currently being deleted, or false otherwise.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `boolean`: Whether post is being deleted.
+
 ### isEditedPostAutosaveable
 
 Returns true if the post can be autosaved, or false otherwise.
