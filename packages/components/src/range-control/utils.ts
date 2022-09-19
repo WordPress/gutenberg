@@ -64,7 +64,7 @@ export function useControlledRangeValue(
 				setInternalState( floatClamp( nextValue, min, max ) );
 			}
 		},
-		[ min, max ]
+		[ min, max, setInternalState ]
 	);
 
 	// `state` can't be an empty string because we specified a fallback value of
