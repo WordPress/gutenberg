@@ -123,11 +123,16 @@ export default function useSetting( path ) {
 			const normalizedPath = removeCustomPrefixes( path );
 
 			// 1. Take settings from the block instance or its ancestors.
+			// Start from the current block and work our way up the ancestors.
 			const candidates = [
-				...select( blockEditorStore ).getBlockParents( clientId ),
-				clientId, // The current block is added last, so it overwrites any ancestor.
+				clientId,
+				...select( blockEditorStore ).getBlockParents(
+					clientId,
+					/* ascending */ true
+				),
 			];
-			candidates.forEach( ( candidateClientId ) => {
+
+			for ( const candidateClientId of candidates ) {
 				const candidateBlockName =
 					select( blockEditorStore ).getBlockName(
 						candidateClientId
@@ -151,9 +156,10 @@ export default function useSetting( path ) {
 						get( candidateAtts, `settings.${ normalizedPath }` );
 					if ( candidateResult !== undefined ) {
 						result = candidateResult;
+						break;
 					}
 				}
-			} );
+			}
 
 			// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
 			const settings = select( blockEditorStore ).getSettings();
