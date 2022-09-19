@@ -15,12 +15,6 @@
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
-		},
-		"layout": {
-			"type": "object",
-			"default": {
-				"type": "constrained"
-			}
 		}
 	},
 	"supports": {

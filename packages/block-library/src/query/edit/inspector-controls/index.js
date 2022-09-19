@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { debounce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -18,6 +13,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
+import { debounce } from '@wordpress/compose';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 
 /**

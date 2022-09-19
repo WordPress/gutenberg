@@ -288,14 +288,15 @@
 	}
 
 	&.is-small {
-		height: 24px;
+		height: $icon-size;
 		line-height: 22px;
 		padding: 0 8px;
 		font-size: 11px;
 
 		&.has-icon:not(.has-text) {
-			padding: 0 8px;
-			width: 24px;
+			padding: 0;
+			width: $icon-size;
+			min-width: $icon-size;
 		}
 	}
 
