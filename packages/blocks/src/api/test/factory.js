@@ -340,9 +340,8 @@ describe( 'block factory', () => {
 				includesFalseyDefault: 0,
 				align: 'left',
 				isDifferent: true,
-				content: '',
 				defaultContent: 'test',
-				unknownDefaultContent: '',
+				unknownDefaultContent: 1,
 				htmlContent: 'test',
 			} );
 			expect( clonedBlock.innerBlocks ).toHaveLength( 1 );
