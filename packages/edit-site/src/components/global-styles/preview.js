@@ -21,47 +21,32 @@ import { useGlobalStylesOutput } from './use-global-styles-output';
 
 const firstFrame = {
 	start: {
-		clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-		transition: { delay: 0.5 },
+		scale: 1,
+		opacity: 1,
 	},
 	hover: {
-		clipPath: [
-			'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-			'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-			'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)',
-		],
+		scale: 0,
+		opacity: 0,
 	},
 };
 
 const midFrame = {
 	hover: {
-		scaleX: [ 1, 1.3, 1.6 ],
-		// x: [ '0%', '10%', '20%' ],
-		clipPath: [
-			'polygon(0 0, 0 0, 0 100%, 0% 100%)',
-			'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-			'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)',
-		],
-		transition: { type: 'tween', duration: 1, delay: 0.2 },
+		opacity: 1,
 	},
 	start: {
-		// x: '70%',
-		clipPath: 'polygon(0 0, 0 0, 0 100%, 0% 100%)',
-		transition: { type: 'tween', duration: 1, delay: 0.2 },
+		opacity: 0.5,
 	},
 };
 
 const secondFrame = {
 	hover: {
-		clipPath: [
-			'polygon(0 0, 0 0, 0 100%, 0 100%)',
-			'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-			'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-		],
-		transition: { delay: 0.8 },
+		scale: 1,
+		opacity: 1,
 	},
 	start: {
-		clipPath: 'polygon(0 0, 0 0, 0 100%, 0 100%)',
+		scale: 0,
+		opacity: 0,
 	},
 };
 
@@ -70,7 +55,7 @@ const normalizedHeight = 152;
 
 const normalizedColorSwatchSize = 32;
 
-const StylesPreview = ( { label, isFocused } ) => {
+const StylesPreview = ( { label, isFocused, isWall } ) => {
 	const [ fontWeight ] = useStyle( 'typography.fontWeight' );
 	const [ fontFamily = 'serif' ] = useStyle( 'typography.fontFamily' );
 	const [ headingFontFamily = fontFamily ] = useStyle(
@@ -159,16 +144,19 @@ const StylesPreview = ( { label, isFocused } ) => {
 							overflow: 'hidden',
 						} }
 					>
-						<div
+						<motion.div
 							style={ {
 								fontFamily: headingFontFamily,
 								fontSize: 65 * ratio,
 								color: headingColor,
 								fontWeight: headingFontWeight,
 							} }
+							animate={ { scale: 1, opacity: 1 } }
+							initial={ { scale: 0.1, opacity: 0 } }
+							transition={ { delay: 0.3, type: 'tween' } }
 						>
 							Aa
-						</div>
+						</motion.div>
 						<VStack spacing={ 4 * ratio }>
 							{ highlightedColors.map(
 								( { slug, color }, index ) => (
@@ -190,7 +178,7 @@ const StylesPreview = ( { label, isFocused } ) => {
 										animate={ { scale: 1, opacity: 1 } }
 										initial={ { scale: 0.1, opacity: 0 } }
 										transition={ {
-											delay: index === 1 ? 0.4 : 0.3,
+											delay: index === 1 ? 0.2 : 0.1,
 										} }
 									/>
 								)
@@ -199,13 +187,15 @@ const StylesPreview = ( { label, isFocused } ) => {
 					</HStack>
 				</motion.div>
 				<motion.div
-					variants={ midFrame }
+					variants={ ! isWall && midFrame }
 					style={ {
 						height: '100%',
 						width: '100%',
 						position: 'absolute',
 						top: 0,
 						overflow: 'hidden',
+						filter: 'blur(60px)',
+						opacity: 0.1,
 					} }
 				>
 					<HStack
@@ -223,11 +213,6 @@ const StylesPreview = ( { label, isFocused } ) => {
 									key={ index }
 									style={ {
 										height: '100%',
-										width:
-											( index === 0 && 100 * ratio ) ||
-											( index === 1 && 20 * ratio ) ||
-											( index === 2 && 30 * ratio ) ||
-											60 * ratio,
 										background: color,
 										flexGrow: 1,
 									} }
@@ -263,27 +248,11 @@ const StylesPreview = ( { label, isFocused } ) => {
 									color: headingColor,
 									fontWeight: headingFontWeight,
 									lineHeight: '1em',
+									textAlign: 'center',
 								} }
 							>
 								{ label }
 							</div>
-						) }
-						{ paletteColors && (
-							<HStack spacing={ 0 }>
-								{ paletteColors
-									.slice( 0, 4 )
-									.map( ( { color }, index ) => (
-										<div
-											key={ index }
-											style={ {
-												height: 10 * ratio,
-												width: 30 * ratio,
-												background: color,
-												flexGrow: 1,
-											} }
-										/>
-									) ) }
-							</HStack>
 						) }
 					</VStack>
 				</motion.div>

@@ -41,7 +41,7 @@ function ScreenRoot() {
 				<VStack spacing={ 4 }>
 					<Card>
 						<CardMedia>
-							<StylesPreview />
+							<StylesPreview isWall />
 						</CardMedia>
 					</Card>
 					{ !! variations?.length && (
