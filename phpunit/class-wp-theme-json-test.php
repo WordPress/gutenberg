@@ -897,7 +897,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }body{background-color: #ffffff;color: #ffffff;}:where(.wp-element-butto), :where(.wp-block-button__link){color: #ffffff;}';
+		$expected = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }body{background-color: #ffffff;color: #ffffff;}:where(.wp-element-button), :where(.wp-block-button__link){color: #ffffff;}';
 		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
 	}
 
