@@ -101,7 +101,8 @@ export default function useNestedSettingsUpdate(
 		}
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
-			// This is an optimization for the initial rendering of a block list
+			// Batch updates to block list settings to avoid triggering cascading renders
+			// for each container block included in a tree and optimize initial render.
 			// To avoid triggering updateBlockListSettings for each container block
 			// causing X re-renderings for X container blocks,
 			// we batch all the updatedBlockListSettings in a single "data" batch
