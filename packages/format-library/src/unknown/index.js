@@ -31,6 +31,7 @@ export const unknown = {
 
 		return (
 			<RichTextToolbarButton
+				name="unknown"
 				icon={ help }
 				title={ title }
 				onClick={ onClick }
