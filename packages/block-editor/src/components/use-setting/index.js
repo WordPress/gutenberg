@@ -109,7 +109,7 @@ const removeCustomPrefixes = ( path ) => {
 export default function useSetting( path ) {
 	const { name: blockName, clientId } = useBlockEditContext();
 
-	const setting = useSelect(
+	return useSelect(
 		( select ) => {
 			if ( blockedPaths.includes( path ) ) {
 				// eslint-disable-next-line no-console
@@ -120,6 +120,7 @@ export default function useSetting( path ) {
 			}
 
 			let result;
+
 			const normalizedPath = removeCustomPrefixes( path );
 
 			// 1. Take settings from the block instance or its ancestors.
@@ -157,6 +158,7 @@ export default function useSetting( path ) {
 						] ) ??
 						get( attributes, [ 'settings', normalizedPath ] );
 					if ( result !== undefined ) {
+						// Stop the search for more distant ancestors and move on.
 						break;
 					}
 				}
@@ -202,6 +204,4 @@ export default function useSetting( path ) {
 		},
 		[ blockName, clientId, path ]
 	);
-
-	return setting;
 }
