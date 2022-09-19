@@ -2,11 +2,9 @@
  * WordPress dependencies
  */
 import {
-	createNewPost,
 	clickBlockAppender,
 	getEditedPostContent,
 	pressKeyTimes,
-	publishPost,
 } from '@wordpress/e2e-test-utils-playwright';
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
@@ -70,12 +68,12 @@ test.describe( 'Autocomplete', () => {
 		await requestUtils.deactivatePlugin( 'gutenberg-test-autocompleter' );
 	} );
 
-	test.beforeEach( async () => {
-		await createNewPost();
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
 	} );
 
-	test.afterEach( async () => {
-		await publishPost();
+	test.afterEach( async ( { editor } ) => {
+		await editor.publishPost();
 	} );
 
 	[
