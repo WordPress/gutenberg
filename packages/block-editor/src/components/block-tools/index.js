@@ -135,11 +135,9 @@ export default function BlockTools( {
 					) }
 				{ /* Even if the toolbar is fixed, the block popover is still
 					needed for navigation and zoom-out mode. */ }
-				{ ! isTyping && (
-					<SelectedBlockPopover
-						__unstableContentRef={ __unstableContentRef }
-					/>
-				) }
+				<SelectedBlockPopover
+					__unstableContentRef={ __unstableContentRef }
+				/>
 				{ /* Used for the inline rich text toolbar. */ }
 				{ ! isTyping && (
 					<Popover.Slot
