@@ -18,11 +18,12 @@ test.describe( 'Nonce', () => {
 		await admin.createNewPost();
 		await page.keyboard.press( 'Enter' );
 		// eslint-disable-next-line no-restricted-syntax
-		await page.waitForTimeout( 5000 );
 		await page.keyboard.type( 'test' );
-		// Click on save draft button so that this test would
-		// timeout if it's not.
+		// Saving draft should still succeed.
 		await page.click( 'role=button[name=/Save draft/i]' );
+		await expect(
+			page.locator( 'role=button[name="Dismiss this notice"i]' )
+		).toContainText( /Draft saved/i );
 		// We expect a 403 status once.
 		page.on( 'console', ( message ) => {
 			expect( message.type() ).toBe( 'error' );
