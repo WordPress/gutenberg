@@ -38,8 +38,8 @@ export function useSlider(
 		min = 0,
 		size = 'default',
 		style,
-		thumbColor = COLORS.admin.theme,
-		trackColor = COLORS.admin.theme,
+		thumbColor = COLORS.ui.theme,
+		trackColor = COLORS.ui.theme,
 		trackBackgroundColor = CONFIG.controlBackgroundDimColor,
 		value: valueProp,
 		...otherProps

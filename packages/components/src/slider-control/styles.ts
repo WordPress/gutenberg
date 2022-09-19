@@ -200,12 +200,10 @@ export const marks = css`
 `;
 
 const markFill = ( { disabled, isFilled }: MarkProps ) => {
-	let backgroundColor = isFilled
-		? COLORS.admin.theme
-		: COLORS.lightGray[ 600 ];
+	let backgroundColor = isFilled ? COLORS.ui.theme : COLORS.gray[ 300 ];
 
 	if ( disabled ) {
-		backgroundColor = COLORS.lightGray[ 800 ];
+		backgroundColor = COLORS.gray[ 400 ];
 	}
 
 	return css( { backgroundColor } );
@@ -225,14 +223,14 @@ export const mark = ( markProps: MarkProps ) => {
 
 const markLabelFill = ( { isFilled }: MarkProps ) => {
 	return css( {
-		color: isFilled ? COLORS.darkGray[ 300 ] : COLORS.lightGray[ 600 ],
+		color: isFilled ? COLORS.gray[ 700 ] : COLORS.gray[ 300 ],
 	} );
 };
 
 export const markLabel = ( markProps: MarkProps ) => {
 	return css`
 		box-sizing: border-box;
-		color: ${ COLORS.lightGray[ 600 ] };
+		color: ${ COLORS.gray[ 300 ] };
 		left: 0;
 		font-size: 11px;
 		position: absolute;

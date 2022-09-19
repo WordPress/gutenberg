@@ -24,7 +24,7 @@ export type SliderColors = {
 	/**
 	 * Allows customization of the thumb's color.
 	 *
-	 * @default COLORS.admin.theme
+	 * @default COLORS.ui.theme
 	 */
 	thumbColor?: CSSProperties[ 'color' ];
 	/**
@@ -32,7 +32,7 @@ export type SliderColors = {
 	 * is the portion of the Slider's track representing progress or the actual
 	 * value selected.
 	 *
-	 * @default COLORS.admin.theme
+	 * @default COLORS.ui.theme
 	 */
 	trackColor?: CSSProperties[ 'color' ];
 	/**
