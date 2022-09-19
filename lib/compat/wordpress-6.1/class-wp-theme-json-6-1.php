@@ -100,7 +100,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		'h4'      => 'h4',
 		'h5'      => 'h5',
 		'h6'      => 'h6',
-		'button'  => '.wp-element-button, .wp-block-button__link', // We have the .wp-block-button__link class so that this will target older buttons that have been serialized.
+		'button'  => ':where(.wp-element-button), :where(.wp-block-button__link)', // We have the .wp-block-button__link class so that this will target older buttons that have been serialized.
 		'caption' => '.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption', // The block classes are necessary to target older content that won't use the new class names.
 		'cite'    => 'cite',
 	);
