@@ -12,7 +12,7 @@ import {
 	Wrapper as BaseControlWrapper,
 } from '../base-control/styles/base-control-styles';
 import { LabelWrapper } from '../input-control/styles/input-control-styles';
-import { COLORS, CONFIG } from '../utils';
+import { baseLabelTypography, COLORS, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 
 const toolsPanelGrid = {
@@ -144,4 +144,20 @@ export const ToolsPanelItemPlaceholder = css`
 
 export const DropdownMenu = css`
 	min-width: 200px;
+`;
+
+export const DefaultControlsItem = css`
+	span:last-child {
+		color: var( --wp-admin-theme-color-darker-10 );
+		margin-left: ${ space( 3 ) };
+		${ baseLabelTypography }
+	}
+
+	&&[aria-disabled='true'] {
+		opacity: 1;
+
+		span:last-child {
+			opacity: 0.3;
+		}
+	}
 `;

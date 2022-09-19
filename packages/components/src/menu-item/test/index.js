@@ -31,6 +31,7 @@ describe( 'MenuItem', () => {
 				role="menuitemcheckbox"
 				onClick={ noop }
 				shortcut="mod+shift+alt+w"
+				suffix={ <span>Suffix</span> }
 			>
 				My item
 			</MenuItem>

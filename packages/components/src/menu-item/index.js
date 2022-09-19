@@ -26,6 +26,7 @@ export function MenuItem( props, ref ) {
 		shortcut,
 		isSelected,
 		role = 'menuitem',
+		suffix,
 		...buttonProps
 	} = props;
 
@@ -68,6 +69,7 @@ export function MenuItem( props, ref ) {
 				shortcut={ shortcut }
 			/>
 			{ icon && iconPosition === 'right' && <Icon icon={ icon } /> }
+			{ suffix }
 		</Button>
 	);
 }
