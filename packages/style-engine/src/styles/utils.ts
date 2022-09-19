@@ -34,7 +34,7 @@ export function generateRule(
 	options: StyleOptions,
 	path: string[],
 	ruleKey: string
-) {
+): GeneratedCSSRule[] {
 	const styleValue: string | undefined = get( style, path );
 
 	return styleValue
@@ -128,10 +128,23 @@ export function getCSSVarFromStyleValue( styleValue: string ): string {
 /**
  * Capitalizes the first letter in a string.
  *
- * @param {string} str The string whose first letter the function will capitalize.
+ * @param string The string whose first letter the function will capitalize.
  *
- * @return string A CSS var value.
+ * @return String with the first letter capitalized.
  */
-export function upperFirst( [ firstLetter, ...rest ]: string ) {
+export function upperFirst( string: string ): string {
+	const [ firstLetter, ...rest ] = string;
 	return firstLetter.toUpperCase() + rest.join( '' );
+}
+
+/**
+ * Converts an array of strings into a camelCase string.
+ *
+ * @param strings The strings to join into a camelCase string.
+ *
+ * @return camelCase string.
+ */
+export function camelCaseJoin( strings: string[] ): string {
+	const [ firstItem, ...rest ] = strings;
+	return firstItem.toLowerCase() + rest.map( upperFirst ).join( '' );
 }

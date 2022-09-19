@@ -46,8 +46,11 @@
 		grid-column: 2 / 2;
 		grid-row: 1 / 1;
 		justify-self: end;
-		margin-right: $grid-unit-05;
 		padding: 0;
+	}
+
+	.component-spacing-sizes-control__linked-button ~ .components-spacing-sizes-control__custom-toggle-all {
+		margin-right: $grid-unit-05;
 	}
 
 	.components-spacing-sizes-control__custom-toggle-single {

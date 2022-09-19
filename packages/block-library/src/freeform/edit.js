@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { debounce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -11,6 +6,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { debounce } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { ToolbarGroup } from '@wordpress/components';
 import { useEffect, useRef } from '@wordpress/element';

@@ -32,8 +32,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/notices": "file:../notices",
-		"classnames": "^2.3.1",
-		"lodash": "^4.17.21"
+		"classnames": "^2.3.1"
 	},
 	"peerDependencies": {
 		"react": "^17.0.0",
