@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { pressKeyTimes } from '@wordpress/e2e-test-utils-playwright';
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const userList = [
@@ -110,6 +109,7 @@ test.describe( 'Autocomplete', () => {
 		test( `should insert ${ type } between two other words`, async ( {
 			page,
 			editor,
+			pageUtils,
 		} ) => {
 			const testData = {};
 			if ( type === 'mention' ) {
@@ -128,7 +128,7 @@ test.describe( 'Autocomplete', () => {
 
 			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( 'Stuck in the middle with you.' );
-			await pressKeyTimes( 'ArrowLeft', 'you.'.length );
+			await pageUtils.pressKeyTimes( 'ArrowLeft', 'you.'.length );
 			await page.keyboard.type( testData.triggerString );
 			await page.waitForXPath(
 				`//button[@role="option"]${ testData.optionPath }`
@@ -215,6 +215,7 @@ test.describe( 'Autocomplete', () => {
 		test( `should allow ${ type } selection via keypress event`, async ( {
 			page,
 			editor,
+			pageUtils,
 		} ) => {
 			const testData = {};
 			// Jean-Luc is the target because user mentions will be listed alphabetically by first + last name
@@ -239,7 +240,7 @@ test.describe( 'Autocomplete', () => {
 			await page.waitForXPath(
 				`//button[@role="option"]${ testData.optionPath }`
 			);
-			await pressKeyTimes( 'ArrowDown', 6 );
+			await pageUtils.pressKeyTimes( 'ArrowDown', 6 );
 			await page.keyboard.press( 'Enter' );
 
 			expect( await editor.getEditedPostContent() ).toBe(
