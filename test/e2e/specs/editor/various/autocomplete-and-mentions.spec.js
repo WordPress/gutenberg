@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	clickBlockAppender,
 	getEditedPostContent,
 	pressKeyTimes,
 } from '@wordpress/e2e-test-utils-playwright';
@@ -102,7 +101,7 @@ test.describe( 'Autocomplete', () => {
 					`;
 			}
 
-			await clickBlockAppender();
+			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.triggerString );
 			await page.waitForXPath(
 				`//button[@role="option"]${ testData.optionPath }`
@@ -137,7 +136,7 @@ test.describe( 'Autocomplete', () => {
 					`;
 			}
 
-			await clickBlockAppender();
+			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( 'Stuck in the middle with you.' );
 			await pressKeyTimes( 'ArrowLeft', 'you.'.length );
 			await page.keyboard.type( testData.triggerString );
@@ -178,7 +177,7 @@ test.describe( 'Autocomplete', () => {
 					`;
 			}
 
-			await clickBlockAppender();
+			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.firstTriggerString );
 			await page.waitForXPath(
 				`//button[@role="option"]${ testData.firstOptionPath }`
@@ -218,7 +217,7 @@ test.describe( 'Autocomplete', () => {
 					`;
 			}
 
-			await clickBlockAppender();
+			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.triggerString );
 			const targetOption = await page.waitForXPath(
 				`//button[@role="option"]${ testData.optionPath }`
@@ -255,7 +254,7 @@ test.describe( 'Autocomplete', () => {
 					`;
 			}
 
-			await clickBlockAppender();
+			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.triggerString );
 			await page.waitForXPath(
 				`//button[@role="option"]${ testData.optionPath }`
@@ -293,7 +292,7 @@ test.describe( 'Autocomplete', () => {
 				`;
 			}
 
-			await clickBlockAppender();
+			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.triggerString );
 			await page.waitForXPath(
 				`//button[@role="option"]${ testData.optionPath }`
@@ -311,7 +310,7 @@ test.describe( 'Autocomplete', () => {
 			test( `should not insert disabled ${ type }s`, async ( {
 				page,
 			} ) => {
-				await clickBlockAppender();
+				await page.click( 'role=button[name="Add default block"i]' );
 				// The 'Grapes' option is disabled in our test plugin, so it should not insert the grapes emoji
 				await page.keyboard.type( 'Sorry, we are all out of ~g' );
 				await page.waitForXPath(
@@ -381,7 +380,7 @@ test.describe( 'Autocomplete', () => {
 					`;
 			}
 
-			await clickBlockAppender();
+			await page.click( 'role=button[name="Add default block"i]' );
 
 			for ( let i = 0; i < 4; i++ ) {
 				await page.keyboard.type( testData.triggerString );
@@ -406,7 +405,7 @@ test.describe( 'Autocomplete', () => {
 	test.skip( 'should insert elements from multiple completers in a single block', async ( {
 		page,
 	} ) => {
-		await clickBlockAppender();
+		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '@fr' );
 		await page.waitForXPath(
 			'//button[@role="option"]//*[contains(text(),"Frodo Baggins")]'
