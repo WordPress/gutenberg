@@ -92,7 +92,14 @@ function get_block_core_post_featured_image_overlay_element_markup( $attributes 
 		return '';
 	}
 
+	$styles            = '';
+	$border_attributes = get_block_core_post_featured_image_border_attributes( $attributes );
+
 	// Generate required classes for the element.
+	if ( ! empty( $border_attributes['class'] ) ) {
+		$class_names[] = $border_attributes['class'];
+	}
+
 	if ( $has_dim_background ) {
 		$class_names[] = 'has-background-dim';
 		$class_names[] = "has-background-dim-{$attributes['dimRatio']}";
@@ -111,12 +118,8 @@ function get_block_core_post_featured_image_overlay_element_markup( $attributes 
 	}
 
 	// Generate required CSS properties and their values.
-	if ( ! empty( $attributes['style']['border']['radius'] ) ) {
-		$styles_properties['border-radius'] = $attributes['style']['border']['radius'];
-	}
-
-	if ( ! empty( $attributes['style']['border']['width'] ) ) {
-		$styles_properties['border-width'] = $attributes['style']['border']['width'];
+	if ( ! empty( $border_attributes['style'] ) ) {
+		$styles = "{$border_attributes['style']} ";
 	}
 
 	if ( $has_custom_gradient ) {
@@ -126,8 +129,6 @@ function get_block_core_post_featured_image_overlay_element_markup( $attributes 
 	if ( $has_custom_overlay ) {
 		$styles_properties['background-color'] = $attributes['customOverlayColor'];
 	}
-
-	$styles = '';
 
 	foreach ( $styles_properties as $style_attribute => $style_attribute_value ) {
 		$styles .= "{$style_attribute}: $style_attribute_value; ";
