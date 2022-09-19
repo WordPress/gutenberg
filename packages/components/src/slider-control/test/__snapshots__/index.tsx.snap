@@ -33,14 +33,11 @@ exports[`SliderControl should render correctly 1`] = `
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   position: relative;
-}
-
-.emotion-4>*+*:not( marquee ) {
-  margin-top: calc(4px * 2);
 }
 
 .emotion-4>* {
@@ -77,22 +74,22 @@ exports[`SliderControl should render correctly 1`] = `
 .emotion-6::-webkit-slider-runnable-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) var( --slider--progress ),
-  			#f3f4f5 var( --slider--progress )
+  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
+  			#f0f0f0 var( --slider--progress )
   		);
   border-radius: 2px;
   height: 2px;
 }
 
 *:disabled.emotion-6::-webkit-slider-runnable-track {
-  background: #f3f4f5;
+  background: #f0f0f0;
 }
 
 .emotion-6::-moz-range-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) var( --slider--progress ),
-  			#f3f4f5 var( --slider--progress )
+  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
+  			#f0f0f0 var( --slider--progress )
   		);
   border-radius: 2px;
   height: 2px;
@@ -100,7 +97,7 @@ exports[`SliderControl should render correctly 1`] = `
 }
 
 *:disabled.emotion-6::-moz-range-track {
-  background: #f3f4f5;
+  background: #f0f0f0;
 }
 
 .emotion-6::-webkit-slider-thumb {
@@ -108,7 +105,7 @@ exports[`SliderControl should render correctly 1`] = `
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  background-color: var( --wp-admin-theme-color, #00669b);
+  background-color: var( --wp-admin-theme-color, #007cba);
   border-radius: 50%;
   border: 1px solid transparent;
   box-shadow: none;
@@ -128,8 +125,8 @@ exports[`SliderControl should render correctly 1`] = `
 }
 
 *:disabled.emotion-6::-webkit-slider-thumb {
-  background: #8d96a0;
-  border-color: #8d96a0;
+  background: #949494;
+  border-color: #949494;
 }
 
 .emotion-6::-moz-range-thumb {
@@ -137,7 +134,7 @@ exports[`SliderControl should render correctly 1`] = `
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  background-color: var( --wp-admin-theme-color, #00669b);
+  background-color: var( --wp-admin-theme-color, #007cba);
   border-radius: 50%;
   border: 1px solid transparent;
   box-shadow: none;
@@ -158,16 +155,16 @@ exports[`SliderControl should render correctly 1`] = `
 }
 
 *:disabled.emotion-6::-moz-range-thumb {
-  background: #8d96a0;
-  border-color: #8d96a0;
+  background: #949494;
+  border-color: #949494;
 }
 
 .emotion-6:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
 }
 
 .emotion-6:focus::-moz-range-thumb {
-  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
 }
 
 .emotion-7 {
@@ -247,14 +244,11 @@ exports[`SliderControl should render max 1`] = `
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   position: relative;
-}
-
-.emotion-4>*+*:not( marquee ) {
-  margin-top: calc(4px * 2);
 }
 
 .emotion-4>* {
@@ -291,22 +285,22 @@ exports[`SliderControl should render max 1`] = `
 .emotion-6::-webkit-slider-runnable-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) var( --slider--progress ),
-  			#f3f4f5 var( --slider--progress )
+  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
+  			#f0f0f0 var( --slider--progress )
   		);
   border-radius: 2px;
   height: 2px;
 }
 
 *:disabled.emotion-6::-webkit-slider-runnable-track {
-  background: #f3f4f5;
+  background: #f0f0f0;
 }
 
 .emotion-6::-moz-range-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) var( --slider--progress ),
-  			#f3f4f5 var( --slider--progress )
+  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
+  			#f0f0f0 var( --slider--progress )
   		);
   border-radius: 2px;
   height: 2px;
@@ -314,7 +308,7 @@ exports[`SliderControl should render max 1`] = `
 }
 
 *:disabled.emotion-6::-moz-range-track {
-  background: #f3f4f5;
+  background: #f0f0f0;
 }
 
 .emotion-6::-webkit-slider-thumb {
@@ -322,7 +316,7 @@ exports[`SliderControl should render max 1`] = `
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  background-color: var( --wp-admin-theme-color, #00669b);
+  background-color: var( --wp-admin-theme-color, #007cba);
   border-radius: 50%;
   border: 1px solid transparent;
   box-shadow: none;
@@ -342,8 +336,8 @@ exports[`SliderControl should render max 1`] = `
 }
 
 *:disabled.emotion-6::-webkit-slider-thumb {
-  background: #8d96a0;
-  border-color: #8d96a0;
+  background: #949494;
+  border-color: #949494;
 }
 
 .emotion-6::-moz-range-thumb {
@@ -351,7 +345,7 @@ exports[`SliderControl should render max 1`] = `
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  background-color: var( --wp-admin-theme-color, #00669b);
+  background-color: var( --wp-admin-theme-color, #007cba);
   border-radius: 50%;
   border: 1px solid transparent;
   box-shadow: none;
@@ -372,16 +366,16 @@ exports[`SliderControl should render max 1`] = `
 }
 
 *:disabled.emotion-6::-moz-range-thumb {
-  background: #8d96a0;
-  border-color: #8d96a0;
+  background: #949494;
+  border-color: #949494;
 }
 
 .emotion-6:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
 }
 
 .emotion-6:focus::-moz-range-thumb {
-  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
 }
 
 .emotion-7 {
@@ -461,14 +455,11 @@ exports[`SliderControl should render min 1`] = `
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   position: relative;
-}
-
-.emotion-4>*+*:not( marquee ) {
-  margin-top: calc(4px * 2);
 }
 
 .emotion-4>* {
@@ -505,22 +496,22 @@ exports[`SliderControl should render min 1`] = `
 .emotion-6::-webkit-slider-runnable-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) var( --slider--progress ),
-  			#f3f4f5 var( --slider--progress )
+  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
+  			#f0f0f0 var( --slider--progress )
   		);
   border-radius: 2px;
   height: 2px;
 }
 
 *:disabled.emotion-6::-webkit-slider-runnable-track {
-  background: #f3f4f5;
+  background: #f0f0f0;
 }
 
 .emotion-6::-moz-range-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) var( --slider--progress ),
-  			#f3f4f5 var( --slider--progress )
+  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
+  			#f0f0f0 var( --slider--progress )
   		);
   border-radius: 2px;
   height: 2px;
@@ -528,7 +519,7 @@ exports[`SliderControl should render min 1`] = `
 }
 
 *:disabled.emotion-6::-moz-range-track {
-  background: #f3f4f5;
+  background: #f0f0f0;
 }
 
 .emotion-6::-webkit-slider-thumb {
@@ -536,7 +527,7 @@ exports[`SliderControl should render min 1`] = `
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  background-color: var( --wp-admin-theme-color, #00669b);
+  background-color: var( --wp-admin-theme-color, #007cba);
   border-radius: 50%;
   border: 1px solid transparent;
   box-shadow: none;
@@ -556,8 +547,8 @@ exports[`SliderControl should render min 1`] = `
 }
 
 *:disabled.emotion-6::-webkit-slider-thumb {
-  background: #8d96a0;
-  border-color: #8d96a0;
+  background: #949494;
+  border-color: #949494;
 }
 
 .emotion-6::-moz-range-thumb {
@@ -565,7 +556,7 @@ exports[`SliderControl should render min 1`] = `
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  background-color: var( --wp-admin-theme-color, #00669b);
+  background-color: var( --wp-admin-theme-color, #007cba);
   border-radius: 50%;
   border: 1px solid transparent;
   box-shadow: none;
@@ -586,16 +577,16 @@ exports[`SliderControl should render min 1`] = `
 }
 
 *:disabled.emotion-6::-moz-range-thumb {
-  background: #8d96a0;
-  border-color: #8d96a0;
+  background: #949494;
+  border-color: #949494;
 }
 
 .emotion-6:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
 }
 
 .emotion-6:focus::-moz-range-thumb {
-  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
 }
 
 .emotion-7 {
@@ -675,14 +666,11 @@ exports[`SliderControl should render size 1`] = `
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   position: relative;
-}
-
-.emotion-4>*+*:not( marquee ) {
-  margin-top: calc(4px * 2);
 }
 
 .emotion-4>* {
@@ -719,22 +707,22 @@ exports[`SliderControl should render size 1`] = `
 .emotion-6::-webkit-slider-runnable-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) var( --slider--progress ),
-  			#f3f4f5 var( --slider--progress )
+  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
+  			#f0f0f0 var( --slider--progress )
   		);
   border-radius: 2px;
   height: 2px;
 }
 
 *:disabled.emotion-6::-webkit-slider-runnable-track {
-  background: #f3f4f5;
+  background: #f0f0f0;
 }
 
 .emotion-6::-moz-range-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) var( --slider--progress ),
-  			#f3f4f5 var( --slider--progress )
+  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
+  			#f0f0f0 var( --slider--progress )
   		);
   border-radius: 2px;
   height: 2px;
@@ -742,7 +730,7 @@ exports[`SliderControl should render size 1`] = `
 }
 
 *:disabled.emotion-6::-moz-range-track {
-  background: #f3f4f5;
+  background: #f0f0f0;
 }
 
 .emotion-6::-webkit-slider-thumb {
@@ -750,7 +738,7 @@ exports[`SliderControl should render size 1`] = `
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  background-color: var( --wp-admin-theme-color, #00669b);
+  background-color: var( --wp-admin-theme-color, #007cba);
   border-radius: 50%;
   border: 1px solid transparent;
   box-shadow: none;
@@ -770,8 +758,8 @@ exports[`SliderControl should render size 1`] = `
 }
 
 *:disabled.emotion-6::-webkit-slider-thumb {
-  background: #8d96a0;
-  border-color: #8d96a0;
+  background: #949494;
+  border-color: #949494;
 }
 
 .emotion-6::-moz-range-thumb {
@@ -779,7 +767,7 @@ exports[`SliderControl should render size 1`] = `
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  background-color: var( --wp-admin-theme-color, #00669b);
+  background-color: var( --wp-admin-theme-color, #007cba);
   border-radius: 50%;
   border: 1px solid transparent;
   box-shadow: none;
@@ -800,16 +788,16 @@ exports[`SliderControl should render size 1`] = `
 }
 
 *:disabled.emotion-6::-moz-range-thumb {
-  background: #8d96a0;
-  border-color: #8d96a0;
+  background: #949494;
+  border-color: #949494;
 }
 
 .emotion-6:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
 }
 
 .emotion-6:focus::-moz-range-thumb {
-  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
 }
 
 .emotion-7 {
@@ -889,14 +877,11 @@ exports[`SliderControl should render value 1`] = `
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   position: relative;
-}
-
-.emotion-4>*+*:not( marquee ) {
-  margin-top: calc(4px * 2);
 }
 
 .emotion-4>* {
@@ -933,22 +918,22 @@ exports[`SliderControl should render value 1`] = `
 .emotion-6::-webkit-slider-runnable-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) var( --slider--progress ),
-  			#f3f4f5 var( --slider--progress )
+  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
+  			#f0f0f0 var( --slider--progress )
   		);
   border-radius: 2px;
   height: 2px;
 }
 
 *:disabled.emotion-6::-webkit-slider-runnable-track {
-  background: #f3f4f5;
+  background: #f0f0f0;
 }
 
 .emotion-6::-moz-range-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) var( --slider--progress ),
-  			#f3f4f5 var( --slider--progress )
+  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
+  			#f0f0f0 var( --slider--progress )
   		);
   border-radius: 2px;
   height: 2px;
@@ -956,7 +941,7 @@ exports[`SliderControl should render value 1`] = `
 }
 
 *:disabled.emotion-6::-moz-range-track {
-  background: #f3f4f5;
+  background: #f0f0f0;
 }
 
 .emotion-6::-webkit-slider-thumb {
@@ -964,7 +949,7 @@ exports[`SliderControl should render value 1`] = `
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  background-color: var( --wp-admin-theme-color, #00669b);
+  background-color: var( --wp-admin-theme-color, #007cba);
   border-radius: 50%;
   border: 1px solid transparent;
   box-shadow: none;
@@ -984,8 +969,8 @@ exports[`SliderControl should render value 1`] = `
 }
 
 *:disabled.emotion-6::-webkit-slider-thumb {
-  background: #8d96a0;
-  border-color: #8d96a0;
+  background: #949494;
+  border-color: #949494;
 }
 
 .emotion-6::-moz-range-thumb {
@@ -993,7 +978,7 @@ exports[`SliderControl should render value 1`] = `
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  background-color: var( --wp-admin-theme-color, #00669b);
+  background-color: var( --wp-admin-theme-color, #007cba);
   border-radius: 50%;
   border: 1px solid transparent;
   box-shadow: none;
@@ -1014,16 +999,16 @@ exports[`SliderControl should render value 1`] = `
 }
 
 *:disabled.emotion-6::-moz-range-thumb {
-  background: #8d96a0;
-  border-color: #8d96a0;
+  background: #949494;
+  border-color: #949494;
 }
 
 .emotion-6:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
 }
 
 .emotion-6:focus::-moz-range-thumb {
-  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
 }
 
 .emotion-7 {
