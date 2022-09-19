@@ -182,7 +182,7 @@ function get_block_core_post_featured_image_border_attributes( $attributes ) {
 		);
 	}
 
-	$styles     = gutenberg_style_engine_get_styles( array( 'border' => $border_styles ) );
+	$styles     = wp_style_engine_get_styles( array( 'border' => $border_styles ) );
 	$attributes = array();
 	if ( ! empty( $styles['classnames'] ) ) {
 		$attributes['class'] = $styles['classnames'];
