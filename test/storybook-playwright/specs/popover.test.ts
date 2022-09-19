@@ -9,8 +9,12 @@ import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 import { gotoStoryId } from '../utils';
 
 test.describe( 'Popover', () => {
+	// This isn't a meaningful test, just some example code.
+	// We can remove it once we have real tests.
 	test( 'should render', async ( { page } ) => {
-		await gotoStoryId( page, 'components-popover--default' );
+		await gotoStoryId( page, 'components-popover--default', {
+			decorators: { marginChecker: 'show' },
+		} );
 
 		await page.click( 'role=button' );
 		const popover = await page.waitForSelector( '.components-popover' );
