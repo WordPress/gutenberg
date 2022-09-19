@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	getEditedPostContent,
-	pressKeyTimes,
-} from '@wordpress/e2e-test-utils-playwright';
+import { pressKeyTimes } from '@wordpress/e2e-test-utils-playwright';
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const userList = [
@@ -80,25 +77,21 @@ test.describe( 'Autocomplete', () => {
 		[ 'Custom Completer', 'option' ],
 	].forEach( ( completerAndOptionType ) => {
 		const [ , type ] = completerAndOptionType;
-		test( `should insert ${ type }`, async ( { page } ) => {
+		test( `should insert ${ type }`, async ( { page, editor } ) => {
 			// Set up test data for each case
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = 'I am @da';
-				testData.optionPath = '//*[contains(text(),"Darth Vader")]';
-				testData.snapshot = `
-					"<!-- wp:paragraph -->
-					<p>I am @yourfather.</p>
-					<!-- /wp:paragraph -->"
-					`;
+				testData.optionPath = 'Darth Vader';
+				testData.snapshot = `<!-- wp:paragraph -->
+<p>I am @yourfather.</p>
+<!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = 'I like ~s';
-				testData.optionPath = '[text()="🍓 Strawberry"]';
-				testData.snapshot = `
-					"<!-- wp:paragraph -->
-					<p>I like 🍓.</p>
-					<!-- /wp:paragraph -->"
-					`;
+				testData.optionPath = 'Strawberry';
+				testData.snapshot = `<!-- wp:paragraph -->
+<p>I like 🍓.</p>
+<!-- /wp:paragraph -->`;
 			}
 
 			await page.click( 'role=button[name="Add default block"i]' );
@@ -109,31 +102,28 @@ test.describe( 'Autocomplete', () => {
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );
 
-			expect( await getEditedPostContent() ).toMatchInlineSnapshot(
+			expect( await editor.getEditedPostContent() ).toBe(
 				testData.snapshot
 			);
 		} );
 
 		test( `should insert ${ type } between two other words`, async ( {
 			page,
+			editor,
 		} ) => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = '@j';
-				testData.optionPath = '//*[contains(text(),"Jane Doe")]';
-				testData.snapshot = `
-					"<!-- wp:paragraph -->
-					<p>Stuck in the middle with @testuser you.</p>
-					<!-- /wp:paragraph -->"
-					`;
+				testData.optionPath = 'Jane Doe';
+				testData.snapshot = `<!-- wp:paragraph -->
+<p>Stuck in the middle with @testuser you.</p>
+<!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = 'a ~m';
 				testData.optionPath = '[text()="🥭 Mango"]';
-				testData.snapshot = `
-					"<!-- wp:paragraph -->
-					<p>Stuck in the middle with a 🥭 you.</p>
-					<!-- /wp:paragraph -->"
-					`;
+				testData.snapshot = `<!-- wp:paragraph -->
+<p>Stuck in the middle with a 🥭 you.</p>
+<!-- /wp:paragraph -->`;
 			}
 
 			await page.click( 'role=button[name="Add default block"i]' );
@@ -145,36 +135,33 @@ test.describe( 'Autocomplete', () => {
 			);
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( ' ' );
-			expect( await getEditedPostContent() ).toMatchInlineSnapshot(
+			expect( await editor.getEditedPostContent() ).toBe(
 				testData.snapshot
 			);
 		} );
 
-		test( `should insert two subsequent ${ type }s`, async ( { page } ) => {
+		test( `should insert two subsequent ${ type }s`, async ( {
+			page,
+			editor,
+		} ) => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.firstTriggerString =
 					'The two greatest hobbits, in order: @bi';
 				testData.secondTriggerString = ' @fr';
-				testData.firstOptionPath =
-					'//*[contains(text(),"Bilbo Baggins")]';
-				testData.secondOptionPath =
-					'//*[contains(text(),"Frodo Baggins")]';
-				testData.snapshot = `
-					"<!-- wp:paragraph -->
-					<p>The two greatest hobbits, in order: @thebetterhobbit @ringbearer.</p>
-					<!-- /wp:paragraph -->"
-					`;
+				testData.firstOptionPath = 'Bilbo Baggins';
+				testData.secondOptionPath = 'Frodo Baggins';
+				testData.snapshot = `<!-- wp:paragraph -->
+<p>The two greatest hobbits, in order: @thebetterhobbit @ringbearer.</p>
+<!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.firstTriggerString = 'An awesome combination: ~m';
 				testData.secondTriggerString = ' ~b';
 				testData.firstOptionPath = '[text()="🥭 Mango"]';
 				testData.secondOptionPath = '[text()="🫐 Blueberry"]';
-				testData.snapshot = `
-					"<!-- wp:paragraph -->
-					<p>An awesome combination: 🥭 🫐.</p>
-					<!-- /wp:paragraph -->"
-					`;
+				testData.snapshot = `<!-- wp:paragraph -->
+<p>An awesome combination: 🥭 🫐.</p>
+<!-- /wp:paragraph -->`;
 			}
 
 			await page.click( 'role=button[name="Add default block"i]' );
@@ -189,32 +176,28 @@ test.describe( 'Autocomplete', () => {
 			);
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );
-			expect( await getEditedPostContent() ).toMatchInlineSnapshot(
+			expect( await editor.getEditedPostContent() ).toBe(
 				testData.snapshot
 			);
 		} );
 
 		test( `should allow ${ type } selection via click event`, async ( {
 			page,
+			editor,
 		} ) => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = '@';
-				testData.optionPath =
-					'//*[contains(text(),"Katniss Everdeen")]';
-				testData.snapshot = `
-					"<!-- wp:paragraph -->
-					<p>@mockingjay</p>
-					<!-- /wp:paragraph -->"
-					`;
+				testData.optionPath = 'Katniss Everdeen';
+				testData.snapshot = `<!-- wp:paragraph -->
+<p>@mockingjay</p>
+<!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = '~';
 				testData.optionPath = '[text()="🍓 Strawberry"]';
-				testData.snapshot = `
-					"<!-- wp:paragraph -->
-					<p>🍓</p>
-					<!-- /wp:paragraph -->"
-					`;
+				testData.snapshot = `<!-- wp:paragraph -->
+<p>🍓</p>
+<!-- /wp:paragraph -->`;
 			}
 
 			await page.click( 'role=button[name="Add default block"i]' );
@@ -224,13 +207,14 @@ test.describe( 'Autocomplete', () => {
 			);
 			await targetOption.click();
 
-			expect( await getEditedPostContent() ).toMatchInlineSnapshot(
+			expect( await editor.getEditedPostContent() ).toBe(
 				testData.snapshot
 			);
 		} );
 
 		test( `should allow ${ type } selection via keypress event`, async ( {
 			page,
+			editor,
 		} ) => {
 			const testData = {};
 			// Jean-Luc is the target because user mentions will be listed alphabetically by first + last name
@@ -238,20 +222,16 @@ test.describe( 'Autocomplete', () => {
 			// 🍒 is the target because options are listed in the order they appear in the custom completer
 			if ( type === 'mention' ) {
 				testData.triggerString = '@';
-				testData.optionPath = '//*[contains(text(),"Jean-Luc Picard")]';
-				testData.snapshot = `
-					"<!-- wp:paragraph -->
-					<p>@makeitso</p>
-					<!-- /wp:paragraph -->"
-					`;
+				testData.optionPath = 'Jean-Luc Picard';
+				testData.snapshot = `<!-- wp:paragraph -->
+<p>@makeitso</p>
+<!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = '~';
 				testData.optionPath = '[text()="🍒 Cherry"]';
-				testData.snapshot = `
-					"<!-- wp:paragraph -->
-					<p>🍒</p>
-					<!-- /wp:paragraph -->"
-					`;
+				testData.snapshot = `<!-- wp:paragraph -->
+<p>🍒</p>
+<!-- /wp:paragraph -->`;
 			}
 
 			await page.click( 'role=button[name="Add default block"i]' );
@@ -262,34 +242,31 @@ test.describe( 'Autocomplete', () => {
 			await pressKeyTimes( 'ArrowDown', 6 );
 			await page.keyboard.press( 'Enter' );
 
-			expect( await getEditedPostContent() ).toMatchInlineSnapshot(
+			expect( await editor.getEditedPostContent() ).toBe(
 				testData.snapshot
 			);
 		} );
 
 		test( `should cancel ${ type } selection via \`Escape\` keypress event`, async ( {
 			page,
+			editor,
 		} ) => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = 'My name is @j';
-				testData.optionPath = '//*[contains(text(),"Jane Doe")]';
+				testData.optionPath = 'Jane Doe';
 				testData.postCompleterInput = ' ...a secret.';
-				testData.snapshot = `
-					"<!-- wp:paragraph -->
-					<p>My name is @j ...a secret.</p>
-					<!-- /wp:paragraph -->"
-					`;
+				testData.snapshot = `<!-- wp:paragraph -->
+<p>My name is @j ...a secret.</p>
+<!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = 'My favorite fruit is ~a';
 				testData.optionPath = '[text()="🍎 Apple"]';
 				testData.postCompleterInput =
-					" ...no I changed my mind. It's mango.";
-				testData.snapshot = `
-				"<!-- wp:paragraph -->
-				<p>My favorite fruit is ~a ...no I changed my mind. It's mango.</p>
-				<!-- /wp:paragraph -->"
-				`;
+					"...no I changed my mind. It's mango.";
+				testData.snapshot = `<!-- wp:paragraph -->
+<p>My favorite fruit is ~a ...no I changed my mind. It's mango.</p>
+<!-- /wp:paragraph -->`;
 			}
 
 			await page.click( 'role=button[name="Add default block"i]' );
@@ -300,7 +277,7 @@ test.describe( 'Autocomplete', () => {
 			await page.keyboard.press( 'Escape' );
 			await page.keyboard.type( testData.postCompleterInput );
 			// The characters before `Escape` should remain (i.e. `~app`)
-			expect( await getEditedPostContent() ).toMatchInlineSnapshot(
+			expect( await editor.getEditedPostContent() ).toBe(
 				testData.snapshot
 			);
 		} );
@@ -309,6 +286,7 @@ test.describe( 'Autocomplete', () => {
 		if ( type !== 'mention' ) {
 			test( `should not insert disabled ${ type }s`, async ( {
 				page,
+				editor,
 			} ) => {
 				await page.click( 'role=button[name="Add default block"i]' );
 				// The 'Grapes' option is disabled in our test plugin, so it should not insert the grapes emoji
@@ -318,7 +296,7 @@ test.describe( 'Autocomplete', () => {
 				);
 				await page.keyboard.press( 'Enter' );
 				await page.keyboard.type( ' grapes.' );
-				expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+				expect( await editor.getEditedPostContent() ).toBe( `
 					"<!-- wp:paragraph -->
 					<p>Sorry, we are all out of ~g grapes.</p>
 					<!-- /wp:paragraph -->"
@@ -328,56 +306,53 @@ test.describe( 'Autocomplete', () => {
 
 		test( `should allow newlines after multiple ${ type } completions`, async ( {
 			page,
+			editor,
 		} ) => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = '@bu';
-				testData.optionPath = '//*[contains(text(),"Buddy Elf")]';
-				testData.snapshot = `
-					"<!-- wp:paragraph -->
-					<p>@buddytheelf test</p>
-					<!-- /wp:paragraph -->
+				testData.optionPath = 'Buddy Elf';
+				testData.snapshot = `<!-- wp:paragraph -->
+<p>@buddytheelf test</p>
+<!-- /wp:paragraph -->
 
-					<!-- wp:paragraph -->
-					<p>@buddytheelf test</p>
-					<!-- /wp:paragraph -->
+<!-- wp:paragraph -->
+<p>@buddytheelf test</p>
+<!-- /wp:paragraph -->
 
-					<!-- wp:paragraph -->
-					<p>@buddytheelf test</p>
-					<!-- /wp:paragraph -->
+<!-- wp:paragraph -->
+<p>@buddytheelf test</p>
+<!-- /wp:paragraph -->
 
-					<!-- wp:paragraph -->
-					<p>@buddytheelf test</p>
-					<!-- /wp:paragraph -->
+<!-- wp:paragraph -->
+<p>@buddytheelf test</p>
+<!-- /wp:paragraph -->
 
-					<!-- wp:paragraph -->
-					<p></p>
-					<!-- /wp:paragraph -->"
-					`;
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = '~b';
-				testData.optionPath = '[text()="🫐 Blueberry"]';
-				testData.snapshot = `
-					"<!-- wp:paragraph -->
-					<p>🫐 test</p>
-					<!-- /wp:paragraph -->
+				testData.optionPath = '🫐 Blueberry';
+				testData.snapshot = `<!-- wp:paragraph -->
+<p>🫐 test</p>
+<!-- /wp:paragraph -->
 
-					<!-- wp:paragraph -->
-					<p>🫐 test</p>
-					<!-- /wp:paragraph -->
+<!-- wp:paragraph -->
+<p>🫐 test</p>
+<!-- /wp:paragraph -->
 
-					<!-- wp:paragraph -->
-					<p>🫐 test</p>
-					<!-- /wp:paragraph -->
+<!-- wp:paragraph -->
+<p>🫐 test</p>
+<!-- /wp:paragraph -->
 
-					<!-- wp:paragraph -->
-					<p>🫐 test</p>
-					<!-- /wp:paragraph -->
+<!-- wp:paragraph -->
+<p>🫐 test</p>
+<!-- /wp:paragraph -->
 
-					<!-- wp:paragraph -->
-					<p></p>
-					<!-- /wp:paragraph -->"
-					`;
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->`;
 			}
 
 			await page.click( 'role=button[name="Add default block"i]' );
@@ -392,7 +367,7 @@ test.describe( 'Autocomplete', () => {
 				await page.keyboard.press( 'Enter' );
 			}
 
-			expect( await getEditedPostContent() ).toMatchInlineSnapshot(
+			expect( await editor.getEditedPostContent() ).toBe(
 				testData.snapshot
 			);
 		} );
@@ -404,6 +379,7 @@ test.describe( 'Autocomplete', () => {
 	// eslint-disable-next-line jest/no-disabled-tests
 	test.skip( 'should insert elements from multiple completers in a single block', async ( {
 		page,
+		editor,
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '@fr' );
@@ -416,7 +392,7 @@ test.describe( 'Autocomplete', () => {
 			'//button[@role="option"]//*[contains(text(),"Bilbo Baggins")]'
 		);
 		await page.keyboard.press( 'Enter' );
-		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		expect( await editor.getEditedPostContent() ).toBe( `
 		"<!-- wp:paragraph -->
 		<p>@ringbearer +thebetterhobbit</p>
 		<!-- /wp:paragraph -->"
