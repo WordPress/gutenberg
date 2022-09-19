@@ -139,7 +139,6 @@ export default function BlockTools( {
 					__unstableContentRef={ __unstableContentRef }
 				/>
 				{ /* Used for the inline rich text toolbar. */ }
-
 				<Popover.Slot name="block-toolbar" ref={ blockToolbarRef } />
 				{ children }
 				{ /* Used for inline rich text popovers. */ }
