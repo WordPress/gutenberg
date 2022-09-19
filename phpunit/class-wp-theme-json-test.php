@@ -797,14 +797,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 	function test_get_element_class_name_button() {
 		$expected = 'wp-element-button';
-		$actual   = wp_theme_element_class_name( 'button' );
+		$actual   = wp_theme_get_element_class_name( 'button' );
 
 		$this->assertEquals( $expected, $actual );
 	}
 
 	function test_get_element_class_name_invalid() {
 		$expected = '';
-		$actual   = wp_theme_element_class_name( 'unknown-element' );
+		$actual   = wp_theme_get_element_class_name( 'unknown-element' );
 
 		$this->assertEquals( $expected, $actual );
 	}
