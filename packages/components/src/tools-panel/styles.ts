@@ -147,7 +147,7 @@ export const DropdownMenu = css`
 `;
 
 export const DefaultControlsItem = css`
-	color: ${ COLORS.gray[ 700 ] };
+	color: ${ COLORS.gray[ 900 ] };
 
 	span:last-child {
 		color: var( --wp-admin-theme-color-darker-10 );
@@ -155,8 +155,13 @@ export const DefaultControlsItem = css`
 		${ baseLabelTypography }
 	}
 
-	&&[aria-disabled='true'] {
+	&[aria-disabled='true'] {
+		color: ${ COLORS.gray[ 700 ] };
 		opacity: 1;
+
+		&:hover {
+			color: ${ COLORS.gray[ 700 ] };
+		}
 
 		span:last-child {
 			opacity: 0.3;
