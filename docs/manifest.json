@@ -504,6 +504,12 @@
 		"parent": "filters"
 	},
 	{
+		"title": "Global Styles Filters",
+		"slug": "global-styles-filters",
+		"markdown_source": "../docs/reference-guides/filters/global-styles-filters.md",
+		"parent": "filters"
+	},
+	{
 		"title": "SlotFills Reference",
 		"slug": "slotfills",
 		"markdown_source": "../docs/reference-guides/slotfills/README.md",

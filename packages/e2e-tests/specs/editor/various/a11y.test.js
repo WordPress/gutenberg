@@ -5,7 +5,7 @@ import { createNewPost, pressKeyWithModifier } from '@wordpress/e2e-test-utils';
 
 function isCloseButtonFocused() {
 	return page.$eval( ':focus', ( focusedElement ) => {
-		return focusedElement.getAttribute( 'aria-label' ) === 'Close dialog';
+		return focusedElement.getAttribute( 'aria-label' ) === 'Close';
 	} );
 }
 

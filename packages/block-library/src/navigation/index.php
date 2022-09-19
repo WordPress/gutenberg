@@ -502,8 +502,17 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		}
 
 		$inner_blocks = new WP_Block_List( $fallback_blocks, $attributes );
-
 	}
+
+	/**
+	 * Filter navigation block $inner_blocks.
+	 * Allows modification of a navigation block menu items.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @param \WP_Block_List $inner_blocks
+	 */
+	$inner_blocks = apply_filters( 'block_core_navigation_render_inner_blocks', $inner_blocks );
 
 	$layout_justification = array(
 		'left'          => 'items-justified-left',
@@ -556,10 +565,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			$is_list_open       = false;
 			$inner_blocks_html .= '</ul>';
 		}
-		if ( 'core/site-title' === $inner_block->name || 'core/site-logo' === $inner_block->name ) {
-			$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block->render() . '</li>';
+		$inner_block_content = $inner_block->render();
+		if ( 'core/site-title' === $inner_block->name || ( 'core/site-logo' === $inner_block->name && $inner_block_content ) ) {
+			$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
 		} else {
-			$inner_blocks_html .= $inner_block->render();
+			$inner_blocks_html .= $inner_block_content;
 		}
 	}
 
@@ -610,12 +620,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
 	$toggle_button_icon        = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg>';
-	if ( 'menu' === $attributes['icon'] ) {
-		$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 5v1.5h14V5H5zm0 7.8h14v-1.5H5v1.5zM5 19h14v-1.5H5V19z" /></svg>';
-	} elseif ( 'more-vertical' === $attributes['icon'] ) {
-		$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z" /></svg>';
-	} elseif ( 'more-horizontal' === $attributes['icon'] ) {
-		$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 13h2v-2h-2v2zm-6 0h2v-2H5v2zm12-2v2h2v-2h-2z" /></svg>';
+	if ( isset( $attributes['icon'] ) ) {
+		if ( 'menu' === $attributes['icon'] ) {
+			$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 5v1.5h14V5H5zm0 7.8h14v-1.5H5v1.5zM5 19h14v-1.5H5V19z" /></svg>';
+		}
 	}
 	$toggle_button_content       = $should_display_icon_label ? $toggle_button_icon : __( 'Menu' );
 	$toggle_close_button_icon    = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';

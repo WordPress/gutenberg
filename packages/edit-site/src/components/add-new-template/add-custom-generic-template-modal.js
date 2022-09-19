@@ -16,27 +16,38 @@ import {
 	TextControl,
 } from '@wordpress/components';
 
-function AddCustomGenericTemplateModal( { onClose, createTemplate } ) {
+/**
+ * Internal dependencies
+ */
+import TemplateActionsLoadingScreen from './template-actions-loading-screen';
+
+function AddCustomGenericTemplateModal( {
+	onClose,
+	createTemplate,
+	isCreatingTemplate,
+} ) {
 	const [ title, setTitle ] = useState( '' );
 	const defaultTitle = __( 'Custom Template' );
 	const [ isBusy, setIsBusy ] = useState( false );
 	async function onCreateTemplate( event ) {
 		event.preventDefault();
-
 		if ( isBusy ) {
 			return;
 		}
-
 		setIsBusy( true );
-
-		createTemplate(
-			{
-				slug:
-					'wp-custom-template-' + kebabCase( title || defaultTitle ),
-				title: title || defaultTitle,
-			},
-			false
-		);
+		try {
+			await createTemplate(
+				{
+					slug:
+						'wp-custom-template-' +
+						kebabCase( title || defaultTitle ),
+					title: title || defaultTitle,
+				},
+				false
+			);
+		} finally {
+			setIsBusy( false );
+		}
 	}
 	return (
 		<Modal
@@ -47,6 +58,7 @@ function AddCustomGenericTemplateModal( { onClose, createTemplate } ) {
 			} }
 			overlayClassName="edit-site-custom-generic-template__modal"
 		>
+			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
 			<form onSubmit={ onCreateTemplate }>
 				<Flex align="flex-start" gap={ 8 }>
 					<FlexItem>

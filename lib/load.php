@@ -83,6 +83,7 @@ require __DIR__ . '/compat/wordpress-6.1/blocks.php';
 require __DIR__ . '/compat/wordpress-6.1/block-editor-settings.php';
 require __DIR__ . '/compat/wordpress-6.1/persisted-preferences.php';
 require __DIR__ . '/compat/wordpress-6.1/get-global-styles-and-settings.php';
+require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-data-gutenberg.php';
 require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-6-1.php';
 require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-resolver-6-1.php';
 require __DIR__ . '/compat/wordpress-6.1/block-template-utils.php';
@@ -114,19 +115,12 @@ require __DIR__ . '/demo.php';
 require __DIR__ . '/experiments-page.php';
 
 // Copied package PHP files.
-if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-gutenberg.php' ) ) {
+if ( is_dir( __DIR__ . '/../build/style-engine' ) ) {
+	require_once __DIR__ . '/../build/style-engine/style-engine-gutenberg.php';
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-gutenberg.php';
-}
-if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-css-declarations-gutenberg.php' ) ) {
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-declarations-gutenberg.php';
-}
-if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rule-gutenberg.php' ) ) {
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rule-gutenberg.php';
-}
-if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rules-store-gutenberg.php' ) ) {
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rules-store-gutenberg.php';
-}
-if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-processor-gutenberg.php' ) ) {
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-processor-gutenberg.php';
 }
 
