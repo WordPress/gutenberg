@@ -191,40 +191,33 @@ function gutenberg_convert_menu_items_to_blocks(
 	$blocks = array();
 
 	foreach ( $menu_items as $menu_item ) {
-		if ( 'block' === $menu_item->type ) {
-			$parsed_blocks = parse_blocks( $menu_item->content );
-
-			if ( count( $parsed_blocks ) ) {
-				$block = $parsed_blocks[0];
-			} else {
-				$block = array(
-					'blockName' => 'core/freeform',
-					'attrs'     => array(
-						'originalContent' => $menu_item->content,
-					),
-				);
-			}
-		} else {
-			$block = array(
-				'blockName' => 'core/navigation-link',
-				'attrs'     => array(
-					'label' => $menu_item->title,
-					'url'   => $menu_item->url,
-				),
-			);
-		}
-
 		$menu_item_id = (int) $menu_item->ID;
 
-		$block['innerContent'] = gutenberg_convert_menu_items_to_blocks(
-			isset( $menu_items_by_parent_id[ $menu_item_id ] )
-					? $menu_items_by_parent_id[ $menu_item_id ]
-					: array(),
-			$menu_items_by_parent_id
+		$has_children = isset( $menu_items_by_parent_id[ $menu_item_id ] );
+
+		if ( $has_children ) {
+			$submenu_items = $menu_items_by_parent_id[ $menu_item_id ];
+			$block_name = 'core/navigation-submenu';
+		} else {
+			$submenu_items = array();
+			$block_name = 'core/navigation-link';
+		}
+
+		$block = array(
+			'blockName' => $block_name,
+			'attrs'     => array(
+				'label' => $menu_item->title,
+				'url'   => $menu_item->url,
+			),
 		);
-
-		$block['innerBlocks'] = $block['innerContent'] ;
-
+		$block_content = gutenberg_convert_menu_items_to_blocks(
+			$submenu_items,
+			$menu_items_by_parent_id,
+		);
+		if ( ! empty( $block_content ) ) {
+			$block['innerContent'] = $block_content;
+			$block['innerBlocks'] = $block_content;
+		}
 		$blocks[] = $block;
 	}
 
