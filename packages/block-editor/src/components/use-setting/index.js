@@ -144,18 +144,19 @@ export default function useSetting( path ) {
 						false
 					)
 				) {
-					const candidateAtts =
+					const attributes =
 						select( blockEditorStore ).getBlockAttributes(
 							candidateClientId
 						);
-					const candidateResult =
-						get(
-							candidateAtts,
-							`settings.blocks.${ blockName }.${ normalizedPath }`
-						) ??
-						get( candidateAtts, `settings.${ normalizedPath }` );
-					if ( candidateResult !== undefined ) {
-						result = candidateResult;
+					result =
+						get( attributes, [
+							'settings',
+							'blocks',
+							blockName,
+							normalizedPath,
+						] ) ??
+						get( attributes, [ 'settings', normalizedPath ] );
+					if ( result !== undefined ) {
 						break;
 					}
 				}
@@ -164,10 +165,17 @@ export default function useSetting( path ) {
 			// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
 			const settings = select( blockEditorStore ).getSettings();
 			if ( result === undefined ) {
-				const defaultsPath = `__experimentalFeatures.${ normalizedPath }`;
-				const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ normalizedPath }`;
 				result =
-					get( settings, blockPath ) ?? get( settings, defaultsPath );
+					get( settings, [
+						'__experimentalFeatures',
+						'blocks',
+						blockName,
+						normalizedPath,
+					] ) ??
+					get( settings, [
+						'__experimentalFeatures',
+						normalizedPath,
+					] );
 			}
 
 			// Return if the setting was found in either the block instance or the store.
