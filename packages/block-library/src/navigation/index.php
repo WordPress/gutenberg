@@ -259,13 +259,14 @@ function block_core_navigation_get_classic_menu_fallback() {
 	// If menus exist.
 	if ( $classic_nav_menus && ! is_wp_error( $classic_nav_menus ) && count( $classic_nav_menus ) === 1 ) {
 		// If there's only one classic menu then use it.
-		return $classic_nav_menus[ 0 ];
+		return $classic_nav_menus[0];
 	}
 }
 
 /**
- * Finds the classic navigation fallback to use.
+ * Converts a classic navigation to blocks.
  *
+ * @param  object WP_Term The classic navigation object to convert.
  * @return array the normalized parsed blocks.
  */
 function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu ) {
@@ -304,21 +305,23 @@ function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_me
  * @return array the normalized parsed blocks.
  */
 function block_core_navigation_maybe_use_classic_menu_fallback() {
-	// See if we have a classic menu
+	// See if we have a classic menu.
 	$classic_nav_menu = block_core_navigation_get_classic_menu_fallback();
 
 	// If we have a classic menu then convert it to blocks.
 	if ( $classic_nav_menu ) {
-		$classic_nav_menu_blocks = block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu );
+		$classic_nav_menu_blocks            = block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu );
 		$classic_nav_menu_blocks_serialized = serialize_blocks( $classic_nav_menu_blocks );
 
 		// Create a new navigation menu from the classic menu.
-		wp_insert_post( array(
-			'post_content' => $classic_nav_menu_blocks_serialized,
-			'post_title' => $classic_nav_menu->slug,
-			'post_status' => 'publish',
-			'post_type' => 'wp_navigation'
-		) );
+		wp_insert_post(
+			array(
+				'post_content' => $classic_nav_menu_blocks_serialized,
+				'post_title'   => $classic_nav_menu->slug,
+				'post_status'  => 'publish',
+				'post_type'    => 'wp_navigation'
+			)
+		);
 
 		// Fetch the most recently published navigation which will be the classic one created above.
 		return block_core_navigation_get_most_recently_published_navigation();

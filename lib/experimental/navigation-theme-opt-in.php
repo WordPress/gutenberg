@@ -197,12 +197,13 @@ function gutenberg_convert_menu_items_to_blocks(
 
 		if ( $has_children ) {
 			$submenu_items = $menu_items_by_parent_id[ $menu_item_id ];
-			$block_name = 'core/navigation-submenu';
+			$block_name    = 'core/navigation-submenu';
 		} else {
 			$submenu_items = array();
-			$block_name = 'core/navigation-link';
+			$block_name    = 'core/navigation-link';
 		}
 
+		// Create a child block.
 		$block = array(
 			'blockName' => $block_name,
 			'attrs'     => array(
@@ -210,14 +211,18 @@ function gutenberg_convert_menu_items_to_blocks(
 				'url'   => $menu_item->url,
 			),
 		);
+
+		// Create the content of the block.
 		$block_content = gutenberg_convert_menu_items_to_blocks(
 			$submenu_items,
-			$menu_items_by_parent_id,
+			$menu_items_by_parent_id
 		);
+
 		if ( ! empty( $block_content ) ) {
 			$block['innerContent'] = $block_content;
-			$block['innerBlocks'] = $block_content;
+			$block['innerBlocks']  = $block_content;
 		}
+
 		$blocks[] = $block;
 	}
 
