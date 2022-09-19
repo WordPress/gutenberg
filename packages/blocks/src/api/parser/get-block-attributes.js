@@ -13,7 +13,7 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { attr, html, text, query, node, children, prop } from '../matchers';
+import { attr, html, text, query, prop } from '../matchers';
 import { normalizeBlockType } from '../utils';
 
 /**
@@ -128,8 +128,6 @@ export function getBlockAttribute(
 		case 'property':
 		case 'html':
 		case 'text':
-		case 'children':
-		case 'node':
 		case 'query':
 		case 'tag':
 			value = parseWithAttributeSchema( innerHTML, attributeSchema );
@@ -202,10 +200,6 @@ export const matcherFromSource = memoize( ( sourceConfig ) => {
 			return html( sourceConfig.selector, sourceConfig.multiline );
 		case 'text':
 			return text( sourceConfig.selector );
-		case 'children':
-			return children( sourceConfig.selector );
-		case 'node':
-			return node( sourceConfig.selector );
 		case 'query':
 			const subMatchers = mapValues(
 				sourceConfig.query,
