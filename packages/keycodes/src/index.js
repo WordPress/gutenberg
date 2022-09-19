@@ -373,9 +373,15 @@ export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 		}
 
 		// Replace some characters to match the key indicated
-		// by the shortcut when a modifier key is pressed.
-		if ( event.shiftKey && character.length === 1 ) {
-			key = key.replace( '<', ',' );
+		// by the shortcut on Windows.
+		if ( ! _isApple() ) {
+			if (
+				event.shiftKey &&
+				character.length === 1 &&
+				event.code === 'Comma'
+			) {
+				key = ',';
+			}
 		}
 
 		// For backwards compatibility.
