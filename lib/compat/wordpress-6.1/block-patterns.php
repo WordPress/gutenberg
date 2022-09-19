@@ -188,8 +188,13 @@ function gutenberg_register_core_block_patterns() {
 
 	// Register categories used for block patterns.
 	$pattern_category_registry = WP_Block_Pattern_Categories_Registry::get_instance();
+
 	if ( ! $pattern_category_registry->is_registered( 'footer' ) ) {
 		register_block_pattern_category( 'footer', array( 'label' => __( 'Footers', 'gutenberg' ) ) );
+	}
+
+	if ( ! $pattern_category_registry->is_registered( 'banner' ) ) {
+		register_block_pattern_category( 'banner', array( 'label' => __( 'Banners', 'gutenberg' ) ) );
 	}
 
 	if ( $should_register_core_patterns ) {
