@@ -11,7 +11,8 @@ import {
 	getEditedPostContent,
 	pressKeyTimes,
 	publishPost,
-} from '@wordpress/e2e-test-utils';
+} from '@wordpress/e2e-test-utils-playwright';
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const userList = [
 	{ userName: 'testuser', firstName: 'Jane', lastName: 'Doe' },
@@ -23,8 +24,8 @@ const userList = [
 	{ userName: 'buddytheelf', firstName: 'Buddy', lastName: 'Elf' },
 ];
 
-describe( 'Autocomplete', () => {
-	beforeAll( async () => {
+test.describe( 'Autocomplete', () => {
+	test.beforeAll( async () => {
 		for ( const user of userList ) {
 			await createUser( user.userName, {
 				firstName: user.firstName,
@@ -34,28 +35,28 @@ describe( 'Autocomplete', () => {
 		await activatePlugin( 'gutenberg-test-autocompleter' );
 	} );
 
-	afterAll( async () => {
+	test.afterAll( async () => {
 		for ( const user of userList ) {
 			await deleteUser( user.userName );
 		}
 		await deactivatePlugin( 'gutenberg-test-autocompleter' );
 	} );
 
-	beforeEach( async () => {
+	test.beforeEach( async () => {
 		await createNewPost();
 	} );
 
-	afterEach( async () => {
+	test.afterEach( async () => {
 		await publishPost();
 	} );
 
-	describe.each( [
+	test.describe.each( [
 		[ 'User Mention', 'mention' ],
 		[ 'Custom Completer', 'option' ],
 	] )( '%s', ( ...completerAndOptionType ) => {
 		const [ , type ] = completerAndOptionType;
 
-		it( `should insert ${ type }`, async () => {
+		test( `should insert ${ type }`, async ( { page } ) => {
 			// Set up test data for each case
 			const testData = {};
 			if ( type === 'mention' ) {
@@ -89,7 +90,9 @@ describe( 'Autocomplete', () => {
 			);
 		} );
 
-		it( `should insert ${ type } between two other words`, async () => {
+		test( `should insert ${ type } between two other words`, async ( {
+			page,
+		} ) => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = '@j';
@@ -123,7 +126,7 @@ describe( 'Autocomplete', () => {
 			);
 		} );
 
-		it( `should insert two subsequent ${ type }s`, async () => {
+		test( `should insert two subsequent ${ type }s`, async ( { page } ) => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.firstTriggerString =
@@ -167,7 +170,9 @@ describe( 'Autocomplete', () => {
 			);
 		} );
 
-		it( `should allow ${ type } selection via click event`, async () => {
+		test( `should allow ${ type } selection via click event`, async ( {
+			page,
+		} ) => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = '@';
@@ -200,7 +205,9 @@ describe( 'Autocomplete', () => {
 			);
 		} );
 
-		it( `should allow ${ type } selection via keypress event`, async () => {
+		test( `should allow ${ type } selection via keypress event`, async ( {
+			page,
+		} ) => {
 			const testData = {};
 			// Jean-Luc is the target because user mentions will be listed alphabetically by first + last name
 			// This may seem off by one, but that's only because the test site adds an `admin` user that ends up at the top of the list
@@ -236,7 +243,9 @@ describe( 'Autocomplete', () => {
 			);
 		} );
 
-		it( 'should cancel selection via `Escape` keypress event', async () => {
+		test( 'should cancel selection via `Escape` keypress event', async ( {
+			page,
+		} ) => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = 'My name is @j';
@@ -274,7 +283,9 @@ describe( 'Autocomplete', () => {
 
 		// This test does not apply to user mentions, because they don't get disabled.
 		if ( type !== 'mention' ) {
-			it( `should not insert disabled ${ type }s`, async () => {
+			test( `should not insert disabled ${ type }s`, async ( {
+				page,
+			} ) => {
 				await clickBlockAppender();
 				// The 'Grapes' option is disabled in our test plugin, so it should not insert the grapes emoji
 				await page.keyboard.type( 'Sorry, we are all out of ~g' );
@@ -291,7 +302,9 @@ describe( 'Autocomplete', () => {
 			} );
 		}
 
-		it( 'should allow newlines after multiple completions', async () => {
+		test( 'should allow newlines after multiple completions', async ( {
+			page,
+		} ) => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = '@bu';
@@ -365,7 +378,9 @@ describe( 'Autocomplete', () => {
 	// Unfortunately, the regression (if present) crashes the tests, as well as the editor,
 	// so it's skipped for now in the hopes we can find a way around that in the future.
 	// eslint-disable-next-line jest/no-disabled-tests
-	it.skip( 'should insert elements from multiple completers in a single block', async () => {
+	test.skip( 'should insert elements from multiple completers in a single block', async ( {
+		page,
+	} ) => {
 		await clickBlockAppender();
 		await page.keyboard.type( '@fr' );
 		await page.waitForXPath(
