@@ -147,6 +147,8 @@ export const DropdownMenu = css`
 `;
 
 export const DefaultControlsItem = css`
+	color: ${ COLORS.gray[ 700 ] };
+
 	span:last-child {
 		color: var( --wp-admin-theme-color-darker-10 );
 		margin-left: ${ space( 3 ) };
