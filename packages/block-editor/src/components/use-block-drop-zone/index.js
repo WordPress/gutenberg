@@ -2,11 +2,8 @@
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback, useState } from '@wordpress/element';
-import {
-	useThrottle,
-	__experimentalUseDropZone as useDropZone,
-} from '@wordpress/compose';
+import { useState, useRef } from '@wordpress/element';
+import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 
 /**
@@ -91,6 +88,7 @@ export default function useBlockDropZone( {
 	rootClientId: targetRootClientId = '',
 } = {} ) {
 	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
+	const pendingLeaveCallback = useRef();
 
 	const isDisabled = useSelect(
 		( select ) => {
@@ -116,9 +114,14 @@ export default function useBlockDropZone( {
 		useDispatch( blockEditorStore );
 
 	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
-	const throttled = useThrottle(
-		useCallback( ( event, currentTarget ) => {
-			const blockElements = Array.from( currentTarget.children ).filter(
+
+	return useDropZone( {
+		isDisabled,
+		onDrop: onBlockDrop,
+		onDragEnter( event ) {
+			const blockElements = Array.from(
+				event.currentTarget.children
+			).filter(
 				// Ensure the element is a block. It should have the `wp-block` class.
 				( element ) => element.classList.contains( 'wp-block' )
 			);
@@ -133,26 +136,23 @@ export default function useBlockDropZone( {
 			if ( targetIndex !== null ) {
 				showInsertionPoint( targetRootClientId, targetIndex );
 			}
-		}, [] ),
-		200
-	);
 
-	return useDropZone( {
-		isDisabled,
-		onDrop: onBlockDrop,
-		onDragOver( event ) {
-			// `currentTarget` is only available while the event is being
-			// handled, so get it now and pass it to the thottled function.
-			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
-			throttled( event, event.currentTarget );
+			// Prevent a leave previous block to run.
+			pendingLeaveCallback.current = true;
+			setTimeout( () => {
+				pendingLeaveCallback.current = false;
+			} );
 		},
 		onDragLeave() {
-			throttled.cancel();
+			if ( pendingLeaveCallback.current ) {
+				pendingLeaveCallback.current = false;
+				return;
+			}
 			hideInsertionPoint();
 			setTargetBlockIndex( null );
 		},
 		onDragEnd() {
-			throttled.cancel();
+			pendingLeaveCallback.current = false;
 			hideInsertionPoint();
 			setTargetBlockIndex( null );
 		},
