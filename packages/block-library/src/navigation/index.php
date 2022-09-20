@@ -320,6 +320,7 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
 			array(
 				'post_content' => $classic_nav_menu_blocks_serialized,
 				'post_title'   => $classic_nav_menu->slug,
+				'post_name'   => $classic_nav_menu->slug,
 				'post_status'  => 'publish',
 				'post_type'    => 'wp_navigation'
 			)
