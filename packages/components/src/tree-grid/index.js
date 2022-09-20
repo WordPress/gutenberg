@@ -286,14 +286,21 @@ function TreeGrid(
 	/* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */
 	return (
 		<RovingTabIndexContainer>
-			<table
-				{ ...props }
-				role="treegrid"
-				onKeyDown={ onKeyDown }
-				ref={ ref }
-			>
-				<tbody>{ children }</tbody>
-			</table>
+			{
+				// Prevent browser mode from triggering in NVDA by wrapping List View
+				// in a role=application wrapper.
+				// see: https://github.com/WordPress/gutenberg/issues/43729
+			 }
+			<div role="application">
+				<table
+					{ ...props }
+					role="treegrid"
+					onKeyDown={ onKeyDown }
+					ref={ ref }
+				>
+					<tbody>{ children }</tbody>
+				</table>
+			</div>
 		</RovingTabIndexContainer>
 	);
 	/* eslint-enable jsx-a11y/no-noninteractive-element-to-interactive-role */
