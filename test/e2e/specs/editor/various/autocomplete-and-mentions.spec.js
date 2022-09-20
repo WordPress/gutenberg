@@ -81,13 +81,13 @@ test.describe( 'Autocomplete', () => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = 'I am @da';
-				testData.optionPath = 'Darth Vader';
+				testData.optionPath = '//*[contains(text(),"Darth Vader")]';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>I am @yourfather.</p>
 <!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = 'I like ~s';
-				testData.optionPath = 'Strawberry';
+				testData.optionPath = '[text()="🍓 Strawberry"]';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>I like 🍓.</p>
 <!-- /wp:paragraph -->`;
@@ -97,7 +97,7 @@ test.describe( 'Autocomplete', () => {
 			await page.keyboard.type( testData.triggerString );
 			await expect(
 				page.locator(
-					`//button[@role="option"]${ testData.optionPath }`
+					`xpath=//button[@role="option"]${ testData.optionPath }`
 				)
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
@@ -116,7 +116,7 @@ test.describe( 'Autocomplete', () => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = '@j';
-				testData.optionPath = 'Jane Doe';
+				testData.optionPath = '//*[contains(text(),"Jane Doe")]';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>Stuck in the middle with @testuser you.</p>
 <!-- /wp:paragraph -->`;
@@ -153,8 +153,10 @@ test.describe( 'Autocomplete', () => {
 				testData.firstTriggerString =
 					'The two greatest hobbits, in order: @bi';
 				testData.secondTriggerString = ' @fr';
-				testData.firstOptionPath = 'Bilbo Baggins';
-				testData.secondOptionPath = 'Frodo Baggins';
+				testData.firstOptionPath =
+					'//*[contains(text(),"Bilbo Baggins")]';
+				testData.secondOptionPath =
+					'//*[contains(text(),"Frodo Baggins")]';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>The two greatest hobbits, in order: @thebetterhobbit @ringbearer.</p>
 <!-- /wp:paragraph -->`;
@@ -196,7 +198,8 @@ test.describe( 'Autocomplete', () => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = '@';
-				testData.optionPath = 'Katniss Everdeen';
+				testData.optionPath =
+					'//*[contains(text(),"Katniss Everdeen")]';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>@mockingjay</p>
 <!-- /wp:paragraph -->`;
@@ -233,7 +236,7 @@ test.describe( 'Autocomplete', () => {
 			// 🍒 is the target because options are listed in the order they appear in the custom completer
 			if ( type === 'mention' ) {
 				testData.triggerString = '@';
-				testData.optionPath = 'Jean-Luc Picard';
+				testData.optionPath = '//*[contains(text(),"Jean-Luc Picard")]';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>@makeitso</p>
 <!-- /wp:paragraph -->`;
@@ -267,7 +270,7 @@ test.describe( 'Autocomplete', () => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = 'My name is @j';
-				testData.optionPath = 'Jane Doe';
+				testData.optionPath = '//*[contains(text(),"Jane Doe")]';
 				testData.postCompleterInput = ' ...a secret.';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>My name is @j ...a secret.</p>
@@ -328,7 +331,7 @@ test.describe( 'Autocomplete', () => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = '@bu';
-				testData.optionPath = 'Buddy Elf';
+				testData.optionPath = '//*[contains(text(),"Buddy Elf")]';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>@buddytheelf test</p>
 <!-- /wp:paragraph -->
@@ -350,7 +353,7 @@ test.describe( 'Autocomplete', () => {
 <!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = '~b';
-				testData.optionPath = '🫐 Blueberry';
+				testData.optionPath = '[text()="🫐 Blueberry"]';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>🫐 test</p>
 <!-- /wp:paragraph -->
