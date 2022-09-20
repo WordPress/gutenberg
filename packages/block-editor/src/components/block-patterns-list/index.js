@@ -49,6 +49,9 @@ function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
 							blocks={ blocks }
 							viewportWidth={ viewportWidth }
 						/>
+						<div className="block-editor-block-patterns-list__item-title">
+							{ pattern.title }
+						</div>
 						{ !! pattern.description && (
 							<VisuallyHidden id={ descriptionId }>
 								{ pattern.description }
