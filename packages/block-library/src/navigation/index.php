@@ -341,7 +341,7 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
  */
 function block_core_navigation_get_most_recently_published_navigation() {
 
-	// We default to the most recently created menu.
+	// Default to the most recently created menu.
 	$parsed_args = array(
 		'post_type'      => 'wp_navigation',
 		'no_found_rows'  => true,
