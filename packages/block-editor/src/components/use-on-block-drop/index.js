@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useCallback } from '@wordpress/element';
 import {
 	cloneBlock,
 	findTransform,
@@ -52,16 +53,27 @@ export function parseDropEvent( event ) {
 /**
  * A function that returns an event handler function for block drop events.
  *
- * @param {Object}   options            The options object.
- * @param {Function} options.addBlocks  A function that inserts or replaces blocks.
- * @param {Function} options.moveBlocks A function that moves blocks.
+ * @param {string}   targetRootClientId        The root client id where the block(s) will be inserted.
+ * @param {number}   targetBlockIndex          The index where the block(s) will be inserted.
+ * @param {Function} getBlockIndex             A function that gets the index of a block.
+ * @param {Function} getClientIdsOfDescendants A function that gets the client ids of descendant blocks.
+ * @param {Function} moveBlocks                A function that moves blocks.
+ * @param {Function} insertOrReplaceBlocks     A function that inserts or replaces blocks.
+ * @param {Function} clearSelectedBlock        A function that clears block selection.
  * @return {Function} The event handler for a block drop event.
  */
-export function useOnBlocksDrop( { addBlocks, moveBlocks } ) {
-	const { clearSelectedBlock } = useDispatch( blockEditorStore );
-
+export function onBlockDrop(
+	targetRootClientId,
+	targetBlockIndex,
+	getBlockIndex,
+	getClientIdsOfDescendants,
+	moveBlocks,
+	insertOrReplaceBlocks,
+	clearSelectedBlock
+) {
 	return ( event ) => {
 		const {
+			srcRootClientId: sourceRootClientId,
 			srcClientIds: sourceClientIds,
 			type: dropType,
 			blocks,
@@ -73,15 +85,45 @@ export function useOnBlocksDrop( { addBlocks, moveBlocks } ) {
 			const blocksToInsert = blocks.map( ( block ) =>
 				cloneBlock( block )
 			);
-			addBlocks( blocksToInsert, {
-				updateSelection: true,
-				initialPosition: null,
-			} );
+			insertOrReplaceBlocks( blocksToInsert, true, null );
 		}
 
 		// If the user is moving a block.
 		if ( dropType === 'block' ) {
-			moveBlocks( sourceClientIds );
+			const sourceBlockIndex = getBlockIndex( sourceClientIds[ 0 ] );
+
+			// If the user is dropping to the same position, return early.
+			if (
+				sourceRootClientId === targetRootClientId &&
+				sourceBlockIndex === targetBlockIndex
+			) {
+				return;
+			}
+
+			// If the user is attempting to drop a block within its own
+			// nested blocks, return early as this would create infinite
+			// recursion.
+			if (
+				sourceClientIds.includes( targetRootClientId ) ||
+				getClientIdsOfDescendants( sourceClientIds ).some(
+					( id ) => id === targetRootClientId
+				)
+			) {
+				return;
+			}
+
+			const isAtSameLevel = sourceRootClientId === targetRootClientId;
+			const draggedBlockCount = sourceClientIds.length;
+
+			// If the block is kept at the same level and moved downwards,
+			// subtract to take into account that the blocks being dragged
+			// were removed from the block list above the insertion point.
+			const insertIndex =
+				isAtSameLevel && sourceBlockIndex < targetBlockIndex
+					? targetBlockIndex - draggedBlockCount
+					: targetBlockIndex;
+
+			moveBlocks( sourceClientIds, sourceRootClientId, insertIndex );
 		}
 	};
 }
@@ -89,23 +131,23 @@ export function useOnBlocksDrop( { addBlocks, moveBlocks } ) {
 /**
  * A function that returns an event handler function for block-related file drop events.
  *
- * @param {Object}   options              The options object.
- * @param {Function} options.addBlocks    A function that insert or replace blocks.
- * @param {string}   options.rootClientId The target root client Id.
+ * @param {string}   targetRootClientId    The root client id where the block(s) will be inserted.
+ * @param {number}   targetBlockIndex      The index where the block(s) will be inserted.
+ * @param {boolean}  hasUploadPermissions  Whether the user has upload permissions.
+ * @param {Function} updateBlockAttributes A function that updates a block's attributes.
+ * @param {Function} canInsertBlockType    A function that returns checks whether a block type can be inserted.
+ * @param {Function} insertOrReplaceBlocks A function that inserts or replaces blocks.
  *
  * @return {Function} The event handler for a block-related file drop event.
  */
-export function useOnFilesDrop( { addBlocks, rootClientId } ) {
-	const { hasUploadPermissions, canInsertBlockType } = useSelect(
-		( select ) => ( {
-			hasUploadPermissions:
-				!! select( blockEditorStore ).getSettings().mediaUpload,
-			canInsertBlockType: select( blockEditorStore ).canInsertBlockType,
-		} ),
-		[]
-	);
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
+export function onFilesDrop(
+	targetRootClientId,
+	targetBlockIndex,
+	hasUploadPermissions,
+	updateBlockAttributes,
+	canInsertBlockType,
+	insertOrReplaceBlocks
+) {
 	return ( files ) => {
 		if ( ! hasUploadPermissions ) {
 			return;
@@ -115,7 +157,7 @@ export function useOnFilesDrop( { addBlocks, rootClientId } ) {
 			getBlockTransforms( 'from' ),
 			( transform ) =>
 				transform.type === 'files' &&
-				canInsertBlockType( transform.blockName, rootClientId ) &&
+				canInsertBlockType( transform.blockName, targetRootClientId ) &&
 				transform.isMatch( files )
 		);
 
@@ -124,7 +166,7 @@ export function useOnFilesDrop( { addBlocks, rootClientId } ) {
 				files,
 				updateBlockAttributes
 			);
-			addBlocks( blocks );
+			insertOrReplaceBlocks( blocks );
 		}
 	};
 }
@@ -132,17 +174,22 @@ export function useOnFilesDrop( { addBlocks, rootClientId } ) {
 /**
  * A function that returns an event handler function for block-related HTML drop events.
  *
- * @param {Object}   options           The options object.
- * @param {Function} options.addBlocks A function that add or replace blocks.
+ * @param {string}   targetRootClientId    The root client id where the block(s) will be inserted.
+ * @param {number}   targetBlockIndex      The index where the block(s) will be inserted.
+ * @param {Function} insertOrReplaceBlocks A function that inserts or replaces blocks.
  *
  * @return {Function} The event handler for a block-related HTML drop event.
  */
-export function useOnHTMLDrop( { addBlocks } ) {
+export function onHTMLDrop(
+	targetRootClientId,
+	targetBlockIndex,
+	insertOrReplaceBlocks
+) {
 	return ( HTML ) => {
 		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
 
 		if ( blocks.length ) {
-			addBlocks( blocks );
+			insertOrReplaceBlocks( blocks );
 		}
 	};
 }
@@ -165,88 +212,118 @@ export default function useOnBlockDrop(
 	options = {}
 ) {
 	const { action = 'insert' } = options;
+	const hasUploadPermissions = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
+		[]
+	);
 	const {
+		canInsertBlockType,
 		getBlockIndex,
+		getClientIdsOfDescendants,
 		getBlockOrder,
-		getBlockRootClientId,
 		getBlocksByClientId,
 	} = useSelect( blockEditorStore );
-	const { insertBlocks, replaceBlocks, moveBlocksToPosition, removeBlocks } =
-		useDispatch( blockEditorStore );
+	const {
+		insertBlocks,
+		moveBlocksToPosition,
+		updateBlockAttributes,
+		clearSelectedBlock,
+		replaceBlocks,
+		removeBlocks,
+	} = useDispatch( blockEditorStore );
 
-	const addBlocks = (
-		blocks,
-		{ updateSelection = true, initialPosition = 0 } = {}
-	) => {
-		if ( action === 'replace' ) {
-			const clientIds = getBlockOrder( targetRootClientId );
-			const clientId = clientIds[ targetBlockIndex ];
+	const insertOrReplaceBlocks = useCallback(
+		( blocks, updateSelection = true, initialPosition = 0 ) => {
+			if ( action === 'replace' ) {
+				const clientIds = getBlockOrder( targetRootClientId );
+				const clientId = clientIds[ targetBlockIndex ];
 
-			replaceBlocks( clientId, blocks, undefined, initialPosition );
-		} else {
-			insertBlocks(
-				blocks,
-				targetBlockIndex,
-				targetRootClientId,
-				updateSelection,
-				initialPosition
-			);
-		}
-	};
+				replaceBlocks( clientId, blocks, undefined, initialPosition );
+			} else {
+				insertBlocks(
+					blocks,
+					targetBlockIndex,
+					targetRootClientId,
+					updateSelection,
+					initialPosition
+				);
+			}
+		},
+		[
+			action,
+			getBlockOrder,
+			insertBlocks,
+			replaceBlocks,
+			targetBlockIndex,
+			targetRootClientId,
+		]
+	);
 
-	const moveBlocks = ( clientIds ) => {
-		const firstClientId = clientIds[ 0 ];
-		const rootClientId = getBlockRootClientId( firstClientId );
-		const sourceBlockIndex = getBlockIndex( firstClientId );
+	const moveBlocks = useCallback(
+		( sourceClientIds, sourceRootClientId, insertIndex ) => {
+			if ( action === 'replace' ) {
+				const sourceBlocks = getBlocksByClientId( sourceClientIds );
+				const targetBlockClientIds =
+					getBlockOrder( targetRootClientId );
+				const targetBlockClientId =
+					targetBlockClientIds[ targetBlockIndex ];
 
-		const isAtSameLevel = rootClientId === targetRootClientId;
-		const draggedBlockCount = clientIds.length;
+				// Remove the source blocks and the target block.
+				removeBlocks(
+					[ ...sourceClientIds, targetBlockClientId ],
+					false
+				);
+				// Insert the source blocks back to the target index.
+				insertBlocks(
+					sourceBlocks,
+					insertIndex,
+					targetRootClientId,
+					true,
+					0
+				);
+			} else {
+				moveBlocksToPosition(
+					sourceClientIds,
+					sourceRootClientId,
+					targetRootClientId,
+					insertIndex
+				);
+			}
+		},
+		[
+			action,
+			getBlockOrder,
+			getBlocksByClientId,
+			insertBlocks,
+			moveBlocksToPosition,
+			removeBlocks,
+			targetBlockIndex,
+			targetRootClientId,
+		]
+	);
 
-		// If the block is kept at the same level and moved downwards,
-		// subtract to take into account that the blocks being dragged
-		// were removed from the block list above the insertion point.
-		const insertIndex =
-			isAtSameLevel && sourceBlockIndex < targetBlockIndex
-				? targetBlockIndex - draggedBlockCount
-				: targetBlockIndex;
-
-		if ( action === 'replace' ) {
-			const sourceBlocks = getBlocksByClientId( clientIds );
-			const targetBlockClientIds = getBlockOrder( targetRootClientId );
-			const targetBlockClientId =
-				targetBlockClientIds[ targetBlockIndex ];
-
-			// Remove the source blocks and the target block.
-			removeBlocks( [ ...clientIds, targetBlockClientId ], false );
-			// Insert the source blocks back to the target index.
-			insertBlocks(
-				sourceBlocks,
-				insertIndex,
-				targetRootClientId,
-				true,
-				0
-			);
-		} else {
-			moveBlocksToPosition(
-				clientIds,
-				rootClientId,
-				targetRootClientId,
-				insertIndex
-			);
-		}
-	};
-
-	const onBlocksDrop = useOnBlocksDrop( {
-		addBlocks,
+	const _onDrop = onBlockDrop(
+		targetRootClientId,
+		targetBlockIndex,
+		getBlockIndex,
+		getClientIdsOfDescendants,
 		moveBlocks,
-	} );
-	const onFilesDrop = useOnFilesDrop( {
-		addBlocks,
-		rootClientId: targetRootClientId,
-	} );
-	const onHTMLDrop = useOnHTMLDrop( {
-		addBlocks,
-	} );
+		insertOrReplaceBlocks,
+		clearSelectedBlock
+	);
+	const _onFilesDrop = onFilesDrop(
+		targetRootClientId,
+		targetBlockIndex,
+		hasUploadPermissions,
+		updateBlockAttributes,
+		canInsertBlockType,
+		insertOrReplaceBlocks
+	);
+	const _onHTMLDrop = onHTMLDrop(
+		targetRootClientId,
+		targetBlockIndex,
+		insertOrReplaceBlocks
+	);
 
 	return ( event ) => {
 		const files = getFilesFromDataTransfer( event.dataTransfer );
@@ -257,11 +334,11 @@ export default function useOnBlockDrop(
 		 * The order of the checks is important to recognise the HTML drop.
 		 */
 		if ( html ) {
-			onHTMLDrop( html );
+			_onHTMLDrop( html );
 		} else if ( files.length ) {
-			onFilesDrop( files );
+			_onFilesDrop( files );
 		} else {
-			onBlocksDrop( event );
+			_onDrop( event );
 		}
 	};
 }

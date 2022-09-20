@@ -98,7 +98,7 @@ describe( 'onBlockDrop', () => {
 		const targetBlockIndex = 0;
 		const getBlockIndex = noop;
 		const getClientIdsOfDescendants = noop;
-		const moveBlocksToPosition = jest.fn();
+		const moveBlocks = jest.fn();
 
 		const event = {
 			dataTransfer: {
@@ -115,11 +115,11 @@ describe( 'onBlockDrop', () => {
 			targetBlockIndex,
 			getBlockIndex,
 			getClientIdsOfDescendants,
-			moveBlocksToPosition
+			moveBlocks
 		);
 		eventHandler( event );
 
-		expect( moveBlocksToPosition ).not.toHaveBeenCalled();
+		expect( moveBlocks ).not.toHaveBeenCalled();
 	} );
 
 	it( 'does nothing if the block is dropped to the same place it was dragged from', () => {
@@ -128,7 +128,7 @@ describe( 'onBlockDrop', () => {
 		// Target and source block index is the same.
 		const getBlockIndex = jest.fn( () => targetBlockIndex );
 		const getClientIdsOfDescendants = noop;
-		const moveBlocksToPosition = jest.fn();
+		const moveBlocks = jest.fn();
 
 		const event = {
 			dataTransfer: {
@@ -148,11 +148,11 @@ describe( 'onBlockDrop', () => {
 			targetBlockIndex,
 			getBlockIndex,
 			getClientIdsOfDescendants,
-			moveBlocksToPosition
+			moveBlocks
 		);
 		eventHandler( event );
 
-		expect( moveBlocksToPosition ).not.toHaveBeenCalled();
+		expect( moveBlocks ).not.toHaveBeenCalled();
 	} );
 
 	it( 'does nothing if the block is dropped as a child of itself', () => {
@@ -160,7 +160,7 @@ describe( 'onBlockDrop', () => {
 		const targetBlockIndex = 0;
 		const getBlockIndex = jest.fn( () => 6 );
 		const getClientIdsOfDescendants = noop;
-		const moveBlocksToPosition = jest.fn();
+		const moveBlocks = jest.fn();
 
 		const event = {
 			dataTransfer: {
@@ -180,11 +180,11 @@ describe( 'onBlockDrop', () => {
 			targetBlockIndex,
 			getBlockIndex,
 			getClientIdsOfDescendants,
-			moveBlocksToPosition
+			moveBlocks
 		);
 		eventHandler( event );
 
-		expect( moveBlocksToPosition ).not.toHaveBeenCalled();
+		expect( moveBlocks ).not.toHaveBeenCalled();
 	} );
 
 	it( 'does nothing if the block is dropped as a descendant of itself', () => {
@@ -195,7 +195,7 @@ describe( 'onBlockDrop', () => {
 		const getClientIdsOfDescendants = jest.fn( () => [
 			targetRootClientId,
 		] );
-		const moveBlocksToPosition = jest.fn();
+		const moveBlocks = jest.fn();
 
 		const event = {
 			dataTransfer: {
@@ -214,11 +214,11 @@ describe( 'onBlockDrop', () => {
 			targetBlockIndex,
 			getBlockIndex,
 			getClientIdsOfDescendants,
-			moveBlocksToPosition
+			moveBlocks
 		);
 		eventHandler( event );
 
-		expect( moveBlocksToPosition ).not.toHaveBeenCalled();
+		expect( moveBlocks ).not.toHaveBeenCalled();
 	} );
 
 	it( 'inserts blocks if the drop is valid', () => {
@@ -228,7 +228,7 @@ describe( 'onBlockDrop', () => {
 		const targetBlockIndex = 0;
 		const getBlockIndex = jest.fn( () => 1 );
 		const getClientIdsOfDescendants = () => [];
-		const moveBlocksToPosition = jest.fn();
+		const moveBlocks = jest.fn();
 
 		const event = {
 			dataTransfer: {
@@ -247,14 +247,13 @@ describe( 'onBlockDrop', () => {
 			targetBlockIndex,
 			getBlockIndex,
 			getClientIdsOfDescendants,
-			moveBlocksToPosition
+			moveBlocks
 		);
 		eventHandler( event );
 
-		expect( moveBlocksToPosition ).toHaveBeenCalledWith(
+		expect( moveBlocks ).toHaveBeenCalledWith(
 			sourceClientIds,
 			sourceRootClientId,
-			targetRootClientId,
 			targetBlockIndex
 		);
 	} );
@@ -267,7 +266,7 @@ describe( 'onBlockDrop', () => {
 		const getBlockIndex = jest.fn( () => 1 );
 		// Dragged block is being dropped as a descendant of itself.
 		const getClientIdsOfDescendants = () => [];
-		const moveBlocksToPosition = jest.fn();
+		const moveBlocks = jest.fn();
 
 		const event = {
 			dataTransfer: {
@@ -289,14 +288,13 @@ describe( 'onBlockDrop', () => {
 			targetBlockIndex,
 			getBlockIndex,
 			getClientIdsOfDescendants,
-			moveBlocksToPosition
+			moveBlocks
 		);
 		eventHandler( event );
 
-		expect( moveBlocksToPosition ).toHaveBeenCalledWith(
+		expect( moveBlocks ).toHaveBeenCalledWith(
 			sourceClientIds,
 			sourceRootClientId,
-			targetRootClientId,
 			insertIndex
 		);
 	} );
@@ -306,7 +304,7 @@ describe( 'onFilesDrop', () => {
 	it( 'does nothing if hasUploadPermissions is false', () => {
 		const updateBlockAttributes = jest.fn();
 		const canInsertBlockType = noop;
-		const insertBlocks = jest.fn();
+		const insertOrReplaceBlocks = jest.fn();
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
 		const uploadPermissions = false;
@@ -317,12 +315,12 @@ describe( 'onFilesDrop', () => {
 			uploadPermissions,
 			updateBlockAttributes,
 			canInsertBlockType,
-			insertBlocks
+			insertOrReplaceBlocks
 		);
 		onFileDropHandler();
 
 		expect( findTransform ).not.toHaveBeenCalled();
-		expect( insertBlocks ).not.toHaveBeenCalled();
+		expect( insertOrReplaceBlocks ).not.toHaveBeenCalled();
 	} );
 
 	it( 'does nothing if the block has no matching file transforms', () => {
@@ -330,7 +328,7 @@ describe( 'onFilesDrop', () => {
 		// to have no return value.
 		findTransform.mockImplementation( noop );
 		const updateBlockAttributes = noop;
-		const insertBlocks = jest.fn();
+		const insertOrReplaceBlocks = jest.fn();
 		const canInsertBlockType = noop;
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
@@ -342,12 +340,12 @@ describe( 'onFilesDrop', () => {
 			uploadPermissions,
 			updateBlockAttributes,
 			canInsertBlockType,
-			insertBlocks
+			insertOrReplaceBlocks
 		);
 		onFileDropHandler();
 
 		expect( findTransform ).toHaveBeenCalled();
-		expect( insertBlocks ).not.toHaveBeenCalled();
+		expect( insertOrReplaceBlocks ).not.toHaveBeenCalled();
 	} );
 
 	it( 'inserts blocks if a valid transform can be found', () => {
@@ -359,7 +357,7 @@ describe( 'onFilesDrop', () => {
 		findTransform.mockImplementation( () => transformation );
 		const updateBlockAttributes = noop;
 		const canInsertBlockType = noop;
-		const insertBlocks = jest.fn();
+		const insertOrReplaceBlocks = jest.fn();
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
 		const uploadPermissions = true;
@@ -370,7 +368,7 @@ describe( 'onFilesDrop', () => {
 			uploadPermissions,
 			updateBlockAttributes,
 			canInsertBlockType,
-			insertBlocks
+			insertOrReplaceBlocks
 		);
 		const files = 'test';
 		onFileDropHandler( files );
@@ -380,11 +378,7 @@ describe( 'onFilesDrop', () => {
 			files,
 			updateBlockAttributes
 		);
-		expect( insertBlocks ).toHaveBeenCalledWith(
-			blocks,
-			targetBlockIndex,
-			targetRootClientId
-		);
+		expect( insertOrReplaceBlocks ).toHaveBeenCalledWith( blocks );
 	} );
 } );
 
@@ -393,16 +387,16 @@ describe( 'onHTMLDrop', () => {
 		pasteHandler.mockImplementation( () => [] );
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
-		const insertBlocks = jest.fn();
+		const insertOrReplaceBlocks = jest.fn();
 
 		const eventHandler = onHTMLDrop(
 			targetRootClientId,
 			targetBlockIndex,
-			insertBlocks
+			insertOrReplaceBlocks
 		);
 		eventHandler();
 
-		expect( insertBlocks ).not.toHaveBeenCalled();
+		expect( insertOrReplaceBlocks ).not.toHaveBeenCalled();
 	} );
 
 	it( 'inserts blocks if the HTML can be converted into blocks', () => {
@@ -410,19 +404,15 @@ describe( 'onHTMLDrop', () => {
 		pasteHandler.mockImplementation( () => blocks );
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
-		const insertBlocks = jest.fn();
+		const insertOrReplaceBlocks = jest.fn();
 
 		const eventHandler = onHTMLDrop(
 			targetRootClientId,
 			targetBlockIndex,
-			insertBlocks
+			insertOrReplaceBlocks
 		);
 		eventHandler();
 
-		expect( insertBlocks ).toHaveBeenCalledWith(
-			blocks,
-			targetBlockIndex,
-			targetRootClientId
-		);
+		expect( insertOrReplaceBlocks ).toHaveBeenCalledWith( blocks );
 	} );
 } );
