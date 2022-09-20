@@ -19,7 +19,7 @@ import type { ToolsPanelHeaderProps } from '../types';
 import ToolsPanelDropdownMenu from '../tools-panel-dropdown-menu';
 
 const ToolsPanelHeader = (
-	props: WordPressComponentProps< ToolsPanelHeaderProps, 'h2' >,
+	props: WordPressComponentProps< ToolsPanelHeaderProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) => {
 	const { headingClassName, label, resetAll, toggleItem, ...headerProps } =

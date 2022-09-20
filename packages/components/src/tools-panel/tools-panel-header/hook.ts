@@ -12,7 +12,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 import type { ToolsPanelHeaderProps } from '../types';
 
 export function useToolsPanelHeader(
-	props: WordPressComponentProps< ToolsPanelHeaderProps, 'h2' >
+	props: WordPressComponentProps< ToolsPanelHeaderProps, 'div' >
 ) {
 	const { className, ...otherProps } = useContextSystem(
 		props,
