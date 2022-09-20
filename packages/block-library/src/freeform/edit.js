@@ -43,6 +43,10 @@ export default function ClassicEdit( {
 	onReplace,
 } ) {
 	const { getMultiSelectedBlockClientIds } = useSelect( blockEditorStore );
+	const canRemove = useSelect(
+		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
+		[ clientId ]
+	);
 	const didMount = useRef( false );
 
 	useEffect( () => {
@@ -221,11 +225,13 @@ export default function ClassicEdit( {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<ConvertToBlocksButton clientId={ clientId } />
-				</ToolbarGroup>
-			</BlockControls>
+			{ canRemove && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ConvertToBlocksButton clientId={ clientId } />
+					</ToolbarGroup>
+				</BlockControls>
+			) }
 			<div { ...useBlockProps() }>
 				<div
 					key="toolbar"
