@@ -285,6 +285,9 @@ $block-inserter-tabs-height: 44px;
 
 	.block-editor-block-preview__container {
 		box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
+		&:hover {
+			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+		}
 	}
 
 	.block-editor-block-patterns-list__item-title {
