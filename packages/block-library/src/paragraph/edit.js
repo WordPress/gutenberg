@@ -70,7 +70,7 @@ function ParagraphBlock( {
 
 	let helpText;
 	if ( hasDropCapDisabled( align ) ) {
-		helpText = __( 'Aligned text can not have a drop cap.' );
+		helpText = __( 'Not available for aligned text.' );
 	} else if ( dropCap ) {
 		helpText = __( 'Showing large initial letter.' );
 	} else {
