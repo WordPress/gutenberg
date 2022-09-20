@@ -91,7 +91,13 @@ function findPostContent( blocks ) {
 			return blocks[ i ];
 		}
 		if ( blocks[ i ].innerBlocks.length ) {
-			return findPostContent( blocks[ i ].innerBlocks );
+			const nestedPostContent = findPostContent(
+				blocks[ i ].innerBlocks
+			);
+
+			if ( nestedPostContent ) {
+				return nestedPostContent;
+			}
 		}
 	}
 }
