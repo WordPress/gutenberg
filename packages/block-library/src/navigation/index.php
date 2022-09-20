@@ -258,7 +258,9 @@ function block_core_navigation_get_classic_menu_fallback() {
 
 	// If menus exist.
 	if ( $classic_nav_menus && ! is_wp_error( $classic_nav_menus ) && count( $classic_nav_menus ) === 1 ) {
-		// If there's only one classic menu then use it.
+		// Use the first classic menu only. Handles simple use case where user has a single
+		// classic menu and switches to a block theme. In future this maybe expanded to
+		// determine the most appropriate classic menu to be used based on location.
 		return $classic_nav_menus[0];
 	}
 }
