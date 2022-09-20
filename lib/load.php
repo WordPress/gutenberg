@@ -57,6 +57,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 }
 
 require __DIR__ . '/experimental/editor-settings.php';
+require __DIR__ . '/experimental/content-styles.php';
 
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
