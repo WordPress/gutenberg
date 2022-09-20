@@ -289,7 +289,7 @@ function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_me
 		$menu_items_by_parent_id[ $menu_item->menu_item_parent ][] = $menu_item;
 	}
 
-	$inner_blocks = gutenberg_convert_menu_items_to_blocks(
+	$inner_blocks = block_core_navigation_parse_blocks_from_menu_items(
 		isset( $menu_items_by_parent_id[0] )
 			? $menu_items_by_parent_id[0]
 			: array(),
