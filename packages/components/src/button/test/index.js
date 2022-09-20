@@ -78,6 +78,7 @@ describe( 'Button', () => {
 
 		it( 'should render a button element with has-text when children are passed', async () => {
 			render( <Button icon={ plusCircle }>Children</Button> );
+			await screen.getByRole( 'button' ).focus();
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'has-text' );
 		} );
 
