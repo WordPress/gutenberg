@@ -95,9 +95,11 @@ test.describe( 'Autocomplete', () => {
 
 			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.triggerString );
-			await page.waitForXPath(
-				`//button[@role="option"]${ testData.optionPath }`
-			);
+			await expect(
+				page.locator(
+					`//button[@role="option"]${ testData.optionPath }`
+				)
+			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );
 
@@ -130,9 +132,11 @@ test.describe( 'Autocomplete', () => {
 			await page.keyboard.type( 'Stuck in the middle with you.' );
 			await pageUtils.pressKeyTimes( 'ArrowLeft', 'you.'.length );
 			await page.keyboard.type( testData.triggerString );
-			await page.waitForXPath(
-				`//button[@role="option"]${ testData.optionPath }`
-			);
+			await expect(
+				page.locator(
+					`//button[@role="option"]${ testData.optionPath }`
+				)
+			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( ' ' );
 			expect( await editor.getEditedPostContent() ).toBe(
@@ -166,14 +170,18 @@ test.describe( 'Autocomplete', () => {
 
 			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.firstTriggerString );
-			await page.waitForXPath(
-				`//button[@role="option"]${ testData.firstOptionPath }`
-			);
+			await expect(
+				page.locator(
+					`//button[@role="option"]${ testData.firstOptionPath }`
+				)
+			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( testData.secondTriggerString );
-			await page.waitForXPath(
-				`//button[@role="option"]${ testData.secondOptionPath }`
-			);
+			await expect(
+				page.locator(
+					`//button[@role="option"]${ testData.secondOptionPath }`
+				)
+			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );
 			expect( await editor.getEditedPostContent() ).toBe(
@@ -202,9 +210,11 @@ test.describe( 'Autocomplete', () => {
 
 			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.triggerString );
-			const targetOption = await page.waitForXPath(
-				`//button[@role="option"]${ testData.optionPath }`
-			);
+			const targetOption = await expect(
+				page.locator(
+					`//button[@role="option"]${ testData.optionPath }`
+				)
+			).toBeVisible();
 			await targetOption.click();
 
 			expect( await editor.getEditedPostContent() ).toBe(
@@ -237,9 +247,11 @@ test.describe( 'Autocomplete', () => {
 
 			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.triggerString );
-			await page.waitForXPath(
-				`//button[@role="option"]${ testData.optionPath }`
-			);
+			await expect(
+				page.locator(
+					`//button[@role="option"]${ testData.optionPath }`
+				)
+			).toBeVisible();
 			await pageUtils.pressKeyTimes( 'ArrowDown', 6 );
 			await page.keyboard.press( 'Enter' );
 
@@ -272,9 +284,11 @@ test.describe( 'Autocomplete', () => {
 
 			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.triggerString );
-			await page.waitForXPath(
-				`//button[@role="option"]${ testData.optionPath }`
-			);
+			await expect(
+				page.locator(
+					`//button[@role="option"]${ testData.optionPath }`
+				)
+			).toBeVisible();
 			await page.keyboard.press( 'Escape' );
 			await page.keyboard.type( testData.postCompleterInput );
 			// The characters before `Escape` should remain (i.e. `~app`)
@@ -292,9 +306,11 @@ test.describe( 'Autocomplete', () => {
 				await page.click( 'role=button[name="Add default block"i]' );
 				// The 'Grapes' option is disabled in our test plugin, so it should not insert the grapes emoji
 				await page.keyboard.type( 'Sorry, we are all out of ~g' );
-				await page.waitForXPath(
-					'//button[@role="option"][text()="🍇 Grapes"]'
-				);
+				await expect(
+					page.locator(
+						'//button[@role="option"][text()="🍇 Grapes"]'
+					)
+				).toBeVisible();
 				await page.keyboard.press( 'Enter' );
 				await page.keyboard.type( ' grapes.' );
 				expect( await editor.getEditedPostContent() ).toBe( `
@@ -360,9 +376,11 @@ test.describe( 'Autocomplete', () => {
 
 			for ( let i = 0; i < 4; i++ ) {
 				await page.keyboard.type( testData.triggerString );
-				await page.waitForXPath(
-					`//button[@role="option"]${ testData.optionPath }`
-				);
+				await expect(
+					page.locator(
+						`//button[@role="option"]${ testData.optionPath }`
+					)
+				).toBeVisible();
 				await page.keyboard.press( 'Enter' );
 				await page.keyboard.type( ' test' );
 				await page.keyboard.press( 'Enter' );
@@ -384,14 +402,18 @@ test.describe( 'Autocomplete', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '@fr' );
-		await page.waitForXPath(
-			'//button[@role="option"]//*[contains(text(),"Frodo Baggins")]'
-		);
+		await expect(
+			page.locator(
+				'//button[@role="option"]//*[contains(text(),"Frodo Baggins")]'
+			)
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' +bi' );
-		await page.waitForXPath(
-			'//button[@role="option"]//*[contains(text(),"Bilbo Baggins")]'
-		);
+		await expect(
+			page.locator(
+				'//button[@role="option"]//*[contains(text(),"Bilbo Baggins")]'
+			)
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		expect( await editor.getEditedPostContent() ).toBe( `
 		"<!-- wp:paragraph -->
