@@ -323,7 +323,8 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
 				'post_name'   => $classic_nav_menu->slug,
 				'post_status'  => 'publish',
 				'post_type'    => 'wp_navigation'
-			)
+			),
+			true // So that we can check whether the result is an error.
 		);
 
 		if ( is_wp_error( $wp_insert_post_result ) ) {
