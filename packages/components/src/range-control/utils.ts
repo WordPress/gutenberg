@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import type { MouseEventHandler } from 'react';
-
-/**
  * WordPress dependencies
  */
-import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,12 +9,7 @@ import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
 import { useControlledState } from '../utils/hooks';
 import { clamp } from '../utils/math';
 
-import type {
-	UseControlledRangeValueArgs,
-	UseDebouncedHoverInteractionArgs,
-} from './types';
-
-const noop = () => {};
+import type { UseControlledRangeValueArgs } from './types';
 
 /**
  * A float supported clamp function for a specific value.
