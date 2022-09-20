@@ -265,45 +265,9 @@ export function useInputAndSelection( props ) {
 			);
 		}
 
-		function onFocus() {
-			const { record, isSelected, onSelectionChange, applyRecord } =
-				propsRef.current;
-
-			// When the whole editor is editable, let writing flow handle
-			// selection.
-			if ( element.parentElement.closest( '[contenteditable="true"]' ) ) {
-				return;
-			}
-
-			if ( ! isSelected ) {
-				// We know for certain that on focus, the old selection is invalid.
-				// It will be recalculated on the next mouseup, keyup, or touchend
-				// event.
-				const index = undefined;
-
-				record.current = {
-					...record.current,
-					start: index,
-					end: index,
-					activeFormats: EMPTY_ACTIVE_FORMATS,
-				};
-				onSelectionChange( index, index );
-			} else {
-				applyRecord( record.current );
-				onSelectionChange( record.current.start, record.current.end );
-			}
-
-			// Update selection as soon as possible, which is at the next animation
-			// frame. The event listener for selection changes may be added too late
-			// at this point, but this focus event is still too early to calculate
-			// the selection.
-			rafId = defaultView.requestAnimationFrame( handleSelectionChange );
-		}
-
 		element.addEventListener( 'input', onInput );
 		element.addEventListener( 'compositionstart', onCompositionStart );
 		element.addEventListener( 'compositionend', onCompositionEnd );
-		element.addEventListener( 'focus', onFocus );
 		// Selection updates must be done at these events as they
 		// happen before the `selectionchange` event. In some cases,
 		// the `selectionchange` event may not even fire, for
@@ -322,7 +286,6 @@ export function useInputAndSelection( props ) {
 				onCompositionStart
 			);
 			element.removeEventListener( 'compositionend', onCompositionEnd );
-			element.removeEventListener( 'focus', onFocus );
 			element.removeEventListener( 'keyup', handleSelectionChange );
 			element.removeEventListener( 'mouseup', handleSelectionChange );
 			element.removeEventListener( 'touchend', handleSelectionChange );
