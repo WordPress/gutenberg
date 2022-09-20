@@ -21,10 +21,7 @@ import {
 	useBlockProps,
 	useSetting,
 } from '@wordpress/block-editor';
-import {
-	useMergeRefs,
-	__experimentalUseDropZone as useDropZone,
-} from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
 
@@ -62,23 +59,13 @@ function ParagraphBlock( {
 	const { align, content, direction, dropCap, placeholder } = attributes;
 	const isDropCapFeatureEnabled = useSetting( 'typography.dropCap' );
 	const [ paragraphElement, setParagraphElement ] = useState( null );
-	const [ isDragging, setIsDragging ] = useState( false );
 	const refCallback = ( element ) => {
 		setParagraphElement( element );
 	};
-	const draggingRef = useDropZone( {
-		onDragStart: () => {
-			setIsDragging( true );
-		},
-		onDragEnd: () => {
-			setIsDragging( false );
-		},
-	} );
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [
 			useOnEnter( { clientId, content } ),
 			refCallback,
-			draggingRef,
 		] ),
 		className: classnames( {
 			'has-drop-cap': dropCap,
@@ -131,7 +118,7 @@ function ParagraphBlock( {
 					</ToolsPanelItem>
 				</InspectorControls>
 			) }
-			{ ! content && isDragging && (
+			{ ! content && (
 				<DropZone
 					clientId={ clientId }
 					paragraphElement={ paragraphElement }

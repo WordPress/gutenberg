@@ -34,8 +34,19 @@ export default function DropZone( { paragraphElement, clientId } ) {
 		},
 		[ clientId ]
 	);
-	const onBlockDrop = useOnBlockDrop( rootClientId, blockIndex, true );
+	const onBlockDrop = useOnBlockDrop( rootClientId, blockIndex, {
+		action: 'replace',
+	} );
+	const [ isDragging, setIsDragging ] = useState( false );
 	const [ isVisible, setIsVisible ] = useState( false );
+	const popoverRef = useDropZone( {
+		onDragStart: () => {
+			setIsDragging( true );
+		},
+		onDragEnd: () => {
+			setIsDragging( false );
+		},
+	} );
 	const dropZoneRef = useDropZone( {
 		onDrop: onBlockDrop,
 		onDragEnter: () => {
@@ -56,35 +67,38 @@ export default function DropZone( { paragraphElement, clientId } ) {
 			flip={ false }
 			resize={ false }
 			className="wp-block-paragraph__drop-zone"
+			ref={ popoverRef }
 		>
-			<div
-				ref={ dropZoneRef }
-				className="wp-block-paragraph__drop-zone-backdrop"
-				style={ {
-					width: paragraphElement?.offsetWidth,
-					height: paragraphElement?.offsetHeight,
-				} }
-			>
-				<AnimatePresence>
-					{ isVisible ? (
-						<motion.div
-							key="drop-zone-foreground"
-							initial={
-								reducedMotion
-									? animateVariants.show
-									: animateVariants.hide
-							}
-							animate={ animateVariants.show }
-							exit={
-								reducedMotion
-									? animateVariants.show
-									: animateVariants.exit
-							}
-							className="wp-block-paragraph__drop-zone-foreground"
-						/>
-					) : null }
-				</AnimatePresence>
-			</div>
+			{ isDragging ? (
+				<div
+					className="wp-block-paragraph__drop-zone-backdrop"
+					ref={ dropZoneRef }
+					style={ {
+						width: paragraphElement?.offsetWidth,
+						height: paragraphElement?.offsetHeight,
+					} }
+				>
+					<AnimatePresence>
+						{ isVisible ? (
+							<motion.div
+								key="drop-zone-foreground"
+								initial={
+									reducedMotion
+										? animateVariants.show
+										: animateVariants.hide
+								}
+								animate={ animateVariants.show }
+								exit={
+									reducedMotion
+										? animateVariants.show
+										: animateVariants.exit
+								}
+								className="wp-block-paragraph__drop-zone-foreground"
+							/>
+						) : null }
+					</AnimatePresence>
+				</div>
+			) : null }
 		</Popover>
 	);
 }

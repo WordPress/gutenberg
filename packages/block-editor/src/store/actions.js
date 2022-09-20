@@ -497,6 +497,18 @@ export const moveBlocksToPosition =
 			if ( ! canInsertBlocks ) {
 				return;
 			}
+
+			// If the user is attempting to drop a block within its own
+			// nested blocks, return early as this would create infinite
+			// recursion.
+			if (
+				clientIds.includes( toRootClientId ) ||
+				select
+					.getClientIdsOfDescendants( clientIds )
+					.includes( toRootClientId )
+			) {
+				return;
+			}
 		}
 
 		dispatch( {

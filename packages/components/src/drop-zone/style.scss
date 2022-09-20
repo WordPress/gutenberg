@@ -8,12 +8,10 @@
 	visibility: hidden;
 	opacity: 0;
 	border-radius: $radius-block-ui;
-	pointer-events: none;
 
 	&.is-active {
 		opacity: 1;
 		visibility: visible;
-		pointer-events: auto;
 	}
 }
 
@@ -32,16 +30,6 @@
 	z-index: z-index(".components-drop-zone__content");
 	text-align: center;
 	color: $white;
-}
-
-.components-drop-zone__content-foreground {
-	height: 100%;
-	display: flex;
-	flex-wrap: wrap;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: $grid-unit-05;
 }
 
 .components-drop-zone__content-icon,

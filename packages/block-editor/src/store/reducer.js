@@ -974,6 +974,12 @@ export const blocks = flow(
 				if ( fromRootClientId === toRootClientId ) {
 					const subState = state[ toRootClientId ];
 					const fromIndex = subState.indexOf( clientIds[ 0 ] );
+
+					// If the block is moved to the same position, return the same state.
+					if ( fromIndex === index ) {
+						return state;
+					}
+
 					return {
 						...state,
 						[ toRootClientId ]: moveTo(
