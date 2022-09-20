@@ -213,12 +213,14 @@ test.describe( 'Autocomplete', () => {
 
 			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.triggerString );
-			const targetOption = await expect(
+			await expect(
 				page.locator(
 					`//button[@role="option"]${ testData.optionPath }`
 				)
 			).toBeVisible();
-			await targetOption.click();
+			await page
+				.locator( `//button[@role="option"]${ testData.optionPath }` )
+				.click();
 
 			expect( await editor.getEditedPostContent() ).toBe(
 				testData.snapshot
