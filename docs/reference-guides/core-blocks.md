@@ -188,7 +188,7 @@ Displays a paginated navigation to next/previous set of comments, when applicabl
 -	**Supports:** align, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow
 
-## Next Page
+## Comments Next Page
 
 Displays the next comment's page link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination-next))
 
@@ -197,7 +197,7 @@ Displays the next comment's page link. ([Source](https://github.com/WordPress/gu
 -	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
-## Page Numbers
+## Comments Page Numbers
 
 Displays a list of page numbers for comments pagination. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination-numbers))
 
@@ -206,7 +206,7 @@ Displays a list of page numbers for comments pagination. ([Source](https://githu
 -	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
-## Previous Page
+## Comments Previous Page
 
 Displays the previous comment's page link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination-previous))
 
