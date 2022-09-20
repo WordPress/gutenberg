@@ -11,6 +11,7 @@ import {
 	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
 	hasBlockSupport,
 } from '@wordpress/blocks';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -127,33 +128,47 @@ export default function useSetting( path ) {
 				...select( blockEditorStore ).getBlockParents( clientId ),
 				clientId, // The current block is added last, so it overwrites any ancestor.
 			];
-			candidates.forEach( ( candidateClientId ) => {
-				const candidateBlockName =
-					select( blockEditorStore ).getBlockName(
-						candidateClientId
-					);
-				if (
-					hasBlockSupport(
-						candidateBlockName,
-						'__experimentalSettings',
-						false
-					)
-				) {
-					const candidateAtts =
-						select( blockEditorStore ).getBlockAttributes(
+
+			result = applyFilters(
+				'blockEditor.useSetting.before',
+				result,
+				blockName,
+				normalizedPath,
+				candidates
+			);
+
+			if ( result !== undefined ) {
+				candidates.forEach( ( candidateClientId ) => {
+					const candidateBlockName =
+						select( blockEditorStore ).getBlockName(
 							candidateClientId
 						);
-					const candidateResult =
-						get(
-							candidateAtts,
-							`settings.blocks.${ blockName }.${ normalizedPath }`
-						) ??
-						get( candidateAtts, `settings.${ normalizedPath }` );
-					if ( candidateResult !== undefined ) {
-						result = candidateResult;
+					if (
+						hasBlockSupport(
+							candidateBlockName,
+							'__experimentalSettings',
+							false
+						)
+					) {
+						const candidateAtts =
+							select( blockEditorStore ).getBlockAttributes(
+								candidateClientId
+							);
+						const candidateResult =
+							get(
+								candidateAtts,
+								`settings.blocks.${ blockName }.${ normalizedPath }`
+							) ??
+							get(
+								candidateAtts,
+								`settings.${ normalizedPath }`
+							);
+						if ( candidateResult !== undefined ) {
+							result = candidateResult;
+						}
 					}
-				}
-			} );
+				} );
+			}
 
 			// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
 			const settings = select( blockEditorStore ).getSettings();
