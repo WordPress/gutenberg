@@ -236,10 +236,3 @@
 	stroke: currentColor;
 	opacity: 0.25;
 }
-
-// Hide the semi-opaque background on selection
-.is-selected {
-	.components-placeholder.has-illustration::before {
-		opacity: 0;
-	}
-}
