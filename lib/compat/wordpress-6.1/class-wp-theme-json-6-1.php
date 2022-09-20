@@ -1249,6 +1249,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$unit            = '%' === $spacing_scale['unit'] ? '%' : sanitize_title( $spacing_scale['unit'] );
 		$current_step    = $spacing_scale['mediumStep'];
 		$steps_mid_point = round( $spacing_scale['steps'] / 2, 0 );
+		$x_small_count   = null;
 		$below_sizes     = array();
 		$slug            = 40;
 		$remainder       = 0;
@@ -1268,10 +1269,19 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 
 			$below_sizes[] = array(
-				'name' => null,
+				/* translators: %s: Digit to indicate multiple of sizing, eg. 2X-Small. */
+				'name' => $below_midpoint_count === $steps_mid_point - 1 ? __( 'Small', 'gutenberg' ) : sprintf( __( '%sX-Small', 'gutenberg' ), strval( $x_small_count ) ),
 				'slug' => (string) $slug,
 				'size' => round( $current_step, 2 ) . $unit,
 			);
+
+			if ( $below_midpoint_count === $steps_mid_point - 2 ) {
+				$x_small_count = 2;
+			}
+
+			if ( $below_midpoint_count < $steps_mid_point - 2 ) {
+				$x_small_count++;
+			}
 
 			$slug -= 10;
 		}
@@ -1284,10 +1294,11 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			'size' => $spacing_scale['mediumStep'] . $unit,
 		);
 
-		$current_step = $spacing_scale['mediumStep'];
-		$above_sizes  = array();
-		$slug         = 60;
-		$steps_above  = ( $spacing_scale['steps'] - $steps_mid_point ) + $remainder;
+		$current_step  = $spacing_scale['mediumStep'];
+		$x_large_count = null;
+		$above_sizes   = array();
+		$slug          = 60;
+		$steps_above   = ( $spacing_scale['steps'] - $steps_mid_point ) + $remainder;
 
 		for ( $above_midpoint_count = 0; $above_midpoint_count < $steps_above; $above_midpoint_count++ ) {
 			$current_step = '+' === $spacing_scale['operator']
@@ -1295,17 +1306,30 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				: ( $spacing_scale['increment'] >= 1 ? $current_step * $spacing_scale['increment'] : $current_step / $spacing_scale['increment'] );
 
 			$above_sizes[] = array(
-				'name' => null,
+				/* translators: %s: Digit to indicate multiple of sizing, eg. 2X-Large. */
+				'name' => 0 === $above_midpoint_count ? __( 'Large', 'gutenberg' ) : sprintf( __( '%sX-Large', 'gutenberg' ), strval( $x_large_count ) ),
 				'slug' => (string) $slug,
 				'size' => round( $current_step, 2 ) . $unit,
 			);
 
+			if ( 1 === $above_midpoint_count ) {
+				$x_large_count = 2;
+			}
+
+			if ( $above_midpoint_count > 1 ) {
+				$x_large_count++;
+			}
+
 			$slug += 10;
 		}
+
 		$spacing_sizes = array_merge( $below_sizes, $above_sizes );
 
-		for ( $spacing_sizes_count = 0; $spacing_sizes_count < count( $spacing_sizes ); $spacing_sizes_count++ ) {
-			$spacing_sizes[ $spacing_sizes_count ]['name'] = strval( $spacing_sizes_count + 1 );
+		// If there are 7 or less steps in the scale revert to numbers for labels instead of t-shirt sizes.
+		if ( $spacing_scale['steps'] <= 7 ) {
+			for ( $spacing_sizes_count = 0; $spacing_sizes_count < count( $spacing_sizes ); $spacing_sizes_count++ ) {
+				$spacing_sizes[ $spacing_sizes_count ]['name'] = strval( $spacing_sizes_count + 1 );
+			}
 		}
 
 		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', 'default' ), $spacing_sizes );
