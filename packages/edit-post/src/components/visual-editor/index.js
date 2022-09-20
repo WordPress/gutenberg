@@ -174,7 +174,7 @@ export default function VisualEditor( { styles } ) {
 		borderBottom: 0,
 	};
 	const resizedCanvasStyles = useResizeCanvas( deviceType, isTemplateMode );
-	const defaultLayout = useSetting( 'layout' );
+	const globalLayoutSettings = useSetting( 'layout' );
 	const previewMode = 'is-' + deviceType.toLowerCase() + '-preview';
 
 	let animatedStyles = isTemplateMode
@@ -203,7 +203,9 @@ export default function VisualEditor( { styles } ) {
 
 	const blockSelectionClearerRef = useBlockSelectionClearer();
 
-	const layout = useMemo( () => {
+	// fallbackLayout is used if there is no Post Content,
+	// and for Post Title.
+	const fallbackLayout = useMemo( () => {
 		if ( isTemplateMode ) {
 			return { type: 'default' };
 		}
@@ -211,17 +213,17 @@ export default function VisualEditor( { styles } ) {
 		if ( themeSupportsLayout ) {
 			// We need to ensure support for wide and full alignments,
 			// so we add the constrained type.
-			return { ...defaultLayout, type: 'constrained' };
+			return { ...globalLayoutSettings, type: 'constrained' };
 		}
 		// Set default layout for classic themes so all alignments are supported.
 		return { type: 'default' };
-	}, [ isTemplateMode, themeSupportsLayout, defaultLayout ] );
+	}, [ isTemplateMode, themeSupportsLayout, globalLayoutSettings ] );
 
 	const templateBlocks = parse( templateContent );
 	const postContentBlock = findPostContent( templateBlocks );
 	const postContentLayoutClasses = useLayoutClasses(
 		postContentBlock?.attributes?.layout,
-		defaultLayout?.definitions
+		globalLayoutSettings?.definitions
 	);
 
 	const blockListLayoutClass = classnames(
@@ -236,6 +238,13 @@ export default function VisualEditor( { styles } ) {
 		postContentBlock,
 		'.wp-container-visual-editor'
 	);
+
+	// If there is a Post Content block we use its layout, or 'default' layout
+	// if it doesn't have one. If no Post Content this must be a classic theme,
+	// in which case we use the fallback layout.
+	const postContentLayout = postContentBlock
+		? postContentBlock?.attributes?.layout || { type: 'default' }
+		: fallbackLayout;
 
 	const titleRef = useRef();
 	useEffect( () => {
@@ -293,21 +302,33 @@ export default function VisualEditor( { styles } ) {
 							! isTemplateMode && (
 								<>
 									<LayoutStyle
-										selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
-										layout={ layout }
+										selector=".edit-post-visual-editor__post-title-wrapper"
+										layout={ fallbackLayout }
 										layoutDefinitions={
-											defaultLayout?.definitions
+											globalLayoutSettings?.definitions
 										}
 									/>
 									{ postContentLayoutStyles && (
 										<LayoutStyle
-											layout={ layout }
+											layout={ postContentLayout }
 											css={ postContentLayoutStyles }
 											layoutDefinitions={
-												defaultLayout?.definitions
+												globalLayoutSettings?.definitions
 											}
 										/>
 									) }
+									{
+										// For classic themes using theme.json we want a default content width in the editor.
+										! postContentBlock && (
+											<LayoutStyle
+												selector=".block-editor-block-list__layout.is-root-container"
+												layout={ fallbackLayout }
+												layoutDefinitions={
+													globalLayoutSettings?.definitions
+												}
+											/>
+										)
+									}
 								</>
 							) }
 						{ ! isTemplateMode && (
@@ -331,9 +352,9 @@ export default function VisualEditor( { styles } ) {
 								className={
 									isTemplateMode
 										? 'wp-site-blocks'
-										: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
+										: blockListLayoutClass
 								}
-								__experimentalLayout={ layout }
+								__experimentalLayout={ postContentLayout }
 							/>
 						</RecursionProvider>
 					</MaybeIframe>
