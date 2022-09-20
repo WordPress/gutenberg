@@ -64,11 +64,15 @@ export function MenuItem( props, ref ) {
 			{ ...buttonProps }
 		>
 			<span className="components-menu-item__item">{ children }</span>
-			<Shortcut
-				className="components-menu-item__shortcut"
-				shortcut={ shortcut }
-			/>
-			{ icon && iconPosition === 'right' && <Icon icon={ icon } /> }
+			{ ! suffix && (
+				<Shortcut
+					className="components-menu-item__shortcut"
+					shortcut={ shortcut }
+				/>
+			) }
+			{ ! suffix && icon && iconPosition === 'right' && (
+				<Icon icon={ icon } />
+			) }
 			{ suffix }
 		</Button>
 	);
