@@ -29,6 +29,13 @@ import {
 	embedPocketCastsIcon,
 } from './icons';
 
+/** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
+
+/**
+ * The embed provider services.
+ *
+ * @type {WPBlockVariation[]}
+ */
 const variations = [
 	{
 		name: 'twitter',
