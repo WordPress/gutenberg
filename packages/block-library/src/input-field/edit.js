@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	RichText,
+	useBlockProps,
+} from '@wordpress/block-editor';
 import {
 	PanelBody,
 	CustomSelectControl,
@@ -47,6 +51,7 @@ const inputTypeOptions = [
 
 function InputFieldBlock( { attributes, setAttributes } ) {
 	const { type, label, inlineLabel } = attributes;
+	const blockProps = useBlockProps();
 
 	return (
 		<>
@@ -86,11 +91,13 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 			</InspectorControls>
 
 			{ type === 'textarea' && (
+				/* eslint-disable jsx-a11y/label-has-associated-control */
 				<label>
 					{ inlineLabel && label && <span>{ label }</span> }
 					{ ! inlineLabel && label && <p>{ label }</p> }
 					<textarea className="wp-block-input-field" />
 				</label>
+				/* eslint-enable jsx-a11y/label-has-associated-control */
 			) }
 
 			{ type === 'submit' && (
@@ -106,11 +113,27 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 			) }
 
 			{ type !== 'textarea' && type !== 'submit' && (
+				/* eslint-disable jsx-a11y/label-has-associated-control */
 				<label>
-					{ inlineLabel && label && <span>{ label }</span> }
-					{ ! inlineLabel && label && <p>{ label }</p> }
+					<RichText
+						identifier="label"
+						tagName={ inlineLabel ? 'span' : 'p' }
+						{ ...blockProps }
+						value={ label }
+						onChange={ ( newContent ) =>
+							setAttributes( { label: newContent } )
+						}
+						aria-label={
+							label ? __( 'Label' ) : __( 'Empty label' )
+						}
+						data-empty={ label ? false : true }
+						placeholder={ __( 'Type the label for this input' ) }
+						__unstableEmbedURLOnPaste
+						__unstableAllowPrefixTransformations
+					/>
 					<input className="wp-block-input-field" type={ type } />
 				</label>
+				/* eslint-enable jsx-a11y/label-has-associated-control */
 			) }
 		</>
 	);
