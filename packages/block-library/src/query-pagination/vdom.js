@@ -5,12 +5,9 @@ import { h } from 'preact';
 
 // Convert DOM nodes to static virtual DOM nodes.
 export const toVdom = ( node ) => {
-	if ( node.nodeType === 3 ) {
-		return node.data;
-	}
-	if ( node.nodeType === 8 || node.localName === 'script' ) {
-		return null;
-	}
+	if ( node.nodeType === 3 ) return node.data;
+	if ( node.nodeType === 8 ) return null;
+	if ( node.localName === 'script' ) return h( 'script' );
 
 	const props = {},
 		a = node.attributes;
