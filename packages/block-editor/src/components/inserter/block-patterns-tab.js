@@ -27,6 +27,7 @@ import {
 	__unstableMotion as motion,
 	FlexBlock,
 	Button,
+	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 
@@ -163,7 +164,9 @@ export function BlockPatternsCategoryPanel( {
 
 	return (
 		<div>
-			<h3>{ category.label }</h3>
+			<Heading level="4" weight="400">
+				{ category.label }
+			</Heading>
 			<p>{ category.description }</p>
 			<BlockPatternList
 				shownPatterns={ currentShownPatterns }
