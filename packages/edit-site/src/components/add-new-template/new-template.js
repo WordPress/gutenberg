@@ -112,7 +112,7 @@ export default function NewTemplate( { postType } ) {
 						template_prefix: templatePrefix,
 					} ),
 				} );
-				templateContent = fallbackTemplate.content;
+				templateContent = fallbackTemplate.content.raw;
 			}
 			const newTemplate = await saveEntityRecord(
 				'postType',
