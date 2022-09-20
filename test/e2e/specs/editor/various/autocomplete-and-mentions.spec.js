@@ -281,7 +281,7 @@ test.describe( 'Autocomplete', () => {
 				testData.triggerString = 'My favorite fruit is ~a';
 				testData.optionPath = '[text()="🍎 Apple"]';
 				testData.postCompleterInput =
-					"...no I changed my mind. It's mango.";
+					" ...no I changed my mind. It's mango.";
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>My favorite fruit is ~a ...no I changed my mind. It's mango.</p>
 <!-- /wp:paragraph -->`;
@@ -318,11 +318,10 @@ test.describe( 'Autocomplete', () => {
 				).toBeVisible();
 				await page.keyboard.press( 'Enter' );
 				await page.keyboard.type( ' grapes.' );
-				expect( await editor.getEditedPostContent() ).toBe( `
-					"<!-- wp:paragraph -->
-					<p>Sorry, we are all out of ~g grapes.</p>
-					<!-- /wp:paragraph -->"
-					` );
+				expect( await editor.getEditedPostContent() )
+					.toBe( `<!-- wp:paragraph -->
+<p>Sorry, we are all out of ~g grapes.</p>
+<!-- /wp:paragraph -->` );
 			} );
 		}
 
