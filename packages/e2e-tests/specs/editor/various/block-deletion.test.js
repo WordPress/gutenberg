@@ -21,6 +21,7 @@ const addThreeParagraphsToNewPost = async () => {
 	await page.keyboard.press( 'Enter' );
 	await page.keyboard.type( 'Second paragraph' );
 	await page.keyboard.press( 'Enter' );
+	await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 };
 
 /**
