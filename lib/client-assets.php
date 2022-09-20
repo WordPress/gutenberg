@@ -310,7 +310,6 @@ function gutenberg_register_packages_styles( $styles ) {
 
 	$wp_edit_blocks_dependencies = array(
 		'wp-components',
-		'wp-editor',
 		// This need to be added before the block library styles,
 		// The block library styles override the "reset" styles.
 		'wp-reset-editor-styles',

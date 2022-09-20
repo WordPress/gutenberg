@@ -123,6 +123,7 @@ export default function VisualEditor( { styles } ) {
 		themeSupportsLayout,
 		assets,
 		useRootPaddingAwareAlignments,
+		isFocusMode,
 	} = useSelect( ( select ) => {
 		const _settings = select( blockEditorStore ).getSettings();
 		return {
@@ -131,6 +132,7 @@ export default function VisualEditor( { styles } ) {
 			assets: _settings.__unstableResolvedAssets,
 			useRootPaddingAwareAlignments:
 				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
+			isFocusMode: _settings.focusMode,
 		};
 	}, [] );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
@@ -265,7 +267,12 @@ export default function VisualEditor( { styles } ) {
 							) }
 						{ ! isTemplateMode && (
 							<div
-								className="edit-post-visual-editor__post-title-wrapper"
+								className={ classnames(
+									'edit-post-visual-editor__post-title-wrapper',
+									{
+										'is-focus-mode': isFocusMode,
+									}
+								) }
 								contentEditable={ false }
 							>
 								<PostTitle ref={ titleRef } />
