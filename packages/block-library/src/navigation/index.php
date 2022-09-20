@@ -314,7 +314,7 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
 		$classic_nav_menu_blocks_serialized = serialize_blocks( $classic_nav_menu_blocks );
 
 		// Create a new navigation menu from the classic menu.
-		wp_insert_post(
+		$wp_insert_post_result = wp_insert_post(
 			array(
 				'post_content' => $classic_nav_menu_blocks_serialized,
 				'post_title'   => $classic_nav_menu->slug,
@@ -322,6 +322,10 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
 				'post_type'    => 'wp_navigation'
 			)
 		);
+
+		if ( is_wp_error( $wp_insert_post_result ) ) {
+			return;
+		}
 
 		// Fetch the most recently published navigation which will be the classic one created above.
 		return block_core_navigation_get_most_recently_published_navigation();
