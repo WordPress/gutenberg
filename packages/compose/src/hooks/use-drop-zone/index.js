@@ -70,36 +70,6 @@ export default function useDropZone( {
 
 			const { ownerDocument } = element;
 
-			/**
-			 * Checks if an element is in the drop zone.
-			 *
-			 * @param {EventTarget|null} targetToCheck
-			 *
-			 * @return {boolean} True if in drop zone, false if not.
-			 */
-			function isElementInZone( targetToCheck ) {
-				const { defaultView } = ownerDocument;
-				if (
-					! targetToCheck ||
-					! defaultView ||
-					! ( targetToCheck instanceof defaultView.HTMLElement ) ||
-					! element.contains( targetToCheck )
-				) {
-					return false;
-				}
-
-				/** @type {HTMLElement|null} */
-				let elementToCheck = targetToCheck;
-
-				do {
-					if ( elementToCheck.dataset.isDropZone ) {
-						return elementToCheck === element;
-					}
-				} while ( ( elementToCheck = elementToCheck.parentElement ) );
-
-				return false;
-			}
-
 			function maybeDragStart( /** @type {DragEvent} */ event ) {
 				if ( isDragging ) {
 					return;
@@ -126,14 +96,17 @@ export default function useDropZone( {
 
 			function onDragEnter( /** @type {DragEvent} */ event ) {
 				event.preventDefault();
+				const defaultView = ownerDocument.defaultView;
 
 				// The `dragenter` event will also fire when entering child
 				// elements, but we only want to call `onDragEnter` when
 				// entering the drop zone, which means the `relatedTarget`
 				// (element that has been left) should be outside the drop zone.
 				if (
-					element.contains(
-						/** @type {Node} */ ( event.relatedTarget )
+					! (
+						defaultView &&
+						event.relatedTarget instanceof defaultView.Node &&
+						element.contains( event.relatedTarget )
 					)
 				) {
 					return;
@@ -156,6 +129,7 @@ export default function useDropZone( {
 			}
 
 			function onDragLeave( /** @type {DragEvent} */ event ) {
+				const defaultView = ownerDocument.defaultView;
 				// The `dragleave` event will also fire when leaving child
 				// elements, but we only want to call `onDragLeave` when
 				// leaving the drop zone, which means the `relatedTarget`
@@ -163,7 +137,11 @@ export default function useDropZone( {
 				// zone.
 				// Note: This is not entirely reliable in Safari due to this bug
 				// https://bugs.webkit.org/show_bug.cgi?id=66547
-				if ( isElementInZone( event.relatedTarget ) ) {
+				if (
+					defaultView &&
+					event.relatedTarget instanceof defaultView.Node &&
+					element.contains( event.relatedTarget )
+				) {
 					return;
 				}
 
@@ -211,7 +189,6 @@ export default function useDropZone( {
 				}
 			}
 
-			element.dataset.isDropZone = 'true';
 			element.addEventListener( 'drop', onDrop );
 			element.addEventListener( 'dragenter', onDragEnter );
 			element.addEventListener( 'dragover', onDragOver );
@@ -227,7 +204,6 @@ export default function useDropZone( {
 				onDragLeaveRef.current = null;
 				onDragEndRef.current = null;
 				onDragOverRef.current = null;
-				delete element.dataset.isDropZone;
 				element.removeEventListener( 'drop', onDrop );
 				element.removeEventListener( 'dragenter', onDragEnter );
 				element.removeEventListener( 'dragover', onDragOver );
