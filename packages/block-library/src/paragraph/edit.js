@@ -59,13 +59,10 @@ function ParagraphBlock( {
 	const { align, content, direction, dropCap, placeholder } = attributes;
 	const isDropCapFeatureEnabled = useSetting( 'typography.dropCap' );
 	const [ paragraphElement, setParagraphElement ] = useState( null );
-	const refCallback = ( element ) => {
-		setParagraphElement( element );
-	};
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [
 			useOnEnter( { clientId, content } ),
-			refCallback,
+			setParagraphElement,
 		] ),
 		className: classnames( {
 			'has-drop-cap': dropCap,
