@@ -380,7 +380,7 @@ async function publishPackagesToNpm( {
 	} else if ( [ 'bugfix', 'wp' ].includes( releaseType ) ) {
 		log( '>> Publishing modified packages to npm.' );
 		await command(
-			`npx lerna publish ${ minimumVersionBump } --dist-tag ${ distTag } --no-private ${ yesFlag } ${ noVerifyAccessFlag }`,
+			`npx lerna publish ${ minimumVersionBump } --dist-tag ${ distTag } --no-private ${ yesFlag } ${ noVerifyAccessFlag } --force-publish`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
