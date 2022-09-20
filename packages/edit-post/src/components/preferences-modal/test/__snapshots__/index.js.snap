@@ -437,7 +437,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     class="components-toggle-control__label"
                     for="inspector-toggle-control-5"
                   >
-                    Reduce the interface
+                    Use theme styles
                   </label>
                 </div>
               </div>
@@ -445,7 +445,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                 class="components-base-control__help emotion-6 emotion-7"
                 id="inspector-toggle-control-5__help"
               >
-                Compacts options and outlines in the toolbar.
+                Make the editor look like your theme.
               </p>
             </div>
           </div>
@@ -483,59 +483,13 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     class="components-toggle-control__label"
                     for="inspector-toggle-control-6"
                   >
-                    Use theme styles
-                  </label>
-                </div>
-              </div>
-              <p
-                class="components-base-control__help emotion-6 emotion-7"
-                id="inspector-toggle-control-6__help"
-              >
-                Make the editor look like your theme.
-              </p>
-            </div>
-          </div>
-          <div
-            class="interface-preferences-modal__option"
-          >
-            <div
-              class="components-base-control components-toggle-control emotion-0 emotion-1"
-            >
-              <div
-                class="components-base-control__field emotion-2 emotion-3"
-              >
-                <div
-                  class="components-flex components-h-stack emotion-4 emotion-5"
-                  data-wp-c16t="true"
-                  data-wp-component="HStack"
-                >
-                  <span
-                    class="components-form-toggle"
-                  >
-                    <input
-                      aria-describedby="inspector-toggle-control-7__help"
-                      class="components-form-toggle__input"
-                      id="inspector-toggle-control-7"
-                      type="checkbox"
-                    />
-                    <span
-                      class="components-form-toggle__track"
-                    />
-                    <span
-                      class="components-form-toggle__thumb"
-                    />
-                  </span>
-                  <label
-                    class="components-toggle-control__label"
-                    for="inspector-toggle-control-7"
-                  >
                     Display block breadcrumbs
                   </label>
                 </div>
               </div>
               <p
                 class="components-base-control__help emotion-6 emotion-7"
-                id="inspector-toggle-control-7__help"
+                id="inspector-toggle-control-6__help"
               >
                 Shows block breadcrumbs at the bottom of the editor.
               </p>
