@@ -574,7 +574,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	foreach ( $inner_blocks as $inner_block ) {
 		if ( ( 'core/navigation-link' === $inner_block->name || 'core/home-link' === $inner_block->name || 'core/site-title' === $inner_block->name || 'core/site-logo' === $inner_block->name || 'core/navigation-submenu' === $inner_block->name ) && ! $is_list_open ) {
 			$is_list_open       = true;
-			$inner_blocks_html .= '<ul class="wp-block-navigation__container">';
+			$inner_blocks_html .= '<ul x-ref="items" class="wp-block-navigation__container">';
 		}
 		if ( 'core/navigation-link' !== $inner_block->name && 'core/home-link' !== $inner_block->name && 'core/site-title' !== $inner_block->name && 'core/site-logo' !== $inner_block->name && 'core/navigation-submenu' !== $inner_block->name && $is_list_open ) {
 			$is_list_open       = false;
@@ -647,7 +647,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
 
 	$responsive_container_markup = sprintf(
-		'<button x-on:click="open = true" aria-haspopup="true" %3$s class="%6$s">%9$s</button>
+		'<button x-on:click="open = true; $focus.within($refs.items).first()" aria-haspopup="true" %3$s class="%6$s">%9$s</button>
 			<div 
 				x-on:keydown.escape="open = false"
 				:class="open && \'is-menu-open\ has-modal-open\'"
