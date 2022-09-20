@@ -97,7 +97,7 @@ const deprecated = [
 	{
 		supports,
 		attributes: {
-			...omit( blockAttributes, [ 'style' ] ),
+			...restBlockAttributes,
 			customTextColor: {
 				type: 'string',
 			},
