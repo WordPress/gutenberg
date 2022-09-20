@@ -49,7 +49,7 @@ export type ToolsPanelProps = {
 	__experimentalLastVisibleItemClass?: string;
 };
 
-export type ToolsPanelHeaderProps = {
+export type ToolsPanelDropdownMenuProps = {
 	/**
 	 * Text to be displayed within the panel header. It is also passed along as
 	 * the `label` for the panel header's `DropdownMenu`.
@@ -68,6 +68,8 @@ export type ToolsPanelHeaderProps = {
 	 */
 	toggleItem: ( label: string ) => void;
 };
+
+export type ToolsPanelHeaderProps = ToolsPanelDropdownMenuProps;
 
 export type ToolsPanelItem = {
 	/**
