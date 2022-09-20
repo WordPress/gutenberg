@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,6 +17,8 @@ import {
 	getSaveContent,
 	isUnmodifiedDefaultBlock,
 	serializeRawBlock,
+	switchToBlockType,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import {
@@ -93,10 +94,38 @@ function BlockListBlock( {
 	onMerge,
 	toggleSelection,
 } ) {
-	const themeSupportsLayout = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings().supportsLayout;
-	}, [] );
+	const {
+		themeSupportsLayout,
+		hasContentLockedParent,
+		isContentBlock,
+		isContentLocking,
+		isTemporarilyEditingAsBlocks,
+	} = useSelect(
+		( select ) => {
+			const {
+				getSettings,
+				__unstableGetContentLockingParent,
+				getTemplateLock,
+				__unstableGetTemporarilyEditingAsBlocks,
+			} = select( blockEditorStore );
+			const _hasContentLockedParent =
+				!! __unstableGetContentLockingParent( clientId );
+			return {
+				themeSupportsLayout: getSettings().supportsLayout,
+				isContentBlock:
+					select( blocksStore ).__experimentalHasContentRoleAttribute(
+						name
+					),
+				hasContentLockedParent: _hasContentLockedParent,
+				isContentLocking:
+					getTemplateLock( clientId ) === 'contentOnly' &&
+					! _hasContentLockedParent,
+				isTemporarilyEditingAsBlocks:
+					__unstableGetTemporarilyEditingAsBlocks() === clientId,
+			};
+		},
+		[ name, clientId ]
+	);
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
@@ -122,6 +151,12 @@ function BlockListBlock( {
 
 	const blockType = getBlockType( name );
 
+	if ( hasContentLockedParent && ! isContentBlock ) {
+		wrapperProps = {
+			...wrapperProps,
+			tabIndex: -1,
+		};
+	}
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType?.getEditWrapperProps ) {
 		wrapperProps = mergeWrapperProps(
@@ -184,18 +219,24 @@ function BlockListBlock( {
 		block = <Block { ...wrapperProps }>{ blockEdit }</Block>;
 	}
 
+	const { 'data-align': dataAlign, ...restWrapperProps } = wrapperProps ?? {};
+
 	const value = {
 		clientId,
-		className:
-			wrapperProps?.[ 'data-align' ] && themeSupportsLayout
-				? classnames(
-						className,
-						`align${ wrapperProps[ 'data-align' ] }`
-				  )
-				: className,
-		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
+		className: classnames(
+			{
+				'is-content-locked': isContentLocking,
+				'is-content-locked-temporarily-editing-as-blocks':
+					isTemporarilyEditingAsBlocks,
+				'is-content-block': hasContentLockedParent && isContentBlock,
+			},
+			dataAlign && themeSupportsLayout && `align${ dataAlign }`,
+			className
+		),
+		wrapperProps: restWrapperProps,
 		isAligned,
 	};
+
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
 
 	return (
@@ -291,8 +332,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
 		onMerge( forward ) {
-			const { clientId } = ownProps;
-			const { getPreviousBlockClientId, getNextBlockClientId } =
+			const { clientId, rootClientId } = ownProps;
+			const { getPreviousBlockClientId, getNextBlockClientId, getBlock } =
 				select( blockEditorStore );
 
 			if ( forward ) {
@@ -305,6 +346,16 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 					getPreviousBlockClientId( clientId );
 				if ( previousBlockClientId ) {
 					mergeBlocks( previousBlockClientId, clientId );
+				} else if ( rootClientId ) {
+					// Attempt to "unwrap" the block contents when there's no
+					// preceding block to merge with.
+					const replacement = switchToBlockType(
+						getBlock( rootClientId ),
+						'*'
+					);
+					if ( replacement && replacement.length ) {
+						replaceBlocks( rootClientId, replacement, 0 );
+					}
 				}
 			}
 		},

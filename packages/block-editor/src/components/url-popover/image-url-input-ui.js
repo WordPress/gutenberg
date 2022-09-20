@@ -51,6 +51,9 @@ const ImageURLInputUI = ( {
 	rel,
 } ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	const openLinkUI = useCallback( () => {
 		setIsOpen( true );
 	} );
@@ -245,9 +248,11 @@ const ImageURLInputUI = ( {
 				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
 				aria-expanded={ isOpen }
 				onClick={ openLinkUI }
+				ref={ setPopoverAnchor }
 			/>
 			{ isOpen && (
 				<URLPopover
+					anchor={ popoverAnchor }
 					onFocusOutside={ onFocusOutside() }
 					onClose={ closeLinkUI }
 					renderSettings={ () => advancedOptions }

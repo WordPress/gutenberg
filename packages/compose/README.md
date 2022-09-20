@@ -2,7 +2,7 @@
 
 The `compose` package is a collection of handy [Hooks](https://reactjs.org/docs/hooks-intro.html) and [Higher Order Components](https://facebook.github.io/react/docs/higher-order-components.html) (HOCs) you can use to wrap your WordPress components and provide some basic features like: state, instance id, pure...
 
-The `compose` function is an alias to [flowRight](https://lodash.com/docs/#flowRight) from Lodash. It comes from functional programming, and allows you to compose any number of functions. You might also think of this as layering functions; `compose` will execute the last function first, then sequentially move back through the previous functions passing the result of each function upward.
+The `compose` function is inspired by [flowRight](https://lodash.com/docs/#flowRight) from Lodash and works the same way. It comes from functional programming, and allows you to compose any number of functions. You might also think of this as layering functions; `compose` will execute the last function first, then sequentially move back through the previous functions passing the result of each function upward.
 
 An example that illustrates it for two functions:
 
@@ -66,7 +66,7 @@ For more details, you can refer to each Higher Order Component's README file. [A
 Composes multiple higher-order components into a single higher-order component. Performs right-to-left function
 composition, where each successive invocation is supplied the return value of the previous.
 
-This is just a re-export of `lodash`'s `flowRight` function.
+This is inspired by `lodash`'s `flowRight` function.
 
 _Related_
 
@@ -85,6 +85,40 @@ _Parameters_
 _Returns_
 
 -   Component class with generated display name assigned.
+
+### debounce
+
+A simplified and properly typed version of lodash's `debounce`, that
+always uses timers instead of sometimes using rAF.
+
+Creates a debounced function that delays invoking `func` until after `wait`
+milliseconds have elapsed since the last time the debounced function was
+invoked. The debounced function comes with a `cancel` method to cancel delayed
+`func` invocations and a `flush` method to immediately invoke them. Provide
+`options` to indicate whether `func` should be invoked on the leading and/or
+trailing edge of the `wait` timeout. The `func` is invoked with the last
+arguments provided to the debounced function. Subsequent calls to the debounced
+function return the result of the last `func` invocation.
+
+**Note:** If `leading` and `trailing` options are `true`, `func` is
+invoked on the trailing edge of the timeout only if the debounced function
+is invoked more than once during the `wait` timeout.
+
+If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+until the next tick, similar to `setTimeout` with a timeout of `0`.
+
+_Parameters_
+
+-   _func_ `Function`: The function to debounce.
+-   _wait_ `number`: The number of milliseconds to delay.
+-   _options_ `Partial< DebounceOptions >`: The options object.
+-   _options.leading_ `boolean`: Specify invoking on the leading edge of the timeout.
+-   _options.maxWait_ `number`: The maximum time `func` is allowed to be delayed before it's invoked.
+-   _options.trailing_ `boolean`: Specify invoking on the trailing edge of the timeout.
+
+_Returns_
+
+-   Returns the new debounced function.
 
 ### ifCondition
 
@@ -110,6 +144,17 @@ _Parameters_
 _Returns_
 
 -   Higher-order component.
+
+### pipe
+
+Composes multiple higher-order components into a single higher-order component. Performs left-to-right function
+composition, where each successive invocation is supplied the return value of the previous.
+
+This is inspired by `lodash`'s `flow` function.
+
+_Related_
+
+-   <https://docs-lodash.com/v4/flow/>
 
 ### pure
 
@@ -186,7 +231,7 @@ _Returns_
 
 ### useDebounce
 
-Debounces a function with Lodash's `debounce`. A new debounced function will
+Debounces a function similar to Lodash's `debounce`. A new debounced function will
 be returned and any scheduled calls cancelled if any of the arguments change,
 including the function to debounce, so please wrap functions created on
 render in components in `useCallback`.
@@ -199,11 +244,11 @@ _Parameters_
 
 -   _fn_ `TFunc`: The function to debounce.
 -   _wait_ `[number]`: The number of milliseconds to delay.
--   _options_ `[import('lodash').DebounceSettings]`: The options object.
+-   _options_ `[import('../../utils/debounce').DebounceOptions]`: The options object.
 
 _Returns_
 
--   `import('lodash').DebouncedFunc<TFunc>`: Debounced function.
+-   `import('../../utils/debounce').DebouncedFunc<TFunc>`: Debounced function.
 
 ### useDisabled
 

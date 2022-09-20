@@ -4,8 +4,6 @@
 import {
 	flow,
 	reduce,
-	first,
-	last,
 	omit,
 	without,
 	mapValues,
@@ -1004,13 +1002,10 @@ export const blocks = flow(
 
 			case 'MOVE_BLOCKS_UP': {
 				const { clientIds, rootClientId = '' } = action;
-				const firstClientId = first( clientIds );
+				const firstClientId = clientIds[ 0 ];
 				const subState = state[ rootClientId ];
 
-				if (
-					! subState.length ||
-					firstClientId === first( subState )
-				) {
+				if ( ! subState.length || firstClientId === subState[ 0 ] ) {
 					return state;
 				}
 
@@ -1029,11 +1024,14 @@ export const blocks = flow(
 
 			case 'MOVE_BLOCKS_DOWN': {
 				const { clientIds, rootClientId = '' } = action;
-				const firstClientId = first( clientIds );
-				const lastClientId = last( clientIds );
+				const firstClientId = clientIds[ 0 ];
+				const lastClientId = clientIds[ clientIds.length - 1 ];
 				const subState = state[ rootClientId ];
 
-				if ( ! subState.length || lastClientId === last( subState ) ) {
+				if (
+					! subState.length ||
+					lastClientId === subState[ subState.length - 1 ]
+				) {
 					return state;
 				}
 
@@ -1610,21 +1608,21 @@ export const blockListSettings = ( state = {}, action ) => {
 };
 
 /**
- * Reducer returning whether the navigation mode is enabled or not.
+ * Reducer returning which mode is enabled.
  *
  * @param {string} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {string} Updated state.
  */
-export function isNavigationMode( state = false, action ) {
-	// Let inserting block always trigger Edit mode.
-	if ( action.type === 'INSERT_BLOCKS' ) {
-		return false;
+export function editorMode( state = 'edit', action ) {
+	// Let inserting block in navigation mode always trigger Edit mode.
+	if ( action.type === 'INSERT_BLOCKS' && state === 'navigation' ) {
+		return 'edit';
 	}
 
-	if ( action.type === 'SET_NAVIGATION_MODE' ) {
-		return action.isNavigationMode;
+	if ( action.type === 'SET_EDITOR_MODE' ) {
+		return action.mode;
 	}
 
 	return state;
@@ -1639,13 +1637,11 @@ export function isNavigationMode( state = false, action ) {
  * @return {string|null} Updated state.
  */
 export function hasBlockMovingClientId( state = null, action ) {
-	// Let inserting block always trigger Edit mode.
-
 	if ( action.type === 'SET_BLOCK_MOVING_MODE' ) {
 		return action.hasBlockMovingClientId;
 	}
 
-	if ( action.type === 'SET_NAVIGATION_MODE' ) {
+	if ( action.type === 'SET_EDITOR_MODE' ) {
 		return null;
 	}
 
@@ -1718,9 +1714,12 @@ export function automaticChangeStatus( state, action ) {
 		case 'SET_BLOCK_VISIBILITY':
 		case 'START_TYPING':
 		case 'STOP_TYPING':
+		case 'UPDATE_BLOCK_LIST_SETTINGS':
 			return state;
 	}
 
+	// TODO: This is a source of bug, as each time there's a change in timing,
+	// or a new action is added, this could break.
 	// Reset the state by default (for any action not handled).
 }
 
@@ -1778,6 +1777,21 @@ export function lastBlockInserted( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the block that is eding temporarily edited as blocks.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function temporarilyEditingAsBlocks( state = '', action ) {
+	if ( action.type === 'SET_TEMPORARILY_EDITING_AS_BLOCKS' ) {
+		return action.temporarilyEditingAsBlocks;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1793,9 +1807,10 @@ export default combineReducers( {
 	settings,
 	preferences,
 	lastBlockAttributesChange,
-	isNavigationMode,
+	editorMode,
 	hasBlockMovingClientId,
 	automaticChangeStatus,
 	highlightedBlock,
 	lastBlockInserted,
+	temporarilyEditingAsBlocks,
 } );

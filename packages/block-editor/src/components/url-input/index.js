@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { debounce } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
 
@@ -18,7 +17,12 @@ import {
 	withSpokenMessages,
 	Popover,
 } from '@wordpress/components';
-import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
+import {
+	compose,
+	debounce,
+	withInstanceId,
+	withSafeTimeout,
+} from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
 
@@ -462,7 +466,7 @@ class URLInput extends Component {
 			'aria-label': label ? undefined : __( 'URL' ), // Ensure input always has an accessible label
 			'aria-expanded': showSuggestions,
 			'aria-autocomplete': 'list',
-			'aria-owns': suggestionsListboxId,
+			'aria-controls': suggestionsListboxId,
 			'aria-activedescendant':
 				selectedSuggestion !== null
 					? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`

@@ -19,7 +19,12 @@ import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { pasteHandler } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { __unstableUseRichText as useRichText } from '@wordpress/rich-text';
+import {
+	__unstableUseRichText as useRichText,
+	create,
+	toHTMLString,
+	insert,
+} from '@wordpress/rich-text';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -149,9 +154,13 @@ function PostTitle( _, forwardedRef ) {
 			plainText,
 		} );
 
-		if ( typeof content !== 'string' && content.length ) {
-			event.preventDefault();
+		event.preventDefault();
 
+		if ( ! content.length ) {
+			return;
+		}
+
+		if ( typeof content !== 'string' ) {
 			const [ firstBlock ] = content;
 
 			if (
@@ -164,6 +173,17 @@ function PostTitle( _, forwardedRef ) {
 			} else {
 				onInsertBlockAfter( content );
 			}
+		} else {
+			const value = {
+				...create( { html: title } ),
+				...selection,
+			};
+			const newValue = insert( value, create( { html: content } ) );
+			onUpdate( toHTMLString( { value: newValue } ) );
+			setSelection( {
+				start: newValue.start,
+				end: newValue.end,
+			} );
 		}
 	}
 

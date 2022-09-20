@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { map, flowRight, omit, filter, mapValues } from 'lodash';
+import { map, omit, filter, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -172,7 +173,7 @@ export function itemIsComplete( state = {}, action ) {
  *
  * @return {Object} Next state.
  */
-const receiveQueries = flowRight( [
+const receiveQueries = compose( [
 	// Limit to matching action type so we don't attempt to replace action on
 	// an unhandled action.
 	ifMatchingAction( ( action ) => 'query' in action ),

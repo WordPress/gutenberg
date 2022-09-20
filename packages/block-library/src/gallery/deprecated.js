@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { map, some, omit } from 'lodash';
+import { map, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -95,9 +95,11 @@ function runV2Migration( attributes ) {
 		return getImageBlock( image, attributes.sizeSlug, linkTo );
 	} );
 
+	const { images, ids, ...restAttributes } = attributes;
+
 	return [
 		{
-			...omit( attributes, [ 'images', 'ids' ] ),
+			...restAttributes,
 			linkTo,
 			allowResize: false,
 		},
@@ -657,8 +659,8 @@ const v3 = {
 					attribute: 'data-link',
 				},
 				caption: {
-					type: 'array',
-					source: 'children',
+					type: 'string',
+					source: 'html',
 					selector: 'figcaption',
 				},
 			},
@@ -777,8 +779,8 @@ const v2 = {
 					attribute: 'data-link',
 				},
 				caption: {
-					type: 'array',
-					source: 'children',
+					type: 'string',
+					source: 'html',
 					selector: 'figcaption',
 				},
 			},

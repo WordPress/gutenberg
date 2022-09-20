@@ -40,6 +40,7 @@ export default function PostTermsEdit( {
 	attributes,
 	clientId,
 	context,
+	isSelected,
 	setAttributes,
 	insertBlocksAfter,
 } ) {
@@ -57,7 +58,6 @@ export default function PostTermsEdit( {
 	);
 	const { postTerms, hasPostTerms, isLoading } = usePostTerms( {
 		postId,
-		postType,
 		term: selectedTerm,
 	} );
 	const hasPost = postId && postType;
@@ -96,7 +96,7 @@ export default function PostTermsEdit( {
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ isLoading && <Spinner /> }
-				{ ! isLoading && hasPostTerms && (
+				{ ! isLoading && hasPostTerms && ( isSelected || prefix ) && (
 					<RichText
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__prefix"
@@ -135,7 +135,7 @@ export default function PostTermsEdit( {
 					! hasPostTerms &&
 					( selectedTerm?.labels?.no_terms ||
 						__( 'Term items not found.' ) ) }
-				{ ! isLoading && hasPostTerms && (
+				{ ! isLoading && hasPostTerms && ( isSelected || suffix ) && (
 					<RichText
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__suffix"

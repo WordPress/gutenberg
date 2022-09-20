@@ -1,25 +1,27 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { group, row, stack } from '@wordpress/icons';
 
 const variations = [
 	{
 		name: 'group',
 		title: __( 'Group' ),
-		description: __( 'Gather blocks in a layout container.' ),
-		attributes: { layout: { type: 'default' } },
-		scope: [ 'transform' ],
+		description: __( 'Gather blocks in a container.' ),
+		attributes: { layout: { type: 'constrained' } },
+		isDefault: true,
+		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
 			! blockAttributes.layout ||
 			! blockAttributes.layout?.type ||
-			blockAttributes.layout?.type === 'default',
+			blockAttributes.layout?.type === 'default' ||
+			blockAttributes.layout?.type === 'constrained',
 		icon: group,
 	},
 	{
 		name: 'group-row',
-		title: __( 'Row' ),
+		title: _x( 'Row', 'single horizontal line' ),
 		description: __( 'Arrange blocks horizontally.' ),
 		attributes: { layout: { type: 'flex', flexWrap: 'nowrap' } },
 		scope: [ 'inserter', 'transform' ],

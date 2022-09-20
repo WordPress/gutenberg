@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { camelCase, upperFirst } from 'lodash';
+import { pascalCase } from 'change-case';
 import type { ComponentType } from 'react';
 
 type GetProps< C > = C extends ComponentType< infer P > ? P : never;
@@ -45,7 +45,7 @@ export function createHigherOrderComponent<
  */
 const hocName = ( name: string, Inner: ComponentType< any > ) => {
 	const inner = Inner.displayName || Inner.name || 'Component';
-	const outer = upperFirst( camelCase( name ) );
+	const outer = pascalCase( name ?? '' );
 
 	return `${ outer }(${ inner })`;
 };

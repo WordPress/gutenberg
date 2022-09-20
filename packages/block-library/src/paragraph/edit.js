@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { __, _x, isRTL } from '@wordpress/i18n';
 import {
-	ToolbarDropdownMenu,
+	ToolbarButton,
 	ToggleControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -33,19 +33,13 @@ const name = 'core/paragraph';
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
 		isRTL() && (
-			<ToolbarDropdownMenu
-				controls={ [
-					{
-						icon: formatLtr,
-						title: _x( 'Left to right', 'editor button' ),
-						isActive: direction === 'ltr',
-						onClick() {
-							setDirection(
-								direction === 'ltr' ? undefined : 'ltr'
-							);
-						},
-					},
-				] }
+			<ToolbarButton
+				icon={ formatLtr }
+				title={ _x( 'Left to right', 'editor button' ) }
+				isActive={ direction === 'ltr' }
+				onClick={ () => {
+					setDirection( direction === 'ltr' ? undefined : 'ltr' );
+				} }
 			/>
 		)
 	);
@@ -167,6 +161,7 @@ function ParagraphBlock( {
 				}
 				data-empty={ content ? false : true }
 				placeholder={ placeholder || __( 'Type / to choose a block' ) }
+				data-custom-placeholder={ placeholder ? true : undefined }
 				__unstableEmbedURLOnPaste
 				__unstableAllowPrefixTransformations
 			/>

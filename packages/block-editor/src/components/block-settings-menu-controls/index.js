@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { compact, map } from 'lodash';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,7 +25,11 @@ import { store as blockEditorStore } from '../../store';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
-const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
+const BlockSettingsMenuControlsSlot = ( {
+	fillProps,
+	clientIds = null,
+	__unstableDisplayLocation,
+} ) => {
 	const { selectedBlocks, selectedClientIds, canRemove } = useSelect(
 		( select ) => {
 			const {
@@ -37,7 +41,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
 			return {
 				selectedBlocks: map(
-					compact( getBlocksByClientId( ids ) ),
+					getBlocksByClientId( ids ).filter( Boolean ),
 					( block ) => block.name
 				),
 				selectedClientIds: ids,
@@ -58,7 +62,14 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 		( isGroupable || isUngroupable ) && canRemove;
 
 	return (
-		<Slot fillProps={ { ...fillProps, selectedBlocks, selectedClientIds } }>
+		<Slot
+			fillProps={ {
+				...fillProps,
+				__unstableDisplayLocation,
+				selectedBlocks,
+				selectedClientIds,
+			} }
+		>
 			{ ( fills ) => {
 				if (
 					! fills?.length > 0 &&

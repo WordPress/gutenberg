@@ -7,11 +7,7 @@
 `Flex` is used with any of it's two sub-components, `FlexItem` and `FlexBlock`.
 
 ```jsx
-import {
-	Flex,
-	FlexBlock,
-	FlexItem,
-} from '@wordpress/components';
+import { Flex, FlexBlock, FlexItem } from '@wordpress/components';
 
 function Example() {
 	return (
@@ -29,38 +25,44 @@ function Example() {
 
 ## Props
 
-##### align
-
-**Type**: `CSSProperties['alignItems']`
+### `align`: `CSSProperties['alignItems']`
 
 Aligns children using CSS Flexbox `align-items`. Vertically aligns content if the `direction` is `row`, or horizontally aligns content if the `direction` is `column`.
 
-##### direction
+-   Required: No
+-   Default: `center`
 
-**Type**: `[ResponsiveCSSValue<CSSProperties['flexDirection']>]`
+### `direction`: `ResponsiveCSSValue<CSSProperties['flexDirection']>`
 
 The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
 
-##### expanded
+-   Required: No
+-   Default: `row`
 
-**Type**: `[boolean]`
+### `expanded`: `boolean`
 
 Expands to the maximum available width (if horizontal) or height (if vertical).
 
-##### gap
+-   Required: No
+-   Default: `true`
 
-**Type**: `[number | string]`
+### `gap`: `number`
 
 Spacing in between each child can be adjusted by using `gap`. The value of `gap` works as a multiplier to the library's grid system (base of `4px`).
 
-##### justify
+-   Required: No
+-   Default: `2`
 
-**Type**: `[CSSProperties['justifyContent']]`
+##### `justify`: `CSSProperties['justifyContent']`
 
 Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
 
-##### wrap
+-   Required: No
+-   Default: `space-between`
 
-**Type**: `[boolean]`
+##### `wrap`: `boolean`
 
 Determines if children should wrap.
+
+-   Required: No
+-   Default: `false`

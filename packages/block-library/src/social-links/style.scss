@@ -1,4 +1,7 @@
 .wp-block-social-links {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
 	padding-left: 0;
 	padding-right: 0;
 	// Some themes set text-indent on all <ul>

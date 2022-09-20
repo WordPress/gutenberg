@@ -5,6 +5,23 @@
  * @package Gutenberg
  */
 
+// Debug settings for parity with WordPress Core's PHPUnit tests.
+if ( ! defined( 'WP_DEBUG' ) ) {
+	define( 'WP_DEBUG', true );
+}
+if ( ! defined( 'LOCAL_WP_DEBUG_LOG' ) ) {
+	define( 'LOCAL_WP_DEBUG_LOG', true );
+}
+if ( ! defined( 'LOCAL_WP_DEBUG_DISPLAY' ) ) {
+	define( 'LOCAL_WP_DEBUG_DISPLAY', true );
+}
+if ( ! defined( 'LOCAL_SCRIPT_DEBUG' ) ) {
+	define( 'LOCAL_SCRIPT_DEBUG', true );
+}
+if ( ! defined( 'LOCAL_WP_ENVIRONMENT_TYPE' ) ) {
+	define( 'LOCAL_WP_ENVIRONMENT_TYPE', 'local' );
+}
+
 // Require composer dependencies.
 require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 
@@ -16,11 +33,6 @@ if ( 'build' === getenv( 'LOCAL_DIR' ) ) {
 // Determine the tests directory (from a WP dev checkout).
 // Try the WP_TESTS_DIR environment variable first.
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
-
-// Next, try the WP_PHPUNIT composer package.
-if ( ! $_tests_dir ) {
-	$_tests_dir = getenv( 'WP_PHPUNIT__DIR' );
-}
 
 // See if we're installed inside an existing WP dev instance.
 if ( ! $_tests_dir ) {
@@ -79,6 +91,51 @@ $GLOBALS['wp_tests_options'] = array(
 
 // Enable the widget block editor.
 tests_add_filter( 'gutenberg_use_widgets_block_editor', '__return_true' );
+
+/**
+ * Register test block prior to theme.json generating metadata.
+ *
+ * This new block is used to test experimental selectors. It is registered
+ * via `tests_add_filter()` here during bootstrapping so that it occurs prior
+ * to theme.json generating block metadata. Once a core block, such as Image,
+ * uses feature level selectors we could remove this in favour of testing via
+ * the core block.
+ */
+function gutenberg_register_test_block_for_feature_selectors() {
+	WP_Block_Type_Registry::get_instance()->register(
+		'test/test',
+		array(
+			'api_version' => 2,
+			'attributes'  => array(
+				'textColor' => array(
+					'type' => 'string',
+				),
+				'style'     => array(
+					'type' => 'object',
+				),
+			),
+			'supports'    => array(
+				'__experimentalBorder'   => array(
+					'radius'                 => true,
+					'__experimentalSelector' => '.inner',
+				),
+				'color'                  => array(
+					'text' => true,
+				),
+				'spacing'                => array(
+					'padding'                => true,
+					'__experimentalSelector' => '.inner',
+				),
+				'typography'             => array(
+					'fontSize'               => true,
+					'__experimentalSelector' => '.sub-heading',
+				),
+				'__experimentalSelector' => '.wp-block-test, .wp-block-test__wrapper',
+			),
+		)
+	);
+}
+tests_add_filter( 'init', 'gutenberg_register_test_block_for_feature_selectors' );
 
 // Start up the WP testing environment.
 require $_tests_dir . '/includes/bootstrap.php';

@@ -165,4 +165,13 @@ module.exports = {
 	blockShortcodeContainer: {
 		padding: 12,
 	},
+	'wp-block-list-item__list-item--default': {
+		fontSize: 16,
+	},
+	'wp-block-list-item__list-item-placeholder': {
+		color: '#87a6bc',
+	},
+	innerAppender: {
+		marginLeft: 8,
+	},
 };

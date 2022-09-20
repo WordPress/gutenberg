@@ -19,7 +19,7 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
-import { useRef } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function getBlockDisplayText( block ) {
@@ -73,10 +73,19 @@ export default function DocumentActions( {
 } ) {
 	const { label } = useSecondaryText();
 
-	// The title ref is passed to the popover as the anchorRef so that the
-	// dropdown is centered over the whole title area rather than just one
-	// part of it.
-	const titleRef = useRef();
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps = useMemo(
+		() => ( {
+			// Use the title wrapper as the popover anchor so that the dropdown is
+			// centered over the whole title area rather than just one part of it.
+			anchor: popoverAnchor,
+		} ),
+		[ popoverAnchor ]
+	);
 
 	// Return a simple loading indicator until we have information to show.
 	if ( ! isLoaded ) {
@@ -103,7 +112,7 @@ export default function DocumentActions( {
 			} ) }
 		>
 			<div
-				ref={ titleRef }
+				ref={ setPopoverAnchor }
 				className="edit-site-document-actions__title-wrapper"
 			>
 				<Text
@@ -130,9 +139,7 @@ export default function DocumentActions( {
 
 				{ dropdownContent && (
 					<Dropdown
-						popoverProps={ {
-							anchorRef: titleRef.current,
-						} }
+						popoverProps={ popoverProps }
 						position="bottom center"
 						renderToggle={ ( { isOpen, onToggle } ) => (
 							<Button
@@ -141,6 +148,9 @@ export default function DocumentActions( {
 								aria-expanded={ isOpen }
 								aria-haspopup="true"
 								onClick={ onToggle }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
 								label={ sprintf(
 									/* translators: %s: the entity to see details about, like "template"*/
 									__( 'Show %s details' ),

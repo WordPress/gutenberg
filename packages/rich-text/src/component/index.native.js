@@ -4,7 +4,7 @@
  * External dependencies
  */
 import { View, Platform, Dimensions } from 'react-native';
-import { get, pickBy, debounce } from 'lodash';
+import { get, pickBy } from 'lodash';
 import memize from 'memize';
 import { colord } from 'colord';
 
@@ -18,7 +18,11 @@ import {
 } from '@wordpress/react-native-bridge';
 import { BlockFormatControls, getPxFromCssUnit } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import {
+	compose,
+	debounce,
+	withPreferredColorScheme,
+} from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -1048,6 +1052,7 @@ export class RichText extends Component {
 			selectionStart,
 			selectionEnd,
 			disableSuggestions,
+			containerWidth,
 		} = this.props;
 		const { currentFontSize } = this.state;
 
@@ -1124,11 +1129,16 @@ export class RichText extends Component {
 			maxWidth && this.state.width && maxWidth - this.state.width < 10
 				? maxWidth
 				: this.state.width;
-		const containerStyles = style?.padding &&
-			style?.backgroundColor && {
-				padding: style.padding,
-				backgroundColor: style.backgroundColor,
-			};
+		const containerStyles = [
+			style?.padding &&
+				style?.backgroundColor && {
+					padding: style.padding,
+					backgroundColor: style.backgroundColor,
+				},
+			containerWidth && {
+				width: containerWidth,
+			},
+		];
 
 		const EditableView = ( props ) => {
 			this.customEditableOnKeyDown = props?.onKeyDown;

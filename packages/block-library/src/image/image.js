@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, filter, map, pick, includes } from 'lodash';
+import { get, filter, isEmpty, map, pick, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -30,6 +30,7 @@ import {
 	__experimentalImageEditor as ImageEditor,
 	__experimentalImageEditingProvider as ImageEditingProvider,
 	__experimentalGetElementClassName,
+	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
 import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
@@ -57,7 +58,20 @@ import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
 
 export default function Image( {
 	temporaryURL,
-	attributes: {
+	attributes,
+	setAttributes,
+	isSelected,
+	insertBlocksAfter,
+	onReplace,
+	onSelectImage,
+	onSelectURL,
+	onUploadError,
+	containerRef,
+	context,
+	clientId,
+	isContentLocked,
+} ) {
+	const {
 		url = '',
 		alt,
 		caption,
@@ -72,18 +86,7 @@ export default function Image( {
 		height,
 		linkTarget,
 		sizeSlug,
-	},
-	setAttributes,
-	isSelected,
-	insertBlocksAfter,
-	onReplace,
-	onSelectImage,
-	onSelectURL,
-	onUploadError,
-	containerRef,
-	context,
-	clientId,
-} ) {
+	} = attributes;
 	const imageRef = useRef();
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
@@ -109,7 +112,7 @@ export default function Image( {
 					),
 			};
 		},
-		[ id, isSelected ]
+		[ id, isSelected, clientId ]
 	);
 	const { canInsertCover, imageEditing, imageSizes, maxWidth, mediaUpload } =
 		useSelect(
@@ -150,7 +153,10 @@ export default function Image( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
-	const isResizable = allowResize && ! ( isWideAligned && isLargeViewport );
+	const isResizable =
+		allowResize &&
+		! isContentLocked &&
+		! ( isWideAligned && isLargeViewport );
 	const imageSizeOptions = map(
 		filter( imageSizes, ( { slug } ) =>
 			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
@@ -186,7 +192,7 @@ export default function Image( {
 
 	// Get naturalWidth and naturalHeight from image ref, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
-	// witdth and height is otherwise lost when switching between alignments.
+	// width and height is otherwise lost when switching between alignments.
 	// See: https://github.com/WordPress/gutenberg/pull/37210.
 	const { naturalWidth, naturalHeight } = useMemo( () => {
 		return {
@@ -307,10 +313,12 @@ export default function Image( {
 	const controls = (
 		<>
 			<BlockControls group="block">
-				<BlockAlignmentControl
-					value={ align }
-					onChange={ updateAlignment }
-				/>
+				{ ! isContentLocked && (
+					<BlockAlignmentControl
+						value={ align }
+						onChange={ updateAlignment }
+					/>
+				) }
 				{ ! multiImageSelection && ! isEditingImage && (
 					<ImageURLInputUI
 						url={ href || '' }
@@ -429,6 +437,11 @@ export default function Image( {
 		defaultedAlt = __( 'This image has an empty alt attribute' );
 	}
 
+	const borderProps = useBorderProps( attributes );
+	const isRounded = attributes.className?.includes( 'is-style-rounded' );
+	const hasCustomBorder =
+		!! borderProps.className || ! isEmpty( borderProps.style );
+
 	let img = (
 		// Disable reason: Image itself is not meant to be interactive, but
 		// should direct focus to block.
@@ -445,6 +458,8 @@ export default function Image( {
 					} );
 				} }
 				ref={ imageRef }
+				className={ borderProps.className }
+				style={ borderProps.style }
 			/>
 			{ temporaryURL && <Spinner /> }
 		</>
@@ -466,6 +481,7 @@ export default function Image( {
 	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageEditor
+				borderProps={ isRounded ? undefined : borderProps }
 				url={ url }
 				width={ width }
 				height={ height }
@@ -530,7 +546,7 @@ export default function Image( {
 			<ResizableBox
 				size={ {
 					width: width ?? 'auto',
-					height: height ?? 'auto',
+					height: height && ! hasCustomBorder ? height : 'auto',
 				} }
 				showHandle={ isSelected }
 				minWidth={ minWidth }

@@ -33,11 +33,12 @@ export const InputWithSlider = ( {
 				label={ label }
 				hideLabelFromVision
 				value={ value }
+				// @ts-expect-error TODO: Resolve discrepancy in NumberControl
 				onChange={ onChange }
 				prefix={
 					<Spacer
 						as={ Text }
-						paddingLeft={ space( 3.5 ) }
+						paddingLeft={ space( 4 ) }
 						color={ COLORS.ui.theme }
 						lineHeight={ 1 }
 					>
@@ -45,6 +46,7 @@ export const InputWithSlider = ( {
 					</Spacer>
 				}
 				hideHTMLArrows
+				size="__unstable-large"
 			/>
 			<RangeControl
 				label={ label }
@@ -52,6 +54,8 @@ export const InputWithSlider = ( {
 				min={ min }
 				max={ max }
 				value={ value }
+				// @ts-expect-error
+				// See: https://github.com/WordPress/gutenberg/pull/40535#issuecomment-1172418185
 				onChange={ onChange }
 				withInputField={ false }
 			/>
