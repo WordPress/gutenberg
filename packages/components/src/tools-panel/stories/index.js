@@ -10,12 +10,16 @@ import { useState } from '@wordpress/element';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	Button,
+	__experimentalHeading as Heading,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import { arrowLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { ToolsPanel, ToolsPanelItem } from '../';
+import { ToolsPanel, ToolsPanelItem, ToolsPanelDropdownMenu } from '../';
 import Panel from '../../panel';
 import UnitControl from '../../unit-control';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
@@ -469,6 +473,70 @@ export const WithConditionallyRenderedControl = () => {
 
 export { ToolsPanelWithItemGroupSlot } from './tools-panel-with-item-group-slot';
 
+export const WithCustomHeader = () => {
+	const [ height, setHeight ] = useState();
+	const [ minHeight, setMinHeight ] = useState();
+	const [ width, setWidth ] = useState();
+
+	const resetAll = () => {
+		setHeight( undefined );
+		setWidth( undefined );
+		setMinHeight( undefined );
+	};
+
+	return (
+		<PanelWrapperView>
+			<Panel>
+				<ToolsPanel resetAll={ resetAll }>
+					<CustomHeader>
+						<Button icon={ arrowLeft } label="Back" isSmall />
+						<CustomHeading level={ 2 }>
+							Tools Panel with custom header
+						</CustomHeading>
+						<ToolsPanelDropdownMenu label="Tools Panel with custom header options" />
+					</CustomHeader>
+					<SingleColumnItem
+						hasValue={ () => !! width }
+						label="Width"
+						onDeselect={ () => setWidth( undefined ) }
+						isShownByDefault={ true }
+					>
+						<UnitControl
+							label="Width"
+							value={ width }
+							onChange={ ( next ) => setWidth( next ) }
+						/>
+					</SingleColumnItem>
+					<SingleColumnItem
+						hasValue={ () => !! height }
+						label="Height"
+						onDeselect={ () => setHeight( undefined ) }
+						isShownByDefault={ true }
+					>
+						<UnitControl
+							label="Height"
+							value={ height }
+							onChange={ ( next ) => setHeight( next ) }
+						/>
+					</SingleColumnItem>
+					<ToolsPanelItem
+						hasValue={ () => !! minHeight }
+						label="Minimum height"
+						onDeselect={ () => setMinHeight( undefined ) }
+						isShownByDefault={ true }
+					>
+						<UnitControl
+							label="Minimum height"
+							value={ minHeight }
+							onChange={ ( next ) => setMinHeight( next ) }
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			</Panel>
+		</PanelWrapperView>
+	);
+};
+
 const PanelWrapperView = styled.div`
 	max-width: 280px;
 	font-size: 13px;
@@ -484,4 +552,14 @@ const SingleColumnItem = styled( ToolsPanelItem )`
 
 const IntroText = styled.div`
 	grid-column: span 2;
+`;
+
+const CustomHeader = styled( HStack )`
+	grid-column: span 2;
+`;
+
+const CustomHeading = styled( Heading )`
+	font-size: inherit;
+	font-weight: 500;
+	line-height: normal;
 `;
