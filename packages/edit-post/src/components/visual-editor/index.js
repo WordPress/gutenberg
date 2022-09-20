@@ -221,8 +221,10 @@ export default function VisualEditor( { styles } ) {
 		return { type: 'default' };
 	}, [ isTemplateMode, themeSupportsLayout, globalLayoutSettings ] );
 
-	const templateBlocks = parse( templateContent );
-	const postContentBlock = findPostContent( templateBlocks );
+	const postContentBlock = useMemo( () => {
+		return findPostContent( parse( templateContent ) );
+	}, [ templateContent ] );
+
 	const postContentLayoutClasses = useLayoutClasses(
 		postContentBlock?.attributes?.layout,
 		globalLayoutSettings?.definitions
