@@ -18,10 +18,38 @@ exports[`Buttons block justify content sets Justify items right option 1`] = `
 <!-- /wp:buttons -->"
 `;
 
+exports[`Buttons block when a button is shown adds another button using the inline appender 1`] = `
+"<!-- wp:buttons -->
+<div class=\\"wp-block-buttons\\"><!-- wp:button /-->
+
+<!-- wp:button /--></div>
+<!-- /wp:buttons -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Buttons block when a button is shown adds another button using the inserter 1`] = `
+"<!-- wp:buttons -->
+<div class=\\"wp-block-buttons\\"><!-- wp:button /-->
+
+<!-- wp:button -->
+<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link wp-element-button\\">Hello!</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->"
+`;
+
 exports[`Buttons block when a button is shown adjusts the border radius 1`] = `
 "<!-- wp:buttons -->
 <div class=\\"wp-block-buttons\\"><!-- wp:button {\\"style\\":{\\"border\\":{\\"radius\\":\\"6px\\"}}} -->
 <div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link wp-element-button\\" href=\\"\\" style=\\"border-radius:6px\\">Hello</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->"
+`;
+
+exports[`Buttons block when a button is shown removing button along with buttons block removes the button and buttons block when deleting the block using the block delete action 1`] = `
+"<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
 `;
