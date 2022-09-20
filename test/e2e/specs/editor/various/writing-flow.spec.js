@@ -700,6 +700,9 @@ test.describe( 'Writing Flow', () => {
 		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
 		const y = paragraphRect.y + paragraphRect.height + 1;
 
+		// The typing observer requires two mouse moves to dectect and actual
+		// move.
+		await page.mouse.move( x - 1, y - 1 );
 		await page.mouse.move( x, y );
 
 		const inserter = page.locator( 'role=button[name="Add block"i]' );
