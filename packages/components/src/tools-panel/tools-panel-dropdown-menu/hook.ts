@@ -26,8 +26,13 @@ export function useToolsPanelDropdownMenu(
 		return cx( styles.DropdownMenu );
 	}, [ cx ] );
 
-	const { menuItems, hasMenuItems, areAllOptionalControlsHidden } =
-		useToolsPanelContext();
+	const {
+		menuItems,
+		hasMenuItems,
+		areAllOptionalControlsHidden,
+		resetAll,
+		toggleItem,
+	} = useToolsPanelContext();
 
 	return {
 		...otherProps,
@@ -35,5 +40,7 @@ export function useToolsPanelDropdownMenu(
 		dropdownMenuClassName,
 		hasMenuItems,
 		menuItems,
+		resetAll,
+		toggleItem,
 	};
 }

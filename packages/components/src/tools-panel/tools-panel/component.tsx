@@ -17,23 +17,13 @@ const ToolsPanel = (
 	props: WordPressComponentProps< ToolsPanelProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) => {
-	const {
-		children,
-		label,
-		panelContext,
-		resetAllItems,
-		toggleItem,
-		...toolsPanelProps
-	} = useToolsPanel( props );
+	const { children, label, panelContext, ...toolsPanelProps } =
+		useToolsPanel( props );
 
 	return (
 		<Grid { ...toolsPanelProps } columns={ 2 } ref={ forwardedRef }>
 			<ToolsPanelContext.Provider value={ panelContext }>
-				<ToolsPanelHeader
-					label={ label }
-					resetAll={ resetAllItems }
-					toggleItem={ toggleItem }
-				/>
+				<ToolsPanelHeader label={ label } />
 				{ children }
 			</ToolsPanelContext.Provider>
 		</Grid>

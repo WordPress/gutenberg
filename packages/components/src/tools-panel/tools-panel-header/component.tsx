@@ -22,7 +22,7 @@ const ToolsPanelHeader = (
 	props: WordPressComponentProps< ToolsPanelHeaderProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) => {
-	const { headingClassName, label, resetAll, toggleItem, ...headerProps } =
+	const { headingClassName, label, ...headerProps } =
 		useToolsPanelHeader( props );
 
 	if ( ! label ) {
@@ -40,11 +40,7 @@ const ToolsPanelHeader = (
 			<Heading level={ 2 } className={ headingClassName }>
 				{ label }
 			</Heading>
-			<ToolsPanelDropdownMenu
-				label={ dropDownMenuLabelText }
-				resetAll={ resetAll }
-				toggleItem={ toggleItem }
-			/>
+			<ToolsPanelDropdownMenu label={ dropDownMenuLabelText } />
 		</HStack>
 	);
 };

@@ -55,18 +55,6 @@ export type ToolsPanelDropdownMenuProps = {
 	 * the `label` for the panel header's `DropdownMenu`.
 	 */
 	label: string;
-	/**
-	 * The `resetAll` prop provides the callback to execute when the "Reset all"
-	 * menu item is selected. Its purpose is to facilitate resetting any control
-	 * values for items contained within this header's panel.
-	 */
-	resetAll: ResetAll;
-	/**
-	 * This is executed when an individual control's menu item is toggled. It
-	 * will update the panel's menu item state and call the panel item's
-	 * `onSelect` or `onDeselect` callbacks as appropriate.
-	 */
-	toggleItem: ( label: string ) => void;
 };
 
 export type ToolsPanelHeaderProps = ToolsPanelDropdownMenuProps;
@@ -146,6 +134,8 @@ export type ToolsPanelContext = {
 	lastDisplayedItem?: string;
 	__experimentalFirstVisibleItemClass?: string;
 	__experimentalLastVisibleItemClass?: string;
+	resetAll: ResetAll;
+	toggleItem: ( label: string ) => void;
 };
 
 export type ToolsPanelControlsGroupProps = {

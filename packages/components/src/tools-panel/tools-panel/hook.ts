@@ -294,6 +294,8 @@ export function useToolsPanel(
 			shouldRenderPlaceholderItems,
 			__experimentalFirstVisibleItemClass,
 			__experimentalLastVisibleItemClass,
+			resetAll: resetAllItems,
+			toggleItem,
 		} ),
 		[
 			areAllOptionalControlsHidden,
@@ -309,14 +311,14 @@ export function useToolsPanel(
 			shouldRenderPlaceholderItems,
 			__experimentalFirstVisibleItemClass,
 			__experimentalLastVisibleItemClass,
+			resetAllItems,
+			toggleItem,
 		]
 	);
 
 	return {
 		...otherProps,
 		panelContext,
-		resetAllItems,
-		toggleItem,
 		className: classes,
 	};
 }
