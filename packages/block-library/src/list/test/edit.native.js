@@ -8,6 +8,9 @@ import {
 	initializeEditor,
 	waitFor,
 	within,
+	addBlock,
+	getBlock,
+	triggerBlockListLayout,
 } from 'test/helpers';
 
 /**
@@ -19,9 +22,7 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 describe( 'List block', () => {
 	beforeAll( () => {
 		// Register all core blocks
-		registerCoreBlocks( {
-			__experimentalEnableListBlockV2: false,
-		} );
+		registerCoreBlocks();
 	} );
 
 	afterAll( () => {
@@ -32,78 +33,25 @@ describe( 'List block', () => {
 	} );
 
 	it( 'inserts block', async () => {
-		const { getByA11yLabel, getByTestId, getByText } =
-			await initializeEditor();
+		const screen = await initializeEditor();
 
-		fireEvent.press( getByA11yLabel( 'Add block' ) );
+		// Add block
+		await addBlock( screen, 'List' );
 
-		const blockList = getByTestId( 'InserterUI-Blocks' );
-		// onScroll event used to force the FlatList to render all items
-		fireEvent.scroll( blockList, {
-			nativeEvent: {
-				contentOffset: { y: 0, x: 0 },
-				contentSize: { width: 100, height: 100 },
-				layoutMeasurement: { width: 100, height: 100 },
-			},
-		} );
-
-		fireEvent.press( await waitFor( () => getByText( 'List' ) ) );
-
-		expect( getByA11yLabel( /List Block\. Row 1/ ) ).toBeVisible();
-		expect( getEditorHtml() ).toMatchSnapshot();
-	} );
-
-	it( 'renders a list with a few items', async () => {
-		const initialHtml = `<!-- wp:list -->
-		<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>
-		<!-- /wp:list -->`;
-
-		const { getByA11yLabel } = await initializeEditor( {
-			initialHtml,
-		} );
-
-		// Select List block
-		const listBlock = getByA11yLabel( /List Block\. Row 1/ );
+		// Get block
+		const listBlock = await getBlock( screen, 'List' );
 		fireEvent.press( listBlock );
+		expect( listBlock ).toBeVisible();
 
-		expect( getEditorHtml() ).toMatchSnapshot();
-	} );
-} );
+		// Trigger onLayout for the list
+		await triggerBlockListLayout( listBlock );
 
-describe( 'List V2 block', () => {
-	beforeAll( () => {
-		// Register all core blocks
-		registerCoreBlocks( {
-			__experimentalEnableListBlockV2: true,
-		} );
-	} );
+		// Get List item
+		const listItemBlock = await getBlock( screen, 'List item' );
+		fireEvent.press( listItemBlock );
 
-	afterAll( () => {
-		// Clean up registered blocks
-		getBlockTypes().forEach( ( block ) => {
-			unregisterBlockType( block.name );
-		} );
-	} );
+		expect( listItemBlock ).toBeVisible();
 
-	it( 'inserts block', async () => {
-		const { getByA11yLabel, getByTestId, getByText } =
-			await initializeEditor();
-
-		fireEvent.press( getByA11yLabel( 'Add block' ) );
-
-		const blockList = getByTestId( 'InserterUI-Blocks' );
-		// onScroll event used to force the FlatList to render all items
-		fireEvent.scroll( blockList, {
-			nativeEvent: {
-				contentOffset: { y: 0, x: 0 },
-				contentSize: { width: 100, height: 100 },
-				layoutMeasurement: { width: 100, height: 100 },
-			},
-		} );
-
-		fireEvent.press( await waitFor( () => getByText( 'List' ) ) );
-
-		expect( getByA11yLabel( /List Block\. Row 1/ ) ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 

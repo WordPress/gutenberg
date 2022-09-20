@@ -47,6 +47,7 @@ import {
 	useResourcePermissions,
 } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -461,6 +462,9 @@ export default function NavigationLinkEdit( {
 	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	const listItemRef = useRef( null );
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add link…' );
@@ -651,7 +655,7 @@ export default function NavigationLinkEdit( {
 	}
 
 	const blockProps = useBlockProps( {
-		ref: listItemRef,
+		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
 		className: classnames( 'wp-block-navigation-item', {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
@@ -844,7 +848,7 @@ export default function NavigationLinkEdit( {
 						<Popover
 							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }
-							anchorRef={ listItemRef.current }
+							anchor={ popoverAnchor }
 							shift
 						>
 							<LinkControl

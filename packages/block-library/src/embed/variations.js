@@ -32,7 +32,7 @@ import {
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
 /**
- * Template option choices for predefined columns layouts.
+ * The embed provider services.
  *
  * @type {WPBlockVariation[]}
  */

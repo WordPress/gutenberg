@@ -2,15 +2,11 @@
  * WordPress dependencies
  */
 import { SVG, Rect } from '@wordpress/primitives';
-import { Icon, menu, moreVertical, moreHorizontal } from '@wordpress/icons';
+import { Icon, menu } from '@wordpress/icons';
 
 export default function OverlayMenuIcon( { icon } ) {
 	if ( icon === 'menu' ) {
 		return <Icon icon={ menu } />;
-	} else if ( icon === 'more-vertical' ) {
-		return <Icon icon={ moreVertical } />;
-	} else if ( icon === 'more-horizontal' ) {
-		return <Icon icon={ moreHorizontal } />;
 	}
 
 	return (

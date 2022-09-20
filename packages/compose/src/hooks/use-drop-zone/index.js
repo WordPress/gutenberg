@@ -161,6 +161,8 @@ export default function useDropZone( {
 				// leaving the drop zone, which means the `relatedTarget`
 				// (element that has been entered) should be outside the drop
 				// zone.
+				// Note: This is not entirely reliable in Safari due to this bug
+				// https://bugs.webkit.org/show_bug.cgi?id=66547
 				if ( isElementInZone( event.relatedTarget ) ) {
 					return;
 				}

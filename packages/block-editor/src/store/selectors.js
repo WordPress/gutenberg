@@ -1435,7 +1435,7 @@ export function getTemplateLock( state, rootClientId ) {
 
 	const blockListSettings = getBlockListSettings( state, rootClientId );
 	if ( ! blockListSettings ) {
-		return null;
+		return undefined;
 	}
 
 	return blockListSettings.templateLock;
@@ -2696,7 +2696,7 @@ export const __unstableGetContentLockingParent = createSelector(
 		let result;
 		while ( !! state.blocks.parents[ current ] ) {
 			current = state.blocks.parents[ current ];
-			if ( getTemplateLock( state, current ) === 'noContent' ) {
+			if ( getTemplateLock( state, current ) === 'contentOnly' ) {
 				result = current;
 			}
 		}
