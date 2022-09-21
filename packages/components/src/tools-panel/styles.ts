@@ -13,7 +13,7 @@ import {
 	Wrapper as BaseControlWrapper,
 } from '../base-control/styles/base-control-styles';
 import { LabelWrapper } from '../input-control/styles/input-control-styles';
-import { COLORS, CONFIG } from '../utils';
+import { COLORS, CONFIG, rtl } from '../utils';
 import { space } from '../ui/utils/space';
 
 const toolsPanelGrid = {
@@ -152,7 +152,7 @@ export const ResetLabel = styled.span`
 	font-size: 11px;
 	font-weight: 500;
 	line-height: 1.4;
-	margin-left: ${ space( 3 ) };
+	${ rtl( { marginLeft: space( 3 ) } ) }
 	text-transform: uppercase;
 `;
 
