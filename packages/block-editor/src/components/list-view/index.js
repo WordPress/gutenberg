@@ -183,6 +183,7 @@ function ListView(
 			<TreeGrid
 				id={ id }
 				className="block-editor-list-view-tree"
+				aria-label={ __( 'Block navigation structure' ) }
 				ref={ treeGridRef }
 				onCollapseRow={ collapseRow }
 				onExpandRow={ expandRow }
