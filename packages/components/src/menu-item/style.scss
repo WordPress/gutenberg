@@ -8,6 +8,7 @@
 			// Ensure unchecked items have clearance for consistency
 			// with checked items containing an icon or shortcut.
 			padding-right: $grid-unit-60;
+			box-sizing: initial;
 		}
 	}
 
