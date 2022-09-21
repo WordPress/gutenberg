@@ -21,6 +21,17 @@ const elements = {
 	heading: {
 		description: __( 'Manage the fonts and typography used on headings.' ),
 		title: __( 'Headings' ),
+		hint: (
+			<>
+				{ __(
+					'Block headings like Site Title and Post Title should be managed in the '
+				) }
+				<strong>{ __( 'Styles' ) }</strong>
+				{ __( ' > ' ) }
+				<strong>{ __( 'Blocks' ) }</strong>
+				{ __( ' menu.' ) }
+			</>
+		),
 	},
 	button: {
 		description: __( 'Manage the fonts and typography used on buttons.' ),
@@ -34,6 +45,7 @@ function ScreenTypographyElement( { name, element } ) {
 			<ScreenHeader
 				title={ elements[ element ].title }
 				description={ elements[ element ].description }
+				hint={ elements[ element ].hint }
 			/>
 			<TypographyPanel name={ name } element={ element } />
 		</>

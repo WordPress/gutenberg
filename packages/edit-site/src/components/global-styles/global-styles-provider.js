@@ -85,7 +85,7 @@ function useGlobalStylesUserConfig() {
 			};
 			const updatedConfig = callback( currentConfig );
 			editEntityRecord( 'root', 'globalStyles', globalStylesId, {
-				styles: cleanEmptyObject( updatedConfig.styles ) || {},
+				styles: updatedConfig.styles || {},
 				settings: cleanEmptyObject( updatedConfig.settings ) || {},
 			} );
 		},
