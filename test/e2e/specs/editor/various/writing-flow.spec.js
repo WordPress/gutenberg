@@ -984,16 +984,7 @@ test.describe( 'Writing Flow', () => {
 		// Create a new paragraph.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'b' );
-
-		await pageUtils.pressKeyWithModifier( 'alt', 'ArrowUp' );
-		await page.keyboard.type( '.' );
-
-		// Expect the "." to be added at the start of the paragraph
-		await expect(
-			page.locator( 'role=document[name="Paragraph block"i] >> nth = 1' )
-		).toHaveText( '.b' );
-
-		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'ArrowLeft' );
 		await pageUtils.pressKeyWithModifier( 'alt', 'ArrowUp' );
 		await page.keyboard.type( '.' );
 
