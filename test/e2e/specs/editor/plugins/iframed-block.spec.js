@@ -35,8 +35,10 @@ test.describe( 'changing image size', () => {
 			page.locator( 'iframe[name="editor-canvas"]' )
 		).toBeVisible();
 
-		await expect(
-			page.locator( 'role=document[name="Block: Iframed Block"i]' )
-		).toHaveText( 'Iframed Block (set with jQuery)' );
+		// Expect the script to load in the iframe, which replaces the block text.
+		const iframedText = page.frameLocator( 'iframe' ).locator( 'p' );
+		await expect( iframedText.nth( 1 ) ).toHaveText(
+			'Iframed Block (set with jQuery)'
+		);
 	} );
 } );
