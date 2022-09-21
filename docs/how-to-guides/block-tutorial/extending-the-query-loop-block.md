@@ -153,7 +153,7 @@ In our case, the property would look like this:
 ```js
 {
 	/** ...variation properties */
-	allowedControls: [ 'inherit', 'order', 'taxQuery', 'search' ],
+	allowControls: [ 'inherit', 'order', 'taxQuery', 'search' ],
 }
 ```
 
