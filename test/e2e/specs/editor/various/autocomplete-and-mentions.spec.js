@@ -75,8 +75,11 @@ test.describe( 'Autocomplete', () => {
 		[ 'User Mention', 'mention' ],
 		[ 'Custom Completer', 'option' ],
 	].forEach( ( completerAndOptionType ) => {
-		const [ , type ] = completerAndOptionType;
-		test( `should insert ${ type }`, async ( { page, editor } ) => {
+		const [ completer, type ] = completerAndOptionType;
+		test( `${ completer }: should insert ${ type }`, async ( {
+			page,
+			editor,
+		} ) => {
 			// Set up test data for each case
 			const testData = {};
 			if ( type === 'mention' ) {
@@ -108,7 +111,7 @@ test.describe( 'Autocomplete', () => {
 			);
 		} );
 
-		test( `should insert ${ type } between two other words`, async ( {
+		test( `${ completer }: should insert ${ type } between two other words`, async ( {
 			page,
 			editor,
 			pageUtils,
@@ -144,7 +147,7 @@ test.describe( 'Autocomplete', () => {
 			);
 		} );
 
-		test( `should insert two subsequent ${ type }s`, async ( {
+		test( `${ completer }: should insert two subsequent ${ type }s`, async ( {
 			page,
 			editor,
 		} ) => {
@@ -191,7 +194,7 @@ test.describe( 'Autocomplete', () => {
 			);
 		} );
 
-		test( `should allow ${ type } selection via click event`, async ( {
+		test( `${ completer }: should allow ${ type } selection via click event`, async ( {
 			page,
 			editor,
 		} ) => {
@@ -227,7 +230,7 @@ test.describe( 'Autocomplete', () => {
 			);
 		} );
 
-		test( `should allow ${ type } selection via keypress event`, async ( {
+		test( `${ completer }: should allow ${ type } selection via keypress event`, async ( {
 			page,
 			editor,
 			pageUtils,
@@ -265,7 +268,7 @@ test.describe( 'Autocomplete', () => {
 			);
 		} );
 
-		test( `should cancel ${ type } selection via \`Escape\` keypress event`, async ( {
+		test( `${ completer }: should cancel ${ type } selection via \`Escape\` keypress event`, async ( {
 			page,
 			editor,
 		} ) => {
@@ -304,7 +307,7 @@ test.describe( 'Autocomplete', () => {
 
 		// This test does not apply to user mentions, because they don't get disabled.
 		if ( type !== 'mention' ) {
-			test( `should not insert disabled ${ type }s`, async ( {
+			test( `${ completer }: should not insert disabled ${ type }s`, async ( {
 				page,
 				editor,
 			} ) => {
@@ -325,7 +328,7 @@ test.describe( 'Autocomplete', () => {
 			} );
 		}
 
-		test( `should allow newlines after multiple ${ type } completions`, async ( {
+		test( `${ completer }: should allow newlines after multiple ${ type } completions`, async ( {
 			page,
 			editor,
 		} ) => {
