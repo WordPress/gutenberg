@@ -8,13 +8,20 @@ import classnames from 'classnames';
  */
 import { useMergeRefs } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
-import { forwardRef, useMemo } from '@wordpress/element';
+import {
+	forwardRef,
+	useMemo,
+	useReducer,
+	useLayoutEffect,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
+
+const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
 
 function BlockPopover(
 	{
@@ -47,8 +54,41 @@ function BlockPopover(
 		};
 	}, [ selectedElement, lastSelectedElement, __unstableRefreshSize ] );
 
+	const [ popoverAnchorRecomputeCounter, forceRecomputePopoverAnchor ] =
+		useReducer(
+			// Module is there to make sure that the counter doesn't overflow.
+			( s ) => ( s + 1 ) % MAX_POPOVER_RECOMPUTE_COUNTER,
+			0
+		);
+
+	// When blocks are moved up/down, they are animated to their new position by
+	// updating the `transform` property manually (i.e. without using CSS
+	// transitions or animations). The animation, which can also scroll the block
+	// editor, can sometimes cause the position of the Popover to get out of sync.
+	// A MutationObserver is therefore used to make sure that changes to the
+	// selectedElement's attribute (i.e. `transform`) can be tracked and used to
+	// trigger the Popover to rerender.
+	useLayoutEffect( () => {
+		if ( ! selectedElement ) {
+			return;
+		}
+
+		const observer = new window.MutationObserver(
+			forceRecomputePopoverAnchor
+		);
+		observer.observe( selectedElement, { attributes: true } );
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [ selectedElement ] );
+
 	const popoverAnchor = useMemo( () => {
 		if (
+			// popoverAnchorRecomputeCounter is by definition always equal or greater
+			// than 0. This check is only there to satisfy the correctness of the
+			// exhaustive-deps rule for the `useMemo` hook.
+			popoverAnchorRecomputeCounter < 0 ||
 			! selectedElement ||
 			( bottomClientId && ! lastSelectedElement )
 		) {
@@ -88,7 +128,12 @@ function BlockPopover(
 			},
 			ownerDocument: selectedElement.ownerDocument,
 		};
-	}, [ bottomClientId, lastSelectedElement, selectedElement ] );
+	}, [
+		bottomClientId,
+		lastSelectedElement,
+		selectedElement,
+		popoverAnchorRecomputeCounter,
+	] );
 
 	if ( ! selectedElement || ( bottomClientId && ! lastSelectedElement ) ) {
 		return null;
