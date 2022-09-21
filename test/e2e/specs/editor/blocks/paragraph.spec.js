@@ -51,9 +51,6 @@ test.describe( 'Paragraph', () => {
 		pageUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
-		const emptyParagraphBlock = page.locator(
-			'[data-type="core/paragraph"]'
-		);
 
 		const testImageName = '10x10_e2e_test_image_z9T8jK.png';
 		const testImagePath = path.join(
@@ -62,18 +59,12 @@ test.describe( 'Paragraph', () => {
 			testImageName
 		);
 
-		const { dragTo, drop } = await pageUtils.dragFiles( testImagePath );
+		const { dragOver, drop } = await pageUtils.dragFiles( testImagePath );
 
-		const { x, y, width, height } = await emptyParagraphBlock.boundingBox();
-		const centerPosition = {
-			x: x + width / 2,
-			y: y + height / 2,
-		};
-
-		await dragTo( centerPosition.x, centerPosition.y );
+		await dragOver( '[data-type="core/paragraph"]' );
 
 		await expect(
-			page.locator( 'text="Drop files to upload"' )
+			page.locator( 'data-testid=empty-paragraph-drop-zone' )
 		).toBeVisible();
 
 		await drop();

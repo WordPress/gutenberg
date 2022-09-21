@@ -16,6 +16,10 @@ type FileObject = {
 	buffer: Buffer;
 };
 
+type Options = {
+	position?: { x: number; y: number };
+};
+
 /**
  * Simulate dragging files from outside the current page.
  *
@@ -72,58 +76,82 @@ async function dragFiles(
 		fileObjects
 	);
 
-	// Simulate dragging over the document.
-	await this.page.dispatchEvent( 'html', 'dragenter', { dataTransfer } );
+	// CDP doesn't actually support dragging files, this is only a _good enough_
+	// dummy data so that it will correctly send the relevant events.
+	const dragData = {
+		items: fileObjects.map( ( fileObject ) => ( {
+			mimeType: fileObject.mimeType ?? 'File',
+			data: fileObject.base64,
+		} ) ),
+		files: fileObjects.map( ( fileObject ) => fileObject.name ),
+		// Copy = 1, Link = 2, Move = 16.
+		dragOperationsMask: 1,
+	};
+
+	const cdpSession = await this.context.newCDPSession( this.page );
 
 	const position = {
 		x: 0,
 		y: 0,
 	};
 
-	const getCurrentTopMostElement = async () => {
-		const elementFromPosition = await this.page.evaluateHandle(
-			( point ) => {
-				const element = document.elementFromPoint( point.x, point.y );
-				return element;
-			},
-			position
-		);
-
-		return elementFromPosition.asElement();
-	};
-
 	return {
 		/**
-		 * Move the cursor and drag the files to the specified position.
+		 * Drag the files over an element (fires `dragenter` and `dragover` events).
 		 *
-		 * @param  x The X coordinate.
-		 * @param  y The Y coordinate.
+		 * @param  selector         A selector to search for an element.
+		 * @param  options          The optional options.
+		 * @param  options.position A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
 		 */
-		dragTo: async ( x: number, y: number ) => {
-			position.x = x;
-			position.y = y;
+		dragOver: async ( selector: string, options: Options = {} ) => {
+			const boundingBox = await this.page
+				.locator( selector )
+				.boundingBox();
 
-			const elementHandle = await getCurrentTopMostElement();
-
-			if ( ! elementHandle ) {
-				return;
+			if ( ! boundingBox ) {
+				throw new Error(
+					'Cannot find the element or the element is not visible on the viewport.'
+				);
 			}
 
-			await elementHandle.dispatchEvent( 'dragenter', { dataTransfer } );
+			position.x =
+				boundingBox.x +
+				( options.position?.x ?? boundingBox.width / 2 );
+			position.y =
+				boundingBox.y +
+				( options.position?.y ?? boundingBox.height / 2 );
+
+			await cdpSession.send( 'Input.dispatchDragEvent', {
+				type: 'dragEnter',
+				...position,
+				data: dragData,
+			} );
+			await cdpSession.send( 'Input.dispatchDragEvent', {
+				type: 'dragOver',
+				...position,
+				data: dragData,
+			} );
 		},
+
 		/**
 		 * Drop the files at the current position.
 		 */
 		drop: async () => {
-			const elementHandle = await getCurrentTopMostElement();
+			const topMostElement = await this.page.evaluateHandle(
+				( { x, y } ) => {
+					return document.elementFromPoint( x, y );
+				},
+				position
+			);
+			const elementHandle = topMostElement.asElement();
 
 			if ( ! elementHandle ) {
-				throw new Error(
-					`No element at position (${ position.x }, ${ position.y }) to drop on`
-				);
+				throw new Error( 'Element not found.' );
 			}
 
 			await elementHandle.dispatchEvent( 'drop', { dataTransfer } );
+
+			await cdpSession.detach();
 		},
 	};
 }

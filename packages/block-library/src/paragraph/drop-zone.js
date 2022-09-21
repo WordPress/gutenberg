@@ -82,6 +82,7 @@ export default function DropZone( { paragraphElement, clientId } ) {
 						{ isVisible ? (
 							<motion.div
 								key="drop-zone-foreground"
+								data-testid="empty-paragraph-drop-zone"
 								initial={
 									reducedMotion
 										? animateVariants.show
