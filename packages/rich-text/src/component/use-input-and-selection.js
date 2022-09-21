@@ -279,6 +279,8 @@ export function useInputAndSelection( props ) {
 				applyRecord( record.current );
 				onSelectionChange( record.current.start, record.current.end );
 			}
+
+			rafId = defaultView.requestAnimationFrame( handleSelectionChange );
 		}
 
 		element.addEventListener( 'input', onInput );
