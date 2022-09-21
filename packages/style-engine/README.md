@@ -106,11 +106,11 @@ $styles = array(
         'declarations' => array( 'color' => 'red' )
     ),
     array(
-        'selector'   => '.wp-tomato',
+        'selector'     => '.wp-tomato',
         'declarations' => array( 'padding' => '100px' )
     ),
     array(
-        'selector'    => '.wp-kumquat',
+        'selector'     => '.wp-kumquat',
         'declarations' => array( 'color' => 'orange' )
     ),
 );
