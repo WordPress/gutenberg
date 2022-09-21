@@ -183,11 +183,11 @@ function ListView(
 			<TreeGrid
 				id={ id }
 				className="block-editor-list-view-tree"
-				aria-label={ __( 'Block navigation structure' ) }
 				ref={ treeGridRef }
 				onCollapseRow={ collapseRow }
 				onExpandRow={ expandRow }
 				onFocusRow={ focusRow }
+				applicationAriaLabel={ __( 'Block navigation structure' ) }
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch
