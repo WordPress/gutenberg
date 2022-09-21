@@ -216,6 +216,15 @@ function Navigation( {
 	const navMenuResolvedButMissing =
 		hasResolvedNavigationMenus && isNavigationMenuMissing;
 
+	const {
+		convert: convertClassicMenu,
+		status: classicMenuConversionStatus,
+		error: classicMenuConversionError,
+	} = useConvertClassicToBlockMenu( clientId );
+
+	const isConvertingClassicMenu =
+		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
+
 	// Attempt to retrieve and prioritize any existing navigation menu unless:
 	// - the are uncontrolled inner blocks already present in the block.
 	// - the user is creating a new menu.
@@ -237,10 +246,9 @@ function Navigation( {
 		// only one classic menu then create a new navigation menu based on it.
 		if ( ! fallbackNavigationMenus?.length && classicMenus?.length === 1 ) {
 			// Only create classic menus once.
-			if ( ! convertingClassicMenu ) {
+			if ( ! isConvertingClassicMenu ) {
 				// This is duplicated several times.
 				const onSelectClassicMenu = async ( classicMenu ) => {
-					setConvertingClassicMenu( true );
 					await convertClassicMenu(
 						classicMenu.id,
 						classicMenu.name,
@@ -275,15 +283,6 @@ function Navigation( {
 	}, [ navigationMenus ] );
 
 	const navRef = useRef();
-
-	const {
-		convert: convertClassicMenu,
-		status: classicMenuConversionStatus,
-		error: classicMenuConversionError,
-	} = useConvertClassicToBlockMenu( clientId );
-
-	const isConvertingClassicMenu =
-		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
 
 	// The standard HTML5 tag for the block wrapper.
 	const TagName = 'nav';
@@ -359,7 +358,6 @@ function Navigation( {
 	// Turn on contrast checker for web only since it's not supported on mobile yet.
 	const enableContrastChecking = Platform.OS === 'web';
 
-	const [ convertingClassicMenu, setConvertingClassicMenu ] = useState();
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
 	const [
