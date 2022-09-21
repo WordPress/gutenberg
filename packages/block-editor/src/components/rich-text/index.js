@@ -159,7 +159,7 @@ function RichTextWrapper(
 	// retreived from the store on merge.
 	// To do: fix this somehow.
 	const { selectionStart, selectionEnd, isSelected } = useSelect( selector );
-	const { getSelectionStart, getSelectionEnd } =
+	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
 	const multilineTag = getMultilineTag( multiline );
@@ -203,7 +203,8 @@ function RichTextWrapper(
 				// is a parent block.
 				if (
 					end === undefined &&
-					clientId !== getSelectionStart().clientId
+					getBlockRootClientId( clientId ) !==
+						getBlockRootClientId( getSelectionEnd().clientId )
 				) {
 					return;
 				}
@@ -218,7 +219,8 @@ function RichTextWrapper(
 			if ( typeof end === 'number' || unset ) {
 				if (
 					start === undefined &&
-					clientId !== getSelectionEnd().clientId
+					getBlockRootClientId( clientId ) !==
+						getBlockRootClientId( getSelectionStart().clientId )
 				) {
 					return;
 				}
