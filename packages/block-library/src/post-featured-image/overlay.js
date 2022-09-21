@@ -47,20 +47,22 @@ const Overlay = ( {
 
 	return (
 		<>
-			<span
-				aria-hidden="true"
-				className={ classnames(
-					'wp-block-post-featured-image__overlay',
-					dimRatioToClass( dimRatio ),
-					{
-						[ overlayColor.class ]: overlayColor.class,
-						'has-background-dim': dimRatio !== undefined,
-						'has-background-gradient': gradientValue,
-						[ gradientClass ]: gradientClass,
-					}
-				) }
-				style={ overlayStyles }
-			/>
+			{ !! dimRatio && (
+				<span
+					aria-hidden="true"
+					className={ classnames(
+						'wp-block-post-featured-image__overlay',
+						dimRatioToClass( dimRatio ),
+						{
+							[ overlayColor.class ]: overlayColor.class,
+							'has-background-dim': dimRatio !== undefined,
+							'has-background-gradient': gradientValue,
+							[ gradientClass ]: gradientClass,
+						}
+					) }
+					style={ overlayStyles }
+				/>
+			) }
 			<InspectorControls __experimentalGroup="color">
 				<ColorGradientSettingsDropdown
 					__experimentalHasMultipleOrigins
