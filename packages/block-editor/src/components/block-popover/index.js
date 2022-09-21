@@ -21,6 +21,8 @@ import {
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
 
+const MAX_ANCHOR_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
+
 function BlockPopover(
 	{
 		clientId,
@@ -53,7 +55,11 @@ function BlockPopover(
 	}, [ selectedElement, lastSelectedElement, __unstableRefreshSize ] );
 
 	const [ popoverAnchorRecomputeCounter, forceRecomputePopoverAnchor ] =
-		useReducer( ( s ) => s + 1, 0 );
+		useReducer(
+			// Module is there to make sure that the counter doesn't overflow.
+			( s ) => ( s + 1 ) % MAX_ANCHOR_RECOMPUTE_COUNTER,
+			0
+		);
 
 	// When blocks are moved up/down, they are animated to their new position by
 	// updating the `transform` property manually (i.e. without using CSS
