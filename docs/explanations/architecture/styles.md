@@ -555,3 +555,7 @@ The current semantic class names that can be output by the Layout block support 
 * `is-content-justification-right`: When a block explicitly sets `justifyContent` to `right`.
 * `is-content-justification-space-between`: When a block explicitly sets `justifyContent` to `space-between`.
 * `is-nowrap`: When a block explicitly sets `flexWrap` to `nowrap`.
+
+#### Opting out of generated layout styles
+
+Layout styles output is switched on by default because the styles are required by core structural blocks. However, themes can opt out of generated block layout styles while retaining semantic class name output by using the `disable-layout-styles` block support. Such themes will be responsible for providing all their own structural layout styles. See [the entry under Theme Support](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#disabling-base-layout-styles).
