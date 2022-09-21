@@ -44,28 +44,30 @@ const MODAL_NAME = 'edit-post/preferences';
 export default function EditPostPreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { closeModal } = useDispatch( editPostStore );
-	const isModalActive = useSelect(
-		( select ) => select( editPostStore ).isModalActive( MODAL_NAME ),
-		[]
-	);
-	const [ showBlockBreadcrumbsOption, isDistractionFree ] = useSelect(
-		( select ) => {
-			const { getEditorSettings } = select( editorStore );
-			const { getEditorMode, isFeatureActive } = select( editPostStore );
-			const mode = getEditorMode();
-			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
-			const isDistractionFreeEnabled =
-				isFeatureActive( 'distractionFree' );
-			return [
-				! isDistractionFreeEnabled &&
-					isLargeViewport &&
-					isRichEditingEnabled &&
-					mode === 'visual',
-				isDistractionFreeEnabled,
-			];
-		},
-		[ isLargeViewport ]
-	);
+	const [ showBlockBreadcrumbsOption, isDistractionFree, isModalActive ] =
+		useSelect(
+			( select ) => {
+				const { getEditorSettings } = select( editorStore );
+				const { getEditorMode, isFeatureActive } =
+					select( editPostStore );
+				const modalActive =
+					select( editPostStore ).isModalActive( MODAL_NAME );
+				const mode = getEditorMode();
+				const isRichEditingEnabled =
+					getEditorSettings().richEditingEnabled;
+				const isDistractionFreeEnabled =
+					isFeatureActive( 'distractionFree' );
+				return [
+					! isDistractionFreeEnabled &&
+						isLargeViewport &&
+						isRichEditingEnabled &&
+						mode === 'visual',
+					isDistractionFreeEnabled,
+					modalActive,
+				];
+			},
+			[ isLargeViewport ]
+		);
 
 	const {
 		closeGeneralSidebar,
