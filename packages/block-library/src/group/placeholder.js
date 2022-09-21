@@ -112,7 +112,18 @@ function GroupPlaceHolder( { clientId, name, setAttributes } ) {
 				label={ blockType?.title }
 				variations={ variations }
 				onSelect={ ( nextVariation = defaultVariation ) => {
-					setAttributes( nextVariation.attributes );
+					/*
+						Remove layout.isDefault if present.
+						`isDefault` exists to identify blocks that have been inserted, programmatically or otherwise, with no changes.
+						When a user selects a layout `isDefault` should not appear in the block's attributes.
+					 */
+					const { isDefault, ...rest } =
+						nextVariation.attributes?.layout;
+					const newAttributes = {
+						...nextVariation.attributes,
+						layout: rest,
+					};
+					setAttributes( newAttributes );
 					updateSelection( clientId );
 				} }
 				instructions={ __( 'Group blocks together. Select a layout:' ) }

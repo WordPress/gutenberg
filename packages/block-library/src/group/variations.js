@@ -9,7 +9,7 @@ const variations = [
 		name: 'group',
 		title: __( 'Group' ),
 		description: __( 'Gather blocks in a container.' ),
-		attributes: { layout: { type: 'constrained' } },
+		attributes: { layout: { type: 'constrained', isDefault: true } },
 		isDefault: true,
 		scope: [ 'block', 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
