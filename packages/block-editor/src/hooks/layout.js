@@ -114,13 +114,9 @@ export function useLayoutStyles( block = {}, selector ) {
 	const { layout = {}, style = {} } = attributes;
 	// Update type for blocks using legacy layouts.
 	const usedLayout =
-		layout &&
-		( layout?.type === 'constrained' ||
-			layout?.inherit ||
-			layout?.contentSize ||
-			layout?.wideSize )
+		layout?.inherit || layout?.contentSize || layout?.wideSize
 			? { ...layout, type: 'constrained' }
-			: { ...layout, type: 'default' };
+			: layout || {};
 	const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
 	const globalLayoutSettings = useSetting( 'layout' ) || {};
 	const blockGapSupport = useSetting( 'spacing.blockGap' );

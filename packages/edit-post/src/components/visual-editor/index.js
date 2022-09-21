@@ -231,14 +231,13 @@ export default function VisualEditor( { styles } ) {
 	const blockListLayoutClass = classnames(
 		{
 			'is-layout-flow': ! themeSupportsLayout,
-			'wp-container-visual-editor': themeSupportsLayout,
 		},
 		postContentLayoutClasses
 	);
 
 	const postContentLayoutStyles = useLayoutStyles(
 		postContentBlock,
-		'.wp-container-visual-editor'
+		'.block-editor-block-list__layout.is-root-container'
 	);
 
 	const { attributes = {} } = postContentBlock;
