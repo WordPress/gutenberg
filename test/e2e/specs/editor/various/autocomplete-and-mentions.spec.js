@@ -400,10 +400,9 @@ test.describe( 'Autocomplete', () => {
 	} );
 
 	// The following test attempts to cover an infinite loop regression (https://github.com/WordPress/gutenberg/issues/41709).
-	// Unfortunately, the regression (if present) crashes the tests, as well as the editor,
-	// so it's skipped for now in the hopes we can find a way around that in the future.
-	// eslint-disable-next-line jest/no-disabled-tests
-	test.skip( 'should insert elements from multiple completers in a single block', async ( {
+	// Unfortunately, the regression (if present) crashes the tests, as well as the editor. If you've updated anything related to
+	// the Autocomplete component and find e2e tests can't complete, this may be why!
+	test( 'should insert elements from multiple completers in a single block', async ( {
 		page,
 		editor,
 	} ) => {
@@ -422,10 +421,9 @@ test.describe( 'Autocomplete', () => {
 			)
 		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
-		expect( await editor.getEditedPostContent() ).toBe( `
-		"<!-- wp:paragraph -->
-		<p>@ringbearer +thebetterhobbit</p>
-		<!-- /wp:paragraph -->"
-		` );
+		expect( await editor.getEditedPostContent() )
+			.toBe( `<!-- wp:paragraph -->
+<p>@ringbearer +thebetterhobbit</p>
+<!-- /wp:paragraph -->` );
 	} );
 } );
