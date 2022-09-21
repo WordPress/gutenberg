@@ -4,7 +4,7 @@
  * External dependencies
  */
 import { View, Platform, Dimensions } from 'react-native';
-import { get, pickBy, debounce } from 'lodash';
+import { get, pickBy } from 'lodash';
 import memize from 'memize';
 import { colord } from 'colord';
 
@@ -18,7 +18,11 @@ import {
 } from '@wordpress/react-native-bridge';
 import { BlockFormatControls, getPxFromCssUnit } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import {
+	compose,
+	debounce,
+	withPreferredColorScheme,
+} from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';

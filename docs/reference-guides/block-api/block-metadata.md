@@ -51,9 +51,9 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 	],
 	"editorScript": "file:./index.js",
 	"script": "file:./script.js",
-	"viewScript": "file:./view.js",
+	"viewScript": [ "file:./view.js", "example-shared-view-script" ],
 	"editorStyle": "file:./index.css",
-	"style": "file:./style.css",
+	"style": [ "file:./style.css", "example-shared-style" ],
 	"render": "file:./render.php"
 }
 ```
@@ -464,7 +464,7 @@ See the [the variations documentation](/docs/reference-guides/block-api/block-va
 
 ### Editor Script
 
--   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `editorScript`
@@ -475,9 +475,11 @@ See the [the variations documentation](/docs/reference-guides/block-api/block-va
 
 Block type editor script definition. It will only be enqueued in the context of the editor.
 
+_Note: An option to pass also an array of editor scripts exists since WordPress `6.1.0`._
+
 ### Script
 
--   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `script`
@@ -488,6 +490,8 @@ Block type editor script definition. It will only be enqueued in the context of 
 
 Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
 
+_Note: An option to pass also an array of scripts exists since WordPress `6.1.0`._
+
 ### View Script
 
 -   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
@@ -497,7 +501,7 @@ Block type frontend and editor script definition. It will be enqueued both in th
 -   Since: `WordPress 5.9.0`
 
 ```json
-{ "viewScript": "file:./view.js" }
+{ "viewScript": [ "file:./view.js", "example-shared-view-script" ] }
 ```
 
 Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.
@@ -527,7 +531,7 @@ _Note: An option to pass also an array of editor styles exists since WordPress `
 -   Property: `style`
 
 ```json
-{ "style": "file:./style.css" }
+{ "style": [ "file:./style.css", "example-shared-style" ] }
 ```
 
 Block type frontend and editor style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
@@ -579,10 +583,10 @@ In `block.json`:
 ```json
 {
 	"editorScript": "file:./index.js",
-	"script": "my-script-handle",
-	"viewScript": "file:./view.js",
-	"editorStyle": "my-editor-style-handle",
-	"style": [ "file:./style.css", "my-style-handle" ]
+	"script": "file:./script.js",
+	"viewScript": [ "file:./view.js", "example-shared-view-script" ],
+	"editorStyle": "file:./index.css",
+	"style": [ "file:./style.css", "example-shared-style" ]
 }
 ```
 

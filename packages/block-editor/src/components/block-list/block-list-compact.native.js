@@ -46,7 +46,7 @@ function BlockListCompact( props ) {
 	};
 
 	return (
-		<View style={ containerStyle }>
+		<View style={ containerStyle } testID="block-list-wrapper">
 			{ blockClientIds.map( ( currentClientId ) => (
 				<BlockListBlock
 					clientId={ currentClientId }

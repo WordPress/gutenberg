@@ -623,10 +623,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	if ( isset( $attributes['icon'] ) ) {
 		if ( 'menu' === $attributes['icon'] ) {
 			$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 5v1.5h14V5H5zm0 7.8h14v-1.5H5v1.5zM5 19h14v-1.5H5V19z" /></svg>';
-		} elseif ( 'more-vertical' === $attributes['icon'] ) {
-			$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z" /></svg>';
-		} elseif ( 'more-horizontal' === $attributes['icon'] ) {
-			$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 13h2v-2h-2v2zm-6 0h2v-2H5v2zm12-2v2h2v-2h-2z" /></svg>';
 		}
 	}
 	$toggle_button_content       = $should_display_icon_label ? $toggle_button_icon : __( 'Menu' );

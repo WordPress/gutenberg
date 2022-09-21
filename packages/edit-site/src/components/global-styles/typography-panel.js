@@ -6,6 +6,7 @@ import {
 	__experimentalFontFamilyControl as FontFamilyControl,
 	__experimentalFontAppearanceControl as FontAppearanceControl,
 	__experimentalLetterSpacingControl as LetterSpacingControl,
+	__experimentalTextTransformControl as TextTransformControl,
 } from '@wordpress/block-editor';
 import {
 	FontSizePicker,
@@ -68,12 +69,28 @@ function useAppearanceControlLabel( name ) {
 	return __( 'Appearance' );
 }
 
-function useHasLetterSpacingControl( name ) {
+function useHasLetterSpacingControl( name, element ) {
+	const setting = useSetting( 'typography.letterSpacing', name )[ 0 ];
+	if ( ! setting ) {
+		return false;
+	}
+	if ( ! name && element === 'heading' ) {
+		return true;
+	}
 	const supports = getSupportedGlobalStylesPanels( name );
-	return (
-		useSetting( 'typography.letterSpacing', name )[ 0 ] &&
-		supports.includes( 'letterSpacing' )
-	);
+	return supports.includes( 'letterSpacing' );
+}
+
+function useHasTextTransformControl( name, element ) {
+	const setting = useSetting( 'typography.textTransform', name )[ 0 ];
+	if ( ! setting ) {
+		return false;
+	}
+	if ( ! name && element === 'heading' ) {
+		return true;
+	}
+	const supports = getSupportedGlobalStylesPanels( name );
+	return supports.includes( 'textTransform' );
 }
 
 function useStyleWithReset( path, blockName ) {
@@ -141,7 +158,8 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 	const hasLineHeightEnabled = useHasLineHeightControl( name );
 	const hasAppearanceControl = useHasAppearanceControl( name );
 	const appearanceControlLabel = useAppearanceControlLabel( name );
-	const hasLetterSpacingControl = useHasLetterSpacingControl( name );
+	const hasLetterSpacingControl = useHasLetterSpacingControl( name, element );
+	const hasTextTransformControl = useHasTextTransformControl( name, element );
 
 	/* Disable font size controls when the option to style all headings is selected. */
 	let hasFontSizeEnabled = supports.includes( 'fontSize' );
@@ -169,6 +187,12 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 		hasLetterSpacing,
 		resetLetterSpacing,
 	] = useStyleWithReset( prefix + 'typography.letterSpacing', name );
+	const [
+		textTransform,
+		setTextTransform,
+		hasTextTransform,
+		resetTextTransform,
+	] = useStyleWithReset( prefix + 'typography.textTransform', name );
 
 	const resetAll = () => {
 		resetFontFamily();
@@ -176,6 +200,7 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 		resetFontAppearance();
 		resetLineHeight();
 		resetLetterSpacing();
+		resetTextTransform();
 	};
 
 	return (
@@ -271,6 +296,23 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 						onChange={ setLetterSpacing }
 						size="__unstable-large"
 						__unstableInputWidth="auto"
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasTextTransformControl && (
+				<ToolsPanelItem
+					label={ __( 'Letter case' ) }
+					hasValue={ hasTextTransform }
+					onDeselect={ resetTextTransform }
+					isShownByDefault
+				>
+					<TextTransformControl
+						value={ textTransform }
+						onChange={ setTextTransform }
+						showNone
+						isBlock
+						size="__unstable-large"
+						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }
