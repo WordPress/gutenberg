@@ -12,6 +12,11 @@
 		box-sizing: border-box;
 	}
 
+	:where(img),
+	:where(.wp-block-post-featured-image__overlay) {
+		border-style: solid;
+	}
+
 	&.alignwide img,
 	&.alignfull img {
 		width: 100%;
