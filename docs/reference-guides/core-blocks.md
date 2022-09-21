@@ -284,7 +284,7 @@ A form. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/blo
 -	**Name:** core/form
 -	**Category:** common
 -	**Supports:** 
--	**Attributes:** 
+-	**Attributes:** action, method
 
 ## Classic
 
@@ -357,7 +357,7 @@ The basic building block for forms. ([Source](https://github.com/WordPress/guten
 -	**Name:** core/input-field
 -	**Category:** common
 -	**Supports:** 
--	**Attributes:** inlineLabel, label, type
+-	**Attributes:** inlineLabel, label, name, type
 
 ## Latest Comments
 

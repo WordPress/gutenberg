@@ -51,7 +51,7 @@ const inputTypeOptions = [
 ];
 
 function InputFieldBlock( { attributes, setAttributes } ) {
-	const { type, label, inlineLabel } = attributes;
+	const { type, name, label, inlineLabel } = attributes;
 	const blockProps = useBlockProps();
 	const ref = useRef();
 
@@ -76,6 +76,17 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 						} }
 					/>
 					{ type !== 'submit' && (
+						<TextControl
+							label={ __( 'Name' ) }
+							value={ name }
+							onChange={ ( newVal ) => {
+								setAttributes( {
+									name: newVal,
+								} );
+							} }
+						/>
+					) }
+					{ type !== 'submit' && (
 						<CheckboxControl
 							label={ __( 'Inline label' ) }
 							checked={ attributes.inlineLabel }
@@ -97,6 +108,7 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 					<textarea
 						className="wp-block-input-field"
 						disabled="true"
+						name={ name }
 					/>
 				</label>
 				/* eslint-enable jsx-a11y/label-has-associated-control */
@@ -156,6 +168,7 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 					<input
 						className="wp-block-input-field"
 						type={ type }
+						name={ name }
 						disabled="true"
 					/>
 				</label>
