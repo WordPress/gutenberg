@@ -85,6 +85,9 @@ function BlockPopover(
 
 	const popoverAnchor = useMemo( () => {
 		if (
+			// popoverAnchorRecomputeCounter is by definition always equal or greater
+			// than 0. This check is only there to satisfy the correctness of the
+			// exhaustive-deps rule for the `useMemo` hook.
 			popoverAnchorRecomputeCounter < 0 ||
 			! selectedElement ||
 			( bottomClientId && ! lastSelectedElement )
