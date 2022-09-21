@@ -65,7 +65,7 @@ function Root( { className, ...settings } ) {
 	const registry = useRegistry();
 	const { setBlockVisibility } = useDispatch( blockEditorStore );
 
-	const delatedBlockVisibilityUpdates = useDebounce(
+	const delayedBlockVisibilityUpdates = useDebounce(
 		useCallback( () => {
 			const updates = {};
 			pendingBlockVisibilityUpdatesPerRegistry
@@ -97,7 +97,7 @@ function Root( { className, ...settings } ) {
 					.get( registry )
 					.push( [ clientId, entry.isIntersecting ] );
 			}
-			delatedBlockVisibilityUpdates();
+			delayedBlockVisibilityUpdates();
 		} );
 	}, [] );
 	const innerBlocksProps = useInnerBlocksProps(
