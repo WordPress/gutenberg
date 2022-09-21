@@ -208,6 +208,7 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 						onChange={ setFontSize }
 						fontSizes={ fontSizes }
 						disableCustomFontSizes={ disableCustomFontSizes }
+						withReset={ false }
 						size="__unstable-large"
 						__nextHasNoMarginBottom
 					/>
