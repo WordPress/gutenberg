@@ -6,5 +6,15 @@
 	"category": "common",
 	"description": "A form.",
 	"keywords": [ "container", "wrapper", "row", "section" ],
-	"textdomain": "default"
+	"textdomain": "default",
+	"attributes": {
+		"action": {
+			"type": "string",
+			"default": "#"
+		},
+		"method": {
+			"type": "string",
+			"default": "get"
+		}
+	}
 }

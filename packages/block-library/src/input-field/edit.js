@@ -10,6 +10,7 @@ import {
 import {
 	PanelBody,
 	CustomSelectControl,
+	TextControl,
 	CheckboxControl,
 } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
