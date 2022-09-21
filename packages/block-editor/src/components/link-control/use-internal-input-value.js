@@ -8,15 +8,13 @@ export default function useInternalInputValue( value ) {
 		value || ''
 	);
 
-	useEffect( () => {
-		/**
-		 * Update the state value internalInputValue if the url value changes
-		 * for example when clicking on another anchor
-		 */
-		if ( value && value !== internalInputValue ) {
-			setInternalInputValue( value );
-		}
-	}, [ value ] );
+	/**
+	 * Update the state value internalInputValue if the url value changes
+	 * for example when clicking on another anchor
+	 */
+	if ( value && value !== internalInputValue ) {
+		setInternalInputValue( value );
+	}
 
 	return [ internalInputValue, setInternalInputValue ];
 }
