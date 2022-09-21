@@ -200,7 +200,10 @@ export default function useDropZone( {
 
 				isDragging = false;
 
-				ownerDocument.addEventListener( 'dragenter', maybeDragStart );
+				ownerDocument.removeEventListener(
+					'dragenter',
+					maybeDragStart
+				);
 				ownerDocument.removeEventListener( 'dragend', maybeDragEnd );
 				ownerDocument.removeEventListener( 'mousemove', maybeDragEnd );
 
