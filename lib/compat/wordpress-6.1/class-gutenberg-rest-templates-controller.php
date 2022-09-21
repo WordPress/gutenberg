@@ -33,7 +33,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Templates_Controller {
 							'required'    => true,
 						),
 						'is_custom'       => array(
-							'description' => __( ' Indicates if a template is custom or part of the template hierarchy', 'gutenberg' ),
+							'description' => __( 'Indicates if a template is custom or part of the template hierarchy', 'gutenberg' ),
 							'type'        => 'boolean',
 						),
 						'template_prefix' => array(
