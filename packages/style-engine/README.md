@@ -1,27 +1,23 @@
 # Style Engine
 
-The Style Engine powering global styles and block customizations.
+The Style Engine aims to provide a consistent API for rendering styling for blocks across both client-side and server-side applications.
+
+Initially, it will offer a single, centralized agent responsible for generating block styles, and, in later phases, it will also assume the responsibility of processing and rendering optimized frontend CSS.
 
 ## Important
 
-This Package is considered experimental at the moment. The idea is to have a package used to generate styles based on a
-style object that is consistent between: backend, frontend, block style object and theme.json.
+This package is new as of WordPress 6.1 and therefore in its infancy.
 
-Because this package is experimental and still in development it does not yet generate a `wp.styleEngine` global. To get
-there, the following tasks need to be completed:
+Upcoming tasks on the roadmap include, but are not limited to, the following:
 
-**TODO List:**
+-   Consolidate global and block style rendering and enqueuing (ongoing)
+-   Explore pre-render CSS rule processing with the intention of deduplicating other common and/or repetitive block styles. (ongoing)
+-   Extend the scope of semantic class names and/or design token expression, and encapsulate rules into stable utility classes.
+-   Explore pre-render CSS rule processing with the intention of deduplicating other common and/or repetitive block styles.
+-   Propose a way to control hierarchy and specificity, and make the style hierarchy cascade accessible and predictable. This might include preparing for CSS cascade layers until they become more widely supported, and allowing for opt-in support in Gutenberg via theme.json.
+-   Refactor all blocks to consistently use the "style" attribute for all customizations, that is, deprecate preset-specific attributes such as `attributes.fontSize`.
 
--   Add style definitions for all the currently supported styles in blocks and theme.json.
--   The CSS variable shortcuts for values (for presets...)
--   Support generating styles in the frontend. (Ongoing)
--   Support generating styles in the backend (block supports and theme.json stylesheet). (Ongoing)
--   Refactor all block styles to use the style engine server side. (Ongoing)
--   Consolidate global and block style rendering and enqueuing
--   Refactor all blocks to consistently use the "style" attribute for all customizations (get rid of the preset specific
-    attributes).
-
-See [Tracking: Add a Style Engine to manage rendering block styles #38167](https://github.com/WordPress/gutenberg/issues/38167)
+For more information about the roadmap, please refer to [Block editor styles: initiatives and goals](https://make.wordpress.org/core/2022/06/24/block-editor-styles-initiatives-and-goals/) and the [Github project board](https://github.com/orgs/WordPress/projects/19).
 
 ## Backend API
 
@@ -30,8 +26,9 @@ See [Tracking: Add a Style Engine to manage rendering block styles #38167](https
 Global public function to generate styles from a single style object, e.g., the value of
 a [block's attributes.style object](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#styles)
 or
-the [top level styles in theme.json](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/)
-.
+the [top level styles in theme.json](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/).
+
+See also [Using the Style Engine to generate block supports styles](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/using-the-style-engine-with-block-supports).
 
 _Parameters_
 
@@ -82,7 +79,7 @@ print_r( $styles );
 
 /*
 array(
-    'css'                 => '.a-selector{padding:10px}'
+    'css'                 => '.a-selector{padding:100px}'
     'declarations'  => array( 'padding' => '100px' )
 )
 */
@@ -132,7 +129,7 @@ $stylesheet = wp_style_engine_get_stylesheet_from_css_rules(
         'context'  => 'block-supports', // Indicates that these styles should be stored with block supports CSS.
     )
 );
-print_r( $stylesheet ); // .wp-pumpkin, .wp-kumquat {color:orange}.wp-tomato{color:red;padding:100px}
+print_r( $stylesheet ); // .wp-pumpkin,.wp-kumquat{color:orange}.wp-tomato{color:red;padding:100px}
 ```
 
 ### wp_style_engine_get_stylesheet_from_context()
@@ -185,10 +182,7 @@ Install the module
 npm install @wordpress/style-engine --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has
-limited or no support for such language features and APIs, you should
-include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill)
-in your code._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## Usage
 
@@ -205,7 +199,11 @@ _Parameters_
 
 _Returns_
 
--   `string`: generated stylesheet.
+-   `string`: A generated stylesheet or inline style declarations.
+
+_Changelog_
+
+`6.1.0` Introduced in WordPress core.
 
 ### getCSSRules
 
@@ -218,7 +216,11 @@ _Parameters_
 
 _Returns_
 
--   `GeneratedCSSRule[]`: generated styles.
+-   `GeneratedCSSRule[]`: A collection of objects containing the selector, if any, the CSS property key (camelcase) and parsed CSS value.
+
+_Changelog_
+
+`6.1.0` Introduced in WordPress core.
 
 <!-- END TOKEN(Autogenerated API docs) -->
 
@@ -239,8 +241,8 @@ A guide to the terms and variable names referenced by the Style Engine package.
   <dd>Identifiers that describe stylistic, modifiable features of an HTML element. E.g., <code>border</code>, <code>font-size</code>, <code>width</code>...</dd>
   <dt>CSS rule</dt>
   <dd>A CSS selector followed by a CSS declarations block inside a set of curly braces. Usually found in a CSS stylesheet.</dd>
-  <dt>CSS selector</dt>
-   <dd>The first component of a CSS rule, a CSS selector is a pattern of elements, classnames or other terms that define the element to which the rule&rsquo;s CSS definitions apply. E.g., <code>p.my-cool-classname > span</code>. See <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors" target="_blank">MDN CSS selectors article</a>.</dd>
+  <dt>CSS selector (or CSS class selector)</dt>
+   <dd>The first component of a CSS rule, a CSS selector is a pattern of elements, classnames or other terms that define the element to which the rule&rsquo;s CSS definitions apply. E.g., <code>p.my-cool-classname > span</code>. A CSS selector matches HTML elements based on the contents of the "class" attribute. See <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors" target="_blank">MDN CSS selectors article</a>.</dd>
   <dt>CSS stylesheet</dt>
   <dd>A collection of CSS rules contained within a file or within an <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style" target="_blank">HTML style tag</a>.</dd>
   <dt>CSS value</dt>

@@ -188,6 +188,7 @@ function ListView(
 				onCollapseRow={ collapseRow }
 				onExpandRow={ expandRow }
 				onFocusRow={ focusRow }
+				applicationAriaLabel={ __( 'Block navigation structure' ) }
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch

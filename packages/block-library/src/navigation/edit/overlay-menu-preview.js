@@ -41,16 +41,6 @@ export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
 					aria-label={ __( 'menu' ) }
 					label={ <OverlayMenuIcon icon="menu" /> }
 				/>
-				<ToggleGroupControlOption
-					value="more-vertical"
-					aria-label={ __( 'more vertical' ) }
-					label={ <OverlayMenuIcon icon="more-vertical" /> }
-				/>
-				<ToggleGroupControlOption
-					value="more-horizontal"
-					aria-label={ __( 'more horizontal' ) }
-					label={ <OverlayMenuIcon icon="more-horizontal" /> }
-				/>
 			</ToggleGroupControl>
 		</>
 	);

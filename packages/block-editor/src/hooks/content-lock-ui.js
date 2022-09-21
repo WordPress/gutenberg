@@ -72,7 +72,7 @@ export const withBlockControls = createHigherOrderComponent(
 			__unstableSetTemporarilyEditingAsBlocks,
 		} = useDispatch( blockEditorStore );
 		const isContentLocked =
-			! isLockedByParent && templateLock === 'noContent';
+			! isLockedByParent && templateLock === 'contentOnly';
 		const {
 			__unstableMarkNextChangeAsNotPersistent,
 			updateBlockAttributes,
@@ -81,11 +81,11 @@ export const withBlockControls = createHigherOrderComponent(
 		const stopEditingAsBlock = useCallback( () => {
 			__unstableMarkNextChangeAsNotPersistent();
 			updateBlockAttributes( props.clientId, {
-				templateLock: 'noContent',
+				templateLock: 'contentOnly',
 			} );
 			updateBlockListSettings( props.clientId, {
 				...getBlockListSettings( props.clientId ),
-				templateLock: 'noContent',
+				templateLock: 'contentOnly',
 			} );
 			updateSettings( { focusMode: focusModeToRevert.current } );
 			__unstableSetTemporarilyEditingAsBlocks();

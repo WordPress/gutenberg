@@ -5,5 +5,6 @@
 		"declarationDir": "build-types",
 		"types": [ "gutenberg-env" ]
 	},
-	"include": [ "src/**/*" ]
+	"include": [ "src/**/*" ],
+	"references": [ { "path": "../deprecated" } ]
 }

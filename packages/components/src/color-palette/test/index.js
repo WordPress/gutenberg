@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { mount, shallow } from 'enzyme';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -17,102 +18,147 @@ describe( 'ColorPalette', () => {
 	const currentColor = '#f00';
 	const onChange = jest.fn();
 
-	const wrapper = mount(
-		<ColorPalette
-			colors={ colors }
-			value={ currentColor }
-			onChange={ onChange }
-		/>
-	);
-	const buttons = wrapper.find( 'Option button' );
-
 	beforeEach( () => {
 		onChange.mockClear();
 	} );
 
 	test( 'should render a dynamic toolbar of colors', () => {
-		expect( wrapper ).toMatchSnapshot();
+		const { container } = render(
+			<ColorPalette
+				colors={ colors }
+				value={ currentColor }
+				onChange={ onChange }
+			/>
+		);
+
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render three color button options', () => {
-		expect( buttons ).toHaveLength( 3 );
+		render(
+			<ColorPalette
+				colors={ colors }
+				value={ currentColor }
+				onChange={ onChange }
+			/>
+		);
+
+		expect(
+			screen.getAllByRole( 'button', { name: /^Color:/ } )
+		).toHaveLength( 3 );
 	} );
 
-	test( 'should call onClick on an active button with undefined', () => {
-		const activeButton = buttons.findWhere( ( button ) =>
-			button.hasClass( 'is-pressed' )
+	test( 'should call onClick on an active button with undefined', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
+		render(
+			<ColorPalette
+				colors={ colors }
+				value={ currentColor }
+				onChange={ onChange }
+			/>
 		);
-		activeButton.simulate( 'click' );
+
+		await user.click(
+			screen.getByRole( 'button', { name: /^Color:/, pressed: true } )
+		);
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 		expect( onChange ).toHaveBeenCalledWith( undefined );
 	} );
 
-	test( 'should call onClick on an inactive button', () => {
-		const inactiveButton = buttons
-			.findWhere( ( button ) => ! button.hasClass( 'is-pressed' ) )
-			.first();
-		inactiveButton.simulate( 'click' );
+	test( 'should call onClick on an inactive button', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
+		render(
+			<ColorPalette
+				colors={ colors }
+				value={ currentColor }
+				onChange={ onChange }
+			/>
+		);
+
+		await user.click(
+			screen.getAllByRole( 'button', {
+				name: /^Color:/,
+				pressed: false,
+			} )[ 0 ]
+		);
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( onChange ).toHaveBeenCalledWith( '#fff' );
 	} );
 
-	test( 'should call onClick with undefined, when the clearButton onClick is triggered', () => {
-		const clearButton = wrapper.find( 'ButtonAction button' );
+	test( 'should call onClick with undefined, when the clearButton onClick is triggered', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 
-		expect( clearButton ).toHaveLength( 1 );
+		render(
+			<ColorPalette
+				colors={ colors }
+				value={ currentColor }
+				onChange={ onChange }
+			/>
+		);
 
-		clearButton.simulate( 'click' );
+		await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 		expect( onChange ).toHaveBeenCalledWith( undefined );
 	} );
 
 	test( 'should allow disabling custom color picker', () => {
-		expect(
-			shallow(
-				<ColorPalette
-					colors={ colors }
-					disableCustomColors={ true }
-					value={ currentColor }
-					onChange={ onChange }
-				/>
-			)
-		).toMatchSnapshot();
+		const { container } = render(
+			<ColorPalette
+				colors={ colors }
+				disableCustomColors
+				value={ currentColor }
+				onChange={ onChange }
+			/>
+		);
+
+		expect( container ).toMatchSnapshot();
 	} );
 
-	describe( 'Dropdown', () => {
-		const dropdown = wrapper.find( 'Dropdown' );
-
-		test( 'should render it correctly', () => {
-			expect( dropdown ).toMatchSnapshot();
+	test( 'should render dropdown and its content', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
 		} );
 
-		describe( '.renderToggle', () => {
-			const isOpen = true;
-			const onToggle = jest.fn();
+		render(
+			<ColorPalette
+				colors={ colors }
+				value={ currentColor }
+				onChange={ onChange }
+			/>
+		);
 
-			const renderedToggleButton = mount(
-				dropdown.props().renderToggle( { isOpen, onToggle } )
-			);
+		await user.click(
+			screen.getByRole( 'button', {
+				name: /^Custom color picker/,
+				expanded: false,
+			} )
+		);
 
-			test( 'should render dropdown content', () => {
-				expect( renderedToggleButton ).toMatchSnapshot();
-			} );
-
-			test( 'should call onToggle on click.', () => {
-				renderedToggleButton.find( 'button' ).simulate( 'click' );
-
-				expect( onToggle ).toHaveBeenCalledTimes( 1 );
-			} );
+		const dropdownButton = screen.getByRole( 'button', {
+			name: /^Custom color picker/,
+			expanded: true,
 		} );
 
-		describe( '.renderContent', () => {
-			const renderedContent = shallow( dropdown.props().renderContent() );
+		expect( dropdownButton ).toBeVisible();
 
-			test( 'should render dropdown content', () => {
-				expect( renderedContent ).toMatchSnapshot();
-			} );
-		} );
+		expect(
+			within( dropdownButton ).getByText( colors[ 0 ].name )
+		).toBeVisible();
+		expect(
+			within( dropdownButton ).getByText(
+				colors[ 0 ].color.replace( '#', '' )
+			)
+		).toBeVisible();
 	} );
 } );

@@ -100,7 +100,7 @@ function UnforwardedUnitControl(
 		if ( parsedUnit !== undefined ) {
 			setUnit( parsedUnit );
 		}
-	}, [ parsedUnit ] );
+	}, [ parsedUnit, setUnit ] );
 
 	// Stores parsed value for hand-off in state reducer.
 	const refParsedQuantity = useRef< number | undefined >( undefined );
@@ -265,7 +265,7 @@ function UnforwardedUnitControl(
 				autoComplete={ autoComplete }
 				className={ classes }
 				disabled={ disabled }
-				disableUnits={ disableUnits }
+				hideHTMLArrows
 				isPressEnterToChange={ isPressEnterToChange }
 				label={ label }
 				onBlur={ handleOnBlur }

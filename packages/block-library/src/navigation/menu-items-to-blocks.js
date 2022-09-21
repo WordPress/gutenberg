@@ -29,9 +29,10 @@ export default function menuItemsToBlocks( menuItems ) {
  * A recursive function that maps menu item nodes to blocks.
  *
  * @param {WPNavMenuItem[]} menuItems An array of WPNavMenuItem items.
+ * @param {number}          level     An integer representing the nesting level.
  * @return {Object} Object containing innerBlocks and mapping.
  */
-function mapMenuItemsToBlocks( menuItems ) {
+function mapMenuItemsToBlocks( menuItems, level = 0 ) {
 	let mapping = {};
 
 	// The menuItem should be in menu_order sort order.
@@ -52,14 +53,22 @@ function mapMenuItemsToBlocks( menuItems ) {
 			return block;
 		}
 
-		const attributes = menuItemToBlockAttributes( menuItem );
+		const blockType = menuItem.children?.length
+			? 'core/navigation-submenu'
+			: 'core/navigation-link';
+
+		const attributes = menuItemToBlockAttributes(
+			menuItem,
+			blockType,
+			level
+		);
 
 		// If there are children recurse to build those nested blocks.
 		const {
 			innerBlocks: nestedBlocks = [], // alias to avoid shadowing
 			mapping: nestedMapping = {}, // alias to avoid shadowing
 		} = menuItem.children?.length
-			? mapMenuItemsToBlocks( menuItem.children )
+			? mapMenuItemsToBlocks( menuItem.children, level + 1 )
 			: {};
 
 		// Update parent mapping with nested mapping.
@@ -67,10 +76,6 @@ function mapMenuItemsToBlocks( menuItems ) {
 			...mapping,
 			...nestedMapping,
 		};
-
-		const blockType = menuItem.children?.length
-			? 'core/navigation-submenu'
-			: 'core/navigation-link';
 
 		// Create block with nested "innerBlocks".
 		const block = createBlock( blockType, attributes, nestedBlocks );
@@ -111,23 +116,29 @@ function mapMenuItemsToBlocks( menuItems ) {
 /**
  * Convert block attributes to menu item.
  *
- * @param {WPNavMenuItem} menuItem the menu item to be converted to block attributes.
+ * @param {WPNavMenuItem} menuItem  the menu item to be converted to block attributes.
+ * @param {string}        blockType The block type.
+ * @param {number}        level     An integer representing the nesting level.
  * @return {Object} the block attributes converted from the WPNavMenuItem item.
  */
-function menuItemToBlockAttributes( {
-	title: menuItemTitleField,
-	xfn,
-	classes,
-	// eslint-disable-next-line camelcase
-	attr_title,
-	object,
-	// eslint-disable-next-line camelcase
-	object_id,
-	description,
-	url,
-	type: menuItemTypeField,
-	target,
-} ) {
+function menuItemToBlockAttributes(
+	{
+		title: menuItemTitleField,
+		xfn,
+		classes,
+		// eslint-disable-next-line camelcase
+		attr_title,
+		object,
+		// eslint-disable-next-line camelcase
+		object_id,
+		description,
+		url,
+		type: menuItemTypeField,
+		target,
+	},
+	blockType,
+	level
+) {
 	// For historical reasons, the `core/navigation-link` variation type is `tag`
 	// whereas WP Core expects `post_tag` as the `object` type.
 	// To avoid writing a block migration we perform a conversion here.
@@ -165,6 +176,12 @@ function menuItemToBlockAttributes( {
 		} ),
 		...( target === '_blank' && {
 			opensInNewTab: true,
+		} ),
+		...( blockType === 'core/navigation-submenu' && {
+			isTopLevelItem: level === 0,
+		} ),
+		...( blockType === 'core/navigation-link' && {
+			isTopLevelLink: level === 0,
 		} ),
 	};
 }

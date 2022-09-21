@@ -163,7 +163,6 @@ const UnforwardedPopover = (
 	forwardedRef: ForwardedRef< any >
 ) => {
 	const {
-		range,
 		animate = true,
 		headerTitle,
 		onClose,
@@ -175,22 +174,28 @@ const UnforwardedPopover = (
 		placement: placementProp = 'bottom-start',
 		offset: offsetProp = 0,
 		focusOnMount = 'firstElement',
-		anchorRef,
-		anchorRect,
-		getAnchorRect,
+		anchor,
 		expandOnMobile,
 		onFocusOutside,
 		__unstableSlotName = SLOT_NAME,
 		flip = true,
 		resize = true,
 		shift = false,
-		__unstableShift,
+
+		// Deprecated props
 		__unstableForcePosition,
+		__unstableShift,
+		anchorRef,
+		anchorRect,
+		getAnchorRect,
+		range,
+
+		// Rest
 		...contentProps
 	} = props;
 
 	if ( range ) {
-		deprecated( 'range prop in Popover component', {
+		deprecated( '`range` prop in wp.components.Popover', {
 			since: '6.1',
 			version: '6.3',
 		} );
@@ -199,7 +204,7 @@ const UnforwardedPopover = (
 	let computedFlipProp = flip;
 	let computedResizeProp = resize;
 	if ( __unstableForcePosition !== undefined ) {
-		deprecated( '__unstableForcePosition prop in Popover component', {
+		deprecated( '`__unstableForcePosition` prop wp.components.Popover', {
 			since: '6.1',
 			version: '6.3',
 			alternative: '`flip={ false }` and  `resize={ false }`',
@@ -213,7 +218,7 @@ const UnforwardedPopover = (
 
 	let shouldShift = shift;
 	if ( __unstableShift !== undefined ) {
-		deprecated( '`__unstableShift` prop in Popover component', {
+		deprecated( '`__unstableShift` prop in wp.components.Popover', {
 			since: '6.1',
 			version: '6.3',
 			alternative: '`shift` prop`',
@@ -221,6 +226,30 @@ const UnforwardedPopover = (
 
 		// Back-compat.
 		shouldShift = __unstableShift;
+	}
+
+	if ( anchorRef !== undefined ) {
+		deprecated( '`anchorRef` prop in wp.components.Popover', {
+			since: '6.1',
+			version: '6.3',
+			alternative: '`anchor` prop',
+		} );
+	}
+
+	if ( anchorRect !== undefined ) {
+		deprecated( '`anchorRect` prop in wp.components.Popover', {
+			since: '6.1',
+			version: '6.3',
+			alternative: '`anchor` prop',
+		} );
+	}
+
+	if ( getAnchorRect !== undefined ) {
+		deprecated( '`getAnchorRect` prop in wp.components.Popover', {
+			since: '6.1',
+			version: '6.3',
+			alternative: '`anchor` prop',
+		} );
 	}
 
 	const arrowRef = useRef( null );
@@ -383,6 +412,7 @@ const UnforwardedPopover = (
 	// recompute the reference element (real or virtual) and its owner document.
 	useLayoutEffect( () => {
 		const resultingReferenceOwnerDoc = getReferenceOwnerDocument( {
+			anchor,
 			anchorRef,
 			anchorRect,
 			getAnchorRect,
@@ -390,6 +420,7 @@ const UnforwardedPopover = (
 			fallbackDocument: document,
 		} );
 		const resultingReferenceElement = getReferenceElement( {
+			anchor,
 			anchorRef,
 			anchorRect,
 			getAnchorRect,
@@ -400,6 +431,7 @@ const UnforwardedPopover = (
 
 		setReferenceOwnerDocument( resultingReferenceOwnerDoc );
 	}, [
+		anchor,
 		anchorRef as Element | undefined,
 		( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top,
 		( anchorRef as PopoverAnchorRefTopBottom | undefined )?.bottom,
@@ -527,7 +559,7 @@ const UnforwardedPopover = (
 		content = <Fill name={ slotName }>{ content }</Fill>;
 	}
 
-	if ( anchorRef || anchorRect ) {
+	if ( anchorRef || anchorRect || anchor ) {
 		return content;
 	}
 

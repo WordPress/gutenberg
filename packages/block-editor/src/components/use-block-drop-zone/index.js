@@ -101,7 +101,7 @@ export default function useBlockDropZone( {
 			} = select( blockEditorStore );
 			const templateLock = getTemplateLock( targetRootClientId );
 			return (
-				[ 'all', 'noContent' ].some(
+				[ 'all', 'contentOnly' ].some(
 					( lock ) => lock === templateLock
 				) ||
 				__unstableHasActiveBlockOverlayActive( targetRootClientId ) ||

@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { Popover, ToolbarGroup } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import {
 	isCollapsed,
 	getActiveFormats,
-	useAnchorRef,
+	useAnchor,
 	store as richTextStore,
 } from '@wordpress/rich-text';
 
@@ -15,50 +16,63 @@ import {
  */
 import BlockControls from '../block-controls';
 import FormatToolbar from './format-toolbar';
+import NavigableToolbar from '../navigable-toolbar';
 import { store as blockEditorStore } from '../../store';
 
-function InlineSelectionToolbar( { value, anchorRef, activeFormats } ) {
+function InlineSelectionToolbar( {
+	value,
+	editableContentElement,
+	activeFormats,
+} ) {
 	const lastFormat = activeFormats[ activeFormats.length - 1 ];
 	const lastFormatType = lastFormat?.type;
 	const settings = useSelect(
 		( select ) => select( richTextStore ).getFormatType( lastFormatType ),
 		[ lastFormatType ]
 	);
-	const selectionRef = useAnchorRef( {
-		ref: anchorRef,
+	const popoverAnchor = useAnchor( {
+		editableContentElement,
 		value,
 		settings,
 	} );
 
-	return <InlineToolbar anchorRef={ selectionRef } />;
+	return <InlineToolbar popoverAnchor={ popoverAnchor } />;
 }
 
-function InlineToolbar( { anchorRef } ) {
+function InlineToolbar( { popoverAnchor } ) {
 	return (
 		<Popover
 			position="top center"
 			focusOnMount={ false }
-			anchorRef={ anchorRef }
+			anchor={ popoverAnchor }
 			className="block-editor-rich-text__inline-format-toolbar"
 			__unstableSlotName="block-toolbar"
 		>
-			<div className="block-editor-rich-text__inline-format-toolbar-group">
+			<NavigableToolbar
+				className="block-editor-rich-text__inline-format-toolbar-group"
+				/* translators: accessibility text for the inline format toolbar */
+				aria-label={ __( 'Format tools' ) }
+			>
 				<ToolbarGroup>
 					<FormatToolbar />
 				</ToolbarGroup>
-			</div>
+			</NavigableToolbar>
 		</Popover>
 	);
 }
 
-const FormatToolbarContainer = ( { inline, anchorRef, value } ) => {
+const FormatToolbarContainer = ( {
+	inline,
+	editableContentElement,
+	value,
+} ) => {
 	const hasInlineToolbar = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().hasInlineToolbar,
 		[]
 	);
 
 	if ( inline ) {
-		return <InlineToolbar anchorRef={ anchorRef } />;
+		return <InlineToolbar popoverAnchor={ editableContentElement } />;
 	}
 
 	if ( hasInlineToolbar ) {
@@ -70,7 +84,7 @@ const FormatToolbarContainer = ( { inline, anchorRef, value } ) => {
 
 		return (
 			<InlineSelectionToolbar
-				anchorRef={ anchorRef }
+				editableContentElement={ editableContentElement }
 				value={ value }
 				activeFormats={ activeFormats }
 			/>
