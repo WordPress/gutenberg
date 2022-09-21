@@ -47,6 +47,10 @@ class WP_Theme_JSON_Data_Gutenberg {
 		return $this;
 	}
 
+	public function create_with( $new_data ) {
+		$this->theme_json = new WP_Theme_JSON_Gutenberg( $new_data, $this->origin );
+	}
+
 	/**
 	 * Returns the underlying data.
 	 *

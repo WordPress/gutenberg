@@ -5,43 +5,50 @@ function theme_json_current_theme_has_support( ){
 }
 
 function theme_json_default_filter_for_classic_themes( $theme_json_data ) {
-	if ( theme_json_current_theme_has_support() ) {
+	if ( ! theme_json_current_theme_has_support() ) {
 		$new_data = array(
 			'version'  => 2,
-			'settings' => array( /* we should maintain the presets by core */ ),
-			'styles'   => array( /* clear this? add only the base-layout-styles? */ ),
+			'settings' => array(
+				/*
+				 * We should be able to remove this.
+				 * Without it, it breaks.
+				 */
+				"spacing" => array(
+					"spacingScale" => array(
+						"operator" => "*",
+						"increment" => 1.5,
+						"steps" => 7,
+						"mediumStep" => 1.5,
+						"unit" => "rem"
+					),
+				),
+			),
+			'styles'   => array(
+				'elements' => array(
+					'button' => array(
+						'color' => array(
+							'text'       => '#fff',
+							'background' => '#32373c',
+						),
+						'spacing' => array(
+							'padding' =>'calc(0.667em + 2px) calc(1.333em + 2px)',
+						),
+						'typography' => array(
+							'fontSize'       => 'inherit',
+							'fontFamily'     => 'inherit',
+							'lineHeight'     => 'inherit',
+							'textDecoration' => 'none',
+						),
+						'border' => array(
+							'width' => '0',
+						),
+					),
+				),
+			),
 		);
-		$theme_json_data->update_with( $new_data );
+		$theme_json_data->create_with( $new_data );
 	}
+
 	return $theme_json_data;
 }
 add_filter( 'theme_json_default', 'theme_json_default_filter_for_classic_themes');
-
-function theme_json_blocks_filter_for_classic_themes( $theme_json_data ) {
-	if ( theme_json_current_theme_has_support() ) {
-		$new_data = array(
-			'version'  => 2,
-			'settings' => array(),
-			'styles'   => array( /* add button styles for classic here */ ),
-		);
-		$theme_json_data->update_with( $new_data );
-	}
-	return $theme_json_data;
-}
-add_filter( 'theme_json_blocks', 'theme_json_blocks_filter_for_classic_themes' );
-
-function theme_json_reset_for_classic_themes( $theme_json_data ) {
-	if ( theme_json_current_theme_has_support() ) {
-		$new_data = array(
-			'version'  => 2,
-			'settings' => array(),
-			'styles'   => array(),
-		);
-		$theme_json_data->update_with( $new_data );
-	}
-
-	error_log( 'theme_json_data ' . print_r( $theme_json_data, true ) );
-	return $theme_json_data;
-}
-add_filter( 'theme_json_theme', 'theme_json_reset_for_classic_themes' );
-add_filter( 'theme_json_user', 'theme_json_reset_for_classic_themes' );
