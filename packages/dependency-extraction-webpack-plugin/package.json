@@ -29,7 +29,7 @@
 	"main": "lib/index.js",
 	"types": "lib/types.d.ts",
 	"dependencies": {
-		"json2php": "^0.0.4",
+		"json2php": "^0.0.5",
 		"webpack-sources": "^3.2.2"
 	},
 	"peerDependencies": {
