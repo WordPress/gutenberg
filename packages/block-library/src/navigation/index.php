@@ -431,7 +431,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		'AlpineJS_focus',
 		'https://unpkg.com/@alpinejs/focus@3.10.3/dist/cdn.min.js',
 		array(),
-		"3.10.3",
+		null,
 		true // Load it in the footer
 	);
 	wp_enqueue_script( 'AlpineJS_focus' );
@@ -441,7 +441,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		'AlpineJS',
 		'https://unpkg.com/alpinejs@3.10.3/dist/cdn.min.js',
 		array('AlpineJS_focus'),
-		"3.10.3",
+		null,
 		true // Load it in the footer
 	);
 	wp_enqueue_script( 'AlpineJS' );
