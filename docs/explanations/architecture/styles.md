@@ -517,30 +517,39 @@ Common layout definitions are stored in the core `theme.json` file, but are not 
 
 When a block that opts-in to the experimental Layout support is rendered, two things are processed and added to the output:
 
-- Semantic classnames are added to the block markup to indicate which Layout settings are in use. Examples include `is-layout-flow` for blocks (such as Group) that use the default/flow layout.
-- Individual styles are generated for unique Layout values that are set on the individual block being rendered. These styles are attached to the block via a container classname using the form `wp-container-$id` where the `$id` is a random/unique number.
+- Semantic class names are added to the block markup to indicate which Layout settings are in use. Examples include `is-layout-flow` for blocks (such as Group) that use the default/flow layout.
+- Individual styles are generated for non-default Layout values that are set on the individual block being rendered. These styles are attached to the block via a container class name using the form `wp-container-$id` where the `$id` is a random/unique number.
 
 #### Available layout types
 
 There are currently two layout types in use:
 
 * Default/Flow: Items are stacked vertically. The parent container block is set to `display: flow` and the spacing between children is handled via vertical margins.
-* Flow: Items are displayed using a Flexbox layout. Spacing between children is handled via the `gap` CSS property.
+* Constrained: Items are stacked vertically, with constrained widths for child content. Outputs widths for standard content size and wide size. Defaults to using global `contentSize` and `wideSize` values set in `settings.layout` in the `theme.json`.
+* Flex: Items are displayed using a Flexbox layout. Defaults to a horizontal orientation. Spacing between children is handled via the `gap` CSS property.
 
 #### Targeting layout or container blocks from themes
 
 The Layout block support is designed to enable control over layout features from within the block and site editors. Where possible, try to use the features of the blocks to determine particular layout requirements rather than relying upon additional stylesheets.
 
-For themes that wish to target container blocks in order to add or adjust particular styles, the block's classname is often the best classname to use. Classnames such as `wp-block-group` or `wp-block-columns` are usually reliable classnames for targeting a particular block.
+For themes that wish to target container blocks in order to add or adjust particular styles, the block's class name is often the best class name to use. Class names such as `wp-block-group` or `wp-block-columns` are usually reliable class names for targeting a particular block.
 
 For targeting a block that uses a particular Layout type, avoid targeting `wp-container-` as container classes may not always be present in the rendered markup.
 
-##### Semantic classnames
+##### Semantic class names
 
-Work is currently underway to introduce stable semantic classnames in Layout block output. The task is being discussed in [this issue](https://github.com/WordPress/gutenberg/issues/38719).
+Work is currently underway to expand stable semantic classnames in Layout block support output. The task is being discussed in [this issue](https://github.com/WordPress/gutenberg/issues/38719).
 
-Until the semantic classname naming structure has stabilised, consider the following classnames as unstable / likely to change:
+The current semantic class names that can be output by the Layout block support are:
 
 * `is-layout-flow`: Blocks that use the Default/Flow layout type.
+* `is-layout-constrained`: Blocks that use the Constrained layout type.
 * `is-layout-flex`: Blocks that use the Flex layout type.
-* `wp-container-$id`: A container class that only exists when the block contains non-default Layout values. This class should not be used directly for any CSS targeting as it may or may not be present.
+* `wp-container-$id`: Where `$id` is a semi-random number. A container class that only exists when the block contains non-default Layout values. This class should not be used directly for any CSS targeting as it may or may not be present.
+* `is-horizontal`: When a block explicitly sets `orientation` to `horizontal`.
+* `is-vertical`: When a block explicitly sets `orientation` to `vertical`.
+* `is-content-justification-left`: When a block explicitly sets `justifyContent` to `left`.
+* `is-content-justification-center`: When a block explicitly sets `justifyContent` to `center`.
+* `is-content-justification-right`: When a block explicitly sets `justifyContent` to `right`.
+* `is-content-justification-space-between`: When a block explicitly sets `justifyContent` to `space-between`.
+* `is-nowrap`: When a block explicitly sets `flexWrap` to `nowrap`.
