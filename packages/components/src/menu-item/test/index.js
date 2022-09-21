@@ -111,7 +111,7 @@ describe( 'MenuItem', () => {
 	it( 'should not render shortcut or right icon if suffix provided', () => {
 		render(
 			<MenuItem
-				icon="Icon"
+				icon={ <span>Icon</span> }
 				iconPosition="right"
 				role="menuitemcheckbox"
 				shortcut="Shortcut"
