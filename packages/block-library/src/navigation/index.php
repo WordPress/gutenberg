@@ -647,17 +647,17 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
 
 	$responsive_container_markup = sprintf(
-		'<button x-ref="hamburger" x-on:click="open = true; $focus.within($refs.items).first()" aria-haspopup="true" %3$s class="%6$s">%9$s</button>
+		'<button x-ref="hamburger" x-on:click="open = true" aria-haspopup="true" %3$s class="%6$s">%9$s</button>
 			<div 
-				x-on:keydown.escape="open = false; $focus.focus($refs.hamburger)"
+				x-on:keydown.escape="open = false"
 				:class="open && \'is-menu-open\ has-modal-open\'"
 				:aria-hidden="open ? false : true"
 				class="%5$s" style="%7$s"
 				id="%1$s"
 			>
 				<div class="wp-block-navigation__responsive-close" tabindex="-1">
-					<div x-trap="open" class="wp-block-navigation__responsive-dialog" aria-label="%8$s" aria-modal="true" role="dialog">
-							<button x-on:click="open = false; $focus.focus($refs.hamburger)" %4$s class="wp-block-navigation__responsive-container-close">%10$s</button>
+					<div x-trap="open" x-effect="open === true ? $focus.within($refs.items).first() : $focus.focus($refs.hamburger)" class="wp-block-navigation__responsive-dialog" aria-label="%8$s" aria-modal="true" role="dialog">
+							<button x-on:click="open = false" %4$s class="wp-block-navigation__responsive-container-close">%10$s</button>
 						<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
 							%2$s
 						</div>
