@@ -28,8 +28,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/compose": "file:../compose"
+		"@wordpress/api-fetch": "file:../api-fetch"
 	},
 	"publishConfig": {
 		"access": "public"

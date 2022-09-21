@@ -1248,38 +1248,42 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		$unit            = '%' === $spacing_scale['unit'] ? '%' : sanitize_title( $spacing_scale['unit'] );
 		$current_step    = $spacing_scale['mediumStep'];
-		$steps_mid_point = round( ( ( $spacing_scale['steps'] ) / 2 ), 0 );
+		$steps_mid_point = round( $spacing_scale['steps'] / 2, 0 );
 		$x_small_count   = null;
 		$below_sizes     = array();
 		$slug            = 40;
 		$remainder       = 0;
 
-		for ( $x = $steps_mid_point - 1; $spacing_scale['steps'] > 1 && $slug > 0 && $x > 0; $x-- ) {
-			$current_step = '+' === $spacing_scale['operator']
-				? $current_step - $spacing_scale['increment']
-				: ( $spacing_scale['increment'] > 1 ? $current_step / $spacing_scale['increment'] : $current_step * $spacing_scale['increment'] );
+		for ( $below_midpoint_count = $steps_mid_point - 1; $spacing_scale['steps'] > 1 && $slug > 0 && $below_midpoint_count > 0; $below_midpoint_count-- ) {
+			if ( '+' === $spacing_scale['operator'] ) {
+				$current_step -= $spacing_scale['increment'];
+			} elseif ( $spacing_scale['increment'] > 1 ) {
+				$current_step /= $spacing_scale['increment'];
+			} else {
+				$current_step *= $spacing_scale['increment'];
+			}
 
 			if ( $current_step <= 0 ) {
-				$remainder = $x;
+				$remainder = $below_midpoint_count;
 				break;
 			}
 
 			$below_sizes[] = array(
-				/* translators: %s: Multiple of t-shirt sizing, eg. 2X-Small */
-				'name' => $x === $steps_mid_point - 1 ? __( 'Small', 'gutenberg' ) : sprintf( __( '%sX-Small', 'gutenberg' ), strval( $x_small_count ) ),
+				/* translators: %s: Digit to indicate multiple of sizing, eg. 2X-Small. */
+				'name' => $below_midpoint_count === $steps_mid_point - 1 ? __( 'Small', 'gutenberg' ) : sprintf( __( '%sX-Small', 'gutenberg' ), strval( $x_small_count ) ),
 				'slug' => (string) $slug,
 				'size' => round( $current_step, 2 ) . $unit,
 			);
 
-			if ( $x === $steps_mid_point - 2 ) {
+			if ( $below_midpoint_count === $steps_mid_point - 2 ) {
 				$x_small_count = 2;
 			}
 
-			if ( $x < $steps_mid_point - 2 ) {
+			if ( $below_midpoint_count < $steps_mid_point - 2 ) {
 				$x_small_count++;
 			}
 
-			$slug = $slug - 10;
+			$slug -= 10;
 		}
 
 		$below_sizes = array_reverse( $below_sizes );
@@ -1296,30 +1300,39 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$slug          = 60;
 		$steps_above   = ( $spacing_scale['steps'] - $steps_mid_point ) + $remainder;
 
-		for ( $x = 0; $x < $steps_above; $x++ ) {
+		for ( $above_midpoint_count = 0; $above_midpoint_count < $steps_above; $above_midpoint_count++ ) {
 			$current_step = '+' === $spacing_scale['operator']
 				? $current_step + $spacing_scale['increment']
 				: ( $spacing_scale['increment'] >= 1 ? $current_step * $spacing_scale['increment'] : $current_step / $spacing_scale['increment'] );
 
 			$above_sizes[] = array(
-				/* translators: %s: Multiple of t-shirt sizing, eg. 2X-Large */
-				'name' => 0 === $x ? __( 'Large', 'gutenberg' ) : sprintf( __( '%sX-Large', 'gutenberg' ), strval( $x_large_count ) ),
+				/* translators: %s: Digit to indicate multiple of sizing, eg. 2X-Large. */
+				'name' => 0 === $above_midpoint_count ? __( 'Large', 'gutenberg' ) : sprintf( __( '%sX-Large', 'gutenberg' ), strval( $x_large_count ) ),
 				'slug' => (string) $slug,
 				'size' => round( $current_step, 2 ) . $unit,
 			);
 
-			if ( 1 === $x ) {
+			if ( 1 === $above_midpoint_count ) {
 				$x_large_count = 2;
 			}
 
-			if ( $x > 1 ) {
+			if ( $above_midpoint_count > 1 ) {
 				$x_large_count++;
 			}
 
-			$slug = $slug + 10;
+			$slug += 10;
 		}
 
-		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', 'default' ), array_merge( $below_sizes, $above_sizes ) );
+		$spacing_sizes = array_merge( $below_sizes, $above_sizes );
+
+		// If there are 7 or less steps in the scale revert to numbers for labels instead of t-shirt sizes.
+		if ( $spacing_scale['steps'] <= 7 ) {
+			for ( $spacing_sizes_count = 0; $spacing_sizes_count < count( $spacing_sizes ); $spacing_sizes_count++ ) {
+				$spacing_sizes[ $spacing_sizes_count ]['name'] = strval( $spacing_sizes_count + 1 );
+			}
+		}
+
+		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', 'default' ), $spacing_sizes );
 	}
 
 	/**

@@ -33,7 +33,7 @@ export default function ReadMore( {
 			</InspectorControls>
 			<RichText
 				tagName="a"
-				aria-label={ __( '"Read more" link text' ) }
+				aria-label={ __( '“Read more” link text' ) }
 				placeholder={ __( 'Read more' ) }
 				value={ content }
 				onChange={ ( newValue ) =>
