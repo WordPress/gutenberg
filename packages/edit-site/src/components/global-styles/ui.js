@@ -27,7 +27,7 @@ import ScreenHeadingColor from './screen-heading-color';
 import ScreenButtonColor from './screen-button-color';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
-import { useRandomizer } from './hooks';
+import { useColorRandomizer } from './hooks';
 
 function GlobalStylesNavigationScreen( { className, ...props } ) {
 	return (
@@ -121,7 +121,7 @@ function ContextScreens( { name } ) {
 
 function GlobalStylesUI() {
 	const blocks = getBlockTypes();
-	const [ randomizeTheme ] = useRandomizer();
+	const [ randomizeThemeColors ] = useColorRandomizer();
 
 	return (
 		<>
@@ -159,11 +159,13 @@ function GlobalStylesUI() {
 					/>
 				) ) }
 			</NavigatorProvider>
-			<Button
-				icon={ shuffle }
-				label={ __( 'Randomize colors' ) }
-				onClick={ randomizeTheme }
-			/>
+			{ randomizeThemeColors && (
+				<Button
+					icon={ shuffle }
+					label={ __( 'Randomize colors' ) }
+					onClick={ randomizeThemeColors }
+				/>
+			) }
 		</>
 	);
 }

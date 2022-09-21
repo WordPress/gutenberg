@@ -329,7 +329,7 @@ export function useGradientsPerOrigin( name ) {
 	}, [ customGradients, themeGradients, defaultGradients ] );
 }
 
-export function useRandomizer( name ) {
+export function useColorRandomizer( name ) {
 	const [ themeColors, setThemeColors ] = useSetting(
 		'color.palette.theme',
 		name
@@ -355,5 +355,7 @@ export function useRandomizer( name ) {
 		setThemeColors( newColors );
 	}
 
-	return [ randomizeColors ];
+	return window.__experimentalEnableColorRandomizer
+		? [ randomizeColors ]
+		: [];
 }
