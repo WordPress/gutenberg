@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.16.0 (2022-09-21)
+
 ### New Features
 
 -   Compose: Introduce an in-house `debounce()` utility, deprecate Lodash version ([#43943](https://github.com/WordPress/gutenberg/pull/43943)).
