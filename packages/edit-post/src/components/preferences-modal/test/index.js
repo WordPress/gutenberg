@@ -39,7 +39,7 @@ describe( 'EditPostPreferencesModal', () => {
 	} );
 
 	it( 'should not render when the modal is not active', () => {
-		useSelect.mockImplementation( () => [ false, false ] );
+		useSelect.mockImplementation( () => false );
 		render( <EditPostPreferencesModal /> );
 		expect(
 			screen.queryByRole( 'dialog', { name: 'Preferences' } )
