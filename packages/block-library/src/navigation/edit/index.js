@@ -233,14 +233,14 @@ function Navigation( {
 	// than 1 exists then use the most recent.
 	// The aim is for the block to "just work" from a user perspective using existing data.
 	useEffect( () => {
+		if ( hasUncontrolledInnerBlocks || isCreatingNavigationMenu || ref ) {
+			return;
+		}
+		
 		// Only autofallback to published menus.
 		const fallbackNavigationMenus = navigationMenus?.filter(
 			( menu ) => menu.status === 'publish'
 		);
-
-		if ( hasUncontrolledInnerBlocks || isCreatingNavigationMenu || ref ) {
-			return;
-		}
 
 		// If there's non fallback navigation menus and
 		// only one classic menu then create a new navigation menu based on it.
