@@ -19,7 +19,8 @@
 	z-index: z-index(".customize-widgets__block-toolbar");
 }
 
-.customize-widgets-popover .components-popover {
+.customize-widgets-popover .components-popover,
+.customize-control-sidebar_block_editor .components-popover {
 	// FloatingUI library used in Popover component forces us to have an "absolute" inline style.
 	// We need to override this in the customizer.
 	position: fixed !important;
