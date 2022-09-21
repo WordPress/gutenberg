@@ -349,6 +349,20 @@ $block-inserter-tabs-height: 44px;
 			width: 100%;
 			height: 48px;
 			text-align: left;
+
+			// Mimic the Preferences TabItem style. @todo: componentize this.
+			&.is-pressed:hover:not(:disabled),
+			&:hover,
+			&:active,
+			&.is-pressed {
+				background: $gray-100;
+				color: $gray-900;
+				font-weight: 500;
+			}
+
+			&:hover {
+				color: var(--wp-admin-theme-color);
+			}
 		}
 	}
 
