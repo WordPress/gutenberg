@@ -28,8 +28,8 @@ import {
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableIframe as Iframe,
 	__experimentalRecursionProvider as RecursionProvider,
-	useLayoutClasses,
-	useLayoutStyles,
+	__experimentaluseLayoutClasses as useLayoutClasses,
+	__experimentaluseLayoutStyles as useLayoutStyles,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { Button, __unstableMotion as motion } from '@wordpress/components';
@@ -225,10 +225,7 @@ export default function VisualEditor( { styles } ) {
 		return findPostContent( parse( templateContent ) );
 	}, [ templateContent ] );
 
-	const postContentLayoutClasses = useLayoutClasses(
-		postContentBlock?.attributes?.layout,
-		globalLayoutSettings?.definitions
-	);
+	const postContentLayoutClasses = useLayoutClasses( postContentBlock );
 
 	const blockListLayoutClass = classnames(
 		{

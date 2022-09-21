@@ -12,8 +12,8 @@ export {
 	getSpacingClassesAndStyles as __experimentalGetSpacingClassesAndStyles,
 	getGapCSSValue as __experimentalGetGapCSSValue,
 	useCachedTruthy,
-	useLayoutClasses,
-	useLayoutStyles,
+	useLayoutClasses as __experimentaluseLayoutClasses,
+	useLayoutStyles as __experimentaluseLayoutStyles,
 } from './hooks';
 export * from './components';
 export * from './elements';
