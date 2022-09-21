@@ -17,12 +17,9 @@ test.describe( 'changing image size', () => {
 		await editor.insertBlock( { name: 'test/iframed-block' } );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
-		const element = await page.waitForSelector(
-			'.wp-block-test-iframed-block'
-		);
-		const text = await element.evaluate( ( el ) => el.textContent );
-
-		expect( text ).toBe( 'Iframed Block (set with jQuery)' );
+		await expect(
+			page.locator( 'role=document[name="Block: Iframed Block"i]' )
+		).toHaveText( 'Iframed Block (set with jQuery)' );
 
 		// open page from sidebar settings
 		await page.click( '[aria-label="Page"]' );
@@ -38,11 +35,8 @@ test.describe( 'changing image size', () => {
 			page.locator( 'iframe[name="editor-canvas"]' )
 		).toBeVisible();
 
-		// Expect the script to load in the iframe, which replaces the block text.
-		const iframedText = page.frameLocator( 'iframe' ).locator( 'body' );
-
-		await expect( iframedText ).toHaveText(
-			'Iframed Block (set with jQuery)'
-		);
+		await expect(
+			page.locator( 'role=document[name="Block: Iframed Block"i]' )
+		).toHaveText( 'Iframed Block (set with jQuery)' );
 	} );
 } );
