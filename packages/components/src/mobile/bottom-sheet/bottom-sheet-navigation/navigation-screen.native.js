@@ -7,13 +7,12 @@ import {
 	useFocusEffect,
 } from '@react-navigation/native';
 import { View, ScrollView, TouchableHighlight } from 'react-native';
-import { debounce } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { BottomSheetContext } from '@wordpress/components';
-
+import { debounce } from '@wordpress/compose';
 import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
 
 /**

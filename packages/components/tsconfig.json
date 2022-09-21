@@ -18,6 +18,7 @@
 		"strictNullChecks": true
 	},
 	"references": [
+		{ "path": "../a11y" },
 		{ "path": "../compose" },
 		{ "path": "../date" },
 		{ "path": "../deprecated" },

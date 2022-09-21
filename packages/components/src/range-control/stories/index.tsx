@@ -35,7 +35,7 @@ const meta: ComponentMeta< typeof RangeControl > = {
 		icon: { control: { type: null } },
 		marks: { control: { type: 'object' } },
 		onBlur: { control: { type: null } },
-		onChange: { action: 'onChange' },
+		onChange: { control: { type: null } },
 		onFocus: { control: { type: null } },
 		onMouseLeave: { control: { type: null } },
 		onMouseMove: { control: { type: null } },
@@ -46,6 +46,7 @@ const meta: ComponentMeta< typeof RangeControl > = {
 		value: { control: { type: null } },
 	},
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
 	},

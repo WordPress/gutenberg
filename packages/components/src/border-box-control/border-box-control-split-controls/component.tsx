@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import type { ComponentProps } from 'react';
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -18,6 +14,7 @@ import { Grid } from '../../grid';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { useBorderBoxControlSplitControls } from './hook';
 
+import type { BorderControlProps } from '../../border-control/types';
 import type { SplitControlsProps } from '../types';
 
 const BorderBoxControlSplitControls = (
@@ -40,18 +37,27 @@ const BorderBoxControlSplitControls = (
 		__next36pxDefaultSize,
 		...otherProps
 	} = useBorderBoxControlSplitControls( props );
-	const containerRef = useRef();
-	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
-	const popoverProps: ComponentProps<
-		typeof BorderControl
-	>[ '__unstablePopoverProps' ] = popoverPlacement
-		? {
-				placement: popoverPlacement,
-				offset: popoverOffset,
-				anchorRef: containerRef,
-				shift: true,
-		  }
-		: undefined;
+
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState< Element | null >(
+		null
+	);
+
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps: BorderControlProps[ '__unstablePopoverProps' ] =
+		useMemo(
+			() =>
+				popoverPlacement
+					? {
+							placement: popoverPlacement,
+							offset: popoverOffset,
+							anchor: popoverAnchor,
+							shift: true,
+					  }
+					: undefined,
+			[ popoverPlacement, popoverOffset, popoverAnchor ]
+		);
 
 	const sharedBorderControlProps = {
 		colors,
@@ -63,6 +69,8 @@ const BorderBoxControlSplitControls = (
 		__experimentalIsRenderedInSidebar,
 		__next36pxDefaultSize,
 	};
+
+	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
 
 	return (
 		<Grid { ...otherProps } ref={ mergedRef } gap={ 4 }>

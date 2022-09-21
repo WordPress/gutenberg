@@ -17,7 +17,7 @@ const transforms = {
 						fontSize,
 						style,
 					},
-					createBlock( 'core/paragraph', { content: value } )
+					[ createBlock( 'core/paragraph', { content: value } ) ]
 				);
 			},
 		},

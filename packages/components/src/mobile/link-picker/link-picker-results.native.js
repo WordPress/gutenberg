@@ -2,12 +2,12 @@
  * External dependencies
  */
 import { ActivityIndicator, FlatList, View } from 'react-native';
-import { debounce } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
+import { debounce } from '@wordpress/compose';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 

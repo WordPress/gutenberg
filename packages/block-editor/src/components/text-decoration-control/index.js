@@ -6,14 +6,16 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
-} from '@wordpress/components';
-import { formatStrikethrough, formatUnderline } from '@wordpress/icons';
+import { BaseControl, Button } from '@wordpress/components';
+import { reset, formatStrikethrough, formatUnderline } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 const TEXT_DECORATIONS = [
+	{
+		name: __( 'None' ),
+		value: 'none',
+		icon: reset,
+	},
 	{
 		name: __( 'Underline' ),
 		value: 'underline',
@@ -40,30 +42,36 @@ export default function TextDecorationControl( {
 	value,
 	onChange,
 	className,
-	...props
 } ) {
 	return (
-		<ToggleGroupControl
-			{ ...props }
+		<fieldset
 			className={ classnames(
 				'block-editor-text-decoration-control',
 				className
 			) }
-			__experimentalIsBorderless
-			label={ __( 'Decoration' ) }
-			value={ value }
-			onChange={ onChange }
 		>
-			{ TEXT_DECORATIONS.map( ( textDecoration ) => {
-				return (
-					<ToggleGroupControlOptionIcon
-						key={ textDecoration.value }
-						value={ textDecoration.value }
-						icon={ textDecoration.icon }
-						label={ textDecoration.name }
-					/>
-				);
-			} ) }
-		</ToggleGroupControl>
+			<BaseControl.VisualLabel as="legend">
+				{ __( 'Decoration' ) }
+			</BaseControl.VisualLabel>
+			<div className="block-editor-text-decoration-control__buttons">
+				{ TEXT_DECORATIONS.map( ( textDecoration ) => {
+					return (
+						<Button
+							key={ textDecoration.value }
+							icon={ textDecoration.icon }
+							label={ textDecoration.name }
+							isPressed={ textDecoration.value === value }
+							onClick={ () => {
+								onChange(
+									textDecoration.value === value
+										? undefined
+										: textDecoration.value
+								);
+							} }
+						/>
+					);
+				} ) }
+			</div>
+		</fieldset>
 	);
 }

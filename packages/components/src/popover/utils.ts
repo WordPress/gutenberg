@@ -116,12 +116,16 @@ export const getFrameOffset = (
 };
 
 export const getReferenceOwnerDocument = ( {
+	anchor,
 	anchorRef,
 	anchorRect,
 	getAnchorRect,
 	fallbackReferenceElement,
 	fallbackDocument,
-}: Pick< PopoverProps, 'anchorRef' | 'anchorRect' | 'getAnchorRect' > & {
+}: Pick<
+	PopoverProps,
+	'anchorRef' | 'anchorRect' | 'getAnchorRect' | 'anchor'
+> & {
 	fallbackReferenceElement: Element | null;
 	fallbackDocument: Document;
 } ): Document => {
@@ -133,7 +137,9 @@ export const getReferenceOwnerDocument = ( {
 	// with the `getBoundingClientRect()` function (like real elements).
 	// See https://floating-ui.com/docs/virtual-elements for more info.
 	let resultingReferenceOwnerDoc;
-	if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
+	if ( anchor ) {
+		resultingReferenceOwnerDoc = anchor.ownerDocument;
+	} else if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
 		resultingReferenceOwnerDoc = ( anchorRef as PopoverAnchorRefTopBottom )
 			?.top.ownerDocument;
 	} else if ( ( anchorRef as Range | undefined )?.startContainer ) {
@@ -160,16 +166,22 @@ export const getReferenceOwnerDocument = ( {
 };
 
 export const getReferenceElement = ( {
+	anchor,
 	anchorRef,
 	anchorRect,
 	getAnchorRect,
 	fallbackReferenceElement,
-}: Pick< PopoverProps, 'anchorRef' | 'anchorRect' | 'getAnchorRect' > & {
+}: Pick<
+	PopoverProps,
+	'anchorRef' | 'anchorRect' | 'getAnchorRect' | 'anchor'
+> & {
 	fallbackReferenceElement: Element | null;
 } ): ReferenceType | null => {
 	let referenceElement = null;
 
-	if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
+	if ( anchor ) {
+		referenceElement = anchor;
+	} else if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
 		// Create a virtual element for the ref. The expectation is that
 		// if anchorRef.top is defined, then anchorRef.bottom is defined too.
 		// Seems to be used by the block toolbar, when multiple blocks are selected

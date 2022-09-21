@@ -29,11 +29,18 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		$attr['alt'] = $post_title;
 	}
 
+	if ( ! empty( $attributes['height'] ) ) {
+		$extra_styles = "height:{$attributes['height']};";
+		if ( ! empty( $attributes['scale'] ) ) {
+			$extra_styles .= "object-fit:{$attributes['scale']};";
+		}
+		$attr['style'] = empty( $attr['style'] ) ? $extra_styles : $attr['style'] . $extra_styles;
+	}
+
 	$featured_image = get_the_post_thumbnail( $post_ID, $size_slug, $attr );
 	if ( ! $featured_image ) {
 		return '';
 	}
-	$wrapper_attributes = get_block_wrapper_attributes();
 	if ( $is_link ) {
 		$link_target    = $attributes['linkTarget'];
 		$rel            = ! empty( $attributes['rel'] ) ? 'rel="' . esc_attr( $attributes['rel'] ) . '"' : '';
@@ -49,23 +56,9 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		$featured_image = $featured_image . $overlay_markup;
 	}
 
-	$has_width  = ! empty( $attributes['width'] );
-	$has_height = ! empty( $attributes['height'] );
-	if ( ! $has_height && ! $has_width ) {
-		return "<figure {$wrapper_attributes}>{$featured_image}</figure>";
-	}
-
-	if ( $has_width ) {
-		$wrapper_attributes = get_block_wrapper_attributes( array( 'style' => "width:{$attributes['width']};" ) );
-	}
-
-	if ( $has_height ) {
-		$image_styles = "height:{$attributes['height']};";
-		if ( ! empty( $attributes['scale'] ) ) {
-			$image_styles .= "object-fit:{$attributes['scale']};";
-		}
-		$featured_image = str_replace( 'src=', 'style="' . esc_attr( $image_styles ) . '" src=', $featured_image );
-	}
+	$wrapper_attributes = empty( $attributes['width'] )
+		? get_block_wrapper_attributes()
+		: get_block_wrapper_attributes( array( 'style' => "width:{$attributes['width']};" ) );
 
 	return "<figure {$wrapper_attributes}>{$featured_image}</figure>";
 }
@@ -182,7 +175,7 @@ function get_block_core_post_featured_image_border_attributes( $attributes ) {
 		);
 	}
 
-	$styles     = gutenberg_style_engine_get_styles( array( 'border' => $border_styles ) );
+	$styles     = wp_style_engine_get_styles( array( 'border' => $border_styles ) );
 	$attributes = array();
 	if ( ! empty( $styles['classnames'] ) ) {
 		$attributes['class'] = $styles['classnames'];
