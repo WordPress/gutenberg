@@ -268,17 +268,13 @@ export default function useOnBlockDrop(
 				const targetBlockClientId =
 					targetBlockClientIds[ targetBlockIndex ];
 
-				// Remove the source blocks and the target block.
-				removeBlocks(
-					[ ...sourceClientIds, targetBlockClientId ],
-					false
-				);
-				// Insert the source blocks back to the target index.
-				insertBlocks(
+				// Remove the source blocks.
+				removeBlocks( sourceClientIds, false );
+				// Replace the target block with the source blocks.
+				replaceBlocks(
+					targetBlockClientId,
 					sourceBlocks,
-					insertIndex,
-					targetRootClientId,
-					true,
+					undefined,
 					0
 				);
 			} else {
