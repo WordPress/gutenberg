@@ -181,3 +181,11 @@ add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_global_styles', 1 );
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
+
+function gutenberg_enqueue_classic_theme_styles() {
+	if ( ! wp_is_block_theme() ) {
+		wp_register_style( 'classic-theme-styles', gutenberg_url( 'build/block-library/classic.css' ), array(), true );
+		wp_enqueue_style( 'classic-theme-styles' );
+	}
+}
+add_action( 'after_setup_theme', 'gutenberg_enqueue_classic_theme_styles' );
