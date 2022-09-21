@@ -112,7 +112,16 @@ export function useLayoutClasses( block = {} ) {
 export function useLayoutStyles( block = {}, selector ) {
 	const { attributes = {}, name } = block;
 	const { layout = {}, style = {} } = attributes;
-	const fullLayoutType = getLayoutType( layout?.type || 'default' );
+	// Update type for blocks using legacy layouts.
+	const usedLayout =
+		layout &&
+		( layout?.type === 'constrained' ||
+			layout?.inherit ||
+			layout?.contentSize ||
+			layout?.wideSize )
+			? { ...layout, type: 'constrained' }
+			: { ...layout, type: 'default' };
+	const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
 	const globalLayoutSettings = useSetting( 'layout' ) || {};
 	const blockGapSupport = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGapSupport !== null;

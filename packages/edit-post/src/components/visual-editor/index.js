@@ -223,7 +223,7 @@ export default function VisualEditor( { styles } ) {
 	}, [ isTemplateMode, themeSupportsLayout, globalLayoutSettings ] );
 
 	const postContentBlock = useMemo( () => {
-		return findPostContent( parse( templateContent ) );
+		return findPostContent( parse( templateContent ) ) || {};
 	}, [ templateContent ] );
 
 	const postContentLayoutClasses = useLayoutClasses( postContentBlock );
@@ -241,11 +241,23 @@ export default function VisualEditor( { styles } ) {
 		'.wp-container-visual-editor'
 	);
 
-	// If there is a Post Content block we use its layout, or 'default' layout
-	// if it doesn't have one. If no Post Content this must be a classic theme,
-	// in which case we use the fallback layout.
-	const postContentLayout = postContentBlock
-		? postContentBlock?.attributes?.layout || { type: 'default' }
+	const { attributes = {} } = postContentBlock;
+	const { layout = {} } = attributes;
+
+	// Update type for blocks using legacy layouts.
+	const postContentLayout =
+		layout &&
+		( layout?.type === 'constrained' ||
+			layout?.inherit ||
+			layout?.contentSize ||
+			layout?.wideSize )
+			? { ...globalLayoutSettings, ...layout, type: 'constrained' }
+			: { ...globalLayoutSettings, ...layout, type: 'default' };
+
+	// If there is a Post Content block we use its layout for the block list;
+	// if not, this must be a classic theme, in which case we use the fallback layout.
+	const blockListLayout = postContentBlock
+		? postContentLayout
 		: fallbackLayout;
 
 	const titleRef = useRef();
@@ -354,9 +366,9 @@ export default function VisualEditor( { styles } ) {
 								className={
 									isTemplateMode
 										? 'wp-site-blocks'
-										: blockListLayoutClass
+										: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
 								}
-								__experimentalLayout={ postContentLayout }
+								__experimentalLayout={ blockListLayout }
 							/>
 						</RecursionProvider>
 					</MaybeIframe>
