@@ -21,7 +21,7 @@ import {
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
 
-const MAX_ANCHOR_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
+const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
 
 function BlockPopover(
 	{
@@ -57,7 +57,7 @@ function BlockPopover(
 	const [ popoverAnchorRecomputeCounter, forceRecomputePopoverAnchor ] =
 		useReducer(
 			// Module is there to make sure that the counter doesn't overflow.
-			( s ) => ( s + 1 ) % MAX_ANCHOR_RECOMPUTE_COUNTER,
+			( s ) => ( s + 1 ) % MAX_POPOVER_RECOMPUTE_COUNTER,
 			0
 		);
 
