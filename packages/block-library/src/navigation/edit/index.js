@@ -236,7 +236,7 @@ function Navigation( {
 		if ( hasUncontrolledInnerBlocks || isCreatingNavigationMenu || ref ) {
 			return;
 		}
-		
+
 		// Only autofallback to published menus.
 		const fallbackNavigationMenus = navigationMenus?.filter(
 			( menu ) => menu.status === 'publish'
@@ -247,8 +247,7 @@ function Navigation( {
 		if ( ! fallbackNavigationMenus?.length && classicMenus?.length === 1 ) {
 			// Only create classic menus once.
 			if ( ! isConvertingClassicMenu ) {
-				// This is duplicated several times.
-				const onSelectClassicMenu = async ( classicMenu ) => {
+				const onConvertClassicMenu = async ( classicMenu ) => {
 					await convertClassicMenu(
 						classicMenu.id,
 						classicMenu.name,
@@ -256,7 +255,7 @@ function Navigation( {
 					);
 				};
 
-				onSelectClassicMenu( classicMenus[ 0 ] );
+				onConvertClassicMenu( classicMenus[ 0 ] );
 			}
 
 			return;
