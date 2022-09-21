@@ -131,9 +131,10 @@ export default function VisualEditor( { styles } ) {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
 			isTemplateMode: _isTemplateMode,
-			templateContent: _isTemplateMode
-				? ''
-				: getEditedPostTemplate()?.content,
+			templateContent:
+				typeof getEditedPostTemplate()?.content === 'string'
+					? getEditedPostTemplate()?.content
+					: '',
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 		};
