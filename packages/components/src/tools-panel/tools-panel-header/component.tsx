@@ -76,7 +76,6 @@ const DefaultControlsGroup = ( {
 						role="menuitemcheckbox"
 						isSelected
 						aria-disabled
-						suffix={ resetSuffix }
 					>
 						{ label }
 					</MenuItem>

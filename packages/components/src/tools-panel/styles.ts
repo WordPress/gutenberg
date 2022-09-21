@@ -159,7 +159,7 @@ export const ResetLabel = styled.span`
 export const DefaultControlsItem = css`
 	color: ${ COLORS.gray[ 900 ] };
 
-	&[aria-disabled='true'] {
+	&&[aria-disabled='true'] {
 		color: ${ COLORS.gray[ 700 ] };
 		opacity: 1;
 
