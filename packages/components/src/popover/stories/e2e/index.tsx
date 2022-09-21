@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Popover from '..';
+import Popover from '../..';
 
 export default {
 	title: 'Components/Popover',

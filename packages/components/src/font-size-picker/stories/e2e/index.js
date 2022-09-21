@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import FontSizePicker from '..';
+import FontSizePicker from '../..';
 
 export default {
 	title: 'Components/FontSizePicker',
