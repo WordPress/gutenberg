@@ -14,15 +14,25 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { GlobalStylesContext } from './context';
+import { DEFAULT_FONT_FAMILY } from './constants';
 
 const identity = ( x ) => x;
 
-function mergeTreesCustomizer( _, srcValue ) {
+function mergeTreesCustomizer( _, srcValue, key ) {
 	// We only pass as arrays the presets,
 	// in which case we want the new array of values
 	// to override the old array (no merging).
 	if ( Array.isArray( srcValue ) ) {
 		return srcValue;
+	}
+
+	if ( srcValue === DEFAULT_FONT_FAMILY && key === 'fontFamily' ) {
+		// a null value signals no CSS rule should be output. For heading
+		// styles, e.g. H1, this will mean they use the "All" headings style.
+		// For block styles, e.g. Site Title, this will mean they inherit the default
+		// style for the heading element they are based on e.g. if the Site Title
+		// is an H2 element then the current H2 font-family will be used
+		return null;
 	}
 }
 

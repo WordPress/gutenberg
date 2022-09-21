@@ -21,6 +21,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
+import { DEFAULT_FONT_FAMILY } from './constants';
 
 export function useHasTypographyPanel( name ) {
 	const hasLineHeight = useHasLineHeightControl( name );
@@ -180,7 +181,7 @@ export default function TypographyPanel( { name, element } ) {
 						>
 							<ToggleGroupControlOption
 								value="heading"
-								/* translators: 'All' refers to selecting all heading levels 
+								/* translators: 'All' refers to selecting all heading levels
 							and applying the same style to h1-h6. */
 								label={ __( 'All' ) }
 							/>
@@ -215,6 +216,7 @@ export default function TypographyPanel( { name, element } ) {
 					<div className="edit-site-typography-panel__full-width-control">
 						<FontFamilyControl
 							fontFamilies={ fontFamilies }
+							defaultValue={ DEFAULT_FONT_FAMILY }
 							value={ fontFamily }
 							onChange={ setFontFamily }
 							size="__unstable-large"

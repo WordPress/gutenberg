@@ -16,6 +16,7 @@ import useSetting from '../use-setting';
 
 export default function FontFamilyControl( {
 	value = '',
+	defaultValue = '',
 	onChange,
 	fontFamilies,
 	...props
@@ -30,7 +31,7 @@ export default function FontFamilyControl( {
 	}
 
 	const options = [
-		{ value: '', label: __( 'Default' ) },
+		{ value: defaultValue, label: __( 'Default' ) },
 		...fontFamilies.map( ( { fontFamily, name } ) => {
 			return {
 				value: fontFamily,
