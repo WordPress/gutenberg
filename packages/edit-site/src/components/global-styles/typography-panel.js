@@ -59,44 +59,12 @@ function useHasLetterSpacingControl( name ) {
 	);
 }
 
-function useFontFamily( prefix, name ) {
-	const [ fontFamily, setFontFamily ] = useStyle(
-		prefix + 'typography.fontFamily',
-		name
-	);
-	const [ userFontFamily ] = useStyle(
-		prefix + 'typography.fontFamily',
-		name,
-		'user'
-	);
-	const hasFontFamily = () => !! userFontFamily;
-	const resetFontFamily = () => setFontFamily( undefined );
-	return {
-		fontFamily,
-		setFontFamily,
-		hasFontFamily,
-		resetFontFamily,
-	};
-}
-
-function useFontSize( prefix, name ) {
-	const [ fontSize, setFontSize ] = useStyle(
-		prefix + 'typography.fontSize',
-		name
-	);
-	const [ userFontSize ] = useStyle(
-		prefix + 'typography.fontSize',
-		name,
-		'user'
-	);
-	const hasFontSize = () => !! userFontSize;
-	const resetFontSize = () => setFontSize( undefined );
-	return {
-		fontSize,
-		setFontSize,
-		hasFontSize,
-		resetFontSize,
-	};
+function useStyleWithReset( path, blockName ) {
+	const [ style, setStyle ] = useStyle( path, blockName );
+	const [ userStyle ] = useStyle( path, blockName, 'user' );
+	const hasStyle = () => !! userStyle;
+	const resetStyle = () => setStyle( undefined );
+	return [ style, setStyle, hasStyle, resetStyle ];
 }
 
 function useFontAppearance( prefix, name ) {
@@ -133,53 +101,6 @@ function useFontAppearance( prefix, name ) {
 	};
 }
 
-function useLineHeight( prefix, name ) {
-	const [ lineHeight, setLineHeight ] = useStyle(
-		prefix + 'typography.lineHeight',
-		name
-	);
-	const [ userLineHeight ] = useStyle(
-		prefix + 'typography.lineHeight',
-		name,
-		'user'
-	);
-	const hasLineHeight = () => !! userLineHeight;
-	const resetLineHeight = () => setLineHeight( undefined );
-	return {
-		lineHeight,
-		setLineHeight,
-		hasLineHeight,
-		resetLineHeight,
-	};
-}
-
-function useLetterSpacing( prefix, name ) {
-	const [ letterSpacing, setLetterSpacing ] = useStyle(
-		prefix + 'typography.letterSpacing',
-		name
-	);
-	const [ userLetterSpacing ] = useStyle(
-		prefix + 'typography.letterSpacing',
-		name,
-		'user'
-	);
-	const hasLetterSpacing = () => !! userLetterSpacing;
-	const resetLetterSpacing = () => setLetterSpacing( undefined );
-	return {
-		letterSpacing,
-		setLetterSpacing,
-		hasLetterSpacing,
-		resetLetterSpacing,
-	};
-}
-
-/*
- * @todo:
- * - check above against what's in hooks/typogrpahy.js. maybe reset logic is
- *   weird for some of the attributes
- * - combine the simple ones into a single hook since the logic is the same
- */
-
 export default function TypographyPanel( { name, element, headingLevel } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	let prefix = '';
@@ -210,12 +131,10 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 		hasFontSizeEnabled = false;
 	}
 
-	const { fontFamily, setFontFamily, hasFontFamily, resetFontFamily } =
-		useFontFamily( prefix, name );
-	const { fontSize, setFontSize, hasFontSize, resetFontSize } = useFontSize(
-		prefix,
-		name
-	);
+	const [ fontFamily, setFontFamily, hasFontFamily, resetFontFamily ] =
+		useStyleWithReset( prefix + 'typography.fontFamily', name );
+	const [ fontSize, setFontSize, hasFontSize, resetFontSize ] =
+		useStyleWithReset( prefix + 'typography.fontSize', name );
 	const {
 		fontStyle,
 		setFontStyle,
@@ -224,14 +143,14 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 		hasFontAppearance,
 		resetFontAppearance,
 	} = useFontAppearance( prefix, name );
-	const { lineHeight, setLineHeight, hasLineHeight, resetLineHeight } =
-		useLineHeight( prefix, name );
-	const {
+	const [ lineHeight, setLineHeight, hasLineHeight, resetLineHeight ] =
+		useStyleWithReset( prefix + 'typography.lineHeight', name );
+	const [
 		letterSpacing,
 		setLetterSpacing,
 		hasLetterSpacing,
 		resetLetterSpacing,
-	} = useLetterSpacing( prefix, name );
+	] = useStyleWithReset( prefix + 'typography.letterSpacing', name );
 
 	const resetAll = () => {
 		resetFontFamily();
