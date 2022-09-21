@@ -11,10 +11,15 @@ import { useCallback, useLayoutEffect, useState } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 
+const COMMON_PROPS = {
+	placement: 'top-start',
+};
+
 // By default the toolbar sets the `shift` prop. If the user scrolls the page
 // down the toolbar will stay on screen by adopting a sticky position at the
 // top of the viewport.
 const DEFAULT_PROPS = {
+	...COMMON_PROPS,
 	flip: false,
 	shift: true,
 };
@@ -25,6 +30,7 @@ const DEFAULT_PROPS = {
 // the block. This only happens if the block is smaller than the viewport, as
 // otherwise the toolbar will be off-screen.
 const RESTRICTED_HEIGHT_PROPS = {
+	...COMMON_PROPS,
 	flip: true,
 	shift: false,
 };
