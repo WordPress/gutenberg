@@ -51,6 +51,23 @@ function useHasAppearanceControl( name ) {
 	return hasFontStyles || hasFontWeights;
 }
 
+function useAppearanceControlLabel( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const hasFontStyles =
+		useSetting( 'typography.fontStyle', name )[ 0 ] &&
+		supports.includes( 'fontStyle' );
+	const hasFontWeights =
+		useSetting( 'typography.fontWeight', name )[ 0 ] &&
+		supports.includes( 'fontWeight' );
+	if ( ! hasFontStyles ) {
+		return __( 'Font weight' );
+	}
+	if ( ! hasFontWeights ) {
+		return __( 'Font style' );
+	}
+	return __( 'Appearance' );
+}
+
 function useHasLetterSpacingControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	return (
@@ -123,6 +140,7 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 		supports.includes( 'fontWeight' );
 	const hasLineHeightEnabled = useHasLineHeightControl( name );
 	const hasAppearanceControl = useHasAppearanceControl( name );
+	const appearanceControlLabel = useAppearanceControlLabel( name );
 	const hasLetterSpacingControl = useHasLetterSpacingControl( name );
 
 	/* Disable font size controls when the option to style all headings is selected. */
@@ -198,7 +216,7 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 			{ hasAppearanceControl && (
 				<ToolsPanelItem
 					className="single-column"
-					label={ __( 'Appearance' ) } // TODO: Should say 'Font weight' and 'Font style' if only one is enabled
+					label={ appearanceControlLabel }
 					hasValue={ hasFontAppearance }
 					onDeselect={ resetFontAppearance }
 					isShownByDefault
