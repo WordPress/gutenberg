@@ -1154,6 +1154,9 @@
 							"properties": {
 								"border": {},
 								"color": {},
+								"filter": {},
+								"outline": {},
+								"shadow": {},
 								"spacing": {},
 								"typography": {},
 								":hover": {
