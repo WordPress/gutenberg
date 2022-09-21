@@ -60,10 +60,6 @@ test.describe( 'Group', () => {
 		page,
 	} ) => {
 		await editor.insertBlock( { name: 'core/group' } );
-		// Select the default, selected Group layout from the variation picker.
-		await page.click(
-			'role=button[name="Gather blocks in a container."i]'
-		);
 		await page.click( 'role=button[name="Add block"i]' );
 		await page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
