@@ -16,11 +16,12 @@ export default function save( { attributes } ) {
 			{ type === 'submit' && (
 				<div className="wp-block-buttons">
 					<div className="wp-block-button">
-						<input
+						<button
 							className="wp-block-button__link wp-element-button"
-							type="submit"
-							value={ label }
-						/>
+							disabled="true"
+						>
+							{ label }
+						</button>
 					</div>
 				</div>
 			) }

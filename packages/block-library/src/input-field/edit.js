@@ -10,9 +10,9 @@ import {
 import {
 	PanelBody,
 	CustomSelectControl,
-	TextControl,
 	CheckboxControl,
 } from '@wordpress/components';
+import { useRef } from '@wordpress/element';
 
 const inputTypeOptions = [
 	{
@@ -52,6 +52,11 @@ const inputTypeOptions = [
 function InputFieldBlock( { attributes, setAttributes } ) {
 	const { type, label, inlineLabel } = attributes;
 	const blockProps = useBlockProps();
+	const ref = useRef();
+
+	if ( ref.current ) {
+		ref.current.focus();
+	}
 
 	return (
 		<>
@@ -69,24 +74,17 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 							} );
 						} }
 					/>
-					<TextControl
-						label={ __( 'Label' ) }
-						value={ label }
-						onChange={ ( newVal ) => {
-							setAttributes( {
-								label: newVal,
-							} );
-						} }
-					/>
-					<CheckboxControl
-						label={ __( 'Inline label' ) }
-						checked={ attributes.inlineLabel }
-						onChange={ ( newVal ) => {
-							setAttributes( {
-								inlineLabel: newVal,
-							} );
-						} }
-					/>
+					{ type !== 'submit' && (
+						<CheckboxControl
+							label={ __( 'Inline label' ) }
+							checked={ attributes.inlineLabel }
+							onChange={ ( newVal ) => {
+								setAttributes( {
+									inlineLabel: newVal,
+								} );
+							} }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 
@@ -95,7 +93,10 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 				<label>
 					{ inlineLabel && label && <span>{ label }</span> }
 					{ ! inlineLabel && label && <p>{ label }</p> }
-					<textarea className="wp-block-input-field" />
+					<textarea
+						className="wp-block-input-field"
+						disabled="true"
+					/>
 				</label>
 				/* eslint-enable jsx-a11y/label-has-associated-control */
 			) }
@@ -103,11 +104,30 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 			{ type === 'submit' && (
 				<div className="wp-block-buttons">
 					<div className="wp-block-button">
-						<input
+						<button
 							className="wp-block-button__link wp-element-button"
-							type="submit"
-							value={ label }
-						/>
+							disabled="true"
+						>
+							<RichText
+								identifier="label"
+								tagName={ inlineLabel ? 'span' : 'p' }
+								{ ...blockProps }
+								value={ label }
+								onChange={ ( newLabel ) =>
+									setAttributes( { label: newLabel } )
+								}
+								ref={ ref.current }
+								aria-label={
+									label ? __( 'Label' ) : __( 'Empty label' )
+								}
+								data-empty={ label ? false : true }
+								placeholder={ __(
+									'Type the label for this input'
+								) }
+								__unstableEmbedURLOnPaste
+								__unstableAllowPrefixTransformations
+							/>
+						</button>
 					</div>
 				</div>
 			) }
@@ -120,9 +140,10 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 						tagName={ inlineLabel ? 'span' : 'p' }
 						{ ...blockProps }
 						value={ label }
-						onChange={ ( newContent ) =>
-							setAttributes( { label: newContent } )
+						onChange={ ( newLabel ) =>
+							setAttributes( { label: newLabel } )
 						}
+						ref={ ref.current }
 						aria-label={
 							label ? __( 'Label' ) : __( 'Empty label' )
 						}
@@ -131,7 +152,11 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 						__unstableEmbedURLOnPaste
 						__unstableAllowPrefixTransformations
 					/>
-					<input className="wp-block-input-field" type={ type } />
+					<input
+						className="wp-block-input-field"
+						type={ type }
+						disabled="true"
+					/>
 				</label>
 				/* eslint-enable jsx-a11y/label-has-associated-control */
 			) }
