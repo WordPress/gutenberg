@@ -37,8 +37,13 @@ function isKeyUpEvent( item ) {
 	return isEvent( item ) && item.args.data.type === 'keyup';
 }
 
-function isFocusEvent( item ) {
-	return isEvent( item ) && item.args.data.type === 'focus';
+function isFocusOrSelectionEvent( item ) {
+	return (
+		isEvent( item ) &&
+		[ 'focus', 'focusin', 'selectionchange', 'focusout' ].includes(
+			item.args.data.type
+		)
+	);
 }
 
 function isClickEvent( item ) {
@@ -68,7 +73,7 @@ export function getTypingEventDurations( trace ) {
 }
 
 export function getSelectionEventDurations( trace ) {
-	return [ getEventDurationsForType( trace, isFocusEvent ) ];
+	return [ getEventDurationsForType( trace, isFocusOrSelectionEvent ) ];
 }
 
 export function getClickEventDurations( trace ) {

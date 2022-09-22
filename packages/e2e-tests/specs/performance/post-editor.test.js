@@ -32,6 +32,10 @@ import {
 
 jest.setTimeout( 1000000 );
 
+function sum( arr ) {
+	return arr.reduce( ( a, b ) => a + b, 0 );
+}
+
 describe( 'Post Editor Performance', () => {
 	const results = {
 		serverResponse: [],
@@ -163,22 +167,26 @@ describe( 'Post Editor Performance', () => {
 			dispatch( 'core/block-editor' ).resetBlocks( blocks );
 		} );
 		const paragraphs = await page.$$( '.wp-block' );
-		await page.tracing.start( {
-			path: traceFile,
-			screenshots: false,
-			categories: [ 'devtools.timeline' ],
-		} );
 		await paragraphs[ 0 ].click();
+		results.focus = [];
 		for ( let j = 1; j <= 10; j++ ) {
+			await page.tracing.start( {
+				path: traceFile,
+				screenshots: false,
+				categories: [ 'devtools.timeline' ],
+			} );
 			// Wait for the browser to be idle before starting the monitoring.
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( 1000 );
 			await paragraphs[ j ].click();
+			// Wait for the browser to be idle before starting the monitoring.
+			// eslint-disable-next-line no-restricted-syntax
+			await page.waitForTimeout( 1000 );
+			await page.tracing.stop();
+			traceResults = JSON.parse( readFile( traceFile ) );
+			const [ focusEvents ] = getSelectionEventDurations( traceResults );
+			results.focus.push( sum( focusEvents ) );
 		}
-		await page.tracing.stop();
-		traceResults = JSON.parse( readFile( traceFile ) );
-		const [ focusEvents ] = getSelectionEventDurations( traceResults );
-		results.focus = focusEvents;
 	} );
 
 	it( 'Opening persistent list view', async () => {
@@ -222,10 +230,6 @@ describe( 'Post Editor Performance', () => {
 	} );
 
 	it( 'Searching the inserter', async () => {
-		function sum( arr ) {
-			return arr.reduce( ( a, b ) => a + b, 0 );
-		}
-
 		// Measure time to search the inserter and get results.
 		await openGlobalBlockInserter();
 		for ( let j = 0; j < 10; j++ ) {
