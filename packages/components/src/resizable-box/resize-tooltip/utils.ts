@@ -84,23 +84,21 @@ export function useResizeLabel( {
 	 */
 	const moveTimeoutRef = useRef< number >();
 
-	const unsetMoveXY = () => {
-		/*
-		 * If axis is controlled, we will avoid resetting the moveX and moveY values.
-		 * This will allow for the preferred axis values to persist in the label.
-		 */
-		if ( isAxisControlled ) return;
-		setMoveX( false );
-		setMoveY( false );
-	};
-
 	const debounceUnsetMoveXY = useCallback( () => {
 		if ( moveTimeoutRef.current ) {
 			window.clearTimeout( moveTimeoutRef.current );
 		}
 
-		moveTimeoutRef.current = window.setTimeout( unsetMoveXY, fadeTimeout );
-	}, [ fadeTimeout, unsetMoveXY ] );
+		moveTimeoutRef.current = window.setTimeout( () => {
+			/*
+			 * If axis is controlled, we will avoid resetting the moveX and moveY values.
+			 * This will allow for the preferred axis values to persist in the label.
+			 */
+			if ( isAxisControlled ) return;
+			setMoveX( false );
+			setMoveY( false );
+		}, fadeTimeout );
+	}, [ fadeTimeout, isAxisControlled ] );
 
 	useEffect( () => {
 		/*
