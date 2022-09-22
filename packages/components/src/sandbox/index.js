@@ -6,6 +6,7 @@ import {
 	useRef,
 	useState,
 	useEffect,
+	useCallback,
 } from '@wordpress/element';
 import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
 
@@ -111,65 +112,70 @@ export default function Sandbox( {
 		}
 	}
 
-	function trySandbox( forceRerender = false ) {
-		if ( ! isFrameAccessible() ) {
-			return;
-		}
+	const trySandbox = useCallback(
+		( forceRerender = false ) => {
+			if ( ! isFrameAccessible() ) {
+				return;
+			}
 
-		const { contentDocument, ownerDocument } = ref.current;
-		const { body } = contentDocument;
+			const { contentDocument, ownerDocument } = ref.current;
+			const { body } = contentDocument;
 
-		if (
-			! forceRerender &&
-			null !== body.getAttribute( 'data-resizable-iframe-connected' )
-		) {
-			return;
-		}
+			if (
+				! forceRerender &&
+				null !== body.getAttribute( 'data-resizable-iframe-connected' )
+			) {
+				return;
+			}
 
-		// Put the html snippet into a html document, and then write it to the iframe's document
-		// we can use this in the future to inject custom styles or scripts.
-		// Scripts go into the body rather than the head, to support embedded content such as Instagram
-		// that expect the scripts to be part of the body.
-		const htmlDoc = (
-			<html
-				lang={ ownerDocument.documentElement.lang }
-				className={ type }
-			>
-				<head>
-					<title>{ title }</title>
-					<style dangerouslySetInnerHTML={ { __html: style } } />
-					{ styles.map( ( rules, i ) => (
-						<style
-							key={ i }
-							dangerouslySetInnerHTML={ { __html: rules } }
-						/>
-					) ) }
-				</head>
-				<body
-					data-resizable-iframe-connected="data-resizable-iframe-connected"
+			// Put the html snippet into a html document, and then write it to the iframe's document
+			// we can use this in the future to inject custom styles or scripts.
+			// Scripts go into the body rather than the head, to support embedded content such as Instagram
+			// that expect the scripts to be part of the body.
+			const htmlDoc = (
+				<html
+					lang={ ownerDocument.documentElement.lang }
 					className={ type }
 				>
-					<div dangerouslySetInnerHTML={ { __html: html } } />
-					<script
-						type="text/javascript"
-						dangerouslySetInnerHTML={ {
-							__html: observeAndResizeJS,
-						} }
-					/>
-					{ scripts.map( ( src ) => (
-						<script key={ src } src={ src } />
-					) ) }
-				</body>
-			</html>
-		);
+					<head>
+						<title>{ title }</title>
+						<style dangerouslySetInnerHTML={ { __html: style } } />
+						{ styles.map( ( rules, i ) => (
+							<style
+								key={ i }
+								dangerouslySetInnerHTML={ { __html: rules } }
+							/>
+						) ) }
+					</head>
+					<body
+						data-resizable-iframe-connected="data-resizable-iframe-connected"
+						className={ type }
+					>
+						<div dangerouslySetInnerHTML={ { __html: html } } />
+						<script
+							type="text/javascript"
+							dangerouslySetInnerHTML={ {
+								__html: observeAndResizeJS,
+							} }
+						/>
+						{ scripts.map( ( src ) => (
+							<script key={ src } src={ src } />
+						) ) }
+					</body>
+				</html>
+			);
 
-		// Writing the document like this makes it act in the same way as if it was
-		// loaded over the network, so DOM creation and mutation, script execution, etc.
-		// all work as expected.
-		contentDocument.open();
-		contentDocument.write( '<!DOCTYPE html>' + renderToString( htmlDoc ) );
-		contentDocument.close();
-	}
+			// Writing the document like this makes it act in the same way as if it was
+			// loaded over the network, so DOM creation and mutation, script execution, etc.
+			// all work as expected.
+			contentDocument.open();
+			contentDocument.write(
+				'<!DOCTYPE html>' + renderToString( htmlDoc )
+			);
+			contentDocument.close();
+		},
+		[ html, scripts, styles, title, type ]
+	);
 
 	useEffect( () => {
 		trySandbox();
