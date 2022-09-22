@@ -84,7 +84,7 @@ export function useResizeLabel( {
 	 */
 	const moveTimeoutRef = useRef< number >();
 
-	const debounceUnsetMoveXY = useCallback( () => {
+	const unsetMoveXY = useCallback( () => {
 		if ( moveTimeoutRef.current ) {
 			window.clearTimeout( moveTimeoutRef.current );
 		}
@@ -140,8 +140,8 @@ export function useResizeLabel( {
 		}
 
 		onResize( { width, height } );
-		debounceUnsetMoveXY();
-	}, [ width, height, onResize, debounceUnsetMoveXY ] );
+		unsetMoveXY();
+	}, [ width, height, onResize, unsetMoveXY ] );
 
 	const label = getSizeLabel( {
 		axis,
