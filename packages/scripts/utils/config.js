@@ -309,7 +309,7 @@ function getWebpackEntryPoints() {
  */
 function getRenderPropPaths() {
 	// Continue only if the source directory exists.
-	if ( ! hasProjectFile( process.env.WP_SRC_DIRECTORY ) ) {
+	if ( ! hasProjectFile( process.env.WP_SRC_DIRECTORY || 'src' ) ) {
 		return [];
 	}
 
