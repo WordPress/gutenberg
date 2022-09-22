@@ -107,11 +107,6 @@ export default function useDropZone( {
 
 				isDragging = true;
 
-				ownerDocument.removeEventListener(
-					'dragenter',
-					maybeDragStart
-				);
-
 				// Note that `dragend` doesn't fire consistently for file and
 				// HTML drag events where the drag origin is outside the browser
 				// window. In Firefox it may also not fire if the originating
@@ -200,10 +195,6 @@ export default function useDropZone( {
 
 				isDragging = false;
 
-				ownerDocument.removeEventListener(
-					'dragenter',
-					maybeDragStart
-				);
 				ownerDocument.removeEventListener( 'dragend', maybeDragEnd );
 				ownerDocument.removeEventListener( 'mousemove', maybeDragEnd );
 
