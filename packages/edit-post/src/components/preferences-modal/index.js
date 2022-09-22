@@ -58,12 +58,12 @@ export default function EditPostPreferencesModal() {
 				const isDistractionFreeEnabled =
 					isFeatureActive( 'distractionFree' );
 				return [
+					modalActive,
 					! isDistractionFreeEnabled &&
 						isLargeViewport &&
 						isRichEditingEnabled &&
 						mode === 'visual',
 					isDistractionFreeEnabled,
-					modalActive,
 				];
 			},
 			[ isLargeViewport ]
