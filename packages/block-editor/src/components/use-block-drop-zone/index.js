@@ -144,7 +144,7 @@ export default function useBlockDropZone( {
 
 			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
 
-			if ( targetIndex !== undefined && targetIndex !== null ) {
+			if ( targetIndex !== undefined ) {
 				const nextBlock = blockElements[ targetIndex ];
 				const previousBlock = blockElements[ targetIndex - 1 ];
 
