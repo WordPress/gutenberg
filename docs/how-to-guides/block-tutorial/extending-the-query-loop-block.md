@@ -12,7 +12,7 @@ By registering your own block variation with some specific Query Loop block sett
 
 With the block variations API you can provide the default settings that make the most sense for your use-case.
 
-Let's go on a journey, for example, of setting up a variation that could fit a plugin which registers a `book` [custom post type](https://developer.wordpress.org/plugins/post-types/).
+Let's go on a journey, for example, of setting up a variation for a plugin which registers a `book` [custom post type](https://developer.wordpress.org/plugins/post-types/).
 
 ### Offer sensible defaults
 
@@ -89,8 +89,6 @@ In this way, your block will show up just like any other block while the user is
 }
 ```
 
-Also note that the Query Loop block supports `'block'` as a string in the `scope` property, and it will allow the variation to be picked up after inserting the block itself. Read more about the Block Variation Picker [here](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-variation-picker/README.md).
-
 At this point, your custom variation will be virtually indistinguishable from a stand-alone block. Completely branded to your plugin, easy to discover and directly available to the user as a drop in.
 
 ### Making Gutenberg recognize your variation
@@ -136,7 +134,7 @@ Even with all of this, your custom post type might have unique requirements: it 
 
 Let's say you don't use at all the `sticky` attribute in your books, so that would be totally irrelevant to the customization of your block. In order to not confuse the users as to what a setting might do, and only exposing a clear UX to them, we want this control to be unavailable. Furthermore, let's say that you don't use the `author` field at all, which generally indicates the person who has added that post to the database, instead you use a custom `bookAuthor` field. As such, not only keeping the `author` filter would be confusing, it would outright break your query.
 
-For this reason, the Query Loop block supports a property called `allowedControls` which accepts an array of keys of the controls we want to display on the inspector sidebar. By default, we accept all the controls, but as soon as we provide an array to this property, we want to be specific and specify only the controls which are going to be relevant for us!
+For this reason, the Query Loop block supports a property called `allowControls` which accepts an array of keys of the controls we want to display on the inspector sidebar. By default, we accept all the controls, but as soon as we provide an array to this property, we want to be specific and specify only the controls which are going to be relevant for us!
 
 As of version 13.9, the following controls are available:
 
