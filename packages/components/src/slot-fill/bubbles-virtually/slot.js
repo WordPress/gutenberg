@@ -19,19 +19,22 @@ function Slot(
 	{ name, fillProps = {}, as: Component = 'div', ...props },
 	forwardedRef
 ) {
-	const registry = useContext( SlotFillContext );
+	const { registerSlot, unregisterSlot, ...registry } =
+		useContext( SlotFillContext );
 	const ref = useRef();
 
+	// We don't fillProps in the deps of the layout effect below because we don't want to
+	// unregister and register the slot whenever fillProps change. Doing so would
+	// cause the fill to be re-mounted, and we are only considering the initial value
+	// of fillProps. Instead, we store that initial value in a ref, but don't update it.
+	const fillPropsRef = useRef( fillProps );
+
 	useLayoutEffect( () => {
-		registry.registerSlot( name, ref, fillProps );
+		registerSlot( name, ref, fillPropsRef.current );
 		return () => {
-			registry.unregisterSlot( name, ref );
+			unregisterSlot( name, ref );
 		};
-		// We are not including fillProps in the deps because we don't want to
-		// unregister and register the slot whenever fillProps change, which would
-		// cause the fill to be re-mounted. We are only considering the initial value
-		// of fillProps.
-	}, [ registry.registerSlot, registry.unregisterSlot, name ] );
+	}, [ registerSlot, unregisterSlot, name ] );
 	// fillProps may be an update that interacts with the layout, so we
 	// useLayoutEffect.
 	useLayoutEffect( () => {
