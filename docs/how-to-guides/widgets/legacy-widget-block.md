@@ -18,7 +18,7 @@ For example, a widget might want to show a "Password" field when the "Change pas
 
 ```js
 ( function ( $ ) {
-	$( document ).on( 'widget-added', function ( $control ) {
+	$( document ).on( 'widget-added', function ( $event, $control ) {
 		$control.find( '.change-password' ).on( 'change', function () {
 			var isChecked = $( this ).prop( 'checked' );
 			$control.find( '.password' ).toggleClass( 'hidden', ! isChecked );
