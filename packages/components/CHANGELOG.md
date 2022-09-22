@@ -7,6 +7,7 @@
 ### Deprecations
 
 -   `Popover`: added new `anchor` prop, supposed to supersede all previous anchor-related props (`anchorRef`, `anchorRect`, `getAnchorRect`). These older anchor-related props are now marked as deprecated and are scheduled to be removed in WordPress 6.3 ([#43691](https://github.com/WordPress/gutenberg/pull/43691)).
+-   `Popover`: deprecate the legacy `position` prop, in favor of the newer `placement` prop. The `position` prop is scheduled to be removed in WordPress 6.4 ([#44386](https://github.com/WordPress/gutenberg/pull/44386)).
 
 ### Bug Fix
 

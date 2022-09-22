@@ -203,7 +203,7 @@ Used to specify the popover's position with respect to its anchor.
 
 ### `position`: `[yAxis] [xAxis] [optionalCorner]`
 
-_Note: use the `placement` prop instead when possible._
+_Note: this prop is deprecated and will be removed in WordPress 6.4. Please use the `placement` prop instead._
 
 Legacy way to specify the popover's position with respect to its anchor.
 
@@ -212,7 +212,6 @@ Possible values:
 - `yAxis`: `'top' | 'middle' | 'bottom'`
 - `xAxis`: `'left' | 'center' | 'right'`
 - `corner`: `'top' | 'right' | 'bottom' | 'left'`
-
 
 -   Required: No
 
