@@ -215,12 +215,10 @@ export default function Sandbox( {
 		ref.current.addEventListener( 'load', tryNoForceSandbox, false );
 		defaultView.addEventListener( 'message', checkMessageForResize );
 
+		const iframeRef = ref.current;
+
 		return () => {
-			ref.current?.removeEventListener(
-				'load',
-				tryNoForceSandbox,
-				false
-			);
+			iframeRef?.removeEventListener( 'load', tryNoForceSandbox, false );
 			defaultView.addEventListener( 'message', checkMessageForResize );
 		};
 	}, [] );
