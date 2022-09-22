@@ -223,7 +223,7 @@ class WP_HTML_Walker {
 	 * @param string $html HTML to process.
 	 */
 	public function __construct( $html ) {
-		$this->html       = $html;
+		$this->html = $html;
 	}
 
 	/**
