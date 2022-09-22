@@ -68,8 +68,8 @@ function Palette( { name } ) {
 						}
 					>
 						<ZStack isLayered={ false } offset={ -8 }>
-							{ colors.slice( 0, 5 ).map( ( { color } ) => (
-								<ColorIndicatorWrapper key={ color }>
+							{ colors.slice( 0, 5 ).map( ( { color, slug } ) => (
+								<ColorIndicatorWrapper key={ slug }>
 									<ColorIndicator colorValue={ color } />
 								</ColorIndicatorWrapper>
 							) ) }
