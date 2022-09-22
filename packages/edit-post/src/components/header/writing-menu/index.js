@@ -21,12 +21,19 @@ function WritingMenu( { onClose } ) {
 		[]
 	);
 
+	const blocks = useSelect(
+		( select ) => select( blockEditorStore ).getBlocks(),
+		[]
+	);
+
 	const {
 		setIsInserterOpened,
 		setIsListViewOpened,
 		closeGeneralSidebar,
 		setFeature,
 	} = useDispatch( postEditorStore );
+
+	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const toggleDistractionFree = () => {
 		setFeature( 'inlineToolbar', ! isDistractionFree );
@@ -35,6 +42,9 @@ function WritingMenu( { onClose } ) {
 		setIsListViewOpened( false );
 		closeGeneralSidebar();
 		onClose();
+		if ( ! isDistractionFree ) {
+			selectBlock( blocks[ 0 ].clientId );
+		}
 	};
 
 	const isLargeViewport = useViewportMatch( 'medium' );
