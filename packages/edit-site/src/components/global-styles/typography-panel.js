@@ -148,23 +148,26 @@ export default function TypographyPanel( { name, element } ) {
 					textDecoration: 'underline',
 			  }
 			: {};
+	const [ bodyFontFamily ] = useStyle( 'typography.fontFamily' );
 
 	return (
 		<PanelBody className="edit-site-typography-panel" initialOpen={ true }>
-			<div
-				className="edit-site-typography-panel__preview"
-				style={ {
-					fontFamily: fontFamily ?? 'serif',
-					background: gradientValue ?? backgroundColor,
-					color,
-					fontSize,
-					fontStyle,
-					fontWeight,
-					letterSpacing,
-					...extraStyles,
-				} }
-			>
-				Aa
+			<div style={ { fontFamily: bodyFontFamily || 'serif' } }>
+				<div
+					className="edit-site-typography-panel__preview"
+					style={ {
+						fontFamily,
+						background: gradientValue ?? backgroundColor,
+						color,
+						fontSize,
+						fontStyle,
+						fontWeight,
+						letterSpacing,
+						...extraStyles,
+					} }
+				>
+					Aa
+				</div>
 			</div>
 			<Grid columns={ 2 } rowGap={ 16 } columnGap={ 8 }>
 				{ element === 'heading' && (
@@ -180,7 +183,7 @@ export default function TypographyPanel( { name, element } ) {
 						>
 							<ToggleGroupControlOption
 								value="heading"
-								/* translators: 'All' refers to selecting all heading levels 
+								/* translators: 'All' refers to selecting all heading levels
 							and applying the same style to h1-h6. */
 								label={ __( 'All' ) }
 							/>
