@@ -265,24 +265,22 @@ function Navigation( {
 	}, [ navigationMenus ] );
 
 	useEffect( () => {
-		( async () => {
-			if (
-				! hasResolvedNavigationMenus ||
-				isConvertingClassicMenu ||
-				fallbackNavigationMenus?.length > 0 ||
-				classicMenus?.length !== 1
-			) {
-				return false;
-			}
+		if (
+			! hasResolvedNavigationMenus ||
+			isConvertingClassicMenu ||
+			fallbackNavigationMenus?.length > 0 ||
+			classicMenus?.length !== 1
+		) {
+			return false;
+		}
 
-			// If there's non fallback navigation menus and
-			// only one classic menu then create a new navigation menu based on it.
-			await convertClassicMenu(
-				classicMenus[ 0 ].id,
-				classicMenus[ 0 ].name,
-				'publish'
-			);
-		} )();
+		// If there's non fallback navigation menus and
+		// only one classic menu then create a new navigation menu based on it.
+		convertClassicMenu(
+			classicMenus[ 0 ].id,
+			classicMenus[ 0 ].name,
+			'publish'
+		);
 	}, [ hasResolvedNavigationMenus ] );
 
 	const navRef = useRef();
