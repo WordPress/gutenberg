@@ -1,6 +1,9 @@
 /**
  * WordPress dependencies
  */
+/**
+ * WordPress dependencies
+ */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'isTyping', () => {
@@ -9,7 +12,7 @@ test.describe( 'isTyping', () => {
 	} );
 
 	test( 'should hide the toolbar when typing', async ( { page, editor } ) => {
-		const blockToolbarSelector = '.block-editor-block-toolbar';
+		const blockToolbar = 'role=toolbar[name="Block tools"i]';
 
 		await page.click( 'role=button[name="Add default block"i]' );
 
@@ -17,19 +20,19 @@ test.describe( 'isTyping', () => {
 		await page.keyboard.type( 'Type' );
 
 		// Toolbar is hidden
-		await expect( page.locator( blockToolbarSelector ) ).toBeHidden();
+		await expect( page.locator( blockToolbar ) ).toBeHidden();
 
 		// Moving the mouse shows the toolbar.
 		await editor.showBlockToolbar();
 
 		// Toolbar is visible.
-		expect( page.locator( blockToolbarSelector ) ).not.toBe( null );
+		expect( page.locator( blockToolbar ) ).not.toBe( null );
 
 		// Typing again hides the toolbar
 		await page.keyboard.type( ' and continue' );
 
 		// Toolbar is hidden again
-		await expect( page.locator( blockToolbarSelector ) ).toBeHidden();
+		await expect( page.locator( blockToolbar ) ).toBeHidden();
 	} );
 
 	test( 'should not close the dropdown when typing in it', async ( {
