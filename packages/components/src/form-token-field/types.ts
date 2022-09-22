@@ -199,6 +199,7 @@ export interface TokenProps extends TokenItem {
 
 export interface TokenInputProps {
 	isExpanded: boolean;
+	inputHasFocus?: boolean;
 	instanceId: string | number;
 	selectedSuggestionIndex: number;
 	onChange?: ( { value }: { value: string } ) => void;

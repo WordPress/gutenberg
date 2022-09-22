@@ -252,6 +252,7 @@ function ComboboxControl( {
 										? `${ currentLabel }, ${ label }`
 										: null
 								}
+								inputHasFocus={ inputHasFocus }
 								onFocus={ onFocus }
 								onBlur={ onBlur }
 								isExpanded={ isExpanded }
