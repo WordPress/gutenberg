@@ -57,7 +57,7 @@ export default function CommentsLegacy( {
 			<div { ...blockProps }>
 				<Warning actions={ actions }>
 					{ __(
-						"Comments block: You're currently using the legacy version of the block. " +
+						'Comments block: You’re currently using the legacy version of the block. ' +
 							'The following is just a placeholder - the final styling will likely look different. ' +
 							'For a better representation and more customization options, ' +
 							'switch the block to its editable mode.'
