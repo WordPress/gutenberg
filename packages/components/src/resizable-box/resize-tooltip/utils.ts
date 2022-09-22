@@ -143,7 +143,7 @@ export function useResizeLabel( {
 
 		onResize( { width, height } );
 		debounceUnsetMoveXY();
-	}, [ width, height ] );
+	}, [ width, height, onResize, debounceUnsetMoveXY ] );
 
 	const label = getSizeLabel( {
 		axis,
