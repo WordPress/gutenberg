@@ -60,7 +60,7 @@ export function getAutoCompleterUI( autocompleter ) {
 			<Popover
 				focusOnMount={ false }
 				onClose={ onReset }
-				position="top right"
+				placement="top-start"
 				className="components-autocomplete__popover"
 				anchor={ popoverAnchor }
 				ref={ popoverRef }
