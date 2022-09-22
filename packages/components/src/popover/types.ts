@@ -117,13 +117,6 @@ export type PopoverProps = {
 	 */
 	placement?: Placement;
 	/**
-	 * Legacy way to specify the popover's position with respect to its anchor.
-	 * _Note: this prop is deprecated. Use the `placement` prop instead._
-	 */
-	position?:
-		| `${ PositionYAxis } ${ PositionXAxis }`
-		| `${ PositionYAxis } ${ PositionXAxis } ${ PositionCorner }`;
-	/**
 	 * Adjusts the size of the popover to prevent its contents from going out of
 	 * view when meeting the viewport edges.
 	 *
@@ -189,4 +182,13 @@ export type PopoverProps = {
 	 * @deprecated
 	 */
 	range?: unknown;
+	/**
+	 * Legacy way to specify the popover's position with respect to its anchor.
+	 * _Note: this prop is deprecated. Use the `placement` prop instead._
+	 *
+	 * @deprecated
+	 */
+	position?:
+		| `${ PositionYAxis } ${ PositionXAxis }`
+		| `${ PositionYAxis } ${ PositionXAxis } ${ PositionCorner }`;
 };

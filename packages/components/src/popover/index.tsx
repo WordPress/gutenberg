@@ -170,7 +170,6 @@ const UnforwardedPopover = (
 		className,
 		noArrow = true,
 		isAlternate,
-		position,
 		placement: placementProp = 'bottom-start',
 		offset: offsetProp = 0,
 		focusOnMount = 'firstElement',
@@ -188,6 +187,7 @@ const UnforwardedPopover = (
 		anchorRef,
 		anchorRect,
 		getAnchorRect,
+		position,
 		range,
 
 		// Rest
@@ -249,6 +249,14 @@ const UnforwardedPopover = (
 			since: '6.1',
 			version: '6.3',
 			alternative: '`anchor` prop',
+		} );
+	}
+
+	if ( position !== undefined ) {
+		deprecated( '`position` prop in wp.components.Popover', {
+			since: '6.2',
+			version: '6.4',
+			alternative: '`placement` prop',
 		} );
 	}
 
