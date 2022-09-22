@@ -23,7 +23,7 @@ function UnforwardedColorIndicator(
 
 	return (
 		<span
-			className={ classnames( 'component-color-indicator', className ) }
+			className={ classnames( 'component-color-indicator', className, !colorValue ? 'is-empty' : undefined ) }
 			style={ { background: colorValue } }
 			ref={ forwardedRef }
 			{ ...additionalProps }

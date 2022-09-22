@@ -45,9 +45,22 @@
 	margin: $grid-unit-20;
 
 	.component-color-indicator {
-		// Show a diagonal line (crossed out) for empty swatches.
-		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+		position: relative;
 		flex-shrink: 0;
+	}
+
+	.component-color-indicator.is-empty {
+	  background: $white;
+	}
+
+	.component-color-indicator.is-empty:before {
+		content: '';
+    position: absolute;
+    top: 50%;
+    border-top: 1px solid $gray-300;
+    width: 100%;
+    height: 1px;
+    transform: rotate(-45deg);
 	}
 }
 
