@@ -148,12 +148,15 @@ export default function useBlockDropZone( {
 				const nextBlock = blockElements[ targetIndex ];
 				const previousBlock = blockElements[ targetIndex - 1 ];
 
+				// Don't show the insertion point when it's near an empty paragraph block.
 				if (
-					( ! nextBlock || ! isEmptyParagraph( nextBlock ) ) &&
-					( ! previousBlock || ! isEmptyParagraph( previousBlock ) )
+					isEmptyParagraph( nextBlock ) ||
+					isEmptyParagraph( previousBlock )
 				) {
-					showInsertionPoint( targetRootClientId, targetIndex );
+					return;
 				}
+
+				showInsertionPoint( targetRootClientId, targetIndex );
 			}
 		}, [] ),
 		200

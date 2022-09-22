@@ -8,7 +8,7 @@ import {
 	getBlockTransforms,
 	pasteHandler,
 } from '@wordpress/blocks';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
 
 /**
@@ -231,6 +231,7 @@ export default function useOnBlockDrop(
 		replaceBlocks,
 		removeBlocks,
 	} = useDispatch( blockEditorStore );
+	const registry = useRegistry();
 
 	const insertOrReplaceBlocks = useCallback(
 		( blocks, updateSelection = true, initialPosition = 0 ) => {
@@ -268,15 +269,17 @@ export default function useOnBlockDrop(
 				const targetBlockClientId =
 					targetBlockClientIds[ targetBlockIndex ];
 
-				// Remove the source blocks.
-				removeBlocks( sourceClientIds, false );
-				// Replace the target block with the source blocks.
-				replaceBlocks(
-					targetBlockClientId,
-					sourceBlocks,
-					undefined,
-					0
-				);
+				registry.batch( () => {
+					// Remove the source blocks.
+					removeBlocks( sourceClientIds, false );
+					// Replace the target block with the source blocks.
+					replaceBlocks(
+						targetBlockClientId,
+						sourceBlocks,
+						undefined,
+						0
+					);
+				} );
 			} else {
 				moveBlocksToPosition(
 					sourceClientIds,
