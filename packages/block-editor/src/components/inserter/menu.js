@@ -14,14 +14,9 @@ import {
 	useImperativeHandle,
 	useRef,
 } from '@wordpress/element';
-import {
-	VisuallyHidden,
-	SearchControl,
-	__unstableMotion as motion,
-} from '@wordpress/components';
+import { VisuallyHidden, SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -116,9 +111,6 @@ function InserterMenu(
 		[ setSelectedPatternCategory ]
 	);
 
-	const isMobile = useViewportMatch( 'medium', '<' );
-	const disableMotion = useReducedMotion();
-
 	const blocksTab = useMemo(
 		() => (
 			<>
@@ -201,22 +193,12 @@ function InserterMenu(
 		selectedTab === 'patterns' && ! filterValue && selectedPatternCategory;
 	const showAsTabs = ! filterValue && ( showPatterns || hasReusableBlocks );
 
-	let inserterWidth = 'auto';
-	if ( ! isMobile && showPatternPanel ) {
-		inserterWidth = 300;
-	} else if ( ! isMobile ) {
-		inserterWidth = 350;
-	}
-
 	return (
 		<div className="block-editor-inserter__menu">
-			<motion.div
+			<div
 				className={ classnames( 'block-editor-inserter__main-area', {
 					'show-as-tabs': showAsTabs,
 				} ) }
-				animate={ disableMotion ? {} : { width: inserterWidth } }
-				style={ disableMotion ? { width: inserterWidth } : {} }
-				transition={ { duration: 0.2 } }
 			>
 				<SearchControl
 					className="block-editor-inserter__search"
@@ -261,7 +243,7 @@ function InserterMenu(
 						{ blocksTab }
 					</div>
 				) }
-			</motion.div>
+			</div>
 			{ showInserterHelpPanel && hoveredItem && (
 				<InserterPreviewPanel item={ hoveredItem } />
 			) }

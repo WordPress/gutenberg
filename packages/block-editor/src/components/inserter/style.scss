@@ -25,6 +25,10 @@ $block-inserter-tabs-height: 44px;
 	&.show-as-tabs {
 		gap: 0;
 	}
+
+	@include break-medium {
+		width: $block-inserter-width;
+	}
 }
 
 .block-editor-inserter__popover.is-quick {
