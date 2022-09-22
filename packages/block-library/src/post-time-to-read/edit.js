@@ -69,7 +69,7 @@ function PostTimeToReadEdit( { attributes, setAttributes } ) {
 						),
 						minutesToRead
 				  )
-				: __( 'You can read this post less than a minute.' );
+				: __( 'You can read this post in less than a minute.' );
 	}
 
 	const blockProps = useBlockProps( {

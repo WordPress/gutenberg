@@ -30,7 +30,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 			),
 			$minutes_to_read
 		)
-	: __( 'You can read this post less than a minute.' );
+	: __( 'You can read this post in less than a minute.' );
 
 	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 
