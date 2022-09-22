@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 
 const noop = () => {};
@@ -94,13 +94,13 @@ export function useResizeLabel( {
 		setMoveY( false );
 	};
 
-	const debounceUnsetMoveXY = () => {
+	const debounceUnsetMoveXY = useCallback( () => {
 		if ( moveTimeoutRef.current ) {
 			window.clearTimeout( moveTimeoutRef.current );
 		}
 
 		moveTimeoutRef.current = window.setTimeout( unsetMoveXY, fadeTimeout );
-	};
+	}, [ fadeTimeout, unsetMoveXY ] );
 
 	useEffect( () => {
 		/*
