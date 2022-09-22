@@ -227,15 +227,15 @@ export default function Sandbox( {
 			iframeRef?.removeEventListener( 'load', tryNoForceSandbox, false );
 			defaultView.addEventListener( 'message', checkMessageForResize );
 		};
-	}, [] );
+	}, [ trySandbox ] );
 
 	useEffect( () => {
 		trySandbox();
-	}, [ title, styles, scripts ] );
+	}, [ trySandbox ] );
 
 	useEffect( () => {
 		trySandbox( true );
-	}, [ html, type ] );
+	}, [ trySandbox ] );
 
 	return (
 		<iframe
