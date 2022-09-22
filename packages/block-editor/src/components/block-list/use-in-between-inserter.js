@@ -14,9 +14,7 @@ import { InsertionPointOpenRef } from '../block-tools/insertion-point';
 export function useInBetweenInserter() {
 	const openRef = useContext( InsertionPointOpenRef );
 	const isInBetweenInserterDisabled = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings().hasReducedUI ||
-			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
+		( select ) => select( blockEditorStore ).getSettings().hasReducedUI,
 		[]
 	);
 	const {
@@ -83,19 +81,19 @@ export function useInBetweenInserter() {
 				const orientation =
 					getBlockListSettings( rootClientId )?.orientation ||
 					'vertical';
-				const rect = event.target.getBoundingClientRect();
-				const offsetTop = event.clientY - rect.top;
-				const offsetLeft = event.clientX - rect.left;
+				const offsetTop = event.clientY;
+				const offsetLeft = event.clientX;
 
 				const children = Array.from( event.target.children );
 				let element = children.find( ( blockEl ) => {
+					const blockElRect = blockEl.getBoundingClientRect();
 					return (
 						( blockEl.classList.contains( 'wp-block' ) &&
 							orientation === 'vertical' &&
-							blockEl.offsetTop > offsetTop ) ||
+							blockElRect.top > offsetTop ) ||
 						( blockEl.classList.contains( 'wp-block' ) &&
 							orientation === 'horizontal' &&
-							blockEl.offsetLeft > offsetLeft )
+							blockElRect.left > offsetLeft )
 					);
 				} );
 
