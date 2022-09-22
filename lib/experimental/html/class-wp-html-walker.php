@@ -929,9 +929,14 @@ class WP_HTML_Walker {
 	 * @return string|null Name of current tag in input HTML, or `null` if none currently open.
 	 */
 	public function get_tag() {
-		return null !== $this->tag_name_starts_at
-			? strtolower( substr( $this->html, $this->tag_name_starts_at, $this->tag_name_ends_at - $this->tag_name_starts_at ) )
-			: null;
+		if ( null === $this->tag_name_starts_at ) {
+			return null;
+		}
+
+		$tag_name_length = $this->tag_name_ends_at - $this->tag_name_starts_at;
+		$tag_name        = substr( $this->html, $this->tag_name_starts_at, $tag_name_length );
+
+		return strtolower( $tag_name );
 	}
 
 	/**
