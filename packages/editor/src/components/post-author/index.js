@@ -11,7 +11,7 @@ import PostAuthorCombobox from './combobox';
 import PostAuthorSelect from './select';
 import { AUTHORS_QUERY } from './constants';
 
-const minimumUsersForCombobox = 1;
+const minimumUsersForCombobox = 25;
 
 function PostAuthor() {
 	const showCombobox = useSelect( ( select ) => {
