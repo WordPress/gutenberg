@@ -42,7 +42,7 @@ $blocks-block__margin: 0.5em;
 }
 
 // Increased specificity needed to override margins.
-.wp-block-buttons > .wp-block-button {
+.wp-block-buttons .wp-block-button {
 	&.has-custom-width {
 		max-width: none;
 		.wp-block-button__link {
