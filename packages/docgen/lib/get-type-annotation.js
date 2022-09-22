@@ -407,16 +407,47 @@ function unwrapWrappedSelectors( token ) {
 
 	if ( babelTypes.isCallExpression( token ) ) {
 		// createSelector( ( state, queryId ) => state.queries[ queryId ] );
-		//                 \--------------------------------------------/ CallExpression.arguments[0]
+		//                 \--------------------------------------------/ selector
 		if ( token.callee.name === 'createSelector' ) {
-			return token.arguments[ 0 ];
+			const [ selector, getDependants ] = token.arguments;
+
+			/*
+			 * A special and awkward case arises when we're using a selector
+			 * as a flag indicating if dependencies have changed.
+			 *
+			 * createSelector( () => [], ( state ) => [ state.dependents ] );
+			 *                 \------/ selector
+			 *                           \-------------------------------/ getDependants
+			 *
+			 * In these cases we'll use the argument list from `getSelector`
+			 * even though that will result in wrong location information for
+			 * the chosen argument nodes. This is fine because `docgen` doesn't
+			 * currently use that location information but if it starts to
+			 * we'll need to update this.
+			 *
+			 * The arguments for `getDependants` must be a strict subset of the
+			 * arguments for the selector, but `state` is _always_ an implicit
+			 * argument provided by the system, so we always have to have at
+			 * least that. If both functions have no arguments it would imply
+			 * there's no point in making them a selector.
+			 */
+			const params =
+				getDependants &&
+				getDependants.params &&
+				getDependants.params.length > selector.params.length
+					? getDependants.params
+					: selector.params;
+
+			return { ...selector, params };
 		}
 
 		// createRegistrySelector( ( selector ) => ( state, queryId ) => select( 'core/queries' ).get( queryId ) );
-		//                                         \-----------------------------------------------------------/ CallExpression.arguments[0].body
-		//                         \---------------------------------------------------------------------------/ CallExpression.arguments[0]
+		//                                         \-----------------------------------------------------------/ selector.body
+		//                         \---------------------------------------------------------------------------/ selector
 		if ( token.callee.name === 'createRegistrySelector' ) {
-			return token.arguments[ 0 ].body;
+			const [ registrySelector ] = token.arguments;
+
+			return registrySelector.body;
 		}
 	}
 }

@@ -1094,8 +1094,7 @@ export const hasFetchedAutosaves = createRegistrySelector(
  * @return A value whose reference will change only when an edit occurs.
  */
 export const getReferenceByDistinctEdits = createSelector(
-	// This unused state argument is listed here for the documentation generating tool (docgen).
-	( state: State ) => [],
+	() => [],
 	( state: State ) => [
 		state.undo.length,
 		state.undo.offset,
