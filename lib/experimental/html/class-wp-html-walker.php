@@ -1251,9 +1251,9 @@ class WP_HTML_Walker {
 				 * to start at a place where the preceding character is whitespace.
 				 */
 				if ( $class_at > $class_start ) {
-					$c = $this->html[ $class_at - 1 ];
+					$character = $this->html[ $class_at - 1 ];
 
-					if ( ' ' !== $c && "\t" !== $c && "\f" !== $c && "\r" !== $c && "\n" !== $c ) {
+					if ( ' ' !== $character && "\t" !== $character && "\f" !== $character && "\r" !== $character && "\n" !== $character ) {
 						$class_at += strlen( $this->sought_class_name );
 						continue;
 					}
@@ -1265,9 +1265,9 @@ class WP_HTML_Walker {
 				 * to end at a place where the next character is whitespace.
 				 */
 				if ( $class_at + strlen( $this->sought_class_name ) < $class_end ) {
-					$c = $this->html[ $class_at + strlen( $this->sought_class_name ) ];
+					$character = $this->html[ $class_at + strlen( $this->sought_class_name ) ];
 
-					if ( ' ' !== $c && "\t" !== $c && "\f" !== $c && "\r" !== $c && "\n" !== $c ) {
+					if ( ' ' !== $character && "\t" !== $character && "\f" !== $character && "\r" !== $character && "\n" !== $character ) {
 						$class_at += strlen( $this->sought_class_name );
 						continue;
 					}
