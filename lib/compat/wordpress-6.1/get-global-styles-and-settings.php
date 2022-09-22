@@ -111,6 +111,10 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	 */
 	$styles_rest = '';
 	if ( ! empty( $types ) ) {
+		// We don't add `blocks` here because they're rendered in
+		// wp_add_global_styles_for_blocks. We do so because
+		// we want to render only the blocks in use in some cases,
+		// and we don't have that info at this point.
 		$origins = array( 'default', 'theme', 'custom' );
 		if ( ! $supports_theme_json ) {
 			$origins = array( 'default' );
