@@ -1212,12 +1212,14 @@ class WP_HTML_Walker {
 			}
 		}
 
-		// Do we match a byte-for-byte (case-sensitive and encoding-form-sensitive) class name?
-		if ( null !== $this->sought_class_name ) {
-			if ( ! isset( $this->attributes['class'] ) ) {
-				return false;
-			}
+		$needs_class_name = null !== $this->sought_class_name;
 
+		if ( $needs_class_name && ! isset( $this->attributes['class'] ) ) {
+			return false;
+		}
+
+		// Do we match a byte-for-byte (case-sensitive and encoding-form-sensitive) class name?
+		if ( $needs_class_name ) {
 			$class_start = $this->attributes['class']->value_starts_at;
 			$class_end   = $class_start + $this->attributes['class']->value_length;
 			$class_at    = $class_start;
