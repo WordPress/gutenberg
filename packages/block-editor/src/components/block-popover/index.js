@@ -143,7 +143,6 @@ function BlockPopover(
 		<Popover
 			ref={ mergedRefs }
 			animate={ false }
-			position="top right left"
 			focusOnMount={ false }
 			anchor={ popoverAnchor }
 			// Render in the old slot if needed for backward compatibility,
