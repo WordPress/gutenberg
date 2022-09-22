@@ -23,7 +23,7 @@ function Slot(
 		useContext( SlotFillContext );
 	const ref = useRef();
 
-	// We don't fillProps in the deps of the layout effect below because we don't want to
+	// We want don't fillProps in the deps of the layout effect below because we don't want to
 	// unregister and register the slot whenever fillProps change. Doing so would
 	// cause the fill to be re-mounted, and we are only considering the initial value
 	// of fillProps. Instead, we store that initial value in a ref, but don't update it.
