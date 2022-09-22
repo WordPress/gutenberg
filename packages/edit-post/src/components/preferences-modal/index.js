@@ -44,7 +44,7 @@ const MODAL_NAME = 'edit-post/preferences';
 export default function EditPostPreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { closeModal } = useDispatch( editPostStore );
-	const [ showBlockBreadcrumbsOption, isDistractionFree, isModalActive ] =
+	const [ isModalActive, showBlockBreadcrumbsOption, isDistractionFree ] =
 		useSelect(
 			( select ) => {
 				const { getEditorSettings } = select( editorStore );

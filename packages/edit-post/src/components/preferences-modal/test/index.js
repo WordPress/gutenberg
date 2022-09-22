@@ -21,7 +21,7 @@ jest.mock( '@wordpress/compose/src/hooks/use-viewport-match', () => jest.fn() );
 describe( 'EditPostPreferencesModal', () => {
 	describe( 'should match snapshot when the modal is active', () => {
 		it( 'large viewports', () => {
-			useSelect.mockImplementation( () => [ true, false ] );
+			useSelect.mockImplementation( () => [ true, true, false ] );
 			useViewportMatch.mockImplementation( () => true );
 			render( <EditPostPreferencesModal /> );
 			expect(
@@ -29,7 +29,7 @@ describe( 'EditPostPreferencesModal', () => {
 			).toMatchSnapshot();
 		} );
 		it( 'small viewports', () => {
-			useSelect.mockImplementation( () => [ true, false ] );
+			useSelect.mockImplementation( () => [ true, true, false ] );
 			useViewportMatch.mockImplementation( () => false );
 			render( <EditPostPreferencesModal /> );
 			expect(
