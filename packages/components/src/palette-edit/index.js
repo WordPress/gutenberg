@@ -316,7 +316,7 @@ export default function PaletteEdit( {
 			<PaletteHStackHeader>
 				<PaletteHeading>{ paletteLabel }</PaletteHeading>
 				<PaletteActionsContainer>
-					{ isEditing && (
+					{ hasElements && isEditing && (
 						<DoneButton
 							isSmall
 							onClick={ () => {
