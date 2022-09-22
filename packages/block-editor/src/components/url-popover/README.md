@@ -94,13 +94,13 @@ class MyURLPopover extends Component {
 
 The component accepts the following props. Any other props are passed through to the underlying `Popover` component ([refer to props documentation](/packages/components/src/popover/README.md)).
 
-### position
+### placement
 
-Where the Popover should be positioned relative to its parent. Defaults to "bottom center".
+Where the Popover should be positioned relative to its parent. Defaults to "bottom".
 
 -   Type: `String`
 -   Required: No
--   Default: "bottom center"
+-   Default: "bottom"
 
 ### focusOnMount
 

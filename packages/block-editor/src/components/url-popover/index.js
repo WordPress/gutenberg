@@ -16,7 +16,7 @@ function URLPopover( {
 	additionalControls,
 	children,
 	renderSettings,
-	position = 'bottom center',
+	placement = 'bottom',
 	focusOnMount = 'firstElement',
 	...popoverProps
 } ) {
@@ -32,7 +32,7 @@ function URLPopover( {
 		<Popover
 			className="block-editor-url-popover"
 			focusOnMount={ focusOnMount }
-			position={ position }
+			placement={ placement }
 			shift
 			{ ...popoverProps }
 		>
