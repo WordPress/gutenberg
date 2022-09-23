@@ -868,14 +868,14 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * Example:
 	 * <code>
-	 *     $w = new WP_HTML_Tag_Processor( '<div enabled class="test" data-test-id="14">Test</div>' );
-	 *     $w->next_tag( [ 'class_name' => 'test' ] ) === true;
-	 *     $w->get_attribute( 'data-test-id' ) === '14';
-	 *     $w->get_attribute( 'enabled' ) === true;
-	 *     $w->get_attribute( 'aria-label' ) === null;
+	 *     $p = new WP_HTML_Tag_Processor( '<div enabled class="test" data-test-id="14">Test</div>' );
+	 *     $p->next_tag( [ 'class_name' => 'test' ] ) === true;
+	 *     $p->get_attribute( 'data-test-id' ) === '14';
+	 *     $p->get_attribute( 'enabled' ) === true;
+	 *     $p->get_attribute( 'aria-label' ) === null;
 	 *
-	 *     $w->next_tag( [] ) === false;
-	 *     $w->get_attribute( 'class' ) === null;
+	 *     $p->next_tag( [] ) === false;
+	 *     $p->get_attribute( 'class' ) === null;
 	 * </code>
 	 *
 	 * @since 6.1.0
@@ -908,12 +908,12 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * Example:
 	 * <code>
-	 *     $w = new WP_HTML_Tag_Processor( '<DIV CLASS="test">Test</DIV>' );
-	 *     $w->next_tag( [] ) === true;
-	 *     $w->get_tag() === 'DIV';
+	 *     $p = new WP_HTML_Tag_Processor( '<DIV CLASS="test">Test</DIV>' );
+	 *     $p->next_tag( [] ) === true;
+	 *     $p->get_tag() === 'DIV';
 	 *
-	 *     $w->next_tag( [] ) === false;
-	 *     $w->get_tag() === null;
+	 *     $p->next_tag( [] ) === false;
+	 *     $p->get_tag() === null;
 	 * </code>
 	 *
 	 * @since 6.1.0
