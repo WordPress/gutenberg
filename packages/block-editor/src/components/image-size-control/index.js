@@ -11,6 +11,7 @@ import {
 	ButtonGroup,
 	SelectControl,
 	TextControl,
+	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -73,6 +74,10 @@ export default function ImageSizeControl( {
 							onChange={ ( value ) =>
 								updateDimension( 'height', value )
 							}
+						/>
+						<ToggleControl
+							className="block-editor-image-size-control__proportions_toggle"
+							label={ __( 'Constrain Proportions' ) }
 						/>
 					</div>
 					<div className="block-editor-image-size-control__row">
