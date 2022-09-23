@@ -89,7 +89,7 @@ array(
 
 Use this function to compile and return a stylesheet for any CSS rules. The style engine will automatically merge declarations and combine selectors.
 
-This function acts as a CSS compiler, but will also enqueue styles for rendering where a `context` string is passed in the options.
+This function acts as a CSS compiler, but will also register the styles in a store where a `context` string is passed in the options.
 
 _Parameters_
 
