@@ -17,26 +17,35 @@
 		align-self: center;
 	}
 
+	.components-base-control__label {
+		margin-bottom: 0;
+		height: 16px;
+	}
+
 	.components-spacing-sizes-control__side-labels {
 		grid-column: 1 / 1;
-		margin-bottom: $grid-unit-10;
 		justify-content: left;
+		height: 16px;
+		margin-top: $grid-unit-05;
+		margin-bottom: $grid-unit-10;
 	}
 
 	.components-spacing-sizes-control__side-label {
 		grid-column: 1 / 1;
 		justify-self: left;
+		margin-bottom: 0;
 	}
 
 	&.is-unlinked {
 		.components-range-control.components-spacing-sizes-control__range-control {
-			margin: -$grid-unit-10 0 $grid-unit-20 0;
+			margin: -$grid-unit-10 0 $grid-unit-10 0;
 		}
 	}
 
 	.components-spacing-sizes-control__hint-single,
 	.components-spacing-sizes-control__hint-all {
 		color: $gray-700;
+		margin-bottom: 0;
 	}
 
 	.components-spacing-sizes-control__hint-all {
