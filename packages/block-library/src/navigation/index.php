@@ -422,23 +422,23 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
 	$is_responsive_menu           = isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
 
-	// Register @alpine/focus plugin
+	// Register @alpine/focus plugin.
 	wp_register_script(
 		'AlpineJS_focus',
 		'https://unpkg.com/@alpinejs/focus@3.10.3/dist/cdn.min.js',
 		array(),
 		null,
-		true // Load it in the footer
+		true // Load it in the footer.
 	);
 	wp_enqueue_script( 'AlpineJS_focus' );
 
-	// Register Alpine
+	// Register Alpine.
 	wp_register_script(
 		'AlpineJS',
 		'https://unpkg.com/alpinejs@3.10.3/dist/cdn.min.js',
-		array('AlpineJS_focus'),
+		array( 'AlpineJS_focus' ),
 		null,
-		true // Load it in the footer
+		true // Load it in the footer.
 	);
 	wp_enqueue_script( 'AlpineJS' );
 
