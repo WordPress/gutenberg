@@ -99,28 +99,6 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_calling_tostring_applies_the_updates_so_far_and_keeps_the_walker_on_the_current_tag() {
-		$w = new WP_HTML_Walker( '<hr id="remove" /><div enabled class="test">Test</div><span id="span-id"></span>' );
-		$w->next_tag();
-		$w->remove_attribute( 'id' );
-
-		$w->next_tag();
-		$w->set_attribute( 'id', 'div-id-1' );
-		$w->add_class( 'new_class_1' );
-		$this->assertSame( '<hr  /><div id="div-id-1" enabled class="test new_class_1">Test</div><span id="span-id"></span>', (string) $w );
-
-		$w->set_attribute( 'id', 'div-id-2' );
-		$w->add_class( 'new_class_2' );
-		$this->assertSame( '<hr  /><div id="div-id-2" enabled class="test new_class_1 new_class_2">Test</div><span id="span-id"></span>', (string) $w );
-
-		$w->next_tag();
-		$w->remove_attribute( 'id' );
-		$this->assertSame( '<hr  /><div id="div-id-2" enabled class="test new_class_1 new_class_2">Test</div><span ></span>', (string) $w );
-	}
-
-	/**
-	 * @ticket 56299
-	 */
 	public function test_get_attribute_returns_string_for_truthy_attributes() {
 		$w = new WP_HTML_Walker( '<div enabled=enabled checked=1 hidden="true" class="test">Test</div>' );
 		$this->assertTrue( $w->next_tag( array() ) );
@@ -140,6 +118,28 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 		$this->assertTrue( $w->get_attribute( 'c' ) );
 		$this->assertTrue( $w->get_attribute( 'd' ) );
 		$this->assertSame( 'test', $w->get_attribute( 'e' ) );
+	}
+
+	/**
+	 * @ticket 56299
+	 */
+	public function test_calling_tostring_applies_the_updates_so_far_and_keeps_the_walker_on_the_current_tag() {
+		$w = new WP_HTML_Walker( '<hr id="remove" /><div enabled class="test">Test</div><span id="span-id"></span>' );
+		$w->next_tag();
+		$w->remove_attribute( 'id' );
+
+		$w->next_tag();
+		$w->set_attribute( 'id', 'div-id-1' );
+		$w->add_class( 'new_class_1' );
+		$this->assertSame( '<hr  /><div id="div-id-1" enabled class="test new_class_1">Test</div><span id="span-id"></span>', (string) $w );
+
+		$w->set_attribute( 'id', 'div-id-2' );
+		$w->add_class( 'new_class_2' );
+		$this->assertSame( '<hr  /><div id="div-id-2" enabled class="test new_class_1 new_class_2">Test</div><span id="span-id"></span>', (string) $w );
+
+		$w->next_tag();
+		$w->remove_attribute( 'id' );
+		$this->assertSame( '<hr  /><div id="div-id-2" enabled class="test new_class_1 new_class_2">Test</div><span ></span>', (string) $w );
 	}
 
 	/**
