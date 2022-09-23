@@ -549,7 +549,7 @@ HTML;
 	/**
 	 * @ticket 56299
 	 */
-	public function test_works_with_single_quote_marks() {
+	public function test_parses_html_attributes_wrapped_in_single_quotation_marks() {
 		$w = new WP_HTML_Walker(
 			'<div id=\'first\'><span id=\'second\'>Text</span></div>'
 		);
