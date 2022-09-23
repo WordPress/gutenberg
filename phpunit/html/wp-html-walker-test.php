@@ -158,7 +158,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_to_string_with_no_updates_returns_the_original_html() {
+	public function test_tostring_with_no_updates_returns_the_original_html() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$this->assertSame( self::HTML_SIMPLE, (string) $w );
 	}
@@ -166,7 +166,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_finding_any_existing_tag() {
+	public function test_next_tag_with_no_arguments_should_find_the_next_existing_tag() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$this->assertTrue( $w->next_tag(), 'Querying an existing tag did not return true' );
 	}
@@ -174,7 +174,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_finding_non_existing_tag() {
+	public function test_next_tag_should_return_false_for_a_non_existing_tag() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$this->assertFalse( $w->next_tag( 'p' ), 'Querying a non-existing tag did not return false' );
 	}
