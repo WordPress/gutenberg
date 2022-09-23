@@ -14,7 +14,7 @@ import type {
 	PopoverAnchorRefTopBottom,
 } from './types';
 
-const POSTION_TO_PLACEMENT: Record<
+const POSITION_TO_PLACEMENT: Record<
 	NonNullable< PopoverProps[ 'position' ] >,
 	NonNullable< PopoverProps[ 'placement' ] >
 > = {
@@ -80,7 +80,7 @@ const POSTION_TO_PLACEMENT: Record<
 export const positionToPlacement = (
 	position: NonNullable< PopoverProps[ 'position' ] >
 ): NonNullable< PopoverProps[ 'placement' ] > =>
-	POSTION_TO_PLACEMENT[ position ] ?? 'bottom';
+	POSITION_TO_PLACEMENT[ position ] ?? 'bottom';
 
 /**
  * @typedef AnimationOrigin
