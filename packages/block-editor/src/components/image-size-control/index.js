@@ -36,8 +36,11 @@ export default function ImageSizeControl( {
 	onChange,
 	onChangeImage = noop,
 } ) {
+	// Set currently-updating dimension to state.
 	const [ dimension, setDimension ] = useState( 'height' );
+	// Set whether or not we should be locking image aspect ratio. True by default.
 	const [ lockAspectRatio, setLockAspectRatio ] = useState( true );
+	// Get and set height and width.
 	const { currentHeight, currentWidth, updateDimension, updateDimensions } =
 		useDimensionHandler(
 			height,

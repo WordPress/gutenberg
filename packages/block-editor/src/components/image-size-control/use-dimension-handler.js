@@ -23,7 +23,7 @@ export default function useDimensionHandler(
 	onChange,
 	lockAspectRatio = false
 ) {
-	// Define the image's aspect ratio.
+	// Define the image's aspect ratio by orientation.
 	const isVertical = defaultHeight > defaultWidth;
 	const ratio = isVertical
 		? defaultHeight / defaultWidth
