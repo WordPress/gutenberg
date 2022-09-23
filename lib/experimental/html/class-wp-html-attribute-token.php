@@ -10,6 +10,9 @@
 /**
  * Data structure for the attribute token that allows to drastically improve performance.
  *
+ * This class is for internal usage of the WP_HTML_Tag_Processor class.
+ *
+ * @access private
  * @since 6.1.0
  *
  * @see WP_HTML_Tag_Processor
