@@ -115,7 +115,7 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	// The return value.
 	$attributes = array();
     
-	/ Return early if the block skips all serialization for block supports.
+	// Return early if the block skips all serialization for block supports.
 	if ( gutenberg_should_skip_block_supports_serialization( $block_type, 'color' ) ) {
 		return $attributes;
 	}
