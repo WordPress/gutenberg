@@ -28,13 +28,16 @@ const migrateIdToRef = ( { navigationMenuId, ...attributes } ) => {
 	};
 };
 
-const migrateTextColorToLinkColor = ( {
+const migrateTextColorToGlobalStylesLinkColor = ( {
 	textColor,
 	customTextColor,
 	...attributes
 } ) => {
+	const newColor = customTextColor || `var:preset|color|${ textColor }`;
+
 	return {
 		...attributes,
+		textColor: customTextColor || textColor,
 		style: {
 			...attributes?.style,
 			elements: {
@@ -43,9 +46,7 @@ const migrateTextColorToLinkColor = ( {
 					...attributes?.style?.elements?.link,
 					color: {
 						...attributes?.style?.elements?.link?.color,
-						text:
-							customTextColor ||
-							`var:preset|color|${ textColor }`,
+						text: newColor,
 					},
 				},
 			},
@@ -198,7 +199,7 @@ const v7 = {
 
 		return !! customTextColor || !! textColor;
 	},
-	migrate: migrateTextColorToLinkColor,
+	migrate: migrateTextColorToGlobalStylesLinkColor,
 };
 
 const v6 = {
