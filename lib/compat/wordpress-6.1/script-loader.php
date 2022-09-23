@@ -182,13 +182,18 @@ add_action( 'wp_footer', 'gutenberg_enqueue_global_styles', 1 );
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
 
+/**
+ * Loads classic theme styles on classic themes.
+ *
+ * This is needed for backwards compatibility for button blocks specifically.
+ */
 function gutenberg_enqueue_classic_theme_styles() {
 	if ( ! wp_is_block_theme() ) {
 		wp_register_style( 'classic-theme-styles', gutenberg_url( 'build/block-library/classic.css' ), array(), true );
 		wp_enqueue_style( 'classic-theme-styles' );
 	}
 }
-// To load classic theme styles on the frontend:
+// To load classic theme styles on the frontend.
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_classic_theme_styles' );
-// To load classic theme styles in the the editor:
+// To load classic theme styles in the the editor.
 add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_classic_theme_styles' );
