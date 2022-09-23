@@ -182,7 +182,7 @@
 		}
 
 		&:focus:not(:disabled) {
-			color: var(--wp-admin-theme-color);
+			color: darken($alert-red, 20%);
 		}
 
 		&:active:not(:disabled) {
@@ -199,6 +199,10 @@
 			color: #fff;
 			background: darken($alert-red, 20%);
 			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
+		}
+
+		&:focus:not(:disabled) {
+			color: #fff;
 		}
 	}
 
