@@ -25,7 +25,7 @@ For more information about the roadmap, please refer to [Block editor styles: in
 
 Global public function to generate styles from a single style object, e.g., the value of a [block's attributes.style object](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#styles) or the [top level styles in theme.json](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/).
 
-See also [Using the Style Engine to generate block supports styles](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/using-the-style-engine-with-block-supports).
+See also [Using the Style Engine to generate block supports styles](https://github.com/WordPress/gutenberg/tree/HEAD/packages/style-engine/docs/using-the-style-engine-with-block-supports.md).
 
 _Parameters_
 
@@ -57,7 +57,7 @@ To enqueue a style for rendering in the site's frontend, the `$options` array re
 
 #### Usage
 
-As mentioned, `wp_style_engine_get_styles()` is useful whenever you wish to generate CSS and/or classnames from a **block's style object**. A good example is [using the Style Engine to generate block supports styles](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/using-the-style-engine-with-block-supports).
+As mentioned, `wp_style_engine_get_styles()` is useful whenever you wish to generate CSS and/or classnames from a **block's style object**. A good example is [using the Style Engine to generate block supports styles](https://github.com/WordPress/gutenberg/tree/HEAD/packages/style-engine/docs/using-the-style-engine-with-block-supports.md).
 
 In the following snippet, we're taking the style object from a block's attributes and passing it to the style engine to get the styles. By passing a `context` in the options, the Style Engine will store the styles for later retrieval, for example, should you wish to batch enqueue a set of CSS rules.
 
