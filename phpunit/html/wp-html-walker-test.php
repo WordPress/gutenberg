@@ -218,25 +218,6 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Removing an attribute that's listed many times, e.g. `<div id="a" id="b" />` should remove
-	 * all its instances and output just `<div />`.
-	 *
-	 * Today, however, WP_HTML_Walker only removes the first such attribute. It seems like a corner case
-	 * and introducing additional complexity to correctly handle this scenario doesn't seem to be worth it.
-	 * Let's revisit if and when this becomes a problem.
-	 *
-	 * This test is in place to confirm this behavior, while incorrect, is well-defined.
-	 *
-	 * @ticket 56299
-	 */
-	public function test_remove_first_when_duplicated_attribute() {
-		$w = new WP_HTML_Walker( '<div id="update-me" id="ignored-id"><span id="second">Text</span></div>' );
-		$w->next_tag();
-		$w->remove_attribute( 'id' );
-		$this->assertSame( '<div  id="ignored-id"><span id="second">Text</span></div>', (string) $w );
-	}
-
-	/**
 	 * @ticket 56299
 	 */
 	public function test_set_existing_attribute() {
@@ -256,6 +237,25 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 		}
 
 		$this->assertSame( '<div data-foo="bar" id="first"><span data-foo="bar" id="second">Text</span></div>', (string) $w );
+	}
+
+	/**
+	 * Removing an attribute that's listed many times, e.g. `<div id="a" id="b" />` should remove
+	 * all its instances and output just `<div />`.
+	 *
+	 * Today, however, WP_HTML_Walker only removes the first such attribute. It seems like a corner case
+	 * and introducing additional complexity to correctly handle this scenario doesn't seem to be worth it.
+	 * Let's revisit if and when this becomes a problem.
+	 *
+	 * This test is in place to confirm this behavior, while incorrect, is well-defined.
+	 *
+	 * @ticket 56299
+	 */
+	public function test_remove_first_when_duplicated_attribute() {
+		$w = new WP_HTML_Walker( '<div id="update-me" id="ignored-id"><span id="second">Text</span></div>' );
+		$w->next_tag();
+		$w->remove_attribute( 'id' );
+		$this->assertSame( '<div  id="ignored-id"><span id="second">Text</span></div>', (string) $w );
 	}
 
 	/**
