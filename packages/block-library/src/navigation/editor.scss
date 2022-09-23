@@ -45,6 +45,16 @@
 	background-color: inherit;
 }
 
+// Make sure that the default text color is not overwritten by the parent container colors.
+.editor-styles-wrapper .wp-block-navigation__submenu-container:not(.has-text-color) .wp-block-navigation-item {
+	color: #000;
+}
+
+// Make sure that the user-set text color is not overwritten by the parent container colors.
+.editor-styles-wrapper .wp-block-navigation__submenu-container.has-text-color .wp-block-navigation-item {
+	color: inherit;
+}
+
 // Only show the flyout on hover if the parent menu item is selected.
 .wp-block-navigation:not(.is-selected):not(.has-child-selected)
 .has-child:hover {
