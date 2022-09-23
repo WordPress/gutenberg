@@ -949,6 +949,38 @@ class WP_HTML_Tag_Processor {
 		}
 
 		/*
+		 * Verify that the attribute name is allowable. In WP_DEBUG
+		 * environments we want to crash to quickly alert developers
+		 * of typos and issues; but in production we don't want to
+		 * interrupt a normal page view, so we'll silently avoid
+		 * updating the attribute in those cases.
+		 *
+		 * Of note, we're disallowing more characters than are strictly
+		 * forbidden in HTML5. This is to prevent additional security
+		 * risks deeper in the WordPress and plugin stack. Specifically
+		 * we reject the less-than (<) and ampersand (&) characters.
+		 *
+		 * The use of a PCRE match allows us to look for specific Unicode
+		 * code points without writing a UTF-8 decoder. Whereas scanning
+		 * for one-byte characters is trivial, scanning for the longer
+		 * byte sequences would be more complicated, and this shouldn't
+		 * be in the hot path for execution so we can compromise on the
+		 * efficiency at this point.
+		 *
+		 * @see https://html.spec.whatwg.org/#attributes-2
+		 */
+		if ( preg_match(
+			'~[ "\'>&</=\x{00}-\x{1F}\x{FDD0}-\x{FDEF}\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}\x{10FFFE}\x{10FFFF}]~Ssu',
+			$name
+		) ) {
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				throw new Exception( 'Invalid attribute name' );
+			}
+
+			return;
+		}
+
+		/*
 		 * > The values "true" and "false" are not allowed on boolean attributes.
 		 * > To represent a false value, the attribute has to be omitted altogether.
 		 *     - HTML5 spec, https://html.spec.whatwg.org/#boolean-attributes

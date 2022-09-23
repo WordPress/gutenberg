@@ -249,6 +249,57 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Attribute names with invalid characters should be rejected.
+	 *
+	 * > Attributes have a name and a value. Attribute names must
+	 * > consist of one or more characters other than controls,
+	 * > U+0020 SPACE, U+0022 ("), U+0027 ('), U+003E (>),
+	 * > U+002F (/), U+003D (=), and noncharacters.
+	 *
+	 * @see https://html.spec.whatwg.org/#attributes-2
+	 *
+	 * @dataProvider data_invalid_attribute_names
+	 * @covers set_attribute
+	 */
+	public function test_set_attribute_rejects_invalid_attribute_names( $attribute_name ) {
+		$p = new WP_HTML_Tag_Processor( '<span></span>' );
+
+		$this->expectException( Exception::class );
+
+		$p->next_tag();
+		$p->set_attribute( $attribute_name, "test" );
+
+		$this->assertEquals( '<span></span>', (string) $p );
+	}
+
+	/**
+	 * Data provider with invalid HTML attribute names.
+	 *
+	 * @return array {
+	 *     @type string $attribute_name Text considered invalid for HTML attribute names.
+	 * }
+	 */
+	public function data_invalid_attribute_names() {
+		return array(
+			'controls_null'    => array( "i\x00d" ),
+			'controls_newline' => array( "\nbroken-expectations" ),
+			'space'            => array( "aria label" ),
+			'double-quote'     => array( '"id"' ),
+			'single-quote'     => array( "'id'" ),
+			'greater-than'     => array( 'sneaky>script' ),
+			'solidus'          => array( 'data/test-id' ),
+			'equals'           => array( 'checked=checked' ),
+			'noncharacters_1'  => array( html_entity_decode( 'anything&#xFDD0;' ) ),
+			'noncharacters_2'  => array( html_entity_decode( 'te&#xFFFF;st' ) ),
+			'noncharacters_3'  => array( html_entity_decode( 'te&#x2FFFE;st' ) ),
+			'noncharacters_4'  => array( html_entity_decode( 'te&#xDFFFF;st' ) ),
+			'noncharacters_5'  => array( html_entity_decode( '&#x10FFFE;' ) ),
+			'wp_no_lt'         => array( 'id<script'),
+			'wp_no_amp'        => array( 'class&lt;script'),
+		);
+	}
+
+	/**
 	 * According to HTML spec, only the first instance of an attribute counts.
 	 * The other ones are ignored.
 	 *
