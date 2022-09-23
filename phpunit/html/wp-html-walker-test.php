@@ -174,7 +174,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_finding_non_existing_tag() {
+	public function test_next_tag_should_return_false_for_a_non_existing_tag() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$this->assertFalse( $w->next_tag( 'p' ), 'Querying a non-existing tag did not return false' );
 	}
