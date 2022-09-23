@@ -92,14 +92,22 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 
 	/*
 	 * If variables are part of the stylesheet,
-	 * we add them for all origins (default, theme, user).
+	 * we add them.
+	 *
 	 * This is so themes without a theme.json still work as before 5.9:
 	 * they can override the default presets.
 	 * See https://core.trac.wordpress.org/ticket/54782
 	 */
 	$styles_variables = '';
 	if ( in_array( 'variables', $types, true ) ) {
-		$styles_variables = $tree->get_stylesheet( array( 'variables' ) );
+		/*
+		 * We only use the default, theme, and custom origins.
+		 * This is because styles for blocks origin are added
+		 * at a later phase (render cycle) so we only render the ones in use.
+		 * @see wp_add_global_styles_for_blocks
+		 */
+		$origins          = array( 'default', 'theme', 'custom' );
+		$styles_variables = $tree->get_stylesheet( array( 'variables' ), $origins );
 		$types            = array_diff( $types, array( 'variables' ) );
 	}
 
@@ -111,6 +119,12 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	 */
 	$styles_rest = '';
 	if ( ! empty( $types ) ) {
+		/*
+		 * We only use the default, theme, and custom origins.
+		 * This is because styles for blocks origin are added
+		 * at a later phase (render cycle) so we only render the ones in use.
+		 * @see wp_add_global_styles_for_blocks
+		 */
 		$origins = array( 'default', 'theme', 'custom' );
 		if ( ! $supports_theme_json ) {
 			$origins = array( 'default' );

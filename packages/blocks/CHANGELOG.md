@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.17.0 (2022-09-21)
+
 - The block attribute sources `children` and `node` have been deprecated. Please use the `html` source instead. See https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/ and the core blocks for examples.
 ## 11.16.0 (2022-09-13)
 

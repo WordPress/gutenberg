@@ -26,6 +26,18 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	);
 
 	/**
+	 * The sources of data this object can represent.
+	 *
+	 * @var string[]
+	 */
+	const VALID_ORIGINS = array(
+		'default',
+		'blocks',
+		'theme',
+		'custom',
+	);
+
+	/**
 	 * Metadata for style properties.
 	 *
 	 * Each element is a direct mapping from the CSS property name to the
