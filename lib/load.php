@@ -126,6 +126,7 @@ if ( is_dir( __DIR__ . '/../build/style-engine' ) ) {
 
 // Block supports overrides.
 require __DIR__ . '/block-supports/utils.php';
+require __DIR__ . '/block-supports/settings.php';
 require __DIR__ . '/block-supports/elements.php';
 require __DIR__ . '/block-supports/colors.php';
 require __DIR__ . '/block-supports/typography.php';
