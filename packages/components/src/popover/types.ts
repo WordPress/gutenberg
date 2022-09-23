@@ -121,6 +121,7 @@ export type PopoverProps = {
 	 * _Note: this prop is deprecated. Use the `placement` prop instead._
 	 */
 	position?:
+		| `${ PositionYAxis }`
 		| `${ PositionYAxis } ${ PositionXAxis }`
 		| `${ PositionYAxis } ${ PositionXAxis } ${ PositionCorner }`;
 	/**
