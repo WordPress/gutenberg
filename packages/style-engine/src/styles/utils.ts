@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, kebabCase } from 'lodash';
 
 /**
  * Internal dependencies
@@ -119,6 +119,7 @@ export function getCSSVarFromStyleValue( styleValue: string ): string {
 		const variable = styleValue
 			.slice( VARIABLE_REFERENCE_PREFIX.length )
 			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
+			.map( ( presetVariable ) => kebabCase( presetVariable ) )
 			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
 		return `var(--wp--${ variable })`;
 	}
