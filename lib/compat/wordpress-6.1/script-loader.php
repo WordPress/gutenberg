@@ -38,9 +38,20 @@ function gutenberg_enqueue_block_support_styles( $style, $priority = 10 ) {
 
 /**
  * Fetches, processes and compiles stored core styles, then combines and renders them to the page.
- * Styles are stored via the style engine API. See: packages/style-engine/README.md
+ * Styles are stored via the style engine API.
+ *
+ * See: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/
+ *
+ * @param array $options {
+ *     Optional. An array of options to pass to gutenberg_style_engine_get_stylesheet_from_context(). Default empty array.
+ *
+ *     @type bool $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
+ *     @type bool $prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
+ * }
+ *
+ * @return void
  */
-function gutenberg_enqueue_stored_styles() {
+function gutenberg_enqueue_stored_styles( $options = array() ) {
 	$is_block_theme   = wp_is_block_theme();
 	$is_classic_theme = ! $is_block_theme;
 
@@ -59,16 +70,17 @@ function gutenberg_enqueue_stored_styles() {
 	$compiled_core_stylesheet = '';
 	$style_tag_id             = 'core';
 	foreach ( $core_styles_keys as $style_key ) {
-		// Add comment to identify core styles sections in debugging.
-		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+		// Adds comment if code is prettified to identify core styles sections in debugging.
+		$should_prettify = isset( $options['prettify'] ) ? true === $options['prettify'] : defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG;
+		if ( $should_prettify ) {
 			$compiled_core_stylesheet .= "/**\n * Core styles: $style_key\n */\n";
 		}
-		// Chain core store ids to signify what the styles contain.
+		// Chains core store ids to signify what the styles contain.
 		$style_tag_id             .= '-' . $style_key;
-		$compiled_core_stylesheet .= gutenberg_style_engine_get_stylesheet_from_context( $style_key );
+		$compiled_core_stylesheet .= gutenberg_style_engine_get_stylesheet_from_context( $style_key, $options );
 	}
 
-	// Combine Core styles.
+	// Combines Core styles.
 	if ( ! empty( $compiled_core_stylesheet ) ) {
 		wp_register_style( $style_tag_id, false, array(), true, true );
 		wp_add_inline_style( $style_tag_id, $compiled_core_stylesheet );
@@ -81,7 +93,7 @@ function gutenberg_enqueue_stored_styles() {
 		if ( in_array( $store_name, $core_styles_keys, true ) ) {
 			continue;
 		}
-		$styles = gutenberg_style_engine_get_stylesheet_from_context( $store_name );
+		$styles = gutenberg_style_engine_get_stylesheet_from_context( $store_name, $options );
 		if ( ! empty( $styles ) ) {
 			$key = "wp-style-engine-$store_name";
 			wp_register_style( $key, false, array(), true, true );

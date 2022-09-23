@@ -118,15 +118,23 @@ export default function VisualEditor( { styles } ) {
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
-	const { themeHasDisabledLayoutStyles, themeSupportsLayout, assets } =
-		useSelect( ( select ) => {
-			const _settings = select( blockEditorStore ).getSettings();
-			return {
-				themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
-				themeSupportsLayout: _settings.supportsLayout,
-				assets: _settings.__unstableResolvedAssets,
-			};
-		}, [] );
+	const {
+		themeHasDisabledLayoutStyles,
+		themeSupportsLayout,
+		assets,
+		useRootPaddingAwareAlignments,
+		isFocusMode,
+	} = useSelect( ( select ) => {
+		const _settings = select( blockEditorStore ).getSettings();
+		return {
+			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
+			themeSupportsLayout: _settings.supportsLayout,
+			assets: _settings.__unstableResolvedAssets,
+			useRootPaddingAwareAlignments:
+				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
+			isFocusMode: _settings.focusMode,
+		};
+	}, [] );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
@@ -189,9 +197,11 @@ export default function VisualEditor( { styles } ) {
 		return { type: 'default' };
 	}, [ isTemplateMode, themeSupportsLayout, defaultLayout ] );
 
-	const blockListLayoutClass = themeSupportsLayout
-		? 'is-layout-constrained'
-		: 'is-layout-flow';
+	const blockListLayoutClass = classnames( {
+		'is-layout-constrained': themeSupportsLayout,
+		'is-layout-flow': ! themeSupportsLayout,
+		'has-global-padding': useRootPaddingAwareAlignments,
+	} );
 
 	const titleRef = useRef();
 	useEffect( () => {
@@ -257,7 +267,12 @@ export default function VisualEditor( { styles } ) {
 							) }
 						{ ! isTemplateMode && (
 							<div
-								className="edit-post-visual-editor__post-title-wrapper"
+								className={ classnames(
+									'edit-post-visual-editor__post-title-wrapper',
+									{
+										'is-focus-mode': isFocusMode,
+									}
+								) }
 								contentEditable={ false }
 							>
 								<PostTitle ref={ titleRef } />

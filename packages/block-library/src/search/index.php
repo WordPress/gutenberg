@@ -121,7 +121,7 @@ function render_block_core_search( $attributes ) {
 		}
 
 		// Include the button element class.
-		$button_classes[] = wp_theme_element_class_name( 'button' );
+		$button_classes[] = wp_theme_get_element_class_name( 'button' );
 		$button_markup    = sprintf(
 			'<button type="submit" class="%s" %s %s>%s</button>',
 			esc_attr( implode( ' ', $button_classes ) ),

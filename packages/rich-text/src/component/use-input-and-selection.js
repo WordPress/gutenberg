@@ -172,10 +172,7 @@ export function useInputAndSelection( props ) {
 					const { start, end: offset = start } = createRecord();
 					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
 					onSelectionChange( offset );
-				} else if (
-					element.contains( focusNode ) &&
-					element !== focusNode
-				) {
+				} else if ( element.contains( focusNode ) ) {
 					const { start, end: offset = start } = createRecord();
 					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
 					onSelectionChange( undefined, offset );
