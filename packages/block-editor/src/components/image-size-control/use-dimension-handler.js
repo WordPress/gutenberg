@@ -4,6 +4,11 @@
 import { useEffect, useState } from '@wordpress/element';
 
 /**
+ * Internal dependencies
+ */
+import { getImageRatio, getDimensionsByRatio, isPortrait } from './utils';
+
+/**
  * Hook to return dimensions of an element.
  *
  * @param {number}   customHeight    new height.
@@ -24,10 +29,8 @@ export default function useDimensionHandler(
 	lockAspectRatio = false
 ) {
 	// Define the image's aspect ratio by orientation.
-	const isVertical = defaultHeight > defaultWidth;
-	const ratio = isVertical
-		? defaultHeight / defaultWidth
-		: defaultWidth / defaultHeight;
+	const ratio = getImageRatio( defaultHeight, defaultWidth );
+	const isVertical = isPortrait( defaultHeight, defaultWidth );
 
 	const [ currentWidth, setCurrentWidth ] = useState(
 		customWidth ?? defaultWidth ?? ''
@@ -66,16 +69,6 @@ export default function useDimensionHandler(
 	}, [ customWidth, customHeight ] );
 
 	/**
-	 * Get ratio dimension based on image orientation.
-	 *
-	 * @param {number}  value    new height or width value.
-	 * @param {boolean} vertical whether or not the image aspect is vertical.
-	 * @return {number} multiplied or divided value by ratio.
-	 */
-	const getRatioByOrientation = ( value, vertical = true ) =>
-		Math.round( vertical ? value * ratio : value / ratio );
-
-	/**
 	 * Update single value dimension on change.
 	 * If lockAspectRatio is true, set height and width simultaneously.
 	 *
@@ -89,11 +82,11 @@ export default function useDimensionHandler(
 			const lockedHeight =
 				dimension === 'height'
 					? value
-					: getRatioByOrientation( value, isVertical );
+					: getDimensionsByRatio( value, ratio, isVertical );
 			const lockedWidth =
 				dimension === 'width'
 					? value
-					: getRatioByOrientation( value, ! isVertical );
+					: getDimensionsByRatio( value, ratio, ! isVertical );
 			updateDimensions( lockedHeight, lockedWidth );
 		} else if ( dimension === 'width' ) {
 			setCurrentWidth( value );
@@ -106,7 +99,7 @@ export default function useDimensionHandler(
 	};
 
 	/**
-	 * Update the height and width simultanously on change.
+	 * Update the height and width simultaneously on change.
 	 *
 	 * @param {number} nextHeight next height.
 	 * @param {number} nextWidth  next width.

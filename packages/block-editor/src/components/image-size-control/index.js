@@ -13,13 +13,14 @@ import {
 	TextControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { unlock, lock } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import useDimensionHandler from './use-dimension-handler';
+import { getImageRatio } from './utils';
 
 const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
 const noop = () => {};
@@ -50,6 +51,20 @@ export default function ImageSizeControl( {
 			onChange,
 			lockAspectRatio
 		);
+
+	/**
+	 * Handle updating the aspect lock state on load.
+	 */
+	useEffect( () => {
+		const ratio = getImageRatio( currentHeight, currentWidth );
+		const defaultRatio = getImageRatio( imageHeight, imageWidth );
+
+		// If our incoming ratio doesn't match the saved ratio.
+		// Set assume unlock force-aspect ratio.
+		if ( ratio !== defaultRatio ) {
+			setToggleAspectRatio( false );
+		}
+	}, [ currentHeight, currentWidth, imageHeight, imageWidth ] );
 
 	return (
 		<>
