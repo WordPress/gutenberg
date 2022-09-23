@@ -157,13 +157,13 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'class' => $css_classes . ' wp-block-navigation-item' . ( $has_submenu ? ' has-child' : '' ) .
+			'class'               => $css_classes . ' wp-block-navigation-item' . ( $has_submenu ? ' has-child' : '' ) .
 			( $open_on_click ? ' open-on-click' : '' ) . ( $open_on_hover_and_click ? ' open-on-hover-click' : '' ) .
 			( $is_active ? ' current-menu-item' : '' ),
-			'style' => $style_attribute,
-			'x-data' => '{open: false}',
-			'x-on:click.outside' => 'open = false',
-			'x-on:keydown.escape' => 'open = false'
+			'style'               => $style_attribute,
+			'x-data'              => '{open: false}',
+			'x-on:click.outside'  => 'open = false',
+			'x-on:keydown.escape' => 'open = false',
 		)
 	);
 
