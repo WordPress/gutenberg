@@ -166,7 +166,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_finding_any_existing_tag() {
+	public function test_next_tag_with_no_arguments_should_find_the_next_existing_tag() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$this->assertTrue( $w->next_tag(), 'Querying an existing tag did not return true' );
 	}
