@@ -99,14 +99,6 @@ class WP_HTML_Tag_Processor {
 	private $updated_bytes = 0;
 
 	/**
-	 * Whether the parsing is already finished.
-	 *
-	 * @since 6.1.0
-	 * @var bool
-	 */
-	private $closed = false;
-
-	/**
 	 * The name of the currently matched tag.
 	 *
 	 * @since 6.1.0
@@ -1040,17 +1032,6 @@ class WP_HTML_Tag_Processor {
 			$this->attributes[ $name ]->end,
 			''
 		);
-	}
-
-	/**
-	 * Return true when the HTML Tag Processor is closed for further lookups and modifications.
-	 *
-	 * @since 6.1.0
-	 *
-	 * @return boolean True if the HTML Tag Processor is closed, false otherwise.
-	 */
-	public function is_closed() {
-		return $this->closed;
 	}
 
 	/**
