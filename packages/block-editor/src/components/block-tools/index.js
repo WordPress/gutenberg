@@ -18,6 +18,7 @@ import SelectedBlockPopover from './selected-block-popover';
 import { store as blockEditorStore } from '../../store';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
+import ZoomOutModeInserters from './zoom-out-mode-inserters';
 
 function selector( select ) {
 	const { __unstableGetEditorMode, getSettings, isTyping } =
@@ -145,6 +146,11 @@ export default function BlockTools( {
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>
+				{ isZoomOutMode && (
+					<ZoomOutModeInserters
+						__unstableContentRef={ __unstableContentRef }
+					/>
+				) }
 			</InsertionPointOpenRef.Provider>
 		</div>
 	);

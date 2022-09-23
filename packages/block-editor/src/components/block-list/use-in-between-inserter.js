@@ -14,7 +14,9 @@ import { InsertionPointOpenRef } from '../block-tools/insertion-point';
 export function useInBetweenInserter() {
 	const openRef = useContext( InsertionPointOpenRef );
 	const isInBetweenInserterDisabled = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().hasReducedUI,
+		( select ) =>
+			select( blockEditorStore ).getSettings().hasReducedUI ||
+			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
 		[]
 	);
 	const {
