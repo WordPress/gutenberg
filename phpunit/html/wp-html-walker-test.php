@@ -158,7 +158,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_to_string_with_no_updates_returns_the_original_html() {
+	public function test_tostring_with_no_updates_returns_the_original_html() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$this->assertSame( self::HTML_SIMPLE, (string) $w );
 	}
