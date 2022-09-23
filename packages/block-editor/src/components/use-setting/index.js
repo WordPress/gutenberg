@@ -11,6 +11,7 @@ import {
 	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
 	hasBlockSupport,
 } from '@wordpress/blocks';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -130,31 +131,41 @@ export default function useSetting( path ) {
 				),
 			];
 
-			for ( const candidateClientId of candidates ) {
-				const candidateBlockName =
-					select( blockEditorStore ).getBlockName(
-						candidateClientId
-					);
-				if (
-					hasBlockSupport(
-						candidateBlockName,
-						'__experimentalSettings',
-						false
-					)
-				) {
-					const candidateAtts =
-						select( blockEditorStore ).getBlockAttributes(
+			result = applyFilters(
+				'blockEditor.useSetting.before',
+				result,
+				blockName,
+				normalizedPath,
+				candidates
+			);
+
+			if ( result != undefined ) {
+				for ( const candidateClientId of candidates ) {
+					const candidateBlockName =
+						select( blockEditorStore ).getBlockName(
 							candidateClientId
 						);
-					result =
-						get(
-							candidateAtts,
-							`settings.blocks.${ blockName }.${ normalizedPath }`
-						) ??
-						get( candidateAtts, `settings.${ normalizedPath }` );
-					if ( result !== undefined ) {
-						// Stop the search for more distant ancestors and move on.
-						break;
+					if (
+						hasBlockSupport(
+							candidateBlockName,
+							'__experimentalSettings',
+							false
+						)
+					) {
+						const candidateAtts =
+							select( blockEditorStore ).getBlockAttributes(
+								candidateClientId
+							);
+						result =
+							get(
+								candidateAtts,
+								`settings.blocks.${ blockName }.${ normalizedPath }`
+							) ??
+							get( candidateAtts, `settings.${ normalizedPath }` );
+						if ( result !== undefined ) {
+							// Stop the search for more distant ancestors and move on.
+							break;
+						}
 					}
 				}
 			}
