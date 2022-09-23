@@ -68,11 +68,15 @@ function Palette( { name } ) {
 						}
 					>
 						<ZStack isLayered={ false } offset={ -8 }>
-							{ colors.slice( 0, 5 ).map( ( { color, slug } ) => (
-								<ColorIndicatorWrapper key={ slug }>
-									<ColorIndicator colorValue={ color } />
-								</ColorIndicatorWrapper>
-							) ) }
+							{ colors
+								.slice( 0, 5 )
+								.map( ( { color }, index ) => (
+									<ColorIndicatorWrapper
+										key={ `${ color }-${ index }` }
+									>
+										<ColorIndicator colorValue={ color } />
+									</ColorIndicatorWrapper>
+								) ) }
 						</ZStack>
 						<FlexItem>{ paletteButtonText }</FlexItem>
 					</HStack>
