@@ -3,13 +3,32 @@
  */
 import { useEffect, useState } from '@wordpress/element';
 
+/**
+ * Hook to return dimensions of an element.
+ *
+ * @param {number}   customHeight    new height.
+ * @param {number}   customWidth     new width.
+ * @param {number}   defaultHeight   original height.
+ * @param {number}   defaultWidth    original width.
+ * @param {Function} onChange        callback function.
+ * @param {boolean}  lockAspectRatio whether or not to retain proportions. default false (legacy).
+ *
+ * @return {Object} previous height and width and updated height and width.
+ */
 export default function useDimensionHandler(
 	customHeight,
 	customWidth,
 	defaultHeight,
 	defaultWidth,
-	onChange
+	onChange,
+	lockAspectRatio = false
 ) {
+	// Define the image's aspect ratio.
+	const isVertical = defaultHeight > defaultWidth;
+	const ratio = isVertical
+		? defaultHeight / defaultWidth
+		: defaultWidth / defaultHeight;
+
 	const [ currentWidth, setCurrentWidth ] = useState(
 		customWidth ?? defaultWidth ?? ''
 	);
@@ -46,10 +65,32 @@ export default function useDimensionHandler(
 		}
 	}, [ customWidth, customHeight ] );
 
-	const updateDimension = ( dimension, value ) => {
-		if ( dimension === 'width' ) {
+	const getValueTest = ( value, multiply = true ) =>
+		multiply ? value * ratio : value / ratio;
+
+	/**
+	 * Update single value dimension on change.
+	 * If lockAspectRatio is true, set height and width simultaneously.
+	 *
+	 * @param {string}  dimension height or width.
+	 * @param {number}  value     new value.
+	 * @param {boolean} lock      force-lock proportions.
+	 */
+	const updateDimension = ( dimension, value, lock = false ) => {
+		// If we're supporting aspect ratio locking, update the height and width simultaneously.
+		if ( lockAspectRatio || lock ) {
+			const nextHeight =
+				dimension === 'height'
+					? value
+					: getValueTest( value, isVertical );
+			const nextWidth =
+				dimension === 'width'
+					? value
+					: getValueTest( value, ! isVertical );
+			updateDimensions( nextHeight, nextWidth );
+		} else if ( dimension === 'width' ) {
 			setCurrentWidth( value );
-		} else {
+		} else if ( dimension === 'height' ) {
 			setCurrentHeight( value );
 		}
 		onChange( {

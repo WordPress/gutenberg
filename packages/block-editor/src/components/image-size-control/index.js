@@ -14,6 +14,7 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,8 +36,17 @@ export default function ImageSizeControl( {
 	onChange,
 	onChangeImage = noop,
 } ) {
+	const [ dimension, setDimension ] = useState( 'height' );
+	const [ lockAspectRatio, setLockAspectRatio ] = useState( true );
 	const { currentHeight, currentWidth, updateDimension, updateDimensions } =
-		useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
+		useDimensionHandler(
+			height,
+			width,
+			imageHeight,
+			imageWidth,
+			onChange,
+			lockAspectRatio
+		);
 
 	return (
 		<>
@@ -61,9 +71,10 @@ export default function ImageSizeControl( {
 							label={ __( 'Width' ) }
 							value={ currentWidth }
 							min={ 1 }
-							onChange={ ( value ) =>
-								updateDimension( 'width', value )
-							}
+							onChange={ ( value ) => {
+								setDimension( 'width' );
+								updateDimension( 'width', value );
+							} }
 						/>
 						<TextControl
 							type="number"
@@ -71,13 +82,28 @@ export default function ImageSizeControl( {
 							label={ __( 'Height' ) }
 							value={ currentHeight }
 							min={ 1 }
-							onChange={ ( value ) =>
-								updateDimension( 'height', value )
-							}
+							onChange={ ( value ) => {
+								setDimension( 'height' );
+								updateDimension( 'height', value );
+							} }
 						/>
 						<ToggleControl
+							checked={ lockAspectRatio }
 							className="block-editor-image-size-control__proportions_toggle"
-							label={ __( 'Constrain Proportions' ) }
+							label={ __( 'Retain Image Proportions' ) }
+							onChange={ () => {
+								const next = ! lockAspectRatio;
+								setLockAspectRatio( next );
+								if ( next ) {
+									updateDimension(
+										dimension,
+										'height' === dimension
+											? currentHeight
+											: currentWidth,
+										true
+									);
+								}
+							} }
 						/>
 					</div>
 					<div className="block-editor-image-size-control__row">
