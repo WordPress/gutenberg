@@ -20,6 +20,8 @@ require_once __DIR__ . '/../../lib/experimental/html/index.php';
 
 /**
  * @group html
+ *
+ * @coversDefaultClass WP_HTML_Walker
  */
 class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	const HTML_SIMPLE       = '<div id="first"><span id="second">Text</span></div>';
