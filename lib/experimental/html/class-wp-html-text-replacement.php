@@ -1,6 +1,6 @@
 <?php
 /**
- * HTML Walker: Text replacement class.
+ * HTML Tag Processor: Text replacement class.
  *
  * @package WordPress
  * @subpackage HTML
@@ -12,7 +12,7 @@
  *
  * @since 6.1.0
  *
- * @see WP_HTML_Walker
+ * @see WP_HTML_Tag_Processor
  */
 class WP_HTML_Text_Replacement {
 	/**

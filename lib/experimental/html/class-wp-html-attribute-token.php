@@ -1,6 +1,6 @@
 <?php
 /**
- * HTML Walker: Attribute token structure class.
+ * HTML Tag Processor: Attribute token structure class.
  *
  * @package WordPress
  * @subpackage HTML
@@ -12,7 +12,7 @@
  *
  * @since 6.1.0
  *
- * @see WP_HTML_Walker
+ * @see WP_HTML_Tag_Processor
  */
 class WP_HTML_Attribute_Token {
 	/**

@@ -31,7 +31,7 @@
  *
  * @since 6.1.0
  */
-class WP_HTML_Walker {
+class WP_HTML_Tag_Processor {
 
 	/**
 	 * The HTML document to parse.
@@ -50,7 +50,7 @@ class WP_HTML_Walker {
 	private $last_query;
 
 	/**
-	 * The tag name this walker currently scans for.
+	 * The tag name this processor currently scans for.
 	 *
 	 * @since 6.1.0
 	 * @var string|null
@@ -58,7 +58,7 @@ class WP_HTML_Walker {
 	private $sought_tag_name;
 
 	/**
-	 * The CSS class name this walker currently scans for.
+	 * The CSS class name this processor currently scans for.
 	 *
 	 * @since 6.1.0
 	 * @var string|null
@@ -66,7 +66,7 @@ class WP_HTML_Walker {
 	private $sought_class_name;
 
 	/**
-	 * The match offset this walker currently scans for.
+	 * The match offset this processor currently scans for.
 	 *
 	 * @since 6.1.0
 	 * @var int|null
@@ -749,7 +749,7 @@ class WP_HTML_Walker {
 		 * It's possible that we are intending to remove certain classes and
 		 * add others in such a way that we don't modify the existing value
 		 * because calls to `add_class()` and `remove_class()` occur
-		 * independent of the input values sent to the walker. That is, we
+		 * independent of the input values sent to the WP_HTML_Tag_Processor. That is, we
 		 * might call `remove_class()` for a class that isn't already present
 		 * and we might call `add_class()` for one that is, in which case we
 		 * wouldn't need to break apart the string and rebuild it.
@@ -876,7 +876,7 @@ class WP_HTML_Walker {
 	 *
 	 * Example:
 	 * <code>
-	 *     $w = new WP_HTML_Walker( '<div enabled class="test" data-test-id="14">Test</div>' );
+	 *     $w = new WP_HTML_Tag_Processor( '<div enabled class="test" data-test-id="14">Test</div>' );
 	 *     $w->next_tag( [ 'class_name' => 'test' ] ) === true;
 	 *     $w->get_attribute( 'data-test-id' ) === '14';
 	 *     $w->get_attribute( 'enabled' ) === true;
@@ -916,7 +916,7 @@ class WP_HTML_Walker {
 	 *
 	 * Example:
 	 * <code>
-	 *     $w = new WP_HTML_Walker( '<DIV CLASS="test">Test</DIV>' );
+	 *     $w = new WP_HTML_Tag_Processor( '<DIV CLASS="test">Test</DIV>' );
 	 *     $w->next_tag( [] ) === true;
 	 *     $w->get_tag() === 'DIV';
 	 *
@@ -1043,11 +1043,11 @@ class WP_HTML_Walker {
 	}
 
 	/**
-	 * Return true when the HTML Walker is closed for further lookups and modifications.
+	 * Return true when the HTML Tag Processor is closed for further lookups and modifications.
 	 *
 	 * @since 6.1.0
 	 *
-	 * @return boolean True if the HTML Walker is closed, false otherwise.
+	 * @return boolean True if the HTML Tag Processor is closed, false otherwise.
 	 */
 	public function is_closed() {
 		return $this->closed;
@@ -1080,8 +1080,8 @@ class WP_HTML_Walker {
 	}
 
 	/**
-	 * Returns the string representation of the HTML Walker.
-	 * It closes the HTML Walker and prevents further lookups and modifications.
+	 * Returns the string representation of the HTML Tag Processor.
+	 * It closes the HTML Tag Processor and prevents further lookups and modifications.
 	 *
 	 * @since 6.1.0
 	 *
@@ -1099,7 +1099,7 @@ class WP_HTML_Walker {
 		 * In practice, it means:
 		 * 1. Applying the attributes updates to the original HTML
 		 * 2. Replacing the original HTML with the updated HTML
-		 * 3. Pointing this walker to the current tag name's end in that updated HTML
+		 * 3. Pointing this tag processor to the current tag name's end in that updated HTML
 		 */
 
 		// Find tag name's end in the updated markup.
@@ -1117,7 +1117,7 @@ class WP_HTML_Walker {
 		// Replace $this->html with the updated markup.
 		$this->html = $this->updated_html . substr( $this->html, $this->updated_bytes );
 
-		// Rewind the walker to the tag name's end.
+		// Rewind this processor to the tag name's end.
 		$this->tag_name_starts_at = $updated_tag_name_starts_at;
 		$this->tag_name_ends_at   = $updated_tag_name_ends_at;
 		$this->parsed_bytes       = $this->tag_name_ends_at;
