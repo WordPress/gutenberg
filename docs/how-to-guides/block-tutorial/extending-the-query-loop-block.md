@@ -91,6 +91,28 @@ In this way, your block will show up just like any other block while the user is
 
 At this point, your custom variation will be virtually indistinguishable from a stand-alone block. Completely branded to your plugin, easy to discover and directly available to the user as a drop in.
 
+### Customize your variation layout
+
+Please note that the Query Loop block supports `'block'` as a string in the `scope` property. In theory, that's to allow the variation to be picked up after inserting the block itself. Read more about the Block Variation Picker [here](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-variation-picker/README.md).
+
+However, it is unadvisable to use this currently, this is due to the Query Loop setup with patterns and `scope: [ 'block' ]` variations, all of the selected pattern's attributes will be used except for `postType` and `inherit` query properties, which will likely lead to conflicts and non-functional variations.
+
+To circumvent this, there two routes, the first one is to add your default `innerBlocks`, like so:
+
+```js
+innerBlocks: [
+	[
+		'core/post-template',
+		{},
+		[ [ 'core/post-title' ], [ 'core/post-excerpt' ] ],
+	],
+	[ 'core/query-pagination' ],
+	[ 'core/query-no-results' ],
+],
+```
+
+The other would be to register patterns specific to your variation, we can cover that in another guide.
+
 ### Making Gutenberg recognize your variation
 
 There is one slight problem you might have realized after implementing this variation: while it is transparent to the user as they are inserting it, Gutenberg will still recognize the variation as a Query Loop block at its core and so, after its insertion, it will show up as a Query Loop block in the tree view of the editor, for instance.
@@ -111,7 +133,7 @@ We need a way to tell the editor that this block is indeed your specific variati
 
 You might have been tempted to only compare the `postType`: in this way, Gutenberg will recognize the block as your variation any time the `postType` matches `book`! That's awesome, but the problem is that now Gutenberg will recognize the block as your specific variation any time the `postType` is set to `book`, which is not what we want: other plugins might want to publish variations based on the `book` post type, or we might just not want the variation to be recognized every time the user sets the type to `book` manually through the editor settings.
 
-That's why the Query Loop block exposes a special attribute called `namespace`: it really doesn't do anything inside the block implementation, and it's used as an easy way for extenders to recognize and scope their own variation. So you would use it like so:
+That's why the Query Loop block exposes a special attribute called `namespace`: it really doesn't do anything inside the block implementation, and it's used as an easy way for extenders to recognize and scope their own variation. In addition, `isActive` also accepts just an array of strings with the attributes to compare. Often, `namespace` would be sufficient, so you would use it like so:
 
 ```js
 {
@@ -120,7 +142,7 @@ That's why the Query Loop block exposes a special attribute called `namespace`: 
 		/** ...variation attributes */
 		namespace: 'my-plugin/books-list',
 	},
-	isActive: [ 'postType', 'namespace' ],
+	isActive: [ 'namespace' ],
 }
 ```
 
