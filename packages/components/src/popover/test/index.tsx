@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { act, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import type { CSSProperties } from 'react';
 
 /**
  * WordPress dependencies
@@ -11,69 +12,83 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Popover from '../';
-
 import { positionToPlacement, placementToMotionAnimationProps } from '../utils';
+import Popover from '..';
+import type { PopoverProps } from '../types';
+
+type PositionToPlacementTuple = [
+	NonNullable< PopoverProps[ 'position' ] >,
+	NonNullable< PopoverProps[ 'placement' ] >
+];
+type PlacementToAnimationOriginTuple = [
+	NonNullable< PopoverProps[ 'placement' ] >,
+	number,
+	number
+];
+type PlacementToInitialTranslationTuple = [
+	NonNullable< PopoverProps[ 'placement' ] >,
+	'translateY' | 'translateX',
+	CSSProperties[ 'translate' ]
+];
 
 describe( 'Popover', () => {
 	describe( 'Component', () => {
-		afterEach( () => {
-			if ( document.activeElement ) {
-				document.activeElement.blur();
-			}
-		} );
+		describe( 'basic behavior', () => {
+			it( 'should render content', () => {
+				render( <Popover>Hello</Popover> );
 
-		it( 'should allow focus-on-open behavior to be disabled', () => {
-			expect( document.activeElement ).toBe( document.body );
-
-			act( () => {
-				render( <Popover focusOnMount={ false } /> );
-
-				jest.advanceTimersByTime( 1 );
+				expect( screen.getByText( 'Hello' ) ).toBeInTheDocument();
 			} );
 
-			expect( document.activeElement ).toBe( document.body );
-		} );
+			it( 'should forward additional props to portaled element', () => {
+				render( <Popover role="tooltip">Hello</Popover> );
 
-		it( 'should render content', () => {
-			let result;
-			act( () => {
-				result = render( <Popover>Hello</Popover> );
+				expect( screen.getByRole( 'tooltip' ) ).toBeInTheDocument();
 			} );
-
-			expect(
-				result.container.querySelector( 'span' )
-			).toMatchSnapshot();
 		} );
 
-		it( 'should pass additional props to portaled element', () => {
-			let result;
-			act( () => {
-				result = render( <Popover role="tooltip">Hello</Popover> );
-			} );
+		describe( 'anchor', () => {
+			it( 'should render correctly when anchor is provided', () => {
+				const PopoverWithAnchor = ( args: PopoverProps ) => {
+					// Use internal state instead of a ref to make sure that the component
+					// re-renders when the popover's anchor updates.
+					const [ anchor, setAnchor ] =
+						useState< HTMLParagraphElement | null >( null );
 
-			expect(
-				result.container.querySelector( 'span' )
-			).toMatchSnapshot();
-		} );
+					return (
+						<div>
+							<p ref={ setAnchor }>Anchor</p>
+							<Popover { ...args } anchor={ anchor } />
+						</div>
+					);
+				};
 
-		it( 'should render correctly when anchor is provided', () => {
-			const PopoverWithAnchor = ( args ) => {
-				// Use internal state instead of a ref to make sure that the component
-				// re-renders when the popover's anchor updates.
-				const [ anchor, setAnchor ] = useState( null );
-
-				return (
-					<div>
-						<p ref={ setAnchor }>Anchor</p>
-						<Popover { ...args } anchor={ anchor } />
-					</div>
+				render(
+					<PopoverWithAnchor>Popover content</PopoverWithAnchor>
 				);
-			};
 
-			render( <PopoverWithAnchor>Popover content</PopoverWithAnchor> );
+				expect(
+					screen.getByText( 'Popover content' )
+				).toBeInTheDocument();
+			} );
+		} );
 
-			expect( screen.getByText( 'Popover content' ) ).toBeInTheDocument();
+		describe( 'focus behavior', () => {
+			it( 'should focus the popover by default when opened', () => {
+				render( <Popover>Popover content</Popover> );
+
+				expect(
+					screen.getByText( 'Popover content' ).parentElement
+				).toHaveFocus();
+			} );
+
+			it( 'should allow focus-on-open behavior to be disabled', () => {
+				render(
+					<Popover focusOnMount={ false }>Popover content</Popover>
+				);
+
+				expect( document.body ).toHaveFocus();
+			} );
 		} );
 	} );
 
@@ -88,11 +103,14 @@ describe( 'Popover', () => {
 			[ 'bottom left', 'bottom-end' ],
 			[ 'bottom center', 'bottom' ],
 			[ 'bottom right', 'bottom-start' ],
-		] )( 'converts `%s` to `%s`', ( inputPosition, expectedPlacement ) => {
-			expect( positionToPlacement( inputPosition ) ).toEqual(
-				expectedPlacement
-			);
-		} );
+		] as PositionToPlacementTuple[] )(
+			'converts `%s` to `%s`',
+			( inputPosition, expectedPlacement ) => {
+				expect( positionToPlacement( inputPosition ) ).toEqual(
+					expectedPlacement
+				);
+			}
+		);
 	} );
 
 	describe( 'placementToMotionAnimationProps', () => {
@@ -110,7 +128,7 @@ describe( 'Popover', () => {
 				[ 'left', 1, 0.5 ],
 				[ 'left-start', 1, 0 ],
 				[ 'left-end', 1, 1 ],
-			] )(
+			] as PlacementToAnimationOriginTuple[] )(
 				'for the `%s` placement computes an animation origin of (%d, %d)',
 				( inputPlacement, expectedOriginX, expectedOriginY ) => {
 					expect(
@@ -140,7 +158,7 @@ describe( 'Popover', () => {
 				[ 'left', 'translateX', '2em' ],
 				[ 'left-start', 'translateX', '2em' ],
 				[ 'left-end', 'translateX', '2em' ],
-			] )(
+			] as PlacementToInitialTranslationTuple[] )(
 				'for the `%s` placement computes an initial `%s` of `%s',
 				(
 					inputPlacement,
