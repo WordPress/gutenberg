@@ -188,4 +188,5 @@ function gutenberg_enqueue_classic_theme_styles() {
 		wp_enqueue_style( 'classic-theme-styles' );
 	}
 }
-add_action( 'after_setup_theme', 'gutenberg_enqueue_classic_theme_styles' );
+add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_classic_theme_styles' );
+add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_classic_theme_styles' );
