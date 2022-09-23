@@ -59,16 +59,16 @@ Here is a _very_ simplified version of how [color block supports](https://github
 
 ```php
 function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
-    // Get the color styles from the style object.
+	// Get the color styles from the style object.
 	$block_color_styles = isset( $block_attributes['style']['color'] ) ? $block_attributes['style']['color'] : null;
 
 	// Since we only want the color styles, pass the color styles only to the Style Engine.
 	$styles = wp_style_engine_get_styles( array( 'color' => $block_color_styles ) );
 
-    // Return the generated styles to be applied to the block's HTML element.
+	// Return the generated styles to be applied to the block's HTML element.
 	return array(
-	    'style' => $styles['css'],
-	    'class' => $styles['classnames']
+		'style' => $styles['css'],
+		'class' => $styles['classnames']
 	);
 }
 
@@ -112,37 +112,37 @@ We can now update the apply callback code above so that we'll only return "style
 
 ```php
 function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
-    // The return value.
-    $attributes = array();
+	// The return value.
+	$attributes = array();
     
-    // Return early if the block skips all serialization for block supports.
+	/ Return early if the block skips all serialization for block supports.
 	if ( gutenberg_should_skip_block_supports_serialization( $block_type, 'color' ) ) {
 		return $attributes;
 	}
 
-    // Checks for support and skip serialization.
-    $has_text_support                        = block_has_support( $block_type, array( 'color', 'text' ), false ); 
-    $has_background_support                  = block_has_support( $block_type, array( 'color', 'background' ), false );
-    $skips_serialization_of_color_text       = wp_should_skip_block_supports_serialization( $block_type, 'color', 'text' ); 
-    $skips_serialization_of_color_background = wp_should_skip_block_supports_serialization( $block_type, 'color', 'background' ); 
+	// Checks for support and skip serialization.
+	$has_text_support                        = block_has_support( $block_type, array( 'color', 'text' ), false ); 
+	$has_background_support                  = block_has_support( $block_type, array( 'color', 'background' ), false );
+	$skips_serialization_of_color_text       = wp_should_skip_block_supports_serialization( $block_type, 'color', 'text' ); 
+	$skips_serialization_of_color_background = wp_should_skip_block_supports_serialization( $block_type, 'color', 'background' ); 
     
-    // Get the color styles from the style object.
+	// Get the color styles from the style object.
 	$block_color_styles = isset( $block_attributes['style']['color'] ) ? $block_attributes['style']['color'] : null;
 
 	// The mutated styles object we're going to pass to wp_style_engine_get_styles().
 	$color_block_styles = array();
 
-    // Set the color style values according to whether the block has support and does not skip serialization.
+	// Set the color style values according to whether the block has support and does not skip serialization.
 	$spacing_block_styles['text']       = $has_text_support && ! $skips_serialization_of_color_text ? _wp_array_get( $block_color_styles, array( 'text' ), null ) : null;
 	$spacing_block_styles['background'] = $has_background_support && ! $skips_serialization_of_color_background ? _wp_array_get( $block_color_styles, array( 'background' ), null ) : null;
-	
+
 	// Pass the color styles, excluding those that have no support or skip serialization, to the Style Engine.
 	$styles = wp_style_engine_get_styles( array( 'color' => $block_color_styles ) );
 
-    // Return the generated styles to be applied to the block's HTML element.
+	// Return the generated styles to be applied to the block's HTML element.
 	return array(
-	    'style' => $styles['css'],
-	    'class' => $styles['classnames']
+		'style' => $styles['css'],
+		'class' => $styles['classnames']
 	);
 }
 ```
@@ -170,8 +170,8 @@ $preset_font_size        = "var:preset|font-size|{$block_attributes['fontSize']}
 $preset_background_color = "var:preset|color|{$block_attributes['backgroundColor']}";
 
 $block_styles =  array(
-     'typography' => array( 'fontSize' => $preset_font_size ),
-     'color'      => array( 'background' => $preset_background_color )
+	'typography' => array( 'fontSize' => $preset_font_size ),
+	'color'      => array( 'background' => $preset_background_color )
 );
 
 $styles = wp_style_engine_get_styles(
@@ -191,12 +191,12 @@ If you don't want the Style Engine to output the CSS custom vars as well, which 
 
 ```php
 $options = array(
-    // Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
-    'convert_vars_to_classnames' => 'true',
+	// Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
+	'convert_vars_to_classnames' => 'true',
 );
 $styles = wp_style_engine_get_styles(
-    $block_styles,
-    $options
+	$block_styles,
+	$options
 );
 print_r( $styles );
 
