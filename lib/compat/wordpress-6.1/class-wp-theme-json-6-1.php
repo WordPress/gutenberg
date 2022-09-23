@@ -687,11 +687,11 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$root_selector    = static::ROOT_BLOCK_SELECTOR;
 			$columns_selector = '.wp-block-columns';
 			if ( ! empty( $options['scope'] ) ) {
-				$root_selector = $options['root_selector'];
-			}
-			if ( ! empty( $options['scope'] ) ) {
 				$root_selector    = static::scope_selector( $options['scope'], $root_selector );
 				$columns_selector = static::scope_selector( $options['scope'], $columns_selector );
+			}
+			if ( ! empty( $options['root_selector'] ) ) {
+				$root_selector = $options['root_selector'];
 			}
 			// Base layout styles are provided as part of `styles`, so only output separately if explicitly requested.
 			// For backwards compatibility, the Columns block is explicitly included, to support a different default gap value.
@@ -1574,17 +1574,12 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			foreach ( $selectors as $inner ) {
 				$outer = trim( $outer );
 				$inner = trim( $inner );
-				if ( empty( $outer ) ) {
-					if ( empty( $inner ) ) {
-						continue;
-					}
+				if ( ! empty( $outer ) && ! empty( $inner ) ) {
+					$selectors_scoped[] = $outer . ' ' . $inner;
+				} elseif ( empty( $outer ) ) {
 					$selectors_scoped[] = $inner;
-				} else {
-					if ( empty( $inner ) ) {
-						$selectors_scoped[] = $outer;
-					} else {
-						$selectors_scoped[] = $outer . ' ' . $inner;
-					}
+				} elseif ( empty( $inner ) ) {
+					$selectors_scoped[] = $outer;
 				}
 			}
 		}

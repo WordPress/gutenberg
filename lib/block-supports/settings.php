@@ -96,7 +96,7 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 	// the root selector for preset variables needs to target every possible block selector
 	// in order for the general setting to override any bock specific setting of a parent block or
 	// the site root.
-	$variables_root_selector = ',[class*="wp-block"]';
+	$variables_root_selector = '*,[class*="wp-block"]';
 	$registry                = WP_Block_Type_Registry::get_instance();
 	$blocks                  = $registry->get_all_registered();
 	foreach ( $blocks as $block_type ) {
@@ -107,7 +107,7 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 			$variables_root_selector .= ',' . $block_type->supports['__experimentalSelector'];
 		}
 	}
-	$variables_root_selector = WP_Theme_JSON_6_1::scope_selector( $variables_root_selector, $class_name );
+	$variables_root_selector = WP_Theme_JSON_6_1::scope_selector( $class_name, $variables_root_selector );
 
 	// Remove any potentially unsafe styles.
 	$theme_json_shape  = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
@@ -125,7 +125,7 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 		array( 'variables' ),
 		null,
 		array(
-			'root_selector' => $variables_root_selector . ',' . $class_name . ' *',
+			'root_selector' => $variables_root_selector,
 			'scope'         => $class_name,
 		)
 	);
