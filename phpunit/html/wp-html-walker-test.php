@@ -30,6 +30,8 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers get_tag
 	 */
 	public function test_get_tag_returns_null_before_finding_tags() {
 		$w = new WP_HTML_Walker( '<div>Test</div>' );
@@ -38,6 +40,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers get_tag
 	 */
 	public function test_get_tag_returns_null_when_not_in_open_tag() {
 		$w = new WP_HTML_Walker( '<div>Test</div>' );
@@ -47,6 +52,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers get_tag
 	 */
 	public function test_get_tag_returns_open_tag_name() {
 		$w = new WP_HTML_Walker( '<div>Test</div>' );
@@ -56,6 +64,8 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers get_attribute
 	 */
 	public function test_get_attribute_returns_null_before_finding_tags() {
 		$w = new WP_HTML_Walker( '<div class="test">Test</div>' );
@@ -64,6 +74,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers get_attribute
 	 */
 	public function test_get_attribute_returns_null_when_not_in_open_tag() {
 		$w = new WP_HTML_Walker( '<div class="test">Test</div>' );
@@ -73,6 +86,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers get_attribute
 	 */
 	public function test_get_attribute_returns_null_when_attribute_missing() {
 		$w = new WP_HTML_Walker( '<div class="test">Test</div>' );
@@ -82,6 +98,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers get_attribute
 	 */
 	public function test_get_attribute_returns_attribute_value() {
 		$w = new WP_HTML_Walker( '<div class="test">Test</div>' );
@@ -91,6 +110,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers get_attribute
 	 */
 	public function test_get_attribute_returns_true_for_boolean_attribute() {
 		$w = new WP_HTML_Walker( '<div enabled class="test">Test</div>' );
@@ -100,6 +122,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers get_attribute
 	 */
 	public function test_get_attribute_returns_string_for_truthy_attributes() {
 		$w = new WP_HTML_Walker( '<div enabled=enabled checked=1 hidden="true" class="test">Test</div>' );
@@ -111,6 +136,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers get_attribute
 	 */
 	public function test_attributes_parser_treats_slash_as_attribute_separator() {
 		$w = new WP_HTML_Walker( '<div a/b/c/d/e="test">Test</div>' );
@@ -124,6 +152,8 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers __toString
 	 */
 	public function test_tostring_applies_the_updates_so_far_and_keeps_the_walker_on_the_current_tag() {
 		$w = new WP_HTML_Walker( '<hr id="remove" /><div enabled class="test">Test</div><span id="span-id"></span>' );
@@ -159,6 +189,8 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers __toString
 	 */
 	public function test_tostring_without_updating_any_attributes_returns_the_original_html() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -167,6 +199,8 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers next_tag
 	 */
 	public function test_next_tag_with_no_arguments_should_find_the_next_existing_tag() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -175,6 +209,8 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers next_tag
 	 */
 	public function test_next_tag_should_return_false_for_a_non_existing_tag() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -183,6 +219,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers __toString
 	 */
 	public function test_set_attribute_on_a_non_existing_tag_does_not_change_the_markup() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -198,6 +237,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers set_attribute
+	 * @covers __toString
 	 */
 	public function test_set_attribute_with_a_non_existing_attribute_adds_a_new_attribute_to_the_markup() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -211,6 +253,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	 * The other ones are ignored.
 	 *
 	 * @ticket 56299
+	 *
+	 * @covers set_attribute
+	 * @covers __toString
 	 */
 	public function test_update_first_when_duplicated_attribute() {
 		$w = new WP_HTML_Walker( '<div id="update-me" id="ignored-id"><span id="second">Text</span></div>' );
@@ -221,6 +266,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers set_attribute
+	 * @covers __toString
 	 */
 	public function test_set_attribute_with_an_existing_attribute_name_updates_its_value_in_the_markup() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -231,6 +279,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers set_attribute
+	 * @covers __toString
 	 */
 	public function test_next_tag_and_set_attribute_in_a_loop_update_all_tags_in_the_markup() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -252,6 +303,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	 * This test is in place to confirm this behavior, while incorrect, is well-defined.
 	 *
 	 * @ticket 56299
+	 *
+	 * @covers remove_attribute
+	 * @covers __toString
 	 */
 	public function test_remove_first_when_duplicated_attribute() {
 		$w = new WP_HTML_Walker( '<div id="update-me" id="ignored-id"><span id="second">Text</span></div>' );
@@ -262,6 +316,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers remove_attribute
+	 * @covers __toString
 	 */
 	public function test_remove_attribute_with_an_existing_attribute_name_removes_it_from_the_markup() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -272,6 +329,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers remove_attribute
+	 * @covers __toString
 	 */
 	public function test_remove_attribute_with_a_non_existing_attribute_name_does_not_change_the_markup() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -282,6 +342,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers add_class
+	 * @covers __toString
 	 */
 	public function test_add_class_creates_a_class_attribute_when_there_is_none() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -292,6 +355,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers add_class
+	 * @covers __toString
 	 */
 	public function test_calling_add_class_twice_creates_a_class_attribute_with_both_class_names_when_there_is_no_class_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -303,6 +369,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers remove_class
+	 * @covers __toString
 	 */
 	public function test_remove_class_does_not_change_the_markup_when_there_is_no_class_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -313,6 +382,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers add_class
+	 * @covers __toString
 	 */
 	public function test_add_class_appends_class_names_to_the_existing_class_attribute_when_one_already_exists() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
@@ -327,6 +399,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers remove_class
+	 * @covers __toString
 	 */
 	public function test_remove_class_removes_a_single_class_from_the_class_attribute_when_one_exists() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
@@ -340,6 +415,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers remove_class
+	 * @covers __toString
 	 */
 	public function test_calling_remove_class_with_all_listed_class_names_removes_the_existing_class_attribute_from_the_markup() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
@@ -354,6 +432,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers add_class
+	 * @covers __toString
 	 */
 	public function test_add_class_does_not_add_duplicate_class_names() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
@@ -367,6 +448,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers add_class
+	 * @covers __toString
 	 */
 	public function test_add_class_preserves_class_name_order_when_a_duplicate_class_name_is_added() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
@@ -380,6 +464,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers add_class
+	 * @covers __toString
 	 */
 	public function test_add_class_when_there_is_a_class_attribute_with_excessive_whitespaces() {
 		$w = new WP_HTML_Walker(
@@ -395,6 +482,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers remove_class
+	 * @covers __toString
 	 */
 	public function test_remove_class_preserves_whitespaces_when_there_is_a_class_attribute_with_excessive_whitespaces() {
 		$w = new WP_HTML_Walker(
@@ -410,6 +500,9 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers remove_class
+	 * @covers __toString
 	 */
 	public function test_removing_all_classes_removes_the_existing_class_attribute_from_the_markup_even_when_excessive_whitespaces_are_present() {
 		$w = new WP_HTML_Walker(
@@ -431,6 +524,10 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	 * are called.
 	 *
 	 * @ticket 56299
+	 *
+	 * @covers add_class
+	 * @covers set_attribute
+	 * @covers __toString
 	 */
 	public function test_set_attribute_takes_priority_over_add_class() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
@@ -456,6 +553,12 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers set_attribute
+	 * @covers remove_attribute
+	 * @covers add_class
+	 * @covers remove_class
+	 * @covers __toString
 	 */
 	public function test_advanced_use_case() {
 		$input = <<<HTML
@@ -550,6 +653,10 @@ HTML;
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers remove_attribute
+	 * @covers set_attribute
+	 * @covers __toString
 	 */
 	public function test_correctly_parses_html_attributes_wrapped_in_single_quotation_marks() {
 		$w = new WP_HTML_Walker(
@@ -577,6 +684,9 @@ HTML;
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers set_attribute
+	 * @covers __toString
 	 */
 	public function test_set_attribute_with_value_equals_to_true_adds_a_boolean_html_attribute_with_implicit_value() {
 		$w = new WP_HTML_Walker(
@@ -592,6 +702,9 @@ HTML;
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers set_attribute
+	 * @covers __toString
 	 */
 	public function test_setting_a_boolean_attribute_to_false_removes_it_from_the_markup() {
 		$w = new WP_HTML_Walker(
@@ -607,6 +720,9 @@ HTML;
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers set_attribute
+	 * @covers __toString
 	 */
 	public function test_setting_a_missing_attribute_to_false_does_not_change_the_markup() {
 		$html_input = '<form action="/action_page.php"><input type="checkbox" name="vehicle" value="Bike"><label for="vehicle">I have a bike</label></form>';
@@ -618,6 +734,9 @@ HTML;
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers set_attribute
+	 * @covers __toString
 	 */
 	public function test_setting_a_boolean_attribute_to_a_string_value_adds_explicit_value_to_the_markup() {
 		$w = new WP_HTML_Walker(
@@ -633,6 +752,9 @@ HTML;
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers get_tag
+	 * @covers next_tag
 	 */
 	public function test_unclosed_script_tag_should_not_cause_an_infinite_loop() {
 		$w = new WP_HTML_Walker( '<script>' );
@@ -643,6 +765,9 @@ HTML;
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 *
 	 * @dataProvider data_script_state
 	 */
 	public function test_next_tag_ignores_the_contents_of_a_script_tag( $script_then_div ) {
@@ -717,6 +842,9 @@ HTML;
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 *
 	 * @dataProvider data_rcdata_state
 	 */
 	public function test_next_tag_ignores_the_contents_of_a_rcdata_tag( $rcdata_then_div, $rcdata_tag ) {
@@ -773,6 +901,10 @@ HTML;
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers set_attribute
+	 * @covers __toString
 	 */
 	public function test_can_query_and_update_wrongly_nested_tags() {
 		$w = new WP_HTML_Walker(
@@ -790,6 +922,10 @@ HTML;
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers remove_attribute
+	 * @covers __toString
 	 */
 	public function test_removing_attributes_works_even_in_malformed_html() {
 		$w = new WP_HTML_Walker( self::HTML_MALFORMED );
@@ -803,6 +939,10 @@ HTML;
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers next_Tag
+	 * @covers set_attribute
+	 * @covers __toString
 	 */
 	public function test_updating_attributes_works_even_in_malformed_html_1() {
 		$w = new WP_HTML_Walker( self::HTML_MALFORMED );
@@ -818,6 +958,12 @@ HTML;
 
 	/**
 	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers set_attribute
+	 * @covers add_class
+	 * @covers __toString
+	 *
 	 * @dataProvider data_malformed_tag
 	 */
 	public function test_updating_attributes_works_even_in_malformed_html_2( $html_input, $html_expected ) {
