@@ -110,7 +110,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_treats_slash_as_attribute_separator() {
+	public function test_attributes_parser_treats_slash_as_attribute_separator() {
 		$w = new WP_HTML_Walker( '<div a/b/c/d/e="test">Test</div>' );
 		$this->assertTrue( $w->next_tag( array() ), 'Querying an existing tag did not return true' );
 		$this->assertTrue( $w->get_attribute( 'a' ), 'Accessing an existing attribute did not return true' );
@@ -123,7 +123,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_calling_tostring_applies_the_updates_so_far_and_keeps_the_walker_on_the_current_tag() {
+	public function test_tostring_applies_the_updates_so_far_and_keeps_the_walker_on_the_current_tag() {
 		$w = new WP_HTML_Walker( '<hr id="remove" /><div enabled class="test">Test</div><span id="span-id"></span>' );
 		$w->next_tag();
 		$w->remove_attribute( 'id' );
@@ -158,7 +158,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_tostring_with_no_updates_returns_the_original_html() {
+	public function test_tostring_without_updating_any_attributes_returns_the_original_html() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$this->assertSame( self::HTML_SIMPLE, (string) $w );
 	}
@@ -182,7 +182,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_updates_ignored_after_a_non_existing_tag() {
+	public function test_set_attribute_on_a_non_existing_tag_does_not_change_the_markup() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$this->assertFalse( $w->next_tag( 'p' ), 'Querying a non-existing tag did not return false' );
 		$this->assertFalse( $w->next_tag( 'div' ), 'Querying a non-existing tag did not return false' );
@@ -197,7 +197,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_set_new_attribute() {
+	public function test_set_attribute_with_a_non_existing_attribute_adds_a_new_attribute_to_the_markup() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$w->next_tag();
 		$w->set_attribute( 'test-attribute', 'test-value' );
@@ -220,7 +220,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_set_existing_attribute() {
+	public function test_set_attribute_with_an_existing_attribute_name_updates_its_value_in_the_markup() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$w->next_tag();
 		$w->set_attribute( 'id', 'new-id' );
@@ -230,7 +230,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_update_all_tags_using_a_loop() {
+	public function test_next_tag_and_set_attribute_in_a_loop_update_all_tags_in_the_markup() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		while ( $w->next_tag() ) {
 			$w->set_attribute( 'data-foo', 'bar' );
@@ -261,7 +261,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_remove_existing_attribute() {
+	public function test_remove_attribute_with_an_existing_attribute_name_removes_it_from_the_markup() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$w->next_tag();
 		$w->remove_attribute( 'id' );
@@ -271,7 +271,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_remove_ignored_when_non_existing_attribute() {
+	public function test_remove_attribute_with_a_non_existing_attribute_name_does_not_change_the_markup() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$w->next_tag();
 		$w->remove_attribute( 'no-such-attribute' );
@@ -281,7 +281,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_add_class_when_there_is_no_class_attribute() {
+	public function test_add_class_creates_a_class_attribute_when_there_is_none() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$w->next_tag();
 		$w->add_class( 'foo-class' );
@@ -291,7 +291,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_add_two_classes_when_there_is_no_class_attribute() {
+	public function test_calling_add_class_twice_creates_a_class_attribute_with_both_class_names_when_there_is_no_class_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$w->next_tag();
 		$w->add_class( 'foo-class' );
@@ -302,7 +302,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_remove_class_when_there_is_no_class_attribute() {
+	public function test_remove_class_does_not_change_the_markup_when_there_is_no_class_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$w->next_tag();
 		$w->remove_class( 'foo-class' );
@@ -312,7 +312,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_add_class_when_there_is_a_class_attribute() {
+	public function test_add_class_appends_class_names_to_the_existing_class_attribute_when_one_already_exists() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
 		$w->next_tag();
 		$w->add_class( 'foo-class' );
@@ -326,7 +326,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_remove_class_when_there_is_a_class_attribute() {
+	public function test_remove_class_removes_a_single_class_from_the_class_attribute_when_one_exists() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
 		$w->next_tag();
 		$w->remove_class( 'main' );
@@ -339,7 +339,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_removing_all_classes_removes_the_class_attribute() {
+	public function test_calling_remove_class_with_all_listed_class_names_removes_the_existing_class_attribute_from_the_markup() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
 		$w->next_tag();
 		$w->remove_class( 'main' );
@@ -353,7 +353,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_does_not_add_duplicate_class_names() {
+	public function test_add_class_does_not_add_duplicate_class_names() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
 		$w->next_tag();
 		$w->add_class( 'with-border' );
@@ -366,7 +366,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_preserves_class_name_order_when_a_duplicate_class_name_is_added() {
+	public function test_add_class_preserves_class_name_order_when_a_duplicate_class_name_is_added() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
 		$w->next_tag();
 		$w->add_class( 'main' );
@@ -394,7 +394,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_remove_class_when_there_is_a_class_attribute_with_excessive_whitespaces() {
+	public function test_remove_class_preserves_whitespaces_when_there_is_a_class_attribute_with_excessive_whitespaces() {
 		$w = new WP_HTML_Walker(
 			'<div class="   main   with-border   " id="first"><span class="not-main bold with-border" id="second">Text</span></div>'
 		);
@@ -409,7 +409,7 @@ class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_remove_all_classes_when_there_is_a_class_attribute_with_excessive_whitespaces() {
+	public function test_removing_all_classes_removes_the_existing_class_attribute_from_the_markup_even_when_excessive_whitespaces_are_present() {
 		$w = new WP_HTML_Walker(
 			'<div class="   main   with-border   " id="first"><span class="not-main bold with-border" id="second">Text</span></div>'
 		);
@@ -549,7 +549,7 @@ HTML;
 	/**
 	 * @ticket 56299
 	 */
-	public function test_parses_html_attributes_wrapped_in_single_quotation_marks() {
+	public function test_correctly_parses_html_attributes_wrapped_in_single_quotation_marks() {
 		$w = new WP_HTML_Walker(
 			'<div id=\'first\'><span id=\'second\'>Text</span></div>'
 		);
@@ -576,7 +576,7 @@ HTML;
 	/**
 	 * @ticket 56299
 	 */
-	public function test_adds_boolean_attributes() {
+	public function test_set_attribute_with_value_equals_to_true_adds_a_boolean_html_attribute_with_implicit_value() {
 		$w = new WP_HTML_Walker(
 			'<form action="/action_page.php"><input type="checkbox" name="vehicle" value="Bike"><label for="vehicle">I have a bike</label></form>'
 		);
@@ -591,7 +591,7 @@ HTML;
 	/**
 	 * @ticket 56299
 	 */
-	public function test_removes_boolean_attributes_when_false_passed() {
+	public function test_setting_a_boolean_attribute_to_false_removes_it_from_the_markup() {
 		$w = new WP_HTML_Walker(
 			'<form action="/action_page.php"><input checked type="checkbox" name="vehicle" value="Bike"><label for="vehicle">I have a bike</label></form>'
 		);
@@ -606,7 +606,7 @@ HTML;
 	/**
 	 * @ticket 56299
 	 */
-	public function test_does_nothing_when_no_boolean_attribute_and_false_passed() {
+	public function test_setting_a_missing_attribute_to_false_does_not_change_the_markup() {
 		$html_input = '<form action="/action_page.php"><input type="checkbox" name="vehicle" value="Bike"><label for="vehicle">I have a bike</label></form>';
 		$w          = new WP_HTML_Walker( $html_input );
 		$w->next_tag( 'input' );
@@ -617,7 +617,7 @@ HTML;
 	/**
 	 * @ticket 56299
 	 */
-	public function test_updates_boolean_attributes_when_string_passed() {
+	public function test_setting_a_boolean_attribute_to_a_string_value_adds_explicit_value_to_the_markup() {
 		$w = new WP_HTML_Walker(
 			'<form action="/action_page.php"><input checked type="checkbox" name="vehicle" value="Bike"><label for="vehicle">I have a bike</label></form>'
 		);
@@ -625,51 +625,6 @@ HTML;
 		$w->set_attribute( 'checked', 'checked' );
 		$this->assertSame(
 			'<form action="/action_page.php"><input checked="checked" type="checkbox" name="vehicle" value="Bike"><label for="vehicle">I have a bike</label></form>',
-			(string) $w
-		);
-	}
-
-	/**
-	 * @ticket 56299
-	 */
-	public function test_works_with_wrongly_nested_tags() {
-		$w = new WP_HTML_Walker(
-			'<span>123<p>456</span>789</p>'
-		);
-		$w->next_tag( 'span' );
-		$w->set_attribute( 'class', 'span-class' );
-		$w->next_tag( 'p' );
-		$w->set_attribute( 'class', 'p-class' );
-		$this->assertSame(
-			'<span class="span-class">123<p class="p-class">456</span>789</p>',
-			(string) $w
-		);
-	}
-
-	/**
-	 * @ticket 56299
-	 */
-	public function test_updates_attributes_in_malformed_html() {
-		$w = new WP_HTML_Walker( self::HTML_MALFORMED );
-		$w->next_tag( 'span' );
-		$w->set_attribute( 'id', 'first' );
-		$w->next_tag( 'span' );
-		$w->set_attribute( 'id', 'second' );
-		$this->assertSame(
-			'<div><span id="first" class="d-md-none" Notifications</span><span id="second" class="d-none d-md-inline">Back to notifications</span></div>',
-			(string) $w
-		);
-	}
-
-	/**
-	 * @ticket 56299
-	 */
-	public function test_removes_attributes_in_malformed_html() {
-		$w = new WP_HTML_Walker( self::HTML_MALFORMED );
-		$w->next_tag( 'span' );
-		$w->remove_attribute( 'Notifications<' );
-		$this->assertSame(
-			'<div><span class="d-md-none" /span><span class="d-none d-md-inline">Back to notifications</span></div>',
 			(string) $w
 		);
 	}
@@ -688,7 +643,7 @@ HTML;
 	 * @ticket 56299
 	 * @dataProvider data_script_state
 	 */
-	public function test_ignores_contents_of_a_script_tag( $script_then_div ) {
+	public function test_next_tag_ignores_the_contents_of_a_script_tag( $script_then_div ) {
 		$w = new WP_HTML_Walker( $script_then_div );
 		$w->next_tag();
 		$this->assertSame( 'script', $w->get_tag(), 'The first found tag was not "script"' );
@@ -762,7 +717,7 @@ HTML;
 	 * @ticket 56299
 	 * @dataProvider data_rcdata_state
 	 */
-	public function test_ignores_contents_of_a_rcdata_tag( $rcdata_then_div, $rcdata_tag ) {
+	public function test_next_tag_ignores_the_contents_of_a_rcdata_tag( $rcdata_then_div, $rcdata_tag ) {
 		$w = new WP_HTML_Walker( $rcdata_then_div );
 		$w->next_tag();
 		$this->assertSame( $rcdata_tag, $w->get_tag(), "The first found tag was not '$rcdata_tag'" );
@@ -816,9 +771,54 @@ HTML;
 
 	/**
 	 * @ticket 56299
+	 */
+	public function test_can_query_and_update_wrongly_nested_tags() {
+		$w = new WP_HTML_Walker(
+			'<span>123<p>456</span>789</p>'
+		);
+		$w->next_tag( 'span' );
+		$w->set_attribute( 'class', 'span-class' );
+		$w->next_tag( 'p' );
+		$w->set_attribute( 'class', 'p-class' );
+		$this->assertSame(
+			'<span class="span-class">123<p class="p-class">456</span>789</p>',
+			(string) $w
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 */
+	public function test_removing_attributes_works_even_in_malformed_html() {
+		$w = new WP_HTML_Walker( self::HTML_MALFORMED );
+		$w->next_tag( 'span' );
+		$w->remove_attribute( 'Notifications<' );
+		$this->assertSame(
+			'<div><span class="d-md-none" /span><span class="d-none d-md-inline">Back to notifications</span></div>',
+			(string) $w
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 */
+	public function test_updating_attributes_works_even_in_malformed_html_1() {
+		$w = new WP_HTML_Walker( self::HTML_MALFORMED );
+		$w->next_tag( 'span' );
+		$w->set_attribute( 'id', 'first' );
+		$w->next_tag( 'span' );
+		$w->set_attribute( 'id', 'second' );
+		$this->assertSame(
+			'<div><span id="first" class="d-md-none" Notifications</span><span id="second" class="d-none d-md-inline">Back to notifications</span></div>',
+			(string) $w
+		);
+	}
+
+	/**
+	 * @ticket 56299
 	 * @dataProvider data_malformed_tag
 	 */
-	public function test_updates_when_malformed_tag( $html_input, $html_expected ) {
+	public function test_updating_attributes_works_even_in_malformed_html_2( $html_input, $html_expected ) {
 		$w = new WP_HTML_Walker( $html_input );
 		$w->next_tag();
 		$w->set_attribute( 'foo', 'bar' );
