@@ -44,6 +44,13 @@ function ScreenTypographyElement( { name, element } ) {
 				title={ elements[ element ].title }
 				description={ elements[ element ].description }
 			/>
+			<Spacer marginX={ 4 }>
+				<TypographyPreview
+					name={ name }
+					element={ element }
+					headingLevel={ headingLevel }
+				/>
+			</Spacer>
 			{ element === 'heading' && (
 				<Spacer marginX={ 4 } marginBottom="1em">
 					<ToggleGroupControl
@@ -88,13 +95,6 @@ function ScreenTypographyElement( { name, element } ) {
 					</ToggleGroupControl>
 				</Spacer>
 			) }
-			<Spacer marginX={ 4 }>
-				<TypographyPreview
-					name={ name }
-					element={ element }
-					headingLevel={ headingLevel }
-				/>
-			</Spacer>
 			<TypographyPanel
 				name={ name }
 				element={ element }
