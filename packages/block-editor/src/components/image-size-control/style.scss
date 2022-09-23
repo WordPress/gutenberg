@@ -3,10 +3,12 @@
 
 	.block-editor-image-size-control__row {
 		display: flex;
+		flex-flow: row wrap;
 		justify-content: space-between;
 
 		.block-editor-image-size-control__width,
 		.block-editor-image-size-control__height {
+			flex: 0 0 calc(50% - 5px);
 			margin-bottom: 0.5em;
 
 			// Fix the text and placeholder text being misaligned in Safari
@@ -21,6 +23,11 @@
 
 		.block-editor-image-size-control__height {
 			margin-left: 5px;
+		}
+
+		.block-editor-image-size-control__proportions_toggle {
+			flex: 0 0 100%;
+			margin-bottom: 13px;
 		}
 	}
 }
