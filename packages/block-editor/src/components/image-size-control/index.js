@@ -64,7 +64,7 @@ export default function ImageSizeControl( {
 		if ( ratio !== defaultRatio ) {
 			setToggleAspectRatio( false );
 		}
-	}, [ currentHeight, currentWidth, imageHeight, imageWidth ] );
+	}, [] );
 
 	return (
 		<>
@@ -155,19 +155,26 @@ export default function ImageSizeControl( {
 											isCurrent ? 'primary' : undefined
 										}
 										isPressed={ isCurrent }
-										onClick={ () =>
+										onClick={ () => {
 											updateDimensions(
 												scaledHeight,
 												scaledWidth
-											)
-										}
+											);
+											setToggleAspectRatio( true );
+										} }
 									>
 										{ scale }%
 									</Button>
 								);
 							} ) }
 						</ButtonGroup>
-						<Button isSmall onClick={ () => updateDimensions() }>
+						<Button
+							isSmall
+							onClick={ () => {
+								updateDimensions();
+								setToggleAspectRatio( true );
+							} }
+						>
 							{ __( 'Reset' ) }
 						</Button>
 					</div>
