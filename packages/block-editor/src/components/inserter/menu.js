@@ -26,6 +26,7 @@ import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTabs from './block-patterns-tab';
 import ReusableBlocksTab from './reusable-blocks-tab';
+import ImagesTab from './images-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
@@ -167,14 +168,31 @@ function InserterMenu(
 		[ destinationRootClientId, onInsert, onHover ]
 	);
 
+	// TODO: need to check if we can insert an Image or Gallery blocks
+	// (probably to more places) based on the `destinationRootClientId`,
+	// and if we can't we should hide this tab.
+	const imagesTab = useMemo(
+		() => (
+			<ImagesTab
+				rootClientId={ destinationRootClientId }
+				onInsert={ onInsert }
+			/>
+		),
+		[ destinationRootClientId, onInsert ]
+	);
+
 	const getCurrentTab = useCallback(
 		( tab ) => {
-			if ( tab.name === 'blocks' ) {
+			const { name } = tab;
+			if ( name === 'blocks' ) {
 				return blocksTab;
-			} else if ( tab.name === 'patterns' ) {
+			} else if ( name === 'patterns' ) {
 				return patternsTab;
+			} else if ( name === 'reusable' ) {
+				return reusableBlocksTab;
+			} else if ( name === 'external-images' ) {
+				return imagesTab;
 			}
-			return reusableBlocksTab;
 		},
 		[ blocksTab, patternsTab, reusableBlocksTab ]
 	);
@@ -228,6 +246,7 @@ function InserterMenu(
 						showPatterns={ showPatterns }
 						showReusableBlocks={ hasReusableBlocks }
 						prioritizePatterns={ prioritizePatterns }
+						showExternalImages={ true } // TODO: should this become a setting?
 					>
 						{ getCurrentTab }
 					</InserterTabs>

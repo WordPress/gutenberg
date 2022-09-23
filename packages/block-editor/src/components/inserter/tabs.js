@@ -20,11 +20,17 @@ const reusableBlocksTab = {
 	/* translators: Reusable blocks tab title in the block inserter. */
 	title: __( 'Reusable' ),
 };
+const externalImagesTab = {
+	name: 'external-images',
+	/* translators: Images tab title in the block inserter. */
+	title: __( 'Images' ),
+};
 
 function InserterTabs( {
 	children,
 	showPatterns = false,
 	showReusableBlocks = false,
+	showExternalImages = false,
 	onSelect,
 	prioritizePatterns,
 } ) {
@@ -40,6 +46,9 @@ function InserterTabs( {
 		if ( showReusableBlocks ) {
 			tempTabs.push( reusableBlocksTab );
 		}
+		if ( showExternalImages ) {
+			tempTabs.push( externalImagesTab );
+		}
 
 		return tempTabs;
 	}, [
@@ -49,6 +58,8 @@ function InserterTabs( {
 		patternsTab,
 		showReusableBlocks,
 		reusableBlocksTab,
+		showExternalImages,
+		externalImagesTab,
 	] );
 
 	return (

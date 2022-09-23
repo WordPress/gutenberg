@@ -388,3 +388,95 @@ $block-inserter-tabs-height: 44px;
 		}
 	}
 }
+
+// TODO: tidy all the styles at the end..
+/**
+ * Styles for the block inserter.
+ */
+.block-editor-inserter__panel-content__images {
+	padding: $grid-unit-20 0;
+}
+
+.block-editor-inserter__panel-header-images {
+	// TODO: check styles here and if we want to sync with `.block-editor-inserter__panel-title`.
+	&__text{
+		color: $gray-700;
+		text-transform: uppercase;
+		font-weight: 500;
+	}
+	.block-editor-image-explorer__list {
+		margin: 0;
+	}
+}
+
+.block-editor-inserter-external-images-list__list-item {
+	cursor: pointer;
+	&[draggable="true"] .block-editor-block-preview__container {
+		cursor: grab;
+	}
+}
+
+/**
+ * Styles for the image explorer.
+ */
+.block-editor-image-explorer {
+	&__sidebar {
+		position: absolute;
+		top: $header-height + $grid-unit-20;
+		left: 0;
+		bottom: 0;
+		width: $sidebar-width;
+		padding: $grid-unit-30 $grid-unit-40 $grid-unit-40;
+		overflow-x: visible;
+		overflow-y: scroll;
+	}
+
+	&__content {
+		margin-left: $sidebar-width - $grid-unit-40;
+	}
+	&__selected-images {
+		padding: 20px;
+		margin-bottom: 20px;
+		border: 1px solid $gray-300;
+		img {
+			width: 75px;
+			height: 75px;
+			object-fit: cover;
+		}
+		&__actions {
+			padding-top: 20px;
+			margin-top: 20px;
+			border-top: 1px solid $gray-300;
+		}
+	}
+
+	&__search {
+		margin-bottom: $grid-unit-40;
+	}
+
+
+
+	.block-editor-image-explorer__list {
+		display: grid;
+		grid-gap: $grid-unit-40;
+		grid-template-columns: repeat(2, 1fr);
+
+		@include break-xlarge() {
+			grid-template-columns: repeat(3, 1fr);
+		}
+
+		@include break-huge() {
+			grid-template-columns: repeat(4, 1fr);
+		}
+
+		.block-editor-image-explorer__list-item {
+			min-height: 240px;
+		}
+
+		.block-editor-block-preview__container {
+			height: inherit;
+			min-height: 100px;
+			max-height: 800px;
+		}
+	}
+}
