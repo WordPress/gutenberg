@@ -107,7 +107,7 @@ export default function VisualEditor( { styles } ) {
 		deviceType,
 		isWelcomeGuideVisible,
 		isTemplateMode,
-		templateContent = '',
+		editedPostTemplate = {},
 		wrapperBlockName,
 		wrapperUniqueId,
 	} = useSelect( ( select ) => {
@@ -117,7 +117,8 @@ export default function VisualEditor( { styles } ) {
 			__experimentalGetPreviewDeviceType,
 			getEditedPostTemplate,
 		} = select( editPostStore );
-		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
+		const { getCurrentPostId, getCurrentPostType, getEditorSettings } =
+			select( editorStore );
 		const _isTemplateMode = isEditingTemplate();
 		let _wrapperBlockName;
 
@@ -127,14 +128,17 @@ export default function VisualEditor( { styles } ) {
 			_wrapperBlockName = 'core/post-content';
 		}
 
+		const supportsTemplateMode = getEditorSettings().supportsTemplateMode;
+
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
 			isTemplateMode: _isTemplateMode,
-			templateContent:
-				typeof getEditedPostTemplate()?.content === 'string'
-					? getEditedPostTemplate()?.content
-					: '',
+			// Post template fetch returns a 404 on classic themes, which
+			// messes with e2e tests, so we check it's a block theme first.
+			editedPostTemplate: supportsTemplateMode
+				? getEditedPostTemplate()
+				: {},
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 		};
@@ -223,8 +227,19 @@ export default function VisualEditor( { styles } ) {
 	}, [ isTemplateMode, themeSupportsLayout, globalLayoutSettings ] );
 
 	const postContentBlock = useMemo( () => {
-		return findPostContent( parse( templateContent ) ) || {};
-	}, [ templateContent ] );
+		// When in template editing mode, we can access the blocks directly.
+		if ( editedPostTemplate?.blocks ) {
+			return findPostContent( editedPostTemplate?.blocks );
+		}
+		// If there are no blocks, we have to parse the content string.
+		// Best double-check it's a string otherwise the parse function gets unhappy.
+		const parseableContent =
+			typeof editedPostTemplate?.content === 'string'
+				? editedPostTemplate?.content
+				: '';
+
+		return findPostContent( parse( parseableContent ) ) || {};
+	}, [ editedPostTemplate?.content, editedPostTemplate?.blocks ] );
 
 	const postContentLayoutClasses = useLayoutClasses( postContentBlock );
 
@@ -232,7 +247,7 @@ export default function VisualEditor( { styles } ) {
 		{
 			'is-layout-flow': ! themeSupportsLayout,
 		},
-		postContentLayoutClasses
+		themeSupportsLayout && postContentLayoutClasses
 	);
 
 	const postContentLayoutStyles = useLayoutStyles(
