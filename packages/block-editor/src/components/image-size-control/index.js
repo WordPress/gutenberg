@@ -11,10 +11,10 @@ import {
 	ButtonGroup,
 	SelectControl,
 	TextControl,
-	ToggleControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
+import { unlock, lock } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -39,7 +39,7 @@ export default function ImageSizeControl( {
 	// Set currently-updating dimension to state.
 	const [ dimension, setDimension ] = useState( 'height' );
 	// Set whether or not we should be locking image aspect ratio. True by default.
-	const [ lockAspectRatio, setLockAspectRatio ] = useState( true );
+	const [ lockAspectRatio, setToggleAspectRatio ] = useState( true );
 	// Get and set height and width.
 	const { currentHeight, currentWidth, updateDimension, updateDimensions } =
 		useDimensionHandler(
@@ -79,24 +79,21 @@ export default function ImageSizeControl( {
 								updateDimension( 'width', value );
 							} }
 						/>
-						<TextControl
-							type="number"
-							className="block-editor-image-size-control__height"
-							label={ __( 'Height' ) }
-							value={ currentHeight }
-							min={ 1 }
-							onChange={ ( value ) => {
-								setDimension( 'height' );
-								updateDimension( 'height', value );
-							} }
-						/>
-						<ToggleControl
-							checked={ lockAspectRatio }
+						<Button
 							className="block-editor-image-size-control__proportions_toggle"
-							label={ __( 'Retain Image Proportions' ) }
-							onChange={ () => {
+							icon={ lockAspectRatio ? lock : unlock }
+							isSmall
+							label={ sprintf(
+								/* translators: image proportions */
+								__( '%s Image Proportions' ),
+								lockAspectRatio ? __( 'Unlock' ) : __( 'Lock' )
+							) }
+							onClick={ () => {
 								const next = ! lockAspectRatio;
-								setLockAspectRatio( next );
+								setToggleAspectRatio( next );
+
+								// If setting to true.
+								// Update height/width with proper ratio.
 								if ( next ) {
 									updateDimension(
 										dimension,
@@ -106,6 +103,18 @@ export default function ImageSizeControl( {
 										true
 									);
 								}
+							} }
+							variant="tertiary"
+						/>
+						<TextControl
+							type="number"
+							className="block-editor-image-size-control__height"
+							label={ __( 'Height' ) }
+							value={ currentHeight }
+							min={ 1 }
+							onChange={ ( value ) => {
+								setDimension( 'height' );
+								updateDimension( 'height', value );
 							} }
 						/>
 					</div>

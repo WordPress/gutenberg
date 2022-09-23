@@ -73,7 +73,7 @@ export default function useDimensionHandler(
 	 * @return {number} multiplied or divided value by ratio.
 	 */
 	const getRatioByOrientation = ( value, vertical = true ) =>
-		vertical ? value * ratio : value / ratio;
+		Math.round( vertical ? value * ratio : value / ratio );
 
 	/**
 	 * Update single value dimension on change.
