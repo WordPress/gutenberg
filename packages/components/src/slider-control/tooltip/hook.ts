@@ -19,7 +19,7 @@ function useTooltipPosition( { inputRef, tooltipPosition }: TooltipProps ) {
 		if ( inputRef && inputRef.current ) {
 			setPosition( tooltipPosition );
 		}
-	}, [ tooltipPosition ] );
+	}, [ tooltipPosition, inputRef ] );
 
 	useEffect( () => {
 		setTooltipPosition();

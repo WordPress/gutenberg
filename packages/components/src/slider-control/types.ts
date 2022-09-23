@@ -65,12 +65,6 @@ export type SliderProps = SliderColors & {
 	 */
 	onChange?: ( value: number ) => void;
 	/**
-	 * Callback for when the element is hidden.
-	 *
-	 * @default () => void
-	 */
-	onHideTooltip?: () => void;
-	/**
 	 * Callback for when mouse exits the `RangeControl`.
 	 *
 	 * @default () => void
@@ -82,12 +76,6 @@ export type SliderProps = SliderColors & {
 	 * @default () => void
 	 */
 	onMouseMove?: MouseEventHandler< HTMLInputElement >;
-	/**
-	 * Callback for when the element is shown.
-	 *
-	 * @default () => void
-	 */
-	onShowTooltip?: () => void;
 	/**
 	 * Toggles which sized height the slider is rendered at.
 	 *

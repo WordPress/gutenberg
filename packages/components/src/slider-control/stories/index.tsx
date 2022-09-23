@@ -18,11 +18,11 @@ const meta: ComponentMeta< typeof SliderControl > = {
 	component: SliderControl,
 	argTypes: {
 		errorColor: { control: { type: 'color' } },
-		onBlur: { action: 'onBlur', control: { type: null } },
-		onChange: { action: 'onChange' },
-		onFocus: { action: 'onFocus', control: { type: null } },
-		onMouseLeave: { action: 'onMouseLeave', control: { type: null } },
-		onMouseMove: { action: 'onMouseMove', control: { type: null } },
+		onBlur: { control: { type: null } },
+		onChange: { control: { type: null } },
+		onFocus: { control: { type: null } },
+		onMouseLeave: { control: { type: null } },
+		onMouseMove: { control: { type: null } },
 		size: {
 			control: 'radio',
 			options: [ 'default', '__unstable-large' ],
@@ -34,6 +34,7 @@ const meta: ComponentMeta< typeof SliderControl > = {
 		value: { control: { type: null } },
 	},
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
 	},

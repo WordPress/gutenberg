@@ -10,7 +10,6 @@ import * as styles from '../styles';
 import { COLORS, CONFIG } from '../../utils';
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import { useControlledValue, useCx } from '../../utils/hooks';
-import { useDebouncedHoverInteraction } from '../utils';
 import { interpolate } from '../../utils/interpolate';
 import { isValueNumeric } from '../../utils/values';
 
@@ -29,10 +28,6 @@ export function useSlider(
 		onBlur = noop,
 		onChange: onChangeProp = noop,
 		onFocus = noop,
-		onHideTooltip = noop,
-		onMouseLeave = noop,
-		onMouseMove = noop,
-		onShowTooltip = noop,
 		isFocused: isFocusedProp = false,
 		max = 100,
 		min = 0,
@@ -85,13 +80,6 @@ export function useSlider(
 		[ onFocus ]
 	);
 
-	const hoverInteractions = useDebouncedHoverInteraction( {
-		onHide: onHideTooltip,
-		onMouseLeave,
-		onMouseMove,
-		onShow: onShowTooltip,
-	} );
-
 	// Interpolate the current value between 0 and 100, so that it can be used
 	// to position the slider's thumb correctly.
 	const progressPercentage = interpolate(
@@ -131,7 +119,6 @@ export function useSlider(
 
 	return {
 		...otherProps,
-		...hoverInteractions,
 		className: classes,
 		max,
 		min,
