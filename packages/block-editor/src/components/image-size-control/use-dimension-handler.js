@@ -65,8 +65,15 @@ export default function useDimensionHandler(
 		}
 	}, [ customWidth, customHeight ] );
 
-	const getValueTest = ( value, multiply = true ) =>
-		multiply ? value * ratio : value / ratio;
+	/**
+	 * Get ratio dimension based on image orientation.
+	 *
+	 * @param {number}  value    new height or width value.
+	 * @param {boolean} vertical whether or not the image aspect is vertical.
+	 * @return {number} multiplied or divided value by ratio.
+	 */
+	const getRatioByOrientation = ( value, vertical = true ) =>
+		vertical ? value * ratio : value / ratio;
 
 	/**
 	 * Update single value dimension on change.
@@ -78,16 +85,16 @@ export default function useDimensionHandler(
 	 */
 	const updateDimension = ( dimension, value, lock = false ) => {
 		// If we're supporting aspect ratio locking, update the height and width simultaneously.
-		if ( lockAspectRatio || lock ) {
-			const nextHeight =
+		if ( ( lockAspectRatio || lock ) && value ) {
+			const lockedHeight =
 				dimension === 'height'
 					? value
-					: getValueTest( value, isVertical );
-			const nextWidth =
+					: getRatioByOrientation( value, isVertical );
+			const lockedWidth =
 				dimension === 'width'
 					? value
-					: getValueTest( value, ! isVertical );
-			updateDimensions( nextHeight, nextWidth );
+					: getRatioByOrientation( value, ! isVertical );
+			updateDimensions( lockedHeight, lockedWidth );
 		} else if ( dimension === 'width' ) {
 			setCurrentWidth( value );
 		} else if ( dimension === 'height' ) {
@@ -98,6 +105,12 @@ export default function useDimensionHandler(
 		} );
 	};
 
+	/**
+	 * Update the height and width simultanously on change.
+	 *
+	 * @param {number} nextHeight next height.
+	 * @param {number} nextWidth  next width.
+	 */
 	const updateDimensions = ( nextHeight, nextWidth ) => {
 		setCurrentHeight( nextHeight ?? defaultHeight );
 		setCurrentWidth( nextWidth ?? defaultWidth );
