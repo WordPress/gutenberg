@@ -46,12 +46,12 @@
 }
 
 // Make sure that the default text color is not overwritten by the parent container colors.
-.editor-styles-wrapper .wp-block-navigation__submenu-container:not(.has-text-color) .wp-block-navigation-item {
+.editor-styles-wrapper .wp-block-navigation__submenu-container:not(.has-text-color) .wp-block-navigation-item__content {
 	color: #000;
 }
 
 // Make sure that the user-set text color is not overwritten by the parent container colors.
-.editor-styles-wrapper .wp-block-navigation__submenu-container.has-text-color .wp-block-navigation-item {
+.editor-styles-wrapper .wp-block-navigation__submenu-container.has-text-color .wp-block-navigation-item__content {
 	color: inherit;
 }
 
