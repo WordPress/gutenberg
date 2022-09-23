@@ -11,12 +11,6 @@
 		"ref": {
 			"type": "number"
 		},
-		"textColor": {
-			"type": "string"
-		},
-		"customTextColor": {
-			"type": "string"
-		},
 		"rgbTextColor": {
 			"type": "string"
 		},
