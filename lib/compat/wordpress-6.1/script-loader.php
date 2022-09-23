@@ -188,5 +188,7 @@ function gutenberg_enqueue_classic_theme_styles() {
 		wp_enqueue_style( 'classic-theme-styles' );
 	}
 }
+// To load classic theme styles on the frontend:
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_classic_theme_styles' );
+// To load classic theme styles in the the editor:
 add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_classic_theme_styles' );
