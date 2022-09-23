@@ -30,7 +30,7 @@ function render_block_core_form( $attributes, $content, $block ) {
 	 *
 	 * @return string The form action attribute.
 	 */
-	$action = apply_filters( 'block_form', $action, $attributes, $content, $block );
+	$action = apply_filters( 'block_form_action', $action, $attributes, $content, $block );
 
 	// Build the form method attribute.
 	$method = empty( $attributes['method'] ) ? '' : $attributes['method'];
