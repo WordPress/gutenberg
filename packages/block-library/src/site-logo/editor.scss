@@ -32,7 +32,7 @@
 
 // Provide special styling for the placeholder.
 // @todo: this particular minimal style of placeholder could be componentized further.
-.wp-block-site-logo.wp-block-site-logo {
+.wp-block-site-logo {
 	// Match the default logo size.
 	&.is-default-size .components-placeholder {
 		height: 120px;
@@ -72,7 +72,7 @@
 		}
 
 		// Style the upload button.
-		.components-button.components-button {
+		.components-button {
 			padding: 0;
 			display: flex;
 			justify-content: center;
