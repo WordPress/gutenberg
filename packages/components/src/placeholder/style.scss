@@ -236,3 +236,21 @@
 	stroke: currentColor;
 	stroke-dasharray: 3;
 }
+
+// Styles when the 'show button text labels' preference is enabled.
+.show-icon-labels {
+	.block-editor-media-placeholder .components-button.has-icon {
+		width: auto;
+		padding: 0 $grid-unit-10;
+		border-radius: 0;
+
+		svg {
+			display: none;
+		}
+
+		&::after {
+			content: attr(aria-label);
+			font-size: $helptext-font-size;
+		}
+	}
+}
