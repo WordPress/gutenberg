@@ -331,7 +331,7 @@ module.exports = {
 		},
 		{
 			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
-			excludedFiles: [ 'test/e2e/**/*.js' ],
+			excludedFiles: [ 'test/e2e/**/*.js', '**/test/**/*.ct.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
@@ -363,6 +363,7 @@ module.exports = {
 			files: [
 				'test/e2e/**/*.[tj]s',
 				'packages/e2e-test-utils-playwright/**/*.[tj]s',
+				'**/*.ct.[tj]s?(x)',
 			],
 			extends: [ 'plugin:eslint-plugin-playwright/playwright-test' ],
 			rules: {

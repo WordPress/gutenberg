@@ -100,7 +100,8 @@
 		"@octokit/rest": "16.26.0",
 		"@octokit/types": "6.34.0",
 		"@octokit/webhooks-types": "5.6.0",
-		"@playwright/test": "1.27.1",
+		"@playwright/experimental-ct-react": "1.28.0",
+		"@playwright/test": "1.28.0",
 		"@pmmmwh/react-refresh-webpack-plugin": "0.5.2",
 		"@storybook/addon-a11y": "6.5.7",
 		"@storybook/addon-actions": "6.5.7",
@@ -315,6 +316,7 @@
 		"test:unit:php:multisite": "wp-env run tests-wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -c /var/www/html/wp-content/plugins/gutenberg/phpunit/multisite.xml --verbose",
 		"test:unit:update": "npm run test:unit -- --updateSnapshot",
 		"test:unit:watch": "npm run test:unit -- --watch",
+		"test:components": "playwright test --config test/components/playwright-ct.config.ts",
 		"wp-env": "wp-env"
 	},
 	"lint-staged": {

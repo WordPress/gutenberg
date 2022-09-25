@@ -1,0 +1,15 @@
+diff --git a/node_modules/@playwright/test/lib/plugins/vitePlugin.js b/node_modules/@playwright/test/lib/plugins/vitePlugin.js
+index 1334e22..28f00cf 100644
+--- a/node_modules/@playwright/test/lib/plugins/vitePlugin.js
++++ b/node_modules/@playwright/test/lib/plugins/vitePlugin.js
+@@ -106,8 +106,8 @@ function createPlugin(registerSourceFile, frameworkPluginFactory) {
+ 
+       if (hasJSComponents(buildInfo.components)) {
+         viteConfig.esbuild = {
+-          loader: 'jsx',
+-          include: /.*\.jsx?$/,
++          loader: 'tsx',
++          include: /.*\.[tj]sx?$/,
+           exclude: []
+         };
+         viteConfig.optimizeDeps = {
