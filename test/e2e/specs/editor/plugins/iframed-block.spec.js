@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'changing image size', () => {
+test.describe( 'Iframed block', () => {
 	test.beforeEach( async ( { requestUtils, admin } ) => {
 		await requestUtils.activatePlugin( 'gutenberg-test-iframed-block' );
 		await admin.createNewPost( { postType: 'page' } );
@@ -19,10 +19,10 @@ test.describe( 'changing image size', () => {
 
 		await expect(
 			page.locator( 'role=document[name="Block: Iframed Block"i]' )
-		).toHaveText( 'Iframed Block (set with jQuery)' );
+		).toContainText( 'Iframed Block (set with jQuery)' );
 
 		// open page from sidebar settings
-		await page.click( '[aria-label="Page"]' );
+		await page.locator( 'role=button[name= "Page"i]' ).first().click();
 
 		// Opens the template editor with a newly created template.
 		await page.click( 'role=button[name="Select template"i]' );
@@ -36,8 +36,8 @@ test.describe( 'changing image size', () => {
 		).toBeVisible();
 
 		// Expect the script to load in the iframe, which replaces the block text.
-		const iframedText = page.frameLocator( 'iframe' ).locator( 'p' );
-		await expect( iframedText.nth( 1 ) ).toHaveText(
+		const iframedText = page.frameLocator( 'iframe' ).locator( 'body' );
+		await expect( iframedText ).toContainText(
 			'Iframed Block (set with jQuery)'
 		);
 	} );
