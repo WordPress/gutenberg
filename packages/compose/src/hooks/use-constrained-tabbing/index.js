@@ -62,9 +62,11 @@ function useConstrainedTabbing() {
 
 			trap.tabIndex = -1;
 			node[ domAction ]( trap );
+
+			// Remove itself when the trap loses focus.
+			trap.addEventListener( 'blur', () => node.removeChild( trap ) );
+
 			trap.focus();
-			// Remove after the browser moves focus to the next element.
-			timeoutId = setTimeout( () => node.removeChild( trap ), 10 );
 		}
 
 		node.addEventListener( 'keydown', onKeyDown );
