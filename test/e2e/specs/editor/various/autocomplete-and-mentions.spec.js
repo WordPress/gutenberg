@@ -84,13 +84,13 @@ test.describe( 'Autocomplete', () => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = 'I am @da';
-				testData.optionPath = '//*[contains(text(),"Darth Vader")]';
+				testData.optionPath = 'Darth Vader';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>I am @yourfather.</p>
 <!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = 'I like ~s';
-				testData.optionPath = '[text()="🍓 Strawberry"]';
+				testData.optionPath = '🍓 Strawberry';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>I like 🍓.</p>
 <!-- /wp:paragraph -->`;
@@ -99,9 +99,7 @@ test.describe( 'Autocomplete', () => {
 			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.triggerString );
 			await expect(
-				page.locator(
-					`xpath=//button[@role="option"]${ testData.optionPath }`
-				)
+				page.locator( 'role=option', { hasText: testData.optionPath } )
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );
@@ -119,13 +117,13 @@ test.describe( 'Autocomplete', () => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = '@j';
-				testData.optionPath = '//*[contains(text(),"Jane Doe")]';
+				testData.optionPath = 'Jane Doe';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>Stuck in the middle with @testuser you.</p>
 <!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = 'a ~m';
-				testData.optionPath = '[text()="🥭 Mango"]';
+				testData.optionPath = '🥭 Mango';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>Stuck in the middle with a 🥭 you.</p>
 <!-- /wp:paragraph -->`;
@@ -136,9 +134,7 @@ test.describe( 'Autocomplete', () => {
 			await pageUtils.pressKeyTimes( 'ArrowLeft', 'you.'.length );
 			await page.keyboard.type( testData.triggerString );
 			await expect(
-				page.locator(
-					`//button[@role="option"]${ testData.optionPath }`
-				)
+				page.locator( 'role=option', { hasText: testData.optionPath } )
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( ' ' );
@@ -156,18 +152,16 @@ test.describe( 'Autocomplete', () => {
 				testData.firstTriggerString =
 					'The two greatest hobbits, in order: @bi';
 				testData.secondTriggerString = ' @fr';
-				testData.firstOptionPath =
-					'//*[contains(text(),"Bilbo Baggins")]';
-				testData.secondOptionPath =
-					'//*[contains(text(),"Frodo Baggins")]';
+				testData.firstOptionPath = 'Bilbo Baggins';
+				testData.secondOptionPath = 'Frodo Baggins';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>The two greatest hobbits, in order: @thebetterhobbit @ringbearer.</p>
 <!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.firstTriggerString = 'An awesome combination: ~m';
 				testData.secondTriggerString = ' ~b';
-				testData.firstOptionPath = '[text()="🥭 Mango"]';
-				testData.secondOptionPath = '[text()="🫐 Blueberry"]';
+				testData.firstOptionPath = '🥭 Mango';
+				testData.secondOptionPath = '🫐 Blueberry';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>An awesome combination: 🥭 🫐.</p>
 <!-- /wp:paragraph -->`;
@@ -176,16 +170,16 @@ test.describe( 'Autocomplete', () => {
 			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.firstTriggerString );
 			await expect(
-				page.locator(
-					`//button[@role="option"]${ testData.firstOptionPath }`
-				)
+				page.locator( 'role=option', {
+					hasText: testData.firstOptionPath,
+				} )
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( testData.secondTriggerString );
 			await expect(
-				page.locator(
-					`//button[@role="option"]${ testData.secondOptionPath }`
-				)
+				page.locator( 'role=option', {
+					hasText: testData.secondOptionPath,
+				} )
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );
@@ -201,14 +195,13 @@ test.describe( 'Autocomplete', () => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = '@';
-				testData.optionPath =
-					'//*[contains(text(),"Katniss Everdeen")]';
+				testData.optionPath = 'Katniss Everdeen';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>@mockingjay</p>
 <!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = '~';
-				testData.optionPath = '[text()="🍓 Strawberry"]';
+				testData.optionPath = '🍓 Strawberry';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>🍓</p>
 <!-- /wp:paragraph -->`;
@@ -217,12 +210,10 @@ test.describe( 'Autocomplete', () => {
 			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.triggerString );
 			await expect(
-				page.locator(
-					`//button[@role="option"]${ testData.optionPath }`
-				)
+				page.locator( 'role=option', { hasText: testData.optionPath } )
 			).toBeVisible();
 			await page
-				.locator( `//button[@role="option"]${ testData.optionPath }` )
+				.locator( 'role=option', { hasText: testData.optionPath } )
 				.click();
 
 			expect( await editor.getEditedPostContent() ).toBe(
@@ -241,13 +232,13 @@ test.describe( 'Autocomplete', () => {
 			// 🍒 is the target because options are listed in the order they appear in the custom completer
 			if ( type === 'mention' ) {
 				testData.triggerString = '@';
-				testData.optionPath = '//*[contains(text(),"Jean-Luc Picard")]';
+				testData.optionPath = 'Jean-Luc Picard';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>@makeitso</p>
 <!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = '~';
-				testData.optionPath = '[text()="🍒 Cherry"]';
+				testData.optionPath = '🍒 Cherry';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>🍒</p>
 <!-- /wp:paragraph -->`;
@@ -256,9 +247,7 @@ test.describe( 'Autocomplete', () => {
 			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.triggerString );
 			await expect(
-				page.locator(
-					`//button[@role="option"]${ testData.optionPath }`
-				)
+				page.locator( 'role=option', { hasText: testData.optionPath } )
 			).toBeVisible();
 			await pageUtils.pressKeyTimes( 'ArrowDown', 6 );
 			await page.keyboard.press( 'Enter' );
@@ -275,14 +264,14 @@ test.describe( 'Autocomplete', () => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = 'My name is @j';
-				testData.optionPath = '//*[contains(text(),"Jane Doe")]';
+				testData.optionPath = 'Jane Doe';
 				testData.postCompleterInput = ' ...a secret.';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>My name is @j ...a secret.</p>
 <!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = 'My favorite fruit is ~a';
-				testData.optionPath = '[text()="🍎 Apple"]';
+				testData.optionPath = '🍎 Apple';
 				testData.postCompleterInput =
 					" ...no I changed my mind. It's mango.";
 				testData.snapshot = `<!-- wp:paragraph -->
@@ -293,9 +282,7 @@ test.describe( 'Autocomplete', () => {
 			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.triggerString );
 			await expect(
-				page.locator(
-					`//button[@role="option"]${ testData.optionPath }`
-				)
+				page.locator( 'role=option', { hasText: testData.optionPath } )
 			).toBeVisible();
 			await page.keyboard.press( 'Escape' );
 			await page.keyboard.type( testData.postCompleterInput );
@@ -315,9 +302,7 @@ test.describe( 'Autocomplete', () => {
 				// The 'Grapes' option is disabled in our test plugin, so it should not insert the grapes emoji
 				await page.keyboard.type( 'Sorry, we are all out of ~g' );
 				await expect(
-					page.locator(
-						'//button[@role="option"][text()="🍇 Grapes"]'
-					)
+					page.locator( 'role=option', { hasText: '🍇 Grape' } )
 				).toBeVisible();
 				await page.keyboard.press( 'Enter' );
 				await page.keyboard.type( ' grapes.' );
@@ -335,7 +320,7 @@ test.describe( 'Autocomplete', () => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = '@bu';
-				testData.optionPath = '//*[contains(text(),"Buddy Elf")]';
+				testData.optionPath = 'Buddy Elf';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>@buddytheelf test</p>
 <!-- /wp:paragraph -->
@@ -357,7 +342,7 @@ test.describe( 'Autocomplete', () => {
 <!-- /wp:paragraph -->`;
 			} else if ( type === 'option' ) {
 				testData.triggerString = '~b';
-				testData.optionPath = '[text()="🫐 Blueberry"]';
+				testData.optionPath = '🫐 Blueberry';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>🫐 test</p>
 <!-- /wp:paragraph -->
@@ -384,9 +369,9 @@ test.describe( 'Autocomplete', () => {
 			for ( let i = 0; i < 4; i++ ) {
 				await page.keyboard.type( testData.triggerString );
 				await expect(
-					page.locator(
-						`//button[@role="option"]${ testData.optionPath }`
-					)
+					page.locator( 'role=option', {
+						hasText: testData.optionPath,
+					} )
 				).toBeVisible();
 				await page.keyboard.press( 'Enter' );
 				await page.keyboard.type( ' test' );
@@ -409,16 +394,12 @@ test.describe( 'Autocomplete', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '@fr' );
 		await expect(
-			page.locator(
-				'//button[@role="option"]//*[contains(text(),"Frodo Baggins")]'
-			)
+			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )
 		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' +bi' );
 		await expect(
-			page.locator(
-				'//button[@role="option"]//*[contains(text(),"Bilbo Baggins")]'
-			)
+			page.locator( 'role=option', { hasText: 'Bilbo Baggins' } )
 		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		expect( await editor.getEditedPostContent() )
