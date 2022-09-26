@@ -53,8 +53,11 @@ export function useBorderControlDropdown(
 	// Generate class names.
 	const cx = useCx();
 	const classes = useMemo( () => {
-		return cx( styles.borderControlDropdown(), className );
-	}, [ className, cx ] );
+		return cx(
+			styles.borderControlDropdown( __next40pxDefaultSize ),
+			className
+		);
+	}, [ className, cx, __next40pxDefaultSize ] );
 
 	const indicatorClassName = useMemo( () => {
 		return cx( styles.borderColorIndicator );
