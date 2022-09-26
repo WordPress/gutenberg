@@ -236,6 +236,71 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Passing a double quote inside of an attribute values could lead to an XSS attack as follows:
+	 *
+	 * <code>
+	 *     $p = new WP_HTML_Tag_Processor( '<div class="header"></div>' );
+	 *     $p->next_tag();
+	 *     $p->set_attribute('class', '" onclick="alert');
+	 *     echo $p;
+	 *     // <div class="" onclick="alert"></div>
+	 * </code>
+	 *
+	 * To prevent it, `set_attribute` encodes the double quote character as an HTML entity:
+	 *
+	 * <code>
+	 *    <div class="&quot; onclick=&quot;alert"></div>
+	 * </code>
+	 *
+	 * As per the HTML standard, the only way to escape out of the double quoted attribute value is
+	 * via the terminating double quote character ", so there is no need to encode other characters
+	 * such as <, >, /, or '.
+	 *
+	 * @see https://html.spec.whatwg.org/#attribute-value-(double-quoted)-state
+	 *
+	 * @ticket 56299
+	 *
+	 * @dataProvider data_set_attribute_xss_values
+	 * @covers set_attribute
+	 */
+	public function test_set_attribute_prevents_xss( $initial_html, $attribute_value, $expected_html ) {
+		$p = new WP_HTML_Tag_Processor( $initial_html );
+		$p->next_tag();
+		$p->set_attribute( 'test', $attribute_value );
+		$this->assertSame(
+			$expected_html,
+			(string) $p,
+			'Setting an attribute to a malicious value did not escape it correctly – this is an XSS vulnerability.'
+		);
+	}
+
+	/**
+	 * Data provider with malicious HTML attribute values.
+	 *
+	 * @return array {
+	 *     @type string $initial_html The initial HTML to process.
+	 *     @type string $attribute_value The value to set for the `test` attribute of the first encountered tag.
+	 *     @type string $expected_html The expected HTML after the processing.
+	 * }
+	 */
+	public function data_set_attribute_xss_values() {
+		return array(
+			'Double quotes should be encoded as HTML entities' => array( '<div></div>', '"', '<div test="&quot;"></div>' ),
+			'Encoded quotes should not be encoded again' => array( '<div></div>', '&quot;', '<div test="&quot;"></div>' ),
+			'Single quotes should not be encoded'        => array( '<div></div>', "'", '<div test="\'"></div>' ),
+			'< and > characters should not be encoded'   => array( '<div></div>', '<>', '<div test="<>"></div>' ),
+			'A quote inside of an HTML entity should still be encoded' => array( '<div></div>', '&quot";', '<div test="&quot&quot;;"></div>' ),
+			'Single-quoted attributes should be rewritten using double quotes' => array( "<div test='foo'></div>", 'foo', '<div test="foo"></div>' ),
+			'Unquoted attributes should be rewritten using double quotes' => array( '<div test=foo></div>', 'foo', '<div test="foo"></div>' ),
+			'An HTML snippet passed as a value should only have the double quote characters encoded ' => array(
+				'<div test=foo></div>',
+				'" onclick="alert(\'1\');"><span onclick=""></span><script>alert("1")</script>',
+				'<div test="&quot; onclick=&quot;alert(\'1\');&quot;><span onclick=&quot;&quot;></span><script>alert(&quot;1&quot;)</script>"></div>',
+			),
+		);
+	}
+
+	/**
 	 * @ticket 56299
 	 *
 	 * @covers set_attribute

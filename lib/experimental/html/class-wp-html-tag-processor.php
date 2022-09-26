@@ -961,7 +961,29 @@ class WP_HTML_Tag_Processor {
 		if ( true === $value ) {
 			$updated_attribute = $name;
 		} else {
-			// @TODO: What escaping and sanitization do we need here?
+			/**
+			 * Prevents HTML injection attacks by encoding the " characters to &quot;
+			 *
+			 * This protects from values terminating the attribute value as follows:
+			 *
+			 * <code>
+			 *     $p = new WP_HTML_Tag_Processor( '<div class="header"></div>' );
+			 *     $p->next_tag();
+			 *     $p->set_attribute('class', '" onclick="alert');
+			 *     echo $p;
+			 *     // Danger! Not encoding the double quotes would create another HTML attribute:
+			 *     //    <div class="" onclick="alert"></div>
+			 *     // Fortunately the encoding is in place:
+			 *     //    <div class="&quot; onclick=&quot;alert"></div>
+			 * </code>
+			 *
+			 * This is sufficient because:
+			 * * WP_HTML_Tag_Processor always outputs updated attribute values with double quotes.
+			 * * The only way to terminate a double quoted attribute value is via a double quote (")
+			 *   character. There is no need to encode other characters such as <, >, /, or '.
+			 *
+			 * @see https://html.spec.whatwg.org/#attribute-value-(double-quoted)-state
+			 */
 			$escaped_new_value = str_replace( '"', '&quot;', $value );
 			$updated_attribute = "{$name}=\"{$escaped_new_value}\"";
 		}
