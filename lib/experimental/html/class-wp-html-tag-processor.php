@@ -11,7 +11,6 @@
  * @TODO: Unify language around "currently-opened tag."
  * @TODO: Organize unit test cases into normative tests, edge-case tests, regression tests.
  * @TODO: Clean up attribute token class after is_true addition
- * @TODO: Review (start,end) vs. (start,length) pairs for consistency and ease.
  * @TODO: Prune whitespace when removing classes/attributes: e.g. "a b c" -> "c" not " c"
  * @TODO: Skip over `/` in attributes area, split attribute names by `/`
  * @TODO: Decode HTML references/entities in class names when matching.
@@ -99,24 +98,33 @@ class WP_HTML_Tag_Processor {
 	private $updated_bytes = 0;
 
 	/**
-	 * The name of the currently matched tag.
+	 * Byte offset in input document where current tag name starts.
 	 *
+	 * Example:
+	 * ```
+	 *   <div id="test">...
+	 *   01234
+	 *    - tag name starts at 1
+	 * ```
 	 * @since 6.2.0
-	 * @var integer|null
+	 * @var ?int
 	 */
 	private $tag_name_starts_at;
 
 	/**
-	 * Byte offset after the name of current tag.
+	 * Byte length of current tag name.
+	 *
 	 * Example:
-	 *   <div
+	 * ```
+	 *   <div id="test">...
 	 *   01234
-	 *       ^ tag_name_ends_at = 4
+	 *    --- tag name length is 3
+	 * ```
 	 *
 	 * @since 6.2.0
-	 * @var number
+	 * @var ?int
 	 */
-	private $tag_name_ends_at;
+	private $tag_name_length;
 
 	/**
 	 * Lazily-built index of attributes found within an HTML tag, keyed by the attribute name.
@@ -489,10 +497,9 @@ class WP_HTML_Tag_Processor {
 			$tag_name_prefix_length = strspn( $html, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', $at + 1 );
 			if ( $tag_name_prefix_length > 0 ) {
 				$at++;
-				$tag_name_length          = $tag_name_prefix_length + strcspn( $html, " \t\f\r\n/>", $at + $tag_name_prefix_length );
+				$this->tag_name_length    = $tag_name_prefix_length + strcspn( $html, " \t\f\r\n/>", $at + $tag_name_prefix_length );
 				$this->tag_name_starts_at = $at;
-				$this->tag_name_ends_at   = $at + $tag_name_length;
-				$this->parsed_bytes       = $at + $tag_name_length;
+				$this->parsed_bytes       = $at + $this->tag_name_length;
 				return true;
 			}
 
@@ -687,7 +694,7 @@ class WP_HTML_Tag_Processor {
 		$this->class_name_updates_to_attributes_updates();
 		$this->apply_attributes_updates();
 		$this->tag_name_starts_at = null;
-		$this->tag_name_ends_at   = null;
+		$this->tag_name_length    = null;
 		$this->attributes         = array();
 	}
 
@@ -925,8 +932,7 @@ class WP_HTML_Tag_Processor {
 			return null;
 		}
 
-		$tag_name_length = $this->tag_name_ends_at - $this->tag_name_starts_at;
-		$tag_name        = substr( $this->html, $this->tag_name_starts_at, $tag_name_length );
+		$tag_name = substr( $this->html, $this->tag_name_starts_at, $this->tag_name_length );
 
 		return strtolower( $tag_name );
 	}
@@ -997,8 +1003,8 @@ class WP_HTML_Tag_Processor {
 			 *    Result: <div id="new"/>
 			 */
 			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
-				$this->tag_name_ends_at,
-				$this->tag_name_ends_at,
+				$this->tag_name_starts_at + $this->tag_name_length,
+				$this->tag_name_starts_at + $this->tag_name_length,
 				' ' . $updated_attribute
 			);
 		}
@@ -1070,7 +1076,8 @@ class WP_HTML_Tag_Processor {
 	 */
 	public function __toString() {
 		// Parsing either already finished or not started yet.
-		if ( null === $this->tag_name_ends_at ) {
+		/** @TODO: What are we intending to measure here? Why check the end of the tag name? */
+		if ( null === $this->tag_name_length ) {
 			return $this->updated_html . substr( $this->html, $this->updated_bytes );
 		}
 
@@ -1084,14 +1091,13 @@ class WP_HTML_Tag_Processor {
 		 */
 
 		// Find tag name's end in the updated markup.
-		$markup_updated_up_to_a_tag_name_end = $this->updated_html . substr( $this->html, $this->updated_bytes, $this->tag_name_ends_at - $this->updated_bytes );
+		$markup_updated_up_to_a_tag_name_end = $this->updated_html . substr( $this->html, $this->updated_bytes, $this->tag_name_starts_at + $this->tag_name_length - $this->updated_bytes );
 		$updated_tag_name_ends_at            = strlen( $markup_updated_up_to_a_tag_name_end );
-		$tag_name_length                     = $this->tag_name_ends_at - $this->tag_name_starts_at;
-		$updated_tag_name_starts_at          = $updated_tag_name_ends_at - $tag_name_length;
+		$updated_tag_name_starts_at          = $updated_tag_name_ends_at - $this->tag_name_length;
 
 		// Apply attributes updates.
 		$this->updated_html  = $markup_updated_up_to_a_tag_name_end;
-		$this->updated_bytes = $this->tag_name_ends_at;
+		$this->updated_bytes = $this->tag_name_starts_at + $this->tag_name_length;
 		$this->class_name_updates_to_attributes_updates();
 		$this->apply_attributes_updates();
 
@@ -1100,8 +1106,7 @@ class WP_HTML_Tag_Processor {
 
 		// Rewind this processor to the tag name's end.
 		$this->tag_name_starts_at = $updated_tag_name_starts_at;
-		$this->tag_name_ends_at   = $updated_tag_name_ends_at;
-		$this->parsed_bytes       = $this->tag_name_ends_at;
+		$this->parsed_bytes       = $updated_tag_name_ends_at;
 
 		// Restore the previous version of the updated_html as we are not finished with the current_tag yet.
 		$this->updated_html  = $markup_updated_up_to_a_tag_name_end;
@@ -1175,8 +1180,7 @@ class WP_HTML_Tag_Processor {
 			 * String (byte) length lookup is fast. If they aren't the
 			 * same length then they can't be the same string values.
 			 */
-			$length = $this->tag_name_ends_at - $this->tag_name_starts_at;
-			if ( strlen( $this->sought_tag_name ) !== $length ) {
+			if ( strlen( $this->sought_tag_name ) !== $this->tag_name_length ) {
 				return false;
 			}
 
@@ -1188,7 +1192,7 @@ class WP_HTML_Tag_Processor {
 			 * most of the time this runs we shouldn't expect to
 			 * actually run the case-folding comparison.
 			 */
-			for ( $i = 0; $i < $length; $i++ ) {
+			for ( $i = 0; $i < $this->tag_name_length; $i++ ) {
 				$html_char = $this->html[ $this->tag_name_starts_at + $i ];
 				$tag_char  = $this->sought_tag_name[ $i ];
 
