@@ -51,11 +51,11 @@ When [registering a block support](https://developer.wordpress.org/reference/cla
 
 If a block has opted into the block support, the values of "class" and "style" will be applied to the block element's "class" and "style" attributes accordingly when rendered in the frontend HTML. Note, this applies only to server-side rendered blocks, for example, the [Site Title block](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/#site-title).
 
-The callback receives `$block_attributes` as an argument. `$block_attributes` only contains the styles object, if any, and not any CSS or classnames to be applied to the block's HTML elements. 
+The callback receives `$block_type` and `$block_attributes` as arguments. The `style` attribute within `$block_attributes` only contains the raw style object, if any styles have been set for the block, and not any CSS or classnames to be applied to the block's HTML elements. 
 
-Here is where `wp_style_engine_get_styles` comes in handy: it will generate CSS and, if appropriate, classnames to be added to the "style" and "class" HTML attributes.
+Here is where `wp_style_engine_get_styles` comes in handy: it will generate CSS and, if appropriate, classnames to be added to the "style" and "class" HTML attributes in the final rendered block markup.
 
-Here is a _very_ simplified version of how [color block supports](https://github.com/WordPress/gutenberg/tree/HEAD/lib/block-supports/color.php) works:
+Here is a _very_ simplified version of how the [color block support](https://github.com/WordPress/gutenberg/tree/HEAD/lib/block-supports/color.php) works:
 
 ```php
 function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
