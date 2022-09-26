@@ -286,14 +286,14 @@ Returns the Entity's records.
 
 _Parameters_
 
--   _state_ State tree
--   _kind_ Entity kind.
--   _name_ Entity name.
--   _query_ Optional terms query. If requesting specific fields, fields must always include the ID.
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID.
 
 _Returns_
 
--   Records.
+-   `EntityRecord[] | null`: Records.
 
 ### getLastEntityDeleteError
 

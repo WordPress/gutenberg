@@ -350,7 +350,7 @@ export const getEntityRecord = createSelector(
 			] ),
 		];
 	}
-) as any as GetEntityRecord;
+) as GetEntityRecord;
 
 /**
  * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity records from the API if the entity record isn't available in the local state.
@@ -505,7 +505,16 @@ export interface GetEntityRecords {
  *
  * @return Records.
  */
-export const getEntityRecords = ( ( state, kind, name, query ) => {
+export const getEntityRecords = ( <
+	EntityRecord extends
+		| ET.EntityRecord< any >
+		| Partial< ET.EntityRecord< any > >
+>(
+	state: State,
+	kind: string,
+	name: string,
+	query: GetRecordsHttpQuery
+): EntityRecord[] | null => {
 	// Queried data state is prepopulated for all known entities. If this is not
 	// assigned for the given parameters, then it is known to not exist.
 	const queriedState = get( state.entities.records, [
