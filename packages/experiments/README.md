@@ -38,8 +38,7 @@ const { __unstableGetInnerBlocksProps } = unlock( blocksExperiments );
 
 All new experimental APIs should be shipped as **private** using this method.
 
-The **public** experimental APIs that have already been shipped in a stable WordPress version should
-remain accessible via `window.wp`. Please do not create new ones.
+The **public** experimental APIs that have already been shipped in a stable WordPress version should remain accessible via `window.wp`. Please do not create new ones.
 
 A determined developer who would want to use the private experimental APIs at all costs would have to:
 
