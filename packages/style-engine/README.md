@@ -96,7 +96,7 @@ _Parameters_
 -   _$css_rules_ `array<array>`
 -   _$options_ `array<string|bool>` An array of options to determine the output.
     -   _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'. When set, the style engine will attempt to store the CSS rules.
-    -   _prettify_ `bool` Whether to add new lines and indents to output. Default is to inherit the value of `SCRIPT_DEBUG` if it is defined.
+    -   _prettify_ `bool` Whether to add new lines and indents to output. Default is to inherit the value of the global constant `SCRIPT_DEBUG`, if it is defined.
     -   _optimize_ `bool` Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
 
 _Returns_
@@ -147,7 +147,7 @@ _Parameters_
 
 -   _$store_name_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or ' global-styles'. Default is 'block-supports'.
 -   _$options_ `array<bool>` An array of options to determine the output.
-    -   _prettify_ `bool` Whether to add new lines and indents to output. Default is to inherit the value of `SCRIPT_DEBUG` if it is defined.
+    -   _prettify_ `bool` Whether to add new lines and indents to output. Default is to inherit the value of the global constant `SCRIPT_DEBUG`, if it is defined.
     -   _optimize_ `bool` Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
 
 _Returns_
