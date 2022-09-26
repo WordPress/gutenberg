@@ -1,7 +1,6 @@
 .tools-panel-item-spacing {
 	display: grid;
 	grid-template-columns: auto 1fr auto;
-	grid-row-gap: $grid-unit-05;
 	align-items: center;
 }
 
@@ -27,6 +26,7 @@
 		grid-column: 1 / 1;
 		justify-content: left;
 		height: 16px;
+		margin-top: 12px;
 	}
 
 	.components-spacing-sizes-control__side-label {
@@ -37,7 +37,7 @@
 
 	&.is-unlinked {
 		.components-range-control.components-spacing-sizes-control__range-control {
-			margin: 0 0 $grid-unit-10 0;
+			margin-top: 12px;
 		}
 	}
 
@@ -76,6 +76,8 @@
 		&.is-small.has-icon {
 			padding: 0;
 			min-width: $icon-size;
+			height: 16px;
+			margin-top: 12px;
 		}
 	}
 
