@@ -363,13 +363,13 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'spacing' => array(
 						'margin'  => array(
 							'left'   => 'var:preset|spacing|10',
-							'right'  => 'var:preset|spacing|20',
+							'right'  => 'var:preset|spacing|3XL',
 							'top'    => '1rem',
 							'bottom' => '1rem',
 						),
 						'padding' => array(
 							'left'   => 'var:preset|spacing|30',
-							'right'  => 'var:preset|spacing|40',
+							'right'  => 'var:preset|spacing|3XL',
 							'top'    => '14px',
 							'bottom' => '14px',
 						),
@@ -377,14 +377,14 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css'          => 'padding-left:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--40);padding-top:14px;padding-bottom:14px;margin-left:var(--wp--preset--spacing--10);margin-right:var(--wp--preset--spacing--20);margin-top:1rem;margin-bottom:1rem;',
+					'css'          => 'padding-left:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--3-xl);padding-top:14px;padding-bottom:14px;margin-left:var(--wp--preset--spacing--10);margin-right:var(--wp--preset--spacing--3-xl);margin-top:1rem;margin-bottom:1rem;',
 					'declarations' => array(
 						'padding-left'   => 'var(--wp--preset--spacing--30)',
-						'padding-right'  => 'var(--wp--preset--spacing--40)',
+						'padding-right'  => 'var(--wp--preset--spacing--3-xl)',
 						'padding-top'    => '14px',
 						'padding-bottom' => '14px',
 						'margin-left'    => 'var(--wp--preset--spacing--10)',
-						'margin-right'   => 'var(--wp--preset--spacing--20)',
+						'margin-right'   => 'var(--wp--preset--spacing--3-xl)',
 						'margin-top'     => '1rem',
 						'margin-bottom'  => '1rem',
 					),

@@ -121,6 +121,7 @@
 		"@types/highlight-words-core": "1.2.1",
 		"@types/istanbul-lib-report": "3.0.0",
 		"@types/lodash": "4.14.172",
+		"@types/mime": "2.0.3",
 		"@types/npm-package-arg": "6.1.1",
 		"@types/prettier": "2.4.4",
 		"@types/qs": "6.9.7",

@@ -2720,6 +2720,7 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	// In zoom-out mode, the block overlay is always active for top level blocks.
 	if (
 		editorMode === 'zoom-out' &&
+		clientId &&
 		! getBlockRootClientId( state, clientId )
 	) {
 		return true;
