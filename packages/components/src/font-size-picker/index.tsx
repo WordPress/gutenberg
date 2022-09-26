@@ -40,7 +40,6 @@ import type {
 	FontSizeSelectOption,
 	FontSizeToggleGroupOption,
 } from './types';
-import type { WordPressComponentProps } from '../ui/context';
 
 // This conditional is needed to maintain the spacing before the slider in the `withSlider` case.
 const MaybeVStack = ( {
@@ -57,7 +56,7 @@ const MaybeVStack = ( {
 	);
 
 function FontSizePicker(
-	props: WordPressComponentProps< FontSizePickerProps, 'fieldset', false >,
+	props: FontSizePickerProps,
 	ref: ForwardedRef< any >
 ) {
 	const {
