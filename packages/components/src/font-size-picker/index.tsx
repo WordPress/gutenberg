@@ -65,7 +65,7 @@ function FontSizePicker(
 		fallbackFontSize,
 		fontSizes = [],
 		disableCustomFontSizes = false,
-		onChange = () => {},
+		onChange,
 		size = 'default',
 		value,
 		withSlider = false,
@@ -221,7 +221,7 @@ function FontSizePicker(
 								}: {
 									selectedItem: FontSizeSelectOption;
 								} ) => {
-									onChange(
+									onChange?.(
 										hasUnits
 											? selectedItem.size
 											: Number( selectedItem.size )
@@ -242,7 +242,7 @@ function FontSizePicker(
 							hideLabelFromVision
 							value={ value }
 							onChange={ ( newValue ) => {
-								onChange(
+								onChange?.(
 									hasUnits ? newValue : Number( newValue )
 								);
 							} }
@@ -280,9 +280,9 @@ function FontSizePicker(
 												! nextSize ||
 												0 === parseFloat( nextSize )
 											) {
-												onChange( undefined );
+												onChange?.( undefined );
 											} else {
-												onChange(
+												onChange?.(
 													hasUnits
 														? nextSize
 														: parseInt(
@@ -302,7 +302,7 @@ function FontSizePicker(
 											className="components-color-palette__clear"
 											disabled={ value === undefined }
 											onClick={ () => {
-												onChange( undefined );
+												onChange?.( undefined );
 											} }
 											isSmall
 											variant="secondary"
@@ -326,7 +326,7 @@ function FontSizePicker(
 						}
 						initialPosition={ fallbackFontSize }
 						onChange={ ( newValue ) => {
-							onChange( hasUnits ? newValue + 'px' : newValue );
+							onChange?.( hasUnits ? newValue + 'px' : newValue );
 						} }
 						min={ 12 }
 						max={ 100 }

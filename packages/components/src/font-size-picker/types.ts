@@ -26,8 +26,6 @@ export type FontSizePickerProps = {
 	 * If onChange is called without any parameter, it should reset the value,
 	 * attending to what reset means in that context, e.g., set the font size to
 	 * undefined or set the font size a starting value.
-	 *
-	 * @default () => {}
 	 */
 	onChange?: ( value: number | string | undefined ) => void;
 	/**
