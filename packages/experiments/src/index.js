@@ -63,14 +63,14 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
 		apis: {},
 	};
 	return {
-		registerExperimentalAPIs: ( experiments ) => {
+		register: ( experiments ) => {
 			for ( const key in experiments ) {
 				registeredExperiments[ moduleName ].apis[ key ] =
 					experiments[ key ];
 			}
 			return registeredExperiments[ moduleName ].accessKey;
 		},
-		unlockExperimentalAPIs: ( accessKey ) => {
+		unlock: ( accessKey ) => {
 			for ( const experiment of Object.values( registeredExperiments ) ) {
 				if ( experiment.accessKey === accessKey ) {
 					return experiment.apis;

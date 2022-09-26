@@ -42,17 +42,13 @@ describe( '__dangerousOptInToUnstableAPIsOnlyForCoreModules', () => {
 			requiredConsent,
 			'@wordpress/edit-site'
 		);
-		expect( unstableAPIs.unlockExperimentalAPIs ).toEqual(
-			expect.any( Function )
-		);
-		expect( unstableAPIs.registerExperimentalAPIs ).toEqual(
-			expect.any( Function )
-		);
+		expect( unstableAPIs.unlock ).toEqual( expect.any( Function ) );
+		expect( unstableAPIs.register ).toEqual( expect.any( Function ) );
 	} );
 	it( 'Should register and unlock experimental APIs', () => {
 		// This would live in @wordpress/data:
 		// Opt-in to experimental APIs
-		const dataUnstableAPIs =
+		const dataExperiments =
 			__dangerousOptInToUnstableAPIsOnlyForCoreModules(
 				requiredConsent,
 				'@wordpress/data'
@@ -62,13 +58,13 @@ describe( '__dangerousOptInToUnstableAPIsOnlyForCoreModules', () => {
 		const dataExperimentalFunctions = {
 			__experimentalFunction: jest.fn(),
 		};
-		const dataAccessKey = dataUnstableAPIs.registerExperimentalAPIs(
+		const dataAccessKey = dataExperiments.register(
 			dataExperimentalFunctions
 		);
 
 		// This would live in @wordpress/core-data:
 		// Register the experimental APIs
-		const coreDataUnstableAPIs =
+		const coreDataExperiments =
 			__dangerousOptInToUnstableAPIsOnlyForCoreModules(
 				requiredConsent,
 				'@wordpress/core-data'
@@ -76,7 +72,7 @@ describe( '__dangerousOptInToUnstableAPIsOnlyForCoreModules', () => {
 
 		// Get the experimental APIs registered by @wordpress/data
 		const { __experimentalFunction } =
-			coreDataUnstableAPIs.unlockExperimentalAPIs( dataAccessKey );
+			coreDataExperiments.unlock( dataAccessKey );
 
 		// Call one!
 		__experimentalFunction();
