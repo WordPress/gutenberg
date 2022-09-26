@@ -15,7 +15,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 	const { showLabel, showPostCounts, displayAsDropdown, type } = attributes;
 
 	// Prevent block support styles and additional CSS classes from being printed twice.
-	const serverSideRenderAttirbutes = {
+	const serverSideRenderAttributes = {
 		...attributes,
 		className: undefined,
 		style: {
