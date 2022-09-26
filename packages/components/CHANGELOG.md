@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `FontSizePicker`: Convert to TypeScript ([#44449](https://github.com/WordPress/gutenberg/pull/44449)).
+
 ## 21.1.0 (2022-09-21)
 
 ### Deprecations
