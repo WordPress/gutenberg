@@ -41,9 +41,7 @@ function render_block_core_archives( $attributes ) {
 
 		$archives = wp_get_archives( $dropdown_args );
 
-		$classnames = esc_attr( $class );
-
-		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
+		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $class ) );
 
 		switch ( $dropdown_args['type'] ) {
 			case 'yearly':
