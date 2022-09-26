@@ -240,8 +240,8 @@ export function getEntityConfig(
  *    // (kind: string number, key: false | "string value") => string number
  * ```
  *
- * The signature withot the state parameter shipped as CurriedSignature
- * is used in the return value of `dispatch( coreStore )`.
+ * The signature without the state parameter shipped as CurriedSignature
+ * is used in the return value of `select( coreStore )`.
  *
  * See https://github.com/WordPress/gutenberg/pull/41578 for more details.
  */
