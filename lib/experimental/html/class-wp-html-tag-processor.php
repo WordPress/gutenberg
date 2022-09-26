@@ -978,7 +978,7 @@ class WP_HTML_Tag_Processor {
 			 * </code>
 			 *
 			 * This is sufficient because:
-			 * * WP_HTML_Tag_Processor always outputs updated attribute values with double quotes.
+			 * * The attributes touched by set_attribute are always rewritten using double quotes.
 			 * * The only way to terminate a double quoted attribute value is via a double quote (")
 			 *   character. There is no need to encode other characters such as <, >, /, or '.
 			 *
