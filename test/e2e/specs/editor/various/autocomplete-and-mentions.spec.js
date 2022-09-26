@@ -106,9 +106,9 @@ test.describe( 'Autocomplete', () => {
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );
 
-			expect( await editor.getEditedPostContent() ).toBe(
-				testData.snapshot
-			);
+			await expect
+				.poll( editor.getEditedPostContent )
+				.toBe( testData.snapshot );
 		} );
 
 		test( `${ completer }: should insert ${ type } between two other words`, async ( {
@@ -140,9 +140,9 @@ test.describe( 'Autocomplete', () => {
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( ' ' );
-			expect( await editor.getEditedPostContent() ).toBe(
-				testData.snapshot
-			);
+			await expect
+				.poll( editor.getEditedPostContent )
+				.toBe( testData.snapshot );
 		} );
 
 		test( `${ completer }: should insert two subsequent ${ type }s`, async ( {
@@ -185,9 +185,9 @@ test.describe( 'Autocomplete', () => {
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );
-			expect( await editor.getEditedPostContent() ).toBe(
-				testData.snapshot
-			);
+			await expect
+				.poll( editor.getEditedPostContent )
+				.toBe( testData.snapshot );
 		} );
 
 		test( `${ completer }: should allow ${ type } selection via click event`, async ( {
@@ -218,9 +218,9 @@ test.describe( 'Autocomplete', () => {
 				.locator( 'role=option', { hasText: testData.optionText } )
 				.click();
 
-			expect( await editor.getEditedPostContent() ).toBe(
-				testData.snapshot
-			);
+			await expect
+				.poll( editor.getEditedPostContent )
+				.toBe( testData.snapshot );
 		} );
 
 		test( `${ completer }: should allow ${ type } selection via keypress event`, async ( {
@@ -254,9 +254,9 @@ test.describe( 'Autocomplete', () => {
 			await pageUtils.pressKeyTimes( 'ArrowDown', 6 );
 			await page.keyboard.press( 'Enter' );
 
-			expect( await editor.getEditedPostContent() ).toBe(
-				testData.snapshot
-			);
+			await expect
+				.poll( editor.getEditedPostContent )
+				.toBe( testData.snapshot );
 		} );
 
 		test( `${ completer }: should cancel ${ type } selection via \`Escape\` keypress event`, async ( {
@@ -289,9 +289,9 @@ test.describe( 'Autocomplete', () => {
 			await page.keyboard.press( 'Escape' );
 			await page.keyboard.type( testData.postCompleterInput );
 			// The characters before `Escape` should remain (i.e. `~app`)
-			expect( await editor.getEditedPostContent() ).toBe(
-				testData.snapshot
-			);
+			await expect
+				.poll( editor.getEditedPostContent )
+				.toBe( testData.snapshot );
 		} );
 
 		// This test does not apply to user mentions, because they don't get disabled.
@@ -308,7 +308,7 @@ test.describe( 'Autocomplete', () => {
 				).toBeVisible();
 				await page.keyboard.press( 'Enter' );
 				await page.keyboard.type( ' grapes.' );
-				expect( await editor.getEditedPostContent() )
+				await expect.poll( editor.getEditedPostContent )
 					.toBe( `<!-- wp:paragraph -->
 <p>Sorry, we are all out of ~g grapes.</p>
 <!-- /wp:paragraph -->` );
@@ -380,9 +380,9 @@ test.describe( 'Autocomplete', () => {
 				await page.keyboard.press( 'Enter' );
 			}
 
-			expect( await editor.getEditedPostContent() ).toBe(
-				testData.snapshot
-			);
+			await expect
+				.poll( editor.getEditedPostContent )
+				.toBe( testData.snapshot );
 		} );
 	} );
 
@@ -404,7 +404,7 @@ test.describe( 'Autocomplete', () => {
 			page.locator( 'role=option', { hasText: 'Bilbo Baggins' } )
 		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
-		expect( await editor.getEditedPostContent() )
+		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
 <p>@ringbearer +thebetterhobbit</p>
 <!-- /wp:paragraph -->` );
