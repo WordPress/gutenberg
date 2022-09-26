@@ -64,7 +64,7 @@ describe( 'PostPreviewButton', () => {
 		expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-tertiary' );
 	} );
 
-	it( 'should not set `variant` if a custom classname is specified.', () => {
+	it( 'should render the button in its default variant if a custom classname is specified.', () => {
 		render( <PostPreviewButton className="foo-bar" /> );
 
 		const button = screen.getByRole( 'button' );
