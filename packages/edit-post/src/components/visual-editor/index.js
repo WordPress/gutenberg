@@ -337,7 +337,7 @@ export default function VisualEditor( { styles } ) {
 							! isTemplateMode && (
 								<>
 									<LayoutStyle
-										selector=".edit-post-visual-editor__post-title-wrapper"
+										selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
 										layout={ fallbackLayout }
 										layoutDefinitions={
 											globalLayoutSettings?.definitions
