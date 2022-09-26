@@ -28,7 +28,6 @@ function render_block_core_tag_cloud( $attributes ) {
 	$tag_cloud = wp_tag_cloud( $args );
 
 	if ( ! $tag_cloud ) {
-		$labels    = get_taxonomy_labels( get_taxonomy( $attributes['taxonomy'] ) );
 		$tag_cloud = __( 'There&#8217;s no content to show here yet.' );
 	}
 
