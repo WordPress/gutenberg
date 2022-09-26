@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 5.2.0 (2022-09-21)
+
+## 5.1.0 (2022-09-13)
+
+### Bug Fix
+
+-   Makepot: Fix translations object handling ([#43797](https://github.com/WordPress/gutenberg/pull/43797)).
+
+## 5.0.0 (2022-08-24)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
 ## 4.0.0 (2021-01-21)
 
 ### Breaking Changes

@@ -109,7 +109,7 @@ function useMovingAnimation( {
 			return;
 		}
 
-		ref.current.style.transform = '';
+		ref.current.style.transform = undefined;
 		const destination = getAbsolutePosition( ref.current );
 
 		triggerAnimation();
@@ -119,37 +119,22 @@ function useMovingAnimation( {
 		} );
 	}, [ triggerAnimationOnChange ] );
 
-	// Only called when either the x or y value changes.
-	function onFrameChange( { x, y } ) {
+	function onChange( { value } ) {
 		if ( ! ref.current ) {
 			return;
 		}
-
-		const isMoving = x === 0 && y === 0;
-		ref.current.style.transformOrigin = isMoving ? '' : 'center';
-		ref.current.style.transform = isMoving
-			? ''
-			: `translate3d(${ x }px,${ y }px,0)`;
-		ref.current.style.zIndex = ! isSelected || isMoving ? '' : '1';
-
-		preserveScrollPosition();
-	}
-
-	// Called for every frame computed by useSpring.
-	function onChange( { value } ) {
 		let { x, y } = value;
 		x = Math.round( x );
 		y = Math.round( y );
+		const finishedMoving = x === 0 && y === 0;
+		ref.current.style.transformOrigin = 'center center';
+		ref.current.style.transform = finishedMoving
+			? undefined
+			: `translate3d(${ x }px,${ y }px,0)`;
+		ref.current.style.zIndex = isSelected ? '1' : '';
 
-		if ( x !== onChange.x || y !== onChange.y ) {
-			onFrameChange( { x, y } );
-			onChange.x = x;
-			onChange.y = y;
-		}
+		preserveScrollPosition();
 	}
-
-	onChange.x = 0;
-	onChange.y = 0;
 
 	useSpring( {
 		from: {

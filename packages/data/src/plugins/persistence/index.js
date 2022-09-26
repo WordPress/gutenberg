@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { merge, isPlainObject } from 'lodash';
+import { isPlainObject } from 'is-plain-object';
+import { merge } from 'lodash';
 
 /**
  * Internal dependencies

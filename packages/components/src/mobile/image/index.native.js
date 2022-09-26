@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/components';
 import { image as icon } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -54,10 +54,14 @@ const ImageComponent = ( {
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
 	const [ containerSize, setContainerSize ] = useState( null );
-	const Image = ! shouldUseFastImage ? RNImage : FastImage;
-	const imageResizeMode = ! shouldUseFastImage
-		? resizeMode
-		: FastImage.resizeMode[ resizeMode ];
+
+	// Disabled for Android due to https://github.com/WordPress/gutenberg/issues/43149
+	const Image =
+		! shouldUseFastImage || Platform.isAndroid ? RNImage : FastImage;
+	const imageResizeMode =
+		! shouldUseFastImage || Platform.isAndroid
+			? resizeMode
+			: FastImage.resizeMode[ resizeMode ];
 
 	useEffect( () => {
 		let isCurrent = true;
@@ -78,6 +82,9 @@ const ImageComponent = ( {
 			} );
 		}
 		return () => ( isCurrent = false );
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ url ] );
 
 	const onContainerLayout = ( event ) => {

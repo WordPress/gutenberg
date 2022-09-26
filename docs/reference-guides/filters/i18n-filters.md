@@ -57,7 +57,7 @@ Here is a simple example, using the `i18n.gettext` filter to override a specific
 ```jsx
 // Define our filter callback.
 function myPluginGettextFilter( translation, text, domain ) {
-	if ( text === 'Add to Reusable blocks' ) {
+	if ( text === 'Create Reusable block' ) {
 		return 'Save to MyOrg block library';
 	}
 	return translation;

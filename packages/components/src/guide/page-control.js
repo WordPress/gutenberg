@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { times } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -24,7 +19,7 @@ export default function PageControl( {
 			className="components-guide__page-control"
 			aria-label={ __( 'Guide controls' ) }
 		>
-			{ times( numberOfPages, ( page ) => (
+			{ Array.from( { length: numberOfPages } ).map( ( _, page ) => (
 				<li
 					key={ page }
 					// Set aria-current="step" on the active page, see https://www.w3.org/TR/wai-aria-1.1/#aria-current

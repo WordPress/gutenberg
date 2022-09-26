@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -74,21 +73,27 @@ const migrateCustomColorsAndFontSizes = ( attributes ) => {
 	if ( attributes.customFontSize ) {
 		style.typography = { fontSize: attributes.customFontSize };
 	}
+
+	const {
+		customTextColor,
+		customBackgroundColor,
+		customFontSize,
+		...restAttributes
+	} = attributes;
+
 	return {
-		...omit( attributes, [
-			'customTextColor',
-			'customBackgroundColor',
-			'customFontSize',
-		] ),
+		...restAttributes,
 		style,
 	};
 };
+
+const { style, ...restBlockAttributes } = blockAttributes;
 
 const deprecated = [
 	{
 		supports,
 		attributes: {
-			...omit( blockAttributes, [ 'style' ] ),
+			...restBlockAttributes,
 			customTextColor: {
 				type: 'string',
 			},
@@ -153,7 +158,7 @@ const deprecated = [
 	{
 		supports,
 		attributes: {
-			...omit( blockAttributes, [ 'style' ] ),
+			...restBlockAttributes,
 			customTextColor: {
 				type: 'string',
 			},
@@ -218,7 +223,7 @@ const deprecated = [
 	{
 		supports,
 		attributes: {
-			...omit( blockAttributes, [ 'style' ] ),
+			...restBlockAttributes,
 			customTextColor: {
 				type: 'string',
 			},
@@ -284,15 +289,12 @@ const deprecated = [
 	},
 	{
 		supports,
-		attributes: omit(
-			{
-				...blockAttributes,
-				fontSize: {
-					type: 'number',
-				},
+		attributes: {
+			...restBlockAttributes,
+			fontSize: {
+				type: 'number',
 			},
-			[ 'style' ]
-		),
+		},
 		save( { attributes } ) {
 			const {
 				width,
@@ -325,25 +327,21 @@ const deprecated = [
 			);
 		},
 		migrate( attributes ) {
-			return migrateCustomColorsAndFontSizes(
-				omit( {
-					...attributes,
-					customFontSize: Number.isFinite( attributes.fontSize )
-						? attributes.fontSize
+			return migrateCustomColorsAndFontSizes( {
+				...attributes,
+				customFontSize: Number.isFinite( attributes.fontSize )
+					? attributes.fontSize
+					: undefined,
+				customTextColor:
+					attributes.textColor && '#' === attributes.textColor[ 0 ]
+						? attributes.textColor
 						: undefined,
-					customTextColor:
-						attributes.textColor &&
-						'#' === attributes.textColor[ 0 ]
-							? attributes.textColor
-							: undefined,
-					customBackgroundColor:
-						attributes.backgroundColor &&
-						'#' === attributes.backgroundColor[ 0 ]
-							? attributes.backgroundColor
-							: undefined,
-				} ),
-				[ 'fontSize', 'textColor', 'backgroundColor', 'style' ]
-			);
+				customBackgroundColor:
+					attributes.backgroundColor &&
+					'#' === attributes.backgroundColor[ 0 ]
+						? attributes.backgroundColor
+						: undefined,
+			} );
 		},
 	},
 	{

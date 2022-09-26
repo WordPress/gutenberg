@@ -18,6 +18,10 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 	private static $pages;
 	private static $terms;
+	/**
+	 * @var array|null
+	 */
+	private $original_block_supports;
 
 	public static function wpSetUpBeforeClass() {
 
@@ -88,6 +92,21 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		foreach ( self::$terms as $term_to_delete ) {
 			wp_delete_term( $term_to_delete->term_id, $term_to_delete->taxonomy );
 		}
+	}
+
+	public function set_up() {
+		parent::set_up();
+
+		$this->original_block_supports      = WP_Block_Supports::$block_to_render;
+		WP_Block_Supports::$block_to_render = array(
+			'attrs'     => array(),
+			'blockName' => '',
+		);
+	}
+
+	public function tear_down() {
+		WP_Block_Supports::$block_to_render = $this->original_block_supports;
+		parent::tear_down();
 	}
 
 	function test_returns_link_when_post_is_published() {

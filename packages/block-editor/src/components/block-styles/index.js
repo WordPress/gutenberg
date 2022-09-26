@@ -1,17 +1,16 @@
 /**
  * External dependencies
  */
-import { debounce } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { useState, useLayoutEffect } from '@wordpress/element';
-import { useViewportMatch } from '@wordpress/compose';
+import { debounce, useViewportMatch } from '@wordpress/compose';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalTruncate as Truncate,
 	Slot,
 	Fill,
 } from '@wordpress/components';
@@ -117,15 +116,12 @@ function BlockStyles( {
 							onClick={ () => onSelectStylePreview( style ) }
 							aria-current={ activeStyle.name === style.name }
 						>
-							<Text
-								as="span"
-								limit={ 12 }
-								ellipsizeMode="tail"
+							<Truncate
+								numberOfLines={ 1 }
 								className="block-editor-block-styles__item-text"
-								truncate
 							>
 								{ buttonText }
-							</Text>
+							</Truncate>
 						</Button>
 					);
 				} ) }

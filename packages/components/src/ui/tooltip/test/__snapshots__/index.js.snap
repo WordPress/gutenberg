@@ -9,6 +9,7 @@ exports[`props should render correctly 1`] = `
   transform-origin: top center;
   -webkit-transition: opacity 100ms ease;
   transition: opacity 100ms ease;
+  font-size: 13px;
 }
 
 .emotion-0[data-enter] {

@@ -190,7 +190,12 @@ export function useToolsPanel(
 			areAllOptionalControlsHidden &&
 			styles.ToolsPanelHiddenInnerWrapper;
 
-		return cx( styles.ToolsPanel, wrapperStyle, emptyStyle, className );
+		return cx(
+			styles.ToolsPanel( DEFAULT_COLUMNS ),
+			wrapperStyle,
+			emptyStyle,
+			className
+		);
 	}, [
 		areAllOptionalControlsHidden,
 		className,

@@ -12,7 +12,7 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 
 export default function ArchivesEdit( { attributes, setAttributes } ) {
-	const { showPostCounts, displayAsDropdown, type } = attributes;
+	const { showLabel, showPostCounts, displayAsDropdown, type } = attributes;
 
 	return (
 		<>
@@ -27,6 +27,17 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 							} )
 						}
 					/>
+					{ displayAsDropdown && (
+						<ToggleControl
+							label={ __( 'Show label' ) }
+							checked={ showLabel }
+							onChange={ () =>
+								setAttributes( {
+									showLabel: ! showLabel,
+								} )
+							}
+						/>
+					) }
 					<ToggleControl
 						label={ __( 'Show post counts' ) }
 						checked={ showPostCounts }

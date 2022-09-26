@@ -22,6 +22,7 @@ data class GutenbergProps @JvmOverloads constructor(
     val enableReusableBlock: Boolean,
     val localeSlug: String,
     val postType: String,
+    val hostAppNamespace: String,
     val featuredImageId: Int,
     val editorTheme: Bundle?,
     val translations: Bundle,
@@ -34,6 +35,7 @@ data class GutenbergProps @JvmOverloads constructor(
         putString(PROP_INITIAL_TITLE, "")
         putString(PROP_LOCALE, revertDeprecatedLanguageCode(localeSlug))
         putString(PROP_POST_TYPE, postType)
+        putString(PROP_HOST_APP_NAMESPACE, hostAppNamespace)
         putInt(PROP_INITIAL_FEATURED_IMAGE_ID, featuredImageId)
         putBundle(PROP_TRANSLATIONS, translations)
         putBoolean(PROP_INITIAL_HTML_MODE_ENABLED, htmlModeEnabled)
@@ -53,6 +55,8 @@ data class GutenbergProps @JvmOverloads constructor(
                     ?.let { putSerializable(PROP_GALLERY_WITH_IMAGE_BLOCKS, it) }
             theme.getSerializable(PROP_QUOTE_BLOCK_V2)
                     ?.let { putSerializable(PROP_QUOTE_BLOCK_V2, it) }
+            theme.getSerializable(PROP_LIST_BLOCK_V2)
+                    ?.let { putSerializable(PROP_LIST_BLOCK_V2, it) }
         }
     }
 
@@ -86,6 +90,7 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_INITIAL_TITLE = "initialTitle"
         private const val PROP_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled"
         private const val PROP_POST_TYPE = "postType"
+        private const val PROP_HOST_APP_NAMESPACE = "hostAppNamespace"
         private const val PROP_INITIAL_FEATURED_IMAGE_ID = "featuredImageId"
         private const val PROP_TRANSLATIONS = "translations"
         private const val PROP_COLORS = "colors"
@@ -95,6 +100,7 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_IS_FSE_THEME = "isFSETheme"
         private const val PROP_GALLERY_WITH_IMAGE_BLOCKS = "galleryWithImageBlocks"
         private const val PROP_QUOTE_BLOCK_V2 = "quoteBlockV2"
+        private const val PROP_LIST_BLOCK_V2 = "listBlockV2"
 
         const val PROP_LOCALE = "locale"
         const val PROP_CAPABILITIES = "capabilities"

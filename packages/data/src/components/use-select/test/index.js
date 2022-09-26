@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { act, render } from '@testing-library/react';
+import { act, render, fireEvent } from '@testing-library/react';
 
 /**
  * WordPress dependencies
  */
-import { useState, useReducer } from '@wordpress/element';
+import { Component, useState, useReducer } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -431,6 +431,63 @@ describe( 'useSelect', () => {
 			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 5 );
 			expect( rendered.getByRole( 'status' ) ).toHaveTextContent(
 				'count:1,dep:1'
+			);
+		} );
+
+		it( 'captures state changes scheduled between render and effect', () => {
+			registry.registerStore( 'store-1', counterStore );
+
+			class ChildComponent extends Component {
+				componentDidUpdate( prevProps ) {
+					if (
+						this.props.childShouldDispatch &&
+						this.props.childShouldDispatch !==
+							prevProps.childShouldDispatch
+					) {
+						registry.dispatch( 'store-1' ).increment();
+					}
+				}
+
+				render() {
+					return null;
+				}
+			}
+
+			const selectCount1AndDep = jest.fn( ( select ) => ( {
+				count1: select( 'store-1' ).getCounter(),
+			} ) );
+
+			const TestComponent = () => {
+				const [ childShouldDispatch, setChildShouldDispatch ] =
+					useState( false );
+				const state = useSelect( selectCount1AndDep, [] );
+
+				return (
+					<>
+						<div role="status">count1:{ state.count1 }</div>
+						<ChildComponent
+							childShouldDispatch={ childShouldDispatch }
+						/>
+						<button
+							onClick={ () => setChildShouldDispatch( true ) }
+						>
+							triggerChildDispatch
+						</button>
+					</>
+				);
+			};
+
+			const rendered = render(
+				<RegistryProvider value={ registry }>
+					<TestComponent />
+				</RegistryProvider>
+			);
+
+			fireEvent.click( rendered.getByText( 'triggerChildDispatch' ) );
+
+			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 3 );
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent(
+				'count1:1'
 			);
 		} );
 

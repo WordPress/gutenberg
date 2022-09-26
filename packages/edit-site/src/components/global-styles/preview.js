@@ -79,13 +79,13 @@ const StylesPreview = ( { label, isFocused } ) => {
 		)
 		.slice( 0, 2 );
 
-	// Reset leaked styles from WP common.css.
+	// Reset leaked styles from WP common.css and remove main content layout padding.
 	const editorStyles = useMemo( () => {
 		if ( styles ) {
 			return [
 				...styles,
 				{
-					css: 'body{min-width: 0;}',
+					css: 'body{min-width: 0;padding: 0;}',
 					isGlobalStyles: true,
 				},
 			];

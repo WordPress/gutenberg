@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+## 4.18.0 (2022-09-21)
+
+## 4.17.0 (2022-09-13)
+
+### Internal
+
+-   Lodash: Remove completely from `@wordpress/redux-routine` package ([#43741](https://github.com/WordPress/gutenberg/pull/43741)).
+
+## 4.16.0 (2022-08-24)
+
+### Bug Fix
+
+-   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
+
+## 4.15.0 (2022-08-10)
+
+## 4.14.0 (2022-07-27)
+
 ## 4.13.0 (2022-07-13)
 
 ## 4.12.0 (2022-06-29)

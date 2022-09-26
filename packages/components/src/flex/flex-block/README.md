@@ -8,8 +8,8 @@ See [`flex/README.md#usage`](/packages/components/src/flex/README.md#usage) for 
 
 ## Props
 
-### display
-
-**Type**: `[CSSProperties['display']]`
+### `display`: `CSSProperties['display']`
 
 The CSS display property of `FlexBlock`.
+
+-   Required: No

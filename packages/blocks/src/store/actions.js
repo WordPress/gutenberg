@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { castArray, isPlainObject, omit, pick, some } from 'lodash';
+import { isPlainObject } from 'is-plain-object';
+import { castArray, pick, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,10 +12,11 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { isValidIcon, normalizeIconObject } from '../api/utils';
+import { isValidIcon, normalizeIconObject, omit } from '../api/utils';
 import { DEPRECATED_ENTRY_KEYS } from '../api/constants';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
+/** @typedef {import('../api/registration').WPBlockType} WPBlockType */
 /** @typedef {import('./reducer').WPBlockCategory} WPBlockCategory */
 
 const { error, warn } = window.console;
@@ -142,8 +144,12 @@ const processBlockType = ( blockType, { select } ) => {
 
 /**
  * Returns an action object used in signalling that block types have been added.
+ * Ignored from documentation as the recommended usage for this action through registerBlockType from @wordpress/blocks.
  *
- * @param {Array|Object} blockTypes Block types received.
+ * @ignore
+ *
+ * @param {WPBlockType|WPBlockType[]} blockTypes Object or array of objects representing blocks to added.
+ *
  *
  * @return {Object} Action object.
  */
@@ -217,8 +223,12 @@ export const __experimentalReapplyBlockTypeFilters =
 
 /**
  * Returns an action object used to remove a registered block type.
+ * Ignored from documentation as the recommended usage for this action through unregisterBlockType from @wordpress/blocks.
  *
- * @param {string|Array} names Block name.
+ * @ignore
+ *
+ * @param {string|string[]} names Block name or array of block names to be removed.
+ *
  *
  * @return {Object} Action object.
  */
@@ -231,9 +241,12 @@ export function removeBlockTypes( names ) {
 
 /**
  * Returns an action object used in signalling that new block styles have been added.
+ * Ignored from documentation as the recommended usage for this action through registerBlockStyle from @wordpress/blocks.
  *
  * @param {string}       blockName Block name.
- * @param {Array|Object} styles    Block styles.
+ * @param {Array|Object} styles    Block style object or array of block style objects.
+ *
+ * @ignore
  *
  * @return {Object} Action object.
  */
@@ -247,9 +260,12 @@ export function addBlockStyles( blockName, styles ) {
 
 /**
  * Returns an action object used in signalling that block styles have been removed.
+ * Ignored from documentation as the recommended usage for this action through unregisterBlockStyle from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string}       blockName  Block name.
- * @param {Array|string} styleNames Block style names.
+ * @param {Array|string} styleNames Block style names or array of block style names.
  *
  * @return {Object} Action object.
  */
@@ -263,6 +279,9 @@ export function removeBlockStyles( blockName, styleNames ) {
 
 /**
  * Returns an action object used in signalling that new block variations have been added.
+ * Ignored from documentation as the recommended usage for this action through registerBlockVariation from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string}                              blockName  Block name.
  * @param {WPBlockVariation|WPBlockVariation[]} variations Block variations.
@@ -279,6 +298,9 @@ export function addBlockVariations( blockName, variations ) {
 
 /**
  * Returns an action object used in signalling that block variations have been removed.
+ * Ignored from documentation as the recommended usage for this action through unregisterBlockVariation from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string}          blockName      Block name.
  * @param {string|string[]} variationNames Block variation names.
@@ -295,24 +317,11 @@ export function removeBlockVariations( blockName, variationNames ) {
 
 /**
  * Returns an action object used to set the default block name.
+ * Ignored from documentation as the recommended usage for this action through setDefaultBlockName from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string} name Block name.
- *
- * @example
- * ```js
- * import { store as blocksStore } from '@wordpress/blocks';
- * import { useDispatch } from '@wordpress/data';
- *
- * const ExampleComponent = () => {
- *     const { setDefaultBlockName } = useDispatch( blocksStore );
- *
- *     return (
- *         <Button onClick={ () => setDefaultBlockName( 'core/heading' ) }>
- *             { __( 'Set the default block to Heading' ) }
- *         </Button>
- *     );
- * };
- * ```
  *
  * @return {Object} Action object.
  */
@@ -326,6 +335,9 @@ export function setDefaultBlockName( name ) {
 /**
  * Returns an action object used to set the name of the block used as a fallback
  * for non-block content.
+ * Ignored from documentation as the recommended usage for this action through setFreeformContentHandlerName from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string} name Block name.
  *
@@ -341,6 +353,9 @@ export function setFreeformFallbackBlockName( name ) {
 /**
  * Returns an action object used to set the name of the block used as a fallback
  * for unregistered blocks.
+ * Ignored from documentation as the recommended usage for this action through setUnregisteredTypeHandlerName from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string} name Block name.
  *
@@ -357,6 +372,9 @@ export function setUnregisteredFallbackBlockName( name ) {
  * Returns an action object used to set the name of the block used
  * when grouping other blocks
  * eg: in "Group/Ungroup" interactions
+ * Ignored from documentation as the recommended usage for this action through setGroupingBlockName from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string} name Block name.
  *
@@ -371,36 +389,11 @@ export function setGroupingBlockName( name ) {
 
 /**
  * Returns an action object used to set block categories.
+ * Ignored from documentation as the recommended usage for this action through setCategories from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {WPBlockCategory[]} categories Block categories.
- *
- * @example
- * ```js
- * import { store as blocksStore } from '@wordpress/blocks';
- * import { useSelect, useDispatch } from '@wordpress/data';
- *
- * const ExampleComponent = () => {
- *     const blockCategories = useSelect( ( select ) =>
- *         select( blocksStore ).getCategories(),
- *         []
- *     );
- *
- *     const { setCategories } = useDispatch( blocksStore )
- *
- *     return (
- *         <Button
- *             onClick={ () =>
- *                 setCategories( [
- *                     ...blockCategories,
- *                     { title: 'Custom Category', slug: 'custom-category' },
- *                 ] )
- *             }
- *         >
- *             { __( 'Add a new custom block category' ) }
- *         </Button>
- *     );
- * };
- * ```
  *
  * @return {Object} Action object.
  */
@@ -413,6 +406,9 @@ export function setCategories( categories ) {
 
 /**
  * Returns an action object used to update a category.
+ * Ignored from documentation as the recommended usage for this action through updateCategory from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string} slug     Block category slug.
  * @param {Object} category Object containing the category properties that should be updated.
@@ -429,6 +425,9 @@ export function updateCategory( slug, category ) {
 
 /**
  * Returns an action object used to add block collections
+ * Ignored from documentation as the recommended usage for this action through registerBlockCollection from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string} namespace The namespace of the blocks to put in the collection
  * @param {string} title     The title to display in the block inserter
@@ -447,6 +446,9 @@ export function addBlockCollection( namespace, title, icon ) {
 
 /**
  * Returns an action object used to remove block collections
+ * Ignored from documentation as the recommended usage for this action through unregisterBlockCollection from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string} namespace The namespace of the blocks to put in the collection
  *

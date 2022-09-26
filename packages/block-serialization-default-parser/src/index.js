@@ -1,7 +1,49 @@
+/**
+ * @type {string}
+ */
 let document;
+/**
+ * @type {number}
+ */
 let offset;
+/**
+ * @type {ParsedBlock[]}
+ */
 let output;
+/**
+ * @type {ParsedFrame[]}
+ */
 let stack;
+
+/**
+ * @typedef {Object|null} Attributes
+ */
+
+/**
+ * @typedef {Object} ParsedBlock
+ * @property {string|null}        blockName    Block name.
+ * @property {Attributes}         attrs        Block attributes.
+ * @property {ParsedBlock[]}      innerBlocks  Inner blocks.
+ * @property {string}             innerHTML    Inner HTML.
+ * @property {Array<string|null>} innerContent Inner content.
+ */
+
+/**
+ * @typedef {Object} ParsedFrame
+ * @property {ParsedBlock} block            Block.
+ * @property {number}      tokenStart       Token start.
+ * @property {number}      tokenLength      Token length.
+ * @property {number}      prevOffset       Previous offset.
+ * @property {number|null} leadingHtmlStart Leading HTML start.
+ */
+
+/**
+ * @typedef {'void-block'|'block-opener'|'block-closer'} TokenType
+ */
+
+/**
+ * @typedef {[TokenType, string, Attributes, number, number]} Token
+ */
 
 /**
  * Matches block comment delimiters
@@ -47,6 +89,16 @@ let stack;
 const tokenizer =
 	/<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/g;
 
+/**
+ * Constructs a block object.
+ *
+ * @param {string|null}   blockName
+ * @param {Attributes}    attrs
+ * @param {ParsedBlock[]} innerBlocks
+ * @param {string}        innerHTML
+ * @param {string[]}      innerContent
+ * @return {ParsedBlock} The block object.
+ */
 function Block( blockName, attrs, innerBlocks, innerHTML, innerContent ) {
 	return {
 		blockName,
@@ -57,10 +109,26 @@ function Block( blockName, attrs, innerBlocks, innerHTML, innerContent ) {
 	};
 }
 
+/**
+ * Constructs a freeform block object.
+ *
+ * @param {string} innerHTML
+ * @return {ParsedBlock} The freeform block object.
+ */
 function Freeform( innerHTML ) {
 	return Block( null, {}, [], innerHTML, [ innerHTML ] );
 }
 
+/**
+ * Constructs a frame object.
+ *
+ * @param {ParsedBlock} block
+ * @param {number}      tokenStart
+ * @param {number}      tokenLength
+ * @param {number}      prevOffset
+ * @param {number|null} leadingHtmlStart
+ * @return {ParsedFrame} The frame object.
+ */
 function Frame( block, tokenStart, tokenLength, prevOffset, leadingHtmlStart ) {
 	return {
 		block,
@@ -146,7 +214,7 @@ function Frame( block, tokenStart, tokenLength, prevOffset, leadingHtmlStart ) {
  *     }
  * ];
  * ```
- * @return {Array} A block-based representation of the input HTML.
+ * @return {ParsedBlock[]} A block-based representation of the input HTML.
  */
 export const parse = ( doc ) => {
 	document = doc;
@@ -162,42 +230,47 @@ export const parse = ( doc ) => {
 	return output;
 };
 
+/**
+ * Parses the next token in the input document.
+ *
+ * @return {boolean} Returns true when there is more tokens to parse.
+ */
 function proceed() {
-	const next = nextToken();
-	const [ tokenType, blockName, attrs, startOffset, tokenLength ] = next;
 	const stackDepth = stack.length;
+	const next = nextToken();
+	if ( next === null ) {
+		// If not in a block then flush output.
+		if ( 0 === stackDepth ) {
+			addFreeform();
+			return false;
+		}
+
+		// Otherwise we have a problem
+		// This is an error
+		// we have options
+		//  - treat it all as freeform text
+		//  - assume an implicit closer (easiest when not nesting)
+
+		// For the easy case we'll assume an implicit closer.
+		if ( 1 === stackDepth ) {
+			addBlockFromStack();
+			return false;
+		}
+
+		// For the nested case where it's more difficult we'll
+		// have to assume that multiple closers are missing
+		// and so we'll collapse the whole stack piecewise.
+		while ( 0 < stack.length ) {
+			addBlockFromStack();
+		}
+		return false;
+	}
+	const [ tokenType, blockName, attrs, startOffset, tokenLength ] = next;
 
 	// We may have some HTML soup before the next block.
 	const leadingHtmlStart = startOffset > offset ? offset : null;
 
 	switch ( tokenType ) {
-		case 'no-more-tokens':
-			// If not in a block then flush output.
-			if ( 0 === stackDepth ) {
-				addFreeform();
-				return false;
-			}
-
-			// Otherwise we have a problem
-			// This is an error
-			// we have options
-			//  - treat it all as freeform text
-			//  - assume an implicit closer (easiest when not nesting)
-
-			// For the easy case we'll assume an implicit closer.
-			if ( 1 === stackDepth ) {
-				addBlockFromStack();
-				return false;
-			}
-
-			// For the nested case where it's more difficult we'll
-			// have to assume that multiple closers are missing
-			// and so we'll collapse the whole stack piecewise.
-			while ( 0 < stack.length ) {
-				addBlockFromStack();
-			}
-			return false;
-
 		case 'void-block':
 			// easy case is if we stumbled upon a void block
 			// in the top-level of the document.
@@ -261,7 +334,7 @@ function proceed() {
 
 			// Otherwise we're nested and we have to close out the current
 			// block and add it as a innerBlock to the parent.
-			const stackTop = stack.pop();
+			const stackTop = /** @type {ParsedFrame} */ ( stack.pop() );
 			const html = document.substr(
 				stackTop.prevOffset,
 				startOffset - stackTop.prevOffset
@@ -304,6 +377,11 @@ function parseJSON( input ) {
 	}
 }
 
+/**
+ * Finds the next token in the document.
+ *
+ * @return {Token|null} The next matched token.
+ */
 function nextToken() {
 	// Aye the magic
 	// we're using a single RegExp to tokenize the block comment delimiters
@@ -315,7 +393,7 @@ function nextToken() {
 
 	// We have no more tokens.
 	if ( null === matches ) {
-		return [ 'no-more-tokens' ];
+		return null;
 	}
 
 	const startedAt = matches.index;
@@ -355,6 +433,11 @@ function nextToken() {
 	return [ 'block-opener', name, attrs, startedAt, length ];
 }
 
+/**
+ * Adds a freeform block to the output.
+ *
+ * @param {number} [rawLength]
+ */
 function addFreeform( rawLength ) {
 	const length = rawLength ? rawLength : document.length - offset;
 
@@ -365,6 +448,14 @@ function addFreeform( rawLength ) {
 	output.push( Freeform( document.substr( offset, length ) ) );
 }
 
+/**
+ * Adds inner block to the parent block.
+ *
+ * @param {ParsedBlock} block
+ * @param {number}      tokenStart
+ * @param {number}      tokenLength
+ * @param {number}      [lastOffset]
+ */
 function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
 	const parent = stack[ stack.length - 1 ];
 	parent.block.innerBlocks.push( block );
@@ -382,8 +473,14 @@ function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
 	parent.prevOffset = lastOffset ? lastOffset : tokenStart + tokenLength;
 }
 
+/**
+ * Adds block from the stack to the output.
+ *
+ * @param {number} [endOffset]
+ */
 function addBlockFromStack( endOffset ) {
-	const { block, leadingHtmlStart, prevOffset, tokenStart } = stack.pop();
+	const { block, leadingHtmlStart, prevOffset, tokenStart } =
+		/** @type {ParsedFrame} */ ( stack.pop() );
 
 	const html = endOffset
 		? document.substr( prevOffset, endOffset - prevOffset )

@@ -17,6 +17,10 @@ export default {
 			description:
 				'If no value exists, this prop defines the starting position for the font size picker slider. Only relevant if `withSlider` is `true`.',
 		},
+		size: {
+			control: { type: 'radio' },
+			options: [ 'default', '__unstable-large' ],
+		},
 		withReset: {
 			description:
 				'If `true`, a reset button will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` or `withSlider` is `true`.',
@@ -61,6 +65,7 @@ const TwoFontSizePickersWithState = ( { fontSizes, ...props } ) => {
 
 export const Default = FontSizePickerWithState.bind( {} );
 Default.args = {
+	__nextHasNoMarginBottom: true,
 	disableCustomFontSizes: false,
 	fontSizes: [
 		{

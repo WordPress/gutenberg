@@ -24,11 +24,6 @@
 function render_block_core_comments( $attributes, $content, $block ) {
 	global $post;
 
-	$is_legacy = 'core/post-comments' === $block->name || ! empty( $attributes['legacy'] );
-	if ( ! $is_legacy ) {
-		return $block->render( array( 'dynamic' => false ) );
-	}
-
 	$post_id = $block->context['postId'];
 	if ( ! isset( $post_id ) ) {
 		return '';
@@ -42,6 +37,12 @@ function render_block_core_comments( $attributes, $content, $block ) {
 	// Return early if there are no comments and comments are closed.
 	if ( ! comments_open( $post_id ) && get_comments( $comment_args ) === 0 ) {
 		return '';
+	}
+
+	// If this isn't the legacy block, we need to render the static version of this block.
+	$is_legacy = 'core/post-comments' === $block->name || ! empty( $attributes['legacy'] );
+	if ( ! $is_legacy ) {
+		return $block->render( array( 'dynamic' => false ) );
 	}
 
 	$post_before = $post;
@@ -108,7 +109,7 @@ add_action( 'init', 'register_block_core_comments' );
  */
 function comments_block_form_defaults( $fields ) {
 	if ( wp_is_block_theme() ) {
-		$fields['submit_button'] = '<input name="%1$s" type="submit" id="%2$s" class="%3$s wp-block-button__link ' . WP_Theme_JSON_Gutenberg::get_element_class_name( 'button' ) . '" value="%4$s" />';
+		$fields['submit_button'] = '<input name="%1$s" type="submit" id="%2$s" class="%3$s wp-block-button__link ' . wp_theme_get_element_class_name( 'button' ) . '" value="%4$s" />';
 		$fields['submit_field']  = '<p class="form-submit wp-block-button">%1$s %2$s</p>';
 	}
 

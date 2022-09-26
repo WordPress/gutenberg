@@ -18,7 +18,7 @@
 function gutenberg_is_theme_directory_ignored( $path ) {
 	$ignore_list = array( '.DS_Store', '.svn', '.git', '.hg', '.bzr', 'node_modules', 'vendor' );
 	foreach ( $ignore_list as $ignored ) {
-		if ( strpos( $path, $ignored ) === 0 ) {
+		if ( str_starts_with( $path, $ignored ) ) {
 			return true;
 		}
 	}

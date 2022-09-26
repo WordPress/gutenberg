@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { has, kebabCase } from 'lodash';
+import { kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -63,7 +63,12 @@ function useLayoutClasses( layout, layoutDefinitions ) {
 		);
 	}
 
-	if ( ( layout?.inherit || layout?.contentSize ) && rootPaddingAlignment ) {
+	if (
+		( layout?.inherit ||
+			layout?.contentSize ||
+			layout?.type === 'constrained' ) &&
+		rootPaddingAlignment
+	) {
 		layoutClassnames.push( 'has-global-padding' );
 	}
 
@@ -110,24 +115,38 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 	// Only show the inherit toggle if it's supported,
 	// a default theme layout is set (e.g. one that provides `contentSize` and/or `wideSize` values),
-	// and that the default / flow layout type is in use, as this is the only one that supports inheritance.
+	// and either the default / flow or the constrained layout type is in use, as the toggle switches from one to the other.
 	const showInheritToggle = !! (
 		allowInheriting &&
 		!! defaultThemeLayout &&
-		( ! layout?.type || layout?.type === 'default' || layout?.inherit )
+		( ! layout?.type ||
+			layout?.type === 'default' ||
+			layout?.type === 'constrained' ||
+			layout?.inherit )
 	);
 
 	const usedLayout = layout || defaultBlockLayout || {};
-	const { inherit = false, type = 'default' } = usedLayout;
+	const {
+		inherit = false,
+		type = 'default',
+		contentSize = null,
+	} = usedLayout;
 	/**
-	 * `themeSupportsLayout` is only relevant to the `default/flow`
-	 * layout and it should not be taken into account when other
+	 * `themeSupportsLayout` is only relevant to the `default/flow` or
+	 * `constrained` layouts and it should not be taken into account when other
 	 * `layout` types are used.
 	 */
-	if ( type === 'default' && ! themeSupportsLayout ) {
+	if (
+		( type === 'default' || type === 'constrained' ) &&
+		! themeSupportsLayout
+	) {
 		return null;
 	}
 	const layoutType = getLayoutType( type );
+	const constrainedType = getLayoutType( 'constrained' );
+	const displayControlsForLegacyLayouts =
+		! usedLayout.type && ( contentSize || inherit );
+	const hasContentSizeOrLegacySettings = !! inherit || !! contentSize;
 
 	const onChangeType = ( newType ) =>
 		setAttributes( { layout: { type: newType } } );
@@ -141,25 +160,35 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 					{ showInheritToggle && (
 						<>
 							<ToggleControl
-								label={ __( 'Inner blocks use full width' ) }
-								checked={ ! inherit }
+								className="block-editor-hooks__toggle-control"
+								label={ __( 'Inner blocks use content width' ) }
+								checked={
+									layoutType?.name === 'constrained' ||
+									hasContentSizeOrLegacySettings
+								}
 								onChange={ () =>
 									setAttributes( {
 										layout: {
-											inherit: ! inherit,
+											type:
+												layoutType?.name ===
+													'constrained' ||
+												hasContentSizeOrLegacySettings
+													? 'default'
+													: 'constrained',
 										},
 									} )
 								}
+								help={
+									layoutType?.name === 'constrained' ||
+									hasContentSizeOrLegacySettings
+										? __(
+												'Nested blocks use content width with options for full and wide widths.'
+										  )
+										: __(
+												'Nested blocks will fill the width of this container. Toggle to constrain.'
+										  )
+								}
 							/>
-							<p className="block-editor-hooks__layout-controls-helptext">
-								{ !! inherit
-									? __(
-											'Nested blocks use theme content width with options for full and wide widths.'
-									  )
-									: __(
-											'Nested blocks will fill the width of this container.'
-									  ) }
-							</p>
 						</>
 					) }
 
@@ -170,8 +199,15 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 						/>
 					) }
 
-					{ ! inherit && layoutType && (
+					{ layoutType && layoutType.name !== 'default' && (
 						<layoutType.inspectorControls
+							layout={ usedLayout }
+							onChange={ onChangeLayout }
+							layoutBlockSupport={ layoutBlockSupport }
+						/>
+					) }
+					{ constrainedType && displayControlsForLegacyLayouts && (
+						<constrainedType.inspectorControls
 							layout={ usedLayout }
 							onChange={ onChangeLayout }
 							layoutBlockSupport={ layoutBlockSupport }
@@ -216,7 +252,7 @@ function LayoutTypeSwitcher( { type, onChange } ) {
  * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
-	if ( has( settings.attributes, [ 'layout', 'type' ] ) ) {
+	if ( 'type' in ( settings.attributes?.layout ?? {} ) ) {
 		return settings;
 	}
 	if ( hasBlockSupport( settings, layoutBlockSupportKey ) ) {
@@ -264,20 +300,27 @@ export const withInspectorControls = createHigherOrderComponent(
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
-		const shouldRenderLayoutStyles = hasBlockSupport(
+		const hasLayoutBlockSupport = hasBlockSupport(
 			name,
 			layoutBlockSupportKey
 		);
+		const disableLayoutStyles = useSelect( ( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			return !! getSettings().disableLayoutStyles;
+		} );
+		const shouldRenderLayoutStyles =
+			hasLayoutBlockSupport && ! disableLayoutStyles;
 		const id = useInstanceId( BlockListBlock );
 		const defaultThemeLayout = useSetting( 'layout' ) || {};
 		const element = useContext( BlockList.__unstableElementContext );
 		const { layout } = attributes;
 		const { default: defaultBlockLayout } =
 			getBlockSupport( name, layoutBlockSupportKey ) || {};
-		const usedLayout = layout?.inherit
-			? defaultThemeLayout
-			: layout || defaultBlockLayout || {};
-		const layoutClasses = shouldRenderLayoutStyles
+		const usedLayout =
+			layout?.inherit || layout?.contentSize || layout?.wideSize
+				? { ...layout, type: 'constrained' }
+				: layout || defaultBlockLayout || {};
+		const layoutClasses = hasLayoutBlockSupport
 			? useLayoutClasses( usedLayout, defaultThemeLayout?.definitions )
 			: null;
 		const selector = `.${ getBlockDefaultClassName(

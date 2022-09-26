@@ -7,7 +7,8 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	useSetting,
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	__experimentalRecursionProvider as RecursionProvider,
+	__experimentalUseHasRecursion as useHasRecursion,
 	store as blockEditorStore,
 	Warning,
 } from '@wordpress/block-editor';
@@ -118,15 +119,14 @@ function RecursionError() {
 export default function PostContentEdit( { context, attributes } ) {
 	const { postId: contextPostId, postType: contextPostType } = context;
 	const { layout = {} } = attributes;
-	const [ hasAlreadyRendered, RecursionProvider ] =
-		useNoRecursiveRenders( contextPostId );
+	const hasAlreadyRendered = useHasRecursion( contextPostId );
 
 	if ( contextPostId && contextPostType && hasAlreadyRendered ) {
 		return <RecursionError />;
 	}
 
 	return (
-		<RecursionProvider>
+		<RecursionProvider uniqueId={ contextPostId }>
 			{ contextPostId && contextPostType ? (
 				<Content context={ context } layout={ layout } />
 			) : (

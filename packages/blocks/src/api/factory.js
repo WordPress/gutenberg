@@ -2,17 +2,6 @@
  * External dependencies
  */
 import { v4 as uuid } from 'uuid';
-import {
-	every,
-	castArray,
-	some,
-	filter,
-	first,
-	has,
-	uniq,
-	isEmpty,
-	map,
-} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -164,14 +153,14 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
  * @return {boolean} Is the transform possible?
  */
 const isPossibleTransformForSource = ( transform, direction, blocks ) => {
-	if ( isEmpty( blocks ) ) {
+	if ( ! blocks.length ) {
 		return false;
 	}
 
 	// If multiple blocks are selected, only multi block transforms
 	// or wildcard transforms are allowed.
 	const isMultiBlock = blocks.length > 1;
-	const firstBlockName = first( blocks ).name;
+	const firstBlockName = blocks[ 0 ].name;
 	const isValidForMultiBlocks =
 		isWildcardBlockTransform( transform ) ||
 		! isMultiBlock ||
@@ -184,7 +173,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	// for a block selection of multiple blocks of different types.
 	if (
 		! isWildcardBlockTransform( transform ) &&
-		! every( blocks, { name: firstBlockName } )
+		! blocks.every( ( block ) => block.name === firstBlockName )
 	) {
 		return false;
 	}
@@ -197,7 +186,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 
 	// Check if the transform's block name matches the source block (or is a wildcard)
 	// only if this is a transform 'from'.
-	const sourceBlock = first( blocks );
+	const sourceBlock = blocks[ 0 ];
 	const hasMatchingName =
 		direction !== 'from' ||
 		transform.blocks.indexOf( sourceBlock.name ) !== -1 ||
@@ -210,6 +199,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	// a Grouping block.
 	if (
 		! isMultiBlock &&
+		direction === 'from' &&
 		isContainerGroupBlock( sourceBlock.name ) &&
 		isContainerGroupBlock( transform.blockName )
 	) {
@@ -241,15 +231,14 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
  * @return {Array} Block types that the blocks can be transformed into.
  */
 const getBlockTypesForPossibleFromTransforms = ( blocks ) => {
-	if ( isEmpty( blocks ) ) {
+	if ( ! blocks.length ) {
 		return [];
 	}
 
 	const allBlockTypes = getBlockTypes();
 
 	// filter all blocks to find those with a 'from' transform.
-	const blockTypesWithPossibleFromTransforms = filter(
-		allBlockTypes,
+	const blockTypesWithPossibleFromTransforms = allBlockTypes.filter(
 		( blockType ) => {
 			const fromTransforms = getBlockTransforms( 'from', blockType.name );
 			return !! findTransform( fromTransforms, ( transform ) => {
@@ -274,18 +263,18 @@ const getBlockTypesForPossibleFromTransforms = ( blocks ) => {
  * @return {Array} Block types that the source can be transformed into.
  */
 const getBlockTypesForPossibleToTransforms = ( blocks ) => {
-	if ( isEmpty( blocks ) ) {
+	if ( ! blocks.length ) {
 		return [];
 	}
 
-	const sourceBlock = first( blocks );
+	const sourceBlock = blocks[ 0 ];
 	const blockType = getBlockType( sourceBlock.name );
 	const transformsTo = blockType
 		? getBlockTransforms( 'to', blockType.name )
 		: [];
 
 	// filter all 'to' transforms to find those that are possible.
-	const possibleTransforms = filter( transformsTo, ( transform ) => {
+	const possibleTransforms = transformsTo.filter( ( transform ) => {
 		return (
 			transform && isPossibleTransformForSource( transform, 'to', blocks )
 		);
@@ -338,7 +327,7 @@ export const isContainerGroupBlock = ( name ) =>
  * @return {Array} Block types that the blocks argument can be transformed to.
  */
 export function getPossibleBlockTransformations( blocks ) {
-	if ( isEmpty( blocks ) ) {
+	if ( ! blocks.length ) {
 		return [];
 	}
 
@@ -347,10 +336,12 @@ export function getPossibleBlockTransformations( blocks ) {
 	const blockTypesForToTransforms =
 		getBlockTypesForPossibleToTransforms( blocks );
 
-	return uniq( [
-		...blockTypesForFromTransforms,
-		...blockTypesForToTransforms,
-	] );
+	return [
+		...new Set( [
+			...blockTypesForFromTransforms,
+			...blockTypesForToTransforms,
+		] ),
+	];
 }
 
 /**
@@ -416,7 +407,7 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
 		transforms.supportedMobileTransforms &&
 		Array.isArray( transforms.supportedMobileTransforms );
 	const filteredTransforms = usingMobileTransformations
-		? filter( transforms[ direction ], ( t ) => {
+		? transforms[ direction ].filter( ( t ) => {
 				if ( t.type === 'raw' ) {
 					return true;
 				}
@@ -429,7 +420,7 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
 					return true;
 				}
 
-				return every( t.blocks, ( transformBlockName ) =>
+				return t.blocks.every( ( transformBlockName ) =>
 					transforms.supportedMobileTransforms.includes(
 						transformBlockName
 					)
@@ -457,7 +448,7 @@ function maybeCheckTransformIsMatch( transform, blocks ) {
 	if ( typeof transform.isMatch !== 'function' ) {
 		return true;
 	}
-	const sourceBlock = first( blocks );
+	const sourceBlock = blocks[ 0 ];
 	const attributes = transform.isMultiBlock
 		? blocks.map( ( block ) => block.attributes )
 		: sourceBlock.attributes;
@@ -475,7 +466,7 @@ function maybeCheckTransformIsMatch( transform, blocks ) {
  * @return {?Array} Array of blocks or null.
  */
 export function switchToBlockType( blocks, name ) {
-	const blocksArray = castArray( blocks );
+	const blocksArray = Array.isArray( blocks ) ? blocks : [ blocks ];
 	const isMultiBlock = blocksArray.length > 1;
 	const firstBlock = blocksArray[ 0 ];
 	const sourceName = firstBlock.name;
@@ -490,8 +481,7 @@ export function switchToBlockType( blocks, name ) {
 			transformationsTo,
 			( t ) =>
 				t.type === 'block' &&
-				( isWildcardBlockTransform( t ) ||
-					t.blocks.indexOf( name ) !== -1 ) &&
+				t.blocks.indexOf( name ) !== -1 &&
 				( ! isMultiBlock || t.isMultiBlock ) &&
 				maybeCheckTransformIsMatch( t, blocksArray )
 		) ||
@@ -513,7 +503,7 @@ export function switchToBlockType( blocks, name ) {
 	let transformationResults;
 
 	if ( transformation.isMultiBlock ) {
-		if ( has( transformation, '__experimentalConvert' ) ) {
+		if ( '__experimentalConvert' in transformation ) {
 			transformationResults =
 				transformation.__experimentalConvert( blocksArray );
 		} else {
@@ -522,7 +512,7 @@ export function switchToBlockType( blocks, name ) {
 				blocksArray.map( ( currentBlock ) => currentBlock.innerBlocks )
 			);
 		}
-	} else if ( has( transformation, '__experimentalConvert' ) ) {
+	} else if ( '__experimentalConvert' in transformation ) {
 		transformationResults =
 			transformation.__experimentalConvert( firstBlock );
 	} else {
@@ -543,7 +533,9 @@ export function switchToBlockType( blocks, name ) {
 
 	// If the transformation function returned a single object, we want to work
 	// with an array instead.
-	transformationResults = castArray( transformationResults );
+	transformationResults = Array.isArray( transformationResults )
+		? transformationResults
+		: [ transformationResults ];
 
 	// Ensure that every block object returned by the transformation has a
 	// valid block type.
@@ -555,9 +547,15 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
-	const hasSwitchedBlock =
-		name === '*' ||
-		some( transformationResults, ( result ) => result.name === name );
+	// When unwrapping blocks (`switchToBlockType( wrapperblocks, '*' )`), do
+	// not run filters on the unwrapped blocks. They shoud remain as they are.
+	if ( name === '*' ) {
+		return transformationResults;
+	}
+
+	const hasSwitchedBlock = transformationResults.some(
+		( result ) => result.name === name
+	);
 
 	// Ensure that at least one block object returned by the transformation has
 	// the expected "destination" block type.
@@ -600,7 +598,7 @@ export const getBlockFromExample = ( name, example ) => {
 	return createBlock(
 		name,
 		example.attributes,
-		map( example.innerBlocks, ( innerBlock ) =>
+		( example.innerBlocks ?? [] ).map( ( innerBlock ) =>
 			getBlockFromExample( innerBlock.name, innerBlock )
 		)
 	);

@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 13.2.0 (2022-09-21)
+
+## 13.0.0 (2022-08-24)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 and minimum npm version to 6.14.4 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+-   Remove all rules targeting test files from the `recommended` and `recommended-with-formatting` presets when Jest package is installed ([#43272](https://github.com/WordPress/gutenberg/pull/43272)).
+
+## 12.8.0 (2022-07-27)
+
+### Code Quality
+
+-   Remove deprecated rules `no-negated-in-lhs` replaced with `no-unsafe-negation`, and `jsx-a11y/label-has-for` replaced with `jsx-a11/label-has-associated-control` ([#42654](https://github.com/WordPress/gutenberg/pull/42654)).
+
 ## 12.6.0 (2022-06-29)
 
 -   Enable `no-unused-vars`'s setting `ignoreRestSiblings` to allow unused variables when destructuring with rest properties ([#41897](https://github.com/WordPress/gutenberg/pull/41897)).

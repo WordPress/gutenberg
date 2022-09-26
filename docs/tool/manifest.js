@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { camelCase, upperFirst } = require( 'lodash' );
+const { pascalCase } = require( 'change-case' );
 const fs = require( 'fs' );
 const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
@@ -31,15 +31,25 @@ const packagePaths = glob( 'packages/*/package.json' )
  * @return {Array} Manifest
  */
 function getPackageManifest( packageFolderNames ) {
-	return packageFolderNames.map( ( folderName ) => {
+	return packageFolderNames.reduce( ( manifest, folderName ) => {
 		const path = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
-		return {
+		const tocPath = `${ baseRepoUrl }/packages/${ folderName }/docs/toc.json`;
+
+		// First add any README files to the TOC
+		manifest.push( {
 			title: `@wordpress/${ folderName }`,
 			slug: `packages-${ folderName }`,
 			markdown_source: path,
 			parent: 'packages',
-		};
-	} );
+		} );
+
+		// Next add any items in the docs/toc.json if found.
+		if ( fs.existsSync( join( __dirname, '..', tocPath ) ) ) {
+			const toc = require( join( __dirname, '..', tocPath ) ).values();
+			manifest.push( ...toc );
+		}
+		return manifest;
+	}, [] );
 }
 
 /**
@@ -54,7 +64,7 @@ function getComponentManifest( paths ) {
 		const pathFragments = filePath.split( '/' );
 		const slug = pathFragments[ pathFragments.length - 2 ];
 		return {
-			title: upperFirst( camelCase( slug ) ),
+			title: pascalCase( slug ),
 			slug,
 			markdown_source: `${ baseRepoUrl }/${ filePath }`,
 			parent: 'components',
@@ -85,7 +95,7 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 				slug = 'handbook';
 			}
 		}
-		let title = upperFirst( camelCase( slug ) );
+		let title = pascalCase( slug );
 		const markdownSource = fs.readFileSync( fileName, 'utf8' );
 		const titleMarkdown = markdownSource.match( /^#\s(.+)$/m );
 		if ( titleMarkdown ) {
