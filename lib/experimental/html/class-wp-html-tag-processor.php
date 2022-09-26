@@ -950,7 +950,7 @@ class WP_HTML_Tag_Processor {
 
 		/*
 		 * Verify that the attribute name is allowable. In WP_DEBUG
-		 * environments we want to crash to quickly alert developers
+		 * environments we want to crash quickly to alert developers
 		 * of typos and issues; but in production we don't want to
 		 * interrupt a normal page view, so we'll silently avoid
 		 * updating the attribute in those cases.
@@ -958,14 +958,14 @@ class WP_HTML_Tag_Processor {
 		 * Of note, we're disallowing more characters than are strictly
 		 * forbidden in HTML5. This is to prevent additional security
 		 * risks deeper in the WordPress and plugin stack. Specifically
-		 * we reject the less-than (<) and ampersand (&) characters.
+		 * we reject the less-than (<) greater-than (>) and ampersand (&).
 		 *
 		 * The use of a PCRE match allows us to look for specific Unicode
 		 * code points without writing a UTF-8 decoder. Whereas scanning
-		 * for one-byte characters is trivial, scanning for the longer
-		 * byte sequences would be more complicated, and this shouldn't
-		 * be in the hot path for execution so we can compromise on the
-		 * efficiency at this point.
+		 * for one-byte characters is trivial (with `strcspn`), scanning
+		 * for the longer byte sequences would be more complicated, and
+		 * this shouldn't be in the hot path for execution so we can
+		 * compromise on the efficiency at this point.
 		 *
 		 * @see https://html.spec.whatwg.org/#attributes-2
 		 */
