@@ -6,7 +6,6 @@ import {
 	useRef,
 	useState,
 	useEffect,
-	useCallback,
 } from '@wordpress/element';
 import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
 
@@ -112,70 +111,65 @@ export default function Sandbox( {
 		}
 	}
 
-	const trySandbox = useCallback(
-		( forceRerender = false ) => {
-			if ( ! isFrameAccessible() ) {
-				return;
-			}
+	function trySandbox( forceRerender = false ) {
+		if ( ! isFrameAccessible() ) {
+			return;
+		}
 
-			const { contentDocument, ownerDocument } = ref.current;
-			const { body } = contentDocument;
+		const { contentDocument, ownerDocument } = ref.current;
+		const { body } = contentDocument;
 
-			if (
-				! forceRerender &&
-				null !== body.getAttribute( 'data-resizable-iframe-connected' )
-			) {
-				return;
-			}
+		if (
+			! forceRerender &&
+			null !== body.getAttribute( 'data-resizable-iframe-connected' )
+		) {
+			return;
+		}
 
-			// Put the html snippet into a html document, and then write it to the iframe's document
-			// we can use this in the future to inject custom styles or scripts.
-			// Scripts go into the body rather than the head, to support embedded content such as Instagram
-			// that expect the scripts to be part of the body.
-			const htmlDoc = (
-				<html
-					lang={ ownerDocument.documentElement.lang }
+		// Put the html snippet into a html document, and then write it to the iframe's document
+		// we can use this in the future to inject custom styles or scripts.
+		// Scripts go into the body rather than the head, to support embedded content such as Instagram
+		// that expect the scripts to be part of the body.
+		const htmlDoc = (
+			<html
+				lang={ ownerDocument.documentElement.lang }
+				className={ type }
+			>
+				<head>
+					<title>{ title }</title>
+					<style dangerouslySetInnerHTML={ { __html: style } } />
+					{ styles.map( ( rules, i ) => (
+						<style
+							key={ i }
+							dangerouslySetInnerHTML={ { __html: rules } }
+						/>
+					) ) }
+				</head>
+				<body
+					data-resizable-iframe-connected="data-resizable-iframe-connected"
 					className={ type }
 				>
-					<head>
-						<title>{ title }</title>
-						<style dangerouslySetInnerHTML={ { __html: style } } />
-						{ styles.map( ( rules, i ) => (
-							<style
-								key={ i }
-								dangerouslySetInnerHTML={ { __html: rules } }
-							/>
-						) ) }
-					</head>
-					<body
-						data-resizable-iframe-connected="data-resizable-iframe-connected"
-						className={ type }
-					>
-						<div dangerouslySetInnerHTML={ { __html: html } } />
-						<script
-							type="text/javascript"
-							dangerouslySetInnerHTML={ {
-								__html: observeAndResizeJS,
-							} }
-						/>
-						{ scripts.map( ( src ) => (
-							<script key={ src } src={ src } />
-						) ) }
-					</body>
-				</html>
-			);
+					<div dangerouslySetInnerHTML={ { __html: html } } />
+					<script
+						type="text/javascript"
+						dangerouslySetInnerHTML={ {
+							__html: observeAndResizeJS,
+						} }
+					/>
+					{ scripts.map( ( src ) => (
+						<script key={ src } src={ src } />
+					) ) }
+				</body>
+			</html>
+		);
 
-			// Writing the document like this makes it act in the same way as if it was
-			// loaded over the network, so DOM creation and mutation, script execution, etc.
-			// all work as expected.
-			contentDocument.open();
-			contentDocument.write(
-				'<!DOCTYPE html>' + renderToString( htmlDoc )
-			);
-			contentDocument.close();
-		},
-		[ html, scripts, styles, title, type ]
-	);
+		// Writing the document like this makes it act in the same way as if it was
+		// loaded over the network, so DOM creation and mutation, script execution, etc.
+		// all work as expected.
+		contentDocument.open();
+		contentDocument.write( '<!DOCTYPE html>' + renderToString( htmlDoc ) );
+		contentDocument.close();
+	}
 
 	useEffect( () => {
 		trySandbox();
@@ -211,31 +205,39 @@ export default function Sandbox( {
 			setHeight( data.height );
 		}
 
-		const { ownerDocument } = ref.current;
+		const iframe = ref.current;
+		const { ownerDocument } = iframe;
 		const { defaultView } = ownerDocument;
 
 		// This used to be registered using <iframe onLoad={} />, but it made the iframe blank
 		// after reordering the containing block. See these two issues for more details:
 		// https://github.com/WordPress/gutenberg/issues/6146
 		// https://github.com/facebook/react/issues/18752
-		ref.current.addEventListener( 'load', tryNoForceSandbox, false );
+		iframe.addEventListener( 'load', tryNoForceSandbox, false );
 		defaultView.addEventListener( 'message', checkMessageForResize );
 
-		const iframeRef = ref.current;
-
 		return () => {
-			iframeRef?.removeEventListener( 'load', tryNoForceSandbox, false );
+			iframe?.removeEventListener( 'load', tryNoForceSandbox, false );
 			defaultView.addEventListener( 'message', checkMessageForResize );
 		};
-	}, [ trySandbox ] );
+		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
+		// See https://github.com/WordPress/gutenberg/pull/44378
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [] );
 
 	useEffect( () => {
 		trySandbox();
-	}, [ trySandbox ] );
+		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
+		// See https://github.com/WordPress/gutenberg/pull/44378
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ title, styles, scripts ] );
 
 	useEffect( () => {
 		trySandbox( true );
-	}, [ trySandbox ] );
+		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
+		// See https://github.com/WordPress/gutenberg/pull/44378
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ html, type ] );
 
 	return (
 		<iframe
