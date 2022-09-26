@@ -275,6 +275,7 @@ export function BorderPanel( props ) {
 						value={ hydratedBorder }
 						__experimentalHasMultipleOrigins={ true }
 						__experimentalIsRenderedInSidebar={ true }
+						__next40pxDefaultSize={ true }
 					/>
 				</ToolsPanelItem>
 			) }
