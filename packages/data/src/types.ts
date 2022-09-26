@@ -143,7 +143,7 @@ type CurriedState< F > = F extends SelectorWithCustomCurrySignature
  * ```
  */
 export interface SelectorWithCustomCurrySignature {
-	CurriedSignature?: Function;
+	CurriedSignature: Function;
 }
 
 export interface DataRegistry {
