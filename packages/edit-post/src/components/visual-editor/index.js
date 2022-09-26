@@ -85,6 +85,14 @@ function MaybeIframe( {
 	);
 }
 
+/**
+ * Given an array of nested blocks, find the first Post Content
+ * block inside it, recursing through any nesting levels.
+ *
+ * @param {Array} blocks A list of blocks.
+ *
+ * @return {Object} The Post Content block.
+ */
 function findPostContent( blocks ) {
 	for ( let i = 0; i < blocks.length; i++ ) {
 		if ( blocks[ i ].name === 'core/post-content' ) {
