@@ -11,9 +11,9 @@
 		align-items: flex-start;
 
 		> .components-unit-control-wrapper {
-			width: 110px;
+			width: 120px;
 			margin-bottom: 0;
-			margin-right: #{ $grid-unit-15 };
+			margin-right: #{$grid-unit-15};
 			flex-shrink: 0;
 		}
 
@@ -52,11 +52,10 @@
 
 	.components-border-radius-control__input-controls-wrapper {
 		display: flex;
-		width: 70%;
 		flex-wrap: wrap;
 
 		.components-border-radius-control__tooltip-wrapper {
-			width: calc(50% - #{ $grid-unit-10 });
+			width: calc(50% - #{$grid-unit-10});
 			margin-bottom: $grid-unit-10;
 			margin-right: $grid-unit-10;
 		}
