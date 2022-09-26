@@ -31,7 +31,7 @@ _Parameters_
 
 -   _$block_styles_ `array` A block's `attributes.style` object or the top level styles in theme.json
 -   _$options_ `array<string|boolean>` An array of options to determine the output.
-    -   _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'. When both `context` and `selector` are set, the style engine will store the CSS rules using the `context` as a key.
+    -   _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'. When both `context` and `selector` are set, the Style Engine will store the CSS rules using the `context` as a key.
     -   _convert_vars_to_classnames_ `boolean` Whether to skip converting CSS var:? values to var( --wp--preset--\* ) values. Default is `false`.
     -   _selector_ `string` When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 
@@ -51,7 +51,7 @@ It will return compiled CSS declarations for inline styles, or, where a selector
 To enqueue a style for rendering in the site's frontend, the `$options` array requires the following:
 
 1.  **selector (string)** - this is the CSS selector for your block style CSS declarations.
-2.  **context (string)** - this tells the style engine where to store the styles. Styles in the same context will be stored together.
+2.  **context (string)** - this tells the Style Engine where to store the styles. Styles in the same context will be stored together.
 
 `wp_style_engine_get_styles` will return the compiled CSS and CSS declarations array.
 
@@ -59,7 +59,7 @@ To enqueue a style for rendering in the site's frontend, the `$options` array re
 
 As mentioned, `wp_style_engine_get_styles()` is useful whenever you wish to generate CSS and/or classnames from a **block's style object**. A good example is [using the Style Engine to generate block supports styles](https://github.com/WordPress/gutenberg/tree/HEAD/packages/style-engine/docs/using-the-style-engine-with-block-supports.md).
 
-In the following snippet, we're taking the style object from a block's attributes and passing it to the style engine to get the styles. By passing a `context` in the options, the Style Engine will store the styles for later retrieval, for example, should you wish to batch enqueue a set of CSS rules.
+In the following snippet, we're taking the style object from a block's attributes and passing it to the Style Engine to get the styles. By passing a `context` in the options, the Style Engine will store the styles for later retrieval, for example, should you wish to batch enqueue a set of CSS rules.
 
 ```php
 $block_attributes =  array(
@@ -87,7 +87,7 @@ array(
 
 ### wp_style_engine_get_stylesheet_from_css_rules()
 
-Use this function to compile and return a stylesheet for any CSS rules. The style engine will automatically merge declarations and combine selectors.
+Use this function to compile and return a stylesheet for any CSS rules. The Style Engine will automatically merge declarations and combine selectors.
 
 This function acts as a CSS compiler, but will also register the styles in a store where a `context` string is passed in the options.
 
@@ -95,7 +95,7 @@ _Parameters_
 
 -   _$css_rules_ `array<array>`
 -   _$options_ `array<string|bool>` An array of options to determine the output.
-    -   _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'. When set, the style engine will attempt to store the CSS rules.
+    -   _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'. When set, the Style Engine will attempt to store the CSS rules.
     -   _prettify_ `bool` Whether to add new lines and indents to output. Default is to inherit the value of the global constant `SCRIPT_DEBUG`, if it is defined.
     -   _optimize_ `bool` Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
 

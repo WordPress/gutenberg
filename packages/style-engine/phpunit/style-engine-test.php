@@ -60,7 +60,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 *     An array of options to pass to `wp_style_engine_get_styles()`.
 	 *
 	 *     @type string|null $context                    An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is `null`.
-	 *                                                   When set, the style engine will attempt to store the CSS rules, where a selector is also passed.
+	 *                                                   When set, the Style Engine will attempt to store the CSS rules, where a selector is also passed.
 	 *     @type bool        $convert_vars_to_classnames Whether to skip converting incoming CSS var patterns, e.g., `var:preset|<PRESET_TYPE>|<PRESET_SLUG>`, to var( --wp--preset--* ) values. Default `false`.
 	 *     @type string      $selector                   Optional. When a selector is passed, the value of `$css` in the return value will comprise a full CSS rule `$selector { ...$css_declarations }`,
 	 *                                                   otherwise, the value will be a concatenated string of CSS declarations.
