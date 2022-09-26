@@ -84,12 +84,8 @@ export function useResizeLabel( {
 	 */
 	const moveTimeoutRef = useRef< number >();
 
-	const unsetMoveXY = useCallback( () => {
-		if ( moveTimeoutRef.current ) {
-			window.clearTimeout( moveTimeoutRef.current );
-		}
-
-		moveTimeoutRef.current = window.setTimeout( () => {
+	const debounceUnsetMoveXY = useCallback( () => {
+		const unsetMoveXY = () => {
 			/*
 			 * If axis is controlled, we will avoid resetting the moveX and moveY values.
 			 * This will allow for the preferred axis values to persist in the label.
@@ -97,7 +93,13 @@ export function useResizeLabel( {
 			if ( isAxisControlled ) return;
 			setMoveX( false );
 			setMoveY( false );
-		}, fadeTimeout );
+		};
+
+		if ( moveTimeoutRef.current ) {
+			window.clearTimeout( moveTimeoutRef.current );
+		}
+
+		moveTimeoutRef.current = window.setTimeout( unsetMoveXY, fadeTimeout );
 	}, [ fadeTimeout, isAxisControlled ] );
 
 	useEffect( () => {
@@ -140,8 +142,8 @@ export function useResizeLabel( {
 		}
 
 		onResize( { width, height } );
-		unsetMoveXY();
-	}, [ width, height, onResize, unsetMoveXY ] );
+		debounceUnsetMoveXY();
+	}, [ width, height, onResize, debounceUnsetMoveXY ] );
 
 	const label = getSizeLabel( {
 		axis,
