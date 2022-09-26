@@ -77,7 +77,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 				<Disabled>
 					<ServerSideRender
 						block="core/archives"
-						attributes={ serverSideRenderAttirbutes }
+						attributes={ serverSideRenderAttributes }
 					/>
 				</Disabled>
 			</div>
