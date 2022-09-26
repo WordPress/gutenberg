@@ -386,9 +386,8 @@ test.describe( 'Autocomplete', () => {
 		} );
 	} );
 
-	// The following test attempts to cover an infinite loop regression (https://github.com/WordPress/gutenberg/issues/41709).
-	// Unfortunately, the regression (if present) crashes the tests, as well as the editor. If you've updated anything related to
-	// the Autocomplete component and find e2e tests can't complete, this may be why!
+	// The following test concerns an infinite loop regression (https://github.com/WordPress/gutenberg/issues/41709).
+	// When present, the regression will cause this test to time out.
 	test( 'should insert elements from multiple completers in a single block', async ( {
 		page,
 		editor,
