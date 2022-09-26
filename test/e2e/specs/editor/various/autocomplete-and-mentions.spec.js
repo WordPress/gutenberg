@@ -49,12 +49,14 @@ const userList = [
 ];
 test.describe( 'Autocomplete', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		for ( const user of userList ) {
-			await requestUtils.createUser( {
-				email: `${ user.username }@example.com`,
-				...user,
-			} );
-		}
+		await Promise.all(
+			userList.map( ( user ) =>
+				requestUtils.createUser( {
+					email: `${ user.username }@example.com`,
+					...user,
+				} )
+			)
+		);
 		await requestUtils.activatePlugin( 'gutenberg-test-autocompleter' );
 	} );
 
