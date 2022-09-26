@@ -29,7 +29,7 @@ function render_block_core_tag_cloud( $attributes ) {
 
 	if ( ! $tag_cloud ) {
 		$labels    = get_taxonomy_labels( get_taxonomy( $attributes['taxonomy'] ) );
-		$tag_cloud = esc_html( __( 'There\'s no content to show here yet.' ) );
+		$tag_cloud = __( 'There&#8217;s no content to show here yet.' );
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes();
