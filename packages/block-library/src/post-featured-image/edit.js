@@ -183,7 +183,7 @@ function PostFeaturedImageDisplay( {
 		);
 	}
 
-	const label = __( 'Add a featured image' );
+	const label = __( 'Add media' );
 	const imageStyles = {
 		...borderProps.style,
 		height,
