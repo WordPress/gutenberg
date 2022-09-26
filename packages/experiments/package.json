@@ -1,5 +1,5 @@
 {
-	"name": "@wordpress/dependency-injection",
+	"name": "@wordpress/experiments",
 	"version": "0.0.1",
 	"description": "Dependency Injection container for WordPress.",
 	"author": "The WordPress Contributors",
