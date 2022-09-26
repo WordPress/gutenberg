@@ -176,7 +176,7 @@ wp_style_engine_get_stylesheet_from_css_rules(
 );
 
 // Later, we fetch compiled rules from context store.
-$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'fruit-styles' );
+$stylesheet = wp_style_engine_get_stylesheet_from_context( 'fruit-styles' );
 
 print_r( $stylesheet ); // .wp-apple{color:green;}
 
