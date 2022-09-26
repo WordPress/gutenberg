@@ -117,7 +117,10 @@ export function useBorderControl(
 		return cx( styles.borderControl, className );
 	}, [ className, cx ] );
 
-	const wrapperWidth = isCompact ? '90px' : width;
+	let wrapperWidth = width;
+	if ( isCompact ) {
+		wrapperWidth = __next40pxDefaultSize ? '110px' : '90px';
+	}
 	const innerWrapperClassName = useMemo( () => {
 		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
 		const heightStyle = styles.wrapperHeight( __next40pxDefaultSize );

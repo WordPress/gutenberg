@@ -7,7 +7,6 @@ import { css } from '@emotion/react';
  * Internal dependencies
  */
 import { COLORS, CONFIG, rtl } from '../utils';
-import { space } from '../ui/utils/space';
 
 import type { Border } from '../border-control/types';
 import type { Borders } from './types';
@@ -51,9 +50,9 @@ export const borderBoxControlVisualizer = (
 	return css`
 		position: absolute;
 		top: ${ __next40pxDefaultSize ? '20px' : '15px' };
-		right: 30px;
+		right: ${ __next40pxDefaultSize ? '20px' : '30px' };
 		bottom: ${ __next40pxDefaultSize ? '20px' : '15px' };
-		left: 30px;
+		left: ${ __next40pxDefaultSize ? '20px' : '30px' };
 		border-top: ${ BorderBoxStyleWithFallback( borders?.top ) };
 		border-bottom: ${ BorderBoxStyleWithFallback( borders?.bottom ) };
 		${ rtl( {
@@ -68,7 +67,6 @@ export const borderBoxControlVisualizer = (
 export const borderBoxControlSplitControls = () => css`
 	position: relative;
 	flex: 1;
-	${ rtl( { marginRight: space( 3 ) }, { marginLeft: space( 3 ) } )() }
 `;
 
 export const CenteredBorderControl = css`

@@ -113,7 +113,7 @@ const BorderBoxControl = (
 						shouldSanitizeBorder={ false } // This component will handle that.
 						value={ linkedValue }
 						withSlider={ true }
-						width={ '110px' }
+						width={ __next40pxDefaultSize ? '120px' : '110px' }
 						__experimentalHasMultipleOrigins={
 							__experimentalHasMultipleOrigins
 						}
