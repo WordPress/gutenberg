@@ -10,11 +10,11 @@
 		"dom",
 		"utils"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/dependency-injection/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/experiments/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/injection"
+		"directory": "packages/experiments"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
