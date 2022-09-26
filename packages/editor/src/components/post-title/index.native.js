@@ -8,13 +8,19 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { RichText } from '@wordpress/rich-text';
+import {
+	__experimentalRichText as RichText,
+	create,
+	insert,
+} from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { pasteHandler } from '@wordpress/blocks';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -22,16 +28,23 @@ import { pasteHandler } from '@wordpress/blocks';
 import styles from './style.scss';
 
 class PostTitle extends Component {
-	constructor() {
-		super( ...arguments );
+	constructor( props ) {
+		super( props );
 
-		this.onSelect = this.onSelect.bind( this );
-		this.onUnselect = this.onUnselect.bind( this );
-		this.titleViewRef = null;
-
-		this.state = {
-			isSelected: false,
-		};
+		this.setRef = this.setRef.bind( this );
+	}
+	componentDidUpdate( prevProps ) {
+		// Unselect if any other block is selected and blur the RichText.
+		if (
+			this.props.isSelected &&
+			! prevProps.isAnyBlockSelected &&
+			this.props.isAnyBlockSelected
+		) {
+			if ( this.richTextRef ) {
+				this.richTextRef.blur();
+			}
+			this.props.onUnselect();
+		}
 	}
 
 	componentDidMount() {
@@ -41,23 +54,50 @@ class PostTitle extends Component {
 	}
 
 	handleFocusOutside() {
-		this.onUnselect();
+		this.props.onUnselect();
 	}
 
 	focus() {
-		if ( this.titleViewRef ) {
-			this.titleViewRef.focus();
-			this.setState( { isSelected: true } );
+		this.props.onSelect();
+	}
+
+	onPaste( { value, onChange, plainText } ) {
+		const content = pasteHandler( {
+			plainText,
+			mode: 'INLINE',
+			tagName: 'p',
+		} );
+
+		if ( typeof content === 'string' ) {
+			const valueToInsert = create( { html: content } );
+			onChange( insert( value, valueToInsert ) );
 		}
 	}
 
-	onSelect() {
-		this.setState( { isSelected: true } );
-		this.props.clearSelectedBlock();
+	setRef( richText ) {
+		this.richTextRef = richText;
 	}
 
-	onUnselect() {
-		this.setState( { isSelected: false } );
+	getTitle( title, postType ) {
+		if ( 'page' === postType ) {
+			return isEmpty( title )
+				? /* translators: accessibility text. empty page title. */
+				  __( 'Page title. Empty' )
+				: sprintf(
+						/* translators: accessibility text. %s: text content of the page title. */
+						__( 'Page title. %s' ),
+						title
+				  );
+		}
+
+		return isEmpty( title )
+			? /* translators: accessibility text. empty post title. */
+			  __( 'Post title. Empty' )
+			: sprintf(
+					/* translators: accessibility text. %s: text content of the post title. */
+					__( 'Post title. %s' ),
+					title
+			  );
 	}
 
 	render() {
@@ -67,79 +107,108 @@ class PostTitle extends Component {
 			title,
 			focusedBorderColor,
 			borderStyle,
+			isDimmed,
+			postType,
+			globalStyles,
 		} = this.props;
 
 		const decodedPlaceholder = decodeEntities( placeholder );
-		const borderColor = this.state.isSelected ? focusedBorderColor : 'transparent';
+		const borderColor = this.props.isSelected
+			? focusedBorderColor
+			: 'transparent';
+		const titleStyles = {
+			...style,
+			...( globalStyles?.text && {
+				color: globalStyles.text,
+				placeholderColor: globalStyles.text,
+			} ),
+		};
 
 		return (
 			<View
-				style={ [ styles.titleContainer, borderStyle, { borderColor } ] }
-				accessible={ ! this.state.isSelected }
-				accessibilityLabel={
-					isEmpty( title ) ?
-						/* translators: accessibility text. empty post title. */
-						__( 'Post title. Empty' ) :
-						sprintf(
-							/* translators: accessibility text. %s: text content of the post title. */
-							__( 'Post title. %s' ),
-							title
-						)
-				}
+				style={ [
+					styles.titleContainer,
+					borderStyle,
+					{ borderColor },
+					isDimmed && styles.dimmed,
+				] }
+				accessible={ ! this.props.isSelected }
+				accessibilityLabel={ this.getTitle( title, postType ) }
+				accessibilityHint={ __( 'Updates the title.' ) }
 			>
 				<RichText
+					setRef={ this.setRef }
+					accessibilityLabel={ this.getTitle( title, postType ) }
 					tagName={ 'p' }
-					rootTagsToEliminate={ [ 'strong' ] }
-					unstableOnFocus={ this.onSelect }
-					onBlur={ this.props.onBlur } // always assign onBlur as a props
+					tagsToEliminate={ [ 'strong' ] }
+					unstableOnFocus={ this.props.onSelect }
+					onBlur={ this.props.onBlur } // Always assign onBlur as a props.
 					multiline={ false }
-					style={ style }
+					style={ titleStyles }
 					styles={ styles }
 					fontSize={ 24 }
+					lineHeight={ 1 }
 					fontWeight={ 'bold' }
 					deleteEnter={ true }
 					onChange={ ( value ) => {
 						this.props.onUpdate( value );
 					} }
+					onPaste={ this.onPaste }
 					placeholder={ decodedPlaceholder }
 					value={ title }
-					onSelectionChange={ () => { } }
+					onSelectionChange={ () => {} }
 					onEnter={ this.props.onEnterPress }
 					disableEditingMenu={ true }
-					setRef={ ( ref ) => {
-						this.titleViewRef = ref;
-					} }
-					__unstablePasteHandler={ pasteHandler }
-				>
-				</RichText>
+					__unstableIsSelected={ this.props.isSelected }
+					__unstableOnCreateUndoLevel={ () => {} }
+				></RichText>
 			</View>
 		);
 	}
 }
 
-const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const {
-		undo,
-		redo,
-	} = dispatch( 'core/editor' );
-
-	const {
-		insertDefaultBlock,
-		clearSelectedBlock,
-	} = dispatch( 'core/block-editor' );
-
-	return {
-		onEnterPress() {
-			insertDefaultBlock( undefined, undefined, 0 );
-		},
-		onUndo: undo,
-		onRedo: redo,
-		clearSelectedBlock,
-	};
-} );
-
 export default compose(
-	applyWithDispatch,
+	withSelect( ( select ) => {
+		const { isPostTitleSelected, getEditedPostAttribute } =
+			select( editorStore );
+		const { getSelectedBlockClientId, getBlockRootClientId, getSettings } =
+			select( blockEditorStore );
+
+		const selectedId = getSelectedBlockClientId();
+		const selectionIsNested = !! getBlockRootClientId( selectedId );
+		const globalStyles =
+			getSettings()?.__experimentalGlobalStylesBaseStyles?.color;
+
+		return {
+			postType: getEditedPostAttribute( 'type' ),
+			isAnyBlockSelected: !! selectedId,
+			isSelected: isPostTitleSelected(),
+			isDimmed: selectionIsNested,
+			globalStyles,
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { undo, redo, togglePostTitleSelection } =
+			dispatch( editorStore );
+
+		const { clearSelectedBlock, insertDefaultBlock } =
+			dispatch( blockEditorStore );
+
+		return {
+			onEnterPress() {
+				insertDefaultBlock( undefined, undefined, 0 );
+			},
+			onUndo: undo,
+			onRedo: redo,
+			onSelect() {
+				togglePostTitleSelection( true );
+				clearSelectedBlock();
+			},
+			onUnselect() {
+				togglePostTitleSelection( false );
+			},
+		};
+	} ),
 	withInstanceId,
 	withFocusOutside
 )( PostTitle );

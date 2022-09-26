@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -12,29 +7,38 @@ import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
-export function BlockModeToggle( { blockType, mode, onToggleMode, small = false, isCodeEditingEnabled = true } ) {
-	if ( ! hasBlockSupport( blockType, 'html', true ) || ! isCodeEditingEnabled ) {
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
+const noop = () => {};
+
+export function BlockModeToggle( {
+	blockType,
+	mode,
+	onToggleMode,
+	small = false,
+	isCodeEditingEnabled = true,
+} ) {
+	if (
+		! blockType ||
+		! hasBlockSupport( blockType, 'html', true ) ||
+		! isCodeEditingEnabled
+	) {
 		return null;
 	}
 
-	const label = mode === 'visual' ?
-		__( 'Edit as HTML' ) :
-		__( 'Edit visually' );
+	const label =
+		mode === 'visual' ? __( 'Edit as HTML' ) : __( 'Edit visually' );
 
-	return (
-		<MenuItem
-			className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-			onClick={ onToggleMode }
-			icon="html"
-		>
-			{ ! small && label }
-		</MenuItem>
-	);
+	return <MenuItem onClick={ onToggleMode }>{ ! small && label }</MenuItem>;
 }
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlock, getBlockMode, getSettings } = select( 'core/block-editor' );
+		const { getBlock, getBlockMode, getSettings } =
+			select( blockEditorStore );
 		const block = getBlock( clientId );
 		const isCodeEditingEnabled = getSettings().codeEditingEnabled;
 
@@ -46,7 +50,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch, { onToggle = noop, clientId } ) => ( {
 		onToggleMode() {
-			dispatch( 'core/block-editor' ).toggleBlockMode( clientId );
+			dispatch( blockEditorStore ).toggleBlockMode( clientId );
 			onToggle();
 		},
 	} ) ),

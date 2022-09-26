@@ -1,77 +1,59 @@
-/**
- * Given a block client ID, returns the corresponding DOM node for the block,
- * if exists. As much as possible, this helper should be avoided, and used only
- * in cases where isolated behaviors need remote access to a block node.
- *
- * @param {string} clientId Block client ID.
- *
- * @return {Element} Block DOM node.
- */
-export function getBlockDOMNode( clientId ) {
-	return document.querySelector( '[data-block="' + clientId + '"]' );
-}
-
-/**
- * Given a block client ID, returns the corresponding DOM node for the block
- * focusable wrapper, if exists. As much as possible, this helper should be
- * avoided, and used only in cases where isolated behaviors need remote access
- * to a block node.
- *
- * @param {string} clientId Block client ID.
- *
- * @return {Element} Block DOM node.
- */
-export function getBlockFocusableWrapper( clientId ) {
-	return getBlockDOMNode( clientId ).closest( '.block-editor-block-list__block' );
-}
-
-/**
- * Returns true if the given HTMLElement is a block focus stop. Blocks without
- * their own text fields rely on the focus stop to be keyboard navigable.
- *
- * @param {HTMLElement} element Element to test.
- *
- * @return {boolean} Whether element is a block focus stop.
- */
-export function isBlockFocusStop( element ) {
-	return element.classList.contains( 'block-editor-block-list__block' );
-}
+const BLOCK_SELECTOR = '.block-editor-block-list__block';
+const APPENDER_SELECTOR = '.block-list-appender';
+const BLOCK_APPENDER_CLASS = '.block-editor-button-block-appender';
 
 /**
  * Returns true if two elements are contained within the same block.
  *
- * @param {HTMLElement} a First element.
- * @param {HTMLElement} b Second element.
+ * @param {Element} a First element.
+ * @param {Element} b Second element.
  *
  * @return {boolean} Whether elements are in the same block.
  */
 export function isInSameBlock( a, b ) {
-	return a.closest( '[data-block]' ) === b.closest( '[data-block]' );
+	return a.closest( BLOCK_SELECTOR ) === b.closest( BLOCK_SELECTOR );
 }
 
 /**
- * Returns true if an elements is considered part of the block and not its children.
+ * Returns true if an element is considered part of the block and not its inner
+ * blocks or appender.
  *
- * @param {HTMLElement} blockElement Block container element.
- * @param {HTMLElement} element      Element.
+ * @param {Element} blockElement Block container element.
+ * @param {Element} element      Element.
  *
- * @return {boolean} Whether element is in the block Element but not its children.
+ * @return {boolean} Whether an element is considered part of the block and not
+ *                   its inner blocks or appender.
  */
 export function isInsideRootBlock( blockElement, element ) {
-	const innerBlocksContainer = blockElement.querySelector( '.block-editor-block-list__layout' );
-	return blockElement.contains( element ) && (
-		! innerBlocksContainer || ! innerBlocksContainer.contains( element )
+	const parentBlock = element.closest(
+		[ BLOCK_SELECTOR, APPENDER_SELECTOR, BLOCK_APPENDER_CLASS ].join( ',' )
 	);
+	return parentBlock === blockElement;
 }
 
 /**
- * Returns true if the given HTMLElement contains inner blocks (an InnerBlocks
- * element).
+ * Finds the block client ID given any DOM node inside the block.
  *
- * @param {HTMLElement} element Element to test.
+ * @param {Node?} node DOM node.
  *
- * @return {boolean} Whether element contains inner blocks.
+ * @return {string|undefined} Client ID or undefined if the node is not part of
+ *                            a block.
  */
-export function hasInnerBlocksContext( element ) {
-	return !! element.querySelector( '.block-editor-block-list__layout' );
+export function getBlockClientId( node ) {
+	while ( node && node.nodeType !== node.ELEMENT_NODE ) {
+		node = node.parentNode;
+	}
+
+	if ( ! node ) {
+		return;
+	}
+
+	const elementNode = /** @type {Element} */ ( node );
+	const blockNode = elementNode.closest( BLOCK_SELECTOR );
+
+	if ( ! blockNode ) {
+		return;
+	}
+
+	return blockNode.id.slice( 'block-'.length );
 }

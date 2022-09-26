@@ -1,197 +1,52 @@
-$arrow-size: 8px;
+$arrow-triangle-base-size: 14px;
 
-/*!rtl:begin:ignore*/
 .components-popover {
-	position: fixed;
 	z-index: z-index(".components-popover");
-	left: 50%;
 
-	&.is-mobile {
+	&.is-expanded {
+		position: fixed;
 		top: 0;
 		left: 0;
 		right: 0;
 		bottom: 0;
-	}
-
-	&:not(.is-without-arrow):not(.is-mobile) {
-		margin-left: 2px;
-
-		&::before {
-			border: $arrow-size solid $light-gray-500;
-		}
-
-		&::after {
-			border: $arrow-size solid $white;
-		}
-
-		&::before,
-		&::after {
-			content: "";
-			position: absolute;
-			height: 0;
-			width: 0;
-			line-height: 0;
-		}
-
-		&.is-top {
-			margin-top: - $arrow-size;
-
-			&::before {
-				bottom: - $arrow-size;
-			}
-
-			&::after {
-				bottom: -6px;
-			}
-
-			&::before,
-			&::after {
-				border-bottom: none;
-				border-left-color: transparent;
-				border-right-color: transparent;
-				border-top-style: solid;
-				margin-left: -10px;
-			}
-		}
-
-		&.is-bottom {
-			margin-top: $arrow-size;
-
-			&::before {
-				top: -$arrow-size;
-			}
-
-			&::after {
-				top: -6px;
-			}
-
-			&::before,
-			&::after {
-				border-bottom-style: solid;
-				border-left-color: transparent;
-				border-right-color: transparent;
-				border-top: none;
-				margin-left: -10px;
-			}
-		}
-
-		&.is-middle.is-left {
-			margin-left: -$arrow-size;
-
-			&::before {
-				right: -$arrow-size;
-			}
-
-			&::after {
-				right: -6px;
-			}
-
-			&::before,
-			&::after {
-				border-bottom-color: transparent;
-				border-left-style: solid;
-				border-right: none;
-				border-top-color: transparent;
-			}
-		}
-
-		&.is-middle.is-right {
-			margin-left: $arrow-size;
-
-			&::before {
-				left: -$arrow-size;
-			}
-
-			&::after {
-				left: -6px;
-			}
-
-			&::before,
-			&::after {
-				border-bottom-color: transparent;
-				border-left: none;
-				border-right-style: solid;
-				border-top-color: transparent;
-			}
-		}
-	}
-
-	&:not(.is-mobile) {
-		&.is-top {
-			bottom: 100%;
-		}
-
-		&.is-bottom {
-			top: 100%;
-			z-index: z-index(".components-popover:not(.is-mobile).is-bottom");
-		}
-
-		&.is-middle {
-			align-items: center;
-			display: flex;
-		}
+		z-index: z-index(".components-popover") !important;
 	}
 }
 
 .components-popover__content {
-	box-shadow: $shadow-popover;
-	border: $border-width solid $light-gray-500;
 	background: $white;
-	height: 100%;
+	// Using outline instead of border to avoid impacting
+	// popover computations.
+	outline: $border-width solid $gray-400;
+	box-shadow: $shadow-popover;
+	border-radius: $radius-block-ui;
+	box-sizing: border-box;
+	width: min-content;
 
-	.components-popover.is-mobile & {
+	// Alternate treatment for popovers that put them at elevation zero with high contrast.
+	.is-alternate & {
+		outline: $border-width solid $gray-900;
+		box-shadow: none;
+	}
+
+	.components-popover.is-expanded & {
+		position: static;
 		height: calc(100% - #{ $panel-header-height });
-		border-top: 0;
+		overflow-y: visible;
+		width: auto;
+		border: none;
+		outline: none;
+		border-top: $border-width solid $gray-900;
 	}
-
-	.components-popover:not(.is-mobile) & {
-		position: absolute;
-		height: auto;
-		overflow-y: auto;
-		min-width: 260px;
-	}
-
-	.components-popover:not(.is-mobile).is-top & {
-		bottom: 100%;
-	}
-
-	.components-popover:not(.is-mobile).is-center & {
-		left: 50%;
-		transform: translateX(-50%);
-	}
-
-	.components-popover:not(.is-mobile).is-right & {
-		position: absolute;
-		left: 100%;
-	}
-
-	.components-popover:not(.is-mobile):not(.is-middle).is-right & {
-		margin-left: -24px;
-	}
-
-	.components-popover:not(.is-mobile).is-left & {
-		position: absolute;
-		right: 100%;
-	}
-
-	.components-popover:not(.is-mobile):not(.is-middle).is-left & {
-		margin-right: -24px;
-	}
-}
-
-// The withFocusReturn div
-.components-popover__content > div {
-	height: 100%;
 }
 
 .components-popover__header {
 	align-items: center;
 	background: $white;
-	border: $border-width solid $light-gray-500;
 	display: flex;
 	height: $panel-header-height;
 	justify-content: space-between;
-	padding: 0 8px 0 $panel-padding;
+	padding: 0 8px 0 $grid-unit-20;
 }
 
 .components-popover__header-title {
@@ -201,7 +56,70 @@ $arrow-size: 8px;
 	width: 100%;
 }
 
-.components-popover__close.components-icon-button {
+.components-popover__close.components-button {
 	z-index: z-index(".components-popover__close");
 }
-/*!rtl:end:ignore*/
+
+.components-popover__arrow {
+	position: absolute;
+	width: $arrow-triangle-base-size;
+	height: $arrow-triangle-base-size;
+	pointer-events: none;
+	display: flex;
+
+	// Thin line that helps to make sure that the underlying
+	// popover__content's outline is fully overlapped by the
+	// arrow
+	&::before {
+		content: "";
+		position: absolute;
+		top: -1px;
+		left: 1px;
+		height: 2px;
+		right: 1px;
+		background-color: $white;
+	}
+
+	// Position and rotate the arrow depending on the popover's placement.
+	// The `!important' is necessary to override the inline styles.
+	&.is-top {
+		bottom: -1 * $arrow-triangle-base-size !important;
+		transform: rotate(0);
+	}
+	&.is-right {
+		/*rtl:begin:ignore*/
+		left: -1 * $arrow-triangle-base-size !important;
+		transform: rotate(90deg);
+	}
+	&.is-bottom {
+		top: -1 * $arrow-triangle-base-size !important;
+		transform: rotate(180deg);
+	}
+	&.is-left {
+		/*rtl:begin:ignore*/
+		right: -1 * $arrow-triangle-base-size !important;
+		transform: rotate(-90deg);
+		/*rtl:end:ignore*/
+	}
+}
+
+.components-popover__triangle {
+	display: block;
+	flex: 1;
+}
+
+.components-popover__triangle-bg {
+	// Fill color is the same as the .components-popover__content's background
+	fill: $white;
+}
+
+.components-popover__triangle-border {
+	// Stroke colors are the same as the .components-popover__content's outline
+	fill: transparent;
+	stroke-width: $border-width;
+	stroke: $gray-400;
+
+	.is-alternate & {
+		stroke: $gray-900;
+	}
+}

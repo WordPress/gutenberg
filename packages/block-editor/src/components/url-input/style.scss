@@ -1,5 +1,5 @@
 // Link input
-$input-padding: 8px;
+$input-padding: $grid-unit $grid-unit $grid-unit $grid-unit-15;
 $input-size: 300px;
 
 .block-editor-block-list__block .block-editor-url-input,
@@ -31,12 +31,28 @@ $input-size: 300px;
 		}
 	}
 
+	&.is-full-width {
+		width: 100%;
+
+		.block-editor-url-input__input[type="text"] {
+			width: 100%;
+		}
+
+		&__suggestions {
+			width: 100%;
+		}
+	}
+
 	.components-spinner {
 		position: absolute;
-		right: $input-padding;
-		top: $input-padding + 1;
 		margin: 0;
+		top: calc(50% - #{$spinner-size} / 2);
+		right: $grid-unit;
 	}
+}
+
+.block-editor-url-input__input[type="text"] {
+	@include input-control;
 }
 
 // Suggestions
@@ -55,13 +71,14 @@ $input-size: 300px;
 .block-editor-url-input .components-spinner {
 	display: none;
 	@include break-small() {
-		display: inherit;
+		display: grid;
 	}
 }
 
 .block-editor-url-input__suggestion {
-	padding: 4px $input-padding;
-	color: $dark-gray-300; // lightest we can use for contrast
+	min-height: $button-size;
+	height: auto;
+	color: $gray-700;
 	display: block;
 	font-size: $default-font-size;
 	cursor: pointer;
@@ -69,21 +86,22 @@ $input-size: 300px;
 	width: 100%;
 	border: none;
 	text-align: left;
-	@include menu-style__neutral();
+	box-shadow: none;
 
 	&:hover {
-		background: $light-gray-500;
+		background: $gray-300;
 	}
 
 	&:focus,
 	&.is-selected {
-		background: color(theme(primary) shade(15%));
+		background: var(--wp-admin-theme-color-darker-20);
 		color: $white;
 		outline: none;
 	}
 }
 
 // Toolbar button
+.components-toolbar-group > .block-editor-url-input__button,
 .components-toolbar > .block-editor-url-input__button {
 	position: inherit; // Let the dialog position according to parent.
 }
@@ -99,13 +117,13 @@ $input-size: 300px;
 		width: 1px;
 		height: 24px;
 		right: -1px;
-		background: $light-gray-500;
+		background: $gray-300;
 	}
 }
 
 .block-editor-url-input__button-modal {
 	box-shadow: $shadow-popover;
-	border: 1px solid $light-gray-500;
+	border: 1px solid $gray-300;
 	background: $white;
 }
 
@@ -119,7 +137,7 @@ $input-size: 300px;
 
 	.components-button {
 		flex-shrink: 0;
-		width: $icon-button-size;
-		height: $icon-button-size;
+		width: $button-size;
+		height: $button-size;
 	}
 }

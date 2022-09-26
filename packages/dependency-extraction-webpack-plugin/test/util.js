@@ -1,7 +1,30 @@
 /**
  * Internal dependencies
  */
-const { defaultRequestToExternal, defaultRequestToHandle } = require( '../util' );
+const {
+	camelCaseDash,
+	defaultRequestToExternal,
+	defaultRequestToHandle,
+} = require( '../lib/util' );
+
+describe( 'camelCaseDash', () => {
+	test( 'does not change a single word', () => {
+		expect( camelCaseDash( 'blocks' ) ).toBe( 'blocks' );
+		expect( camelCaseDash( 'dom' ) ).toBe( 'dom' );
+	} );
+
+	test( 'does not capitalize letters following numbers', () => {
+		expect( camelCaseDash( 'a11y' ) ).toBe( 'a11y' );
+		expect( camelCaseDash( 'i18n' ) ).toBe( 'i18n' );
+	} );
+
+	test( 'converts dashes into camel case', () => {
+		expect( camelCaseDash( 'api-fetch' ) ).toBe( 'apiFetch' );
+		expect( camelCaseDash( 'list-reusable-blocks' ) ).toBe(
+			'listReusableBlocks'
+		);
+	} );
+} );
 
 describe( 'defaultRequestToExternal', () => {
 	test( 'Returns undefined on unrecognized request', () => {
@@ -13,14 +36,16 @@ describe( 'defaultRequestToExternal', () => {
 	} );
 
 	test( 'Handles known @wordpress request', () => {
-		expect( defaultRequestToExternal( '@wordpress/i18n' ) ).toEqual( [ 'wp', 'i18n' ] );
+		expect( defaultRequestToExternal( '@wordpress/i18n' ) ).toEqual( [
+			'wp',
+			'i18n',
+		] );
 	} );
 
 	test( 'Handles future @wordpress namespace packages', () => {
-		expect( defaultRequestToExternal( '@wordpress/some-future-package' ) ).toEqual( [
-			'wp',
-			'someFuturePackage',
-		] );
+		expect(
+			defaultRequestToExternal( '@wordpress/some-future-package' )
+		).toEqual( [ 'wp', 'someFuturePackage' ] );
 	} );
 } );
 
@@ -34,8 +59,8 @@ describe( 'defaultRequestToHandle', () => {
 	} );
 
 	test( 'Handles  @wordpress request', () => {
-		expect( defaultRequestToHandle( '@wordpress/some-future-package' ) ).toBe(
-			'wp-some-future-package'
-		);
+		expect(
+			defaultRequestToHandle( '@wordpress/some-future-package' )
+		).toBe( 'wp-some-future-package' );
 	} );
 } );

@@ -1,146 +1,107 @@
 /**
  * External dependencies
  */
-import { first, last, partial, castArray } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
+
+import { dragHandle } from '@wordpress/icons';
+import { ToolbarGroup, ToolbarItem, Button } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
-import { getBlockType } from '@wordpress/blocks';
-import { Component } from '@wordpress/element';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { withInstanceId, compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { getBlockMoverDescription } from './mover-description';
-import { upArrow, downArrow, dragHandle } from './icons';
-import { IconDragHandle } from './drag-handle';
+import BlockDraggable from '../block-draggable';
+import { BlockMoverUpButton, BlockMoverDownButton } from './button';
+import { store as blockEditorStore } from '../../store';
 
-export class BlockMover extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			isFocused: false,
-		};
-		this.onFocus = this.onFocus.bind( this );
-		this.onBlur = this.onBlur.bind( this );
+function BlockMover( { clientIds, hideDragHandle } ) {
+	const { canMove, rootClientId, isFirst, isLast, orientation } = useSelect(
+		( select ) => {
+			const {
+				getBlockIndex,
+				getBlockListSettings,
+				canMoveBlocks,
+				getBlockOrder,
+				getBlockRootClientId,
+			} = select( blockEditorStore );
+			const normalizedClientIds = Array.isArray( clientIds )
+				? clientIds
+				: [ clientIds ];
+			const firstClientId = normalizedClientIds[ 0 ];
+			const _rootClientId = getBlockRootClientId( firstClientId );
+			const firstIndex = getBlockIndex( firstClientId );
+			const lastIndex = getBlockIndex(
+				normalizedClientIds[ normalizedClientIds.length - 1 ]
+			);
+			const blockOrder = getBlockOrder( _rootClientId );
+
+			return {
+				canMove: canMoveBlocks( clientIds, _rootClientId ),
+				rootClientId: _rootClientId,
+				isFirst: firstIndex === 0,
+				isLast: lastIndex === blockOrder.length - 1,
+				orientation: getBlockListSettings( _rootClientId )?.orientation,
+			};
+		},
+		[ clientIds ]
+	);
+
+	if ( ! canMove || ( isFirst && isLast && ! rootClientId ) ) {
+		return null;
 	}
 
-	onFocus() {
-		this.setState( {
-			isFocused: true,
-		} );
-	}
+	const dragHandleLabel = __( 'Drag' );
 
-	onBlur() {
-		this.setState( {
-			isFocused: false,
-		} );
-	}
-
-	render() {
-		const { onMoveUp, onMoveDown, isFirst, isLast, isDraggable, onDragStart, onDragEnd, clientIds, blockElementId, blockType, firstIndex, isLocked, instanceId, isHidden, rootClientId } = this.props;
-		const { isFocused } = this.state;
-		const blocksCount = castArray( clientIds ).length;
-		if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
-			return null;
-		}
-
-		// We emulate a disabled state because forcefully applying the `disabled`
-		// attribute on the button while it has focus causes the screen to change
-		// to an unfocused state (body as active element) without firing blur on,
-		// the rendering parent, leaving it unable to react to focus out.
-		return (
-			<div className={ classnames( 'editor-block-mover block-editor-block-mover', { 'is-visible': isFocused || ! isHidden } ) }>
-				<IconButton
-					className="editor-block-mover__control block-editor-block-mover__control"
-					onClick={ isFirst ? null : onMoveUp }
-					icon={ upArrow }
-					label={ __( 'Move up' ) }
-					aria-describedby={ `block-editor-block-mover__up-description-${ instanceId }` }
-					aria-disabled={ isFirst }
-					onFocus={ this.onFocus }
-					onBlur={ this.onBlur }
-				/>
-				<IconDragHandle
-					className="editor-block-mover__control block-editor-block-mover__control"
-					icon={ dragHandle }
-					clientId={ clientIds }
-					blockElementId={ blockElementId }
-					isVisible={ isDraggable }
-					onDragStart={ onDragStart }
-					onDragEnd={ onDragEnd }
-				/>
-				<IconButton
-					className="editor-block-mover__control block-editor-block-mover__control"
-					onClick={ isLast ? null : onMoveDown }
-					icon={ downArrow }
-					label={ __( 'Move down' ) }
-					aria-describedby={ `block-editor-block-mover__down-description-${ instanceId }` }
-					aria-disabled={ isLast }
-					onFocus={ this.onFocus }
-					onBlur={ this.onBlur }
-				/>
-				<span id={ `block-editor-block-mover__up-description-${ instanceId }` } className="editor-block-mover__description block-editor-block-mover__description">
-					{
-						getBlockMoverDescription(
-							blocksCount,
-							blockType && blockType.title,
-							firstIndex,
-							isFirst,
-							isLast,
-							-1,
-						)
-					}
-				</span>
-				<span id={ `block-editor-block-mover__down-description-${ instanceId }` } className="editor-block-mover__description block-editor-block-mover__description">
-					{
-						getBlockMoverDescription(
-							blocksCount,
-							blockType && blockType.title,
-							firstIndex,
-							isFirst,
-							isLast,
-							1,
-						)
-					}
-				</span>
+	return (
+		<ToolbarGroup
+			className={ classnames( 'block-editor-block-mover', {
+				'is-horizontal': orientation === 'horizontal',
+			} ) }
+		>
+			{ ! hideDragHandle && (
+				<BlockDraggable clientIds={ clientIds }>
+					{ ( draggableProps ) => (
+						<Button
+							icon={ dragHandle }
+							className="block-editor-block-mover__drag-handle"
+							aria-hidden="true"
+							label={ dragHandleLabel }
+							// Should not be able to tab to drag handle as this
+							// button can only be used with a pointer device.
+							tabIndex="-1"
+							{ ...draggableProps }
+						/>
+					) }
+				</BlockDraggable>
+			) }
+			<div className="block-editor-block-mover__move-button-container">
+				<ToolbarItem>
+					{ ( itemProps ) => (
+						<BlockMoverUpButton
+							clientIds={ clientIds }
+							{ ...itemProps }
+						/>
+					) }
+				</ToolbarItem>
+				<ToolbarItem>
+					{ ( itemProps ) => (
+						<BlockMoverDownButton
+							clientIds={ clientIds }
+							{ ...itemProps }
+						/>
+					) }
+				</ToolbarItem>
 			</div>
-		);
-	}
+		</ToolbarGroup>
+	);
 }
 
-export default compose(
-	withSelect( ( select, { clientIds } ) => {
-		const { getBlock, getBlockIndex, getTemplateLock, getBlockRootClientId, getBlockOrder } = select( 'core/block-editor' );
-		const normalizedClientIds = castArray( clientIds );
-		const firstClientId = first( normalizedClientIds );
-		const block = getBlock( firstClientId );
-		const rootClientId = getBlockRootClientId( first( normalizedClientIds ) );
-		const blockOrder = getBlockOrder( rootClientId );
-		const firstIndex = getBlockIndex( firstClientId, rootClientId );
-		const lastIndex = getBlockIndex( last( normalizedClientIds ), rootClientId );
-
-		return {
-			blockType: block ? getBlockType( block.name ) : null,
-			isLocked: getTemplateLock( rootClientId ) === 'all',
-			rootClientId,
-			firstIndex,
-			isFirst: firstIndex === 0,
-			isLast: lastIndex === blockOrder.length - 1,
-		};
-	} ),
-	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {
-		const { moveBlocksDown, moveBlocksUp } = dispatch( 'core/block-editor' );
-		return {
-			onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
-			onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),
-		};
-	} ),
-	withInstanceId,
-)( BlockMover );
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-mover/README.md
+ */
+export default BlockMover;

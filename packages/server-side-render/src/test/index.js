@@ -3,13 +3,17 @@
  */
 import { rendererPath } from '../server-side-render';
 
-describe( 'rendererPath', function() {
-	test( 'should return an base path for empty input', function() {
-		expect( rendererPath( 'core/test-block', null ) ).toBe( '/wp/v2/block-renderer/core/test-block?context=edit' );
-		expect( rendererPath( 'core/test-block' ) ).toBe( '/wp/v2/block-renderer/core/test-block?context=edit' );
+describe( 'rendererPath', () => {
+	test( 'should return an base path for empty input', () => {
+		expect( rendererPath( 'core/test-block', null ) ).toBe(
+			'/wp/v2/block-renderer/core/test-block?context=edit'
+		);
+		expect( rendererPath( 'core/test-block' ) ).toBe(
+			'/wp/v2/block-renderer/core/test-block?context=edit'
+		);
 	} );
 
-	test( 'should format basic url params ', function() {
+	test( 'should format basic url params', () => {
 		expect(
 			rendererPath( 'core/test-block', {
 				stringArg: 'test',
@@ -18,11 +22,11 @@ describe( 'rendererPath', function() {
 				numberArg: 123,
 			} )
 		).toBe(
-			'/wp/v2/block-renderer/core/test-block?context=edit&attributes%5BstringArg%5D=test&attributes%5BnullArg%5D=&attributes%5BemptyArg%5D=&attributes%5BnumberArg%5D=123',
+			'/wp/v2/block-renderer/core/test-block?context=edit&attributes%5BstringArg%5D=test&attributes%5BnullArg%5D=&attributes%5BemptyArg%5D=&attributes%5BnumberArg%5D=123'
 		);
 	} );
 
-	test( 'should format object params ', function() {
+	test( 'should format object params', () => {
 		expect(
 			rendererPath( 'core/test-block', {
 				objectArg: {
@@ -31,11 +35,11 @@ describe( 'rendererPath', function() {
 				},
 			} )
 		).toBe(
-			'/wp/v2/block-renderer/core/test-block?context=edit&attributes%5BobjectArg%5D%5BstringProp%5D=test&attributes%5BobjectArg%5D%5BnumberProp%5D=123',
+			'/wp/v2/block-renderer/core/test-block?context=edit&attributes%5BobjectArg%5D%5BstringProp%5D=test&attributes%5BobjectArg%5D%5BnumberProp%5D=123'
 		);
 	} );
 
-	test( 'should format an array of objects', function() {
+	test( 'should format an array of objects', () => {
 		expect(
 			rendererPath( 'core/test-block', {
 				children: [
@@ -52,14 +56,15 @@ describe( 'rendererPath', function() {
 				],
 			} )
 		).toBe(
-			'/wp/v2/block-renderer/core/test-block?context=edit&attributes%5Bchildren%5D%5B0%5D%5Bname%5D=bobby&attributes%5Bchildren%5D%5B0%5D%5Bage%5D=12&attributes%5Bchildren%5D%5B0%5D%5Bsex%5D=M&attributes%5Bchildren%5D%5B1%5D%5Bname%5D=sally&attributes%5Bchildren%5D%5B1%5D%5Bage%5D=8&attributes%5Bchildren%5D%5B1%5D%5Bsex%5D=F',
+			'/wp/v2/block-renderer/core/test-block?context=edit&attributes%5Bchildren%5D%5B0%5D%5Bname%5D=bobby&attributes%5Bchildren%5D%5B0%5D%5Bage%5D=12&attributes%5Bchildren%5D%5B0%5D%5Bsex%5D=M&attributes%5Bchildren%5D%5B1%5D%5Bname%5D=sally&attributes%5Bchildren%5D%5B1%5D%5Bage%5D=8&attributes%5Bchildren%5D%5B1%5D%5Bsex%5D=F'
 		);
 	} );
 
-	test( 'should include urlQueryArgs', function() {
+	test( 'should include urlQueryArgs', () => {
 		expect(
 			rendererPath(
-				'core/test-block', {
+				'core/test-block',
+				{
 					stringArg: 'test',
 				},
 				{
@@ -67,7 +72,7 @@ describe( 'rendererPath', function() {
 				}
 			)
 		).toBe(
-			'/wp/v2/block-renderer/core/test-block?context=edit&attributes%5BstringArg%5D=test&id=1234',
+			'/wp/v2/block-renderer/core/test-block?context=edit&attributes%5BstringArg%5D=test&id=1234'
 		);
 	} );
 } );

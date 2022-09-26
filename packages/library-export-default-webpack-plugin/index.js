@@ -10,27 +10,33 @@ module.exports = class LibraryExportDefaultPlugin {
 	}
 
 	apply( compiler ) {
-		compiler.hooks.compilation.tap( 'LibraryExportDefaultPlugin', ( compilation ) => {
-			const { mainTemplate, chunkTemplate } = compilation;
+		compiler.hooks.compilation.tap(
+			'LibraryExportDefaultPlugin',
+			( compilation ) => {
+				const { mainTemplate, chunkTemplate } = compilation;
 
-			const onRenderWithEntry = ( source, chunk ) => {
-				if ( ! includes( this.entryPointNames, chunk.name ) ) {
-					return source;
+				const onRenderWithEntry = ( source, chunk ) => {
+					if ( ! includes( this.entryPointNames, chunk.name ) ) {
+						return source;
+					}
+					return new ConcatSource( source, '["default"]' );
+				};
+
+				for ( const template of [ mainTemplate, chunkTemplate ] ) {
+					template.hooks.renderWithEntry.tap(
+						'LibraryExportDefaultPlugin',
+						onRenderWithEntry
+					);
 				}
-				return new ConcatSource( source, '["default"]' );
-			};
 
-			for ( const template of [ mainTemplate, chunkTemplate ] ) {
-				template.hooks.renderWithEntry.tap(
+				mainTemplate.hooks.hash.tap(
 					'LibraryExportDefaultPlugin',
-					onRenderWithEntry
+					( hash ) => {
+						hash.update( 'export property' );
+						hash.update( 'default' );
+					}
 				);
 			}
-
-			mainTemplate.hooks.hash.tap( 'LibraryExportDefaultPlugin', ( hash ) => {
-				hash.update( 'export property' );
-				hash.update( 'default' );
-			} );
-		} );
+		);
 	}
 };

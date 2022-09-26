@@ -7,7 +7,7 @@ function isList( node ) {
 	return node.nodeName === 'OL' || node.nodeName === 'UL';
 }
 
-export default function( node, doc ) {
+export default function msListConverter( node, doc ) {
 	if ( node.nodeName !== 'P' ) {
 		return;
 	}
@@ -54,7 +54,7 @@ export default function( node, doc ) {
 	let receivingNode = listNode;
 
 	// Remove the first span with list info.
-	node.removeChild( node.firstElementChild );
+	node.removeChild( node.firstChild );
 
 	// Add content.
 	while ( node.firstChild ) {
@@ -63,17 +63,19 @@ export default function( node, doc ) {
 
 	// Change pointer depending on indentation level.
 	while ( level-- ) {
-		receivingNode = receivingNode.lastElementChild || receivingNode;
+		receivingNode = receivingNode.lastChild || receivingNode;
 
 		// If it's a list, move pointer to the last item.
 		if ( isList( receivingNode ) ) {
-			receivingNode = receivingNode.lastElementChild || receivingNode;
+			receivingNode = receivingNode.lastChild || receivingNode;
 		}
 	}
 
 	// Make sure we append to a list.
 	if ( ! isList( receivingNode ) ) {
-		receivingNode = receivingNode.appendChild( doc.createElement( listType ) );
+		receivingNode = receivingNode.appendChild(
+			doc.createElement( listType )
+		);
 	}
 
 	// Append the list item to the list.

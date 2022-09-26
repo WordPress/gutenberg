@@ -1,7 +1,4 @@
-/**
- * External dependencies
- */
-import { forEach } from 'lodash';
+// @ts-nocheck
 
 const LIVE_REGION_ARIA_ROLES = new Set( [
 	'alert',
@@ -30,11 +27,9 @@ export function hideApp( unhiddenElement ) {
 	if ( isHidden ) {
 		return;
 	}
-	const elements = document.body.children;
-	forEach( elements, ( element ) => {
-		if (
-			element === unhiddenElement
-		) {
+	const elements = Array.from( document.body.children );
+	elements.forEach( ( element ) => {
+		if ( element === unhiddenElement ) {
 			return;
 		}
 		if ( elementShouldBeHidden( element ) ) {
@@ -70,7 +65,7 @@ export function showApp() {
 	if ( ! isHidden ) {
 		return;
 	}
-	forEach( hiddenElements, ( element ) => {
+	hiddenElements.forEach( ( element ) => {
 		element.removeAttribute( 'aria-hidden' );
 	} );
 	hiddenElements = [];

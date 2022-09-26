@@ -4,65 +4,131 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { useMemo, useRef, memo } from '@wordpress/element';
+import {
+	createBlock,
+	createBlocksFromInnerBlocksTemplate,
+} from '@wordpress/blocks';
+import { __experimentalTruncate as Truncate } from '@wordpress/components';
+import { ENTER, isAppleOS } from '@wordpress/keycodes';
+
+/**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
+import { InserterListboxItem } from '../inserter-listbox';
+import InserterDraggableBlocks from '../inserter-draggable-blocks';
 
 function InserterListItem( {
-	icon,
-	hasChildBlocksWithInserterSupport,
-	onClick,
-	isDisabled,
-	title,
 	className,
+	isFirst,
+	item,
+	onSelect,
+	onHover,
+	isDraggable,
 	...props
 } ) {
-	const itemIconStyle = icon ? {
-		backgroundColor: icon.background,
-		color: icon.foreground,
-	} : {};
-	const itemIconStackStyle = icon && icon.shadowColor ? {
-		backgroundColor: icon.shadowColor,
-	} : {};
+	const isDragging = useRef( false );
+	const itemIconStyle = item.icon
+		? {
+				backgroundColor: item.icon.background,
+				color: item.icon.foreground,
+		  }
+		: {};
+	const blocks = useMemo( () => {
+		return [
+			createBlock(
+				item.name,
+				item.initialAttributes,
+				createBlocksFromInnerBlocksTemplate( item.innerBlocks )
+			),
+		];
+	}, [ item.name, item.initialAttributes, item.initialAttributes ] );
 
 	return (
-		<li className="editor-block-types-list__list-item block-editor-block-types-list__list-item">
-			<button
-				className={
-					classnames(
-						'editor-block-types-list__item block-editor-block-types-list__item',
-						className,
-						{
-							'editor-block-types-list__item-has-children block-editor-block-types-list__item-has-children':
-								hasChildBlocksWithInserterSupport,
+		<InserterDraggableBlocks
+			isEnabled={ isDraggable && ! item.disabled }
+			blocks={ blocks }
+			icon={ item.icon }
+		>
+			{ ( { draggable, onDragStart, onDragEnd } ) => (
+				<div
+					className="block-editor-block-types-list__list-item"
+					draggable={ draggable }
+					onDragStart={ ( event ) => {
+						isDragging.current = true;
+						if ( onDragStart ) {
+							onHover( null );
+							onDragStart( event );
 						}
-					)
-				}
-				onClick={ ( event ) => {
-					event.preventDefault();
-					onClick();
-				} }
-				disabled={ isDisabled }
-				{ ...props }
-			>
-				<span
-					className="editor-block-types-list__item-icon block-editor-block-types-list__item-icon"
-					style={ itemIconStyle }
+					} }
+					onDragEnd={ ( event ) => {
+						isDragging.current = false;
+						if ( onDragEnd ) {
+							onDragEnd( event );
+						}
+					} }
 				>
-					<BlockIcon icon={ icon } showColors />
-					{ hasChildBlocksWithInserterSupport &&
+					<InserterListboxItem
+						isFirst={ isFirst }
+						className={ classnames(
+							'block-editor-block-types-list__item',
+							className
+						) }
+						disabled={ item.isDisabled }
+						onClick={ ( event ) => {
+							event.preventDefault();
+							onSelect(
+								item,
+								isAppleOS() ? event.metaKey : event.ctrlKey
+							);
+							onHover( null );
+						} }
+						onKeyDown={ ( event ) => {
+							const { keyCode } = event;
+							if ( keyCode === ENTER ) {
+								event.preventDefault();
+								onSelect(
+									item,
+									isAppleOS() ? event.metaKey : event.ctrlKey
+								);
+								onHover( null );
+							}
+						} }
+						onFocus={ () => {
+							if ( isDragging.current ) {
+								return;
+							}
+							onHover( item );
+						} }
+						onMouseEnter={ () => {
+							if ( isDragging.current ) {
+								return;
+							}
+							onHover( item );
+						} }
+						onMouseLeave={ () => onHover( null ) }
+						onBlur={ () => onHover( null ) }
+						{ ...props }
+					>
 						<span
-							className="editor-block-types-list__item-icon-stack block-editor-block-types-list__item-icon-stack"
-							style={ itemIconStackStyle }
-						/>
-					}
-				</span>
-				<span className="editor-block-types-list__item-title block-editor-block-types-list__item-title">
-					{ title }
-				</span>
-			</button>
-		</li>
+							className="block-editor-block-types-list__item-icon"
+							style={ itemIconStyle }
+						>
+							<BlockIcon icon={ item.icon } showColors />
+						</span>
+						<span className="block-editor-block-types-list__item-title">
+							<Truncate numberOfLines={ 3 }>
+								{ item.title }
+							</Truncate>
+						</span>
+					</InserterListboxItem>
+				</div>
+			) }
+		</InserterDraggableBlocks>
 	);
 }
 
-export default InserterListItem;
+export default memo( InserterListItem );

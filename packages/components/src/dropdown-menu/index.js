@@ -1,95 +1,156 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap, isEmpty, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { DOWN } from '@wordpress/keycodes';
+import { menu } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
+import Button from '../button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
 
-function DropdownMenu( {
-	children,
-	className,
-	controls,
-	icon = 'menu',
-	label,
-	menuLabel,
-	position,
-	__unstableLabelPosition,
-	__unstableMenuClassName,
-	__unstablePopoverClassName,
-	__unstableToggleClassName,
-} ) {
-	if ( isEmpty( controls ) && ! isFunction( children ) ) {
+function mergeProps( defaultProps = {}, props = {} ) {
+	const mergedProps = {
+		...defaultProps,
+		...props,
+	};
+
+	if ( props.className && defaultProps.className ) {
+		mergedProps.className = classnames(
+			props.className,
+			defaultProps.className
+		);
+	}
+
+	return mergedProps;
+}
+
+/**
+ * Whether the argument is a function.
+ *
+ * @param {*} maybeFunc The argument to check.
+ * @return {boolean} True if the argument is a function, false otherwise.
+ */
+function isFunction( maybeFunc ) {
+	return typeof maybeFunc === 'function';
+}
+
+function DropdownMenu( dropdownMenuProps ) {
+	const {
+		children,
+		className,
+		controls,
+		icon = menu,
+		label,
+		popoverProps,
+		toggleProps,
+		menuProps,
+		disableOpenOnArrowDown = false,
+		text,
+		noIcons,
+	} = dropdownMenuProps;
+
+	if ( ! controls?.length && ! isFunction( children ) ) {
 		return null;
 	}
 
 	// Normalize controls to nested array of objects (sets of controls)
 	let controlSets;
-	if ( ! isEmpty( controls ) ) {
+	if ( controls?.length ) {
 		controlSets = controls;
 		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
 			controlSets = [ controlSets ];
 		}
 	}
+	const mergedPopoverProps = mergeProps(
+		{
+			className: 'components-dropdown-menu__popover',
+		},
+		popoverProps
+	);
 
 	return (
 		<Dropdown
 			className={ classnames( 'components-dropdown-menu', className ) }
-			contentClassName={ classnames( 'components-dropdown-menu__popover', __unstablePopoverClassName ) }
-			position={ position }
+			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event ) => {
-					if ( ! isOpen && event.keyCode === DOWN ) {
+					if ( disableOpenOnArrowDown ) {
+						return;
+					}
+
+					if ( ! isOpen && event.code === 'ArrowDown' ) {
 						event.preventDefault();
-						event.stopPropagation();
 						onToggle();
 					}
 				};
+				const mergedToggleProps = mergeProps(
+					{
+						className: classnames(
+							'components-dropdown-menu__toggle',
+							{
+								'is-opened': isOpen,
+							}
+						),
+					},
+					toggleProps
+				);
 
 				return (
-					<IconButton
-						className={ classnames( 'components-dropdown-menu__toggle', __unstableToggleClassName, {
-							'is-opened': isOpen,
-						} ) }
+					<Button
+						{ ...mergedToggleProps }
 						icon={ icon }
-						onClick={ onToggle }
-						onKeyDown={ openOnArrowDown }
+						onClick={ ( event ) => {
+							onToggle( event );
+							if ( mergedToggleProps.onClick ) {
+								mergedToggleProps.onClick( event );
+							}
+						} }
+						onKeyDown={ ( event ) => {
+							openOnArrowDown( event );
+							if ( mergedToggleProps.onKeyDown ) {
+								mergedToggleProps.onKeyDown( event );
+							}
+						} }
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
-						labelPosition={ __unstableLabelPosition }
-						tooltip={ label }
+						text={ text }
+						showTooltip={ toggleProps?.showTooltip ?? true }
 					>
-						{ ! icon && <span className="components-dropdown-menu__indicator" /> }
-					</IconButton>
+						{ mergedToggleProps.children }
+					</Button>
 				);
 			} }
 			renderContent={ ( props ) => {
+				const mergedMenuProps = mergeProps(
+					{
+						'aria-label': label,
+						className: classnames(
+							'components-dropdown-menu__menu',
+							{ 'no-icons': noIcons }
+						),
+					},
+					menuProps
+				);
+
 				return (
-					<NavigableMenu
-						className={ classnames( 'components-dropdown-menu__menu', __unstableMenuClassName ) }
-						role="menu"
-						aria-label={ menuLabel || label }
-					>
-						{
-							isFunction( children ) ?
-								children( props ) :
-								null
-						}
-						{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
+					<NavigableMenu { ...mergedMenuProps } role="menu">
+						{ isFunction( children ) ? children( props ) : null }
+						{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
 							controlSet.map( ( control, indexOfControl ) => (
-								<IconButton
-									key={ [ indexOfSet, indexOfControl ].join() }
+								<Button
+									key={ [
+										indexOfSet,
+										indexOfControl,
+									].join() }
 									onClick={ ( event ) => {
 										event.stopPropagation();
 										props.onClose();
@@ -100,18 +161,33 @@ function DropdownMenu( {
 									className={ classnames(
 										'components-dropdown-menu__menu-item',
 										{
-											'has-separator': indexOfSet > 0 && indexOfControl === 0,
+											'has-separator':
+												indexOfSet > 0 &&
+												indexOfControl === 0,
 											'is-active': control.isActive,
-										},
+											'is-icon-only': ! control.title,
+										}
 									) }
 									icon={ control.icon }
-									role="menuitem"
+									label={ control.label }
+									aria-checked={
+										control.role === 'menuitemcheckbox' ||
+										control.role === 'menuitemradio'
+											? control.isActive
+											: undefined
+									}
+									role={
+										control.role === 'menuitemcheckbox' ||
+										control.role === 'menuitemradio'
+											? control.role
+											: 'menuitem'
+									}
 									disabled={ control.isDisabled }
 								>
 									{ control.title }
-								</IconButton>
+								</Button>
 							) )
-						) ) }
+						) }
 					</NavigableMenu>
 				);
 			} }

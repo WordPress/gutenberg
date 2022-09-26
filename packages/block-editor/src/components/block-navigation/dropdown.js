@@ -1,56 +1,82 @@
 /**
  * WordPress dependencies
  */
-import { IconButton, Dropdown, SVG, Path, KeyboardShortcuts } from '@wordpress/components';
+import deprecated from '@wordpress/deprecated';
+
+/**
+ * WordPress dependencies
+ */
+import { Button, Dropdown } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
+import { forwardRef } from '@wordpress/element';
+import { listView } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import BlockNavigation from './';
+import ListView from '../list-view';
+import { store as blockEditorStore } from '../../store';
 
-const MenuIcon = (
-	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
-		<Path d="M5 5H3v2h2V5zm3 8h11v-2H8v2zm9-8H6v2h11V5zM7 11H5v2h2v-2zm0 8h2v-2H7v2zm3-2v2h11v-2H10z" />
-	</SVG>
-);
+function BlockNavigationDropdownToggle( {
+	isEnabled,
+	onToggle,
+	isOpen,
+	innerRef,
+	...props
+} ) {
+	return (
+		<Button
+			{ ...props }
+			ref={ innerRef }
+			icon={ listView }
+			aria-expanded={ isOpen }
+			aria-haspopup="true"
+			onClick={ isEnabled ? onToggle : undefined }
+			/* translators: button label text should, if possible, be under 16 characters. */
+			label={ __( 'List view' ) }
+			className="block-editor-block-navigation"
+			aria-disabled={ ! isEnabled }
+		/>
+	);
+}
 
-function BlockNavigationDropdown( { hasBlocks, isDisabled } ) {
+function BlockNavigationDropdown( { isDisabled, ...props }, ref ) {
+	deprecated( 'wp.blockEditor.BlockNavigationDropdown', {
+		since: '6.1',
+		alternative: 'wp.components.Dropdown and wp.blockEditor.ListView',
+	} );
+
+	const hasBlocks = useSelect(
+		( select ) => !! select( blockEditorStore ).getBlockCount(),
+		[]
+	);
 	const isEnabled = hasBlocks && ! isDisabled;
 
-	return	(
+	return (
 		<Dropdown
+			contentClassName="block-editor-block-navigation__popover"
+			position="bottom right"
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<>
-					{ isEnabled && <KeyboardShortcuts
-						bindGlobal
-						shortcuts={ {
-							[ rawShortcut.access( 'o' ) ]: onToggle,
-						} }
-					/>
-					}
-					<IconButton
-						icon={ MenuIcon }
-						aria-expanded={ isOpen }
-						onClick={ isEnabled ? onToggle : undefined }
-						label={ __( 'Block Navigation' ) }
-						className="editor-block-navigation block-editor-block-navigation"
-						shortcut={ displayShortcut.access( 'o' ) }
-						aria-disabled={ ! isEnabled }
-					/>
-				</>
+				<BlockNavigationDropdownToggle
+					{ ...props }
+					innerRef={ ref }
+					isOpen={ isOpen }
+					onToggle={ onToggle }
+					isEnabled={ isEnabled }
+				/>
 			) }
-			renderContent={ ( { onClose } ) => (
-				<BlockNavigation onSelect={ onClose } />
+			renderContent={ () => (
+				<div className="block-editor-block-navigation__container">
+					<p className="block-editor-block-navigation__label">
+						{ __( 'List view' ) }
+					</p>
+
+					<ListView />
+				</div>
 			) }
 		/>
 	);
 }
 
-export default withSelect( ( select ) => {
-	return {
-		hasBlocks: !! select( 'core/block-editor' ).getBlockCount(),
-	};
-} )( BlockNavigationDropdown );
+export default forwardRef( BlockNavigationDropdown );

@@ -1,14 +1,21 @@
 /**
+ * Internal dependencies
+ */
+import { toggleMoreMenu } from './toggle-more-menu';
+
+/**
  * Switches editor mode.
  *
  * @param {string} mode String editor mode.
  */
 export async function switchEditorModeTo( mode ) {
-	await page.click(
-		'.edit-post-more-menu [aria-label="More tools & options"]'
-	);
+	await toggleMoreMenu( 'open' );
 	const [ button ] = await page.$x(
-		`//button[contains(text(), '${ mode } Editor')]`
+		`//button/span[contains(text(), '${ mode } editor')]`
 	);
 	await button.click( 'button' );
+	await toggleMoreMenu( 'close' );
+	if ( mode === 'Code' ) {
+		await page.waitForSelector( '.editor-post-text-editor' );
+	}
 }

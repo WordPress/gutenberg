@@ -1,0 +1,13 @@
+.components-dropdown {
+	display: inline-block;
+}
+
+.components-dropdown__content {
+	.components-popover__content {
+		padding: $grid-unit-10;
+	}
+
+	[role="menuitem"] {
+		white-space: nowrap;
+	}
+}

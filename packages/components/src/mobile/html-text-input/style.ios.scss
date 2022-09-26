@@ -1,21 +1,10 @@
-@import "./style-common.scss";
-
-$title-height: 32;
-
-.htmlView {
-	font-family: $htmlFont;
-	background-color: $backgroundColor;
-	padding-left: $padding;
-	padding-right: $padding;
-	padding-bottom: $title-height + $padding;
-}
+@import "./style.scss";
 
 .htmlViewTitle {
 	font-family: $htmlFont;
-	background-color: $backgroundColor;
 	padding-left: $padding;
 	padding-right: $padding;
 	padding-top: $padding;
 	padding-bottom: $padding;
-	height: $title-height;
+	margin-top: $padding * 2;
 }

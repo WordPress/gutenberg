@@ -10,6 +10,11 @@ import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
 export function PublishButtonLabel( {
 	isPublished,
 	isBeingScheduled,
@@ -17,21 +22,27 @@ export function PublishButtonLabel( {
 	isPublishing,
 	hasPublishAction,
 	isAutosaving,
+	hasNonPostEntityChanges,
 } ) {
 	if ( isPublishing ) {
+		/* translators: button label text should, if possible, be under 16 characters. */
 		return __( 'Publishing…' );
 	} else if ( isPublished && isSaving && ! isAutosaving ) {
+		/* translators: button label text should, if possible, be under 16 characters. */
 		return __( 'Updating…' );
 	} else if ( isBeingScheduled && isSaving && ! isAutosaving ) {
+		/* translators: button label text should, if possible, be under 16 characters. */
 		return __( 'Scheduling…' );
 	}
 
 	if ( ! hasPublishAction ) {
-		return __( 'Submit for Review' );
+		return hasNonPostEntityChanges
+			? __( 'Submit for Review…' )
+			: __( 'Submit for Review' );
 	} else if ( isPublished ) {
-		return __( 'Update' );
+		return hasNonPostEntityChanges ? __( 'Update…' ) : __( 'Update' );
 	} else if ( isBeingScheduled ) {
-		return __( 'Schedule' );
+		return hasNonPostEntityChanges ? __( 'Schedule…' ) : __( 'Schedule' );
 	}
 
 	return __( 'Publish' );
@@ -47,13 +58,17 @@ export default compose( [
 			getCurrentPost,
 			getCurrentPostType,
 			isAutosavingPost,
-		} = select( 'core/editor' );
+		} = select( editorStore );
 		return {
 			isPublished: isCurrentPostPublished(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isSaving: forceIsSaving || isSavingPost(),
 			isPublishing: isPublishingPost(),
-			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			hasPublishAction: get(
+				getCurrentPost(),
+				[ '_links', 'wp:action-publish' ],
+				false
+			),
 			postType: getCurrentPostType(),
 			isAutosaving: isAutosavingPost(),
 		};

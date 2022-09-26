@@ -1,10 +1,12 @@
 .components-notice {
+	display: flex;
 	font-family: $default-font;
 	font-size: $default-font-size;
-	background-color: $blue-medium-100;
-	border-left: 4px solid $blue-medium-500;
+	background-color: $white;
+	border-left: 4px solid var(--wp-admin-theme-color);
 	margin: 5px 15px 2px;
 	padding: 8px 12px;
+	align-items: center;
 
 	&.is-dismissible {
 		padding-right: 36px;
@@ -28,38 +30,62 @@
 }
 
 .components-notice__content {
-	margin: 1em #{ $icon-button-size-small + $border-width } 1em 0;
+	flex-grow: 1;
+	margin: $grid-unit-05 #{ $button-size-small + $border-width } $grid-unit-05 0;
+}
+
+.components-notice__actions {
+	display: flex;
+	flex-wrap: wrap;
 }
 
 .components-notice__action.components-button {
 	&,
 	&.is-link {
-		margin-left: 4px;
+		margin-left: $grid-unit-15;
 	}
-	&.is-default {
+	&.is-secondary {
 		vertical-align: initial;
 	}
+
+	// When it has better support, this can be replaced
+	// with column-gap since these are flex items.
+	margin-right: $grid-unit-10;
 }
 
 .components-notice__dismiss {
-	position: absolute;
-	top: 0;
-	right: 0;
-	color: $dark-gray-300;
+	color: $gray-700;
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active,
+	// Place the dismiss button at the top of the container, even when text wraps onto two lines.
+	align-self: flex-start;
+	flex-shrink: 0;
+
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
 	&:not(:disabled):not([aria-disabled="true"]):focus {
-		color: $alert-red;
+		color: $gray-900;
 		background-color: transparent;
 	}
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
 		box-shadow: none;
 	}
 }
 
 .components-notice-list {
-	min-width: 300px;
-	z-index: z-index(".components-notice-list");
+	// The notice should never be wider than the viewport, or the close button might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
+	max-width: 100vw;
+	box-sizing: border-box;
+
+	.components-notice__content {
+		margin-top: $grid-unit-15;
+		margin-bottom: $grid-unit-15;
+		line-height: 2;
+	}
+
+	.components-notice__action.components-button {
+		display: block;
+		margin-left: 0;
+		margin-top: $grid-unit-10;
+	}
 }

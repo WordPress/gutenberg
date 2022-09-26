@@ -1,24 +1,21 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { visibilityOptions } from './utils';
+import { store as editorStore } from '../../store';
 
-function PostVisibilityLabel( { visibility } ) {
-	const getVisibilityLabel = () => find( visibilityOptions, { value: visibility } ).label;
-
-	return getVisibilityLabel( visibility );
+export default function PostVisibilityLabel() {
+	return usePostVisibilityLabel();
 }
 
-export default withSelect( ( select ) => ( {
-	visibility: select( 'core/editor' ).getEditedPostVisibility(),
-} ) )( PostVisibilityLabel );
+export function usePostVisibilityLabel() {
+	const visibility = useSelect( ( select ) =>
+		select( editorStore ).getEditedPostVisibility()
+	);
+	return visibilityOptions[ visibility ]?.label;
+}

@@ -25,10 +25,11 @@ import { useDispatchWithMap } from '../use-dispatch';
  *     return <button type="button" onClick={ onClick }>{ children }</button>;
  * }
  *
- * const { withDispatch } = wp.data;
+ * import { withDispatch } from '@wordpress/data';
+ * import { store as myCustomStore } from 'my-custom-store';
  *
  * const SaleButton = withDispatch( ( dispatch, ownProps ) => {
- *     const { startSale } = dispatch( 'my-shop' );
+ *     const { startSale } = dispatch( myCustomStore );
  *     const { discountPercent } = ownProps;
  *
  *     return {
@@ -62,12 +63,13 @@ import { useDispatchWithMap } from '../use-dispatch';
  *     return <button type="button" onClick={ onClick }>{ children }</button>;
  * }
  *
- * const { withDispatch } = wp.data;
+ * import { withDispatch } from '@wordpress/data';
+ * import { store as myCustomStore } from 'my-custom-store';
  *
  * const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
  *    // Stock number changes frequently.
- *    const { getStockNumber } = select( 'my-shop' );
- *    const { startSale } = dispatch( 'my-shop' );
+ *    const { getStockNumber } = select( myCustomStore );
+ *    const { startSale } = dispatch( myCustomStore );
  *    return {
  *        onClick() {
  *            const discountPercent = getStockNumber() > 50 ? 10 : 20;
@@ -85,19 +87,17 @@ import { useDispatchWithMap } from '../use-dispatch';
  * returns an object with the same keys. For example, it should not contain
  * conditions under which a different value would be returned.
  *
- * @return {Component} Enhanced component with merged dispatcher props.
+ * @return {WPComponent} Enhanced component with merged dispatcher props.
  */
-const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
-	( WrappedComponent ) => ( ownProps ) => {
-		const mapDispatch = ( dispatch, registry ) => mapDispatchToProps(
-			dispatch,
-			ownProps,
-			registry
-		);
-		const dispatchProps = useDispatchWithMap( mapDispatch, [] );
-		return <WrappedComponent { ...ownProps } { ...dispatchProps } />;
-	},
-	'withDispatch'
-);
+const withDispatch = ( mapDispatchToProps ) =>
+	createHigherOrderComponent(
+		( WrappedComponent ) => ( ownProps ) => {
+			const mapDispatch = ( dispatch, registry ) =>
+				mapDispatchToProps( dispatch, ownProps, registry );
+			const dispatchProps = useDispatchWithMap( mapDispatch, [] );
+			return <WrappedComponent { ...ownProps } { ...dispatchProps } />;
+		},
+		'withDispatch'
+	);
 
 export default withDispatch;

@@ -3,8 +3,10 @@
  */
 import { createSlotFill } from '@wordpress/components';
 
-const { Fill: __experimentalBlockSettingsMenuFirstItem, Slot } = createSlotFill( '__experimentalBlockSettingsMenuFirstItem' );
+const { Fill: __unstableBlockSettingsMenuFirstItem, Slot } = createSlotFill(
+	'__unstableBlockSettingsMenuFirstItem'
+);
 
-__experimentalBlockSettingsMenuFirstItem.Slot = Slot;
+__unstableBlockSettingsMenuFirstItem.Slot = Slot;
 
-export default __experimentalBlockSettingsMenuFirstItem;
+export default __unstableBlockSettingsMenuFirstItem;

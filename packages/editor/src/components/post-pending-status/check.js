@@ -9,7 +9,16 @@ import { get } from 'lodash';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
-export function PostPendingStatusCheck( { hasPublishAction, isPublished, children } ) {
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
+export function PostPendingStatusCheck( {
+	hasPublishAction,
+	isPublished,
+	children,
+} ) {
 	if ( isPublished || ! hasPublishAction ) {
 		return null;
 	}
@@ -19,9 +28,14 @@ export function PostPendingStatusCheck( { hasPublishAction, isPublished, childre
 
 export default compose(
 	withSelect( ( select ) => {
-		const { isCurrentPostPublished, getCurrentPostType, getCurrentPost } = select( 'core/editor' );
+		const { isCurrentPostPublished, getCurrentPostType, getCurrentPost } =
+			select( editorStore );
 		return {
-			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			hasPublishAction: get(
+				getCurrentPost(),
+				[ '_links', 'wp:action-publish' ],
+				false
+			),
 			isPublished: isCurrentPostPublished(),
 			postType: getCurrentPostType(),
 		};

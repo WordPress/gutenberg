@@ -3,7 +3,7 @@
  */
 import { wrap, replaceTag } from '@wordpress/dom';
 
-export default function( node, doc ) {
+export default function phrasingContentReducer( node, doc ) {
 	// In jsdom-jscore, 'node.style' can be null.
 	// TODO: Explore fixing this by patching jsdom-jscore.
 	if ( node.nodeName === 'SPAN' && node.style ) {
@@ -11,6 +11,7 @@ export default function( node, doc ) {
 			fontWeight,
 			fontStyle,
 			textDecorationLine,
+			textDecoration,
 			verticalAlign,
 		} = node.style;
 
@@ -22,7 +23,13 @@ export default function( node, doc ) {
 			wrap( doc.createElement( 'em' ), node );
 		}
 
-		if ( textDecorationLine === 'line-through' ) {
+		// Some DOM implementations (Safari, JSDom) don't support
+		// style.textDecorationLine, so we check style.textDecoration as a
+		// fallback.
+		if (
+			textDecorationLine === 'line-through' ||
+			textDecoration.includes( 'line-through' )
+		) {
 			wrap( doc.createElement( 's' ), node );
 		}
 
@@ -43,6 +50,19 @@ export default function( node, doc ) {
 		} else {
 			node.removeAttribute( 'target' );
 			node.removeAttribute( 'rel' );
+		}
+
+		// Saves anchor elements name attribute as id
+		if ( node.name && ! node.id ) {
+			node.id = node.name;
+		}
+
+		// Keeps id only if there is an internal link pointing to it
+		if (
+			node.id &&
+			! node.ownerDocument.querySelector( `[href="#${ node.id }"]` )
+		) {
+			node.removeAttribute( 'id' );
 		}
 	}
 }

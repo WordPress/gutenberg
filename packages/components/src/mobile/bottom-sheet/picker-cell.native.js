@@ -1,15 +1,17 @@
 /**
+ * External dependencies
+ */
+import { find } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import Cell from './cell';
 import Picker from '../picker';
 
 export default function BottomSheetPickerCell( props ) {
-	const {
-		options,
-		onChangeValue,
-		...cellProps
-	} = props;
+	const { options, hideCancelButton, onChangeValue, value, ...cellProps } =
+		props;
 
 	let picker;
 
@@ -21,10 +23,20 @@ export default function BottomSheetPickerCell( props ) {
 		onChangeValue( newValue );
 	};
 
+	const option = find( options, { value } );
+	const label = option ? option.label : value;
+
 	return (
-		<Cell onPress={ onCellPress } editable={ false } { ...cellProps } >
+		<Cell
+			onPress={ onCellPress }
+			editable={ false }
+			value={ label }
+			{ ...cellProps }
+		>
 			<Picker
-				ref={ ( instance ) => picker = instance }
+				leftAlign
+				hideCancelButton={ hideCancelButton }
+				ref={ ( instance ) => ( picker = instance ) }
 				options={ options }
 				onChange={ onChange }
 			/>

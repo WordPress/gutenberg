@@ -11,65 +11,86 @@ const webpack = require( 'webpack' );
 const fixturesPath = path.join( __dirname, 'fixtures' );
 const configFixtures = fs.readdirSync( fixturesPath ).sort();
 
-afterAll( () => rimraf( path.join( __dirname, 'build' ) ) );
+jest.useRealTimers();
 
-describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
-	const testDirectory = path.join( fixturesPath, configCase );
-	const outputDirectory = path.join( __dirname, 'build', configCase );
+describe( 'DependencyExtractionWebpackPlugin', () => {
+	afterAll( () => rimraf( path.join( __dirname, 'build' ) ) );
 
-	beforeEach( () => {
-		rimraf( outputDirectory );
-		mkdirp( outputDirectory );
-	} );
+	describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
+		const testDirectory = path.join( fixturesPath, configCase );
+		const outputDirectory = path.join( __dirname, 'build', configCase );
 
-	// This afterEach is necessary to prevent watched tests from retriggering on every run.
-	afterEach( () => rimraf( outputDirectory ) );
+		beforeEach( () => {
+			rimraf( outputDirectory );
+			mkdirp( outputDirectory );
+		} );
 
-	test( 'should produce expected output', () =>
-		new Promise( ( resolve ) => {
-			const options = Object.assign(
-				{
-					context: testDirectory,
-					entry: './index.js',
-					mode: 'production',
-					optimization: {
-						minimize: false,
-						namedChunks: true,
-						namedModules: true,
+		// This afterEach is necessary to prevent watched tests from retriggering on every run.
+		afterEach( () => rimraf( outputDirectory ) );
+
+		test( 'should produce expected output', () =>
+			new Promise( ( resolve ) => {
+				const options = Object.assign(
+					{
+						context: testDirectory,
+						entry: './index.js',
+						mode: 'production',
+						optimization: {
+							minimize: false,
+							chunkIds: 'named',
+							moduleIds: 'named',
+						},
+						output: {},
 					},
-					output: {},
-				},
-				require( path.join( testDirectory, 'webpack.config.js' ) )
-			);
-			options.output.path = outputDirectory;
+					require( path.join( testDirectory, 'webpack.config.js' ) )
+				);
+				options.output.path = outputDirectory;
 
-			webpack( options, ( err, stats ) => {
-				expect( err ).toBeNull();
+				webpack( options, ( err, stats ) => {
+					expect( err ).toBeNull();
 
-				const depsFiles = glob( `${ outputDirectory }/*.deps.json` );
-				const expectedLength =
-					typeof options.entry === 'object' ? Object.keys( options.entry ).length : 1;
-				expect( depsFiles ).toHaveLength( expectedLength );
-
-				// Deps files should match
-				depsFiles.forEach( ( depsFile ) => {
-					expect( require( depsFile ) ).toMatchSnapshot(
-						'Dependencies JSON should match snapshot'
+					const assetFiles = glob(
+						`${ outputDirectory }/+(*.asset|assets).@(json|php)`
 					);
+
+					expect( assetFiles.length ).toBeGreaterThan( 0 );
+
+					// Asset files should match.
+					assetFiles.forEach( ( assetFile ) => {
+						const assetBasename = path.basename( assetFile );
+
+						expect(
+							fs.readFileSync( assetFile, 'utf-8' )
+						).toMatchSnapshot(
+							`Asset file '${ assetBasename }' should match snapshot`
+						);
+					} );
+
+					const compareByModuleIdentifier = ( m1, m2 ) => {
+						const i1 = m1.identifier();
+						const i2 = m2.identifier();
+						if ( i1 < i2 ) return -1;
+						if ( i1 > i2 ) return 1;
+						return 0;
+					};
+
+					// Webpack stats external modules should match.
+					const externalModules = Array.from(
+						stats.compilation.modules
+					)
+						.filter( ( { externalType } ) => externalType )
+						.sort( compareByModuleIdentifier )
+						.map( ( module ) => ( {
+							externalType: module.externalType,
+							request: module.request,
+							userRequest: module.userRequest,
+						} ) );
+					expect( externalModules ).toMatchSnapshot(
+						'External modules should match snapshot'
+					);
+
+					resolve();
 				} );
-
-				// Webpack stats external modules should match
-				const externalModules = stats.compilation.modules
-					.filter( ( { external } ) => external )
-					.sort()
-					.map( ( module ) => ( {
-						externalType: module.externalType,
-						request: module.request,
-						userRequest: module.userRequest,
-					} ) );
-				expect( externalModules ).toMatchSnapshot( 'External modules should match snapshot' );
-
-				resolve();
-			} );
-		} ) );
+			} ) );
+	} );
 } );

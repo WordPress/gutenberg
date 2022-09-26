@@ -3,27 +3,34 @@
  */
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
-import { useState, useCallback } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editWidgetsStore } from '../../store';
 
 function SaveButton() {
-	const [ isSaving, setIsSaving ] = useState( false );
-	const { saveWidgetAreas } = useDispatch( 'core/edit-widgets' );
-	const onClick = useCallback( async () => {
-		setIsSaving( true );
-		await saveWidgetAreas();
-		setIsSaving( false );
+	const { hasEditedWidgetAreaIds, isSaving } = useSelect( ( select ) => {
+		const { getEditedWidgetAreas, isSavingWidgetAreas } =
+			select( editWidgetsStore );
+
+		return {
+			hasEditedWidgetAreaIds: getEditedWidgetAreas()?.length > 0,
+			isSaving: isSavingWidgetAreas(),
+		};
 	}, [] );
+	const { saveEditedWidgetAreas } = useDispatch( editWidgetsStore );
 
 	return (
 		<Button
-			isPrimary
-			isLarge
+			variant="primary"
 			isBusy={ isSaving }
 			aria-disabled={ isSaving }
-			onClick={ isSaving ? undefined : onClick }
+			onClick={ isSaving ? undefined : saveEditedWidgetAreas }
+			disabled={ ! hasEditedWidgetAreaIds }
 		>
-			{ __( 'Update' ) }
+			{ isSaving ? __( 'Saving…' ) : __( 'Update' ) }
 		</Button>
 	);
 }

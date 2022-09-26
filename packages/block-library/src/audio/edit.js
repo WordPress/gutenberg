@@ -1,32 +1,36 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
-import { compose } from '@wordpress/compose';
 import {
 	Disabled,
-	IconButton,
 	PanelBody,
 	SelectControl,
+	Spinner,
 	ToggleControl,
-	Toolbar,
-	withNotices,
 } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
+	MediaReplaceFlow,
 	RichText,
+	useBlockProps,
+	store as blockEditorStore,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
-import { Component } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { withSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import icon from './icon';
+import { useEffect } from '@wordpress/element';
+import { __, _x } from '@wordpress/i18n';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { audio as icon } from '@wordpress/icons';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -35,191 +39,185 @@ import { createUpgradedEmbedBlock } from '../embed/util';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
-class AudioEdit extends Component {
-	constructor() {
-		super( ...arguments );
-		// edit component has its own src in the state so it can be edited
-		// without setting the actual value outside of the edit UI
-		this.state = {
-			editing: ! this.props.attributes.src,
-		};
+function AudioEdit( {
+	attributes,
+	className,
+	setAttributes,
+	onReplace,
+	isSelected,
+	insertBlocksAfter,
+} ) {
+	const { id, autoplay, caption, loop, preload, src } = attributes;
+	const isTemporaryAudio = ! id && isBlobURL( src );
+	const mediaUpload = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().mediaUpload;
+	}, [] );
 
-		this.toggleAttribute = this.toggleAttribute.bind( this );
-		this.onSelectURL = this.onSelectURL.bind( this );
-		this.onUploadError = this.onUploadError.bind( this );
-	}
-
-	componentDidMount() {
-		const {
-			attributes,
-			mediaUpload,
-			noticeOperations,
-			setAttributes,
-		} = this.props;
-		const { id, src = '' } = attributes;
-
+	useEffect( () => {
 		if ( ! id && isBlobURL( src ) ) {
 			const file = getBlobByURL( src );
 
 			if ( file ) {
 				mediaUpload( {
 					filesList: [ file ],
-					onFileChange: ( [ { id: mediaId, url } ] ) => {
-						setAttributes( { id: mediaId, src: url } );
-					},
-					onError: ( e ) => {
-						setAttributes( { src: undefined, id: undefined } );
-						this.setState( { editing: true } );
-						noticeOperations.createErrorNotice( e );
-					},
+					onFileChange: ( [ media ] ) => onSelectAudio( media ),
+					onError: ( e ) => onUploadError( e ),
 					allowedTypes: ALLOWED_MEDIA_TYPES,
 				} );
 			}
 		}
-	}
+	}, [] );
 
-	toggleAttribute( attribute ) {
+	function toggleAttribute( attribute ) {
 		return ( newValue ) => {
-			this.props.setAttributes( { [ attribute ]: newValue } );
+			setAttributes( { [ attribute ]: newValue } );
 		};
 	}
 
-	onSelectURL( newSrc ) {
-		const { attributes, setAttributes } = this.props;
-		const { src } = attributes;
-
+	function onSelectURL( newSrc ) {
 		// Set the block's src from the edit component's state, and switch off
 		// the editing UI.
 		if ( newSrc !== src ) {
 			// Check if there's an embed block that handles this URL.
-			const embedBlock = createUpgradedEmbedBlock(
-				{ attributes: { url: newSrc } }
-			);
-			if ( undefined !== embedBlock ) {
-				this.props.onReplace( embedBlock );
+			const embedBlock = createUpgradedEmbedBlock( {
+				attributes: { url: newSrc },
+			} );
+			if ( undefined !== embedBlock && onReplace ) {
+				onReplace( embedBlock );
 				return;
 			}
 			setAttributes( { src: newSrc, id: undefined } );
 		}
-
-		this.setState( { editing: false } );
 	}
 
-	onUploadError( message ) {
-		const { noticeOperations } = this.props;
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+	const { createErrorNotice } = useDispatch( noticesStore );
+	function onUploadError( message ) {
+		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
-	getAutoplayHelp( checked ) {
-		return checked ? __( 'Note: Autoplaying audio may cause usability issues for some visitors.' ) : null;
+	function getAutoplayHelp( checked ) {
+		return checked
+			? __( 'Autoplay may cause usability issues for some users.' )
+			: null;
 	}
 
-	render() {
-		const { autoplay, caption, loop, preload, src } = this.props.attributes;
-		const { setAttributes, isSelected, className, noticeUI } = this.props;
-		const { editing } = this.state;
-		const switchToEditing = () => {
-			this.setState( { editing: true } );
-		};
-		const onSelectAudio = ( media ) => {
-			if ( ! media || ! media.url ) {
-				// in this case there was an error and we should continue in the editing state
-				// previous attributes should be removed because they may be temporary blob urls
-				setAttributes( { src: undefined, id: undefined } );
-				switchToEditing();
-				return;
-			}
-			// sets the block's attribute and updates the edit component from the
-			// selected media, then switches off the editing UI
-			setAttributes( { src: media.url, id: media.id } );
-			this.setState( { src: media.url, editing: false } );
-		};
-		if ( editing ) {
-			return (
+	function onSelectAudio( media ) {
+		if ( ! media || ! media.url ) {
+			// In this case there was an error and we should continue in the editing state
+			// previous attributes should be removed because they may be temporary blob urls.
+			setAttributes( { src: undefined, id: undefined } );
+			return;
+		}
+		// Sets the block's attribute and updates the edit component from the
+		// selected media, then switches off the editing UI.
+		setAttributes( { src: media.url, id: media.id } );
+	}
+
+	const classes = classnames( className, {
+		'is-transient': isTemporaryAudio,
+	} );
+
+	const blockProps = useBlockProps( {
+		className: classes,
+	} );
+
+	if ( ! src ) {
+		return (
+			<div { ...blockProps }>
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
-					className={ className }
 					onSelect={ onSelectAudio }
-					onSelectURL={ this.onSelectURL }
+					onSelectURL={ onSelectURL }
 					accept="audio/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					value={ this.props.attributes }
-					notices={ noticeUI }
-					onError={ this.onUploadError }
+					value={ attributes }
+					onError={ onUploadError }
 				/>
-			);
-		}
-
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-		return (
-			<>
-				<BlockControls>
-					<Toolbar>
-						<IconButton
-							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit audio' ) }
-							onClick={ switchToEditing }
-							icon="edit"
-						/>
-					</Toolbar>
-				</BlockControls>
-				<InspectorControls>
-					<PanelBody title={ __( 'Audio Settings' ) }>
-						<ToggleControl
-							label={ __( 'Autoplay' ) }
-							onChange={ this.toggleAttribute( 'autoplay' ) }
-							checked={ autoplay }
-							help={ this.getAutoplayHelp }
-						/>
-						<ToggleControl
-							label={ __( 'Loop' ) }
-							onChange={ this.toggleAttribute( 'loop' ) }
-							checked={ loop }
-						/>
-						<SelectControl
-							label={ __( 'Preload' ) }
-							value={ undefined !== preload ? preload : 'none' }
-							// `undefined` is required for the preload attribute to be unset.
-							onChange={ ( value ) => setAttributes( { preload: ( 'none' !== value ) ? value : undefined } ) }
-							options={ [
-								{ value: 'auto', label: __( 'Auto' ) },
-								{ value: 'metadata', label: __( 'Metadata' ) },
-								{ value: 'none', label: __( 'None' ) },
-							] }
-						/>
-					</PanelBody>
-				</InspectorControls>
-				<figure className={ className }>
-					{ /*
-						Disable the audio tag so the user clicking on it won't play the
-						file or change the position slider when the controls are enabled.
-					*/ }
-					<Disabled>
-						<audio controls="controls" src={ src } />
-					</Disabled>
-					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-						<RichText
-							tagName="figcaption"
-							placeholder={ __( 'Write caption…' ) }
-							value={ caption }
-							onChange={ ( value ) => setAttributes( { caption: value } ) }
-							inlineToolbar
-						/>
-					) }
-				</figure>
-			</>
+			</div>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
+
+	return (
+		<>
+			<BlockControls group="other">
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ src }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="audio/*"
+					onSelect={ onSelectAudio }
+					onSelectURL={ onSelectURL }
+					onError={ onUploadError }
+				/>
+			</BlockControls>
+			<InspectorControls>
+				<PanelBody title={ __( 'Settings' ) }>
+					<ToggleControl
+						label={ __( 'Autoplay' ) }
+						onChange={ toggleAttribute( 'autoplay' ) }
+						checked={ autoplay }
+						help={ getAutoplayHelp }
+					/>
+					<ToggleControl
+						label={ __( 'Loop' ) }
+						onChange={ toggleAttribute( 'loop' ) }
+						checked={ loop }
+					/>
+					<SelectControl
+						label={ _x( 'Preload', 'noun; Audio block parameter' ) }
+						value={ preload || '' }
+						// `undefined` is required for the preload attribute to be unset.
+						onChange={ ( value ) =>
+							setAttributes( {
+								preload: value || undefined,
+							} )
+						}
+						options={ [
+							{ value: '', label: __( 'Browser default' ) },
+							{ value: 'auto', label: __( 'Auto' ) },
+							{ value: 'metadata', label: __( 'Metadata' ) },
+							{
+								value: 'none',
+								label: _x( 'None', 'Preload value' ),
+							},
+						] }
+					/>
+				</PanelBody>
+			</InspectorControls>
+			<figure { ...blockProps }>
+				{ /*
+					Disable the audio tag if the block is not selected
+					so the user clicking on it won't play the
+					file or change the position slider when the controls are enabled.
+				*/ }
+				<Disabled isDisabled={ ! isSelected }>
+					<audio controls="controls" src={ src } />
+				</Disabled>
+				{ isTemporaryAudio && <Spinner /> }
+				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
+					<RichText
+						tagName="figcaption"
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
+						aria-label={ __( 'Audio caption text' ) }
+						placeholder={ __( 'Add caption' ) }
+						value={ caption }
+						onChange={ ( value ) =>
+							setAttributes( { caption: value } )
+						}
+						inlineToolbar
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
+						}
+					/>
+				) }
+			</figure>
+		</>
+	);
 }
-export default compose( [
-	withSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		const { __experimentalMediaUpload } = getSettings();
-		return {
-			mediaUpload: __experimentalMediaUpload,
-		};
-	} ),
-	withNotices,
-] )( AudioEdit );
+
+export default AudioEdit;

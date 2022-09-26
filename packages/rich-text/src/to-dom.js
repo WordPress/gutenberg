@@ -5,11 +5,7 @@
 import { toTree } from './to-tree';
 import { createElement } from './create-element';
 
-/**
- * Browser dependencies
- */
-
-const { TEXT_NODE } = window.Node;
+/** @typedef {import('./create').RichTextValue} RichTextValue */
 
 /**
  * Creates a path as an array of indices from the given root node to the given
@@ -59,18 +55,6 @@ function getNodeByPath( node, path ) {
 	};
 }
 
-/**
- * Returns a new instance of a DOM tree upon which RichText operations can be
- * applied.
- *
- * Note: The current implementation will return a shared reference, reset on
- * each call to `createEmpty`. Therefore, you should not hold a reference to
- * the value to operate upon asynchronously, as it may have unexpected results.
- *
- * @return {WPRichTextTree} RichText tree.
- */
-const createEmpty = () => createElement( document, '' );
-
 function append( element, child ) {
 	if ( typeof child === 'string' ) {
 		child = element.ownerDocument.createTextNode( child );
@@ -101,8 +85,8 @@ function getParent( { parentNode } ) {
 	return parentNode;
 }
 
-function isText( { nodeType } ) {
-	return nodeType === TEXT_NODE;
+function isText( node ) {
+	return node.nodeType === node.TEXT_NODE;
 }
 
 function getText( { nodeValue } ) {
@@ -118,6 +102,8 @@ export function toDom( {
 	multilineTag,
 	prepareEditableTree,
 	isEditableTree = true,
+	placeholder,
+	doc = document,
 } ) {
 	let startPath = [];
 	let endPath = [];
@@ -128,6 +114,18 @@ export function toDom( {
 			formats: prepareEditableTree( value ),
 		};
 	}
+
+	/**
+	 * Returns a new instance of a DOM tree upon which RichText operations can be
+	 * applied.
+	 *
+	 * Note: The current implementation will return a shared reference, reset on
+	 * each call to `createEmpty`. Therefore, you should not hold a reference to
+	 * the value to operate upon asynchronously, as it may have unexpected results.
+	 *
+	 * @return {Object} RichText tree.
+	 */
+	const createEmpty = () => createElement( doc, '' );
 
 	const tree = toTree( {
 		value,
@@ -141,12 +139,17 @@ export function toDom( {
 		remove,
 		appendText,
 		onStartIndex( body, pointer ) {
-			startPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
+			startPath = createPathToNode( pointer, body, [
+				pointer.nodeValue.length,
+			] );
 		},
 		onEndIndex( body, pointer ) {
-			endPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
+			endPath = createPathToNode( pointer, body, [
+				pointer.nodeValue.length,
+			] );
 		},
 		isEditableTree,
+		placeholder,
 	} );
 
 	return {
@@ -160,11 +163,13 @@ export function toDom( {
  * the `Element` tree contained by `current`. If a `multilineTag` is provided,
  * text separated by two new lines will be wrapped in an `Element` of that type.
  *
- * @param {Object}      $1                        Named arguments.
- * @param {Object}      $1.value                  Value to apply.
- * @param {HTMLElement} $1.current                The live root node to apply the element tree to.
- * @param {string}      [$1.multilineTag]         Multiline tag.
- * @param {Array}       [$1.multilineWrapperTags] Tags where lines can be found if nesting is possible.
+ * @param {Object}        $1                       Named arguments.
+ * @param {RichTextValue} $1.value                 Value to apply.
+ * @param {HTMLElement}   $1.current               The live root node to apply the element tree to.
+ * @param {string}        [$1.multilineTag]        Multiline tag.
+ * @param {Function}      [$1.prepareEditableTree] Function to filter editorable formats.
+ * @param {boolean}       [$1.__unstableDomOnly]   Only apply elements, no selection.
+ * @param {string}        [$1.placeholder]         Placeholder text.
  */
 export function apply( {
 	value,
@@ -172,12 +177,15 @@ export function apply( {
 	multilineTag,
 	prepareEditableTree,
 	__unstableDomOnly,
+	placeholder,
 } ) {
 	// Construct a new element tree in memory.
 	const { body, selection } = toDom( {
 		value,
 		multilineTag,
 		prepareEditableTree,
+		placeholder,
+		doc: current.ownerDocument,
 	} );
 
 	applyValue( body, current );
@@ -199,7 +207,8 @@ export function applyValue( future, current ) {
 		} else if ( ! currentChild.isEqualNode( futureChild ) ) {
 			if (
 				currentChild.nodeName !== futureChild.nodeName ||
-				( currentChild.nodeType === TEXT_NODE && currentChild.data !== futureChild.data )
+				( currentChild.nodeType === currentChild.TEXT_NODE &&
+					currentChild.data !== futureChild.data )
 			) {
 				current.replaceChild( futureChild, currentChild );
 			} else {
@@ -265,19 +274,23 @@ function isRangeEqual( a, b ) {
 }
 
 export function applySelection( { startPath, endPath }, current ) {
-	const { node: startContainer, offset: startOffset } = getNodeByPath( current, startPath );
-	const { node: endContainer, offset: endOffset } = getNodeByPath( current, endPath );
-	const selection = window.getSelection();
+	const { node: startContainer, offset: startOffset } = getNodeByPath(
+		current,
+		startPath
+	);
+	const { node: endContainer, offset: endOffset } = getNodeByPath(
+		current,
+		endPath
+	);
 	const { ownerDocument } = current;
+	const { defaultView } = ownerDocument;
+	const selection = defaultView.getSelection();
 	const range = ownerDocument.createRange();
 
 	range.setStart( startContainer, startOffset );
 	range.setEnd( endContainer, endOffset );
 
-	// Set back focus if focus is lost.
-	if ( ownerDocument.activeElement !== current ) {
-		current.focus();
-	}
+	const { activeElement } = ownerDocument;
 
 	if ( selection.rangeCount > 0 ) {
 		// If the to be added range and the live range are the same, there's no
@@ -290,4 +303,18 @@ export function applySelection( { startPath, endPath }, current ) {
 	}
 
 	selection.addRange( range );
+
+	// This function is not intended to cause a shift in focus. Since the above
+	// selection manipulations may shift focus, ensure that focus is restored to
+	// its previous state.
+	if ( activeElement !== ownerDocument.activeElement ) {
+		// The `instanceof` checks protect against edge cases where the focused
+		// element is not of the interface HTMLElement (does not have a `focus`
+		// or `blur` property).
+		//
+		// See: https://github.com/Microsoft/TypeScript/issues/5901#issuecomment-431649653
+		if ( activeElement instanceof defaultView.HTMLElement ) {
+			activeElement.focus();
+		}
+	}
 }

@@ -1,185 +1,55 @@
+@import "./archives/style.scss";
+@import "./avatar/style.scss";
 @import "./audio/style.scss";
 @import "./button/style.scss";
+@import "./buttons/style.scss";
 @import "./calendar/style.scss";
 @import "./categories/style.scss";
+@import "./code/style.scss";
 @import "./columns/style.scss";
+@import "./comments/style.scss";
+@import "./comments-pagination/style.scss";
+@import "./comment-template/style.scss";
 @import "./cover/style.scss";
 @import "./embed/style.scss";
 @import "./file/style.scss";
 @import "./gallery/style.scss";
+@import "./group/style.scss";
+@import "./heading/style.scss";
 @import "./image/style.scss";
 @import "./latest-comments/style.scss";
 @import "./latest-posts/style.scss";
+@import "./list/style.scss";
 @import "./media-text/style.scss";
+@import "./navigation/style.scss";
+@import "./navigation-link/style.scss";
+@import "./page-list/style.scss";
 @import "./paragraph/style.scss";
+@import "./post-author/style.scss";
+@import "./post-comments-form/style.scss";
+@import "./post-date/style.scss";
+@import "./post-excerpt/style.scss";
+@import "./post-featured-image/style.scss";
+@import "./post-navigation-link/style.scss";
+@import "./post-terms/style.scss";
+@import "./post-title/style.scss";
+@import "./preformatted/style.scss";
 @import "./pullquote/style.scss";
+@import "./post-template/style.scss";
+@import "./query-pagination/style.scss";
+@import "./query-title/style.scss";
 @import "./quote/style.scss";
+@import "./read-more/style.scss";
 @import "./rss/style.scss";
 @import "./search/style.scss";
 @import "./separator/style.scss";
+@import "./site-logo/style.scss";
+@import "./social-links/style.scss";
 @import "./spacer/style.scss";
-@import "./subhead/style.scss";
+@import "./tag-cloud/style.scss";
 @import "./table/style.scss";
 @import "./text-columns/style.scss";
 @import "./verse/style.scss";
 @import "./video/style.scss";
 
-// The following selectors have increased specificity (using the :root prefix)
-// to assure colors take effect over another base class color, mainly to let
-// the colors override the added specificity by link states such as :hover.
-
-:root {
-	// Background colors.
-
-	.has-pale-pink-background-color {
-		background-color: #f78da7;
-	}
-
-	.has-vivid-red-background-color {
-		background-color: #cf2e2e;
-	}
-
-	.has-luminous-vivid-orange-background-color {
-		background-color: #ff6900;
-	}
-
-	.has-luminous-vivid-amber-background-color {
-		background-color: #fcb900;
-	}
-
-	.has-light-green-cyan-background-color {
-		background-color: #7bdcb5;
-	}
-
-	.has-vivid-green-cyan-background-color {
-		background-color: #00d084;
-	}
-
-	.has-pale-cyan-blue-background-color {
-		background-color: #8ed1fc;
-	}
-
-	.has-vivid-cyan-blue-background-color {
-		background-color: #0693e3;
-	}
-
-	.has-very-light-gray-background-color {
-		background-color: #eee;
-	}
-
-	.has-cyan-bluish-gray-background-color {
-		background-color: #abb8c3;
-	}
-
-	.has-very-dark-gray-background-color {
-		background-color: #313131;
-	}
-
-	// Foreground colors.
-
-	.has-pale-pink-color {
-		color: #f78da7;
-	}
-
-	.has-vivid-red-color {
-		color: #cf2e2e;
-	}
-
-	.has-luminous-vivid-orange-color {
-		color: #ff6900;
-	}
-
-	.has-luminous-vivid-amber-color {
-		color: #fcb900;
-	}
-
-	.has-light-green-cyan-color {
-		color: #7bdcb5;
-	}
-
-	.has-vivid-green-cyan-color {
-		color: #00d084;
-	}
-
-	.has-pale-cyan-blue-color {
-		color: #8ed1fc;
-	}
-
-	.has-vivid-cyan-blue-color {
-		color: #0693e3;
-	}
-
-	.has-very-light-gray-color {
-		color: #eee;
-	}
-
-	.has-cyan-bluish-gray-color {
-		color: #abb8c3;
-	}
-
-	.has-very-dark-gray-color {
-		color: #313131;
-	}
-}
-
-
-// Font sizes.
-
-.has-small-font-size {
-	font-size: 13px;
-}
-
-.has-regular-font-size, // Not used now, kept because of backward compatibility.
-.has-normal-font-size {
-	font-size: 16px;
-}
-
-.has-medium-font-size {
-	font-size: 20px;
-}
-
-.has-large-font-size {
-	font-size: 36px;
-}
-
-.has-larger-font-size, // Not used now, kept because of backward compatibility.
-.has-huge-font-size {
-	font-size: 42px;
-}
-
-// Text alignments.
-.has-text-align-center {
-	text-align: center;
-}
-
-.has-text-align-left {
-	text-align: left;
-}
-
-.has-text-align-right {
-	text-align: right;
-}
-
-/**
- * Vanilla Block Styles
- * These are base styles that apply across blocks, meant to provide a baseline.
- * They are applied both to the editor and the theme, so we should have as few of these as possible.
- * Please note that some styles are stored in packages/editor/src/editor-styles.scss, as they pertain to CSS bleed for the editor only.
- */
-
-// Caption styles.
-// Supply these even if the theme hasn't opted in, because the figcaption element is not likely to be styled in the majority of existing themes.
-// By providing a minimum of margin styles, we ensure it doesn't look broken or unstyled in those themes.
-figcaption {
-	margin-top: 0.5em;
-}
-
-// Apply some base styles to blocks that need them.
-img {
-	max-width: 100%;
-	height: auto;
-}
-
-iframe {
-	width: 100%;
-}
+@import "common.scss";

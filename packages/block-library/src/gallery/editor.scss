@@ -1,118 +1,204 @@
-ul.wp-block-gallery {
+figure.wp-block-gallery {
 	// Override the default list style type _only in the editor_
 	// to avoid :not() selector specificity issues.
 	// See https://github.com/WordPress/gutenberg/pull/10358
-	li {
-		list-style-type: none;
+
+	display: block;
+	&.has-nested-images {
+		.components-drop-zone {
+			display: none;
+			pointer-events: none;
+		}
 	}
 
-	// Override the bottom margin every block gets.
-	.is-selected & {
-		margin-bottom: 0;
+	> .blocks-gallery-caption {
+		flex: 0 0 100%;
+	}
+
+	> .blocks-gallery-media-placeholder-wrapper {
+		flex-basis: 100%;
+	}
+
+	.wp-block-image {
+		.components-notice.is-error {
+			display: block;
+		}
+		.components-notice__content {
+			margin: 4px 0;
+		}
+		.components-notice__dismiss {
+			position: absolute;
+			top: 0;
+			right: 5px;
+		}
+	}
+
+	// @todo: this deserves a refactor, by being moved to the toolbar.
+	.block-editor-media-placeholder.is-appender {
+		.components-placeholder__label {
+			display: none;
+		}
+		.block-editor-media-placeholder__button {
+			margin-bottom: 0;
+		}
+	}
+	.block-editor-media-placeholder {
+		margin: 0;
+		.components-placeholder__label {
+			display: flex;
+		}
+		figcaption {
+			z-index: 2;
+		}
+	}
+
+	// Shown while image is being uploaded
+	.components-spinner {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -9px;
+		margin-left: -9px;
 	}
 }
 
-.blocks-gallery-item {
+/**
+ * Gallery inspector controls settings.
+ */
+.gallery-settings-buttons {
+	.components-button:first-child {
+		margin-right: 8px;
+	}
+}
 
+.gallery-image-sizes {
+	.components-base-control__label {
+		display: block;
+		margin-bottom: 4px;
+	}
+
+	.gallery-image-sizes__loading {
+		display: flex;
+		align-items: center;
+		color: $gray-700;
+		font-size: $helptext-font-size;
+	}
+
+	.components-spinner {
+		margin: 0 8px 0 4px;
+	}
+}
+
+/**
+ * Deprecated css past this point. This can be removed once all galleries are migrated
+ * to V2.
+ */
+.blocks-gallery-item {
 	// Hide the focus outline that otherwise briefly appears when selecting a block.
-	figure:not(.is-selected):focus {
+	figure:not(.is-selected):focus,
+	img:focus {
 		outline: none;
 	}
 
-	.is-selected {
-		outline: 4px solid theme(primary);
+	figure.is-selected {
+
+		&::before {
+			box-shadow: 0 0 0 $border-width $white inset, 0 0 0 3px var(--wp-admin-theme-color) inset;
+			content: "";
+			// Shown in Windows 10 high contrast mode.
+			outline: 2px solid transparent;
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			z-index: 1;
+			pointer-events: none;
+		}
 	}
 
-	.is-transient img {
+	figure.is-transient img {
 		opacity: 0.3;
 	}
 
-	.block-editor-rich-text {
-		position: absolute;
-		bottom: 0;
-		width: 100%;
-		max-height: 100%;
-		overflow-y: auto;
-	}
-
-	.block-editor-rich-text figcaption:not([data-is-placeholder-visible="true"]) {
-		position: relative;
-		overflow: hidden;
-	}
-
-	.is-selected .block-editor-rich-text {
-		// IE calculates this incorrectly, so leave it to modern browsers.
-		@supports (position: sticky) {
-			right: 0;
-			left: 0;
-			margin-top: -4px;
-		}
-
-		// Override negative margins so this toolbar isn't hidden by overflow. Overflow is needed for long captions.
-		.block-editor-rich-text__inline-toolbar {
-			top: 0;
-		}
-
-		// Make extra space for the inline toolbar.
-		figcaption {
-			padding-top: 48px;
-		}
-	}
-
-	.is-selected .block-library-gallery-item__move-menu,
 	.is-selected .block-library-gallery-item__inline-menu {
-		background-color: theme(primary);
-
-		.components-button {
-			color: $white;
-		}
-
-		.components-button:focus {
-			color: inherit;
-		}
-
+		display: inline-flex;
 	}
 
-	.block-editor-rich-text figcaption {
-		a {
-			color: $white;
+	.block-editor-media-placeholder {
+		margin: 0;
+		height: 100%;
+
+		.components-placeholder__label {
+			display: flex;
 		}
 	}
 }
 
-.block-library-gallery-item__move-menu,
 .block-library-gallery-item__inline-menu {
-	padding: 2px;
-	display: inline-flex;
+	display: none;
+	position: absolute;
+	top: -2px;
+	margin: $grid-unit-10;
 	z-index: z-index(".block-library-gallery-item__inline-menu");
+	transition: box-shadow 0.2s ease-out;
+	@include reduce-motion("transition");
+	border-radius: $radius-block-ui;
+	background: $white;
+	border: $border-width solid $gray-900;
 
-	.components-button {
-		color: transparent;
+	&:hover {
+		box-shadow: $shadow-popover;
+	}
+
+	@include break-small() {
+		// Use smaller buttons to fit when there are many columns.
+		.columns-7 &,
+		.columns-8 & {
+			padding: $grid-unit-05 * 0.5;
+		}
+	}
+
+	.components-button.has-icon {
+		&:not(:focus) {
+			border: none;
+			box-shadow: none;
+		}
+
+		@include break-small() {
+			// Use smaller buttons to fit when there are many columns.
+			.columns-7 &,
+			.columns-8 & {
+				padding: 0;
+				width: inherit;
+				height: inherit;
+			}
+		}
+	}
+
+	&.is-left {
+		left: -2px;
+	}
+
+	&.is-right {
+		right: -2px;
 	}
 }
 
-.block-library-gallery-item__inline-menu {
-	position: absolute;
-	top: -2px;
-	right: -2px;
-}
-
-.block-library-gallery-item__move-menu {
-	position: absolute;
-	top: -2px;
-	left: -2px;
-}
-
-.blocks-gallery-item__move-backward,
-.blocks-gallery-item__move-forward,
-.blocks-gallery-item__remove {
+.wp-block-gallery ul.blocks-gallery-grid {
 	padding: 0;
+	// Some themes give all <ul> default margin instead of padding.
+	margin: 0;
 }
 
-.blocks-gallery-item .components-spinner {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	margin-top: -9px;
-	margin-left: -9px;
+.wp-block-update-gallery-modal {
+	@include break-small() {
+		max-width: $break-mobile;
+	}
+}
+
+.wp-block-update-gallery-modal-buttons {
+	display: flex;
+	justify-content: flex-end;
+	gap: $grid-unit-15;
 }

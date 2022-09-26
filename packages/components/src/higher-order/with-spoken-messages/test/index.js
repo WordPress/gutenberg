@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from 'enzyme';
-import { isFunction } from 'lodash';
+import { render } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -13,15 +12,18 @@ describe( 'withSpokenMessages', () => {
 	it( 'should generate speak and debouncedSpeak props', () => {
 		const testSpeak = jest.fn();
 		const testDebouncedSpeak = jest.fn();
-		const DumpComponent = withSpokenMessages( ( { speak, debouncedSpeak } ) => {
-			testSpeak( isFunction( speak ) );
-			testDebouncedSpeak( isFunction( debouncedSpeak ) );
-			return <div />;
-		} );
+		const isFunction = ( maybeFunc ) => typeof maybeFunc === 'function';
+		const DumpComponent = withSpokenMessages(
+			( { speak, debouncedSpeak } ) => {
+				testSpeak( isFunction( speak ) );
+				testDebouncedSpeak( isFunction( debouncedSpeak ) );
+				return <div />;
+			}
+		);
 		render( <DumpComponent /> );
 
 		// Unrendered element.
-		expect( testSpeak ).toBeCalledWith( true );
-		expect( testDebouncedSpeak ).toBeCalledWith( true );
+		expect( testSpeak ).toHaveBeenCalledWith( true );
+		expect( testDebouncedSpeak ).toHaveBeenCalledWith( true );
 	} );
 } );

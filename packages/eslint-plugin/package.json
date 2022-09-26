@@ -1,14 +1,16 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "2.3.0",
+	"version": "13.2.0",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"eslint"
+		"gutenberg",
+		"eslint",
+		"plugin"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/eslint-plugin/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -17,18 +19,48 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=14",
+		"npm": ">=6.14.4"
+	},
 	"files": [
 		"configs",
 		"rules",
+		"utils",
 		"index.js"
 	],
 	"main": "index.js",
 	"dependencies": {
-		"babel-eslint": "^10.0.1",
-		"eslint-plugin-jsx-a11y": "^6.2.1",
-		"eslint-plugin-react": "^7.12.4",
-		"eslint-plugin-react-hooks": "^1.6.0",
+		"@babel/eslint-parser": "^7.16.0",
+		"@typescript-eslint/eslint-plugin": "^5.3.0",
+		"@typescript-eslint/parser": "^5.3.0",
+		"@wordpress/babel-preset-default": "file:../babel-preset-default",
+		"@wordpress/prettier-config": "file:../prettier-config",
+		"cosmiconfig": "^7.0.0",
+		"eslint-config-prettier": "^8.3.0",
+		"eslint-plugin-import": "^2.25.2",
+		"eslint-plugin-jest": "^25.2.3",
+		"eslint-plugin-jsdoc": "^37.0.3",
+		"eslint-plugin-jsx-a11y": "^6.5.1",
+		"eslint-plugin-prettier": "^3.3.0",
+		"eslint-plugin-react": "^7.27.0",
+		"eslint-plugin-react-hooks": "^4.3.0",
+		"globals": "^13.12.0",
 		"requireindex": "^1.2.0"
+	},
+	"peerDependencies": {
+		"@babel/core": ">=7",
+		"eslint": ">=8",
+		"prettier": ">=2",
+		"typescript": ">=4"
+	},
+	"peerDependenciesMeta": {
+		"prettier": {
+			"optional": true
+		},
+		"typescript": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

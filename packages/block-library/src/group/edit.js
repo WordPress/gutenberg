@@ -1,71 +1,106 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+
 import {
-	InspectorControls,
 	InnerBlocks,
-	PanelColorSettings,
-	withColors,
+	useBlockProps,
+	InspectorControls,
+	useInnerBlocksProps,
+	useSetting,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { SelectControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
-function GroupEdit( {
-	className,
-	setBackgroundColor,
-	backgroundColor,
-	hasInnerBlocks,
-} ) {
-	const styles = {
-		backgroundColor: backgroundColor.color,
-	};
+const htmlElementMessages = {
+	header: __(
+		'The <header> element should represent introductory content, typically a group of introductory or navigational aids.'
+	),
+	main: __(
+		'The <main> element should be used for the primary content of your document only. '
+	),
+	section: __(
+		"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
+	),
+	article: __(
+		'The <article> element should represent a self contained, syndicatable portion of the document.'
+	),
+	aside: __(
+		"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
+	),
+	footer: __(
+		'The <footer> element should represent a footer for its nearest sectioning element (e.g.: <section>, <article>, <main> etc.).'
+	),
+};
 
-	const classes = classnames( className, backgroundColor.class, {
-		'has-background': !! backgroundColor.color,
-	} );
+function GroupEdit( { attributes, setAttributes, clientId } ) {
+	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
+		( select ) => {
+			const { getBlock, getSettings } = select( blockEditorStore );
+			const block = getBlock( clientId );
+			return {
+				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+				themeSupportsLayout: getSettings()?.supportsLayout,
+			};
+		},
+		[ clientId ]
+	);
+	const defaultLayout = useSetting( 'layout' ) || {};
+	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
+	const usedLayout = ! layout?.type
+		? { ...defaultLayout, ...layout, type: 'default' }
+		: { ...defaultLayout, ...layout };
+	const { type = 'default' } = usedLayout;
+	const layoutSupportEnabled = themeSupportsLayout || type !== 'default';
+
+	const blockProps = useBlockProps();
+
+	const innerBlocksProps = useInnerBlocksProps(
+		layoutSupportEnabled
+			? blockProps
+			: { className: 'wp-block-group__inner-container' },
+		{
+			templateLock,
+			renderAppender: hasInnerBlocks
+				? undefined
+				: InnerBlocks.ButtonBlockAppender,
+			__experimentalLayout: layoutSupportEnabled ? usedLayout : undefined,
+		}
+	);
 
 	return (
 		<>
-			<InspectorControls>
-				<PanelColorSettings
-					title={ __( 'Color Settings' ) }
-					colorSettings={ [
-						{
-							value: backgroundColor.color,
-							onChange: setBackgroundColor,
-							label: __( 'Background Color' ),
-						},
+			<InspectorControls __experimentalGroup="advanced">
+				<SelectControl
+					label={ __( 'HTML element' ) }
+					options={ [
+						{ label: __( 'Default (<div>)' ), value: 'div' },
+						{ label: '<header>', value: 'header' },
+						{ label: '<main>', value: 'main' },
+						{ label: '<section>', value: 'section' },
+						{ label: '<article>', value: 'article' },
+						{ label: '<aside>', value: 'aside' },
+						{ label: '<footer>', value: 'footer' },
 					] }
+					value={ TagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+					help={ htmlElementMessages[ TagName ] }
 				/>
 			</InspectorControls>
-			<div className={ classes } style={ styles }>
-				<div className="wp-block-group__inner-container">
-					<InnerBlocks
-						renderAppender={ ! hasInnerBlocks && InnerBlocks.ButtonBlockAppender }
-					/>
-				</div>
-			</div>
+			{ layoutSupportEnabled && <TagName { ...innerBlocksProps } /> }
+			{ /* Ideally this is not needed but it's there for backward compatibility reason
+				to keep this div for themes that might rely on its presence */ }
+			{ ! layoutSupportEnabled && (
+				<TagName { ...blockProps }>
+					<div { ...innerBlocksProps } />
+				</TagName>
+			) }
 		</>
 	);
 }
 
-export default compose( [
-	withColors( 'backgroundColor' ),
-	withSelect( ( select, { clientId } ) => {
-		const {
-			getBlock,
-		} = select( 'core/block-editor' );
-
-		const block = getBlock( clientId );
-
-		return {
-			hasInnerBlocks: !! ( block && block.innerBlocks.length ),
-		};
-	} ),
-] )( GroupEdit );
+export default GroupEdit;

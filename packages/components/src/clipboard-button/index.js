@@ -1,105 +1,81 @@
 /**
  * External dependencies
  */
-import Clipboard from 'clipboard';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
+import { useCopyToClipboard } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
 import Button from '../button';
 
-class ClipboardButton extends Component {
-	constructor() {
-		super( ...arguments );
+const TIMEOUT = 4000;
 
-		this.bindContainer = this.bindContainer.bind( this );
-		this.onCopy = this.onCopy.bind( this );
-		this.getText = this.getText.bind( this );
-	}
+/**
+ * @param {Object}                    props
+ * @param {string}                    [props.className]
+ * @param {import('react').ReactNode} props.children
+ * @param {() => void}                props.onCopy
+ * @param {() => void}                [props.onFinishCopy]
+ * @param {string}                    props.text
+ */
+export default function ClipboardButton( {
+	className,
+	children,
+	onCopy,
+	onFinishCopy,
+	text,
+	...buttonProps
+} ) {
+	deprecated( 'wp.components.ClipboardButton', {
+		since: '5.8',
+		alternative: 'wp.compose.useCopyToClipboard',
+	} );
 
-	componentDidMount() {
-		const { container, getText, onCopy } = this;
-		const button = container.firstChild;
+	/** @type {import('react').MutableRefObject<ReturnType<setTimeout> | undefined>} */
+	const timeoutId = useRef();
+	const ref = useCopyToClipboard( text, () => {
+		onCopy();
+		// @ts-expect-error: Should check if .current is defined, but not changing because this component is deprecated.
+		clearTimeout( timeoutId.current );
 
-		this.clipboard = new Clipboard( button,	{
-			text: getText,
-			container,
-		} );
-
-		this.clipboard.on( 'success', onCopy );
-	}
-
-	componentWillUnmount() {
-		this.clipboard.destroy();
-		delete this.clipboard;
-		clearTimeout( this.onCopyTimeout );
-	}
-
-	bindContainer( container ) {
-		this.container = container;
-	}
-
-	onCopy( args ) {
-		// Clearing selection will move focus back to the triggering button,
-		// ensuring that it is not reset to the body, and further that it is
-		// kept within the rendered node.
-		args.clearSelection();
-
-		const { onCopy, onFinishCopy } = this.props;
-		if ( onCopy ) {
-			onCopy();
-			// For convenience and consistency, ClipboardButton offers to call
-			// a secondary callback with delay. This is useful to reset
-			// consumers' state, e.g. to revert a label from "Copied" to
-			// "Copy".
-			if ( onFinishCopy ) {
-				clearTimeout( this.onCopyTimeout );
-				this.onCopyTimeout = setTimeout( onFinishCopy, 4000 );
-			}
+		if ( onFinishCopy ) {
+			timeoutId.current = setTimeout( () => onFinishCopy(), TIMEOUT );
 		}
-	}
+	} );
 
-	getText() {
-		let text = this.props.text;
-		if ( 'function' === typeof text ) {
-			text = text();
-		}
+	useEffect( () => {
+		// @ts-expect-error: Should check if .current is defined, but not changing because this component is deprecated.
+		clearTimeout( timeoutId.current );
+	}, [] );
 
-		return text;
-	}
+	const classes = classnames( 'components-clipboard-button', className );
 
-	render() {
-		// Disable reason: Exclude from spread props passed to Button
-		// eslint-disable-next-line no-unused-vars
-		const { className, children, onCopy, onFinishCopy, text, ...buttonProps } = this.props;
-		const { icon } = buttonProps;
-		const classes = classnames( 'components-clipboard-button', className );
-		const ComponentToUse = icon ? IconButton : Button;
+	// Workaround for inconsistent behavior in Safari, where <textarea> is not
+	// the document.activeElement at the moment when the copy event fires.
+	// This causes documentHasSelection() in the copy-handler component to
+	// mistakenly override the ClipboardButton, and copy a serialized string
+	// of the current block instead.
+	/** @type {import('react').ClipboardEventHandler<HTMLButtonElement>} */
+	const focusOnCopyEventTarget = ( event ) => {
+		// @ts-expect-error: Should be currentTarget, but not changing because this component is deprecated.
+		event.target.focus();
+	};
 
-		// Workaround for inconsistent behavior in Safari, where <textarea> is not
-		// the document.activeElement at the moment when the copy event fires.
-		// This causes documentHasSelection() in the copy-handler component to
-		// mistakenly override the ClipboardButton, and copy a serialized string
-		// of the current block instead.
-		const focusOnCopyEventTarget = ( event ) => {
-			event.target.focus();
-		};
-
-		return (
-			<span ref={ this.bindContainer } onCopy={ focusOnCopyEventTarget }>
-				<ComponentToUse { ...buttonProps } className={ classes }>
-					{ children }
-				</ComponentToUse>
-			</span>
-		);
-	}
+	return (
+		<Button
+			{ ...buttonProps }
+			className={ classes }
+			ref={ ref }
+			onCopy={ focusOnCopyEventTarget }
+		>
+			{ children }
+		</Button>
+	);
 }
-
-export default ClipboardButton;

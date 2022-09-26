@@ -1,83 +1,156 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { render, fireEvent } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
 import { PanelBody } from '../body';
 
+const getPanelBody = ( container ) =>
+	container.querySelector( '.components-panel__body' );
+const getPanelBodyContent = ( container ) =>
+	container.querySelector( '.components-panel__body > div' );
+const getPanelToggle = ( container ) =>
+	container.querySelector( '.components-panel__body-toggle' );
+
 describe( 'PanelBody', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an empty div with the matching className', () => {
-			const panelBody = shallow( <PanelBody /> );
-			expect( panelBody.hasClass( 'components-panel__body' ) ).toBe( true );
-			expect( panelBody.type() ).toBe( 'div' );
+			const { container } = render( <PanelBody /> );
+			const panelBody = getPanelBody( container );
+
+			expect( panelBody ).toBeTruthy();
+			expect( panelBody.tagName ).toBe( 'DIV' );
 		} );
 
-		it( 'should render an Button matching the following props and state', () => {
-			const panelBody = shallow( <PanelBody title="Some Text" /> );
-			const button = panelBody.find( '.components-panel__body-toggle' );
-			expect( panelBody.hasClass( 'is-opened' ) ).toBe( true );
-			expect( panelBody.state( 'opened' ) ).toBe( true );
-			expect( button.prop( 'onClick' ) ).toBe( panelBody.instance().toggle );
-			expect( button.childAt( 0 ).name() ).toBe( 'span' );
-			expect( button.childAt( 0 ).childAt( 0 ).name() ).toBe( 'SVG' );
-			expect( button.childAt( 1 ).text() ).toBe( 'Some Text' );
+		it( 'should render inner content, if opened', () => {
+			const { container } = render(
+				<PanelBody opened={ true }>
+					<div className="inner-content">Content</div>
+				</PanelBody>
+			);
+			const panelContent = getPanelBodyContent( container );
+
+			expect( panelContent ).toBeTruthy();
 		} );
 
-		it( 'should change state and class when sidebar is closed', () => {
-			const panelBody = shallow( <PanelBody title="Some Text" initialOpen={ false } /> );
-			expect( panelBody.state( 'opened' ) ).toBe( false );
-			expect( panelBody.hasClass( 'is-opened' ) ).toBe( false );
+		it( 'should be opened by default', () => {
+			const { container } = render(
+				<PanelBody>
+					<div>Content</div>
+				</PanelBody>
+			);
+			const panelContent = getPanelBodyContent( container );
+
+			expect( panelContent ).toBeTruthy();
 		} );
 
-		it( 'should use the "opened" prop instead of state if provided', () => {
-			const panelBody = shallow( <PanelBody title="Some Text" opened={ true } initialOpen={ false } /> );
-			expect( panelBody.state( 'opened' ) ).toBe( false );
-			expect( panelBody.hasClass( 'is-opened' ) ).toBe( true );
+		it( 'should render as initially opened, if specified', () => {
+			const { container } = render(
+				<PanelBody initialOpen={ true }>
+					<div>Content</div>
+				</PanelBody>
+			);
+			const panelContent = getPanelBodyContent( container );
+
+			expect( panelContent ).toBeTruthy();
 		} );
 
-		it( 'should render child elements within PanelBody element', () => {
-			const panelBody = shallow( <PanelBody children="Some Text" /> );
-			expect( panelBody.instance().props.children ).toBe( 'Some Text' );
-			expect( panelBody.text() ).toBe( 'Some Text' );
-		} );
+		it( 'should call the children function, if specified', () => {
+			const { container, rerender } = render(
+				<PanelBody opened={ true }>
+					{ ( { opened } ) => <div hidden={ opened }>Content</div> }
+				</PanelBody>
+			);
+			let panelContent = getPanelBodyContent( container );
 
-		it( 'should pass children prop but not render when sidebar is closed', () => {
-			const panelBody = shallow( <PanelBody children="Some Text" initialOpen={ false } /> );
-			expect( panelBody.instance().props.children ).toBe( 'Some Text' );
-			// Text should be empty even though props.children is set.
-			expect( panelBody.text() ).toBe( '' );
+			expect( panelContent ).toBeTruthy();
+			expect( panelContent.getAttribute( 'hidden' ) ).toBe( '' );
+
+			rerender(
+				<PanelBody opened={ false }>
+					{ ( { opened } ) => <div hidden={ opened }>Content</div> }
+				</PanelBody>
+			);
+			panelContent = getPanelBodyContent( container );
+
+			expect( panelContent ).toBeTruthy();
+			expect( panelContent.getAttribute( 'hidden' ) ).toBeNull();
 		} );
 	} );
 
-	describe( 'mounting behavior', () => {
-		it( 'should mount with a default of being opened', () => {
-			const panelBody = mount( <PanelBody /> );
-			expect( panelBody.state( 'opened' ) ).toBe( true );
+	describe( 'toggling', () => {
+		it( 'should toggle collapse with opened prop', () => {
+			const { container, rerender } = render(
+				<PanelBody opened={ true }>
+					<div>Content</div>
+				</PanelBody>
+			);
+			let panelContent = getPanelBodyContent( container );
+
+			expect( panelContent ).toBeTruthy();
+
+			rerender(
+				<PanelBody opened={ false }>
+					<div>Content</div>
+				</PanelBody>
+			);
+
+			panelContent = getPanelBodyContent( container );
+
+			expect( panelContent ).toBeFalsy();
+
+			rerender(
+				<PanelBody opened={ true }>
+					<div>Content</div>
+				</PanelBody>
+			);
+
+			panelContent = getPanelBodyContent( container );
+
+			expect( panelContent ).toBeTruthy();
 		} );
 
-		it( 'should mount with a state of not opened when initialOpen set to false', () => {
-			const panelBody = mount( <PanelBody initialOpen={ false } /> );
-			expect( panelBody.state( 'opened' ) ).toBe( false );
+		it( 'should toggle when clicking header', () => {
+			const { container } = render(
+				<PanelBody title="Panel" initialOpen={ false }>
+					<div>Content</div>
+				</PanelBody>
+			);
+			let panelContent = getPanelBodyContent( container );
+			const panelToggle = getPanelToggle( container );
+
+			expect( panelContent ).toBeFalsy();
+
+			fireEvent.click( panelToggle );
+
+			panelContent = getPanelBodyContent( container );
+
+			expect( panelContent ).toBeTruthy();
+
+			fireEvent.click( panelToggle );
+
+			panelContent = getPanelBodyContent( container );
+
+			expect( panelContent ).toBeFalsy();
 		} );
-	} );
 
-	describe( 'toggling behavior', () => {
-		const fakeEvent = { preventDefault: () => undefined };
+		it( 'should pass button props to panel title', () => {
+			const mock = jest.fn();
 
-		it( 'should set the opened state to false when a toggle fires', () => {
-			const panelBody = mount( <PanelBody /> );
-			panelBody.instance().toggle( fakeEvent );
-			expect( panelBody.state( 'opened' ) ).toBe( false );
-		} );
+			const { container } = render(
+				<PanelBody title="Panel" buttonProps={ { onClick: mock } }>
+					<div>Content</div>
+				</PanelBody>
+			);
 
-		it( 'should set the opened state to true when a toggle fires on a closed state', () => {
-			const panelBody = mount( <PanelBody initialOpen={ false } /> );
-			panelBody.instance().toggle( fakeEvent );
-			expect( panelBody.state( 'opened' ) ).toBe( true );
+			const panelToggle = getPanelToggle( container );
+
+			fireEvent.click( panelToggle );
+
+			expect( mock ).toHaveBeenCalled();
 		} );
 	} );
 } );

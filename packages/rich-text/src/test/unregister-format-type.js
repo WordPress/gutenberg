@@ -1,15 +1,12 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { unregisterFormatType } from '../unregister-format-type';
 import { registerFormatType } from '../register-format-type';
 import { getFormatTypes } from '../get-format-types';
 import { getFormatType } from '../get-format-type';
+
+const noop = () => {};
 
 describe( 'unregisterFormatType', () => {
 	const defaultFormatSettings = {
@@ -32,7 +29,9 @@ describe( 'unregisterFormatType', () => {
 
 	it( 'should fail if the format is not registered', () => {
 		const oldFormat = unregisterFormatType( 'core/test-format' );
-		expect( console ).toHaveErroredWith( 'Format core/test-format is not registered.' );
+		expect( console ).toHaveErroredWith(
+			'Format core/test-format is not registered.'
+		);
 		expect( oldFormat ).toBeUndefined();
 	} );
 

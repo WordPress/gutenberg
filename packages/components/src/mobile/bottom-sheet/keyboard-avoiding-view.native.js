@@ -1,8 +1,6 @@
-
 /**
  * External dependencies
  */
-import React from 'react';
 import {
 	Keyboard,
 	LayoutAnimation,
@@ -13,13 +11,18 @@ import {
 } from 'react-native';
 
 /**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
+
+/**
  * This is a simplified version of Facebook's KeyboardAvoidingView.
  * It's meant to work specifically with BottomSheets.
  * This fixes an issue in the bottom padding calculation, when the
  * BottomSheet was presented on Landscape, with the keyboard already present,
  * and a TextField on Autofocus (situation present on Links UI)
  */
-class KeyboardAvoidingView extends React.Component {
+class KeyboardAvoidingView extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -35,8 +38,15 @@ class KeyboardAvoidingView extends React.Component {
 			return 0;
 		}
 
+		const windowWidth = Dimensions.get( 'window' ).width;
+		const isFloatingKeyboard = keyboardFrame.width !== windowWidth;
+		if ( isFloatingKeyboard ) {
+			return 0;
+		}
+
 		const windowHeight = Dimensions.get( 'window' ).height;
-		const keyboardY = keyboardFrame.screenY - this.props.keyboardVerticalOffset;
+		const keyboardY =
+			keyboardFrame.screenY - this.props.keyboardVerticalOffset;
 
 		const final = Math.max( windowHeight - keyboardY, 0 );
 		return final;
@@ -73,7 +83,10 @@ class KeyboardAvoidingView extends React.Component {
 	componentDidMount() {
 		if ( Platform.OS === 'ios' ) {
 			this._subscriptions = [
-				Keyboard.addListener( 'keyboardWillChangeFrame', this._onKeyboardChange ),
+				Keyboard.addListener(
+					'keyboardWillChangeFrame',
+					this._onKeyboardChange
+				),
 			];
 		}
 	}
@@ -85,25 +98,19 @@ class KeyboardAvoidingView extends React.Component {
 	}
 
 	render() {
-		const {
-			children,
-			enabled,
-			keyboardVerticalOffset, // eslint-disable-line no-unused-vars
-			style,
-			...props
-		} = this.props;
+		const { children, enabled, keyboardVerticalOffset, style, ...props } =
+			this.props;
 
 		let finalStyle = style;
 		if ( Platform.OS === 'ios' ) {
 			const bottomHeight = enabled ? this.state.bottom : 0;
-			finalStyle = StyleSheet.compose( style, { paddingBottom: bottomHeight } );
+			finalStyle = StyleSheet.compose( style, {
+				paddingBottom: bottomHeight,
+			} );
 		}
 
 		return (
-			<View
-				style={ finalStyle }
-				{ ...props }
-			>
+			<View style={ finalStyle } { ...props }>
 				{ children }
 			</View>
 		);

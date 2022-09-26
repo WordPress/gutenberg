@@ -5,53 +5,56 @@
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background-color: rgba($black, 0.7);
+	background-color: rgba($black, 0.35);
 	z-index: z-index(".components-modal__screen-overlay");
-
+	display: flex;
+	// backdrop-filter: blur($grid-unit);
 	// This animates the appearance of the white background.
 	@include edit-post__fade-in-animation();
 }
 
 // The modal window element.
 .components-modal__frame {
-	// On small screens the content needs to be full width because of limited
-	// space.
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	box-sizing: border-box;
+	// Use the entire viewport on smaller screens.
 	margin: 0;
-	border: $border-width solid $light-gray-500;
+	width: 100%;
 	background: $white;
 	box-shadow: $shadow-modal;
-	overflow: auto;
+	border-radius: $radius-block-ui;
+	overflow: hidden;
+	// Have the content element fill the vertical space yet not overflow.
+	display: flex;
 
 	// Show a centered modal on bigger screens.
 	@include break-small() {
-		top: 50%;
-		right: auto;
-		bottom: auto;
-		left: 50%;
+		margin: auto;
+		width: auto;
 		min-width: $modal-min-width;
-		max-width: calc(100% - #{ $grid-size-large } - #{ $grid-size-large });
-		max-height: calc(100% - #{ $header-height } - #{ $header-height });
-		transform: translate(-50%, -50%);
+		max-width: calc(100% - #{$grid-unit-20 * 2});
+		max-height: calc(100% - #{$header-height * 2});
 
 		// Animate the modal frame/contents appearing on the page.
 		animation: components-modal__appear-animation 0.1s ease-out;
 		animation-fill-mode: forwards;
 		@include reduce-motion("animation");
+
+		&.is-full-screen {
+			width: 90vw;
+			min-height: 90vh;
+		}
+	}
+
+	@include break-large() {
+		max-height: 70%;
 	}
 }
 
 @keyframes components-modal__appear-animation {
 	from {
-		margin-top: $grid-size * 4;
+		transform: translateY($grid-unit-40);
 	}
 	to {
-		margin-top: 0;
+		transform: translateY(0);
 	}
 }
 
@@ -60,35 +63,40 @@
 // modal screen).
 .components-modal__header {
 	box-sizing: border-box;
-	border-bottom: $border-width solid $light-gray-500;
-	padding: 0 $grid-size-large;
+	border-bottom: $border-width solid transparent;
+	padding: 0 $grid-unit-40;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
-	background: $white;
 	align-items: center;
-	height: $header-height;
-	position: sticky;
-	top: 0;
+	height: $header-height + $grid-unit-20;
+	width: 100%;
 	z-index: z-index(".components-modal__header");
-	margin: 0 -#{ $grid-size-large } $grid-size-large;
-
-	// Rules inside this query are only run by Microsoft Edge.
-	// Edge has bugs around position: sticky;, so it needs a separate top rule.
-	// See also https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/17555420/.
-	@supports (-ms-ime-align:auto) {
-		position: fixed;
-		width: 100%;
-	}
+	position: absolute;
+	top: 0;
+	left: 0;
 
 	.components-modal__header-heading {
-		font-size: 1rem;
+		font-size: 1.2rem;
 		font-weight: 600;
 	}
 
 	h1 {
 		line-height: 1;
 		margin: 0;
+	}
+
+	.components-button {
+		position: relative;
+		left: $grid-unit-10;
+	}
+
+	.components-modal__content.has-scrolled-content:not(.hide-header) & {
+		border-bottom-color: $gray-300;
+	}
+
+	& + p {
+		margin-top: 0;
 	}
 }
 
@@ -104,21 +112,21 @@
 	display: inline-block;
 
 	svg {
-		max-width: $icon-button-size;
-		max-height: $icon-button-size;
-		padding: $grid-size;
+		max-width: $button-size;
+		max-height: $button-size;
+		padding: $grid-unit-10;
 	}
 }
 
 // Modal contents.
 .components-modal__content {
-	box-sizing: border-box;
-	height: 100%;
-	padding: 0 $grid-size-large $grid-size-large;
+	flex: 1;
+	margin-top: $header-height + $grid-unit-20;
+	padding: 0 $grid-unit-40 $grid-unit-40;
+	overflow: auto;
 
-	// Rules inside this query are only run by Microsoft Edge.
-	// This is a companion top padding to the fixed rule in line 77.
-	@supports (-ms-ime-align:auto) {
-		padding-top: $header-height;
+	&.hide-header {
+		margin-top: 0;
+		padding-top: $grid-unit-30;
 	}
 }

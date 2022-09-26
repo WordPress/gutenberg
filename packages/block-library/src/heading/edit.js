@@ -4,115 +4,142 @@
 import classnames from 'classnames';
 
 /**
- * Internal dependencies
- */
-import HeadingToolbar from './heading-toolbar';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
-import { createBlock } from '@wordpress/blocks';
+import { useEffect, Platform } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import {
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
-	InspectorControls,
 	RichText,
-	withColors,
-	PanelColorSettings,
+	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { memo } from '@wordpress/element';
 
-const HeadingColorUI = memo(
-	function( {
-		textColorValue,
-		setTextColor,
-	} ) {
-		return (
-			<PanelColorSettings
-				title={ __( 'Color Settings' ) }
-				initialOpen={ false }
-				colorSettings={ [
-					{
-						value: textColorValue,
-						onChange: setTextColor,
-						label: __( 'Text Color' ),
-					},
-				] }
-			/>
-		);
-	}
-);
+/**
+ * Internal dependencies
+ */
+import HeadingLevelDropdown from './heading-level-dropdown';
+import { generateAnchor, setAnchor } from './autogenerate-anchors';
 
 function HeadingEdit( {
 	attributes,
 	setAttributes,
 	mergeBlocks,
 	onReplace,
-	className,
-	textColor,
-	setTextColor,
+	style,
+	clientId,
 } ) {
-	const { align, content, level, placeholder } = attributes;
+	const { textAlign, content, level, placeholder, anchor } = attributes;
 	const tagName = 'h' + level;
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+		style,
+	} );
+
+	const { canGenerateAnchors } = useSelect( ( select ) => {
+		const { getGlobalBlockCount, getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+
+		return {
+			canGenerateAnchors:
+				!! settings.generateAnchors ||
+				getGlobalBlockCount( 'core/table-of-contents' ) > 0,
+		};
+	}, [] );
+
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
+	// Initially set anchor for headings that have content but no anchor set.
+	// This is used when transforming a block to heading, or for legacy anchors.
+	useEffect( () => {
+		if ( ! canGenerateAnchors ) {
+			return;
+		}
+
+		if ( ! anchor && content ) {
+			// This side-effect should not create an undo level.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				anchor: generateAnchor( clientId, content ),
+			} );
+		}
+		setAnchor( clientId, anchor );
+
+		// Remove anchor map when block unmounts.
+		return () => setAnchor( clientId, null );
+	}, [ anchor, content, clientId, canGenerateAnchors ] );
+
+	const onContentChange = ( value ) => {
+		const newAttrs = { content: value };
+		if (
+			canGenerateAnchors &&
+			( ! anchor ||
+				! value ||
+				generateAnchor( clientId, content ) === anchor )
+		) {
+			newAttrs.anchor = generateAnchor( clientId, value );
+		}
+		setAttributes( newAttrs );
+	};
 
 	return (
 		<>
-			<BlockControls>
-				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
-			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Heading Settings' ) }>
-					<p>{ __( 'Level' ) }</p>
-					<HeadingToolbar minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
-					<p>{ __( 'Text Alignment' ) }</p>
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
-				</PanelBody>
-				<HeadingColorUI
-					setTextColor={ setTextColor }
-					textColorValue={ textColor.color }
+			<BlockControls group="block">
+				<HeadingLevelDropdown
+					selectedLevel={ level }
+					onChange={ ( newLevel ) =>
+						setAttributes( { level: newLevel } )
+					}
 				/>
-			</InspectorControls>
+				<AlignmentControl
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
+				/>
+			</BlockControls>
 			<RichText
 				identifier="content"
-				wrapperClassName="wp-block-heading"
 				tagName={ tagName }
 				value={ content }
-				onChange={ ( value ) => setAttributes( { content: value } ) }
+				onChange={ onContentChange }
 				onMerge={ mergeBlocks }
-				onSplit={ ( value ) => {
-					if ( ! value ) {
-						return createBlock( 'core/paragraph' );
+				onSplit={ ( value, isOriginal ) => {
+					let block;
+
+					if ( isOriginal || value ) {
+						block = createBlock( 'core/heading', {
+							...attributes,
+							content: value,
+						} );
+					} else {
+						block = createBlock(
+							getDefaultBlockName() ?? 'core/heading'
+						);
 					}
 
-					return createBlock( 'core/heading', {
-						...attributes,
-						content: value,
-					} );
+					if ( isOriginal ) {
+						block.clientId = clientId;
+					}
+
+					return block;
 				} }
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
-				className={ classnames( className, {
-					[ `has-text-align-${ align }` ]: align,
-					'has-text-color': textColor.color,
-					[ textColor.class ]: textColor.class,
-				} ) }
-				placeholder={ placeholder || __( 'Write heading…' ) }
-				style={ {
-					color: textColor.color,
-				} }
+				aria-label={ __( 'Heading text' ) }
+				placeholder={ placeholder || __( 'Heading' ) }
+				textAlign={ textAlign }
+				{ ...( Platform.isNative && { deleteEnter: true } ) } // setup RichText on native mobile to delete the "Enter" key as it's handled by the JS/RN side
+				{ ...blockProps }
 			/>
 		</>
 	);
 }
 
-export default compose( [
-	withColors( 'backgroundColor', { textColor: 'color' } ),
-] )( HeadingEdit );
+export default HeadingEdit;

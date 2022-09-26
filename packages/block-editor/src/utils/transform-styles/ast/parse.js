@@ -7,19 +7,19 @@
 // https://github.com/visionmedia/css-parse/pull/49#issuecomment-30088027
 const commentre = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//g;
 
-export default function( css, options ) {
+export default function ( css, options ) {
 	options = options || {};
 
 	/**
-   * Positional.
-   */
+	 * Positional.
+	 */
 
 	let lineno = 1;
 	let column = 1;
 
 	/**
-   * Update lineno and column based on `str`.
-   */
+	 * Update lineno and column based on `str`.
+	 */
 
 	function updatePosition( str ) {
 		const lines = str.match( /\n/g );
@@ -32,12 +32,12 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Mark position and patch `node.position`.
-   */
+	 * Mark position and patch `node.position`.
+	 */
 
 	function position() {
 		const start = { line: lineno, column };
-		return function( node ) {
+		return function ( node ) {
 			node.position = new Position( start );
 			whitespace();
 			return node;
@@ -45,8 +45,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Store position information for a node
-   */
+	 * Store position information for a node
+	 */
 
 	function Position( start ) {
 		this.start = start;
@@ -55,19 +55,21 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Non-enumerable source string
-   */
+	 * Non-enumerable source string
+	 */
 
 	Position.prototype.content = css;
 
 	/**
-   * Error `msg`.
-   */
+	 * Error `msg`.
+	 */
 
 	const errorsList = [];
 
 	function error( msg ) {
-		const err = new Error( options.source + ':' + lineno + ':' + column + ': ' + msg );
+		const err = new Error(
+			options.source + ':' + lineno + ':' + column + ': ' + msg
+		);
 		err.reason = msg;
 		err.filename = options.source;
 		err.line = lineno;
@@ -82,8 +84,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse stylesheet.
-   */
+	 * Parse stylesheet.
+	 */
 
 	function stylesheet() {
 		const rulesList = rules();
@@ -99,31 +101,35 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Opening brace.
-   */
+	 * Opening brace.
+	 */
 
 	function open() {
 		return match( /^{\s*/ );
 	}
 
 	/**
-   * Closing brace.
-   */
+	 * Closing brace.
+	 */
 
 	function close() {
 		return match( /^}/ );
 	}
 
 	/**
-   * Parse ruleset.
-   */
+	 * Parse ruleset.
+	 */
 
 	function rules() {
 		let node;
 		const accumulator = [];
 		whitespace();
 		comments( accumulator );
-		while ( css.length && css.charAt( 0 ) !== '}' && ( node = atrule() || rule() ) ) {
+		while (
+			css.length &&
+			css.charAt( 0 ) !== '}' &&
+			( node = atrule() || rule() )
+		) {
 			if ( node !== false ) {
 				accumulator.push( node );
 				comments( accumulator );
@@ -133,8 +139,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Match `re` and return captures.
-   */
+	 * Match `re` and return captures.
+	 */
 
 	function match( re ) {
 		const m = re.exec( css );
@@ -148,22 +154,22 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse whitespace.
-   */
+	 * Parse whitespace.
+	 */
 
 	function whitespace() {
 		match( /^\s*/ );
 	}
 
 	/**
-   * Parse comments;
-   */
+	 * Parse comments;
+	 */
 
 	function comments( accumulator ) {
 		let c;
 		accumulator = accumulator || [];
 		// eslint-disable-next-line no-cond-assign
-		while ( c = comment() ) {
+		while ( ( c = comment() ) ) {
 			if ( c !== false ) {
 				accumulator.push( c );
 			}
@@ -172,8 +178,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse comment.
-   */
+	 * Parse comment.
+	 */
 
 	function comment() {
 		const pos = position();
@@ -182,7 +188,10 @@ export default function( css, options ) {
 		}
 
 		let i = 2;
-		while ( '' !== css.charAt( i ) && ( '*' !== css.charAt( i ) || '/' !== css.charAt( i + 1 ) ) ) {
+		while (
+			'' !== css.charAt( i ) &&
+			( '*' !== css.charAt( i ) || '/' !== css.charAt( i + 1 ) )
+		) {
 			++i;
 		}
 		i += 2;
@@ -204,35 +213,34 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse selector.
-   */
+	 * Parse selector.
+	 */
 
 	function selector() {
 		const m = match( /^([^{]+)/ );
 		if ( ! m ) {
 			return;
 		}
-		/* @fix Remove all comments from selectors
-     * http://ostermiller.org/findcomment.html */
+		// FIXME: Remove all comments from selectors http://ostermiller.org/findcomment.html
 		return trim( m[ 0 ] )
 			.replace( /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*\/+/g, '' )
-			.replace( /"(?:\\"|[^"])*"|'(?:\\'|[^'])*'/g, function( matched ) {
+			.replace( /"(?:\\"|[^"])*"|'(?:\\'|[^'])*'/g, function ( matched ) {
 				return matched.replace( /,/g, '\u200C' );
 			} )
 			.split( /\s*(?![^(]*\)),\s*/ )
-			.map( function( s ) {
+			.map( function ( s ) {
 				return s.replace( /\u200C/g, ',' );
 			} );
 	}
 
 	/**
-   * Parse declaration.
-   */
+	 * Parse declaration.
+	 */
 
 	function declaration() {
 		const pos = position();
 
-		// prop
+		// prop.
 		let prop = match( /^(\*?[-#\/\*\\\w]+(\[[0-9a-z_-]+\])?)\s*/ );
 		if ( ! prop ) {
 			return;
@@ -244,8 +252,10 @@ export default function( css, options ) {
 			return error( "property missing ':'" );
 		}
 
-		// val
-		const val = match( /^((?:'(?:\\'|.)*?'|"(?:\\"|.)*?"|\([^\)]*?\)|[^};])+)/ );
+		// val.
+		const val = match(
+			/^((?:'(?:\\'|.)*?'|"(?:\\"|.)*?"|\([^\)]*?\)|[^};])+)/
+		);
 
 		const ret = pos( {
 			type: 'declaration',
@@ -260,8 +270,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse declarations.
-   */
+	 * Parse declarations.
+	 */
 
 	function declarations() {
 		const decls = [];
@@ -271,10 +281,10 @@ export default function( css, options ) {
 		}
 		comments( decls );
 
-		// declarations
+		// declarations.
 		let decl;
 		// eslint-disable-next-line no-cond-assign
-		while ( decl = declaration() ) {
+		while ( ( decl = declaration() ) ) {
 			if ( decl !== false ) {
 				decls.push( decl );
 				comments( decls );
@@ -288,8 +298,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse keyframe.
-   */
+	 * Parse keyframe.
+	 */
 
 	function keyframe() {
 		let m;
@@ -297,7 +307,7 @@ export default function( css, options ) {
 		const pos = position();
 
 		// eslint-disable-next-line no-cond-assign
-		while ( m = match( /^((\d+\.\d+|\.\d+|\d+)%?|[a-z]+)\s*/ ) ) {
+		while ( ( m = match( /^((\d+\.\d+|\.\d+|\d+)%?|[a-z]+)\s*/ ) ) ) {
 			vals.push( m[ 1 ] );
 			match( /^,\s*/ );
 		}
@@ -314,8 +324,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse keyframes.
-   */
+	 * Parse keyframes.
+	 */
 
 	function atkeyframes() {
 		const pos = position();
@@ -340,7 +350,7 @@ export default function( css, options ) {
 		let frame;
 		let frames = comments();
 		// eslint-disable-next-line no-cond-assign
-		while ( frame = keyframe() ) {
+		while ( ( frame = keyframe() ) ) {
 			frames.push( frame );
 			frames = frames.concat( comments() );
 		}
@@ -358,8 +368,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse supports.
-   */
+	 * Parse supports.
+	 */
 
 	function atsupports() {
 		const pos = position();
@@ -388,8 +398,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse host.
-   */
+	 * Parse host.
+	 */
 
 	function athost() {
 		const pos = position();
@@ -416,8 +426,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse media.
-   */
+	 * Parse media.
+	 */
 
 	function atmedia() {
 		const pos = position();
@@ -446,8 +456,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse custom-media.
-   */
+	 * Parse custom-media.
+	 */
 
 	function atcustommedia() {
 		const pos = position();
@@ -464,8 +474,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse paged media.
-   */
+	 * Parse paged media.
+	 */
 
 	function atpage() {
 		const pos = position();
@@ -481,10 +491,10 @@ export default function( css, options ) {
 		}
 		let decls = comments();
 
-		// declarations
+		// declarations.
 		let decl;
 		// eslint-disable-next-line no-cond-assign
-		while ( decl = declaration() ) {
+		while ( ( decl = declaration() ) ) {
 			decls.push( decl );
 			decls = decls.concat( comments() );
 		}
@@ -501,8 +511,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse document.
-   */
+	 * Parse document.
+	 */
 
 	function atdocument() {
 		const pos = position();
@@ -533,8 +543,8 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse font-face.
-   */
+	 * Parse font-face.
+	 */
 
 	function atfontface() {
 		const pos = position();
@@ -548,10 +558,10 @@ export default function( css, options ) {
 		}
 		let decls = comments();
 
-		// declarations
+		// declarations.
 		let decl;
 		// eslint-disable-next-line no-cond-assign
-		while ( decl = declaration() ) {
+		while ( ( decl = declaration() ) ) {
 			decls.push( decl );
 			decls = decls.concat( comments() );
 		}
@@ -567,30 +577,30 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse import
-   */
+	 * Parse import
+	 */
 
 	const atimport = _compileAtrule( 'import' );
 
 	/**
-   * Parse charset
-   */
+	 * Parse charset
+	 */
 
 	const atcharset = _compileAtrule( 'charset' );
 
 	/**
-   * Parse namespace
-   */
+	 * Parse namespace
+	 */
 
 	const atnamespace = _compileAtrule( 'namespace' );
 
 	/**
-   * Parse non-block at-rules
-   */
+	 * Parse non-block at-rules
+	 */
 
 	function _compileAtrule( name ) {
 		const re = new RegExp( '^@' + name + '\\s*([^;]+);' );
-		return function() {
+		return function () {
 			const pos = position();
 			const m = match( re );
 			if ( ! m ) {
@@ -603,30 +613,32 @@ export default function( css, options ) {
 	}
 
 	/**
-   * Parse at rule.
-   */
+	 * Parse at rule.
+	 */
 
 	function atrule() {
 		if ( css[ 0 ] !== '@' ) {
 			return;
 		}
 
-		return atkeyframes() ||
-      atmedia() ||
-      atcustommedia() ||
-      atsupports() ||
-      atimport() ||
-      atcharset() ||
-      atnamespace() ||
-      atdocument() ||
-      atpage() ||
-      athost() ||
-      atfontface();
+		return (
+			atkeyframes() ||
+			atmedia() ||
+			atcustommedia() ||
+			atsupports() ||
+			atimport() ||
+			atcharset() ||
+			atnamespace() ||
+			atdocument() ||
+			atpage() ||
+			athost() ||
+			atfontface()
+		);
 	}
 
 	/**
-   * Parse rule.
-   */
+	 * Parse rule.
+	 */
 
 	function rule() {
 		const pos = position();
@@ -666,7 +678,7 @@ function addParent( obj, parent ) {
 	for ( const k in obj ) {
 		const value = obj[ k ];
 		if ( Array.isArray( value ) ) {
-			value.forEach( function( v ) {
+			value.forEach( function ( v ) {
 				addParent( v, childParent );
 			} );
 		} else if ( value && typeof value === 'object' ) {
@@ -685,3 +697,5 @@ function addParent( obj, parent ) {
 
 	return obj;
 }
+
+/* eslint-enable @wordpress/no-unused-vars-before-return */

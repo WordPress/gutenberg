@@ -1,32 +1,23 @@
 /**
- * External dependencies
- */
-import { castArray, pick, mapValues, has } from 'lodash';
-import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-
-/**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
 import deprecated from '@wordpress/deprecated';
-import { dispatch, select, apiFetch } from '@wordpress/data-controls';
 import {
 	parse,
 	synchronizeBlocksWithTemplate,
+	__unstableSerializeAndClean,
 } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
-import {
-	getPostRawValue,
-} from './reducer';
-import {
-	STORE_KEY,
-	POST_UPDATE_TRANSACTION_ID,
-	SAVE_POST_NOTICE_ID,
-	TRASH_POST_NOTICE_ID,
-	AUTOSAVE_PROPERTIES,
-} from './constants';
+import { TRASH_POST_NOTICE_ID } from './constants';
+import { localAutosaveSet } from './local-autosave';
 import {
 	getNotificationArgumentsForSaveSuccess,
 	getNotificationArgumentsForSaveFail,
@@ -37,171 +28,82 @@ import {
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
- * @param {Object} post      Post object.
- * @param {Object} edits     Initial edited attributes object.
- * @param {Array?} template  Block Template.
+ * @param {Object} post     Post object.
+ * @param {Object} edits    Initial edited attributes object.
+ * @param {Array?} template Block Template.
  */
-export function* setupEditor( post, edits, template ) {
-	yield {
-		type: 'SETUP_EDITOR',
-		post,
-		edits,
-		template,
+export const setupEditor =
+	( post, edits, template ) =>
+	( { dispatch } ) => {
+		dispatch.setupEditorState( post );
+		// Apply a template for new posts only, if exists.
+		const isNewPost = post.status === 'auto-draft';
+		if ( isNewPost && template ) {
+			// In order to ensure maximum of a single parse during setup, edits are
+			// included as part of editor setup action. Assume edited content as
+			// canonical if provided, falling back to post.
+			let content;
+			if ( 'content' in edits ) {
+				content = edits.content;
+			} else {
+				content = post.content.raw;
+			}
+			let blocks = parse( content );
+			blocks = synchronizeBlocksWithTemplate( blocks, template );
+			dispatch.resetEditorBlocks( blocks, {
+				__unstableShouldCreateUndoLevel: false,
+			} );
+		}
+		if (
+			edits &&
+			Object.values( edits ).some(
+				( [ key, edit ] ) =>
+					edit !== ( post[ key ]?.raw ?? post[ key ] )
+			)
+		) {
+			dispatch.editPost( edits );
+		}
 	};
 
-	// In order to ensure maximum of a single parse during setup, edits are
-	// included as part of editor setup action. Assume edited content as
-	// canonical if provided, falling back to post.
-	let content;
-	if ( has( edits, [ 'content' ] ) ) {
-		content = edits.content;
-	} else {
-		content = post.content.raw;
-	}
-
-	let blocks = parse( content );
-
-	// Apply a template for new posts only, if exists.
-	const isNewPost = post.status === 'auto-draft';
-	if ( isNewPost && template ) {
-		blocks = synchronizeBlocksWithTemplate( blocks, template );
-	}
-
-	yield resetEditorBlocks( blocks );
-	yield setupEditorState( post );
+/**
+ * Returns an action object signalling that the editor is being destroyed and
+ * that any necessary state or side-effect cleanup should occur.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalTearDownEditor() {
+	return { type: 'TEAR_DOWN_EDITOR' };
 }
 
 /**
  * Returns an action object used in signalling that the latest version of the
  * post has been received, either by initialization or save.
  *
- * @param {Object} post Post object.
- *
- * @return {Object} Action object.
+ * @deprecated Since WordPress 6.0.
  */
-export function resetPost( post ) {
-	return {
-		type: 'RESET_POST',
-		post,
-	};
-}
-
-/**
- * Returns an action object used in signalling that the latest autosave of the
- * post has been received, by initialization or autosave.
- *
- * @deprecated since 5.6. Callers should use the `receiveAutosaves( postId, autosave )`
- * 			   selector from the '@wordpress/core-data' package.
- *
- * @param {Object} newAutosave Autosave post object.
- *
- * @return {Object} Action object.
- */
-export function* resetAutosave( newAutosave ) {
-	deprecated( 'resetAutosave action (`core/editor` store)', {
-		alternative: 'receiveAutosaves action (`core` store)',
-		plugin: 'Gutenberg',
+export function resetPost() {
+	deprecated( "wp.data.dispatch( 'core/editor' ).resetPost", {
+		since: '6.0',
+		version: '6.3',
+		alternative: 'Initialize the editor with the setupEditorState action',
 	} );
-
-	const postId = yield select( STORE_KEY, 'getCurrentPostId' );
-	yield dispatch( 'core', 'receiveAutosaves', postId, newAutosave );
-
-	return { type: '__INERT__' };
-}
-
-/**
- * Optimistic action for dispatching that a post update request has started.
- *
- * @param {Object} options
- *
- * @return {Object} An action object
- */
-export function __experimentalRequestPostUpdateStart( options = {} ) {
-	return {
-		type: 'REQUEST_POST_UPDATE_START',
-		optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
-		options,
-	};
-}
-
-/**
- * Optimistic action for indicating that the request post update has completed
- * successfully.
- *
- * @param {Object}  data                The data for the action.
- * @param {Object}  data.previousPost   The previous post prior to update.
- * @param {Object}  data.post           The new post after update
- * @param {boolean} data.isRevision     Whether the post is a revision or not.
- * @param {Object}  data.options        Options passed through from the original
- *                                      action dispatch.
- * @param {Object}  data.postType       The post type object.
- *
- * @return {Object}	Action object.
- */
-export function __experimentalRequestPostUpdateSuccess( {
-	previousPost,
-	post,
-	isRevision,
-	options,
-	postType,
-} ) {
-	return {
-		type: 'REQUEST_POST_UPDATE_SUCCESS',
-		previousPost,
-		post,
-		optimist: {
-			// Note: REVERT is not a failure case here. Rather, it
-			// is simply reversing the assumption that the updates
-			// were applied to the post proper, such that the post
-			// treated as having unsaved changes.
-			type: isRevision ? REVERT : COMMIT,
-			id: POST_UPDATE_TRANSACTION_ID,
-		},
-		options,
-		postType,
-	};
-}
-
-/**
- * Optimistic action for indicating that the request post update has completed
- * with a failure.
- *
- * @param {Object}  data          The data for the action
- * @param {Object}  data.post     The post that failed updating.
- * @param {Object}  data.edits    The fields that were being updated.
- * @param {*}       data.error    The error from the failed call.
- * @param {Object}  data.options  Options passed through from the original
- *                                action dispatch.
- * @return {Object} An action object
- */
-export function __experimentalRequestPostUpdateFailure( {
-	post,
-	edits,
-	error,
-	options,
-} ) {
-	return {
-		type: 'REQUEST_POST_UPDATE_FAILURE',
-		optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
-		post,
-		edits,
-		error,
-		options,
-	};
+	return { type: 'DO_NOTHING' };
 }
 
 /**
  * Returns an action object used in signalling that a patch of updates for the
  * latest version of the post have been received.
  *
- * @param {Object} edits Updated post fields.
- *
  * @return {Object} Action object.
+ * @deprecated since Gutenberg 9.7.0.
  */
-export function updatePost( edits ) {
+export function updatePost() {
+	deprecated( "wp.data.dispatch( 'core/editor' ).updatePost", {
+		since: '5.7',
+		alternative: 'Use the core entities store instead',
+	} );
 	return {
-		type: 'UPDATE_POST',
-		edits,
+		type: 'DO_NOTHING',
 	};
 }
 
@@ -209,7 +111,7 @@ export function updatePost( edits ) {
  * Returns an action object used to setup the editor state when first opening
  * an editor.
  *
- * @param {Object} post   Post object.
+ * @param {Object} post Post object.
  *
  * @return {Object} Action object.
  */
@@ -224,334 +126,205 @@ export function setupEditorState( post ) {
  * Returns an action object used in signalling that attributes of the post have
  * been edited.
  *
- * @param {Object} edits Post attributes to edit.
- *
- * @return {Object} Action object.
+ * @param {Object} edits   Post attributes to edit.
+ * @param {Object} options Options for the edit.
  */
-export function editPost( edits ) {
-	return {
-		type: 'EDIT_POST',
-		edits,
+export const editPost =
+	( edits, options ) =>
+	( { select, registry } ) => {
+		const { id, type } = select.getCurrentPost();
+		registry
+			.dispatch( coreStore )
+			.editEntityRecord( 'postType', type, id, edits, options );
 	};
-}
 
 /**
- * Returns action object produced by the updatePost creator augmented by
- * an optimist option that signals optimistically applying updates.
- *
- * @param {Object} edits  Updated post fields.
- *
- * @return {Object} Action object.
- */
-export function __experimentalOptimisticUpdatePost( edits ) {
-	return {
-		...updatePost( edits ),
-		optimist: { id: POST_UPDATE_TRANSACTION_ID },
-	};
-}
-
-/**
- * Action generator for saving the current post in the editor.
+ * Action for saving the current post in the editor.
  *
  * @param {Object} options
  */
-export function* savePost( options = {} ) {
-	const isEditedPostSaveable = yield select(
-		STORE_KEY,
-		'isEditedPostSaveable'
-	);
-	if ( ! isEditedPostSaveable ) {
-		return;
-	}
-	let edits = yield select(
-		STORE_KEY,
-		'getPostEdits'
-	);
-	const isAutosave = !! options.isAutosave;
+export const savePost =
+	( options = {} ) =>
+	async ( { select, dispatch, registry } ) => {
+		if ( ! select.isEditedPostSaveable() ) {
+			return;
+		}
 
-	if ( isAutosave ) {
-		edits = pick( edits, AUTOSAVE_PROPERTIES );
-	}
+		const content = select.getEditedPostContent();
 
-	const isEditedPostNew = yield select(
-		STORE_KEY,
-		'isEditedPostNew',
-	);
+		if ( ! options.isAutosave ) {
+			dispatch.editPost( { content }, { undoIgnore: true } );
+		}
 
-	// New posts (with auto-draft status) must be explicitly assigned draft
-	// status if there is not already a status assigned in edits (publish).
-	// Otherwise, they are wrongly left as auto-draft. Status is not always
-	// respected for autosaves, so it cannot simply be included in the pick
-	// above. This behavior relies on an assumption that an auto-draft post
-	// would never be saved by anyone other than the owner of the post, per
-	// logic within autosaves REST controller to save status field only for
-	// draft/auto-draft by current user.
-	//
-	// See: https://core.trac.wordpress.org/ticket/43316#comment:88
-	// See: https://core.trac.wordpress.org/ticket/43316#comment:89
-	if ( isEditedPostNew ) {
-		edits = { status: 'draft', ...edits };
-	}
+		const previousRecord = select.getCurrentPost();
+		const edits = {
+			id: previousRecord.id,
+			...registry
+				.select( coreStore )
+				.getEntityRecordNonTransientEdits(
+					'postType',
+					previousRecord.type,
+					previousRecord.id
+				),
+			content,
+		};
+		dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
+		await registry
+			.dispatch( coreStore )
+			.saveEntityRecord(
+				'postType',
+				previousRecord.type,
+				edits,
+				options
+			);
+		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 
-	const post = yield select(
-		STORE_KEY,
-		'getCurrentPost'
-	);
-
-	const editedPostContent = yield select(
-		STORE_KEY,
-		'getEditedPostContent'
-	);
-
-	let toSend = {
-		...edits,
-		content: editedPostContent,
-		id: post.id,
+		const error = registry
+			.select( coreStore )
+			.getLastEntitySaveError(
+				'postType',
+				previousRecord.type,
+				previousRecord.id
+			);
+		if ( error ) {
+			const args = getNotificationArgumentsForSaveFail( {
+				post: previousRecord,
+				edits,
+				error,
+			} );
+			if ( args.length ) {
+				registry.dispatch( noticesStore ).createErrorNotice( ...args );
+			}
+		} else {
+			const updatedRecord = select.getCurrentPost();
+			const args = getNotificationArgumentsForSaveSuccess( {
+				previousPost: previousRecord,
+				post: updatedRecord,
+				postType: await registry
+					.resolveSelect( coreStore )
+					.getPostType( updatedRecord.type ),
+				options,
+			} );
+			if ( args.length ) {
+				registry
+					.dispatch( noticesStore )
+					.createSuccessNotice( ...args );
+			}
+			// Make sure that any edits after saving create an undo level and are
+			// considered for change detection.
+			if ( ! options.isAutosave ) {
+				registry
+					.dispatch( blockEditorStore )
+					.__unstableMarkLastChangeAsPersistent();
+			}
+		}
 	};
 
-	const currentPostType = yield select(
-		STORE_KEY,
-		'getCurrentPostType'
-	);
-
-	const postType = yield select(
-		'core',
-		'getPostType',
-		currentPostType
-	);
-
-	yield dispatch(
-		STORE_KEY,
-		'__experimentalRequestPostUpdateStart',
-		options,
-	);
-
-	// Optimistically apply updates under the assumption that the post
-	// will be updated. See below logic in success resolution for revert
-	// if the autosave is applied as a revision.
-	yield dispatch(
-		STORE_KEY,
-		'__experimentalOptimisticUpdatePost',
-		toSend
-	);
-
-	let path = `/wp/v2/${ postType.rest_base }/${ post.id }`;
-	let method = 'PUT';
-	if ( isAutosave ) {
-		const currentUser = yield select( 'core', 'getCurrentUser' );
-		const currentUserId = currentUser ? currentUser.id : undefined;
-		const autosavePost = yield select( 'core', 'getAutosave', post.type, post.id, currentUserId );
-		const mappedAutosavePost = mapValues( pick( autosavePost, AUTOSAVE_PROPERTIES ), getPostRawValue );
-
-		// Ensure autosaves contain all expected fields, using autosave or
-		// post values as fallback if not otherwise included in edits.
-		toSend = {
-			...pick( post, AUTOSAVE_PROPERTIES ),
-			...mappedAutosavePost,
-			...toSend,
-		};
-		path += '/autosaves';
-		method = 'POST';
-	} else {
-		yield dispatch(
-			'core/notices',
-			'removeNotice',
-			SAVE_POST_NOTICE_ID
-		);
-		yield dispatch(
-			'core/notices',
-			'removeNotice',
-			'autosave-exists'
-		);
-	}
-
-	try {
-		const newPost = yield apiFetch( {
-			path,
-			method,
-			data: toSend,
-		} );
-
-		if ( isAutosave ) {
-			yield dispatch( 'core', 'receiveAutosaves', post.id, newPost );
-		} else {
-			yield dispatch( STORE_KEY, 'resetPost', newPost );
-		}
-
-		yield dispatch(
-			STORE_KEY,
-			'__experimentalRequestPostUpdateSuccess',
-			{
-				previousPost: post,
-				post: newPost,
-				options,
-				postType,
-				// An autosave may be processed by the server as a regular save
-				// when its update is requested by the author and the post was
-				// draft or auto-draft.
-				isRevision: newPost.id !== post.id,
-			}
-		);
-
-		const notifySuccessArgs = getNotificationArgumentsForSaveSuccess( {
-			previousPost: post,
-			post: newPost,
-			postType,
-			options,
-		} );
-		if ( notifySuccessArgs.length > 0 ) {
-			yield dispatch(
-				'core/notices',
-				'createSuccessNotice',
-				...notifySuccessArgs
-			);
-		}
-	} catch ( error ) {
-		yield dispatch(
-			STORE_KEY,
-			'__experimentalRequestPostUpdateFailure',
-			{ post, edits, error, options }
-		);
-		const notifyFailArgs = getNotificationArgumentsForSaveFail( {
-			post,
-			edits,
-			error,
-		} );
-		if ( notifyFailArgs.length > 0 ) {
-			yield dispatch(
-				'core/notices',
-				'createErrorNotice',
-				...notifyFailArgs
-			);
-		}
-	}
+/**
+ * Action for refreshing the current post.
+ *
+ * @deprecated Since WordPress 6.0.
+ */
+export function refreshPost() {
+	deprecated( "wp.data.dispatch( 'core/editor' ).refreshPost", {
+		since: '6.0',
+		version: '6.3',
+		alternative: 'Use the core entities store instead',
+	} );
+	return { type: 'DO_NOTHING' };
 }
 
 /**
- * Action generator for handling refreshing the current post.
+ * Action for trashing the current post in the editor.
  */
-export function* refreshPost() {
-	const post = yield select(
-		STORE_KEY,
-		'getCurrentPost'
-	);
-	const postTypeSlug = yield select(
-		STORE_KEY,
-		'getCurrentPostType'
-	);
-	const postType = yield select(
-		'core',
-		'getPostType',
-		postTypeSlug
-	);
-	const newPost = yield apiFetch(
-		{
-			// Timestamp arg allows caller to bypass browser caching, which is
-			// expected for this specific function.
-			path: `/wp/v2/${ postType.rest_base }/${ post.id }` +
-				`?context=edit&_timestamp=${ Date.now() }`,
-		}
-	);
-	yield dispatch(
-		STORE_KEY,
-		'resetPost',
-		newPost
-	);
-}
-
-/**
- * Action generator for trashing the current post in the editor.
- */
-export function* trashPost() {
-	const postTypeSlug = yield select(
-		STORE_KEY,
-		'getCurrentPostType'
-	);
-	const postType = yield select(
-		'core',
-		'getPostType',
-		postTypeSlug
-	);
-	yield dispatch(
-		'core/notices',
-		'removeNotice',
-		TRASH_POST_NOTICE_ID
-	);
-	try {
-		const post = yield select(
-			STORE_KEY,
-			'getCurrentPost'
-		);
-		yield apiFetch(
-			{
-				path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
+export const trashPost =
+	() =>
+	async ( { select, dispatch, registry } ) => {
+		const postTypeSlug = select.getCurrentPostType();
+		const postType = await registry
+			.resolveSelect( coreStore )
+			.getPostType( postTypeSlug );
+		registry.dispatch( noticesStore ).removeNotice( TRASH_POST_NOTICE_ID );
+		const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2' } =
+			postType;
+		dispatch( { type: 'REQUEST_POST_DELETE_START' } );
+		try {
+			const post = select.getCurrentPost();
+			await apiFetch( {
+				path: `/${ restNamespace }/${ restBase }/${ post.id }`,
 				method: 'DELETE',
-			}
-		);
+			} );
 
-		// TODO: This should be an updatePost action (updating subsets of post
-		// properties), but right now editPost is tied with change detection.
-		yield dispatch(
-			STORE_KEY,
-			'resetPost',
-			{ ...post, status: 'trash' }
-		);
-	} catch ( error ) {
-		yield dispatch(
-			'core/notices',
-			'createErrorNotice',
-			...getNotificationArgumentsForTrashFail( { error } ),
-		);
-	}
-}
+			await dispatch.savePost();
+		} catch ( error ) {
+			registry
+				.dispatch( noticesStore )
+				.createErrorNotice(
+					...getNotificationArgumentsForTrashFail( { error } )
+				);
+		}
+		dispatch( { type: 'REQUEST_POST_DELETE_FINISH' } );
+	};
 
 /**
- * Action generator used in signalling that the post should autosave.
+ * Action that autosaves the current post.  This
+ * includes server-side autosaving (default) and client-side (a.k.a. local)
+ * autosaving (e.g. on the Web, the post might be committed to Session
+ * Storage).
  *
  * @param {Object?} options Extra flags to identify the autosave.
  */
-export function* autosave( options ) {
-	yield dispatch(
-		STORE_KEY,
-		'savePost',
-		{ isAutosave: true, ...options }
-	);
-}
+export const autosave =
+	( { local = false, ...options } = {} ) =>
+	async ( { select, dispatch } ) => {
+		if ( local ) {
+			const post = select.getCurrentPost();
+			const isPostNew = select.isEditedPostNew();
+			const title = select.getEditedPostAttribute( 'title' );
+			const content = select.getEditedPostAttribute( 'content' );
+			const excerpt = select.getEditedPostAttribute( 'excerpt' );
+			localAutosaveSet( post.id, isPostNew, title, content, excerpt );
+		} else {
+			await dispatch.savePost( { isAutosave: true, ...options } );
+		}
+	};
 
 /**
- * Returns an action object used in signalling that undo history should
- * restore last popped state.
- *
- * @return {Object} Action object.
+ * Action that restores last popped state in undo history.
  */
-export function redo() {
-	return { type: 'REDO' };
-}
+export const redo =
+	() =>
+	( { registry } ) => {
+		registry.dispatch( coreStore ).redo();
+	};
 
 /**
- * Returns an action object used in signalling that undo history should pop.
- *
- * @return {Object} Action object.
+ * Action that pops a record from undo history and undoes the edit.
  */
-export function undo() {
-	return { type: 'UNDO' };
-}
+export const undo =
+	() =>
+	( { registry } ) => {
+		registry.dispatch( coreStore ).undo();
+	};
 
 /**
- * Returns an action object used in signalling that undo history record should
- * be created.
+ * Action that creates an undo history record.
  *
- * @return {Object} Action object.
+ * @deprecated Since WordPress 6.0
  */
 export function createUndoLevel() {
-	return { type: 'CREATE_UNDO_LEVEL' };
+	deprecated( "wp.data.dispatch( 'core/editor' ).createUndoLevel", {
+		since: '6.0',
+		version: '6.3',
+		alternative: 'Use the core entities store instead',
+	} );
+	return { type: 'DO_NOTHING' };
 }
 
 /**
- * Returns an action object used to lock the editor.
+ * Action that locks the editor.
  *
- * @param {Object}  lock Details about the post lock status, user, and nonce.
- *
+ * @param {Object} lock Details about the post lock status, user, and nonce.
  * @return {Object} Action object.
  */
 export function updatePostLock( lock ) {
@@ -562,142 +335,67 @@ export function updatePostLock( lock ) {
 }
 
 /**
- * Returns an action object used to fetch a single reusable block or all
- * reusable blocks from the REST API into the store.
- *
- * @param {?string} id If given, only a single reusable block with this ID will
- *                     be fetched.
- *
- * @return {Object} Action object.
+ * Enable the publish sidebar.
  */
-export function __experimentalFetchReusableBlocks( id ) {
-	return {
-		type: 'FETCH_REUSABLE_BLOCKS',
-		id,
+export const enablePublishSidebar =
+	() =>
+	( { registry } ) => {
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'isPublishSidebarEnabled', true );
 	};
-}
 
 /**
- * Returns an action object used in signalling that reusable blocks have been
- * received. `results` is an array of objects containing:
- *  - `reusableBlock` - Details about how the reusable block is persisted.
- *  - `parsedBlock` - The original block.
- *
- * @param {Object[]} results Reusable blocks received.
- *
- * @return {Object} Action object.
+ * Disables the publish sidebar.
  */
-export function __experimentalReceiveReusableBlocks( results ) {
-	return {
-		type: 'RECEIVE_REUSABLE_BLOCKS',
-		results,
+export const disablePublishSidebar =
+	() =>
+	( { registry } ) => {
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'isPublishSidebarEnabled', false );
 	};
-}
 
 /**
- * Returns an action object used to save a reusable block that's in the store to
- * the REST API.
+ * Action that locks post saving.
  *
- * @param {Object} id The ID of the reusable block to save.
+ * @param {string} lockName The lock name.
  *
- * @return {Object} Action object.
- */
-export function __experimentalSaveReusableBlock( id ) {
-	return {
-		type: 'SAVE_REUSABLE_BLOCK',
-		id,
-	};
-}
-
-/**
- * Returns an action object used to delete a reusable block via the REST API.
+ * @example
+ * ```
+ * const { subscribe } = wp.data;
  *
- * @param {number} id The ID of the reusable block to delete.
+ * const initialPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
  *
- * @return {Object} Action object.
- */
-export function __experimentalDeleteReusableBlock( id ) {
-	return {
-		type: 'DELETE_REUSABLE_BLOCK',
-		id,
-	};
-}
-
-/**
- * Returns an action object used in signalling that a reusable block's title is
- * to be updated.
+ * // Only allow publishing posts that are set to a future date.
+ * if ( 'publish' !== initialPostStatus ) {
  *
- * @param {number} id    The ID of the reusable block to update.
- * @param {string} title The new title.
+ * 	// Track locking.
+ * 	let locked = false;
  *
- * @return {Object} Action object.
- */
-export function __experimentalUpdateReusableBlockTitle( id, title ) {
-	return {
-		type: 'UPDATE_REUSABLE_BLOCK_TITLE',
-		id,
-		title,
-	};
-}
-
-/**
- * Returns an action object used to convert a reusable block into a static
- * block.
+ * 	// Watch for the publish event.
+ * 	let unssubscribe = subscribe( () => {
+ * 		const currentPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+ * 		if ( 'publish' !== currentPostStatus ) {
  *
- * @param {string} clientId The client ID of the block to attach.
- *
- * @return {Object} Action object.
- */
-export function __experimentalConvertBlockToStatic( clientId ) {
-	return {
-		type: 'CONVERT_BLOCK_TO_STATIC',
-		clientId,
-	};
-}
-
-/**
- * Returns an action object used to convert a static block into a reusable
- * block.
- *
- * @param {string} clientIds The client IDs of the block to detach.
- *
- * @return {Object} Action object.
- */
-export function __experimentalConvertBlockToReusable( clientIds ) {
-	return {
-		type: 'CONVERT_BLOCK_TO_REUSABLE',
-		clientIds: castArray( clientIds ),
-	};
-}
-
-/**
- * Returns an action object used in signalling that the user has enabled the
- * publish sidebar.
- *
- * @return {Object} Action object
- */
-export function enablePublishSidebar() {
-	return {
-		type: 'ENABLE_PUBLISH_SIDEBAR',
-	};
-}
-
-/**
- * Returns an action object used in signalling that the user has disabled the
- * publish sidebar.
- *
- * @return {Object} Action object
- */
-export function disablePublishSidebar() {
-	return {
-		type: 'DISABLE_PUBLISH_SIDEBAR',
-	};
-}
-
-/**
- * Returns an action object used to signal that post saving is locked.
- *
- * @param  {string} lockName The lock name.
+ * 			// Compare the post date to the current date, lock the post if the date isn't in the future.
+ * 			const postDate = new Date( wp.data.select( 'core/editor' ).getEditedPostAttribute( 'date' ) );
+ * 			const currentDate = new Date();
+ * 			if ( postDate.getTime() <= currentDate.getTime() ) {
+ * 				if ( ! locked ) {
+ * 					locked = true;
+ * 					wp.data.dispatch( 'core/editor' ).lockPostSaving( 'futurelock' );
+ * 				}
+ * 			} else {
+ * 				if ( locked ) {
+ * 					locked = false;
+ * 					wp.data.dispatch( 'core/editor' ).unlockPostSaving( 'futurelock' );
+ * 				}
+ * 			}
+ * 		}
+ * 	} );
+ * }
+ * ```
  *
  * @return {Object} Action object
  */
@@ -709,9 +407,15 @@ export function lockPostSaving( lockName ) {
 }
 
 /**
- * Returns an action object used to signal that post saving is unlocked.
+ * Action that unlocks post saving.
  *
- * @param  {string} lockName The lock name.
+ * @param {string} lockName The lock name.
+ *
+ * @example
+ * ```
+ * // Unlock post saving with the lock key `mylock`:
+ * wp.data.dispatch( 'core/editor' ).unlockPostSaving( 'mylock' );
+ * ```
  *
  * @return {Object} Action object
  */
@@ -723,20 +427,80 @@ export function unlockPostSaving( lockName ) {
 }
 
 /**
+ * Action that locks post autosaving.
+ *
+ * @param {string} lockName The lock name.
+ *
+ * @example
+ * ```
+ * // Lock post autosaving with the lock key `mylock`:
+ * wp.data.dispatch( 'core/editor' ).lockPostAutosaving( 'mylock' );
+ * ```
+ *
+ * @return {Object} Action object
+ */
+export function lockPostAutosaving( lockName ) {
+	return {
+		type: 'LOCK_POST_AUTOSAVING',
+		lockName,
+	};
+}
+
+/**
+ * Action that unlocks post autosaving.
+ *
+ * @param {string} lockName The lock name.
+ *
+ * @example
+ * ```
+ * // Unlock post saving with the lock key `mylock`:
+ * wp.data.dispatch( 'core/editor' ).unlockPostAutosaving( 'mylock' );
+ * ```
+ *
+ * @return {Object} Action object
+ */
+export function unlockPostAutosaving( lockName ) {
+	return {
+		type: 'UNLOCK_POST_AUTOSAVING',
+		lockName,
+	};
+}
+
+/**
  * Returns an action object used to signal that the blocks have been updated.
  *
  * @param {Array}   blocks  Block Array.
  * @param {?Object} options Optional options.
- *
- * @return {Object} Action object
  */
-export function resetEditorBlocks( blocks, options = {} ) {
-	return {
-		type: 'RESET_EDITOR_BLOCKS',
-		blocks,
-		shouldCreateUndoLevel: options.__unstableShouldCreateUndoLevel !== false,
+export const resetEditorBlocks =
+	( blocks, options = {} ) =>
+	( { select, dispatch, registry } ) => {
+		const { __unstableShouldCreateUndoLevel, selection } = options;
+		const edits = { blocks, selection };
+
+		if ( __unstableShouldCreateUndoLevel !== false ) {
+			const { id, type } = select.getCurrentPost();
+			const noChange =
+				registry
+					.select( coreStore )
+					.getEditedEntityRecord( 'postType', type, id ).blocks ===
+				edits.blocks;
+			if ( noChange ) {
+				registry
+					.dispatch( coreStore )
+					.__unstableCreateUndoLevel( 'postType', type, id );
+				return;
+			}
+
+			// We create a new function here on every persistent edit
+			// to make sure the edit makes the post dirty and creates
+			// a new undo level.
+			edits.content = ( { blocks: blocksForSerialization = [] } ) =>
+				__unstableSerializeAndClean( blocksForSerialization );
+		}
+
+		dispatch.editPost( edits );
 	};
-}
 
 /*
  * Returns an action object used in signalling that the post editor settings have been updated.
@@ -756,12 +520,18 @@ export function updateEditorSettings( settings ) {
  * Backward compatibility
  */
 
-const getBlockEditorAction = ( name ) => function* ( ...args ) {
-	deprecated( '`wp.data.dispatch( \'core/editor\' ).' + name + '`', {
-		alternative: '`wp.data.dispatch( \'core/block-editor\' ).' + name + '`',
-	} );
-	yield dispatch( 'core/block-editor', name, ...args );
-};
+const getBlockEditorAction =
+	( name ) =>
+	( ...args ) =>
+	( { registry } ) => {
+		deprecated( "`wp.data.dispatch( 'core/editor' )." + name + '`', {
+			since: '5.3',
+			alternative:
+				"`wp.data.dispatch( 'core/block-editor' )." + name + '`',
+			version: '6.2',
+		} );
+		registry.dispatch( blockEditorStore )[ name ]( ...args );
+	};
 
 /**
  * @see resetBlocks in core/block-editor store.
@@ -781,7 +551,9 @@ export const updateBlock = getBlockEditorAction( 'updateBlock' );
 /**
  * @see updateBlockAttributes in core/block-editor store.
  */
-export const updateBlockAttributes = getBlockEditorAction( 'updateBlockAttributes' );
+export const updateBlockAttributes = getBlockEditorAction(
+	'updateBlockAttributes'
+);
 
 /**
  * @see selectBlock in core/block-editor store.
@@ -836,7 +608,9 @@ export const moveBlocksUp = getBlockEditorAction( 'moveBlocksUp' );
 /**
  * @see moveBlockToPosition in core/block-editor store.
  */
-export const moveBlockToPosition = getBlockEditorAction( 'moveBlockToPosition' );
+export const moveBlockToPosition = getBlockEditorAction(
+	'moveBlockToPosition'
+);
 
 /**
  * @see insertBlock in core/block-editor store.
@@ -861,12 +635,16 @@ export const hideInsertionPoint = getBlockEditorAction( 'hideInsertionPoint' );
 /**
  * @see setTemplateValidity in core/block-editor store.
  */
-export const setTemplateValidity = getBlockEditorAction( 'setTemplateValidity' );
+export const setTemplateValidity = getBlockEditorAction(
+	'setTemplateValidity'
+);
 
 /**
  * @see synchronizeTemplate in core/block-editor store.
  */
-export const synchronizeTemplate = getBlockEditorAction( 'synchronizeTemplate' );
+export const synchronizeTemplate = getBlockEditorAction(
+	'synchronizeTemplate'
+);
 
 /**
  * @see mergeBlocks in core/block-editor store.
@@ -916,4 +694,6 @@ export const insertDefaultBlock = getBlockEditorAction( 'insertDefaultBlock' );
 /**
  * @see updateBlockListSettings in core/block-editor store.
  */
-export const updateBlockListSettings = getBlockEditorAction( 'updateBlockListSettings' );
+export const updateBlockListSettings = getBlockEditorAction(
+	'updateBlockListSettings'
+);

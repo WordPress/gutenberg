@@ -1,6 +1,4 @@
 /**
- * Constant for the store module (or reducer) key.
- * @type {string}
+ * Module Constants
  */
-export const STORE_KEY = 'core/edit-widgets';
-
+export const STORE_NAME = 'core/edit-widgets';

@@ -3,7 +3,7 @@
  */
 import { unwrap } from '@wordpress/dom';
 
-export default function( node ) {
+export default function googleDocsUIdRemover( node ) {
 	if ( ! node.id || node.id.indexOf( 'docs-internal-guid-' ) !== 0 ) {
 		return;
 	}

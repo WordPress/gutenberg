@@ -1,6 +1,6 @@
 # Draggable
 
-`Draggable` is a Component that provides a way to set up a a cross-browser (including IE) customisable drag image and the transfer data for the drag event. It decouples the drag handle and the element to drag: use it by wrapping the component that will become the drag handle and providing the DOM ID of the element to drag.
+`Draggable` is a Component that provides a way to set up a cross-browser (including IE) customisable drag image and the transfer data for the drag event. It decouples the drag handle and the element to drag: use it by wrapping the component that will become the drag handle and providing the DOM ID of the element to drag.
 
 Note that the drag handle needs to declare the `draggable="true"` property and bind the `Draggable`s `onDraggableStart` and `onDraggableEnd` event handlers to its own `onDragStart` and `onDragEnd` respectively. `Draggable` takes care of the logic to setup the drag image and the transfer data, but is not concerned with creating an actual DOM element that is draggable.
 
@@ -12,55 +12,61 @@ The component accepts the following props:
 
 The HTML id of the element to clone on drag
 
-- Type: `string`
-- Required: Yes
+-   Type: `string`
+-   Required: Yes
 
 ### transferData
 
 Arbitrary data object attached to the drag and drop event.
 
-- Type: `Object`
-- Required: Yes
+-   Type: `Object`
+-   Required: Yes
 
 ### onDragStart
 
-A function to be called when dragging starts.
+A function called when dragging starts. This callback receives the `event` object from the `dragstart` event as its first parameter.
 
-- Type: `Function`
-- Required: No
-- Default: `noop`
+-   Type: `Function`
+-   Required: No
+-   Default: `noop`
+
+### onDragOver
+
+A function called when the element being dragged is dragged over a valid drop target. This callback receives the `event` object from the `dragover` event as its first parameter.
+
+-   Type: `Function`
+-   Required: No
+-   Default: `noop`
 
 ### onDragEnd
 
-A function to be called when dragging ends.
+A function called when dragging ends. This callback receives the `event` object from the `dragend` event as its first parameter.
 
-- Type: `Function`
-- Required: No
-- Default: `noop`
+-   Type: `Function`
+-   Required: No
+-   Default: `noop`
 
 ## Usage
 
 ```jsx
-import { Dashicon, Draggable, Panel, PanelBody } from '@wordpress/components';
+import { Draggable, Panel, PanelBody } from '@wordpress/components';
+import { Icon, more } from '@wordpress/icons';
 
 const MyDraggable = () => (
 	<div id="draggable-panel">
-		<Panel header="Draggable panel" >
+		<Panel header="Draggable panel">
 			<PanelBody>
-				<Draggable
-					elementId="draggable-panel"
-					transferData={ { } }
-				>
-				{
-					( { onDraggableStart, onDraggableEnd } ) => (
-						<Dashicon
-							icon="move"
+				<Draggable elementId="draggable-panel" transferData={ {} }>
+					{ ( { onDraggableStart, onDraggableEnd } ) => (
+						<div
+							className="example-drag-handle"
+							draggable
 							onDragStart={ onDraggableStart }
 							onDragEnd={ onDraggableEnd }
-							draggable
-						/>
-					)
-				}
+						>
+							<Icon icon={ more } />
+						</div>
+					) }
 				</Draggable>
 			</PanelBody>
 		</Panel>
@@ -71,28 +77,29 @@ const MyDraggable = () => (
 In case you want to call your own `dragstart` / `dragend` event handlers as well, you can pass them to `Draggable` and it'll take care of calling them after their own:
 
 ```jsx
-import { Dashicon, Draggable, Panel, PanelBody } from '@wordpress/components';
+import { Draggable, Panel, PanelBody } from '@wordpress/components';
+import { Icon, more } from '@wordpress/icons';
 
 const MyDraggable = ( { onDragStart, onDragEnd } ) => (
 	<div id="draggable-panel">
-		<Panel header="Draggable panel" >
+		<Panel header="Draggable panel">
 			<PanelBody>
 				<Draggable
 					elementId="draggable-panel"
-					transferData={ { } }
+					transferData={ {} }
 					onDragStart={ onDragStart }
 					onDragEnd={ onDragEnd }
 				>
-				{
-					( { onDraggableStart, onDraggableEnd } ) => (
-						<Dashicon
-							icon="move"
+					{ ( { onDraggableStart, onDraggableEnd } ) => (
+						<div
+							className="example-drag-handle"
+							draggable
 							onDragStart={ onDraggableStart }
 							onDragEnd={ onDraggableEnd }
-							draggable
-						/>
-					)
-				}
+						>
+							<Icon icon={ more } />
+						</div>
+					) }
 				</Draggable>
 			</PanelBody>
 		</Panel>

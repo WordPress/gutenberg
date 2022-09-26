@@ -2,101 +2,67 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
-import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
-import { PostTitle } from '@wordpress/editor';
-import { ReadableContentView } from '@wordpress/components';
-
+import { BlockList } from '@wordpress/block-editor';
+/**
+ * External dependencies
+ */
+import { Keyboard } from 'react-native';
 /**
  * Internal dependencies
  */
-import styles from './style.scss';
+import Header from './header';
 
-class VisualEditor extends Component {
-	renderHeader() {
-		const {
-			editTitle,
-			setTitleRef,
-			title,
-		} = this.props;
+export default class VisualEditor extends Component {
+	constructor( props ) {
+		super( props );
+		this.renderHeader = this.renderHeader.bind( this );
+		this.keyboardDidShow = this.keyboardDidShow.bind( this );
+		this.keyboardDidHide = this.keyboardDidHide.bind( this );
 
-		return (
-			<ReadableContentView>
-				<PostTitle
-					innerRef={ setTitleRef }
-					title={ title }
-					onUpdate={ editTitle }
-					placeholder={ __( 'Add title' ) }
-					borderStyle={
-						this.props.isFullyBordered ?
-							styles.blockHolderFullBordered :
-							styles.blockHolderSemiBordered
-					}
-					focusedBorderColor={ styles.blockHolderFocused.borderColor }
-					accessibilityLabel="post-title"
-				/>
-			</ReadableContentView>
+		this.state = {
+			isAutoScrollEnabled: true,
+		};
+	}
+
+	componentDidMount() {
+		this.keyboardDidShow = Keyboard.addListener(
+			'keyboardDidShow',
+			this.keyboardDidShow
 		);
+		this.keyboardDidHideListener = Keyboard.addListener(
+			'keyboardDidHide',
+			this.keyboardDidHide
+		);
+	}
+
+	componentWillUnmount() {
+		this.keyboardDidShow.remove();
+		this.keyboardDidHideListener.remove();
+	}
+
+	keyboardDidShow() {
+		this.setState( { isAutoScrollEnabled: false } );
+	}
+
+	keyboardDidHide() {
+		this.setState( { isAutoScrollEnabled: true } );
+	}
+
+	renderHeader() {
+		const { setTitleRef } = this.props;
+		return <Header setTitleRef={ setTitleRef } />;
 	}
 
 	render() {
-		const {
-			blocks,
-			isFullyBordered,
-			resetEditorBlocks,
-			resetEditorBlocksWithoutUndoLevel,
-			rootViewHeight,
-			safeAreaBottomInset,
-		} = this.props;
+		const { safeAreaBottomInset } = this.props;
+		const { isAutoScrollEnabled } = this.state;
 
 		return (
-			<BlockEditorProvider
-				value={ blocks }
-				onInput={ resetEditorBlocksWithoutUndoLevel }
-				onChange={ resetEditorBlocks }
-				settings={ null }
-			>
-				<BlockList
-					header={ this.renderHeader() }
-					isFullyBordered={ isFullyBordered }
-					rootViewHeight={ rootViewHeight }
-					safeAreaBottomInset={ safeAreaBottomInset }
-				/>
-			</BlockEditorProvider>
+			<BlockList
+				header={ this.renderHeader }
+				safeAreaBottomInset={ safeAreaBottomInset }
+				autoScroll={ isAutoScrollEnabled }
+			/>
 		);
 	}
 }
-
-export default compose( [
-	withSelect( ( select ) => {
-		const {
-			getEditorBlocks,
-			getEditedPostAttribute,
-		} = select( 'core/editor' );
-
-		return {
-			blocks: getEditorBlocks(),
-			title: getEditedPostAttribute( 'title' ),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const {
-			editPost,
-			resetEditorBlocks,
-		} = dispatch( 'core/editor' );
-
-		return {
-			editTitle( title ) {
-				editPost( { title } );
-			},
-			resetEditorBlocks,
-			resetEditorBlocksWithoutUndoLevel( blocks ) {
-				resetEditorBlocks( blocks, {
-					__unstableShouldCreateUndoLevel: false,
-				} );
-			},
-		};
-	} ),
-] )( VisualEditor );

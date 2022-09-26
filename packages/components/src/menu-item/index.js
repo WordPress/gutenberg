@@ -1,79 +1,81 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
 import classnames from 'classnames';
-import { isString } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { createElement, cloneElement } from '@wordpress/element';
+import { cloneElement, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import Button from '../button';
 import Shortcut from '../shortcut';
-import IconButton from '../icon-button';
+import Button from '../button';
+import Icon from '../icon';
 
-/**
- * Renders a generic menu item for use inside the more menu.
- *
- * @return {WPElement} More menu item.
- */
-export function MenuItem( {
-	children,
-	info,
-	className,
-	icon,
-	shortcut,
-	isSelected,
-	role = 'menuitem',
-	...props
-} ) {
-	className = classnames( 'components-menu-item__button', className, {
-		'has-icon': icon,
-	} );
+export function MenuItem( props, ref ) {
+	let {
+		children,
+		info,
+		className,
+		icon,
+		iconPosition = 'right',
+		shortcut,
+		isSelected,
+		role = 'menuitem',
+		suffix,
+		...buttonProps
+	} = props;
+
+	className = classnames( 'components-menu-item__button', className );
 
 	if ( info ) {
 		children = (
 			<span className="components-menu-item__info-wrapper">
-				{ children }
-				<span
-					className="components-menu-item__info">
-					{ info }
-				</span>
+				<span className="components-menu-item__item">{ children }</span>
+				<span className="components-menu-item__info">{ info }</span>
 			</span>
 		);
 	}
 
-	let tagName = Button;
-
-	if ( icon ) {
-		if ( ! isString( icon ) ) {
-			icon = cloneElement( icon, {
-				className: 'components-menu-items__item-icon',
-				height: 20,
-				width: 20,
-			} );
-		}
-
-		tagName = IconButton;
-		props.icon = icon;
+	if ( icon && typeof icon !== 'string' ) {
+		icon = cloneElement( icon, {
+			className: classnames( 'components-menu-items__item-icon', {
+				'has-icon-right': iconPosition === 'right',
+			} ),
+		} );
 	}
 
-	return createElement(
-		tagName,
-		{
+	return (
+		<Button
+			ref={ ref }
 			// Make sure aria-checked matches spec https://www.w3.org/TR/wai-aria-1.1/#aria-checked
-			'aria-checked': ( role === 'menuitemcheckbox' || role === 'menuitemradio' ) ? isSelected : undefined,
-			role,
-			className,
-			...props,
-		},
-		children,
-		<Shortcut className="components-menu-item__shortcut" shortcut={ shortcut } />
+			aria-checked={
+				role === 'menuitemcheckbox' || role === 'menuitemradio'
+					? isSelected
+					: undefined
+			}
+			role={ role }
+			icon={ iconPosition === 'left' ? icon : undefined }
+			className={ className }
+			{ ...buttonProps }
+		>
+			<span className="components-menu-item__item">{ children }</span>
+			{ ! suffix && (
+				<Shortcut
+					className="components-menu-item__shortcut"
+					shortcut={ shortcut }
+				/>
+			) }
+			{ ! suffix && icon && iconPosition === 'right' && (
+				<Icon icon={ icon } />
+			) }
+			{ suffix }
+		</Button>
 	);
 }
 
-export default MenuItem;
+export default forwardRef( MenuItem );

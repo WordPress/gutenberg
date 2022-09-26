@@ -25,12 +25,14 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should call the API properly', () => {
-		window.fetch.mockReturnValue( Promise.resolve( {
-			status: 200,
-			json() {
-				return Promise.resolve( { message: 'ok' } );
-			},
-		} ) );
+		window.fetch.mockReturnValue(
+			Promise.resolve( {
+				status: 200,
+				json() {
+					return Promise.resolve( { message: 'ok' } );
+				},
+			} )
+		);
 
 		return apiFetch( { path: '/random' } ).then( ( body ) => {
 			expect( body ).toEqual( { message: 'ok' } );
@@ -48,14 +50,17 @@ describe( 'apiFetch', () => {
 			body,
 		} );
 
-		expect( window.fetch ).toHaveBeenCalledWith( '/wp/v2/media?_locale=user', {
-			credentials: 'include',
-			headers: {
-				Accept: 'application/json, */*;q=0.1',
-			},
-			method: 'POST',
-			body,
-		} );
+		expect( window.fetch ).toHaveBeenCalledWith(
+			'/wp/v2/media?_locale=user',
+			{
+				credentials: 'include',
+				headers: {
+					Accept: 'application/json, */*;q=0.1',
+				},
+				method: 'POST',
+				body,
+			}
+		);
 	} );
 
 	it( 'should fetch with a JSON body', () => {
@@ -70,15 +75,18 @@ describe( 'apiFetch', () => {
 			data: {},
 		} );
 
-		expect( window.fetch ).toHaveBeenCalledWith( '/wp/v2/posts?_locale=user', {
-			body: '{}',
-			credentials: 'include',
-			headers: {
-				Accept: 'application/json, */*;q=0.1',
-				'Content-Type': 'application/json',
-			},
-			method: 'POST',
-		} );
+		expect( window.fetch ).toHaveBeenCalledWith(
+			'/wp/v2/posts?_locale=user',
+			{
+				body: '{}',
+				credentials: 'include',
+				headers: {
+					Accept: 'application/json, */*;q=0.1',
+					'Content-Type': 'application/json',
+				},
+				method: 'POST',
+			}
+		);
 	} );
 
 	it( 'should respect developer-provided options', () => {
@@ -91,29 +99,35 @@ describe( 'apiFetch', () => {
 			credentials: 'omit',
 		} );
 
-		expect( window.fetch ).toHaveBeenCalledWith( '/wp/v2/posts?_locale=user', {
-			body: '{}',
-			credentials: 'omit',
-			headers: {
-				Accept: 'application/json, */*;q=0.1',
-				'Content-Type': 'application/json',
-			},
-			method: 'POST',
-		} );
+		expect( window.fetch ).toHaveBeenCalledWith(
+			'/wp/v2/posts?_locale=user',
+			{
+				body: '{}',
+				credentials: 'omit',
+				headers: {
+					Accept: 'application/json, */*;q=0.1',
+					'Content-Type': 'application/json',
+				},
+				method: 'POST',
+			}
+		);
 	} );
 
 	it( 'should return the error message properly', () => {
-		window.fetch.mockReturnValue( Promise.resolve( {
-			status: 400,
-			json() {
-				return Promise.resolve( {
-					code: 'bad_request',
-					message: 'Bad Request',
-				} );
-			},
-		} ) );
+		window.fetch.mockReturnValue(
+			Promise.resolve( {
+				status: 400,
+				json() {
+					return Promise.resolve( {
+						code: 'bad_request',
+						message: 'Bad Request',
+					} );
+				},
+			} )
+		);
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			// eslint-disable-next-line jest/no-conditional-expect
 			expect( body ).toEqual( {
 				code: 'bad_request',
 				message: 'Bad Request',
@@ -122,11 +136,14 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should return invalid JSON error if no json response', () => {
-		window.fetch.mockReturnValue( Promise.resolve( {
-			status: 200,
-		} ) );
+		window.fetch.mockReturnValue(
+			Promise.resolve( {
+				status: 200,
+			} )
+		);
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			// eslint-disable-next-line jest/no-conditional-expect
 			expect( body ).toEqual( {
 				code: 'invalid_json',
 				message: 'The response is not a valid JSON response.',
@@ -135,14 +152,17 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should return invalid JSON error if response is not valid', () => {
-		window.fetch.mockReturnValue( Promise.resolve( {
-			status: 200,
-			json() {
-				return Promise.reject();
-			},
-		} ) );
+		window.fetch.mockReturnValue(
+			Promise.resolve( {
+				status: 200,
+				json() {
+					return Promise.reject();
+				},
+			} )
+		);
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			// eslint-disable-next-line jest/no-conditional-expect
 			expect( body ).toEqual( {
 				code: 'invalid_json',
 				message: 'The response is not a valid JSON response.',
@@ -150,38 +170,89 @@ describe( 'apiFetch', () => {
 		} );
 	} );
 
-	it( 'should return null if response has no content status code', () => {
-		window.fetch.mockReturnValue( Promise.resolve( {
-			status: 204,
-		} ) );
+	it( 'should return offline error when fetch errors', () => {
+		window.fetch.mockReturnValue( Promise.reject() );
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			// eslint-disable-next-line jest/no-conditional-expect
+			expect( body ).toEqual( {
+				code: 'fetch_error',
+				message: 'You are probably offline.',
+			} );
+		} );
+	} );
+
+	it( 'should throw AbortError when fetch aborts', async () => {
+		const abortError = new Error();
+		abortError.name = 'AbortError';
+		abortError.code = 20;
+
+		window.fetch.mockReturnValue( Promise.reject( abortError ) );
+
+		const controller = new window.AbortController();
+
+		const promise = apiFetch( {
+			path: '/random',
+			signal: controller.signal,
+		} );
+
+		controller.abort();
+
+		let error;
+
+		try {
+			await promise;
+		} catch ( err ) {
+			error = err;
+		}
+
+		expect( error.name ).toBe( 'AbortError' );
+	} );
+
+	it( 'should return null if response has no content status code', () => {
+		window.fetch.mockReturnValue(
+			Promise.resolve( {
+				status: 204,
+			} )
+		);
+
+		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			// eslint-disable-next-line jest/no-conditional-expect
 			expect( body ).toEqual( null );
 		} );
 	} );
 
 	it( 'should not try to parse the response', () => {
-		window.fetch.mockReturnValue( Promise.resolve( {
-			status: 200,
-		} ) );
-
-		return apiFetch( { path: '/random', parse: false } ).then( ( response ) => {
-			expect( response ).toEqual( {
+		window.fetch.mockReturnValue(
+			Promise.resolve( {
 				status: 200,
-			} );
-		} );
+			} )
+		);
+
+		return apiFetch( { path: '/random', parse: false } ).then(
+			( response ) => {
+				expect( response ).toEqual( {
+					status: 200,
+				} );
+			}
+		);
 	} );
 
 	it( 'should not try to parse the error', () => {
-		window.fetch.mockReturnValue( Promise.resolve( {
-			status: 400,
-		} ) );
-
-		return apiFetch( { path: '/random', parse: false } ).catch( ( response ) => {
-			expect( response ).toEqual( {
+		window.fetch.mockReturnValue(
+			Promise.resolve( {
 				status: 400,
-			} );
-		} );
+			} )
+		);
+
+		return apiFetch( { path: '/random', parse: false } ).catch(
+			( response ) => {
+				// eslint-disable-next-line jest/no-conditional-expect
+				expect( response ).toEqual( {
+					status: 400,
+				} );
+			}
+		);
 	} );
 
 	it( 'should not use the default fetch handler when using a custom fetch handler', () => {

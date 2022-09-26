@@ -1,12 +1,22 @@
 .wp-block-table {
-	width: 100%;
-	min-width: $break-mobile / 2;
-	border-collapse: collapse;
+	margin: "0 0 1em 0";
+
+	thead {
+		border-bottom: 3px solid;
+	}
+
+	tfoot {
+		border-top: 3px solid;
+	}
 
 	td,
 	th {
 		padding: 0.5em;
 		border: 1px solid;
-		word-break: break-all;
+		word-break: normal;
+	}
+
+	figcaption {
+		@include caption-style-theme();
 	}
 }

@@ -1,40 +1,51 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import {
-	navigateRegions,
-	Popover,
-	SlotFillProvider,
-} from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
+import { Popover } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
+import { PluginArea } from '@wordpress/plugins';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
-import Header from '../header';
+import ErrorBoundary from '../error-boundary';
+import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
 import Sidebar from '../sidebar';
-import WidgetAreas from '../widget-areas';
-import Notices from '../notices';
+import Interface from './interface';
+import UnsavedChangesWarning from './unsaved-changes-warning';
+import WelcomeGuide from '../welcome-guide';
 
-function Layout( { blockEditorSettings } ) {
+function Layout( { blockEditorSettings, onError } ) {
+	const { createErrorNotice } = useDispatch( noticesStore );
+
+	function onPluginAreaError( name ) {
+		createErrorNotice(
+			sprintf(
+				/* translators: %s: plugin name */
+				__(
+					'The "%s" plugin has encountered an error and cannot be rendered.'
+				),
+				name
+			)
+		);
+	}
+
 	return (
-		<SlotFillProvider>
-			<Header />
-			<Sidebar />
-			<Notices />
-			<div
-				className="edit-widgets-layout__content"
-				role="region"
-				aria-label={ __( 'Widgets screen content' ) }
-				tabIndex="-1"
+		<ErrorBoundary onError={ onError }>
+			<WidgetAreasBlockEditorProvider
+				blockEditorSettings={ blockEditorSettings }
 			>
-				<WidgetAreas
-					blockEditorSettings={ blockEditorSettings }
-				/>
-			</div>
-			<Popover.Slot />
-		</SlotFillProvider>
+				<Interface blockEditorSettings={ blockEditorSettings } />
+				<Sidebar />
+				<Popover.Slot />
+				<PluginArea onError={ onPluginAreaError } />
+				<UnsavedChangesWarning />
+				<WelcomeGuide />
+			</WidgetAreasBlockEditorProvider>
+		</ErrorBoundary>
 	);
 }
 
-export default navigateRegions( Layout );
+export default Layout;

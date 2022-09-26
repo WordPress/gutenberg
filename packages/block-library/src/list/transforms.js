@@ -1,143 +1,119 @@
 /**
  * WordPress dependencies
  */
-import {
-	createBlock,
-	getBlockAttributes,
-	getPhrasingContentSchema,
-} from '@wordpress/blocks';
-import {
-	__UNSTABLE_LINE_SEPARATOR,
-	create,
-	join,
-	replace,
-	split,
-	toHTMLString,
-} from '@wordpress/rich-text';
+import { createBlock } from '@wordpress/blocks';
+import { create, split, toHTMLString } from '@wordpress/rich-text';
 
-const listContentSchema = {
-	...getPhrasingContentSchema(),
-	ul: {},
-	ol: { attributes: [ 'type' ] },
-};
+/**
+ * Internal dependencies
+ */
+import { createListBlockFromDOMElement } from './utils';
 
-// Recursion is needed.
-// Possible: ul > li > ul.
-// Impossible: ul > ul.
-[ 'ul', 'ol' ].forEach( ( tag ) => {
-	listContentSchema[ tag ].children = {
-		li: {
-			children: listContentSchema,
-		},
+function getListContentSchema( { phrasingContentSchema } ) {
+	const listContentSchema = {
+		...phrasingContentSchema,
+		ul: {},
+		ol: { attributes: [ 'type', 'start', 'reversed' ] },
 	};
-} );
+
+	// Recursion is needed.
+	// Possible: ul > li > ul.
+	// Impossible: ul > ul.
+	[ 'ul', 'ol' ].forEach( ( tag ) => {
+		listContentSchema[ tag ].children = {
+			li: {
+				children: listContentSchema,
+			},
+		};
+	} );
+
+	return listContentSchema;
+}
+
+function getListContentFlat( blocks ) {
+	return blocks.flatMap( ( { name, attributes, innerBlocks = [] } ) => {
+		if ( name === 'core/list-item' ) {
+			return [ attributes.content, ...getListContentFlat( innerBlocks ) ];
+		}
+		return getListContentFlat( innerBlocks );
+	} );
+}
 
 const transforms = {
 	from: [
 		{
 			type: 'block',
 			isMultiBlock: true,
-			blocks: [ 'core/paragraph' ],
+			blocks: [ 'core/paragraph', 'core/heading' ],
 			transform: ( blockAttributes ) => {
-				return createBlock( 'core/list', {
-					values: toHTMLString( {
-						value: join( blockAttributes.map( ( { content } ) => {
-							const value = create( { html: content } );
-
-							if ( blockAttributes.length > 1 ) {
-								return value;
-							}
-
-							// When converting only one block, transform
-							// every line to a list item.
-							return replace( value, /\n/g, __UNSTABLE_LINE_SEPARATOR );
-						} ), __UNSTABLE_LINE_SEPARATOR ),
-						multilineTag: 'li',
-					} ),
-				} );
-			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/quote' ],
-			transform: ( { value } ) => {
-				return createBlock( 'core/list', {
-					values: toHTMLString( {
-						value: create( { html: value, multilineTag: 'p' } ),
-						multilineTag: 'li',
-					} ),
-				} );
+				let childBlocks = [];
+				if ( blockAttributes.length > 1 ) {
+					childBlocks = blockAttributes.map( ( { content } ) => {
+						return createBlock( 'core/list-item', { content } );
+					} );
+				} else if ( blockAttributes.length === 1 ) {
+					const value = create( {
+						html: blockAttributes[ 0 ].content,
+					} );
+					childBlocks = split( value, '\n' ).map( ( result ) => {
+						return createBlock( 'core/list-item', {
+							content: toHTMLString( { value: result } ),
+						} );
+					} );
+				}
+				return createBlock(
+					'core/list',
+					{
+						anchor: blockAttributes.anchor,
+					},
+					childBlocks
+				);
 			},
 		},
 		{
 			type: 'raw',
 			selector: 'ol,ul',
-			schema: {
-				ol: listContentSchema.ol,
-				ul: listContentSchema.ul,
-			},
-			transform( node ) {
-				return createBlock( 'core/list', {
-					...getBlockAttributes(
-						'core/list',
-						node.outerHTML
-					),
-					ordered: node.nodeName === 'OL',
-				} );
-			},
+			schema: ( args ) => ( {
+				ol: getListContentSchema( args ).ol,
+				ul: getListContentSchema( args ).ul,
+			} ),
+			transform: createListBlockFromDOMElement,
 		},
 		...[ '*', '-' ].map( ( prefix ) => ( {
 			type: 'prefix',
 			prefix,
 			transform( content ) {
-				return createBlock( 'core/list', {
-					values: `<li>${ content }</li>`,
-				} );
+				return createBlock( 'core/list', {}, [
+					createBlock( 'core/list-item', { content } ),
+				] );
 			},
 		} ) ),
 		...[ '1.', '1)' ].map( ( prefix ) => ( {
 			type: 'prefix',
 			prefix,
 			transform( content ) {
-				return createBlock( 'core/list', {
-					ordered: true,
-					values: `<li>${ content }</li>`,
-				} );
+				return createBlock(
+					'core/list',
+					{
+						ordered: true,
+					},
+					[ createBlock( 'core/list-item', { content } ) ]
+				);
 			},
 		} ) ),
 	],
 	to: [
-		{
+		...[ 'core/paragraph', 'core/heading' ].map( ( block ) => ( {
 			type: 'block',
-			blocks: [ 'core/paragraph' ],
-			transform: ( { values } ) =>
-				split( create( {
-					html: values,
-					multilineTag: 'li',
-					multilineWrapperTags: [ 'ul', 'ol' ],
-				} ), __UNSTABLE_LINE_SEPARATOR )
-					.map( ( piece ) =>
-						createBlock( 'core/paragraph', {
-							content: toHTMLString( { value: piece } ),
-						} )
-					),
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/quote' ],
-			transform: ( { values } ) => {
-				return createBlock( 'core/quote', {
-					value: toHTMLString( {
-						value: create( {
-							html: values,
-							multilineTag: 'li',
-							multilineWrapperTags: [ 'ul', 'ol' ],
-						} ),
-						multilineTag: 'p',
-					} ),
-				} );
+			blocks: [ block ],
+			transform: ( _attributes, childBlocks ) => {
+				return getListContentFlat( childBlocks ).map( ( content ) =>
+					createBlock( block, {
+						content,
+					} )
+				);
 			},
-		},
+		} ) ),
 	],
 };
 

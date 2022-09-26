@@ -1,49 +1,37 @@
 /**
- * External dependencies
- */
-import { Platform } from 'react-native';
-
-/**
  * WordPress dependencies
  */
 import '@wordpress/core-data';
-import '@wordpress/block-editor';
-import '@wordpress/editor';
-import '@wordpress/notices';
-import { registerCoreBlocks } from '@wordpress/block-library';
-import { unregisterBlockType } from '@wordpress/blocks';
 import '@wordpress/format-library';
+import { dispatch } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
-import './store';
-
-let blocksRegistered = false;
+export { store } from './store';
+import Editor from './editor';
 
 /**
- * Initializes the Editor.
+ * Initializes the Editor and returns a componentProvider
+ * that can be registered with `AppRegistry.registerComponent`
+ *
+ * @param {string} id       Unique identifier for editor instance.
+ * @param {Object} postType Post type of the post to edit.
+ * @param {Object} postId   ID of the post to edit (unused right now)
  */
-export function initializeEditor() {
-	if ( blocksRegistered ) {
-		return;
-	}
+export function initializeEditor( id, postType, postId ) {
+	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
+		editorMode: 'visual',
+		fixedToolbar: false,
+		fullscreenMode: true,
+		hiddenBlockTypes: [],
+		inactivePanels: [],
+		isPublishSidebarEnabled: true,
+		openPanels: [ 'post-status' ],
+		preferredStyleVariations: {},
+		welcomeGuide: true,
+	} );
 
-	// register and setup blocks
-	registerCoreBlocks();
-
-	// disable Code block for the release
-	// eslint-disable-next-line no-undef
-	if ( typeof __DEV__ === 'undefined' || ! __DEV__ ) {
-		unregisterBlockType( 'core/code' );
-
-		// Disable Video block except for iOS for now.
-		if ( Platform.OS !== 'ios' ) {
-			unregisterBlockType( 'core/video' );
-		}
-	}
-
-	blocksRegistered = true;
+	return <Editor postId={ postId } postType={ postType } />;
 }
-
-export { default as Editor } from './editor';

@@ -1,50 +1,64 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
  */
-import { DefaultBlockAppender } from '../';
+import { DefaultBlockAppender, ZWNBSP } from '../';
 
 describe( 'DefaultBlockAppender', () => {
-	const expectOnAppendCalled = ( onAppend ) => {
-		expect( onAppend ).toHaveBeenCalledTimes( 1 );
-		expect( onAppend ).toHaveBeenCalledWith();
-	};
-
-	it( 'should render nothing if not visible', () => {
-		const wrapper = shallow( <DefaultBlockAppender /> );
-
-		expect( wrapper.type() ).toBe( null );
-	} );
-
 	it( 'should match snapshot', () => {
 		const onAppend = jest.fn();
-		const wrapper = shallow( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt /> );
 
-		expect( wrapper ).toMatchSnapshot();
+		const { container } = render(
+			<DefaultBlockAppender onAppend={ onAppend } showPrompt />
+		);
+
+		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should append a default block when input focused', () => {
+	it( 'should append a default block when input focused', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 		const onAppend = jest.fn();
-		const wrapper = shallow( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt /> );
 
-		wrapper.find( 'TextareaAutosize' ).simulate( 'focus' );
+		const { container } = render(
+			<DefaultBlockAppender onAppend={ onAppend } showPrompt />
+		);
 
-		expect( wrapper ).toMatchSnapshot();
+		await user.click(
+			screen.getByRole( 'button', { name: 'Add default block' } )
+		);
 
-		expectOnAppendCalled( onAppend );
+		expect( container ).toMatchSnapshot();
+
+		// Called once for focusing and once for clicking.
+		expect( onAppend ).toHaveBeenCalledTimes( 2 );
+		expect( onAppend ).toHaveBeenCalledWith();
 	} );
 
-	it( 'should optionally show without prompt', () => {
+	it( 'should optionally show without prompt', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 		const onAppend = jest.fn();
-		const wrapper = shallow( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt={ false } /> );
-		const input = wrapper.find( 'TextareaAutosize' );
 
-		expect( input.prop( 'value' ) ).toEqual( '' );
+		const { container } = render(
+			<DefaultBlockAppender onAppend={ onAppend } showPrompt={ false } />
+		);
 
-		expect( wrapper ).toMatchSnapshot();
+		const appender = screen.getByRole( 'button', {
+			name: 'Add default block',
+		} );
+
+		await user.click( appender );
+
+		expect( appender ).toContainHTML( ZWNBSP );
+
+		expect( container ).toMatchSnapshot();
 	} );
 } );

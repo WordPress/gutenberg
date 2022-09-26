@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -28,52 +28,56 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 		return [];
 	}
 
+	// No notice is shown after trashing a post
+	if ( post.status === 'trash' && previousPost.status !== 'trash' ) {
+		return [];
+	}
+
 	const publishStatus = [ 'publish', 'private', 'future' ];
 	const isPublished = includes( publishStatus, previousPost.status );
 	const willPublish = includes( publishStatus, post.status );
 
 	let noticeMessage;
 	let shouldShowLink = get( postType, [ 'viewable' ], false );
+	let isDraft;
 
+	// Always should a notice, which will be spoken for accessibility.
 	if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.
-		noticeMessage = null;
+		noticeMessage = __( 'Draft saved.' );
+		isDraft = true;
 	} else if ( isPublished && ! willPublish ) {
-		// If undoing publish status, show specific notice
+		// If undoing publish status, show specific notice.
 		noticeMessage = postType.labels.item_reverted_to_draft;
 		shouldShowLink = false;
 	} else if ( ! isPublished && willPublish ) {
 		// If publishing or scheduling a post, show the corresponding
-		// publish message
+		// publish message.
 		noticeMessage = {
 			publish: postType.labels.item_published,
 			private: postType.labels.item_published_privately,
 			future: postType.labels.item_scheduled,
 		}[ post.status ];
 	} else {
-		// Generic fallback notice
+		// Generic fallback notice.
 		noticeMessage = postType.labels.item_updated;
 	}
 
-	if ( noticeMessage ) {
-		const actions = [];
-		if ( shouldShowLink ) {
-			actions.push( {
-				label: postType.labels.view_item,
-				url: post.link,
-			} );
-		}
-		return [
-			noticeMessage,
-			{
-				id: SAVE_POST_NOTICE_ID,
-				type: 'snackbar',
-				actions,
-			},
-		];
+	const actions = [];
+	if ( shouldShowLink ) {
+		actions.push( {
+			label: isDraft ? __( 'View Preview' ) : postType.labels.view_item,
+			url: post.link,
+		} );
 	}
-
-	return [];
+	return [
+		noticeMessage,
+		{
+			id: SAVE_POST_NOTICE_ID,
+			type: 'snackbar',
+			actions,
+		},
+	];
 }
 
 /**
@@ -95,24 +99,28 @@ export function getNotificationArgumentsForSaveFail( data ) {
 	const publishStatus = [ 'publish', 'private', 'future' ];
 	const isPublished = publishStatus.indexOf( post.status ) !== -1;
 	// If the post was being published, we show the corresponding publish error message
-	// Unless we publish an "updating failed" message
+	// Unless we publish an "updating failed" message.
 	const messages = {
 		publish: __( 'Publishing failed.' ),
 		private: __( 'Publishing failed.' ),
 		future: __( 'Scheduling failed.' ),
 	};
-	let noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1 ?
-		messages[ edits.status ] :
-		__( 'Updating failed.' );
+	let noticeMessage =
+		! isPublished && publishStatus.indexOf( edits.status ) !== -1
+			? messages[ edits.status ]
+			: __( 'Updating failed.' );
 
 	// Check if message string contains HTML. Notice text is currently only
 	// supported as plaintext, and stripping the tags may muddle the meaning.
-	if ( error.message && ! ( /<\/?[^>]*>/.test( error.message ) ) ) {
-		noticeMessage = sprintf( __( '%1$s Error message: %2$s' ), noticeMessage, error.message );
+	if ( error.message && ! /<\/?[^>]*>/.test( error.message ) ) {
+		noticeMessage = [ noticeMessage, error.message ].join( ' ' );
 	}
-	return [ noticeMessage, {
-		id: SAVE_POST_NOTICE_ID,
-	} ];
+	return [
+		noticeMessage,
+		{
+			id: SAVE_POST_NOTICE_ID,
+		},
+	];
 }
 
 /**
@@ -124,9 +132,9 @@ export function getNotificationArgumentsForSaveFail( data ) {
  */
 export function getNotificationArgumentsForTrashFail( data ) {
 	return [
-		data.error.message && data.error.code !== 'unknown_error' ?
-			data.error.message :
-			__( 'Trashing failed' ),
+		data.error.message && data.error.code !== 'unknown_error'
+			? data.error.message
+			: __( 'Trashing failed' ),
 		{
 			id: TRASH_POST_NOTICE_ID,
 		},

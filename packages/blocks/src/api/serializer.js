@@ -1,14 +1,15 @@
 /**
- * External dependencies
- */
-import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { Component, cloneElement, renderToString } from '@wordpress/element';
+import {
+	Component,
+	cloneElement,
+	renderToString,
+	RawHTML,
+} from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import { removep } from '@wordpress/autop';
 
 /**
  * Internal dependencies
@@ -18,8 +19,16 @@ import {
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
 } from './registration';
-import { normalizeBlockType } from './utils';
-import BlockContentProvider from '../block-content-provider';
+import { serializeRawBlock } from './parser/serialize-raw-block';
+import { isUnmodifiedDefaultBlock, normalizeBlockType } from './utils';
+
+/** @typedef {import('./parser').WPBlock} WPBlock */
+
+/**
+ * @typedef {Object} WPBlockSerializationOptions Serialization Options.
+ *
+ * @property {boolean} isInnerBlocks Whether we are serializing inner blocks.
+ */
 
 /**
  * Returns the block's default classname from its name.
@@ -30,10 +39,15 @@ import BlockContentProvider from '../block-content-provider';
  */
 export function getBlockDefaultClassName( blockName ) {
 	// Generated HTML classes for blocks follow the `wp-block-{name}` nomenclature.
-	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
-	const className = 'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (historically used in 'core-embed/').
+	const className =
+		'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
 
-	return applyFilters( 'blocks.getBlockDefaultClassName', className, blockName );
+	return applyFilters(
+		'blocks.getBlockDefaultClassName',
+		className,
+		blockName
+	);
 }
 
 /**
@@ -45,23 +59,66 @@ export function getBlockDefaultClassName( blockName ) {
  */
 export function getBlockMenuDefaultClassName( blockName ) {
 	// Generated HTML classes for blocks follow the `editor-block-list-item-{name}` nomenclature.
-	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
-	const className = 'editor-block-list-item-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (historically used in 'core-embed/').
+	const className =
+		'editor-block-list-item-' +
+		blockName.replace( /\//, '-' ).replace( /^core-/, '' );
 
-	return applyFilters( 'blocks.getBlockMenuDefaultClassName', className, blockName );
+	return applyFilters(
+		'blocks.getBlockMenuDefaultClassName',
+		className,
+		blockName
+	);
+}
+
+const blockPropsProvider = {};
+const innerBlocksPropsProvider = {};
+
+/**
+ * Call within a save function to get the props for the block wrapper.
+ *
+ * @param {Object} props Optional. Props to pass to the element.
+ */
+export function getBlockProps( props = {} ) {
+	const { blockType, attributes } = blockPropsProvider;
+	return applyFilters(
+		'blocks.getSaveContent.extraProps',
+		{ ...props },
+		blockType,
+		attributes
+	);
+}
+
+/**
+ * Call within a save function to get the props for the inner blocks wrapper.
+ *
+ * @param {Object} props Optional. Props to pass to the element.
+ */
+export function getInnerBlocksProps( props = {} ) {
+	const { innerBlocks } = innerBlocksPropsProvider;
+	// Value is an array of blocks, so defer to block serializer.
+	const html = serialize( innerBlocks, { isInnerBlocks: true } );
+	// Use special-cased raw HTML tag to avoid default escaping.
+	const children = <RawHTML>{ html }</RawHTML>;
+
+	return { ...props, children };
 }
 
 /**
  * Given a block type containing a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
  *
- * @param {string|Object} blockTypeOrName   Block type or name.
- * @param {Object}        attributes        Block attributes.
- * @param {?Array}        innerBlocks       Nested blocks.
+ * @param {string|Object} blockTypeOrName Block type or name.
+ * @param {Object}        attributes      Block attributes.
+ * @param {?Array}        innerBlocks     Nested blocks.
  *
  * @return {Object|string} Save element or raw HTML string.
  */
-export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) {
+export function getSaveElement(
+	blockTypeOrName,
+	attributes,
+	innerBlocks = []
+) {
 	const blockType = normalizeBlockType( blockTypeOrName );
 	let { save } = blockType;
 
@@ -73,15 +130,24 @@ export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) 
 		save = instance.render.bind( instance );
 	}
 
+	blockPropsProvider.blockType = blockType;
+	blockPropsProvider.attributes = attributes;
+	innerBlocksPropsProvider.innerBlocks = innerBlocks;
+
 	let element = save( { attributes, innerBlocks } );
 
-	if ( isObject( element ) && hasFilter( 'blocks.getSaveContent.extraProps' ) ) {
+	if (
+		element !== null &&
+		typeof element === 'object' &&
+		hasFilter( 'blocks.getSaveContent.extraProps' ) &&
+		! ( blockType.apiVersion > 1 )
+	) {
 		/**
 		 * Filters the props applied to the block save result element.
 		 *
-		 * @param {Object}      props      Props applied to save element.
-		 * @param {WPBlockType} blockType  Block type definition.
-		 * @param {Object}      attributes Block attributes.
+		 * @param {Object}  props      Props applied to save element.
+		 * @param {WPBlock} blockType  Block type definition.
+		 * @param {Object}  attributes Block attributes.
 		 */
 		const props = applyFilters(
 			'blocks.getSaveContent.extraProps',
@@ -98,16 +164,15 @@ export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) 
 	/**
 	 * Filters the save result of a block during serialization.
 	 *
-	 * @param {WPElement}   element    Block save result.
-	 * @param {WPBlockType} blockType  Block type definition.
-	 * @param {Object}      attributes Block attributes.
+	 * @param {WPElement} element    Block save result.
+	 * @param {WPBlock}   blockType  Block type definition.
+	 * @param {Object}    attributes Block attributes.
 	 */
-	element = applyFilters( 'blocks.getSaveElement', element, blockType, attributes );
-
-	return (
-		<BlockContentProvider innerBlocks={ innerBlocks }>
-			{ element }
-		</BlockContentProvider>
+	return applyFilters(
+		'blocks.getSaveElement',
+		element,
+		blockType,
+		attributes
 	);
 }
 
@@ -124,7 +189,9 @@ export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) 
 export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
 
-	return renderToString( getSaveElement( blockType, attributes, innerBlocks ) );
+	return renderToString(
+		getSaveElement( blockType, attributes, innerBlocks )
+	);
 }
 
 /**
@@ -138,35 +205,40 @@ export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
  * This function returns only those attributes which are needed to persist and
  * which cannot be matched from the block content.
  *
- * @param {Object<string,*>} blockType     Block type.
+ * @param {Object<string,*>} blockType  Block type.
  * @param {Object<string,*>} attributes Attributes from in-memory block data.
  *
  * @return {Object<string,*>} Subset of attributes for comment serialization.
  */
 export function getCommentAttributes( blockType, attributes ) {
-	return reduce( blockType.attributes, ( result, attributeSchema, key ) => {
-		const value = attributes[ key ];
+	return Object.entries( blockType.attributes ?? {} ).reduce(
+		( accumulator, [ key, attributeSchema ] ) => {
+			const value = attributes[ key ];
+			// Ignore undefined values.
+			if ( undefined === value ) {
+				return accumulator;
+			}
 
-		// Ignore undefined values.
-		if ( undefined === value ) {
-			return result;
-		}
+			// Ignore all attributes but the ones with an "undefined" source
+			// "undefined" source refers to attributes saved in the block comment.
+			if ( attributeSchema.source !== undefined ) {
+				return accumulator;
+			}
 
-		// Ignore all attributes but the ones with an "undefined" source
-		// "undefined" source refers to attributes saved in the block comment.
-		if ( attributeSchema.source !== undefined ) {
-			return result;
-		}
+			// Ignore default value.
+			if (
+				'default' in attributeSchema &&
+				attributeSchema.default === value
+			) {
+				return accumulator;
+			}
 
-		// Ignore default value.
-		if ( 'default' in attributeSchema && attributeSchema.default === value ) {
-			return result;
-		}
-
-		// Otherwise, include in comment set.
-		result[ key ] = value;
-		return result;
-	}, {} );
+			// Otherwise, include in comment set.
+			accumulator[ key ] = value;
+			return accumulator;
+		},
+		{}
+	);
 }
 
 /**
@@ -178,20 +250,22 @@ export function getCommentAttributes( blockType, attributes ) {
  * @return {string} Serialized attributes.
  */
 export function serializeAttributes( attributes ) {
-	return JSON.stringify( attributes )
-		// Don't break HTML comments.
-		.replace( /--/g, '\\u002d\\u002d' )
+	return (
+		JSON.stringify( attributes )
+			// Don't break HTML comments.
+			.replace( /--/g, '\\u002d\\u002d' )
 
-		// Don't break non-standard-compliant tools.
-		.replace( /</g, '\\u003c' )
-		.replace( />/g, '\\u003e' )
-		.replace( /&/g, '\\u0026' )
+			// Don't break non-standard-compliant tools.
+			.replace( /</g, '\\u003c' )
+			.replace( />/g, '\\u003e' )
+			.replace( /&/g, '\\u0026' )
 
-		// Bypass server stripslashes behavior which would unescape stringify's
-		// escaping of quotation mark.
-		//
-		// See: https://developer.wordpress.org/reference/functions/wp_kses_stripslashes/
-		.replace( /\\"/g, '\\u0022' );
+			// Bypass server stripslashes behavior which would unescape stringify's
+			// escaping of quotation mark.
+			//
+			// See: https://developer.wordpress.org/reference/functions/wp_kses_stripslashes/
+			.replace( /\\"/g, '\\u0022' )
+	);
 }
 
 /**
@@ -201,9 +275,7 @@ export function serializeAttributes( attributes ) {
  *
  * @return {string} HTML.
  */
-export function getBlockContent( block ) {
-	// @todo why not getBlockInnerHtml?
-
+export function getBlockInnerHTML( block ) {
 	// If block was parsed as invalid or encounters an error while generating
 	// save content, use original content instead to avoid content loss. If a
 	// block contains nested content, exempt it from this condition because we
@@ -212,7 +284,11 @@ export function getBlockContent( block ) {
 	let saveContent = block.originalContent;
 	if ( block.isValid || block.innerBlocks.length ) {
 		try {
-			saveContent = getSaveContent( block.name, block.attributes, block.innerBlocks );
+			saveContent = getSaveContent(
+				block.name,
+				block.attributes,
+				block.innerBlocks
+			);
 		} catch ( error ) {}
 	}
 
@@ -228,15 +304,20 @@ export function getBlockContent( block ) {
  *
  * @return {string} Comment-delimited block content.
  */
-export function getCommentDelimitedContent( rawBlockName, attributes, content ) {
-	const serializedAttributes = ! isEmpty( attributes ) ?
-		serializeAttributes( attributes ) + ' ' :
-		'';
+export function getCommentDelimitedContent(
+	rawBlockName,
+	attributes,
+	content
+) {
+	const serializedAttributes =
+		attributes && Object.entries( attributes ).length
+			? serializeAttributes( attributes ) + ' '
+			: '';
 
 	// Strip core blocks of their namespace prefix.
-	const blockName = startsWith( rawBlockName, 'core/' ) ?
-		rawBlockName.slice( 5 ) :
-		rawBlockName;
+	const blockName = rawBlockName?.startsWith( 'core/' )
+		? rawBlockName.slice( 5 )
+		: rawBlockName;
 
 	// @todo make the `wp:` prefix potentially configurable.
 
@@ -255,34 +336,68 @@ export function getCommentDelimitedContent( rawBlockName, attributes, content ) 
  * Returns the content of a block, including comment delimiters, determining
  * serialized attributes and content form from the current state of the block.
  *
- * @param {Object} block Block instance.
+ * @param {WPBlock}                     block   Block instance.
+ * @param {WPBlockSerializationOptions} options Serialization options.
  *
  * @return {string} Serialized block.
  */
-export function serializeBlock( block ) {
-	const blockName = block.name;
-	const saveContent = getBlockContent( block );
-
-	switch ( blockName ) {
-		case getFreeformContentHandlerName():
-		case getUnregisteredTypeHandlerName():
-			return saveContent;
-
-		default: {
-			const blockType = getBlockType( blockName );
-			const saveAttributes = getCommentAttributes( blockType, block.attributes );
-			return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
-		}
+export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
+	if ( ! block.isValid && block.__unstableBlockSource ) {
+		return serializeRawBlock( block.__unstableBlockSource );
 	}
+
+	const blockName = block.name;
+	const saveContent = getBlockInnerHTML( block );
+
+	if (
+		blockName === getUnregisteredTypeHandlerName() ||
+		( ! isInnerBlocks && blockName === getFreeformContentHandlerName() )
+	) {
+		return saveContent;
+	}
+
+	const blockType = getBlockType( blockName );
+	if ( ! blockType ) {
+		return saveContent;
+	}
+
+	const saveAttributes = getCommentAttributes( blockType, block.attributes );
+	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
+}
+
+export function __unstableSerializeAndClean( blocks ) {
+	// A single unmodified default block is assumed to
+	// be equivalent to an empty post.
+	if ( blocks.length === 1 && isUnmodifiedDefaultBlock( blocks[ 0 ] ) ) {
+		blocks = [];
+	}
+
+	let content = serialize( blocks );
+
+	// For compatibility, treat a post consisting of a
+	// single freeform block as legacy content and apply
+	// pre-block-editor removep'd content formatting.
+	if (
+		blocks.length === 1 &&
+		blocks[ 0 ].name === getFreeformContentHandlerName()
+	) {
+		content = removep( content );
+	}
+
+	return content;
 }
 
 /**
  * Takes a block or set of blocks and returns the serialized post content.
  *
- * @param {Array} blocks Block(s) to serialize.
+ * @param {Array}                       blocks  Block(s) to serialize.
+ * @param {WPBlockSerializationOptions} options Serialization options.
  *
  * @return {string} The post content.
  */
-export default function serialize( blocks ) {
-	return castArray( blocks ).map( serializeBlock ).join( '\n\n' );
+export default function serialize( blocks, options ) {
+	const blocksArray = Array.isArray( blocks ) ? blocks : [ blocks ];
+	return blocksArray
+		.map( ( block ) => serializeBlock( block, options ) )
+		.join( '\n\n' );
 }

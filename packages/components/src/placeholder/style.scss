@@ -1,22 +1,34 @@
-.components-placeholder {
-	margin-bottom: $default-block-margin;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
+// This needs specificity to override individual block styles.
+.components-placeholder.components-placeholder {
+	box-sizing: border-box;
+	position: relative;
 	padding: 1em;
 	min-height: 200px;
 	width: 100%;
-	text-align: center;
+	text-align: left;
+	margin: 0;
+	color: $gray-900;
 
-	// Use opacity to work in various editor styles.
-	background: $dark-opacity-light-200;
+	// Some editor styles unset this.
+	-moz-font-smoothing: subpixel-antialiased;
+	-webkit-font-smoothing: subpixel-antialiased;
 
-	.is-dark-theme & {
-		background: $light-opacity-light-200;
+	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
+	@supports (position: sticky) {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: flex-start;
 	}
+
+	// Block UI appearance.
+	border-radius: $radius-block-ui;
+	background-color: $white;
+	box-shadow: inset 0 0 0 $border-width $gray-900;
+	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 }
 
+.components-placeholder__error,
 .components-placeholder__instructions,
 .components-placeholder__label,
 .components-placeholder__fieldset {
@@ -26,15 +38,25 @@
 
 .components-placeholder__label {
 	display: flex;
-	align-items: center;
-	justify-content: center;
 	font-weight: 600;
-	margin-bottom: 1em;
+	margin-bottom: $grid-unit-20;
+	align-items: center;
 
+	> svg,
 	.dashicon,
 	.block-editor-block-icon {
-		fill: currentColor;
 		margin-right: 1ch;
+		fill: currentColor;
+		// Optimizate for high contrast modes.
+		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
+		@media (forced-colors: active) {
+			fill: CanvasText;
+		}
+	}
+
+	// Don't take up space if the label is empty.
+	&:empty {
+		display: none;
 	}
 }
 
@@ -42,15 +64,24 @@
 .components-placeholder__fieldset form {
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
 	width: 100%;
-	max-width: 400px;
 	flex-wrap: wrap;
-	z-index: z-index(".components-placeholder__fieldset");
 
 	p {
 		font-family: $default-font;
 		font-size: $default-font-size;
+	}
+}
+
+// Overrides for browser and editor fieldset styles.
+.components-placeholder__fieldset.components-placeholder__fieldset {
+	border: none;
+	padding: 0;
+
+	.components-placeholder__instructions {
+		padding: 0;
+		font-weight: normal;
+		font-size: 1em;
 	}
 }
 
@@ -59,8 +90,9 @@
 	flex-direction: column;
 }
 
-.components-placeholder__input {
-	margin-right: 8px;
+.components-placeholder__input[type="url"] {
+	@include input-control;
+	margin: 0 8px 0 0;
 	flex: 1 1 auto;
 }
 
@@ -68,7 +100,139 @@
 	margin-bottom: 1em;
 }
 
-.components-placeholder__preview img {
-	margin: 3%;
-	width: 50%;
+.components-placeholder__error {
+	margin-top: 1em;
+	width: 100%;
+}
+
+.components-placeholder__fieldset .components-button {
+	margin-right: $grid-unit-15;
+	margin-bottom: $grid-unit-15; // If buttons wrap we need vertical space between.
+
+	&:last-child {
+		margin-bottom: 0;
+		margin-right: 0;
+	}
+}
+
+// Any `<Button />` component with `variant="link"` prop will need extra spacing if placed
+// immediately after a button which is *not* an `variant="link"` style button. This is because
+// `variant="link"` has no padding so we need to account for this to avoid the buttons butting
+// up against each other. If it's the last item we don't need a right margin.
+.components-placeholder__fieldset .components-button:not(.is-link) ~ .components-button.is-link {
+	margin-left: 10px; // equal to standard button inner padding
+	margin-right: 10px; // equal to standard button inner padding
+
+	&:last-child {
+		margin-right: 0;
+	}
+}
+
+// Element queries to show different layouts at various sizes.
+.components-placeholder {
+	// Medium and large sizes.
+	&.is-large {
+		.components-placeholder__label {
+			font-size: 18pt;
+			font-weight: normal;
+		}
+	}
+
+	// Medium and small sizes.
+	&.is-medium,
+	&.is-small {
+		.components-placeholder__instructions {
+			display: none;
+		}
+
+		.components-placeholder__fieldset,
+		.components-placeholder__fieldset form {
+			flex-direction: column;
+		}
+
+		.components-placeholder__fieldset .components-button {
+			margin-right: auto;
+		}
+	}
+
+	// Small sizes.
+	&.is-small {
+		.components-button {
+			padding: 0 $grid-unit-10 2px;
+		}
+	}
+}
+
+
+/**
+ * Dashed style placeholders
+ */
+
+// @todo
+// These styles are only applied after the has-illustration gets added.
+// This is mainly an issue in terms of Site Logo which has a brief flash of the square placeholder.
+.components-placeholder.has-illustration {
+	color: inherit;
+	display: flex;
+	box-shadow: none;
+	min-width: 100px;
+
+	// Blur the background so layered dashed placeholders are still visually separate.
+	// We also provide a semitransparent background so as to allow duotones to sheen through.
+	backdrop-filter: blur(100px);
+	background-color: rgba($white, 0.1);
+
+	// Invert the colors in themes deemed dark.
+	.is-dark-theme & {
+		background-color: rgba($black, 0.1);
+	}
+
+	.components-placeholder__fieldset {
+		width: auto;
+
+		// Unset intrinsic margins.
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	// Show placeholder buttons on block selection.
+	// Note that these can't be display: none; or visibility: hidden;, as that breaks the writing flow.
+	.components-placeholder__label,
+	.components-placeholder__instructions,
+	.components-button {
+		opacity: 0;
+		transition: opacity 0.1s linear;
+		@include reduce-motion("transition");
+	}
+
+	.is-selected > & {
+		.components-placeholder__label,
+		.components-placeholder__instructions,
+		.components-button {
+			opacity: 1;
+		}
+	}
+
+	// By painting the borders here, we enable them to be replaced by the Border control.
+	@include placeholder-style();
+	overflow: hidden;
+}
+
+// Position the spinner.
+// @todo these rules should ideally live with the spinner component itself.
+.components-placeholder__preview {
+	display: flex;
+	justify-content: center;
+}
+
+.components-placeholder__illustration {
+	box-sizing: content-box;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 100%;
+	height: 100%;
+	stroke: currentColor;
+	opacity: 0.25;
 }

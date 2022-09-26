@@ -1,139 +1,31 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useDispatch } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import withRegistryProvider from './with-registry-provider';
+import useBlockSync from './use-block-sync';
+import { store as blockEditorStore } from '../../store';
+import { BlockRefsProvider } from './block-refs-provider';
 
-class BlockEditorProvider extends Component {
-	componentDidMount() {
-		this.props.updateSettings( this.props.settings );
-		this.props.resetBlocks( this.props.value );
-		this.attachChangeObserver( this.props.registry );
-	}
+/** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
-	componentDidUpdate( prevProps ) {
-		const {
-			settings,
-			updateSettings,
-			value,
-			resetBlocks,
-			registry,
-		} = this.props;
+function BlockEditorProvider( props ) {
+	const { children, settings } = props;
 
-		if ( settings !== prevProps.settings ) {
-			updateSettings( settings );
-		}
+	const { updateSettings } = useDispatch( blockEditorStore );
+	useEffect( () => {
+		updateSettings( settings );
+	}, [ settings ] );
 
-		if ( registry !== prevProps.registry ) {
-			this.attachChangeObserver( registry );
-		}
+	// Syncs the entity provider with changes in the block-editor store.
+	useBlockSync( props );
 
-		if ( this.isSyncingOutcomingValue ) {
-			this.isSyncingOutcomingValue = false;
-		} else if ( value !== prevProps.value ) {
-			this.isSyncingIncomingValue = true;
-			resetBlocks( value );
-		}
-	}
-
-	componentWillUnmount() {
-		if ( this.unsubscribe ) {
-			this.unsubscribe();
-		}
-	}
-
-	/**
-	 * Given a registry object, overrides the default dispatch behavior for the
-	 * `core/block-editor` store to interpret a state change and decide whether
-	 * we should call `onChange` or `onInput` depending on whether the change
-	 * is persistent or not.
-	 *
-	 * This needs to be done synchronously after state changes (instead of using
-	 * `componentDidUpdate`) in order to avoid batching these changes.
-	 *
-	 * @param {WPDataRegistry} registry     Registry from which block editor
-	 *                                      dispatch is to be overriden.
-	 */
-	attachChangeObserver( registry ) {
-		if ( this.unsubscribe ) {
-			this.unsubscribe();
-		}
-
-		const {
-			getBlocks,
-			isLastBlockChangePersistent,
-			__unstableIsLastBlockChangeIgnored,
-		} = registry.select( 'core/block-editor' );
-
-		let blocks = getBlocks();
-		let isPersistent = isLastBlockChangePersistent();
-
-		this.unsubscribe = registry.subscribe( () => {
-			const {
-				onChange,
-				onInput,
-			} = this.props;
-			const newBlocks = getBlocks();
-			const newIsPersistent = isLastBlockChangePersistent();
-			if (
-				newBlocks !== blocks && (
-					this.isSyncingIncomingValue ||
-					__unstableIsLastBlockChangeIgnored()
-				)
-			) {
-				this.isSyncingIncomingValue = false;
-				blocks = newBlocks;
-				isPersistent = newIsPersistent;
-				return;
-			}
-
-			if (
-				newBlocks !== blocks ||
-				// This happens when a previous input is explicitely marked as persistent.
-				( newIsPersistent && ! isPersistent )
-			) {
-				// When knowing the blocks value is changing, assign instance
-				// value to skip reset in subsequent `componentDidUpdate`.
-				if ( newBlocks !== blocks ) {
-					this.isSyncingOutcomingValue = true;
-				}
-
-				blocks = newBlocks;
-				isPersistent = newIsPersistent;
-
-				if ( isPersistent ) {
-					onChange( blocks );
-				} else {
-					onInput( blocks );
-				}
-			}
-		} );
-	}
-
-	render() {
-		const { children } = this.props;
-
-		return children;
-	}
+	return <BlockRefsProvider>{ children }</BlockRefsProvider>;
 }
 
-export default compose( [
-	withRegistryProvider,
-	withDispatch( ( dispatch ) => {
-		const {
-			updateSettings,
-			resetBlocks,
-		} = dispatch( 'core/block-editor' );
-
-		return {
-			updateSettings,
-			resetBlocks,
-		};
-	} ),
-] )( BlockEditorProvider );
+export default withRegistryProvider( BlockEditorProvider );

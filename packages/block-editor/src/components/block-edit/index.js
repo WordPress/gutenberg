@@ -1,46 +1,39 @@
 /**
- * External dependencies
- */
-import memize from 'memize';
-
-/**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Edit from './edit';
-import { BlockEditContextProvider } from './context';
+import { BlockEditContextProvider, useBlockEditContext } from './context';
 
-class BlockEdit extends Component {
-	constructor() {
-		super( ...arguments );
+/**
+ * The `useBlockEditContext` hook provides information about the block this hook is being used in.
+ * It returns an object with the `name`, `isSelected` state, and the `clientId` of the block.
+ * It is useful if you want to create custom hooks that need access to the current blocks clientId
+ * but don't want to rely on the data getting passed in as a parameter.
+ *
+ * @return {Object} Block edit context
+ */
+export { useBlockEditContext };
 
-		// It is important to return the same object if props haven't changed
-		// to avoid  unnecessary rerenders.
-		// See https://reactjs.org/docs/context.html#caveats.
-		this.propsToContext = memize(
-			this.propsToContext.bind( this ),
-			{ maxSize: 1 }
-		);
-	}
-
-	propsToContext( name, isSelected, clientId, onFocus, onCaretVerticalPositionChange ) {
-		return { name, isSelected, clientId, onFocus, onCaretVerticalPositionChange };
-	}
-
-	render() {
-		const { name, isSelected, clientId, onFocus, onCaretVerticalPositionChange } = this.props;
-		const value = this.propsToContext( name, isSelected, clientId, onFocus, onCaretVerticalPositionChange );
-
-		return (
-			<BlockEditContextProvider value={ value }>
-				<Edit { ...this.props } />
-			</BlockEditContextProvider>
-		);
-	}
+export default function BlockEdit( props ) {
+	const { name, isSelected, clientId } = props;
+	const context = {
+		name,
+		isSelected,
+		clientId,
+	};
+	return (
+		<BlockEditContextProvider
+			// It is important to return the same object if props haven't
+			// changed to avoid  unnecessary rerenders.
+			// See https://reactjs.org/docs/context.html#caveats.
+			value={ useMemo( () => context, Object.values( context ) ) }
+		>
+			<Edit { ...props } />
+		</BlockEditContextProvider>
+	);
 }
-
-export default BlockEdit;

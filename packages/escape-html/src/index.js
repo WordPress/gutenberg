@@ -20,7 +20,7 @@ const REGEXP_INVALID_ATTRIBUTE_NAME = /[\u007F-\u009F "'>/="\uFDD0-\uFDEF]/;
  * Returns a string with ampersands escaped. Note that this is an imperfect
  * implementation, where only ampersands which do not appear as a pattern of
  * named, decimal, or hexadecimal character references are escaped. Invalid
- * named references (i.e. ambiguous ampersand) are are still permitted.
+ * named references (i.e. ambiguous ampersand) are still permitted.
  *
  * @see https://w3c.github.io/html/syntax.html#character-references
  * @see https://w3c.github.io/html/syntax.html#ambiguous-ampersand
@@ -77,7 +77,9 @@ export function escapeLessThan( value ) {
  * @return {string} Escaped attribute value.
  */
 export function escapeAttribute( value ) {
-	return __unstableEscapeGreaterThan( escapeQuotationMark( escapeAmpersand( value ) ) );
+	return __unstableEscapeGreaterThan(
+		escapeQuotationMark( escapeAmpersand( value ) )
+	);
 }
 
 /**
@@ -94,6 +96,19 @@ export function escapeAttribute( value ) {
  */
 export function escapeHTML( value ) {
 	return escapeLessThan( escapeAmpersand( value ) );
+}
+
+/**
+ * Returns an escaped Editable HTML element value. This is different from
+ * `escapeHTML`, because for editable HTML, ALL ampersands must be escaped in
+ * order to render the content correctly on the page.
+ *
+ * @param {string} value Element value.
+ *
+ * @return {string} Escaped HTML element value.
+ */
+export function escapeEditableHTML( value ) {
+	return escapeLessThan( value.replace( /&/g, '&amp;' ) );
 }
 
 /**

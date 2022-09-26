@@ -1,14 +1,11 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { getFormatTypes } from '../get-format-types';
 import { unregisterFormatType } from '../unregister-format-type';
 import { registerFormatType } from '../register-format-type';
+
+const noop = () => {};
 
 describe( 'getFormatTypes', () => {
 	beforeAll( () => {
@@ -42,7 +39,10 @@ describe( 'getFormatTypes', () => {
 			formatTestSetting: 'settingTestValue',
 		};
 		registerFormatType( 'core/test-format', testFormat );
-		registerFormatType( 'core/test-format-with-settings', testFormatWithSettings );
+		registerFormatType(
+			'core/test-format-with-settings',
+			testFormatWithSettings
+		);
 		expect( getFormatTypes() ).toEqual( [
 			{
 				name: 'core/test-format',

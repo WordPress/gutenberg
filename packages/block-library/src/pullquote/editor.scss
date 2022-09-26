@@ -1,24 +1,6 @@
-.block-editor-block-list__block[data-type="core/pullquote"] {
-	&[data-align="left"],
-	&[data-align="right"] {
-		& .block-editor-rich-text p {
-			font-size: 20px;
-		}
-	}
-}
-
-.wp-block-pullquote {
-	& blockquote > .block-editor-rich-text p {
-		font-size: 28px;
-		line-height: 1.6;
-	}
-}
-
+// .is-style-solid-color is deprecated.
 .wp-block-pullquote.is-style-solid-color {
-	margin-left: 0;
-	margin-right: 0;
-
-	& blockquote > .block-editor-rich-text p {
+	& blockquote p {
 		font-size: 32px;
 	}
 

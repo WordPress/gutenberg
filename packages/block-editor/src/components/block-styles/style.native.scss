@@ -1,0 +1,64 @@
+$image-height: 64px;
+
+.image {
+	height: $image-height;
+}
+
+.container {
+	padding-top: $grid-unit;
+	padding-right: $grid-unit;
+}
+
+.imageWrapper {
+	height: $image-height;
+	margin-bottom: $grid-unit * 0.5;
+}
+
+.rounded {
+	border-radius: $image-height * 0.5;
+	overflow: hidden;
+}
+
+.label {
+	color: $gray-dark;
+	text-align: center;
+}
+
+.labelDark {
+	color: $white;
+}
+
+.labelSelected {
+	color: $blue-wordpress;
+}
+
+.outline {
+	border-color: $blue-wordpress;
+	border-width: $border-width;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 2;
+}
+
+.innerOutline {
+	border-color: $white;
+	border-width: $border-width * 2;
+	position: absolute;
+	top: $border-width;
+	left: $border-width;
+	right: $border-width;
+	bottom: $border-width;
+	z-index: 2;
+}
+
+.innerOutlineDark {
+	border-color: $background-dark-elevated;
+}
+
+.content {
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
+}

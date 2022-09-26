@@ -1,41 +1,18 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
-import { noop } from 'lodash';
+import { render } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
-import { PanelColorSettings } from '../';
+import PanelColorSettings from '../';
+
+const noop = () => {};
 
 describe( 'PanelColorSettings', () => {
-	it( 'matches the snapshot', () => {
-		const wrapper = shallow(
-			<PanelColorSettings
-				title="Test Title"
-				colors={ [] }
-				colorSettings={ [
-					{
-						value: '#000',
-						onChange: noop,
-						label: 'border color',
-					},
-					{
-						value: '#111',
-						onChange: noop,
-						label: 'background color',
-					},
-				] }
-			/>
-		);
-
-		expect( wrapper ).toMatchSnapshot();
-		expect( wrapper.dive() ).toMatchSnapshot();
-	} );
-
-	it( 'should not render anything if there are no colors to choose', () => {
-		const wrapper = shallow(
+	it( 'should not render anything if there are no colors to choose', async () => {
+		const { container } = render(
 			<PanelColorSettings
 				title="Test Title"
 				colors={ [] }
@@ -54,12 +31,11 @@ describe( 'PanelColorSettings', () => {
 				] }
 			/>
 		);
-
-		expect( wrapper.type() ).toBeNull();
+		expect( container.innerHTML ).toBe( '' );
 	} );
 
-	it( 'should render a color panel if at least one setting supports custom colors', () => {
-		const wrapper = shallow(
+	it( 'should render a color panel if at least one setting supports custom colors', async () => {
+		const { container } = render(
 			<PanelColorSettings
 				title="Test Title"
 				colors={ [] }
@@ -79,13 +55,11 @@ describe( 'PanelColorSettings', () => {
 				] }
 			/>
 		);
-		expect( wrapper.type() ).not.toBeNull();
-		expect( wrapper ).toMatchSnapshot();
-		expect( wrapper.dive() ).toMatchSnapshot();
+		expect( container.innerHTML ).not.toBe( '' );
 	} );
 
-	it( 'should render a color panel if at least one setting specifies some colors to choose', () => {
-		const wrapper = shallow(
+	it( 'should render a color panel if at least one setting specifies some colors to choose', async () => {
+		const { container } = render(
 			<PanelColorSettings
 				title="Test Title"
 				colors={ [] }
@@ -95,11 +69,13 @@ describe( 'PanelColorSettings', () => {
 						value: '#000',
 						onChange: noop,
 						label: 'border color',
-						colors: [ {
-							slug: 'red',
-							name: 'Red',
-							color: '#ff0000',
-						} ],
+						colors: [
+							{
+								slug: 'red',
+								name: 'Red',
+								color: '#ff0000',
+							},
+						],
 					},
 					{
 						value: '#111',
@@ -109,15 +85,14 @@ describe( 'PanelColorSettings', () => {
 				] }
 			/>
 		);
-		expect( wrapper.type() ).not.toBeNull();
-		expect( wrapper ).toMatchSnapshot();
-		expect( wrapper.dive() ).toMatchSnapshot();
+		expect( container.innerHTML ).not.toBe( '' );
 	} );
 
-	it( 'should not render anything if none of the setting panels has colors to choose', () => {
-		const wrapper = shallow(
+	it( 'should not render anything if none of the setting panels has colors to choose', async () => {
+		const { container } = render(
 			<PanelColorSettings
 				title="Test Title"
+				colors={ [] }
 				disableCustomColors={ false }
 				colorSettings={ [
 					{
@@ -137,6 +112,6 @@ describe( 'PanelColorSettings', () => {
 				] }
 			/>
 		);
-		expect( wrapper.type() ).toBeNull();
+		expect( container.innerHTML ).not.toBe( '' );
 	} );
 } );

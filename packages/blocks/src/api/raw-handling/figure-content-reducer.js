@@ -1,12 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { has } from 'lodash';
-
-/**
- * Internal dependencies
- */
-import { isPhrasingContent } from './phrasing-content';
+import { isTextContent } from '@wordpress/dom';
 
 /**
  * Whether or not the given node is figure content.
@@ -21,11 +16,11 @@ function isFigureContent( node, schema ) {
 
 	// We are looking for tags that can be a child of the figure tag, excluding
 	// `figcaption` and any phrasing content.
-	if ( tag === 'figcaption' || isPhrasingContent( node ) ) {
+	if ( tag === 'figcaption' || isTextContent( node ) ) {
 		return false;
 	}
 
-	return has( schema, [ 'figure', 'children', tag ] );
+	return tag in ( schema?.figure?.children ?? {} );
 }
 
 /**
@@ -39,7 +34,19 @@ function isFigureContent( node, schema ) {
 function canHaveAnchor( node, schema ) {
 	const tag = node.nodeName.toLowerCase();
 
-	return has( schema, [ 'figure', 'children', 'a', 'children', tag ] );
+	return tag in ( schema?.figure?.children?.a?.children ?? {} );
+}
+
+/**
+ * Wraps the given element in a figure element.
+ *
+ * @param {Element} element       The element to wrap.
+ * @param {Element} beforeElement The element before which to place the figure.
+ */
+function wrapFigureContent( element, beforeElement = element ) {
+	const figure = element.ownerDocument.createElement( 'figure' );
+	beforeElement.parentNode.insertBefore( figure, beforeElement );
+	figure.appendChild( element );
 }
 
 /**
@@ -52,7 +59,7 @@ function canHaveAnchor( node, schema ) {
  *
  * @return {void}
  */
-export default function( node, doc, schema ) {
+export default function figureContentReducer( node, doc, schema ) {
 	if ( ! isFigureContent( node, schema ) ) {
 		return;
 	}
@@ -70,19 +77,25 @@ export default function( node, doc, schema ) {
 		nodeToInsert = node.parentNode;
 	}
 
-	let wrapper = nodeToInsert;
+	const wrapper = nodeToInsert.closest( 'p,div' );
 
-	while ( wrapper && wrapper.nodeName !== 'P' ) {
-		wrapper = wrapper.parentElement;
-	}
-
-	const figure = doc.createElement( 'figure' );
-
+	// If wrapped in a paragraph or div, only extract if it's aligned or if
+	// there is no text content.
+	// Otherwise, if directly at the root, wrap in a figure element.
 	if ( wrapper ) {
-		wrapper.parentNode.insertBefore( figure, wrapper );
-	} else {
-		nodeToInsert.parentNode.insertBefore( figure, nodeToInsert );
+		// In jsdom-jscore, 'node.classList' can be undefined.
+		// In this case, default to extract as it offers a better UI experience on mobile.
+		if ( ! node.classList ) {
+			wrapFigureContent( nodeToInsert, wrapper );
+		} else if (
+			node.classList.contains( 'alignright' ) ||
+			node.classList.contains( 'alignleft' ) ||
+			node.classList.contains( 'aligncenter' ) ||
+			! wrapper.textContent.trim()
+		) {
+			wrapFigureContent( nodeToInsert, wrapper );
+		}
+	} else if ( nodeToInsert.parentNode.nodeName === 'BODY' ) {
+		wrapFigureContent( nodeToInsert );
 	}
-
-	figure.appendChild( nodeToInsert );
 }

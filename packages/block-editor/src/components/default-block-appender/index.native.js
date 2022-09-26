@@ -11,11 +11,14 @@ import { RichText } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import BlockInsertionPoint from '../block-list/insertion-point';
 import styles from './style.scss';
+import { store as blockEditorStore } from '../../store';
 
 export function DefaultBlockAppender( {
 	isLocked,
@@ -23,22 +26,31 @@ export function DefaultBlockAppender( {
 	onAppend,
 	placeholder,
 	containerStyle,
+	showSeparator,
 } ) {
 	if ( isLocked || ! isVisible ) {
 		return null;
 	}
 
-	const value = decodeEntities( placeholder ) || __( 'Start writing…' );
+	const value =
+		typeof placeholder === 'string'
+			? decodeEntities( placeholder )
+			: __( 'Start writing…' );
 
 	return (
-		<TouchableWithoutFeedback
-			onPress={ onAppend }
-		>
-			<View style={ [ styles.blockHolder, containerStyle ] } pointerEvents="box-only">
-				<RichText
-					placeholder={ value }
-					onChange={ () => {} }
-				/>
+		<TouchableWithoutFeedback onPress={ onAppend }>
+			<View
+				style={ [
+					styles.blockHolder,
+					showSeparator && containerStyle,
+				] }
+				pointerEvents="box-only"
+			>
+				{ showSeparator ? (
+					<BlockInsertionPoint />
+				) : (
+					<RichText placeholder={ value } onChange={ () => {} } />
+				) }
 			</View>
 		</TouchableWithoutFeedback>
 	);
@@ -46,22 +58,23 @@ export function DefaultBlockAppender( {
 
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const { getBlockCount, getSettings, getTemplateLock } = select( 'core/block-editor' );
+		const { getBlockCount, getBlockName, isBlockValid, getTemplateLock } =
+			select( blockEditorStore );
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
-		const { bodyPlaceholder } = getSettings();
+		const isLastBlockDefault =
+			getBlockName( ownProps.lastBlockClientId ) ===
+			getDefaultBlockName();
+		const isLastBlockValid = isBlockValid( ownProps.lastBlockClientId );
 
 		return {
-			isVisible: isEmpty,
+			isVisible: isEmpty || ! isLastBlockDefault || ! isLastBlockValid,
 			isLocked: !! getTemplateLock( ownProps.rootClientId ),
-			placeholder: bodyPlaceholder,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const {
-			insertDefaultBlock,
-			startTyping,
-		} = dispatch( 'core/block-editor' );
+		const { insertDefaultBlock, startTyping } =
+			dispatch( blockEditorStore );
 
 		return {
 			onAppend() {
@@ -71,5 +84,5 @@ export default compose(
 				startTyping();
 			},
 		};
-	} ),
+	} )
 )( DefaultBlockAppender );

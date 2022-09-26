@@ -2,146 +2,100 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { includes } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
 import {
+	AlignmentControl,
+	BlockControls,
 	RichText,
-	ContrastChecker,
-	InspectorControls,
-	withColors,
-	PanelColorSettings,
+	useBlockProps,
 } from '@wordpress/block-editor';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { SOLID_COLOR_CLASS } from './shared';
+import { Figure } from './figure';
+import { BlockQuote } from './blockquote';
 
-class PullQuoteEdit extends Component {
-	constructor( props ) {
-		super( props );
+const isWebPlatform = Platform.OS === 'web';
 
-		this.wasTextColorAutomaticallyComputed = false;
-		this.pullQuoteMainColorSetter = this.pullQuoteMainColorSetter.bind( this );
-		this.pullQuoteTextColorSetter = this.pullQuoteTextColorSetter.bind( this );
-	}
+function PullQuoteEdit( {
+	attributes,
+	setAttributes,
+	isSelected,
+	insertBlocksAfter,
+} ) {
+	const { textAlign, citation, value } = attributes;
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
+	const shouldShowCitation = ! RichText.isEmpty( citation ) || isSelected;
 
-	pullQuoteMainColorSetter( colorValue ) {
-		const { colorUtils, textColor, setTextColor, setMainColor, className } = this.props;
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
-		const needTextColor = ! textColor.color || this.wasTextColorAutomaticallyComputed;
-		const shouldSetTextColor = isSolidColorStyle && needTextColor && colorValue;
-
-		setMainColor( colorValue );
-		if ( shouldSetTextColor ) {
-			this.wasTextColorAutomaticallyComputed = true;
-			setTextColor( colorUtils.getMostReadableColor( colorValue ) );
-		}
-	}
-
-	pullQuoteTextColorSetter( colorValue ) {
-		const { setTextColor } = this.props;
-		setTextColor( colorValue );
-		this.wasTextColorAutomaticallyComputed = false;
-	}
-
-	render() {
-		const {
-			attributes,
-			mainColor,
-			textColor,
-			setAttributes,
-			isSelected,
-			className,
-		} = this.props;
-
-		const { value, citation } = attributes;
-
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
-		const figureStyle = isSolidColorStyle ?
-			{ backgroundColor: mainColor.color } :
-			{ borderColor: mainColor.color };
-		const blockquoteStyle = {
-			color: textColor.color,
-		};
-		const blockquoteClasses = textColor.color ? classnames( 'has-text-color', {
-			[ textColor.class ]: textColor.class,
-		} ) : undefined;
-		return (
-			<>
-				<figure style={ figureStyle } className={ classnames(
-					className, {
-						[ mainColor.class ]: isSolidColorStyle && mainColor.class,
-					} ) }>
-					<blockquote style={ blockquoteStyle } className={ blockquoteClasses }>
+	return (
+		<>
+			<BlockControls group="block">
+				<AlignmentControl
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
+				/>
+			</BlockControls>
+			<Figure { ...blockProps }>
+				<BlockQuote>
+					<RichText
+						identifier="value"
+						tagName="p"
+						value={ value }
+						onChange={ ( nextValue ) =>
+							setAttributes( {
+								value: nextValue,
+							} )
+						}
+						aria-label={ __( 'Pullquote text' ) }
+						placeholder={
+							// translators: placeholder text used for the quote
+							__( 'Add quote' )
+						}
+						textAlign="center"
+					/>
+					{ shouldShowCitation && (
 						<RichText
-							multiline
-							value={ value }
-							onChange={
-								( nextValue ) => setAttributes( {
-									value: nextValue,
+							identifier="citation"
+							tagName={ isWebPlatform ? 'cite' : undefined }
+							style={ { display: 'block' } }
+							value={ citation }
+							aria-label={ __( 'Pullquote citation text' ) }
+							placeholder={
+								// translators: placeholder text used for the citation
+								__( 'Add citation' )
+							}
+							onChange={ ( nextCitation ) =>
+								setAttributes( {
+									citation: nextCitation,
 								} )
 							}
-							placeholder={
-								// translators: placeholder text used for the quote
-								__( 'Write quote…' )
+							className="wp-block-pullquote__citation"
+							__unstableMobileNoFocusOnMount
+							textAlign="center"
+							__unstableOnSplitAtEnd={ () =>
+								insertBlocksAfter(
+									createBlock( getDefaultBlockName() )
+								)
 							}
-							wrapperClassName="block-library-pullquote__content"
 						/>
-						{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
-							<RichText
-								value={ citation }
-								placeholder={
-									// translators: placeholder text used for the citation
-									__( 'Write citation…' )
-								}
-								onChange={
-									( nextCitation ) => setAttributes( {
-										citation: nextCitation,
-									} )
-								}
-								className="wp-block-pullquote__citation"
-							/>
-						) }
-					</blockquote>
-				</figure>
-				<InspectorControls>
-					<PanelColorSettings
-						title={ __( 'Color Settings' ) }
-						colorSettings={ [
-							{
-								value: mainColor.color,
-								onChange: this.pullQuoteMainColorSetter,
-								label: __( 'Main Color' ),
-							},
-							{
-								value: textColor.color,
-								onChange: this.pullQuoteTextColorSetter,
-								label: __( 'Text Color' ),
-							},
-						] }
-					>
-						{ isSolidColorStyle && (
-							<ContrastChecker
-								{ ...{
-									textColor: textColor.color,
-									backgroundColor: mainColor.color,
-								} }
-								isLargeText={ false }
-							/>
-						) }
-					</PanelColorSettings>
-				</InspectorControls>
-			</>
-		);
-	}
+					) }
+				</BlockQuote>
+			</Figure>
+		</>
+	);
 }
 
-export default withColors( { mainColor: 'background-color', textColor: 'color' } )(
-	PullQuoteEdit
-);
+export default PullQuoteEdit;

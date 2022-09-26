@@ -12,9 +12,11 @@ import babelPresetDefault from '../';
 
 describe( 'Babel preset default', () => {
 	test( 'transpilation works properly', () => {
-		const input = readFileSync( path.join( __dirname, '/fixtures/input.js' ) );
+		const filename = path.join( __dirname, '/fixtures/input.js' );
+		const input = readFileSync( filename );
 
 		const output = transform( input, {
+			filename,
 			configFile: false,
 			envName: 'production',
 			presets: [ babelPresetDefault ],

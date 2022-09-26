@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { forEach, without } from 'lodash';
+import { without } from 'lodash';
 
 /**
  * Class responsible for orchestrating event handling on the global window,
@@ -10,12 +10,13 @@ import { forEach, without } from 'lodash';
  */
 class Listener {
 	constructor() {
+		/** @type {any} */
 		this.listeners = {};
 
 		this.handleEvent = this.handleEvent.bind( this );
 	}
 
-	add( eventType, instance ) {
+	add( /** @type {any} */ eventType, /** @type {any} */ instance ) {
 		if ( ! this.listeners[ eventType ] ) {
 			// Adding first listener for this type, so bind event.
 			window.addEventListener( eventType, this.handleEvent );
@@ -25,8 +26,11 @@ class Listener {
 		this.listeners[ eventType ].push( instance );
 	}
 
-	remove( eventType, instance ) {
-		this.listeners[ eventType ] = without( this.listeners[ eventType ], instance );
+	remove( /** @type {any} */ eventType, /** @type {any} */ instance ) {
+		this.listeners[ eventType ] = without(
+			this.listeners[ eventType ],
+			instance
+		);
 
 		if ( ! this.listeners[ eventType ].length ) {
 			// Removing last listener for this type, so unbind event.
@@ -35,10 +39,12 @@ class Listener {
 		}
 	}
 
-	handleEvent( event ) {
-		forEach( this.listeners[ event.type ], ( instance ) => {
-			instance.handleEvent( event );
-		} );
+	handleEvent( /** @type {any} */ event ) {
+		this.listeners[ event.type ]?.forEach(
+			( /** @type {any} */ instance ) => {
+				instance.handleEvent( event );
+			}
+		);
 	}
 }
 

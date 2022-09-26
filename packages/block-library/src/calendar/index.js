@@ -1,24 +1,25 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { calendar as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
+import metadata from './block.json';
 import edit from './edit';
-import icon from './icon';
+import transforms from './transforms';
 
-export const name = 'core/calendar';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
-	title: __( 'Calendar' ),
-	description: __( 'A calendar of your site’s posts.' ),
 	icon,
-	category: 'widgets',
-	keywords: [ __( 'posts' ), __( 'archive' ) ],
-	supports: {
-		align: true,
-	},
+	example: {},
 	edit,
+	transforms,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

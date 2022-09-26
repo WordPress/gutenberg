@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/pattern",
+		"isValid": true,
+		"attributes": {
+			"slug": "core/text-two-columns"
+		},
+		"innerBlocks": []
+	}
+]

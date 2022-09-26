@@ -1,113 +1,77 @@
 .edit-post-visual-editor {
 	position: relative;
-	padding: 50px 0;
+	display: flex;
+	flex-flow: column;
 
+	// Gray preview overlay (desktop/tablet/mobile) is intentionally not set on an element with scrolling content like
+	// interface-interface-skeleton__content. This causes graphical glitches (flashes of the background color)
+	// when scrolling in Safari due to incorrect ordering of large compositing layers (GPU acceleration).
+	background-color: $gray-800;
+
+	// The button element easily inherits styles that are meant for the editor style.
+	// These rules enhance the specificity to reduce that inheritance.
+	// This is duplicated in edit-site.
 	& .components-button {
 		font-family: $default-font;
-	}
-}
+		font-size: $default-font-size;
+		padding: 6px 12px;
 
-.edit-post-visual-editor .block-editor-writing-flow__click-redirect {
-	// Collapse to minimum height of 50px, to fully occupy editor bottom pad.
-	height: 50px;
-	width: 100%;
-	// Offset for: Visual editor padding, block (default appender) margin.
-	margin: #{ -1 * $block-spacing } auto -50px;
-}
-
-// The base width of blocks
-.edit-post-visual-editor .block-editor-block-list__block {
-	margin-left: auto;
-	margin-right: auto;
-
-	@include break-small() {
-		// Compensate for side UI width.
-		.block-editor-block-list__block-edit {
-			margin-left: -$block-side-ui-width;
-			margin-right: -$block-side-ui-width;
-		}
-
-		// Center the block toolbar on wide and full-wide blocks.
-		// Use specific selector to not affect nested block toolbars.
-		&[data-align="wide"] > .block-editor-block-list__block-edit > .block-editor-block-contextual-toolbar,
-		&[data-align="full"] > .block-editor-block-list__block-edit > .block-editor-block-contextual-toolbar {
-			height: 0; // This collapses the container to an invisible element without margin.
-			width: calc(100% - 1px); // -1px to account for inner element left: 1px value causing overflow-x scrollbars
-			margin-left: 0;
-			margin-right: 0;
-			text-align: center;
-			// This float rule takes the toolbar out of the flow, without it having to be absolute positioned.
-			// This is necessary because otherwise the mere presence of the toolbar can push down content.
-			// Pairs with relative rule on line 49.
-			float: left;
-
-			.block-editor-block-toolbar {
-				max-width: $content-width;
-				width: 100%;
-
-				// Necessary for the toolbar to be centered.
-				// This unsets an absolute position that will otherwise left align the toolbar.
-				position: relative;
-			}
+		&.is-tertiary,
+		&.has-icon {
+			padding: 6px;
 		}
 	}
+
+	// The following flex rule is important for the canvas layout, please be careful when refactoring,
+	// as older browser interpret flex height behavior differently. Be sure to test on Safari 13.
+	// The syntax is `flex: [flex-grow] [flex-shrink] [flex-basis];`
+	// We set the canvas to be allowed to grow (vertically), but not shrink.
+	flex: 1 0 auto;
+
+	// Since the parent container is also a flex container, a `flex-basis: 100%;` is not needed,
+	// as align-items: stretch is inherited by default.Additionally due to older browser's flex height
+	// interpretation, any percentage value is likely going to cause issues, such as metaboxes overlapping.
+	// See also https://www.w3.org/TR/CSS22/visudet.html#the-height-property.
 }
 
-// The base width of the title should match that of blocks even if it isn't a block
-.editor-post-title {
-	@include break-small() {
-		padding-left: $block-container-side-padding;
-		padding-right: $block-container-side-padding;
-	}
-}
-.edit-post-visual-editor .editor-post-title__block {
-	margin-left: auto;
-	margin-right: auto;
-
-	// Apply default block margin below the post title.
-	// This ensures the first block on the page is in a good position.
-	// This rule can be retired once the title becomes an actual block.
-	margin-bottom: ($block-padding * 2) + $block-spacing; // This matches 2em in the vanilla style.
-
-	// Stack borders.
-	> div {
-		margin-left: 0;
-		margin-right: 0;
-	}
-
-	// Stretch to mimic outline padding on desktop.
-	@include break-small() {
-		> div {
-			margin-left: -$block-side-ui-clearance;
-			margin-right: -$block-side-ui-clearance;
-		}
-	}
-}
-
-.edit-post-visual-editor {
-	// If the first block is floated, it needs top margin, unlike the rule in line 69.
-	.block-editor-block-list__layout > .block-editor-block-list__block[data-align="left"]:first-child,
-	.block-editor-block-list__layout > .block-editor-block-list__block[data-align="right"]:first-child {
-		margin-top: $block-padding + $block-spacing + $border-width + $border-width + $block-padding;
-	}
-
-	.block-editor-default-block-appender {
-		// Default to centered and content-width, like blocks
+// Ideally this wrapper div is not needed but if we want to match the positioning of blocks
+// .block-editor-block-list__layout and block-editor-block-list__block
+// We need to have two DOM elements.
+.edit-post-visual-editor__post-title-wrapper {
+	.editor-post-title {
+		// Center.
 		margin-left: auto;
 		margin-right: auto;
-		position: relative;
-
-		&[data-root-client-id=""] .block-editor-default-block-appender__content:hover {
-			// Outline on root-level default block appender is redundant with the
-			// WritingFlow click redirector.
-			outline: 1px solid transparent;
-		}
 	}
 
-	// Ensure that the height of the first appender, and the one between blocks, is the same as text.
-	.block-editor-block-list__block[data-type="core/paragraph"] p[data-is-placeholder-visible="true"] + p,
-	.block-editor-default-block-appender__content {
-		min-height: $empty-paragraph-height / 2;
-		line-height: $editor-line-height;
+	// Add extra margin at the top, to push down the Title area in the post editor.
+	margin-top: 4rem;
+	margin-bottom: var(--wp--style--block-gap);
+}
+
+.edit-post-visual-editor__exit-template-mode {
+	position: absolute;
+	top: $grid-unit-10;
+	left: $grid-unit-10;
+	color: $white;
+
+	&:active:not([aria-disabled="true"]),
+	&:focus:not([aria-disabled="true"]),
+	&:hover {
+		color: $gray-100;
 	}
+}
+
+.edit-post-visual-editor__content-area {
+	width: 100%;
+	height: 100%;
+	position: relative;
+	box-sizing: border-box;
+	display: flex;
+
+	// This is necessary for older browsers due to their flex height interpretation.
+	// These browsers (including Safari 13) ignore the percentage value entirely.
+	// By setting flex-grow, the element stretches to fill the parent.
+	// See also https://www.w3.org/TR/CSS22/visudet.html#the-height-property
+	flex-grow: 1;
 }

@@ -1,12 +1,16 @@
 /**
+ * External dependencies
+ */
+import { every } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { createBlobURL } from '@wordpress/blob';
-import {
-	createBlock,
-	getBlockAttributes,
-	getPhrasingContentSchema,
-} from '@wordpress/blocks';
+import { createBlock, getBlockAttributes } from '@wordpress/blocks';
+import { dispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { __ } from '@wordpress/i18n';
 
 export function stripFirstImage( attributes, { shortcode } ) {
 	const { body } = document.implementation.createHTMLDocument( '' );
@@ -15,8 +19,12 @@ export function stripFirstImage( attributes, { shortcode } ) {
 
 	let nodeToRemove = body.querySelector( 'img' );
 
-	// if an image has parents, find the topmost node to remove
-	while ( nodeToRemove && nodeToRemove.parentNode && nodeToRemove.parentNode !== body ) {
+	// If an image has parents, find the topmost node to remove.
+	while (
+		nodeToRemove &&
+		nodeToRemove.parentNode &&
+		nodeToRemove.parentNode !== body
+	) {
 		nodeToRemove = nodeToRemove.parentNode;
 	}
 
@@ -34,22 +42,25 @@ function getFirstAnchorAttributeFormHTML( html, attributeName ) {
 
 	const { firstElementChild } = body;
 
-	if (
-		firstElementChild &&
-		firstElementChild.nodeName === 'A'
-	) {
+	if ( firstElementChild && firstElementChild.nodeName === 'A' ) {
 		return firstElementChild.getAttribute( attributeName ) || undefined;
 	}
 }
 
 const imageSchema = {
 	img: {
-		attributes: [ 'src', 'alt' ],
-		classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone', /^wp-image-\d+$/ ],
+		attributes: [ 'src', 'alt', 'title' ],
+		classes: [
+			'alignleft',
+			'aligncenter',
+			'alignright',
+			'alignnone',
+			/^wp-image-\d+$/,
+		],
 	},
 };
 
-const schema = {
+const schema = ( { phrasingContentSchema } ) => ( {
 	figure: {
 		require: [ 'img' ],
 		children: {
@@ -59,48 +70,105 @@ const schema = {
 				children: imageSchema,
 			},
 			figcaption: {
-				children: getPhrasingContentSchema(),
+				children: phrasingContentSchema,
 			},
 		},
 	},
-};
+} );
 
 const transforms = {
 	from: [
 		{
 			type: 'raw',
-			isMatch: ( node ) => node.nodeName === 'FIGURE' && !! node.querySelector( 'img' ),
+			isMatch: ( node ) =>
+				node.nodeName === 'FIGURE' && !! node.querySelector( 'img' ),
 			schema,
 			transform: ( node ) => {
 				// Search both figure and image classes. Alignment could be
 				// set on either. ID is set on the image.
-				const className = node.className + ' ' + node.querySelector( 'img' ).className;
-				const alignMatches = /(?:^|\s)align(left|center|right)(?:$|\s)/.exec( className );
+				const className =
+					node.className +
+					' ' +
+					node.querySelector( 'img' ).className;
+				const alignMatches =
+					/(?:^|\s)align(left|center|right)(?:$|\s)/.exec(
+						className
+					);
+				const anchor = node.id === '' ? undefined : node.id;
 				const align = alignMatches ? alignMatches[ 1 ] : undefined;
-				const idMatches = /(?:^|\s)wp-image-(\d+)(?:$|\s)/.exec( className );
+				const idMatches = /(?:^|\s)wp-image-(\d+)(?:$|\s)/.exec(
+					className
+				);
 				const id = idMatches ? Number( idMatches[ 1 ] ) : undefined;
 				const anchorElement = node.querySelector( 'a' );
-				const linkDestination = anchorElement && anchorElement.href ? 'custom' : undefined;
-				const href = anchorElement && anchorElement.href ? anchorElement.href : undefined;
-				const rel = anchorElement && anchorElement.rel ? anchorElement.rel : undefined;
-				const linkClass = anchorElement && anchorElement.className ? anchorElement.className : undefined;
-				const attributes = getBlockAttributes( 'core/image', node.outerHTML, { align, id, linkDestination, href, rel, linkClass } );
+				const linkDestination =
+					anchorElement && anchorElement.href ? 'custom' : undefined;
+				const href =
+					anchorElement && anchorElement.href
+						? anchorElement.href
+						: undefined;
+				const rel =
+					anchorElement && anchorElement.rel
+						? anchorElement.rel
+						: undefined;
+				const linkClass =
+					anchorElement && anchorElement.className
+						? anchorElement.className
+						: undefined;
+				const attributes = getBlockAttributes(
+					'core/image',
+					node.outerHTML,
+					{
+						align,
+						id,
+						linkDestination,
+						href,
+						rel,
+						linkClass,
+						anchor,
+					}
+				);
 				return createBlock( 'core/image', attributes );
 			},
 		},
 		{
+			// Note: when dragging and dropping multiple files onto a gallery this overrides the
+			// gallery transform in order to add new images to the gallery instead of
+			// creating a new gallery.
 			type: 'files',
 			isMatch( files ) {
-				return files.length === 1 && files[ 0 ].type.indexOf( 'image/' ) === 0;
+				// The following check is intended to catch non-image files when dropped together with images.
+				if (
+					files.some(
+						( file ) => file.type.indexOf( 'image/' ) === 0
+					) &&
+					files.some(
+						( file ) => file.type.indexOf( 'image/' ) !== 0
+					)
+				) {
+					const { createErrorNotice } = dispatch( noticesStore );
+					createErrorNotice(
+						__(
+							'If uploading to a gallery all files need to be image formats'
+						),
+						{
+							id: 'gallery-transform-invalid-file',
+							type: 'snackbar',
+						}
+					);
+				}
+				return every(
+					files,
+					( file ) => file.type.indexOf( 'image/' ) === 0
+				);
 			},
 			transform( files ) {
-				const file = files[ 0 ];
-				// We don't need to upload the media directly here
-				// It's already done as part of the `componentDidMount`
-				// int the image block
-				return createBlock( 'core/image', {
-					url: createBlobURL( file ),
+				const blocks = files.map( ( file ) => {
+					return createBlock( 'core/image', {
+						url: createBlobURL( file ),
+					} );
 				} );
+				return blocks;
 			},
 		},
 		{
@@ -124,17 +192,26 @@ const transforms = {
 				},
 				href: {
 					shortcode: ( attributes, { shortcode } ) => {
-						return getFirstAnchorAttributeFormHTML( shortcode.content, 'href' );
+						return getFirstAnchorAttributeFormHTML(
+							shortcode.content,
+							'href'
+						);
 					},
 				},
 				rel: {
 					shortcode: ( attributes, { shortcode } ) => {
-						return getFirstAnchorAttributeFormHTML( shortcode.content, 'rel' );
+						return getFirstAnchorAttributeFormHTML(
+							shortcode.content,
+							'rel'
+						);
 					},
 				},
 				linkClass: {
 					shortcode: ( attributes, { shortcode } ) => {
-						return getFirstAnchorAttributeFormHTML( shortcode.content, 'class' );
+						return getFirstAnchorAttributeFormHTML(
+							shortcode.content,
+							'class'
+						);
 					},
 				},
 				id: {

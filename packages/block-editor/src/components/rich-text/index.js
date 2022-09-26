@@ -2,233 +2,481 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { RawHTML } from '@wordpress/element';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { pasteHandler, children } from '@wordpress/blocks';
-import { withInstanceId, compose } from '@wordpress/compose';
-import { RichText, __unstableCreateElement } from '@wordpress/rich-text';
-import { withFilters, IsolatedEventContainer } from '@wordpress/components';
+import {
+	RawHTML,
+	useRef,
+	useCallback,
+	forwardRef,
+	createContext,
+} from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { children as childrenSource } from '@wordpress/blocks';
+import { useInstanceId, useMergeRefs } from '@wordpress/compose';
+import {
+	__unstableUseRichText as useRichText,
+	__unstableCreateElement,
+	isEmpty,
+	isCollapsed,
+	removeFormat,
+} from '@wordpress/rich-text';
+import deprecated from '@wordpress/deprecated';
+import { BACKSPACE, DELETE } from '@wordpress/keycodes';
+import { Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import Autocomplete from '../autocomplete';
-import BlockFormatControls from '../block-format-controls';
-import FormatToolbar from './format-toolbar';
-import { getPatterns, getEnterPatterns } from './patterns';
-import { withBlockEditContext } from '../block-edit/context';
-import { ListEdit } from './list-edit';
-import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
+import { useBlockEditorAutocompleteProps } from '../autocomplete';
+import { useBlockEditContext } from '../block-edit';
+import FormatToolbarContainer from './format-toolbar-container';
+import { store as blockEditorStore } from '../../store';
+import { useUndoAutomaticChange } from './use-undo-automatic-change';
+import { useMarkPersistent } from './use-mark-persistent';
+import { usePasteHandler } from './use-paste-handler';
+import { useBeforeInputRules } from './use-before-input-rules';
+import { useInputRules } from './use-input-rules';
+import { useEnter } from './use-enter';
+import { useFormatTypes } from './use-format-types';
+import { useRemoveBrowserShortcuts } from './use-remove-browser-shortcuts';
+import { useShortcuts } from './use-shortcuts';
+import { useInputEvents } from './use-input-events';
+import { useFirefoxCompat } from './use-firefox-compat';
+import FormatEdit from './format-edit';
+import { getMultilineTag, getAllowedFormats } from './utils';
 
-const wrapperClasses = 'editor-rich-text block-editor-rich-text';
-const classes = 'editor-rich-text__editable block-editor-rich-text__editable';
+export const keyboardShortcutContext = createContext();
+export const inputEventContext = createContext();
 
-function RichTextWraper( {
-	tagName,
-	value: originalValue,
-	onChange: originalOnChange,
-	selectionStart,
-	selectionEnd,
-	onSelectionChange,
-	multiline,
-	onTagNameChange,
-	inlineToolbar,
-	wrapperClassName,
-	className,
-	autocompleters,
-	onReplace,
-	onRemove,
-	onMerge,
-	onSplit,
-	isCaretWithinFormattedText,
-	onEnterFormattedText,
-	onExitFormattedText,
-	canUserUseUnfilteredHTML,
-	isSelected: originalIsSelected,
-	onCreateUndoLevel,
-	placeholder,
-	keepPlaceholderOnFocus,
-	// From experimental filter.
-	...experimentalProps
-} ) {
+/**
+ * Removes props used for the native version of RichText so that they are not
+ * passed to the DOM element and log warnings.
+ *
+ * @param {Object} props Props to filter.
+ *
+ * @return {Object} Filtered props.
+ */
+function removeNativeProps( props ) {
+	const {
+		__unstableMobileNoFocusOnMount,
+		deleteEnter,
+		placeholderTextColor,
+		textAlign,
+		selectionColor,
+		tagsToEliminate,
+		rootTagsToEliminate,
+		disableEditingMenu,
+		fontSize,
+		fontFamily,
+		fontWeight,
+		fontStyle,
+		minWidth,
+		maxWidth,
+		setRef,
+		disableSuggestions,
+		disableAutocorrection,
+		...restProps
+	} = props;
+	return restProps;
+}
+
+function RichTextWrapper(
+	{
+		children,
+		tagName = 'div',
+		value: originalValue = '',
+		onChange: originalOnChange,
+		isSelected: originalIsSelected,
+		multiline,
+		inlineToolbar,
+		wrapperClassName,
+		autocompleters,
+		onReplace,
+		placeholder,
+		allowedFormats,
+		formattingControls,
+		withoutInteractiveFormatting,
+		onRemove,
+		onMerge,
+		onSplit,
+		__unstableOnSplitAtEnd: onSplitAtEnd,
+		__unstableOnSplitMiddle: onSplitMiddle,
+		identifier,
+		preserveWhiteSpace,
+		__unstablePastePlainText: pastePlainText,
+		__unstableEmbedURLOnPaste,
+		__unstableDisableFormats: disableFormats,
+		disableLineBreaks,
+		unstableOnFocus,
+		__unstableAllowPrefixTransformations,
+		...props
+	},
+	forwardedRef
+) {
+	if ( multiline ) {
+		deprecated( 'wp.blockEditor.RichText multiline prop', {
+			since: '6.1',
+			version: '6.3',
+			alternative: 'nested blocks (InnerBlocks)',
+			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/nested-blocks-inner-blocks/',
+		} );
+	}
+
+	const instanceId = useInstanceId( RichTextWrapper );
+
+	identifier = identifier || instanceId;
+	props = removeNativeProps( props );
+
+	const anchorRef = useRef();
+	const { clientId } = useBlockEditContext();
+	const selector = ( select ) => {
+		const { getSelectionStart, getSelectionEnd } =
+			select( blockEditorStore );
+		const selectionStart = getSelectionStart();
+		const selectionEnd = getSelectionEnd();
+
+		let isSelected;
+
+		if ( originalIsSelected === undefined ) {
+			isSelected =
+				selectionStart.clientId === clientId &&
+				selectionEnd.clientId === clientId &&
+				selectionStart.attributeKey === identifier;
+		} else if ( originalIsSelected ) {
+			isSelected = selectionStart.clientId === clientId;
+		}
+
+		return {
+			selectionStart: isSelected ? selectionStart.offset : undefined,
+			selectionEnd: isSelected ? selectionEnd.offset : undefined,
+			isSelected,
+		};
+	};
+	// This selector must run on every render so the right selection state is
+	// retreived from the store on merge.
+	// To do: fix this somehow.
+	const { selectionStart, selectionEnd, isSelected } = useSelect( selector );
+	const { selectionChange } = useDispatch( blockEditorStore );
+	const multilineTag = getMultilineTag( multiline );
+	const adjustedAllowedFormats = getAllowedFormats( {
+		allowedFormats,
+		formattingControls,
+		disableFormats,
+	} );
+	const hasFormats =
+		! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
 	let adjustedValue = originalValue;
 	let adjustedOnChange = originalOnChange;
 
 	// Handle deprecated format.
 	if ( Array.isArray( originalValue ) ) {
-		adjustedValue = children.toHTML( originalValue );
-		adjustedOnChange = ( newValue ) => originalOnChange( children.fromDOM(
-			__unstableCreateElement( document, newValue ).childNodes
-		) );
+		deprecated( 'wp.blockEditor.RichText value prop as children type', {
+			since: '6.1',
+			version: '6.3',
+			alternative: 'value prop as string',
+			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
+		} );
+
+		adjustedValue = childrenSource.toHTML( originalValue );
+		adjustedOnChange = ( newValue ) =>
+			originalOnChange(
+				childrenSource.fromDOM(
+					__unstableCreateElement( document, newValue ).childNodes
+				)
+			);
 	}
 
-	return (
-		<RichText
-			{ ...experimentalProps }
-			value={ adjustedValue }
-			onChange={ adjustedOnChange }
-			selectionStart={ selectionStart }
-			selectionEnd={ selectionEnd }
-			onSelectionChange={ onSelectionChange }
-			tagName={ tagName }
-			wrapperClassName={ classnames( wrapperClasses, wrapperClassName ) }
-			className={ classnames( classes, className ) }
-			placeholder={ placeholder }
-			keepPlaceholderOnFocus={ keepPlaceholderOnFocus }
-			__unstableIsSelected={ originalIsSelected }
-			__unstablePatterns={ getPatterns() }
-			__unstableEnterPatterns={ getEnterPatterns() }
-			__unstablePasteHandler={ pasteHandler }
-			__unstableAutocomplete={ Autocomplete }
-			__unstableAutocompleters={ autocompleters }
-			__unstableOnReplace={ onReplace }
-			__unstableOnRemove={ onRemove }
-			__unstableOnMerge={ onMerge }
-			__unstableOnSplit={ onSplit }
-			__unstableMultiline={ multiline }
-			__unstableIsCaretWithinFormattedText={ isCaretWithinFormattedText }
-			__unstableOnEnterFormattedText={ onEnterFormattedText }
-			__unstableOnExitFormattedText={ onExitFormattedText }
-			__unstableCanUserUseUnfilteredHTML={ canUserUseUnfilteredHTML }
-			__unstableOnCreateUndoLevel={ onCreateUndoLevel }
-		>
-			{ ( { isSelected, value, onChange } ) =>
-				<>
-					{ isSelected && multiline === 'li' && (
-						<ListEdit
-							onTagNameChange={ onTagNameChange }
-							tagName={ tagName }
-							value={ value }
-							onChange={ onChange }
-						/>
-					) }
-					{ isSelected && ! inlineToolbar && (
-						<BlockFormatControls>
-							<FormatToolbar />
-						</BlockFormatControls>
-					) }
-					{ isSelected && inlineToolbar && (
-						<IsolatedEventContainer
-							className="editor-rich-text__inline-toolbar block-editor-rich-text__inline-toolbar"
-						>
-							<FormatToolbar />
-						</IsolatedEventContainer>
-					) }
-					{ isSelected && <RemoveBrowserShortcuts /> }
-				</>
+	const onSelectionChange = useCallback(
+		( start, end ) => {
+			const selection = {};
+			const unset = start === undefined && end === undefined;
+
+			if ( typeof start === 'number' || unset ) {
+				selection.start = {
+					clientId,
+					attributeKey: identifier,
+					offset: start,
+				};
 			}
-		</RichText>
+
+			if ( typeof end === 'number' || unset ) {
+				selection.end = {
+					clientId,
+					attributeKey: identifier,
+					offset: end,
+				};
+			}
+
+			selectionChange( selection );
+		},
+		[ clientId, identifier ]
+	);
+
+	const {
+		formatTypes,
+		prepareHandlers,
+		valueHandlers,
+		changeHandlers,
+		dependencies,
+	} = useFormatTypes( {
+		clientId,
+		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats: adjustedAllowedFormats,
+	} );
+
+	function addEditorOnlyFormats( value ) {
+		return valueHandlers.reduce(
+			( accumulator, fn ) => fn( accumulator, value.text ),
+			value.formats
+		);
+	}
+
+	function removeEditorOnlyFormats( value ) {
+		formatTypes.forEach( ( formatType ) => {
+			// Remove formats created by prepareEditableTree, because they are editor only.
+			if ( formatType.__experimentalCreatePrepareEditableTree ) {
+				value = removeFormat(
+					value,
+					formatType.name,
+					0,
+					value.text.length
+				);
+			}
+		} );
+
+		return value.formats;
+	}
+
+	function addInvisibleFormats( value ) {
+		return prepareHandlers.reduce(
+			( accumulator, fn ) => fn( accumulator, value.text ),
+			value.formats
+		);
+	}
+
+	const {
+		value,
+		onChange,
+		ref: richTextRef,
+	} = useRichText( {
+		value: adjustedValue,
+		onChange( html, { __unstableFormats, __unstableText } ) {
+			adjustedOnChange( html );
+			Object.values( changeHandlers ).forEach( ( changeHandler ) => {
+				changeHandler( __unstableFormats, __unstableText );
+			} );
+		},
+		selectionStart,
+		selectionEnd,
+		onSelectionChange,
+		placeholder,
+		__unstableIsSelected: isSelected,
+		__unstableMultilineTag: multilineTag,
+		__unstableDisableFormats: disableFormats,
+		preserveWhiteSpace,
+		__unstableDependencies: [ ...dependencies, tagName ],
+		__unstableAfterParse: addEditorOnlyFormats,
+		__unstableBeforeSerialize: removeEditorOnlyFormats,
+		__unstableAddInvisibleFormats: addInvisibleFormats,
+	} );
+	const autocompleteProps = useBlockEditorAutocompleteProps( {
+		onReplace,
+		completers: autocompleters,
+		record: value,
+		onChange,
+	} );
+
+	useMarkPersistent( { html: adjustedValue, value } );
+
+	const keyboardShortcuts = useRef( new Set() );
+	const inputEvents = useRef( new Set() );
+
+	function onKeyDown( event ) {
+		const { keyCode } = event;
+
+		if ( event.defaultPrevented ) {
+			return;
+		}
+
+		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
+			const { start, end, text } = value;
+			const isReverse = keyCode === BACKSPACE;
+			const hasActiveFormats =
+				value.activeFormats && !! value.activeFormats.length;
+
+			// Only process delete if the key press occurs at an uncollapsed edge.
+			if (
+				! isCollapsed( value ) ||
+				hasActiveFormats ||
+				( isReverse && start !== 0 ) ||
+				( ! isReverse && end !== text.length )
+			) {
+				return;
+			}
+
+			if ( onMerge ) {
+				onMerge( ! isReverse );
+			}
+
+			// Only handle remove on Backspace. This serves dual-purpose of being
+			// an intentional user interaction distinguishing between Backspace and
+			// Delete to remove the empty field, but also to avoid merge & remove
+			// causing destruction of two fields (merge, then removed merged).
+			if ( onRemove && isEmpty( value ) && isReverse ) {
+				onRemove( ! isReverse );
+			}
+
+			event.preventDefault();
+		}
+	}
+
+	function onFocus() {
+		anchorRef.current?.focus();
+	}
+
+	const TagName = tagName;
+	return (
+		<>
+			{ isSelected && (
+				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
+					<inputEventContext.Provider value={ inputEvents }>
+						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
+							{ children &&
+								children( { value, onChange, onFocus } ) }
+							<FormatEdit
+								value={ value }
+								onChange={ onChange }
+								onFocus={ onFocus }
+								formatTypes={ formatTypes }
+								forwardedRef={ anchorRef }
+							/>
+						</Popover.__unstableSlotNameProvider>
+					</inputEventContext.Provider>
+				</keyboardShortcutContext.Provider>
+			) }
+			{ isSelected && hasFormats && (
+				<FormatToolbarContainer
+					inline={ inlineToolbar }
+					editableContentElement={ anchorRef.current }
+					value={ value }
+				/>
+			) }
+			<TagName
+				// Overridable props.
+				role="textbox"
+				aria-multiline={ ! disableLineBreaks }
+				aria-label={ placeholder }
+				{ ...props }
+				{ ...autocompleteProps }
+				ref={ useMergeRefs( [
+					forwardedRef,
+					autocompleteProps.ref,
+					props.ref,
+					richTextRef,
+					useBeforeInputRules( { value, onChange } ),
+					useInputRules( {
+						value,
+						onChange,
+						__unstableAllowPrefixTransformations,
+						formatTypes,
+						onReplace,
+						selectionChange,
+					} ),
+					useRemoveBrowserShortcuts(),
+					useShortcuts( keyboardShortcuts ),
+					useInputEvents( inputEvents ),
+					useUndoAutomaticChange(),
+					usePasteHandler( {
+						isSelected,
+						disableFormats,
+						onChange,
+						value,
+						formatTypes,
+						tagName,
+						onReplace,
+						onSplit,
+						onSplitMiddle,
+						__unstableEmbedURLOnPaste,
+						multilineTag,
+						preserveWhiteSpace,
+						pastePlainText,
+					} ),
+					useEnter( {
+						removeEditorOnlyFormats,
+						value,
+						onReplace,
+						onSplit,
+						onSplitMiddle,
+						multilineTag,
+						onChange,
+						disableLineBreaks,
+						onSplitAtEnd,
+					} ),
+					useFirefoxCompat(),
+					anchorRef,
+				] ) }
+				contentEditable={ true }
+				suppressContentEditableWarning={ true }
+				className={ classnames(
+					'block-editor-rich-text__editable',
+					props.className,
+					'rich-text'
+				) }
+				onFocus={ unstableOnFocus }
+				onKeyDown={ onKeyDown }
+			/>
+		</>
 	);
 }
 
-const RichTextContainer = compose( [
-	withInstanceId,
-	withBlockEditContext( ( { clientId } ) => ( { clientId } ) ),
-	withSelect( ( select, {
-		clientId,
-		instanceId,
-		identifier = instanceId,
-		isSelected,
-	} ) => {
-		// This should probably be moved to the block editor settings.
-		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
-		const {
-			isCaretWithinFormattedText,
-			getSelectionStart,
-			getSelectionEnd,
-		} = select( 'core/block-editor' );
+const ForwardedRichTextContainer = forwardRef( RichTextWrapper );
 
-		const selectionStart = getSelectionStart();
-		const selectionEnd = getSelectionEnd();
-
-		if ( isSelected === undefined ) {
-			isSelected = (
-				selectionStart.clientId === clientId &&
-				selectionStart.attributeKey === identifier
-			);
-		}
-
-		return {
-			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
-			isCaretWithinFormattedText: isCaretWithinFormattedText(),
-			selectionStart: isSelected ? selectionStart.offset : undefined,
-			selectionEnd: isSelected ? selectionEnd.offset : undefined,
-			isSelected,
-		};
-	} ),
-	withDispatch( ( dispatch, {
-		clientId,
-		instanceId,
-		identifier = instanceId,
-	} ) => {
-		const {
-			__unstableMarkLastChangeAsPersistent,
-			enterFormattedText,
-			exitFormattedText,
-			selectionChange,
-		} = dispatch( 'core/block-editor' );
-
-		return {
-			onCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
-			onEnterFormattedText: enterFormattedText,
-			onExitFormattedText: exitFormattedText,
-			onSelectionChange( start, end ) {
-				selectionChange( clientId, identifier, start, end );
-			},
-		};
-	} ),
-	withFilters( 'experimentalRichText' ),
-] )( RichTextWraper );
-
-RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {
-	let html = value;
-	let MultilineTag;
-
-	if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
-		MultilineTag = multiline === true ? 'p' : multiline;
-	}
-
+ForwardedRichTextContainer.Content = ( {
+	value,
+	tagName: Tag,
+	multiline,
+	...props
+} ) => {
 	// Handle deprecated `children` and `node` sources.
 	if ( Array.isArray( value ) ) {
-		html = children.toHTML( value );
+		deprecated( 'wp.blockEditor.RichText value prop as children type', {
+			since: '6.1',
+			version: '6.3',
+			alternative: 'value prop as string',
+			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
+		} );
+
+		value = childrenSource.toHTML( value );
 	}
 
-	if ( ! html && MultilineTag ) {
-		html = `<${ MultilineTag }></${ MultilineTag }>`;
+	const MultilineTag = getMultilineTag( multiline );
+
+	if ( ! value && MultilineTag ) {
+		value = `<${ MultilineTag }></${ MultilineTag }>`;
 	}
 
-	const content = <RawHTML>{ html }</RawHTML>;
+	const content = <RawHTML>{ value }</RawHTML>;
 
 	if ( Tag ) {
-		return <Tag { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
+		const { format, ...restProps } = props;
+		return <Tag { ...restProps }>{ content }</Tag>;
 	}
 
 	return content;
 };
 
-RichTextContainer.isEmpty = ( value = '' ) => {
-	// Handle deprecated `children` and `node` sources.
-	if ( Array.isArray( value ) ) {
-		return ! value || value.length === 0;
-	}
-
-	return value.length === 0;
-};
-
-RichTextContainer.Content.defaultProps = {
-	format: 'string',
-	value: '',
+ForwardedRichTextContainer.isEmpty = ( value ) => {
+	return ! value || value.length === 0;
 };
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/rich-text/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
  */
-export default RichTextContainer;
+export default ForwardedRichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
 export { __unstableRichTextInputEvent } from './input-event';

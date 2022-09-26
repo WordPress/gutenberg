@@ -1,71 +1,29 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { KeyboardShortcuts } from '@wordpress/components';
-import { withDispatch } from '@wordpress/data';
-import { rawShortcut } from '@wordpress/keycodes';
-import deprecated from '@wordpress/deprecated';
-import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import SaveShortcut from './save-shortcut';
+import { store as editorStore } from '../../store';
 
-class VisualEditorGlobalKeyboardShortcuts extends Component {
-	constructor() {
-		super( ...arguments );
-		this.undoOrRedo = this.undoOrRedo.bind( this );
-	}
+function VisualEditorGlobalKeyboardShortcuts() {
+	const { redo, undo } = useDispatch( editorStore );
 
-	undoOrRedo( event ) {
-		const { onRedo, onUndo } = this.props;
-
-		if ( event.shiftKey ) {
-			onRedo();
-		} else {
-			onUndo();
-		}
-
+	useShortcut( 'core/editor/undo', ( event ) => {
+		undo();
 		event.preventDefault();
-	}
-
-	render() {
-		return (
-			<>
-				<BlockEditorKeyboardShortcuts />
-				<KeyboardShortcuts
-					shortcuts={ {
-						[ rawShortcut.primary( 'z' ) ]: this.undoOrRedo,
-						[ rawShortcut.primaryShift( 'z' ) ]: this.undoOrRedo,
-					} }
-				/>
-				<SaveShortcut />
-			</>
-		);
-	}
-}
-
-const EnhancedVisualEditorGlobalKeyboardShortcuts = withDispatch( ( dispatch ) => {
-	const {
-		redo,
-		undo,
-	} = dispatch( 'core/editor' );
-
-	return {
-		onRedo: redo,
-		onUndo: undo,
-	};
-} )( VisualEditorGlobalKeyboardShortcuts );
-
-export default EnhancedVisualEditorGlobalKeyboardShortcuts;
-
-export function EditorGlobalKeyboardShortcuts() {
-	deprecated( 'EditorGlobalKeyboardShortcuts', {
-		alternative: 'VisualEditorGlobalKeyboardShortcuts',
-		plugin: 'Gutenberg',
 	} );
 
-	return <EnhancedVisualEditorGlobalKeyboardShortcuts />;
+	useShortcut( 'core/editor/redo', ( event ) => {
+		redo();
+		event.preventDefault();
+	} );
+
+	return <SaveShortcut />;
 }
+
+export default VisualEditorGlobalKeyboardShortcuts;

@@ -15,7 +15,7 @@ import {
 } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { Warning } from '@wordpress/block-editor';
+import { Warning, store as blockEditorStore } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
@@ -28,9 +28,9 @@ const enhance = compose(
 	 * "original" block is not the current one. Thus, an inexisting
 	 * `originalBlockClientId` prop signals that the block is valid.
 	 *
-	 * @param {Component} WrappedBlockEdit A filtered BlockEdit instance.
+	 * @param {WPComponent} WrappedBlockEdit A filtered BlockEdit instance.
 	 *
-	 * @return {Component} Enhanced component with merged state data props.
+	 * @return {WPComponent} Enhanced component with merged state data props.
 	 */
 	withSelect( ( select, block ) => {
 		const multiple = hasBlockSupport( block.name, 'multiple', true );
@@ -43,24 +43,25 @@ const enhance = compose(
 
 		// Otherwise, only pass `originalBlockClientId` if it refers to a different
 		// block from the current one.
-		const blocks = select( 'core/block-editor' ).getBlocks();
-		const firstOfSameType = find( blocks, ( { name } ) => block.name === name );
-		const isInvalid = firstOfSameType && firstOfSameType.clientId !== block.clientId;
+		const blocks = select( blockEditorStore ).getBlocks();
+		const firstOfSameType = find(
+			blocks,
+			( { name } ) => block.name === name
+		);
+		const isInvalid =
+			firstOfSameType && firstOfSameType.clientId !== block.clientId;
 		return {
 			originalBlockClientId: isInvalid && firstOfSameType.clientId,
 		};
 	} ),
 	withDispatch( ( dispatch, { originalBlockClientId } ) => ( {
-		selectFirst: () => dispatch( 'core/block-editor' ).selectBlock( originalBlockClientId ),
-	} ) ),
+		selectFirst: () =>
+			dispatch( blockEditorStore ).selectBlock( originalBlockClientId ),
+	} ) )
 );
 
 const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
-	return enhance( ( {
-		originalBlockClientId,
-		selectFirst,
-		...props
-	} ) => {
+	return enhance( ( { originalBlockClientId, selectFirst, ...props } ) => {
 		if ( ! originalBlockClientId ) {
 			return <BlockEdit { ...props } />;
 		}
@@ -75,27 +76,39 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
 			<Warning
 				key="multiple-use-warning"
 				actions={ [
-					<Button key="find-original" isLarge onClick={ selectFirst }>
+					<Button
+						key="find-original"
+						variant="secondary"
+						onClick={ selectFirst }
+					>
 						{ __( 'Find original' ) }
 					</Button>,
-					<Button key="remove" isLarge onClick={ () => props.onReplace( [] ) }>
+					<Button
+						key="remove"
+						variant="secondary"
+						onClick={ () => props.onReplace( [] ) }
+					>
 						{ __( 'Remove' ) }
 					</Button>,
 					outboundType && (
 						<Button
 							key="transform"
-							isLarge
-							onClick={ () => props.onReplace(
-								createBlock( outboundType.name, props.attributes )
-							) }
+							variant="secondary"
+							onClick={ () =>
+								props.onReplace(
+									createBlock(
+										outboundType.name,
+										props.attributes
+									)
+								)
+							}
 						>
-							{ __( 'Transform into:' ) }{ ' ' }
-							{ outboundType.title }
+							{ __( 'Transform into:' ) } { outboundType.title }
 						</Button>
 					),
 				] }
 			>
-				<strong>{ blockType.title }: </strong>
+				<strong>{ blockType?.title }: </strong>
 				{ __( 'This block can only be used once.' ) }
 			</Warning>,
 		];
@@ -111,7 +124,7 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
  * @return {?Object} The chosen default block type.
  */
 function getOutboundType( blockName ) {
-	// Grab the first outbound transform
+	// Grab the first outbound transform.
 	const transform = findTransform(
 		getBlockTransforms( 'to', blockName ),
 		( { type, blocks } ) => type === 'block' && blocks.length === 1 // What about when .length > 1?

@@ -19,7 +19,7 @@ describe( 'PluginPostPublishPanel', () => {
 					title="My panel title"
 					initialOpen={ true }
 				>
-				My panel content
+					My panel content
 				</PluginPostPublishPanel>
 				<PluginPostPublishPanel.Slot />
 			</SlotFillProvider>,

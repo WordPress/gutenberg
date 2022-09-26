@@ -6,33 +6,38 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
+import { useViewportMatch, compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { PostPublishButton } from '@wordpress/editor';
-import { withViewportMatch } from '@wordpress/viewport';
+import { PostPublishButton, store as editorStore } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../store';
 
 export function PostPublishButtonOrToggle( {
 	forceIsDirty,
 	forceIsSaving,
 	hasPublishAction,
 	isBeingScheduled,
-	isLessThanMediumViewport,
 	isPending,
 	isPublished,
 	isPublishSidebarEnabled,
 	isPublishSidebarOpened,
 	isScheduled,
 	togglePublishSidebar,
+	setEntitiesSavedStatesCallback,
 } ) {
 	const IS_TOGGLE = 'toggle';
 	const IS_BUTTON = 'button';
+	const isSmallerThanMediumViewport = useViewportMatch( 'medium', '<' );
 	let component;
 
 	/**
 	 * Conditions to show a BUTTON (publish directly) or a TOGGLE (open publish sidebar):
 	 *
 	 * 1) We want to show a BUTTON when the post status is at the _final stage_
-	 * for a particular role (see https://codex.wordpress.org/Post_Status):
+	 * for a particular role (see https://wordpress.org/support/article/post-status/):
 	 *
 	 * - is published
 	 * - is scheduled to be published
@@ -53,10 +58,10 @@ export function PostPublishButtonOrToggle( {
 	if (
 		isPublished ||
 		( isScheduled && isBeingScheduled ) ||
-		( isPending && ! hasPublishAction && ! isLessThanMediumViewport )
+		( isPending && ! hasPublishAction && ! isSmallerThanMediumViewport )
 	) {
 		component = IS_BUTTON;
-	} else if ( isLessThanMediumViewport ) {
+	} else if ( isSmallerThanMediumViewport ) {
 		component = IS_TOGGLE;
 	} else if ( isPublishSidebarEnabled ) {
 		component = IS_TOGGLE;
@@ -71,6 +76,7 @@ export function PostPublishButtonOrToggle( {
 			isOpen={ isPublishSidebarOpened }
 			isToggle={ component === IS_TOGGLE }
 			onToggle={ togglePublishSidebar }
+			setEntitiesSavedStatesCallback={ setEntitiesSavedStatesCallback }
 		/>
 	);
 }
@@ -78,22 +84,23 @@ export function PostPublishButtonOrToggle( {
 export default compose(
 	withSelect( ( select ) => ( {
 		hasPublishAction: get(
-			select( 'core/editor' ).getCurrentPost(),
+			select( editorStore ).getCurrentPost(),
 			[ '_links', 'wp:action-publish' ],
 			false
 		),
-		isBeingScheduled: select( 'core/editor' ).isEditedPostBeingScheduled(),
-		isPending: select( 'core/editor' ).isCurrentPostPending(),
-		isPublished: select( 'core/editor' ).isCurrentPostPublished(),
-		isPublishSidebarEnabled: select( 'core/editor' ).isPublishSidebarEnabled(),
-		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
-		isScheduled: select( 'core/editor' ).isCurrentPostScheduled(),
+		isBeingScheduled: select( editorStore ).isEditedPostBeingScheduled(),
+		isPending: select( editorStore ).isCurrentPostPending(),
+		isPublished: select( editorStore ).isCurrentPostPublished(),
+		isPublishSidebarEnabled:
+			select( editorStore ).isPublishSidebarEnabled(),
+		isPublishSidebarOpened:
+			select( editPostStore ).isPublishSidebarOpened(),
+		isScheduled: select( editorStore ).isCurrentPostScheduled(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
-		const { togglePublishSidebar } = dispatch( 'core/edit-post' );
+		const { togglePublishSidebar } = dispatch( editPostStore );
 		return {
 			togglePublishSidebar,
 		};
-	} ),
-	withViewportMatch( { isLessThanMediumViewport: '< medium' } ),
+	} )
 )( PostPublishButtonOrToggle );

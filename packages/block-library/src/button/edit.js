@@ -7,144 +7,266 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
-import { compose } from '@wordpress/compose';
+import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
 import {
-	Dashicon,
-	IconButton,
-	withFallbackStyles,
+	Button,
+	ButtonGroup,
+	PanelBody,
+	TextControl,
+	ToolbarButton,
+	Popover,
 } from '@wordpress/components';
 import {
-	URLInput,
-	RichText,
-	ContrastChecker,
+	BlockControls,
 	InspectorControls,
-	withColors,
-	PanelColorSettings,
+	RichText,
+	useBlockProps,
+	__experimentalUseBorderProps as useBorderProps,
+	__experimentalUseColorProps as useColorProps,
+	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
+	__experimentalLinkControl as LinkControl,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
+import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
+import { link, linkOff } from '@wordpress/icons';
+import { createBlock } from '@wordpress/blocks';
+import { useMergeRefs } from '@wordpress/compose';
 
-const { getComputedStyle } = window;
+const NEW_TAB_REL = 'noreferrer noopener';
 
-const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
-	const { textColor, backgroundColor } = ownProps;
-	const backgroundColorValue = backgroundColor && backgroundColor.color;
-	const textColorValue = textColor && textColor.color;
-	//avoid the use of querySelector if textColor color is known and verify if node is available.
-	const textNode = ! textColorValue && node ? node.querySelector( '[contenteditable="true"]' ) : null;
-	return {
-		fallbackBackgroundColor: backgroundColorValue || ! node ? undefined : getComputedStyle( node ).backgroundColor,
-		fallbackTextColor: textColorValue || ! textNode ? undefined : getComputedStyle( textNode ).color,
-	};
-} );
+function WidthPanel( { selectedWidth, setAttributes } ) {
+	function handleChange( newWidth ) {
+		// Check if we are toggling the width off
+		const width = selectedWidth === newWidth ? undefined : newWidth;
 
-class ButtonEdit extends Component {
-	constructor() {
-		super( ...arguments );
-		this.nodeRef = null;
-		this.bindRef = this.bindRef.bind( this );
+		// Update attributes.
+		setAttributes( { width } );
 	}
 
-	bindRef( node ) {
-		if ( ! node ) {
-			return;
-		}
-		this.nodeRef = node;
-	}
-
-	render() {
-		const {
-			attributes,
-			backgroundColor,
-			textColor,
-			setBackgroundColor,
-			setTextColor,
-			fallbackBackgroundColor,
-			fallbackTextColor,
-			setAttributes,
-			isSelected,
-			className,
-		} = this.props;
-
-		const {
-			text,
-			url,
-			title,
-		} = attributes;
-
-		return (
-			<>
-				<div className={ className } title={ title } ref={ this.bindRef }>
-					<RichText
-						placeholder={ __( 'Add text…' ) }
-						value={ text }
-						onChange={ ( value ) => setAttributes( { text: value } ) }
-						formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
-						className={ classnames(
-							'wp-block-button__link', {
-								'has-background': backgroundColor.color,
-								[ backgroundColor.class ]: backgroundColor.class,
-								'has-text-color': textColor.color,
-								[ textColor.class ]: textColor.class,
+	return (
+		<PanelBody title={ __( 'Width settings' ) }>
+			<ButtonGroup aria-label={ __( 'Button width' ) }>
+				{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
+					return (
+						<Button
+							key={ widthValue }
+							isSmall
+							variant={
+								widthValue === selectedWidth
+									? 'primary'
+									: undefined
 							}
-						) }
-						style={ {
-							backgroundColor: backgroundColor.color,
-							color: textColor.color,
-						} }
-						keepPlaceholderOnFocus
-					/>
-					<InspectorControls>
-						<PanelColorSettings
-							title={ __( 'Color Settings' ) }
-							colorSettings={ [
-								{
-									value: backgroundColor.color,
-									onChange: setBackgroundColor,
-									label: __( 'Background Color' ),
-								},
-								{
-									value: textColor.color,
-									onChange: setTextColor,
-									label: __( 'Text Color' ),
-								},
-							] }
+							onClick={ () => handleChange( widthValue ) }
 						>
-							<ContrastChecker
-								{ ...{
-									// Text is considered large if font size is greater or equal to 18pt or 24px,
-									// currently that's not the case for button.
-									isLargeText: false,
-									textColor: textColor.color,
-									backgroundColor: backgroundColor.color,
-									fallbackBackgroundColor,
-									fallbackTextColor,
-								} }
-							/>
-						</PanelColorSettings>
-					</InspectorControls>
-				</div>
-				{ isSelected && (
-					<form
-						className="block-library-button__inline-link"
-						onSubmit={ ( event ) => event.preventDefault() }>
-						<Dashicon icon="admin-links" />
-						<URLInput
-							value={ url }
-							/* eslint-disable jsx-a11y/no-autofocus */
-							// Disable Reason: The rule is meant to prevent enabling auto-focus, not disabling it.
-							autoFocus={ false }
-							/* eslint-enable jsx-a11y/no-autofocus */
-							onChange={ ( value ) => setAttributes( { url: value } ) }
-						/>
-						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-					</form>
-				) }
-			</>
-		);
-	}
+							{ widthValue }%
+						</Button>
+					);
+				} ) }
+			</ButtonGroup>
+		</PanelBody>
+	);
 }
 
-export default compose( [
-	withColors( 'backgroundColor', { textColor: 'color' } ),
-	applyFallbackStyles,
-] )( ButtonEdit );
+function ButtonEdit( props ) {
+	const {
+		attributes,
+		setAttributes,
+		className,
+		isSelected,
+		onReplace,
+		mergeBlocks,
+	} = props;
+	const { linkTarget, placeholder, rel, style, text, url, width } =
+		attributes;
+	const onSetLinkRel = useCallback(
+		( value ) => {
+			setAttributes( { rel: value } );
+		},
+		[ setAttributes ]
+	);
+
+	function onToggleOpenInNewTab( value ) {
+		const newLinkTarget = value ? '_blank' : undefined;
+
+		let updatedRel = rel;
+		if ( newLinkTarget && ! rel ) {
+			updatedRel = NEW_TAB_REL;
+		} else if ( ! newLinkTarget && rel === NEW_TAB_REL ) {
+			updatedRel = undefined;
+		}
+
+		setAttributes( {
+			linkTarget: newLinkTarget,
+			rel: updatedRel,
+		} );
+	}
+
+	function setButtonText( newText ) {
+		// Remove anchor tags from button text content.
+		setAttributes( { text: newText.replace( /<\/?a[^>]*>/g, '' ) } );
+	}
+
+	function onKeyDown( event ) {
+		if ( isKeyboardEvent.primary( event, 'k' ) ) {
+			startEditing( event );
+		} else if ( isKeyboardEvent.primaryShift( event, 'k' ) ) {
+			unlink();
+			richTextRef.current?.focus();
+		}
+	}
+
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+
+	const borderProps = useBorderProps( attributes );
+	const colorProps = useColorProps( attributes );
+	const spacingProps = useSpacingProps( attributes );
+	const ref = useRef();
+	const richTextRef = useRef();
+	const blockProps = useBlockProps( {
+		ref: useMergeRefs( [ setPopoverAnchor, ref ] ),
+		onKeyDown,
+	} );
+
+	const [ isEditingURL, setIsEditingURL ] = useState( false );
+	const isURLSet = !! url;
+	const opensInNewTab = linkTarget === '_blank';
+
+	function startEditing( event ) {
+		event.preventDefault();
+		setIsEditingURL( true );
+	}
+
+	function unlink() {
+		setAttributes( {
+			url: undefined,
+			linkTarget: undefined,
+			rel: undefined,
+		} );
+		setIsEditingURL( false );
+	}
+
+	useEffect( () => {
+		if ( ! isSelected ) {
+			setIsEditingURL( false );
+		}
+	}, [ isSelected ] );
+
+	return (
+		<>
+			<div
+				{ ...blockProps }
+				className={ classnames( blockProps.className, {
+					[ `has-custom-width wp-block-button__width-${ width }` ]:
+						width,
+					[ `has-custom-font-size` ]: blockProps.style.fontSize,
+				} ) }
+			>
+				<RichText
+					ref={ richTextRef }
+					aria-label={ __( 'Button text' ) }
+					placeholder={ placeholder || __( 'Add text…' ) }
+					value={ text }
+					onChange={ ( value ) => setButtonText( value ) }
+					withoutInteractiveFormatting
+					className={ classnames(
+						className,
+						'wp-block-button__link',
+						colorProps.className,
+						borderProps.className,
+						{
+							// For backwards compatibility add style that isn't
+							// provided via block support.
+							'no-border-radius': style?.border?.radius === 0,
+						},
+						__experimentalGetElementClassName( 'button' )
+					) }
+					style={ {
+						...borderProps.style,
+						...colorProps.style,
+						...spacingProps.style,
+					} }
+					onSplit={ ( value ) =>
+						createBlock( 'core/button', {
+							...attributes,
+							text: value,
+						} )
+					}
+					onReplace={ onReplace }
+					onMerge={ mergeBlocks }
+					identifier="text"
+				/>
+			</div>
+			<BlockControls group="block">
+				{ ! isURLSet && (
+					<ToolbarButton
+						name="link"
+						icon={ link }
+						title={ __( 'Link' ) }
+						shortcut={ displayShortcut.primary( 'k' ) }
+						onClick={ startEditing }
+					/>
+				) }
+				{ isURLSet && (
+					<ToolbarButton
+						name="link"
+						icon={ linkOff }
+						title={ __( 'Unlink' ) }
+						shortcut={ displayShortcut.primaryShift( 'k' ) }
+						onClick={ unlink }
+						isActive={ true }
+					/>
+				) }
+			</BlockControls>
+			{ isSelected && ( isEditingURL || isURLSet ) && (
+				<Popover
+					position="bottom center"
+					onClose={ () => {
+						setIsEditingURL( false );
+						richTextRef.current?.focus();
+					} }
+					anchor={ popoverAnchor }
+					focusOnMount={ isEditingURL ? 'firstElement' : false }
+					__unstableSlotName={ '__unstable-block-tools-after' }
+					shift
+				>
+					<LinkControl
+						className="wp-block-navigation-link__inline-link-input"
+						value={ { url, opensInNewTab } }
+						onChange={ ( {
+							url: newURL = '',
+							opensInNewTab: newOpensInNewTab,
+						} ) => {
+							setAttributes( { url: newURL } );
+
+							if ( opensInNewTab !== newOpensInNewTab ) {
+								onToggleOpenInNewTab( newOpensInNewTab );
+							}
+						} }
+						onRemove={ () => {
+							unlink();
+							richTextRef.current?.focus();
+						} }
+						forceIsEditingLink={ isEditingURL }
+					/>
+				</Popover>
+			) }
+			<InspectorControls>
+				<WidthPanel
+					selectedWidth={ width }
+					setAttributes={ setAttributes }
+				/>
+			</InspectorControls>
+			<InspectorControls __experimentalGroup="advanced">
+				<TextControl
+					label={ __( 'Link rel' ) }
+					value={ rel || '' }
+					onChange={ onSetLinkRel }
+				/>
+			</InspectorControls>
+		</>
+	);
+}
+
+export default ButtonEdit;

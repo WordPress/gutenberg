@@ -7,8 +7,8 @@
 
 ?>
 <!-- wp:cover {"url":"https://cldup.com/Fz-ASbo2s3.jpg","className":"alignwide"} -->
-<div class="wp-block-cover has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
-<p style="text-align:center" class="has-large-font-size"><?php _e( 'Of Mountains &amp; Printing Presses', 'gutenberg' ); ?></p>
+<div class="wp-block-cover has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","textColor":"white","fontSize":"large"} -->
+<p class="has-text-align-center has-white-color has-text-color has-large-font-size"><?php _e( 'Of Mountains &amp; Printing Presses', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->
 
@@ -21,7 +21,7 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"align":"right"} -->
-<p style="text-align:right"><?php _e( '... like this one, which is right aligned.', 'gutenberg' ); ?></p>
+<p class="has-text-align-right"><?php _e( '... like this one, which is right aligned.', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -99,11 +99,13 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:gallery {"ids":[null,null,null],"columns":2} -->
-<ul class="wp-block-gallery columns-2 is-cropped">
+<figure class="wp-block-gallery columns-2 is-cropped">
+<ul class="blocks-gallery-grid">
 <li class="blocks-gallery-item"><figure><img src="https://cldup.com/n0g6ME5VKC.jpg" alt="" /></figure></li>
 <li class="blocks-gallery-item"><figure><img src="https://cldup.com/ZjESfxPI3R.jpg" alt="" /></figure></li>
 <li class="blocks-gallery-item"><figure><img src="https://cldup.com/EKNF8xD2UM.jpg" alt="" /></figure></li>
 </ul>
+</figure>
 <!-- /wp:gallery -->
 
 <!-- wp:paragraph -->
@@ -126,11 +128,13 @@
 <p><?php _e( 'Sure, the full-wide image can be pretty big. But sometimes the image is worth it.', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:gallery {"ids":[null,null],"align":"wide","images":[{"url":"https://cldup.com/_rSwtEeDGD.jpg","alt":""},{"url":"https://cldup.com/L-cC3qX2DN.jpg","alt":""}]} -->
-<ul class="wp-block-gallery alignwide columns-2 is-cropped">
+<!-- wp:gallery {"ids":[null,null],"align":"wide"} -->
+<figure class="wp-block-gallery alignwide columns-2 is-cropped">
+<ul class="blocks-gallery-grid">
 <li class="blocks-gallery-item"><figure><img src="https://cldup.com/_rSwtEeDGD.jpg" alt="" /></figure></li>
 <li class="blocks-gallery-item"><figure><img src="https://cldup.com/L-cC3qX2DN.jpg" alt="" /></figure></li>
 </ul>
+</figure>
 <!-- /wp:gallery -->
 
 <!-- wp:paragraph -->
@@ -141,11 +145,11 @@
 <p><?php _e( 'Any block can opt into these alignments. The embed block has them also, and is responsive out of the box:', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:core-embed/vimeo {"url":"https://vimeo.com/22439234","type":"video","providerNameSlug":"vimeo","align":"wide","className":"wp-has-aspect-ratio wp-embed-aspect-16-9"} -->
+<!-- wp:embed {"url":"https://vimeo.com/22439234","type":"video","providerNameSlug":"vimeo","align":"wide","className":"wp-has-aspect-ratio wp-embed-aspect-16-9","responsive":true} -->
 <figure class="wp-block-embed-vimeo alignwide wp-block-embed is-type-video is-provider-vimeo wp-has-aspect-ratio wp-embed-aspect-16-9"><div class="wp-block-embed__wrapper">
 https://vimeo.com/22439234
 </div></figure>
-<!-- /wp:core-embed/vimeo -->
+<!-- /wp:embed -->
 
 <!-- wp:paragraph -->
 <p><?php _e( 'You can build any block you like, static or dynamic, decorative or plain. Here&#8217;s a pullquote block:', 'gutenberg' ); ?></p>
@@ -156,7 +160,7 @@ https://vimeo.com/22439234
 <!-- /wp:pullquote -->
 
 <!-- wp:paragraph {"align":"center"} -->
-<p style="text-align:center">
+<p class="has-text-align-center">
 	<em>
 		<?php
 		echo sprintf(
@@ -178,9 +182,9 @@ https://vimeo.com/22439234
 <!-- /wp:separator -->
 
 <!-- wp:paragraph {"align":"center"} -->
-<p style="text-align:center"><?php _e( 'Thanks for testing Gutenberg!', 'gutenberg' ); ?></p>
+<p class="has-text-align-center"><?php _e( 'Thanks for testing Gutenberg!', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"align":"center"} -->
-<p style="text-align:center">👋</p>
+<p class="has-text-align-center">👋</p>
 <!-- /wp:paragraph -->

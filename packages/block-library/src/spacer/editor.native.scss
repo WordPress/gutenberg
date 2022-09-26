@@ -1,0 +1,18 @@
+.staticSpacer {
+	height: 20px;
+	background-color: transparent;
+	border: $border-width dashed $light-gray-500;
+	border-radius: 1px;
+}
+
+.staticDarkSpacer {
+	border: $border-width dashed rgba($color: $light-gray-500, $alpha: 0.3);
+}
+
+.selectedSpacer {
+	border: $border-width * 2 solid $blue-30;
+}
+
+.rangeCellContainer {
+	padding-bottom: 16px;
+}

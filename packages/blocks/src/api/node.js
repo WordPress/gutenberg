@@ -1,12 +1,12 @@
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 import * as children from './children';
-
-/**
- * Browser dependencies
- */
-const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 
 /**
  * A representation of a single node within a block's rich text value. If
@@ -24,11 +24,17 @@ const { TEXT_NODE, ELEMENT_NODE } = window.Node;
  * corresponds to that type, false otherwise.
  *
  * @param {WPBlockNode} node Block node to test
- * @param {string} type      Node to type to test against.
+ * @param {string}      type Node to type to test against.
  *
  * @return {boolean} Whether node is of intended type.
  */
 function isNodeOfType( node, type ) {
+	deprecated( 'wp.blocks.node.isNodeOfType', {
+		since: '6.1',
+		version: '6.3',
+		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
+	} );
+
 	return node && node.type === type;
 }
 
@@ -63,14 +69,21 @@ export function getNamedNodeMapAsObject( nodeMap ) {
  * @return {WPBlockNode} Block node equivalent to DOM node.
  */
 export function fromDOM( domNode ) {
-	if ( domNode.nodeType === TEXT_NODE ) {
+	deprecated( 'wp.blocks.node.fromDOM', {
+		since: '6.1',
+		version: '6.3',
+		alternative: 'wp.richText.create',
+		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
+	} );
+
+	if ( domNode.nodeType === domNode.TEXT_NODE ) {
 		return domNode.nodeValue;
 	}
 
-	if ( domNode.nodeType !== ELEMENT_NODE ) {
+	if ( domNode.nodeType !== domNode.ELEMENT_NODE ) {
 		throw new TypeError(
 			'A block node can only be created from a node of type text or ' +
-			'element.'
+				'element.'
 		);
 	}
 
@@ -91,6 +104,13 @@ export function fromDOM( domNode ) {
  * @return {string} String HTML representation of block node.
  */
 export function toHTML( node ) {
+	deprecated( 'wp.blocks.node.toHTML', {
+		since: '6.1',
+		version: '6.3',
+		alternative: 'wp.richText.toHTMLString',
+		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
+	} );
+
 	return children.toHTML( [ node ] );
 }
 
@@ -103,6 +123,13 @@ export function toHTML( node ) {
  * @return {Function} hpq matcher.
  */
 export function matcher( selector ) {
+	deprecated( 'wp.blocks.node.matcher', {
+		since: '6.1',
+		version: '6.3',
+		alternative: 'html source',
+		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
+	} );
+
 	return ( domNode ) => {
 		let match = domNode;
 

@@ -1,5 +1,10 @@
+/**
+ * Internal dependencies
+ */
+import { ZWNBSP, OBJECT_REPLACEMENT_CHARACTER } from '../../special-characters';
+
 export function getSparseArrayLength( array ) {
-	return array.reduce( ( i ) => i + 1, 0 );
+	return array.reduce( ( accumulator ) => accumulator + 1, 0 );
 }
 
 const em = { type: 'em' };
@@ -27,6 +32,46 @@ export const spec = [
 			formats: [],
 			replacements: [],
 			text: '',
+		},
+	},
+	{
+		description:
+			'should ignore manually added object replacement character',
+		html: `test${ OBJECT_REPLACEMENT_CHARACTER }`,
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 1,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 4 ],
+		record: {
+			start: 0,
+			end: 4,
+			formats: [ , , , , ],
+			replacements: [ , , , , ],
+			text: 'test',
+		},
+	},
+	{
+		description:
+			'should ignore manually added object replacement character with formatting',
+		html: `<em>h${ OBJECT_REPLACEMENT_CHARACTER }i</em>`,
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 1,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 0, 0, 2 ],
+		record: {
+			start: 0,
+			end: 2,
+			formats: [ [ em ], [ em ] ],
+			replacements: [ , , ],
+			text: 'hi',
 		},
 	},
 	{
@@ -176,7 +221,12 @@ export const spec = [
 		record: {
 			start: 0,
 			end: 4,
-			formats: [ [ em, strong ], [ em, strong ], [ em, strong ], [ em, strong ] ],
+			formats: [
+				[ em, strong ],
+				[ em, strong ],
+				[ em, strong ],
+				[ em, strong ],
+			],
 			replacements: [ , , , , ],
 			text: 'test',
 		},
@@ -447,7 +497,25 @@ export const spec = [
 			start: 0,
 			end: 9,
 			formats: [ , , , , , , , , , , , , , , , , , ],
-			replacements: [ , , , [ ul ], , [ ul ], , [ ul, ol ], , [ ul, ol ], , , , , , , , ],
+			replacements: [
+				,
+				,
+				,
+				[ ul ],
+				,
+				[ ul ],
+				,
+				[ ul, ol ],
+				,
+				[ ul, ol ],
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+			],
 			text: 'one\u2028a\u2028b\u20281\u20282\u2028three',
 		},
 	},
@@ -504,8 +572,8 @@ export const spec = [
 			endOffset: 0,
 			endContainer: element.firstChild.nextSibling,
 		} ),
-		startPath: [ 1, 2, 0 ],
-		endPath: [ 1, 2, 0 ],
+		startPath: [ 1, 1, 1 ],
+		endPath: [ 1, 1, 1 ],
 		record: {
 			start: 1,
 			end: 1,
@@ -568,7 +636,7 @@ export const spec = [
 	},
 	{
 		description: 'should remove padding',
-		html: '<br data-rich-text-padding="true">',
+		html: ZWNBSP,
 		createRange: ( element ) => ( {
 			startOffset: 0,
 			startContainer: element,
@@ -604,6 +672,100 @@ export const spec = [
 			text: 'test',
 		},
 	},
+	{
+		description: 'should not error with overlapping formats (1)',
+		html: '<a href="#"><em>1</em><strong>2</strong></a>',
+		createRange: ( element ) => ( {
+			startOffset: 1,
+			startContainer: element.firstChild,
+			endOffset: 1,
+			endContainer: element.firstChild,
+		} ),
+		startPath: [ 0, 0, 0, 1 ],
+		endPath: [ 0, 0, 0, 1 ],
+		record: {
+			start: 1,
+			end: 1,
+			formats: [
+				[ a, em ],
+				[ a, strong ],
+			],
+			replacements: [ , , ],
+			text: '12',
+		},
+	},
+	{
+		description: 'should not error with overlapping formats (2)',
+		html: '<em><a href="#">1</a></em><strong><a href="#">2</a></strong>',
+		createRange: ( element ) => ( {
+			startOffset: 1,
+			startContainer: element.firstChild,
+			endOffset: 1,
+			endContainer: element.firstChild,
+		} ),
+		startPath: [ 0, 0, 0, 1 ],
+		endPath: [ 0, 0, 0, 1 ],
+		record: {
+			start: 1,
+			end: 1,
+			formats: [
+				[ em, a ],
+				[ strong, a ],
+			],
+			replacements: [ , , ],
+			text: '12',
+		},
+	},
+	{
+		description: 'should disarm script',
+		html: '<script>alert("1")</script>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 0,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 0 ],
+		record: {
+			start: 0,
+			end: 0,
+			formats: [ , ],
+			replacements: [
+				{
+					attributes: { 'data-rich-text-script': 'alert(%221%22)' },
+					type: 'script',
+				},
+			],
+			text: '\ufffc',
+		},
+	},
+	{
+		description: 'should disarm on* attribute',
+		html: '<img onerror="alert(\'1\')">',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 0,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 0 ],
+		record: {
+			start: 0,
+			end: 0,
+			formats: [ , ],
+			replacements: [
+				{
+					attributes: {
+						'data-disable-rich-text-onerror': "alert('1')",
+					},
+					type: 'img',
+				},
+			],
+			text: '\ufffc',
+		},
+	},
 ];
 
 export const specWithRegistration = [
@@ -618,11 +780,15 @@ export const specWithRegistration = [
 		},
 		html: '<a class="custom-format">a</a>',
 		value: {
-			formats: [ [ {
-				type: 'my-plugin/link',
-				attributes: {},
-				unregisteredAttributes: {},
-			} ] ],
+			formats: [
+				[
+					{
+						type: 'my-plugin/link',
+						attributes: {},
+						unregisteredAttributes: {},
+					},
+				],
+			],
 			replacements: [ , ],
 			text: 'a',
 		},
@@ -638,13 +804,17 @@ export const specWithRegistration = [
 		},
 		html: '<a class="custom-format test">a</a>',
 		value: {
-			formats: [ [ {
-				type: 'my-plugin/link',
-				attributes: {},
-				unregisteredAttributes: {
-					class: 'test',
-				},
-			} ] ],
+			formats: [
+				[
+					{
+						type: 'my-plugin/link',
+						attributes: {},
+						unregisteredAttributes: {
+							class: 'test',
+						},
+					},
+				],
+			],
 			replacements: [ , ],
 			text: 'a',
 		},
@@ -660,13 +830,17 @@ export const specWithRegistration = [
 		},
 		html: '<a class="custom-format">a</a>',
 		value: {
-			formats: [ [ {
-				type: 'core/link',
-				attributes: {},
-				unregisteredAttributes: {
-					class: 'custom-format',
-				},
-			} ] ],
+			formats: [
+				[
+					{
+						type: 'core/link',
+						attributes: {},
+						unregisteredAttributes: {
+							class: 'custom-format',
+						},
+					},
+				],
+			],
 			replacements: [ , ],
 			text: 'a',
 		},
@@ -675,12 +849,16 @@ export const specWithRegistration = [
 		description: 'should create fallback format',
 		html: '<a class="custom-format">a</a>',
 		value: {
-			formats: [ [ {
-				type: 'a',
-				attributes: {
-					class: 'custom-format',
-				},
-			} ] ],
+			formats: [
+				[
+					{
+						type: 'a',
+						attributes: {
+							class: 'custom-format',
+						},
+					},
+				],
+			],
 			replacements: [ , ],
 			text: 'a',
 		},
@@ -704,7 +882,8 @@ export const specWithRegistration = [
 		noToHTMLString: true,
 	},
 	{
-		description: 'should create format if editable tree only but changes need to be recorded',
+		description:
+			'should create format if editable tree only but changes need to be recorded',
 		formatName: 'my-plugin/link',
 		formatType: {
 			title: 'Custom Link',
@@ -716,11 +895,15 @@ export const specWithRegistration = [
 		},
 		html: '<a class="custom-format">a</a>',
 		value: {
-			formats: [ [ {
-				type: 'my-plugin/link',
-				attributes: {},
-				unregisteredAttributes: {},
-			} ] ],
+			formats: [
+				[
+					{
+						type: 'my-plugin/link',
+						attributes: {},
+						unregisteredAttributes: {},
+					},
+				],
+			],
 			replacements: [ , ],
 			text: 'a',
 		},

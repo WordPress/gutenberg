@@ -12,7 +12,7 @@ function traverseCSS( css, callback ) {
 	try {
 		const parsed = parse( css );
 
-		const updated = traverse.map( parsed, function( node ) {
+		const updated = traverse.map( parsed, function ( node ) {
 			if ( ! node ) {
 				return node;
 			}

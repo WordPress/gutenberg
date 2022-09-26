@@ -1,43 +1,29 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
-import { Modal, KeyboardShortcuts } from '@wordpress/components';
+import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { rawShortcut } from '@wordpress/keycodes';
-import { withSelect, withDispatch } from '@wordpress/data';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
+import { withSelect, withDispatch, useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import shortcutConfig from './config';
+import { textFormattingShortcuts } from './config';
+import Shortcut from './shortcut';
+import DynamicShortcut from './dynamic-shortcut';
+import { store as editPostStore } from '../../store';
 
 const MODAL_NAME = 'edit-post/keyboard-shortcut-help';
-
-const mapKeyCombination = ( keyCombination ) => keyCombination.map( ( character, index ) => {
-	if ( character === '+' ) {
-		return (
-			<Fragment key={ index }>
-				{ character }
-			</Fragment>
-		);
-	}
-
-	return (
-		<kbd
-			key={ index }
-			className="edit-post-keyboard-shortcut-help__shortcut-key"
-		>
-			{ character }
-		</kbd>
-	);
-} );
 
 const ShortcutList = ( { shortcuts } ) => (
 	/*
@@ -45,71 +31,124 @@ const ShortcutList = ( { shortcuts } ) => (
 	 * Safari+VoiceOver won't announce the list otherwise.
 	 */
 	/* eslint-disable jsx-a11y/no-redundant-roles */
-	<ul className="edit-post-keyboard-shortcut-help__shortcut-list" role="list">
-		{ shortcuts.map( ( { keyCombination, description, ariaLabel }, index ) => (
+	<ul
+		className="edit-post-keyboard-shortcut-help-modal__shortcut-list"
+		role="list"
+	>
+		{ shortcuts.map( ( shortcut, index ) => (
 			<li
-				className="edit-post-keyboard-shortcut-help__shortcut"
+				className="edit-post-keyboard-shortcut-help-modal__shortcut"
 				key={ index }
 			>
-				<div className="edit-post-keyboard-shortcut-help__shortcut-description">
-					{ description }
-				</div>
-				<div className="edit-post-keyboard-shortcut-help__shortcut-term">
-					<kbd className="edit-post-keyboard-shortcut-help__shortcut-key-combination" aria-label={ ariaLabel }>
-						{ mapKeyCombination( castArray( keyCombination ) ) }
-					</kbd>
-				</div>
+				{ typeof shortcut === 'string' ? (
+					<DynamicShortcut name={ shortcut } />
+				) : (
+					<Shortcut { ...shortcut } />
+				) }
 			</li>
 		) ) }
 	</ul>
+	/* eslint-enable jsx-a11y/no-redundant-roles */
 );
 
-const ShortcutSection = ( { title, shortcuts } ) => (
-	<section className="edit-post-keyboard-shortcut-help__section">
-		<h2 className="edit-post-keyboard-shortcut-help__section-title">
-			{ title }
-		</h2>
+const ShortcutSection = ( { title, shortcuts, className } ) => (
+	<section
+		className={ classnames(
+			'edit-post-keyboard-shortcut-help-modal__section',
+			className
+		) }
+	>
+		{ !! title && (
+			<h2 className="edit-post-keyboard-shortcut-help-modal__section-title">
+				{ title }
+			</h2>
+		) }
 		<ShortcutList shortcuts={ shortcuts } />
 	</section>
 );
 
-export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
+const ShortcutCategorySection = ( {
+	title,
+	categoryName,
+	additionalShortcuts = [],
+} ) => {
+	const categoryShortcuts = useSelect(
+		( select ) => {
+			return select( keyboardShortcutsStore ).getCategoryShortcuts(
+				categoryName
+			);
+		},
+		[ categoryName ]
+	);
+
 	return (
-		<Fragment>
-			<KeyboardShortcuts
-				bindGlobal
-				shortcuts={ {
-					[ rawShortcut.access( 'h' ) ]: toggleModal,
-				} }
+		<ShortcutSection
+			title={ title }
+			shortcuts={ categoryShortcuts.concat( additionalShortcuts ) }
+		/>
+	);
+};
+
+export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
+	useShortcut( 'core/edit-post/keyboard-shortcuts', toggleModal );
+
+	if ( ! isModalActive ) {
+		return null;
+	}
+
+	return (
+		<Modal
+			className="edit-post-keyboard-shortcut-help-modal"
+			title={ __( 'Keyboard shortcuts' ) }
+			closeButtonLabel={ __( 'Close' ) }
+			onRequestClose={ toggleModal }
+		>
+			<ShortcutSection
+				className="edit-post-keyboard-shortcut-help-modal__main-shortcuts"
+				shortcuts={ [ 'core/edit-post/keyboard-shortcuts' ] }
 			/>
-			{ isModalActive && (
-				<Modal
-					className="edit-post-keyboard-shortcut-help"
-					title={ __( 'Keyboard Shortcuts' ) }
-					closeLabel={ __( 'Close' ) }
-					onRequestClose={ toggleModal }
-				>
-					{ shortcutConfig.map( ( config, index ) => (
-						<ShortcutSection key={ index } { ...config } />
-					) ) }
-				</Modal>
-			) }
-		</Fragment>
+			<ShortcutCategorySection
+				title={ __( 'Global shortcuts' ) }
+				categoryName="global"
+			/>
+
+			<ShortcutCategorySection
+				title={ __( 'Selection shortcuts' ) }
+				categoryName="selection"
+			/>
+
+			<ShortcutCategorySection
+				title={ __( 'Block shortcuts' ) }
+				categoryName="block"
+				additionalShortcuts={ [
+					{
+						keyCombination: { character: '/' },
+						description: __(
+							'Change the block type after adding a new paragraph.'
+						),
+						/* translators: The forward-slash character. e.g. '/'. */
+						ariaLabel: __( 'Forward-slash' ),
+					},
+				] }
+			/>
+			<ShortcutSection
+				title={ __( 'Text formatting' ) }
+				shortcuts={ textFormattingShortcuts }
+			/>
+		</Modal>
 	);
 }
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		isModalActive: select( 'core/edit-post' ).isModalActive( MODAL_NAME ),
+		isModalActive: select( editPostStore ).isModalActive( MODAL_NAME ),
 	} ) ),
 	withDispatch( ( dispatch, { isModalActive } ) => {
-		const {
-			openModal,
-			closeModal,
-		} = dispatch( 'core/edit-post' );
+		const { openModal, closeModal } = dispatch( editPostStore );
 
 		return {
-			toggleModal: () => isModalActive ? closeModal() : openModal( MODAL_NAME ),
+			toggleModal: () =>
+				isModalActive ? closeModal() : openModal( MODAL_NAME ),
 		};
 	} ),
 ] )( KeyboardShortcutHelpModal );

@@ -1,0 +1,14 @@
+[
+	{
+		"name": "core/search",
+		"isValid": true,
+		"attributes": {
+			"showLabel": true,
+			"placeholder": "",
+			"buttonPosition": "button-outside",
+			"buttonUseIcon": false,
+			"query": {}
+		},
+		"innerBlocks": []
+	}
+]

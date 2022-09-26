@@ -42,14 +42,18 @@ describe( 'postcss-themes', () => {
 	} );
 
 	it( 'replaces multiple rules in the same declaration', () => {
-		return run( 'a{ background: linear-gradient( -45deg, theme(main) 50%, theme(highlight) 50% ) }' ).then( ( result ) => {
+		return run(
+			'a{ background: linear-gradient( -45deg, theme(main) 50%, theme(highlight) 50% ) }'
+		).then( ( result ) => {
 			expect( result.css ).toMatchSnapshot();
 			expect( result.warnings() ).toHaveLength( 0 );
 		} );
 	} );
 
 	it( 'gather several declaration in a unique rule', () => {
-		return run( 'a{ color: theme( main ); background: theme(highlight); }' ).then( ( result ) => {
+		return run(
+			'a{ color: theme( main ); background: theme(highlight); }'
+		).then( ( result ) => {
 			expect( result.css ).toMatchSnapshot();
 			expect( result.warnings() ).toHaveLength( 0 );
 		} );

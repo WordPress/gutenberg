@@ -2,35 +2,14 @@
  * Internal dependencies
  */
 import {
-	getColumnsTemplate,
 	toWidthPrecision,
-	getAdjacentBlocks,
 	getEffectiveColumnWidth,
 	getTotalColumnsWidth,
 	getColumnWidths,
 	getRedistributedColumnWidths,
-	hasExplicitColumnWidths,
+	hasExplicitPercentColumnWidths,
 	getMappedColumnWidths,
 } from '../utils';
-
-describe( 'getColumnsTemplate', () => {
-	it( 'should return a template corresponding to columns count', () => {
-		const template = getColumnsTemplate( 4 );
-
-		expect( template ).toEqual( [
-			[ 'core/column' ],
-			[ 'core/column' ],
-			[ 'core/column' ],
-			[ 'core/column' ],
-		] );
-	} );
-
-	it( 'should return null if columns count is not defined', () => {
-		const template = getColumnsTemplate( undefined );
-
-		expect( template ).toBe( null );
-	} );
-} );
 
 describe( 'toWidthPrecision', () => {
 	it( 'should round value to standard precision', () => {
@@ -39,28 +18,17 @@ describe( 'toWidthPrecision', () => {
 		expect( value ).toBe( 50.11 );
 	} );
 
+	it( 'should convert a string value with unit to a number', () => {
+		expect( toWidthPrecision( '33.3%' ) ).toBe( 33.3 );
+	} );
+
+	it( 'should return undefined for an invalid string', () => {
+		expect( toWidthPrecision( 'blahblah' ) ).toBe( undefined );
+	} );
+
 	it( 'should return undefined for invalid number', () => {
 		expect( toWidthPrecision( null ) ).toBe( undefined );
 		expect( toWidthPrecision( undefined ) ).toBe( undefined );
-	} );
-} );
-
-describe( 'getAdjacentBlocks', () => {
-	const blockA = { clientId: 'a' };
-	const blockB = { clientId: 'b' };
-	const blockC = { clientId: 'c' };
-	const blocks = [ blockA, blockB, blockC ];
-
-	it( 'should return blocks after clientId', () => {
-		const result = getAdjacentBlocks( blocks, 'b' );
-
-		expect( result ).toEqual( [ blockC ] );
-	} );
-
-	it( 'should return blocks before clientId if clientId is last', () => {
-		const result = getAdjacentBlocks( blocks, 'c' );
-
-		expect( result ).toEqual( [ blockA, blockB ] );
 	} );
 } );
 
@@ -146,7 +114,7 @@ describe( 'getColumnWidths', () => {
 
 describe( 'getRedistributedColumnWidths', () => {
 	describe( 'explicit width', () => {
-		const blocks = [
+		let blocks = [
 			{ clientId: 'a', attributes: { width: 30 } },
 			{ clientId: 'b', attributes: { width: 40 } },
 		];
@@ -155,8 +123,8 @@ describe( 'getRedistributedColumnWidths', () => {
 			const widths = getRedistributedColumnWidths( blocks, 60 );
 
 			expect( widths ).toEqual( {
-				a: 25,
-				b: 35,
+				a: 25.71,
+				b: 34.29,
 			} );
 		} );
 
@@ -164,8 +132,36 @@ describe( 'getRedistributedColumnWidths', () => {
 			const widths = getRedistributedColumnWidths( blocks, 80 );
 
 			expect( widths ).toEqual( {
-				a: 35,
-				b: 45,
+				a: 34.29,
+				b: 45.71,
+			} );
+		} );
+
+		it( 'should decrease proportionally for third column', () => {
+			blocks = [
+				{ clientId: 'a', attributes: { width: 99 } },
+				{ clientId: 'b', attributes: { width: 1 } },
+			];
+			const widths = getRedistributedColumnWidths( blocks, 66.67 );
+
+			expect( widths ).toEqual( {
+				a: 66,
+				b: 0.67,
+			} );
+		} );
+
+		it( 'should decrease proportionally for fourth column', () => {
+			blocks = [
+				{ clientId: 'a', attributes: { width: 98 } },
+				{ clientId: 'b', attributes: { width: 1 } },
+				{ clientId: 'c', attributes: { width: 1 } },
+			];
+			const widths = getRedistributedColumnWidths( blocks, 75 );
+
+			expect( widths ).toEqual( {
+				a: 73.5,
+				b: 0.75,
+				c: 0.75,
 			} );
 		} );
 	} );
@@ -196,21 +192,73 @@ describe( 'getRedistributedColumnWidths', () => {
 	} );
 } );
 
-describe( 'hasExplicitColumnWidths', () => {
+describe( 'hasExplicitPercentColumnWidths', () => {
 	it( 'returns false if no blocks have explicit width', () => {
 		const blocks = [ { attributes: {} } ];
 
-		const result = hasExplicitColumnWidths( blocks );
+		const result = hasExplicitPercentColumnWidths( blocks );
 
 		expect( result ).toBe( false );
 	} );
 
-	it( 'returns true if a block has explicit width', () => {
-		const blocks = [ { attributes: { width: 10 } } ];
+	it( 'returns true if a block has explicit width defined as a number', () => {
+		const blocks = [ { attributes: { width: 100 } } ];
 
-		const result = hasExplicitColumnWidths( blocks );
+		const result = hasExplicitPercentColumnWidths( blocks );
 
 		expect( result ).toBe( true );
+	} );
+
+	it( 'returns true if a block has explicit percent width defined as a string', () => {
+		const blocks = [ { attributes: { width: '100%' } } ];
+
+		const result = hasExplicitPercentColumnWidths( blocks );
+
+		expect( result ).toBe( true );
+	} );
+
+	it( 'returns false if some, not all blocks have explicit width', () => {
+		const blocks = [
+			{ attributes: { width: 10 } },
+			{ attributes: { width: undefined } },
+		];
+
+		const result = hasExplicitPercentColumnWidths( blocks );
+
+		expect( result ).toBe( false );
+	} );
+
+	it( 'returns true if all blocks have explicit width', () => {
+		const blocks = [
+			{ attributes: { width: 10 } },
+			{ attributes: { width: 90 } },
+		];
+
+		const result = hasExplicitPercentColumnWidths( blocks );
+
+		expect( result ).toBe( true );
+	} );
+
+	it( 'returns true if blocks have width defined as percent strings and numbers', () => {
+		const blocks = [
+			{ attributes: { width: '10%' } },
+			{ attributes: { width: 90 } },
+		];
+
+		const result = hasExplicitPercentColumnWidths( blocks );
+
+		expect( result ).toBe( true );
+	} );
+
+	it( 'returns false if blocks have width defined as mixed unit strings', () => {
+		const blocks = [
+			{ attributes: { width: '20%' } },
+			{ attributes: { width: '90px' } },
+		];
+
+		const result = hasExplicitPercentColumnWidths( blocks );
+
+		expect( result ).toBe( false );
 	} );
 } );
 
@@ -228,8 +276,8 @@ describe( 'getMappedColumnWidths', () => {
 		const result = getMappedColumnWidths( blocks, widths );
 
 		expect( result ).toEqual( [
-			{ clientId: 'a', attributes: { width: 25 } },
-			{ clientId: 'b', attributes: { width: 35 } },
+			{ clientId: 'a', attributes: { width: '25%' } },
+			{ clientId: 'b', attributes: { width: '35%' } },
 		] );
 	} );
 } );

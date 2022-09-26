@@ -8,7 +8,7 @@ import { createBlobURL } from '@wordpress/blob';
  */
 const { atob, File } = window;
 
-export default function( node ) {
+export default function imageCorrector( node ) {
 	if ( node.nodeName !== 'IMG' ) {
 		return;
 	}

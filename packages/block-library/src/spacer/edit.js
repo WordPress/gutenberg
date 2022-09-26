@@ -6,76 +6,188 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
-import { BaseControl, PanelBody, ResizableBox } from '@wordpress/components';
-import { withInstanceId } from '@wordpress/compose';
+import { useBlockProps } from '@wordpress/block-editor';
+import { ResizableBox } from '@wordpress/components';
+import { useState, useEffect } from '@wordpress/element';
+import { View } from '@wordpress/primitives';
 
-const SpacerEdit = ( { attributes, isSelected, setAttributes, instanceId } ) => {
-	const { height } = attributes;
-	const id = `block-spacer-height-input-${ instanceId }`;
-	const [ inputHeightValue, setInputHeightValue ] = useState( height );
+/**
+ * Internal dependencies
+ */
+import SpacerControls from './controls';
+import { MIN_SPACER_SIZE } from './constants';
+
+const ResizableSpacer = ( {
+	orientation,
+	onResizeStart,
+	onResize,
+	onResizeStop,
+	isSelected,
+	isResizing,
+	setIsResizing,
+	...props
+} ) => {
+	const getCurrentSize = ( elt ) => {
+		return orientation === 'horizontal'
+			? elt.clientWidth
+			: elt.clientHeight;
+	};
+
+	const getNextVal = ( elt ) => {
+		return `${ getCurrentSize( elt ) }px`;
+	};
+
+	return (
+		<ResizableBox
+			className={ classnames( 'block-library-spacer__resize-container', {
+				'resize-horizontal': orientation === 'horizontal',
+				'is-resizing': isResizing,
+				'is-selected': isSelected,
+			} ) }
+			onResizeStart={ ( _event, _direction, elt ) => {
+				const nextVal = getNextVal( elt );
+				onResizeStart( nextVal );
+				onResize( nextVal );
+			} }
+			onResize={ ( _event, _direction, elt ) => {
+				onResize( getNextVal( elt ) );
+				if ( ! isResizing ) {
+					setIsResizing( true );
+				}
+			} }
+			onResizeStop={ ( _event, _direction, elt ) => {
+				const nextVal = getCurrentSize( elt );
+				onResizeStop( `${ nextVal }px` );
+				setIsResizing( false );
+			} }
+			__experimentalShowTooltip={ true }
+			__experimentalTooltipProps={ {
+				axis: orientation === 'horizontal' ? 'x' : 'y',
+				position: 'corner',
+				isVisible: isResizing,
+			} }
+			showHandle={ isSelected }
+			{ ...props }
+		/>
+	);
+};
+
+const SpacerEdit = ( {
+	attributes,
+	isSelected,
+	setAttributes,
+	toggleSelection,
+	context,
+} ) => {
+	const { orientation } = context;
+	const { height, width } = attributes;
+
+	const [ isResizing, setIsResizing ] = useState( false );
+	const [ temporaryHeight, setTemporaryHeight ] = useState( null );
+	const [ temporaryWidth, setTemporaryWidth ] = useState( null );
+
+	const onResizeStart = () => toggleSelection( false );
+	const onResizeStop = () => toggleSelection( true );
+
+	const handleOnVerticalResizeStop = ( newHeight ) => {
+		onResizeStop();
+
+		setAttributes( { height: newHeight } );
+		setTemporaryHeight( null );
+	};
+
+	const handleOnHorizontalResizeStop = ( newWidth ) => {
+		onResizeStop();
+		setAttributes( { width: newWidth } );
+		setTemporaryWidth( null );
+	};
+
+	const style = {
+		height:
+			orientation === 'horizontal'
+				? 24
+				: temporaryHeight || height || undefined,
+		width:
+			orientation === 'horizontal'
+				? temporaryWidth || width || undefined
+				: undefined,
+	};
+
+	const resizableBoxWithOrientation = ( blockOrientation ) => {
+		if ( blockOrientation === 'horizontal' ) {
+			return (
+				<ResizableSpacer
+					minWidth={ MIN_SPACER_SIZE }
+					enable={ {
+						top: false,
+						right: true,
+						bottom: false,
+						left: false,
+						topRight: false,
+						bottomRight: false,
+						bottomLeft: false,
+						topLeft: false,
+					} }
+					orientation={ blockOrientation }
+					onResizeStart={ onResizeStart }
+					onResize={ setTemporaryWidth }
+					onResizeStop={ handleOnHorizontalResizeStop }
+					isSelected={ isSelected }
+					isResizing={ isResizing }
+					setIsResizing={ setIsResizing }
+				/>
+			);
+		}
+
+		return (
+			<>
+				<ResizableSpacer
+					minHeight={ MIN_SPACER_SIZE }
+					enable={ {
+						top: false,
+						right: false,
+						bottom: true,
+						left: false,
+						topRight: false,
+						bottomRight: false,
+						bottomLeft: false,
+						topLeft: false,
+					} }
+					orientation={ blockOrientation }
+					onResizeStart={ onResizeStart }
+					onResize={ setTemporaryHeight }
+					onResizeStop={ handleOnVerticalResizeStop }
+					isSelected={ isSelected }
+					isResizing={ isResizing }
+					setIsResizing={ setIsResizing }
+				/>
+			</>
+		);
+	};
+
+	useEffect( () => {
+		if ( orientation === 'horizontal' && ! width ) {
+			setAttributes( {
+				height: '0px',
+				width: '72px',
+			} );
+		}
+	}, [] );
 
 	return (
 		<>
-			<ResizableBox
-				className={ classnames(
-					'block-library-spacer__resize-container',
-					{ 'is-selected': isSelected },
-				) }
-				size={ {
-					height,
-				} }
-				minHeight="20"
-				enable={ {
-					top: false,
-					right: false,
-					bottom: true,
-					left: false,
-					topRight: false,
-					bottomRight: false,
-					bottomLeft: false,
-					topLeft: false,
-				} }
-				onResizeStop={ ( event, direction, elt, delta ) => {
-					const spacerHeight = parseInt( height + delta.height, 10 );
-					setAttributes( {
-						height: spacerHeight,
-					} );
-					setInputHeightValue( spacerHeight );
-				} }
+			<View { ...useBlockProps( { style } ) }>
+				{ resizableBoxWithOrientation( orientation ) }
+			</View>
+			<SpacerControls
+				setAttributes={ setAttributes }
+				height={ temporaryHeight || height }
+				width={ temporaryWidth || width }
+				orientation={ orientation }
+				isResizing={ isResizing }
 			/>
-			<InspectorControls>
-				<PanelBody title={ __( 'Spacer Settings' ) }>
-					<BaseControl label={ __( 'Height in pixels' ) } id={ id }>
-						<input
-							type="number"
-							id={ id }
-							onChange={ ( event ) => {
-								let spacerHeight = parseInt( event.target.value, 10 );
-								setInputHeightValue( spacerHeight );
-								if ( isNaN( spacerHeight ) ) {
-									// Set spacer height to default size and input box to empty string
-									setInputHeightValue( '' );
-									spacerHeight = 100;
-								} else if ( spacerHeight < 20 ) {
-									// Set spacer height to minimum size
-									spacerHeight = 20;
-								}
-								setAttributes( {
-									height: spacerHeight,
-								} );
-							} }
-							value={ inputHeightValue }
-							min="20"
-							step="10"
-						/>
-					</BaseControl>
-				</PanelBody>
-			</InspectorControls>
 		</>
 	);
 };
 
-export default withInstanceId( SpacerEdit );
+export default SpacerEdit;

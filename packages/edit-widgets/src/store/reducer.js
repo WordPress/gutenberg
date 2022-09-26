@@ -1,69 +1,75 @@
 /**
- * External dependencies
- */
-import { keyBy, mapValues, pick } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
 
 /**
- * Reducer storing some properties of each widget area.
+ * Controls the open state of the widget areas.
  *
- * @param {Array}  state  Current state.
- * @param {Object} action Action object.
+ * @param {Object} state  Redux state.
+ * @param {Object} action Redux action.
  *
  * @return {Array} Updated state.
  */
-export function widgetAreas( state = {}, action = {} ) {
-	switch ( action.type ) {
-		case 'SETUP_WIDGET_AREAS':
-			return mapValues(
-				keyBy( action.widgetAreas, 'id' ),
-				( value ) => pick( value, [
-					'name',
-					'id',
-					'description',
-				] )
-			);
+export function widgetAreasOpenState( state = {}, action ) {
+	const { type } = action;
+	switch ( type ) {
+		case 'SET_WIDGET_AREAS_OPEN_STATE': {
+			return action.widgetAreasOpenState;
+		}
+		case 'SET_IS_WIDGET_AREA_OPEN': {
+			const { clientId, isOpen } = action;
+			return {
+				...state,
+				[ clientId ]: isOpen,
+			};
+		}
+		default: {
+			return state;
+		}
 	}
+}
 
+/**
+ * Reducer to set the block inserter panel open or closed.
+ *
+ * Note: this reducer interacts with the list view panel reducer
+ * to make sure that only one of the two panels is open at the same time.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ */
+export function blockInserterPanel( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_LIST_VIEW_OPENED':
+			return action.isOpen ? false : state;
+		case 'SET_IS_INSERTER_OPENED':
+			return action.value;
+	}
 	return state;
 }
 
 /**
- * Reducer storing the blocks part of each widget area.
+ * Reducer to set the list view panel open or closed.
  *
- * @param {Array}  state  Current state.
- * @param {Object} action Action object.
+ * Note: this reducer interacts with the inserter panel reducer
+ * to make sure that only one of the two panels is open at the same time.
  *
- * @return {Array} Updated state.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  */
-export function widgetAreaBlocks( state = {}, action = {} ) {
+export function listViewPanel( state = false, action ) {
 	switch ( action.type ) {
-		case 'SETUP_WIDGET_AREAS':
-			return mapValues(
-				keyBy( action.widgetAreas, 'id' ),
-				( value ) => value.blocks
-			);
-		case 'UPDATE_BLOCKS_IN_WIDGET_AREA': {
-			const blocks = state[ action.widgetAreaId ] || [];
-			// check if change is required
-			if ( blocks === action.blocks ) {
-				return state;
-			}
-			return {
-				...state,
-				[ action.widgetAreaId ]: action.blocks,
-			};
-		}
+		case 'SET_IS_INSERTER_OPENED':
+			return action.value ? false : state;
+		case 'SET_IS_LIST_VIEW_OPENED':
+			return action.isOpen;
 	}
-
 	return state;
 }
 
 export default combineReducers( {
-	widgetAreas,
-	widgetAreaBlocks,
+	blockInserterPanel,
+	listViewPanel,
+	widgetAreasOpenState,
 } );

@@ -1,33 +1,12 @@
 /**
- * External dependencies
- */
-import optimist from 'redux-optimist';
-import {
-	flow,
-	reduce,
-	omit,
-	mapValues,
-	keys,
-	isEqual,
-} from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import {
-	PREFERENCES_DEFAULTS,
-	INITIAL_EDITS_DEFAULTS,
-	EDITOR_SETTINGS_DEFAULTS,
-} from './defaults';
-import { EDIT_MERGE_PROPERTIES } from './constants';
-import withChangeDetection from '../utils/with-change-detection';
-import withHistory from '../utils/with-history';
+import { EDITOR_SETTINGS_DEFAULTS } from './defaults';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -46,23 +25,6 @@ export function getPostRawValue( value ) {
 }
 
 /**
- * Returns an object against which it is safe to perform mutating operations,
- * given the original object and its current working copy.
- *
- * @param {Object} original Original object.
- * @param {Object} working  Working object.
- *
- * @return {Object} Mutation-safe object.
- */
-function getMutateSafeObject( original, working ) {
-	if ( original === working ) {
-		return { ...original };
-	}
-
-	return working;
-}
-
-/**
  * Returns true if the two object arguments have the same keys, or false
  * otherwise.
  *
@@ -72,7 +34,12 @@ function getMutateSafeObject( original, working ) {
  * @return {boolean} Whether the two objects have the same keys.
  */
 export function hasSameKeys( a, b ) {
-	return isEqual( keys( a ), keys( b ) );
+	const keysA = Object.keys( a ).sort();
+	const keysB = Object.keys( b ).sort();
+	return (
+		keysA.length === keysB.length &&
+		keysA.every( ( key, index ) => keysB[ index ] === key )
+	);
 }
 
 /**
@@ -114,165 +81,19 @@ export function shouldOverwriteState( action, previousAction ) {
 	return isUpdatingSamePostProperty( action, previousAction );
 }
 
-/**
- * Undoable reducer returning the editor post state, including blocks parsed
- * from current HTML markup.
- *
- * Handles the following state keys:
- *  - edits: an object describing changes to be made to the current post, in
- *           the format accepted by the WP REST API
- *  - blocks: post content blocks
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @returns {Object} Updated state.
- */
-export const editor = flow( [
-	combineReducers,
-
-	withHistory( {
-		resetTypes: [ 'SETUP_EDITOR_STATE' ],
-		ignoreTypes: [
-			'RESET_POST',
-			'UPDATE_POST',
-		],
-		shouldOverwriteState,
-	} ),
-] )( {
-	// Track whether changes exist, resetting at each post save. Relies on
-	// editor initialization firing post reset as an effect.
-	blocks: withChangeDetection( {
-		resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
-	} )( ( state = { value: [] }, action ) => {
-		switch ( action.type ) {
-			case 'RESET_EDITOR_BLOCKS':
-				if ( action.blocks === state.value ) {
-					return state;
-				}
-				return { value: action.blocks };
-		}
-
-		return state;
-	} ),
-	edits( state = {}, action ) {
-		switch ( action.type ) {
-			case 'EDIT_POST':
-				return reduce( action.edits, ( result, value, key ) => {
-					// Only assign into result if not already same value
-					if ( value !== state[ key ] ) {
-						result = getMutateSafeObject( state, result );
-
-						if ( EDIT_MERGE_PROPERTIES.has( key ) ) {
-							// Merge properties should assign to current value.
-							result[ key ] = { ...result[ key ], ...value };
-						} else {
-							// Otherwise override.
-							result[ key ] = value;
-						}
-					}
-
-					return result;
-				}, state );
-			case 'UPDATE_POST':
-			case 'RESET_POST':
-				const getCanonicalValue = action.type === 'UPDATE_POST' ?
-					( key ) => action.edits[ key ] :
-					( key ) => getPostRawValue( action.post[ key ] );
-
-				return reduce( state, ( result, value, key ) => {
-					if ( ! isEqual( value, getCanonicalValue( key ) ) ) {
-						return result;
-					}
-
-					result = getMutateSafeObject( state, result );
-					delete result[ key ];
-					return result;
-				}, state );
-			case 'RESET_EDITOR_BLOCKS':
-				if ( 'content' in state ) {
-					return omit( state, 'content' );
-				}
-
-				return state;
-		}
-
-		return state;
-	},
-} );
-
-/**
- * Reducer returning the initial edits state. With matching shape to that of
- * `editor.edits`, the initial edits are those applied programmatically, are
- * not considered in prompting the user for unsaved changes, and are included
- * in (and reset by) the next save payload.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Action object.
- *
- * @return {Object} Next state.
- */
-export function initialEdits( state = INITIAL_EDITS_DEFAULTS, action ) {
+export function postId( state = null, action ) {
 	switch ( action.type ) {
-		case 'SETUP_EDITOR':
-			if ( ! action.edits ) {
-				break;
-			}
-
-			return action.edits;
-
 		case 'SETUP_EDITOR_STATE':
-			if ( 'content' in state ) {
-				return omit( state, 'content' );
-			}
-
-			return state;
-
-		case 'UPDATE_POST':
-			return reduce( action.edits, ( result, value, key ) => {
-				if ( ! result.hasOwnProperty( key ) ) {
-					return result;
-				}
-
-				result = getMutateSafeObject( state, result );
-				delete result[ key ];
-				return result;
-			}, state );
-
-		case 'RESET_POST':
-			return INITIAL_EDITS_DEFAULTS;
+			return action.post.id;
 	}
 
 	return state;
 }
 
-/**
- * Reducer returning the last-known state of the current post, in the format
- * returned by the WP REST API.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function currentPost( state = {}, action ) {
+export function postType( state = null, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
-		case 'RESET_POST':
-		case 'UPDATE_POST':
-			let post;
-			if ( action.post ) {
-				post = action.post;
-			} else if ( action.edits ) {
-				post = {
-					...state,
-					...action.edits,
-				};
-			} else {
-				return state;
-			}
-
-			return mapValues( post, getPostRawValue );
+			return action.post.type;
 	}
 
 	return state;
@@ -299,32 +120,6 @@ export function template( state = { isValid: true }, action ) {
 }
 
 /**
- * Reducer returning the user preferences.
- *
- * @param {Object}  state                 Current state.
- * @param {Object}  action                Dispatched action.
- *
- * @return {string} Updated state.
- */
-export function preferences( state = PREFERENCES_DEFAULTS, action ) {
-	switch ( action.type ) {
-		case 'ENABLE_PUBLISH_SIDEBAR':
-			return {
-				...state,
-				isPublishSidebarEnabled: true,
-			};
-
-		case 'DISABLE_PUBLISH_SIDEBAR':
-			return {
-				...state,
-				isPublishSidebarEnabled: false,
-			};
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning current network request state (whether a request to
  * the WP REST API is in progress, successful, or failed).
  *
@@ -336,27 +131,30 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 export function saving( state = {}, action ) {
 	switch ( action.type ) {
 		case 'REQUEST_POST_UPDATE_START':
+		case 'REQUEST_POST_UPDATE_FINISH':
 			return {
-				requesting: true,
-				successful: false,
-				error: null,
+				pending: action.type === 'REQUEST_POST_UPDATE_START',
 				options: action.options || {},
 			};
+	}
 
-		case 'REQUEST_POST_UPDATE_SUCCESS':
-			return {
-				requesting: false,
-				successful: true,
-				error: null,
-				options: action.options || {},
-			};
+	return state;
+}
 
-		case 'REQUEST_POST_UPDATE_FAILURE':
+/**
+ * Reducer returning deleting post request state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function deleting( state = {}, action ) {
+	switch ( action.type ) {
+		case 'REQUEST_POST_DELETE_START':
+		case 'REQUEST_POST_DELETE_FINISH':
 			return {
-				requesting: false,
-				successful: false,
-				error: action.error,
-				options: action.options || {},
+				pending: action.type === 'REQUEST_POST_DELETE_START',
 			};
 	}
 
@@ -368,7 +166,7 @@ export function saving( state = {}, action ) {
  *
  * @typedef {Object} PostLockState
  *
- * @property {boolean} isLocked       Whether the post is locked.
+ * @property {boolean}  isLocked       Whether the post is locked.
  * @property {?boolean} isTakeover     Whether the post editing has been taken over.
  * @property {?boolean} activePostLock Active post lock value.
  * @property {?Object}  user           User that took over the post.
@@ -378,7 +176,7 @@ export function saving( state = {}, action ) {
  * Reducer returning the post lock status.
  *
  * @param {PostLockState} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Object}        action Dispatched action.
  *
  * @return {PostLockState} Updated state.
  */
@@ -396,8 +194,8 @@ export function postLock( state = { isLocked: false }, action ) {
  *
  * When post saving is locked, the post cannot be published or updated.
  *
- * @param {PostSavingLockState} state  Current state.
- * @param {Object}              action Dispatched action.
+ * @param {PostLockState} state  Current state.
+ * @param {Object}        action Dispatched action.
  *
  * @return {PostLockState} Updated state.
  */
@@ -406,141 +204,36 @@ export function postSavingLock( state = {}, action ) {
 		case 'LOCK_POST_SAVING':
 			return { ...state, [ action.lockName ]: true };
 
-		case 'UNLOCK_POST_SAVING':
-			return omit( state, action.lockName );
+		case 'UNLOCK_POST_SAVING': {
+			const { [ action.lockName ]: removedLockName, ...restState } =
+				state;
+			return restState;
+		}
 	}
 	return state;
 }
 
-export const reusableBlocks = combineReducers( {
-	data( state = {}, action ) {
-		switch ( action.type ) {
-			case 'RECEIVE_REUSABLE_BLOCKS': {
-				return reduce( action.results, ( nextState, result ) => {
-					const { id, title } = result.reusableBlock;
-					const { clientId } = result.parsedBlock;
-
-					const value = { clientId, title };
-
-					if ( ! isEqual( nextState[ id ], value ) ) {
-						nextState = getMutateSafeObject( state, nextState );
-						nextState[ id ] = value;
-					}
-
-					return nextState;
-				}, state );
-			}
-
-			case 'UPDATE_REUSABLE_BLOCK_TITLE': {
-				const { id, title } = action;
-
-				if ( ! state[ id ] || state[ id ].title === title ) {
-					return state;
-				}
-
-				return {
-					...state,
-					[ id ]: {
-						...state[ id ],
-						title,
-					},
-				};
-			}
-
-			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
-				const { id, updatedId } = action;
-
-				// If a temporary reusable block is saved, we swap the temporary id with the final one
-				if ( id === updatedId ) {
-					return state;
-				}
-
-				const value = state[ id ];
-				return {
-					...omit( state, id ),
-					[ updatedId ]: value,
-				};
-			}
-
-			case 'REMOVE_REUSABLE_BLOCK': {
-				const { id } = action;
-				return omit( state, id );
-			}
-		}
-
-		return state;
-	},
-
-	isFetching( state = {}, action ) {
-		switch ( action.type ) {
-			case 'FETCH_REUSABLE_BLOCKS': {
-				const { id } = action;
-				if ( ! id ) {
-					return state;
-				}
-
-				return {
-					...state,
-					[ id ]: true,
-				};
-			}
-
-			case 'FETCH_REUSABLE_BLOCKS_SUCCESS':
-			case 'FETCH_REUSABLE_BLOCKS_FAILURE': {
-				const { id } = action;
-				return omit( state, id );
-			}
-		}
-
-		return state;
-	},
-
-	isSaving( state = {}, action ) {
-		switch ( action.type ) {
-			case 'SAVE_REUSABLE_BLOCK':
-				return {
-					...state,
-					[ action.id ]: true,
-				};
-
-			case 'SAVE_REUSABLE_BLOCK_SUCCESS':
-			case 'SAVE_REUSABLE_BLOCK_FAILURE': {
-				const { id } = action;
-				return omit( state, id );
-			}
-		}
-
-		return state;
-	},
-} );
-
 /**
- * Reducer returning the post preview link.
+ * Post autosaving lock.
  *
- * @param {string?} state  The preview link.
- * @param {Object}  action Dispatched action.
+ * When post autosaving is locked, the post will not autosave.
  *
- * @return {string?} Updated state.
+ * @param {PostLockState} state  Current state.
+ * @param {Object}        action Dispatched action.
+ *
+ * @return {PostLockState} Updated state.
  */
-export function previewLink( state = null, action ) {
+export function postAutosavingLock( state = {}, action ) {
 	switch ( action.type ) {
-		case 'REQUEST_POST_UPDATE_SUCCESS':
-			if ( action.post.preview_link ) {
-				return action.post.preview_link;
-			} else if ( action.post.link ) {
-				return addQueryArgs( action.post.link, { preview: true } );
-			}
+		case 'LOCK_POST_AUTOSAVING':
+			return { ...state, [ action.lockName ]: true };
 
-			return state;
-
-		case 'REQUEST_POST_UPDATE_START':
-			// Invalidate known preview link when autosave starts.
-			if ( state && action.options.isPreview ) {
-				return null;
-			}
-			break;
+		case 'UNLOCK_POST_AUTOSAVING': {
+			const { [ action.lockName ]: removedLockName, ...restState } =
+				state;
+			return restState;
+		}
 	}
-
 	return state;
 }
 
@@ -550,7 +243,7 @@ export function previewLink( state = null, action ) {
  * the post object is loaded properly and the initial blocks parsed.
  *
  * @param {boolean} state
- * @param {Object} action
+ * @param {Object}  action
  *
  * @return {boolean} Updated state.
  */
@@ -558,6 +251,9 @@ export function isReady( state = false, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
 			return true;
+
+		case 'TEAR_DOWN_EDITOR':
+			return false;
 	}
 
 	return state;
@@ -583,17 +279,15 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 	return state;
 }
 
-export default optimist( combineReducers( {
-	editor,
-	initialEdits,
-	currentPost,
-	preferences,
+export default combineReducers( {
+	postId,
+	postType,
 	saving,
+	deleting,
 	postLock,
-	reusableBlocks,
 	template,
-	previewLink,
 	postSavingLock,
 	isReady,
 	editorSettings,
-} ) );
+	postAutosavingLock,
+} );

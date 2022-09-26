@@ -16,7 +16,7 @@
 	}
 
 	.document-outline__emdash::before {
-		color: $light-gray-500;
+		color: $gray-300;
 		margin-right: 4px;
 	}
 
@@ -49,21 +49,25 @@
 	align-items: flex-start;
 	margin: 0 0 0 -1px;
 	padding: 2px 5px 2px 1px;
-	color: $dark-gray-800;
+	color: $gray-900;
 	text-align: left;
+	border-radius: $radius-block-ui;
 
 	&:disabled {
 		cursor: default;
 	}
 
 	&:focus {
-		@include button-style__focus-active;
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
 	}
 }
 
 .document-outline__level {
-	background: $light-gray-500;
-	color: $dark-gray-800;
+	background: $gray-300;
+	color: $gray-900;
 	border-radius: 3px;
 	font-size: $default-font-size;
 	padding: 1px 6px;

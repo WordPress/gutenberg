@@ -1,12 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
-
-/**
- * WordPress dependencies
- */
-import { Component } from '@wordpress/element';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -15,112 +10,86 @@ import Icon from '../';
 import { Path, SVG } from '../../';
 
 describe( 'Icon', () => {
+	const testId = 'icon';
 	const className = 'example-class';
-	const svg = <SVG><Path d="M5 4v3h5.5v12h3V7H19V4z" /></SVG>;
-	const style = { fill: 'red' };
+	const svg = (
+		<SVG>
+			<Path d="M5 4v3h5.5v12h3V7H19V4z" />
+		</SVG>
+	);
 
 	it( 'renders nothing when icon omitted', () => {
-		const wrapper = shallow( <Icon /> );
+		render( <Icon data-testid={ testId } /> );
 
-		expect( wrapper.type() ).toBeNull();
+		expect( screen.queryByTestId( testId ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'renders a dashicon by slug', () => {
-		const wrapper = shallow( <Icon icon="format-image" /> );
+		render( <Icon data-testid={ testId } icon="format-image" /> );
 
-		expect( wrapper.find( 'Dashicon' ).prop( 'icon' ) ).toBe( 'format-image' );
-	} );
-
-	it( 'renders a dashicon and with a default size of 20', () => {
-		const wrapper = shallow( <Icon icon="format-image" /> );
-
-		expect( wrapper.find( 'Dashicon' ).prop( 'size' ) ).toBe( 20 );
+		expect( screen.getByTestId( testId ) ).toHaveClass(
+			'dashicons-format-image'
+		);
 	} );
 
 	it( 'renders a function', () => {
-		const wrapper = shallow( <Icon icon={ () => <span /> } /> );
+		render( <Icon icon={ () => <span data-testid={ testId } /> } /> );
 
-		expect( wrapper.name() ).toBe( 'span' );
+		expect( screen.getByTestId( testId ) ).toBeVisible();
 	} );
 
 	it( 'renders an element', () => {
-		const wrapper = shallow( <Icon icon={ <span /> } /> );
+		render( <Icon icon={ <span data-testid={ testId } /> } /> );
 
-		expect( wrapper.name() ).toBe( 'span' );
+		expect( screen.getByTestId( testId ) ).toBeVisible();
 	} );
 
 	it( 'renders an svg element', () => {
-		const wrapper = shallow( <Icon icon={ svg } /> );
+		render( <Icon data-testid={ testId } icon={ svg } /> );
 
-		expect( wrapper.name() ).toBe( 'SVG' );
+		expect( screen.getByTestId( testId ) ).toBeVisible();
 	} );
 
 	it( 'renders an svg element with a default width and height of 24', () => {
-		const wrapper = shallow( <Icon icon={ svg } /> );
+		render( <Icon data-testid={ testId } icon={ svg } /> );
+		const icon = screen.getByTestId( testId );
 
-		expect( wrapper.prop( 'width' ) ).toBe( 24 );
-		expect( wrapper.prop( 'height' ) ).toBe( 24 );
+		expect( icon ).toHaveAttribute( 'width', '24' );
+		expect( icon ).toHaveAttribute( 'height', '24' );
 	} );
 
-	it( 'renders an svg element and passes the size as its width and height', () => {
-		const wrapper = shallow( <Icon icon={ <SVG width={ 64 } height={ 64 }><Path d="M5 4v3h5.5v12h3V7H19V4z" /></SVG> } size={ 32 } /> );
+	it( 'renders an svg element and override its width and height', () => {
+		render(
+			<Icon
+				data-testid={ testId }
+				icon={
+					<SVG width={ 64 } height={ 64 }>
+						<Path d="M5 4v3h5.5v12h3V7H19V4z" />
+					</SVG>
+				}
+				size={ 32 }
+			/>
+		);
+		const icon = screen.getByTestId( testId );
 
-		expect( wrapper.prop( 'width' ) ).toBe( 64 );
-		expect( wrapper.prop( 'height' ) ).toBe( 64 );
+		expect( icon ).toHaveAttribute( 'width', '32' );
+		expect( icon ).toHaveAttribute( 'height', '32' );
 	} );
 
 	it( 'renders an svg element and does not override width and height if already specified', () => {
-		const wrapper = shallow( <Icon icon={ svg } size={ 32 } /> );
+		render( <Icon data-testid={ testId } icon={ svg } size={ 32 } /> );
+		const icon = screen.getByTestId( testId );
 
-		expect( wrapper.prop( 'width' ) ).toBe( 32 );
-		expect( wrapper.prop( 'height' ) ).toBe( 32 );
+		expect( icon ).toHaveAttribute( 'width', '32' );
+		expect( icon ).toHaveAttribute( 'height', '32' );
 	} );
 
 	it( 'renders a component', () => {
-		class MyComponent extends Component {
-			render() {
-				return <span />;
-			}
-		}
-		const wrapper = shallow(
-			<Icon icon={ MyComponent } />
+		const MyComponent = () => (
+			<span data-testid={ testId } className={ className } />
 		);
+		render( <Icon icon={ MyComponent } /> );
 
-		expect( wrapper.name() ).toBe( 'MyComponent' );
-	} );
-
-	describe( 'props passing', () => {
-		class MyComponent extends Component {
-			render( ) {
-				return <span className={ this.props.className } />;
-			}
-		}
-
-		describe.each( [
-			[ 'dashicon', { icon: 'format-image' } ],
-			[ 'element', { icon: <span /> } ],
-			[ 'svg element', { icon: svg } ],
-			[ 'component', { icon: MyComponent } ],
-		] )( '%s', ( label, props ) => {
-			it( 'should pass through size', () => {
-				if ( label === 'svg element' ) {
-					// Custom logic for SVG elements tested separately.
-					//
-					// See: `renders an svg element and passes the size as its width and height`
-					return;
-				}
-
-				const wrapper = shallow( <Icon { ...props } size={ 32 } /> );
-
-				expect( wrapper.prop( 'size' ) ).toBe( 32 );
-			} );
-
-			it( 'should pass through all other props', () => {
-				const wrapper = shallow( <Icon { ...props } style={ style } className={ className } /> );
-
-				expect( wrapper.prop( 'style' ) ).toBe( style );
-				expect( wrapper.prop( 'className' ) ).toBe( className );
-			} );
-		} );
+		expect( screen.getByTestId( testId ) ).toHaveClass( className );
 	} );
 } );

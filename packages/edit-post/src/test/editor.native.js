@@ -1,18 +1,22 @@
 /**
  * External dependencies
  */
-import renderer from 'react-test-renderer';
-import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
+import { act, render } from 'test/helpers';
 
 /**
  * WordPress dependencies
  */
 import { registerCoreBlocks } from '@wordpress/block-library';
+import RNReactNativeGutenbergBridge from '@wordpress/react-native-bridge';
+// Force register 'core/editor' store.
+import { store } from '@wordpress/editor'; // eslint-disable-line no-unused-vars
+
+jest.mock( '../components/layout', () => () => 'Layout' );
 
 /**
  * Internal dependencies
  */
-import '../store';
+import '..';
 import Editor from '../editor';
 
 const unsupportedBlock = `
@@ -21,27 +25,48 @@ const unsupportedBlock = `
 <!-- /wp:notablock -->
 `;
 
+beforeAll( () => {
+	jest.useFakeTimers( 'legacy' );
+} );
+
+afterAll( () => {
+	jest.runOnlyPendingTimers();
+	jest.useRealTimers();
+} );
+
 describe( 'Editor', () => {
-	beforeAll( registerCoreBlocks );
+	beforeAll( () => {
+		registerCoreBlocks();
+	} );
 
 	it( 'detects unsupported block and sends hasUnsupportedBlocks true to native', () => {
 		RNReactNativeGutenbergBridge.editorDidMount = jest.fn();
 
 		const appContainer = renderEditorWith( unsupportedBlock );
+		// For some reason resetEditorBlocks() is asynchronous when dispatching editEntityRecord.
+		act( () => {
+			jest.runAllTicks();
+		} );
 		appContainer.unmount();
 
-		expect( RNReactNativeGutenbergBridge.editorDidMount ).toHaveBeenCalledTimes( 1 );
-		expect( RNReactNativeGutenbergBridge.editorDidMount ).toHaveBeenCalledWith( true );
+		expect(
+			RNReactNativeGutenbergBridge.editorDidMount
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			RNReactNativeGutenbergBridge.editorDidMount
+		).toHaveBeenCalledWith( [ 'core/notablock' ] );
 	} );
 } );
 
-// Utilities
+// Utilities.
 const renderEditorWith = ( content ) => {
-	return renderer.create(
+	return render(
 		<Editor
 			initialHtml={ content }
 			initialHtmlModeEnabled={ false }
 			initialTitle={ '' }
+			postType="post"
+			postId="1"
 		/>
 	);
 };

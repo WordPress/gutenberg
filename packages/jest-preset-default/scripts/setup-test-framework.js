@@ -7,12 +7,14 @@ require( '@wordpress/jest-console' );
 let mockEnzymeSetup = false;
 
 jest.mock( 'enzyme', () => {
-	const actualEnzyme = require.requireActual( 'enzyme' );
+	const actualEnzyme = jest.requireActual( 'enzyme' );
 	if ( ! mockEnzymeSetup ) {
 		mockEnzymeSetup = true;
 
-		// configure enzyme 3 for React, from docs: http://airbnb.io/enzyme/docs/installation/index.html
-		const Adapter = require.requireActual( 'enzyme-adapter-react-16' );
+		// Configure enzyme 3 for React, from docs: http://airbnb.io/enzyme/docs/installation/index.html
+		const Adapter = jest.requireActual(
+			'@wojtekmaj/enzyme-adapter-react-17'
+		);
 		actualEnzyme.configure( { adapter: new Adapter() } );
 	}
 	return actualEnzyme;

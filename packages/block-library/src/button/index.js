@@ -1,14 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
+import { button as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
-import icon from './icon';
 import metadata from './block.json';
 import save from './save';
 
@@ -17,20 +18,20 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Button' ),
-	description: __( 'Prompt visitors to take action with a button-style link.' ),
 	icon,
-	keywords: [ __( 'link' ) ],
-	supports: {
-		align: true,
-		alignWide: false,
+	example: {
+		attributes: {
+			className: 'is-style-fill',
+			text: __( 'Call to Action' ),
+		},
 	},
-	styles: [
-		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
-		{ name: 'outline', label: __( 'Outline' ) },
-		{ name: 'squared', label: _x( 'Squared', 'block style' ) },
-	],
 	edit,
 	save,
 	deprecated,
+	merge: ( a, { text = '' } ) => ( {
+		...a,
+		text: ( a.text || '' ) + text,
+	} ),
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

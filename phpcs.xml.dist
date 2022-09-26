@@ -3,13 +3,18 @@
 	<description>Sniffs for WordPress plugins, with minor modifications for Gutenberg</description>
 
 	<rule ref="PHPCompatibility"/>
-	<config name="testVersion" value="5.2-"/>
+	<config name="testVersion" value="5.6-"/>
 
 	<rule ref="WordPress-Core"/>
 	<rule ref="WordPress-Docs"/>
 	<rule ref="WordPress.WP.I18n"/>
 	<config name="text_domain" value="gutenberg,default"/>
 
+	<rule ref="VariableAnalysis.CodeAnalysis.VariableAnalysis">
+		<properties>
+			<property name="allowUnusedParametersBeforeUsed" value="true"/>
+		</properties>
+	</rule>
 	<rule ref="WordPress.CodeAnalysis.EmptyStatement"/>
 
 	<rule ref="PEAR.Functions.FunctionCallSignature">
@@ -25,15 +30,15 @@
 	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
 
-	<file>.</file>
-
-	<!-- Exclude 3rd party libraries -->
-	<exclude-pattern>./node_modules</exclude-pattern>
-	<exclude-pattern>./vendor</exclude-pattern>
+	<file>./bin</file>
+	<file>./gutenberg.php</file>
+	<file>./lib</file>
+	<file>./packages</file>
+	<file>./phpunit</file>
+	<file>./post-content.php</file>
 
 	<!-- Exclude generated files -->
 	<exclude-pattern>./packages/block-serialization-spec-parser/parser.php</exclude-pattern>
-	<exclude-pattern>./build</exclude-pattern>
 
 	<!-- These special comments are markers for the build process -->
 	<rule ref="Squiz.Commenting.InlineComment.WrongStyle">
@@ -56,6 +61,9 @@
 	<rule ref="Squiz.Commenting.FunctionComment.MissingParamTag">
 		<exclude-pattern>phpunit/*</exclude-pattern>
 	</rule>
+	<rule ref="Generic.Commenting.DocComment.Empty">
+    	<exclude-pattern>phpunit/*</exclude-pattern>
+    </rule>
 	<rule ref="Generic.Commenting.DocComment.MissingShort">
 		<exclude-pattern>phpunit/*</exclude-pattern>
 	</rule>
@@ -67,17 +75,26 @@
 	</rule>
 
 	<!-- Ignore snake case error in parser -->
-	<rule ref="WordPress.NamingConventions.ValidVariableName.NotSnakeCase">
+	<rule ref="WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase">
 		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
 	</rule>
-	<rule ref="WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar">
+	<rule ref="WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase">
 		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
 	</rule>
-	<rule ref="WordPress.NamingConventions.ValidVariableName.MemberNotSnakeCase">
+	<rule ref="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase">
 		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
 	</rule>
 	<!-- Ignore filename error since it requires WP core build process change -->
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
 		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
+		<exclude-pattern>/phpunit/*</exclude-pattern>
+	</rule>
+
+	<!-- Exclude PHPUnit tests from file and class name sniffs (for Core parity). -->
+	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+		<exclude-pattern>/phpunit/*</exclude-pattern>
+	</rule>
+	<rule ref="PEAR.NamingConventions.ValidClassName.Invalid">
+		<exclude-pattern>/phpunit/*</exclude-pattern>
 	</rule>
 </ruleset>

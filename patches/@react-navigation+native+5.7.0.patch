@@ -1,0 +1,19 @@
+diff --git a/node_modules/@react-navigation/native/src/useLinking.native.tsx b/node_modules/@react-navigation/native/src/useLinking.native.tsx
+index 22274f1..acc95f5 100644
+--- a/node_modules/@react-navigation/native/src/useLinking.native.tsx
++++ b/node_modules/@react-navigation/native/src/useLinking.native.tsx
+@@ -113,9 +113,12 @@ export default function useLinking(
+       }
+     };
+ 
+-    Linking.addEventListener('url', listener);
++		// The following `linkingSubscription` changes were added via
++		// patch-package. The patch can be removed once we upgrade to
++		// react-navigation@^6.0.0. https://git.io/JP7OG
++    const linkingSubscription = Linking.addEventListener('url', listener);
+ 
+-    return () => Linking.removeEventListener('url', listener);
++    return () => linkingSubscription.remove();
+   }, [enabled, extractPathFromURL, ref]);
+ 
+   return {

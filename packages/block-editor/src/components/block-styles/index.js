@@ -1,171 +1,149 @@
 /**
  * External dependencies
  */
-import { find, noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
-import TokenList from '@wordpress/token-list';
-import { ENTER, SPACE } from '@wordpress/keycodes';
-import { _x } from '@wordpress/i18n';
-import { getBlockType } from '@wordpress/blocks';
+import { useState, useLayoutEffect } from '@wordpress/element';
+import { debounce, useViewportMatch } from '@wordpress/compose';
+import {
+	Button,
+	__experimentalTruncate as Truncate,
+	Slot,
+	Fill,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { BlockPreviewContent } from '../block-preview';
+import BlockStylesPreviewPanel from './preview-panel';
+import useStylesForBlocks from './use-styles-for-block';
 
-/**
- * Returns the active style from the given className.
- *
- * @param {Array} styles Block style variations.
- * @param {string} className  Class name
- *
- * @return {Object?} The active style.
- */
-export function getActiveStyle( styles, className ) {
-	for ( const style of new TokenList( className ).values() ) {
-		if ( style.indexOf( 'is-style-' ) === -1 ) {
-			continue;
-		}
-
-		const potentialStyleName = style.substring( 9 );
-		const activeStyle = find( styles, { name: potentialStyleName } );
-		if ( activeStyle ) {
-			return activeStyle;
-		}
-	}
-
-	return find( styles, 'isDefault' );
+function BlockStylesPreviewPanelSlot( { scope } ) {
+	return <Slot name={ `BlockStylesPreviewPanel/${ scope }` } />;
 }
 
-/**
- * Replaces the active style in the block's className.
- *
- * @param {string}  className   Class name.
- * @param {Object?} activeStyle The replaced style.
- * @param {Object}  newStyle    The replacing style.
- *
- * @return {string} The updated className.
- */
-export function replaceActiveStyle( className, activeStyle, newStyle ) {
-	const list = new TokenList( className );
-
-	if ( activeStyle ) {
-		list.remove( 'is-style-' + activeStyle.name );
-	}
-
-	list.add( 'is-style-' + newStyle.name );
-
-	return list.value;
+function BlockStylesPreviewPanelFill( { children, scope, ...props } ) {
+	return (
+		<Fill name={ `BlockStylesPreviewPanel/${ scope }` }>
+			<div { ...props }>{ children }</div>
+		</Fill>
+	);
 }
 
+// Top position (in px) of the Block Styles container
+// relative to the editor pane.
+// The value is the equivalent of the container's right position.
+const DEFAULT_POSITION_TOP = 16;
+
+const noop = () => {};
+
+// Block Styles component for the Settings Sidebar.
 function BlockStyles( {
-	styles,
-	className,
-	onChangeClassName,
-	name,
-	attributes,
-	type,
-	block,
+	clientId,
 	onSwitch = noop,
 	onHoverClassName = noop,
+	scope,
 } ) {
-	if ( ! styles || styles.length === 0 ) {
+	const {
+		onSelect,
+		stylesToRender,
+		activeStyle,
+		genericPreviewBlock,
+		className: previewClassName,
+	} = useStylesForBlocks( {
+		clientId,
+		onSwitch,
+	} );
+	const [ hoveredStyle, setHoveredStyle ] = useState( null );
+	const [ containerScrollTop, setContainerScrollTop ] = useState( 0 );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+
+	useLayoutEffect( () => {
+		const scrollContainer = document.querySelector(
+			'.interface-interface-skeleton__content'
+		);
+		const scrollTop = scrollContainer?.scrollTop || 0;
+		setContainerScrollTop( scrollTop + DEFAULT_POSITION_TOP );
+	}, [ hoveredStyle ] );
+
+	if ( ! stylesToRender || stylesToRender.length === 0 ) {
 		return null;
 	}
 
-	if ( ! type.styles && ! find( styles, 'isDefault' ) ) {
-		styles = [
-			{
-				name: 'default',
-				label: _x( 'Default', 'block style' ),
-				isDefault: true,
-			},
-			...styles,
-		];
-	}
+	const debouncedSetHoveredStyle = debounce( setHoveredStyle, 250 );
 
-	const activeStyle = getActiveStyle( styles, className );
-	function updateClassName( style ) {
-		const updatedClassName = replaceActiveStyle( className, activeStyle, style );
-		onChangeClassName( updatedClassName );
+	const onSelectStylePreview = ( style ) => {
+		onSelect( style );
 		onHoverClassName( null );
-		onSwitch();
-	}
+		setHoveredStyle( null );
+		debouncedSetHoveredStyle.cancel();
+	};
+
+	const styleItemHandler = ( item ) => {
+		if ( hoveredStyle === item ) {
+			debouncedSetHoveredStyle.cancel();
+			return;
+		}
+		debouncedSetHoveredStyle( item );
+		onHoverClassName( item?.name ?? null );
+	};
 
 	return (
-		<div className="editor-block-styles block-editor-block-styles">
-			{ styles.map( ( style ) => {
-				const styleClassName = replaceActiveStyle( className, activeStyle, style );
-				return (
-					<div
-						key={ style.name }
-						className={ classnames(
-							'editor-block-styles__item block-editor-block-styles__item', {
-								'is-active': activeStyle === style,
-							}
-						) }
-						onClick={ () => updateClassName( style ) }
-						onKeyDown={ ( event ) => {
-							if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
-								event.preventDefault();
-								updateClassName( style );
-							}
-						} }
-						onMouseEnter={ () => onHoverClassName( styleClassName ) }
-						onMouseLeave={ () => onHoverClassName( null ) }
-						role="button"
-						tabIndex="0"
-						aria-label={ style.label || style.name }
-					>
-						<div className="editor-block-styles__item-preview block-editor-block-styles__item-preview">
-							<BlockPreviewContent
-								name={ name }
-								attributes={ {
-									...attributes,
-									className: styleClassName,
-								} }
-								innerBlocks={ block.innerBlocks }
-							/>
-						</div>
-						<div className="editor-block-styles__item-label block-editor-block-styles__item-label">
-							{ style.label || style.name }
-						</div>
-					</div>
-				);
-			} ) }
+		<div className="block-editor-block-styles">
+			<div className="block-editor-block-styles__variants">
+				{ stylesToRender.map( ( style ) => {
+					const buttonText = style.label || style.name;
+
+					return (
+						<Button
+							className={ classnames(
+								'block-editor-block-styles__item',
+								{
+									'is-active':
+										activeStyle.name === style.name,
+								}
+							) }
+							key={ style.name }
+							variant="secondary"
+							label={ buttonText }
+							onMouseEnter={ () => styleItemHandler( style ) }
+							onFocus={ () => styleItemHandler( style ) }
+							onMouseLeave={ () => styleItemHandler( null ) }
+							onBlur={ () => styleItemHandler( null ) }
+							onClick={ () => onSelectStylePreview( style ) }
+							aria-current={ activeStyle.name === style.name }
+						>
+							<Truncate
+								numberOfLines={ 1 }
+								className="block-editor-block-styles__item-text"
+							>
+								{ buttonText }
+							</Truncate>
+						</Button>
+					);
+				} ) }
+			</div>
+			{ hoveredStyle && ! isMobileViewport && (
+				<BlockStylesPreviewPanelFill
+					scope={ scope }
+					className="block-editor-block-styles__preview-panel"
+					style={ { top: containerScrollTop } }
+					onMouseLeave={ () => styleItemHandler( null ) }
+				>
+					<BlockStylesPreviewPanel
+						activeStyle={ activeStyle }
+						className={ previewClassName }
+						genericPreviewBlock={ genericPreviewBlock }
+						style={ hoveredStyle }
+					/>
+				</BlockStylesPreviewPanelFill>
+			) }
 		</div>
 	);
 }
 
-export default compose( [
-	withSelect( ( select, { clientId } ) => {
-		const { getBlock } = select( 'core/block-editor' );
-		const { getBlockStyles } = select( 'core/blocks' );
-		const block = getBlock( clientId );
-		const blockType = getBlockType( block.name );
-
-		return {
-			block,
-			name: block.name,
-			attributes: block.attributes,
-			className: block.attributes.className || '',
-			styles: getBlockStyles( block.name ),
-			type: blockType,
-		};
-	} ),
-	withDispatch( ( dispatch, { clientId } ) => {
-		return {
-			onChangeClassName( newClassName ) {
-				dispatch( 'core/block-editor' ).updateBlockAttributes( clientId, {
-					className: newClassName,
-				} );
-			},
-		};
-	} ),
-] )( BlockStyles );
+BlockStyles.Slot = BlockStylesPreviewPanelSlot;
+export default BlockStyles;

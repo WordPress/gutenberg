@@ -1,75 +1,167 @@
-.block-editor-block-list__layout .components-draggable__clone {
-	// Hide the Block UI when dragging the block.
-	// This ensures the page scroll properly (no sticky elements).
-	.block-editor-block-contextual-toolbar {
-		// It's probably okay to use !important here to avoid over-complicating the selector.
-		display: none !important;
-	}
+// This remove the margins set here: https://github.com/WordPress/gutenberg/blob/17e5c2d870d84fb6de48dcd5bc3c38cd0c0fb0d0/packages/block-library/src/editor.scss#L56
+// It removes the margins around blocks when a BlockPreview is rendered in the block style selector
+.block-editor-block-styles .block-editor-block-list__block {
+	margin: 0;
 }
-
-.block-editor-block-list__layout .block-editor-block-list__block.is-selected { // Needs specificity to override inherited styles.
-	// While block is being dragged, dim the slot dragged from, and hide some UI.
-	&.is-dragging {
-		.block-editor-block-list__block-edit::before {
-			border: none;
-		}
-
-		> .block-editor-block-list__block-edit > * {
-			background: $light-gray-100;
-		}
-
-		> .block-editor-block-list__block-edit > * > * {
-			visibility: hidden;
-		}
-
-		.block-editor-block-mover,
-		.block-editor-block-contextual-toolbar {
-			display: none;
-		}
-	}
-
-	> .block-editor-block-list__block-edit .reusable-block-edit-panel * {
-		z-index: z-index(".block-editor-block-list__block-edit .reusable-block-edit-panel *");
-	}
-}
-
 
 /**
- * General layout
+ * Cross-Block Selection
  */
 
+// Note to developers refactoring this, please test navigation mode, and
+// multi selection and hovering the block switcher to highlight the block.
 .block-editor-block-list__layout {
-	// Make room in the main content column for the side UI.
-	// The side UI uses negative margins to position itself so as to not affect the block width.
-	@include break-small() {
-		padding-left: $block-container-side-padding;
-		padding-right: $block-container-side-padding;
+	position: relative;
+
+	// Hide selections on this element, otherwise Safari will include it stacked
+	// under your actual selection.
+	&::selection {
+		background: transparent;
 	}
 
-	// Don't add side padding for nested blocks.
-	.block-editor-block-list__block & {
-		// Compensate for side UI.
-		padding-left: 0;
-		padding-right: 0;
+	// The primary indicator of selection in text is the native selection marker.
+	// When selecting multiple blocks, we provide an additional selection indicator.
+	.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected),
+	.block-editor-block-list__block.is-highlighted,
+	.block-editor-block-list__block.is-highlighted ~ .is-multi-selected {
+		&::after {
+			// Show selection borders around every non-nested block's actual footprint.
+			position: absolute;
+			z-index: 1;
+			pointer-events: none;
+			content: "";
+			top: $border-width;
+			bottom: $border-width;
+			left: $border-width;
+			right: $border-width;
 
-		// Compensate for block padding.
-		margin-left: -$block-padding;
-		margin-right: -$block-padding;
+			// Everything else.
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
+
+			// Windows High Contrast mode will show this outline.
+			outline: 2px solid transparent;
+
+			// Show a lighter color for dark themes.
+			.is-dark-theme & {
+				box-shadow: 0 0 0 $border-width $dark-theme-focus;
+			}
+		}
+
+		// Provide exceptions for placeholders.
+		.components-placeholder,
+		.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected) {
+			::selection {
+				background: transparent;
+			}
+		}
+	}
+
+	// Hide the selection indicator on .block-editor-block-list__layout, else Safari will show it stacked.
+	.has-multi-selection &::selection {
+		background: transparent;
+	}
+
+	.block-editor-block-list__block.is-highlighted::after {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		outline: $border-width solid transparent;
+	}
+
+	&.is-navigate-mode .block-editor-block-list__block.is-selected::after,
+	& .is-block-moving-mode.block-editor-block-list__block.has-child-selected {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		outline: 2px solid transparent;
+	}
+
+	& .is-block-moving-mode.block-editor-block-list__block.is-selected {
+
+		&::before {
+			content: "";
+			position: absolute;
+			z-index: 0;
+			pointer-events: none;
+			transition:
+				border-color 0.1s linear,
+				border-style 0.1s linear,
+				box-shadow 0.1s linear;
+			right: 0;
+			left: 0;
+			top: -$default-block-margin * 0.5;
+			border-radius: $radius-block-ui;
+			border-top: 4px solid $gray-400;
+		}
+
+		&::after {
+			content: none;
+		}
+	}
+
+	& .is-block-moving-mode.can-insert-moving-block.block-editor-block-list__block.is-selected {
+		&::before {
+			border-color: var(--wp-admin-theme-color);
+		}
+	}
+
+	// Ensure an accurate partial text selection.
+	// To do this, we disable text selection on the main container, then re-enable it only on the
+	// elements that actually get selected.
+	// To keep in mind: user-select is currently inherited to all nodes inside.
+	.has-multi-selection & {
+		user-select: none;
+	}
+
+	// Re-enable it on components inside.
+	[class^="components-"] {
+		user-select: text;
+	}
+}
+
+.is-block-moving-mode.block-editor-block-list__block-selection-button {
+	// Should be invisible but not unfocusable.
+	opacity: 0;
+	font-size: 1px;
+	height: 1px;
+	padding: 0;
+}
+
+.is-content-locked {
+	.block-editor-block-list__block {
+		pointer-events: none;
+	}
+	.is-content-block {
+		pointer-events: initial;
 	}
 }
 
 .block-editor-block-list__layout .block-editor-block-list__block {
 	position: relative;
-	padding-left: $block-padding;
-	padding-right: $block-padding;
+
+	// Re-enable text-selection on editable blocks.
+	user-select: text;
+
+	// Hide the select style pseudo element as otherwise it gets shwon as "selected" in Safari.
+	&.is-partially-selected::after {
+		// By positioning this pseudo element outside the boundaries of the parent block,
+		// when partially selected it hides the pseudo element selection in Safari.
+		top: -0.5px;
+		right: -0.5px;
+		bottom: -0.5px;
+		left: -0.5px;
+	}
+
+	&.is-highlighted::after,
+	&.is-highlighted ~ .is-multi-selected::after {
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+	}
 
 	// Break long strings of text without spaces so they don't overflow the block.
 	overflow-wrap: break-word;
 
-	@include break-small() {
-		// The block mover needs to stay inside the block to allow clicks when hovering the block-.
-		padding-left: $block-padding + $block-side-ui-width + $block-side-ui-clearance - $border-width;
-		padding-right: $block-padding + $block-side-ui-width + $block-side-ui-clearance - $border-width;
+	.reusable-block-edit-panel * {
+		z-index: z-index(".block-editor-block-list__block .reusable-block-edit-panel *");
 	}
 
 	/**
@@ -77,8 +169,7 @@
 	 */
 
 	.components-placeholder .components-with-notices-ui {
-		margin: -10px 20px 12px 20px;
-		width: calc(100% - 40px);
+		margin: -10px 0 12px 0;
 	}
 
 	.components-with-notices-ui {
@@ -95,128 +186,60 @@
 		}
 	}
 
+
 	/**
-	 * Block border layout
+	 * Block Layout
 	 */
 
-	.block-editor-block-list__block-edit {
-		position: relative;
+	// Navigate mode & Focused wrapper.
+	// We're using a pseudo element to overflow placeholder borders
+	// and any border inside the block itself.
+	&:not([contenteditable]):focus {
+		outline: none;
 
-		&::before {
-			z-index: z-index(".block-editor-block-list__block-edit::before");
-			content: "";
+		&::after {
 			position: absolute;
-			border: $border-width solid transparent;
-			border-left: none;
-			box-shadow: none;
+			z-index: 1;
 			pointer-events: none;
-			transition: border-color 0.1s linear, box-shadow 0.1s linear;
-			@include reduce-motion("transition");
+			content: "";
+			top: $border-width;
+			bottom: $border-width;
+			left: $border-width;
+			right: $border-width;
 
-			// Include a transparent outline for Windows High Contrast mode.
-			outline: $border-width solid transparent;
+			// 2px outside.
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
+			outline: 2px solid transparent; // This shows up in Windows High Contrast Mode.
 
-			// Go edge-to-edge on mobile.
-			right: -$block-padding;
-			left: -$block-padding;
-			top: -$block-padding;
-			bottom: -$block-padding;
-		}
-	}
-
-	// Selected style.
-	&.is-selected {
-
-		> .block-editor-block-list__block-edit::before {
-			// Use opacity to work in various editor styles.
-			border-color: $dark-opacity-light-800;
-			box-shadow: inset $block-left-border-width 0 0 0 $dark-gray-500;
-
+			// Show a light color for dark themes.
 			.is-dark-theme & {
-				border-color: $light-opacity-light-800;
-				box-shadow: inset $block-left-border-width 0 0 0 $light-gray-600;
-			}
-
-			// Switch to outset borders on larger screens.
-			@include break-small() {
-				box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
-
-				.is-dark-theme & {
-					box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
-				}
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $dark-theme-focus;
 			}
 		}
 	}
 
-	// Hover style.
-	&.is-hovered > .block-editor-block-list__block-edit::before {
-		box-shadow: -$block-left-border-width 0 0 0 $dark-opacity-light-500;
-
-		.is-dark-theme & {
-			box-shadow: -$block-left-border-width 0 0 0 $light-opacity-light-400;
-		}
-	}
-
-	// Spotlight mode.
-	&.is-focus-mode:not(.is-multi-selected) {
-		opacity: 0.5;
-		transition: opacity 0.1s linear;
+	/**
+	* Block styles and alignments
+	*/
+	&::after {
+		content: "";
+		pointer-events: none;
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		border-radius: $radius-block-ui;
+		box-shadow: 0 0 0 0 transparent;
+		transition: box-shadow 0.1s linear;
 		@include reduce-motion("transition");
-
-		&:not(.is-focused) .block-editor-block-list__block,
-		&.is-focused {
-			opacity: 1;
-		}
-	}
-}
-
-
-/**
- * Cross-block selection
- */
-
-.block-editor-block-list__layout .block-editor-block-list__block {
-	::-moz-selection {
-		background-color: $blue-medium-highlight;
-	}
-
-	::selection {
-		background-color: $blue-medium-highlight;
-	}
-
-	// Selection style for multiple blocks.
-	&.is-multi-selected *::selection {
-		background-color: transparent;
-	}
-
-	&.is-multi-selected .block-editor-block-list__block-edit::before {
-		background: $blue-medium-highlight;
-
-		// Use opacity to work in various editor styles.
-		mix-blend-mode: multiply;
-
-		// Collapse extra vertical padding on selection.
-		top: -$block-padding;
-		bottom: -$block-padding;
-
-		.is-dark-theme & {
-			mix-blend-mode: soft-light;
-		}
-	}
-}
-
-
-/**
- * Block styles and alignments
- */
-
-.block-editor-block-list__layout .block-editor-block-list__block {
-	&.has-warning {
-		min-height: ( $block-padding + $block-spacing ) * 2;
 	}
 
 	// Warnings
-	&.has-warning .block-editor-block-list__block-edit {
+	&.has-warning {
+		min-height: $grid-unit-60;
+
 		// When a block has a warning, you shouldn't be able to manipulate the contents.
 		> * {
 			pointer-events: none;
@@ -229,868 +252,228 @@
 		}
 	}
 
-	&.has-warning .block-editor-block-list__block-edit::before {
-		// Use opacity to work in various editor styles.
-		border-color: $dark-opacity-light-500;
-		border-left: $border-width solid $dark-opacity-light-500;
-
-		.is-dark-theme & {
-			border-color: $light-opacity-light-600;
-		}
-	}
-
-	&.has-warning.is-selected .editor-block-list__block-edit::before {
-		// Use opacity to work in various editor styles.
-		border-color: $dark-opacity-light-800;
-		border-left-color: transparent;
-
-		.is-dark-theme & {
-			border-color: $light-opacity-light-800;
-		}
-	}
-
-	&.has-warning .block-editor-block-list__block-edit::after {
+	// Scrim overlay.
+	&.has-warning::after {
 		content: "";
 		position: absolute;
-		background-color: rgba($light-gray-100, 0.4);
-
-		top: -$block-padding;
-		bottom: -$block-padding;
-		right: -$block-padding;
-		left: -$block-padding;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		border-radius: $radius-block-ui;
+		background-color: rgba($white, 0.4);
 	}
 
 	// Avoid conflict with the multi-selection highlight color.
-	&.has-warning.is-multi-selected .block-editor-block-list__block-edit::after {
+	&.has-warning.is-multi-selected::after {
 		background-color: transparent;
 	}
 
-	&.has-warning.is-selected .block-editor-block-list__block-edit::after {
-		bottom: ( $block-toolbar-height - $block-padding - $border-width );
-
-		@include break-small() {
-			bottom: -$block-padding;
-		}
-	}
-
-	// Appender
-	&.is-typing .block-editor-block-list__side-inserter {
-		opacity: 0;
-		animation: none;
-	}
-
-	.block-editor-block-list__side-inserter {
-		@include edit-post__fade-in-animation;
-	}
-
-	// Reusable blocks
-	&.is-reusable > .block-editor-block-list__block-edit::before {
-		border: $border-width dashed $dark-opacity-light-500;
-
-		.is-dark-theme & {
-			border-color: $light-opacity-light-600;
-		}
-	}
-
-	&.is-reusable.is-selected > .block-editor-block-list__block-edit::before {
-		// Use opacity to work in various editor styles.
-		border-color: $dark-opacity-light-800;
-		border-left-color: transparent;
-
-		.is-dark-theme & {
-			border-color: $light-opacity-light-800;
-			border-left-color: transparent;
-		}
-	}
-
-	// Reusable Blocks clickthrough overlays
-	&.is-reusable > .block-editor-block-list__block-edit .block-editor-inner-blocks.has-overlay {
+	// Reusable blocks clickthrough overlays.
+	&.is-reusable > .block-editor-inner-blocks > .block-editor-block-list__layout.has-overlay {
 		// Remove only the top click overlay.
 		&::after {
 			display: none;
 		}
 
 		// Restore it for subsequent.
-		.block-editor-inner-blocks.has-overlay::after {
+		.block-editor-block-list__layout.has-overlay::after {
 			display: block;
 		}
 	}
 
-
-	// Alignments
-	&[data-align="left"],
-	&[data-align="right"] {
-		// Without z-index, won't be clickable as "above" adjacent content.
-		z-index: z-index(".block-editor-block-list__block {core/image aligned left or right}");
-		width: 100%;
-
-		// When images are floated, the block itself should collapse to zero height.
-		height: 0;
-
-		// Hide block border when an image is floated.
-		.block-editor-block-list__block-edit {
-			&::before {
-				content: none;
-			}
-
-			// This margin won't collapse on its own, so zero it out.
-			margin-top: 0;
-		}
-
-		// Keep a 1px margin to compensate for the border/outline.
-		.block-editor-block-contextual-toolbar {
-			margin-bottom: $border-width;
-		}
-
-		// Position toolbar better on mobile.
-		.block-editor-block-contextual-toolbar {
-			width: auto;
-			border-bottom: $border-width solid $light-gray-800;
-			bottom: auto;
-		}
+	// Reusable blocks parent borer.
+	&.is-reusable.has-child-selected::after {
+		box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
 	}
 
-	// Unlike most explicit left/right alignments, this one should be flipped by the auto-RTL system.
-	&[data-align="left"] .block-editor-block-contextual-toolbar {
-		left: 0;
-		right: auto;
-	}
-
-	&[data-align="right"] .block-editor-block-contextual-toolbar {
-		left: auto;
-		right: 0;
-	}
-
-	// Position the sticky toolbar correctly beyond the mobile breakpoint.
-	@include break-small() {
-		&[data-align="right"] .block-editor-block-contextual-toolbar,
-		&[data-align="left"] .block-editor-block-contextual-toolbar {
-			top: $block-padding;
-		}
-	}
-
-	// Left
-	&[data-align="left"] {
-		// This is in the editor only; the image should be floated on the frontend.
-		.block-editor-block-list__block-edit {
-			/*!rtl:begin:ignore*/
-			float: left;
-			margin-right: 2em;
-			/*!rtl:end:ignore*/
-		}
-
-		// Align block toolbar to floated content.
-		@include break-small() {
-			.block-editor-block-toolbar {
-				/*!rtl:begin:ignore*/
-				left: $block-padding;
-				right: auto;
-				/*!rtl:end:ignore*/
-			}
-		}
-	}
-
-	// Right
-	&[data-align="right"] {
-		// Right: This is in the editor only; the image should be floated on the frontend.
-		> .block-editor-block-list__block-edit {
-			/*!rtl:begin:ignore*/
-			float: right;
-			margin-left: 2em;
-			/*!rtl:end:ignore*/
-		}
-
-		// Align block toolbar to floated content.
-		@include break-small() {
-			.block-editor-block-toolbar {
-				/*!rtl:begin:ignore*/
-				right: $block-padding;
-				left: auto;
-				/*!rtl:end:ignore*/
-			}
-		}
-	}
-
-	// Wide and full-wide
-	&[data-align="full"],
-	&[data-align="wide"] {
-		clear: both;
-
-		// Without z-index, the block toolbar will be below an adjecent float
-		z-index: z-index(".block-editor-block-list__block {core/image aligned wide or fullwide}");
-
-		// Mover and settings above
-		&.is-multi-selected > .block-editor-block-mover,
-		> .block-editor-block-list__block-edit > .block-editor-block-mover {
-			// This moves the menu up by the height of the button + border + padding.
-			top: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
-			bottom: auto;
-			min-height: 0;
-			height: auto;
-			width: auto;
-
-			&::before {
-				content: none;
-			}
-		}
-
-		&.is-multi-selected > .block-editor-block-mover .block-editor-block-mover__control,
-		> .block-editor-block-list__block-edit > .block-editor-block-mover .block-editor-block-mover__control {
-			float: left;
-		}
-
-		// Hide mover until wide breakpoints, or it might be covered by toolbar
-		&.is-multi-selected > .block-editor-block-mover,
-		> .block-editor-block-list__block-edit > .block-editor-block-mover {
-			display: none;
-		}
-
-		@include break-wide() {
-			&.is-multi-selected > .block-editor-block-mover,
-			> .block-editor-block-list__block-edit > .block-editor-block-mover {
-				display: block;
-			}
-		}
-
-		// Beyond the mobile breakpoint, wide images stretch outside of the column.
-		// To center the toolbar, we make it inline-flex so the toolbar is not full-wide.
-		@include break-small () {
-			.block-editor-block-toolbar {
-				display: inline-flex;
-			}
-		}
-
-		// If the block movers are visible, push the breadcrumb down to make room for them.
-		.block-editor-block-mover.is-visible + .block-editor-block-list__breadcrumb {
-			top: (-$block-padding - $block-left-border-width - ($grid-size-small / 2));
-		}
-	}
-
-	// Wide
-	&[data-align="wide"] {
-		// Position mover
-		&.is-multi-selected > .block-editor-block-mover,
-		> .block-editor-block-list__block-edit > .block-editor-block-mover {
-			left: -$block-padding + $border-width;
-		}
-	}
-
-	// Full-wide
-	&[data-align="full"] {
-		// Position hover label on the left for the top level block.
-		> .block-editor-block-list__block-edit > .block-editor-block-list__breadcrumb {
-			left: 0;
-		}
-
-		// Compensate for main container padding and subtract border.
-		@include break-small() {
-			margin-left: -$block-side-ui-width - $block-padding - $block-side-ui-clearance - $border-width;
-			margin-right: -$block-side-ui-width - $block-padding - $block-side-ui-clearance - $border-width;
-		}
-
-		> .block-editor-block-list__block-edit {
-			margin-left: -$block-padding;
-			margin-right: -$block-padding;
-
-			@include break-small() {
-				margin-left: -$block-side-ui-width - $block-side-ui-clearance - $block-padding;
-				margin-right: -$block-side-ui-width - $block-side-ui-clearance - $block-padding;
-			}
-
-			// This explicitly sets the width of the block, to override
-			// `width: fit-content` from the image block.
-			figure {
-				width: 100%;
-			}
-		}
-
-		> .block-editor-block-list__block-edit::before {
-			left: 0;
-			right: 0;
-			border-left-width: 0;
-			border-right-width: 0;
-		}
-
-		// Position mover
-		&.is-multi-selected > .block-editor-block-mover,
-		> .block-editor-block-list__block-edit > .block-editor-block-mover {
-			left: $border-width;
-		}
-	}
-
-	// Clear floats
+	// Clear floats.
 	&[data-clear="true"] {
 		float: none;
 	}
+}
 
-	// Dropzones
-	.block-editor-block-drop-zone {
-		top: -4px;
-		bottom: -3px;
-		margin: 0 $block-padding;
+.is-outline-mode .block-editor-block-list__block:not(.remove-outline) {
+	&.is-hovered {
+		cursor: default;
+
+		&::after {
+			top: $border-width;
+			left: $border-width;
+			right: $border-width;
+			bottom: $border-width;
+			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
+			// Border is outset, so subtract the width to achieve correct radius.
+			border-radius: $radius-block-ui - $border-width;
+		}
 	}
 
-	// Hide appender shortcuts in nested blocks
-	// This essentially duplicates the mobile styles for the appender component
-	// It would be nice to be able to use element queries in that component instead https://github.com/tomhodgins/element-queries-spec
-	.block-editor-block-list__layout {
-		.block-editor-inserter-with-shortcuts {
-			display: none;
+	&.is-selected {
+		cursor: default;
+
+		&.rich-text {
+			cursor: unset;
 		}
 
-		.block-editor-block-list__empty-block-inserter,
-		.block-editor-default-block-appender .block-editor-inserter {
-			left: auto;
-			right: $grid-size;
+		&::after {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color); // Selected not focussed.
+			top: $border-width;
+			left: $border-width;
+			right: $border-width;
+			bottom: $border-width;
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
+		}
+
+		&:focus {
+			&::after {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			}
 		}
 	}
 }
 
+// Spotlight mode. Fade out blocks unless they contain a selected block.
+.is-focus-mode .block-editor-block-list__block:not(.has-child-selected) {
+	opacity: 0.2;
+	transition: opacity 0.1s linear;
+	@include reduce-motion("transition");
 
-/**
- * Left and right side UI; Unified toolbar on Mobile
- */
-
-.block-editor-block-list__block {
-
-	// Left and right block settings and mover.
-	&.is-multi-selected > .block-editor-block-mover,
-	> .block-editor-block-list__block-edit > .block-editor-block-mover {
-		position: absolute;
-		width: $block-side-ui-width + $block-side-ui-clearance;
-
-		// Stretch to fill half of the available space to increase hoverable area.
-		height: 100%;
-		max-height: $block-side-ui-width * 4;
-	}
-
-	// Position depending on whether selected or not.
-	&.is-multi-selected > .block-editor-block-mover,
-	> .block-editor-block-list__block-edit > .block-editor-block-mover {
-		top: -$block-padding - $border-width;
-	}
-
-	// Elevate when block is selected or hovered.
-	@include break-small() {
-		&.is-multi-selected,
-		&.is-selected,
-		&.is-hovered {
-			.block-editor-block-mover {
-				z-index: z-index(".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover");
-			}
-		}
-	}
-
-	// Left side UI.
-	&.is-multi-selected > .block-editor-block-mover,
-	> .block-editor-block-list__block-edit > .block-editor-block-mover {
-		padding-right: $block-side-ui-clearance;
-
-		// Position for top level blocks.
-		left: -$block-side-ui-width - $block-side-ui-clearance - $block-padding - $border-width;
-
-		// Hide on mobile, as mobile has a separate solution.
-		display: none;
-		@include break-small() {
-			display: block;
-		}
-	}
-
-	&.is-multi-selected > .block-editor-block-mover {
-		left: -$block-side-ui-width - $block-side-ui-clearance;
-	}
-
-	// For floats, show block mover when block is selected, and never on hover.
-	&[data-align="left"],
-	&[data-align="right"] {
-		// Show always when the block is selected.
-		&.is-selected > .block-editor-block-list__block-edit > .block-editor-block-mover {
-			// Don't show on mobile, allow the special mobile toolbar to work there.
-			display: none;
-			@include break-small() {
-				display: block;
-				opacity: 1;
-				animation: none;
-
-				// Make wider and taller to make "safe" hover area bigger.
-				// The intent is to make it less likely that you hover float-adjacent
-				// blocks that visually appear below the block.
-				width: $block-side-ui-width + $block-side-ui-clearance + $block-padding + $border-width;
-				height: auto;
-				padding-bottom: $block-padding;
-
-				// Unset the negative top margin, or it might overlap the block toolbar.
-				margin-top: 0;
-			}
-		}
-
-		// Don't show on hover, or on the "ghost" when dragging.
-		&.is-hovered > .block-editor-block-list__block-edit > .block-editor-block-mover,
-		&.is-dragging > .block-editor-block-list__block-edit > .block-editor-block-mover {
-			display: none;
-		}
+	// Nested blocks should never be faded. If the parent block is already faded
+	// out, it shouldn't be faded out more. If the parent block in not faded
+	// out, it shouldn't be faded out either because the block as a whole,
+	// including inner blocks, should be focused.
+	.block-editor-block-list__block,
+	&.is-selected,
+	&.is-multi-selected {
+		opacity: 1;
 	}
 }
 
-
-/**
- * Mobile unified toolbar.
- */
-
-.block-editor-block-list__block {
-
-	// Show side UI inline below the block on mobile.
-	.block-editor-block-list__block-mobile-toolbar {
-		display: flex;
-		flex-direction: row;
-
-		// Make room for the height of the block toolbar above.
-		transform: translateY($block-padding + $border-width);
-		margin-top: $block-toolbar-height;
-		margin-right: -$block-padding;
-		margin-left: -$block-padding;
-		border-top: $border-width solid $light-gray-800;
-		height: $block-toolbar-height;
-
-		@include break-small() {
-			display: none;
-		}
-
-		// Add a white background to prevent the block's left border from showing through.
-		background-color: $white;
-
-		// Show a shadow below the selected block to imply separation.
-		box-shadow: $shadow-below-only;
-		@include break-small() {
-			box-shadow: none;
-		}
-
-		// Movers, inserter, trash, and ellipsis.
-		.block-editor-inserter {
-			position: relative;
-			left: auto;
-			top: auto;
-			margin: 0;
-		}
-
-		.block-editor-inserter__toggle,
-		.block-editor-block-mover__control {
-			width: $icon-button-size;
-			height: $icon-button-size;
-			border-radius: $radius-round-rectangle;
-			padding: 3px;
-			margin: 0;
-			justify-content: center;
-			align-items: center;
-
-			.dashicon {
-				margin: auto;
-			}
-		}
-
-		// Movers
-		.block-editor-block-mover {
-			display: flex;
-			margin-right: auto;
-
-			.block-editor-inserter,
-			.block-editor-block-mover__control {
-				float: left;
-			}
-		}
-	}
-
-	// Reset negative margins on mobile for full-width.
-	&[data-align="full"] .block-editor-block-list__block-mobile-toolbar {
-		margin-left: 0;
-		margin-right: 0;
+.is-focus-mode .block-editor-block-list__block.is-content-locked.has-child-selected,
+.is-focus-mode .block-editor-block-list__block.is-content-locked-temporarily-editing-as-blocks.has-child-selected {
+	&,
+	& .block-editor-block-list__block {
+		opacity: 1;
 	}
 }
 
+.wp-block[data-align="left"] > *,
+.wp-block[data-align="right"] > *,
+.wp-block.alignleft,
+.wp-block.alignright {
+	// Without z-index, won't be clickable as "above" adjacent content.
+	z-index: z-index("{core/image aligned left or right} .wp-block");
+}
+
+.wp-site-blocks > [data-align="left"] {
+	float: left;
+	margin-right: 2em;
+}
+
+.wp-site-blocks > [data-align="right"] {
+	float: right;
+	margin-left: 2em;
+}
+
+.wp-site-blocks > [data-align="center"] {
+	justify-content: center;
+	margin-left: auto;
+	margin-right: auto;
+}
 
 /**
  * In-Canvas Inserter
  */
 
 .block-editor-block-list .block-editor-inserter {
-	margin: $grid-size;
+	margin: $grid-unit-10;
 	cursor: move; // Fallback for IE/Edge < 14
 	cursor: grab;
 }
 
-// Insertion point (includes inbetween inserter and insertion indicator)
-.block-editor-block-list__insertion-point {
-	position: relative;
-	z-index: z-index(".block-editor-block-list__insertion-point");
-	margin-top: -$block-padding;
-}
-
-.block-editor-block-list__insertion-point-indicator {
-	position: absolute;
-	top: calc(50% - #{ $border-width });
-	height: 2px;
-	left: 0;
-	right: 0;
-	background: theme(primary);
-}
-
-// This is the clickable plus.
-.block-editor-block-list__insertion-point-inserter {
-	// Don't show on mobile.
-	display: none;
-	@include break-mobile() {
-		display: flex;
+@keyframes block-editor-inserter__toggle__fade-in-animation {
+	from {
+		opacity: 0;
 	}
-
-	position: absolute;
-	bottom: auto;
-	left: 0;
-	right: 0;
-	justify-content: center;
-	height: $block-padding + 8px;
-
-	// Show a clickable plus.
-	.block-editor-inserter__toggle {
-		margin-top: -8px;
-		border-radius: 50%;
-		color: $blue-medium-focus;
-		background: $white;
-		height: $block-padding * 2 + 8px;
-		width: $block-padding * 2 + 8px;
-
-		&:not(:disabled):not([aria-disabled="true"]):hover {
-			box-shadow: none;
-		}
-	}
-
-	// Hide both the button until hovered.
-	opacity: 0;
-	transition: opacity 0.1s linear;
-	@include reduce-motion("transition");
-
-	&:hover,
-	&.is-visible {
+	to {
 		opacity: 1;
 	}
 }
 
-// Don't show the sibling inserter before the selected block.
-.edit-post-layout:not(.has-fixed-toolbar) {
-	// The child selector is necessary for this to work properly in nested contexts.
-	.is-selected > .block-editor-block-list__insertion-point > .block-editor-block-list__insertion-point-inserter,
-	.is-focused > .block-editor-block-list__insertion-point > .block-editor-block-list__insertion-point-inserter {
-		opacity: 0;
-		pointer-events: none;
-
-		&:hover,
-		&.is-visible {
-			opacity: 1;
-			pointer-events: auto;
-		}
-	}
+// Hide the appender that sits at the end of block lists, when inside a nested block,
+// unless the block itself, or a parent, is selected.
+.wp-block .block-list-appender .block-editor-inserter__toggle {
+	animation: block-editor-inserter__toggle__fade-in-animation 0.1s ease;
+	animation-fill-mode: forwards;
+	@include reduce-motion("animation");
 }
 
-// This is the edge-to-edge hover area that contains the plus.
-.block-editor-block-list__block {
-	> .block-editor-block-list__insertion-point {
-		position: absolute;
-		top: -$block-padding - $block-spacing / 2;
+.block-editor-block-list__block:not(.is-selected):not(.has-child-selected) .block-editor-default-block-appender {
+	display: none;
 
-		// Matches the whole empty space between two blocks.
-		height: $block-padding * 2;
-		bottom: auto;
-
-		// Go edge to edge on mobile.
-		left: 0;
-		right: 0;
-
-		// Beyond mobile, make sure the toolbar overlaps the hover style.
-		@include break-small() {
-			left: -$border-width;
-			right: -$border-width;
-		}
-	}
-
-	&[data-align="full"] > .block-editor-block-list__insertion-point {
-		left: 0;
-		right: 0;
+	.block-editor-inserter__toggle {
+		opacity: 0;
+		transform: scale(0);
 	}
 }
 
 .block-editor-block-list__block .block-editor-block-list__block-html-textarea {
 	display: block;
 	margin: 0;
+	padding: $grid-unit-15;
 	width: 100%;
 	border: none;
 	outline: none;
-	box-shadow: none;
+	border-radius: 2px;
+	box-shadow: inset 0 0 0 $border-width $gray-900;
 	resize: none;
 	overflow: hidden;
 	font-family: $editor-html-font;
 	font-size: $text-editor-font-size;
-	line-height: 150%;
+	line-height: 1.5;
 	transition: padding 0.2s linear;
 	@include reduce-motion("transition");
 
 	&:focus {
-		box-shadow: none;
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 	}
 }
 
 
 /**
- * Block Toolbar when contextual.
+ * Warnings.
  */
-
-.block-editor-block-list__block {
-	.block-editor-block-contextual-toolbar {
-		z-index: z-index(".block-editor-block-contextual-toolbar");
-		white-space: nowrap;
-		text-align: left;
-		pointer-events: none;
-
-		// Position toolbar below the block on mobile.
-		position: absolute;
-		bottom: $block-toolbar-height - $block-padding - $border-width;
-		left: -$block-padding;
-		right: -$block-padding;
-
-		// Paint the borders on the toolbar itself on mobile.
-		border-top: $border-width solid $light-gray-800;
-		.components-toolbar {
-			border-top: none;
-			border-bottom: none;
-		}
-
-		@include break-small() {
-			border-top: none;
-			.components-toolbar {
-				border-top: $border-width solid $light-gray-800;
-				border-bottom: $border-width solid $light-gray-800;
-			}
-		}
-	}
-
-	// Floated items have special needs for the contextual toolbar position + the thicker left border.
-	&[data-align="left"] .block-editor-block-contextual-toolbar,
-	&[data-align="right"] .block-editor-block-contextual-toolbar {
-		margin-bottom: $border-width;
-		margin-top: -$block-toolbar-height;
-
-		// Display the box-shadow on the parent element.
-		box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
-		.is-dark-theme & {
-			box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
-		}
-
-		@include break-small() {
-			box-shadow: none;
-		}
-
-		.editor-block-toolbar {
-			border-left: none;
-		}
-	}
-
-	// Make block toolbar full width on mobile.
-	.block-editor-block-contextual-toolbar {
-		margin-left: 0;
-		margin-right: 0;
-		@include break-small() {
-			margin-left: -$block-padding - $border-width;
-			margin-right: -$block-padding - $border-width;
-		}
-	}
-
-	// For floats, compensate for this so content doesn't grow smaller.
-	&[data-align="left"] .block-editor-block-contextual-toolbar {
-		/*rtl:ignore*/
-		margin-right: $block-padding + $border-width;
-	}
-
-	&[data-align="right"] .block-editor-block-contextual-toolbar {
-		/*rtl:ignore*/
-		margin-left: $block-padding + $border-width;
-	}
-
-	// Reset pointer-events on children.
-	.block-editor-block-contextual-toolbar > * {
-		pointer-events: auto;
-	}
-
-	// Full-aligned blocks have negative margins on the parent of the toolbar, so additional position adjustment is not required.
-	&[data-align="full"] .block-editor-block-contextual-toolbar {
-		left: 0;
-		right: 0;
-	}
-}
-
-// Enable toolbar footprint collapsing
-.block-editor-block-contextual-toolbar {
-	// Position the contextual toolbar above the block.
-	.block-editor-block-list__block & {
-		@include break-small() {
-			bottom: auto;
-			left: auto;
-			right: auto;
-			box-shadow: none;
-
-			// Move the block toolbar out of the flow using translate.
-			transform: translateY(-$block-toolbar-height -$block-padding -$border-width);
-
-			// IE11 does not support `position: sticky`.
-			@supports (position: sticky) {
-				position: sticky;
-
-				// Compensate for translate, so the sticky sticks to the top.
-				top: $block-toolbar-height + $block-padding;
-			}
-		}
-	}
-
-	.block-editor-block-list__block[data-align="left"] & {
-		// RTL note: this rule should not be auto-flipped based on direction.
-		/*rtl:ignore*/
-		float: left;
-	}
-
-	.block-editor-block-list__block[data-align="right"] & {
-		// RTL note: this rule should not be auto-flipped based on direction.
-		/*rtl:ignore*/
-		float: right;
-	}
-
-	.block-editor-block-list__block[data-align="left"] &,
-	.block-editor-block-list__block[data-align="right"] & {
-		// Move the block toolbar out of the flow using translate, but less for floats.
-		transform: translateY(-$block-padding -$border-width);
-	}
-}
-
-// Position the block toolbar when contextual.
-.block-editor-block-contextual-toolbar .block-editor-block-toolbar {
-	width: 100%;
-
-	@include break-small() {
-		width: auto;
-
-		// Hide right border on desktop, where the .components-toolbar instead has a right border.
-		border-right: none;
-
-		// This prevents floats from messing up the position of the block toolbar on floats-adjacent blocks when selected.
-		position: absolute;
-		left: $border-width;
-		top: $border-width;
-	}
-}
-
-
-/**
- * Hover label
- */
-
-.block-editor-block-list__breadcrumb {
-	position: absolute;
-	line-height: 1;
-	z-index: z-index(".block-editor-block-list__breadcrumb");
-
-	// Position in the top left of the border.
-	left: -$block-padding - $block-left-border-width;
-	top: (($block-padding * -2) - $block-left-border-width);
-
-	.components-toolbar {
-		border: none;
-		line-height: 1;
-		font-family: $default-font;
-		font-size: 11px;
-		padding: 4px 4px;
-		background: $light-gray-500;
-		color: $dark-gray-900;
-
-		.is-dark-theme & {
-			background: $dark-gray-600;
-			color: $white;
-		}
-
-		// Animate in
-		.block-editor-block-list__block:hover & {
-			opacity: 0;
-			@include edit-post__fade-in-animation(60ms, 0.5s);
-		}
-	}
-
-	// Position this above the toolbar of parent blocks.
-	.editor-inner-blocks & {
-		z-index: z-index(".editor-inner-blocks .block-editor-block-list__breadcrumb");
-	}
-
-	// Remove negative left breadcrumb position for left aligned blocks.
-	[data-align="left"] & {
-		left: 0;
-	}
-
-	// Right-align the breadcrumb for right-aligned blocks.
-	[data-align="right"] & {
-		left: auto;
-		right: 0;
-	}
-}
-
-.block-editor-block-list__descendant-arrow::before {
-	content: "→";
-	display: inline-block;
-	padding: 0 4px;
-
-	.rtl & {
-		content: "←";
-	}
-}
-
-.block-editor-block-list__block {
-	@include break-small {
-		// Increase the hover and selection area around blocks.
-		// This makes the blue hover line and the settings button appear even if
-		// the mouse cursor is technically outside the block.
-		// This improves usability by making it possible to click somewhat outside
-		// the block and select it. (eg. A fuzzy click target.)
-		&::before {
-			bottom: 0;
-			content: "";
-			left: -$block-padding * 2;
-			position: absolute;
-			right: -$block-padding * 2;
-			top: 0;
-		}
-
-		// Remove the fuzzy click area effect set above on nested blocks.
-		// It should only applies to top-level blocks; applying this rule to
-		// nested blocks will result in difficult-to-use and possibly overlapping
-		// click targets.
-		& &::before {
-			left: 0;
-			right: 0;
-		}
-
-		// Don't use this for full-wide blocks, as there's no clearance to accommodate extra area on the side.
-		&[data-align="full"]::before {
-			content: none;
-		}
-	}
-}
 
 .block-editor-block-list__block .block-editor-warning {
 	z-index: z-index(".block-editor-warning");
 	position: relative;
-	margin-right: -$block-padding;
-	margin-left: -$block-padding;
 
-	// Pull the warning upwards to the edge, and add a negative bottom margin to compensate.
-	margin-bottom: -$block-padding;
-	transform: translateY(-$block-padding);
+	&.block-editor-block-list__block-crash-warning {
+		// The block crash warning has no block preview underneath it.
+		// The lack of a preview combined with the negative margin that
+		// the warning normally has results in crashed blocks overlapping
+		// any blocks that come after them. Resetting the margin to `auto`
+		// solves this.
+		margin-bottom: auto;
+	}
+}
 
-	// Bigger padding on mobile where blocks are edge to edge.
-	padding: 10px $block-padding;
-	@include break-small() {
-		padding: 10px $block-padding;
+/** Zoom Out mode styles **/
+.block-editor-iframe__body {
+	transition: all 0.3s;
+	transform-origin: top center;
+
+	&.is-zoomed-out {
+		margin: 100px 0;
+		transform: scale(0.45);
+
+		// Add a bit more space between the top level blocks.
+		.wp-site-blocks > * + * {
+			margin-block-start: 2.5rem;
+		}
+
+		> .block-list-appender {
+			display: none;
+		}
 	}
 }

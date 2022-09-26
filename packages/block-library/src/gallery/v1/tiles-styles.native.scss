@@ -1,0 +1,11 @@
+.containerStyle {
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.tileStyle {
+	overflow: hidden;
+	flex-direction: row;
+	align-items: center;
+	border-color: transparent;
+}

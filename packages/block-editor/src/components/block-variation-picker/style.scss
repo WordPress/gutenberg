@@ -1,0 +1,89 @@
+.block-editor-block-variation-picker {
+	.components-placeholder__instructions {
+		// Defer to vertical margins applied by template picker options.
+		margin-bottom: 0;
+	}
+
+	.components-placeholder__fieldset {
+		// Options will render horizontally, but the immediate children of the
+		// fieldset are the options and the skip button, oriented vertically.
+		flex-direction: column;
+	}
+
+	&.has-many-variations .components-placeholder__fieldset {
+		// Allow options to occupy a greater amount of the available space if
+		// many options exist.
+		max-width: 90%;
+	}
+}
+
+.block-editor-block-variation-picker__variations.block-editor-block-variation-picker__variations {
+	display: flex;
+	justify-content: flex-start;
+	flex-direction: row;
+	flex-wrap: wrap;
+	width: 100%;
+	margin: $grid-unit-20 0;
+	padding: 0;
+	list-style: none;
+
+	> li {
+		list-style: none;
+		margin: $grid-unit-10 ( $grid-unit-10 + $grid-unit-15 ) 0 0;
+		flex-shrink: 1;
+		width: 75px;
+		text-align: center;
+
+		button {
+			display: inline-flex;
+			margin-right: 0;
+		}
+	}
+
+	.block-editor-block-variation-picker__variation {
+		padding: $grid-unit-10;
+	}
+
+	.block-editor-block-variation-picker__variation-label {
+		font-family: $default-font;
+		font-size: 12px;
+		display: block;
+		line-height: 1.4;
+	}
+}
+
+.block-editor-block-variation-picker__variation {
+	width: 100%;
+
+	&.components-button.has-icon {
+		// Override default styles inherited from <Button /> to center
+		// icon horizontally.
+		justify-content: center;
+		width: auto;
+
+		&.is-secondary {
+			background-color: $white;
+		}
+	}
+
+	&.components-button {
+		// Override default styles inherited from <Button /> to allow button
+		// to grow vertically.
+		height: auto;
+		padding: 0;
+	}
+
+	&::before {
+		// Use `padding-bottom` trick to style element as perfect square.
+		content: "";
+		padding-bottom: 100%;
+	}
+
+	&:first-child {
+		margin-left: 0;
+	}
+
+	&:last-child {
+		margin-right: 0;
+	}
+}
