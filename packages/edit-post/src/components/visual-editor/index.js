@@ -255,8 +255,7 @@ export default function VisualEditor( { styles } ) {
 		'.block-editor-block-list__layout.is-root-container'
 	);
 
-	const { attributes = {} } = postContentBlock;
-	const { layout = {} } = attributes;
+	const layout = postContentBlock?.attributes?.layout || {};
 
 	// Update type for blocks using legacy layouts.
 	const postContentLayout =
