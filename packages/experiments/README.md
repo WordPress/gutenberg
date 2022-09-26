@@ -9,7 +9,7 @@ Each package needs to start by registering itself:
 ```js
 const { register } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.',
+		'<CONSENT STRING>',  // See index.js
 		'@wordpress/blocks'
 	);
 ```
@@ -29,7 +29,7 @@ Consume the registered `__experimental` APIs as follows:
 import { __experiments as blocksExperiments } from '@wordpress/blocks';
 const { unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.',
+		'<CONSENT STRING>',  // See index.js
 		'@wordpress/block-editor'
 	);
 
