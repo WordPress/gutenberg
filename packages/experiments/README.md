@@ -9,7 +9,7 @@ Each package needs to start by registering itself:
 ```js
 const { register } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'<CONSENT STRING>',  // See index.js
+		'<CONSENT STRING>',  // See index.js, this may change without notice.
 		'@wordpress/blocks'
 	);
 ```
