@@ -1,7 +1,6 @@
-Guide
-========
+# Guide
 
-`Guide` is a React component that renders a _user guide_ in a modal. The guide consists of several `GuidePage` components which the user can step through one by one. The guide is finished when the modal is closed or when the user clicks _Finish_ on the last page of the guide.
+`Guide` is a React component that renders a _user guide_ in a modal. The guide consists of several pages which the user can step through one by one. The guide is finished when the modal is closed or when the user clicks _Finish_ on the last page of the guide.
 
 ## Usage
 
@@ -13,14 +12,24 @@ function MyTutorial() {
 		return null;
 	}
 
-	<Guide onFinish={ () => setIsOpen( false ) }>
-		<GuidePage>
-			<p>Welcome to the ACME Store! Select a category to begin browsing our wares.</p>
-		</GuidePage>
-		<GuidePage>
-			<p>When you find something you love, click <i>Add to Cart</i> to add the product to your shopping cart.</p>
-		</GuidePage>
-	</Guide>
+	return (
+		<Guide
+			onFinish={ () => setIsOpen( false ) }
+			pages={ [
+				{
+					content: <p>Welcome to the ACME Store!</p>,
+				},
+				{
+					image: <img src="https://acmestore.com/add-to-cart.png" />,
+					content: (
+						<p>
+							Click <i>Add to Cart</i> to buy a product.
+						</p>
+					),
+				},
+			] }
+		/>
+	);
 }
 ```
 
@@ -32,32 +41,33 @@ The component accepts the following props:
 
 A function which is called when the guide is finished. The guide is finished when the modal is closed or when the user clicks _Finish_ on the last page of the guide.
 
-- Type: `function`
-- Required: Yes
+-   Type: `function`
+-   Required: Yes
 
-### children
+### pages
 
-A list of `GuidePage` components. One page is shown at a time.
+A list of objects describing each page in the guide. Each object **must** contain a `'content'` property and may optionally contain a `'image'` property.
 
-- Required: Yes
+-   Type: `array`
+-   Required: Yes
 
 ### className
 
 A custom class to add to the modal.
 
-- Type: `string`
-- Required: No
+-   Type: `string`
+-   Required: No
 
 ### contentLabel
 
 This property is used as the modal's accessibility label. It is required for accessibility reasons.
 
-- Type: `String`
-- Required: Yes
+-   Type: `String`
+-   Required: Yes
 
 ### finishButtonText
 
 Use this to customize the label of the _Finish_ button shown at the end of the guide.
 
-- Type: `string`
-- Required: No
+-   Type: `string`
+-   Required: No

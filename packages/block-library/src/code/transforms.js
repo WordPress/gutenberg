@@ -11,6 +11,15 @@ const transforms = {
 			transform: () => createBlock( 'core/code' ),
 		},
 		{
+			type: 'block',
+			blocks: [ 'core/html', 'core/paragraph' ],
+			transform: ( { content } ) => {
+				return createBlock( 'core/code', {
+					content,
+				} );
+			},
+		},
+		{
 			type: 'raw',
 			isMatch: ( node ) =>
 				node.nodeName === 'PRE' &&
@@ -26,6 +35,15 @@ const transforms = {
 						},
 					},
 				},
+			},
+		},
+	],
+	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			transform: ( { content } ) => {
+				return createBlock( 'core/paragraph', { content } );
 			},
 		},
 	],

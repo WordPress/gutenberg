@@ -1,24 +1,25 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { tag as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
+import transforms from './transforms';
+import metadata from './block.json';
 import edit from './edit';
 
-export const name = 'core/tag-cloud';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
-	title: __( 'Tag Cloud' ),
-	description: __( 'A cloud of your most used tags.' ),
 	icon,
-	category: 'widgets',
-	supports: {
-		html: false,
-		align: true,
-	},
+	example: {},
 	edit,
+	transforms,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

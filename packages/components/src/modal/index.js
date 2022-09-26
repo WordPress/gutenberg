@@ -1,175 +1,207 @@
+// @ts-nocheck
+
+/**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
 /**
  * WordPress dependencies
  */
-import { Component, createPortal } from '@wordpress/element';
-import { withInstanceId } from '@wordpress/compose';
-import deprecated from '@wordpress/deprecated';
+import {
+	createPortal,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+	forwardRef,
+} from '@wordpress/element';
+import {
+	useInstanceId,
+	useFocusReturn,
+	useFocusOnMount,
+	__experimentalUseFocusOutside as useFocusOutside,
+	useConstrainedTabbing,
+	useMergeRefs,
+} from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
+import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import ModalFrame from './frame';
-import ModalHeader from './header';
 import * as ariaHelper from './aria-helper';
+import Button from '../button';
+import StyleProvider from '../style-provider';
 
 // Used to count the number of open modals.
-let parentElement,
-	openModalCount = 0;
+let openModalCount = 0;
 
-class Modal extends Component {
-	constructor( props ) {
-		super( props );
-		this.prepareDOM();
-	}
+function Modal( props, forwardedRef ) {
+	const {
+		bodyOpenClassName = 'modal-open',
+		role = 'dialog',
+		title = null,
+		focusOnMount = true,
+		shouldCloseOnEsc = true,
+		shouldCloseOnClickOutside = true,
+		isDismissible = true,
+		/* Accessibility. */
+		aria = {
+			labelledby: null,
+			describedby: null,
+		},
+		onRequestClose,
+		icon,
+		closeButtonLabel,
+		children,
+		style,
+		overlayClassName,
+		className,
+		contentLabel,
+		onKeyDown,
+		isFullScreen = false,
+		__experimentalHideHeader = false,
+	} = props;
 
-	/**
-	 * Appends the modal's node to the DOM, so the portal can render the
-	 * modal in it. Also calls the openFirstModal when this is the first modal to be
-	 * opened.
-	 */
-	componentDidMount() {
+	const ref = useRef();
+	const instanceId = useInstanceId( Modal );
+	const headingId = title
+		? `components-modal-header-${ instanceId }`
+		: aria.labelledby;
+	const focusOnMountRef = useFocusOnMount( focusOnMount );
+	const constrainedTabbingRef = useConstrainedTabbing();
+	const focusReturnRef = useFocusReturn();
+	const focusOutsideProps = useFocusOutside( onRequestClose );
+
+	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
+
+	useEffect( () => {
 		openModalCount++;
 
 		if ( openModalCount === 1 ) {
-			this.openFirstModal();
+			ariaHelper.hideApp( ref.current );
+			document.body.classList.add( bodyOpenClassName );
+		}
+
+		return () => {
+			openModalCount--;
+
+			if ( openModalCount === 0 ) {
+				document.body.classList.remove( bodyOpenClassName );
+				ariaHelper.showApp();
+			}
+		};
+	}, [ bodyOpenClassName ] );
+
+	function handleEscapeKeyDown( event ) {
+		if (
+			shouldCloseOnEsc &&
+			event.code === 'Escape' &&
+			! event.defaultPrevented
+		) {
+			event.preventDefault();
+			if ( onRequestClose ) {
+				onRequestClose( event );
+			}
 		}
 	}
 
-	/**
-	 * Removes the modal's node from the DOM. Also calls closeLastModal when this is
-	 * the last modal to be closed.
-	 */
-	componentWillUnmount() {
-		openModalCount--;
+	const onContentContainerScroll = useCallback(
+		( e ) => {
+			const scrollY = e?.target?.scrollTop ?? -1;
 
-		if ( openModalCount === 0 ) {
-			this.closeLastModal();
-		}
+			if ( ! hasScrolledContent && scrollY > 0 ) {
+				setHasScrolledContent( true );
+			} else if ( hasScrolledContent && scrollY <= 0 ) {
+				setHasScrolledContent( false );
+			}
+		},
+		[ hasScrolledContent ]
+	);
 
-		this.cleanDOM();
-	}
-
-	/**
-	 * Prepares the DOM for the modals to be rendered.
-	 *
-	 * Every modal is mounted in a separate div appended to a parent div
-	 * that is appended to the document body.
-	 *
-	 * The parent div will be created if it does not yet exist, and the
-	 * separate div for this specific modal will be appended to that.
-	 */
-	prepareDOM() {
-		if ( ! parentElement ) {
-			parentElement = document.createElement( 'div' );
-			document.body.appendChild( parentElement );
-		}
-		this.node = document.createElement( 'div' );
-		parentElement.appendChild( this.node );
-	}
-
-	/**
-	 * Removes the specific mounting point for this modal from the DOM.
-	 */
-	cleanDOM() {
-		parentElement.removeChild( this.node );
-	}
-
-	/**
-	 * Prepares the DOM for this modal and any additional modal to be mounted.
-	 *
-	 * It appends an additional div to the body for the modals to be rendered in,
-	 * it hides any other elements from screen-readers and adds an additional class
-	 * to the body to prevent scrolling while the modal is open.
-	 */
-	openFirstModal() {
-		ariaHelper.hideApp( parentElement );
-		document.body.classList.add( this.props.bodyOpenClassName );
-	}
-
-	/**
-	 * Cleans up the DOM after the last modal is closed and makes the app available
-	 * for screen-readers again.
-	 */
-	closeLastModal() {
-		document.body.classList.remove( this.props.bodyOpenClassName );
-		ariaHelper.showApp();
-	}
-
-	/**
-	 * Renders the modal.
-	 *
-	 * @return {WPElement} The modal element.
-	 */
-	render() {
-		const {
-			onRequestClose,
-			title,
-			icon,
-			closeButtonLabel,
-			children,
-			aria,
-			instanceId,
-			isDismissible,
-			isDismissable, //Deprecated
-			// Many of the documented props for Modal are passed straight through
-			// to the ModalFrame component and handled there.
-			...otherProps
-		} = this.props;
-
-		const headingId =
-			aria.labelledby || `components-modal-header-${ instanceId }`;
-
-		if ( isDismissable ) {
-			deprecated( 'isDismissable prop of the Modal component', {
-				alternative:
-					'isDismissible prop (renamed) of the Modal component',
-			} );
-		}
-		// Disable reason: this stops mouse events from triggering tooltips and
-		// other elements underneath the modal overlay.
-		return createPortal(
-			<ModalFrame
-				onRequestClose={ onRequestClose }
-				aria={ {
-					labelledby: title ? headingId : null,
-					describedby: aria.describedby,
-				} }
-				{ ...otherProps }
-			>
+	return createPortal(
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div
+			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
+			className={ classnames(
+				'components-modal__screen-overlay',
+				overlayClassName
+			) }
+			onKeyDown={ handleEscapeKeyDown }
+		>
+			<StyleProvider document={ document }>
 				<div
-					className={ 'components-modal__content' }
-					tabIndex="0"
-					role="document"
+					className={ classnames(
+						'components-modal__frame',
+						className,
+						{
+							'is-full-screen': isFullScreen,
+						}
+					) }
+					style={ style }
+					ref={ useMergeRefs( [
+						constrainedTabbingRef,
+						focusReturnRef,
+						focusOnMountRef,
+					] ) }
+					role={ role }
+					aria-label={ contentLabel }
+					aria-labelledby={ contentLabel ? null : headingId }
+					aria-describedby={ aria.describedby }
+					tabIndex="-1"
+					{ ...( shouldCloseOnClickOutside
+						? focusOutsideProps
+						: {} ) }
+					onKeyDown={ onKeyDown }
 				>
-					<ModalHeader
-						closeLabel={ closeButtonLabel }
-						headingId={ headingId }
-						icon={ icon }
-						isDismissible={ isDismissible || isDismissable }
-						onClose={ onRequestClose }
-						title={ title }
-					/>
-					{ children }
+					<div
+						className={ classnames( 'components-modal__content', {
+							'hide-header': __experimentalHideHeader,
+							'has-scrolled-content': hasScrolledContent,
+						} ) }
+						role="document"
+						onScroll={ onContentContainerScroll }
+					>
+						{ ! __experimentalHideHeader && (
+							<div className="components-modal__header">
+								<div className="components-modal__header-heading-container">
+									{ icon && (
+										<span
+											className="components-modal__icon-container"
+											aria-hidden
+										>
+											{ icon }
+										</span>
+									) }
+									{ title && (
+										<h1
+											id={ headingId }
+											className="components-modal__header-heading"
+										>
+											{ title }
+										</h1>
+									) }
+								</div>
+								{ isDismissible && (
+									<Button
+										onClick={ onRequestClose }
+										icon={ close }
+										label={
+											closeButtonLabel ||
+											__( 'Close dialog' )
+										}
+									/>
+								) }
+							</div>
+						) }
+						{ children }
+					</div>
 				</div>
-			</ModalFrame>,
-			this.node
-		);
-	}
+			</StyleProvider>
+		</div>,
+		document.body
+	);
 }
 
-Modal.defaultProps = {
-	bodyOpenClassName: 'modal-open',
-	role: 'dialog',
-	title: null,
-	focusOnMount: true,
-	shouldCloseOnEsc: true,
-	shouldCloseOnClickOutside: true,
-	isDismissible: true,
-	/* accessibility */
-	aria: {
-		labelledby: null,
-		describedby: null,
-	},
-};
-
-export default withInstanceId( Modal );
+export default forwardRef( Modal );

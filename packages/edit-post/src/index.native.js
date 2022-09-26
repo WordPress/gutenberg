@@ -2,31 +2,36 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
-import '@wordpress/block-editor';
-import '@wordpress/editor';
-import '@wordpress/viewport';
-import '@wordpress/notices';
-import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
+import { dispatch } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
-import './store';
-
-let blocksRegistered = false;
+export { store } from './store';
+import Editor from './editor';
 
 /**
- * Initializes the Editor.
+ * Initializes the Editor and returns a componentProvider
+ * that can be registered with `AppRegistry.registerComponent`
+ *
+ * @param {string} id       Unique identifier for editor instance.
+ * @param {Object} postType Post type of the post to edit.
+ * @param {Object} postId   ID of the post to edit (unused right now)
  */
-export function initializeEditor() {
-	if ( blocksRegistered ) {
-		return;
-	}
+export function initializeEditor( id, postType, postId ) {
+	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
+		editorMode: 'visual',
+		fixedToolbar: false,
+		fullscreenMode: true,
+		hiddenBlockTypes: [],
+		inactivePanels: [],
+		isPublishSidebarEnabled: true,
+		openPanels: [ 'post-status' ],
+		preferredStyleVariations: {},
+		welcomeGuide: true,
+	} );
 
-	// register and setup blocks
-	registerCoreBlocks();
-	blocksRegistered = true;
+	return <Editor postId={ postId } postType={ postType } />;
 }
-
-export { default as Editor } from './editor';

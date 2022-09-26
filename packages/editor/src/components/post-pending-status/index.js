@@ -10,6 +10,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import PostPendingStatusCheck from './check';
+import { store as editorStore } from '../../store';
 
 export function PostPendingStatus( { status, onUpdateStatus } ) {
 	const togglePendingStatus = () => {
@@ -30,11 +31,11 @@ export function PostPendingStatus( { status, onUpdateStatus } ) {
 
 export default compose(
 	withSelect( ( select ) => ( {
-		status: select( 'core/editor' ).getEditedPostAttribute( 'status' ),
+		status: select( editorStore ).getEditedPostAttribute( 'status' ),
 	} ) ),
 	withDispatch( ( dispatch ) => ( {
 		onUpdateStatus( status ) {
-			dispatch( 'core/editor' ).editPost( { status } );
+			dispatch( editorStore ).editPost( { status } );
 		},
 	} ) )
 )( PostPendingStatus );

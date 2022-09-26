@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import {
 	Children,
 	cloneElement,
@@ -26,7 +27,6 @@ import {
 	lazy,
 	Suspense,
 } from 'react';
-import { isString } from 'lodash';
 
 /**
  * Object containing a React element.
@@ -37,7 +37,7 @@ import { isString } from 'lodash';
 /**
  * Object containing a React component.
  *
- * @typedef {import('react').Component} WPComponent
+ * @typedef {import('react').ComponentType} WPComponent
  */
 
 /**
@@ -230,7 +230,7 @@ export function switchChildrenNodeName( children, nodeName ) {
 	return (
 		children &&
 		Children.map( children, ( elt, index ) => {
-			if ( isString( elt ) ) {
+			if ( typeof elt?.valueOf() === 'string' ) {
 				return createElement( nodeName, { key: index }, elt );
 			}
 			const { children: childrenProp, ...props } = elt.props;

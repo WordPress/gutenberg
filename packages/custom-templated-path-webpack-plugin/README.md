@@ -2,7 +2,15 @@
 
 Webpack plugin for creating custom path template tags. Extend the [default set of template tags](https://webpack.js.org/configuration/output/#output-filename) with your own custom behavior. Hooks into Webpack's compilation process to allow you to replace tags with a substitute value.
 
-**Note:** This plugin targets Webpack 4.0 and newer, and is not compatible with older versions.
+## Installation
+
+Install the module
+
+```bash
+npm install @wordpress/custom-templated-path-webpack-plugin --save-dev
+```
+
+**Note**: This package requires Node.js 12.0.0 or later. It targets Webpack 4.0 and newer. It is not compatible with older versions.
 
 ## Usage
 
@@ -16,7 +24,7 @@ const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-web
 
 module.exports = {
 	// ...
-	
+
 	entry: './entry',
 
 	output: {
@@ -52,4 +60,10 @@ module.exports = {
 
 For more examples, refer to Webpack's own [`TemplatedPathPlugin.js`](https://github.com/webpack/webpack/blob/v4.1.1/lib/TemplatedPathPlugin.js), which implements the base set of template tags.
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

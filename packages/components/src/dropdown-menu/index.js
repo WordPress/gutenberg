@@ -1,14 +1,13 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap, isEmpty, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { DOWN } from '@wordpress/keycodes';
-import deprecated from '@wordpress/deprecated';
+import { menu } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -33,41 +32,38 @@ function mergeProps( defaultProps = {}, props = {} ) {
 	return mergedProps;
 }
 
-function DropdownMenu( {
-	children,
-	className,
-	controls,
-	hasArrowIndicator = false,
-	icon = 'menu',
-	label,
-	popoverProps,
-	toggleProps,
-	menuProps,
-	// The following props exist for backward compatibility.
-	menuLabel,
-	position,
-} ) {
-	if ( menuLabel ) {
-		deprecated( '`menuLabel` prop in `DropdownComponent`', {
-			alternative: '`menuProps` object and its `aria-label` property',
-			plugin: 'Gutenberg',
-		} );
-	}
+/**
+ * Whether the argument is a function.
+ *
+ * @param {*} maybeFunc The argument to check.
+ * @return {boolean} True if the argument is a function, false otherwise.
+ */
+function isFunction( maybeFunc ) {
+	return typeof maybeFunc === 'function';
+}
 
-	if ( position ) {
-		deprecated( '`position` prop in `DropdownComponent`', {
-			alternative: '`popoverProps` object and its `position` property',
-			plugin: 'Gutenberg',
-		} );
-	}
+function DropdownMenu( dropdownMenuProps ) {
+	const {
+		children,
+		className,
+		controls,
+		icon = menu,
+		label,
+		popoverProps,
+		toggleProps,
+		menuProps,
+		disableOpenOnArrowDown = false,
+		text,
+		noIcons,
+	} = dropdownMenuProps;
 
-	if ( isEmpty( controls ) && ! isFunction( children ) ) {
+	if ( ! controls?.length && ! isFunction( children ) ) {
 		return null;
 	}
 
 	// Normalize controls to nested array of objects (sets of controls)
 	let controlSets;
-	if ( ! isEmpty( controls ) ) {
+	if ( controls?.length ) {
 		controlSets = controls;
 		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
 			controlSets = [ controlSets ];
@@ -76,7 +72,6 @@ function DropdownMenu( {
 	const mergedPopoverProps = mergeProps(
 		{
 			className: 'components-dropdown-menu__popover',
-			position,
 		},
 		popoverProps
 	);
@@ -87,9 +82,12 @@ function DropdownMenu( {
 			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event ) => {
-					if ( ! isOpen && event.keyCode === DOWN ) {
+					if ( disableOpenOnArrowDown ) {
+						return;
+					}
+
+					if ( ! isOpen && event.code === 'ArrowDown' ) {
 						event.preventDefault();
-						event.stopPropagation();
 						onToggle();
 					}
 				};
@@ -124,19 +122,21 @@ function DropdownMenu( {
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
-						showTooltip
+						text={ text }
+						showTooltip={ toggleProps?.showTooltip ?? true }
 					>
-						{ ( ! icon || hasArrowIndicator ) && (
-							<span className="components-dropdown-menu__indicator" />
-						) }
+						{ mergedToggleProps.children }
 					</Button>
 				);
 			} }
 			renderContent={ ( props ) => {
 				const mergedMenuProps = mergeProps(
 					{
-						'aria-label': menuLabel || label,
-						className: 'components-dropdown-menu__menu',
+						'aria-label': label,
+						className: classnames(
+							'components-dropdown-menu__menu',
+							{ 'no-icons': noIcons }
+						),
 					},
 					menuProps
 				);
@@ -144,7 +144,7 @@ function DropdownMenu( {
 				return (
 					<NavigableMenu { ...mergedMenuProps } role="menu">
 						{ isFunction( children ) ? children( props ) : null }
-						{ flatMap( controlSets, ( controlSet, indexOfSet ) =>
+						{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
 							controlSet.map( ( control, indexOfControl ) => (
 								<Button
 									key={ [
@@ -165,9 +165,11 @@ function DropdownMenu( {
 												indexOfSet > 0 &&
 												indexOfControl === 0,
 											'is-active': control.isActive,
+											'is-icon-only': ! control.title,
 										}
 									) }
 									icon={ control.icon }
+									label={ control.label }
 									aria-checked={
 										control.role === 'menuitemcheckbox' ||
 										control.role === 'menuitemradio'

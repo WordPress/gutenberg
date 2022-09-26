@@ -1,23 +1,19 @@
-## Description
-<!-- Please describe what you have changed or added -->
+<!-- Thanks for contributing to Gutenberg! Please follow the Gutenberg Contributing Guidelines:
+https://github.com/WordPress/gutenberg/blob/trunk/CONTRIBUTING.md -->
 
-## How has this been tested?
-<!-- Please describe in detail how you tested your changes. -->
-<!-- Include details of your testing environment, tests ran to see how -->
-<!-- your change affects other areas of the code, etc. -->
+## What?
+<!-- In a few words, what is the PR actually doing? -->
 
-## Screenshots <!-- if applicable -->
+## Why?
+<!-- Why is this PR necessary? What problem is it solving? Reference any existing previous issue(s) or PR(s), but please add a short summary here, too -->
 
-## Types of changes
-<!-- What types of changes does your code introduce?  -->
-<!-- Bug fix (non-breaking change which fixes an issue) -->
-<!-- New feature (non-breaking change which adds functionality) -->
-<!-- Breaking change (fix or feature that would cause existing functionality to not work as expected) -->
+## How?
+<!-- How is your PR addressing the issue at hand? What are the implementation details? -->
 
-## Checklist:
-- [ ] My code is tested.
-- [ ] My code follows the WordPress code style. <!-- Check code: `npm run lint`, Guidelines: https://make.wordpress.org/core/handbook/best-practices/coding-standards/javascript/ -->
-- [ ] My code follows the accessibility standards. <!-- Guidelines: https://make.wordpress.org/core/handbook/best-practices/coding-standards/accessibility-coding-standards/ -->
-- [ ] My code has proper inline documentation. <!-- Guidelines: https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/ -->
-- [ ] I've included developer documentation if appropriate. <!-- Handbook: https://developer.wordpress.org/block-editor/ -->
-- [ ] I've updated all React Native files affected by any refactorings/renamings in this PR. <!-- React Native mobile Gutenberg guidelines: https://github.com/WordPress/gutenberg/blob/master/docs/contributors/native-mobile.md -->
+## Testing Instructions
+<!-- Please include step by step instructions on how to test this PR. -->
+<!-- 1. Open a Post or Page. -->
+<!-- 2. Insert a Heading Block. -->
+<!-- 3. etc. -->
+
+## Screenshots or screencast <!-- if applicable -->

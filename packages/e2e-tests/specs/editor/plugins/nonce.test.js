@@ -9,22 +9,21 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Nonce', () => {
-	beforeAll( async () => {
+	// While using beforeEach/afterEach is suboptimal for multiple tests, they
+	// are used here to ensure that the nonce plugin doesn't interfere with API
+	// calls made in global before/after calls, which may perform API requests.
+	beforeEach( async () => {
 		await activatePlugin( 'gutenberg-test-plugin-nonce' );
 	} );
-
-	afterAll( async () => {
+	afterEach( async () => {
 		await deactivatePlugin( 'gutenberg-test-plugin-nonce' );
 	} );
 
-	beforeEach( async () => {
-		await createNewPost();
-	} );
-
 	it( 'should refresh when expired', async () => {
+		await createNewPost();
 		await page.keyboard.press( 'Enter' );
 		// eslint-disable-next-line no-restricted-syntax
-		await page.waitFor( 5000 );
+		await page.waitForTimeout( 5000 );
 		await page.keyboard.type( 'test' );
 		// `saveDraft` waits for saving to be successful, so this test would
 		// timeout if it's not.

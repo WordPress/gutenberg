@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
-import { uniqWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,22 +11,28 @@ import {
 	MediaUpload,
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
+	MEDIA_TYPE_AUDIO,
 } from '@wordpress/block-editor';
-import { Dashicon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
+import { Icon, plusCircleFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
 
-// remove duplicates after gallery append
+const isMediaEqual = ( media1, media2 ) =>
+	media1.id === media2.id || media1.url === media2.url;
+
+// Remove duplicates after gallery append.
 const dedupMedia = ( media ) =>
-	uniqWith(
-		media,
-		( media1, media2 ) =>
-			media1.id === media2.id || media1.url === media2.url
+	media.reduce(
+		( dedupedMedia, mediaItem ) =>
+			dedupedMedia.some( ( item ) => isMediaEqual( item, mediaItem ) )
+				? dedupedMedia
+				: [ ...dedupedMedia, mediaItem ],
+		[]
 	);
 
 function MediaPlaceholder( props ) {
@@ -37,18 +42,26 @@ function MediaPlaceholder( props ) {
 		labels = {},
 		icon,
 		onSelect,
+		onFocus,
+		__experimentalOnlyMediaLibrary,
 		isAppender,
 		disableMediaButtons,
 		getStylesFromColorScheme,
 		multiple,
 		value = [],
+		children,
+		height,
+		backgroundColor,
+		hideContent,
+		autoOpenMediaUpload,
+		onSelectURL,
 	} = props;
 
-	// use ref to keep media array current for callbacks during rerenders
+	// Use ref to keep media array current for callbacks during rerenders.
 	const mediaRef = useRef( value );
 	mediaRef.current = value;
 
-	// append and deduplicate media array for gallery use case
+	// Append and deduplicate media array for gallery use case.
 	const setMedia =
 		multiple && addToGallery
 			? ( selected ) =>
@@ -60,6 +73,7 @@ function MediaPlaceholder( props ) {
 	const isOneType = allowedTypes.length === 1;
 	const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
 	const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
+	const isAudio = isOneType && allowedTypes.includes( MEDIA_TYPE_AUDIO );
 
 	let placeholderTitle = labels.title;
 	if ( placeholderTitle === undefined ) {
@@ -68,6 +82,8 @@ function MediaPlaceholder( props ) {
 			placeholderTitle = __( 'Image' );
 		} else if ( isVideo ) {
 			placeholderTitle = __( 'Video' );
+		} else if ( isAudio ) {
+			placeholderTitle = __( 'Audio' );
 		}
 	}
 
@@ -77,6 +93,8 @@ function MediaPlaceholder( props ) {
 			instructions = __( 'ADD IMAGE' );
 		} else if ( isVideo ) {
 			instructions = __( 'ADD VIDEO' );
+		} else if ( isAudio ) {
+			instructions = __( 'ADD AUDIO' );
 		} else {
 			instructions = __( 'ADD IMAGE OR VIDEO' );
 		}
@@ -87,6 +105,8 @@ function MediaPlaceholder( props ) {
 		accessibilityHint = __( 'Double tap to select an image' );
 	} else if ( isVideo ) {
 		accessibilityHint = __( 'Double tap to select a video' );
+	} else if ( isAudio ) {
+		accessibilityHint = __( 'Double tap to select an audio file' );
 	}
 
 	const emptyStateTitleStyle = getStylesFromColorScheme(
@@ -106,6 +126,7 @@ function MediaPlaceholder( props ) {
 					<Text style={ emptyStateTitleStyle }>
 						{ placeholderTitle }
 					</Text>
+					{ children }
 					<Text style={ styles.emptyStateDescription }>
 						{ instructions }
 					</Text>
@@ -113,12 +134,14 @@ function MediaPlaceholder( props ) {
 			);
 		} else if ( isAppender && ! disableMediaButtons ) {
 			return (
-				<Dashicon
-					icon="plus-alt"
-					style={ addMediaButtonStyle }
-					color={ addMediaButtonStyle.color }
-					size={ addMediaButtonStyle.size }
-				/>
+				<View testID="media-placeholder-appender-icon">
+					<Icon
+						icon={ plusCircleFilled }
+						style={ addMediaButtonStyle }
+						color={ addMediaButtonStyle.color }
+						size={ addMediaButtonStyle.size }
+					/>
+				</View>
 			);
 		}
 	};
@@ -141,7 +164,13 @@ function MediaPlaceholder( props ) {
 			<MediaUpload
 				allowedTypes={ allowedTypes }
 				onSelect={ setMedia }
+				onSelectURL={ onSelectURL }
+				__experimentalOnlyMediaLibrary={
+					__experimentalOnlyMediaLibrary
+				}
 				multiple={ multiple }
+				isReplacingMedia={ false }
+				autoOpen={ autoOpenMediaUpload }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
 						<TouchableWithoutFeedback
@@ -153,18 +182,22 @@ function MediaPlaceholder( props ) {
 							accessibilityRole={ 'button' }
 							accessibilityHint={ accessibilityHint }
 							onPress={ ( event ) => {
-								props.onFocus( event );
+								onFocus?.( event );
 								open();
 							} }
 						>
 							<View
 								style={ [
-									emptyStateContainerStyle,
+									[
+										emptyStateContainerStyle,
+										height && { height },
+										backgroundColor && { backgroundColor },
+									],
 									isAppender && appenderStyle,
 								] }
 							>
 								{ getMediaOptions() }
-								{ renderContent() }
+								{ ! hideContent && renderContent() }
 							</View>
 						</TouchableWithoutFeedback>
 					);

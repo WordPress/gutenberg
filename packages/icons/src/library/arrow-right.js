@@ -4,8 +4,8 @@
 import { SVG, Path } from '@wordpress/primitives';
 
 const arrowRight = (
-	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24">
-		<Path d="M2 11V9h12l-4-4 1-2 7 7-7 7-1-2 4-4H2z" />
+	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+		<Path d="M14.3 6.7l-1.1 1.1 4 4H4v1.5h13.3l-4.1 4.4 1.1 1.1 5.8-6.3z" />
 	</SVG>
 );
 

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { uniq, compact, without } from 'lodash';
-
-/**
  * A set of tokens.
  *
  * @see https://dom.spec.whatwg.org/#domtokenlist
@@ -17,9 +12,42 @@ export default class TokenList {
 	constructor( initialValue = '' ) {
 		this.value = initialValue;
 
-		[ 'entries', 'forEach', 'keys', 'values' ].forEach( ( fn ) => {
-			this[ fn ] = ( ...args ) => this._valueAsArray[ fn ]( ...args );
-		} );
+		// Disable reason: These are type hints on the class.
+		/* eslint-disable no-unused-expressions */
+		/** @type {string} */
+		this._currentValue;
+
+		/** @type {string[]} */
+		this._valueAsArray;
+		/* eslint-enable no-unused-expressions */
+	}
+
+	/**
+	 * @param {Parameters<Array<string>['entries']>} args
+	 */
+	entries( ...args ) {
+		return this._valueAsArray.entries( ...args );
+	}
+
+	/**
+	 * @param {Parameters<Array<string>['forEach']>} args
+	 */
+	forEach( ...args ) {
+		return this._valueAsArray.forEach( ...args );
+	}
+
+	/**
+	 * @param {Parameters<Array<string>['keys']>} args
+	 */
+	keys( ...args ) {
+		return this._valueAsArray.keys( ...args );
+	}
+
+	/**
+	 * @param {Parameters<Array<string>['values']>} args
+	 */
+	values( ...args ) {
+		return this._valueAsArray.values( ...args );
 	}
 
 	/**
@@ -42,7 +70,9 @@ export default class TokenList {
 	 */
 	set value( value ) {
 		value = String( value );
-		this._valueAsArray = uniq( compact( value.split( /\s+/g ) ) );
+		this._valueAsArray = [
+			...new Set( value.split( /\s+/g ).filter( Boolean ) ),
+		];
 		this._currentValue = this._valueAsArray.join( ' ' );
 	}
 
@@ -125,7 +155,9 @@ export default class TokenList {
 	 * @param {...string} items Items to remove.
 	 */
 	remove( ...items ) {
-		this.value = without( this._valueAsArray, ...items ).join( ' ' );
+		this.value = this._valueAsArray
+			.filter( ( val ) => ! items.includes( val ) )
+			.join( ' ' );
 	}
 
 	/**

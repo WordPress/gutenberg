@@ -6,22 +6,20 @@ import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
 	BlockList,
+	BlockTools,
 	BlockInspector,
 	WritingFlow,
 	ObserveTyping,
 } from '@wordpress/block-editor';
-import {
-	Popover,
-	SlotFillProvider,
-	DropZoneProvider,
-} from '@wordpress/components';
+import { Popover, SlotFillProvider } from '@wordpress/components';
 import { registerCoreBlocks } from '@wordpress/block-library';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import '@wordpress/format-library';
 
 /**
  * Internal dependencies
  */
-import './style.scss';
+import styles from './style.lazy.scss';
 
 function App() {
 	const [ blocks, updateBlocks ] = useState( [] );
@@ -30,10 +28,18 @@ function App() {
 		registerCoreBlocks();
 	}, [] );
 
+	// Ensures that the CSS intended for the playground (especially the style resets)
+	// are only loaded for the playground and don't leak into other stories.
+	useEffect( () => {
+		styles.use();
+
+		return styles.unuse;
+	} );
+
 	return (
 		<div className="playground">
-			<SlotFillProvider>
-				<DropZoneProvider>
+			<ShortcutProvider>
+				<SlotFillProvider>
 					<BlockEditorProvider
 						value={ blocks }
 						onInput={ updateBlocks }
@@ -42,18 +48,22 @@ function App() {
 						<div className="playground__sidebar">
 							<BlockInspector />
 						</div>
-						<div className="editor-styles-wrapper">
-							<BlockEditorKeyboardShortcuts />
-							<WritingFlow>
-								<ObserveTyping>
-									<BlockList />
-								</ObserveTyping>
-							</WritingFlow>
+						<div className="playground__content">
+							<BlockTools>
+								<div className="editor-styles-wrapper">
+									<BlockEditorKeyboardShortcuts.Register />
+									<WritingFlow>
+										<ObserveTyping>
+											<BlockList />
+										</ObserveTyping>
+									</WritingFlow>
+								</div>
+							</BlockTools>
 						</div>
 						<Popover.Slot />
 					</BlockEditorProvider>
-				</DropZoneProvider>
-			</SlotFillProvider>
+				</SlotFillProvider>
+			</ShortcutProvider>
 		</div>
 	);
 }

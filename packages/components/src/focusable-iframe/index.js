@@ -1,65 +1,23 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { Component, createRef } from '@wordpress/element';
-import { withGlobalEvents } from '@wordpress/compose';
+import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
- * Browser dependencies
+ * @param {Object}                                 props
+ * @param {import('react').Ref<HTMLIFrameElement>} props.iframeRef
  */
-
-const { FocusEvent } = window;
-
-class FocusableIframe extends Component {
-	constructor( props ) {
-		super( ...arguments );
-
-		this.checkFocus = this.checkFocus.bind( this );
-
-		this.node = props.iframeRef || createRef();
-	}
-
-	/**
-	 * Checks whether the iframe is the activeElement, inferring that it has
-	 * then received focus, and calls the `onFocus` prop callback.
-	 */
-	checkFocus() {
-		const iframe = this.node.current;
-
-		if ( document.activeElement !== iframe ) {
-			return;
-		}
-
-		const focusEvent = new FocusEvent( 'focus', { bubbles: true } );
-		iframe.dispatchEvent( focusEvent );
-
-		const { onFocus } = this.props;
-		if ( onFocus ) {
-			onFocus( focusEvent );
-		}
-	}
-
-	render() {
-		// Disable reason: The rendered iframe is a pass-through component,
-		// assigning props inherited from the rendering parent. It's the
-		// responsibility of the parent to assign a title.
-
-		/* eslint-disable jsx-a11y/iframe-has-title */
-		return (
-			<iframe
-				ref={ this.node }
-				{ ...omit( this.props, [ 'iframeRef', 'onFocus' ] ) }
-			/>
-		);
-		/* eslint-enable jsx-a11y/iframe-has-title */
-	}
+export default function FocusableIframe( { iframeRef, ...props } ) {
+	// @ts-expect-error: Return type for useFocusableIframe() is incorrect.
+	const ref = useMergeRefs( [ iframeRef, useFocusableIframe() ] );
+	deprecated( 'wp.components.FocusableIframe', {
+		since: '5.9',
+		alternative: 'wp.compose.useFocusableIframe',
+	} );
+	// Disable reason: The rendered iframe is a pass-through component,
+	// assigning props inherited from the rendering parent. It's the
+	// responsibility of the parent to assign a title.
+	// eslint-disable-next-line jsx-a11y/iframe-has-title
+	return <iframe ref={ ref } { ...props } />;
 }
-
-export default withGlobalEvents( {
-	blur: 'checkFocus',
-} )( FocusableIframe );

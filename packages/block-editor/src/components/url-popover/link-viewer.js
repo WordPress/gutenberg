@@ -7,26 +7,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ExternalLink, Button } from '@wordpress/components';
-import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
-import { pencil } from '@wordpress/icons';
+import { Button } from '@wordpress/components';
+import { edit } from '@wordpress/icons';
 
-function LinkViewerUrl( { url, urlLabel, className } ) {
-	const linkClassName = classnames(
-		className,
-		'block-editor-url-popover__link-viewer-url'
-	);
-
-	if ( ! url ) {
-		return <span className={ linkClassName }></span>;
-	}
-
-	return (
-		<ExternalLink className={ linkClassName } href={ url }>
-			{ urlLabel || filterURLForDisplay( safeDecodeURI( url ) ) }
-		</ExternalLink>
-	);
-}
+/**
+ * Internal dependencies
+ */
+import LinkViewerURL from './link-viewer-url';
 
 export default function LinkViewer( {
 	className,
@@ -44,14 +31,14 @@ export default function LinkViewer( {
 			) }
 			{ ...props }
 		>
-			<LinkViewerUrl
+			<LinkViewerURL
 				url={ url }
 				urlLabel={ urlLabel }
 				className={ linkClassName }
 			/>
 			{ onEditLinkClick && (
 				<Button
-					icon={ pencil }
+					icon={ edit }
 					label={ __( 'Edit' ) }
 					onClick={ onEditLinkClick }
 				/>

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import renderer, { act } from 'react-test-renderer';
 
 /**
@@ -25,10 +24,12 @@ import {
 	addAssignedAlign,
 } from '../align';
 
+const noop = () => {};
+
 describe( 'align', () => {
 	const blockSettings = {
 		save: noop,
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 
@@ -74,6 +75,18 @@ describe( 'align', () => {
 			] );
 		} );
 
+		it( 'should return all aligns sorted when provided in the random order', () => {
+			expect(
+				getValidAlignments( [
+					'full',
+					'right',
+					'center',
+					'wide',
+					'left',
+				] )
+			).toEqual( [ 'left', 'center', 'right', 'wide', 'full' ] );
+		} );
+
 		it( 'should return all aligns if block defines align support as true', () => {
 			expect( getValidAlignments( true ) ).toEqual( [
 				'left',
@@ -83,7 +96,6 @@ describe( 'align', () => {
 				'full',
 			] );
 		} );
-
 		it( 'should return all aligns except wide if wide align explicitly false on the block', () => {
 			expect( getValidAlignments( true, false, true ) ).toEqual( [
 				'left',
@@ -156,7 +168,7 @@ describe( 'align', () => {
 					isSelected
 				/>
 			);
-			// when there's only one child, `rendered` in the tree is an object not an array.
+			// When there's only one child, `rendered` in the tree is an object not an array.
 			expect( wrapper.toTree().rendered ).toBeInstanceOf( Object );
 		} );
 
@@ -202,7 +214,7 @@ describe( 'align', () => {
 			act( () => {
 				wrapper = renderer.create(
 					<BlockEditorProvider
-						settings={ { alignWide: true } }
+						settings={ { alignWide: true, supportsLayout: false } }
 						value={ [] }
 					>
 						<EnhancedComponent

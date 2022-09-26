@@ -8,7 +8,14 @@ import { check } from '@wordpress/icons';
  */
 import MenuItem from '../menu-item';
 
-export default function MenuItemsChoice( { choices = [], onSelect, value } ) {
+const noop = () => {};
+
+export default function MenuItemsChoice( {
+	choices = [],
+	onHover = noop,
+	onSelect,
+	value,
+} ) {
 	return choices.map( ( item ) => {
 		const isSelected = value === item.value;
 		return (
@@ -16,6 +23,7 @@ export default function MenuItemsChoice( { choices = [], onSelect, value } ) {
 				key={ item.value }
 				role="menuitemradio"
 				icon={ isSelected && check }
+				info={ item.info }
 				isSelected={ isSelected }
 				shortcut={ item.shortcut }
 				className="components-menu-items-choice"
@@ -24,6 +32,9 @@ export default function MenuItemsChoice( { choices = [], onSelect, value } ) {
 						onSelect( item.value );
 					}
 				} }
+				onMouseEnter={ () => onHover( item.value ) }
+				onMouseLeave={ () => onHover( null ) }
+				aria-label={ item[ 'aria-label' ] }
 			>
 				{ item.label }
 			</MenuItem>

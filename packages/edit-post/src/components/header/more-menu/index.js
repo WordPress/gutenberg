@@ -2,46 +2,56 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { DropdownMenu, MenuGroup } from '@wordpress/components';
-import { moreHorizontal } from '@wordpress/icons';
+import { MenuGroup } from '@wordpress/components';
+import {
+	ActionItem,
+	MoreMenuDropdown,
+	PinnedItems,
+} from '@wordpress/interface';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import ModeSwitcher from '../mode-switcher';
-import PluginMoreMenuGroup from '../plugins-more-menu-group';
+import PreferencesMenuItem from '../preferences-menu-item';
 import ToolsMoreMenuGroup from '../tools-more-menu-group';
-import OptionsMenuItem from '../options-menu-item';
 import WritingMenu from '../writing-menu';
 
-const POPOVER_PROPS = {
-	className: 'edit-post-more-menu__content',
-	position: 'bottom left',
-};
-const TOGGLE_PROPS = {
-	tooltipPosition: 'bottom',
-};
+const MoreMenu = ( { showIconLabels } ) => {
+	const isLargeViewport = useViewportMatch( 'large' );
 
-const MoreMenu = () => (
-	<DropdownMenu
-		className="edit-post-more-menu"
-		icon={ moreHorizontal }
-		label={ __( 'More tools & options' ) }
-		popoverProps={ POPOVER_PROPS }
-		toggleProps={ TOGGLE_PROPS }
-	>
-		{ ( { onClose } ) => (
-			<>
-				<WritingMenu />
-				<ModeSwitcher />
-				<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
-				<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />
-				<MenuGroup>
-					<OptionsMenuItem />
-				</MenuGroup>
-			</>
-		) }
-	</DropdownMenu>
-);
+	return (
+		<MoreMenuDropdown
+			toggleProps={ {
+				showTooltip: ! showIconLabels,
+				...( showIconLabels && { variant: 'tertiary' } ),
+			} }
+		>
+			{ ( { onClose } ) => (
+				<>
+					{ showIconLabels && ! isLargeViewport && (
+						<PinnedItems.Slot
+							className={ showIconLabels && 'show-icon-labels' }
+							scope="core/edit-post"
+						/>
+					) }
+					<WritingMenu />
+					<ModeSwitcher />
+					<ActionItem.Slot
+						name="core/edit-post/plugin-more-menu"
+						label={ __( 'Plugins' ) }
+						as={ MenuGroup }
+						fillProps={ { onClick: onClose } }
+					/>
+					<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />
+					<MenuGroup>
+						<PreferencesMenuItem />
+					</MenuGroup>
+				</>
+			) }
+		</MoreMenuDropdown>
+	);
+};
 
 export default MoreMenu;

@@ -34,7 +34,7 @@ describe( 'withSelect', () => {
 		// In normal circumstances, the fact that we have to add an arbitrary
 		// prefix to the variable name would be concerning, and perhaps an
 		// argument that we ought to expect developer to use select from the
-		// wp.data export. But in-fact, this serves as a good deterrent for
+		// `@wordpress/data` export. But in-fact, this serves as a good deterrent for
 		// including both `withSelect` and `select` in the same scope, which
 		// shouldn't occur for a typical component, and if it did might wrongly
 		// encourage the developer to use `select` within the component itself.
@@ -50,9 +50,8 @@ describe( 'withSelect', () => {
 			.fn()
 			.mockImplementation( ( props ) => <div>{ props.data }</div> );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )(
-			OriginalComponent
-		);
+		const DataBoundComponent =
+			withSelect( mapSelectToProps )( OriginalComponent );
 		let testRenderer;
 		act( () => {
 			testRenderer = TestRenderer.create(
@@ -131,7 +130,7 @@ describe( 'withSelect', () => {
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( mapDispatchToProps ).toHaveBeenCalledTimes( 1 );
 
-		// Simulate a click on the button
+		// Simulate a click on the button.
 		act( () => {
 			testInstance.findByType( 'button' ).props.onClick();
 		} );
@@ -139,7 +138,7 @@ describe( 'withSelect', () => {
 		expect( testInstance.findByType( 'button' ).props.children ).toBe( 1 );
 		// 2 times =
 		//  1. Initial mount
-		//  2. When click handler is called
+		// 2. When click handler is called.
 		expect( mapDispatchToProps ).toHaveBeenCalledTimes( 2 );
 		// 4 times
 		// - 1 on initial render
@@ -147,7 +146,7 @@ describe( 'withSelect', () => {
 		// - 1 on click triggering subscription firing.
 		// - 1 on rerender.
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 4 );
-		// verifies component only renders twice.
+		// Verifies component only renders twice.
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
 
@@ -268,9 +267,8 @@ describe( 'withSelect', () => {
 			.fn()
 			.mockImplementation( ( props ) => <div>{ props.count }</div> );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )(
-			OriginalComponent
-		);
+		const DataBoundComponent =
+			withSelect( mapSelectToProps )( OriginalComponent );
 
 		let testRenderer;
 		act( () => {
@@ -367,9 +365,8 @@ describe( 'withSelect', () => {
 
 		const OriginalComponent = jest.fn().mockImplementation( () => <div /> );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )(
-			OriginalComponent
-		);
+		const DataBoundComponent =
+			withSelect( mapSelectToProps )( OriginalComponent );
 
 		act( () => {
 			TestRenderer.create(
@@ -492,9 +489,8 @@ describe( 'withSelect', () => {
 				<div>{ JSON.stringify( props ) }</div>
 			) );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )(
-			OriginalComponent
-		);
+		const DataBoundComponent =
+			withSelect( mapSelectToProps )( OriginalComponent );
 
 		let testRenderer;
 		act( () => {
@@ -561,9 +557,8 @@ describe( 'withSelect', () => {
 				<div>{ props.count || 'Unknown' }</div>
 			) );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )(
-			OriginalComponent
-		);
+		const DataBoundComponent =
+			withSelect( mapSelectToProps )( OriginalComponent );
 
 		let testRenderer;
 		act( () => {
@@ -666,11 +661,7 @@ describe( 'withSelect', () => {
 			registry.dispatch( 'childRender' ).toggleRender();
 		} );
 
-		// 3 times because
-		// - 1 on initial render
-		// - 1 on effect before subscription set.
-		// - 1 child subscription fires.
-		expect( childMapSelectToProps ).toHaveBeenCalledTimes( 3 );
+		expect( childMapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( parentMapSelectToProps ).toHaveBeenCalledTimes( 4 );
 		expect( ChildOriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( ParentOriginalComponent ).toHaveBeenCalledTimes( 2 );
@@ -695,9 +686,8 @@ describe( 'withSelect', () => {
 			.fn()
 			.mockImplementation( ( props ) => <div>{ props.value }</div> );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )(
-			OriginalComponent
-		);
+		const DataBoundComponent =
+			withSelect( mapSelectToProps )( OriginalComponent );
 
 		let testRenderer;
 		act( () => {

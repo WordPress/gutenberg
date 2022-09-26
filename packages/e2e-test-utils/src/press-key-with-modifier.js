@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { capitalize } from 'lodash';
+import { capitalCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -81,6 +81,26 @@ async function emulateSelectAll() {
 	} );
 }
 
+/**
+ * Sets the clipboard data that can be pasted with
+ * `pressKeyWithModifier( 'primary', 'v' )`.
+ *
+ * @param {Object} $1           Options.
+ * @param {string} $1.plainText Plain text to set.
+ * @param {string} $1.html      HTML to set.
+ */
+export async function setClipboardData( { plainText = '', html = '' } ) {
+	await page.evaluate(
+		( _plainText, _html ) => {
+			window._clipboardData = new DataTransfer();
+			window._clipboardData.setData( 'text/plain', _plainText );
+			window._clipboardData.setData( 'text/html', _html );
+		},
+		plainText,
+		html
+	);
+}
+
 async function emulateClipboard( type ) {
 	await page.evaluate( ( _type ) => {
 		if ( _type !== 'paste' ) {
@@ -106,6 +126,7 @@ async function emulateClipboard( type ) {
 		document.activeElement.dispatchEvent(
 			new ClipboardEvent( _type, {
 				bubbles: true,
+				cancelable: true,
 				clipboardData: window._clipboardData,
 			} )
 		);
@@ -117,7 +138,7 @@ async function emulateClipboard( type ) {
  * is normalized to platform-specific modifier.
  *
  * @param {string} modifier Modifier key.
- * @param {string} key Key to press while modifier held.
+ * @param {string} key      Key to press while modifier held.
  */
 export async function pressKeyWithModifier( modifier, key ) {
 	if ( modifier.toLowerCase() === 'primary' && key.toLowerCase() === 'a' ) {
@@ -147,7 +168,7 @@ export async function pressKeyWithModifier( modifier, key ) {
 
 	await Promise.all(
 		mappedModifiers.map( async ( mod ) => {
-			const capitalizedMod = capitalize( ctrlSwap( mod ) );
+			const capitalizedMod = capitalCase( ctrlSwap( mod ) );
 			return page.keyboard.down( capitalizedMod );
 		} )
 	);
@@ -156,7 +177,7 @@ export async function pressKeyWithModifier( modifier, key ) {
 
 	await Promise.all(
 		mappedModifiers.map( async ( mod ) => {
-			const capitalizedMod = capitalize( ctrlSwap( mod ) );
+			const capitalizedMod = capitalCase( ctrlSwap( mod ) );
 			return page.keyboard.up( capitalizedMod );
 		} )
 	);

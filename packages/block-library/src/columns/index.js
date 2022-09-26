@@ -7,28 +7,23 @@ import { columns as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import variations from './variations';
+import transforms from './transforms';
 
 const { name } = metadata;
 
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Columns' ),
 	icon,
-	description: __(
-		'Add a block that displays content in multiple columns, then add whatever content blocks you’d like.'
-	),
-	supports: {
-		align: [ 'wide', 'full' ],
-		html: false,
-	},
 	variations,
 	example: {
+		viewportWidth: 600, // Columns collapse "@media (max-width: 599px)".
 		innerBlocks: [
 			{
 				name: 'core/column',
@@ -45,8 +40,7 @@ export const settings = {
 					{
 						name: 'core/image',
 						attributes: {
-							url:
-								'https://s.w.org/images/core/5.3/Windbuchencom.jpg',
+							url: 'https://s.w.org/images/core/5.3/Windbuchencom.jpg',
 						},
 					},
 					{
@@ -88,4 +82,7 @@ export const settings = {
 	deprecated,
 	edit,
 	save,
+	transforms,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

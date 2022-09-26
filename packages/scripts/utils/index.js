@@ -5,42 +5,47 @@ const {
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,
+	getNodeArgsFromCLI,
 	hasArgInCLI,
 	hasFileArgInCLI,
 	spawnScript,
 } = require( './cli' );
 const {
+	getJestOverrideConfigFile,
 	getWebpackArgs,
+	getWordPressSrcDirectory,
+	getWebpackEntryPoints,
+	getRenderPropPaths,
 	hasBabelConfig,
+	hasCssnanoConfig,
 	hasJestConfig,
+	hasPostCSSConfig,
 	hasPrettierConfig,
 } = require( './config' );
-const {
-	buildWordPress,
-	downloadWordPressZip,
-	mergeYAMLConfigs,
-} = require( './env' );
 const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
-const { hasPackageProp } = require( './package' );
-const { camelCaseDash } = require( './string' );
+const { getPackageProp, hasPackageProp } = require( './package' );
 
 module.exports = {
-	buildWordPress,
-	camelCaseDash,
 	fromProjectRoot,
 	fromConfigRoot,
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,
+	getJestOverrideConfigFile,
+	getNodeArgsFromCLI,
+	getPackageProp,
 	getWebpackArgs,
-	hasBabelConfig,
+	getWordPressSrcDirectory,
+	getWebpackEntryPoints,
+	getRenderPropPaths,
 	hasArgInCLI,
+	hasBabelConfig,
+	hasCssnanoConfig,
 	hasFileArgInCLI,
 	hasJestConfig,
 	hasPackageProp,
+	hasPostCSSConfig,
 	hasPrettierConfig,
 	hasProjectFile,
-	downloadWordPressZip,
-	mergeYAMLConfigs,
 	spawnScript,
 };

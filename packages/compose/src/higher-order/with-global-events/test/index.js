@@ -15,7 +15,7 @@ import withGlobalEvents from '../';
 import Listener from '../listener';
 
 jest.mock( '../listener', () => {
-	const ActualListener = require.requireActual( '../listener' ).default;
+	const ActualListener = jest.requireActual( '../listener' ).default;
 
 	return class extends ActualListener {
 		constructor() {
@@ -72,6 +72,7 @@ describe( 'withGlobalEvents', () => {
 	it( 'renders with original component', () => {
 		mountEnhancedComponent();
 
+		expect( console ).toHaveWarned();
 		expect( wrapper.root.findByType( 'div' ).children[ 0 ] ).toBe(
 			'Hello'
 		);
@@ -80,9 +81,9 @@ describe( 'withGlobalEvents', () => {
 	it( 'binds events from passed object', () => {
 		mountEnhancedComponent();
 
-		// Get the HOC wrapper instance
-		const hocInstance = wrapper.root.findByType( OriginalComponent ).parent
-			.instance;
+		// Get the HOC wrapper instance.
+		const hocInstance =
+			wrapper.root.findByType( OriginalComponent ).parent.instance;
 
 		expect( Listener._instance.add ).toHaveBeenCalledWith(
 			'resize',

@@ -38,7 +38,7 @@ const PluginPrePublishPanelFill = ( {
  *                                                                      icon slug string, or an SVG WP element, to be rendered when
  *                                                                      the sidebar is pinned to toolbar.
  *
- * @example <caption>ES5</caption>
+ * @example
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
@@ -57,11 +57,11 @@ const PluginPrePublishPanelFill = ( {
  * }
  * ```
  *
- * @example <caption>ESNext</caption>
+ * @example
  * ```jsx
  * // Using ESNext syntax
- * const { __ } = wp.i18n;
- * const { PluginPrePublishPanel } = wp.editPost;
+ * import { __ } from '@wordpress/i18n';
+ * import { PluginPrePublishPanel } from '@wordpress/edit-post';
  *
  * const MyPluginPrePublishPanel = () => (
  * 	<PluginPrePublishPanel

@@ -6,18 +6,17 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, Children } from '@wordpress/element';
+import { useState, useEffect, Children, useRef } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
+import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
 import Modal from '../modal';
-import KeyboardShortcuts from '../keyboard-shortcuts';
 import Button from '../button';
 import PageControl from './page-control';
-import { BackButtonIcon, ForwardButtonIcon } from './icons';
-import FinishButton from './finish-button';
 
 export default function Guide( {
 	children,
@@ -25,12 +24,34 @@ export default function Guide( {
 	contentLabel,
 	finishButtonText,
 	onFinish,
+	pages = [],
 } ) {
+	const guideContainer = useRef();
 	const [ currentPage, setCurrentPage ] = useState( 0 );
 
-	const numberOfPages = Children.count( children );
+	useEffect( () => {
+		if ( Children.count( children ) ) {
+			deprecated( 'Passing children to <Guide>', {
+				since: '5.5',
+				alternative: 'the `pages` prop',
+			} );
+		}
+	}, [ children ] );
+
+	useEffect( () => {
+		// Each time we change the current page, start from the first element of the page.
+		// This also solves any focus loss that can happen.
+		if ( guideContainer.current ) {
+			focus.tabbable.find( guideContainer.current )?.[ 0 ]?.focus();
+		}
+	}, [ currentPage ] );
+
+	if ( Children.count( children ) ) {
+		pages = Children.map( children, ( child ) => ( { content: child } ) );
+	}
+
 	const canGoBack = currentPage > 0;
-	const canGoForward = currentPage < numberOfPages - 1;
+	const canGoForward = currentPage < pages.length - 1;
 
 	const goBack = () => {
 		if ( canGoBack ) {
@@ -44,7 +65,7 @@ export default function Guide( {
 		}
 	};
 
-	if ( numberOfPages === 0 ) {
+	if ( pages.length === 0 ) {
 		return null;
 	}
 
@@ -53,58 +74,58 @@ export default function Guide( {
 			className={ classnames( 'components-guide', className ) }
 			contentLabel={ contentLabel }
 			onRequestClose={ onFinish }
+			onKeyDown={ ( event ) => {
+				if ( event.code === 'ArrowLeft' ) {
+					goBack();
+					// Do not scroll the modal's contents.
+					event.preventDefault();
+				} else if ( event.code === 'ArrowRight' ) {
+					goForward();
+					// Do not scroll the modal's contents.
+					event.preventDefault();
+				}
+			} }
+			ref={ guideContainer }
 		>
-			<KeyboardShortcuts
-				key={ currentPage }
-				shortcuts={ {
-					left: goBack,
-					right: goForward,
-				} }
-			/>
-
 			<div className="components-guide__container">
-				{ children[ currentPage ] }
+				<div className="components-guide__page">
+					{ pages[ currentPage ].image }
 
-				{ ! canGoForward && (
-					<FinishButton
-						className="components-guide__inline-finish-button"
-						onClick={ onFinish }
-					>
-						{ finishButtonText || __( 'Finish' ) }
-					</FinishButton>
-				) }
+					{ pages.length > 1 && (
+						<PageControl
+							currentPage={ currentPage }
+							numberOfPages={ pages.length }
+							setCurrentPage={ setCurrentPage }
+						/>
+					) }
+
+					{ pages[ currentPage ].content }
+				</div>
 
 				<div className="components-guide__footer">
 					{ canGoBack && (
 						<Button
 							className="components-guide__back-button"
-							icon={ <BackButtonIcon /> }
 							onClick={ goBack }
 						>
 							{ __( 'Previous' ) }
 						</Button>
 					) }
-					<PageControl
-						currentPage={ currentPage }
-						numberOfPages={ numberOfPages }
-						setCurrentPage={ setCurrentPage }
-					/>
 					{ canGoForward && (
 						<Button
 							className="components-guide__forward-button"
-							icon={ <ForwardButtonIcon /> }
 							onClick={ goForward }
 						>
 							{ __( 'Next' ) }
 						</Button>
 					) }
 					{ ! canGoForward && (
-						<FinishButton
+						<Button
 							className="components-guide__finish-button"
 							onClick={ onFinish }
 						>
 							{ finishButtonText || __( 'Finish' ) }
-						</FinishButton>
+						</Button>
 					) }
 				</div>
 			</div>

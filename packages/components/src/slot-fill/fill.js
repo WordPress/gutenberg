@@ -1,7 +1,4 @@
-/**
- * External dependencies
- */
-import { isFunction } from 'lodash';
+// @ts-nocheck
 
 /**
  * WordPress dependencies
@@ -11,9 +8,8 @@ import { createPortal, useLayoutEffect, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Consumer, useSlot } from './context';
-
-let occurrences = 0;
+import SlotFillContext from './context';
+import useSlot from './use-slot';
 
 function FillComponent( { name, children, registerFill, unregisterFill } ) {
 	const slot = useSlot( name );
@@ -23,10 +19,6 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
 		children,
 	} );
 
-	if ( ! ref.current.occurrence ) {
-		ref.current.occurrence = ++occurrences;
-	}
-
 	useLayoutEffect( () => {
 		registerFill( name, ref.current );
 		return () => unregisterFill( name, ref.current );
@@ -34,14 +26,14 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
 
 	useLayoutEffect( () => {
 		ref.current.children = children;
-		if ( slot && ! slot.props.bubblesVirtually ) {
+		if ( slot ) {
 			slot.forceUpdate();
 		}
 	}, [ children ] );
 
 	useLayoutEffect( () => {
 		if ( name === ref.current.name ) {
-			// ignore initial effect
+			// Ignore initial effect.
 			return;
 		}
 		unregisterFill( ref.current.name, ref.current );
@@ -49,12 +41,12 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
 		registerFill( name, ref.current );
 	}, [ name ] );
 
-	if ( ! slot || ! slot.node || ! slot.props.bubblesVirtually ) {
+	if ( ! slot || ! slot.node ) {
 		return null;
 	}
 
 	// If a function is passed as a child, provide it with the fillProps.
-	if ( isFunction( children ) ) {
+	if ( typeof children === 'function' ) {
 		children = children( slot.props.fillProps );
 	}
 
@@ -62,7 +54,7 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
 }
 
 const Fill = ( props ) => (
-	<Consumer>
+	<SlotFillContext.Consumer>
 		{ ( { registerFill, unregisterFill } ) => (
 			<FillComponent
 				{ ...props }
@@ -70,7 +62,7 @@ const Fill = ( props ) => (
 				unregisterFill={ unregisterFill }
 			/>
 		) }
-	</Consumer>
+	</SlotFillContext.Consumer>
 );
 
 export default Fill;

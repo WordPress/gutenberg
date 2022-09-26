@@ -57,6 +57,7 @@ const defaultConfig = {
 				'main',
 				'module',
 				'react-native',
+				'types',
 				'bin',
 				'dependencies',
 				'devDependencies',

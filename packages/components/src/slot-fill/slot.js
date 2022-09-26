@@ -1,8 +1,4 @@
-/**
- * External dependencies
- */
-import { isFunction, isString, map, negate } from 'lodash';
-
+// @ts-nocheck
 /**
  * WordPress dependencies
  */
@@ -16,12 +12,23 @@ import {
 /**
  * Internal dependencies
  */
-import { Consumer } from './context';
+import SlotFillContext from './context';
+
+/**
+ * Whether the argument is a function.
+ *
+ * @param {*} maybeFunc The argument to check.
+ * @return {boolean} True if the argument is a function, false otherwise.
+ */
+function isFunction( maybeFunc ) {
+	return typeof maybeFunc === 'function';
+}
 
 class SlotComponent extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.isUnmounted = false;
 		this.bindNode = this.bindNode.bind( this );
 	}
 
@@ -33,7 +40,7 @@ class SlotComponent extends Component {
 
 	componentWillUnmount() {
 		const { unregisterSlot } = this.props;
-
+		this.isUnmounted = true;
 		unregisterSlot( this.props.name, this );
 	}
 
@@ -50,47 +57,44 @@ class SlotComponent extends Component {
 		this.node = node;
 	}
 
-	render() {
-		const {
-			children,
-			name,
-			bubblesVirtually = false,
-			fillProps = {},
-			getFills,
-			className,
-		} = this.props;
-
-		if ( bubblesVirtually ) {
-			return <div ref={ this.bindNode } className={ className } />;
+	forceUpdate() {
+		if ( this.isUnmounted ) {
+			return;
 		}
+		super.forceUpdate();
+	}
 
-		const fills = map( getFills( name, this ), ( fill ) => {
-			const fillKey = fill.occurrence;
-			const fillChildren = isFunction( fill.children )
-				? fill.children( fillProps )
-				: fill.children;
+	render() {
+		const { children, name, fillProps = {}, getFills } = this.props;
 
-			return Children.map( fillChildren, ( child, childIndex ) => {
-				if ( ! child || isString( child ) ) {
-					return child;
-				}
+		const fills = ( getFills( name, this ) ?? [] )
+			.map( ( fill ) => {
+				const fillChildren = isFunction( fill.children )
+					? fill.children( fillProps )
+					: fill.children;
 
-				const childKey = `${ fillKey }---${ child.key || childIndex }`;
-				return cloneElement( child, { key: childKey } );
-			} );
-		} ).filter(
-			// In some cases fills are rendered only when some conditions apply.
-			// This ensures that we only use non-empty fills when rendering, i.e.,
-			// it allows us to render wrappers only when the fills are actually present.
-			negate( isEmptyElement )
-		);
+				return Children.map( fillChildren, ( child, childIndex ) => {
+					if ( ! child || typeof child === 'string' ) {
+						return child;
+					}
+
+					const childKey = child.key || childIndex;
+					return cloneElement( child, { key: childKey } );
+				} );
+			} )
+			.filter(
+				// In some cases fills are rendered only when some conditions apply.
+				// This ensures that we only use non-empty fills when rendering, i.e.,
+				// it allows us to render wrappers only when the fills are actually present.
+				( element ) => ! isEmptyElement( element )
+			);
 
 		return <>{ isFunction( children ) ? children( fills ) : fills }</>;
 	}
 }
 
 const Slot = ( props ) => (
-	<Consumer>
+	<SlotFillContext.Consumer>
 		{ ( { registerSlot, unregisterSlot, getFills } ) => (
 			<SlotComponent
 				{ ...props }
@@ -99,7 +103,7 @@ const Slot = ( props ) => (
 				getFills={ getFills }
 			/>
 		) }
-	</Consumer>
+	</SlotFillContext.Consumer>
 );
 
 export default Slot;

@@ -2,16 +2,17 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { RichText } from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function PreformattedEdit( {
 	attributes,
 	mergeBlocks,
 	setAttributes,
-	className,
+	onRemove,
 	style,
 } ) {
 	const { content } = attributes;
+	const blockProps = useBlockProps( { style } );
 
 	return (
 		<RichText
@@ -24,10 +25,12 @@ export default function PreformattedEdit( {
 					content: nextContent,
 				} );
 			} }
+			onRemove={ onRemove }
+			aria-label={ __( 'Preformatted text' ) }
 			placeholder={ __( 'Write preformatted text…' ) }
-			className={ className }
-			style={ style }
 			onMerge={ mergeBlocks }
+			{ ...blockProps }
+			__unstablePastePlainText
 		/>
 	);
 }

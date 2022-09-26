@@ -4,7 +4,7 @@
 const globals = require( 'globals' );
 
 /**
- * The temporary list of types defined in Gutenberg which are whitelisted to avoid
+ * The temporary list of types defined in Gutenberg which are allowed to avoid
  * ESLint warnings. It should be removed once importing is going to be implemented
  * in the tool which generates public APIs from JSDoc comments. Related issue to
  * fix the root cause `@wordpress/docgen`:
@@ -17,6 +17,7 @@ const temporaryWordPressInternalTypes = [
 	'WPBlockSerializationOptions',
 	'WPBlock',
 	'WPBlockPattern',
+	'WPBlockType',
 	'WPBlockTypeIcon',
 	'WPBlockTypeIconRender',
 	'WPBlockTypeIconDescriptor',
@@ -26,7 +27,7 @@ const temporaryWordPressInternalTypes = [
 ];
 
 /**
- * The temporary list of external types used in Gutenberg which are whitelisted
+ * The temporary list of external types used in Gutenberg which are allowed
  * to avoid ESLint warnings. It's similar to `wordpressInternalTypes` and it
  * should be removed once the related issues is fixed:
  * https://github.com/WordPress/gutenberg/issues/18045
@@ -47,6 +48,7 @@ const typescriptUtilityTypes = [
 	'IterableIterator',
 	'NonNullable',
 	'Omit',
+	'Parameters',
 	'Partial',
 	'Pick',
 	'PromiseLike',
@@ -58,6 +60,13 @@ const typescriptUtilityTypes = [
 	'Required',
 	'ReturnType',
 	'ThisType',
+	'unknown',
+	'never',
+	'NodeJS',
+	'AsyncIterableIterator',
+	'NodeRequire',
+	'true',
+	'false',
 ];
 
 module.exports = {
@@ -75,7 +84,7 @@ module.exports = {
 	},
 	rules: {
 		'jsdoc/no-undefined-types': [
-			'warn',
+			'error',
 			{
 				definedTypes: [
 					// Required to reference browser types because we don't have the `browser` environment enabled for the project.
@@ -88,11 +97,47 @@ module.exports = {
 					...temporaryWordPressInternalTypes,
 					...temporaryExternalTypes,
 					'void',
+					'JSX',
 				],
 			},
 		],
 		'jsdoc/require-jsdoc': 'off',
 		'jsdoc/require-param-description': 'off',
 		'jsdoc/require-returns': 'off',
+		'jsdoc/require-yields': 'off',
+		'jsdoc/tag-lines': 'off',
+		'jsdoc/no-multi-asterisks': [
+			'error',
+			{ preventAtMiddleLines: false },
+		],
+		'jsdoc/check-access': 'error',
+		'jsdoc/check-alignment': 'error',
+		'jsdoc/check-line-alignment': [
+			'warn',
+			'always',
+			{
+				tags: [ 'param', 'arg', 'argument', 'property', 'prop' ],
+				preserveMainDescriptionPostDelimiter: true,
+			},
+		],
+		'jsdoc/check-param-names': 'error',
+		'jsdoc/check-property-names': 'error',
+		'jsdoc/check-tag-names': 'error',
+		'jsdoc/check-types': 'error',
+		'jsdoc/check-values': 'off',
+		'jsdoc/empty-tags': 'error',
+		'jsdoc/implements-on-classes': 'error',
+		'jsdoc/newline-after-description': 'error',
+		'jsdoc/require-param': 'error',
+		'jsdoc/require-param-name': 'error',
+		'jsdoc/require-param-type': 'error',
+		'jsdoc/require-property': 'error',
+		'jsdoc/require-property-description': 'error',
+		'jsdoc/require-property-name': 'error',
+		'jsdoc/require-property-type': 'error',
+		'jsdoc/require-returns-check': 'error',
+		'jsdoc/require-returns-description': 'error',
+		'jsdoc/require-returns-type': 'error',
+		'jsdoc/valid-types': 'error',
 	},
 };

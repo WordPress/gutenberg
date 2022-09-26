@@ -11,34 +11,49 @@ export const PREFERENCES_DEFAULTS = {
  * The default editor settings
  *
  * @typedef {Object} SETTINGS_DEFAULT
- * @property {boolean} alignWide Enable/Disable Wide/Full Alignments
- * @property {Array} availableLegacyWidgets Array of objects representing the legacy widgets available.
- * @property {Array} colors Palette colors
- * @property {boolean} disableCustomColors Whether or not the custom colors are disabled
- * @property {Array} fontSizes Available font sizes
- * @property {boolean} disableCustomFontSizes Whether or not the custom font sizes are disabled
- * @property {Array} imageSizes Available image sizes
- * @property {number} maxWidth Max width to constraint resizing
- * @property {boolean|Array} allowedBlockTypes Allowed block types
- * @property {boolean} hasFixedToolbar Whether or not the editor toolbar is fixed
- * @property {boolean} hasPermissionsToManageWidgets Whether or not the user is able to manage widgets.
- * @property {boolean} focusMode Whether the focus mode is enabled or not
- * @property {Array} styles Editor Styles
- * @property {boolean} isRTL Whether the editor is in RTL mode
- * @property {string} bodyPlaceholder Empty post placeholder
- * @property {string} titlePlaceholder Empty title placeholder
- * @property {boolean} codeEditingEnabled Whether or not the user can switch to the code editor
- * @property {boolean} showInserterHelpPanel Whether or not the inserter help panel is shown
- * @property {boolean} __experimentalCanUserUseUnfilteredHTML Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
- * @property {boolean} __experimentalEnableLegacyWidgetBlock Whether the user has enabled the Legacy Widget Block
- * @property {boolean} __experimentalBlockDirectory Whether the user has enabled the Block Directory
- * @property {boolean} __experimentalEnableFullSiteEditing Whether the user has enabled Full Site Editing
- * @property {boolean} __experimentalEnableFullSiteEditingDemo Whether the user has enabled Full Site Editing Demo Templates
- * @property {boolean} __experimentalEnablePageTemplates Whether the user has enabled the Page Templates
+ * @property {boolean}       alignWide                              Enable/Disable Wide/Full Alignments
+ * @property {boolean}       supportsLayout                         Enable/disable layouts support in container blocks.
+ * @property {boolean}       imageEditing                           Image Editing settings set to false to disable.
+ * @property {Array}         imageSizes                             Available image sizes
+ * @property {number}        maxWidth                               Max width to constraint resizing
+ * @property {boolean|Array} allowedBlockTypes                      Allowed block types
+ * @property {boolean}       hasFixedToolbar                        Whether or not the editor toolbar is fixed
+ * @property {boolean}       focusMode                              Whether the focus mode is enabled or not
+ * @property {Array}         styles                                 Editor Styles
+ * @property {boolean}       keepCaretInsideBlock                   Whether caret should move between blocks in edit mode
+ * @property {string}        bodyPlaceholder                        Empty post placeholder
+ * @property {string}        titlePlaceholder                       Empty title placeholder
+ * @property {boolean}       canLockBlocks                          Whether the user can manage Block Lock state
+ * @property {boolean}       codeEditingEnabled                     Whether or not the user can switch to the code editor
+ * @property {boolean}       generateAnchors                        Enable/Disable auto anchor generation for Heading blocks
+ * @property {boolean}       __experimentalCanUserUseUnfilteredHTML Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
+ * @property {boolean}       __experimentalBlockDirectory           Whether the user has enabled the Block Directory
+ * @property {Array}         __experimentalBlockPatterns            Array of objects representing the block patterns
+ * @property {Array}         __experimentalBlockPatternCategories   Array of objects representing the block pattern categories
+ * @property {boolean}       __unstableGalleryWithImageBlocks       Whether the user has enabled the refactored gallery block which uses InnerBlocks
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
+	supportsLayout: true,
+
+	// colors setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
+	// The setting is only kept for backward compatibility purposes.
 	colors: [
+		{
+			name: __( 'Black' ),
+			slug: 'black',
+			color: '#000000',
+		},
+		{
+			name: __( 'Cyan bluish gray' ),
+			slug: 'cyan-bluish-gray',
+			color: '#abb8c3',
+		},
+		{
+			name: __( 'White' ),
+			slug: 'white',
+			color: '#ffffff',
+		},
 		{
 			name: __( 'Pale pink' ),
 			slug: 'pale-pink',
@@ -80,23 +95,9 @@ export const SETTINGS_DEFAULTS = {
 			slug: 'vivid-purple',
 			color: '#9b51e0',
 		},
-		{
-			name: __( 'Very light gray' ),
-			slug: 'very-light-gray',
-			color: '#eeeeee',
-		},
-		{
-			name: __( 'Cyan bluish gray' ),
-			slug: 'cyan-bluish-gray',
-			color: '#abb8c3',
-		},
-		{
-			name: __( 'Very dark gray' ),
-			slug: 'very-dark-gray',
-			color: '#313131',
-		},
 	],
-
+	// fontSizes setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
+	// The setting is only kept for backward compatibility purposes.
 	fontSizes: [
 		{
 			name: _x( 'Small', 'font size name' ),
@@ -120,10 +121,13 @@ export const SETTINGS_DEFAULTS = {
 		},
 		{
 			name: _x( 'Huge', 'font size name' ),
-			size: 48,
+			size: 42,
 			slug: 'huge',
 		},
 	],
+
+	// Image default size slug.
+	imageDefaultSize: 'large',
 
 	imageSizes: [
 		{ slug: 'thumbnail', name: __( 'Thumbnail' ) },
@@ -131,6 +135,9 @@ export const SETTINGS_DEFAULTS = {
 		{ slug: 'large', name: __( 'Large' ) },
 		{ slug: 'full', name: __( 'Full Size' ) },
 	],
+
+	// Allow plugin to disable Image Editor if need be.
+	imageEditing: true,
 
 	// This is current max width of the block inner area
 	// It's used to constraint image resizing and this value could be overridden later by themes
@@ -145,15 +152,19 @@ export const SETTINGS_DEFAULTS = {
 	// List of allowed mime types and file extensions.
 	allowedMimeTypes: null,
 
-	availableLegacyWidgets: {},
-	hasPermissionsToManageWidgets: false,
-	showInserterHelpPanel: true,
+	// Allows to disable block locking interface.
+	canLockBlocks: true,
+
 	__experimentalCanUserUseUnfilteredHTML: false,
-	__experimentalEnableLegacyWidgetBlock: false,
 	__experimentalBlockDirectory: false,
-	__experimentalEnableFullSiteEditing: false,
-	__experimentalEnableFullSiteEditingDemo: false,
-	__experimentalEnablePageTemplates: false,
+	__mobileEnablePageTemplates: false,
+	__experimentalBlockPatterns: [],
+	__experimentalBlockPatternCategories: [],
+	__unstableGalleryWithImageBlocks: false,
+
+	generateAnchors: false,
+	// gradients setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
+	// The setting is only kept for backward compatibility purposes.
 	gradients: [
 		{
 			name: __( 'Vivid cyan blue to vivid purple' ),
@@ -228,4 +239,6 @@ export const SETTINGS_DEFAULTS = {
 			slug: 'midnight',
 		},
 	],
+
+	__unstableResolvedAssets: { styles: [], scripts: [] },
 };

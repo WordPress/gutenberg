@@ -1,7 +1,14 @@
 /**
  * External dependencies
  */
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
+
+/**
+ * @typedef WPAnnotationRange
+ *
+ * @property {number} start The offset where the annotation should start.
+ * @property {number} end   The offset where the annotation should end.
+ */
 
 /**
  * Adds an annotation to a block.
@@ -13,15 +20,13 @@ import uuid from 'uuid/v4';
  *
  * The `range` property is only relevant if the selector is 'range'.
  *
- * @param {Object} annotation                    The annotation to add.
- * @param {string} annotation.blockClientId      The blockClientId to add the annotation to.
- * @param {string} annotation.richTextIdentifier Identifier for the RichText instance the annotation applies to.
- * @param {Object} annotation.range              The range at which to apply this annotation.
- * @param {number} annotation.range.start        The offset where the annotation should start.
- * @param {number} annotation.range.end          The offset where the annotation should end.
- * @param {string} annotation.[selector="range"] The way to apply this annotation.
- * @param {string} annotation.[source="default"] The source that added the annotation.
- * @param {string} annotation.[id]               The ID the annotation should have. Generates a UUID by default.
+ * @param {Object}            annotation                    The annotation to add.
+ * @param {string}            annotation.blockClientId      The blockClientId to add the annotation to.
+ * @param {string}            annotation.richTextIdentifier Identifier for the RichText instance the annotation applies to.
+ * @param {WPAnnotationRange} annotation.range              The range at which to apply this annotation.
+ * @param {string}            [annotation.selector="range"] The way to apply this annotation.
+ * @param {string}            [annotation.source="default"] The source that added the annotation.
+ * @param {string}            [annotation.id]               The ID the annotation should have. Generates a UUID by default.
  *
  * @return {Object} Action object.
  */
@@ -67,8 +72,8 @@ export function __experimentalRemoveAnnotation( annotationId ) {
  * Updates the range of an annotation.
  *
  * @param {string} annotationId ID of the annotation to update.
- * @param {number} start The start of the new range.
- * @param {number} end The end of the new range.
+ * @param {number} start        The start of the new range.
+ * @param {number} end          The end of the new range.
  *
  * @return {Object} Action object.
  */

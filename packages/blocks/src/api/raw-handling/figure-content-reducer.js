@@ -1,12 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { has } from 'lodash';
-
-/**
- * Internal dependencies
- */
-import { isTextContent } from './phrasing-content';
+import { isTextContent } from '@wordpress/dom';
 
 /**
  * Whether or not the given node is figure content.
@@ -25,7 +20,7 @@ function isFigureContent( node, schema ) {
 		return false;
 	}
 
-	return has( schema, [ 'figure', 'children', tag ] );
+	return tag in ( schema?.figure?.children ?? {} );
 }
 
 /**
@@ -39,7 +34,7 @@ function isFigureContent( node, schema ) {
 function canHaveAnchor( node, schema ) {
 	const tag = node.nodeName.toLowerCase();
 
-	return has( schema, [ 'figure', 'children', 'a', 'children', tag ] );
+	return tag in ( schema?.figure?.children?.a?.children ?? {} );
 }
 
 /**
@@ -64,7 +59,7 @@ function wrapFigureContent( element, beforeElement = element ) {
  *
  * @return {void}
  */
-export default function( node, doc, schema ) {
+export default function figureContentReducer( node, doc, schema ) {
 	if ( ! isFigureContent( node, schema ) ) {
 		return;
 	}
@@ -88,7 +83,11 @@ export default function( node, doc, schema ) {
 	// there is no text content.
 	// Otherwise, if directly at the root, wrap in a figure element.
 	if ( wrapper ) {
-		if (
+		// In jsdom-jscore, 'node.classList' can be undefined.
+		// In this case, default to extract as it offers a better UI experience on mobile.
+		if ( ! node.classList ) {
+			wrapFigureContent( nodeToInsert, wrapper );
+		} else if (
 			node.classList.contains( 'alignright' ) ||
 			node.classList.contains( 'alignleft' ) ||
 			node.classList.contains( 'aligncenter' ) ||

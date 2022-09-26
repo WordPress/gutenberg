@@ -1,35 +1,57 @@
 <?php
 /**
- * Plugin Name:     {{title}}
- * Description:     {{description}}
- * Version:         {{version}}
- * Author:          {{author}}
- * License:         {{license}}
- * Text Domain:     {{textdomain}}
+ * Plugin Name:       {{title}}
+{{#pluginURI}}
+ * Plugin URI:        {{{pluginURI}}}
+{{/pluginURI}}
+{{#description}}
+ * Description:       {{description}}
+{{/description}}
+ * Requires at least: 5.7
+ * Requires PHP:      7.0
+ * Version:           {{version}}
+{{#author}}
+ * Author:            {{author}}
+{{/author}}
+{{#license}}
+ * License:           {{license}}
+{{/license}}
+{{#licenseURI}}
+ * License URI:       {{{licenseURI}}}
+{{/licenseURI}}
+ * Text Domain:       {{textdomain}}
+{{#domainPath}}
+ * Domain Path:       {{{domainPath}}}
+{{/domainPath}}
+{{#updateURI}}
+ * Update URI:        {{{updateURI}}}
+{{/updateURI}}
  *
- * @package         {{namespace}}
+ * @package           {{namespace}}
  */
 
 /**
  * Registers all block assets so that they can be enqueued through the block editor
  * in the corresponding context.
  *
- * @see https://developer.wordpress.org/block-editor/tutorials/block-tutorial/applying-styles-with-stylesheets/
+ * @see https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/applying-styles-with-stylesheets/
  */
 function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
-	$dir = dirname( __FILE__ );
+	$dir = __DIR__;
 
 	$index_js = 'index.js';
 	wp_register_script(
 		'{{namespace}}-{{slug}}-block-editor',
 		plugins_url( $index_js, __FILE__ ),
 		array(
+			'wp-block-editor',
 			'wp-blocks',
 			'wp-i18n',
 			'wp-element',
 		),
 		filemtime( "$dir/$index_js" )
 	);
+	wp_set_script_translations( '{{namespace}}-{{slug}}-block-editor', '{{textdomain}}' );
 
 	$editor_css = 'editor.css';
 	wp_register_style(
@@ -47,10 +69,33 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 		filemtime( "$dir/$style_css" )
 	);
 
-	register_block_type( '{{namespace}}/{{slug}}', array(
-		'editor_script' => '{{namespace}}-{{slug}}-block-editor',
-		'editor_style'  => '{{namespace}}-{{slug}}-block-editor',
-		'style'         => '{{namespace}}-{{slug}}-block',
-	) );
+	register_block_type(
+		'{{namespace}}/{{slug}}',
+		array(
+			'editor_script' => '{{namespace}}-{{slug}}-block-editor',
+			'editor_style'  => '{{namespace}}-{{slug}}-block-editor',
+			'style'         => '{{namespace}}-{{slug}}-block',
+			{{#isDynamicVariant}}
+			'render_callback' => '{{namespaceSnakeCase}}_{{slugSnakeCase}}_render_callback',
+			{{/isDynamicVariant}}
+		)
+	);
 }
 add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );
+{{#isDynamicVariant}}
+
+/**
+ * Render callback function.
+ *
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The block content.
+ * @param WP_Block $block      Block instance.
+ *
+ * @return string The rendered output.
+ */
+function {{namespaceSnakeCase}}_{{slugSnakeCase}}_render_callback( $attributes, $content, $block ) {
+	ob_start();
+	require plugin_dir_path( __FILE__ ) . '/template.php';
+	return ob_get_clean();
+}
+{{/isDynamicVariant}}

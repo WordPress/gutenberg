@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -15,25 +16,38 @@ import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
 
-function Option( { className, isSelected, tooltipText, ...additionalProps } ) {
+function Option( {
+	className,
+	isSelected,
+	selectedIconProps,
+	tooltipText,
+	...additionalProps
+} ) {
 	const optionButton = (
 		<Button
 			isPressed={ isSelected }
-			className={ classnames(
-				className,
-				'components-circular-option-picker__option'
-			) }
+			className="components-circular-option-picker__option"
 			{ ...additionalProps }
 		/>
 	);
 	return (
-		<div className="components-circular-option-picker__option-wrapper">
+		<div
+			className={ classnames(
+				className,
+				'components-circular-option-picker__option-wrapper'
+			) }
+		>
 			{ tooltipText ? (
 				<Tooltip text={ tooltipText }>{ optionButton }</Tooltip>
 			) : (
 				optionButton
 			) }
-			{ isSelected && <Icon icon={ check } /> }
+			{ isSelected && (
+				<Icon
+					icon={ check }
+					{ ...( selectedIconProps ? selectedIconProps : {} ) }
+				/>
+			) }
 		</div>
 	);
 }
@@ -53,8 +67,9 @@ function DropdownLinkAction( {
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
 					aria-expanded={ isOpen }
+					aria-haspopup="true"
 					onClick={ onToggle }
-					isLink
+					variant="link"
 					{ ...buttonProps }
 				>
 					{ linkText }
@@ -72,8 +87,7 @@ function ButtonAction( { className, children, ...additionalProps } ) {
 				'components-circular-option-picker__clear',
 				className
 			) }
-			isSmall
-			isSecondary
+			variant="tertiary"
 			{ ...additionalProps }
 		>
 			{ children }
@@ -94,7 +108,9 @@ export default function CircularOptionPicker( {
 				className
 			) }
 		>
-			{ options }
+			<div className="components-circular-option-picker__swatches">
+				{ options }
+			</div>
 			{ children }
 			{ actions && (
 				<div className="components-circular-option-picker__custom-clear-wrapper">

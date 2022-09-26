@@ -1,6 +1,12 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
 	"name": "core/video",
-	"category": "common",
+	"title": "Video",
+	"category": "media",
+	"description": "Embed a video from your media library or upload a new one.",
+	"keywords": [ "movie" ],
+	"textdomain": "default",
 	"attributes": {
 		"autoplay": {
 			"type": "boolean",
@@ -11,7 +17,8 @@
 		"caption": {
 			"type": "string",
 			"source": "html",
-			"selector": "figcaption"
+			"selector": "figcaption",
+			"__experimentalRole": "content"
 		},
 		"controls": {
 			"type": "boolean",
@@ -21,7 +28,8 @@
 			"default": true
 		},
 		"id": {
-			"type": "number"
+			"type": "number",
+			"__experimentalRole": "content"
 		},
 		"loop": {
 			"type": "boolean",
@@ -52,13 +60,32 @@
 			"type": "string",
 			"source": "attribute",
 			"selector": "video",
-			"attribute": "src"
+			"attribute": "src",
+			"__experimentalRole": "content"
 		},
 		"playsInline": {
 			"type": "boolean",
 			"source": "attribute",
 			"selector": "video",
 			"attribute": "playsinline"
+		},
+		"tracks": {
+			"__experimentalRole": "content",
+			"type": "array",
+			"items": {
+				"type": "object"
+			},
+			"default": []
 		}
-	}
+	},
+	"supports": {
+		"anchor": true,
+		"align": true,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"editorStyle": "wp-block-video-editor",
+	"style": "wp-block-video"
 }

@@ -1,0 +1,16 @@
+.editor-post-url__link-label {
+	font-size: $default-font-size;
+	font-weight: 400;
+	margin: 0;
+}
+
+/* rtl:begin:ignore */
+.editor-post-url__link {
+	direction: ltr;
+	word-break: break-word;
+}
+/* rtl:end:ignore */
+
+.editor-post-url__link-slug {
+	font-weight: 600;
+}

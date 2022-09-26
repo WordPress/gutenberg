@@ -1,28 +1,26 @@
-.wp-block-template-part__placeholder-input-container {
-	display: flex;
-	flex-wrap: wrap;
-	width: 100%;
-}
+.block-editor-template-part__selection-modal {
+	z-index: z-index(".block-editor-template-part__selection-modal");
 
-.wp-block-template-part__placeholder-input {
-	margin: 5px;
-}
-
-.wp-block-template-part__placeholder-preview {
-	margin-bottom: 15px;
-	width: 100%;
-
-	.block-editor-block-preview__container {
-		padding: 1px;
-	}
-
-	.block-editor-block-preview__content {
-		position: initial;
+	// To keep modal dimensions consistent as subsections are navigated, width
+	// and height are used instead of max-(width/height).
+	.components-modal__frame {
+		@include break-small() {
+			width: calc(100% - #{ $grid-unit-20 * 2 });
+			height: calc(100% - #{ $header-height * 2 });
+		}
+		@include break-medium() {
+			width: $break-medium - $grid-unit-20 * 2;
+		}
+		@include break-large() {
+			height: 70%;
+		}
 	}
 }
 
-.wp-block-template-part__placeholder-preview-title {
-	font-size: 15px;
-	font-weight: 600;
-	margin-bottom: 4px;
+.block-library-template-part__selection-search {
+	background: $white;
+	position: sticky;
+	top: 0;
+	padding: $grid-unit-20 0;
+	z-index: z-index(".block-library-template-part__selection-search");
 }

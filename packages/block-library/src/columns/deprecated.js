@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { InnerBlocks } from '@wordpress/block-editor';
+import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
 
 /**
  * Given an HTML string for a deprecated columns inner block, returns the
@@ -38,7 +37,90 @@ function getDeprecatedLayoutColumn( originalContent ) {
 	}
 }
 
+const migrateCustomColors = ( attributes ) => {
+	if ( ! attributes.customTextColor && ! attributes.customBackgroundColor ) {
+		return attributes;
+	}
+	const style = { color: {} };
+	if ( attributes.customTextColor ) {
+		style.color.text = attributes.customTextColor;
+	}
+	if ( attributes.customBackgroundColor ) {
+		style.color.background = attributes.customBackgroundColor;
+	}
+
+	const { customTextColor, customBackgroundColor, ...restAttributes } =
+		attributes;
+
+	return {
+		...restAttributes,
+		style,
+		isStackedOnMobile: true,
+	};
+};
+
 export default [
+	{
+		attributes: {
+			verticalAlignment: {
+				type: 'string',
+			},
+			backgroundColor: {
+				type: 'string',
+			},
+			customBackgroundColor: {
+				type: 'string',
+			},
+			customTextColor: {
+				type: 'string',
+			},
+			textColor: {
+				type: 'string',
+			},
+		},
+		migrate: migrateCustomColors,
+		save( { attributes } ) {
+			const {
+				verticalAlignment,
+				backgroundColor,
+				customBackgroundColor,
+				textColor,
+				customTextColor,
+			} = attributes;
+
+			const backgroundClass = getColorClassName(
+				'background-color',
+				backgroundColor
+			);
+
+			const textClass = getColorClassName( 'color', textColor );
+
+			const className = classnames( {
+				'has-background': backgroundColor || customBackgroundColor,
+				'has-text-color': textColor || customTextColor,
+				[ backgroundClass ]: backgroundClass,
+				[ textClass ]: textClass,
+				[ `are-vertically-aligned-${ verticalAlignment }` ]:
+					verticalAlignment,
+			} );
+
+			const style = {
+				backgroundColor: backgroundClass
+					? undefined
+					: customBackgroundColor,
+				color: textClass ? undefined : customTextColor,
+			};
+
+			return (
+				<div
+					className={ className ? className : undefined }
+					style={ style }
+				>
+					<InnerBlocks.Content />
+				</div>
+			);
+		},
+	},
 	{
 		attributes: {
 			columns: {
@@ -89,7 +171,15 @@ export default [
 				createBlock( 'core/column', {}, columnBlocks )
 			);
 
-			return [ omit( attributes, [ 'columns' ] ), migratedInnerBlocks ];
+			const { columns: ignoredColumns, ...restAttributes } = attributes;
+
+			return [
+				{
+					...restAttributes,
+					isStackedOnMobile: true,
+				},
+				migratedInnerBlocks,
+			];
 		},
 		save( { attributes } ) {
 			const { columns } = attributes;
@@ -109,7 +199,11 @@ export default [
 			},
 		},
 		migrate( attributes, innerBlocks ) {
-			attributes = omit( attributes, [ 'columns' ] );
+			const { columns, ...restAttributes } = attributes;
+			attributes = {
+				...restAttributes,
+				isStackedOnMobile: true,
+			};
 
 			return [ attributes, innerBlocks ];
 		},
@@ -117,7 +211,8 @@ export default [
 			const { verticalAlignment, columns } = attributes;
 
 			const wrapperClasses = classnames( `has-${ columns }-columns`, {
-				[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+				[ `are-vertically-aligned-${ verticalAlignment }` ]:
+					verticalAlignment,
 			} );
 
 			return (

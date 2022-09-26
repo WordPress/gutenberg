@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`md5 creates a hash of a number 1`] = `"55587a910882016321201e6ebbc9f595"`;
+
+exports[`md5 creates a hash of a object 1`] = `"a0294b0e88367a0ff800d78413356538"`;
+
+exports[`md5 creates a hash of a string 1`] = `"5d41402abc4b2a76b9719d911017c592"`;
+
+exports[`md5 creates a hash of null 1`] = `"37a6259cc0c1dae299a7866489dff0bd"`;

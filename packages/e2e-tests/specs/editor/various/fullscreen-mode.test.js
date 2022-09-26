@@ -14,7 +14,7 @@ describe( 'Fullscreen Mode', () => {
 
 	it( 'should open the fullscreen mode from the more menu', async () => {
 		await clickOnMoreMenuItem( 'Fullscreen mode' );
-		await toggleMoreMenu();
+		await toggleMoreMenu( 'close' );
 
 		const isFullscreenEnabled = await page.$eval( 'body', ( body ) => {
 			return body.classList.contains( 'is-fullscreen-mode' );
@@ -22,10 +22,10 @@ describe( 'Fullscreen Mode', () => {
 
 		expect( isFullscreenEnabled ).toBe( true );
 
-		const fullscreenToolbar = await page.$(
-			'.edit-post-fullscreen-mode-close__toolbar'
+		const fullscreenCloseButton = await page.$(
+			'.edit-post-fullscreen-mode-close'
 		);
 
-		expect( fullscreenToolbar ).not.toBeNull();
+		expect( fullscreenCloseButton ).not.toBeNull();
 	} );
 } );

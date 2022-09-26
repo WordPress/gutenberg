@@ -16,8 +16,7 @@ import {
 
 const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
 	url: 'https://wordpress.org/gutenberg/handbook/block-api/attributes/',
-	html:
-		'<div class="wp-embedded-content" data-secret="shhhh it is a secret">WordPress embed</div>',
+	html: '<div class="wp-embedded-content" data-secret="shhhh it is a secret"></div>',
 	type: 'rich',
 	provider_name: 'WordPress',
 	provider_url: 'https://wordpress.org',
@@ -30,6 +29,15 @@ const MOCK_EMBED_RICH_SUCCESS_RESPONSE = {
 	type: 'rich',
 	provider_name: 'Twitter',
 	provider_url: 'https://twitter.com',
+	version: '1.0',
+};
+
+const MOCK_EMBED_PHOTO_SUCCESS_RESPONSE = {
+	url: 'https://cloudup.com/cQFlxqtY4ob',
+	html: '<p>Mock success response.</p>',
+	type: 'photo',
+	provider_name: 'Cloudup',
+	provider_url: 'https://cloudup.com',
 	version: '1.0',
 };
 
@@ -69,8 +77,7 @@ const MOCK_BAD_EMBED_PROVIDER_RESPONSE = {
 
 const MOCK_CANT_EMBED_RESPONSE = {
 	provider_name: 'Embed Handler',
-	html:
-		'<a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a>',
+	html: '<a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a>',
 };
 
 const MOCK_BAD_WORDPRESS_RESPONSE = {
@@ -123,7 +130,7 @@ const MOCK_RESPONSES = [
 	},
 	{
 		match: createEmbeddingMatcher( 'https://cloudup.com/cQFlxqtY4ob' ),
-		onRequestMatch: createJSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
+		onRequestMatch: createJSONResponse( MOCK_EMBED_PHOTO_SUCCESS_RESPONSE ),
 	},
 	{
 		match: createEmbeddingMatcher( 'https://twitter.com/notnownikki' ),
@@ -151,6 +158,17 @@ const MOCK_RESPONSES = [
 	},
 ];
 
+async function insertEmbed( URL ) {
+	await clickBlockAppender();
+	await page.keyboard.type( '/embed' );
+	await page.waitForXPath(
+		`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Embed')]`
+	);
+	await page.keyboard.press( 'Enter' );
+	await page.keyboard.type( URL );
+	await page.keyboard.press( 'Enter' );
+}
+
 describe( 'Embedding content', () => {
 	beforeEach( async () => {
 		await setUpResponseMocking( MOCK_RESPONSES );
@@ -159,118 +177,85 @@ describe( 'Embedding content', () => {
 
 	it( 'should render embeds in the correct state', async () => {
 		// Valid embed. Should render valid figure element.
-		await clickBlockAppender();
-		await page.keyboard.type( '/embed' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'https://twitter.com/notnownikki' );
-		await page.keyboard.press( 'Enter' );
-		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
+		await insertEmbed( 'https://twitter.com/notnownikki' );
+		await page.waitForSelector( 'figure.wp-block-embed' );
 
 		// Valid provider; invalid content. Should render failed, edit state.
-		await clickBlockAppender();
-		await page.keyboard.type( '/embed' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type(
-			'https://twitter.com/wooyaygutenberg123454312'
-		);
-		await page.keyboard.press( 'Enter' );
+		await insertEmbed( 'https://twitter.com/wooyaygutenberg123454312' );
 		await page.waitForSelector(
 			'input[value="https://twitter.com/wooyaygutenberg123454312"]'
 		);
 
 		// WordPress invalid content. Should render failed, edit state.
-		await clickBlockAppender();
-		await page.keyboard.type( '/embed' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'https://wordpress.org/gutenberg/handbook/' );
-		await page.keyboard.press( 'Enter' );
+		await insertEmbed( 'https://wordpress.org/gutenberg/handbook/' );
 		await page.waitForSelector(
 			'input[value="https://wordpress.org/gutenberg/handbook/"]'
 		);
 
 		// Provider whose oembed API has gone wrong. Should render failed, edit
 		// state.
-		await clickBlockAppender();
-		await page.keyboard.type( '/embed' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'https://twitter.com/thatbunty' );
-		await page.keyboard.press( 'Enter' );
+		await insertEmbed( 'https://twitter.com/thatbunty' );
 		await page.waitForSelector(
 			'input[value="https://twitter.com/thatbunty"]'
 		);
 
 		// WordPress content that can be embedded. Should render valid figure
 		// element.
-		await clickBlockAppender();
-		await page.keyboard.type( '/embed' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type(
+		await insertEmbed(
 			'https://wordpress.org/gutenberg/handbook/block-api/attributes/'
 		);
-		await page.keyboard.press( 'Enter' );
-		await page.waitForSelector( 'figure.wp-block-embed-wordpress' );
+		await page.waitForSelector( 'figure.wp-block-embed' );
 
 		// Video content. Should render valid figure element, and include the
 		// aspect ratio class.
-		await clickBlockAppender();
-		await page.keyboard.type( '/embed' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type(
-			'https://www.youtube.com/watch?v=lXMskKTw3Bc'
-		);
-		await page.keyboard.press( 'Enter' );
+		await insertEmbed( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
 		await page.waitForSelector(
-			'figure.wp-block-embed-youtube.wp-embed-aspect-16-9'
+			'figure.wp-block-embed.is-type-video.wp-embed-aspect-16-9'
 		);
 
 		// Photo content. Should render valid figure element.
-		await clickBlockAppender();
-		await page.keyboard.type( '/embed' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'https://cloudup.com/cQFlxqtY4ob' );
-		await page.keyboard.press( 'Enter' );
+		await insertEmbed( 'https://cloudup.com/cQFlxqtY4ob' );
+		await page.waitForSelector(
+			'iframe[title="Embedded content from cloudup"'
+		);
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should allow the user to convert unembeddable URLs to a paragraph with a link in it', async () => {
 		// URL that can't be embedded.
-		await clickBlockAppender();
-		await page.keyboard.type( '/embed' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type(
-			'https://twitter.com/wooyaygutenberg123454312'
-		);
-		await page.keyboard.press( 'Enter' );
+		await insertEmbed( 'https://twitter.com/wooyaygutenberg123454312' );
 
-		// Wait for the request to fail and present an error.
-		await page.waitForSelector( '.components-placeholder__error' );
+		// Wait for the request to fail and present an error. Since placeholder
+		// has styles applied which depend on resize observer, wait for the
+		// expected size class to settle before clicking, since otherwise a race
+		// condition could occur on the placeholder layout vs. click intent.
+		await page.waitForSelector(
+			'.components-placeholder.is-large .components-placeholder__error'
+		);
 
 		await clickButton( 'Convert to link' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should retry embeds that could not be embedded with trailing slashes, without the trailing slashes', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( '/embed' );
-		await page.keyboard.press( 'Enter' );
-		// This URL can't be embedded, but without the trailing slash, it can.
-		await page.keyboard.type( 'https://twitter.com/notnownikki/' );
-		await page.keyboard.press( 'Enter' );
+		await insertEmbed( 'https://twitter.com/notnownikki/' );
 		// The twitter block should appear correctly.
-		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
+		await page.waitForSelector( 'figure.wp-block-embed' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should allow the user to try embedding a failed URL again', async () => {
 		// URL that can't be embedded.
-		await clickBlockAppender();
-		await page.keyboard.type( '/embed' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type(
-			'https://twitter.com/wooyaygutenberg123454312'
-		);
-		await page.keyboard.press( 'Enter' );
+		await insertEmbed( 'https://twitter.com/wooyaygutenberg123454312' );
 
-		// Wait for the request to fail and present an error.
-		await page.waitForSelector( '.components-placeholder__error' );
+		// Wait for the request to fail and present an error. Since placeholder
+		// has styles applied which depend on resize observer, wait for the
+		// expected size class to settle before clicking, since otherwise a race
+		// condition could occur on the placeholder layout vs. click intent.
+		await page.waitForSelector(
+			'.components-placeholder.is-large .components-placeholder__error'
+		);
 
 		// Set up a different mock to make sure that try again actually does make the request again.
 		await setUpResponseMocking( [
@@ -284,7 +269,8 @@ describe( 'Embedding content', () => {
 			},
 		] );
 		await clickButton( 'Try again' );
-		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
+		await page.waitForSelector( 'figure.wp-block-embed' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should switch to the WordPress block correctly', async () => {
@@ -297,19 +283,15 @@ describe( 'Embedding content', () => {
 		await page.keyboard.type( 'Hello there!' );
 		await publishPost();
 		const postUrl = await page.$eval(
-			'[id^=inspector-text-control-]',
+			'.editor-post-publish-panel [id^=inspector-text-control-]',
 			( el ) => el.value
 		);
 
 		// Start a new post, embed the previous post.
 		await createNewPost();
-		await clickBlockAppender();
-		await page.keyboard.type( '/embed' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( postUrl );
-		await page.keyboard.press( 'Enter' );
+		await insertEmbed( postUrl );
 
 		// Check the block has become a WordPress block.
-		await page.waitForSelector( '.wp-block-embed-wordpress' );
+		await page.waitForSelector( 'figure.wp-block-embed' );
 	} );
 } );

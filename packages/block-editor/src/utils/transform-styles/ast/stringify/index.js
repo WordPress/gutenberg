@@ -20,7 +20,7 @@ import Identity from './identity';
  * @return {string}
  */
 
-export default function( node, options ) {
+export default function ( node, options ) {
 	options = options || {};
 
 	const compiler = options.compress

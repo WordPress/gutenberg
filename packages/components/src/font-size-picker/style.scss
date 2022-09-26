@@ -1,16 +1,49 @@
+.components-font-size-picker__header {
+	&__hint {
+		margin-left: $grid-unit-05;
+		color: $gray-700;
+	}
+
+	.components-base-control__label {
+		margin-bottom: 0;
+	}
+
+	// This button is inheriting padding and min-width.
+	// @todo: we should refactor it to not need to unset this.
+	.components-button.is-small.has-icon:not(.has-text) {
+		min-width: $icon-size;
+		padding: 0;
+	}
+}
+
 .components-font-size-picker__controls {
-	max-width: $sidebar-width - ( 2 * $panel-padding );
-	display: flex;
+	max-width: $sidebar-width - ( 2 * $grid-unit-20 );
 	align-items: center;
-	margin-bottom: $grid-size * 3;
+	margin-top: $grid-unit-10;
+
+	&:not(.is-next-has-no-margin-bottom) {
+		margin-bottom: $grid-unit-30;
+	}
+
+	.components-unit-control-wrapper {
+		.components-input-control__label {
+			font-weight: 300;
+			padding-bottom: 0 !important;
+			margin-bottom: $grid-unit-10 !important;
+		}
+	}
 
 	// Apply the same height as the isSmall Reset button.
-	.components-range-control__number {
+	.components-font-size-picker__number {
+		@include input-control;
+		display: inline-block;
+		font-weight: 500;
 		height: 30px;
 		margin-bottom: 0;
-		margin-top: 5px;
 		margin-left: 0;
-		margin-right: $grid-size;
+		margin-right: $grid-unit-10;
+		margin-top: $grid-unit-10;
+		width: 54px;
 
 		// Show the reset button as disabled until a value is entered.
 		&[value=""] + .components-button {
@@ -25,15 +58,8 @@
 		}
 	}
 
-	// Allow the font-size picker dropdown to grow in width.
-	.components-font-size-picker__select {
-		margin-right: $grid-size;
-		flex-grow: 1;
-	}
-
 	.components-color-palette__clear {
 		height: 30px;
-		margin-top: 23px;
 	}
 }
 

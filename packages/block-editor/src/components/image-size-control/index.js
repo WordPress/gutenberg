@@ -1,129 +1,120 @@
 /**
  * External dependencies
  */
-import { isEmpty, noop } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	ButtonGroup,
 	SelectControl,
 	TextControl,
 } from '@wordpress/components';
-import { Component } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
-class ImageSizeControl extends Component {
-	/**
-	 * Run additional operations during component initialization.
-	 *
-	 * @param {Object} props
-	 */
-	constructor( props ) {
-		super( props );
+/**
+ * Internal dependencies
+ */
+import useDimensionHandler from './use-dimension-handler';
 
-		this.updateDimensions = this.updateDimensions.bind( this );
-	}
+const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
+const noop = () => {};
 
-	updateDimensions( width = undefined, height = undefined ) {
-		return () => {
-			this.props.onChange( { width, height } );
-		};
-	}
+export default function ImageSizeControl( {
+	imageSizeHelp,
+	imageWidth,
+	imageHeight,
+	imageSizeOptions = [],
+	isResizable = true,
+	slug,
+	width,
+	height,
+	onChange,
+	onChangeImage = noop,
+} ) {
+	const { currentHeight, currentWidth, updateDimension, updateDimensions } =
+		useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
 
-	render() {
-		const {
-			imageWidth,
-			imageHeight,
-			imageSizeOptions = [],
-			isResizable = true,
-			slug,
-			width,
-			height,
-			onChange,
-			onChangeImage = noop,
-		} = this.props;
-
-		return (
-			<>
-				{ ! isEmpty( imageSizeOptions ) && (
-					<SelectControl
-						label={ __( 'Image Size' ) }
-						value={ slug }
-						options={ imageSizeOptions }
-						onChange={ onChangeImage }
-					/>
-				) }
-				{ isResizable && (
-					<div className="block-editor-image-size-control">
-						<p className="block-editor-image-size-control__row">
-							{ __( 'Image Dimensions' ) }
-						</p>
-						<div className="block-editor-image-size-control__row">
-							<TextControl
-								type="number"
-								className="block-editor-image-size-control__width"
-								label={ __( 'Width' ) }
-								value={ width || imageWidth || '' }
-								min={ 1 }
-								onChange={ ( value ) =>
-									onChange( { width: parseInt( value, 10 ) } )
-								}
-							/>
-							<TextControl
-								type="number"
-								className="block-editor-image-size-control__height"
-								label={ __( 'Height' ) }
-								value={ height || imageHeight || '' }
-								min={ 1 }
-								onChange={ ( value ) =>
-									onChange( {
-										height: parseInt( value, 10 ),
-									} )
-								}
-							/>
-						</div>
-						<div className="block-editor-image-size-control__row">
-							<ButtonGroup aria-label={ __( 'Image Size' ) }>
-								{ [ 25, 50, 75, 100 ].map( ( scale ) => {
-									const scaledWidth = Math.round(
-										imageWidth * ( scale / 100 )
-									);
-									const scaledHeight = Math.round(
-										imageHeight * ( scale / 100 )
-									);
-
-									const isCurrent =
-										width === scaledWidth &&
-										height === scaledHeight;
-
-									return (
-										<Button
-											key={ scale }
-											isSmall
-											isPrimary={ isCurrent }
-											isPressed={ isCurrent }
-											onClick={ this.updateDimensions(
-												scaledWidth,
-												scaledHeight
-											) }
-										>
-											{ scale }%
-										</Button>
-									);
-								} ) }
-							</ButtonGroup>
-							<Button isSmall onClick={ this.updateDimensions() }>
-								{ __( 'Reset' ) }
-							</Button>
-						</div>
+	return (
+		<>
+			{ ! isEmpty( imageSizeOptions ) && (
+				<SelectControl
+					label={ __( 'Image size' ) }
+					value={ slug }
+					options={ imageSizeOptions }
+					onChange={ onChangeImage }
+					help={ imageSizeHelp }
+				/>
+			) }
+			{ isResizable && (
+				<div className="block-editor-image-size-control">
+					<p className="block-editor-image-size-control__row">
+						{ __( 'Image dimensions' ) }
+					</p>
+					<div className="block-editor-image-size-control__row">
+						<TextControl
+							type="number"
+							className="block-editor-image-size-control__width"
+							label={ __( 'Width' ) }
+							value={ currentWidth }
+							min={ 1 }
+							onChange={ ( value ) =>
+								updateDimension( 'width', value )
+							}
+						/>
+						<TextControl
+							type="number"
+							className="block-editor-image-size-control__height"
+							label={ __( 'Height' ) }
+							value={ currentHeight }
+							min={ 1 }
+							onChange={ ( value ) =>
+								updateDimension( 'height', value )
+							}
+						/>
 					</div>
-				) }
-			</>
-		);
-	}
-}
+					<div className="block-editor-image-size-control__row">
+						<ButtonGroup aria-label={ __( 'Image size presets' ) }>
+							{ IMAGE_SIZE_PRESETS.map( ( scale ) => {
+								const scaledWidth = Math.round(
+									imageWidth * ( scale / 100 )
+								);
+								const scaledHeight = Math.round(
+									imageHeight * ( scale / 100 )
+								);
 
-export default ImageSizeControl;
+								const isCurrent =
+									currentWidth === scaledWidth &&
+									currentHeight === scaledHeight;
+
+								return (
+									<Button
+										key={ scale }
+										isSmall
+										variant={
+											isCurrent ? 'primary' : undefined
+										}
+										isPressed={ isCurrent }
+										onClick={ () =>
+											updateDimensions(
+												scaledHeight,
+												scaledWidth
+											)
+										}
+									>
+										{ scale }%
+									</Button>
+								);
+							} ) }
+						</ButtonGroup>
+						<Button isSmall onClick={ () => updateDimensions() }>
+							{ __( 'Reset' ) }
+						</Button>
+					</div>
+				</div>
+			) }
+		</>
+	);
+}

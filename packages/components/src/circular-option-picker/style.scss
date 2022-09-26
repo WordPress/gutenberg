@@ -3,12 +3,19 @@ $color-palette-circle-spacing: 12px;
 
 .components-circular-option-picker {
 	display: inline-block;
-	margin-top: 0.6rem;
 	width: 100%;
+	min-width: 188px;
 
 	.components-circular-option-picker__custom-clear-wrapper {
 		display: flex;
 		justify-content: flex-end;
+		margin-top: $grid-unit-15;
+	}
+
+	.components-circular-option-picker__swatches {
+		display: flex;
+		flex-wrap: wrap;
+		gap: $color-palette-circle-spacing;
 	}
 }
 
@@ -16,8 +23,6 @@ $color-palette-circle-spacing: 12px;
 	display: inline-block;
 	height: $color-palette-circle-size;
 	width: $color-palette-circle-size;
-	margin-right: $color-palette-circle-spacing;
-	margin-bottom: $color-palette-circle-spacing;
 	vertical-align: top;
 	transform: scale(1);
 	transition: 100ms transform ease;
@@ -57,20 +62,21 @@ $color-palette-circle-spacing: 12px;
 	border: none;
 	border-radius: 50%;
 	background: transparent;
-	box-shadow: inset 0 0 0 ($color-palette-circle-size / 2);
+	box-shadow: inset 0 0 0 ($color-palette-circle-size * 0.5);
 	transition: 100ms box-shadow ease;
 	@include reduce-motion("transition");
 	cursor: pointer;
 
 	&:hover {
 		// Override default button hover style.
-		box-shadow: inset 0 0 0 ($color-palette-circle-size / 2) !important;
+		box-shadow: inset 0 0 0 ($color-palette-circle-size * 0.5) !important;
 	}
 
 	&.is-pressed {
 		box-shadow: inset 0 0 0 4px;
 		position: relative;
 		z-index: z-index(".components-circular-option-picker__option.is-pressed");
+		overflow: visible;
 
 		& + svg {
 			position: absolute;
@@ -78,7 +84,6 @@ $color-palette-circle-spacing: 12px;
 			top: 2px;
 			border-radius: 50%;
 			z-index: z-index(".components-circular-option-picker__option.is-pressed + svg");
-			background: $white;
 			pointer-events: none;
 		}
 	}
@@ -94,12 +99,13 @@ $color-palette-circle-spacing: 12px;
 		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
 		// Show a thin circular outline in Windows high contrast mode, otherwise the button is invisible.
 		border: 1px solid transparent;
+		box-sizing: inherit;
 	}
 
 	&:focus {
 		&::after {
 			content: "";
-			border: #{ $border-width * 2 } solid $dark-gray-400;
+			border: #{ $border-width * 2 } solid $gray-700;
 			width: 32px;
 			height: 32px;
 			position: absolute;
@@ -112,7 +118,7 @@ $color-palette-circle-spacing: 12px;
 
 	&.components-button:focus {
 		background-color: transparent;
-		box-shadow: inset 0 0 0 ($color-palette-circle-size / 2);
+		box-shadow: inset 0 0 0 ($color-palette-circle-size * 0.5);
 		outline: none;
 	}
 }
@@ -124,7 +130,7 @@ $color-palette-circle-spacing: 12px;
 
 
 .components-circular-option-picker__dropdown-link-action {
-	margin-right: $grid-size-large;
+	margin-right: $grid-unit-20;
 
 	.components-button {
 		line-height: 22px;

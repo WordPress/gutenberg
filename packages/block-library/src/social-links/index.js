@@ -1,11 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { share as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
+import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
@@ -15,14 +17,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Social Icons' ),
-	description: __(
-		'Create a block of links to your social media or external sites.'
-	),
-	keywords: [ _x( 'links', 'block keywords' ) ],
-	supports: {
-		align: [ 'left', 'center', 'right' ],
-	},
 	example: {
 		innerBlocks: [
 			{
@@ -48,11 +42,10 @@ export const settings = {
 			},
 		],
 	},
-	styles: [
-		{ name: 'default', label: __( 'Default' ), isDefault: true },
-		{ name: 'logos-only', label: __( 'Logos Only' ) },
-		{ name: 'pill-shape', label: __( 'Pill Shape' ) },
-	],
+	icon,
 	edit,
 	save,
+	deprecated,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

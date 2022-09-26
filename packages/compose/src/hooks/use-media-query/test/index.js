@@ -33,6 +33,18 @@ describe( 'useMediaQuery', () => {
 		return `useMediaQuery: ${ queryResult }`;
 	};
 
+	it( 'should return true when query matches on the first render', async () => {
+		global.matchMedia.mockReturnValue( {
+			addListener,
+			removeListener,
+			matches: true,
+		} );
+
+		const root = create( <TestComponent query="(min-width: 782px)" /> );
+
+		expect( root.toJSON() ).toBe( 'useMediaQuery: true' );
+	} );
+
 	it( 'should return true when query matches', async () => {
 		global.matchMedia.mockReturnValue( {
 			addListener,
@@ -55,6 +67,13 @@ describe( 'useMediaQuery', () => {
 	} );
 
 	it( 'should correctly update the value when the query evaluation matches', async () => {
+		// First render.
+		global.matchMedia.mockReturnValueOnce( {
+			addListener,
+			removeListener,
+			matches: true,
+		} );
+		// The query within useEffect.
 		global.matchMedia.mockReturnValueOnce( {
 			addListener,
 			removeListener,
@@ -119,7 +138,8 @@ describe( 'useMediaQuery', () => {
 		await act( async () => {
 			root = create( <TestComponent /> );
 		} );
-		expect( root.toJSON() ).toBe( 'useMediaQuery: undefined' );
+		// Query will be case to a boolean to simplify the return type.
+		expect( root.toJSON() ).toBe( 'useMediaQuery: false' );
 
 		await act( async () => {
 			root.update( <TestComponent query={ false } /> );

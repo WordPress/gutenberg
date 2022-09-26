@@ -80,7 +80,7 @@ function testIsUsedInStrictBinaryExpression( node, context ) {
 		const comparisonNode =
 			node.parent.type === 'MemberExpression' ? node.parent : node;
 
-		// Test for process.env.GUTENBERG_PHASE === <number> or <number> === process.env.GUTENBERG_PHASE
+		// Test for process.env.GUTENBERG_PHASE === <number> or <number> === process.env.GUTENBERG_PHASE.
 		const hasCorrectOperator = [ '===', '!==' ].includes( parent.operator );
 		const hasCorrectOperands =
 			( parent.left === comparisonNode &&
@@ -128,8 +128,8 @@ function testIsUsedInIfOrTernary( node, context ) {
 		conditionalParent &&
 		binaryParent &&
 		conditionalParent.test &&
-		conditionalParent.test.start === binaryParent.start &&
-		conditionalParent.test.end === binaryParent.end
+		conditionalParent.test.range[ 0 ] === binaryParent.range[ 0 ] &&
+		conditionalParent.test.range[ 1 ] === binaryParent.range[ 1 ]
 	) {
 		return;
 	}
@@ -144,6 +144,8 @@ module.exports = {
 	meta: {
 		type: 'problem',
 		schema: [],
+		deprecated: true,
+		replacedBy: '@wordpress/is-gutenberg-plugin',
 	},
 	create( context ) {
 		return {

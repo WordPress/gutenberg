@@ -4,8 +4,8 @@
 import { SVG, Path } from '@wordpress/primitives';
 
 const arrowDown = (
-	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24">
-		<Path d="M9 2h2v12l4-4 2 1-7 7-7-7 2-1 4 4V2z" />
+	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+		<Path d="M16.2 13.2l-4 4V4h-1.5v13.3l-4.5-4.1-1 1.1 6.2 5.8 5.8-5.8-1-1.1z" />
 	</SVG>
 );
 

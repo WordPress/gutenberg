@@ -1,6 +1,6 @@
 <?php
 /**
- * Bootstraping the Gutenberg experiments page.
+ * Bootstrapping the Gutenberg experiments page.
  *
  * @package gutenberg
  */
@@ -40,59 +40,16 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg_display_experiment_section',
 		'gutenberg-experiments'
 	);
+
 	add_settings_field(
-		'gutenberg-widget-experiments',
-		__( 'Widgets', 'gutenberg' ),
+		'gutenberg-zoomed-out-view',
+		__( 'Zoomed out view ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable Widgets screen and Legacy Widgets block', 'gutenberg' ),
-			'id'    => 'gutenberg-widget-experiments',
-		)
-	);
-	add_settings_field(
-		'gutenberg-block-directory',
-		__( 'Block Directory', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enable block directory search', 'gutenberg' ),
-			'id'    => 'gutenberg-block-directory',
-		)
-	);
-	add_settings_field(
-		'gutenberg-full-site-editing',
-		__( 'Full Site Editing', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enable Full Site Editing (Warning: this will replace your theme and cause potentially irreversible changes to your site. We recommend using this only in a development environment.)', 'gutenberg' ),
-			'id'    => 'gutenberg-full-site-editing',
-		)
-	);
-	add_settings_field(
-		'gutenberg-full-site-editing-demo',
-		__( 'Full Site Editing Demo Templates', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enable Full Site Editing demo templates', 'gutenberg' ),
-			'id'    => 'gutenberg-full-site-editing-demo',
-		)
-	);
-	add_settings_field(
-		'gutenberg-page-templates',
-		__( 'Page Templates', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enable page templates', 'gutenberg' ),
-			'id'    => 'gutenberg-page-templates',
+			'label' => __( 'Test a new zoomed out view on the site editor (Warning: The new feature is not ready. You may experience UX issues that are being addressed)', 'gutenberg' ),
+			'id'    => 'gutenberg-zoomed-out-view',
 		)
 	);
 	register_setting(
@@ -141,21 +98,13 @@ function gutenberg_display_experiment_section() {
  * @return array Filtered editor settings.
  */
 function gutenberg_experiments_editor_settings( $settings ) {
+	// The refactored gallery currently can't be run on sites with use_balanceTags option set.
+	// This bypass needs to remain in place until this is resolved and a patch released.
+	// https://core.trac.wordpress.org/ticket/54130.
 	$experiments_settings = array(
-		'__experimentalEnableLegacyWidgetBlock'   => gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ),
-		'__experimentalBlockDirectory'            => gutenberg_is_experiment_enabled( 'gutenberg-block-directory' ),
-		'__experimentalEnableFullSiteEditing'     => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ),
-		'__experimentalEnableFullSiteEditingDemo' => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ),
-		'__experimentalEnablePageTemplates'       => gutenberg_is_experiment_enabled( 'gutenberg-page-templates' ),
+		'__unstableGalleryWithImageBlocks' => (int) get_option( 'use_balanceTags' ) !== 1 || is_wp_version_compatible( '5.9' ),
 	);
-
-	$gradient_presets = current( (array) get_theme_support( 'editor-gradient-presets' ) );
-	if ( false !== $gradient_presets ) {
-		$experiments_settings['gradients'] = $gradient_presets;
-	}
-
-	$experiments_settings['disableCustomGradients'] = get_theme_support( 'disable-custom-gradients' );
-
 	return array_merge( $settings, $experiments_settings );
 }
-add_filter( 'block_editor_settings', 'gutenberg_experiments_editor_settings' );
+
+add_filter( 'block_editor_settings_all', 'gutenberg_experiments_editor_settings' );

@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { map, flowRight } from 'lodash';
+import { map, omit, filter, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -20,6 +21,16 @@ import {
 import { DEFAULT_ENTITY_KEY } from '../entities';
 import getQueryParts from './get-query-parts';
 
+function getContextFromAction( action ) {
+	const { query } = action;
+	if ( ! query ) {
+		return 'default';
+	}
+
+	const queryParts = getQueryParts( query );
+	return queryParts.context;
+}
+
 /**
  * Returns a merged array of item IDs, given details of the received paginated
  * items. The array is sparse-like with `undefined` entries where holes exist.
@@ -32,12 +43,16 @@ import getQueryParts from './get-query-parts';
  * @return {number[]} Merged array of item IDs.
  */
 export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
+	const receivedAllIds = page === 1 && perPage === -1;
+	if ( receivedAllIds ) {
+		return nextItemIds;
+	}
 	const nextItemIdsStartIndex = ( page - 1 ) * perPage;
 
 	// If later page has already been received, default to the larger known
 	// size of the existing array, else calculate as extending the existing.
 	const size = Math.max(
-		itemIds.length,
+		itemIds?.length ?? 0,
 		nextItemIdsStartIndex + nextItemIds.length
 	);
 
@@ -52,7 +67,7 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 
 		mergedItemIds[ i ] = isInNextItemsRange
 			? nextItemIds[ i - nextItemIdsStartIndex ]
-			: itemIds[ i ];
+			: itemIds?.[ i ];
 	}
 
 	return mergedItemIds;
@@ -67,21 +82,83 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
  *
  * @return {Object} Next state.
  */
-function items( state = {}, action ) {
+export function items( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_ITEMS':
+		case 'RECEIVE_ITEMS': {
+			const context = getContextFromAction( action );
 			const key = action.key || DEFAULT_ENTITY_KEY;
 			return {
 				...state,
-				...action.items.reduce( ( accumulator, value ) => {
-					const itemId = value[ key ];
-					accumulator[ itemId ] = conservativeMapItem(
-						state[ itemId ],
-						value
-					);
-					return accumulator;
-				}, {} ),
+				[ context ]: {
+					...state[ context ],
+					...action.items.reduce( ( accumulator, value ) => {
+						const itemId = value[ key ];
+						accumulator[ itemId ] = conservativeMapItem(
+							state?.[ context ]?.[ itemId ],
+							value
+						);
+						return accumulator;
+					}, {} ),
+				},
 			};
+		}
+		case 'REMOVE_ITEMS':
+			return mapValues( state, ( contextState ) =>
+				omit( contextState, action.itemIds )
+			);
+	}
+	return state;
+}
+
+/**
+ * Reducer tracking item completeness, keyed by ID. A complete item is one for
+ * which all fields are known. This is used in supporting `_fields` queries,
+ * where not all properties associated with an entity are necessarily returned.
+ * In such cases, completeness is used as an indication of whether it would be
+ * safe to use queried data for a non-`_fields`-limited request.
+ *
+ * @param {Object<string,Object<string,boolean>>} state  Current state.
+ * @param {Object}                                action Dispatched action.
+ *
+ * @return {Object<string,Object<string,boolean>>} Next state.
+ */
+export function itemIsComplete( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_ITEMS': {
+			const context = getContextFromAction( action );
+			const { query, key = DEFAULT_ENTITY_KEY } = action;
+
+			// An item is considered complete if it is received without an associated
+			// fields query. Ideally, this would be implemented in such a way where the
+			// complete aggregate of all fields would satisfy completeness. Since the
+			// fields are not consistent across all entities, this would require
+			// introspection on the REST schema for each entity to know which fields
+			// compose a complete item for that entity.
+			const queryParts = query ? getQueryParts( query ) : {};
+			const isCompleteQuery =
+				! query || ! Array.isArray( queryParts.fields );
+
+			return {
+				...state,
+				[ context ]: {
+					...state[ context ],
+					...action.items.reduce( ( result, item ) => {
+						const itemId = item[ key ];
+
+						// Defer to completeness if already assigned. Technically the
+						// data may be outdated if receiving items for a field subset.
+						result[ itemId ] =
+							state?.[ context ]?.[ itemId ] || isCompleteQuery;
+
+						return result;
+					}, {} ),
+				},
+			};
+		}
+		case 'REMOVE_ITEMS':
+			return mapValues( state, ( contextState ) =>
+				omit( contextState, action.itemIds )
+			);
 	}
 
 	return state;
@@ -96,7 +173,7 @@ function items( state = {}, action ) {
  *
  * @return {Object} Next state.
  */
-const queries = flowRight( [
+const receiveQueries = compose( [
 	// Limit to matching action type so we don't attempt to replace action on
 	// an unhandled action.
 	ifMatchingAction( ( action ) => 'query' in action ),
@@ -116,6 +193,8 @@ const queries = flowRight( [
 		return action;
 	} ),
 
+	onSubKey( 'context' ),
+
 	// Queries shape is shared, but keyed by query `stableKey` part. Original
 	// reducer tracks only a single query object.
 	onSubKey( 'stableKey' ),
@@ -134,7 +213,38 @@ const queries = flowRight( [
 	);
 } );
 
+/**
+ * Reducer tracking queries state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Next state.
+ */
+const queries = ( state = {}, action ) => {
+	switch ( action.type ) {
+		case 'RECEIVE_ITEMS':
+			return receiveQueries( state, action );
+		case 'REMOVE_ITEMS':
+			const removedItems = action.itemIds.reduce( ( result, itemId ) => {
+				result[ itemId ] = true;
+				return result;
+			}, {} );
+
+			return mapValues( state, ( contextQueries ) => {
+				return mapValues( contextQueries, ( queryItems ) => {
+					return filter( queryItems, ( queryId ) => {
+						return ! removedItems[ queryId ];
+					} );
+				} );
+			} );
+		default:
+			return state;
+	}
+};
+
 export default combineReducers( {
 	items,
+	itemIsComplete,
 	queries,
 } );

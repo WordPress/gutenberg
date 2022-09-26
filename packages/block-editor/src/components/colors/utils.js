@@ -1,8 +1,12 @@
 /**
  * External dependencies
  */
-import { find, kebabCase, map } from 'lodash';
-import tinycolor from 'tinycolor2';
+import { find, kebabCase } from 'lodash';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
+import a11yPlugin from 'colord/plugins/a11y';
+
+extend( [ namesPlugin, a11yPlugin ] );
 
 /**
  * Provided an array of color objects as set by the theme or by the editor defaults,
@@ -36,8 +40,8 @@ export const getColorObjectByAttributeValues = (
 /**
  * Provided an array of color objects as set by the theme or by the editor defaults, and a color value returns the color object matching that value or undefined.
  *
- * @param {Array}   colors      Array of color objects as set by the theme or by the editor defaults.
- * @param {?string} colorValue  A string containing the color value.
+ * @param {Array}   colors     Array of color objects as set by the theme or by the editor defaults.
+ * @param {?string} colorValue A string containing the color value.
  *
  * @return {?Object} Color object included in the colors array whose color property equals colorValue.
  *                   Returns undefined if no color object matches this requirement.
@@ -72,7 +76,10 @@ export function getColorClassName( colorContextName, colorSlug ) {
  * @return {string} String with the color value of the most readable color.
  */
 export function getMostReadableColor( colors, colorValue ) {
-	return tinycolor
-		.mostReadable( colorValue, map( colors, 'color' ) )
-		.toHexString();
+	const colordColor = colord( colorValue );
+	const getColorContrast = ( { color } ) => colordColor.contrast( color );
+
+	const maxContrast = Math.max( ...colors.map( getColorContrast ) );
+	return colors.find( ( color ) => getColorContrast( color ) === maxContrast )
+		.color;
 }

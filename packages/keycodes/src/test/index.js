@@ -91,9 +91,9 @@ describe( 'displayShortcutList', () => {
 			expect( shortcut ).toEqual( [ 'Shift', '+', 'Alt', '+', 'M' ] );
 		} );
 
-		it( 'should output [^, ⌥, M ] on MacOS', () => {
+		it( 'should output [⌃, ⌥, M ] on MacOS', () => {
 			const shortcut = displayShortcutList.access( 'm', isAppleOSTrue );
-			expect( shortcut ).toEqual( [ '^', '⌥', 'M' ] );
+			expect( shortcut ).toEqual( [ '⌃', '⌥', 'M' ] );
 		} );
 	} );
 } );
@@ -159,7 +159,7 @@ describe( 'displayShortcut', () => {
 
 		it( 'should output control+option symbols on MacOS', () => {
 			const shortcut = displayShortcut.access( 'm', isAppleOSTrue );
-			expect( shortcut ).toEqual( '^⌥M' );
+			expect( shortcut ).toEqual( '⌃⌥M' );
 		} );
 	} );
 } );
@@ -277,10 +277,13 @@ describe( 'isKeyboardEvent', () => {
 		}
 	} );
 
-	function keyPress( target, modifiers = {} ) {
+	function keyPress( target, modifiers ) {
 		[ 'keydown', 'keypress', 'keyup' ].forEach( ( eventName ) => {
-			const event = new window.Event( eventName, { bubbles: true } );
-			Object.assign( event, modifiers );
+			const event = new window.KeyboardEvent( eventName, {
+				...modifiers,
+				bubbles: true,
+				keyCode: modifiers.key.charCodeAt( 0 ),
+			} );
 			target.dispatchEvent( event );
 		} );
 	}
@@ -295,6 +298,21 @@ describe( 'isKeyboardEvent', () => {
 
 		return attachNode;
 	}
+
+	it( 'returns false for a superset of modifiers', () => {
+		expect.assertions( 3 );
+		const attachNode = attachEventListeners( ( event ) => {
+			expect(
+				isKeyboardEvent.primary( event, 'm', isAppleOSFalse )
+			).toBe( false );
+		} );
+
+		keyPress( attachNode, {
+			ctrlKey: true,
+			shiftKey: true,
+			key: 'm',
+		} );
+	} );
 
 	describe( 'primary', () => {
 		it( 'should identify modifier key when Ctrl is pressed', () => {
@@ -359,7 +377,11 @@ describe( 'isKeyboardEvent', () => {
 			expect.assertions( 3 );
 			const attachNode = attachEventListeners( ( event ) => {
 				expect(
-					isKeyboardEvent.primary( event, undefined, isAppleOSFalse )
+					isKeyboardEvent.primaryShift(
+						event,
+						undefined,
+						isAppleOSFalse
+					)
 				).toBe( true );
 			} );
 
@@ -374,7 +396,11 @@ describe( 'isKeyboardEvent', () => {
 			expect.assertions( 3 );
 			const attachNode = attachEventListeners( ( event ) => {
 				expect(
-					isKeyboardEvent.primary( event, undefined, isAppleOSTrue )
+					isKeyboardEvent.primaryShift(
+						event,
+						undefined,
+						isAppleOSTrue
+					)
 				).toBe( true );
 			} );
 
@@ -389,7 +415,7 @@ describe( 'isKeyboardEvent', () => {
 			expect.assertions( 3 );
 			const attachNode = attachEventListeners( ( event ) => {
 				expect(
-					isKeyboardEvent.primary( event, 'm', isAppleOSFalse )
+					isKeyboardEvent.primaryShift( event, 'm', isAppleOSFalse )
 				).toBe( true );
 			} );
 
@@ -404,7 +430,7 @@ describe( 'isKeyboardEvent', () => {
 			expect.assertions( 3 );
 			const attachNode = attachEventListeners( ( event ) => {
 				expect(
-					isKeyboardEvent.primary( event, 'm', isAppleOSTrue )
+					isKeyboardEvent.primaryShift( event, 'm', isAppleOSTrue )
 				).toBe( true );
 			} );
 
@@ -421,7 +447,11 @@ describe( 'isKeyboardEvent', () => {
 			expect.assertions( 3 );
 			const attachNode = attachEventListeners( ( event ) => {
 				expect(
-					isKeyboardEvent.primary( event, undefined, isAppleOSFalse )
+					isKeyboardEvent.secondary(
+						event,
+						undefined,
+						isAppleOSFalse
+					)
 				).toBe( true );
 			} );
 
@@ -437,7 +467,7 @@ describe( 'isKeyboardEvent', () => {
 			expect.assertions( 3 );
 			const attachNode = attachEventListeners( ( event ) => {
 				expect(
-					isKeyboardEvent.primary( event, undefined, isAppleOSTrue )
+					isKeyboardEvent.secondary( event, undefined, isAppleOSTrue )
 				).toBe( true );
 			} );
 
@@ -453,7 +483,7 @@ describe( 'isKeyboardEvent', () => {
 			expect.assertions( 3 );
 			const attachNode = attachEventListeners( ( event ) => {
 				expect(
-					isKeyboardEvent.primary( event, 'm', isAppleOSFalse )
+					isKeyboardEvent.secondary( event, 'm', isAppleOSFalse )
 				).toBe( true );
 			} );
 
@@ -469,7 +499,7 @@ describe( 'isKeyboardEvent', () => {
 			expect.assertions( 3 );
 			const attachNode = attachEventListeners( ( event ) => {
 				expect(
-					isKeyboardEvent.primary( event, 'm', isAppleOSTrue )
+					isKeyboardEvent.secondary( event, 'm', isAppleOSTrue )
 				).toBe( true );
 			} );
 
@@ -483,61 +513,61 @@ describe( 'isKeyboardEvent', () => {
 	} );
 
 	describe( 'access', () => {
-		it( 'should identify modifier key when Alt + Ctrl is pressed', () => {
+		it( 'should identify modifier key when Shift + Alt is pressed', () => {
 			expect.assertions( 3 );
 			const attachNode = attachEventListeners( ( event ) => {
 				expect(
-					isKeyboardEvent.primary( event, undefined, isAppleOSFalse )
+					isKeyboardEvent.access( event, undefined, isAppleOSFalse )
+				).toBe( true );
+			} );
+
+			keyPress( attachNode, {
+				shiftKey: true,
+				altKey: true,
+				key: 'Alt',
+			} );
+		} );
+
+		it( 'should identify modifier key when Ctrl + ⌥ is pressed', () => {
+			expect.assertions( 3 );
+			const attachNode = attachEventListeners( ( event ) => {
+				expect(
+					isKeyboardEvent.access( event, undefined, isAppleOSTrue )
 				).toBe( true );
 			} );
 
 			keyPress( attachNode, {
 				ctrlKey: true,
 				altKey: true,
-				key: 'Ctrl',
+				key: 'Alt',
 			} );
 		} );
 
-		it( 'should identify modifier key when ⌥⌘ is pressed', () => {
+		it( 'should identify modifier key when Shift + Alt + M is pressed', () => {
 			expect.assertions( 3 );
 			const attachNode = attachEventListeners( ( event ) => {
 				expect(
-					isKeyboardEvent.primary( event, undefined, isAppleOSTrue )
+					isKeyboardEvent.access( event, 'm', isAppleOSFalse )
 				).toBe( true );
 			} );
 
 			keyPress( attachNode, {
-				metaKey: true,
-				altKey: true,
-				key: 'Meta',
-			} );
-		} );
-
-		it( 'should identify modifier key when Ctrl + ALt + M is pressed', () => {
-			expect.assertions( 3 );
-			const attachNode = attachEventListeners( ( event ) => {
-				expect(
-					isKeyboardEvent.primary( event, 'm', isAppleOSFalse )
-				).toBe( true );
-			} );
-
-			keyPress( attachNode, {
-				ctrlKey: true,
+				shiftKey: true,
 				altKey: true,
 				key: 'm',
 			} );
 		} );
 
-		it( 'should identify modifier key when ⌥⌘M is pressed', () => {
+		it( 'should identify modifier key when Ctrl + ⌥M is pressed', () => {
 			expect.assertions( 3 );
 			const attachNode = attachEventListeners( ( event ) => {
 				expect(
-					isKeyboardEvent.primary( event, 'm', isAppleOSTrue )
+					isKeyboardEvent.access( event, 'm', isAppleOSTrue )
 				).toBe( true );
 			} );
 
 			keyPress( attachNode, {
-				metaKey: true,
+				ctrlKey: true,
 				altKey: true,
 				key: 'm',
 			} );

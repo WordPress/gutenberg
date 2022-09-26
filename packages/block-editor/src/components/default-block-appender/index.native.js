@@ -16,7 +16,9 @@ import { getDefaultBlockName } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
+import BlockInsertionPoint from '../block-list/insertion-point';
 import styles from './style.scss';
+import { store as blockEditorStore } from '../../store';
 
 export function DefaultBlockAppender( {
 	isLocked,
@@ -24,6 +26,7 @@ export function DefaultBlockAppender( {
 	onAppend,
 	placeholder,
 	containerStyle,
+	showSeparator,
 } ) {
 	if ( isLocked || ! isVisible ) {
 		return null;
@@ -37,10 +40,17 @@ export function DefaultBlockAppender( {
 	return (
 		<TouchableWithoutFeedback onPress={ onAppend }>
 			<View
-				style={ [ styles.blockHolder, containerStyle ] }
+				style={ [
+					styles.blockHolder,
+					showSeparator && containerStyle,
+				] }
 				pointerEvents="box-only"
 			>
-				<RichText placeholder={ value } onChange={ () => {} } />
+				{ showSeparator ? (
+					<BlockInsertionPoint />
+				) : (
+					<RichText placeholder={ value } onChange={ () => {} } />
+				) }
 			</View>
 		</TouchableWithoutFeedback>
 	);
@@ -48,12 +58,8 @@ export function DefaultBlockAppender( {
 
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const {
-			getBlockCount,
-			getBlockName,
-			isBlockValid,
-			getTemplateLock,
-		} = select( 'core/block-editor' );
+		const { getBlockCount, getBlockName, isBlockValid, getTemplateLock } =
+			select( blockEditorStore );
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
 		const isLastBlockDefault =
@@ -67,9 +73,8 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const { insertDefaultBlock, startTyping } = dispatch(
-			'core/block-editor'
-		);
+		const { insertDefaultBlock, startTyping } =
+			dispatch( blockEditorStore );
 
 		return {
 			onAppend() {

@@ -9,13 +9,11 @@ Accessibility note: the tooltip text is hidden from screen readers and assistive
 Render a Tooltip, passing as a child the element to which it should anchor:
 
 ```jsx
-import { Tooltip, Button } from '@wordpress/components';
+import { Tooltip } from '@wordpress/components';
 
 const MyTooltip = () => (
 	<Tooltip text="More information">
-		<Button isSecondary>
-			Hover for more information
-		</Button>
+		<div>Hover for more information</div>
 	</Tooltip>
 );
 ```
@@ -28,22 +26,38 @@ The component accepts the following props:
 
 The direction in which the tooltip should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
 
-- Type: `String`
-- Required: No
-- Default: `"top center"`
+-   Type: `String`
+-   Required: No
+-   Default: `"top center"`
 
 ### children
 
 The element to which the tooltip should anchor.
 
-__NOTE:__ You must pass only a single child. Tooltip renders itself as a clone of `children` with a [`Popover`](/packages/components/src/popover/README.md) added as an additional child.
+**NOTE:** You must pass only a single child. Tooltip renders itself as a clone of `children` with a [`Popover`](/packages/components/src/popover/README.md) added as an additional child.
 
-- Type: `Element`
-- Required: Yes
+-   Type: `Element`
+-   Required: Yes
 
 ### text
 
 The tooltip text to show on focus or hover.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
+
+### delay (web only)
+
+Time in milliseconds to wait before showing tooltip after the tooltip's visibility is toggled. This prop is currently only available for the web platforms.
+
+-   Type: `Number`
+-   Required: No
+-   Default: 700
+
+### visible (native only)
+
+Whether the tooltip should be displayed on initial render. This prop is currently only available for the native mobile app built with React Native.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`

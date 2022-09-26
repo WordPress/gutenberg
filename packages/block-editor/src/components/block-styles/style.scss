@@ -1,56 +1,85 @@
-.block-editor-block-styles {
+.block-editor-block-styles + .default-style-picker__default-switcher {
+	margin-top: $grid-unit-20;
+}
+
+.block-editor-block-styles__preview-panel {
+	display: none;
+	position: absolute;
+	right: $grid-unit-20;
+	left: auto;
+	// Same layer as the sidebar from which it's triggered.
+	z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
+
+	// Only show in narrow widths.
+	@include break-medium() {
+		display: block;
+	}
+
+	// Overrides for InserterPreviewPanel.
+	.block-editor-inserter__preview-container {
+		left: auto;
+		right: auto;
+		top: auto;
+		position: static;
+	}
+
+	.block-editor-block-card__title.block-editor-block-card__title {
+		margin: 0;
+	}
+	.block-editor-block-icon {
+		display: none;
+	}
+}
+
+.block-editor-block-styles__variants {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
-}
+	gap: $grid-unit-10;
 
-.block-editor-block-styles__item {
-	width: calc(50% - #{ $grid-size-small });
-	margin: $grid-size-small 0;
-	flex-shrink: 0;
-	cursor: pointer;
-	overflow: hidden;
-	border-radius: $radius-round-rectangle;
-	padding: $grid-size-small * 1.5;
-	padding-top: calc(50% * 0.75 - #{ $grid-size-small } * 1.5);
+	.block-editor-block-styles__item {
+		color: $gray-800;
+		box-shadow: inset 0 0 0 1px $gray-400;
+		display: inline-block;
+		width: calc(50% - #{$grid-unit-05});
 
-	&:focus {
-		@include block-style__focus();
-	}
+		&:focus,
+		&:hover {
+			color: var(--wp-admin-theme-color);
+			box-shadow: inset 0 0 0 2px var(--wp-admin-theme-color);
+		}
 
-	&:hover {
-		@include block-style__hover;
-	}
+		&.is-active,
+		&.is-active:hover {
+			background-color: $gray-800;
+			box-shadow: none;
+		}
 
-	&.is-active {
-		@include block-style__is-active();
+		&.is-active .block-editor-block-styles__item-text,
+		&.is-active:hover .block-editor-block-styles__item-text {
+			color: $white;
+		}
 
-		&:focus {
-			@include block-style__is-active-focus();
+		&.is-active:focus {
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 2px var(--wp-admin-theme-color);
 		}
 	}
-}
 
-// Show a little preview thumbnail for style variations.
-.block-editor-block-styles__item-preview {
-	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
-	padding: 0;
-	border: $border-width solid rgba($dark-gray-900, 0.2);
-	border-radius: $radius-round-rectangle;
-	display: flex;
-	overflow: hidden;
-	background: $white;
-	padding-top: 75%;
-	margin-top: -75%;
+	.block-editor-block-styles__item-text {
+		word-break: break-all;
+		// The Button component is white-space: nowrap, and that won't work with line-clamp.
+		white-space: normal;
 
-	.block-editor-block-preview__container {
-		padding-top: 0;
-		margin: 0;
-		margin-top: -75%;
+		// Without this, the ellipsis can sometimes be partially hidden by the Button padding.
+		text-align: start;
+		text-align-last: center;
 	}
 }
 
-.block-editor-block-styles__item-label {
-	text-align: center;
-	padding: 4px 2px;
+// To prevent overflow in the preview container,
+// ensure that block contents' margin and padding
+// do not add to the block container's width.
+.block-editor-block-styles__block-preview-container,
+.block-editor-block-styles__block-preview-container * {
+	box-sizing: border-box !important;
 }

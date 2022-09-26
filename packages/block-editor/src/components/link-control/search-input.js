@@ -1,87 +1,164 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+/**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
+import { forwardRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
-import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import { URLInput } from '../';
+import LinkControlSearchResults from './search-results';
+import { CREATE_TYPE } from './constants';
+import useSearchHandler from './use-search-handler';
 
-const handleLinkControlOnKeyDown = ( event ) => {
-	const { keyCode } = event;
+// Must be a function as otherwise URLInput will default
+// to the fetchLinkSuggestions passed in block editor settings
+// which will cause an unintended http request.
+const noopSearchHandler = () => Promise.resolve( [] );
 
-	if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( keyCode ) > -1 ) {
-		// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-		event.stopPropagation();
-	}
-};
+const noop = () => {};
 
-const handleLinkControlOnKeyPress = ( event ) => {
-	const { keyCode } = event;
+const LinkControlSearchInput = forwardRef(
+	(
+		{
+			value,
+			children,
+			currentLink = {},
+			className = null,
+			placeholder = null,
+			withCreateSuggestion = false,
+			onCreateSuggestion = noop,
+			onChange = noop,
+			onSelect = noop,
+			showSuggestions = true,
+			renderSuggestions = ( props ) => (
+				<LinkControlSearchResults { ...props } />
+			),
+			fetchSuggestions = null,
+			allowDirectEntry = true,
+			showInitialSuggestions = false,
+			suggestionsQuery = {},
+			withURLSuggestion = true,
+			createSuggestionButtonText,
+			useLabel = false,
+		},
+		ref
+	) => {
+		const genericSearchHandler = useSearchHandler(
+			suggestionsQuery,
+			allowDirectEntry,
+			withCreateSuggestion,
+			withURLSuggestion
+		);
 
-	event.stopPropagation();
+		const searchHandler = showSuggestions
+			? fetchSuggestions || genericSearchHandler
+			: noopSearchHandler;
 
-	if ( keyCode === ENTER ) {
-	}
-};
+		const instanceId = useInstanceId( LinkControlSearchInput );
+		const [ focusedSuggestion, setFocusedSuggestion ] = useState();
 
-const LinkControlSearchInput = ( {
-	value,
-	onChange,
-	onSelect,
-	renderSuggestions,
-	fetchSuggestions,
-	showInitialSuggestions,
-} ) => {
-	const [ selectedSuggestion, setSelectedSuggestion ] = useState();
+		/**
+		 * Handles the user moving between different suggestions. Does not handle
+		 * choosing an individual item.
+		 *
+		 * @param {string} selection  the url of the selected suggestion.
+		 * @param {Object} suggestion the suggestion object.
+		 */
+		const onInputChange = ( selection, suggestion ) => {
+			onChange( selection );
+			setFocusedSuggestion( suggestion );
+		};
 
-	const selectItemHandler = ( selection, suggestion ) => {
-		onChange( selection );
-		setSelectedSuggestion( suggestion );
-	};
-
-	function selectSuggestionOrCurrentInputValue( event ) {
-		// Avoid default forms behavior, since it's being handled custom here.
-		event.preventDefault();
-
-		// Interpret the selected value as either the selected suggestion, if
-		// exists, or otherwise the current input value as entered.
-		onSelect( selectedSuggestion || { url: value } );
-	}
-
-	return (
-		<form onSubmit={ selectSuggestionOrCurrentInputValue }>
-			<URLInput
-				className="block-editor-link-control__search-input"
-				value={ value }
-				onChange={ selectItemHandler }
-				onKeyDown={ ( event ) => {
-					if ( event.keyCode === ENTER ) {
-						return;
+		const handleRenderSuggestions = ( props ) =>
+			renderSuggestions( {
+				...props,
+				instanceId,
+				withCreateSuggestion,
+				currentInputValue: value,
+				createSuggestionButtonText,
+				suggestionsQuery,
+				handleSuggestionClick: ( suggestion ) => {
+					if ( props.handleSuggestionClick ) {
+						props.handleSuggestionClick( suggestion );
 					}
-					handleLinkControlOnKeyDown( event );
-				} }
-				onKeyPress={ handleLinkControlOnKeyPress }
-				placeholder={ __( 'Search or type url' ) }
-				__experimentalRenderSuggestions={ renderSuggestions }
-				__experimentalFetchLinkSuggestions={ fetchSuggestions }
-				__experimentalHandleURLSuggestions={ true }
-				__experimentalShowInitialSuggestions={ showInitialSuggestions }
-			/>
-			<div className="block-editor-link-control__search-actions">
-				<Button
-					type="submit"
-					label={ __( 'Submit' ) }
-					icon="editor-break"
-					className="block-editor-link-control__search-submit"
+					onSuggestionSelected( suggestion );
+				},
+			} );
+
+		const onSuggestionSelected = async ( selectedSuggestion ) => {
+			let suggestion = selectedSuggestion;
+			if ( CREATE_TYPE === selectedSuggestion.type ) {
+				// Create a new page and call onSelect with the output from the onCreateSuggestion callback.
+				try {
+					suggestion = await onCreateSuggestion(
+						selectedSuggestion.title
+					);
+					if ( suggestion?.url ) {
+						onSelect( suggestion );
+					}
+				} catch ( e ) {}
+				return;
+			}
+
+			if (
+				allowDirectEntry ||
+				( suggestion && Object.keys( suggestion ).length >= 1 )
+			) {
+				const { id, url, ...restLinkProps } = currentLink;
+				onSelect(
+					// Some direct entries don't have types or IDs, and we still need to clear the previous ones.
+					{ ...restLinkProps, ...suggestion },
+					suggestion
+				);
+			}
+		};
+
+		const inputClasses = classnames( className, {
+			'has-no-label': ! useLabel,
+		} );
+
+		return (
+			<div className="block-editor-link-control__search-input-container">
+				<URLInput
+					label={ useLabel ? 'URL' : undefined }
+					className={ inputClasses }
+					value={ value }
+					onChange={ onInputChange }
+					placeholder={ placeholder ?? __( 'Search or type url' ) }
+					__experimentalRenderSuggestions={
+						showSuggestions ? handleRenderSuggestions : null
+					}
+					__experimentalFetchLinkSuggestions={ searchHandler }
+					__experimentalHandleURLSuggestions={ true }
+					__experimentalShowInitialSuggestions={
+						showInitialSuggestions
+					}
+					onSubmit={ ( suggestion, event ) => {
+						const hasSuggestion = suggestion || focusedSuggestion;
+
+						// If there is no suggestion and the value (ie: any manually entered URL) is empty
+						// then don't allow submission otherwise we get empty links.
+						if ( ! hasSuggestion && ! value?.trim()?.length ) {
+							event.preventDefault();
+						} else {
+							onSuggestionSelected(
+								hasSuggestion || { url: value }
+							);
+						}
+					} }
+					ref={ ref }
 				/>
+				{ children }
 			</div>
-		</form>
-	);
-};
+		);
+	}
+);
 
 export default LinkControlSearchInput;

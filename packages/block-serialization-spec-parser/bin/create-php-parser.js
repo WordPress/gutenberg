@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+/**
+ * External dependencies
+ */
 const pegjs = require( 'pegjs' );
 const phpegjs = require( 'phpegjs' );
 const fs = require( 'fs' );

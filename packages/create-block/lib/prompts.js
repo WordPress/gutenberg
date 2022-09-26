@@ -1,13 +1,19 @@
 /**
- * External dependencies
+ * Capitalizes the first letter in a string.
+ *
+ * @param {string} str The string whose first letter the function will capitalize.
+ *
+ * @return {string} Capitalized string.
  */
-const { upperFirst } = require( 'lodash' );
+const upperFirst = ( [ firstLetter, ...rest ] ) =>
+	firstLetter.toUpperCase() + rest.join( '' );
 
+// Block metadata.
 const slug = {
 	type: 'input',
 	name: 'slug',
 	message:
-		'The block slug used for identification (also the plugin and output folder name):',
+		'The block slug used for identification (also the output folder name):',
 	validate( input ) {
 		if ( ! /^[a-z][a-z0-9\-]*$/.test( input ) ) {
 			return 'Invalid block slug specified. Block slug can contain only lowercase alphanumeric characters or dashes, and start with a letter.';
@@ -55,7 +61,7 @@ const dashicon = {
 	message:
 		'The dashicon to make it easier to identify your block (optional):',
 	validate( input ) {
-		if ( ! /^[a-z][a-z0-9\-]*$/.test( input ) ) {
+		if ( input.length && ! /^[a-z][a-z0-9\-]*$/.test( input ) ) {
 			return 'Invalid dashicon name specified. Visit https://developer.wordpress.org/resource/dashicons/ to discover available names.';
 		}
 
@@ -70,7 +76,62 @@ const category = {
 	type: 'list',
 	name: 'category',
 	message: 'The category name to help users browse and discover your block:',
-	choices: [ 'common', 'embed', 'formatting', 'layout', 'widgets' ],
+	choices: [ 'text', 'media', 'design', 'widgets', 'theme', 'embed' ],
+};
+
+// Plugin header fields.
+const pluginURI = {
+	type: 'input',
+	name: 'pluginURI',
+	message:
+		'The home page of the plugin (optional). Unique URL outside of WordPress.org:',
+};
+
+const version = {
+	type: 'input',
+	name: 'version',
+	message: 'The current version number of the plugin:',
+	validate( input ) {
+		// Regular expression was copied from https://semver.org.
+		const validSemVerPattern =
+			/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
+		if ( ! validSemVerPattern.test( input ) ) {
+			return 'Invalid Semantic Version provided. Visit https://regex101.com/r/vkijKf/1/ to discover all valid patterns.';
+		}
+
+		return true;
+	},
+};
+
+const author = {
+	type: 'input',
+	name: 'author',
+	message:
+		'The name of the plugin author (optional). Multiple authors may be listed using commas:',
+};
+
+const license = {
+	type: 'input',
+	name: 'license',
+	message: 'The short name of the plugin’s license (optional):',
+};
+
+const licenseURI = {
+	type: 'input',
+	name: 'licenseURI',
+	message: 'A link to the full text of the license (optional):',
+};
+
+const domainPath = {
+	type: 'input',
+	name: 'domainPath',
+	message: 'A custom domain path for the translations (optional):',
+};
+
+const updateURI = {
+	type: 'input',
+	name: 'updateURI',
+	message: 'A custom update URI for the plugin (optional):',
 };
 
 module.exports = {
@@ -80,4 +141,11 @@ module.exports = {
 	description,
 	dashicon,
 	category,
+	pluginURI,
+	version,
+	author,
+	license,
+	licenseURI,
+	domainPath,
+	updateURI,
 };

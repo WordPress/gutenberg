@@ -1,5 +1,5 @@
 module.exports = {
-	//Mock block paragraph style with minimum height
+	// Mock block paragraph style with minimum height.
 	blockText: {
 		minHeight: 50,
 	},
@@ -80,5 +80,98 @@ module.exports = {
 	},
 	infoSheetIcon: {
 		color: 'gray',
+	},
+	blockToolbar: {
+		height: 44,
+	},
+	headerToolbar: {
+		height: 44,
+	},
+	blockBorder: {
+		width: 1,
+	},
+	defaultBlock: {
+		marginTop: 16,
+	},
+	scrollableContent: {
+		paddingBottom: 20,
+	},
+	buttonText: {
+		color: 'white',
+	},
+	placeholderTextColor: {
+		color: 'white',
+	},
+	defaultButton: {
+		paddingLeft: 10,
+		paddingRight: 10,
+	},
+	'block-types-list__column': {
+		paddingLeft: 10,
+		paddingRight: 10,
+	},
+	floatingToolbar: {
+		height: 10,
+	},
+	searchFormPlaceholder: {
+		color: 'gray',
+	},
+	ripple: {
+		backgroundColor: 'white',
+	},
+	spacing: {
+		marginLeft: 6,
+		marginRight: 6,
+	},
+	arrow: {
+		color: 'red',
+	},
+	button: {
+		color: 'red',
+	},
+	textInput: {
+		color: 'black',
+	},
+	buttonNoBg: {
+		color: 'orange',
+	},
+	isSelected: {
+		color: 'blue',
+	},
+	'embed-no-preview__help-icon': {
+		fill: 'gray',
+	},
+	'embed-no-preview__sheet-icon': {
+		fill: 'gray',
+	},
+	fullAlignment: {
+		width: '100%',
+	},
+	'embed__icon--error': {
+		fill: 'red',
+	},
+	'components-autocomplete': {
+		height: 100,
+	},
+	addMediaButton: {
+		color: 'white',
+	},
+	'header-toolbar__container': {
+		height: 44,
+	},
+	'dropping-insertion-point': {
+		height: 3,
+	},
+	blockShortcodeContainer: {
+		padding: 12,
+	},
+	'wp-block-list-item__list-item--default': {
+		fontSize: 16,
+	},
+	'wp-block-list-item__list-item-placeholder': {
+		color: '#87a6bc',
+	},
+	innerAppender: {
+		marginLeft: 8,
 	},
 };

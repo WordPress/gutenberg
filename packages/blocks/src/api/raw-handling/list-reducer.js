@@ -13,7 +13,7 @@ function shallowTextContent( element ) {
 		.join( '' );
 }
 
-export default function( node ) {
+export default function listReducer( node ) {
 	if ( ! isList( node ) ) {
 		return;
 	}

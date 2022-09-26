@@ -1,4 +1,4 @@
-module.exports = function( api ) {
+module.exports = ( api ) => {
 	api.cache( true );
 	return {
 		presets: [ 'module:metro-react-native-babel-preset' ],
@@ -27,7 +27,7 @@ module.exports = function( api ) {
 				exclude: /node_modules\/react-native/,
 			},
 			{
-				// Auto-add `import { createElement } from '@wordpress/element';` when JSX is found
+				// Auto-add `import { createElement } from '@wordpress/element';` when JSX is found.
 				plugins: [
 					[
 						'../../packages/babel-plugin-import-jsx-pragma',

@@ -1,7 +1,10 @@
-$components-custom-gradient-picker__padding: 3px; // 24px container, 18px handles inside, that leaves 6px padding, half of which is 3.
+$components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 16px handles inside, that leaves 32px padding, half of which is 1å6.
 
 .components-custom-gradient-picker {
-	margin-top: $grid-size;
+	&:not(.is-next-has-no-margin) {
+		margin-top: $grid-unit-15;
+		margin-bottom: $grid-unit-30;
+	}
 }
 
 .components-custom-gradient-picker__gradient-bar:not(.has-gradient) {
@@ -9,55 +12,76 @@ $components-custom-gradient-picker__padding: 3px; // 24px container, 18px handle
 }
 
 .components-custom-gradient-picker__gradient-bar {
+	border-radius: $radius-block-ui;
 	width: 100%;
-	height: $icon-button-size-small;
-	border-radius: $icon-button-size-small;
-	margin-bottom: $grid-size-large;
-	padding-left: $components-custom-gradient-picker__padding;
-	padding-right: $icon-button-size-small - $components-custom-gradient-picker__padding;
+	height: $grid-unit-60;
 
 	.components-custom-gradient-picker__markers-container {
 		position: relative;
+		width: calc(100% - #{ $grid-unit-60 });
+		margin-left: auto;
+		margin-right: auto;
 	}
 
-	.components-custom-gradient-picker__insert-point {
+	.components-custom-gradient-picker__control-point-dropdown {
+		position: absolute;
+		height: $grid-unit-20;
+		width: $grid-unit-20;
+		top: $components-custom-gradient-picker__padding;
+		// Trim any internal white spacing that would be cause d by inline positioned elements
+		display: flex;
+	}
+
+	.components-custom-gradient-picker__insert-point-dropdown {
+		position: relative;
+
+		// Same size as the .components-custom-gradient-picker__control-point-dropdown parent
+		height: inherit;
+		width: inherit;
+		min-width: $grid-unit-20;
 		border-radius: 50%;
+
 		background: $white;
 		padding: 2px;
-		width: $icon-button-size-small;
-		height: $icon-button-size-small;
-		position: relative;
+
+		color: $gray-900;
+
+		svg {
+			height: 100%;
+			width: 100%;
+		}
 	}
 
 	.components-custom-gradient-picker__control-point-button {
-		border: 2px solid $white;
+		// Same size as the .components-custom-gradient-picker__control-point-dropdown parent
+		height: inherit;
+		width: inherit;
 		border-radius: 50%;
-		height: 18px;
-		position: absolute;
-		width: 18px;
-		top: $components-custom-gradient-picker__padding;
+		padding: 0;
 
+		// Shadow and stroke.
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white, 0 0 $border-width-focus 0 rgba($black, 0.25);
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+
+		&:focus,
 		&.is-active {
-			background: #fafafa;
-			color: #23282d;
-			border-color: #999;
-			box-shadow:
-				inset 0 -1px 0 #999,
-				0 0 0 1px $white,
-				0 0 0 3px $blue-medium-focus;
+			box-shadow: inset 0 0 0 calc(var(--wp-admin-border-width-focus) * 2) $white, 0 0 $border-width-focus 0 rgba($black, 0.25);
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: $border-width-tab solid transparent;
 		}
 	}
 }
 
-.components-custom-gradient-picker__color-picker-popover .components-custom-gradient-picker__remove-control-point {
-	margin-left: auto;
-	margin-right: auto;
-	display: block;
-	margin-bottom: 8px;
+.components-custom-gradient-picker__remove-control-point-wrapper {
+	padding-bottom: $grid-unit-10;
 }
 
 .components-custom-gradient-picker__inserter {
-	width: 100%;
+	/*rtl:ignore*/
+	direction: ltr;
 }
 
 .components-custom-gradient-picker__liner-gradient-indicator {
@@ -65,18 +89,6 @@ $components-custom-gradient-picker__padding: 3px; // 24px container, 18px handle
 	flex: 0 auto;
 	width: 20px;
 	height: 20px;
-}
-
-.components-custom-gradient-picker__ui-line {
-	display: flex;
-	justify-content: space-between;
-}
-
-.components-custom-gradient-picker .components-custom-gradient-picker__ui-line {
-	.components-base-control.components-angle-picker,
-	.components-base-control.components-custom-gradient-picker__type-picker {
-		margin-bottom: 0;
-	}
 }
 
 .components-custom-gradient-picker .components-custom-gradient-picker__toolbar {
@@ -91,7 +103,7 @@ $components-custom-gradient-picker__padding: 3px; // 24px container, 18px handle
 		&.is-pressed {
 			> svg {
 				background: $white;
-				border: 1px solid $dark-gray-200;
+				border: 1px solid $gray-600;
 				border-radius: 2px;
 			}
 		}

@@ -118,10 +118,10 @@ describe( 'useViewportMatch', () => {
 		expect( root.toJSON() ).toBe( 'useViewportMatch: false' );
 
 		expect( useMediaQueryMock.mock.calls ).toEqual( [
-			[ false ],
-			[ false ],
-			[ false ],
-			[ false ],
+			[ undefined ],
+			[ undefined ],
+			[ undefined ],
+			[ undefined ],
 		] );
 
 		root.unmount();

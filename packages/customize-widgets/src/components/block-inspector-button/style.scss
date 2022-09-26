@@ -1,0 +1,21 @@
+#customize-theme-controls .customize-pane-child.accordion-section-content.customize-widgets-layout__inspector {
+	background: $white;
+	box-sizing: border-box;
+
+	* {
+		box-sizing: inherit;
+	}
+
+	.block-editor-block-inspector {
+		margin: -$grid-unit-15;
+
+		// To override the style in block-editor/block-inspector.
+		h3 {
+			margin-bottom: 0;
+		}
+	}
+}
+
+#customize-theme-controls .customize-pane-child.control-section-sidebar.is-sub-section-open {
+	transform: translateX(-100%);
+}

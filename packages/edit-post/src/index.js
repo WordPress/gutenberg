@@ -1,25 +1,23 @@
 /**
  * WordPress dependencies
  */
-import '@wordpress/core-data';
-import '@wordpress/block-editor';
-import '@wordpress/editor';
-import '@wordpress/keyboard-shortcuts';
-import '@wordpress/viewport';
-import '@wordpress/notices';
+import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
+import { dispatch, select } from '@wordpress/data';
+import { addFilter } from '@wordpress/hooks';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 import './hooks';
 import './plugins';
-import './store';
 import Editor from './editor';
+import { store as editPostStore } from './store';
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -67,11 +65,8 @@ export function reinitializeEditor(
 /**
  * Initializes and returns an instance of Editor.
  *
- * The return value of this function is not necessary if we change where we
- * call initializeEditor(). This is due to metaBox timing.
- *
  * @param {string}  id           Unique identifier for editor instance.
- * @param {Object}  postType     Post type of the post to edit.
+ * @param {string}  postType     Post type of the post to edit.
  * @param {Object}  postId       ID of the post to edit.
  * @param {?Object} settings     Editor settings object.
  * @param {Object}  initialEdits Programmatic edits to apply initially, to be
@@ -85,6 +80,22 @@ export function initializeEditor(
 	settings,
 	initialEdits
 ) {
+	// Prevent adding template part in the post editor.
+	// Only add the filter when the post editor is initialized, not imported.
+	addFilter(
+		'blockEditor.__unstableCanInsertBlockType',
+		'removeTemplatePartsFromInserter',
+		( can, blockType ) => {
+			if (
+				! select( editPostStore ).isEditingTemplate() &&
+				blockType.name === 'core/template-part'
+			) {
+				return false;
+			}
+			return can;
+		}
+	);
+
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind(
 		null,
@@ -94,9 +105,36 @@ export function initializeEditor(
 		settings,
 		initialEdits
 	);
+
+	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
+		editorMode: 'visual',
+		fixedToolbar: false,
+		fullscreenMode: true,
+		hiddenBlockTypes: [],
+		inactivePanels: [],
+		isPublishSidebarEnabled: true,
+		openPanels: [ 'post-status' ],
+		preferredStyleVariations: {},
+		showBlockBreadcrumbs: true,
+		showIconLabels: false,
+		showListViewByDefault: false,
+		themeStyles: true,
+		welcomeGuide: true,
+		welcomeGuideTemplate: true,
+	} );
+
+	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+
+	// Check if the block list view should be open by default.
+	if ( select( editPostStore ).isFeatureActive( 'showListViewByDefault' ) ) {
+		dispatch( editPostStore ).setIsListViewOpened( true );
+	}
+
 	registerCoreBlocks();
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+		__experimentalRegisterExperimentalCoreBlocks( {
+			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
+		} );
 	}
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
@@ -113,14 +151,14 @@ export function initializeEditor(
 	// Without this hack the browser scrolls the mobile toolbar off-screen.
 	// Once supported in Safari we can replace this in favor of preventScroll.
 	// For details see issue #18632 and PR #18686
-	// Specifically, we scroll `block-editor-editor-skeleton__body` to enable a fixed top toolbar.
+	// Specifically, we scroll `interface-interface-skeleton__body` to enable a fixed top toolbar.
 	// But Mobile Safari forces the `html` element to scroll upwards, hiding the toolbar.
 
 	const isIphone = window.navigator.userAgent.indexOf( 'iPhone' ) !== -1;
 	if ( isIphone ) {
-		window.addEventListener( 'scroll', function( event ) {
+		window.addEventListener( 'scroll', ( event ) => {
 			const editorScrollContainer = document.getElementsByClassName(
-				'block-editor-editor-skeleton__body'
+				'interface-interface-skeleton__body'
 			)[ 0 ];
 			if ( event.target === document ) {
 				// Scroll element into view by scrolling the editor container by the same amount
@@ -129,11 +167,19 @@ export function initializeEditor(
 					editorScrollContainer.scrollTop =
 						editorScrollContainer.scrollTop + window.scrollY;
 				}
-				//Undo unwanted scroll on html element
-				window.scrollTo( 0, 0 );
+				// Undo unwanted scroll on html element, but only in the visual editor.
+				if (
+					document.getElementsByClassName( 'is-mode-visual' )[ 0 ]
+				) {
+					window.scrollTo( 0, 0 );
+				}
 			}
 		} );
 	}
+
+	// Prevent the default browser action for files dropped outside of dropzones.
+	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
+	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
 
 	render(
 		<Editor
@@ -155,3 +201,6 @@ export { default as PluginPostStatusInfo } from './components/sidebar/plugin-pos
 export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
+export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
+export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
+export { store } from './store';

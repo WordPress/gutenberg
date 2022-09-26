@@ -1,8 +1,13 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
-import { uniqueId } from 'lodash';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+/**
+ * WordPress dependencies
+ */
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -11,6 +16,7 @@ import { DimensionControl } from '../';
 
 describe( 'DimensionControl', () => {
 	const onChangeHandler = jest.fn();
+	const instanceId = 1;
 
 	afterEach( () => {
 		onChangeHandler.mockClear();
@@ -18,36 +24,36 @@ describe( 'DimensionControl', () => {
 
 	describe( 'rendering', () => {
 		it( 'renders with defaults', () => {
-			const wrapper = shallow(
+			const { container } = render(
 				<DimensionControl
-					instanceId={ uniqueId() }
+					instanceId={ instanceId }
 					label={ 'Padding' }
 				/>
 			);
-			expect( wrapper ).toMatchSnapshot();
+			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'renders with icon and default icon label', () => {
-			const wrapper = shallow(
+			const { container } = render(
 				<DimensionControl
-					instanceId={ uniqueId() }
+					instanceId={ instanceId }
 					label={ 'Margin' }
-					icon={ 'tablet' }
+					icon={ plus }
 				/>
 			);
-			expect( wrapper ).toMatchSnapshot();
+			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'renders with icon and custom icon label', () => {
-			const wrapper = shallow(
+			const { container } = render(
 				<DimensionControl
-					instanceId={ uniqueId() }
+					instanceId={ instanceId }
 					label={ 'Margin' }
-					icon={ 'tablet' }
+					icon={ plus }
 					iconLabel={ 'Tablet Devices' }
 				/>
 			);
-			expect( wrapper ).toMatchSnapshot();
+			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'renders with custom sizes', () => {
@@ -69,67 +75,57 @@ describe( 'DimensionControl', () => {
 				},
 			];
 
-			const wrapper = shallow(
+			const { container } = render(
 				<DimensionControl
-					instanceId={ uniqueId() }
+					instanceId={ instanceId }
 					label={ 'Custom Dimension' }
 					sizes={ customSizes }
 				/>
 			);
-			expect( wrapper ).toMatchSnapshot();
+			expect( container ).toMatchSnapshot();
 		} );
 	} );
 
 	describe( 'callbacks', () => {
-		it( 'should call onChange handler with correct args on size change', () => {
-			const wrapper = mount(
+		it( 'should call onChange handler with correct args on size change', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			render(
 				<DimensionControl
-					instanceId={ uniqueId() }
+					instanceId={ instanceId }
 					label={ 'Padding' }
 					onChange={ onChangeHandler }
 				/>
 			);
 
-			wrapper
-				.find( 'select' )
-				.at( 0 )
-				.simulate( 'change', {
-					target: {
-						value: 'small',
-					},
-				} );
-
-			wrapper
-				.find( 'select' )
-				.at( 0 )
-				.simulate( 'change', {
-					target: {
-						value: 'medium',
-					},
-				} );
+			await user.selectOptions( screen.getByRole( 'combobox' ), 'small' );
+			await user.selectOptions(
+				screen.getByRole( 'combobox' ),
+				'medium'
+			);
 
 			expect( onChangeHandler ).toHaveBeenCalledTimes( 2 );
 			expect( onChangeHandler.mock.calls[ 0 ][ 0 ] ).toEqual( 'small' );
 			expect( onChangeHandler.mock.calls[ 1 ][ 0 ] ).toEqual( 'medium' );
 		} );
 
-		it( 'should call onChange handler with undefined value when no size is provided on change', () => {
-			const wrapper = mount(
+		it( 'should call onChange handler with undefined value when no size is provided on change', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			render(
 				<DimensionControl
-					instanceId={ uniqueId() }
+					instanceId={ instanceId }
 					label={ 'Padding' }
 					onChange={ onChangeHandler }
 				/>
 			);
 
-			wrapper
-				.find( 'select' )
-				.at( 0 )
-				.simulate( 'change', {
-					target: {
-						value: '', // this happens when you select the "default" <option />
-					},
-				} );
+			// Select the "default" <option />
+			await user.selectOptions( screen.getByRole( 'combobox' ), '' );
 
 			expect( onChangeHandler ).toHaveBeenNthCalledWith( 1, undefined );
 		} );

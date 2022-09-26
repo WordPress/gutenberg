@@ -1,7 +1,6 @@
-ButtonBlockAppender
-=============================
+# ButtonBlockAppender
 
-`ButtonBlockAppender` provides button with a `+` (plus) icon which when clicked will trigger the default Block `Inserter` UI to allow a Block to be inserted. 
+`ButtonBlockAppender` provides button with a `+` (plus) icon which when clicked will trigger the default Block `Inserter` UI to allow a Block to be inserted.
 
 This is typically used as an alternative to the `<DefaultBlockAppender />` component to determine the initial placeholder behaviour for a Block when displayed in the editor UI.
 
@@ -9,9 +8,8 @@ This is typically used as an alternative to the `<DefaultBlockAppender />` compo
 
 In a block's `edit` implementation, render a `<ButtonBlockAppender />` component passing in the `rootClientId`.
 
-
 ```jsx
-function render( { clientId }) {
+function render( { clientId } ) {
 	return (
 		<div>
 			<p>Some rendered content here</p>
@@ -21,20 +19,22 @@ function render( { clientId }) {
 }
 ```
 
-_Note:_ 
+_Note:_
 
 ## Props
 
 ### `rootClientId`
-* **Type:** `String`
-* **Required** `true`
-* **Default:** `undefined`
+
+-   **Type:** `String`
+-   **Required** `true`
+-   **Default:** `undefined`
 
 The `clientId` of the Block from who's root new Blocks should be inserted. This prop is required by the block `Inserter` component. Typically this is the `clientID` of the Block where the prop is being rendered.
 
 ### `className`
-* **Type:** `String`
-* **Default:** `""`
+
+-   **Type:** `String`
+-   **Default:** `""`
 
 A CSS `class` to be _prepended_ to the default class of `"button-block-appender"`.
 

@@ -5,7 +5,7 @@ import { createNewPost, pressKeyWithModifier } from '@wordpress/e2e-test-utils';
 
 function isCloseButtonFocused() {
 	return page.$eval( ':focus', ( focusedElement ) => {
-		return focusedElement.getAttribute( 'aria-label' ) === 'Close dialog';
+		return focusedElement.getAttribute( 'aria-label' ) === 'Close';
 	} );
 }
 
@@ -15,7 +15,7 @@ describe( 'a11y', () => {
 	} );
 
 	it( 'tabs header bar', async () => {
-		await pressKeyWithModifier( 'ctrl', '~' );
+		await pressKeyWithModifier( 'ctrl', '`' );
 
 		await page.keyboard.press( 'Tab' );
 
@@ -23,7 +23,7 @@ describe( 'a11y', () => {
 			':focus',
 			( focusedElement ) => {
 				return focusedElement.classList.contains(
-					'editor-post-publish-button__button'
+					'edit-post-header-toolbar__inserter-toggle'
 				);
 			}
 		);

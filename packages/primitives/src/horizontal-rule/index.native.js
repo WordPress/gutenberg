@@ -3,12 +3,27 @@
  */
 import Hr from 'react-native-hr';
 
-export const HorizontalRule = ( props ) => {
-	const lineStyle = {
-		backgroundColor: '#555d66',
-		height: 2,
-		...props.lineStyle,
-	};
+/**
+ * WordPress dependencies
+ */
+import { withPreferredColorScheme } from '@wordpress/compose';
 
-	return <Hr { ...props } lineStyle={ lineStyle } />;
+/**
+ * Internal dependencies
+ */
+import styles from './styles.scss';
+
+const HR = ( { getStylesFromColorScheme, ...props } ) => {
+	const lineStyle = getStylesFromColorScheme( styles.line, styles.lineDark );
+
+	return (
+		<Hr
+			{ ...props }
+			lineStyle={ [ lineStyle, props.lineStyle ] }
+			marginLeft={ 0 }
+			marginRight={ 0 }
+		/>
+	);
 };
+
+export const HorizontalRule = withPreferredColorScheme( HR );

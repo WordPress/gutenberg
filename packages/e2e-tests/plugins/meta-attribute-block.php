@@ -29,13 +29,23 @@ add_action( 'init', 'init_test_meta_attribute_block_plugin' );
  */
 function enqueue_test_meta_attribute_block() {
 	wp_enqueue_script(
-		'gutenberg-test-meta-attribute-block',
-		plugins_url( 'meta-attribute-block/index.js', __FILE__ ),
+		'gutenberg-test-meta-attribute-block-early',
+		plugins_url( 'meta-attribute-block/early.js', __FILE__ ),
 		array(
 			'wp-blocks',
 			'wp-element',
 		),
-		filemtime( plugin_dir_path( __FILE__ ) . 'meta-attribute-block/index.js' ),
+		filemtime( plugin_dir_path( __FILE__ ) . 'meta-attribute-block/early.js' )
+	);
+
+	wp_enqueue_script(
+		'gutenberg-test-meta-attribute-block-late',
+		plugins_url( 'meta-attribute-block/late.js', __FILE__ ),
+		array(
+			'wp-blocks',
+			'wp-element',
+		),
+		filemtime( plugin_dir_path( __FILE__ ) . 'meta-attribute-block/late.js' ),
 		true
 	);
 }

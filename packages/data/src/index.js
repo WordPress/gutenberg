@@ -1,13 +1,15 @@
 /**
  * External dependencies
  */
-import combineReducers from 'turbo-combine-reducers';
+import turboCombineReducers from 'turbo-combine-reducers';
 
 /**
  * Internal dependencies
  */
 import defaultRegistry from './default-registry';
 import * as plugins from './plugins';
+
+/** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
 
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
@@ -17,14 +19,16 @@ export {
 	RegistryConsumer,
 	useRegistry,
 } from './components/registry-provider';
-export { default as useSelect } from './components/use-select';
 export {
-	useDispatch,
-	useDispatchWithMap as __unstableUseDispatchWithMap,
-} from './components/use-dispatch';
+	default as useSelect,
+	useSuspenseSelect,
+} from './components/use-select';
+export { useDispatch } from './components/use-dispatch';
 export { AsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
+export { controls } from './controls';
+export { default as createReduxStore } from './redux-store';
 
 /**
  * Object of available plugins to use with a registry.
@@ -39,12 +43,13 @@ export { plugins };
  * The combineReducers helper function turns an object whose values are different
  * reducing functions into a single reducing function you can pass to registerReducer.
  *
+ * @type  {import('./types').combineReducers}
  * @param {Object} reducers An object whose values correspond to different reducing
  *                          functions that need to be combined into one.
  *
  * @example
  * ```js
- * const { combineReducers, registerStore } = wp.data;
+ * import { combineReducers, createReduxStore, register } from '@wordpress/data';
  *
  * const prices = ( state = {}, action ) => {
  * 	return action.type === 'SET_PRICE' ?
@@ -61,31 +66,35 @@ export { plugins };
  * 		state;
  * };
  *
- * registerStore( 'my-shop', {
+ * const store = createReduxStore( 'my-shop', {
  * 	reducer: combineReducers( {
  * 		prices,
  * 		discountPercent,
  * 	} ),
  * } );
+ * register( store );
  * ```
  *
- * @return {Function}       A reducer that invokes every reducer inside the reducers
- *                          object, and constructs a state object with the same shape.
+ * @return {Function} A reducer that invokes every reducer inside the reducers
+ *                    object, and constructs a state object with the same shape.
  */
-export { combineReducers };
+export const combineReducers = turboCombineReducers;
 
 /**
- * Given the name of a registered store, returns an object of the store's selectors.
+ * Given a store descriptor, returns an object of the store's selectors.
  * The selector functions are been pre-bound to pass the current state automatically.
  * As a consumer, you need only pass arguments of the selector, if applicable.
  *
- * @param {string} name Store name.
+ * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
+ *                                                       convention of passing the store name is
+ *                                                       also supported.
  *
  * @example
  * ```js
- * const { select } = wp.data;
+ * import { select } from '@wordpress/data';
+ * import { store as myCustomStore } from 'my-custom-store';
  *
- * select( 'my-shop' ).getPrice( 'hammer' );
+ * select( myCustomStore ).getPrice( 'hammer' );
  * ```
  *
  * @return {Object} Object containing the store's selectors.
@@ -93,39 +102,56 @@ export { combineReducers };
 export const select = defaultRegistry.select;
 
 /**
- * Given the name of a registered store, returns an object containing the store's
- * selectors pre-bound to state so that you only need to supply additional arguments,
- * and modified so that they return promises that resolve to their eventual values,
- * after any resolvers have ran.
+ * Given a store descriptor, returns an object containing the store's selectors pre-bound to state
+ * so that you only need to supply additional arguments, and modified so that they return promises
+ * that resolve to their eventual values, after any resolvers have ran.
  *
- * @param {string} name Store name.
+ * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
+ *                                                       convention of passing the store name is
+ *                                                       also supported.
  *
  * @example
  * ```js
- * const { __experimentalResolveSelect } = wp.data;
+ * import { resolveSelect } from '@wordpress/data';
+ * import { store as myCustomStore } from 'my-custom-store';
  *
- * __experimentalResolveSelect( 'my-shop' ).getPrice( 'hammer' ).then(console.log)
+ * resolveSelect( myCustomStore ).getPrice( 'hammer' ).then(console.log)
  * ```
  *
  * @return {Object} Object containing the store's promise-wrapped selectors.
  */
-export const __experimentalResolveSelect =
-	defaultRegistry.__experimentalResolveSelect;
+export const resolveSelect = defaultRegistry.resolveSelect;
 
 /**
- * Given the name of a registered store, returns an object of the store's action creators.
+ * Given a store descriptor, returns an object containing the store's selectors pre-bound to state
+ * so that you only need to supply additional arguments, and modified so that they throw promises
+ * in case the selector is not resolved yet.
+ *
+ * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
+ *                                                       convention of passing the store name is
+ *                                                       also supported.
+ *
+ * @return {Object} Object containing the store's suspense-wrapped selectors.
+ */
+export const suspendSelect = defaultRegistry.suspendSelect;
+
+/**
+ * Given a store descriptor, returns an object of the store's action creators.
  * Calling an action creator will cause it to be dispatched, updating the state value accordingly.
  *
  * Note: Action creators returned by the dispatch will return a promise when
  * they are called.
  *
- * @param {string} name Store name.
+ * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
+ *                                                       convention of passing the store name is
+ *                                                       also supported.
  *
  * @example
  * ```js
- * const { dispatch } = wp.data;
+ * import { dispatch } from '@wordpress/data';
+ * import { store as myCustomStore } from 'my-custom-store';
  *
- * dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
+ * dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
  * ```
  * @return {Object} Object containing the action creators.
  */
@@ -140,7 +166,7 @@ export const dispatch = defaultRegistry.dispatch;
  *
  * @example
  * ```js
- * const { subscribe } = wp.data;
+ * import { subscribe } from '@wordpress/data';
  *
  * const unsubscribe = subscribe( () => {
  * 	// You could use this opportunity to test whether the derived result of a
@@ -154,18 +180,22 @@ export const dispatch = defaultRegistry.dispatch;
 export const subscribe = defaultRegistry.subscribe;
 
 /**
- * Registers a generic store.
+ * Registers a generic store instance.
  *
- * @param {string} key    Store registry key.
- * @param {Object} config Configuration (getSelectors, getActions, subscribe).
+ * @deprecated Use `register( storeDescriptor )` instead.
+ *
+ * @param {string} name  Store registry name.
+ * @param {Object} store Store instance (`{ getSelectors, getActions, subscribe }`).
  */
 export const registerGenericStore = defaultRegistry.registerGenericStore;
 
 /**
  * Registers a standard `@wordpress/data` store.
  *
- * @param {string} reducerKey Reducer key.
- * @param {Object} options    Store description (reducer, actions, selectors, resolvers).
+ * @deprecated Use `register` instead.
+ *
+ * @param {string} storeName Unique namespace identifier for the store.
+ * @param {Object} options   Store description (reducer, actions, selectors, resolvers).
  *
  * @return {Object} Registered store object.
  */
@@ -179,3 +209,23 @@ export const registerStore = defaultRegistry.registerStore;
  * @param {Object} plugin Plugin object.
  */
 export const use = defaultRegistry.use;
+
+/**
+ * Registers a standard `@wordpress/data` store descriptor.
+ *
+ * @example
+ * ```js
+ * import { createReduxStore, register } from '@wordpress/data';
+ *
+ * const store = createReduxStore( 'demo', {
+ *     reducer: ( state = 'OK' ) => state,
+ *     selectors: {
+ *         getValue: ( state ) => state,
+ *     },
+ * } );
+ * register( store );
+ * ```
+ *
+ * @param {StoreDescriptor} store Store descriptor.
+ */
+export const register = defaultRegistry.register;

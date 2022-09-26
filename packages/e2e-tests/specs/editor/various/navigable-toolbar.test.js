@@ -3,6 +3,14 @@
  */
 import { createNewPost, pressKeyWithModifier } from '@wordpress/e2e-test-utils';
 
+async function isInBlockToolbar() {
+	return await page.evaluate( () => {
+		return !! document.activeElement.closest(
+			'.block-editor-block-toolbar'
+		);
+	} );
+}
+
 describe.each( [
 	[ 'unified', true ],
 	[ 'contextual', false ],
@@ -12,37 +20,24 @@ describe.each( [
 
 		await page.evaluate( ( _isUnifiedToolbar ) => {
 			const { select, dispatch } = wp.data;
-			const isCurrentlyUnified = select(
-				'core/edit-post'
-			).isFeatureActive( 'fixedToolbar' );
+			const isCurrentlyUnified =
+				select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' );
 			if ( isCurrentlyUnified !== _isUnifiedToolbar ) {
 				dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
 			}
 		}, isUnifiedToolbar );
 	} );
 
-	const isInBlockToolbar = () =>
-		page.evaluate( ( _isUnifiedToolbar ) => {
-			if ( _isUnifiedToolbar ) {
-				return !! document.activeElement
-					.closest( '.edit-post-header-toolbar' )
-					.querySelector( '.block-editor-block-toolbar' );
-			}
-			return !! document.activeElement.closest(
-				'.block-editor-block-toolbar'
-			);
-		}, isUnifiedToolbar );
-
 	it( 'navigates in and out of toolbar by keyboard (Alt+F10, Escape)', async () => {
 		// Assumes new post focus starts in title. Create first new
-		// block by ArrowDown.
-		await page.keyboard.press( 'ArrowDown' );
+		// block by Enter.
+		await page.keyboard.press( 'Enter' );
 
 		// [TEMPORARY]: A new paragraph is not technically a block yet
 		// until starting to type within it.
 		await page.keyboard.type( 'Example' );
 
-		// Upward
+		// Upward.
 		await pressKeyWithModifier( 'alt', 'F10' );
 		expect( await isInBlockToolbar() ).toBe( true );
 	} );
@@ -50,11 +45,12 @@ describe.each( [
 	if ( ! isUnifiedToolbar ) {
 		it( 'should not scroll page', async () => {
 			while (
-				await page.evaluate(
-					() =>
-						wp.dom.getScrollContainer( document.activeElement )
-							.scrollTop === 0
-				)
+				await page.evaluate( () => {
+					const scrollable = wp.dom.getScrollContainer(
+						document.activeElement
+					);
+					return ! scrollable || scrollable.scrollTop === 0;
+				} )
 			) {
 				await page.keyboard.press( 'Enter' );
 			}

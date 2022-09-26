@@ -7,6 +7,7 @@ import { verse as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
@@ -18,20 +19,17 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Verse' ),
-	description: __(
-		'Insert poetry. Use special spacing formats. Or quote song lyrics.'
-	),
 	icon,
 	example: {
 		attributes: {
+			/* eslint-disable @wordpress/i18n-no-collapsible-whitespace */
 			// translators: Sample content for the Verse block. Can be replaced with a more locale-adequate work.
 			content: __(
 				'WHAT was he doing, the great god Pan,\n	Down in the reeds by the river?\nSpreading ruin and scattering ban,\nSplashing and paddling with hoofs of a goat,\nAnd breaking the golden lilies afloat\n    With the dragon-fly on the river.'
 			),
+			/* eslint-enable @wordpress/i18n-no-collapsible-whitespace */
 		},
 	},
-	keywords: [ __( 'poetry' ), __( 'poem' ) ],
 	transforms,
 	deprecated,
 	merge( attributes, attributesToMerge ) {
@@ -42,3 +40,5 @@ export const settings = {
 	edit,
 	save,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

@@ -7,16 +7,13 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import BlockControls from '../block-controls';
-import BlockFormatControls from '../block-format-controls';
 import UngroupButton from '../ungroup-button';
+import { store as blockEditorStore } from '../../store';
 
 export default function BlockToolbar() {
 	const { blockClientIds, isValid, mode } = useSelect( ( select ) => {
-		const {
-			getBlockMode,
-			getSelectedBlockClientIds,
-			isBlockValid,
-		} = select( 'core/block-editor' );
+		const { getBlockMode, getSelectedBlockClientIds, isBlockValid } =
+			select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 
 		return {
@@ -41,8 +38,10 @@ export default function BlockToolbar() {
 			{ mode === 'visual' && isValid && (
 				<>
 					<UngroupButton />
+					<BlockControls.Slot group="block" />
 					<BlockControls.Slot />
-					<BlockFormatControls.Slot />
+					<BlockControls.Slot group="inline" />
+					<BlockControls.Slot group="other" />
 				</>
 			) }
 		</>

@@ -3,43 +3,26 @@
  */
 const { command } = require( 'execa' );
 const { join } = require( 'path' );
-const writePkg = require( 'write-pkg' );
 
 /**
  * Internal dependencies
  */
 const { info } = require( './log' );
 
-module.exports = async function( {
-	author,
-	description,
-	license,
-	slug,
-	version,
-} ) {
+module.exports = async ( { slug } ) => {
 	const cwd = join( process.cwd(), slug );
 
 	info( '' );
-	info( 'Creating a "package.json" file.' );
-	await writePkg( cwd, {
-		name: slug,
-		version,
-		description,
-		author,
-		license,
-		main: 'build/index.js',
-		scripts: {
-			build: 'wp-scripts build',
-			'lint:css': 'wp-scripts lint-style',
-			'lint:js': 'wp-scripts lint-js',
-			start: 'wp-scripts start',
-			'packages-update': 'wp-scripts packages-update',
-		},
+	info(
+		'Installing `@wordpress/scripts` package. It might take a couple of minutes...'
+	);
+	await command( 'npm install @wordpress/scripts --save-dev', {
+		cwd,
 	} );
 
 	info( '' );
-	info( 'Installing packages. It might take a couple of minutes.' );
-	await command( 'npm install @wordpress/scripts --save-dev', {
+	info( 'Formatting JavaScript files.' );
+	await command( 'npm run format', {
 		cwd,
 	} );
 

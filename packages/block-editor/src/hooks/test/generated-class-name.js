@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
@@ -13,11 +8,13 @@ import { applyFilters } from '@wordpress/hooks';
  */
 import '../generated-class-name';
 
+const noop = () => {};
+
 describe( 'generated className', () => {
 	const blockSettings = {
 		name: 'chicken/ribs',
 		save: noop,
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 

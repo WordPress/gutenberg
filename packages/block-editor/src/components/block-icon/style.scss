@@ -4,12 +4,16 @@
 	justify-content: center;
 	width: 24px;
 	height: 24px;
-	margin: 0;
-	border-radius: 4px;
 
 	&.has-colors {
 		svg {
 			fill: currentColor;
+
+			// Optimizate for high contrast modes.
+			// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
+			@media (forced-colors: active) {
+				fill: CanvasText;
+			}
 		}
 	}
 

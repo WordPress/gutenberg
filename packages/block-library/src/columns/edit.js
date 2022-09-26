@@ -2,31 +2,40 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { dropRight, get, map, times } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, RangeControl } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
+import {
+	Notice,
+	PanelBody,
+	RangeControl,
+	ToggleControl,
+} from '@wordpress/components';
 
 import {
 	InspectorControls,
-	InnerBlocks,
+	useInnerBlocksProps,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
-	__experimentalUseColors,
+	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+import {
+	createBlock,
+	createBlocksFromInnerBlocksTemplate,
+	store as blocksStore,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import {
-	hasExplicitColumnWidths,
+	hasExplicitPercentColumnWidths,
 	getMappedColumnWidths,
 	getRedistributedColumnWidths,
 	toWidthPrecision,
@@ -45,40 +54,34 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
 
 function ColumnsEditContainer( {
 	attributes,
-	className,
+	setAttributes,
 	updateAlignment,
 	updateColumns,
 	clientId,
 } ) {
-	const { verticalAlignment } = attributes;
+	const { isStackedOnMobile, verticalAlignment } = attributes;
 
 	const { count } = useSelect(
 		( select ) => {
 			return {
-				count: select( 'core/block-editor' ).getBlockCount( clientId ),
+				count: select( blockEditorStore ).getBlockCount( clientId ),
 			};
 		},
 		[ clientId ]
 	);
 
-	const ref = useRef();
-	const {
-		BackgroundColor,
-		InspectorControlsColorPanel,
-		TextColor,
-	} = __experimentalUseColors(
-		[
-			{ name: 'textColor', property: 'color' },
-			{ name: 'backgroundColor', className: 'has-background' },
-		],
-		{
-			contrastCheckers: [ { backgroundColor: true, textColor: true } ],
-			colorDetector: { targetRef: ref },
-		}
-	);
-
-	const classes = classnames( className, {
+	const classes = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
+	} );
+
+	const blockProps = useBlockProps( {
+		className: classes,
+	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: ALLOWED_BLOCKS,
+		orientation: 'horizontal',
+		renderAppender: false,
 	} );
 
 	return (
@@ -95,22 +98,28 @@ function ColumnsEditContainer( {
 						label={ __( 'Columns' ) }
 						value={ count }
 						onChange={ ( value ) => updateColumns( count, value ) }
-						min={ 2 }
-						max={ 6 }
+						min={ 1 }
+						max={ Math.max( 6, count ) }
+					/>
+					{ count > 6 && (
+						<Notice status="warning" isDismissible={ false }>
+							{ __(
+								'This column count exceeds the recommended amount and may cause visual breakage.'
+							) }
+						</Notice>
+					) }
+					<ToggleControl
+						label={ __( 'Stack on mobile' ) }
+						checked={ isStackedOnMobile }
+						onChange={ () =>
+							setAttributes( {
+								isStackedOnMobile: ! isStackedOnMobile,
+							} )
+						}
 					/>
 				</PanelBody>
 			</InspectorControls>
-			{ InspectorControlsColorPanel }
-			<BackgroundColor>
-				<TextColor>
-					<div className={ classes } ref={ ref }>
-						<InnerBlocks
-							templateLock="all"
-							allowedBlocks={ ALLOWED_BLOCKS }
-						/>
-					</div>
-				</TextColor>
-			</BackgroundColor>
+			<div { ...innerBlocksProps } />
 		</>
 	);
 }
@@ -126,13 +135,13 @@ const ColumnsEditContainerWrapper = withDispatch(
 		 */
 		updateAlignment( verticalAlignment ) {
 			const { clientId, setAttributes } = ownProps;
-			const { updateBlockAttributes } = dispatch( 'core/block-editor' );
-			const { getBlockOrder } = registry.select( 'core/block-editor' );
+			const { updateBlockAttributes } = dispatch( blockEditorStore );
+			const { getBlockOrder } = registry.select( blockEditorStore );
 
 			// Update own alignment.
 			setAttributes( { verticalAlignment } );
 
-			// Update all child Column Blocks to match
+			// Update all child Column Blocks to match.
 			const innerBlockClientIds = getBlockOrder( clientId );
 			innerBlockClientIds.forEach( ( innerBlockClientId ) => {
 				updateBlockAttributes( innerBlockClientId, {
@@ -150,11 +159,12 @@ const ColumnsEditContainerWrapper = withDispatch(
 		 */
 		updateColumns( previousColumns, newColumns ) {
 			const { clientId } = ownProps;
-			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
-			const { getBlocks } = registry.select( 'core/block-editor' );
+			const { replaceInnerBlocks } = dispatch( blockEditorStore );
+			const { getBlocks } = registry.select( blockEditorStore );
 
 			let innerBlocks = getBlocks( clientId );
-			const hasExplicitWidths = hasExplicitColumnWidths( innerBlocks );
+			const hasExplicitWidths =
+				hasExplicitPercentColumnWidths( innerBlocks );
 
 			// Redistribute available width for existing inner blocks.
 			const isAddingColumn = newColumns > previousColumns;
@@ -173,24 +183,28 @@ const ColumnsEditContainerWrapper = withDispatch(
 
 				innerBlocks = [
 					...getMappedColumnWidths( innerBlocks, widths ),
-					...times( newColumns - previousColumns, () => {
+					...Array.from( {
+						length: newColumns - previousColumns,
+					} ).map( () => {
 						return createBlock( 'core/column', {
-							width: newColumnWidth,
+							width: `${ newColumnWidth }%`,
 						} );
 					} ),
 				];
 			} else if ( isAddingColumn ) {
 				innerBlocks = [
 					...innerBlocks,
-					...times( newColumns - previousColumns, () => {
+					...Array.from( {
+						length: newColumns - previousColumns,
+					} ).map( () => {
 						return createBlock( 'core/column' );
 					} ),
 				];
 			} else {
 				// The removed column will be the last of the inner blocks.
-				innerBlocks = dropRight(
-					innerBlocks,
-					previousColumns - newColumns
+				innerBlocks = innerBlocks.slice(
+					0,
+					-( previousColumns - newColumns )
 				);
 
 				if ( hasExplicitWidths ) {
@@ -204,77 +218,69 @@ const ColumnsEditContainerWrapper = withDispatch(
 				}
 			}
 
-			replaceInnerBlocks( clientId, innerBlocks, false );
+			replaceInnerBlocks( clientId, innerBlocks );
 		},
 	} )
 )( ColumnsEditContainer );
 
-const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
-	return map(
-		innerBlocksTemplate,
-		( [ name, attributes, innerBlocks = [] ] ) =>
-			createBlock(
-				name,
-				attributes,
-				createBlocksFromInnerBlocksTemplate( innerBlocks )
-			)
-	);
-};
-
-const ColumnsEdit = ( props ) => {
-	const { clientId, name } = props;
-	const {
-		blockType,
-		defaultVariation,
-		hasInnerBlocks,
-		variations,
-	} = useSelect(
+function Placeholder( { clientId, name, setAttributes } ) {
+	const { blockType, defaultVariation, variations } = useSelect(
 		( select ) => {
 			const {
 				getBlockVariations,
 				getBlockType,
 				getDefaultBlockVariation,
-			} = select( 'core/blocks' );
+			} = select( blocksStore );
 
 			return {
 				blockType: getBlockType( name ),
 				defaultVariation: getDefaultBlockVariation( name, 'block' ),
-				hasInnerBlocks:
-					select( 'core/block-editor' ).getBlocks( clientId ).length >
-					0,
 				variations: getBlockVariations( name, 'block' ),
 			};
 		},
-		[ clientId, name ]
+		[ name ]
 	);
-
-	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
-
-	if ( hasInnerBlocks ) {
-		return <ColumnsEditContainerWrapper { ...props } />;
-	}
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	const blockProps = useBlockProps();
 
 	return (
-		<__experimentalBlockVariationPicker
-			icon={ get( blockType, [ 'icon', 'src' ] ) }
-			label={ get( blockType, [ 'title' ] ) }
-			variations={ variations }
-			onSelect={ ( nextVariation = defaultVariation ) => {
-				if ( nextVariation.attributes ) {
-					props.setAttributes( nextVariation.attributes );
-				}
-				if ( nextVariation.innerBlocks ) {
-					replaceInnerBlocks(
-						props.clientId,
-						createBlocksFromInnerBlocksTemplate(
-							nextVariation.innerBlocks
-						)
-					);
-				}
-			} }
-			allowSkip
-		/>
+		<div { ...blockProps }>
+			<__experimentalBlockVariationPicker
+				icon={ get( blockType, [ 'icon', 'src' ] ) }
+				label={ get( blockType, [ 'title' ] ) }
+				variations={ variations }
+				onSelect={ ( nextVariation = defaultVariation ) => {
+					if ( nextVariation.attributes ) {
+						setAttributes( nextVariation.attributes );
+					}
+					if ( nextVariation.innerBlocks ) {
+						replaceInnerBlocks(
+							clientId,
+							createBlocksFromInnerBlocksTemplate(
+								nextVariation.innerBlocks
+							),
+							true
+						);
+					}
+				} }
+				allowSkip
+			/>
+		</div>
 	);
+}
+
+const ColumnsEdit = ( props ) => {
+	const { clientId } = props;
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlocks( clientId ).length > 0,
+		[ clientId ]
+	);
+	const Component = hasInnerBlocks
+		? ColumnsEditContainerWrapper
+		: Placeholder;
+
+	return <Component { ...props } />;
 };
 
 export default ColumnsEdit;

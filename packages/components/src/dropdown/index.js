@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -6,112 +7,132 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, createRef } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import Popover from '../popover';
 
-class Dropdown extends Component {
-	constructor() {
-		super( ...arguments );
+function useObservableState( initialState, onStateChange ) {
+	const [ state, setState ] = useState( initialState );
+	return [
+		state,
+		( value ) => {
+			setState( value );
+			if ( onStateChange ) {
+				onStateChange( value );
+			}
+		},
+	];
+}
 
-		this.toggle = this.toggle.bind( this );
-		this.close = this.close.bind( this );
-		this.closeIfFocusOutside = this.closeIfFocusOutside.bind( this );
+export default function Dropdown( props ) {
+	const {
+		renderContent,
+		renderToggle,
+		className,
+		contentClassName,
+		expandOnMobile,
+		headerTitle,
+		focusOnMount,
+		position,
+		popoverProps,
+		onClose,
+		onToggle,
+		style,
+	} = props;
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
+		useState( null );
+	const containerRef = useRef();
+	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
 
-		this.containerRef = createRef();
+	useEffect(
+		() => () => {
+			if ( onToggle && isOpen ) {
+				onToggle( false );
+			}
+		},
+		[ onToggle, isOpen ]
+	);
 
-		this.state = {
-			isOpen: false,
-		};
-	}
-
-	componentWillUnmount() {
-		const { isOpen } = this.state;
-		const { onToggle } = this.props;
-		if ( isOpen && onToggle ) {
-			onToggle( false );
-		}
-	}
-
-	componentDidUpdate( prevProps, prevState ) {
-		const { isOpen } = this.state;
-		const { onToggle } = this.props;
-		if ( prevState.isOpen !== isOpen && onToggle ) {
-			onToggle( isOpen );
-		}
-	}
-
-	toggle() {
-		this.setState( ( state ) => ( {
-			isOpen: ! state.isOpen,
-		} ) );
+	function toggle() {
+		setIsOpen( ! isOpen );
 	}
 
 	/**
-	 * Closes the dropdown if a focus leaves the dropdown wrapper. This is
-	 * intentionally distinct from `onClose` since focus loss from the popover
-	 * is expected to occur when using the Dropdown's toggle button, in which
-	 * case the correct behavior is to keep the dropdown closed. The same applies
-	 * in case when focus is moved to the modal dialog.
+	 * Closes the popover when focus leaves it unless the toggle was pressed or
+	 * focus has moved to a separate dialog. The former is to let the toggle
+	 * handle closing the popover and the latter is to preserve presence in
+	 * case a dialog has opened, allowing focus to return when it's dismissed.
 	 */
-	closeIfFocusOutside() {
+	function closeIfFocusOutside() {
+		const { ownerDocument } = containerRef.current;
+		const dialog = ownerDocument.activeElement.closest( '[role="dialog"]' );
 		if (
-			! this.containerRef.current.contains( document.activeElement ) &&
-			! document.activeElement.closest( '[role="dialog"]' )
+			! containerRef.current.contains( ownerDocument.activeElement ) &&
+			( ! dialog || dialog.contains( containerRef.current ) )
 		) {
-			this.close();
+			close();
 		}
 	}
 
-	close() {
-		if ( this.props.onClose ) {
-			this.props.onClose();
+	function close() {
+		if ( onClose ) {
+			onClose();
 		}
-		this.setState( { isOpen: false } );
+		setIsOpen( false );
 	}
 
-	render() {
-		const { isOpen } = this.state;
-		const {
-			renderContent,
-			renderToggle,
-			position = 'bottom',
-			className,
-			contentClassName,
-			expandOnMobile,
-			headerTitle,
-			focusOnMount,
-			popoverProps,
-		} = this.props;
+	const args = { isOpen, onToggle: toggle, onClose: close };
+	const popoverPropsHaveAnchor =
+		!! popoverProps?.anchor ||
+		// Note: `anchorRef`, `getAnchorRect` and `anchorRect` are deprecated and
+		// be removed from `Popover` from WordPress 6.3
+		!! popoverProps?.anchorRef ||
+		!! popoverProps?.getAnchorRect ||
+		!! popoverProps?.anchorRect;
 
-		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
-
-		return (
-			<div
-				className={ classnames( 'components-dropdown', className ) }
-				ref={ this.containerRef }
-			>
-				{ renderToggle( args ) }
-				{ isOpen && (
-					<Popover
-						className={ contentClassName }
-						position={ position }
-						onClose={ this.close }
-						onFocusOutside={ this.closeIfFocusOutside }
-						expandOnMobile={ expandOnMobile }
-						headerTitle={ headerTitle }
-						focusOnMount={ focusOnMount }
-						{ ...popoverProps }
-					>
-						{ renderContent( args ) }
-					</Popover>
-				) }
-			</div>
-		);
-	}
+	return (
+		<div
+			className={ classnames( 'components-dropdown', className ) }
+			ref={ useMergeRefs( [ setFallbackPopoverAnchor, containerRef ] ) }
+			// Some UAs focus the closest focusable parent when the toggle is
+			// clicked. Making this div focusable ensures such UAs will focus
+			// it and `closeIfFocusOutside` can tell if the toggle was clicked.
+			tabIndex="-1"
+			style={ style }
+		>
+			{ renderToggle( args ) }
+			{ isOpen && (
+				<Popover
+					position={ position }
+					onClose={ close }
+					onFocusOutside={ closeIfFocusOutside }
+					expandOnMobile={ expandOnMobile }
+					headerTitle={ headerTitle }
+					focusOnMount={ focusOnMount }
+					// This value is used to ensure that the dropdowns
+					// align with the editor header by default.
+					offset={ 13 }
+					anchor={
+						! popoverPropsHaveAnchor
+							? fallbackPopoverAnchor
+							: undefined
+					}
+					{ ...popoverProps }
+					className={ classnames(
+						'components-dropdown__content',
+						popoverProps ? popoverProps.className : undefined,
+						contentClassName
+					) }
+				>
+					{ renderContent( args ) }
+				</Popover>
+			) }
+		</div>
+	);
 }
-
-export default Dropdown;

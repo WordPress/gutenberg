@@ -2,37 +2,26 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Button, ExternalLink, VisuallyHidden } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
-import {
-	useRef,
-	useCallback,
-	useState,
-	Fragment,
-	useEffect,
-} from '@wordpress/element';
-import {
-	safeDecodeURI,
-	filterURLForDisplay,
-	isURL,
-	prependHTTP,
-	getProtocol,
-} from '@wordpress/url';
-import { useInstanceId } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
+import { keyboardReturn } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
+import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
+import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import LinkControlSettingsDrawer from './settings-drawer';
-import LinkControlSearchItem from './search-item';
 import LinkControlSearchInput from './search-input';
+import LinkPreview from './link-preview';
+import useCreatePage from './use-create-page';
+import { ViewerFill } from './viewer-slot';
+import { DEFAULT_LINK_SETTINGS } from './constants';
 
 /**
  * Default properties associated with a link control value.
@@ -46,11 +35,13 @@ import LinkControlSearchInput from './search-input';
  *                                    providing a custom `settings` prop.
  */
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Custom settings values associated with a link.
  *
  * @typedef {{[setting:string]:any}} WPLinkControlSettingsValue
  */
+/* eslint-enable */
 
 /**
  * Custom settings values associated with a link.
@@ -71,18 +62,41 @@ import LinkControlSearchInput from './search-input';
 /** @typedef {(nextValue:WPLinkControlValue)=>void} WPLinkControlOnChangeProp */
 
 /**
+ * Properties associated with a search suggestion used within the LinkControl.
+ *
+ * @typedef WPLinkControlSuggestion
+ *
+ * @property {string} id    Identifier to use to uniquely identify the suggestion.
+ * @property {string} type  Identifies the type of the suggestion (eg: `post`,
+ *                          `page`, `url`...etc)
+ * @property {string} title Human-readable label to show in user interface.
+ * @property {string} url   A URL for the suggestion.
+ */
+
+/** @typedef {(title:string)=>WPLinkControlSuggestion} WPLinkControlCreateSuggestionProp */
+
+/**
  * @typedef WPLinkControlProps
  *
- * @property {(WPLinkControlSetting[])=}  settings               An array of settings objects. Each object will used to
- *                                                               render a `ToggleControl` for that setting.
- * @property {boolean=}                   forceIsEditingLink     If passed as either `true` or `false`, controls the
- *                                                               internal editing state of the component to respective
- *                                                               show or not show the URL input field.
- * @property {WPLinkControlValue=}        value                  Current link value.
- * @property {WPLinkControlOnChangeProp=} onChange               Value change handler, called with the updated value if
- *                                                               the user selects a new link or updates settings.
- * @property {boolean=}                   showInitialSuggestions Whether to present initial suggestions immediately.
+ * @property {(WPLinkControlSetting[])=}  settings                   An array of settings objects. Each object will used to
+ *                                                                   render a `ToggleControl` for that setting.
+ * @property {boolean=}                   forceIsEditingLink         If passed as either `true` or `false`, controls the
+ *                                                                   internal editing state of the component to respective
+ *                                                                   show or not show the URL input field.
+ * @property {WPLinkControlValue=}        value                      Current link value.
+ * @property {WPLinkControlOnChangeProp=} onChange                   Value change handler, called with the updated value if
+ *                                                                   the user selects a new link or updates settings.
+ * @property {boolean=}                   noDirectEntry              Whether to allow turning a URL-like search query directly into a link.
+ * @property {boolean=}                   showSuggestions            Whether to present suggestions when typing the URL.
+ * @property {boolean=}                   showInitialSuggestions     Whether to present initial suggestions immediately.
+ * @property {boolean=}                   withCreateSuggestion       Whether to allow creation of link value from suggestion.
+ * @property {Object=}                    suggestionsQuery           Query parameters to pass along to wp.blockEditor.__experimentalFetchLinkSuggestions.
+ * @property {boolean=}                   noURLSuggestion            Whether to add a fallback suggestion which treats the search query as a URL.
+ * @property {string|Function|undefined}  createSuggestionButtonText The text to use in the button that calls createSuggestion.
+ * @property {Function}                   renderControlBottom        Optional controls to be rendered at the bottom of the component.
  */
+
+const noop = () => {};
 
 /**
  * Renders a link control. A link control is a controlled input which maintains
@@ -92,32 +106,51 @@ import LinkControlSearchInput from './search-input';
  * @param {WPLinkControlProps} props Component props.
  */
 function LinkControl( {
+	searchInputPlaceholder,
 	value,
-	settings,
+	settings = DEFAULT_LINK_SETTINGS,
 	onChange = noop,
+	onRemove,
+	noDirectEntry = false,
+	showSuggestions = true,
 	showInitialSuggestions,
 	forceIsEditingLink,
+	createSuggestion,
+	withCreateSuggestion,
+	inputValue: propInputValue = '',
+	suggestionsQuery = {},
+	noURLSuggestion = false,
+	createSuggestionButtonText,
+	hasRichPreviews = false,
+	hasTextControl = false,
+	renderControlBottom = null,
 } ) {
+	if ( withCreateSuggestion === undefined && createSuggestion ) {
+		withCreateSuggestion = true;
+	}
+
+	const isMounting = useRef( true );
 	const wrapperNode = useRef();
-	const instanceId = useInstanceId( LinkControl );
-	const [ inputValue, setInputValue ] = useState(
-		( value && value.url ) || ''
+	const textInputRef = useRef();
+
+	const [ internalInputValue, setInternalInputValue ] = useState(
+		value?.url || ''
 	);
+	const [ internalTextValue, setInternalTextValue ] = useState(
+		value?.title || ''
+	);
+	const currentInputValue = propInputValue || internalInputValue;
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined
 			? forceIsEditingLink
 			: ! value || ! value.url
 	);
 	const isEndingEditWithFocus = useRef( false );
-	const { fetchSearchSuggestions } = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		return {
-			fetchSearchSuggestions: getSettings()
-				.__experimentalFetchLinkSuggestions,
-		};
-	}, [] );
-	const displayURL =
-		( value && filterURLForDisplay( safeDecodeURI( value.url ) ) ) || '';
+
+	const currentInputIsEmpty = ! currentInputValue?.trim()?.length;
+
+	const { createPage, isCreatingPage, errorMessage } =
+		useCreatePage( createSuggestion );
 
 	useEffect( () => {
 		if (
@@ -129,185 +162,107 @@ function LinkControl( {
 	}, [ forceIsEditingLink ] );
 
 	useEffect( () => {
-		// When `isEditingLink` is set to `false`, a focus loss could occur
-		// since the link input may be removed from the DOM. To avoid this,
-		// reinstate focus to a suitable target if focus has in-fact been lost.
-		// Note that the check is necessary because while typically unsetting
-		// edit mode would render the read-only mode's link element, it isn't
-		// guaranteed. The link input may continue to be shown if the next value
-		// is still unassigned after calling `onChange`.
-		const hadFocusLoss =
-			isEndingEditWithFocus.current &&
-			wrapperNode.current &&
-			! wrapperNode.current.contains( document.activeElement );
-
-		if ( hadFocusLoss ) {
-			// Prefer to focus a natural focusable descendent of the wrapper,
-			// but settle for the wrapper if there are no other options.
-			const nextFocusTarget =
-				focus.focusable.find( wrapperNode.current )[ 0 ] ||
-				wrapperNode.current;
-
-			nextFocusTarget.focus();
+		// We don't auto focus into the Link UI on mount
+		// because otherwise using the keyboard to select text
+		// *within* the link format is not possible.
+		if ( isMounting.current ) {
+			isMounting.current = false;
+			return;
 		}
+		// Unless we are mounting, we always want to focus either:
+		// - the URL input
+		// - the first focusable element in the Link UI.
+		// But in editing mode if there is a text input present then
+		// the URL input is at index 1. If not then it is at index 0.
+		const whichFocusTargetIndex = textInputRef?.current ? 1 : 0;
+
+		// Scenario - when:
+		// - switching between editable and non editable LinkControl
+		// - clicking on a link
+		// ...then move focus to the *first* element to avoid focus loss
+		// and to ensure focus is *within* the Link UI.
+		const nextFocusTarget =
+			focus.focusable.find( wrapperNode.current )[
+				whichFocusTargetIndex
+			] || wrapperNode.current;
+
+		nextFocusTarget.focus();
 
 		isEndingEditWithFocus.current = false;
-	}, [ isEditingLink ] );
+	}, [ isEditingLink, isCreatingPage ] );
 
-	/**
-	 * onChange LinkControlSearchInput event handler
-	 *
-	 * @param {string} val Current value returned by the search.
-	 */
-	const onInputChange = ( val = '' ) => {
-		setInputValue( val );
-	};
-
-	const handleDirectEntry = ( val ) => {
-		let type = 'URL';
-
-		const protocol = getProtocol( val ) || '';
-
-		if ( protocol.includes( 'mailto' ) ) {
-			type = 'mailto';
+	useEffect( () => {
+		/**
+		 * If the value's `text` property changes then sync this
+		 * back up with state.
+		 */
+		if ( value?.title && value.title !== internalTextValue ) {
+			setInternalTextValue( value.title );
 		}
 
-		if ( protocol.includes( 'tel' ) ) {
-			type = 'tel';
+		/**
+		 * Update the state value internalInputValue if the url value changes
+		 * for example when clicking on another anchor
+		 */
+		if ( value?.url ) {
+			setInternalInputValue( value.url );
 		}
-
-		if ( startsWith( val, '#' ) ) {
-			type = 'internal';
-		}
-
-		return Promise.resolve( [
-			{
-				id: '-1',
-				title: val,
-				url: type === 'URL' ? prependHTTP( val ) : val,
-				type,
-			},
-		] );
-	};
-
-	const handleEntitySearch = async ( val, args ) => {
-		const results = await Promise.all( [
-			fetchSearchSuggestions( val, {
-				...( args.isInitialSuggestions ? { perPage: 3 } : {} ),
-			} ),
-			handleDirectEntry( val ),
-		] );
-
-		const couldBeURL = ! val.includes( ' ' );
-
-		// If it's potentially a URL search then concat on a URL search suggestion
-		// just for good measure. That way once the actual results run out we always
-		// have a URL option to fallback on.
-		return couldBeURL && ! args.isInitialSuggestions
-			? results[ 0 ].concat( results[ 1 ] )
-			: results[ 0 ];
-	};
+	}, [ value ] );
 
 	/**
 	 * Cancels editing state and marks that focus may need to be restored after
 	 * the next render, if focus was within the wrapper when editing finished.
 	 */
 	function stopEditing() {
-		isEndingEditWithFocus.current =
-			!! wrapperNode.current &&
-			wrapperNode.current.contains( document.activeElement );
+		isEndingEditWithFocus.current = !! wrapperNode.current?.contains(
+			wrapperNode.current.ownerDocument.activeElement
+		);
 
 		setIsEditingLink( false );
 	}
 
-	// Effects
-	const getSearchHandler = useCallback(
-		( val, args ) => {
-			const isInternal = startsWith( val, '#' );
-
-			const handleManualEntry =
-				isInternal || isURL( val ) || ( val && val.includes( 'www.' ) );
-
-			return handleManualEntry
-				? handleDirectEntry( val, args )
-				: handleEntitySearch( val, args );
-		},
-		[ handleDirectEntry, fetchSearchSuggestions ]
-	);
-
-	// Render Components
-	const renderSearchResults = ( {
-		suggestionsListProps,
-		buildSuggestionItemProps,
-		suggestions,
-		selectedSuggestion,
-		isLoading,
-		isInitialSuggestions,
-	} ) => {
-		const resultsListClasses = classnames(
-			'block-editor-link-control__search-results',
-			{
-				'is-loading': isLoading,
-			}
-		);
-
-		const manualLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
-		const searchResultsLabelId = isInitialSuggestions
-			? `block-editor-link-control-search-results-label-${ instanceId }`
-			: undefined;
-		const labelText = isInitialSuggestions
-			? __( 'Recently updated' )
-			: sprintf( __( 'Search results for %s' ), inputValue );
-		// According to guidelines aria-label should be added if the label
-		// itself is not visible.
-		// See: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role
-		const ariaLabel = isInitialSuggestions ? undefined : labelText;
-		const SearchResultsLabel = (
-			<span
-				className="block-editor-link-control__search-results-label"
-				id={ searchResultsLabelId }
-				aria-label={ ariaLabel }
-			>
-				{ labelText }
-			</span>
-		);
-
-		return (
-			<div className="block-editor-link-control__search-results-wrapper">
-				{ isInitialSuggestions ? (
-					SearchResultsLabel
-				) : (
-					<VisuallyHidden>{ SearchResultsLabel }</VisuallyHidden>
-				) }
-
-				<div
-					{ ...suggestionsListProps }
-					className={ resultsListClasses }
-					aria-labelledby={ searchResultsLabelId }
-				>
-					{ suggestions.map( ( suggestion, index ) => (
-						<LinkControlSearchItem
-							key={ `${ suggestion.id }-${ suggestion.type }` }
-							itemProps={ buildSuggestionItemProps(
-								suggestion,
-								index
-							) }
-							suggestion={ suggestion }
-							onClick={ () => {
-								onChange( { ...value, ...suggestion } );
-								stopEditing();
-							} }
-							isSelected={ index === selectedSuggestion }
-							isURL={ manualLinkEntryTypes.includes(
-								suggestion.type.toLowerCase()
-							) }
-							searchTerm={ inputValue }
-						/>
-					) ) }
-				</div>
-			</div>
-		);
+	const handleSelectSuggestion = ( updatedValue ) => {
+		onChange( {
+			...updatedValue,
+			title: internalTextValue || updatedValue?.title,
+		} );
+		stopEditing();
 	};
+
+	const handleSubmit = () => {
+		if (
+			currentInputValue !== value?.url ||
+			internalTextValue !== value?.title
+		) {
+			onChange( {
+				...value,
+				url: currentInputValue,
+				title: internalTextValue,
+			} );
+		}
+		stopEditing();
+	};
+
+	const handleSubmitWithEnter = ( event ) => {
+		const { keyCode } = event;
+		if (
+			keyCode === ENTER &&
+			! currentInputIsEmpty // Disallow submitting empty values.
+		) {
+			event.preventDefault();
+			handleSubmit();
+		}
+	};
+
+	const shownUnlinkControl =
+		onRemove && value && ! isEditingLink && ! isCreatingPage;
+
+	const showSettingsDrawer = !! settings?.length;
+
+	// Only show text control once a URL value has been committed
+	// and it isn't just empty whitespace.
+	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
+	const showTextControl = value?.url?.trim()?.length > 0 && hasTextControl;
 
 	return (
 		<div
@@ -315,67 +270,98 @@ function LinkControl( {
 			ref={ wrapperNode }
 			className="block-editor-link-control"
 		>
-			{ isEditingLink || ! value ? (
-				<LinkControlSearchInput
-					value={ inputValue }
-					onChange={ onInputChange }
-					onSelect={ ( suggestion ) => {
-						onChange( { ...value, ...suggestion } );
-						stopEditing();
-					} }
-					renderSuggestions={ renderSearchResults }
-					fetchSuggestions={ getSearchHandler }
-					showInitialSuggestions={ showInitialSuggestions }
-				/>
-			) : (
-				<Fragment>
-					<p
-						className="screen-reader-text"
-						id={ `current-link-label-${ instanceId }` }
-					>
-						{ __( 'Currently selected' ) }:
-					</p>
-					<div
-						aria-labelledby={ `current-link-label-${ instanceId }` }
-						aria-selected="true"
-						className={ classnames(
-							'block-editor-link-control__search-item',
-							{
-								'is-current': true,
-							}
-						) }
-					>
-						<span className="block-editor-link-control__search-item-header">
-							<ExternalLink
-								className="block-editor-link-control__search-item-title"
-								href={ value.url }
-							>
-								{ ( value && value.title ) || displayURL }
-							</ExternalLink>
-							{ value && value.title && (
-								<span className="block-editor-link-control__search-item-info">
-									{ displayURL }
-								</span>
-							) }
-						</span>
-
-						<Button
-							isSecondary
-							onClick={ () => setIsEditingLink( true ) }
-							className="block-editor-link-control__search-item-action"
-						>
-							{ __( 'Edit' ) }
-						</Button>
-					</div>
-				</Fragment>
+			{ isCreatingPage && (
+				<div className="block-editor-link-control__loading">
+					<Spinner /> { __( 'Creating' ) }…
+				</div>
 			) }
-			<LinkControlSettingsDrawer
-				value={ value }
-				settings={ settings }
-				onChange={ onChange }
-			/>
+
+			{ ( isEditingLink || ! value ) && ! isCreatingPage && (
+				<>
+					<div
+						className={ classnames( {
+							'block-editor-link-control__search-input-wrapper': true,
+							'has-text-control': showTextControl,
+						} ) }
+					>
+						{ showTextControl && (
+							<TextControl
+								ref={ textInputRef }
+								className="block-editor-link-control__field block-editor-link-control__text-content"
+								label="Text"
+								value={ internalTextValue }
+								onChange={ setInternalTextValue }
+								onKeyDown={ handleSubmitWithEnter }
+							/>
+						) }
+
+						<LinkControlSearchInput
+							currentLink={ value }
+							className="block-editor-link-control__field block-editor-link-control__search-input"
+							placeholder={ searchInputPlaceholder }
+							value={ currentInputValue }
+							withCreateSuggestion={ withCreateSuggestion }
+							onCreateSuggestion={ createPage }
+							onChange={ setInternalInputValue }
+							onSelect={ handleSelectSuggestion }
+							showInitialSuggestions={ showInitialSuggestions }
+							allowDirectEntry={ ! noDirectEntry }
+							showSuggestions={ showSuggestions }
+							suggestionsQuery={ suggestionsQuery }
+							withURLSuggestion={ ! noURLSuggestion }
+							createSuggestionButtonText={
+								createSuggestionButtonText
+							}
+							useLabel={ showTextControl }
+						>
+							<div className="block-editor-link-control__search-actions">
+								<Button
+									onClick={ handleSubmit }
+									label={ __( 'Submit' ) }
+									icon={ keyboardReturn }
+									className="block-editor-link-control__search-submit"
+									disabled={ currentInputIsEmpty } // Disallow submitting empty values.
+								/>
+							</div>
+						</LinkControlSearchInput>
+					</div>
+					{ errorMessage && (
+						<Notice
+							className="block-editor-link-control__search-error"
+							status="error"
+							isDismissible={ false }
+						>
+							{ errorMessage }
+						</Notice>
+					) }
+				</>
+			) }
+
+			{ value && ! isEditingLink && ! isCreatingPage && (
+				<LinkPreview
+					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
+					value={ value }
+					onEditClick={ () => setIsEditingLink( true ) }
+					hasRichPreviews={ hasRichPreviews }
+					hasUnlinkControl={ shownUnlinkControl }
+					onRemove={ onRemove }
+				/>
+			) }
+
+			{ showSettingsDrawer && (
+				<div className="block-editor-link-control__tools">
+					<LinkControlSettingsDrawer
+						value={ value }
+						settings={ settings }
+						onChange={ onChange }
+					/>
+				</div>
+			) }
+			{ renderControlBottom && renderControlBottom() }
 		</div>
 	);
 }
+
+LinkControl.ViewerFill = ViewerFill;
 
 export default LinkControl;

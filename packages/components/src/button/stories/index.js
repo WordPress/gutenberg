@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { text, number } from '@storybook/addon-knobs';
+import { text, number, boolean } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -11,6 +11,7 @@ import {
 	formatItalic,
 	link as linkIcon,
 	more,
+	wordpress,
 } from '@wordpress/icons';
 
 /**
@@ -19,7 +20,13 @@ import {
 import './style.css';
 import Button from '../';
 
-export default { title: 'Components/Button', component: Button };
+export default {
+	title: 'Components/Button',
+	component: Button,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 export const _default = () => {
 	const label = text( 'Label', 'Default Button' );
@@ -30,19 +37,48 @@ export const _default = () => {
 export const primary = () => {
 	const label = text( 'Label', 'Primary Button' );
 
-	return <Button isPrimary>{ label }</Button>;
+	return <Button variant="primary">{ label }</Button>;
 };
 
 export const secondary = () => {
 	const label = text( 'Label', 'Secondary Button' );
 
-	return <Button isSecondary>{ label }</Button>;
+	return <Button variant="secondary">{ label }</Button>;
 };
 
 export const tertiary = () => {
 	const label = text( 'Label', 'Tertiary Button' );
 
-	return <Button isTertiary>{ label }</Button>;
+	return <Button variant="tertiary">{ label }</Button>;
+};
+
+export const isDestructive = () => {
+	const label = text( 'Label', 'Destructive Button' );
+	const isSmall = boolean( 'isSmall', false );
+	const disabled = boolean( 'disabled', false );
+
+	return (
+		<Button isDestructive isSmall={ isSmall } disabled={ disabled }>
+			{ label }
+		</Button>
+	);
+};
+
+export const isPrimaryDestructive = () => {
+	const label = text( 'Label', 'Destructive Primary Button' );
+	const isSmall = boolean( 'isSmall', false );
+	const disabled = boolean( 'disabled', false );
+
+	return (
+		<Button
+			variant="primary"
+			isDestructive
+			isSmall={ isSmall }
+			disabled={ disabled }
+		>
+			{ label }
+		</Button>
+	);
 };
 
 export const small = () => {
@@ -93,22 +129,30 @@ export const disabledLink = () => {
 	);
 };
 
-export const icon = () => {
-	const usedIcon = text( 'Icon', 'ellipsis' );
-	const label = text( 'Label', 'More' );
-	const size = number( 'Size' );
+export const destructiveLink = () => {
+	const label = text( 'Label', 'Destructive Link' );
 
-	return <Button icon={ usedIcon } label={ label } iconSize={ size } />;
+	return (
+		<Button isDestructive variant="link">
+			{ label }
+		</Button>
+	);
+};
+
+export const icon = () => {
+	const label = text( 'Label', 'Code is poetry' );
+	const size = number( 'Size', 24 );
+
+	return <Button icon={ wordpress } label={ label } iconSize={ size } />;
 };
 
 export const disabledFocusableIcon = () => {
-	const usedIcon = text( 'Icon', 'ellipsis' );
-	const label = text( 'Label', 'More' );
-	const size = number( 'Size' );
+	const label = text( 'Label', 'Code is poetry' );
+	const size = number( 'Size', 24 );
 
 	return (
 		<Button
-			icon={ usedIcon }
+			icon={ wordpress }
 			label={ label }
 			iconSize={ size }
 			disabled
@@ -137,20 +181,20 @@ export const buttons = () => {
 			<h2>Small Buttons</h2>
 			<div className="story-buttons-container">
 				<Button isSmall>Button</Button>
-				<Button isPrimary isSmall>
+				<Button variant="primary" isSmall>
 					Primary Button
 				</Button>
-				<Button isSecondary isSmall>
+				<Button variant="secondary" isSmall>
 					Secondary Button
 				</Button>
-				<Button isTertiary isSmall>
+				<Button variant="tertiary" isSmall>
 					Tertiary Button
 				</Button>
 				<Button isSmall icon={ more } />
-				<Button isSmall isPrimary icon={ more } />
-				<Button isSmall isSecondary icon={ more } />
-				<Button isSmall isTertiary icon={ more } />
-				<Button isSmall isPrimary icon={ more }>
+				<Button isSmall variant="primary" icon={ more } />
+				<Button isSmall variant="secondary" icon={ more } />
+				<Button isSmall variant="tertiary" icon={ more } />
+				<Button isSmall variant="primary" icon={ more }>
 					Icon & Text
 				</Button>
 			</div>
@@ -158,14 +202,14 @@ export const buttons = () => {
 			<h2>Regular Buttons</h2>
 			<div className="story-buttons-container">
 				<Button>Button</Button>
-				<Button isPrimary>Primary Button</Button>
-				<Button isSecondary>Secondary Button</Button>
-				<Button isTertiary>Tertiary Button</Button>
+				<Button variant="primary">Primary Button</Button>
+				<Button variant="secondary">Secondary Button</Button>
+				<Button variant="tertiary">Tertiary Button</Button>
 				<Button icon={ more } />
-				<Button isPrimary icon={ more } />
-				<Button isSecondary icon={ more } />
-				<Button isTertiary icon={ more } />
-				<Button isPrimary icon={ more }>
+				<Button variant="primary" icon={ more } />
+				<Button variant="secondary" icon={ more } />
+				<Button variant="tertiary" icon={ more } />
+				<Button variant="primary" icon={ more }>
 					Icon & Text
 				</Button>
 			</div>

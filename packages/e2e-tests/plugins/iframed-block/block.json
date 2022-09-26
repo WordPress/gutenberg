@@ -1,0 +1,16 @@
+{
+	"apiVersion": 2,
+	"name": "test/iframed-block",
+	"title": "Iframed Block",
+	"category": "text",
+	"icon": "smiley",
+	"description": "",
+	"supports": {
+		"html": false
+	},
+	"textdomain": "iframed-block",
+	"editorScript": "iframed-block-editor",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css",
+	"script": "iframed-block-script"
+}

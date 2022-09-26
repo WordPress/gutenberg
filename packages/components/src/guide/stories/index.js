@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { times } from 'lodash';
 import { text, number } from '@storybook/addon-knobs';
 
 /**
@@ -14,9 +13,14 @@ import { useState } from '@wordpress/element';
  */
 import Button from '../../button';
 import Guide from '../';
-import GuidePage from '../page';
 
-export default { title: 'Components/Guide', component: Guide };
+export default {
+	title: 'Components/Guide',
+	component: Guide,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 const ModalExample = ( { numberOfPages, ...props } ) => {
 	const [ isOpen, setOpen ] = useState( false );
@@ -29,20 +33,26 @@ const ModalExample = ( { numberOfPages, ...props } ) => {
 
 	return (
 		<>
-			<Button isSecondary onClick={ openGuide }>
+			<Button variant="secondary" onClick={ openGuide }>
 				Open Guide
 			</Button>
 			{ isOpen && (
-				<Guide { ...props } onFinish={ closeGuide }>
-					{ times( numberOfPages, ( page ) => (
-						<GuidePage key={ page }>
-							<h1>
-								Page { page + 1 } of { numberOfPages }
-							</h1>
-							<p>{ loremIpsum }</p>
-						</GuidePage>
-					) ) }
-				</Guide>
+				<Guide
+					{ ...props }
+					onFinish={ closeGuide }
+					pages={ Array.from( { length: numberOfPages } ).map(
+						( _, page ) => ( {
+							content: (
+								<>
+									<h1>
+										Page { page + 1 } of { numberOfPages }
+									</h1>
+									<p>{ loremIpsum }</p>
+								</>
+							),
+						} )
+					) }
+				/>
 			) }
 		</>
 	);

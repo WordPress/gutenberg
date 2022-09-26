@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -11,47 +11,45 @@ import PanelHeader from '../header.js';
 describe( 'PanelHeader', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render PanelHeader with empty div inside', () => {
-			const panelHeader = shallow( <PanelHeader /> );
-			expect( panelHeader.hasClass( 'components-panel__header' ) ).toBe(
-				true
-			);
-			expect( panelHeader.type() ).toBe( 'div' );
-			expect(
-				panelHeader
-					.find( 'div' )
-					.shallow()
-					.children()
-			).toHaveLength( 0 );
+			const { container } = render( <PanelHeader /> );
+
+			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'should render a label matching the text provided in the prop', () => {
-			const panelHeader = shallow( <PanelHeader label="Some Text" /> );
-			const label = panelHeader.find( 'h2' ).shallow();
-			expect( label.text() ).toBe( 'Some Text' );
-			expect( label.type() ).toBe( 'h2' );
+			render( <PanelHeader label="Some Label" /> );
+
+			const heading = screen.getByRole( 'heading' );
+			expect( heading ).toBeVisible();
+			expect( heading ).toHaveTextContent( 'Some Label' );
 		} );
 
 		it( 'should render child elements in the panel header body when provided', () => {
-			const panelHeader = shallow( <PanelHeader children="Some Text" /> );
-			expect( panelHeader.text() ).toBe( 'Some Text' );
-			expect(
-				panelHeader
-					.find( 'div' )
-					.shallow()
-					.children()
-			).toHaveLength( 1 );
+			render(
+				<PanelHeader>
+					<dfn>Some text</dfn>
+				</PanelHeader>
+			);
+
+			const term = screen.getByRole( 'term' );
+			expect( term ).toBeVisible();
+			expect( term ).toHaveTextContent( 'Some text' );
 		} );
 
 		it( 'should render both child elements and label when passed in', () => {
-			const panelHeader = shallow(
-				<PanelHeader label="Some Label" children="Some Text" />
+			render(
+				<PanelHeader label="Some Label">
+					<dfn>Some text</dfn>
+				</PanelHeader>
 			);
-			expect(
-				panelHeader
-					.find( 'div' )
-					.shallow()
-					.children()
-			).toHaveLength( 2 );
+
+			const heading = screen.getByRole( 'heading' );
+			expect( heading ).toBeVisible();
+			expect( heading ).toHaveTextContent( 'Some Label' );
+
+			const term = screen.getByRole( 'term' );
+			expect( term ).toBeVisible();
+			expect( term ).toHaveTextContent( 'Some text' );
 		} );
 	} );
 } );

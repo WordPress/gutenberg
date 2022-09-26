@@ -1,31 +1,26 @@
 /**
  * Internal dependencies
  */
-const defaultPrettierConfig = require( './.prettierrc' );
-const { hasPrettierConfig } = require( '../utils' );
+const { hasBabelConfig } = require( '../utils' );
 
 const eslintConfig = {
 	root: true,
-	extends: [
-		'plugin:@wordpress/eslint-plugin/recommended',
-
-		// Temporary workaround to use linting rules for both e2e and unit tests with all files
-		// until override files globbing logic is fixed when using with --config.
-		// @see https://github.com/eslint/eslint/issues/11558
-		'plugin:@wordpress/eslint-plugin/test-e2e',
-		'plugin:@wordpress/eslint-plugin/test-unit',
+	extends: [ 'plugin:@wordpress/eslint-plugin/recommended' ],
+	overrides: [
+		{
+			// Unit test files and their helpers only.
+			files: [ '**/@(test|__tests__)/**/*.js', '**/?(*.)test.js' ],
+			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
+		},
 	],
 };
 
-if ( ! hasPrettierConfig() ) {
-	eslintConfig.rules = {
-		'prettier/prettier': [
-			'error',
-			defaultPrettierConfig,
-			{
-				usePrettierrc: false,
-			},
-		],
+if ( ! hasBabelConfig() ) {
+	eslintConfig.parserOptions = {
+		requireConfigFile: false,
+		babelOptions: {
+			presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
+		},
 	};
 }
 

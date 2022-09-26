@@ -5,8 +5,9 @@ import {
 	createNewPost,
 	getAllBlockInserterItemTitles,
 	insertBlock,
-	openAllBlockInserterCategories,
 	openGlobalBlockInserter,
+	closeGlobalBlockInserter,
+	getListViewBlocks,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Columns', () => {
@@ -16,16 +17,15 @@ describe( 'Columns', () => {
 
 	it( 'restricts all blocks inside the columns block', async () => {
 		await insertBlock( 'Columns' );
+		await closeGlobalBlockInserter();
 		await page.click( '[aria-label="Two columns; equal split"]' );
-		await page.click( '[aria-label="Block navigation"]' );
+		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
+
 		const columnBlockMenuItem = (
-			await page.$x(
-				'//button[contains(concat(" ", @class, " "), " block-editor-block-navigation__item-button ")][text()="Column"]'
-			)
+			await getListViewBlocks( 'Column' )
 		 )[ 0 ];
 		await columnBlockMenuItem.click();
 		await openGlobalBlockInserter();
-		await openAllBlockInserterCategories();
-		expect( await getAllBlockInserterItemTitles() ).toHaveLength( 0 );
+		expect( await getAllBlockInserterItemTitles() ).toHaveLength( 1 );
 	} );
 } );

@@ -1,84 +1,64 @@
-@include break-small() {
-	.block-editor-block-contextual-toolbar:not([data-align="wide"]):not([data-align="full"])
-	.block-editor-block-mover:not(.is-horizontal) {
-		display: block;
-		position: absolute;
-		top: $block-toolbar-height;
-		left: - $block-side-ui-width - 10;
-		opacity: 0;
-		background: $white;
-		border: 1px solid $dark-opacity-light-800;
-		border-radius: $radius-round-rectangle;
-		transition: box-shadow 0.2s ease-out;
-		@include reduce-motion("transition");
+.block-editor-block-mover__move-button-container {
+	display: flex;
+	padding: 0;
+	border: none;
 
-		&.is-visible {
-			@include edit-post__fade-in-animation;
-		}
+	@include break-small() {
+		.block-editor-block-mover:not(.is-horizontal) & {
+			flex-direction: column;
+			width: $block-toolbar-height - $grid-unit-15;
 
-		.block-editor-block-mover__control {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			padding: 0;
-			border: none;
+			> * {
+				height: $block-toolbar-height * 0.5;
+				width: 100%;
+				min-width: 0 !important; // overrides default button width.
 
-			// Carefully adjust the size of the side UI to fit one paragraph of text (56px).
-			width: $block-side-ui-width;
-			height: $icon-button-size-small;
-
-			svg {
-				width: $block-side-ui-width;
-				height: $icon-button-size-small;
-				padding: #{ ($block-side-ui-width - $icon-button-size-small) / 2 } #{ ($block-side-ui-width - 18px) / 2 }; // This makes the SVG fill the whole available area, without scaling the artwork.
+				// Focus style.
+				&::before {
+					height: calc(100% - 4px);
+					width: calc(100% - 4px);
+				}
 			}
 
-			&[aria-disabled="true"] {
-				cursor: default;
-				pointer-events: none;
-				color: $dark-opacity-300;
+			.block-editor-block-mover-button.is-up-button svg {
+				top: 5px;
+				flex-shrink: 0;
 			}
 
-			color: $dark-opacity-300;
-
-			&:focus:not(:disabled) {
-				background-color: transparent;
+			.block-editor-block-mover-button.is-down-button svg {
+				bottom: 5px;
+				flex-shrink: 0;
 			}
 		}
+
+		.block-editor-block-mover.is-horizontal & {
+			width: $block-toolbar-height;
+
+			> * {
+				width: $block-toolbar-height * 0.5;
+				min-width: 0 !important; // overrides default button width.
+				padding-left: 0 !important;
+				padding-right: 0 !important;
+				overflow: hidden;
+			}
+
+			.block-editor-block-mover-button.is-up-button svg {
+				left: 5px;
+			}
+
+			.block-editor-block-mover-button.is-down-button svg {
+				right: 5px;
+			}
+		}
 	}
 }
 
-// Don't add negative vertical margin for wide, fullwide, or mobile.
-// @todo: simplify this selector.
-@include break-small() {
-	.block-editor-block-list__block:not([data-align="wide"]):not([data-align="full"]) .block-editor-block-mover:not(.is-horizontal) {
-		margin-top: 0;
+.block-editor-block-mover__drag-handle {
+	@include break-small() {
+		width: $block-toolbar-height * 0.5;
+		min-width: 0 !important; // overrides default button width.
+		padding-left: 0 !important;
+		padding-right: 0 !important;
+		overflow: hidden;
 	}
-}
-
-.block-editor-block-mover__control-drag-handle {
-	cursor: move; // Fallback for IE/Edge < 14
-	cursor: grab;
-	fill: currentColor;
-
-	&,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):focus {
-		box-shadow: none;
-		background: none;
-		color: $dark-opacity-500;
-	}
-
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active {
-		cursor: grabbing;
-	}
-}
-
-.block-editor-block-mover__description {
-	display: none;
-}
-
-.block-editor-block-mover.is-horizontal .block-editor-block-mover__control-drag-handle {
-	display: none;
 }

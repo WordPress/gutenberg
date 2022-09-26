@@ -1,19 +1,36 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
-import { displayShortcut } from '@wordpress/keycodes';
-import { redo as redoIcon } from '@wordpress/icons';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
+import { redo as redoIcon, undo as undoIcon } from '@wordpress/icons';
+import { forwardRef } from '@wordpress/element';
 
-function EditorHistoryRedo( { hasRedo, redo } ) {
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
+function EditorHistoryRedo( props, ref ) {
+	const shortcut = isAppleOS()
+		? displayShortcut.primaryShift( 'z' )
+		: displayShortcut.primary( 'y' );
+
+	const hasRedo = useSelect(
+		( select ) => select( editorStore ).hasEditorRedo(),
+		[]
+	);
+	const { redo } = useDispatch( editorStore );
 	return (
 		<Button
-			icon={ redoIcon }
+			{ ...props }
+			ref={ ref }
+			icon={ ! isRTL() ? redoIcon : undoIcon }
+			/* translators: button label text should, if possible, be under 16 characters. */
 			label={ __( 'Redo' ) }
-			shortcut={ displayShortcut.primaryShift( 'z' ) }
+			shortcut={ shortcut }
 			// If there are no redo levels we don't want to actually disable this
 			// button, because it will remove focus for keyboard users.
 			// See: https://github.com/WordPress/gutenberg/issues/3486
@@ -24,11 +41,4 @@ function EditorHistoryRedo( { hasRedo, redo } ) {
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => ( {
-		hasRedo: select( 'core/editor' ).hasEditorRedo(),
-	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		redo: dispatch( 'core/editor' ).redo,
-	} ) ),
-] )( EditorHistoryRedo );
+export default forwardRef( EditorHistoryRedo );

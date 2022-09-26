@@ -11,73 +11,67 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
+import { forwardRef } from '@wordpress/element';
+import { Icon, edit as editIcon } from '@wordpress/icons';
 
-const editIcon = (
-	<SVG
-		xmlns="http://www.w3.org/2000/svg"
-		width="20"
-		height="20"
-		viewBox="0 0 24 24"
-	>
-		<Path fill="none" d="M0 0h24v24H0V0z" />
-		<Path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" />
-	</SVG>
-);
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
 const selectIcon = (
 	<SVG
 		xmlns="http://www.w3.org/2000/svg"
-		width="20"
-		height="20"
+		width="24"
+		height="24"
 		viewBox="0 0 24 24"
 	>
-		<Path d="M6.5 1v21.5l6-6.5H21L6.5 1zm5.1 13l-3.1 3.4V5.9l7.8 8.1h-4.7z" />
+		<Path d="M9.4 20.5L5.2 3.8l14.6 9-2 .3c-.2 0-.4.1-.7.1-.9.2-1.6.3-2.2.5-.8.3-1.4.5-1.8.8-.4.3-.8.8-1.3 1.5-.4.5-.8 1.2-1.2 2l-.3.6-.9 1.9zM7.6 7.1l2.4 9.3c.2-.4.5-.8.7-1.1.6-.8 1.1-1.4 1.6-1.8.5-.4 1.3-.8 2.2-1.1l1.2-.3-8.1-5z" />
 	</SVG>
 );
 
-function ToolSelector() {
-	const isNavigationTool = useSelect(
-		( select ) => select( 'core/block-editor' ).isNavigationMode(),
+function ToolSelector( props, ref ) {
+	const mode = useSelect(
+		( select ) => select( blockEditorStore ).__unstableGetEditorMode(),
 		[]
 	);
-	const { setNavigationMode } = useDispatch( 'core/block-editor' );
-	const isMediumViewport = useViewportMatch( 'medium' );
-	if ( ! isMediumViewport ) {
-		return null;
-	}
-
-	const onSwitchMode = ( mode ) => {
-		setNavigationMode( mode === 'edit' ? false : true );
-	};
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 
 	return (
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
-					icon={ isNavigationTool ? selectIcon : editIcon }
+					{ ...props }
+					ref={ ref }
+					icon={ mode === 'navigation' ? selectIcon : editIcon }
 					aria-expanded={ isOpen }
+					aria-haspopup="true"
 					onClick={ onToggle }
+					/* translators: button label text should, if possible, be under 16 characters. */
 					label={ __( 'Tools' ) }
 				/>
 			) }
+			position="bottom right"
 			renderContent={ () => (
 				<>
 					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>
 						<MenuItemsChoice
-							value={ isNavigationTool ? 'select' : 'edit' }
-							onSelect={ onSwitchMode }
+							value={
+								mode === 'navigation' ? 'navigation' : 'edit'
+							}
+							onSelect={ __unstableSetEditorMode }
 							choices={ [
 								{
 									value: 'edit',
 									label: (
 										<>
-											{ editIcon }
+											<Icon icon={ editIcon } />
 											{ __( 'Edit' ) }
 										</>
 									),
 								},
 								{
-									value: 'select',
+									value: 'navigation',
 									label: (
 										<>
 											{ selectIcon }
@@ -90,7 +84,7 @@ function ToolSelector() {
 					</NavigableMenu>
 					<div className="block-editor-tool-selector__help">
 						{ __(
-							'Tools offer different interactions for block selection & editing. To select, press Escape, to go back to editing, press Enter.'
+							'Tools provide different interactions for selecting, navigating, and editing blocks. Toggle between select and edit by pressing Escape and Enter.'
 						) }
 					</div>
 				</>
@@ -99,4 +93,4 @@ function ToolSelector() {
 	);
 }
 
-export default ToolSelector;
+export default forwardRef( ToolSelector );

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import { VisuallyHidden } from '@wordpress/components';
 import { _x, sprintf } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 
@@ -14,6 +15,7 @@ export default function ResponsiveBlockControlLabel( {
 	const accessibleLabel =
 		desc ||
 		sprintf(
+			/* translators: 1: property name. 2: viewport name. */
 			_x(
 				'Controls the %1$s property for %2$s viewports.',
 				'Text labelling a interface as controlling a given layout property (eg: margin) for a given screen size.'
@@ -26,12 +28,9 @@ export default function ResponsiveBlockControlLabel( {
 			<span aria-describedby={ `rbc-desc-${ instanceId }` }>
 				{ viewport.label }
 			</span>
-			<span
-				className="screen-reader-text"
-				id={ `rbc-desc-${ instanceId }` }
-			>
+			<VisuallyHidden as="span" id={ `rbc-desc-${ instanceId }` }>
 				{ accessibleLabel }
-			</span>
+			</VisuallyHidden>
 		</Fragment>
 	);
 }

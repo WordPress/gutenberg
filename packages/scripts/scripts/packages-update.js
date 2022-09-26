@@ -6,6 +6,11 @@ const fs = require( 'fs' );
 const spawn = require( 'cross-spawn' );
 
 /**
+ * Internal dependencies
+ */
+const { getArgFromCLI } = require( '../utils' );
+
+/**
  * Constants
  */
 const WORDPRESS_PACKAGES_PREFIX = '@wordpress/';
@@ -15,9 +20,9 @@ function readJSONFile( fileName ) {
 	return JSON.parse( data );
 }
 
-function getWordPressPackages( packageJSON ) {
-	return Object.keys( packageJSON.dependencies )
-		.concat( Object.keys( packageJSON.devDependencies ) )
+function getWordPressPackages( { dependencies = {}, devDependencies = {} } ) {
+	return Object.keys( dependencies )
+		.concat( Object.keys( devDependencies ) )
 		.filter( ( packageName ) =>
 			packageName.startsWith( WORDPRESS_PACKAGES_PREFIX )
 		);
@@ -26,19 +31,17 @@ function getWordPressPackages( packageJSON ) {
 function getPackageVersionDiff( initialPackageJSON, finalPackageJSON ) {
 	const diff = [ 'dependencies', 'devDependencies' ].reduce(
 		( result, keyPackageJSON ) => {
-			return Object.keys( finalPackageJSON[ keyPackageJSON ] ).reduce(
-				( _result, dependency ) => {
-					const initial =
-						initialPackageJSON[ keyPackageJSON ][ dependency ];
-					const final =
-						finalPackageJSON[ keyPackageJSON ][ dependency ];
-					if ( initial !== final ) {
-						_result.push( { dependency, initial, final } );
-					}
-					return _result;
-				},
-				result
-			);
+			return Object.keys(
+				finalPackageJSON[ keyPackageJSON ] || {}
+			).reduce( ( _result, dependency ) => {
+				const initial =
+					initialPackageJSON[ keyPackageJSON ][ dependency ];
+				const final = finalPackageJSON[ keyPackageJSON ][ dependency ];
+				if ( initial !== final ) {
+					_result.push( { dependency, initial, final } );
+				}
+				return _result;
+			}, result );
 		},
 		[]
 	);
@@ -46,8 +49,10 @@ function getPackageVersionDiff( initialPackageJSON, finalPackageJSON ) {
 }
 
 function updatePackagesToLatestVersion( packages ) {
+	const distTag = getArgFromCLI( '--dist-tag' ) || 'latest';
+
 	const packagesWithLatest = packages.map(
-		( packageName ) => `${ packageName }@latest`
+		( packageName ) => `${ packageName }@${ distTag }`
 	);
 	return spawn.sync( 'npm', [ 'install', ...packagesWithLatest, '--save' ], {
 		stdio: 'inherit',

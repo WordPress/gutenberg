@@ -1,0 +1,65 @@
+name: End-to-End Tests
+
+on:
+    pull_request:
+    push:
+        branches:
+            - trunk
+            - 'release/**'
+            - 'wp/**'
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+jobs:
+    admin:
+        name: Admin - ${{ matrix.part }}
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            fail-fast: false
+            matrix:
+                part: [1, 2, 3, 4]
+
+        steps:
+            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+
+            - name: Use desired version of NodeJS
+              uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - name: Npm install and build
+              run: |
+                  npm ci
+                  npm run build
+
+            - name: Install WordPress
+              run: |
+                  npm run wp-env start
+
+            - name: Running the tests
+              run: |
+                  $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
+                  $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == ${{ matrix.part }} - 1' < ~/.jest-e2e-tests )
+
+            - name: Archive debug artifacts (screenshots, HTML snapshots)
+              uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              if: always()
+              with:
+                  name: failures-artifacts
+                  path: artifacts
+                  if-no-files-found: ignore
+
+            - name: Archive flaky tests report
+              uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              if: always()
+              with:
+                  name: flaky-tests-report-${{ matrix.part }}
+                  path: flaky-tests
+                  if-no-files-found: ignore

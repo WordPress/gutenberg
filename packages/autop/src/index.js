@@ -1,7 +1,7 @@
 /**
  * The regular expression for an HTML element.
  *
- * @type {string}
+ * @type {RegExp}
  */
 const htmlSplitRegex = ( () => {
 	/* eslint-disable no-multi-spaces */
@@ -51,8 +51,9 @@ const htmlSplitRegex = ( () => {
 /**
  * Separate HTML elements and comments from the text.
  *
- * @param  {string} input The text which has to be formatted.
- * @return {Array}        The formatted text.
+ * @param {string} input The text which has to be formatted.
+ *
+ * @return {string[]} The formatted text.
  */
 function htmlSplit( input ) {
 	const parts = [];
@@ -60,9 +61,15 @@ function htmlSplit( input ) {
 
 	let match;
 	while ( ( match = workingInput.match( htmlSplitRegex ) ) ) {
-		parts.push( workingInput.slice( 0, match.index ) );
+		// The `match` result, when invoked on a RegExp with the `g` flag (`/foo/g`) will not include `index`.
+		// If the `g` flag is omitted, `index` is included.
+		// `htmlSplitRegex` does not have the `g` flag so we can assert it will have an index number.
+		// Assert `match.index` is a number.
+		const index = /** @type {number} */ ( match.index );
+
+		parts.push( workingInput.slice( 0, index ) );
 		parts.push( match[ 0 ] );
-		workingInput = workingInput.slice( match.index + match[ 0 ].length );
+		workingInput = workingInput.slice( index + match[ 0 ].length );
 	}
 
 	if ( workingInput.length ) {
@@ -75,9 +82,10 @@ function htmlSplit( input ) {
 /**
  * Replace characters or phrases within HTML elements only.
  *
- * @param  {string} haystack     The text which has to be formatted.
- * @param  {Object} replacePairs In the form {from: 'to', ...}.
- * @return {string}              The formatted text.
+ * @param {string}                haystack     The text which has to be formatted.
+ * @param {Record<string,string>} replacePairs In the form {from: 'to', …}.
+ *
+ * @return {string} The formatted text.
  */
 function replaceInHtmlTags( haystack, replacePairs ) {
 	// Find all elements.
@@ -117,9 +125,9 @@ function replaceInHtmlTags( haystack, replacePairs ) {
  * replace double line-breaks with HTML paragraph tags. The remaining line-
  * breaks after conversion become `<br />` tags, unless br is set to 'false'.
  *
- * @param  {string}    text The text which has to be formatted.
- * @param  {boolean}   br   Optional. If set, will convert all remaining line-
- *                          breaks after paragraphing. Default true.
+ * @param {string}  text The text which has to be formatted.
+ * @param {boolean} br   Optional. If set, will convert all remaining line-
+ *                       breaks after paragraphing. Default true.
  *
  * @example
  *```js
@@ -127,7 +135,7 @@ function replaceInHtmlTags( haystack, replacePairs ) {
  * autop( 'my text' ); // "<p>my text</p>"
  * ```
  *
- * @return {string}         Text which has been converted into paragraph tags.
+ * @return {string} Text which has been converted into paragraph tags.
  */
 export function autop( text, br = true ) {
 	const preTags = [];
@@ -322,7 +330,7 @@ export function autop( text, br = true ) {
  * Replaces `<p>` tags with two line breaks except where the `<p>` has attributes.
  * Unifies whitespace. Indents `<li>`, `<dt>` and `<dd>` for better readability.
  *
- * @param  {string} html The content from the editor.
+ * @param {string} html The content from the editor.
  *
  * @example
  * ```js
@@ -330,13 +338,14 @@ export function autop( text, br = true ) {
  * removep( '<p>my text</p>' ); // "my text"
  * ```
  *
- * @return {string}      The content with stripped paragraph tags.
+ * @return {string} The content with stripped paragraph tags.
  */
 export function removep( html ) {
 	const blocklist =
 		'blockquote|ul|ol|li|dl|dt|dd|table|thead|tbody|tfoot|tr|th|td|h[1-6]|fieldset|figure';
 	const blocklist1 = blocklist + '|div|p';
 	const blocklist2 = blocklist + '|pre';
+	/** @type {string[]} */
 	const preserve = [];
 	let preserveLinebreaks = false;
 	let preserveBr = false;
@@ -347,18 +356,19 @@ export function removep( html ) {
 
 	// Protect script and style tags.
 	if ( html.indexOf( '<script' ) !== -1 || html.indexOf( '<style' ) !== -1 ) {
-		html = html.replace( /<(script|style)[^>]*>[\s\S]*?<\/\1>/g, function(
-			match
-		) {
-			preserve.push( match );
-			return '<wp-preserve>';
-		} );
+		html = html.replace(
+			/<(script|style)[^>]*>[\s\S]*?<\/\1>/g,
+			( match ) => {
+				preserve.push( match );
+				return '<wp-preserve>';
+			}
+		);
 	}
 
 	// Protect pre tags.
 	if ( html.indexOf( '<pre' ) !== -1 ) {
 		preserveLinebreaks = true;
-		html = html.replace( /<pre[^>]*>[\s\S]+?<\/pre>/g, function( a ) {
+		html = html.replace( /<pre[^>]*>[\s\S]+?<\/pre>/g, ( a ) => {
 			a = a.replace( /<br ?\/?>(\r\n|\n)?/g, '<wp-line-break>' );
 			a = a.replace( /<\/?p( [^>]*)?>(\r\n|\n)?/g, '<wp-line-break>' );
 			return a.replace( /\r?\n/g, '<wp-line-break>' );
@@ -368,7 +378,7 @@ export function removep( html ) {
 	// Remove line breaks but keep <br> tags inside image captions.
 	if ( html.indexOf( '[caption' ) !== -1 ) {
 		preserveBr = true;
-		html = html.replace( /\[caption[\s\S]+?\[\/caption\]/g, function( a ) {
+		html = html.replace( /\[caption[\s\S]+?\[\/caption\]/g, ( a ) => {
 			return a
 				.replace( /<br([^>]*)>/g, '<wp-temp-br$1>' )
 				.replace( /[\r\n\t]+/, '' );
@@ -399,7 +409,7 @@ export function removep( html ) {
 	html = html.replace( /\n[\s\u00a0]+\n/g, '\n\n' );
 
 	// Replace <br> tags with line breaks.
-	html = html.replace( /(\s*)<br ?\/?>\s*/gi, function( match, space ) {
+	html = html.replace( /(\s*)<br ?\/?>\s*/gi, ( _, space ) => {
 		if ( space && space.indexOf( '\n' ) !== -1 ) {
 			return '\n\n';
 		}
@@ -444,7 +454,7 @@ export function removep( html ) {
 
 	// Remove line breaks in <object> tags.
 	if ( html.indexOf( '<object' ) !== -1 ) {
-		html = html.replace( /<object[\s\S]+?<\/object>/g, function( a ) {
+		html = html.replace( /<object[\s\S]+?<\/object>/g, ( a ) => {
 			return a.replace( /[\r\n]+/g, '' );
 		} );
 	}
@@ -469,8 +479,8 @@ export function removep( html ) {
 
 	// Restore preserved tags.
 	if ( preserve.length ) {
-		html = html.replace( /<wp-preserve>/g, function() {
-			return preserve.shift();
+		html = html.replace( /<wp-preserve>/g, () => {
+			return /** @type {string} */ ( preserve.shift() );
 		} );
 	}
 

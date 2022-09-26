@@ -2,42 +2,31 @@ module.exports = {
 	plugins: [ '@wordpress' ],
 	rules: {
 		'@wordpress/no-unused-vars-before-return': 'error',
-		'@wordpress/valid-sprintf': 'error',
 		'@wordpress/no-base-control-with-label-without-id': 'error',
 		'@wordpress/no-unguarded-get-range-at': 'error',
-		'no-restricted-syntax': [
-			'error',
-			{
-				selector:
-					'CallExpression[callee.name=/^(__|_n|_nx|_x)$/]:not([arguments.0.type=/^Literal|BinaryExpression$/])',
-				message:
-					'Translate function arguments must be string literals.',
-			},
-			{
-				selector:
-					'CallExpression[callee.name=/^(_n|_nx|_x)$/]:not([arguments.1.type=/^Literal|BinaryExpression$/])',
-				message:
-					'Translate function arguments must be string literals.',
-			},
-			{
-				selector:
-					'CallExpression[callee.name=_nx]:not([arguments.3.type=/^Literal|BinaryExpression$/])',
-				message:
-					'Translate function arguments must be string literals.',
-			},
-		],
+		'@wordpress/no-global-active-element': 'error',
+		'@wordpress/no-global-get-selection': 'error',
+		'@wordpress/no-unsafe-wp-apis': 'error',
 	},
 	overrides: [
 		{
 			files: [ '*.native.js' ],
 			rules: {
 				'@wordpress/no-base-control-with-label-without-id': 'off',
+				'@wordpress/i18n-no-flanking-whitespace': 'error',
+				'@wordpress/i18n-hyphenated-range': 'error',
+			},
+		},
+		{
+			files: [
+				'*.test.js',
+				'**/test/*.js',
+				'packages/e2e-test-utils/**/*.js',
+			],
+			rules: {
+				'@wordpress/no-global-active-element': 'off',
+				'@wordpress/no-global-get-selection': 'off',
 			},
 		},
 	],
-	settings: {
-		react: {
-			version: '16.6',
-		},
-	},
 };

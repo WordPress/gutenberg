@@ -4,27 +4,26 @@
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { chevronRightSmall, Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
  *
- * @return {WPElement} Block Breadcrumb.
+ * @param {Object} props               Component props.
+ * @param {string} props.rootLabelText Translated label for the root element of the breadcrumb trail.
+ * @return {WPElement}                 Block Breadcrumb.
  */
-const BlockBreadcrumb = function() {
-	const { selectBlock, clearSelectedBlock } = useDispatch(
-		'core/block-editor'
-	);
+function BlockBreadcrumb( { rootLabelText } ) {
+	const { selectBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { clientId, parents, hasSelection } = useSelect( ( select ) => {
-		const {
-			getSelectionStart,
-			getSelectedBlockClientId,
-			getBlockParents,
-		} = select( 'core/block-editor' );
+		const { getSelectionStart, getSelectedBlockClientId, getBlockParents } =
+			select( blockEditorStore );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
 			parents: getBlockParents( selectedBlockClientId ),
@@ -32,6 +31,7 @@ const BlockBreadcrumb = function() {
 			hasSelection: !! getSelectionStart().clientId,
 		};
 	}, [] );
+	const rootLabel = rootLabelText || __( 'Document' );
 
 	/*
 	 * Disable reason: The `list` ARIA role is redundant but
@@ -55,23 +55,37 @@ const BlockBreadcrumb = function() {
 				{ hasSelection && (
 					<Button
 						className="block-editor-block-breadcrumb__button"
-						isTertiary
+						variant="tertiary"
 						onClick={ clearSelectedBlock }
 					>
-						{ __( 'Document' ) }
+						{ rootLabel }
 					</Button>
 				) }
-				{ ! hasSelection && __( 'Document' ) }
+				{ ! hasSelection && rootLabel }
+				{ !! clientId && (
+					<Icon
+						icon={ chevronRightSmall }
+						className="block-editor-block-breadcrumb__separator"
+					/>
+				) }
 			</li>
+
 			{ parents.map( ( parentClientId ) => (
 				<li key={ parentClientId }>
 					<Button
 						className="block-editor-block-breadcrumb__button"
-						isTertiary
+						variant="tertiary"
 						onClick={ () => selectBlock( parentClientId ) }
 					>
-						<BlockTitle clientId={ parentClientId } />
+						<BlockTitle
+							clientId={ parentClientId }
+							maximumLength={ 35 }
+						/>
 					</Button>
+					<Icon
+						icon={ chevronRightSmall }
+						className="block-editor-block-breadcrumb__separator"
+					/>
 				</li>
 			) ) }
 			{ !! clientId && (
@@ -79,12 +93,12 @@ const BlockBreadcrumb = function() {
 					className="block-editor-block-breadcrumb__current"
 					aria-current="true"
 				>
-					<BlockTitle clientId={ clientId } />
+					<BlockTitle clientId={ clientId } maximumLength={ 35 } />
 				</li>
 			) }
 		</ul>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
 	);
-};
+}
 
 export default BlockBreadcrumb;
