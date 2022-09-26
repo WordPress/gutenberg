@@ -58,21 +58,28 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
 				'your product will inevitably break on the next WordPress release.'
 		);
 	}
-	registeredExperiments[ moduleName ] = {};
+	registeredExperiments[ moduleName ] = {
+		accessKey: {},
+		apis: {},
+	};
 	return {
 		registerExperimentalAPIs: ( experiments ) => {
-			registeredExperiments[ moduleName ] = {
-				...registeredExperiments[ moduleName ],
-				...experiments,
-			};
-		},
-		getExperimentalAPIs: ( targetModuleName ) => {
-			if ( ! ( targetModuleName in registeredExperiments ) ) {
-				throw new Error(
-					`Module ${ targetModuleName } is not registered yet.`
-				);
+			for ( const key in experiments ) {
+				registeredExperiments[ moduleName ].apis[ key ] =
+					experiments[ key ];
 			}
-			return registeredExperiments[ targetModuleName ];
+			return registeredExperiments[ moduleName ].accessKey;
+		},
+		unlockExperimentalAPIs: ( accessKey ) => {
+			for ( const experiment of Object.values( registeredExperiments ) ) {
+				if ( experiment.accessKey === accessKey ) {
+					return experiment.apis;
+				}
+			}
+
+			throw new Error(
+				'There is no registered module matching the specified access key'
+			);
 		},
 	};
 };
