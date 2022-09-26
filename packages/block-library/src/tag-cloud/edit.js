@@ -105,7 +105,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		setAttributes( updateObj );
 	};
 
-	const serverSideRenderAttirbutes = {
+	const serverSideRenderAttributes = {
 		...attributes,
 		className: undefined,
 		style: {
