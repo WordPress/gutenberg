@@ -72,8 +72,12 @@ const BorderBoxControlSplitControls = (
 
 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
 
+	const spacingProps = __next40pxDefaultSize
+		? { rowGap: 4, columnGap: 2 }
+		: { gap: 4 };
+
 	return (
-		<Grid { ...otherProps } ref={ mergedRef } gap={ 4 }>
+		<Grid { ...otherProps } ref={ mergedRef } { ...spacingProps }>
 			<BorderBoxControlVisualizer
 				value={ value }
 				__next40pxDefaultSize={ __next40pxDefaultSize }
