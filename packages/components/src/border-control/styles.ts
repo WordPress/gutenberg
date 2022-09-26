@@ -66,7 +66,7 @@ export const wrapperHeight = ( __next40pxDefaultSize?: boolean ) => {
 	`;
 };
 
-export const borderControlDropdown = () => css`
+export const borderControlDropdown = ( __next40pxDefaultSize?: boolean ) => css`
 	background: #fff;
 
 	&& > button {
@@ -74,7 +74,7 @@ export const borderControlDropdown = () => css`
 		 * Override button component height and padding to fit within
 		 * BorderControl regardless of size.
 		 */
-		height: 100%;
+		height: ${ __next40pxDefaultSize ? '40px' : '100%' };
 		padding: ${ space( 0.75 ) };
 		${ rtl(
 			{ borderRadius: `2px 0 0 2px` },

@@ -100,6 +100,9 @@ const UnconnectedBorderControl = (
 					placeholder={ placeholder }
 					disableUnits={ disableUnits }
 					__unstableInputWidth={ inputWidth }
+					size={
+						__next40pxDefaultSize ? '__unstable-large' : undefined
+					}
 				/>
 				{ withSlider && (
 					<RangeControl
