@@ -156,6 +156,8 @@ function getColors( context, isSubMenu ) {
 		customBackgroundColor,
 		overlayTextColor,
 		customOverlayTextColor,
+		overlayLinkColor,
+		customOverlayLinkColor,
 		overlayBackgroundColor,
 		customOverlayBackgroundColor,
 		style,
@@ -173,6 +175,12 @@ function getColors( context, isSubMenu ) {
 		colors.textColor = textColor;
 	} else if ( !! style?.color?.text ) {
 		colors.customTextColor = style.color.text;
+	}
+
+	if ( isSubMenu && !! customOverlayLinkColor ) {
+		colors.customLinkColor = customOverlayLinkColor;
+	} else if ( isSubMenu && !! overlayLinkColor ) {
+		colors.linkColor = overlayLinkColor;
 	}
 
 	if ( isSubMenu && !! customOverlayBackgroundColor ) {
@@ -643,6 +651,8 @@ export default function NavigationLinkEdit( {
 		customTextColor,
 		backgroundColor,
 		customBackgroundColor,
+		customLinkColor,
+		linkColor,
 	} = getColors( context, ! isTopLevelLink );
 
 	function onKeyDown( event ) {
@@ -678,9 +688,20 @@ export default function NavigationLinkEdit( {
 		blockProps.onClick = () => setIsLinkOpen( true );
 	}
 
-	const classes = classnames( 'wp-block-navigation-item__content', {
-		'wp-block-navigation-link__placeholder': ! url || isInvalid || isDraft,
-	} );
+	const linkProps = {
+		className: classnames( 'wp-block-navigation-item__content', {
+			'wp-block-navigation-link__placeholder':
+				! url || isInvalid || isDraft,
+		} ),
+		style: {
+			...( customLinkColor && {
+				color: customLinkColor,
+			} ),
+			...( linkColor && {
+				color: `var(--wp--preset--color--${ linkColor })`,
+			} ),
+		},
+	};
 
 	const missingText = getMissingText( type );
 	/* translators: Whether the navigation link is Invalid or a Draft. */
@@ -745,7 +766,7 @@ export default function NavigationLinkEdit( {
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
-				<a className={ classes }>
+				<a { ...linkProps }>
 					{ /* eslint-enable */ }
 					{ ! url ? (
 						<div className="wp-block-navigation-link__placeholder-text">

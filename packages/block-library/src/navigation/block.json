@@ -58,6 +58,12 @@
 		"customOverlayTextColor": {
 			"type": "string"
 		},
+		"overlayLinkColor": {
+			"type": "string"
+		},
+		"customOverlayLinkColor": {
+			"type": "string"
+		},
 		"maxNestingLevel": {
 			"type": "number",
 			"default": 5
@@ -70,6 +76,8 @@
 		"customBackgroundColor": "customBackgroundColor",
 		"overlayTextColor": "overlayTextColor",
 		"customOverlayTextColor": "customOverlayTextColor",
+		"overlayLinkColor": "overlayLinkColor",
+		"customOverlayLinkColor": "customOverlayLinkColor",
 		"overlayBackgroundColor": "overlayBackgroundColor",
 		"customOverlayBackgroundColor": "customOverlayBackgroundColor",
 		"fontSize": "fontSize",

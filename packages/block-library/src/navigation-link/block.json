@@ -47,6 +47,8 @@
 		"customBackgroundColor",
 		"overlayTextColor",
 		"customOverlayTextColor",
+		"overlayLinkColor",
+		"customOverlayLinkColor",
 		"overlayBackgroundColor",
 		"customOverlayBackgroundColor",
 		"fontSize",
