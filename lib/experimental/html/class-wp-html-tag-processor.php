@@ -17,6 +17,9 @@
  *        E.g. match having class `1<"2` needs to recognize `class="1&lt;&quot;2"`.
  * @TODO: Decode character references in `get_attribute()`
  * @TODO: Properly escape attribute value in `set_attribute()`
+ * @TODO: Add slow mode to escape character entities in CSS class names?
+ *        (This requires a custom decoder since `html_entity_decode()`
+ *        doesn't handle attribute character reference decoding rules.
  *
  * @package WordPress
  * @subpackage HTML
@@ -27,6 +30,144 @@
  * Processes an input HTML document by applying a specified set
  * of patches to that input. Tokenizes HTML but does not fully
  * parse the input document.
+ *
+ * ## Usage
+ *
+ * Use of this class requires three steps:
+ *
+ *  1. Create a new class instance with your input HTML document.
+ *  2. Find the tag(s) you are looking for.
+ *  3. Request changes to the attributes in those tag(s).
+ *
+ * Example
+ * ```php
+ *     $processor = new WP_HTML_Tag_Processor( $html );
+ *     if ( $processor->next_tag( array( 'tag_name' => 'option' ) ) ) {
+ *         $processor->set_attribute( 'selected', true );
+ *     }
+ * ```
+ *
+ * ### Finding tags
+ *
+ * The `next_tag()` function moves the internal cursor through
+ * your input HTML document until it finds a tag meeting any of
+ * the supplied restrictions in the optional query argument. If
+ * no argument is provided then it will find the next HTML tag,
+ * regardless of what kind it is.
+ *
+ * If you want to _find whatever the next tag is_
+ * ```php
+ *     $processor->next_tag();
+ * ```
+ *
+ * | Goal                                                      | Query                                                                              |
+ * |-----------------------------------------------------------|------------------------------------------------------------------------------------|
+ * | Find any tag.                                             | `$processor->next_tag();`                                                          |
+ * | Find next image tag.                                      | `$processor->next_tag( array( 'tag_name' => 'img' ) );`                            |
+ * | Find next tag containing the `fullwidth` CSS class.       | `$process->next_tag( array( 'class_name' => 'fullwidth' ) );`                      |
+ * | Find next image tag containing the `fullwidth` CSS class. | `$process->next_tag( array( 'tag_name' => 'img', 'class_name' => 'fullwidth' ) );` |
+ *
+ * If a tag was found meeting your criteria then `next_tag()`
+ * will return `true` and you can proceed to modify it. If it
+ * returns `false`, however, it failed to find the tag and
+ * moved the cursor to the end of the file.
+ *
+ * Once the cursor reaches the end of the file the processor
+ * is done and if you want to reach an earlier tag you will
+ * need to recreate the processor and start over. The internal
+ * cursor can only proceed forward, never backing up.
+ *
+ * #### Custom queries
+ *
+ * Sometimes it's necessary to further inspect an HTML tag than
+ * the query syntax here permits. In these cases one may further
+ * inspect the search results using the read-only functions
+ * provided by the processor or external state or variables.
+ *
+ * Example
+ * ```php
+ *     // Paint up to the first five DIV or SPAN tags marked with the "jazzy" style.
+ *     $remaining_tags_to_style = 5;
+ *     while ( $processor->next_tag() ) {
+ *         if (
+ *              ( 'DIV' === $processor->get_tag() || 'SPAN' === $processor->get_tag() ) &&
+ *              'jazzy' === $processor->get_attribute( 'data-style' )
+ *         ) {
+ *             $processor->add_class( 'theme-style-everest-jazz' );
+ *             if ( 0 === --$remaining_tag_to_style ) {
+ *                 return (string) $processor;
+ *             }
+ *         }
+ *     }
+ * ```
+ *
+ * ### Modifying HTML attributes for a found tag
+ *
+ * Once the processor has found the start of a tag you can
+ * instruct it to modify the attributes on that tag by setting
+ * a new value for an attribute or by removing an existing one.
+ *
+ * Example
+ * ```php
+ *     if ( $processor->next_tag( array( 'class' => 'wp-group-block' ) ) ) {
+ *         $processor->set_attribute( 'title' => 'This groups the contained content.' );
+ *         $processor->remove_attribute( 'data-test-id' );
+ *     }
+ * ```
+ *
+ * If `set_attribute()` is called for an existing attribute it will
+ * overwrite the existing value. Similarly, calling `remove_attribute()`
+ * for a non-existing attribute has no effect on the document.
+ *
+ * ### Modifying CSS classes for a found tag
+ *
+ * The tag processor treats the `class` attribute as a special case.
+ * Because it's a common operation to add or remove CSS classes you
+ * can do so using this interface.
+ *
+ * As with attribute values, adding or removing CSS classes is a safe
+ * operation that doesn't require checking if the attribute or class
+ * exists before making changes. If removing the only class then the
+ * entire `class` attribute will be removed.
+ *
+ * Example
+ * ```php
+ *     // from `<span>Yippee!</span>`
+ *     //   to `<span class="is-active">Yippee!</span>`
+ *     $processor->add_class( 'is-active' );
+ *
+ *     // from `<span class="excited">Yippee!</span>`
+ *     //   to `<span class="excited is-active">Yippee!</span>`
+ *     $processor->add_class( 'is-active' );
+ *
+ *     // from `<span class="is-active heavy-accent">Yippee!</span>`
+ *     //   to `<span class="is-active heavy-accent">Yippee!</span>`
+ *     $processor->add_class( 'is-active' );
+ *
+ *     // from `<input type="text" class="is-active rugby not-disabled" length="24">`
+ *     //   to `<input type="text" class="is-active not-disabled" length="24">
+ *     $processor->remove_class( 'rugby' );
+ *
+ *     // from `<input type="text" class="rugby" length="24">`
+ *     //   to `<input type="text" length="24">
+ *     $processor->remove_class( 'rugby' );
+ *
+ *     // from `<input type="text" length="24">`
+ *     //   to `<input type="text" length="24">
+ *     $processor->remove_class( 'rugby' );
+ * ```
+ *
+ * ## Design limitations
+ *
+ * @TODO: Expand this section
+ *
+ *  - no nesting: cannot match open and close tag
+ *  - only move forward, never backward
+ *  - class names not decoded if they contain character references
+ *  - only secures against HTML escaping issues; requires
+ *    manually sanitizing or escaping values based on the needs of
+ *    each individual attribute, since different attributes have
+ *    different needs.
  *
  * @since 6.2.0
  */
@@ -937,7 +1078,7 @@ class WP_HTML_Tag_Processor {
 
 		$tag_name = substr( $this->html, $this->tag_name_starts_at, $this->tag_name_length );
 
-		return strtolower( $tag_name );
+		return strtoupper( $tag_name );
 	}
 
 	/**
