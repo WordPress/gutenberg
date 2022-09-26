@@ -179,7 +179,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 				<ServerSideRender
 					key="tag-cloud"
 					block="core/tag-cloud"
-					attributes={ serverSideRenderAttirbutes }
+					attributes={ serverSideRenderAttributes }
 				/>
 			</div>
 		</>
