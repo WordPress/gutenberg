@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/experiments",
 	"version": "0.0.1",
-	"description": "Dependency Injection container for WordPress.",
+	"description": "Internal experimental APIs for WordPress core.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
