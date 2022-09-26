@@ -3,6 +3,16 @@
  */
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import type {
+	FontSize,
+	FontSizeOption,
+	FontSizeSelectOption,
+	FontSizeToggleGroupOption,
+} from './types';
+
 const DEFAULT_FONT_SIZE = 'default';
 const DEFAULT_FONT_SIZE_OPTION = {
 	slug: DEFAULT_FONT_SIZE,
@@ -36,13 +46,16 @@ const FONT_SIZES_ALIASES = [
  * Helper util to split a font size to its numeric value
  * and its `unit`, if exists.
  *
- * @param {string|number} size Font size.
- * @return {[number, string]} An array with the numeric value and the unit if exists.
+ * @param  size Font size.
+ * @return An array with the numeric value and the unit if exists.
  */
-export function splitValueAndUnitFromSize( size ) {
-	const [ numericValue, unit ] = `${ size }`.match( /[\d\.]+|\D+/g );
+export function splitValueAndUnitFromSize( size: number | string ) {
+	const [ numericValue, unit ] = `${ size }`.match( /[\d\.]+|\D+/g ) ?? [];
 
-	if ( ! isNaN( parseFloat( numericValue ) ) && isFinite( numericValue ) ) {
+	if (
+		! isNaN( parseFloat( numericValue ) ) &&
+		isFinite( Number( numericValue ) )
+	) {
 		return [ numericValue, unit ];
 	}
 
@@ -53,28 +66,28 @@ export function splitValueAndUnitFromSize( size ) {
  * Some themes use css vars for their font sizes, so until we
  * have the way of calculating them don't display them.
  *
- * @param {string|number} value The value that is checked.
- * @return {boolean} Whether the value is a simple css value.
+ * @param  value The value that is checked.
+ * @return Whether the value is a simple css value.
  */
-export function isSimpleCssValue( value ) {
+export function isSimpleCssValue( value: number | string ) {
 	const sizeRegex = /^[\d\.]+(px|em|rem|vw|vh|%)?$/i;
-	return sizeRegex.test( value );
+	return sizeRegex.test( String( value ) );
 }
 
 /**
  * Return font size options in the proper format depending
  * on the currently used control (select, toggle group).
  *
- * @param {boolean}  useSelectControl       Whether to use a select control.
- * @param {Object[]} optionsArray           Array of available font sizes objects.
- * @param {boolean}  disableCustomFontSizes Flag that indicates if custom font sizes are disabled.
- * @return {Object[]|null}                  Array of font sizes in proper format for the used control.
+ * @param  useSelectControl       Whether to use a select control.
+ * @param  optionsArray           Array of available font sizes objects.
+ * @param  disableCustomFontSizes Flag that indicates if custom font sizes are disabled.
+ * @return Array of font sizes in proper format for the used control.
  */
 export function getFontSizeOptions(
-	useSelectControl,
-	optionsArray,
-	disableCustomFontSizes
-) {
+	useSelectControl: boolean,
+	optionsArray: FontSize[],
+	disableCustomFontSizes: boolean
+): FontSizeSelectOption[] | FontSizeToggleGroupOption[] | null {
 	if ( disableCustomFontSizes && ! optionsArray.length ) {
 		return null;
 	}
@@ -83,8 +96,11 @@ export function getFontSizeOptions(
 		: getToggleGroupOptions( optionsArray );
 }
 
-function getSelectOptions( optionsArray, disableCustomFontSizes ) {
-	const options = [
+function getSelectOptions(
+	optionsArray: FontSize[],
+	disableCustomFontSizes: boolean
+): FontSizeSelectOption[] {
+	const options: FontSizeOption[] = [
 		DEFAULT_FONT_SIZE_OPTION,
 		...optionsArray,
 		...( disableCustomFontSizes ? [] : [ CUSTOM_FONT_SIZE_OPTION ] ),
@@ -94,21 +110,21 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 		name,
 		size,
 		__experimentalHint:
-			size && isSimpleCssValue( size ) && parseFloat( size ),
+			size && isSimpleCssValue( size ) && parseFloat( String( size ) ),
 	} ) );
 }
 
 /**
  * Build options for the toggle group options.
  *
- * @param {Array}    optionsArray An array of font size options.
- * @param {string[]} labelAliases An array of alternative labels.
- * @return {Array}   Remapped optionsArray.
+ * @param  optionsArray An array of font size options.
+ * @param  labelAliases An array of alternative labels.
+ * @return Remapped optionsArray.
  */
 export function getToggleGroupOptions(
-	optionsArray,
-	labelAliases = FONT_SIZES_ALIASES
-) {
+	optionsArray: FontSize[],
+	labelAliases: string[] = FONT_SIZES_ALIASES
+): FontSizeToggleGroupOption[] {
 	return optionsArray.map( ( { slug, size, name }, index ) => {
 		return {
 			key: slug,
@@ -119,7 +135,10 @@ export function getToggleGroupOptions(
 	} );
 }
 
-export function getSelectedOption( fontSizes, value ) {
+export function getSelectedOption(
+	fontSizes: FontSize[],
+	value: number | string | undefined
+): FontSizeOption {
 	if ( ! value ) {
 		return DEFAULT_FONT_SIZE_OPTION;
 	}
