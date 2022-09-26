@@ -58,7 +58,7 @@ describe( 'PostPreviewButton', () => {
 		expect( button ).not.toHaveClass( 'editor-post-preview' );
 	} );
 
-	it( 'should set `variant` to `tertiary` if no classname is specified.', () => {
+	it( 'should render a tertiary button if no classname is specified.', () => {
 		render( <PostPreviewButton /> );
 
 		expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-tertiary' );
