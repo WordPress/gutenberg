@@ -10,7 +10,7 @@
 		.block-editor-image-size-control__height {
 			margin-bottom: 0.5em;
 
-			// Fix the text and placeholder text being misaligned in Safari
+			// Fix the text and placeholder text being misaligned in Safari.
 			input {
 				line-height: 1.25;
 			}
@@ -24,6 +24,7 @@
 			margin-left: 5px;
 		}
 
+		// Vertical alignment help for lock button.
 		.block-editor-image-size-control__proportions_toggle {
 			margin-top: 8px;
 		}
