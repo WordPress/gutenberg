@@ -1,0 +1,18 @@
+// Don't show the drop cap when editing the paragraph's content. It causes a
+// number of bugs in combination with `contenteditable` fields. The caret
+// cannot be set around it, caret position calculation fails in Chrome, and
+// typing at the end of the paragraph doesn't work.
+.has-drop-cap:not(:focus)::first-letter {
+	float: left;
+	font-size: 8.4em;
+	line-height: 0.68;
+	font-weight: 100;
+	margin: 0.05em 0.1em 0 0;
+	text-transform: uppercase;
+	font-style: normal;
+}
+
+// Prevent the dropcap from breaking out of the box when a background is applied.
+p.has-drop-cap.has-background {
+	overflow: hidden;
+}

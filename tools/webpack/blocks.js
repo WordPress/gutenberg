@@ -113,6 +113,15 @@ module.exports = {
 					},
 					transform: stylesTransform,
 				} ) ),
+				{
+					from: `./packages/block-library/build-style/*/styles/*.css`,
+					to( { absoluteFilename } ) {
+						const parts = absoluteFilename.split( sep );
+						const dirname = parts[ parts.length - 3 ];
+						return `build/block-library/blocks/${ dirname }/styles/[name].css`;
+					},
+					transform: stylesTransform,
+				},
 				Object.entries( {
 					'./packages/block-library/src/':
 						'build/block-library/blocks/',

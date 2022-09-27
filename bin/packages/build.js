@@ -125,9 +125,12 @@ function createStyleEntryTransform() {
 			// block-library package also need rebuilding.
 			if (
 				packageName === 'block-library' &&
-				[ 'style.scss', 'editor.scss', 'theme.scss' ].includes(
-					path.basename( file )
-				)
+				[
+					'style.scss',
+					'editor.scss',
+					'theme.scss',
+					'styles/*.scss',
+				].includes( path.basename( file ) )
 			) {
 				entries.push( file );
 			}
@@ -219,6 +222,7 @@ if ( files.length ) {
 			`${ PACKAGES_DIR }/block-library/src/*/style.scss`,
 			`${ PACKAGES_DIR }/block-library/src/*/theme.scss`,
 			`${ PACKAGES_DIR }/block-library/src/*/editor.scss`,
+			`${ PACKAGES_DIR }/block-library/src/*/styles/*.scss`,
 			`${ PACKAGES_DIR }/block-library/src/*.scss`,
 		],
 		{
