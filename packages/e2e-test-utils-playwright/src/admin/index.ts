@@ -11,6 +11,7 @@ import { getPageError } from './get-page-error';
 import { visitAdminPage } from './visit-admin-page';
 import { visitSiteEditor } from './visit-site-editor';
 import type { PageUtils } from '../page-utils';
+import { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 
 type AdminConstructorProps = {
 	page: Page;
@@ -34,4 +35,5 @@ export class Admin {
 	getPageError = getPageError.bind( this );
 	visitAdminPage = visitAdminPage.bind( this );
 	visitSiteEditor = visitSiteEditor.bind( this );
+	openDocumentSettingsSidebar = openDocumentSettingsSidebar.bind(this);
 }
