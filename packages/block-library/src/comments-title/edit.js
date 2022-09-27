@@ -55,24 +55,16 @@ export default function Edit( {
 		if ( isSiteEditor ) {
 			// Match the number of comments that will be shown in the comment-template/edit.js placeholder
 
-			const commentsDepth = ! threadComments
-				? 1
-				: Math.min( threadCommentsDepth, 3 );
+			const nestedCommentsNumber = threadComments
+				? Math.min( threadCommentsDepth, 3 ) - 1
+				: 0;
+			const topLevelCommentsNumber = pageComments ? commentsPerPage : 3;
 
-			// Number of nested comments
-			let commentsNumber = commentsDepth;
+			const commentsNumber =
+				parseInt( nestedCommentsNumber ) +
+				parseInt( topLevelCommentsNumber );
 
-			// Sum one comment unless the break comments setting is active and set to less than 2
-			if ( ! pageComments || commentsPerPage >= 2 ) {
-				commentsNumber++;
-			}
-
-			// Sum one comment unless the break comments setting is active and set to less than 3
-			if ( ! pageComments || commentsPerPage >= 3 ) {
-				commentsNumber++;
-			}
-
-			setCommentsCount( commentsNumber );
+			setCommentsCount( Math.min( commentsNumber, 3 ) );
 			return;
 		}
 		const currentPostId = postId;

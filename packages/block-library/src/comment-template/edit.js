@@ -50,6 +50,7 @@ const getCommentsPlaceholder = ( {
 	threadComments,
 	threadCommentsDepth,
 } ) => {
+	// Limit commentsDepth to 3
 	const commentsDepth = ! threadComments
 		? 1
 		: Math.min( threadCommentsDepth, 3 );
@@ -74,16 +75,16 @@ const getCommentsPlaceholder = ( {
 		{ commentId: -1, children: buildChildrenComment( 1 ) },
 	];
 
-	// Add a second comment unless the break comments setting is active and set to less than 2
-	if ( ! pageComments || perPage >= 2 ) {
+	// Add a second comment unless the break comments setting is active and set to less than 2, and there is one nested comment max
+	if ( ( ! pageComments || perPage >= 2 ) && commentsDepth < 3 ) {
 		placeholderComments.push( {
 			commentId: -2,
 			children: [],
 		} );
 	}
 
-	// Add a third comment unless the break comments setting is active and set to less than 3
-	if ( ! pageComments || perPage >= 3 ) {
+	// Add a third comment unless the break comments setting is active and set to less than 3, and there aren't nested comments
+	if ( ( ! pageComments || perPage >= 3 ) && commentsDepth < 2 ) {
 		placeholderComments.push( {
 			commentId: -3,
 			children: [],
