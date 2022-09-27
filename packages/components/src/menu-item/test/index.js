@@ -107,4 +107,40 @@ describe( 'MenuItem', () => {
 		expect( checkboxMenuItem ).toBeChecked();
 		expect( checkboxMenuItem ).toHaveAttribute( 'aria-checked', 'true' );
 	} );
+
+	it( 'should not render shortcut or right icon if suffix provided', () => {
+		render(
+			<MenuItem
+				icon={ <span>Icon</span> }
+				iconPosition="right"
+				role="menuitemcheckbox"
+				shortcut="Shortcut"
+				suffix="Suffix"
+			>
+				My item
+			</MenuItem>
+		);
+
+		expect( screen.getByText( 'Suffix' ) ).toBeInTheDocument();
+		expect( screen.queryByText( 'Shortcut' ) ).not.toBeInTheDocument();
+		expect( screen.queryByText( 'Icon' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'should render left icon despite suffix being provided', () => {
+		render(
+			<MenuItem
+				icon={ <span>Icon</span> }
+				iconPosition="left"
+				role="menuitemcheckbox"
+				shortcut="Shortcut"
+				suffix="Suffix"
+			>
+				My item
+			</MenuItem>
+		);
+
+		expect( screen.getByText( 'Icon' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Suffix' ) ).toBeInTheDocument();
+		expect( screen.queryByText( 'Shortcut' ) ).not.toBeInTheDocument();
+	} );
 } );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { includes, debounce } from 'lodash';
+import { includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,6 +11,7 @@ import { focus } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
+import { debounce } from '../../utils/debounce';
 import useRefEffect from '../use-ref-effect';
 
 /**
@@ -176,7 +177,7 @@ export default function useDisabled( {
 
 			// Debounce re-disable since disabling process itself will incur
 			// additional mutations which should be ignored.
-			const debouncedDisable = debounce( disable, undefined, {
+			const debouncedDisable = debounce( disable, 0, {
 				leading: true,
 			} );
 			disable();

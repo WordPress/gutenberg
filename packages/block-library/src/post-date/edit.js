@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useRef } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import {
 	AlignmentControl,
@@ -39,7 +39,16 @@ export default function PostDateEdit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-	const timeRef = useRef();
+
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps = useMemo(
+		() => ( { anchor: popoverAnchor } ),
+		[ popoverAnchor ]
+	);
+
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const dateSettings = getDateSettings();
 	const [ siteFormat = dateSettings.formats.date ] = useEntityProp(
@@ -68,7 +77,7 @@ export default function PostDateEdit( {
 	);
 
 	let postDate = date ? (
-		<time dateTime={ dateI18n( 'c', date ) } ref={ timeRef }>
+		<time dateTime={ dateI18n( 'c', date ) } ref={ setPopoverAnchor }>
 			{ dateI18n( format || siteFormat, date ) }
 		</time>
 	) : (
@@ -98,7 +107,7 @@ export default function PostDateEdit( {
 				{ date && ! isDescendentOfQueryLoop && (
 					<ToolbarGroup>
 						<Dropdown
-							popoverProps={ { anchorRef: timeRef.current } }
+							popoverProps={ popoverProps }
 							renderContent={ ( { onClose } ) => (
 								<PublishDateTimePicker
 									currentDate={ date }

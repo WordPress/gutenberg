@@ -614,7 +614,6 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 			order: mapBlockOrder( action.blocks ),
 			parents: mapBlockParents( action.blocks ),
 			controlledInnerBlocks: {},
-			visibility: {},
 		};
 
 		const subTree = buildBlockTree( newState, action.blocks );
@@ -1162,17 +1161,6 @@ export const blocks = flow(
 		}
 		return state;
 	},
-
-	visibility( state = {}, action ) {
-		if ( action.type === 'SET_BLOCK_VISIBILITY' ) {
-			return {
-				...state,
-				...action.updates,
-			};
-		}
-
-		return state;
-	},
 } );
 
 /**
@@ -1210,6 +1198,25 @@ export function draggedBlocks( state = [], action ) {
 
 		case 'STOP_DRAGGING_BLOCKS':
 			return [];
+	}
+
+	return state;
+}
+
+/**
+ * Reducer tracking the visible blocks.
+ *
+ * @param {Record<string,boolean>} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {Record<string,boolean>} Block visibility.
+ */
+export function blockVisibility( state = {}, action ) {
+	if ( action.type === 'SET_BLOCK_VISIBILITY' ) {
+		return {
+			...state,
+			...action.updates,
+		};
 	}
 
 	return state;
@@ -1660,7 +1667,7 @@ export function hasBlockMovingClientId( state = null, action ) {
  *
  * @return {[string,Object]} Updated state.
  */
-export function lastBlockAttributesChange( state, action ) {
+export function lastBlockAttributesChange( state = null, action ) {
 	switch ( action.type ) {
 		case 'UPDATE_BLOCK':
 			if ( ! action.updates.attributes ) {
@@ -1681,7 +1688,7 @@ export function lastBlockAttributesChange( state, action ) {
 			);
 	}
 
-	return null;
+	return state;
 }
 
 /**
@@ -1714,9 +1721,12 @@ export function automaticChangeStatus( state, action ) {
 		case 'SET_BLOCK_VISIBILITY':
 		case 'START_TYPING':
 		case 'STOP_TYPING':
+		case 'UPDATE_BLOCK_LIST_SETTINGS':
 			return state;
 	}
 
+	// TODO: This is a source of bug, as each time there's a change in timing,
+	// or a new action is added, this could break.
 	// Reset the state by default (for any action not handled).
 }
 
@@ -1810,4 +1820,5 @@ export default combineReducers( {
 	highlightedBlock,
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
+	blockVisibility,
 } );

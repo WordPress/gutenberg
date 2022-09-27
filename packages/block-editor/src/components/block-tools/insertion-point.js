@@ -149,13 +149,13 @@ function InsertionPointPopover( {
 			...( ! isVertical ? horizontalLine.rest : verticalLine.rest ),
 			opacity: 1,
 			borderRadius: '2px',
-			transition: { delay: isInserterShown ? 0.4 : 0 },
+			transition: { delay: isInserterShown ? 0.1 : 0, type: 'tween' },
 		},
 		hover: {
 			...( ! isVertical ? horizontalLine.hover : verticalLine.hover ),
 			opacity: 1,
 			borderRadius: '2px',
-			transition: { delay: 0.4 },
+			transition: { delay: 0.1, type: 'tween' },
 		},
 	};
 
@@ -165,7 +165,7 @@ function InsertionPointPopover( {
 		},
 		rest: {
 			scale: 1,
-			transition: { delay: 0.2 },
+			transition: { type: 'tween' },
 		},
 	};
 

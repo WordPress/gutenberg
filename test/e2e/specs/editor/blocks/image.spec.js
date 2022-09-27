@@ -216,14 +216,27 @@ test.describe( 'Image', () => {
 		await expect( image ).toBeVisible();
 		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
 
-		// Navigate to More,
+		// Navigate to inline toolbar,
 		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
-		// Link,
-		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
-		// Italic,
-		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
-		// and finally Bold.
-		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
+		await expect(
+			await page.evaluate( () =>
+				document.activeElement.getAttribute( 'aria-label' )
+			)
+		).toBe( 'Bold' );
+
+		// Bold to italic,
+		await page.keyboard.press( 'ArrowRight' );
+		// Italic to link,
+		await page.keyboard.press( 'ArrowRight' );
+		// Link to italic,
+		await page.keyboard.press( 'ArrowLeft' );
+		// Italic to bold.
+		await page.keyboard.press( 'ArrowLeft' );
+		await expect(
+			await page.evaluate( () =>
+				document.activeElement.getAttribute( 'aria-label' )
+			)
+		).toBe( 'Bold' );
 
 		await page.keyboard.press( 'Space' );
 		await page.keyboard.press( 'a' );

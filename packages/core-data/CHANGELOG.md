@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 5.1.0 (2022-09-21)
+
+## 5.0.0 (2022-09-13)
+
 ### Breaking Changes
 
 –   Add TypeScript types to the built package (via "types": "build-types" in the package.json)

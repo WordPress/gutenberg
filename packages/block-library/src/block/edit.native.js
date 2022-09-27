@@ -163,7 +163,7 @@ export default function ReusableBlockEdit( {
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
 						{ __(
-							'Alternatively, you can detach and edit these blocks separately by tapping "Convert to regular blocks".'
+							'Alternatively, you can detach and edit these blocks separately by tapping “Convert to regular blocks”.'
 						) }
 					</Text>
 					<TextControl

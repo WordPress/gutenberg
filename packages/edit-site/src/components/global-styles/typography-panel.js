@@ -6,6 +6,7 @@ import {
 	__experimentalFontFamilyControl as FontFamilyControl,
 	__experimentalFontAppearanceControl as FontAppearanceControl,
 	__experimentalLetterSpacingControl as LetterSpacingControl,
+	__experimentalTextTransformControl as TextTransformControl,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -53,12 +54,28 @@ function useHasAppearanceControl( name ) {
 	return hasFontStyles || hasFontWeights;
 }
 
-function useHasLetterSpacingControl( name ) {
+function useHasLetterSpacingControl( name, element ) {
+	const setting = useSetting( 'typography.letterSpacing', name )[ 0 ];
+	if ( ! setting ) {
+		return false;
+	}
+	if ( ! name && element === 'heading' ) {
+		return true;
+	}
 	const supports = getSupportedGlobalStylesPanels( name );
-	return (
-		useSetting( 'typography.letterSpacing', name )[ 0 ] &&
-		supports.includes( 'letterSpacing' )
-	);
+	return supports.includes( 'letterSpacing' );
+}
+
+function useHasTextTransformControl( name, element ) {
+	const setting = useSetting( 'typography.textTransform', name )[ 0 ];
+	if ( ! setting ) {
+		return false;
+	}
+	if ( ! name && element === 'heading' ) {
+		return true;
+	}
+	const supports = getSupportedGlobalStylesPanels( name );
+	return supports.includes( 'textTransform' );
 }
 
 export default function TypographyPanel( { name, element } ) {
@@ -84,7 +101,8 @@ export default function TypographyPanel( { name, element } ) {
 		supports.includes( 'fontWeight' );
 	const hasLineHeightEnabled = useHasLineHeightControl( name );
 	const hasAppearanceControl = useHasAppearanceControl( name );
-	const hasLetterSpacingControl = useHasLetterSpacingControl( name );
+	const hasLetterSpacingControl = useHasLetterSpacingControl( name, element );
+	const hasTextTransformControl = useHasTextTransformControl( name, element );
 
 	/* Disable font size controls when the option to style all headings is selected. */
 	let hasFontSizeEnabled = supports.includes( 'fontSize' );
@@ -115,6 +133,10 @@ export default function TypographyPanel( { name, element } ) {
 	);
 	const [ letterSpacing, setLetterSpacing ] = useStyle(
 		prefix + 'typography.letterSpacing',
+		name
+	);
+	const [ textTransform, setTextTransform ] = useStyle(
+		prefix + 'typography.textTransform',
 		name
 	);
 	const [ backgroundColor ] = useStyle( prefix + 'color.background', name );
@@ -247,6 +269,18 @@ export default function TypographyPanel( { name, element } ) {
 						size="__unstable-large"
 						__unstableInputWidth="auto"
 					/>
+				) }
+				{ hasTextTransformControl && (
+					<div className="edit-site-typography-panel__full-width-control">
+						<TextTransformControl
+							value={ textTransform }
+							onChange={ setTextTransform }
+							showNone
+							isBlock
+							size="__unstable-large"
+							__nextHasNoMarginBottom
+						/>
+					</div>
 				) }
 			</Grid>
 		</PanelBody>

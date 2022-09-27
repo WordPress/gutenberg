@@ -26,6 +26,18 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	);
 
 	/**
+	 * The sources of data this object can represent.
+	 *
+	 * @var string[]
+	 */
+	const VALID_ORIGINS = array(
+		'default',
+		'blocks',
+		'theme',
+		'custom',
+	);
+
+	/**
 	 * Metadata for style properties.
 	 *
 	 * Each element is a direct mapping from the CSS property name to the
@@ -445,7 +457,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				static::$blocks_metadata[ $block_name ]['features'] = $features;
 			}
 
-			// Assign defaults, then overwrite those that the block sets by itself.
+			// Assign defaults, then override those that the block sets by itself.
 			// If the block selector is compounded, will append the element to each
 			// individual block selector.
 			$block_selectors = explode( ',', static::$blocks_metadata[ $block_name ]['selector'] );
@@ -534,7 +546,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$nodes = array_merge( $nodes, static::get_block_nodes( $theme_json, $selectors ) );
 
 		// This filter allows us to modify the output of WP_Theme_JSON so that we can do things like loading block CSS independently.
-		return apply_filters( 'gutenberg_get_style_nodes', $nodes );
+		return apply_filters( 'gutenberg_theme_json_get_style_nodes', $nodes );
 	}
 
 	/**
@@ -625,9 +637,12 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 *                         'styles': only the styles section in theme.json.
 	 *                         'presets': only the classes for the presets.
 	 * @param array $origins A list of origins to include. By default it includes VALID_ORIGINS.
+	 * @param array $options An array of options for now used for internal purposes only (may change without notice).
+	 *                       The options currently supported are 'scope' that makes sure all style are scoped to a given selector,
+	 *                       and root_selector which overwrites and forces a given selector to be used on the root node.
 	 * @return string Stylesheet.
 	 */
-	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = null ) {
+	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = null, $options = array() ) {
 		if ( null === $origins ) {
 			$origins = static::VALID_ORIGINS;
 		}
@@ -648,6 +663,27 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$style_nodes     = static::get_style_nodes( $this->theme_json, $blocks_metadata );
 		$setting_nodes   = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
 
+		$root_style_key    = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $style_nodes, 'selector' ), true );
+		$root_settings_key = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $setting_nodes, 'selector' ), true );
+
+		if ( ! empty( $options['scope'] ) ) {
+			foreach ( $setting_nodes as &$node ) {
+				$node['selector'] = static::scope_selector( $options['scope'], $node['selector'] );
+			}
+			foreach ( $style_nodes as &$node ) {
+				$node['selector'] = static::scope_selector( $options['scope'], $node['selector'] );
+			}
+		}
+
+		if ( ! empty( $options['root_selector'] ) ) {
+			if ( false !== $root_settings_key ) {
+				$setting_nodes[ $root_settings_key ]['selector'] = $options['root_selector'];
+			}
+			if ( false !== $root_style_key ) {
+				$setting_nodes[ $root_style_key ]['selector'] = $options['root_selector'];
+			}
+		}
+
 		$stylesheet = '';
 
 		if ( in_array( 'variables', $types, true ) ) {
@@ -655,23 +691,30 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 
 		if ( in_array( 'styles', $types, true ) ) {
-			$root_block_key = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $style_nodes, 'selector' ), true );
-
-			if ( false !== $root_block_key ) {
-				$stylesheet .= $this->get_root_layout_rules( static::ROOT_BLOCK_SELECTOR, $style_nodes[ $root_block_key ] );
+			if ( false !== $root_style_key ) {
+				$stylesheet .= $this->get_root_layout_rules( $style_nodes[ $root_style_key ]['selector'], $style_nodes[ $root_style_key ] );
 			}
 			$stylesheet .= $this->get_block_classes( $style_nodes );
 		} elseif ( in_array( 'base-layout-styles', $types, true ) ) {
+			$root_selector    = static::ROOT_BLOCK_SELECTOR;
+			$columns_selector = '.wp-block-columns';
+			if ( ! empty( $options['scope'] ) ) {
+				$root_selector    = static::scope_selector( $options['scope'], $root_selector );
+				$columns_selector = static::scope_selector( $options['scope'], $columns_selector );
+			}
+			if ( ! empty( $options['root_selector'] ) ) {
+				$root_selector = $options['root_selector'];
+			}
 			// Base layout styles are provided as part of `styles`, so only output separately if explicitly requested.
 			// For backwards compatibility, the Columns block is explicitly included, to support a different default gap value.
 			$base_styles_nodes = array(
 				array(
 					'path'     => array( 'styles' ),
-					'selector' => static::ROOT_BLOCK_SELECTOR,
+					'selector' => $root_selector,
 				),
 				array(
 					'path'     => array( 'styles', 'blocks', 'core/columns' ),
-					'selector' => '.wp-block-columns',
+					'selector' => $columns_selector,
 					'name'     => 'core/columns',
 				),
 			);
@@ -1248,38 +1291,42 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		$unit            = '%' === $spacing_scale['unit'] ? '%' : sanitize_title( $spacing_scale['unit'] );
 		$current_step    = $spacing_scale['mediumStep'];
-		$steps_mid_point = round( ( ( $spacing_scale['steps'] ) / 2 ), 0 );
+		$steps_mid_point = round( $spacing_scale['steps'] / 2, 0 );
 		$x_small_count   = null;
 		$below_sizes     = array();
 		$slug            = 40;
 		$remainder       = 0;
 
-		for ( $x = $steps_mid_point - 1; $spacing_scale['steps'] > 1 && $slug > 0 && $x > 0; $x-- ) {
-			$current_step = '+' === $spacing_scale['operator']
-				? $current_step - $spacing_scale['increment']
-				: ( $spacing_scale['increment'] > 1 ? $current_step / $spacing_scale['increment'] : $current_step * $spacing_scale['increment'] );
+		for ( $below_midpoint_count = $steps_mid_point - 1; $spacing_scale['steps'] > 1 && $slug > 0 && $below_midpoint_count > 0; $below_midpoint_count-- ) {
+			if ( '+' === $spacing_scale['operator'] ) {
+				$current_step -= $spacing_scale['increment'];
+			} elseif ( $spacing_scale['increment'] > 1 ) {
+				$current_step /= $spacing_scale['increment'];
+			} else {
+				$current_step *= $spacing_scale['increment'];
+			}
 
 			if ( $current_step <= 0 ) {
-				$remainder = $x;
+				$remainder = $below_midpoint_count;
 				break;
 			}
 
 			$below_sizes[] = array(
-				/* translators: %s: Multiple of t-shirt sizing, eg. 2X-Small */
-				'name' => $x === $steps_mid_point - 1 ? __( 'Small', 'gutenberg' ) : sprintf( __( '%sX-Small', 'gutenberg' ), strval( $x_small_count ) ),
+				/* translators: %s: Digit to indicate multiple of sizing, eg. 2X-Small. */
+				'name' => $below_midpoint_count === $steps_mid_point - 1 ? __( 'Small', 'gutenberg' ) : sprintf( __( '%sX-Small', 'gutenberg' ), strval( $x_small_count ) ),
 				'slug' => (string) $slug,
 				'size' => round( $current_step, 2 ) . $unit,
 			);
 
-			if ( $x === $steps_mid_point - 2 ) {
+			if ( $below_midpoint_count === $steps_mid_point - 2 ) {
 				$x_small_count = 2;
 			}
 
-			if ( $x < $steps_mid_point - 2 ) {
+			if ( $below_midpoint_count < $steps_mid_point - 2 ) {
 				$x_small_count++;
 			}
 
-			$slug = $slug - 10;
+			$slug -= 10;
 		}
 
 		$below_sizes = array_reverse( $below_sizes );
@@ -1296,30 +1343,39 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$slug          = 60;
 		$steps_above   = ( $spacing_scale['steps'] - $steps_mid_point ) + $remainder;
 
-		for ( $x = 0; $x < $steps_above; $x++ ) {
+		for ( $above_midpoint_count = 0; $above_midpoint_count < $steps_above; $above_midpoint_count++ ) {
 			$current_step = '+' === $spacing_scale['operator']
 				? $current_step + $spacing_scale['increment']
 				: ( $spacing_scale['increment'] >= 1 ? $current_step * $spacing_scale['increment'] : $current_step / $spacing_scale['increment'] );
 
 			$above_sizes[] = array(
-				/* translators: %s: Multiple of t-shirt sizing, eg. 2X-Large */
-				'name' => 0 === $x ? __( 'Large', 'gutenberg' ) : sprintf( __( '%sX-Large', 'gutenberg' ), strval( $x_large_count ) ),
+				/* translators: %s: Digit to indicate multiple of sizing, eg. 2X-Large. */
+				'name' => 0 === $above_midpoint_count ? __( 'Large', 'gutenberg' ) : sprintf( __( '%sX-Large', 'gutenberg' ), strval( $x_large_count ) ),
 				'slug' => (string) $slug,
 				'size' => round( $current_step, 2 ) . $unit,
 			);
 
-			if ( 1 === $x ) {
+			if ( 1 === $above_midpoint_count ) {
 				$x_large_count = 2;
 			}
 
-			if ( $x > 1 ) {
+			if ( $above_midpoint_count > 1 ) {
 				$x_large_count++;
 			}
 
-			$slug = $slug + 10;
+			$slug += 10;
 		}
 
-		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', 'default' ), array_merge( $below_sizes, $above_sizes ) );
+		$spacing_sizes = array_merge( $below_sizes, $above_sizes );
+
+		// If there are 7 or less steps in the scale revert to numbers for labels instead of t-shirt sizes.
+		if ( $spacing_scale['steps'] <= 7 ) {
+			for ( $spacing_sizes_count = 0; $spacing_sizes_count < count( $spacing_sizes ); $spacing_sizes_count++ ) {
+				$spacing_sizes[ $spacing_sizes_count ]['name'] = strval( $spacing_sizes_count + 1 );
+			}
+		}
+
+		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', 'default' ), $spacing_sizes );
 	}
 
 	/**
@@ -1503,4 +1559,45 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 		return $block_rules;
 	}
+
+	/**
+	 * Function that scopes a selector with another one. This works a bit like
+	 * SCSS nesting except the `&` operator isn't supported.
+	 *
+	 * <code>
+	 * $scope = '.a, .b .c';
+	 * $selector = '> .x, .y';
+	 * $merged = scope_selector( $scope, $selector );
+	 * // $merged is '.a > .x, .a .y, .b .c > .x, .b .c .y'
+	 * </code>
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param string $scope    Selector to scope to.
+	 * @param string $selector Original selector.
+	 * @return string Scoped selector.
+	 */
+	public static function scope_selector( $scope, $selector ) {
+		$scopes    = explode( ',', $scope );
+		$selectors = explode( ',', $selector );
+
+		$selectors_scoped = array();
+		foreach ( $scopes as $outer ) {
+			foreach ( $selectors as $inner ) {
+				$outer = trim( $outer );
+				$inner = trim( $inner );
+				if ( ! empty( $outer ) && ! empty( $inner ) ) {
+					$selectors_scoped[] = $outer . ' ' . $inner;
+				} elseif ( empty( $outer ) ) {
+					$selectors_scoped[] = $inner;
+				} elseif ( empty( $inner ) ) {
+					$selectors_scoped[] = $outer;
+				}
+			}
+		}
+
+		$result = implode( ', ', $selectors_scoped );
+		return $result;
+	}
+
 }

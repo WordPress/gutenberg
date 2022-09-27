@@ -504,6 +504,12 @@
 		"parent": "filters"
 	},
 	{
+		"title": "Global Styles Filters",
+		"slug": "global-styles-filters",
+		"markdown_source": "../docs/reference-guides/filters/global-styles-filters.md",
+		"parent": "filters"
+	},
+	{
 		"title": "SlotFills Reference",
 		"slug": "slotfills",
 		"markdown_source": "../docs/reference-guides/slotfills/README.md",
@@ -1602,6 +1608,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/experiments",
+		"slug": "packages-experiments",
+		"markdown_source": "../packages/experiments/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/format-library",
 		"slug": "packages-format-library",
 		"markdown_source": "../packages/format-library/README.md",
@@ -1822,6 +1834,12 @@
 		"slug": "packages-style-engine",
 		"markdown_source": "../packages/style-engine/README.md",
 		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/style-engine Using the Style Engine to generate block supports styles",
+		"slug": "using-the-style-engine-with-block-supports",
+		"markdown_source": "../packages/style-engine/docs/using-the-style-engine-with-block-supports.md",
+		"parent": "packages-style-engine"
 	},
 	{
 		"title": "@wordpress/stylelint-config",

@@ -113,6 +113,7 @@ function MediaContainer( props, ref ) {
 		mediaWidth,
 		onSelectMedia,
 		onWidthChange,
+		isContentLocked,
 	} = props;
 
 	const isTemporaryMedia = ! mediaId && isBlobURL( mediaUrl );
@@ -131,8 +132,8 @@ function MediaContainer( props, ref ) {
 			commitWidthChange( parseInt( elt.style.width ) );
 		};
 		const enablePositions = {
-			right: mediaPosition === 'left',
-			left: mediaPosition === 'right',
+			right: ! isContentLocked && mediaPosition === 'left',
+			left: ! isContentLocked && mediaPosition === 'right',
 		};
 
 		const backgroundStyles =

@@ -17,7 +17,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
-import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 
 const TEMPLATE = [
 	[ 'core/post-title' ],
@@ -85,6 +85,13 @@ export default function PostTemplateEdit( {
 			inherit,
 			taxQuery,
 			parents,
+			pages,
+			// We gather extra query args to pass to the REST API call.
+			// This way extenders of Query Loop can add their own query args,
+			// and have accurate previews in the editor.
+			// Noting though that these args should either be supported by the
+			// REST API or be handled by custom REST filters like `rest_{$this->post_type}_query`.
+			...restQueryArgs
 		} = {},
 		queryContext = [ { page: 1 } ],
 		templateSlug,
@@ -94,19 +101,6 @@ export default function PostTemplateEdit( {
 } ) {
 	const [ { page } ] = queryContext;
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
-
-	let categorySlug = null;
-	if ( templateSlug?.startsWith( 'category-' ) ) {
-		categorySlug = templateSlug.replace( 'category-', '' );
-	}
-	const { records: categories, hasResolved: hasResolvedCategories } =
-		useEntityRecords( 'taxonomy', 'category', {
-			context: 'view',
-			per_page: -1,
-			_fields: [ 'id' ],
-			slug: categorySlug,
-		} );
-
 	const { posts, blocks } = useSelect(
 		( select ) => {
 			const { getEntityRecords, getTaxonomies } = select( coreStore );
@@ -116,12 +110,22 @@ export default function PostTemplateEdit( {
 				per_page: -1,
 				context: 'view',
 			} );
+			const templateCategory =
+				inherit &&
+				templateSlug?.startsWith( 'category-' ) &&
+				getEntityRecords( 'taxonomy', 'category', {
+					context: 'view',
+					per_page: 1,
+					_fields: [ 'id' ],
+					slug: templateSlug.replace( 'category-', '' ),
+				} );
 			const query = {
 				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
 				order,
 				orderby: orderBy,
 			};
-			if ( taxQuery ) {
+			// There is no need to build the taxQuery if we inherit.
+			if ( taxQuery && ! inherit ) {
 				// We have to build the tax query for the REST API and use as
 				// keys the taxonomies `rest_base` with the `term ids` as values.
 				const builtTaxQuery = Object.entries( taxQuery ).reduce(
@@ -167,18 +171,18 @@ export default function PostTemplateEdit( {
 				if ( templateSlug?.startsWith( 'archive-' ) ) {
 					query.postType = templateSlug.replace( 'archive-', '' );
 					postType = query.postType;
-				} else if ( !! categorySlug && hasResolvedCategories ) {
-					query.taxQuery = {
-						category: categories.map( ( { id } ) => id ),
-					};
-					taxQuery = query.taxQuery;
+				} else if ( templateCategory ) {
+					query.categories = templateCategory[ 0 ]?.id;
 				}
 			}
 			// When we preview Query Loop blocks we should prefer the current
 			// block's postType, which is passed through block context.
 			const usedPostType = previewPostType || postType;
 			return {
-				posts: getEntityRecords( 'postType', usedPostType, query ),
+				posts: getEntityRecords( 'postType', usedPostType, {
+					...query,
+					...restQueryArgs,
+				} ),
 				blocks: getBlocks( clientId ),
 			};
 		},
@@ -198,10 +202,8 @@ export default function PostTemplateEdit( {
 			templateSlug,
 			taxQuery,
 			parents,
+			restQueryArgs,
 			previewPostType,
-			categories,
-			categorySlug,
-			hasResolvedCategories,
 		]
 	);
 	const blockContexts = useMemo(

@@ -118,7 +118,7 @@ function BlockListBlock( {
 					),
 				hasContentLockedParent: _hasContentLockedParent,
 				isContentLocking:
-					getTemplateLock( clientId ) === 'noContent' &&
+					getTemplateLock( clientId ) === 'contentOnly' &&
 					! _hasContentLockedParent,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,

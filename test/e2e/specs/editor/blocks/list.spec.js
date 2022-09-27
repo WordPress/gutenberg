@@ -333,7 +333,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( 'two' );
-		await pageUtils.pressKeyTimes( 'ArrowUp', 5 );
+		await pageUtils.pressKeyTimes( 'ArrowUp', 4 );
 		await editor.transformBlockTo( 'core/paragraph' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -419,7 +419,6 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.press( 'ArrowUp' );
-		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Enter' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -492,7 +491,6 @@ test.describe( 'List', () => {
 		await page.keyboard.type( '1. one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
-		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
@@ -682,7 +680,7 @@ test.describe( 'List', () => {
 
 		// To do: investigate why the toolbar is not showing up right after
 		// outdenting.
-		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowLeft' );
 		await editor.clickBlockToolbarButton( 'Outdent' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -781,7 +779,6 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'b' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'c' );
-		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
 
@@ -924,7 +921,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' a' );
-		await pageUtils.pressKeyTimes( 'ArrowUp', 3 );
+		await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
 		await page.keyboard.press( 'Enter' );
 		// The caret should land in the second item.
 		await page.keyboard.type( '2' );
@@ -1025,6 +1022,7 @@ test.describe( 'List', () => {
 
 		// Again create a new paragraph.
 		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
 
 		// Move to the end of the list.
 		await page.keyboard.press( 'ArrowLeft' );
@@ -1057,7 +1055,6 @@ test.describe( 'List', () => {
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
-		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' );

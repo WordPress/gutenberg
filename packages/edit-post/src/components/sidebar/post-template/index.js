@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { PanelRow, Dropdown, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -15,7 +15,14 @@ import PostTemplateForm from './form';
 import { store as editPostStore } from '../../../store';
 
 export default function PostTemplate() {
-	const anchorRef = useRef();
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps = useMemo(
+		() => ( { anchor: popoverAnchor } ),
+		[ popoverAnchor ]
+	);
 
 	const isVisible = useSelect( ( select ) => {
 		const postTypeSlug = select( editorStore ).getCurrentPostType();
@@ -46,10 +53,10 @@ export default function PostTemplate() {
 	}
 
 	return (
-		<PanelRow className="edit-post-post-template" ref={ anchorRef }>
+		<PanelRow className="edit-post-post-template" ref={ setPopoverAnchor }>
 			<span>{ __( 'Template' ) }</span>
 			<Dropdown
-				popoverProps={ { anchorRef } }
+				popoverProps={ popoverProps }
 				position="bottom left"
 				className="edit-post-post-template__dropdown"
 				contentClassName="edit-post-post-template__dialog"

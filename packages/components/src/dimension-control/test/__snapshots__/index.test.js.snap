@@ -33,6 +33,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
@@ -40,17 +41,6 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   position: relative;
   border-radius: 2px;
   padding-top: 0;
-  -webkit-align-items: flex-start;
-  -webkit-box-align: flex-start;
-  -ms-flex-align: flex-start;
-  align-items: flex-start;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-}
-
-.emotion-5>*+*:not( marquee ) {
-  margin-top: 0;
 }
 
 .emotion-5>* {
@@ -86,10 +76,6 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   padding-bottom: 0;
   max-width: 100%;
   z-index: 1;
-  margin-top: 0;
-  margin-right: 0;
-  margin-bottom: 8px;
-  margin-left: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -318,6 +304,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
@@ -325,17 +312,6 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   position: relative;
   border-radius: 2px;
   padding-top: 0;
-  -webkit-align-items: flex-start;
-  -webkit-box-align: flex-start;
-  -ms-flex-align: flex-start;
-  align-items: flex-start;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-}
-
-.emotion-5>*+*:not( marquee ) {
-  margin-top: 0;
 }
 
 .emotion-5>* {
@@ -371,10 +347,6 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   padding-bottom: 0;
   max-width: 100%;
   z-index: 1;
-  margin-top: 0;
-  margin-right: 0;
-  margin-bottom: 8px;
-  margin-left: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -613,6 +585,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
@@ -620,17 +593,6 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   position: relative;
   border-radius: 2px;
   padding-top: 0;
-  -webkit-align-items: flex-start;
-  -webkit-box-align: flex-start;
-  -ms-flex-align: flex-start;
-  align-items: flex-start;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-}
-
-.emotion-5>*+*:not( marquee ) {
-  margin-top: 0;
 }
 
 .emotion-5>* {
@@ -666,10 +628,6 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   padding-bottom: 0;
   max-width: 100%;
   z-index: 1;
-  margin-top: 0;
-  margin-right: 0;
-  margin-bottom: 8px;
-  margin-left: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -920,6 +878,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
@@ -927,17 +886,6 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   position: relative;
   border-radius: 2px;
   padding-top: 0;
-  -webkit-align-items: flex-start;
-  -webkit-box-align: flex-start;
-  -ms-flex-align: flex-start;
-  align-items: flex-start;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-}
-
-.emotion-5>*+*:not( marquee ) {
-  margin-top: 0;
 }
 
 .emotion-5>* {
@@ -973,10 +921,6 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   padding-bottom: 0;
   max-width: 100%;
   z-index: 1;
-  margin-top: 0;
-  margin-right: 0;
-  margin-bottom: 8px;
-  margin-left: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

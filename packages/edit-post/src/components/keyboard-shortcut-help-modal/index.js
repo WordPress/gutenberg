@@ -100,7 +100,7 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 		<Modal
 			className="edit-post-keyboard-shortcut-help-modal"
 			title={ __( 'Keyboard shortcuts' ) }
-			closeLabel={ __( 'Close' ) }
+			closeButtonLabel={ __( 'Close' ) }
 			onRequestClose={ toggleModal }
 		>
 			<ShortcutSection

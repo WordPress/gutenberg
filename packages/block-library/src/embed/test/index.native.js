@@ -39,8 +39,7 @@ jest.mock( 'react-native-modal', () => {
 } );
 
 // Mock debounce to prevent potentially belated state updates.
-jest.mock( 'lodash', () => ( {
-	...jest.requireActual( 'lodash' ),
+jest.mock( '@wordpress/compose/src/utils/debounce', () => ( {
 	debounce: ( fn ) => {
 		fn.cancel = jest.fn();
 		return fn;

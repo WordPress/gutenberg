@@ -25,7 +25,7 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -14,18 +14,17 @@
+@@ -14,19 +14,18 @@
       "background": "#fff",
       "border": "1px solid",
       "border-color": "#757575",
@@ -36,6 +36,7 @@ Snapshot Diff:
       "flex": "1",
       "flex-direction": "row",
       "font-size": "13px",
+      "gap": "calc(4px * 2)",
       "justify-content": "space-between",
       "outline": "none",
       "padding": "0 8px",
@@ -80,6 +81,7 @@ exports[`base field should render correctly 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
@@ -103,10 +105,6 @@ exports[`base field should render correctly 1`] = `
   -webkit-transition: border-color 100ms ease;
   transition: border-color 100ms ease;
   width: 100%;
-}
-
-.emotion-0>*+*:not( marquee ) {
-  margin-left: calc(4px * 2);
 }
 
 .emotion-0>* {

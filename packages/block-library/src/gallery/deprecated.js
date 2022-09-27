@@ -659,8 +659,8 @@ const v3 = {
 					attribute: 'data-link',
 				},
 				caption: {
-					type: 'array',
-					source: 'children',
+					type: 'string',
+					source: 'html',
 					selector: 'figcaption',
 				},
 			},
@@ -779,8 +779,8 @@ const v2 = {
 					attribute: 'data-link',
 				},
 				caption: {
-					type: 'array',
-					source: 'children',
+					type: 'string',
+					source: 'html',
 					selector: 'figcaption',
 				},
 			},

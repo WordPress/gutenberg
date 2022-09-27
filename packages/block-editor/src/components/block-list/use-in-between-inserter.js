@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
-
+import { useRefEffect, useDebounce } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 
@@ -33,6 +32,10 @@ export function useInBetweenInserter() {
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
 
+	const delayedShowInsertionPoint = useDebounce( showInsertionPoint, 500, {
+		trailing: true,
+	} );
+
 	return useRefEffect(
 		( node ) => {
 			if ( isInBetweenInserterDisabled ) {
@@ -53,6 +56,7 @@ export function useInBetweenInserter() {
 						'block-editor-block-list__layout'
 					)
 				) {
+					delayedShowInsertionPoint.cancel();
 					if ( isBlockInsertionPointVisible() ) {
 						hideInsertionPoint();
 					}
@@ -79,19 +83,19 @@ export function useInBetweenInserter() {
 				const orientation =
 					getBlockListSettings( rootClientId )?.orientation ||
 					'vertical';
-				const rect = event.target.getBoundingClientRect();
-				const offsetTop = event.clientY - rect.top;
-				const offsetLeft = event.clientX - rect.left;
+				const offsetTop = event.clientY;
+				const offsetLeft = event.clientX;
 
 				const children = Array.from( event.target.children );
 				let element = children.find( ( blockEl ) => {
+					const blockElRect = blockEl.getBoundingClientRect();
 					return (
 						( blockEl.classList.contains( 'wp-block' ) &&
 							orientation === 'vertical' &&
-							blockEl.offsetTop > offsetTop ) ||
+							blockElRect.top > offsetTop ) ||
 						( blockEl.classList.contains( 'wp-block' ) &&
 							orientation === 'horizontal' &&
-							blockEl.offsetLeft > offsetLeft )
+							blockElRect.left > offsetLeft )
 					);
 				} );
 
@@ -134,6 +138,7 @@ export function useInBetweenInserter() {
 						( event.clientX > elementRect.right ||
 							event.clientX < elementRect.left ) )
 				) {
+					delayedShowInsertionPoint.cancel();
 					if ( isBlockInsertionPointVisible() ) {
 						hideInsertionPoint();
 					}
@@ -145,13 +150,14 @@ export function useInBetweenInserter() {
 				// Don't show the in-between inserter before the first block in
 				// the list (preserves the original behaviour).
 				if ( index === 0 ) {
+					delayedShowInsertionPoint.cancel();
 					if ( isBlockInsertionPointVisible() ) {
 						hideInsertionPoint();
 					}
 					return;
 				}
 
-				showInsertionPoint( rootClientId, index, {
+				delayedShowInsertionPoint( rootClientId, index, {
 					__unstableWithInserter: true,
 				} );
 			}
