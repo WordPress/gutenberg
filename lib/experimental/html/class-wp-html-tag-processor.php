@@ -847,7 +847,7 @@ class WP_HTML_Tag_Processor {
 		 * out of order, which could otherwise lead to mangled output,
 		 * partially-duplicate attributes, and overwritten attributes.
 		 */
-		usort( $this->attribute_updates, array( 'self', 'sort_start_ascending' ) );
+		usort( $this->attribute_updates, array( self::class, 'sort_start_ascending' ) );
 
 		foreach ( $this->attribute_updates as $diff ) {
 			$this->updated_html .= substr( $this->html, $this->updated_bytes, $diff->start - $this->updated_bytes );
