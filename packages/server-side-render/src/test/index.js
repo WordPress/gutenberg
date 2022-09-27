@@ -79,7 +79,7 @@ describe( 'rendererPath', () => {
 		);
 	} );
 
-	test( 'Should remove attributes and style properties applied by global styles', () => {
+	test( 'Should remove attributes and style properties applied by the block supports', () => {
 		expect(
 			removeBlockSupportAttributes( {
 				backgroundColor: 'foreground',
