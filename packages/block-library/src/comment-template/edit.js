@@ -50,7 +50,9 @@ const getCommentsPlaceholder = ( {
 	threadComments,
 	threadCommentsDepth,
 } ) => {
-	const commentsDepth = ! threadComments ? 1 : threadCommentsDepth;
+	const commentsDepth = ! threadComments
+		? 1
+		: Math.min( threadCommentsDepth, 3 );
 
 	const buildChildrenComment = ( commentsLevel ) => {
 		// Render children comments until commentsDepth is reached
