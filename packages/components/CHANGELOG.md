@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 21.1.1-next.0 (2022-09-27)
+
 ### Bug Fix
 
 -   `Popover`: fix limitShift logic by adding iframe offset correctly [#42950](https://github.com/WordPress/gutenberg/pull/42950)).
