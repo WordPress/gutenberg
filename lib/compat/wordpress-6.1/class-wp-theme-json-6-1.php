@@ -233,7 +233,8 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 		}
 
-		return $output;
+		// This filter allows us to modify the settings that have been understood from the theme, in order to bake in support for features like nested block settings.
+		return apply_filters( 'gutenberg_theme_json_sanitize', $output, $schema, $valid_block_names, $input );
 	}
 
 	/**
