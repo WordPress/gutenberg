@@ -76,6 +76,13 @@ function add_rest_method( $endpoints ) {
 add_filter( 'rest_endpoints', 'add_rest_method');
 ```
 
+### skipBlockSupportAttributes
+
+Remove attributes and style properties applied by global styles. This prevents duplication of styles in the block wrapper and the `ServerSideRender` components.
+
+-   Type: `Boolean`
+-   Required: No
+
 ### urlQueryArgs
 
 Query arguments to apply to the request URL.
