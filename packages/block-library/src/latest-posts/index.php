@@ -46,7 +46,7 @@ function render_block_core_latest_posts( $attributes ) {
 	);
 
 	$block_core_latest_posts_excerpt_length = $attributes['excerptLength'];
-	add_filter( 'excerpt_length', 'block_core_latest_posts_get_excerpt_length', 20 );
+	add_filter( 'excerpt_length', 'block_core_latest_posts_get_excerpt_length', 9999 );
 
 	if ( isset( $attributes['categories'] ) ) {
 		$args['category__in'] = array_column( $attributes['categories'], 'id' );
