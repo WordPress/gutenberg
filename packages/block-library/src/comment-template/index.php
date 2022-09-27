@@ -70,7 +70,6 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 	}
 
 	return $content;
-
 }
 
 /**
