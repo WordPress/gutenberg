@@ -1087,10 +1087,10 @@ class WP_HTML_Tag_Processor {
 		/*
 		 * Parsing is in progress – let's apply the attribute updates without moving on to the next tag.
 		 *
-		 * In practice, it means:
-		 * 1. Applying the attributes updates to the original HTML
-		 * 2. Replacing the original HTML with the updated HTML
-		 * 3. Pointing this tag processor to the current tag name's end in that updated HTML
+		 * In practice:
+		 * 1. Apply the attributes updates to the original HTML
+		 * 2. Replace the original HTML with the updated HTML
+		 * 3. Point this tag processor to the current tag name's end in that updated HTML
 		 */
 
 		// Find tag name's end in the updated markup.
