@@ -106,6 +106,7 @@ class WP_HTML_Tag_Processor {
 	 *   01234
 	 *    - tag name starts at 1
 	 * ```
+	 *
 	 * @since 6.2.0
 	 * @var ?int
 	 */
@@ -1075,8 +1076,10 @@ class WP_HTML_Tag_Processor {
 	 * @return string The processed HTML.
 	 */
 	public function __toString() {
+		/*
+		 * @TODO: What are we intending to measure here? Why check the end of the tag name?
+		 */
 		// Parsing either already finished or not started yet.
-		/** @TODO: What are we intending to measure here? Why check the end of the tag name? */
 		if ( null === $this->tag_name_length ) {
 			return $this->updated_html . substr( $this->html, $this->updated_bytes );
 		}
