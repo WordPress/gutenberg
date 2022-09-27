@@ -70,7 +70,7 @@ const UnconnectedBorderControl = (
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 			/>
-			<HStack spacing={ 3 } className={ innerWrapperClassName }>
+			<HStack spacing={ 4 } className={ innerWrapperClassName }>
 				<UnitControl
 					prefix={
 						<BorderControlDropdown
