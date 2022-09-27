@@ -91,8 +91,52 @@ class WP_HTML_Tag_Processor_Isolated_Test extends WP_UnitTestCase {
 			'noncharacters_3'  => array( html_entity_decode( 'te&#x2FFFE;st' ) ),
 			'noncharacters_4'  => array( html_entity_decode( 'te&#xDFFFF;st' ) ),
 			'noncharacters_5'  => array( html_entity_decode( '&#x10FFFE;' ) ),
+			'noncharacters_6'  => array( "\u{10FFFE}" ),
 			'wp_no_lt'         => array( 'id<script'),
 			'wp_no_amp'        => array( 'class&lt;script'),
 		);
 	}
+
+	/**
+	 * Attribute names with only valid characters should not be rejected.
+	 *
+	 * > Attributes have a name and a value. Attribute names must
+	 * > consist of one or more characters other than controls,
+	 * > U+0020 SPACE, U+0022 ("), U+0027 ('), U+003E (>),
+	 * > U+002F (/), U+003D (=), and noncharacters.
+	 *
+	 * @see https://html.spec.whatwg.org/#attributes-2
+	 *
+	 * @dataProvider data_valid_attribute_names
+	 * @covers set_attribute
+	 */
+	public function test_set_attribute_does_not_reject_valid_attribute_names( $attribute_name ) {
+		define( 'WP_DEBUG', true );
+		$p = new WP_HTML_Tag_Processor( '<span></span>' );
+
+		$p->next_tag();
+		$p->set_attribute( $attribute_name, "test" );
+
+		$this->assertEquals( "<span $attribute_name=\"test\"></span>", (string) $p );
+	}
+
+	/**
+	 * Data provider with invalid HTML attribute names.
+	 *
+	 * @return array {
+	 *     @type string $attribute_name Text considered invalid for HTML attribute names.
+	 * }
+	 */
+	public function data_valid_attribute_names() {
+		return array(
+			'ascii_letters'    => array( "abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUWXYZ" ),
+			'ascii_numbers'    => array( "0123456789" ),
+			'symbols'          => array( '!@#$%^*()[]{};:\\||,.?`~£§±' ),
+			'utf8_diacritics'  => array( "ÁÄÂÀÃÅČÇĆĎÉĚËÈÊẼĔȆĞÍÌÎÏİŇÑÓÖÒÔÕØŘŔŠŞŤÚŮÜÙÛÝŸŽáäâàãåčçćďéěëèêẽĕȇğíìîïıňñóöòôõøðřŕšşťúůüùûýÿžþÞĐđßÆa" ),
+			'hebrew_accents'   => array( "\u{059D}a" ),
+			// See https://arxiv.org/abs/2111.00169
+			'rtl_magic'        => array( html_entity_decode("&#x2067;&#x2066;abc&#x2069;&#x2066;def&#x2069;&#x2069;") ),
+		);
+	}
+
 }
