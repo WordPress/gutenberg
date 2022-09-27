@@ -24,6 +24,26 @@ export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {
 	} );
 }
 
+export function removeBlockSupportAttributes( attributes ) {
+	const {
+		backgroundColor,
+		borderColor,
+		fontFamily,
+		fontSize,
+		gradient,
+		textColor,
+		...restAttributes
+	} = attributes;
+
+	const { border, color, elements, spacing, typography, ...restStyles } =
+		attributes?.style || EMPTY_OBJECT;
+
+	return {
+		...restAttributes,
+		style: restStyles,
+	};
+}
+
 function DefaultEmptyResponsePlaceholder( { className } ) {
 	return (
 		<Placeholder className={ className }>
@@ -62,26 +82,6 @@ function DefaultLoadingResponsePlaceholder( { children, showLoader } ) {
 			</div>
 		</div>
 	);
-}
-
-function removeBlockSupportAttributes( attributes ) {
-	const {
-		backgroundColor,
-		borderColor,
-		fontFamily,
-		fontSize,
-		gradient,
-		textColor,
-		...restAttributes
-	} = attributes;
-
-	const { border, color, elements, spacing, typography, ...restStyles } =
-		attributes?.style || EMPTY_OBJECT;
-
-	return {
-		...restAttributes,
-		style: restStyles,
-	};
 }
 
 export default function ServerSideRender( props ) {
