@@ -152,7 +152,7 @@ class WP_Style_Engine_CSS_Declarations {
 		 *
 		 * It does not need to be backported to future versions of WordPress.
 		 */
-		if ( isset( static::$valid_custom_declarations[ $property ] ) ) {
+		if ( '' !== $filtered_value && isset( static::$valid_custom_declarations[ $property ] ) ) {
 			return safecss_filter_attr( static::$valid_custom_declarations[ $property ] . ":{$spacer}{$value}" ) ?
 				"{$property}:{$spacer}{$value}" : '';
 		}
