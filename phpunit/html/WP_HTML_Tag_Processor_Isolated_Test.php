@@ -121,10 +121,10 @@ class WP_HTML_Tag_Processor_Isolated_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Data provider with invalid HTML attribute names.
+	 * Data provider with valid HTML attribute names.
 	 *
 	 * @return array {
-	 *     @type string $attribute_name Text considered invalid for HTML attribute names.
+	 *     @type string $attribute_name Text considered valid for HTML attribute names.
 	 * }
 	 */
 	public function data_valid_attribute_names() {
