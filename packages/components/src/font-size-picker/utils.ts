@@ -11,6 +11,7 @@ import type {
 	FontSizeOption,
 	FontSizeSelectOption,
 	FontSizeToggleGroupOption,
+	FontSizePickerProps,
 } from './types';
 
 const DEFAULT_FONT_SIZE = 'default';
@@ -49,7 +50,9 @@ const FONT_SIZES_ALIASES = [
  * @param  size Font size.
  * @return An array with the numeric value and the unit if exists.
  */
-export function splitValueAndUnitFromSize( size: number | string ) {
+export function splitValueAndUnitFromSize(
+	size: NonNullable< FontSizePickerProps[ 'value' ] >
+) {
 	const [ numericValue, unit ] = `${ size }`.match( /[\d\.]+|\D+/g ) ?? [];
 
 	if (
@@ -69,7 +72,9 @@ export function splitValueAndUnitFromSize( size: number | string ) {
  * @param  value The value that is checked.
  * @return Whether the value is a simple css value.
  */
-export function isSimpleCssValue( value: number | string ) {
+export function isSimpleCssValue(
+	value: NonNullable< FontSizePickerProps[ 'value' ] >
+) {
 	const sizeRegex = /^[\d\.]+(px|em|rem|vw|vh|%)?$/i;
 	return sizeRegex.test( String( value ) );
 }
@@ -137,7 +142,7 @@ export function getToggleGroupOptions(
 
 export function getSelectedOption(
 	fontSizes: FontSize[],
-	value: number | string | undefined
+	value: FontSizePickerProps[ 'value' ]
 ): FontSizeOption {
 	if ( ! value ) {
 		return DEFAULT_FONT_SIZE_OPTION;
