@@ -15,6 +15,10 @@
 		> svg {
 			opacity: 0;
 		}
+
+		&::before {
+			opacity: 0;
+		}
 	}
 
 	// Remove the transition while we still have a legacy placeholder style.
