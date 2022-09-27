@@ -60,7 +60,7 @@ describe( 'AutosaveMonitor', () => {
 			<AutosaveMonitor isDirty isAutosaveable autosave={ autosave } />
 		);
 
-		expect( autosave ).toHaveBeenCalledTimes( 0 );
+		expect( autosave ).not.toHaveBeenCalled();
 
 		rerender(
 			<AutosaveMonitor
@@ -82,7 +82,7 @@ describe( 'AutosaveMonitor', () => {
 			<AutosaveMonitor isAutosaveable autosave={ autosave } />
 		);
 
-		expect( autosave ).toHaveBeenCalledTimes( 0 );
+		expect( autosave ).not.toHaveBeenCalled();
 
 		rerender(
 			<AutosaveMonitor
@@ -104,7 +104,7 @@ describe( 'AutosaveMonitor', () => {
 			<AutosaveMonitor isDirty isAutosaveable autosave={ autosave } />
 		);
 
-		expect( autosave ).toHaveBeenCalledTimes( 0 );
+		expect( autosave ).not.toHaveBeenCalled();
 
 		rerender(
 			<AutosaveMonitor
@@ -116,7 +116,7 @@ describe( 'AutosaveMonitor', () => {
 
 		jest.runOnlyPendingTimers();
 
-		expect( autosave ).toHaveBeenCalledTimes( 0 );
+		expect( autosave ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should not autosave when `editReference` changes and the post is not autosaving', () => {
@@ -125,7 +125,7 @@ describe( 'AutosaveMonitor', () => {
 			<AutosaveMonitor isAutosaveable autosave={ autosave } />
 		);
 
-		expect( autosave ).toHaveBeenCalledTimes( 0 );
+		expect( autosave ).not.toHaveBeenCalled();
 
 		rerender(
 			<AutosaveMonitor
@@ -138,7 +138,7 @@ describe( 'AutosaveMonitor', () => {
 
 		jest.runOnlyPendingTimers();
 
-		expect( autosave ).toHaveBeenCalledTimes( 0 );
+		expect( autosave ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should not autosave when `editReference` changes and the post started autosaving', () => {
@@ -151,7 +151,7 @@ describe( 'AutosaveMonitor', () => {
 			/>
 		);
 
-		expect( autosave ).toHaveBeenCalledTimes( 0 );
+		expect( autosave ).not.toHaveBeenCalled();
 
 		rerender(
 			<AutosaveMonitor
@@ -164,7 +164,7 @@ describe( 'AutosaveMonitor', () => {
 
 		jest.runOnlyPendingTimers();
 
-		expect( autosave ).toHaveBeenCalledTimes( 0 );
+		expect( autosave ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should schedule itself in another {interval} ms', () => {
