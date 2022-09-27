@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post visibility', () => {
@@ -14,12 +13,13 @@ test.describe( 'Post visibility', () => {
 			page,
 			admin,
 			pageUtils,
+			editor,
 		} ) => {
 			await pageUtils.setBrowserViewport( viewport );
 
 			await admin.createNewPost();
 
-			await admin.openDocumentSettingsSidebar();
+			await editor.openDocumentSettingsSidebar();
 
 			await page.click( 'role=button[name="Public"i]' );
 
@@ -40,12 +40,13 @@ test.describe( 'Post visibility', () => {
 			page,
 			pageUtils,
 			admin,
+			editor,
 		} ) => {
 			await pageUtils.setBrowserViewport( viewport );
 
 			await admin.createNewPost();
 
-			await admin.openDocumentSettingsSidebar();
+			await editor.openDocumentSettingsSidebar();
 
 			const initialStatus = await page.evaluate( () => {
 				return wp.data
@@ -72,13 +73,14 @@ test.describe( 'Post visibility', () => {
 	test( 'visibility remains private even if the publish date is in the future', async ( {
 		page,
 		admin,
+		editor,
 	} ) => {
 		await admin.createNewPost();
 
 		// Enter a title for this post.
 		await page.type( '.editor-post-title__input', 'Title' );
 
-		await admin.openDocumentSettingsSidebar();
+		await editor.openDocumentSettingsSidebar();
 
 		// Set a publish date for the next month.
 		await page.click(
