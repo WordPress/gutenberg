@@ -62,8 +62,10 @@ export default function useCoverIsDark(
 				} )
 				.then( ( color ) => setIsDark( color.isDark ) );
 			return () => {
-				elementRef.current.crossOrigin = originalCrossOrigin;
-			}
+				if ( elementRef.current ) {
+					elementRef.current.crossOrigin = originalCrossOrigin;
+				}
+			};
 		}
 	}, [ url, url && dimRatio <= 50 && elementRef.current, setIsDark ] );
 	useEffect( () => {
