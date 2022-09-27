@@ -55,10 +55,10 @@ const MaybeVStack = ( {
 		<VStack spacing={ 6 } children={ children } />
 	);
 
-function FontSizePicker(
+const UnforwardedFontSizePicker = (
 	props: FontSizePickerProps,
 	ref: ForwardedRef< any >
-) {
+) => {
 	const {
 		/** Start opting into the new margin-free styles that will become the default in a future version. */
 		__nextHasNoMarginBottom = false,
@@ -335,6 +335,8 @@ function FontSizePicker(
 			</MaybeVStack>
 		</fieldset>
 	);
-}
+};
 
-export default forwardRef( FontSizePicker );
+export const FontSizePicker = forwardRef( UnforwardedFontSizePicker );
+
+export default FontSizePicker;
