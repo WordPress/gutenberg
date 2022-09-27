@@ -38,7 +38,7 @@ npm install @wordpress/jest-preset-default --save-dev
 
 #### Using enzyme
 
-Historically, this package used to use `enzyme`, but support was dropped in favor of upgrading to React 18.
+Historically, this package used to use `enzyme`, but support was dropped in favor of `@testing-library/react`, primary reason being unblocking the upgrade to React 18.
 
 If you wish to use `enzyme`, you can still use it by manually providing the React 17 adapter, by following the steps below.
 
