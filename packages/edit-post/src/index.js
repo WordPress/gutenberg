@@ -121,8 +121,12 @@ export function initializeEditor(
 		} );
 	}
 
-	// Prevent adding template part in the post editor.
-	// Only add the filter when the post editor is initialized, not imported.
+	/*
+		Prevent adding template part in the post editor.
+		Only add the filter when the post editor is initialized, not imported.
+		Also only add the filter(s) after registerCoreBlocks()
+		so that common filters in the block library are not overwritten.
+	 */
 	addFilter(
 		'blockEditor.__unstableCanInsertBlockType',
 		'removeTemplatePartsFromInserter',
