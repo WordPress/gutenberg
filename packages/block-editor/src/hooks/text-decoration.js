@@ -46,6 +46,7 @@ export function TextDecorationEdit( props ) {
 		<TextDecorationControl
 			value={ style?.typography?.textDecoration }
 			onChange={ onChange }
+			size="__unstable-large"
 		/>
 	);
 }

@@ -60,7 +60,6 @@ export default function LinkPreview( {
 	return (
 		<div
 			aria-label={ __( 'Currently selected' ) }
-			aria-selected="true"
 			className={ classnames( 'block-editor-link-control__search-item', {
 				'is-current': true,
 				'is-rich': hasRichData,
@@ -124,9 +123,11 @@ export default function LinkPreview( {
 				<ViewerSlot fillProps={ value } />
 			</div>
 
-			{ ( ( hasRichData &&
-				( richData?.image || richData?.description ) ) ||
-				isFetching ) && (
+			{ !! (
+				( hasRichData &&
+					( richData?.image || richData?.description ) ) ||
+				isFetching
+			) && (
 				<div className="block-editor-link-control__search-item-bottom">
 					{ ( richData?.image || isFetching ) && (
 						<div

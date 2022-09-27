@@ -35,6 +35,9 @@ interface QuerySelectResponse< Data > {
  * Like useSelect, but the selectors return objects containing
  * both the original data AND the resolution info.
  *
+ * @since 6.1.0 Introduced in WordPress core.
+ * @private
+ *
  * @param {Function} mapQuerySelect see useSelect
  * @param {Array}    deps           see useSelect
  *
@@ -71,7 +74,7 @@ interface QuerySelectResponse< Data > {
  *
  * @return {QuerySelectResponse} Queried data.
  */
-export default function __experimentalUseQuerySelect( mapQuerySelect, deps ) {
+export default function useQuerySelect( mapQuerySelect, deps ) {
 	return useSelect( ( select, registry ) => {
 		const resolve = ( store ) => enrichSelectors( select( store ) );
 		return mapQuerySelect( resolve, registry );

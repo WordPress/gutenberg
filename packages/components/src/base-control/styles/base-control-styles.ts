@@ -64,7 +64,7 @@ export const StyledHelp = styled.p`
 	margin-bottom: 0;
 	font-size: ${ font( 'helpText.fontSize' ) };
 	font-style: normal;
-	color: ${ COLORS.mediumGray.text };
+	color: ${ COLORS.gray[ 700 ] };
 
 	${ deprecatedMarginHelp }
 `;

@@ -21,7 +21,7 @@ export default function save( { attributes } ) {
 			} ) }
 		>
 			<blockquote>
-				<RichText.Content value={ value } multiline />
+				<RichText.Content tagName="p" value={ value } />
 				{ shouldShowCitation && (
 					<RichText.Content tagName="cite" value={ citation } />
 				) }

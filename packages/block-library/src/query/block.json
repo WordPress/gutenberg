@@ -37,6 +37,9 @@
 			"default": {
 				"type": "list"
 			}
+		},
+		"namespace": {
+			"type": "string"
 		}
 	},
 	"providesContext": {

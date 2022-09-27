@@ -484,6 +484,19 @@ describe( 'global styles renderer', () => {
 					'.has-white-color{color: var(--wp--preset--color--white) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}h1.has-blue-color,h2.has-blue-color,h3.has-blue-color,h4.has-blue-color,h5.has-blue-color,h6.has-blue-color{color: var(--wp--preset--color--blue) !important;}h1.has-blue-background-color,h2.has-blue-background-color,h3.has-blue-background-color,h4.has-blue-background-color,h5.has-blue-background-color,h6.has-blue-background-color{background-color: var(--wp--preset--color--blue) !important;}h1.has-blue-border-color,h2.has-blue-border-color,h3.has-blue-border-color,h4.has-blue-border-color,h5.has-blue-border-color,h6.has-blue-border-color{border-color: var(--wp--preset--color--blue) !important;}'
 			);
 		} );
+		it( 'should output content and wide size variables if values are specified', () => {
+			const tree = {
+				settings: {
+					layout: {
+						contentSize: '840px',
+						wideSize: '1100px',
+					},
+				},
+			};
+			expect( toStyles( tree, 'body' ) ).toEqual(
+				'body {margin: 0; --wp--style--global--content-size: 840px; --wp--style--global--wide-size: 1100px;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
+			);
+		} );
 	} );
 
 	describe( 'getLayoutStyles', () => {
@@ -705,12 +718,12 @@ describe( 'global styles renderer', () => {
 			expect(
 				getStylesDeclarations( blockStyles, 'body', true )
 			).toEqual( [
-				'font-family: sans-serif',
 				'--wp--style--root--padding-top: 33px',
 				'--wp--style--root--padding-right: 33px',
 				'--wp--style--root--padding-bottom: 33px',
 				'--wp--style--root--padding-left: 33px',
 				'background-color: var(--wp--preset--color--light-green-cyan)',
+				'font-family: sans-serif',
 			] );
 		} );
 
@@ -718,12 +731,12 @@ describe( 'global styles renderer', () => {
 			expect(
 				getStylesDeclarations( blockStyles, 'body', false )
 			).toEqual( [
-				'font-family: sans-serif',
 				'background-color: var(--wp--preset--color--light-green-cyan)',
 				'padding-top: 33px',
 				'padding-right: 33px',
 				'padding-bottom: 33px',
 				'padding-left: 33px',
+				'font-family: sans-serif',
 			] );
 		} );
 
@@ -735,12 +748,12 @@ describe( 'global styles renderer', () => {
 					true
 				)
 			).toEqual( [
-				'font-family: sans-serif',
 				'background-color: var(--wp--preset--color--light-green-cyan)',
 				'padding-top: 33px',
 				'padding-right: 33px',
 				'padding-bottom: 33px',
 				'padding-left: 33px',
+				'font-family: sans-serif',
 			] );
 		} );
 	} );

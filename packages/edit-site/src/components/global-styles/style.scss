@@ -21,6 +21,11 @@
 	border-radius: $radius-block-ui;
 }
 
+.edit-site-typography-panel__full-width-control {
+	grid-column: 1 / -1;
+	max-width: 100%;
+}
+
 .edit-site-global-styles-screen-heading-color,
 .edit-site-global-styles-screen-typography {
 	margin: $grid-unit-20;
@@ -41,7 +46,7 @@
 
 	.component-color-indicator {
 		// Show a diagonal line (crossed out) for empty swatches.
-		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+		background: $white linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
 		flex-shrink: 0;
 	}
 }

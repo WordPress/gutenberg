@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { sortBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
@@ -41,7 +36,9 @@ function mapMenuItemsToBlocks( menuItems ) {
 	let mapping = {};
 
 	// The menuItem should be in menu_order sort order.
-	const sortedItems = sortBy( menuItems, 'menu_order' );
+	const sortedItems = [ ...menuItems ].sort(
+		( a, b ) => a.menu_order - b.menu_order
+	);
 
 	const innerBlocks = sortedItems.map( ( menuItem ) => {
 		const attributes = menuItemToBlockAttributes( menuItem );

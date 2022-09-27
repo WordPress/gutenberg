@@ -59,7 +59,7 @@ Our button looks nice but doesn't do anything yet. To display an edit form, we n
 
 ```js
 import { Button, TextControl } from '@wordpress/components';
-export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
@@ -131,7 +131,7 @@ wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', 9 );  // Replace 9
 Let's update `EditPageForm` accordingly:
 
 ```js
-export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	const page = useSelect(
 		select => select( coreDataStore ).getEntityRecord( 'postType', 'page', pageId ),
 		[pageId]
@@ -140,7 +140,7 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 		<div className="my-gutenberg-form">
 			<TextControl
 				label='Page title:'
-				value={ page.title }
+				value={ page.title.rendered }
 			/>
 			{ /* ... */ }
 		</div>
@@ -148,7 +148,7 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 }
 ```
 
-Now it should look like that:
+Now it should look like this:
 
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-populated.png)
 
@@ -160,7 +160,7 @@ There's one problem with our _Page title_ field: you can't edit it. It receives 
 You may have seen a pattern similar to this one in other React apps. It's known as a ["controlled component"](https://reactjs.org/docs/forms.html#controlled-components):
 
 ```js
-export function VanillaReactForm({ initialTitle }) {
+function VanillaReactForm({ initialTitle }) {
 	const [title, setTitle] = useState( initialTitle );
 	return (
 		<TextControl
@@ -181,7 +181,7 @@ const pageId = wp.data.select( 'core' ).getEntityRecords( 'postType', 'page' )[0
 wp.data.dispatch( 'core' ).editEntityRecord( 'postType', 'page', pageId, { title: 'updated title' } );
 ```
 
-At this point, you may ask _how is `editEntityRecord` better than `useState`? The answer is that it offers a few features you wouldn't otherwise get.
+At this point, you may ask _how_ is `editEntityRecord` better than `useState`? The answer is that it offers a few features you wouldn't otherwise get.
 
 Firstly, we can save the changes as easily as we retrieve the data and ensure that all caches will be correctly updated.
 
@@ -222,7 +222,7 @@ We can now update `EditPageForm` accordingly. We can access the actions using th
 ```js
 import { useDispatch } from '@wordpress/data';
 
-export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	const page = useSelect(
 		select => select( coreDataStore ).getEditedEntityRecord( 'postType', 'page', pageId ),
 		[ pageId ]
@@ -281,7 +281,7 @@ Entity records are updated to reflect any saved changes right after the REST API
 This is how the `EditPageForm` looks like with a working *Save* button:
 
 ```js
-export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	// ...
 	const { saveEditedEntityRecord } = useDispatch( coreDataStore );
 	const handleSave = () => saveEditedEntityRecord( 'postType', 'page', pageId );
@@ -303,7 +303,7 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 It works, but there's still one thing to fix: the form modal doesn't automatically close because we never call `onSaveFinished`. Lucky for us, `saveEditedEntityRecord` returns a promise that resolves once the save operation is finished. Let's take advantage of it in `EditPageForm`:
 
 ```js
-export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	// ...
 	const handleSave = async () => {
 		await saveEditedEntityRecord( 'postType', 'page', pageId );
@@ -324,7 +324,7 @@ We optimistically assumed that a *save* operation would always succeed. Unfortun
 To tell the user when any of these happens, we have to make two adjustments. We don't want to close the form modal when the update fails. The promise returned by `saveEditedEntityRecord` is resolved with an updated record only if the update actually worked. When something goes wrong, it resolves with an empty value. Let's use it to keep the modal open:
 
 ```js
-export function EditPageForm( { pageId, onSaveFinished } ) {
+function EditPageForm( { pageId, onSaveFinished } ) {
 	// ...
 	const handleSave = async () => {
 		const updatedRecord = await saveEditedEntityRecord( 'postType', 'page', pageId );
@@ -346,7 +346,7 @@ wp.data.select( 'core' ).getLastEntitySaveError( 'postType', 'page', 9 )
 Here's how we can use it in `EditPageForm`:
 
 ```js
-export function EditPageForm( { pageId, onSaveFinished } ) {
+function EditPageForm( { pageId, onSaveFinished } ) {
 	// ...
     const { lastError, page } = useSelect(
         select => ({
@@ -357,7 +357,7 @@ export function EditPageForm( { pageId, onSaveFinished } ) {
 	)
 	// ...
 	return (
-		<>
+		<div className="my-gutenberg-form">
 			{/* ... */}
 			{ lastError ? (
 				<div className="form-error">
@@ -365,7 +365,7 @@ export function EditPageForm( { pageId, onSaveFinished } ) {
 				</div>
 			) : false }
 			{/* ... */}
-		</>
+		</div>
 	);
 }
 ```
@@ -375,7 +375,7 @@ Great! `EditPageForm` is now fully aware of errors.
 Let's see that error message in action. We'll trigger an invalid update and let it fail. The post title is hard to break, so let's set a `date` property to `-1` instead – that's a guaranteed validation error:
 
 ```js
-export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	// ...
 	const handleChange = ( title ) => editEntityRecord( 'postType', 'page', pageId, { title, date: -1 } );
 	// ...
@@ -397,7 +397,7 @@ We're going to clear it up and communicate two states to the user: _Saving_ and 
 Let's use them in `EditPageForm`:
 
 ```js
-export function EditPageForm( { pageId, onSaveFinished } ) {
+function EditPageForm( { pageId, onSaveFinished } ) {
 	// ...
 	const { isSaving, hasEdits, /* ... */ } = useSelect(
 		select => ({
@@ -413,8 +413,7 @@ export function EditPageForm( { pageId, onSaveFinished } ) {
 We can now use `isSaving` and `hasEdits` to display a spinner when saving is in progress and grey out the save button when there are no edits:
 
 ```js
-
-export function EditPageForm( { pageId, onSaveFinished } ) {
+function EditPageForm( { pageId, onSaveFinished } ) {
 	// ...
 	return (
 		// ...
@@ -479,7 +478,7 @@ function PageEditButton( { pageId } ) {
 	);
 }
 
-export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	const { page, lastError, isSaving, hasEdits } = useSelect(
 		( select ) => ( {
 			page: select( coreDataStore ).getEditedEntityRecord( 'postType', 'page', pageId ),
@@ -541,4 +540,4 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 
 * **Previous part:** [Building a list of pages](/docs/how-to-guides/data-basics/2-building-a-list-of-pages.md)
 * **Next part:** Building a *New Page* form (coming soon)
-* (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/09-code-data-basics-esnext) in the gutenberg-examples repository
+* (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/non-block-examples/09-code-data-basics-esnext) in the gutenberg-examples repository

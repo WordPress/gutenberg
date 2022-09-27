@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useCallback, useRef } from '@wordpress/element';
@@ -7,11 +12,12 @@ import {
 	ToolSelector,
 	__experimentalPreviewOptions as PreviewOptions,
 	NavigableToolbar,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
-import { listView, plus, external } from '@wordpress/icons';
+import { listView, plus, external, chevronUpDown } from '@wordpress/icons';
 import {
 	Button,
 	ToolbarItem,
@@ -55,6 +61,7 @@ export default function Header( {
 		isLoaded,
 		isVisualMode,
 		settings,
+		blockEditorMode,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -69,6 +76,7 @@ export default function Header( {
 		const { __experimentalGetTemplateInfo: getTemplateInfo } =
 			select( editorStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+		const { __unstableGetEditorMode } = select( blockEditorStore );
 
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
@@ -88,6 +96,7 @@ export default function Header( {
 			),
 			isVisualMode: getEditorMode() === 'visual',
 			settings: getSettings(),
+			blockEditorMode: __unstableGetEditorMode(),
 		};
 	}, [] );
 
@@ -96,6 +105,7 @@ export default function Header( {
 		setIsInserterOpened,
 		setIsListViewOpened,
 	} = useDispatch( editSiteStore );
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 
@@ -121,6 +131,10 @@ export default function Header( {
 		'Generic label for block inserter button'
 	);
 	const shortLabel = ! isInserterOpen ? __( 'Add' ) : __( 'Close' );
+
+	const isZoomedOutViewExperimentEnabled =
+		window?.__experimentalEnableZoomedOutView && isVisualMode;
+	const isZoomedOutView = blockEditorMode === 'zoom-out';
 
 	return (
 		<div className="edit-site-header">
@@ -169,15 +183,37 @@ export default function Header( {
 							<ToolbarItem
 								as={ Button }
 								className="edit-site-header-toolbar__list-view-toggle"
+								disabled={ ! isVisualMode && isZoomedOutView }
 								icon={ listView }
-								disabled={ ! isVisualMode }
 								isPressed={ isListViewOpen }
 								/* translators: button label text should, if possible, be under 16 characters. */
 								label={ __( 'List View' ) }
 								onClick={ toggleListView }
 								shortcut={ listViewShortcut }
 								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
 							/>
+							{ isZoomedOutViewExperimentEnabled && (
+								<ToolbarItem
+									as={ Button }
+									className="edit-site-header-toolbar__zoom-out-view-toggle"
+									icon={ chevronUpDown }
+									isPressed={ isZoomedOutView }
+									/* translators: button label text should, if possible, be under 16 characters. */
+									label={ __( 'Zoom-out View' ) }
+									onClick={ () => {
+										setPreviewDeviceType( 'desktop' );
+										setIsListViewOpened( false );
+										__unstableSetEditorMode(
+											isZoomedOutView
+												? 'edit'
+												: 'zoom-out'
+										);
+									} }
+								/>
+							) }
 						</>
 					) }
 				</div>
@@ -206,33 +242,40 @@ export default function Header( {
 			<div className="edit-site-header_end">
 				<div className="edit-site-header__actions">
 					{ ! isFocusMode && (
-						<PreviewOptions
-							deviceType={ deviceType }
-							setDeviceType={ setPreviewDeviceType }
+						<div
+							className={ classnames(
+								'edit-site-header__actions__preview-options',
+								{ 'is-zoomed-out': isZoomedOutView }
+							) }
 						>
-							<MenuGroup>
-								<MenuItem
-									href={ settings?.siteUrl }
-									target="_blank"
-									icon={ external }
-								>
-									{ __( 'View site' ) }
-									<VisuallyHidden as="span">
-										{
-											/* translators: accessibility text */
-											__( '(opens in a new tab)' )
-										}
-									</VisuallyHidden>
-								</MenuItem>
-							</MenuGroup>
-						</PreviewOptions>
+							<PreviewOptions
+								deviceType={ deviceType }
+								setDeviceType={ setPreviewDeviceType }
+							>
+								<MenuGroup>
+									<MenuItem
+										href={ settings?.siteUrl }
+										target="_blank"
+										icon={ external }
+									>
+										{ __( 'View site' ) }
+										<VisuallyHidden as="span">
+											{
+												/* translators: accessibility text */
+												__( '(opens in a new tab)' )
+											}
+										</VisuallyHidden>
+									</MenuItem>
+								</MenuGroup>
+							</PreviewOptions>
+						</div>
 					) }
 					<SaveButton
 						openEntitiesSavedStates={ openEntitiesSavedStates }
 						isEntitiesSavedStatesOpen={ isEntitiesSavedStatesOpen }
 					/>
 					<PinnedItems.Slot scope="core/edit-site" />
-					<MoreMenu />
+					<MoreMenu showIconLabels={ showIconLabels } />
 				</div>
 			</div>
 		</div>

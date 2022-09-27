@@ -1,7 +1,9 @@
 /**
  * External dependencies
  */
-import { deburr, find, words } from 'lodash';
+import { noCase } from 'change-case';
+import removeAccents from 'remove-accents';
+import { find } from 'lodash';
 
 // Default search helpers.
 const defaultGetName = ( item ) => item.name || '';
@@ -21,7 +23,7 @@ const defaultGetCollection = () => null;
 function normalizeSearchInput( input = '' ) {
 	// Disregard diacritics.
 	//  Input: "média"
-	input = deburr( input );
+	input = removeAccents( input );
 
 	// Accommodate leading slash, matching autocomplete expectations.
 	//  Input: "/media"
@@ -35,6 +37,17 @@ function normalizeSearchInput( input = '' ) {
 }
 
 /**
+ * Extracts words from an input string.
+ *
+ * @param {string} input The input string.
+ *
+ * @return {Array} Words, extracted from the input string.
+ */
+function extractWords( input = '' ) {
+	return noCase( input ).split( ' ' ).filter( Boolean );
+}
+
+/**
  * Converts the search term into a list of normalized terms.
  *
  * @param {string} input The search term to normalize.
@@ -42,8 +55,7 @@ function normalizeSearchInput( input = '' ) {
  * @return {string[]} The normalized list of search terms.
  */
 export const getNormalizedSearchTerms = ( input = '' ) => {
-	// Extract words.
-	return words( normalizeSearchInput( input ) );
+	return extractWords( normalizeSearchInput( input ) );
 };
 
 const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
@@ -150,7 +162,7 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 			category,
 			collection,
 		].join( ' ' );
-		const normalizedSearchTerms = words( normalizedSearchInput );
+		const normalizedSearchTerms = extractWords( normalizedSearchInput );
 		const unmatchedTerms = removeMatchingTerms(
 			normalizedSearchTerms,
 			terms

@@ -14,11 +14,5 @@
 		{ "path": "../priority-queue" },
 		{ "path": "../redux-routine" }
 	],
-	"include": [
-		"src/redux-store/metadata/**/*",
-		"src/promise-middleware.js",
-		"src/utils",
-		"src/*.ts",
-		"src/**/*.js"
-	]
+	"include": [ "src/**/*" ]
 }

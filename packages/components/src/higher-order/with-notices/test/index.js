@@ -5,6 +5,7 @@ import {
 	act,
 	render,
 	fireEvent,
+	screen,
 	waitForElementToBeRemoved,
 	within,
 } from '@testing-library/react';
@@ -145,10 +146,11 @@ describe( 'withNotices rendering', () => {
 	it( 'should display notices with functioning dismissal triggers', async () => {
 		const messages = [ 'Aló!', 'hu dis?', 'Otis' ];
 		const notices = noticesFrom( messages );
-		const { container, getAllByLabelText } = render(
+		const { container } = render(
 			<TestComponent notifications={ notices } />
 		);
-		const [ buttonRemoveFirst ] = getAllByLabelText( stockDismissText );
+		const [ buttonRemoveFirst ] =
+			screen.getAllByLabelText( stockDismissText );
 		const getRemovalTarget = () =>
 			within( container ).getByText(
 				// The last item corresponds to the first notice in the DOM.

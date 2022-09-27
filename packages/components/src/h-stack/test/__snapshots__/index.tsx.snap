@@ -13,15 +13,12 @@ exports[`props should render alignment 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 2);
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   -webkit-justify-content: center;
   justify-content: center;
   width: 100%;
-}
-
-.emotion-0>*+*:not( marquee ) {
-  margin-left: calc(4px * 2);
 }
 
 .emotion-0>* {
@@ -55,14 +52,11 @@ exports[`props should render correctly 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   width: 100%;
-}
-
-.emotion-0>*+*:not( marquee ) {
-  margin-left: calc(4px * 2);
 }
 
 .emotion-0>* {
@@ -96,14 +90,11 @@ exports[`props should render spacing 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 5);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   width: 100%;
-}
-
-.emotion-0>*+*:not( marquee ) {
-  margin-left: calc(4px * 5);
 }
 
 .emotion-0>* {

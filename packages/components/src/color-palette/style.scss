@@ -31,20 +31,6 @@
 	}
 }
 
-.components-dropdown__content.components-color-palette__custom-color-dropdown-content .components-popover__content {
-	overflow: visible;
-	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.05);
-	border: none;
-	outline: none;
-	border-radius: $radius-block-ui;
-	padding: 0;
-
-	.react-colorful__saturation {
-		border-top-right-radius: $radius-block-ui;
-		border-top-left-radius: $radius-block-ui;
-	}
-}
-
 .components-color-palette__custom-color-name {
 	text-align: left;
 }

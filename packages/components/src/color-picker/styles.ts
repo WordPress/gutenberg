@@ -11,6 +11,7 @@ import InnerSelectControl from '../select-control';
 import InnerRangeControl from '../range-control';
 import { StyledField } from '../base-control/styles/base-control-styles';
 import { space } from '../ui/utils/space';
+import { boxSizingReset } from '../utils';
 import Button from '../button';
 import { Flex } from '../flex';
 import { HStack } from '../h-stack';
@@ -70,6 +71,8 @@ export const ColorInputWrapper = styled( Flex )`
 `;
 
 export const ColorfulWrapper = styled.div`
+	${ boxSizingReset };
+
 	width: 216px;
 
 	.react-colorful {
