@@ -27,7 +27,8 @@ require_once __DIR__ . '/../../lib/experimental/html/index.php';
  * @coversDefaultClass WP_HTML_Tag_Processor
  */
 class WP_HTML_Tag_Processor_Isolated_Test extends WP_UnitTestCase {
-	protected $runTestInSeparateProcess = TRUE;
+	// phpcs:disable WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase
+	protected $runTestInSeparateProcess = true;
 
 	/**
 	 * Attribute names with invalid characters should be rejected.
@@ -45,7 +46,7 @@ class WP_HTML_Tag_Processor_Isolated_Test extends WP_UnitTestCase {
 		$this->expectException( Exception::class );
 
 		$p->next_tag();
-		$p->set_attribute( $attribute_name, "test" );
+		$p->set_attribute( $attribute_name, 'test' );
 
 		$this->assertEquals( '<span></span>', (string) $p );
 	}
@@ -64,7 +65,7 @@ class WP_HTML_Tag_Processor_Isolated_Test extends WP_UnitTestCase {
 		$p = new WP_HTML_Tag_Processor( '<span></span>' );
 
 		$p->next_tag();
-		$p->set_attribute( $attribute_name, "test" );
+		$p->set_attribute( $attribute_name, 'test' );
 
 		$this->assertEquals( '<span></span>', (string) $p );
 	}
@@ -80,7 +81,7 @@ class WP_HTML_Tag_Processor_Isolated_Test extends WP_UnitTestCase {
 		return array(
 			'controls_null'    => array( "i\x00d" ),
 			'controls_newline' => array( "\nbroken-expectations" ),
-			'space'            => array( "aria label" ),
+			'space'            => array( 'aria label' ),
 			'double-quote'     => array( '"id"' ),
 			'single-quote'     => array( "'id'" ),
 			'greater-than'     => array( 'sneaky>script' ),
@@ -91,9 +92,8 @@ class WP_HTML_Tag_Processor_Isolated_Test extends WP_UnitTestCase {
 			'noncharacters_3'  => array( html_entity_decode( 'te&#x2FFFE;st' ) ),
 			'noncharacters_4'  => array( html_entity_decode( 'te&#xDFFFF;st' ) ),
 			'noncharacters_5'  => array( html_entity_decode( '&#x10FFFE;' ) ),
-			'noncharacters_6'  => array( "\u{10FFFE}" ),
-			'wp_no_lt'         => array( 'id<script'),
-			'wp_no_amp'        => array( 'class&lt;script'),
+			'wp_no_lt'         => array( 'id<script' ),
+			'wp_no_amp'        => array( 'class&lt;script' ),
 		);
 	}
 
@@ -115,7 +115,7 @@ class WP_HTML_Tag_Processor_Isolated_Test extends WP_UnitTestCase {
 		$p = new WP_HTML_Tag_Processor( '<span></span>' );
 
 		$p->next_tag();
-		$p->set_attribute( $attribute_name, "test" );
+		$p->set_attribute( $attribute_name, 'test' );
 
 		$this->assertEquals( "<span $attribute_name=\"test\"></span>", (string) $p );
 	}
@@ -129,13 +129,16 @@ class WP_HTML_Tag_Processor_Isolated_Test extends WP_UnitTestCase {
 	 */
 	public function data_valid_attribute_names() {
 		return array(
-			'ascii_letters'    => array( "abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUWXYZ" ),
-			'ascii_numbers'    => array( "0123456789" ),
-			'symbols'          => array( '!@#$%^*()[]{};:\\||,.?`~£§±' ),
-			'utf8_diacritics'  => array( "ÁÄÂÀÃÅČÇĆĎÉĚËÈÊẼĔȆĞÍÌÎÏİŇÑÓÖÒÔÕØŘŔŠŞŤÚŮÜÙÛÝŸŽáäâàãåčçćďéěëèêẽĕȇğíìîïıňñóöòôõøðřŕšşťúůüùûýÿžþÞĐđßÆa" ),
-			'hebrew_accents'   => array( "\u{059D}a" ),
-			// See https://arxiv.org/abs/2111.00169
-			'rtl_magic'        => array( html_entity_decode("&#x2067;&#x2066;abc&#x2069;&#x2066;def&#x2069;&#x2069;") ),
+			'ascii_letters'         => array( 'abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUWXYZ' ),
+			'ascii_numbers'         => array( '0123456789' ),
+			'symbols'               => array( '!@#$%^*()[]{};:\\||,.?`~£§±' ),
+			'emoji'                 => array( '❌' ),
+			'utf8_diacritics'       => array( 'ÁÄÂÀÃÅČÇĆĎÉĚËÈÊẼĔȆĞÍÌÎÏİŇÑÓÖÒÔÕØŘŔŠŞŤÚŮÜÙÛÝŸŽáäâàãåčçćďéěëèêẽĕȇğíìîïıňñóöòôõøðřŕšşťúůüùûýÿžþÞĐđßÆa' ),
+			'hebrew_accents'        => array( html_entity_decode( '&#x059D;a' ) ),
+			// See https://arxiv.org/abs/2111.00169.
+			'rtl_magic'             => array( html_entity_decode( '&#x2067;&#x2066;abc&#x2069;&#x2066;def&#x2069;&#x2069;' ) ),
+			// Only a single unicode "noncharacter" should be rejected. Specific byte segments used in the "noncharacter" sequence are valid.
+			'noncharacter_segments' => array( "\xFF\xFE" ),
 		);
 	}
 
