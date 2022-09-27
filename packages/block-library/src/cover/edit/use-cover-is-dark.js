@@ -8,6 +8,7 @@ import { colord } from 'colord';
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
@@ -41,6 +42,14 @@ export default function useCoverIsDark(
 		// If opacity is lower than 50 the dominant color is the image or video color,
 		// so use that color for the dark mode computation.
 		if ( url && dimRatio <= 50 && elementRef.current ) {
+			const imgCrossOrigin = applyFilters(
+				'media.crossOrigin',
+				elementRef.current.crossOrigin,
+				url
+			);
+			if ( typeof imgCrossOrigin === 'string' ) {
+				elementRef.current.crossOrigin = imgCrossOrigin;
+			}
 			retrieveFastAverageColor()
 				.getColorAsync( elementRef.current, {
 					// Previously the default color was white, but that changed
