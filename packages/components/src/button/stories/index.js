@@ -1,15 +1,10 @@
 /**
- * External dependencies
- */
-import { text, number, boolean } from '@storybook/addon-knobs';
-
-/**
  * WordPress dependencies
  */
 import {
 	formatBold,
 	formatItalic,
-	link as linkIcon,
+	link,
 	more,
 	wordpress,
 } from '@wordpress/icons';
@@ -23,158 +18,62 @@ import Button from '../';
 export default {
 	title: 'Components/Button',
 	component: Button,
-	parameters: {
-		knobs: { disable: false },
+	argTypes: {
+		label: {
+			control: { type: 'text' },
+		},
+		children: {
+			control: { type: 'text' },
+		},
+		icon: {
+			control: { type: 'select' },
+			options: [ 'wordpress', 'link', 'more' ],
+			mapping: {
+				wordpress,
+				link,
+				more,
+			},
+		},
+		iconSize: {
+			control: { type: 'number' },
+		},
+		isBusy: {
+			control: 'boolean',
+		},
+		isDestructive: {
+			control: 'boolean',
+		},
+		isSmall: {
+			control: 'boolean',
+		},
+		disabled: {
+			control: 'boolean',
+		},
+		variant: {
+			options: [ 'primary', 'secondary', 'tertiary', 'link' ],
+			control: { type: 'select' },
+		},
+		__experimentalIsFocusable: {
+			control: 'boolean',
+		},
 	},
 };
 
-export const _default = () => {
-	const label = text( 'Label', 'Default Button' );
+function Template( { children, ...props } ) {
+	return <Button { ...props }>{ children }</Button>;
+}
 
-	return <Button>{ label }</Button>;
+export const Default = Template.bind( {} );
+Default.args = {
+	children: 'Code is poetry',
+	variant: undefined,
 };
 
-export const primary = () => {
-	const label = text( 'Label', 'Primary Button' );
-	const isBusy = boolean( 'isBusy', false );
-
-	return (
-		<Button isBusy={ isBusy } variant="primary">
-			{ label }
-		</Button>
-	);
-};
-
-export const secondary = () => {
-	const label = text( 'Label', 'Secondary Button' );
-	const isBusy = boolean( 'isBusy', false );
-
-	return (
-		<Button isBusy={ isBusy } variant="secondary">
-			{ label }
-		</Button>
-	);
-};
-
-export const tertiary = () => {
-	const label = text( 'Label', 'Tertiary Button' );
-
-	return <Button variant="tertiary">{ label }</Button>;
-};
-
-export const isDestructive = () => {
-	const label = text( 'Label', 'Destructive Button' );
-	const isBusy = boolean( 'isBusy', false );
-	const isSmall = boolean( 'isSmall', false );
-	const disabled = boolean( 'disabled', false );
-
-	return (
-		<Button
-			isDestructive
-			isBusy={ isBusy }
-			isSmall={ isSmall }
-			disabled={ disabled }
-		>
-			{ label }
-		</Button>
-	);
-};
-
-export const isPrimaryDestructive = () => {
-	const label = text( 'Label', 'Destructive Primary Button' );
-	const isSmall = boolean( 'isSmall', false );
-	const disabled = boolean( 'disabled', false );
-
-	return (
-		<Button
-			variant="primary"
-			isDestructive
-			isSmall={ isSmall }
-			disabled={ disabled }
-		>
-			{ label }
-		</Button>
-	);
-};
-
-export const small = () => {
-	const label = text( 'Label', 'Small Button' );
-
-	return <Button isSmall>{ label }</Button>;
-};
-
-export const pressed = () => {
-	const label = text( 'Label', 'Pressed Button' );
-
-	return <Button isPressed>{ label }</Button>;
-};
-
-export const disabled = () => {
-	const label = text( 'Label', 'Disabled Button' );
-
-	return <Button disabled>{ label }</Button>;
-};
-
-export const disabledFocusable = () => {
-	const label = text( 'Label', 'Disabled Button' );
-
-	return (
-		<Button disabled __experimentalIsFocusable>
-			{ label }
-		</Button>
-	);
-};
-
-export const link = () => {
-	const label = text( 'Label', 'Link Button' );
-
-	return (
-		<Button href="https://wordpress.org/" target="_blank">
-			{ label }
-		</Button>
-	);
-};
-
-export const disabledLink = () => {
-	const label = text( 'Label', 'Disabled Link Button' );
-
-	return (
-		<Button href="https://wordpress.org/" target="_blank" disabled>
-			{ label }
-		</Button>
-	);
-};
-
-export const destructiveLink = () => {
-	const label = text( 'Label', 'Destructive Link' );
-
-	return (
-		<Button isDestructive variant="link">
-			{ label }
-		</Button>
-	);
-};
-
-export const icon = () => {
-	const label = text( 'Label', 'Code is poetry' );
-	const size = number( 'Size', 24 );
-
-	return <Button icon={ wordpress } label={ label } iconSize={ size } />;
-};
-
-export const disabledFocusableIcon = () => {
-	const label = text( 'Label', 'Code is poetry' );
-	const size = number( 'Size', 24 );
-
-	return (
-		<Button
-			icon={ wordpress }
-			label={ label }
-			iconSize={ size }
-			disabled
-			__experimentalIsFocusable
-		/>
-	);
+export const Icon = Template.bind( {} );
+Icon.args = {
+	label: 'Code is poetry',
+	icon: 'wordpress',
+	iconSize: 24,
 };
 
 export const groupedIcons = () => {
@@ -186,7 +85,7 @@ export const groupedIcons = () => {
 		<GroupContainer>
 			<Button icon={ formatBold } label="Bold" />
 			<Button icon={ formatItalic } label="Italic" />
-			<Button icon={ linkIcon } label="Link" />
+			<Button icon={ link } label="Link" />
 		</GroupContainer>
 	);
 };
