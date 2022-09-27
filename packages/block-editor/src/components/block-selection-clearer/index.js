@@ -17,7 +17,7 @@ import { store as blockEditorStore } from '../../store';
  * @param {boolean} isDisabled Disable the block selection clearer.
  * @return {import('react').RefCallback} Ref callback.
  */
-export function useBlockSelectionClearer( isDisabled ) {
+export function useBlockSelectionClearer( isDisabled = false ) {
 	const { hasSelectedBlock, hasMultiSelection } =
 		useSelect( blockEditorStore );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
