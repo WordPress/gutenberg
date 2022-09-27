@@ -29,9 +29,6 @@ export default function GlobalStylesSidebar() {
 				<Flex>
 					<FlexBlock>
 						<strong>{ __( 'Styles' ) }</strong>
-						<span className="edit-site-global-styles-sidebar__beta">
-							{ __( 'Beta' ) }
-						</span>
 					</FlexBlock>
 					<FlexItem>
 						<DropdownMenu

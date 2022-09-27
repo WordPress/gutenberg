@@ -32,7 +32,6 @@ export default function useBlockSelection() {
 	const updateBlockSelection = useCallback(
 		async ( event, clientId, destinationClientId ) => {
 			if ( ! event?.shiftKey ) {
-				await clearSelectedBlock();
 				selectBlock( clientId );
 				return;
 			}

@@ -27,7 +27,11 @@ const blockViewRegex = new RegExp(
  * but have been declared elsewhere. This way we can call Gutenberg override functions, but
  * the block will still call the core function when updates are back ported.
  */
-const prefixFunctions = [ 'build_query_vars_from_query_block' ];
+const prefixFunctions = [
+	'build_query_vars_from_query_block',
+	'wp_enqueue_block_support_styles',
+	'wp_style_engine_get_styles',
+];
 
 /**
  * Escapes the RegExp special characters.
@@ -140,7 +144,11 @@ module.exports = {
 							// block will still call the core function when updates are back ported.
 							content = content.replace(
 								new RegExp( prefixFunctions.join( '|' ), 'g' ),
-								( match ) => `${ prefix }${ match }`
+								( match ) =>
+									`${ prefix }${ match.replace(
+										/^wp_/,
+										''
+									) }`
 							);
 
 							// Within content, search for any function definitions. For

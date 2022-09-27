@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { omit, castArray } from 'lodash';
+import { castArray } from 'lodash';
 
 /**
  * Internal dependencies
@@ -10,6 +10,7 @@ import { DEPRECATED_ENTRY_KEYS } from '../constants';
 import { validateBlock } from '../validation';
 import { getBlockAttributes } from './get-block-attributes';
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
+import { omit } from '../utils';
 
 /**
  * Function that takes no arguments and always returns false.

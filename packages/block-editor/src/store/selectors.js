@@ -1,17 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	castArray,
-	first,
-	last,
-	map,
-	reduce,
-	some,
-	find,
-	filter,
-	orderBy,
-} from 'lodash';
+import { castArray, map, reduce, some, find, filter, orderBy } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -798,7 +788,7 @@ export const getMultiSelectedBlocks = createSelector(
  * @return {?string} First block client ID in the multi-selection set.
  */
 export function getFirstMultiSelectedBlockClientId( state ) {
-	return first( getMultiSelectedBlockClientIds( state ) ) || null;
+	return getMultiSelectedBlockClientIds( state )[ 0 ] || null;
 }
 
 /**
@@ -810,7 +800,8 @@ export function getFirstMultiSelectedBlockClientId( state ) {
  * @return {?string} Last block client ID in the multi-selection set.
  */
 export function getLastMultiSelectedBlockClientId( state ) {
-	return last( getMultiSelectedBlockClientIds( state ) ) || null;
+	const selectedClientIds = getMultiSelectedBlockClientIds( state );
+	return selectedClientIds[ selectedClientIds.length - 1 ] || null;
 }
 
 /**
@@ -948,6 +939,14 @@ export function __unstableIsSelectionCollapsed( state ) {
 	);
 }
 
+export function __unstableSelectionHasUnmergeableBlock( state ) {
+	return getSelectedBlockClientIds( state ).some( ( clientId ) => {
+		const blockName = getBlockName( state, clientId );
+		const blockType = getBlockType( blockName );
+		return ! blockType.merge;
+	} );
+}
+
 /**
  * Check whether the selection is mergeable.
  *
@@ -1009,19 +1008,19 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 		? selectionStart.clientId
 		: selectionEnd.clientId;
 
-	const targetBlock = getBlock( state, targetBlockClientId );
-	const targetBlockType = getBlockType( targetBlock.name );
+	const targetBlockName = getBlockName( state, targetBlockClientId );
+	const targetBlockType = getBlockType( targetBlockName );
 
 	if ( ! targetBlockType.merge ) return false;
 
 	const blockToMerge = getBlock( state, blockToMergeClientId );
 
 	// It's mergeable if the blocks are of the same type.
-	if ( blockToMerge.name === targetBlock.name ) return true;
+	if ( blockToMerge.name === targetBlockName ) return true;
 
 	// If the blocks are of a different type, try to transform the block being
 	// merged into the same type of block.
-	const blocksToMerge = switchToBlockType( blockToMerge, targetBlock.name );
+	const blocksToMerge = switchToBlockType( blockToMerge, targetBlockName );
 
 	return blocksToMerge && blocksToMerge.length;
 }
@@ -1436,7 +1435,7 @@ export function getTemplateLock( state, rootClientId ) {
 
 	const blockListSettings = getBlockListSettings( state, rootClientId );
 	if ( ! blockListSettings ) {
-		return null;
+		return undefined;
 	}
 
 	return blockListSettings.templateLock;
@@ -2542,7 +2541,18 @@ function getReusableBlocks( state ) {
  * @return {boolean} Is navigation mode enabled.
  */
 export function isNavigationMode( state ) {
-	return state.isNavigationMode;
+	return state.editorMode === 'navigation';
+}
+
+/**
+ * Returns the current editor mode.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string} the editor mode.
+ */
+export function __unstableGetEditorMode( state ) {
+	return state.editorMode;
 }
 
 /**
@@ -2625,7 +2635,7 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
 		);
 		if ( entityAreaParents ) {
 			// Last parent closest/most interior.
-			return last( entityAreaParents );
+			return entityAreaParents[ entityAreaParents.length - 1 ];
 		}
 		return null;
 	},
@@ -2660,7 +2670,7 @@ export function wasBlockJustInserted( state, clientId, source ) {
  * @return {boolean} True if the block is visible.
  */
 export function isBlockVisible( state, clientId ) {
-	return state.blocks.visibility?.[ clientId ] ?? true;
+	return state.blockVisibility?.[ clientId ] ?? true;
 }
 
 /**
@@ -2672,10 +2682,80 @@ export function isBlockVisible( state, clientId ) {
 export const __unstableGetVisibleBlocks = createSelector(
 	( state ) => {
 		return new Set(
-			Object.keys( state.blocks.visibility ).filter(
-				( key ) => state.blocks.visibility[ key ]
+			Object.keys( state.blockVisibility ).filter(
+				( key ) => state.blockVisibility[ key ]
 			)
 		);
 	},
-	( state ) => [ state.blocks.visibility ]
+	( state ) => [ state.blockVisibility ]
 );
+
+export const __unstableGetContentLockingParent = createSelector(
+	( state, clientId ) => {
+		let current = clientId;
+		let result;
+		while ( !! state.blocks.parents[ current ] ) {
+			current = state.blocks.parents[ current ];
+			if ( getTemplateLock( state, current ) === 'contentOnly' ) {
+				result = current;
+			}
+		}
+		return result;
+	},
+	( state ) => [ state.blocks.parents, state.blockListSettings ]
+);
+
+export function __unstableGetTemporarilyEditingAsBlocks( state ) {
+	return state.temporarilyEditingAsBlocks;
+}
+
+export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
+	// If the block editing is locked, the block overlay is always active.
+	if ( ! canEditBlock( state, clientId ) ) {
+		return true;
+	}
+
+	const editorMode = __unstableGetEditorMode( state );
+
+	// In zoom-out mode, the block overlay is always active for top level blocks.
+	if (
+		editorMode === 'zoom-out' &&
+		clientId &&
+		! getBlockRootClientId( state, clientId )
+	) {
+		return true;
+	}
+
+	// In navigation mode, the block overlay is active when the block is not
+	// selected (and doesn't contain a selected child). The same behavior is
+	// also enabled in all modes for blocks that have controlled children
+	// (reusable block, template part, navigation), unless explicitly disabled
+	// with `supports.__experimentalDisableBlockOverlay`.
+	const blockSupportDisable = hasBlockSupport(
+		getBlockName( state, clientId ),
+		'__experimentalDisableBlockOverlay',
+		false
+	);
+	const shouldEnableIfUnselected =
+		editorMode === 'navigation' ||
+		( blockSupportDisable
+			? false
+			: areInnerBlocksControlled( state, clientId ) );
+
+	return (
+		shouldEnableIfUnselected &&
+		! isBlockSelected( state, clientId ) &&
+		! hasSelectedInnerBlock( state, clientId, true )
+	);
+}
+
+export function __unstableIsWithinBlockOverlay( state, clientId ) {
+	let parent = state.blocks.parents[ clientId ];
+	while ( !! parent ) {
+		if ( __unstableHasActiveBlockOverlayActive( state, parent ) ) {
+			return true;
+		}
+		parent = state.blocks.parents[ parent ];
+	}
+	return false;
+}

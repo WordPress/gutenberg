@@ -45,7 +45,7 @@ function UnconnectedToggleGroupControl(
 		className,
 		isAdaptiveWidth = false,
 		isBlock = false,
-		__experimentalIsIconGroup = false,
+		__experimentalIsBorderless = false,
 		label,
 		hideLabelFromVision = false,
 		help,
@@ -88,11 +88,11 @@ function UnconnectedToggleGroupControl(
 		() =>
 			cx(
 				styles.ToggleGroupControl( { size } ),
-				! __experimentalIsIconGroup && styles.border,
+				! __experimentalIsBorderless && styles.border,
 				isBlock && styles.block,
 				className
 			),
-		[ className, cx, isBlock, __experimentalIsIconGroup, size ]
+		[ className, cx, isBlock, __experimentalIsBorderless, size ]
 	);
 	return (
 		<BaseControl

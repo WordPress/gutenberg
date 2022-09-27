@@ -28,7 +28,11 @@ describe( 'FontSizePicker', () => {
 			);
 
 			render(
-				<FontSizePicker value={ fontSize } onChange={ setFontSize } />
+				<FontSizePicker
+					value={ fontSize }
+					onChange={ setFontSize }
+					__nextHasNoMarginBottom
+				/>
 			);
 
 			const unitSelect = getUnitSelect();
@@ -52,7 +56,11 @@ describe( 'FontSizePicker', () => {
 			);
 
 			render(
-				<FontSizePicker value={ fontSize } onChange={ setFontSize } />
+				<FontSizePicker
+					value={ fontSize }
+					onChange={ setFontSize }
+					__nextHasNoMarginBottom
+				/>
 			);
 
 			const unitSelect = getUnitSelect();
@@ -87,6 +95,7 @@ describe( 'FontSizePicker', () => {
 					fontSizes={ fontSizes }
 					value={ fontSize }
 					onChange={ setFontSize }
+					__nextHasNoMarginBottom
 				/>
 			);
 
@@ -123,6 +132,7 @@ describe( 'FontSizePicker', () => {
 					fontSizes={ fontSizes }
 					value={ fontSize }
 					onChange={ setFontSize }
+					__nextHasNoMarginBottom
 				/>
 			);
 
@@ -182,6 +192,7 @@ describe( 'FontSizePicker', () => {
 				<FontSizePicker
 					fontSizes={ fontSizes }
 					value={ fontSizes[ 0 ].size }
+					__nextHasNoMarginBottom
 				/>
 			);
 			// Trigger click to open the select menu and take into account
@@ -199,6 +210,7 @@ describe( 'FontSizePicker', () => {
 					<FontSizePicker
 						fontSizes={ fontSizes }
 						value={ fontSizes[ 0 ].size }
+						__nextHasNoMarginBottom
 					/>
 				);
 				const element = screen.getByLabelText( 'Large' );
@@ -218,6 +230,7 @@ describe( 'FontSizePicker', () => {
 					<FontSizePicker
 						fontSizes={ fontSizes }
 						value={ fontSizes[ 0 ].size }
+						__nextHasNoMarginBottom
 					/>
 				);
 				const largeElement = screen.getByLabelText( 'Large' );

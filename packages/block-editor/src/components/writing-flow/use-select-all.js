@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { first, last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { isEntirelySelected } from '@wordpress/dom';
@@ -55,7 +50,10 @@ export default function useSelectAll() {
 				return;
 			}
 
-			multiSelect( first( blockClientIds ), last( blockClientIds ) );
+			multiSelect(
+				blockClientIds[ 0 ],
+				blockClientIds[ blockClientIds.length - 1 ]
+			);
 		}
 
 		node.addEventListener( 'keydown', onKeyDown );

@@ -6,6 +6,7 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { __, sprintf } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 import { useState, useMemo, forwardRef } from '@wordpress/element';
@@ -58,6 +59,14 @@ function FontSizePicker(
 	},
 	ref
 ) {
+	if ( ! __nextHasNoMarginBottom ) {
+		deprecated( 'Bottom margin styles for wp.components.FontSizePicker', {
+			since: '6.1',
+			version: '6.4',
+			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
+		} );
+	}
+
 	const hasUnits = [ typeof value, typeof fontSizes?.[ 0 ]?.size ].includes(
 		'string'
 	);

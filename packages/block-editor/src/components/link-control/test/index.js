@@ -24,8 +24,7 @@ import {
 } from './fixtures';
 
 // Mock debounce() so that it runs instantly.
-jest.mock( 'lodash', () => ( {
-	...jest.requireActual( 'lodash' ),
+jest.mock( '@wordpress/compose/src/utils/debounce', () => ( {
 	debounce: ( fn ) => {
 		fn.cancel = jest.fn();
 		return fn;

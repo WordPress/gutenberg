@@ -26,7 +26,6 @@ function SingleOrigin( {
 	onChange,
 	value,
 	actions,
-	content,
 } ) {
 	const gradientOptions = useMemo( () => {
 		return map( gradients, ( { gradient, name } ) => (
@@ -60,9 +59,7 @@ function SingleOrigin( {
 			className={ className }
 			options={ gradientOptions }
 			actions={ actions }
-		>
-			{ content }
-		</CircularOptionPicker>
+		/>
 	);
 }
 
@@ -73,7 +70,6 @@ function MultipleOrigin( {
 	onChange,
 	value,
 	actions,
-	content,
 } ) {
 	return (
 		<VStack spacing={ 3 } className={ className }>
@@ -87,10 +83,7 @@ function MultipleOrigin( {
 							onChange={ onChange }
 							value={ value }
 							{ ...( gradients.length === index + 1
-								? {
-										actions,
-										content,
-								  }
+								? { actions }
 								: {} ) }
 						/>
 					</VStack>
@@ -129,47 +122,48 @@ export default function GradientPicker( {
 		} );
 	}
 
-	// Can be removed when deprecation period is over
 	const deprecatedMarginSpacerProps = ! __nextHasNoMargin
-		? { marginTop: 3 }
+		? {
+				marginTop: ! gradients?.length ? 3 : undefined,
+				marginBottom: ! clearable ? 6 : 0,
+		  }
 		: {};
 
 	return (
-		<Component
-			className={ className }
-			clearable={ clearable }
-			clearGradient={ clearGradient }
-			gradients={ gradients }
-			onChange={ onChange }
-			value={ value }
-			actions={
-				clearable &&
-				( gradients?.length || ! disableCustomGradients ) && (
-					<CircularOptionPicker.ButtonAction
-						onClick={ clearGradient }
-					>
-						{ __( 'Clear' ) }
-					</CircularOptionPicker.ButtonAction>
-				)
-			}
-			content={
-				! disableCustomGradients && (
-					<Spacer
-						marginTop={ gradients?.length ? 3 : 0 }
-						marginBottom={ 0 }
-						{ ...deprecatedMarginSpacerProps }
-					>
-						<CustomGradientPicker
-							__nextHasNoMargin={ __nextHasNoMargin }
-							__experimentalIsRenderedInSidebar={
-								__experimentalIsRenderedInSidebar
-							}
-							value={ value }
-							onChange={ onChange }
-						/>
-					</Spacer>
-				)
-			}
-		/>
+		// Outmost Spacer wrapper can be removed when deprecation period is over
+		<Spacer marginBottom={ 0 } { ...deprecatedMarginSpacerProps }>
+			<VStack spacing={ gradients?.length ? 4 : 0 }>
+				{ ! disableCustomGradients && (
+					<CustomGradientPicker
+						__nextHasNoMargin
+						__experimentalIsRenderedInSidebar={
+							__experimentalIsRenderedInSidebar
+						}
+						value={ value }
+						onChange={ onChange }
+					/>
+				) }
+				{ ( gradients?.length || clearable ) && (
+					<Component
+						className={ className }
+						clearable={ clearable }
+						clearGradient={ clearGradient }
+						gradients={ gradients }
+						onChange={ onChange }
+						value={ value }
+						actions={
+							clearable &&
+							! disableCustomGradients && (
+								<CircularOptionPicker.ButtonAction
+									onClick={ clearGradient }
+								>
+									{ __( 'Clear' ) }
+								</CircularOptionPicker.ButtonAction>
+							)
+						}
+					/>
+				) }
+			</VStack>
+		</Spacer>
 	);
 }

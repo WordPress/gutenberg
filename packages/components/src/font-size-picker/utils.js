@@ -114,7 +114,7 @@ export function getToggleGroupOptions(
 			key: slug,
 			value: size,
 			label: labelAliases[ index ],
-			name,
+			name: name || labelAliases[ index ],
 		};
 	} );
 }

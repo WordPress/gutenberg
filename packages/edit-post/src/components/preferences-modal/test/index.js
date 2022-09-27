@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -23,20 +23,26 @@ describe( 'EditPostPreferencesModal', () => {
 		it( 'large viewports', () => {
 			useSelect.mockImplementation( () => true );
 			useViewportMatch.mockImplementation( () => true );
-			const wrapper = shallow( <EditPostPreferencesModal /> );
-			expect( wrapper ).toMatchSnapshot();
+			render( <EditPostPreferencesModal /> );
+			expect(
+				screen.getByRole( 'dialog', { name: 'Preferences' } )
+			).toMatchSnapshot();
 		} );
 		it( 'small viewports', () => {
 			useSelect.mockImplementation( () => true );
 			useViewportMatch.mockImplementation( () => false );
-			const wrapper = shallow( <EditPostPreferencesModal /> );
-			expect( wrapper ).toMatchSnapshot();
+			render( <EditPostPreferencesModal /> );
+			expect(
+				screen.getByRole( 'dialog', { name: 'Preferences' } )
+			).toMatchSnapshot();
 		} );
 	} );
 
 	it( 'should not render when the modal is not active', () => {
 		useSelect.mockImplementation( () => false );
-		const wrapper = shallow( <EditPostPreferencesModal /> );
-		expect( wrapper.isEmptyRender() ).toBe( true );
+		render( <EditPostPreferencesModal /> );
+		expect(
+			screen.queryByRole( 'dialog', { name: 'Preferences' } )
+		).not.toBeInTheDocument();
 	} );
 } );

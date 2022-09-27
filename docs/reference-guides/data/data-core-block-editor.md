@@ -1492,7 +1492,7 @@ Action that enables or disables the navigation mode.
 
 _Parameters_
 
--   _isNavigationMode_ `string`: Enable/Disable navigation mode.
+-   _isNavigationMode_ `boolean`: Enable/Disable navigation mode.
 
 ### setTemplateValidity
 

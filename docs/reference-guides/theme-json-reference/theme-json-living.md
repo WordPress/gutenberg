@@ -139,10 +139,10 @@ Border styles.
 | radius | undefined |  |
 | style | string |  |
 | width | string |  |
-| top | undefined |  |
-| right | undefined |  |
-| bottom | undefined |  |
-| left | undefined |  |
+| top | object | color, style, width |
+| right | object | color, style, width |
+| bottom | object | color, style, width |
+| left | object | color, style, width |
 
 ---
 
@@ -155,6 +155,19 @@ Color styles.
 | background | string |  |
 | gradient | string |  |
 | text | string |  |
+
+---
+
+### outline
+
+Outline styles.
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| color | string |  |
+| offset | string |  |
+| style | string |  |
+| width | string |  |
 
 ---
 

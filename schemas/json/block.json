@@ -439,12 +439,32 @@
 			}
 		},
 		"editorScript": {
-			"type": "string",
-			"description": "Block type editor script definition. It will only be enqueued in the context of the editor."
+			"description": "Block type editor script definition. It will only be enqueued in the context of the editor.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
 		},
 		"script": {
-			"type": "string",
-			"description": "Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site."
+			"description": "Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
 		},
 		"viewScript": {
 			"description": "Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.",
@@ -574,6 +594,10 @@
 					}
 				}
 			}
+		},
+		"render": {
+			"type": "string",
+			"description": "Template file loaded on the server when rendering a block."
 		}
 	},
 	"required": [ "name", "title" ],

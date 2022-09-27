@@ -26,6 +26,7 @@ export default function ResponsiveWrapper( {
 	overlayBackgroundColor,
 	overlayTextColor,
 	hasIcon,
+	icon,
 } ) {
 	if ( ! isResponsive ) {
 		return children;
@@ -83,7 +84,7 @@ export default function ResponsiveWrapper( {
 					className={ openButtonClasses }
 					onClick={ () => onToggle( true ) }
 				>
-					{ hasIcon && <OverlayMenuIcon /> }
+					{ hasIcon && <OverlayMenuIcon icon={ icon } /> }
 					{ ! hasIcon && (
 						<span className="wp-block-navigation__toggle_button_label">
 							{ __( 'Menu' ) }

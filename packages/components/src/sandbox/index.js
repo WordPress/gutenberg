@@ -74,14 +74,14 @@ const style = `
 	}
 	html,
 	body,
-	body > div,
-	body > div iframe {
+	body > div {
 		width: 100%;
 	}
 	html.wp-has-aspect-ratio,
 	body.wp-has-aspect-ratio,
 	body.wp-has-aspect-ratio > div,
 	body.wp-has-aspect-ratio > div iframe {
+		width: 100%;
 		height: 100%;
 		overflow: hidden; /* If it has an aspect ratio, it shouldn't scroll. */
 	}

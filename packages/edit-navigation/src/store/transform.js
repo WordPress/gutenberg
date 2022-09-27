@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, omit } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -46,7 +46,8 @@ export function blockToMenuItem(
 	blockPosition,
 	menuId
 ) {
-	menuItem = omit( menuItem, 'menus', 'meta', '_links' );
+	const { menus, meta, _links, ...restMenuItem } = menuItem;
+	menuItem = restMenuItem;
 	menuItem.content = get( menuItem.content, 'raw', menuItem.content );
 
 	let attributes;

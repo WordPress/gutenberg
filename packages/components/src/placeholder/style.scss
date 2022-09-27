@@ -189,6 +189,10 @@
 
 	.components-placeholder__fieldset {
 		width: auto;
+
+		// Unset intrinsic margins.
+		margin-left: 0;
+		margin-right: 0;
 	}
 
 	// Show placeholder buttons on block selection.
@@ -230,5 +234,5 @@
 	width: 100%;
 	height: 100%;
 	stroke: currentColor;
-	stroke-dasharray: 3;
+	opacity: 0.25;
 }

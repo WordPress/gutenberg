@@ -112,16 +112,23 @@ WithTooltip.args = {
 /**
  * The `ToggleGroupControlOptionIcon` component can be used for icon options. A `label` is required
  * on each option for accessibility, which will be shown in a tooltip.
- *
- * When using icon options within `ToggleGroupControl`, the `__experimentalIsIconGroup` style is preferred.
  */
 export const WithIcons: ComponentStory< typeof ToggleGroupControl > =
 	Template.bind( {} );
 WithIcons.args = {
 	...Default.args,
-	__experimentalIsIconGroup: true,
 	children: [
 		{ value: 'uppercase', label: 'Uppercase', icon: formatUppercase },
 		{ value: 'lowercase', label: 'Lowercase', icon: formatLowercase },
 	].map( mapPropsToOptionIconComponent ),
+};
+
+/**
+ * A borderless style may be preferred in some contexts.
+ */
+export const Borderless: ComponentStory< typeof ToggleGroupControl > =
+	Template.bind( {} );
+Borderless.args = {
+	...WithIcons.args,
+	__experimentalIsBorderless: true,
 };

@@ -9,8 +9,14 @@ import { get } from 'lodash';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
-import { cloneBlock } from '@wordpress/blocks';
+import { cloneBlock, store as blocksStore } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { name as queryLoopName } from './block.json';
 
 /**
  * @typedef IHasNameAndId
@@ -128,6 +134,48 @@ export const useTaxonomies = ( postType ) => {
 };
 
 /**
+ * Hook that returns whether a specific post type is hierarchical.
+ *
+ * @param {string} postType The post type to check.
+ * @return {boolean} Whether a specific post type is hierarchical.
+ */
+export function useIsPostTypeHierarchical( postType ) {
+	return useSelect(
+		( select ) => {
+			const type = select( coreStore ).getPostType( postType );
+			return type?.viewable && type?.hierarchical;
+		},
+		[ postType ]
+	);
+}
+
+/**
+ * Hook that returns the query properties' names defined by the active
+ * block variation, to determine which block's filters to show.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {string[]} An array of the query attributes.
+ */
+export function useAllowedControls( attributes ) {
+	return useSelect(
+		( select ) =>
+			select( blocksStore ).getActiveBlockVariation(
+				queryLoopName,
+				attributes
+			)?.allowControls,
+
+		[ attributes ]
+	);
+}
+export function isControlAllowed( allowedControls, key ) {
+	// Every controls is allowed if the list is not defined.
+	if ( ! allowedControls ) {
+		return true;
+	}
+	return allowedControls.includes( key );
+}
+
+/**
  * Clones a pattern's blocks and then recurses over that list of blocks,
  * transforming them to retain some `query` attribute properties.
  * For now we retain the `postType` and `inherit` properties as they are
@@ -167,3 +215,48 @@ export const getTransformedBlocksFromPattern = (
 	}
 	return { newBlocks: clonedBlocks, queryClientIds };
 };
+
+/**
+ * Helper hook that determines if there is an active variation of the block
+ * and if there are available specific patterns for this variation.
+ * If there are, these patterns are going to be the only ones suggested to
+ * the user in setup and replace flow, without including the default ones
+ * for Query Loop.
+ *
+ * If there are no such patterns, the default ones for Query Loop are going
+ * to be suggested.
+ *
+ * @param {string} clientId   The block's client ID.
+ * @param {Object} attributes The block's attributes.
+ * @return {string} The block name to be used in the patterns suggestions.
+ */
+export function useBlockNameForPatterns( clientId, attributes ) {
+	const activeVariationName = useSelect(
+		( select ) =>
+			select( blocksStore ).getActiveBlockVariation(
+				queryLoopName,
+				attributes
+			)?.name,
+
+		[ attributes ]
+	);
+	const blockName = `${ queryLoopName }/${ activeVariationName }`;
+	const activeVariationPatterns = useSelect(
+		( select ) => {
+			if ( ! activeVariationName ) {
+				return;
+			}
+			const {
+				getBlockRootClientId,
+				__experimentalGetPatternsByBlockTypes,
+			} = select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+			return __experimentalGetPatternsByBlockTypes(
+				blockName,
+				rootClientId
+			);
+		},
+		[ clientId, activeVariationName ]
+	);
+	return activeVariationPatterns?.length ? blockName : queryLoopName;
+}

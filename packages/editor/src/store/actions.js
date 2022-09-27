@@ -247,6 +247,7 @@ export const trashPost =
 		registry.dispatch( noticesStore ).removeNotice( TRASH_POST_NOTICE_ID );
 		const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2' } =
 			postType;
+		dispatch( { type: 'REQUEST_POST_DELETE_START' } );
 		try {
 			const post = select.getCurrentPost();
 			await apiFetch( {
@@ -262,6 +263,7 @@ export const trashPost =
 					...getNotificationArgumentsForTrashFail( { error } )
 				);
 		}
+		dispatch( { type: 'REQUEST_POST_DELETE_FINISH' } );
 	};
 
 /**

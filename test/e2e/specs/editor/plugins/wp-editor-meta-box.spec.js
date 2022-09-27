@@ -31,6 +31,11 @@ test.describe( 'WP Editor Meta Boxes', () => {
 
 		await editor.publishPost();
 
+		// Close the publish panel so that it won't cover the tinymce editor.
+		await page.click(
+			'role=region[name="Editor publish"i] >> role=button[name="Close panel"i]'
+		);
+
 		await expect( page.locator( '.edit-post-layout' ) ).toBeVisible();
 
 		await page.click( 'role=button[name="Text"i]' );

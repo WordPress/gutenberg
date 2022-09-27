@@ -33,12 +33,17 @@ export function useToolsPanelHeader(
 		return cx( styles.ToolsPanelHeading );
 	}, [ cx ] );
 
+	const defaultControlsItemClassName = useMemo( () => {
+		return cx( styles.DefaultControlsItem );
+	}, [ cx ] );
+
 	const { menuItems, hasMenuItems, areAllOptionalControlsHidden } =
 		useToolsPanelContext();
 
 	return {
 		...otherProps,
 		areAllOptionalControlsHidden,
+		defaultControlsItemClassName,
 		dropdownMenuClassName,
 		hasMenuItems,
 		headingClassName,

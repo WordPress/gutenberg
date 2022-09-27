@@ -66,8 +66,8 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 	category: 'design',
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			type: 'string',
+			source: 'html',
 			selector: 'p',
 		},
 	},
@@ -124,8 +124,8 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 
 		attributes: {
 			content: {
-				type: 'array',
-				source: 'children',
+				type: 'string',
+				source: 'html',
 				selector: 'p',
 			},
 		},

@@ -428,7 +428,7 @@ The naming schema for the classes and the custom properties is as follows:
 					"slug": "x-large",
 					"size": 46,
 					"name": "Large"
-				},
+				}
 			]
 		},
 		"spacing": {
@@ -454,7 +454,7 @@ The naming schema for the classes and the custom properties is as follows:
 					"slug": "60",
 					"size": "2rem",
 					"name": "Large"
-				},
+				}
 			]
 		},
 		"blocks": {

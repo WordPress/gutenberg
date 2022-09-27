@@ -141,10 +141,12 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"__experimentalFontFamily": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
@@ -160,12 +162,7 @@
 				"width": true
 			}
 		},
-		"__experimentalSelector": ".wp-block-table > table",
-		"__experimentalStyle": {
-			"spacing": {
-				"margin": "0 0 1em 0"
-			}
-		}
+		"__experimentalSelector": ".wp-block-table > table"
 	},
 	"styles": [
 		{

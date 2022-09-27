@@ -41,6 +41,10 @@
 			"type": "string",
 			"default": "mobile"
 		},
+		"icon": {
+			"type": "string",
+			"default": "handle"
+		},
 		"hasIcon": {
 			"type": "boolean",
 			"default": true

@@ -76,14 +76,14 @@ const railBackgroundColor = ( { disabled, railColor }: RailProps ) => {
 	let background = railColor || '';
 
 	if ( disabled ) {
-		background = COLORS.lightGray[ 400 ];
+		background = COLORS.ui.backgroundDisabled;
 	}
 
 	return css( { background } );
 };
 
 export const Rail = styled.span`
-	background-color: ${ COLORS.lightGray[ 600 ] };
+	background-color: ${ COLORS.gray[ 300 ] };
 	left: 0;
 	pointer-events: none;
 	right: 0;
@@ -101,7 +101,7 @@ const trackBackgroundColor = ( { disabled, trackColor }: TrackProps ) => {
 	let background = trackColor || 'currentColor';
 
 	if ( disabled ) {
-		background = COLORS.lightGray[ 800 ];
+		background = COLORS.gray[ 400 ];
 	}
 
 	return css( { background } );
@@ -129,10 +129,10 @@ export const MarksWrapper = styled.span`
 `;
 
 const markFill = ( { disabled, isFilled }: RangeMarkProps ) => {
-	let backgroundColor = isFilled ? 'currentColor' : COLORS.lightGray[ 600 ];
+	let backgroundColor = isFilled ? 'currentColor' : COLORS.gray[ 300 ];
 
 	if ( disabled ) {
-		backgroundColor = COLORS.lightGray[ 800 ];
+		backgroundColor = COLORS.gray[ 400 ];
 	}
 
 	return css( {
@@ -152,12 +152,12 @@ export const Mark = styled.span`
 
 const markLabelFill = ( { isFilled }: RangeMarkProps ) => {
 	return css( {
-		color: isFilled ? COLORS.darkGray[ 300 ] : COLORS.lightGray[ 600 ],
+		color: isFilled ? COLORS.gray[ 700 ] : COLORS.gray[ 300 ],
 	} );
 };
 
 export const MarkLabel = styled.span`
-	color: ${ COLORS.lightGray[ 600 ] };
+	color: ${ COLORS.gray[ 300 ] };
 	left: 0;
 	font-size: 11px;
 	position: absolute;
@@ -171,7 +171,7 @@ export const MarkLabel = styled.span`
 const thumbColor = ( { disabled }: ThumbProps ) =>
 	disabled
 		? css`
-				background-color: ${ COLORS.lightGray[ 800 ] };
+				background-color: ${ COLORS.gray[ 400 ] };
 		  `
 		: css`
 				background-color: var( --wp-admin-theme-color );

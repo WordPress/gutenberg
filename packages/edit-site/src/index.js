@@ -107,6 +107,10 @@ export function reinitializeEditor( target, settings ) {
 		}
 	}
 
+	// Prevent the default browser action for files dropped outside of dropzones.
+	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
+	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
+
 	render( <EditSiteApp reboot={ reboot } />, target );
 }
 

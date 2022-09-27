@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 4.18.0 (2022-09-21)
+
+## 4.17.0 (2022-09-13)
+
+### Internal
+
+-   Lodash: Remove completely from `@wordpress/redux-routine` package ([#43741](https://github.com/WordPress/gutenberg/pull/43741)).
+
 ## 4.16.0 (2022-08-24)
 
 ### Bug Fix

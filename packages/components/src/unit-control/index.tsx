@@ -46,6 +46,7 @@ function UnforwardedUnitControl(
 	const {
 		__unstableStateReducer: stateReducerProp,
 		autoComplete = 'off',
+		// @ts-expect-error Ensure that children is omitted from restProps
 		children,
 		className,
 		disabled = false,
@@ -99,7 +100,7 @@ function UnforwardedUnitControl(
 		if ( parsedUnit !== undefined ) {
 			setUnit( parsedUnit );
 		}
-	}, [ parsedUnit ] );
+	}, [ parsedUnit, setUnit ] );
 
 	// Stores parsed value for hand-off in state reducer.
 	const refParsedQuantity = useRef< number | undefined >( undefined );
@@ -259,13 +260,12 @@ function UnforwardedUnitControl(
 	return (
 		<Root className="components-unit-control-wrapper" style={ style }>
 			<ValueInput
-				aria-label={ label }
 				type={ isPressEnterToChange ? 'text' : 'number' }
 				{ ...props }
 				autoComplete={ autoComplete }
 				className={ classes }
 				disabled={ disabled }
-				disableUnits={ disableUnits }
+				hideHTMLArrows
 				isPressEnterToChange={ isPressEnterToChange }
 				label={ label }
 				onBlur={ handleOnBlur }

@@ -144,7 +144,7 @@ module.exports = async (
 	success(
 		plugin
 			? `Done: WordPress plugin ${ title } bootstrapped in the ${ slug } directory.`
-			: `Done: Block "${ title }" bootstrapped in the ${ slug }directory.`
+			: `Done: Block "${ title }" bootstrapped in the ${ slug } directory.`
 	);
 
 	if ( plugin && wpScripts ) {

@@ -7,6 +7,7 @@ import { render, screen, waitFor } from '@testing-library/react';
  * Internal dependencies
  */
 import Disabled from '../';
+import userEvent from '@testing-library/user-event';
 
 jest.mock( '@wordpress/dom', () => {
 	const focus = jest.requireActual( '../../../../dom/src' ).focus;
@@ -131,6 +132,43 @@ describe( 'Disabled', () => {
 				'contenteditable',
 				'false'
 			)
+		);
+	} );
+
+	it( 'should preserve input values when toggling the isDisabled prop', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
+		const MaybeDisable = ( { isDisabled = true } ) => (
+			<Disabled isDisabled={ isDisabled }>
+				<Form />
+			</Disabled>
+		);
+
+		const getInput = () => screen.getByRole( 'textbox' );
+		const getContentEditable = () => screen.getByTitle( 'edit my content' );
+
+		const { rerender } = render( <MaybeDisable isDisabled={ false } /> );
+
+		await user.type( getInput(), 'This is input.' );
+		expect( getInput() ).toHaveValue( 'This is input.' );
+
+		await user.type( getContentEditable(), 'This is contentEditable.' );
+		expect( getContentEditable() ).toHaveTextContent(
+			'This is contentEditable.'
+		);
+
+		rerender( <MaybeDisable isDisabled={ true } /> );
+		expect( getInput() ).toHaveValue( 'This is input.' );
+		expect( getContentEditable() ).toHaveTextContent(
+			'This is contentEditable.'
+		);
+
+		rerender( <MaybeDisable isDisabled={ false } /> );
+		expect( getInput() ).toHaveValue( 'This is input.' );
+		expect( getContentEditable() ).toHaveTextContent(
+			'This is contentEditable.'
 		);
 	} );
 

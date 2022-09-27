@@ -2,14 +2,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, isEmpty, omit, pick } from 'lodash';
+import { get, isEmpty, pick } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { withNotices, Placeholder } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { Placeholder } from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	BlockAlignmentControl,
 	BlockControls,
@@ -22,6 +22,7 @@ import {
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -108,9 +109,7 @@ export function ImageEdit( {
 	setAttributes,
 	isSelected,
 	className,
-	noticeUI,
 	insertBlocksAfter,
-	noticeOperations,
 	onReplace,
 	context,
 	clientId,
@@ -138,14 +137,24 @@ export function ImageEdit( {
 	}, [ caption ] );
 
 	const ref = useRef();
-	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return pick( getSettings(), [ 'imageDefaultSize', 'mediaUpload' ] );
-	}, [] );
+	const { imageDefaultSize, mediaUpload, isContentLocked } = useSelect(
+		( select ) => {
+			const { getSettings, __unstableGetContentLockingParent } =
+				select( blockEditorStore );
+			const settings = getSettings();
+			return {
+				imageDefaultSize: settings.imageDefaultSize,
+				mediaUpload: settings.mediaUpload,
+				isContentLocked:
+					!! __unstableGetContentLockingParent( clientId ),
+			};
+		},
+		[]
+	);
 
+	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 		setAttributes( {
 			src: undefined,
 			id: undefined,
@@ -179,7 +188,9 @@ export function ImageEdit( {
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
 		if ( captionRef.current && ! get( mediaAttributes, [ 'caption' ] ) ) {
-			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
+			const { caption: omittedCaption, ...restMediaAttributes } =
+				mediaAttributes;
+			mediaAttributes = restMediaAttributes;
 		}
 
 		let additionalAttributes;
@@ -345,9 +356,10 @@ export function ImageEdit( {
 					containerRef={ ref }
 					context={ context }
 					clientId={ clientId }
+					isContentLocked={ isContentLocked }
 				/>
 			) }
-			{ ! url && (
+			{ ! url && ! isContentLocked && (
 				<BlockControls group="block">
 					<BlockAlignmentControl
 						value={ align }
@@ -359,7 +371,6 @@ export function ImageEdit( {
 				icon={ <BlockIcon icon={ icon } /> }
 				onSelect={ onSelectImage }
 				onSelectURL={ onSelectURL }
-				notices={ noticeUI }
 				onError={ onUploadError }
 				placeholder={ placeholder }
 				accept="image/*"
@@ -372,4 +383,4 @@ export function ImageEdit( {
 	);
 }
 
-export default withNotices( ImageEdit );
+export default ImageEdit;

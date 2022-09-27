@@ -12,7 +12,7 @@ import {
 	URLInput,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { Fragment, useState, useRef } from '@wordpress/element';
+import { Fragment, useState } from '@wordpress/element';
 import {
 	Button,
 	PanelBody,
@@ -31,12 +31,9 @@ const SocialLinkURLPopover = ( {
 	url,
 	setAttributes,
 	setPopover,
-	anchorRef,
+	popoverAnchor,
 } ) => (
-	<URLPopover
-		anchorRef={ anchorRef?.current }
-		onClose={ () => setPopover( false ) }
-	>
+	<URLPopover anchor={ popoverAnchor } onClose={ () => setPopover( false ) }>
 		<form
 			className="block-editor-url-popover__link-editor"
 			onSubmit={ ( event ) => {
@@ -76,7 +73,10 @@ const SocialLinkEdit = ( {
 		'wp-social-link__is-incomplete': ! url,
 	} );
 
-	const ref = useRef();
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+
 	const IconComponent = getIconBySite( service );
 	const socialLinkName = getNameBySite( service );
 	const socialLinkLabel = label ?? socialLinkName;
@@ -116,7 +116,7 @@ const SocialLinkEdit = ( {
 			<li { ...blockProps }>
 				<Button
 					className="wp-block-social-link-anchor"
-					ref={ ref }
+					ref={ setPopoverAnchor }
 					onClick={ () => setPopover( true ) }
 				>
 					<IconComponent />
@@ -132,7 +132,7 @@ const SocialLinkEdit = ( {
 							url={ url }
 							setAttributes={ setAttributes }
 							setPopover={ setPopover }
-							anchorRef={ ref }
+							popoverAnchor={ popoverAnchor }
 						/>
 					) }
 				</Button>

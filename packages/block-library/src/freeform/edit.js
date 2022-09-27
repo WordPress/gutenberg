@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { debounce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -11,6 +6,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { debounce } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { ToolbarGroup } from '@wordpress/components';
 import { useEffect, useRef } from '@wordpress/element';
@@ -47,6 +43,10 @@ export default function ClassicEdit( {
 	onReplace,
 } ) {
 	const { getMultiSelectedBlockClientIds } = useSelect( blockEditorStore );
+	const canRemove = useSelect(
+		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
+		[ clientId ]
+	);
 	const didMount = useRef( false );
 
 	useEffect( () => {
@@ -225,11 +225,13 @@ export default function ClassicEdit( {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<ConvertToBlocksButton clientId={ clientId } />
-				</ToolbarGroup>
-			</BlockControls>
+			{ canRemove && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ConvertToBlocksButton clientId={ clientId } />
+					</ToolbarGroup>
+				</BlockControls>
+			) }
 			<div { ...useBlockProps() }>
 				<div
 					key="toolbar"
