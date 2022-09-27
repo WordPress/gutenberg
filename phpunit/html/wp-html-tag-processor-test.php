@@ -288,14 +288,14 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 			'Double quotes should be encoded as HTML entities' => array( '<div></div>', '"', '<div test="&quot;"></div>' ),
 			'Encoded quotes should not be encoded again' => array( '<div></div>', '&quot;', '<div test="&quot;"></div>' ),
 			'Single quotes should not be encoded'        => array( '<div></div>', "'", '<div test="\'"></div>' ),
-			'< and > characters should not be encoded'   => array( '<div></div>', '<>', '<div test="<>"></div>' ),
+			'< and > characters should not be encoded'   => array( '<div></div>', '<>', '<div test="&lt;&gt;"></div>' ),
 			'A quote inside of an HTML entity should still be encoded' => array( '<div></div>', '&quot";', '<div test="&quot&quot;;"></div>' ),
 			'Single-quoted attributes should be rewritten using double quotes' => array( "<div test='foo'></div>", 'foo', '<div test="foo"></div>' ),
 			'Unquoted attributes should be rewritten using double quotes' => array( '<div test=foo></div>', 'foo', '<div test="foo"></div>' ),
 			'An HTML snippet passed as a value should only have the double quote characters encoded ' => array(
 				'<div test=foo></div>',
 				'" onclick="alert(\'1\');"><span onclick=""></span><script>alert("1")</script>',
-				'<div test="&quot; onclick=&quot;alert(\'1\');&quot;><span onclick=&quot;&quot;></span><script>alert(&quot;1&quot;)</script>"></div>',
+				'<div test="&quot; onclick=&quot;alert(\'1\');&quot;&gt;&lt;span onclick=&quot;&quot;&gt;&lt;/span&gt;&lt;script&gt;alert(&quot;1&quot;)&lt;/script&gt;"></div>',
 			),
 		);
 	}
@@ -1064,12 +1064,12 @@ HTML;
 
 		$examples['HTML tag opening inside attribute value'] = array(
 			'<pre id="<code" class="wp-block-code <code is poetry&gt;"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
-			'<pre foo="bar" id="<code" class="wp-block-code <code is poetry&gt; firstTag"><code class="secondTag">This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
+			'<pre foo="bar" id="<code" class="wp-block-code &lt;code is poetry&gt; firstTag"><code class="secondTag">This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
 		);
 
 		$examples['HTML tag brackets in attribute values and data markup'] = array(
 			'<pre id="<code-&gt;-block-&gt;" class="wp-block-code <code is poetry&gt;"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
-			'<pre foo="bar" id="<code-&gt;-block-&gt;" class="wp-block-code <code is poetry&gt; firstTag"><code class="secondTag">This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
+			'<pre foo="bar" id="<code-&gt;-block-&gt;" class="wp-block-code &lt;code is poetry&gt; firstTag"><code class="secondTag">This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
 		);
 
 		$examples['Single and double quotes in attribute value'] = array(
