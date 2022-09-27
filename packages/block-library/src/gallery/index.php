@@ -115,7 +115,6 @@ function block_core_gallery_render( $attributes, $content ) {
 		$gallery_styles,
 		array(
 			'context' => 'block-supports',
-			'enqueue' => true,
 		)
 	);
 	return $content;
