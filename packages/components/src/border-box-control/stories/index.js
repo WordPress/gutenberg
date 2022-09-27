@@ -89,7 +89,7 @@ Default.args = {
 };
 
 const WrapperView = styled.div`
-	max-width: 252px;
+	max-width: 248px;
 	padding: 16px;
 `;
 
