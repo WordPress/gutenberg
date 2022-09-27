@@ -1077,9 +1077,30 @@ class WP_HTML_Tag_Processor {
 	 */
 	public function __toString() {
 		/*
-		 * @TODO: What are we intending to measure here? Why check the end of the tag name?
+		 * Short-circuit if there are no updates to apply.
+		 *
+		 * This happens when this processor:
+		 * * Hasn't processed the first tag yet
+		 * * Has already processed all the tags
+		 *
+		 * In both cases, $this->tag_name_length is null since no tag
+		 * is currently being processed.
+		 *
+		 * For example:
+		 * ```php
+		 * $p = new WP_HTML_Tag_Processor('<div></div><div></div>');
+		 * (string) $p; // Short-circuits as there were no updates yet.
+		 *
+		 * $p->next_tag('div');
+		 * $p->add_class('active');
+		 * (string) $p; // Can't short-circuit as __toString() must update the HTML.
+		 *
+		 * $p->next_tag('div');
+		 * $p->add_class('active');
+		 * $p->next_tag('span'); // Updates the HTML in after_tag().
+		 * (string) $p; // Short-circuits as the HTML updates have already been applied.
+		 * ```
 		 */
-		// Parsing either already finished or not started yet.
 		if ( null === $this->tag_name_length ) {
 			return $this->updated_html . substr( $this->html, $this->updated_bytes );
 		}
