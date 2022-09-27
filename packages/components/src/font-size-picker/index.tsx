@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
 import type { ReactNode, ForwardedRef } from 'react';
 
 /**
@@ -15,7 +14,6 @@ import { useState, useMemo, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { BaseControl } from '../base-control';
 import Button from '../button';
 import RangeControl from '../range-control';
 import { Flex, FlexItem } from '../flex';
@@ -33,26 +31,32 @@ import {
 	isSimpleCssValue,
 	CUSTOM_FONT_SIZE,
 } from './utils';
-import { VStack } from '../v-stack';
 import { HStack } from '../h-stack';
 import type {
 	FontSizePickerProps,
 	FontSizeSelectOption,
 	FontSizeToggleGroupOption,
 } from './types';
+import {
+	Container,
+	HeaderHint,
+	HeaderLabel,
+	Controls,
+	ResetButton,
+} from './styles';
+import { Spacer } from '../spacer';
 
-// This conditional is needed to maintain the spacing before the slider in the `withSlider` case.
-const MaybeVStack = ( {
+const MaybeMarginBottom = ( {
 	__nextHasNoMarginBottom,
 	children,
 }: {
 	__nextHasNoMarginBottom: boolean;
 	children: ReactNode;
 } ) =>
-	! __nextHasNoMarginBottom ? (
+	__nextHasNoMarginBottom ? (
 		<>{ children }</>
 	) : (
-		<VStack spacing={ 6 } children={ children } />
+		<Spacer marginBottom={ 6 }>{ children }</Spacer>
 	);
 
 const UnforwardedFontSizePicker = (
@@ -163,49 +167,51 @@ const UnforwardedFontSizePicker = (
 		__( 'Currently selected font size: %s' ),
 		selectedOption.name
 	);
-	const baseClassName = 'components-font-size-picker';
 	return (
-		<fieldset className={ baseClassName } { ...( ref ? {} : { ref } ) }>
+		<Container ref={ ref } className="components-font-size-picker">
 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
-			<HStack className={ `${ baseClassName }__header` }>
-				<BaseControl.VisualLabel>
-					{ __( 'Size' ) }
-					{ headerHint && (
-						<span className={ `${ baseClassName }__header__hint` }>
-							{ headerHint }
-						</span>
+			<Spacer>
+				<HStack className="components-font-size-picker__header">
+					<HeaderLabel>
+						{ __( 'Size' ) }
+						{ headerHint && (
+							<HeaderHint className="components-font-size-picker__header__hint">
+								{ headerHint }
+							</HeaderHint>
+						) }
+					</HeaderLabel>
+					{ ! disableCustomFontSizes && (
+						<Button
+							label={
+								showCustomValueControl
+									? __( 'Use size preset' )
+									: __( 'Set custom size' )
+							}
+							icon={ settings }
+							onClick={ () => {
+								setShowCustomValueControl(
+									! showCustomValueControl
+								);
+							} }
+							isPressed={ showCustomValueControl }
+							isSmall
+						/>
 					) }
-				</BaseControl.VisualLabel>
-				{ ! disableCustomFontSizes && (
-					<Button
-						label={
-							showCustomValueControl
-								? __( 'Use size preset' )
-								: __( 'Set custom size' )
-						}
-						icon={ settings }
-						onClick={ () => {
-							setShowCustomValueControl(
-								! showCustomValueControl
-							);
-						} }
-						isPressed={ showCustomValueControl }
-						isSmall
-					/>
-				) }
-			</HStack>
-			<MaybeVStack __nextHasNoMarginBottom={ __nextHasNoMarginBottom }>
-				<div
-					className={ classNames( `${ baseClassName }__controls`, {
-						'is-next-has-no-margin-bottom': __nextHasNoMarginBottom,
-					} ) }
+				</HStack>
+			</Spacer>
+			<MaybeMarginBottom
+				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			>
+				<Controls
+					className="components-font-size-picker__controls"
+					spacing={ 6 }
 				>
 					{ !! fontSizes.length &&
 						shouldUseSelectControl &&
 						! showCustomValueControl && (
 							<CustomSelectControl
 								__nextUnconstrainedWidth
-								className={ `${ baseClassName }__select` }
+								className="components-font-size-picker__select"
 								label={ __( 'Font size' ) }
 								hideLabelFromVision
 								describedBy={ currentFontSizeSR }
@@ -237,7 +243,7 @@ const UnforwardedFontSizePicker = (
 						) }
 					{ ! shouldUseSelectControl && ! showCustomValueControl && (
 						<ToggleGroupControl
-							__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+							__nextHasNoMarginBottom
 							label={ __( 'Font size' ) }
 							hideLabelFromVision
 							value={ value }
@@ -267,7 +273,7 @@ const UnforwardedFontSizePicker = (
 						showCustomValueControl && (
 							<Flex
 								justify="space-between"
-								className={ `${ baseClassName }__custom-size-control` }
+								className="components-font-size-picker__custom-size-control"
 							>
 								<FlexItem isBlock>
 									<UnitControl
@@ -298,7 +304,7 @@ const UnforwardedFontSizePicker = (
 								</FlexItem>
 								{ withReset && (
 									<FlexItem isBlock>
-										<Button
+										<ResetButton
 											className="components-color-palette__clear"
 											disabled={ value === undefined }
 											onClick={ () => {
@@ -306,34 +312,37 @@ const UnforwardedFontSizePicker = (
 											} }
 											isSmall
 											variant="secondary"
+											size={ size }
 										>
 											{ __( 'Reset' ) }
-										</Button>
+										</ResetButton>
 									</FlexItem>
 								) }
 							</Flex>
 						) }
-				</div>
-				{ withSlider && (
-					<RangeControl
-						__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-						className={ `${ baseClassName }__custom-input` }
-						label={ __( 'Custom Size' ) }
-						value={
-							isPixelValue && noUnitsValue
-								? Number( noUnitsValue )
-								: undefined
-						}
-						initialPosition={ fallbackFontSize }
-						onChange={ ( newValue ) => {
-							onChange?.( hasUnits ? newValue + 'px' : newValue );
-						} }
-						min={ 12 }
-						max={ 100 }
-					/>
-				) }
-			</MaybeVStack>
-		</fieldset>
+					{ withSlider && (
+						<RangeControl
+							__nextHasNoMarginBottom
+							className="components-font-size-picker__custom-input"
+							label={ __( 'Custom Size' ) }
+							value={
+								isPixelValue && noUnitsValue
+									? Number( noUnitsValue )
+									: undefined
+							}
+							initialPosition={ fallbackFontSize }
+							onChange={ ( newValue ) => {
+								onChange?.(
+									hasUnits ? newValue + 'px' : newValue
+								);
+							} }
+							min={ 12 }
+							max={ 100 }
+						/>
+					) }
+				</Controls>
+			</MaybeMarginBottom>
+		</Container>
 	);
 };
 
