@@ -11,7 +11,6 @@ import { useMergeRefs } from '@wordpress/compose';
 import BorderBoxControlLinkedButton from '../border-box-control-linked-button';
 import BorderBoxControlSplitControls from '../border-box-control-split-controls';
 import { BorderControl } from '../../border-control';
-import { HStack } from '../../h-stack';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import { View } from '../../view';
 import { VisuallyHidden } from '../../visually-hidden';
@@ -61,6 +60,7 @@ const BorderBoxControl = (
 		popoverOffset,
 		splitValue,
 		toggleLinked,
+		wrapperClassName,
 		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
 		__next40pxDefaultSize = false,
@@ -96,7 +96,7 @@ const BorderBoxControl = (
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 			/>
-			<HStack alignment={ 'start' } expanded={ true } spacing={ 0 }>
+			<View className={ wrapperClassName }>
 				{ isLinked ? (
 					<BorderControl
 						className={ linkedControlClassName }
@@ -146,7 +146,7 @@ const BorderBoxControl = (
 					isLinked={ isLinked }
 					__next40pxDefaultSize={ __next40pxDefaultSize }
 				/>
-			</HStack>
+			</View>
 		</View>
 	);
 };
