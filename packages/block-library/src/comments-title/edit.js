@@ -11,11 +11,13 @@ import {
 	BlockControls,
 	useBlockProps,
 	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -39,9 +41,38 @@ export default function Edit( {
 		} ),
 	} );
 
+	const {
+		threadCommentsDepth,
+		threadComments,
+		commentsPerPage,
+		pageComments,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().__experimentalDiscussionSettings;
+	} );
+
 	useEffect( () => {
 		if ( isSiteEditor ) {
-			setCommentsCount( 3 );
+			// Match the number of comments that will be shown in the comment-template/edit.js placeholder
+
+			const commentsDepth = ! threadComments
+				? 1
+				: Math.min( threadCommentsDepth, 3 );
+
+			// Number of nested comments
+			let commentsNumber = commentsDepth;
+
+			// Sum one comment unless the break comments setting is active and set to less than 2
+			if ( ! pageComments || commentsPerPage >= 2 ) {
+				commentsNumber++;
+			}
+
+			// Sum one comment unless the break comments setting is active and set to less than 3
+			if ( ! pageComments || commentsPerPage >= 3 ) {
+				commentsNumber++;
+			}
+
+			setCommentsCount( commentsNumber );
 			return;
 		}
 		const currentPostId = postId;
