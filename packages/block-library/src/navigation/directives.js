@@ -12,12 +12,15 @@ export const directive = ( name, cb ) => {
 };
 
 const WpDirective = ( props ) => {
+	const element = h( props.type, props );
+	const directiveProps = { ...props, children: element, element };
+
 	for ( const d in props.wp ) {
-		directives[ d ]?.( props );
+		const ret = directives[ d ]?.( directiveProps );
+		if ( ret !== undefined ) directiveProps.children = ret;
 	}
-	props._wrapped = true;
-	const { wp, tag, children, ...rest } = props;
-	return h( tag, rest, children );
+
+	return directiveProps.children;
 };
 
 const old = options.vnode;
@@ -28,7 +31,8 @@ options.vnode = ( vnode ) => {
 
 	if ( wp ) {
 		if ( ! wrapped ) {
-			vnode.props.tag = vnode.type;
+			vnode.props.type = vnode.type;
+			vnode.props._wrapped = true;
 			vnode.type = WpDirective;
 		}
 	} else if ( wrapped ) {

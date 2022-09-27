@@ -1,3 +1,10 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable jsdoc/check-tag-names */
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable no-eval */
+
+/** @jsx h */
+
 /**
  * External dependencies
  */
@@ -12,32 +19,25 @@ import { toVdom } from './vdom';
 import { directive } from './directives';
 import { createRootFragment, idle } from './utils';
 
+/**
+ * Directives
+ */
+// wp-log
 directive( 'log', ( { wp: { log } } ) => {
 	useEffect( () => {
+		// eslint-disable-next-line no-console
 		console.log( log );
 	}, [ log ] );
 } );
 
+// wp-context
 const ctx = createContext( {} );
-
-const CtxProvider = ( { oldTag: OldTag, value, ...props } ) => (
-	<ctx.Provider value={ value }>
-		<OldTag { ...props } />
-	</ctx.Provider>
-);
-
-directive( 'context', ( props ) => {
-	const {
-		wp: { context },
-	} = props;
-
+directive( 'context', ( { wp: { context }, children } ) => {
 	const value = useState( context );
-
-	props.oldTag = props.tag;
-	props.tag = CtxProvider;
-	props.value = value;
+	return <ctx.Provider value={ value }>{ children }</ctx.Provider>;
 } );
 
+// wp-effect
 directive( 'effect', ( { wp: { effect } } ) => {
 	const [ context, setContext ] = useContext( ctx );
 	useEffect( () => {
@@ -46,18 +46,19 @@ directive( 'effect', ( { wp: { effect } } ) => {
 	} );
 } );
 
-directive( 'onClick', ( props ) => {
-	const {
-		wp: { onClick },
-	} = props;
+// wp-on-click
+directive( 'onClick', ( { wp: { onClick }, element } ) => {
 	const [ context, setContext ] = useContext( ctx );
-	props.onclick = ( event ) => {
+
+	element.props.onclick = ( event ) => {
 		const cb = eval( `(${ onClick })` );
 		cb( { context, setContext, event } );
 	};
 } );
 
-// Initialize the initial vDOM.
+/**
+ * Initialize the initial vDOM.
+ */
 document.addEventListener( 'DOMContentLoaded', async () => {
 	// Create the root fragment to hydrate everything.
 	const rootFragment = createRootFragment(
