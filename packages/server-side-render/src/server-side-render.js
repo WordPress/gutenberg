@@ -14,6 +14,8 @@ import { addQueryArgs } from '@wordpress/url';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { __experimentalSanitizeBlockAttributes } from '@wordpress/blocks';
 
+const EMPTY_OBJECT = {};
+
 export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {
 	return addQueryArgs( `/wp/v2/block-renderer/${ block }`, {
 		context: 'edit',
@@ -62,6 +64,26 @@ function DefaultLoadingResponsePlaceholder( { children, showLoader } ) {
 	);
 }
 
+function removeBlockSupportAttributes( attributes ) {
+	const {
+		backgroundColor,
+		borderColor,
+		fontFamily,
+		fontSize,
+		gradient,
+		textColor,
+		...restAttributes
+	} = attributes;
+
+	const { border, color, elements, spacing, typography, ...restStyles } =
+		attributes?.style || EMPTY_OBJECT;
+
+	return {
+		...restAttributes,
+		style: restStyles,
+	};
+}
+
 export default function ServerSideRender( props ) {
 	const {
 		attributes,
@@ -69,6 +91,7 @@ export default function ServerSideRender( props ) {
 		className,
 		httpMethod = 'GET',
 		urlQueryArgs,
+		skipBlockSupportAttributes = false,
 		EmptyResponsePlaceholder = DefaultEmptyResponsePlaceholder,
 		ErrorResponsePlaceholder = DefaultErrorResponsePlaceholder,
 		LoadingResponsePlaceholder = DefaultLoadingResponsePlaceholder,
@@ -88,9 +111,14 @@ export default function ServerSideRender( props ) {
 
 		setIsLoading( true );
 
-		const sanitizedAttributes =
+		let sanitizedAttributes =
 			attributes &&
 			__experimentalSanitizeBlockAttributes( block, attributes );
+
+		if ( skipBlockSupportAttributes ) {
+			sanitizedAttributes =
+				removeBlockSupportAttributes( sanitizedAttributes );
+		}
 
 		// If httpMethod is 'POST', send the attributes in the request body instead of the URL.
 		// This allows sending a larger attributes object than in a GET request, where the attributes are in the URL.
