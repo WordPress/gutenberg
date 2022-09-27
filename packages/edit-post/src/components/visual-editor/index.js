@@ -352,18 +352,6 @@ export default function VisualEditor( { styles } ) {
 											}
 										/>
 									) }
-									{
-										// For classic themes using theme.json we want a default content width in the editor.
-										! postContentBlock && (
-											<LayoutStyle
-												selector=".block-editor-block-list__layout.is-root-container"
-												layout={ fallbackLayout }
-												layoutDefinitions={
-													globalLayoutSettings?.definitions
-												}
-											/>
-										)
-									}
 								</>
 							) }
 						{ ! isTemplateMode && (
