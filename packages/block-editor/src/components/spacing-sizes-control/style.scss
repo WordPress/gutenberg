@@ -19,14 +19,14 @@
 
 	.components-base-control__label {
 		margin-bottom: 0;
-		height: 16px;
+		height: $grid-unit-20;
 	}
 
 	.components-spacing-sizes-control__side-labels {
 		grid-column: 1 / 1;
 		justify-content: left;
-		height: 16px;
-		margin-top: 12px;
+		height: $grid-unit-20;
+		margin-top: $grid-unit-15;
 	}
 
 	.components-spacing-sizes-control__side-label {
@@ -37,7 +37,7 @@
 
 	&.is-unlinked {
 		.components-range-control.components-spacing-sizes-control__range-control {
-			margin-top: 12px;
+			margin-top: $grid-unit-15;
 		}
 	}
 
@@ -60,6 +60,11 @@
 		grid-row: 1 / 1;
 		justify-self: end;
 		padding: 0;
+		&.is-small.has-icon {
+			padding: 0;
+			min-width: $icon-size;
+			height: $grid-unit-20;
+		}
 	}
 
 	.component-spacing-sizes-control__linked-button ~ .components-spacing-sizes-control__custom-toggle-all {
@@ -69,15 +74,11 @@
 	.components-spacing-sizes-control__custom-toggle-single {
 		grid-column: 3 / 3;
 		justify-self: end;
-	}
-
-	.components-spacing-sizes-control__custom-toggle-all,
-	.components-spacing-sizes-control__custom-toggle-single {
 		&.is-small.has-icon {
 			padding: 0;
 			min-width: $icon-size;
-			height: 16px;
-			margin-top: 12px;
+			height: $grid-unit-20;
+			margin-top: $grid-unit-15;
 		}
 	}
 
