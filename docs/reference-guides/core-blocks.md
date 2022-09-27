@@ -203,7 +203,7 @@ Displays a list of page numbers for comments pagination. ([Source](https://githu
 
 -	**Name:** core/comments-pagination-numbers
 -	**Category:** theme
--	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
 ## Comments Previous Page
