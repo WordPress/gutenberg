@@ -1076,9 +1076,7 @@ class WP_HTML_Tag_Processor {
 	 * @return string The processed HTML.
 	 */
 	public function __toString() {
-		/*
-		 * Short-circuit if there are no updates to apply.
-		 */
+		// Short-circuit if there are no updates to apply.
 		if ( ! count( $this->classname_updates ) && ! count( $this->attribute_updates ) ) {
 			return $this->updated_html . substr( $this->html, $this->updated_bytes );
 		}
