@@ -7,7 +7,7 @@
  */
 
 class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
-	function set_up() {
+	public function set_up() {
 		parent::set_up();
 		$this->theme_root     = realpath( __DIR__ . '/../data/themedir1' );
 		$this->orig_theme_dir = $GLOBALS['wp_theme_directories'];
@@ -24,7 +24,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		unset( $GLOBALS['wp_themes'] );
 	}
 
-	function tear_down() {
+	public function tear_down() {
 		$GLOBALS['wp_theme_directories'] = $this->orig_theme_dir;
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
@@ -32,11 +32,11 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		parent::tear_down();
 	}
 
-	function filter_set_theme_root() {
+	public function filter_set_theme_root() {
 		return $this->theme_root;
 	}
 
-	function test_outer_container_not_restored_for_non_aligned_image_block_with_non_themejson_theme() {
+	public function test_outer_container_not_restored_for_non_aligned_image_block_with_non_themejson_theme() {
 		// The "default" theme doesn't have theme.json support.
 		switch_theme( 'default' );
 		$block         = array(
@@ -49,7 +49,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_content, $block ) );
 	}
 
-	function test_outer_container_restored_for_aligned_image_block_with_non_themejson_theme() {
+	public function test_outer_container_restored_for_aligned_image_block_with_non_themejson_theme() {
 		// The "default" theme doesn't have theme.json support.
 		switch_theme( 'default' );
 		$block         = array(
@@ -62,7 +62,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, gutenberg_restore_image_outer_container( $block_content, $block ) );
 	}
 
-	function test_additional_styles_moved_to_restored_outer_container_for_aligned_image_block_with_non_themejson_theme() {
+	public function test_additional_styles_moved_to_restored_outer_container_for_aligned_image_block_with_non_themejson_theme() {
 		// The "default" theme doesn't have theme.json support.
 		switch_theme( 'default' );
 		$block = array(
@@ -89,7 +89,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected_other_attributes, gutenberg_restore_image_outer_container( $block_classes_other_attributes, $block ) );
 	}
 
-	function test_outer_container_not_restored_for_aligned_image_block_with_themejson_theme() {
+	public function test_outer_container_not_restored_for_aligned_image_block_with_themejson_theme() {
 		switch_theme( 'block-theme' );
 		$block         = array(
 			'blockName' => 'core/image',
@@ -123,7 +123,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	 * }
 	 * @param string $expected_output The expected output.
 	 */
-	function test_gutenberg_get_layout_style( $args, $expected_output ) {
+	public function test_gutenberg_get_layout_style( $args, $expected_output ) {
 		$layout_styles = gutenberg_get_layout_style( $args['selector'], $args['layout'], $args['has_block_gap_support'], $args['gap_value'], $args['should_skip_gap_serialization'], $args['fallback_gap_value'], $args['block_spacing'] );
 		$this->assertSame( $expected_output, $layout_styles );
 	}
