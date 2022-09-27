@@ -243,7 +243,7 @@ function block_core_page_list_nest_pages( $current_level, $children ) {
  */
 function render_block_core_page_list( $attributes, $content, $block ) {
 	static $block_id = 0;
-	$block_id++;
+	++$block_id;
 
 	$all_pages = get_pages(
 		array(
