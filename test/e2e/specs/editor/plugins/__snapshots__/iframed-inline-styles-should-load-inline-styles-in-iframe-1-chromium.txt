@@ -1,0 +1,3 @@
+<!-- wp:test/iframed-inline-styles -->
+<div class="wp-block-test-iframed-inline-styles">Save</div>
+<!-- /wp:test/iframed-inline-styles -->
