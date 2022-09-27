@@ -11,9 +11,9 @@
 		align-items: flex-start;
 
 		> .components-unit-control-wrapper {
-			width: 120px;
+			width: 116px;
 			margin-bottom: 0;
-			margin-right: #{$grid-unit-15};
+			margin-right: #{$grid-unit-20};
 			flex-shrink: 0;
 		}
 
@@ -51,14 +51,10 @@
 	}
 
 	.components-border-radius-control__input-controls-wrapper {
-		display: flex;
-		flex-wrap: wrap;
-
-		.components-border-radius-control__tooltip-wrapper {
-			width: calc(50% - #{$grid-unit-10});
-			margin-bottom: $grid-unit-10;
-			margin-right: $grid-unit-10;
-		}
+		display: grid;
+		gap: $grid-unit-20;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		margin-right: $grid-unit-15;
 	}
 
 	.component-border-radius-control__linked-button.has-icon {
