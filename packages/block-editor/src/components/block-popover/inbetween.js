@@ -218,7 +218,7 @@ function BlockPopoverInbetween( {
 	}, [ nextElement ] );
 
 	useLayoutEffect( () => {
-		if ( ! previousElement?.ownerDocument?.defaultView ) {
+		if ( ! previousElement ) {
 			return;
 		}
 		previousElement.ownerDocument.defaultView.addEventListener(
@@ -226,7 +226,7 @@ function BlockPopoverInbetween( {
 			forcePopoverRecompute
 		);
 		return () => {
-			previousElement.ownerDocument.defaultView.removeEventListener(
+			previousElement.ownerDocument.defaultView?.removeEventListener(
 				'resize',
 				forcePopoverRecompute
 			);
