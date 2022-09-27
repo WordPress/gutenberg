@@ -71,11 +71,15 @@ export const borderControlDropdown = ( __next40pxDefaultSize?: boolean ) => css`
 
 	&& > button {
 		/*
-		 * Override button component height and padding to fit within
-		 * BorderControl regardless of size.
+		 * Override button component styles to fit within BorderControl
+		 * regardless of size.
 		 */
-		height: ${ __next40pxDefaultSize ? '40px' : '100%' };
-		padding: ${ space( 0.75 ) };
+		height: ${ __next40pxDefaultSize ? '40px' : '30px' };
+		width: ${ __next40pxDefaultSize ? '40px' : '30px' };
+		padding: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		${ rtl(
 			{ borderRadius: `2px 0 0 2px` },
 			{ borderRadius: `0 2px 2px 0` }
@@ -114,8 +118,8 @@ export const colorIndicatorWrapper = (
 		border-radius: 9999px;
 		border: 2px solid transparent;
 		${ style ? colorIndicatorBorder( border ) : undefined }
-		width: ${ __next40pxDefaultSize ? '28px' : '22px' };
-		height: ${ __next40pxDefaultSize ? '28px' : '22px' };
+		width: ${ __next40pxDefaultSize ? '24px' : '22px' };
+		height: ${ __next40pxDefaultSize ? '24px' : '22px' };
 		padding: ${ __next40pxDefaultSize ? '2px' : '1px' };
 
 		/*
@@ -125,13 +129,8 @@ export const colorIndicatorWrapper = (
 		 * over the active state of the border control dropdown's toggle button.
 		 */
 		& > span {
-			${ ! __next40pxDefaultSize
-				? css`
-						/* Dimensions fit in 30px overall control height. */
-						height: 16px;
-						width: 16px;
-				  `
-				: '' }
+			height: 16px;
+			width: 16px;
 			background: linear-gradient(
 				-45deg,
 				transparent 48%,
