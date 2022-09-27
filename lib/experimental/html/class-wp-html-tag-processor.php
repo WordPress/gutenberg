@@ -582,7 +582,7 @@ class WP_HTML_Tag_Processor {
 	 */
 	private function parse_tag_opener_attributes() {
 		while ( $this->parse_next_attribute() ) {
-			// Twiddle our thumbs...
+			continue;
 		}
 	}
 
@@ -593,7 +593,7 @@ class WP_HTML_Tag_Processor {
 	 */
 	private function skip_tag_closer_attributes() {
 		while ( $this->parse_next_attribute( 'tag-closer' ) ) {
-			// Twiddle our thumbs...
+			continue;
 		}
 	}
 

@@ -231,9 +231,9 @@ class WP_Block_Parser {
 		$this->stack       = array();
 		$this->empty_attrs = json_decode( '{}', true );
 
-		do {
-			// twiddle our thumbs.
-		} while ( $this->proceed() );
+		while ( $this->proceed() ) {
+			continue;
+		}
 
 		return $this->output;
 	}
