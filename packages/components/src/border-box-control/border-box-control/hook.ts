@@ -104,6 +104,10 @@ export function useBorderBoxControl(
 		return cx( styles.LinkedBorderControl );
 	}, [ cx ] );
 
+	const wrapperClassName = useMemo( () => {
+		return cx( styles.Wrapper );
+	}, [ cx ] );
+
 	return {
 		...otherProps,
 		className: classes,
@@ -115,5 +119,6 @@ export function useBorderBoxControl(
 		toggleLinked,
 		linkedValue,
 		splitValue,
+		wrapperClassName,
 	};
 }
