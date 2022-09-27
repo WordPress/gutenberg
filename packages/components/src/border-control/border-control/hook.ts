@@ -119,7 +119,7 @@ export function useBorderControl(
 
 	let wrapperWidth = width;
 	if ( isCompact ) {
-		wrapperWidth = __next40pxDefaultSize ? '118px' : '90px';
+		wrapperWidth = __next40pxDefaultSize ? '116px' : '90px';
 	}
 	const innerWrapperClassName = useMemo( () => {
 		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
