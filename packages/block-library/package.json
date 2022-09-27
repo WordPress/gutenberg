@@ -64,6 +64,7 @@
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"micromodal": "^0.4.10",
+		"preact": "^10.11.0",
 		"remove-accents": "^0.4.2"
 	},
 	"peerDependencies": {

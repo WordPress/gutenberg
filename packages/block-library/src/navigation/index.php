@@ -632,11 +632,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
 
 	$responsive_container_markup = sprintf(
-		'<button aria-haspopup="true" %3$s class="%6$s" data-micromodal-trigger="%1$s">%9$s</button>
+		'<button wp-effect="function({ context }) { console.log(context.open); }" wp-on-click="function({ setContext }) { setContext({ open: true }); }" aria-haspopup="true" %3$s class="%6$s">%9$s</button>
 			<div class="%5$s" style="%7$s" id="%1$s">
-				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
-					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s">
-							<button %4$s data-micromodal-close class="wp-block-navigation__responsive-container-close">%10$s</button>
+				<div class="wp-block-navigation__responsive-close" tabindex="-1">
+					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s" aria-modal="true" role="dialog">
+							<button %4$s class="wp-block-navigation__responsive-container-close">%10$s</button>
 						<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
 							%2$s
 						</div>
@@ -656,7 +656,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	);
 
 	return sprintf(
-		'<nav %1$s>%2$s</nav>',
+		'<nav %1$s wp-context=\'{"open": false}\'>%2$s</nav>',
 		$wrapper_attributes,
 		$responsive_container_markup
 	);
