@@ -130,7 +130,7 @@
 			}
 		}
 	},
-	"viewScript": [ "file:./view.min.js" ],
+	"viewScript": [ "file:./wordpress-directives.min.js" ],
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"
 }

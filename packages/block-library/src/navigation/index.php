@@ -421,14 +421,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	 */
 	$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
 	$is_responsive_menu           = isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
-	$should_load_view_script      = ! wp_script_is( 'wp-block-navigation-view' ) && ( $is_responsive_menu || $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] );
-	if ( $should_load_view_script ) {
-		wp_enqueue_script( 'wp-block-navigation-view' );
-	}
 
-	$should_load_modal_view_script = isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'];
-	if ( $should_load_modal_view_script ) {
-		wp_enqueue_script( 'wp-block-navigation-view-modal' );
+	$should_load_view_script      = ! wp_script_is( 'wp-block-navigation-wordpress-directives' ) && ( $is_responsive_menu || $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] );
+	if ( $should_load_view_script ) {
+		wp_enqueue_script( 'wp-block-navigation-wordpress-directives' );
 	}
 
 	$inner_blocks = $block->inner_blocks;
