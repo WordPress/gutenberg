@@ -42,6 +42,7 @@ export default function useCoverIsDark(
 		// If opacity is lower than 50 the dominant color is the image or video color,
 		// so use that color for the dark mode computation.
 		if ( url && dimRatio <= 50 && elementRef.current ) {
+			const originalCrossOrigin = elementRef.current.crossOrigin;
 			const imgCrossOrigin = applyFilters(
 				'media.crossOrigin',
 				elementRef.current.crossOrigin,
@@ -60,6 +61,9 @@ export default function useCoverIsDark(
 					silent: process.env.NODE_ENV === 'production',
 				} )
 				.then( ( color ) => setIsDark( color.isDark ) );
+			return () => {
+				elementRef.current.crossOrigin = originalCrossOrigin;
+			}
 		}
 	}, [ url, url && dimRatio <= 50 && elementRef.current, setIsDark ] );
 	useEffect( () => {
