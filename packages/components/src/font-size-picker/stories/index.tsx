@@ -20,6 +20,7 @@ const meta: ComponentMeta< typeof FontSizePicker > = {
 		value: { control: { type: null } },
 	},
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
 	},
@@ -28,6 +29,7 @@ export default meta;
 
 const FontSizePickerWithState: ComponentStory< typeof FontSizePicker > = ( {
 	value,
+	onChange,
 	...props
 } ) => {
 	const [ fontSize, setFontSize ] = useState( value );
@@ -35,7 +37,10 @@ const FontSizePickerWithState: ComponentStory< typeof FontSizePicker > = ( {
 		<FontSizePicker
 			{ ...props }
 			value={ fontSize }
-			onChange={ setFontSize }
+			onChange={ ( nextValue ) => {
+				setFontSize( nextValue );
+				onChange?.( nextValue );
+			} }
 		/>
 	);
 };
