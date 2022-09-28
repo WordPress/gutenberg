@@ -1194,15 +1194,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			'classes'           => array(),
 			'properties'        => array( 'padding', 'margin' ),
 		),
-		array(
-			'path'              => array( 'spacing', 'spacingScale' ),
-			'prevent_override'  => false,
-			'use_default_names' => true,
-			'value_key'         => 'size',
-			'css_vars'          => '--wp--preset--spacing--$slug',
-			'classes'           => array(),
-			'properties'        => array( 'padding', 'margin' ),
-		),
 	);
 
 	/**
