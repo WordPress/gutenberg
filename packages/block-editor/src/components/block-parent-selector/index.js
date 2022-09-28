@@ -83,10 +83,10 @@ export default function BlockParentSelector() {
 				label={ sprintf(
 					/* translators: %s: Name of the block's parent. */
 					__( 'Select %s' ),
-					blockInformation.title
+					blockInformation?.title
 				) }
 				showTooltip
-				icon={ <BlockIcon icon={ blockInformation.icon } /> }
+				icon={ <BlockIcon icon={ blockInformation?.icon } /> }
 			/>
 		</div>
 	);
