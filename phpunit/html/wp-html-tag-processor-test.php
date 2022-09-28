@@ -7,16 +7,9 @@
  */
 
 if ( ! function_exists( 'esc_attr' ) ) {
-	function get_option( $option ) {
-		if ( 'blog_charset' === $option ) {
-			return 'UTF-8';
-		}
+	function esc_attr( $string ) {
+		return htmlspecialchars( $string, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'utf-8', false );
 	}
-	function wp_load_alloptions(){}
-	function apply_filters( $name, $value ) {
-		return $value; }
-	require_once( __DIR__ . '/../../../../wordpress-develop/src/wp-includes/kses.php' );
-	require_once( __DIR__ . '/../../../../wordpress-develop/src/wp-includes/formatting.php' );
 }
 
 if ( ! class_exists( 'WP_UnitTestCase' ) ) {
@@ -253,60 +246,54 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	 *     // <div class="" onclick="alert"></div>
 	 * </code>
 	 *
-	 * To prevent it, `set_attribute` encodes the double quote character as an HTML entity:
+	 * To prevent it, `set_attribute` calls `esc_attr()` on its given values.
 	 *
 	 * <code>
 	 *    <div class="&quot; onclick=&quot;alert"></div>
 	 * </code>
 	 *
-	 * As per the HTML standard, the only way to escape out of the double quoted attribute value is
-	 * via the terminating double quote character ", so there is no need to encode other characters
-	 * such as <, >, /, or '.
-	 *
-	 * @see https://html.spec.whatwg.org/#attribute-value-(double-quoted)-state
-	 *
 	 * @ticket 56299
 	 *
-	 * @dataProvider data_set_attribute_xss_values
+	 * @dataProvider data_set_attribute_escapable_values
 	 * @covers set_attribute
 	 */
-	public function test_set_attribute_prevents_xss( $initial_html, $attribute_value, $expected_html ) {
-		$p = new WP_HTML_Tag_Processor( $initial_html );
+	public function test_set_attribute_prevents_xss( $attribute_value ) {
+		$p = new WP_HTML_Tag_Processor( '<div></div>' );
 		$p->next_tag();
 		$p->set_attribute( 'test', $attribute_value );
-		$this->assertSame(
-			$expected_html,
-			(string) $p,
-			'Setting an attribute to a malicious value did not escape it correctly – this is an XSS vulnerability.'
-		);
+
+		/*
+		 * Testing the escaping is hard using tools that properly parse
+		 * HTML because they might interpret the escaped values. It's hard
+		 * with tools that don't understand HTML because they might get
+		 * confused by improperly-escaped values.
+		 *
+		 * For this test, since we control the input HTML we're going to
+		 * do what looks like the opposite of what we want to be doing with
+		 * this library but are only doing so because we have full control
+		 * over the content and because we want to look at the raw values.
+		 */
+		$match = null;
+		preg_match( '~^<div test=(.*)></div>$~', (string) $p, $match );
+		list( $full_match, $actual_value ) = $match;
+
+		$this->assertEquals( $actual_value, '"' . esc_attr( $attribute_value ) . '"' );
 	}
 
 	/**
-	 * Data provider with malicious HTML attribute values.
-	 *
-	 * @return array {
-	 *     @type string $initial_html The initial HTML to process.
-	 *     @type string $attribute_value The value to set for the `test` attribute of the first encountered tag.
-	 *     @type string $expected_html The expected HTML after the processing.
-	 * }
+	 * Data provider with HTML attribute values that might need escaping.
 	 */
-	public function data_set_attribute_xss_values() {
+	public function data_set_attribute_escapable_values() {
 		return array(
-			'Double quotes should be encoded as HTML entities' => array( '<div></div>', '"', '<div test="&quot;"></div>' ),
-			'Encoded quotes should not be encoded again' => array( '<div></div>', '&quot;', '<div test="&quot;"></div>' ),
-			'Ampersand should be encoded'                => array( '<div></div>', '&', '<div test="&amp;"></div>' ),
-			'An encoded ampersand should not be encoded again' => array( '<div></div>', '&amp;', '<div test="&amp;"></div>' ),
-			'An encoded euro entity should not be encoded again' => array( '<div></div>', '&euro;', '<div test="&euro;"></div>' ),
-			'Single quotes should be encoded'            => array( '<div></div>', "'", '<div test="&#039;"></div>' ),
-			'< and > characters should not be encoded'   => array( '<div></div>', '<>', '<div test="&lt;&gt;"></div>' ),
-			'A quote inside of an HTML entity should still be encoded' => array( '<div></div>', '&quot";', '<div test="&amp;quot&quot;;"></div>' ),
-			'Single-quoted attributes should be rewritten using double quotes' => array( "<div test='foo'></div>", 'foo', '<div test="foo"></div>' ),
-			'Unquoted attributes should be rewritten using double quotes' => array( '<div test=foo></div>', 'foo', '<div test="foo"></div>' ),
-			'An HTML snippet passed as a value should only have the double quote characters encoded ' => array(
-				'<div test=foo></div>',
-				'" onclick="alert(\'1\');"><span onclick=""></span><script>alert("1")</script>',
-				'<div test="&quot; onclick=&quot;alert(&#039;1&#039;);&quot;&gt;&lt;span onclick=&quot;&quot;&gt;&lt;/span&gt;&lt;script&gt;alert(&quot;1&quot;)&lt;/script&gt;"></div>',
-			),
+			[ '"' ],
+			[ '&quot;' ],
+			[ '&' ],
+			[ '&amp;' ],
+			[ '&euro;' ],
+			[ "'" ],
+			[ '<>' ],
+			[ '&quot";' ],
+			[ '" onclick="alert(\'1\');"><span onclick=""></span><script>alert("1")</script>' ],
 		);
 	}
 
