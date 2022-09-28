@@ -32,7 +32,10 @@ export default function AllInputControl( {
 
 	const hasValues = hasDefinedValues( values );
 	const isMixed = hasValues && hasMixedValues( values );
-	const allPlaceholder = isMixed ? __( 'Mixed' ) : null;
+	const allPlaceholder = isMixed
+		? /* translators: Placeholder text representing a mix of values. */
+		  __( 'Mix' )
+		: null;
 
 	// Filter out CSS-unit-only values to prevent invalid styles.
 	const handleOnChange = ( next ) => {

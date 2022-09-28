@@ -127,7 +127,7 @@ describe( 'BorderBoxControl', () => {
 			clickButton( 'Link sides' );
 
 			const widthInput = screen.getByRole( 'spinbutton' );
-			expect( widthInput ).toHaveAttribute( 'placeholder', 'Mixed' );
+			expect( widthInput ).toHaveAttribute( 'placeholder', 'Mix' );
 		} );
 
 		it( 'should render shared border width when switching to linked view', async () => {
