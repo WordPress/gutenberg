@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classNames from 'classnames';
+import type { ReactNode, ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -34,31 +35,42 @@ import {
 } from './utils';
 import { VStack } from '../v-stack';
 import { HStack } from '../h-stack';
+import type {
+	FontSizePickerProps,
+	FontSizeSelectOption,
+	FontSizeToggleGroupOption,
+} from './types';
 
 // This conditional is needed to maintain the spacing before the slider in the `withSlider` case.
-const MaybeVStack = ( { __nextHasNoMarginBottom, children } ) =>
+const MaybeVStack = ( {
+	__nextHasNoMarginBottom,
+	children,
+}: {
+	__nextHasNoMarginBottom: boolean;
+	children: ReactNode;
+} ) =>
 	! __nextHasNoMarginBottom ? (
-		children
+		<>{ children }</>
 	) : (
 		<VStack spacing={ 6 } children={ children } />
 	);
 
-function FontSizePicker(
-	{
+const UnforwardedFontSizePicker = (
+	props: FontSizePickerProps,
+	ref: ForwardedRef< any >
+) => {
+	const {
 		/** Start opting into the new margin-free styles that will become the default in a future version. */
 		__nextHasNoMarginBottom = false,
 		fallbackFontSize,
 		fontSizes = [],
 		disableCustomFontSizes = false,
 		onChange,
-		/** @type {'default' | '__unstable-large'} */
 		size = 'default',
 		value,
 		withSlider = false,
 		withReset = true,
-	},
-	ref
-) {
+	} = props;
 	if ( ! __nextHasNoMarginBottom ) {
 		deprecated( 'Bottom margin styles for wp.components.FontSizePicker', {
 			since: '6.1',
@@ -70,7 +82,7 @@ function FontSizePicker(
 	const hasUnits = [ typeof value, typeof fontSizes?.[ 0 ]?.size ].includes(
 		'string'
 	);
-	const noUnitsValue = ! hasUnits ? value : parseInt( value );
+	const noUnitsValue = ! hasUnits ? value : parseInt( String( value ) );
 	const isPixelValue = typeof value === 'number' || value?.endsWith?.( 'px' );
 	const units = useCustomUnits( {
 		availableUnits: [ 'px', 'em', 'rem' ],
@@ -106,10 +118,15 @@ function FontSizePicker(
 		// If we have a custom value that is not available in the font sizes,
 		// show it as a hint as long as it's a simple CSS value.
 		if ( isCustomValue ) {
-			return isSimpleCssValue( value ) && `(${ value })`;
+			return (
+				value !== undefined &&
+				isSimpleCssValue( value ) &&
+				`(${ value })`
+			);
 		}
 		if ( shouldUseSelectControl ) {
 			return (
+				selectedOption?.size !== undefined &&
 				isSimpleCssValue( selectedOption?.size ) &&
 				`(${ selectedOption?.size })`
 			);
@@ -192,13 +209,19 @@ function FontSizePicker(
 								label={ __( 'Font size' ) }
 								hideLabelFromVision
 								describedBy={ currentFontSizeSR }
-								options={ options }
-								value={ options.find(
+								options={ options as FontSizeSelectOption[] }
+								value={ (
+									options as FontSizeSelectOption[]
+								 ).find(
 									( option ) =>
 										option.key === selectedOption.slug
 								) }
-								onChange={ ( { selectedItem } ) => {
-									onChange(
+								onChange={ ( {
+									selectedItem,
+								}: {
+									selectedItem: FontSizeSelectOption;
+								} ) => {
+									onChange?.(
 										hasUnits
 											? selectedItem.size
 											: Number( selectedItem.size )
@@ -219,22 +242,24 @@ function FontSizePicker(
 							hideLabelFromVision
 							value={ value }
 							onChange={ ( newValue ) => {
-								onChange(
+								onChange?.(
 									hasUnits ? newValue : Number( newValue )
 								);
 							} }
 							isBlock
 							size={ size }
 						>
-							{ options.map( ( option ) => (
-								<ToggleGroupControlOption
-									key={ option.key }
-									value={ option.value }
-									label={ option.label }
-									aria-label={ option.name }
-									showTooltip={ true }
-								/>
-							) ) }
+							{ ( options as FontSizeToggleGroupOption[] ).map(
+								( option ) => (
+									<ToggleGroupControlOption
+										key={ option.key }
+										value={ option.value }
+										label={ option.label }
+										aria-label={ option.name }
+										showTooltip={ true }
+									/>
+								)
+							) }
 						</ToggleGroupControl>
 					) }
 					{ ! withSlider &&
@@ -252,12 +277,12 @@ function FontSizePicker(
 										value={ value }
 										onChange={ ( nextSize ) => {
 											if (
-												0 === parseFloat( nextSize ) ||
-												! nextSize
+												! nextSize ||
+												0 === parseFloat( nextSize )
 											) {
-												onChange( undefined );
+												onChange?.( undefined );
 											} else {
-												onChange(
+												onChange?.(
 													hasUnits
 														? nextSize
 														: parseInt(
@@ -277,7 +302,7 @@ function FontSizePicker(
 											className="components-color-palette__clear"
 											disabled={ value === undefined }
 											onClick={ () => {
-												onChange( undefined );
+												onChange?.( undefined );
 											} }
 											isSmall
 											variant="secondary"
@@ -294,10 +319,14 @@ function FontSizePicker(
 						__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 						className={ `${ baseClassName }__custom-input` }
 						label={ __( 'Custom Size' ) }
-						value={ ( isPixelValue && noUnitsValue ) || '' }
+						value={
+							isPixelValue && noUnitsValue
+								? Number( noUnitsValue )
+								: undefined
+						}
 						initialPosition={ fallbackFontSize }
 						onChange={ ( newValue ) => {
-							onChange( hasUnits ? newValue + 'px' : newValue );
+							onChange?.( hasUnits ? newValue + 'px' : newValue );
 						} }
 						min={ 12 }
 						max={ 100 }
@@ -306,6 +335,8 @@ function FontSizePicker(
 			</MaybeVStack>
 		</fieldset>
 	);
-}
+};
 
-export default forwardRef( FontSizePicker );
+export const FontSizePicker = forwardRef( UnforwardedFontSizePicker );
+
+export default FontSizePicker;

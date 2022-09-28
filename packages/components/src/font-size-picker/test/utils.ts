@@ -7,7 +7,7 @@ import {
 	getToggleGroupOptions,
 } from '../utils';
 
-const simpleCSSCases = [
+const simpleCSSCases: [ number | string, boolean ][] = [
 	// Test integers and non-integers.
 	[ 1, true ],
 	[ 1.25, true ],
@@ -41,7 +41,11 @@ describe( 'isSimpleCssValue', () => {
 	);
 } );
 
-const splitValuesCases = [
+const splitValuesCases: [
+	number | string,
+	string | undefined,
+	string | undefined
+][] = [
 	// Test integers and non-integers.
 	[ 1, '1', undefined ],
 	[ 1.25, '1.25', undefined ],

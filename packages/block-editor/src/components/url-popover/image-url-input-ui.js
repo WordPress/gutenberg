@@ -221,7 +221,7 @@ const ImageURLInputUI = ( {
 				checked={ linkTarget === '_blank' }
 			/>
 			<TextControl
-				label={ __( 'Link Rel' ) }
+				label={ __( 'Link rel' ) }
 				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
 			/>

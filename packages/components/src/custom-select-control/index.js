@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -15,7 +16,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { VisuallyHidden } from '../';
+import { VisuallyHidden } from '../visually-hidden';
 import { Select as SelectControlSelect } from '../select-control/styles/select-control-styles';
 import SelectControlChevronDown from '../select-control/chevron-down';
 import { InputBaseWithBackCompatMinWidth } from './styles';

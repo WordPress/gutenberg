@@ -11,7 +11,6 @@
  * @TODO: Unify language around "currently-opened tag."
  * @TODO: Organize unit test cases into normative tests, edge-case tests, regression tests.
  * @TODO: Clean up attribute token class after is_true addition
- * @TODO: Review (start,end) vs. (start,length) pairs for consistency and ease.
  * @TODO: Prune whitespace when removing classes/attributes: e.g. "a b c" -> "c" not " c"
  * @TODO: Skip over `/` in attributes area, split attribute names by `/`
  * @TODO: Decode HTML references/entities in class names when matching.
@@ -21,7 +20,7 @@
  *
  * @package WordPress
  * @subpackage HTML
- * @since 6.1.0
+ * @since 6.2.0
  */
 
 /**
@@ -29,14 +28,14 @@
  * of patches to that input. Tokenizes HTML but does not fully
  * parse the input document.
  *
- * @since 6.1.0
+ * @since 6.2.0
  */
 class WP_HTML_Tag_Processor {
 
 	/**
 	 * The HTML document to parse.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 * @var string
 	 */
 	private $html;
@@ -44,7 +43,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * The last query passed to next_tag().
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 * @var array|null
 	 */
 	private $last_query;
@@ -52,7 +51,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * The tag name this processor currently scans for.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 * @var string|null
 	 */
 	private $sought_tag_name;
@@ -60,7 +59,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * The CSS class name this processor currently scans for.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 * @var string|null
 	 */
 	private $sought_class_name;
@@ -68,7 +67,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * The match offset this processor currently scans for.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 * @var int|null
 	 */
 	private $sought_match_offset;
@@ -76,7 +75,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * The updated HTML document.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 * @var string
 	 */
 	private $updated_html = '';
@@ -84,7 +83,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * How many bytes from the original HTML document were already read.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 * @var int
 	 */
 	private $parsed_bytes = 0;
@@ -93,30 +92,40 @@ class WP_HTML_Tag_Processor {
 	 * How many bytes from the original HTML document were already treated
 	 * with the requested replacements.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 * @var int
 	 */
 	private $updated_bytes = 0;
 
 	/**
-	 * The name of the currently matched tag.
+	 * Byte offset in input document where current tag name starts.
 	 *
-	 * @since 6.1.0
-	 * @var integer|null
+	 * Example:
+	 * ```
+	 *   <div id="test">...
+	 *   01234
+	 *    - tag name starts at 1
+	 * ```
+	 *
+	 * @since 6.2.0
+	 * @var ?int
 	 */
 	private $tag_name_starts_at;
 
 	/**
-	 * Byte offset after the name of current tag.
-	 * Example:
-	 *   <div
-	 *   01234
-	 *       ^ tag_name_ends_at = 4
+	 * Byte length of current tag name.
 	 *
-	 * @since 6.1.0
-	 * @var number
+	 * Example:
+	 * ```
+	 *   <div id="test">...
+	 *   01234
+	 *    --- tag name length is 3
+	 * ```
+	 *
+	 * @since 6.2.0
+	 * @var ?int
 	 */
-	private $tag_name_ends_at;
+	private $tag_name_length;
 
 	/**
 	 * Lazily-built index of attributes found within an HTML tag, keyed by the attribute name.
@@ -142,7 +151,7 @@ class WP_HTML_Tag_Processor {
 	 *     // That's because it is the only value used by this class at the moment.
 	 * </code>
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 * @var WP_HTML_Attribute_Token[]
 	 */
 	private $attributes = array();
@@ -168,7 +177,7 @@ class WP_HTML_Tag_Processor {
 	 *     );
 	 * </code>
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 * @var bool[]
 	 */
 	private $classname_updates = array();
@@ -202,7 +211,7 @@ class WP_HTML_Tag_Processor {
 	 *     );
 	 * </code>
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 * @var WP_HTML_Text_Replacement[]
 	 */
 	private $attribute_updates = array();
@@ -210,7 +219,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * Constructor.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 *
 	 * @param string $html HTML to process.
 	 */
@@ -221,7 +230,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * Finds the next tag matching the $query.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 *
 	 * @param array|string $query {
 	 *     Which tag name to find, having which class, etc.
@@ -278,7 +287,7 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * @see https://html.spec.whatwg.org/multipage/parsing.html#rcdata-state
 	 * @param string $tag_name – the lowercase tag name which will close the RCDATA region.
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 */
 	private function skip_rcdata( $tag_name ) {
 		$html       = $this->html;
@@ -341,7 +350,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * Skips the contents of <script> tags.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 */
 	private function skip_script_data() {
 		$state      = 'unescaped';
@@ -460,7 +469,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * Parses the next tag.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 */
 	private function parse_next_tag() {
 		$this->after_tag();
@@ -489,10 +498,9 @@ class WP_HTML_Tag_Processor {
 			$tag_name_prefix_length = strspn( $html, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', $at + 1 );
 			if ( $tag_name_prefix_length > 0 ) {
 				$at++;
-				$tag_name_length          = $tag_name_prefix_length + strcspn( $html, " \t\f\r\n/>", $at + $tag_name_prefix_length );
+				$this->tag_name_length    = $tag_name_prefix_length + strcspn( $html, " \t\f\r\n/>", $at + $tag_name_prefix_length );
 				$this->tag_name_starts_at = $at;
-				$this->tag_name_ends_at   = $at + $tag_name_length;
-				$this->parsed_bytes       = $at + $tag_name_length;
+				$this->parsed_bytes       = $at + $this->tag_name_length;
 				return true;
 			}
 
@@ -570,7 +578,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * Parses all attributes of the current tag.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 */
 	private function parse_tag_opener_attributes() {
 		while ( $this->parse_next_attribute() ) {
@@ -581,7 +589,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * Skips all attributes of the current tag.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 */
 	private function skip_tag_closer_attributes() {
 		while ( $this->parse_next_attribute( 'tag-closer' ) ) {
@@ -593,7 +601,7 @@ class WP_HTML_Tag_Processor {
 	 * Parses the next attribute.
 	 *
 	 * @param string $context tag-opener or tag-closer.
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 */
 	private function parse_next_attribute( $context = 'tag-opener' ) {
 		// Skip whitespace and slashes.
@@ -668,7 +676,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * Move the pointer past any immediate successive whitespace.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 *
 	 * @return void
 	 */
@@ -679,7 +687,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * Applies attribute updates and cleans up once a tag is fully parsed.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 *
 	 * @return void
 	 */
@@ -687,7 +695,7 @@ class WP_HTML_Tag_Processor {
 		$this->class_name_updates_to_attributes_updates();
 		$this->apply_attributes_updates();
 		$this->tag_name_starts_at = null;
-		$this->tag_name_ends_at   = null;
+		$this->tag_name_length    = null;
 		$this->attributes         = array();
 	}
 
@@ -699,7 +707,7 @@ class WP_HTML_Tag_Processor {
 	 * The behavior in all other cases is undefined.
 	 *
 	 * @return void
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 *
 	 * @see $classname_updates
 	 * @see $attribute_updates
@@ -822,7 +830,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * Applies updates to attributes.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 */
 	private function apply_attributes_updates() {
 		if ( ! count( $this->attribute_updates ) ) {
@@ -853,7 +861,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * Sort function to arrange objects with a start property in ascending order.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 *
 	 * @param object $a First attribute update.
 	 * @param object $b Second attribute update.
@@ -878,7 +886,7 @@ class WP_HTML_Tag_Processor {
 	 *     $p->get_attribute( 'class' ) === null;
 	 * </code>
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 *
 	 * @param string $name Name of attribute whose value is requested.
 	 * @return string|true|null Value of attribute or `null` if not available.
@@ -916,7 +924,7 @@ class WP_HTML_Tag_Processor {
 	 *     $p->get_tag() === null;
 	 * </code>
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 *
 	 * @return string|null Name of current tag in input HTML, or `null` if none currently open.
 	 */
@@ -925,8 +933,7 @@ class WP_HTML_Tag_Processor {
 			return null;
 		}
 
-		$tag_name_length = $this->tag_name_ends_at - $this->tag_name_starts_at;
-		$tag_name        = substr( $this->html, $this->tag_name_starts_at, $tag_name_length );
+		$tag_name = substr( $this->html, $this->tag_name_starts_at, $this->tag_name_length );
 
 		return strtolower( $tag_name );
 	}
@@ -938,7 +945,7 @@ class WP_HTML_Tag_Processor {
 	 *  - When `true` is passed as the value, then only the attribute name is added to the tag.
 	 *  - When `false` is passed, the attribute gets removed if it existed before.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 *
 	 * @param string         $name  The attribute name to target.
 	 * @param string|boolean $value The new attribute value.
@@ -997,8 +1004,8 @@ class WP_HTML_Tag_Processor {
 			 *    Result: <div id="new"/>
 			 */
 			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
-				$this->tag_name_ends_at,
-				$this->tag_name_ends_at,
+				$this->tag_name_starts_at + $this->tag_name_length,
+				$this->tag_name_starts_at + $this->tag_name_length,
 				' ' . $updated_attribute
 			);
 		}
@@ -1007,7 +1014,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * Removes an attribute of the currently matched tag.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 *
 	 * @param string $name The attribute name to remove.
 	 */
@@ -1037,7 +1044,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * Adds a new class name to the currently matched tag.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 *
 	 * @param string $class_name The class name to add.
 	 */
@@ -1050,7 +1057,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * Removes a class name from the currently matched tag.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 *
 	 * @param string $class_name The class name to remove.
 	 */
@@ -1064,34 +1071,33 @@ class WP_HTML_Tag_Processor {
 	 * Returns the string representation of the HTML Tag Processor.
 	 * It closes the HTML Tag Processor and prevents further lookups and modifications.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 *
 	 * @return string The processed HTML.
 	 */
 	public function __toString() {
-		// Parsing either already finished or not started yet.
-		if ( null === $this->tag_name_ends_at ) {
+		// Short-circuit if there are no updates to apply.
+		if ( ! count( $this->classname_updates ) && ! count( $this->attribute_updates ) ) {
 			return $this->updated_html . substr( $this->html, $this->updated_bytes );
 		}
 
 		/*
 		 * Parsing is in progress – let's apply the attribute updates without moving on to the next tag.
 		 *
-		 * In practice, it means:
-		 * 1. Applying the attributes updates to the original HTML
-		 * 2. Replacing the original HTML with the updated HTML
-		 * 3. Pointing this tag processor to the current tag name's end in that updated HTML
+		 * In practice:
+		 * 1. Apply the attributes updates to the original HTML
+		 * 2. Replace the original HTML with the updated HTML
+		 * 3. Point this tag processor to the current tag name's end in that updated HTML
 		 */
 
 		// Find tag name's end in the updated markup.
-		$markup_updated_up_to_a_tag_name_end = $this->updated_html . substr( $this->html, $this->updated_bytes, $this->tag_name_ends_at - $this->updated_bytes );
+		$markup_updated_up_to_a_tag_name_end = $this->updated_html . substr( $this->html, $this->updated_bytes, $this->tag_name_starts_at + $this->tag_name_length - $this->updated_bytes );
 		$updated_tag_name_ends_at            = strlen( $markup_updated_up_to_a_tag_name_end );
-		$tag_name_length                     = $this->tag_name_ends_at - $this->tag_name_starts_at;
-		$updated_tag_name_starts_at          = $updated_tag_name_ends_at - $tag_name_length;
+		$updated_tag_name_starts_at          = $updated_tag_name_ends_at - $this->tag_name_length;
 
 		// Apply attributes updates.
 		$this->updated_html  = $markup_updated_up_to_a_tag_name_end;
-		$this->updated_bytes = $this->tag_name_ends_at;
+		$this->updated_bytes = $this->tag_name_starts_at + $this->tag_name_length;
 		$this->class_name_updates_to_attributes_updates();
 		$this->apply_attributes_updates();
 
@@ -1100,8 +1106,7 @@ class WP_HTML_Tag_Processor {
 
 		// Rewind this processor to the tag name's end.
 		$this->tag_name_starts_at = $updated_tag_name_starts_at;
-		$this->tag_name_ends_at   = $updated_tag_name_ends_at;
-		$this->parsed_bytes       = $this->tag_name_ends_at;
+		$this->parsed_bytes       = $updated_tag_name_ends_at;
 
 		// Restore the previous version of the updated_html as we are not finished with the current_tag yet.
 		$this->updated_html  = $markup_updated_up_to_a_tag_name_end;
@@ -1117,7 +1122,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * Prepares tag search criteria from input interface.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 *
 	 * @param array|string $query {
 	 *     Which tag name to find, having which class.
@@ -1164,7 +1169,7 @@ class WP_HTML_Tag_Processor {
 	/**
 	 * Checks whether a given tag and its attributes match the search criteria.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 *
 	 * @return boolean
 	 */
@@ -1175,8 +1180,7 @@ class WP_HTML_Tag_Processor {
 			 * String (byte) length lookup is fast. If they aren't the
 			 * same length then they can't be the same string values.
 			 */
-			$length = $this->tag_name_ends_at - $this->tag_name_starts_at;
-			if ( strlen( $this->sought_tag_name ) !== $length ) {
+			if ( strlen( $this->sought_tag_name ) !== $this->tag_name_length ) {
 				return false;
 			}
 
@@ -1188,7 +1192,7 @@ class WP_HTML_Tag_Processor {
 			 * most of the time this runs we shouldn't expect to
 			 * actually run the case-folding comparison.
 			 */
-			for ( $i = 0; $i < $length; $i++ ) {
+			for ( $i = 0; $i < $this->tag_name_length; $i++ ) {
 				$html_char = $this->html[ $this->tag_name_starts_at + $i ];
 				$tag_char  = $this->sought_tag_name[ $i ];
 

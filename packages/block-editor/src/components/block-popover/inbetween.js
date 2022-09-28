@@ -226,7 +226,7 @@ function BlockPopoverInbetween( {
 			forcePopoverRecompute
 		);
 		return () => {
-			previousElement.ownerDocument.defaultView.removeEventListener(
+			previousElement.ownerDocument.defaultView?.removeEventListener(
 				'resize',
 				forcePopoverRecompute
 			);
