@@ -73,13 +73,19 @@ describe( 'generate', () => {
 						letterSpacing: '12px',
 						textTransform: 'uppercase',
 					},
+					outline: {
+						offset: '2px',
+						width: '4px',
+						style: 'dashed',
+						color: 'red',
+					},
 				},
 				{
 					selector: '.some-selector',
 				}
 			)
 		).toEqual(
-			".some-selector { color: #cccccc; background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%); background-color: #111111; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; text-decoration: line-through; text-transform: uppercase; }"
+			".some-selector { color: #cccccc; background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%); background-color: #111111; outline-color: red; outline-style: dashed; outline-offset: 2px; outline-width: 4px; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; text-decoration: line-through; text-transform: uppercase; }"
 		);
 	} );
 
@@ -234,6 +240,12 @@ describe( 'getCSSRules', () => {
 						letterSpacing: '12px',
 						textTransform: 'uppercase',
 					},
+					outline: {
+						offset: '2px',
+						width: '4px',
+						style: 'dashed',
+						color: 'red',
+					},
 				},
 				{
 					selector: '.some-selector',
@@ -254,6 +266,26 @@ describe( 'getCSSRules', () => {
 				selector: '.some-selector',
 				key: 'backgroundColor',
 				value: '#555555',
+			},
+			{
+				selector: '.some-selector',
+				key: 'outlineColor',
+				value: 'red',
+			},
+			{
+				selector: '.some-selector',
+				key: 'outlineStyle',
+				value: 'dashed',
+			},
+			{
+				selector: '.some-selector',
+				key: 'outlineOffset',
+				value: '2px',
+			},
+			{
+				selector: '.some-selector',
+				key: 'outlineWidth',
+				value: '4px',
 			},
 			{
 				selector: '.some-selector',
