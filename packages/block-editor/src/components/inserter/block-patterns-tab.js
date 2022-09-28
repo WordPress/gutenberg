@@ -8,7 +8,7 @@ import {
 	useRef,
 	useEffect,
 } from '@wordpress/element';
-import { _x, __, isRTL } from '@wordpress/i18n';
+import { _x, __, isRTL, sprintf } from '@wordpress/i18n';
 import {
 	useAsyncList,
 	useViewportMatch,
@@ -107,6 +107,11 @@ export function BlockPatternsCategoryDialog( {
 			ref={ useMergeRefs( [ ref, container ] ) }
 			{ ...props }
 			className="block-editor-inserter__patterns-category-panel"
+			aria-label={ sprintf(
+				/* translators: %1$s: category name */
+				__( 'Pattern list for the "%s" category' ),
+				category.label
+			) }
 		>
 			<BlockPatternsCategoryPanel
 				rootClientId={ rootClientId }
