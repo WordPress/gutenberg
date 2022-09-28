@@ -525,7 +525,7 @@ export default function LogoEdit( {
 		className: classes,
 	} );
 
-	const label = __( 'Add media' );
+	const label = __( 'Add image' );
 
 	return (
 		<div { ...blockProps }>
