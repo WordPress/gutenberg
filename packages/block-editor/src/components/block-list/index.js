@@ -46,7 +46,7 @@ const elementContext = createContext();
 export const IntersectionObserver = createContext();
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
 
-function Root( { className, disableBlockSelectionClearer, ...settings } ) {
+function Root( { className, ...settings } ) {
 	const [ element, setElement ] = useState();
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { isOutlineMode, isFocusMode, editorMode } = useSelect(
@@ -103,9 +103,7 @@ function Root( { className, disableBlockSelectionClearer, ...settings } ) {
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			ref: useMergeRefs( [
-				useBlockSelectionClearer( {
-					disabled: disableBlockSelectionClearer,
-				} ),
+				useBlockSelectionClearer(),
 				useInBetweenInserter(),
 				setElement,
 			] ),

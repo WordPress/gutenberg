@@ -14,17 +14,17 @@ import { store as blockEditorStore } from '../../store';
  * selection. Selection will only be cleared if the element is clicked directly,
  * not if a child element is clicked.
  *
- * @param {boolean} isDisabled Disable the block selection clearer.
  * @return {import('react').RefCallback} Ref callback.
  */
-export function useBlockSelectionClearer( isDisabled = false ) {
-	const { hasSelectedBlock, hasMultiSelection } =
+export function useBlockSelectionClearer() {
+	const { getSettings, hasSelectedBlock, hasMultiSelection } =
 		useSelect( blockEditorStore );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const { __experimentalClearBlockSelection: isEnabled } = getSettings();
 
 	return useRefEffect(
 		( node ) => {
-			if ( isDisabled ) {
+			if ( ! isEnabled ) {
 				return;
 			}
 
@@ -47,7 +47,7 @@ export function useBlockSelectionClearer( isDisabled = false ) {
 				node.removeEventListener( 'mousedown', onMouseDown );
 			};
 		},
-		[ hasSelectedBlock, hasMultiSelection, clearSelectedBlock, isDisabled ]
+		[ hasSelectedBlock, hasMultiSelection, clearSelectedBlock, isEnabled ]
 	);
 }
 
