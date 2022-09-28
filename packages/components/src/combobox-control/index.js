@@ -247,11 +247,6 @@ function ComboboxControl( {
 								instanceId={ instanceId }
 								ref={ inputContainer }
 								value={ isExpanded ? inputValue : currentLabel }
-								aria-label={
-									currentLabel
-										? `${ currentLabel }, ${ label }`
-										: null
-								}
 								inputHasFocus={ inputHasFocus }
 								onFocus={ onFocus }
 								onBlur={ onBlur }
