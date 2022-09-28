@@ -12,7 +12,7 @@ import {
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 
-function ScreenHeader( { title, description } ) {
+function ScreenHeader( { title, description, hint = undefined } ) {
 	return (
 		<VStack spacing={ 0 }>
 			<View>
@@ -38,6 +38,9 @@ function ScreenHeader( { title, description } ) {
 				<p className="edit-site-global-styles-header__description">
 					{ description }
 				</p>
+			) }
+			{ hint && (
+				<p className="edit-site-global-styles-header__hint">{ hint }</p>
 			) }
 		</VStack>
 	);
