@@ -87,16 +87,14 @@
  * Example:
  * ```php
  *     // Paint up to the first five DIV or SPAN tags marked with the "jazzy" style.
- *     $remaining_tags_to_style = 5;
- *     while ( $processor->next_tag() ) {
+ *     $remaining_count = 5;
+ *     while ( $remaining_count > 0 && $processor->next_tag() ) {
  *         if (
  *              ( 'DIV' === $processor->get_tag() || 'SPAN' === $processor->get_tag() ) &&
  *              'jazzy' === $processor->get_attribute( 'data-style' )
  *         ) {
  *             $processor->add_class( 'theme-style-everest-jazz' );
- *             if ( 0 === --$remaining_tag_to_style ) {
- *                 return (string) $processor;
- *             }
+ *             $remaining_count--;
  *         }
  *     }
  * ```
