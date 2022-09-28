@@ -7,9 +7,16 @@
  */
 
 if ( ! function_exists( 'esc_attr' ) ) {
-	function esc_attr( $s ) {
-		return str_replace( '"', '&quot;', $s );
+	function get_option( $option ) {
+		if ( 'blog_charset' === $option ) {
+			return 'UTF-8';
+		}
 	}
+	function wp_load_alloptions(){}
+	function apply_filters( $name, $value ) {
+		return $value; }
+	require_once( __DIR__ . '/../../../../wordpress-develop/src/wp-includes/kses.php' );
+	require_once( __DIR__ . '/../../../../wordpress-develop/src/wp-includes/formatting.php' );
 }
 
 if ( ! class_exists( 'WP_UnitTestCase' ) ) {
@@ -287,15 +294,18 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		return array(
 			'Double quotes should be encoded as HTML entities' => array( '<div></div>', '"', '<div test="&quot;"></div>' ),
 			'Encoded quotes should not be encoded again' => array( '<div></div>', '&quot;', '<div test="&quot;"></div>' ),
-			'Single quotes should not be encoded'        => array( '<div></div>', "'", '<div test="\'"></div>' ),
+			'Ampersand should be encoded'                => array( '<div></div>', '&', '<div test="&amp;"></div>' ),
+			'An encoded ampersand should not be encoded again' => array( '<div></div>', '&amp;', '<div test="&amp;"></div>' ),
+			'An encoded euro entity should not be encoded again' => array( '<div></div>', '&euro;', '<div test="&euro;"></div>' ),
+			'Single quotes should be encoded'            => array( '<div></div>', "'", '<div test="&#039;"></div>' ),
 			'< and > characters should not be encoded'   => array( '<div></div>', '<>', '<div test="&lt;&gt;"></div>' ),
-			'A quote inside of an HTML entity should still be encoded' => array( '<div></div>', '&quot";', '<div test="&quot&quot;;"></div>' ),
+			'A quote inside of an HTML entity should still be encoded' => array( '<div></div>', '&quot";', '<div test="&amp;quot&quot;;"></div>' ),
 			'Single-quoted attributes should be rewritten using double quotes' => array( "<div test='foo'></div>", 'foo', '<div test="foo"></div>' ),
 			'Unquoted attributes should be rewritten using double quotes' => array( '<div test=foo></div>', 'foo', '<div test="foo"></div>' ),
 			'An HTML snippet passed as a value should only have the double quote characters encoded ' => array(
 				'<div test=foo></div>',
 				'" onclick="alert(\'1\');"><span onclick=""></span><script>alert("1")</script>',
-				'<div test="&quot; onclick=&quot;alert(\'1\');&quot;&gt;&lt;span onclick=&quot;&quot;&gt;&lt;/span&gt;&lt;script&gt;alert(&quot;1&quot;)&lt;/script&gt;"></div>',
+				'<div test="&quot; onclick=&quot;alert(&#039;1&#039;);&quot;&gt;&lt;span onclick=&quot;&quot;&gt;&lt;/span&gt;&lt;script&gt;alert(&quot;1&quot;)&lt;/script&gt;"></div>',
 			),
 		);
 	}

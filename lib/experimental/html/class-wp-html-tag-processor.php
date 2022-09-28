@@ -938,7 +938,7 @@ class WP_HTML_Tag_Processor {
 	 *  - When `true` is passed as the value, then only the attribute name is added to the tag.
 	 *  - When `false` is passed, the attribute gets removed if it existed before.
 	 *
-	 * For string attributes, the value is escaped via the esc_attr function.
+	 * For string attributes, the value is escaped using the `esc_attr` function.
 	 *
 	 * @since 6.1.0
 	 *
