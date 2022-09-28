@@ -11,9 +11,9 @@
 		align-items: flex-start;
 
 		> .components-unit-control-wrapper {
-			width: 116px;
+			width: calc((100% - #{$grid-unit-20}) / 2);
 			margin-bottom: 0;
-			margin-right: #{$grid-unit-20};
+			margin-right: $grid-unit-20;
 			flex-shrink: 0;
 		}
 
@@ -27,7 +27,7 @@
 			}
 
 			.components-range-control__wrapper {
-				margin-right: 10px;
+				margin-right: 12px;
 			}
 		}
 
@@ -60,7 +60,6 @@
 	.component-border-radius-control__linked-button.has-icon {
 		display: flex;
 		justify-content: center;
-		margin-left: 2px;
 		margin-top: 3px;
 
 		svg {
