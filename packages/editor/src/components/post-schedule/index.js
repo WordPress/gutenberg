@@ -17,8 +17,16 @@ function getDayOfTheMonth( date = new Date(), firstDay = true ) {
 	return new Date(
 		d.getFullYear(),
 		d.getMonth() + ( firstDay ? 0 : 1 ),
-		firstDay ? 1 : 0
+		firstDay ? 1 : 0,
+		firstDay ? 0 : 23,
+		firstDay ? 0 : 59,
+		firstDay ? 0 : 59
 	).toISOString();
+}
+
+function getDaysInMonth( date = new Date() ) {
+	const d = new Date( date );
+	return new Date( d.getFullYear(), d.getMonth() + 1, 0 ).getDate();
 }
 
 export default function PostSchedule( { onClose } ) {
@@ -45,6 +53,7 @@ export default function PostSchedule( { onClose } ) {
 				after: getDayOfTheMonth( previewedMonth ),
 				before: getDayOfTheMonth( previewedMonth, false ),
 				exclude: [ select( editorStore ).getCurrentPostId() ],
+				per_page: getDaysInMonth( previewedMonth ),
 			} ),
 		[ previewedMonth, postType ]
 	);
