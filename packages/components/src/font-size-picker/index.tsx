@@ -305,7 +305,6 @@ const UnforwardedFontSizePicker = (
 								{ withReset && (
 									<FlexItem isBlock>
 										<ResetButton
-											className="components-color-palette__clear"
 											disabled={ value === undefined }
 											onClick={ () => {
 												onChange?.( undefined );
