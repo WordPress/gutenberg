@@ -16,7 +16,9 @@ import FontSizePicker from '../';
 const meta: ComponentMeta< typeof FontSizePicker > = {
 	title: 'Components/FontSizePicker',
 	component: FontSizePicker,
-	argTypes: {},
+	argTypes: {
+		value: { control: { type: null } },
+	},
 	parameters: {
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
