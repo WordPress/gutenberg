@@ -96,6 +96,19 @@ describe( 'generate', () => {
 		);
 	} );
 
+	it( 'should parse preset values and kebab-case the slug', () => {
+		expect(
+			compileCSS( {
+				color: {
+					text: 'var:preset|font-size|h1',
+				},
+				spacing: { margin: { top: 'var:preset|spacing|3XL' } },
+			} )
+		).toEqual(
+			'color: var(--wp--preset--font-size--h-1); margin-top: var(--wp--preset--spacing--3-xl);'
+		);
+	} );
+
 	it( 'should parse border rules', () => {
 		expect(
 			compileCSS( {

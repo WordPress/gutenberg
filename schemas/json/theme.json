@@ -1178,7 +1178,33 @@
 			"type": "object",
 			"properties": {
 				"button": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"type": "object",
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesProperties"
+						},
+						{
+							"properties": {
+								"border": {},
+								"color": {},
+								"filter": {},
+								"outline": {},
+								"shadow": {},
+								"spacing": {},
+								"typography": {},
+								":hover": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":focus": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":active": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								}
+							},
+							"additionalProperties": false
+						}
+					]
 				},
 				"link": {
 					"type": "object",

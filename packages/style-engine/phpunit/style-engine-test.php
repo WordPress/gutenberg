@@ -60,7 +60,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 *     An array of options to pass to `wp_style_engine_get_styles()`.
 	 *
 	 *     @type string|null $context                    An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is `null`.
-	 *                                                   When set, the style engine will attempt to store the CSS rules, where a selector is also passed.
+	 *                                                   When set, the Style Engine will attempt to store the CSS rules, where a selector is also passed.
 	 *     @type bool        $convert_vars_to_classnames Whether to skip converting incoming CSS var patterns, e.g., `var:preset|<PRESET_TYPE>|<PRESET_SLUG>`, to var( --wp--preset--* ) values. Default `false`.
 	 *     @type string      $selector                   Optional. When a selector is passed, the value of `$css` in the return value will comprise a full CSS rule `$selector { ...$css_declarations }`,
 	 *                                                   otherwise, the value will be a concatenated string of CSS declarations.
@@ -363,13 +363,13 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'spacing' => array(
 						'margin'  => array(
 							'left'   => 'var:preset|spacing|10',
-							'right'  => 'var:preset|spacing|20',
+							'right'  => 'var:preset|spacing|3XL',
 							'top'    => '1rem',
 							'bottom' => '1rem',
 						),
 						'padding' => array(
 							'left'   => 'var:preset|spacing|30',
-							'right'  => 'var:preset|spacing|40',
+							'right'  => 'var:preset|spacing|3XL',
 							'top'    => '14px',
 							'bottom' => '14px',
 						),
@@ -377,14 +377,14 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css'          => 'padding-left:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--40);padding-top:14px;padding-bottom:14px;margin-left:var(--wp--preset--spacing--10);margin-right:var(--wp--preset--spacing--20);margin-top:1rem;margin-bottom:1rem;',
+					'css'          => 'padding-left:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--3-xl);padding-top:14px;padding-bottom:14px;margin-left:var(--wp--preset--spacing--10);margin-right:var(--wp--preset--spacing--3-xl);margin-top:1rem;margin-bottom:1rem;',
 					'declarations' => array(
 						'padding-left'   => 'var(--wp--preset--spacing--30)',
-						'padding-right'  => 'var(--wp--preset--spacing--40)',
+						'padding-right'  => 'var(--wp--preset--spacing--3-xl)',
 						'padding-top'    => '14px',
 						'padding-bottom' => '14px',
 						'margin-left'    => 'var(--wp--preset--spacing--10)',
-						'margin-right'   => 'var(--wp--preset--spacing--20)',
+						'margin-right'   => 'var(--wp--preset--spacing--3-xl)',
 						'margin-top'     => '1rem',
 						'margin-bottom'  => '1rem',
 					),

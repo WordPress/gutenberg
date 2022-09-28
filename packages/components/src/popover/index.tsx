@@ -10,9 +10,9 @@ import {
 	autoUpdate,
 	arrow,
 	offset as offsetMiddleware,
-	limitShift,
 	size,
 	Middleware,
+	MiddlewareArguments,
 } from '@floating-ui/react-dom';
 // eslint-disable-next-line no-restricted-imports
 import {
@@ -34,7 +34,6 @@ import {
 	useMemo,
 	useState,
 	useCallback,
-	useEffect,
 } from '@wordpress/element';
 import {
 	useViewportMatch,
@@ -65,6 +64,7 @@ import type {
 	PopoverAnchorRefReference,
 	PopoverAnchorRefTopBottom,
 } from './types';
+import { limitShift as customLimitShift } from './limit-shift';
 
 /**
  * Name of slot in which popover should fill.
@@ -281,42 +281,31 @@ const UnforwardedPopover = (
 	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
 	 */
 	const frameOffsetRef = useRef( getFrameOffset( referenceOwnerDocument ) );
-	/**
-	 * Store the offset prop in a ref, due to constraints with floating-ui:
-	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
-	 */
-	const offsetRef = useRef( offsetProp );
 
 	const middleware = [
-		offsetMiddleware( ( { placement: currentPlacement } ) => {
-			if ( ! frameOffsetRef.current ) {
-				return offsetRef.current;
-			}
+		// Custom middleware which adjusts the popover's position by taking into
+		// account the offset of the anchor's iframe (if any) compared to the page.
+		{
+			name: 'frameOffset',
+			fn( { x, y }: MiddlewareArguments ) {
+				if ( ! frameOffsetRef.current ) {
+					return {
+						x,
+						y,
+					};
+				}
 
-			const isTopBottomPlacement =
-				currentPlacement.includes( 'top' ) ||
-				currentPlacement.includes( 'bottom' );
-
-			// The main axis should represent the gap between the
-			// floating element and the reference element. The cross
-			// axis is always perpendicular to the main axis.
-			const mainAxis = isTopBottomPlacement ? 'y' : 'x';
-			const crossAxis = mainAxis === 'x' ? 'y' : 'x';
-
-			// When the popover is before the reference, subtract the offset,
-			// of the main axis else add it.
-			const hasBeforePlacement =
-				currentPlacement.includes( 'top' ) ||
-				currentPlacement.includes( 'left' );
-			const mainAxisModifier = hasBeforePlacement ? -1 : 1;
-
-			return {
-				mainAxis:
-					offsetRef.current +
-					frameOffsetRef.current[ mainAxis ] * mainAxisModifier,
-				crossAxis: frameOffsetRef.current[ crossAxis ],
-			};
-		} ),
+				return {
+					x: x + frameOffsetRef.current.x,
+					y: y + frameOffsetRef.current.y,
+					data: {
+						// This will be used in the customLimitShift() function.
+						amount: frameOffsetRef.current,
+					},
+				};
+			},
+		},
+		offsetMiddleware( offsetProp ),
 		computedFlipProp ? flipMiddleware() : undefined,
 		computedResizeProp
 			? size( {
@@ -339,7 +328,7 @@ const UnforwardedPopover = (
 		shouldShift
 			? shiftMiddleware( {
 					crossAxis: true,
-					limiter: limitShift(),
+					limiter: customLimitShift(),
 					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
 			  } )
 			: undefined,
@@ -394,11 +383,6 @@ const UnforwardedPopover = (
 				animationFrame: true,
 			} ),
 	} );
-
-	useEffect( () => {
-		offsetRef.current = offsetProp;
-		update();
-	}, [ offsetProp, update ] );
 
 	const arrowCallbackRef = useCallback(
 		( node ) => {

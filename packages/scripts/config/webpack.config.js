@@ -25,6 +25,7 @@ const {
 	hasArgInCLI,
 	hasCssnanoConfig,
 	hasPostCSSConfig,
+	getWordPressSrcDirectory,
 	getWebpackEntryPoints,
 	getRenderPropPaths,
 } = require( '../utils' );
@@ -233,7 +234,7 @@ const config = {
 			patterns: [
 				{
 					from: '**/block.json',
-					context: process.env.WP_SRC_DIRECTORY,
+					context: getWordPressSrcDirectory(),
 					noErrorOnMissing: true,
 					transform( content, absoluteFrom ) {
 						const convertExtension = ( path ) => {
@@ -267,7 +268,7 @@ const config = {
 				},
 				{
 					from: '**/*.php',
-					context: process.env.WP_SRC_DIRECTORY,
+					context: getWordPressSrcDirectory(),
 					noErrorOnMissing: true,
 					filter: ( filepath ) => {
 						return (
