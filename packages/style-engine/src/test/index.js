@@ -268,23 +268,23 @@ describe( 'getCSSRules', () => {
 				value: '#555555',
 			},
 			{
-				key: 'outlineColor',
 				selector: '.some-selector',
+				key: 'outlineColor',
 				value: 'red',
 			},
 			{
-				key: 'outlineStyle',
 				selector: '.some-selector',
+				key: 'outlineStyle',
 				value: 'dashed',
 			},
 			{
-				key: 'outlineOffset',
 				selector: '.some-selector',
+				key: 'outlineOffset',
 				value: '2px',
 			},
 			{
-				key: 'outlineWidth',
 				selector: '.some-selector',
+				key: 'outlineWidth',
 				value: '4px',
 			},
 			{
