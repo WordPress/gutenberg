@@ -86,7 +86,7 @@ test.describe( 'Autocomplete', () => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = 'I am @da';
-				testData.optionText = 'Darth Vader';
+				testData.optionText = 'Darth Vader yourfather';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>I am @yourfather.</p>
 <!-- /wp:paragraph -->`;
@@ -101,7 +101,7 @@ test.describe( 'Autocomplete', () => {
 			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.triggerString );
 			await expect(
-				page.locator( 'role=option', { hasText: testData.optionText } )
+				page.locator( `role=option[name="${ testData.optionText }"i]` )
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );
@@ -119,7 +119,7 @@ test.describe( 'Autocomplete', () => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = '@j';
-				testData.optionText = 'Jane Doe';
+				testData.optionText = 'Jane Doe testuser';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>Stuck in the middle with @testuser you.</p>
 <!-- /wp:paragraph -->`;
@@ -136,7 +136,7 @@ test.describe( 'Autocomplete', () => {
 			await pageUtils.pressKeyTimes( 'ArrowLeft', 'you.'.length );
 			await page.keyboard.type( testData.triggerString );
 			await expect(
-				page.locator( 'role=option', { hasText: testData.optionText } )
+				page.locator( `role=option[name="${ testData.optionText }"i]` )
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( ' ' );
@@ -154,8 +154,8 @@ test.describe( 'Autocomplete', () => {
 				testData.firstTriggerString =
 					'The two greatest hobbits, in order: @bi';
 				testData.secondTriggerString = ' @fr';
-				testData.firstOptionText = 'Bilbo Baggins';
-				testData.secondOptionText = 'Frodo Baggins';
+				testData.firstOptionText = 'Bilbo Baggins thebetterhobbit';
+				testData.secondOptionText = 'Frodo Baggins ringbearer';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>The two greatest hobbits, in order: @thebetterhobbit @ringbearer.</p>
 <!-- /wp:paragraph -->`;
@@ -172,16 +172,16 @@ test.describe( 'Autocomplete', () => {
 			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.firstTriggerString );
 			await expect(
-				page.locator( 'role=option', {
-					hasText: testData.firstOptionText,
-				} )
+				page.locator(
+					`role=option[name="${ testData.firstOptionText }"i]`
+				)
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( testData.secondTriggerString );
 			await expect(
-				page.locator( 'role=option', {
-					hasText: testData.secondOptionText,
-				} )
+				page.locator(
+					`role=option[name="${ testData.secondOptionText }"i]`
+				)
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );
@@ -197,7 +197,7 @@ test.describe( 'Autocomplete', () => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = '@';
-				testData.optionText = 'Katniss Everdeen';
+				testData.optionText = 'Katniss Everdeen mockingjay';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>@mockingjay</p>
 <!-- /wp:paragraph -->`;
@@ -212,11 +212,12 @@ test.describe( 'Autocomplete', () => {
 			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.triggerString );
 			await expect(
-				page.locator( 'role=option', { hasText: testData.optionText } )
+				page.locator( `role=option[name="${ testData.optionText }"i]` )
 			).toBeVisible();
-			await page
-				.locator( 'role=option', { hasText: testData.optionText } )
-				.click();
+			await page;
+			page.locator(
+				`role=option[name="${ testData.optionText }"i]`
+			).click();
 
 			await expect
 				.poll( editor.getEditedPostContent )
@@ -234,7 +235,7 @@ test.describe( 'Autocomplete', () => {
 			// 🍒 is the target because options are listed in the order they appear in the custom completer
 			if ( type === 'mention' ) {
 				testData.triggerString = '@';
-				testData.optionText = 'Jean-Luc Picard';
+				testData.optionText = 'Jean-Luc Picard makeitso';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>@makeitso</p>
 <!-- /wp:paragraph -->`;
@@ -249,7 +250,7 @@ test.describe( 'Autocomplete', () => {
 			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.triggerString );
 			await expect(
-				page.locator( 'role=option', { hasText: testData.optionText } )
+				page.locator( `role=option[name="${ testData.optionText }"i]` )
 			).toBeVisible();
 			await pageUtils.pressKeyTimes( 'ArrowDown', 6 );
 			await page.keyboard.press( 'Enter' );
@@ -266,7 +267,7 @@ test.describe( 'Autocomplete', () => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = 'My name is @j';
-				testData.optionText = 'Jane Doe';
+				testData.optionText = 'Jane Doe testuser';
 				testData.postCompleterInput = ' ...a secret.';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>My name is @j ...a secret.</p>
@@ -284,7 +285,7 @@ test.describe( 'Autocomplete', () => {
 			await page.click( 'role=button[name="Add default block"i]' );
 			await page.keyboard.type( testData.triggerString );
 			await expect(
-				page.locator( 'role=option', { hasText: testData.optionText } )
+				page.locator( `role=option[name="${ testData.optionText }"i]` )
 			).toBeVisible();
 			await page.keyboard.press( 'Escape' );
 			await page.keyboard.type( testData.postCompleterInput );
@@ -322,7 +323,7 @@ test.describe( 'Autocomplete', () => {
 			const testData = {};
 			if ( type === 'mention' ) {
 				testData.triggerString = '@bu';
-				testData.optionText = 'Buddy Elf';
+				testData.optionText = 'Buddy Elf buddytheelf';
 				testData.snapshot = `<!-- wp:paragraph -->
 <p>@buddytheelf test</p>
 <!-- /wp:paragraph -->
@@ -371,9 +372,9 @@ test.describe( 'Autocomplete', () => {
 			for ( let i = 0; i < 4; i++ ) {
 				await page.keyboard.type( testData.triggerString );
 				await expect(
-					page.locator( 'role=option', {
-						hasText: testData.optionText,
-					} )
+					page.locator(
+						`role=option[name="${ testData.optionText }"i]`
+					)
 				).toBeVisible();
 				await page.keyboard.press( 'Enter' );
 				await page.keyboard.type( ' test' );
