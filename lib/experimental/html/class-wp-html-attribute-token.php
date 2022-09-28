@@ -4,7 +4,7 @@
  *
  * @package WordPress
  * @subpackage HTML
- * @since 6.1.0
+ * @since 6.2.0
  */
 
 /**
@@ -13,7 +13,7 @@
  * This class is for internal usage of the WP_HTML_Tag_Processor class.
  *
  * @access private
- * @since 6.1.0
+ * @since 6.2.0
  *
  * @see WP_HTML_Tag_Processor
  */
@@ -21,7 +21,7 @@ class WP_HTML_Attribute_Token {
 	/**
 	 * Attribute name.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 * @var string
 	 */
 	public $name;
@@ -29,7 +29,7 @@ class WP_HTML_Attribute_Token {
 	/**
 	 * Attribute value.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 * @var int
 	 */
 	public $value_starts_at;
@@ -37,7 +37,7 @@ class WP_HTML_Attribute_Token {
 	/**
 	 * How many bytes the value occupies in the input HTML.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 * @var int
 	 */
 	public $value_length;
@@ -45,7 +45,7 @@ class WP_HTML_Attribute_Token {
 	/**
 	 * The string offset where the attribute name starts.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 * @var int
 	 */
 	public $start;
@@ -53,7 +53,7 @@ class WP_HTML_Attribute_Token {
 	/**
 	 * The string offset after the attribute value or its name.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 * @var int
 	 */
 	public $end;
@@ -61,7 +61,7 @@ class WP_HTML_Attribute_Token {
 	/**
 	 * Whether the attribute is a boolean attribute with value `true`.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 * @var bool
 	 */
 	public $is_true;
@@ -69,7 +69,7 @@ class WP_HTML_Attribute_Token {
 	/**
 	 * Constructor.
 	 *
-	 * @since 6.1.0
+	 * @since 6.2.0
 	 *
 	 * @param string $name         Attribute name.
 	 * @param int    $value_start  Attribute value.

@@ -46,45 +46,105 @@ array(
 */
 ```
 
+## Use case
+When [registering a block support](https://developer.wordpress.org/reference/classes/wp_block_supports/register/), it is possible to pass an 'apply' callback in the block support config array to add or extend block support attributes with "class" or "style" properties.
+
+If a block has opted into the block support, the values of "class" and "style" will be applied to the block element's "class" and "style" attributes accordingly when rendered in the frontend HTML. Note, this applies only to server-side rendered blocks, for example, the [Site Title block](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/#site-title).
+
+The callback receives `$block_type` and `$block_attributes` as arguments. The `style` attribute within `$block_attributes` only contains the raw style object, if any styles have been set for the block, and not any CSS or classnames to be applied to the block's HTML elements. 
+
+Here is where `wp_style_engine_get_styles` comes in handy: it will generate CSS and, if appropriate, classnames to be added to the "style" and "class" HTML attributes in the final rendered block markup.
+
+Here is a _very_ simplified version of how the [color block support](https://github.com/WordPress/gutenberg/tree/HEAD/lib/block-supports/color.php) works:
+
+```php
+function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
+	// Get the color styles from the style object.
+	$block_color_styles = isset( $block_attributes['style']['color'] ) ? $block_attributes['style']['color'] : null;
+
+	// Since we only want the color styles, pass the color styles only to the Style Engine.
+	$styles = wp_style_engine_get_styles( array( 'color' => $block_color_styles ) );
+
+	// Return the generated styles to be applied to the block's HTML element.
+	return array(
+		'style' => $styles['css'],
+		'class' => $styles['classnames']
+	);
+}
+
+// Register the block support.
+WP_Block_Supports::get_instance()->register(
+	'colors',
+	array(
+		'register_attribute' => 'gutenberg_register_colors_support',
+		'apply'              => 'gutenberg_apply_colors_support',
+	)
+);
+```
+
+It's important to note that, for now, the Style Engine will only generate styles for the following, core block supports:
+
+- border
+- color
+- spacing
+- typography
+
+In future releases, it will be possible to extend this list.
+
 ## Checking for block support and skip serialization
 
-Before passing the block style object to the Style Engine, it's important to take into account:
+Before passing the block style object to the Style Engine, you'll need to take into account:
 
 1. whether the theme has elected to support a particular block style, and
 2. whether a block has elected to "skip serialization" of that particular block style, that is, opt-out of automatic application of styles to the block's element (usually in order to do it via the block's internals). See the [block API documentation](https://developer.wordpress.org/block-editor/explanations/architecture/styles/#block-supports-api) for further information.
 
 If a block either:
 
-- has no support for a specific style, or 
+- has no support for a style, or 
 - skips serialization of that style
 
-it's likely that you'll want to remove those style values from the style object.
+it's likely that you'll want to remove those style values from the style object before passing it to the Style Engine with help of two functions:
 
-For example:
+- wp_should_skip_block_supports_serialization()
+- block_has_support()
+
+We can now update the apply callback code above so that we'll only return "style" and "class", where a block has support and it doesn't skip serialization:
 
 ```php
-// Check if a block has support using block_has_support (https://developer.wordpress.org/reference/functions/block_has_support/)
-$has_padding_support = block_has_support( $block_type, array( 'spacing', 'padding' ), false ); // Returns true.
-$has_margin_support  = block_has_support( $block_type, array( 'spacing', 'margin' ), false ); // Returns false.
+function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
+	// The return value.
+	$attributes = array();
+    
+	// Return early if the block skips all serialization for block supports.
+	if ( gutenberg_should_skip_block_supports_serialization( $block_type, 'color' ) ) {
+		return $attributes;
+	}
 
-// Check skipping of serialization.
-$should_skip_padding = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'padding' ); // Returns true.
-$should_skip_margin  = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'margin' ); // Returns false.
+	// Checks for support and skip serialization.
+	$has_text_support                        = block_has_support( $block_type, array( 'color', 'text' ), false ); 
+	$has_background_support                  = block_has_support( $block_type, array( 'color', 'background' ), false );
+	$skips_serialization_of_color_text       = wp_should_skip_block_supports_serialization( $block_type, 'color', 'text' ); 
+	$skips_serialization_of_color_background = wp_should_skip_block_supports_serialization( $block_type, 'color', 'background' ); 
+    
+	// Get the color styles from the style object.
+	$block_color_styles = isset( $block_attributes['style']['color'] ) ? $block_attributes['style']['color'] : null;
 
-// Now build the styles object.
-$spacing_block_styles            = array();
-$spacing_block_styles['padding'] = $has_padding_support && ! $skip_padding ? _wp_array_get( $block_attributes['style'], array( 'spacing', 'padding' ), null ) : null;
-$spacing_block_styles['margin']  = $has_margin_support && ! $skip_margin ? _wp_array_get( $block_attributes['style'], array( 'spacing', 'margin' ), null ) : null;
+	// The mutated styles object we're going to pass to wp_style_engine_get_styles().
+	$color_block_styles = array();
 
-// Now get the styles.
-$styles = wp_style_engine_get_styles( array( 'spacing' => $spacing_block_styles ) );
+	// Set the color style values according to whether the block has support and does not skip serialization.
+	$spacing_block_styles['text']       = $has_text_support && ! $skips_serialization_of_color_text ? _wp_array_get( $block_color_styles, array( 'text' ), null ) : null;
+	$spacing_block_styles['background'] = $has_background_support && ! $skips_serialization_of_color_background ? _wp_array_get( $block_color_styles, array( 'background' ), null ) : null;
 
-print_r( $styles );
+	// Pass the color styles, excluding those that have no support or skip serialization, to the Style Engine.
+	$styles = wp_style_engine_get_styles( array( 'color' => $block_color_styles ) );
 
-/*
-// Nothing, because there's no support for margin and the block skip's serialization for padding.
-array()
-*/
+	// Return the generated styles to be applied to the block's HTML element.
+	return array(
+		'style' => $styles['css'],
+		'class' => $styles['classnames']
+	);
+}
 ```
 
 ## Generating classnames and CSS custom selectors from presets
@@ -110,8 +170,8 @@ $preset_font_size        = "var:preset|font-size|{$block_attributes['fontSize']}
 $preset_background_color = "var:preset|color|{$block_attributes['backgroundColor']}";
 
 $block_styles =  array(
-     'typography' => array( 'fontSize' => $preset_font_size ),
-     'color'      => array( 'background' => $preset_background_color )
+	'typography' => array( 'fontSize' => $preset_font_size ),
+	'color'      => array( 'background' => $preset_background_color )
 );
 
 $styles = wp_style_engine_get_styles(
@@ -131,12 +191,12 @@ If you don't want the Style Engine to output the CSS custom vars as well, which 
 
 ```php
 $options = array(
-    // Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
-    'convert_vars_to_classnames' => 'true',
+	// Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
+	'convert_vars_to_classnames' => 'true',
 );
 $styles = wp_style_engine_get_styles(
-    $block_styles,
-    $options
+	$block_styles,
+	$options
 );
 print_r( $styles );
 
