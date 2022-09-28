@@ -938,8 +938,7 @@ class WP_HTML_Tag_Processor {
 	 *  - When `true` is passed as the value, then only the attribute name is added to the tag.
 	 *  - When `false` is passed, the attribute gets removed if it existed before.
 	 *
-	 * For string attributes, the value is escaped by encoding the ", <, and > characters to
-	 * their corresponding HTML entities: &quot;, &lt;, and &gt;.
+	 * For string attributes, the value is escaped via the esc_attr function.
 	 *
 	 * @since 6.1.0
 	 *
@@ -964,11 +963,7 @@ class WP_HTML_Tag_Processor {
 		if ( true === $value ) {
 			$updated_attribute = $name;
 		} else {
-			$escaped_new_value = str_replace(
-				array( '"', '<', '>' ),
-				array( '&quot;', '&lt;', '&gt;' ),
-				$value
-			);
+			$escaped_new_value = esc_attr( $value );
 			$updated_attribute = "{$name}=\"{$escaped_new_value}\"";
 		}
 
