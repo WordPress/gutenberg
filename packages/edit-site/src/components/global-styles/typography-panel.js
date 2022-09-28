@@ -21,16 +21,24 @@ import { __ } from '@wordpress/i18n';
 import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
 
 export function useHasTypographyPanel( name ) {
+	const hasFontFamily = useHasFontFamilyControl( name );
 	const hasLineHeight = useHasLineHeightControl( name );
 	const hasFontAppearance = useHasAppearanceControl( name );
 	const hasLetterSpacing = useHasLetterSpacingControl( name );
 	const supports = getSupportedGlobalStylesPanels( name );
 	return (
+		hasFontFamily ||
 		hasLineHeight ||
 		hasFontAppearance ||
 		hasLetterSpacing ||
 		supports.includes( 'fontSize' )
 	);
+}
+
+function useHasFontFamilyControl( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const [ fontFamilies ] = useSetting( 'typography.fontFamilies', name );
+	return supports.includes( 'fontFamily' ) && !! fontFamilies?.length;
 }
 
 function useHasLineHeightControl( name ) {
@@ -155,6 +163,7 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 	const hasFontWeights =
 		useSetting( 'typography.fontWeight', name )[ 0 ] &&
 		supports.includes( 'fontWeight' );
+	const hasFontFamilyEnabled = useHasFontFamilyControl( name );
 	const hasLineHeightEnabled = useHasLineHeightControl( name );
 	const hasAppearanceControl = useHasAppearanceControl( name );
 	const appearanceControlLabel = useAppearanceControlLabel( name );
@@ -205,7 +214,7 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 
 	return (
 		<ToolsPanel label={ __( 'Typography' ) } resetAll={ resetAll }>
-			{ supports.includes( 'fontFamily' ) && (
+			{ hasFontFamilyEnabled && (
 				<ToolsPanelItem
 					label={ __( 'Font family' ) }
 					hasValue={ hasFontFamily }
