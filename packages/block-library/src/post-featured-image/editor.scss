@@ -40,10 +40,19 @@
 
 		// Show default placeholder height when not resized.
 		min-height: 200px;
+	}
 
-		// The following override the default placeholder styles that remove
-		// its border so that a user selection for border color or width displays
-		// a visual border.
+	// The following override the default placeholder styles that remove
+	// its border so that a user selection for border color or width displays
+	// a visual border. They also override the `img { border: none; }` applied
+	// by core.
+	.wp-block-post-featured-image__placeholder,
+	.components-placeholder,
+	img {
+		// The following is required to overcome WP Core applying styles that clear
+		// img borders with a higher specificity than those added by the border
+		// block support to provide a default border-style of solid when a border
+		// color or width has been set.
 		&:where(.has-border-color) {
 			border-style: solid;
 		}
