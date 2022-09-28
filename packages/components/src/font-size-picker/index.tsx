@@ -31,6 +31,7 @@ import {
 	isSimpleCssValue,
 	CUSTOM_FONT_SIZE,
 } from './utils';
+import { VStack } from '../v-stack';
 import { HStack } from '../h-stack';
 import type {
 	FontSizePickerProps,
@@ -46,17 +47,18 @@ import {
 } from './styles';
 import { Spacer } from '../spacer';
 
-const MaybeMarginBottom = ( {
+// This conditional is needed to maintain the spacing before the slider in the `withSlider` case.
+const MaybeVStack = ( {
 	__nextHasNoMarginBottom,
 	children,
 }: {
 	__nextHasNoMarginBottom: boolean;
 	children: ReactNode;
 } ) =>
-	__nextHasNoMarginBottom ? (
+	! __nextHasNoMarginBottom ? (
 		<>{ children }</>
 	) : (
-		<Spacer marginBottom={ 6 }>{ children }</Spacer>
+		<VStack spacing={ 6 } children={ children } />
 	);
 
 const UnforwardedFontSizePicker = (
@@ -199,12 +201,10 @@ const UnforwardedFontSizePicker = (
 					) }
 				</HStack>
 			</Spacer>
-			<MaybeMarginBottom
-				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			>
+			<MaybeVStack __nextHasNoMarginBottom={ __nextHasNoMarginBottom }>
 				<Controls
 					className="components-font-size-picker__controls"
-					spacing={ 6 }
+					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 				>
 					{ !! fontSizes.length &&
 						shouldUseSelectControl &&
@@ -243,7 +243,7 @@ const UnforwardedFontSizePicker = (
 						) }
 					{ ! shouldUseSelectControl && ! showCustomValueControl && (
 						<ToggleGroupControl
-							__nextHasNoMarginBottom
+							__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 							label={ __( 'Font size' ) }
 							hideLabelFromVision
 							value={ value }
@@ -319,28 +319,26 @@ const UnforwardedFontSizePicker = (
 								) }
 							</Flex>
 						) }
-					{ withSlider && (
-						<RangeControl
-							__nextHasNoMarginBottom
-							className="components-font-size-picker__custom-input"
-							label={ __( 'Custom Size' ) }
-							value={
-								isPixelValue && noUnitsValue
-									? Number( noUnitsValue )
-									: undefined
-							}
-							initialPosition={ fallbackFontSize }
-							onChange={ ( newValue ) => {
-								onChange?.(
-									hasUnits ? newValue + 'px' : newValue
-								);
-							} }
-							min={ 12 }
-							max={ 100 }
-						/>
-					) }
 				</Controls>
-			</MaybeMarginBottom>
+				{ withSlider && (
+					<RangeControl
+						__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+						className="components-font-size-picker__custom-input"
+						label={ __( 'Custom Size' ) }
+						value={
+							isPixelValue && noUnitsValue
+								? Number( noUnitsValue )
+								: undefined
+						}
+						initialPosition={ fallbackFontSize }
+						onChange={ ( newValue ) => {
+							onChange?.( hasUnits ? newValue + 'px' : newValue );
+						} }
+						min={ 12 }
+						max={ 100 }
+					/>
+				) }
+			</MaybeVStack>
 		</Container>
 	);
 };

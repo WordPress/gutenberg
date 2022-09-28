@@ -10,7 +10,6 @@ import BaseControl from '../base-control';
 import Button from '../button';
 import { space } from '../ui/utils/space';
 import { COLORS } from '../utils';
-import { VStack } from '../v-stack';
 import type { FontSizePickerProps } from './types';
 
 export const Container = styled.fieldset`
@@ -30,8 +29,13 @@ export const HeaderHint = styled.span`
 
 // 280px is the sidebar width.
 // TODO: Remove this, @wordpress/components shouldn't care what a "sidebar" is.
-export const Controls = styled( VStack )`
+export const Controls = styled.div< {
+	__nextHasNoMarginBottom: boolean;
+} >`
 	max-width: calc( 280px - ${ space( 4 ) } * 2 );
+
+	${ ( props ) =>
+		! props.__nextHasNoMarginBottom && `margin-bottom: ${ space( 6 ) };` }
 `;
 
 export const ResetButton = styled( Button )< {
