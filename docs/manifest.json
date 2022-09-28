@@ -1836,6 +1836,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/style-engine Using the Style Engine to generate block supports styles",
+		"slug": "using-the-style-engine-with-block-supports",
+		"markdown_source": "../packages/style-engine/docs/using-the-style-engine-with-block-supports.md",
+		"parent": "packages-style-engine"
+	},
+	{
 		"title": "@wordpress/stylelint-config",
 		"slug": "packages-stylelint-config",
 		"markdown_source": "../packages/stylelint-config/README.md",

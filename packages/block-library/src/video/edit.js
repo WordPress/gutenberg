@@ -13,6 +13,7 @@ import {
 	Disabled,
 	PanelBody,
 	Spinner,
+	Placeholder,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -42,6 +43,23 @@ import { createUpgradedEmbedBlock } from '../embed/util';
 import VideoCommonSettings from './edit-common-settings';
 import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
+
+// Much of this description is duplicated from MediaPlaceholder.
+const placeholder = ( content ) => {
+	return (
+		<Placeholder
+			className="block-editor-media-placeholder"
+			withIllustration={ true }
+			icon={ icon }
+			label={ __( 'Video' ) }
+			instructions={ __(
+				'Upload a video file, pick one from your media library, or add one with a URL.'
+			) }
+		>
+			{ content }
+		</Placeholder>
+	);
+};
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -146,6 +164,7 @@ function VideoEdit( {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
 					onError={ onUploadError }
+					placeholder={ placeholder }
 				/>
 			</div>
 		);
