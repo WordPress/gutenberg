@@ -156,7 +156,7 @@ Even with all of this, your custom post type might have unique requirements: it 
 
 Let's say you don't use at all the `sticky` attribute in your books, so that would be totally irrelevant to the customization of your block. In order to not confuse the users as to what a setting might do, and only exposing a clear UX to them, we want this control to be unavailable. Furthermore, let's say that you don't use the `author` field at all, which generally indicates the person who has added that post to the database, instead you use a custom `bookAuthor` field. As such, not only keeping the `author` filter would be confusing, it would outright break your query.
 
-For this reason, the Query Loop block supports a property called `allowControls` which accepts an array of keys of the controls we want to display on the inspector sidebar. By default, we accept all the controls, but as soon as we provide an array to this property, we want to be specific and specify only the controls which are going to be relevant for us!
+For this reason, the Query Loop block supports a property called `allowedControls` which accepts an array of keys of the controls we want to display on the inspector sidebar. By default, we accept all the controls, but as soon as we provide an array to this property, we want to be specific and specify only the controls which are going to be relevant for us!
 
 As of version 13.9, the following controls are available:
 
@@ -173,7 +173,7 @@ In our case, the property would look like this:
 ```js
 {
 	/** ...variation properties */
-	allowControls: [ 'inherit', 'order', 'taxQuery', 'search' ],
+	allowedControls: [ 'inherit', 'order', 'taxQuery', 'search' ],
 }
 ```
 
