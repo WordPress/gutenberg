@@ -21,9 +21,11 @@ test.describe( 'Post visibility', () => {
 
 			await editor.openDocumentSettingsSidebar();
 
-			await page.click( 'role=button[name="Public"i]' );
+			await page.click(
+				'.components-button.edit-post-post-visibility__toggle.is-tertiary'
+			);
 
-			await page.click( 'role=radio[name="Private"i]' );
+			await page.click( '#editor-post-private-0' );
 
 			await page.click( 'role=button[name="OK"i]' );
 
@@ -54,9 +56,11 @@ test.describe( 'Post visibility', () => {
 					.getEditedPostAttribute( 'status' );
 			} );
 
-			await page.click( 'role=button[name="Public"i]' );
+			await page.click(
+				'.components-button.edit-post-post-visibility__toggle.is-tertiary'
+			);
 
-			await page.click( 'role=radio[name="Private"i]' );
+			await page.click( '#editor-post-private-0' );
 
 			await page.click( 'role=button[name="Cancel"i]' );
 
@@ -88,14 +92,16 @@ test.describe( 'Post visibility', () => {
 		);
 
 		await page.click(
-			'role=button[name="Move forward to switch to the next month."i]'
+			"div[aria-label='Move forward to switch to the next month.']"
 		);
 
 		await page.click( 'text=15  >> nth=1' );
 
-		await page.click( 'role=button[name="Public"i]' );
+		await page.click(
+			'.components-button.edit-post-post-visibility__toggle.is-tertiary'
+		);
 
-		await page.click( 'role=radio[name="Private"i]' );
+		await page.click( '#editor-post-private-0' );
 
 		await page.click( 'role=button[name="OK"i]' );
 
