@@ -9,11 +9,13 @@ import classnames from 'classnames';
 import { useState, useEffect, useRef, Platform } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import {
+	__experimentalListView as ListView,
 	InspectorControls,
 	useBlockProps,
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
 	store as blockEditorStore,
+	BlockEditorProvider,
 	withColors,
 	PanelColorSettings,
 	ContrastChecker,
@@ -21,7 +23,11 @@ import {
 	Warning,
 	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 } from '@wordpress/block-editor';
-import { EntityProvider, store as coreStore } from '@wordpress/core-data';
+import {
+	useEntityBlockEditor,
+	EntityProvider,
+	store as coreStore,
+} from '@wordpress/core-data';
 
 import { useDispatch } from '@wordpress/data';
 import {
@@ -213,6 +219,12 @@ function Navigation( {
 		isResolvingCanUserCreateNavigationMenu,
 		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
+
+	const [ navigationInnerBlocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		'wp_navigation',
+		{ id: ref }
+	);
 
 	const navMenuResolvedButMissing =
 		hasResolvedNavigationMenus && isNavigationMenuMissing;
@@ -501,6 +513,18 @@ function Navigation( {
 
 	const stylingInspectorControls = (
 		<InspectorControls>
+			<PanelBody title={ __( 'Navigation structure' ) }>
+				<BlockEditorProvider
+					value={ navigationInnerBlocks }
+					onChange={ onChange }
+					onInput={ onInput }
+				>
+					<ListView
+						blocks={ navigationInnerBlocks }
+						isExpanded={ true }
+					/>
+				</BlockEditorProvider>
+			</PanelBody>
 			{ hasSubmenuIndicatorSetting && (
 				<PanelBody title={ __( 'Display' ) }>
 					{ isResponsive && (
