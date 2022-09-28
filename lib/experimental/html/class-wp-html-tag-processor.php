@@ -39,7 +39,7 @@
  *  2. Find the tag(s) you are looking for.
  *  3. Request changes to the attributes in those tag(s).
  *
- * Example
+ * Example:
  * ```php
  *     $processor = new WP_HTML_Tag_Processor( $html );
  *     if ( $processor->next_tag( array( 'tag_name' => 'option' ) ) ) {
@@ -84,7 +84,7 @@
  * inspect the search results using the read-only functions
  * provided by the processor or external state or variables.
  *
- * Example
+ * Example:
  * ```php
  *     // Paint up to the first five DIV or SPAN tags marked with the "jazzy" style.
  *     $remaining_tags_to_style = 5;
@@ -107,10 +107,10 @@
  * instruct it to modify the attributes on that tag by setting
  * a new value for an attribute or by removing an existing one.
  *
- * Example
+ * Example:
  * ```php
  *     if ( $processor->next_tag( array( 'class' => 'wp-group-block' ) ) ) {
- *         $processor->set_attribute( 'title' => 'This groups the contained content.' );
+ *         $processor->set_attribute( 'title', 'This groups the contained content.' );
  *         $processor->remove_attribute( 'data-test-id' );
  *     }
  * ```
@@ -130,7 +130,7 @@
  * exists before making changes. If removing the only class then the
  * entire `class` attribute will be removed.
  *
- * Example
+ * Example:
  * ```php
  *     // from `<span>Yippee!</span>`
  *     //   to `<span class="is-active">Yippee!</span>`
