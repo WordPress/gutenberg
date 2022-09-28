@@ -137,6 +137,17 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 *
+	 * @covers WP_HTML_Tag_Processor::get_attribute
+	 */
+	public function test_get_attribute_decodes_html_character_references() {
+		$p = new WP_HTML_Tag_Processor( '<div id="the &quot;grande&quot; is &lt; &#x033;&#50;oz&dagger;"></div>' );
+		$p->next_tag();
+		$this->assertSame( 'the "grande" is < 32oz†', $p->get_attribute( 'id' ), 'HTML Attribute value was returned without decoding character references' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
 	 * @covers next_tag
 	 * @covers get_attribute
 	 */

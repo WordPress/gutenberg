@@ -900,7 +900,9 @@ class WP_HTML_Tag_Processor {
 			return true;
 		}
 
-		return substr( $this->html, $attribute->value_starts_at, $attribute->value_length );
+		$raw_value = substr( $this->html, $attribute->value_starts_at, $attribute->value_length );
+
+		return html_entity_decode( $raw_value );
 	}
 
 	/**
