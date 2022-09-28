@@ -256,6 +256,7 @@ export default function SpacingInputControl( {
 					marks={ marks }
 					label={ ariaLabel }
 					hideLabelFromVision={ true }
+					__nextHasNoMarginBottom={ true }
 				/>
 			) }
 			{ ! showRangeControl && ! showCustomValueControl && (

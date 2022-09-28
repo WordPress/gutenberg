@@ -2,6 +2,7 @@
 	display: grid;
 	grid-template-columns: auto 1fr auto;
 	align-items: center;
+	grid-template-rows: 25px auto;
 }
 
 .component-spacing-sizes-control {
@@ -101,11 +102,6 @@
 	.components-spacing-sizes-control__range-control {
 		grid-column: span 3;
 		height: 40px;
-		margin-bottom: $grid-unit-20;
-	}
-
-	.components-range-control__wrapper {
-		margin-bottom: 0;
 	}
 
 	.components-range-control__mark {
