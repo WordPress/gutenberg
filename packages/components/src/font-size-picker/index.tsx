@@ -311,7 +311,6 @@ const UnforwardedFontSizePicker = (
 											} }
 											isSmall
 											variant="secondary"
-											size={ size }
 										>
 											{ __( 'Reset' ) }
 										</ResetButton>
