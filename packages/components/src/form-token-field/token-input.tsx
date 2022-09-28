@@ -31,6 +31,9 @@ export function UnForwardedTokenInput(
 	} = props;
 
 	const size = value ? value.length + 1 : 0;
+	// Ensure this is set to true if inputHasFocus is not defined.
+	const checkInputHasFocus =
+		inputHasFocus !== undefined ? inputHasFocus : true;
 
 	const onChangeHandler = ( event: ChangeEvent< HTMLInputElement > ) => {
 		if ( onChange ) {
@@ -63,7 +66,7 @@ export function UnForwardedTokenInput(
 					: undefined
 			}
 			aria-activedescendant={
-				inputHasFocus && selectedSuggestionIndex !== -1
+				checkInputHasFocus && selectedSuggestionIndex !== -1
 					? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }`
 					: undefined
 			}
