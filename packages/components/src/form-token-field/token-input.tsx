@@ -22,7 +22,7 @@ export function UnForwardedTokenInput(
 	const {
 		value,
 		isExpanded,
-		inputHasFocus = false,
+		inputHasFocus,
 		instanceId,
 		selectedSuggestionIndex,
 		className,
