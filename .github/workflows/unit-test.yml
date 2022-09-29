@@ -77,7 +77,7 @@ jobs:
 
     unit-php:
         name: PHP
-        runs-on: ${{ matrix.runs-on }}
+        runs-on: ${{ matrix.os }}
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         needs: [ read-php-matrix ]
         strategy:
