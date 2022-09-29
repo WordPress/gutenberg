@@ -79,7 +79,8 @@ jobs:
         name: PHP
         runs-on: ${{ matrix.runs-on }}
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-        matrix: ${{ fromJSON( needs.read-php-matrix.outputs.matrix ) }}
+        strategy:
+          matrix: ${{ fromJSON( needs.read-php-matrix.outputs.matrix ) }}
         env:
           WP_ENV_PHP_VERSION: ${{ matrix.php }}
 
