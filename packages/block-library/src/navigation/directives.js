@@ -54,17 +54,9 @@ export const rename = ( name ) =>
 // Add some support for suffixes and modifiers. See the tests file.
 export const value = ( name, val ) => {
 	if ( ! name.includes( ':' ) ) return val;
-	const [ , suffix, mods ] = /^.*?:([^.]*)\.?(.*)/.exec( name );
-	const modifiers = mods?.split( '.' ).reduce( ( obj, mod ) => {
-		const i = mod.indexOf( '=' );
-		if ( i !== -1 ) obj[ mod.substring( 0, i ) ] = mod.substring( i + 1 );
-		else obj[ mod ] = true;
-		return obj;
-	}, {} );
 	return {
 		name: rename( name ),
-		suffix: rename( suffix ),
-		...( mods && { modifiers } ),
+		suffix: rename( name.substring( name.indexOf( ':' ) + 1 ) ),
 		value: val,
 	};
 };
