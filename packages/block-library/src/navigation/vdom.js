@@ -5,7 +5,7 @@ import { h } from 'preact';
 /**
  * Internal dependencies
  */
-import { rename } from './directives';
+import { rename, value } from './directives';
 
 // Recursive function that transfoms a DOM tree into vDOM.
 export default function toVdom( node ) {
@@ -22,11 +22,11 @@ export default function toVdom( node ) {
 		const name = attributes[ i ].name;
 		if ( name.startsWith( 'wp-' ) ) {
 			hasWpDirectives = true;
-			let value = attributes[ i ].value;
+			let val = attributes[ i ].value;
 			try {
-				value = JSON.parse( value );
+				val = JSON.parse( val );
 			} catch ( e ) {}
-			wpDirectives[ rename( name ) ] = value;
+			wpDirectives[ rename( name ) ] = value( name, val );
 		} else {
 			props[ name ] = attributes[ i ].value;
 		}

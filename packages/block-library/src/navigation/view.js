@@ -47,11 +47,11 @@ directive( 'effect', ( { effect } ) => {
 } );
 
 // wp-on-click
-directive( 'onClick', ( { onClick }, _, { element } ) => {
+directive( 'on', ( { on: { suffix, value } }, _, { element } ) => {
 	const [ context, setContext ] = useContext( ctx );
 
-	element.props.onclick = ( event ) => {
-		const cb = eval( `(${ onClick })` );
+	element.props[ `on${ suffix }` ] = ( event ) => {
+		const cb = eval( `(${ value })` );
 		cb( { context, setContext, event } );
 	};
 } );

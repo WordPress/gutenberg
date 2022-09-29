@@ -632,7 +632,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
 
 	$responsive_container_markup = sprintf(
-		'<button wp-log="The button was rendered" wp-effect="function({ context }) { console.log(context.open); }" wp-on-click="function({ setContext }) { setContext({ open: true }); }" aria-haspopup="true" %3$s class="%6$s">%9$s</button>
+		'<button wp-log="The button was rendered" wp-effect="function({ context }) { console.log(context.open); }" wp-on:click="function({ setContext }) { setContext({ open: true }); }" aria-haspopup="true" %3$s class="%6$s">%9$s</button>
 			<div class="%5$s" style="%7$s" id="%1$s">
 				<div class="wp-block-navigation__responsive-close" tabindex="-1">
 					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s" aria-modal="true" role="dialog">
