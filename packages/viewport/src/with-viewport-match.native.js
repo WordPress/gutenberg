@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { mapValues } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -27,9 +22,9 @@ import { store } from './store';
  *
  * ```jsx
  * function MyComponent( { isMobile } ) {
- * 	return (
- * 		<div>Currently: { isMobile ? 'Mobile' : 'Not Mobile' }</div>
- * 	);
+ *     return (
+ *         <div>Currently: { isMobile ? 'Mobile' : 'Not Mobile' }</div>
+ *     );
  * }
  *
  * MyComponent = withViewportMatch( { isMobile: '< small' } )( MyComponent );
@@ -40,9 +35,11 @@ import { store } from './store';
 const withViewportMatch = ( queries ) =>
 	createHigherOrderComponent(
 		withSelect( ( select ) => {
-			return mapValues( queries, ( query ) => {
-				return select( store ).isViewportMatch( query );
-			} );
+			return Object.fromEntries(
+				Object.entries( queries ).map( ( [ key, query ] ) => {
+					return [ key, select( store ).isViewportMatch( query ) ];
+				} )
+			);
 		} ),
 		'withViewportMatch'
 	);

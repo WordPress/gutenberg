@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { reduce, mapValues } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { debounce } from '@wordpress/compose';
@@ -21,7 +16,12 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 	 */
 	const setIsMatching = debounce(
 		() => {
-			const values = mapValues( queries, ( query ) => query.matches );
+			const values = Object.fromEntries(
+				Object.entries( queries ).map( ( [ key, query ] ) => [
+					key,
+					query.matches,
+				] )
+			);
 			dispatch( store ).setIsMatching( values );
 		},
 		0,
@@ -37,9 +37,8 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 	 *
 	 * @type {Object<string,MediaQueryList>}
 	 */
-	const queries = reduce(
-		breakpoints,
-		( result, width, name ) => {
+	const queries = Object.entries( breakpoints ).reduce(
+		( result, [ name, width ] ) => {
 			Object.entries( operators ).forEach(
 				( [ operator, condition ] ) => {
 					const list = window.matchMedia(

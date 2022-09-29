@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { reduce } from 'lodash';
 import { Dimensions } from 'react-native';
 
 /**
@@ -26,9 +25,8 @@ const matchWidth = ( operator, breakpoint ) => {
 
 const addDimensionsEventListener = ( breakpoints, operators ) => {
 	const setIsMatching = () => {
-		const matches = reduce(
-			breakpoints,
-			( result, width, name ) => {
+		const matches = Object.entries( breakpoints ).reduce(
+			( result, [ name, width ] ) => {
 				Object.entries( operators ).forEach(
 					( [ operator, condition ] ) => {
 						const key = [ operator, name ].join( ' ' );
