@@ -295,7 +295,7 @@ class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
 		 */
 		$match = null;
 		preg_match( '~^<div test=(.*)></div>$~', (string) $p, $match );
-		list( $full_match, $actual_value ) = $match;
+		list( , $actual_value ) = $match;
 
 		$this->assertEquals( $actual_value, '"' . esc_attr( $attribute_value ) . '"' );
 	}
@@ -305,15 +305,15 @@ class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
 	 */
 	public function data_set_attribute_escapable_values() {
 		return array(
-			[ '"' ],
-			[ '&quot;' ],
-			[ '&' ],
-			[ '&amp;' ],
-			[ '&euro;' ],
-			[ "'" ],
-			[ '<>' ],
-			[ '&quot";' ],
-			[ '" onclick="alert(\'1\');"><span onclick=""></span><script>alert("1")</script>' ],
+			array( '"' ),
+			array( '&quot;' ),
+			array( '&' ),
+			array( '&amp;' ),
+			array( '&euro;' ),
+			array( "'" ),
+			array( '<>' ),
+			array( '&quot";' ),
+			array( '" onclick="alert(\'1\');"><span onclick=""></span><script>alert("1")</script>' ),
 		);
 	}
 

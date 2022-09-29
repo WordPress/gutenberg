@@ -63,7 +63,7 @@ class WP_HTML_Tag_Processor_Test_WP extends WP_UnitTestCase {
 		 */
 		$match = null;
 		preg_match( '~^<div test=(.*)></div>$~', (string) $p, $match );
-		list( $full_match, $actual_value ) = $match;
+		list( , $actual_value ) = $match;
 
 		$this->assertEquals( $actual_value, '"' . $expected_result . '"' );
 	}
@@ -73,18 +73,18 @@ class WP_HTML_Tag_Processor_Test_WP extends WP_UnitTestCase {
 	 */
 	public function data_set_attribute_escapable_values() {
 		return array(
-			[ '"','&quot;' ],
-			[ '&quot;', '&quot;' ],
-			[ '&', '&amp;' ],
-			[ '&amp;', '&amp;' ],
-			[ '&euro;', '&euro;' ],
-			[ "'", '&#039;' ],
-			[ '<>', '&lt;&gt;' ],
-			[ '&quot";', '&amp;quot&quot;;' ],
-			[
+			array( '"', '&quot;' ),
+			array( '&quot;', '&quot;' ),
+			array( '&', '&amp;' ),
+			array( '&amp;', '&amp;' ),
+			array( '&euro;', '&euro;' ),
+			array( "'", '&#039;' ),
+			array( '<>', '&lt;&gt;' ),
+			array( '&quot";', '&amp;quot&quot;;' ),
+			array(
 				'" onclick="alert(\'1\');"><span onclick=""></span><script>alert("1")</script>',
 				'&quot; onclick=&quot;alert(&#039;1&#039;);&quot;&gt;&lt;span onclick=&quot;&quot;&gt;&lt;/span&gt;&lt;script&gt;alert(&quot;1&quot;)&lt;/script&gt;',
-			],
+			),
 		);
 	}
 
