@@ -908,7 +908,9 @@ class WP_HTML_Tag_Processor {
 			return true;
 		}
 
-		return substr( $this->html, $attribute->value_starts_at, $attribute->value_length );
+		$raw_value = substr( $this->html, $attribute->value_starts_at, $attribute->value_length );
+
+		return html_entity_decode( $raw_value );
 	}
 
 	/**
@@ -945,6 +947,8 @@ class WP_HTML_Tag_Processor {
 	 *  - When `true` is passed as the value, then only the attribute name is added to the tag.
 	 *  - When `false` is passed, the attribute gets removed if it existed before.
 	 *
+	 * For string attributes, the value is escaped using the `esc_attr` function.
+	 *
 	 * @since 6.2.0
 	 *
 	 * @param string         $name  The attribute name to target.
@@ -968,8 +972,7 @@ class WP_HTML_Tag_Processor {
 		if ( true === $value ) {
 			$updated_attribute = $name;
 		} else {
-			// @TODO: What escaping and sanitization do we need here?
-			$escaped_new_value = str_replace( '"', '&quot;', $value );
+			$escaped_new_value = esc_attr( $value );
 			$updated_attribute = "{$name}=\"{$escaped_new_value}\"";
 		}
 
