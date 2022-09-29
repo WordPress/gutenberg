@@ -41,9 +41,9 @@
  *
  * Example:
  * ```php
- *     $processor = new WP_HTML_Tag_Processor( $html );
- *     if ( $processor->next_tag( [ 'tag_name' => 'option' ] ) ) {
- *         $processor->set_attribute( 'selected', true );
+ *     $tags = new WP_HTML_Tag_Processor( $html );
+ *     if ( $tags->next_tag( [ 'tag_name' => 'option' ] ) ) {
+ *         $tags->set_attribute( 'selected', true );
  *     }
  * ```
  *
@@ -57,15 +57,15 @@
  *
  * If you want to _find whatever the next tag is_
  * ```php
- *     $processor->next_tag();
+ *     $tags->next_tag();
  * ```
  *
- * | Goal                                                      | Query                                                                         |
- * |-----------------------------------------------------------|-------------------------------------------------------------------------------|
- * | Find any tag.                                             | `$processor->next_tag();`                                                     |
- * | Find next image tag.                                      | `$processor->next_tag( [ 'tag_name' => 'img' ] );`                            |
- * | Find next tag containing the `fullwidth` CSS class.       | `$process->next_tag( [ 'class_name' => 'fullwidth' ] );`                      |
- * | Find next image tag containing the `fullwidth` CSS class. | `$process->next_tag( [ 'tag_name' => 'img', 'class_name' => 'fullwidth' ] );` |
+ * | Goal                                                      | Query                                                                      |
+ * |-----------------------------------------------------------|----------------------------------------------------------------------------|
+ * | Find any tag.                                             | `$tags->next_tag();`                                                       |
+ * | Find next image tag.                                      | `$tags->next_tag( [ 'tag_name' => 'img' ] );`                              |
+ * | Find next tag containing the `fullwidth` CSS class.       | `$tags->next_tag( [ 'class_name' => 'fullwidth' ] );`                      |
+ * | Find next image tag containing the `fullwidth` CSS class. | `$tags->next_tag( [ 'tag_name' => 'img', 'class_name' => 'fullwidth' ] );` |
  *
  * If a tag was found meeting your criteria then `next_tag()`
  * will return `true` and you can proceed to modify it. If it
@@ -88,12 +88,12 @@
  * ```php
  *     // Paint up to the first five DIV or SPAN tags marked with the "jazzy" style.
  *     $remaining_count = 5;
- *     while ( $remaining_count > 0 && $processor->next_tag() ) {
+ *     while ( $remaining_count > 0 && $tags->next_tag() ) {
  *         if (
- *              ( 'DIV' === $processor->get_tag() || 'SPAN' === $processor->get_tag() ) &&
- *              'jazzy' === $processor->get_attribute( 'data-style' )
+ *              ( 'DIV' === $tags->get_tag() || 'SPAN' === $tags->get_tag() ) &&
+ *              'jazzy' === $tags->get_attribute( 'data-style' )
  *         ) {
- *             $processor->add_class( 'theme-style-everest-jazz' );
+ *             $tags->add_class( 'theme-style-everest-jazz' );
  *             $remaining_count--;
  *         }
  *     }
@@ -115,9 +115,9 @@
  *
  * Example:
  * ```php
- *     if ( $processor->next_tag( [ 'class' => 'wp-group-block' ] ) ) {
- *         $processor->set_attribute( 'title', 'This groups the contained content.' );
- *         $processor->remove_attribute( 'data-test-id' );
+ *     if ( $tags->next_tag( [ 'class' => 'wp-group-block' ] ) ) {
+ *         $tags->set_attribute( 'title', 'This groups the contained content.' );
+ *         $tags->remove_attribute( 'data-test-id' );
  *     }
  * ```
  *
@@ -142,27 +142,27 @@
  * ```php
  *     // from `<span>Yippee!</span>`
  *     //   to `<span class="is-active">Yippee!</span>`
- *     $processor->add_class( 'is-active' );
+ *     $tags->add_class( 'is-active' );
  *
  *     // from `<span class="excited">Yippee!</span>`
  *     //   to `<span class="excited is-active">Yippee!</span>`
- *     $processor->add_class( 'is-active' );
+ *     $tags->add_class( 'is-active' );
  *
  *     // from `<span class="is-active heavy-accent">Yippee!</span>`
  *     //   to `<span class="is-active heavy-accent">Yippee!</span>`
- *     $processor->add_class( 'is-active' );
+ *     $tags->add_class( 'is-active' );
  *
  *     // from `<input type="text" class="is-active rugby not-disabled" length="24">`
  *     //   to `<input type="text" class="is-active not-disabled" length="24">
- *     $processor->remove_class( 'rugby' );
+ *     $tags->remove_class( 'rugby' );
  *
  *     // from `<input type="text" class="rugby" length="24">`
  *     //   to `<input type="text" length="24">
- *     $processor->remove_class( 'rugby' );
+ *     $tags->remove_class( 'rugby' );
  *
  *     // from `<input type="text" length="24">`
  *     //   to `<input type="text" length="24">
- *     $processor->remove_class( 'rugby' );
+ *     $tags->remove_class( 'rugby' );
  * ```
  *
  * ## Design limitations
