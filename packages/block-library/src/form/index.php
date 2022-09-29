@@ -34,7 +34,7 @@ function render_block_core_form( $attributes, $content, $block ) {
 
 	// Build the form method attribute.
 	$method = empty( $attributes['method'] ) ? '' : $attributes['method'];
-	$method = empty( $method ) || ( 'get' !== strtolower( $method ) && 'post' !== strtolower( $method ) ) ? 'get' : $method;
+	$method = empty( $method ) || ( 'get' !== strtolower( $method ) && 'post' !== strtolower( $method ) ) ? 'post' : $method;
 	/**
 	 * Filters the form method attribute.
 	 *

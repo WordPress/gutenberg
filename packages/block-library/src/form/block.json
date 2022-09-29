@@ -14,7 +14,7 @@
 		},
 		"method": {
 			"type": "string",
-			"default": "get"
+			"default": "post"
 		}
 	}
 }
