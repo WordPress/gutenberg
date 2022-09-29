@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { rename, value } from '../directives';
+import { rename, value } from '../vdom';
 
 describe( 'directives name', () => {
 	it( 'should do camelcase', () => {

@@ -40,23 +40,3 @@ options.vnode = ( vnode ) => {
 
 	if ( old ) old( vnode );
 };
-
-// Rename WordPress Directives from:
-// - `wp-some-directive` to `someDirective`.
-// - `wp-some-prefix:some-directive` to `somePrefix`.
-export const rename = ( name ) =>
-	name
-		.toLowerCase()
-		.replace( /^wp-/, '' )
-		.replace( /:.*/, '' )
-		.replace( /-(.)/g, ( _, chr ) => chr.toUpperCase() );
-
-// Add some support for suffixes and modifiers. See the tests file.
-export const value = ( name, val ) => {
-	if ( ! name.includes( ':' ) ) return val;
-	return {
-		name: rename( name ),
-		suffix: rename( name.substring( name.indexOf( ':' ) + 1 ) ),
-		value: val,
-	};
-};
