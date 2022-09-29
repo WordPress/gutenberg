@@ -441,6 +441,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 				'typography',
 				'filter',
 				'outline',
+				'shadow',
 			].includes( key )
 		);
 
