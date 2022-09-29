@@ -47,6 +47,10 @@ $navigation-icon-size: 24px;
 		display: block;
 	}
 
+	.wp-block-navigation-item__content.wp-block-navigation-item__content {
+		color: inherit;
+	}
+
 	// The following rules provide class based application of user selected text
 	// decoration via block supports.
 	&.has-text-decoration-underline .wp-block-navigation-item__content {
