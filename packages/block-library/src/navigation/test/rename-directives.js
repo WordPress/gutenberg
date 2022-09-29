@@ -27,7 +27,7 @@ describe( 'directives value', () => {
 	it( 'should return an object if name contains a colon', () => {
 		expect( value( 'wp-some-prefix:some-directive', 123 ) ).toEqual( {
 			name: 'somePrefix',
-			suffix: 'someDirective',
+			suffix: 'some-directive',
 			value: 123,
 		} );
 	} );

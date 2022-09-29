@@ -54,7 +54,7 @@ export const value = ( name, val ) => {
 	if ( ! name.includes( ':' ) ) return val;
 	return {
 		name: rename( name ),
-		suffix: rename( name.substring( name.indexOf( ':' ) + 1 ) ),
+		suffix: name.substring( name.indexOf( ':' ) + 1 ),
 		value: val,
 	};
 };
