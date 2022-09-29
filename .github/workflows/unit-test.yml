@@ -112,12 +112,10 @@ jobs:
             - name: Running single site unit tests
               if: ${{ ! matrix.multisite }}
               run: npm run test:unit:php
-              if: ${{ success() || failure() }}
 
             - name: Running multisite unit tests
               if: ${{ matrix.multisite }}
               run: npm run test:unit:php:multisite
-              if: ${{ success() || failure() }}
 
     mobile-unit-js:
         name: Mobile
