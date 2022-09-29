@@ -156,10 +156,15 @@ export default function useSetting( path ) {
 							select( blockEditorStore ).getBlockAttributes(
 								candidateClientId
 							);
-						result = get(
-							candidateAtts,
-							`settings.${ normalizedPath }`
-						);
+						result =
+							get(
+								candidateAtts,
+								`settings.blocks.${ blockName }.${ normalizedPath }`
+							) ??
+							get(
+								candidateAtts,
+								`settings.${ normalizedPath }`
+							);
 						if ( result !== undefined ) {
 							// Stop the search for more distant ancestors and move on.
 							break;
