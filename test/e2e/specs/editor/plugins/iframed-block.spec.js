@@ -22,7 +22,9 @@ test.describe( 'Iframed block', () => {
 		).toContainText( 'Iframed Block (set with jQuery)' );
 
 		// open page from sidebar settings
-		await page.locator( 'role=button[name= "Page"i]' ).first().click();
+		await page.click(
+			'role=region[name="Editor settings"i] >> role=button[name="Page"i]'
+		);
 
 		// Opens the template editor with a newly created template.
 		await page.click( 'role=button[name="Select template"i]' );
