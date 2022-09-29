@@ -234,6 +234,7 @@ describe( 'getCSSRules', () => {
 						letterSpacing: '12px',
 						textTransform: 'uppercase',
 					},
+					shadow: '10px 10px red',
 				},
 				{
 					selector: '.some-selector',
@@ -276,44 +277,49 @@ describe( 'getCSSRules', () => {
 				value: '5px',
 			},
 			{
-				key: 'fontFamily',
 				selector: '.some-selector',
+				key: 'fontFamily',
 				value: "'Helvetica Neue',sans-serif",
 			},
 			{
-				key: 'fontSize',
 				selector: '.some-selector',
+				key: 'fontSize',
 				value: '2.2rem',
 			},
 			{
-				key: 'fontStyle',
 				selector: '.some-selector',
+				key: 'fontStyle',
 				value: 'italic',
 			},
 			{
-				key: 'fontWeight',
 				selector: '.some-selector',
+				key: 'fontWeight',
 				value: '800',
 			},
 			{
-				key: 'letterSpacing',
 				selector: '.some-selector',
+				key: 'letterSpacing',
 				value: '12px',
 			},
 			{
-				key: 'lineHeight',
 				selector: '.some-selector',
+				key: 'lineHeight',
 				value: '3.3',
 			},
 			{
-				key: 'textDecoration',
 				selector: '.some-selector',
+				key: 'textDecoration',
 				value: 'line-through',
 			},
 			{
-				key: 'textTransform',
 				selector: '.some-selector',
+				key: 'textTransform',
 				value: 'uppercase',
+			},
+			{
+				selector: '.some-selector',
+				key: 'boxShadow',
+				value: '10px 10px red',
 			},
 		] );
 	} );
