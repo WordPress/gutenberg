@@ -205,32 +205,38 @@ export default function Sandbox( {
 			setHeight( data.height );
 		}
 
-		const { ownerDocument } = ref.current;
+		const iframe = ref.current;
+		const { ownerDocument } = iframe;
 		const { defaultView } = ownerDocument;
 
 		// This used to be registered using <iframe onLoad={} />, but it made the iframe blank
 		// after reordering the containing block. See these two issues for more details:
 		// https://github.com/WordPress/gutenberg/issues/6146
 		// https://github.com/facebook/react/issues/18752
-		ref.current.addEventListener( 'load', tryNoForceSandbox, false );
+		iframe.addEventListener( 'load', tryNoForceSandbox, false );
 		defaultView.addEventListener( 'message', checkMessageForResize );
 
 		return () => {
-			ref.current?.removeEventListener(
-				'load',
-				tryNoForceSandbox,
-				false
-			);
+			iframe?.removeEventListener( 'load', tryNoForceSandbox, false );
 			defaultView.addEventListener( 'message', checkMessageForResize );
 		};
+		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
+		// See https://github.com/WordPress/gutenberg/pull/44378
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	useEffect( () => {
 		trySandbox();
+		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
+		// See https://github.com/WordPress/gutenberg/pull/44378
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ title, styles, scripts ] );
 
 	useEffect( () => {
 		trySandbox( true );
+		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
+		// See https://github.com/WordPress/gutenberg/pull/44378
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ html, type ] );
 
 	return (

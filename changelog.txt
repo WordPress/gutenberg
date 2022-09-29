@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 14.2.0-rc.1 =
+= 14.2.0 =
 
 ## Changelog
 
@@ -33,6 +33,8 @@
 - Embed block: Mark which attributes should be considered content. ([44039](https://github.com/WordPress/gutenberg/pull/44039))
 - List Item block: Improve writing flow. ([43954](https://github.com/WordPress/gutenberg/pull/43954))
 - Post Navigation Link block: Add arrows. ([40684](https://github.com/WordPress/gutenberg/pull/40684))
+- Query Loop block: Suggest active variation patterns.
+  ([44197](https://github.com/WordPress/gutenberg/pull/44197))
 
 #### Patterns
 
@@ -68,15 +70,14 @@
 - Query Loop block: Fix broken preview in specific category template. ([44294](https://github.com/WordPress/gutenberg/pull/44294))
 - Query Loop block: Fix variation with declared`icon` object with `src`.
   ([44270](https://github.com/WordPress/gutenberg/pull/44270))
-- Query Loop block: Suggest active variation patterns.
-  ([44197](https://github.com/WordPress/gutenberg/pull/44197))
 
-##### Bugfixes not related to a specific block:
+##### Other bugfixes not related to a specific block:
 
 - Avoid showing the recursion warning in previews when replacing template parts. ([44256](https://github.com/WordPress/gutenberg/pull/44256))
 - Ensure replacing a template part using a pattern doesn't update the existing
 - Fix demo content cover block text color. ([44174](https://github.com/WordPress/gutenberg/pull/44174))
   entity. ([44221](https://github.com/WordPress/gutenberg/pull/44221))
+- Add style-engine to Gutenberg's `tsconfig.json` references. ([44516](https://github.com/WordPress/gutenberg/pull/44516))
 
 #### Block Editor
 
@@ -93,9 +94,11 @@
 
 #### Global Styles
 
+- Add: Frontend section presets output. ([42124](https://github.com/WordPress/gutenberg/pull/42124))
 - Block supports: Prioritize prettify options over `SCRIPT_DEBUG`. ([44254](https://github.com/WordPress/gutenberg/pull/44254))
 - Fix padding on the post editor when `RootPaddingAwareAlignments` setting is enabled. ([44209](https://github.com/WordPress/gutenberg/pull/44209))
 - Remove the beta label from global styles header. ([44251](https://github.com/WordPress/gutenberg/pull/44251))
+- Theme.json: Fix some outline properties that don't work properly in the editor. ([44504](https://github.com/WordPress/gutenberg/pull/44504))
 
 #### Site Editor
 
@@ -189,7 +192,9 @@ The following PRs were merged by first time contributors:
 
 The following contributors merged PRs in this release:
 
-@aaronrobertshaw @ajlende @annezazu @apmatthews @aristath @c4rl0sbr4v0 @carolinan @chad1008 @ciampo @dcalhoun @draganescu @ellatrix @geriux @glendaviesnz @gziolo @jasmussen @jorgefilipecosta @kebbet @kkoppenhaver @Mamaduka @matiasbenedetto @mcsf @michalczaplinski @mirka @mtias @noisysocks @ntsekouras @pagelab @ramonjd @t-hamano @talldan @tellthemachines @tyxla @walbo @youknowriad
+@aaronrobertshaw @ajlende @annezazu @apmatthews @aristath @c4rl0sbr4v0 @carolinan @chad1008 @ciampo @dcalhoun @draganescu @ellatrix @geriux @glendaviesnz @gziolo @jasmussen @jorgefilipecosta @kebbet @kkoppenhaver @Mamaduka @matiasbenedetto @mcsf @michalczaplinski @mirka @mtias @noisysocks @ntsekouras @pagelab @ramonjd @t-hamano @talldan @tellthemachines @tyxla @walbo @youknowriad 
+
+
 
 
 = 14.1.1 =

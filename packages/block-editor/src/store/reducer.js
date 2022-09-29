@@ -2,7 +2,6 @@
  * External dependencies
  */
 import {
-	flow,
 	reduce,
 	omit,
 	without,
@@ -15,6 +14,7 @@ import {
 /**
  * WordPress dependencies
  */
+import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 /**
@@ -789,7 +789,7 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
  *
  * @return {Object} Updated state.
  */
-export const blocks = flow(
+export const blocks = pipe(
 	combineReducers,
 	withSaveReusableBlock, // Needs to be before withBlockCache.
 	withBlockTree, // Needs to be before withInnerBlocksRemoveCascade.
@@ -1055,7 +1055,7 @@ export const blocks = flow(
 
 				const mappedBlocks = mapBlockOrder( action.blocks );
 
-				return flow( [
+				return pipe( [
 					( nextState ) =>
 						omit( nextState, action.replacedClientIds ),
 					( nextState ) => ( {
@@ -1089,7 +1089,7 @@ export const blocks = flow(
 			}
 
 			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
-				return flow( [
+				return pipe( [
 					// Remove inner block ordering for removed blocks.
 					( nextState ) => omit( nextState, action.removedClientIds ),
 
