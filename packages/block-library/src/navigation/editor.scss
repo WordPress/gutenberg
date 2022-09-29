@@ -582,6 +582,11 @@ body.editor-styles-wrapper
 	margin-bottom: $grid-unit-20;
 }
 
+// increased specificity to override button variant
+.components-button.is-link.wp-block-navigation-manage-menus-button {
+	margin-bottom: $grid-unit-20;
+}
+
 .wp-block-navigation__overlay-menu-preview {
 	display: flex;
 	align-items: center;
