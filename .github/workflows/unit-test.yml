@@ -69,7 +69,7 @@ jobs:
         - name: Load the matrix
           id: set-matrix
           run: |
-            content=`cat ./path/to/package.json`
+            content=`cat .wordpress-develop/.github/workflows/php-test-matrix.json
             content="${content//'%'/'%25'}"
             content="${content//$'\n'/'%0A'}"
             content="${content//$'\r'/'%0D'}"
