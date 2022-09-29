@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-const { includes } = require( 'lodash' );
 const { ConcatSource } = require( 'webpack-sources' );
 
 module.exports = class LibraryExportDefaultPlugin {
@@ -16,7 +15,7 @@ module.exports = class LibraryExportDefaultPlugin {
 				const { mainTemplate, chunkTemplate } = compilation;
 
 				const onRenderWithEntry = ( source, chunk ) => {
-					if ( ! includes( this.entryPointNames, chunk.name ) ) {
+					if ( ! this.entryPointNames.includes( chunk.name ) ) {
 						return source;
 					}
 					return new ConcatSource( source, '["default"]' );
