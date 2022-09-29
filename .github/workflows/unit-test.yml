@@ -75,8 +75,10 @@ jobs:
                   npm run build
 
             - name: Install WordPress
+              env:
+                  WP_ENV_PHP_VERSION: ${{ matrix.php-version }}
               run: |
-                  WP_ENV_PHP_VERSION=${{ matrix.php-version }} npm run wp-env start
+                  npm run wp-env start
 
             - name: Running lint check
               run: npm run lint:php
