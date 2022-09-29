@@ -17,12 +17,12 @@ if ( class_exists( 'WP_Style_Engine' ) ) {
  * The Style Engine aims to provide a consistent API for rendering styling for blocks across both client-side and server-side applications.
  *
  * This class is for internal Core usage and is not supposed to be used by extenders (plugins and/or themes).
- * This class should not be extended.
+ * This class is final and should not be extended.
  * This is a low-level API that may need to do breaking changes. Please, use wp_style_engine_get_styles instead.
  *
  * @access private
  */
-class WP_Style_Engine {
+final class WP_Style_Engine {
 	/**
 	 * Style definitions that contain the instructions to
 	 * parse/output valid Gutenberg styles from a block's attributes.
