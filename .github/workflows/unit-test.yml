@@ -51,13 +51,40 @@ jobs:
             - name: Running the date tests
               run: npm run test:unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
+    read-php-matrix:
+      name: Load PHP testing matrix
+      runs-on: ubuntu-latest
+      if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+      outputs:
+        matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+      steps:
+        - name: Checkout WordPress
+          uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+          with:
+            repository: desrosj/wordpress-develop
+            ref: try/json-php-matrix
+            path: 'wordpress-develop'
+
+        - name: Load the matrix
+          id: set-matrix
+          run: |
+            content=`cat ./path/to/package.json`
+            content="${content//'%'/'%25'}"
+            content="${content//$'\n'/'%0A'}"
+            content="${content//$'\r'/'%0D'}"
+            echo "::set-output name=matrix::$content"
+
     unit-php:
         name: PHP
-        runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        matrix: ${{ fromJSON( needs.read-php-matrix.outputs.matrix ) }}
+        env:
+          WP_ENV_PHP_VERSION: ${{ matrix.php }}
 
         steps:
-            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+            - name: Checkout repository
+              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
             - name: Use desired version of NodeJS
               uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
