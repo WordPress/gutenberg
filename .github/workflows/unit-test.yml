@@ -69,7 +69,7 @@ jobs:
         - name: Load the matrix
           id: set-matrix
           run: |
-            content=`cat .wordpress-develop/.github/workflows/php-test-matrix.json
+            content=`cat .wordpress-develop/.github/workflows/php-test-matrix.json`
             content="${content//'%'/'%25'}"
             content="${content//$'\n'/'%0A'}"
             content="${content//$'\r'/'%0D'}"
@@ -79,6 +79,7 @@ jobs:
         name: PHP
         runs-on: ${{ matrix.runs-on }}
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        needs: [ read-php-matrix ]
         strategy:
           matrix: ${{ fromJSON( needs.read-php-matrix.outputs.matrix ) }}
         env:
