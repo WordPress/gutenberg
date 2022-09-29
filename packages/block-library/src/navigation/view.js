@@ -46,7 +46,7 @@ directive( 'effect', ( { effect } ) => {
 	} );
 } );
 
-// wp-on-click
+// wp-on:[event]
 directive( 'on', ( { on: { suffix, value } }, _, { element } ) => {
 	const [ context, setContext ] = useContext( ctx );
 
@@ -54,6 +54,18 @@ directive( 'on', ( { on: { suffix, value } }, _, { element } ) => {
 		const cb = eval( `(${ value })` );
 		cb( { context, setContext, event } );
 	};
+} );
+
+// wp-class:[event]
+directive( 'class', ( { class: { suffix, value } }, _, { element } ) => {
+	const [ context, setContext ] = useContext( ctx );
+
+	const cb = eval( `(${ value })` );
+	const result = cb( { context, setContext } );
+
+	if ( ! result ) element.props.class.replace( suffix, '' );
+	else if ( ! element.props.class.includes( suffix ) )
+		element.props.class += ` ${ suffix }`;
 } );
 
 /**
