@@ -92,7 +92,7 @@ test.describe( 'Post visibility', () => {
 		);
 
 		await page.click(
-			"div[aria-label='Move forward to switch to the next month.']"
+			'div.DayPickerNavigation.DayPickerNavigation_1.DayPickerNavigation__horizontal.DayPickerNavigation__horizontal_2 > div.DayPickerNavigation_button.DayPickerNavigation_button_1.DayPickerNavigation_button__default.DayPickerNavigation_button__default_2.DayPickerNavigation_button__horizontal.DayPickerNavigation_button__horizontal_3.DayPickerNavigation_button__horizontalDefault.DayPickerNavigation_button__horizontalDefault_4.DayPickerNavigation_rightButton__horizontalDefault.DayPickerNavigation_rightButton__horizontalDefault_5'
 		);
 
 		await page.click( 'text=15  >> nth=1' );
