@@ -13,7 +13,7 @@ const getUnitSelect = () =>
 const getUnitLabel = () =>
 	document.body.querySelector( '.components-unit-control__unit-label' );
 
-const toggleCustomInput = ( showCustomInput ) => {
+const toggleCustomInput = ( showCustomInput: boolean ) => {
 	const label = showCustomInput ? 'Set custom size' : 'Use size preset';
 	const toggleCustom = screen.getByLabelText( label, { selector: 'button' } );
 	fireEvent.click( toggleCustom );

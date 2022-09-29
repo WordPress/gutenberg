@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -8,53 +13,48 @@ import { useState } from '@wordpress/element';
  */
 import FontSizePicker from '../';
 
-export default {
+const meta: ComponentMeta< typeof FontSizePicker > = {
 	title: 'Components/FontSizePicker',
 	component: FontSizePicker,
 	argTypes: {
-		initialValue: { table: { disable: true } }, // hide prop because it's not actually part of FontSizePicker
-		fallbackFontSize: {
-			description:
-				'If no value exists, this prop defines the starting position for the font size picker slider. Only relevant if `withSlider` is `true`.',
-		},
-		size: {
-			control: { type: 'radio' },
-			options: [ 'default', '__unstable-large' ],
-		},
-		withReset: {
-			description:
-				'If `true`, a reset button will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` or `withSlider` is `true`.',
-			control: { type: 'boolean' },
-			table: {
-				type: 'boolean',
-				defaultValue: { summary: true },
-			},
-		},
+		value: { control: { type: null } },
 	},
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
 	},
 };
+export default meta;
 
-const FontSizePickerWithState = ( { initialValue, ...props } ) => {
-	const [ fontSize, setFontSize ] = useState( initialValue );
+const FontSizePickerWithState: ComponentStory< typeof FontSizePicker > = ( {
+	value,
+	onChange,
+	...props
+} ) => {
+	const [ fontSize, setFontSize ] = useState( value );
 	return (
 		<FontSizePicker
 			{ ...props }
 			value={ fontSize }
-			onChange={ setFontSize }
+			onChange={ ( nextValue ) => {
+				setFontSize( nextValue );
+				onChange?.( nextValue );
+			} }
 		/>
 	);
 };
 
-const TwoFontSizePickersWithState = ( { fontSizes, ...props } ) => {
+const TwoFontSizePickersWithState: ComponentStory< typeof FontSizePicker > = ( {
+	fontSizes,
+	...props
+} ) => {
 	return (
 		<>
 			<h2>Fewer font sizes</h2>
 			<FontSizePickerWithState
 				{ ...props }
-				fontSizes={ fontSizes.slice( 0, 4 ) }
+				fontSizes={ fontSizes?.slice( 0, 4 ) }
 			/>
 
 			<h2>More font sizes</h2>
@@ -63,7 +63,8 @@ const TwoFontSizePickersWithState = ( { fontSizes, ...props } ) => {
 	);
 };
 
-export const Default = FontSizePickerWithState.bind( {} );
+export const Default: ComponentStory< typeof FontSizePicker > =
+	FontSizePickerWithState.bind( {} );
 Default.args = {
 	__nextHasNoMarginBottom: true,
 	disableCustomFontSizes: false,
@@ -84,15 +85,16 @@ Default.args = {
 			size: 26,
 		},
 	],
-	initialValue: 16,
+	value: 16,
 	withSlider: false,
 };
 
-export const WithSlider = FontSizePickerWithState.bind( {} );
+export const WithSlider: ComponentStory< typeof FontSizePicker > =
+	FontSizePickerWithState.bind( {} );
 WithSlider.args = {
 	...Default.args,
 	fallbackFontSize: 16,
-	initialValue: undefined,
+	value: undefined,
 	withSlider: true,
 };
 
@@ -100,7 +102,8 @@ WithSlider.args = {
  * With custom font sizes disabled via the `disableCustomFontSizes` prop, the user will
  * only be able to pick one of the predefined sizes passed in `fontSizes`.
  */
-export const WithCustomSizesDisabled = FontSizePickerWithState.bind( {} );
+export const WithCustomSizesDisabled: ComponentStory< typeof FontSizePicker > =
+	FontSizePickerWithState.bind( {} );
 WithCustomSizesDisabled.args = {
 	...Default.args,
 	disableCustomFontSizes: true,
@@ -109,7 +112,8 @@ WithCustomSizesDisabled.args = {
 /**
  * When there are more than 5 font size options, the UI is no longer a toggle group.
  */
-export const WithMoreFontSizes = FontSizePickerWithState.bind( {} );
+export const WithMoreFontSizes: ComponentStory< typeof FontSizePicker > =
+	FontSizePickerWithState.bind( {} );
 WithMoreFontSizes.args = {
 	...Default.args,
 	fontSizes: [
@@ -144,27 +148,29 @@ WithMoreFontSizes.args = {
 			size: 36,
 		},
 	],
-	initialValue: 8,
+	value: 8,
 };
 
 /**
  * When units like `px` are specified explicitly, it will be shown as a label hint.
  */
-export const WithUnits = TwoFontSizePickersWithState.bind( {} );
+export const WithUnits: ComponentStory< typeof FontSizePicker > =
+	TwoFontSizePickersWithState.bind( {} );
 WithUnits.args = {
 	...WithMoreFontSizes.args,
-	fontSizes: WithMoreFontSizes.args.fontSizes.map( ( option ) => ( {
+	fontSizes: WithMoreFontSizes.args.fontSizes?.map( ( option ) => ( {
 		...option,
 		size: `${ option.size }px`,
 	} ) ),
-	initialValue: '8px',
+	value: '8px',
 };
 
 /**
  * The label hint will not be shown if it is a complex CSS value. Some examples of complex CSS values
  * in this context are CSS functions like `calc()`, `clamp()`, and `var()`.
  */
-export const WithComplexCSSValues = TwoFontSizePickersWithState.bind( {} );
+export const WithComplexCSSValues: ComponentStory< typeof FontSizePicker > =
+	TwoFontSizePickersWithState.bind( {} );
 WithComplexCSSValues.args = {
 	...Default.args,
 	fontSizes: [
@@ -200,5 +206,5 @@ WithComplexCSSValues.args = {
 			size: '2.8rem',
 		},
 	],
-	initialValue: '1.125rem',
+	value: '1.125rem',
 };

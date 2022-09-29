@@ -162,7 +162,7 @@ export function useAllowedControls( attributes ) {
 			select( blocksStore ).getActiveBlockVariation(
 				queryLoopName,
 				attributes
-			)?.allowControls,
+			)?.allowedControls,
 
 		[ attributes ]
 	);

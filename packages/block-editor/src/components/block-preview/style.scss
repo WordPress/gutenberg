@@ -64,3 +64,16 @@
 		display: none;
 	}
 }
+
+// The goal of this pseudo-element is to cover the iframe
+// otherwise it won't be able to drag elements containing
+// the preview iframe in Safari.
+.block-editor-block-preview__container::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1;
+}
