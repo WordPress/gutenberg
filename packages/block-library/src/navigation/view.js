@@ -15,7 +15,7 @@ import { useState, useEffect, useContext } from 'preact/hooks';
 /**
  * Internal dependencies
  */
-import { toVdom } from './vdom';
+import toVdom from './vdom';
 import { directive } from './directives';
 import { createRootFragment, idle } from './utils';
 
@@ -23,7 +23,7 @@ import { createRootFragment, idle } from './utils';
  * Directives
  */
 // wp-log
-directive( 'log', ( { wp: { log } } ) => {
+directive( 'log', ( { log } ) => {
 	useEffect( () => {
 		// eslint-disable-next-line no-console
 		console.log( log );
@@ -32,13 +32,13 @@ directive( 'log', ( { wp: { log } } ) => {
 
 // wp-context
 const ctx = createContext( {} );
-directive( 'context', ( { wp: { context }, children } ) => {
+directive( 'context', ( { context }, { children } ) => {
 	const value = useState( context );
 	return <ctx.Provider value={ value }>{ children }</ctx.Provider>;
 } );
 
 // wp-effect
-directive( 'effect', ( { wp: { effect } } ) => {
+directive( 'effect', ( { effect } ) => {
 	const [ context, setContext ] = useContext( ctx );
 	useEffect( () => {
 		const cb = eval( `(${ effect })` );
@@ -47,7 +47,7 @@ directive( 'effect', ( { wp: { effect } } ) => {
 } );
 
 // wp-on-click
-directive( 'onClick', ( { wp: { onClick }, element } ) => {
+directive( 'onClick', ( { onClick }, _, { element } ) => {
 	const [ context, setContext ] = useContext( ctx );
 
 	element.props.onclick = ( event ) => {

@@ -2,42 +2,43 @@
  * External dependencies
  */
 import { h } from 'preact';
+/**
+ * Internal dependencies
+ */
+import { rename } from './directives';
 
-// Convert DOM nodes to static virtual DOM nodes.
-export const toVdom = ( node ) => {
+// Recursive function that transfoms a DOM tree into vDOM.
+export default function toVdom( node ) {
+	const props = {};
+	const attributes = node.attributes;
+	const wpDirectives = { initialRef: node }; // Pass down original static node.
+	let hasWpDirectives = false;
+
 	if ( node.nodeType === 3 ) return node.data;
 	if ( node.nodeType === 8 ) return null;
 	if ( node.localName === 'script' ) return h( 'script' );
 
-	const props = {},
-		a = node.attributes;
-
-	for ( let i = 0; i < a.length; i++ ) {
-		if ( a[ i ].name.startsWith( 'wp-' ) ) {
-			props.wp = props.wp || {};
-			let value = a[ i ].value;
+	for ( let i = 0; i < attributes.length; i++ ) {
+		const name = attributes[ i ].name;
+		if ( name.startsWith( 'wp-' ) ) {
+			hasWpDirectives = true;
+			let value = attributes[ i ].value;
 			try {
 				value = JSON.parse( value );
 			} catch ( e ) {}
-			props.wp[ renameDirective( a[ i ].name ) ] = value;
+			wpDirectives[ rename( name ) ] = value;
 		} else {
-			props[ a[ i ].name ] = a[ i ].value;
+			props[ name ] = attributes[ i ].value;
 		}
 	}
 
-	return h(
-		node.localName,
-		props,
-		[].map.call( node.childNodes, toVdom ).filter( exists )
-	);
-};
+	if ( hasWpDirectives ) props.wp = wpDirectives;
 
-// Rename WordPress Directives from `wp-some-directive` to `someDirective`.
-const renameDirective = ( s ) =>
-	s
-		.toLowerCase()
-		.replace( /^wp-/, '' )
-		.replace( /-(.)/g, ( _, chr ) => chr.toUpperCase() );
+	// Walk child nodes and return vDOM children.
+	const children = [].map.call( node.childNodes, toVdom ).filter( exists );
 
-// Filter the truthy.
-const exists = ( i ) => i;
+	return h( node.localName, props, children );
+}
+
+// Filter existing items.
+const exists = ( x ) => x;

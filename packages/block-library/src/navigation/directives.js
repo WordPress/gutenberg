@@ -11,33 +11,39 @@ export const directive = ( name, cb ) => {
 	directives[ name ] = cb;
 };
 
-const WpDirective = ( props ) => {
-	const element = h( props.type, props );
-	const directiveProps = { ...props, children: element, element };
+const WpDirective = ( { type, wp, props: originalProps } ) => {
+	const element = h( type, { ...originalProps, _wrapped: true } );
+	const props = { ...originalProps, children: element };
 
-	for ( const d in props.wp ) {
-		const ret = directives[ d ]?.( directiveProps );
-		if ( ret !== undefined ) directiveProps.children = ret;
+	for ( const d in wp ) {
+		const wrapper = directives[ d ]?.( wp, props, { element } );
+		if ( wrapper !== undefined ) props.children = wrapper;
 	}
 
-	return directiveProps.children;
+	return props.children;
 };
 
 const old = options.vnode;
-
 options.vnode = ( vnode ) => {
 	const wp = vnode.props.wp;
-	const wrapped = vnode.props._wrapped;
 
 	if ( wp ) {
-		if ( ! wrapped ) {
-			vnode.props.type = vnode.type;
-			vnode.props._wrapped = true;
+		const props = vnode.props;
+		delete props.wp;
+		if ( ! props._wrapped ) {
+			vnode.props = { type: vnode.type, wp, props };
 			vnode.type = WpDirective;
+		} else {
+			delete props._wrapped;
 		}
-	} else if ( wrapped ) {
-		delete vnode.props._wrapped;
 	}
 
 	if ( old ) old( vnode );
 };
+
+// Rename WordPress Directives from `wp-some-directive` to `someDirective`.
+export const rename = ( s ) =>
+	s
+		.toLowerCase()
+		.replace( /^wp-/, '' )
+		.replace( /-(.)/g, ( _, chr ) => chr.toUpperCase() );
