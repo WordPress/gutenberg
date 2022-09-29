@@ -42,7 +42,7 @@
  * Example:
  * ```php
  *     $processor = new WP_HTML_Tag_Processor( $html );
- *     if ( $processor->next_tag( array( 'tag_name' => 'option' ) ) ) {
+ *     if ( $processor->next_tag( [ 'tag_name' => 'option' ] ) ) {
  *         $processor->set_attribute( 'selected', true );
  *     }
  * ```
@@ -60,12 +60,12 @@
  *     $processor->next_tag();
  * ```
  *
- * | Goal                                                      | Query                                                                              |
- * |-----------------------------------------------------------|------------------------------------------------------------------------------------|
- * | Find any tag.                                             | `$processor->next_tag();`                                                          |
- * | Find next image tag.                                      | `$processor->next_tag( array( 'tag_name' => 'img' ) );`                            |
- * | Find next tag containing the `fullwidth` CSS class.       | `$process->next_tag( array( 'class_name' => 'fullwidth' ) );`                      |
- * | Find next image tag containing the `fullwidth` CSS class. | `$process->next_tag( array( 'tag_name' => 'img', 'class_name' => 'fullwidth' ) );` |
+ * | Goal                                                      | Query                                                                         |
+ * |-----------------------------------------------------------|-------------------------------------------------------------------------------|
+ * | Find any tag.                                             | `$processor->next_tag();`                                                     |
+ * | Find next image tag.                                      | `$processor->next_tag( [ 'tag_name' => 'img' ] );`                            |
+ * | Find next tag containing the `fullwidth` CSS class.       | `$process->next_tag( [ 'class_name' => 'fullwidth' ] );`                      |
+ * | Find next image tag containing the `fullwidth` CSS class. | `$process->next_tag( [ 'tag_name' => 'img', 'class_name' => 'fullwidth' ] );` |
  *
  * If a tag was found meeting your criteria then `next_tag()`
  * will return `true` and you can proceed to modify it. If it
@@ -107,7 +107,7 @@
  *
  * Example:
  * ```php
- *     if ( $processor->next_tag( array( 'class' => 'wp-group-block' ) ) ) {
+ *     if ( $processor->next_tag( [ 'class' => 'wp-group-block' ] ) ) {
  *         $processor->set_attribute( 'title', 'This groups the contained content.' );
  *         $processor->remove_attribute( 'data-test-id' );
  *     }
@@ -275,16 +275,16 @@ class WP_HTML_Tag_Processor {
 	 *     // and stops after recognizing the `id` attribute
 	 *     // <div id="test-4" class=outline title="data:text/plain;base64=asdk3nk1j3fo8">
 	 *     //                 ^ parsing will continue from this point
-	 *     $this->attributes = array(
+	 *     $this->attributes = [
 	 *         'id' => new WP_HTML_Attribute_Match( 'id', null, 6, 17 )
-	 *     );
+	 *     ];
 	 *
 	 *     // when picking up parsing again, or when asking to find the
 	 *     // `class` attribute we will continue and add to this array
-	 *     $this->attributes = array(
-	 *         'id' => new WP_HTML_Attribute_Match( 'id', null, 6, 17 ),
+	 *     $this->attributes = [
+	 *         'id'    => new WP_HTML_Attribute_Match( 'id', null, 6, 17 ),
 	 *         'class' => new WP_HTML_Attribute_Match( 'class', 'outline', 18, 32 )
-	 *     );
+	 *     ];
 	 *
 	 *     // Note that only the `class` attribute value is stored in the index.
 	 *     // That's because it is the only value used by this class at the moment.
@@ -309,11 +309,11 @@ class WP_HTML_Tag_Processor {
 	 * Example:
 	 * <code>
 	 *     // Add the `WP-block-group` class, remove the `WP-group` class.
-	 *     $class_changes = array(
+	 *     $class_changes = [
 	 *         // Indexed by a comparable class name
 	 *         'wp-block-group' => new WP_Class_Name_Operation( 'WP-block-group', WP_Class_Name_Operation::ADD ),
 	 *         'wp-group'       => new WP_Class_Name_Operation( 'WP-group', WP_Class_Name_Operation::REMOVE )
-	 *     );
+	 *     ];
 	 * </code>
 	 *
 	 * @since 6.2.0
@@ -345,9 +345,9 @@ class WP_HTML_Tag_Processor {
 	 *
 	 *     // Correspondingly, something like this
 	 *     // will appear in the replacements array.
-	 *     $replacements = array(
+	 *     $replacements = [
 	 *         WP_HTML_Text_Replacement( 14, 28, 'https://my-site.my-domain/wp-content/uploads/2014/08/kittens.jpg' )
-	 *     );
+	 *     ];
 	 * </code>
 	 *
 	 * @since 6.2.0
