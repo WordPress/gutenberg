@@ -68,7 +68,7 @@ class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
 	public function test_get_tag_returns_open_tag_name() {
 		$p = new WP_HTML_Tag_Processor( '<div>Test</div>' );
 		$this->assertTrue( $p->next_tag( 'div' ), 'Querying an existing tag did not return true' );
-		$this->assertSame( 'div', $p->get_tag(), 'Accessing an existing tag name did not return "div"' );
+		$this->assertSame( 'DIV', $p->get_tag(), 'Accessing an existing tag name did not return "div"' );
 	}
 
 	/**
@@ -841,7 +841,7 @@ HTML;
 	public function test_unclosed_script_tag_should_not_cause_an_infinite_loop() {
 		$p = new WP_HTML_Tag_Processor( '<script>' );
 		$p->next_tag();
-		$this->assertSame( 'script', $p->get_tag() );
+		$this->assertSame( 'SCRIPT', $p->get_tag() );
 		$p->next_tag();
 	}
 
@@ -855,9 +855,9 @@ HTML;
 	public function test_next_tag_ignores_the_contents_of_a_script_tag( $script_then_div ) {
 		$p = new WP_HTML_Tag_Processor( $script_then_div );
 		$p->next_tag();
-		$this->assertSame( 'script', $p->get_tag(), 'The first found tag was not "script"' );
+		$this->assertSame( 'SCRIPT', $p->get_tag(), 'The first found tag was not "script"' );
 		$p->next_tag();
-		$this->assertSame( 'div', $p->get_tag(), 'The second found tag was not "∂iv"' );
+		$this->assertSame( 'DIV', $p->get_tag(), 'The second found tag was not "div"' );
 	}
 
 	/**
@@ -934,7 +934,7 @@ HTML;
 		$p->next_tag();
 		$this->assertSame( $rcdata_tag, $p->get_tag(), "The first found tag was not '$rcdata_tag'" );
 		$p->next_tag();
-		$this->assertSame( 'div', $p->get_tag(), "The second found tag was not 'div'" );
+		$this->assertSame( 'DIV', $p->get_tag(), "The second found tag was not 'div'" );
 	}
 
 	/**
@@ -951,32 +951,32 @@ HTML;
 		$examples                    = array();
 		$examples['Simple textarea'] = array(
 			'<textarea><span class="d-none d-md-inline">Back to notifications</span></textarea><div></div>',
-			'textarea',
+			'TEXTAREA',
 		);
 
 		$examples['Simple title'] = array(
 			'<title><span class="d-none d-md-inline">Back to notifications</title</span></title><div></div>',
-			'title',
+			'TITLE',
 		);
 
 		$examples['Comment opener inside a textarea tag should be ignored'] = array(
 			'<textarea class="d-md-none"><!--</textarea><div></div>-->',
-			'textarea',
+			'TEXTAREA',
 		);
 
 		$examples['Textarea closer with another textarea tag in closer attributes'] = array(
 			'<textarea><span class="d-none d-md-inline">Back to notifications</title</span></textarea <textarea><div></div>',
-			'textarea',
+			'TEXTAREA',
 		);
 
 		$examples['Textarea closer with attributes'] = array(
 			'<textarea class="d-md-none"><span class="d-none d-md-inline">Back to notifications</span></textarea id="test"><div></div>',
-			'textarea',
+			'TEXTAREA',
 		);
 
 		$examples['Textarea opener with title closer inside'] = array(
 			'<textarea class="d-md-none"></title></textarea><div></div>',
-			'textarea',
+			'TEXTAREA',
 		);
 		return $examples;
 	}

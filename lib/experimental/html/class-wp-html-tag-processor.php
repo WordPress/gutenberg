@@ -99,11 +99,19 @@
  *     }
  * ```
  *
+ * `get_attribute()` will return `null` if the attribute wasn't present
+ * on the tag when it was called. It may return `""` (the empty string)
+ * in cases where the attribute was present but its value was empty.
+ * For boolean attributes, those whose name is present but no value is
+ * given, it will return `true` (the only way to set `false` for an
+ * attribute is to remove it).
+ *
  * ### Modifying HTML attributes for a found tag
  *
- * Once the processor has found the start of a tag you can
- * instruct it to modify the attributes on that tag by setting
- * a new value for an attribute or by removing an existing one.
+ * Once you've found the start of an opening tag you can modify
+ * any number of the attributes on that tag. You can set a new
+ * value for an attribute, remove the entire attribute, or do
+ * nothing and move on to the next opening tag.
  *
  * Example:
  * ```php
@@ -115,7 +123,9 @@
  *
  * If `set_attribute()` is called for an existing attribute it will
  * overwrite the existing value. Similarly, calling `remove_attribute()`
- * for a non-existing attribute has no effect on the document.
+ * for a non-existing attribute has no effect on the document. Both
+ * of these methods are safe to call without knowing if a given attribute
+ * exists beforehand.
  *
  * ### Modifying CSS classes for a found tag
  *
@@ -409,9 +419,9 @@ class WP_HTML_Tag_Processor {
 			if ( 's' === $t || 'S' === $t || 't' === $t || 'T' === $t ) {
 				$tag_name = $this->get_tag();
 
-				if ( 'script' === $tag_name ) {
+				if ( 'SCRIPT' === $tag_name ) {
 					$this->skip_script_data();
-				} elseif ( 'textarea' === $tag_name || 'title' === $tag_name ) {
+				} elseif ( 'TEXTAREA' === $tag_name || 'TITLE' === $tag_name ) {
 					$this->skip_rcdata( $tag_name );
 				}
 			}
@@ -457,7 +467,7 @@ class WP_HTML_Tag_Processor {
 				$tag_char  = $tag_name[ $i ];
 				$html_char = $html[ $at + $i ];
 
-				if ( $html_char !== $tag_char && strtolower( $html_char ) !== $tag_char ) {
+				if ( $html_char !== $tag_char && strtoupper( $html_char ) !== $tag_char ) {
 					$at += $i;
 					continue 2;
 				}
@@ -1328,7 +1338,7 @@ class WP_HTML_Tag_Processor {
 
 			/*
 			 * Otherwise we have to check for each character if they
-			 * are the same, and only `strtolower()` if we have to.
+			 * are the same, and only `strtoupper()` if we have to.
 			 * Presuming that most people will supply lowercase tag
 			 * names and most HTML will contain lowercase tag names,
 			 * most of the time this runs we shouldn't expect to
@@ -1338,7 +1348,7 @@ class WP_HTML_Tag_Processor {
 				$html_char = $this->html[ $this->tag_name_starts_at + $i ];
 				$tag_char  = $this->sought_tag_name[ $i ];
 
-				if ( $html_char !== $tag_char && strtolower( $html_char ) !== $tag_char ) {
+				if ( $html_char !== $tag_char && strtoupper( $html_char ) !== $tag_char ) {
 					return false;
 				}
 			}
