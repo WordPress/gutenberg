@@ -67,7 +67,7 @@ function ListViewBlockSelectButton(
 					'block-editor-list-view-block-select-button',
 					className
 				) }
-				onClick={ onClick }
+				onClick={ () => null }
 				onKeyDown={ onKeyDownHandler }
 				ref={ ref }
 				tabIndex={ tabIndex }
