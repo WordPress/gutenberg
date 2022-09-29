@@ -1,14 +1,23 @@
 <?php
 /**
  * Unit tests covering WP_HTML_Tag_Processor functionality.
+ * This file takes about 100ms to run because it does not load
+ * any WordPress libraries:
+ *
+ * ```
+ * ./vendor/bin/phpunit --no-configuration ./phpunit/html/wp-html-tag-processor-test.php
+ * ```
+ *
+ * Put all new WP_HTML_Tag_Processor tests here, and only add new cases to
+ * wp-html-tag-processor-test-wp.php when they cannot run without WordPress.
  *
  * @package WordPress
  * @subpackage HTML
  */
 
 if ( ! function_exists( 'esc_attr' ) ) {
-	function esc_attr( $s ) {
-		return str_replace( '"', '&quot;', $s );
+	function esc_attr( $string ) {
+		return htmlspecialchars( $string, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'utf-8', false );
 	}
 }
 
@@ -23,7 +32,7 @@ require_once __DIR__ . '/../../lib/experimental/html/index.php';
  *
  * @coversDefaultClass WP_HTML_Tag_Processor
  */
-class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
+class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
 	const HTML_SIMPLE       = '<div id="first"><span id="second">Text</span></div>';
 	const HTML_WITH_CLASSES = '<div class="main with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>';
 	const HTML_MALFORMED    = '<div><span class="d-md-none" Notifications</span><span class="d-none d-md-inline">Back to notifications</span></div>';
@@ -137,6 +146,17 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 *
+	 * @covers WP_HTML_Tag_Processor::get_attribute
+	 */
+	public function test_get_attribute_decodes_html_character_references() {
+		$p = new WP_HTML_Tag_Processor( '<div id="the &quot;grande&quot; is &lt; &#x033;&#50;oz&dagger;"></div>' );
+		$p->next_tag();
+		$this->assertSame( 'the "grande" is < 32oz†', $p->get_attribute( 'id' ), 'HTML Attribute value was returned without decoding character references' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
 	 * @covers next_tag
 	 * @covers get_attribute
 	 */
@@ -232,6 +252,68 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 			self::HTML_SIMPLE,
 			(string) $p,
 			'Calling __toString after updating a non-existing tag returned an HTML that was different from the original HTML'
+		);
+	}
+
+	/**
+	 * Passing a double quote inside of an attribute values could lead to an XSS attack as follows:
+	 *
+	 * <code>
+	 *     $p = new WP_HTML_Tag_Processor( '<div class="header"></div>' );
+	 *     $p->next_tag();
+	 *     $p->set_attribute('class', '" onclick="alert');
+	 *     echo $p;
+	 *     // <div class="" onclick="alert"></div>
+	 * </code>
+	 *
+	 * To prevent it, `set_attribute` calls `esc_attr()` on its given values.
+	 *
+	 * <code>
+	 *    <div class="&quot; onclick=&quot;alert"></div>
+	 * </code>
+	 *
+	 * @ticket 56299
+	 *
+	 * @dataProvider data_set_attribute_escapable_values
+	 * @covers set_attribute
+	 */
+	public function test_set_attribute_prevents_xss( $attribute_value ) {
+		$p = new WP_HTML_Tag_Processor( '<div></div>' );
+		$p->next_tag();
+		$p->set_attribute( 'test', $attribute_value );
+
+		/*
+		 * Testing the escaping is hard using tools that properly parse
+		 * HTML because they might interpret the escaped values. It's hard
+		 * with tools that don't understand HTML because they might get
+		 * confused by improperly-escaped values.
+		 *
+		 * For this test, since we control the input HTML we're going to
+		 * do what looks like the opposite of what we want to be doing with
+		 * this library but are only doing so because we have full control
+		 * over the content and because we want to look at the raw values.
+		 */
+		$match = null;
+		preg_match( '~^<div test=(.*)></div>$~', (string) $p, $match );
+		list( , $actual_value ) = $match;
+
+		$this->assertEquals( $actual_value, '"' . esc_attr( $attribute_value ) . '"' );
+	}
+
+	/**
+	 * Data provider with HTML attribute values that might need escaping.
+	 */
+	public function data_set_attribute_escapable_values() {
+		return array(
+			array( '"' ),
+			array( '&quot;' ),
+			array( '&' ),
+			array( '&amp;' ),
+			array( '&euro;' ),
+			array( "'" ),
+			array( '<>' ),
+			array( '&quot";' ),
+			array( '" onclick="alert(\'1\');"><span onclick=""></span><script>alert("1")</script>' ),
 		);
 	}
 
@@ -999,12 +1081,12 @@ HTML;
 
 		$examples['HTML tag opening inside attribute value'] = array(
 			'<pre id="<code" class="wp-block-code <code is poetry&gt;"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
-			'<pre foo="bar" id="<code" class="wp-block-code <code is poetry&gt; firstTag"><code class="secondTag">This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
+			'<pre foo="bar" id="<code" class="wp-block-code &lt;code is poetry&gt; firstTag"><code class="secondTag">This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
 		);
 
 		$examples['HTML tag brackets in attribute values and data markup'] = array(
 			'<pre id="<code-&gt;-block-&gt;" class="wp-block-code <code is poetry&gt;"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
-			'<pre foo="bar" id="<code-&gt;-block-&gt;" class="wp-block-code <code is poetry&gt; firstTag"><code class="secondTag">This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
+			'<pre foo="bar" id="<code-&gt;-block-&gt;" class="wp-block-code &lt;code is poetry&gt; firstTag"><code class="secondTag">This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
 		);
 
 		$examples['Single and double quotes in attribute value'] = array(
