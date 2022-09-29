@@ -85,7 +85,7 @@ const StylesPreview = ( { label, isFocused } ) => {
 			return [
 				...styles,
 				{
-					css: 'body{min-width: 0;padding: 0;border: none}',
+					css: 'body{min-width: 0;padding: 0;border: none;}',
 					isGlobalStyles: true,
 				},
 			];
