@@ -56,6 +56,10 @@ jobs:
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
+        strategy:
+            matrix:
+                php-version: ['7.2', '8.1']
+
         steps:
             - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
@@ -72,7 +76,7 @@ jobs:
 
             - name: Install WordPress
               run: |
-                  npm run wp-env start
+                  WP_ENV_PHP_VERSION=${{ matrix.php-version }} npm run wp-env start
 
             - name: Running lint check
               run: npm run lint:php
