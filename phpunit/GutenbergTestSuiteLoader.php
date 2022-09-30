@@ -13,6 +13,7 @@ use PHPUnit\Framework\TestCase;
 use PHPUnit\Util\FileLoader;
 use PHPUnit\Runner\TestSuiteLoader;
 
+use \Exception;
 use \ReflectionClass;
 use \ReflectionException;
 
