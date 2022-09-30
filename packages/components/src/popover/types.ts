@@ -139,6 +139,13 @@ export type PopoverProps = {
 	 */
 	shift?: boolean;
 
+	/**
+	 * Does the `Popover` update to the anchor's position on an animation frame.
+	 *
+	 * @default true
+	 */
+	updateOnAnimationFrame?: boolean;
+
 	// Deprecated props
 	/**
 	 * Prevent the popover from flipping and resizing when meeting the viewport

@@ -68,6 +68,7 @@ export default function DropZone( { paragraphElement, clientId } ) {
 			resize={ false }
 			className="wp-block-paragraph__drop-zone"
 			ref={ popoverRef }
+			updateOnAnimationFrame={ false }
 		>
 			{ isDragging ? (
 				<div

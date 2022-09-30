@@ -181,6 +181,7 @@ const UnforwardedPopover = (
 		flip = true,
 		resize = true,
 		shift = false,
+		updateOnAnimationFrame = true,
 
 		// Deprecated props
 		__unstableForcePosition,
@@ -380,7 +381,7 @@ const UnforwardedPopover = (
 		middleware,
 		whileElementsMounted: ( referenceParam, floatingParam, updateParam ) =>
 			autoUpdate( referenceParam, floatingParam, updateParam, {
-				animationFrame: true,
+				animationFrame: updateOnAnimationFrame,
 			} ),
 	} );
 
