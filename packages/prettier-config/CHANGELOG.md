@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Internal
+
+-   Fix doc for extending the prettier config in `.prettierrc` config file.
+-   Add step to extend the prettier config in `.prettierrc.js` config file.
+
 ## 2.1.0 (2022-09-21)
 
 ## 2.0.0 (2022-08-24)
