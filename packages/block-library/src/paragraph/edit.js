@@ -12,6 +12,7 @@ import {
 	ToolbarButton,
 	ToggleControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import {
 	AlignmentControl,
@@ -21,7 +22,10 @@ import {
 	useBlockProps,
 	useSetting,
 } from '@wordpress/block-editor';
-import { useMergeRefs } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	__experimentalUseDropZone as useDropZone,
+} from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
 
@@ -63,10 +67,20 @@ function ParagraphBlock( {
 	const { align, content, direction, dropCap, placeholder } = attributes;
 	const isDropCapFeatureEnabled = useSetting( 'typography.dropCap' );
 	const [ paragraphElement, setParagraphElement ] = useState( null );
+	const [ isDropZoneVisible, setIsDropZoneVisible ] = useState( false );
+	const dragEventsRef = useDropZone( {
+		onDragEnd() {
+			setIsDropZoneVisible( false );
+		},
+		onDragEnter() {
+			setIsDropZoneVisible( true );
+		},
+	} );
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [
 			useOnEnter( { clientId, content } ),
 			setParagraphElement,
+			dragEventsRef,
 		] ),
 		className: classnames( {
 			'has-drop-cap': hasDropCapDisabled( align ) ? false : dropCap,
@@ -130,12 +144,16 @@ function ParagraphBlock( {
 					</ToolsPanelItem>
 				</InspectorControls>
 			) }
-			{ ! content && (
-				<DropZone
-					clientId={ clientId }
-					paragraphElement={ paragraphElement }
-				/>
-			) }
+			<AnimatePresence>
+				{ ! content && isDropZoneVisible && (
+					<DropZone
+						key="empty-paragraph-drop-zone"
+						clientId={ clientId }
+						paragraphElement={ paragraphElement }
+						setIsDropZoneVisible={ setIsDropZoneVisible }
+					/>
+				) }
+			</AnimatePresence>
 			<RichText
 				identifier="content"
 				tagName="p"

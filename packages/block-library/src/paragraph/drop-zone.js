@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	__experimentalUseOnBlockDrop as useOnBlockDrop,
@@ -11,11 +10,7 @@ import {
 	__experimentalUseDropZone as useDropZone,
 	useReducedMotion,
 } from '@wordpress/compose';
-import {
-	Popover,
-	__unstableMotion as motion,
-	__unstableAnimatePresence as AnimatePresence,
-} from '@wordpress/components';
+import { Popover, __unstableMotion as motion } from '@wordpress/components';
 
 const animateVariants = {
 	hide: { opacity: 0, scaleY: 0.75 },
@@ -23,7 +18,11 @@ const animateVariants = {
 	exit: { opacity: 0, scaleY: 0.9 },
 };
 
-export default function DropZone( { paragraphElement, clientId } ) {
+export default function DropZone( {
+	paragraphElement,
+	clientId,
+	setIsDropZoneVisible,
+} ) {
 	const { rootClientId, blockIndex } = useSelect(
 		( select ) => {
 			const selectors = select( blockEditorStore );
@@ -37,23 +36,10 @@ export default function DropZone( { paragraphElement, clientId } ) {
 	const onBlockDrop = useOnBlockDrop( rootClientId, blockIndex, {
 		action: 'replace',
 	} );
-	const [ isDragging, setIsDragging ] = useState( false );
-	const [ isVisible, setIsVisible ] = useState( false );
-	const popoverRef = useDropZone( {
-		onDragStart: () => {
-			setIsDragging( true );
-		},
-		onDragEnd: () => {
-			setIsDragging( false );
-		},
-	} );
 	const dropZoneRef = useDropZone( {
 		onDrop: onBlockDrop,
-		onDragEnter: () => {
-			setIsVisible( true );
-		},
 		onDragLeave: () => {
-			setIsVisible( false );
+			setIsDropZoneVisible( false );
 		},
 	} );
 	const reducedMotion = useReducedMotion();
@@ -67,39 +53,23 @@ export default function DropZone( { paragraphElement, clientId } ) {
 			flip={ false }
 			resize={ false }
 			className="wp-block-paragraph__drop-zone"
-			ref={ popoverRef }
 		>
-			{ isDragging ? (
-				<div
-					className="wp-block-paragraph__drop-zone-backdrop"
-					ref={ dropZoneRef }
-					style={ {
-						width: paragraphElement?.offsetWidth,
-						height: paragraphElement?.offsetHeight,
-					} }
-				>
-					<AnimatePresence>
-						{ isVisible ? (
-							<motion.div
-								key="drop-zone-foreground"
-								data-testid="empty-paragraph-drop-zone"
-								initial={
-									reducedMotion
-										? animateVariants.show
-										: animateVariants.hide
-								}
-								animate={ animateVariants.show }
-								exit={
-									reducedMotion
-										? animateVariants.show
-										: animateVariants.exit
-								}
-								className="wp-block-paragraph__drop-zone-foreground"
-							/>
-						) : null }
-					</AnimatePresence>
-				</div>
-			) : null }
+			<motion.div
+				ref={ dropZoneRef }
+				style={ {
+					width: paragraphElement?.offsetWidth,
+					height: paragraphElement?.offsetHeight,
+				} }
+				data-testid="empty-paragraph-drop-zone"
+				initial={
+					reducedMotion ? animateVariants.show : animateVariants.hide
+				}
+				animate={ animateVariants.show }
+				exit={
+					reducedMotion ? animateVariants.show : animateVariants.exit
+				}
+				className="wp-block-paragraph__drop-zone-foreground"
+			/>
 		</Popover>
 	);
 }
