@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
 import BaseControl from '../base-control';
 import Button from '../button';
 import { space } from '../ui/utils/space';
-import { COLORS } from '../utils';
+import { COLORS, rtl } from '../utils';
 
 export const Container = styled.fieldset`
 	border: 0;
@@ -18,12 +18,14 @@ export const Container = styled.fieldset`
 `;
 
 export const HeaderLabel = styled( BaseControl.VisualLabel )`
+	display: inline-block;
 	margin-bottom: 0;
 `;
 
 export const HeaderHint = styled.span`
 	color: ${ COLORS.gray[ 700 ] };
-	margin-left: ${ space( 1 ) };
+	display: inline-block;
+	${ rtl( { marginLeft: space( 1 ) }, { marginRight: space( 1 ) } )() }
 `;
 
 // 280px is the sidebar width.
