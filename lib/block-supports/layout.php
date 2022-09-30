@@ -292,26 +292,23 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 }
 
 /**
- * Adds an identifying classname to the inner block wrapper.
+ * Indentifies inner block wrapper classnames.
  *
- * @param array $parsed_block A parsed block object.
- * @return array              The updated block object.
+ * @param array $inner_content An array of strings.
+ * @return string String of inner wrapper classnames.
  */
-function gutenberg_identify_inner_block_wrapper( $parsed_block ) {
+function gutenberg_identify_inner_block_wrapper_classnames( $inner_content ) {
 
-	if ( ! isset( $parsed_block['innerContent'][0] ) ) {
-		return $parsed_block;
+	if ( ! isset( $inner_content[0] ) ) {
+		return false;
 	}
 
-	$inner_class_position = strrpos( $parsed_block['innerContent'][0], 'class="' );
+	$matches = array();
 
-	if ( ! $inner_class_position ) {
-		return $parsed_block;
-	}
+	preg_match_all( '/class="[a-z\-\_\s]*/', $inner_content[0], $matches );
 
-	$parsed_block['innerContent'][0] = substr_replace( $parsed_block['innerContent'][0], 'class="is-inner-block-wrapper ', $inner_class_position, strlen( 'class="' ) );
+	return end( $matches[0] );
 
-	return $parsed_block;
 }
 
 /**
@@ -435,22 +432,16 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	}
 
-	/*
-	* Ideally we'll be able to attach this class to all inner block wrappers and
-	* we won't need the condition or the fallback.
-	*/
-	if ( strpos( $block_content, 'is-inner-block-wrapper' ) ) {
+	$inner_content_classnames = gutenberg_identify_inner_block_wrapper_classnames( $block['innerContent'] );
+
+	if ( $inner_content_classnames ) {
 		$content = preg_replace(
-			'/' . preg_quote( 'is-inner-block-wrapper', '/' ) . '/',
-			esc_attr( implode( ' ', $class_names ) ),
+			'/' . $inner_content_classnames . '/',
+			$inner_content_classnames . ' ' . esc_attr( implode( ' ', $class_names ) ),
 			$block_content,
 			1
 		);
 	} else {
-		/*
-		* This assumes the hook only applies to blocks with a single wrapper.
-		* A limitation of this hook is that nested inner blocks wrappers are not yet supported.
-		*/
 		$content = preg_replace(
 			'/' . preg_quote( 'class="', '/' ) . '/',
 			'class="' . esc_attr( implode( ' ', $class_names ) ) . ' ',
@@ -469,11 +460,6 @@ WP_Block_Supports::get_instance()->register(
 		'register_attribute' => 'gutenberg_register_layout_support',
 	)
 );
-
-if ( function_exists( 'wp_identify_inner_block_wrapper' ) ) {
-	remove_filter( 'render_block', 'wp_identify_inner_block_wrapper' );
-}
-add_filter( 'render_block_data', 'gutenberg_identify_inner_block_wrapper' );
 
 if ( function_exists( 'wp_render_layout_support_flag' ) ) {
 	remove_filter( 'render_block', 'wp_render_layout_support_flag' );
