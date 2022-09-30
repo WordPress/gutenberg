@@ -28,7 +28,7 @@ class WP_HTML_Tag_Processor_Test_WP extends WP_UnitTestCase {
 	 *
 	 * <code>
 	 *     $p = new WP_HTML_Tag_Processor( '<div class="header"></div>' );
-	 *     $p->next_tag();
+	 *     $p->next();
 	 *     $p->set_attribute('class', '" onclick="alert');
 	 *     echo $p;
 	 *     // <div class="" onclick="alert"></div>
@@ -47,7 +47,7 @@ class WP_HTML_Tag_Processor_Test_WP extends WP_UnitTestCase {
 	 */
 	public function test_set_attribute_prevents_xss( $value_to_set, $expected_result ) {
 		$p = new WP_HTML_Tag_Processor( '<div></div>' );
-		$p->next_tag();
+		$p->next();
 		$p->set_attribute( 'test', $value_to_set );
 
 		/*

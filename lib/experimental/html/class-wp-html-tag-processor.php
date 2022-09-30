@@ -42,7 +42,7 @@
  * Example:
  * ```php
  *     $tags = new WP_HTML_Tag_Processor( $html );
- *     if ( $tags->next( [ 'tag_name' => 'option' ] ) ) {
+ *     if ( $tags->next( [ 'tag' => 'option' ] ) ) {
  *         $tags->set_attribute( 'selected', true );
  *     }
  * ```
@@ -63,9 +63,9 @@
  * | Goal                                                      | Query                                                                      |
  * |-----------------------------------------------------------|----------------------------------------------------------------------------|
  * | Find any tag.                                             | `$tags->next();`                                                       |
- * | Find next image tag.                                      | `$tags->next( [ 'tag_name' => 'img' ] );`                              |
- * | Find next tag containing the `fullwidth` CSS class.       | `$tags->next( [ 'class_name' => 'fullwidth' ] );`                      |
- * | Find next image tag containing the `fullwidth` CSS class. | `$tags->next( [ 'tag_name' => 'img', 'class_name' => 'fullwidth' ] );` |
+ * | Find next image tag.                                      | `$tags->next( [ 'tag' => 'img' ] );`                              |
+ * | Find next tag containing the `fullwidth` CSS class.       | `$tags->next( [ 'class' => 'fullwidth' ] );`                      |
+ * | Find next image tag containing the `fullwidth` CSS class. | `$tags->next( [ 'tag' => 'img', 'class' => 'fullwidth' ] );` |
  *
  * If a tag was found meeting your criteria then `next()`
  * will return `true` and you can proceed to modify it. If it
@@ -203,7 +203,7 @@ class WP_HTML_Tag_Processor {
 	 * @since 6.2.0
 	 * @var string|null
 	 */
-	private $sought_tag_name;
+	private $sought_tag;
 
 	/**
 	 * The CSS class name this processor currently scans for.
@@ -211,7 +211,7 @@ class WP_HTML_Tag_Processor {
 	 * @since 6.2.0
 	 * @var string|null
 	 */
-	private $sought_class_name;
+	private $sought_class;
 
 	/**
 	 * The match offset this processor currently scans for.
@@ -259,7 +259,7 @@ class WP_HTML_Tag_Processor {
 	 * @since 6.2.0
 	 * @var ?int
 	 */
-	private $tag_name_starts_at;
+	private $tag_starts_at;
 
 	/**
 	 * Byte length of current tag name.
@@ -274,7 +274,7 @@ class WP_HTML_Tag_Processor {
 	 * @since 6.2.0
 	 * @var ?int
 	 */
-	private $tag_name_length;
+	private $tag_length;
 
 	/**
 	 * Lazily-built index of attributes found within an HTML tag, keyed by the attribute name.
@@ -321,8 +321,8 @@ class WP_HTML_Tag_Processor {
 	 *     // Add the `WP-block-group` class, remove the `WP-group` class.
 	 *     $class_changes = [
 	 *         // Indexed by a comparable class name
-	 *         'wp-block-group' => new WP_Class_Name_Operation( 'WP-block-group', WP_Class_Name_Operation::ADD ),
-	 *         'wp-group'       => new WP_Class_Name_Operation( 'WP-group', WP_Class_Name_Operation::REMOVE )
+	 *         'wp-block-group' => new WP_class_Operation( 'WP-block-group', WP_class_Operation::ADD ),
+	 *         'wp-group'       => new WP_class_Operation( 'WP-group', WP_class_Operation::REMOVE )
 	 *     ];
 	 * </code>
 	 *
@@ -384,11 +384,11 @@ class WP_HTML_Tag_Processor {
 	 * @param array|string $query {
 	 *     Which tag name to find, having which class, etc.
 	 *
-	 *     @type string|null $tag_name     Which tag to find, or `null` for "any tag."
+	 *     @type string|null $tag     Which tag to find, or `null` for "any tag."
 	 *     @type int|null    $match_offset Find the Nth tag matching all search criteria.
 	 *                                     0 for "first" tag, 2 for "third," etc.
 	 *                                     Defaults to first tag.
-	 *     @type string|null $class_name   Tag must contain this whole class name to match.
+	 *     @type string|null $class   Tag must contain this whole class name to match.
 	 * }
 	 * @return boolean Whether a tag was matched.
 	 */
@@ -415,14 +415,14 @@ class WP_HTML_Tag_Processor {
 			}
 
 			// Avoid copying the tag name string when possible.
-			$t = $this->html[ $this->tag_name_starts_at ];
+			$t = $this->html[ $this->tag_starts_at ];
 			if ( 's' === $t || 'S' === $t || 't' === $t || 'T' === $t ) {
-				$tag_name = $this->get_tag();
+				$tag = $this->get_tag();
 
-				if ( 'SCRIPT' === $tag_name ) {
+				if ( 'SCRIPT' === $tag ) {
 					$this->skip_script_data();
-				} elseif ( 'TEXTAREA' === $tag_name || 'TITLE' === $tag_name ) {
-					$this->skip_rcdata( $tag_name );
+				} elseif ( 'TEXTAREA' === $tag || 'TITLE' === $tag ) {
+					$this->skip_rcdata( $tag );
 				}
 			}
 		} while ( $already_found < $this->sought_match_offset );
@@ -435,13 +435,13 @@ class WP_HTML_Tag_Processor {
 	 * tag closer is found.
 	 *
 	 * @see https://html.spec.whatwg.org/multipage/parsing.html#rcdata-state
-	 * @param string $tag_name – the lowercase tag name which will close the RCDATA region.
+	 * @param string $tag – the lowercase tag name which will close the RCDATA region.
 	 * @since 6.2.0
 	 */
-	private function skip_rcdata( $tag_name ) {
+	private function skip_rcdata( $tag ) {
 		$html       = $this->html;
 		$doc_length = strlen( $html );
-		$tag_length = strlen( $tag_name );
+		$tag_length = strlen( $tag );
 
 		$at = $this->parsed_bytes;
 
@@ -464,7 +464,7 @@ class WP_HTML_Tag_Processor {
 			 * will never be a match.
 			 */
 			for ( $i = 0; $i < $tag_length; $i++ ) {
-				$tag_char  = $tag_name[ $i ];
+				$tag_char  = $tag[ $i ];
 				$html_char = $html[ $at + $i ];
 
 				if ( $html_char !== $tag_char && strtoupper( $html_char ) !== $tag_char ) {
@@ -644,12 +644,12 @@ class WP_HTML_Tag_Processor {
 			 * * https://html.spec.whatwg.org/multipage/parsing.html#data-state
 			 * * https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
 			 */
-			$tag_name_prefix_length = strspn( $html, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', $at + 1 );
-			if ( $tag_name_prefix_length > 0 ) {
+			$tag_prefix_length = strspn( $html, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', $at + 1 );
+			if ( $tag_prefix_length > 0 ) {
 				$at++;
-				$this->tag_name_length    = $tag_name_prefix_length + strcspn( $html, " \t\f\r\n/>", $at + $tag_name_prefix_length );
-				$this->tag_name_starts_at = $at;
-				$this->parsed_bytes       = $at + $this->tag_name_length;
+				$this->tag_length    = $tag_prefix_length + strcspn( $html, " \t\f\r\n/>", $at + $tag_prefix_length );
+				$this->tag_starts_at = $at;
+				$this->parsed_bytes       = $at + $this->tag_length;
 				return true;
 			}
 
@@ -841,10 +841,10 @@ class WP_HTML_Tag_Processor {
 	 * @return void
 	 */
 	private function after_tag() {
-		$this->class_name_updates_to_attributes_updates();
+		$this->class_updates_to_attributes_updates();
 		$this->apply_attributes_updates();
-		$this->tag_name_starts_at = null;
-		$this->tag_name_length    = null;
+		$this->tag_starts_at = null;
+		$this->tag_length    = null;
 		$this->attributes         = array();
 	}
 
@@ -861,7 +861,7 @@ class WP_HTML_Tag_Processor {
 	 * @see $classname_updates
 	 * @see $attribute_updates
 	 */
-	private function class_name_updates_to_attributes_updates() {
+	private function class_updates_to_attributes_updates() {
 		if ( count( $this->classname_updates ) === 0 || isset( $this->attribute_updates['class'] ) ) {
 			$this->classname_updates = array();
 			return;
@@ -1026,7 +1026,7 @@ class WP_HTML_Tag_Processor {
 	 * Example:
 	 * <code>
 	 *     $p = new WP_HTML_Tag_Processor( '<div enabled class="test" data-test-id="14">Test</div>' );
-	 *     $p->next( [ 'class_name' => 'test' ] ) === true;
+	 *     $p->next( [ 'class' => 'test' ] ) === true;
 	 *     $p->get_attribute( 'data-test-id' ) === '14';
 	 *     $p->get_attribute( 'enabled' ) === true;
 	 *     $p->get_attribute( 'aria-label' ) === null;
@@ -1042,7 +1042,7 @@ class WP_HTML_Tag_Processor {
 	 *                          Boolean attributes return `true`.
 	 */
 	public function get_attribute( $name ) {
-		if ( null === $this->tag_name_starts_at ) {
+		if ( null === $this->tag_starts_at ) {
 			return null;
 		}
 
@@ -1080,13 +1080,13 @@ class WP_HTML_Tag_Processor {
 	 * @return string|null Name of current tag in input HTML, or `null` if none currently open.
 	 */
 	public function get_tag() {
-		if ( null === $this->tag_name_starts_at ) {
+		if ( null === $this->tag_starts_at ) {
 			return null;
 		}
 
-		$tag_name = substr( $this->html, $this->tag_name_starts_at, $this->tag_name_length );
+		$tag = substr( $this->html, $this->tag_starts_at, $this->tag_length );
 
-		return strtoupper( $tag_name );
+		return strtoupper( $tag );
 	}
 
 	/**
@@ -1104,7 +1104,7 @@ class WP_HTML_Tag_Processor {
 	 * @param string|boolean $value The new attribute value.
 	 */
 	public function set_attribute( $name, $value ) {
-		if ( null === $this->tag_name_starts_at ) {
+		if ( null === $this->tag_starts_at ) {
 			return;
 		}
 
@@ -1156,8 +1156,8 @@ class WP_HTML_Tag_Processor {
 			 *    Result: <div id="new"/>
 			 */
 			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
-				$this->tag_name_starts_at + $this->tag_name_length,
-				$this->tag_name_starts_at + $this->tag_name_length,
+				$this->tag_starts_at + $this->tag_length,
+				$this->tag_starts_at + $this->tag_length,
 				' ' . $updated_attribute
 			);
 		}
@@ -1198,11 +1198,11 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * @since 6.2.0
 	 *
-	 * @param string $class_name The class name to add.
+	 * @param string $class The class name to add.
 	 */
-	public function add_class( $class_name ) {
-		if ( null !== $this->tag_name_starts_at ) {
-			$this->classname_updates[ $class_name ] = self::ADD_CLASS;
+	public function add_class( $class ) {
+		if ( null !== $this->tag_starts_at ) {
+			$this->classname_updates[ $class ] = self::ADD_CLASS;
 		}
 	}
 
@@ -1211,11 +1211,11 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * @since 6.2.0
 	 *
-	 * @param string $class_name The class name to remove.
+	 * @param string $class The class name to remove.
 	 */
-	public function remove_class( $class_name ) {
-		if ( null !== $this->tag_name_starts_at ) {
-			$this->classname_updates[ $class_name ] = self::REMOVE_CLASS;
+	public function remove_class( $class ) {
+		if ( null !== $this->tag_starts_at ) {
+			$this->classname_updates[ $class ] = self::REMOVE_CLASS;
 		}
 	}
 
@@ -1243,26 +1243,26 @@ class WP_HTML_Tag_Processor {
 		 */
 
 		// Find tag name's end in the updated markup.
-		$markup_updated_up_to_a_tag_name_end = $this->updated_html . substr( $this->html, $this->updated_bytes, $this->tag_name_starts_at + $this->tag_name_length - $this->updated_bytes );
-		$updated_tag_name_ends_at            = strlen( $markup_updated_up_to_a_tag_name_end );
-		$updated_tag_name_starts_at          = $updated_tag_name_ends_at - $this->tag_name_length;
+		$markup_updated_up_to_a_tag_end = $this->updated_html . substr( $this->html, $this->updated_bytes, $this->tag_starts_at + $this->tag_length - $this->updated_bytes );
+		$updated_tag_ends_at            = strlen( $markup_updated_up_to_a_tag_end );
+		$updated_tag_starts_at          = $updated_tag_ends_at - $this->tag_length;
 
 		// Apply attributes updates.
-		$this->updated_html  = $markup_updated_up_to_a_tag_name_end;
-		$this->updated_bytes = $this->tag_name_starts_at + $this->tag_name_length;
-		$this->class_name_updates_to_attributes_updates();
+		$this->updated_html  = $markup_updated_up_to_a_tag_end;
+		$this->updated_bytes = $this->tag_starts_at + $this->tag_length;
+		$this->class_updates_to_attributes_updates();
 		$this->apply_attributes_updates();
 
 		// Replace $this->html with the updated markup.
 		$this->html = $this->updated_html . substr( $this->html, $this->updated_bytes );
 
 		// Rewind this processor to the tag name's end.
-		$this->tag_name_starts_at = $updated_tag_name_starts_at;
-		$this->parsed_bytes       = $updated_tag_name_ends_at;
+		$this->tag_starts_at = $updated_tag_starts_at;
+		$this->parsed_bytes       = $updated_tag_ends_at;
 
 		// Restore the previous version of the updated_html as we are not finished with the current_tag yet.
-		$this->updated_html  = $markup_updated_up_to_a_tag_name_end;
-		$this->updated_bytes = $updated_tag_name_ends_at;
+		$this->updated_html  = $markup_updated_up_to_a_tag_end;
+		$this->updated_bytes = $updated_tag_ends_at;
 
 		// Parse the attributes in the updated markup.
 		$this->attributes = array();
@@ -1279,8 +1279,8 @@ class WP_HTML_Tag_Processor {
 	 * @param array $query {
 	 *     Which tag name to find, having which class.
 	 *
-	 *     @type string|null $tag_name     Which tag to find, or `null` for "any tag."
-	 *     @type string|null $class_name   Tag must contain this class name to match.
+	 *     @type string|null $tag     Which tag to find, or `null` for "any tag."
+	 *     @type string|null $class   Tag must contain this class name to match.
 	 * }
 	 */
 	private function parse_query( $query ) {
@@ -1291,16 +1291,16 @@ class WP_HTML_Tag_Processor {
 		}
 
 		$this->last_query          = $query;
-		$this->sought_tag_name     = null;
-		$this->sought_class_name   = null;
+		$this->sought_tag     = null;
+		$this->sought_class   = null;
 		$this->sought_match_offset = 1;
 
 		if ( isset( $query['tag'] ) && is_string( $query['tag'] ) ) {
-			$this->sought_tag_name = $query['tag'];
+			$this->sought_tag = $query['tag'];
 		}
 
 		if ( isset( $query['class'] ) && is_string( $query['class'] ) ) {
-			$this->sought_class_name = $query['class'];
+			$this->sought_class = $query['class'];
 		}
 
 		if ( isset( $query['match_offset'] ) && is_int( $query['match_offset'] ) && 0 < $query['match_offset'] ) {
@@ -1318,12 +1318,12 @@ class WP_HTML_Tag_Processor {
 	 */
 	private function matches() {
 		// Do we match a case-insensitive HTML tag name?
-		if ( null !== $this->sought_tag_name ) {
+		if ( null !== $this->sought_tag ) {
 			/*
 			 * String (byte) length lookup is fast. If they aren't the
 			 * same length then they can't be the same string values.
 			 */
-			if ( strlen( $this->sought_tag_name ) !== $this->tag_name_length ) {
+			if ( strlen( $this->sought_tag ) !== $this->tag_length ) {
 				return false;
 			}
 
@@ -1335,9 +1335,9 @@ class WP_HTML_Tag_Processor {
 			 * most of the time this runs we shouldn't expect to
 			 * actually run the case-folding comparison.
 			 */
-			for ( $i = 0; $i < $this->tag_name_length; $i++ ) {
-				$html_char = $this->html[ $this->tag_name_starts_at + $i ];
-				$tag_char  = $this->sought_tag_name[ $i ];
+			for ( $i = 0; $i < $this->tag_length; $i++ ) {
+				$html_char = $this->html[ $this->tag_starts_at + $i ];
+				$tag_char  = $this->sought_tag[ $i ];
 
 				if ( $html_char !== $tag_char && strtoupper( $html_char ) !== $tag_char ) {
 					return false;
@@ -1345,14 +1345,14 @@ class WP_HTML_Tag_Processor {
 			}
 		}
 
-		$needs_class_name = null !== $this->sought_class_name;
+		$needs_class = null !== $this->sought_class;
 
-		if ( $needs_class_name && ! isset( $this->attributes['class'] ) ) {
+		if ( $needs_class && ! isset( $this->attributes['class'] ) ) {
 			return false;
 		}
 
 		// Do we match a byte-for-byte (case-sensitive and encoding-form-sensitive) class name?
-		if ( $needs_class_name ) {
+		if ( $needs_class ) {
 			$class_start = $this->attributes['class']->value_starts_at;
 			$class_end   = $class_start + $this->attributes['class']->value_length;
 			$class_at    = $class_start;
@@ -1370,7 +1370,7 @@ class WP_HTML_Tag_Processor {
 			 */
 			while (
 				// phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
-				false !== ( $class_at = strpos( $this->html, $this->sought_class_name, $class_at ) ) &&
+				false !== ( $class_at = strpos( $this->html, $this->sought_class, $class_at ) ) &&
 				$class_at < $class_end
 			) {
 				/*
@@ -1382,7 +1382,7 @@ class WP_HTML_Tag_Processor {
 					$character = $this->html[ $class_at - 1 ];
 
 					if ( ' ' !== $character && "\t" !== $character && "\f" !== $character && "\r" !== $character && "\n" !== $character ) {
-						$class_at += strlen( $this->sought_class_name );
+						$class_at += strlen( $this->sought_class );
 						continue;
 					}
 				}
@@ -1392,11 +1392,11 @@ class WP_HTML_Tag_Processor {
 				 * can end at the very end of the string value, otherwise we have
 				 * to end at a place where the next character is whitespace.
 				 */
-				if ( $class_at + strlen( $this->sought_class_name ) < $class_end ) {
-					$character = $this->html[ $class_at + strlen( $this->sought_class_name ) ];
+				if ( $class_at + strlen( $this->sought_class ) < $class_end ) {
+					$character = $this->html[ $class_at + strlen( $this->sought_class ) ];
 
 					if ( ' ' !== $character && "\t" !== $character && "\f" !== $character && "\r" !== $character && "\n" !== $character ) {
-						$class_at += strlen( $this->sought_class_name );
+						$class_at += strlen( $this->sought_class );
 						continue;
 					}
 				}
