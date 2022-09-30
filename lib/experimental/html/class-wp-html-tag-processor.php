@@ -60,11 +60,11 @@
  *     $tags->next();
  * ```
  *
- * | Goal                                                      | Query                                                                      |
- * |-----------------------------------------------------------|----------------------------------------------------------------------------|
- * | Find any tag.                                             | `$tags->next();`                                                       |
- * | Find next image tag.                                      | `$tags->next( [ 'tag' => 'img' ] );`                              |
- * | Find next tag containing the `fullwidth` CSS class.       | `$tags->next( [ 'class' => 'fullwidth' ] );`                      |
+ * | Goal                                                      | Query                                                        |
+ * |-----------------------------------------------------------|--------------------------------------------------------------|
+ * | Find any tag.                                             | `$tags->next();`                                             |
+ * | Find next image tag.                                      | `$tags->next( [ 'tag' => 'img' ] );`                         |
+ * | Find next tag containing the `fullwidth` CSS class.       | `$tags->next( [ 'class' => 'fullwidth' ] );`                 |
  * | Find next image tag containing the `fullwidth` CSS class. | `$tags->next( [ 'tag' => 'img', 'class' => 'fullwidth' ] );` |
  *
  * If a tag was found meeting your criteria then `next()`
