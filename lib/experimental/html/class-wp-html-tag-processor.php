@@ -1223,7 +1223,7 @@ class WP_HTML_Tag_Processor {
 	 * Returns the string representation of the HTML Tag Processor.
 	 *
 	 * @since 6.2.0
-	 * @see getUpdatedHTML
+	 * @see get_updated_html
 	 *
 	 * @return string The processed HTML.
 	 */
