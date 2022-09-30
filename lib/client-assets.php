@@ -510,7 +510,7 @@ function gutenberg_enqueue_stored_styles( $options = array() ) {
 	 * this function should still honour any styles stored using the Core Style Engine store.
 	 */
 	if ( class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
-		$additional_stores = array_merge( $additional_stores, WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_stores() );
+		$additional_stores = array_merge( $additional_stores, WP_Style_Engine_CSS_Rules_Store::get_stores() );
 	}
 
 	foreach ( array_keys( $additional_stores ) as $store_name ) {
