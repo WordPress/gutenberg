@@ -23,65 +23,74 @@ import { createRootFragment, idle } from './utils';
  * Directives
  */
 // wp-log
-directive( 'log', ( { log } ) => {
-	useEffect( () => {
-		// eslint-disable-next-line no-console
-		console.log( log );
-	}, [ log ] );
+directive( 'log', ( { directives: { log } } ) => {
+	Object.values( log ).forEach( ( expression ) => {
+		useEffect( () => {
+			// eslint-disable-next-line no-console
+			console.log( expression );
+		}, [ expression ] );
+	} );
 } );
 
 // wp-context
 const ctx = createContext( [ {}, () => ( {} ) ] );
-directive( 'context', ( { context: initialContext }, { children } ) => {
-	const [ context, setContext ] = useState( initialContext );
+directive( 'context', ( { directives: { context }, props: { children } } ) => {
+	const [ contextValue, setContext ] = useState( context.default );
 	const setMergedContext = ( newContext ) => {
-		setContext( { ...context, ...newContext } );
+		setContext( { ...contextValue, ...newContext } );
 	};
 	return (
-		<ctx.Provider value={ [ context, setMergedContext ] }>
+		<ctx.Provider value={ [ contextValue, setMergedContext ] }>
 			{ children }
 		</ctx.Provider>
 	);
 } );
 
 // wp-effect
-directive( 'effect', ( { effect } ) => {
+directive( 'effect', ( { directives: { effect } } ) => {
 	const [ context, setContext ] = useContext( ctx );
-	useEffect( () => {
-		const cb = eval( `(${ effect })` );
-		cb( { context, setContext } );
+	Object.values( effect ).forEach( ( expression ) => {
+		useEffect( () => {
+			const cb = eval( `(${ expression })` );
+			cb( { context, setContext } );
+		} );
 	} );
 } );
 
 // wp-init
-directive( 'init', ( { init }, _, { ref } ) => {
+directive( 'init', ( { directives: { init }, element } ) => {
 	const [ context, setContext ] = useContext( ctx );
-	useEffect( () => {
-		const cb = eval( `(${ init })` );
-		cb( { context, setContext, ref: ref.current } );
-	}, [] );
+	Object.values( init ).forEach( ( expression ) => {
+		useEffect( () => {
+			const cb = eval( `(${ expression })` );
+			cb( { context, setContext, ref: element.ref.current } );
+		}, [] );
+	} );
 } );
 
 // wp-on:[event]
-directive( 'on', ( { on: { suffix, value } }, _, { element } ) => {
+directive( 'on', ( { directives: { on }, element } ) => {
 	const [ context, setContext ] = useContext( ctx );
-
-	element.props[ `on${ suffix }` ] = ( event ) => {
-		const cb = eval( `(${ value })` );
-		cb( { context, setContext, event } );
-	};
+	Object.entries( on ).forEach( ( [ name, expression ] ) => {
+		element.props[ `on${ name }` ] = ( event ) => {
+			const cb = eval( `(${ expression })` );
+			cb( { context, setContext, event } );
+		};
+	} );
 } );
 
 // wp-class:[event]
-directive( 'class', ( { class: { suffix, value } }, _, { element } ) => {
+directive( 'class', ( { directives: { class: className }, element } ) => {
 	const [ context, setContext ] = useContext( ctx );
-
-	const cb = eval( `(${ value })` );
-	const result = cb( { context, setContext } );
-
-	if ( ! result ) element.props.class.replace( suffix, '' );
-	else if ( ! element.props.class.includes( suffix ) )
-		element.props.class += ` ${ suffix }`;
+	Object.keys( className )
+		.filter( ( n ) => n !== 'default' )
+		.forEach( ( name ) => {
+			const cb = eval( `(${ className[ name ] })` );
+			const result = cb( { context, setContext } );
+			if ( ! result ) element.props.class.replace( name, '' );
+			else if ( ! element.props.class.includes( name ) )
+				element.props.class += ` ${ name }`;
+		} );
 } );
 
 /**

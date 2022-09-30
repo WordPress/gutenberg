@@ -7,7 +7,7 @@ import { h } from 'preact';
 export default function toVdom( node ) {
 	const props = {};
 	const attributes = node.attributes;
-	const wpDirectives = { initialRef: node }; // Pass down original static node.
+	const wpDirectives = {};
 	let hasWpDirectives = false;
 
 	if ( node.nodeType === 3 ) return node.data;
@@ -22,7 +22,9 @@ export default function toVdom( node ) {
 			try {
 				val = JSON.parse( val );
 			} catch ( e ) {}
-			wpDirectives[ rename( name ) ] = value( name, val );
+			const [ , prefix, suffix ] = /wp-([^:]+):?(.*)$/.exec( name );
+			wpDirectives[ prefix ] = wpDirectives[ prefix ] || {};
+			wpDirectives[ prefix ][ suffix || 'default' ] = val;
 		} else {
 			props[ name ] = attributes[ i ].value;
 		}
@@ -38,23 +40,3 @@ export default function toVdom( node ) {
 
 // Filter existing items.
 const exists = ( x ) => x;
-
-// Rename WordPress Directives from:
-// - `wp-some-directive` to `someDirective`.
-// - `wp-some-prefix:some-directive` to `somePrefix`.
-export const rename = ( name ) =>
-	name
-		.toLowerCase()
-		.replace( /^wp-/, '' )
-		.replace( /:.*/, '' )
-		.replace( /-(.)/g, ( _, chr ) => chr.toUpperCase() );
-
-// Add some support for suffixes and modifiers. See the tests file.
-export const value = ( name, val ) => {
-	if ( ! name.includes( ':' ) ) return val;
-	return {
-		name: rename( name ),
-		suffix: name.substring( name.indexOf( ':' ) + 1 ),
-		value: val,
-	};
-};

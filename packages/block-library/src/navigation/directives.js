@@ -16,12 +16,10 @@ const WpDirective = ( { type, wp, props: originalProps } ) => {
 	const ref = useRef( null );
 	const element = h( type, { ...originalProps, ref, _wrapped: true } );
 	const props = { ...originalProps, children: element };
+	const directiveProps = { directives: wp, props, element };
 
 	for ( const d in wp ) {
-		const wrapper = directives[ d ]?.( wp, props, {
-			ref,
-			element,
-		} );
+		const wrapper = directives[ d ]?.( directiveProps );
 		if ( wrapper !== undefined ) props.children = wrapper;
 	}
 
