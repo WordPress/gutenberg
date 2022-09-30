@@ -42,14 +42,14 @@
  * Example:
  * ```php
  *     $tags = new WP_HTML_Tag_Processor( $html );
- *     if ( $tags->next_tag( [ 'tag_name' => 'option' ] ) ) {
+ *     if ( $tags->next( [ 'tag_name' => 'option' ] ) ) {
  *         $tags->set_attribute( 'selected', true );
  *     }
  * ```
  *
  * ### Finding tags
  *
- * The `next_tag()` function moves the internal cursor through
+ * The `next()` function moves the internal cursor through
  * your input HTML document until it finds a tag meeting any of
  * the supplied restrictions in the optional query argument. If
  * no argument is provided then it will find the next HTML tag,
@@ -57,17 +57,17 @@
  *
  * If you want to _find whatever the next tag is_:
  * ```php
- *     $tags->next_tag();
+ *     $tags->next();
  * ```
  *
  * | Goal                                                      | Query                                                                      |
  * |-----------------------------------------------------------|----------------------------------------------------------------------------|
- * | Find any tag.                                             | `$tags->next_tag();`                                                       |
- * | Find next image tag.                                      | `$tags->next_tag( [ 'tag_name' => 'img' ] );`                              |
- * | Find next tag containing the `fullwidth` CSS class.       | `$tags->next_tag( [ 'class_name' => 'fullwidth' ] );`                      |
- * | Find next image tag containing the `fullwidth` CSS class. | `$tags->next_tag( [ 'tag_name' => 'img', 'class_name' => 'fullwidth' ] );` |
+ * | Find any tag.                                             | `$tags->next();`                                                       |
+ * | Find next image tag.                                      | `$tags->next( [ 'tag_name' => 'img' ] );`                              |
+ * | Find next tag containing the `fullwidth` CSS class.       | `$tags->next( [ 'class_name' => 'fullwidth' ] );`                      |
+ * | Find next image tag containing the `fullwidth` CSS class. | `$tags->next( [ 'tag_name' => 'img', 'class_name' => 'fullwidth' ] );` |
  *
- * If a tag was found meeting your criteria then `next_tag()`
+ * If a tag was found meeting your criteria then `next()`
  * will return `true` and you can proceed to modify it. If it
  * returns `false`, however, it failed to find the tag and
  * moved the cursor to the end of the file.
@@ -88,7 +88,7 @@
  * ```php
  *     // Paint up to the first five DIV or SPAN tags marked with the "jazzy" style.
  *     $remaining_count = 5;
- *     while ( $remaining_count > 0 && $tags->next_tag() ) {
+ *     while ( $remaining_count > 0 && $tags->next() ) {
  *         if (
  *              ( 'DIV' === $tags->get_tag() || 'SPAN' === $tags->get_tag() ) &&
  *              'jazzy' === $tags->get_attribute( 'data-style' )
@@ -115,7 +115,7 @@
  *
  * Example:
  * ```php
- *     if ( $tags->next_tag( [ 'class' => 'wp-group-block' ] ) ) {
+ *     if ( $tags->next( [ 'class' => 'wp-group-block' ] ) ) {
  *         $tags->set_attribute( 'title', 'This groups the contained content.' );
  *         $tags->remove_attribute( 'data-test-id' );
  *     }
@@ -190,7 +190,7 @@ class WP_HTML_Tag_Processor {
 	private $html;
 
 	/**
-	 * The last query passed to next_tag().
+	 * The last query passed to next().
 	 *
 	 * @since 6.2.0
 	 * @var array|null
@@ -392,7 +392,7 @@ class WP_HTML_Tag_Processor {
 	 * }
 	 * @return boolean Whether a tag was matched.
 	 */
-	public function next_tag( $query = null ) {
+	public function next( $query = null ) {
 		$this->parse_query( $query );
 		$already_found = 0;
 
@@ -402,7 +402,7 @@ class WP_HTML_Tag_Processor {
 			 * lead us to skip over other tags and lose track of our place. So we need to search for
 			 * _every_ tag and then check after we find one if it's the one we are looking for.
 			 */
-			if ( false === $this->parse_next_tag() ) {
+			if ( false === $this->parse_next() ) {
 				$this->parsed_bytes = strlen( $this->html );
 
 				return false;
@@ -620,7 +620,7 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * @since 6.2.0
 	 */
-	private function parse_next_tag() {
+	private function parse_next() {
 		$this->after_tag();
 
 		$html = $this->html;
@@ -1027,12 +1027,12 @@ class WP_HTML_Tag_Processor {
 	 * Example:
 	 * <code>
 	 *     $p = new WP_HTML_Tag_Processor( '<div enabled class="test" data-test-id="14">Test</div>' );
-	 *     $p->next_tag( [ 'class_name' => 'test' ] ) === true;
+	 *     $p->next( [ 'class_name' => 'test' ] ) === true;
 	 *     $p->get_attribute( 'data-test-id' ) === '14';
 	 *     $p->get_attribute( 'enabled' ) === true;
 	 *     $p->get_attribute( 'aria-label' ) === null;
 	 *
-	 *     $p->next_tag( [] ) === false;
+	 *     $p->next( [] ) === false;
 	 *     $p->get_attribute( 'class' ) === null;
 	 * </code>
 	 *
@@ -1069,10 +1069,10 @@ class WP_HTML_Tag_Processor {
 	 * Example:
 	 * <code>
 	 *     $p = new WP_HTML_Tag_Processor( '<DIV CLASS="test">Test</DIV>' );
-	 *     $p->next_tag( [] ) === true;
+	 *     $p->next( [] ) === true;
 	 *     $p->get_tag() === 'DIV';
 	 *
-	 *     $p->next_tag( [] ) === false;
+	 *     $p->next( [] ) === false;
 	 *     $p->get_tag() === null;
 	 * </code>
 	 *
@@ -1333,7 +1333,7 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * @since 6.2.0
 	 *
-	 * @param array|string $query {
+	 * @param array $query {
 	 *     Which tag name to find, having which class.
 	 *
 	 *     @type string|null $tag_name     Which tag to find, or `null` for "any tag."
@@ -1341,8 +1341,10 @@ class WP_HTML_Tag_Processor {
 	 * }
 	 */
 	private function parse_query( $query ) {
-		if ( null !== $query && $query === $this->last_query ) {
-			return;
+		if ( null !== $query ) {
+			if ( ! is_array( $query ) || $query === $this->last_query ) {
+				return;
+			}
 		}
 
 		$this->last_query          = $query;
@@ -1350,23 +1352,12 @@ class WP_HTML_Tag_Processor {
 		$this->sought_class_name   = null;
 		$this->sought_match_offset = 1;
 
-		// A single string value means "find the tag of this name".
-		if ( is_string( $query ) ) {
-			$this->sought_tag_name = $query;
-			return;
+		if ( isset( $query['tag'] ) && is_string( $query['tag'] ) ) {
+			$this->sought_tag_name = $query['tag'];
 		}
 
-		// If not using the string interface we have to pass an associative array.
-		if ( ! is_array( $query ) ) {
-			return;
-		}
-
-		if ( isset( $query['tag_name'] ) && is_string( $query['tag_name'] ) ) {
-			$this->sought_tag_name = $query['tag_name'];
-		}
-
-		if ( isset( $query['class_name'] ) && is_string( $query['class_name'] ) ) {
-			$this->sought_class_name = $query['class_name'];
+		if ( isset( $query['class'] ) && is_string( $query['class'] ) ) {
+			$this->sought_class_name = $query['class'];
 		}
 
 		if ( isset( $query['match_offset'] ) && is_int( $query['match_offset'] ) && 0 < $query['match_offset'] ) {
