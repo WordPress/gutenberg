@@ -5,7 +5,7 @@
  * WordPress libraries as follows:
  *
  * ```
- * ./vendor/bin/phpunit --no-configuration ./phpunit/html/wp-html-tag-processor-test.php
+ * ./vendor/bin/phpunit --loader phpunit\\GutenbergTestSuiteLoader --no-configuration ./phpunit/html/wp-html-tag-processor-test.php
  * ```
  *
  * There might be minor discrepancies between the command above and a full
