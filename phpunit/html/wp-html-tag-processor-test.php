@@ -1,15 +1,15 @@
 <?php
 /**
  * Unit tests covering WP_HTML_Tag_Processor functionality.
- * This file takes about 100ms to run because it does not load
- * any WordPress libraries:
+ * This file can be run for rapid development without loading any
+ * WordPress libraries as follows:
  *
  * ```
  * ./vendor/bin/phpunit --no-configuration ./phpunit/html/wp-html-tag-processor-test.php
  * ```
  *
- * Put all new WP_HTML_Tag_Processor tests here, and only add new cases to
- * wp-html-tag-processor-test-wp.php when they cannot run without WordPress.
+ * There might be minor discrepancies between the command above and a full
+ * CI run with WordPress loaded – the latter is always right.
  *
  * @package WordPress
  * @subpackage HTML
@@ -277,10 +277,10 @@ class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
 	 * @dataProvider data_set_attribute_escapable_values
 	 * @covers set_attribute
 	 */
-	public function test_set_attribute_prevents_xss( $attribute_value ) {
+	public function test_set_attribute_prevents_xss( $value_to_set, $expected_result ) {
 		$p = new WP_HTML_Tag_Processor( '<div></div>' );
 		$p->next_tag();
-		$p->set_attribute( 'test', $attribute_value );
+		$p->set_attribute( 'test', $value_to_set );
 
 		/*
 		 * Testing the escaping is hard using tools that properly parse
@@ -297,7 +297,7 @@ class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
 		preg_match( '~^<div test=(.*)></div>$~', (string) $p, $match );
 		list( , $actual_value ) = $match;
 
-		$this->assertEquals( $actual_value, '"' . esc_attr( $attribute_value ) . '"' );
+		$this->assertEquals( $actual_value, '"' . $expected_result . '"' );
 	}
 
 	/**
@@ -305,15 +305,18 @@ class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
 	 */
 	public function data_set_attribute_escapable_values() {
 		return array(
-			array( '"' ),
-			array( '&quot;' ),
-			array( '&' ),
-			array( '&amp;' ),
-			array( '&euro;' ),
-			array( "'" ),
-			array( '<>' ),
-			array( '&quot";' ),
-			array( '" onclick="alert(\'1\');"><span onclick=""></span><script>alert("1")</script>' ),
+			array( '"', '&quot;' ),
+			array( '&quot;', '&quot;' ),
+			array( '&', '&amp;' ),
+			array( '&amp;', '&amp;' ),
+			array( '&euro;', '&euro;' ),
+			array( "'", '&#039;' ),
+			array( '<>', '&lt;&gt;' ),
+			array( '&quot";', '&amp;quot&quot;;' ),
+			array(
+				'" onclick="alert(\'1\');"><span onclick=""></span><script>alert("1")</script>',
+				'&quot; onclick=&quot;alert(&#039;1&#039;);&quot;&gt;&lt;span onclick=&quot;&quot;&gt;&lt;/span&gt;&lt;script&gt;alert(&quot;1&quot;)&lt;/script&gt;',
+			),
 		);
 	}
 
