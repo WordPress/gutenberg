@@ -28,6 +28,7 @@
 	.wp-block-paragraph__drop-zone-foreground {
 		position: absolute;
 		background-color: var(--wp-admin-theme-color);
+		pointer-events: none;
 		border-radius: 2px;
 	}
 }

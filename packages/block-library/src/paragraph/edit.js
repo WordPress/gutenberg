@@ -21,6 +21,8 @@ import {
 	RichText,
 	useBlockProps,
 	useSetting,
+	__experimentalUseOnBlockDrop as useOnBlockDrop,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	useMergeRefs,
@@ -28,6 +30,7 @@ import {
 } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -68,12 +71,26 @@ function ParagraphBlock( {
 	const isDropCapFeatureEnabled = useSetting( 'typography.dropCap' );
 	const [ paragraphElement, setParagraphElement ] = useState( null );
 	const [ isDropZoneVisible, setIsDropZoneVisible ] = useState( false );
-	const dragEventsRef = useDropZone( {
-		onDragEnd() {
-			setIsDropZoneVisible( false );
+	const { rootClientId, blockIndex } = useSelect(
+		( select ) => {
+			const selectors = select( blockEditorStore );
+			return {
+				rootClientId: selectors.getBlockRootClientId( clientId ),
+				blockIndex: selectors.getBlockIndex( clientId ),
+			};
 		},
+		[ clientId ]
+	);
+	const onBlockDrop = useOnBlockDrop( rootClientId, blockIndex, {
+		action: 'replace',
+	} );
+	const dragEventsRef = useDropZone( {
+		onDrop: onBlockDrop,
 		onDragEnter() {
 			setIsDropZoneVisible( true );
+		},
+		onDragLeave() {
+			setIsDropZoneVisible( false );
 		},
 	} );
 	const blockProps = useBlockProps( {
@@ -148,9 +165,7 @@ function ParagraphBlock( {
 				{ ! content && isDropZoneVisible && (
 					<DropZone
 						key="empty-paragraph-drop-zone"
-						clientId={ clientId }
 						paragraphElement={ paragraphElement }
-						setIsDropZoneVisible={ setIsDropZoneVisible }
 					/>
 				) }
 			</AnimatePresence>
