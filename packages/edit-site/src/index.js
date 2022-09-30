@@ -53,10 +53,13 @@ export function reinitializeEditor( target, settings ) {
 	}
 
 	/*
-	 * Prevent adding template part in the post editor.
-	 * Only add the filter when the post editor is initialized, not imported.
+	 * Prevent adding the Clasic block in the site editor.
+	 * Only add the filter when the site editor is initialized, not imported.
 	 * Also only add the filter(s) after registerCoreBlocks()
 	 * so that common filters in the block library are not overwritten.
+	 *
+	 * This usage here is inspired by previous usage of the filter in the post editor:
+	 * https://github.com/WordPress/gutenberg/pull/37157
 	 */
 	addFilter(
 		'blockEditor.__unstableCanInsertBlockType',
