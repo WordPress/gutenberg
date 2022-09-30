@@ -3,7 +3,7 @@
  */
 import {
 	isSimpleCssValue,
-	splitValueAndUnitFromSize,
+	splitNumberAndUnitFromSize,
 	getToggleGroupOptions,
 } from '../utils';
 
@@ -42,22 +42,24 @@ describe( 'isSimpleCssValue', () => {
 } );
 
 const splitValuesCases: [
-	number | string,
-	string | undefined,
+	number | string | undefined,
+	number | undefined,
 	string | undefined
 ][] = [
+	// Test undefined.
+	[ undefined, undefined, undefined ],
 	// Test integers and non-integers.
-	[ 1, '1', undefined ],
-	[ 1.25, '1.25', undefined ],
-	[ '123', '123', undefined ],
-	[ '1.5', '1.5', undefined ],
-	[ '0.75', '0.75', undefined ],
+	[ 1, 1, undefined ],
+	[ 1.25, 1.25, undefined ],
+	[ '123', 123, undefined ],
+	[ '1.5', 1.5, undefined ],
+	[ '0.75', 0.75, undefined ],
 	// Valid simple CSS values.
-	[ '20px', '20', 'px' ],
-	[ '0.8em', '0.8', 'em' ],
-	[ '2rem', '2', 'rem' ],
-	[ '1.4vw', '1.4', 'vw' ],
-	[ '0.4vh', '0.4', 'vh' ],
+	[ '20px', 20, 'px' ],
+	[ '0.8em', 0.8, 'em' ],
+	[ '2rem', 2, 'rem' ],
+	[ '1.4vw', 1.4, 'vw' ],
+	[ '0.4vh', 0.4, 'vh' ],
 	// Invalid negative values,
 	[ '-5px', undefined, undefined ],
 	// Complex CSS values that shouldn't parse.
@@ -74,7 +76,7 @@ describe( 'splitValueAndUnitFromSize', () => {
 	test.each( splitValuesCases )(
 		'given %p as argument, returns value = %p and unit = %p',
 		( cssValue, expectedValue, expectedUnit ) => {
-			const [ value, unit ] = splitValueAndUnitFromSize( cssValue );
+			const [ value, unit ] = splitNumberAndUnitFromSize( cssValue );
 			expect( value ).toBe( expectedValue );
 			expect( unit ).toBe( expectedUnit );
 		}
