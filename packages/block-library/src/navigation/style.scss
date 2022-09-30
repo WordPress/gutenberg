@@ -47,6 +47,8 @@ $navigation-icon-size: 24px;
 		display: block;
 	}
 
+	// This rule needs extra specificity so that it inherits the correct color from its parent.
+	// Otherwise, a link color set by a parent group can override the value.
 	.wp-block-navigation-item__content.wp-block-navigation-item__content {
 		color: inherit;
 	}
