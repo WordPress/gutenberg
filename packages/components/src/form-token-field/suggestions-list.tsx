@@ -38,6 +38,7 @@ export function SuggestionsList< T extends string | { value: string } >( {
 		( listNode ) => {
 			// only have to worry about scrolling selected suggestion into view
 			// when already expanded.
+			let rafId: number | undefined;
 			if (
 				selectedIndex > -1 &&
 				scrollIntoView &&
@@ -51,10 +52,16 @@ export function SuggestionsList< T extends string | { value: string } >( {
 						onlyScrollIfNeeded: true,
 					}
 				);
-				requestAnimationFrame( () => {
+				rafId = requestAnimationFrame( () => {
 					setScrollingIntoView( false );
 				} );
 			}
+
+			return () => {
+				if ( rafId !== undefined ) {
+					cancelAnimationFrame( rafId );
+				}
+			};
 		},
 		[ selectedIndex, scrollIntoView ]
 	);
