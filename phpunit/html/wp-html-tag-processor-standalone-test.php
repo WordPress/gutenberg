@@ -460,7 +460,7 @@ class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
 	 * @covers add_class
 	 * @covers get_updated_html
 	 */
-	public function test_calling_add_class_twice_creates_a_class_attribute_with_both_classs_when_there_is_no_class_attribute() {
+	public function test_calling_add_class_twice_creates_a_class_attribute_with_both_class_names_when_there_is_no_class_attribute() {
 		$p = new WP_HTML_Tag_Processor( self::HTML_SIMPLE );
 		$p->next();
 		$p->add_class( 'foo-class' );
@@ -487,7 +487,7 @@ class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
 	 * @covers add_class
 	 * @covers get_updated_html
 	 */
-	public function test_add_class_appends_classs_to_the_existing_class_attribute_when_one_already_exists() {
+	public function test_add_class_appends_class_names_to_the_existing_class_attribute_when_one_already_exists() {
 		$p = new WP_HTML_Tag_Processor( self::HTML_WITH_CLASSES );
 		$p->next();
 		$p->add_class( 'foo-class' );
@@ -520,7 +520,7 @@ class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
 	 * @covers remove_class
 	 * @covers get_updated_html
 	 */
-	public function test_calling_remove_class_with_all_listed_classs_removes_the_existing_class_attribute_from_the_markup() {
+	public function test_calling_remove_class_with_all_listed_class_names_removes_the_existing_class_attribute_from_the_markup() {
 		$p = new WP_HTML_Tag_Processor( self::HTML_WITH_CLASSES );
 		$p->next();
 		$p->remove_class( 'main' );
@@ -537,7 +537,7 @@ class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
 	 * @covers add_class
 	 * @covers get_updated_html
 	 */
-	public function test_add_class_does_not_add_duplicate_classs() {
+	public function test_add_class_does_not_add_duplicate_class_names() {
 		$p = new WP_HTML_Tag_Processor( self::HTML_WITH_CLASSES );
 		$p->next();
 		$p->add_class( 'with-border' );
@@ -553,7 +553,7 @@ class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
 	 * @covers add_class
 	 * @covers get_updated_html
 	 */
-	public function test_add_class_preserves_class_order_when_a_duplicate_class_is_added() {
+	public function test_add_class_preserves_class_name_order_when_a_duplicate_class_name_is_added() {
 		$p = new WP_HTML_Tag_Processor( self::HTML_WITH_CLASSES );
 		$p->next();
 		$p->add_class( 'main' );
