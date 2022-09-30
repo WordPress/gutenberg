@@ -468,7 +468,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 *
 	 * @return array Block metadata.
 	 */
-	protected static function get_blocks_metadata() {
+	public static function get_blocks_metadata() {
 		if ( null !== static::$blocks_metadata ) {
 			return static::$blocks_metadata;
 		}
