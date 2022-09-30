@@ -34,7 +34,6 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { createBlock } from '@wordpress/blocks';
 import { close, Icon } from '@wordpress/icons';
 
 /**
@@ -281,19 +280,6 @@ function Navigation( {
 		! isConvertingClassicMenu &&
 		hasResolvedNavigationMenus &&
 		! hasUncontrolledInnerBlocks;
-
-	useEffect( () => {
-		if ( isPlaceholder && ! ref ) {
-			/**
-			 *  this fallback only displays (both in editor and on front)
-			 *  the list of pages block if no menu is available as a fallback.
-			 *  We don't want the fallback to request a save,
-			 *  nor to be undoable, hence we mark it non persistent.
-			 */
-			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( clientId, [ createBlock( 'core/page-list' ) ] );
-		}
-	}, [ clientId, isPlaceholder, ref ] );
 
 	const isEntityAvailable =
 		! isNavigationMenuMissing && isNavigationMenuResolved;
@@ -621,14 +607,14 @@ function Navigation( {
 		</InspectorControls>
 	);
 
-	// If the block has inner blocks, but no menu id, then these blocks are either:
+	// If no navigation menu entity is available, then these blocks are either:
+	// - showing the default Page List inner block when there are no menus or inner blocks of any kind.
 	// - inserted via a pattern.
 	// - inserted directly via Code View (or otherwise).
 	// - from an older version of navigation block added before the block used a wp_navigation entity.
 	// Consider this state as 'unsaved' and offer an uncontrolled version of inner blocks,
 	// that automatically saves the menu as an entity when changes are made to the inner blocks.
-	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
-	if ( hasUnsavedBlocks ) {
+	if ( ! isEntityAvailable ) {
 		return (
 			<TagName { ...blockProps }>
 				<InspectorControls>

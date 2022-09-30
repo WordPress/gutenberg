@@ -82,6 +82,7 @@ export default function UnsavedInnerBlocks( {
 			className: 'wp-block-navigation__container',
 		},
 		{
+			template: [ [ 'core/page-list' ] ],
 			renderAppender: hasSelection ? undefined : false,
 			allowedBlocks: ALLOWED_BLOCKS,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
