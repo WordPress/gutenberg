@@ -942,6 +942,7 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * @param string         $name  The attribute name to target.
 	 * @param string|boolean $value The new attribute value.
+	 * @throws Exception When WP_DEBUG is true and the attribute name is invalid.
 	 */
 	public function set_attribute( $name, $value ) {
 		if ( null === $this->tag_name_starts_at ) {
@@ -971,11 +972,11 @@ class WP_HTML_Tag_Processor {
 		 */
 		if ( preg_match(
 			'~[' .
-				// Syntax-like characters
+				// Syntax-like characters.
 				'"\'>&</ =' .
-				// Control characters
+				// Control characters.
 				'\x{00}-\x{1F}' .
-				// HTML noncharacters
+				// HTML noncharacters.
 				'\x{FDD0}-\x{FDEF}' .
 				'\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}' .
 				'\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}' .
