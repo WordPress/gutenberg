@@ -18,6 +18,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { __ } from '@wordpress/i18n';
 import { store as viewportStore } from '@wordpress/viewport';
 import { getQueryArgs } from '@wordpress/url';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -50,6 +51,23 @@ export function reinitializeEditor( target, settings ) {
 		);
 		return;
 	}
+
+	/*
+	 * Prevent adding template part in the post editor.
+	 * Only add the filter when the post editor is initialized, not imported.
+	 * Also only add the filter(s) after registerCoreBlocks()
+	 * so that common filters in the block library are not overwritten.
+	 */
+	addFilter(
+		'blockEditor.__unstableCanInsertBlockType',
+		'removeClassicBlockFromInserter',
+		( canInsert, blockType ) => {
+			if ( blockType.name === 'core/freeform' ) {
+				return false;
+			}
+			return canInsert;
+		}
+	);
 
 	// This will be a no-op if the target doesn't have any React nodes.
 	unmountComponentAtNode( target );
