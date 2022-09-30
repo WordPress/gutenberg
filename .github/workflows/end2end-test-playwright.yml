@@ -39,7 +39,7 @@ jobs:
 
             - name: Install Playwright dependencies
               run: |
-                  npx playwright install chromium --with-deps
+                  npx playwright install chromium firefox webkit --with-deps
 
             - name: Install WordPress and start the server
               run: |
@@ -47,14 +47,14 @@ jobs:
 
             - name: Run the tests
               run: |
-                  npm run test:e2e:playwright
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e:playwright
 
             - name: Archive debug artifacts (screenshots, traces)
               uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
               if: always()
               with:
                   name: failures-artifacts
-                  path: artifacts
+                  path: artifacts/test-results
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
