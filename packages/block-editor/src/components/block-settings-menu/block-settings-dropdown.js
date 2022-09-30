@@ -6,7 +6,11 @@ import { castArray } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getBlockType, serialize } from '@wordpress/blocks';
+import {
+	getBlockType,
+	serialize,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
@@ -75,7 +79,10 @@ export function BlockSettingsDropdown( {
 				getNextBlockClientId,
 				getSelectedBlockClientIds,
 				getSettings,
+				getBlockAttributes,
 			} = select( blockEditorStore );
+
+			const { getActiveBlockVariation } = select( blocksStore );
 
 			const parents = getBlockParents( firstBlockClientId );
 			const _firstParentClientId = parents[ parents.length - 1 ];
@@ -85,7 +92,11 @@ export function BlockSettingsDropdown( {
 				firstParentClientId: _firstParentClientId,
 				hasReducedUI: getSettings().hasReducedUI,
 				onlyBlock: 1 === getBlockCount(),
-				parentBlockType: getBlockType( parentBlockName ),
+				parentBlockType:
+					getActiveBlockVariation(
+						parentBlockName,
+						getBlockAttributes( _firstParentClientId )
+					) || getBlockType( parentBlockName ),
 				previousBlockClientId:
 					getPreviousBlockClientId( firstBlockClientId ),
 				nextBlockClientId: getNextBlockClientId( firstBlockClientId ),
