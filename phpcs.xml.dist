@@ -84,6 +84,7 @@
 		<properties>
 			<property name="prefixes" type="array">
 				<element value="gutenberg"/>
+				<element value="wp"/>
 			</property>
 		</properties>
 	</rule>
