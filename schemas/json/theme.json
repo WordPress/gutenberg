@@ -463,7 +463,8 @@
 														"auto",
 														"block",
 														"fallback",
-														"swap"
+														"swap",
+														"optional"
 													]
 												},
 												"src": {
