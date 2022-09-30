@@ -643,7 +643,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		'<button 
 			wp-on:click="function({ setContext }) { setContext({ open: true, previousElementWithFocus: document.activeElement }); }" 
 			wp-effect:on-open="function({ context }) { context.open && context.firstMenuElement.focus(); }" 
-			wp-effect:on-close="function({ context }) { context.close && context.previousElementWithFocus.focus(); }" 
+			wp-effect:on-close="function({ context }) { !context.open && context.previousElementWithFocus && context.previousElementWithFocus.focus(); }" 
 			aria-haspopup="true" 
 			%3$s 
 			class="%6$s"
