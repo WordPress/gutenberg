@@ -402,7 +402,7 @@ class WP_HTML_Tag_Processor {
 			 * lead us to skip over other tags and lose track of our place. So we need to search for
 			 * _every_ tag and then check after we find one if it's the one we are looking for.
 			 */
-			if ( false === $this->parse_next() ) {
+			if ( false === $this->parse_next_tag() ) {
 				$this->parsed_bytes = strlen( $this->html );
 
 				return false;
@@ -620,7 +620,7 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * @since 6.2.0
 	 */
-	private function parse_next() {
+	private function parse_next_tag() {
 		$this->after_tag();
 
 		$html = $this->html;
