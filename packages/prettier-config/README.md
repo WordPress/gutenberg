@@ -23,7 +23,7 @@ Add this to your `package.json` file:
 Alternatively, add this to `.prettierrc` file:
 
 ```
-extends: ['@wordpress/prettier-config']
+"@wordpress/prettier-config"
 ```
 
 ## Contributing to this package
