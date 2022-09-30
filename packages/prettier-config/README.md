@@ -26,6 +26,12 @@ Alternatively, add this to `.prettierrc` file:
 "@wordpress/prettier-config"
 ```
 
+Or add this to `.prettierrc.js` file:
+
+```js
+module.exports = require( '@wordpress/prettier-config' );
+```
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
