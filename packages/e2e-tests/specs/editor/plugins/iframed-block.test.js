@@ -7,9 +7,8 @@ import {
 	deactivatePlugin,
 	insertBlock,
 	getEditedPostContent,
-	openDocumentSettingsSidebar,
-	clickButton,
 	canvas,
+	createNewTemplate,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'changing image size', () => {
@@ -34,16 +33,7 @@ describe( 'changing image size', () => {
 
 		expect( text ).toBe( 'Iframed Block (set with jQuery)' );
 
-		await openDocumentSettingsSidebar();
-		await clickButton( 'Page' );
-		await page.click( 'button[aria-label^="Select template"]' );
-		await page.waitForSelector( 'button[aria-label="Add template"]' );
-		await page.click( 'button[aria-label="Add template"]' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.type( 'Iframed Test' );
-		await clickButton( 'Create' );
-		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
+		await createNewTemplate( 'Iframed Test' );
 
 		const iframeElement = await canvas().waitForSelector(
 			'.wp-block-test-iframed-block'

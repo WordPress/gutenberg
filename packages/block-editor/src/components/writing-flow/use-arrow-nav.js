@@ -17,7 +17,7 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { isInSameBlock } from '../../utils/dom';
+import { getBlockClientId, isInSameBlock } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -101,6 +101,16 @@ export function getClosestTabbable(
 	}
 
 	function isTabCandidate( node ) {
+		// Skip if there's only one child that is content editable (and thus a
+		// better candidate).
+		if (
+			node.children.length === 1 &&
+			isInSameBlock( node, node.firstElementChild ) &&
+			node.firstElementChild.getAttribute( 'contenteditable' ) === 'true'
+		) {
+			return;
+		}
+
 		// Not a candidate if the node is not tabbable.
 		if ( ! focus.tabbable.isTabbableIndex( node ) ) {
 			return false;
@@ -130,11 +140,8 @@ export function getClosestTabbable(
 
 export default function useArrowNav() {
 	const {
-		getSelectedBlockClientId,
 		getMultiSelectedBlocksStartClientId,
 		getMultiSelectedBlocksEndClientId,
-		getPreviousBlockClientId,
-		getNextBlockClientId,
 		getSettings,
 		hasMultiSelection,
 		__unstableIsFullySelected,
@@ -150,30 +157,18 @@ export default function useArrowNav() {
 			verticalRect = null;
 		}
 
-		/**
-		 * Returns true if the given target field is the last in its block which
-		 * can be considered for tab transition. For example, in a block with
-		 * two text fields, this would return true when reversing from the first
-		 * of the two fields, but false when reversing from the second.
-		 *
-		 * @param {Element} target    Currently focused text field.
-		 * @param {boolean} isReverse True if considering as the first field.
-		 *
-		 * @return {boolean} Whether field is at edge for tab transition.
-		 */
-		function isTabbableEdge( target, isReverse ) {
+		function isClosestTabbableABlock( target, isReverse ) {
 			const closestTabbable = getClosestTabbable(
 				target,
 				isReverse,
 				node
 			);
-			return (
-				! closestTabbable || ! isInSameBlock( target, closestTabbable )
-			);
+			return closestTabbable && getBlockClientId( closestTabbable );
 		}
 
 		function onKeyDown( event ) {
-			const { keyCode, target } = event;
+			const { keyCode, target, shiftKey, ctrlKey, altKey, metaKey } =
+				event;
 			const isUp = keyCode === UP;
 			const isDown = keyCode === DOWN;
 			const isLeft = keyCode === LEFT;
@@ -182,9 +177,7 @@ export default function useArrowNav() {
 			const isHorizontal = isLeft || isRight;
 			const isVertical = isUp || isDown;
 			const isNav = isHorizontal || isVertical;
-			const isShift = event.shiftKey;
-			const hasModifier =
-				isShift || event.ctrlKey || event.altKey || event.metaKey;
+			const hasModifier = shiftKey || ctrlKey || altKey || metaKey;
 			const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
@@ -206,7 +199,7 @@ export default function useArrowNav() {
 					return;
 				}
 
-				if ( isShift ) {
+				if ( shiftKey ) {
 					return;
 				}
 
@@ -254,23 +247,10 @@ export default function useArrowNav() {
 			// next, which is the exact reverse of LTR.
 			const isReverseDir = isRTL( target ) ? ! isReverse : isReverse;
 			const { keepCaretInsideBlock } = getSettings();
-			const selectedBlockClientId = getSelectedBlockClientId();
 
-			if ( isShift ) {
-				const selectionEndClientId =
-					getMultiSelectedBlocksEndClientId();
-				const selectionBeforeEndClientId = getPreviousBlockClientId(
-					selectionEndClientId || selectedBlockClientId
-				);
-				const selectionAfterEndClientId = getNextBlockClientId(
-					selectionEndClientId || selectedBlockClientId
-				);
-
+			if ( shiftKey ) {
 				if (
-					// Ensure that there is a target block.
-					( ( isReverse && selectionBeforeEndClientId ) ||
-						( ! isReverse && selectionAfterEndClientId ) ) &&
-					isTabbableEdge( target, isReverse ) &&
+					isClosestTabbableABlock( target, isReverse ) &&
 					isNavEdge( target, isReverse )
 				) {
 					node.contentEditable = true;
@@ -280,6 +260,9 @@ export default function useArrowNav() {
 			} else if (
 				isVertical &&
 				isVerticalEdge( target, isReverse ) &&
+				// When Alt is pressed, only intercept if the caret is also at
+				// the horizontal edge.
+				( altKey ? isHorizontalEdge( target, isReverseDir ) : true ) &&
 				! keepCaretInsideBlock
 			) {
 				const closestTabbable = getClosestTabbable(
@@ -292,8 +275,10 @@ export default function useArrowNav() {
 				if ( closestTabbable ) {
 					placeCaretAtVerticalEdge(
 						closestTabbable,
-						isReverse,
-						verticalRect
+						// When Alt is pressed, place the caret at the furthest
+						// horizontal edge and the furthest vertical edge.
+						altKey ? ! isReverse : isReverse,
+						altKey ? undefined : verticalRect
 					);
 					event.preventDefault();
 				}

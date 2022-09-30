@@ -1,17 +1,19 @@
 /**
  * External dependencies
  */
-import { castArray, isPlainObject, omit, pick, some } from 'lodash';
+import { isPlainObject } from 'is-plain-object';
+import { castArray, pick, some } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
-import { isValidIcon, normalizeIconObject } from '../api/utils';
+import { isValidIcon, normalizeIconObject, omit } from '../api/utils';
 import { DEPRECATED_ENTRY_KEYS } from '../api/constants';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
@@ -61,6 +63,12 @@ const processBlockType = ( blockType, { select } ) => {
 		name,
 		null
 	);
+
+	if ( settings.description && typeof settings.description !== 'string' ) {
+		deprecated( 'Declaring non-string block descriptions', {
+			since: '6.2',
+		} );
+	}
 
 	if ( settings.deprecated ) {
 		settings.deprecated = settings.deprecated.map( ( deprecation ) =>

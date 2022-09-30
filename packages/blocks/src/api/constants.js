@@ -23,6 +23,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	background: {
 		value: [ 'color', 'gradient' ],
 		support: [ 'color', 'gradients' ],
+		useEngine: true,
 	},
 	backgroundColor: {
 		value: [ 'color', 'background' ],
@@ -141,6 +142,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	fontFamily: {
 		value: [ 'typography', 'fontFamily' ],
 		support: [ 'typography', '__experimentalFontFamily' ],
+		useEngine: true,
 	},
 	fontSize: {
 		value: [ 'typography', 'fontSize' ],
@@ -224,6 +226,7 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	button: '.wp-element-button, .wp-block-button__link',
 	caption:
 		'.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption',
+	cite: 'cite',
 };
 
 export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
@@ -232,4 +235,5 @@ export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
 	'color.palette': true,
 	'typography.fontFamilies': true,
 	'typography.fontSizes': true,
+	'spacing.spacingSizes': true,
 };

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { omit, has } from 'lodash';
 import EquivalentKeyMap from 'equivalent-key-map';
 import type { Reducer } from 'redux';
 
@@ -125,10 +124,16 @@ const isResolved = ( state: Record< string, State > = {}, action: Action ) => {
 	switch ( action.type ) {
 		case 'INVALIDATE_RESOLUTION_FOR_STORE':
 			return {};
-		case 'INVALIDATE_RESOLUTION_FOR_STORE_SELECTOR':
-			return has( state, [ action.selectorName ] )
-				? omit( state, [ action.selectorName ] )
-				: state;
+		case 'INVALIDATE_RESOLUTION_FOR_STORE_SELECTOR': {
+			if ( action.selectorName in state ) {
+				const {
+					[ action.selectorName ]: removedSelector,
+					...restState
+				} = state;
+				return restState;
+			}
+			return state;
+		}
 		case 'START_RESOLUTION':
 		case 'FINISH_RESOLUTION':
 		case 'FAIL_RESOLUTION':

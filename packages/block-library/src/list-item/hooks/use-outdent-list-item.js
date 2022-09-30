@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { first, last, castArray } from 'lodash';
+import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -61,7 +61,7 @@ export default function useOutdentListItem( clientId ) {
 
 			if ( ! clientIds.length ) return;
 
-			const firstClientId = first( clientIds );
+			const firstClientId = clientIds[ 0 ];
 
 			// Can't outdent if it's not a list item.
 			if ( getBlockName( firstClientId ) !== listItemName ) return;
@@ -72,7 +72,7 @@ export default function useOutdentListItem( clientId ) {
 			if ( ! parentListItemId ) return;
 
 			const parentListId = getBlockRootClientId( firstClientId );
-			const lastClientId = last( clientIds );
+			const lastClientId = clientIds[ clientIds.length - 1 ];
 			const order = getBlockOrder( parentListId );
 			const followingListItems = order.slice(
 				getBlockIndex( lastClientId ) + 1
@@ -80,7 +80,7 @@ export default function useOutdentListItem( clientId ) {
 
 			registry.batch( () => {
 				if ( followingListItems.length ) {
-					let nestedListId = first( getBlockOrder( firstClientId ) );
+					let nestedListId = getBlockOrder( firstClientId )[ 0 ];
 
 					if ( ! nestedListId ) {
 						const nestedListBlock = cloneBlock(

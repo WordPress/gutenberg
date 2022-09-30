@@ -32,4 +32,8 @@ export const textFormattingShortcuts = [
 		keyCombination: { modifier: 'access', character: 'd' },
 		description: __( 'Strikethrough the selected text.' ),
 	},
+	{
+		keyCombination: { modifier: 'access', character: 'x' },
+		description: __( 'Make the selected text inline code.' ),
+	},
 ];

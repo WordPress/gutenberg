@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -82,7 +77,7 @@ function TextColorEdit( {
 		[ value, colors ]
 	);
 
-	const hasColorsToChoose = ! isEmpty( colors ) || ! allowCustomControl;
+	const hasColorsToChoose = colors.length || ! allowCustomControl;
 	if ( ! hasColorsToChoose && ! isActive ) {
 		return null;
 	}

@@ -200,9 +200,9 @@ $color-control-label-height: 20px;
 
 // Override inner padding on default appender.
 // This should be a temporary fix, to be replaced by improvements to
-// the sibling inserter.
+// the sibling inserter. Or by the dropdown appender that is used in Group, instead of the "Button block appender".
 // See https://github.com/WordPress/gutenberg/issues/37572.
-.wp-block-navigation .block-editor-button-block-appender {
+.wp-block-navigation .wp-block + .block-list-appender .block-editor-button-block-appender {
 	background-color: $gray-900;
 	color: $white;
 
@@ -290,9 +290,8 @@ $color-control-label-height: 20px;
 		right: 0;
 		bottom: 0;
 		left: 0;
-		border: $border-width dashed currentColor;
-		opacity: 0.4;
 		pointer-events: none;
+		@include placeholder-style();
 
 		// Inherit border radius from style variations.
 		border-radius: inherit;
@@ -300,7 +299,6 @@ $color-control-label-height: 20px;
 
 	> svg {
 		fill: currentColor;
-		opacity: 0.4;
 	}
 }
 
@@ -520,6 +518,7 @@ body.editor-styles-wrapper
 // so focus is applied naturally on the block container.
 // It's important the right container has focus, otherwise you can't press
 // "Delete" to remove the block.
+.wp-block-navigation__responsive-container,
 .wp-block-navigation__responsive-close {
 	@include break-small() {
 		pointer-events: none;
@@ -567,21 +566,6 @@ body.editor-styles-wrapper
 	padding: $grid-unit-10 $grid-unit-15;
 }
 
-.wp-block-navigation__unsaved-changes {
-	position: relative;
-
-	.components-spinner {
-		position: absolute;
-		top: calc(50% - #{$spinner-size} / 2);
-		left: calc(50% - #{$spinner-size} / 2);
-
-		// Delay showing the saving spinner until after 2 seconds.
-		// This should ensure it only shows for slow connections.
-		opacity: 0;
-		animation: 0.5s linear 2s normal forwards fadein;
-	}
-}
-
 @keyframes fadeouthalf {
 	0% {
 		opacity: 1;
@@ -589,11 +573,6 @@ body.editor-styles-wrapper
 	100% {
 		opacity: 0.5;
 	}
-}
-
-.wp-block-navigation__unsaved-changes-overlay.is-saving {
-	opacity: 1;
-	animation: 0.5s linear 2s normal forwards fadeouthalf;
 }
 
 .wp-block-navigation-delete-menu-button {
@@ -605,6 +584,7 @@ body.editor-styles-wrapper
 .wp-block-navigation__overlay-menu-preview {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	width: 100%;
 	background-color: $gray-100;
 	padding: 0 $grid-unit-30;
@@ -630,3 +610,28 @@ body.editor-styles-wrapper
 	display: none;
 }
 
+/**
+ * Navigation selector styles
+ */
+.wp-block-navigation__navigation-selector {
+	margin-bottom: $grid-unit-20;
+	width: 100%;
+}
+
+.wp-block-navigation__navigation-selector-button {
+	border: 1px solid;
+	justify-content: space-between;
+	width: 100%;
+}
+
+.wp-block-navigation__navigation-selector-button--createnew {
+	border: 1px solid;
+	margin-bottom: $grid-unit-20;
+	width: 100%;
+}
+
+// Buttons inside a disabled component get semitransparent when there's a clickthrough overlay.
+// Since this navigation button is content rather than UI, however, override that.
+.wp-block-navigation__responsive-container-open.components-button {
+	opacity: 1;
+}

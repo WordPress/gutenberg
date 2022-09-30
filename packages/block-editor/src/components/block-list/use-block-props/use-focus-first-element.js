@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { first, last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
@@ -36,7 +31,7 @@ function useInitialPosition( clientId ) {
 		( select ) => {
 			const {
 				getSelectedBlocksInitialCaretPosition,
-				isNavigationMode,
+				__unstableGetEditorMode,
 				isBlockSelected,
 			} = select( blockEditorStore );
 
@@ -44,7 +39,7 @@ function useInitialPosition( clientId ) {
 				return;
 			}
 
-			if ( isNavigationMode() ) {
+			if ( __unstableGetEditorMode() !== 'edit' ) {
 				return;
 			}
 
@@ -85,7 +80,7 @@ export function useFocusFirstElement( clientId ) {
 		const { ownerDocument } = ref.current;
 
 		// Do not focus the block if it already contains the active element.
-		if ( ref.current.contains( ownerDocument.activeElement ) ) {
+		if ( isInsideRootBlock( ref.current, ownerDocument.activeElement ) ) {
 			return;
 		}
 
@@ -98,7 +93,7 @@ export function useFocusFirstElement( clientId ) {
 		// tabbables.
 		const isReverse = -1 === initialPosition;
 		const target =
-			( isReverse ? last : first )( textInputs ) || ref.current;
+			textInputs[ isReverse ? textInputs.length - 1 : 0 ] || ref.current;
 
 		if ( ! isInsideRootBlock( ref.current, target ) ) {
 			ref.current.focus();

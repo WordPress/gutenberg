@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useCallback, useMemo } from '@wordpress/element';
@@ -12,7 +7,7 @@ import {
 	applyFormat,
 	removeFormat,
 	getActiveFormat,
-	useAnchorRef,
+	useAnchor,
 } from '@wordpress/rich-text';
 import {
 	ColorPalette,
@@ -112,7 +107,7 @@ function setColors( value, name, colorSettings, colors ) {
 function ColorPicker( { name, property, value, onChange } ) {
 	const colors = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return get( getSettings(), [ 'colors' ], [] );
+		return getSettings().colors ?? [];
 	}, [] );
 	const onColorChange = useCallback(
 		( color ) => {
@@ -142,22 +137,26 @@ export default function InlineColorUI( {
 	onClose,
 	contentRef,
 } ) {
-	/* 
+	/*
 	 As you change the text color by typing a HEX value into a field,
 	 the return value of document.getSelection jumps to the field you're editing,
-	 not the highlighted text. Given that useAnchorRef uses document.getSelection,
+	 not the highlighted text. Given that useAnchor uses document.getSelection,
 	 it will return null, since it can't find the <mark> element within the HEX input.
 	 This caches the last truthy value of the selection anchor reference.
 	 */
-	const anchorRef = useCachedTruthy(
-		useAnchorRef( { ref: contentRef, value, settings } )
+	const popoverAnchor = useCachedTruthy(
+		useAnchor( {
+			editableContentElement: contentRef.current,
+			value,
+			settings,
+		} )
 	);
 
 	return (
 		<Popover
 			onClose={ onClose }
 			className="components-inline-color-popover"
-			anchorRef={ anchorRef }
+			anchor={ popoverAnchor }
 		>
 			<TabPanel
 				tabs={ [

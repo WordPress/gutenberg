@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { find, get, has, includes, some } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -149,8 +148,7 @@ export const hasNonPostEntityChanges = createRegistrySelector(
 		const dirtyEntityRecords =
 			select( coreStore ).__experimentalGetDirtyEntityRecords();
 		const { type, id } = getCurrentPost( state );
-		return some(
-			dirtyEntityRecords,
+		return dirtyEntityRecords.some(
 			( entityRecord ) =>
 				entityRecord.kind !== 'postType' ||
 				entityRecord.name !== type ||
@@ -232,10 +230,8 @@ export function getCurrentPostId( state ) {
  * @return {number} Number of revisions.
  */
 export function getCurrentPostRevisionsCount( state ) {
-	return get(
-		getCurrentPost( state ),
-		[ '_links', 'version-history', 0, 'count' ],
-		0
+	return (
+		getCurrentPost( state )._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0
 	);
 }
 
@@ -248,9 +244,8 @@ export function getCurrentPostRevisionsCount( state ) {
  * @return {?number} ID of the last revision.
  */
 export function getCurrentPostLastRevisionId( state ) {
-	return get(
-		getCurrentPost( state ),
-		[ '_links', 'predecessor-version', 0, 'id' ],
+	return (
+		getCurrentPost( state )._links?.[ 'predecessor-version' ]?.[ 0 ]?.id ??
 		null
 	);
 }
@@ -371,7 +366,7 @@ export function getEditedPostAttribute( state, attributeName ) {
 export const getAutosaveAttribute = createRegistrySelector(
 	( select ) => ( state, attributeName ) => {
 		if (
-			! includes( AUTOSAVE_PROPERTIES, attributeName ) &&
+			! AUTOSAVE_PROPERTIES.includes( attributeName ) &&
 			attributeName !== 'preview_link'
 		) {
 			return;
@@ -379,9 +374,7 @@ export const getAutosaveAttribute = createRegistrySelector(
 
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
-		const currentUserId = get( select( coreStore ).getCurrentUser(), [
-			'id',
-		] );
+		const currentUserId = select( coreStore ).getCurrentUser()?.id;
 		const autosave = select( coreStore ).getAutosave(
 			postType,
 			postId,
@@ -589,9 +582,7 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 			postType,
 			postId
 		);
-		const currentUserId = get( select( coreStore ).getCurrentUser(), [
-			'id',
-		] );
+		const currentUserId = select( coreStore ).getCurrentUser()?.id;
 
 		// Disable reason - this line causes the side-effect of fetching the autosave
 		// via a resolver, moving below the return would result in the autosave never
@@ -682,6 +673,17 @@ export function isEditedPostDateFloating( state ) {
 }
 
 /**
+ * Returns true if the post is currently being deleted, or false otherwise.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether post is being deleted.
+ */
+export function isDeletingPost( state ) {
+	return !! state.deleting.pending;
+}
+
+/**
  * Returns true if the post is currently being saved, or false otherwise.
  *
  * @param {Object} state Global application state.
@@ -710,8 +712,7 @@ export const isSavingNonPostEntityChanges = createRegistrySelector(
 		const entitiesBeingSaved =
 			select( coreStore ).__experimentalGetEntitiesBeingSaved();
 		const { type, id } = getCurrentPost( state );
-		return some(
-			entitiesBeingSaved,
+		return entitiesBeingSaved.some(
 			( entityRecord ) =>
 				entityRecord.kind !== 'postType' ||
 				entityRecord.name !== type ||
@@ -771,7 +772,7 @@ export function isAutosavingPost( state ) {
 	if ( ! isSavingPost( state ) ) {
 		return false;
 	}
-	return !! get( state.saving, [ 'options', 'isAutosave' ] );
+	return Boolean( state.saving.options?.isAutosave );
 }
 
 /**
@@ -785,7 +786,7 @@ export function isPreviewingPost( state ) {
 	if ( ! isSavingPost( state ) ) {
 		return false;
 	}
-	return !! get( state.saving, [ 'options', 'isPreview' ] );
+	return Boolean( state.saving.options?.isPreview );
 }
 
 /**
@@ -1081,10 +1082,11 @@ export function getActivePostLock( state ) {
  * @return {boolean} Whether the user can or can't post unfiltered HTML.
  */
 export function canUserUseUnfilteredHTML( state ) {
-	return has( getCurrentPost( state ), [
-		'_links',
-		'wp:action-unfiltered-html',
-	] );
+	return Boolean(
+		getCurrentPost( state )._links?.hasOwnProperty(
+			'wp:action-unfiltered-html'
+		)
+	);
 }
 
 /**
@@ -1583,8 +1585,18 @@ export const __experimentalGetDefaultTemplatePartAreas = createSelector(
  * @return {Object} The template type.
  */
 export const __experimentalGetDefaultTemplateType = createSelector(
-	( state, slug ) =>
-		find( __experimentalGetDefaultTemplateTypes( state ), { slug } ) || {},
+	( state, slug ) => {
+		const templateTypes = __experimentalGetDefaultTemplateTypes( state );
+		if ( ! templateTypes ) {
+			return EMPTY_OBJECT;
+		}
+
+		return (
+			Object.values( templateTypes ).find(
+				( type ) => type.slug === slug
+			) ?? EMPTY_OBJECT
+		);
+	},
 	( state, slug ) => [ __experimentalGetDefaultTemplateTypes( state ), slug ]
 );
 
@@ -1598,7 +1610,7 @@ export const __experimentalGetDefaultTemplateType = createSelector(
  */
 export function __experimentalGetTemplateInfo( state, template ) {
 	if ( ! template ) {
-		return {};
+		return EMPTY_OBJECT;
 	}
 
 	const { description, slug, title, area } = template;

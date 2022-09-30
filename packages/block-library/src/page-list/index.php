@@ -264,7 +264,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$active_page_ancestor_ids = array();
 
 	foreach ( (array) $all_pages as $page ) {
-		$is_active = ! empty( $page->ID ) && ( get_the_ID() === $page->ID );
+		$is_active = ! empty( $page->ID ) && ( get_queried_object_id() === $page->ID );
 
 		if ( $is_active ) {
 			$active_page_ancestor_ids = get_post_ancestors( $page->ID );
@@ -328,9 +328,9 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	);
 }
 
-	/**
-	 * Registers the `core/pages` block on server.
-	 */
+/**
+ * Registers the `core/pages` block on server.
+ */
 function register_block_core_page_list() {
 	register_block_type_from_metadata(
 		__DIR__ . '/page-list',
@@ -339,4 +339,4 @@ function register_block_core_page_list() {
 		)
 	);
 }
-	add_action( 'init', 'register_block_core_page_list' );
+add_action( 'init', 'register_block_core_page_list' );

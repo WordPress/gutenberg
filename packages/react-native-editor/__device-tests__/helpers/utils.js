@@ -12,8 +12,6 @@ const path = require( 'path' );
 const serverConfigs = require( './serverConfigs' );
 const { iosServer, iosLocal, android } = require( './caps' );
 const AppiumLocal = require( './appium-local' );
-// eslint-disable-next-line import/no-extraneous-dependencies
-const _ = require( 'underscore' );
 
 // Platform setup.
 const defaultPlatform = 'android';
@@ -95,7 +93,7 @@ const setupDriver = async () => {
 
 	let desiredCaps;
 	if ( isAndroid() ) {
-		desiredCaps = _.clone( android );
+		desiredCaps = { ...android };
 		if ( isLocalEnvironment() ) {
 			desiredCaps.app = path.resolve( localAndroidAppPath );
 			try {
@@ -117,10 +115,10 @@ const setupDriver = async () => {
 			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.apk`; // App should be preloaded to sauce storage, this can also be a URL.
 		}
 	} else {
-		desiredCaps = _.clone( iosServer );
+		desiredCaps = { ...iosServer };
 		desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL.
 		if ( isLocalEnvironment() ) {
-			desiredCaps = _.clone( iosLocal );
+			desiredCaps = { ...iosLocal };
 
 			const iosPlatformVersions = getIOSPlatformVersions();
 			if ( iosPlatformVersions.length === 0 ) {
@@ -515,9 +513,9 @@ const waitForMediaLibrary = async ( driver ) => {
 /**
  * @param {string} driver
  * @param {string} elementLocator
- * @param {number} maxIteration - Default value is 25
+ * @param {number} maxIteration    - Default value is 25
  * @param {string} elementToReturn - Options are allElements, lastElement, firstElement. Defaults to "firstElement"
- * @param {number} iteration - Default value is 0
+ * @param {number} iteration       - Default value is 0
  * @return {string} - Returns the first element found, empty string if not found
  */
 const waitForVisible = async (
@@ -567,7 +565,7 @@ const waitForVisible = async (
 /**
  * @param {string} driver
  * @param {string} elementLocator
- * @param {number} maxIteration - Default value is 25, can be adjusted to be less to wait for element to not be visible
+ * @param {number} maxIteration    - Default value is 25, can be adjusted to be less to wait for element to not be visible
  * @param {string} elementToReturn - Options are allElements, lastElement, firstElement. Defaults to "firstElement"
  * @return {boolean} - Returns true if element is found, false otherwise
  */

@@ -1,14 +1,7 @@
 /**
  * External dependencies
  */
-const {
-	groupBy,
-	escapeRegExp,
-	uniq,
-	flow,
-	sortBy,
-	uniqBy,
-} = require( 'lodash' );
+const { groupBy } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
@@ -193,6 +186,32 @@ const REWORD_TERMS = {
 };
 
 /**
+ * Creates a pipe function. Performs left-to-right function composition, where
+ * each successive invocation is supplied the return value of the previous.
+ *
+ * @param {Function[]} functions Functions to pipe.
+ */
+function pipe( functions ) {
+	return ( /** @type {unknown[]} */ ...args ) => {
+		return functions.reduce(
+			( prev, func ) => [ func( ...prev ) ],
+			args
+		)[ 0 ];
+	};
+}
+
+/**
+ * Escapes the RegExp special characters.
+ *
+ * @param {string} string Input string.
+ *
+ * @return {string} Regex-escaped string.
+ */
+function escapeRegExp( string ) {
+	return string.replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' );
+}
+
+/**
  * Returns candidates based on whether the given labels
  * are part of the allowed list.
  *
@@ -201,13 +220,15 @@ const REWORD_TERMS = {
  * @return {string[]} Type candidates.
  */
 function getTypesByLabels( labels ) {
-	return uniq(
-		labels
-			.filter( ( label ) =>
-				Object.keys( LABEL_TYPE_MAPPING ).includes( label )
-			)
-			.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
-	);
+	return [
+		...new Set(
+			labels
+				.filter( ( label ) =>
+					Object.keys( LABEL_TYPE_MAPPING ).includes( label )
+				)
+				.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
+		),
+	];
 }
 
 /**
@@ -828,7 +849,9 @@ function getContributorPropsMarkdownList( ftcPRs ) {
  * @return {IssuesListForRepoResponseItem[]} The sorted list of pull requests.
  */
 function sortByUsername( items ) {
-	return sortBy( items, ( item ) => item.user.login.toLowerCase() );
+	return [ ...items ].sort( ( a, b ) =>
+		a.user.login.toLowerCase().localeCompare( b.user.login.toLowerCase() )
+	);
 }
 
 /**
@@ -838,7 +861,17 @@ function sortByUsername( items ) {
  * @return {IssuesListForRepoResponseItem[]} The list of pull requests unique per user.
  */
 function getUniqueByUsername( items ) {
-	return uniqBy( items, ( item ) => item.user.login );
+	/**
+	 * @type {IssuesListForRepoResponseItem[]} List of pull requests.
+	 */
+	const EMPTY_PR_LIST = [];
+
+	return items.reduce( ( acc, item ) => {
+		if ( ! acc.some( ( i ) => i.user.login === item.user.login ) ) {
+			acc.push( item );
+		}
+		return acc;
+	}, EMPTY_PR_LIST );
 }
 
 /**
@@ -862,7 +895,7 @@ function skipCreatedByBots( pullRequests ) {
  * @return {string} The formatted props section.
  */
 function getContributorProps( pullRequests ) {
-	const contributorsList = flow( [
+	const contributorsList = pipe( [
 		skipCreatedByBots,
 		getFirstTimeContributorPRs,
 		getUniqueByUsername,
@@ -902,7 +935,7 @@ function getContributorsMarkdownList( pullRequests ) {
  * @return {string} The formatted contributors section.
  */
 function getContributorsList( pullRequests ) {
-	const contributorsList = flow( [
+	const contributorsList = pipe( [
 		skipCreatedByBots,
 		getUniqueByUsername,
 		sortByUsername,

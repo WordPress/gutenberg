@@ -76,7 +76,7 @@ export type ControlledRangeValue = number | '' | null;
 
 export type RangeControlProps< IconProps = unknown > = Pick<
 	BaseControlProps,
-	'hideLabelFromVision' | 'help'
+	'hideLabelFromVision' | 'help' | '__nextHasNoMarginBottom'
 > &
 	MarksProps & {
 		/**
@@ -236,14 +236,15 @@ export type RailProps = MarksProps & {
 export type InputRangeProps = {
 	describedBy?: string;
 	label?: string;
-	onHideTooltip?: () => void;
 	onMouseLeave?: MouseEventHandler< HTMLInputElement >;
 	onMouseMove?: MouseEventHandler< HTMLInputElement >;
-	onShowTooltip?: () => void;
 	value?: number | '';
 };
 
-export type WrapperProps = {
+export type WrapperProps = Pick<
+	BaseControlProps,
+	'__nextHasNoMarginBottom'
+> & {
 	color?: CSSProperties[ 'color' ];
 	marks?: RangeMarks;
 };
@@ -287,39 +288,6 @@ export type UseControlledRangeValueArgs = {
 	 * The current value.
 	 */
 	value: number | null;
-};
-
-export type UseDebouncedHoverInteractionArgs = {
-	/**
-	 *  A callback function invoked when the element is hidden.
-	 *
-	 * @default () => {}
-	 */
-	onHide?: () => void;
-	/**
-	 * A callback function invoked when the mouse is moved out of the element.
-	 *
-	 * @default () => {}
-	 */
-	onMouseLeave?: MouseEventHandler< HTMLInputElement >;
-	/**
-	 * A callback function invoked when the mouse is moved.
-	 *
-	 * @default () => {}
-	 */
-	onMouseMove?: MouseEventHandler< HTMLInputElement >;
-	/**
-	 * A callback function invoked when the element is shown.
-	 *
-	 * @default () => {}
-	 */
-	onShow?: () => void;
-	/**
-	 * Timeout before the element is shown or hidden.
-	 *
-	 * @default 300
-	 */
-	timeout?: number;
 };
 
 export type UseMarksArgs = NumericProps & {

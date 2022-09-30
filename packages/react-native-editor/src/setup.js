@@ -58,9 +58,9 @@ const gutenbergSetup = () => {
 
 const setupInitHooks = () => {
 	addAction( 'native.pre-render', 'core/react-native-editor', ( props ) => {
-		registerBlocks();
-
 		const capabilities = props.capabilities ?? {};
+
+		registerBlocks();
 
 		// Unregister non-supported blocks by capabilities
 		if (

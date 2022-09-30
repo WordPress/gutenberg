@@ -136,7 +136,7 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 		$actual   = gutenberg_apply_colors_support( $block_type, $block_atts );
 		$expected = array(
 			'class' => 'has-text-color',
-			'style' => 'color: #d92828;',
+			'style' => 'color:#d92828;',
 		);
 
 		$this->assertSame( $expected, $actual );

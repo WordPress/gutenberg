@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, times } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,7 @@ export default function save( { attributes } ) {
 				className: `align${ width } columns-${ columns }`,
 			} ) }
 		>
-			{ times( columns, ( index ) => (
+			{ Array.from( { length: columns } ).map( ( _, index ) => (
 				<div className="wp-block-column" key={ `column-${ index }` }>
 					<RichText.Content
 						tagName="p"

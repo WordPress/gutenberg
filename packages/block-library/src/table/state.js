@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { times, get, mapValues, every, pick } from 'lodash';
+import { get, mapValues, every, pick } from 'lodash';
 
 const INHERITED_COLUMN_ATTRIBUTES = [ 'align' ];
 
@@ -16,8 +16,8 @@ const INHERITED_COLUMN_ATTRIBUTES = [ 'align' ];
  */
 export function createTable( { rowCount, columnCount } ) {
 	return {
-		body: times( rowCount, () => ( {
-			cells: times( columnCount, () => ( {
+		body: Array.from( { length: rowCount } ).map( () => ( {
+			cells: Array.from( { length: columnCount } ).map( () => ( {
 				content: '',
 				tag: 'td',
 			} ) ),
@@ -167,23 +167,25 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 		[ sectionName ]: [
 			...state[ sectionName ].slice( 0, rowIndex ),
 			{
-				cells: times( cellCount, ( index ) => {
-					const firstCellInColumn = get(
-						firstRow,
-						[ 'cells', index ],
-						{}
-					);
-					const inheritedAttributes = pick(
-						firstCellInColumn,
-						INHERITED_COLUMN_ATTRIBUTES
-					);
+				cells: Array.from( { length: cellCount } ).map(
+					( _, index ) => {
+						const firstCellInColumn = get(
+							firstRow,
+							[ 'cells', index ],
+							{}
+						);
+						const inheritedAttributes = pick(
+							firstCellInColumn,
+							INHERITED_COLUMN_ATTRIBUTES
+						);
 
-					return {
-						...inheritedAttributes,
-						content: '',
-						tag: sectionName === 'head' ? 'th' : 'td',
-					};
-				} ),
+						return {
+							...inheritedAttributes,
+							content: '',
+							tag: sectionName === 'head' ? 'th' : 'td',
+						};
+					}
+				),
 			},
 			...state[ sectionName ].slice( rowIndex ),
 		],

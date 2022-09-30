@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import CustomGradientBar from '../custom-gradient-bar';
+import CustomGradientBar from '../custom-gradient-picker/gradient-bar';
 
 import {
 	getColorStopsFromColors,

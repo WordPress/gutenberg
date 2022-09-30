@@ -464,7 +464,7 @@ In addition to the CSS Custom Properties, all presets but duotone generate CSS c
 /* vivid-red */
 .has-vivid-red-color { color: var(--wp--preset--color--vivid-red) !important; }
 .has-vivid-red-background-color { background-color: var(--wp--preset--color--vivid-red) !important; }
-.has-vivid-red-bordfer-color { border-color: var(--wp--preset--color--vivid-red) !important; }
+.has-vivid-red-border-color { border-color: var(--wp--preset--color--vivid-red) !important; }
 
 /* foreground */
 .has-foreground-color { color: var(--wp--preset--color--foreground) !important; }

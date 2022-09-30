@@ -33,12 +33,12 @@ const getTermIdByTermValue = ( termsMappedByName, termValue ) => {
 	}
 };
 
-function TaxonomyControls( { onChange, query } ) {
-	const taxonomies = useTaxonomies( query.postType );
+export const useTaxonomiesInfo = ( postType ) => {
+	const taxonomies = useTaxonomies( postType );
 	const taxonomiesInfo = useSelect(
 		( select ) => {
 			const { getEntityRecords } = select( coreStore );
-			const termsQuery = { per_page: MAX_FETCHED_TERMS };
+			const termsQuery = { context: 'view', per_page: MAX_FETCHED_TERMS };
 			const _taxonomiesInfo = taxonomies?.map( ( { slug, name } ) => {
 				const _terms = getEntityRecords( 'taxonomy', slug, termsQuery );
 				return {
@@ -51,6 +51,11 @@ function TaxonomyControls( { onChange, query } ) {
 		},
 		[ taxonomies ]
 	);
+	return taxonomiesInfo;
+};
+
+export function TaxonomyControls( { onChange, query } ) {
+	const taxonomiesInfo = useTaxonomiesInfo( query.postType );
 	const onTermsChange = ( taxonomySlug ) => ( newTermValues ) => {
 		const taxonomyInfo = taxonomiesInfo.find(
 			( { slug } ) => slug === taxonomySlug
@@ -102,17 +107,19 @@ function TaxonomyControls( { onChange, query } ) {
 						return null;
 					}
 					return (
-						<FormTokenField
+						<div
 							key={ slug }
-							label={ name }
-							value={ getExistingTaxQueryValue( slug ) }
-							suggestions={ terms.names }
-							onChange={ onTermsChange( slug ) }
-						/>
+							className="block-library-query-inspector__taxonomy-control"
+						>
+							<FormTokenField
+								label={ name }
+								value={ getExistingTaxQueryValue( slug ) }
+								suggestions={ terms.names }
+								onChange={ onTermsChange( slug ) }
+							/>
+						</div>
 					);
 				} ) }
 		</>
 	);
 }
-
-export default TaxonomyControls;

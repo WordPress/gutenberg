@@ -58,7 +58,6 @@ export default function PostTermsEdit( {
 	);
 	const { postTerms, hasPostTerms, isLoading } = usePostTerms( {
 		postId,
-		postType,
 		term: selectedTerm,
 	} );
 	const hasPost = postId && postType;

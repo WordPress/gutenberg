@@ -15,8 +15,8 @@
 
 				// Focus style.
 				&::before {
-					height: 100%;
-					width: 100%;
+					height: calc(100% - 4px);
+					width: calc(100% - 4px);
 				}
 			}
 
@@ -40,11 +40,6 @@
 				padding-left: 0 !important;
 				padding-right: 0 !important;
 				overflow: hidden;
-
-				// Focus style.
-				&::before {
-					height: 100%;
-				}
 			}
 
 			.block-editor-block-mover-button.is-up-button svg {

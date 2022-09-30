@@ -38,6 +38,15 @@ const transforms = {
 			},
 		},
 	],
+	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			transform: ( { content } ) => {
+				return createBlock( 'core/paragraph', { content } );
+			},
+		},
+	],
 };
 
 export default transforms;

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
-import { __experimentalGetSettings, getDate, dateI18n } from '@wordpress/date';
+import { getSettings, getDate, dateI18n } from '@wordpress/date';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -95,7 +95,7 @@ export function getPostScheduleLabel(
 }
 
 function getTimezoneAbbreviation() {
-	const { timezone } = __experimentalGetSettings();
+	const { timezone } = getSettings();
 
 	if ( timezone.abbr && isNaN( Number( timezone.abbr ) ) ) {
 		return timezone.abbr;
@@ -106,7 +106,7 @@ function getTimezoneAbbreviation() {
 }
 
 function isTimezoneSameAsSiteTimezone( date ) {
-	const { timezone } = __experimentalGetSettings();
+	const { timezone } = getSettings();
 
 	const siteOffset = Number( timezone.offset );
 	const dateOffset = -1 * ( date.getTimezoneOffset() / 60 );

@@ -168,6 +168,7 @@ class Inserter extends Component {
 				clientId={ clientId }
 				isAppender={ isAppender }
 				showInserterHelpPanel={ showInserterHelpPanel }
+				prioritizePatterns={ prioritizePatterns }
 			/>
 		);
 	}
@@ -212,8 +213,6 @@ export default compose( [
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
 			__experimentalGetDirectInsertBlock,
-			getBlockIndex,
-			getBlockCount,
 			getSettings,
 		} = select( blockEditorStore );
 
@@ -227,8 +226,6 @@ export default compose( [
 		const directInsertBlock =
 			__experimentalGetDirectInsertBlock( rootClientId );
 
-		const index = getBlockIndex( clientId );
-		const blockCount = getBlockCount();
 		const settings = getSettings();
 
 		const hasSingleBlockType =
@@ -249,10 +246,7 @@ export default compose( [
 			directInsertBlock,
 			rootClientId,
 			prioritizePatterns:
-				settings.__experimentalPreferPatternsOnRoot &&
-				! rootClientId &&
-				index > 0 &&
-				( index < blockCount || blockCount === 0 ),
+				settings.__experimentalPreferPatternsOnRoot && ! rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

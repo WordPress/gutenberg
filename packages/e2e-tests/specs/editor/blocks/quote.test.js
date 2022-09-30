@@ -143,8 +143,57 @@ describe( 'Quote', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		await page.keyboard.press( 'Backspace' );
+		// Allow time for selection to update.
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		await page.keyboard.type( '2' );
 
-		// Expect the paragraph to be deleted.
+		// Expect the paragraph to be merged into the quote block.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'can be unwrapped on Backspace', async () => {
+		await insertBlock( 'Quote' );
+
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:quote -->
+		<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
+		<p></p>
+		<!-- /wp:paragraph --></blockquote>
+		<!-- /wp:quote -->"
+	` );
+
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `""` );
+	} );
+
+	it( 'can be unwrapped with content on Backspace', async () => {
+		await insertBlock( 'Quote' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '2' );
+
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:quote -->
+		<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
+		<p>1</p>
+		<!-- /wp:paragraph --><cite>2</cite></blockquote>
+		<!-- /wp:quote -->"
+	` );
+
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>1</p>
+		<!-- /wp:paragraph -->
+
+		<!-- wp:paragraph -->
+		<p>2</p>
+		<!-- /wp:paragraph -->"
+	` );
 	} );
 } );

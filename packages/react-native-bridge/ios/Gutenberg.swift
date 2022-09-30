@@ -210,6 +210,10 @@ public class Gutenberg: UIResponder {
             settingsUpdates["quoteBlockV2"] = quoteBlockV2
         }
 
+        if let listBlockV2 = editorSettings?.listBlockV2 {
+            settingsUpdates["listBlockV2"] = listBlockV2
+        }
+
         if let rawStyles = editorSettings?.rawStyles {
             settingsUpdates["rawStyles"] = rawStyles
         }

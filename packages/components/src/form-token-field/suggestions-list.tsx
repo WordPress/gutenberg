@@ -1,10 +1,9 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
 import scrollView from 'dom-scroll-into-view';
 import classnames from 'classnames';
-import type { MouseEventHandler } from 'react';
+import type { MouseEventHandler, ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -31,6 +30,7 @@ export function SuggestionsList< T extends string | { value: string } >( {
 	suggestions = [],
 	displayTransform,
 	instanceId,
+	__experimentalRenderItem,
 }: SuggestionsListProps< T > ) {
 	const [ scrollingIntoView, setScrollingIntoView ] = useState( false );
 
@@ -113,7 +113,7 @@ export function SuggestionsList< T extends string | { value: string } >( {
 			id={ `components-form-token-suggestions-${ instanceId }` }
 			role="listbox"
 		>
-			{ map( suggestions, ( suggestion, index ) => {
+			{ suggestions.map( ( suggestion, index ) => {
 				const matchText = computeSuggestionMatch( suggestion );
 				const className = classnames(
 					'components-form-token-field__suggestion',
@@ -121,6 +121,24 @@ export function SuggestionsList< T extends string | { value: string } >( {
 						'is-selected': index === selectedIndex,
 					}
 				);
+
+				let output: ReactNode;
+
+				if ( typeof __experimentalRenderItem === 'function' ) {
+					output = __experimentalRenderItem( { item: suggestion } );
+				} else if ( matchText ) {
+					output = (
+						<span aria-label={ displayTransform( suggestion ) }>
+							{ matchText.suggestionBeforeMatch }
+							<strong className="components-form-token-field__suggestion-match">
+								{ matchText.suggestionMatch }
+							</strong>
+							{ matchText.suggestionAfterMatch }
+						</span>
+					);
+				} else {
+					output = displayTransform( suggestion );
+				}
 
 				/* eslint-disable jsx-a11y/click-events-have-key-events */
 				return (
@@ -139,17 +157,7 @@ export function SuggestionsList< T extends string | { value: string } >( {
 						onMouseEnter={ handleHover( suggestion ) }
 						aria-selected={ index === selectedIndex }
 					>
-						{ matchText ? (
-							<span aria-label={ displayTransform( suggestion ) }>
-								{ matchText.suggestionBeforeMatch }
-								<strong className="components-form-token-field__suggestion-match">
-									{ matchText.suggestionMatch }
-								</strong>
-								{ matchText.suggestionAfterMatch }
-							</span>
-						) : (
-							displayTransform( suggestion )
-						) }
+						{ output }
 					</li>
 				);
 				/* eslint-enable jsx-a11y/click-events-have-key-events */
