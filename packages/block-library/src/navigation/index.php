@@ -556,6 +556,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$inner_blocks_html = '';
 	$is_list_open      = false;
+	$is_first_item     = false;
 	foreach ( $inner_blocks as $inner_block ) {
 		if ( ( 'core/navigation-link' === $inner_block->name || 'core/home-link' === $inner_block->name || 'core/site-title' === $inner_block->name || 'core/site-logo' === $inner_block->name || 'core/navigation-submenu' === $inner_block->name ) && ! $is_list_open ) {
 			$is_list_open       = true;
@@ -566,6 +567,13 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			$inner_blocks_html .= '</ul>';
 		}
 		$inner_block_content = $inner_block->render();
+		if (!$is_first_item) {
+			$w = new WP_HTML_Tag_Processor($inner_block_content);
+			$w->next_tag('a');
+			$w->set_attribute('wp-init', 'function({ setContext, ref }) { setContext({ firstMenuElement: ref }); }');	
+			$inner_block_content = (string) $w;
+			$is_first_item = true;
+		}
 		if ( 'core/site-title' === $inner_block->name || ( 'core/site-logo' === $inner_block->name && $inner_block_content ) ) {
 			$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
 		} else {
@@ -632,18 +640,19 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
 
 	$responsive_container_markup = sprintf(
-		'<button wp-on:click="function({ setContext }) { setContext({ open: true }); }" aria-haspopup="true" %3$s class="%6$s">%9$s</button>
+		'<button wp-on:click="function({ setContext }) { setContext({ open: true }); }" wp-effect="function({ context }) { context.open && context.firstMenuElement.focus(); }" aria-haspopup="true" %3$s class="%6$s">%9$s</button>
 			<div 
 				class="%5$s" 
+				wp-effect="function({ context }) { console.log(context); }"
 				wp-class:is-menu-open="function({ context }) { return context.open; }"
 				style="%7$s" 
 				id="%1$s"
 			>
 				<div class="wp-block-navigation__responsive-close" tabindex="-1">
 					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s" aria-modal="true" role="dialog">
-							<button wp-on:click="function({ setContext }) { setContext({ open: false }); }" %4$s class="wp-block-navigation__responsive-container-close">%10$s</button>
+						<button wp-on:click="function({ setContext }) { setContext({ open: false }); }" %4$s class="wp-block-navigation__responsive-container-close">%10$s</button>
 						<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
-							%2$s
+						%2$s
 						</div>
 					</div>
 				</div>

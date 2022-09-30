@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { useRef } from 'preact/hooks';
 import { h, options } from 'preact';
 
 // WordPress Directives.
@@ -12,11 +13,15 @@ export const directive = ( name, cb ) => {
 };
 
 const WpDirective = ( { type, wp, props: originalProps } ) => {
-	const element = h( type, { ...originalProps, _wrapped: true } );
+	const ref = useRef( null );
+	const element = h( type, { ...originalProps, ref, _wrapped: true } );
 	const props = { ...originalProps, children: element };
 
 	for ( const d in wp ) {
-		const wrapper = directives[ d ]?.( wp, props, { element } );
+		const wrapper = directives[ d ]?.( wp, props, {
+			ref,
+			element,
+		} );
 		if ( wrapper !== undefined ) props.children = wrapper;
 	}
 

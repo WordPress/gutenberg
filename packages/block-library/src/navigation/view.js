@@ -31,10 +31,17 @@ directive( 'log', ( { log } ) => {
 } );
 
 // wp-context
-const ctx = createContext( {} );
-directive( 'context', ( { context }, { children } ) => {
-	const value = useState( context );
-	return <ctx.Provider value={ value }>{ children }</ctx.Provider>;
+const ctx = createContext( [ {}, () => ( {} ) ] );
+directive( 'context', ( { context: initialContext }, { children } ) => {
+	const [ context, setContext ] = useState( initialContext );
+	const setMergedContext = ( newContext ) => {
+		setContext( { ...context, ...newContext } );
+	};
+	return (
+		<ctx.Provider value={ [ context, setMergedContext ] }>
+			{ children }
+		</ctx.Provider>
+	);
 } );
 
 // wp-effect
@@ -44,6 +51,15 @@ directive( 'effect', ( { effect } ) => {
 		const cb = eval( `(${ effect })` );
 		cb( { context, setContext } );
 	} );
+} );
+
+// wp-init
+directive( 'init', ( { init }, _, { ref } ) => {
+	const [ context, setContext ] = useContext( ctx );
+	useEffect( () => {
+		const cb = eval( `(${ init })` );
+		cb( { context, setContext, ref: ref.current } );
+	}, [] );
 } );
 
 // wp-on:[event]
