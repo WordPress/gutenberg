@@ -22,16 +22,6 @@ import { createRootFragment, idle } from './utils';
 /**
  * Directives
  */
-// wp-log
-directive( 'log', ( { directives: { log } } ) => {
-	Object.values( log ).forEach( ( expression ) => {
-		useEffect( () => {
-			// eslint-disable-next-line no-console
-			console.log( expression );
-		}, [ expression ] );
-	} );
-} );
-
 // wp-context
 const ctx = createContext( [ {}, () => ( {} ) ] );
 directive( 'context', ( { directives: { context }, props: { children } } ) => {
