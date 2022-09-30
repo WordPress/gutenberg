@@ -442,7 +442,7 @@ function gutenberg_register_gutenberg_patterns() {
 			<div class="wp-block-query"><!-- wp:post-template -->
 			<!-- wp:group {"layout":{"inherit":false},"style":{"spacing":{"padding":{"top":"0px","right":"0px","bottom":"var:preset|spacing|40","left":"0px"}}}} -->
 			<div class="wp-block-group" style="padding-top:0px;padding-right:0px;padding-bottom:var(--wp--preset--spacing--40);padding-left:0px"><!-- wp:separator {"backgroundColor":"white"} -->
-			<hr class="wp-block-separator has-text-color has-white-color has-alpha-channel-opacity has-white-background-color has-background"/>
+			<hr class="wp-block-separator has-text-color has-white-color has-alpha-channel-opacity has-white-background-color has-background is-style-wide"/>
 			<!-- /wp:separator -->
 
 			<!-- wp:post-title {"isLink":true,"style":{"elements":{"link":{"color":{"text":"var:preset|color|white"}}}}} /--></div>
@@ -450,6 +450,34 @@ function gutenberg_register_gutenberg_patterns() {
 			<!-- /wp:post-template --></div>
 			<!-- /wp:query --></div>
 			<!-- /wp:group -->',
+		),
+		'query-post-and-date-list'                   => array(
+			'title'      => _x( 'Post and date list', 'Block pattern title', 'gutenberg' ),
+			'blockTypes' => array( 'core/query' ),
+			'categories' => array( 'query' ),
+			'content'    => '<!-- wp:group {"style":{"spacing":{"margin":{"top":"14vh","bottom":"0px"}}},"layout":{"inherit":true,"type":"constrained"}} -->
+<div class="wp-block-group" style="margin-top:14vh;margin-bottom:0px"><!-- wp:query {"query":{"perPage":"99","pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
+<div class="wp-block-query"><!-- wp:post-template -->
+<!-- wp:group {"style":{"spacing":{"margin":{"top":"0px","bottom":"0px"},"blockGap":"0px","padding":{"top":"0px","right":"0px","bottom":"0px","left":"0px"}}}} -->
+<div class="wp-block-group" style="margin-top:0px;margin-bottom:0px;padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px"><!-- wp:separator {"style":{"color":{"background":"#d6d5d3"}},"className":"is-style-wide"} -->
+<hr class="wp-block-separator has-text-color has-alpha-channel-opacity has-background is-style-wide" style="background-color:#d6d5d3;color:#d6d5d3"/>
+<!-- /wp:separator -->
+
+<!-- wp:group {"style":{"spacing":{"margin":{"top":"0px","bottom":"0px"},"padding":{"top":"26px","bottom":"0px"},"blockGap":"1em"}},"layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"space-between","verticalAlignment":"top"}} -->
+<div class="wp-block-group" style="margin-top:0px;margin-bottom:0px;padding-top:26px;padding-bottom:0px"><!-- wp:post-title {"isLink":true,"style":{"typography":{"fontStyle":"normal","fontWeight":"500"},"elements":{"link":{"color":{"text":"#1d201f"}}}},"fontSize":"medium"} /-->
+
+<!-- wp:post-date {"textAlign":"right","format":"M Y","isLink":true,"style":{"elements":{"link":{"color":{"text":"#707170"}}}},"className":"no-shrink","fontSize":"medium"} /--></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->
+<!-- /wp:post-template --></div>
+<!-- /wp:query -->
+
+<!-- wp:group {"style":{"spacing":{"blockGap":"0px","margin":{"top":"0px","bottom":"0px"},"padding":{"top":"26px"}}}} -->
+<div class="wp-block-group" style="margin-top:0px;margin-bottom:0px;padding-top:26px"><!-- wp:separator {"style":{"color":{"background":"#d6d5d3"}},"className":"is-style-wide"} -->
+<hr class="wp-block-separator has-text-color has-alpha-channel-opacity has-background is-style-wide" style="background-color:#d6d5d3;color:#d6d5d3"/>
+<!-- /wp:separator --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->',
 		),
 		// Initial block pattern to be used with block transformations with patterns.
 		'social-links-shared-background-color' => array(
