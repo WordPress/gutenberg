@@ -107,10 +107,7 @@ const BorderBoxControl = (
 						enableStyle={ enableStyle }
 						onChange={ onLinkedChange }
 						placeholder={
-							hasMixedBorders
-								? /* translators: Placeholder text representing a mix of values. */
-								  __( 'Mix' )
-								: undefined
+							hasMixedBorders ? __( 'Mixed' ) : undefined
 						}
 						__unstablePopoverProps={ popoverProps }
 						shouldSanitizeBorder={ false } // This component will handle that.
