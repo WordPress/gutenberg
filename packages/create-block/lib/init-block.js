@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-const { omitBy } = require( 'lodash' );
 const { dirname, join } = require( 'path' );
 const makeDir = require( 'make-dir' );
 const { writeFile } = require( 'fs' ).promises;
@@ -41,8 +40,8 @@ async function initBlockJSON( {
 	await writeFile(
 		outputFile,
 		JSON.stringify(
-			omitBy(
-				{
+			Object.fromEntries(
+				Object.entries( {
 					$schema,
 					apiVersion,
 					name: namespace + '/' + slug,
@@ -57,8 +56,7 @@ async function initBlockJSON( {
 					editorScript,
 					editorStyle,
 					style,
-				},
-				( value ) => ! value
+				} ).filter( ( [ , value ] ) => !! value )
 			),
 			null,
 			'\t'

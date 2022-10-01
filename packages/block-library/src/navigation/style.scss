@@ -326,7 +326,6 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation__responsive-container,
 .wp-block-navigation__responsive-close,
 .wp-block-navigation__responsive-dialog,
-.wp-block-navigation,
 .wp-block-navigation .wp-block-page-list,
 .wp-block-navigation__container,
 .wp-block-navigation__responsive-container-content {
@@ -341,16 +340,17 @@ button.wp-block-navigation-item__content {
 // We use :where to keep specificity minimal, yet still scope it to only the navigation block.
 // That way if padding is set in theme.json, it still wins.
 // https://css-tricks.com/almanac/selectors/w/where/
+// Note: .wp-block-navigation-item targets both Page List and custom menu items. .wp-block-navigation-link targets only custom.
 
 // When the menu has a background, items have paddings, reduce margins to compensate.
 // Treat margins and paddings differently when the block has a background.
-:where(.wp-block-navigation.has-background .wp-block-navigation-link a:not(.wp-element-button)),
+:where(.wp-block-navigation.has-background .wp-block-navigation-item a:not(.wp-element-button)),
 :where(.wp-block-navigation.has-background .wp-block-navigation-submenu a:not(.wp-element-button)) {
 	padding: 0.5em 1em;
 }
 
 // Provide a default padding for submenus who should always have some, regardless of the top level menu items.
-:where(.wp-block-navigation .wp-block-navigation__submenu-container .wp-block-navigation-link a:not(.wp-element-button)),
+:where(.wp-block-navigation .wp-block-navigation__submenu-container .wp-block-navigation-item a:not(.wp-element-button)),
 :where(.wp-block-navigation .wp-block-navigation__submenu-container .wp-block-navigation-submenu a:not(.wp-element-button)) {
 	padding: 0.5em 1em;
 }
@@ -430,6 +430,16 @@ button.wp-block-navigation-item__content {
  * Mobile menu.
  */
 
+@keyframes overlay-menu__fade-in-animation {
+	from {
+		opacity: 0;
+		transform: translateY(0.5em);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
 .wp-block-navigation__responsive-container {
 	display: none;
 	position: fixed;
@@ -467,8 +477,16 @@ button.wp-block-navigation-item__content {
 		flex-direction: column;
 		background-color: inherit;
 
-		// Use em units to apply padding, so themes can more easily style this in various ways.
-		padding: 2rem;
+		// Animation.
+		animation: overlay-menu__fade-in-animation 0.1s ease-out;
+		animation-fill-mode: forwards;
+		@include reduce-motion("animation");
+
+		// Try to inherit any root paddings set, so the X can align to a top-right aligned menu.
+		padding-top: var(--wp--style--root--padding-top, 2rem);
+		padding-right: var(--wp--style--root--padding-right, 2rem);
+		padding-bottom: var(--wp--style--root--padding-bottom, 2rem);
+		padding-left: var(--wp--style--root--padding-left, 2rem);
 
 		// Allow modal to scroll.
 		overflow: auto;
@@ -612,6 +630,7 @@ button.wp-block-navigation-item__content {
 	border: none;
 	margin: 0;
 	padding: 0;
+	text-transform: inherit;
 
 	svg {
 		fill: currentColor;
@@ -645,6 +664,11 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation__responsive-close {
 	width: 100%;
 
+	// Try to inherit wide-width when defined, so the X can align to a top-right aligned menu.
+	max-width: var(--wp--style--global--wide-size, 100%);
+	margin-left: auto;
+	margin-right: auto;
+
 	// This element is not keyboard accessible, and is focusable only using the mouse.
 	// It is part of the MicroModal library that adds a scrim outside of a modal dialog that is not fullscreen,
 	// where clicking that scrim closes the overlay just like the close button.
@@ -665,7 +689,8 @@ button.wp-block-navigation-item__content {
 }
 
 // Adjust open dialog top margin when admin-bar is visible.
-.has-modal-open .admin-bar .wp-block-navigation__responsive-dialog {
+// Needs to be scoped to .is-menu-open, or it will shift the position of any other navigations that may be present.
+.has-modal-open .admin-bar .is-menu-open .wp-block-navigation__responsive-dialog {
 	margin-top: $admin-bar-height-big;
 
 	// Handle smaller admin-bar.

@@ -82,6 +82,14 @@ _Returns_
 
 -   `Date`: Date
 
+### getSettings
+
+Returns the currently defined date settings.
+
+_Returns_
+
+-   `DateSettings`: Settings, including locale data.
+
 ### gmdate
 
 Formats a date (like `date()` in PHP), in the UTC timezone.

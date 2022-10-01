@@ -56,6 +56,8 @@ export interface Options {
 /**
  * Resolves the specified entity record.
  *
+ * @since 6.1.0 Introduced in WordPress core.
+ *
  * @param  kind     Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
  * @param  name     Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
  * @param  recordId ID of the requested entity record.
@@ -163,8 +165,16 @@ export default function useEntityRecord< RecordType >(
 
 	const { editedRecord, hasEdits } = useSelect(
 		( select ) => ( {
-			editedRecord: select( coreStore ).getEditedEntityRecord(),
-			hasEdits: select( coreStore ).hasEditsForEntityRecord(),
+			editedRecord: select( coreStore ).getEditedEntityRecord(
+				kind,
+				name,
+				recordId
+			),
+			hasEdits: select( coreStore ).hasEditsForEntityRecord(
+				kind,
+				name,
+				recordId
+			),
 		} ),
 		[ kind, name, recordId ]
 	);

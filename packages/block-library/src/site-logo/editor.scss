@@ -39,11 +39,18 @@
 		width: 120px;
 	}
 
+	// Inherit radius.
+	> div, // A 60px width div shown only in the editor on mobile.
+	.components-resizable-box__container {
+		border-radius: inherit;
+	}
+
 	// Style the placeholder.
 	.components-placeholder {
 		justify-content: center;
 		align-items: center;
 		padding: 0;
+		border-radius: inherit;
 
 		// Provide a minimum size for the placeholder, for when the logo is resized.
 		// @todo: resizing is currently only possible by adding an image, resizing,

@@ -26,9 +26,10 @@ export default function ColorPanel( {
 	const [ detectedColor, setDetectedColor ] = useState();
 	const [ detectedLinkColor, setDetectedLinkColor ] = useState();
 	const ref = useBlockRef( clientId );
+	const definedColors = settings.filter( ( setting ) => setting?.colorValue );
 
 	useEffect( () => {
-		if ( ! enableContrastChecking ) {
+		if ( ! enableContrastChecking || ! definedColors.length ) {
 			return;
 		}
 

@@ -4,7 +4,6 @@
  * External dependencies
  */
 import { camelCase } from 'change-case';
-import { isEmpty, pick, pickBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -174,12 +173,11 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 		}
 
 		serverSideBlockDefinitions[ blockName ] = Object.fromEntries(
-			Object.entries(
-				pickBy(
-					definitions[ blockName ],
-					( value ) => value !== null && value !== undefined
+			Object.entries( definitions[ blockName ] )
+				.filter(
+					( [ , value ] ) => value !== null && value !== undefined
 				)
-			).map( ( [ key, value ] ) => [ camelCase( key ), value ] )
+				.map( ( [ key, value ] ) => [ camelCase( key ), value ] )
 		);
 	}
 }
@@ -211,7 +209,11 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
 		'variations',
 	];
 
-	const settings = pick( metadata, allowedFields );
+	const settings = Object.fromEntries(
+		Object.entries( metadata ).filter( ( [ key ] ) =>
+			allowedFields.includes( key )
+		)
+	);
 
 	if ( textdomain ) {
 		Object.keys( i18nBlockSchema ).forEach( ( key ) => {
@@ -321,7 +323,7 @@ function translateBlockSettingUsingI18nSchema(
 	}
 	if (
 		Array.isArray( i18nSchema ) &&
-		! isEmpty( i18nSchema ) &&
+		i18nSchema.length &&
 		Array.isArray( settingValue )
 	) {
 		return settingValue.map( ( value ) =>
@@ -334,7 +336,7 @@ function translateBlockSettingUsingI18nSchema(
 	}
 	if (
 		isObject( i18nSchema ) &&
-		! isEmpty( i18nSchema ) &&
+		Object.entries( i18nSchema ).length &&
 		isObject( settingValue )
 	) {
 		return Object.keys( settingValue ).reduce( ( accumulator, key ) => {

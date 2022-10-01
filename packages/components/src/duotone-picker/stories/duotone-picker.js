@@ -13,6 +13,8 @@ export default {
 	component: DuotonePicker,
 	argTypes: {
 		clearable: { control: { type: 'boolean' } },
+		disableCustomColors: { control: { type: 'boolean' } },
+		disableCustomDuotone: { control: { type: 'boolean' } },
 		onChange: { action: 'onChange' },
 		unsetable: { control: { type: 'boolean' } },
 	},

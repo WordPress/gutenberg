@@ -7,7 +7,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { DOWN } from '@wordpress/keycodes';
 import { menu } from '@wordpress/icons';
 
 /**
@@ -87,7 +86,7 @@ function DropdownMenu( dropdownMenuProps ) {
 						return;
 					}
 
-					if ( ! isOpen && event.keyCode === DOWN ) {
+					if ( ! isOpen && event.code === 'ArrowDown' ) {
 						event.preventDefault();
 						onToggle();
 					}

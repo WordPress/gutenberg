@@ -79,7 +79,7 @@ export const PRESET_METADATA = [
 	},
 	{
 		path: [ 'spacing', 'spacingSizes' ],
-		valueKey: 'spacingSizes',
+		valueKey: 'size',
 		cssVarInfix: 'spacing',
 		valueFunc: ( { size } ) => size,
 		classes: [],

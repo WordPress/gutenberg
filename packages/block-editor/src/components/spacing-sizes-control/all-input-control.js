@@ -19,7 +19,7 @@ export default function AllInputControl( {
 } ) {
 	const allValue = getAllRawValue( values );
 	const hasValues = isValuesDefined( values );
-	const isMixed = hasValues && isValuesMixed( values );
+	const isMixed = hasValues && isValuesMixed( values, sides );
 
 	const handleOnChange = ( next ) => {
 		const nextValues = applyValueToSides( values, next, sides );

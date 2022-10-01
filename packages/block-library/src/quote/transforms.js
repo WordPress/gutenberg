@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createBlock, parseWithAttributeSchema } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 const transforms = {
 	from: [
@@ -17,19 +17,7 @@ const transforms = {
 						fontSize,
 						style,
 					},
-					parseWithAttributeSchema( value, {
-						type: 'array',
-						source: 'query',
-						selector: 'p',
-						query: {
-							content: {
-								type: 'string',
-								source: 'html',
-							},
-						},
-					} ).map( ( { content } ) =>
-						createBlock( 'core/paragraph', { content } )
-					)
+					[ createBlock( 'core/paragraph', { content: value } ) ]
 				);
 			},
 		},
@@ -76,6 +64,16 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ '*' ],
 			isMatch: ( {}, blocks ) => {
+				// When a single block is selected make the tranformation
+				// available only to specific blocks that make sense.
+				if ( blocks.length === 1 ) {
+					return [
+						'core/paragraph',
+						'core/heading',
+						'core/list',
+						'core/pullquote',
+					].includes( blocks[ 0 ].name );
+				}
 				return ! blocks.some( ( { name } ) => name === 'core/quote' );
 			},
 			__experimentalConvert: ( blocks ) =>
@@ -106,10 +104,8 @@ const transforms = {
 				innerBlocks
 			) => {
 				const value = innerBlocks
-					.map(
-						( { attributes } ) => `<p>${ attributes.content }</p>`
-					)
-					.join( '' );
+					.map( ( { attributes } ) => `${ attributes.content }` )
+					.join( '<br>' );
 				return createBlock( 'core/pullquote', {
 					value,
 					citation,

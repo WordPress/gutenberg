@@ -1,15 +1,26 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
+	reset,
 	formatCapitalize,
 	formatLowercase,
 	formatUppercase,
 } from '@wordpress/icons';
 
 const TEXT_TRANSFORMS = [
+	{
+		name: __( 'None' ),
+		value: 'none',
+		icon: reset,
+	},
 	{
 		name: __( 'Uppercase' ),
 		value: 'uppercase',
@@ -30,15 +41,21 @@ const TEXT_TRANSFORMS = [
 /**
  * Control to facilitate text transform selections.
  *
- * @param {Object}   props          Component props.
- * @param {string}   props.value    Currently selected text transform.
- * @param {Function} props.onChange Handles change in text transform selection.
+ * @param {Object}   props           Component props.
+ * @param {string}   props.className Class name to add to the control.
+ * @param {string}   props.value     Currently selected text transform.
+ * @param {Function} props.onChange  Handles change in text transform selection.
  *
  * @return {WPElement} Text transform control.
  */
-export default function TextTransformControl( { value, onChange } ) {
+export default function TextTransformControl( { className, value, onChange } ) {
 	return (
-		<fieldset className="block-editor-text-transform-control">
+		<fieldset
+			className={ classnames(
+				'block-editor-text-transform-control',
+				className
+			) }
+		>
 			<BaseControl.VisualLabel as="legend">
 				{ __( 'Letter case' ) }
 			</BaseControl.VisualLabel>
@@ -48,16 +65,15 @@ export default function TextTransformControl( { value, onChange } ) {
 						<Button
 							key={ textTransform.value }
 							icon={ textTransform.icon }
-							isSmall
-							isPressed={ value === textTransform.value }
-							aria-label={ textTransform.name }
-							onClick={ () =>
+							label={ textTransform.name }
+							isPressed={ textTransform.value === value }
+							onClick={ () => {
 								onChange(
-									value === textTransform.value
+									textTransform.value === value
 										? undefined
 										: textTransform.value
-								)
-							}
+								);
+							} }
 						/>
 					);
 				} ) }

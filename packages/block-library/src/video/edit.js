@@ -13,7 +13,7 @@ import {
 	Disabled,
 	PanelBody,
 	Spinner,
-	withNotices,
+	Placeholder,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -31,9 +31,10 @@ import {
 import { useRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -43,18 +44,33 @@ import VideoCommonSettings from './edit-common-settings';
 import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 
+// Much of this description is duplicated from MediaPlaceholder.
+const placeholder = ( content ) => {
+	return (
+		<Placeholder
+			className="block-editor-media-placeholder"
+			withIllustration={ true }
+			icon={ icon }
+			label={ __( 'Video' ) }
+			instructions={ __(
+				'Upload a video file, pick one from your media library, or add one with a URL.'
+			) }
+		>
+			{ content }
+		</Placeholder>
+	);
+};
+
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 function VideoEdit( {
 	isSelected,
-	noticeUI,
 	attributes,
 	className,
 	setAttributes,
 	insertBlocksAfter,
 	onReplace,
-	noticeOperations,
 } ) {
 	const instanceId = useInstanceId( VideoEdit );
 	const videoPlayer = useRef();
@@ -73,9 +89,7 @@ function VideoEdit( {
 				mediaUpload( {
 					filesList: [ file ],
 					onFileChange: ( [ media ] ) => onSelectVideo( media ),
-					onError: ( message ) => {
-						noticeOperations.createErrorNotice( message );
-					},
+					onError: onUploadError,
 					allowedTypes: ALLOWED_MEDIA_TYPES,
 				} );
 			}
@@ -126,9 +140,9 @@ function VideoEdit( {
 		}
 	}
 
+	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
 	const classes = classnames( className, {
@@ -149,8 +163,8 @@ function VideoEdit( {
 					accept="video/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
-					notices={ noticeUI }
 					onError={ onUploadError }
+					placeholder={ placeholder }
 				/>
 			</div>
 		);
@@ -289,4 +303,4 @@ function VideoEdit( {
 	);
 }
 
-export default withNotices( VideoEdit );
+export default VideoEdit;

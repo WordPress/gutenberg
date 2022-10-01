@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import isPlainObject from 'is-plain-obj';
+import { isPlainObject } from 'is-plain-object';
 
 /* eslint-disable jsdoc/valid-types */
 /**

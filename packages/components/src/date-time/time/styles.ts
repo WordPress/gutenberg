@@ -18,6 +18,7 @@ import SelectControl from '../../select-control';
 import { Select } from '../../select-control/styles/select-control-styles';
 
 export const Wrapper = styled.div`
+	box-sizing: border-box;
 	font-size: ${ CONFIG.fontSize };
 `;
 

@@ -19,6 +19,7 @@ test.describe( 'new editor state', () => {
 	test( 'should show the New Post page in Gutenberg', async ( {
 		admin,
 		page,
+		editor,
 	} ) => {
 		await admin.createNewPost();
 
@@ -35,6 +36,7 @@ test.describe( 'new editor state', () => {
 		).toBeVisible();
 
 		// Should display the Post Formats UI.
+		await editor.openDocumentSettingsSidebar();
 		await expect(
 			page.locator( 'role=combobox[name="Post Format"i]' )
 		).toBeVisible();

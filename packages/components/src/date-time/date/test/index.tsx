@@ -31,7 +31,9 @@ describe( 'DatePicker', () => {
 	} );
 
 	it( 'should call onChange when a day is selected', async () => {
-		const user = userEvent.setup( { delay: null } );
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 
 		const onChange = jest.fn();
 
@@ -50,7 +52,9 @@ describe( 'DatePicker', () => {
 	} );
 
 	it( 'should call onMonthPreviewed and onChange when a day in a different month is selected', async () => {
-		const user = userEvent.setup( { delay: null } );
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 
 		const onMonthPreviewed = jest.fn();
 		const onChange = jest.fn();

@@ -29,8 +29,10 @@ export default function useCopy( clientId ) {
 		}
 
 		node.addEventListener( 'copy', onCopy );
+		node.addEventListener( 'cut', onCopy );
 		return () => {
 			node.removeEventListener( 'copy', onCopy );
+			node.removeEventListener( 'cut', onCopy );
 		};
 	}, [] );
 }

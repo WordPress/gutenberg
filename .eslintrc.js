@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-const { escapeRegExp } = require( 'lodash' );
 const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
 
@@ -17,7 +16,8 @@ const { version } = require( './package' );
  * @type {string}
  */
 const majorMinorRegExp =
-	escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.\\d+)?';
+	version.replace( /\.\d+$/, '' ).replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' ) +
+	'(\\.\\d+)?';
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -83,9 +83,11 @@ module.exports = {
 							'capitalize',
 							'chunk',
 							'clamp',
+							'cloneDeep',
 							'compact',
 							'concat',
 							'countBy',
+							'debounce',
 							'deburr',
 							'defaults',
 							'defaultTo',
@@ -94,14 +96,20 @@ module.exports = {
 							'differenceWith',
 							'dropRight',
 							'each',
+							'escapeRegExp',
 							'extend',
 							'findIndex',
 							'findKey',
 							'findLast',
+							'first',
 							'flatMap',
 							'flatten',
 							'flattenDeep',
+							'flow',
+							'flowRight',
+							'forEach',
 							'fromPairs',
+							'has',
 							'identity',
 							'invoke',
 							'isArray',
@@ -118,6 +126,7 @@ module.exports = {
 							'isUndefined',
 							'keyBy',
 							'keys',
+							'last',
 							'lowerCase',
 							'mapKeys',
 							'maxBy',
@@ -127,6 +136,7 @@ module.exports = {
 							'nth',
 							'once',
 							'overEvery',
+							'partial',
 							'partialRight',
 							'random',
 							'reject',
@@ -134,6 +144,7 @@ module.exports = {
 							'reverse',
 							'size',
 							'snakeCase',
+							'sortBy',
 							'startCase',
 							'startsWith',
 							'stubFalse',
@@ -141,9 +152,12 @@ module.exports = {
 							'sum',
 							'sumBy',
 							'take',
+							'throttle',
+							'times',
 							'toString',
 							'trim',
 							'truncate',
+							'unionBy',
 							'uniq',
 							'uniqBy',
 							'uniqueId',
@@ -151,6 +165,7 @@ module.exports = {
 							'upperFirst',
 							'values',
 							'words',
+							'xor',
 							'zip',
 						],
 						message:

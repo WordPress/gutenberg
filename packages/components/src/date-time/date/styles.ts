@@ -12,6 +12,10 @@ import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { space } from '../../ui/utils/space';
 
+export const Wrapper = styled.div`
+	box-sizing: border-box;
+`;
+
 export const Navigator = styled( HStack )`
 	margin-bottom: ${ space( 4 ) };
 `;
@@ -35,6 +39,8 @@ export const Calendar = styled.div`
 
 export const DayOfWeek = styled.div`
 	color: ${ COLORS.gray[ 700 ] };
+	font-size: ${ CONFIG.fontSize };
+	line-height: ${ CONFIG.fontLineHeightBase };
 
 	&:nth-of-type( 1 ) {
 		justify-self: start;

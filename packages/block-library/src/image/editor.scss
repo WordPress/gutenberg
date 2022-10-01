@@ -9,10 +9,21 @@
 		box-shadow: inset 0 0 0 $border-width $gray-900;
 		border: none;
 
+		// Disable any duotone filter applied in the selected state.
+		filter: none;
+
 		// @todo: this should eventually be overridden by a custom border-radius set in the inspector.
 		border-radius: $radius-block-ui;
 
 		> svg {
+			opacity: 0;
+		}
+
+		.components-placeholder__illustration {
+			display: none;
+		}
+
+		&::before {
 			opacity: 0;
 		}
 	}

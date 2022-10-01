@@ -15,7 +15,7 @@ export default function PostURLLabel() {
 
 export function usePostURLLabel() {
 	const postLink = useSelect(
-		( select ) => select( editorStore ).getCurrentPost().link,
+		( select ) => select( editorStore ).getPermalink(),
 		[]
 	);
 	return filterURLForDisplay( safeDecodeURIComponent( postLink ) );

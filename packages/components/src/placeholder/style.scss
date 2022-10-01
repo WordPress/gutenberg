@@ -173,14 +173,26 @@
 // This is mainly an issue in terms of Site Logo which has a brief flash of the square placeholder.
 .components-placeholder.has-illustration {
 	color: inherit;
-	border-radius: inherit;
 	display: flex;
 	box-shadow: none;
-	background: none;
 	min-width: 100px;
+
+	// Blur the background so layered dashed placeholders are still visually separate.
+	// Make the background transparent to not interfere with the background overlay in placeholder-style() pseudo element
+	backdrop-filter: blur(100px);
+	background-color: transparent;
+
+	// Invert the colors in themes deemed dark.
+	.is-dark-theme & {
+		background-color: rgba($black, 0.1);
+	}
 
 	.components-placeholder__fieldset {
 		width: auto;
+
+		// Unset intrinsic margins.
+		margin-left: 0;
+		margin-right: 0;
 	}
 
 	// Show placeholder buttons on block selection.
@@ -202,7 +214,7 @@
 	}
 
 	// By painting the borders here, we enable them to be replaced by the Border control.
-	border: $border-width dashed currentColor;
+	@include placeholder-style();
 	overflow: hidden;
 }
 
@@ -222,7 +234,5 @@
 	width: 100%;
 	height: 100%;
 	stroke: currentColor;
-	stroke-dasharray: 3;
-	border-width: inherit;
-	border-style: inherit;
+	opacity: 0.25;
 }

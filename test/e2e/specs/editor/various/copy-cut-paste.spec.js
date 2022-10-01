@@ -134,11 +134,11 @@ test.describe( 'Copy/cut/paste', () => {
 	} ) => {
 		// Add group block with paragraph.
 		await editor.insertBlock( {
-			name: 'core/group',
+			name: 'core/buttons',
 			innerBlocks: [
 				{
-					name: 'core/paragraph',
-					attributes: { content: 'P' },
+					name: 'core/button',
+					attributes: { text: 'Click' },
 				},
 			],
 		} );
@@ -188,11 +188,11 @@ test.describe( 'Copy/cut/paste', () => {
 	} ) => {
 		// Add group block with paragraph.
 		await editor.insertBlock( {
-			name: 'core/group',
+			name: 'core/buttons',
 			innerBlocks: [
 				{
-					name: 'core/paragraph',
-					attributes: { content: 'P' },
+					name: 'core/button',
+					attributes: { text: 'Click' },
 				},
 			],
 		} );

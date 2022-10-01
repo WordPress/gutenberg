@@ -143,6 +143,8 @@ describe( 'Quote', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		await page.keyboard.press( 'Backspace' );
+		// Allow time for selection to update.
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await page.keyboard.type( '2' );
 
 		// Expect the paragraph to be merged into the quote block.

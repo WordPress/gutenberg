@@ -36,9 +36,38 @@ export function getCustomValueFromPreset( value, spacingSizes ) {
 	}
 
 	const slug = getSpacingPresetSlug( value );
-	const spacingSize = spacingSizes.find( ( size ) => size.slug === slug );
+	const spacingSize = spacingSizes.find(
+		( size ) => String( size.slug ) === slug
+	);
 
 	return spacingSize?.size;
+}
+
+/**
+ * Converts a custom value to preset value if one can be found.
+ *
+ * Returns value as-is if no match is found.
+ *
+ * @param {string} value        Value to convert
+ * @param {Array}  spacingSizes Array of the current spacing preset objects
+ *
+ * @return {string} The preset value if it can be found.
+ */
+export function getPresetValueFromCustomValue( value, spacingSizes ) {
+	// Return value as-is if it is already a preset;
+	if ( isValueSpacingPreset( value ) ) {
+		return value;
+	}
+
+	const spacingMatch = spacingSizes.find(
+		( size ) => String( size.size ) === String( value )
+	);
+
+	if ( spacingMatch?.slug ) {
+		return `var:preset|spacing|${ spacingMatch.slug }`;
+	}
+
+	return value;
 }
 
 /**
@@ -80,7 +109,7 @@ export function getSpacingPresetSlug( value ) {
 
 	const slug = value.match( /var:preset\|spacing\|(.+)/ );
 
-	return slug ? parseInt( slug[ 1 ], 10 ) : undefined;
+	return slug ? slug[ 1 ] : undefined;
 }
 
 /**
@@ -100,7 +129,7 @@ export function getSliderValueFromPreset( presetValue, spacingSizes ) {
 			? '0'
 			: getSpacingPresetSlug( presetValue );
 	const sliderValue = spacingSizes.findIndex( ( spacingSize ) => {
-		return spacingSize.slug === slug;
+		return String( spacingSize.slug ) === slug;
 	} );
 
 	// Returning NaN rather than undefined as undefined makes range control thumb sit in center
@@ -159,13 +188,14 @@ export function getAllRawValue( values = {} ) {
  * Checks to determine if values are mixed.
  *
  * @param {Object} values Box values.
+ * @param {Array}  sides  Sides that values relate to.
  *
  * @return {boolean} Whether values are mixed.
  */
-export function isValuesMixed( values = {} ) {
+export function isValuesMixed( values = {}, sides = ALL_SIDES ) {
 	return (
 		( Object.values( values ).length >= 1 &&
-			Object.values( values ).length < 4 ) ||
+			Object.values( values ).length < sides.length ) ||
 		new Set( Object.values( values ) ).size > 1
 	);
 }
@@ -178,15 +208,8 @@ export function isValuesMixed( values = {} ) {
  * @return {boolean} Whether values are defined.
  */
 export function isValuesDefined( values ) {
-	return (
-		values !== undefined &&
-		! isEmpty(
-			Object.values( values ).filter(
-				// Switching units when input is empty causes values only
-				// containing units. This gives false positive on mixed values
-				// unless filtered.
-				( value ) => !! value && /\d/.test( value )
-			)
-		)
-	);
+	if ( values === undefined || values === null ) {
+		return false;
+	}
+	return ! isEmpty( Object.values( values ).filter( ( value ) => !! value ) );
 }

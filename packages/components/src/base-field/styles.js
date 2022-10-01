@@ -35,7 +35,7 @@ export const BaseField = css`
 
 	&:focus,
 	&[data-focused='true'] {
-		border-color: ${ COLORS.admin.theme };
+		border-color: ${ COLORS.ui.theme };
 		box-shadow: ${ CONFIG.controlBoxShadowFocus };
 	}
 `;

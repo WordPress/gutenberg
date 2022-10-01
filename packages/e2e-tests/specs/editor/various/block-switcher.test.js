@@ -18,6 +18,7 @@ describe( 'Block Switcher', () => {
 		// Insert a list block.
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'List content' );
+		await page.keyboard.press( 'ArrowUp' );
 		await pressKeyWithModifier( 'alt', 'F10' );
 
 		// Verify the block switcher exists.
@@ -31,7 +32,6 @@ describe( 'Block Switcher', () => {
 				'Heading',
 				'Quote',
 				'Columns',
-				'Table of Contents',
 			] )
 		);
 	} );
@@ -45,6 +45,7 @@ describe( 'Block Switcher', () => {
 		// Insert a list block.
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'List content' );
+		await page.keyboard.press( 'ArrowUp' );
 		await pressKeyWithModifier( 'alt', 'F10' );
 
 		// Verify the block switcher exists.
@@ -56,7 +57,7 @@ describe( 'Block Switcher', () => {
 				'Group',
 				'Paragraph',
 				'Heading',
-				'Table of Contents',
+				'Columns',
 			] )
 		);
 	} );
@@ -71,13 +72,13 @@ describe( 'Block Switcher', () => {
 				'core/group',
 				'core/heading',
 				'core/columns',
-				'core/table-of-contents',
 			].map( ( block ) => wp.blocks.unregisterBlockType( block ) );
 		} );
 
 		// Insert a list block.
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'List content' );
+		await page.keyboard.press( 'ArrowUp' );
 		await pressKeyWithModifier( 'alt', 'F10' );
 
 		// Verify the block switcher exists.
@@ -91,6 +92,7 @@ describe( 'Block Switcher', () => {
 			it( 'Should show Columns block only if selected blocks are between limits (1-6)', async () => {
 				await insertBlock( 'List' );
 				await page.keyboard.type( 'List content' );
+				await page.keyboard.press( 'ArrowUp' );
 				await insertBlock( 'Heading' );
 				await page.keyboard.type( 'I am a header' );
 				await page.keyboard.down( 'Shift' );
@@ -103,6 +105,7 @@ describe( 'Block Switcher', () => {
 			it( 'Should NOT show Columns transform only if selected blocks are more than max limit(6)', async () => {
 				await insertBlock( 'List' );
 				await page.keyboard.type( 'List content' );
+				await page.keyboard.press( 'ArrowUp' );
 				await insertBlock( 'Heading' );
 				await page.keyboard.type( 'I am a header' );
 				await page.keyboard.press( 'Enter' );

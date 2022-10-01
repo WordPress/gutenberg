@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Don't use hardcoded login credentials when requesting nonce ([#44331](https://github.com/WordPress/gutenberg/pull/44331)).
+
+## 8.2.0 (2022-09-21)
+
+## 8.0.0 (2022-08-24)
+
 ### Breaking Change
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).

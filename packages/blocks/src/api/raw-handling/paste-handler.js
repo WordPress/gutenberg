@@ -226,8 +226,9 @@ export function pasteHandler( {
 		blocks.length === 1 &&
 		hasBlockSupport( blocks[ 0 ].name, '__unstablePasteTextInline', false )
 	) {
+		const trimRegex = /^[\n]+|[\n]+$/g;
 		// Don't catch line breaks at the start or end.
-		const trimmedPlainText = plainText.replace( /^[\n]+|[\n]+$/g, '' );
+		const trimmedPlainText = plainText.replace( trimRegex, '' );
 
 		if (
 			trimmedPlainText !== '' &&
@@ -236,7 +237,7 @@ export function pasteHandler( {
 			return removeInvalidHTML(
 				getBlockInnerHTML( blocks[ 0 ] ),
 				phrasingContentSchema
-			);
+			).replace( trimRegex, '' );
 		}
 	}
 
