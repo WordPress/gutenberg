@@ -435,7 +435,7 @@ function gutenberg_register_gutenberg_patterns() {
 			<!-- /wp:query -->
 
 			<!-- wp:paragraph {"textColor":"white"} -->
-			<p class="has-white-color has-text-color"><strong>More Posts</strong></p>
+			<p class="has-white-color has-text-color"><strong>' . _x( 'More Posts', 'block pattern sample content', 'gutenberg' ) . '</strong></p>
 			<!-- /wp:paragraph -->
 
 			<!-- wp:query {"query":{"perPage":6,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"flex","columns":3}} -->
