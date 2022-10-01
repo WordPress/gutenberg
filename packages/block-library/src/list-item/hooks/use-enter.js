@@ -69,9 +69,14 @@ export default function useEnter( props ) {
 							} ),
 					  ]
 					: [];
+
+				// Replace the list block itself with a paragraph block if it's completely empty.
+				const isEmpty =
+					topParentListBlock.innerBlocks.length === 1 && ! content;
+
 				replaceBlocks(
 					topParentListBlock.clientId,
-					[ head, middle, ...tail ],
+					isEmpty ? [ middle ] : [ head, middle, ...tail ],
 					1
 				);
 				// We manually change the selection here because we are replacing
