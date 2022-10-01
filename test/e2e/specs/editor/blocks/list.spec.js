@@ -514,6 +514,16 @@ test.describe( 'List', () => {
 		);
 	} );
 
+	test( 'Should be converted from an empty list to an empty paragraph block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/list' } );
+		await page.keyboard.press( 'Enter' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe( `` );
+	} );
+
 	test( 'should split indented list item', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'one' );
