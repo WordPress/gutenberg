@@ -103,6 +103,7 @@ describe( 'skipBlockSupportAttributes', () => {
 		fontFamily: 'system-font',
 		borderColor: 'foreground',
 		style: {
+			customStyle: 'custom-style',
 			color: {
 				text: '#000000',
 				background: '#000000',
@@ -194,6 +195,9 @@ describe( 'skipBlockSupportAttributes', () => {
 			removeBlockSupportAttributes( 'core/test-block', attributes )
 		).toEqual( {
 			customAttribute: 'custom-attribute',
+			style: {
+				customStyle: 'custom-style',
+			},
 		} );
 	} );
 
@@ -247,6 +251,7 @@ describe( 'skipBlockSupportAttributes', () => {
 			gradient: 'vivid-cyan-blue-to-vivid-purple',
 			fontSize: 'small',
 			style: {
+				customStyle: 'custom-style',
 				color: {
 					text: '#000000',
 				},
