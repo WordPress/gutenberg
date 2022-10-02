@@ -123,14 +123,17 @@ export function removeBlockSupportAttributes( block, attributes ) {
 		{}
 	);
 
-	return cleanEmptyObject( {
-		...restAttributes,
-		...newAttributes,
-		style: {
-			...style,
-			...newStyle,
-		},
-	} );
+	// Override with new block support attributes and styles.
+	return (
+		cleanEmptyObject( {
+			...restAttributes,
+			...newAttributes,
+			style: {
+				...style,
+				...newStyle,
+			},
+		} ) || {}
+	);
 }
 
 export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {

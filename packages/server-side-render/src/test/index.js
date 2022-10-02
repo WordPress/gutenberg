@@ -86,6 +86,73 @@ describe( 'rendererPath', () => {
 	} );
 } );
 
+const allAttributes = {
+	textColor: 'foreground',
+	backgroundColor: 'foreground',
+	gradient: 'vivid-cyan-blue-to-vivid-purple',
+	fontSize: 'small',
+	fontFamily: 'system-font',
+	borderColor: 'foreground',
+	style: {
+		color: {
+			text: '#000000',
+			background: '#000000',
+			gradients: '#000000',
+		},
+		elements: {
+			link: {
+				color: {
+					text: '#000000',
+				},
+			},
+		},
+		typography: {
+			fontSize: '10px',
+			lineHeight: '1',
+			fontWeight: '500',
+			fontStyle: 'normal',
+			textTransform: 'uppercase',
+			textDecoration: 'line-through',
+			letterSpacing: '10px',
+		},
+		spacing: {
+			margin: {
+				top: '10px',
+				right: '10px',
+				bottom: '10px',
+				left: '10px',
+			},
+			padding: {
+				top: '10px',
+				right: '10px',
+				bottom: '10px',
+				left: '10px',
+			},
+			blockGap: '10px',
+		},
+		border: {
+			radius: '10px',
+			style: 'solid',
+			top: {
+				width: '10px',
+				color: '#000000',
+			},
+			right: {
+				width: '10px',
+				color: '#000000',
+			},
+			bottom: {
+				width: '10px',
+				color: '#000000',
+			},
+			left: {
+				width: '10px',
+				color: '#000000',
+			},
+		},
+	},
+};
+
 describe( 'skipBlockSupportAttributes', () => {
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
@@ -93,72 +160,42 @@ describe( 'skipBlockSupportAttributes', () => {
 		} );
 	} );
 
-	const attributes = {
-		className: 'class-name',
-		customAttribute: 'custom-attribute',
-		textColor: 'foreground',
-		backgroundColor: 'foreground',
-		gradient: 'vivid-cyan-blue-to-vivid-purple',
-		fontSize: 'small',
-		fontFamily: 'system-font',
-		borderColor: 'foreground',
-		style: {
-			customStyle: 'custom-style',
-			color: {
-				text: '#000000',
-				background: '#000000',
-				gradients: '#000000',
-			},
-			typography: {
-				fontSize: '10px',
-				lineHeight: '1',
-				fontWeight: '500',
-				fontStyle: 'normal',
-				textTransform: 'uppercase',
-				textDecoration: 'line-through',
-				letterSpacing: '10px',
-			},
-			spacing: {
-				margin: {
-					top: '10px',
-					right: '10px',
-					bottom: '10px',
-					left: '10px',
-				},
-				padding: {
-					top: '10px',
-					right: '10px',
-					bottom: '10px',
-					left: '10px',
-				},
-				blockGap: '10px',
-			},
-			border: {
-				radius: '10px',
-				style: 'solid',
-				top: {
-					width: '10px',
-					color: '#000000',
-				},
-				right: {
-					width: '10px',
-					color: '#000000',
-				},
-				bottom: {
-					width: '10px',
-					color: '#000000',
-				},
-				left: {
-					width: '10px',
-					color: '#000000',
-				},
-			},
-		},
-	};
+	test( 'should remove custom CSS class', () => {
+		const attributes = {
+			className: 'class-name',
+		};
 
-	test( 'Should remove attributes and style properties', () => {
 		registerBlockType( 'core/test-block', {
-			category: 'text',
+			title: 'test block',
+		} );
+
+		expect(
+			removeBlockSupportAttributes( 'core/test-block', attributes )
+		).toEqual( {} );
+	} );
+
+	test( 'should not remove custom style', () => {
+		const attributes = {
+			style: {
+				customStyle: 'custom-style',
+			},
+		};
+
+		registerBlockType( 'core/test-block', {
+			title: 'test block',
+		} );
+
+		expect(
+			removeBlockSupportAttributes( 'core/test-block', attributes )
+		).toEqual( {
+			style: {
+				customStyle: 'custom-style',
+			},
+		} );
+	} );
+
+	test( 'Should remove all attributes and style properties', () => {
+		registerBlockType( 'core/test-block', {
 			title: 'test block',
 			supports: {
 				color: {
@@ -192,18 +229,12 @@ describe( 'skipBlockSupportAttributes', () => {
 		} );
 
 		expect(
-			removeBlockSupportAttributes( 'core/test-block', attributes )
-		).toEqual( {
-			customAttribute: 'custom-attribute',
-			style: {
-				customStyle: 'custom-style',
-			},
-		} );
+			removeBlockSupportAttributes( 'core/test-block', allAttributes )
+		).toEqual( {} );
 	} );
 
-	test( 'Should skip attributes and style properties which serialization is omitted', () => {
+	test( 'Should pass attributes and style properties which serialization is omitted', () => {
 		registerBlockType( 'core/test-block', {
-			category: 'text',
 			title: 'test block',
 			supports: {
 				color: {
@@ -211,7 +242,11 @@ describe( 'skipBlockSupportAttributes', () => {
 					background: true,
 					gradients: true,
 					link: true,
-					__experimentalSkipSerialization: [ 'text', 'gradients' ],
+					__experimentalSkipSerialization: [
+						'text',
+						'gradients',
+						'link',
+					],
 				},
 				typography: {
 					fontSize: true,
@@ -244,16 +279,21 @@ describe( 'skipBlockSupportAttributes', () => {
 		} );
 
 		expect(
-			removeBlockSupportAttributes( 'core/test-block', attributes )
+			removeBlockSupportAttributes( 'core/test-block', allAttributes )
 		).toEqual( {
-			customAttribute: 'custom-attribute',
 			textColor: 'foreground',
 			gradient: 'vivid-cyan-blue-to-vivid-purple',
 			fontSize: 'small',
 			style: {
-				customStyle: 'custom-style',
 				color: {
 					text: '#000000',
+				},
+				elements: {
+					link: {
+						color: {
+							text: '#000000',
+						},
+					},
 				},
 				typography: {
 					fontSize: '10px',
