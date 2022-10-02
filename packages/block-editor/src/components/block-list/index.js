@@ -170,6 +170,8 @@ function Items( {
 						// not visible and not selected.
 						! visibleBlocks.has( clientId ) &&
 						! selectedBlocks.includes( clientId )
+							? null
+							: false
 					}
 				>
 					<BlockListBlock

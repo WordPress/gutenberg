@@ -130,6 +130,7 @@ export default function useSelect( mapSelect, deps ) {
 
 	const latestRegistry = useRef( registry );
 	const latestMapSelect = useRef();
+	const latestIsAsync = useRef( isAsync );
 	const latestMapOutput = useRef();
 	const latestMapOutputError = useRef();
 
@@ -157,11 +158,13 @@ export default function useSelect( mapSelect, deps ) {
 		mapOutput = latestMapOutput.current;
 		const hasReplacedRegistry = latestRegistry.current !== registry;
 		const hasReplacedMapSelect = latestMapSelect.current !== _mapSelect;
+		const hasLeftAsyncMode = latestIsAsync.current && ! isAsync;
 		const lastMapSelectFailed = !! latestMapOutputError.current;
 
 		if (
 			hasReplacedRegistry ||
 			hasReplacedMapSelect ||
+			hasLeftAsyncMode ||
 			lastMapSelectFailed
 		) {
 			try {
@@ -189,17 +192,22 @@ export default function useSelect( mapSelect, deps ) {
 
 		latestRegistry.current = registry;
 		latestMapSelect.current = _mapSelect;
+		latestIsAsync.current = isAsync;
 		if ( selectorRan ) {
 			latestMapOutput.current = mapOutput;
 		}
 		latestMapOutputError.current = undefined;
 	} );
 
+	// React can sometimes clear the `useMemo` cache.
+	// We use the cache-stable `useMemoOne` to avoid
+	// losing queues.
+	const queueContext = useMemoOne( () => ( { queue: true } ), [ registry ] );
 	const [ , forceRender ] = useReducer( ( s ) => s + 1, 0 );
 	const isMounted = useRef( false );
 
 	useIsomorphicLayoutEffect( () => {
-		if ( ! hasMappingFunction || isAsync ) {
+		if ( ! hasMappingFunction || isAsync === null ) {
 			return;
 		}
 
@@ -217,12 +225,24 @@ export default function useSelect( mapSelect, deps ) {
 			forceRender();
 		};
 
+		const onChange = () => {
+			if ( ! isMounted.current ) {
+				return;
+			}
+
+			if ( latestIsAsync.current ) {
+				renderQueue.add( queueContext, onStoreChange );
+			} else {
+				onStoreChange();
+			}
+		};
+
 		// Catch any possible state changes during mount before the subscription
 		// could be set.
 		onStoreChange();
 
 		const unsubscribers = listeningStores.current.map( ( storeName ) =>
-			registry.__unstableSubscribeStore( storeName, onStoreChange )
+			registry.__unstableSubscribeStore( storeName, onChange )
 		);
 
 		isMounted.current = true;
@@ -230,6 +250,7 @@ export default function useSelect( mapSelect, deps ) {
 		return () => {
 			// The return value of the subscribe function could be undefined if the store is a custom generic store.
 			unsubscribers.forEach( ( unsubscribe ) => unsubscribe?.() );
+			renderQueue.cancel( queueContext );
 			isMounted.current = false;
 		};
 		// If you're tempted to eliminate the spread dependencies below don't do it!
