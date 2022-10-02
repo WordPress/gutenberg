@@ -16,6 +16,16 @@ import { ATTRIBUTE_PROPERTY, STYLE_PROPERTY } from './constants';
 
 const identity = ( x ) => x;
 
+/**
+ * Check whether serialization of specific block support feature or set should
+ * be skipped.
+ *
+ * @param {string} blockType  Block name.
+ * @param {string} featureSet Name of block support feature set.
+ * @param {string} feature    Name of the individual feature to check.
+ *
+ * @return {boolean} Whether serialization should occur.
+ */
 function shouldSkipSerialization( blockType, featureSet, feature ) {
 	const support = getBlockSupport( blockType, featureSet );
 	const skipSerialization = support?.__experimentalSkipSerialization;
@@ -27,6 +37,13 @@ function shouldSkipSerialization( blockType, featureSet, feature ) {
 	return skipSerialization;
 }
 
+/**
+ * Remove attributes and styles, taking into account serialization of block supports.
+ *
+ * @param {string} block      Block name.
+ * @param {*}      attributes Block attributes.
+ * @return {*} Cleaned up block attributes.
+ */
 export function removeBlockSupportAttributes( block, attributes ) {
 	// Omit className and style from attributes.
 	const { className, style, ...restAttributes } = attributes;
@@ -136,6 +153,14 @@ export function removeBlockSupportAttributes( block, attributes ) {
 	);
 }
 
+/**
+ * Create the path to fetch api.
+ *
+ * @param {string} block        Block name.
+ * @param {*}      attributes   Block attributes.
+ * @param {*}      urlQueryArgs Query arguments to apply to the request URL.
+ * @return {string} Path to fetch api.
+ */
 export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {
 	return addQueryArgs( `/wp/v2/block-renderer/${ block }`, {
 		context: 'edit',
