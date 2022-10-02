@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -6,11 +11,12 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import ColorPalette from '../';
+import ColorPalette from '..';
 import Popover from '../../popover';
 import { Provider as SlotFillProvider } from '../../slot-fill';
+import type { Color, MultipleColors, ColorPaletteProps } from '../types';
 
-const meta = {
+const meta: ComponentMeta< typeof ColorPalette > = {
 	title: 'Components/ColorPalette',
 	component: ColorPalette,
 	argTypes: {
@@ -42,14 +48,16 @@ const meta = {
 };
 export default meta;
 
-const Template = ( args ) => {
+const Template: ComponentStory< typeof ColorPalette > = ( args ) => {
 	const firstColor =
-		args.colors[ 0 ].color || args.colors[ 0 ].colors[ 0 ].color;
-	const [ color, setColor ] = useState( firstColor );
+		( args.colors as Color[] )[ 0 ].color ||
+		( args.colors as MultipleColors )[ 0 ].colors[ 0 ].color;
+	const [ color, setColor ] = useState< string | undefined >( firstColor );
 
 	return (
 		<SlotFillProvider>
 			<ColorPalette { ...args } value={ color } onChange={ setColor } />
+			{ /* @ts-ignore Property 'Slot' does not exist on type. */ }
 			<Popover.Slot />
 		</SlotFillProvider>
 	);
@@ -92,10 +100,11 @@ MultipleOrigins.args = {
 	],
 };
 
-export const CSSVariables = ( args ) => {
+export const CSSVariables = ( args: ColorPaletteProps ) => {
 	return (
 		<div
 			style={ {
+				// @ts-ignore
 				'--red': '#f00',
 				'--yellow': '#ff0',
 				'--blue': '#00f',

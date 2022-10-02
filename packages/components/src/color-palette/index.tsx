@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
@@ -23,6 +22,14 @@ import { Flex, FlexItem } from '../flex';
 import { Truncate } from '../truncate';
 import { ColorHeading } from './styles';
 import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
+import type {
+	Color,
+	MultipleColors,
+	ColorPaletteProps,
+	CustomColorPickerDropdownProps,
+	MultiplePalettesProps,
+	SinglePaletteProps,
+} from './types';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -33,13 +40,14 @@ function SinglePalette( {
 	onChange,
 	value,
 	actions,
-} ) {
+}: SinglePaletteProps ) {
 	const colorOptions = useMemo( () => {
 		return colors.map( ( { color, name }, index ) => {
 			const colordColor = colord( color );
 			const isSelected = value === color;
 
 			return (
+				// @ts-ignore Required className prop.
 				<CircularOptionPicker.Option
 					key={ `${ color }-${ index }` }
 					isSelected={ isSelected }
@@ -75,6 +83,7 @@ function SinglePalette( {
 		} );
 	}, [ colors, value, onChange, clearColor ] );
 	return (
+		// @ts-ignore Required children prop.
 		<CircularOptionPicker
 			className={ className }
 			options={ colorOptions }
@@ -90,7 +99,7 @@ function MultiplePalettes( {
 	onChange,
 	value,
 	actions,
-} ) {
+}: MultiplePalettesProps ) {
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ colors.map( ( { name, colors: colorPalette }, index ) => {
@@ -117,7 +126,7 @@ export function CustomColorPickerDropdown( {
 	isRenderedInSidebar,
 	popoverProps: receivedPopoverProps,
 	...props
-} ) {
+}: CustomColorPickerDropdownProps ) {
 	const popoverProps = useMemo(
 		() => ( {
 			shift: true,
@@ -148,9 +157,9 @@ export function CustomColorPickerDropdown( {
 }
 
 export const extractColorNameFromCurrentValue = (
-	currentValue,
-	colors = [],
-	showMultiplePalettes = false
+	currentValue?: string,
+	colors: Color[] | MultipleColors = [],
+	showMultiplePalettes: boolean = false
 ) => {
 	if ( ! currentValue ) {
 		return '';
@@ -162,7 +171,9 @@ export const extractColorNameFromCurrentValue = (
 		: colord( currentValue ).toHex();
 
 	// Normalize format of `colors` to simplify the following loop
-	const colorPalettes = showMultiplePalettes ? colors : [ { colors } ];
+	const colorPalettes = showMultiplePalettes
+		? ( colors as MultipleColors )
+		: [ { colors: colors as Color[] } ];
 	for ( const { colors: paletteColors } of colorPalettes ) {
 		for ( const { name: colorName, color: colorValue } of paletteColors ) {
 			const normalizedColorValue = currentValueIsCssVariable
@@ -179,7 +190,7 @@ export const extractColorNameFromCurrentValue = (
 	return __( 'Custom' );
 };
 
-export const showTransparentBackground = ( currentValue ) => {
+export const showTransparentBackground = ( currentValue?: string ) => {
 	if ( typeof currentValue === 'undefined' ) {
 		return true;
 	}
@@ -196,10 +207,10 @@ export default function ColorPalette( {
 	value,
 	__experimentalHasMultipleOrigins = false,
 	__experimentalIsRenderedInSidebar = false,
-} ) {
+}: ColorPaletteProps ) {
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
 	const showMultiplePalettes =
-		__experimentalHasMultipleOrigins && colors?.length;
+		__experimentalHasMultipleOrigins && !! colors?.length;
 	const Component = showMultiplePalettes ? MultiplePalettes : SinglePalette;
 
 	const renderCustomColorPicker = () => (
@@ -212,7 +223,7 @@ export default function ColorPalette( {
 		</DropdownContentWrapper>
 	);
 
-	const colordColor = colord( value );
+	const colordColor = colord( value ?? '' );
 
 	const valueWithoutLeadingHash = value?.startsWith( '#' )
 		? value.substring( 1 )
@@ -287,11 +298,13 @@ export default function ColorPalette( {
 			<Component
 				clearable={ clearable }
 				clearColor={ clearColor }
+				// @ts-ignore Component can be MultiplePalettes or SinglePalette, which have different colors prop types.
 				colors={ colors }
 				onChange={ onChange }
 				value={ value }
 				actions={
 					!! clearable && (
+						// @ts-ignore Required className property.
 						<CircularOptionPicker.ButtonAction
 							onClick={ clearColor }
 						>
