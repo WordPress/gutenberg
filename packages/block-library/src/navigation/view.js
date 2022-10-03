@@ -17,7 +17,7 @@ import { useSignalEffect } from '@preact/signals';
  * Internal dependencies
  */
 import toVdom from './vdom';
-import { directive, component } from './directives';
+import { directive, component } from './wpx';
 import { createRootFragment, idle } from './utils';
 import { deepSignal } from './deep-signal';
 
