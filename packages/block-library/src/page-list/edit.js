@@ -168,12 +168,26 @@ const PageItems = memo( function PageItems( {
 	const isSubmenuItem = depth > 0;
 
 	// User-set custom colors for the submenu needs to be added inline.
+	// If there are no user-set colors on the submenu,
+	// inherit the user-set colors from the navigation block.
 	const blockProps = useBlockProps();
 	const customSubmenuStyles = {
 		...blockProps.style,
-		color: context.customOverlayTextColor,
-		background: context.customOverlayBackgroundColor,
+		color: !! context.customOverlayTextColor
+			? context.customOverlayTextColor
+			: context.customTextColor,
+		background: !! context.customOverlayBackgroundColor
+			? context.customOverlayBackgroundColor
+			: context.customBackgroundColor,
 	};
+
+	// If there is no overlay color set, inherit the color from the navigation block.
+	const textColor = !! context.overlayTextColor
+		? context.overlayTextColor
+		: context.textColor;
+	const backgroundColor = !! context.overlayBackgroundColor
+		? context.overlayBackgroundColor
+		: context.backgroundColor;
 
 	if ( ! pages?.length ) {
 		return [];
@@ -194,9 +208,12 @@ const PageItems = memo( function PageItems( {
 					'menu-item-home': page.id === frontPageId,
 					'has-text-color':
 						( !! context.overlayTextColor && isSubmenuItem ) ||
-						( !! context.customOverlayTextColor && isSubmenuItem ),
-					[ getColorClassName( 'color', context.overlayTextColor ) ]:
-						!! context.overlayTextColor && isSubmenuItem,
+						( !! context.customOverlayTextColor &&
+							isSubmenuItem ) ||
+						( !! context.customTextColor && isSubmenuItem ) ||
+						( !! context.textColor && isSubmenuItem ),
+					[ getColorClassName( 'color', textColor ) ]:
+						!! textColor && isSubmenuItem,
 					'has-background':
 						!! (
 							context.overlayBackgroundColor && isSubmenuItem
@@ -204,11 +221,13 @@ const PageItems = memo( function PageItems( {
 						!! (
 							context.customOverlayBackgroundColor &&
 							isSubmenuItem
-						),
+						) ||
+						!! ( context.backgroundColor && isSubmenuItem ) ||
+						!! ( context.customBackgroundColor && isSubmenuItem ),
 					[ getColorClassName(
 						'background-color',
-						context.overlayBackgroundColor
-					) ]: !! context.overlayBackgroundColor && isSubmenuItem,
+						backgroundColor
+					) ]: !! backgroundColor && isSubmenuItem,
 				} ) }
 				style={ !! isSubmenuItem ? customSubmenuStyles : undefined }
 			>
