@@ -79,14 +79,10 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 				// Observe the body, since the `html` element seems to always
 				// have a height of `100%`.
 				resizeObserver.observe( iframe.contentDocument.body );
-
 				setFrameHeight();
 			}
 
-			// This is only required in Firefox for some unknown reasons.
 			iframe.addEventListener( 'load', registerObserver );
-			// This is required in Chrome and Safari.
-			registerObserver();
 
 			return () => {
 				resizeObserver?.disconnect();
