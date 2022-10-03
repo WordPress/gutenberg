@@ -76,17 +76,6 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 						} }
 					/>
 					{ type !== 'submit' && (
-						<TextControl
-							label={ __( 'Name' ) }
-							value={ name }
-							onChange={ ( newVal ) => {
-								setAttributes( {
-									name: newVal,
-								} );
-							} }
-						/>
-					) }
-					{ type !== 'submit' && (
 						<CheckboxControl
 							label={ __( 'Inline label' ) }
 							checked={ attributes.inlineLabel }
@@ -99,6 +88,23 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
+			{ type !== 'submit' && (
+				<InspectorControls __experimentalGroup="advanced">
+					<TextControl
+						autoComplete="off"
+						label={ __( 'Name' ) }
+						value={ name }
+						onChange={ ( newVal ) => {
+							setAttributes( {
+								name: newVal,
+							} );
+						} }
+						help={ __(
+							'Affects the "name" atribute of the input element, and is used as a name for the form submission results.'
+						) }
+					/>
+				</InspectorControls>
+			) }
 
 			{ type === 'textarea' && (
 				/* eslint-disable jsx-a11y/label-has-associated-control */
