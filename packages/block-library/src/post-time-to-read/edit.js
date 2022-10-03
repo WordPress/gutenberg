@@ -6,16 +6,16 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { _x, _n, __, sprintf } from '@wordpress/i18n';
 import {
 	AlignmentControl,
 	BlockControls,
 	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { store as editorStore } from '@wordpress/editor';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
-import { _x, _n, __, sprintf } from '@wordpress/i18n';
+import { useEntityProp } from '@wordpress/core-data';
 import { count as wordCount } from '@wordpress/wordcount';
 
 /**
@@ -25,12 +25,15 @@ import { count as wordCount } from '@wordpress/wordcount';
  */
 const AVERAGE_READING_RATE = 189;
 
-function PostTimeToReadEdit( { attributes, setAttributes } ) {
+function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 	const { textAlign, minutesToRead } = attributes;
+	const { postId, postType } = context;
 
-	const content = useSelect(
-		( select ) => select( editorStore ).getEditedPostAttribute( 'content' ),
-		[]
+	const [ content = '' ] = useEntityProp(
+		'postType',
+		postType,
+		'content',
+		postId
 	);
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
