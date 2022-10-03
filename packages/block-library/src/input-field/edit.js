@@ -25,6 +25,10 @@ const inputTypeOptions = [
 		name: __( 'Textarea' ),
 	},
 	{
+		key: 'checkbox',
+		name: __( 'Checkbox' ),
+	},
+	{
 		key: 'email',
 		name: __( 'Email' ),
 	},
