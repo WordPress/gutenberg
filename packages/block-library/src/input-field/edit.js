@@ -15,44 +15,10 @@ import {
 } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 
-const inputTypeOptions = [
-	{
-		key: 'text',
-		name: __( 'Text' ),
-	},
-	{
-		key: 'textarea',
-		name: __( 'Textarea' ),
-	},
-	{
-		key: 'checkbox',
-		name: __( 'Checkbox' ),
-	},
-	{
-		key: 'email',
-		name: __( 'Email' ),
-	},
-	{
-		key: 'url',
-		name: __( 'URL' ),
-	},
-	{
-		key: 'tel',
-		name: __( 'Telephone' ),
-	},
-	{
-		key: 'number',
-		name: __( 'Number' ),
-	},
-	{
-		key: 'datetime-local',
-		name: __( 'Date and time' ),
-	},
-	{
-		key: 'submit',
-		name: __( 'Submit' ),
-	},
-];
+/**
+ * Internal dependencies
+ */
+import { INPUT_TYPES } from './utils';
 
 function InputFieldBlock( { attributes, setAttributes } ) {
 	const { type, name, label, inlineLabel } = attributes;
@@ -69,10 +35,10 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 				<PanelBody title={ __( 'Input settings' ) }>
 					<CustomSelectControl
 						label={ __( 'Type' ) }
-						value={ inputTypeOptions.find(
+						value={ INPUT_TYPES.find(
 							( option ) => option.key === type
 						) }
-						options={ inputTypeOptions }
+						options={ INPUT_TYPES }
 						onChange={ ( newVal ) => {
 							setAttributes( {
 								type: newVal?.selectedItem?.key,
