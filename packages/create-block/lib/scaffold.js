@@ -44,6 +44,7 @@ module.exports = async (
 		editorStyle,
 		style,
 		variantVars,
+		customPackageJSON,
 		...customVariantKeys
 	}
 ) => {
@@ -102,6 +103,7 @@ module.exports = async (
 		style,
 		...variantVars,
 		customVariantKeys,
+		customPackageJSON,
 	};
 
 	if ( plugin ) {
