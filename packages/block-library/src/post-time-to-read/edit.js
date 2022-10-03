@@ -11,8 +11,13 @@ import {
 	AlignmentControl,
 	BlockControls,
 	useBlockProps,
+	RichText,
 } from '@wordpress/block-editor';
-import { __unstableSerializeAndClean } from '@wordpress/blocks';
+import {
+	createBlock,
+	getDefaultBlockName,
+	__unstableSerializeAndClean,
+} from '@wordpress/blocks';
 import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
 import { count as wordCount } from '@wordpress/wordcount';
 
@@ -23,8 +28,24 @@ import { count as wordCount } from '@wordpress/wordcount';
  */
 const AVERAGE_READING_RATE = 189;
 
-function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
-	const { textAlign } = attributes;
+// Allowed formats for the prefix and suffix fields.
+const ALLOWED_FORMATS = [
+	'core/bold',
+	'core/image',
+	'core/italic',
+	'core/link',
+	'core/strikethrough',
+	'core/text-color',
+];
+
+function PostTimeToReadEdit( {
+	attributes,
+	setAttributes,
+	insertBlocksAfter,
+	isSelected,
+	context,
+} ) {
+	const { textAlign, prefix, suffix } = attributes;
 	const { postId, postType } = context;
 
 	const [ contentStructure ] = useEntityProp(
@@ -69,14 +90,10 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 			minutesToRead !== 0
 				? sprintf(
 						/* translators: %d is the number of minutes the post will take to read. */
-						_n(
-							'You can read this post in %d minute.',
-							'You can read this post in %d minutes.',
-							minutesToRead
-						),
+						_n( '%d minute', '%d minutes', minutesToRead ),
 						minutesToRead
 				  )
-				: __( 'You can read this post in less than a minute.' );
+				: __( 'less than a minute' );
 	}
 
 	const blockProps = useBlockProps( {
@@ -95,7 +112,42 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 					} }
 				/>
 			</BlockControls>
-			<p { ...blockProps }>{ minutesToReadString }</p>
+			<p { ...blockProps }>
+				{ ( isSelected || prefix ) && (
+					<RichText
+						allowedFormats={ ALLOWED_FORMATS }
+						className="wp-block-post-time-to-read__prefix"
+						multiline={ false }
+						aria-label={ __( 'Prefix' ) }
+						placeholder={ __( 'Prefix' ) + ' ' }
+						value={ prefix }
+						onChange={ ( value ) =>
+							setAttributes( { prefix: value } )
+						}
+						tagName="span"
+					/>
+				) }
+				{ minutesToReadString }
+				{ ( isSelected || suffix ) && (
+					<RichText
+						allowedFormats={ ALLOWED_FORMATS }
+						className="wp-block-post-time-to-read__suffix"
+						multiline={ false }
+						aria-label={ __( 'Suffix' ) }
+						placeholder={ ' ' + __( 'Suffix' ) }
+						value={ suffix }
+						onChange={ ( value ) =>
+							setAttributes( { suffix: value } )
+						}
+						tagName="span"
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
+						}
+					/>
+				) }
+			</p>
 		</>
 	);
 }
