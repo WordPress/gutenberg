@@ -44,6 +44,7 @@ module.exports = async (
 		editorStyle,
 		style,
 		variantVars,
+		...customVariantKeys
 	}
 ) => {
 	slug = slug.toLowerCase();
@@ -100,6 +101,7 @@ module.exports = async (
 		editorStyle,
 		style,
 		...variantVars,
+		customVariantKeys,
 	};
 
 	if ( plugin ) {
