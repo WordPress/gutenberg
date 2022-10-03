@@ -12,13 +12,25 @@ const knownSymbols = new Set(
 		.map( ( key ) => Symbol[ key ] )
 		.filter( ( value ) => typeof value === 'symbol' )
 );
-const builtIns = new Set( [ Object, Array ] );
+const supported = new Set( [
+	Object,
+	Array,
+	Int8Array,
+	Uint8Array,
+	Uint8ClampedArray,
+	Int16Array,
+	Uint16Array,
+	Int32Array,
+	Uint32Array,
+	Float32Array,
+	Float64Array,
+] );
 const shouldWrap = ( { constructor } ) => {
 	const isBuiltIn =
 		typeof constructor === 'function' &&
 		constructor.name in globalThis &&
 		globalThis[ constructor.name ] === constructor;
-	return ! isBuiltIn || builtIns.has( constructor );
+	return ! isBuiltIn || supported.has( constructor );
 };
 
 export const deepSignal = ( obj ) => new Proxy( obj, handlers );
