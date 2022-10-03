@@ -1,28 +1,25 @@
 /**
  * External dependencies
  */
-import { useRef } from 'preact/hooks';
 import { h, options, createContext } from 'preact';
+import { useRef } from 'preact/hooks';
 
 // Main context
 const context = createContext( {} );
 
 // WordPress Directives.
 const directives = {};
-
-// Expose function to add directives.
 export const directive = ( name, cb ) => {
 	directives[ name ] = cb;
 };
 
 // WordPress Components.
 const components = {};
-
-// Expose function to add directives.
 export const component = ( name, Comp ) => {
 	components[ name ] = Comp;
 };
 
+// Directive wrapper.
 const WpDirective = ( { type, wp, props: originalProps } ) => {
 	const ref = useRef( null );
 	const element = h( type, { ...originalProps, ref, _wrapped: true } );
@@ -37,6 +34,7 @@ const WpDirective = ( { type, wp, props: originalProps } ) => {
 	return props.children;
 };
 
+// Preact Options Hook called each time a vnode is created.
 const old = options.vnode;
 options.vnode = ( vnode ) => {
 	const type = vnode.type;
