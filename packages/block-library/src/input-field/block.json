@@ -6,7 +6,26 @@
 	"category": "common",
 	"parent": [ "core/form" ],
 	"description": "The basic building block for forms.",
-	"keywords": [ "input", "text", "textarea" ],
+	"keywords": [
+		"input",
+		"text",
+		"textarea",
+		"checkbox",
+		"email",
+		"url",
+		"tel",
+		"number",
+		"range",
+		"date",
+		"time",
+		"password",
+		"radio",
+		"select",
+		"file",
+		"submit",
+		"button",
+		"form"
+	],
 	"textdomain": "default",
 	"attributes": {
 		"type": {
@@ -25,5 +44,5 @@
 			"default": false
 		}
 	},
-	"style": [ "wp-block-input-field" ]
+	"style": [ "wp-block-input-field", "wp-block-buttons", "wp-block-button" ]
 }
