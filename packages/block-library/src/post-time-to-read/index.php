@@ -34,12 +34,12 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 
 	$minutes_to_read = round( gutenberg_word_count( $content, $word_count_type ) / $average_reading_rate );
 
-	$minutes_to_read_string = $minutes_to_read !== 0
+	$minutes_to_read_string = 0 !== $minutes_to_read
 		? sprintf(
 			/* translators: %d is the number of minutes the post will take to read. */
 			_n( '%d minute', '%d minutes', $minutes_to_read ),
 			$minutes_to_read
-		 )
+		)
 		: __( 'less than a minute' );
 
 	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";

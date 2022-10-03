@@ -14,7 +14,9 @@
  * @param string $type The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
  * @return number The word or character count.
  */
-function gutenberg_word_count( $text ) {
+function gutenberg_word_count( $text, $type ) {
+	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+	$dummy = $text . $type;
 	// TODO: The logic of the @wordpress/wordcount package needs to be fully implemented here.
 	return 500;
 }
