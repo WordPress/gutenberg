@@ -12,6 +12,14 @@ export const directive = ( name, cb ) => {
 	directives[ name ] = cb;
 };
 
+// WordPress Components.
+const components = {};
+
+// Expose function to add directives.
+export const component = ( name, Comp ) => {
+	components[ name ] = Comp;
+};
+
 const WpDirective = ( { type, wp, props: originalProps } ) => {
 	const ref = useRef( null );
 	const element = h( type, { ...originalProps, ref, _wrapped: true } );
@@ -28,7 +36,12 @@ const WpDirective = ( { type, wp, props: originalProps } ) => {
 
 const old = options.vnode;
 options.vnode = ( vnode ) => {
+	const type = vnode.type;
 	const wp = vnode.props.wp;
+
+	if ( typeof type === 'string' && type.startsWith( 'wp-' ) ) {
+		vnode.type = components[ type ];
+	}
 
 	if ( wp ) {
 		const props = vnode.props;

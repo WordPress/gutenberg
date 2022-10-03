@@ -17,18 +17,23 @@ import { useSignalEffect } from '@preact/signals';
  * Internal dependencies
  */
 import toVdom from './vdom';
-import { directive } from './directives';
+import { directive, component } from './directives';
 import { createRootFragment, idle } from './utils';
 import { deepSignal } from './deep-signal';
 
-/**
- * Directives
- */
 const ctx = createContext( {} );
 const raf = window.requestAnimationFrame;
 // Until useSignalEffects is fixed: https://github.com/preactjs/signals/issues/228
 const tick = () => new Promise( ( r ) => raf( () => raf( r ) ) );
 
+// COMPONENTS
+const WpContext = ( { children, data } ) => {
+	const signals = useMemo( () => deepSignal( JSON.parse( data ) ), [] );
+	return <ctx.Provider value={ signals }>{ children }</ctx.Provider>;
+};
+component( 'wp-context', WpContext );
+
+// DIRECTIVES
 // wp-context
 directive( 'context', ( { directives: { context }, props: { children } } ) => {
 	const signals = useMemo( () => deepSignal( context.default ), [] );

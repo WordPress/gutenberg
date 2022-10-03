@@ -679,7 +679,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	);
 
 	return sprintf(
-		'<nav %1$s wp-context=\'{"open": false}\'>%2$s</nav>',
+		'<wp-context data=\'{"open": false}\'><nav %1$s >%2$s</nav></wp-context>',
 		$wrapper_attributes,
 		$responsive_container_markup
 	);
