@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Feature
+
+-   Allow passed custom elements from template `defaults` to be added to block.json. Add new `customPackageJSON` key to allow templates to define custom keys for the resulting package.json file.
+
 ## 4.2.0 (2022-09-21)
 
 ## 4.0.0 (2022-08-24)
