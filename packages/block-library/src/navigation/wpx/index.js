@@ -9,26 +9,31 @@ import { hydrate } from 'preact';
 import registerDirectives from './directives';
 import registerComponents from './components';
 import toVdom from './vdom';
-import { createRootFragment, idle } from './utils';
+import { createRootFragment, idle, deepMerge } from './utils';
 
 /**
  * Initialize the initial vDOM.
  */
-export default () =>
-	document.addEventListener( 'DOMContentLoaded', async () => {
-		registerDirectives();
-		registerComponents();
+document.addEventListener( 'DOMContentLoaded', async () => {
+	registerDirectives();
+	registerComponents();
 
-		// Create the root fragment to hydrate everything.
-		const rootFragment = createRootFragment(
-			document.documentElement,
-			document.body
-		);
+	// Create the root fragment to hydrate everything.
+	const rootFragment = createRootFragment(
+		document.documentElement,
+		document.body
+	);
 
-		await idle(); // Wait until the CPU is idle to do the hydration.
-		const vdom = toVdom( document.body );
-		hydrate( vdom, rootFragment );
+	await idle(); // Wait until the CPU is idle to do the hydration.
+	const vdom = toVdom( document.body );
+	hydrate( vdom, rootFragment );
 
-		// eslint-disable-next-line no-console
-		console.log( 'hydrated!' );
-	} );
+	// eslint-disable-next-line no-console
+	console.log( 'hydrated!' );
+} );
+
+window.wpx = window.wpx || {};
+
+export default ( block ) => {
+	deepMerge( window.wpx, block );
+};

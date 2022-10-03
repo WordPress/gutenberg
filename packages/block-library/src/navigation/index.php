@@ -570,7 +570,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		if (!$is_first_item) {
 			$w = new WP_HTML_Tag_Processor($inner_block_content);
 			$w->next_tag('a');
-			$w->set_attribute('wp-effect', 'function({ context, ref }) { context.firstMenuElement = ref; }');	
+			$w->set_attribute('wp-effect', 'core.navigation.addFirstElementToContext');	
 			$inner_block_content = (string) $w;
 			$is_first_item = true;
 		}
@@ -641,9 +641,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$responsive_container_markup = sprintf(
 		'<button 
-			wp-on:click="function({ context }) { context.open = true; context.previousElementWithFocus = document.activeElement; }" 
-			wp-effect:on-open="async function({ context, tick }) { if (context.open) { await tick(); context.firstMenuElement.focus(); } }" 
-			wp-effect:on-close="function({ context }) { !context.open && context.previousElementWithFocus && context.previousElementWithFocus.focus(); }" 
+			wp-on:click="core.navigation.openMenu" 
+			wp-effect:on-open="core.navigation.focusFirstElement" 
+			wp-effect:on-close="core.navigation.focusLastFocusedElement" 
 			aria-haspopup="true" 
 			%3$s 
 			class="%6$s"
@@ -652,15 +652,15 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		</button>
 		<div 
 			class="%5$s" 
-			wp-class:is-menu-open="function({ context }) { return context.open; }"
-			wp-class:has-modal-open="function({ context }) { return context.open; }"
-			wp-bind:aria-hidden="function({ context }) { return context.open ? false : true; }"
+			wp-class:is-menu-open="core.navigation.isMenuOpen"
+			wp-class:has-modal-open="core.navigation.isMenuOpen"
+			wp-bind:aria-hidden="core.navigation.isMenuClosed"
 			style="%7$s" 
 			id="%1$s"
 		>
 			<div class="wp-block-navigation__responsive-close" tabindex="-1">
 				<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s" aria-modal="true" role="dialog">
-					<button wp-on:click="function({ context }) { context.open = false; }" %4$s class="wp-block-navigation__responsive-container-close">%10$s</button>
+					<button wp-on:click="core.navigation.closeMenu" %4$s class="wp-block-navigation__responsive-container-close">%10$s</button>
 					<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
 					%2$s
 					</div>

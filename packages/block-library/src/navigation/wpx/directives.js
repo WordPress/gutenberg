@@ -17,6 +17,7 @@ import { useSignalEffect } from '@preact/signals';
  */
 import { directive } from './hooks';
 import { deepSignal } from './deep-signal';
+import { getCallback } from './utils';
 
 const raf = window.requestAnimationFrame;
 // Until useSignalEffects is fixed: https://github.com/preactjs/signals/issues/228
@@ -41,9 +42,9 @@ export default () => {
 		'effect',
 		( { directives: { effect }, element, context: mainContext } ) => {
 			const context = useContext( mainContext );
-			Object.values( effect ).forEach( ( expression ) => {
+			Object.values( effect ).forEach( ( callback ) => {
 				useSignalEffect( () => {
-					const cb = eval( `(${ expression })` );
+					const cb = getCallback( callback );
 					cb( { context, tick, ref: element.ref.current } );
 				} );
 			} );
@@ -55,9 +56,9 @@ export default () => {
 		'on',
 		( { directives: { on }, element, context: mainContext } ) => {
 			const context = useContext( mainContext );
-			Object.entries( on ).forEach( ( [ name, expression ] ) => {
+			Object.entries( on ).forEach( ( [ name, callback ] ) => {
 				element.props[ `on${ name }` ] = ( event ) => {
-					const cb = eval( `(${ expression })` );
+					const cb = getCallback( callback );
 					cb( { context, event } );
 				};
 			} );
@@ -76,7 +77,7 @@ export default () => {
 			Object.keys( className )
 				.filter( ( n ) => n !== 'default' )
 				.forEach( ( name ) => {
-					const cb = eval( `(${ className[ name ] })` );
+					const cb = getCallback( className[ name ] );
 					const result = cb( { context } );
 					if ( ! result ) element.props.class.replace( name, '' );
 					else if ( ! element.props.class.includes( name ) )
@@ -92,8 +93,8 @@ export default () => {
 			const context = useContext( mainContext );
 			Object.entries( bind )
 				.filter( ( n ) => n !== 'default' )
-				.forEach( ( [ attribute, expression ] ) => {
-					const cb = eval( `(${ expression })` );
+				.forEach( ( [ attribute, callback ] ) => {
+					const cb = getCallback( callback );
 					element.props[ attribute ] = cb( { context } );
 				} );
 		}
