@@ -1,25 +1,10 @@
 <?php
 /**
  * Unit tests covering WP_HTML_Tag_Processor functionality.
- * This file can be run for rapid development without loading any
- * WordPress libraries as follows:
- *
- * ```
- * ./vendor/bin/phpunit --loader phpunit\\GutenbergTestSuiteLoader --no-configuration ./phpunit/html/wp-html-tag-processor-test.php
- * ```
- *
- * There might be minor discrepancies between the command above and a full
- * CI run with WordPress loaded – the latter is always right.
  *
  * @package WordPress
  * @subpackage HTML
  */
-
-if ( ! function_exists( 'esc_attr' ) ) {
-	function esc_attr( $string ) {
-		return htmlspecialchars( $string, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'utf-8', false );
-	}
-}
 
 if ( ! class_exists( 'WP_UnitTestCase' ) ) {
 	abstract class WP_UnitTestCase extends \PHPUnit\Framework\TestCase {}
@@ -256,20 +241,20 @@ class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Passing a double quote inside of an attribute values could lead to an XSS attack as follows:
+	 * Passing unescaped attribute values could lead to XSS attacks and malformed HTML.
+	 * This test ensures that we properly escape the values to avoid these problems.
 	 *
+	 * Example:
 	 * <code>
 	 *     $p = new WP_HTML_Tag_Processor( '<div class="header"></div>' );
 	 *     $p->next_tag();
-	 *     $p->set_attribute('class', '" onclick="alert');
-	 *     echo $p;
-	 *     // <div class="" onclick="alert"></div>
-	 * </code>
+	 *     $p->set_attribute( 'class', '" onclick="alert' );
 	 *
-	 * To prevent it, `set_attribute` calls `esc_attr()` on its given values.
+	 *     // Not this!
+	 *     '<div class="" onclick="alert"></div>'
 	 *
-	 * <code>
-	 *    <div class="&quot; onclick=&quot;alert"></div>
+	 *     // This instead…
+	 *     '<div class="&quot; onclick=&quot;alert"></div>'
 	 * </code>
 	 *
 	 * @ticket 56299
@@ -277,10 +262,20 @@ class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
 	 * @dataProvider data_set_attribute_escapable_values
 	 * @covers set_attribute
 	 */
-	public function test_set_attribute_prevents_xss( $value_to_set, $expected_result ) {
+	public function test_set_attribute_escapes_value($value ) {
+		$spy = function ( $safe_text, $text ) use ( $value ) {
+			$this->assertEquals( $value, $text );
+
+			return $safe_text;
+		};
+
+		add_filter( 'attribute_escape', $spy );
+
 		$p = new WP_HTML_Tag_Processor( '<div></div>' );
 		$p->next_tag();
-		$p->set_attribute( 'test', $value_to_set );
+		$p->set_attribute( 'test', $value );
+
+		remove_filter( 'attribute_escape', $spy );
 
 		/*
 		 * Testing the escaping is hard using tools that properly parse
@@ -297,7 +292,7 @@ class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
 		preg_match( '~^<div test=(.*)></div>$~', (string) $p, $match );
 		list( , $actual_value ) = $match;
 
-		$this->assertEquals( $actual_value, '"' . $expected_result . '"' );
+		$this->assertEquals( $actual_value, '"' . esc_attr( $value ) . '"' );
 	}
 
 	/**
@@ -305,18 +300,15 @@ class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
 	 */
 	public function data_set_attribute_escapable_values() {
 		return array(
-			array( '"', '&quot;' ),
-			array( '&quot;', '&quot;' ),
-			array( '&', '&amp;' ),
-			array( '&amp;', '&amp;' ),
-			array( '&euro;', '&euro;' ),
-			array( "'", '&#039;' ),
-			array( '<>', '&lt;&gt;' ),
-			array( '&quot";', '&amp;quot&quot;;' ),
-			array(
-				'" onclick="alert(\'1\');"><span onclick=""></span><script>alert("1")</script>',
-				'&quot; onclick=&quot;alert(&#039;1&#039;);&quot;&gt;&lt;span onclick=&quot;&quot;&gt;&lt;/span&gt;&lt;script&gt;alert(&quot;1&quot;)&lt;/script&gt;',
-			),
+			array( '"' ),
+			array( '&quot;' ),
+			array( '&' ),
+			array( '&amp;' ),
+			array( '&euro;' ),
+			array( "'" ),
+			array( '<>' ),
+			array( '&quot";' ),
+			array( '" onclick="alert(\'1\');"><span onclick=""></span><script>alert("1")</script>' ),
 		);
 	}
 
