@@ -14,34 +14,49 @@
  * @return string Returns the rendered post author name block.
  */
 function render_block_core_post_time_to_read( $attributes, $content, $block ) {
-	if ( ! isset( $block->context['postId'] ) ) {
+	if ( ! isset( $block->context['postId'] ) || ! get_the_content() ) {
 		return '';
 	}
 
-	// TODO: Create an equivalent word count PHP funciton.
-	$minutes_to_read = 0;
+	/*
+	 * Average reading rate - based on average taken from
+	 * https://irisreading.com/average-reading-speed-in-various-languages/
+	 * (Characters/minute used for Chinese rather than words).
+	 */
+	$average_reading_rate = 189;
 
-	$minutes_to_read_string = 0 !== $minutes_to_read
+	/*
+	 * translators: If your word count is based on single characters (e.g. East Asian characters),
+	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
+	 * Do not translate into your own language.
+	 */
+	$word_count_type = _x( 'words', 'Word count type. Do not translate!' );
+
+	$minutes_to_read = round( gutenberg_word_count( $content, $word_count_type ) / $average_reading_rate );
+
+	$minutes_to_read_string = $minutes_to_read !== 0
 		? sprintf(
 			/* translators: %d is the number of minutes the post will take to read. */
-			_n(
-				'You can read this post in %d minute.',
-				'You can read this post in %d minutes.',
-				$minutes_to_read
-			),
+			_n( '%d minute', '%d minutes', $minutes_to_read ),
 			$minutes_to_read
-		)
-	: __( 'You can read this post in less than a minute.' );
+		 )
+		: __( 'less than a minute' );
 
 	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 
-	return sprintf(
-		'<p %1$s>%2$s</p>',
-		$wrapper_attributes,
-		$minutes_to_read_string
-	);
+	$prefix = "<div $wrapper_attributes>";
+	if ( isset( $attributes['prefix'] ) && $attributes['prefix'] ) {
+		$prefix .= '<span class="wp-block-post-time-to-read__prefix">' . $attributes['prefix'] . '</span>';
+	}
+
+	$suffix = '</div>';
+	if ( isset( $attributes['suffix'] ) && $attributes['suffix'] ) {
+		$suffix = '<span class="wp-block-post-time-to-read__suffix">' . $attributes['suffix'] . '</span>' . $suffix;
+	}
+
+	return wp_kses_post( $prefix ) . $minutes_to_read_string . wp_kses_post( $suffix );
 }
 
 /**
