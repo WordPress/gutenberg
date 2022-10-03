@@ -1,4 +1,21 @@
 .wp-block-input-field-label {
 	display: block;
-	background: #f00 !important;
+
+	p {
+		margin-block-end: 0;
+		margin-bottom: 0;
+	}
+}
+
+.wp-block-input-field {
+	padding: 0.5em;
+	border: 1px solid currentColor;
+	opacity: 0.75;
+	border-radius: 0;
+
+	&:focus,
+	&:active,
+	&:focus-within {
+		outline: 2px solid currentColor;
+	}
 }
