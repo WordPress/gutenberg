@@ -8,7 +8,7 @@
 
 class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 
-	function set_up() {
+	public function set_up() {
 		parent::set_up();
 		$this->theme_root = realpath( __DIR__ . '/data/themedir1' );
 
@@ -26,29 +26,29 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		unset( $GLOBALS['wp_themes'] );
 	}
 
-	function tear_down() {
+	public function tear_down() {
 		$GLOBALS['wp_theme_directories'] = $this->orig_theme_dir;
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
 		parent::tear_down();
 	}
 
-	function filter_set_theme_root() {
+	public function filter_set_theme_root() {
 		return $this->theme_root;
 	}
 
-	function filter_set_locale_to_polish() {
+	public function filter_set_locale_to_polish() {
 		return 'pl_PL';
 	}
 
-	function filter_db_query( $query ) {
+	public function filter_db_query( $query ) {
 		if ( preg_match( '#post_type = \'wp_global_styles\'#', $query ) ) {
 			$this->queries[] = $query;
 		}
 		return $query;
 	}
 
-	function test_translations_are_applied() {
+	public function test_translations_are_applied() {
 		add_filter( 'locale', array( $this, 'filter_set_locale_to_polish' ) );
 		load_textdomain( 'block-theme', realpath( __DIR__ . '/data/languages/themes/block-theme-pl_PL.mo' ) );
 
@@ -125,7 +125,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	function test_switching_themes_recalculates_data() {
+	public function test_switching_themes_recalculates_data() {
 		// The "default" theme doesn't have theme.json support.
 		switch_theme( 'default' );
 		$default = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
@@ -138,7 +138,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertTrue( $has_theme_json_support );
 	}
 
-	function test_add_theme_supports_are_loaded_for_themes_without_theme_json() {
+	public function test_add_theme_supports_are_loaded_for_themes_without_theme_json() {
 		switch_theme( 'default' );
 		$color_palette = array(
 			array(
@@ -182,7 +182,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		ksort( $array );
 	}
 
-	function test_merges_child_theme_json_into_parent_theme_json() {
+	public function test_merges_child_theme_json_into_parent_theme_json() {
 		switch_theme( 'block-theme-child' );
 
 		$actual_settings   = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_settings();
@@ -268,7 +268,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	function test_get_user_data_from_wp_global_styles_does_not_use_uncached_queries() {
+	public function test_get_user_data_from_wp_global_styles_does_not_use_uncached_queries() {
 		add_filter( 'query', array( $this, 'filter_db_query' ) );
 		$query_count = count( $this->queries );
 		for ( $i = 0; $i < 3; $i++ ) {
