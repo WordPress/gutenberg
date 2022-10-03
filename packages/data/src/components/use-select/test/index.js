@@ -942,7 +942,7 @@ describe( 'useSelect', () => {
 			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 1 );
 
 			// initial render + subscription check + rerender with isAsync=false
-			expect( selectSpy ).toHaveBeenCalledTimes( 3 );
+			expect( selectSpy ).toHaveBeenCalledTimes( 4 );
 			// initial render + rerender with isAsync=false
 			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 		} );
