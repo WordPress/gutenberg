@@ -5,7 +5,7 @@ export default function save( { attributes } ) {
 		<>
 			{ type === 'textarea' && (
 				/* eslint-disable jsx-a11y/label-has-associated-control */
-				<label>
+				<label className="wp-block-input-field-label">
 					{ inlineLabel && label && <span>{ label }</span> }
 					{ ! inlineLabel && label && <p>{ label }</p> }
 					<textarea
@@ -28,7 +28,7 @@ export default function save( { attributes } ) {
 
 			{ type !== 'textarea' && type !== 'submit' && (
 				/* eslint-disable jsx-a11y/label-has-associated-control */
-				<label>
+				<label className="wp-block-input-field-label">
 					{ inlineLabel && label && <span>{ label }</span> }
 					{ ! inlineLabel && label && <p>{ label }</p> }
 					<input

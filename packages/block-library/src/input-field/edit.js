@@ -112,7 +112,7 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 
 			{ type === 'textarea' && (
 				/* eslint-disable jsx-a11y/label-has-associated-control */
-				<label>
+				<label className="wp-block-input-field-label">
 					{ inlineLabel && label && <span>{ label }</span> }
 					{ ! inlineLabel && label && <p>{ label }</p> }
 					<textarea
@@ -157,7 +157,7 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 
 			{ type !== 'textarea' && type !== 'submit' && (
 				/* eslint-disable jsx-a11y/label-has-associated-control */
-				<label>
+				<label className="wp-block-input-field-label">
 					<RichText
 						identifier="label"
 						tagName={ inlineLabel ? 'span' : 'p' }
