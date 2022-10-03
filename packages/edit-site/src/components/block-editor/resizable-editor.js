@@ -67,8 +67,6 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 				setHeight( iframe.contentDocument.body.scrollHeight );
 			}
 
-			iframe.addEventListener( 'load', setFrameHeight );
-
 			let resizeObserver;
 
 			function registerObserver() {
@@ -93,7 +91,6 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 			return () => {
 				resizeObserver?.disconnect();
 				iframe.removeEventListener( 'load', registerObserver );
-				iframe.removeEventListener( 'load', setFrameHeight );
 			};
 		},
 		[ enableResizing, iframeRef.current ]
