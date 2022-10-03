@@ -10,7 +10,8 @@
  */
 import 'preact/debug';
 import { h, hydrate, createContext } from 'preact';
-import { useState, useEffect, useContext } from 'preact/hooks';
+import { useContext, useMemo } from 'preact/hooks';
+import { useSignalEffect } from '@preact/signals';
 
 /**
  * Internal dependencies
@@ -18,65 +19,52 @@ import { useState, useEffect, useContext } from 'preact/hooks';
 import toVdom from './vdom';
 import { directive } from './directives';
 import { createRootFragment, idle } from './utils';
+import { deepSignal } from './deep-signal';
 
 /**
  * Directives
  */
+const ctx = createContext( {} );
+const raf = window.requestAnimationFrame;
+// Until useSignalEffects is fixed: https://github.com/preactjs/signals/issues/228
+const tick = () => new Promise( ( r ) => raf( () => raf( r ) ) );
+
 // wp-context
-const ctx = createContext( [ {}, () => ( {} ) ] );
 directive( 'context', ( { directives: { context }, props: { children } } ) => {
-	const [ contextValue, setContext ] = useState( context.default );
-	const setMergedContext = ( newContext ) => {
-		setContext( { ...contextValue, ...newContext } );
-	};
-	return (
-		<ctx.Provider value={ [ contextValue, setMergedContext ] }>
-			{ children }
-		</ctx.Provider>
-	);
+	const signals = useMemo( () => deepSignal( context.default ), [] );
+	return <ctx.Provider value={ signals }>{ children }</ctx.Provider>;
 } );
 
 // wp-effect
-directive( 'effect', ( { directives: { effect } } ) => {
-	const [ context, setContext ] = useContext( ctx );
+directive( 'effect', ( { directives: { effect }, element } ) => {
+	const context = useContext( ctx );
 	Object.values( effect ).forEach( ( expression ) => {
-		useEffect( () => {
+		useSignalEffect( () => {
 			const cb = eval( `(${ expression })` );
-			cb( { context, setContext } );
+			cb( { context, tick, ref: element.ref.current } );
 		} );
-	} );
-} );
-
-// wp-init
-directive( 'init', ( { directives: { init }, element } ) => {
-	const [ context, setContext ] = useContext( ctx );
-	Object.values( init ).forEach( ( expression ) => {
-		useEffect( () => {
-			const cb = eval( `(${ expression })` );
-			cb( { context, setContext, ref: element.ref.current } );
-		}, [] );
 	} );
 } );
 
 // wp-on:[event]
 directive( 'on', ( { directives: { on }, element } ) => {
-	const [ context, setContext ] = useContext( ctx );
+	const context = useContext( ctx );
 	Object.entries( on ).forEach( ( [ name, expression ] ) => {
 		element.props[ `on${ name }` ] = ( event ) => {
 			const cb = eval( `(${ expression })` );
-			cb( { context, setContext, event } );
+			cb( { context, event } );
 		};
 	} );
 } );
 
-// wp-class:[event]
+// wp-class:[classname]
 directive( 'class', ( { directives: { class: className }, element } ) => {
-	const [ context, setContext ] = useContext( ctx );
+	const context = useContext( ctx );
 	Object.keys( className )
 		.filter( ( n ) => n !== 'default' )
 		.forEach( ( name ) => {
 			const cb = eval( `(${ className[ name ] })` );
-			const result = cb( { context, setContext } );
+			const result = cb( { context } );
 			if ( ! result ) element.props.class.replace( name, '' );
 			else if ( ! element.props.class.includes( name ) )
 				element.props.class += ` ${ name }`;
