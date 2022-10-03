@@ -2,7 +2,10 @@
  * External dependencies
  */
 import { useRef } from 'preact/hooks';
-import { h, options } from 'preact';
+import { h, options, createContext } from 'preact';
+
+// Main context
+const context = createContext( {} );
 
 // WordPress Directives.
 const directives = {};
@@ -24,7 +27,7 @@ const WpDirective = ( { type, wp, props: originalProps } ) => {
 	const ref = useRef( null );
 	const element = h( type, { ...originalProps, ref, _wrapped: true } );
 	const props = { ...originalProps, children: element };
-	const directiveArgs = { directives: wp, props, element };
+	const directiveArgs = { directives: wp, props, element, context };
 
 	for ( const d in wp ) {
 		const wrapper = directives[ d ]?.( directiveArgs );
@@ -41,6 +44,7 @@ options.vnode = ( vnode ) => {
 
 	if ( typeof type === 'string' && type.startsWith( 'wp-' ) ) {
 		vnode.type = components[ type ];
+		vnode.props.context = context;
 	}
 
 	if ( wp ) {

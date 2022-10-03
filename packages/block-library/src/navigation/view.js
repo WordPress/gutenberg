@@ -9,7 +9,7 @@
  * External dependencies
  */
 import 'preact/debug';
-import { h, hydrate, createContext } from 'preact';
+import { h, hydrate } from 'preact';
 import { useContext, useMemo } from 'preact/hooks';
 import { useSignalEffect } from '@preact/signals';
 
@@ -21,39 +21,48 @@ import { directive, component } from './wpx';
 import { createRootFragment, idle } from './utils';
 import { deepSignal } from './deep-signal';
 
-const ctx = createContext( {} );
 const raf = window.requestAnimationFrame;
 // Until useSignalEffects is fixed: https://github.com/preactjs/signals/issues/228
 const tick = () => new Promise( ( r ) => raf( () => raf( r ) ) );
 
 // COMPONENTS
-const WpContext = ( { children, data } ) => {
+const WpContext = ( { children, data, context: { Provider } } ) => {
 	const signals = useMemo( () => deepSignal( JSON.parse( data ) ), [] );
-	return <ctx.Provider value={ signals }>{ children }</ctx.Provider>;
+	return <Provider value={ signals }>{ children }</Provider>;
 };
 component( 'wp-context', WpContext );
 
 // DIRECTIVES
 // wp-context
-directive( 'context', ( { directives: { context }, props: { children } } ) => {
+directive(
+	'context',
+	( {
+		directives: { context },
+		props: { children },
+		context: { Provider },
+	} ) => {
 	const signals = useMemo( () => deepSignal( context.default ), [] );
-	return <ctx.Provider value={ signals }>{ children }</ctx.Provider>;
-} );
+		return <Provider value={ signals }>{ children }</Provider>;
+	}
+);
 
 // wp-effect
-directive( 'effect', ( { directives: { effect }, element } ) => {
-	const context = useContext( ctx );
+directive(
+	'effect',
+	( { directives: { effect }, element, context: mainContext } ) => {
+		const context = useContext( mainContext );
 	Object.values( effect ).forEach( ( expression ) => {
 		useSignalEffect( () => {
 			const cb = eval( `(${ expression })` );
 			cb( { context, tick, ref: element.ref.current } );
 		} );
 	} );
-} );
+	}
+);
 
 // wp-on:[event]
-directive( 'on', ( { directives: { on }, element } ) => {
-	const context = useContext( ctx );
+directive( 'on', ( { directives: { on }, element, context: mainContext } ) => {
+	const context = useContext( mainContext );
 	Object.entries( on ).forEach( ( [ name, expression ] ) => {
 		element.props[ `on${ name }` ] = ( event ) => {
 			const cb = eval( `(${ expression })` );
@@ -63,8 +72,10 @@ directive( 'on', ( { directives: { on }, element } ) => {
 } );
 
 // wp-class:[classname]
-directive( 'class', ( { directives: { class: className }, element } ) => {
-	const context = useContext( ctx );
+directive(
+	'class',
+	( { directives: { class: className }, element, context: mainContext } ) => {
+		const context = useContext( mainContext );
 	Object.keys( className )
 		.filter( ( n ) => n !== 'default' )
 		.forEach( ( name ) => {
