@@ -154,7 +154,8 @@ export default function PostSavedState( {
 			shortcut={ isDisabled ? undefined : displayShortcut.primary( 's' ) }
 			variant="tertiary"
 			icon={ isLargeViewport ? undefined : cloudUpload }
-			label={ text }
+			// Make sure the aria-label has always a value, as the default `text` is undefined on small screens.
+			label={ text || label }
 			aria-disabled={ isDisabled }
 		>
 			{ isSavedState && <Icon icon={ isSaved ? check : cloud } /> }

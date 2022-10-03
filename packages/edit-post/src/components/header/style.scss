@@ -145,6 +145,13 @@
 			padding-right: $grid-unit-15;
 		}
 	}
+
+	.editor-post-save-draft.editor-post-save-draft,
+	.editor-post-saved-state.editor-post-saved-state {
+		&::after {
+			content: none;
+		}
+	}
 }
 
 .edit-post-header__dropdown {
