@@ -614,6 +614,7 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 			order: mapBlockOrder( action.blocks ),
 			parents: mapBlockParents( action.blocks ),
 			controlledInnerBlocks: {},
+			visibility: {},
 		};
 
 		const subTree = buildBlockTree( newState, action.blocks );
@@ -1161,6 +1162,17 @@ export const blocks = pipe(
 		}
 		return state;
 	},
+
+	visibility( state = {}, action ) {
+		if ( action.type === 'SET_BLOCK_VISIBILITY' ) {
+			return {
+				...state,
+				...action.updates,
+			};
+		}
+
+		return state;
+	},
 } );
 
 /**
@@ -1198,25 +1210,6 @@ export function draggedBlocks( state = [], action ) {
 
 		case 'STOP_DRAGGING_BLOCKS':
 			return [];
-	}
-
-	return state;
-}
-
-/**
- * Reducer tracking the visible blocks.
- *
- * @param {Record<string,boolean>} state  Current state.
- * @param {Object}                 action Dispatched action.
- *
- * @return {Record<string,boolean>} Block visibility.
- */
-export function blockVisibility( state = {}, action ) {
-	if ( action.type === 'SET_BLOCK_VISIBILITY' ) {
-		return {
-			...state,
-			...action.updates,
-		};
 	}
 
 	return state;
@@ -1667,7 +1660,7 @@ export function hasBlockMovingClientId( state = null, action ) {
  *
  * @return {[string,Object]} Updated state.
  */
-export function lastBlockAttributesChange( state = null, action ) {
+export function lastBlockAttributesChange( state, action ) {
 	switch ( action.type ) {
 		case 'UPDATE_BLOCK':
 			if ( ! action.updates.attributes ) {
@@ -1688,7 +1681,7 @@ export function lastBlockAttributesChange( state = null, action ) {
 			);
 	}
 
-	return state;
+	return null;
 }
 
 /**
@@ -1820,5 +1813,4 @@ export default combineReducers( {
 	highlightedBlock,
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
-	blockVisibility,
 } );

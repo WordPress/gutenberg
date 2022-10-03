@@ -2670,7 +2670,7 @@ export function wasBlockJustInserted( state, clientId, source ) {
  * @return {boolean} True if the block is visible.
  */
 export function isBlockVisible( state, clientId ) {
-	return state.blockVisibility?.[ clientId ] ?? true;
+	return state.blocks.visibility?.[ clientId ] ?? true;
 }
 
 /**
@@ -2682,12 +2682,12 @@ export function isBlockVisible( state, clientId ) {
 export const __unstableGetVisibleBlocks = createSelector(
 	( state ) => {
 		return new Set(
-			Object.keys( state.blockVisibility ).filter(
-				( key ) => state.blockVisibility[ key ]
+			Object.keys( state.blocks.visibility ).filter(
+				( key ) => state.blocks.visibility[ key ]
 			)
 		);
 	},
-	( state ) => [ state.blockVisibility ]
+	( state ) => [ state.blocks.visibility ]
 );
 
 export const __unstableGetContentLockingParent = createSelector(

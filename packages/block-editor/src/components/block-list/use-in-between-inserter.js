@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect, useDebounce } from '@wordpress/compose';
+import { useRefEffect } from '@wordpress/compose';
+
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 
@@ -32,10 +33,6 @@ export function useInBetweenInserter() {
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
 
-	const delayedShowInsertionPoint = useDebounce( showInsertionPoint, 500, {
-		trailing: true,
-	} );
-
 	return useRefEffect(
 		( node ) => {
 			if ( isInBetweenInserterDisabled ) {
@@ -56,7 +53,6 @@ export function useInBetweenInserter() {
 						'block-editor-block-list__layout'
 					)
 				) {
-					delayedShowInsertionPoint.cancel();
 					if ( isBlockInsertionPointVisible() ) {
 						hideInsertionPoint();
 					}
@@ -138,7 +134,6 @@ export function useInBetweenInserter() {
 						( event.clientX > elementRect.right ||
 							event.clientX < elementRect.left ) )
 				) {
-					delayedShowInsertionPoint.cancel();
 					if ( isBlockInsertionPointVisible() ) {
 						hideInsertionPoint();
 					}
@@ -150,14 +145,13 @@ export function useInBetweenInserter() {
 				// Don't show the in-between inserter before the first block in
 				// the list (preserves the original behaviour).
 				if ( index === 0 ) {
-					delayedShowInsertionPoint.cancel();
 					if ( isBlockInsertionPointVisible() ) {
 						hideInsertionPoint();
 					}
 					return;
 				}
 
-				delayedShowInsertionPoint( rootClientId, index, {
+				showInsertionPoint( rootClientId, index, {
 					__unstableWithInserter: true,
 				} );
 			}
