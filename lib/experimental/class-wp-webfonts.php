@@ -362,8 +362,8 @@ class WP_Webfonts extends WP_Dependencies {
 		}
 
 		// Check the font-display.
-		if ( ! in_array( $webfont['font-display'], array( 'auto', 'block', 'fallback', 'swap', 'optional' ), true ) ) {
-			$webfont['font-display'] = 'fallback';
+		if ( ! in_array( $variation['font-display'], array( 'auto', 'block', 'fallback', 'swap', 'optional' ), true ) ) {
+			$variation['font-display'] = 'fallback';
 		}
 
 		$valid_props = array(
