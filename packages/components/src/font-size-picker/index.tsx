@@ -271,10 +271,7 @@ const UnforwardedFontSizePicker = (
 					{ ! withSlider &&
 						! disableCustomFontSizes &&
 						showCustomValueControl && (
-							<Flex
-								justify="space-between"
-								className="components-font-size-picker__custom-size-control"
-							>
+							<Flex className="components-font-size-picker__custom-size-control">
 								<FlexItem isBlock>
 									<UnitControl
 										label={ __( 'Custom' ) }
@@ -303,7 +300,7 @@ const UnforwardedFontSizePicker = (
 									/>
 								</FlexItem>
 								{ withReset && (
-									<FlexItem isBlock>
+									<FlexItem>
 										<ResetButton
 											disabled={ value === undefined }
 											onClick={ () => {
@@ -311,6 +308,7 @@ const UnforwardedFontSizePicker = (
 											} }
 											isSmall
 											variant="secondary"
+											size={ size }
 										>
 											{ __( 'Reset' ) }
 										</ResetButton>
