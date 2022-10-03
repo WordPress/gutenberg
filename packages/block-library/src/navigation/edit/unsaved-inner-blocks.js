@@ -36,6 +36,8 @@ const ALLOWED_BLOCKS = [
 	'core/navigation-submenu',
 ];
 
+const TEMPLATE = [ [ 'core/page-list' ] ];
+
 export default function UnsavedInnerBlocks( {
 	blocks,
 	clientId,
@@ -82,7 +84,7 @@ export default function UnsavedInnerBlocks( {
 			className: 'wp-block-navigation__container',
 		},
 		{
-			template: [ [ 'core/page-list' ] ],
+			template: TEMPLATE,
 			renderAppender: hasSelection ? undefined : false,
 			allowedBlocks: ALLOWED_BLOCKS,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
