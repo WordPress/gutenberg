@@ -2670,7 +2670,7 @@ export function wasBlockJustInserted( state, clientId, source ) {
  * @return {boolean} True if the block is visible.
  */
 export function isBlockVisible( state, clientId ) {
-	return state.blocks.visibility?.[ clientId ] ?? true;
+	return state.blockVisibility?.[ clientId ] ?? true;
 }
 
 /**
@@ -2682,12 +2682,12 @@ export function isBlockVisible( state, clientId ) {
 export const __unstableGetVisibleBlocks = createSelector(
 	( state ) => {
 		return new Set(
-			Object.keys( state.blocks.visibility ).filter(
-				( key ) => state.blocks.visibility[ key ]
+			Object.keys( state.blockVisibility ).filter(
+				( key ) => state.blockVisibility[ key ]
 			)
 		);
 	},
-	( state ) => [ state.blocks.visibility ]
+	( state ) => [ state.blockVisibility ]
 );
 
 export const __unstableGetContentLockingParent = createSelector(
@@ -2720,6 +2720,7 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	// In zoom-out mode, the block overlay is always active for top level blocks.
 	if (
 		editorMode === 'zoom-out' &&
+		clientId &&
 		! getBlockRootClientId( state, clientId )
 	) {
 		return true;

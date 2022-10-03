@@ -23,6 +23,8 @@ import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
 
+const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
+
 export const InsertionPointOpenRef = createContext();
 
 function BlockPopoverInbetween( {
@@ -34,8 +36,9 @@ function BlockPopoverInbetween( {
 	...props
 } ) {
 	// This is a temporary hack to get the inbetween inserter to recompute properly.
-	const [ positionRecompute, forceRecompute ] = useReducer(
-		( s ) => s + 1,
+	const [ popoverRecomputeCounter, forcePopoverRecompute ] = useReducer(
+		// Module is there to make sure that the counter doesn't overflow.
+		( s ) => ( s + 1 ) % MAX_POPOVER_RECOMPUTE_COUNTER,
 		0
 	);
 
@@ -66,7 +69,14 @@ function BlockPopoverInbetween( {
 	const nextElement = useBlockElement( nextClientId );
 	const isVertical = orientation === 'vertical';
 	const style = useMemo( () => {
-		if ( ( ! previousElement && ! nextElement ) || ! isVisible ) {
+		if (
+			// popoverRecomputeCounter is by definition always equal or greater than 0.
+			// This check is only there to satisfy the correctness of the
+			// exhaustive-deps rule for the `useMemo` hook.
+			popoverRecomputeCounter < 0 ||
+			( ! previousElement && ! nextElement ) ||
+			! isVisible
+		) {
 			return {};
 		}
 
@@ -102,12 +112,19 @@ function BlockPopoverInbetween( {
 		previousElement,
 		nextElement,
 		isVertical,
-		positionRecompute,
+		popoverRecomputeCounter,
 		isVisible,
 	] );
 
 	const popoverAnchor = useMemo( () => {
-		if ( ( ! previousElement && ! nextElement ) || ! isVisible ) {
+		if (
+			// popoverRecomputeCounter is by definition always equal or greater than 0.
+			// This check is only there to satisfy the correctness of the
+			// exhaustive-deps rule for the `useMemo` hook.
+			popoverRecomputeCounter < 0 ||
+			( ! previousElement && ! nextElement ) ||
+			! isVisible
+		) {
 			return undefined;
 		}
 
@@ -161,7 +178,7 @@ function BlockPopoverInbetween( {
 	}, [
 		previousElement,
 		nextElement,
-		positionRecompute,
+		popoverRecomputeCounter,
 		isVertical,
 		isVisible,
 	] );
@@ -169,11 +186,18 @@ function BlockPopoverInbetween( {
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
 
 	// This is only needed for a smooth transition when moving blocks.
+	// When blocks are moved up/down, their position can be set by
+	// updating the `transform` property manually (i.e. without using CSS
+	// transitions or animations). The animation, which can also scroll the block
+	// editor, can sometimes cause the position of the Popover to get out of sync.
+	// A MutationObserver is therefore used to make sure that changes to the
+	// selectedElement's attribute (i.e. `transform`) can be tracked and used to
+	// trigger the Popover to rerender.
 	useLayoutEffect( () => {
 		if ( ! previousElement ) {
 			return;
 		}
-		const observer = new window.MutationObserver( forceRecompute );
+		const observer = new window.MutationObserver( forcePopoverRecompute );
 		observer.observe( previousElement, { attributes: true } );
 
 		return () => {
@@ -185,7 +209,7 @@ function BlockPopoverInbetween( {
 		if ( ! nextElement ) {
 			return;
 		}
-		const observer = new window.MutationObserver( forceRecompute );
+		const observer = new window.MutationObserver( forcePopoverRecompute );
 		observer.observe( nextElement, { attributes: true } );
 
 		return () => {
@@ -199,12 +223,12 @@ function BlockPopoverInbetween( {
 		}
 		previousElement.ownerDocument.defaultView.addEventListener(
 			'resize',
-			forceRecompute
+			forcePopoverRecompute
 		);
 		return () => {
-			previousElement.ownerDocument.defaultView.removeEventListener(
+			previousElement.ownerDocument.defaultView?.removeEventListener(
 				'resize',
-				forceRecompute
+				forcePopoverRecompute
 			);
 		};
 	}, [ previousElement ] );

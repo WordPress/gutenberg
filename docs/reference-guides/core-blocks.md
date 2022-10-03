@@ -28,7 +28,7 @@ Embed a simple audio player. ([Source](https://github.com/WordPress/gutenberg/tr
 
 ## Avatar
 
-Add a user's avatar. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/avatar))
+Add a user’s avatar. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/avatar))
 
 -	**Name:** core/avatar
 -	**Category:** theme
@@ -203,7 +203,7 @@ Displays a list of page numbers for comments pagination. ([Source](https://githu
 
 -	**Name:** core/comments-pagination-numbers
 -	**Category:** theme
--	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
 ## Comments Previous Page
@@ -456,7 +456,7 @@ Display post author details such as name, avatar, and bio. ([Source](https://git
 -	**Name:** core/post-author
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** avatarSize, byline, showAvatar, showBio, textAlign
+-	**Attributes:** avatarSize, byline, isLink, linkTarget, showAvatar, showBio, textAlign
 
 ## Post Author Biography
 
@@ -572,7 +572,7 @@ Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages
 
 -	**Name:** core/post-terms
 -	**Category:** theme
--	**Supports:** color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** prefix, separator, suffix, term, textAlign
 
 ## Post Title
@@ -730,7 +730,7 @@ Display a graphic to represent this site. Update the block, and the changes appl
 
 ## Site Tagline
 
-Describe in a few words what the site is about. The tagline can be used in search results or when sharing on social networks even if it's not displayed in the theme design. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-tagline))
+Describe in a few words what the site is about. The tagline can be used in search results or when sharing on social networks even if it’s not displayed in the theme design. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-tagline))
 
 -	**Name:** core/site-tagline
 -	**Category:** theme

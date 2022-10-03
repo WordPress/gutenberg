@@ -3,7 +3,12 @@
  */
 import createSelector from 'rememo';
 import removeAccents from 'remove-accents';
-import { filter, flow, get, includes, map, some } from 'lodash';
+import { filter, get, includes, map, some } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { pipe } from '@wordpress/compose';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
@@ -686,7 +691,7 @@ export function hasBlockSupport( state, nameOrType, feature, defaultSupports ) {
 export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 	const blockType = getNormalizedBlockType( state, nameOrType );
 
-	const getNormalizedSearchTerm = flow( [
+	const getNormalizedSearchTerm = pipe( [
 		// Disregard diacritics.
 		//  Input: "média"
 		( term ) => removeAccents( term ?? '' ),
@@ -702,7 +707,7 @@ export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 
 	const normalizedSearchTerm = getNormalizedSearchTerm( searchTerm );
 
-	const isSearchMatch = flow( [
+	const isSearchMatch = pipe( [
 		getNormalizedSearchTerm,
 		( normalizedCandidate ) =>
 			includes( normalizedCandidate, normalizedSearchTerm ),

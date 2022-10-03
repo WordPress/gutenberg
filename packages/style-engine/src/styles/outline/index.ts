@@ -22,7 +22,7 @@ const offset = {
 		style: Style,
 		options: StyleOptions,
 		path: string[] = [ 'outline', 'offset' ],
-		ruleKey: string = 'outlineColor'
+		ruleKey: string = 'outlineOffset'
 	): GeneratedCSSRule[] => {
 		return generateRule( style, options, path, ruleKey );
 	},

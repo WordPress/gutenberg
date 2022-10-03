@@ -133,7 +133,7 @@ export default function QueryInspectorControls( {
 								label={ __( 'Post type' ) }
 								onChange={ onPostTypeChange }
 								help={ __(
-									'WordPress contains different types of content and they are divided into collections called "Post types". By default there are a few different ones such as blog posts and pages, but plugins could add more.'
+									'WordPress contains different types of content and they are divided into collections called “Post types”. By default there are a few different ones such as blog posts and pages, but plugins could add more.'
 								) }
 							/>
 						) }
@@ -237,10 +237,7 @@ export default function QueryInspectorControls( {
 							</ToolsPanelItem>
 						) }
 						{ isPostTypeHierarchical &&
-							! isControlAllowed(
-								allowedControls,
-								'parents'
-							) && (
+							isControlAllowed( allowedControls, 'parents' ) && (
 								<ToolsPanelItem
 									hasValue={ () => !! parents?.length }
 									label={ __( 'Parents' ) }

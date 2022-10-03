@@ -2,11 +2,14 @@
 
 ## Unreleased
 
+## 7.15.0 (2022-09-21)
+
 ## 7.14.0 (2022-09-13)
 
 ### New Feature
 
 -   Made it possible to import individual blocks ([#42258](https://github.com/WordPress/gutenberg/pull/42258)). Check [README](./README.md#loading-individual-blocks) for more information.
+-   Paragraph block: You can now drop files/blocks/HTML on an empty Paragraph block to transform it into relevant blocks ([#42722](https://github.com/WordPress/gutenberg/pull/42722)).
 
 ## 7.13.0 (2022-08-24)
 
