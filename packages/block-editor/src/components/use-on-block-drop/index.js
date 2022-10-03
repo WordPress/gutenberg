@@ -17,6 +17,7 @@ import { getFilesFromDataTransfer } from '@wordpress/dom';
 import { store as blockEditorStore } from '../../store';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
+/** @typedef {import('./types').WPDropOperation} WPDropOperation */
 
 /**
  * Retrieve the data for a block drop event.
@@ -197,21 +198,19 @@ export function onHTMLDrop(
 /**
  * A React hook for handling block drop events.
  *
- * @typedef {'insert'|'replace'} DropAction The type of action to perform on drop.
+ * @param {string}          targetRootClientId  The root client id where the block(s) will be inserted.
+ * @param {number}          targetBlockIndex    The index where the block(s) will be inserted.
+ * @param {Object}          options             The optional options.
+ * @param {WPDropOperation} [options.operation] The type of operation to perform on drop. Could be `insert` or `replace` for now.
  *
- * @param {string}     targetRootClientId The root client id where the block(s) will be inserted.
- * @param {number}     targetBlockIndex   The index where the block(s) will be inserted.
- * @param {Object}     options            The optional options.
- * @param {DropAction} options.action     The type of action to perform on drop. Could be `insert` or `replace` for now.
- *
- * @return {Object} An object that contains the event handlers `onDrop`, `onFilesDrop` and `onHTMLDrop`.
+ * @return {Function} A function to be passed to the onDrop handler.
  */
 export default function useOnBlockDrop(
 	targetRootClientId,
 	targetBlockIndex,
 	options = {}
 ) {
-	const { action = 'insert' } = options;
+	const { operation = 'insert' } = options;
 	const hasUploadPermissions = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
 		[]
@@ -235,7 +234,7 @@ export default function useOnBlockDrop(
 
 	const insertOrReplaceBlocks = useCallback(
 		( blocks, updateSelection = true, initialPosition = 0 ) => {
-			if ( action === 'replace' ) {
+			if ( operation === 'replace' ) {
 				const clientIds = getBlockOrder( targetRootClientId );
 				const clientId = clientIds[ targetBlockIndex ];
 
@@ -251,7 +250,7 @@ export default function useOnBlockDrop(
 			}
 		},
 		[
-			action,
+			operation,
 			getBlockOrder,
 			insertBlocks,
 			replaceBlocks,
@@ -262,7 +261,7 @@ export default function useOnBlockDrop(
 
 	const moveBlocks = useCallback(
 		( sourceClientIds, sourceRootClientId, insertIndex ) => {
-			if ( action === 'replace' ) {
+			if ( operation === 'replace' ) {
 				const sourceBlocks = getBlocksByClientId( sourceClientIds );
 				const targetBlockClientIds =
 					getBlockOrder( targetRootClientId );
@@ -290,7 +289,7 @@ export default function useOnBlockDrop(
 			}
 		},
 		[
-			action,
+			operation,
 			getBlockOrder,
 			getBlocksByClientId,
 			insertBlocks,

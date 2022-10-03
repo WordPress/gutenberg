@@ -8,20 +8,31 @@ import {
 	__experimentalUseDropZone as useDropZone,
 } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
+import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import useOnBlockDrop from '../use-on-block-drop';
-import { getDistanceToNearestEdge } from '../../utils/math';
+import {
+	getDistanceToNearestEdge,
+	isPointContainedByRect,
+} from '../../utils/math';
 import { store as blockEditorStore } from '../../store';
 
 /** @typedef {import('../../utils/math').WPPoint} WPPoint */
+/** @typedef {import('../use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
 /**
  * The orientation of a block list.
  *
  * @typedef {'horizontal'|'vertical'|undefined} WPBlockListOrientation
+ */
+
+/**
+ * The insert position when dropping a block.
+ *
+ * @typedef {'before'|'after'} WPInsertPosition
  */
 
 /**
@@ -32,7 +43,7 @@ import { store as blockEditorStore } from '../../store';
  * @param {WPPoint}                position    The position of the item being dragged.
  * @param {WPBlockListOrientation} orientation The orientation of a block list.
  *
- * @return {number|undefined} The block index that's closest to the drag position.
+ * @return {[number|undefined, WPInsertPosition]} The block index and the position that's closest to the drag position.
  */
 export function getNearestBlockIndex( elements, position, orientation ) {
 	const allowedEdges =
@@ -43,48 +54,79 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 	const isRightToLeft = isRTL();
 
 	let candidateIndex;
+	let candidatePosition = 'after';
 	let candidateDistance;
 
 	elements.forEach( ( element, index ) => {
 		const rect = element.getBoundingClientRect();
-		const [ distance, edge ] = getDistanceToNearestEdge(
+
+		let [ distance, edge ] = getDistanceToNearestEdge(
 			position,
 			rect,
 			allowedEdges
 		);
+		// Prioritize the element if the point is inside of it.
+		if ( isPointContainedByRect( position, rect ) ) {
+			distance = 0;
+		}
 
 		if ( candidateDistance === undefined || distance < candidateDistance ) {
-			// If the user is dropping to the trailing edge of the block
-			// add 1 to the index to represent dragging after.
-			// Take RTL languages into account where the left edge is
-			// the trailing edge.
-			const isTrailingEdge =
+			// Where the dropped block will be inserted on the nearest block.
+			candidatePosition =
 				edge === 'bottom' ||
 				( ! isRightToLeft && edge === 'right' ) ||
-				( isRightToLeft && edge === 'left' );
-			const offset = isTrailingEdge ? 1 : 0;
+				( isRightToLeft && edge === 'left' )
+					? 'after'
+					: 'before';
 
 			// Update the currently known best candidate.
 			candidateDistance = distance;
-			candidateIndex = index + offset;
+			candidateIndex = index;
 		}
 	} );
 
-	return candidateIndex;
+	return [ candidateIndex, candidatePosition ];
 }
 
 /**
- * Determine if the element is an empty paragraph block.
+ * Get the drop target index and operation based on the the blocks and the nearst block index.
  *
- * @param {?HTMLElement} element The element being tested.
- * @return {boolean} True or False.
+ * @param {number|undefined} nearestIndex   The nearest block index calculated by getNearestBlockIndex.
+ * @param {WPInsertPosition} insertPosition Whether to insert before or after the nearestIndex.
+ * @param {WPBlock[]}        blocks         The blocks list.
+ * @return {[number, WPDropOperation]} The drop target.
  */
-function isEmptyParagraph( element ) {
-	return (
-		!! element &&
-		element.dataset.type === 'core/paragraph' &&
-		element.dataset.empty === 'true'
-	);
+export function getDropTargetIndexAndOperation(
+	nearestIndex,
+	insertPosition,
+	blocks
+) {
+	const adjacentIndex =
+		nearestIndex + ( insertPosition === 'after' ? 1 : -1 );
+	const nearestBlock = blocks[ nearestIndex ];
+	const adjacentBlock = blocks[ adjacentIndex ];
+	const isNearestBlockUnmodifiedDefaultBlock =
+		!! nearestBlock && isUnmodifiedDefaultBlock( nearestBlock );
+	const isAdjacentBlockUnmodifiedDefaultBlock =
+		!! adjacentBlock && isUnmodifiedDefaultBlock( adjacentBlock );
+
+	// If both blocks are not unmodified default blocks then just insert between them.
+	if (
+		! isNearestBlockUnmodifiedDefaultBlock &&
+		! isAdjacentBlockUnmodifiedDefaultBlock
+	) {
+		// If the user is dropping to the trailing edge of the block
+		// add 1 to the index to represent dragging after.
+		const insertionIndex =
+			insertPosition === 'after' ? nearestIndex + 1 : nearestIndex;
+		return [ insertionIndex, 'insert' ];
+	}
+
+	// Otherwise, replace the nearest unmodified default block.
+	return [
+		isNearestBlockUnmodifiedDefaultBlock ? nearestIndex : adjacentIndex,
+		'replace',
+	];
 }
 
 /**
@@ -104,7 +146,10 @@ export default function useBlockDropZone( {
 	// an empty string to represent top-level blocks.
 	rootClientId: targetRootClientId = '',
 } = {} ) {
-	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
+	const [ dropTarget, setDropTarget ] = useState( {
+		index: null,
+		operation: 'insert',
+	} );
 
 	const isDisabled = useSelect(
 		( select ) => {
@@ -125,40 +170,58 @@ export default function useBlockDropZone( {
 		[ targetRootClientId ]
 	);
 
-	const { getBlockListSettings } = useSelect( blockEditorStore );
+	const { getBlockListSettings, getBlocks } = useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
 
-	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
+	const onBlockDrop = useOnBlockDrop( targetRootClientId, dropTarget.index, {
+		operation: dropTarget.operation,
+	} );
 	const throttled = useThrottle(
-		useCallback( ( event, currentTarget ) => {
-			const blockElements = Array.from( currentTarget.children ).filter(
-				// Ensure the element is a block. It should have the `wp-block` class.
-				( element ) => element.classList.contains( 'wp-block' )
-			);
-			const targetIndex = getNearestBlockIndex(
-				blockElements,
-				{ x: event.clientX, y: event.clientY },
-				getBlockListSettings( targetRootClientId )?.orientation
-			);
+		useCallback(
+			( event, currentTarget ) => {
+				const blockElements = Array.from(
+					currentTarget.children
+				).filter(
+					// Ensure the element is a block. It should have the `wp-block` class.
+					( element ) => element.classList.contains( 'wp-block' )
+				);
+				// The second value in the tuple is only needed afterwards but we don't want to recalculate it.
+				// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+				const [ nearestBlockIndex, insertPosition ] =
+					getNearestBlockIndex(
+						blockElements,
+						{ x: event.clientX, y: event.clientY },
+						getBlockListSettings( targetRootClientId )?.orientation
+					);
 
-			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
-
-			if ( targetIndex !== undefined ) {
-				const nextBlock = blockElements[ targetIndex ];
-				const previousBlock = blockElements[ targetIndex - 1 ];
-
-				// Don't show the insertion point when it's near an empty paragraph block.
-				if (
-					isEmptyParagraph( nextBlock ) ||
-					isEmptyParagraph( previousBlock )
-				) {
+				// The block list is empty, don't show the insertion point but still allow dropping.
+				if ( nearestBlockIndex === undefined ) {
+					setDropTarget( {
+						index: 0,
+						operation: 'insert',
+					} );
 					return;
 				}
 
-				showInsertionPoint( targetRootClientId, targetIndex );
-			}
-		}, [] ),
+				const blocks = getBlocks( targetRootClientId );
+				const [ targetIndex, operation ] =
+					getDropTargetIndexAndOperation(
+						nearestBlockIndex,
+						insertPosition,
+						blocks
+					);
+
+				setDropTarget( {
+					index: targetIndex,
+					operation,
+				} );
+				showInsertionPoint( targetRootClientId, targetIndex, {
+					operation,
+				} );
+			},
+			[ targetRootClientId ]
+		),
 		200
 	);
 
@@ -174,12 +237,10 @@ export default function useBlockDropZone( {
 		onDragLeave() {
 			throttled.cancel();
 			hideInsertionPoint();
-			setTargetBlockIndex( null );
 		},
 		onDragEnd() {
 			throttled.cancel();
 			hideInsertionPoint();
-			setTargetBlockIndex( null );
 		},
 	} );
 }

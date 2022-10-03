@@ -17,10 +17,11 @@ import { useReducedMotion } from '@wordpress/compose';
 import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import BlockPopoverInbetween from '../block-popover/inbetween';
+import BlockPopoverDropZone from '../block-popover/drop-zone';
 
 export const InsertionPointOpenRef = createContext();
 
-function InsertionPointPopover( {
+function InBetweenInsertionPointPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
 } ) {
@@ -232,9 +233,21 @@ function InsertionPointPopover( {
 }
 
 export default function InsertionPoint( props ) {
-	const isVisible = useSelect( ( select ) => {
-		return select( blockEditorStore ).isBlockInsertionPointVisible();
+	const { insertionPoint, isVisible } = useSelect( ( select ) => {
+		const { getBlockInsertionPoint, isBlockInsertionPointVisible } =
+			select( blockEditorStore );
+		return {
+			insertionPoint: getBlockInsertionPoint(),
+			isVisible: isBlockInsertionPointVisible(),
+		};
 	}, [] );
 
-	return isVisible && <InsertionPointPopover { ...props } />;
+	return (
+		isVisible &&
+		( insertionPoint.operation === 'replace' ? (
+			<BlockPopoverDropZone { ...props } />
+		) : (
+			<InBetweenInsertionPointPopover { ...props } />
+		) )
+	);
 }

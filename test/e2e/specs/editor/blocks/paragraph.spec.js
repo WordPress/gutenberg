@@ -74,7 +74,7 @@ test.describe( 'Paragraph', () => {
 			await dragOver( '[data-type="core/paragraph"]' );
 
 			await expect(
-				page.locator( 'data-testid=empty-paragraph-drop-zone' )
+				page.locator( 'data-testid=block-popover-drop-zone' )
 			).toBeVisible();
 
 			await drop();
@@ -118,7 +118,7 @@ test.describe( 'Paragraph', () => {
 			}
 
 			await expect(
-				page.locator( 'data-testid=empty-paragraph-drop-zone' )
+				page.locator( 'data-testid=block-popover-drop-zone' )
 			).toBeVisible();
 
 			await page.mouse.up();
@@ -178,7 +178,7 @@ test.describe( 'Paragraph', () => {
 			}
 
 			await expect(
-				page.locator( 'data-testid=empty-paragraph-drop-zone' )
+				page.locator( 'data-testid=block-popover-drop-zone' )
 			).toBeVisible();
 
 			await page.mouse.up();
