@@ -654,6 +654,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			class="%5$s" 
 			wp-class:is-menu-open="function({ context }) { return context.open; }"
 			wp-class:has-modal-open="function({ context }) { return context.open; }"
+			wp-bind:aria-hidden="function({ context }) { return context.open ? false : true; }"
 			style="%7$s" 
 			id="%1$s"
 		>

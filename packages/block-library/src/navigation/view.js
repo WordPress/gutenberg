@@ -41,7 +41,7 @@ directive(
 		props: { children },
 		context: { Provider },
 	} ) => {
-	const signals = useMemo( () => deepSignal( context.default ), [] );
+		const signals = useMemo( () => deepSignal( context.default ), [] );
 		return <Provider value={ signals }>{ children }</Provider>;
 	}
 );
@@ -51,12 +51,12 @@ directive(
 	'effect',
 	( { directives: { effect }, element, context: mainContext } ) => {
 		const context = useContext( mainContext );
-	Object.values( effect ).forEach( ( expression ) => {
-		useSignalEffect( () => {
-			const cb = eval( `(${ expression })` );
-			cb( { context, tick, ref: element.ref.current } );
+		Object.values( effect ).forEach( ( expression ) => {
+			useSignalEffect( () => {
+				const cb = eval( `(${ expression })` );
+				cb( { context, tick, ref: element.ref.current } );
+			} );
 		} );
-	} );
 	}
 );
 
@@ -76,16 +76,31 @@ directive(
 	'class',
 	( { directives: { class: className }, element, context: mainContext } ) => {
 		const context = useContext( mainContext );
-	Object.keys( className )
-		.filter( ( n ) => n !== 'default' )
-		.forEach( ( name ) => {
-			const cb = eval( `(${ className[ name ] })` );
-			const result = cb( { context } );
-			if ( ! result ) element.props.class.replace( name, '' );
-			else if ( ! element.props.class.includes( name ) )
-				element.props.class += ` ${ name }`;
-		} );
-} );
+		Object.keys( className )
+			.filter( ( n ) => n !== 'default' )
+			.forEach( ( name ) => {
+				const cb = eval( `(${ className[ name ] })` );
+				const result = cb( { context } );
+				if ( ! result ) element.props.class.replace( name, '' );
+				else if ( ! element.props.class.includes( name ) )
+					element.props.class += ` ${ name }`;
+			} );
+	}
+);
+
+// wp-bind:[attribute]
+directive(
+	'bind',
+	( { directives: { bind }, element, context: mainContext } ) => {
+		const context = useContext( mainContext );
+		Object.entries( bind )
+			.filter( ( n ) => n !== 'default' )
+			.forEach( ( [ attribute, expression ] ) => {
+				const cb = eval( `(${ expression })` );
+				element.props[ attribute ] = cb( { context } );
+			} );
+	}
+);
 
 /**
  * Initialize the initial vDOM.
