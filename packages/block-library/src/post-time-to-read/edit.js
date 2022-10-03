@@ -12,8 +12,8 @@ import {
 	BlockControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { useEffect, useState } from '@wordpress/element';
-import { useEntityProp } from '@wordpress/core-data';
+import { __unstableSerializeAndClean } from '@wordpress/blocks';
+import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
 import { count as wordCount } from '@wordpress/wordcount';
 
 /**
@@ -26,14 +26,30 @@ const AVERAGE_READING_RATE = 189;
 function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 	const { textAlign } = attributes;
 	const { postId, postType } = context;
-	const [ minutesToRead, setMinituesToRead ] = useState();
 
-	const [ content = '' ] = useEntityProp(
+	const [ contentStructure ] = useEntityProp(
 		'postType',
 		postType,
 		'content',
 		postId
 	);
+
+	const [ blocks ] = useEntityBlockEditor( 'postType', postType, {
+		id: postId,
+	} );
+
+	// Replicates the logic found in getEditedPostContent().
+	let content;
+	if ( contentStructure instanceof Function ) {
+		content = contentStructure( { blocks } );
+	} else if ( blocks ) {
+		// If we have parsed blocks already, they should be our source of truth.
+		// Parsing applies block deprecations and legacy block conversions that
+		// unparsed content will not have.
+		content = __unstableSerializeAndClean( blocks );
+	} else {
+		content = contentStructure;
+	}
 
 	/*
 	 * translators: If your word count is based on single characters (e.g. East Asian characters),
@@ -42,13 +58,9 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 	 */
 	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
 
-	useEffect( () => {
-		setMinituesToRead(
-			Math.round(
-				wordCount( content, wordCountType ) / AVERAGE_READING_RATE
-			)
-		);
-	}, [ content ] );
+	const minutesToRead = Math.round(
+		wordCount( content, wordCountType ) / AVERAGE_READING_RATE
+	);
 
 	let minutesToReadString = __( 'There is no content.' );
 
