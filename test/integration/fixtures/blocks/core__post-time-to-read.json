@@ -2,9 +2,7 @@
 	{
 		"name": "core/post-time-to-read",
 		"isValid": true,
-		"attributes": {
-			"minutesToRead": 0
-		},
+		"attributes": {},
 		"innerBlocks": []
 	}
 ]

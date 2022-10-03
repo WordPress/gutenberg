@@ -591,7 +591,7 @@ Time to read the post. ([Source](https://github.com/WordPress/gutenberg/tree/tru
 -	**Name:** core/post-time-to-read
 -	**Category:** theme
 -	**Supports:** ~~html~~, ~~multiple~~
--	**Attributes:** minutesToRead, textAlign
+-	**Attributes:** textAlign
 
 ## Post Title
 

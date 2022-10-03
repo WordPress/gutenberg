@@ -18,7 +18,8 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$minutes_to_read = ! empty( $attributes['minutesToRead'] ) ? (int) $attributes['minutesToRead'] : 0;
+	// TODO: Create an equivalent word count PHP funciton.
+	$minutes_to_read = 0;
 
 	$minutes_to_read_string = 0 !== $minutes_to_read
 		? sprintf(

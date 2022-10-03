@@ -1,9 +1,7 @@
 [
 	{
 		"blockName": "core/post-time-to-read",
-		"attrs": {
-			"minutesToRead": 0
-		},
+		"attrs": {},
 		"innerBlocks": [],
 		"innerHTML": "",
 		"innerContent": []

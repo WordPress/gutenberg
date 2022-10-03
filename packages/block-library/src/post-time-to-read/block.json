@@ -10,9 +10,6 @@
 	"attributes": {
 		"textAlign": {
 			"type": "string"
-		},
-		"minutesToRead": {
-			"type": "number"
 		}
 	},
 	"supports": {

@@ -10,11 +10,9 @@ import { _x, _n, __, sprintf } from '@wordpress/i18n';
 import {
 	AlignmentControl,
 	BlockControls,
-	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useEntityProp } from '@wordpress/core-data';
 import { count as wordCount } from '@wordpress/wordcount';
 
@@ -26,8 +24,9 @@ import { count as wordCount } from '@wordpress/wordcount';
 const AVERAGE_READING_RATE = 189;
 
 function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
-	const { textAlign, minutesToRead } = attributes;
+	const { textAlign } = attributes;
 	const { postId, postType } = context;
+	const [ minutesToRead, setMinituesToRead ] = useState();
 
 	const [ content = '' ] = useEntityProp(
 		'postType',
@@ -35,9 +34,6 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 		'content',
 		postId
 	);
-
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
 
 	/*
 	 * translators: If your word count is based on single characters (e.g. East Asian characters),
@@ -47,15 +43,11 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
 
 	useEffect( () => {
-		const newMinutesToRead = Math.round(
-			wordCount( content, wordCountType ) / AVERAGE_READING_RATE
+		setMinituesToRead(
+			Math.round(
+				wordCount( content, wordCountType ) / AVERAGE_READING_RATE
+			)
 		);
-		// This is required to keep undo working and not create 2 undo steps
-		// for the content change.
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( {
-			minutesToRead: content ? newMinutesToRead : undefined,
-		} );
 	}, [ content ] );
 
 	let minutesToReadString = __( 'There is no content.' );
