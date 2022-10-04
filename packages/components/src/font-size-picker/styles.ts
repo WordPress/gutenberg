@@ -26,7 +26,7 @@ export const HeaderLabel = styled( BaseControl.VisualLabel )`
 export const HeaderHint = styled.span`
 	color: ${ COLORS.gray[ 700 ] };
 	display: inline-block;
-	${ rtl( { marginLeft: space( 1 ) }, { marginRight: space( 1 ) } )() }
+	${ rtl( { marginLeft: space( 1 ) } )() }
 `;
 
 export const Controls = styled.div< {
