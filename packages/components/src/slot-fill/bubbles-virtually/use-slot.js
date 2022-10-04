@@ -16,7 +16,7 @@ import SlotFillContext from './slot-fill-context';
 
 export default function useSlot( name ) {
 	const registry = useContext( SlotFillContext );
-	const slots = useSnapshot( registry.slots );
+	const slots = useSnapshot( registry.slots, { sync: true } );
 	const slot = slots.get( name );
 
 	const updateSlot = useCallback(
