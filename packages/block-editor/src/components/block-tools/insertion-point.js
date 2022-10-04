@@ -245,7 +245,11 @@ export default function InsertionPoint( props ) {
 	return (
 		isVisible &&
 		( insertionPoint.operation === 'replace' ? (
-			<BlockPopoverDropZone { ...props } />
+			<BlockPopoverDropZone
+				// Force remount to trigger the animation.
+				key={ `${ insertionPoint.rootClientId }-${ insertionPoint.index }` }
+				{ ...props }
+			/>
 		) : (
 			<InBetweenInsertionPointPopover { ...props } />
 		) )
