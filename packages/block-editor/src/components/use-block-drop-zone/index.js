@@ -74,6 +74,20 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 }
 
 /**
+ * Determine if the element is an empty paragraph block.
+ *
+ * @param {?HTMLElement} element The element being tested.
+ * @return {boolean} True or False.
+ */
+function isEmptyParagraph( element ) {
+	return (
+		!! element &&
+		element.dataset.type === 'core/paragraph' &&
+		element.dataset.empty === 'true'
+	);
+}
+
+/**
  * @typedef  {Object} WPBlockDropZoneConfig
  * @property {string} rootClientId The root client id for the block list.
  */
@@ -101,7 +115,7 @@ export default function useBlockDropZone( {
 			} = select( blockEditorStore );
 			const templateLock = getTemplateLock( targetRootClientId );
 			return (
-				[ 'all', 'noContent' ].some(
+				[ 'all', 'contentOnly' ].some(
 					( lock ) => lock === templateLock
 				) ||
 				__unstableHasActiveBlockOverlayActive( targetRootClientId ) ||
@@ -130,7 +144,18 @@ export default function useBlockDropZone( {
 
 			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
 
-			if ( targetIndex !== null ) {
+			if ( targetIndex !== undefined ) {
+				const nextBlock = blockElements[ targetIndex ];
+				const previousBlock = blockElements[ targetIndex - 1 ];
+
+				// Don't show the insertion point when it's near an empty paragraph block.
+				if (
+					isEmptyParagraph( nextBlock ) ||
+					isEmptyParagraph( previousBlock )
+				) {
+					return;
+				}
+
 				showInsertionPoint( targetRootClientId, targetIndex );
 			}
 		}, [] ),

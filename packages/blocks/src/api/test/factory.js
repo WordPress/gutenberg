@@ -302,17 +302,17 @@ describe( 'block factory', () => {
 						default: 0,
 					},
 					content: {
-						type: 'array',
-						source: 'children',
+						type: 'string',
+						source: 'html',
 					},
 					defaultContent: {
-						type: 'array',
-						source: 'children',
+						type: 'string',
+						source: 'html',
 						default: 'test',
 					},
 					unknownDefaultContent: {
-						type: 'array',
-						source: 'children',
+						type: 'string',
+						source: 'html',
 						default: 1,
 					},
 					htmlContent: {
@@ -340,9 +340,8 @@ describe( 'block factory', () => {
 				includesFalseyDefault: 0,
 				align: 'left',
 				isDifferent: true,
-				content: [],
-				defaultContent: [ 'test' ],
-				unknownDefaultContent: [],
+				defaultContent: 'test',
+				unknownDefaultContent: 1,
 				htmlContent: 'test',
 			} );
 			expect( clonedBlock.innerBlocks ).toHaveLength( 1 );

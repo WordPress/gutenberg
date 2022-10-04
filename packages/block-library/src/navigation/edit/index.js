@@ -92,7 +92,7 @@ function Navigation( {
 			flexWrap = 'wrap',
 		} = {},
 		hasIcon,
-		icon,
+		icon = 'handle',
 	} = attributes;
 
 	const ref = attributes.ref;
@@ -282,16 +282,18 @@ function Navigation( {
 		hasResolvedNavigationMenus &&
 		! hasUncontrolledInnerBlocks;
 
-	if ( isPlaceholder && ! ref ) {
-		/**
-		 *  this fallback only displays (both in editor and on front)
-		 *  the list of pages block if no menu is available as a fallback.
-		 *  We don't want the fallback to request a save,
-		 *  nor to be undoable, hence we mark it non persistent.
-		 */
-		__unstableMarkNextChangeAsNotPersistent();
-		replaceInnerBlocks( clientId, [ createBlock( 'core/page-list' ) ] );
-	}
+	useEffect( () => {
+		if ( isPlaceholder && ! ref ) {
+			/**
+			 *  this fallback only displays (both in editor and on front)
+			 *  the list of pages block if no menu is available as a fallback.
+			 *  We don't want the fallback to request a save,
+			 *  nor to be undoable, hence we mark it non persistent.
+			 */
+			__unstableMarkNextChangeAsNotPersistent();
+			replaceInnerBlocks( clientId, [ createBlock( 'core/page-list' ) ] );
+		}
+	}, [ clientId, isPlaceholder, ref ] );
 
 	const isEntityAvailable =
 		! isNavigationMenuMissing && isNavigationMenuResolved;

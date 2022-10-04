@@ -17,7 +17,7 @@ const transforms = {
 						fontSize,
 						style,
 					},
-					createBlock( 'core/paragraph', { content: value } )
+					[ createBlock( 'core/paragraph', { content: value } ) ]
 				);
 			},
 		},
@@ -64,6 +64,16 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ '*' ],
 			isMatch: ( {}, blocks ) => {
+				// When a single block is selected make the tranformation
+				// available only to specific blocks that make sense.
+				if ( blocks.length === 1 ) {
+					return [
+						'core/paragraph',
+						'core/heading',
+						'core/list',
+						'core/pullquote',
+					].includes( blocks[ 0 ].name );
+				}
 				return ! blocks.some( ( { name } ) => name === 'core/quote' );
 			},
 			__experimentalConvert: ( blocks ) =>

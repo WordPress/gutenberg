@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import type { ComponentProps } from 'react';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -24,7 +19,10 @@ import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { useBorderBoxControl } from './hook';
 
 import type { BorderBoxControlProps } from '../types';
-import type { LabelProps } from '../../border-control/types';
+import type {
+	LabelProps,
+	BorderControlProps,
+} from '../../border-control/types';
 
 const BorderLabel = ( props: LabelProps ) => {
 	const { label, hideLabelFromVision } = props;
@@ -67,18 +65,29 @@ const BorderBoxControl = (
 		__next36pxDefaultSize = false,
 		...otherProps
 	} = useBorderBoxControl( props );
-	const containerRef = useRef();
-	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
-	const popoverProps: ComponentProps<
-		typeof BorderControl
-	>[ '__unstablePopoverProps' ] = popoverPlacement
-		? {
-				placement: popoverPlacement,
-				offset: popoverOffset,
-				anchorRef: containerRef,
-				shift: true,
-		  }
-		: undefined;
+
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState< Element | null >(
+		null
+	);
+
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps: BorderControlProps[ '__unstablePopoverProps' ] =
+		useMemo(
+			() =>
+				popoverPlacement
+					? {
+							placement: popoverPlacement,
+							offset: popoverOffset,
+							anchor: popoverAnchor,
+							shift: true,
+					  }
+					: undefined,
+			[ popoverPlacement, popoverOffset, popoverAnchor ]
+		);
+
+	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
 
 	return (
 		<View className={ className } { ...otherProps } ref={ mergedRef }>

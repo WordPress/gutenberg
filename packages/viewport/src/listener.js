@@ -1,11 +1,12 @@
 /**
  * External dependencies
  */
-import { reduce, debounce, mapValues } from 'lodash';
+import { reduce, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { debounce } from '@wordpress/compose';
 import { dispatch } from '@wordpress/data';
 
 /**
@@ -23,6 +24,7 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 			const values = mapValues( queries, ( query ) => query.matches );
 			dispatch( store ).setIsMatching( values );
 		},
+		0,
 		{ leading: true }
 	);
 

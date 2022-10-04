@@ -36,12 +36,13 @@ function getRowFocusables( rowElement ) {
  * Renders both a table and tbody element, used to create a tree hierarchy.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/components/src/tree-grid/README.md
- * @param {Object}    props               Component props.
- * @param {WPElement} props.children      Children to be rendered.
- * @param {Function}  props.onExpandRow   Callback to fire when row is expanded.
- * @param {Function}  props.onCollapseRow Callback to fire when row is collapsed.
- * @param {Function}  props.onFocusRow    Callback to fire when moving focus to a different row.
- * @param {Object}    ref                 A ref to the underlying DOM table element.
+ * @param {Object}    props                      Component props.
+ * @param {WPElement} props.children             Children to be rendered.
+ * @param {Function}  props.onExpandRow          Callback to fire when row is expanded.
+ * @param {Function}  props.onCollapseRow        Callback to fire when row is collapsed.
+ * @param {Function}  props.onFocusRow           Callback to fire when moving focus to a different row.
+ * @param {string}    props.applicationAriaLabel Label to use for the application role.
+ * @param {Object}    ref                        A ref to the underlying DOM table element.
  */
 function TreeGrid(
 	{
@@ -49,6 +50,7 @@ function TreeGrid(
 		onExpandRow = () => {},
 		onCollapseRow = () => {},
 		onFocusRow = () => {},
+		applicationAriaLabel,
 		...props
 	},
 	ref
@@ -286,14 +288,21 @@ function TreeGrid(
 	/* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */
 	return (
 		<RovingTabIndexContainer>
-			<table
-				{ ...props }
-				role="treegrid"
-				onKeyDown={ onKeyDown }
-				ref={ ref }
-			>
-				<tbody>{ children }</tbody>
-			</table>
+			{
+				// Prevent browser mode from triggering in NVDA by wrapping List View
+				// in a role=application wrapper.
+				// see: https://github.com/WordPress/gutenberg/issues/43729
+			 }
+			<div role="application" aria-label={ applicationAriaLabel }>
+				<table
+					{ ...props }
+					role="treegrid"
+					onKeyDown={ onKeyDown }
+					ref={ ref }
+				>
+					<tbody>{ children }</tbody>
+				</table>
+			</div>
 		</RovingTabIndexContainer>
 	);
 	/* eslint-enable jsx-a11y/no-noninteractive-element-to-interactive-role */

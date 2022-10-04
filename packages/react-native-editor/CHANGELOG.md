@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.83.0
+* No User facing changes *
+
 ## 1.82.1
 -   [**] List block v2: Fix issues splitting or merging paragraphs into the block [#43949]
 

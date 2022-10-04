@@ -104,7 +104,7 @@ export default function Edit( {
 		</InspectorControls>
 	);
 
-	const postTitle = isSiteEditor ? __( '"Post Title"' ) : `"${ rawTitle }"`;
+	const postTitle = isSiteEditor ? __( '“Post Title”' ) : `"${ rawTitle }"`;
 
 	let placeholder;
 	if ( showCommentsCount && commentsCount !== undefined ) {

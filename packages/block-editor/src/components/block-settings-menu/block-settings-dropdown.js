@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, flow } from 'lodash';
+import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,7 @@ import {
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { useCopyToClipboard } from '@wordpress/compose';
+import { pipe, useCopyToClipboard } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -51,6 +51,7 @@ export function BlockSettingsDropdown( {
 	clientIds,
 	__experimentalSelectBlock,
 	children,
+	__unstableDisplayLocation,
 	...props
 } ) {
 	const blockClientIds = castArray( clientIds );
@@ -240,7 +241,7 @@ export function BlockSettingsDropdown( {
 								/>
 								{ canDuplicate && (
 									<MenuItem
-										onClick={ flow(
+										onClick={ pipe(
 											onClose,
 											onDuplicate,
 											updateSelectionAfterDuplicate
@@ -253,7 +254,7 @@ export function BlockSettingsDropdown( {
 								{ canInsertDefaultBlock && (
 									<>
 										<MenuItem
-											onClick={ flow(
+											onClick={ pipe(
 												onClose,
 												onInsertBefore
 											) }
@@ -262,7 +263,7 @@ export function BlockSettingsDropdown( {
 											{ __( 'Insert before' ) }
 										</MenuItem>
 										<MenuItem
-											onClick={ flow(
+											onClick={ pipe(
 												onClose,
 												onInsertAfter
 											) }
@@ -274,7 +275,7 @@ export function BlockSettingsDropdown( {
 								) }
 								{ canMove && ! onlyBlock && (
 									<MenuItem
-										onClick={ flow( onClose, onMoveTo ) }
+										onClick={ pipe( onClose, onMoveTo ) }
 									>
 										{ __( 'Move to' ) }
 									</MenuItem>
@@ -289,6 +290,9 @@ export function BlockSettingsDropdown( {
 							<BlockSettingsMenuControls.Slot
 								fillProps={ { onClose } }
 								clientIds={ clientIds }
+								__unstableDisplayLocation={
+									__unstableDisplayLocation
+								}
 							/>
 							{ typeof children === 'function'
 								? children( { onClose } )
@@ -298,7 +302,7 @@ export function BlockSettingsDropdown( {
 							{ canRemove && (
 								<MenuGroup>
 									<MenuItem
-										onClick={ flow(
+										onClick={ pipe(
 											onClose,
 											onRemove,
 											updateSelectionAfterRemove
