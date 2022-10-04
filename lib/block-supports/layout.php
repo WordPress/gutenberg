@@ -429,7 +429,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	if (
 		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ||
 		1 === preg_match( $group_with_inner_container_regex, $block_content ) ||
-		( isset( $block['attrs']['layout']['type'] ) && 'default' !== $block['attrs']['layout']['type'] )
+		( isset( $block['attrs']['layout']['type'] ) && 'flex' === $block['attrs']['layout']['type'] )
 	) {
 		return $block_content;
 	}
