@@ -13,7 +13,6 @@
  * @param  WP_Block $block      Block instance.
  * @return string Returns the rendered post author name block.
  */
-
 function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 	$content = get_the_content();
 
