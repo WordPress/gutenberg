@@ -18,7 +18,7 @@ type ThemeProps = {
 const colors = ( { accent }: ThemeProps ) => {
 	const accentColor = accent
 		? css`
-				--wp-admin-theme-color: ${ accent };
+				--wp-components-color-accent: ${ accent };
 		  `
 		: undefined;
 

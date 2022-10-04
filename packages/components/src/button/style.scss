@@ -20,7 +20,7 @@
 
 	&[aria-expanded="true"],
 	&:hover {
-		color: var(--wp-admin-theme-color);
+		color: $components-color-accent;
 	}
 
 	// Unset some hovers, instead of adding :not specificity.
@@ -31,7 +31,7 @@
 	// Focus.
 	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
 	&:focus:not(:disabled) {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 3px solid transparent;
@@ -43,7 +43,7 @@
 
 	&.is-primary {
 		white-space: nowrap;
-		background: var(--wp-admin-theme-color);
+		background: $components-color-accent;
 		color: $white;
 		text-decoration: none;
 		text-shadow: none;
@@ -63,7 +63,7 @@
 		}
 
 		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 		}
 
 		&:disabled,
@@ -72,15 +72,15 @@
 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
 			color: rgba($white, 0.4);
-			background: var(--wp-admin-theme-color);
-			border-color: var(--wp-admin-theme-color);
+			background: $components-color-accent;
+			border-color: $components-color-accent;
 			opacity: 1;
 			outline: none;
 
 			&:focus:enabled {
 				box-shadow:
 					0 0 0 $border-width $white,
-					0 0 0 3px var(--wp-admin-theme-color);
+					0 0 0 3px $components-color-accent;
 			}
 		}
 
@@ -93,13 +93,13 @@
 			/* stylelint-disable */
 			background-image: linear-gradient(
 				-45deg,
-				var(--wp-admin-theme-color) 33%,
+				$components-color-accent 33%,
 				var(--wp-admin-theme-color-darker-20) 33%,
 				var(--wp-admin-theme-color-darker-20) 70%,
-				var(--wp-admin-theme-color) 70%
+				$components-color-accent 70%
 			);
 			/* stylelint-enable */
-			border-color: var(--wp-admin-theme-color);
+			border-color: $components-color-accent;
 		}
 	}
 
@@ -140,10 +140,10 @@
 	 */
 
 	&.is-secondary {
-		box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
+		box-shadow: inset 0 0 0 $border-width $components-color-accent;
 		outline: 1px solid transparent; // Shown in high contrast mode.
 		white-space: nowrap;
-		color: var(--wp-admin-theme-color);
+		color: $components-color-accent;
 		background: transparent;
 	}
 
@@ -153,7 +153,7 @@
 
 	&.is-tertiary {
 		white-space: nowrap;
-		color: var(--wp-admin-theme-color);
+		color: $components-color-accent;
 		background: transparent;
 		padding: $grid-unit-15 * 0.5; // This reduces the horizontal padding on tertiary/text buttons, so as to space them optically.
 
@@ -182,7 +182,7 @@
 		}
 
 		&:focus:not(:disabled) {
-			color: var(--wp-admin-theme-color);
+			color: $components-color-accent;
 		}
 
 		&:active:not(:disabled) {
@@ -230,7 +230,7 @@
 		background: none;
 		outline: none;
 		text-align: left;
-		color: var(--wp-admin-theme-color);
+		color: $components-color-accent;
 		text-decoration: underline;
 		transition-property: border, background, color;
 		transition-duration: 0.05s;
@@ -253,7 +253,7 @@
 			}
 
 			&:focus:not(:disabled) {
-				color: var(--wp-admin-theme-color);
+				color: $components-color-accent;
 			}
 		}
 	}
@@ -333,7 +333,7 @@
 		background: $gray-900;
 
 		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;

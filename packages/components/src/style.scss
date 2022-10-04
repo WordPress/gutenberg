@@ -1,3 +1,4 @@
+$components-color-accent: var(--wp-components-color-accent, --wp-admin-theme-color);
 @import "./animate/style.scss";
 @import "./autocomplete/style.scss";
 @import "./button-group/style.scss";
