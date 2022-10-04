@@ -8,16 +8,6 @@ import { render, screen, within } from '@testing-library/react';
  */
 import AlignmentMatrixControl from '../';
 
-const __windowFocus = window.focus;
-
-beforeAll( () => {
-	window.focus = jest.fn();
-} );
-
-afterAll( () => {
-	window.focus = __windowFocus;
-} );
-
 const getControl = () => {
 	return screen.getByRole( 'grid' );
 };
