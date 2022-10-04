@@ -1060,7 +1060,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			if ( is_array( $ref_value ) && array_key_exists( 'ref', $ref_value ) ) {
 				$path_string      = json_encode( $path );
 				$ref_value_string = json_encode( $ref_value );
-				_doing_it_wrong( 'get_property_value', "Your theme.json file uses a dynamic value (${ref_value_string}) for the path at ${path_string}. However, the value at ${path_string} is also a dynamic value (pointing to ${ref_value['ref']}) and pointing to another dynamic value is not supported. Please update ${path_string} to point directly to ${ref_value['ref']}.", '6.1.0' );
+				_doing_it_wrong( 'get_property_value', "Your theme.json file uses a dynamic value ({$ref_value_string}) for the path at {$path_string}. However, the value at {$path_string} is also a dynamic value (pointing to {$ref_value['ref']}) and pointing to another dynamic value is not supported. Please update {$path_string} to point directly to {$ref_value['ref']}.", '6.1.0' );
 			}
 		}
 
@@ -1194,15 +1194,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			'classes'           => array(),
 			'properties'        => array( 'padding', 'margin' ),
 		),
-		array(
-			'path'              => array( 'spacing', 'spacingScale' ),
-			'prevent_override'  => false,
-			'use_default_names' => true,
-			'value_key'         => 'size',
-			'css_vars'          => '--wp--preset--spacing--$slug',
-			'classes'           => array(),
-			'properties'        => array( 'padding', 'margin' ),
-		),
 	);
 
 	/**
@@ -1323,7 +1314,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 
 			if ( $below_midpoint_count < $steps_mid_point - 2 ) {
-				$x_small_count++;
+				++$x_small_count;
 			}
 
 			$slug -= 10;
@@ -1360,7 +1351,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 
 			if ( $above_midpoint_count > 1 ) {
-				$x_large_count++;
+				++$x_large_count;
 			}
 
 			$slug += 10;
