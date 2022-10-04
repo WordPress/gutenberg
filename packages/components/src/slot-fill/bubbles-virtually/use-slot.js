@@ -17,6 +17,9 @@ import SlotFillContext from './slot-fill-context';
 export default function useSlot( name ) {
 	const registry = useContext( SlotFillContext );
 	const slots = useSnapshot( registry.slots, { sync: true } );
+	// The important bit here is that this call ensures
+	// the hook only causes a re-render if the slot
+	// with the given name change, not any other slot.
 	const slot = slots.get( name );
 
 	const updateSlot = useCallback(
