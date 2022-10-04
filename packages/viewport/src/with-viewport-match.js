@@ -31,9 +31,10 @@ import {
  * @return {Function} Higher-order component.
  */
 const withViewportMatch = ( queries ) => {
+	const queryEntries = Object.entries( queries );
 	const useViewPortQueriesResult = () =>
 		Object.fromEntries(
-			Object.entries( queries ).map( ( [ key, query ] ) => {
+			queryEntries.map( ( [ key, query ] ) => {
 				let [ operator, breakpointName ] = query.split( ' ' );
 				if ( breakpointName === undefined ) {
 					breakpointName = operator;
