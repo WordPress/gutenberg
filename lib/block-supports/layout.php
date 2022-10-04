@@ -373,6 +373,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	if ( ! current_theme_supports( 'disable-layout-styles' ) ) {
 
 		$gap_value = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
+
 		/*
 		 * Skip if gap value contains unsupported characters.
 		 * Regex for CSS value borrowed from `safecss_filter_attr`, and used here
