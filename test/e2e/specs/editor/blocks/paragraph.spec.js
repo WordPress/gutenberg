@@ -473,7 +473,7 @@ class DraggingUtils {
 
 	async simulateDraggingHTML( html ) {
 		// Insert a dummy draggable element on the page to simulate dragging
-		// HTML from other places.
+		// HTML from other places. The dummy element will get removed once the drag starts.
 		await this.page.evaluate( ( _html ) => {
 			const draggable = document.createElement( 'div' );
 			draggable.draggable = true;
@@ -490,6 +490,11 @@ class DraggingUtils {
 				( event ) => {
 					// Set the data transfer to some HTML on dragstart.
 					event.dataTransfer.setData( 'text/html', _html );
+
+					// Some browsers will cancel the drag if the source is immediately removed.
+					setTimeout( () => {
+						draggable.remove();
+					}, 0 );
 				},
 				{ once: true }
 			);
