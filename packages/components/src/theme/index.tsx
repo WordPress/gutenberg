@@ -4,6 +4,7 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { ReactNode } from 'react';
+import { colord } from 'colord';
 
 /**
  * Internal dependencies
@@ -19,6 +20,12 @@ const colors = ( { accent }: ThemeProps ) => {
 	const accentColor = accent
 		? css`
 				--wp-components-color-accent: ${ accent };
+				--wp-components-color-accent-darker-10: ${ colord( accent )
+					.darken( 0.1 )
+					.toHex() };
+				--wp-components-color-accent-darker-20: ${ colord( accent )
+					.darken( 0.2 )
+					.toHex() };
 		  `
 		: undefined;
 

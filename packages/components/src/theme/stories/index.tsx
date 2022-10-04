@@ -30,7 +30,7 @@ const Template: ComponentStory< typeof Theme > = ( args ) => (
 
 export const Default = Template.bind( {} );
 Default.args = {
-	accent: '#00006b',
+	// accent: '#00006b',
 };
 
 export const Nested: ComponentStory< typeof Theme > = ( args ) => (

@@ -52,13 +52,13 @@
 		outline: 1px solid transparent;
 
 		&:hover:not(:disabled) {
-			background: var(--wp-admin-theme-color-darker-10);
+			background: $components-color-accent-darker-10;
 			color: $white;
 		}
 
 		&:active:not(:disabled) {
-			background: var(--wp-admin-theme-color-darker-20);
-			border-color: var(--wp-admin-theme-color-darker-20);
+			background: $components-color-accent-darker-20;
+			border-color: $components-color-accent-darker-20;
 			color: $white;
 		}
 
@@ -94,8 +94,8 @@
 			background-image: linear-gradient(
 				-45deg,
 				$components-color-accent 33%,
-				var(--wp-admin-theme-color-darker-20) 33%,
-				var(--wp-admin-theme-color-darker-20) 70%,
+				$components-color-accent-darker-20 33%,
+				$components-color-accent-darker-20 70%,
 				$components-color-accent 70%
 			);
 			/* stylelint-enable */
@@ -114,13 +114,13 @@
 
 		&:active:not(:disabled) {
 			background: $gray-300;
-			color: var(--wp-admin-theme-color-darker-10);
+			color: $components-color-accent-darker-10;
 			box-shadow: none;
 		}
 
 		&:hover:not(:disabled) {
-			color: var(--wp-admin-theme-color-darker-10);
-			box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color-darker-10);
+			color: $components-color-accent-darker-10;
+			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-10;
 		}
 
 		&:disabled,
