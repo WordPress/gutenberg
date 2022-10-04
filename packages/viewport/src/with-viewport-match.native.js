@@ -32,19 +32,16 @@ import { store } from './store';
  *
  * @return {Function} Higher-order component.
  */
-const withViewportMatch = ( queries ) => {
-	const queryEntries = Object.entries( queries );
-
-	return createHigherOrderComponent(
+const withViewportMatch = ( queries ) =>
+	createHigherOrderComponent(
 		withSelect( ( select ) => {
 			return Object.fromEntries(
-				queryEntries.map( ( [ key, query ] ) => {
+				Object.entries( queries ).map( ( [ key, query ] ) => {
 					return [ key, select( store ).isViewportMatch( query ) ];
 				} )
 			);
 		} ),
 		'withViewportMatch'
 	);
-};
 
 export default withViewportMatch;

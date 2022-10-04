@@ -24,22 +24,20 @@ const matchWidth = ( operator, breakpoint ) => {
 };
 
 const addDimensionsEventListener = ( breakpoints, operators ) => {
-	const operatorEntries = Object.entries( operators );
-	const breakpointEntries = Object.entries( breakpoints );
-
 	const setIsMatching = () => {
-		const matches = breakpointEntries.flatMap( ( [ name, width ] ) => {
-			return operatorEntries.map( ( [ operator, condition ] ) => {
-				const list = window.matchMedia(
-					`(${ condition }: ${ width }px)`
+		const matches = Object.entries( breakpoints ).reduce(
+			( result, [ name, width ] ) => {
+				Object.entries( operators ).forEach(
+					( [ operator, condition ] ) => {
+						const key = [ operator, name ].join( ' ' );
+						result[ key ] = matchWidth( condition, width );
+					}
 				);
-				list.addListener( setIsMatching );
-				return [
-					`${ operator } ${ name }`,
-					matchWidth( condition, width ),
-				];
-			} );
-		} );
+
+				return result;
+			},
+			{}
+		);
 
 		dispatch( store ).setIsMatching( matches );
 	};
