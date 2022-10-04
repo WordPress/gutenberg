@@ -4,7 +4,7 @@
 const { ConcatSource } = require( 'webpack-sources' );
 
 module.exports = class LibraryExportDefaultPlugin {
-	constructor( entryPointNames ) {
+	constructor( entryPointNames = [] ) {
 		this.entryPointNames = entryPointNames;
 	}
 
