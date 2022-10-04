@@ -22,8 +22,8 @@ const getControl = () => {
 	return screen.getByRole( 'grid' );
 };
 
-const getCells = () => {
-	return within( getControl() ).getAllByRole( 'gridcell' );
+const getCell = ( name ) => {
+	return within( getControl() ).getByRole( 'gridcell', { name } );
 };
 
 describe( 'AlignmentMatrixControl', () => {
@@ -31,31 +31,26 @@ describe( 'AlignmentMatrixControl', () => {
 		it( 'should render', () => {
 			render( <AlignmentMatrixControl /> );
 
-			expect( getControl() ).toBeTruthy();
+			expect( getControl() ).toBeInTheDocument();
 		} );
 	} );
 
 	describe( 'Change value', () => {
-		it( 'should change value on cell click', () => {
-			const spy = jest.fn();
+		const alignments = [ 'center left', 'center center', 'bottom center' ];
 
-			render(
-				<AlignmentMatrixControl value={ 'center' } onChange={ spy } />
-			);
+		it.each( alignments )(
+			'should change value on %s cell click',
+			( alignment ) => {
+				const spy = jest.fn();
 
-			const cells = getCells();
+				render(
+					<AlignmentMatrixControl value="center" onChange={ spy } />
+				);
 
-			cells[ 3 ].focus();
+				getCell( alignment ).focus();
 
-			expect( spy.mock.calls[ 0 ][ 0 ] ).toBe( 'center left' );
-
-			cells[ 4 ].focus();
-
-			expect( spy.mock.calls[ 1 ][ 0 ] ).toBe( 'center center' );
-
-			cells[ 7 ].focus();
-
-			expect( spy.mock.calls[ 2 ][ 0 ] ).toBe( 'bottom center' );
-		} );
+				expect( spy ).toHaveBeenCalledWith( alignment );
+			}
+		);
 	} );
 } );
