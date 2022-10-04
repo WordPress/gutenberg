@@ -35,7 +35,9 @@
 // When the appender shows up in empty container blocks, such as Group and Columns, add an extra click state.
 .block-list-appender:only-child {
 	.is-layout-constrained.block-editor-block-list__block:not(.is-selected) > &,
-	.is-layout-flow.block-editor-block-list__block:not(.is-selected) > & {
+	.is-layout-flow.block-editor-block-list__block:not(.is-selected) > &,
+	.is-layout-constrained.block-editor-block-list__block:not(.is-selected) .block-editor-block-list__layout > &,
+	.is-layout-flow.block-editor-block-list__block:not(.is-selected) .block-editor-block-list__layout > & {
 		pointer-events: none;
 
 		&::after {
