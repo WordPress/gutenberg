@@ -40,6 +40,7 @@ function useContentBlocks( blockTypes, block ) {
 	const contenBlocksObjectAux = useMemo( () => {
 		return blockTypes.reduce( ( result, blockType ) => {
 			if (
+				blockType.name !== 'core/list-item' &&
 				Object.entries( blockType.attributes ).some(
 					( [ , { __experimentalRole } ] ) =>
 						__experimentalRole === 'content'
