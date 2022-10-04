@@ -3,7 +3,7 @@
  */
 import {
 	isSimpleCssValue,
-	splitNumberAndUnitFromSize,
+	parseNumberAndUnitFromSize,
 	getToggleGroupOptions,
 } from '../utils';
 
@@ -76,7 +76,7 @@ describe( 'splitValueAndUnitFromSize', () => {
 	test.each( splitValuesCases )(
 		'given %p as argument, returns value = %p and unit = %p',
 		( cssValue, expectedValue, expectedUnit ) => {
-			const [ value, unit ] = splitNumberAndUnitFromSize( cssValue );
+			const [ value, unit ] = parseNumberAndUnitFromSize( cssValue );
 			expect( value ).toBe( expectedValue );
 			expect( unit ).toBe( expectedUnit );
 		}

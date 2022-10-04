@@ -27,7 +27,7 @@ import {
 import {
 	getFontSizeOptions,
 	getSelectedOption,
-	splitNumberAndUnitFromSize,
+	parseNumberAndUnitFromSize,
 	isSimpleCssValue,
 	CUSTOM_FONT_SIZE,
 } from './utils';
@@ -124,7 +124,7 @@ const UnforwardedFontSizePicker = (
 			! fontSizesContainComplexValues &&
 			typeof selectedOption.size === 'string'
 		) {
-			const [ , unit ] = splitNumberAndUnitFromSize(
+			const [ , unit ] = parseNumberAndUnitFromSize(
 				selectedOption.size
 			);
 			hint += `(${ unit })`;
@@ -152,10 +152,10 @@ const UnforwardedFontSizePicker = (
 		selectedOption.name
 	);
 
-	const [ valueNumber, valueUnit ] = splitNumberAndUnitFromSize( value );
+	const [ valueNumber, valueUnit ] = parseNumberAndUnitFromSize( value );
 	const isValueUnitRelative =
 		!! valueUnit && [ 'em', 'rem' ].includes( valueUnit );
-	const [ , firstFontSizeUnit ] = splitNumberAndUnitFromSize(
+	const [ , firstFontSizeUnit ] = parseNumberAndUnitFromSize(
 		fontSizes[ 0 ]?.size
 	);
 	const hasUnits = !! valueUnit || !! firstFontSizeUnit;

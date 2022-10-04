@@ -44,13 +44,13 @@ const FONT_SIZES_ALIASES = [
 ];
 
 /**
- * Splits a font size into its numeric part and unit part. For example, '30px'
- * would be split into 30 and 'px'.
+ * Given a font size, returns the numeric part and unit part. For example, given
+ * '30px', 30 and 'px' would be returned.
  *
  * @param  size Font size.
  * @return An array with the number and the unit if it exists.
  */
-export function splitNumberAndUnitFromSize(
+export function parseNumberAndUnitFromSize(
 	size: FontSizePickerProps[ 'value' ]
 ): [ number, string ] | [ number ] | [] {
 	const [ , rawNumber, unit ] = `${ size }`.match( /^([\d\.]+)(\D*)/ ) ?? [];
