@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, has, omit } from 'lodash';
+import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -12,14 +12,10 @@ import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
 	hasBlockSupport,
-	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
-import {
-	getCSSRules,
-	generate as generateStyles,
-} from '@wordpress/style-engine';
+import { getCSSRules, compileCSS } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
@@ -46,20 +42,6 @@ const styleSupportKeys = [
 const hasStyleSupport = ( blockType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
 
-const VARIABLE_REFERENCE_PREFIX = 'var:';
-const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
-const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
-function compileStyleValue( uncompiledValue ) {
-	if ( uncompiledValue?.startsWith?.( VARIABLE_REFERENCE_PREFIX ) ) {
-		const variable = uncompiledValue
-			.slice( VARIABLE_REFERENCE_PREFIX.length )
-			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
-			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
-		return `var(--wp--${ variable })`;
-	}
-	return uncompiledValue;
-}
-
 /**
  * Returns the inline styles to add depending on the style object
  *
@@ -68,43 +50,10 @@ function compileStyleValue( uncompiledValue ) {
  * @return {Object} Flattened CSS variables declaration.
  */
 export function getInlineStyles( styles = {} ) {
-	const ignoredStyles = [ 'spacing.blockGap' ];
 	const output = {};
-	Object.keys( STYLE_PROPERTY ).forEach( ( propKey ) => {
-		if ( STYLE_PROPERTY[ propKey ].rootOnly ) {
-			return;
-		}
-		const path = STYLE_PROPERTY[ propKey ].value;
-		const subPaths = STYLE_PROPERTY[ propKey ].properties;
-		// Ignore styles on elements because they are handled on the server.
-		if ( has( styles, path ) && 'elements' !== path?.[ 0 ] ) {
-			// Checking if style value is a string allows for shorthand css
-			// option and backwards compatibility for border radius support.
-			const styleValue = get( styles, path );
-
-			if ( ! STYLE_PROPERTY[ propKey ].useEngine ) {
-				if ( !! subPaths && typeof styleValue !== 'string' ) {
-					Object.entries( subPaths ).forEach( ( entry ) => {
-						const [ name, subPath ] = entry;
-						const value = get( styleValue, [ subPath ] );
-
-						if ( value ) {
-							output[ name ] = compileStyleValue( value );
-						}
-					} );
-				} else if ( ! ignoredStyles.includes( path.join( '.' ) ) ) {
-					output[ propKey ] = compileStyleValue(
-						get( styles, path )
-					);
-				}
-			}
-		}
-	} );
-
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
-	const extraRules = getCSSRules( styles );
-	extraRules.forEach( ( rule ) => {
+	getCSSRules( styles ).forEach( ( rule ) => {
 		output[ rule.key ] = rule.value;
 	} );
 
@@ -290,7 +239,7 @@ export const withBlockControls = createHigherOrderComponent(
 );
 
 /**
- * Override the default block element to include duotone styles.
+ * Override the default block element to include elements styles.
  *
  * @param {Function} BlockListBlock Original component
  * @return {Function}                Wrapped component
@@ -328,7 +277,7 @@ const withElementsStyles = createHigherOrderComponent(
 				for ( const [ elementName, elementStyles ] of Object.entries(
 					filteredElementsStyles
 				) ) {
-					const cssRule = generateStyles( elementStyles, {
+					const cssRule = compileCSS( elementStyles, {
 						// The .editor-styles-wrapper selector is required on elements styles. As it is
 						// added to all other editor styles, not providing it causes reset and global
 						// styles to override element styles because of higher specificity.

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type { FunctionComponent } from 'react';
 
 /**
  * Internal dependencies
@@ -16,6 +15,7 @@ import {
 	StyledHelp,
 	StyledVisualLabel,
 } from './styles/base-control-styles';
+import type { WordPressComponentProps } from '../ui/context';
 
 /**
  * `BaseControl` is a component used to generate labels and help text for components handling user inputs.
@@ -104,12 +104,14 @@ export const BaseControl = ( {
  * 	</BaseControl>
  * );
  */
-export const VisualLabel: FunctionComponent< BaseControlVisualLabelProps > = ( {
+export const VisualLabel = ( {
 	className,
 	children,
-} ) => {
+	...props
+}: WordPressComponentProps< BaseControlVisualLabelProps, 'span' > ) => {
 	return (
 		<StyledVisualLabel
+			{ ...props }
 			className={ classnames(
 				'components-base-control__label',
 				className

@@ -14,7 +14,7 @@ export default {
 		focusOnMount: {
 			control: {
 				type: 'radio',
-				options: [ 'firstElement', 'container', false ],
+				options: [ 'firstElement', true, false ],
 			},
 		},
 		headerTitle: { control: { type: 'text' } },

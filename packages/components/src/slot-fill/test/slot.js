@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -95,7 +95,7 @@ describe( 'Slot', () => {
 	it( 'calls the functions passed as the Slot’s fillProps in the Fill', () => {
 		const onClose = jest.fn();
 
-		const { getByText } = render(
+		render(
 			<Provider>
 				<Slot name="chicken" fillProps={ { onClose } } />
 				<Fill name="chicken">
@@ -108,7 +108,7 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		fireEvent.click( getByText( 'Click me' ) );
+		fireEvent.click( screen.getByText( 'Click me' ) );
 
 		expect( onClose ).toHaveBeenCalledTimes( 1 );
 	} );
@@ -150,7 +150,7 @@ describe( 'Slot', () => {
 	} );
 
 	it( 'should re-render Slot when not bubbling virtually', () => {
-		const { container, getByRole } = render(
+		const { container } = render(
 			<Provider>
 				<div>
 					<Slot name="egg" />
@@ -161,7 +161,7 @@ describe( 'Slot', () => {
 
 		expect( container ).toMatchSnapshot();
 
-		fireEvent.click( getByRole( 'button' ) );
+		fireEvent.click( screen.getByRole( 'button' ) );
 
 		expect( container ).toMatchSnapshot();
 	} );

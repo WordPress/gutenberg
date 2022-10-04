@@ -60,17 +60,12 @@ const storeConfig = () => ( {
  * Store definition for the code data namespace.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
- *
- * @type {Object}
  */
 export const store = createReduxStore( STORE_NAME, storeConfig() );
 
 register( store );
 
 export { default as EntityProvider } from './entity-provider';
-export { default as useEntityRecord } from './hooks/use-entity-record';
-export { default as useEntityRecords } from './hooks/use-entity-records';
-export { default as __experimentalUseResourcePermissions } from './hooks/use-resource-permissions';
 export * from './entity-provider';
 export * from './entity-types';
 export * from './fetch';

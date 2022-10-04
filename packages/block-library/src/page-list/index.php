@@ -243,7 +243,7 @@ function block_core_page_list_nest_pages( $current_level, $children ) {
  */
 function render_block_core_page_list( $attributes, $content, $block ) {
 	static $block_id = 0;
-	$block_id++;
+	++$block_id;
 
 	$all_pages = get_pages(
 		array(
@@ -264,7 +264,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$active_page_ancestor_ids = array();
 
 	foreach ( (array) $all_pages as $page ) {
-		$is_active = ! empty( $page->ID ) && ( get_the_ID() === $page->ID );
+		$is_active = ! empty( $page->ID ) && ( get_queried_object_id() === $page->ID );
 
 		if ( $is_active ) {
 			$active_page_ancestor_ids = get_post_ancestors( $page->ID );

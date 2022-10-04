@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import type { MouseEventHandler } from 'react';
-
-/**
  * WordPress dependencies
  */
-import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,12 +9,7 @@ import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
 import { useControlledState } from '../utils/hooks';
 import { clamp } from '../utils/math';
 
-import type {
-	UseControlledRangeValueArgs,
-	UseDebouncedHoverInteractionArgs,
-} from './types';
-
-const noop = () => {};
+import type { UseControlledRangeValueArgs } from './types';
 
 /**
  * A float supported clamp function for a specific value.
@@ -64,72 +54,10 @@ export function useControlledRangeValue(
 				setInternalState( floatClamp( nextValue, min, max ) );
 			}
 		},
-		[ min, max ]
+		[ min, max, setInternalState ]
 	);
 
 	// `state` can't be an empty string because we specified a fallback value of
 	// `null` in `useControlledState`
 	return [ state as Exclude< typeof state, '' >, setState ] as const;
-}
-
-/**
- * Hook to encapsulate the debouncing "hover" to better handle the showing
- * and hiding of the Tooltip.
- *
- * @param  settings
- * @return Bound properties for use on a React.Node.
- */
-export function useDebouncedHoverInteraction(
-	settings: UseDebouncedHoverInteractionArgs
-) {
-	const {
-		onHide = noop,
-		onMouseLeave = noop as MouseEventHandler,
-		onMouseMove = noop as MouseEventHandler,
-		onShow = noop,
-		timeout = 300,
-	} = settings;
-
-	const [ show, setShow ] = useState( false );
-	const timeoutRef = useRef< number | undefined >();
-
-	const setDebouncedTimeout = useCallback(
-		( callback ) => {
-			window.clearTimeout( timeoutRef.current );
-
-			timeoutRef.current = window.setTimeout( callback, timeout );
-		},
-		[ timeout ]
-	);
-
-	const handleOnMouseMove = useCallback( ( event ) => {
-		onMouseMove( event );
-
-		setDebouncedTimeout( () => {
-			if ( ! show ) {
-				setShow( true );
-				onShow();
-			}
-		} );
-	}, [] );
-
-	const handleOnMouseLeave = useCallback( ( event ) => {
-		onMouseLeave( event );
-
-		setDebouncedTimeout( () => {
-			setShow( false );
-			onHide();
-		} );
-	}, [] );
-
-	useEffect( () => {
-		return () => {
-			window.clearTimeout( timeoutRef.current );
-		};
-	} );
-
-	return {
-		onMouseMove: handleOnMouseMove,
-		onMouseLeave: handleOnMouseLeave,
-	};
 }

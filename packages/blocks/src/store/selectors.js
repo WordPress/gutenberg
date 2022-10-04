@@ -2,7 +2,13 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { deburr, filter, flow, get, includes, map, some } from 'lodash';
+import removeAccents from 'remove-accents';
+import { filter, get, includes, map, some } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { pipe } from '@wordpress/compose';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
@@ -685,10 +691,10 @@ export function hasBlockSupport( state, nameOrType, feature, defaultSupports ) {
 export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 	const blockType = getNormalizedBlockType( state, nameOrType );
 
-	const getNormalizedSearchTerm = flow( [
+	const getNormalizedSearchTerm = pipe( [
 		// Disregard diacritics.
 		//  Input: "média"
-		deburr,
+		( term ) => removeAccents( term ?? '' ),
 
 		// Lowercase.
 		//  Input: "MEDIA"
@@ -701,7 +707,7 @@ export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 
 	const normalizedSearchTerm = getNormalizedSearchTerm( searchTerm );
 
-	const isSearchMatch = flow( [
+	const isSearchMatch = pipe( [
 		getNormalizedSearchTerm,
 		( normalizedCandidate ) =>
 			includes( normalizedCandidate, normalizedSearchTerm ),
@@ -711,7 +717,8 @@ export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 		isSearchMatch( blockType.title ) ||
 		some( blockType.keywords, isSearchMatch ) ||
 		isSearchMatch( blockType.category ) ||
-		isSearchMatch( blockType.description )
+		( typeof blockType.description === 'string' &&
+			isSearchMatch( blockType.description ) )
 	);
 }
 
@@ -789,3 +796,19 @@ export const hasChildBlocksWithInserterSupport = ( state, blockName ) => {
 		return hasBlockSupport( state, childBlockName, 'inserter', true );
 	} );
 };
+
+export const __experimentalHasContentRoleAttribute = createSelector(
+	( state, blockTypeName ) => {
+		const blockType = getBlockType( state, blockTypeName );
+		if ( ! blockType ) {
+			return false;
+		}
+
+		return Object.entries( blockType.attributes ).some(
+			( [ , { __experimentalRole } ] ) => __experimentalRole === 'content'
+		);
+	},
+	( state, blockTypeName ) => [
+		state.blockTypes[ blockTypeName ]?.attributes,
+	]
+);

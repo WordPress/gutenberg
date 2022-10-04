@@ -16,7 +16,7 @@ export {
 	default as Animate,
 	getAnimateClassName as __unstableGetAnimateClassName,
 } from './animate';
-export { __unstableMotion } from './animation';
+export { __unstableMotion, __unstableAnimatePresence } from './animation';
 export { default as AnglePickerControl } from './angle-picker-control';
 export {
 	default as Autocomplete,
@@ -30,7 +30,10 @@ export {
 	isEmptyBorder as __experimentalIsEmptyBorder,
 } from './border-box-control';
 export { BorderControl as __experimentalBorderControl } from './border-control';
-export { default as __experimentalBoxControl } from './box-control';
+export {
+	default as __experimentalBoxControl,
+	applyValueToSides as __experimentalApplyValueToSides,
+} from './box-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
 export {

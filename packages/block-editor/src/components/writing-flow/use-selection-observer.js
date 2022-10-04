@@ -25,7 +25,11 @@ function extractSelectionStartNode( selection ) {
 		return anchorNode;
 	}
 
-	return anchorNode.childNodes[ anchorOffset ];
+	if ( anchorOffset === 0 ) {
+		return anchorNode;
+	}
+
+	return anchorNode.childNodes[ anchorOffset - 1 ];
 }
 
 /**
@@ -44,7 +48,11 @@ function extractSelectionEndNode( selection ) {
 		return focusNode;
 	}
 
-	return focusNode.childNodes[ focusOffset - 1 ];
+	if ( focusOffset === focusNode.childNodes.length ) {
+		return focusNode;
+	}
+
+	return focusNode.childNodes[ focusOffset ];
 }
 
 function findDepth( a, b ) {

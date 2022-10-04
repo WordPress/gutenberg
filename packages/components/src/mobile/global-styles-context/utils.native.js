@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { find, startsWith, get, camelCase, has } from 'lodash';
+import { camelCase } from 'change-case';
+import { find, get } from 'lodash';
 import { Dimensions } from 'react-native';
 
 /**
@@ -104,7 +105,7 @@ export function getBlockColors(
 
 	// Custom colors.
 	Object.entries( blockStyleAttributes ).forEach( ( [ key, value ] ) => {
-		const isCustomColor = startsWith( value, '#' );
+		const isCustomColor = value?.startsWith?.( '#' );
 		let styleKey = key;
 
 		if ( BLOCK_STYLE_ATTRIBUTES_MAPPING[ styleKey ] ) {
@@ -223,7 +224,12 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 			const customValuesData = customValues ?? JSON.parse( stylesBase );
 			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
 				const path = $2.split( '--' );
-				if ( has( customValuesData, path ) ) {
+				if (
+					path.reduce(
+						( prev, curr ) => prev && prev[ curr ],
+						customValuesData
+					)
+				) {
 					return get( customValuesData, path );
 				}
 

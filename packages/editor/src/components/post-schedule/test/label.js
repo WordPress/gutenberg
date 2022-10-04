@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalGetSettings, setSettings } from '@wordpress/date';
+import { getSettings, setSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -15,7 +15,7 @@ describe( 'getFullPostScheduleLabel', () => {
 	} );
 
 	it( "should show site's timezone abbr", () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		setSettings( {
 			...settings,
@@ -29,7 +29,7 @@ describe( 'getFullPostScheduleLabel', () => {
 	} );
 
 	it( "should show site's timezone offset", () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		setSettings( {
 			...settings,
@@ -67,7 +67,7 @@ describe( 'getPostScheduleLabel', () => {
 	} );
 
 	it( "should show today if date is same day as now and user timezone equals site's timezone", () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		setSettings( {
 			...settings,
@@ -86,7 +86,7 @@ describe( 'getPostScheduleLabel', () => {
 	} );
 
 	it( "should show tomorrow if date is same day as now + 1 day and user timezone equals site's timezone", () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		setSettings( {
 			...settings,
@@ -105,7 +105,7 @@ describe( 'getPostScheduleLabel', () => {
 	} );
 
 	it( "should hide year if date is same year as now and user timezone equals site's timezone", () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		setSettings( {
 			...settings,
@@ -124,7 +124,7 @@ describe( 'getPostScheduleLabel', () => {
 	} );
 
 	it( "should show year if date is not same year as now and user timezone equals site's timezone", () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		setSettings( {
 			...settings,

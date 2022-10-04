@@ -104,7 +104,12 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 		}
 
 		elementToFocus.focus();
-	}, [ isInitialLocation, isMatch ] );
+	}, [
+		isInitialLocation,
+		isMatch,
+		location.isBack,
+		previousLocation?.focusTargetSelector,
+	] );
 
 	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
 

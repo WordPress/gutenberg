@@ -4,7 +4,7 @@
 import { Path, SVG, TextControl, Popover, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { insertObject, useAnchorRef } from '@wordpress/rich-text';
+import { insertObject, useAnchor } from '@wordpress/rich-text';
 import {
 	MediaUpload,
 	RichTextToolbarButton,
@@ -36,8 +36,8 @@ export const image = {
 function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 	const { style } = activeObjectAttributes;
 	const [ width, setWidth ] = useState( style?.replace( /\D/g, '' ) );
-	const anchorRef = useAnchorRef( {
-		ref: contentRef,
+	const popoverAnchor = useAnchor( {
+		editableContentElement: contentRef.current,
 		value,
 		settings: image,
 	} );
@@ -46,7 +46,7 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 		<Popover
 			position="bottom center"
 			focusOnMount={ false }
-			anchorRef={ anchorRef }
+			anchor={ popoverAnchor }
 			className="block-editor-format-toolbar__image-popover"
 		>
 			<form

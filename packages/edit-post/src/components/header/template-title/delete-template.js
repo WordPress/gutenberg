@@ -84,7 +84,7 @@ export default function DeleteTemplate() {
 					} }
 					info={
 						isRevertable
-							? __( 'Restore template to default state' )
+							? __( 'Use the template as supplied by the theme.' )
 							: undefined
 					}
 				>

@@ -77,6 +77,13 @@ function UncontrolledInnerBlocks( props ) {
 	const context = useSelect(
 		( select ) => {
 			const block = select( blockEditorStore ).getBlock( clientId );
+
+			// This check is here to avoid the Redux zombie bug where a child subscription
+			// is called before a parent, causing potential JS errors when the child has been removed.
+			if ( ! block ) {
+				return;
+			}
+
 			const blockType = getBlockType( block.name );
 
 			if ( ! blockType || ! blockType.providesContext ) {
@@ -155,10 +162,11 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				getBlockName,
 				isBlockSelected,
 				hasSelectedInnerBlock,
-				isNavigationMode,
+				__unstableGetEditorMode,
 			} = select( blockEditorStore );
 			const blockName = getBlockName( clientId );
-			const enableClickThrough = isNavigationMode() || isSmallScreen;
+			const enableClickThrough =
+				__unstableGetEditorMode() === 'navigation' || isSmallScreen;
 			return {
 				__experimentalCaptureToolbars: select(
 					blocksStore

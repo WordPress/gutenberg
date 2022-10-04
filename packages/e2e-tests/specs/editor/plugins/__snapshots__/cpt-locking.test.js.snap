@@ -84,7 +84,9 @@ exports[`cpt locking template_lock false should allow blocks to be inserted 1`] 
 <!-- /wp:columns -->
 
 <!-- wp:list -->
-<ul><li>List content</li></ul>
+<ul><!-- wp:list-item -->
+<li>List content</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->"
 `;
 

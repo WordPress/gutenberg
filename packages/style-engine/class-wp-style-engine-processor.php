@@ -19,7 +19,7 @@ if ( class_exists( 'WP_Style_Engine_Processor' ) ) {
 class WP_Style_Engine_Processor {
 
 	/**
-	 * The Style-Engine Store objects
+	 * A collection of Style Engine Store objects.
 	 *
 	 * @var WP_Style_Engine_CSS_Rules_Store[]
 	 */
@@ -36,20 +36,36 @@ class WP_Style_Engine_Processor {
 	 * Add a store to the processor.
 	 *
 	 * @param WP_Style_Engine_CSS_Rules_Store $store The store to add.
+	 *
+	 * @return WP_Style_Engine_Processor Returns the object to allow chaining methods.
 	 */
-	public function add_store( WP_Style_Engine_CSS_Rules_Store $store ) {
+	public function add_store( $store ) {
+		if ( ! $store instanceof WP_Style_Engine_CSS_Rules_Store ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( '$store must be an instance of WP_Style_Engine_CSS_Rules_Store', 'default' ),
+				'6.1.0'
+			);
+			return $this;
+		}
+
 		$this->stores[ $store->get_name() ] = $store;
+
+		return $this;
 	}
 
 	/**
 	 * Adds rules to be processed.
 	 *
 	 * @param WP_Style_Engine_CSS_Rule|WP_Style_Engine_CSS_Rule[] $css_rules A single, or an array of, WP_Style_Engine_CSS_Rule objects from a store or otherwise.
+	 *
+	 * @return WP_Style_Engine_Processor Returns the object to allow chaining methods.
 	 */
 	public function add_rules( $css_rules ) {
 		if ( ! is_array( $css_rules ) ) {
 			$css_rules = array( $css_rules );
 		}
+
 		foreach ( $css_rules as $rule ) {
 			$selector = $rule->get_selector();
 			if ( isset( $this->css_rules[ $selector ] ) ) {
@@ -58,21 +74,26 @@ class WP_Style_Engine_Processor {
 			}
 			$this->css_rules[ $rule->get_selector() ] = $rule;
 		}
+
+		return $this;
 	}
 
 	/**
 	 * Get the CSS rules as a string.
 	 *
-	 * @param array $options array(
-	 *    'optimize' => (boolean) Whether to optimize the CSS output, e.g., combine rules.
-	 * );.
+	 * @param array $options   {
+	 *     Optional. An array of options. Default empty array.
+	 *
+	 *     @type bool $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
+	 *     @type bool $prettify Whether to add new lines and indents to output. Default is to inherit the value of the global constant `SCRIPT_DEBUG`, if it is defined.
+	 * }
 	 *
 	 * @return string The computed CSS.
 	 */
 	public function get_css( $options = array() ) {
 		$defaults = array(
 			'optimize' => true,
-			'prettify' => false,
+			'prettify' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
 		);
 		$options  = wp_parse_args( $options, $defaults );
 
@@ -127,7 +148,8 @@ class WP_Style_Engine_Processor {
 				unset( $this->css_rules[ $key ] );
 			}
 			// Create a new rule with the combined selectors.
-			$this->css_rules[ implode( ',', $duplicates ) ] = new WP_Style_Engine_CSS_Rule( implode( ',', $duplicates ), $declarations );
+			$duplicate_selectors                     = implode( ',', $duplicates );
+			$this->css_rules[ $duplicate_selectors ] = new WP_Style_Engine_CSS_Rule( $duplicate_selectors, $declarations );
 		}
 	}
 }

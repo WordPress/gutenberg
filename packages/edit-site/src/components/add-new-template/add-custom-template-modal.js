@@ -21,6 +21,7 @@ import { useEntityRecords } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 import { mapToIHasNameAndId } from './utils';
 
 const EMPTY_ARRAY = [];
@@ -160,7 +161,12 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 	);
 }
 
-function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
+function AddCustomTemplateModal( {
+	onClose,
+	onSelect,
+	entityForSuggestions,
+	isCreatingTemplate,
+} ) {
 	const [ showSearchEntities, setShowSearchEntities ] = useState(
 		entityForSuggestions.hasGeneralTemplate
 	);
@@ -176,6 +182,7 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
 		>
+			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
 			{ ! showSearchEntities && (
 				<>
 					<p>
@@ -192,9 +199,18 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 							isBlock
 							as={ Button }
 							onClick={ () => {
-								const { slug, title, description } =
-									entityForSuggestions.template;
-								onSelect( { slug, title, description } );
+								const {
+									slug,
+									title,
+									description,
+									templatePrefix,
+								} = entityForSuggestions.template;
+								onSelect( {
+									slug,
+									title,
+									description,
+									templatePrefix,
+								} );
 							} }
 						>
 							<Text as="span" weight={ 600 }>

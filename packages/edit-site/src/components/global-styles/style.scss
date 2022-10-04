@@ -11,7 +11,7 @@
 	display: block;
 }
 
-.edit-site-typography-panel__preview {
+.edit-site-typography-preview {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -21,6 +21,12 @@
 	border-radius: $radius-block-ui;
 }
 
+.edit-site-typography-panel__full-width-control {
+	grid-column: 1 / -1;
+	max-width: 100%;
+}
+
+.edit-site-global-styles-screen-heading-color,
 .edit-site-global-styles-screen-typography {
 	margin: $grid-unit-20;
 }
@@ -40,7 +46,7 @@
 
 	.component-color-indicator {
 		// Show a diagonal line (crossed out) for empty swatches.
-		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+		background: $white linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
 		flex-shrink: 0;
 	}
 }
@@ -71,12 +77,6 @@
 .edit-site-screen-link-color__control,
 .edit-site-screen-button-color__control {
 	padding: $grid-unit-20;
-}
-
-.edit-site-screen-background-color__control {
-	.block-editor-color-gradient-control__tab-panel {
-		padding: $grid-unit-20;
-	}
 }
 
 .edit-site-global-styles-variations_item {
