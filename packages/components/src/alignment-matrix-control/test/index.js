@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { render, unmountComponentAtNode } from 'react-dom';
-import { act } from 'react-dom/test-utils';
+import { render, screen, within } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -19,37 +18,20 @@ afterAll( () => {
 	window.focus = __windowFocus;
 } );
 
-let container = null;
-
-beforeEach( () => {
-	container = document.createElement( 'div' );
-	document.body.appendChild( container );
-} );
-
-afterEach( () => {
-	unmountComponentAtNode( container );
-	container.remove();
-	container = null;
-} );
-
 const getControl = () => {
-	return container.querySelector( '.component-alignment-matrix-control' );
+	return screen.getByRole( 'grid' );
 };
 
 const getCells = () => {
-	const control = getControl();
-	return control.querySelectorAll( '[role="gridcell"]' );
+	return within( getControl() ).getAllByRole( 'gridcell' );
 };
 
 describe( 'AlignmentMatrixControl', () => {
 	describe( 'Basic rendering', () => {
 		it( 'should render', () => {
-			act( () => {
-				render( <AlignmentMatrixControl />, container );
-			} );
-			const control = getControl();
+			render( <AlignmentMatrixControl /> );
 
-			expect( control ).toBeTruthy();
+			expect( getControl() ).toBeTruthy();
 		} );
 	} );
 
@@ -57,33 +39,21 @@ describe( 'AlignmentMatrixControl', () => {
 		it( 'should change value on cell click', () => {
 			const spy = jest.fn();
 
-			act( () => {
-				render(
-					<AlignmentMatrixControl
-						value={ 'center' }
-						onChange={ spy }
-					/>,
-					container
-				);
-			} );
+			render(
+				<AlignmentMatrixControl value={ 'center' } onChange={ spy } />
+			);
 
 			const cells = getCells();
 
-			act( () => {
-				cells[ 3 ].focus();
-			} );
+			cells[ 3 ].focus();
 
 			expect( spy.mock.calls[ 0 ][ 0 ] ).toBe( 'center left' );
 
-			act( () => {
-				cells[ 4 ].focus();
-			} );
+			cells[ 4 ].focus();
 
 			expect( spy.mock.calls[ 1 ][ 0 ] ).toBe( 'center center' );
 
-			act( () => {
-				cells[ 7 ].focus();
-			} );
+			cells[ 7 ].focus();
 
 			expect( spy.mock.calls[ 2 ][ 0 ] ).toBe( 'bottom center' );
 		} );
