@@ -1,43 +1,70 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockTypesList from '../block-types-list';
 import useClipboardBlock from './hooks/use-clipboard-block';
-import { store as blockEditorStore } from '../../store';
+import useBlockTypeImpressions from './hooks/use-block-type-impressions';
+import { createInserterSection, filterInserterItems } from './utils';
+import useBlockTypesState from './hooks/use-block-types-state';
 
-const NON_BLOCK_CATEGORIES = [ 'reusable' ];
+const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
 function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
-	const clipboardBlock = useClipboardBlock( rootClientId );
-
-	const { items } = useSelect(
-		( select ) => {
-			const { getInserterItems } = select( blockEditorStore );
-
-			const allItems = getInserterItems( rootClientId );
-			const blockItems = allItems.filter(
-				( { category } ) => ! NON_BLOCK_CATEGORIES.includes( category )
-			);
-
-			return {
-				items: clipboardBlock
-					? [ clipboardBlock, ...blockItems ]
-					: blockItems,
-			};
-		},
-		[ rootClientId ]
+	const [ rawBlockTypes, , collections ] = useBlockTypesState(
+		rootClientId,
+		onSelect
 	);
+	const clipboardBlock = useClipboardBlock( rootClientId );
+	const filteredBlockTypes = filterInserterItems( rawBlockTypes );
+	const blockTypes = clipboardBlock
+		? [ clipboardBlock, ...filteredBlockTypes ]
+		: filteredBlockTypes;
+	const { items, trackBlockTypeSelected } =
+		useBlockTypeImpressions( blockTypes );
+
+	const handleSelect = ( ...args ) => {
+		trackBlockTypeSelected( ...args );
+		onSelect( ...args );
+	};
+
+	const collectionSections = useMemo( () => {
+		const result = [];
+		Object.keys( collections ).forEach( ( namespace ) => {
+			const data = items.filter(
+				( item ) => getBlockNamespace( item ) === namespace
+			);
+			if ( data.length > 0 ) {
+				result.push(
+					createInserterSection( {
+						key: `collection-${ namespace }`,
+						metadata: {
+							icon: collections[ namespace ].icon,
+							title: collections[ namespace ].title,
+						},
+						items: data,
+					} )
+				);
+			}
+		} );
+
+		return result;
+	}, [ items, collections ] );
+
+	const sections = [
+		createInserterSection( { key: 'default', items } ),
+		...collectionSections,
+	];
 
 	return (
 		<BlockTypesList
 			name="Blocks"
-			items={ items }
-			onSelect={ onSelect }
+			sections={ sections }
+			onSelect={ handleSelect }
 			listProps={ listProps }
 		/>
 	);

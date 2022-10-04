@@ -10,7 +10,7 @@ const SimpleGit = require( 'simple-git' );
 const { getRandomTemporaryPath } = require( './utils' );
 
 /**
- * Clones a Github repository.
+ * Clones a GitHub repository.
  *
  * @param {string} repositoryUrl
  *
@@ -24,6 +24,17 @@ async function clone( repositoryUrl ) {
 		'--no-single-branch',
 	] );
 	return gitWorkingDirectoryPath;
+}
+
+/**
+ * Fetches changes from the repository.
+ *
+ * @param {string}          gitWorkingDirectoryPath Local repository path.
+ * @param {string[]|Object} options                 Git options to apply.
+ */
+async function fetch( gitWorkingDirectoryPath, options = [] ) {
+	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
+	await simpleGit.fetch( options );
 }
 
 /**
@@ -126,17 +137,31 @@ async function resetLocalBranchAgainstOrigin(
 }
 
 /**
+ * Gets the commit hash for the last commit in the current branch.
+ *
+ * @param {string} gitWorkingDirectoryPath Local repository path.
+ *
+ * @return {string} Commit hash.
+ */
+async function getLastCommitHash( gitWorkingDirectoryPath ) {
+	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
+	return await simpleGit.revparse( [ '--short', 'HEAD' ] );
+}
+
+/**
  * Cherry-picks a commit into trunk
  *
  * @param {string} gitWorkingDirectoryPath Local repository path.
- * @param {string} commitHash              Branch Name
+ * @param {string} branchName              Branch name.
+ * @param {string} commitHash              Commit hash.
  */
 async function cherrypickCommitIntoBranch(
 	gitWorkingDirectoryPath,
+	branchName,
 	commitHash
 ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.checkout( 'trunk' );
+	await simpleGit.checkout( branchName );
 	await simpleGit.raw( [ 'cherry-pick', commitHash ] );
 }
 
@@ -166,10 +191,12 @@ module.exports = {
 	checkoutRemoteBranch,
 	createLocalBranch,
 	createLocalTag,
+	fetch,
 	pushBranchToOrigin,
 	pushTagsToOrigin,
 	discardLocalChanges,
 	resetLocalBranchAgainstOrigin,
+	getLastCommitHash,
 	cherrypickCommitIntoBranch,
 	replaceContentFromRemoteBranch,
 };

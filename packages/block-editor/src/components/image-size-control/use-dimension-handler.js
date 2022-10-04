@@ -3,7 +3,7 @@
  */
 import { useEffect, useState } from '@wordpress/element';
 
-export default function useDimensionHander(
+export default function useDimensionHandler(
 	customHeight,
 	customWidth,
 	defaultHeight,
@@ -28,6 +28,23 @@ export default function useDimensionHander(
 			setCurrentHeight( defaultHeight );
 		}
 	}, [ defaultWidth, defaultHeight ] );
+
+	// If custom values change, it means an outsider has resized the image using some other method (eg resize box)
+	// this keeps track of these values too. We need to parse before comparing; custom values can be strings.
+	useEffect( () => {
+		if (
+			customWidth !== undefined &&
+			Number.parseInt( customWidth ) !== Number.parseInt( currentWidth )
+		) {
+			setCurrentWidth( customWidth );
+		}
+		if (
+			customHeight !== undefined &&
+			Number.parseInt( customHeight ) !== Number.parseInt( currentHeight )
+		) {
+			setCurrentHeight( customHeight );
+		}
+	}, [ customWidth, customHeight ] );
 
 	const updateDimension = ( dimension, value ) => {
 		if ( dimension === 'width' ) {

@@ -15,12 +15,14 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { unescapeTerms } from '../../utils/terms';
 
-const MAX_MOST_USED_TERMS = 10;
+const MIN_MOST_USED_TERMS = 3;
 const DEFAULT_QUERY = {
-	per_page: MAX_MOST_USED_TERMS,
+	per_page: 10,
 	orderby: 'count',
 	order: 'desc',
+	hide_empty: true,
 	_fields: 'id,name,count',
+	context: 'view',
 };
 
 export default function MostUsedTerms( { onSelect, taxonomy } ) {
@@ -32,7 +34,7 @@ export default function MostUsedTerms( { onSelect, taxonomy } ) {
 		);
 		return {
 			_terms: mostUsedTerms,
-			showTerms: mostUsedTerms?.length >= MAX_MOST_USED_TERMS,
+			showTerms: mostUsedTerms?.length >= MIN_MOST_USED_TERMS,
 		};
 	}, [] );
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, orderBy } from 'lodash';
+import { orderBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,6 +21,7 @@ import useBlockTypesState from '../components/inserter/hooks/use-block-types-sta
 import BlockIcon from '../components/block-icon';
 import { store as blockEditorStore } from '../store';
 
+const noop = () => {};
 const SHOWN_BLOCK_TYPES = 9;
 
 /** @typedef {import('@wordpress/components').WPCompleter} WPCompleter */

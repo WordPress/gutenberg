@@ -26,8 +26,7 @@ import deprecated from '@wordpress/deprecated';
 export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 	/* eslint-enable jsdoc/no-undefined-types */
 	deprecated( 'wp.compose.useCopyOnClick', {
-		since: '10.3',
-		plugin: 'Gutenberg',
+		since: '5.8',
 		alternative: 'wp.compose.useCopyToClipboard',
 	} );
 

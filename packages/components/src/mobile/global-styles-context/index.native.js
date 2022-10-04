@@ -15,6 +15,7 @@ import {
 	BLOCK_STYLE_ATTRIBUTES,
 	getBlockPaddings,
 	getBlockColors,
+	getBlockTypography,
 } from './utils';
 
 const GlobalStylesContext = createContext( { style: {} } );
@@ -27,7 +28,8 @@ export const getMergedGlobalStyles = (
 	wrapperPropsStyle,
 	blockAttributes,
 	defaultColors,
-	blockName
+	blockName,
+	fontSizes
 ) => {
 	const baseGlobalColors = {
 		baseColors: baseGlobalStyles || {},
@@ -36,10 +38,17 @@ export const getMergedGlobalStyles = (
 		blockAttributes,
 		BLOCK_STYLE_ATTRIBUTES
 	);
+	// This prevents certain wrapper styles from being applied to blocks that
+	// don't support them yet.
+	const wrapperPropsStyleFiltered = pick(
+		wrapperPropsStyle,
+		BLOCK_STYLE_ATTRIBUTES
+	);
+
 	const mergedStyle = {
 		...baseGlobalColors,
 		...globalStyle,
-		...wrapperPropsStyle,
+		...wrapperPropsStyleFiltered,
 	};
 	const blockColors = getBlockColors(
 		blockStyleAttributes,
@@ -53,8 +62,19 @@ export const getMergedGlobalStyles = (
 		blockStyleAttributes,
 		blockColors
 	);
+	const blockTypography = getBlockTypography(
+		blockStyleAttributes,
+		fontSizes,
+		blockName,
+		baseGlobalStyles
+	);
 
-	return { ...mergedStyle, ...blockPaddings, ...blockColors };
+	return {
+		...mergedStyle,
+		...blockPaddings,
+		...blockColors,
+		...blockTypography,
+	};
 };
 
 export const useGlobalStyles = () => {
@@ -63,12 +83,13 @@ export const useGlobalStyles = () => {
 	return globalStyles;
 };
 
-export const withGlobalStyles = ( WrappedComponent ) => ( props ) => (
-	<GlobalStylesContext.Consumer>
-		{ ( globalStyles ) => (
-			<WrappedComponent { ...props } globalStyles={ globalStyles } />
-		) }
-	</GlobalStylesContext.Consumer>
-);
+export const withGlobalStyles = ( WrappedComponent ) => ( props ) =>
+	(
+		<GlobalStylesContext.Consumer>
+			{ ( globalStyles ) => (
+				<WrappedComponent { ...props } globalStyles={ globalStyles } />
+			) }
+		</GlobalStylesContext.Consumer>
+	);
 
 export default GlobalStylesContext;

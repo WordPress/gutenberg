@@ -5,9 +5,8 @@ const { command } = require( 'execa' );
 const path = require( 'path' );
 const glob = require( 'fast-glob' );
 const fs = require( 'fs' );
-const semver = require( 'semver' );
+const { inc: semverInc } = require( 'semver' );
 const readline = require( 'readline' );
-const { prompt } = require( 'inquirer' );
 
 /**
  * Internal dependencies
@@ -16,11 +15,12 @@ const { log, formats } = require( '../lib/logger' );
 const { askForConfirmation, runStep, readJSONFile } = require( '../lib/utils' );
 const {
 	calculateVersionBumpFromChangelog,
-	findReleaseBranchName,
+	findPluginReleaseBranchName,
 	runGitRepositoryCloneStep,
 	runCleanLocalFoldersStep,
 } = require( './common' );
 const git = require( '../lib/git' );
+const { join } = require( 'path' );
 
 /**
  * Release type names.
@@ -35,89 +35,122 @@ const git = require( '../lib/git' );
  */
 
 /**
- * Checks out the WordPress release branch and syncs it with the changes from
+ * @typedef WPPackagesCommandOptions
+ *
+ * @property {boolean} [ci]             Disables interactive mode when executed in CI mode.
+ * @property {string}  [repositoryPath] Relative path to the git repository.
+ * @property {SemVer}  [semver]         The selected semantic versioning. Defaults to `patch`.
+ * @property {string}  [wpVersion]      The major WordPress version number, example: `6.0`.
+ */
+
+/**
+ * @typedef WPPackagesConfig
+ *
+ * @property {string}      abortMessage            Abort Message.
+ * @property {string}      distTag                 The dist-tag used for npm publishing.
+ * @property {string}      gitWorkingDirectoryPath Git working directory path.
+ * @property {boolean}     interactive             Whether to run in interactive mode.
+ * @property {SemVer}      minimumVersionBump      The selected minimum version bump.
+ * @property {string}      npmReleaseBranch        The selected branch for npm release.
+ * @property {ReleaseType} releaseType             The selected release type.
+ */
+
+/**
+ * Checks out the npm release branch.
+ *
+ * @param {WPPackagesConfig} options The config object.
+ */
+async function checkoutNpmReleaseBranch( {
+	gitWorkingDirectoryPath,
+	npmReleaseBranch,
+} ) {
+	// Creating the release branch.
+	await git.checkoutRemoteBranch( gitWorkingDirectoryPath, npmReleaseBranch );
+	await git.fetch( gitWorkingDirectoryPath, [ '--depth=100' ] );
+	log(
+		'>> The local npm release branch ' +
+			formats.success( npmReleaseBranch ) +
+			' has been successfully checked out.'
+	);
+}
+
+/**
+ * Checks out the npm release branch and syncs it with the changes from
  * the last plugin release.
  *
- * @param {string}      gitWorkingDirectoryPath Git working directory path.
- * @param {ReleaseType} releaseType             Release type selected from CLI.
- * @param {string}      abortMessage            Abort Message.
+ * @param {string}           pluginReleaseBranch The plugin release branch name.
+ * @param {WPPackagesConfig} config              The config object.
  *
- * @return {Promise<Object>} WordPress release branch.
+ * @return {?string}   The optional commit's hash when branch synced.
  */
-async function runWordPressReleaseBranchSyncStep(
-	gitWorkingDirectoryPath,
-	releaseType,
-	abortMessage
-) {
-	const wordpressReleaseBranch =
-		releaseType === 'next' ? 'wp/next' : 'wp/trunk';
-	await runStep(
-		'Getting into the WordPress release branch',
+async function runNpmReleaseBranchSyncStep( pluginReleaseBranch, config ) {
+	const {
 		abortMessage,
-		async () => {
-			// Creating the release branch
-			await git.checkoutRemoteBranch(
-				gitWorkingDirectoryPath,
-				wordpressReleaseBranch
+		interactive,
+		gitWorkingDirectoryPath,
+		npmReleaseBranch,
+	} = config;
+	await runStep( 'Syncing the npm release branch', abortMessage, async () => {
+		await checkoutNpmReleaseBranch( config );
+
+		if ( interactive ) {
+			await askForConfirmation(
+				`The branch is ready for sync with the latest plugin release changes applied to "${ pluginReleaseBranch }". Proceed?`,
+				true,
+				abortMessage
 			);
-			log(
-				'>> The local release branch ' +
-					formats.success( wordpressReleaseBranch ) +
-					' has been successfully checked out.'
-			);
-
-			if ( [ 'latest', 'next' ].includes( releaseType ) ) {
-				const packageJsonPath =
-					gitWorkingDirectoryPath + '/package.json';
-				const pluginReleaseBranch = findReleaseBranchName(
-					packageJsonPath
-				);
-
-				await askForConfirmation(
-					`The branch is ready for sync with the latest plugin release changes applied to "${ pluginReleaseBranch }". Proceed?`,
-					true,
-					abortMessage
-				);
-
-				await git.replaceContentFromRemoteBranch(
-					gitWorkingDirectoryPath,
-					pluginReleaseBranch
-				);
-
-				await git.commit(
-					gitWorkingDirectoryPath,
-					`Merge changes published in the Gutenberg plugin "${ pluginReleaseBranch }" branch`
-				);
-
-				log(
-					'>> The local WordPress release branch ' +
-						formats.success( wordpressReleaseBranch ) +
-						' has been successfully synced.'
-				);
-			}
 		}
-	);
 
-	return {
-		releaseBranch: wordpressReleaseBranch,
-	};
+		log(
+			`>> Syncing the latest plugin release to "${ pluginReleaseBranch }".`
+		);
+
+		await git.replaceContentFromRemoteBranch(
+			gitWorkingDirectoryPath,
+			pluginReleaseBranch
+		);
+
+		const commitHash = await git.commit(
+			gitWorkingDirectoryPath,
+			`Merge changes published in the Gutenberg plugin "${ pluginReleaseBranch }" branch`
+		);
+
+		if ( commitHash ) {
+			await runPushGitChangesStep( config );
+		}
+
+		log(
+			'>> The local npm release branch ' +
+				formats.success( npmReleaseBranch ) +
+				' has been successfully synced.'
+		);
+	} );
 }
 
 /**
  * Update CHANGELOG files with the new version number for those packages that
  * contain new entries.
  *
- * @param {string}      gitWorkingDirectoryPath Git working directory path.
- * @param {SemVer}      minimumVersionBump      Minimum version bump for the packages.
- * @param {ReleaseType} releaseType             Release type selected from CLI.
- * @param {string}      abortMessage            Abort Message.
+ * @param {WPPackagesConfig} config Command config.
+ *
+ * @return {?string}   The optional commit's hash when changelog files updated.
  */
-async function updatePackages(
-	gitWorkingDirectoryPath,
-	minimumVersionBump,
-	releaseType,
-	abortMessage
-) {
+async function updatePackages( config ) {
+	const {
+		abortMessage,
+		gitWorkingDirectoryPath,
+		interactive,
+		minimumVersionBump,
+		releaseType,
+	} = config;
+
+	if ( releaseType === 'wp' ) {
+		log(
+			'>> Skipping CHANGELOG files processing when targeting WordPress core.'
+		);
+		return;
+	}
+
 	const changelogFiles = await glob(
 		path.resolve( gitWorkingDirectoryPath, 'packages/*/CHANGELOG.md' )
 	);
@@ -129,10 +162,6 @@ async function updatePackages(
 			) );
 			return pkg.private !== true;
 		}
-	);
-
-	const productionPackageNames = Object.keys(
-		require( '../../../package.json' ).dependencies
 	);
 
 	const processedPackages = await Promise.all(
@@ -154,13 +183,12 @@ async function updatePackages(
 			const packageName = `@wordpress/${
 				changelogPath.split( '/' ).reverse()[ 1 ]
 			}`;
-			// Enforce version bump for production packages when
+			// Enforce version bump for all packages when
 			// the stable minor or major version bump requested.
 			if (
 				! versionBump &&
 				releaseType !== 'next' &&
-				minimumVersionBump !== 'patch' &&
-				productionPackageNames.includes( packageName )
+				minimumVersionBump !== 'patch'
 			) {
 				versionBump = minimumVersionBump;
 			}
@@ -170,9 +198,7 @@ async function updatePackages(
 			);
 			const { version } = readJSONFile( packageJSONPath );
 			const nextVersion =
-				versionBump !== null
-					? semver.inc( version, versionBump )
-					: null;
+				versionBump !== null ? semverInc( version, versionBump ) : null;
 
 			return {
 				changelogPath,
@@ -207,7 +233,7 @@ async function updatePackages(
 				nextVersion,
 				version,
 			} ) => {
-				// Update changelog
+				// Update changelog.
 				const content = await fs.promises.readFile(
 					changelogPath,
 					'utf8'
@@ -224,7 +250,7 @@ async function updatePackages(
 					)
 				);
 
-				// Update package.json
+				// Update package.json.
 				const packageJson = readJSONFile( packageJSONPath );
 				const newPackageJson = {
 					...packageJson,
@@ -246,69 +272,92 @@ async function updatePackages(
 		)
 	);
 
-	await askForConfirmation(
-		`All corresponding files were updated. Commit the changes?`,
-		true,
-		abortMessage
+	if ( interactive ) {
+		await askForConfirmation(
+			`All corresponding files were updated. Commit the changes?`,
+			true,
+			abortMessage
+		);
+	}
+
+	const commitHash = await git.commit(
+		gitWorkingDirectoryPath,
+		'Update changelog files',
+		[ './*' ]
 	);
-	git.commit( gitWorkingDirectoryPath, 'Update changelog files', [ './*' ] );
-	log( '>> Changelog files changes have been committed successfully.' );
+	if ( commitHash ) {
+		await runPushGitChangesStep( config );
+	}
+
+	log( '>> Changelog files have been updated successfully.' );
+
+	return commitHash;
 }
 
 /**
- * Push the local Git Changes and Tags to the remote repository.
+ * Push the local Git Changes the remote repository.
  *
- * @param {string} gitWorkingDirectoryPath Git working directory path.
- * @param {string} releaseBranch           Release branch name.
- * @param {string} abortMessage            Abort message.
+ * @param {WPPackagesConfig} config Command config.
  */
-async function runPushGitChangesStep(
+async function runPushGitChangesStep( {
 	gitWorkingDirectoryPath,
-	releaseBranch,
-	abortMessage
-) {
-	await runStep(
-		'Pushing the release branch and the tag',
-		abortMessage,
-		async () => {
+	interactive,
+	npmReleaseBranch,
+} ) {
+	const abortMessage = `Aborting! Make sure to push changes applied to npm release branch "${ npmReleaseBranch }" manually.`;
+	await runStep( 'Pushing the release branch', abortMessage, async () => {
+		if ( interactive ) {
 			await askForConfirmation(
-				'The release branch and the tag are going to be pushed to the remote repository. Continue?',
+				'The release branch is going to be pushed to the remote repository. Continue?',
 				true,
 				abortMessage
 			);
-			await git.pushBranchToOrigin(
-				gitWorkingDirectoryPath,
-				releaseBranch
-			);
-			await git.pushTagsToOrigin();
 		}
-	);
+		await git.pushBranchToOrigin(
+			gitWorkingDirectoryPath,
+			npmReleaseBranch
+		);
+	} );
 }
 
 /**
  * Publishes all changed packages to npm.
  *
- * @param {string}      gitWorkingDirectoryPath Git working directory path.
- * @param {SemVer}      minimumVersionBump      Minimum version bump for the packages.
- * @param {ReleaseType} releaseType             Release type selected from CLI.
+ * @param {WPPackagesConfig} config Command config.
+ *
+ * @return {?string} The optional commit's hash when packages published to npm.
  */
-async function publishPackagesToNpm(
+async function publishPackagesToNpm( {
+	distTag,
 	gitWorkingDirectoryPath,
+	interactive,
 	minimumVersionBump,
-	releaseType
-) {
+	releaseType,
+} ) {
 	log( '>> Installing npm packages.' );
 	await command( 'npm ci', {
 		cwd: gitWorkingDirectoryPath,
 	} );
 
+	log( '>> Current npm user:' );
+	await command( 'npm whoami', {
+		cwd: gitWorkingDirectoryPath,
+		stdio: 'inherit',
+	} );
+
+	const beforeCommitHash = await git.getLastCommitHash(
+		gitWorkingDirectoryPath
+	);
+
+	const yesFlag = interactive ? '' : '--yes';
+	const noVerifyAccessFlag = interactive ? '' : '--no-verify-access';
 	if ( releaseType === 'next' ) {
 		log(
 			'>> Bumping version of public packages changed since the last release.'
 		);
-		const { stdout: sha } = await command( 'git rev-parse --short HEAD' );
+
 		await command(
-			`npx lerna version pre${ minimumVersionBump } --preid next.${ sha } --no-private`,
+			`npx lerna version pre${ minimumVersionBump } --preid next.${ beforeCommitHash } --no-private ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
@@ -316,22 +365,28 @@ async function publishPackagesToNpm(
 		);
 
 		log( '>> Publishing modified packages to npm.' );
-		await command( 'npx lerna publish from-package --dist-tag next', {
-			cwd: gitWorkingDirectoryPath,
-			stdio: 'inherit',
-		} );
-	} else if ( releaseType === 'bugfix' ) {
+		await command(
+			`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
+			{
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'inherit',
+			}
+		);
+	} else if ( [ 'bugfix', 'wp' ].includes( releaseType ) ) {
 		log( '>> Publishing modified packages to npm.' );
-		await command( `npm run publish:latest`, {
-			cwd: gitWorkingDirectoryPath,
-			stdio: 'inherit',
-		} );
+		await command(
+			`npx lerna publish ${ minimumVersionBump } --dist-tag ${ distTag } --no-private ${ yesFlag } ${ noVerifyAccessFlag }`,
+			{
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'inherit',
+			}
+		);
 	} else {
 		log(
 			'>> Bumping version of public packages changed since the last release.'
 		);
 		await command(
-			`npx lerna version ${ minimumVersionBump } --no-private`,
+			`npx lerna version ${ minimumVersionBump } --no-private ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
@@ -339,148 +394,221 @@ async function publishPackagesToNpm(
 		);
 
 		log( '>> Publishing modified packages to npm.' );
-		await command( `npx lerna publish from-package`, {
-			cwd: gitWorkingDirectoryPath,
-			stdio: 'inherit',
-		} );
+		await command(
+			`npx lerna publish from-package ${ yesFlag } ${ noVerifyAccessFlag }`,
+			{
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'inherit',
+			}
+		);
 	}
+
+	const afterCommitHash = await git.getLastCommitHash(
+		gitWorkingDirectoryPath
+	);
+	if ( afterCommitHash === beforeCommitHash ) {
+		return;
+	}
+
+	return afterCommitHash;
 }
 
 /**
- * Prepare everything to publish WordPress packages to npm.
+ * Backports commits from the release branch to the selected branch.
  *
- * @param {ReleaseType} releaseType           Release type selected from CLI.
- * @param {SemVer}      [minimumVersionBump]  Minimum version bump for the packages. Default: `true`.
- * @param {string}      [confirmationMessage] Confirmation message to show at first.
- *
- * @return {Promise<Object>} Github release object.
+ * @param {string}           branchName Selected branch name.
+ * @param {string[]}         commits    The list of commits to backport.
+ * @param {WPPackagesConfig} config     Command config.
  */
-async function prepareForPackageRelease(
-	releaseType,
-	minimumVersionBump = 'patch',
-	confirmationMessage = 'Ready to go?'
+async function backportCommitsToBranch(
+	branchName,
+	commits,
+	{ abortMessage, gitWorkingDirectoryPath, interactive }
 ) {
-	await askForConfirmation( confirmationMessage );
+	if ( commits.length === 0 ) {
+		return;
+	}
 
-	// Cloning the Git repository.
-	const abortMessage = 'Aborting!';
-	const gitWorkingDirectoryPath = await runGitRepositoryCloneStep(
-		abortMessage
+	if ( interactive ) {
+		await askForConfirmation(
+			`Commits are going to be backported to "${ branchName }". Continue?`,
+			true,
+			abortMessage
+		);
+	}
+
+	log( `>> Backporting commits to "${ branchName }".` );
+
+	await git.resetLocalBranchAgainstOrigin(
+		gitWorkingDirectoryPath,
+		branchName
 	);
+	for ( const commitHash of commits ) {
+		await git.cherrypickCommitIntoBranch(
+			gitWorkingDirectoryPath,
+			branchName,
+			commitHash
+		);
+	}
+	await git.pushBranchToOrigin( gitWorkingDirectoryPath, branchName );
+
+	log( `>> Backporting successfully finished.` );
+}
+
+/**
+ * Runs WordPress packages release.
+ *
+ * @param {WPPackagesConfig} config         Command config.
+ * @param {string[]}         customMessages Custom messages to print in the terminal.
+ *
+ * @return {Promise<Object>} GitHub release object.
+ */
+async function runPackagesRelease( config, customMessages ) {
+	log(
+		formats.title(
+			'\n💃 Time to publish WordPress packages to npm 🕺\n\n'
+		),
+		"To perform a release you'll have to be a member of the WordPress Team on npm.\n",
+		...customMessages
+	);
+
+	if ( config.interactive ) {
+		await askForConfirmation( 'Ready to go?' );
+	}
+
 	const temporaryFolders = [];
-	temporaryFolders.push( gitWorkingDirectoryPath );
+	if ( ! config.gitWorkingDirectoryPath ) {
+		// Cloning the Git repository.
+		config.gitWorkingDirectoryPath = await runGitRepositoryCloneStep(
+			config.abortMessage
+		);
+		temporaryFolders.push( config.gitWorkingDirectoryPath );
+	}
 
-	// Checking out the WordPress release branch and doing sync with the last plugin release.
-	const { releaseBranch } = await runWordPressReleaseBranchSyncStep(
-		gitWorkingDirectoryPath,
-		releaseType,
-		abortMessage
-	);
+	let pluginReleaseBranch;
+	if ( [ 'latest', 'next' ].includes( config.releaseType ) ) {
+		pluginReleaseBranch =
+			config.releaseType === 'next'
+				? 'trunk'
+				: await findPluginReleaseBranchName(
+						config.gitWorkingDirectoryPath
+				  );
+		await runNpmReleaseBranchSyncStep( pluginReleaseBranch, config );
+	} else {
+		await checkoutNpmReleaseBranch( config );
+	}
 
-	await updatePackages(
-		gitWorkingDirectoryPath,
-		minimumVersionBump,
-		releaseType,
-		abortMessage
-	);
+	const commitHashChangelogUpdates = await updatePackages( config );
 
-	await runPushGitChangesStep(
-		gitWorkingDirectoryPath,
-		releaseBranch,
-		`Aborting! Make sure to push changes applied to WordPress release branch "${ releaseBranch }" manually.`
-	);
+	const commitHashNpmPublish = await publishPackagesToNpm( config );
 
-	await publishPackagesToNpm(
-		gitWorkingDirectoryPath,
-		minimumVersionBump,
-		releaseType
-	);
+	if ( [ 'latest', 'bugfix' ].includes( config.releaseType ) ) {
+		const commits = [
+			commitHashChangelogUpdates,
+			commitHashNpmPublish,
+		].filter( Boolean );
+		await backportCommitsToBranch( 'trunk', commits, config );
+
+		if ( config.releaseType === 'latest' && pluginReleaseBranch ) {
+			await backportCommitsToBranch(
+				pluginReleaseBranch,
+				commits,
+				config
+			);
+		}
+	}
 
 	await runCleanLocalFoldersStep( temporaryFolders, 'Cleaning failed.' );
+
+	log(
+		'\n>> 🎉 WordPress packages are now published!\n\n',
+		'Let also people know on WordPress Slack and celebrate together.'
+	);
 }
 
 /**
- * Publishes a new latest version of WordPress packages.
+ * Gets config object.
+ *
+ * @param {ReleaseType}              releaseType The selected release type.
+ * @param {WPPackagesCommandOptions} options     Command options.
+ *
+ * @return {WPPackagesConfig} The config object.
  */
-async function publishNpmLatestDistTag() {
-	log(
-		formats.title(
-			'\n💃 Time to publish WordPress packages to npm 🕺\n\n'
-		),
-		'Welcome! This tool is going to help you with publishing a new latest version of WordPress packages.\n',
-		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
-	);
+function getConfig(
+	releaseType,
+	{ ci, repositoryPath, semver = 'patch', wpVersion }
+) {
+	let distTag = 'latest';
+	let npmReleaseBranch = 'wp/latest';
+	if ( releaseType === 'next' ) {
+		distTag = 'next';
+		npmReleaseBranch = 'wp/next';
+	} else if ( releaseType === 'wp' ) {
+		distTag = `wp-${ wpVersion }`;
+		npmReleaseBranch = `wp/${ wpVersion }`;
+	}
 
-	const minimumVersionBump = await prompt( [
-		{
-			type: 'list',
-			name: 'minimumVersionBump',
-			message: 'Select the minimum version bump for packages:',
-			default: 'patch',
-			choices: [ 'patch', 'minor', 'major' ],
-		},
+	return {
+		abortMessage: 'Aborting!',
+		distTag,
+		gitWorkingDirectoryPath:
+			repositoryPath && join( process.cwd(), repositoryPath ),
+		interactive: ! ci,
+		minimumVersionBump: semver,
+		npmReleaseBranch,
+		releaseType,
+	};
+}
+
+/**
+ * Publishes to npm packages synced from the Gutenberg plugin (latest dist-tag, production version).
+ *
+ * @param {WPPackagesCommandOptions} options Command options.
+ */
+async function publishNpmGutenbergPlugin( options ) {
+	await runPackagesRelease( getConfig( 'latest', options ), [
+		'Welcome! This tool helps with npm publishing a new latest version of WordPress packages synced from the Gutenberg plugin.\n',
 	] );
-
-	await prepareForPackageRelease( 'latest', minimumVersionBump );
-
-	log(
-		'\n>> 🎉 WordPress packages are now published!\n\n',
-		'Please remember to run `git cherry-pick` in the `trunk` branch for the newly created commits during the release with labels:\n',
-		' - Update changelog files (if exists)\n',
-		' - chore(release): publish\n\n',
-		'Finally, let also people know on WordPress Slack and celebrate together.'
-	);
 }
 
 /**
- * Publishes a new latest version of WordPress packages.
+ * Publishes to npm bugfixes for packages (latest dist-tag, production version).
+ *
+ * @param {WPPackagesCommandOptions} options Command options.
  */
-async function publishNpmBugfixLatestDistTag() {
-	log(
-		formats.title(
-			'\n💃 Time to publish WordPress packages to npm 🕺\n\n'
-		),
-		'Welcome! This tool is going to help you with publishing a new bugfix version of WordPress packages with the latest dist tag.\n',
-		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
-	);
-
-	await prepareForPackageRelease(
-		'bugfix',
-		'patch',
-		'Before we proceed, can you confirm that all required changes have beed already cherry-picked to the release branch?'
-	);
-
-	log(
-		'\n>> 🎉 WordPress packages are now published!\n\n',
-		'Please remember to run `git cherry-pick` in the `trunk` branch for the newly created commits during the release with labels:\n',
-		' - Update changelog files (if exists)\n',
-		' - chore(release): publish\n\n',
-		'Finally, let also people know on WordPress Slack and celebrate together.'
-	);
+async function publishNpmBugfixLatest( options ) {
+	await runPackagesRelease( getConfig( 'bugfix', options ), [
+		'Welcome! This tool helps with npm publishing a new bugfix version of WordPress packages.\n',
+		'Make sure that all required changes have been already cherry-picked to the `wp/latest` release branch.\n',
+	] );
 }
 
 /**
- * Publishes a new next version of WordPress packages.
+ * Publishes to npm bugfixes targeting WordPress core (wp-X.Y dist-tag, production version).
+ *
+ * @param {WPPackagesCommandOptions} options Command options.
  */
-async function publishNpmNextDistTag() {
-	log(
-		formats.title(
-			'\n💃 Time to publish WordPress packages to npm 🕺\n\n'
-		),
-		'Welcome! This tool is going to help you with publishing a new next version of WordPress packages.\n',
-		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
-	);
+async function publishNpmBugfixWordPressCore( options ) {
+	await runPackagesRelease( getConfig( 'wp', options ), [
+		'Welcome! This tool helps with npm publishing a new bugfix version of WordPress packages targeting WordPress core.\n',
+		'Make sure that all required changes have been already cherry-picked to the `wp/X.Y` release branch.\n',
+	] );
+}
 
-	await prepareForPackageRelease( 'next' );
-
-	log(
-		'\n>> 🎉 WordPress packages are now published!\n',
-		'Let also people know on WordPress Slack.\n'
-	);
+/**
+ * Publishes to npm development version of packages (next dist-tag, prerelease version).
+ *
+ * @param {WPPackagesCommandOptions} options Command options.
+ */
+async function publishNpmNext( options ) {
+	await runPackagesRelease( getConfig( 'next', options ), [
+		'Welcome! This tool helps with npm publishing a development version of WordPress packages.\n',
+	] );
 }
 
 module.exports = {
-	publishNpmLatestDistTag,
-	publishNpmBugfixLatestDistTag,
-	publishNpmNextDistTag,
+	publishNpmGutenbergPlugin,
+	publishNpmBugfixLatest,
+	publishNpmBugfixWordPressCore,
+	publishNpmNext,
 };

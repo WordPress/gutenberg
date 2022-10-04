@@ -6,7 +6,9 @@ const path = require( 'path' );
 
 class AddReadableJsAssetsWebpackPlugin {
 	extractUnminifiedFiles( compilation ) {
-		const files = compilation.chunks.flatMap( ( chunk ) => chunk.files );
+		const files = Array.from( compilation.chunks ).flatMap( ( chunk ) =>
+			Array.from( chunk.files )
+		);
 		compilation.unminifiedAssets = files.map( ( file ) => {
 			const asset = compilation.assets[ file ];
 			const unminifiedFile = file.replace( /\.min\.js$/, '.js' );
@@ -17,7 +19,7 @@ class AddReadableJsAssetsWebpackPlugin {
 		for ( const [ file, source ] of compilation.unminifiedAssets ) {
 			await fs.promises.writeFile(
 				path.join( compilation.options.output.path, file ),
-				source
+				source.replace( /\r\n/g, '\n' )
 			);
 		}
 	}

@@ -3,10 +3,9 @@
 	border-bottom: 1px solid currentColor;
 	// Default, thin style, is stored in theme.scss so it can be opted out of
 
-	// Wide style
-	&.is-style-wide {
-		border-bottom-width: 1px;
-	}
+	// Unset the left and right borders by default, otherwise some browsers will render them as "inset".
+	border-left: none;
+	border-right: none;
 
 	// Dots style
 	&.is-style-dots {
@@ -15,7 +14,6 @@
 		background: none !important;
 		border: none;
 		text-align: center;
-		width: none;
 		line-height: 1;
 		height: auto;
 

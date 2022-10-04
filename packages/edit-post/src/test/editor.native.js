@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
-import { act } from 'react-dom/test-utils';
+import { act, render } from 'test/helpers';
 
 /**
  * WordPress dependencies
@@ -26,15 +25,25 @@ const unsupportedBlock = `
 <!-- /wp:notablock -->
 `;
 
+beforeAll( () => {
+	jest.useFakeTimers( 'legacy' );
+} );
+
+afterAll( () => {
+	jest.runOnlyPendingTimers();
+	jest.useRealTimers();
+} );
+
 describe( 'Editor', () => {
-	beforeAll( registerCoreBlocks );
+	beforeAll( () => {
+		registerCoreBlocks();
+	} );
 
 	it( 'detects unsupported block and sends hasUnsupportedBlocks true to native', () => {
-		jest.useFakeTimers();
 		RNReactNativeGutenbergBridge.editorDidMount = jest.fn();
 
 		const appContainer = renderEditorWith( unsupportedBlock );
-		// for some reason resetEditorBlocks() is asynchronous when dispatching editEntityRecord
+		// For some reason resetEditorBlocks() is asynchronous when dispatching editEntityRecord.
 		act( () => {
 			jest.runAllTicks();
 		} );
@@ -49,9 +58,9 @@ describe( 'Editor', () => {
 	} );
 } );
 
-// Utilities
+// Utilities.
 const renderEditorWith = ( content ) => {
-	return mount(
+	return render(
 		<Editor
 			initialHtml={ content }
 			initialHtmlModeEnabled={ false }

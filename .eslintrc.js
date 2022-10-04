@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-const { escapeRegExp } = require( 'lodash' );
 const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
 
@@ -17,7 +16,8 @@ const { version } = require( './package' );
  * @type {string}
  */
 const majorMinorRegExp =
-	escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.\\d+)?';
+	version.replace( /\.\d+$/, '' ).replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' ) +
+	'(\\.\\d+)?';
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -26,8 +26,8 @@ const majorMinorRegExp =
  */
 const developmentFiles = [
 	'**/benchmark/**/*.js',
-	'**/@(__mocks__|__tests__|test)/**/*.js',
-	'**/@(storybook|stories)/**/*.js',
+	'**/@(__mocks__|__tests__|test)/**/*.[tj]s?(x)',
+	'**/@(storybook|stories)/**/*.[tj]s?(x)',
 	'packages/babel-preset-default/bin/**/*.js',
 ];
 
@@ -49,12 +49,13 @@ module.exports = {
 		jsdoc: {
 			mode: 'typescript',
 		},
+		'import/internal-regex': null,
 		'import/resolver': require.resolve( './tools/eslint/import-resolver' ),
 	},
 	rules: {
 		'jest/expect-expect': 'off',
 		'@wordpress/dependency-group': 'error',
-		'@wordpress/gutenberg-phase': 'error',
+		'@wordpress/is-gutenberg-plugin': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'@wordpress/i18n-text-domain': [
 			'error',
@@ -71,14 +72,103 @@ module.exports = {
 			{
 				paths: [
 					{
-						name: 'lodash',
-						importNames: [ 'memoize' ],
-						message: 'Please use `memize` instead.',
+						name: 'framer-motion',
+						message:
+							'Please use the Framer Motion API through `@wordpress/components` instead.',
 					},
 					{
-						name: 'react',
+						name: 'lodash',
+						importNames: [
+							'camelCase',
+							'capitalize',
+							'chunk',
+							'clamp',
+							'cloneDeep',
+							'compact',
+							'concat',
+							'countBy',
+							'debounce',
+							'deburr',
+							'defaults',
+							'defaultTo',
+							'delay',
+							'difference',
+							'differenceWith',
+							'dropRight',
+							'each',
+							'escapeRegExp',
+							'extend',
+							'findIndex',
+							'findKey',
+							'findLast',
+							'first',
+							'flatMap',
+							'flatten',
+							'flattenDeep',
+							'flow',
+							'flowRight',
+							'forEach',
+							'fromPairs',
+							'has',
+							'identity',
+							'invoke',
+							'isArray',
+							'isBoolean',
+							'isFinite',
+							'isFunction',
+							'isMatch',
+							'isNil',
+							'isNumber',
+							'isObject',
+							'isObjectLike',
+							'isPlainObject',
+							'isString',
+							'isUndefined',
+							'keyBy',
+							'keys',
+							'last',
+							'lowerCase',
+							'mapKeys',
+							'maxBy',
+							'memoize',
+							'negate',
+							'noop',
+							'nth',
+							'once',
+							'overEvery',
+							'partial',
+							'partialRight',
+							'random',
+							'reject',
+							'repeat',
+							'reverse',
+							'size',
+							'snakeCase',
+							'sortBy',
+							'startCase',
+							'startsWith',
+							'stubFalse',
+							'stubTrue',
+							'sum',
+							'sumBy',
+							'take',
+							'throttle',
+							'times',
+							'toString',
+							'trim',
+							'truncate',
+							'unionBy',
+							'uniq',
+							'uniqBy',
+							'uniqueId',
+							'uniqWith',
+							'upperFirst',
+							'values',
+							'xor',
+							'zip',
+						],
 						message:
-							'Please use React API through `@wordpress/element` instead.',
+							'This Lodash method is not recommended. Please use native functionality instead. If using `memoize`, please use `memize` instead.',
 					},
 					{
 						name: 'reakit',
@@ -99,7 +189,20 @@ module.exports = {
 					{
 						name: '@emotion/css',
 						message:
-							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support',
+							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
+					},
+				],
+			},
+		],
+		'@typescript-eslint/no-restricted-imports': [
+			'error',
+			{
+				paths: [
+					{
+						name: 'react',
+						message:
+							'Please use React API through `@wordpress/element` instead.',
+						allowTypeImports: true,
 					},
 				],
 			},
@@ -114,12 +217,6 @@ module.exports = {
 					'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]',
 				message:
 					'Path access on WordPress dependencies is not allowed.',
-			},
-			{
-				selector:
-					'ImportDeclaration[source.value=/^react-spring(?!\\u002Fweb.cjs)/]',
-				message:
-					'The react-spring dependency must specify CommonJS bundle: react-spring/web.cjs',
 			},
 			{
 				selector:
@@ -176,6 +273,7 @@ module.exports = {
 				...developmentFiles,
 			],
 			rules: {
+				'import/default': 'off',
 				'import/no-extraneous-dependencies': 'off',
 				'import/no-unresolved': 'off',
 				'import/named': 'off',
@@ -185,7 +283,7 @@ module.exports = {
 		{
 			files: [ 'packages/react-native-*/**/*.js' ],
 			settings: {
-				'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549
+				'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549.
 			},
 		},
 		{
@@ -216,18 +314,49 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'packages/jest*/**/*.js' ],
+			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
+			excludedFiles: [ 'test/e2e/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
+			excludedFiles: [ 'packages/e2e-test-utils-playwright/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-e2e' ],
 			rules: {
 				'jest/expect-expect': 'off',
 			},
 		},
 		{
-			files: [ 'bin/**/*.js', 'packages/env/**' ],
+			files: [
+				'test/e2e/**/*.[tj]s',
+				'packages/e2e-test-utils-playwright/**/*.[tj]s',
+			],
+			extends: [ 'plugin:eslint-plugin-playwright/playwright-test' ],
+			rules: {
+				'@wordpress/no-global-active-element': 'off',
+				'@wordpress/no-global-get-selection': 'off',
+				'no-restricted-syntax': [
+					'error',
+					{
+						selector: 'CallExpression[callee.property.name="$"]',
+						message:
+							'`$` is discouraged, please use `locator` instead',
+					},
+					{
+						selector: 'CallExpression[callee.property.name="$$"]',
+						message:
+							'`$$` is discouraged, please use `locator` instead',
+					},
+					{
+						selector:
+							'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
+						message: 'Prefer page.locator instead.',
+					},
+				],
+			},
+		},
+		{
+			files: [ 'bin/**/*.js', 'bin/**/*.mjs', 'packages/env/**' ],
 			rules: {
 				'no-console': 'off',
 			},
@@ -238,6 +367,23 @@ module.exports = {
 				'jsdoc/no-undefined-types': 'off',
 				'jsdoc/valid-types': 'off',
 			},
+		},
+		{
+			files: [
+				'**/@(storybook|stories)/*',
+				'packages/components/src/**/*.tsx',
+			],
+			rules: {
+				// Useful to add story descriptions via JSDoc without specifying params,
+				// or in TypeScript files where params are likely already documented outside of the JSDoc.
+				'jsdoc/require-param': 'off',
+			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
+			plugins: [ 'ssr-friendly' ],
+			extends: [ 'plugin:ssr-friendly/recommended' ],
 		},
 	],
 };

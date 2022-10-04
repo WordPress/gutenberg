@@ -16,7 +16,7 @@ import RangeCell from '../mobile/bottom-sheet/range-cell';
 import StepperCell from '../mobile/bottom-sheet/stepper-cell';
 import Picker from '../mobile/picker';
 import styles from './style.scss';
-import { CSS_UNITS, hasUnits, parseA11yLabelForUnit } from './utils';
+import { CSS_UNITS, hasUnits, getAccessibleLabelForUnit } from './utils';
 
 /**
  * WordPress dependencies
@@ -38,7 +38,6 @@ function UnitControl( {
 	units = CSS_UNITS,
 	unit,
 	getStylesFromColorScheme,
-	decimalNum,
 	...props
 } ) {
 	const pickerRef = useRef();
@@ -48,6 +47,10 @@ function UnitControl( {
 		if ( pickerRef?.current ) {
 			pickerRef.current.presentPicker();
 		}
+		// Disable reason: this should be fixed by the native team.
+		// It would be great if this could be done in the context of
+		// https://github.com/WordPress/gutenberg/pull/39218
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ pickerRef?.current ] );
 
 	const currentInputValue = currentInput === null ? value : currentInput;
@@ -75,7 +78,7 @@ function UnitControl( {
 			</View>
 		);
 
-		if ( hasUnits( units ) ) {
+		if ( hasUnits( units ) && units?.length > 1 ) {
 			return (
 				<TouchableWithoutFeedback
 					onPress={ onPickerPresent }
@@ -95,6 +98,7 @@ function UnitControl( {
 		accessibilityHint,
 		unitButtonTextStyle,
 		unit,
+		units,
 	] );
 
 	const getAnchor = useCallback(
@@ -102,14 +106,33 @@ function UnitControl( {
 			anchorNodeRef?.current
 				? findNodeHandle( anchorNodeRef?.current )
 				: undefined,
+		// Disable reason: this should be fixed by the native team.
+		// It would be great if this could be done in the context of
+		// https://github.com/WordPress/gutenberg/pull/39218
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ anchorNodeRef?.current ]
 	);
 
+	const getDecimal = ( step ) => {
+		// Return the decimal offset based on the step size.
+		// if step size is 0.1 we expect the offset to be 1.
+		// for example 12 + 0.1 we would expect the see 12.1 (not 12.10 or 12 );
+		// steps are defined in the CSS_UNITS and they vary from unit to unit.
+		const stepToString = step;
+		const splitStep = stepToString.toString().split( '.' );
+		return splitStep[ 1 ] ? splitStep[ 1 ].length : 0;
+	};
+
 	const renderUnitPicker = useCallback( () => {
+		// Keeping for legacy reasons, although `false` should not be a valid
+		// value for the `units` prop anymore.
+		if ( units === false ) {
+			return null;
+		}
 		return (
 			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
 				{ renderUnitButton }
-				{ hasUnits( units ) ? (
+				{ hasUnits( units ) && units?.length > 1 ? (
 					<Picker
 						ref={ pickerRef }
 						options={ units }
@@ -121,7 +144,7 @@ function UnitControl( {
 				) : null }
 			</View>
 		);
-	}, [ pickerRef, units, onUnitChange, getAnchor ] );
+	}, [ pickerRef, units, onUnitChange, getAnchor, renderUnitButton ] );
 
 	let step = props.step;
 
@@ -133,6 +156,8 @@ function UnitControl( {
 		const activeUnit = units.find( ( option ) => option.value === unit );
 		step = activeUnit?.step ?? 1;
 	}
+
+	const decimalNum = getDecimal( step );
 
 	return (
 		<>
@@ -147,9 +172,9 @@ function UnitControl( {
 					step={ step }
 					defaultValue={ initialControlValue }
 					shouldDisplayTextInput
-					decimalNum={ unit === 'px' ? 0 : decimalNum }
+					decimalNum={ decimalNum }
 					openUnitPicker={ onPickerPresent }
-					unitLabel={ parseA11yLabelForUnit( unit ) }
+					unitLabel={ getAccessibleLabelForUnit( unit ) }
 					{ ...props }
 				>
 					{ renderUnitPicker() }
@@ -167,7 +192,7 @@ function UnitControl( {
 					separatorType={ separatorType }
 					decimalNum={ decimalNum }
 					openUnitPicker={ onPickerPresent }
-					unitLabel={ parseA11yLabelForUnit( unit ) }
+					unitLabel={ getAccessibleLabelForUnit( unit ) }
 					{ ...props }
 				>
 					{ renderUnitPicker() }

@@ -70,10 +70,10 @@ export default function FocusControl( { api, sidebarControls, children } ) {
 		};
 	}, [ api, focusWidget ] );
 
-	const context = useMemo( () => [ focusedWidgetIdRef, focusWidget ], [
-		focusedWidgetIdRef,
-		focusWidget,
-	] );
+	const context = useMemo(
+		() => [ focusedWidgetIdRef, focusWidget ],
+		[ focusedWidgetIdRef, focusWidget ]
+	);
 
 	return (
 		<FocusControlContext.Provider value={ context }>

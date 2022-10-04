@@ -4,9 +4,9 @@
 const { basename } = require( 'path' );
 
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
+const CustomTemplatedPathPlugin = require( '../../' );
 
 module.exports = {
 	mode: 'development',

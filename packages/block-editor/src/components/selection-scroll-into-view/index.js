@@ -12,6 +12,7 @@ import deprecated from '@wordpress/deprecated';
 export function MultiSelectScrollIntoView() {
 	deprecated( 'wp.blockEditor.MultiSelectScrollIntoView', {
 		hint: 'This behaviour is now built-in.',
+		since: '5.8',
 	} );
 	return null;
 }

@@ -147,6 +147,11 @@ _Optional._ If this property is added, a label will be generated using label pro
 
 _Optional._ Adds and optional class to the parent `div` that wraps the URLInput field and popover
 
+### `placeholder: String`
+
+_Optional._ Placeholder text to show when the field is empty, similar to the
+[`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
+
 ### `disableSuggestions: Boolean`
 
 _Optional._ Provides additional control over whether suggestions are disabled.

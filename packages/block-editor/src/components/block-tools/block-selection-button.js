@@ -38,15 +38,8 @@ import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
 import useBlockDisplayInformation from '../use-block-display-information';
-
-/**
- * Returns true if the user is using windows.
- *
- * @return {boolean} Whether the user is using Windows.
- */
-function isWindows() {
-	return window.navigator.platform.indexOf( 'Win' ) > -1;
-}
+import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import BlockMover from '../block-mover';
 
 /**
  * Block selection button component, displaying the label of the block. If the block
@@ -58,20 +51,19 @@ function isWindows() {
  *
  * @return {WPComponent} The component to be rendered.
  */
-function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
+function BlockSelectionButton( { clientId, rootClientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const selected = useSelect(
 		( select ) => {
 			const {
-				__unstableGetBlockWithoutInnerBlocks,
+				getBlock,
 				getBlockIndex,
 				hasBlockMovingClientId,
 				getBlockListSettings,
+				__unstableGetEditorMode,
 			} = select( blockEditorStore );
-			const index = getBlockIndex( clientId, rootClientId );
-			const { name, attributes } = __unstableGetBlockWithoutInnerBlocks(
-				clientId
-			);
+			const index = getBlockIndex( clientId );
+			const { name, attributes } = getBlock( clientId );
 			const blockMovingMode = hasBlockMovingClientId();
 			return {
 				index,
@@ -79,25 +71,37 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				attributes,
 				blockMovingMode,
 				orientation: getBlockListSettings( rootClientId )?.orientation,
+				editorMode: __unstableGetEditorMode(),
 			};
 		},
 		[ clientId, rootClientId ]
 	);
-	const { index, name, attributes, blockMovingMode, orientation } = selected;
+	const {
+		index,
+		name,
+		attributes,
+		blockMovingMode,
+		orientation,
+		editorMode,
+	} = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
+
+	const blockType = getBlockType( name );
+	const label = getAccessibleBlockLabel(
+		blockType,
+		attributes,
+		index + 1,
+		orientation
+	);
 
 	// Focus the breadcrumb in navigation mode.
 	useEffect( () => {
 		ref.current.focus();
 
-		// NVDA on windows suffers from a bug where focus changes are not announced properly
-		// See WordPress/gutenberg#24121 and nvaccess/nvda#5825 for more details
-		// To solve it we announce the focus change manually.
-		if ( isWindows() ) {
-			speak( label );
-		}
-	}, [] );
+		speak( label );
+	}, [ label ] );
+	const blockElement = useBlockElement( clientId );
 
 	const {
 		hasBlockMovingClientId,
@@ -165,21 +169,15 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				selectedBlockClientId;
 		}
 		const startingBlockClientId = hasBlockMovingClientId();
-
-		if ( isEscape && startingBlockClientId ) {
+		if ( isEscape && startingBlockClientId && ! event.defaultPrevented ) {
 			setBlockMovingClientId( null );
+			event.preventDefault();
 		}
 		if ( ( isEnter || isSpace ) && startingBlockClientId ) {
 			const sourceRoot = getBlockRootClientId( startingBlockClientId );
 			const destRoot = getBlockRootClientId( selectedBlockClientId );
-			const sourceBlockIndex = getBlockIndex(
-				startingBlockClientId,
-				sourceRoot
-			);
-			let destinationBlockIndex = getBlockIndex(
-				selectedBlockClientId,
-				destRoot
-			);
+			const sourceBlockIndex = getBlockIndex( startingBlockClientId );
+			let destinationBlockIndex = getBlockIndex( selectedBlockClientId );
 			if (
 				sourceBlockIndex < destinationBlockIndex &&
 				sourceRoot === destRoot
@@ -203,7 +201,13 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				let nextTabbable;
 
 				if ( navigateDown ) {
-					nextTabbable = focus.tabbable.findNext( blockElement );
+					nextTabbable = blockElement;
+					do {
+						nextTabbable = focus.tabbable.findNext( nextTabbable );
+					} while (
+						nextTabbable &&
+						blockElement.contains( nextTabbable )
+					);
 
 					if ( ! nextTabbable ) {
 						nextTabbable =
@@ -222,14 +226,6 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 			}
 		}
 	}
-
-	const blockType = getBlockType( name );
-	const label = getAccessibleBlockLabel(
-		blockType,
-		attributes,
-		index + 1,
-		orientation
-	);
 
 	const classNames = classnames(
 		'block-editor-block-list__block-selection-button',
@@ -250,30 +246,43 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 					<BlockIcon icon={ blockInformation?.icon } showColors />
 				</FlexItem>
 				<FlexItem>
-					<BlockDraggable clientIds={ [ clientId ] }>
-						{ ( draggableProps ) => (
-							<Button
-								icon={ dragHandle }
-								className="block-selection-button_drag-handle"
-								aria-hidden="true"
-								label={ dragHandleLabel }
-								// Should not be able to tab to drag handle as this
-								// button can only be used with a pointer device.
-								tabIndex="-1"
-								{ ...draggableProps }
-							/>
-						) }
-					</BlockDraggable>
+					{ editorMode === 'zoom-out' && (
+						<BlockMover clientIds={ [ clientId ] } hideDragHandle />
+					) }
+					{ editorMode === 'navigation' && (
+						<BlockDraggable clientIds={ [ clientId ] }>
+							{ ( draggableProps ) => (
+								<Button
+									icon={ dragHandle }
+									className="block-selection-button_drag-handle"
+									aria-hidden="true"
+									label={ dragHandleLabel }
+									// Should not be able to tab to drag handle as this
+									// button can only be used with a pointer device.
+									tabIndex="-1"
+									{ ...draggableProps }
+								/>
+							) }
+						</BlockDraggable>
+					) }
 				</FlexItem>
 				<FlexItem>
 					<Button
 						ref={ ref }
-						onClick={ () => setNavigationMode( false ) }
+						onClick={
+							editorMode === 'navigation'
+								? () => setNavigationMode( false )
+								: undefined
+						}
 						onKeyDown={ onKeyDown }
 						label={ label }
+						showTooltip={ false }
 						className="block-selection-button_select-button"
 					>
-						<BlockTitle clientId={ clientId } />
+						<BlockTitle
+							clientId={ clientId }
+							maximumLength={ 35 }
+						/>
 					</Button>
 				</FlexItem>
 			</Flex>

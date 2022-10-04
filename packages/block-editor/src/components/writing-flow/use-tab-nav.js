@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { focus } from '@wordpress/dom';
+import { focus, isFormElement } from '@wordpress/dom';
 import { TAB, ESCAPE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect, useMergeRefs } from '@wordpress/compose';
@@ -12,24 +12,13 @@ import { useRef } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../../store';
 
-function isFormElement( element ) {
-	const { tagName } = element;
-	return (
-		tagName === 'INPUT' ||
-		tagName === 'BUTTON' ||
-		tagName === 'SELECT' ||
-		tagName === 'TEXTAREA'
-	);
-}
-
 export default function useTabNav() {
 	const container = useRef();
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
 	const lastFocus = useRef();
-	const { hasMultiSelection, getSelectedBlockClientId } = useSelect(
-		blockEditorStore
-	);
+	const { hasMultiSelection, getSelectedBlockClientId, getBlockCount } =
+		useSelect( blockEditorStore );
 	const { setNavigationMode } = useDispatch( blockEditorStore );
 	const isNavigationMode = useSelect(
 		( select ) => select( blockEditorStore ).isNavigationMode(),
@@ -82,8 +71,12 @@ export default function useTabNav() {
 
 	const ref = useRefEffect( ( node ) => {
 		function onKeyDown( event ) {
-			if ( event.keyCode === ESCAPE && ! hasMultiSelection() ) {
-				event.stopPropagation();
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			if ( event.keyCode === ESCAPE ) {
+				event.preventDefault();
 				setNavigationMode( true );
 				return;
 			}
@@ -102,16 +95,26 @@ export default function useTabNav() {
 			const direction = isShift ? 'findPrevious' : 'findNext';
 
 			if ( ! hasMultiSelection() && ! getSelectedBlockClientId() ) {
+				// Preserve the behaviour of entering navigation mode when
+				// tabbing into the content without a block selection.
+				// `onFocusCapture` already did this previously, but we need to
+				// do it again here because after clearing block selection,
+				// focus land on the writing flow container and pressing Tab
+				// will no longer send focus through the focus capture element.
+				if ( event.target === node ) setNavigationMode( true );
 				return;
 			}
 
-			// Allow tabbing between form elements rendered in a block,
+			// Allow tabbing from the block wrapper to a form element,
+			// and between form elements rendered in a block,
 			// such as inside a placeholder. Form elements are generally
 			// meant to be UI rather than part of the content. Ideally
 			// these are not rendered in the content and perhaps in the
 			// future they can be rendered in an iframe or shadow DOM.
 			if (
-				isFormElement( event.target ) &&
+				( isFormElement( event.target ) ||
+					event.target.getAttribute( 'data-block' ) ===
+						getSelectedBlockClientId() ) &&
 				isFormElement( focus.tabbable[ direction ]( event.target ) )
 			) {
 				return;
@@ -132,6 +135,18 @@ export default function useTabNav() {
 
 		function onFocusOut( event ) {
 			lastFocus.current = event.target;
+
+			const { ownerDocument } = node;
+
+			// If focus disappears due to there being no blocks, move focus to
+			// the writing flow wrapper.
+			if (
+				! event.relatedTarget &&
+				ownerDocument.activeElement === ownerDocument.body &&
+				getBlockCount() === 0
+			) {
+				node.focus();
+			}
 		}
 
 		// When tabbing back to an element in block list, this event handler prevents scrolling if the
@@ -158,7 +173,7 @@ export default function useTabNav() {
 			const isShift = event.shiftKey;
 			const direction = isShift ? 'findPrevious' : 'findNext';
 			const target = focus.tabbable[ direction ]( event.target );
-			// only do something when the next tabbable is a focus capture div (before/after)
+			// Only do something when the next tabbable is a focus capture div (before/after)
 			if (
 				target === focusCaptureBeforeRef.current ||
 				target === focusCaptureAfterRef.current
@@ -168,17 +183,13 @@ export default function useTabNav() {
 			}
 		}
 
-		node.ownerDocument.defaultView.addEventListener(
-			'keydown',
-			preventScrollOnTab
-		);
+		const { ownerDocument } = node;
+		const { defaultView } = ownerDocument;
+		defaultView.addEventListener( 'keydown', preventScrollOnTab );
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'focusout', onFocusOut );
 		return () => {
-			node.ownerDocument.defaultView.removeEventListener(
-				'keydown',
-				preventScrollOnTab
-			);
+			defaultView.removeEventListener( 'keydown', preventScrollOnTab );
 			node.removeEventListener( 'keydown', onKeyDown );
 			node.removeEventListener( 'focusout', onFocusOut );
 		};

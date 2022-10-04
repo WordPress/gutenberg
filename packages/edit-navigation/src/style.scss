@@ -8,6 +8,7 @@ $navigation-editor-spacing-top: $grid-unit-50 * 2;
 }
 
 @import "./components/add-menu/style.scss";
+@import "./components/block-placeholder/style.scss";
 @import "../../interface/src/style.scss";
 @import "./components/editor/style.scss";
 @import "./components/error-boundary/style.scss";

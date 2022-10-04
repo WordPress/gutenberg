@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { Ref, ReactNode } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -14,38 +13,13 @@ import { isValidElement } from '@wordpress/element';
  */
 import { getValidChildren } from '../ui/utils/get-valid-children';
 import { contextConnect, useContextSystem } from '../ui/context';
-// eslint-disable-next-line no-duplicate-imports
-import type { PolymorphicComponentProps } from '../ui/context';
 import { ZStackView, ZStackChildView } from './styles';
+import type { ZStackProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
-export interface ZStackProps {
-	/**
-	 * Layers children elements on top of each other (first: highest z-index, last: lowest z-index).
-	 *
-	 * @default true
-	 */
-	isLayered?: boolean;
-	/**
-	 * Reverse the layer ordering (first: lowest z-index, last: highest z-index).
-	 *
-	 * @default false
-	 */
-	isReversed?: boolean;
-	/**
-	 * The amount of offset between each child element.
-	 *
-	 * @default 0
-	 */
-	offset?: number;
-	/**
-	 * Child elements.
-	 */
-	children: ReactNode;
-}
-
-function ZStack(
-	props: PolymorphicComponentProps< ZStackProps, 'div' >,
-	forwardedRef: Ref< any >
+function UnconnectedZStack(
+	props: WordPressComponentProps< ZStackProps, 'div' >,
+	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		children,
@@ -88,4 +62,23 @@ function ZStack(
 	);
 }
 
-export default contextConnect( ZStack, 'ZStack' );
+/**
+ * `ZStack` allows you to stack things along the Z-axis.
+ *
+ * ```jsx
+ * import { __experimentalZStack as ZStack } from '@wordpress/components';
+ *
+ * function Example() {
+ *   return (
+ *     <ZStack offset={ 20 } isLayered>
+ *       <ExampleImage />
+ *       <ExampleImage />
+ *       <ExampleImage />
+ *     </ZStack>
+ *   );
+ * }
+ * ```
+ */
+export const ZStack = contextConnect( UnconnectedZStack, 'ZStack' );
+
+export default ZStack;

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { has } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
@@ -16,7 +11,7 @@ import { Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { InspectorControls, InspectorAdvancedControls } from '../components';
+import { InspectorControls } from '../components';
 
 /**
  * Regular expression matching invalid anchor characters for replacement.
@@ -24,6 +19,13 @@ import { InspectorControls, InspectorAdvancedControls } from '../components';
  * @type {RegExp}
  */
 const ANCHOR_REGEX = /[\s#]/g;
+
+const ANCHOR_SCHEMA = {
+	type: 'string',
+	source: 'attribute',
+	attribute: 'id',
+	selector: '*',
+};
 
 /**
  * Filters registered block settings, extending attributes with anchor using ID
@@ -34,20 +36,15 @@ const ANCHOR_REGEX = /[\s#]/g;
  * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
-	// allow blocks to specify their own attribute definition with default values if needed.
-	if ( has( settings.attributes, [ 'anchor', 'type' ] ) ) {
+	// Allow blocks to specify their own attribute definition with default values if needed.
+	if ( 'type' in ( settings.attributes?.anchor ?? {} ) ) {
 		return settings;
 	}
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
 		// Gracefully handle if settings.attributes is undefined.
 		settings.attributes = {
 			...settings.attributes,
-			anchor: {
-				type: 'string',
-				source: 'attribute',
-				attribute: 'id',
-				selector: '*',
-			},
+			anchor: ANCHOR_SCHEMA,
 		};
 	}
 
@@ -81,9 +78,9 @@ export const withInspectorControl = createHigherOrderComponent(
 
 								{ isWeb && (
 									<ExternalLink
-										href={
+										href={ __(
 											'https://wordpress.org/support/article/page-jumps/'
-										}
+										) }
 									>
 										{ __( 'Learn more about anchors' ) }
 									</ExternalLink>
@@ -107,15 +104,15 @@ export const withInspectorControl = createHigherOrderComponent(
 					<>
 						<BlockEdit { ...props } />
 						{ isWeb && (
-							<InspectorAdvancedControls>
+							<InspectorControls __experimentalGroup="advanced">
 								{ textControl }
-							</InspectorAdvancedControls>
+							</InspectorControls>
 						) }
 						{ /*
 						 * We plan to remove scoping anchors to 'core/heading' to support
 						 * anchors for all eligble blocks. Additionally we plan to explore
 						 * leveraging InspectorAdvancedControls instead of a custom
-						 * PanelBody title. https://git.io/Jtcov
+						 * PanelBody title. https://github.com/WordPress/gutenberg/issues/28363
 						 */ }
 						{ ! isWeb && props.name === 'core/heading' && (
 							<InspectorControls>

@@ -19,11 +19,16 @@ import BlockMover from '../block-mover';
 import BlockParentSelector from '../block-parent-selector';
 import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
+import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
 import BlockSettingsMenu from '../block-settings-menu';
+import { BlockLockToolbar } from '../block-lock';
+import { BlockGroupToolbar } from '../convert-to-group-buttons';
+import BlockEditVisuallyButton from '../block-edit-visually-button';
 import { useShowMoversGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
+import __unstableBlockNameContext from './block-name-context';
 
-export default function BlockToolbar( { hideDragHandle } ) {
+const BlockToolbar = ( { hideDragHandle } ) => {
 	const {
 		blockClientIds,
 		blockClientId,
@@ -32,6 +37,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		hasReducedUI,
 		isValid,
 		isVisual,
+		isContentLocked,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -40,6 +46,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			isBlockValid,
 			getBlockRootClientId,
 			getSettings,
+			__unstableGetContentLockingParent,
 		} = select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -60,6 +67,9 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			),
 			isVisual: selectedBlockClientIds.every(
 				( id ) => getBlockMode( id ) === 'visual'
+			),
+			isContentLocked: !! __unstableGetContentLockingParent(
+				selectedBlockClientId
 			),
 		};
 	}, [] );
@@ -107,22 +117,37 @@ export default function BlockToolbar( { hideDragHandle } ) {
 
 	return (
 		<div className={ classes }>
-			{ ! isMultiToolbar && ! displayHeaderToolbar && (
-				<BlockParentSelector clientIds={ blockClientIds } />
-			) }
+			{ ! isMultiToolbar &&
+				! displayHeaderToolbar &&
+				! isContentLocked && <BlockParentSelector /> }
 			<div ref={ nodeRef } { ...showMoversGestures }>
-				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
-					<ToolbarGroup className="block-editor-block-toolbar__block-controls">
-						<BlockSwitcher clientIds={ blockClientIds } />
-						<BlockMover
-							clientIds={ blockClientIds }
-							hideDragHandle={ hideDragHandle || hasReducedUI }
-						/>
-					</ToolbarGroup>
-				) }
+				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
+					! isContentLocked && (
+						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
+							<BlockSwitcher clientIds={ blockClientIds } />
+							{ ! isMultiToolbar && (
+								<BlockLockToolbar
+									clientId={ blockClientIds[ 0 ] }
+								/>
+							) }
+							<BlockMover
+								clientIds={ blockClientIds }
+								hideDragHandle={
+									hideDragHandle || hasReducedUI
+								}
+							/>
+						</ToolbarGroup>
+					) }
 			</div>
+			{ shouldShowVisualToolbar && isMultiToolbar && (
+				<BlockGroupToolbar />
+			) }
 			{ shouldShowVisualToolbar && (
 				<>
+					<BlockControls.Slot
+						group="parent"
+						className="block-editor-block-toolbar__slot"
+					/>
 					<BlockControls.Slot
 						group="block"
 						className="block-editor-block-toolbar__slot"
@@ -136,9 +161,22 @@ export default function BlockToolbar( { hideDragHandle } ) {
 						group="other"
 						className="block-editor-block-toolbar__slot"
 					/>
+					<__unstableBlockNameContext.Provider
+						value={ blockType?.name }
+					>
+						<__unstableBlockToolbarLastItem.Slot />
+					</__unstableBlockNameContext.Provider>
 				</>
 			) }
-			<BlockSettingsMenu clientIds={ blockClientIds } />
+			<BlockEditVisuallyButton clientIds={ blockClientIds } />
+			{ ! isContentLocked && (
+				<BlockSettingsMenu clientIds={ blockClientIds } />
+			) }
 		</div>
 	);
-}
+};
+
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md
+ */
+export default BlockToolbar;

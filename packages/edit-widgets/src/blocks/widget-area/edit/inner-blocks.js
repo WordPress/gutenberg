@@ -7,10 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityBlockEditor } from '@wordpress/core-data';
-import {
-	InnerBlocks,
-	__experimentalUseInnerBlocksProps,
-} from '@wordpress/block-editor';
+import { InnerBlocks, useInnerBlocksProps } from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
 
 /**
@@ -18,7 +15,7 @@ import { useRef } from '@wordpress/element';
  */
 import useIsDraggingWithin from './use-is-dragging-within';
 
-export default function WidgetAreaInnerBlocks() {
+export default function WidgetAreaInnerBlocks( { id } ) {
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'root',
 		'postType'
@@ -27,7 +24,7 @@ export default function WidgetAreaInnerBlocks() {
 	const isDraggingWithinInnerBlocks = useIsDraggingWithin( innerBlocksRef );
 	const shouldHighlightDropZone = isDraggingWithinInnerBlocks;
 	// Using the experimental hook so that we can control the className of the element.
-	const innerBlocksProps = __experimentalUseInnerBlocksProps(
+	const innerBlocksProps = useInnerBlocksProps(
 		{ ref: innerBlocksRef },
 		{
 			value: blocks,
@@ -40,10 +37,12 @@ export default function WidgetAreaInnerBlocks() {
 
 	return (
 		<div
+			data-widget-area-id={ id }
 			className={ classnames(
 				'wp-block-widget-area__inner-blocks block-editor-inner-blocks editor-styles-wrapper',
 				{
-					'wp-block-widget-area__highlight-drop-zone': shouldHighlightDropZone,
+					'wp-block-widget-area__highlight-drop-zone':
+						shouldHighlightDropZone,
 				}
 			) }
 		>

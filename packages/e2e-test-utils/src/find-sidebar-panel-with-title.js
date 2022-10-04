@@ -1,4 +1,4 @@
-/** @typedef {import('puppeteer').ElementHandle} ElementHandle */
+/** @typedef {import('puppeteer-core').ElementHandle} ElementHandle */
 
 /**
  * Finds the button responsible for toggling the sidebar panel with the provided title.

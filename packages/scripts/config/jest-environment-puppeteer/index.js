@@ -43,7 +43,10 @@ const KEYS = {
 };
 
 const root = process.env.GITHUB_WORKSPACE || process.cwd();
-const ARTIFACTS_PATH = path.join( root, 'artifacts' );
+const ARTIFACTS_PATH = path.resolve(
+	root,
+	process.env.WP_ARTIFACTS_PATH || 'artifacts'
+);
 
 class PuppeteerEnvironment extends NodeEnvironment {
 	// Jest is not available here, so we have to reverse engineer
@@ -68,7 +71,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
 
 		this.global.jestPuppeteer = {
 			debug: async () => {
-				// Set timeout to 4 days
+				// Set timeout to 4 days.
 				this.setTimeout( 345600000 );
 				// Run a debugger (in case Puppeteer has been launched with `{ devtools: true }`)
 				await this.global.page.evaluate( () => {
@@ -81,7 +84,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
 						'\n\n🕵️‍  Code is paused, press enter to resume'
 					)
 				);
-				// Run an infinite promise
+				// Run an infinite promise.
 				return new Promise( ( resolve ) => {
 					const { stdin } = process;
 					const onKeyPress = ( key ) => {
@@ -149,7 +152,8 @@ class PuppeteerEnvironment extends NodeEnvironment {
 
 				if ( config.browserContext === 'incognito' ) {
 					// Using this, pages will be created in a pristine context.
-					this.global.context = await this.global.browser.createIncognitoBrowserContext();
+					this.global.context =
+						await this.global.browser.createIncognitoBrowserContext();
 				} else if (
 					config.browserContext === 'default' ||
 					! config.browserContext
@@ -158,7 +162,8 @@ class PuppeteerEnvironment extends NodeEnvironment {
 					 * Since this is a new browser, browserContexts() will return only one instance
 					 * https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#browserbrowsercontexts
 					 */
-					this.global.context = await this.global.browser.browserContexts()[ 0 ];
+					this.global.context =
+						await this.global.browser.browserContexts()[ 0 ];
 				} else {
 					throw new Error(
 						`browserContext should be either 'incognito' or 'default'. Received '${ config.browserContext }'`
@@ -171,7 +176,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
 		await this.global.jestPuppeteer.resetBrowser();
 
 		try {
-			await mkdir( ARTIFACTS_PATH );
+			await mkdir( ARTIFACTS_PATH, { recursive: true } );
 		} catch ( err ) {
 			if ( err.code !== 'EEXIST' ) {
 				throw err;

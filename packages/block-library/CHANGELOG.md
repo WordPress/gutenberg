@@ -2,12 +2,91 @@
 
 ## Unreleased
 
-## Breaking Changes
+## 7.15.0 (2022-09-21)
 
--   Removes the `core/legacy-widget` block. This is now in `@wordpress/widgets`
-	via `registerLegacyWidgetBlock()`.
+## 7.14.0 (2022-09-13)
 
-## Bug Fixes
+### New Feature
+
+-   Made it possible to import individual blocks ([#42258](https://github.com/WordPress/gutenberg/pull/42258)). Check [README](./README.md#loading-individual-blocks) for more information.
+-   Paragraph block: You can now drop files/blocks/HTML on an empty Paragraph block to transform it into relevant blocks ([#42722](https://github.com/WordPress/gutenberg/pull/42722)).
+
+## 7.13.0 (2022-08-24)
+
+### Bug Fix
+
+-   Ensure all dependencies allow version ranges ([#43355](https://github.com/WordPress/gutenberg/pull/43355)).
+
+## 7.12.0 (2022-08-10)
+
+## 7.11.0 (2022-07-27)
+
+## 7.10.0 (2022-07-13)
+
+## 7.9.0 (2022-06-29)
+
+## 7.8.0 (2022-06-15)
+
+## 7.7.0 (2022-06-01)
+
+## 7.6.0 (2022-05-18)
+
+### Enhancement
+
+-   Declare blocks as \_\_experimental in block.json to automate syncing Gutenberg packages to WordPress ([#40655](https://github.com/WordPress/gutenberg/pull/40655)).
+
+## 7.5.0 (2022-05-04)
+
+## 7.4.0 (2022-04-21)
+
+## 7.3.0 (2022-04-08)
+
+## 7.2.0 (2022-03-23)
+
+### Bug Fix
+
+-   Table block: Fix deprecation eligibility to prevent loss of named (color palette) background color ([#39445](https://github.com/WordPress/gutenberg/pull/39445)).
+
+### Enhancement
+
+-   Social Icons: Avoid loss of previously selected background color when switching back from "Logos Only" style ([#39276](https://github.com/WordPress/gutenberg/pull/39276)).
+
+## 7.1.0 (2022-03-11)
+
+## 7.0.0 (2022-02-10)
+
+### Breaking Change
+
+-   The `GUTENBERG_PHASE` environment variable has been renamed to `IS_GUTENBERG_PLUGIN` and is now a boolean ([#38202](https://github.com/WordPress/gutenberg/pull/38202)).
+
+### Bug Fix
+
+-   Gallery block: disable edit as html support ([#39318](https://github.com/WordPress/gutenberg/pull/39318)).
+-   Removed unused `@wordpress/escape-html` and `@wordpress/is-shallow-equal` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
+## 6.1.0 (2022-01-27)
+
+-   Code quality: Add block schema to each core block ([#35900](https://github.com/WordPress/gutenberg/pull/35900)).
+
+## 6.0.0 (2021-09-09)
+
+### Breaking Change
+
+-   Remove the background-colors, foreground-colors, and gradient-colors mixins.
+
+## 5.0.0 (2021-07-29)
+
+### Breaking Change
+
+-   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
+
+## 4.0.0 (2021-07-21)
+
+### Breaking Changes
+
+-   Removes the `core/legacy-widget` block. This is now in `@wordpress/widgets` via `registerLegacyWidgetBlock()`.
+
+### Bug Fixes
 
 -   Include missing attributes when upgrading embed block ([#33235](https://github.com/WordPress/gutenberg/pull/33235))
 

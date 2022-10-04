@@ -1,12 +1,4 @@
 /**
- * External dependencies
- */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { cx } from '@emotion/css';
-
-/**
  * WordPress dependencies
  */
 import warn from '@wordpress/warning';
@@ -17,10 +9,11 @@ import warn from '@wordpress/warning';
 import { useComponentsContext } from './context-system-provider';
 import { getNamespace, getConnectedNamespace } from './utils';
 import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
  * @template TProps
- * @typedef {TProps & { className: string; }} ConnectedProps
+ * @typedef {TProps & { className: string }} ConnectedProps
  */
 
 /**
@@ -55,6 +48,8 @@ export function useContextSystem( props, namespace ) {
 		? Object.assign( {}, otherContextProps, props )
 		: props;
 
+	const cx = useCx();
+
 	const classes = cx(
 		getStyledClassNameFromKey( namespace ),
 		props.className
@@ -76,8 +71,13 @@ export function useContextSystem( props, namespace ) {
 		finalComponentProps[ key ] = overrideProps[ key ];
 	}
 
-	// @ts-ignore
-	finalComponentProps.children = rendered;
+	// Setting an `undefined` explicitly can cause unintended overwrites
+	// when a `cloneElement()` is involved.
+	if ( rendered !== undefined ) {
+		// @ts-ignore
+		finalComponentProps.children = rendered;
+	}
+
 	finalComponentProps.className = classes;
 
 	return finalComponentProps;

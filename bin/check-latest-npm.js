@@ -69,15 +69,16 @@ async function getLatestNPMVersion() {
 				/** @type {NodeJS.ErrnoException} */ ( error ).code ===
 				'ENOTFOUND'
 			) {
-				error = new Error( `Could not contact the npm registry to determine latest version.
+				error =
+					new Error( `Could not contact the npm registry to determine latest version.
 
 This could be due to an intermittent outage of the service, or because you are not connected to the internet.
 
 Because it is important that \`package-lock.json\` files only be committed while running the latest version of npm, this commit has been blocked.
 
 If you are certain of your changes and desire to commit anyways, you should either connect to the internet or bypass commit verification using ${ yellow(
-					'git commit --no-verify'
-				) } .` );
+						'git commit --no-verify'
+					) } .` );
 			}
 
 			reject( error );

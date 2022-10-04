@@ -5,7 +5,7 @@ import { sprintf, _n } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 import { serialize } from '@wordpress/blocks';
 import { count as wordCount } from '@wordpress/wordcount';
-import { stack } from '@wordpress/icons';
+import { copy } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -18,7 +18,7 @@ function MultiSelectionInspector( { blocks } ) {
 
 	return (
 		<div className="block-editor-multi-selection-inspector__card">
-			<BlockIcon icon={ stack } showColors />
+			<BlockIcon icon={ copy } showColors />
 			<div className="block-editor-multi-selection-inspector__card-content">
 				<div className="block-editor-multi-selection-inspector__card-title">
 					{ sprintf(

@@ -24,6 +24,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 				getBlockName,
 				getBlockParents,
 				getSelectedBlockClientIds,
+				__unstableGetContentLockingParent,
 			} = select( blockEditorStore );
 			const { getBlockType } = select( blocksStore );
 			const selectedBlockClientIds = getSelectedBlockClientIds();
@@ -38,15 +39,22 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 					selectedBlockClientId &&
 					getBlockType( getBlockName( selectedBlockClientId ) ),
 				hasParents: parents.length,
-				showParentSelector: hasBlockSupport(
-					parentBlockType,
-					'__experimentalParentSelector',
-					true
-				),
+				showParentSelector:
+					parentBlockType &&
+					hasBlockSupport(
+						parentBlockType,
+						'__experimentalParentSelector',
+						true
+					) &&
+					selectedBlockClientIds.length <= 1 &&
+					! __unstableGetContentLockingParent(
+						selectedBlockClientId
+					),
 			};
 		},
 		[]
 	);
+
 	if ( blockType ) {
 		if ( ! hasBlockSupport( blockType, '__experimentalToolbar', true ) ) {
 			return null;

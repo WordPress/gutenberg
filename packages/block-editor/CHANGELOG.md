@@ -2,6 +2,86 @@
 
 ## Unreleased
 
+## 10.1.0 (2022-09-21)
+
+## 10.0.0 (2022-09-13)
+
+### Breaking change
+
+-   `FontSizePicker`: Deprecate bottom margin style. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4 ([#43870](https://github.com/WordPress/gutenberg/pull/43870)).
+
+## 9.8.0 (2022-08-24)
+
+## 9.7.0 (2022-08-10)
+
+## 9.6.0 (2022-07-27)
+
+## 9.5.0 (2022-07-13)
+
+## 9.4.0 (2022-06-29)
+
+## 9.3.0 (2022-06-15)
+
+### Bug fix
+
+-   Fix focus trap on certain `input` elements when navigating within a block with the left/right arrow keys ([#41538](https://github.com/WordPress/gutenberg/pull/41538)).
+
+## 9.2.0 (2022-06-01)
+
+## 9.1.0 (2022-05-18)
+
+## 9.0.0 (2022-05-04)
+
+### Breaking change
+
+-   `BlockNavigationDropdown` is now deprecated. Use the `Dropdown` component from the `@wordpress/components` package and the `ListView` component from this package ([#40777](https://github.com/WordPress/gutenberg/pull/40777)).
+-   `ListView` no longer accepts the `__experimentalFeatures`, `__experimentalPersistentListViewFeatures`, `__experimentalHideContainerBlockActions`, and `showNestedBlocks` props. Passing additional undocumented props through to `ListView` is also now disallowed. ([#40777](https://github.com/WordPress/gutenberg/pull/40777)).
+
+## 8.6.0 (2022-04-21)
+
+## 8.5.0 (2022-04-08)
+
+## 8.4.0 (2022-03-23)
+
+## 8.3.0 (2022-03-11)
+
+## 8.2.0 (2022-02-23)
+
+### New Features
+
+-   `LineHeightControl`: Changes internal implementation to use `NumberControl`, which allows enhanced interactions such as dragging to change the value. To improve consistency with other control components, the bottom margin styles on the component has been deprecated, and will be removed in a future version. To opt into this simplified margin style, set the `__nextHasNoMarginBottom` prop to `true`.
+
+## 8.1.1 (2022-02-10)
+
+### Bug Fix
+
+-   Removed unused `@wordpress/block-serialization-default-parser`, `css-mediaquery`, `memize` and `redux-multi` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
+### New Features
+
+-   List View now supports selecting and dragging multiple blocks via `SHIFT` clicking items in the list [#38314](https://github.com/WordPress/gutenberg/pull/38314).
+
+## 8.1.0 (2022-01-27)
+
+## 8.0.0 (2021-11-07)
+
+### Performance
+
+-   Avoid re-rendering all List View items on block focus [#35706](https://github.com/WordPress/gutenberg/pull/35706). When List View is open Block focus time is 4 times faster in large posts.
+-   Render fixed number of items in List View [#35706](https://github.com/WordPress/gutenberg/pull/35230). Opening List View is 13 times faster in large posts.
+
+### Breaking change
+
+-   List View no longer supports the `showOnlyCurrentHierarchy` flag [#35706](https://github.com/WordPress/gutenberg/pull/35706). To display a subset of blocks, use the `blocks` parameter instead.
+
+## 7.0.0 (2021-07-29)
+
+### Breaking Change
+
+-   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
+
+## 6.2.0 (2021-07-21)
+
 ### New Features
 
 -   `ButtonBlockerAppender` is now `ButtonBlockAppender`, the original name was a typo, but is still being exported for backward compatibility.

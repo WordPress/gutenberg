@@ -3,18 +3,17 @@
  */
 import { compose, ifCondition } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { ___unstablePreferencesModalBaseOption as BaseOption } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
-import BaseOption from './base';
 import { store as editPostStore } from '../../../store';
 
 export default compose(
 	withSelect( ( select, { panelName } ) => {
-		const { isEditorPanelEnabled, isEditorPanelRemoved } = select(
-			editPostStore
-		);
+		const { isEditorPanelEnabled, isEditorPanelRemoved } =
+			select( editPostStore );
 		return {
 			isRemoved: isEditorPanelRemoved( panelName ),
 			isChecked: isEditorPanelEnabled( panelName ),

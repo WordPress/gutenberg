@@ -7,25 +7,11 @@
 }
 
 .wp-block-search {
-	.wp-block-search__input {
-		padding: $grid-unit-10;
-	}
-
-	&.wp-block-search__button-inside .wp-block-search__inside-wrapper {
-		padding: $grid-unit-05;
-	}
-
 	.wp-block-search__button {
 		height: auto;
 		border-radius: initial;
-
-		// This needs high specificity because it otherwise inherits styles from `components-button`.
-		// stylelint-disable-line no-duplicate-selectors
-		&.wp-block-search__button.wp-block-search__button {
-			padding: 6px 10px;
-			display: flex;
-			align-items: center;
-		}
+		display: flex;
+		align-items: center;
 	}
 
 	&__components-button-group {

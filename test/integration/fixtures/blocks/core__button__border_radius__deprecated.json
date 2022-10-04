@@ -1,0 +1,23 @@
+[
+	{
+		"name": "core/button",
+		"isValid": true,
+		"attributes": {
+			"text": "My button",
+			"style": {
+				"border": {
+					"radius": "25px"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/freeform",
+		"isValid": true,
+		"attributes": {
+			"content": ""
+		},
+		"innerBlocks": []
+	}
+]

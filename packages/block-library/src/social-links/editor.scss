@@ -4,6 +4,13 @@
 		display: inline-block;
 		margin-left: $grid-unit-10;
 	}
+
+	// Unset background colors that can be inherited from Global Styles.
+	// This is a duplicate of a rule in style.scss, as it needs higher specificity in the editor.
+	// The rule can be removed if editor styles get lowered in specificity.
+	&.wp-block-social-links {
+		background: none;
+	}
 }
 
 // Prevent toolbar from jumping when selecting / hovering a link.
@@ -37,13 +44,16 @@
 		display: flex;
 	}
 
-	& + .block-list-appender,
 	.wp-social-link {
 		padding: 0.25em;
 
 		.is-style-pill-shape & {
 			padding-left: calc((2/3) * 1em);
 			padding-right: calc((2/3) * 1em);
+		}
+
+		.is-style-logos-only & {
+			padding: 0;
 		}
 	}
 
@@ -62,6 +72,7 @@
 
 // Selected placeholder state.
 .wp-block-social-links .wp-block-social-links__social-prompt {
+	min-height: $button-size-small;
 	list-style: none;
 	order: 2; // Move after the appender button. Because this element is non-interactive, it does not affect tab order.
 
@@ -73,52 +84,6 @@
 	margin-bottom: auto;
 	cursor: default;
 	padding-right: $grid-unit-10;
-
-	& + .block-list-appender {
-		margin-right: $grid-unit-10;
-		padding: 0.25em;
-	}
-}
-
-// Polish the Appender.
-.wp-block-social-links .block-list-appender {
-	// Match the overall silhouette of social links.
-	margin: 4px auto 4px 0;
-	border-radius: 9999px; // This works as both circular and pill shapes.
-
-	// Treat just like a social icon.
-	.block-editor-inserter {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: inherit;
-		width: 1em;
-		height: 1em;
-	}
-
-	// Duplicate the font sizes from style.scss to size the appender.
-	.has-small-icon-size & {
-		font-size: 16px; // 16 makes for a quarter-padding that keeps the icon centered.
-	}
-
-	// Normal/default.
-	.has-normal-icon-size & {
-		font-size: 24px;
-	}
-
-	// Large.
-	.has-large-icon-size & {
-		font-size: 36px;
-	}
-
-	// Huge.
-	.has-huge-icon-size & {
-		font-size: 48px;
-	}
-
-	&::before {
-		content: none;
-	}
 }
 
 // Center flex items. This has an equivalent in style.scss.

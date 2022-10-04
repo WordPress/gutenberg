@@ -1,8 +1,9 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "core/post-template",
 	"title": "Post Template",
-	"category": "design",
+	"category": "theme",
 	"parent": [ "core/query" ],
 	"description": "Contains the block elements used to render a post, like the title, date, featured image, content or excerpt, and more.",
 	"textdomain": "default",
@@ -11,12 +12,29 @@
 		"query",
 		"queryContext",
 		"displayLayout",
-		"templateSlug"
+		"templateSlug",
+		"previewPostType"
 	],
 	"supports": {
 		"reusable": false,
 		"html": false,
-		"align": true
+		"align": true,
+		"__experimentalLayout": {
+			"allowEditing": false
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		}
 	},
 	"style": "wp-block-post-template",
 	"editorStyle": "wp-block-post-template-editor"

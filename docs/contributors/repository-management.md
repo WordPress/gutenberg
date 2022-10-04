@@ -13,6 +13,7 @@ This document covers:
     -   [Design Review](#design-review)
     -   [Merging Pull Requests](#merging-pull-requests)
     -   [Closing Pull Requests](#closing-pull-requests)
+    -   [How To Get Your Pull Request Reviewed?](/docs/contributors/code/how-to-get-your-pull-request-reviewed.md)
 -   [Projects](#projects)
 
 ## Issues
@@ -103,6 +104,8 @@ Code reviews are encouraged by everyone who is willing to attempt one. If you re
 
 If you are not yet comfortable leaving a full review, try commenting on a PR. Questions about functionality or the reasoning behind a change are helpful too. You could also comment on changes to parts of the code you understand, without leaving a full review.
 
+If you struggle with getting a review, see: [How To Get Your Pull Request Reviewed?](/docs/contributors/code/how-to-get-your-pull-request-reviewed.md)
+
 ### Design Review
 
 If your pull request impacts the design/UI, you need to label appropriately to alert design. To request a design review, add the [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) label to your PR. If there are any PRs that require an update to the design/UI, please use the [Figma Library Update](https://github.com/WordPress/gutenberg/labels/Figma%20Library%20Update) label.
@@ -123,7 +126,7 @@ A pull request can generally be merged once it is:
 -   Vetted against all potential edge cases.
 -   Changelog entries were properly added.
 -   Reviewed by someone other than the original author.
--   [Rebased](/docs/contributors/code/git-workflow.md#keeping-your-branch-up-to-date) onto the latest version of the master branch.
+-   [Rebased](/docs/contributors/code/git-workflow.md#keeping-your-branch-up-to-date) onto the latest version of the `trunk` branch.
 
 The final pull request merge decision is made by the **@wordpress/gutenberg-core** team.
 
@@ -157,7 +160,7 @@ Two GitHub teams are used in the project.
 
 -   [Gutenberg](https://github.com/orgs/WordPress/teams/gutenberg): A team composed of contributors with at least 2–3 meaningful contributions to the project.
 
-If you meet this criteria of several meaningful contributions having been accepted into the repository and would like to be added to the Gutenberg team, feel free to ask in the [#core-editor Slack channel](https://make.wordpress.org/chat/).
+If you meet this criterion of several meaningful contributions having been accepted into the repository and would like to be added to the Gutenberg team, feel free to ask in the [#core-editor Slack channel](https://make.wordpress.org/chat/).
 
 ## Projects
 

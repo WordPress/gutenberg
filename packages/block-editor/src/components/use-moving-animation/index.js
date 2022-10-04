@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useSpring } from 'react-spring/web.cjs';
+import { useSpring } from '@react-spring/web';
 
 /**
  * WordPress dependencies
@@ -102,14 +102,14 @@ function useMovingAnimation( {
 		}
 
 		if ( prefersReducedMotion ) {
-			// if the animation is disabled and the scroll needs to be adjusted,
+			// If the animation is disabled and the scroll needs to be adjusted,
 			// just move directly to the final scroll position.
 			preserveScrollPosition();
 
 			return;
 		}
 
-		ref.current.style.transform = '';
+		ref.current.style.transform = undefined;
 		const destination = getAbsolutePosition( ref.current );
 
 		triggerAnimation();
@@ -119,36 +119,22 @@ function useMovingAnimation( {
 		} );
 	}, [ triggerAnimationOnChange ] );
 
-	// Only called when either the x or y value changes.
-	function onFrameChange( { x, y } ) {
+	function onChange( { value } ) {
 		if ( ! ref.current ) {
 			return;
 		}
-
-		const isMoving = x === 0 && y === 0;
-		ref.current.style.transformOrigin = isMoving ? '' : 'center';
-		ref.current.style.transform = isMoving
-			? ''
+		let { x, y } = value;
+		x = Math.round( x );
+		y = Math.round( y );
+		const finishedMoving = x === 0 && y === 0;
+		ref.current.style.transformOrigin = 'center center';
+		ref.current.style.transform = finishedMoving
+			? undefined
 			: `translate3d(${ x }px,${ y }px,0)`;
-		ref.current.style.zIndex = ! isSelected || isMoving ? '' : '1';
+		ref.current.style.zIndex = isSelected ? '1' : '';
 
 		preserveScrollPosition();
 	}
-
-	// Called for every frame computed by useSpring.
-	function onFrame( { x, y } ) {
-		x = Math.round( x );
-		y = Math.round( y );
-
-		if ( x !== onFrame.x || y !== onFrame.y ) {
-			onFrameChange( { x, y } );
-			onFrame.x = x;
-			onFrame.y = y;
-		}
-	}
-
-	onFrame.x = 0;
-	onFrame.y = 0;
 
 	useSpring( {
 		from: {
@@ -162,7 +148,7 @@ function useMovingAnimation( {
 		reset: triggeredAnimation !== finishedAnimation,
 		config: { mass: 5, tension: 2000, friction: 200 },
 		immediate: prefersReducedMotion,
-		onFrame,
+		onChange,
 	} );
 
 	return ref;

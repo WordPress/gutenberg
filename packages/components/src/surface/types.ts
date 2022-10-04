@@ -5,7 +5,7 @@ export type SurfaceVariant =
 	| 'dotted'
 	| 'grid';
 
-export type Props = {
+export type SurfaceProps = {
 	/**
 	 * Determines the grid size for "dotted" and "grid" variants.
 	 *

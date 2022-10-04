@@ -1,5 +1,4 @@
 module.exports = {
-	parser: 'babel-eslint',
 	env: {
 		browser: true,
 		'jest/globals': true,
@@ -68,4 +67,12 @@ module.exports = {
 			},
 		],
 	},
+	overrides: [
+		{
+			files: [ '**/*.js' ],
+			rules: {
+				'import/no-unresolved': 'off',
+			},
+		},
+	],
 };

@@ -9,13 +9,14 @@ import { View, TouchableHighlight, Text } from 'react-native';
 import { Component } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { BlockIcon } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-
+import sparkles from './sparkles';
 class MenuItem extends Component {
 	constructor() {
 		super( ...arguments );
@@ -29,21 +30,14 @@ class MenuItem extends Component {
 	}
 
 	render() {
-		const {
-			getStylesFromColorScheme,
-			item,
-			itemWidth,
-			maxWidth,
-		} = this.props;
+		const { getStylesFromColorScheme, item, itemWidth, maxWidth } =
+			this.props;
 
 		const modalIconWrapperStyle = getStylesFromColorScheme(
 			styles.modalIconWrapper,
 			styles.modalIconWrapperDark
 		);
-		const modalIconStyle = getStylesFromColorScheme(
-			styles.modalIcon,
-			styles.modalIconDark
-		);
+		const modalIconStyle = styles.modalIcon;
 		const modalItemLabelStyle = getStylesFromColorScheme(
 			styles.modalItemLabel,
 			styles.modalItemLabelDark
@@ -56,6 +50,16 @@ class MenuItem extends Component {
 
 		const isClipboardBlock = item.id === 'clipboard';
 		const blockTitle = isClipboardBlock ? __( 'Copied block' ) : item.title;
+		const blockIsNew = item.isNew === true;
+		const accessibilityLabelFormat = blockIsNew
+			? // translators: Newly available block name. %s: The localized block name
+			  __( '%s block, newly available' )
+			: // translators: Block name. %s: The localized block name
+			  __( '%s block' );
+		const accessibilityLabel = sprintf(
+			accessibilityLabelFormat,
+			item.title
+		);
 
 		return (
 			<TouchableHighlight
@@ -66,7 +70,7 @@ class MenuItem extends Component {
 				underlayColor="transparent"
 				activeOpacity={ 0.5 }
 				accessibilityRole="button"
-				accessibilityLabel={ `${ item.title } block` }
+				accessibilityLabel={ accessibilityLabel }
 				onPress={ this.onPress }
 				disabled={ item.isDisabled }
 			>
@@ -80,10 +84,15 @@ class MenuItem extends Component {
 							isClipboardBlock && clipboardBlockStyles,
 						] }
 					>
-						<View style={ modalIconStyle }>
+						{ blockIsNew && (
 							<Icon
-								icon={ item.icon.src || item.icon }
-								fill={ modalIconStyle.fill }
+								icon={ sparkles }
+								style={ styles.newIndicator }
+							/>
+						) }
+						<View style={ modalIconStyle }>
+							<BlockIcon
+								icon={ item.icon }
 								size={ modalIconStyle.width }
 							/>
 						</View>

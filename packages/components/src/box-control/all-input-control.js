@@ -1,12 +1,16 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-/**
  * Internal dependencies
  */
 import UnitControl from './unit-control';
-import { LABELS, getAllValue, isValuesMixed, isValuesDefined } from './utils';
+import {
+	LABELS,
+	applyValueToSides,
+	getAllValue,
+	isValuesMixed,
+	isValuesDefined,
+} from './utils';
+
+const noop = () => {};
 
 export default function AllInputControl( {
 	onChange = noop,
@@ -15,12 +19,13 @@ export default function AllInputControl( {
 	onHoverOff = noop,
 	values,
 	sides,
+	selectedUnits,
+	setSelectedUnits,
 	...props
 } ) {
-	const allValue = getAllValue( values );
+	const allValue = getAllValue( values, selectedUnits, sides );
 	const hasValues = isValuesDefined( values );
-	const isMixed = hasValues && isValuesMixed( values );
-
+	const isMixed = hasValues && isValuesMixed( values, selectedUnits, sides );
 	const allPlaceholder = isMixed ? LABELS.mixed : null;
 
 	const handleOnFocus = ( event ) => {
@@ -28,27 +33,18 @@ export default function AllInputControl( {
 	};
 
 	const handleOnChange = ( next ) => {
-		const nextValues = { ...values };
-
-		if ( sides?.length ) {
-			sides.forEach( ( side ) => {
-				if ( side === 'vertical' ) {
-					nextValues.top = next;
-					nextValues.bottom = next;
-				} else if ( side === 'horizontal' ) {
-					nextValues.left = next;
-					nextValues.right = next;
-				} else {
-					nextValues[ side ] = next;
-				}
-			} );
-		} else {
-			[ 'top', 'right', 'bottom', 'left' ].forEach(
-				( side ) => ( nextValues[ side ] = next )
-			);
-		}
+		const isNumeric = ! isNaN( parseFloat( next ) );
+		const nextValue = isNumeric ? next : undefined;
+		const nextValues = applyValueToSides( values, nextValue, sides );
 
 		onChange( nextValues );
+	};
+
+	// Set selected unit so it can be used as fallback by unlinked controls
+	// when individual sides do not have a value containing a unit.
+	const handleOnUnitChange = ( unit ) => {
+		const newUnits = applyValueToSides( selectedUnits, unit, sides );
+		setSelectedUnits( newUnits );
 	};
 
 	const handleOnHoverOn = () => {
@@ -76,6 +72,7 @@ export default function AllInputControl( {
 			isOnly
 			value={ allValue }
 			onChange={ handleOnChange }
+			onUnitChange={ handleOnUnitChange }
 			onFocus={ handleOnFocus }
 			onHoverOn={ handleOnHoverOn }
 			onHoverOff={ handleOnHoverOff }

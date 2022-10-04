@@ -10,26 +10,333 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.83.0
+* No User facing changes *
+
+## 1.82.1
+-   [**] List block v2: Fix issues splitting or merging paragraphs into the block [#43949]
+
+## 1.82.0
+-   [*] [iOS] Explicitly set tint color for action sheets to always be blue [#43759]
+
+## 1.81.2
+-   [**] List V2 - Prevent error when list is empty [#43861]
+
+## 1.81.1
+-   [*] List block v2: Fix text color inconsistencies with list items [#43244]
+-   [*] Use default placeholder text color for native List Item [#43353]
+-   [**] Add BlockListCompact [#43431]
+-   [*] Fix dynamic React Native version [#43058]
+-   [**] Disable FastImage on Android [#43322]
+
+## 1.81.0
+-   [***] List block V2 [#42702]
+
+## 1.80.1
+-   [*] Image - Workaround for Android and orientation changes [#42900]
+
+## 1.80.0
+-   [*] Add React Native FastImage [#42009]
+-   [*] Block inserter displays block collections [#42405]
+-   [*] Fix incorrect spacing within Image alt text footnote [#42504]
+-   [***] Gallery and Image block - Performance improvements [#42178]
+
+## 1.79.1
+-   [**] Fix a crash when scrolling posts containing Embed blocks (Android 12 only) [#42514]
+
+## 1.79.0
+-   [*] Add 'Insert from URL' option to Video block [#41493]
+-   [*] Image block copies the alt text from the media library when selecting an item [#41839]
+-   [*] Introduce "block recovery" option for invalid blocks [#41988]
+
+## 1.78.1
+
+-   [**] Re-introduce support for v1 of the Gallery block to the native version of the editor [#41533]
+-   [**] Fix missing translations for locales that include region (only on Android) [#41685]
+
+## 1.78.0
+
+-   [*] Bump react-native-gesture-handler to version 2.3.2 [#41337]
+
+## 1.77.1
+
+-   [***] Fix crash on iOS related to JSI and Reanimated [#41482]
+
+## 1.77.0
+
+-   [*] [a11y] Improve text read by screen readers for BottomSheetSelectControl [#41036]
+-   [*] Add 'Insert from URL' option to Image block [#40334]
+
+## 1.76.3
+
+-   [***] Fix crash on iOS related to JSI and Reanimated [#41482]
+
+## 1.76.2
+
+-   [*] Ensure post title gets focused when is notified from native side [#41371]
+
+## 1.76.1
+
+-   [*] BlockList - Add internal onLayout from CellRendererComponent to BlockListItemCell [#41105]
+-   [*] Fix Drag & Drop Chip positioning issue with RTL languages [#41053]
+-   [*] Add drag & drop help guide in Help & Support screen [#40961]
+-   [**] Fix drag mode not being enabled when long-pressing over Shortcode block [#41155]
+
+## 1.76.0
+
+-   [**] [Buttons block] Fix Android-only issue related to displaying formatting buttons after closing the block settings [#40725]
+-   [**] [Cover block] Improve color contrast between background and text [#40691]
+-   [*] [Gallery block] Fix broken "Link To" settings and add "Image Size" settings [#40947]
+-   [***] Add drag & drop blocks feature [#40424]
+
+## 1.75.0
+
+-   [*] [Latest Posts block] Add featured image settings [#39257]
+-   [*] Prevent incorrect notices displaying when switching between HTML-Visual mode quickly [#40415]
+-   [*] [Embed block] Fix inline preview cut-off when editing URL [#35326]
+-   [*] [iOS] Prevent gaps shown around floating toolbar when using external keyboard [#40266]
+
+## 1.74.1
+
+-   [**] RichText - Set a default value for selection values [#40581]
+
+## 1.74.0
+
+-   [**] [Quote block] Adds support for V2 behind a feature flag [#40133]
+-   [**] Update "add block" button's style in default editor view. [#39726]
+-   [*] Remove banner error notification on upload failure [#39694]
+
+## 1.73.1
+
+-   [*] [Spacer block] Fix crash when changing the height value using the text input [#40053]
+
+## 1.73.0
+
+-   [*] Update react-native-reanimated version to 2.4.1 [#39430]
+-   [*] Upgrade Gradle to 7.4 & AGP to 7.1.1 [#39508]
+-   [*] Add waits to fix editor test flakiness [#39668]
+
+## 1.72.1
+
+-   [*] Detect GIF badge during render [#39882]
+
+## 1.72.0
+
+-   [*] Add GIF badge for animated GIFs uploaded to Image blocks [#38996]
+-   [*] Small refinement to media upload errors, including centring and tweaking copy. [#38951]
+-   [*] Update gesture handler and reanimated libraries [#39098]
+-   [*] Fix issue with list's starting index and the order [#39354]
+
+## 1.71.3
+
+-   [*] Fix autocorrected Headings applying bold formatting on iOS [#38633]
+-   [***] Support for multiple color palettes [#38417]
+
+## 1.71.1
+
+-   [*] Highlight text: Check if style attribute value is defined during filtering [#38670]
+
+## 1.71.0
+
+-   [*] Image block: Replacing the media for an image set as featured prompts to update the featured image [#34666]
+-   [***] Font size and line-height support for text-based blocks used in block-based themes [#38205]
+
+## 1.70.3
+
+-   [*] Highlight text: Check if style attribute value is defined during filtering [#38670]
+
+## 1.70.2
+
+-   [**] Rich Text - Validate link colors [#38474]
+
+## 1.70.1
+
+-   [**] [Gallery block] Fix crash when adding images and selecting a gallery item [#38238]
+
+## 1.70.0
+
+-   [**] Fix content justification attribute in Buttons block [#37887]
+-   [*] Hide help button from Unsupported Block Editor. [#37221]
+-   [*] Add contrast checker to text-based blocks [#34902]
+-   [*] [Image block] Fix missing translations [#37956]
+-   [*] Fix cut-off setting labels by properly wrapping the text [#37993]
+-   [*] Highlight text: fix applying formatting for non-selected text [#37915]
+-   [*] Fix missing translations of color settings [#38026]
+
+## 1.69.1
+
+-   [*] Fix app freeze when closing link picker while virtual keyboard is hidden [#37782]
+-   [*] Gallery block - Fix bug when migrating from old galleries format [#37889]
+-   [*] RichText - Use parsed font size values when comparing new changes [#37951]
+
+## 1.69.0
+
+-   [*] Give multi-line block names central alignment in inserter [#37185]
+-   [**] Fix empty line apperaing when splitting heading blocks on Android 12 [#37279]
+-   [**] Fix missing translations by refactoring the editor initialization code [#37073]
+-   [**] Fix text formatting mode lost after backspace is used [#37676]
+-   [*] Fix app freeze when closing link picker while virtual keyboard is hidden [#37782]
+
+## 1.68.0
+
+-   [**] Fix undo/redo functionality in links when applying text format [#36861]
+-   [**] [iOS] Fix scroll update when typing in RichText component [#36914]
+-   [*] [Preformatted block] Fix an issue where the background color is not showing up for standard themes [#36883]
+-   [**] Update Gallery Block to default to the new format and auto-convert old galleries to the new format [#36191]
+-   [***] Highlight text - enables color customization for specific text within a Paragraph block [#36028]
+
+## 1.67.0
+
+-   [**] Adds Clipboard Link Suggestion to Image block and Button block [#35972]
+-   [*] [Embed block] Included Link in Block Settings [#36099]
+-   [**] Fix tab titles translation of inserter menu [#36534]
+-   [*] [Media & Text block] Fix an issue where the text font size would be bigger than expected in some cases [#36570]
+-   [**] [Gallery block] When a gallery block is added, the media options are auto opened for v2 of the Gallery block. [#36757]
+
+## 1.66.0
+
+-   [**] [Image block] Add ability to quickly link images to Media Files and Attachment Pages [#34846]
+-   [*] Fixed a race condition when autosaving content (Android) [#36072]
+
+## 1.65.1
+
+-   [**] Fixed a crash that could occur when copying lists from Microsoft Word. [https://github.com/WordPress/gutenberg/pull/36019]
+
+## 1.65.0
+
+-   [**] Search block - Text and background color support [#35511]
+-   [*] [Embed Block] Fix loading glitch with resolver resolution approach [#35798]
+-   [*] Fixed an issue where the Help screens may not respect an iOS device's notch. [#35570]
+-   [**] Block inserter indicates newly available block types [#35201]
+-   [*] Add support for the Mark HTML tag [#35956]
+
+## 1.64.1
+
+-   [**] Fix updating the block list after block removal [#35721]
+-   [**] Cover block: Change dimRatio to 50 if media added and dimRatio is set to 100 [#35792]
+
+## 1.64.0
+
+-   [*] [Embed block] Fix inline preview cut-off when editing URL [#35321]
+-   [**] [Embed block] Detect when an embeddable URL is pasted into an empty paragraph. [#35204]
+-   [*] [Unsupported Block Editor] Fix text selection bug for Android [#34668]
+-   [*] [Embed block] Fix URL not editable after dismissing the edit URL bottom sheet with empty value [#35460]
+-   [**] Pullquote block - Added support for text and background color customization [#34451]
+-   [**] Preformatted block - Added support for text and background color customization [#35314]
+
+## 1.63.1
+
+-   [*] Fixed missing modal backdrop for Android help section [#35557]
+-   [*] Fixed erroneous overflow within editor Help screens. [#35552]
+
+## 1.63.0
+
+-   [**] [Embed block] Add the top 5 specific embed blocks to the Block inserter list [#34967]
+-   [*] Embed block: Fix URL update when edited after setting a bad URL of a provider [#35013]
+-   [**] Users can now contact support from inside the block editor screen. [#34890]
+
+## 1.62.2
+
+-   Same as 1.62.1 but with the changelog.
+
+## 1.62.1
+
+-   [**] Image block: fix height and border regression. [#34957]
+-   [**] Column block: fix width attribute float cut off. [#34604]
+
+## 1.62.0
+
+-   [**] [Embed block] Implement WP embed preview component [#34004]
+-   [*] [Embed block] Fix content disappearing on Android when switching light/dark mode [#34207]
+-   [*] Embed block: Add device's locale to preview content [#33858]
+-   [**] Fix Android-only issue of main toolbar initial position being wrong when RTL [#34617]
+-   [**] Embed block: Implemented the No Preview UI when an embed is successful, but we're unable to show an inline preview [#34626]
+-   [*] Column block: Translate column width's control labels [#34777]
+-   [**] Enable embed preview for Instagram and Vimeo providers. [#34563]
+-   [**] Embed block: Add error bottom sheet with retry and convert to link actions. [#34604]
+
+## 1.61.2
+
+-   [*] Image block - Fix height and border regression. [#34957]
+
+## 1.61.1
+
+-   [*] Fix crash related to reusable blocks in the block picker. [#34873]
+
+## 1.61.0
+
+-   [**] Enable embed preview for a list of providers (for now only YouTube and Twitter) [#34446]
+-   [***] Inserter: Add Inserter Block Search [https://github.com/WordPress/gutenberg/pull/33237]
+
+## 1.60.1
+
+-   [*] RNmobile: Fix the cancel button on Block Variation Picker / Columns Block. [#34249]
+-   [*] Column block: Fix Android close button alignment. [#34332]
+
+## 1.60.0
+
+-   [**] Embed block: Add "Resize for smaller devices" setting. [#33654]
+
+## 1.59.2
+
+-   [*] Inserter: Prevent non-deterministic order of inserter items [#34078]
+-   [*] Fix missing block title of core/latest-posts block [#34116]
+
+## 1.59.1
+
+-   [*] Global styles - Add color to the block styles filter list [#34000]
+-   [*] Rich text - toTree - Add check in replacements before accessing its type [#34020]
+
+## 1.59.0
+
+-   [*] [Android] Fix UBE's inaccessible "more" toolbar item. [#33740]
+-   [*] Image block: Add a "featured" banner and ability to set or remove an image as featured. (iOS only) [#31345]
+
+## 1.58.3
+
+-   [*] Rich text - toTree - Add check in replacements before accessing its type [#34020]
+
+## 1.58.2
+
+-   [*] Fix issue with text input in alt text settings [#33845]
+
+## 1.58.1
+
+-   [*] Global styles: Check for undefined values and merge user colors [#33707]
+-   [*] [Embed block] Disable paragraph transform [#33745]
+
+## 1.58.0
+
+-   [***] New Block: Embed block. [#33452]
+
+## 1.57.0
+
 -   [*] Update loading and failed screens for web version of the editor [#32395]
 -   [*] Handle floating keyboard case - Fix issue with the block selector on iPad. [#33089]
 -   [**] Added color/background customization for text blocks. [#33250]
 
 ## 1.56.0
+
 -   [*] Tweaks to the badge component's styling, including change of background color and reduced padding. [#32865]
 
 ## 1.55.2
+
 -   [**] Fix incorrect block insertion point after blurring the post title field. [#32831]
 
 ## 1.55.1
+
 -   [*] Fix: RNMobile borderRadius value setting [#32717]
 -   [*] Improve unsupported block message for reusable block [#32618]
 
 ## 1.55.0
+
 -   [*] Gallery block - Fix gallery images caption text formatting [#32351]
 -   [*] Image block: "Set as featured" button within image block settings. (Android only) [#31705]
 -   [***] Audio block now available on WP.com sites on the free plan. [#31966]
 
 ## 1.54.0
+
 -   [***] Slash inserter [#29772]
 -   [*] Audio block: Add Insert from URL functionality. [#27817]
 -   [*] The BottomSheet Cell component now supports the help prop so that a hint can be supplied to all Cell based components. [#30885]

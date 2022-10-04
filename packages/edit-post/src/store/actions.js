@@ -1,15 +1,15 @@
 /**
  * External dependencies
  */
-import { castArray, reduce } from 'lodash';
+import { castArray, reduce, without } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { apiFetch } from '@wordpress/data-controls';
+import apiFetch from '@wordpress/api-fetch';
 import { store as interfaceStore } from '@wordpress/interface';
-import { controls, dispatch, select, subscribe } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -21,34 +21,28 @@ import { store as editorStore } from '@wordpress/editor';
  */
 import { getMetaBoxContainer } from '../utils/meta-boxes';
 import { store as editPostStore } from '.';
+
 /**
  * Returns an action object used in signalling that the user opened an editor sidebar.
  *
  * @param {?string} name Sidebar name to be opened.
- *
- * @yield {Object} Action object.
  */
-export function* openGeneralSidebar( name ) {
-	yield controls.dispatch(
-		interfaceStore.name,
-		'enableComplementaryArea',
-		editPostStore.name,
-		name
-	);
-}
+export const openGeneralSidebar =
+	( name ) =>
+	( { registry } ) =>
+		registry
+			.dispatch( interfaceStore )
+			.enableComplementaryArea( editPostStore.name, name );
 
 /**
  * Returns an action object signalling that the user closed the sidebar.
- *
- * @yield {Object} Action object.
  */
-export function* closeGeneralSidebar() {
-	yield controls.dispatch(
-		interfaceStore.name,
-		'disableComplementaryArea',
-		editPostStore.name
-	);
-}
+export const closeGeneralSidebar =
+	() =>
+	( { registry } ) =>
+		registry
+			.dispatch( interfaceStore )
+			.disableComplementaryArea( editPostStore.name );
 
 /**
  * Returns an action object used in signalling that the user opened a modal.
@@ -117,26 +111,62 @@ export function togglePublishSidebar() {
  *
  * @return {Object} Action object.
  */
-export function toggleEditorPanelEnabled( panelName ) {
-	return {
-		type: 'TOGGLE_PANEL_ENABLED',
-		panelName,
+export const toggleEditorPanelEnabled =
+	( panelName ) =>
+	( { registry } ) => {
+		const inactivePanels =
+			registry
+				.select( preferencesStore )
+				.get( 'core/edit-post', 'inactivePanels' ) ?? [];
+
+		const isPanelInactive = !! inactivePanels?.includes( panelName );
+
+		// If the panel is inactive, remove it to enable it, else add it to
+		// make it inactive.
+		let updatedInactivePanels;
+		if ( isPanelInactive ) {
+			updatedInactivePanels = inactivePanels.filter(
+				( invactivePanelName ) => invactivePanelName !== panelName
+			);
+		} else {
+			updatedInactivePanels = [ ...inactivePanels, panelName ];
+		}
+
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'inactivePanels', updatedInactivePanels );
 	};
-}
 
 /**
- * Returns an action object used to open or close a panel in the editor.
+ * Opens a closed panel and closes an open panel.
  *
  * @param {string} panelName A string that identifies the panel to open or close.
- *
- * @return {Object} Action object.
  */
-export function toggleEditorPanelOpened( panelName ) {
-	return {
-		type: 'TOGGLE_PANEL_OPENED',
-		panelName,
+export const toggleEditorPanelOpened =
+	( panelName ) =>
+	( { registry } ) => {
+		const openPanels =
+			registry
+				.select( preferencesStore )
+				.get( 'core/edit-post', 'openPanels' ) ?? [];
+
+		const isPanelOpen = !! openPanels?.includes( panelName );
+
+		// If the panel is open, remove it to close it, else add it to
+		// make it open.
+		let updatedOpenPanels;
+		if ( isPanelOpen ) {
+			updatedOpenPanels = openPanels.filter(
+				( openPanelName ) => openPanelName !== panelName
+			);
+		} else {
+			updatedOpenPanels = [ ...openPanels, panelName ];
+		}
+
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'openPanels', updatedOpenPanels );
 	};
-}
 
 /**
  * Returns an action object used to remove a panel from the editor.
@@ -153,249 +183,235 @@ export function removeEditorPanel( panelName ) {
 }
 
 /**
- * Returns an action object used to toggle a feature flag.
+ * Triggers an action used to toggle a feature flag.
  *
  * @param {string} feature Feature name.
- *
- * @return {Object} Action object.
  */
-export function toggleFeature( feature ) {
-	return {
-		type: 'TOGGLE_FEATURE',
-		feature,
-	};
-}
-
-export function* switchEditorMode( mode ) {
-	yield {
-		type: 'SWITCH_MODE',
-		mode,
-	};
-
-	// Unselect blocks when we switch to the code editor.
-	if ( mode !== 'visual' ) {
-		yield controls.dispatch( blockEditorStore.name, 'clearSelectedBlock' );
-	}
-
-	const message =
-		mode === 'visual'
-			? __( 'Visual editor selected' )
-			: __( 'Code editor selected' );
-	speak( message, 'assertive' );
-}
+export const toggleFeature =
+	( feature ) =>
+	( { registry } ) =>
+		registry
+			.dispatch( preferencesStore )
+			.toggle( 'core/edit-post', feature );
 
 /**
- * Returns an action object used to toggle a plugin name flag.
+ * Triggers an action used to switch editor mode.
+ *
+ * @param {string} mode The editor mode.
+ */
+export const switchEditorMode =
+	( mode ) =>
+	( { registry } ) => {
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'editorMode', mode );
+
+		// Unselect blocks when we switch to the code editor.
+		if ( mode !== 'visual' ) {
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+		}
+
+		const message =
+			mode === 'visual'
+				? __( 'Visual editor selected' )
+				: __( 'Code editor selected' );
+		speak( message, 'assertive' );
+	};
+
+/**
+ * Triggers an action object used to toggle a plugin name flag.
  *
  * @param {string} pluginName Plugin name.
- *
- * @return {Object} Action object.
  */
-export function togglePinnedPluginItem( pluginName ) {
-	return {
-		type: 'TOGGLE_PINNED_PLUGIN_ITEM',
-		pluginName,
-	};
-}
+export const togglePinnedPluginItem =
+	( pluginName ) =>
+	( { registry } ) => {
+		const isPinned = registry
+			.select( interfaceStore )
+			.isItemPinned( 'core/edit-post', pluginName );
 
-/**
- * Returns an action object used in signalling that block types by the given
- * name(s) should be hidden.
- *
- * @param {string[]} blockNames Names of block types to hide.
- *
- * @return {Object} Action object.
- */
-export function hideBlockTypes( blockNames ) {
-	return {
-		type: 'HIDE_BLOCK_TYPES',
-		blockNames: castArray( blockNames ),
+		registry
+			.dispatch( interfaceStore )
+			[ isPinned ? 'unpinItem' : 'pinItem' ](
+				'core/edit-post',
+				pluginName
+			);
 	};
-}
 
 /**
  * Returns an action object used in signaling that a style should be auto-applied when a block is created.
  *
  * @param {string}  blockName  Name of the block.
  * @param {?string} blockStyle Name of the style that should be auto applied. If undefined, the "auto apply" setting of the block is removed.
- *
- * @return {Object} Action object.
  */
-export function updatePreferredStyleVariations( blockName, blockStyle ) {
-	return {
-		type: 'UPDATE_PREFERRED_STYLE_VARIATIONS',
-		blockName,
-		blockStyle,
+export const updatePreferredStyleVariations =
+	( blockName, blockStyle ) =>
+	( { registry } ) => {
+		if ( ! blockName ) {
+			return;
+		}
+
+		const existingVariations =
+			registry
+				.select( preferencesStore )
+				.get( 'core/edit-post', 'preferredStyleVariations' ) ?? {};
+
+		// When the blockStyle is omitted, remove the block's preferred variation.
+		if ( ! blockStyle ) {
+			const updatedVariations = {
+				...existingVariations,
+			};
+
+			delete updatedVariations[ blockName ];
+
+			registry
+				.dispatch( preferencesStore )
+				.set(
+					'core/edit-post',
+					'preferredStyleVariations',
+					updatedVariations
+				);
+		} else {
+			// Else add the variation.
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core/edit-post', 'preferredStyleVariations', {
+					...existingVariations,
+					[ blockName ]: blockStyle,
+				} );
+		}
 	};
-}
 
 /**
- * Returns an action object used in signalling that the editor should attempt
- * to locally autosave the current post every `interval` seconds.
- *
- * @param {number} interval The new interval, in seconds.
- * @return {Object} Action object.
- */
-export function __experimentalUpdateLocalAutosaveInterval( interval ) {
-	return {
-		type: 'UPDATE_LOCAL_AUTOSAVE_INTERVAL',
-		interval,
-	};
-}
-
-/**
- * Returns an action object used in signalling that block types by the given
- * name(s) should be shown.
+ * Update the provided block types to be visible.
  *
  * @param {string[]} blockNames Names of block types to show.
- *
- * @return {Object} Action object.
  */
-export function showBlockTypes( blockNames ) {
-	return {
-		type: 'SHOW_BLOCK_TYPES',
-		blockNames: castArray( blockNames ),
-	};
-}
+export const showBlockTypes =
+	( blockNames ) =>
+	( { registry } ) => {
+		const existingBlockNames =
+			registry
+				.select( preferencesStore )
+				.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
 
-let saveMetaboxUnsubscribe;
+		const newBlockNames = without(
+			existingBlockNames,
+			...castArray( blockNames )
+		);
+
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'hiddenBlockTypes', newBlockNames );
+	};
+
+/**
+ * Update the provided block types to be hidden.
+ *
+ * @param {string[]} blockNames Names of block types to hide.
+ */
+export const hideBlockTypes =
+	( blockNames ) =>
+	( { registry } ) => {
+		const existingBlockNames =
+			registry
+				.select( preferencesStore )
+				.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
+
+		const mergedBlockNames = new Set( [
+			...existingBlockNames,
+			...castArray( blockNames ),
+		] );
+
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'hiddenBlockTypes', [
+				...mergedBlockNames,
+			] );
+	};
 
 /**
  * Returns an action object used in signaling
  * what Meta boxes are available in which location.
  *
  * @param {Object} metaBoxesPerLocation Meta boxes per location.
- *
- * @yield {Object} Action object.
  */
-export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
-	yield {
-		type: 'SET_META_BOXES_PER_LOCATIONS',
-		metaBoxesPerLocation,
-	};
-
-	const postType = yield controls.select(
-		editorStore.name,
-		'getCurrentPostType'
-	);
-	if ( window.postboxes.page !== postType ) {
-		window.postboxes.add_postbox_toggles( postType );
-	}
-
-	let wasSavingPost = yield controls.select(
-		editorStore.name,
-		'isSavingPost'
-	);
-	let wasAutosavingPost = yield controls.select(
-		editorStore.name,
-		'isAutosavingPost'
-	);
-
-	// Meta boxes are initialized once at page load. It is not necessary to
-	// account for updates on each state change.
-	//
-	// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309
-	const hasActiveMetaBoxes = yield controls.select(
-		editPostStore.name,
-		'hasMetaBoxes'
-	);
-
-	// First remove any existing subscription in order to prevent multiple saves
-	if ( !! saveMetaboxUnsubscribe ) {
-		saveMetaboxUnsubscribe();
-	}
-
-	// Save metaboxes when performing a full save on the post.
-	saveMetaboxUnsubscribe = subscribe( () => {
-		const isSavingPost = select( editorStore.name ).isSavingPost();
-		const isAutosavingPost = select( editorStore.name ).isAutosavingPost();
-
-		// Save metaboxes on save completion, except for autosaves that are not a post preview.
-		const shouldTriggerMetaboxesSave =
-			hasActiveMetaBoxes &&
-			wasSavingPost &&
-			! isSavingPost &&
-			! wasAutosavingPost;
-
-		// Save current state for next inspection.
-		wasSavingPost = isSavingPost;
-		wasAutosavingPost = isAutosavingPost;
-
-		if ( shouldTriggerMetaboxesSave ) {
-			dispatch( editPostStore.name ).requestMetaBoxUpdates();
-		}
-	} );
-}
+export const setAvailableMetaBoxesPerLocation =
+	( metaBoxesPerLocation ) =>
+	( { dispatch } ) =>
+		dispatch( {
+			type: 'SET_META_BOXES_PER_LOCATIONS',
+			metaBoxesPerLocation,
+		} );
 
 /**
- * Returns an action object used to request meta box update.
- *
- * @yield {Object} Action object.
+ * Update a metabox.
  */
-export function* requestMetaBoxUpdates() {
-	yield {
-		type: 'REQUEST_META_BOX_UPDATES',
-	};
-
-	// Saves the wp_editor fields
-	if ( window.tinyMCE ) {
-		window.tinyMCE.triggerSave();
-	}
-
-	// Additional data needed for backward compatibility.
-	// If we do not provide this data, the post will be overridden with the default values.
-	const post = yield controls.select( editorStore.name, 'getCurrentPost' );
-	const additionalData = [
-		post.comment_status ? [ 'comment_status', post.comment_status ] : false,
-		post.ping_status ? [ 'ping_status', post.ping_status ] : false,
-		post.sticky ? [ 'sticky', post.sticky ] : false,
-		post.author ? [ 'post_author', post.author ] : false,
-	].filter( Boolean );
-
-	// We gather all the metaboxes locations data and the base form data
-	const baseFormData = new window.FormData(
-		document.querySelector( '.metabox-base-form' )
-	);
-	const activeMetaBoxLocations = yield controls.select(
-		editPostStore.name,
-		'getActiveMetaBoxLocations'
-	);
-	const formDataToMerge = [
-		baseFormData,
-		...activeMetaBoxLocations.map(
-			( location ) =>
-				new window.FormData( getMetaBoxContainer( location ) )
-		),
-	];
-
-	// Merge all form data objects into a single one.
-	const formData = reduce(
-		formDataToMerge,
-		( memo, currentFormData ) => {
-			for ( const [ key, value ] of currentFormData ) {
-				memo.append( key, value );
-			}
-			return memo;
-		},
-		new window.FormData()
-	);
-	additionalData.forEach( ( [ key, value ] ) =>
-		formData.append( key, value )
-	);
-
-	try {
-		// Save the metaboxes
-		yield apiFetch( {
-			url: window._wpMetaBoxUrl,
-			method: 'POST',
-			body: formData,
-			parse: false,
+export const requestMetaBoxUpdates =
+	() =>
+	async ( { registry, select, dispatch } ) => {
+		dispatch( {
+			type: 'REQUEST_META_BOX_UPDATES',
 		} );
-		yield controls.dispatch( editPostStore.name, 'metaBoxUpdatesSuccess' );
-	} catch {
-		yield controls.dispatch( editPostStore.name, 'metaBoxUpdatesFailure' );
-	}
-}
+
+		// Saves the wp_editor fields.
+		if ( window.tinyMCE ) {
+			window.tinyMCE.triggerSave();
+		}
+
+		// Additional data needed for backward compatibility.
+		// If we do not provide this data, the post will be overridden with the default values.
+		const post = registry.select( editorStore ).getCurrentPost();
+		const additionalData = [
+			post.comment_status
+				? [ 'comment_status', post.comment_status ]
+				: false,
+			post.ping_status ? [ 'ping_status', post.ping_status ] : false,
+			post.sticky ? [ 'sticky', post.sticky ] : false,
+			post.author ? [ 'post_author', post.author ] : false,
+		].filter( Boolean );
+
+		// We gather all the metaboxes locations data and the base form data.
+		const baseFormData = new window.FormData(
+			document.querySelector( '.metabox-base-form' )
+		);
+		const activeMetaBoxLocations = select.getActiveMetaBoxLocations();
+		const formDataToMerge = [
+			baseFormData,
+			...activeMetaBoxLocations.map(
+				( location ) =>
+					new window.FormData( getMetaBoxContainer( location ) )
+			),
+		];
+
+		// Merge all form data objects into a single one.
+		const formData = reduce(
+			formDataToMerge,
+			( memo, currentFormData ) => {
+				for ( const [ key, value ] of currentFormData ) {
+					memo.append( key, value );
+				}
+				return memo;
+			},
+			new window.FormData()
+		);
+		additionalData.forEach( ( [ key, value ] ) =>
+			formData.append( key, value )
+		);
+
+		try {
+			// Save the metaboxes.
+			await apiFetch( {
+				url: window._wpMetaBoxUrl,
+				method: 'POST',
+				body: formData,
+				parse: false,
+			} );
+			dispatch.metaBoxUpdatesSuccess();
+		} catch {
+			dispatch.metaBoxUpdatesFailure();
+		}
+	};
 
 /**
  * Returns an action object used to signal a successful meta box update.
@@ -479,52 +495,109 @@ export function setIsEditingTemplate( value ) {
 }
 
 /**
- * Potentially create a block based template and switches to the template mode.
+ * Switches to the template mode.
  *
- * @param {Object?} template template to create and assign before switching.
+ * @param {boolean} newTemplate Is new template.
  */
-export function* __unstableSwitchToTemplateMode( template ) {
-	if ( !! template ) {
-		const savedTemplate = yield controls.dispatch(
-			coreStore,
-			'saveEntityRecord',
-			'postType',
-			'wp_template',
-			template
+export const __unstableSwitchToTemplateMode =
+	( newTemplate = false ) =>
+	( { registry, select, dispatch } ) => {
+		dispatch( setIsEditingTemplate( true ) );
+		const isWelcomeGuideActive = select.isFeatureActive(
+			'welcomeGuideTemplate'
 		);
-		const post = yield controls.select(
-			editorStore.name,
-			'getCurrentPost'
-		);
+		if ( ! isWelcomeGuideActive ) {
+			const message = newTemplate
+				? __( "Custom template created. You're in template mode now." )
+				: __(
+						'Editing template. Changes made here affect all posts and pages that use the template.'
+				  );
+			registry.dispatch( noticesStore ).createSuccessNotice( message, {
+				type: 'snackbar',
+			} );
+		}
+	};
 
-		yield controls.dispatch(
-			coreStore,
-			'editEntityRecord',
-			'postType',
-			post.type,
-			post.id,
-			{
+/**
+ * Create a block based template.
+ *
+ * @param {Object?} template Template to create and assign.
+ */
+export const __unstableCreateTemplate =
+	( template ) =>
+	async ( { registry } ) => {
+		const savedTemplate = await registry
+			.dispatch( coreStore )
+			.saveEntityRecord( 'postType', 'wp_template', template );
+		const post = registry.select( editorStore ).getCurrentPost();
+		registry
+			.dispatch( coreStore )
+			.editEntityRecord( 'postType', post.type, post.id, {
 				template: savedTemplate.slug,
+			} );
+	};
+
+let metaBoxesInitialized = false;
+
+/**
+ * Initializes WordPress `postboxes` script and the logic for saving meta boxes.
+ */
+export const initializeMetaBoxes =
+	() =>
+	( { registry, select, dispatch } ) => {
+		const isEditorReady = registry
+			.select( editorStore )
+			.__unstableIsEditorReady();
+
+		if ( ! isEditorReady ) {
+			return;
+		}
+		// Only initialize once.
+		if ( metaBoxesInitialized ) {
+			return;
+		}
+		const postType = registry.select( editorStore ).getCurrentPostType();
+		if ( window.postboxes.page !== postType ) {
+			window.postboxes.add_postbox_toggles( postType );
+		}
+
+		metaBoxesInitialized = true;
+
+		let wasSavingPost = registry.select( editorStore ).isSavingPost();
+		let wasAutosavingPost = registry
+			.select( editorStore )
+			.isAutosavingPost();
+		const hasMetaBoxes = select.hasMetaBoxes();
+
+		// Save metaboxes when performing a full save on the post.
+		registry.subscribe( async () => {
+			const isSavingPost = registry.select( editorStore ).isSavingPost();
+			const isAutosavingPost = registry
+				.select( editorStore )
+				.isAutosavingPost();
+
+			// Save metaboxes on save completion, except for autosaves that are not a post preview.
+			//
+			// Meta boxes are initialized once at page load. It is not necessary to
+			// account for updates on each state change.
+			//
+			// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309.
+			const shouldTriggerMetaboxesSave =
+				hasMetaBoxes &&
+				wasSavingPost &&
+				! isSavingPost &&
+				! wasAutosavingPost;
+
+			// Save current state for next inspection.
+			wasSavingPost = isSavingPost;
+			wasAutosavingPost = isAutosavingPost;
+
+			if ( shouldTriggerMetaboxesSave ) {
+				await dispatch.requestMetaBoxUpdates();
 			}
-		);
-	}
-
-	yield setIsEditingTemplate( true );
-
-	const isWelcomeGuideActive = yield controls.select(
-		editPostStore.name,
-		'isFeatureActive',
-		'welcomeGuideTemplate'
-	);
-
-	if ( ! isWelcomeGuideActive ) {
-		const message = !! template
-			? __( "Custom template created. You're in template mode now." )
-			: __(
-					'Editing template. Changes made here affect all posts and pages that use the template.'
-			  );
-		yield controls.dispatch( noticesStore, 'createSuccessNotice', message, {
-			type: 'snackbar',
 		} );
-	}
-}
+
+		dispatch( {
+			type: 'META_BOXES_INITIALIZED',
+		} );
+	};

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { flatMap, compact } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
@@ -13,7 +8,7 @@ import { getPhrasingContentSchema } from '@wordpress/dom';
  * Internal dependencies
  */
 import { htmlToBlocks } from './html-to-blocks';
-import { parseWithGrammar } from '../parser';
+import parse from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
 import listReducer from './list-reducer';
@@ -43,7 +38,7 @@ export function deprecatedGetPhrasingContentSchema( context ) {
 export function rawHandler( { HTML = '' } ) {
 	// If we detect block delimiters, parse entirely as blocks.
 	if ( HTML.indexOf( '<!-- wp:' ) !== -1 ) {
-		return parseWithGrammar( HTML );
+		return parse( HTML );
 	}
 
 	// An array of HTML strings and block objects. The blocks replace matched
@@ -51,8 +46,8 @@ export function rawHandler( { HTML = '' } ) {
 	const pieces = shortcodeConverter( HTML );
 	const blockContentSchema = getBlockContentSchema();
 
-	return compact(
-		flatMap( pieces, ( piece ) => {
+	return pieces
+		.map( ( piece ) => {
 			// Already a block from shortcode.
 			if ( typeof piece !== 'string' ) {
 				return piece;
@@ -76,7 +71,8 @@ export function rawHandler( { HTML = '' } ) {
 			piece = deepFilterHTML( piece, filters, blockContentSchema );
 			piece = normaliseBlocks( piece );
 
-			return htmlToBlocks( piece );
+			return htmlToBlocks( piece, rawHandler );
 		} )
-	);
+		.flat()
+		.filter( Boolean );
 }

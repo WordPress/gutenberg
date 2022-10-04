@@ -6,7 +6,7 @@ import { filter } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { NoticeList, SnackbarList } from '@wordpress/components';
+import { NoticeList } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
@@ -25,9 +25,6 @@ export function EditorNotices( { notices, onRemove } ) {
 		isDismissible: false,
 		type: 'default',
 	} );
-	const snackbarNotices = filter( notices, {
-		type: 'snackbar',
-	} );
 
 	return (
 		<>
@@ -42,11 +39,6 @@ export function EditorNotices( { notices, onRemove } ) {
 			>
 				<TemplateValidationNotice />
 			</NoticeList>
-			<SnackbarList
-				notices={ snackbarNotices }
-				className="components-editor-notices__snackbar"
-				onRemove={ onRemove }
-			/>
 		</>
 	);
 }

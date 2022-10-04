@@ -1,13 +1,17 @@
 /**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
-import { controls, dispatch } from '@wordpress/data';
-import { apiFetch } from '@wordpress/data-controls';
+import deprecated from '@wordpress/deprecated';
 import { addQueryArgs, getPathAndQueryString } from '@wordpress/url';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as interfaceStore } from '@wordpress/interface';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { speak } from '@wordpress/a11y';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -16,21 +20,26 @@ import { STORE_NAME as editSiteStoreName } from './constants';
 import isTemplateRevertable from '../utils/is-template-revertable';
 
 /**
- * Returns an action object used to toggle a feature flag.
+ * Dispatches an action that toggles a feature flag.
  *
- * @param {string} feature Feature name.
- *
- * @return {Object} Action object.
+ * @param {string} featureName Feature name.
  */
-export function toggleFeature( feature ) {
-	return {
-		type: 'TOGGLE_FEATURE',
-		feature,
+export function toggleFeature( featureName ) {
+	return function ( { registry } ) {
+		deprecated( "select( 'core/edit-site' ).toggleFeature( featureName )", {
+			since: '6.0',
+			alternative:
+				"select( 'core/preferences').toggle( 'core/edit-site', featureName )",
+		} );
+
+		registry
+			.dispatch( preferencesStore )
+			.toggle( 'core/edit-site', featureName );
 	};
 }
 
 /**
- * Returns an action object used to toggle the width of the editing canvas.
+ * Action that changes the width of the editing canvas.
  *
  * @param {string} deviceType
  *
@@ -44,84 +53,113 @@ export function __experimentalSetPreviewDeviceType( deviceType ) {
 }
 
 /**
- * Returns an action object used to set a template.
+ * Action that sets a template, optionally fetching it from REST API.
  *
  * @param {number} templateId   The template ID.
  * @param {string} templateSlug The template slug.
  * @return {Object} Action object.
  */
-export function* setTemplate( templateId, templateSlug ) {
-	const pageContext = { templateSlug };
-	if ( ! templateSlug ) {
-		const template = yield controls.resolveSelect(
-			coreStore.name,
-			'getEntityRecord',
-			'postType',
-			'wp_template',
-			templateId
-		);
-		pageContext.templateSlug = template?.slug;
-	}
-	return {
-		type: 'SET_TEMPLATE',
-		templateId,
-		page: { context: pageContext },
+export const setTemplate =
+	( templateId, templateSlug ) =>
+	async ( { dispatch, registry } ) => {
+		if ( ! templateSlug ) {
+			const template = await registry
+				.resolveSelect( coreStore )
+				.getEntityRecord( 'postType', 'wp_template', templateId );
+			templateSlug = template?.slug;
+		}
+
+		dispatch( {
+			type: 'SET_TEMPLATE',
+			templateId,
+			page: { context: { templateSlug } },
+		} );
 	};
-}
 
 /**
- * Adds a new template, and sets it as the current template.
+ * Action that adds a new template and sets it as the current template.
  *
  * @param {Object} template The template.
  *
  * @return {Object} Action object used to set the current template.
  */
-export function* addTemplate( template ) {
-	const newTemplate = yield controls.dispatch(
-		coreStore.name,
-		'saveEntityRecord',
-		'postType',
-		'wp_template',
-		template
-	);
+export const addTemplate =
+	( template ) =>
+	async ( { dispatch, registry } ) => {
+		const newTemplate = await registry
+			.dispatch( coreStore )
+			.saveEntityRecord( 'postType', 'wp_template', template );
 
-	if ( template.content ) {
-		yield controls.dispatch(
-			coreStore.name,
-			'editEntityRecord',
-			'postType',
-			'wp_template',
-			newTemplate.id,
-			{ blocks: parse( template.content ) },
-			{ undoIgnore: true }
-		);
-	}
+		if ( template.content ) {
+			registry
+				.dispatch( coreStore )
+				.editEntityRecord(
+					'postType',
+					'wp_template',
+					newTemplate.id,
+					{ blocks: parse( template.content ) },
+					{ undoIgnore: true }
+				);
+		}
 
-	return {
-		type: 'SET_TEMPLATE',
-		templateId: newTemplate.id,
-		page: { context: { templateSlug: newTemplate.slug } },
+		dispatch( {
+			type: 'SET_TEMPLATE',
+			templateId: newTemplate.id,
+			page: { context: { templateSlug: newTemplate.slug } },
+		} );
 	};
-}
 
 /**
- * Removes a template, and updates the current page and template.
+ * Action that removes a template.
  *
- * @param {number} templateId The template ID.
+ * @param {Object} template The template object.
  */
-export function* removeTemplate( templateId ) {
-	yield apiFetch( {
-		path: `/wp/v2/templates/${ templateId }`,
-		method: 'DELETE',
-	} );
-	const page = yield controls.select( editSiteStoreName, 'getPage' );
-	yield controls.dispatch( editSiteStoreName, 'setPage', page );
-}
+export const removeTemplate =
+	( template ) =>
+	async ( { registry } ) => {
+		try {
+			await registry
+				.dispatch( coreStore )
+				.deleteEntityRecord( 'postType', template.type, template.id, {
+					force: true,
+				} );
+
+			const lastError = registry
+				.select( coreStore )
+				.getLastEntityDeleteError(
+					'postType',
+					template.type,
+					template.id
+				);
+
+			if ( lastError ) {
+				throw lastError;
+			}
+
+			registry.dispatch( noticesStore ).createSuccessNotice(
+				sprintf(
+					/* translators: The template/part's name. */
+					__( '"%s" deleted.' ),
+					template.title.rendered
+				),
+				{ type: 'snackbar' }
+			);
+		} catch ( error ) {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __( 'An error occurred while deleting the template.' );
+
+			registry
+				.dispatch( noticesStore )
+				.createErrorNotice( errorMessage, { type: 'snackbar' } );
+		}
+	};
 
 /**
- * Returns an action object used to set a template part.
+ * Action that sets a template part.
  *
- * @param {number} templatePartId The template part ID.
+ * @param {string} templatePartId The template part ID.
  *
  * @return {Object} Action object.
  */
@@ -133,8 +171,8 @@ export function setTemplatePart( templatePartId ) {
 }
 
 /**
- * Updates the homeTemplateId state with the templateId of the page resolved
- * from the given path.
+ * Action that sets the home template ID to the template ID of the page resolved
+ * from a given path.
  *
  * @param {number} homeTemplateId The template ID for the homepage.
  */
@@ -157,75 +195,48 @@ export function setHomeTemplateId( homeTemplateId ) {
  *
  * @return {number} The resolved template ID for the page route.
  */
-export function* setPage( page ) {
-	if ( ! page.path && page.context?.postId ) {
-		const entity = yield controls.resolveSelect(
-			coreStore.name,
-			'getEntityRecord',
-			'postType',
-			page.context.postType || 'post',
-			page.context.postId
-		);
+export const setPage =
+	( page ) =>
+	async ( { dispatch, registry } ) => {
+		if ( ! page.path && page.context?.postId ) {
+			const entity = await registry
+				.resolveSelect( coreStore )
+				.getEntityRecord(
+					'postType',
+					page.context.postType || 'post',
+					page.context.postId
+				);
+			// If the entity is undefined for some reason, path will resolve to "/"
+			page.path = getPathAndQueryString( entity?.link );
+		}
 
-		page.path = getPathAndQueryString( entity.link );
-	}
-	const { id: templateId, slug: templateSlug } = yield controls.resolveSelect(
-		coreStore.name,
-		'__experimentalGetTemplateForLink',
-		page.path
-	);
-	yield {
-		type: 'SET_PAGE',
-		page: ! templateSlug
-			? page
-			: {
-					...page,
-					context: {
-						...page.context,
-						templateSlug,
-					},
-			  },
-		templateId,
-	};
-	return templateId;
-}
+		const template = await registry
+			.resolveSelect( coreStore )
+			.__experimentalGetTemplateForLink( page.path );
 
-/**
- * Displays the site homepage for editing in the editor.
- */
-export function* showHomepage() {
-	const {
-		show_on_front: showOnFront,
-		page_on_front: frontpageId,
-	} = yield controls.resolveSelect(
-		coreStore.name,
-		'getEntityRecord',
-		'root',
-		'site'
-	);
+		if ( ! template ) {
+			return;
+		}
 
-	const { siteUrl } = yield controls.select(
-		editSiteStoreName,
-		'getSettings'
-	);
-
-	const page = {
-		path: siteUrl,
-		context:
-			showOnFront === 'page'
+		dispatch( {
+			type: 'SET_PAGE',
+			page: template.slug
 				? {
-						postType: 'page',
-						postId: frontpageId,
+						...page,
+						context: {
+							...page.context,
+							templateSlug: template.slug,
+						},
 				  }
-				: {},
+				: page,
+			templateId: template.id,
+		} );
+
+		return template.id;
 	};
 
-	const homeTemplate = yield* setPage( page );
-	yield setHomeTemplateId( homeTemplate );
-}
-
 /**
- * Returns an action object used to set the active navigation panel menu.
+ * Action that sets the active navigation panel menu.
  *
  * @param {string} menu Menu prop of active menu.
  *
@@ -264,7 +275,7 @@ export function setIsNavigationPanelOpened( isOpen ) {
 }
 
 /**
- * Returns an action object used to open/close the inserter.
+ * Opens or closes the inserter.
  *
  * @param {boolean|Object} value                Whether the inserter should be
  *                                              opened (true) or closed (false).
@@ -312,132 +323,176 @@ export function setIsListViewOpened( isOpen ) {
 /**
  * Reverts a template to its original theme-provided file.
  *
- * @param {Object} template The template to revert.
+ * @param {Object}  template            The template to revert.
+ * @param {Object}  [options]
+ * @param {boolean} [options.allowUndo] Whether to allow the user to undo
+ *                                      reverting the template. Default true.
  */
-export function* revertTemplate( template ) {
-	if ( ! isTemplateRevertable( template ) ) {
-		yield controls.dispatch(
-			noticesStore,
-			'createErrorNotice',
-			__( 'This template is not revertable.' ),
-			{ type: 'snackbar' }
-		);
-		return;
-	}
-
-	try {
-		const templateEntity = yield controls.select(
-			coreStore,
-			'getEntity',
-			'postType',
-			template.type
-		);
-		if ( ! templateEntity ) {
-			yield controls.dispatch(
-				noticesStore,
-				'createErrorNotice',
-				__(
-					'The editor has encountered an unexpected error. Please reload.'
-				),
-				{ type: 'snackbar' }
-			);
+export const revertTemplate =
+	( template, { allowUndo = true } = {} ) =>
+	async ( { registry } ) => {
+		if ( ! isTemplateRevertable( template ) ) {
+			registry
+				.dispatch( noticesStore )
+				.createErrorNotice( __( 'This template is not revertable.' ), {
+					type: 'snackbar',
+				} );
 			return;
 		}
 
-		const fileTemplatePath = addQueryArgs(
-			`${ templateEntity.baseURL }/${ template.id }`,
-			{ context: 'edit', source: 'theme' }
-		);
-		const fileTemplate = yield apiFetch( { path: fileTemplatePath } );
-		if ( ! fileTemplate ) {
-			yield controls.dispatch(
-				noticesStore,
-				'createErrorNotice',
-				__(
-					'The editor has encountered an unexpected error. Please reload.'
-				),
-				{ type: 'snackbar' }
+		try {
+			const templateEntityConfig = registry
+				.select( coreStore )
+				.getEntityConfig( 'postType', template.type );
+
+			if ( ! templateEntityConfig ) {
+				registry
+					.dispatch( noticesStore )
+					.createErrorNotice(
+						__(
+							'The editor has encountered an unexpected error. Please reload.'
+						),
+						{ type: 'snackbar' }
+					);
+				return;
+			}
+
+			const fileTemplatePath = addQueryArgs(
+				`${ templateEntityConfig.baseURL }/${ template.id }`,
+				{ context: 'edit', source: 'theme' }
 			);
-			return;
-		}
 
-		const serializeBlocks = ( { blocks: blocksForSerialization = [] } ) =>
-			__unstableSerializeAndClean( blocksForSerialization );
-		const edited = yield controls.select(
-			coreStore,
-			'getEditedEntityRecord',
-			'postType',
-			'wp_template',
-			template.id
-		);
-		// We are fixing up the undo level here to make sure we can undo
-		// the revert in the header toolbar correctly.
-		yield controls.dispatch(
-			coreStore,
-			'editEntityRecord',
-			'postType',
-			'wp_template',
-			template.id,
-			{
-				content: serializeBlocks, // required to make the `undo` behave correctly
-				blocks: edited.blocks, // required to revert the blocks in the editor
-				source: 'custom', // required to avoid turning the editor into a dirty state
-			},
-			{
-				undoIgnore: true, // required to merge this edit with the last undo level
+			const fileTemplate = await apiFetch( { path: fileTemplatePath } );
+			if ( ! fileTemplate ) {
+				registry
+					.dispatch( noticesStore )
+					.createErrorNotice(
+						__(
+							'The editor has encountered an unexpected error. Please reload.'
+						),
+						{ type: 'snackbar' }
+					);
+				return;
 			}
-		);
 
-		const blocks = parse( fileTemplate?.content?.raw );
-		yield controls.dispatch(
-			coreStore,
-			'editEntityRecord',
-			'postType',
-			'wp_template',
-			fileTemplate.id,
-			{
-				content: serializeBlocks,
-				blocks,
-				source: 'theme',
-			}
-		);
+			const serializeBlocks = ( {
+				blocks: blocksForSerialization = [],
+			} ) => __unstableSerializeAndClean( blocksForSerialization );
 
-		const undoRevert = async () => {
-			await dispatch( coreStore ).editEntityRecord(
+			const edited = registry
+				.select( coreStore )
+				.getEditedEntityRecord(
+					'postType',
+					template.type,
+					template.id
+				);
+
+			// We are fixing up the undo level here to make sure we can undo
+			// the revert in the header toolbar correctly.
+			registry.dispatch( coreStore ).editEntityRecord(
 				'postType',
-				'wp_template',
-				edited.id,
+				template.type,
+				template.id,
 				{
-					content: serializeBlocks,
-					blocks: edited.blocks,
-					source: 'custom',
+					content: serializeBlocks, // Required to make the `undo` behave correctly.
+					blocks: edited.blocks, // Required to revert the blocks in the editor.
+					source: 'custom', // required to avoid turning the editor into a dirty state
+				},
+				{
+					undoIgnore: true, // Required to merge this edit with the last undo level.
 				}
 			);
-		};
-		yield controls.dispatch(
-			noticesStore,
-			'createSuccessNotice',
-			__( 'Template reverted.' ),
-			{
-				type: 'snackbar',
-				actions: [
-					{
-						label: __( 'Undo' ),
-						onClick: undoRevert,
-					},
-				],
+
+			const blocks = parse( fileTemplate?.content?.raw );
+			registry
+				.dispatch( coreStore )
+				.editEntityRecord( 'postType', template.type, fileTemplate.id, {
+					content: serializeBlocks,
+					blocks,
+					source: 'theme',
+				} );
+
+			if ( allowUndo ) {
+				const undoRevert = () => {
+					registry
+						.dispatch( coreStore )
+						.editEntityRecord(
+							'postType',
+							template.type,
+							edited.id,
+							{
+								content: serializeBlocks,
+								blocks: edited.blocks,
+								source: 'custom',
+							}
+						);
+				};
+
+				registry
+					.dispatch( noticesStore )
+					.createSuccessNotice( __( 'Template reverted.' ), {
+						type: 'snackbar',
+						actions: [
+							{
+								label: __( 'Undo' ),
+								onClick: undoRevert,
+							},
+						],
+					} );
+			} else {
+				registry
+					.dispatch( noticesStore )
+					.createSuccessNotice( __( 'Template reverted.' ) );
 			}
-		);
-	} catch ( error ) {
-		const errorMessage =
-			error.message && error.code !== 'unknown_error'
-				? error.message
-				: __( 'Template revert failed. Please reload.' );
-		yield controls.dispatch(
-			noticesStore,
-			'createErrorNotice',
-			errorMessage,
-			{ type: 'snackbar' }
-		);
-	}
-}
+		} catch ( error ) {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __( 'Template revert failed. Please reload.' );
+			registry
+				.dispatch( noticesStore )
+				.createErrorNotice( errorMessage, { type: 'snackbar' } );
+		}
+	};
+/**
+ * Action that opens an editor sidebar.
+ *
+ * @param {?string} name Sidebar name to be opened.
+ */
+export const openGeneralSidebar =
+	( name ) =>
+	( { registry } ) => {
+		registry
+			.dispatch( interfaceStore )
+			.enableComplementaryArea( editSiteStoreName, name );
+	};
+
+/**
+ * Action that closes the sidebar.
+ */
+export const closeGeneralSidebar =
+	() =>
+	( { registry } ) => {
+		registry
+			.dispatch( interfaceStore )
+			.disableComplementaryArea( editSiteStoreName );
+	};
+
+export const switchEditorMode =
+	( mode ) =>
+	( { registry } ) => {
+		registry
+			.dispatch( 'core/preferences' )
+			.set( 'core/edit-site', 'editorMode', mode );
+
+		// Unselect blocks when we switch to a non visual mode.
+		if ( mode !== 'visual' ) {
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+		}
+
+		if ( mode === 'visual' ) {
+			speak( __( 'Visual editor selected' ), 'assertive' );
+		} else if ( mode === 'mosaic' ) {
+			speak( __( 'Mosaic view selected' ), 'assertive' );
+		}
+	};

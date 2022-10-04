@@ -11,11 +11,10 @@ import { store as blockEditorStore } from '../../store';
 
 export default function useDisplayBlockControls() {
 	const { isSelected, clientId, name } = useBlockEditContext();
-	const isFirstAndSameTypeMultiSelected = useSelect(
+	return useSelect(
 		( select ) => {
-			// Don't bother checking, see OR statement below.
 			if ( isSelected ) {
-				return;
+				return true;
 			}
 
 			const {
@@ -24,16 +23,14 @@ export default function useDisplayBlockControls() {
 				getMultiSelectedBlockClientIds,
 			} = select( blockEditorStore );
 
-			if ( ! isFirstMultiSelectedBlock( clientId ) ) {
-				return false;
+			if ( isFirstMultiSelectedBlock( clientId ) ) {
+				return getMultiSelectedBlockClientIds().every(
+					( id ) => getBlockName( id ) === name
+				);
 			}
 
-			return getMultiSelectedBlockClientIds().every(
-				( id ) => getBlockName( id ) === name
-			);
+			return false;
 		},
 		[ clientId, isSelected, name ]
 	);
-
-	return isSelected || isFirstAndSameTypeMultiSelected;
 }

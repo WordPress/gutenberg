@@ -6,17 +6,11 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalNavigation as Navigation,
-	__experimentalNavigationMenu as NavigationMenu,
-	__experimentalNavigationItem as NavigationItem,
-	Modal,
-	TabPanel,
-} from '@wordpress/components';
+
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback, useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import {
 	PostTaxonomies,
 	PostExcerptCheck,
@@ -25,12 +19,16 @@ import {
 	PostTypeSupportCheck,
 	store as editorStore,
 } from '@wordpress/editor';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	PreferencesModal,
+	PreferencesModalTabs,
+	PreferencesModalSection,
+} from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
-import Section from './section';
+
 import {
 	EnablePluginDocumentSettingPanelOption,
 	EnablePublishSidebarOption,
@@ -42,20 +40,14 @@ import { store as editPostStore } from '../../store';
 import BlockManager from '../block-manager';
 
 const MODAL_NAME = 'edit-post/preferences';
-const PREFERENCES_MENU = 'preferences-menu';
 
-export default function PreferencesModal() {
+export default function EditPostPreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { closeModal } = useDispatch( editPostStore );
-	const { isModalActive, isViewable } = useSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( editorStore );
-		const { getPostType } = select( coreStore );
-		const postType = getPostType( getEditedPostAttribute( 'type' ) );
-		return {
-			isModalActive: select( editPostStore ).isModalActive( MODAL_NAME ),
-			isViewable: get( postType, [ 'viewable' ], false ),
-		};
-	}, [] );
+	const isModalActive = useSelect(
+		( select ) => select( editPostStore ).isModalActive( MODAL_NAME ),
+		[]
+	);
 	const showBlockBreadcrumbsOption = useSelect(
 		( select ) => {
 			const { getEditorSettings } = select( editorStore );
@@ -80,7 +72,7 @@ export default function PreferencesModal() {
 				content: (
 					<>
 						{ isLargeViewport && (
-							<Section
+							<PreferencesModalSection
 								title={ __( 'Publishing' ) }
 								description={ __(
 									'Change options related to publishing.'
@@ -94,22 +86,15 @@ export default function PreferencesModal() {
 										'Include pre-publish checklist'
 									) }
 								/>
-							</Section>
+							</PreferencesModalSection>
 						) }
 
-						<Section
+						<PreferencesModalSection
 							title={ __( 'Appearance' ) }
 							description={ __(
 								'Customize options related to the block editor interface and editing flow.'
 							) }
 						>
-							<EnableFeature
-								featureName="reducedUI"
-								help={ __(
-									'Compacts options and outlines in the toolbar.'
-								) }
-								label={ __( 'Reduce the interface' ) }
-							/>
 							<EnableFeature
 								featureName="focusMode"
 								help={ __(
@@ -119,8 +104,24 @@ export default function PreferencesModal() {
 							/>
 							<EnableFeature
 								featureName="showIconLabels"
-								help={ __( 'Shows text instead of icons.' ) }
-								label={ __( 'Display button labels' ) }
+								label={ __( 'Show button text labels' ) }
+								help={ __(
+									'Show text instead of icons on buttons.'
+								) }
+							/>
+							<EnableFeature
+								featureName="showListViewByDefault"
+								help={ __(
+									'Opens the block list view sidebar by default.'
+								) }
+								label={ __( 'Always open list view' ) }
+							/>
+							<EnableFeature
+								featureName="reducedUI"
+								help={ __(
+									'Compacts options and outlines in the toolbar.'
+								) }
+								label={ __( 'Reduce the interface' ) }
 							/>
 							<EnableFeature
 								featureName="themeStyles"
@@ -138,7 +139,7 @@ export default function PreferencesModal() {
 									label={ __( 'Display block breadcrumbs' ) }
 								/>
 							) }
-						</Section>
+						</PreferencesModalSection>
 					</>
 				),
 			},
@@ -147,7 +148,7 @@ export default function PreferencesModal() {
 				tabLabel: __( 'Blocks' ),
 				content: (
 					<>
-						<Section
+						<PreferencesModalSection
 							title={ __( 'Block interactions' ) }
 							description={ __(
 								'Customize how you interact with blocks in the block library and editing canvas.'
@@ -169,15 +170,15 @@ export default function PreferencesModal() {
 									'Contain text cursor inside block'
 								) }
 							/>
-						</Section>
-						<Section
+						</PreferencesModalSection>
+						<PreferencesModalSection
 							title={ __( 'Visible blocks' ) }
 							description={ __(
 								"Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
 							) }
 						>
 							<BlockManager />
-						</Section>
+						</PreferencesModalSection>
 					</>
 				),
 			},
@@ -186,25 +187,13 @@ export default function PreferencesModal() {
 				tabLabel: __( 'Panels' ),
 				content: (
 					<>
-						<Section
+						<PreferencesModalSection
 							title={ __( 'Document settings' ) }
 							description={ __(
 								'Choose what displays in the panel.'
 							) }
 						>
 							<EnablePluginDocumentSettingPanelOption.Slot />
-							{ isViewable && (
-								<EnablePanelOption
-									label={ __( 'Permalink' ) }
-									panelName="post-link"
-								/>
-							) }
-							{ isViewable && (
-								<EnablePanelOption
-									label={ __( 'Template' ) }
-									panelName="template"
-								/>
-							) }
 							<PostTaxonomies
 								taxonomyWrapper={ ( content, taxonomy ) => (
 									<EnablePanelOption
@@ -242,105 +231,27 @@ export default function PreferencesModal() {
 									panelName="page-attributes"
 								/>
 							</PageAttributesCheck>
-						</Section>
-						<Section
+						</PreferencesModalSection>
+						<MetaBoxesSection
 							title={ __( 'Additional' ) }
 							description={ __(
 								'Add extra areas to the editor.'
 							) }
-						>
-							<MetaBoxesSection />
-						</Section>
+						/>
 					</>
 				),
 			},
 		],
-		[ isViewable, isLargeViewport, showBlockBreadcrumbsOption ]
+		[ isLargeViewport, showBlockBreadcrumbsOption ]
 	);
 
-	// This is also used to sync the two different rendered components
-	// between small and large viewports.
-	const [ activeMenu, setActiveMenu ] = useState( PREFERENCES_MENU );
-	/**
-	 * Create helper objects from `sections` for easier data handling.
-	 * `tabs` is used for creating the `TabPanel` and `sectionsContentMap`
-	 * is used for easier access to active tab's content.
-	 */
-	const { tabs, sectionsContentMap } = useMemo(
-		() =>
-			sections.reduce(
-				( accumulator, { name, tabLabel: title, content } ) => {
-					accumulator.tabs.push( { name, title } );
-					accumulator.sectionsContentMap[ name ] = content;
-					return accumulator;
-				},
-				{ tabs: [], sectionsContentMap: {} }
-			),
-		[ sections ]
-	);
-	const getCurrentTab = useCallback(
-		( tab ) => sectionsContentMap[ tab.name ] || null,
-		[ sectionsContentMap ]
-	);
 	if ( ! isModalActive ) {
 		return null;
 	}
-	let modalContent;
-	// We render different components based on the viewport size.
-	if ( isLargeViewport ) {
-		modalContent = (
-			<TabPanel
-				className="edit-post-preferences__tabs"
-				tabs={ tabs }
-				initialTabName={
-					activeMenu !== PREFERENCES_MENU ? activeMenu : undefined
-				}
-				onSelect={ setActiveMenu }
-				orientation="vertical"
-			>
-				{ getCurrentTab }
-			</TabPanel>
-		);
-	} else {
-		modalContent = (
-			<Navigation
-				activeMenu={ activeMenu }
-				onActivateMenu={ setActiveMenu }
-			>
-				<NavigationMenu menu={ PREFERENCES_MENU }>
-					{ tabs.map( ( tab ) => {
-						return (
-							<NavigationItem
-								key={ tab.name }
-								title={ tab.title }
-								navigateToMenu={ tab.name }
-							/>
-						);
-					} ) }
-				</NavigationMenu>
-				{ sections.map( ( section ) => {
-					return (
-						<NavigationMenu
-							key={ `${ section.name }-menu` }
-							menu={ section.name }
-							title={ section.tabLabel }
-							parentMenu={ PREFERENCES_MENU }
-						>
-							<NavigationItem>{ section.content }</NavigationItem>
-						</NavigationMenu>
-					);
-				} ) }
-			</Navigation>
-		);
-	}
+
 	return (
-		<Modal
-			className="edit-post-preferences-modal"
-			title={ __( 'Preferences' ) }
-			closeLabel={ __( 'Close' ) }
-			onRequestClose={ closeModal }
-		>
-			{ modalContent }
-		</Modal>
+		<PreferencesModal closeModal={ closeModal }>
+			<PreferencesModalTabs sections={ sections } />
+		</PreferencesModal>
 	);
 }

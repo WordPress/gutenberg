@@ -1,12 +1,8 @@
-// Specificity required to ensure overlay width is not restricted to that
-// of standard block content.  The overlay's width should be as wide as
-// its children require.
-.editor-styles-wrapper .wp-block .block-editor-block-content-overlay__overlay {
-	max-width: none;
-}
+.block-editor-block-list__block.has-block-overlay {
+	cursor: default;
 
-.block-editor-block-content-overlay {
-	.block-editor-block-content-overlay__overlay {
+	&::before {
+		content: "";
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -15,27 +11,30 @@
 		background: transparent;
 		border: none;
 		border-radius: $radius-block-ui;
-		z-index: z-index(".block-editor-block-content-overlay__overlay");
+		z-index: z-index(".block-editor-block-list__block.has-block-overlay");
 	}
 
-	&:hover:not(.is-dragging-blocks),
-	&.parent-highlighted {
-		> .block-editor-block-content-overlay__overlay {
-			background: rgba(var(--wp-admin-theme-color--rgb), 0.1);
-			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color) inset;
-		}
+	&::after {
+		content: none !important;
 	}
 
-	&.overlay-active:not(.is-dragging-blocks) {
-		*:not(.block-editor-block-content-overlay__overlay) {
-			pointer-events: none;
-		}
+	&:hover:not(.is-dragging-blocks)::before {
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.3);
+		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color) inset;
 	}
 
-	&.is-dragging-blocks {
-		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
-		.block-editor-block-content-overlay__overlay {
-			pointer-events: none;
-		}
+	&.is-selected:not(.is-dragging-blocks)::before {
+		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color) inset;
+	}
+
+	.block-editor-block-list__block {
+		pointer-events: none;
+	}
+
+	.block-editor-iframe__body.is-zoomed-out &::before {
+		// Unfortunately because of the vw unit, this is not always going to be exact
+		// When the scrollbar is visible, the frame exceeds the canvas by a few pixels.
+		width: calc(100vw);
+		left: calc(( 100% - 100vw ) / 2);
 	}
 }

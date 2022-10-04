@@ -27,11 +27,16 @@ const ColorSettingsMemo = memo(
 		colorValue,
 		gradientValue,
 		onGradientChange,
+		onColorCleared,
 		label,
+		hideNavigation,
 	} ) => {
 		useEffect( () => {
 			shouldEnableBottomSheetMaxHeight( true );
 			onHandleClosingBottomSheet( null );
+			// Disable reason: deferring this refactor to the native team.
+			// see https://github.com/WordPress/gutenberg/pull/41166
+			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [] );
 		return (
 			<BottomSheet.NavigationContainer>
@@ -43,7 +48,9 @@ const ColorSettingsMemo = memo(
 						colorValue,
 						gradientValue,
 						onGradientChange,
+						onColorCleared,
 						label,
+						hideNavigation,
 					} }
 				>
 					<PaletteScreen />
@@ -64,10 +71,8 @@ const ColorSettingsMemo = memo(
 );
 function ColorSettings( props ) {
 	const route = useRoute();
-	const {
-		onHandleClosingBottomSheet,
-		shouldEnableBottomSheetMaxHeight,
-	} = useContext( BottomSheetContext );
+	const { onHandleClosingBottomSheet, shouldEnableBottomSheetMaxHeight } =
+		useContext( BottomSheetContext );
 
 	return (
 		<ColorSettingsMemo

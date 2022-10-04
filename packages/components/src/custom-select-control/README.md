@@ -50,6 +50,7 @@ function MyCustomSelectControl() {
 	const [ , setFontSize ] = useState();
 	return (
 		<CustomSelectControl
+			__nextUnconstrainedWidth
 			label="Font Size"
 			options={ options }
 			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }
@@ -61,6 +62,7 @@ function MyControlledCustomSelectControl() {
 	const [ fontSize, setFontSize ] = useState( options[ 0 ] );
 	return (
 		<CustomSelectControl
+			__nextUnconstrainedWidth
 			label="Font Size"
 			options={ options }
 			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }
@@ -93,6 +95,13 @@ The label for the control.
 -   Type: `String`
 -   Required: Yes
 
+#### describedBy
+
+Pass in a description that will be shown to screen readers associated with the select trigger button. If no value is passed, the text "Currently selected: selectedItem.name" will be used fully translated.
+
+-   Type: `String`
+-   Required: No
+
 #### options
 
 The options that can be chosen from.
@@ -113,6 +122,14 @@ Can be used to externally control the value of the control, like in the `MyContr
 
 -   Type: `Object`
 -   Required: No
+
+#### __nextUnconstrainedWidth
+
+Start opting into the unconstrained width style that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
 
 ## Related components
 

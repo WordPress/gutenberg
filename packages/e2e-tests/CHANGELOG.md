@@ -2,6 +2,43 @@
 
 ## Unreleased
 
+### New features
+
+-   Added Autocomplete Component e2e test suite. [#42905](https://github.com/WordPress/gutenberg/pull/42905).
+
+## 5.2.0 (2022-09-21)
+
+## 5.0.0 (2022-08-24)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
+## 4.0.0 (2022-04-08)
+
+### Breaking Changes
+
+-   There's currently an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate E2E tests to Playwright instead. This package is deprecated and will only accept bug fixes until fully migrated.
+
+## 3.0.0 (2022-01-27)
+
+### Breaking Changes
+
+-   The peer `puppeteer` dependency has been replaced with `puppeteer-core` requiring version `>=11` (see [Breaking Changes](https://github.com/puppeteer/puppeteer/releases/tag/v11.0.0), [#36040](https://github.com/WordPress/gutenberg/pull/36040)).
+-   The peer `jest` dependency has been updated from requiring `>=26` to requiring `>=27` (see [Breaking Changes](https://jestjs.io/blog/2021/05/25/jest-27), [#33287](https://github.com/WordPress/gutenberg/pull/33287)).
+
+## 2.5.0 (2021-09-09)
+
+### New Features
+
+-   Emulate `prefers-reduced-motion: reduce` [#34132](https://github.com/WordPress/gutenberg/pull/34132).
+
+## 2.4.0 (2021-07-29)
+
+### New Features
+
+-   Bail out tests if a prior snapshot failed. Fixed a bug which failing snapshots won't trigger screenshots [#33448](https://github.com/WordPress/gutenberg/pull/33448).
+
 ## 2.0.0 (2021-01-21)
 
 ### Breaking Changes

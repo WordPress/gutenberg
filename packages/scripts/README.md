@@ -16,7 +16,7 @@ You only need to install one npm module:
 npm install @wordpress/scripts --save-dev
 ```
 
-**Note**: This package requires Node.js 12.0.0 or later, and `npm` 6.9.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js 14.0.0 or later, and `npm` 6.14.4 or later. It is not compatible with older versions.
 
 ## Setup
 
@@ -34,9 +34,9 @@ _Example:_
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
 		"lint:md:docs": "wp-scripts lint-md-docs",
-		"lint:md:js": "wp-scripts lint-md-js",
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
 		"start": "wp-scripts start",
 		"test:e2e": "wp-scripts test-e2e",
 		"test:unit": "wp-scripts test-unit-js"
@@ -44,7 +44,11 @@ _Example:_
 }
 ```
 
-It might also be a good idea to get familiar with the [JavaScript Build Setup tutorial](/docs/how-to-guides/javascript/js-build-setup.md) for setting up a development environment to use ESNext syntax. It gives a very in-depth explanation of how to use the [build](#build) and [start](#start) scripts.
+It might also be a good idea to get familiar with the [JavaScript Build Setup tutorial](https://github.com/WordPress/gutenberg/tree/HEAD/docs/how-to-guides/javascript/js-build-setup.md) for setting up a development environment to use ESNext syntax. It gives a very in-depth explanation of how to use the [build](#build) and [start](#start) scripts.
+
+## Automatic block.json detection and the source code directory
+
+When using the `start` or `build` commands, the source code directory ( the default is `./src`) and its subdirectories are scanned for the existence of `block.json` files. If one or more are found, they are treated a entry points and will be output into corresponding folders in the `build` directory. This allows for the creation of multiple blocks that use a single build process. The source directory can be customized using the `--webpack-src-dir` flag.
 
 ## Updating to New Release
 
@@ -58,7 +62,23 @@ We commit to keeping the breaking changes minimal so you can upgrade `@wordpress
 
 ### `build`
 
-Transforms your code according the configuration provided so it’s ready for production and optimized for the best performance. The entry point for your project’s code should be located in `src/index.js`. The output generated will be written to `build/index.js`. This script exits after producing a single build. For incremental builds, better suited for development, see the [start](#start) script.
+Transforms your code according the configuration provided so it’s ready for production and optimized for the best performance.
+
+_This script exits after producing a single build. For incremental builds, better suited for development, see the [start](#start) script._
+
+The entry points for your project get detected by scanning all script fields in `block.json` files located in the `src` directory. The script fields in `block.json` should pass relative paths to `block.json` in the same folder.
+
+_Example:_
+
+```json
+{
+	"editorScript": "file:index.js",
+	"script": "file:script.js",
+	"viewScript": "file:view.js"
+}
+```
+
+The fallback entry point is `src/index.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) in case there is no `block.json` file found. In that scenario, the output generated will be written to `build/index.js`.
 
 _Example:_
 
@@ -66,7 +86,9 @@ _Example:_
 {
 	"scripts": {
 		"build": "wp-scripts build",
-		"build:custom": "wp-scripts build entry-one.js entry-two.js --output-path=custom"
+		"build:custom": "wp-scripts build entry-one.js entry-two.js --output-path=custom",
+		"build:copy-php": "wp-scripts build --webpack-copy-php",
+		"build:custom-directory": "wp-scripts build --webpack-src-dir=custom-directory"
 	}
 }
 ```
@@ -74,12 +96,16 @@ _Example:_
 This is how you execute the script with presented setup:
 
 -   `npm run build` - builds the code for production.
--   `npm run build:custom` - builds the code for production with two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
+-   `npm run build:custom` - builds the code for production with two entry points and a custom output directory. Paths for custom entry points are relative to the project root.
+-   `npm run build:copy-php` - builds the code for production and opts into copying all PHP files from the `src` directory and its subfolders to the output directory. By default, only PHP files listed in the `render` field in the detected `block.json` files get copied.
+-   `build:custom-directory` - builds the code for production using the `custom-directory` as the source code directory.
 
 This script automatically use the optimized config but sometimes you may want to specify some custom options:
 
--   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
 -   `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
+-   `--webpack-copy-php` – enables copying all PHP files from the source directory ( default is `src` ) and its subfolders to the output directory.
+-   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
+-   `--webpack-src-dir` – Allows customization of the source code directory. Default is `src`.
 
 #### Advanced information
 
@@ -130,7 +156,7 @@ _Flags_:
 
 ### `format`
 
-It helps to enforce coding style guidelines for your files (JavaScript, YAML) by formatting source code in a consistent way.
+It helps to enforce coding style guidelines for your files (enabled by default for JavaScript, JSON, TypeScript, YAML) by formatting source code in a consistent way.
 
 _Example:_
 
@@ -154,7 +180,7 @@ By default, files located in `build`, `node_modules`, and `vendor` folders are i
 
 ### `lint-js`
 
-Helps enforce coding style guidelines for your JavaScript files.
+Helps enforce coding style guidelines for your JavaScript and TypeScript files.
 
 _Example:_
 
@@ -169,8 +195,8 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm run lint:js` - lints JavaScript files in the entire project’s directories.
--   `npm run lint:js:src` - lints JavaScript files in the project’s `src` subfolder’s directories.
+-   `npm run lint:js` - lints JavaScript and TypeScript files in the entire project’s directories.
+-   `npm run lint:js:src` - lints JavaScript and TypeScript files in the project’s `src` subfolder’s directories.
 
 When you run commands similar to the `npm run lint:js:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them. See [more examples](https://eslint.org/docs/user-guide/command-line-interface).
 
@@ -232,30 +258,6 @@ By default, files located in `build`, `node_modules`, and `vendor` folders are i
 
 It uses [markdownlint](https://github.com/DavidAnson/markdownlint) with the [.markdownlint.json](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/config/.markdownlint.json) configuration. This configuration tunes the linting rules to match WordPress standard, you can override with your own config, see [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli/) for command-line parameters.
 
-### `lint-md-js`
-
-Uses ESLint to lint the source included in markdown files to enforce standards for JS code.
-
-_Example:_
-
-```json
-{
-	"scripts": {
-		"lint:md:js": "wp-scripts lint-md-js"
-	}
-}
-```
-
-This is how you execute the script with presented setup:
-
--   `npm run lint:md:js` - lints markdown files in the entire project’s directories.
-
-By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
-
-#### Advanced information
-
-It uses [eslint-plugin-markdown](https://github.com/eslint/eslint-plugin-markdown) with the [.eslintrc-md.js](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/config/.eslintrc-md.js) configuration. This configuration tunes down the linting rules since documentation often includes just snippets of code. It is recommended to use the markdown linting as a check, but not necessarily a blocker since it might report more false errors.
-
 ### `lint-style`
 
 Helps enforce coding style guidelines for your style files.
@@ -282,7 +284,7 @@ By default, files located in `build`, `node_modules`, and `vendor` folders are i
 
 #### Advanced information
 
-It uses [stylelint](https://github.com/stylelint/stylelint) with the [@wordpress/stylelint-config](<(https://www.npmjs.com/package/@wordpress/stylelint-config)>) configuration per the [WordPress CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://stylelint.io/user-guide/configure). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [stylelint](https://github.com/stylelint/stylelint) with the [@wordpress/stylelint-config](https://www.npmjs.com/package/@wordpress/stylelint-config) configuration per the [WordPress CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://stylelint.io/user-guide/configure). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `packages-update`
 
@@ -299,13 +301,61 @@ _Example:_
 }
 ```
 
+This script provides the following custom options:
+
+-   `--dist-tag` – allows specifying a custom dist-tag when updating npm packages. Defaults to `latest`. This is especially useful when using [`@wordpress/dependency-extraction-webpack-plugin`](https://www.npmjs.com/package/@wordpress/dependency-extraction-webpack-plugin). It lets installing the npm dependencies at versions used by the given WordPress major version for local testing, etc. Example: `wp-scripts packages-update --dist-tag=wp-6.0`.
+
 #### Advanced information
 
-The command checks which packages whose name starts with `@wordpress/` are used in the project by reading the package.json file, and then executes `npm install @wordpress/package1@latest @wordpress/package2@latest ... --save` to change the package versions to the latest one.
+The command detects project dependencies that have name starting with `@wordpress/` by scanning the `package.json` file. By default, it executes `npm install @wordpress/package1@latest @wordpress/package2@latest ... --save` to change the package versions to the latest one. You can chose a different dist-tag than `latest` by using the `--dist-tag` option when running the command.
+
+### `plugin-zip`
+
+Creates a zip file for a WordPress plugin.
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"plugin-zip": "wp-scripts plugin-zip"
+	}
+}
+```
+
+By default, it uses [Plugin Handbook best practices](https://developer.wordpress.org/plugins/plugin-basics/best-practices/#file-organization) to discover files.
+
+#### Advanced information
+
+In the case where the plugin author wants to customize the files included in the zip file, they can provide the `files` field in the `package.json` file as documented in the [`npm-packlist`](https://www.npmjs.com/package/npm-packlist) package, example:
+
+```json
+{
+	"files": [ "dir" ]
+}
+```
+
+It reuses the same logic as `npm pack` command to create an npm package tarball.
 
 ### `start`
 
-Transforms your code according the configuration provided so it’s ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. The entry point for your project’s code should be located in `src/index.js`. The output generated will be written to `build/index.js`. For single builds, better suited for production, see the [build](#build) script.
+Transforms your code according the configuration provided so it’s ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console.
+
+_For single builds, better suited for production, see the [build](#build) script._
+
+The entry points for your project get detected by scanning all script fields in `block.json` files located in the `src` directory. The script fields in `block.json` should pass relative paths to `block.json` in the same folder.
+
+_Example:_
+
+```json
+{
+	"editorScript": "file:index.js",
+	"script": "file:script.js",
+	"viewScript": "file:view.js"
+}
+```
+
+The fallback entry point is `src/index.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) in case there is no `block.json` file found. In that scenario, the output generated will be written to `build/index.js`.
 
 _Example:_
 
@@ -313,7 +363,10 @@ _Example:_
 {
 	"scripts": {
 		"start": "wp-scripts start",
-		"start:custom": "wp-scripts start entry-one.js entry-two.js --output-path=custom"
+		"start:hot": "wp-scripts start --hot",
+		"start:custom": "wp-scripts start entry-one.js entry-two.js --output-path=custom",
+		"start:copy-php": "wp-scripts start --webpack-copy-php",
+		"start:custom-directory": "wp-scripts start --webpack-src-dir=custom-directory"
 	}
 }
 ```
@@ -321,13 +374,19 @@ _Example:_
 This is how you execute the script with presented setup:
 
 -   `npm start` - starts the build for development.
--   `npm run start:custom` - starts the build for development which contains two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
+-   `npm run start:hot` - starts the build for development with "Fast Refresh". The page will automatically reload if you make changes to the files.
+-   `npm run start:custom` - starts the build for development which contains two entry points and a custom output directory. Paths for custom entry points are relative to the project root.
+-   `npm run start:copy-php` - starts the build for development and opts into copying all PHP files from the `src` directory and its subfolders to the output directory. By default, only PHP files listed in the `render` field in the detected `block.json` files get copied.
+-   `npm run start:custom-directory` - builds the code for production using the `custom-directory` as the source code directory.
 
 This script automatically use the optimized config but sometimes you may want to specify some custom options:
 
--   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
+-   `--hot` – enables "Fast Refresh". The page will automatically reload if you make changes to the code. _For now, it requires that WordPress has the [`SCRIPT_DEBUG`](https://wordpress.org/support/article/debugging-in-wordpress/#script_debug) flag enabled and the [Gutenberg](https://wordpress.org/plugins/gutenberg/) plugin installed._
 -   `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
--   `--webpack--devtool` – controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool.
+-   `--webpack-copy-php` – enables copying all PHP files from the source directory ( default is `src` ) and its subfolders to the output directory.
+-   `--webpack-devtool` – controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool.
+-   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
+-   `--webpack-src-dir` – Allows customization of the source code directory. Default is `src`.
 
 #### Advanced information
 
@@ -359,19 +418,25 @@ This is how you execute those scripts using the presented setup:
 -   `npm run test:e2e:help` - prints all available options to configure e2e test runner.
 -   `npm run test-e2e -- --puppeteer-interactive` - runs all e2e tests interactively.
 -   `npm run test-e2e FILE_NAME -- --puppeteer-interactive` - runs one test file interactively.
--   `npm run test-e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
--   `npm run test-e2e:debug` - runs all tests interactively and enables [debugging tests](#debugging-e2e-tests).
+-   `npm run test:e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
+-   `npm run test:e2e:debug` - runs all tests interactively and enables [debugging tests](#debugging-e2e-tests).
 
 Jest will look for test files with any of the following popular naming conventions:
 
--   Files with `.js` (or `.ts`) suffix at any level of depth in `spec` folders.
--   Files with `.spec.js` (or `.spec.ts`) suffix.
+-   Files with `.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix at any level of depth in `spec` folders.
+-   Files with `.spec.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix.
 
 This script automatically detects the best config to start Puppeteer but sometimes you may need to specify custom options:
 
 -   You can add a `jest-puppeteer.config.js` at the root of the project or define a custom path using `JEST_PUPPETEER_CONFIG` environment variable. Check [jest-puppeteer](https://github.com/smooth-code/jest-puppeteer#jest-puppeteerconfigjs) for more details.
 
 We enforce that all tests run serially in the current process using [--runInBand](https://jestjs.io/docs/en/cli#runinband) Jest CLI option to avoid conflicts between tests caused by the fact that they share the same WordPress instance.
+
+#### Failed Test Artifacts
+
+When tests fail, both a screenshot and an HTML snapshot will be taken of the page and stored in the `artifacts/` directory at the root of your project. These snapshots may help debug failed tests during development or when running tests in a CI environment.
+
+The `artifacts/` directory can be customized by setting the `WP_ARTIFACTS_PATH` environment variable to the relative path of the desired directory within your project's root. For example: to change the default directory from `artifacts/` to `my/custom/artifacts`, you could use `WP_ARTIFACTS_PATH=my/custom/artifacts npm run test:e2e`.
 
 #### Advanced information
 
@@ -411,9 +476,9 @@ This is how you execute those scripts using the presented setup:
 
 Jest will look for test files with any of the following popular naming conventions:
 
--   Files with `.js` (or `.ts`) suffix located at any level of depth in `__tests__` folders.
--   Files with `.js` (or `.ts`) suffix directly located in `test` folders.
--   Files with `.test.js` (or `.test.ts`) suffix.
+-   Files with `.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix located at any level of depth in `__tests__` folders.
+-   Files with `.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix directly located in `test` folders.
+-   Files with `.test.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) suffix.
 
 #### Advanced information
 
@@ -489,15 +554,16 @@ The `build` and `start` commands use [webpack](https://webpack.js.org/) behind t
 
 `@wordpress/scripts` bundles the default webpack config used as a base by the WordPress editor. These are the defaults:
 
--   [Entry](https://webpack.js.org/configuration/entry-context/#entry): `src/index.js`
--   [Output](https://webpack.js.org/configuration/output): `build/index.js`
+-   [Entry](https://webpack.js.org/configuration/entry-context/#entry): the entry points for your project get detected by scanning all script fields in `block.json` files located in the `src` directory. The fallback entry point is `src/index.js` (other supported extensions: `.jsx`, `.ts`, and `.tsx`) in case there is no `block.json` file found.
+-   [Output](https://webpack.js.org/configuration/output): `build/[name].js`, for example: `build/index.js`, or `build/my-block/index.js`.
 -   [Loaders](https://webpack.js.org/loaders/):
-    -   [`babel-loader`](https://webpack.js.org/loaders/babel-loader/) allows transpiling JavaScript files using Babel and webpack.
+    -   [`babel-loader`](https://webpack.js.org/loaders/babel-loader/) allows transpiling JavaScript and TypeScript files using Babel and webpack.
     -   [`@svgr/webpack`](https://www.npmjs.com/package/@svgr/webpack) and [`url-loader`](https://webpack.js.org/loaders/url-loader/) makes it possible to handle SVG files in JavaScript code.
     -   [`css-loader`](https://webpack.js.org/loaders/css-loader/) chained with [`postcss-loader`](https://webpack.js.org/loaders/postcss-loader/) and [sass-loader](https://webpack.js.org/loaders/sass-loader/) let webpack process CSS, SASS or SCSS files referenced in JavaScript files.
 -   [Plugins](https://webpack.js.org/configuration/plugins) (among others):
+    -   [`CopyWebpackPlugin`](https://webpack.js.org/plugins/copy-webpack-plugin/) copies all `block.json` files discovered in the `src` directory to the build directory.
     -   [`MiniCssExtractPlugin`](https://webpack.js.org/plugins/mini-css-extract-plugin/) extracts CSS into separate files. It creates a CSS file per JavaScript entry point which contains CSS.
-    -   [`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md) is used with the default configuration to ensure that WordPress provided scripts are not included in the built bundle.
+    -   [`@wordpress/dependency-extraction-webpack-plugin`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/dependency-extraction-webpack-plugin/README.md) is used with the default configuration to ensure that WordPress provided scripts are not included in the built bundle.
 
 #### Using CSS
 
@@ -544,7 +610,7 @@ You can also bundle CSS modules by prefixing `.module` to the extension, e.g. `s
 
 #### Using fonts and images
 
-It is possible to reference font (`woff`, `woff2`, `eot`, `ttf` and `otf`) and image (`bmp`, `png`, `jpg`, `jpeg` and `gif`) files from CSS that is controlled by webpack as explained in the previous section.
+It is possible to reference font (`woff`, `woff2`, `eot`, `ttf` and `otf`) and image (`bmp`, `png`, `jpg`, `jpeg`, `gif` and `wepb`) files from CSS that is controlled by webpack as explained in the previous section.
 
 _Example:_
 
@@ -610,6 +676,15 @@ module.exports = {
 };
 ```
 
-If you follow this approach, please, be aware that future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
+If you follow this approach, please, be aware that:
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+- You should keep using the `wp-scripts` commands (`start` and `build`). Do not use `webpack` directly.
+- Future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
+
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

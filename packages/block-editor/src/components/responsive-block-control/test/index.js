@@ -1,15 +1,13 @@
 /**
  * External dependencies
  */
-import { render, unmountComponentAtNode } from 'react-dom';
-import { act, Simulate } from 'react-dom/test-utils';
-import { uniqueId } from 'lodash';
+import { render } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
  */
 import { Fragment, useState } from '@wordpress/element';
-
 import { SelectControl } from '@wordpress/components';
 
 /**
@@ -17,21 +15,7 @@ import { SelectControl } from '@wordpress/components';
  */
 import ResponsiveBlockControl from '../index';
 
-let container = null;
-beforeEach( () => {
-	// setup a DOM element as a render target
-	container = document.createElement( 'div' );
-	document.body.appendChild( container );
-} );
-
-afterEach( () => {
-	// cleanup on exiting
-	unmountComponentAtNode( container );
-	container.remove();
-	container = null;
-} );
-
-const inputId = uniqueId();
+const inputId = 'input-12345678';
 
 const sizeOptions = [
 	{
@@ -66,16 +50,13 @@ const renderTestDefaultControlComponent = ( labelComponent, device ) => {
 
 describe( 'Basic rendering', () => {
 	it( 'should render with required props', () => {
-		act( () => {
-			render(
-				<ResponsiveBlockControl
-					title="Padding"
-					property="padding"
-					renderDefaultControl={ renderTestDefaultControlComponent }
-				/>,
-				container
-			);
-		} );
+		const { container } = render(
+			<ResponsiveBlockControl
+				title="Padding"
+				property="padding"
+				renderDefaultControl={ renderTestDefaultControlComponent }
+			/>
+		);
 
 		const activePropertyLabel = Array.from(
 			container.querySelectorAll( 'legend' )
@@ -97,8 +78,9 @@ describe( 'Basic rendering', () => {
 			)
 		);
 
-		const toggleState = container.querySelector( 'input[type="checkbox"]' )
-			.checked;
+		const toggleState = container.querySelector(
+			'input[type="checkbox"]'
+		).checked;
 
 		const defaultControlGroup = container.querySelector(
 			'.block-editor-responsive-block-control__group:not(.is-responsive)'
@@ -121,40 +103,31 @@ describe( 'Basic rendering', () => {
 	} );
 
 	it( 'should not render without valid legend', () => {
-		act( () => {
-			render(
-				<ResponsiveBlockControl
-					property="padding"
-					renderDefaultControl={ renderTestDefaultControlComponent }
-				/>,
-				container
-			);
-		} );
+		const { container } = render(
+			<ResponsiveBlockControl
+				property="padding"
+				renderDefaultControl={ renderTestDefaultControlComponent }
+			/>
+		);
 
 		expect( container.innerHTML ).toBe( '' );
 	} );
 
 	it( 'should not render without valid property', () => {
-		act( () => {
-			render(
-				<ResponsiveBlockControl
-					title="Padding"
-					renderDefaultControl={ renderTestDefaultControlComponent }
-				/>,
-				container
-			);
-		} );
+		const { container } = render(
+			<ResponsiveBlockControl
+				title="Padding"
+				renderDefaultControl={ renderTestDefaultControlComponent }
+			/>
+		);
 
 		expect( container.innerHTML ).toBe( '' );
 	} );
 
 	it( 'should not render without valid default control render prop', () => {
-		act( () => {
-			render(
-				<ResponsiveBlockControl title="Padding" property="padding" />,
-				container
-			);
-		} );
+		const { container } = render(
+			<ResponsiveBlockControl title="Padding" property="padding" />
+		);
 
 		expect( container.innerHTML ).toBe( '' );
 	} );
@@ -162,17 +135,14 @@ describe( 'Basic rendering', () => {
 	it( 'should render with custom label for toggle control when provided', () => {
 		const customToggleLabel =
 			'Utilise a matching padding value on all viewports';
-		act( () => {
-			render(
-				<ResponsiveBlockControl
-					title="Padding"
-					property="padding"
-					renderDefaultControl={ renderTestDefaultControlComponent }
-					toggleLabel={ customToggleLabel }
-				/>,
-				container
-			);
-		} );
+		const { container } = render(
+			<ResponsiveBlockControl
+				title="Padding"
+				property="padding"
+				renderDefaultControl={ renderTestDefaultControlComponent }
+				toggleLabel={ customToggleLabel }
+			/>
+		);
 
 		const actualToggleLabel = container.querySelector(
 			'label.components-toggle-control__label'
@@ -184,17 +154,14 @@ describe( 'Basic rendering', () => {
 	it( 'should pass custom label for default control group to the renderDefaultControl function when provided', () => {
 		const customDefaultControlGroupLabel = 'Everything';
 
-		act( () => {
-			render(
-				<ResponsiveBlockControl
-					title="Padding"
-					property="padding"
-					renderDefaultControl={ renderTestDefaultControlComponent }
-					defaultLabel={ customDefaultControlGroupLabel }
-				/>,
-				container
-			);
-		} );
+		const { container } = render(
+			<ResponsiveBlockControl
+				title="Padding"
+				property="padding"
+				renderDefaultControl={ renderTestDefaultControlComponent }
+				defaultLabel={ customDefaultControlGroupLabel }
+			/>
+		);
 
 		const defaultControlLabel = Array.from(
 			container.querySelectorAll( 'label' )
@@ -206,17 +173,14 @@ describe( 'Basic rendering', () => {
 
 describe( 'Default and Responsive modes', () => {
 	it( 'should render in responsive mode when isResponsive prop is set to true', () => {
-		act( () => {
-			render(
-				<ResponsiveBlockControl
-					title="Padding"
-					property="padding"
-					isResponsive={ true }
-					renderDefaultControl={ renderTestDefaultControlComponent }
-				/>,
-				container
-			);
-		} );
+		const { container } = render(
+			<ResponsiveBlockControl
+				title="Padding"
+				property="padding"
+				isResponsive={ true }
+				renderDefaultControl={ renderTestDefaultControlComponent }
+			/>
+		);
 
 		const defaultControlGroup = container.querySelector(
 			'.block-editor-responsive-block-control__group:not(.is-responsive)'
@@ -253,18 +217,15 @@ describe( 'Default and Responsive modes', () => {
 			renderTestDefaultControlComponent
 		);
 
-		act( () => {
-			render(
-				<ResponsiveBlockControl
-					title="Padding"
-					property="padding"
-					isResponsive={ true }
-					renderDefaultControl={ mockRenderDefaultControl }
-					viewports={ customViewportSet }
-				/>,
-				container
-			);
-		} );
+		const { container } = render(
+			<ResponsiveBlockControl
+				title="Padding"
+				property="padding"
+				isResponsive={ true }
+				renderDefaultControl={ mockRenderDefaultControl }
+				viewports={ customViewportSet }
+			/>
+		);
 
 		const defaultRenderControlCall = 1;
 
@@ -287,7 +248,10 @@ describe( 'Default and Responsive modes', () => {
 		);
 	} );
 
-	it( 'should switch between default and responsive modes when interacting with toggle control', () => {
+	it( 'should switch between default and responsive modes when interacting with toggle control', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 		const ResponsiveBlockControlConsumer = () => {
 			const [ isResponsive, setIsResponsive ] = useState( false );
 
@@ -304,9 +268,7 @@ describe( 'Default and Responsive modes', () => {
 			);
 		};
 
-		act( () => {
-			render( <ResponsiveBlockControlConsumer />, container );
-		} );
+		const { container } = render( <ResponsiveBlockControlConsumer /> );
 
 		let defaultControlGroup = container.querySelector(
 			'.block-editor-responsive-block-control__group:not(.is-responsive)'
@@ -315,7 +277,7 @@ describe( 'Default and Responsive modes', () => {
 			'.block-editor-responsive-block-control__group.is-responsive'
 		);
 
-		// Select elements based on what the user can see
+		// Select elements based on what the user can see.
 		const toggleLabel = Array.from(
 			container.querySelectorAll( 'label' )
 		).find( ( label ) =>
@@ -331,10 +293,8 @@ describe( 'Default and Responsive modes', () => {
 		expect( defaultControlGroup ).not.toBeNull();
 		expect( responsiveControlGroup ).toBeNull();
 
-		// Toggle to "responsive" mode
-		act( () => {
-			Simulate.change( toggleInput, { target: { checked: false } } );
-		} );
+		// Toggle to "responsive" mode.
+		await user.click( toggleInput );
 
 		defaultControlGroup = container.querySelector(
 			'.block-editor-responsive-block-control__group:not(.is-responsive)'
@@ -346,10 +306,8 @@ describe( 'Default and Responsive modes', () => {
 		expect( defaultControlGroup ).toBeNull();
 		expect( responsiveControlGroup ).not.toBeNull();
 
-		// Toggle back to "default" mode
-		act( () => {
-			Simulate.change( toggleInput, { target: { checked: true } } );
-		} );
+		// Toggle back to "default" mode.
+		await user.click( toggleInput );
 
 		defaultControlGroup = container.querySelector(
 			'.block-editor-responsive-block-control__group:not(.is-responsive)'
@@ -382,20 +340,17 @@ describe( 'Default and Responsive modes', () => {
 			} );
 		} );
 
-		act( () => {
-			render(
-				<ResponsiveBlockControl
-					title="Padding"
-					property="padding"
-					isResponsive={ true }
-					renderDefaultControl={ spyRenderDefaultControl }
-					renderResponsiveControls={ mockRenderResponsiveControls }
-				/>,
-				container
-			);
-		} );
+		const { container } = render(
+			<ResponsiveBlockControl
+				title="Padding"
+				property="padding"
+				isResponsive={ true }
+				renderDefaultControl={ spyRenderDefaultControl }
+				renderResponsiveControls={ mockRenderResponsiveControls }
+			/>
+		);
 
-		// The user should see "range" controls so we can legitimately query for them here
+		// The user should see "range" controls so we can legitimately query for them here.
 		const customControls = Array.from(
 			container.querySelectorAll( 'input[type="range"]' )
 		);

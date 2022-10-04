@@ -14,7 +14,8 @@ import { cleanEmptyObject } from './utils';
  * Key within block settings' supports array indicating support for letter-spacing
  * e.g. settings found in `block.json`.
  */
-export const LETTER_SPACING_SUPPORT_KEY = '__experimentalLetterSpacing';
+export const LETTER_SPACING_SUPPORT_KEY =
+	'typography.__experimentalLetterSpacing';
 
 /**
  * Inspector control panel containing the letter-spacing options.
@@ -27,12 +28,6 @@ export function LetterSpacingEdit( props ) {
 		attributes: { style },
 		setAttributes,
 	} = props;
-
-	const isDisabled = useIsLetterSpacingDisabled( props );
-
-	if ( isDisabled ) {
-		return null;
-	}
 
 	function onChange( newSpacing ) {
 		setAttributes( {
@@ -50,6 +45,8 @@ export function LetterSpacingEdit( props ) {
 		<LetterSpacingControl
 			value={ style?.typography?.letterSpacing }
 			onChange={ onChange }
+			__unstableInputWidth={ '100%' }
+			size="__unstable-large"
 		/>
 	);
 }
@@ -65,7 +62,40 @@ export function useIsLetterSpacingDisabled( { name: blockName } = {} ) {
 		blockName,
 		LETTER_SPACING_SUPPORT_KEY
 	);
-	const hasLetterSpacing = useSetting( 'typography.customLetterSpacing' );
+	const hasLetterSpacing = useSetting( 'typography.letterSpacing' );
 
 	return notSupported || ! hasLetterSpacing;
+}
+
+/**
+ * Checks if there is a current value set for the letter spacing block support.
+ *
+ * @param {Object} props Block props.
+ * @return {boolean}     Whether or not the block has a letter spacing set.
+ */
+export function hasLetterSpacingValue( props ) {
+	return !! props.attributes.style?.typography?.letterSpacing;
+}
+
+/**
+ * Resets the letter spacing block support attribute. This can be used when
+ * disabling the letter spacing support controls for a block via a progressive
+ * discovery panel.
+ *
+ * @param {Object} props               Block props.
+ * @param {Object} props.attributes    Block's attributes.
+ * @param {Object} props.setAttributes Function to set block's attributes.
+ */
+export function resetLetterSpacing( { attributes = {}, setAttributes } ) {
+	const { style } = attributes;
+
+	setAttributes( {
+		style: cleanEmptyObject( {
+			...style,
+			typography: {
+				...style?.typography,
+				letterSpacing: undefined,
+			},
+		} ),
+	} );
 }

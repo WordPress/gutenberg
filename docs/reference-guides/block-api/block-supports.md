@@ -1,20 +1,59 @@
 # Supports
 
-Block Supports is the API that allows a block to declare features used in the editor.
+Block Supports is the API that allows a block to declare support for certain features.
 
-Some block supports — for example, `anchor` or `className` — apply their attributes by adding additional props on the element returned by `save`. This will work automatically for default HTML tag elements (`div`, etc). However, if the return value of your `save` is a custom component element, you will need to ensure that your custom component handles these props in order for the attributes to be persisted.
+Opting into any of these features will register additional attributes on the block and provide the UI to manipulate that attribute.
+
+In order for the attribute to get applied to the block the generated properties get added to the wrapping element of the block. They get added to the object you get returned from the `useBlockProps` hook.
+
+`BlockEdit` function:
+```js
+function BlockEdit() {
+	const blockProps = useBlockProps();
+
+	return (
+		<div {...blockProps}>Hello World!</div>
+	);
+}
+```
+
+`save` function:
+```js
+function BlockEdit() {
+	const blockProps = useBlockProps.save();
+
+	return (
+		<div {...blockProps}>Hello World!</div>
+	);
+}
+```
+
+For dynamic blocks that get rendered via a `render_callback` in PHP you can use the `get_block_wrapper_attributes()` function. It returns a string containing all the generated properties and needs to get output in the opening tag of the wrapping block element.
+
+`render_callback` function:
+```php
+function render_block() {
+	$wrapper_attributes = get_block_wrapper_attributes();
+
+	return sprintf(
+		'<div %1$s>%2$s</div>',
+		$wrapper_attributes,
+		'Hello World!'
+	);
+}
+```
 
 ## anchor
 
 -   Type: `boolean`
 -   Default value: `false`
 
-Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
+Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link. _Important: It doesn't work with dynamic blocks yet._
 
 ```js
 // Declare support for anchor links.
 supports: {
-	anchor: true;
+	anchor: true
 }
 ```
 
@@ -23,21 +62,21 @@ supports: {
 -   Type: `boolean` or `array`
 -   Default value: `false`
 
-This property adds block controls which allow to change block's alignment. _Important: It doesn't work with dynamic blocks yet._
+This property adds block controls which allow to change block's alignment.
 
 ```js
 supports: {
 	// Declare support for block's alignment.
 	// This adds support for all the options:
 	// left, center, right, wide, and full.
-	align: true;
+	align: true
 }
 ```
 
 ```js
 supports: {
 	// Declare support for specific alignment options.
-	align: [ 'left', 'right', 'full' ];
+	align: [ 'left', 'right', 'full' ]
 }
 ```
 
@@ -62,7 +101,7 @@ This property allows to enable [wide alignment](/docs/how-to-guides/themes/theme
 ```js
 supports: {
 	// Remove the support for wide alignment.
-	alignWide: false;
+	alignWide: false
 }
 ```
 
@@ -76,7 +115,7 @@ By default, the class `.wp-block-your-block-name` is added to the root element o
 ```js
 supports: {
 	// Remove the support for the generated className.
-	className: false;
+	className: false
 }
 ```
 
@@ -99,7 +138,7 @@ Note that the `background` and `text` keys have a default value of `true`, so if
 supports: {
 	color: {
 		// This also enables text and background UI controls.
-		gradients: true; // Enable gradients UI control.
+		gradients: true // Enable gradients UI control.
 	}
 }
 ```
@@ -226,7 +265,7 @@ This property adds UI controls which allow the user to apply a gradient backgrou
 ```js
 supports: {
     color: {
-        gradient: true,
+        gradients: true,
 
         // Default values must be disabled if you don't want to use them with gradient.
         background: false,
@@ -406,7 +445,7 @@ This property adds a field to define a custom className for the block's wrapper.
 ```js
 supports: {
 	// Remove the support for the custom className.
-	customClassName: false;
+	customClassName: false
 }
 ```
 
@@ -415,34 +454,178 @@ supports: {
 -   Type: `boolean`
 -   Default value: `true`
 
-When the style picker is shown, a dropdown is displayed so the user can select a default style for this block type. If you prefer not to show the dropdown, set this property to `false`.
+When the style picker is shown, the user can set a default style for a block type based on the block's currently active style. If you prefer not to make this option available, set this property to `false`.
 
 ```js
 supports: {
 	// Remove the Default Style picker.
-	defaultStylePicker: false;
+	defaultStylePicker: false
 }
 ```
 
-## fontSize
+## html
 
+-   Type: `boolean`
+-   Default value: `true`
+
+By default, a block's markup can be edited individually. To disable this behavior, set `html` to `false`.
+
+```js
+supports: {
+	// Remove support for an HTML mode.
+	html: false
+}
+```
+
+## inserter
+
+-   Type: `boolean`
+-   Default value: `true`
+
+By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
+
+```js
+supports: {
+	// Hide this block from the inserter.
+	inserter: false
+}
+```
+
+## multiple
+
+-   Type: `boolean`
+-   Default value: `true`
+
+A non-multiple block can be inserted into each post, one time only. For example, the built-in 'More' block cannot be inserted again if it already exists in the post being edited. A non-multiple block's icon is automatically dimmed (unclickable) to prevent multiple instances.
+
+```js
+supports: {
+	// Use the block just once per post
+	multiple: false
+}
+```
+
+## reusable
+
+-   Type: `boolean`
+-   Default value: `true`
+
+A block may want to disable the ability of being converted into a reusable block. By default all blocks can be converted to a reusable block. If supports reusable is set to false, the option to convert the block into a reusable block will not appear.
+
+```js
+supports: {
+	// Don't allow the block to be converted into a reusable block.
+	reusable: false,
+}
+```
+
+## lock
+
+-   Type: `boolean`
+-   Default value: `true`
+
+A block may want to disable the ability to toggle the lock state. It can be locked/unlocked by a user from the block "Options" dropdown by default. To disable this behavior, set `lock` to `false`.
+
+```js
+supports: {
+	// Remove support for locking UI.
+	lock: false
+}
+```
+
+## spacing
+
+-   Type: `Object`
+-   Default value: null
+-   Subproperties:
+    -   `margin`: type `boolean` or `array`, default value `false`
+    -   `padding`: type `boolean` or `array`, default value `false`
+    -   `blockGap`: type `boolean` or `array`, default value `false`
+
+This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
+
+```js
+supports: {
+    spacing: {
+        margin: true,  // Enable margin UI control.
+        padding: true, // Enable padding UI control.
+        blockGap: true,  // Enables block spacing UI control.
+    }
+}
+```
+
+When the block declares support for a specific spacing property, the attributes definition is extended to include the `style` attribute.
+
+- `style`: attribute of `object` type with no default assigned. This is added when `margin` or `padding` support is declared. It stores the custom values set by the user, e.g.:
+
+```js
+attributes: {
+    style: {
+        margin: 'value',
+        padding: {
+            top: 'value',
+        }
+    }
+}
+```
+
+A spacing property may define an array of allowable sides – 'top', 'right', 'bottom', 'left' – that can be configured. When such arbitrary sides are defined, only UI controls for those sides are displayed. 
+
+Axial sides are defined with the `vertical` and `horizontal` terms, and display a single UI control for each axial pair (for example, `vertical` controls both the top and bottom sides). A spacing property may support arbitrary individual sides **or** axial sides, but not a mix of both.
+
+Note: `blockGap` accepts `vertical` and `horizontal` axial sides, which adjust gap column and row values. `blockGap` doesn't support arbitrary sides.
+
+```js
+supports: {
+    spacing: {
+        margin: [ 'top', 'bottom' ],             // Enable margin for arbitrary sides.
+        padding: true,                           // Enable padding for all sides.
+        blockGap: [ 'horizontal', 'vertical' ],  // Enables axial (column/row) block spacing controls
+    }
+}
+```
+
+## typography
+
+-   Type: `Object`
+-   Default value: `null`
+-   Subproperties:
+    - `fontSize`: type `boolean`, default value `false`
+    - `lineHeight`: type `boolean`, default value `false`
+
+The presence of this object signals that a block supports some typography related properties. When it does, the block editor will show a typography UI allowing the user to control their values.
+
+```js
+supports: {
+    typography: {
+        // Enable support and UI control for font-size.
+        fontSize: true,
+        // Enable support and UI control for line-height.
+        lineHeight: true,
+    },
+}
+```
+
+### typography.fontSize
 -   Type: `boolean`
 -   Default value: `false`
 
 This value signals that a block supports the font-size CSS style property. When it does, the block editor will show an UI control for the user to set its value.
 
-The values shown in this control are the ones declared by the theme via the `editor-font-sizes` [theme support](/docs/how-to-guides/themes/theme-support.md#block-font-sizes), or the default ones if none is provided.
+The values shown in this control are the ones declared by the theme via the `editor-font-sizes` [theme support](/docs/how-to-guides/themes/theme-support.md#block-font-sizes), or the default ones if none are provided.
 
 ```js
 supports: {
-    // Enable UI control for font-size.
-    fontSize: true,
+    typography: {
+        // Enable support and UI control for font-size.
+        fontSize: true,
+    },
 }
 ```
 
 When the block declares support for `fontSize`, the attributes definition is extended to include two new attributes: `fontSize` and `style`:
 
--   `fontSize`: attribute of `string` type with no default assigned. It stores the preset values set by the user. The block can apply a default fontSize by specifying its own `fontSize` attribute with a default e.g.:
+-   `fontSize`: attribute of `string` type with no default assigned. It stores any preset value selected by the user. The block can apply a default fontSize by specifying its own `fontSize` attribute with a default e.g.:
 
 ```js
 attributes: {
@@ -453,7 +636,7 @@ attributes: {
 }
 ```
 
--   `style`: attribute of `object` type with no default assigned. It stores the custom values set by the user. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
+-   `style`: attribute of `object` type with no default assigned. It stores the custom values set by the user and is shared with other block supports such as color. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
 
 ```js
 attributes: {
@@ -468,35 +651,7 @@ attributes: {
 }
 ```
 
-## html
-
--   Type: `boolean`
--   Default value: `true`
-
-By default, a block's markup can be edited individually. To disable this behavior, set `html` to `false`.
-
-```js
-supports: {
-	// Remove support for an HTML mode.
-	html: false;
-}
-```
-
-## inserter
-
--   Type: `boolean`
--   Default value: `true`
-
-By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
-
-```js
-supports: {
-	// Hide this block from the inserter.
-	inserter: false;
-}
-```
-
-## lineHeight
+### typography.lineHeight
 
 -   Type: `boolean`
 -   Default value: `false`
@@ -505,8 +660,10 @@ This value signals that a block supports the line-height CSS style property. Whe
 
 ```js
 supports: {
-    // Enable UI control for line-height.
-    lineHeight: true,
+    typography: {
+        // Enable support and UI control for line-height.
+        lineHeight: true,
+    },
 }
 ```
 
@@ -524,65 +681,3 @@ attributes: {
     }
 }
 ```
-
-## multiple
-
--   Type: `boolean`
--   Default value: `true`
-
-A non-multiple block can be inserted into each post, one time only. For example, the built-in 'More' block cannot be inserted again if it already exists in the post being edited. A non-multiple block's icon is automatically dimmed (unclickable) to prevent multiple instances.
-
-```js
-supports: {
-	// Use the block just once per post
-	multiple: false;
-}
-```
-
-## reusable
-
--   Type: `boolean`
--   Default value: `true`
-
-A block may want to disable the ability of being converted into a reusable block. By default all blocks can be converted to a reusable block. If supports reusable is set to false, the option to convert the block into a reusable block will not appear.
-
-```js
-supports: {
-	// Don't allow the block to be converted into a reusable block.
-	reusable: false;
-}
-```
-
-## spacing
-
--   Type: `Object`
--   Default value: null
--   Subproperties:
-    -   `margin`: type `boolean` or `array`, default value `false`
-    -   `padding`: type `boolean` or `array`, default value `false`
-
-This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
-
-```js
-supports: {
-    spacing: {
-        margin: true,  // Enable margin UI control.
-        padding: true, // Enable padding UI control.
-    }
-}
-```
-
-When the block declares support for a specific spacing property, the attributes definition is extended to include the `style` attribute.
-
--   `style`: attribute of `object` type with no default assigned. This is added when `margin` or `padding` support is declared. It stores the custom values set by the user.
-
-```js
-supports: {
-    spacing: {
-        margin: [ 'top', 'bottom' ], // Enable margin for arbitrary sides.
-        padding: true,               // Enable padding for all sides.
-    }
-}
-```
-
-A spacing property may define an array of allowable sides that can be configured. When arbitrary sides are defined only UI controls for those sides are displayed.

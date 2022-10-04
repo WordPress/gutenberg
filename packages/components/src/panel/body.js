@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,6 +16,8 @@ import { chevronUp, chevronDown } from '@wordpress/icons';
 import Button from '../button';
 import Icon from '../icon';
 import { useControlledState, useUpdateEffect } from '../utils';
+
+const noop = () => {};
 
 export function PanelBody(
 	{
@@ -48,10 +49,10 @@ export function PanelBody(
 		onToggle( next );
 	};
 
-	// Ref is used so that the effect does not re-run upon scrollAfterOpen changing value
+	// Ref is used so that the effect does not re-run upon scrollAfterOpen changing value.
 	const scrollAfterOpenRef = useRef();
 	scrollAfterOpenRef.current = scrollAfterOpen;
-	// Runs after initial render
+	// Runs after initial render.
 	useUpdateEffect( () => {
 		if (
 			isOpened &&

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import CustomGradientBar from '../custom-gradient-bar';
+import CustomGradientBar from '../custom-gradient-picker/gradient-bar';
 
 import {
 	getColorStopsFromColors,
@@ -19,7 +19,6 @@ export default function CustomDuotoneBar( { value, onChange } ) {
 	return (
 		<CustomGradientBar
 			disableInserter
-			disableAlpha
 			background={ background }
 			hasGradient={ hasGradient }
 			value={ controlPoints }

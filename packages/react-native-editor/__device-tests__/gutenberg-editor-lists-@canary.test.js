@@ -6,54 +6,52 @@ import { isAndroid } from './helpers/utils';
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor tests for List block', () => {
-	it( 'should be able to add a new List block', async () => {
+	it.skip( 'should be able to add a new List block', async () => {
 		await editorPage.addNewBlock( blockNames.list );
-		const listBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.list
-		);
-		// Click List block on Android to force EditText focus
-		if ( isAndroid() ) {
-			await listBlockElement.click();
-		}
+		let listBlockElement = await editorPage.getListBlockAtPosition( 1, {
+			isEmptyBlock: true,
+		} );
 
-		// Send the first list item text
-		await editorPage.sendTextToListBlock(
+		await editorPage.typeTextToTextBlock(
 			listBlockElement,
-			testData.listItem1
+			testData.listItem1,
+			false
 		);
 
-		// send an Enter
-		await editorPage.sendTextToListBlock( listBlockElement, '\n' );
+		listBlockElement = await editorPage.getListBlockAtPosition();
 
-		// Send the second list item text
-		await editorPage.sendTextToListBlock(
+		// Send an Enter.
+		await editorPage.typeTextToTextBlock( listBlockElement, '\n', false );
+
+		// Send the second list item text.
+		await editorPage.typeTextToTextBlock(
 			listBlockElement,
-			testData.listItem2
+			testData.listItem2,
+			false
 		);
 
-		// switch to html and verify html
+		// Switch to html and verify html.
 		const html = await editorPage.getHtmlContent();
 		expect( html.toLowerCase() ).toBe( testData.listHtml.toLowerCase() );
 	} );
 
 	// This test depends on being run immediately after 'should be able to add a new List block'
-	it( 'should update format to ordered list, using toolbar button', async () => {
-		let listBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.list
-		);
+	it.skip( 'should update format to ordered list, using toolbar button', async () => {
+		let listBlockElement = await editorPage.getListBlockAtPosition();
 
-		// Click List block to force EditText focus
-		await listBlockElement.click();
+		if ( isAndroid() ) {
+			await listBlockElement.click();
+		}
 
-		// Send a click on the order list format button
+		// Send a click on the order list format button.
 		await editorPage.clickOrderedListToolBarButton();
 
-		// switch to html and verify html
+		// Switch to html and verify html.
 		const html = await editorPage.getHtmlContent();
 		expect( html.toLowerCase() ).toBe(
 			testData.listHtmlOrdered.toLowerCase()
 		);
-		// Remove list block to return editor to empty state
+		// Remove list block to return editor to empty state.
 		listBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.list
 		);

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import renderer, { act } from 'react-test-renderer';
 
 /**
@@ -24,6 +23,8 @@ import {
 	withDataAlign,
 	addAssignedAlign,
 } from '../align';
+
+const noop = () => {};
 
 describe( 'align', () => {
 	const blockSettings = {
@@ -167,7 +168,7 @@ describe( 'align', () => {
 					isSelected
 				/>
 			);
-			// when there's only one child, `rendered` in the tree is an object not an array.
+			// When there's only one child, `rendered` in the tree is an object not an array.
 			expect( wrapper.toTree().rendered ).toBeInstanceOf( Object );
 		} );
 
@@ -213,7 +214,7 @@ describe( 'align', () => {
 			act( () => {
 				wrapper = renderer.create(
 					<BlockEditorProvider
-						settings={ { alignWide: true } }
+						settings={ { alignWide: true, supportsLayout: false } }
 						value={ [] }
 					>
 						<EnhancedComponent

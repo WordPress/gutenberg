@@ -37,14 +37,14 @@ function _gutenberg_migrate_database() {
  */
 function _gutenberg_migrate_remove_fse_drafts() {
 	// Delete auto-draft templates and template parts.
-	$delete_query = new WP_QUERY(
+	$delete_query = new WP_Query(
 		array(
 			'post_status'    => array( 'auto-draft' ),
 			'post_type'      => array( 'wp_template', 'wp_template_part' ),
 			'posts_per_page' => -1,
 		)
 	);
-	foreach ( $delete_query->get_posts() as $post ) {
+	foreach ( $delete_query->posts as $post ) {
 		wp_delete_post( $post->ID, true );
 	}
 

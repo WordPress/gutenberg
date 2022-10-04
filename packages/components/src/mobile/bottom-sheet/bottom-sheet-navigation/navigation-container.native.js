@@ -59,7 +59,13 @@ const options = {
 
 const ANIMATION_DURATION = 190;
 
-function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
+function BottomSheetNavigationContainer( {
+	children,
+	animate,
+	main,
+	theme,
+	style,
+} ) {
 	const Stack = useRef( createStackNavigator() ).current;
 	const context = useContext( BottomSheetNavigationContext );
 	const [ currentHeight, setCurrentHeight ] = useState(
@@ -81,11 +87,10 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 
 	const setHeight = useCallback(
 		( height ) => {
-			// The screen is fullHeight or changing from fullScreen to the default mode
+			// The screen is fullHeight.
 			if (
-				( typeof currentHeight === 'string' &&
-					typeof height !== 'string' ) ||
-				typeof height === 'string'
+				typeof height === 'string' &&
+				typeof height !== typeof currentHeight
 			) {
 				performLayoutAnimation( ANIMATION_DURATION );
 				setCurrentHeight( height );
@@ -93,7 +98,10 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 				return;
 			}
 
-			if ( height > 1 ) {
+			if (
+				height > 1 &&
+				Math.round( height ) !== Math.round( currentHeight )
+			) {
 				if ( currentHeight === 1 ) {
 					setCurrentHeight( height );
 				} else if ( animate ) {
@@ -104,6 +112,9 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 				}
 			}
 		},
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ currentHeight ]
 	);
 
@@ -125,15 +136,14 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 				/>
 			);
 		} );
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ children ] );
 
 	return useMemo( () => {
 		return (
-			<View
-				style={ {
-					height: currentHeight,
-				} }
-			>
+			<View style={ [ style, { height: currentHeight } ] }>
 				<BottomSheetNavigationProvider
 					value={ {
 						setHeight,
@@ -154,6 +164,9 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 				</BottomSheetNavigationProvider>
 			</View>
 		);
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ currentHeight, _theme ] );
 }
 

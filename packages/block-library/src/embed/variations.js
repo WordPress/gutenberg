@@ -24,12 +24,15 @@ import {
 	embedAmazonIcon,
 	embedAnimotoIcon,
 	embedDailymotionIcon,
+	embedPinterestIcon,
+	embedWolframIcon,
+	embedPocketCastsIcon,
 } from './icons';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
 /**
- * Template option choices for predefined columns layouts.
+ * The embed provider services.
  *
  * @type {WPBlockVariation[]}
  */
@@ -149,7 +152,7 @@ const variations = [
 		attributes: { providerNameSlug: 'cloudup', responsive: true },
 	},
 	{
-		// Deprecated since CollegeHumor content is now powered by YouTube
+		// Deprecated since CollegeHumor content is now powered by YouTube.
 		name: 'collegehumor',
 		title: 'CollegeHumor',
 		icon: embedVideoIcon,
@@ -206,14 +209,6 @@ const variations = [
 		attributes: { providerNameSlug: 'kickstarter', responsive: true },
 	},
 	{
-		name: 'meetup-com',
-		title: 'Meetup.com',
-		icon: embedContentIcon,
-		description: __( 'Embed Meetup.com content.' ),
-		patterns: [ /^https?:\/\/(www\.)?meetu(\.ps|p\.com)\/.+/i ],
-		attributes: { providerNameSlug: 'meetup-com', responsive: true },
-	},
-	{
 		name: 'mixcloud',
 		title: 'Mixcloud',
 		icon: embedAudioIcon,
@@ -221,6 +216,15 @@ const variations = [
 		description: __( 'Embed Mixcloud content.' ),
 		patterns: [ /^https?:\/\/(www\.)?mixcloud\.com\/.+/i ],
 		attributes: { providerNameSlug: 'mixcloud', responsive: true },
+	},
+	{
+		name: 'pocketcasts',
+		title: 'Pocket Casts',
+		icon: embedPocketCastsIcon,
+		keywords: [ __( 'podcast' ), __( 'audio' ) ],
+		description: __( 'Embed a podcast player from Pocket Casts.' ),
+		patterns: [ /^https:\/\/pca.st\/\w+/i ],
+		attributes: { providerNameSlug: 'pocketcasts', responsive: true },
 	},
 	{
 		name: 'reddit',
@@ -336,6 +340,25 @@ const variations = [
 			/^https?:\/\/(www\.)?(a\.co|z\.cn)\/.+/i,
 		],
 		attributes: { providerNameSlug: 'amazon-kindle' },
+	},
+	{
+		name: 'pinterest',
+		title: 'Pinterest',
+		icon: embedPinterestIcon,
+		keywords: [ __( 'social' ), __( 'bookmark' ) ],
+		description: __( 'Embed Pinterest pins, boards, and profiles.' ),
+		patterns: [
+			/^https?:\/\/([a-z]{2}|www)\.pinterest\.com(\.(au|mx))?\/.*/i,
+		],
+		attributes: { providerNameSlug: 'pinterest' },
+	},
+	{
+		name: 'wolfram-cloud',
+		title: 'Wolfram',
+		icon: embedWolframIcon,
+		description: __( 'Embed Wolfram notebook content.' ),
+		patterns: [ /^https?:\/\/(www\.)?wolframcloud\.com\/obj\/.+/i ],
+		attributes: { providerNameSlug: 'wolfram-cloud', responsive: true },
 	},
 ];
 

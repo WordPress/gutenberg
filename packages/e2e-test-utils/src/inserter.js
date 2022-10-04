@@ -27,7 +27,7 @@ export async function openGlobalBlockInserter() {
 		await toggleGlobalBlockInserter();
 
 		// Waiting here is necessary because sometimes the inserter takes more time to
-		// render than Puppeteer takes to complete the 'click' action
+		// render than Puppeteer takes to complete the 'click' action.
 		await page.waitForSelector( '.block-editor-inserter__menu' );
 	}
 }
@@ -43,7 +43,12 @@ async function isGlobalInserterOpen() {
 		// "Add block" selector is required to make sure performance comparison
 		// doesn't fail on older branches where we still had "Add block" as label.
 		return !! document.querySelector(
-			'.edit-post-header [aria-label="Add block"].is-pressed, .edit-site-header [aria-label="Add block"].is-pressed, .edit-post-header [aria-label="Toggle block inserter"].is-pressed, .edit-site-header [aria-label="Toggle block inserter"].is-pressed'
+			'.edit-post-header [aria-label="Add block"].is-pressed,' +
+				'.edit-site-header [aria-label="Add block"].is-pressed,' +
+				'.edit-post-header [aria-label="Toggle block inserter"].is-pressed,' +
+				'.edit-site-header [aria-label="Toggle block inserter"].is-pressed,' +
+				'.edit-widgets-header [aria-label="Toggle block inserter"].is-pressed,' +
+				'.edit-widgets-header [aria-label="Add block"].is-pressed'
 		);
 	} );
 }
@@ -54,7 +59,12 @@ export async function toggleGlobalBlockInserter() {
 	// "Add block" selector is required to make sure performance comparison
 	// doesn't fail on older branches where we still had "Add block" as label.
 	await page.click(
-		'.edit-post-header [aria-label="Add block"], .edit-site-header [aria-label="Add block"], .edit-post-header [aria-label="Toggle block inserter"], .edit-site-header [aria-label="Toggle block inserter"]'
+		'.edit-post-header [aria-label="Add block"],' +
+			'.edit-site-header [aria-label="Add block"],' +
+			'.edit-post-header [aria-label="Toggle block inserter"],' +
+			'.edit-site-header [aria-label="Toggle block inserter"],' +
+			'.edit-widgets-header [aria-label="Add block"],' +
+			'.edit-widgets-header [aria-label="Toggle block inserter"]'
 	);
 }
 
@@ -107,7 +117,7 @@ export async function searchForBlock( searchTerm ) {
  */
 export async function searchForPattern( searchTerm ) {
 	await openGlobalBlockInserter();
-	// Select the patterns tab
+	// Select the patterns tab.
 	const tab = await page.waitForXPath(
 		'//div[contains(@class, "block-editor-inserter__tabs")]//button[.="Patterns"]'
 	);
@@ -194,7 +204,7 @@ export async function insertReusableBlock( searchTerm ) {
 	await focusSelectedBlock();
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
-	// We should wait until the block is loaded
+	// We should wait until the block is loaded.
 	await page.waitForXPath(
 		'//*[contains(@class,"block-library-block__reusable-block-container")]'
 	);
@@ -210,7 +220,7 @@ export async function insertReusableBlock( searchTerm ) {
 export async function insertBlockDirectoryBlock( searchTerm ) {
 	await searchForBlock( searchTerm );
 
-	// Grab the first block in the list
+	// Grab the first block in the list.
 	const insertButton = await page.waitForSelector(
 		'.block-directory-downloadable-blocks-list button:first-child'
 	);

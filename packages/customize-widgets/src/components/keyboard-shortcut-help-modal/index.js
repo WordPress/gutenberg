@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -37,7 +36,7 @@ const ShortcutList = ( { shortcuts } ) => (
 				className="customize-widgets-keyboard-shortcut-help-modal__shortcut"
 				key={ index }
 			>
-				{ isString( shortcut ) ? (
+				{ typeof shortcut === 'string' ? (
 					<DynamicShortcut name={ shortcut } />
 				) : (
 					<Shortcut { ...shortcut } />
@@ -101,9 +100,7 @@ export default function KeyboardShortcutHelpModal( {
 		},
 	} );
 
-	useShortcut( 'core/customize-widgets/keyboard-shortcuts', toggleModal, {
-		bindGlobal: true,
-	} );
+	useShortcut( 'core/customize-widgets/keyboard-shortcuts', toggleModal );
 
 	if ( ! isModalActive ) {
 		return null;

@@ -20,6 +20,7 @@
 		border-bottom: none;
 		padding: 0;
 		position: sticky;
+		height: $header-height;
 
 		.components-button {
 			align-self: flex-start;
@@ -62,11 +63,6 @@
 		padding: 0 $grid-unit-40;
 		position: relative;
 		width: 100%;
-
-		@media (max-width: $break-small) {
-			position: absolute;
-			bottom: 0;
-		}
 	}
 
 	&__page-control {
@@ -92,12 +88,9 @@
 	height: 80vh;
 	max-height: 575px;
 
-	@media (max-width: $break-small) {
-		bottom: 5%;
-		left: $grid-unit-20;
-		right: $grid-unit-20;
-		top: 5%;
-		margin: 0 auto;
+	@media ( max-width: $break-small ) {
+		margin: auto;
+		max-width: calc(100vw - #{$grid-unit-20} * 2);
 	}
 }
 
@@ -135,9 +128,5 @@
 
 	&.components-guide__finish-button {
 		right: $grid-unit-40;
-	}
-
-	&.components-guide__inline-finish-button {
-		display: none;
 	}
 }

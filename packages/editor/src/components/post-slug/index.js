@@ -4,14 +4,14 @@
 import { withDispatch, withSelect } from '@wordpress/data';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { withInstanceId, compose } from '@wordpress/compose';
-import { safeDecodeURIComponent } from '@wordpress/url';
+import { compose } from '@wordpress/compose';
+import { safeDecodeURIComponent, cleanForSlug } from '@wordpress/url';
+import { TextControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import PostSlugCheck from './check';
-import { cleanForSlug } from '../../utils/url';
 import { store as editorStore } from '../../store';
 
 export class PostSlug extends Component {
@@ -42,23 +42,19 @@ export class PostSlug extends Component {
 	}
 
 	render() {
-		const { instanceId } = this.props;
 		const { editedSlug } = this.state;
-
-		const inputId = 'editor-post-slug-' + instanceId;
-
 		return (
 			<PostSlugCheck>
-				<label htmlFor={ inputId }>{ __( 'Slug' ) }</label>
-				<input
-					type="text"
-					id={ inputId }
+				<TextControl
+					label={ __( 'Slug' ) }
+					autoComplete="off"
+					spellCheck="false"
 					value={ editedSlug }
-					onChange={ ( event ) =>
-						this.setState( { editedSlug: event.target.value } )
+					onChange={ ( slug ) =>
+						this.setState( { editedSlug: slug } )
 					}
 					onBlur={ this.setSlug }
-					className="editor-post-slug__input"
+					className="editor-post-slug"
 				/>
 			</PostSlugCheck>
 		);
@@ -67,9 +63,8 @@ export class PostSlug extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getCurrentPost, getEditedPostAttribute } = select(
-			editorStore
-		);
+		const { getCurrentPost, getEditedPostAttribute } =
+			select( editorStore );
 
 		const { id } = getCurrentPost();
 		return {
@@ -86,5 +81,4 @@ export default compose( [
 			},
 		};
 	} ),
-	withInstanceId,
 ] )( PostSlug );

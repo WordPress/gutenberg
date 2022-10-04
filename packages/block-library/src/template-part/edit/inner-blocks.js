@@ -4,21 +4,18 @@
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	InnerBlocks,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-	__experimentalBlockContentOverlay as BlockContentOverlay,
+	useInnerBlocksProps,
 	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
 
 export default function TemplatePartInnerBlocks( {
 	postId: id,
 	hasInnerBlocks,
 	layout,
-	tagName,
+	tagName: TagName,
 	blockProps,
-	clientId,
 } ) {
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -26,21 +23,6 @@ export default function TemplatePartInnerBlocks( {
 	}, [] );
 	const defaultLayout = useSetting( 'layout' ) || {};
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
-	const { contentSize, wideSize } = usedLayout;
-	const _layout = useMemo( () => {
-		if ( themeSupportsLayout ) {
-			const alignments =
-				contentSize || wideSize
-					? [ 'wide', 'full', 'left', 'center', 'right' ]
-					: [ 'left', 'center', 'right' ];
-			return {
-				type: 'default',
-				// Find a way to inject this in the support flag code (hooks).
-				alignments,
-			};
-		}
-		return undefined;
-	}, [ themeSupportsLayout, contentSize, wideSize ] );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
@@ -55,14 +37,8 @@ export default function TemplatePartInnerBlocks( {
 		renderAppender: hasInnerBlocks
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,
-		__experimentalLayout: _layout,
+		__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
 	} );
 
-	return (
-		<BlockContentOverlay
-			clientId={ clientId }
-			tagName={ tagName }
-			wrapperProps={ innerBlocksProps }
-		/>
-	);
+	return <TagName { ...innerBlocksProps } />;
 }

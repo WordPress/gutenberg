@@ -16,10 +16,8 @@ export default function SaveButton( {
 	isEntitiesSavedStatesOpen,
 } ) {
 	const { isDirty, isSaving } = useSelect( ( select ) => {
-		const {
-			__experimentalGetDirtyEntityRecords,
-			isSavingEntityRecord,
-		} = select( coreStore );
+		const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
+			select( coreStore );
 		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 		return {
 			isDirty: dirtyEntityRecords.length > 0,
@@ -27,23 +25,20 @@ export default function SaveButton( {
 				isSavingEntityRecord( record.kind, record.name, record.key )
 			),
 		};
-	} );
+	}, [] );
 
 	const disabled = ! isDirty || isSaving;
 
 	return (
-		<>
-			<Button
-				variant="primary"
-				className="edit-site-save-button__button"
-				aria-disabled={ disabled }
-				aria-expanded={ isEntitiesSavedStatesOpen }
-				disabled={ disabled }
-				isBusy={ isSaving }
-				onClick={ disabled ? undefined : openEntitiesSavedStates }
-			>
-				{ __( 'Save' ) }
-			</Button>
-		</>
+		<Button
+			variant="primary"
+			className="edit-site-save-button__button"
+			aria-disabled={ disabled }
+			aria-expanded={ isEntitiesSavedStatesOpen }
+			isBusy={ isSaving }
+			onClick={ disabled ? undefined : openEntitiesSavedStates }
+		>
+			{ __( 'Save' ) }
+		</Button>
 	);
 }

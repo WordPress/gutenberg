@@ -56,6 +56,7 @@ function Stepper( {
 			) }
 			{ children }
 			<TouchableOpacity
+				testID={ 'Increment' }
 				disabled={ isMaxValue }
 				onPressIn={ onPressInIncrement }
 				onPressOut={ onPressOut }

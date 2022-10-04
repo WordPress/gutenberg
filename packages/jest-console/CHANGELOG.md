@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## 6.1.0 (2022-09-21)
+
+## 6.0.0 (2022-08-24)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
+## 5.1.0 (2022-05-18)
+
+### Enhancements
+
+-   Added TypeScript definitions for package consumers ([#40957](https://github.com/WordPress/gutenberg/pull/40957)).
+
+## 5.0.0 (2022-01-27)
+
+### Breaking Changes
+
+-   The peer `jest` dependency has been updated from requiring `>=26` to requiring `>=27` (see [Breaking Changes](https://jestjs.io/blog/2021/05/25/jest-27), [#33287](https://github.com/WordPress/gutenberg/pull/33287)).
+
 ## 4.0.0 (2021-01-21)
 
 ### Breaking Changes

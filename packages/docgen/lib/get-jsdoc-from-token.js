@@ -48,7 +48,7 @@ module.exports = ( token ) => {
 					token,
 					0
 				);
-				if ( potentialTypeAnnotation !== '' ) {
+				if ( potentialTypeAnnotation ) {
 					jsdoc.tags.push( {
 						tag: 'type',
 						type: potentialTypeAnnotation,

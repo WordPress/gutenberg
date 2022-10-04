@@ -1,12 +1,4 @@
 /**
- * External dependencies
- */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { cx } from '@emotion/css';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -18,6 +10,7 @@ import { useContextSystem } from '../ui/context';
 import { useControlGroupContext } from '../ui/control-group';
 import { useFlex } from '../flex';
 import * as styles from './styles';
+import { useCx } from '../utils/hooks/use-cx';
 
 /**
  * @typedef OwnProps
@@ -30,7 +23,7 @@ import * as styles from './styles';
 /** @typedef {import('../flex/types').FlexProps & OwnProps} Props */
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<Props, 'div'>} props
+ * @param {import('../ui/context').WordPressComponentProps<Props, 'div'>} props
  */
 export function useBaseField( props ) {
 	const {
@@ -38,13 +31,14 @@ export function useBaseField( props ) {
 		hasError = false,
 		isInline = false,
 		isSubtle = false,
-		// extract these because useFlex doesn't accept it
+		// Extract these because useFlex doesn't accept it.
 		defaultValue,
 		disabled,
 		...flexProps
 	} = useContextSystem( props, 'BaseField' );
 
 	const { styles: controlGroupStyles } = useControlGroupContext();
+	const cx = useCx();
 
 	const classes = useMemo(
 		() =>
@@ -56,7 +50,7 @@ export function useBaseField( props ) {
 				isInline && styles.inline,
 				className
 			),
-		[ className, controlGroupStyles, hasError, isInline, isSubtle ]
+		[ className, controlGroupStyles, cx, hasError, isInline, isSubtle ]
 	);
 
 	return {

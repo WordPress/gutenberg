@@ -39,7 +39,7 @@ describe( 'Scheduling', () => {
 				expect( await getPublishButtonText() ).toBe( 'Publish' );
 
 				// Open the datepicker.
-				await page.click( '.edit-post-post-schedule__toggle' );
+				await page.click( '*[aria-label^="Change date"]' );
 
 				// Change the publishing date to a year in the future.
 				await page.click( '.components-datetime__time-field-year' );
@@ -56,14 +56,10 @@ describe( 'Scheduling', () => {
 	it( 'Should keep date time UI focused when the previous and next month buttons are clicked', async () => {
 		await createNewPost();
 
-		await page.click( '.edit-post-post-schedule__toggle' );
-		await page.click(
-			'div[aria-label="Move backward to switch to the previous month."]'
-		);
+		await page.click( '*[aria-label^="Change date"]' );
+		await page.click( '*[aria-label="View previous month"]' );
 		expect( await isDateTimeComponentFocused() ).toBe( true );
-		await page.click(
-			'div[aria-label="Move forward to switch to the next month."]'
-		);
+		await page.click( '*[aria-label="View next month"]' );
 		expect( await isDateTimeComponentFocused() ).toBe( true );
 	} );
 } );

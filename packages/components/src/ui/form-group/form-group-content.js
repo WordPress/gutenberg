@@ -12,7 +12,7 @@ import FormGroupHelp from './form-group-help';
 import FormGroupLabel from './form-group-label';
 
 /**
- * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupContentProps, 'label'>} props
+ * @param {import('../context').WordPressComponentProps<import('./types').FormGroupContentProps, 'label', false>} props
  */
 function FormGroupContent( {
 	alignLabel,
@@ -26,10 +26,10 @@ function FormGroupContent( {
 	truncate,
 	...props
 } ) {
-	const contextProps = useMemo( () => ( { id, horizontal } ), [
-		id,
-		horizontal,
-	] );
+	const contextProps = useMemo(
+		() => ( { id, horizontal } ),
+		[ id, horizontal ]
+	);
 
 	const content = help ? (
 		<VStack expanded={ false } spacing={ spacing }>

@@ -420,4 +420,25 @@ describe( 'undo', () => {
 		// Expect "1".
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should be able to undo and redo when transient changes have been made and we update/publish', async () => {
+		// Typing consecutive characters in a `Paragraph` block updates the same
+		// block attribute as in the previous action and results in transient edits
+		// and skipping `undo` history steps.
+		const text = 'tonis';
+		await clickBlockAppender();
+		await page.keyboard.type( text );
+		await publishPost();
+		await pressKeyWithModifier( 'primary', 'z' );
+		expect( await getEditedPostContent() ).toBe( '' );
+		await page.waitForSelector(
+			'.editor-history__redo[aria-disabled="false"]'
+		);
+		await page.click( '.editor-history__redo[aria-disabled="false"]' );
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>tonis</p>
+		<!-- /wp:paragraph -->"
+	` );
+	} );
 } );

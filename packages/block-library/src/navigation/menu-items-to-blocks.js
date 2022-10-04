@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import { sortBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createBlock, parse } from '@wordpress/blocks';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Convert a flat menu item structure to a nested blocks structure.
@@ -21,20 +17,28 @@ export default function menuItemsToBlocks( menuItems ) {
 	}
 
 	const menuTree = createDataTree( menuItems );
-	return mapMenuItemsToBlocks( menuTree );
+	const blocks = mapMenuItemsToBlocks( menuTree );
+	return applyFilters(
+		'blocks.navigation.__unstableMenuItemsToBlocks',
+		blocks,
+		menuItems
+	);
 }
 
 /**
  * A recursive function that maps menu item nodes to blocks.
  *
  * @param {WPNavMenuItem[]} menuItems An array of WPNavMenuItem items.
+ * @param {number}          level     An integer representing the nesting level.
  * @return {Object} Object containing innerBlocks and mapping.
  */
-function mapMenuItemsToBlocks( menuItems ) {
+function mapMenuItemsToBlocks( menuItems, level = 0 ) {
 	let mapping = {};
 
 	// The menuItem should be in menu_order sort order.
-	const sortedItems = sortBy( menuItems, 'menu_order' );
+	const sortedItems = [ ...menuItems ].sort(
+		( a, b ) => a.menu_order - b.menu_order
+	);
 
 	const innerBlocks = sortedItems.map( ( menuItem ) => {
 		if ( menuItem.type === 'block' ) {
@@ -49,14 +53,22 @@ function mapMenuItemsToBlocks( menuItems ) {
 			return block;
 		}
 
-		const attributes = menuItemToBlockAttributes( menuItem );
+		const blockType = menuItem.children?.length
+			? 'core/navigation-submenu'
+			: 'core/navigation-link';
+
+		const attributes = menuItemToBlockAttributes(
+			menuItem,
+			blockType,
+			level
+		);
 
 		// If there are children recurse to build those nested blocks.
 		const {
 			innerBlocks: nestedBlocks = [], // alias to avoid shadowing
 			mapping: nestedMapping = {}, // alias to avoid shadowing
 		} = menuItem.children?.length
-			? mapMenuItemsToBlocks( menuItem.children )
+			? mapMenuItemsToBlocks( menuItem.children, level + 1 )
 			: {};
 
 		// Update parent mapping with nested mapping.
@@ -66,13 +78,9 @@ function mapMenuItemsToBlocks( menuItems ) {
 		};
 
 		// Create block with nested "innerBlocks".
-		const block = createBlock(
-			'core/navigation-link',
-			attributes,
-			nestedBlocks
-		);
+		const block = createBlock( blockType, attributes, nestedBlocks );
 
-		// Create mapping for menuItem -> block
+		// Create mapping for menuItem -> block.
 		mapping[ menuItem.id ] = block.clientId;
 
 		return block;
@@ -108,23 +116,29 @@ function mapMenuItemsToBlocks( menuItems ) {
 /**
  * Convert block attributes to menu item.
  *
- * @param {WPNavMenuItem} menuItem the menu item to be converted to block attributes.
+ * @param {WPNavMenuItem} menuItem  the menu item to be converted to block attributes.
+ * @param {string}        blockType The block type.
+ * @param {number}        level     An integer representing the nesting level.
  * @return {Object} the block attributes converted from the WPNavMenuItem item.
  */
-function menuItemToBlockAttributes( {
-	title: menuItemTitleField,
-	xfn,
-	classes,
-	// eslint-disable-next-line camelcase
-	attr_title,
-	object,
-	// eslint-disable-next-line camelcase
-	object_id,
-	description,
-	url,
-	type: menuItemTypeField,
-	target,
-} ) {
+function menuItemToBlockAttributes(
+	{
+		title: menuItemTitleField,
+		xfn,
+		classes,
+		// eslint-disable-next-line camelcase
+		attr_title,
+		object,
+		// eslint-disable-next-line camelcase
+		object_id,
+		description,
+		url,
+		type: menuItemTypeField,
+		target,
+	},
+	blockType,
+	level
+) {
 	// For historical reasons, the `core/navigation-link` variation type is `tag`
 	// whereas WP Core expects `post_tag` as the `object` type.
 	// To avoid writing a block migration we perform a conversion here.
@@ -148,19 +162,26 @@ function menuItemToBlockAttributes( {
 			classes.join( ' ' ).trim() && {
 				className: classes.join( ' ' ).trim(),
 			} ),
+		/* eslint-disable camelcase */
 		...( attr_title?.length && {
 			title: attr_title,
 		} ),
-		// eslint-disable-next-line camelcase
 		...( object_id &&
 			'custom' !== object && {
 				id: object_id,
 			} ),
+		/* eslint-enable camelcase */
 		...( description?.length && {
 			description,
 		} ),
 		...( target === '_blank' && {
 			opensInNewTab: true,
+		} ),
+		...( blockType === 'core/navigation-submenu' && {
+			isTopLevelItem: level === 0,
+		} ),
+		...( blockType === 'core/navigation-link' && {
+			isTopLevelLink: level === 0,
 		} ),
 	};
 }
@@ -189,9 +210,10 @@ function createDataTree( dataset, id = 'id', relation = 'parent' ) {
 			...data,
 			children: [],
 		};
-	}
-	for ( const data of dataset ) {
 		if ( data[ relation ] ) {
+			hashTable[ data[ relation ] ] = hashTable[ data[ relation ] ] || {};
+			hashTable[ data[ relation ] ].children =
+				hashTable[ data[ relation ] ].children || [];
 			hashTable[ data[ relation ] ].children.push(
 				hashTable[ data[ id ] ]
 			);

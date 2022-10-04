@@ -23,8 +23,10 @@ describe( 'reducer', () => {
 				args: [],
 			} );
 
-			// { test: { getFoo: EquivalentKeyMap( [] => true ) } }
-			expect( state.getFoo.get( [] ) ).toBe( true );
+			// { test: { getFoo: EquivalentKeyMap( [] =>  status: 'resolving } ) } }
+			expect( state.getFoo.get( [] ) ).toEqual( {
+				status: 'resolving',
+			} );
 		} );
 
 		it( 'should return with finished resolution', () => {
@@ -39,8 +41,10 @@ describe( 'reducer', () => {
 				args: [],
 			} );
 
-			// { test: { getFoo: EquivalentKeyMap( [] => false ) } }
-			expect( state.getFoo.get( [] ) ).toBe( false );
+			// { test: { getFoo: EquivalentKeyMap( [] => { status: 'finished' } ) } }
+			expect( state.getFoo.get( [] ) ).toEqual( {
+				status: 'finished',
+			} );
 		} );
 
 		it( 'should remove invalidations', () => {
@@ -81,9 +85,13 @@ describe( 'reducer', () => {
 				args: [ 'block' ],
 			} );
 
-			// { getFoo: EquivalentKeyMap( [] => false ) }
-			expect( state.getFoo.get( [ 'post' ] ) ).toBe( false );
-			expect( state.getFoo.get( [ 'block' ] ) ).toBe( true );
+			// { getFoo: EquivalentKeyMap( [] => { status: 'finished' } ) }
+			expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
+				status: 'finished',
+			} );
+			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
+				status: 'resolving',
+			} );
 		} );
 
 		it(
@@ -123,10 +131,32 @@ describe( 'reducer', () => {
 				} );
 
 				expect( state.getBar ).toBeUndefined();
-				// { getFoo: EquivalentKeyMap( [] => false ) }
-				expect( state.getFoo.get( [ 'post' ] ) ).toBe( false );
+				// { getFoo: EquivalentKeyMap( [] => { status: 'finished' } ) }
+				expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
+					status: 'finished',
+				} );
 			}
 		);
+
+		it( 'should normalize args array when dispatching actions', () => {
+			const started = reducer( undefined, {
+				type: 'START_RESOLUTION',
+				selectorName: 'getFoo',
+				args: [ 1, undefined ],
+			} );
+			expect( started.getFoo.get( [ 1 ] ) ).toEqual( {
+				status: 'resolving',
+			} );
+
+			const finished = reducer( started, {
+				type: 'FINISH_RESOLUTION',
+				selectorName: 'getFoo',
+				args: [ 1, undefined, undefined ],
+			} );
+			expect( finished.getFoo.get( [ 1 ] ) ).toEqual( {
+				status: 'finished',
+			} );
+		} );
 	} );
 
 	describe( 'resolution batch', () => {
@@ -137,8 +167,12 @@ describe( 'reducer', () => {
 				args: [ [ 'post' ], [ 'block' ] ],
 			} );
 
-			expect( state.getFoo.get( [ 'post' ] ) ).toBe( true );
-			expect( state.getFoo.get( [ 'block' ] ) ).toBe( true );
+			expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
+				status: 'resolving',
+			} );
+			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
+				status: 'resolving',
+			} );
 		} );
 
 		it( 'should return with finished resolutions', () => {
@@ -153,8 +187,12 @@ describe( 'reducer', () => {
 				args: [ [ 'post' ], [ 'block' ] ],
 			} );
 
-			expect( state.getFoo.get( [ 'post' ] ) ).toBe( false );
-			expect( state.getFoo.get( [ 'block' ] ) ).toBe( false );
+			expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
+				status: 'finished',
+			} );
+			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
+				status: 'finished',
+			} );
 		} );
 
 		it( 'should remove invalidations', () => {
@@ -175,7 +213,9 @@ describe( 'reducer', () => {
 			} );
 
 			expect( state.getFoo.get( [ 'post' ] ) ).toBe( undefined );
-			expect( state.getFoo.get( [ 'block' ] ) ).toBe( false );
+			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
+				status: 'finished',
+			} );
 		} );
 
 		it( 'different arguments should not conflict', () => {
@@ -195,8 +235,12 @@ describe( 'reducer', () => {
 				args: [ [ 'block' ] ],
 			} );
 
-			expect( state.getFoo.get( [ 'post' ] ) ).toBe( false );
-			expect( state.getFoo.get( [ 'block' ] ) ).toBe( true );
+			expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
+				status: 'finished',
+			} );
+			expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
+				status: 'resolving',
+			} );
 		} );
 
 		it(
@@ -236,9 +280,45 @@ describe( 'reducer', () => {
 				} );
 
 				expect( state.getBar ).toBeUndefined();
-				expect( state.getFoo.get( [ 'post' ] ) ).toBe( false );
-				expect( state.getFoo.get( [ 'block' ] ) ).toBe( false );
+				expect( state.getFoo.get( [ 'post' ] ) ).toEqual( {
+					status: 'finished',
+				} );
+				expect( state.getFoo.get( [ 'block' ] ) ).toEqual( {
+					status: 'finished',
+				} );
 			}
 		);
+
+		it( 'should normalize args array when dispatching actions', () => {
+			const started = reducer( undefined, {
+				type: 'START_RESOLUTIONS',
+				selectorName: 'getFoo',
+				args: [
+					[ 1, undefined ],
+					[ 2, undefined, undefined ],
+				],
+			} );
+			expect( started.getFoo.get( [ 1 ] ) ).toEqual( {
+				status: 'resolving',
+			} );
+			expect( started.getFoo.get( [ 2 ] ) ).toEqual( {
+				status: 'resolving',
+			} );
+
+			const finished = reducer( started, {
+				type: 'FINISH_RESOLUTIONS',
+				selectorName: 'getFoo',
+				args: [
+					[ 1, undefined, undefined ],
+					[ 2, undefined ],
+				],
+			} );
+			expect( finished.getFoo.get( [ 1 ] ) ).toEqual( {
+				status: 'finished',
+			} );
+			expect( finished.getFoo.get( [ 2 ] ) ).toEqual( {
+				status: 'finished',
+			} );
+		} );
 	} );
 } );

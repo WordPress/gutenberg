@@ -61,37 +61,39 @@ const QueryControls = memo(
 			[ order, orderBy, onOrderByChange, onOrderChange ]
 		);
 
-		return [
-			onOrderChange && onOrderByChange && (
-				<SelectControl
-					label={ __( 'Order by' ) }
-					value={ `${ orderBy }/${ order }` }
-					options={ options }
-					onChange={ onChange }
-					hideCancelButton={ true }
-				/>
-			),
-			onCategoryChange && (
-				<CategorySelect
-					categoriesList={ categoriesList }
-					label={ __( 'Category' ) }
-					noOptionLabel={ __( 'All' ) }
-					selectedCategoryId={ selectedCategoryId }
-					onChange={ onCategoryChange }
-					hideCancelButton={ true }
-				/>
-			),
-			onNumberOfItemsChange && (
-				<RangeControl
-					label={ __( 'Number of items' ) }
-					value={ numberOfItems }
-					onChange={ onNumberOfItemsChange }
-					min={ minItems }
-					max={ maxItems }
-					required
-				/>
-			),
-		];
+		return (
+			<>
+				{ onOrderChange && onOrderByChange && (
+					<SelectControl
+						label={ __( 'Order by' ) }
+						value={ `${ orderBy }/${ order }` }
+						options={ options }
+						onChange={ onChange }
+						hideCancelButton={ true }
+					/>
+				) }
+				{ onCategoryChange && (
+					<CategorySelect
+						categoriesList={ categoriesList }
+						label={ __( 'Category' ) }
+						noOptionLabel={ __( 'All' ) }
+						selectedCategoryId={ selectedCategoryId }
+						onChange={ onCategoryChange }
+						hideCancelButton={ true }
+					/>
+				) }
+				{ onNumberOfItemsChange && (
+					<RangeControl
+						label={ __( 'Number of items' ) }
+						value={ numberOfItems }
+						onChange={ onNumberOfItemsChange }
+						min={ minItems }
+						max={ maxItems }
+						required
+					/>
+				) }
+			</>
+		);
 	}
 );
 

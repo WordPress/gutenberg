@@ -6,32 +6,38 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import BaseControl from '../base-control';
 import { FlexBlock, FlexItem } from '../flex';
 import NumberControl from '../number-control';
 import AngleCircle from './angle-circle';
 import { Root } from './styles/angle-picker-control-styles';
+import { space } from '../ui/utils/space';
+import { Text } from '../text';
+import { Spacer } from '../spacer';
 
 export default function AnglePickerControl( {
+	/** Start opting into the new margin-free styles that will become the default in a future version. */
+	__nextHasNoMarginBottom = false,
 	className,
-	hideLabelFromVision,
-	id: idProp,
 	label = __( 'Angle' ),
 	onChange,
 	value,
-	...props
 } ) {
-	const instanceId = useInstanceId(
-		AnglePickerControl,
-		'components-angle-picker-control__input'
-	);
-	const id = idProp || instanceId;
+	if ( ! __nextHasNoMarginBottom ) {
+		deprecated(
+			'Bottom margin styles for wp.components.AnglePickerControl',
+			{
+				since: '6.1',
+				version: '6.4',
+				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
+			}
+		);
+	}
 
 	const handleOnNumberChange = ( unprocessedValue ) => {
 		const inputValue =
@@ -42,33 +48,48 @@ export default function AnglePickerControl( {
 	const classes = classnames( 'components-angle-picker-control', className );
 
 	return (
-		<BaseControl
+		<Root
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			className={ classes }
-			hideLabelFromVision={ hideLabelFromVision }
-			id={ id }
-			label={ label }
-			{ ...props }
+			gap={ 4 }
 		>
-			<Root>
-				<FlexBlock>
-					<NumberControl
-						className="components-angle-picker-control__input-field"
-						id={ id }
-						max={ 360 }
-						min={ 0 }
-						onChange={ handleOnNumberChange }
-						step="1"
-						value={ value }
-					/>
-				</FlexBlock>
-				<FlexItem>
-					<AngleCircle
-						aria-hidden="true"
-						value={ value }
-						onChange={ onChange }
-					/>
-				</FlexItem>
-			</Root>
-		</BaseControl>
+			<FlexBlock>
+				<NumberControl
+					label={ label }
+					className="components-angle-picker-control__input-field"
+					max={ 360 }
+					min={ 0 }
+					onChange={ handleOnNumberChange }
+					size="__unstable-large"
+					step="1"
+					value={ value }
+					hideHTMLArrows
+					suffix={
+						<Spacer
+							as={ Text }
+							marginBottom={ 0 }
+							marginRight={ space( 3 ) }
+							style={ {
+								color: 'var( --wp-admin-theme-color )',
+							} }
+						>
+							°
+						</Spacer>
+					}
+				/>
+			</FlexBlock>
+			<FlexItem
+				style={ {
+					marginBottom: space( 1 ),
+					marginTop: 'auto',
+				} }
+			>
+				<AngleCircle
+					aria-hidden="true"
+					value={ value }
+					onChange={ onChange }
+				/>
+			</FlexItem>
+		</Root>
 	);
 }

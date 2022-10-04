@@ -1,11 +1,7 @@
 /**
  * External dependencies
  */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { css, cx } from '@emotion/css';
-import { isPlainObject } from 'lodash';
+import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
@@ -23,9 +19,10 @@ import { createHighlighterText } from './utils';
 import { getFontSize } from '../ui/utils/font-size';
 import { CONFIG, COLORS } from '../utils';
 import { getLineHeight } from './get-line-height';
+import { useCx } from '../utils/hooks/use-cx';
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'span'>} props
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
  */
 export default function useText( props ) {
 	const {
@@ -76,6 +73,8 @@ export default function useText( props ) {
 		} );
 	}
 
+	const cx = useCx();
+
 	const classes = useMemo( () => {
 		const sx = {};
 
@@ -89,7 +88,10 @@ export default function useText( props ) {
 			display,
 			fontSize: getFontSize( size ),
 			/* eslint-disable jsdoc/valid-types */
-			fontWeight: /** @type {import('react').CSSProperties['fontWeight']} */ ( weight ),
+			fontWeight:
+				/** @type {import('react').CSSProperties['fontWeight']} */ (
+					weight
+				),
 			/* eslint-enable jsdoc/valid-types */
 			lineHeight,
 			letterSpacing,
@@ -105,7 +107,7 @@ export default function useText( props ) {
 				getOptimalTextShade( optimizeReadabilityFor ) === 'dark';
 
 			sx.optimalTextColor = isOptimalTextColorDark
-				? css( { color: COLORS.black } )
+				? css( { color: COLORS.gray[ 900 ] } )
 				: css( { color: COLORS.white } );
 		}
 
@@ -126,6 +128,7 @@ export default function useText( props ) {
 		align,
 		className,
 		color,
+		cx,
 		display,
 		isBlock,
 		isCaption,
@@ -163,8 +166,11 @@ export default function useText( props ) {
 	 */
 	if ( ! truncate && Array.isArray( children ) ) {
 		content = Children.map( children, ( child ) => {
-			// @ts-ignore
-			if ( ! isPlainObject( child ) || ! ( 'props' in child ) ) {
+			if (
+				typeof child !== 'object' ||
+				child === null ||
+				! ( 'props' in child )
+			) {
 				return child;
 			}
 

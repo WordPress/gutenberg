@@ -57,11 +57,16 @@ const BottomSheetSelectControl = ( {
 					value={ selectedOption.label }
 					onPress={ openSubSheet }
 					accessibilityRole={ 'button' }
-					accessibilityLabel={ selectedOption.label }
+					accessibilityLabel={ sprintf(
+						// translators:  %1$s: Select control button label e.g. "Button width". %2$s: Select control option value e.g: "Auto, 25%".
+						__( '%1$s. Currently selected: %2$s' ),
+						label,
+						selectedOption.label
+					) }
 					accessibilityHint={ sprintf(
 						// translators: %s: Select control button label e.g. "Button width"
 						__( 'Navigates to select %s' ),
-						selectedOption.label
+						label
 					) }
 				>
 					<Icon icon={ chevronRight }></Icon>
@@ -70,16 +75,19 @@ const BottomSheetSelectControl = ( {
 			showSheet={ showSubSheet }
 		>
 			<>
-				<BottomSheet.NavigationHeader
-					screen={ label }
-					leftButtonOnPress={ goBack }
-				/>
+				<BottomSheet.NavBar>
+					<BottomSheet.NavBar.BackButton onPress={ goBack } />
+					<BottomSheet.NavBar.Heading>
+						{ label }
+					</BottomSheet.NavBar.Heading>
+				</BottomSheet.NavBar>
 				<View style={ styles.selectControl }>
 					{ items.map( ( item, index ) => (
 						<BottomSheet.Cell
 							customActionButton
 							separatorType="none"
 							label={ item.label }
+							icon={ item.icon }
 							onPress={ onChangeValue( item.value ) }
 							leftAlign={ true }
 							key={ index }

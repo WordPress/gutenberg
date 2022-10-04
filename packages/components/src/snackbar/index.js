@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -17,6 +16,7 @@ import warning from '@wordpress/warning';
  */
 import { Button } from '../';
 
+const noop = () => {};
 const NOTICE_TIMEOUT = 10000;
 
 /** @typedef {import('@wordpress/element').WPElement} WPElement */
@@ -53,6 +53,7 @@ function Snackbar(
 		// It is distinct from onRemove, which _looks_ like a callback but is
 		// actually the function to call to remove the snackbar from the UI.
 		onDismiss = noop,
+		listRef,
 	},
 	ref
 ) {
@@ -62,6 +63,9 @@ function Snackbar(
 		if ( event && event.preventDefault ) {
 			event.preventDefault();
 		}
+
+		// Prevent focus loss by moving it to the list element.
+		listRef.current.focus();
 
 		onDismiss();
 		onRemove();
@@ -95,7 +99,7 @@ function Snackbar(
 		'components-snackbar-explicit-dismiss': !! explicitDismiss,
 	} );
 	if ( actions && actions.length > 1 ) {
-		// we need to inform developers that snackbar only accepts 1 action
+		// We need to inform developers that snackbar only accepts 1 action.
 		warning(
 			'Snackbar can only have 1 action, use Notice if your message require many messages'
 		);

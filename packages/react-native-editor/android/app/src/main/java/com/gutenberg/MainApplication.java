@@ -1,5 +1,7 @@
 package com.gutenberg;
 
+import static org.wordpress.mobile.WPAndroidGlue.Media.createRNMediaUsingMimeType;
+
 import android.app.Application;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -11,7 +13,11 @@ import androidx.core.util.Consumer;
 
 import com.facebook.react.ReactApplication;
 import com.BV.LinearGradient.LinearGradientPackage;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.JSIModulePackage;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
+import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import com.brentvatne.react.ReactVideoPackage;
 import com.facebook.react.bridge.ReadableArray;
@@ -19,6 +25,7 @@ import com.facebook.react.devsupport.interfaces.DevOptionHandler;
 import com.facebook.react.devsupport.interfaces.DevSupportManager;
 import com.horcrux.svg.SvgPackage;
 import org.linusu.RNGetRandomValuesPackage;
+import com.dylanvann.fastimage.FastImageViewPackage;
 
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeInterface;
@@ -32,7 +39,9 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.reactnativecommunity.webview.RNCWebViewPackage;
+import com.swmansion.gesturehandler.RNGestureHandlerPackage;
+import com.swmansion.reanimated.ReanimatedJSIModulePackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
@@ -77,17 +86,17 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
                 switch (mediaType) {
                     case IMAGE:
-                        rnMediaList.add(new Media(1, "https://cldup.com/cXyG__fTLN.jpg", "image", "Mountain", ""));
+                        rnMediaList.add(createRNMediaUsingMimeType(1, "https://cldup.com/cXyG__fTLN.jpg", "image", "Mountain", "", "A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground"));
                         break;
                     case VIDEO:
-                        rnMediaList.add(new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup", ""));
+                        rnMediaList.add(createRNMediaUsingMimeType(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup", ""));
                         break;
                     case ANY:
                     case OTHER:
-                        rnMediaList.add(new Media(3, "https://wordpress.org/latest.zip", "zip", "WordPress latest version", "WordPress.zip"));
+                        rnMediaList.add(createRNMediaUsingMimeType(3, "https://wordpress.org/latest.zip", "zip", "WordPress latest version", "WordPress.zip"));
                         break;
                     case AUDIO:
-                        rnMediaList.add(new Media(5, "https://cldup.com/59IrU0WJtq.mp3", "audio", "Summer presto", ""));
+                        rnMediaList.add(createRNMediaUsingMimeType(5, "https://cldup.com/59IrU0WJtq.mp3", "audio", "Summer presto", ""));
                         break;
                 }
                 mediaSelectedCallback.onMediaFileSelected(rnMediaList);
@@ -139,7 +148,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
             public void requestMediaPickFrom(String mediaSource, MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection) {
                 if (mediaSource.equals("1")) {
                     List<RNMedia> rnMediaList = new ArrayList<>();
-                    rnMediaList.add(new Media(1, "https://grad.illinois.edu/sites/default/files/pdfs/cvsamples.pdf", "other", "","cvsamples.pdf"));
+                    rnMediaList.add(createRNMediaUsingMimeType(1, "https://grad.illinois.edu/sites/default/files/pdfs/cvsamples.pdf", "other", "","cvsamples.pdf"));
                     mediaSelectedCallback.onMediaFileSelected(rnMediaList);
                 }
             }
@@ -245,6 +254,31 @@ public class MainApplication extends Application implements ReactApplication, Gu
                 Toast.makeText(MainApplication.this, "requestPreview called", Toast.LENGTH_SHORT).show();
             }
 
+            @Override
+            public void requestBlockTypeImpressions(BlockTypeImpressionsCallback blockTypeImpressionsCallback) {
+                ReadableMap impressions = Arguments.createMap();
+                blockTypeImpressionsCallback.onRequestBlockTypeImpressions(impressions);
+            }
+
+            @Override
+            public void setBlockTypeImpressions(ReadableMap impressions) {
+                Log.d("BlockTypeImpressions", String.format("Gutenberg requested setting block type impression to %s.", impressions));
+            }
+
+            @Override
+            public void requestContactCustomerSupport() {
+                Toast.makeText(MainApplication.this, "requestContactCustomerSupport called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void requestGotoCustomerSupportOptions() {
+                Toast.makeText(MainApplication.this, "requestGotoCustomerSupportOptions called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void sendEventToHost(final String eventName, final ReadableMap properties) {
+                Log.d("SendEventToHost", String.format("Gutenberg requested sending '%s' event to host with properties: %s", eventName, properties));
+            }
         }, isDarkMode());
 
         return new ReactNativeHost(this) {
@@ -270,12 +304,20 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         new SafeAreaContextPackage(),
                         new RNScreensPackage(),
                         new RNPromptPackage(),
+                        new RNCWebViewPackage(),
+                        new ClipboardPackage(),
+                        new FastImageViewPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }
 
             @Override
             protected String getJSMainModuleName() {
                 return "index";
+            }
+
+            @Override
+            protected JSIModulePackage getJSIModulePackage() {
+                return new ReanimatedJSIModulePackage();
             }
         };
     }
@@ -321,6 +363,13 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             public void onOptionSelected() {
                 mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
+            }
+        });
+
+        devSupportManager.addCustomDevOption("Help", new DevOptionHandler() {
+            @Override
+            public void onOptionSelected() {
+                mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().showEditorHelp();
             }
         });
     }

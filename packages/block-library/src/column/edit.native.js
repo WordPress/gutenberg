@@ -175,7 +175,6 @@ function ColumnEdit( {
 								onChange={ onChange }
 								onComplete={ onChangeWidth }
 								onUnitChange={ onChangeUnit }
-								decimalNum={ 1 }
 								value={
 									getWidths( columns )[ selectedColumnIndex ]
 								}
@@ -262,8 +261,8 @@ export default compose( [
 		const selectedColumnIndex = blockOrder.indexOf( clientId );
 		const columns = getBlocks( parentId );
 
-		const parentAlignment = getBlockAttributes( parentId )
-			?.verticalAlignment;
+		const parentAlignment =
+			getBlockAttributes( parentId )?.verticalAlignment;
 
 		return {
 			hasChildren,

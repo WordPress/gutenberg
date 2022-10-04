@@ -55,7 +55,7 @@
 
 .picker {
 	padding: $grid-unit-20;
-	border-radius: $grid-unit-20 / 2;
+	border-radius: $grid-unit-20 * 0.5;
 	height: 200px;
 }
 

@@ -13,14 +13,11 @@ exports[`props should render correctly 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: -1px;
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   width: 100%;
-}
-
-.emotion-0>*+*:not(marquee) {
-  margin-left: -1px;
 }
 
 .emotion-0>* {
@@ -32,7 +29,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-flex components-control-group emotion-0 emotion-1 emotion-2"
+  class="components-flex components-control-group emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="ControlGroup"
 >

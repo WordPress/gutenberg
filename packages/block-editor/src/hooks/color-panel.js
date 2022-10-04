@@ -1,15 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import PanelColorGradientSettings from '../components/colors-gradients/panel-color-gradient-settings';
+import ColorGradientSettingsDropdown from '../components/colors-gradients/dropdown';
 import ContrastChecker from '../components/contrast-checker';
 import InspectorControls from '../components/inspector-controls';
+import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
 import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
 
 function getComputedStyle( node ) {
@@ -17,16 +17,19 @@ function getComputedStyle( node ) {
 }
 
 export default function ColorPanel( {
+	enableAlpha = false,
 	settings,
 	clientId,
 	enableContrastChecking = true,
 } ) {
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
+	const [ detectedLinkColor, setDetectedLinkColor ] = useState();
 	const ref = useBlockRef( clientId );
+	const definedColors = settings.filter( ( setting ) => setting?.colorValue );
 
 	useEffect( () => {
-		if ( ! enableContrastChecking ) {
+		if ( ! enableContrastChecking || ! definedColors.length ) {
 			return;
 		}
 
@@ -35,9 +38,14 @@ export default function ColorPanel( {
 		}
 		setDetectedColor( getComputedStyle( ref.current ).color );
 
+		const firstLinkElement = ref.current?.querySelector( 'a' );
+		if ( firstLinkElement && !! firstLinkElement.innerText ) {
+			setDetectedLinkColor( getComputedStyle( firstLinkElement ).color );
+		}
+
 		let backgroundColorNode = ref.current;
-		let backgroundColor = getComputedStyle( backgroundColorNode )
-			.backgroundColor;
+		let backgroundColor =
+			getComputedStyle( backgroundColorNode ).backgroundColor;
 		while (
 			backgroundColor === 'rgba(0, 0, 0, 0)' &&
 			backgroundColorNode.parentNode &&
@@ -45,27 +53,34 @@ export default function ColorPanel( {
 				backgroundColorNode.parentNode.ELEMENT_NODE
 		) {
 			backgroundColorNode = backgroundColorNode.parentNode;
-			backgroundColor = getComputedStyle( backgroundColorNode )
-				.backgroundColor;
+			backgroundColor =
+				getComputedStyle( backgroundColorNode ).backgroundColor;
 		}
 
 		setDetectedBackgroundColor( backgroundColor );
 	} );
 
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+
 	return (
-		<InspectorControls>
-			<PanelColorGradientSettings
-				title={ __( 'Color' ) }
-				initialOpen={ false }
+		<InspectorControls __experimentalGroup="color">
+			<ColorGradientSettingsDropdown
+				enableAlpha={ enableAlpha }
+				panelId={ clientId }
 				settings={ settings }
-			>
-				{ enableContrastChecking && (
-					<ContrastChecker
-						backgroundColor={ detectedBackgroundColor }
-						textColor={ detectedColor }
-					/>
-				) }
-			</PanelColorGradientSettings>
+				__experimentalIsItemGroup={ false }
+				__experimentalHasMultipleOrigins
+				__experimentalIsRenderedInSidebar
+				{ ...colorGradientSettings }
+			/>
+			{ enableContrastChecking && (
+				<ContrastChecker
+					backgroundColor={ detectedBackgroundColor }
+					textColor={ detectedColor }
+					enableAlphaChecker={ enableAlpha }
+					linkColor={ detectedLinkColor }
+				/>
+			) }
 		</InspectorControls>
 	);
 }

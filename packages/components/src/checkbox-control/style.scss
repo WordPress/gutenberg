@@ -33,7 +33,8 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
 		outline: 2px solid transparent;
 	}
 
-	&:checked {
+	&:checked,
+	&:indeterminate {
 		background: var(--wp-admin-theme-color);
 		border-color: var(--wp-admin-theme-color);
 
@@ -62,7 +63,8 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
 	}
 }
 
-svg.components-checkbox-control__checked {
+svg.components-checkbox-control__checked,
+svg.components-checkbox-control__indeterminate {
 	fill: $white;
 	cursor: pointer;
 	position: absolute;

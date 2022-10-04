@@ -10,21 +10,24 @@ import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function ConvertToRegularBlocks( { clientId } ) {
-	const { innerBlocks } = useSelect(
-		( select ) =>
-			select( blockEditorStore ).__unstableGetBlockWithBlockTree(
-				clientId
-			),
+	const { getBlocks } = useSelect( blockEditorStore );
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+
+	const canRemove = useSelect(
+		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
 		[ clientId ]
 	);
-	const { replaceBlocks } = useDispatch( blockEditorStore );
+
+	if ( ! canRemove ) {
+		return null;
+	}
 
 	return (
 		<BlockSettingsMenuControls>
 			{ ( { onClose } ) => (
 				<MenuItem
 					onClick={ () => {
-						replaceBlocks( clientId, innerBlocks );
+						replaceBlocks( clientId, getBlocks( clientId ) );
 						onClose();
 					} }
 				>

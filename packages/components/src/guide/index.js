@@ -6,18 +6,17 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, Children } from '@wordpress/element';
+import { useState, useEffect, Children, useRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
+import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
 import Modal from '../modal';
-import KeyboardShortcuts from '../keyboard-shortcuts';
 import Button from '../button';
 import PageControl from './page-control';
-import FinishButton from './finish-button';
 
 export default function Guide( {
 	children,
@@ -27,6 +26,7 @@ export default function Guide( {
 	onFinish,
 	pages = [],
 } ) {
+	const guideContainer = useRef();
 	const [ currentPage, setCurrentPage ] = useState( 0 );
 
 	useEffect( () => {
@@ -37,6 +37,14 @@ export default function Guide( {
 			} );
 		}
 	}, [ children ] );
+
+	useEffect( () => {
+		// Each time we change the current page, start from the first element of the page.
+		// This also solves any focus loss that can happen.
+		if ( guideContainer.current ) {
+			focus.tabbable.find( guideContainer.current )?.[ 0 ]?.focus();
+		}
+	}, [ currentPage ] );
 
 	if ( Children.count( children ) ) {
 		pages = Children.map( children, ( child ) => ( { content: child } ) );
@@ -66,15 +74,19 @@ export default function Guide( {
 			className={ classnames( 'components-guide', className ) }
 			contentLabel={ contentLabel }
 			onRequestClose={ onFinish }
+			onKeyDown={ ( event ) => {
+				if ( event.code === 'ArrowLeft' ) {
+					goBack();
+					// Do not scroll the modal's contents.
+					event.preventDefault();
+				} else if ( event.code === 'ArrowRight' ) {
+					goForward();
+					// Do not scroll the modal's contents.
+					event.preventDefault();
+				}
+			} }
+			ref={ guideContainer }
 		>
-			<KeyboardShortcuts
-				key={ currentPage }
-				shortcuts={ {
-					left: goBack,
-					right: goForward,
-				} }
-			/>
-
 			<div className="components-guide__container">
 				<div className="components-guide__page">
 					{ pages[ currentPage ].image }
@@ -88,15 +100,6 @@ export default function Guide( {
 					) }
 
 					{ pages[ currentPage ].content }
-
-					{ ! canGoForward && (
-						<FinishButton
-							className="components-guide__inline-finish-button"
-							onClick={ onFinish }
-						>
-							{ finishButtonText || __( 'Finish' ) }
-						</FinishButton>
-					) }
 				</div>
 
 				<div className="components-guide__footer">
@@ -117,12 +120,12 @@ export default function Guide( {
 						</Button>
 					) }
 					{ ! canGoForward && (
-						<FinishButton
+						<Button
 							className="components-guide__finish-button"
 							onClick={ onFinish }
 						>
 							{ finishButtonText || __( 'Finish' ) }
-						</FinishButton>
+						</Button>
 					) }
 				</div>
 			</div>

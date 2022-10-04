@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import UnitControl from './unit-control';
 import { LABELS } from './utils';
 import { Layout } from './styles/box-control-styles';
@@ -13,6 +14,8 @@ export default function AxialInputControls( {
 	onHoverOn,
 	onHoverOff,
 	values,
+	selectedUnits,
+	setSelectedUnits,
 	sides,
 	...props
 } ) {
@@ -64,17 +67,36 @@ export default function AxialInputControls( {
 			return;
 		}
 		const nextValues = { ...values };
+		const isNumeric = ! isNaN( parseFloat( next ) );
+		const nextValue = isNumeric ? next : undefined;
 
 		if ( side === 'vertical' ) {
-			nextValues.top = next;
-			nextValues.bottom = next;
+			nextValues.top = nextValue;
+			nextValues.bottom = nextValue;
 		}
+
 		if ( side === 'horizontal' ) {
-			nextValues.left = next;
-			nextValues.right = next;
+			nextValues.left = nextValue;
+			nextValues.right = nextValue;
 		}
 
 		onChange( nextValues );
+	};
+
+	const createHandleOnUnitChange = ( side ) => ( next ) => {
+		const newUnits = { ...selectedUnits };
+
+		if ( side === 'vertical' ) {
+			newUnits.top = next;
+			newUnits.bottom = next;
+		}
+
+		if ( side === 'horizontal' ) {
+			newUnits.left = next;
+			newUnits.right = next;
+		}
+
+		setSelectedUnits( newUnits );
 	};
 
 	// Filter sides if custom configuration provided, maintaining default order.
@@ -84,7 +106,7 @@ export default function AxialInputControls( {
 
 	const first = filteredSides[ 0 ];
 	const last = filteredSides[ filteredSides.length - 1 ];
-	const only = first === last;
+	const only = first === last && first;
 
 	return (
 		<Layout
@@ -92,21 +114,35 @@ export default function AxialInputControls( {
 			align="top"
 			className="component-box-control__vertical-horizontal-input-controls"
 		>
-			{ filteredSides.map( ( side ) => (
-				<UnitControl
-					{ ...props }
-					isFirst={ first === side }
-					isLast={ last === side }
-					isOnly={ only === side }
-					value={ 'vertical' === side ? values.top : values.left }
-					onChange={ createHandleOnChange( side ) }
-					onFocus={ createHandleOnFocus( side ) }
-					onHoverOn={ createHandleOnHoverOn( side ) }
-					onHoverOff={ createHandleOnHoverOff( side ) }
-					label={ LABELS[ side ] }
-					key={ side }
-				/>
-			) ) }
+			{ filteredSides.map( ( side ) => {
+				const [ parsedQuantity, parsedUnit ] =
+					parseQuantityAndUnitFromRawValue(
+						side === 'vertical' ? values.top : values.left
+					);
+				const selectedUnit =
+					side === 'vertical'
+						? selectedUnits.top
+						: selectedUnits.left;
+				return (
+					<UnitControl
+						{ ...props }
+						isFirst={ first === side }
+						isLast={ last === side }
+						isOnly={ only === side }
+						value={ [
+							parsedQuantity,
+							selectedUnit ?? parsedUnit,
+						].join( '' ) }
+						onChange={ createHandleOnChange( side ) }
+						onUnitChange={ createHandleOnUnitChange( side ) }
+						onFocus={ createHandleOnFocus( side ) }
+						onHoverOn={ createHandleOnHoverOn( side ) }
+						onHoverOff={ createHandleOnHoverOff( side ) }
+						label={ LABELS[ side ] }
+						key={ side }
+					/>
+				);
+			} ) }
 		</Layout>
 	);
 }

@@ -27,14 +27,15 @@ function useUpdatedRef( value ) {
 /**
  * Copies the given text to the clipboard when the element is clicked.
  *
+ * @template {HTMLElement} TElementType
  * @param {string | (() => string)} text      The text to copy. Use a function if not
  *                                            already available and expensive to compute.
  * @param {Function}                onSuccess Called when to text is copied.
  *
- * @return {import('react').Ref<HTMLElement>} A ref to assign to the target element.
+ * @return {import('react').Ref<TElementType>} A ref to assign to the target element.
  */
 export default function useCopyToClipboard( text, onSuccess ) {
-	// Store the dependencies as refs and continuesly update them so they're
+	// Store the dependencies as refs and continuously update them so they're
 	// fresh when the callback is called.
 	const textRef = useUpdatedRef( text );
 	const onSuccessRef = useUpdatedRef( onSuccess );

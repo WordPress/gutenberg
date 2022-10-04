@@ -2,6 +2,49 @@
 
 ## Unreleased
 
+## 2.6.0 (2022-09-21)
+
+## 2.5.0 (2022-08-24)
+
+### Enhancement
+
+-   Add support to the `dynamic` variant ([#41289](https://github.com/WordPress/gutenberg/pull/41289), [#43481](https://github.com/WordPress/gutenberg/pull/43481)).
+
+## 2.3.0 (2022-06-01)
+
+### Enhancement
+
+-   Read the block name from `block.json` file in JavaScript files ([#41273](https://github.com/WordPress/gutenberg/pull/41273)).
+
+### Bug Fix
+
+-   Fix the issue with the block wrapper in the editor ([#41273](https://github.com/WordPress/gutenberg/pull/41273)).
+
+## 2.1.0 (2022-04-21)
+
+### Bug Fix
+
+-   Fix some CSS Coding Standards violations in file templates ([#40479](https://github.com/WordPress/gutenberg/pull/40479)).
+
+## 2.0.0 (2022-03-03)
+
+### Breaking Change
+
+-   Bring project's template compatibility with `@wordpress/create-block` v3 ([#39049](https://github.com/WordPress/gutenberg/pull/39049)).
+
+### Enhancement
+
+-   Update project template configuration and templates to synchronize with the updated [Create a Block Tutorial](https://developer.wordpress.org/block-editor/getting-started/create-block/) ([#39049](https://github.com/WordPress/gutenberg/pull/39049)).
+
+## 1.4.0 (2022-01-27)
+
+### Enhancement
+
+-   Speed up scaffolding process by omitting WordPress dependencies in the template ([#37639](https://github.com/WordPress/gutenberg/pull/37639)).
+-   Update link to block registration reference ([#37674](https://github.com/WordPress/gutenberg/pull/37674))
+
+## 1.3.0 (2021-07-21)
+
 ### Enhancement
 
 -   Plugin scaffolded requires WordPress 5.8 now ([#33252](https://github.com/WordPress/gutenberg/pull/33252).

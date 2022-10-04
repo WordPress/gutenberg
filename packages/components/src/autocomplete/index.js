@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { escapeRegExp, find, deburr } from 'lodash';
+import { find } from 'lodash';
+import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
@@ -11,16 +12,8 @@ import {
 	useEffect,
 	useState,
 	useRef,
+	useMemo,
 } from '@wordpress/element';
-import {
-	ENTER,
-	ESCAPE,
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT,
-	BACKSPACE,
-} from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	useInstanceId,
@@ -41,6 +34,7 @@ import { speak } from '@wordpress/a11y';
  * Internal dependencies
  */
 import { getAutoCompleterUI } from './autocompleter-ui';
+import { escapeRegExp } from '../utils/strings';
 
 /**
  * A raw completer option.
@@ -132,7 +126,7 @@ function useAutocomplete( {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ autocompleter, setAutocompleter ] = useState( null );
 	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
-	const [ backspacing, setBackspacing ] = useState( false );
+	const backspacing = useRef( false );
 
 	function insertCompletion( replacement ) {
 		const end = record.start;
@@ -218,7 +212,7 @@ function useAutocomplete( {
 	}
 
 	function handleKeyDown( event ) {
-		setBackspacing( event.keyCode === BACKSPACE );
+		backspacing.current = event.code === 'Backspace';
 
 		if ( ! autocompleter ) {
 			return;
@@ -226,8 +220,11 @@ function useAutocomplete( {
 		if ( filteredOptions.length === 0 ) {
 			return;
 		}
-		switch ( event.keyCode ) {
-			case UP:
+		if ( event.defaultPrevented ) {
+			return;
+		}
+		switch ( event.code ) {
+			case 'ArrowUp':
 				setSelectedIndex(
 					( selectedIndex === 0
 						? filteredOptions.length
@@ -235,23 +232,24 @@ function useAutocomplete( {
 				);
 				break;
 
-			case DOWN:
+			case 'ArrowDown':
 				setSelectedIndex(
 					( selectedIndex + 1 ) % filteredOptions.length
 				);
 				break;
 
-			case ESCAPE:
+			case 'Escape':
 				setAutocompleter( null );
 				setAutocompleterUI( null );
+				event.preventDefault();
 				break;
 
-			case ENTER:
+			case 'Enter':
 				select( filteredOptions[ selectedIndex ] );
 				break;
 
-			case LEFT:
-			case RIGHT:
+			case 'ArrowLeft':
+			case 'ArrowRight':
 				reset();
 				return;
 
@@ -259,24 +257,27 @@ function useAutocomplete( {
 				return;
 		}
 
-		// Any handled keycode should prevent original behavior. This relies on
+		// Any handled key should prevent original behavior. This relies on
 		// the early return in the default case.
 		event.preventDefault();
-		event.stopPropagation();
 	}
 
-	let textContent;
-
-	if ( isCollapsed( record ) ) {
-		textContent = getTextContent( slice( record, 0 ) );
-	}
+	// textContent is a primitive (string), memoizing is not strictly necessary
+	// but this is a preemptive performance improvement, since the autocompleter
+	// is a potential bottleneck for the editor type metric.
+	const textContent = useMemo( () => {
+		if ( isCollapsed( record ) ) {
+			return getTextContent( slice( record, 0 ) );
+		}
+	}, [ record ] );
 
 	useEffect( () => {
 		if ( ! textContent ) {
+			reset();
 			return;
 		}
 
-		const text = deburr( textContent );
+		const text = removeAccents( textContent );
 		const textAfterSelection = getTextContent(
 			slice( record, undefined, getTextContent( record ).length )
 		);
@@ -321,7 +322,8 @@ function useAutocomplete( {
 				// Ex: "Some text @marcelo sekkkk" <--- "kkkk" caused a mismatch, but
 				// if the user presses backspace here, it will show the completion popup again.
 				const matchingWhileBackspacing =
-					backspacing && textWithoutTrigger.split( /\s/ ).length <= 3;
+					backspacing.current &&
+					textWithoutTrigger.split( /\s/ ).length <= 3;
 
 				if (
 					mismatch &&
@@ -366,6 +368,9 @@ function useAutocomplete( {
 				: AutocompleterUI
 		);
 		setFilterValue( query );
+		// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
+		// See https://github.com/WordPress/gutenberg/pull/41820
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ textContent ] );
 
 	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};

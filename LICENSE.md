@@ -1,6 +1,6 @@
 ## Gutenberg
 
-    Copyright 2016-2021 by the contributors
+    Copyright 2016-2022 by the contributors
 
 **License for Contributions (on and after April 15, 2021)**
 

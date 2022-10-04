@@ -17,6 +17,14 @@ import Button from '../button';
 
 const TIMEOUT = 4000;
 
+/**
+ * @param {Object}                    props
+ * @param {string}                    [props.className]
+ * @param {import('react').ReactNode} props.children
+ * @param {() => void}                props.onCopy
+ * @param {() => void}                [props.onFinishCopy]
+ * @param {string}                    props.text
+ */
 export default function ClipboardButton( {
 	className,
 	children,
@@ -26,14 +34,15 @@ export default function ClipboardButton( {
 	...buttonProps
 } ) {
 	deprecated( 'wp.components.ClipboardButton', {
-		since: '10.3',
-		plugin: 'Gutenberg',
+		since: '5.8',
 		alternative: 'wp.compose.useCopyToClipboard',
 	} );
 
+	/** @type {import('react').MutableRefObject<ReturnType<setTimeout> | undefined>} */
 	const timeoutId = useRef();
 	const ref = useCopyToClipboard( text, () => {
 		onCopy();
+		// @ts-expect-error: Should check if .current is defined, but not changing because this component is deprecated.
 		clearTimeout( timeoutId.current );
 
 		if ( onFinishCopy ) {
@@ -42,6 +51,7 @@ export default function ClipboardButton( {
 	} );
 
 	useEffect( () => {
+		// @ts-expect-error: Should check if .current is defined, but not changing because this component is deprecated.
 		clearTimeout( timeoutId.current );
 	}, [] );
 
@@ -52,7 +62,9 @@ export default function ClipboardButton( {
 	// This causes documentHasSelection() in the copy-handler component to
 	// mistakenly override the ClipboardButton, and copy a serialized string
 	// of the current block instead.
+	/** @type {import('react').ClipboardEventHandler<HTMLButtonElement>} */
 	const focusOnCopyEventTarget = ( event ) => {
+		// @ts-expect-error: Should be currentTarget, but not changing because this component is deprecated.
 		event.target.focus();
 	};
 

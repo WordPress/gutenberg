@@ -21,23 +21,23 @@ To opt-in for one of these features, call `add_theme_support` in the `functions.
 function mytheme_setup_theme_supported_features() {
 	add_theme_support( 'editor-color-palette', array(
 		array(
-			'name' => esc_attr__( 'strong magenta', 'themeLangDomain' ),
-			'slug' => 'strong-magenta',
+			'name'  => esc_attr__( 'strong magenta', 'themeLangDomain' ),
+			'slug'  => 'strong-magenta',
 			'color' => '#a156b4',
 		),
 		array(
-			'name' => esc_attr__( 'light grayish magenta', 'themeLangDomain' ),
-			'slug' => 'light-grayish-magenta',
+			'name'  => esc_attr__( 'light grayish magenta', 'themeLangDomain' ),
+			'slug'  => 'light-grayish-magenta',
 			'color' => '#d0a5db',
 		),
 		array(
-			'name' => esc_attr__( 'very light gray', 'themeLangDomain' ),
-			'slug' => 'very-light-gray',
+			'name'  => esc_attr__( 'very light gray', 'themeLangDomain' ),
+			'slug'  => 'very-light-gray',
 			'color' => '#eee',
 		),
 		array(
-			'name' => esc_attr__( 'very dark gray', 'themeLangDomain' ),
-			'slug' => 'very-dark-gray',
+			'name'  => esc_attr__( 'very dark gray', 'themeLangDomain' ),
+			'slug'  => 'very-dark-gray',
 			'color' => '#444',
 		),
 	) );
@@ -105,23 +105,23 @@ Different blocks have the possibility of customizing colors. The block editor pr
 ```php
 add_theme_support( 'editor-color-palette', array(
 	array(
-		'name' => esc_attr__( 'strong magenta', 'themeLangDomain' ),
-		'slug' => 'strong-magenta',
+		'name'  => esc_attr__( 'strong magenta', 'themeLangDomain' ),
+		'slug'  => 'strong-magenta',
 		'color' => '#a156b4',
 	),
 	array(
-		'name' => esc_attr__( 'light grayish magenta', 'themeLangDomain' ),
-		'slug' => 'light-grayish-magenta',
+		'name'  => esc_attr__( 'light grayish magenta', 'themeLangDomain' ),
+		'slug'  => 'light-grayish-magenta',
 		'color' => '#d0a5db',
 	),
 	array(
-		'name' => esc_attr__( 'very light gray', 'themeLangDomain' ),
-		'slug' => 'very-light-gray',
+		'name'  => esc_attr__( 'very light gray', 'themeLangDomain' ),
+		'slug'  => 'very-light-gray',
 		'color' => '#eee',
 	),
 	array(
-		'name' => esc_attr__( 'very dark gray', 'themeLangDomain' ),
-		'slug' => 'very-dark-gray',
+		'name'  => esc_attr__( 'very dark gray', 'themeLangDomain' ),
+		'slug'  => 'very-dark-gray',
 		'color' => '#444',
 	),
 ) );
@@ -133,19 +133,30 @@ Some colors change dynamically — such as "Primary" and "Secondary" color — s
 
 The colors will be shown in order on the palette, and there's no limit to how many can be specified.
 
-Themes are responsible for creating the classes that apply the colors in different contexts. Core blocks use "color" and "background-color" contexts. So to correctly apply "strong magenta" to all contexts of core blocks a theme should implement the following classes:
+Themes are responsible for creating the classes that apply the colors in different contexts. Core blocks use "color", "background-color", and "border-color" contexts. So to correctly apply "strong magenta" to all contexts of core blocks a theme should implement the classes itself. The class name is built appending 'has-', followed by the class name _using_ kebab case and ending with the context name.
 
 ```css
 .has-strong-magenta-background-color {
-	background-color: #313131;
+	background-color: #a156b4;
 }
 
 .has-strong-magenta-color {
-	color: #f78da7;
+	color: #a156b4;
+}
+
+.has-strong-magenta-border-color {
+	color: #a156b4;
 }
 ```
 
-The class name is built appending 'has-', followed by the class name _using_ kebab case and ending with the context name.
+Starting in WordPress 5.9, to override color values defined by core, themes without a `theme.json` have to set their values via CSS Custom Properties instead of providing the classes. The CSS Custom Properties use the following naming `--wp--preset--color--<slug>`. See more info in [this devnote](https://make.wordpress.org/core/2022/01/08/updates-for-settings-styles-and-theme-json/). For example:
+
+```css
+:root {
+	--wp--preset--color--cyan-bluish-gray: <new_value>;
+	--wp--preset--color--pale-pink: <new_value>;
+}
+```
 
 ### Block Gradient Presets
 
@@ -198,7 +209,16 @@ Themes are responsible for creating the classes that apply the gradients. So to 
 }
 ```
 
-### Block Font Sizes:
+Starting in WordPress 5.9, to override gradient values defined by core, themes without a `theme.json` have to set their values via CSS Custom Properties instead of providing the classes. The CSS Custom Properties use the following naming `--wp--preset--gradient--<slug>`. See more info in [this devnote](https://make.wordpress.org/core/2022/01/08/updates-for-settings-styles-and-theme-json/). For example:
+
+```css
+:root {
+	--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: <new_value>;
+	--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: <new_value>;
+}
+```
+
+### Block Font Sizes
 
 Blocks may allow the user to configure the font sizes they use, e.g., the paragraph block. The block provides a default set of font sizes, but a theme can overwrite it and provide its own:
 
@@ -244,6 +264,15 @@ As an example for the regular font size, a theme may provide the following class
 <strong>Note:</strong> The slugs `default` and `custom` are reserved and cannot be used by themes.
 </div>
 
+Starting in WordPress 5.9, to override font size values defined by core, themes without a `theme.json` have to set their values via CSS Custom Properties instead of providing the classes. The CSS Custom Properties use the following naming `--wp--preset--font-size--<slug>`. See more info in [this devnote](https://make.wordpress.org/core/2022/01/08/updates-for-settings-styles-and-theme-json/). For example:
+
+```css
+:root {
+	--wp--preset--font-size--small: <new_value>;
+	--wp--preset--font-size--large: <new_value>;
+}
+```
+
 ### Disabling custom font sizes
 
 Themes can disable the ability to set custom font sizes with the following code:
@@ -275,6 +304,18 @@ add_theme_support( 'disable-custom-gradients' );
 ```
 
 When set, users will be restricted to the default gradients provided in the block editor or the gradients provided via the `editor-gradient-presets` theme support setting.
+
+### Disabling base layout styles
+
+_**Note:** Since WordPress 6.1._
+
+Themes can opt out of generated block layout styles that provide default structural styles for core blocks including Group, Columns, Buttons, and Social Icons. By using the following code, these themes commit to providing their own structural styling, as using this feature will result in core blocks displaying incorrectly in both the editor and site frontend:
+
+```php
+add_theme_support( 'disable-layout-styles' );
+```
+
+For themes looking to customize `blockGap` styles or block spacing, see [the developer docs on Global Settings & Styles](/docs/how-to-guides/themes/theme-json/#what-is-blockgap-and-how-can-i-use-it).
 
 ### Supporting custom line heights
 
@@ -388,7 +429,7 @@ add_theme_support( 'responsive-embeds' );
 Some blocks can have padding controls. This is off by default, and requires the theme to opt in by declaring support:
 
 ```php
-add_theme_support('custom-spacing');
+add_theme_support( 'custom-spacing' );
 ```
 
 ## Link color control
@@ -406,7 +447,7 @@ Link support has been made stable as part of WordPress 5.8. It's `false` by defa
 }
 ```
 
-> Alternatively, with the Gutenberg plugin active, the old legacy support `add_theme_support('experimental-link-color')` would also work. This fallback would be removed when the Gutenberg plugin requires WordPress 5.8 as the minimum version.
+> Alternatively, with the Gutenberg plugin active, the old legacy support `add_theme_support( 'experimental-link-color' )` would also work. This fallback would be removed when the Gutenberg plugin requires WordPress 5.9 as the minimum version.
 
 When the user sets the link color of a block, a new style will be added in the form of:
 
@@ -422,3 +463,30 @@ where
 - `<link-color>` is either `var(--wp--preset--color--slug)` (if the user selected a preset value) or a raw color value (if the user selected a custom value)
 
 The block will get attached the class `.wp-elements-<uuid>`.
+
+## Appearance Tools
+
+Use this setting to enable the following Global Styles settings:
+
+- border: color, radius, style, width
+- color: link
+- spacing: blockGap, margin, padding
+- typography: lineHeight
+
+```php
+add_theme_support( 'appearance-tools' );
+```
+
+## Block Based Template Parts
+
+Block Based Template parts allow administrators to edit parts of the site using blocks. This is off by default, and requires the theme to opt in by declaring support:
+
+```php
+add_theme_support( 'block-template-parts' );
+```
+
+This feature is only relevant for non block based themes, as block based themes already support block based template parts as part of the site editor.
+
+The standalone template part editor does not allow editors to create new, or delete existing template parts. This is because the theme manually needs to include the template part in the PHP template.
+
+You can find out more about block based template parts in the [themes handbook block template and template parts section](https://developer.wordpress.org/themes/block-themes/templates-and-template-parts/#block-c5fa39a2-a27d-4bd2-98d0-dc6249a0801a).

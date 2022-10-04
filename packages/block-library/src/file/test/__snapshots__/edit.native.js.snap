@@ -20,7 +20,12 @@ exports[`File block renders file error state without crashing 1`] = `
     }
   />
   <View
-    accessible={true}
+    accessibilityState={
+      Object {
+        "disabled": false,
+      }
+    }
+    accessible={false}
     focusable={true}
     onClick={[Function]}
     onLayout={[Function]}
@@ -30,6 +35,7 @@ exports[`File block renders file error state without crashing 1`] = `
     onResponderTerminate={[Function]}
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
+    testID="file-edit-container"
   >
     <Text
       onTextLayout={[Function]}
@@ -48,7 +54,14 @@ exports[`File block renders file error state without crashing 1`] = `
         }
       }
     >
-      <View>
+      <View
+        style={
+          Array [
+            undefined,
+            undefined,
+          ]
+        }
+      >
         <RCTAztecView
           accessible={true}
           activeFormats={Array []}
@@ -61,6 +74,7 @@ exports[`File block renders file error state without crashing 1`] = `
           disableEditingMenu={false}
           focusable={true}
           fontFamily="serif"
+          fontSize={16}
           isMultiline={false}
           maxImagesWidth={200}
           onBackspace={[Function]}
@@ -94,6 +108,7 @@ exports[`File block renders file error state without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "<p>File name</p>",
             }
           }
@@ -104,18 +119,18 @@ exports[`File block renders file error state without crashing 1`] = `
       <View>
         Svg
         <TextInput
-          allowFontScaling={true}
           editable={false}
           fontFamily="serif"
           onChange={[Function]}
-          rejectResponderTermination={true}
           scrollEnabled={false}
           style={
-            Object {
-              "fontFamily": "serif",
-            }
+            Array [
+              Object {
+                "fontFamily": "serif",
+              },
+              undefined,
+            ]
           }
-          underlineColorAndroid="transparent"
           value="Error"
         />
       </View>
@@ -136,7 +151,14 @@ exports[`File block renders file error state without crashing 1`] = `
         ]
       }
     >
-      <View>
+      <View
+        style={
+          Array [
+            undefined,
+            undefined,
+          ]
+        }
+      >
         <RCTAztecView
           accessible={true}
           activeFormats={Array []}
@@ -150,6 +172,7 @@ exports[`File block renders file error state without crashing 1`] = `
           disableEditingMenu={false}
           focusable={true}
           fontFamily="serif"
+          fontSize={16}
           isMultiline={false}
           maxImagesWidth={200}
           minWidth={40}
@@ -186,6 +209,7 @@ exports[`File block renders file error state without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "<p>Download</p>",
             }
           }
@@ -218,7 +242,12 @@ exports[`File block renders file without crashing 1`] = `
     }
   />
   <View
-    accessible={true}
+    accessibilityState={
+      Object {
+        "disabled": false,
+      }
+    }
+    accessible={false}
     focusable={true}
     onClick={[Function]}
     onLayout={[Function]}
@@ -228,6 +257,7 @@ exports[`File block renders file without crashing 1`] = `
     onResponderTerminate={[Function]}
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
+    testID="file-edit-container"
   >
     <Text
       onTextLayout={[Function]}
@@ -246,7 +276,14 @@ exports[`File block renders file without crashing 1`] = `
         }
       }
     >
-      <View>
+      <View
+        style={
+          Array [
+            undefined,
+            undefined,
+          ]
+        }
+      >
         <RCTAztecView
           accessible={true}
           activeFormats={Array []}
@@ -259,6 +296,7 @@ exports[`File block renders file without crashing 1`] = `
           disableEditingMenu={false}
           focusable={true}
           fontFamily="serif"
+          fontSize={16}
           isMultiline={false}
           maxImagesWidth={200}
           onBackspace={[Function]}
@@ -292,6 +330,7 @@ exports[`File block renders file without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "<p>File name</p>",
             }
           }
@@ -316,7 +355,14 @@ exports[`File block renders file without crashing 1`] = `
         ]
       }
     >
-      <View>
+      <View
+        style={
+          Array [
+            undefined,
+            undefined,
+          ]
+        }
+      >
         <RCTAztecView
           accessible={true}
           activeFormats={Array []}
@@ -330,6 +376,7 @@ exports[`File block renders file without crashing 1`] = `
           disableEditingMenu={false}
           focusable={true}
           fontFamily="serif"
+          fontSize={16}
           isMultiline={false}
           maxImagesWidth={200}
           minWidth={40}
@@ -366,6 +413,7 @@ exports[`File block renders file without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "<p>Download</p>",
             }
           }

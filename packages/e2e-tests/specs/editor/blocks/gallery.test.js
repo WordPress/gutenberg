@@ -14,6 +14,8 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	clickButton,
+	openListView,
+	getListViewBlocks,
 } from '@wordpress/e2e-test-utils';
 
 async function upload( selector ) {
@@ -47,7 +49,7 @@ describe( 'Gallery', () => {
 		const filename = await upload( '.wp-block-gallery input[type="file"]' );
 
 		const regex = new RegExp(
-			`<!-- wp:gallery {"ids":\\[\\d+\\],"linkTo":"none"} -->\\s*<figure class="wp-block-gallery columns-1 is-cropped"><ul class="blocks-gallery-grid"><li class="blocks-gallery-item"><figure><img src="[^"]+\\/${ filename }\\.png" alt="" data-id="\\d+" data-link=".+" class="wp-image-\\d+"\\/><\\/figure><\\/li><\\/ul><\\/figure>\\s*<!-- \\/wp:gallery -->`
+			`<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"(?:full|large)\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image (?:size-full|size-large)\\"><img src=\\"[^"]+\/${ filename }\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
@@ -57,8 +59,17 @@ describe( 'Gallery', () => {
 
 		await insertBlock( 'Gallery' );
 		await upload( '.wp-block-gallery input[type="file"]' );
+		await page.waitForSelector( '.wp-block-gallery .wp-block-image' );
 
-		await page.click( '.wp-block-gallery>.blocks-gallery-caption' );
+		// The Gallery needs to be selected from the List view panel due to the
+		// way that Image uploads take and lose focus.
+		await openListView();
+
+		const galleryListLink = ( await getListViewBlocks( 'Gallery' ) )[ 0 ];
+		await galleryListLink.click();
+
+		await page.click( '.wp-block-gallery .blocks-gallery-caption' );
+
 		await page.keyboard.type( galleryCaption );
 
 		expect( await getEditedPostContent() ).toMatch(
@@ -71,18 +82,42 @@ describe( 'Gallery', () => {
 		await upload( '.wp-block-gallery input[type="file"]' );
 
 		const figureElement = await page.waitForSelector(
-			'.blocks-gallery-item figure'
+			'.wp-block-gallery .wp-block-image'
 		);
 
-		await figureElement.click();
+		// Check that the Image is unselected, in which case the figcaption won't be
+		// in the DOM - due the way that the Gallery block handles the upload the latest
+		// image gets selected in order to scroll to the position of it, as in large
+		// galleries the new upload may be off-canvas. After upload the image is unselected
+		// so if we don't check for that it may get unselected again by this flow after we
+		// have re-selected it to edit it.
+		await page.waitForFunction(
+			() => ! document.querySelector( '.wp-block-image figcaption' )
+		);
+
+		// The Image needs to be selected from the List view panel due to the
+		// way that Image uploads take and lose focus.
+		await openListView();
+
+		// Due to collapsed state of ListView nodes Gallery must be expanded to reveal the child blocks.
+		// This xpath selects the anchor node for the block which has a child span which contains the text
+		// label of the block and then selects the expander span for that node.
+		const galleryExpander = await page.waitForXPath(
+			`//a[.//span[text()='Gallery']]/span[contains(@class, 'block-editor-list-view__expander')]`
+		);
+
+		await galleryExpander.click();
+
+		const imageListLink = ( await getListViewBlocks( 'Image' ) )[ 0 ];
+		await imageListLink.click();
 
 		const captionElement = await figureElement.$(
 			'.block-editor-rich-text__editable'
 		);
 
+		await captionElement.click();
 		const caption = 'Tested caption';
 
-		await captionElement.click();
 		await page.keyboard.type( caption );
 
 		expect( await getEditedPostContent() ).toMatch(

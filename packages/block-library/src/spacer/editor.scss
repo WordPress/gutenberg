@@ -28,6 +28,12 @@
 .block-library-spacer__resize-container {
 	clear: both;
 
+	&:not(.is-resizing) {
+		// Important is used to have higher specificity than the inline style set by re-resizable library.
+		height: 100% !important;
+		width: 100% !important;
+	}
+
 	// Don't show the horizontal indicator.
 	.components-resizable-box__handle::before {
 		content: none;

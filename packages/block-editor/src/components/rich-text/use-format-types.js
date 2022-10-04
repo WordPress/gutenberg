@@ -3,10 +3,6 @@
  */
 import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as richTextStore } from '@wordpress/rich-text';
 
 function formatTypesSelector( select ) {
@@ -31,6 +27,26 @@ const interactiveContentTags = new Set( [
 	'textarea',
 	'video',
 ] );
+
+function prefixSelectKeys( selected, prefix ) {
+	if ( typeof selected !== 'object' ) return { [ prefix ]: selected };
+	return Object.fromEntries(
+		Object.entries( selected ).map( ( [ key, value ] ) => [
+			`${ prefix }.${ key }`,
+			value,
+		] )
+	);
+}
+
+function getPrefixedSelectKeys( selected, prefix ) {
+	if ( selected[ prefix ] ) return selected[ prefix ];
+	return Object.keys( selected )
+		.filter( ( key ) => key.startsWith( prefix + '.' ) )
+		.reduce( ( accumulator, key ) => {
+			accumulator[ key.slice( prefix.length + 1 ) ] = selected[ key ];
+			return accumulator;
+		}, {} );
+}
 
 /**
  * This hook provides RichText with the `formatTypes` and its derived props from
@@ -68,19 +84,23 @@ export function useFormatTypes( {
 	const keyedSelected = useSelect(
 		( select ) =>
 			formatTypes.reduce( ( accumulator, type ) => {
-				if ( type.__experimentalGetPropsForEditableTreePreparation ) {
-					accumulator[
-						type.name
-					] = type.__experimentalGetPropsForEditableTreePreparation(
-						select,
-						{
-							richTextIdentifier: identifier,
-							blockClientId: clientId,
-						}
-					);
+				if ( ! type.__experimentalGetPropsForEditableTreePreparation ) {
+					return accumulator;
 				}
 
-				return accumulator;
+				return {
+					...accumulator,
+					...prefixSelectKeys(
+						type.__experimentalGetPropsForEditableTreePreparation(
+							select,
+							{
+								richTextIdentifier: identifier,
+								blockClientId: clientId,
+							}
+						),
+						type.name
+					),
+				};
 			}, {} ),
 		[ formatTypes, clientId, identifier ]
 	);
@@ -90,11 +110,14 @@ export function useFormatTypes( {
 	const changeHandlers = [];
 	const dependencies = [];
 
+	for ( const key in keyedSelected ) {
+		dependencies.push( keyedSelected[ key ] );
+	}
+
 	formatTypes.forEach( ( type ) => {
 		if ( type.__experimentalCreatePrepareEditableTree ) {
-			const selected = keyedSelected[ type.name ];
 			const handler = type.__experimentalCreatePrepareEditableTree(
-				selected,
+				getPrefixedSelectKeys( keyedSelected, type.name ),
 				{
 					richTextIdentifier: identifier,
 					blockClientId: clientId,
@@ -106,29 +129,27 @@ export function useFormatTypes( {
 			} else {
 				prepareHandlers.push( handler );
 			}
-
-			for ( const key in selected ) {
-				dependencies.push( selected[ key ] );
-			}
 		}
 
 		if ( type.__experimentalCreateOnChangeEditableValue ) {
 			let dispatchers = {};
 
 			if ( type.__experimentalGetPropsForEditableTreeChangeHandler ) {
-				dispatchers = type.__experimentalGetPropsForEditableTreeChangeHandler(
-					dispatch,
-					{
-						richTextIdentifier: identifier,
-						blockClientId: clientId,
-					}
-				);
+				dispatchers =
+					type.__experimentalGetPropsForEditableTreeChangeHandler(
+						dispatch,
+						{
+							richTextIdentifier: identifier,
+							blockClientId: clientId,
+						}
+					);
 			}
 
+			const selected = getPrefixedSelectKeys( keyedSelected, type.name );
 			changeHandlers.push(
 				type.__experimentalCreateOnChangeEditableValue(
 					{
-						...( keyedSelected[ type.name ] || {} ),
+						...( typeof selected === 'object' ? selected : {} ),
 						...dispatchers,
 					},
 					{

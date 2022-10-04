@@ -9,7 +9,11 @@ import classnames from 'classnames';
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { getBlockType, withBlockContentContext } from '@wordpress/blocks';
+import {
+	getBlockType,
+	store as blocksStore,
+	__unstableGetInnerBlocksProps as getInnerBlocksProps,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -38,6 +42,8 @@ function UncontrolledInnerBlocks( props ) {
 	const {
 		clientId,
 		allowedBlocks,
+		__experimentalDefaultBlock,
+		__experimentalDirectInsert,
 		template,
 		templateLock,
 		wrapperRef,
@@ -53,9 +59,12 @@ function UncontrolledInnerBlocks( props ) {
 	useNestedSettingsUpdate(
 		clientId,
 		allowedBlocks,
+		__experimentalDefaultBlock,
+		__experimentalDirectInsert,
 		templateLock,
 		captureToolbars,
-		orientation
+		orientation,
+		__experimentalLayout
 	);
 
 	useInnerBlockTemplateSync(
@@ -68,6 +77,13 @@ function UncontrolledInnerBlocks( props ) {
 	const context = useSelect(
 		( select ) => {
 			const block = select( blockEditorStore ).getBlock( clientId );
+
+			// This check is here to avoid the Redux zombie bug where a child subscription
+			// is called before a parent, causing potential JS errors when the child has been removed.
+			if ( ! block ) {
+				return;
+			}
+
 			const blockType = getBlockType( block.name );
 
 			if ( ! blockType || ! blockType.providesContext ) {
@@ -136,21 +152,35 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
 export function useInnerBlocksProps( props = {}, options = {} ) {
 	const { clientId } = useBlockEditContext();
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
-	const hasOverlay = useSelect(
+	const { __experimentalCaptureToolbars, hasOverlay } = useSelect(
 		( select ) => {
+			if ( ! clientId ) {
+				return {};
+			}
+
 			const {
 				getBlockName,
 				isBlockSelected,
 				hasSelectedInnerBlock,
-				isNavigationMode,
+				__unstableGetEditorMode,
 			} = select( blockEditorStore );
-			const enableClickThrough = isNavigationMode() || isSmallScreen;
-			return (
-				getBlockName( clientId ) !== 'core/template' &&
-				! isBlockSelected( clientId ) &&
-				! hasSelectedInnerBlock( clientId, true ) &&
-				enableClickThrough
-			);
+			const blockName = getBlockName( clientId );
+			const enableClickThrough =
+				__unstableGetEditorMode() === 'navigation' || isSmallScreen;
+			return {
+				__experimentalCaptureToolbars: select(
+					blocksStore
+				).hasBlockSupport(
+					blockName,
+					'__experimentalExposeControlsToChildren',
+					false
+				),
+				hasOverlay:
+					blockName !== 'core/template' &&
+					! isBlockSelected( clientId ) &&
+					! hasSelectedInnerBlock( clientId, true ) &&
+					enableClickThrough,
+			};
 		},
 		[ clientId, isSmallScreen ]
 	);
@@ -161,11 +191,15 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			rootClientId: clientId,
 		} ),
 	] );
+
+	const innerBlocksProps = {
+		__experimentalCaptureToolbars,
+		...options,
+	};
 	const InnerBlocks =
-		options.value && options.onChange
+		innerBlocksProps.value && innerBlocksProps.onChange
 			? ControlledInnerBlocks
 			: UncontrolledInnerBlocks;
-
 	return {
 		...props,
 		ref,
@@ -176,17 +210,21 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				'has-overlay': hasOverlay,
 			}
 		),
-		children: <InnerBlocks { ...options } clientId={ clientId } />,
+		children: clientId ? (
+			<InnerBlocks { ...innerBlocksProps } clientId={ clientId } />
+		) : (
+			<BlockListItems { ...options } />
+		),
 	};
 }
+
+useInnerBlocksProps.save = getInnerBlocksProps;
 
 // Expose default appender placeholders as components.
 ForwardedInnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
 ForwardedInnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
 
-ForwardedInnerBlocks.Content = withBlockContentContext(
-	( { BlockContent } ) => <BlockContent />
-);
+ForwardedInnerBlocks.Content = () => useInnerBlocksProps.save().children;
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md

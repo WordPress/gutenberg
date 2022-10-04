@@ -2,6 +2,73 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   Deprecate non-string descriptions ([#44455](https://github.com/WordPress/gutenberg/pull/44455)).
+
+## 11.17.0 (2022-09-21)
+
+- The block attribute sources `children` and `node` have been deprecated. Please use the `html` source instead. See https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/ and the core blocks for examples.
+## 11.16.0 (2022-09-13)
+
+## 11.15.0 (2022-08-24)
+
+### Bug Fix
+
+-   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
+
+## 11.14.0 (2022-08-10)
+
+## 11.13.0 (2022-07-27)
+
+## 11.12.0 (2022-07-13)
+
+### Deprecations
+
+-   `withBlockContentContext` is no longer used by the block editor and therefore got deprecated ([#41395](https://github.com/WordPress/gutenberg/pull/3204139530)).
+
+### New API
+
+-   The shortcode transformer now accepts a `transform` method to allow advanced controls over the transformed result. For instance, it's now possible to define custom `innerBlocks` for the transformed block. ([#42001](https://github.com/WordPress/gutenberg/pull/42001))
+
+## 11.11.0 (2022-06-29)
+
+## 11.10.0 (2022-06-15)
+
+## 11.9.0 (2022-06-01)
+
+## 11.8.0 (2022-05-18)
+
+## 11.7.0 (2022-05-04)
+
+## 11.6.0 (2022-04-21)
+
+## 11.5.0 (2022-04-08)
+
+## 11.4.0 (2022-03-23)
+
+## 11.3.0 (2022-03-11)
+
+## 11.2.0 (2022-01-27)
+
+## 11.1.0 (2021-09-09)
+
+### Backward Compatibility
+
+-   Register a block even when an invalid value provided for the icon setting ([#34350](https://github.com/WordPress/gutenberg/pull/34350)).
+
+### New API
+
+-   The `isMatch` callback on block transforms now receives the block object (or block objects if `isMulti` is `true`) as its second argument.
+
+## 11.0.0 (2021-07-29)
+
+### Breaking Change
+
+-   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
+
+## 10.0.0 (2021-07-21)
+
 ### Breaking Changes
 
 -   The deprecated `registerBlockTypeFromMetadata` function was removed. Please use `registerBlockType` that covers the same functionality ([#32030](https://github.com/WordPress/gutenberg/pull/32030)).

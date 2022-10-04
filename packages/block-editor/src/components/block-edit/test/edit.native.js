@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { render } from 'test/helpers';
+import { Text } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -26,26 +27,26 @@ describe( 'Edit', () => {
 	} );
 
 	it( 'should return null if block type not defined', () => {
-		const wrapper = shallow( <Edit name="core/test-block" /> );
+		const screen = render( <Edit name="core/test-block" /> );
 
-		expect( wrapper.type() ).toBe( null );
+		expect( screen.toJSON() ).toBe( null );
 	} );
 
 	it( 'should use edit implementation of block', () => {
-		const edit = () => <div />;
+		const edit = () => <Text>core/test-block</Text>;
 		registerBlockType( 'core/test-block', {
 			category: 'text',
 			title: 'block title',
 			edit,
 		} );
 
-		const wrapper = shallow( <Edit name="core/test-block" /> );
+		const screen = render( <Edit name="core/test-block" /> );
 
-		expect( wrapper.exists( edit ) ).toBe( true );
+		expect( screen.getByText( 'core/test-block' ) ).toBeDefined();
 	} );
 
 	it( 'should assign context', () => {
-		const edit = ( { context } ) => context.value;
+		const edit = ( { context } ) => <Text>{ context.value }</Text>;
 		registerBlockType( 'core/test-block', {
 			category: 'text',
 			title: 'block title',
@@ -53,12 +54,12 @@ describe( 'Edit', () => {
 			edit,
 		} );
 
-		const wrapper = mount(
+		const screen = render(
 			<BlockContextProvider value={ { value: 'Ok' } }>
 				<Edit name="core/test-block" />
 			</BlockContextProvider>
 		);
 
-		expect( wrapper.html() ).toBe( 'Ok' );
+		expect( screen.getByText( 'Ok' ) ).toBeDefined();
 	} );
 } );

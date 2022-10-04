@@ -277,10 +277,13 @@ describe( 'isKeyboardEvent', () => {
 		}
 	} );
 
-	function keyPress( target, modifiers = {} ) {
+	function keyPress( target, modifiers ) {
 		[ 'keydown', 'keypress', 'keyup' ].forEach( ( eventName ) => {
-			const event = new window.Event( eventName, { bubbles: true } );
-			Object.assign( event, modifiers );
+			const event = new window.KeyboardEvent( eventName, {
+				...modifiers,
+				bubbles: true,
+				keyCode: modifiers.key.charCodeAt( 0 ),
+			} );
 			target.dispatchEvent( event );
 		} );
 	}

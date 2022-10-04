@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "2.1.14",
+	"version": "4.15.0",
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,8 +26,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.13.10",
-		"@wordpress/a11y": "file:../a11y",
+		"@babel/runtime": "^7.16.0",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
@@ -36,7 +35,8 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
-		"@wordpress/data-controls": "file:../data-controls",
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
@@ -47,14 +47,15 @@
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/plugins": "file:../plugins",
+		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
-		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",
 		"@wordpress/widgets": "file:../widgets",
-		"classnames": "^2.3.1",
-		"lodash": "^4.17.21",
-		"rememo": "^3.0.0",
-		"uuid": "^8.3.0"
+		"classnames": "^2.3.1"
+	},
+	"peerDependencies": {
+		"react": "^17.0.0",
+		"react-dom": "^17.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

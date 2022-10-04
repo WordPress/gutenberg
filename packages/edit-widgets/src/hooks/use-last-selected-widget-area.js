@@ -19,9 +19,8 @@ import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../store/utils';
  */
 const useLastSelectedWidgetArea = () =>
 	useSelect( ( select ) => {
-		const { getBlockSelectionEnd, getBlockName } = select(
-			blockEditorStore
-		);
+		const { getBlockSelectionEnd, getBlockName } =
+			select( blockEditorStore );
 		const selectionEndClientId = getBlockSelectionEnd();
 
 		// If the selected block is a widget area, return its clientId.
@@ -30,9 +29,8 @@ const useLastSelectedWidgetArea = () =>
 		}
 
 		const { getParentWidgetAreaBlock } = select( widgetsEditorStore );
-		const widgetAreaBlock = getParentWidgetAreaBlock(
-			selectionEndClientId
-		);
+		const widgetAreaBlock =
+			getParentWidgetAreaBlock( selectionEndClientId );
 		const widgetAreaBlockClientId = widgetAreaBlock?.clientId;
 
 		if ( widgetAreaBlockClientId ) {

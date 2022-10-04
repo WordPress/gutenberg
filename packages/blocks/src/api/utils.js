@@ -1,8 +1,10 @@
 /**
  * External dependencies
  */
-import { every, has, isFunction, isString, reduce } from 'lodash';
-import { default as tinycolor, mostReadable } from 'tinycolor2';
+import { every, reduce } from 'lodash';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
+import a11yPlugin from 'colord/plugins/a11y';
 
 /**
  * WordPress dependencies
@@ -14,8 +16,11 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
+import { BLOCK_ICON_DEFAULT } from './constants';
 import { getBlockType, getDefaultBlockName } from './registration';
 import { createBlock } from './factory';
+
+extend( [ namesPlugin, a11yPlugin ] );
 
 /**
  * Array of icon colors containing a color to be used if the icon color
@@ -53,7 +58,7 @@ export function isUnmodifiedDefaultBlock( block ) {
 	const blockType = getBlockType( defaultBlockName );
 
 	return every(
-		blockType.attributes,
+		blockType?.attributes,
 		( value, key ) =>
 			newDefaultBlock.attributes[ key ] === block.attributes[ key ]
 	);
@@ -70,9 +75,9 @@ export function isUnmodifiedDefaultBlock( block ) {
 export function isValidIcon( icon ) {
 	return (
 		!! icon &&
-		( isString( icon ) ||
+		( typeof icon === 'string' ||
 			isValidElement( icon ) ||
-			isFunction( icon ) ||
+			typeof icon === 'function' ||
 			icon instanceof Component )
 	);
 }
@@ -89,23 +94,26 @@ export function isValidIcon( icon ) {
  * @return {WPBlockTypeIconDescriptor} Object describing the icon.
  */
 export function normalizeIconObject( icon ) {
+	icon = icon || BLOCK_ICON_DEFAULT;
 	if ( isValidIcon( icon ) ) {
 		return { src: icon };
 	}
 
-	if ( has( icon, [ 'background' ] ) ) {
-		const tinyBgColor = tinycolor( icon.background );
+	if ( 'background' in icon ) {
+		const colordBgColor = colord( icon.background );
+		const getColorContrast = ( iconColor ) =>
+			colordBgColor.contrast( iconColor );
+		const maxContrast = Math.max( ...ICON_COLORS.map( getColorContrast ) );
 
 		return {
 			...icon,
 			foreground: icon.foreground
 				? icon.foreground
-				: mostReadable( tinyBgColor, ICON_COLORS, {
-						includeFallbackColors: true,
-						level: 'AA',
-						size: 'large',
-				  } ).toHexString(),
-			shadowColor: tinyBgColor.setAlpha( 0.3 ).toRgbString(),
+				: ICON_COLORS.find(
+						( iconColor ) =>
+							getColorContrast( iconColor ) === maxContrast
+				  ),
+			shadowColor: colordBgColor.alpha( 0.3 ).toRgbString(),
 		};
 	}
 
@@ -122,7 +130,7 @@ export function normalizeIconObject( icon ) {
  * @return {?Object} Block type.
  */
 export function normalizeBlockType( blockTypeOrName ) {
-	if ( isString( blockTypeOrName ) ) {
+	if ( typeof blockTypeOrName === 'string' ) {
 		return getBlockType( blockTypeOrName );
 	}
 
@@ -157,7 +165,7 @@ export function getBlockLabel( blockType, attributes, context = 'visual' ) {
  * than the visual label and includes the block title and the value of the
  * `getLabel` function if it's specified.
  *
- * @param {Object}  blockType              The block type.
+ * @param {?Object} blockType              The block type.
  * @param {Object}  attributes             The values of the block's attributes.
  * @param {?number} position               The position of the block in the block list.
  * @param {string}  [direction='vertical'] The direction of the block layout.
@@ -171,8 +179,10 @@ export function getAccessibleBlockLabel(
 	direction = 'vertical'
 ) {
 	// `title` is already localized, `label` is a user-supplied value.
-	const { title } = blockType;
-	const label = getBlockLabel( blockType, attributes, 'accessibility' );
+	const title = blockType?.title;
+	const label = blockType
+		? getBlockLabel( blockType, attributes, 'accessibility' )
+		: '';
 	const hasPosition = position !== undefined;
 
 	// getBlockLabel returns the block title as a fallback when there's no label,
@@ -292,5 +302,19 @@ export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
 	return attributesNames.filter(
 		( attributeName ) =>
 			attributes[ attributeName ]?.__experimentalRole === role
+	);
+}
+
+/**
+ * Return a new object with the specified keys omitted.
+ *
+ * @param {Object} object Original object.
+ * @param {Array}  keys   Keys to be omitted.
+ *
+ * @return {Object} Object with omitted keys.
+ */
+export function omit( object, keys ) {
+	return Object.fromEntries(
+		Object.entries( object ).filter( ( [ key ] ) => ! keys.includes( key ) )
 	);
 }

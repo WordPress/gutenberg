@@ -14,7 +14,7 @@ import { useSelect } from '@wordpress/data';
 import NavigationToggle from '..';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// This allows us to tweak the returned value on each test
+	// This allows us to tweak the returned value on each test.
 	const mock = jest.fn();
 	return mock;
 } );
@@ -34,6 +34,7 @@ describe( 'NavigationToggle', () => {
 						site_icon_url: 'https://fakeUrl.com',
 					} ),
 					isResolving: () => false,
+					isNavigationOpened: () => false,
 				} ) );
 			} );
 
@@ -53,6 +54,7 @@ describe( 'NavigationToggle', () => {
 						site_icon_url: '',
 					} ),
 					isResolving: () => false,
+					isNavigationOpened: () => false,
 				} ) );
 			} );
 

@@ -13,11 +13,21 @@ public protocol GutenbergBridgeDataSource: class {
     /// - Returns: The HTML initial title or nil.
     func gutenbergInitialTitle() -> String?
 
+    /// Asks the data source for the initial featured image id to be presented by the editor.
+    ///
+    /// - Returns: The initial id of the post's featured image, zero if no featured image is set.
+    func gutenbergFeaturedImageId() -> NSNumber?
+
     /// Asks the data source for the post type to be presented by the editor.
     /// Return `nil` to assume a `post` type.
     ///
     /// - Returns: The post type or nil.
     func gutenbergPostType() -> String
+
+    /// Asks the data source for the host app's namespace.
+    ///
+    /// - Returns: The host app's namespace e.g. WordPress.
+    func gutenbergHostAppNamespace() -> String
 
     /// Asks the data source for an object conforming to `TextViewAttachmentDelegate`
     /// to handle media loading.
@@ -72,6 +82,9 @@ public extension GutenbergBridgeDataSource {
 
 public protocol GutenbergEditorSettings {
     var isFSETheme: Bool { get }
+    var galleryWithImageBlocks: Bool { get }
+    var quoteBlockV2: Bool { get }
+    var listBlockV2: Bool { get }
     var rawStyles: String? { get }
     var rawFeatures: String? { get }
     var colors: [[String: String]]? { get }

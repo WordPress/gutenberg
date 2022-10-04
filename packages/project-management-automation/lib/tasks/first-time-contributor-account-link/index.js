@@ -47,13 +47,23 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 		return;
 	}
 
-	const commit = /** @type {WebhookPayloadPushCommit} */ ( payload
-		.commits[ 0 ] );
+	const commit = /** @type {WebhookPayloadPushCommit} */ (
+		payload.commits[ 0 ]
+	);
 	const pullRequest = getAssociatedPullRequest( commit );
 	if ( ! pullRequest ) {
 		debug(
 			'first-time-contributor-account-link: Cannot determine pull request associated with commit. Aborting'
 		);
+		return;
+	}
+
+	const { data: user } = await octokit.rest.users.getByUsername( {
+		username: commit.author.username,
+	} );
+
+	if ( user.type === 'Bot' ) {
+		debug( 'first-time-contributor-account-link: User is a bot. Aborting' );
 		return;
 	}
 
@@ -86,9 +96,11 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 	try {
 		hasProfile = await hasWordPressProfile( author );
 	} catch ( error ) {
-		debug(
-			`first-time-contributor-account-link: Error retrieving from profile API:\n\n${ error.toString() }`
-		);
+		if ( error instanceof Object ) {
+			debug(
+				`first-time-contributor-account-link: Error retrieving from profile API:\n\n${ error.toString() }`
+			);
+		}
 		return;
 	}
 

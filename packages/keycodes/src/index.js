@@ -12,7 +12,8 @@
 /**
  * External dependencies
  */
-import { get, mapValues, includes, capitalize, xor } from 'lodash';
+import { capitalCase } from 'change-case';
+import { get, mapValues, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -26,7 +27,7 @@ import { isAppleOS } from './platform';
 
 /** @typedef {typeof ALT | CTRL | COMMAND | SHIFT } WPModifierPart */
 
-/** @typedef {'primary' | 'primaryShift' | 'primaryAlt' | 'secondary' | 'access' | 'ctrl' | 'alt' | 'ctrlShift' | 'shift' | 'shiftAlt'} WPKeycodeModifier */
+/** @typedef {'primary' | 'primaryShift' | 'primaryAlt' | 'secondary' | 'access' | 'ctrl' | 'alt' | 'ctrlShift' | 'shift' | 'shiftAlt' | 'undefined'} WPKeycodeModifier */
 
 /**
  * An object of handler functions for each of the possible modifier
@@ -68,6 +69,26 @@ export const ESCAPE = 27;
  * Keycode for SPACE key.
  */
 export const SPACE = 32;
+
+/**
+ * Keycode for PAGEUP key.
+ */
+export const PAGEUP = 33;
+
+/**
+ * Keycode for PAGEDOWN key.
+ */
+export const PAGEDOWN = 34;
+
+/**
+ * Keycode for END key.
+ */
+export const END = 35;
+
+/**
+ * Keycode for HOME key.
+ */
+export const HOME = 36;
 
 /**
  * Keycode for LEFT key.
@@ -124,6 +145,8 @@ export const SHIFT = 'shift';
  */
 export const ZERO = 48;
 
+export { isAppleOS };
+
 /**
  * Object that contains functions that return the available modifier
  * depending on platform.
@@ -144,6 +167,7 @@ export const modifiers = {
 	ctrlShift: () => [ CTRL, SHIFT ],
 	shift: () => [ SHIFT ],
 	shiftAlt: () => [ SHIFT, ALT ],
+	undefined: () => [],
 };
 
 /**
@@ -209,7 +233,13 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 			/** @type {string[]} */ ( [] )
 		);
 
-		const capitalizedCharacter = capitalize( character );
+		// Symbols (`,.) are removed by the default regular expression,
+		// so override the rule to allow symbols used for shortcuts.
+		// see: https://github.com/blakeembrey/change-case#options
+		const capitalizedCharacter = capitalCase( character, {
+			stripRegexp: /[^A-Z0-9`,\.]/gi,
+		} );
+
 		return [ ...modifierKeys, capitalizedCharacter ];
 	};
 } );
@@ -271,7 +301,7 @@ export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
 		};
 
 		return [ ...modifier( _isApple ), character ]
-			.map( ( key ) => capitalize( get( replacementKeyMap, key, key ) ) )
+			.map( ( key ) => capitalCase( get( replacementKeyMap, key, key ) ) )
 			.join( isApple ? ' ' : ' + ' );
 	};
 } );
@@ -293,7 +323,9 @@ function getEventModifiers( event ) {
 	] ).filter(
 		( key ) =>
 			event[
-				/** @type {'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey'} */ ( `${ key }Key` )
+				/** @type {'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey'} */ (
+					`${ key }Key`
+				)
 			]
 	);
 }
@@ -321,14 +353,42 @@ export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 		const mods = getModifiers( _isApple );
 		const eventMods = getEventModifiers( event );
 
-		if ( xor( mods, eventMods ).length ) {
+		const modsDiff = mods.filter( ( mod ) => ! eventMods.includes( mod ) );
+		const eventModsDiff = eventMods.filter(
+			( mod ) => ! mods.includes( mod )
+		);
+
+		if ( modsDiff.length > 0 || eventModsDiff.length > 0 ) {
 			return false;
 		}
 
+		let key = event.key.toLowerCase();
+
 		if ( ! character ) {
-			return includes( mods, event.key.toLowerCase() );
+			return includes( mods, key );
 		}
 
-		return event.key === character;
+		if ( event.altKey && character.length === 1 ) {
+			key = String.fromCharCode( event.keyCode ).toLowerCase();
+		}
+
+		// Replace some characters to match the key indicated
+		// by the shortcut on Windows.
+		if ( ! _isApple() ) {
+			if (
+				event.shiftKey &&
+				character.length === 1 &&
+				event.code === 'Comma'
+			) {
+				key = ',';
+			}
+		}
+
+		// For backwards compatibility.
+		if ( character === 'del' ) {
+			character = 'delete';
+		}
+
+		return key === character.toLowerCase();
 	};
 } );

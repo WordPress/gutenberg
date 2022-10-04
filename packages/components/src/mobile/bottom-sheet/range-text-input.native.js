@@ -56,11 +56,14 @@ class RangeTextInput extends Component {
 	}
 
 	componentDidMount() {
-		AppState.addEventListener( 'change', this.handleChangePixelRatio );
+		this.appStateChangeSubscription = AppState.addEventListener(
+			'change',
+			this.handleChangePixelRatio
+		);
 	}
 
 	componentWillUnmount() {
-		AppState.removeEventListener( 'change', this.handleChangePixelRatio );
+		this.appStateChangeSubscription.remove();
 		clearTimeout( this.timeoutAnnounceValue );
 	}
 
@@ -176,9 +179,9 @@ class RangeTextInput extends Component {
 			styles.textInputDark
 		);
 
-		const verticalBorderStyle = getStylesFromColorScheme(
-			styles.verticalBorder,
-			styles.verticalBorderDark
+		const textInputIOSStyle = getStylesFromColorScheme(
+			styles.textInputIOS,
+			styles.textInputIOSDark
 		);
 
 		const inputBorderStyles = [
@@ -188,9 +191,13 @@ class RangeTextInput extends Component {
 		];
 
 		const valueFinalStyle = [
-			! isIOS ? inputBorderStyles : verticalBorderStyle,
+			Platform.select( {
+				android: inputBorderStyles,
+				ios: textInputIOSStyle,
+			} ),
 			{
 				width: 50 * fontScale,
+				borderRightWidth: children ? 1 : 0,
 			},
 		];
 

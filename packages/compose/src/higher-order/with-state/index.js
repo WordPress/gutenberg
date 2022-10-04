@@ -7,7 +7,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import createHigherOrderComponent from '../../utils/create-higher-order-component';
+import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 
 /**
  * A Higher Order Component used to provide and manage internal component state
@@ -21,6 +21,7 @@ import createHigherOrderComponent from '../../utils/create-higher-order-componen
  */
 export default function withState( initialState = {} ) {
 	deprecated( 'wp.compose.withState', {
+		since: '5.8',
 		alternative: 'wp.element.useState',
 	} );
 

@@ -54,6 +54,18 @@ exports[`RichText should navigate arround emoji 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`RichText should navigate consecutive format boundaries 1`] = `
+"<!-- wp:paragraph -->
+<p><strong>1</strong><em>2</em></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should navigate consecutive format boundaries 2`] = `
+"<!-- wp:paragraph -->
+<p><strong>1</strong>-<em>2</em></p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`RichText should not format text after code backtick 1`] = `
 "<!-- wp:paragraph -->
 <p>A <code>backtick</code> and more.</p>
@@ -88,25 +100,65 @@ exports[`RichText should only mutate text data on input 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`RichText should paste list contents into paragraph 1`] = `
+"<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>1<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>1<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`RichText should paste paragraph contents into list 1`] = `
+"<!-- wp:paragraph -->
+<p>1<br>2</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>1<br>2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->"
+`;
+
 exports[`RichText should preserve internal formatting 1`] = `
 "<!-- wp:paragraph -->
-<p><span class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</span></p>
+<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</mark></p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`RichText should preserve internal formatting 2`] = `
 "<!-- wp:paragraph -->
-<p><span class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</span></p>
+<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</mark></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p><span class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</span></p>
+<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</mark></p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`RichText should return focus when pressing formatting button 1`] = `
 "<!-- wp:paragraph -->
 <p>Some <strong>bold</strong>.</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should run input rules after composition end 1`] = `
+"<!-- wp:paragraph -->
+<p><code>a</code></p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -137,6 +189,18 @@ exports[`RichText should transform backtick to code 1`] = `
 exports[`RichText should transform backtick to code 2`] = `
 "<!-- wp:paragraph -->
 <p>A \`backtick\`</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should transform when typing backtick over selection 1`] = `
+"<!-- wp:paragraph -->
+<p>A <code>selection</code> test.</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should transform when typing backtick over selection 2`] = `
+"<!-- wp:paragraph -->
+<p>A \`selection\` test.</p>
 <!-- /wp:paragraph -->"
 `;
 

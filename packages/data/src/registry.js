@@ -1,16 +1,21 @@
 /**
  * External dependencies
  */
-import { without, mapValues, isObject } from 'lodash';
+import { mapValues } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import createReduxStore from './redux-store';
-import createCoreDataStore from './store';
-import { STORE_NAME } from './store/name';
+import coreDataStore from './store';
+import { createEmitter } from './utils/emitter';
 
-/** @typedef {import('./types').WPDataStore} WPDataStore */
+/** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
 
 /**
  * @typedef {Object} WPDataRegistry An isolated orchestrator of store registrations.
@@ -38,6 +43,10 @@ import { STORE_NAME } from './store/name';
  * @property {Function} registerStore registers store.
  */
 
+function isObject( object ) {
+	return object !== null && typeof object === 'object';
+}
+
 /**
  * Creates a new store registry, given an optional object of initial store
  * configurations.
@@ -49,14 +58,14 @@ import { STORE_NAME } from './store/name';
  */
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
-	let listeners = [];
-	const __experimentalListeningStores = new Set();
+	const emitter = createEmitter();
+	const listeningStores = new Set();
 
 	/**
 	 * Global listener called for each store's update.
 	 */
 	function globalListener() {
-		listeners.forEach( ( listener ) => listener() );
+		emitter.emit();
 	}
 
 	/**
@@ -67,57 +76,55 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * @return {Function} Unsubscribe function.
 	 */
 	const subscribe = ( listener ) => {
-		listeners.push( listener );
-
-		return () => {
-			listeners = without( listeners, listener );
-		};
+		return emitter.subscribe( listener );
 	};
 
 	/**
 	 * Calls a selector given the current state and extra arguments.
 	 *
-	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
-	 *                                                   or the store definition.
+	 * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
+	 *                                                       or the store descriptor.
 	 *
 	 * @return {*} The selector's returned value.
 	 */
-	function select( storeNameOrDefinition ) {
-		const storeName = isObject( storeNameOrDefinition )
-			? storeNameOrDefinition.name
-			: storeNameOrDefinition;
-		__experimentalListeningStores.add( storeName );
+	function select( storeNameOrDescriptor ) {
+		const storeName = isObject( storeNameOrDescriptor )
+			? storeNameOrDescriptor.name
+			: storeNameOrDescriptor;
+		listeningStores.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getSelectors();
 		}
 
-		return parent && parent.select( storeName );
+		return parent?.select( storeName );
 	}
 
-	function __experimentalMarkListeningStores( callback, ref ) {
-		__experimentalListeningStores.clear();
-		const result = callback.call( this );
-		ref.current = Array.from( __experimentalListeningStores );
-		return result;
+	function __unstableMarkListeningStores( callback, ref ) {
+		listeningStores.clear();
+		try {
+			return callback.call( this );
+		} finally {
+			ref.current = Array.from( listeningStores );
+		}
 	}
 
 	/**
-	 * Given the name of a registered store, returns an object containing the store's
-	 * selectors pre-bound to state so that you only need to supply additional arguments,
-	 * and modified so that they return promises that resolve to their eventual values,
-	 * after any resolvers have ran.
+	 * Given a store descriptor, returns an object containing the store's selectors pre-bound to
+	 * state so that you only need to supply additional arguments, and modified so that they return
+	 * promises that resolve to their eventual values, after any resolvers have ran.
 	 *
-	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
-	 *                                                   or the store definition.
+	 * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
+	 *                                                       convention of passing the store name is
+	 *                                                       also supported.
 	 *
 	 * @return {Object} Each key of the object matches the name of a selector.
 	 */
-	function resolveSelect( storeNameOrDefinition ) {
-		const storeName = isObject( storeNameOrDefinition )
-			? storeNameOrDefinition.name
-			: storeNameOrDefinition;
-		__experimentalListeningStores.add( storeName );
+	function resolveSelect( storeNameOrDescriptor ) {
+		const storeName = isObject( storeNameOrDescriptor )
+			? storeNameOrDescriptor.name
+			: storeNameOrDescriptor;
+		listeningStores.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getResolveSelectors();
@@ -127,17 +134,41 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	/**
+	 * Given a store descriptor, returns an object containing the store's selectors pre-bound to
+	 * state so that you only need to supply additional arguments, and modified so that they throw
+	 * promises in case the selector is not resolved yet.
+	 *
+	 * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
+	 *                                                       convention of passing the store name is
+	 *                                                       also supported.
+	 *
+	 * @return {Object} Object containing the store's suspense-wrapped selectors.
+	 */
+	function suspendSelect( storeNameOrDescriptor ) {
+		const storeName = isObject( storeNameOrDescriptor )
+			? storeNameOrDescriptor.name
+			: storeNameOrDescriptor;
+		listeningStores.add( storeName );
+		const store = stores[ storeName ];
+		if ( store ) {
+			return store.getSuspendSelectors();
+		}
+
+		return parent && parent.suspendSelect( storeName );
+	}
+
+	/**
 	 * Returns the available actions for a part of the state.
 	 *
-	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
-	 *                                                   or the store definition.
+	 * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
+	 *                                                       or the store descriptor.
 	 *
 	 * @return {*} The action's returned value.
 	 */
-	function dispatch( storeNameOrDefinition ) {
-		const storeName = isObject( storeNameOrDefinition )
-			? storeNameOrDefinition.name
-			: storeNameOrDefinition;
+	function dispatch( storeNameOrDescriptor ) {
+		const storeName = isObject( storeNameOrDescriptor )
+			? storeNameOrDescriptor.name
+			: storeNameOrDescriptor;
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getActions();
@@ -149,7 +180,6 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	//
 	// Deprecated
 	// TODO: Remove this after `use()` is removed.
-	//
 	function withPlugins( attributes ) {
 		return mapValues( attributes, ( attribute, key ) => {
 			if ( typeof attribute !== 'function' ) {
@@ -162,32 +192,80 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	/**
-	 * Registers a generic store.
+	 * Registers a store instance.
 	 *
-	 * @param {string} key    Store registry key.
-	 * @param {Object} config Configuration (getSelectors, getActions, subscribe).
+	 * @param {string} name  Store registry name.
+	 * @param {Object} store Store instance object (getSelectors, getActions, subscribe).
 	 */
-	function registerGenericStore( key, config ) {
-		if ( typeof config.getSelectors !== 'function' ) {
-			throw new TypeError( 'config.getSelectors must be a function' );
+	function registerStoreInstance( name, store ) {
+		if ( typeof store.getSelectors !== 'function' ) {
+			throw new TypeError( 'store.getSelectors must be a function' );
 		}
-		if ( typeof config.getActions !== 'function' ) {
-			throw new TypeError( 'config.getActions must be a function' );
+		if ( typeof store.getActions !== 'function' ) {
+			throw new TypeError( 'store.getActions must be a function' );
 		}
-		if ( typeof config.subscribe !== 'function' ) {
-			throw new TypeError( 'config.subscribe must be a function' );
+		if ( typeof store.subscribe !== 'function' ) {
+			throw new TypeError( 'store.subscribe must be a function' );
 		}
-		stores[ key ] = config;
-		config.subscribe( globalListener );
+		// The emitter is used to keep track of active listeners when the registry
+		// get paused, that way, when resumed we should be able to call all these
+		// pending listeners.
+		store.emitter = createEmitter();
+		const currentSubscribe = store.subscribe;
+		store.subscribe = ( listener ) => {
+			const unsubscribeFromEmitter = store.emitter.subscribe( listener );
+			const unsubscribeFromStore = currentSubscribe( () => {
+				if ( store.emitter.isPaused ) {
+					store.emitter.emit();
+					return;
+				}
+				listener();
+			} );
+
+			return () => {
+				unsubscribeFromStore?.();
+				unsubscribeFromEmitter?.();
+			};
+		};
+		stores[ name ] = store;
+		store.subscribe( globalListener );
 	}
 
 	/**
-	 * Registers a new store definition.
+	 * Registers a new store given a store descriptor.
 	 *
-	 * @param {WPDataStore} store Store definition.
+	 * @param {StoreDescriptor} store Store descriptor.
 	 */
 	function register( store ) {
-		registerGenericStore( store.name, store.instantiate( registry ) );
+		registerStoreInstance( store.name, store.instantiate( registry ) );
+	}
+
+	function registerGenericStore( name, store ) {
+		deprecated( 'wp.data.registerGenericStore', {
+			since: '5.9',
+			alternative: 'wp.data.register( storeDescriptor )',
+		} );
+		registerStoreInstance( name, store );
+	}
+
+	/**
+	 * Registers a standard `@wordpress/data` store.
+	 *
+	 * @param {string} storeName Unique namespace identifier.
+	 * @param {Object} options   Store description (reducer, actions, selectors, resolvers).
+	 *
+	 * @return {Object} Registered store object.
+	 */
+	function registerStore( storeName, options ) {
+		if ( ! options.reducer ) {
+			throw new TypeError( 'Must specify store reducer' );
+		}
+
+		const store = createReduxStore( storeName, options ).instantiate(
+			registry
+		);
+		registerStoreInstance( storeName, store );
+		return store.store;
 	}
 
 	/**
@@ -197,7 +275,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * @param {Function} handler   The function subscribed to the store.
 	 * @return {Function} A function to unsubscribe the handler.
 	 */
-	function __experimentalSubscribeStore( storeName, handler ) {
+	function __unstableSubscribeStore( storeName, handler ) {
 		if ( storeName in stores ) {
 			return stores[ storeName ].subscribe( handler );
 		}
@@ -210,48 +288,42 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			return subscribe( handler );
 		}
 
-		return parent.__experimentalSubscribeStore( storeName, handler );
+		return parent.__unstableSubscribeStore( storeName, handler );
+	}
+
+	function batch( callback ) {
+		emitter.pause();
+		Object.values( stores ).forEach( ( store ) => store.emitter.pause() );
+		callback();
+		emitter.resume();
+		Object.values( stores ).forEach( ( store ) => store.emitter.resume() );
 	}
 
 	let registry = {
-		registerGenericStore,
+		batch,
 		stores,
 		namespaces: stores, // TODO: Deprecate/remove this.
 		subscribe,
 		select,
 		resolveSelect,
+		suspendSelect,
 		dispatch,
 		use,
 		register,
-		__experimentalMarkListeningStores,
-		__experimentalSubscribeStore,
-	};
-
-	/**
-	 * Registers a standard `@wordpress/data` store.
-	 *
-	 * @param {string} storeName Unique namespace identifier.
-	 * @param {Object} options   Store description (reducer, actions, selectors, resolvers).
-	 *
-	 * @return {Object} Registered store object.
-	 */
-	registry.registerStore = ( storeName, options ) => {
-		if ( ! options.reducer ) {
-			throw new TypeError( 'Must specify store reducer' );
-		}
-
-		const store = createReduxStore( storeName, options ).instantiate(
-			registry
-		);
-		registerGenericStore( storeName, store );
-		return store.store;
+		registerGenericStore,
+		registerStore,
+		__unstableMarkListeningStores,
+		__unstableSubscribeStore,
 	};
 
 	//
 	// TODO:
 	// This function will be deprecated as soon as it is no longer internally referenced.
-	//
 	function use( plugin, options ) {
+		if ( ! plugin ) {
+			return;
+		}
+
 		registry = {
 			...registry,
 			...plugin( registry, options ),
@@ -260,11 +332,11 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		return registry;
 	}
 
-	registerGenericStore( STORE_NAME, createCoreDataStore( registry ) );
+	registry.register( coreDataStore );
 
-	Object.entries( storeConfigs ).forEach( ( [ name, config ] ) =>
-		registry.registerStore( name, config )
-	);
+	for ( const [ name, config ] of Object.entries( storeConfigs ) ) {
+		registry.register( createReduxStore( name, config ) );
+	}
 
 	if ( parent ) {
 		parent.subscribe( globalListener );

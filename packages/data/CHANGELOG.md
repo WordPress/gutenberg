@@ -2,6 +2,90 @@
 
 ## Unreleased
 
+## 7.2.0 (2022-09-21)
+
+## 7.1.0 (2022-09-13)
+
+## 7.0.0 (2022-08-24)
+
+### Breaking Changes
+
+–   Add TypeScript types to the built package (via "types": "build-types" in the package.json)
+
+### Bug Fix
+
+-   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
+
+## 6.15.0 (2022-08-10)
+
+## 6.14.0 (2022-07-27)
+
+## 6.13.0 (2022-07-13)
+
+### Enhancements
+
+-   Use `useDebugValue` in `useSelect` to better display data in React DevTools ([#42225](https://github.com/WordPress/gutenberg/pull/42225)).
+
+## 6.12.0 (2022-06-29)
+
+## 6.11.0 (2022-06-15)
+
+## 6.10.0 (2022-06-01)
+
+## 6.9.0 (2022-05-18)
+
+## 6.8.0 (2022-05-04)
+
+## 6.7.0 (2022-04-21)
+
+## 6.6.0 (2022-04-08)
+
+## 6.5.0 (2022-03-23)
+
+## 6.4.0 (2022-03-11)
+
+## 6.3.0 (2022-02-23)
+
+### New Features
+
+- Enabled thunks by default for all stores and removed the `__experimentalUseThunks` flag.
+- Store the resolution errors in store metadata and expose them using `hasResolutionFailed` the `getResolutionError` meta-selectors ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
+- Expose the resolution status (undefined, resolving, finished, error) via the `getResolutionState` meta-selector ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
+
+## 6.2.1 (2022-02-10)
+
+### Bug Fix
+
+-   Removed unused `memize` dependency ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
+## 6.2.0 (2022-01-27)
+
+### Bug Fix
+
+-   Corrected expect type of action creators and selectors in Redux store configuration type
+-   Move `redux` to regular dependencies and update it to version `^4.1.2`.
+
+### Internal
+
+-   Changed names of store-related types to better reflect their use and role.
+-   Changed "storeDefinition" to "storeDescriptor" to better reflect its use and role.
+
+## 6.1.0 (2021-09-09)
+
+### New Features
+
+-   Added a `batch` registry method to batch dispatch calls for performance reasons.
+-   Add a new migration for the persistence plugin to migrate edit-widgets preferences to the interface package. As part of this change deprecated migrations for the persistence plugin have been removed ([#33774](https://github.com/WordPress/gutenberg/pull/33774)).
+-   Update data controls to accept a data store definition as their first param in addition to a string-based store name value ([#34170](https://github.com/WordPress/gutenberg/pull/34170)).
+
+## 6.0.0 (2021-07-29)
+
+### Breaking Change
+
+-   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
+
+## 5.2.0 (2021-07-21)
+
 ## 5.1.0 (2021-05-20)
 
 ## 5.0.0 (2021-05-14)

@@ -54,7 +54,14 @@ Callback used when media is replaced from the Media Library or when a new media 
 Callback used when media is replaced with an URL. It is called with one argument `newURL` which is a `string` containing the new URL.
 
 -   Type: `func`
--   Required: Yes
+-   Required: No
+
+### onError
+
+Callback called when an upload error happens and receives an error message as an argument.
+
+-   Type: `func`
+-   Required: No
 
 ### name
 
@@ -76,3 +83,10 @@ Removes a media replace notice.
 
 -   Type: `func`
 -   Required: No
+
+### children
+
+-   Type: `Element`
+-   Required: No
+
+If passed, children are rendered inside the dropdown.

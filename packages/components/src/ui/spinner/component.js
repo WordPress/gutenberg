@@ -16,12 +16,12 @@ import { COLORS } from '../../utils/colors-values';
 
 /**
  *
- * @param {import('../context').PolymorphicComponentProps<Props, 'div'>} props
- * @param {import('react').Ref<any>}                                     forwardedRef
+ * @param {import('../context').WordPressComponentProps<Props, 'div'>} props
+ * @param {import('react').ForwardedRef<any>}                          forwardedRef
  */
 function Spinner( props, forwardedRef ) {
 	const {
-		color = COLORS.black,
+		color = COLORS.gray[ 900 ],
 		size = BASE_SIZE,
 		...otherProps
 	} = useContextSystem( props, 'Spinner' );

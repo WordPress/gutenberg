@@ -8,7 +8,7 @@ const BlockControls = BlockControlsFill;
 
 BlockControls.Slot = BlockControlsSlot;
 
-// This is just here for backward compatibility
+// This is just here for backward compatibility.
 export const BlockFormatControls = ( props ) => {
 	return <BlockControlsFill group="inline" { ...props } />;
 };

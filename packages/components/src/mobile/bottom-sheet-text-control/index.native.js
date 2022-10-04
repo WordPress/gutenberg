@@ -42,8 +42,6 @@ const BottomSheetTextControl = ( {
 		setShowSubSheet( true );
 	};
 
-	const [ value, onChangeText ] = useState( initialValue );
-
 	const horizontalBorderStyle = usePreferredColorSchemeStyle(
 		styles.horizontalBorder,
 		styles.horizontalBorderDark
@@ -70,16 +68,17 @@ const BottomSheetTextControl = ( {
 			showSheet={ showSubSheet }
 		>
 			<>
-				<BottomSheet.NavigationHeader
-					screen={ label }
-					leftButtonOnPress={ goBack }
-				/>
+				<BottomSheet.NavBar>
+					<BottomSheet.NavBar.BackButton onPress={ goBack } />
+					<BottomSheet.NavBar.Heading>
+						{ label }
+					</BottomSheet.NavBar.Heading>
+				</BottomSheet.NavBar>
 				<PanelBody style={ horizontalBorderStyle }>
 					<TextInput
 						label={ label }
-						onChangeText={ ( text ) => onChangeText( text ) }
-						onChange={ onChange( value ) }
-						value={ value }
+						onChangeText={ ( text ) => onChange( text ) }
+						defaultValue={ initialValue }
 						multiline={ true }
 						placeholder={ placeholder }
 						placeholderTextColor={ '#87a6bc' }

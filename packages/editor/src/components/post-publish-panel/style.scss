@@ -141,6 +141,7 @@
 		height: auto;
 		justify-content: center;
 		padding: 3px 10px 4px;
+		flex: 1;
 		line-height: 1.6;
 		text-align: center;
 		white-space: normal;
@@ -151,14 +152,34 @@
 	}
 }
 
-.post-publish-panel__postpublish-post-address {
+.post-publish-panel__postpublish-post-address-container {
+	display: flex;
+	align-items: flex-end;
 	margin-bottom: $grid-unit-20;
+
+	.components-base-control__field {
+		margin-bottom: 0;
+	}
+
+	.post-publish-panel__postpublish-post-address {
+		flex: 1;
+	}
 
 	input[readonly] {
 		padding: 10px;
 		background: $gray-300;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+}
+
+.post-publish-panel__postpublish-post-address__copy-button-wrap {
+	flex-shrink: 0;
+	margin-left: 8px; // margin left for copy button
+
+	// match copy button height to the address field height
+	.components-button {
+		height: 38px;
 	}
 }
 
@@ -172,4 +193,13 @@
 
 .post-publish-panel__tip {
 	color: $alert-yellow;
+}
+
+@media screen and (max-width: 782px) {
+	.post-publish-panel__postpublish-post-address__button-wrap {
+		// match copy button height to the address field height in smaller screens
+		.components-button {
+			height: 40px;
+		}
+	}
 }

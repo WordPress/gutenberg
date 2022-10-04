@@ -15,7 +15,7 @@ import { HideIfEmptyStory } from './hide-if-empty';
 import './style.css';
 
 export default {
-	title: 'Components/Navigation',
+	title: 'Components (Experimental)/Navigation',
 	component: Navigation,
 	subcomponents: {
 		NavigationBackButton,

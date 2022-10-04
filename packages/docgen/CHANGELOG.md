@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.27.0 (2022-09-21)
+
+## 1.18.0 (2021-07-21)
+
 ### Bug Fixes
 
 -	Fix getting param annotations for default exported functions. ([#31603](https://github.com/WordPress/gutenberg/pull/31603))

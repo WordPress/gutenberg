@@ -11,12 +11,11 @@ $z-layers: (
 	".block-editor-block-list__block-selection-button": 22,
 	".components-form-toggle__input": 1,
 	".edit-post-text-editor__toolbar": 1,
+	".edit-site-code-editor__toolbar": 1,
 	".edit-post-sidebar__panel-tab.is-active": 1,
 
 	// These next three share a stacking context
-	".block-editor-inserter__tabs .components-tab-panel__tab-content": 0, // lower scrolling content
-	".block-editor-inserter__tabs .components-tab-panel__tabs": 1, // higher sticky element
-	".block-editor-inserter__search": 1, // higher sticky element
+	".block-library-template-part__selection-search": 1, // higher sticky element
 
 	// These next two share a stacking context
 	".interface-complementary-area .components-panel" : 0, // lower scrolling content
@@ -37,14 +36,19 @@ $z-layers: (
 	".edit-widgets-header": 30,
 	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
 	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block
+	".wp-block-cover.is-placeholder .components-placeholder.is-large": 1, // Cover block resizer component inside a large placeholder.
 	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
+	".block-library-cover__padding-visualizer": 2, // BoxControl visualizer needs to be +1 higher than .wp-block-cover.has-background-dim::before
 	".wp-block-cover__image-background": 0, // Image background inside cover block.
 	".wp-block-cover__video-background": 0, // Video background inside cover block.
 	".wp-block-template-part__placeholder-preview-filter-input": 1,
 
+	// Fixed position appender:
+	".block-editor-block-list__block .block-list-appender": 2,
+
 	// Navigation menu dropdown.
-	".has-child .wp-block-navigation-link__container": 28,
-	".has-child:hover .wp-block-navigation-link__container": 29,
+	".has-child .wp-block-navigation__submenu-container": 28,
+	".has-child:hover .wp-block-navigation__submenu-container": 29,
 
 	// Active pill button
 	".components-button {:focus or .is-primary}": 1,
@@ -75,11 +79,7 @@ $z-layers: (
 	".block-editor-block-contextual-toolbar": 61,
 
 	// Ensures content overlay appears higher than resize containers used for image/video/etc.
-	".block-editor-block-content-overlay__overlay": 10,
-
-	// The block mover, particularly in nested contexts,
-	// should overlap most block content.
-	".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover": 61,
+	".block-editor-block-list__block.has-block-overlay": 10,
 
 	// Query block setup state.
 	".block-editor-block-pattern-setup .pattern-slide": 100,
@@ -114,15 +114,14 @@ $z-layers: (
 
 	// Show the navigation toggle above the skeleton header
 	".edit-site-navigation-toggle": 31,
+	// Show the navigation link above the skeleton header
+	".edit-site-navigation-link": 31,
 
 	// Show the FSE template previews above the editor and any open block toolbars
 	".edit-site-navigation-panel__preview": 32,
 
 	// Above the block list and the header.
-	".block-editor-block-list__block-popover": 31,
-
-	// Under the block popover (block toolbar).
-	".block-editor-block-list__insertion-point-popover": 28,
+	".block-editor-block-popover": 31,
 
 	// Show snackbars above everything (similar to popovers)
 	".components-snackbar-list": 100000,
@@ -136,18 +135,20 @@ $z-layers: (
 
 	// Should be above the popover (dropdown)
 	".reusable-blocks-menu-items__convert-modal": 1000001,
-	".edit-site-template-part-converter__modal": 1000001,
+	".edit-site-create-template-part-modal": 1000001,
+	".block-editor-block-lock-modal": 1000001,
+	".block-editor-template-part__selection-modal": 1000001,
+
+	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
+	// because it uses emotion and not sass. We need it to render on top its parent popover.
 
 	// ...Except for popovers immediately beneath wp-admin menu on large breakpoints
 	".components-popover.block-editor-inserter__popover": 99999,
 	".components-popover.table-of-contents__popover": 99998,
-	".components-popover.customize-widgets-more-menu__content": 99998,
-	".components-popover.edit-post-more-menu__content": 99998,
-	".components-popover.edit-site-more-menu__content": 99998,
-	".components-popover.edit-widgets-more-menu__content": 99998,
+	".components-popover.interface-more-menu__content": 99998,
 	".components-popover.block-editor-rich-text__inline-format-toolbar": 99998,
 	".components-popover.block-editor-warning__dropdown": 99998,
-	".components-popover.edit-navigation-header__menu-switcher-dropdown": 99998,
+	".components-popover.edit-navigation-menu-actions__switcher-dropdown": 99998,
 
 	".components-autocomplete__results": 1000000,
 
@@ -159,6 +160,9 @@ $z-layers: (
 
 	// Show tooltips above NUX tips, wp-admin menus, submenus, and sidebar:
 	".components-tooltip": 1000002,
+
+	// Keep template popover underneath 'Create custom template' modal overlay.
+	".edit-post-post-template__dialog": 99999,
 
 	// Make sure corner handles are above side handles for ResizableBox component
 	".components-resizable-box__handle": 2,

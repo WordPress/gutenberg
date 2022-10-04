@@ -13,6 +13,7 @@ import {
 	ComplementaryArea,
 	store as interfaceStore,
 } from '@wordpress/interface';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -29,13 +30,14 @@ export default function Sidebar( {
 	isMenuBeingDeleted,
 	onDeleteMenu,
 	onSelectMenu,
-	hasPermanentSidebar,
 } ) {
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const { sidebar, hasBlockSelection, hasSidebarEnabled } = useSelect(
 		( select ) => {
-			const _sidebar = select(
-				interfaceStore
-			).getActiveComplementaryArea( SIDEBAR_SCOPE );
+			const _sidebar =
+				select( interfaceStore ).getActiveComplementaryArea(
+					SIDEBAR_SCOPE
+				);
 
 			const _hasSidebarEnabled = [ SIDEBAR_MENU, SIDEBAR_BLOCK ].includes(
 				_sidebar
@@ -43,9 +45,8 @@ export default function Sidebar( {
 
 			return {
 				sidebar: _sidebar,
-				hasBlockSelection: !! select(
-					blockEditorStore
-				).getBlockSelectionStart(),
+				hasBlockSelection:
+					!! select( blockEditorStore ).getBlockSelectionStart(),
 				hasSidebarEnabled: _hasSidebarEnabled,
 			};
 		},
@@ -79,10 +80,10 @@ export default function Sidebar( {
 			scope={ SIDEBAR_SCOPE }
 			identifier={ sidebarName }
 			icon={ cog }
-			isActiveByDefault={ hasPermanentSidebar }
+			isActiveByDefault={ isLargeViewport }
 			header={ <SidebarHeader sidebarName={ sidebarName } /> }
 			headerClassName="edit-navigation-sidebar__panel-tabs"
-			isPinnable={ ! hasPermanentSidebar }
+			isPinnable
 		>
 			{ sidebarName === SIDEBAR_MENU && (
 				<>

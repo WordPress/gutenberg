@@ -27,9 +27,8 @@ export function PostSticky( { onUpdateSticky, postSticky = false } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			postSticky: select( editorStore ).getEditedPostAttribute(
-				'sticky'
-			),
+			postSticky:
+				select( editorStore ).getEditedPostAttribute( 'sticky' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

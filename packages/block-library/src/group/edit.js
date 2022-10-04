@@ -2,17 +2,38 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+
 import {
 	InnerBlocks,
 	useBlockProps,
-	InspectorAdvancedControls,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	InspectorControls,
+	useInnerBlocksProps,
 	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+
+const htmlElementMessages = {
+	header: __(
+		'The <header> element should represent introductory content, typically a group of introductory or navigational aids.'
+	),
+	main: __(
+		'The <main> element should be used for the primary content of your document only. '
+	),
+	section: __(
+		"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
+	),
+	article: __(
+		'The <article> element should represent a self contained, syndicatable portion of the document.'
+	),
+	aside: __(
+		"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
+	),
+	footer: __(
+		'The <footer> element should represent a footer for its nearest sectioning element (e.g.: <section>, <article>, <main> etc.).'
+	),
+};
 
 function GroupEdit( { attributes, setAttributes, clientId } ) {
 	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
@@ -28,26 +49,16 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 	);
 	const defaultLayout = useSetting( 'layout' ) || {};
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
-	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
-	const { contentSize, wideSize } = usedLayout;
-	const _layout = useMemo( () => {
-		if ( themeSupportsLayout ) {
-			const alignments =
-				contentSize || wideSize
-					? [ 'wide', 'full', 'left', 'center', 'right' ]
-					: [ 'left', 'center', 'right' ];
-			return {
-				type: 'default',
-				// Find a way to inject this in the support flag code (hooks).
-				alignments,
-			};
-		}
-		return undefined;
-	}, [ themeSupportsLayout, contentSize, wideSize ] );
+	const usedLayout = ! layout?.type
+		? { ...defaultLayout, ...layout, type: 'default' }
+		: { ...defaultLayout, ...layout };
+	const { type = 'default' } = usedLayout;
+	const layoutSupportEnabled = themeSupportsLayout || type !== 'default';
 
 	const blockProps = useBlockProps();
+
 	const innerBlocksProps = useInnerBlocksProps(
-		themeSupportsLayout
+		layoutSupportEnabled
 			? blockProps
 			: { className: 'wp-block-group__inner-container' },
 		{
@@ -55,13 +66,13 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
-			__experimentalLayout: _layout,
+			__experimentalLayout: layoutSupportEnabled ? usedLayout : undefined,
 		}
 	);
 
 	return (
 		<>
-			<InspectorAdvancedControls>
+			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl
 					label={ __( 'HTML element' ) }
 					options={ [
@@ -77,12 +88,13 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 					onChange={ ( value ) =>
 						setAttributes( { tagName: value } )
 					}
+					help={ htmlElementMessages[ TagName ] }
 				/>
-			</InspectorAdvancedControls>
-			{ themeSupportsLayout && <TagName { ...innerBlocksProps } /> }
+			</InspectorControls>
+			{ layoutSupportEnabled && <TagName { ...innerBlocksProps } /> }
 			{ /* Ideally this is not needed but it's there for backward compatibility reason
 				to keep this div for themes that might rely on its presence */ }
-			{ ! themeSupportsLayout && (
+			{ ! layoutSupportEnabled && (
 				<TagName { ...blockProps }>
 					<div { ...innerBlocksProps } />
 				</TagName>

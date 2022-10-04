@@ -6,34 +6,35 @@ import { useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
- * External dependencies
- */
-import { startsWith } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import isURLLike from './is-url-like';
-import { CREATE_TYPE } from './constants';
+import {
+	CREATE_TYPE,
+	TEL_TYPE,
+	MAILTO_TYPE,
+	INTERNAL_TYPE,
+	URL_TYPE,
+} from './constants';
 import { store as blockEditorStore } from '../../store';
 
 export const handleNoop = () => Promise.resolve( [] );
 
 export const handleDirectEntry = ( val ) => {
-	let type = 'URL';
+	let type = URL_TYPE;
 
 	const protocol = getProtocol( val ) || '';
 
 	if ( protocol.includes( 'mailto' ) ) {
-		type = 'mailto';
+		type = MAILTO_TYPE;
 	}
 
 	if ( protocol.includes( 'tel' ) ) {
-		type = 'tel';
+		type = TEL_TYPE;
 	}
 
-	if ( startsWith( val, '#' ) ) {
-		type = 'internal';
+	if ( val?.startsWith( '#' ) ) {
+		type = INTERNAL_TYPE;
 	}
 
 	return Promise.resolve( [
@@ -52,21 +53,39 @@ const handleEntitySearch = async (
 	fetchSearchSuggestions,
 	directEntryHandler,
 	withCreateSuggestion,
-	withURLSuggestion
+	withURLSuggestion,
+	pageOnFront
 ) => {
 	const { isInitialSuggestions } = suggestionsQuery;
+	let resultsIncludeFrontPage = false;
 
 	let results = await Promise.all( [
 		fetchSearchSuggestions( val, suggestionsQuery ),
 		directEntryHandler( val ),
 	] );
 
+	// Identify front page and update type to match.
+	results[ 0 ] = results[ 0 ].map( ( result ) => {
+		if ( Number( result.id ) === pageOnFront ) {
+			resultsIncludeFrontPage = true;
+			result.isFrontPage = true;
+			return result;
+		}
+
+		return result;
+	} );
+
 	const couldBeURL = ! val.includes( ' ' );
 
 	// If it's potentially a URL search then concat on a URL search suggestion
 	// just for good measure. That way once the actual results run out we always
 	// have a URL option to fallback on.
-	if ( couldBeURL && withURLSuggestion && ! isInitialSuggestions ) {
+	if (
+		! resultsIncludeFrontPage &&
+		couldBeURL &&
+		withURLSuggestion &&
+		! isInitialSuggestions
+	) {
 		results = results[ 0 ].concat( results[ 1 ] );
 	} else {
 		results = results[ 0 ];
@@ -97,8 +116,8 @@ const handleEntitySearch = async (
 				// the `id` prop is intentionally ommitted here because it
 				// is never exposed as part of the component's public API.
 				// see: https://github.com/WordPress/gutenberg/pull/19775#discussion_r378931316.
-				title: val, // must match the existing `<input>`s text value
-				url: val, // must match the existing `<input>`s text value
+				title: val, // Must match the existing `<input>`s text value.
+				url: val, // Must match the existing `<input>`s text value.
 				type: CREATE_TYPE,
 		  } );
 };
@@ -109,11 +128,13 @@ export default function useSearchHandler(
 	withCreateSuggestion,
 	withURLSuggestion
 ) {
-	const { fetchSearchSuggestions } = useSelect( ( select ) => {
+	const { fetchSearchSuggestions, pageOnFront } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
+
 		return {
-			fetchSearchSuggestions: getSettings()
-				.__experimentalFetchLinkSuggestions,
+			pageOnFront: getSettings().pageOnFront,
+			fetchSearchSuggestions:
+				getSettings().__experimentalFetchLinkSuggestions,
 		};
 	}, [] );
 
@@ -131,7 +152,8 @@ export default function useSearchHandler(
 						fetchSearchSuggestions,
 						directEntryHandler,
 						withCreateSuggestion,
-						withURLSuggestion
+						withURLSuggestion,
+						pageOnFront
 				  );
 		},
 		[ directEntryHandler, fetchSearchSuggestions, withCreateSuggestion ]

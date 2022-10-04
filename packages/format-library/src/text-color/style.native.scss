@@ -1,0 +1,23 @@
+.components-inline-color--is-active {
+	border-radius: 18px;
+}
+
+.components-inline-color__outline {
+	border-color: $light-dim;
+	top: 6px;
+	bottom: 6px;
+	left: 11px;
+	right: 11px;
+	border-radius: 24px;
+	border-width: $border-width;
+	position: absolute;
+	z-index: 2;
+}
+
+.components-inline-color__outline--dark {
+	border-color: $dark-ultra-dim;
+}
+
+.components-inline-color__button-container {
+	padding: 6px;
+}

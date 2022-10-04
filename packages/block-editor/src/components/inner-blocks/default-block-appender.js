@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
@@ -16,13 +11,8 @@ import BaseDefaultBlockAppender from '../default-block-appender';
 import withClientId from './with-client-id';
 import { store as blockEditorStore } from '../../store';
 
-export const DefaultBlockAppender = ( { clientId, lastBlockClientId } ) => {
-	return (
-		<BaseDefaultBlockAppender
-			rootClientId={ clientId }
-			lastBlockClientId={ lastBlockClientId }
-		/>
-	);
+export const DefaultBlockAppender = ( { clientId } ) => {
+	return <BaseDefaultBlockAppender rootClientId={ clientId } />;
 };
 
 export default compose( [
@@ -33,7 +23,7 @@ export default compose( [
 		const blockClientIds = getBlockOrder( clientId );
 
 		return {
-			lastBlockClientId: last( blockClientIds ),
+			lastBlockClientId: blockClientIds[ blockClientIds.length - 1 ],
 		};
 	} ),
 ] )( DefaultBlockAppender );

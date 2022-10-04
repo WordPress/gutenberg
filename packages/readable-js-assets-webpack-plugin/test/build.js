@@ -8,12 +8,11 @@ const path = require( 'path' );
 const rimraf = require( 'rimraf' ).sync;
 const webpack = require( 'webpack' );
 
-const testDirectory = path.join( __dirname, 'fixtures' );
-
-afterAll( () => rimraf( path.join( __dirname, 'build' ) ) );
+jest.useRealTimers();
 
 describe( 'ReadableJsAssetsWebpackPlugin', () => {
 	const outputDirectory = path.join( __dirname, 'build' );
+	const testDirectory = path.join( __dirname, 'fixtures' );
 
 	beforeEach( () => {
 		rimraf( outputDirectory );
@@ -23,8 +22,8 @@ describe( 'ReadableJsAssetsWebpackPlugin', () => {
 	// This afterEach is necessary to prevent watched tests from retriggering on every run.
 	afterEach( () => rimraf( outputDirectory ) );
 
-	test( 'should produce the expected output', () =>
-		new Promise( ( resolve ) => {
+	test( 'should produce the expected output', async () => {
+		await new Promise( ( resolve ) => {
 			const options = Object.assign(
 				{
 					context: testDirectory,
@@ -44,10 +43,16 @@ describe( 'ReadableJsAssetsWebpackPlugin', () => {
 				assetFiles.forEach( ( assetFile ) => {
 					expect(
 						fs.readFileSync( assetFile, 'utf-8' )
-					).toMatchSnapshot( 'Asset file should match snapshot' );
+					).toMatchSnapshot(
+						`Asset file ${ path.relative(
+							outputDirectory,
+							assetFile
+						) } should match snapshot`
+					);
 				} );
 
 				resolve();
 			} );
-		} ) );
+		} );
+	} );
 } );

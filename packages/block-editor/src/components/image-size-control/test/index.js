@@ -15,7 +15,7 @@ describe( 'ImageSizeControl', () => {
 	const getWidthInput = () => screen.getByLabelText( 'Width' );
 
 	afterEach( () => {
-		// cleanup on exiting
+		// Cleanup on exiting.
 		jest.clearAllMocks();
 	} );
 

@@ -7,13 +7,8 @@ import {
 	header as headerIcon,
 	footer as footerIcon,
 	sidebar as sidebarIcon,
-	layout as layoutIcon,
+	symbolFilled as symbolFilledIcon,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import fallbackVariations from './fallback-variations';
 
 function getTemplatePartIcon( iconName ) {
 	if ( 'header' === iconName ) {
@@ -23,18 +18,12 @@ function getTemplatePartIcon( iconName ) {
 	} else if ( 'sidebar' === iconName ) {
 		return sidebarIcon;
 	}
-	return layoutIcon;
+	return symbolFilledIcon;
 }
 
 export function enhanceTemplatePartVariations( settings, name ) {
 	if ( name !== 'core/template-part' ) {
 		return settings;
-	}
-
-	// WordPress versions pre-5.8 do not support server side variation registration.
-	// So we must register the fallback variations until those versions are no longer supported.
-	if ( ! ( settings.variations && settings.variations.length ) ) {
-		return { ...settings, variations: fallbackVariations };
 	}
 
 	if ( settings.variations ) {

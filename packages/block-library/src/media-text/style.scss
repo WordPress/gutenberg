@@ -6,6 +6,8 @@
 	display: grid;
 	grid-template-columns: 50% 1fr;
 	grid-template-rows: auto;
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 
 	&.has-media-on-the-right {
 		grid-template-columns: 1fr 50%;
@@ -67,6 +69,7 @@
 
 .wp-block-media-text__media img,
 .wp-block-media-text__media video {
+	height: auto;
 	max-width: unset;
 	width: 100%;
 	vertical-align: middle;

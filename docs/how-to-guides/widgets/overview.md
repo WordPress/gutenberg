@@ -14,7 +14,7 @@ The new Widgets Editor also replaces the Widgets section in the Customizer with 
 
 You can access the Customizer Widgets Block Editor by navigating to Appearance → Customize, selecting Widgets, and then selecting a Widget Area.
 
-Using the new Widgets Editor through the Customizer goes beyond inserting blocks and widgets into a selected Widget Area, makeing use of the live preview of the changes, to the right of the editor, and of all the other Customizer specific features such as scheduling and sharing changes.
+Using the new Widgets Editor through the Customizer goes beyond inserting blocks and widgets into a selected Widget Area, making use of the live preview of the changes, to the right of the editor, and of all the other Customizer specific features such as scheduling and sharing changes.
 
 ## Compatibility
 
@@ -24,7 +24,7 @@ The Legacy Widget block is the compatibility mechanism which allows us to edit a
 
 Any third party widgets registered by plugins can still be inserted in widget areas by adding and setting them up through a Legacy Widget block.
 
-The Widgets Editor stores blocks using an underlying "Block" widget that is invisible to the user. This means that plugins and themes will contibue to work normally, and that the Widgets Block Editor can be disabled without any data loss.
+The Widgets Editor stores blocks using an underlying "Block" widget that is invisible to the user. This means that plugins and themes will continue to work normally, and that the Widgets Block Editor can be disabled without any data loss.
 
 Themes may disable the Widgets Block Editor using `remove_theme_support( 'widgets-block-editor' )`.
 

@@ -2,14 +2,26 @@
 .components-menu-item__button.components-button {
 	width: 100%;
 
-	.components-menu-items__item-icon {
-		margin-right: -2px; // This optically balances the icon.
-		margin-left: $grid-unit-30;
-		display: inline-block;
-		flex: 0 0 auto;
+	&[role="menuitemradio"],
+	&[role="menuitemcheckbox"] {
+		.components-menu-item__item:only-child {
+			// Ensure unchecked items have clearance for consistency
+			// with checked items containing an icon or shortcut.
+			padding-right: $grid-unit-60;
+			box-sizing: initial;
+		}
 	}
 
-	.components-menu-item__shortcut + .components-menu-items__item-icon {
+	.components-menu-items__item-icon {
+		display: inline-block;
+		flex: 0 0 auto;
+		&.has-icon-right {
+			margin-right: -2px; // This optically balances the icon.
+			margin-left: $grid-unit-30;
+		}
+	}
+
+	.components-menu-item__shortcut + .components-menu-items__item-icon.has-icon-right {
 		margin-left: $grid-unit-10;
 	}
 
@@ -25,6 +37,16 @@
 		.components-menu-item__item {
 			// Override the default right margin.
 			margin-right: 0;
+		}
+	}
+
+	&:disabled,
+	&[aria-disabled="true"] {
+		// Override the button component's tertiary background and color.
+		&.is-tertiary {
+			background: none;
+			color: var(--wp-admin-theme-color-darker-10);
+			opacity: 0.3;
 		}
 	}
 }
@@ -43,7 +65,10 @@
 }
 
 .components-menu-item__item {
+	// Provide a minimum width for text items in menus.
 	white-space: nowrap;
+	min-width: 160px;
+
 	margin-right: auto;
 	display: inline-flex;
 	align-items: center;

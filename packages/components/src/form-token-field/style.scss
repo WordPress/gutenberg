@@ -1,13 +1,9 @@
 .components-form-token-field__input-container {
 	@include input-control();
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
 	width: 100%;
 	margin: 0 0 $grid-unit-10 0;
-	padding: $grid-unit-05/2 $grid-unit-05;
+	padding: 0;
 	cursor: text;
-
 
 	&.is-disabled {
 		background: $gray-300;
@@ -22,6 +18,7 @@
 	input[type="text"].components-form-token-field__input {
 		display: inline-block;
 		flex: 1;
+		font-family: inherit;
 		font-size: 16px;
 		width: 100%;
 		max-width: 100%;
@@ -51,11 +48,6 @@
 	}
 }
 
-.components-form-token-field__label {
-	display: inline-block;
-	margin-bottom: $grid-unit-05;
-}
-
 .components-form-token-field__help {
 	font-size: $helptext-font-size;
 	font-style: normal;
@@ -66,7 +58,6 @@
 .components-form-token-field__token {
 	font-size: $default-font-size;
 	display: flex;
-	margin: 2px 4px 2px 0;
 	color: $gray-900;
 	max-width: 100%;
 
@@ -93,7 +84,7 @@
 
 	&.is-borderless {
 		position: relative;
-		padding: 0 16px 0 0;
+		padding: 0 24px 0 0;
 
 		.components-form-token-field__token-text {
 			background: transparent;
@@ -106,6 +97,7 @@
 			position: absolute;
 			top: 1px;
 			right: 0;
+			padding: 0;
 		}
 
 		&.is-success {
@@ -178,7 +170,7 @@
 	@include reduce-motion("transition");
 	list-style: none;
 	border-top: $border-width solid $gray-700;
-	margin: $grid-unit-05 (-$grid-unit-05) (-$grid-unit-05);
+	margin: 0;
 	padding: 0;
 }
 

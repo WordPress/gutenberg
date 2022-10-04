@@ -1,6 +1,6 @@
-# Templates
+# Block Templates
 
-A block template is defined as a list of block items. Such blocks can have predefined attributes, placeholder content, and be static or dynamic. Block templates allow specifying a default initial state for an editor session.
+A block template is defined as a list of block items. Such blocks can have predefined attributes, placeholder content, and be static or dynamic. Block templates allow specifying a default initial state for an editor session. 
 
 The scope of templates include:
 
@@ -59,7 +59,7 @@ registerBlockType( 'myplugin/template', {
 } );
 ```
 
-See the [Meta Block Tutorial](/docs/how-to-guides/metabox/meta-block-5-finishing.md) for a full example of a template in use.
+See the [Meta Block Tutorial](/docs/how-to-guides/metabox.md#step-4-finishing-touches) for a full example of a template in use.
 
 ## Block Attributes
 
@@ -96,7 +96,7 @@ function myplugin_register_book_post_type() {
 add_action( 'init', 'myplugin_register_book_post_type' );
 ```
 
-### Locking
+## Locking
 
 Sometimes the intention might be to lock the template on the UI so that the blocks presented cannot be manipulated. This is achieved with a `template_lock` property.
 
@@ -115,10 +115,49 @@ add_action( 'init', 'myplugin_register_template' );
 
 _Options:_
 
+-   `contentOnly` — prevents all operations. Additionally, the block types that don't have content are hidden from the list view and can't gain focus within the block list. Unlike the other lock types, this is not overrideable by children.
 -   `all` — prevents all operations. It is not possible to insert new blocks, move existing blocks, or delete blocks.
 -   `insert` — prevents inserting or removing blocks, but allows moving existing blocks.
 
 Lock settings can be inherited by InnerBlocks. If `templateLock` is not set in an InnerBlocks area, the locking of the parent InnerBlocks area is used. If the block is a top level block, the locking configuration of the current post type is used.
+
+## Individual block locking
+
+Alongside template level locking, you can lock individual blocks; you can do this using a `lock` attribute on the attributes level. Block-level lock takes priority over the `templateLock` feature. Currently, you can lock moving and removing blocks.
+
+```js
+attributes: {
+  // Prevent a block from being moved or removed.
+  lock: {
+    remove: true,
+    move: true,
+  }
+}
+```
+_Options:_
+-   `remove` — Locks the ability of a block from being removed.
+-   `move` — Locks the ability of a block from being moved.
+
+You can use this with `templateLock` to lock all blocks except a single block by using `false` in `remove` or `move`.
+
+```php
+$template = array(
+	array( 'core/image', array(
+		'align' => 'left',
+	) ),
+	array( 'core/heading', array(
+		'placeholder' => 'Add Author...',
+	) ),
+	// Allow a Paragraph block to be moved or removed.
+	array( 'core/paragraph', array(
+		'placeholder' => 'Add Description...',
+		'lock' => array(
+			'move'   => false,
+			'remove' => false,
+		),
+	) ),
+);
+```
 
 ## Nested Templates
 

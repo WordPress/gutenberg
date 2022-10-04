@@ -1,7 +1,4 @@
 GEM
-  specs:
-
-GEM
   remote: https://rubygems.org/
   specs:
     CFPropertyList (3.0.3)
@@ -10,7 +7,7 @@ GEM
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
       tzinfo (~> 1.1)
-    addressable (2.7.0)
+    addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
     algoliasearch (1.27.5)
       httpclient (~> 2.8, >= 2.8.3)
@@ -46,7 +43,7 @@ GEM
       public_suffix
       typhoeus (~> 1.0)
     cocoapods-deintegrate (1.0.4)
-    cocoapods-downloader (1.4.0)
+    cocoapods-downloader (1.6.3)
     cocoapods-plugins (1.0.0)
       nap
     cocoapods-search (1.0.0)
@@ -77,7 +74,7 @@ GEM
     thread_safe (0.3.6)
     typhoeus (1.4.0)
       ethon (>= 0.9.0)
-    tzinfo (1.2.9)
+    tzinfo (1.2.10)
       thread_safe (~> 0.1)
     xcodeproj (1.19.0)
       CFPropertyList (>= 2.3.3, < 4.0)
@@ -90,7 +87,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  cocoapods (~> 1.10.0)!
+  cocoapods (~> 1.10.0)
 
 BUNDLED WITH
-   2.2.15
+   2.2.27

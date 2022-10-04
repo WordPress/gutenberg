@@ -18,18 +18,15 @@
 import jsdom from 'jsdom-jscore-rn';
 import jsdomLevel1Core from 'jsdom-jscore-rn/lib/jsdom/level1/core';
 
-// must be called to initialize jsdom before patching prototypes
+// Must be called to initialize jsdom before patching prototypes.
 jsdom.html( '', null, null );
 
 const { core } = jsdomLevel1Core.dom.level1;
 const { Node, Element, CharacterData } = core;
 
-// Exception codes
-const {
-	NO_MODIFICATION_ALLOWED_ERR,
-	HIERARCHY_REQUEST_ERR,
-	NOT_FOUND_ERR,
-} = core;
+// Exception codes.
+const { NO_MODIFICATION_ALLOWED_ERR, HIERARCHY_REQUEST_ERR, NOT_FOUND_ERR } =
+	core;
 
 /**
  * Simple recursive implementation of Node.contains method
@@ -66,7 +63,7 @@ Node.prototype.contains = function ( otherNode ) {
  */
 Node.prototype.insertBefore = function (
 	/* Node */ newChild,
-	/* Node*/ refChild
+	/* Node */ refChild
 ) {
 	if ( this._readonly === true ) {
 		throw new core.DOMException(
@@ -75,7 +72,7 @@ Node.prototype.insertBefore = function (
 		);
 	}
 
-	// Adopt unowned children, for weird nodes like DocumentType
+	// Adopt unowned children, for weird nodes like DocumentType.
 	if ( ! newChild._ownerDocument ) {
 		newChild._ownerDocument = this._ownerDocument;
 	}
@@ -94,7 +91,7 @@ Node.prototype.insertBefore = function (
 		throw new core.DOMException( HIERARCHY_REQUEST_ERR );
 	}
 
-	// search for parents matching the newChild
+	// Search for parents matching the newChild.
 	let current = this;
 	do {
 		if ( current === newChild ) {
@@ -102,7 +99,7 @@ Node.prototype.insertBefore = function (
 		}
 	} while ( ( current = current._parentNode ) );
 
-	// fragments are merged into the element
+	// Fragments are merged into the element.
 	if ( newChild.nodeType === newChild.DOCUMENT_FRAGMENT_NODE ) {
 		let tmpNode,
 			i = newChild._childNodes.length;
@@ -113,7 +110,7 @@ Node.prototype.insertBefore = function (
 	} else if ( newChild === refChild ) {
 		return newChild;
 	} else {
-		// if the newChild is already in the tree elsewhere, remove it first
+		// If the newChild is already in the tree elsewhere, remove it first.
 		if ( newChild._parentNode ) {
 			newChild._parentNode.removeChild( newChild );
 		}
@@ -145,7 +142,7 @@ Node.prototype.insertBefore = function (
 	}
 
 	return newChild;
-}; // raises(DOMException);
+}; // Raises(DOMException);
 
 /*
  * This is merely an alias (polyfill not needed).
@@ -211,7 +208,7 @@ Object.defineProperties( Node.prototype, {
 	 */
 	previousElementSibling: {
 		get() {
-			// Property is undefined if node is not a NonDocumentTypeChildNode
+			// Property is undefined if node is not a NonDocumentTypeChildNode.
 			if ( ! isNonDocumentTypeChildNode( this ) ) {
 				return;
 			}
@@ -232,7 +229,7 @@ Object.defineProperties( Node.prototype, {
 	 */
 	nextElementSibling: {
 		get() {
-			// Property is undefined if node is not a NonDocumentTypeChildNode
+			// Property is undefined if node is not a NonDocumentTypeChildNode.
 			if ( ! isNonDocumentTypeChildNode( this ) ) {
 				return;
 			}

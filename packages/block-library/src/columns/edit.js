@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { dropRight, get, times } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,7 @@ import {
 
 import {
 	InspectorControls,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
@@ -141,7 +141,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 			// Update own alignment.
 			setAttributes( { verticalAlignment } );
 
-			// Update all child Column Blocks to match
+			// Update all child Column Blocks to match.
 			const innerBlockClientIds = getBlockOrder( clientId );
 			innerBlockClientIds.forEach( ( innerBlockClientId ) => {
 				updateBlockAttributes( innerBlockClientId, {
@@ -163,9 +163,8 @@ const ColumnsEditContainerWrapper = withDispatch(
 			const { getBlocks } = registry.select( blockEditorStore );
 
 			let innerBlocks = getBlocks( clientId );
-			const hasExplicitWidths = hasExplicitPercentColumnWidths(
-				innerBlocks
-			);
+			const hasExplicitWidths =
+				hasExplicitPercentColumnWidths( innerBlocks );
 
 			// Redistribute available width for existing inner blocks.
 			const isAddingColumn = newColumns > previousColumns;
@@ -184,7 +183,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 
 				innerBlocks = [
 					...getMappedColumnWidths( innerBlocks, widths ),
-					...times( newColumns - previousColumns, () => {
+					...Array.from( {
+						length: newColumns - previousColumns,
+					} ).map( () => {
 						return createBlock( 'core/column', {
 							width: `${ newColumnWidth }%`,
 						} );
@@ -193,15 +194,17 @@ const ColumnsEditContainerWrapper = withDispatch(
 			} else if ( isAddingColumn ) {
 				innerBlocks = [
 					...innerBlocks,
-					...times( newColumns - previousColumns, () => {
+					...Array.from( {
+						length: newColumns - previousColumns,
+					} ).map( () => {
 						return createBlock( 'core/column' );
 					} ),
 				];
 			} else {
 				// The removed column will be the last of the inner blocks.
-				innerBlocks = dropRight(
-					innerBlocks,
-					previousColumns - newColumns
+				innerBlocks = innerBlocks.slice(
+					0,
+					-( previousColumns - newColumns )
 				);
 
 				if ( hasExplicitWidths ) {

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dom",
-	"version": "3.1.1",
+	"version": "3.18.0",
 	"description": "DOM utilities module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -28,8 +28,8 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.13.10",
-		"lodash": "^4.17.21"
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/deprecated": "file:../deprecated"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, includes, isArray, get, some } from 'lodash';
+import { castArray, includes, get, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -26,7 +26,7 @@ export function ThemeSupportCheck( {
 		// In the latter case, we need to verify `postType` exists
 		// within `supported`. If `postType` isn't passed, then the check
 		// should fail.
-		if ( 'post-thumbnails' === key && isArray( supported ) ) {
+		if ( 'post-thumbnails' === key && Array.isArray( supported ) ) {
 			return includes( supported, postType );
 		}
 		return supported;

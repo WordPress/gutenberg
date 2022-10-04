@@ -4,6 +4,11 @@
 	&__image {
 		background: #00a0d2;
 		margin: 0 0 $grid-unit-20;
+		> img {
+			display: block;
+			max-width: 100%;
+			object-fit: cover;
+		}
 	}
 
 	&__heading {

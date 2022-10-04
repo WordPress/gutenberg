@@ -27,7 +27,8 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	__experimentalRecursionProvider as RecursionProvider,
+	__experimentalUseHasRecursion as useHasRecursion,
 	InnerBlocks,
 	Warning,
 	store as blockEditorStore,
@@ -48,9 +49,7 @@ export default function ReusableBlockEdit( {
 	clientId,
 	isSelected,
 } ) {
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		ref
-	);
+	const hasAlreadyRendered = useHasRecursion( ref );
 
 	const [ showHelp, setShowHelp ] = useState( false );
 	const infoTextStyle = usePreferredColorSchemeStyle(
@@ -85,18 +84,16 @@ export default function ReusableBlockEdit( {
 				'wp_block',
 				ref
 			);
-			const hasResolvedBlock = select(
-				coreStore
-			).hasFinishedResolution( 'getEntityRecord', [
-				'postType',
-				'wp_block',
-				ref,
-			] );
+			const hasResolvedBlock = select( coreStore ).hasFinishedResolution(
+				'getEntityRecord',
+				[ 'postType', 'wp_block', ref ]
+			);
 			return {
 				hasResolved: hasResolvedBlock,
-				isEditing: select(
-					reusableBlocksStore
-				).__experimentalIsEditingReusableBlock( clientId ),
+				isEditing:
+					select(
+						reusableBlocksStore
+					).__experimentalIsEditingReusableBlock( clientId ),
 				isMissing: hasResolvedBlock && ! persistedBlock,
 			};
 		},
@@ -104,9 +101,8 @@ export default function ReusableBlockEdit( {
 	);
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const {
-		__experimentalConvertBlockToStatic: convertBlockToStatic,
-	} = useDispatch( reusableBlocksStore );
+	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
+		useDispatch( reusableBlocksStore );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
@@ -167,7 +163,7 @@ export default function ReusableBlockEdit( {
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
 						{ __(
-							'Alternatively, you can detach and edit these blocks separately by tapping "Convert to regular blocks".'
+							'Alternatively, you can detach and edit these blocks separately by tapping “Convert to regular blocks”.'
 						) }
 					</Text>
 					<TextControl
@@ -218,7 +214,7 @@ export default function ReusableBlockEdit( {
 	}
 
 	return (
-		<RecursionProvider>
+		<RecursionProvider uniqueId={ ref }>
 			<TouchableWithoutFeedback
 				disabled={ ! isSelected }
 				accessibilityLabel={ __( 'Help button' ) }

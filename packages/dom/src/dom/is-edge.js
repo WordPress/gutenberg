@@ -21,7 +21,10 @@ import isInputOrTextArea from './is-input-or-text-area';
  * @return {boolean} True if at the edge, false if not.
  */
 export default function isEdge( container, isReverse, onlyVertical = false ) {
-	if ( isInputOrTextArea( container ) ) {
+	if (
+		isInputOrTextArea( container ) &&
+		typeof container.selectionStart === 'number'
+	) {
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
 		}
@@ -33,7 +36,7 @@ export default function isEdge( container, isReverse, onlyVertical = false ) {
 		return container.value.length === container.selectionStart;
 	}
 
-	if ( ! (/** @type {HTMLElement} */ ( container ).isContentEditable) ) {
+	if ( ! ( /** @type {HTMLElement} */ ( container ).isContentEditable ) ) {
 		return true;
 	}
 

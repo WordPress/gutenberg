@@ -1,6 +1,7 @@
 .titleStyle {
 	text-align: left;
 	font-weight: bold;
+	width: 100%;
 }
 
 .summaryStyle {
@@ -16,6 +17,8 @@
 }
 
 .containerStyle {
+	flex-grow: 1;
+	flex-basis: 0;
 	align-items: flex-start;
 }
 

@@ -18,11 +18,11 @@ Block attributes can be used for any content or setting you want to save for tha
 The following code example shows how to create a dynamic block that shows only the last post as a link.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-dynamic', {
@@ -31,12 +31,11 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 	icon: 'megaphone',
 	category: 'widgets',
 
-	edit: withSelect( ( select ) => {
-		return {
-			posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
-		};
-	} )( ( { posts } ) => {
+	edit: () => {
 		const blockProps = useBlockProps();
+		const posts = useSelect( ( select ) => {
+			return select( 'core' ).getEntityRecords( 'postType', 'post' );
+		}, [] );
 
 		return (
 			<div { ...blockProps }>
@@ -49,17 +48,17 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 				) }
 			</div>
 		);
-	} ),
+	},
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 ( function ( blocks, element, data, blockEditor ) {
 	var el = element.createElement,
 		registerBlockType = blocks.registerBlockType,
-		withSelect = data.withSelect,
+		useSelect = data.useSelect,
 		useBlockProps = blockEditor.useBlockProps;
 
 	registerBlockType( 'gutenberg-examples/example-dynamic', {
@@ -67,24 +66,23 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 		title: 'Example: last post',
 		icon: 'megaphone',
 		category: 'widgets',
-		edit: withSelect( function ( select ) {
-			return {
-				posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
-			};
-		} )( function ( props ) {
-			var blockProps = useBlockProps();
+		edit: function () {
 			var content;
-			if ( ! props.posts ) {
+			var blockProps = useBlockProps();
+			var posts = useSelect( function ( select ) {
+				return select( 'core' ).getEntityRecords( 'postType', 'post' );
+			}, [] );
+			if ( ! posts ) {
 				content = 'Loading...';
-			} else if ( props.posts.length === 0 ) {
+			} else if ( posts.length === 0 ) {
 				content = 'No posts';
 			} else {
-				var post = props.posts[ 0 ];
+				var post = posts[ 0 ];
 				content = el( 'a', { href: post.link }, post.title.rendered );
 			}
 
 			return el( 'div', blockProps, content );
-		} ),
+		},
 	} );
 } )(
 	window.wp.blocks,
@@ -150,6 +148,8 @@ There are a few things to notice:
 -   The built-in `save` function just returns `null` because the rendering is performed server-side.
 -   The server-side rendering is a function taking the block and the block inner content as arguments, and returning the markup (quite similar to shortcodes)
 
+**Note :** For common customization settings including color, border, spacing customization and more, we will see on the [next chapter](/docs/how-to-guides/block-tutorial/block-supports-in-dynamic-blocks.md) how you can rely on block supports to provide such functionality in an efficient way.
+
 ## Live rendering in the block editor
 
 Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/server-side-render/README.md) block which enables rendering to take place on the server using PHP rather than in JavaScript.
@@ -157,7 +157,7 @@ Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/server-side-render/READ
 _Server-side render is meant as a fallback; client-side rendering in JavaScript is always preferred (client rendering is faster and allows better editor manipulation)._
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
@@ -184,7 +184,7 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 ( function ( blocks, element, serverSideRender, blockEditor ) {
@@ -221,4 +221,4 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 
 {% end %}
 
-Note that this code uses the `wp-server-side-render` package but not `wp-data`. Make sure to update the dependencies in the PHP code. You can use wp-scripts and ESNext setup for auto dependencies (see the [gutenberg-examples repo](https://github.com/WordPress/gutenberg-examples/tree/HEAD/01-basic-esnext) for PHP code setup).
+Note that this code uses the `wp-server-side-render` package but not `wp-data`. Make sure to update the dependencies in the PHP code. You can use wp-scripts to automatically build dependencies (see the [gutenberg-examples repo](https://github.com/WordPress/gutenberg-examples/tree/HEAD/01-basic-esnext) for PHP code setup).

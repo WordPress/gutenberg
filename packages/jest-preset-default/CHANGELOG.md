@@ -2,6 +2,57 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Testing: Remove enzyme completely ([#44494](https://github.com/WordPress/gutenberg/pull/44494)). See the [example in the README](./README.md#using-enzyme) for instructions on how to continue using `enzyme` in your project.
+
+## 9.1.0 (2022-09-21)
+
+## 9.0.0 (2022-08-24)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
+### Bug Fix
+
+-   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
+
+## 8.5.2 (2022-08-17)
+
+### Bug Fix
+
+-   Jest Preset: Improve `is-plain-obj` transformation ignore ([#43271](https://github.com/WordPress/gutenberg/pull/43271)).
+
+## 8.5.1 (2022-08-12)
+
+### Bug Fix
+
+-   Jest Preset: Ignore `is-plain-obj` transformation ([#43179](https://github.com/WordPress/gutenberg/pull/43179)).
+
+## 8.0.0 (2022-01-27)
+
+### Breaking Changes
+
+-   The peer `jest` dependency has been updated from requiring `>=26` to requiring `>=27` (see [Breaking Changes](https://jestjs.io/blog/2021/05/25/jest-27), [#33287](https://github.com/WordPress/gutenberg/pull/33287)).
+
+### Bug Fixes
+
+-   Allow ESLint to be imported from within Jest (e.g. when using `ruleTester`) ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
+-   Improve support for test files with `.jsx` and `.tsx` extensions ([#36260](https://github.com/WordPress/gutenberg/pull/36260)).
+
+## 7.1.2 (2021-10-22)
+
+### Bug Fix
+
+-   Provide more complete mocks of browser timing functions. ([#35368](https://github.com/WordPress/gutenberg/pull/35368))
+
+## 7.1.1 (2021-09-09)
+
+### Bug Fix
+
+-   Restore the default setting for the `verbose` option. In effect, each test won't get reported during the run ([#34327](https://github.com/WordPress/gutenberg/pull/34327)).
+
 ## 7.0.0 (2021-01-21)
 
 ### Breaking Changes

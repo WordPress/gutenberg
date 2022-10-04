@@ -5,7 +5,7 @@ Simple interface to introduce animations to components.
 ## Usage
 
 ```jsx
-import { Animate } from '@wordpress/components';
+import { Animate, Notice } from '@wordpress/components';
 
 const MyAnimatedNotice = () => (
 	<Animate type="slide-in" options={ { origin: 'top' } }>

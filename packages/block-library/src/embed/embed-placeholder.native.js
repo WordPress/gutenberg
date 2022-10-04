@@ -8,7 +8,9 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { Icon } from '@wordpress/components';
+import { Icon, Picker } from '@wordpress/components';
+import { BlockIcon } from '@wordpress/block-editor';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,6 +24,9 @@ const EmbedPlaceholder = ( {
 	label,
 	onPress,
 	cannotEmbed,
+	fallback,
+	tryAgain,
+	openEmbedLinkSettings,
 } ) => {
 	const containerStyle = usePreferredColorSchemeStyle(
 		styles.embed__container,
@@ -31,25 +36,67 @@ const EmbedPlaceholder = ( {
 		styles.embed__label,
 		styles[ 'embed__label--dark' ]
 	);
-	const descriptionStyle = usePreferredColorSchemeStyle(
-		styles.embed__description,
-		styles[ 'embed__description--dark' ]
-	);
+	const descriptionStyle = styles.embed__description;
+	const descriptionErrorStyle = styles[ 'embed__description--error' ];
 	const actionStyle = usePreferredColorSchemeStyle(
 		styles.embed__action,
 		styles[ 'embed__action--dark' ]
 	);
-	const embedIconStyle = usePreferredColorSchemeStyle(
-		styles.embed__icon,
-		styles[ 'embed__icon--dark' ]
-	);
+	const embedIconErrorStyle = styles[ 'embed__icon--error' ];
+
+	const cannotEmbedMenuPickerRef = useRef();
+
+	const errorPickerOptions = {
+		retry: {
+			id: 'retryOption',
+			label: __( 'Retry' ),
+			value: 'retryOption',
+			onSelect: tryAgain,
+		},
+		convertToLink: {
+			id: 'convertToLinkOption',
+			label: __( 'Convert to link' ),
+			value: 'convertToLinkOption',
+			onSelect: fallback,
+		},
+		editLink: {
+			id: 'editLinkOption',
+			label: __( 'Edit link' ),
+			value: 'editLinkOption',
+			onSelect: openEmbedLinkSettings,
+		},
+	};
+
+	const options = [
+		cannotEmbed && errorPickerOptions.retry,
+		cannotEmbed && errorPickerOptions.convertToLink,
+		cannotEmbed && errorPickerOptions.editLink,
+	].filter( Boolean );
+
+	function onPickerSelect( value ) {
+		const selectedItem = options.find( ( item ) => item.value === value );
+		selectedItem.onSelect();
+	}
+
+	// When the content cannot be embedded the onPress should trigger the Picker instead of the onPress prop.
+	function resolveOnPressEvent() {
+		if ( cannotEmbed ) {
+			cannotEmbedMenuPickerRef.current?.presentPicker();
+		} else {
+			onPress();
+		}
+	}
 
 	return (
 		<>
 			<TouchableWithoutFeedback
 				accessibilityRole={ 'button' }
-				accessibilityHint={ __( 'Double tap to add a link.' ) }
-				onPress={ onPress }
+				accessibilityHint={
+					cannotEmbed
+						? __( 'Double tap to view embed options.' )
+						: __( 'Double tap to add a link.' )
+				}
+				onPress={ resolveOnPressEvent }
 				disabled={ ! isSelected }
 			>
 				<View style={ containerStyle }>
@@ -57,19 +104,32 @@ const EmbedPlaceholder = ( {
 						<>
 							<Icon
 								icon={ noticeOutline }
-								fill={ embedIconStyle.fill }
-								style={ styles[ 'embed__icon--error' ] }
+								fill={ embedIconErrorStyle.fill }
+								style={ embedIconErrorStyle }
 							/>
-							<Text style={ descriptionStyle }>
+							<Text
+								style={ [
+									descriptionStyle,
+									descriptionErrorStyle,
+								] }
+							>
 								{ __( 'Unable to embed media' ) }
 							</Text>
 							<Text style={ actionStyle }>
-								{ __( 'EDIT LINK' ) }
+								{ __( 'More options' ) }
 							</Text>
+							<Picker
+								title={ __( 'Embed options' ) }
+								ref={ cannotEmbedMenuPickerRef }
+								options={ options }
+								onChange={ onPickerSelect }
+								hideCancelButton
+								leftAlign
+							/>
 						</>
 					) : (
 						<>
-							<Icon icon={ icon } fill={ embedIconStyle.fill } />
+							<BlockIcon icon={ icon } />
 							<Text style={ labelStyle }>{ label }</Text>
 							<Text style={ actionStyle }>
 								{ __( 'ADD LINK' ) }

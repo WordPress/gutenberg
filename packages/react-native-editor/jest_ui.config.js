@@ -22,5 +22,6 @@ module.exports = {
 	setupFilesAfterEnv: [ './jest_ui_setup_after_env.js' ],
 	testEnvironment: './jest_ui_test_environment.js',
 	testMatch: [ '**/__device-tests__/**/*.test.[jt]s?(x)' ],
+	testRunner: 'jest-jasmine2',
 	reporters: [ 'default', 'jest-junit' ],
 };

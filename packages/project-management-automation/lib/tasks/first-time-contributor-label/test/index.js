@@ -19,6 +19,31 @@ describe( 'firstTimeContributorLabel', () => {
 		},
 	};
 
+	it( 'does nothing for PRs by bots', async () => {
+		const payloadForBot = {
+			...payload,
+			pull_request: {
+				user: {
+					login: 'ghost',
+					type: 'Bot',
+				},
+				number: 123,
+			},
+		};
+
+		const octokit = {
+			rest: {
+				repos: {
+					listCommits: jest.fn(),
+				},
+			},
+		};
+
+		await firstTimeContributorLabel( payloadForBot, octokit );
+
+		expect( octokit.rest.repos.listCommits ).not.toHaveBeenCalled();
+	} );
+
 	it( 'does nothing if the user has at least one commit', async () => {
 		const octokit = {
 			rest: {
@@ -27,8 +52,7 @@ describe( 'firstTimeContributorLabel', () => {
 						Promise.resolve( {
 							data: [
 								{
-									sha:
-										'4c535288a6a2b75ff23ee96c75f7d9877e919241',
+									sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
 								},
 							],
 						} )

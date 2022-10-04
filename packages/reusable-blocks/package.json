@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/reusable-blocks",
-	"version": "2.1.11",
+	"version": "3.16.0",
 	"description": "Reusable blocks utilities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,15 +31,17 @@
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
-		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/notices": "file:../notices",
-		"@wordpress/url": "file:../url",
-		"lodash": "^4.17.21"
+		"@wordpress/url": "file:../url"
+	},
+	"peerDependencies": {
+		"react": "^17.0.0",
+		"react-dom": "^17.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

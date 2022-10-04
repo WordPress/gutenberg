@@ -26,10 +26,13 @@ const ReadableContentView = ( { align, reversed, children, style } ) => {
 	}
 
 	useEffect( () => {
-		Dimensions.addEventListener( 'change', onDimensionsChange );
+		const dimensionsChangeSubscription = Dimensions.addEventListener(
+			'change',
+			onDimensionsChange
+		);
 
 		return () => {
-			Dimensions.removeEventListener( 'change', onDimensionsChange );
+			dimensionsChangeSubscription.remove();
 		};
 	}, [] );
 

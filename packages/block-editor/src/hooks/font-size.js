@@ -15,7 +15,12 @@ import {
 	getFontSizeObjectByValue,
 	FontSizePicker,
 } from '../components/font-sizes';
-import { cleanEmptyObject } from './utils';
+import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
+import {
+	cleanEmptyObject,
+	transformStyles,
+	shouldSkipSerialization,
+} from './utils';
 import useSetting from '../components/use-setting';
 
 export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
@@ -60,10 +65,7 @@ function addSaveProps( props, blockType, attributes ) {
 	}
 
 	if (
-		hasBlockSupport(
-			blockType,
-			'typography.__experimentalSkipSerialization'
-		)
+		shouldSkipSerialization( blockType, TYPOGRAPHY_SUPPORT_KEY, 'fontSize' )
 	) {
 		return props;
 	}
@@ -114,7 +116,6 @@ export function FontSizeEdit( props ) {
 		attributes: { fontSize, style },
 		setAttributes,
 	} = props;
-	const isDisabled = useIsFontSizeDisabled( props );
 	const fontSizes = useSetting( 'typography.fontSizes' );
 
 	const onChange = ( value ) => {
@@ -132,10 +133,6 @@ export function FontSizeEdit( props ) {
 		} );
 	};
 
-	if ( isDisabled ) {
-		return null;
-	}
-
 	const fontSizeObject = getFontSize(
 		fontSizes,
 		fontSize,
@@ -145,7 +142,50 @@ export function FontSizeEdit( props ) {
 	const fontSizeValue =
 		fontSizeObject?.size || style?.typography?.fontSize || fontSize;
 
-	return <FontSizePicker onChange={ onChange } value={ fontSizeValue } />;
+	return (
+		<FontSizePicker
+			onChange={ onChange }
+			value={ fontSizeValue }
+			withReset={ false }
+			size="__unstable-large"
+			__nextHasNoMarginBottom
+		/>
+	);
+}
+
+/**
+ * Checks if there is a current value set for the font size block support.
+ *
+ * @param {Object} props Block props.
+ * @return {boolean}     Whether or not the block has a font size value set.
+ */
+export function hasFontSizeValue( props ) {
+	const { fontSize, style } = props.attributes;
+	return !! fontSize || !! style?.typography?.fontSize;
+}
+
+/**
+ * Resets the font size block support attribute. This can be used when
+ * disabling the font size support controls for a block via a progressive
+ * discovery panel.
+ *
+ * @param {Object} props               Block props.
+ * @param {Object} props.attributes    Block's attributes.
+ * @param {Object} props.setAttributes Function to set block's attributes.
+ */
+export function resetFontSize( { attributes = {}, setAttributes } ) {
+	const { style } = attributes;
+
+	setAttributes( {
+		fontSize: undefined,
+		style: cleanEmptyObject( {
+			...style,
+			typography: {
+				...style?.typography,
+				fontSize: undefined,
+			},
+		} ),
+	} );
 }
 
 /**
@@ -187,9 +227,10 @@ const withFontSizeInlineStyles = createHigherOrderComponent(
 		// and does have a class to extract the font size from.
 		if (
 			! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) ||
-			hasBlockSupport(
+			shouldSkipSerialization(
 				blockName,
-				'typography.__experimentalSkipSerialization'
+				TYPOGRAPHY_SUPPORT_KEY,
+				'fontSize'
 			) ||
 			! fontSize ||
 			style?.typography?.fontSize
@@ -219,6 +260,28 @@ const withFontSizeInlineStyles = createHigherOrderComponent(
 	'withFontSizeInlineStyles'
 );
 
+const MIGRATION_PATHS = {
+	fontSize: [ [ 'fontSize' ], [ 'style', 'typography', 'fontSize' ] ],
+};
+
+export function addTransforms( result, source, index, results ) {
+	const destinationBlockType = result.name;
+	const activeSupports = {
+		fontSize: hasBlockSupport(
+			destinationBlockType,
+			FONT_SIZE_SUPPORT_KEY
+		),
+	};
+	return transformStyles(
+		activeSupports,
+		MIGRATION_PATHS,
+		result,
+		source,
+		index,
+		results
+	);
+}
+
 addFilter(
 	'blocks.registerBlockType',
 	'core/font/addAttribute',
@@ -237,4 +300,10 @@ addFilter(
 	'editor.BlockListBlock',
 	'core/font-size/with-font-size-inline-styles',
 	withFontSizeInlineStyles
+);
+
+addFilter(
+	'blocks.switchToBlockType.transformedBlock',
+	'core/font-size/addTransforms',
+	addTransforms
 );

@@ -20,6 +20,26 @@ import { isURL } from '@wordpress/url';
 import { filePasteHandler } from './file-paste-handler';
 import { addActiveFormats, isShortcode } from './utils';
 import { splitValue } from './split-value';
+import { shouldDismissPastedFiles } from '../../utils/pasting';
+
+/** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
+
+/**
+ * Replaces line separators with line breaks if not multiline.
+ * Replaces line breaks with line separators if multiline.
+ *
+ * @param {RichTextValue} value       Value to adjust.
+ * @param {boolean}       isMultiline Whether to adjust to multiline or not.
+ *
+ * @return {RichTextValue} Adjusted value.
+ */
+function adjustLines( value, isMultiline ) {
+	if ( isMultiline ) {
+		return replace( value, /\n+/g, LINE_SEPARATOR );
+	}
+
+	return replace( value, new RegExp( LINE_SEPARATOR, 'g' ), '\n' );
+}
 
 export function usePasteHandler( props ) {
 	const propsRef = useRef( props );
@@ -43,7 +63,6 @@ export function usePasteHandler( props ) {
 			} = propsRef.current;
 
 			if ( ! isSelected ) {
-				event.preventDefault();
 				return;
 			}
 
@@ -68,6 +87,12 @@ export function usePasteHandler( props ) {
 					return;
 				}
 			}
+
+			// Remove Windows-specific metadata appended within copied HTML text.
+			html = removeWindowsFragments( html );
+
+			// Strip meta tag.
+			html = removeCharsetMetaTag( html );
 
 			event.preventDefault();
 
@@ -107,13 +132,19 @@ export function usePasteHandler( props ) {
 			// without filtering the data. The filters are only meant for externally
 			// pasted content and remove inline styles.
 			if ( isInternal ) {
-				const pastedValue = create( {
+				const pastedMultilineTag =
+					clipboardData.getData( 'rich-text-multi-line-tag' ) ||
+					undefined;
+				let pastedValue = create( {
 					html,
-					multilineTag,
+					multilineTag: pastedMultilineTag,
 					multilineWrapperTags:
-						multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
+						pastedMultilineTag === 'li'
+							? [ 'ul', 'ol' ]
+							: undefined,
 					preserveWhiteSpace,
 				} );
+				pastedValue = adjustLines( pastedValue, !! multilineTag );
 				addActiveFormats( pastedValue, value.activeFormats );
 				onChange( insert( value, pastedValue ) );
 				return;
@@ -124,9 +155,15 @@ export function usePasteHandler( props ) {
 				return;
 			}
 
-			// Only process file if no HTML is present.
-			// Note: a pasted file may have the URL as plain text.
-			if ( files && files.length && ! html ) {
+			// Process any attached files, unless we infer that the files in
+			// question are redundant "screenshots" of the actual HTML payload,
+			// as created by certain office-type programs.
+			//
+			// @see shouldDismissPastedFiles
+			if (
+				files?.length &&
+				! shouldDismissPastedFiles( files, html, plainText )
+			) {
 				const content = pasteHandler( {
 					HTML: filePasteHandler( files ),
 					mode: 'BLOCKS',
@@ -187,18 +224,11 @@ export function usePasteHandler( props ) {
 			if ( typeof content === 'string' ) {
 				let valueToInsert = create( { html: content } );
 
-				addActiveFormats( valueToInsert, value.activeFormats );
-
 				// If the content should be multiline, we should process text
 				// separated by a line break as separate lines.
-				if ( multilineTag ) {
-					valueToInsert = replace(
-						valueToInsert,
-						/\n+/g,
-						LINE_SEPARATOR
-					);
-				}
+				valueToInsert = adjustLines( valueToInsert, !! multilineTag );
 
+				addActiveFormats( valueToInsert, value.activeFormats );
 				onChange( insert( value, valueToInsert ) );
 			} else if ( content.length > 0 ) {
 				if ( onReplace && isEmpty( value ) ) {
@@ -221,4 +251,49 @@ export function usePasteHandler( props ) {
 			element.removeEventListener( 'paste', _onPaste );
 		};
 	}, [] );
+}
+
+/**
+ * Normalizes a given string of HTML to remove the Windows-specific "Fragment"
+ * comments and any preceeding and trailing content.
+ *
+ * @param {string} html the html to be normalized
+ * @return {string} the normalized html
+ */
+function removeWindowsFragments( html ) {
+	const startStr = '<!--StartFragment-->';
+	const startIdx = html.indexOf( startStr );
+	if ( startIdx > -1 ) {
+		html = html.substring( startIdx + startStr.length );
+	} else {
+		// No point looking for EndFragment
+		return html;
+	}
+
+	const endStr = '<!--EndFragment-->';
+	const endIdx = html.indexOf( endStr );
+	if ( endIdx > -1 ) {
+		html = html.substring( 0, endIdx );
+	}
+
+	return html;
+}
+
+/**
+ * Removes the charset meta tag inserted by Chromium.
+ * See:
+ * - https://github.com/WordPress/gutenberg/issues/33585
+ * - https://bugs.chromium.org/p/chromium/issues/detail?id=1264616#c4
+ *
+ * @param {string} html the html to be stripped of the meta tag.
+ * @return {string} the cleaned html
+ */
+function removeCharsetMetaTag( html ) {
+	const metaTag = `<meta charset='utf-8'>`;
+
+	if ( html.startsWith( metaTag ) ) {
+		return html.slice( metaTag.length );
+	}
+
+	return html;
 }

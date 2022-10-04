@@ -30,7 +30,7 @@ export const TooltipWrapper = styled.div`
 `;
 
 export const Tooltip = styled.div`
-	background: ${ COLORS.ui.border };
+	background: ${ COLORS.gray[ 900 ] };
 	border-radius: 2px;
 	box-sizing: border-box;
 	font-size: 12px;
@@ -44,9 +44,10 @@ export const Tooltip = styled.div`
 
 export const LabelText = styled( Text )`
 	&&& {
-		color: white;
+		color: ${ COLORS.ui.textDark };
 		display: block;
 		font-size: 13px;
 		line-height: 1.4;
+		white-space: nowrap;
 	}
 `;

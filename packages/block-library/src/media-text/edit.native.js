@@ -82,7 +82,7 @@ class MediaTextEdit extends Component {
 
 		let mediaType;
 		let src;
-		// for media selections originated from a file upload.
+		// For media selections originated from a file upload.
 		if ( media.media_type ) {
 			if ( media.media_type === 'image' ) {
 				mediaType = 'image';
@@ -92,7 +92,7 @@ class MediaTextEdit extends Component {
 				mediaType = 'video';
 			}
 		} else {
-			// for media selections originated from existing files in the media library.
+			// For media selections originated from existing files in the media library.
 			mediaType = media.type;
 		}
 
@@ -186,7 +186,7 @@ class MediaTextEdit extends Component {
 
 		return (
 			<InspectorControls>
-				<PanelBody title={ __( 'Media & Text settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						label={ __( 'Crop image to fill entire column' ) }
 						checked={ imageFill }
@@ -275,6 +275,8 @@ class MediaTextEdit extends Component {
 		const widthString = `${ temporaryMediaWidth }%`;
 		const innerBlockWidth = shouldStack ? 100 : 100 - temporaryMediaWidth;
 		const innerBlockWidthString = `${ innerBlockWidth }%`;
+		const hasMedia =
+			mediaType === MEDIA_TYPE_IMAGE || mediaType === MEDIA_TYPE_VIDEO;
 
 		const innerBlockContainerStyle = [
 			{ width: innerBlockWidthString },
@@ -344,7 +346,7 @@ class MediaTextEdit extends Component {
 			<>
 				{ mediaType === MEDIA_TYPE_IMAGE && this.getControls() }
 				<BlockControls>
-					{ ( isMediaSelected || mediaType === MEDIA_TYPE_VIDEO ) && (
+					{ hasMedia && (
 						<ToolbarGroup>
 							<Button
 								label={ __( 'Edit media' ) }
@@ -393,11 +395,8 @@ class MediaTextEdit extends Component {
 export default compose(
 	withColors( 'backgroundColor' ),
 	withSelect( ( select, { clientId } ) => {
-		const {
-			getSelectedBlockClientId,
-			getBlockParents,
-			getSettings,
-		} = select( blockEditorStore );
+		const { getSelectedBlockClientId, getBlockParents, getSettings } =
+			select( blockEditorStore );
 
 		const parents = getBlockParents( clientId, true );
 

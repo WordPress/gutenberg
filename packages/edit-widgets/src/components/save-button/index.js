@@ -12,9 +12,8 @@ import { store as editWidgetsStore } from '../../store';
 
 function SaveButton() {
 	const { hasEditedWidgetAreaIds, isSaving } = useSelect( ( select ) => {
-		const { getEditedWidgetAreas, isSavingWidgetAreas } = select(
-			editWidgetsStore
-		);
+		const { getEditedWidgetAreas, isSavingWidgetAreas } =
+			select( editWidgetsStore );
 
 		return {
 			hasEditedWidgetAreaIds: getEditedWidgetAreas()?.length > 0,

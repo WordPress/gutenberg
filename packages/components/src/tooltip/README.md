@@ -46,6 +46,14 @@ The tooltip text to show on focus or hover.
 -   Type: `String`
 -   Required: No
 
+### delay (web only)
+
+Time in milliseconds to wait before showing tooltip after the tooltip's visibility is toggled. This prop is currently only available for the web platforms.
+
+-   Type: `Number`
+-   Required: No
+-   Default: 700
+
 ### visible (native only)
 
 Whether the tooltip should be displayed on initial render. This prop is currently only available for the native mobile app built with React Native.

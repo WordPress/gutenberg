@@ -2,12 +2,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop, omit } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import Notice from './';
+
+const noop = () => {};
 
 /**
  * Renders a list of notices.
@@ -28,15 +29,18 @@ function NoticeList( { notices, onRemove = noop, className, children } ) {
 	return (
 		<div className={ className }>
 			{ children }
-			{ [ ...notices ].reverse().map( ( notice ) => (
-				<Notice
-					{ ...omit( notice, [ 'content' ] ) }
-					key={ notice.id }
-					onRemove={ removeNotice( notice.id ) }
-				>
-					{ notice.content }
-				</Notice>
-			) ) }
+			{ [ ...notices ].reverse().map( ( notice ) => {
+				const { content, ...restNotice } = notice;
+				return (
+					<Notice
+						{ ...restNotice }
+						key={ notice.id }
+						onRemove={ removeNotice( notice.id ) }
+					>
+						{ notice.content }
+					</Notice>
+				);
+			} ) }
 		</div>
 	);
 }

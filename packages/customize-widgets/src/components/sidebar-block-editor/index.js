@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { defaultTo } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
@@ -19,8 +14,10 @@ import {
 	WritingFlow,
 	BlockEditorKeyboardShortcuts,
 	__unstableBlockSettingsMenuFirstItem,
+	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -29,7 +26,6 @@ import BlockInspectorButton from '../block-inspector-button';
 import Header from '../header';
 import useInserter from '../inserter/use-inserter';
 import SidebarEditorProvider from './sidebar-editor-provider';
-import { store as customizeWidgetsStore } from '../../store';
 import WelcomeGuide from '../welcome-guide';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import BlockAppender from '../block-appender';
@@ -47,20 +43,22 @@ export default function SidebarBlockEditor( {
 		keepCaretInsideBlock,
 		isWelcomeGuideActive,
 	} = useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
 		return {
-			hasUploadPermissions: defaultTo(
-				select( coreStore ).canUser( 'create', 'media' ),
-				true
+			hasUploadPermissions:
+				select( coreStore ).canUser( 'create', 'media' ) ?? true,
+			isFixedToolbarActive: !! get(
+				'core/customize-widgets',
+				'fixedToolbar'
 			),
-			isFixedToolbarActive: select(
-				customizeWidgetsStore
-			).__unstableIsFeatureActive( 'fixedToolbar' ),
-			keepCaretInsideBlock: select(
-				customizeWidgetsStore
-			).__unstableIsFeatureActive( 'keepCaretInsideBlock' ),
-			isWelcomeGuideActive: select(
-				customizeWidgetsStore
-			).__unstableIsFeatureActive( 'welcomeGuide' ),
+			keepCaretInsideBlock: !! get(
+				'core/customize-widgets',
+				'keepCaretInsideBlock'
+			),
+			isWelcomeGuideActive: !! get(
+				'core/customize-widgets',
+				'welcomeGuide'
+			),
 		};
 	}, [] );
 	const settings = useMemo( () => {
@@ -88,6 +86,7 @@ export default function SidebarBlockEditor( {
 		blockEditorSettings,
 		isFixedToolbarActive,
 		keepCaretInsideBlock,
+		setIsInserterOpened,
 	] );
 
 	if ( isWelcomeGuideActive ) {
@@ -100,7 +99,6 @@ export default function SidebarBlockEditor( {
 			<KeyboardShortcuts.Register />
 
 			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
-				<BlockEditorKeyboardShortcuts />
 				<KeyboardShortcuts
 					undo={ sidebar.undo }
 					redo={ sidebar.redo }
@@ -117,8 +115,9 @@ export default function SidebarBlockEditor( {
 
 				<CopyHandler>
 					<BlockTools>
+						<EditorStyles styles={ settings.defaultEditorStyles } />
 						<BlockSelectionClearer>
-							<WritingFlow>
+							<WritingFlow className="editor-styles-wrapper">
 								<ObserveTyping>
 									<BlockList
 										renderAppender={ BlockAppender }

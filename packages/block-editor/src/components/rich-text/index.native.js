@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -37,7 +36,6 @@ import {
 	toHTMLString,
 	slice,
 } from '@wordpress/rich-text';
-import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
 
 /**
@@ -55,15 +53,18 @@ import {
 	getMultilineTag,
 	getAllowedFormats,
 	isShortcode,
+	createLinkInParagraph,
 } from './utils';
+import EmbedHandlerPicker from './embed-handler-picker';
 
-const wrapperClasses = 'block-editor-rich-text';
 const classes = 'block-editor-rich-text__editable';
 
 function RichTextWrapper(
 	{
 		children,
 		tagName,
+		start,
+		reversed,
 		value: originalValue,
 		onChange: originalOnChange,
 		isSelected: originalIsSelected,
@@ -107,6 +108,10 @@ function RichTextWrapper(
 		maxWidth,
 		onBlur,
 		setRef,
+		disableSuggestions,
+		disableAutocorrection,
+		containerWidth,
+		onEnter: onCustomEnter,
 		...props
 	},
 	forwardedRef
@@ -118,14 +123,14 @@ function RichTextWrapper(
 	const fallbackRef = useRef();
 	const { clientId, isSelected: blockIsSelected } = useBlockEditContext();
 	const nativeProps = useNativeProps();
+	const embedHandlerPickerRef = useRef();
 	const selector = ( select ) => {
 		const {
-			isCaretWithinFormattedText,
 			getSelectionStart,
 			getSelectionEnd,
 			getSettings,
 			didAutomaticChange,
-			__unstableGetBlockWithoutInnerBlocks,
+			getBlock,
 			isMultiSelecting,
 			hasMultiSelection,
 		} = select( blockEditorStore );
@@ -148,9 +153,8 @@ function RichTextWrapper(
 		if ( Platform.OS === 'native' ) {
 			// If the block of this RichText is unmodified then it's a candidate for replacing when adding a new block.
 			// In order to fix https://github.com/wordpress-mobile/gutenberg-mobile/issues/1126, let's blur on unmount in that case.
-			// This apparently assumes functionality the BlockHlder actually
-			const block =
-				clientId && __unstableGetBlockWithoutInnerBlocks( clientId );
+			// This apparently assumes functionality the BlockHlder actually.
+			const block = clientId && getBlock( clientId );
 			const shouldBlurOnUnmount =
 				block && isSelected && isUnmodifiedDefaultBlock( block );
 			extraProps = {
@@ -159,7 +163,6 @@ function RichTextWrapper(
 		}
 
 		return {
-			isCaretWithinFormattedText: isCaretWithinFormattedText(),
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
@@ -170,10 +173,9 @@ function RichTextWrapper(
 		};
 	};
 	// This selector must run on every render so the right selection state is
-	// retreived from the store on merge.
+	// retrieved from the store on merge.
 	// To do: fix this somehow.
 	const {
-		isCaretWithinFormattedText,
 		selectionStart,
 		selectionEnd,
 		isSelected,
@@ -212,8 +214,13 @@ function RichTextWrapper(
 	}
 
 	const onSelectionChange = useCallback(
-		( start, end ) => {
-			selectionChange( clientId, identifier, start, end );
+		( selectionChangeStart, selectionChangeEnd ) => {
+			selectionChange(
+				clientId,
+				identifier,
+				selectionChangeStart,
+				selectionChangeEnd
+			);
 		},
 		[ clientId, identifier ]
 	);
@@ -284,7 +291,7 @@ function RichTextWrapper(
 			}
 
 			// If there's pasted blocks, append a block with non empty content
-			/// after the caret. Otherwise, do append an empty block if there
+			// after the caret. Otherwise, do append an empty block if there
 			// is no `onSplitMiddle` prop, but if there is and the content is
 			// empty, the middle block is enough to set focus in.
 			if (
@@ -336,6 +343,10 @@ function RichTextWrapper(
 				}
 			}
 
+			if ( onCustomEnter ) {
+				onCustomEnter();
+			}
+
 			if ( multiline ) {
 				if ( shiftKey ) {
 					if ( ! disableLineBreaks ) {
@@ -347,9 +358,11 @@ function RichTextWrapper(
 					onChange( insertLineSeparator( value ) );
 				}
 			} else {
-				const { text, start, end } = value;
+				const { text, start: splitStart, end: splitEnd } = value;
 				const canSplitAtEnd =
-					onSplitAtEnd && start === end && end === text.length;
+					onSplitAtEnd &&
+					splitStart === splitEnd &&
+					splitEnd === text.length;
 
 				if ( shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
 					if ( ! disableLineBreaks ) {
@@ -440,10 +453,19 @@ function RichTextWrapper(
 				mode = 'BLOCKS';
 			}
 
+			const isPastedURL = isURL( plainText.trim() );
+			const presentEmbedHandlerPicker = () =>
+				embedHandlerPickerRef.current?.presentPicker( {
+					createEmbed: () =>
+						onReplace( content, content.length - 1, -1 ),
+					createLink: () =>
+						createLinkInParagraph( plainText.trim(), onReplace ),
+				} );
+
 			if (
 				__unstableEmbedURLOnPaste &&
 				isEmpty( value ) &&
-				isURL( plainText.trim() )
+				isPastedURL
 			) {
 				mode = 'BLOCKS';
 			}
@@ -473,9 +495,30 @@ function RichTextWrapper(
 
 				onChange( insert( value, valueToInsert ) );
 			} else if ( content.length > 0 ) {
+				// When an URL is pasted in an empty paragraph then the EmbedHandlerPicker should showcase options allowing the transformation of that URL
+				// into either an Embed block or a link within the target paragraph. If the paragraph is non-empty, the URL is pasted as text.
+				const canPasteEmbed =
+					isPastedURL &&
+					content.length === 1 &&
+					content[ 0 ].name === 'core/embed';
 				if ( onReplace && isEmpty( value ) ) {
+					if ( canPasteEmbed ) {
+						onChange(
+							insert( value, create( { text: plainText } ) )
+						);
+						if ( __unstableEmbedURLOnPaste ) {
+							presentEmbedHandlerPicker();
+						}
+						return;
+					}
 					onReplace( content, content.length - 1, -1 );
 				} else {
+					if ( canPasteEmbed ) {
+						onChange(
+							insert( value, create( { text: plainText } ) )
+						);
+						return;
+					}
 					splitValue( value, content );
 				}
 			}
@@ -498,15 +541,18 @@ function RichTextWrapper(
 				return;
 			}
 
-			const { start, text } = value;
-			const characterBefore = text.slice( start - 1, start );
+			const { start: startPosition, text } = value;
+			const characterBefore = text.slice(
+				startPosition - 1,
+				startPosition
+			);
 
 			// The character right before the caret must be a plain space.
 			if ( characterBefore !== ' ' ) {
 				return;
 			}
 
-			const trimmedTextBefore = text.slice( 0, start ).trim();
+			const trimmedTextBefore = text.slice( 0, startPosition ).trim();
 			const prefixTransforms = getBlockTransforms( 'from' ).filter(
 				( { type } ) => type === 'prefix'
 			);
@@ -521,7 +567,9 @@ function RichTextWrapper(
 				return;
 			}
 
-			const content = valueToFormat( slice( value, start, text.length ) );
+			const content = valueToFormat(
+				slice( value, startPosition, text.length )
+			);
 			const block = transformation.transform( content );
 
 			onReplace( [ block ] );
@@ -532,7 +580,7 @@ function RichTextWrapper(
 
 	const mergedRef = useMergeRefs( [ forwardedRef, fallbackRef ] );
 
-	const content = (
+	return (
 		<RichText
 			clientId={ clientId }
 			identifier={ identifier }
@@ -543,6 +591,8 @@ function RichTextWrapper(
 			selectionEnd={ selectionEnd }
 			onSelectionChange={ onSelectionChange }
 			tagName={ tagName }
+			start={ start }
+			reversed={ reversed }
 			placeholder={ placeholder }
 			allowedFormats={ adjustedAllowedFormats }
 			withoutInteractiveFormatting={ withoutInteractiveFormatting }
@@ -552,7 +602,6 @@ function RichTextWrapper(
 			__unstableIsSelected={ isSelected }
 			__unstableInputRule={ inputRule }
 			__unstableMultilineTag={ multilineTag }
-			__unstableIsCaretWithinFormattedText={ isCaretWithinFormattedText }
 			__unstableOnEnterFormattedText={ enterFormattedText }
 			__unstableOnExitFormattedText={ exitFormattedText }
 			__unstableOnCreateUndoLevel={ __unstableMarkLastChangeAsPersistent }
@@ -591,6 +640,9 @@ function RichTextWrapper(
 			maxWidth={ maxWidth }
 			onBlur={ onBlur }
 			setRef={ setRef }
+			disableSuggestions={ disableSuggestions }
+			disableAutocorrection={ disableAutocorrection }
+			containerWidth={ containerWidth }
 			// Props to be set on the editable container are destructured on the
 			// element itself for web (see below), but passed through rich text
 			// for native.
@@ -651,24 +703,10 @@ function RichTextWrapper(
 							/>
 						) }
 					</Autocomplete>
+					<EmbedHandlerPicker ref={ embedHandlerPickerRef } />
 				</>
 			) }
 		</RichText>
-	);
-
-	if ( ! wrapperClassName ) {
-		return content;
-	}
-
-	deprecated( 'wp.blockEditor.RichText wrapperClassName prop', {
-		since: '5.4',
-		alternative: 'className prop or create your own wrapper div',
-	} );
-
-	return (
-		<div className={ classnames( wrapperClasses, wrapperClassName ) }>
-			{ content }
-		</div>
 	);
 }
 
@@ -694,7 +732,8 @@ ForwardedRichTextContainer.Content = ( {
 	const content = <RawHTML>{ value }</RawHTML>;
 
 	if ( Tag ) {
-		return <Tag { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
+		const { format, ...restProps } = props;
+		return <Tag { ...restProps }>{ content }</Tag>;
 	}
 
 	return content;

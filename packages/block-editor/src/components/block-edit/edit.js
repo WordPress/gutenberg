@@ -51,18 +51,19 @@ export const Edit = ( props ) => {
 	// them preferentially as the render value for the block.
 	const Component = blockType.edit || blockType.save;
 
-	if (
-		blockType.apiVersion > 1 ||
-		hasBlockSupport( blockType, 'lightBlockWrapper', false )
-	) {
+	if ( blockType.apiVersion > 1 ) {
 		return <Component { ...props } context={ context } />;
 	}
 
-	// Generate a class name for the block's editable form
+	// Generate a class name for the block's editable form.
 	const generatedClassName = hasBlockSupport( blockType, 'className', true )
 		? getBlockDefaultClassName( name )
 		: null;
-	const className = classnames( generatedClassName, attributes.className );
+	const className = classnames(
+		generatedClassName,
+		attributes.className,
+		props.className
+	);
 
 	return (
 		<Component { ...props } context={ context } className={ className } />

@@ -4,10 +4,42 @@
 import { space } from '../ui/utils/space';
 import { COLORS } from './colors-values';
 
-const CONTROL_HEIGHT = '30px';
+const CONTROL_HEIGHT = '36px';
 const CONTROL_PADDING_X = '12px';
 
-export default {
+const CONTROL_PROPS = {
+	controlSurfaceColor: COLORS.white,
+	controlTextActiveColor: COLORS.ui.theme,
+	controlPaddingX: CONTROL_PADDING_X,
+	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
+	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
+	controlBackgroundColor: COLORS.white,
+	controlBorderRadius: '2px',
+	controlBorderColor: COLORS.gray[ 700 ],
+	controlBoxShadow: 'transparent',
+	controlBorderColorHover: COLORS.gray[ 700 ],
+	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.ui.theme }`,
+	controlDestructiveBorderColor: COLORS.alert.red,
+	controlHeight: CONTROL_HEIGHT,
+	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
+	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
+	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
+	controlHeightXLarge: `calc( ${ CONTROL_HEIGHT } * 1.4 )`,
+};
+
+const TOGGLE_GROUP_CONTROL_PROPS = {
+	toggleGroupControlBackgroundColor: CONTROL_PROPS.controlBackgroundColor,
+	toggleGroupControlBorderColor: COLORS.ui.border,
+	toggleGroupControlBackdropBackgroundColor:
+		CONTROL_PROPS.controlSurfaceColor,
+	toggleGroupControlBackdropBorderColor: COLORS.ui.border,
+	toggleGroupControlBackdropBoxShadow: 'transparent',
+	toggleGroupControlButtonColorActive: CONTROL_PROPS.controlBackgroundColor,
+};
+
+// Using Object.assign to avoid creating circular references when emitting
+// TypeScript type declarations.
+export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
 	colorDivider: 'rgba(0, 0, 0, 0.1)',
 	colorScrollbarThumb: 'rgba(0, 0, 0, 0.2)',
 	colorScrollbarThumbHover: 'rgba(0, 0, 0, 0.5)',
@@ -17,7 +49,7 @@ export default {
 	borderWidth: '1px',
 	borderWidthFocus: '1.5px',
 	borderWidthTab: '4px',
-	spinnerSize: '18px',
+	spinnerSize: 16,
 	fontSize: '13px',
 	fontSizeH1: 'calc(2.44 * 13px)',
 	fontSizeH2: 'calc(1.95 * 13px)',
@@ -33,20 +65,6 @@ export default {
 	fontWeight: 'normal',
 	fontWeightHeading: '600',
 	gridBase: '4px',
-	controlPaddingX: CONTROL_PADDING_X,
-	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
-	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
-	controlBackgroundColor: COLORS.white,
-	controlBorderRadius: '2px',
-	controlBorderColor: COLORS.gray[ 700 ],
-	controlBoxShadow: 'transparent',
-	controlBorderColorHover: COLORS.gray[ 700 ],
-	controlBoxShadowFocus: `0 0 0, 0.5px, ${ COLORS.admin }`,
-	controlDestructiveBorderColor: COLORS.alert.red,
-	controlHeight: CONTROL_HEIGHT,
-	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
-	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
-	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
 	cardBorderRadius: '2px',
 	cardPaddingXSmall: `${ space( 2 ) }`,
 	cardPaddingSmall: `${ space( 4 ) }`,
@@ -66,4 +84,4 @@ export default {
 	transitionDurationFastest: '100ms',
 	transitionTimingFunction: 'cubic-bezier(0.08, 0.52, 0.52, 1)',
 	transitionTimingFunctionControl: 'cubic-bezier(0.12, 0.8, 0.32, 1)',
-};
+} );

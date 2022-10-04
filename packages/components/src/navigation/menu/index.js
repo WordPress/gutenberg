@@ -45,7 +45,7 @@ export default function NavigationMenu( props ) {
 		search: uncontrolledSearch,
 	};
 
-	// Keep the children rendered to make sure invisible items are included in the navigation tree
+	// Keep the children rendered to make sure invisible items are included in the navigation tree.
 	if ( activeMenu !== menu ) {
 		return (
 			<NavigationMenuContext.Provider value={ context }>
@@ -74,13 +74,15 @@ export default function NavigationMenu( props ) {
 					/>
 				) }
 
-				<NavigationMenuTitle
-					hasSearch={ hasSearch }
-					onSearch={ onSearch }
-					search={ search }
-					title={ title }
-					titleAction={ titleAction }
-				/>
+				{ title && (
+					<NavigationMenuTitle
+						hasSearch={ hasSearch }
+						onSearch={ onSearch }
+						search={ search }
+						title={ title }
+						titleAction={ titleAction }
+					/>
+				) }
 
 				<NavigableMenu>
 					<ul aria-labelledby={ menuTitleId }>

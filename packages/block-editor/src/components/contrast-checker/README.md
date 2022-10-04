@@ -1,6 +1,8 @@
 # ContrastChecker
 
-ContrastChecker component determines if contrast for text styles is sufficient (WCAG 2.0 AA) when used with a given background color. ContrastCheker also accounts for background color transparency (alpha) as well as font sizes.
+ContrastChecker component determines if contrast for text styles is sufficient (WCAG 2.0 AA) when used with a given background color. 
+
+ContrastChecker also accounts for font sizes.
 
 A notice will be rendered if the color combination of text and background colors are low.
 

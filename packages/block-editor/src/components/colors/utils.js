@@ -1,8 +1,12 @@
 /**
  * External dependencies
  */
-import { find, kebabCase, map } from 'lodash';
-import tinycolor from 'tinycolor2';
+import { find, kebabCase } from 'lodash';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
+import a11yPlugin from 'colord/plugins/a11y';
+
+extend( [ namesPlugin, a11yPlugin ] );
 
 /**
  * Provided an array of color objects as set by the theme or by the editor defaults,
@@ -72,7 +76,10 @@ export function getColorClassName( colorContextName, colorSlug ) {
  * @return {string} String with the color value of the most readable color.
  */
 export function getMostReadableColor( colors, colorValue ) {
-	return tinycolor
-		.mostReadable( colorValue, map( colors, 'color' ) )
-		.toHexString();
+	const colordColor = colord( colorValue );
+	const getColorContrast = ( { color } ) => colordColor.contrast( color );
+
+	const maxContrast = Math.max( ...colors.map( getColorContrast ) );
+	return colors.find( ( color ) => getColorContrast( color ) === maxContrast )
+		.color;
 }

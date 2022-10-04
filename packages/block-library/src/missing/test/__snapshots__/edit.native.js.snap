@@ -5,6 +5,11 @@ exports[`Missing block renders without crashing 1`] = `
   accessibilityHint="Tap here to show help"
   accessibilityLabel="Help button"
   accessibilityRole="button"
+  accessibilityState={
+    Object {
+      "disabled": true,
+    }
+  }
   accessible={true}
   focusable={true}
   onClick={[Function]}

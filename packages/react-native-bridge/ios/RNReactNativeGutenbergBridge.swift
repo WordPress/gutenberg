@@ -130,6 +130,13 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
+    func setFeaturedImage(_ mediaID: Int32) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestToSetFeaturedImage(for: mediaID)
+        }
+    }
+
+    @objc
     func editorDidLayout() {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidLayout()
@@ -349,7 +356,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             self.delegate?.gutenbergDidSendButtonPressedAction(button)
         }
     }
-    
+
     @objc
     func requestPreview() {
         DispatchQueue.main.async {
@@ -357,6 +364,39 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         }
     }
 
+    @objc
+    func requestBlockTypeImpressions(_ callback: @escaping RCTResponseSenderBlock) {
+        callback([self.delegate?.gutenbergDidRequestBlockTypeImpressions() ?? [:]])
+    }
+
+    @objc
+    func setBlockTypeImpressions(_ impressions: [String: Int]) {
+        self.delegate?.gutenbergDidRequestSetBlockTypeImpressions(impressions)
+    }
+
+    @objc
+    func requestContactCustomerSupport() {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestContactCustomerSupport()
+        }
+    }
+
+    @objc
+    func requestGotoCustomerSupportOptions() {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestGotoCustomerSupportOptions()
+        }
+    }
+
+    @objc
+    func sendEventToHost(_ eventName: String, properties: [AnyHashable: Any]) {
+        self.delegate?.gutenbergDidRequestSendEventToHost(eventName, properties: properties)
+    }
+
+    @objc
+    func generateHapticFeedback() {
+        UISelectionFeedbackGenerator().selectionChanged()
+    }
 }
 
 // MARK: - RCTBridgeModule delegate
@@ -373,6 +413,7 @@ extension RNReactNativeGutenbergBridge {
         case setTitle
         case toggleHTMLMode
         case updateHtml
+        case featuredImageIdNativeUpdated
         case mediaUpload
         case setFocusOnTitle
         case mediaAppend

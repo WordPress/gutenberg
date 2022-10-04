@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { capitalize } from 'lodash';
+import { capitalCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -126,6 +126,7 @@ async function emulateClipboard( type ) {
 		document.activeElement.dispatchEvent(
 			new ClipboardEvent( _type, {
 				bubbles: true,
+				cancelable: true,
 				clipboardData: window._clipboardData,
 			} )
 		);
@@ -167,7 +168,7 @@ export async function pressKeyWithModifier( modifier, key ) {
 
 	await Promise.all(
 		mappedModifiers.map( async ( mod ) => {
-			const capitalizedMod = capitalize( ctrlSwap( mod ) );
+			const capitalizedMod = capitalCase( ctrlSwap( mod ) );
 			return page.keyboard.down( capitalizedMod );
 		} )
 	);
@@ -176,7 +177,7 @@ export async function pressKeyWithModifier( modifier, key ) {
 
 	await Promise.all(
 		mappedModifiers.map( async ( mod ) => {
-			const capitalizedMod = capitalize( ctrlSwap( mod ) );
+			const capitalizedMod = capitalCase( ctrlSwap( mod ) );
 			return page.keyboard.up( capitalizedMod );
 		} )
 	);

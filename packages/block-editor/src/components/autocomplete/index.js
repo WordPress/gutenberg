@@ -12,13 +12,14 @@ import {
 	__unstableUseAutocompleteProps as useAutocompleteProps,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
-import { getDefaultBlockName } from '@wordpress/blocks';
+import { getDefaultBlockName, getBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { useBlockEditContext } from '../block-edit/context';
 import blockAutocompleter from '../../autocompleters/block';
+import linkAutocompleter from '../../autocompleters/link';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -31,12 +32,13 @@ const EMPTY_ARRAY = [];
 function useCompleters( { completers = EMPTY_ARRAY } ) {
 	const { name } = useBlockEditContext();
 	return useMemo( () => {
-		let filteredCompleters = completers;
+		let filteredCompleters = [ ...completers, linkAutocompleter ];
 
-		if ( name === getDefaultBlockName() ) {
-			filteredCompleters = filteredCompleters.concat( [
-				blockAutocompleter,
-			] );
+		if (
+			name === getDefaultBlockName() ||
+			getBlockSupport( name, '__experimentalSlashInserter', false )
+		) {
+			filteredCompleters = [ ...filteredCompleters, blockAutocompleter ];
 		}
 
 		if ( hasFilter( 'editor.Autocomplete.completers' ) ) {

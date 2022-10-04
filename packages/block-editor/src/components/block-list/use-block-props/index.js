@@ -11,9 +11,9 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	__unstableGetBlockProps as getBlockProps,
 	getBlockType,
-	hasBlockSupport,
+	store as blocksStore,
 } from '@wordpress/blocks';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useDisabled } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import warning from '@wordpress/warning';
 
@@ -32,11 +32,10 @@ import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-name
 import { useFocusHandler } from './use-focus-handler';
 import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
-import { useScrollIntoView } from './use-scroll-into-view';
 import { useBlockRefProvider } from './use-block-refs';
-import { useMultiSelection } from './use-multi-selection';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { store as blockEditorStore } from '../../../store';
+import useBlockOverlayActive from '../../block-content-overlay';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -61,22 +60,25 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  * @return {Object} Props to pass to the element to mark as a block.
  */
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
-	const { clientId, className, wrapperProps = {}, isAligned } = useContext(
-		BlockListBlockContext
-	);
+	const {
+		clientId,
+		className,
+		wrapperProps = {},
+		isAligned,
+	} = useContext( BlockListBlockContext );
 	const {
 		index,
 		mode,
 		name,
+		blockApiVersion,
 		blockTitle,
 		isPartOfSelection,
 		adjustScrolling,
 		enableAnimation,
-		lightBlockWrapper,
 	} = useSelect(
 		( select ) => {
 			const {
-				getBlockRootClientId,
+				getBlockAttributes,
 				getBlockIndex,
 				getBlockMode,
 				getBlockName,
@@ -87,32 +89,34 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isAncestorMultiSelected,
 				isFirstMultiSelectedBlock,
 			} = select( blockEditorStore );
+			const { getActiveBlockVariation } = select( blocksStore );
 			const isSelected = isBlockSelected( clientId );
 			const isPartOfMultiSelection =
 				isBlockMultiSelected( clientId ) ||
 				isAncestorMultiSelected( clientId );
 			const blockName = getBlockName( clientId );
-			const rootClientId = getBlockRootClientId( clientId );
 			const blockType = getBlockType( blockName );
+			const attributes = getBlockAttributes( clientId );
+			const match = getActiveBlockVariation( blockName, attributes );
 
 			return {
-				index: getBlockIndex( clientId, rootClientId ),
+				index: getBlockIndex( clientId ),
 				mode: getBlockMode( clientId ),
 				name: blockName,
-				blockTitle: blockType.title,
+				blockApiVersion: blockType?.apiVersion || 1,
+				blockTitle: match?.title || blockType?.title,
 				isPartOfSelection: isSelected || isPartOfMultiSelection,
 				adjustScrolling:
 					isSelected || isFirstMultiSelectedBlock( clientId ),
 				enableAnimation:
 					! isTyping() &&
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
-				lightBlockWrapper:
-					blockType.apiVersion > 1 ||
-					hasBlockSupport( blockType, 'lightBlockWrapper', false ),
 			};
 		},
 		[ clientId ]
 	);
+
+	const hasOverlay = useBlockOverlayActive( clientId );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
@@ -120,11 +124,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const mergedRefs = useMergeRefs( [
 		props.ref,
 		useFocusFirstElement( clientId ),
-		// Must happen after focus because we check for focus in the block.
-		useScrollIntoView( clientId ),
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
-		useMultiSelection( clientId ),
 		useEventHandlers( clientId ),
 		useNavModeExit( clientId ),
 		useIsHovered(),
@@ -135,23 +136,24 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			enableAnimation,
 			triggerAnimationOnChange: index,
 		} ),
+		useDisabled( { isDisabled: ! hasOverlay } ),
 	] );
 
 	const blockEditContext = useBlockEditContext();
 	// Ensures it warns only inside the `edit` implementation for the block.
-	if ( ! lightBlockWrapper && clientId === blockEditContext.clientId ) {
+	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
 		warning(
 			`Block type "${ name }" must support API version 2 or higher to work correctly with "useBlockProps" method.`
 		);
 	}
 
 	return {
+		tabIndex: 0,
 		...wrapperProps,
 		...props,
 		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
-		tabIndex: 0,
-		role: 'group',
+		role: 'document',
 		'aria-label': blockLabel,
 		'data-block': clientId,
 		'data-type': name,
@@ -160,6 +162,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			// The wp-block className is important for editor styles.
 			classnames( 'block-editor-block-list__block', {
 				'wp-block': ! isAligned,
+				'has-block-overlay': hasOverlay,
 			} ),
 			className,
 			props.className,

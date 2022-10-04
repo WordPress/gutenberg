@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, includes, isArray } from 'lodash';
+import { filter, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,7 +10,9 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { withSelect } from '@wordpress/data';
 import { SearchControl } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
+import { useDebounce } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -25,6 +27,7 @@ function BlockManager( {
 	isMatchingSearchTerm,
 	numberOfHiddenBlocks,
 } ) {
+	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ search, setSearch ] = useState( '' );
 
 	// Filtering occurs here (as opposed to `withSelect`) to avoid
@@ -37,6 +40,20 @@ function BlockManager( {
 			( ! blockType.parent ||
 				includes( blockType.parent, 'core/post-content' ) )
 	);
+
+	// Announce search results on change
+	useEffect( () => {
+		if ( ! search ) {
+			return;
+		}
+		const count = blockTypes.length;
+		const resultsFoundMessage = sprintf(
+			/* translators: %d: number of results. */
+			_n( '%d result found.', '%d results found.', count ),
+			count
+		);
+		debouncedSpeak( resultsFoundMessage );
+	}, [ blockTypes.length, search, debouncedSpeak ] );
 
 	return (
 		<div className="edit-post-block-manager__content">
@@ -99,13 +116,24 @@ export default withSelect( ( select ) => {
 		hasBlockSupport,
 		isMatchingSearchTerm,
 	} = select( blocksStore );
-	const { getPreference } = select( editPostStore );
-	const hiddenBlockTypes = getPreference( 'hiddenBlockTypes' );
+	const { getHiddenBlockTypes } = select( editPostStore );
+
+	// Some hidden blocks become unregistered
+	// by removing for instance the plugin that registered them, yet
+	// they're still remain as hidden by the user's action.
+	// We consider "hidden", blocks which were hidden and
+	// are still registered.
+	const blockTypes = getBlockTypes();
+	const hiddenBlockTypes = getHiddenBlockTypes().filter( ( hiddenBlock ) => {
+		return blockTypes.some(
+			( registeredBlock ) => registeredBlock.name === hiddenBlock
+		);
+	} );
 	const numberOfHiddenBlocks =
-		isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
+		Array.isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
 
 	return {
-		blockTypes: getBlockTypes(),
+		blockTypes,
 		categories: getCategories(),
 		hasBlockSupport,
 		isMatchingSearchTerm,

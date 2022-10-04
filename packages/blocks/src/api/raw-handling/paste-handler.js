@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { flatMap, compact } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
@@ -14,7 +9,7 @@ import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
 import { htmlToBlocks } from './html-to-blocks';
 import { hasBlockSupport } from '../registration';
 import { getBlockInnerHTML } from '../serializer';
-import { parseWithGrammar } from '../parser';
+import parse from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
 import commentRemover from './comment-remover';
@@ -25,6 +20,7 @@ import msListConverter from './ms-list-converter';
 import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
+import divNormaliser from './div-normaliser';
 import figureContentReducer from './figure-content-reducer';
 import shortcodeConverter from './shortcode-converter';
 import markdownConverter from './markdown-converter';
@@ -34,6 +30,7 @@ import htmlFormattingRemover from './html-formatting-remover';
 import brRemover from './br-remover';
 import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
+import slackParagraphCorrector from './slack-paragraph-corrector';
 
 /**
  * Browser dependencies
@@ -108,7 +105,7 @@ export function pasteHandler( {
 		const content = HTML ? HTML : plainText;
 
 		if ( content.indexOf( '<!-- wp:' ) !== -1 ) {
-			return parseWithGrammar( content );
+			return parse( content );
 		}
 	}
 
@@ -153,6 +150,9 @@ export function pasteHandler( {
 		return filterInlineHTML( HTML, preserveWhiteSpace );
 	}
 
+	// Must be run before checking if it's inline content.
+	HTML = deepFilterHTML( HTML, [ slackParagraphCorrector ] );
+
 	// An array of HTML strings and block objects. The blocks replace matched
 	// shortcodes.
 	const pieces = shortcodeConverter( HTML );
@@ -173,8 +173,8 @@ export function pasteHandler( {
 	const phrasingContentSchema = getPhrasingContentSchema( 'paste' );
 	const blockContentSchema = getBlockContentSchema( 'paste' );
 
-	const blocks = compact(
-		flatMap( pieces, ( piece ) => {
+	const blocks = pieces
+		.map( ( piece ) => {
 			// Already a block from shortcode.
 			if ( typeof piece !== 'string' ) {
 				return piece;
@@ -192,6 +192,7 @@ export function pasteHandler( {
 				iframeRemover,
 				figureContentReducer,
 				blockquoteNormaliser,
+				divNormaliser,
 			];
 
 			const schema = {
@@ -212,9 +213,10 @@ export function pasteHandler( {
 			// Allows us to ask for this information when we get a report.
 			console.log( 'Processed HTML piece:\n\n', piece );
 
-			return htmlToBlocks( piece );
+			return htmlToBlocks( piece, pasteHandler );
 		} )
-	);
+		.flat()
+		.filter( Boolean );
 
 	// If we're allowed to return inline content, and there is only one
 	// inlineable block, and the original plain text content does not have any
@@ -224,8 +226,9 @@ export function pasteHandler( {
 		blocks.length === 1 &&
 		hasBlockSupport( blocks[ 0 ].name, '__unstablePasteTextInline', false )
 	) {
+		const trimRegex = /^[\n]+|[\n]+$/g;
 		// Don't catch line breaks at the start or end.
-		const trimmedPlainText = plainText.replace( /^[\n]+|[\n]+$/g, '' );
+		const trimmedPlainText = plainText.replace( trimRegex, '' );
 
 		if (
 			trimmedPlainText !== '' &&
@@ -234,7 +237,7 @@ export function pasteHandler( {
 			return removeInvalidHTML(
 				getBlockInnerHTML( blocks[ 0 ] ),
 				phrasingContentSchema
-			);
+			).replace( trimRegex, '' );
 		}
 	}
 

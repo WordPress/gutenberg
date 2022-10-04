@@ -24,8 +24,8 @@
 }
 
 .containerBorderFullWidth {
-	left: -$solid-border-space / 2;
-	right: -$solid-border-space / 2;
+	left: -$solid-border-space * 0.5;
+	right: -$solid-border-space * 0.5;
 }
 
 .dimmed {

@@ -33,9 +33,14 @@ describe( 'Query block', () => {
 	describe( 'Query block insertion', () => {
 		it( 'Carousel', async () => {
 			await insertBlock( 'Query' );
+			// Wait for the choose pattern button
+			const choosePatternButton = await page.waitForSelector(
+				'div[data-type="core/query"] button.is-primary'
+			);
+			await choosePatternButton.click();
 			// Wait for pattern blocks to be loaded.
 			await page.waitForSelector(
-				'.block-editor-block-pattern-setup__container .wp-block-post-title'
+				'.block-editor-block-pattern-setup__container iframe[title="Editor canvas"]'
 			);
 			/**
 			 * Ensure that carousel is working by checking slider css classes
@@ -70,6 +75,11 @@ describe( 'Query block', () => {
 		} );
 		it( 'Grid view', async () => {
 			await insertBlock( 'Query' );
+			// Wait for the choose pattern button
+			const choosePatternButton = await page.waitForSelector(
+				'div[data-type="core/query"] button.is-primary'
+			);
+			await choosePatternButton.click();
 			// Wait for patterns setup to be loaded.
 			await page.waitForSelector(
 				'.block-editor-block-pattern-setup__display-controls'
@@ -80,8 +90,8 @@ describe( 'Query block', () => {
 			);
 			await gridViewButton.click();
 			// Wait for patterns to be loaded and click the wanted pattern.
-			const gridPattern = await page.waitForXPath(
-				'//div[@class="block-editor-block-pattern-setup-list__item-title" and contains(text(), "Query Test 2")]'
+			const gridPattern = await page.waitForSelector(
+				'.block-editor-block-pattern-setup-list__list-item[aria-label="Query Test 2"]'
 			);
 			await gridPattern.click();
 			// Wait for pattern setup to go away.

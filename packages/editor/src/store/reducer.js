@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { omit, keys, isEqual } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -11,7 +6,7 @@ import { combineReducers } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { PREFERENCES_DEFAULTS, EDITOR_SETTINGS_DEFAULTS } from './defaults';
+import { EDITOR_SETTINGS_DEFAULTS } from './defaults';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -39,7 +34,12 @@ export function getPostRawValue( value ) {
  * @return {boolean} Whether the two objects have the same keys.
  */
 export function hasSameKeys( a, b ) {
-	return isEqual( keys( a ), keys( b ) );
+	const keysA = Object.keys( a ).sort();
+	const keysB = Object.keys( b ).sort();
+	return (
+		keysA.length === keysB.length &&
+		keysA.every( ( key, index ) => keysB[ index ] === key )
+	);
 }
 
 /**
@@ -84,7 +84,6 @@ export function shouldOverwriteState( action, previousAction ) {
 export function postId( state = null, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
-		case 'RESET_POST':
 			return action.post.id;
 	}
 
@@ -94,7 +93,6 @@ export function postId( state = null, action ) {
 export function postType( state = null, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
-		case 'RESET_POST':
 			return action.post.type;
 	}
 
@@ -122,32 +120,6 @@ export function template( state = { isValid: true }, action ) {
 }
 
 /**
- * Reducer returning the user preferences.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {string} Updated state.
- */
-export function preferences( state = PREFERENCES_DEFAULTS, action ) {
-	switch ( action.type ) {
-		case 'ENABLE_PUBLISH_SIDEBAR':
-			return {
-				...state,
-				isPublishSidebarEnabled: true,
-			};
-
-		case 'DISABLE_PUBLISH_SIDEBAR':
-			return {
-				...state,
-				isPublishSidebarEnabled: false,
-			};
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning current network request state (whether a request to
  * the WP REST API is in progress, successful, or failed).
  *
@@ -163,6 +135,26 @@ export function saving( state = {}, action ) {
 			return {
 				pending: action.type === 'REQUEST_POST_UPDATE_START',
 				options: action.options || {},
+			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning deleting post request state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function deleting( state = {}, action ) {
+	switch ( action.type ) {
+		case 'REQUEST_POST_DELETE_START':
+		case 'REQUEST_POST_DELETE_FINISH':
+			return {
+				pending: action.type === 'REQUEST_POST_DELETE_START',
 			};
 	}
 
@@ -212,8 +204,11 @@ export function postSavingLock( state = {}, action ) {
 		case 'LOCK_POST_SAVING':
 			return { ...state, [ action.lockName ]: true };
 
-		case 'UNLOCK_POST_SAVING':
-			return omit( state, action.lockName );
+		case 'UNLOCK_POST_SAVING': {
+			const { [ action.lockName ]: removedLockName, ...restState } =
+				state;
+			return restState;
+		}
 	}
 	return state;
 }
@@ -233,8 +228,11 @@ export function postAutosavingLock( state = {}, action ) {
 		case 'LOCK_POST_AUTOSAVING':
 			return { ...state, [ action.lockName ]: true };
 
-		case 'UNLOCK_POST_AUTOSAVING':
-			return omit( state, action.lockName );
+		case 'UNLOCK_POST_AUTOSAVING': {
+			const { [ action.lockName ]: removedLockName, ...restState } =
+				state;
+			return restState;
+		}
 	}
 	return state;
 }
@@ -284,8 +282,8 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 export default combineReducers( {
 	postId,
 	postType,
-	preferences,
 	saving,
+	deleting,
 	postLock,
 	template,
 	postSavingLock,

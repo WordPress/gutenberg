@@ -1,19 +1,16 @@
 /**
- * External dependencies
- */
-import { last, noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
-import { useRegistry } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+
+const noop = () => {};
 
 /**
  * A function to call when the block value has been updated in the block-editor
@@ -83,6 +80,15 @@ export default function useBlockSync( {
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
 	const { getBlockName, getBlocks } = registry.select( blockEditorStore );
+	const isControlled = useSelect(
+		( select ) => {
+			return (
+				! clientId ||
+				select( blockEditorStore ).areInnerBlocksControlled( clientId )
+			);
+		},
+		[ clientId ]
+	);
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
 	const subscribed = useRef( false );
@@ -97,15 +103,21 @@ export default function useBlockSync( {
 		// and so it would already be persisted.
 		__unstableMarkNextChangeAsNotPersistent();
 		if ( clientId ) {
-			setHasControlledInnerBlocks( clientId, true );
-			__unstableMarkNextChangeAsNotPersistent();
-			const storeBlocks = controlledBlocks.map( ( block ) =>
-				cloneBlock( block )
-			);
-			if ( subscribed.current ) {
-				pendingChanges.current.incoming = storeBlocks;
-			}
-			replaceInnerBlocks( clientId, storeBlocks );
+			// It is important to batch here because otherwise,
+			// as soon as `setHasControlledInnerBlocks` is called
+			// the effect to restore might be triggered
+			// before the actual blocks get set properly in state.
+			registry.batch( () => {
+				setHasControlledInnerBlocks( clientId, true );
+				const storeBlocks = controlledBlocks.map( ( block ) =>
+					cloneBlock( block )
+				);
+				if ( subscribed.current ) {
+					pendingChanges.current.incoming = storeBlocks;
+				}
+				__unstableMarkNextChangeAsNotPersistent();
+				replaceInnerBlocks( clientId, storeBlocks );
+			} );
 		} else {
 			if ( subscribed.current ) {
 				pendingChanges.current.incoming = controlledBlocks;
@@ -135,7 +147,9 @@ export default function useBlockSync( {
 			// to allow that the consumer may apply modifications to reflect
 			// back on the editor.
 			if (
-				last( pendingChanges.current.outgoing ) === controlledBlocks
+				pendingChanges.current.outgoing[
+					pendingChanges.current.outgoing.length - 1
+				] === controlledBlocks
 			) {
 				pendingChanges.current.outgoing = [];
 			}
@@ -158,12 +172,22 @@ export default function useBlockSync( {
 	}, [ controlledBlocks, clientId ] );
 
 	useEffect( () => {
+		// When the block becomes uncontrolled, it means its inner state has been reset
+		// we need to take the blocks again from the external value property.
+		if ( ! isControlled ) {
+			pendingChanges.current.outgoing = [];
+			setControlledBlocks();
+		}
+	}, [ isControlled ] );
+
+	useEffect( () => {
 		const {
 			getSelectionStart,
 			getSelectionEnd,
 			getSelectedBlocksInitialCaretPosition,
 			isLastBlockChangePersistent,
 			__unstableIsLastBlockChangeIgnored,
+			areInnerBlocksControlled,
 		} = registry.select( blockEditorStore );
 
 		let blocks = getBlocks( clientId );
@@ -182,8 +206,17 @@ export default function useBlockSync( {
 			if ( clientId !== null && getBlockName( clientId ) === null )
 				return;
 
-			const newIsPersistent = isLastBlockChangePersistent();
+			// When RESET_BLOCKS on parent blocks get called, the controlled blocks
+			// can reset to uncontrolled, in these situations, it means we need to populate
+			// the blocks again from the external blocks (the value property here)
+			// and we should stop triggering onChange
+			const isStillControlled =
+				! clientId || areInnerBlocksControlled( clientId );
+			if ( ! isStillControlled ) {
+				return;
+			}
 
+			const newIsPersistent = isLastBlockChangePersistent();
 			const newBlocks = getBlocks( clientId );
 			const areBlocksDifferent = newBlocks !== blocks;
 			blocks = newBlocks;
@@ -224,7 +257,8 @@ export default function useBlockSync( {
 					selection: {
 						selectionStart: getSelectionStart(),
 						selectionEnd: getSelectionEnd(),
-						initialPosition: getSelectedBlocksInitialCaretPosition(),
+						initialPosition:
+							getSelectedBlocksInitialCaretPosition(),
 					},
 				} );
 			}

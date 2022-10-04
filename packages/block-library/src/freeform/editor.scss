@@ -211,8 +211,6 @@
 		margin: 0;
 		text-align: center;
 		padding: 6px;
-		-webkit-box-sizing: border-box;
-		-moz-box-sizing: border-box;
 		box-sizing: border-box;
 	}
 
@@ -228,7 +226,7 @@
 
 	@for $i from 1 through 9 {
 		.gallery-columns-#{ $i } .gallery-item {
-			width: #{ (100 / $i) + "%" };
+			width: #{ math.div(100, $i) + "%" };
 		}
 	}
 

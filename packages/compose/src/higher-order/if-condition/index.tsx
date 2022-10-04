@@ -1,9 +1,12 @@
 /**
+ * External dependencies
+ */
+import type { ComponentType } from 'react';
+
+/**
  * Internal dependencies
  */
-import createHigherOrderComponent from '../../utils/create-higher-order-component';
-// eslint-disable-next-line no-duplicate-imports
-import type { HigherOrderComponent } from '../../utils/create-higher-order-component';
+import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 
 /**
  * Higher-order component creator, creating a new component which renders if
@@ -22,11 +25,9 @@ import type { HigherOrderComponent } from '../../utils/create-higher-order-compo
  *
  * @return Higher-order component.
  */
-const ifCondition = < TProps, >(
-	predicate: ( props: TProps ) => boolean
-): HigherOrderComponent< TProps, TProps > =>
-	createHigherOrderComponent(
-		( WrappedComponent ) => ( props: TProps ) => {
+function ifCondition< Props >( predicate: ( props: Props ) => boolean ) {
+	return createHigherOrderComponent(
+		( WrappedComponent: ComponentType< Props > ) => ( props: Props ) => {
 			if ( ! predicate( props ) ) {
 				return null;
 			}
@@ -35,5 +36,6 @@ const ifCondition = < TProps, >(
 		},
 		'ifCondition'
 	);
+}
 
 export default ifCondition;

@@ -71,10 +71,6 @@
 
 // Block controls.
 .block-editor-block-toolbar__block-controls {
-	// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
-	height: auto !important;
-	padding: 0 !important;
-
 	// Switcher.
 	.block-editor-block-switcher .components-dropdown-menu__toggle,
 	.block-editor-block-switcher__no-switcher-icon {
@@ -84,12 +80,14 @@
 		}
 	}
 
-	// Match the parent selector button.
-	margin-left: -$border-width;
+	.block-editor-block-lock-toolbar {
+		margin-left: -$grid-unit-15 * 0.5 !important;
+	}
 
-	// Compensate for width of block switcher.
-	.block-editor-block-mover {
-		margin-left: -$grid-unit-15 / 2;
+	// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
+	// This is best fixed by making the mover control area a proper single toolbar group.
+	.components-toolbar-group {
+		padding: 0;
 	}
 }
 

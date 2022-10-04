@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
 import { Button, Notice } from '@wordpress/components';
@@ -11,52 +11,41 @@ import { Button, Notice } from '@wordpress/components';
  */
 import importReusableBlock from '../../utils/import';
 
-class ImportForm extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			isLoading: false,
-			error: null,
-			file: null,
-		};
+function ImportForm( { instanceId, onUpload } ) {
+	const inputId = 'list-reusable-blocks-import-form-' + instanceId;
 
-		this.isStillMounted = true;
-		this.onChangeFile = this.onChangeFile.bind( this );
-		this.onSubmit = this.onSubmit.bind( this );
-	}
+	const formRef = useRef();
+	const [ isLoading, setIsLoading ] = useState( false );
+	const [ error, setError ] = useState( null );
+	const [ file, setFile ] = useState( null );
 
-	componentWillUnmount() {
-		this.isStillMounted = false;
-	}
+	const onChangeFile = ( event ) => {
+		setFile( event.target.files[ 0 ] );
+		setError( null );
+	};
 
-	onChangeFile( event ) {
-		this.setState( { file: event.target.files[ 0 ], error: null } );
-	}
-
-	onSubmit( event ) {
+	const onSubmit = ( event ) => {
 		event.preventDefault();
-		const { file } = this.state;
-		const { onUpload } = this.props;
 		if ( ! file ) {
 			return;
 		}
-		this.setState( { isLoading: true } );
+		setIsLoading( { isLoading: true } );
 		importReusableBlock( file )
 			.then( ( reusableBlock ) => {
-				if ( ! this.isStillMounted ) {
+				if ( ! formRef ) {
 					return;
 				}
 
-				this.setState( { isLoading: false } );
+				setIsLoading( false );
 				onUpload( reusableBlock );
 			} )
-			.catch( ( error ) => {
-				if ( ! this.isStillMounted ) {
+			.catch( ( errors ) => {
+				if ( ! formRef ) {
 					return;
 				}
 
 				let uiMessage;
-				switch ( error.message ) {
+				switch ( errors.message ) {
 					case 'Invalid JSON file':
 						uiMessage = __( 'Invalid JSON file' );
 						break;
@@ -67,54 +56,44 @@ class ImportForm extends Component {
 						uiMessage = __( 'Unknown error' );
 				}
 
-				this.setState( { isLoading: false, error: uiMessage } );
+				setIsLoading( false );
+				setError( uiMessage );
 			} );
-	}
+	};
 
-	onDismissError() {
-		this.setState( { error: null } );
-	}
+	const onDismissError = () => {
+		setError( null );
+	};
 
-	render() {
-		const { instanceId } = this.props;
-		const { file, isLoading, error } = this.state;
-		const inputId = 'list-reusable-blocks-import-form-' + instanceId;
-		return (
-			<form
-				className="list-reusable-blocks-import-form"
-				onSubmit={ this.onSubmit }
+	return (
+		<form
+			className="list-reusable-blocks-import-form"
+			onSubmit={ onSubmit }
+			ref={ formRef }
+		>
+			{ error && (
+				<Notice status="error" onRemove={ () => onDismissError() }>
+					{ error }
+				</Notice>
+			) }
+			<label
+				htmlFor={ inputId }
+				className="list-reusable-blocks-import-form__label"
 			>
-				{ error && (
-					<Notice
-						status="error"
-						onRemove={ () => this.onDismissError() }
-					>
-						{ error }
-					</Notice>
-				) }
-				<label
-					htmlFor={ inputId }
-					className="list-reusable-blocks-import-form__label"
-				>
-					{ __( 'File' ) }
-				</label>
-				<input
-					id={ inputId }
-					type="file"
-					onChange={ this.onChangeFile }
-				/>
-				<Button
-					type="submit"
-					isBusy={ isLoading }
-					disabled={ ! file || isLoading }
-					variant="secondary"
-					className="list-reusable-blocks-import-form__button"
-				>
-					{ _x( 'Import', 'button label' ) }
-				</Button>
-			</form>
-		);
-	}
+				{ __( 'File' ) }
+			</label>
+			<input id={ inputId } type="file" onChange={ onChangeFile } />
+			<Button
+				type="submit"
+				isBusy={ isLoading }
+				disabled={ ! file || isLoading }
+				variant="secondary"
+				className="list-reusable-blocks-import-form__button"
+			>
+				{ _x( 'Import', 'button label' ) }
+			</Button>
+		</form>
+	);
 }
 
 export default withInstanceId( ImportForm );

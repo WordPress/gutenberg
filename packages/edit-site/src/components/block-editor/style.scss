@@ -11,3 +11,77 @@
 		padding: 6px;
 	}
 }
+
+.edit-site-visual-editor {
+	position: relative;
+	background-color: $gray-800;
+	// Centralize the editor horizontally (flex-direction is column).
+	align-items: center;
+
+	&.is-focus-mode {
+		padding: $grid-unit-60;
+
+		.edit-site-visual-editor__editor-canvas {
+			border-radius: $radius-block-ui;
+		}
+
+		// To hide the horizontal scrollbar and show the drag handle on the
+		// left and right of the container.
+		.components-resizable-box__container {
+			overflow: visible;
+		}
+	}
+
+	.components-resizable-box__container {
+		margin: 0 auto;
+		// Removing this will cancel the bottom margins in the iframe.
+		overflow: auto;
+	}
+}
+
+.edit-site-visual-editor__back-button {
+	position: absolute;
+	top: $grid-unit-10;
+	left: $grid-unit-10;
+	color: $white;
+
+	&:active:not([aria-disabled="true"]),
+	&:focus:not([aria-disabled="true"]),
+	&:hover {
+		color: $gray-100;
+	}
+}
+
+.resizable-editor__drag-handle {
+	$height: 100px;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	padding: 0;
+	margin: auto 0;
+	width: $grid-unit-05;
+	height: $height;
+	appearance: none;
+	cursor: ew-resize;
+	outline: none;
+	background: $gray-600;
+	border-radius: 2px;
+	border: 0;
+
+	&.is-left {
+		left: -$grid-unit-20;
+	}
+
+	&.is-right {
+		right: -$grid-unit-20;
+	}
+
+	&:hover,
+	&:active {
+		background: $gray-400;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 1px $gray-800, 0 0 0 calc(var(--wp-admin-border-width-focus) + 1px) var(--wp-admin-theme-color);
+	}
+}

@@ -84,11 +84,10 @@ export default function PluginSidebarEditPost( { className, ...props } ) {
 			shortcut: select(
 				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
-			showIconLabels: select( editPostStore ).isFeatureActive(
-				'showIconLabels'
-			),
+			showIconLabels:
+				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
 		};
-	} );
+	}, [] );
 	return (
 		<ComplementaryArea
 			panelClassName={ className }

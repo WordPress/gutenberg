@@ -33,7 +33,7 @@ Note that all of the widget's event handlers are added in the `widget-added` cal
 
 The Legacy Widget block will display a preview of the widget when the Legacy Widget block is not selected.
 
-A "No preview available." message is automatically shown by the Legacy Widget block when the widget's `widget()` function does not render anytihng or only renders empty HTML elements.
+A "No preview available." message is automatically shown by the Legacy Widget block when the widget's `widget()` function does not render anything or only renders empty HTML elements.
 
 Widgets may take advantage of this by returning early from `widget()` when a preview should not be displayed.
 
@@ -111,10 +111,10 @@ This is done by adding JavaScript code to your block's definition. In this examp
 
 ```js
 transforms: {
-    from: [
-        {
-            type: 'block',
-            blocks: [ 'core/legacy-widget' ],
+	from: [
+		{
+			type: 'block',
+			blocks: [ 'core/legacy-widget' ],
 			isMatch: ( { idBase, instance } ) => {
 				if ( ! instance?.raw ) {
 					// Can't transform if raw instance is not shown in REST API.
@@ -122,13 +122,13 @@ transforms: {
 				}
 				return idBase === 'example_widget';
 			},
-            transform: ( { instance } ) => {
-                return createBlock( 'example/block', {
+			transform: ( { instance } ) => {
+				return createBlock( 'example/block', {
 					name: instance.raw.name,
-                } );
-            },
-        },
-    ]
+				} );
+			},
+		},
+	]
 },
 ```
 

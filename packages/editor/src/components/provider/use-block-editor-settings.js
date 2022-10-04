@@ -1,32 +1,25 @@
 /**
  * External dependencies
  */
-import { pick, defaultTo } from 'lodash';
+import { pick } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Platform, useMemo, useCallback } from '@wordpress/element';
+import { Platform, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
-	__experimentalFetchRemoteUrlData as fetchRemoteUrlData,
+	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
-import {
-	getAuthority,
-	isURL,
-	getProtocol,
-	isValidProtocol,
-} from '@wordpress/url';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
-
-const EMPTY_DATA = {};
 
 /**
  * React hook used to compute the block editor settings to use for the post editor.
@@ -41,20 +34,18 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
-		baseUrl,
-		hasResolvedLocalSiteData,
+		userCanCreatePages,
+		pageOnFront,
+		postType,
 	} = useSelect( ( select ) => {
-		const { canUserUseUnfilteredHTML } = select( editorStore );
+		const { canUserUseUnfilteredHTML, getCurrentPostType } =
+			select( editorStore );
 		const isWeb = Platform.OS === 'web';
-		const { canUser, getUnstableBase, hasFinishedResolution } = select(
-			coreStore
-		);
+		const { canUser, getEntityRecord } = select( coreStore );
 
-		const siteData = getUnstableBase();
-
-		const hasFinishedResolvingSiteData = hasFinishedResolution(
-			'getUnstableBase'
-		);
+		const siteSettings = canUser( 'read', 'settings' )
+			? getEntityRecord( 'root', 'site' )
+			: undefined;
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
@@ -65,92 +56,111 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 						{ per_page: -1 }
 				  )
 				: [], // Reusable blocks are fetched in the native version of this hook.
-			hasUploadPermissions: defaultTo(
-				canUser( 'create', 'media' ),
-				true
-			),
-			hasResolvedLocalSiteData: hasFinishedResolvingSiteData,
-			baseUrl: siteData?.url || '',
+			hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
+			userCanCreatePages: canUser( 'create', 'pages' ),
+			pageOnFront: siteSettings?.page_on_front,
+			postType: getCurrentPostType(),
 		};
 	}, [] );
 
+	const settingsBlockPatterns =
+		settings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
+		settings.__experimentalBlockPatterns; // WP 5.9
+	const settingsBlockPatternCategories =
+		settings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
+		settings.__experimentalBlockPatternCategories; // WP 5.9
+
+	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
+		( select ) => ( {
+			restBlockPatterns: select( coreStore ).getBlockPatterns(),
+			restBlockPatternCategories:
+				select( coreStore ).getBlockPatternCategories(),
+		} ),
+		[]
+	);
+
+	const blockPatterns = useMemo(
+		() =>
+			[
+				...( settingsBlockPatterns || [] ),
+				...( restBlockPatterns || [] ),
+			]
+				.filter(
+					( x, index, arr ) =>
+						index === arr.findIndex( ( y ) => x.name === y.name )
+				)
+				.filter( ( { postTypes } ) => {
+					return (
+						! postTypes ||
+						( Array.isArray( postTypes ) &&
+							postTypes.includes( postType ) )
+					);
+				} ),
+		[ settingsBlockPatterns, restBlockPatterns, postType ]
+	);
+
+	const blockPatternCategories = useMemo(
+		() =>
+			[
+				...( settingsBlockPatternCategories || [] ),
+				...( restBlockPatternCategories || [] ),
+			].filter(
+				( x, index, arr ) =>
+					index === arr.findIndex( ( y ) => x.name === y.name )
+			),
+		[ settingsBlockPatternCategories, restBlockPatternCategories ]
+	);
+
 	const { undo } = useDispatch( editorStore );
 
-	// Temporary home - should this live in `core-data`?
-	const fetchRichUrlData = useCallback(
-		function ( url, fetchOptions = {} ) {
-			if ( ! isURL( url ) ) {
-				return Promise.reject(
-					new TypeError( `${ url } is not a valid URL.` )
-				);
-			}
+	const { saveEntityRecord } = useDispatch( coreStore );
 
-			// Test for "http" based URL as it is possible for valid
-			// yet unusable URLs such as `tel:123456` to be passed.
-			const protocol = getProtocol( url );
-
-			if (
-				! isValidProtocol( protocol ) ||
-				! protocol.startsWith( 'http' ) ||
-				! /^https?:\/\/[^\/\s]/i.test( url )
-			) {
-				return Promise.reject(
-					new TypeError( `${ url } does not have a valid protocol.` )
-				);
-			}
-
-			// If the baseUrl is still resolving then return
-			// empty data for this request.
-			if ( ! hasResolvedLocalSiteData ) {
-				return Promise.resolve( EMPTY_DATA );
-			}
-
-			// More accurate test for internal URLs to avoid edge cases
-			// such as baseURL being included as part of a query string
-			// on the target url.
-			const baseUrlAuthority = getAuthority( baseUrl );
-			const urlAuthority = getAuthority( url );
-
-			const isInternal = urlAuthority === baseUrlAuthority;
-
-			// Don't handle internal URLs (yet...).
-			if ( isInternal ) {
-				return Promise.resolve( EMPTY_DATA );
-			}
-
-			// If external then attempt fetch of data.
-			return fetchRemoteUrlData( url, fetchOptions );
-		},
-		[ baseUrl, hasResolvedLocalSiteData ]
-	);
+	/**
+	 * Creates a Post entity.
+	 * This is utilised by the Link UI to allow for on-the-fly creation of Posts/Pages.
+	 *
+	 * @param {Object} options parameters for the post being created. These mirror those used on 3rd param of saveEntityRecord.
+	 * @return {Object} the post type object that was created.
+	 */
+	const createPageEntity = ( options ) => {
+		if ( ! userCanCreatePages ) {
+			return Promise.reject( {
+				message: __( 'You do not have permission to create Pages.' ),
+			} );
+		}
+		return saveEntityRecord( 'postType', 'page', options );
+	};
 
 	return useMemo(
 		() => ( {
 			...pick( settings, [
 				'__experimentalBlockDirectory',
-				'__experimentalBlockPatternCategories',
-				'__experimentalBlockPatterns',
+				'__experimentalDiscussionSettings',
 				'__experimentalFeatures',
-				'__experimentalGlobalStylesBaseStyles',
-				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
+				'__unstableGalleryWithImageBlocks',
 				'alignWide',
 				'allowedBlockTypes',
 				'bodyPlaceholder',
+				'canLockBlocks',
 				'codeEditingEnabled',
 				'colors',
 				'disableCustomColors',
 				'disableCustomFontSizes',
+				'disableCustomSpacingSizes',
 				'disableCustomGradients',
+				'disableLayoutStyles',
 				'enableCustomLineHeight',
 				'enableCustomSpacing',
 				'enableCustomUnits',
 				'focusMode',
 				'fontSizes',
 				'gradients',
+				'generateAnchors',
 				'hasFixedToolbar',
 				'hasReducedUI',
+				'hasInlineToolbar',
 				'imageDefaultSize',
 				'imageDimensions',
 				'imageEditing',
@@ -165,23 +175,34 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'titlePlaceholder',
 				'supportsLayout',
 				'widgetTypesToHideFromLegacyWidgetBlock',
+				'__unstableResolvedAssets',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
+			__experimentalBlockPatterns: blockPatterns,
+			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
-			__experimentalFetchRichUrlData: fetchRichUrlData,
+			__experimentalFetchRichUrlData: fetchUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			outlineMode: hasTemplate,
+			__experimentalCreatePageEntity: createPageEntity,
+			__experimentalUserCanCreatePages: userCanCreatePages,
+			pageOnFront,
+			__experimentalPreferPatternsOnRoot: hasTemplate,
 		} ),
 		[
 			settings,
 			hasUploadPermissions,
 			reusableBlocks,
+			blockPatterns,
+			blockPatternCategories,
 			canUseUnfilteredHTML,
 			undo,
 			hasTemplate,
+			userCanCreatePages,
+			pageOnFront,
 		]
 	);
 }

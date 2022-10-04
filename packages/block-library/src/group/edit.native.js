@@ -120,7 +120,7 @@ export default compose( [
 			const { innerBlocks } = block;
 			const selectedBlockClientId = getSelectedBlockClientId();
 			const totalInnerBlocks = innerBlocks.length - 1;
-			const blockIndex = getBlockIndex( selectedBlockClientId, clientId );
+			const blockIndex = getBlockIndex( selectedBlockClientId );
 			isLastInnerBlockSelected = totalInnerBlocks === blockIndex;
 		}
 

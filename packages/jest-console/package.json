@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/jest-console",
-	"version": "4.0.5",
+	"version": "6.1.0",
 	"description": "Custom Jest matchers for the Console object.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,21 +21,22 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=14"
 	},
 	"files": [
 		"build",
-		"build-module"
+		"build-module",
+		"types"
 	],
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"types": "types",
 	"dependencies": {
-		"@babel/runtime": "^7.13.10",
-		"jest-matcher-utils": "^26.6.2",
-		"lodash": "^4.17.21"
+		"@babel/runtime": "^7.16.0",
+		"jest-matcher-utils": "^27.4.2"
 	},
 	"peerDependencies": {
-		"jest": ">=26"
+		"jest": ">=27"
 	},
 	"publishConfig": {
 		"access": "public"

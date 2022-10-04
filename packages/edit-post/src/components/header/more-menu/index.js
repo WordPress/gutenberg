@@ -2,9 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { DropdownMenu, MenuGroup } from '@wordpress/components';
-import { moreVertical } from '@wordpress/icons';
-import { ActionItem, PinnedItems } from '@wordpress/interface';
+import { MenuGroup } from '@wordpress/components';
+import {
+	ActionItem,
+	MoreMenuDropdown,
+	PinnedItems,
+} from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -15,28 +18,14 @@ import PreferencesMenuItem from '../preferences-menu-item';
 import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import WritingMenu from '../writing-menu';
 
-const POPOVER_PROPS = {
-	className: 'edit-post-more-menu__content',
-	position: 'bottom left',
-};
-const TOGGLE_PROPS = {
-	tooltipPosition: 'bottom',
-};
-
 const MoreMenu = ( { showIconLabels } ) => {
 	const isLargeViewport = useViewportMatch( 'large' );
 
 	return (
-		<DropdownMenu
-			className="edit-post-more-menu"
-			icon={ moreVertical }
-			/* translators: button label text should, if possible, be under 16 characters. */
-			label={ __( 'Options' ) }
-			popoverProps={ POPOVER_PROPS }
+		<MoreMenuDropdown
 			toggleProps={ {
 				showTooltip: ! showIconLabels,
 				...( showIconLabels && { variant: 'tertiary' } ),
-				...TOGGLE_PROPS,
 			} }
 		>
 			{ ( { onClose } ) => (
@@ -61,7 +50,7 @@ const MoreMenu = ( { showIconLabels } ) => {
 					</MenuGroup>
 				</>
 			) }
-		</DropdownMenu>
+		</MoreMenuDropdown>
 	);
 };
 

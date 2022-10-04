@@ -108,16 +108,14 @@ const PluginDocumentSettingPanel = compose(
 			warning( 'PluginDocumentSettingPanel requires a name property.' );
 		}
 		return {
-			icon: ownProps.icon || context.icon,
 			panelName: `${ context.name }/${ ownProps.name }`,
 		};
 	} ),
 	withSelect( ( select, { panelName } ) => {
 		return {
 			opened: select( editPostStore ).isEditorPanelOpened( panelName ),
-			isEnabled: select( editPostStore ).isEditorPanelEnabled(
-				panelName
-			),
+			isEnabled:
+				select( editPostStore ).isEditorPanelEnabled( panelName ),
 		};
 	} ),
 	withDispatch( ( dispatch, { panelName } ) => ( {

@@ -4,7 +4,7 @@ The NUX module exposes components, and `wp.data` methods useful for onboarding a
 
 A _tip_ is a component that points to an element in the UI and contains text that explains the element's functionality. The user can dismiss a tip, in which case it never shows again. The user can also disable tips entirely. Information about tips is persisted between sessions using `localStorage`.
 
-A _guide_ allows a series of of tips to be presented to the user one by one. When a user dismisses a tip that is in a guide, the next tip in the guide is shown.
+A _guide_ allows a series of tips to be presented to the user one by one. When a user dismisses a tip that is in a guide, the next tip in the guide is shown.
 
 ## Installation
 
@@ -14,7 +14,7 @@ Install the module
 npm install @wordpress/nux --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## DotTip
 
@@ -105,4 +105,10 @@ console.log( 'Currently showing:', guide.currentTipId );
 console.log( 'Next to show:', guide.nextTipId );
 ```
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

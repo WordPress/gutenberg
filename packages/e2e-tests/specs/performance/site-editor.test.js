@@ -8,42 +8,53 @@ import { writeFileSync } from 'fs';
  * WordPress dependencies
  */
 import {
-	trashAllPosts,
 	activateTheme,
 	canvas,
 	createNewPost,
+	visitSiteEditor,
 	saveDraft,
 	insertBlock,
+	deleteAllTemplates,
 } from '@wordpress/e2e-test-utils';
 
 /**
  * Internal dependencies
  */
-import { siteEditor } from '../../experimental-features';
-import { readFile, deleteFile, getTypingEventDurations } from './utils';
+import {
+	readFile,
+	deleteFile,
+	getTypingEventDurations,
+	getLoadingDurations,
+} from './utils';
 
 jest.setTimeout( 1000000 );
 
 describe( 'Site Editor Performance', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template', 'auto-draft' );
-		await trashAllPosts( 'wp_template_part' );
+		await activateTheme( 'emptytheme' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 	} );
 	afterAll( async () => {
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 		await activateTheme( 'twentytwentyone' );
 	} );
 
 	it( 'Loading', async () => {
 		const results = {
-			load: [],
+			serverResponse: [],
+			firstPaint: [],
+			domContentLoaded: [],
+			loaded: [],
+			firstContentfulPaint: [],
+			firstBlock: [],
 			type: [],
 			focus: [],
 			inserterOpen: [],
 			inserterHover: [],
+			inserterSearch: [],
+			listViewOpen: [],
 		};
 
 		const html = readFile(
@@ -71,20 +82,32 @@ describe( 'Site Editor Performance', () => {
 			new URL( document.location ).searchParams.get( 'post' )
 		);
 
-		await siteEditor.visit( { postId: id, postType: 'page' } );
+		await visitSiteEditor( { postId: id, postType: 'page' } );
 
 		let i = 3;
 
-		// Measuring loading time
+		// Measuring loading time.
 		while ( i-- ) {
-			const startTime = new Date();
 			await page.reload();
 			await page.waitForSelector( '.edit-site-visual-editor', {
 				timeout: 120000,
 			} );
 			await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
+			const {
+				serverResponse,
+				firstPaint,
+				domContentLoaded,
+				loaded,
+				firstContentfulPaint,
+				firstBlock,
+			} = await getLoadingDurations();
 
-			results.load.push( new Date() - startTime );
+			results.serverResponse.push( serverResponse );
+			results.firstPaint.push( firstPaint );
+			results.domContentLoaded.push( domContentLoaded );
+			results.loaded.push( loaded );
+			results.firstContentfulPaint.push( firstContentfulPaint );
+			results.firstBlock.push( firstBlock );
 		}
 
 		// Measuring typing performance inside the post content.
@@ -107,30 +130,12 @@ describe( 'Site Editor Performance', () => {
 		}
 		await page.tracing.stop();
 		const traceResults = JSON.parse( readFile( traceFile ) );
-		const [
-			keyDownEvents,
-			keyPressEvents,
-			keyUpEvents,
-		] = getTypingEventDurations( traceResults );
+		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+			getTypingEventDurations( traceResults );
 
-		// Both keydown and keypress events are bubbled from the iframe to the
-		// main frame, which must be ignored. These will be the odd values in
-		// the array.
-		const _keyDownEvents = keyDownEvents.filter(
-			( v, ii ) => ii % 2 === 0
-		);
-		const _keyPressEvents = keyPressEvents.filter(
-			( v, ii ) => ii % 2 === 0
-		);
-
-		expect(
-			_keyDownEvents.length === _keyPressEvents.length &&
-				_keyPressEvents.length === keyUpEvents.length
-		).toBe( true );
-
-		for ( let j = 0; j < _keyDownEvents.length; j++ ) {
+		for ( let j = 0; j < keyDownEvents.length; j++ ) {
 			results.type.push(
-				_keyDownEvents[ j ] + _keyPressEvents[ j ] + keyUpEvents[ j ]
+				keyDownEvents[ j ] + keyPressEvents[ j ] + keyUpEvents[ j ]
 			);
 		}
 

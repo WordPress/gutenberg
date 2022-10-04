@@ -10,7 +10,18 @@ import Panel from '../';
 import PanelRow from '../row';
 import PanelBody from '../body';
 
-export default { title: 'Components/Panel', component: Panel };
+/**
+ * WordPress dependencies
+ */
+import { wordpress } from '@wordpress/icons';
+
+export default {
+	title: 'Components/Panel',
+	component: Panel,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 export const _default = () => {
 	const bodyTitle = text( 'Body Title', 'My Block Settings' );
@@ -62,7 +73,7 @@ export const multipleBodies = () => {
 export const withIcon = () => {
 	const bodyTitle = text( 'Body Title', 'My Block Settings' );
 	const rowText = text( 'Row Text', 'My Panel Inputs and Labels' );
-	const icon = text( 'Icon', 'wordpress' );
+	const icon = boolean( 'Icon', true ) ? wordpress : undefined;
 	const opened = boolean( 'Opened', true );
 	return (
 		<Panel header="My Panel">

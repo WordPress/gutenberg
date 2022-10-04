@@ -27,7 +27,6 @@ class GutenbergViewController: UIViewController {
         super.viewDidLoad()
         configureNavigationBar()
         gutenberg.delegate = self
-        navigationController?.navigationBar.isTranslucent = false
         registerLongPressGestureRecognizer()
 
         _ = try! FallbackJavascriptInjection(blockHTML: "Hello", userId: "1")
@@ -89,9 +88,9 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             case .image:
                 if(allowMultipleSelection) {
                     callback([MediaInfo(id: 1, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image"),
-                              MediaInfo(id: 3, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain")])
+                              MediaInfo(id: 3, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain", alt: "A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground")])
                 } else {
-                    callback([MediaInfo(id: 1, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain")])
+                    callback([MediaInfo(id: 1, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain", alt: "A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground")])
                 }
             case .video:
                 if(allowMultipleSelection) {
@@ -141,6 +140,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
 
     func gutenbergDidRequestMediaUploadSync() {
         print("Gutenberg request for media uploads to be resync")
+    }
+
+    func gutenbergDidRequestToSetFeaturedImage(for mediaID: Int32) {
+        print("Gutenberg request to set featured image")
     }
 
     func gutenbergDidRequestMediaUploadActionDialog(for mediaID: Int32) {
@@ -244,6 +247,26 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestPreview() {
         print(#function)
     }
+
+    func gutenbergDidRequestBlockTypeImpressions() -> [String: Int] {
+        return [:]
+    }
+
+    func gutenbergDidRequestSetBlockTypeImpressions(_ impressions: [String: Int]) -> Void {
+        print("Gutenberg requested setting block type impressions to \(impressions).")
+    }
+
+    func gutenbergDidRequestContactCustomerSupport() {
+        print(#function)
+    }
+
+    func gutenbergDidRequestGotoCustomerSupportOptions() {
+        print(#function)
+    }
+
+    func gutenbergDidRequestSendEventToHost(_ eventName: String, properties: [AnyHashable: Any]) -> Void {
+        print("Gutenberg requested sending '\(eventName)' event to host with propreties: \(properties).")
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {
@@ -283,6 +306,14 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return nil
     }
 
+    func gutenbergHostAppNamespace() -> String {
+        return "WordPress"
+    }
+
+    func gutenbergFeaturedImageId() -> NSNumber? {
+        return nil
+    }
+
     func gutenbergCapabilities() -> [Capabilities : Bool] {
         return [
             .mentions: true,
@@ -290,9 +321,13 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .mediaFilesCollectionBlock: true,
+            .tiledGalleryBlock: true,
             .isAudioBlockMediaUploadEnabled: true,
             .reusableBlock: false,
-            .editorOnboarding: false
+            .facebookEmbed: true,
+            .instagramEmbed: true,
+            .loomEmbed: true,
+            .smartframeEmbed: true,
         ]
     }
 
@@ -351,6 +386,7 @@ extension GutenbergViewController {
         alert.addAction(toggleHTMLModeAction)
         alert.addAction(updateHtmlAction)
         alert.addAction(unsupportedBlockUIAction)
+        alert.addAction(showEditorHelpAction)
         alert.addAction(cancelAction)
 
         present(alert, animated: true)
@@ -363,6 +399,16 @@ extension GutenbergViewController {
             handler: { [unowned self] action in
                 self.toggleHTMLMode(action)
         })
+    }
+    
+    var showEditorHelpAction: UIAlertAction {
+        return UIAlertAction(
+            title: "Help & Support",
+            style: .default,
+            handler: { [unowned self] action in
+                self.showEditorHelp()
+            }
+        )
     }
 
     var updateHtmlAction: UIAlertAction {
@@ -408,5 +454,9 @@ extension GutenbergViewController {
     func toggleHTMLMode(_ action: UIAlertAction) {
         htmlMode = !htmlMode
         gutenberg.toggleHTMLMode()
+    }
+    
+    func showEditorHelp() {
+        gutenberg.showEditorHelp()
     }
 }

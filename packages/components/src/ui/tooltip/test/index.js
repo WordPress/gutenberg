@@ -41,11 +41,11 @@ describe( 'props', () => {
 		const invisibleTooltipTrigger = screen.getByText(
 			invisibleTooltipTriggerContent
 		);
-		// The invisible tooltip should not render
+		// The invisible tooltip should not render.
 		expect( tooltips ).toHaveLength( 1 );
-		// Assert that the rendered tooltip is indeed the base tooltip
+		// Assert that the rendered tooltip is indeed the base tooltip.
 		expect( tooltips[ 0 ].id ).toBe( baseTooltipId );
-		// But the invisible tooltip's trigger still should have rendered
+		// But the invisible tooltip's trigger still should have rendered.
 		expect( invisibleTooltipTrigger ).not.toBeUndefined();
 	} );
 
@@ -71,7 +71,7 @@ describe( 'props', () => {
 			</Tooltip>
 		);
 		const tooltips = screen.getAllByRole( /tooltip/ );
-		// assert only the base tooltip rendered
+		// Assert only the base tooltip rendered.
 		expect( tooltips ).toHaveLength( 1 );
 		expect( tooltips[ 0 ].id ).toBe( baseTooltipId );
 	} );

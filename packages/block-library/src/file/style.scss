@@ -1,6 +1,10 @@
 .wp-block-file {
 	margin-bottom: 1.5em;
 
+	&:not(.wp-element-button) {
+		font-size: 0.8em;
+	}
+
 	&.aligncenter {
 		text-align: center;
 	}
@@ -10,20 +14,21 @@
 		text-align: right;
 	}
 
-	.wp-block-file__embed {
-		margin-bottom: 1em;
+	* + .wp-block-file__button {
+		margin-left: 0.75em;
 	}
+}
 
-	.wp-block-file__button {
-		background: #32373c;
-		border-radius: 2em;
-		color: $white;
-		font-size: 0.8em;
-		padding: 0.5em 1em;
-	}
+.wp-block-file__embed {
+	margin-bottom: 1em;
+}
 
-	a.wp-block-file__button {
-		text-decoration: none;
+//This needs a low specificity so it won't override the rules from the button element if defined in theme.json.
+:where(.wp-block-file__button) {
+	border-radius: 2em;
+	padding: 0.5em 1em;
+
+	&:is(a) {
 
 		&:hover,
 		&:visited,
@@ -34,9 +39,5 @@
 			opacity: 0.85;
 			text-decoration: none;
 		}
-	}
-
-	* + .wp-block-file__button {
-		margin-left: 0.75em;
 	}
 }

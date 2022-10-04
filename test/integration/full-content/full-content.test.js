@@ -2,7 +2,7 @@
  * External dependencies
  */
 import glob from 'fast-glob';
-import { fromPairs, omit, startsWith, get } from 'lodash';
+import { get } from 'lodash';
 import { format } from 'util';
 
 /**
@@ -20,7 +20,10 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import prettierConfig from '@wordpress/prettier-config';
-//eslint-disable-next-line no-restricted-syntax
+
+/**
+ * Internal dependencies
+ */
 import {
 	blockNameToFixtureBasename,
 	getAvailableBlockFixturesBasenames,
@@ -31,45 +34,38 @@ import {
 	writeBlockFixtureParsedJSON,
 	writeBlockFixtureJSON,
 	writeBlockFixtureSerializedHTML,
-} from '@wordpress/e2e-tests/fixtures';
+} from '../fixtures';
 
 const blockBasenames = getAvailableBlockFixturesBasenames();
 
-function normalizeParsedBlocks( blocks ) {
-	return blocks.map( ( block, index ) => {
-		// Clone and remove React-instance-specific stuff; also, attribute
-		// values that equal `undefined` will be removed. Validation issues
-		// add too much noise so they get removed as well.
-		block = JSON.parse(
-			JSON.stringify( omit( block, 'validationIssues' ) )
-		);
-
-		// Change client IDs to a predictable value
-		block.clientId = '_clientId_' + index;
-
-		// Recurse to normalize inner blocks
-		block.innerBlocks = normalizeParsedBlocks( block.innerBlocks );
-
-		return block;
-	} );
-}
+/**
+ * Returns only the properties of the block that
+ * we care about comparing with the fixture data.
+ *
+ * @param {WPBlock[]} blocks loaded blocks to normalize.
+ */
+const normalizeParsedBlocks = ( blocks ) =>
+	blocks.map( ( block ) => ( {
+		name: block.name,
+		isValid: block.isValid,
+		attributes: JSON.parse( JSON.stringify( block.attributes ) ),
+		innerBlocks: normalizeParsedBlocks( block.innerBlocks ),
+	} ) );
 
 describe( 'full post content fixture', () => {
-	beforeAll( async () => {
-		const blockMetadataFiles = await glob(
+	beforeAll( () => {
+		const blockMetadataFiles = glob.sync(
 			'packages/block-library/src/*/block.json'
 		);
-		const blockDefinitions = fromPairs(
+		const blockDefinitions = Object.fromEntries(
 			blockMetadataFiles.map( ( file ) => {
 				const { name, ...metadata } = require( file );
 				return [ name, metadata ];
 			} )
 		);
 		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
-		// Load all hooks that modify blocks
-		require( '../../../packages/editor/src/hooks' );
 		registerCoreBlocks();
-		if ( process.env.GUTENBERG_PHASE === 2 ) {
+		if ( process.env.IS_GUTENBERG_PLUGIN ) {
 			__experimentalRegisterExperimentalCoreBlocks( {
 				enableFSEBlocks: true,
 			} );
@@ -86,10 +82,8 @@ describe( 'full post content fixture', () => {
 	blockBasenames.forEach( ( basename ) => {
 		// eslint-disable-next-line jest/valid-title
 		it( basename, () => {
-			const {
-				filename: htmlFixtureFileName,
-				file: htmlFixtureContent,
-			} = getBlockFixtureHTML( basename );
+			const { filename: htmlFixtureFileName, file: htmlFixtureContent } =
+				getBlockFixtureHTML( basename );
 			if ( htmlFixtureContent === null ) {
 				throw new Error(
 					`Missing fixture file: ${ htmlFixtureFileName }`
@@ -146,13 +140,10 @@ describe( 'full post content fixture', () => {
 				/* eslint-enable no-console */
 			}
 
-			const blocksActualNormalized = normalizeParsedBlocks(
-				blocksActual
-			);
-			const {
-				filename: jsonFixtureFileName,
-				file: jsonFixtureContent,
-			} = getBlockFixtureJSON( basename );
+			const blocksActualNormalized =
+				normalizeParsedBlocks( blocksActual );
+			const { filename: jsonFixtureFileName, file: jsonFixtureContent } =
+				getBlockFixtureJSON( basename );
 
 			let blocksExpectedString;
 
@@ -205,13 +196,26 @@ describe( 'full post content fixture', () => {
 			try {
 				expect( serializedActual ).toEqual( serializedExpected );
 			} catch ( err ) {
-				throw new Error(
-					format(
-						"File '%s' does not match expected value:\n\n%s",
-						serializedHTMLFileName,
-						err.message
-					)
-				);
+				if (
+					serialize( blocksActual ) ===
+					serialize( parse( serializedExpected ) )
+				) {
+					throw new Error(
+						format(
+							"File '%s' does not match expected value (however, the block re-serializes identically so you may need to run 'npm run fixtures:regenerate'):\n\n%s",
+							serializedHTMLFileName,
+							err.message
+						)
+					);
+				} else {
+					throw new Error(
+						format(
+							"File '%s' does not match expected value:\n\n%s",
+							serializedHTMLFileName,
+							err.message
+						)
+					);
+				}
 			}
 		} );
 	} );
@@ -233,15 +237,13 @@ describe( 'full post content fixture', () => {
 					.filter(
 						( basename ) =>
 							basename === nameToFilename ||
-							startsWith( basename, nameToFilename + '__' )
+							basename.startsWith( nameToFilename + '__' )
 					)
 					.map( ( basename ) => {
-						const {
-							filename: htmlFixtureFileName,
-						} = getBlockFixtureHTML( basename );
-						const {
-							file: jsonFixtureContent,
-						} = getBlockFixtureJSON( basename );
+						const { filename: htmlFixtureFileName } =
+							getBlockFixtureHTML( basename );
+						const { file: jsonFixtureContent } =
+							getBlockFixtureJSON( basename );
 						// The parser output for this test.  For missing files,
 						// JSON.parse( null ) === null.
 						const parserOutput = JSON.parse( jsonFixtureContent );
@@ -263,7 +265,9 @@ describe( 'full post content fixture', () => {
 				if ( ! foundFixtures.length ) {
 					errors.push(
 						format(
-							"Expected a fixture file called '%s.html' or '%s__*.html'.",
+							"Expected a fixture file called '%s.html' or '%s__*.html' in `test/integration/fixtures/blocks/` " +
+								'\n\n' +
+								'For more information on how to create test fixtures see https://github.com/WordPress/gutenberg/blob/1f75f8f6f500a20df5b9d6e317b4d72dd5af4ede/test/integration/fixtures/blocks/README.md\n\n',
 							nameToFilename,
 							nameToFilename
 						)
