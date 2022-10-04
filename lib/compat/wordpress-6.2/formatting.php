@@ -86,7 +86,6 @@ function gutenberg_word_count( $text, $type, $settings = array() ) {
 	$text = preg_replace( $settings['space_regexp'], ' ', $text );
 
 	if ( 'words' === $type ) {
-
 		// Remove HTML Entities.
 		$text = preg_replace( $settings['html_entity_regexp'], '', $text );
 
@@ -96,7 +95,6 @@ function gutenberg_word_count( $text, $type, $settings = array() ) {
 		// Remove unwanted characters.
 		$text = preg_replace( $settings['remove_regexp'], '', $text );
 	} else {
-
 		// Convert HTML Entities to "a".
 		$text = preg_replace( $settings['html_entity_regexp'], 'a', $text );
 
