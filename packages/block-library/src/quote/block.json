@@ -28,6 +28,7 @@
 		}
 	},
 	"supports": {
+		"align": [ "left", "right", "center", "wide", "full" ],
 		"anchor": true,
 		"__experimentalOnEnter": true,
 		"typography": {
