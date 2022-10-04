@@ -22,10 +22,13 @@ class Listener {
 	}
 
 	remove( /** @type {any} */ eventType, /** @type {any} */ instance ) {
-		this.listeners[ eventType ] =
-			this.listeners[ eventType ]?.filter(
-				( /** @type {any} */ listener ) => listener !== instance
-			) ?? [];
+		if ( ! this.listeners[ eventType ] ) {
+			return;
+		}
+
+		this.listeners[ eventType ] = this.listeners[ eventType ].filter(
+			( /** @type {any} */ listener ) => listener !== instance
+		);
 
 		if ( ! this.listeners[ eventType ].length ) {
 			// Removing last listener for this type, so unbind event.
