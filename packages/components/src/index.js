@@ -188,6 +188,7 @@ export {
 	Fill,
 	Provider as SlotFillProvider,
 	useSlot as __experimentalUseSlot,
+	useSlotFills as __experimentalUseSlotFills,
 } from './slot-fill';
 export { default as __experimentalStyleProvider } from './style-provider';
 export { ZStack as __experimentalZStack } from './z-stack';
