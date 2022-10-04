@@ -4,7 +4,7 @@
 
 ### New Feature
 
--   Allow passed custom elements from template `defaults` to be added to block.json. Add new `customPackageJSON` key to allow templates to define custom keys for the resulting package.json file.[#44649](https://github.com/WordPress/gutenberg/pull/44649)
+-   Add new `customPackageJSON` and `customBlockJSON` keys to allow templates to define custom keys for the resulting `package.json` and `block.json` files respectively.[#44649](https://github.com/WordPress/gutenberg/pull/44649)
 
 ## 4.2.0 (2022-09-21)
 
