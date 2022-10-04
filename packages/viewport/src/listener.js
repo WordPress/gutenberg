@@ -33,7 +33,7 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 					const list = window.matchMedia(
 						`(${ condition }: ${ width }px)`
 					);
-					list.addEventListener( 'change', setIsMatching );
+					list.addListener( setIsMatching );
 					return [ `${ operator } ${ name }`, list ];
 				} );
 			} );
