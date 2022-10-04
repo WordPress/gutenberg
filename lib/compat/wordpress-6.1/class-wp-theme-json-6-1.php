@@ -145,61 +145,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	}
 
 	/**
-	 * Builds metadata for the setting nodes, which returns in the form of:
-	 *
-	 *     [
-	 *       [
-	 *         'path'     => ['path', 'to', 'some', 'node' ],
-	 *         'selector' => 'CSS selector for some node'
-	 *       ],
-	 *       [
-	 *         'path'     => [ 'path', 'to', 'other', 'node' ],
-	 *         'selector' => 'CSS selector for other node'
-	 *       ],
-	 *     ]
-	 *
-	 * @since 5.8.0
-	 *
-	 * @param array $theme_json The tree to extract setting nodes from.
-	 * @param array $selectors  List of selectors per block.
-	 * @return array
-	 */
-	protected static function get_setting_nodes( $theme_json, $selectors = array() ) {
-		$nodes = array();
-		if ( ! isset( $theme_json['settings'] ) ) {
-			return $nodes;
-		}
-
-		// Top-level.
-		$nodes[] = array(
-			'path'     => array( 'settings' ),
-			'selector' => static::ROOT_BLOCK_SELECTOR,
-		);
-
-		// Calculate paths for blocks.
-		if ( ! isset( $theme_json['settings']['blocks'] ) ) {
-			return $nodes;
-		}
-
-		$valid_block_names = array_keys( static::get_blocks_metadata() );
-
-		foreach ( $theme_json['settings']['blocks'] as $name => $node ) {
-			$selector = null;
-			if ( isset( $selectors[ $name ]['selector'] ) ) {
-				$selector = $selectors[ $name ]['selector'];
-			}
-
-			$nodes[] = array(
-				'path'     => array( 'settings', 'blocks', $name ),
-				'selector' => $selector,
-			);
-		}
-
-		// This filter allows us to modify the settings for each node that have been understood from the theme, in order to bake in support for features like nested block settings.
-		return apply_filters( 'gutenberg_theme_json_get_settings_nodes', $nodes, $theme_json, $selectors, $valid_block_names );
-	}
-
-	/**
 	 * Sanitizes the input according to the schemas.
 	 *
 	 * @since 5.8.0
@@ -288,8 +233,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 		}
 
-		// This filter allows us to modify the settings that have been understood from the theme, in order to bake in support for features like nested block settings.
-		return apply_filters( 'gutenberg_theme_json_sanitize', $output, $schema, $valid_block_names, $input );
+		return $output;
 	}
 
 	/**
