@@ -144,6 +144,42 @@ describe( 'getNearestBlockIndex', () => {
 			expect( result ).toEqual( [ 1, 'after' ] );
 		} );
 
+		it( "returns [2, 'before'] when the position is nearest to the start of the third block", () => {
+			const position = { x: 0, y: 510 };
+
+			const result = getNearestBlockIndex(
+				verticalElements,
+				position,
+				orientation
+			);
+
+			expect( result ).toEqual( [ 2, 'before' ] );
+		} );
+
+		it( "returns [2, 'after'] when the position is nearest to the end of the third block", () => {
+			const position = { x: 0, y: 880 };
+
+			const result = getNearestBlockIndex(
+				verticalElements,
+				position,
+				orientation
+			);
+
+			expect( result ).toEqual( [ 2, 'after' ] );
+		} );
+
+		it( "returns [2, 'after'] when the position is past the end of the third block", () => {
+			const position = { x: 0, y: 920 };
+
+			const result = getNearestBlockIndex(
+				verticalElements,
+				position,
+				orientation
+			);
+
+			expect( result ).toEqual( [ 2, 'after' ] );
+		} );
+
 		it( "returns [3, 'before'] when the position is nearest to the start of the last block", () => {
 			const position = { x: 401, y: 0 };
 
@@ -220,6 +256,30 @@ describe( 'getNearestBlockIndex', () => {
 			expect( result ).toEqual( [ 1, 'after' ] );
 		} );
 
+		it( "returns [2, 'before'] when the position is nearest to the start of the third block", () => {
+			const position = { x: 510, y: 0 };
+
+			const result = getNearestBlockIndex(
+				horizontalElements,
+				position,
+				orientation
+			);
+
+			expect( result ).toEqual( [ 2, 'before' ] );
+		} );
+
+		it( "returns [2, 'after'] when the position is past the end of the third block", () => {
+			const position = { x: 920, y: 0 };
+
+			const result = getNearestBlockIndex(
+				horizontalElements,
+				position,
+				orientation
+			);
+
+			expect( result ).toEqual( [ 2, 'after' ] );
+		} );
+
 		it( "returns [3, 'before'] when the position is nearest to the start of the last block", () => {
 			const position = { x: 0, y: 401 };
 
@@ -232,7 +292,7 @@ describe( 'getNearestBlockIndex', () => {
 			expect( result ).toEqual( [ 3, 'before' ] );
 		} );
 
-		it( "returns [3, 'after'] when the position is nearest to the end of the fourth block", () => {
+		it( "returns [3, 'after'] when the position is nearest to the end of the last block", () => {
 			const position = { x: 300, y: 401 };
 
 			const result = getNearestBlockIndex(
