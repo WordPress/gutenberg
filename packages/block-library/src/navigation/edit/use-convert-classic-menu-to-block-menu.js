@@ -127,7 +127,7 @@ function useConvertClassicToBlockMenu( clientId ) {
 		}
 
 		// Set the ID for the currently importing classic menu.
-		isConvertingClassicMenu = menuId;
+		classicMenuBeingConvertedId = menuId;
 
 		if ( ! menuId || ! menuName ) {
 			setError( 'Unable to convert menu. Missing menu details.' );
@@ -146,7 +146,7 @@ function useConvertClassicToBlockMenu( clientId ) {
 			.then( ( navigationMenu ) => {
 				setStatus( CLASSIC_MENU_CONVERSION_SUCCESS );
 				// Reset the ID for the currently importing classic menu.
-				isConvertingClassicMenu = null;
+				classicMenuBeingConvertedId = null;
 				return navigationMenu;
 			} )
 			.catch( ( err ) => {
