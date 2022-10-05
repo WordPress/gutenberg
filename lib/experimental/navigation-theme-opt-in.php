@@ -191,37 +191,35 @@ function gutenberg_convert_menu_items_to_blocks(
 	$blocks = array();
 
 	foreach ( $menu_items as $menu_item ) {
-		$menu_item_id = (int) $menu_item->ID;
+		if ( 'block' === $menu_item->type ) {
+			$parsed_blocks = parse_blocks( $menu_item->content );
 
-		$has_children = isset( $menu_items_by_parent_id[ $menu_item_id ] );
-
-		if ( $has_children ) {
-			$submenu_items = $menu_items_by_parent_id[ $menu_item_id ];
-			$block_name    = 'core/navigation-submenu';
+			if ( count( $parsed_blocks ) ) {
+				$block = $parsed_blocks[0];
+			} else {
+				$block = array(
+					'blockName' => 'core/freeform',
+					'attrs'     => array(
+						'originalContent' => $menu_item->content,
+					),
+				);
+			}
 		} else {
-			$submenu_items = array();
-			$block_name    = 'core/navigation-link';
+			$block = array(
+				'blockName' => 'core/navigation-link',
+				'attrs'     => array(
+					'label' => $menu_item->title,
+					'url'   => $menu_item->url,
+				),
+			);
 		}
 
-		// Create a child block.
-		$block = array(
-			'blockName' => $block_name,
-			'attrs'     => array(
-				'label' => $menu_item->title,
-				'url'   => $menu_item->url,
-			),
-		);
-
-		// Create the content of the block.
-		$block_content = gutenberg_convert_menu_items_to_blocks(
-			$submenu_items,
+		$block['innerBlocks'] = gutenberg_convert_menu_items_to_blocks(
+			isset( $menu_items_by_parent_id[ $menu_item->ID ] )
+					? $menu_items_by_parent_id[ $menu_item->ID ]
+					: array(),
 			$menu_items_by_parent_id
 		);
-
-		if ( ! empty( $block_content ) ) {
-			$block['innerContent'] = $block_content;
-			$block['innerBlocks']  = $block_content;
-		}
 
 		$blocks[] = $block;
 	}
