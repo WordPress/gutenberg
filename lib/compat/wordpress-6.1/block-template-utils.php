@@ -323,7 +323,7 @@ function _gutenberg_build_title_and_description_for_single_post_type_block_templ
  * @param string            $slug     Slug of the term, e.g.: shoes.
  * @param WP_Block_Template $template Template to mutate adding the description and title computed.
  *
- * @return boolean True if a term referenced was found and false otherwise.
+ * @return boolean True if the term referenced was found and false otherwise.
  */
 function _gutenberg_build_title_and_description_for_taxonomy_block_template( $taxonomy, $slug, WP_Block_Template $template ) {
 	$taxonomy_object = get_taxonomy( $taxonomy );
