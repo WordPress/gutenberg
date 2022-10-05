@@ -134,7 +134,7 @@ function GalleryEdit( props ) {
 			} ) ),
 		[ innerBlockImages ]
 	);
-
+	// Test change.
 	const imageData = useGetMedia( innerBlockImages );
 
 	const newImages = useGetNewImages( images, imageData );
