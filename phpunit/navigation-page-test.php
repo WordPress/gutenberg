@@ -79,7 +79,12 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 		$handle  = 'wp-edit-navigation';
 		$scripts->remove( $handle );
 		$scripts->add( $handle, 'https://test.test/test.js' );
-		$response = new WP_REST_Response( array( 'someData' ) );
+
+		/**
+		 * Create a dummy response to prevent querying
+		 * the actual /wp/v2/menus endpoint.
+		*/
+		$response = new WP_REST_Response();
 		$this->callback
 			->expects( $this->once() )
 			->method( 'preload_menus_rest_pre_dispatch_callback' )
