@@ -55,7 +55,7 @@ function render_block_core_latest_posts( $attributes ) {
 		$args['author'] = $attributes['selectedAuthor'];
 	}
 
-	$query        = new WP_Query;
+	$query        = new WP_Query();
 	$recent_posts = $query->query( $args );
 
 	if ( isset( $attributes['displayFeaturedImage'] ) && $attributes['displayFeaturedImage'] ) {

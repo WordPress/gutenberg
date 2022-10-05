@@ -237,10 +237,7 @@ export default function QueryInspectorControls( {
 							</ToolsPanelItem>
 						) }
 						{ isPostTypeHierarchical &&
-							! isControlAllowed(
-								allowedControls,
-								'parents'
-							) && (
+							isControlAllowed( allowedControls, 'parents' ) && (
 								<ToolsPanelItem
 									hasValue={ () => !! parents?.length }
 									label={ __( 'Parents' ) }

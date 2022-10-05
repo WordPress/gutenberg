@@ -266,14 +266,21 @@ export default function VisualEditor( { styles } ) {
 	const layout = postContentBlock?.attributes?.layout || {};
 
 	// Update type for blocks using legacy layouts.
-	const postContentLayout =
-		layout &&
-		( layout?.type === 'constrained' ||
-			layout?.inherit ||
-			layout?.contentSize ||
-			layout?.wideSize )
+	const postContentLayout = useMemo( () => {
+		return layout &&
+			( layout?.type === 'constrained' ||
+				layout?.inherit ||
+				layout?.contentSize ||
+				layout?.wideSize )
 			? { ...globalLayoutSettings, ...layout, type: 'constrained' }
 			: { ...globalLayoutSettings, ...layout, type: 'default' };
+	}, [
+		layout?.type,
+		layout?.inherit,
+		layout?.contentSize,
+		layout?.wideSize,
+		globalLayoutSettings,
+	] );
 
 	// If there is a Post Content block we use its layout for the block list;
 	// if not, this must be a classic theme, in which case we use the fallback layout.
