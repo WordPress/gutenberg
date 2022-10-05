@@ -1,18 +1,7 @@
 /**
- * WordPress dependencies
- */
-import {
-	registerBlockType,
-	unregisterBlockType,
-	createBlock,
-	getDefaultBlockName,
-	setDefaultBlockName,
-} from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
-import { getNearestBlockIndex, getDropTargetIndexAndOperation } from '..';
+import { getDropTargetPosition } from '..';
 
 const elementData = [
 	{
@@ -42,19 +31,12 @@ const elementData = [
 	},
 ];
 
-const createMockClassList = ( classes ) => {
-	return {
-		contains( textToMatch ) {
-			return classes.includes( textToMatch );
-		},
-	};
-};
-
 const mapElements =
 	( orientation ) =>
-	( { top, right, bottom, left }, index ) => {
+	( { top, right, bottom, left, isUnmodifiedDefaultBlock }, index ) => {
 		return {
-			dataset: { block: index + 1 },
+			isUnmodifiedDefaultBlock: !! isUnmodifiedDefaultBlock,
+			blockIndex: index,
 			getBoundingClientRect() {
 				return orientation === 'vertical'
 					? {
@@ -70,349 +52,509 @@ const mapElements =
 							right: bottom,
 					  };
 			},
-			classList: createMockClassList( 'wp-block' ),
 		};
 	};
 
-const verticalElements = elementData.map( mapElements( 'vertical' ) );
+const verticalBlocksData = elementData.map( mapElements( 'vertical' ) );
 // Flip the elementData to make a horizontal block list.
-const horizontalElements = elementData.map( mapElements( 'horizontal' ) );
+const horizontalBlocksData = elementData.map( mapElements( 'horizontal' ) );
 
-describe( 'getNearestBlockIndex', () => {
-	it( 'returns `undefined` for an empty list of elements', () => {
-		const emptyElementList = [];
+describe( 'getDropTargetPosition', () => {
+	it( 'returns `0` for an empty list of elements', () => {
 		const position = { x: 0, y: 0 };
 		const orientation = 'horizontal';
 
-		const result = getNearestBlockIndex(
-			emptyElementList,
-			position,
-			orientation
-		);
+		const result = getDropTargetPosition( [], position, orientation );
 
-		expect( result ).toEqual( [ undefined, 'after' ] );
+		expect( result ).toEqual( [ 0, 'insert' ] );
 	} );
 
 	describe( 'Vertical block lists', () => {
 		const orientation = 'vertical';
 
-		it( "returns [0, 'before'] when the position is nearest to the start of the first block", () => {
+		it( 'returns `0` when the position is nearest to the start of the first block', () => {
 			const position = { x: 0, y: 0 };
 
-			const result = getNearestBlockIndex(
-				verticalElements,
+			const result = getDropTargetPosition(
+				verticalBlocksData,
 				position,
 				orientation
 			);
 
-			expect( result ).toEqual( [ 0, 'before' ] );
+			expect( result ).toEqual( [ 0, 'insert' ] );
 		} );
 
-		it( "returns [0, 'after'] when the position is nearest to the end of the first block", () => {
+		it( 'returns `1` when the position is nearest to the end of the first block', () => {
 			const position = { x: 0, y: 190 };
 
-			const result = getNearestBlockIndex(
-				verticalElements,
+			const result = getDropTargetPosition(
+				verticalBlocksData,
 				position,
 				orientation
 			);
 
-			expect( result ).toEqual( [ 0, 'after' ] );
+			expect( result ).toEqual( [ 1, 'insert' ] );
 		} );
 
-		it( "returns [1, 'before'] when the position is nearest to the start of the second block", () => {
+		it( 'returns `1` when the position is nearest to the start of the second block', () => {
 			const position = { x: 0, y: 210 };
 
-			const result = getNearestBlockIndex(
-				verticalElements,
+			const result = getDropTargetPosition(
+				verticalBlocksData,
 				position,
 				orientation
 			);
 
-			expect( result ).toEqual( [ 1, 'before' ] );
+			expect( result ).toEqual( [ 1, 'insert' ] );
 		} );
 
-		it( "returns [1, 'after'] when the position is nearest to the end of the second block", () => {
+		it( 'returns `2` when the position is nearest to the end of the second block', () => {
 			const position = { x: 0, y: 450 };
 
-			const result = getNearestBlockIndex(
-				verticalElements,
+			const result = getDropTargetPosition(
+				verticalBlocksData,
 				position,
 				orientation
 			);
 
-			expect( result ).toEqual( [ 1, 'after' ] );
+			expect( result ).toEqual( [ 2, 'insert' ] );
 		} );
 
-		it( "returns [2, 'before'] when the position is nearest to the start of the third block", () => {
+		it( 'returns `2` when the position is nearest to the start of the third block', () => {
 			const position = { x: 0, y: 510 };
 
-			const result = getNearestBlockIndex(
-				verticalElements,
+			const result = getDropTargetPosition(
+				verticalBlocksData,
 				position,
 				orientation
 			);
 
-			expect( result ).toEqual( [ 2, 'before' ] );
+			expect( result ).toEqual( [ 2, 'insert' ] );
 		} );
 
-		it( "returns [2, 'after'] when the position is nearest to the end of the third block", () => {
+		it( 'returns `3` when the position is nearest to the end of the third block', () => {
 			const position = { x: 0, y: 880 };
 
-			const result = getNearestBlockIndex(
-				verticalElements,
+			const result = getDropTargetPosition(
+				verticalBlocksData,
 				position,
 				orientation
 			);
 
-			expect( result ).toEqual( [ 2, 'after' ] );
+			expect( result ).toEqual( [ 3, 'insert' ] );
 		} );
 
-		it( "returns [2, 'after'] when the position is past the end of the third block", () => {
+		it( 'returns `3` when the position is past the end of the third block', () => {
 			const position = { x: 0, y: 920 };
 
-			const result = getNearestBlockIndex(
-				verticalElements,
+			const result = getDropTargetPosition(
+				verticalBlocksData,
 				position,
 				orientation
 			);
 
-			expect( result ).toEqual( [ 2, 'after' ] );
+			expect( result ).toEqual( [ 3, 'insert' ] );
 		} );
 
-		it( "returns [3, 'before'] when the position is nearest to the start of the last block", () => {
+		it( 'returns `4` when the position is nearest to the start of the fourth block', () => {
 			const position = { x: 401, y: 0 };
 
-			const result = getNearestBlockIndex(
-				verticalElements,
+			const result = getDropTargetPosition(
+				verticalBlocksData,
 				position,
 				orientation
 			);
 
-			expect( result ).toEqual( [ 3, 'before' ] );
+			expect( result ).toEqual( [ 3, 'insert' ] );
 		} );
 
-		it( "returns [3, 'after'] when the position is nearest to the end of the last block", () => {
+		it( 'returns `5` when the position is nearest to the end of the fourth block', () => {
 			const position = { x: 401, y: 300 };
 
-			const result = getNearestBlockIndex(
-				verticalElements,
+			const result = getDropTargetPosition(
+				verticalBlocksData,
 				position,
 				orientation
 			);
 
-			expect( result ).toEqual( [ 3, 'after' ] );
+			expect( result ).toEqual( [ 4, 'insert' ] );
 		} );
 	} );
 
 	describe( 'Horizontal block lists', () => {
 		const orientation = 'horizontal';
 
-		it( "returns [0, 'before'] when the position is nearest to the start of the first block", () => {
+		it( 'returns `0` when the position is nearest to the start of the first block', () => {
 			const position = { x: 0, y: 0 };
 
-			const result = getNearestBlockIndex(
-				horizontalElements,
+			const result = getDropTargetPosition(
+				horizontalBlocksData,
 				position,
 				orientation
 			);
 
-			expect( result ).toEqual( [ 0, 'before' ] );
+			expect( result ).toEqual( [ 0, 'insert' ] );
 		} );
 
-		it( "returns [0, 'after'] when the position is nearest to the end of the first block", () => {
+		it( 'returns `1` when the position is nearest to the end of the first block', () => {
 			const position = { x: 190, y: 0 };
 
-			const result = getNearestBlockIndex(
-				horizontalElements,
+			const result = getDropTargetPosition(
+				horizontalBlocksData,
 				position,
 				orientation
 			);
 
-			expect( result ).toEqual( [ 0, 'after' ] );
+			expect( result ).toEqual( [ 1, 'insert' ] );
 		} );
 
-		it( "returns [1, 'before'] when the position is nearest to the start of the second block", () => {
+		it( 'returns `1` when the position is nearest to the start of the second block', () => {
 			const position = { x: 210, y: 0 };
 
-			const result = getNearestBlockIndex(
-				horizontalElements,
+			const result = getDropTargetPosition(
+				horizontalBlocksData,
 				position,
 				orientation
 			);
 
-			expect( result ).toEqual( [ 1, 'before' ] );
+			expect( result ).toEqual( [ 1, 'insert' ] );
 		} );
 
-		it( "returns [1, 'after'] when the position is nearest to the end of the second block", () => {
+		it( 'returns `2` when the position is nearest to the end of the second block', () => {
 			const position = { x: 450, y: 0 };
 
-			const result = getNearestBlockIndex(
-				horizontalElements,
+			const result = getDropTargetPosition(
+				horizontalBlocksData,
 				position,
 				orientation
 			);
 
-			expect( result ).toEqual( [ 1, 'after' ] );
+			expect( result ).toEqual( [ 2, 'insert' ] );
 		} );
 
-		it( "returns [2, 'before'] when the position is nearest to the start of the third block", () => {
+		it( 'returns `2` when the position is nearest to the start of the third block', () => {
 			const position = { x: 510, y: 0 };
 
-			const result = getNearestBlockIndex(
-				horizontalElements,
+			const result = getDropTargetPosition(
+				horizontalBlocksData,
 				position,
 				orientation
 			);
 
-			expect( result ).toEqual( [ 2, 'before' ] );
+			expect( result ).toEqual( [ 2, 'insert' ] );
 		} );
 
-		it( "returns [2, 'after'] when the position is past the end of the third block", () => {
+		it( 'returns `3` when the position is nearest to the end of the third block', () => {
+			const position = { x: 880, y: 0 };
+
+			const result = getDropTargetPosition(
+				horizontalBlocksData,
+				position,
+				orientation
+			);
+
+			expect( result ).toEqual( [ 3, 'insert' ] );
+		} );
+
+		it( 'returns `3` when the position is past the end of the third block', () => {
 			const position = { x: 920, y: 0 };
 
-			const result = getNearestBlockIndex(
-				horizontalElements,
+			const result = getDropTargetPosition(
+				horizontalBlocksData,
 				position,
 				orientation
 			);
 
-			expect( result ).toEqual( [ 2, 'after' ] );
+			expect( result ).toEqual( [ 3, 'insert' ] );
 		} );
 
-		it( "returns [3, 'before'] when the position is nearest to the start of the last block", () => {
+		it( 'returns `3` when the position is nearest to the start of the last block', () => {
 			const position = { x: 0, y: 401 };
 
-			const result = getNearestBlockIndex(
-				horizontalElements,
+			const result = getDropTargetPosition(
+				horizontalBlocksData,
 				position,
 				orientation
 			);
 
-			expect( result ).toEqual( [ 3, 'before' ] );
+			expect( result ).toEqual( [ 3, 'insert' ] );
 		} );
 
-		it( "returns [3, 'after'] when the position is nearest to the end of the last block", () => {
+		it( 'returns `4` when the position is nearest to the end of the last block', () => {
 			const position = { x: 300, y: 401 };
 
-			const result = getNearestBlockIndex(
-				horizontalElements,
+			const result = getDropTargetPosition(
+				horizontalBlocksData,
 				position,
 				orientation
 			);
 
-			expect( result ).toEqual( [ 3, 'after' ] );
+			expect( result ).toEqual( [ 4, 'insert' ] );
 		} );
 	} );
-} );
 
-describe( 'getDropTargetIndexAndOperation', () => {
-	let defaultBlockName;
+	describe( 'Unmodified default blocks', () => {
+		const orientation = 'vertical';
 
-	beforeAll( () => {
-		defaultBlockName = getDefaultBlockName();
-		registerBlockType( 'test/default-block', { title: 'default block' } );
-		registerBlockType( 'test/not-default-block', {
-			title: 'not default block',
+		it( 'handles replacement index when only the first block is an unmodified default block', () => {
+			const blocksData = [
+				{
+					left: 0,
+					top: 10,
+					right: 400,
+					bottom: 210,
+					isUnmodifiedDefaultBlock: true,
+				},
+				{
+					left: 0,
+					top: 220,
+					right: 400,
+					bottom: 420,
+					isUnmodifiedDefaultBlock: false,
+				},
+			].map( mapElements( 'vertical' ) );
+
+			// Dropping above the first block.
+			expect(
+				getDropTargetPosition( blocksData, { x: 0, y: 0 }, orientation )
+			).toEqual( [ 0, 'replace' ] );
+
+			// Dropping on the top half of the first block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 20 },
+					orientation
+				)
+			).toEqual( [ 0, 'replace' ] );
+
+			// Dropping on the bottom half of the first block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 200 },
+					orientation
+				)
+			).toEqual( [ 0, 'replace' ] );
+
+			// Dropping slightly after the first block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 211 },
+					orientation
+				)
+			).toEqual( [ 0, 'replace' ] );
+
+			// Dropping slightly above the second block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 219 },
+					orientation
+				)
+			).toEqual( [ 0, 'replace' ] );
+
+			// Dropping on the top half of the second block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 230 },
+					orientation
+				)
+			).toEqual( [ 0, 'replace' ] );
+
+			// Dropping on the bottom half of the second block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 410 },
+					orientation
+				)
+			).toEqual( [ 2, 'insert' ] );
+
+			// Dropping below the second block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 421 },
+					orientation
+				)
+			).toEqual( [ 2, 'insert' ] );
 		} );
-		setDefaultBlockName( 'test/default-block' );
-	} );
 
-	afterAll( () => {
-		setDefaultBlockName( defaultBlockName );
-		unregisterBlockType( 'test/default-block' );
-		unregisterBlockType( 'test/not-default-block' );
-	} );
+		it( 'handles replacement index when only the second block is an unmodified default block', () => {
+			const blocksData = [
+				{
+					left: 0,
+					top: 10,
+					right: 400,
+					bottom: 210,
+					isUnmodifiedDefaultBlock: false,
+				},
+				{
+					left: 0,
+					top: 220,
+					right: 400,
+					bottom: 420,
+					isUnmodifiedDefaultBlock: true,
+				},
+			].map( mapElements( 'vertical' ) );
 
-	it( 'returns insertion index when there are no unmodified default blocks', () => {
-		const blocks = [
-			createBlock( 'test/not-default-block' ),
-			createBlock( 'test/not-default-block' ),
-		];
+			// Dropping above the first block.
+			expect(
+				getDropTargetPosition( blocksData, { x: 0, y: 0 }, orientation )
+			).toEqual( [ 0, 'insert' ] );
 
-		expect( getDropTargetIndexAndOperation( 0, 'before', blocks ) ).toEqual(
-			[ 0, 'insert' ]
-		);
+			// Dropping on the top half of the first block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 20 },
+					orientation
+				)
+			).toEqual( [ 0, 'insert' ] );
 
-		expect( getDropTargetIndexAndOperation( 0, 'after', blocks ) ).toEqual(
-			[ 1, 'insert' ]
-		);
+			// Dropping on the bottom half of the first block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 200 },
+					orientation
+				)
+			).toEqual( [ 1, 'replace' ] );
 
-		expect( getDropTargetIndexAndOperation( 1, 'before', blocks ) ).toEqual(
-			[ 1, 'insert' ]
-		);
+			// Dropping slightly after the first block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 211 },
+					orientation
+				)
+			).toEqual( [ 1, 'replace' ] );
 
-		expect( getDropTargetIndexAndOperation( 1, 'after', blocks ) ).toEqual(
-			[ 2, 'insert' ]
-		);
-	} );
+			// Dropping slightly above the second block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 219 },
+					orientation
+				)
+			).toEqual( [ 1, 'replace' ] );
 
-	it( 'handles replacement index when only the first block is an unmodified default block', () => {
-		const blocks = [
-			createBlock( 'test/default-block' ),
-			createBlock( 'test/not-default-block' ),
-		];
+			// Dropping on the top half of the second block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 230 },
+					orientation
+				)
+			).toEqual( [ 1, 'replace' ] );
 
-		expect( getDropTargetIndexAndOperation( 0, 'before', blocks ) ).toEqual(
-			[ 0, 'replace' ]
-		);
+			// Dropping on the bottom half of the second block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 410 },
+					orientation
+				)
+			).toEqual( [ 1, 'replace' ] );
 
-		expect( getDropTargetIndexAndOperation( 0, 'after', blocks ) ).toEqual(
-			[ 0, 'replace' ]
-		);
+			// Dropping below the second block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 421 },
+					orientation
+				)
+			).toEqual( [ 1, 'replace' ] );
+		} );
 
-		expect( getDropTargetIndexAndOperation( 1, 'before', blocks ) ).toEqual(
-			[ 0, 'replace' ]
-		);
+		it( 'returns replacement index when both blocks are unmodified default blocks', () => {
+			const blocksData = [
+				{
+					left: 0,
+					top: 10,
+					right: 400,
+					bottom: 210,
+					isUnmodifiedDefaultBlock: true,
+				},
+				{
+					left: 0,
+					top: 220,
+					right: 400,
+					bottom: 420,
+					isUnmodifiedDefaultBlock: true,
+				},
+			].map( mapElements( 'vertical' ) );
 
-		expect( getDropTargetIndexAndOperation( 1, 'after', blocks ) ).toEqual(
-			[ 2, 'insert' ]
-		);
-	} );
+			// Dropping above the first block.
+			expect(
+				getDropTargetPosition( blocksData, { x: 0, y: 0 }, orientation )
+			).toEqual( [ 0, 'replace' ] );
 
-	it( 'handles replacement index when only the second block is an unmodified default block', () => {
-		const blocks = [
-			createBlock( 'test/not-default-block' ),
-			createBlock( 'test/default-block' ),
-		];
+			// Dropping on the top half of the first block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 20 },
+					orientation
+				)
+			).toEqual( [ 0, 'replace' ] );
 
-		expect( getDropTargetIndexAndOperation( 0, 'before', blocks ) ).toEqual(
-			[ 0, 'insert' ]
-		);
+			// Dropping on the bottom half of the first block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 200 },
+					orientation
+				)
+			).toEqual( [ 0, 'replace' ] );
 
-		expect( getDropTargetIndexAndOperation( 0, 'after', blocks ) ).toEqual(
-			[ 1, 'replace' ]
-		);
+			// Dropping slightly after the first block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 211 },
+					orientation
+				)
+			).toEqual( [ 0, 'replace' ] );
 
-		expect( getDropTargetIndexAndOperation( 1, 'before', blocks ) ).toEqual(
-			[ 1, 'replace' ]
-		);
+			// Dropping slightly above the second block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 219 },
+					orientation
+				)
+			).toEqual( [ 1, 'replace' ] );
 
-		expect( getDropTargetIndexAndOperation( 1, 'after', blocks ) ).toEqual(
-			[ 1, 'replace' ]
-		);
-	} );
+			// Dropping on the top half of the second block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 230 },
+					orientation
+				)
+			).toEqual( [ 1, 'replace' ] );
 
-	it( 'returns replacement index when both blocks are unmodified default blocks', () => {
-		const blocks = [
-			createBlock( 'test/default-block' ),
-			createBlock( 'test/default-block' ),
-		];
+			// Dropping on the bottom half of the second block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 410 },
+					orientation
+				)
+			).toEqual( [ 1, 'replace' ] );
 
-		expect( getDropTargetIndexAndOperation( 0, 'before', blocks ) ).toEqual(
-			[ 0, 'replace' ]
-		);
-
-		expect( getDropTargetIndexAndOperation( 0, 'after', blocks ) ).toEqual(
-			[ 0, 'replace' ]
-		);
-
-		expect( getDropTargetIndexAndOperation( 1, 'before', blocks ) ).toEqual(
-			[ 1, 'replace' ]
-		);
-
-		expect( getDropTargetIndexAndOperation( 1, 'after', blocks ) ).toEqual(
-			[ 1, 'replace' ]
-		);
+			// Dropping below the second block.
+			expect(
+				getDropTargetPosition(
+					blocksData,
+					{ x: 0, y: 421 },
+					orientation
+				)
+			).toEqual( [ 1, 'replace' ] );
+		} );
 	} );
 } );

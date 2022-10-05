@@ -8,7 +8,7 @@ import {
 	__experimentalUseDropZone as useDropZone,
 } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { isUnmodifiedDefaultBlock as getIsUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -36,16 +36,25 @@ import { store as blockEditorStore } from '../../store';
  */
 
 /**
- * Given a list of block DOM elements finds the index that a block should be dropped
- * at.
- *
- * @param {Element[]}              elements    Array of DOM elements that represent each block in a block list.
- * @param {WPPoint}                position    The position of the item being dragged.
- * @param {WPBlockListOrientation} orientation The orientation of a block list.
- *
- * @return {[number|undefined, WPInsertPosition]} The block index and the position that's closest to the drag position.
+ * @typedef {Object} WPBlockData
+ * @property {boolean}       isUnmodifiedDefaultBlock Is the block unmodified default block.
+ * @property {() => DOMRect} getBoundingClientRect    Get the bounding client rect of the block.
+ * @property {number}        blockIndex               The index of the block.
  */
-export function getNearestBlockIndex( elements, position, orientation ) {
+
+/**
+ * Get the drop target position from a given drop point and the orientation.
+ *
+ * @param {WPBlockData[]}          blocksData  The block data list.
+ * @param {WPPoint}                position    The position of the item being dragged.
+ * @param {WPBlockListOrientation} orientation The orientation of the block list.
+ * @return {[number, WPDropOperation]} The drop target position.
+ */
+export function getDropTargetPosition(
+	blocksData,
+	position,
+	orientation = 'vertical'
+) {
 	const allowedEdges =
 		orientation === 'horizontal'
 			? [ 'left', 'right' ]
@@ -53,62 +62,49 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 
 	const isRightToLeft = isRTL();
 
-	let candidateIndex;
-	let candidatePosition = 'after';
-	let candidateDistance;
+	let nearestIndex = 0;
+	let insertPosition = 'before';
+	let minDistance = Infinity;
 
-	elements.forEach( ( element, index ) => {
-		const rect = element.getBoundingClientRect();
+	blocksData.forEach(
+		( { isUnmodifiedDefaultBlock, getBoundingClientRect, blockIndex } ) => {
+			const rect = getBoundingClientRect();
 
-		let [ distance, edge ] = getDistanceToNearestEdge(
-			position,
-			rect,
-			allowedEdges
-		);
-		// Prioritize the element if the point is inside of it.
-		if ( isPointContainedByRect( position, rect ) ) {
-			distance = 0;
+			let [ distance, edge ] = getDistanceToNearestEdge(
+				position,
+				rect,
+				allowedEdges
+			);
+			// Prioritize the element if the point is inside of an unmodified default block.
+			if (
+				isUnmodifiedDefaultBlock &&
+				isPointContainedByRect( position, rect )
+			) {
+				distance = 0;
+			}
+
+			if ( distance < minDistance ) {
+				// Where the dropped block will be inserted on the nearest block.
+				insertPosition =
+					edge === 'bottom' ||
+					( ! isRightToLeft && edge === 'right' ) ||
+					( isRightToLeft && edge === 'left' )
+						? 'after'
+						: 'before';
+
+				// Update the currently known best candidate.
+				minDistance = distance;
+				nearestIndex = blockIndex;
+			}
 		}
+	);
 
-		if ( candidateDistance === undefined || distance < candidateDistance ) {
-			// Where the dropped block will be inserted on the nearest block.
-			candidatePosition =
-				edge === 'bottom' ||
-				( ! isRightToLeft && edge === 'right' ) ||
-				( isRightToLeft && edge === 'left' )
-					? 'after'
-					: 'before';
-
-			// Update the currently known best candidate.
-			candidateDistance = distance;
-			candidateIndex = index;
-		}
-	} );
-
-	return [ candidateIndex, candidatePosition ];
-}
-
-/**
- * Get the drop target index and operation based on the the blocks and the nearst block index.
- *
- * @param {number|undefined} nearestIndex   The nearest block index calculated by getNearestBlockIndex.
- * @param {WPInsertPosition} insertPosition Whether to insert before or after the nearestIndex.
- * @param {WPBlock[]}        blocks         The blocks list.
- * @return {[number, WPDropOperation]} The drop target.
- */
-export function getDropTargetIndexAndOperation(
-	nearestIndex,
-	insertPosition,
-	blocks
-) {
 	const adjacentIndex =
 		nearestIndex + ( insertPosition === 'after' ? 1 : -1 );
-	const nearestBlock = blocks[ nearestIndex ];
-	const adjacentBlock = blocks[ adjacentIndex ];
 	const isNearestBlockUnmodifiedDefaultBlock =
-		!! nearestBlock && isUnmodifiedDefaultBlock( nearestBlock );
+		!! blocksData[ nearestIndex ]?.isUnmodifiedDefaultBlock;
 	const isAdjacentBlockUnmodifiedDefaultBlock =
-		!! adjacentBlock && isUnmodifiedDefaultBlock( adjacentBlock );
+		!! blocksData[ adjacentIndex ]?.isUnmodifiedDefaultBlock;
 
 	// If both blocks are not unmodified default blocks then just insert between them.
 	if (
@@ -170,7 +166,8 @@ export default function useBlockDropZone( {
 		[ targetRootClientId ]
 	);
 
-	const { getBlockListSettings, getBlocks } = useSelect( blockEditorStore );
+	const { getBlockListSettings, getBlocks, getBlockIndex } =
+		useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
 
@@ -179,16 +176,11 @@ export default function useBlockDropZone( {
 	} );
 	const throttled = useThrottle(
 		useCallback(
-			( event, currentTarget ) => {
-				const blockElements = Array.from(
-					currentTarget.children
-				).filter(
-					// Ensure the element is a block. It should have the `wp-block` class.
-					( element ) => element.classList.contains( 'wp-block' )
-				);
+			( event, ownerDocument ) => {
+				const blocks = getBlocks( targetRootClientId );
 
 				// The block list is empty, don't show the insertion point but still allow dropping.
-				if ( blockElements.length === 0 ) {
+				if ( blocks.length === 0 ) {
 					setDropTarget( {
 						index: 0,
 						operation: 'insert',
@@ -196,20 +188,25 @@ export default function useBlockDropZone( {
 					return;
 				}
 
-				const [ nearestBlockIndex, insertPosition ] =
-					getNearestBlockIndex(
-						blockElements,
-						{ x: event.clientX, y: event.clientY },
-						getBlockListSettings( targetRootClientId )?.orientation
-					);
+				const blocksData = blocks.map( ( block ) => {
+					const clientId = block.clientId;
 
-				const blocks = getBlocks( targetRootClientId );
-				const [ targetIndex, operation ] =
-					getDropTargetIndexAndOperation(
-						nearestBlockIndex,
-						insertPosition,
-						blocks
-					);
+					return {
+						isUnmodifiedDefaultBlock:
+							getIsUnmodifiedDefaultBlock( block ),
+						getBoundingClientRect: () =>
+							ownerDocument
+								.getElementById( `block-${ clientId }` )
+								.getBoundingClientRect(),
+						blockIndex: getBlockIndex( clientId ),
+					};
+				} );
+
+				const [ targetIndex, operation ] = getDropTargetPosition(
+					blocksData,
+					{ x: event.clientX, y: event.clientY },
+					getBlockListSettings( targetRootClientId )?.orientation
+				);
 
 				setDropTarget( {
 					index: targetIndex,
@@ -231,7 +228,7 @@ export default function useBlockDropZone( {
 			// `currentTarget` is only available while the event is being
 			// handled, so get it now and pass it to the thottled function.
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
-			throttled( event, event.currentTarget );
+			throttled( event, event.currentTarget.ownerDocument );
 		},
 		onDragLeave() {
 			throttled.cancel();
