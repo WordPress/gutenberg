@@ -502,11 +502,11 @@ Similarly to block supports, there can be only one instance of any style in use 
 
 The global styles UI in the site editor has a screen for per-block styles. The list of blocks is generated dynamically using the block supports from the `block.json` of blocks. If a block wants to be listed there, it needs to use the block supports mechanism.
 
-### Structural layout styles
+### Layout styles
 
-In addition to styles at the individual block level and in global styles, there is the concept of Layout styles that are output for both blocks-based and classic themes.
+In addition to styles at the individual block level and in global styles, there is the concept of layout styles that are output for both blocks-based and classic themes.
 
-The Layout block support is an experimental approach for outputting common structural layout styles that are shared between blocks that are used for creating layouts. Layout styles are useful for providing common styling for any block that is a container for other blocks. Examples of blocks that depend on these layout styles include Group, Row, Columns, Buttons, and Social Icons.
+The layout block support is an experimental approach for outputting common layout styles that are shared between blocks that are used for creating layouts. Layout styles are useful for providing common styling for any block that is a container for other blocks. Examples of blocks that depend on these layout styles include Group, Row, Columns, Buttons, and Social Icons.
 
 While the feature is part of WordPress core, it is still flagged as experimental in the sense that the features and output are still undergoing active development. It is therefore not yet a stable feature from the perspective of 3rd party blocks, as the API is likely to change. The feature is enabled in core blocks via the `__experimentalLayout` setting under `supports` in a block's `block.json` file.
 
@@ -522,7 +522,7 @@ Common layout definitions are stored in [the core `theme.json` file](https://git
 
 #### Individual layout styles
 
-When a block that opts in to the experimental Layout support is rendered, two things are processed and added to the output via [`layout.php`](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-supports/layout.php):
+When a block that opts in to the experimental layout support is rendered, two things are processed and added to the output via [`layout.php`](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-supports/layout.php):
 
 - Semantic class names are added to the block markup to indicate which layout settings are in use. For example, `is-layout-flow` is for blocks (such as Group) that use the default/flow layout, and `is-content-justification-right` is added when a user sets a block to use right justification.
 - Individual styles are generated for non-default layout values that are set on the individual block being rendered. These styles are attached to the block via a container class name using the form `wp-container-$id` where the `$id` is a [unique number](https://developer.wordpress.org/reference/functions/wp_unique_id/).
@@ -539,11 +539,11 @@ For controlling spacing between blocks, and enabling block spacing controls see:
 
 #### Targeting layout or container blocks from themes
 
-The Layout block support is designed to enable control over layout features from within the block and site editors. Where possible, try to use the features of the blocks to determine particular layout requirements rather than relying upon additional stylesheets.
+The layout block support is designed to enable control over layout features from within the block and site editors. Where possible, try to use the features of the blocks to determine particular layout requirements rather than relying upon additional stylesheets.
 
 For themes that wish to target container blocks in order to add or adjust particular styles, the block's class name is often the best class name to use. Class names such as `wp-block-group` or `wp-block-columns` are usually reliable class names for targeting a particular block.
 
-For targeting a block that uses a particular Layout type, avoid targeting `wp-container-` as container classes may not always be present in the rendered markup.
+For targeting a block that uses a particular layout type, avoid targeting `wp-container-` as container classes may not always be present in the rendered markup.
 
 ##### Semantic class names
 
