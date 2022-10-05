@@ -67,9 +67,11 @@ function useSlotRegistry() {
 		if ( fills.current.get( name ) ) {
 			fills.current.set(
 				name,
-				fills.current
-					.get( name )
-					.filter( ( fillRef ) => fillRef !== ref )
+				valRef(
+					fills.current
+						.get( name )
+						.filter( ( fillRef ) => fillRef !== ref )
+				)
 			);
 		}
 	}, [] );
