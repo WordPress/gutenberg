@@ -10,13 +10,39 @@ import { useDebounce, usePrevious } from '@wordpress/compose';
 import { RawHTML, useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { __experimentalSanitizeBlockAttributes } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import { rendererPath, removeBlockSupportAttributes } from './utils';
+const EMPTY_OBJECT = {};
+
+export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {
+	return addQueryArgs( `/wp/v2/block-renderer/${ block }`, {
+		context: 'edit',
+		...( null !== attributes ? { attributes } : {} ),
+		...urlQueryArgs,
+	} );
+}
+
+export function removeBlockSupportAttributes( attributes ) {
+	const {
+		backgroundColor,
+		borderColor,
+		fontFamily,
+		fontSize,
+		gradient,
+		textColor,
+		...restAttributes
+	} = attributes;
+
+	const { border, color, elements, spacing, typography, ...restStyles } =
+		attributes?.style || EMPTY_OBJECT;
+
+	return {
+		...restAttributes,
+		style: restStyles,
+	};
+}
 
 function DefaultEmptyResponsePlaceholder( { className } ) {
 	return (
@@ -90,10 +116,8 @@ export default function ServerSideRender( props ) {
 			__experimentalSanitizeBlockAttributes( block, attributes );
 
 		if ( skipBlockSupportAttributes ) {
-			sanitizedAttributes = removeBlockSupportAttributes(
-				block,
-				sanitizedAttributes
-			);
+			sanitizedAttributes =
+				removeBlockSupportAttributes( sanitizedAttributes );
 		}
 
 		// If httpMethod is 'POST', send the attributes in the request body instead of the URL.
