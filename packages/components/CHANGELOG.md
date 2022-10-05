@@ -31,6 +31,10 @@
 -   `FontSizePicker`: Convert to TypeScript ([#44449](https://github.com/WordPress/gutenberg/pull/44449)).
 -   `FontSizePicker`: Replace SCSS with Emotion + components ([#44483](https://github.com/WordPress/gutenberg/pull/44483)).
 
+### Experimental
+
+-   Add experimental `Theme` component ([#44668](https://github.com/WordPress/gutenberg/pull/44668)).
+
 ## 21.1.0 (2022-09-21)
 
 ### Deprecations
