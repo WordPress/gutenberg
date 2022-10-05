@@ -1191,10 +1191,6 @@ _Parameters_
 
 Action that hides the insertion point.
 
-_Returns_
-
--   `Object`: Action object.
-
 ### insertAfterBlock
 
 Action that inserts an empty block after a given block.
