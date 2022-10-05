@@ -126,10 +126,7 @@ export function removeBlockSupportAttributes( block, attributes ) {
 	return cleanEmptyObject( {
 		...restAttributes,
 		...newAttributes,
-		style: {
-			...style,
-			...newStyle,
-		},
+		style: newStyle,
 	} );
 }
 
