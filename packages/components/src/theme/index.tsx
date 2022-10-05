@@ -3,18 +3,14 @@
  */
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import type { ReactNode } from 'react';
+
 import { colord } from 'colord';
 
 /**
  * Internal dependencies
  */
+import type { ThemeProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
-
-type ThemeProps = {
-	accent?: string;
-	children?: ReactNode;
-};
 
 const colors = ( { accent }: ThemeProps ) => {
 	const accentColor = accent
