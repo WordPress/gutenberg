@@ -2,17 +2,22 @@
 
 This document introduces the main concepts related to styles that affect the user content in the block editor. It points to the relevant reference guides and tutorials for readers to dig deeper into each one of the ideas presented. It's aimed to block authors and people working in the block editor project.
 
-1. HTML and CSS
-2. Block styles
--   From UI controls to HTML markup
--   Block Supports API
--   Current limits of the Block Supports API
-3. Global styles
--   Gather data
--   Consolidate data
--   From data to styles
--   Current limits of the Global styles API
-4. Structural layout styles
+1. [HTML and CSS](#html-and-css)
+2. [Block styles](#block-styles)
+  - [From UI controls to HTML markup](#from-ui-controls-to-html-markup)
+  - [Block Supports API](#block-supports-api)
+  - [Current limitations of the Block Supports API](#current-limitations-of-the-block-supports-api)
+3. [Global styles](#global-styles)
+  - [Gather data](#gather-data)
+  - [Consolidate data](#consolidate-data)
+  - [From data to styles](#from-data-to-styles)
+  - [Current limitations of the Global Styles API](#current-limitations-of-the-global-styles-api)
+4. [Structural layout styles](#structural-layout-styles)
+  - [Base layout styles](#base-layout-styles)
+  - [Individual layout styles](#individual-layout-styles)
+  - [Available layout types](#available-layout-types)
+  - [Targeting layout or container blocks from themes](#targeting-layout-or-container-blocks-from-themes)
+  - [Opting out of generated layout styles](#opting-out-of-generated-layout-styles)
 
 ### HTML and CSS
 
@@ -477,23 +482,23 @@ In addition to the CSS Custom Properties, all presets but duotone generate CSS c
 
 #### Current limitations of the Global Styles API
 
-1. **Setting a different CSS selector for blocks requires server-registration**
+##### 1. **Setting a different CSS selector for blocks requires server-registration**
 
 By default, the selector assigned to a block is `.wp-block-<block-name>`. However, blocks can change this should they need. They can provide a CSS selector via the `__experimentalSelector` property in its `block.json`.
 
 If blocks do this, they need to be registered in the server using the `block.json`, otherwise, the global styles code doesn't have access to that information and will use the default CSS selector for the block.
 
-2. **Can't target different HTML nodes for different styles**
+##### 2. **Can't target different HTML nodes for different styles**
 
 Every chunk of styles can only use a single selector.
 
 This is particularly relevant if the block is using `__experimentalSkipSerialization` to serialize the different style properties to different nodes other than the wrapper. See "Current limitations of blocks supports" for more.
 
-3. **Only a single property per block**
+##### 3. **Only a single property per block**
 
 Similarly to block supports, there can be only one instance of any style in use by the block. For example, the block can only have a single font size. See related "Current limitations of block supports".
 
-4. **Only blocks using block supports are shown in the Global Styles UI**
+##### 4. **Only blocks using block supports are shown in the Global Styles UI**
 
 The global styles UI in the site editor has a screen for per-block styles. The list of blocks is generated dynamically using the block supports from the `block.json` of blocks. If a block wants to be listed there, it needs to use the block supports mechanism.
 
@@ -507,20 +512,20 @@ While the feature is part of WordPress core, it is still flagged as experimental
 
 There are two primary places where Layout styles are output:
 
-1. Base layout styles
+#### Base layout styles
 
-Base layout styles are those styles that are common to all blocks that opt-in to a particular layout type. Examples of common base layout styling include setting `display: flex` for blocks that use the Flex layout type (such as Buttons and Social Icons), and providing default max-width for constrained layouts.
+Base layout styles are those styles that are common to all blocks that opt in to a particular layout type. Examples of common base layout styling include setting `display: flex` for blocks that use the Flex layout type (such as Buttons and Social Icons), and providing default max-width for constrained layouts.
 
 Base layout styles are output from within [the main PHP class](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/class-wp-theme-json.php) that handles global styles, and form part of the global styles stylesheet. In order to provide support for core blocks in classic themes, these styles are always output, irrespective of whether the theme provides its own `theme.json` file.
 
 Common layout definitions are stored in [the core `theme.json` file](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/theme.json), but are not intended to be extended or overridden by themes.
 
-2. Individual layout styles
+#### Individual layout styles
 
-When a block that opts-in to the experimental Layout support is rendered, two things are processed and added to the output:
+When a block that opts in to the experimental Layout support is rendered, two things are processed and added to the output via [`layout.php`](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-supports/layout.php):
 
-- Semantic class names are added to the block markup to indicate which Layout settings are in use. For example, `is-layout-flow` is for blocks (such as Group) that use the default/flow layout, and `is-content-justification-right` is added when a user sets a block to use right justification.
-- Individual styles are generated for non-default Layout values that are set on the individual block being rendered. These styles are attached to the block via a container class name using the form `wp-container-$id` where the `$id` is a random/unique number.
+- Semantic class names are added to the block markup to indicate which layout settings are in use. For example, `is-layout-flow` is for blocks (such as Group) that use the default/flow layout, and `is-content-justification-right` is added when a user sets a block to use right justification.
+- Individual styles are generated for non-default layout values that are set on the individual block being rendered. These styles are attached to the block via a container class name using the form `wp-container-$id` where the `$id` is a [unique number](https://developer.wordpress.org/reference/functions/wp_unique_id/).
 
 #### Available layout types
 
