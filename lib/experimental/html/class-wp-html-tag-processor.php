@@ -55,7 +55,7 @@
  * no argument is provided then it will find the next HTML tag,
  * regardless of what kind it is.
  *
- * If you want to _find whatever the next tag is_
+ * If you want to _find whatever the next tag is_:
  * ```php
  *     $tags->next_tag();
  * ```
@@ -411,7 +411,7 @@ class WP_HTML_Tag_Processor {
 			$this->parse_tag_opener_attributes();
 
 			if ( $this->matches() ) {
-				$already_found++;
+				++$already_found;
 			}
 
 			// Avoid copying the tag name string when possible.
@@ -490,7 +490,7 @@ class WP_HTML_Tag_Processor {
 			$at = $this->parsed_bytes;
 
 			if ( '>' === $html[ $at ] || '/' === $html[ $at ] ) {
-				$this->parsed_bytes++;
+				++$this->parsed_bytes;
 				return;
 			}
 		}
@@ -556,7 +556,7 @@ class WP_HTML_Tag_Processor {
 
 			if ( '/' === $html[ $at ] ) {
 				$is_closing = true;
-				$at++;
+				++$at;
 			} else {
 				$is_closing = false;
 			}
@@ -576,7 +576,7 @@ class WP_HTML_Tag_Processor {
 				( 'p' === $html[ $at + 4 ] || 'P' === $html[ $at + 4 ] ) &&
 				( 't' === $html[ $at + 5 ] || 'T' === $html[ $at + 5 ] )
 			) ) {
-				$at++;
+				++$at;
 				continue;
 			}
 
@@ -587,7 +587,7 @@ class WP_HTML_Tag_Processor {
 			$at += 6;
 			$c   = $html[ $at ];
 			if ( ' ' !== $c && "\t" !== $c && "\r" !== $c && "\n" !== $c && '/' !== $c && '>' !== $c ) {
-				$at++;
+				++$at;
 				continue;
 			}
 
@@ -606,12 +606,12 @@ class WP_HTML_Tag_Processor {
 				$this->skip_tag_closer_attributes();
 
 				if ( '>' === $html[ $this->parsed_bytes ] ) {
-					$this->parsed_bytes++;
+					++$this->parsed_bytes;
 					return;
 				}
 			}
 
-			$at++;
+			++$at;
 		}
 	}
 
@@ -646,7 +646,7 @@ class WP_HTML_Tag_Processor {
 			 */
 			$tag_name_prefix_length = strspn( $html, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', $at + 1 );
 			if ( $tag_name_prefix_length > 0 ) {
-				$at++;
+				++$at;
 				$this->tag_name_length    = $tag_name_prefix_length + strcspn( $html, " \t\f\r\n/>", $at + $tag_name_prefix_length );
 				$this->tag_name_starts_at = $at;
 				$this->parsed_bytes       = $at + $this->tag_name_length;
@@ -720,7 +720,7 @@ class WP_HTML_Tag_Processor {
 				continue;
 			}
 
-			$at++;
+			++$at;
 		}
 	}
 
@@ -731,7 +731,7 @@ class WP_HTML_Tag_Processor {
 	 */
 	private function parse_tag_opener_attributes() {
 		while ( $this->parse_next_attribute() ) {
-			// Twiddle our thumbs...
+			continue;
 		}
 	}
 
@@ -742,7 +742,7 @@ class WP_HTML_Tag_Processor {
 	 */
 	private function skip_tag_closer_attributes() {
 		while ( $this->parse_next_attribute( 'tag-closer' ) ) {
-			// Twiddle our thumbs...
+			continue;
 		}
 	}
 
@@ -778,7 +778,7 @@ class WP_HTML_Tag_Processor {
 
 		$has_value = '=' === $this->html[ $this->parsed_bytes ];
 		if ( $has_value ) {
-			$this->parsed_bytes++;
+			++$this->parsed_bytes;
 			$this->skip_whitespace();
 
 			switch ( $this->html[ $this->parsed_bytes ] ) {

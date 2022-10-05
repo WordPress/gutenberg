@@ -204,7 +204,6 @@ class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
 			(string) $p,
 			'Calling __toString after removing the id attribute of the third tag returned different HTML than expected'
 		);
-
 	}
 
 	/**

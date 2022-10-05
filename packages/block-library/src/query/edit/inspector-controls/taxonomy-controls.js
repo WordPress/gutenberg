@@ -116,6 +116,7 @@ export function TaxonomyControls( { onChange, query } ) {
 								value={ getExistingTaxQueryValue( slug ) }
 								suggestions={ terms.names }
 								onChange={ onTermsChange( slug ) }
+								__experimentalShowHowTo={ false }
 							/>
 						</div>
 					);
