@@ -6,7 +6,7 @@ This feature is still experimental. “Experimental” means this is an early im
 
 `Theme` allows defining theme variables for components in the `@wordpress/components` package.
 
-Multiple `Theme` components can be use and nested, in order to override specific theme variables.
+Multiple `Theme` components can be nested in order to override specific theme variables.
 
 ## Usage
 
@@ -29,6 +29,6 @@ const Example = () => {
 
 ### `accent`: `CSSProperties[ 'color' ]`
 
-The accent color, used as the primary color _(wording TBD)_. If an accent color is not defined, the default fallback value is the original WP Admin main theme color.
+Used to set the accent color (used by components as the primary color). If an accent color is not defined, the default fallback value is the original WP Admin main theme color.
 
 -   Required: No
