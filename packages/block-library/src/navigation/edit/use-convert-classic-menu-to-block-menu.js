@@ -19,7 +19,7 @@ export const CLASSIC_MENU_CONVERSION_IDLE = 'idle';
 
 // This is needed to ensure that multiple components using this hook
 // do not import the same classic menu twice.
-let isConvertingClassicMenu = null;
+let classicMenuBeingConvertedId = null;
 
 function useConvertClassicToBlockMenu( clientId ) {
 	/*
@@ -122,7 +122,7 @@ function useConvertClassicToBlockMenu( clientId ) {
 
 	const convert = useCallback( async ( menuId, menuName, postStatus ) => {
 		// Check whether this classic menu is being imported already.
-		if ( isConvertingClassicMenu === menuId ) {
+		if ( classicMenuBeingConvertedId === menuId ) {
 			return;
 		}
 
