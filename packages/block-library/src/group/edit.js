@@ -53,7 +53,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		? { ...defaultLayout, ...layout, type: 'default' }
 		: { ...defaultLayout, ...layout };
 	const { type = 'default' } = usedLayout;
-	const layoutSupportEnabled = themeSupportsLayout || type !== 'default';
+	const layoutSupportEnabled = themeSupportsLayout || type === 'flex';
 
 	const blockProps = useBlockProps();
 
