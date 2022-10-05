@@ -83,15 +83,3 @@ function gutenberg_enable_zoomed_out_view() {
 }
 
 add_action( 'admin_init', 'gutenberg_enable_zoomed_out_view' );
-
-/**
- * Sets a global JS variable used to trigger the availability of distraction free mode.
- */
-function gutenberg_enable_distraction_free_mode() {
-	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-distraction-free-mode', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableDistractionFreeMode = true', 'before' );
-	}
-}
-
-add_action( 'admin_init', 'gutenberg_enable_distraction_free_mode' );
