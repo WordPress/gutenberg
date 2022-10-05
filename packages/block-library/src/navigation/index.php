@@ -268,7 +268,7 @@ function block_core_navigation_get_classic_menu_fallback() {
 /**
  * Converts a classic navigation to blocks.
  *
- * @param  object WP_Term The classic navigation object to convert.
+ * @param  object $classic_nav_menu WP_Term The classic navigation object to convert.
  * @return array the normalized parsed blocks.
  */
 function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu ) {
@@ -328,9 +328,9 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
 		array(
 			'post_content' => $classic_nav_menu_blocks_serialized,
 			'post_title'   => $classic_nav_menu->slug,
-			'post_name'   => $classic_nav_menu->slug,
+			'post_name'    => $classic_nav_menu->slug,
 			'post_status'  => 'publish',
-			'post_type'    => 'wp_navigation'
+			'post_type'    => 'wp_navigation',
 		),
 		true // So that we can check whether the result is an error.
 	);
