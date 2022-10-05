@@ -32,6 +32,7 @@ export function removeBlockSupportAttributes( attributes ) {
 		fontSize,
 		gradient,
 		textColor,
+		className,
 		...restAttributes
 	} = attributes;
 
