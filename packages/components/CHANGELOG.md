@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 21.2.0 (2022-10-05)
+
 ### Enhancements
 
 -   `FontSizePicker`: Updated to take up full width of its parent and have a 40px Reset button when `size` is `__unstable-large` ((44559)[https://github.com/WordPress/gutenberg/pull/44559]).
