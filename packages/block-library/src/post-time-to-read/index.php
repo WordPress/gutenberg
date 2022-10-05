@@ -44,6 +44,16 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 		)
 		: __( 'less than a minute' );
 
+	if ( 0 !== $minutes_to_read ) {
+		$minutes_to_read_string = sprintf(
+			/* translators: %d is the number of minutes the post will take to read. */
+			_n( '%d minute', '%d minutes', $minutes_to_read ),
+			$minutes_to_read
+		);
+	} else {
+		$minutes_to_read_string = empty( $attributes['prefix'] ) ? __( 'Less than a minute' ) : __( 'less than a minute' );
+	}
+
 	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );

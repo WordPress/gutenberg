@@ -92,13 +92,15 @@ function PostTimeToReadEdit( {
 			return __( 'There is no content.' );
 		}
 
-		return minutesToRead !== 0
-			? sprintf(
-					/* translators: %d is the number of minutes the post will take to read. */
-					_n( '%d minute', '%d minutes', minutesToRead ),
-					minutesToRead
-			  )
-			: __( 'less than a minute' );
+		if ( minutesToRead !== 0 ) {
+			return sprintf(
+				/* translators: %d is the number of minutes the post will take to read. */
+				_n( '%d minute', '%d minutes', minutesToRead ),
+				minutesToRead
+			);
+		}
+
+		return prefix ? __( 'less than a minute' ) : __( 'Less than a minute' );
 	}, [ contentStructure, blocks ] );
 
 	const blockProps = useBlockProps( {
