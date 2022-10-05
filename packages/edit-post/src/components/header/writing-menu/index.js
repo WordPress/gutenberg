@@ -36,7 +36,6 @@ function WritingMenu( { onClose } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const toggleDistractionFree = () => {
-		setFeature( 'inlineToolbar', ! isDistractionFree );
 		setFeature( 'fixedToolbar', false );
 		setIsInserterOpened( false );
 		setIsListViewOpened( false );

@@ -19,11 +19,6 @@ import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
 	const { getBlockSelectionStart } = useSelect( blockEditorStore );
-	const isDistractionFree = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings().isDistractionFree,
-		[]
-	);
 	const {
 		getEditorMode,
 		isEditorSidebarOpened,
@@ -50,7 +45,6 @@ function KeyboardShortcuts() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 
 	const toggleDistractionFree = () => {
-		setFeature( 'inlineToolbar', ! isDistractionFree );
 		setFeature( 'fixedToolbar', false );
 		setIsInserterOpened( false );
 		setIsListViewOpened( false );
