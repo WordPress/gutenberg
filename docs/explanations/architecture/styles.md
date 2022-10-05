@@ -511,7 +511,7 @@ There are two primary places where Layout styles are output:
 
 Base layout styles are those styles that are common to all blocks that opt-in to a particular layout type. Examples of common base layout styling include setting `display: flex` for blocks that use the Flex layout type (such as Buttons and Social Icons), and providing default max-width for constrained layouts.
 
-Base layout styles are output from within [the main class](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/class-wp-theme-json.php) that handles global styles, and form part of the global styles stylesheet. In order to provide support for core blocks in classic themes, these styles are always output, irrespective of whether the theme provides its own `theme.json` file.
+Base layout styles are output from within [the main PHP class](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/class-wp-theme-json.php) that handles global styles, and form part of the global styles stylesheet. In order to provide support for core blocks in classic themes, these styles are always output, irrespective of whether the theme provides its own `theme.json` file.
 
 Common layout definitions are stored in [the core `theme.json` file](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/theme.json), but are not intended to be extended or overridden by themes.
 
