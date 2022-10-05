@@ -509,26 +509,28 @@ There are two primary places where Layout styles are output:
 
 1. Base layout styles
 
-Base layout styles are those styles that are common to all blocks that opt-in to a particular layout type. Examples of common base layout styling include setting `display: flex` for blocks that use the Flex layout type, such as Buttons and Social Icons.
+Base layout styles are those styles that are common to all blocks that opt-in to a particular layout type. Examples of common base layout styling include setting `display: flex` for blocks that use the Flex layout type (such as Buttons and Social Icons), and providing default max-width for constrained layouts.
 
-Base layout styles are output from within the main class that handles global styles, and form part of the global styles stylesheet. In order to provide support for core blocks in classic themes, these styles are always output, irrespective of whether the theme provides its own `theme.json` file.
+Base layout styles are output from within [the main class](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/class-wp-theme-json.php) that handles global styles, and form part of the global styles stylesheet. In order to provide support for core blocks in classic themes, these styles are always output, irrespective of whether the theme provides its own `theme.json` file.
 
-Common layout definitions are stored in the core `theme.json` file, but are not intended to be extended or overridden by themes.
+Common layout definitions are stored in [the core `theme.json` file](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/theme.json), but are not intended to be extended or overridden by themes.
 
 2. Individual layout styles
 
 When a block that opts-in to the experimental Layout support is rendered, two things are processed and added to the output:
 
-- Semantic class names are added to the block markup to indicate which Layout settings are in use. Examples include `is-layout-flow` for blocks (such as Group) that use the default/flow layout.
+- Semantic class names are added to the block markup to indicate which Layout settings are in use. For example, `is-layout-flow` is for blocks (such as Group) that use the default/flow layout, and `is-content-justification-right` is added when a user sets a block to use right justification.
 - Individual styles are generated for non-default Layout values that are set on the individual block being rendered. These styles are attached to the block via a container class name using the form `wp-container-$id` where the `$id` is a random/unique number.
 
 #### Available layout types
 
-There are currently two layout types in use:
+There are currently three layout types in use:
 
 * Default/Flow: Items are stacked vertically. The parent container block is set to `display: flow` and the spacing between children is handled via vertical margins.
-* Constrained: Items are stacked vertically, with constrained widths for child content. Outputs widths for standard content size and wide size. Defaults to using global `contentSize` and `wideSize` values set in `settings.layout` in the `theme.json`.
+* Constrained: Items are stacked vertically, using the same spacing logic as the Flow layout. Features constrained widths for child content, outputting widths for standard content size and wide size. Defaults to using global `contentSize` and `wideSize` values set in `settings.layout` in the `theme.json`.
 * Flex: Items are displayed using a Flexbox layout. Defaults to a horizontal orientation. Spacing between children is handled via the `gap` CSS property.
+
+For controlling spacing between blocks, and enabling block spacing controls see: [What is blockGap and how can I use it?](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/#what-is-blockgap-and-how-can-i-use-it).
 
 #### Targeting layout or container blocks from themes
 
