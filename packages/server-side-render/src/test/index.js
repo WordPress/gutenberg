@@ -89,6 +89,7 @@ describe( 'rendererPath', () => {
 				gradient: 'vivid-cyan-blue-to-vivid-purple',
 				textColor: 'foreground',
 				customAttribute: 'customAttribute',
+				className: 'custom-class',
 				style: {
 					border: {
 						radius: '10px',
