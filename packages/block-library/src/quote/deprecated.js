@@ -70,6 +70,7 @@ const v4 = {
 		},
 	},
 	supports: {
+		align: [ 'left', 'right', 'center', 'wide', 'full' ],
 		anchor: true,
 		__experimentalSlashInserter: true,
 		typography: {
