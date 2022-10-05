@@ -52,6 +52,17 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-zoomed-out-view',
 		)
 	);
+	add_settings_field(
+		'gutenberg-distraction-free-mode',
+		__( 'Distraction free mode ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test a new distraction free mode in the post editor.', 'gutenberg' ),
+			'id'    => 'gutenberg-distraction-free-mode',
+		)
+	);
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

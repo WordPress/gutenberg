@@ -51,6 +51,9 @@ function WritingMenu( { onClose } ) {
 		return null;
 	}
 
+	const isDistractionFreeModeExperimentEnabled =
+		window?.__experimentalEnableDistractionFreeMode;
+
 	return (
 		<MenuGroup label={ _x( 'View', 'noun' ) }>
 			<PreferenceToggleMenuItem
@@ -81,16 +84,20 @@ function WritingMenu( { onClose } ) {
 				messageDeactivated={ __( 'Fullscreen mode deactivated' ) }
 				shortcut={ displayShortcut.secondary( 'f' ) }
 			/>
-			<PreferenceToggleMenuItem
-				scope="core/edit-post"
-				name="distractionFree"
-				toggleHandler={ toggleDistractionFree }
-				label={ __( 'Distraction free' ) }
-				info={ __( 'Write with calmness' ) }
-				messageActivated={ __( 'Distraction free mode activated' ) }
-				messageDeactivated={ __( 'Distraction free mode deactivated' ) }
-				shortcut={ displayShortcut.primaryShift( '\\' ) }
-			/>
+			{ isDistractionFreeModeExperimentEnabled && (
+				<PreferenceToggleMenuItem
+					scope="core/edit-post"
+					name="distractionFree"
+					toggleHandler={ toggleDistractionFree }
+					label={ __( 'Distraction free' ) }
+					info={ __( 'Write with calmness' ) }
+					messageActivated={ __( 'Distraction free mode activated' ) }
+					messageDeactivated={ __(
+						'Distraction free mode deactivated'
+					) }
+					shortcut={ displayShortcut.primaryShift( '\\' ) }
+				/>
+			) }
 		</MenuGroup>
 	);
 }

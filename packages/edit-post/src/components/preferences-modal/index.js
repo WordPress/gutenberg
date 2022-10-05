@@ -80,6 +80,9 @@ export default function EditPostPreferencesModal() {
 		closeGeneralSidebar();
 	};
 
+	const isDistractionFreeModeExperimentEnabled =
+		window?.__experimentalEnableDistractionFreeMode;
+
 	const sections = useMemo(
 		() => [
 			{
@@ -111,14 +114,16 @@ export default function EditPostPreferencesModal() {
 								'Customize options related to the block editor interface and editing flow.'
 							) }
 						>
-							<EnableFeature
-								featureName="distractionFree"
-								onToggle={ toggleDistractionFree }
-								help={ __(
-									'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
-								) }
-								label={ __( 'Distraction Free' ) }
-							/>
+							{ isDistractionFreeModeExperimentEnabled && (
+								<EnableFeature
+									featureName="distractionFree"
+									onToggle={ toggleDistractionFree }
+									help={ __(
+										'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
+									) }
+									label={ __( 'Distraction Free' ) }
+								/>
+							) }
 							<EnableFeature
 								featureName="focusMode"
 								help={ __(

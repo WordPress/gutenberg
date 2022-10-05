@@ -162,21 +162,25 @@ function KeyboardShortcuts() {
 	} );
 
 	useShortcut( 'core/edit-post/toggle-distraction-free', () => {
-		closeGeneralSidebar();
-		setIsListViewOpened( false );
-		toggleDistractionFree();
-		toggleFeature( 'distractionFree' );
-		const modeState = isFeatureActive( 'distractionFree' )
-			? __( 'on' )
-			: __( 'off' );
-		createInfoNotice(
-			// translators: Mode of distraction free can be 'on' or 'off';
-			sprintf( __( 'Distraction free mode turned %s.' ), modeState ),
-			{
-				speak: true,
-				type: 'snackbar',
-			}
-		);
+		const isDistractionFreeModeExperimentEnabled =
+			window?.__experimentalEnableDistractionFreeMode;
+		if ( isDistractionFreeModeExperimentEnabled ) {
+			closeGeneralSidebar();
+			setIsListViewOpened( false );
+			toggleDistractionFree();
+			toggleFeature( 'distractionFree' );
+			const modeState = isFeatureActive( 'distractionFree' )
+				? __( 'on' )
+				: __( 'off' );
+			createInfoNotice(
+				// translators: Mode of distraction free can be 'on' or 'off';
+				sprintf( __( 'Distraction free mode turned %s.' ), modeState ),
+				{
+					speak: true,
+					type: 'snackbar',
+				}
+			);
+		}
 	} );
 
 	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {
