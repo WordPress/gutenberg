@@ -17,7 +17,7 @@ const animateVariants = {
 	exit: { opacity: 0, scaleY: 0.9 },
 };
 
-function BlockPopoverDropZone( {
+function BlockDropZonePopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
 } ) {
@@ -60,4 +60,4 @@ function BlockPopoverDropZone( {
 	);
 }
 
-export default BlockPopoverDropZone;
+export default BlockDropZonePopover;

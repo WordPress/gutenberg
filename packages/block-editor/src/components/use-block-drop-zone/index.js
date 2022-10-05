@@ -186,23 +186,22 @@ export default function useBlockDropZone( {
 					// Ensure the element is a block. It should have the `wp-block` class.
 					( element ) => element.classList.contains( 'wp-block' )
 				);
-				// The second value in the tuple is only needed afterwards but we don't want to recalculate it.
-				// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-				const [ nearestBlockIndex, insertPosition ] =
-					getNearestBlockIndex(
-						blockElements,
-						{ x: event.clientX, y: event.clientY },
-						getBlockListSettings( targetRootClientId )?.orientation
-					);
 
 				// The block list is empty, don't show the insertion point but still allow dropping.
-				if ( nearestBlockIndex === undefined ) {
+				if ( blockElements.length === 0 ) {
 					setDropTarget( {
 						index: 0,
 						operation: 'insert',
 					} );
 					return;
 				}
+
+				const [ nearestBlockIndex, insertPosition ] =
+					getNearestBlockIndex(
+						blockElements,
+						{ x: event.clientX, y: event.clientY },
+						getBlockListSettings( targetRootClientId )?.orientation
+					);
 
 				const blocks = getBlocks( targetRootClientId );
 				const [ targetIndex, operation ] =
