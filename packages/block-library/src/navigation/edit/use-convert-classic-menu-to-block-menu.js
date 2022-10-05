@@ -66,8 +66,6 @@ function useConvertClassicToBlockMenu( clientId ) {
 			);
 		}
 
-		classicMenuItems = null;
-
 		// Handle offline response which resolves to `null`.
 		if ( classicMenuItems === null ) {
 			throw new Error(
