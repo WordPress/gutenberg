@@ -28,12 +28,14 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 	const breakpointEntries = Object.entries( breakpoints );
 
 	const setIsMatching = () => {
-		const matches = breakpointEntries.flatMap( ( [ name, width ] ) => {
-			return operatorEntries.map( ( [ operator, condition ] ) => [
-				`${ operator } ${ name }`,
-				matchWidth( condition, width ),
-			] );
-		} );
+		const matches = Object.fromEntries(
+			breakpointEntries.flatMap( ( [ name, width ] ) => {
+				return operatorEntries.map( ( [ operator, condition ] ) => [
+					`${ operator } ${ name }`,
+					matchWidth( condition, width ),
+				] );
+			} )
+		);
 
 		dispatch( store ).setIsMatching( matches );
 	};
