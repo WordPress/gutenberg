@@ -129,7 +129,6 @@ function CommentTemplateInnerBlocks( {
 			 is ALWAYS rendered and the preview for the active block is hidden.
 			 This ensures that when switching the active block, the component is not
 			 mounted again but rather it only toggles the `isHidden` prop.
- 
 			 The same strategy is used for preventing the flicker in the Post Template
 			 block. */ }
 			<MemoizedCommentTemplatePreview
