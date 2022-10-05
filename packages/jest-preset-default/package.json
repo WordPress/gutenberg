@@ -36,8 +36,8 @@
 	"peerDependencies": {
 		"@babel/core": ">=7",
 		"jest": ">=27",
-		"react": "^17.0.0",
-		"react-dom": "^17.0.0"
+		"react": ">=17",
+		"react-dom": ">=17"
 	},
 	"publishConfig": {
 		"access": "public"
