@@ -264,8 +264,17 @@
 .is-outline-mode .block-editor-block-list__block:not(.remove-outline) {
 	&.is-hovered {
 		cursor: default;
-		box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
-		border-radius: $radius-block-ui;
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: $border-width;
+			left: $border-width;
+			right: $border-width;
+			bottom: $border-width;
+			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
+			border-radius: $radius-block-ui - $border-width;
+		}
 	}
 
 	&.is-selected {
