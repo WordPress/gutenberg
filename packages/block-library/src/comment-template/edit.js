@@ -37,7 +37,7 @@ const TEMPLATE = [
  *
  * @param {Object}  settings                       Discussion Settings.
  * @param {number}  [settings.perPage]             - Comments per page setting or block attribute.
- * @param {boolean}  [settings.pageComments]       - Enable break comments into pages setting.
+ * @param {boolean} [settings.pageComments]        - Enable break comments into pages setting.
  * @param {boolean} [settings.threadComments]      - Enable threaded (nested) comments setting.
  * @param {number}  [settings.threadCommentsDepth] - Level deep of threaded comments.
  *
