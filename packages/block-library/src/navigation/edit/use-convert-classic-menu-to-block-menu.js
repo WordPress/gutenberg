@@ -66,6 +66,8 @@ function useConvertClassicToBlockMenu( clientId ) {
 			);
 		}
 
+		classicMenuItems = null;
+
 		// Handle offline response which resolves to `null`.
 		if ( classicMenuItems === null ) {
 			throw new Error(
@@ -153,6 +155,9 @@ function useConvertClassicToBlockMenu( clientId ) {
 				setError( err?.message );
 				// Reset the ID for the currently importing classic menu.
 				setStatus( CLASSIC_MENU_CONVERSION_ERROR );
+
+				// Reset the ID for the currently importing classic menu.
+				classicMenuBeingConvertedId = null;
 
 				// Rethrow error for debugging.
 				throw new Error(
