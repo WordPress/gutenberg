@@ -55,7 +55,7 @@
  * no argument is provided then it will find the next HTML tag,
  * regardless of what kind it is.
  *
- * If you want to _find whatever the next tag is_
+ * If you want to _find whatever the next tag is_:
  * ```php
  *     $tags->next_tag();
  * ```
