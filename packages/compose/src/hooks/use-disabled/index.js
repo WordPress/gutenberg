@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
@@ -89,8 +84,7 @@ export default function useDisabled( {
 
 				focus.focusable.find( node ).forEach( ( focusable ) => {
 					if (
-						includes(
-							DISABLED_ELIGIBLE_NODE_NAMES,
+						DISABLED_ELIGIBLE_NODE_NAMES.includes(
 							focusable.nodeName
 						) &&
 						// @ts-ignore

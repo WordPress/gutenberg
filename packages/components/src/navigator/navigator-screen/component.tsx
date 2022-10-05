@@ -83,6 +83,14 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 			return;
 		}
 
+		const activeElement = wrapperRef.current.ownerDocument.activeElement;
+
+		// If an element is already focused within the wrapper do not focus the
+		// element. This prevents inputs or buttons from losing focus unecessarily.
+		if ( wrapperRef.current.contains( activeElement ) ) {
+			return;
+		}
+
 		let elementToFocus: HTMLElement | null = null;
 
 		// When navigating back, if a selector is provided, use it to look for the
@@ -99,7 +107,6 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 			const firstTabbable = (
 				focus.tabbable.find( wrapperRef.current ) as HTMLElement[]
 			 )[ 0 ];
-
 			elementToFocus = firstTabbable ?? wrapperRef.current;
 		}
 

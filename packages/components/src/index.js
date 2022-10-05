@@ -16,7 +16,7 @@ export {
 	default as Animate,
 	getAnimateClassName as __unstableGetAnimateClassName,
 } from './animate';
-export { __unstableMotion } from './animation';
+export { __unstableMotion, __unstableAnimatePresence } from './animation';
 export { default as AnglePickerControl } from './angle-picker-control';
 export {
 	default as Autocomplete,
@@ -188,6 +188,7 @@ export {
 	Fill,
 	Provider as SlotFillProvider,
 	useSlot as __experimentalUseSlot,
+	useSlotFills as __experimentalUseSlotFills,
 } from './slot-fill';
 export { default as __experimentalStyleProvider } from './style-provider';
 export { ZStack as __experimentalZStack } from './z-stack';
