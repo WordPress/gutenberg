@@ -4,6 +4,7 @@
 import { WithGlobalCSS } from './decorators/with-global-css';
 import { WithMarginChecker } from './decorators/with-margin-checker';
 import { WithRTL } from './decorators/with-rtl';
+import { WithTheme } from './decorators/with-theme';
 import './style.scss';
 
 export const globalTypes = {
@@ -16,6 +17,19 @@ export const globalTypes = {
 			items: [
 				{ value: 'ltr', title: 'LTR' },
 				{ value: 'rtl', title: 'RTL' },
+			],
+		},
+	},
+	componentsTheme: {
+		name: 'Theme',
+		description: 'Change the components theme.',
+		defaultValue: 'default',
+		toolbar: {
+			icon: 'paintbrush',
+			items: [
+				{ value: 'default', title: 'Default' },
+				{ value: 'modern', title: 'Modern' },
+				{ value: 'sunrise', title: 'Sunrise' },
 			],
 		},
 	},
@@ -51,7 +65,12 @@ export const globalTypes = {
 	},
 };
 
-export const decorators = [ WithGlobalCSS, WithMarginChecker, WithRTL ];
+export const decorators = [
+	WithTheme,
+	WithGlobalCSS,
+	WithMarginChecker,
+	WithRTL,
+];
 
 export const parameters = {
 	controls: {
