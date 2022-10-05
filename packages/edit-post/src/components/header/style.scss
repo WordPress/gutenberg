@@ -45,9 +45,13 @@
 
 
 		// hide some parts
-		& > .edit-post-header__settings > .editor-post-preview,
-		& > .edit-post-header__toolbar {
+		& > .edit-post-header__settings > .editor-post-preview {
 			visibility: hidden;
+		}
+
+		& > .edit-post-header__toolbar .edit-post-header-toolbar__inserter-toggle,
+		& > .edit-post-header__toolbar .edit-post-header-toolbar__list-view-toggle {
+			display: none;
 		}
 
 		& > .edit-post-header__settings > .block-editor-post-preview__dropdown {
