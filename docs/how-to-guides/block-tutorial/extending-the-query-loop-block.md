@@ -111,13 +111,13 @@ innerBlocks: [
 ],
 ```
 
-By having `innerBlocks` in your variation you essentially skip the set up phase of Query Loop block with suggested patterns and the block is inserted with these inner blocks as its starting content.
+By having `innerBlocks` in your variation you essentially skip the setup phase of Query Loop block with suggested patterns and the block is inserted with these inner blocks as its starting content.
 
-The other way would be to register patterns specific to your variation, which are going to be suggested in set up and replace flows of the block.
+The other way would be to register patterns specific to your variation, which are going to be suggested in the setup, and replace flows of the block.
 
-Query Loop determines if there is an active variation of the block and if there are available specific patterns for this variation. If there are, these patterns are going to be the only ones suggested to the user, without including the default ones for Query Loop. If there are no such patterns, the default ones for Query Loop are going to be suggested.
+The Query Loop block determines if there is an active variation of itself and if there are specific patterns available for this variation. If there are, these patterns are going to be the only ones suggested to the user, without including the default ones for the original Query Loop block. Otherwise, if there are no such patterns, the default ones are going to be suggested.
 
-In order for a pattern to be 'connected' with a Query Loop variation, you should add to the pattern's `blockTypes` property the name of your variation prefixed with the Query Loop name(ex. core/query/$variation_name). For more details about registering patterns [see here](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-patterns/).
+In order for a pattern to be “connected” with a Query Loop variation, you should add the name of your variation prefixed with the Query Loop name (e.g. `core/query/$variation_name`) to the pattern's `blockTypes` property. For more details about registering patterns [see here](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-patterns/).
 
 ### Making Gutenberg recognize your variation
 
@@ -160,11 +160,11 @@ Even with all of this, your custom post type might have unique requirements: it 
 
 ### Disabling irrelevant or unsupported query controls
 
-Let's say you don't use at all the `sticky` attribute in your books, so that would be totally irrelevant to the customization of your block. In order to not confuse the users as to what a setting might do, and only exposing a clear UX to them, we want this control to be unavailable. Furthermore, let's say that you don't use the `author` field at all, which generally indicates the person who has added that post to the database, instead you use a custom `bookAuthor` field. As such, not only keeping the `author` filter would be confusing, it would outright 'break' your query.
+Let's say you don't use at all the `sticky` attribute in your books, so that would be totally irrelevant to the customization of your block. In order to not confuse the users as to what a setting might do, and only exposing a clear UX to them, we want this control to be unavailable. Furthermore, let's say that you don't use the `author` field at all, which generally indicates the person who has added that post to the database, instead you use a custom `bookAuthor` field. As such, not only keeping the `author` filter would be confusing, it would outright “break” your query.
 
-For this reason, the Query Loop variations support a property called `allowedControls`, which accepts an array of keys of the controls we want to display on the inspector sidebar. By default, we accept all the controls, but as soon as we provide an array to this property, we want to specify only the controls which are going to be relevant for us!
+For this reason, the Query Loop block variations support a property called `allowedControls`, which accepts an array of keys of the controls we want to display on the inspector sidebar. By default, we accept all the controls, but as soon as we provide an array to this property, we want to specify only the controls which are going to be relevant for us!
 
-As of GB version 14.2, the following controls are available:
+As of Gutenberg version 14.2, the following controls are available:
 
 -   `inherit` - Shows the toggle switch for allowing the query to be inherited directly from the template.
 -   `postType` - Shows a dropdown of available post types.
