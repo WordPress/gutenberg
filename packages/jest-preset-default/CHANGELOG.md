@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.0.0 (2022-10-05)
+
 ### Breaking Change
 
 -   Testing: Remove enzyme completely ([#44494](https://github.com/WordPress/gutenberg/pull/44494)). See the [example in the README](./README.md#using-enzyme) for instructions on how to continue using `enzyme` in your project.
