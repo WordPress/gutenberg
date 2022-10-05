@@ -19,11 +19,6 @@ export const STYLE_PROPERTY = {
 			support: [ 'color', 'gradients' ],
 		},
 	},
-	elements: {
-		link: {
-			support: [ 'color', 'link' ],
-		},
-	},
 	typography: {
 		fontSize: {
 			support: [ 'typography', 'fontSize' ],
