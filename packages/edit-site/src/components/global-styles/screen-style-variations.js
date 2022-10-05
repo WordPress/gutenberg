@@ -87,6 +87,7 @@ function Variation( { variation } ) {
 					<StylesPreview
 						label={ variation?.title }
 						isFocused={ isFocused }
+						withHoverView
 					/>
 				</div>
 			</div>

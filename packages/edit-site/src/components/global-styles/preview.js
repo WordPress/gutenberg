@@ -55,7 +55,7 @@ const normalizedHeight = 152;
 
 const normalizedColorSwatchSize = 32;
 
-const StylesPreview = ( { label, isFocused, isWall } ) => {
+const StylesPreview = ( { label, isFocused, withHoverView } ) => {
 	const [ fontWeight ] = useStyle( 'typography.fontWeight' );
 	const [ fontFamily = 'serif' ] = useStyle( 'typography.fontFamily' );
 	const [ headingFontFamily = fontFamily ] = useStyle(
@@ -187,7 +187,7 @@ const StylesPreview = ( { label, isFocused, isWall } ) => {
 					</HStack>
 				</motion.div>
 				<motion.div
-					variants={ ! isWall && midFrame }
+					variants={ withHoverView && midFrame }
 					style={ {
 						height: '100%',
 						width: '100%',
