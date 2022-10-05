@@ -1,16 +1,10 @@
 /**
- * WordPress dependencies
- */
-import {
-	registerBlockType,
-	unregisterBlockType,
-	getBlockTypes,
-} from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
-import { rendererPath, removeBlockSupportAttributes } from '../utils';
+import {
+	rendererPath,
+	removeBlockSupportAttributes,
+} from '../server-side-render';
 
 describe( 'rendererPath', () => {
 	test( 'should return an base path for empty input', () => {
@@ -84,206 +78,64 @@ describe( 'rendererPath', () => {
 			'/wp/v2/block-renderer/core/test-block?context=edit&attributes%5BstringArg%5D=test&id=1234'
 		);
 	} );
-} );
 
-describe( 'skipBlockSupportAttributes', () => {
-	afterEach( () => {
-		getBlockTypes().forEach( ( block ) => {
-			unregisterBlockType( block.name );
-		} );
-	} );
-
-	const attributes = {
-		className: 'class-name',
-		customAttribute: 'custom-attribute',
-		textColor: 'foreground',
-		backgroundColor: 'foreground',
-		gradient: 'vivid-cyan-blue-to-vivid-purple',
-		fontSize: 'small',
-		fontFamily: 'system-font',
-		borderColor: 'foreground',
-		style: {
-			color: {
-				text: '#000000',
-				background: '#000000',
-				gradients: '#000000',
-			},
-			typography: {
-				fontSize: '10px',
-				lineHeight: '1',
-				fontWeight: '500',
-				fontStyle: 'normal',
-				textTransform: 'uppercase',
-				textDecoration: 'line-through',
-				letterSpacing: '10px',
-			},
-			spacing: {
-				margin: {
-					top: '10px',
-					right: '10px',
-					bottom: '10px',
-					left: '10px',
-				},
-				padding: {
-					top: '10px',
-					right: '10px',
-					bottom: '10px',
-					left: '10px',
-				},
-				blockGap: '10px',
-			},
-			border: {
-				radius: '10px',
-				style: 'solid',
-				top: {
-					width: '10px',
-					color: '#000000',
-				},
-				right: {
-					width: '10px',
-					color: '#000000',
-				},
-				bottom: {
-					width: '10px',
-					color: '#000000',
-				},
-				left: {
-					width: '10px',
-					color: '#000000',
-				},
-			},
-		},
-	};
-
-	test( 'Should remove attributes and style properties', () => {
-		registerBlockType( 'core/test-block', {
-			category: 'text',
-			title: 'test block',
-			supports: {
-				color: {
-					text: true,
-					background: true,
-					gradients: true,
-					link: true,
-				},
-				typography: {
-					fontSize: true,
-					lineHeight: true,
-					__experimentalFontFamily: true,
-					__experimentalFontWeight: true,
-					__experimentalFontStyle: true,
-					__experimentalTextTransform: true,
-					__experimentalTextDecoration: true,
-					__experimentalLetterSpacing: true,
-				},
-				spacing: {
-					margin: true,
-					padding: true,
-					blockGap: true,
-				},
-				__experimentalBorder: {
-					radius: true,
-					width: true,
-					color: true,
-					style: true,
-				},
-			},
-		} );
-
+	test( 'Should remove attributes and style properties applied by the block supports', () => {
 		expect(
-			removeBlockSupportAttributes( 'core/test-block', attributes )
+			removeBlockSupportAttributes( {
+				backgroundColor: 'foreground',
+				borderColor: 'foreground',
+				fontFamily: 'system-font',
+				fontSize: 'small',
+				gradient: 'vivid-cyan-blue-to-vivid-purple',
+				textColor: 'foreground',
+				customAttribute: 'customAttribute',
+				style: {
+					border: {
+						radius: '10px',
+						style: 'solid',
+						width: '10px',
+					},
+					color: {
+						background: '#000000',
+						text: '#000000',
+					},
+					elements: {
+						link: {
+							color: {
+								text: '#000000',
+							},
+						},
+					},
+					spacing: {
+						margin: {
+							top: '10px',
+							right: '10px',
+							bottom: '10px',
+							left: '10px',
+						},
+						padding: {
+							top: '10px',
+							right: '10px',
+							bottom: '10px',
+							left: '10px',
+						},
+					},
+					typography: {
+						fontSize: '10px',
+						fontStyle: 'normal',
+						fontWeight: '500',
+						letterSpacing: '10px',
+						lineHeight: '1',
+						textDecoration: 'line-through',
+						textTransform: 'uppercase',
+					},
+					customStyle: 'customStyle',
+				},
+			} )
 		).toEqual( {
-			customAttribute: 'custom-attribute',
-		} );
-	} );
-
-	test( 'Should skip attributes and style properties which serialization is omitted', () => {
-		registerBlockType( 'core/test-block', {
-			category: 'text',
-			title: 'test block',
-			supports: {
-				color: {
-					text: true,
-					background: true,
-					gradients: true,
-					link: true,
-					__experimentalSkipSerialization: [ 'text', 'gradients' ],
-				},
-				typography: {
-					fontSize: true,
-					lineHeight: true,
-					__experimentalFontFamily: true,
-					__experimentalFontWeight: true,
-					__experimentalFontStyle: true,
-					__experimentalTextTransform: true,
-					__experimentalTextDecoration: true,
-					__experimentalLetterSpacing: true,
-					__experimentalSkipSerialization: [
-						'fontSize',
-						'__experimentalFontWeight',
-					],
-				},
-				spacing: {
-					margin: true,
-					padding: true,
-					blockGap: true,
-					__experimentalSkipSerialization: true,
-				},
-				__experimentalBorder: {
-					radius: true,
-					width: true,
-					color: true,
-					style: true,
-					__experimentalSkipSerialization: [ 'width', 'style' ],
-				},
-			},
-		} );
-
-		expect(
-			removeBlockSupportAttributes( 'core/test-block', attributes )
-		).toEqual( {
-			customAttribute: 'custom-attribute',
-			textColor: 'foreground',
-			gradient: 'vivid-cyan-blue-to-vivid-purple',
-			fontSize: 'small',
+			customAttribute: 'customAttribute',
 			style: {
-				color: {
-					text: '#000000',
-				},
-				typography: {
-					fontSize: '10px',
-					fontWeight: '500',
-				},
-				spacing: {
-					margin: {
-						top: '10px',
-						right: '10px',
-						bottom: '10px',
-						left: '10px',
-					},
-					padding: {
-						top: '10px',
-						right: '10px',
-						bottom: '10px',
-						left: '10px',
-					},
-					blockGap: '10px',
-				},
-				border: {
-					style: 'solid',
-					top: {
-						width: '10px',
-					},
-					right: {
-						width: '10px',
-					},
-					bottom: {
-						width: '10px',
-					},
-					left: {
-						width: '10px',
-					},
-				},
+				customStyle: 'customStyle',
 			},
 		} );
 	} );

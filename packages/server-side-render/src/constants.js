@@ -1,7 +1,7 @@
 export const ATTRIBUTE_PROPERTY = {
 	textColor: [ 'color', 'text' ],
 	backgroundColor: [ 'color', 'background' ],
-	gradient: [ 'color', 'gradients' ],
+	gradient: [ 'color', 'gradient' ],
 	fontSize: [ 'typography', 'fontSize' ],
 	fontFamily: [ 'typography', '__experimentalFontFamily' ],
 	borderColor: [ '__experimentalBorder', 'color' ],
@@ -16,7 +16,7 @@ export const STYLE_PROPERTY = {
 			support: [ 'color', 'background' ],
 		},
 		gradient: {
-			support: [ 'color', 'gradients' ],
+			support: [ 'color', 'gradient' ],
 		},
 	},
 	typography: {
