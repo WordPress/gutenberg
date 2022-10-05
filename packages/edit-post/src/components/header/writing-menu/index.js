@@ -86,8 +86,8 @@ function WritingMenu( { onClose } ) {
 				scope="core/edit-post"
 				name="distractionFree"
 				toggleHandler={ toggleDistractionFree }
-				label={ __( 'Toggle interface' ) }
-				info={ __( 'Work without distraction' ) }
+				label={ __( 'Distraction free' ) }
+				info={ __( 'Write with calmness' ) }
 				messageActivated={ __( 'Distraction free mode activated' ) }
 				messageDeactivated={ __( 'Distraction free mode deactivated' ) }
 				shortcut={ displayShortcut.primaryShift( '\\' ) }
