@@ -621,8 +621,6 @@ export const insertBlocks =
 		}
 	};
 
-const delayedInsertionPointCalls = new WeakMap();
-
 /**
  * Action that shows the insertion point.
  *
@@ -630,40 +628,28 @@ const delayedInsertionPointCalls = new WeakMap();
  *                                    which to insert.
  * @param {?number} index             Index at which block should be inserted.
  * @param {Object}  __unstableOptions Whether or not to show an inserter button.
- */
-export const showInsertionPoint =
-	( rootClientId, index, __unstableOptions = {} ) =>
-	( { dispatch, registry } ) => {
-		const previousCall = delayedInsertionPointCalls.get( registry );
-		if ( previousCall ) {
-			clearTimeout( previousCall );
-		}
-		const { __unstableWithInserter, delay } = __unstableOptions;
-		delayedInsertionPointCalls.set(
-			registry,
-			setTimeout( () => {
-				dispatch( {
-					type: 'SHOW_INSERTION_POINT',
-					rootClientId,
-					index,
-					__unstableWithInserter,
-				} );
-			}, delay )
-		);
-	};
-
-/**
- * Action that hides the insertion point.
  *
  * @return {Object} Action object.
  */
+export function showInsertionPoint(
+	rootClientId,
+	index,
+	__unstableOptions = {}
+) {
+	const { __unstableWithInserter } = __unstableOptions;
+	return {
+		type: 'SHOW_INSERTION_POINT',
+		rootClientId,
+		index,
+		__unstableWithInserter,
+	};
+}
+/**
+ * Action that hides the insertion point.
+ */
 export const hideInsertionPoint =
 	() =>
-	( { select, dispatch, registry } ) => {
-		const previousCall = delayedInsertionPointCalls.get( registry );
-		if ( previousCall ) {
-			clearTimeout( previousCall );
-		}
+	( { select, dispatch } ) => {
 		if ( ! select.isBlockInsertionPointVisible() ) {
 			return;
 		}

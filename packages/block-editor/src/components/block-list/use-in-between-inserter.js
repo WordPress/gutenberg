@@ -146,7 +146,6 @@ export function useInBetweenInserter() {
 
 				showInsertionPoint( rootClientId, index, {
 					__unstableWithInserter: true,
-					delay: 500,
 				} );
 			}
 
