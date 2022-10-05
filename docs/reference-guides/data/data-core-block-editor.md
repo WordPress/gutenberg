@@ -1516,10 +1516,6 @@ _Parameters_
 -   _index_ `?number`: Index at which block should be inserted.
 -   _\_\_unstableOptions_ `Object`: Whether or not to show an inserter button.
 
-_Returns_
-
--   `Object`: Action object.
-
 ### startDraggingBlocks
 
 Returns an action object used in signalling that the user has begun to drag blocks.
