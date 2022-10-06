@@ -609,6 +609,18 @@ export function isReusableBlock( blockOrType ) {
 }
 
 /**
+ * Determines whether or not the given block is a navigation block. This is a
+ * special block type that can used to point to a wp_navigation post type.
+ *
+ * @param {Object} blockOrType Block or Block Type to test.
+ *
+ * @return {boolean} Whether the given block is a navigation block.
+ */
+export function isNavigationBlock( blockOrType ) {
+	return blockOrType?.name === 'core/navigation';
+}
+
+/**
  * Determines whether or not the given block is a template part. This is a
  * special block type that allows composing a page template out of reusable
  * design elements.

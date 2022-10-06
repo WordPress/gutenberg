@@ -15,7 +15,11 @@ import {
 import { lock as lockIcon, unlock as unlockIcon } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { isReusableBlock, getBlockType } from '@wordpress/blocks';
+import {
+	isReusableBlock,
+	isNavigationBlock,
+	getBlockType,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -41,21 +45,23 @@ function getTemplateLockValue( lock ) {
 export default function BlockLockModal( { clientId, onClose } ) {
 	const [ lock, setLock ] = useState( { move: false, remove: false } );
 	const { canEdit, canMove, canRemove } = useBlockLock( clientId );
-	const { isReusable, templateLock, hasTemplateLock } = useSelect(
-		( select ) => {
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
-			const blockName = getBlockName( clientId );
-			const blockType = getBlockType( blockName );
+	const { isReusable, isNavigation, templateLock, hasTemplateLock } =
+		useSelect(
+			( select ) => {
+				const { getBlockName, getBlockAttributes } =
+					select( blockEditorStore );
+				const blockName = getBlockName( clientId );
+				const blockType = getBlockType( blockName );
 
-			return {
-				isReusable: isReusableBlock( blockType ),
-				templateLock: getBlockAttributes( clientId )?.templateLock,
-				hasTemplateLock: !! blockType?.attributes?.templateLock,
-			};
-		},
-		[ clientId ]
-	);
+				return {
+					isReusable: isReusableBlock( blockType ),
+					isNavigation: isNavigationBlock( blockType ),
+					templateLock: getBlockAttributes( clientId )?.templateLock,
+					hasTemplateLock: !! blockType?.attributes?.templateLock,
+				};
+			},
+			[ clientId ]
+		);
 	const [ applyTemplateLock, setApplyTemplateLock ] = useState(
 		!! templateLock
 	);
@@ -70,9 +76,9 @@ export default function BlockLockModal( { clientId, onClose } ) {
 		setLock( {
 			move: ! canMove,
 			remove: ! canRemove,
-			...( isReusable ? { edit: ! canEdit } : {} ),
+			...( isReusable || isNavigation ? { edit: ! canEdit } : {} ),
 		} );
-	}, [ canEdit, canMove, canRemove, isReusable ] );
+	}, [ canEdit, canMove, canRemove, isReusable, isNavigation ] );
 
 	const isAllChecked = Object.values( lock ).every( Boolean );
 	const isMixed = Object.values( lock ).some( Boolean ) && ! isAllChecked;
@@ -126,7 +132,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 						}
 					/>
 					<ul className="block-editor-block-lock-modal__checklist">
-						{ isReusable && (
+						{ ( isReusable || isNavigation ) && (
 							<li className="block-editor-block-lock-modal__checklist-item">
 								<CheckboxControl
 									label={
