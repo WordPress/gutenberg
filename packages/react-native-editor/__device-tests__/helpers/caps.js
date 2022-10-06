@@ -13,15 +13,15 @@ const ios = {
 
 exports.iosLocal = {
 	...ios,
-	deviceName: 'iPhone 11',
+	deviceName: 'iPhone 13',
 	wdaLaunchTimeout: 240000,
 	usePrebuiltWDA: true,
 };
 
 exports.iosServer = {
 	...ios,
-	platformVersion: '14.5', // Supported Sauce Labs platforms can be found here: https://saucelabs.com/rest/v1/info/platforms/appium
-	deviceName: 'iPhone 11 Simulator',
+	platformVersion: '15.4', // Supported Sauce Labs platforms can be found here: https://saucelabs.com/rest/v1/info/platforms/appium
+	deviceName: 'iPhone 13 Simulator',
 };
 
 exports.android = {
