@@ -25,7 +25,7 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - name: Cache NPM packages
-              uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
+              uses: actions/cache@56461b9eb0f8438fd15c7a9968e3c9ebb18ceff1 # v2.1.6
               with:
                   # npm cache files are stored in `~/.npm` on Linux/macOS
                   path: ~/.npm
