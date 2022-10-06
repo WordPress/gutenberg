@@ -671,7 +671,7 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 
 -	**Name:** core/quote
 -	**Category:** text
--	**Supports:** align (center, full, left, right, wide), anchor, color (background, gradients, link, text), typography (fontSize, lineHeight)
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), typography (fontSize, lineHeight)
 -	**Attributes:** citation, textAlign, value
 
 ## Read More
