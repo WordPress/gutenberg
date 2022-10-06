@@ -22,6 +22,8 @@ import {
 	shouldSkipSerialization,
 } from './utils';
 import useSetting from '../components/use-setting';
+// @TODO move this to a common lib and export.
+import { getTypographyFontSizeValue } from '../../../edit-site/src/components/global-styles/typography-utils';
 
 export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 
@@ -117,16 +119,27 @@ export function FontSizeEdit( props ) {
 		setAttributes,
 	} = props;
 	const fontSizes = useSetting( 'typography.fontSizes' );
+	const isFluidTypographyEnabled = useSetting( 'typography.fluid' );
 
 	const onChange = ( value ) => {
 		const fontSizeSlug = getFontSizeObjectByValue( fontSizes, value ).slug;
+		let fontSizeValue;
+		if (
+			isFluidTypographyEnabled &&
+			typeof style?.typography?.fontSize === 'string'
+		) {
+			fontSizeValue = getTypographyFontSizeValue(
+				{ size: style?.typography?.fontSize },
+				{ fluid: isFluidTypographyEnabled }
+			);
+		}
 
 		setAttributes( {
 			style: cleanEmptyObject( {
 				...style,
 				typography: {
 					...style?.typography,
-					fontSize: fontSizeSlug ? undefined : value,
+					fontSize: fontSizeSlug ? undefined : fontSizeValue || value,
 				},
 			} ),
 			fontSize: fontSizeSlug,
@@ -215,12 +228,42 @@ export function useIsFontSizeDisabled( { name: blockName } = {} ) {
 const withFontSizeInlineStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const fontSizes = useSetting( 'typography.fontSizes' );
+		const isFluidTypographyEnabled = useSetting( 'typography.fluid' );
 		const {
 			name: blockName,
 			attributes: { fontSize, style },
 			wrapperProps,
 		} = props;
-
+		console.log(
+			'what? hasBlockSupport',
+			hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY )
+		);
+		console.log(
+			'what? isFluidTypographyEnabled',
+			isFluidTypographyEnabled
+		);
+		let fontSizeValue;
+		let newProps = props;
+		if (
+			isFluidTypographyEnabled &&
+			typeof style?.typography?.fontSize === 'string'
+		) {
+			fontSizeValue = getTypographyFontSizeValue(
+				{ size: style?.typography?.fontSize },
+				{ fluid: isFluidTypographyEnabled }
+			);
+			newProps = {
+				...props,
+				wrapperProps: {
+					...wrapperProps,
+					style: {
+						fontSize: fontSizeValue,
+						...wrapperProps?.style,
+					},
+				},
+			};
+		}
+console.log( 'fontSizeValue 1', fontSizeValue );
 		// Only add inline styles if the block supports font sizes,
 		// doesn't skip serialization of font sizes,
 		// doesn't already have an inline font size,
@@ -235,16 +278,19 @@ const withFontSizeInlineStyles = createHigherOrderComponent(
 			! fontSize ||
 			style?.typography?.fontSize
 		) {
-			return <BlockListBlock { ...props } />;
+			return <BlockListBlock { ...newProps } />;
 		}
 
-		const fontSizeValue = getFontSize(
-			fontSizes,
-			fontSize,
-			style?.typography?.fontSize
-		).size;
-
-		const newProps = {
+		// @TODO Should be getFontSize()?
+		if ( ! isFluidTypographyEnabled ) {
+			fontSizeValue = getFontSize(
+				fontSizes,
+				fontSize,
+				style?.typography?.fontSize
+			).size;
+		}
+		console.log( 'fontSizeValue 2', fontSizeValue );
+		newProps = {
 			...props,
 			wrapperProps: {
 				...wrapperProps,

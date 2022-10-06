@@ -72,6 +72,7 @@ function gutenberg_register_typography_support( $block_type ) {
  * @return array Typography CSS classes and inline styles.
  */
 function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
+
 	if ( ! property_exists( $block_type, 'supports' ) ) {
 		return array();
 	}
@@ -108,7 +109,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	if ( $has_font_size_support && ! $should_skip_font_size ) {
 		$preset_font_size                    = array_key_exists( 'fontSize', $block_attributes ) ? "var:preset|font-size|{$block_attributes['fontSize']}" : null;
 		$custom_font_size                    = isset( $block_attributes['style']['typography']['fontSize'] ) ? $block_attributes['style']['typography']['fontSize'] : null;
-		$typography_block_styles['fontSize'] = $preset_font_size ? $preset_font_size : $custom_font_size;
+		$typography_block_styles['fontSize'] = $preset_font_size ? $preset_font_size : gutenberg_get_typography_font_size_value( array( 'size' => $custom_font_size ) );
 	}
 
 	if ( $has_font_family_support && ! $should_skip_font_family ) {
@@ -381,7 +382,7 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	$typography_settings         = gutenberg_get_global_settings( array( 'typography' ) );
 	$should_use_fluid_typography = isset( $typography_settings['fluid'] ) && true === $typography_settings['fluid'] ? true : $should_use_fluid_typography;
 
-	if ( ! $should_use_fluid_typography ) {
+	if ( ! $should_use_fluid_typography || empty( $preset['size'] ) ) {
 		return $preset['size'];
 	}
 

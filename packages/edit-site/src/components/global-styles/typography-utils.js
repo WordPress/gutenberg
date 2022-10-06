@@ -23,7 +23,7 @@
 export function getTypographyFontSizeValue( preset, typographySettings ) {
 	const { size: defaultSize } = preset;
 
-	if ( true !== typographySettings?.fluid ) {
+	if ( true !== typographySettings?.fluid || ! defaultSize ) {
 		return defaultSize;
 	}
 

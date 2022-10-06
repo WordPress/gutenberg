@@ -2,6 +2,9 @@
 	"version": 2,
 	"settings": {
 		"appearanceTools": true,
+		"typography": {
+			"fluid": true
+		},
 		"layout": {
 			"contentSize": "840px",
 			"wideSize": "1100px"
