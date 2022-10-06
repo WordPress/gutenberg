@@ -299,7 +299,7 @@ function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_me
 		$menu_items_by_parent_id
 	);
 
-	return $inner_blocks;
+	return serialize_blocks( $inner_blocks );
 }
 
 /**
@@ -316,17 +316,16 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
 	}
 
 	// If we have a classic menu then convert it to blocks.
-	$classic_nav_menu_blocks            = block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu );
-	$classic_nav_menu_blocks_serialized = serialize_blocks( $classic_nav_menu_blocks );
+	$classic_nav_menu_blocks = block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu );
 
-	if ( empty( $classic_nav_menu_blocks_serialized ) ) {
+	if ( empty( $classic_nav_menu_blocks ) ) {
 		return;
 	}
 
 	// Create a new navigation menu from the classic menu.
 	$wp_insert_post_result = wp_insert_post(
 		array(
-			'post_content' => $classic_nav_menu_blocks_serialized,
+			'post_content' => $classic_nav_menu_blocks,
 			'post_title'   => $classic_nav_menu->slug,
 			'post_name'    => $classic_nav_menu->slug,
 			'post_status'  => 'publish',
