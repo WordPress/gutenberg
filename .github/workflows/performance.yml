@@ -63,7 +63,7 @@ jobs:
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
                   ./bin/plugin/cli.js perf --ci $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 --tests-branch $GITHUB_SHA  --wp-version "$WP_MAJOR"
 
-            - uses: actions/github-script@0.3.0
+            - uses: actions/github-script@v6.3.1
               if: github.event_name == 'push'
               id: commit-timestamp
               with:
