@@ -305,9 +305,9 @@ function gutenberg_identify_inner_block_wrapper_classnames( $inner_content ) {
 
 	$matches = array();
 
-	preg_match_all( '/class="[a-z\-\_\s]*/', $inner_content[0], $matches );
+	preg_match_all( '/class="([a-z0-9\-\_\s]*)/', $inner_content[0], $matches );
 
-	return end( $matches[0] );
+	return end( $matches[1] );
 
 }
 
@@ -340,7 +340,6 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$class_names        = array();
 	$layout_definitions = _wp_array_get( $global_layout_settings, array( 'definitions' ), array() );
-	$block_classname    = wp_get_block_default_classname( $block['blockName'] );
 	$container_class    = wp_unique_id( 'wp-container-' );
 	$layout_classname   = '';
 
@@ -417,7 +416,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
 
 		$style = gutenberg_get_layout_style(
-			".$block_classname.$container_class",
+			".$container_class.$container_class",
 			$used_layout,
 			$has_block_gap_support,
 			$gap_value,

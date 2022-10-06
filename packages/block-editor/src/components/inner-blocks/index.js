@@ -150,7 +150,7 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
-	const { clientId } = useBlockEditContext();
+	const { clientId, layoutClassNames = '' } = useBlockEditContext();
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
 	const { __experimentalCaptureToolbars, hasOverlay } = useSelect(
 		( select ) => {
@@ -200,11 +200,15 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		innerBlocksProps.value && innerBlocksProps.onChange
 			? ControlledInnerBlocks
 			: UncontrolledInnerBlocks;
+	//Dedupe layout classes
+	const allTheClassNames = `${ props.className } ${ layoutClassNames }`;
+	const classNameSet = new Set( allTheClassNames.split( ' ' ) );
+	const dedupedClassNames = Array.from( classNameSet ).join( ' ' );
 	return {
 		...props,
 		ref,
 		className: classnames(
-			props.className,
+			dedupedClassNames,
 			'block-editor-block-list__layout',
 			{
 				'has-overlay': hasOverlay,
