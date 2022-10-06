@@ -1,7 +1,6 @@
 name: 'Stale Issue Gardening'
 
 on:
-  pull_request:
   schedule:
     - cron: '30 1 * * *'
 
@@ -44,7 +43,6 @@ jobs:
     steps:
       - name: Update issues
         uses: actions/stale@3de2653986ebd134983c79fe2be5d45cc3d9f4e1 # v6.0.0
-        if: ${{ false }}
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           stale-issue-message: ${{ matrix.message }}
