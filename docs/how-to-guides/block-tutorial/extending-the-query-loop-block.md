@@ -137,7 +137,7 @@ We need a way to tell the editor that this block is indeed your specific variati
 }
 ```
 
-You might have been tempted to only compare the `postType`, but in this way, Gutenberg will recognize the block as your variation any time the `postType` matches `book`! That's awesome, but the problem is that now Gutenberg will recognize the block as your specific variation any time the `postType` is set to `book`, which is not what we want. Other plugins might want to publish variations based on the `book` post type, or we might just not want the variation to be recognized every time the user sets the type to `book` manually through the editor settings.
+You might be tempted to only compare the `postType` so that Gutenberg will recognize the block as your variation any time the `postType` matches `book`. This casts a net too wide, however, as other plugins might want to publish variations based on the `book` post type too, or we might just not want the variation to be recognized every time the user sets the type to `book` manually through the editor settings.
 
 That's why the Query Loop block exposes a special attribute called `namespace`. It really doesn't do anything inside the block implementation, and it's used as an easy and consistent way for extenders to recognize and scope their own variation. In addition, `isActive` also accepts just an array of strings with the attributes to compare. Often, `namespace` would be sufficient, so you would use it like so:
 
