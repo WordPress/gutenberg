@@ -45,7 +45,7 @@ jobs:
                   path: ~/.gradle/caches
                   key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
 
-            - uses: reactivecircus/android-emulator-runner@5de26e4bd23bf523e8a4b7f077df8bfb8e52b50e # v2.19.1
+            - uses: reactivecircus/android-emulator-runner@d7b53ddc6e44254e1f4cf4a6ad67345837027a66 # v2.19.1
               with:
                   api-level: 28
                   emulator-build: 7425822 # https://github.com/ReactiveCircus/android-emulator-runner/issues/160#issuecomment-868615730
