@@ -5,7 +5,7 @@
 ### Enhancements
 
 -   `FontSizePicker`: Updated to take up full width of its parent and have a 40px Reset button when `size` is `__unstable-large` ((44559)[https://github.com/WordPress/gutenberg/pull/44559]).
--   `BorderBoxControl`: Omit unit select when values are mixed ([#44592](https://github.com/WordPress/gutenberg/pull/44592))
+-   `BorderBoxControl`: Omit unit select when width values are mixed ([#44592](https://github.com/WordPress/gutenberg/pull/44592))
 -   `BorderControl`: Add ability to disable unit selection ([#44592](https://github.com/WordPress/gutenberg/pull/44592))
 
 ### Bug Fix
