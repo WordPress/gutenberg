@@ -39,12 +39,13 @@ jobs:
             remove-stale-when-updated: false
             stale-issue-label: 'Needs Testing'
 
-      steps:
-        - uses: actions/stale@3de2653986ebd134983c79fe2be5d45cc3d9f4e1 # v6.0.0
-          with:
-            repo-token: ${{ secrets.GITHUB_TOKEN }}
-            stale-issue-message: ${{ matrix.message }}
-            days-before-stale: ${{ matrix.days-before-stale }}
-            days-before-close: ${{ matrix.days-before-close }}
-            remove-stale-when-updated: ${{ matrix.remove-stale-when-updated }}
-            stale-issue-label: ${{ matrix.stale-issue-label }}
+    steps:
+      - name: Update issues
+        uses: actions/stale@3de2653986ebd134983c79fe2be5d45cc3d9f4e1 # v6.0.0
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          stale-issue-message: ${{ matrix.message }}
+          days-before-stale: ${{ matrix.days-before-stale }}
+          days-before-close: ${{ matrix.days-before-close }}
+          remove-stale-when-updated: ${{ matrix.remove-stale-when-updated }}
+          stale-issue-label: ${{ matrix.stale-issue-label }}
