@@ -98,6 +98,19 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		'box-shadow'                        => array( 'shadow' ),
 	);
 
+	const APPEARANCE_TOOLS_OPT_INS = array(
+		array( 'border', 'color' ),
+		array( 'border', 'radius' ),
+		array( 'border', 'style' ),
+		array( 'border', 'width' ),
+		array( 'color', 'link' ),
+		array( 'layout', 'position' ),
+		array( 'spacing', 'blockGap' ),
+		array( 'spacing', 'margin' ),
+		array( 'spacing', 'padding' ),
+		array( 'typography', 'lineHeight' ),
+	);
+
 	/**
 	 * The valid elements that can be found under styles.
 	 *
@@ -1327,6 +1340,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		'layout'                        => array(
 			'contentSize' => null,
 			'definitions' => null,
+			'position'    => null,
 			'wideSize'    => null,
 		),
 		'spacing'                       => array(

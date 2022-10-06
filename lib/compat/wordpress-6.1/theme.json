@@ -323,7 +323,8 @@
 						}
 					]
 				}
-			}
+			},
+			"position": false
 		},
 		"spacing": {
 			"blockGap": null,
