@@ -129,6 +129,10 @@ add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_classic_theme_styles' );
 
 // To load classic theme styles in the the editor.
 function block_editor_settings_add_classic_theme_styles( $editor_settings ) {
+	if ( wp_is_block_theme() ) {
+		return;
+	}
+
 	$classic_theme_styles = gutenberg_dir_path(). '/build/block-library/classic.css';
 
 	// This follows the pattern of get_block_editor_theme_styles,
