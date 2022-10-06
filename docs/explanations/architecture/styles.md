@@ -12,7 +12,7 @@ This document introduces the main concepts related to styles that affect the use
   - [Consolidate data](#consolidate-data)
   - [From data to styles](#from-data-to-styles)
   - [Current limitations of the Global Styles API](#current-limitations-of-the-global-styles-api)
-4. [Structural layout styles](#structural-layout-styles)
+4. [Layout styles](#layout-styles)
   - [Base layout styles](#base-layout-styles)
   - [Individual layout styles](#individual-layout-styles)
   - [Available layout types](#available-layout-types)
@@ -565,4 +565,4 @@ The current semantic class names that can be output by the Layout block support 
 
 #### Opting out of generated layout styles
 
-Layout styles output is switched on by default because the styles are required by core structural blocks. However, themes can opt out of generated block layout styles while retaining semantic class name output by using the `disable-layout-styles` block support. Such themes will be responsible for providing all their own structural layout styles. See [the entry under Theme Support](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#disabling-base-layout-styles).
+Layout styles output is switched on by default because the styles are required by core structural blocks. However, themes can opt out of generated block layout styles while retaining semantic class name output by using the `disable-layout-styles` block support. Such themes will be responsible for providing all their own layout styles. See [the entry under Theme Support](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#disabling-base-layout-styles).
