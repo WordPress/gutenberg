@@ -1,7 +1,7 @@
 name: 'Stale Issue Gardening'
 
 on:
-  push:
+  pull_request:
   schedule:
     - cron: '30 1 * * *'
 
@@ -9,7 +9,7 @@ jobs:
   issue-gardening:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
-    if: ${{ github.repository == 'WordPress/gutenberg' && false }}
+    if: ${{ github.repository == 'WordPress/gutenberg' }}
     strategy:
       matrix:
         remove-stale-when-updated: [ true ]
@@ -43,6 +43,7 @@ jobs:
     steps:
       - name: Update issues
         uses: actions/stale@3de2653986ebd134983c79fe2be5d45cc3d9f4e1 # v6.0.0
+        if: ${{ false }}
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           stale-issue-message: ${{ matrix.message }}
