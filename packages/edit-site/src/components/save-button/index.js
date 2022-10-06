@@ -41,7 +41,18 @@ export default function SaveButton() {
 			isBusy={ isSaving }
 			onClick={ disabled ? undefined : () => setIsSaveViewOpened( true ) }
 			label={ label }
+			/*
+			 * We want the tooltip to show the keyboard shortcut only when the
+			 * button does something, i.e. when it's not disabled.
+			 */
 			shortcut={ disabled ? undefined : displayShortcut.primary( 's' ) }
+			/*
+			 * Displaying the keyboard shortcut conditionally makes the tooltip
+			 * itself show conditionally. This would trigger a full-rerendering
+			 * of the button that we want to avoid. By setting `showTooltip`,
+			 & the tooltip is always rendered even when there's no keyboard shortcut.
+			 */
+			showTooltip
 		>
 			{ label }
 		</Button>
