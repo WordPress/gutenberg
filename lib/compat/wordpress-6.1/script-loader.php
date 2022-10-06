@@ -126,5 +126,21 @@ function gutenberg_enqueue_classic_theme_styles() {
 }
 // To load classic theme styles on the frontend.
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_classic_theme_styles' );
+
 // To load classic theme styles in the the editor.
-add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_classic_theme_styles' );
+function block_editor_settings_add_classic_theme_styles( $editor_settings ) {
+	$classic_theme_styles = gutenberg_dir_path(). '/build/block-library/classic.css';
+
+	// This follows the pattern of get_block_editor_theme_styles,
+	// but we can't use get_block_editor_theme_styles directly as it
+	// only handles external files or theme files.
+	$editor_settings['styles'][] = array(
+		'css'            => file_get_contents( $classic_theme_styles ),
+		'baseURL'        => get_theme_file_uri( $classic_theme_styles ),
+		'__unstableType' => 'theme',
+		'isGlobalStyles' => false,
+	);
+
+	return $editor_settings;
+}
+add_filter( 'block_editor_settings_all', 'block_editor_settings_add_classic_theme_styles' );
