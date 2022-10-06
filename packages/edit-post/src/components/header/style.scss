@@ -54,13 +54,11 @@
 			display: none;
 		}
 
-		& > .edit-post-header__settings > .block-editor-post-preview__dropdown {
-			display: none;
-		}
-
+		& > .edit-post-header__settings > .block-editor-post-preview__dropdown,
 		& > .edit-post-header__settings > .interface-pinned-items {
 			display: none;
 		}
+
 	}
 
 	// we need ! important because we override inline styles
