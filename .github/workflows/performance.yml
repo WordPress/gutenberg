@@ -69,7 +69,7 @@ jobs:
               with:
                   github-token: ${{secrets.GITHUB_TOKEN}}
                   script: |
-                      const commit_details = await github.git.getCommit({owner: context.repo.owner, repo: context.repo.repo, commit_sha: context.sha});
+                      const commit_details = await github.rest.git.getCommit({owner: context.repo.owner, repo: context.repo.repo, commit_sha: context.sha});
                       return parseInt((new Date( commit_details.data.author.date ).getTime() / 1000).toFixed(0))
 
             - name: Publish performance results
