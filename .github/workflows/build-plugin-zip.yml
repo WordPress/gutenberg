@@ -266,12 +266,12 @@ jobs:
               run: echo ::set-output name=version::$(echo $VERSION | cut -d / -f 3 | sed 's/-rc./ RC/' )
 
             - name: Download Plugin Zip Artifact
-              uses: actions/download-artifact@4a7a711286f30c025902c28b541c10e147a9b843 # v2.0.8
+              uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v2.0.8
               with:
                   name: gutenberg-plugin
 
             - name: Download Release Notes Artifact
-              uses: actions/download-artifact@4a7a711286f30c025902c28b541c10e147a9b843 # v2.0.8
+              uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v2.0.8
               with:
                   name: release-notes
 
