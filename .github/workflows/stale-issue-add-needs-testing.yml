@@ -9,7 +9,7 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' }}
 
         steps:
-            - uses: actions/stale@3de2653986ebd134983c79fe2be5d45cc3d9f4e1 # v3.0.17
+            - uses: actions/stale@3de2653986ebd134983c79fe2be5d45cc3d9f4e1 # v6.0.0
               with:
                   repo-token: ${{ secrets.GITHUB_TOKEN }}
                   stale-issue-message: "Hi,\nThis issue has gone 180 days without any activity. This means it is time for a check-in to make sure it is still relevant. If you are still experiencing this issue with the latest versions, you can help the project by responding to confirm the problem and by providing any updated reproduction steps.\nThanks for helping out."
