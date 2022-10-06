@@ -25,7 +25,7 @@ jobs:
               uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
             - name: Use desired version of Java
-              uses: actions/setup-java@v2
+              uses: actions/setup-java@v3
               with:
                   distribution: 'temurin'
                   java-version: '11'
