@@ -306,7 +306,7 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Propagating updates for block types ",
+		"title": "Propagating updates for block types",
 		"slug": "propagating-updates",
 		"markdown_source": "../docs/how-to-guides/propagating-updates.md",
 		"parent": "how-to-guides"
