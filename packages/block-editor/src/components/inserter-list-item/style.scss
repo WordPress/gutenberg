@@ -30,7 +30,10 @@
 
 	&:not(:disabled) {
 		&:hover {
-			color: var(--wp-admin-theme-color) !important;
+			.block-editor-block-types-list__item-title {
+				color: var(--wp-admin-theme-color) !important;
+				filter: brightness(0.95);
+			}
 
 			svg {
 				color: var(--wp-admin-theme-color) !important;
