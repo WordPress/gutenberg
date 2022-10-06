@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import scrollIntoView from 'dom-scroll-into-view';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -9,6 +14,7 @@ import {
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
 	isRTL,
+	getScrollContainer,
 } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -142,11 +148,13 @@ export default function useArrowNav() {
 	const {
 		getMultiSelectedBlocksStartClientId,
 		getMultiSelectedBlocksEndClientId,
+		getPreviousBlockClientId,
+		getNextBlockClientId,
 		getSettings,
 		hasMultiSelection,
 		__unstableIsFullySelected,
 	} = useSelect( blockEditorStore );
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { selectBlock, multiSelect } = useDispatch( blockEditorStore );
 	return useRefEffect( ( node ) => {
 		// Here a DOMRect is stored while moving the caret vertically so
 		// vertical position of the start position can be restored. This is to
@@ -195,10 +203,6 @@ export default function useArrowNav() {
 			// If there is a multi-selection, the arrow keys should collapse the
 			// selection to the start or end of the selection.
 			if ( hasMultiSelection() ) {
-				if ( shiftKey ) {
-					return;
-				}
-
 				// Only handle if we have a full selection (not a native partial
 				// selection).
 				if ( ! __unstableIsFullySelected() ) {
@@ -207,7 +211,42 @@ export default function useArrowNav() {
 
 				event.preventDefault();
 
-				if ( isReverse ) {
+				if ( shiftKey ) {
+					const selectionStartClientId =
+						getMultiSelectedBlocksStartClientId();
+					const selectionEndClientId =
+						getMultiSelectedBlocksEndClientId();
+					const selectionBeforeEndClientId =
+						getPreviousBlockClientId( selectionEndClientId );
+					const selectionAfterEndClientId =
+						getNextBlockClientId( selectionEndClientId );
+					const nextSelectionEndClientId = isReverse
+						? selectionBeforeEndClientId
+						: selectionAfterEndClientId;
+
+					if ( nextSelectionEndClientId ) {
+						if (
+							selectionStartClientId === nextSelectionEndClientId
+						) {
+							selectBlock( nextSelectionEndClientId );
+						} else {
+							multiSelect(
+								selectionStartClientId,
+								nextSelectionEndClientId
+							);
+							scrollIntoView(
+								node.ownerDocument.getElementById(
+									`block-${ nextSelectionEndClientId }`
+								),
+								getScrollContainer( node ) ||
+									node.ownerDocument.defaultView,
+								{
+									onlyScrollIfNeeded: true,
+								}
+							);
+						}
+					}
+				} else if ( isReverse ) {
 					selectBlock( getMultiSelectedBlocksStartClientId() );
 				} else {
 					selectBlock( getMultiSelectedBlocksEndClientId(), -1 );
