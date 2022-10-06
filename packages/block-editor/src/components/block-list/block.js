@@ -306,6 +306,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 		__unstableMarkLastChangeAsPersistent,
 		moveBlocksToPosition,
 		removeBlock,
+		selectBlock,
 	} = dispatch( blockEditorStore );
 
 	// Do not add new properties here, use `useDispatch` instead to avoid
@@ -345,13 +346,62 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 			} = registry.select( blockEditorStore );
 
 			if ( forward ) {
+				if ( rootClientId ) {
+					const nextRootClientId =
+						getNextBlockClientId( rootClientId );
+
+					if (
+						nextRootClientId &&
+						getBlockName( rootClientId ) ===
+							getBlockName( nextRootClientId )
+					) {
+						const rootAttributes =
+							getBlockAttributes( rootClientId );
+						const previousRootAttributes =
+							getBlockAttributes( nextRootClientId );
+
+						if (
+							Object.keys( rootAttributes ).every(
+								( key ) =>
+									rootAttributes[ key ] ===
+									previousRootAttributes[ key ]
+							)
+						) {
+							registry.batch( () => {
+								moveBlocksToPosition(
+									getBlockOrder( rootClientId ),
+									rootClientId,
+									nextRootClientId
+								);
+								removeBlock( rootClientId, false );
+							} );
+							return;
+						}
+					}
+				}
+
 				const nextBlockClientId = getNextBlockClientId( clientId );
-				if ( nextBlockClientId ) {
+
+				if ( ! nextBlockClientId ) {
+					return;
+				}
+
+				// Attempt to "unwrap" the block contents when there's no
+				// preceding block to merge with.
+				const replacement = switchToBlockType(
+					getBlock( nextBlockClientId ),
+					'*'
+				);
+
+				if ( replacement && replacement.length ) {
+					replaceBlocks( nextBlockClientId, replacement );
+				} else if ( nextBlockClientId ) {
 					mergeBlocks( clientId, nextBlockClientId );
 				}
 			} else {
 				const previousBlockClientId =
 					getPreviousBlockClientId( clientId );
+
 				if ( previousBlockClientId ) {
 					mergeBlocks( previousBlockClientId, clientId );
 				} else if ( rootClientId ) {
@@ -394,7 +444,10 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 						'*'
 					);
 					if ( replacement && replacement.length ) {
-						replaceBlocks( rootClientId, replacement, 0 );
+						registry.batch( () => {
+							replaceBlocks( rootClientId, replacement );
+							selectBlock( replacement[ 0 ].clientId, 0 );
+						} );
 					}
 				}
 			}
