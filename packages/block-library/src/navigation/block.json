@@ -11,12 +11,6 @@
 		"ref": {
 			"type": "number"
 		},
-		"textColor": {
-			"type": "string"
-		},
-		"customTextColor": {
-			"type": "string"
-		},
 		"rgbTextColor": {
 			"type": "string"
 		},
@@ -64,6 +58,12 @@
 		"customOverlayTextColor": {
 			"type": "string"
 		},
+		"overlayLinkColor": {
+			"type": "string"
+		},
+		"customOverlayLinkColor": {
+			"type": "string"
+		},
 		"maxNestingLevel": {
 			"type": "number",
 			"default": 5
@@ -76,6 +76,8 @@
 		"customBackgroundColor": "customBackgroundColor",
 		"overlayTextColor": "overlayTextColor",
 		"customOverlayTextColor": "customOverlayTextColor",
+		"overlayLinkColor": "overlayLinkColor",
+		"customOverlayLinkColor": "customOverlayLinkColor",
 		"overlayBackgroundColor": "overlayBackgroundColor",
 		"customOverlayBackgroundColor": "customOverlayBackgroundColor",
 		"fontSize": "fontSize",
@@ -91,6 +93,13 @@
 		"anchor": true,
 		"html": false,
 		"inserter": true,
+		"color": {
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": false
+			}
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
