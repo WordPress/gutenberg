@@ -69,7 +69,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v2.3.4
               with:
                   token: ${{ secrets.GUTENBERG_TOKEN }}
 
@@ -164,7 +164,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v2.3.4
               with:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
 
@@ -219,7 +219,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v2.3.4
               with:
                   fetch-depth: 2
                   ref: ${{ needs.bump-version.outputs.release_branch }}
@@ -307,13 +307,13 @@ jobs:
         if: ${{ endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}
         steps:
             - name: Checkout (for CLI)
-              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v2.3.4
               with:
                   path: main
                   ref: trunk
 
             - name: Checkout (for publishing)
-              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v2.3.4
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.
