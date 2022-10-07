@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useContext } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	BaseControl,
@@ -34,6 +34,8 @@ import {
 	isValueSpacingPreset,
 } from './utils';
 
+import { VisualiserContext } from '../../hooks/dimensions';
+
 export default function SpacingInputControl( {
 	spacingSizes,
 	value,
@@ -45,6 +47,14 @@ export default function SpacingInputControl( {
 } ) {
 	// Treat value as a preset value if the passed in value matches the value of one of the spacingSizes.
 	value = getPresetValueFromCustomValue( value, spacingSizes );
+	const visualiserContext = useContext( VisualiserContext );
+
+	const handleMouseOver = () => {
+		visualiserContext.setMouseOver( true );
+	};
+	const handleMouseLeave = () => {
+		visualiserContext.setMouseOver( false );
+	};
 
 	let selectListSizes = spacingSizes;
 	const showRangeControl = spacingSizes.length <= 8;
@@ -235,6 +245,8 @@ export default function SpacingInputControl( {
 			) }
 			{ showRangeControl && ! showCustomValueControl && (
 				<RangeControl
+					onMouseOver={ handleMouseOver }
+					onMouseOut={ handleMouseLeave }
 					className="components-spacing-sizes-control__range-control"
 					value={ currentValue }
 					onChange={ ( newSize ) =>

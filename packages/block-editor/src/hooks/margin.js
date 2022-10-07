@@ -8,6 +8,7 @@ import {
 	useRef,
 	useState,
 	useEffect,
+	useContext,
 } from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
 import {
@@ -25,6 +26,7 @@ import {
 	SPACING_SUPPORT_KEY,
 	useCustomSides,
 	useIsDimensionsSupportValid,
+	VisualiserContext,
 } from './dimensions';
 import { cleanEmptyObject } from './utils';
 import BlockPopover from '../components/block-popover';
@@ -159,6 +161,8 @@ export function MarginEdit( props ) {
 						units={ units }
 						allowReset={ false }
 						splitOnAxis={ false }
+						onMouseEnter={ props.onMouseEnter }
+						onMouseOut={ props.onMouseOut }
 					/>
 				) }
 			</>
@@ -167,7 +171,9 @@ export function MarginEdit( props ) {
 	} );
 }
 
-export function MarginVisualizer( { clientId, attributes } ) {
+export function MarginVisualizer( { clientId, attributes, mouseOverMargin } ) {
+	const visualiserContext = useContext( VisualiserContext );
+	console.log( visualiserContext );
 	const margin = attributes?.style?.spacing?.margin;
 	const spacingSizes = useSetting( 'spacing.spacingSizes' );
 
@@ -208,7 +214,10 @@ export function MarginVisualizer( { clientId, attributes } ) {
 	};
 
 	useEffect( () => {
-		if ( ! isShallowEqual( margin, valueRef.current ) ) {
+		if (
+			! isShallowEqual( margin, valueRef.current ) ||
+			visualiserContext?.mouseOver
+		) {
 			setIsActive( true );
 			valueRef.current = margin;
 
@@ -220,7 +229,7 @@ export function MarginVisualizer( { clientId, attributes } ) {
 		}
 
 		return () => clearTimer();
-	}, [ margin ] );
+	}, [ margin, mouseOverMargin ] );
 
 	if ( ! isActive ) {
 		return null;

@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
-import { Platform } from '@wordpress/element';
+import { Platform, useState, createContext } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport } from '@wordpress/blocks';
 
@@ -43,7 +43,20 @@ import useSetting from '../components/use-setting';
 export const SPACING_SUPPORT_KEY = 'spacing';
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
 export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
+export const VisualiserContext = createContext();
+export function SpacingVisualiserContext( { children } ) {
+	const [ mouseOver, setMouseOver ] = useState( false );
 
+	const providerValue = {
+		mouseOver,
+		setMouseOver,
+	};
+	return (
+		<VisualiserContext.Provider value={ providerValue }>
+			{ children }
+		</VisualiserContext.Provider>
+	);
+}
 /**
  * Inspector controls for dimensions support.
  *
@@ -52,6 +65,7 @@ export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
  * @return {WPElement} Inspector controls for spacing support features.
  */
 export function DimensionsPanel( props ) {
+	const [ mouseOverMargin, setMouseOverMargin ] = useState( false );
 	const isGapDisabled = useIsGapDisabled( props );
 	const isPaddingDisabled = useIsPaddingDisabled( props );
 	const isMarginDisabled = useIsMarginDisabled( props );
@@ -82,6 +96,14 @@ export function DimensionsPanel( props ) {
 	const spacingClassnames = classnames( {
 		'tools-panel-item-spacing': spacingSizes && spacingSizes.length > 0,
 	} );
+	const handleMouseEnter = () => {
+		console.log( 'enter' );
+		setMouseOverMargin( true );
+	};
+	const handleMouseOut = () => {
+		console.log( 'leave' );
+		setMouseOverMargin( false );
+	};
 
 	return (
 		<>
@@ -109,7 +131,9 @@ export function DimensionsPanel( props ) {
 						isShownByDefault={ defaultSpacingControls?.margin }
 						panelId={ props.clientId }
 					>
-						<MarginEdit { ...props } />
+						<SpacingVisualiserContext>
+							<MarginEdit { ...props } />
+						</SpacingVisualiserContext>
 					</ToolsPanelItem>
 				) }
 				{ ! isGapDisabled && (
@@ -127,7 +151,11 @@ export function DimensionsPanel( props ) {
 				) }
 			</InspectorControls>
 			{ ! isPaddingDisabled && <PaddingVisualizer { ...props } /> }
-			{ ! isMarginDisabled && <MarginVisualizer { ...props } /> }
+			{ ! isMarginDisabled && (
+				<SpacingVisualiserContext>
+					<MarginVisualizer { ...props } />
+				</SpacingVisualiserContext>
+			) }
 		</>
 	);
 }
