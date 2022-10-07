@@ -773,17 +773,7 @@ function Navigation( {
 						</Button>
 					</PanelBody>
 				</InspectorControls>
-				<Warning>
-					{ __(
-						'Navigation menu has been deleted or is unavailable. '
-					) }
-					<Button
-						onClick={ createUntitledEmptyNavigationMenu }
-						variant="link"
-					>
-						{ __( 'Create a new menu?' ) }
-					</Button>
-				</Warning>
+				<Warning>{ __( 'Menu missing.' ) }</Warning>
 			</TagName>
 		);
 	}
