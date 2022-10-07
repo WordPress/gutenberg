@@ -84,6 +84,7 @@
 	},
 	"supports": {
 		"align": true,
+		"anchor": true,
 		"html": false,
 		"typography": {
 			"fontSize": true,

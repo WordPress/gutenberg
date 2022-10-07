@@ -29,6 +29,7 @@
 	},
 	"supports": {
 		"align": true,
+		"anchor": true,
 		"html": false
 	},
 	"editorStyle": "wp-block-latest-comments-editor",
