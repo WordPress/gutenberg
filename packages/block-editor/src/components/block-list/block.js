@@ -345,12 +345,17 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				getBlockOrder,
 			} = registry.select( blockEditorStore );
 
+			// For `Delete` or forward merge, we should do the exact same thing
+			// as `Backspace`, but from the other block.
 			if ( forward ) {
 				if ( rootClientId ) {
 					const nextRootClientId =
 						getNextBlockClientId( rootClientId );
 
 					if ( nextRootClientId ) {
+						// If there is a block that follows with the same parent
+						// block name and the same attributes, merge the inner
+						// blocks.
 						if (
 							getBlockName( rootClientId ) ===
 							getBlockName( nextRootClientId )
@@ -390,6 +395,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					return;
 				}
 
+				// Check if it's possibile to "unwrap" the following block
+				// before trying to merge.
 				const replacement = switchToBlockType(
 					getBlock( nextBlockClientId ),
 					'*'
@@ -410,6 +417,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					const previousRootClientId =
 						getPreviousBlockClientId( rootClientId );
 
+					// If there is a preceding block with the same parent block
+					// name and the same attributes, merge the inner blocks.
 					if (
 						previousRootClientId &&
 						getBlockName( rootClientId ) ===
