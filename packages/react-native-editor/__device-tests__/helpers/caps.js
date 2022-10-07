@@ -4,7 +4,7 @@ const ios = {
 	os: 'iOS',
 	deviceOrientation: 'portrait',
 	automationName: 'XCUITest',
-	appiumVersion: '1.20.1', // Sauce Labs requires appiumVersion to be specified.
+	appiumVersion: '1.22.3', // Sauce Labs requires appiumVersion to be specified.
 	app: undefined, // Will be set later, locally this is relative to root of project.
 	processArguments: {
 		args: [ 'uitesting' ],
@@ -27,13 +27,13 @@ exports.iosServer = {
 exports.android = {
 	browserName: '',
 	platformName: 'Android',
-	platformVersion: '9.0',
+	platformVersion: '11.0',
 	deviceName: 'Google Pixel 3 XL GoogleAPI Emulator',
 	automationName: 'UiAutomator2',
 	os: 'Android',
 	appPackage: 'com.gutenberg',
 	appActivity: 'com.gutenberg.MainActivity',
 	deviceOrientation: 'portrait',
-	appiumVersion: '1.20.2',
+	appiumVersion: '1.22.1',
 	app: undefined,
 };
