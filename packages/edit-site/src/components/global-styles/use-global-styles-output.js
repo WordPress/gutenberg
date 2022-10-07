@@ -277,6 +277,7 @@ export function getStylesDeclarations(
 			}
 		}
 
+		// Calculate fluid typography rules where available.
 		if ( cssProperty === 'font-size' ) {
 			ruleValue = getTypographyFontSizeValue(
 				{ size: ruleValue },
