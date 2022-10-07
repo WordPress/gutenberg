@@ -278,7 +278,7 @@
 			left: $border-width;
 			right: $border-width;
 			bottom: $border-width;
-			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
+			box-shadow: 0 0 0 0.5px var(--wp-admin-theme-color);
 			border-radius: $radius-block-ui - $border-width;
 		}
 	}
