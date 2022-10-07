@@ -8,7 +8,7 @@ import { map } from 'lodash';
  * WordPress dependencies
  */
 import { useLayoutEffect } from '@wordpress/element';
-import { useAnchorRef } from '@wordpress/rich-text';
+import { useAnchor } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -35,10 +35,16 @@ export function getAutoCompleterUI( autocompleter ) {
 		contentRef,
 	} ) {
 		const [ items ] = useItems( filterValue );
-		const anchorRef = useAnchorRef( { ref: contentRef, value } );
+		const popoverAnchor = useAnchor( {
+			editableContentElement: contentRef.current,
+			value,
+		} );
 
 		useLayoutEffect( () => {
 			onChangeOptions( items );
+			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
+			// See https://github.com/WordPress/gutenberg/pull/41820
+			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [ items ] );
 
 		if ( ! items.length > 0 ) {
@@ -51,7 +57,7 @@ export function getAutoCompleterUI( autocompleter ) {
 				onClose={ onReset }
 				position="top right"
 				className="components-autocomplete__popover"
-				anchorRef={ anchorRef }
+				anchor={ popoverAnchor }
 			>
 				<div
 					id={ listBoxId }

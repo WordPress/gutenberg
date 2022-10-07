@@ -4,8 +4,7 @@
 		"isValid": true,
 		"attributes": {
 			"isLink": true,
-			"linkTarget": "_self",
-			"fontSize": "small"
+			"linkTarget": "_self"
 		},
 		"innerBlocks": []
 	}

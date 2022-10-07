@@ -36,7 +36,5 @@ export const BottomSheetContext = createContext( {
 	setIsFullScreen: () => {},
 } );
 
-export const {
-	Provider: BottomSheetProvider,
-	Consumer: BottomSheetConsumer,
-} = BottomSheetContext;
+export const { Provider: BottomSheetProvider, Consumer: BottomSheetConsumer } =
+	BottomSheetContext;

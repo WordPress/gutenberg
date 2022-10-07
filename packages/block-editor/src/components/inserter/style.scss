@@ -16,8 +16,20 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__content {
+.block-editor-inserter__main-area {
 	position: relative;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	gap: $grid-unit-20;
+	width: auto;
+	@include break-medium {
+		width: $block-inserter-width;
+	}
+
+	&.show-as-tabs {
+		gap: 0;
+	}
 }
 
 .block-editor-inserter__popover.is-quick {
@@ -78,15 +90,6 @@ $block-inserter-tabs-height: 44px;
 	overflow: visible;
 }
 
-.block-editor-inserter__main-area {
-	width: auto;
-	overflow-y: auto;
-	height: 100%;
-	@include break-medium {
-		width: $block-inserter-width;
-	}
-}
-
 .block-editor-inserter__inline-elements {
 	margin-top: -1px;
 }
@@ -100,11 +103,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__search {
-	background: $white;
 	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
-	position: sticky;
-	top: 0;
-	z-index: z-index(".block-editor-inserter__search");
 
 	.components-search-control__icon {
 		right: $grid-unit-10 + ($grid-unit-60 - $icon-size) * 0.5;
@@ -116,15 +115,12 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__tabs {
+	flex-grow: 1;
 	display: flex;
 	flex-direction: column;
+	overflow: hidden;
 
 	.components-tab-panel__tabs {
-		position: sticky;
-		// Computed based off the search input height and paddings
-		top: $grid-unit-20 + $grid-unit-60;
-		background: $white;
-		z-index: z-index(".block-editor-inserter__tabs .components-tab-panel__tabs");
 		border-bottom: $border-width solid $gray-300;
 
 		.components-tab-panel__tabs-item {
@@ -137,10 +133,13 @@ $block-inserter-tabs-height: 44px;
 		display: flex;
 		flex-grow: 1;
 		flex-direction: column;
-		// Make a stacking context that keeps all descendents behind the sticky tabs
-		position: relative;
-		z-index: z-index(".block-editor-inserter__tabs .components-tab-panel__tab-content");
+		overflow-y: auto;
 	}
+}
+
+.block-editor-inserter__no-tab-container {
+	overflow-y: auto;
+	flex-grow: 1;
 }
 
 .block-editor-inserter__panel-header {
@@ -173,11 +172,6 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__panel-dropdown select {
 	border: none;
-}
-
-.block-editor-inserter__block-list {
-	flex-grow: 1;
-	position: relative;
 }
 
 .block-editor-inserter__reusable-blocks-panel {
@@ -342,7 +336,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-block-patterns-explorer {
 	&__sidebar {
 		position: absolute;
-		top: $header-height;
+		top: $header-height + $grid-unit-20;
 		left: 0;
 		bottom: 0;
 		width: $sidebar-width;

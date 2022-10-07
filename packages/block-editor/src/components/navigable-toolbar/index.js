@@ -69,8 +69,7 @@ function useIsAccessibleToolbar( ref ) {
 				since: '5.6',
 				alternative:
 					'ToolbarItem, ToolbarButton or ToolbarDropdownMenu components',
-				link:
-					'https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols',
+				link: 'https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols',
 			} );
 		}
 		setIsAccessibleToolbar( onlyToolbarItem );

@@ -2,7 +2,7 @@
 
 You can create a single block that nests other blocks using the [InnerBlocks](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/inner-blocks/README.md) component. This is used in the Columns block, Social Links block, or any block you want to contain other blocks.
 
-Note: A single block can only contain one `InnerBlock` component.
+Note: A single block can only contain one `InnerBlocks` component.
 
 Here is the basic InnerBlocks usage.
 

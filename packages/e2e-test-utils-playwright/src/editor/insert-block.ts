@@ -41,4 +41,5 @@ async function insertBlock(
 	}, blockRepresentation );
 }
 
+export type { BlockRepresentation };
 export { insertBlock };

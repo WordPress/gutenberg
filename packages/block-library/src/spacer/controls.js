@@ -43,9 +43,8 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	};
 
 	// Force the unit to update to `px` when the Spacer is being resized.
-	const [ parsedQuantity, parsedUnit ] = parseQuantityAndUnitFromRawValue(
-		value
-	);
+	const [ parsedQuantity, parsedUnit ] =
+		parseQuantityAndUnitFromRawValue( value );
 	const computedValue = [
 		parsedQuantity,
 		isResizing ? 'px' : parsedUnit,

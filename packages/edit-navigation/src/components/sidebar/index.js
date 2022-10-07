@@ -34,9 +34,10 @@ export default function Sidebar( {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { sidebar, hasBlockSelection, hasSidebarEnabled } = useSelect(
 		( select ) => {
-			const _sidebar = select(
-				interfaceStore
-			).getActiveComplementaryArea( SIDEBAR_SCOPE );
+			const _sidebar =
+				select( interfaceStore ).getActiveComplementaryArea(
+					SIDEBAR_SCOPE
+				);
 
 			const _hasSidebarEnabled = [ SIDEBAR_MENU, SIDEBAR_BLOCK ].includes(
 				_sidebar
@@ -44,9 +45,8 @@ export default function Sidebar( {
 
 			return {
 				sidebar: _sidebar,
-				hasBlockSelection: !! select(
-					blockEditorStore
-				).getBlockSelectionStart(),
+				hasBlockSelection:
+					!! select( blockEditorStore ).getBlockSelectionStart(),
 				hasSidebarEnabled: _hasSidebarEnabled,
 			};
 		},

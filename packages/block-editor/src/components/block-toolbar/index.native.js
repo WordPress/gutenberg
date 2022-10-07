@@ -12,11 +12,8 @@ import { store as blockEditorStore } from '../../store';
 
 export default function BlockToolbar() {
 	const { blockClientIds, isValid, mode } = useSelect( ( select ) => {
-		const {
-			getBlockMode,
-			getSelectedBlockClientIds,
-			isBlockValid,
-		} = select( blockEditorStore );
+		const { getBlockMode, getSelectedBlockClientIds, isBlockValid } =
+			select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 
 		return {

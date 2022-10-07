@@ -782,9 +782,8 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				opensInNewTab: false,
 			};
 
-			const shouldOpenInNewTab = blockAttributesToMenuItem(
-				openInNewTabBlock
-			);
+			const shouldOpenInNewTab =
+				blockAttributesToMenuItem( openInNewTabBlock );
 
 			const shouldNotOpenInNewTab = blockAttributesToMenuItem(
 				doNotOpenInNewTabBlock

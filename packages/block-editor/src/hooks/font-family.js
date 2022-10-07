@@ -111,8 +111,10 @@ export function FontFamilyEdit( {
 } ) {
 	const fontFamilies = useSetting( 'typography.fontFamilies' );
 
-	const value = find( fontFamilies, ( { slug } ) => fontFamily === slug )
-		?.fontFamily;
+	const value = find(
+		fontFamilies,
+		( { slug } ) => fontFamily === slug
+	)?.fontFamily;
 
 	function onChange( newValue ) {
 		const predefinedFontFamily = find(
@@ -130,6 +132,8 @@ export function FontFamilyEdit( {
 			fontFamilies={ fontFamilies }
 			value={ value }
 			onChange={ onChange }
+			size="__unstable-large"
+			__nextHasNoMarginBottom
 		/>
 	);
 }

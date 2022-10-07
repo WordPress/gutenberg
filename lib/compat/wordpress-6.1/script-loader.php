@@ -6,6 +6,37 @@
  */
 
 /**
+ * This function takes care of adding inline styles
+ * in the proper place, depending on the theme in use.
+ *
+ * This method was added to core in 5.9.1, but with a single param ($style). The second param ($priority) was
+ * added post 6.0, so the 6.1 release needs to have wp_enqueue_block_support_styles updated to include this param.
+ *
+ * For block themes, it's loaded in the head.
+ * For classic ones, it's loaded in the body
+ * because the wp_head action  happens before
+ * the render_block.
+ *
+ * @link https://core.trac.wordpress.org/ticket/53494.
+ *
+ * @param string $style String containing the CSS styles to be added.
+ * @param int    $priority To set the priority for the add_action.
+ */
+function gutenberg_enqueue_block_support_styles( $style, $priority = 10 ) {
+	$action_hook_name = 'wp_footer';
+	if ( wp_is_block_theme() ) {
+		$action_hook_name = 'wp_head';
+	}
+	add_action(
+		$action_hook_name,
+		static function () use ( $style ) {
+			echo "<style>$style</style>\n";
+		},
+		$priority
+	);
+}
+
+/**
  * This applies a filter to the list of style nodes that comes from `get_style_nodes` in WP_Theme_JSON.
  * This particular filter removes all of the blocks from the array.
  *
@@ -18,7 +49,7 @@
  * @param array $nodes The nodes to filter.
  * @return array A filtered array of style nodes.
  */
-function filter_out_block_nodes( $nodes ) {
+function gutenberg_filter_out_block_nodes( $nodes ) {
 	return array_filter(
 		$nodes,
 		function( $node ) {
@@ -56,15 +87,11 @@ function gutenberg_enqueue_global_styles() {
 	/**
 	 * If we are loading CSS for each block separately, then we can load the theme.json CSS conditionally.
 	 * This removes the CSS from the global-styles stylesheet and adds it to the inline CSS for each block.
+	 * This filter has to be registered before we call gutenberg_get_global_stylesheet();
 	 */
-	if ( $separate_assets ) {
-		add_filter( 'gutenberg_get_style_nodes', 'filter_out_block_nodes' );
-		// add each block as an inline css.
-		wp_add_global_styles_for_blocks();
-	}
+	add_filter( 'gutenberg_theme_json_get_style_nodes', 'gutenberg_filter_out_block_nodes', 10, 1 );
 
 	$stylesheet = gutenberg_get_global_stylesheet();
-
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
@@ -72,12 +99,32 @@ function gutenberg_enqueue_global_styles() {
 	wp_register_style( 'global-styles', false, array(), true, true );
 	wp_add_inline_style( 'global-styles', $stylesheet );
 	wp_enqueue_style( 'global-styles' );
+
+	// add each block as an inline css.
+	gutenberg_add_global_styles_for_blocks();
 }
 
 remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles' );
-remove_action( 'wp_footer', 'wp_enqueue_global_styles' );
+remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 );
 remove_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles_assets' );
 remove_action( 'wp_footer', 'gutenberg_enqueue_global_styles_assets' );
 
+// Enqueue global styles, and then block supports styles.
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_global_styles', 1 );
+
+/**
+ * Loads classic theme styles on classic themes.
+ *
+ * This is needed for backwards compatibility for button blocks specifically.
+ */
+function gutenberg_enqueue_classic_theme_styles() {
+	if ( ! wp_is_block_theme() ) {
+		wp_register_style( 'classic-theme-styles', gutenberg_url( 'build/block-library/classic.css' ), array(), true );
+		wp_enqueue_style( 'classic-theme-styles' );
+	}
+}
+// To load classic theme styles on the frontend.
+add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_classic_theme_styles' );
+// To load classic theme styles in the the editor.
+add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_classic_theme_styles' );

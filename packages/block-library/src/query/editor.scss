@@ -20,8 +20,8 @@
 }
 
 .block-editor-query-pattern__selection-modal .components-modal__content {
-	overflow: hidden;
 	padding: 0;
+	margin-bottom: $header-height; // $header-height to accommodate bottom toolbar
 	&::before {
 		margin-bottom: 0;
 	}
@@ -41,5 +41,14 @@
 		height: 80%;
 		width: 80%;
 		max-height: none;
+	}
+}
+
+.block-library-query-toolspanel__filters {
+	.components-form-token-field__help {
+		margin-bottom: 0;
+	}
+	.block-library-query-inspector__taxonomy-control:not(:last-child) {
+		margin-bottom: $grid-unit-30;
 	}
 }

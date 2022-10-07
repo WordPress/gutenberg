@@ -27,6 +27,7 @@ function ContextMenu( { name, parentMenu = '' } ) {
 				<NavigationButtonAsItem
 					icon={ typography }
 					path={ parentMenu + '/typography' }
+					aria-label={ __( 'Typography styles' ) }
 				>
 					{ __( 'Typography' ) }
 				</NavigationButtonAsItem>
@@ -35,6 +36,7 @@ function ContextMenu( { name, parentMenu = '' } ) {
 				<NavigationButtonAsItem
 					icon={ color }
 					path={ parentMenu + '/colors' }
+					aria-label={ __( 'Colors styles' ) }
 				>
 					{ __( 'Colors' ) }
 				</NavigationButtonAsItem>
@@ -43,6 +45,7 @@ function ContextMenu( { name, parentMenu = '' } ) {
 				<NavigationButtonAsItem
 					icon={ layout }
 					path={ parentMenu + '/layout' }
+					aria-label={ __( 'Layout styles' ) }
 				>
 					{ __( 'Layout' ) }
 				</NavigationButtonAsItem>

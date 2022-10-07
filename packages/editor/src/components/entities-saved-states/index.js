@@ -39,9 +39,8 @@ const PUBLISH_ON_SAVE_ENTITIES = [
 export default function EntitiesSavedStates( { close } ) {
 	const saveButtonRef = useRef();
 	const { dirtyEntityRecords } = useSelect( ( select ) => {
-		const dirtyRecords = select(
-			coreStore
-		).__experimentalGetDirtyEntityRecords();
+		const dirtyRecords =
+			select( coreStore ).__experimentalGetDirtyEntityRecords();
 
 		// Remove site object and decouple into its edited pieces.
 		const dirtyRecordsWithoutSite = dirtyRecords.filter(
@@ -77,13 +76,11 @@ export default function EntitiesSavedStates( { close } ) {
 		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
 	} = useDispatch( coreStore );
 
-	const { __unstableMarkLastChangeAsPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const { __unstableMarkLastChangeAsPersistent } =
+		useDispatch( blockEditorStore );
 
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
 	// To group entities by type.
 	const partitionedSavables = groupBy( dirtyEntityRecords, 'name' );

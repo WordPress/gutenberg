@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isObject } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -55,13 +54,21 @@ const hasLinkColorSupport = ( blockType ) => {
 
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
-	return isObject( colorSupport ) && !! colorSupport.link;
+	return (
+		colorSupport !== null &&
+		typeof colorSupport === 'object' &&
+		!! colorSupport.link
+	);
 };
 
 const hasGradientSupport = ( blockType ) => {
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
-	return isObject( colorSupport ) && !! colorSupport.gradients;
+	return (
+		colorSupport !== null &&
+		typeof colorSupport === 'object' &&
+		!! colorSupport.gradients
+	);
 };
 
 const hasBackgroundColorSupport = ( blockType ) => {
@@ -443,13 +450,23 @@ export function ColorEdit( props ) {
 		};
 	};
 
-	const enableContrastChecking =
-		Platform.OS === 'web' && ! gradient && ! style?.color?.gradient;
-
 	const defaultColorControls = getBlockSupport( props.name, [
 		COLOR_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
+
+	const enableContrastChecking =
+		Platform.OS === 'web' &&
+		! gradient &&
+		! style?.color?.gradient &&
+		// Contrast checking is enabled by default.
+		// Deactivating it requires `enableContrastChecker` to have
+		// an explicit value of `false`.
+		false !==
+			getBlockSupport( props.name, [
+				COLOR_SUPPORT_KEY,
+				'enableContrastChecker',
+			] );
 
 	return (
 		<ColorPanel
@@ -503,8 +520,8 @@ export function ColorEdit( props ) {
 									allSolids,
 									style?.elements?.link?.color?.text
 								),
-								clearable: !! style?.elements?.link?.color
-									?.text,
+								clearable:
+									!! style?.elements?.link?.color?.text,
 								isShownByDefault: defaultColorControls?.link,
 								resetAllFilter: resetAllLinkFilter,
 							},

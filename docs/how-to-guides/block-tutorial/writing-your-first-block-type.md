@@ -133,9 +133,37 @@ Add the following to `block.js`
 
 {% end %}
 
-NOTE: If using the JSX version, you need to run `npm run build` and it will create the JavaScript file that is loaded in the editor at `build/index.js`
+### Step 4: Build or add dependency
 
-### Step 4: Confirm
+In order to register the block, an asset php file is required in the same directory as the directory used in `register_block_type()` and must begin with the script's filename.
+
+{% codetabs %}
+{% JSX %}
+
+Build the scripts and asset file which is used to keep track of dependencies and the build version.
+```bash
+npm run build
+```
+
+{% Plain %}
+
+Create the asset file to load the dependencies for the scripts. The name of this file should be the name of the js file then .asset.php. For this example, create `block.asset.php` with the following:
+
+```php
+<?php return
+	array( 'dependencies' =>
+		array(
+			'wp-blocks',
+			'wp-element',
+			'wp-polyfill'
+		),
+		'version' => '0.1'
+	);
+```
+
+{% end %}
+
+### Step 5: Confirm
 
 Open your editor and try adding your new block. It will show in the inserter using the `title`.
 When inserted you will see the `Hello World (from the editor)` message.

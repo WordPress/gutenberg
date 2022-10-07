@@ -21,16 +21,18 @@ const retry = require( '../retry' );
 const stop = require( './stop' );
 const initConfig = require( '../init-config' );
 const downloadSources = require( '../download-sources' );
+const downloadWPPHPUnit = require( '../download-wp-phpunit' );
 const {
 	checkDatabaseConnection,
 	configureWordPress,
 	setupWordPressDirectories,
+	readWordPressVersion,
 } = require( '../wordpress' );
 const { didCacheChange, setCache } = require( '../cache' );
 const md5 = require( '../md5' );
 
 /**
- * @typedef {import('../config').Config} Config
+ * @typedef {import('../config').WPConfig} WPConfig
  */
 const CONFIG_CACHE_KEY = 'config_checksum';
 
@@ -127,7 +129,25 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 	] );
 
 	if ( shouldConfigureWp ) {
+		spinner.text = 'Setting up WordPress directories';
+
 		await setupWordPressDirectories( config );
+
+		// Use the WordPress versions to download the PHPUnit suite.
+		const wpVersions = await Promise.all( [
+			readWordPressVersion(
+				config.env.development.coreSource,
+				spinner,
+				debug
+			),
+			readWordPressVersion( config.env.tests.coreSource, spinner, debug ),
+		] );
+		await downloadWPPHPUnit(
+			config,
+			{ development: wpVersions[ 0 ], tests: wpVersions[ 1 ] },
+			spinner,
+			debug
+		);
 	}
 
 	spinner.text = 'Starting WordPress.';
@@ -173,7 +193,7 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 	}
 
 	const siteUrl = config.env.development.config.WP_SITEURL;
-	const e2eSiteUrl = config.env.tests.config.WP_TESTS_DOMAIN;
+	const e2eSiteUrl = `http://${ config.env.tests.config.WP_TESTS_DOMAIN }:${ config.env.tests.port }/`;
 
 	const { out: mySQLAddress } = await dockerCompose.port(
 		'mysql',

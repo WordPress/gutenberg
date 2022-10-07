@@ -38,23 +38,18 @@ class LatestPostsEdit extends Component {
 		this.state = {
 			categoriesList: [],
 		};
-		this.onSetDisplayPostContent = this.onSetDisplayPostContent.bind(
-			this
-		);
-		this.onSetDisplayPostContentRadio = this.onSetDisplayPostContentRadio.bind(
-			this
-		);
+		this.onSetDisplayPostContent =
+			this.onSetDisplayPostContent.bind( this );
+		this.onSetDisplayPostContentRadio =
+			this.onSetDisplayPostContentRadio.bind( this );
 		this.onSetExcerptLength = this.onSetExcerptLength.bind( this );
 		this.onSetDisplayPostDate = this.onSetDisplayPostDate.bind( this );
-		this.onSetDisplayFeaturedImage = this.onSetDisplayFeaturedImage.bind(
-			this
-		);
-		this.onSetFeaturedImageAlign = this.onSetFeaturedImageAlign.bind(
-			this
-		);
-		this.onSetAddLinkToFeaturedImage = this.onSetAddLinkToFeaturedImage.bind(
-			this
-		);
+		this.onSetDisplayFeaturedImage =
+			this.onSetDisplayFeaturedImage.bind( this );
+		this.onSetFeaturedImageAlign =
+			this.onSetFeaturedImageAlign.bind( this );
+		this.onSetAddLinkToFeaturedImage =
+			this.onSetAddLinkToFeaturedImage.bind( this );
 		this.onSetOrder = this.onSetOrder.bind( this );
 		this.onSetOrderBy = this.onSetOrderBy.bind( this );
 		this.onSetPostsToShow = this.onSetPostsToShow.bind( this );

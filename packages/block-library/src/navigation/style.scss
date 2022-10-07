@@ -44,11 +44,15 @@ $navigation-icon-size: 24px;
 	// By adding low specificity, we enable compatibility with link colors set in theme.json,
 	// but still allow them to be overridden by user-set colors.
 	.wp-block-navigation-item__content {
-		color: inherit;
 		display: block;
+	}
 
-		// Set the default menu item padding to zero, to allow text-only buttons.
-		padding: 0;
+	// This rule needs extra specificity so that it inherits the correct color from its parent.
+	// Otherwise, a link color set by a parent group can override the value.
+	// This also fixes an issue where a navigation with an explicitly set color is overridden
+	// by link colors defined in Global Styles.
+	.wp-block-navigation-item__content.wp-block-navigation-item__content {
+		color: inherit;
 	}
 
 	// The following rules provide class based application of user selected text
@@ -106,7 +110,7 @@ $navigation-icon-size: 24px;
 			width: inherit;
 			height: inherit;
 
-			// Position the arrow to balance with the the text.
+			// Position the arrow to balance with the text.
 			margin-top: 0.075em;
 		}
 	}
@@ -155,10 +159,7 @@ $navigation-icon-size: 24px;
 // Styles for submenu flyout.
 // These are separated out with reduced specificity to allow better inheritance from Global Styles.
 .wp-block-navigation .has-child {
-	// We use :where to keep specificity minimal, yet still scope it to only the navigation block.
-	// That way if padding is set in theme.json, it still wins.
-	// https://css-tricks.com/almanac/selectors/w/where/
-	:where(.wp-block-navigation__submenu-container) {
+	.wp-block-navigation__submenu-container {
 		background-color: inherit;
 		color: inherit;
 		position: absolute;
@@ -234,7 +235,7 @@ $navigation-icon-size: 24px;
 
 	// Custom menu items.
 	// Show submenus on hover unless they open on click.
-	&:where(:not(.open-on-click)):hover > .wp-block-navigation__submenu-container {
+	&:not(.open-on-click):hover > .wp-block-navigation__submenu-container {
 		visibility: visible;
 		overflow: visible;
 		opacity: 1;
@@ -244,7 +245,7 @@ $navigation-icon-size: 24px;
 	}
 
 	// Keep submenus open when focus is within.
-	&:where(:not(.open-on-click):not(.open-on-hover-click)):focus-within > .wp-block-navigation__submenu-container {
+	&:not(.open-on-click):not(.open-on-hover-click):focus-within > .wp-block-navigation__submenu-container {
 		visibility: visible;
 		overflow: visible;
 		opacity: 1;
@@ -333,24 +334,12 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation__responsive-container,
 .wp-block-navigation__responsive-close,
 .wp-block-navigation__responsive-dialog,
-.wp-block-navigation,
 .wp-block-navigation .wp-block-page-list,
 .wp-block-navigation__container,
 .wp-block-navigation__responsive-container-content {
 	gap: inherit;
 }
 
-// Menu items with background.
-// We use :where to keep specificity minimal, yet still scope it to only the navigation block.
-// That way if padding is set in theme.json, it still wins.
-// https://css-tricks.com/almanac/selectors/w/where/
-.wp-block-navigation:where(.has-background) {
-	&,
-	.wp-block-navigation .wp-block-page-list,
-	.wp-block-navigation__container {
-		gap: inherit;
-	}
-}
 
 /**
  * Paddings
@@ -359,17 +348,21 @@ button.wp-block-navigation-item__content {
 // We use :where to keep specificity minimal, yet still scope it to only the navigation block.
 // That way if padding is set in theme.json, it still wins.
 // https://css-tricks.com/almanac/selectors/w/where/
+// Note: .wp-block-navigation-item targets both Page List and custom menu items. .wp-block-navigation-link targets only custom.
 
 // When the menu has a background, items have paddings, reduce margins to compensate.
 // Treat margins and paddings differently when the block has a background.
-.wp-block-navigation:where(.has-background) .wp-block-navigation-item__content {
+:where(.wp-block-navigation.has-background .wp-block-navigation-item a:not(.wp-element-button)),
+:where(.wp-block-navigation.has-background .wp-block-navigation-submenu a:not(.wp-element-button)) {
 	padding: 0.5em 1em;
 }
 
 // Provide a default padding for submenus who should always have some, regardless of the top level menu items.
-.wp-block-navigation :where(.wp-block-navigation__submenu-container) .wp-block-navigation-item__content {
+:where(.wp-block-navigation .wp-block-navigation__submenu-container .wp-block-navigation-item a:not(.wp-element-button)),
+:where(.wp-block-navigation .wp-block-navigation__submenu-container .wp-block-navigation-submenu a:not(.wp-element-button)) {
 	padding: 0.5em 1em;
 }
+
 
 /**
  * Justifications.
@@ -445,6 +438,16 @@ button.wp-block-navigation-item__content {
  * Mobile menu.
  */
 
+@keyframes overlay-menu__fade-in-animation {
+	from {
+		opacity: 0;
+		transform: translateY(0.5em);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
 .wp-block-navigation__responsive-container {
 	display: none;
 	position: fixed;
@@ -452,6 +455,10 @@ button.wp-block-navigation-item__content {
 	left: 0;
 	right: 0;
 	bottom: 0;
+
+	.wp-block-navigation-link a {
+		color: inherit;
+	}
 
 	.wp-block-navigation__responsive-container-content {
 		display: flex;
@@ -478,8 +485,16 @@ button.wp-block-navigation-item__content {
 		flex-direction: column;
 		background-color: inherit;
 
-		// Use em units to apply padding, so themes can more easily style this in various ways.
-		padding: 2rem;
+		// Animation.
+		animation: overlay-menu__fade-in-animation 0.1s ease-out;
+		animation-fill-mode: forwards;
+		@include reduce-motion("animation");
+
+		// Try to inherit any root paddings set, so the X can align to a top-right aligned menu.
+		padding-top: var(--wp--style--root--padding-top, 2rem);
+		padding-right: var(--wp--style--root--padding-right, 2rem);
+		padding-bottom: var(--wp--style--root--padding-bottom, 2rem);
+		padding-left: var(--wp--style--root--padding-left, 2rem);
 
 		// Allow modal to scroll.
 		overflow: auto;
@@ -623,6 +638,7 @@ button.wp-block-navigation-item__content {
 	border: none;
 	margin: 0;
 	padding: 0;
+	text-transform: inherit;
 
 	svg {
 		fill: currentColor;
@@ -656,6 +672,11 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation__responsive-close {
 	width: 100%;
 
+	// Try to inherit wide-width when defined, so the X can align to a top-right aligned menu.
+	max-width: var(--wp--style--global--wide-size, 100%);
+	margin-left: auto;
+	margin-right: auto;
+
 	// This element is not keyboard accessible, and is focusable only using the mouse.
 	// It is part of the MicroModal library that adds a scrim outside of a modal dialog that is not fullscreen,
 	// where clicking that scrim closes the overlay just like the close button.
@@ -673,6 +694,17 @@ button.wp-block-navigation-item__content {
 
 .wp-block-navigation__responsive-dialog {
 	position: relative;
+}
+
+// Adjust open dialog top margin when admin-bar is visible.
+// Needs to be scoped to .is-menu-open, or it will shift the position of any other navigations that may be present.
+.has-modal-open .admin-bar .is-menu-open .wp-block-navigation__responsive-dialog {
+	margin-top: $admin-bar-height-big;
+
+	// Handle smaller admin-bar.
+	@include break-medium() {
+		margin-top: $admin-bar-height;
+	}
 }
 
 // Prevent scrolling of the parent content when the modal is open.

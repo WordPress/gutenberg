@@ -28,11 +28,8 @@ afterAll( () => {
 
 describe( 'Shortcode block', () => {
 	it( 'inserts block', async () => {
-		const {
-			getByA11yLabel,
-			getByTestId,
-			getByText,
-		} = await initializeEditor();
+		const { getByA11yLabel, getByTestId, getByText } =
+			await initializeEditor();
 
 		fireEvent.press( getByA11yLabel( 'Add block' ) );
 

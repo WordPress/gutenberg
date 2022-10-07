@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { includes, debounce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
@@ -11,6 +6,7 @@ import { focus } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
+import { debounce } from '../../utils/debounce';
 import useRefEffect from '../use-ref-effect';
 
 /**
@@ -70,9 +66,8 @@ export default function useDisabled( {
 
 			const disable = () => {
 				if ( node.style.getPropertyValue( 'user-select' ) !== 'none' ) {
-					const previousValue = node.style.getPropertyValue(
-						'user-select'
-					);
+					const previousValue =
+						node.style.getPropertyValue( 'user-select' );
 					node.style.setProperty( 'user-select', 'none' );
 					node.style.setProperty( '-webkit-user-select', 'none' );
 					updates.push( () => {
@@ -89,8 +84,7 @@ export default function useDisabled( {
 
 				focus.focusable.find( node ).forEach( ( focusable ) => {
 					if (
-						includes(
-							DISABLED_ELIGIBLE_NODE_NAMES,
+						DISABLED_ELIGIBLE_NODE_NAMES.includes(
 							focusable.nodeName
 						) &&
 						// @ts-ignore
@@ -110,9 +104,8 @@ export default function useDisabled( {
 						focusable.nodeName === 'A' &&
 						focusable.getAttribute( 'tabindex' ) !== '-1'
 					) {
-						const previousValue = focusable.getAttribute(
-							'tabindex'
-						);
+						const previousValue =
+							focusable.getAttribute( 'tabindex' );
 						focusable.setAttribute( 'tabindex', '-1' );
 						updates.push( () => {
 							if ( ! focusable.isConnected ) {
@@ -158,9 +151,10 @@ export default function useDisabled( {
 						focusable instanceof
 							node.ownerDocument.defaultView.HTMLElement
 					) {
-						const previousValue = focusable.style.getPropertyValue(
-							'pointer-events'
-						);
+						const previousValue =
+							focusable.style.getPropertyValue(
+								'pointer-events'
+							);
 						focusable.style.setProperty( 'pointer-events', 'none' );
 						updates.push( () => {
 							if ( ! focusable.isConnected ) {
@@ -177,7 +171,7 @@ export default function useDisabled( {
 
 			// Debounce re-disable since disabling process itself will incur
 			// additional mutations which should be ignored.
-			const debouncedDisable = debounce( disable, undefined, {
+			const debouncedDisable = debounce( disable, 0, {
 				leading: true,
 			} );
 			disable();

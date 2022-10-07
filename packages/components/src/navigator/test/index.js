@@ -2,6 +2,12 @@
  * External dependencies
  */
 import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+/**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -86,60 +92,74 @@ function CustomNavigatorBackButton( { onClick, ...props } ) {
 const MyNavigation = ( {
 	initialPath = PATHS.HOME,
 	onNavigatorButtonClick,
-} ) => (
-	<NavigatorProvider initialPath={ initialPath }>
-		<NavigatorScreen path={ PATHS.HOME }>
-			<p>This is the home screen.</p>
-			<CustomNavigatorButton
-				path={ PATHS.NOT_FOUND }
-				onClick={ onNavigatorButtonClick }
-			>
-				Navigate to non-existing screen.
-			</CustomNavigatorButton>
-			<CustomNavigatorButton
-				path={ PATHS.CHILD }
-				onClick={ onNavigatorButtonClick }
-			>
-				Navigate to child screen.
-			</CustomNavigatorButton>
-			<CustomNavigatorButton
-				path={ PATHS.INVALID_HTML_ATTRIBUTE }
-				onClick={ onNavigatorButtonClick }
-			>
-				Navigate to screen with an invalid HTML value as a path.
-			</CustomNavigatorButton>
-		</NavigatorScreen>
+} ) => {
+	const [ inputValue, setInputValue ] = useState( '' );
+	return (
+		<NavigatorProvider initialPath={ initialPath }>
+			<NavigatorScreen path={ PATHS.HOME }>
+				<p>This is the home screen.</p>
+				<CustomNavigatorButton
+					path={ PATHS.NOT_FOUND }
+					onClick={ onNavigatorButtonClick }
+				>
+					Navigate to non-existing screen.
+				</CustomNavigatorButton>
+				<CustomNavigatorButton
+					path={ PATHS.CHILD }
+					onClick={ onNavigatorButtonClick }
+				>
+					Navigate to child screen.
+				</CustomNavigatorButton>
+				<CustomNavigatorButton
+					path={ PATHS.INVALID_HTML_ATTRIBUTE }
+					onClick={ onNavigatorButtonClick }
+				>
+					Navigate to screen with an invalid HTML value as a path.
+				</CustomNavigatorButton>
+			</NavigatorScreen>
 
-		<NavigatorScreen path={ PATHS.CHILD }>
-			<p>This is the child screen.</p>
-			<CustomNavigatorButtonWithFocusRestoration
-				path={ PATHS.NESTED }
-				onClick={ onNavigatorButtonClick }
-			>
-				Navigate to nested screen.
-			</CustomNavigatorButtonWithFocusRestoration>
-			<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
-				Go back
-			</CustomNavigatorBackButton>
-		</NavigatorScreen>
+			<NavigatorScreen path={ PATHS.CHILD }>
+				<p>This is the child screen.</p>
+				<CustomNavigatorButtonWithFocusRestoration
+					path={ PATHS.NESTED }
+					onClick={ onNavigatorButtonClick }
+				>
+					Navigate to nested screen.
+				</CustomNavigatorButtonWithFocusRestoration>
+				<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
+					Go back
+				</CustomNavigatorBackButton>
 
-		<NavigatorScreen path={ PATHS.NESTED }>
-			<p>This is the nested screen.</p>
-			<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
-				Go back
-			</CustomNavigatorBackButton>
-		</NavigatorScreen>
+				<label htmlFor="test-input">This is a test input</label>
+				<input
+					name="test-input"
+					// eslint-disable-next-line no-restricted-syntax
+					id="test-input"
+					onChange={ ( e ) => {
+						setInputValue( e.target.value );
+					} }
+					value={ inputValue }
+				/>
+			</NavigatorScreen>
 
-		<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
-			<p>This is the screen with an invalid HTML value as a path.</p>
-			<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
-				Go back
-			</CustomNavigatorBackButton>
-		</NavigatorScreen>
+			<NavigatorScreen path={ PATHS.NESTED }>
+				<p>This is the nested screen.</p>
+				<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
+					Go back
+				</CustomNavigatorBackButton>
+			</NavigatorScreen>
 
-		{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
-	</NavigatorProvider>
-);
+			<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
+				<p>This is the screen with an invalid HTML value as a path.</p>
+				<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
+					Go back
+				</CustomNavigatorBackButton>
+			</NavigatorScreen>
+
+			{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
+		</NavigatorProvider>
+	);
+};
 
 const getNavigationScreenByText = ( text, { throwIfNotFound = true } = {} ) => {
 	const fnName = throwIfNotFound ? 'getByText' : 'queryByText';
@@ -194,6 +214,28 @@ const getBackButton = ( { throwIfNotFound } = {} ) =>
 	} );
 
 describe( 'Navigator', () => {
+	const originalGetClientRects = window.Element.prototype.getClientRects;
+
+	// `getClientRects` needs to be mocked so that `isVisible` from the `@wordpress/dom`
+	// `focusable` module can pass, in a JSDOM env where the DOM elements have no width/height.
+	const mockedGetClientRects = jest.fn( () => [
+		{
+			x: 0,
+			y: 0,
+			width: 100,
+			height: 100,
+		},
+	] );
+
+	beforeAll( () => {
+		window.Element.prototype.getClientRects =
+			jest.fn( mockedGetClientRects );
+	} );
+
+	afterAll( () => {
+		window.Element.prototype.getClientRects = originalGetClientRects;
+	} );
+
 	it( 'should render', () => {
 		render( <MyNavigation /> );
 
@@ -403,5 +445,28 @@ describe( 'Navigator', () => {
 
 		expect( getHomeScreen() ).toBeInTheDocument();
 		expect( getToInvalidHTMLPathScreenButton() ).toHaveFocus();
+	} );
+
+	it( 'should keep focus on the element that is being interacted with, while re-rendering', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
+		render( <MyNavigation /> );
+
+		expect( getHomeScreen() ).toBeInTheDocument();
+		expect( getToChildScreenButton() ).toBeInTheDocument();
+
+		// Navigate to child screen.
+		await user.click( getToChildScreenButton() );
+
+		expect( getChildScreen() ).toBeInTheDocument();
+		expect( getBackButton() ).toBeInTheDocument();
+		expect( getToNestedScreenButton() ).toHaveFocus();
+
+		// Interact with the input, the focus should stay on the input element.
+		const input = screen.getByLabelText( 'This is a test input' );
+		await user.type( input, 'd' );
+		expect( input ).toHaveFocus();
 	} );
 } );

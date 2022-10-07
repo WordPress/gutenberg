@@ -145,8 +145,10 @@ describe( 'useQuerySelect', () => {
 					} ),
 				},
 				resolvers: {
-					getResolvedFoo: () => ( { dispatch } ) =>
-						dispatch.receiveFoo( 5 ),
+					getResolvedFoo:
+						() =>
+						( { dispatch } ) =>
+							dispatch.receiveFoo( 5 ),
 				},
 				selectors: {
 					getResolvedFoo: ( state, arg ) => state.resolvedFoo + arg,

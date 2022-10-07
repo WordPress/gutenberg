@@ -32,9 +32,10 @@ describe( 'controls', () => {
 				},
 				controls: {
 					DISPATCH: createRegistryControl(
-						( reg ) => ( { store, action } ) => {
-							return reg.dispatch( store )[ action ]();
-						}
+						( reg ) =>
+							( { store, action } ) => {
+								return reg.dispatch( store )[ action ]();
+							}
 					),
 				},
 			} );

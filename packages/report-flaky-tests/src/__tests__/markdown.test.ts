@@ -46,8 +46,7 @@ describe( 'formatTestResults', () => {
 			date: new Date(),
 			failedTimes: 1,
 			headBranch: 'trunk',
-			runURL:
-				'https://github.com/WordPress/gutenberg/actions/runs/2282393879',
+			runURL: 'https://github.com/WordPress/gutenberg/actions/runs/2282393879',
 		} );
 
 		expect( formatted ).toMatchInlineSnapshot(
@@ -64,8 +63,7 @@ describe( 'formatTestResults', () => {
 			date: new Date(),
 			failedTimes: 1,
 			headBranch: 'trunk',
-			runURL:
-				'https://github.com/WordPress/gutenberg/actions/runs/2282393879',
+			runURL: 'https://github.com/WordPress/gutenberg/actions/runs/2282393879',
 			errorMessage: 'Error:\n  Oops...\n',
 		} );
 
@@ -124,8 +122,7 @@ describe( 'parseFormattedTestResults', () => {
 			date: new Date(),
 			failedTimes: 1,
 			headBranch: 'trunk',
-			runURL:
-				'https://github.com/WordPress/gutenberg/actions/runs/2297863316',
+			runURL: 'https://github.com/WordPress/gutenberg/actions/runs/2297863316',
 		};
 
 		const formatted = formatTestResults( testResult );
@@ -140,8 +137,7 @@ describe( 'parseFormattedTestResults', () => {
 			date: new Date(),
 			failedTimes: 1,
 			headBranch: 'trunk',
-			runURL:
-				'https://github.com/WordPress/gutenberg/actions/runs/2297863316',
+			runURL: 'https://github.com/WordPress/gutenberg/actions/runs/2297863316',
 			errorMessage: 'Error:\n  Oops...\n',
 		};
 
@@ -157,8 +153,7 @@ describe( 'parseFormattedTestResults', () => {
 			date: new Date(),
 			failedTimes: 1,
 			headBranch: 'trunk',
-			runURL:
-				'https://github.com/WordPress/gutenberg/actions/runs/2297863316',
+			runURL: 'https://github.com/WordPress/gutenberg/actions/runs/2297863316',
 			errorMessage: 'Error:\n  Oops...\n',
 		};
 
@@ -180,15 +175,13 @@ describe( 'parseIssueBody', () => {
 				date: new Date( '2020-08-01' ),
 				failedTimes: 1,
 				headBranch: 'trunk',
-				runURL:
-					'https://github.com/WordPress/gutenberg/actions/runs/2282393879',
+				runURL: 'https://github.com/WordPress/gutenberg/actions/runs/2282393879',
 			} ),
 			formatTestResults( {
 				date: new Date(),
 				failedTimes: 2,
 				headBranch: 'try/some-branch',
-				runURL:
-					'https://github.com/WordPress/gutenberg/actions/runs/2297863316',
+				runURL: 'https://github.com/WordPress/gutenberg/actions/runs/2297863316',
 				errorMessage: 'Error:\n  Oops...\n  Oops again',
 			} ),
 			`\n<!-- __TEST_RESULT__ -->Some broken log.\nOops.\n<!-- /__TEST_RESULT__ -->\n`,
@@ -219,15 +212,13 @@ describe( 'parseIssueBody', () => {
 					date: new Date( '2020-08-01' ),
 					failedTimes: 1,
 					headBranch: 'trunk',
-					runURL:
-						'https://github.com/WordPress/gutenberg/actions/runs/2282393879',
+					runURL: 'https://github.com/WordPress/gutenberg/actions/runs/2282393879',
 				},
 				{
 					date: new Date(),
 					failedTimes: 2,
 					headBranch: 'try/some-branch',
-					runURL:
-						'https://github.com/WordPress/gutenberg/actions/runs/2297863316',
+					runURL: 'https://github.com/WordPress/gutenberg/actions/runs/2297863316',
 					errorMessage: 'Error:\n  Oops...\n  Oops again',
 				},
 			],

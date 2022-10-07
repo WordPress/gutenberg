@@ -30,9 +30,8 @@ function ParentControl( { parents, postType, onChange } ) {
 			if ( ! search ) {
 				return { searchResults: EMPTY_ARRAY, searchHasResolved: true };
 			}
-			const { getEntityRecords, hasFinishedResolution } = select(
-				coreStore
-			);
+			const { getEntityRecords, hasFinishedResolution } =
+				select( coreStore );
 			const selectorArgs = [
 				'postType',
 				postType,
@@ -126,6 +125,7 @@ function ParentControl( { parents, postType, onChange } ) {
 			onInputChange={ debouncedSearch }
 			suggestions={ suggestions }
 			onChange={ onParentChange }
+			__experimentalShowHowTo={ false }
 		/>
 	);
 }

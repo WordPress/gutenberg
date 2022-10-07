@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { Dimensions, Platform } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 /**
  * WordPress dependencies
  */
 import {
+	Platform,
 	renderToString,
 	memo,
 	useRef,
@@ -281,6 +282,9 @@ function Sandbox( {
 
 	useEffect( () => {
 		updateContentHtml();
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ html, title, type, styles, scripts ] );
 
 	useEffect( () => {
@@ -307,6 +311,7 @@ function Sandbox( {
 			style={ [
 				sandboxStyles[ 'sandbox-webview__content' ],
 				getSizeStyle(),
+				Platform.isAndroid && workaroundStyles.webView,
 			] }
 			onMessage={ checkMessageForResize }
 			scrollEnabled={ false }
@@ -316,5 +321,16 @@ function Sandbox( {
 		/>
 	);
 }
+
+const workaroundStyles = StyleSheet.create( {
+	webView: {
+		/**
+		 * The slight opacity below is a workaround for an Android crash caused from combining Android
+		 * 12's new scroll overflow behavior and webviews.
+		 * https://github.com/react-native-webview/react-native-webview/issues/1915#issuecomment-808869253
+		 */
+		opacity: 0.99,
+	},
+} );
 
 export default memo( Sandbox );

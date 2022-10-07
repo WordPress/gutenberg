@@ -17,7 +17,7 @@
 		},
 		"apiVersion": {
 			"type": "integer",
-			"description": "The version of the Block API used by the block. The most recent version is 2 and it was introduced in WordPress 5.6.\n\n See the the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
+			"description": "The version of the Block API used by the block. The most recent version is 2 and it was introduced in WordPress 5.6.\n\n See the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
 			"default": 1,
 			"enum": [ 1, 2 ]
 		},
@@ -185,7 +185,7 @@
 							"description": "Although attributes may be obtained from a post’s meta, meta attribute sources are considered deprecated; EntityProvider and related hook APIs should be used instead, as shown in the Create Meta Block how-to here:\n\nhttps://developer.wordpress.org/block-editor/how-to-guides/metabox/meta-block-3-add/"
 						},
 						"default": {
-							"description": "TA block attribute can contain a default value, which will be used if the type and source do not match anything within the block content.\n\nThe value is provided by the default field, and the value should match the expected format of the attribute."
+							"description": "A block attribute can contain a default value, which will be used if the type and source do not match anything within the block content.\n\nThe value is provided by the default field, and the value should match the expected format of the attribute."
 						}
 					},
 					"required": [ "type" ]
@@ -211,7 +211,7 @@
 		},
 		"supports": {
 			"type": "object",
-			"description": "It contains as set of options to control features used in the editor. See the the supports documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/ for more details.",
+			"description": "It contains as set of options to control features used in the editor. See the supports documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/ for more details.",
 			"properties": {
 				"anchor": {
 					"type": "boolean",
@@ -245,6 +245,11 @@
 					"description": "This property allows to enable wide alignment for your theme. To disable this behavior for a single block, set this flag to false.",
 					"default": true
 				},
+				"ariaLabel": {
+					"type": "boolean",
+					"description": "ARIA-labels let you define an accessible label for elements. This property allows enabling the definition of an aria-label for the block, without exposing a UI field.",
+					"default": false
+				},
 				"className": {
 					"type": "boolean",
 					"description": "By default, the class .wp-block-your-block-name is added to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If, for whatever reason, a class is not desired on the markup, this functionality can be disabled.",
@@ -272,6 +277,11 @@
 						"text": {
 							"type": "boolean",
 							"description": "This property adds block controls which allow the user to set text color in a block.\n\nWhen color support is declared, this property is enabled by default (along with background), so simply setting color will enable text color.\n\nText color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.text, the attributes definition is extended to include two new attributes: textColor and style",
+							"default": true
+						},
+						"enableContrastChecker": {
+							"type": "boolean",
+							"description": "Determines whether the contrast checker widget displays in the block editor UI.\n\nThe contrast checker appears only if the block declares support for color. It tests the readability of color combinations and warns if there is a potential issue. The property is enabled by default.\n\nSet to `false` to explicitly disable.",
 							"default": true
 						}
 					}
@@ -411,7 +421,7 @@
 		},
 		"example": {
 			"type": "object",
-			"description": "It provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.\n\nSee the the example documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#example-optional for more details.",
+			"description": "It provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.\n\nSee the example documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#example-optional for more details.",
 			"properties": {
 				"viewportWidth": {
 					"type": "number",
@@ -429,12 +439,32 @@
 			}
 		},
 		"editorScript": {
-			"type": "string",
-			"description": "Block type editor script definition. It will only be enqueued in the context of the editor."
+			"description": "Block type editor script definition. It will only be enqueued in the context of the editor.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
 		},
 		"script": {
-			"type": "string",
-			"description": "Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site."
+			"description": "Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
 		},
 		"viewScript": {
 			"description": "Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.",
@@ -477,6 +507,97 @@
 					}
 				}
 			]
+		},
+		"variations": {
+			"type": "array",
+			"description": "Block Variations is the API that allows a block to have similar versions of it, but all these versions share some common functionality.",
+			"items": {
+				"type": "object",
+				"required": [ "name", "title" ],
+				"additionalProperties": false,
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": "The unique and machine-readable name."
+					},
+					"title": {
+						"type": "string",
+						"description": "A human-readable variation title."
+					},
+					"description": {
+						"type": "string",
+						"description": "A detailed variation description."
+					},
+					"category": {
+						"description": "A category classification, used in search interfaces to arrange block types by category.",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"enum": [
+									"text",
+									"media",
+									"design",
+									"widgets",
+									"theme",
+									"embed"
+								]
+							}
+						]
+					},
+					"icon": {
+						"description": "An icon helping to visualize the variation. It can have the same shape as the block type.",
+						"type": "string"
+					},
+					"isDefault": {
+						"type": "boolean",
+						"default": false,
+						"description": "Indicates whether the current variation is the default one."
+					},
+					"attributes": {
+						"type": "object",
+						"description": "Values that override block attributes."
+					},
+					"innerBlocks": {
+						"type": "array",
+						"items": {
+							"type": "array"
+						},
+						"description": "Initial configuration of nested blocks."
+					},
+					"example": {
+						"type": "object",
+						"description": "Example provides structured data for the block preview. You can set to undefined to disable the preview shown for the block type."
+					},
+					"scope": {
+						"type": "array",
+						"description": "The list of scopes where the variation is applicable.",
+						"items": {
+							"enum": [ "inserter", "block", "transform" ]
+						},
+						"default": [ "inseter", "block" ]
+					},
+					"keywords": {
+						"type": "array",
+						"description": "An array of terms (which can be translated) that help users discover the variation while searching.",
+						"items": {
+							"type": "string"
+						}
+					},
+					"isActive": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "The list of attributes that should be compared. Each attributes will be matched and the variation will be active if all of them are matching."
+					}
+				}
+			}
+		},
+		"render": {
+			"type": "string",
+			"description": "Template file loaded on the server when rendering a block."
 		}
 	},
 	"required": [ "name", "title" ],

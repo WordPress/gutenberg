@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,6 +16,8 @@ import { chevronUp, chevronDown } from '@wordpress/icons';
 import Button from '../button';
 import Icon from '../icon';
 import { useControlledState, useUpdateEffect } from '../utils';
+
+const noop = () => {};
 
 export function PanelBody(
 	{

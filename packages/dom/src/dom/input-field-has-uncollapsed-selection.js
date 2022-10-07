@@ -30,10 +30,8 @@ export default function inputFieldHasUncollapsedSelection( element ) {
 	// `selectionEnd` on non-text <input> elements, so a try/catch construct is
 	// necessary.
 	try {
-		const {
-			selectionStart,
-			selectionEnd,
-		} = /** @type {HTMLInputElement | HTMLTextAreaElement} */ ( element );
+		const { selectionStart, selectionEnd } =
+			/** @type {HTMLInputElement | HTMLTextAreaElement} */ ( element );
 		return (
 			// `null` means the input type doesn't implement selection, thus we
 			// cannot determine whether the selection is collapsed, so we

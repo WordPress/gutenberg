@@ -3,6 +3,7 @@
  */
 import { blockNames } from './pages/editor-page';
 import {
+	clearClipboard,
 	longPressMiddleOfElement,
 	tapSelectAllAboveElement,
 	tapCopyAboveElement,
@@ -21,7 +22,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 	}
 
 	beforeAll( async () => {
-		await editorPage.driver.setClipboard( '', 'plaintext' );
+		await clearClipboard( editorPage.driver );
 	} );
 
 	it( 'copies plain text from one paragraph block and pastes in another', async () => {
@@ -58,10 +59,6 @@ describe( 'Gutenberg Editor paste tests', () => {
 		);
 
 		// Paste into second paragraph block.
-		await longPressMiddleOfElement(
-			editorPage.driver,
-			paragraphBlockElement2
-		);
 		await tapPasteAboveElement( editorPage.driver, paragraphBlockElement2 );
 
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 2 );
@@ -101,10 +98,6 @@ describe( 'Gutenberg Editor paste tests', () => {
 		);
 
 		// Paste into second paragraph block.
-		await longPressMiddleOfElement(
-			editorPage.driver,
-			paragraphBlockElement2
-		);
 		await tapPasteAboveElement( editorPage.driver, paragraphBlockElement2 );
 
 		// Check styled text by verifying html contents.

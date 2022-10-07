@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { useInnerBlocksProps } from '@wordpress/block-editor';
@@ -42,7 +37,6 @@ const ALLOWED_BLOCKS = [
 ];
 
 export default function UnsavedInnerBlocks( {
-	blockProps,
 	blocks,
 	clientId,
 	hasSavedUnsavedInnerBlocks,
@@ -63,7 +57,9 @@ export default function UnsavedInnerBlocks( {
 	// from the original inner blocks from the post content then the
 	// user has made changes to the inner blocks. At this point the inner
 	// blocks can be considered "dirty".
-	const innerBlocksAreDirty = blocks !== originalBlocks.current;
+	// We also make sure the current innerBlocks had a chance to be set.
+	const innerBlocksAreDirty =
+		!! originalBlocks.current && blocks !== originalBlocks.current;
 
 	const shouldDirectInsert = useMemo(
 		() =>
@@ -81,46 +77,52 @@ export default function UnsavedInnerBlocks( {
 	const isDisabled = useContext( Disabled.Context );
 	const savingLock = useRef( false );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		renderAppender: hasSelection ? undefined : false,
-		allowedBlocks: ALLOWED_BLOCKS,
-		__experimentalDefaultBlock: DEFAULT_BLOCK,
-		__experimentalDirectInsert: shouldDirectInsert,
-	} );
-
-	const {
-		isSaving,
-		draftNavigationMenus,
-		hasResolvedDraftNavigationMenus,
-	} = useSelect(
-		( select ) => {
-			if ( isDisabled ) {
-				return EMPTY_OBJECT;
-			}
-
-			const {
-				getEntityRecords,
-				hasFinishedResolution,
-				isSavingEntityRecord,
-			} = select( coreStore );
-
-			return {
-				isSaving: isSavingEntityRecord( 'postType', 'wp_navigation' ),
-				draftNavigationMenus: getEntityRecords( ...DRAFT_MENU_PARAMS ),
-				hasResolvedDraftNavigationMenus: hasFinishedResolution(
-					'getEntityRecords',
-					DRAFT_MENU_PARAMS
-				),
-			};
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'wp-block-navigation__container',
 		},
-		[ isDisabled ]
+		{
+			renderAppender: hasSelection ? undefined : false,
+			allowedBlocks: ALLOWED_BLOCKS,
+			__experimentalDefaultBlock: DEFAULT_BLOCK,
+			__experimentalDirectInsert: shouldDirectInsert,
+		}
 	);
+
+	const { isSaving, draftNavigationMenus, hasResolvedDraftNavigationMenus } =
+		useSelect(
+			( select ) => {
+				if ( isDisabled ) {
+					return EMPTY_OBJECT;
+				}
+
+				const {
+					getEntityRecords,
+					hasFinishedResolution,
+					isSavingEntityRecord,
+				} = select( coreStore );
+
+				return {
+					isSaving: isSavingEntityRecord(
+						'postType',
+						'wp_navigation'
+					),
+					draftNavigationMenus: getEntityRecords(
+						...DRAFT_MENU_PARAMS
+					),
+					hasResolvedDraftNavigationMenus: hasFinishedResolution(
+						'getEntityRecords',
+						DRAFT_MENU_PARAMS
+					),
+				};
+			},
+			[ isDisabled ]
+		);
 
 	const { hasResolvedNavigationMenus, navigationMenus } = useNavigationMenu();
 
-	const { create: createNavigationMenu } = useCreateNavigationMenu(
-		clientId
-	);
+	const { create: createNavigationMenu } =
+		useCreateNavigationMenu( clientId );
 
 	// Automatically save the uncontrolled blocks.
 	useEffect( () => {
@@ -169,18 +171,9 @@ export default function UnsavedInnerBlocks( {
 	const Wrapper = isSaving ? Disabled : 'div';
 
 	return (
-		<Wrapper className="wp-block-navigation__unsaved-changes">
-			<div
-				className={ classnames(
-					'wp-block-navigation__unsaved-changes-overlay',
-					{
-						'is-saving': isSaving,
-					}
-				) }
-			>
-				<div { ...innerBlocksProps } />
-			</div>
+		<>
+			<Wrapper { ...innerBlocksProps } />
 			{ isSaving && <Spinner /> }
-		</Wrapper>
+		</>
 	);
 }

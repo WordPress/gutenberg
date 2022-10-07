@@ -4,7 +4,6 @@
  * External dependencies
  */
 import { View, Platform, Dimensions } from 'react-native';
-import { get, pickBy, debounce } from 'lodash';
 import memize from 'memize';
 import { colord } from 'colord';
 
@@ -18,7 +17,11 @@ import {
 } from '@wordpress/react-native-bridge';
 import { BlockFormatControls, getPxFromCssUnit } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import {
+	compose,
+	debounce,
+	withPreferredColorScheme,
+} from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -109,9 +112,8 @@ export class RichText extends Component {
 		this.debounceCreateUndoLevel = debounce( this.onCreateUndoLevel, 1000 );
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change.
 		this.onSelectionChange = this.onSelectionChange.bind( this );
-		this.onSelectionChangeFromAztec = this.onSelectionChangeFromAztec.bind(
-			this
-		);
+		this.onSelectionChangeFromAztec =
+			this.onSelectionChangeFromAztec.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.getHtmlToRender = this.getHtmlToRender.bind( this );
 		this.handleSuggestionFunc = this.handleSuggestionFunc.bind( this );
@@ -125,12 +127,10 @@ export class RichText extends Component {
 		).bind( this );
 		this.suggestionOptions = this.suggestionOptions.bind( this );
 		this.insertString = this.insertString.bind( this );
-		this.manipulateEventCounterToForceNativeToRefresh = this.manipulateEventCounterToForceNativeToRefresh.bind(
-			this
-		);
-		this.shouldDropEventFromAztec = this.shouldDropEventFromAztec.bind(
-			this
-		);
+		this.manipulateEventCounterToForceNativeToRefresh =
+			this.manipulateEventCounterToForceNativeToRefresh.bind( this );
+		this.shouldDropEventFromAztec =
+			this.shouldDropEventFromAztec.bind( this );
 		this.state = {
 			activeFormats: [],
 			selectedFormat: null,
@@ -227,8 +227,10 @@ export class RichText extends Component {
 
 	onFormatChange( record ) {
 		const { start = 0, end = 0, activeFormats = [] } = record;
-		const changeHandlers = pickBy( this.props, ( v, key ) =>
-			key.startsWith( 'format_on_change_functions_' )
+		const changeHandlers = Object.fromEntries(
+			Object.entries( this.props ).filter( ( [ key ] ) =>
+				key.startsWith( 'format_on_change_functions_' )
+			)
 		);
 
 		Object.values( changeHandlers ).forEach( ( changeHandler ) => {
@@ -1051,6 +1053,7 @@ export class RichText extends Component {
 			selectionStart,
 			selectionEnd,
 			disableSuggestions,
+			containerWidth,
 		} = this.props;
 		const { currentFontSize } = this.state;
 
@@ -1127,11 +1130,16 @@ export class RichText extends Component {
 			maxWidth && this.state.width && maxWidth - this.state.width < 10
 				? maxWidth
 				: this.state.width;
-		const containerStyles = style?.padding &&
-			style?.backgroundColor && {
-				padding: style.padding,
-				backgroundColor: style.backgroundColor,
-			};
+		const containerStyles = [
+			style?.padding &&
+				style?.backgroundColor && {
+					padding: style.padding,
+					backgroundColor: style.backgroundColor,
+				},
+			containerWidth && {
+				width: containerWidth,
+			},
+		];
 
 		const EditableView = ( props ) => {
 			this.customEditableOnKeyDown = props?.onKeyDown;
@@ -1271,15 +1279,11 @@ const withFormatTypes = ( WrappedComponent ) => ( props ) => {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockParents, getBlock, getSettings } = select(
-			'core/block-editor'
-		);
+		const { getBlockParents, getBlock, getSettings } =
+			select( 'core/block-editor' );
 		const parents = getBlockParents( clientId, true );
 		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;
-		const parentBlockStyles = get( parentBlock, [
-			'attributes',
-			'childrenStyles',
-		] );
+		const parentBlockStyles = parentBlock?.attributes?.childrenStyles;
 
 		const settings = getSettings();
 		const baseGlobalStyles = settings?.__experimentalGlobalStylesBaseStyles;

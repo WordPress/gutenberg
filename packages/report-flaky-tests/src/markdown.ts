@@ -156,13 +156,8 @@ function parseFormattedTestResults(
 ${ formattedTestResults }` );
 	}
 
-	const {
-		date,
-		failedTimes,
-		runURL,
-		headBranch,
-		errorMessage,
-	} = matches.groups!;
+	const { date, failedTimes, runURL, headBranch, errorMessage } =
+		matches.groups!;
 
 	return {
 		date: new Date( date ),

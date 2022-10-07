@@ -22,11 +22,8 @@ const BlockDraggable = ( {
 } ) => {
 	const { srcRootClientId, isDraggable, icon } = useSelect(
 		( select ) => {
-			const {
-				canMoveBlocks,
-				getBlockRootClientId,
-				getBlockName,
-			} = select( blockEditorStore );
+			const { canMoveBlocks, getBlockRootClientId, getBlockName } =
+				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 			const blockName = getBlockName( clientIds[ 0 ] );
 
@@ -39,15 +36,11 @@ const BlockDraggable = ( {
 		[ clientIds ]
 	);
 	const isDragging = useRef( false );
-	const [
-		startScrolling,
-		scrollOnDragOver,
-		stopScrolling,
-	] = useScrollWhenDragging();
+	const [ startScrolling, scrollOnDragOver, stopScrolling ] =
+		useScrollWhenDragging();
 
-	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
-		blockEditorStore
-	);
+	const { startDraggingBlocks, stopDraggingBlocks } =
+		useDispatch( blockEditorStore );
 
 	// Stop dragging blocks if the block draggable is unmounted.
 	useEffect( () => {
@@ -59,7 +52,7 @@ const BlockDraggable = ( {
 	}, [] );
 
 	if ( ! isDraggable ) {
-		return children( { isDraggable: false } );
+		return children( { draggable: false } );
 	}
 
 	const transferData = {

@@ -79,6 +79,7 @@ function Variation( { variation } ) {
 				onKeyDown={ selectOnEnter }
 				tabIndex="0"
 				aria-label={ variation?.title }
+				aria-current={ isActive }
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
 			>
@@ -86,6 +87,7 @@ function Variation( { variation } ) {
 					<StylesPreview
 						label={ variation?.title }
 						isFocused={ isFocused }
+						withHoverView
 					/>
 				</div>
 			</div>
@@ -96,9 +98,10 @@ function Variation( { variation } ) {
 function ScreenStyleVariations() {
 	const { variations } = useSelect( ( select ) => {
 		return {
-			variations: select(
-				coreStore
-			).__experimentalGetCurrentThemeGlobalStylesVariations(),
+			variations:
+				select(
+					coreStore
+				).__experimentalGetCurrentThemeGlobalStylesVariations(),
 		};
 	}, [] );
 
@@ -109,7 +112,11 @@ function ScreenStyleVariations() {
 				settings: {},
 				styles: {},
 			},
-			...variations,
+			...variations.map( ( variation ) => ( {
+				...variation,
+				settings: variation.settings ?? {},
+				styles: variation.styles ?? {},
+			} ) ),
 		];
 	}, [ variations ] );
 
@@ -119,7 +126,7 @@ function ScreenStyleVariations() {
 				back="/"
 				title={ __( 'Browse styles' ) }
 				description={ __(
-					'Choose a different style combination for the theme styles'
+					'Choose a variation to change the look of the site.'
 				) }
 			/>
 

@@ -4,7 +4,7 @@
 		"module": "CommonJS",
 		"declarationDir": "build-types",
 		"rootDir": "src",
-		"types": [ "jest" ],
+		"types": [ "jest" ]
 	},
 	"include": [ "src/**/*" ],
 	"exclude": [ "src/__tests__/**/*", "src/__fixtures__/**/*" ]

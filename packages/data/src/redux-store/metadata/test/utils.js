@@ -47,8 +47,7 @@ describe( 'selectorArgsToStateKey', () => {
 
 	it( 'should remove trailing undefined values', () => {
 		expect( selectorArgsToStateKey( [ 1, 2, undefined ] ) ).toEqual( [
-			1,
-			2,
+			1, 2,
 		] );
 		expect(
 			selectorArgsToStateKey( [ 1, 2, undefined, undefined ] )

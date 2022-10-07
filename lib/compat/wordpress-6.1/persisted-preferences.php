@@ -21,11 +21,11 @@ function gutenberg_register_persisted_preferences_meta() {
 			'type'         => 'object',
 			'single'       => true,
 			'show_in_rest' => array(
-				'name'    => 'persisted_preferences',
-				'type'    => 'object',
-				'context' => array( 'edit' ),
-				'schema'  => array(
+				'name'   => 'persisted_preferences',
+				'type'   => 'object',
+				'schema' => array(
 					'type'                 => 'object',
+					'context'              => array( 'edit' ),
 					'properties'           => array(
 						'_modified' => array(
 							'description' => __( 'The date and time the preferences were updated.', 'default' ),
@@ -72,7 +72,6 @@ function gutenberg_configure_persisted_preferences() {
 		),
 		'after'
 	);
-
 }
 
 add_action( 'admin_init', 'gutenberg_configure_persisted_preferences' );

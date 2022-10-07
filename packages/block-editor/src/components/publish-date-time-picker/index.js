@@ -1,15 +1,15 @@
 /**
  * WordPress dependencies
  */
-import {
-	DateTimePicker,
-	__experimentalHStack as HStack,
-	__experimentalSpacer as Spacer,
-	Button,
-} from '@wordpress/components';
-import { closeSmall } from '@wordpress/icons';
+import { DateTimePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
+import { getSettings } from '@wordpress/date';
+
+/**
+ * Internal dependencies
+ */
+import InspectorPopoverHeader from '../inspector-popover-header';
 
 function PublishDateTimePicker(
 	{ onClose, onChange, ...additionalProps },
@@ -17,27 +17,18 @@ function PublishDateTimePicker(
 ) {
 	return (
 		<div ref={ ref } className="block-editor-publish-date-time-picker">
-			{ /* TODO: This header is essentially the same as the one in <PostVisiblity />. DRY it up. */ }
-			<HStack className="block-editor-publish-date-time-picker__header">
-				<h2 className="block-editor-publish-date-time-picker__heading">
-					{ __( 'Publish' ) }
-				</h2>
-				<Spacer />
-				<Button
-					className="block-editor-publish-date-time-picker__reset"
-					variant="tertiary"
-					onClick={ () => onChange?.( null ) }
-				>
-					{ __( 'Now' ) }
-				</Button>
-				<Button
-					className="block-editor-publish-date-time-picker__close"
-					icon={ closeSmall }
-					label={ __( 'Close' ) }
-					onClick={ onClose }
-				/>
-			</HStack>
+			<InspectorPopoverHeader
+				title={ __( 'Publish' ) }
+				actions={ [
+					{
+						label: __( 'Now' ),
+						onClick: () => onChange?.( null ),
+					},
+				] }
+				onClose={ onClose }
+			/>
 			<DateTimePicker
+				startOfWeek={ getSettings().l10n.startOfWeek }
 				__nextRemoveHelpButton
 				__nextRemoveResetButton
 				onChange={ onChange }

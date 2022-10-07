@@ -28,11 +28,8 @@ export function PostPendingStatusCheck( {
 
 export default compose(
 	withSelect( ( select ) => {
-		const {
-			isCurrentPostPublished,
-			getCurrentPostType,
-			getCurrentPost,
-		} = select( editorStore );
+		const { isCurrentPostPublished, getCurrentPostType, getCurrentPost } =
+			select( editorStore );
 		return {
 			hasPublishAction: get(
 				getCurrentPost(),

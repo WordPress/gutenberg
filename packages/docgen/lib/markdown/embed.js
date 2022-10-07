@@ -1,14 +1,8 @@
-/**
- * External dependencies
- */
-const { findLast } = require( 'lodash' );
-
 const getHeadingIndex = ( ast, index ) => {
 	const astBeforeIndex = ast.children.slice( 0, index );
-	const lastHeading = findLast(
-		astBeforeIndex,
-		( node ) => node.type === 'heading'
-	);
+	const lastHeading = astBeforeIndex
+		.reverse()
+		.find( ( node ) => node.type === 'heading' );
 	return lastHeading ? lastHeading.depth : 1;
 };
 

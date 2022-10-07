@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { cloneDeep } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import cleanEmptyObject from './clean-empty-object';
@@ -21,17 +16,14 @@ export default function ( attributes ) {
 		return attributes;
 	}
 
-	// Clone first so when we delete the fontFamily
-	// below we're not modifying the original
-	// attributes. Because the deprecation may be discarded
-	// we don't want to alter the original attributes.
-	const atts = cloneDeep( attributes );
-	const fontFamily = atts.style.typography.fontFamily.split( '|' ).pop();
-	delete atts.style.typography.fontFamily;
-	atts.style = cleanEmptyObject( atts.style );
+	const { fontFamily, ...typography } = attributes.style.typography;
 
 	return {
-		...atts,
-		fontFamily,
+		...attributes,
+		style: cleanEmptyObject( {
+			...attributes.style,
+			typography,
+		} ),
+		fontFamily: fontFamily.split( '|' ).pop(),
 	};
 }

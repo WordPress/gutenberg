@@ -8,7 +8,7 @@ import * as fs from 'fs';
  */
 import type { RequestUtils } from './index';
 
-interface Media {
+export interface Media {
 	id: number;
 	title: {
 		raw: string;

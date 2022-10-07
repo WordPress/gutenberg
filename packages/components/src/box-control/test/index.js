@@ -1,18 +1,28 @@
 /**
  * External dependencies
  */
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import BoxControl from '../';
+
+const setupUser = () =>
+	userEvent.setup( {
+		advanceTimers: jest.advanceTimersByTime,
+	} );
+
+const getInput = () =>
+	screen.getByLabelText( 'Box Control', { selector: 'input' } );
+const getSelect = () => screen.getByLabelText( 'Select unit' );
+const getReset = () => screen.getByText( /Reset/ );
 
 describe( 'BoxControl', () => {
 	describe( 'Basic rendering', () => {
@@ -23,42 +33,41 @@ describe( 'BoxControl', () => {
 			expect( input ).toBeTruthy();
 		} );
 
-		it( 'should update values when interacting with input', () => {
-			const { container } = render( <BoxControl /> );
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
+		it( 'should update values when interacting with input', async () => {
+			const user = setupUser();
+			render( <BoxControl /> );
+			const input = getInput();
+			const select = getSelect();
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100%' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			await user.type( input, '100%' );
+			await user.keyboard( '{Enter}' );
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( '%' );
+			expect( input ).toHaveValue( '100' );
+			expect( select ).toHaveValue( '%' );
 		} );
 	} );
 
 	describe( 'Reset', () => {
-		it( 'should reset values when clicking Reset', () => {
-			const { container, getByText } = render( <BoxControl /> );
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
-			const reset = getByText( /Reset/ );
+		it( 'should reset values when clicking Reset', async () => {
+			const user = setupUser();
+			render( <BoxControl /> );
+			const input = getInput();
+			const select = getSelect();
+			const reset = getReset();
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			await user.type( input, '100px' );
+			await user.keyboard( '{Enter}' );
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( 'px' );
+			expect( input ).toHaveValue( '100' );
+			expect( select ).toHaveValue( 'px' );
 
-			reset.focus();
-			fireEvent.click( reset );
+			await user.click( reset );
 
-			expect( input.value ).toBe( '' );
-			expect( unitSelect.value ).toBe( 'px' );
+			expect( input ).toHaveValue( '' );
+			expect( select ).toHaveValue( 'px' );
 		} );
 
-		it( 'should reset values when clicking Reset, if controlled', () => {
+		it( 'should reset values when clicking Reset, if controlled', async () => {
 			const Example = () => {
 				const [ state, setState ] = useState();
 
@@ -69,26 +78,25 @@ describe( 'BoxControl', () => {
 					/>
 				);
 			};
-			const { container, getByText } = render( <Example /> );
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
-			const reset = getByText( /Reset/ );
+			const user = setupUser();
+			render( <Example /> );
+			const input = getInput();
+			const select = getSelect();
+			const reset = getReset();
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			await user.type( input, '100px' );
+			await user.keyboard( '{Enter}' );
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( 'px' );
+			expect( input ).toHaveValue( '100' );
+			expect( select ).toHaveValue( 'px' );
 
-			reset.focus();
-			fireEvent.click( reset );
+			await user.click( reset );
 
-			expect( input.value ).toBe( '' );
-			expect( unitSelect.value ).toBe( 'px' );
+			expect( input ).toHaveValue( '' );
+			expect( select ).toHaveValue( 'px' );
 		} );
 
-		it( 'should reset values when clicking Reset, if controlled <-> uncontrolled state changes', () => {
+		it( 'should reset values when clicking Reset, if controlled <-> uncontrolled state changes', async () => {
 			const Example = () => {
 				const [ state, setState ] = useState();
 
@@ -106,70 +114,78 @@ describe( 'BoxControl', () => {
 					/>
 				);
 			};
-			const { container, getByText } = render( <Example /> );
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
-			const reset = getByText( /Reset/ );
+			const user = setupUser();
+			render( <Example /> );
+			const input = getInput();
+			const select = getSelect();
+			const reset = getReset();
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			await user.type( input, '100px' );
+			await user.keyboard( '{Enter}' );
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( 'px' );
+			expect( input ).toHaveValue( '100' );
+			expect( select ).toHaveValue( 'px' );
 
-			reset.focus();
-			fireEvent.click( reset );
+			await user.click( reset );
 
-			expect( input.value ).toBe( '' );
-			expect( unitSelect.value ).toBe( 'px' );
+			expect( input ).toHaveValue( '' );
+			expect( select ).toHaveValue( 'px' );
 		} );
 
-		it( 'should persist cleared value when focus changes', () => {
-			render( <BoxControl /> );
+		it( 'should persist cleared value when focus changes', async () => {
+			const user = setupUser();
+			const spyChange = jest.fn();
+			render( <BoxControl onChange={ ( v ) => spyChange( v ) } /> );
 			const input = screen.getByLabelText( 'Box Control', {
 				selector: 'input',
 			} );
 			const unitSelect = screen.getByLabelText( 'Select unit' );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100%' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			await user.type( input, '100%' );
+			await user.keyboard( '{Enter}' );
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( '%' );
+			expect( input ).toHaveValue( '100' );
+			expect( unitSelect ).toHaveValue( '%' );
 
-			fireEvent.change( input, { target: { value: '' } } );
-			fireEvent.blur( input );
+			await user.clear( input );
+			expect( input ).toHaveValue( '' );
+			// Clicking document.body to trigger a blur event on the input.
+			await user.click( document.body );
 
-			expect( input.value ).toBe( '' );
+			expect( input ).toHaveValue( '' );
+			expect( spyChange ).toHaveBeenLastCalledWith( {
+				top: undefined,
+				right: undefined,
+				bottom: undefined,
+				left: undefined,
+			} );
 		} );
 	} );
 
-	describe( 'Unlinked Sides', () => {
-		it( 'should update a single side value when unlinked', () => {
+	describe( 'Unlinked sides', () => {
+		it( 'should update a single side value when unlinked', async () => {
 			let state = {};
 			const setState = ( newState ) => ( state = newState );
 
-			const { container, getByLabelText } = render(
+			render(
 				<BoxControl
 					values={ state }
 					onChange={ ( next ) => setState( next ) }
 				/>
 			);
+			const user = setupUser();
+			const unlink = screen.getByLabelText( /Unlink sides/ );
 
-			const unlink = getByLabelText( /Unlink Sides/ );
-			fireEvent.click( unlink );
+			await user.click( unlink );
 
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
+			const input = screen.getByLabelText( /Top/ );
+			const select = screen.getAllByLabelText( /Select unit/ )[ 0 ];
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			await user.type( input, '100px' );
+			await user.keyboard( '{Enter}' );
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( 'px' );
+			expect( input ).toHaveValue( '100' );
+			expect( select ).toHaveValue( 'px' );
 
 			expect( state ).toEqual( {
 				top: '100px',
@@ -179,30 +195,30 @@ describe( 'BoxControl', () => {
 			} );
 		} );
 
-		it( 'should update a whole axis when value is changed when unlinked', () => {
+		it( 'should update a whole axis when value is changed when unlinked', async () => {
 			let state = {};
 			const setState = ( newState ) => ( state = newState );
 
-			const { container, getByLabelText } = render(
+			render(
 				<BoxControl
 					values={ state }
 					onChange={ ( next ) => setState( next ) }
 					splitOnAxis={ true }
 				/>
 			);
+			const user = setupUser();
+			const unlink = screen.getByLabelText( /Unlink sides/ );
 
-			const unlink = getByLabelText( /Unlink Sides/ );
-			fireEvent.click( unlink );
+			await user.click( unlink );
 
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
+			const input = screen.getByLabelText( /Vertical/ );
+			const select = screen.getAllByLabelText( /Select unit/ )[ 0 ];
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			await user.type( input, '100px' );
+			await user.keyboard( '{Enter}' );
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( 'px' );
+			expect( input ).toHaveValue( '100' );
+			expect( select ).toHaveValue( 'px' );
 
 			expect( state ).toEqual( {
 				top: '100px',
@@ -214,36 +230,34 @@ describe( 'BoxControl', () => {
 	} );
 
 	describe( 'Unit selections', () => {
-		it( 'should update unlinked controls unit selection based on all input control', () => {
+		it( 'should update unlinked controls unit selection based on all input control', async () => {
 			// Render control.
 			render( <BoxControl /> );
+			const user = setupUser();
 
 			// Make unit selection on all input control.
-			const allUnitSelect = screen.getByLabelText( 'Select unit' );
-			allUnitSelect.focus();
-			fireEvent.change( allUnitSelect, { target: { value: 'em' } } );
+			const allUnitSelect = getSelect();
+			await user.selectOptions( allUnitSelect, [ 'em' ] );
 
 			// Unlink the controls.
-			const unlink = screen.getByLabelText( /Unlink Sides/ );
-			fireEvent.click( unlink );
+			await user.click( screen.getByLabelText( /Unlink sides/ ) );
 
 			// Confirm that each individual control has the selected unit
 			const unlinkedSelects = screen.getAllByDisplayValue( 'em' );
 			expect( unlinkedSelects.length ).toEqual( 4 );
 		} );
 
-		it( 'should use individual side attribute unit when available', () => {
+		it( 'should use individual side attribute unit when available', async () => {
 			// Render control.
 			const { rerender } = render( <BoxControl /> );
+			const user = setupUser();
 
 			// Make unit selection on all input control.
-			const allUnitSelect = screen.getByLabelText( 'Select unit' );
-			allUnitSelect.focus();
-			fireEvent.change( allUnitSelect, { target: { value: 'vw' } } );
+			const allUnitSelect = getSelect();
+			await user.selectOptions( allUnitSelect, [ 'vw' ] );
 
 			// Unlink the controls.
-			const unlink = screen.getByLabelText( /Unlink Sides/ );
-			fireEvent.click( unlink );
+			await user.click( screen.getByLabelText( /Unlink sides/ ) );
 
 			// Confirm that each individual control has the selected unit
 			const unlinkedSelects = screen.getAllByDisplayValue( 'vw' );
@@ -261,18 +275,15 @@ describe( 'BoxControl', () => {
 	} );
 
 	describe( 'onChange updates', () => {
-		it( 'should call onChange when values contain more than just CSS units', () => {
+		it( 'should call onChange when values contain more than just CSS units', async () => {
 			const setState = jest.fn();
 
 			render( <BoxControl onChange={ setState } /> );
+			const user = setupUser();
+			const input = getInput();
 
-			const input = screen.getByLabelText( 'Box Control', {
-				selector: 'input',
-			} );
-
-			input.focus();
-			fireEvent.change( input, { target: { value: '7.5rem' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			await user.type( input, '7.5rem' );
+			await user.keyboard( '{Enter}' );
 
 			expect( setState ).toHaveBeenCalledWith( {
 				top: '7.5rem',
@@ -282,14 +293,14 @@ describe( 'BoxControl', () => {
 			} );
 		} );
 
-		it( 'should not pass invalid CSS unit only values to onChange', () => {
+		it( 'should not pass invalid CSS unit only values to onChange', async () => {
 			const setState = jest.fn();
 
 			render( <BoxControl onChange={ setState } /> );
+			const user = setupUser();
 
-			const allUnitSelect = screen.getByLabelText( 'Select unit' );
-			allUnitSelect.focus();
-			fireEvent.change( allUnitSelect, { target: { value: 'rem' } } );
+			const allUnitSelect = getSelect();
+			await user.selectOptions( allUnitSelect, 'rem' );
 
 			expect( setState ).toHaveBeenCalledWith( {
 				top: undefined,

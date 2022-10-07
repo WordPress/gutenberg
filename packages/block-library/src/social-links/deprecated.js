@@ -99,12 +99,14 @@ const deprecated = [
 			const className = classNames( size, {
 				'has-icon-color': iconColorValue,
 				'has-icon-background-color': iconBackgroundColorValue,
-				[ `items-justified-${ itemsJustification }` ]: itemsJustification,
+				[ `items-justified-${ itemsJustification }` ]:
+					itemsJustification,
 			} );
 
 			const style = {
 				'--wp--social-links--icon-color': iconColorValue,
-				'--wp--social-links--icon-background-color': iconBackgroundColorValue,
+				'--wp--social-links--icon-background-color':
+					iconBackgroundColorValue,
 			};
 
 			return (

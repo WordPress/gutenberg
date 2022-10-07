@@ -263,6 +263,7 @@ class BlockListBlock extends Component {
 							clientId={ clientId }
 							draggingClientId={ draggingClientId }
 							enabled={ draggingEnabled }
+							testID="draggable-trigger-content"
 						>
 							{ () =>
 								isValid ? (
@@ -271,6 +272,7 @@ class BlockListBlock extends Component {
 									<BlockInvalidWarning
 										blockTitle={ title }
 										icon={ icon }
+										clientId={ clientId }
 									/>
 								)
 							}
@@ -346,9 +348,8 @@ export default compose( [
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
-		const commonAncestor = getLowestCommonAncestorWithSelectedBlock(
-			clientId
-		);
+		const commonAncestor =
+			getLowestCommonAncestorWithSelectedBlock( clientId );
 		const commonAncestorIndex = parents.indexOf( commonAncestor ) - 1;
 		const firstToSelectId = commonAncestor
 			? parents[ commonAncestorIndex ]
@@ -362,16 +363,15 @@ export default compose( [
 		const selectedParents = selectedBlockClientId
 			? getBlockParents( selectedBlockClientId )
 			: [];
-		const isDescendantOfParentSelected = selectedParents.includes(
-			parentId
-		);
+		const isDescendantOfParentSelected =
+			selectedParents.includes( parentId );
 		const isTouchable =
 			isSelected ||
 			isDescendantOfParentSelected ||
 			isParentSelected ||
 			parentId === '';
-		const baseGlobalStyles = getSettings()
-			?.__experimentalGlobalStylesBaseStyles;
+		const baseGlobalStyles =
+			getSettings()?.__experimentalGlobalStylesBaseStyles;
 
 		const hasInnerBlocks = getBlockCount( clientId ) > 0;
 		// For blocks with inner blocks, we only enable the dragging in the nested
@@ -419,10 +419,8 @@ export default compose( [
 		return {
 			mergeBlocks( forward ) {
 				const { clientId } = ownProps;
-				const {
-					getPreviousBlockClientId,
-					getNextBlockClientId,
-				} = select( blockEditorStore );
+				const { getPreviousBlockClientId, getNextBlockClientId } =
+					select( blockEditorStore );
 
 				if ( forward ) {
 					const nextBlockClientId = getNextBlockClientId( clientId );
@@ -430,9 +428,8 @@ export default compose( [
 						mergeBlocks( clientId, nextBlockClientId );
 					}
 				} else {
-					const previousBlockClientId = getPreviousBlockClientId(
-						clientId
-					);
+					const previousBlockClientId =
+						getPreviousBlockClientId( clientId );
 					if ( previousBlockClientId ) {
 						mergeBlocks( previousBlockClientId, clientId );
 					}

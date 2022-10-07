@@ -62,9 +62,8 @@ export function useBorderControl(
 	const onWidthChange = useCallback(
 		( newWidth?: string ) => {
 			const newWidthValue = newWidth === '' ? undefined : newWidth;
-			const [ parsedValue ] = parseQuantityAndUnitFromRawValue(
-				newWidth
-			);
+			const [ parsedValue ] =
+				parseQuantityAndUnitFromRawValue( newWidth );
 			const hasZeroWidth = parsedValue === 0;
 
 			const updatedBorder = { ...border, width: newWidthValue };
@@ -107,7 +106,7 @@ export function useBorderControl(
 	);
 
 	const onSliderChange = useCallback(
-		( value: string ) => {
+		( value?: number ) => {
 			onWidthChange( `${ value }${ widthUnit }` );
 		},
 		[ onWidthChange, widthUnit ]
@@ -119,18 +118,13 @@ export function useBorderControl(
 		return cx( styles.borderControl, className );
 	}, [ className, cx ] );
 
+	const wrapperWidth = isCompact ? '90px' : width;
 	const innerWrapperClassName = useMemo( () => {
-		const wrapperWidth = isCompact ? '90px' : width;
-		const widthStyle =
-			!! wrapperWidth && styles.wrapperWidth( wrapperWidth );
+		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
 		const heightStyle = styles.wrapperHeight( __next36pxDefaultSize );
 
 		return cx( styles.innerWrapper(), widthStyle, heightStyle );
-	}, [ isCompact, width, cx, __next36pxDefaultSize ] );
-
-	const widthControlClassName = useMemo( () => {
-		return cx( styles.borderWidthControl() );
-	}, [ cx ] );
+	}, [ wrapperWidth, cx, __next36pxDefaultSize ] );
 
 	const sliderClassName = useMemo( () => {
 		return cx( styles.borderSlider() );
@@ -140,13 +134,13 @@ export function useBorderControl(
 		...otherProps,
 		className: classes,
 		innerWrapperClassName,
+		inputWidth: wrapperWidth,
 		onBorderChange,
 		onSliderChange,
 		onWidthChange,
 		previousStyleSelection: styleSelection,
 		sliderClassName,
 		value: border,
-		widthControlClassName,
 		widthUnit,
 		widthValue,
 		__next36pxDefaultSize,

@@ -53,14 +53,12 @@ export default function SearchEdit( {
 } ) {
 	const [ isButtonSelected, setIsButtonSelected ] = useState( false );
 	const [ isLabelSelected, setIsLabelSelected ] = useState( false );
-	const [ isPlaceholderSelected, setIsPlaceholderSelected ] = useState(
-		false
-	);
+	const [ isPlaceholderSelected, setIsPlaceholderSelected ] =
+		useState( false );
 	const [ isLongButton, setIsLongButton ] = useState( false );
 	const [ buttonWidth, setButtonWidth ] = useState( MIN_BUTTON_WIDTH );
-	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
-		false
-	);
+	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] =
+		useState( false );
 
 	const textInputRef = useRef( null );
 

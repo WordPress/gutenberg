@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, noop } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,8 +20,10 @@ import { __ } from '@wordpress/i18n';
 import useDimensionHandler from './use-dimension-handler';
 
 const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
+const noop = () => {};
 
 export default function ImageSizeControl( {
+	imageSizeHelp,
 	imageWidth,
 	imageHeight,
 	imageSizeOptions = [],
@@ -32,12 +34,8 @@ export default function ImageSizeControl( {
 	onChange,
 	onChangeImage = noop,
 } ) {
-	const {
-		currentHeight,
-		currentWidth,
-		updateDimension,
-		updateDimensions,
-	} = useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
+	const { currentHeight, currentWidth, updateDimension, updateDimensions } =
+		useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
 
 	return (
 		<>
@@ -47,6 +45,7 @@ export default function ImageSizeControl( {
 					value={ slug }
 					options={ imageSizeOptions }
 					onChange={ onChangeImage }
+					help={ imageSizeHelp }
 				/>
 			) }
 			{ isResizable && (

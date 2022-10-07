@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,6 +37,7 @@ import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
 import { useMarkPersistent } from './use-mark-persistent';
 import { usePasteHandler } from './use-paste-handler';
+import { useBeforeInputRules } from './use-before-input-rules';
 import { useInputRules } from './use-input-rules';
 import { useEnter } from './use-enter';
 import { useFormatTypes } from './use-format-types';
@@ -60,25 +60,27 @@ export const inputEventContext = createContext();
  * @return {Object} Filtered props.
  */
 function removeNativeProps( props ) {
-	return omit( props, [
-		'__unstableMobileNoFocusOnMount',
-		'deleteEnter',
-		'placeholderTextColor',
-		'textAlign',
-		'selectionColor',
-		'tagsToEliminate',
-		'rootTagsToEliminate',
-		'disableEditingMenu',
-		'fontSize',
-		'fontFamily',
-		'fontWeight',
-		'fontStyle',
-		'minWidth',
-		'maxWidth',
-		'setRef',
-		'disableSuggestions',
-		'disableAutocorrection',
-	] );
+	const {
+		__unstableMobileNoFocusOnMount,
+		deleteEnter,
+		placeholderTextColor,
+		textAlign,
+		selectionColor,
+		tagsToEliminate,
+		rootTagsToEliminate,
+		disableEditingMenu,
+		fontSize,
+		fontFamily,
+		fontWeight,
+		fontStyle,
+		minWidth,
+		maxWidth,
+		setRef,
+		disableSuggestions,
+		disableAutocorrection,
+		...restProps
+	} = props;
+	return restProps;
 }
 
 function RichTextWrapper(
@@ -114,6 +116,15 @@ function RichTextWrapper(
 	},
 	forwardedRef
 ) {
+	if ( multiline ) {
+		deprecated( 'wp.blockEditor.RichText multiline prop', {
+			since: '6.1',
+			version: '6.3',
+			alternative: 'nested blocks (InnerBlocks)',
+			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/nested-blocks-inner-blocks/',
+		} );
+	}
+
 	const instanceId = useInstanceId( RichTextWrapper );
 
 	identifier = identifier || instanceId;
@@ -122,9 +133,8 @@ function RichTextWrapper(
 	const anchorRef = useRef();
 	const { clientId } = useBlockEditContext();
 	const selector = ( select ) => {
-		const { getSelectionStart, getSelectionEnd } = select(
-			blockEditorStore
-		);
+		const { getSelectionStart, getSelectionEnd } =
+			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
 
@@ -149,6 +159,8 @@ function RichTextWrapper(
 	// retreived from the store on merge.
 	// To do: fix this somehow.
 	const { selectionStart, selectionEnd, isSelected } = useSelect( selector );
+	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
+		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
@@ -163,6 +175,13 @@ function RichTextWrapper(
 
 	// Handle deprecated format.
 	if ( Array.isArray( originalValue ) ) {
+		deprecated( 'wp.blockEditor.RichText value prop as children type', {
+			since: '6.1',
+			version: '6.3',
+			alternative: 'value prop as string',
+			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
+		} );
+
 		adjustedValue = childrenSource.toHTML( originalValue );
 		adjustedOnChange = ( newValue ) =>
 			originalOnChange(
@@ -178,6 +197,18 @@ function RichTextWrapper(
 			const unset = start === undefined && end === undefined;
 
 			if ( typeof start === 'number' || unset ) {
+				// If we are only setting the start (or the end below), which
+				// means a partial selection, and we're not updating a selection
+				// with the same client ID, abort. This means the selected block
+				// is a parent block.
+				if (
+					end === undefined &&
+					getBlockRootClientId( clientId ) !==
+						getBlockRootClientId( getSelectionEnd().clientId )
+				) {
+					return;
+				}
+
 				selection.start = {
 					clientId,
 					attributeKey: identifier,
@@ -186,6 +217,14 @@ function RichTextWrapper(
 			}
 
 			if ( typeof end === 'number' || unset ) {
+				if (
+					start === undefined &&
+					getBlockRootClientId( clientId ) !==
+						getBlockRootClientId( getSelectionStart().clientId )
+				) {
+					return;
+				}
+
 				selection.end = {
 					clientId,
 					attributeKey: identifier,
@@ -241,7 +280,11 @@ function RichTextWrapper(
 		);
 	}
 
-	const { value, onChange, ref: richTextRef } = useRichText( {
+	const {
+		value,
+		onChange,
+		ref: richTextRef,
+	} = useRichText( {
 		value: adjustedValue,
 		onChange( html, { __unstableFormats, __unstableText } ) {
 			adjustedOnChange( html );
@@ -314,11 +357,11 @@ function RichTextWrapper(
 	}
 
 	function onFocus() {
-		anchorRef.current.focus();
+		anchorRef.current?.focus();
 	}
 
 	const TagName = tagName;
-	const content = (
+	return (
 		<>
 			{ isSelected && (
 				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
@@ -340,7 +383,8 @@ function RichTextWrapper(
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
-					anchorRef={ anchorRef }
+					editableContentElement={ anchorRef.current }
+					value={ value }
 				/>
 			) }
 			<TagName
@@ -355,6 +399,7 @@ function RichTextWrapper(
 					autocompleteProps.ref,
 					props.ref,
 					richTextRef,
+					useBeforeInputRules( { value, onChange } ),
 					useInputRules( {
 						value,
 						onChange,
@@ -408,19 +453,6 @@ function RichTextWrapper(
 			/>
 		</>
 	);
-
-	if ( ! wrapperClassName ) {
-		return content;
-	}
-
-	deprecated( 'wp.blockEditor.RichText wrapperClassName prop', {
-		since: '5.4',
-		alternative: 'className prop or create your own wrapper div',
-		version: '6.2',
-	} );
-
-	const className = classnames( 'block-editor-rich-text', wrapperClassName );
-	return <div className={ className }>{ content }</div>;
 }
 
 const ForwardedRichTextContainer = forwardRef( RichTextWrapper );
@@ -433,6 +465,13 @@ ForwardedRichTextContainer.Content = ( {
 } ) => {
 	// Handle deprecated `children` and `node` sources.
 	if ( Array.isArray( value ) ) {
+		deprecated( 'wp.blockEditor.RichText value prop as children type', {
+			since: '6.1',
+			version: '6.3',
+			alternative: 'value prop as string',
+			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
+		} );
+
 		value = childrenSource.toHTML( value );
 	}
 
@@ -445,7 +484,8 @@ ForwardedRichTextContainer.Content = ( {
 	const content = <RawHTML>{ value }</RawHTML>;
 
 	if ( Tag ) {
-		return <Tag { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
+		const { format, ...restProps } = props;
+		return <Tag { ...restProps }>{ content }</Tag>;
 	}
 
 	return content;

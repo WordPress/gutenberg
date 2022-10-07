@@ -209,9 +209,9 @@ describe( 'getMimeTypesArray', () => {
 	} );
 
 	it( 'should return the mime type passed and an additional mime type per extension supported', () => {
-		expect(
-			getMimeTypesArray( { 'jpg|jpeg|jpe': 'image/jpeg' } )
-		).toEqual( [ 'image/jpeg', 'image/jpg', 'image/jpeg', 'image/jpe' ] );
+		expect( getMimeTypesArray( { 'jpg|jpeg|jpe': 'image/jpeg' } ) ).toEqual(
+			[ 'image/jpeg', 'image/jpg', 'image/jpeg', 'image/jpe' ]
+		);
 	} );
 
 	it( 'should handle multiple mime types', () => {

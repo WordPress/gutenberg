@@ -5,6 +5,7 @@ const dockerCompose = require( 'docker-compose' );
 const util = require( 'util' );
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
+const got = require( 'got' );
 
 /**
  * Promisified dependencies
@@ -14,6 +15,7 @@ const copyDir = util.promisify( require( 'copy-dir' ) );
 /**
  * @typedef {import('./config').WPConfig} WPConfig
  * @typedef {import('./config').WPServiceConfig} WPServiceConfig
+ * @typedef {import('./config').WPSource} WPSource
  * @typedef {'development'|'tests'} WPEnvironment
  * @typedef {'development'|'tests'|'all'} WPEnvironmentSelection
  */
@@ -101,25 +103,15 @@ async function configureWordPress( environment, config, spinner ) {
 		}
 	);
 
-	/**
-	 * Since wp-phpunit loads wp-settings.php at the end of its wp-config.php
-	 * file, we need to avoid loading it too early in our own wp-config.php. If
-	 * we load it too early, then some things (like MULTISITE) will be defined
-	 * before wp-phpunit has a chance to configure them. To avoid this, create a
-	 * copy of wp-config.php for phpunit which doesn't require wp-settings.php.
-	 *
-	 * Note that This needs to be executed using `exec` on the wordpress service
-	 * so that file permissions work properly.
-	 *
-	 * This will be removed in the future. @see https://github.com/WordPress/gutenberg/issues/23171
-	 *
-	 */
+	// WordPress' PHPUnit suite expects a `wp-tests-config.php` in
+	// the directory that the test suite is contained within.
+	// Make sure ABSPATH points to the WordPress install.
 	await dockerCompose.exec(
 		environment === 'development' ? 'wordpress' : 'tests-wordpress',
 		[
 			'sh',
 			'-c',
-			'sed "/^require.*wp-settings.php/d" /var/www/html/wp-config.php > /var/www/html/phpunit-wp-config.php && chmod 777 /var/www/html/phpunit-wp-config.php',
+			`sed -e "/^require.*wp-settings.php/d" -e "s/define( 'ABSPATH', __DIR__ . '\\/' );/define( 'ABSPATH', '\\/var\\/www\\/html\\/' );\\n\\tdefine( 'WP_DEFAULT_THEME', 'default' );/" /var/www/html/wp-config.php > /wordpress-phpunit/wp-tests-config.php`,
 		],
 		{
 			config: config.dockerComposeConfigPath,
@@ -246,10 +238,70 @@ async function copyCoreFiles( fromPath, toPath ) {
 	} );
 }
 
+/**
+ * Scans through a WordPress source to find the version of WordPress it contains.
+ *
+ * @param {WPSource} coreSource The WordPress source.
+ * @param {Object}   spinner    A CLI spinner which indicates progress.
+ * @param {boolean}  debug      Indicates whether or not the CLI is in debug mode.
+ * @return {string} The version of WordPress the source is for.
+ */
+async function readWordPressVersion( coreSource, spinner, debug ) {
+	const versionFilePath = path.join(
+		coreSource.path,
+		'wp-includes',
+		'version.php'
+	);
+	const versionFile = await fs.readFile( versionFilePath, {
+		encoding: 'utf-8',
+	} );
+	const versionMatch = versionFile.match(
+		/\$wp_version = '([A-Za-z\-0-9.]+)'/
+	);
+	if ( ! versionMatch ) {
+		throw new Error( `Failed to find version in ${ versionFilePath }` );
+	}
+
+	if ( debug ) {
+		spinner.info(
+			`Found WordPress ${ versionMatch[ 1 ] } in ${ versionFilePath }.`
+		);
+	}
+
+	return versionMatch[ 1 ];
+}
+
+/**
+ * Returns the latest stable version of WordPress by requesting the stable-check
+ * endpoint on WordPress.org.
+ *
+ * @return {string} The latest stable version of WordPress, like "6.0.1"
+ */
+let CACHED_WP_VERSION;
+async function getLatestWordPressVersion() {
+	// Avoid extra network requests.
+	if ( CACHED_WP_VERSION ) {
+		return CACHED_WP_VERSION;
+	}
+
+	const versions = await got(
+		'https://api.wordpress.org/core/stable-check/1.0/'
+	).json();
+
+	for ( const [ version, status ] of Object.entries( versions ) ) {
+		if ( status === 'latest' ) {
+			CACHED_WP_VERSION = version;
+			return version;
+		}
+	}
+}
+
 module.exports = {
 	hasSameCoreSource,
 	checkDatabaseConnection,
 	configureWordPress,
 	resetDatabase,
 	setupWordPressDirectories,
+	readWordPressVersion,
+	getLatestWordPressVersion,
 };

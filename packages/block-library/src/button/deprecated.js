@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -70,33 +69,33 @@ const migrateCustomColorsAndGradients = ( attributes ) => {
 	if ( attributes.customGradient ) {
 		style.color.gradient = attributes.customGradient;
 	}
+
+	const {
+		customTextColor,
+		customBackgroundColor,
+		customGradient,
+		...restAttributes
+	} = attributes;
+
 	return {
-		...omit( attributes, [
-			'customTextColor',
-			'customBackgroundColor',
-			'customGradient',
-		] ),
+		...restAttributes,
 		style,
 	};
 };
 
 const oldColorsMigration = ( attributes ) => {
-	return migrateCustomColorsAndGradients(
-		omit(
-			{
-				...attributes,
-				customTextColor:
-					attributes.textColor && '#' === attributes.textColor[ 0 ]
-						? attributes.textColor
-						: undefined,
-				customBackgroundColor:
-					attributes.color && '#' === attributes.color[ 0 ]
-						? attributes.color
-						: undefined,
-			},
-			[ 'color', 'textColor' ]
-		)
-	);
+	const { color, textColor, ...restAttributes } = {
+		...attributes,
+		customTextColor:
+			attributes.textColor && '#' === attributes.textColor[ 0 ]
+				? attributes.textColor
+				: undefined,
+		customBackgroundColor:
+			attributes.color && '#' === attributes.color[ 0 ]
+				? attributes.color
+				: undefined,
+	};
+	return migrateCustomColorsAndGradients( restAttributes );
 };
 
 const blockAttributes = {
@@ -203,16 +202,8 @@ const v11 = {
 		__experimentalSelector: '.wp-block-button__link',
 	},
 	save( { attributes, className } ) {
-		const {
-			fontSize,
-			linkTarget,
-			rel,
-			style,
-			text,
-			title,
-			url,
-			width,
-		} = attributes;
+		const { fontSize, linkTarget, rel, style, text, title, url, width } =
+			attributes;
 
 		if ( ! text ) {
 			return null;
@@ -337,16 +328,8 @@ const v10 = {
 		__experimentalSelector: '.wp-block-button__link',
 	},
 	save( { attributes, className } ) {
-		const {
-			fontSize,
-			linkTarget,
-			rel,
-			style,
-			text,
-			title,
-			url,
-			width,
-		} = attributes;
+		const { fontSize, linkTarget, rel, style, text, title, url, width } =
+			attributes;
 
 		if ( ! text ) {
 			return null;
@@ -558,15 +541,8 @@ const deprecated = [
 			},
 		},
 		save( { attributes, className } ) {
-			const {
-				borderRadius,
-				linkTarget,
-				rel,
-				text,
-				title,
-				url,
-				width,
-			} = attributes;
+			const { borderRadius, linkTarget, rel, text, title, url, width } =
+				attributes;
 			const colorProps = getColorClassesAndStyles( attributes );
 			const buttonClasses = classnames(
 				'wp-block-button__link',
@@ -653,15 +629,8 @@ const deprecated = [
 			},
 		},
 		save( { attributes, className } ) {
-			const {
-				borderRadius,
-				linkTarget,
-				rel,
-				text,
-				title,
-				url,
-				width,
-			} = attributes;
+			const { borderRadius, linkTarget, rel, text, title, url, width } =
+				attributes;
 			const colorProps = getColorClassesAndStyles( attributes );
 			const buttonClasses = classnames(
 				'wp-block-button__link',
@@ -740,14 +709,8 @@ const deprecated = [
 			},
 		},
 		save( { attributes } ) {
-			const {
-				borderRadius,
-				linkTarget,
-				rel,
-				text,
-				title,
-				url,
-			} = attributes;
+			const { borderRadius, linkTarget, rel, text, title, url } =
+				attributes;
 			const buttonClasses = classnames( 'wp-block-button__link', {
 				'no-border-radius': borderRadius === 0,
 			} );

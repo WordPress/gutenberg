@@ -39,9 +39,8 @@ const ControlledSyncUnits = () => {
 		fieldName: 'valueA' | 'valueB',
 		newValue?: string | number
 	) => {
-		const parsedQuantityAndUnit = parseQuantityAndUnitFromRawValue(
-			newValue
-		);
+		const parsedQuantityAndUnit =
+			parseQuantityAndUnitFromRawValue( newValue );
 		const quantity = parsedQuantityAndUnit[ 0 ];
 
 		if ( ! Number.isFinite( quantity ) ) {
@@ -56,10 +55,8 @@ const ControlledSyncUnits = () => {
 		};
 
 		Object.entries( state ).forEach( ( [ stateProp, stateValue ] ) => {
-			const [
-				stateQuantity,
-				stateUnit,
-			] = parseQuantityAndUnitFromRawValue( stateValue );
+			const [ stateQuantity, stateUnit ] =
+				parseQuantityAndUnitFromRawValue( stateValue );
 
 			if ( stateProp !== fieldName && stateUnit !== newUnit ) {
 				nextState[
@@ -114,9 +111,12 @@ describe( 'UnitControl', () => {
 				<UnitControl className="hello" />
 			);
 
-			expect( withoutClassName.firstChild ).toMatchDiffSnapshot(
-				withClassName.firstChild
-			);
+			expect(
+				withoutClassName.querySelector( '.components-unit-control' )
+			).not.toHaveClass( 'hello' );
+			expect(
+				withClassName.querySelector( '.components-unit-control' )
+			).toHaveClass( 'hello' );
 		} );
 
 		it( 'should not render select, if units are disabled', () => {

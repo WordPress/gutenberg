@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "23.1.0",
+	"version": "24.3.0",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,8 +19,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12.13",
-		"npm": ">=6.9"
+		"node": ">=14",
+		"npm": ">=6.14.4"
 	},
 	"files": [
 		"bin",
@@ -72,7 +72,7 @@
 		"npm-packlist": "^3.0.0",
 		"postcss": "^8.4.5",
 		"postcss-loader": "^6.2.1",
-		"prettier": "npm:wp-prettier@2.2.1-beta-1",
+		"prettier": "npm:wp-prettier@2.6.2",
 		"puppeteer-core": "^13.2.0",
 		"react-refresh": "^0.10.0",
 		"read-pkg-up": "^7.0.1",

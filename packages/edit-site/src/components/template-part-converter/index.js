@@ -12,9 +12,8 @@ import ConvertToTemplatePart from './convert-to-template-part';
 
 export default function TemplatePartConverter() {
 	const { clientIds, blocks } = useSelect( ( select ) => {
-		const { getSelectedBlockClientIds, getBlocksByClientId } = select(
-			blockEditorStore
-		);
+		const { getSelectedBlockClientIds, getBlocksByClientId } =
+			select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		return {
 			clientIds: selectedBlockClientIds,

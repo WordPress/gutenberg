@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { has } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
@@ -37,35 +32,38 @@ import {
  * @param {Object} edits    Initial edited attributes object.
  * @param {Array?} template Block Template.
  */
-export const setupEditor = ( post, edits, template ) => ( { dispatch } ) => {
-	dispatch.setupEditorState( post );
-	// Apply a template for new posts only, if exists.
-	const isNewPost = post.status === 'auto-draft';
-	if ( isNewPost && template ) {
-		// In order to ensure maximum of a single parse during setup, edits are
-		// included as part of editor setup action. Assume edited content as
-		// canonical if provided, falling back to post.
-		let content;
-		if ( has( edits, [ 'content' ] ) ) {
-			content = edits.content;
-		} else {
-			content = post.content.raw;
+export const setupEditor =
+	( post, edits, template ) =>
+	( { dispatch } ) => {
+		dispatch.setupEditorState( post );
+		// Apply a template for new posts only, if exists.
+		const isNewPost = post.status === 'auto-draft';
+		if ( isNewPost && template ) {
+			// In order to ensure maximum of a single parse during setup, edits are
+			// included as part of editor setup action. Assume edited content as
+			// canonical if provided, falling back to post.
+			let content;
+			if ( 'content' in edits ) {
+				content = edits.content;
+			} else {
+				content = post.content.raw;
+			}
+			let blocks = parse( content );
+			blocks = synchronizeBlocksWithTemplate( blocks, template );
+			dispatch.resetEditorBlocks( blocks, {
+				__unstableShouldCreateUndoLevel: false,
+			} );
 		}
-		let blocks = parse( content );
-		blocks = synchronizeBlocksWithTemplate( blocks, template );
-		dispatch.resetEditorBlocks( blocks, {
-			__unstableShouldCreateUndoLevel: false,
-		} );
-	}
-	if (
-		edits &&
-		Object.values( edits ).some(
-			( [ key, edit ] ) => edit !== ( post[ key ]?.raw ?? post[ key ] )
-		)
-	) {
-		dispatch.editPost( edits );
-	}
-};
+		if (
+			edits &&
+			Object.values( edits ).some(
+				( [ key, edit ] ) =>
+					edit !== ( post[ key ]?.raw ?? post[ key ] )
+			)
+		) {
+			dispatch.editPost( edits );
+		}
+	};
 
 /**
  * Returns an action object signalling that the editor is being destroyed and
@@ -131,89 +129,96 @@ export function setupEditorState( post ) {
  * @param {Object} edits   Post attributes to edit.
  * @param {Object} options Options for the edit.
  */
-export const editPost = ( edits, options ) => ( { select, registry } ) => {
-	const { id, type } = select.getCurrentPost();
-	registry
-		.dispatch( coreStore )
-		.editEntityRecord( 'postType', type, id, edits, options );
-};
+export const editPost =
+	( edits, options ) =>
+	( { select, registry } ) => {
+		const { id, type } = select.getCurrentPost();
+		registry
+			.dispatch( coreStore )
+			.editEntityRecord( 'postType', type, id, edits, options );
+	};
 
 /**
  * Action for saving the current post in the editor.
  *
  * @param {Object} options
  */
-export const savePost = ( options = {} ) => async ( {
-	select,
-	dispatch,
-	registry,
-} ) => {
-	if ( ! select.isEditedPostSaveable() ) {
-		return;
-	}
+export const savePost =
+	( options = {} ) =>
+	async ( { select, dispatch, registry } ) => {
+		if ( ! select.isEditedPostSaveable() ) {
+			return;
+		}
 
-	const content = select.getEditedPostContent();
+		const content = select.getEditedPostContent();
 
-	if ( ! options.isAutosave ) {
-		dispatch.editPost( { content }, { undoIgnore: true } );
-	}
+		if ( ! options.isAutosave ) {
+			dispatch.editPost( { content }, { undoIgnore: true } );
+		}
 
-	const previousRecord = select.getCurrentPost();
-	const edits = {
-		id: previousRecord.id,
-		...registry
+		const previousRecord = select.getCurrentPost();
+		const edits = {
+			id: previousRecord.id,
+			...registry
+				.select( coreStore )
+				.getEntityRecordNonTransientEdits(
+					'postType',
+					previousRecord.type,
+					previousRecord.id
+				),
+			content,
+		};
+		dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
+		await registry
+			.dispatch( coreStore )
+			.saveEntityRecord(
+				'postType',
+				previousRecord.type,
+				edits,
+				options
+			);
+		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
+
+		const error = registry
 			.select( coreStore )
-			.getEntityRecordNonTransientEdits(
+			.getLastEntitySaveError(
 				'postType',
 				previousRecord.type,
 				previousRecord.id
-			),
-		content,
+			);
+		if ( error ) {
+			const args = getNotificationArgumentsForSaveFail( {
+				post: previousRecord,
+				edits,
+				error,
+			} );
+			if ( args.length ) {
+				registry.dispatch( noticesStore ).createErrorNotice( ...args );
+			}
+		} else {
+			const updatedRecord = select.getCurrentPost();
+			const args = getNotificationArgumentsForSaveSuccess( {
+				previousPost: previousRecord,
+				post: updatedRecord,
+				postType: await registry
+					.resolveSelect( coreStore )
+					.getPostType( updatedRecord.type ),
+				options,
+			} );
+			if ( args.length ) {
+				registry
+					.dispatch( noticesStore )
+					.createSuccessNotice( ...args );
+			}
+			// Make sure that any edits after saving create an undo level and are
+			// considered for change detection.
+			if ( ! options.isAutosave ) {
+				registry
+					.dispatch( blockEditorStore )
+					.__unstableMarkLastChangeAsPersistent();
+			}
+		}
 	};
-	dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
-	await registry
-		.dispatch( coreStore )
-		.saveEntityRecord( 'postType', previousRecord.type, edits, options );
-	dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
-
-	const error = registry
-		.select( coreStore )
-		.getLastEntitySaveError(
-			'postType',
-			previousRecord.type,
-			previousRecord.id
-		);
-	if ( error ) {
-		const args = getNotificationArgumentsForSaveFail( {
-			post: previousRecord,
-			edits,
-			error,
-		} );
-		if ( args.length ) {
-			registry.dispatch( noticesStore ).createErrorNotice( ...args );
-		}
-	} else {
-		const updatedRecord = select.getCurrentPost();
-		const args = getNotificationArgumentsForSaveSuccess( {
-			previousPost: previousRecord,
-			post: updatedRecord,
-			postType: await registry
-				.resolveSelect( coreStore )
-				.getPostType( updatedRecord.type ),
-			options,
-		} );
-		if ( args.length ) {
-			registry.dispatch( noticesStore ).createSuccessNotice( ...args );
-		}
-		// Make sure that any edits after saving create an undo level and are
-		// considered for change detection.
-		if ( ! options.isAutosave ) {
-			registry
-				.dispatch( blockEditorStore )
-				.__unstableMarkLastChangeAsPersistent();
-		}
-	}
-};
 
 /**
  * Action for refreshing the current post.
@@ -232,28 +237,34 @@ export function refreshPost() {
 /**
  * Action for trashing the current post in the editor.
  */
-export const trashPost = () => async ( { select, dispatch, registry } ) => {
-	const postTypeSlug = select.getCurrentPostType();
-	const postType = await registry
-		.resolveSelect( coreStore )
-		.getPostType( postTypeSlug );
-	registry.dispatch( noticesStore ).removeNotice( TRASH_POST_NOTICE_ID );
-	try {
-		const post = select.getCurrentPost();
-		await apiFetch( {
-			path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
-			method: 'DELETE',
-		} );
+export const trashPost =
+	() =>
+	async ( { select, dispatch, registry } ) => {
+		const postTypeSlug = select.getCurrentPostType();
+		const postType = await registry
+			.resolveSelect( coreStore )
+			.getPostType( postTypeSlug );
+		registry.dispatch( noticesStore ).removeNotice( TRASH_POST_NOTICE_ID );
+		const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2' } =
+			postType;
+		dispatch( { type: 'REQUEST_POST_DELETE_START' } );
+		try {
+			const post = select.getCurrentPost();
+			await apiFetch( {
+				path: `/${ restNamespace }/${ restBase }/${ post.id }`,
+				method: 'DELETE',
+			} );
 
-		await dispatch.savePost();
-	} catch ( error ) {
-		registry
-			.dispatch( noticesStore )
-			.createErrorNotice(
-				...getNotificationArgumentsForTrashFail( { error } )
-			);
-	}
-};
+			await dispatch.savePost();
+		} catch ( error ) {
+			registry
+				.dispatch( noticesStore )
+				.createErrorNotice(
+					...getNotificationArgumentsForTrashFail( { error } )
+				);
+		}
+		dispatch( { type: 'REQUEST_POST_DELETE_FINISH' } );
+	};
 
 /**
  * Action that autosaves the current post.  This
@@ -263,35 +274,38 @@ export const trashPost = () => async ( { select, dispatch, registry } ) => {
  *
  * @param {Object?} options Extra flags to identify the autosave.
  */
-export const autosave = ( { local = false, ...options } = {} ) => async ( {
-	select,
-	dispatch,
-} ) => {
-	if ( local ) {
-		const post = select.getCurrentPost();
-		const isPostNew = select.isEditedPostNew();
-		const title = select.getEditedPostAttribute( 'title' );
-		const content = select.getEditedPostAttribute( 'content' );
-		const excerpt = select.getEditedPostAttribute( 'excerpt' );
-		localAutosaveSet( post.id, isPostNew, title, content, excerpt );
-	} else {
-		await dispatch.savePost( { isAutosave: true, ...options } );
-	}
-};
+export const autosave =
+	( { local = false, ...options } = {} ) =>
+	async ( { select, dispatch } ) => {
+		if ( local ) {
+			const post = select.getCurrentPost();
+			const isPostNew = select.isEditedPostNew();
+			const title = select.getEditedPostAttribute( 'title' );
+			const content = select.getEditedPostAttribute( 'content' );
+			const excerpt = select.getEditedPostAttribute( 'excerpt' );
+			localAutosaveSet( post.id, isPostNew, title, content, excerpt );
+		} else {
+			await dispatch.savePost( { isAutosave: true, ...options } );
+		}
+	};
 
 /**
  * Action that restores last popped state in undo history.
  */
-export const redo = () => ( { registry } ) => {
-	registry.dispatch( coreStore ).redo();
-};
+export const redo =
+	() =>
+	( { registry } ) => {
+		registry.dispatch( coreStore ).redo();
+	};
 
 /**
  * Action that pops a record from undo history and undoes the edit.
  */
-export const undo = () => ( { registry } ) => {
-	registry.dispatch( coreStore ).undo();
-};
+export const undo =
+	() =>
+	( { registry } ) => {
+		registry.dispatch( coreStore ).undo();
+	};
 
 /**
  * Action that creates an undo history record.
@@ -323,20 +337,24 @@ export function updatePostLock( lock ) {
 /**
  * Enable the publish sidebar.
  */
-export const enablePublishSidebar = () => ( { registry } ) => {
-	registry
-		.dispatch( preferencesStore )
-		.set( 'core/edit-post', 'isPublishSidebarEnabled', true );
-};
+export const enablePublishSidebar =
+	() =>
+	( { registry } ) => {
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'isPublishSidebarEnabled', true );
+	};
 
 /**
  * Disables the publish sidebar.
  */
-export const disablePublishSidebar = () => ( { registry } ) => {
-	registry
-		.dispatch( preferencesStore )
-		.set( 'core/edit-post', 'isPublishSidebarEnabled', false );
-};
+export const disablePublishSidebar =
+	() =>
+	( { registry } ) => {
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'isPublishSidebarEnabled', false );
+	};
 
 /**
  * Action that locks post saving.
@@ -454,37 +472,35 @@ export function unlockPostAutosaving( lockName ) {
  * @param {Array}   blocks  Block Array.
  * @param {?Object} options Optional options.
  */
-export const resetEditorBlocks = ( blocks, options = {} ) => ( {
-	select,
-	dispatch,
-	registry,
-} ) => {
-	const { __unstableShouldCreateUndoLevel, selection } = options;
-	const edits = { blocks, selection };
+export const resetEditorBlocks =
+	( blocks, options = {} ) =>
+	( { select, dispatch, registry } ) => {
+		const { __unstableShouldCreateUndoLevel, selection } = options;
+		const edits = { blocks, selection };
 
-	if ( __unstableShouldCreateUndoLevel !== false ) {
-		const { id, type } = select.getCurrentPost();
-		const noChange =
-			registry
-				.select( coreStore )
-				.getEditedEntityRecord( 'postType', type, id ).blocks ===
-			edits.blocks;
-		if ( noChange ) {
-			registry
-				.dispatch( coreStore )
-				.__unstableCreateUndoLevel( 'postType', type, id );
-			return;
+		if ( __unstableShouldCreateUndoLevel !== false ) {
+			const { id, type } = select.getCurrentPost();
+			const noChange =
+				registry
+					.select( coreStore )
+					.getEditedEntityRecord( 'postType', type, id ).blocks ===
+				edits.blocks;
+			if ( noChange ) {
+				registry
+					.dispatch( coreStore )
+					.__unstableCreateUndoLevel( 'postType', type, id );
+				return;
+			}
+
+			// We create a new function here on every persistent edit
+			// to make sure the edit makes the post dirty and creates
+			// a new undo level.
+			edits.content = ( { blocks: blocksForSerialization = [] } ) =>
+				__unstableSerializeAndClean( blocksForSerialization );
 		}
 
-		// We create a new function here on every persistent edit
-		// to make sure the edit makes the post dirty and creates
-		// a new undo level.
-		edits.content = ( { blocks: blocksForSerialization = [] } ) =>
-			__unstableSerializeAndClean( blocksForSerialization );
-	}
-
-	dispatch.editPost( edits );
-};
+		dispatch.editPost( edits );
+	};
 
 /*
  * Returns an action object used in signalling that the post editor settings have been updated.
@@ -504,14 +520,18 @@ export function updateEditorSettings( settings ) {
  * Backward compatibility
  */
 
-const getBlockEditorAction = ( name ) => ( ...args ) => ( { registry } ) => {
-	deprecated( "`wp.data.dispatch( 'core/editor' )." + name + '`', {
-		since: '5.3',
-		alternative: "`wp.data.dispatch( 'core/block-editor' )." + name + '`',
-		version: '6.2',
-	} );
-	registry.dispatch( blockEditorStore )[ name ]( ...args );
-};
+const getBlockEditorAction =
+	( name ) =>
+	( ...args ) =>
+	( { registry } ) => {
+		deprecated( "`wp.data.dispatch( 'core/editor' )." + name + '`', {
+			since: '5.3',
+			alternative:
+				"`wp.data.dispatch( 'core/block-editor' )." + name + '`',
+			version: '6.2',
+		} );
+		registry.dispatch( blockEditorStore )[ name ]( ...args );
+	};
 
 /**
  * @see resetBlocks in core/block-editor store.

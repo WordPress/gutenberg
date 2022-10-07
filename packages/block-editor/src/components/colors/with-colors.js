@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isString, kebabCase, reduce, upperFirst } from 'lodash';
+import { kebabCase, reduce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,6 +21,16 @@ import {
 import useSetting from '../use-setting';
 
 /**
+ * Capitalizes the first letter in a string.
+ *
+ * @param {string} str The string whose first letter the function will capitalize.
+ *
+ * @return {string} Capitalized string.
+ */
+const upperFirst = ( [ firstLetter, ...rest ] ) =>
+	firstLetter.toUpperCase() + rest.join( '' );
+
+/**
  * Higher order component factory for injecting the `colorsArray` argument as
  * the colors prop in the `withCustomColors` HOC.
  *
@@ -30,9 +40,8 @@ import useSetting from '../use-setting';
  */
 const withCustomColorPalette = ( colorsArray ) =>
 	createHigherOrderComponent(
-		( WrappedComponent ) => ( props ) => (
-			<WrappedComponent { ...props } colors={ colorsArray } />
-		),
+		( WrappedComponent ) => ( props ) =>
+			<WrappedComponent { ...props } colors={ colorsArray } />,
 		'withCustomColorPalette'
 	);
 
@@ -79,7 +88,7 @@ function createColorHOC( colorTypes, withColorPalette ) {
 		( colorObject, colorType ) => {
 			return {
 				...colorObject,
-				...( isString( colorType )
+				...( typeof colorType === 'string'
 					? { [ colorType ]: kebabCase( colorType ) }
 					: colorType ),
 			};
@@ -96,9 +105,8 @@ function createColorHOC( colorTypes, withColorPalette ) {
 
 					this.setters = this.createSetters();
 					this.colorUtils = {
-						getMostReadableColor: this.getMostReadableColor.bind(
-							this
-						),
+						getMostReadableColor:
+							this.getMostReadableColor.bind( this ),
 					};
 
 					this.state = {};
@@ -117,9 +125,8 @@ function createColorHOC( colorTypes, withColorPalette ) {
 							colorContext,
 							colorAttributeName
 						) => {
-							const upperFirstColorAttributeName = upperFirst(
-								colorAttributeName
-							);
+							const upperFirstColorAttributeName =
+								upperFirst( colorAttributeName );
 							const customColorAttributeName = `custom${ upperFirstColorAttributeName }`;
 							settersAccumulator[
 								`set${ upperFirstColorAttributeName }`
@@ -181,9 +188,8 @@ function createColorHOC( colorTypes, withColorPalette ) {
 								previousColor === colorObject.color &&
 								previousColorObject
 							) {
-								newState[
-									colorAttributeName
-								] = previousColorObject;
+								newState[ colorAttributeName ] =
+									previousColorObject;
 							} else {
 								newState[ colorAttributeName ] = {
 									...colorObject,

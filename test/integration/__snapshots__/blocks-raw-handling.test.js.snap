@@ -28,6 +28,18 @@ exports[`Blocks raw handling pasteHandler should strip windows data 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Blocks raw handling should correctly handle quotes with mixed content 1`] = `
+"<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><!-- wp:heading {\\"level\\":1} -->
+<h1>chicken</h1>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>ribs</p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->"
+`;
+
 exports[`rawHandler should convert HTML post to blocks with minimal content changes 1`] = `
 "<!-- wp:heading -->
 <h2>Howdy</h2>
@@ -57,8 +69,10 @@ exports[`rawHandler should convert HTML post to blocks with minimal content chan
 <h3>Shortcode</h3>
 <!-- /wp:heading -->
 
-<!-- wp:gallery {\\"shortCodeTransforms\\":[{\\"id\\":1}],\\"columns\\":3,\\"linkTo\\":\\"none\\"} -->
-<figure class=\\"wp-block-gallery has-nested-images columns-3 is-cropped\\"></figure>
+<!-- wp:gallery {\\"columns\\":3,\\"linkTo\\":\\"none\\"} -->
+<figure class=\\"wp-block-gallery has-nested-images columns-3 is-cropped\\"><!-- wp:image {\\"id\\":1} -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\" class=\\"wp-image-1\\"/></figure>
+<!-- /wp:image --></figure>
 <!-- /wp:gallery -->
 
 <!-- wp:html -->
@@ -71,43 +85,55 @@ exports[`rawHandler should convert HTML post to blocks with minimal content chan
 <!-- /wp:html -->
 
 <!-- wp:list {\\"ordered\\":true} -->
-<ol><li>Item</li></ol>
+<ol><!-- wp:list-item -->
+<li>Item</li>
+<!-- /wp:list-item --></ol>
 <!-- /wp:list -->
 
 <!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>Text.</p></blockquote>
+<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
+<p>Text.</p>
+<!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->
 
-<!-- wp:html -->
-<blockquote><h1>Heading</h1><p>Text.</p></blockquote>
-<!-- /wp:html -->"
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><!-- wp:heading {\\"level\\":1} -->
+<h1>Heading</h1>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Text.</p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->"
 `;
 
 exports[`rawHandler should convert a caption shortcode 1`] = `
 "<!-- wp:image {\\"align\\":\\"none\\",\\"id\\":122,\\"className\\":\\"size-medium wp-image-122\\"} -->
-<figure class=\\"wp-block-image alignnone size-medium wp-image-122\\"><img src=\\"image.png\\" alt=\\"\\" class=\\"wp-image-122\\"/><figcaption>test</figcaption></figure>
+<figure class=\\"wp-block-image alignnone size-medium wp-image-122\\"><img src=\\"image.png\\" alt=\\"\\" class=\\"wp-image-122\\"/><figcaption class=\\"wp-element-caption\\">test</figcaption></figure>
 <!-- /wp:image -->"
 `;
 
 exports[`rawHandler should convert a caption shortcode with caption 1`] = `
 "<!-- wp:image {\\"align\\":\\"none\\",\\"id\\":122,\\"className\\":\\"size-medium wp-image-122\\"} -->
-<figure class=\\"wp-block-image alignnone size-medium wp-image-122\\"><img src=\\"image.png\\" alt=\\"\\" class=\\"wp-image-122\\"/><figcaption><a href=\\"https://w.org\\">test</a></figcaption></figure>
+<figure class=\\"wp-block-image alignnone size-medium wp-image-122\\"><img src=\\"image.png\\" alt=\\"\\" class=\\"wp-image-122\\"/><figcaption class=\\"wp-element-caption\\"><a href=\\"https://w.org\\">test</a></figcaption></figure>
 <!-- /wp:image -->"
 `;
 
 exports[`rawHandler should convert a caption shortcode with link 1`] = `
 "<!-- wp:image {\\"align\\":\\"none\\",\\"id\\":754} -->
-<figure class=\\"wp-block-image alignnone\\"><a href=\\"http://build.wordpress-develop.test/wp-content/uploads/2011/07/100_5478.jpg\\"><img src=\\"http://build.wordpress-develop.test/wp-content/uploads/2011/07/100_5478.jpg?w=604\\" alt=\\"Bell on Wharf\\" class=\\"wp-image-754\\"/></a><figcaption>Bell on wharf in San Francisco</figcaption></figure>
+<figure class=\\"wp-block-image alignnone\\"><a href=\\"http://build.wordpress-develop.test/wp-content/uploads/2011/07/100_5478.jpg\\"><img src=\\"http://build.wordpress-develop.test/wp-content/uploads/2011/07/100_5478.jpg?w=604\\" alt=\\"Bell on Wharf\\" class=\\"wp-image-754\\"/></a><figcaption class=\\"wp-element-caption\\">Bell on wharf in San Francisco</figcaption></figure>
 <!-- /wp:image -->"
 `;
 
 exports[`rawHandler should convert a list with attributes 1`] = `
 "<!-- wp:list {\\"ordered\\":true,\\"type\\":\\"i\\",\\"start\\":2,\\"reversed\\":true} -->
-<ol type=\\"i\\" reversed start=\\"2\\"><li>1
-        <ol start=\\"2\\" reversed=\\"\\" type=\\"i\\">
-            <li>1</li>
-        </ol>
-    </li></ol>
+<ol type=\\"i\\" reversed start=\\"2\\"><!-- wp:list-item -->
+<li>1<!-- wp:list {\\"ordered\\":true,\\"type\\":\\"i\\",\\"start\\":2,\\"reversed\\":true} -->
+<ol type=\\"i\\" reversed start=\\"2\\"><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ol>
 <!-- /wp:list -->"
 `;
 

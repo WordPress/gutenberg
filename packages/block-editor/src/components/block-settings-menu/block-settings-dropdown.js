@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, flow, noop } from 'lodash';
+import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,7 @@ import {
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { useCopyToClipboard } from '@wordpress/compose';
+import { pipe, useCopyToClipboard } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -33,6 +33,7 @@ import { store as blockEditorStore } from '../../store';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { useShowMoversGestures } from '../block-toolbar/utils';
 
+const noop = () => {};
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	position: 'bottom right',
@@ -41,13 +42,16 @@ const POPOVER_PROPS = {
 
 function CopyMenuItem( { blocks, onCopy } ) {
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
-	return <MenuItem ref={ ref }>{ __( 'Copy' ) }</MenuItem>;
+	const copyMenuItemLabel =
+		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy block' );
+	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
 }
 
 export function BlockSettingsDropdown( {
 	clientIds,
 	__experimentalSelectBlock,
 	children,
+	__unstableDisplayLocation,
 	...props
 } ) {
 	const blockClientIds = castArray( clientIds );
@@ -82,9 +86,8 @@ export function BlockSettingsDropdown( {
 				hasReducedUI: getSettings().hasReducedUI,
 				onlyBlock: 1 === getBlockCount(),
 				parentBlockType: getBlockType( parentBlockName ),
-				previousBlockClientId: getPreviousBlockClientId(
-					firstBlockClientId
-				),
+				previousBlockClientId:
+					getPreviousBlockClientId( firstBlockClientId ),
 				nextBlockClientId: getNextBlockClientId( firstBlockClientId ),
 				selectedBlockClientIds: getSelectedBlockClientIds(),
 			};
@@ -108,9 +111,8 @@ export function BlockSettingsDropdown( {
 		};
 	}, [] );
 
-	const { selectBlock, toggleBlockHighlight } = useDispatch(
-		blockEditorStore
-	);
+	const { selectBlock, toggleBlockHighlight } =
+		useDispatch( blockEditorStore );
 
 	const updateSelectionAfterDuplicate = useCallback(
 		__experimentalSelectBlock
@@ -124,7 +126,10 @@ export function BlockSettingsDropdown( {
 		[ __experimentalSelectBlock ]
 	);
 
-	const blockTitle = useBlockDisplayTitle( firstBlockClientId, 25 );
+	const blockTitle = useBlockDisplayTitle( {
+		clientId: firstBlockClientId,
+		maximumLength: 25,
+	} );
 
 	const updateSelectionAfterRemove = useCallback(
 		__experimentalSelectBlock
@@ -236,7 +241,7 @@ export function BlockSettingsDropdown( {
 								/>
 								{ canDuplicate && (
 									<MenuItem
-										onClick={ flow(
+										onClick={ pipe(
 											onClose,
 											onDuplicate,
 											updateSelectionAfterDuplicate
@@ -249,7 +254,7 @@ export function BlockSettingsDropdown( {
 								{ canInsertDefaultBlock && (
 									<>
 										<MenuItem
-											onClick={ flow(
+											onClick={ pipe(
 												onClose,
 												onInsertBefore
 											) }
@@ -258,7 +263,7 @@ export function BlockSettingsDropdown( {
 											{ __( 'Insert before' ) }
 										</MenuItem>
 										<MenuItem
-											onClick={ flow(
+											onClick={ pipe(
 												onClose,
 												onInsertAfter
 											) }
@@ -270,7 +275,7 @@ export function BlockSettingsDropdown( {
 								) }
 								{ canMove && ! onlyBlock && (
 									<MenuItem
-										onClick={ flow( onClose, onMoveTo ) }
+										onClick={ pipe( onClose, onMoveTo ) }
 									>
 										{ __( 'Move to' ) }
 									</MenuItem>
@@ -285,6 +290,9 @@ export function BlockSettingsDropdown( {
 							<BlockSettingsMenuControls.Slot
 								fillProps={ { onClose } }
 								clientIds={ clientIds }
+								__unstableDisplayLocation={
+									__unstableDisplayLocation
+								}
 							/>
 							{ typeof children === 'function'
 								? children( { onClose } )
@@ -294,7 +302,7 @@ export function BlockSettingsDropdown( {
 							{ canRemove && (
 								<MenuGroup>
 									<MenuItem
-										onClick={ flow(
+										onClick={ pipe(
 											onClose,
 											onRemove,
 											updateSelectionAfterRemove

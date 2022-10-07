@@ -2,12 +2,13 @@
  * External dependencies
  */
 import { render } from '@testing-library/react';
-import { noop } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import PanelColorSettings from '../';
+
+const noop = () => {};
 
 describe( 'PanelColorSettings', () => {
 	it( 'should not render anything if there are no colors to choose', async () => {

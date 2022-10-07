@@ -39,9 +39,8 @@ const PostFormatSuggestion = ( {
 
 export default function PostFormatPanel() {
 	const { currentPostFormat, suggestion } = useSelect( ( select ) => {
-		const { getEditedPostAttribute, getSuggestedPostFormat } = select(
-			editorStore
-		);
+		const { getEditedPostAttribute, getSuggestedPostFormat } =
+			select( editorStore );
 		const supportedFormats = get(
 			select( coreStore ).getThemeSupports(),
 			[ 'formats' ],

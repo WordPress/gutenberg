@@ -196,16 +196,13 @@ export class ImageEdit extends Component {
 
 		this.replacedFeaturedImage = false;
 
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
-			this
-		);
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
-			this
-		);
+		this.finishMediaUploadWithSuccess =
+			this.finishMediaUploadWithSuccess.bind( this );
+		this.finishMediaUploadWithFailure =
+			this.finishMediaUploadWithFailure.bind( this );
 		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
-		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
-			this
-		);
+		this.onSelectMediaUploadOption =
+			this.onSelectMediaUploadOption.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetNewTab = this.onSetNewTab.bind( this );
@@ -215,9 +212,8 @@ export class ImageEdit extends Component {
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
-		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(
-			this
-		);
+		this.accessibilityLabelCreator =
+			this.accessibilityLabelCreator.bind( this );
 		this.setMappedAttributes = this.setMappedAttributes.bind( this );
 		this.onSizeChangeValue = this.onSizeChangeValue.bind( this );
 	}
@@ -270,17 +266,17 @@ export class ImageEdit extends Component {
 	}
 
 	componentDidUpdate( previousProps ) {
-		const {
-			image,
-			attributes,
-			setAttributes,
-			featuredImageId,
-		} = this.props;
+		const { image, attributes, setAttributes, featuredImageId } =
+			this.props;
+		const { url } = attributes;
 		if ( ! previousProps.image && image ) {
-			const url =
-				getUrlForSlug( image, attributes?.sizeSlug ) ||
-				image.source_url;
-			setAttributes( { url } );
+			if ( ! hasQueryArg( url, 'w' ) && attributes?.sizeSlug ) {
+				const updatedUrl =
+					getUrlForSlug( image, attributes.sizeSlug ) ||
+					image.source_url;
+
+				setAttributes( { url: updatedUrl } );
+			}
 		}
 
 		const { id } = attributes;
@@ -436,6 +432,7 @@ export class ImageEdit extends Component {
 			id: media.id,
 			url: media.url,
 			caption: media.caption,
+			alt: media.alt,
 		};
 
 		let additionalAttributes;
@@ -469,11 +466,8 @@ export class ImageEdit extends Component {
 	}
 
 	onSelectURL( newURL ) {
-		const {
-			createErrorNotice,
-			imageDefaultSize,
-			setAttributes,
-		} = this.props;
+		const { createErrorNotice, imageDefaultSize, setAttributes } =
+			this.props;
 
 		if ( isURL( newURL ) ) {
 			this.setState( {
@@ -584,7 +578,7 @@ export class ImageEdit extends Component {
 					<>
 						{ __(
 							'Describe the purpose of the image. Leave empty if the image is purely decorative.'
-						) }
+						) }{ ' ' }
 						<FooterMessageLink
 							href={
 								'https://www.w3.org/WAI/tutorials/images/decision-tree/'
@@ -675,6 +669,7 @@ export class ImageEdit extends Component {
 			context,
 			featuredImageId,
 			wasBlockJustInserted,
+			shouldUseFastImage,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 		const hasImageContext = context
@@ -855,6 +850,9 @@ export class ImageEdit extends Component {
 											isUploadInProgress={
 												isUploadInProgress
 											}
+											shouldUseFastImage={
+												shouldUseFastImage
+											}
 											onSelectMediaUploadOption={
 												this.onSelectMediaUploadOption
 											}
@@ -906,16 +904,16 @@ export class ImageEdit extends Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( coreStore );
-		const { getSettings, wasBlockJustInserted } = select(
-			blockEditorStore
-		);
+		const { getSettings, wasBlockJustInserted } =
+			select( blockEditorStore );
 		const { getEditedPostAttribute } = select( 'core/editor' );
 		const {
 			attributes: { id, url },
 			isSelected,
 			clientId,
 		} = props;
-		const { imageSizes, imageDefaultSize } = getSettings();
+		const { imageSizes, imageDefaultSize, shouldUseFastImage } =
+			getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
 		const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
@@ -927,11 +925,13 @@ export default compose( [
 				isNotFileUrl &&
 				url &&
 				! hasQueryArg( url, 'w' ) );
+		const image = shouldGetMedia ? getMedia( id ) : null;
 
 		return {
-			image: shouldGetMedia ? getMedia( id ) : null,
+			image,
 			imageSizes,
 			imageDefaultSize,
+			shouldUseFastImage,
 			featuredImageId,
 			wasBlockJustInserted: wasBlockJustInserted(
 				clientId,

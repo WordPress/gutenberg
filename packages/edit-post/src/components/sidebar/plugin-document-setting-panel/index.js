@@ -114,9 +114,8 @@ const PluginDocumentSettingPanel = compose(
 	withSelect( ( select, { panelName } ) => {
 		return {
 			opened: select( editPostStore ).isEditorPanelOpened( panelName ),
-			isEnabled: select( editPostStore ).isEditorPanelEnabled(
-				panelName
-			),
+			isEnabled:
+				select( editPostStore ).isEditorPanelEnabled( panelName ),
 		};
 	} ),
 	withDispatch( ( dispatch, { panelName } ) => ( {

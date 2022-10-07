@@ -16,14 +16,14 @@
  * @return float      Value in the range [0,1].
  */
 function gutenberg_tinycolor_bound01( $n, $max ) {
-	if ( 'string' === gettype( $n ) && false !== strpos( $n, '.' ) && 1 === (float) $n ) {
+	if ( 'string' === gettype( $n ) && str_contains( $n, '.' ) && 1 === (float) $n ) {
 		$n = '100%';
 	}
 
 	$n = min( $max, max( 0, (float) $n ) );
 
 	// Automatically convert percentage into number.
-	if ( 'string' === gettype( $n ) && false !== strpos( $n, '%' ) ) {
+	if ( 'string' === gettype( $n ) && str_contains( $n, '%' ) ) {
 		$n = (int) ( $n * $max ) / 100;
 	}
 
@@ -83,10 +83,10 @@ function gutenberg_tinycolor_rgb_to_rgb( $rgb_color ) {
  */
 function gutenberg_tinycolor_hue_to_rgb( $p, $q, $t ) {
 	if ( $t < 0 ) {
-		$t += 1;
+		++$t;
 	}
 	if ( $t > 1 ) {
-		$t -= 1;
+		--$t;
 	}
 	if ( $t < 1 / 6 ) {
 		return $p + ( $q - $p ) * 6 * $t;
@@ -311,6 +311,9 @@ function gutenberg_get_duotone_filter_id( $preset ) {
  * @return string        Duotone CSS filter property url value.
  */
 function gutenberg_get_duotone_filter_property( $preset ) {
+	if ( isset( $preset['colors'] ) && 'unset' === $preset['colors'] ) {
+		return 'none';
+	}
 	$filter_id = gutenberg_get_duotone_filter_id( $preset );
 	return "url('#" . $filter_id . "')";
 }
@@ -387,7 +390,7 @@ function gutenberg_get_duotone_filter_svg( $preset ) {
 	if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
 		// Clean up the whitespace.
 		$svg = preg_replace( "/[\r\n\t ]+/", ' ', $svg );
-		$svg = preg_replace( '/> </', '><', $svg );
+		$svg = str_replace( '> <', '><', $svg );
 		$svg = trim( $svg );
 	}
 
@@ -442,13 +445,14 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		return $block_content;
 	}
 
+	$colors          = $block['attrs']['style']['color']['duotone'];
+	$filter_key      = is_array( $colors ) ? implode( '-', $colors ) : $colors;
 	$filter_preset   = array(
-		'slug'   => wp_unique_id( sanitize_key( implode( '-', $block['attrs']['style']['color']['duotone'] ) . '-' ) ),
-		'colors' => $block['attrs']['style']['color']['duotone'],
+		'slug'   => wp_unique_id( sanitize_key( $filter_key . '-' ) ),
+		'colors' => $colors,
 	);
 	$filter_property = gutenberg_get_duotone_filter_property( $filter_preset );
 	$filter_id       = gutenberg_get_duotone_filter_id( $filter_preset );
-	$filter_svg      = gutenberg_get_duotone_filter_svg( $filter_preset );
 
 	$scope     = '.' . $filter_id;
 	$selectors = explode( ',', $duotone_support );
@@ -468,25 +472,32 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	wp_add_inline_style( $filter_id, $filter_style );
 	wp_enqueue_style( $filter_id );
 
-	add_action(
-		'wp_footer',
-		static function () use ( $filter_svg, $selector ) {
-			echo $filter_svg;
+	if ( 'unset' !== $colors ) {
+		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_preset );
+		add_action(
+			'wp_footer',
+			static function () use ( $filter_svg, $selector ) {
+				echo $filter_svg;
 
-			// Safari renders elements incorrectly on first paint when the SVG
-			// filter comes after the content that it is filtering, so we force
-			// a repaint with a WebKit hack which solves the issue.
-			global $is_safari;
-			if ( $is_safari ) {
-				printf(
-					// Simply accessing el.offsetHeight flushes layout and style
-					// changes in WebKit without having to wait for setTimeout.
-					'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
-					wp_json_encode( $selector )
-				);
+				/*
+				 * Safari renders elements incorrectly on first paint when the
+				 * SVG filter comes after the content that it is filtering, so
+				 * we force a repaint with a WebKit hack which solves the issue.
+				 */
+				global $is_safari;
+				if ( $is_safari ) {
+					/*
+					 * Simply accessing el.offsetHeight flushes layout and style
+					 * changes in WebKit without having to wait for setTimeout.
+					 */
+					printf(
+						'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
+						wp_json_encode( $selector )
+					);
+				}
 			}
-		}
-	);
+		);
+	}
 
 	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
 	return preg_replace(

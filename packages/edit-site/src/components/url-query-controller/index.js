@@ -11,9 +11,8 @@ import { useLocation } from '../routes';
 import { store as editSiteStore } from '../../store';
 
 export default function URLQueryController() {
-	const { setTemplate, setTemplatePart, setPage } = useDispatch(
-		editSiteStore
-	);
+	const { setTemplate, setTemplatePart, setPage } =
+		useDispatch( editSiteStore );
 	const {
 		params: { postId, postType },
 	} = useLocation();

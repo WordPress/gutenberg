@@ -7,9 +7,6 @@ import { escapeAttribute } from '@wordpress/escape-html';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import Button from '../../button';
 import useNavigator from '../use-navigator';
@@ -32,19 +29,20 @@ export function useNavigatorButton(
 	const escapedPath = escapeAttribute( path );
 
 	const { goTo } = useNavigator();
-	const handleClick: React.MouseEventHandler< HTMLButtonElement > = useCallback(
-		( e ) => {
-			e.preventDefault();
-			goTo( escapedPath, {
-				focusTargetSelector: cssSelectorForAttribute(
-					attributeName,
-					escapedPath
-				),
-			} );
-			onClick?.( e );
-		},
-		[ goTo, onClick ]
-	);
+	const handleClick: React.MouseEventHandler< HTMLButtonElement > =
+		useCallback(
+			( e ) => {
+				e.preventDefault();
+				goTo( escapedPath, {
+					focusTargetSelector: cssSelectorForAttribute(
+						attributeName,
+						escapedPath
+					),
+				} );
+				onClick?.( e );
+			},
+			[ goTo, onClick, attributeName, escapedPath ]
+		);
 
 	return {
 		as,

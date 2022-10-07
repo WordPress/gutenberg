@@ -19,6 +19,7 @@ import { STORE_NAME } from '../../store/constants';
 import SettingsHeader from './settings-header';
 import TemplateCard from './template-card';
 import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
+import { store as editSiteStore } from '../../store';
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
@@ -26,25 +27,27 @@ const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 export const SidebarInspectorFill = InspectorFill;
 
 export function SidebarComplementaryAreaFills() {
-	const { sidebar, isEditorSidebarOpened, hasBlockSelection } = useSelect(
-		( select ) => {
-			const _sidebar = select(
-				interfaceStore
-			).getActiveComplementaryArea( STORE_NAME );
-			const _isEditorSidebarOpened = [
-				SIDEBAR_BLOCK,
-				SIDEBAR_TEMPLATE,
-			].includes( _sidebar );
-			return {
-				sidebar: _sidebar,
-				isEditorSidebarOpened: _isEditorSidebarOpened,
-				hasBlockSelection: !! select(
-					blockEditorStore
-				).getBlockSelectionStart(),
-			};
-		},
-		[]
-	);
+	const {
+		sidebar,
+		isEditorSidebarOpened,
+		hasBlockSelection,
+		supportsGlobalStyles,
+	} = useSelect( ( select ) => {
+		const _sidebar =
+			select( interfaceStore ).getActiveComplementaryArea( STORE_NAME );
+		const _isEditorSidebarOpened = [
+			SIDEBAR_BLOCK,
+			SIDEBAR_TEMPLATE,
+		].includes( _sidebar );
+		const settings = select( editSiteStore ).getSettings();
+		return {
+			sidebar: _sidebar,
+			isEditorSidebarOpened: _isEditorSidebarOpened,
+			hasBlockSelection:
+				!! select( blockEditorStore ).getBlockSelectionStart(),
+			supportsGlobalStyles: ! settings?.supportsTemplatePartsMode,
+		};
+	}, [] );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	useEffect( () => {
@@ -89,7 +92,7 @@ export function SidebarComplementaryAreaFills() {
 					<InspectorSlot bubblesVirtually />
 				) }
 			</DefaultSidebar>
-			<GlobalStylesSidebar />
+			{ supportsGlobalStyles && <GlobalStylesSidebar /> }
 			<MaybeNavigationMenuSidebar />
 		</>
 	);

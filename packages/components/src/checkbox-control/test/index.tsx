@@ -3,7 +3,6 @@
  */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,6 +14,8 @@ import { useState } from '@wordpress/element';
  */
 import BaseCheckboxControl from '..';
 import type { CheckboxControlProps } from '../types';
+
+const noop = () => {};
 
 const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
 

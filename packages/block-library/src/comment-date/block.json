@@ -14,10 +14,6 @@
 		"isLink": {
 			"type": "boolean",
 			"default": true
-		},
-		"fontSize": {
-			"type": "string",
-			"default": "small"
 		}
 	},
 	"usesContext": [ "commentId" ],
@@ -32,6 +28,10 @@
 				"link": true
 			}
 		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -39,6 +39,7 @@
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true

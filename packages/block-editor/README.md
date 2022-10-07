@@ -246,6 +246,7 @@ _Parameters_
 -   _props_ `Object`:
 -   _props.clientId_ `string`: Client ID of block.
 -   _props.maximumLength_ `number|undefined`: The maximum length that the block title string may be before truncated.
+-   _props.context_ `string|undefined`: The context to pass to `getBlockLabel`.
 
 _Returns_
 
@@ -473,6 +474,19 @@ _Returns_
 
 -   `string`: returns the cssUnit value in a simple px format.
 
+### getTypographyClassesAndStyles
+
+Provides the CSS class names and inline styles for a block's typography support
+attributes.
+
+_Parameters_
+
+-   _attributes_ `Object`: Block attributes.
+
+_Returns_
+
+-   `Object`: Typography block support derived CSS classes & styles.
+
 ### InnerBlocks
 
 _Related_
@@ -621,10 +635,6 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
 
-_Type_
-
--   `Object`
-
 ### storeConfig
 
 Block editor data store configuration.
@@ -632,10 +642,6 @@ Block editor data store configuration.
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore>
-
-_Type_
-
--   `Object`
 
 ### ToolSelector
 
@@ -724,7 +730,6 @@ _Parameters_
 -   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 -   _options_ `Object`: Options for internal use only.
 -   _options.\_\_unstableIsHtml_ `boolean`:
--   _options.\_\_unstableIsDisabled_ `boolean`: Whether the block should be disabled.
 
 _Returns_
 

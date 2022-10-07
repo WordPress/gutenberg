@@ -37,12 +37,8 @@ export class BlockListItem extends Component {
 			parentWidth,
 			blockWidth,
 		} = this.props;
-		const {
-			isFullWidth,
-			isWideWidth,
-			isWider,
-			isContainerRelated,
-		} = alignmentHelpers;
+		const { isFullWidth, isWideWidth, isWider, isContainerRelated } =
+			alignmentHelpers;
 
 		if ( isFullWidth( blockAlignment ) ) {
 			if ( ! hasParents ) {
@@ -83,12 +79,8 @@ export class BlockListItem extends Component {
 	}
 
 	getContentStyles( readableContentViewStyle ) {
-		const {
-			blockAlignment,
-			blockName,
-			hasParents,
-			parentBlockName,
-		} = this.props;
+		const { blockAlignment, blockName, hasParents, parentBlockName } =
+			this.props;
 		const { isFullWidth, isContainerRelated } = alignmentHelpers;
 
 		return [

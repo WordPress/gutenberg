@@ -35,6 +35,24 @@ const formatExamples = ( tags, docs ) => {
 	}
 };
 
+const formatSince = ( tags, docs ) => {
+	if ( tags && tags.length > 0 ) {
+		docs.push( '\n' );
+		docs.push( '\n' );
+		docs.push( '*Changelog*' );
+		docs.push( '\n' );
+		docs.push( '\n' );
+		docs.push(
+			...tags.map(
+				( tag ) =>
+					`\n${ cleanSpaces(
+						`\`${ tag.name }\` ${ tag.description }`
+					) }`
+			)
+		);
+	}
+};
+
 const formatDeprecated = ( tags, docs ) => {
 	if ( tags && tags.length > 0 ) {
 		docs.push( '\n' );
@@ -187,6 +205,7 @@ module.exports = (
 				},
 				docs
 			);
+			formatSince( getSymbolTagsByName( symbol, 'since' ), docs );
 			docs.push( '\n' );
 			docs.push( '\n' );
 		} );

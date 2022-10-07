@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
@@ -43,8 +43,17 @@ function Item( { name, parentMenu, element, label } ) {
 		return null;
 	}
 
+	const navigationButtonLabel = sprintf(
+		// translators: %s: is a subset of Typography, e.g., 'text' or 'links'.
+		__( 'Typography %s styles' ),
+		label
+	);
+
 	return (
-		<NavigationButtonAsItem path={ parentMenu + '/typography/' + element }>
+		<NavigationButtonAsItem
+			path={ parentMenu + '/typography/' + element }
+			aria-label={ navigationButtonLabel }
+		>
 			<HStack justify="flex-start">
 				<FlexItem
 					className="edit-site-global-styles-screen-typography__indicator"
@@ -94,6 +103,18 @@ function ScreenTypography( { name } ) {
 								parentMenu={ parentMenu }
 								element="link"
 								label={ __( 'Links' ) }
+							/>
+							<Item
+								name={ name }
+								parentMenu={ parentMenu }
+								element="heading"
+								label={ __( 'Headings' ) }
+							/>
+							<Item
+								name={ name }
+								parentMenu={ parentMenu }
+								element="button"
+								label={ __( 'Buttons' ) }
 							/>
 						</ItemGroup>
 					</VStack>

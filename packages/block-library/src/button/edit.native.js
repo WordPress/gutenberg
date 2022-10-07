@@ -95,9 +95,8 @@ function ButtonEdit( props ) {
 	const { editorSidebarOpened, numOfButtons } = useSelect(
 		( select ) => {
 			const { isEditorSidebarOpened } = select( editPostStore );
-			const { getBlockCount, getBlockRootClientId } = select(
-				blockEditorStore
-			);
+			const { getBlockCount, getBlockRootClientId } =
+				select( blockEditorStore );
 			const parentId = getBlockRootClientId( clientId );
 			const blockCount = getBlockCount( parentId );
 			const currentIsEditorSidebarOpened = isEditorSidebarOpened();

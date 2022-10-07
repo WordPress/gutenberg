@@ -93,10 +93,12 @@ export const createQueue = () => {
 				return;
 			}
 
-			const nextElement = /** @type {WPPriorityQueueContext} */ ( waitingList.shift() );
-			const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
-				nextElement
-			) );
+			const nextElement = /** @type {WPPriorityQueueContext} */ (
+				waitingList.shift()
+			);
+			const callback = /** @type {WPPriorityQueueCallback} */ (
+				elementsMap.get( nextElement )
+			);
 			// If errors with undefined callbacks are encountered double check that all of your useSelect calls
 			// have all dependecies set correctly in second parameter. Missing dependencies can cause unexpected
 			// loops and race conditions in the queue.
@@ -143,9 +145,9 @@ export const createQueue = () => {
 
 		const index = waitingList.indexOf( element );
 		waitingList.splice( index, 1 );
-		const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
-			element
-		) );
+		const callback = /** @type {WPPriorityQueueCallback} */ (
+			elementsMap.get( element )
+		);
 		elementsMap.delete( element );
 		callback();
 

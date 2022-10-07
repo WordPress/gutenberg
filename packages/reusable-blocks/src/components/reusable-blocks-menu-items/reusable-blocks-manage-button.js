@@ -39,9 +39,8 @@ function ReusableBlocksManageButton( { clientId } ) {
 		[ clientId ]
 	);
 
-	const {
-		__experimentalConvertBlockToStatic: convertBlockToStatic,
-	} = useDispatch( reusableBlocksStore );
+	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
+		useDispatch( reusableBlocksStore );
 
 	if ( ! isVisible ) {
 		return null;

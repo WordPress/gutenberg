@@ -7,7 +7,13 @@ import { useMemoOne } from 'use-memo-one';
  * WordPress dependencies
  */
 import { createQueue } from '@wordpress/priority-queue';
-import { useRef, useCallback, useMemo, useReducer } from '@wordpress/element';
+import {
+	useRef,
+	useCallback,
+	useMemo,
+	useReducer,
+	useDebugValue,
+} from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 
@@ -20,7 +26,19 @@ import useAsyncMode from '../async-mode-provider/use-async-mode';
 const noop = () => {};
 const renderQueue = createQueue();
 
-/** @typedef {import('../../types').StoreDescriptor} StoreDescriptor */
+/**
+ * @typedef {import('../../types').StoreDescriptor<C>} StoreDescriptor
+ * @template C
+ */
+/**
+ * @typedef {import('../../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
+ * @template State,Actions,Selectors
+ */
+/**
+ * @typedef {import('../../types').UseSelectReturn<T>} UseSelectReturn
+ * @template T
+ */
+/** @typedef {import('../../types').MapSelect} MapSelect */
 
 /**
  * Custom react hook for retrieving props from registered selectors.
@@ -28,28 +46,25 @@ const renderQueue = createQueue();
  * In general, this custom React hook follows the
  * [rules of hooks](https://reactjs.org/docs/hooks-rules.html).
  *
- * @param {Function|StoreDescriptor|string} mapSelect Function called on every state change. The
- *                                                    returned value is exposed to the component
- *                                                    implementing this hook. The function receives
- *                                                    the `registry.select` method on the first
- *                                                    argument and the `registry` on the second
- *                                                    argument.
- *                                                    When a store key is passed, all selectors for
- *                                                    the store will be returned. This is only meant
- *                                                    for usage of these selectors in event
- *                                                    callbacks, not for data needed to create the
- *                                                    element tree.
- * @param {Array}                           deps      If provided, this memoizes the mapSelect so the
- *                                                    same `mapSelect` is invoked on every state
- *                                                    change unless the dependencies change.
+ * @template {MapSelect | StoreDescriptor<any>} T
+ * @param {T}         mapSelect Function called on every state change. The returned value is
+ *                              exposed to the component implementing this hook. The function
+ *                              receives the `registry.select` method on the first argument
+ *                              and the `registry` on the second argument.
+ *                              When a store key is passed, all selectors for the store will be
+ *                              returned. This is only meant for usage of these selectors in event
+ *                              callbacks, not for data needed to create the element tree.
+ * @param {unknown[]} deps      If provided, this memoizes the mapSelect so the same `mapSelect` is
+ *                              invoked on every state change unless the dependencies change.
  *
  * @example
  * ```js
  * import { useSelect } from '@wordpress/data';
+ * import { store as myCustomStore } from 'my-custom-store';
  *
  * function HammerPriceDisplay( { currency } ) {
  *   const price = useSelect( ( select ) => {
- *     return select( 'my-shop' ).getPrice( 'hammer', currency )
+ *     return select( myCustomStore ).getPrice( 'hammer', currency );
  *   }, [ currency ] );
  *   return new Intl.NumberFormat( 'en-US', {
  *     style: 'currency',
@@ -76,9 +91,10 @@ const renderQueue = createQueue();
  *
  * ```js
  * import { useSelect } from '@wordpress/data';
+ * import { store as myCustomStore } from 'my-custom-store';
  *
  * function Paste( { children } ) {
- *   const { getSettings } = useSelect( 'my-shop' );
+ *   const { getSettings } = useSelect( myCustomStore );
  *   function onPaste() {
  *     // Do something with the settings.
  *     const settings = getSettings();
@@ -86,8 +102,7 @@ const renderQueue = createQueue();
  *   return <div onPaste={ onPaste }>{ children }</div>;
  * }
  * ```
- *
- * @return {Function}  A custom react hook.
+ * @return {UseSelectReturn<T>} A custom react hook.
  */
 export default function useSelect( mapSelect, deps ) {
 	const hasMappingFunction = 'function' === typeof mapSelect;
@@ -138,6 +153,7 @@ export default function useSelect( mapSelect, deps ) {
 
 	let mapOutput;
 
+	let selectorRan = false;
 	if ( _mapSelect ) {
 		mapOutput = latestMapOutput.current;
 		const hasReplacedRegistry = latestRegistry.current !== registry;
@@ -153,6 +169,7 @@ export default function useSelect( mapSelect, deps ) {
 		) {
 			try {
 				mapOutput = wrapSelect( _mapSelect );
+				selectorRan = true;
 			} catch ( error ) {
 				let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
 
@@ -176,7 +193,9 @@ export default function useSelect( mapSelect, deps ) {
 		latestRegistry.current = registry;
 		latestMapSelect.current = _mapSelect;
 		latestIsAsync.current = isAsync;
-		latestMapOutput.current = mapOutput;
+		if ( selectorRan ) {
+			latestMapOutput.current = mapOutput;
+		}
 		latestMapOutputError.current = undefined;
 	} );
 
@@ -239,6 +258,8 @@ export default function useSelect( mapSelect, deps ) {
 		// examining every individual value inside the `deps` array.
 	}, [ registry, wrapSelect, hasMappingFunction, depsChangedFlag ] );
 
+	useDebugValue( mapOutput );
+
 	return hasMappingFunction ? mapOutput : registry.select( mapSelect );
 }
 
@@ -293,9 +314,11 @@ export function useSuspenseSelect( mapSelect, deps ) {
 	const hasReplacedMapSelect = latestMapSelect.current !== _mapSelect;
 	const hasLeftAsyncMode = latestIsAsync.current && ! isAsync;
 
+	let selectorRan = false;
 	if ( hasReplacedRegistry || hasReplacedMapSelect || hasLeftAsyncMode ) {
 		try {
 			mapOutput = wrapSelect( _mapSelect );
+			selectorRan = true;
 		} catch ( error ) {
 			mapOutputError = error;
 		}
@@ -305,7 +328,9 @@ export function useSuspenseSelect( mapSelect, deps ) {
 		latestRegistry.current = registry;
 		latestMapSelect.current = _mapSelect;
 		latestIsAsync.current = isAsync;
-		latestMapOutput.current = mapOutput;
+		if ( selectorRan ) {
+			latestMapOutput.current = mapOutput;
+		}
 		latestMapOutputError.current = mapOutputError;
 	} );
 

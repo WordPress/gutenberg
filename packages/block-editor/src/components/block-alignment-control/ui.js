@@ -48,12 +48,10 @@ function BlockAlignmentUI( {
 
 	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
 	const commonProps = {
-		popoverProps: POPOVER_PROPS,
 		icon: activeAlignmentControl
 			? activeAlignmentControl.icon
 			: defaultAlignmentControl.icon,
 		label: __( 'Align' ),
-		toggleProps: { describedBy: __( 'Change alignment' ) },
 	};
 	const extraProps = isToolbar
 		? {
@@ -70,18 +68,18 @@ function BlockAlignmentUI( {
 				} ),
 		  }
 		: {
+				toggleProps: { describedBy: __( 'Change alignment' ) },
+				popoverProps: POPOVER_PROPS,
 				children: ( { onClose } ) => {
 					return (
 						<>
 							<MenuGroup className="block-editor-block-alignment-control__menu-group">
 								{ enabledControls.map(
 									( { name: controlName, info } ) => {
-										const {
-											icon,
-											title,
-										} = BLOCK_ALIGNMENTS_CONTROLS[
-											controlName
-										];
+										const { icon, title } =
+											BLOCK_ALIGNMENTS_CONTROLS[
+												controlName
+											];
 										// If no value is provided, mark as selected the `none` option.
 										const isSelected =
 											controlName === value ||

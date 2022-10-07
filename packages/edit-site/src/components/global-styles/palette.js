@@ -58,18 +58,25 @@ function Palette( { name } ) {
 		<VStack spacing={ 3 }>
 			<Subtitle>{ __( 'Palette' ) }</Subtitle>
 			<ItemGroup isBordered isSeparated>
-				<NavigationButtonAsItem path={ screenPath }>
+				<NavigationButtonAsItem
+					path={ screenPath }
+					aria-label={ __( 'Color palettes' ) }
+				>
 					<HStack
 						direction={
 							colors.length === 0 ? 'row-reverse' : 'row'
 						}
 					>
 						<ZStack isLayered={ false } offset={ -8 }>
-							{ colors.slice( 0, 5 ).map( ( { color } ) => (
-								<ColorIndicatorWrapper key={ color }>
-									<ColorIndicator colorValue={ color } />
-								</ColorIndicatorWrapper>
-							) ) }
+							{ colors
+								.slice( 0, 5 )
+								.map( ( { color }, index ) => (
+									<ColorIndicatorWrapper
+										key={ `${ color }-${ index }` }
+									>
+										<ColorIndicator colorValue={ color } />
+									</ColorIndicatorWrapper>
+								) ) }
 						</ZStack>
 						<FlexItem>{ paletteButtonText }</FlexItem>
 					</HStack>

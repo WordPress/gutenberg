@@ -149,13 +149,13 @@ function InsertionPointPopover( {
 			...( ! isVertical ? horizontalLine.rest : verticalLine.rest ),
 			opacity: 1,
 			borderRadius: '2px',
-			transition: { delay: isInserterShown ? 0.4 : 0 },
+			transition: { delay: isInserterShown ? 0.5 : 0, type: 'tween' },
 		},
 		hover: {
 			...( ! isVertical ? horizontalLine.hover : verticalLine.hover ),
 			opacity: 1,
 			borderRadius: '2px',
-			transition: { delay: 0.4 },
+			transition: { delay: 0.5, type: 'tween' },
 		},
 	};
 
@@ -165,7 +165,7 @@ function InsertionPointPopover( {
 		},
 		rest: {
 			scale: 1,
-			transition: { delay: 0.2 },
+			transition: { delay: 0.4, type: 'tween' },
 		},
 	};
 
@@ -200,6 +200,7 @@ function InsertionPointPopover( {
 				<motion.div
 					variants={ lineVariants }
 					className="block-editor-block-list__insertion-point-indicator"
+					data-testid="block-list-insertion-point-indicator"
 				/>
 				{ isInserterShown && (
 					<motion.div
@@ -227,15 +228,10 @@ function InsertionPointPopover( {
 	);
 }
 
-export default function InsertionPoint( { children, ...props } ) {
+export default function InsertionPoint( props ) {
 	const isVisible = useSelect( ( select ) => {
 		return select( blockEditorStore ).isBlockInsertionPointVisible();
 	}, [] );
 
-	return (
-		<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-			{ isVisible && <InsertionPointPopover { ...props } /> }
-			{ children }
-		</InsertionPointOpenRef.Provider>
-	);
+	return isVisible && <InsertionPointPopover { ...props } />;
 }

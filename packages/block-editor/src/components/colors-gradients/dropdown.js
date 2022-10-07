@@ -11,6 +11,7 @@ import {
 	ColorIndicator,
 	Dropdown,
 	FlexItem,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	__experimentalHStack as HStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -60,31 +61,41 @@ const LabeledColorIndicator = ( { colorValue, label } ) => (
 			className="block-editor-panel-color-gradient-settings__color-indicator"
 			colorValue={ colorValue }
 		/>
-		<FlexItem>{ label }</FlexItem>
+		<FlexItem
+			className="block-editor-panel-color-gradient-settings__color-name"
+			title={ label }
+		>
+			{ label }
+		</FlexItem>
 	</HStack>
 );
 
 // Renders a color dropdown's toggle as an `Item` if it is within an `ItemGroup`
 // or as a `Button` if it isn't e.g. the controls are being rendered in
 // a `ToolsPanel`.
-const renderToggle = ( settings ) => ( { onToggle, isOpen } ) => {
-	const { colorValue, label } = settings;
+const renderToggle =
+	( settings ) =>
+	( { onToggle, isOpen } ) => {
+		const { colorValue, label } = settings;
 
-	const toggleProps = {
-		onClick: onToggle,
-		className: classnames(
-			'block-editor-panel-color-gradient-settings__dropdown',
-			{ 'is-open': isOpen }
-		),
-		'aria-expanded': isOpen,
+		const toggleProps = {
+			onClick: onToggle,
+			className: classnames(
+				'block-editor-panel-color-gradient-settings__dropdown',
+				{ 'is-open': isOpen }
+			),
+			'aria-expanded': isOpen,
+		};
+
+		return (
+			<Button { ...toggleProps }>
+				<LabeledColorIndicator
+					colorValue={ colorValue }
+					label={ label }
+				/>
+			</Button>
+		);
 	};
-
-	return (
-		<Button { ...toggleProps }>
-			<LabeledColorIndicator colorValue={ colorValue } label={ label } />
-		</Button>
-	);
-};
 
 // Renders a collection of color controls as dropdowns. Depending upon the
 // context in which these dropdowns are being rendered, they may be wrapped
@@ -109,6 +120,7 @@ export default function ColorGradientSettingsDropdown( {
 		popoverProps = {
 			placement: 'left-start',
 			offset: 36,
+			shift: true,
 		};
 	}
 
@@ -149,10 +161,15 @@ export default function ColorGradientSettingsDropdown( {
 							<Dropdown
 								popoverProps={ popoverProps }
 								className="block-editor-tools-panel-color-gradient-settings__dropdown"
-								contentClassName="block-editor-panel-color-gradient-settings__dropdown-content"
 								renderToggle={ renderToggle( toggleSettings ) }
 								renderContent={ () => (
-									<ColorGradientControl { ...controlProps } />
+									<DropdownContentWrapper paddingSize="none">
+										<div className="block-editor-panel-color-gradient-settings__dropdown-content">
+											<ColorGradientControl
+												{ ...controlProps }
+											/>
+										</div>
+									</DropdownContentWrapper>
 								) }
 							/>
 						</WithToolsPanelItem>

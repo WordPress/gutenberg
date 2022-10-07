@@ -1191,10 +1191,6 @@ _Parameters_
 
 Action that hides the insertion point.
 
-_Returns_
-
--   `Object`: Action object.
-
 ### insertAfterBlock
 
 Action that inserts an empty block after a given block.
@@ -1492,7 +1488,7 @@ Action that enables or disables the navigation mode.
 
 _Parameters_
 
--   _isNavigationMode_ `string`: Enable/Disable navigation mode.
+-   _isNavigationMode_ `boolean`: Enable/Disable navigation mode.
 
 ### setTemplateValidity
 

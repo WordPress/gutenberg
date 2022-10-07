@@ -4,7 +4,7 @@
 >
 > There're related documents you may be interested in: the [theme.json v1](/docs/reference-guides/theme-json-reference/theme-json-v1.md) specification and the [reference to migrate from theme.json v1 to v2](/docs/reference-guides/theme-json-reference/theme-json-migrations.md).
 
-This reference guide lists the settings and style properties defined in the theme.json schema. See the [theme.json how to guide](/docs/how-to-guides/themes/theme-json.md) for examples and guide on how to use the theme.json file in your theme. 
+This reference guide lists the settings and style properties defined in the theme.json schema. See the [theme.json how to guide](/docs/how-to-guides/themes/theme-json.md) for examples and guide on how to use the theme.json file in your theme.
 
 ## Schema
 
@@ -24,6 +24,17 @@ Setting that enables the following UI tools:
 - color: link
 - spacing: blockGap, margin, padding
 - typography: lineHeight
+
+
+---
+
+### useRootPaddingAwareAlignments
+
+_**Note:** Since WordPress 6.1._
+
+Enables root padding (the values from `styles.spacing.padding`) to be applied to the contents of full-width blocks instead of the root block.
+
+Please note that when using this setting, `styles.spacing.padding` should always be set as an object with `top`, `right`, `bottom`, `left` values declared separately.
 
 
 ---
@@ -83,6 +94,9 @@ Settings related to spacing.
 | margin | boolean | false |  |
 | padding | boolean | false |  |
 | units | array | px,em,rem,vh,vw,% |  |
+| customSpacingSize | boolean | true |  |
+| spacingSizes | array |  | name, size, slug |
+| spacingScale | object |  |  |
 
 ---
 
@@ -95,13 +109,14 @@ Settings related to typography.
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
+| fluid | boolean |  |  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
 | textDecoration | boolean | true |  |
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
-| fontSizes | array |  | name, size, slug |
-| fontFamilies | array |  | fontFamily, name, slug |
+| fontSizes | array |  | fluid, name, size, slug |
+| fontFamilies | array |  | fontFace, fontFamily, name, slug |
 
 ---
 
@@ -124,10 +139,10 @@ Border styles.
 | radius | undefined |  |
 | style | string |  |
 | width | string |  |
-| top | undefined |  |
-| right | undefined |  |
-| bottom | undefined |  |
-| left | undefined |  |
+| top | object | color, style, width |
+| right | object | color, style, width |
+| bottom | object | color, style, width |
+| left | object | color, style, width |
 
 ---
 
@@ -140,6 +155,19 @@ Color styles.
 | background | string |  |
 | gradient | string |  |
 | text | string |  |
+
+---
+
+### outline
+
+Outline styles.
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| color | string |  |
+| offset | string |  |
+| style | string |  |
+| width | string |  |
 
 ---
 
@@ -169,6 +197,23 @@ Typography styles.
 | lineHeight | string |  |
 | textDecoration | string |  |
 | textTransform | string |  |
+
+---
+
+### filter
+
+CSS and SVG filter styles.
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| duotone | string |  |
+
+---
+
+### shadow
+
+Box shadow styles.
+
 
 ---
 

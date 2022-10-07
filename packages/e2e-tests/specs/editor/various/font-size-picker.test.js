@@ -37,9 +37,7 @@ const toggleCustomInput = async ( showCustomInput ) => {
 };
 
 const clickCustomInput = async () => {
-	const customInput = await page.waitForXPath(
-		"//input[@aria-label='Custom']"
-	);
+	const customInput = await page.waitForXPath( "//input[@type='number']" );
 	return customInput.click();
 };
 

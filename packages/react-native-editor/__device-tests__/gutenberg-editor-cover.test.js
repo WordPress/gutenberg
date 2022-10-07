@@ -47,9 +47,8 @@ describe( 'Gutenberg Editor Cover Block test', () => {
 			await editorPage.replaceMediaImage();
 
 			// First modal should no longer be presented.
-			const replaceButtons = await editorPage.driver.elementsByAccessibilityId(
-				'Replace'
-			);
+			const replaceButtons =
+				await editorPage.driver.elementsByAccessibilityId( 'Replace' );
 			// eslint-disable-next-line jest/no-conditional-expect
 			expect( replaceButtons.length ).toBe( 0 );
 

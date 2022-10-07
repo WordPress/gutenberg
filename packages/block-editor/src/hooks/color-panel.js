@@ -26,9 +26,10 @@ export default function ColorPanel( {
 	const [ detectedColor, setDetectedColor ] = useState();
 	const [ detectedLinkColor, setDetectedLinkColor ] = useState();
 	const ref = useBlockRef( clientId );
+	const definedColors = settings.filter( ( setting ) => setting?.colorValue );
 
 	useEffect( () => {
-		if ( ! enableContrastChecking ) {
+		if ( ! enableContrastChecking || ! definedColors.length ) {
 			return;
 		}
 
@@ -43,8 +44,8 @@ export default function ColorPanel( {
 		}
 
 		let backgroundColorNode = ref.current;
-		let backgroundColor = getComputedStyle( backgroundColorNode )
-			.backgroundColor;
+		let backgroundColor =
+			getComputedStyle( backgroundColorNode ).backgroundColor;
 		while (
 			backgroundColor === 'rgba(0, 0, 0, 0)' &&
 			backgroundColorNode.parentNode &&
@@ -52,8 +53,8 @@ export default function ColorPanel( {
 				backgroundColorNode.parentNode.ELEMENT_NODE
 		) {
 			backgroundColorNode = backgroundColorNode.parentNode;
-			backgroundColor = getComputedStyle( backgroundColorNode )
-				.backgroundColor;
+			backgroundColor =
+				getComputedStyle( backgroundColorNode ).backgroundColor;
 		}
 
 		setDetectedBackgroundColor( backgroundColor );

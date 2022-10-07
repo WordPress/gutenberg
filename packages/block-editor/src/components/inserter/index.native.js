@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { AccessibilityInfo, Platform, Text } from 'react-native';
-import { delay } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -80,12 +79,18 @@ const defaultRenderToggle = ( {
 };
 
 export class Inserter extends Component {
+	announcementTimeout;
+
 	constructor() {
 		super( ...arguments );
 
 		this.onToggle = this.onToggle.bind( this );
 		this.renderInserterToggle = this.renderInserterToggle.bind( this );
 		this.renderContent = this.renderContent.bind( this );
+	}
+
+	componentWillUnmount() {
+		clearTimeout( this.announcementTimeout );
 	}
 
 	getInsertionOptions() {
@@ -217,7 +222,7 @@ export class Inserter extends Component {
 				const announcement = isOpen
 					? __( 'Scrollable block menu opened. Select a block.' )
 					: __( 'Scrollable block menu closed.' );
-				delay(
+				this.announcementTimeout = setTimeout(
 					() =>
 						AccessibilityInfo.announceForAccessibility(
 							announcement
@@ -282,9 +287,8 @@ export class Inserter extends Component {
 			this.setState(
 				{
 					destinationRootClientId: this.props.destinationRootClientId,
-					shouldReplaceBlock: this.shouldReplaceBlock(
-						insertionType
-					),
+					shouldReplaceBlock:
+						this.shouldReplaceBlock( insertionType ),
 					insertionIndex: this.getInsertionIndex( insertionType ),
 				},
 				onToggle
@@ -324,11 +328,8 @@ export class Inserter extends Component {
 	 */
 	renderContent( { onClose, isOpen } ) {
 		const { clientId, isAppender } = this.props;
-		const {
-			destinationRootClientId,
-			shouldReplaceBlock,
-			insertionIndex,
-		} = this.state;
+		const { destinationRootClientId, shouldReplaceBlock, insertionIndex } =
+			this.state;
 		return (
 			<InserterMenu
 				isOpen={ isOpen }
@@ -385,9 +386,8 @@ export default compose( [
 			: undefined;
 
 		function getDefaultInsertionIndex() {
-			const {
-				__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
-			} = getBlockEditorSettings();
+			const { __experimentalShouldInsertAtTheTop: shouldInsertAtTheTop } =
+				getBlockEditorSettings();
 
 			// If post title is selected insert as first block.
 			if ( shouldInsertAtTheTop ) {

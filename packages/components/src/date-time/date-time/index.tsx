@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -18,12 +17,14 @@ import Button from '../../button';
 import { default as DatePicker } from '../date';
 import { default as TimePicker } from '../time';
 import type { DateTimePickerProps } from '../types';
-import { CalendarHelp } from './styles';
+import { Wrapper, CalendarHelp } from './styles';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { Spacer } from '../../spacer';
 
 export { DatePicker, TimePicker };
+
+const noop = () => {};
 
 function UnforwardedDateTimePicker(
 	{
@@ -33,6 +34,7 @@ function UnforwardedDateTimePicker(
 		onMonthPreviewed = noop,
 		onChange,
 		events,
+		startOfWeek,
 		__nextRemoveHelpButton = false,
 		__nextRemoveResetButton = false,
 	}: DateTimePickerProps,
@@ -42,29 +44,26 @@ function UnforwardedDateTimePicker(
 		deprecated( 'Help button in wp.components.DateTimePicker', {
 			since: '13.4',
 			version: '14.6', // Six months of plugin releases.
-			hint:
-				'Set the `__nextRemoveHelpButton` prop to `true` to remove this warning and opt in to the new behaviour, which will become the default in a future version.',
+			hint: 'Set the `__nextRemoveHelpButton` prop to `true` to remove this warning and opt in to the new behaviour, which will become the default in a future version.',
 		} );
 	}
 	if ( ! __nextRemoveResetButton ) {
 		deprecated( 'Reset button in wp.components.DateTimePicker', {
 			since: '13.4',
 			version: '14.6', // Six months of plugin releases.
-			hint:
-				'Set the `__nextRemoveResetButton` prop to `true` to remove this warning and opt in to the new behaviour, which will become the default in a future version.',
+			hint: 'Set the `__nextRemoveResetButton` prop to `true` to remove this warning and opt in to the new behaviour, which will become the default in a future version.',
 		} );
 	}
 
-	const [ calendarHelpIsVisible, setCalendarHelpIsVisible ] = useState(
-		false
-	);
+	const [ calendarHelpIsVisible, setCalendarHelpIsVisible ] =
+		useState( false );
 
 	function onClickDescriptionToggle() {
 		setCalendarHelpIsVisible( ! calendarHelpIsVisible );
 	}
 
 	return (
-		<div ref={ ref } className="components-datetime">
+		<Wrapper ref={ ref } className="components-datetime" spacing={ 4 }>
 			{ ! calendarHelpIsVisible && (
 				<>
 					<TimePicker
@@ -78,6 +77,7 @@ function UnforwardedDateTimePicker(
 						isInvalidDate={ isInvalidDate }
 						events={ events }
 						onMonthPreviewed={ onMonthPreviewed }
+						startOfWeek={ startOfWeek }
 					/>
 				</>
 			) }
@@ -186,7 +186,7 @@ function UnforwardedDateTimePicker(
 					) }
 				</HStack>
 			) }
-		</div>
+		</Wrapper>
 	);
 }
 

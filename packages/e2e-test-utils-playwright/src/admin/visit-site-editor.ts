@@ -8,7 +8,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import type { Admin } from './';
 
-interface SiteEditorQueryParams {
+export interface SiteEditorQueryParams {
 	postId: string | number;
 	postType: string;
 }
@@ -30,11 +30,10 @@ export async function visitSiteEditor(
 	skipWelcomeGuide = true
 ) {
 	const path = addQueryArgs( '', {
-		page: 'gutenberg-edit-site',
 		...query,
 	} ).slice( 1 );
 
-	await this.visitAdminPage( 'themes.php', path );
+	await this.visitAdminPage( 'site-editor.php', path );
 	await this.page.waitForSelector( CANVAS_SELECTOR );
 
 	if ( skipWelcomeGuide ) {

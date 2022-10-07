@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { create, Control } from 'rungen';
-import { map } from 'lodash';
 import isPromise from 'is-promise';
 import type { Dispatch, AnyAction } from 'redux';
 
@@ -24,27 +23,21 @@ export default function createRuntime(
 	> = {},
 	dispatch: Dispatch
 ) {
-	const rungenControls = map(
-		controls,
-		( control, actionType ): Control => (
-			value,
-			next,
-			iterate,
-			yieldNext,
-			yieldError
-		) => {
-			if ( ! isActionOfType( value, actionType ) ) {
-				return false;
+	const rungenControls = Object.entries( controls ).map(
+		( [ actionType, control ] ): Control =>
+			( value, next, iterate, yieldNext, yieldError ) => {
+				if ( ! isActionOfType( value, actionType ) ) {
+					return false;
+				}
+				const routine = control( value );
+				if ( isPromise( routine ) ) {
+					// Async control routine awaits resolution.
+					routine.then( yieldNext, yieldError );
+				} else {
+					yieldNext( routine );
+				}
+				return true;
 			}
-			const routine = control( value );
-			if ( isPromise( routine ) ) {
-				// Async control routine awaits resolution.
-				routine.then( yieldNext, yieldError );
-			} else {
-				yieldNext( routine );
-			}
-			return true;
-		}
 	);
 
 	const unhandledActionControl = (

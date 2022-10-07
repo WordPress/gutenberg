@@ -30,12 +30,8 @@ function NavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const {
-		initialPath,
-		children,
-		className,
-		...otherProps
-	} = useContextSystem( props, 'NavigatorProvider' );
+	const { initialPath, children, className, ...otherProps } =
+		useContextSystem( props, 'NavigatorProvider' );
 
 	const [ locationHistory, setLocationHistory ] = useState<
 		NavigatorLocation[]

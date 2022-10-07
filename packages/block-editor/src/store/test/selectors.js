@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -83,7 +78,9 @@ describe( 'selectors', () => {
 	let cachedSelectors;
 
 	beforeAll( () => {
-		cachedSelectors = filter( selectors, ( selector ) => selector.clear );
+		cachedSelectors = Object.entries( selectors )
+			.filter( ( [ , selector ] ) => selector.clear )
+			.map( ( [ , selector ] ) => selector );
 	} );
 
 	beforeEach( () => {
@@ -575,18 +572,18 @@ describe( 'selectors', () => {
 					controlledInnerBlocks: {},
 				},
 			};
-			expect(
-				getClientIdsOfDescendants( state, [ 'uuid-10' ] )
-			).toEqual( [
-				'uuid-12',
-				'uuid-16',
-				'uuid-14',
-				'uuid-18',
-				'uuid-24',
-				'uuid-26',
-				'uuid-28',
-				'uuid-30',
-			] );
+			expect( getClientIdsOfDescendants( state, [ 'uuid-10' ] ) ).toEqual(
+				[
+					'uuid-12',
+					'uuid-16',
+					'uuid-14',
+					'uuid-18',
+					'uuid-24',
+					'uuid-26',
+					'uuid-28',
+					'uuid-30',
+				]
+			);
 		} );
 	} );
 
@@ -1282,9 +1279,7 @@ describe( 'selectors', () => {
 			};
 
 			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [
-				4,
-				3,
-				2,
+				4, 3, 2,
 			] );
 		} );
 
@@ -1314,9 +1309,7 @@ describe( 'selectors', () => {
 			};
 
 			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [
-				9,
-				8,
-				7,
+				9, 8, 7,
 			] );
 		} );
 	} );
@@ -2914,9 +2907,9 @@ describe( 'selectors', () => {
 				'core/block/1',
 				'core/block/2',
 			] );
-			expect(
-				secondBlockSecondCall.map( ( item ) => item.id )
-			).toEqual( [ 'core/test-block-b' ] );
+			expect( secondBlockSecondCall.map( ( item ) => item.id ) ).toEqual(
+				[ 'core/test-block-b' ]
+			);
 		} );
 
 		it( 'should set isDisabled when a block with `multiple: false` has been used', () => {
@@ -3260,7 +3253,7 @@ describe( 'selectors', () => {
 			expect( getTemplateLock( state ) ).toBe( 'all' );
 		} );
 
-		it( 'should return null if the specified clientId was not found', () => {
+		it( 'should return undefined if the specified clientId was not found', () => {
 			const state = {
 				settings: { templateLock: 'all' },
 				blockListSettings: {
@@ -3270,10 +3263,10 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getTemplateLock( state, 'ribs' ) ).toBe( null );
+			expect( getTemplateLock( state, 'ribs' ) ).toBe( undefined );
 		} );
 
-		it( 'should return null if template lock was not set on the specified block', () => {
+		it( 'should return undefined if template lock was not set on the specified block', () => {
 			const state = {
 				settings: { templateLock: 'all' },
 				blockListSettings: {
@@ -3283,7 +3276,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getTemplateLock( state, 'ribs' ) ).toBe( null );
+			expect( getTemplateLock( state, 'ribs' ) ).toBe( undefined );
 		} );
 
 		it( 'should return the template lock for the specified clientId', () => {

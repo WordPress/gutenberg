@@ -94,12 +94,12 @@ test.describe( 'Post Editor Template mode', () => {
 
 		// Preview changes.
 		const previewPage = await editor.openPreviewPage();
-		const siteBlocks = await previewPage.waitForSelector(
-			'.wp-site-blocks'
-		);
-		const content = await siteBlocks.innerHTML();
 
-		expect( content ).toMatchSnapshot();
+		await expect(
+			previewPage.locator(
+				'text="Just a random paragraph added to the template"'
+			)
+		).toBeVisible();
 	} );
 
 	test.describe( 'Delete Post Template Confirmation Dialog', () => {
@@ -141,9 +141,10 @@ test.describe( 'Post Editor Template mode', () => {
 
 				// Test deletion dialog.
 				{
-					const templateDropdown = postEditorTemplateMode.editorTopBar.locator(
-						'role=button[name="Template Options"i]'
-					);
+					const templateDropdown =
+						postEditorTemplateMode.editorTopBar.locator(
+							'role=button[name="Template Options"i]'
+						);
 					await templateDropdown.click();
 					await page.click(
 						'role=menuitem[name="Delete template"i]'
@@ -168,16 +169,19 @@ test.describe( 'Post Editor Template mode', () => {
 				await editor.openDocumentSettingsSidebar();
 
 				// Move focus to the "Post" panel in the editor sidebar.
-				const postPanel = postEditorTemplateMode.editorSettingsSidebar.locator(
-					'role=button[name="Post"i]'
-				);
+				const postPanel =
+					postEditorTemplateMode.editorSettingsSidebar.locator(
+						'role=button[name="Post"i]'
+					);
 				await postPanel.click();
 
-				const templateSelect = postEditorTemplateMode.editorSettingsSidebar.locator(
-					'role=combobox[name="Template:"i]'
+				await postEditorTemplateMode.openTemplatePopover();
+
+				const templateSelect = page.locator(
+					'role=combobox[name="Template"i]'
 				);
 				await expect( templateSelect ).toHaveValue(
-					`wp-custom-template-${ viewport }-viewport-deletion-test`
+					`${ viewport }-viewport-deletion-test`
 				);
 			} );
 
@@ -207,9 +211,10 @@ test.describe( 'Post Editor Template mode', () => {
 				await postEditorTemplateMode.saveTemplateWithoutPublishing();
 
 				{
-					const templateDropdown = postEditorTemplateMode.editorTopBar.locator(
-						'role=button[name="Template Options"i]'
-					);
+					const templateDropdown =
+						postEditorTemplateMode.editorTopBar.locator(
+							'role=button[name="Template Options"i]'
+						);
 					await templateDropdown.click();
 					await page.click(
 						'role=menuitem[name="Delete template"i]'
@@ -239,10 +244,12 @@ test.describe( 'Post Editor Template mode', () => {
 					await page.reload();
 				}
 
-				const templateOptions = postEditorTemplateMode.editorSettingsSidebar.locator(
-					'role=combobox[name="Template:"i] >> role=menuitem'
-				);
-				const availableTemplates = await templateOptions.allTextContents();
+				const templateOptions =
+					postEditorTemplateMode.editorSettingsSidebar.locator(
+						'role=combobox[name="Template:"i] >> role=menuitem'
+					);
+				const availableTemplates =
+					await templateOptions.allTextContents();
 
 				expect( availableTemplates ).not.toContain(
 					`${ viewport } Viewport Deletion Test`
@@ -277,28 +284,21 @@ class PostEditorTemplateMode {
 		} );
 	}
 
-	async expandTemplatePanel() {
+	async openTemplatePopover() {
 		await this.editor.openDocumentSettingsSidebar();
 
-		const templatePanelButton = this.editorSettingsSidebar.locator(
-			'role=button[name=/^Template/i]'
-		);
-		const isExpanded =
-			( await templatePanelButton.getAttribute( 'aria-expanded' ) ) !==
-			'false';
-		if ( ! isExpanded ) {
-			await templatePanelButton.click();
-		}
+		// Only match the beginning of Select template: because it contains the template name or slug afterwards.
+		await this.editorSettingsSidebar
+			.locator( 'role=button[name^="Select template"i]' )
+			.click();
 	}
 
 	async switchToTemplateMode() {
 		await this.disableTemplateWelcomeGuide();
 
-		await this.expandTemplatePanel();
+		await this.openTemplatePopover();
 
-		await this.editorSettingsSidebar
-			.locator( 'role=button[name="Edit"i]' )
-			.click();
+		await this.page.locator( 'role=button[name="Edit template"i]' ).click();
 
 		// Check that we switched properly to edit mode.
 		await this.page.waitForSelector(
@@ -332,10 +332,10 @@ class PostEditorTemplateMode {
 	async createNewTemplate( templateName ) {
 		await this.disableTemplateWelcomeGuide();
 
-		await this.expandTemplatePanel();
+		await this.openTemplatePopover();
 
-		const newTemplateButton = this.editorSettingsSidebar.locator(
-			'role=button[name="New"i]'
+		const newTemplateButton = this.page.locator(
+			'role=button[name="Add template"i]'
 		);
 		await newTemplateButton.click();
 

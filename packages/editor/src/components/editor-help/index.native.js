@@ -99,9 +99,10 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 							</BottomSheet.NavBar>
 							<BottomSheetConsumer>
 								{ ( { listProps } ) => {
-									const contentContainerStyle = StyleSheet.flatten(
-										listProps.contentContainerStyle
-									);
+									const contentContainerStyle =
+										StyleSheet.flatten(
+											listProps.contentContainerStyle
+										);
 									return (
 										<ScrollView
 											{ ...listProps }
@@ -129,9 +130,8 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 														{ label, icon },
 														index
 													) => {
-														const labelSlug = kebabCase(
-															label
-														);
+														const labelSlug =
+															kebabCase( label );
 														const isLastItem =
 															index ===
 															HELP_TOPICS.length -

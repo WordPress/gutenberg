@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import FastAverageColor from 'fast-average-color';
+import { FastAverageColor } from 'fast-average-color';
 import { colord } from 'colord';
 
 /**
@@ -41,12 +41,16 @@ export default function useCoverIsDark(
 		// If opacity is lower than 50 the dominant color is the image or video color,
 		// so use that color for the dark mode computation.
 		if ( url && dimRatio <= 50 && elementRef.current ) {
-			retrieveFastAverageColor().getColorAsync(
-				elementRef.current,
-				( color ) => {
-					setIsDark( color.isDark );
-				}
-			);
+			retrieveFastAverageColor()
+				.getColorAsync( elementRef.current, {
+					// Previously the default color was white, but that changed
+					// in v6.0.0 so it has to be manually set now.
+					defaultColor: [ 255, 255, 255, 255 ],
+					// Errors that come up don't reject the promise, so error
+					// logging has to be silenced with this option.
+					silent: process.env.NODE_ENV === 'production',
+				} )
+				.then( ( color ) => setIsDark( color.isDark ) );
 		}
 	}, [ url, url && dimRatio <= 50 && elementRef.current, setIsDark ] );
 	useEffect( () => {

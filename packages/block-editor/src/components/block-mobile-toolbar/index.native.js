@@ -78,6 +78,7 @@ const BlockMobileToolbar = ( {
 			<BlockDraggable
 				clientId={ clientId }
 				draggingClientId={ draggingClientId }
+				testID="draggable-trigger-mobile-toolbar"
 			>
 				{ () => <View style={ styles.spacer } /> }
 			</BlockDraggable>

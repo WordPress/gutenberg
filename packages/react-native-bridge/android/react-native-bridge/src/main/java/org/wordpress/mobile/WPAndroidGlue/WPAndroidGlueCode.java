@@ -52,6 +52,7 @@ import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import org.reactnative.maskedview.RNCMaskedViewPackage;
+import com.dylanvann.fastimage.FastImageViewPackage;
 
 import org.wordpress.android.util.AppLog;
 import org.wordpress.android.util.AppLog.T;
@@ -585,6 +586,7 @@ public class WPAndroidGlueCode {
                 new RNPromptPackage(),
                 new RNCWebViewPackage(),
                 new ClipboardPackage(),
+                new FastImageViewPackage(),
                 mRnReactNativeGutenbergBridgePackage);
     }
 

@@ -169,19 +169,15 @@ class PostTitle extends Component {
 
 export default compose(
 	withSelect( ( select ) => {
-		const { isPostTitleSelected, getEditedPostAttribute } = select(
-			editorStore
-		);
-		const {
-			getSelectedBlockClientId,
-			getBlockRootClientId,
-			getSettings,
-		} = select( blockEditorStore );
+		const { isPostTitleSelected, getEditedPostAttribute } =
+			select( editorStore );
+		const { getSelectedBlockClientId, getBlockRootClientId, getSettings } =
+			select( blockEditorStore );
 
 		const selectedId = getSelectedBlockClientId();
 		const selectionIsNested = !! getBlockRootClientId( selectedId );
-		const globalStyles = getSettings()?.__experimentalGlobalStylesBaseStyles
-			?.color;
+		const globalStyles =
+			getSettings()?.__experimentalGlobalStylesBaseStyles?.color;
 
 		return {
 			postType: getEditedPostAttribute( 'type' ),
@@ -192,13 +188,11 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { undo, redo, togglePostTitleSelection } = dispatch(
-			editorStore
-		);
+		const { undo, redo, togglePostTitleSelection } =
+			dispatch( editorStore );
 
-		const { clearSelectedBlock, insertDefaultBlock } = dispatch(
-			blockEditorStore
-		);
+		const { clearSelectedBlock, insertDefaultBlock } =
+			dispatch( blockEditorStore );
 
 		return {
 			onEnterPress() {

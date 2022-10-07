@@ -141,6 +141,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type Attachment< C extends Context > = OmitNevers<
+export type Attachment< C extends Context = 'edit' > = OmitNevers<
 	_BaseEntityRecords.Attachment< C >
 >;

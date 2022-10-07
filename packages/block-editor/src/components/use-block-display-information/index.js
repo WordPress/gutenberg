@@ -41,12 +41,10 @@ export default function useBlockDisplayInformation( clientId ) {
 	return useSelect(
 		( select ) => {
 			if ( ! clientId ) return null;
-			const { getBlockName, getBlockAttributes } = select(
-				blockEditorStore
-			);
-			const { getBlockType, getActiveBlockVariation } = select(
-				blocksStore
-			);
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
+			const { getBlockType, getActiveBlockVariation } =
+				select( blocksStore );
 			const blockName = getBlockName( clientId );
 			const blockType = getBlockType( blockName );
 			if ( ! blockType ) return null;

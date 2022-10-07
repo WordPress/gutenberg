@@ -35,6 +35,7 @@
 @import "./components/image-size-control/style.scss";
 @import "./components/inner-blocks/style.scss";
 @import "./components/inserter-list-item/style.scss";
+@import "./components/inspector-popover-header/style.scss";
 @import "./components/justify-content-control/style.scss";
 @import "./components/link-control/style.scss";
 @import "./components/list-view/style.scss";
@@ -42,12 +43,11 @@
 @import "./components/media-placeholder/style.scss";
 @import "./components/multi-selection-inspector/style.scss";
 @import "./components/plain-text/style.scss";
-@import "./components/publish-date-time-picker/style.scss";
 @import "./components/responsive-block-control/style.scss";
 @import "./components/rich-text/style.scss";
 @import "./components/skip-to-selected-block/style.scss";
-@import "./components/text-transform-control/style.scss";
 @import "./components/text-decoration-control/style.scss";
+@import "./components/text-transform-control/style.scss";
 @import "./components/tool-selector/style.scss";
 @import "./components/url-input/style.scss";
 @import "./components/url-popover/style.scss";
@@ -63,5 +63,6 @@
 @import "./components/block-toolbar/style.scss";
 @import "./components/inserter/style.scss";
 @import "./components/preview-options/style.scss";
+@import "./components/spacing-sizes-control/style.scss";
 
 @include wordpress-admin-schemes();

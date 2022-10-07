@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import BorderControlDropdown from '../border-control-dropdown';
@@ -21,23 +26,25 @@ const BorderLabel = ( props: LabelProps ) => {
 	}
 
 	return hideLabelFromVision ? (
-		<VisuallyHidden as="label">{ label }</VisuallyHidden>
+		<VisuallyHidden as="legend">{ label }</VisuallyHidden>
 	) : (
-		<StyledLabel>{ label }</StyledLabel>
+		<StyledLabel as="legend">{ label }</StyledLabel>
 	);
 };
 
-const BorderControl = (
-	props: WordPressComponentProps< BorderControlProps, 'div' >,
+const UnconnectedBorderControl = (
+	props: WordPressComponentProps< BorderControlProps, 'div', false >,
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
 		colors,
 		disableCustomColors,
+		disableUnits,
 		enableAlpha,
 		enableStyle = true,
 		hideLabelFromVision,
 		innerWrapperClassName,
+		inputWidth,
 		label,
 		onBorderChange,
 		onSliderChange,
@@ -48,7 +55,6 @@ const BorderControl = (
 		showDropdownHeader,
 		sliderClassName,
 		value: border,
-		widthControlClassName,
 		widthUnit,
 		widthValue,
 		withSlider,
@@ -59,41 +65,46 @@ const BorderControl = (
 	} = useBorderControl( props );
 
 	return (
-		<View { ...otherProps } ref={ forwardedRef }>
+		<View as="fieldset" { ...otherProps } ref={ forwardedRef }>
 			<BorderLabel
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 			/>
-			<HStack spacing={ 3 }>
-				<HStack className={ innerWrapperClassName } alignment="stretch">
-					<BorderControlDropdown
-						border={ border }
-						colors={ colors }
-						__unstablePopoverProps={ __unstablePopoverProps }
-						disableCustomColors={ disableCustomColors }
-						enableAlpha={ enableAlpha }
-						enableStyle={ enableStyle }
-						onChange={ onBorderChange }
-						previousStyleSelection={ previousStyleSelection }
-						showDropdownHeader={ showDropdownHeader }
-						__experimentalHasMultipleOrigins={
-							__experimentalHasMultipleOrigins
-						}
-						__experimentalIsRenderedInSidebar={
-							__experimentalIsRenderedInSidebar
-						}
-						__next36pxDefaultSize={ __next36pxDefaultSize }
-					/>
-					<UnitControl
-						className={ widthControlClassName }
-						min={ 0 }
-						onChange={ onWidthChange }
-						value={ border?.width || '' }
-						placeholder={ placeholder }
-					/>
-				</HStack>
+			<HStack spacing={ 3 } className={ innerWrapperClassName }>
+				<UnitControl
+					prefix={
+						<BorderControlDropdown
+							border={ border }
+							colors={ colors }
+							__unstablePopoverProps={ __unstablePopoverProps }
+							disableCustomColors={ disableCustomColors }
+							enableAlpha={ enableAlpha }
+							enableStyle={ enableStyle }
+							onChange={ onBorderChange }
+							previousStyleSelection={ previousStyleSelection }
+							showDropdownHeader={ showDropdownHeader }
+							__experimentalHasMultipleOrigins={
+								__experimentalHasMultipleOrigins
+							}
+							__experimentalIsRenderedInSidebar={
+								__experimentalIsRenderedInSidebar
+							}
+							__next36pxDefaultSize={ __next36pxDefaultSize }
+						/>
+					}
+					label={ __( 'Border width' ) }
+					hideLabelFromVision
+					min={ 0 }
+					onChange={ onWidthChange }
+					value={ border?.width || '' }
+					placeholder={ placeholder }
+					disableUnits={ disableUnits }
+					__unstableInputWidth={ inputWidth }
+				/>
 				{ withSlider && (
 					<RangeControl
+						label={ __( 'Border width' ) }
+						hideLabelFromVision
 						className={ sliderClassName }
 						initialPosition={ 0 }
 						max={ 100 }
@@ -109,6 +120,43 @@ const BorderControl = (
 	);
 };
 
-const ConnectedBorderControl = contextConnect( BorderControl, 'BorderControl' );
+/**
+ * The `BorderControl` brings together internal sub-components which allow users to
+ * set the various properties of a border. The first sub-component, a
+ * `BorderDropdown` contains options representing border color and style. The
+ * border width is controlled via a `UnitControl` and an optional `RangeControl`.
+ *
+ * Border radius is not covered by this control as it may be desired separate to
+ * color, style, and width. For example, the border radius may be absorbed under
+ * a "shape" abstraction.
+ *
+ * ```jsx
+ * import { __experimentalBorderControl as BorderControl } from '@wordpress/components';
+ * import { __ } from '@wordpress/i18n';
+ *
+ * const colors = [
+ * 	{ name: 'Blue 20', color: '#72aee6' },
+ * 	// ...
+ * ];
+ *
+ * const MyBorderControl = () => {
+ * 	const [ border, setBorder ] = useState();
+ * 	const onChange = ( newBorder ) => setBorder( newBorder );
+ *
+ * 	return (
+ * 		<BorderControl
+ * 			colors={ colors }
+ * 			label={ __( 'Border' ) }
+ * 			onChange={ onChange }
+ * 			value={ border }
+ * 		/>
+ * 	);
+ * };
+ * ```
+ */
+export const BorderControl = contextConnect(
+	UnconnectedBorderControl,
+	'BorderControl'
+);
 
-export default ConnectedBorderControl;
+export default BorderControl;

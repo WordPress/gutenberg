@@ -29,9 +29,10 @@ function PostComments( { commentStatus = 'open', ...props } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			commentStatus: select( editorStore ).getEditedPostAttribute(
-				'comment_status'
-			),
+			commentStatus:
+				select( editorStore ).getEditedPostAttribute(
+					'comment_status'
+				),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

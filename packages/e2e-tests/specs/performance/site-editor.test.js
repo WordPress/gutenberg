@@ -130,11 +130,8 @@ describe( 'Site Editor Performance', () => {
 		}
 		await page.tracing.stop();
 		const traceResults = JSON.parse( readFile( traceFile ) );
-		const [
-			keyDownEvents,
-			keyPressEvents,
-			keyUpEvents,
-		] = getTypingEventDurations( traceResults );
+		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+			getTypingEventDurations( traceResults );
 
 		for ( let j = 0; j < keyDownEvents.length; j++ ) {
 			results.type.push(

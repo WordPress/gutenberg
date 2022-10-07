@@ -53,9 +53,8 @@ export const Default: ComponentStory< typeof DateTimePicker > = Template.bind(
 	{}
 );
 
-export const WithEvents: ComponentStory<
-	typeof DateTimePicker
-> = Template.bind( {} );
+export const WithEvents: ComponentStory< typeof DateTimePicker > =
+	Template.bind( {} );
 WithEvents.args = {
 	currentDate: new Date(),
 	events: [
@@ -66,9 +65,8 @@ WithEvents.args = {
 	],
 };
 
-export const WithInvalidDates: ComponentStory<
-	typeof DateTimePicker
-> = Template.bind( {} );
+export const WithInvalidDates: ComponentStory< typeof DateTimePicker > =
+	Template.bind( {} );
 WithInvalidDates.args = {
 	currentDate: new Date(),
 	isInvalidDate: isWeekend,

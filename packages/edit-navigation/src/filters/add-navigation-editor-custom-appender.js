@@ -39,7 +39,8 @@ function EnhancedNavigationBlock( { blockEdit: BlockEdit, ...props } ) {
 			return {
 				isSelected: selectedBlockId === clientId,
 				noBlockSelected: ! selectedBlockId,
-				isImmediateParentOfSelectedBlock: _isImmediateParentOfSelectedBlock,
+				isImmediateParentOfSelectedBlock:
+					_isImmediateParentOfSelectedBlock,
 				selectedBlockHasDescendants: _selectedBlockHasDescendants,
 			};
 		},

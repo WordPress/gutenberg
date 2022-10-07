@@ -21,8 +21,9 @@ import { useInstanceId } from '@wordpress/compose';
 import {
 	InspectorControls,
 	useSetting,
+	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseGradient,
-	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
+	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -138,6 +139,9 @@ export default function CoverInspectorControls( {
 			: [ coverRef.current.style, 'backgroundPosition' ];
 		styleOfRef[ property ] = mediaPosition( value );
 	};
+
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+
 	return (
 		<>
 			<InspectorControls>
@@ -220,23 +224,50 @@ export default function CoverInspectorControls( {
 						</PanelRow>
 					</PanelBody>
 				) }
-				<PanelColorGradientSettings
+			</InspectorControls>
+			<InspectorControls __experimentalGroup="color">
+				<ColorGradientSettingsDropdown
 					__experimentalHasMultipleOrigins
 					__experimentalIsRenderedInSidebar
-					title={ __( 'Overlay' ) }
-					initialOpen={ true }
 					settings={ [
 						{
 							colorValue: overlayColor.color,
 							gradientValue,
+							label: __( 'Overlay' ),
 							onColorChange: setOverlayColor,
 							onGradientChange: setGradient,
-							label: __( 'Color' ),
+							isShownByDefault: true,
+							resetAllFilter: () => ( {
+								overlayColor: undefined,
+								customOverlayColor: undefined,
+								gradient: undefined,
+								customGradient: undefined,
+							} ),
 						},
 					] }
+					panelId={ clientId }
+					{ ...colorGradientSettings }
+				/>
+				<ToolsPanelItem
+					hasValue={ () => {
+						// If there's a media background the dimRatio will be
+						// defaulted to 50 whereas it will be 100 for colors.
+						return dimRatio === undefined
+							? false
+							: dimRatio !== ( url ? 50 : 100 );
+					} }
+					label={ __( 'Overlay opacity' ) }
+					onDeselect={ () =>
+						setAttributes( { dimRatio: url ? 50 : 100 } )
+					}
+					resetAllFilter={ () => ( {
+						dimRatio: url ? 50 : 100,
+					} ) }
+					isShownByDefault
+					panelId={ clientId }
 				>
 					<RangeControl
-						label={ __( 'Opacity' ) }
+						label={ __( 'Overlay opacity' ) }
 						value={ dimRatio }
 						onChange={ ( newDimRation ) =>
 							setAttributes( {
@@ -248,7 +279,7 @@ export default function CoverInspectorControls( {
 						step={ 10 }
 						required
 					/>
-				</PanelColorGradientSettings>
+				</ToolsPanelItem>
 			</InspectorControls>
 			<InspectorControls __experimentalGroup="dimensions">
 				<ToolsPanelItem

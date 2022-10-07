@@ -13,8 +13,9 @@ import {
 	RichText,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
+	getTypographyClassesAndStyles as useTypographyProps,
 	store as blockEditorStore,
-	__experimentalElementButtonClassName,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
@@ -80,9 +81,8 @@ export default function SearchEdit( {
 
 	const insertedInNavigationBlock = useSelect(
 		( select ) => {
-			const { getBlockParentsByBlockName, wasBlockJustInserted } = select(
-				blockEditorStore
-			);
+			const { getBlockParentsByBlockName, wasBlockJustInserted } =
+				select( blockEditorStore );
 			return (
 				!! getBlockParentsByBlockName( clientId, 'core/navigation' )
 					?.length && wasBlockJustInserted( clientId )
@@ -90,9 +90,8 @@ export default function SearchEdit( {
 		},
 		[ clientId ]
 	);
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	useEffect( () => {
 		if ( ! insertedInNavigationBlock ) return;
 		// This side-effect should not create an undo level.
@@ -114,6 +113,7 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
+	const typographyProps = useTypographyProps( attributes );
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 	const isButtonPositionInside = 'button-inside' === buttonPosition;
@@ -210,11 +210,16 @@ export default function SearchEdit( {
 		// If the input is inside the wrapper, the wrapper gets the border color styles/classes, not the input control.
 		const textFieldClasses = classnames(
 			'wp-block-search__input',
-			isButtonPositionInside ? undefined : borderProps.className
+			isButtonPositionInside ? undefined : borderProps.className,
+			typographyProps.className
 		);
-		const textFieldStyles = isButtonPositionInside
-			? { borderRadius }
-			: borderProps.style;
+		const textFieldStyles = {
+			...( isButtonPositionInside
+				? { borderRadius }
+				: borderProps.style ),
+			...typographyProps.style,
+			textDecoration: undefined,
+		};
 
 		return (
 			<input
@@ -241,12 +246,14 @@ export default function SearchEdit( {
 		const buttonClasses = classnames(
 			'wp-block-search__button',
 			colorProps.className,
+			typographyProps.className,
 			isButtonPositionInside ? undefined : borderProps.className,
 			buttonUseIcon ? 'has-icon' : undefined,
-			__experimentalElementButtonClassName
+			__experimentalGetElementClassName( 'button' )
 		);
 		const buttonStyles = {
 			...colorProps.style,
+			...typographyProps.style,
 			...( isButtonPositionInside
 				? { borderRadius }
 				: borderProps.style ),
@@ -418,12 +425,8 @@ export default function SearchEdit( {
 
 			if ( typeof borderRadius === 'object' ) {
 				// Individual corner border radii present.
-				const {
-					topLeft,
-					topRight,
-					bottomLeft,
-					bottomRight,
-				} = borderRadius;
+				const { topLeft, topRight, bottomLeft, bottomRight } =
+					borderRadius;
 
 				return {
 					...styles,
@@ -449,7 +452,17 @@ export default function SearchEdit( {
 
 	const blockProps = useBlockProps( {
 		className: getBlockClassNames(),
+		style: {
+			...typographyProps.style,
+			// Input opts out of text decoration.
+			textDecoration: undefined,
+		},
 	} );
+
+	const labelClassnames = classnames(
+		'wp-block-search__label',
+		typographyProps.className
+	);
 
 	return (
 		<div { ...blockProps }>
@@ -457,12 +470,13 @@ export default function SearchEdit( {
 
 			{ showLabel && (
 				<RichText
-					className="wp-block-search__label"
+					className={ labelClassnames }
 					aria-label={ __( 'Label text' ) }
 					placeholder={ __( 'Add label…' ) }
 					withoutInteractiveFormatting
 					value={ label }
 					onChange={ ( html ) => setAttributes( { label: html } ) }
+					style={ typographyProps.style }
 				/>
 			) }
 

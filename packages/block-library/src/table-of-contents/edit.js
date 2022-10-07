@@ -59,9 +59,8 @@ export default function TableOfContentsEdit( {
 
 	const canInsertList = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, canInsertBlockType } = select(
-				blockEditorStore
-			);
+			const { getBlockRootClientId, canInsertBlockType } =
+				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
 
 			return canInsertBlockType( 'core/list', rootClientId );
@@ -69,10 +68,8 @@ export default function TableOfContentsEdit( {
 		[ clientId ]
 	);
 
-	const {
-		__unstableMarkNextChangeAsNotPersistent,
-		replaceBlocks,
-	} = useDispatch( blockEditorStore );
+	const { __unstableMarkNextChangeAsNotPersistent, replaceBlocks } =
+		useDispatch( blockEditorStore );
 
 	/**
 	 * The latest heading data, or null if the new data deeply equals the saved
@@ -184,9 +181,8 @@ export default function TableOfContentsEdit( {
 					headingPage === tocPage
 				) {
 					if ( blockName === 'core/heading' ) {
-						const headingAttributes = getBlockAttributes(
-							blockClientId
-						);
+						const headingAttributes =
+							getBlockAttributes( blockClientId );
 
 						const canBeLinked =
 							typeof headingPageLink === 'string' &&

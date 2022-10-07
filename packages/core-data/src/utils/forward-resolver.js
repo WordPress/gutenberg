@@ -5,10 +5,11 @@
  *
  * @return {Function} Enhanced resolver.
  */
-const forwardResolver = ( resolverName ) => ( ...args ) => async ( {
-	resolveSelect,
-} ) => {
-	await resolveSelect[ resolverName ]( ...args );
-};
+const forwardResolver =
+	( resolverName ) =>
+	( ...args ) =>
+	async ( { resolveSelect } ) => {
+		await resolveSelect[ resolverName ]( ...args );
+	};
 
 export default forwardResolver;

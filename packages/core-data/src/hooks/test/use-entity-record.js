@@ -50,7 +50,11 @@ describe( 'useEntityRecord', () => {
 		);
 
 		expect( data ).toEqual( {
-			records: undefined,
+			edit: expect.any( Function ),
+			editedRecord: {},
+			hasEdits: false,
+			record: undefined,
+			save: expect.any( Function ),
 			hasResolved: false,
 			isResolving: false,
 			status: 'IDLE',
@@ -66,10 +70,54 @@ describe( 'useEntityRecord', () => {
 		} );
 
 		expect( data ).toEqual( {
+			edit: expect.any( Function ),
+			editedRecord: { hello: 'world', id: 1 },
+			hasEdits: false,
 			record: { hello: 'world', id: 1 },
+			save: expect.any( Function ),
 			hasResolved: true,
 			isResolving: false,
 			status: 'SUCCESS',
 		} );
+	} );
+
+	it( 'applies edits to the entity record', async () => {
+		// Provide response
+		triggerFetch.mockImplementation( () => TEST_RECORD );
+
+		let widget;
+		const TestComponent = () => {
+			widget = useEntityRecord( 'root', 'widget', 1 );
+			return <div />;
+		};
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+
+		await act( async () => {
+			jest.advanceTimersByTime( 1 );
+		} );
+
+		expect( widget ).toEqual( {
+			edit: expect.any( Function ),
+			editedRecord: { hello: 'world', id: 1 },
+			hasEdits: false,
+			record: { hello: 'world', id: 1 },
+			save: expect.any( Function ),
+			hasResolved: true,
+			isResolving: false,
+			status: 'SUCCESS',
+		} );
+
+		await act( async () => {
+			widget.edit( { hello: 'foo' } );
+			jest.advanceTimersByTime( 1 );
+		} );
+
+		expect( widget.hasEdits ).toEqual( true );
+		expect( widget.record ).toEqual( { hello: 'world', id: 1 } );
+		expect( widget.editedRecord ).toEqual( { hello: 'foo', id: 1 } );
 	} );
 } );

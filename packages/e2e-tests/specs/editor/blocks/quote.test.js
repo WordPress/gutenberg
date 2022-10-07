@@ -77,7 +77,9 @@ describe( 'Quote', () => {
 			await page.keyboard.type( 'one' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( 'two' );
-			await transformBlockTo( 'Paragraph' );
+			// Navigate to the citation to select the block.
+			await page.keyboard.press( 'ArrowRight' );
+			await transformBlockTo( 'Unwrap' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
@@ -89,7 +91,7 @@ describe( 'Quote', () => {
 			await page.keyboard.type( 'two' );
 			await page.keyboard.press( 'ArrowRight' );
 			await page.keyboard.type( 'cite' );
-			await transformBlockTo( 'Paragraph' );
+			await transformBlockTo( 'Unwrap' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
@@ -98,14 +100,15 @@ describe( 'Quote', () => {
 			await insertBlock( 'Quote' );
 			await page.keyboard.press( 'ArrowRight' );
 			await page.keyboard.type( 'cite' );
-			await transformBlockTo( 'Paragraph' );
+			await transformBlockTo( 'Unwrap' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 
 		it( 'and renders a void paragraph if both the cite and quote are void', async () => {
 			await insertBlock( 'Quote' );
-			await transformBlockTo( 'Paragraph' );
+			await page.keyboard.press( 'ArrowRight' ); // Select the quote
+			await transformBlockTo( 'Unwrap' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
@@ -116,56 +119,6 @@ describe( 'Quote', () => {
 		await page.keyboard.type( 'test' );
 		await transformBlockTo( 'Quote' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'is transformed to an empty heading if the quote is empty', async () => {
-		await insertBlock( 'Quote' );
-		await transformBlockTo( 'Heading' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'is transformed to a heading if the quote just contains one paragraph', async () => {
-		await insertBlock( 'Quote' );
-		await page.keyboard.type( 'one' );
-		await transformBlockTo( 'Heading' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'is transformed to a heading and a quote if the quote contains multiple paragraphs', async () => {
-		await insertBlock( 'Quote' );
-		await page.keyboard.type( 'one' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'two' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'three' );
-		await transformBlockTo( 'Heading' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'is transformed to a heading and a quote if the quote contains a citation', async () => {
-		await insertBlock( 'Quote' );
-		await page.keyboard.type( 'one' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( 'cite' );
-		await transformBlockTo( 'Heading' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'the resuling quote after transforming to a heading can be transformed again', async () => {
-		await insertBlock( 'Quote' );
-		await page.keyboard.type( 'one' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'two' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( 'cite' );
-		await transformBlockTo( 'Heading' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-		await page.click( '[data-type="core/quote"]' );
-		await transformBlockTo( 'Heading' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-		await page.click( '[data-type="core/quote"]' );
-		await transformBlockTo( 'Heading' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -180,16 +133,7 @@ describe( 'Quote', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'can be merged into from a paragraph', async () => {
-		await insertBlock( 'Quote' );
-		await insertBlock( 'Paragraph' );
-		await page.keyboard.type( 'test' );
-		await pressKeyTimes( 'ArrowLeft', 'test'.length );
-		await page.keyboard.press( 'Backspace' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'can be split at the end and merged back', async () => {
+	it( 'can be split at the end', async () => {
 		await insertBlock( 'Quote' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
@@ -199,47 +143,57 @@ describe( 'Quote', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		await page.keyboard.press( 'Backspace' );
+		// Allow time for selection to update.
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		await page.keyboard.type( '2' );
 
-		// Expect empty paragraph inside quote block.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		await page.keyboard.press( 'Backspace' );
-
-		// Expect quote without empty paragraphs.
+		// Expect the paragraph to be merged into the quote block.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'can be split in the middle and merged back', async () => {
+	it( 'can be unwrapped on Backspace', async () => {
+		await insertBlock( 'Quote' );
+
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:quote -->
+		<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
+		<p></p>
+		<!-- /wp:paragraph --></blockquote>
+		<!-- /wp:quote -->"
+	` );
+
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `""` );
+	} );
+
+	it( 'can be unwrapped with content on Backspace', async () => {
 		await insertBlock( 'Quote' );
 		await page.keyboard.type( '1' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( 'c' );
-		await page.keyboard.press( 'ArrowUp' );
-		await page.keyboard.press( 'ArrowUp' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
 
-		// Expect two quote blocks and empty paragraph in the middle.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		await page.keyboard.press( 'Backspace' );
-
-		// Expect two quote blocks and empty paragraph in the first quote.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		await page.keyboard.press( 'Backspace' );
-
-		// Expect two quote blocks.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:quote -->
+		<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
+		<p>1</p>
+		<!-- /wp:paragraph --><cite>2</cite></blockquote>
+		<!-- /wp:quote -->"
+	` );
 
 		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>1</p>
+		<!-- /wp:paragraph -->
+
+		<!-- wp:paragraph -->
+		<p>2</p>
+		<!-- /wp:paragraph -->"
+	` );
 	} );
 } );

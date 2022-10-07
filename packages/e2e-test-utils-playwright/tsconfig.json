@@ -4,6 +4,7 @@
 		"incremental": false,
 		"composite": false,
 		"module": "CommonJS",
+		"types": [ "node" ],
 		"rootDir": "src",
 		"noEmit": false,
 		"outDir": "build",

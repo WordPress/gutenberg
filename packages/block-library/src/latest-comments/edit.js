@@ -25,12 +25,8 @@ const MIN_COMMENTS = 1;
 const MAX_COMMENTS = 100;
 
 export default function LatestComments( { attributes, setAttributes } ) {
-	const {
-		commentsToShow,
-		displayAvatar,
-		displayDate,
-		displayExcerpt,
-	} = attributes;
+	const { commentsToShow, displayAvatar, displayDate, displayExcerpt } =
+		attributes;
 
 	return (
 		<div { ...useBlockProps() }>

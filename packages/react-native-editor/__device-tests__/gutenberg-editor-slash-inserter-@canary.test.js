@@ -69,9 +69,8 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		expect( await editorPage.assertSlashInserterPresent() ).toBe( true );
 
 		// Find Image block button.
-		const imageButtonElement = await editorPage.driver.elementByAccessibilityId(
-			'Image block'
-		);
+		const imageButtonElement =
+			await editorPage.driver.elementByAccessibilityId( 'Image block' );
 		expect( imageButtonElement ).toBeTruthy();
 
 		// Add image block.

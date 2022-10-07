@@ -14,7 +14,7 @@
  *
  * @access private
  */
-class WP_Theme_JSON_6_0 extends WP_Theme_JSON_5_9 {
+class WP_Theme_JSON_6_0 extends WP_Theme_JSON {
 	/**
 	 * Metadata for style properties.
 	 *
@@ -592,7 +592,7 @@ class WP_Theme_JSON_6_0 extends WP_Theme_JSON_5_9 {
 				}
 				$flattened_preset = array();
 				foreach ( $items as $slug => $value ) {
-					$flattened_preset[] = array_merge( array( 'slug' => $slug ), $value );
+					$flattened_preset[] = array_merge( array( 'slug' => (string) $slug ), $value );
 				}
 				_wp_array_set( $output, $path, $flattened_preset );
 			}

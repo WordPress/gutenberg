@@ -12,9 +12,7 @@ const prettierPackage = require( require.resolve( 'prettier/package.json' ) );
  */
 
 const isWPPrettier = prettierPackage.name === 'wp-prettier';
-const customOptions = isWPPrettier
-	? { parenSpacing: true, jsxBracketSameLine: false }
-	: { bracketSameLine: false };
+const customOptions = isWPPrettier ? { parenSpacing: true } : {};
 const customStyleOptions = isWPPrettier ? { parenSpacing: false } : {};
 
 // Disable reason: The current JSDoc tooling does not yet understand TypeScript
@@ -26,6 +24,7 @@ const config = {
 	printWidth: 80,
 	singleQuote: true,
 	trailingComma: 'es5',
+	bracketSameLine: false,
 	bracketSpacing: true,
 	semi: true,
 	arrowParens: 'always',

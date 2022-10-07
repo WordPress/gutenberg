@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { identity } from 'lodash';
 import { View, Platform, TouchableWithoutFeedback } from 'react-native';
 
 /**
@@ -35,6 +34,7 @@ import { BlockDraggableWrapper } from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
 
 export const OnCaretVerticalPositionChange = createContext();
+const identity = ( x ) => x;
 
 const stylesMemo = {};
 const getStyles = (
@@ -70,22 +70,18 @@ export class BlockList extends Component {
 		};
 		this.renderItem = this.renderItem.bind( this );
 		this.renderBlockListFooter = this.renderBlockListFooter.bind( this );
-		this.onCaretVerticalPositionChange = this.onCaretVerticalPositionChange.bind(
-			this
-		);
+		this.onCaretVerticalPositionChange =
+			this.onCaretVerticalPositionChange.bind( this );
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
 		this.addBlockToEndOfPost = this.addBlockToEndOfPost.bind( this );
-		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind(
-			this
-		);
-		this.shouldShowInnerBlockAppender = this.shouldShowInnerBlockAppender.bind(
-			this
-		);
+		this.shouldFlatListPreventAutomaticScroll =
+			this.shouldFlatListPreventAutomaticScroll.bind( this );
+		this.shouldShowInnerBlockAppender =
+			this.shouldShowInnerBlockAppender.bind( this );
 		this.renderEmptyList = this.renderEmptyList.bind( this );
 		this.getExtraData = this.getExtraData.bind( this );
-		this.getCellRendererComponent = this.getCellRendererComponent.bind(
-			this
-		);
+		this.getCellRendererComponent =
+			this.getCellRendererComponent.bind( this );
 
 		this.onLayout = this.onLayout.bind( this );
 
@@ -241,12 +237,8 @@ export class BlockList extends Component {
 		} = this.props;
 		const { parentScrollRef, onScroll } = extraProps;
 
-		const {
-			blockToolbar,
-			blockBorder,
-			headerToolbar,
-			floatingToolbar,
-		} = styles;
+		const { blockToolbar, blockBorder, headerToolbar, floatingToolbar } =
+			styles;
 
 		const containerStyle = {
 			flex: isRootList ? 1 : 0,
@@ -456,9 +448,8 @@ export default compose( [
 		}
 	),
 	withDispatch( ( dispatch ) => {
-		const { insertBlock, replaceBlock, clearSelectedBlock } = dispatch(
-			blockEditorStore
-		);
+		const { insertBlock, replaceBlock, clearSelectedBlock } =
+			dispatch( blockEditorStore );
 
 		return {
 			clearSelectedBlock,
@@ -478,7 +469,7 @@ class EmptyListComponent extends Component {
 			renderFooterAppender,
 		} = this.props;
 
-		if ( renderFooterAppender ) {
+		if ( renderFooterAppender || renderAppender === false ) {
 			return null;
 		}
 
