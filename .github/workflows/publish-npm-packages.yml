@@ -50,7 +50,7 @@ jobs:
                   git config user.email gutenberg@wordpress.org
 
             - name: Setup Node (for CLI)
-              uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
+              uses: actions/setup-node@969bd2663942d722d85b6a8626225850c2f7be4b # v3.1.0
               with:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
