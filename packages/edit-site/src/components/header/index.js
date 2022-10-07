@@ -205,7 +205,6 @@ export default function Header( {
 									label={ __( 'Zoom-out View' ) }
 									onClick={ () => {
 										setPreviewDeviceType( 'desktop' );
-										setIsListViewOpened( false );
 										__unstableSetEditorMode(
 											isZoomedOutView
 												? 'edit'
