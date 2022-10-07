@@ -105,15 +105,6 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		setAttributes( updateObj );
 	};
 
-	const serverSideRenderAttributes = {
-		...attributes,
-		className: undefined,
-		style: {
-			...attributes.style,
-			spacing: undefined,
-		},
-	};
-
 	const inspectorControls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
@@ -177,9 +168,9 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 			{ inspectorControls }
 			<div { ...useBlockProps() }>
 				<ServerSideRender
-					key="tag-cloud"
+					skipBlockSupportAttributes
 					block="core/tag-cloud"
-					attributes={ serverSideRenderAttributes }
+					attributes={ attributes }
 				/>
 			</div>
 		</>
