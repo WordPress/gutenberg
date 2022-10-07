@@ -214,22 +214,26 @@ export function MarginVisualizer( { clientId, attributes, mouseOverMargin } ) {
 	};
 
 	useEffect( () => {
-		if (
-			! isShallowEqual( margin, valueRef.current ) ||
-			visualiserContext?.mouseOver
-		) {
+		if ( ! isShallowEqual( margin, valueRef.current ) ) {
 			setIsActive( true );
 			valueRef.current = margin;
 
 			clearTimer();
 
 			timeoutRef.current = setTimeout( () => {
-				setIsActive( false );
+				if ( ! visualiserContext?.mouseOver ) {
+					setIsActive( false );
+				}
 			}, 400 );
 		}
 
 		return () => clearTimer();
-	}, [ margin, mouseOverMargin ] );
+	}, [ margin, visualiserContext?.mouseOver ] );
+
+	useEffect( () => {
+		setIsActive( visualiserContext?.mouseOver );
+		valueRef.current = margin;
+	}, [ visualiserContext?.mouseOver ] );
 
 	if ( ! isActive ) {
 		return null;

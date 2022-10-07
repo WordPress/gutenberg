@@ -106,7 +106,7 @@ export function DimensionsPanel( props ) {
 	};
 
 	return (
-		<>
+		<SpacingVisualiserContext>
 			<InspectorControls __experimentalGroup="dimensions">
 				{ ! isPaddingDisabled && (
 					<ToolsPanelItem
@@ -131,9 +131,7 @@ export function DimensionsPanel( props ) {
 						isShownByDefault={ defaultSpacingControls?.margin }
 						panelId={ props.clientId }
 					>
-						<SpacingVisualiserContext>
-							<MarginEdit { ...props } />
-						</SpacingVisualiserContext>
+						<MarginEdit { ...props } />
 					</ToolsPanelItem>
 				) }
 				{ ! isGapDisabled && (
@@ -151,12 +149,8 @@ export function DimensionsPanel( props ) {
 				) }
 			</InspectorControls>
 			{ ! isPaddingDisabled && <PaddingVisualizer { ...props } /> }
-			{ ! isMarginDisabled && (
-				<SpacingVisualiserContext>
-					<MarginVisualizer { ...props } />
-				</SpacingVisualiserContext>
-			) }
-		</>
+			{ ! isMarginDisabled && <MarginVisualizer { ...props } /> }
+		</SpacingVisualiserContext>
 	);
 }
 
