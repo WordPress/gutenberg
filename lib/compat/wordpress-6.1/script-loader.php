@@ -138,7 +138,7 @@ add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_classic_theme_styles' );
  */
 function gutenberg_add_editor_classic_theme_styles( $editor_settings ) {
 	if ( wp_is_block_theme() ) {
-		return;
+		return $editor_settings;
 	}
 
 	$classic_theme_styles = gutenberg_dir_path() . '/build/block-library/classic.css';
