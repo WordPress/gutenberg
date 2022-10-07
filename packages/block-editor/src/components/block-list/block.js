@@ -369,11 +369,11 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 							) {
 								registry.batch( () => {
 									moveBlocksToPosition(
-										getBlockOrder( rootClientId ),
-										rootClientId,
-										nextRootClientId
+										getBlockOrder( nextRootClientId ),
+										nextRootClientId,
+										rootClientId
 									);
-									removeBlock( rootClientId, false );
+									removeBlock( nextRootClientId, false );
 								} );
 								return;
 							}
