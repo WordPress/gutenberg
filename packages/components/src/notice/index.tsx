@@ -7,16 +7,20 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { RawHTML, useEffect, renderToString } from '@wordpress/element';
+import {
+	RawHTML,
+	useEffect,
+	renderToString,
+	WPElement,
+} from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { Button } from '../';
-
-/** @typedef {import('@wordpress/element').WPElement} WPElement */
+import { Button } from '../button';
+import type { NoticeProps } from './types';
 
 const noop = () => {};
 
@@ -24,10 +28,13 @@ const noop = () => {};
  * Custom hook which announces the message with the given politeness, if a
  * valid message is provided.
  *
- * @param {string|WPElement}     [message]  Message to announce.
- * @param {'polite'|'assertive'} politeness Politeness to announce.
+ * @param  message    Message to announce.
+ * @param  politeness Politeness to announce.
  */
-function useSpokenMessage( message, politeness ) {
+function useSpokenMessage(
+	message: string | WPElement,
+	politeness: 'polite' | 'assertive'
+) {
 	const spokenMessage =
 		typeof message === 'string' ? message : renderToString( message );
 
@@ -42,11 +49,11 @@ function useSpokenMessage( message, politeness ) {
  * Given a notice status, returns an assumed default politeness for the status.
  * Defaults to 'assertive'.
  *
- * @param {string} [status] Notice status.
+ * @param  status Notice status.
  *
- * @return {'polite'|'assertive'} Notice politeness.
+ * @return  Notice politeness.
  */
-function getDefaultPoliteness( status ) {
+function getDefaultPoliteness( status: string ): 'polite' | 'assertive' {
 	switch ( status ) {
 		case 'success':
 		case 'warning':
@@ -73,7 +80,7 @@ function Notice( {
 	// It is distinct from onRemove, which _looks_ like a callback but is
 	// actually the function to call to remove the notice from the UI.
 	onDismiss = noop,
-} ) {
+}: NoticeProps ) {
 	useSpokenMessage( spokenMessage, politeness );
 
 	const classes = classnames(
@@ -85,11 +92,11 @@ function Notice( {
 		}
 	);
 
-	if ( __unstableHTML ) {
+	if ( __unstableHTML && typeof children === 'string' ) {
 		children = <RawHTML>{ children }</RawHTML>;
 	}
 
-	const onDismissNotice = ( event ) => {
+	const onDismissNotice = ( event: MouseEvent ) => {
 		event?.preventDefault?.();
 		onDismiss();
 		onRemove();
@@ -113,7 +120,7 @@ function Notice( {
 							},
 							index
 						) => {
-							let computedVariant = variant;
+							let computedVariant: string | undefined = variant;
 							if ( variant !== 'primary' && ! noDefaultClasses ) {
 								computedVariant = ! url ? 'secondary' : 'link';
 							}
