@@ -14,17 +14,6 @@ import ServerSideRender from '@wordpress/server-side-render';
 export default function ArchivesEdit( { attributes, setAttributes } ) {
 	const { showLabel, showPostCounts, displayAsDropdown, type } = attributes;
 
-	// Prevent block support styles and additional CSS classes from being printed twice.
-	const serverSideRenderAttributes = {
-		...attributes,
-		className: undefined,
-		style: {
-			...attributes.style,
-			spacing: undefined,
-			typography: undefined,
-		},
-	};
-
 	return (
 		<>
 			<InspectorControls>
@@ -77,7 +66,8 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 				<Disabled>
 					<ServerSideRender
 						block="core/archives"
-						attributes={ serverSideRenderAttributes }
+						skipBlockSupportAttributes
+						attributes={ attributes }
 					/>
 				</Disabled>
 			</div>
