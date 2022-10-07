@@ -56,6 +56,7 @@ The HTTP request method to use, either 'GET' or 'POST'. It's 'GET' by default. T
 
 -   Type: `String`
 -   Required: No
+-   Default: 'GET'
 
 #### Example:
 
@@ -78,7 +79,7 @@ add_filter( 'rest_endpoints', 'add_rest_method');
 
 ### skipBlockSupportAttributes
 
-Remove attributes and style properties applied by the block supports. This prevents duplication of styles in the block wrapper and the `ServerSideRender` components.
+Remove attributes and style properties applied by the block supports. This prevents duplication of styles in the block wrapper and the `ServerSideRender` components. Even if certain features skip serialization to HTML markup by `__experimentalSkipSerialization`, all attributes and style properties are removed.
 
 -   Type: `Boolean`
 -   Required: No
