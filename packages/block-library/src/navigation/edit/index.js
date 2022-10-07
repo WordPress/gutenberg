@@ -86,6 +86,7 @@ function Navigation( {
 		openSubmenusOnClick,
 		overlayMenu,
 		showSubmenuIcon,
+		templateLock,
 		layout: {
 			justifyContent,
 			orientation = 'horizontal',
@@ -706,6 +707,7 @@ function Navigation( {
 					<UnsavedInnerBlocks
 						blocks={ uncontrolledInnerBlocks }
 						clientId={ clientId }
+						templateLock={ templateLock }
 						navigationMenus={ navigationMenus }
 						hasSelection={ isSelected || isInnerBlockSelected }
 						hasSavedUnsavedInnerBlocks={
@@ -944,6 +946,7 @@ function Navigation( {
 									hasCustomPlaceholder={
 										!! CustomPlaceholder
 									}
+									templateLock={ templateLock }
 									orientation={ orientation }
 								/>
 							) }
