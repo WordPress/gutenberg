@@ -28,15 +28,21 @@ export function BlockPreview( {
 	__experimentalOnClick,
 	__experimentalMinHeight,
 } ) {
-	const originalSettings = useSelect(
-		( select ) => select( blockEditorStore ).getSettings(),
-		[]
+	const { originalSettings, patterns } = useSelect( ( select ) => {
+		const { getSettings, __experimentalGetAllowedPatterns } =
+			select( blockEditorStore );
+		return {
+			originalSettings: getSettings(),
+			patterns: __experimentalGetAllowedPatterns(),
+		};
+	}, [] );
+	const settings = useMemo(
+		() => ( {
+			...originalSettings,
+			__experimentalBlockPatterns: patterns,
+		} ),
+		[ originalSettings, patterns ]
 	);
-	const settings = useMemo( () => {
-		const _settings = { ...originalSettings };
-		_settings.__experimentalBlockPatterns = [];
-		return _settings;
-	}, [ originalSettings ] );
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 	if ( ! blocks || blocks.length === 0 ) {
 		return null;
@@ -90,15 +96,22 @@ export function useBlockPreview( {
 	props = {},
 	__experimentalLayout,
 } ) {
-	const originalSettings = useSelect(
-		( select ) => select( blockEditorStore ).getSettings(),
-		[]
-	);
 	const disabledRef = useDisabled();
 	const ref = useMergeRefs( [ props.ref, disabledRef ] );
+	const { originalSettings, patterns } = useSelect( ( select ) => {
+		const { getSettings, __experimentalGetAllowedPatterns } =
+			select( blockEditorStore );
+		return {
+			originalSettings: getSettings(),
+			patterns: __experimentalGetAllowedPatterns(),
+		};
+	}, [] );
 	const settings = useMemo(
-		() => ( { ...originalSettings, __experimentalBlockPatterns: [] } ),
-		[ originalSettings ]
+		() => ( {
+			...originalSettings,
+			__experimentalBlockPatterns: patterns,
+		} ),
+		[ originalSettings, patterns ]
 	);
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 

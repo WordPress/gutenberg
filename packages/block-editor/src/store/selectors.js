@@ -2249,6 +2249,11 @@ export const __experimentalGetParsedPattern = createSelector(
 		if ( ! pattern ) {
 			return null;
 		}
+		// In previews we pass the already passed patterns
+		// to avoid parsing again.
+		if ( pattern.blocks ) {
+			return { ...pattern };
+		}
 		return {
 			...pattern,
 			blocks: parse( pattern.content, {
