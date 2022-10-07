@@ -19,7 +19,7 @@ import { close } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { Button } from '../button';
+import Button from '../button';
 import type { NoticeProps } from './types';
 
 const noop = () => {};
