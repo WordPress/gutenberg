@@ -1047,6 +1047,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				continue;
 			}
 
+			if ( 'font-size' === $css_property ) {
+				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ) );
+			}
+
 			$declarations[] = array(
 				'name'  => $css_property,
 				'value' => $value,

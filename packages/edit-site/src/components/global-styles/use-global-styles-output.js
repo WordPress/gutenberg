@@ -24,6 +24,7 @@ import {
  * Internal dependencies
  */
 import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
+import { getTypographyFontSizeValue } from './typography-utils';
 import { GlobalStylesContext } from './context';
 import { useSetting } from './hooks';
 
@@ -274,6 +275,13 @@ export function getStylesDeclarations(
 			if ( ! ruleValue || !! ruleValue?.ref ) {
 				return;
 			}
+		}
+
+		if ( cssProperty === 'font-size' ) {
+			ruleValue = getTypographyFontSizeValue(
+				{ size: ruleValue },
+				tree?.settings?.typography
+			);
 		}
 
 		output.push( `${ cssProperty }: ${ ruleValue }` );
