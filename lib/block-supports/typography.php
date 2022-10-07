@@ -229,6 +229,25 @@ function gutenberg_typography_get_css_variable_inline_style( $attributes, $featu
 }
 
 /**
+ * Renders typography styles/content to the block wrapper.
+ *
+ * @param  string $block_content Rendered block content.
+ * @param  array  $block         Block object.
+ * @return string                Filtered block content.
+ */
+function gutenberg_render_typography_support( $block_content, $block ) {
+	$custom_font_size = isset( $block['attrs']['style']['typography']['fontSize'] ) ? $block['attrs']['style']['typography']['fontSize'] : null;
+	$fluid_font_size  = gutenberg_get_typography_font_size_value( array( 'size' => $custom_font_size ) );
+
+	if ( ! empty( $fluid_font_size ) && $fluid_font_size !== $custom_font_size ) {
+		return preg_replace( '/font-size\s*:\s*' . preg_quote( $custom_font_size, '/' ) . '\s*;?/', 'font-size:' . esc_attr( $fluid_font_size ) . ';', $block_content, 1 );
+	}
+
+	return $block_content;
+
+}
+
+/**
  * Internal method that checks a string for a unit and value and returns an array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ].
  * A raw font size of `value + unit` is expected. If the value is a number, it will convert to `value + 'px'`.
  *
@@ -380,9 +399,13 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
  * }
  * @param bool  $should_use_fluid_typography An override to switch fluid typography "on". Can be used for unit testing. Default is `false`.
  *
- * @return string Font-size value.
+ * @return string|null Font-size value or `null` if a size is not passed in $preset.
  */
 function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_typography = false ) {
+	if ( ! isset( $preset['size'] ) || empty( $preset['size'] ) ) {
+		return null;
+	}
+
 	// Check if fluid font sizes are activated.
 	$typography_settings         = gutenberg_get_global_settings( array( 'typography' ) );
 	$should_use_fluid_typography = isset( $typography_settings['fluid'] ) && true === $typography_settings['fluid'] ? true : $should_use_fluid_typography;
@@ -452,3 +475,8 @@ WP_Block_Supports::get_instance()->register(
 		'apply'              => 'gutenberg_apply_typography_support',
 	)
 );
+
+if ( function_exists( 'wp_render_typography_support' ) ) {
+	remove_filter( 'render_block', 'wp_render_typography_support' );
+}
+add_filter( 'render_block', 'gutenberg_render_typography_support', 10, 2 );
