@@ -350,31 +350,35 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					const nextRootClientId =
 						getNextBlockClientId( rootClientId );
 
-					if (
-						nextRootClientId &&
-						getBlockName( rootClientId ) ===
-							getBlockName( nextRootClientId )
-					) {
-						const rootAttributes =
-							getBlockAttributes( rootClientId );
-						const previousRootAttributes =
-							getBlockAttributes( nextRootClientId );
-
+					if ( nextRootClientId ) {
 						if (
-							Object.keys( rootAttributes ).every(
-								( key ) =>
-									rootAttributes[ key ] ===
-									previousRootAttributes[ key ]
-							)
+							getBlockName( rootClientId ) ===
+							getBlockName( nextRootClientId )
 						) {
-							registry.batch( () => {
-								moveBlocksToPosition(
-									getBlockOrder( rootClientId ),
-									rootClientId,
-									nextRootClientId
-								);
-								removeBlock( rootClientId, false );
-							} );
+							const rootAttributes =
+								getBlockAttributes( rootClientId );
+							const previousRootAttributes =
+								getBlockAttributes( nextRootClientId );
+
+							if (
+								Object.keys( rootAttributes ).every(
+									( key ) =>
+										rootAttributes[ key ] ===
+										previousRootAttributes[ key ]
+								)
+							) {
+								registry.batch( () => {
+									moveBlocksToPosition(
+										getBlockOrder( rootClientId ),
+										rootClientId,
+										nextRootClientId
+									);
+									removeBlock( rootClientId, false );
+								} );
+								return;
+							}
+						} else {
+							mergeBlocks( rootClientId, nextRootClientId );
 							return;
 						}
 					}
@@ -386,8 +390,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					return;
 				}
 
-				// Attempt to "unwrap" the block contents when there's no
-				// preceding block to merge with.
 				const replacement = switchToBlockType(
 					getBlock( nextBlockClientId ),
 					'*'
@@ -395,7 +397,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 
 				if ( replacement && replacement.length ) {
 					replaceBlocks( nextBlockClientId, replacement );
-				} else if ( nextBlockClientId ) {
+				} else {
 					mergeBlocks( clientId, nextBlockClientId );
 				}
 			} else {
