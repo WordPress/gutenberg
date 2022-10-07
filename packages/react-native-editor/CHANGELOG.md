@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Upgrade compile and target sdk version to Android API 31 [#44610]
 
 ## 1.82.1
 -   [**] List block v2: Fix issues splitting or merging paragraphs into the block [#43949]
