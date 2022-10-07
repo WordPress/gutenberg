@@ -120,6 +120,7 @@ function Notice( {
 							},
 							index
 						) => {
+							// Should be able to get the type from the props of the Button.
 							let computedVariant: string | undefined = variant;
 							if ( variant !== 'primary' && ! noDefaultClasses ) {
 								computedVariant = ! url ? 'secondary' : 'link';
