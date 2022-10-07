@@ -82,6 +82,7 @@ Remove attributes and style properties applied by the block supports. This preve
 
 -   Type: `Boolean`
 -   Required: No
+-   Default: false
 
 ### urlQueryArgs
 
