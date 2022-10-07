@@ -266,7 +266,8 @@
 	}
 }
 
-.is-outline-mode .block-editor-block-list__block:not(.remove-outline) {
+// Show hover borders (née "outline-mode") in navigate-mode.
+.is-navigate-mode .block-editor-block-list__block:not(.remove-outline) {
 	&.is-hovered {
 		cursor: default;
 
