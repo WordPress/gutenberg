@@ -29,11 +29,13 @@ export const _default = () => {
 	const [ height, setHeight ] = useState();
 	const [ minHeight, setMinHeight ] = useState();
 	const [ width, setWidth ] = useState();
+	const [ scale, setScale ] = useState();
 
 	const resetAll = () => {
 		setHeight( undefined );
 		setWidth( undefined );
 		setMinHeight( undefined );
+		setScale( undefined );
 	};
 
 	return (
@@ -78,6 +80,31 @@ export const _default = () => {
 							value={ minHeight }
 							onChange={ ( next ) => setMinHeight( next ) }
 						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () => !! scale }
+						label="Scale"
+						onDeselect={ () => setScale( undefined ) }
+					>
+						<ToggleGroupControl
+							label="Scale"
+							value={ scale }
+							onChange={ ( next ) => setScale( next ) }
+							isBlock
+						>
+							<ToggleGroupControlOption
+								value="cover"
+								label="Cover"
+							/>
+							<ToggleGroupControlOption
+								value="contain"
+								label="Contain"
+							/>
+							<ToggleGroupControlOption
+								value="fill"
+								label="Fill"
+							/>
+						</ToggleGroupControl>
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</Panel>

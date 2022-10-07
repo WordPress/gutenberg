@@ -7,7 +7,7 @@ import type { ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
-import { check, reset, moreVertical, plus } from '@wordpress/icons';
+import { check, moreVertical, plus } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 
 /**
@@ -20,12 +20,14 @@ import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { useToolsPanelHeader } from './hook';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import { ResetLabel } from '../styles';
 import type {
 	ToolsPanelControlsGroupProps,
 	ToolsPanelHeaderProps,
 } from '../types';
 
 const DefaultControlsGroup = ( {
+	itemClassName,
 	items,
 	toggleItem,
 }: ToolsPanelControlsGroupProps ) => {
@@ -33,15 +35,17 @@ const DefaultControlsGroup = ( {
 		return null;
 	}
 
+	const resetSuffix = <ResetLabel aria-hidden>{ __( 'Reset' ) }</ResetLabel>;
+
 	return (
-		<MenuGroup>
+		<MenuGroup label={ __( 'Defaults' ) }>
 			{ items.map( ( [ label, hasValue ] ) => {
 				if ( hasValue ) {
 					return (
 						<MenuItem
 							key={ label }
+							className={ itemClassName }
 							role="menuitem"
-							icon={ reset }
 							label={ sprintf(
 								// translators: %s: The name of the control being reset e.g. "Padding".
 								__( 'Reset %s' ),
@@ -58,6 +62,7 @@ const DefaultControlsGroup = ( {
 									'assertive'
 								);
 							} }
+							suffix={ resetSuffix }
 						>
 							{ label }
 						</MenuItem>
@@ -67,8 +72,8 @@ const DefaultControlsGroup = ( {
 				return (
 					<MenuItem
 						key={ label }
+						className={ itemClassName }
 						role="menuitemcheckbox"
-						icon={ check }
 						isSelected
 						aria-disabled
 					>
@@ -89,7 +94,7 @@ const OptionalControlsGroup = ( {
 	}
 
 	return (
-		<MenuGroup>
+		<MenuGroup label={ __( 'Tools' ) }>
 			{ items.map( ( [ label, isSelected ] ) => {
 				const itemLabel = isSelected
 					? sprintf(
@@ -147,6 +152,7 @@ const ToolsPanelHeader = (
 ) => {
 	const {
 		areAllOptionalControlsHidden,
+		defaultControlsItemClassName,
 		dropdownMenuClassName,
 		hasMenuItems,
 		headingClassName,
@@ -197,6 +203,7 @@ const ToolsPanelHeader = (
 							<DefaultControlsGroup
 								items={ defaultItems }
 								toggleItem={ toggleItem }
+								itemClassName={ defaultControlsItemClassName }
 							/>
 							<OptionalControlsGroup
 								items={ optionalItems }

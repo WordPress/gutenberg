@@ -37,7 +37,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
               with:
                   fetch-depth: 1
 
@@ -47,7 +47,7 @@ jobs:
                   node-version-file: '.nvmrc'
                   cache: npm
 
-            - uses: preactjs/compressed-size-action@df6e03e187079aef959a2878311639c77b95ee2e # v2.2.0
+            - uses: preactjs/compressed-size-action@8119d3d31b6e57b167e09c81dfa877eada3bcb35 # v2.5.0
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
                   pattern: '{build/**/*.min.js,build/**/*.css}'

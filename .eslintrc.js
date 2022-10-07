@@ -105,6 +105,7 @@ module.exports = {
 							'flatMap',
 							'flatten',
 							'flattenDeep',
+							'flow',
 							'flowRight',
 							'forEach',
 							'fromPairs',
@@ -151,6 +152,7 @@ module.exports = {
 							'sum',
 							'sumBy',
 							'take',
+							'throttle',
 							'times',
 							'toString',
 							'trim',
@@ -162,7 +164,6 @@ module.exports = {
 							'uniqWith',
 							'upperFirst',
 							'values',
-							'words',
 							'xor',
 							'zip',
 						],
@@ -355,7 +356,7 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'bin/**/*.js', 'packages/env/**' ],
+			files: [ 'bin/**/*.js', 'bin/**/*.mjs', 'packages/env/**' ],
 			rules: {
 				'no-console': 'off',
 			},
