@@ -239,7 +239,12 @@ function gutenberg_render_typography_support( $block_content, $block ) {
 	$custom_font_size = isset( $block['attrs']['style']['typography']['fontSize'] ) ? $block['attrs']['style']['typography']['fontSize'] : null;
 	$fluid_font_size  = gutenberg_get_typography_font_size_value( array( 'size' => $custom_font_size ) );
 
+	/*
+	 * Checks that $fluid_font_size does not match $custom_font_size,
+	 * which means it's been mutated by the fluid font size functions.
+	 */
 	if ( ! empty( $fluid_font_size ) && $fluid_font_size !== $custom_font_size ) {
+		// Replaces the first instance of `font-size:$custom_font_size` with `font-size:$fluid_font_size`.
 		return preg_replace( '/font-size\s*:\s*' . preg_quote( $custom_font_size, '/' ) . '\s*;?/', 'font-size:' . esc_attr( $fluid_font_size ) . ';', $block_content, 1 );
 	}
 
