@@ -8,13 +8,8 @@ import {
 	useRef,
 	useEffect,
 } from '@wordpress/element';
-import { _x, __, isRTL, sprintf } from '@wordpress/i18n';
-import {
-	useAsyncList,
-	useViewportMatch,
-	__experimentalUseDialog as useDialog,
-	useMergeRefs,
-} from '@wordpress/compose';
+import { _x, __, isRTL } from '@wordpress/i18n';
+import { useAsyncList, useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -26,8 +21,12 @@ import {
 	FlexBlock,
 	Button,
 	__experimentalHeading as Heading,
+	__unstableComposite as Composite,
+	__unstableUseCompositeState as useCompositeState,
+	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
+import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -91,27 +90,21 @@ export function BlockPatternsCategoryDialog( {
 	rootClientId,
 	onInsert,
 	category,
-	onClose,
 } ) {
 	const container = useRef();
-	const [ ref, props ] = useDialog( {
-		onClose,
-	} );
 
 	useEffect( () => {
-		container?.current?.focus();
+		const timeout = setTimeout( () => {
+			const [ firstTabbable ] = focus.tabbable.find( container.current );
+			firstTabbable?.focus();
+		} );
+		return () => clearTimeout( timeout );
 	}, [ category ] );
 
 	return (
 		<div
-			ref={ useMergeRefs( [ ref, container ] ) }
-			{ ...props }
+			ref={ container }
 			className="block-editor-inserter__patterns-category-panel"
-			aria-label={ sprintf(
-				/* translators: %1$s: category name */
-				__( 'Pattern list for the "%s" category' ),
-				category.label
-			) }
 		>
 			<BlockPatternsCategoryPanel
 				rootClientId={ rootClientId }
@@ -189,14 +182,24 @@ function BlockPatternsTabs( {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
 	const categories = usePatternsCategories();
 	const isMobile = useViewportMatch( 'medium', '<' );
+	const composite = useCompositeState();
 
 	return (
 		<>
 			{ ! isMobile && (
 				<div className="block-editor-inserter__block-patterns-tabs-container">
-					<ItemGroup className="block-editor-inserter__block-patterns-tabs">
+					<Composite
+						{ ...composite }
+						role="listbox"
+						className="block-editor-inserter__block-patterns-tabs"
+						as={ ItemGroup }
+						label={ __( 'Block pattern categories' ) }
+					>
 						{ categories.map( ( category ) => (
-							<Item
+							<CompositeItem
+								role="option"
+								as={ Item }
+								{ ...composite }
 								key={ category.name }
 								onClick={ () => onSelectCategory( category ) }
 								className={
@@ -204,14 +207,15 @@ function BlockPatternsTabs( {
 										? 'block-editor-inserter__patterns-category block-editor-inserter__patterns-selected-category'
 										: 'block-editor-inserter__patterns-category'
 								}
+								aria-label={ category.label }
 							>
 								<HStack>
 									<FlexBlock>{ category.label }</FlexBlock>
 									<Icon icon={ chevronRight } />
 								</HStack>
-							</Item>
+							</CompositeItem>
 						) ) }
-					</ItemGroup>
+					</Composite>
 
 					<Button
 						onClick={ () => setShowPatternsExplorer( true ) }

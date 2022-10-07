@@ -252,16 +252,6 @@ function InserterMenu(
 					rootClientId={ destinationRootClientId }
 					onInsert={ onInsertPattern }
 					category={ selectedPatternCategory }
-					onClose={ () => {
-						if (
-							searchRef.current.ownerDocument.activeElement.classList.contains(
-								'block-editor-inserter__patterns-category'
-							)
-						) {
-							return;
-						}
-						setSelectedPatternCategory( null );
-					} }
 				/>
 			) }
 		</div>
