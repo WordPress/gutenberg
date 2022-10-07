@@ -1,3 +1,12 @@
+@keyframes click-overlay__fade-in-animation {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
 .block-editor-block-list__block.has-block-overlay {
 	cursor: default;
 
@@ -21,6 +30,11 @@
 	&:hover:not(.is-dragging-blocks)::before {
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.3);
 		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color) inset;
+
+		// Animate.
+		animation: click-overlay__fade-in-animation 0.1s ease-out;
+		animation-fill-mode: forwards;
+		@include reduce-motion("animation");
 	}
 
 	&.is-selected:not(.is-dragging-blocks)::before {
