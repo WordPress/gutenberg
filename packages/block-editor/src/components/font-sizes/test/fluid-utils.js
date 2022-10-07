@@ -15,7 +15,7 @@ describe( 'getComputedFluidTypographyValue()', () => {
 		}
 	} );
 
-	it( 'should return a fluid font size when given a min and max', () => {
+	it( 'should return a fluid font size when given a min and max font size', () => {
 		const fluidTypographyValues = getComputedFluidTypographyValue( {
 			minimumFontSize: '20px',
 			maximumFontSize: '45px',
