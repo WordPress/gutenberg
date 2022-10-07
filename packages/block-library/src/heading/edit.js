@@ -16,6 +16,7 @@ import {
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
+	useSemanticLevelShortcuts,
 } from '@wordpress/block-editor';
 
 /**
@@ -40,6 +41,8 @@ function HeadingEdit( {
 		} ),
 		style,
 	} );
+
+	const semanticShorcutsHandler = useSemanticLevelShortcuts();
 
 	const { canGenerateAnchors } = useSelect( ( select ) => {
 		const { getGlobalBlockCount, getSettings } = select( blockEditorStore );
@@ -132,6 +135,7 @@ function HeadingEdit( {
 				} }
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
+				onKeyDown={ semanticShorcutsHandler }
 				aria-label={ __( 'Heading text' ) }
 				placeholder={ placeholder || __( 'Heading' ) }
 				textAlign={ textAlign }

@@ -19,15 +19,10 @@ import {
 	RichText,
 	useBlockProps,
 	useSetting,
-	store as blockEditorStore,
+	useSemanticLevelShortcuts,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
-import { useDispatch } from '@wordpress/data';
-import {
-	useShortcut,
-	store as keyboardShortcutsStore,
-} from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -55,115 +50,6 @@ function hasDropCapDisabled( align ) {
 	return align === ( isRTL() ? 'left' : 'right' ) || align === 'center';
 }
 
-function ParagrapgShortcuts( { attributes, clientId } ) {
-	const { align, content } = attributes;
-	const { replaceBlocks } = useDispatch( blockEditorStore );
-	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
-	registerShortcut( {
-		name: 'core/blocks/paragraph/transform-to-heading-1',
-		category: 'block-library',
-		description: __( 'Transform to heading.' ),
-		keyCombination: {
-			modifier: 'access',
-			character: '1',
-		},
-	} );
-	useShortcut( 'core/blocks/paragraph/transform-to-heading-1', ( event ) => {
-		event.preventDefault();
-		replaceBlocks(
-			clientId,
-			createBlock( 'core/heading', { level: 1, content, align } )
-		);
-	} );
-
-	registerShortcut( {
-		name: 'core/blocks/paragraph/transform-to-heading-2',
-		category: 'block-library',
-		description: __( 'Transform to heading.' ),
-		keyCombination: {
-			modifier: 'access',
-			character: '2',
-		},
-	} );
-	useShortcut( 'core/blocks/paragraph/transform-to-heading-2', ( event ) => {
-		event.preventDefault();
-		replaceBlocks(
-			clientId,
-			createBlock( 'core/heading', { level: 2, content, align } )
-		);
-	} );
-
-	registerShortcut( {
-		name: 'core/blocks/paragraph/transform-to-heading-3',
-		category: 'block-library',
-		description: __( 'Transform to heading.' ),
-		keyCombination: {
-			modifier: 'access',
-			character: '3',
-		},
-	} );
-	useShortcut( 'core/blocks/paragraph/transform-to-heading-3', ( event ) => {
-		event.preventDefault();
-		replaceBlocks(
-			clientId,
-			createBlock( 'core/heading', { level: 3, content, align } )
-		);
-	} );
-
-	registerShortcut( {
-		name: 'core/blocks/paragraph/transform-to-heading-4',
-		category: 'block-library',
-		description: __( 'Transform to heading.' ),
-		keyCombination: {
-			modifier: 'access',
-			character: '4',
-		},
-	} );
-	useShortcut( 'core/blocks/paragraph/transform-to-heading-4', ( event ) => {
-		event.preventDefault();
-		replaceBlocks(
-			clientId,
-			createBlock( 'core/heading', { level: 4, content, align } )
-		);
-	} );
-
-	registerShortcut( {
-		name: 'core/blocks/paragraph/transform-to-heading-5',
-		category: 'block-library',
-		description: __( 'Transform to heading.' ),
-		keyCombination: {
-			modifier: 'access',
-			character: '5',
-		},
-	} );
-	useShortcut( 'core/blocks/paragraph/transform-to-heading-5', ( event ) => {
-		event.preventDefault();
-		replaceBlocks(
-			clientId,
-			createBlock( 'core/heading', { level: 5, content, align } )
-		);
-	} );
-
-	registerShortcut( {
-		name: 'core/blocks/paragraph/transform-to-heading-6',
-		category: 'block-library',
-		description: __( 'Transform to heading.' ),
-		keyCombination: {
-			modifier: 'access',
-			character: '6',
-		},
-	} );
-	useShortcut( 'core/blocks/paragraph/transform-to-heading-6', ( event ) => {
-		event.preventDefault();
-		replaceBlocks(
-			clientId,
-			createBlock( 'core/heading', { level: 6, content, align } )
-		);
-	} );
-
-	return null;
-}
-
 function ParagraphBlock( {
 	attributes,
 	mergeBlocks,
@@ -174,6 +60,7 @@ function ParagraphBlock( {
 } ) {
 	const { align, content, direction, dropCap, placeholder } = attributes;
 	const isDropCapFeatureEnabled = useSetting( 'typography.dropCap' );
+	const semanticShorcutsHandler = useSemanticLevelShortcuts();
 	const blockProps = useBlockProps( {
 		ref: useOnEnter( { clientId, content } ),
 		className: classnames( {
@@ -194,10 +81,6 @@ function ParagraphBlock( {
 
 	return (
 		<>
-			<ParagrapgShortcuts
-				attributes={ attributes }
-				clientId={ clientId }
-			/>
 			<BlockControls group="block">
 				<AlignmentControl
 					value={ align }
@@ -278,6 +161,7 @@ function ParagraphBlock( {
 								'Empty block; start writing or type forward slash to choose a block'
 						  )
 				}
+				onKeyDown={ semanticShorcutsHandler }
 				data-empty={ content ? false : true }
 				placeholder={ placeholder || __( 'Type / to choose a block' ) }
 				data-custom-placeholder={ placeholder ? true : undefined }

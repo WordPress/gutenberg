@@ -14,6 +14,7 @@ export {
 	useCachedTruthy,
 	useLayoutClasses as __experimentaluseLayoutClasses,
 	useLayoutStyles as __experimentaluseLayoutStyles,
+	useSemanticLevelShortcuts,
 } from './hooks';
 export * from './components';
 export * from './elements';

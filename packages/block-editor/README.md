@@ -807,6 +807,16 @@ _Parameters_
 -   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 -   _options_ `Object`: Optional. Inner blocks options.
 
+### useSemanticLevelShortcuts
+
+Registers keyboard shortcuts for blocks that participate
+in document structure such as paragraphs and headings, allowing
+a user to cycle through diverent document levels.
+
+_Returns_
+
+-   `any`: value
+
 ### useSetting
 
 Hook that retrieves the given setting for the block instance in use.

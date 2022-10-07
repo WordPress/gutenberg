@@ -102,6 +102,7 @@ function RichTextWrapper(
 		onRemove,
 		onMerge,
 		onSplit,
+		onKeyDown = false,
 		__unstableOnSplitAtEnd: onSplitAtEnd,
 		__unstableOnSplitMiddle: onSplitMiddle,
 		identifier,
@@ -317,7 +318,13 @@ function RichTextWrapper(
 	const keyboardShortcuts = useRef( new Set() );
 	const inputEvents = useRef( new Set() );
 
-	function onKeyDown( event ) {
+	if ( ! onKeyDown ) {
+		onKeyDown = ( event, defaultHandler ) => {
+			defaultHandler( event );
+		};
+	}
+
+	function onKeyDownHandler( event ) {
 		const { keyCode } = event;
 
 		if ( event.defaultPrevented ) {
@@ -449,7 +456,9 @@ function RichTextWrapper(
 					'rich-text'
 				) }
 				onFocus={ unstableOnFocus }
-				onKeyDown={ onKeyDown }
+				onKeyDown={ ( event ) => {
+					onKeyDown( event, onKeyDownHandler );
+				} }
 			/>
 		</>
 	);
