@@ -644,17 +644,19 @@ export function showInsertionPoint(
 		__unstableWithInserter,
 	};
 }
-
 /**
  * Action that hides the insertion point.
- *
- * @return {Object} Action object.
  */
-export function hideInsertionPoint() {
-	return {
-		type: 'HIDE_INSERTION_POINT',
+export const hideInsertionPoint =
+	() =>
+	( { select, dispatch } ) => {
+		if ( ! select.isBlockInsertionPointVisible() ) {
+			return;
+		}
+		dispatch( {
+			type: 'HIDE_INSERTION_POINT',
+		} );
 	};
-}
 
 /**
  * Action that resets the template validity.

@@ -10,7 +10,7 @@ import {
 } from '@wordpress/blocks';
 import {
 	PanelBody,
-	__experimentalUseSlot as useSlot,
+	__experimentalUseSlotFills as useSlotFills,
 	FlexItem,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -40,6 +40,7 @@ function useContentBlocks( blockTypes, block ) {
 	const contenBlocksObjectAux = useMemo( () => {
 		return blockTypes.reduce( ( result, blockType ) => {
 			if (
+				blockType.name !== 'core/list-item' &&
 				Object.entries( blockType.attributes ).some(
 					( [ , { __experimentalRole } ] ) =>
 						__experimentalRole === 'content'
@@ -143,7 +144,6 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			getSelectedBlockCount,
 			getBlockName,
 			__unstableGetContentLockingParent,
-			getTemplateLock,
 		} = select( blockEditorStore );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
@@ -157,12 +157,9 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			selectedBlockClientId: _selectedBlockClientId,
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
-			topLevelLockedBlock:
-				getTemplateLock( _selectedBlockClientId ) === 'contentOnly'
-					? _selectedBlockClientId
-					: __unstableGetContentLockingParent(
-							_selectedBlockClientId
-					  ),
+			topLevelLockedBlock: __unstableGetContentLockingParent(
+				_selectedBlockClientId
+			),
 		};
 	}, [] );
 
@@ -284,8 +281,8 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 };
 
 const AdvancedControls = () => {
-	const slot = useSlot( InspectorAdvancedControls.slotName );
-	const hasFills = Boolean( slot.fills && slot.fills.length );
+	const fills = useSlotFills( InspectorAdvancedControls.slotName );
+	const hasFills = Boolean( fills && fills.length );
 
 	if ( ! hasFills ) {
 		return null;

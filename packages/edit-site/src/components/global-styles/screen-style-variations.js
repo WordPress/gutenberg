@@ -87,6 +87,7 @@ function Variation( { variation } ) {
 					<StylesPreview
 						label={ variation?.title }
 						isFocused={ isFocused }
+						withHoverView
 					/>
 				</div>
 			</div>
@@ -125,7 +126,7 @@ function ScreenStyleVariations() {
 				back="/"
 				title={ __( 'Browse styles' ) }
 				description={ __(
-					'Choose a different style combination for the theme styles'
+					'Choose a variation to change the look of the site.'
 				) }
 			/>
 

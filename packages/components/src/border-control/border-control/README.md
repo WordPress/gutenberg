@@ -66,6 +66,12 @@ This toggles the ability to choose custom colors.
 
 - Required: No
 
+### `disableUnits`: `boolean`
+
+This controls whether unit selection should be disabled.
+
+- Required: No
+
 ### `enableAlpha`: `boolean`
 
 This controls whether the alpha channel will be offered when selecting
