@@ -156,6 +156,12 @@
 		"parent": "block-tutorial"
 	},
 	{
+		"title": "Extending the Query Loop block",
+		"slug": "extending-the-query-loop-block",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/extending-the-query-loop-block.md",
+		"parent": "block-tutorial"
+	},
+	{
 		"title": "Development Platform",
 		"slug": "platform",
 		"markdown_source": "../docs/how-to-guides/platform/README.md",
@@ -306,7 +312,7 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Propagating updates for block types ",
+		"title": "Propagating updates for block types",
 		"slug": "propagating-updates",
 		"markdown_source": "../docs/how-to-guides/propagating-updates.md",
 		"parent": "how-to-guides"

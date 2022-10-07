@@ -15,7 +15,7 @@ jobs:
         steps:
             # Checkout defaults to using the branch which triggered the event, which
             # isn't necessarily `trunk` (e.g. in the case of a merge).
-            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
               with:
                   ref: trunk
 
@@ -25,7 +25,7 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - name: Cache NPM packages
-              uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
+              uses: actions/cache@56461b9eb0f8438fd15c7a9968e3c9ebb18ceff1 # v3.0.10
               with:
                   # npm cache files are stored in `~/.npm` on Linux/macOS
                   path: ~/.npm

@@ -6,18 +6,10 @@
  * @subpackage style-engine
  */
 
-// Check for the existence of Style Engine classes and methods.
-// Once the Style Engine has been migrated to Core we can remove the if statements and require imports.
-// Testing new features from the Gutenberg package may require
-// testing against `gutenberg_` and `_Gutenberg` functions and methods in the future.
-if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
-	require __DIR__ . '/../class-wp-style-engine-css-declarations.php';
-}
-
 /**
  * Tests registering, storing and generating CSS declarations.
  *
- * @coversDefaultClass WP_Style_Engine_CSS_Declarations
+ * @coversDefaultClass WP_Style_Engine_CSS_Declarations_Gutenberg
  */
 class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	/**
@@ -30,7 +22,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 			'margin-top' => '10px',
 			'font-size'  => '2rem',
 		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations_Gutenberg( $input_declarations );
 		$this->assertSame( $input_declarations, $css_declarations->get_declarations() );
 	}
 
@@ -45,7 +37,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 			'padding' => '20px',
 			'color'   => 'var(--wp--preset--elbow-patches)',
 		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations();
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations_Gutenberg();
 		$css_declarations->add_declarations( $input_declarations );
 
 		$this->assertSame( $input_declarations, $css_declarations->get_declarations() );
@@ -62,7 +54,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 			'border-width'     => '1%',
 			'background-color' => 'var(--wp--preset--english-mustard)',
 		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations_Gutenberg( $input_declarations );
 		$extra_declaration  = array(
 			'letter-spacing' => '1.5px',
 		);
@@ -82,7 +74,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 			'^--wp--style--sleepy-potato$' => '40px',
 			'<background-//color>'         => 'var(--wp--preset--english-mustard)',
 		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations_Gutenberg( $input_declarations );
 
 		$this->assertSame(
 			array(
@@ -107,7 +99,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 			'cheese'       => '10px',
 			'margin-right' => '10em',
 		);
-		$css_declarations           = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+		$css_declarations           = new WP_Style_Engine_CSS_Declarations_Gutenberg( $input_declarations );
 		$safe_style_css_mock_action = new MockAction();
 
 		// filter_declaration() is called in get_declarations_string().
@@ -146,7 +138,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 			'line-height'      => 'url("https://wordpress.org")',
 			'margin'           => 'illegalfunction(30px)',
 		);
-		$css_declarations                          = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+		$css_declarations                          = new WP_Style_Engine_CSS_Declarations_Gutenberg( $input_declarations );
 		$safecss_filter_attr_allow_css_mock_action = new MockAction();
 
 		// filter_declaration() is called in get_declarations_string().
@@ -183,7 +175,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 			'border-top-left-radius' => '99px',
 			'text-decoration'        => 'underline',
 		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations_Gutenberg( $input_declarations );
 
 		$this->assertSame(
 			$expected,
@@ -234,7 +226,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 			'margin'      => '10em 10em 20em 1px',
 			'font-family' => 'Happy Font serif',
 		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations_Gutenberg( $input_declarations );
 
 		$this->assertSame(
 			'color:tomato;margin:10em 10em 20em 1px;font-family:Happy Font serif;',
@@ -262,7 +254,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 			'margin'      => '10em 10em 20em 1px',
 			'font-family' => 'Happy Font serif',
 		);
-		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations_Gutenberg( $input_declarations );
 
 		$this->assertSame(
 			'color:cucumber;margin:10em 10em 20em 1px;font-family:Happy Font serif;',
