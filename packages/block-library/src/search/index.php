@@ -442,7 +442,16 @@ function get_typography_styles_for_block_core_search( $attributes ) {
 
 	// Add typography styles.
 	if ( ! empty( $attributes['style']['typography']['fontSize'] ) ) {
-		$typography_styles[] = sprintf( 'font-size: %s;', esc_attr( $attributes['style']['typography']['fontSize'] ) );
+		$typography_styles[] = sprintf(
+			'font-size: %s;',
+			gutenberg_get_typography_font_size_value(
+				array(
+					'size'  => esc_attr( $attributes['style']['typography']['fontSize'] ),
+					'fluid' => true,
+				)
+			)
+		);
+
 	}
 
 	if ( ! empty( $attributes['style']['typography']['fontFamily'] ) ) {
