@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	InspectorControls,
 	BlockControls,
@@ -16,6 +16,7 @@ import {
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -25,6 +26,7 @@ import {
 	TextControl,
 	ToggleControl,
 	ToolbarDropdownMenu,
+	__experimentalHasSplitBorders as hasSplitBorders,
 } from '@wordpress/components';
 import {
 	alignLeft,
@@ -39,7 +41,7 @@ import {
 	tableRowDelete,
 	table,
 } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -104,6 +106,9 @@ function TableEdit( {
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
 
+	const tableRef = useRef();
+	const [ hasTableCreated, setHasTableCreated ] = useState( false );
+
 	/**
 	 * Updates the initial column count used for table creation.
 	 *
@@ -136,6 +141,7 @@ function TableEdit( {
 				columnCount: parseInt( initialColumnCount, 10 ) || 2,
 			} )
 		);
+		setHasTableCreated( true );
 	}
 
 	/**
@@ -340,6 +346,15 @@ function TableEdit( {
 		}
 	}, [ isSelected ] );
 
+	useEffect( () => {
+		if ( hasTableCreated ) {
+			tableRef?.current
+				?.querySelector( 'td[contentEditable="true"]' )
+				?.focus();
+			setHasTableCreated( false );
+		}
+	}, [ hasTableCreated ] );
+
 	const sections = [ 'head', 'body', 'foot' ].filter(
 		( name ) => ! isEmptyTableSection( attributes[ name ] )
 	);
@@ -425,7 +440,7 @@ function TableEdit( {
 	const isEmpty = ! sections.length;
 
 	return (
-		<figure { ...useBlockProps() }>
+		<figure { ...useBlockProps( { ref: tableRef } ) }>
 			{ ! isEmpty && (
 				<>
 					<BlockControls group="block">
@@ -451,7 +466,7 @@ function TableEdit( {
 			{ ! isEmpty && (
 				<InspectorControls>
 					<PanelBody
-						title={ __( 'Table settings' ) }
+						title={ __( 'Settings' ) }
 						className="blocks-table-settings"
 					>
 						<ToggleControl
@@ -477,7 +492,15 @@ function TableEdit( {
 					className={ classnames(
 						colorProps.className,
 						borderProps.className,
-						{ 'has-fixed-layout': hasFixedLayout }
+						{
+							'has-fixed-layout': hasFixedLayout,
+							// This is required in the editor only to overcome
+							// the fact the editor rewrites individual border
+							// widths into a shorthand format.
+							'has-individual-borders': hasSplitBorders(
+								attributes?.style?.border
+							),
+						}
 					) }
 					style={ { ...colorProps.style, ...borderProps.style } }
 				>
@@ -487,6 +510,7 @@ function TableEdit( {
 			{ ! isEmpty && (
 				<RichText
 					tagName="figcaption"
+					className={ __experimentalGetElementClassName( 'caption' ) }
 					aria-label={ __( 'Table caption text' ) }
 					placeholder={ __( 'Add caption' ) }
 					value={ caption }
@@ -496,7 +520,9 @@ function TableEdit( {
 					// Deselect the selected table cell when the caption is focused.
 					unstableOnFocus={ () => setSelectedCell() }
 					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						insertBlocksAfter(
+							createBlock( getDefaultBlockName() )
+						)
 					}
 				/>
 			) }

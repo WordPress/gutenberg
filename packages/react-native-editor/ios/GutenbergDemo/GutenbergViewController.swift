@@ -88,9 +88,9 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             case .image:
                 if(allowMultipleSelection) {
                     callback([MediaInfo(id: 1, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image"),
-                              MediaInfo(id: 3, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain")])
+                              MediaInfo(id: 3, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain", alt: "A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground")])
                 } else {
-                    callback([MediaInfo(id: 1, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain")])
+                    callback([MediaInfo(id: 1, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain", alt: "A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground")])
                 }
             case .video:
                 if(allowMultipleSelection) {
@@ -304,6 +304,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
 
     func gutenbergInitialTitle() -> String? {
         return nil
+    }
+
+    func gutenbergHostAppNamespace() -> String {
+        return "WordPress"
     }
 
     func gutenbergFeaturedImageId() -> NSNumber? {

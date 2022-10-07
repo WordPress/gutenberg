@@ -3,6 +3,11 @@
  */
 import type { CSSProperties } from 'react';
 
+/**
+ * Internal dependencies
+ */
+import type { PopoverProps } from '../popover/types';
+
 export type Border = {
 	color?: CSSProperties[ 'borderColor' ];
 	style?: CSSProperties[ 'borderStyle' ];
@@ -63,6 +68,10 @@ export type LabelProps = {
 export type BorderControlProps = ColorProps &
 	LabelProps & {
 		/**
+		 * This controls whether unit selection should be disabled.
+		 */
+		disableUnits?: boolean;
+		/**
 		 * This controls whether to include border style options within the
 		 * `BorderDropdown` sub-component.
 		 *
@@ -81,10 +90,9 @@ export type BorderControlProps = ColorProps &
 		 */
 		onChange: ( value?: Border ) => void;
 		/**
-		 * A custom CSS class name to be assigned to the border control's
-		 * dropdown popover content.
+		 * An internal prop used to control the visibility of the dropdown.
 		 */
-		popoverContentClassName?: string;
+		__unstablePopoverProps?: Omit< PopoverProps, 'children' >;
 		/**
 		 * If opted into, sanitizing the border means that if no width or color
 		 * have been selected, the border style is also cleared and `undefined`
@@ -114,6 +122,13 @@ export type BorderControlProps = ColorProps &
 		 * `RangeControl` for additional control over a border's width.
 		 */
 		withSlider?: boolean;
+		/**
+		 * Start opting into the larger default height that will become the
+		 * default size in a future version.
+		 *
+		 * @default false
+		 */
+		__next36pxDefaultSize?: boolean;
 	};
 
 export type DropdownProps = ColorProps & {
@@ -124,10 +139,9 @@ export type DropdownProps = ColorProps & {
 	 */
 	border?: Border;
 	/**
-	 * A custom CSS class name to be assigned to the border control's
-	 * dropdown popover content.
+	 * An internal prop used to control the visibility of the dropdown.
 	 */
-	contentClassName?: string;
+	__unstablePopoverProps?: Omit< PopoverProps, 'children' >;
 	/**
 	 * This controls whether to render border style options.
 	 *
@@ -150,6 +164,13 @@ export type DropdownProps = ColorProps & {
 	 * close button.
 	 */
 	showDropdownHeader?: boolean;
+	/**
+	 * Start opting into the larger default height that will become the
+	 * default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next36pxDefaultSize?: boolean;
 };
 
 export type StylePickerProps = LabelProps & {
@@ -163,11 +184,4 @@ export type StylePickerProps = LabelProps & {
 	 * to store other valid CSS values is maintained e.g. `none`, `inherit` etc.
 	 */
 	value?: string;
-};
-
-export type PopoverProps = {
-	/**
-	 * Callback function to invoke when closing the border dropdown's popover.
-	 */
-	onClose: () => void;
 };

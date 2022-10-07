@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { check } from '@wordpress/icons';
@@ -15,17 +10,14 @@ import { MenuItem } from '@wordpress/components';
 import ComplementaryAreaToggle from '../complementary-area-toggle';
 import ActionItem from '../action-item';
 
-const PluginsMenuItem = ( props ) => (
+const PluginsMenuItem = ( {
 	// Menu item is marked with unstable prop for backward compatibility.
 	// They are removed so they don't leak to DOM elements.
 	// @see https://github.com/WordPress/gutenberg/issues/14457
-	<MenuItem
-		{ ...omit( props, [
-			'__unstableExplicitMenuItem',
-			'__unstableTarget',
-		] ) }
-	/>
-);
+	__unstableExplicitMenuItem,
+	__unstableTarget,
+	...restProps
+} ) => <MenuItem { ...restProps } />;
 
 export default function ComplementaryAreaMoreMenuItem( {
 	scope,

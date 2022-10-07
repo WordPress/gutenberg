@@ -4,7 +4,7 @@
 import { createRegistry } from '../../registry';
 import { createRegistryControl } from '../../factory';
 
-jest.useFakeTimers();
+jest.useRealTimers();
 
 describe( 'controls', () => {
 	let registry;
@@ -32,9 +32,10 @@ describe( 'controls', () => {
 				},
 				controls: {
 					DISPATCH: createRegistryControl(
-						( reg ) => ( { store, action } ) => {
-							return reg.dispatch( store )[ action ]();
-						}
+						( reg ) =>
+							( { store, action } ) => {
+								return reg.dispatch( store )[ action ]();
+							}
 					),
 				},
 			} );
@@ -90,7 +91,6 @@ describe( 'controls', () => {
 			} );
 
 			registry.select( 'store' ).getItems();
-			jest.runAllTimers();
 		} );
 	} );
 	describe( 'selectors have expected value for the `hasResolver` property', () => {
@@ -250,6 +250,7 @@ describe( 'resolveSelect', () => {
 			},
 			selectors: {
 				getItems: () => 'items',
+				getItemsNoResolver: () => 'items-no-resolver',
 			},
 			resolvers: {
 				getItems: () => {
@@ -264,16 +265,26 @@ describe( 'resolveSelect', () => {
 	it( 'resolves when the resolution succeeded', async () => {
 		shouldFail = false;
 		const promise = registry.resolveSelect( 'store' ).getItems();
-		jest.runAllTimers();
-		await expect( promise ).resolves.toEqual( 'items' );
+		await expect( promise ).resolves.toBe( 'items' );
 	} );
 
 	it( 'rejects when the resolution failed', async () => {
 		shouldFail = true;
 		const promise = registry.resolveSelect( 'store' ).getItems();
-		jest.runAllTimers();
 		await expect( promise ).rejects.toEqual(
 			new Error( 'cannot fetch items' )
 		);
+	} );
+
+	it( 'resolves when calling a sync selector without resolver', async () => {
+		const promise = registry.resolveSelect( 'store' ).getItemsNoResolver();
+		await expect( promise ).resolves.toBe( 'items-no-resolver' );
+	} );
+
+	it( 'returns only store native selectors and excludes all meta ones', () => {
+		expect( Object.keys( registry.resolveSelect( 'store' ) ) ).toEqual( [
+			'getItems',
+			'getItemsNoResolver',
+		] );
 	} );
 } );

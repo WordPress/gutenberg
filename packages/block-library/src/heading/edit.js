@@ -42,16 +42,18 @@ function HeadingEdit( {
 	} );
 
 	const { canGenerateAnchors } = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
+		const { getGlobalBlockCount, getSettings } = select( blockEditorStore );
+		const settings = getSettings();
 
 		return {
-			canGenerateAnchors: !! settings.__experimentalGenerateAnchors,
+			canGenerateAnchors:
+				!! settings.generateAnchors ||
+				getGlobalBlockCount( 'core/table-of-contents' ) > 0,
 		};
 	}, [] );
 
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	// Initially set anchor for headings that have content but no anchor set.
 	// This is used when transforming a block to heading, or for legacy anchors.

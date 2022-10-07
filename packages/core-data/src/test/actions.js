@@ -58,6 +58,11 @@ describe( 'deleteEntityRecord', () => {
 		jest.useFakeTimers();
 	} );
 
+	afterEach( () => {
+		jest.runOnlyPendingTimers();
+		jest.useRealTimers();
+	} );
+
 	it( 'triggers a DELETE request for an existing record', async () => {
 		const deletedRecord = { title: 'new post', id: 10 };
 		const configs = [
@@ -180,13 +185,18 @@ describe( 'saveEditedEntityRecord', () => {
 		jest.useFakeTimers();
 	} );
 
+	afterEach( () => {
+		jest.runOnlyPendingTimers();
+		jest.useRealTimers();
+	} );
+
 	it( 'Uses "id" as a key when no entity key is provided', async () => {
-		const area = { id: 1, menu: 0 };
+		const item = { id: 1, menu: 0 };
 		const configs = [
 			{
 				kind: 'root',
-				name: 'navigationArea',
-				baseURL: '/wp/v2/block-navigation-areas',
+				name: 'menuItem',
+				baseURL: '/wp/v2/menu-items',
 			},
 		];
 		const select = {
@@ -201,33 +211,33 @@ describe( 'saveEditedEntityRecord', () => {
 		dispatch.mockReturnValueOnce( configs );
 
 		// Provide response
-		const updatedRecord = { ...area, menu: 10 };
+		const updatedRecord = { ...item, menu: 10 };
 		apiFetch.mockImplementation( () => {
 			return updatedRecord;
 		} );
 
 		await saveEditedEntityRecord(
 			'root',
-			'navigationArea',
+			'menuItem',
 			1
 		)( { dispatch, select } );
 
 		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
 			'root',
-			'navigationArea',
+			'menuItem',
 			{ id: 1 },
 			undefined
 		);
 	} );
 
 	it( 'Uses the entity key when provided', async () => {
-		const area = { area: 'primary', menu: 0 };
+		const item = { name: 'primary', menu: 0 };
 		const configs = [
 			{
 				kind: 'root',
-				name: 'navigationArea',
-				baseURL: '/wp/v2/block-navigation-areas',
-				key: 'area',
+				name: 'menuLocation',
+				baseURL: '/wp/v2/menu-items',
+				key: 'name',
 			},
 		];
 		const select = {
@@ -242,21 +252,21 @@ describe( 'saveEditedEntityRecord', () => {
 		dispatch.mockReturnValueOnce( configs );
 
 		// Provide response
-		const updatedRecord = { ...area, menu: 10 };
+		const updatedRecord = { ...item, menu: 10 };
 		apiFetch.mockImplementation( () => {
 			return updatedRecord;
 		} );
 
 		await saveEditedEntityRecord(
 			'root',
-			'navigationArea',
+			'menuLocation',
 			'primary'
 		)( { dispatch, select } );
 
 		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
 			'root',
-			'navigationArea',
-			{ area: 'primary' },
+			'menuLocation',
+			{ name: 'primary' },
 			undefined
 		);
 	} );
@@ -264,6 +274,7 @@ describe( 'saveEditedEntityRecord', () => {
 
 describe( 'saveEntityRecord', () => {
 	let dispatch;
+
 	beforeEach( async () => {
 		apiFetch.mockReset();
 		jest.useFakeTimers();
@@ -272,6 +283,11 @@ describe( 'saveEntityRecord', () => {
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
+	} );
+
+	afterEach( () => {
+		jest.runOnlyPendingTimers();
+		jest.useRealTimers();
 	} );
 
 	it( 'triggers a POST request for a new record', async () => {

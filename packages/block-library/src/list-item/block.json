@@ -14,7 +14,7 @@
 		"content": {
 			"type": "string",
 			"source": "html",
-    		"selector": "li",
+			"selector": "li",
 			"default": "",
 			"__experimentalRole": "content"
 		}

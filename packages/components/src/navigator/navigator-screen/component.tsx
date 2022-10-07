@@ -83,6 +83,14 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 			return;
 		}
 
+		const activeElement = wrapperRef.current.ownerDocument.activeElement;
+
+		// If an element is already focused within the wrapper do not focus the
+		// element. This prevents inputs or buttons from losing focus unecessarily.
+		if ( wrapperRef.current.contains( activeElement ) ) {
+			return;
+		}
+
 		let elementToFocus: HTMLElement | null = null;
 
 		// When navigating back, if a selector is provided, use it to look for the
@@ -96,15 +104,19 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 		// If the previous query didn't run or find any element to focus, fallback
 		// to the first tabbable element in the screen (or the screen itself).
 		if ( ! elementToFocus ) {
-			const firstTabbable = ( focus.tabbable.find(
-				wrapperRef.current
-			) as HTMLElement[] )[ 0 ];
-
+			const firstTabbable = (
+				focus.tabbable.find( wrapperRef.current ) as HTMLElement[]
+			 )[ 0 ];
 			elementToFocus = firstTabbable ?? wrapperRef.current;
 		}
 
 		elementToFocus.focus();
-	}, [ isInitialLocation, isMatch ] );
+	}, [
+		isInitialLocation,
+		isMatch,
+		location.isBack,
+		previousLocation?.focusTargetSelector,
+	] );
 
 	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
 

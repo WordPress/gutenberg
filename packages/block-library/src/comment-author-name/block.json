@@ -4,13 +4,13 @@
 	"name": "core/comment-author-name",
 	"title": "Comment Author Name",
 	"category": "theme",
-	"parent": [ "core/comment-template" ],
+	"ancestor": [ "core/comment-template" ],
 	"description": "Displays the name of the author of the comment.",
 	"textdomain": "default",
 	"attributes": {
 		"isLink": {
 			"type": "boolean",
-			"default": false
+			"default": true
 		},
 		"linkTarget": {
 			"type": "string",
@@ -43,7 +43,11 @@
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
-			"__experimentalLetterSpacing": true
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		}
 	}
 }

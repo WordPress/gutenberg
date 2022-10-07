@@ -157,12 +157,12 @@ function apiFetch( options ) {
 	// ```
 	// opts1 => m1( opts1, opts2 => m2( opts2, opts3 => m3( opts3, fetchHandler ) ) );
 	// ```
-	const enhancedHandler = middlewares.reduceRight( (
-		/** @type {FetchHandler} */ next,
-		middleware
-	) => {
-		return ( workingOptions ) => middleware( workingOptions, next );
-	}, fetchHandler );
+	const enhancedHandler = middlewares.reduceRight(
+		( /** @type {FetchHandler} */ next, middleware ) => {
+			return ( workingOptions ) => middleware( workingOptions, next );
+		},
+		fetchHandler
+	);
 
 	return enhancedHandler( options ).catch( ( error ) => {
 		if ( error.code !== 'rest_cookie_invalid_nonce' ) {

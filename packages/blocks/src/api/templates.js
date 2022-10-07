@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { every, map, get, mapValues, isArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
@@ -26,7 +21,7 @@ import { getBlockType } from './registration';
 export function doBlocksMatchTemplate( blocks = [], template = [] ) {
 	return (
 		blocks.length === template.length &&
-		every( template, ( [ name, , innerBlocksTemplate ], index ) => {
+		template.every( ( [ name, , innerBlocksTemplate ], index ) => {
 			const block = blocks[ index ];
 			return (
 				name === block.name &&
@@ -55,8 +50,7 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 		return blocks;
 	}
 
-	return map(
-		template,
+	return template.map(
 		( [ name, attributes, innerBlocksTemplate ], index ) => {
 			const block = blocks[ index ];
 
@@ -74,17 +68,24 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 
 			const blockType = getBlockType( name );
 			const isHTMLAttribute = ( attributeDefinition ) =>
-				get( attributeDefinition, [ 'source' ] ) === 'html';
+				attributeDefinition?.source === 'html';
 			const isQueryAttribute = ( attributeDefinition ) =>
-				get( attributeDefinition, [ 'source' ] ) === 'query';
+				attributeDefinition?.source === 'query';
 
 			const normalizeAttributes = ( schema, values ) => {
-				return mapValues( values, ( value, key ) => {
-					return normalizeAttribute( schema[ key ], value );
-				} );
+				if ( ! values ) {
+					return {};
+				}
+
+				return Object.fromEntries(
+					Object.entries( values ).map( ( [ key, value ] ) => [
+						key,
+						normalizeAttribute( schema[ key ], value ),
+					] )
+				);
 			};
 			const normalizeAttribute = ( definition, value ) => {
-				if ( isHTMLAttribute( definition ) && isArray( value ) ) {
+				if ( isHTMLAttribute( definition ) && Array.isArray( value ) ) {
 					// Introduce a deprecated call at this point
 					// When we're confident that "children" format should be removed from the templates.
 
@@ -104,17 +105,15 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 			};
 
 			const normalizedAttributes = normalizeAttributes(
-				get( blockType, [ 'attributes' ], {} ),
+				blockType?.attributes ?? {},
 				attributes
 			);
 
-			let [
-				blockName,
-				blockAttributes,
-			] = convertLegacyBlockNameAndAttributes(
-				name,
-				normalizedAttributes
-			);
+			let [ blockName, blockAttributes ] =
+				convertLegacyBlockNameAndAttributes(
+					name,
+					normalizedAttributes
+				);
 
 			// If a Block is undefined at this point, use the core/missing block as
 			// a placeholder for a better user experience.

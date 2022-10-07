@@ -2,7 +2,7 @@
  * External dependencies
  */
 import glob from 'fast-glob';
-import { fromPairs, startsWith, get } from 'lodash';
+import { get } from 'lodash';
 import { format } from 'util';
 
 /**
@@ -57,15 +57,13 @@ describe( 'full post content fixture', () => {
 		const blockMetadataFiles = glob.sync(
 			'packages/block-library/src/*/block.json'
 		);
-		const blockDefinitions = fromPairs(
+		const blockDefinitions = Object.fromEntries(
 			blockMetadataFiles.map( ( file ) => {
 				const { name, ...metadata } = require( file );
 				return [ name, metadata ];
 			} )
 		);
 		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
-		// Load all hooks that modify blocks.
-		require( '../../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 		if ( process.env.IS_GUTENBERG_PLUGIN ) {
 			__experimentalRegisterExperimentalCoreBlocks( {
@@ -84,10 +82,8 @@ describe( 'full post content fixture', () => {
 	blockBasenames.forEach( ( basename ) => {
 		// eslint-disable-next-line jest/valid-title
 		it( basename, () => {
-			const {
-				filename: htmlFixtureFileName,
-				file: htmlFixtureContent,
-			} = getBlockFixtureHTML( basename );
+			const { filename: htmlFixtureFileName, file: htmlFixtureContent } =
+				getBlockFixtureHTML( basename );
 			if ( htmlFixtureContent === null ) {
 				throw new Error(
 					`Missing fixture file: ${ htmlFixtureFileName }`
@@ -144,13 +140,10 @@ describe( 'full post content fixture', () => {
 				/* eslint-enable no-console */
 			}
 
-			const blocksActualNormalized = normalizeParsedBlocks(
-				blocksActual
-			);
-			const {
-				filename: jsonFixtureFileName,
-				file: jsonFixtureContent,
-			} = getBlockFixtureJSON( basename );
+			const blocksActualNormalized =
+				normalizeParsedBlocks( blocksActual );
+			const { filename: jsonFixtureFileName, file: jsonFixtureContent } =
+				getBlockFixtureJSON( basename );
 
 			let blocksExpectedString;
 
@@ -244,15 +237,13 @@ describe( 'full post content fixture', () => {
 					.filter(
 						( basename ) =>
 							basename === nameToFilename ||
-							startsWith( basename, nameToFilename + '__' )
+							basename.startsWith( nameToFilename + '__' )
 					)
 					.map( ( basename ) => {
-						const {
-							filename: htmlFixtureFileName,
-						} = getBlockFixtureHTML( basename );
-						const {
-							file: jsonFixtureContent,
-						} = getBlockFixtureJSON( basename );
+						const { filename: htmlFixtureFileName } =
+							getBlockFixtureHTML( basename );
+						const { file: jsonFixtureContent } =
+							getBlockFixtureJSON( basename );
 						// The parser output for this test.  For missing files,
 						// JSON.parse( null ) === null.
 						const parserOutput = JSON.parse( jsonFixtureContent );

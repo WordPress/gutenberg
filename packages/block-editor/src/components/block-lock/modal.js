@@ -10,34 +10,54 @@ import {
 	FlexItem,
 	Icon,
 	Modal,
+	ToggleControl,
 } from '@wordpress/components';
-import { dragHandle, trash } from '@wordpress/icons';
+import { lock as lockIcon, unlock as unlockIcon } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { isReusableBlock, getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import useBlockLock from './use-block-lock';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 
+function getTemplateLockValue( lock ) {
+	// Prevents all operations.
+	if ( lock.remove && lock.move ) {
+		return 'all';
+	}
+
+	// Prevents inserting or removing blocks, but allows moving existing blocks.
+	if ( lock.remove && ! lock.move ) {
+		return 'insert';
+	}
+
+	return false;
+}
+
 export default function BlockLockModal( { clientId, onClose } ) {
 	const [ lock, setLock ] = useState( { move: false, remove: false } );
-	const { canMove, canRemove } = useSelect(
+	const { canEdit, canMove, canRemove } = useBlockLock( clientId );
+	const { isReusable, templateLock, hasTemplateLock } = useSelect(
 		( select ) => {
-			const {
-				canMoveBlock,
-				canRemoveBlock,
-				getBlockRootClientId,
-			} = select( blockEditorStore );
-			const rootClientId = getBlockRootClientId( clientId );
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
+			const blockName = getBlockName( clientId );
+			const blockType = getBlockType( blockName );
 
 			return {
-				canMove: canMoveBlock( clientId, rootClientId ),
-				canRemove: canRemoveBlock( clientId, rootClientId ),
+				isReusable: isReusableBlock( blockType ),
+				templateLock: getBlockAttributes( clientId )?.templateLock,
+				hasTemplateLock: !! blockType?.attributes?.templateLock,
 			};
 		},
 		[ clientId ]
+	);
+	const [ applyTemplateLock, setApplyTemplateLock ] = useState(
+		!! templateLock
 	);
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const blockInformation = useBlockDisplayInformation( clientId );
@@ -50,19 +70,12 @@ export default function BlockLockModal( { clientId, onClose } ) {
 		setLock( {
 			move: ! canMove,
 			remove: ! canRemove,
+			...( isReusable ? { edit: ! canEdit } : {} ),
 		} );
-	}, [ canMove, canRemove ] );
+	}, [ canEdit, canMove, canRemove, isReusable ] );
 
 	const isAllChecked = Object.values( lock ).every( Boolean );
-
-	let ariaChecked;
-	if ( isAllChecked ) {
-		ariaChecked = 'true';
-	} else if ( Object.values( lock ).some( Boolean ) ) {
-		ariaChecked = 'mixed';
-	} else {
-		ariaChecked = 'false';
-	}
+	const isMixed = Object.values( lock ).some( Boolean ) && ! isAllChecked;
 
 	return (
 		<Modal
@@ -75,18 +88,23 @@ export default function BlockLockModal( { clientId, onClose } ) {
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
 		>
+			<p>
+				{ __(
+					'Choose specific attributes to restrict or lock all available options.'
+				) }
+			</p>
 			<form
 				onSubmit={ ( event ) => {
 					event.preventDefault();
-					updateBlockAttributes( [ clientId ], { lock } );
+					updateBlockAttributes( [ clientId ], {
+						lock,
+						templateLock: applyTemplateLock
+							? getTemplateLockValue( lock )
+							: undefined,
+					} );
 					onClose();
 				} }
 			>
-				<p>
-					{ __(
-						'Choose specific attributes to restrict or lock all available options.'
-					) }
-				</p>
 				<div
 					role="group"
 					aria-labelledby={ instanceId }
@@ -98,21 +116,53 @@ export default function BlockLockModal( { clientId, onClose } ) {
 							<span id={ instanceId }>{ __( 'Lock all' ) }</span>
 						}
 						checked={ isAllChecked }
-						aria-checked={ ariaChecked }
+						indeterminate={ isMixed }
 						onChange={ ( newValue ) =>
 							setLock( {
 								move: newValue,
 								remove: newValue,
+								...( isReusable ? { edit: newValue } : {} ),
 							} )
 						}
 					/>
 					<ul className="block-editor-block-lock-modal__checklist">
+						{ isReusable && (
+							<li className="block-editor-block-lock-modal__checklist-item">
+								<CheckboxControl
+									label={
+										<>
+											{ __( 'Restrict editing' ) }
+											<Icon
+												icon={
+													lock.edit
+														? lockIcon
+														: unlockIcon
+												}
+											/>
+										</>
+									}
+									checked={ !! lock.edit }
+									onChange={ ( edit ) =>
+										setLock( ( prevLock ) => ( {
+											...prevLock,
+											edit,
+										} ) )
+									}
+								/>
+							</li>
+						) }
 						<li className="block-editor-block-lock-modal__checklist-item">
 							<CheckboxControl
 								label={
 									<>
 										{ __( 'Disable movement' ) }
-										<Icon icon={ dragHandle } />
+										<Icon
+											icon={
+												lock.move
+													? lockIcon
+													: unlockIcon
+											}
+										/>
 									</>
 								}
 								checked={ lock.move }
@@ -129,7 +179,13 @@ export default function BlockLockModal( { clientId, onClose } ) {
 								label={
 									<>
 										{ __( 'Prevent removal' ) }
-										<Icon icon={ trash } />
+										<Icon
+											icon={
+												lock.remove
+													? lockIcon
+													: unlockIcon
+											}
+										/>
 									</>
 								}
 								checked={ lock.remove }
@@ -142,6 +198,17 @@ export default function BlockLockModal( { clientId, onClose } ) {
 							/>
 						</li>
 					</ul>
+					{ hasTemplateLock && (
+						<ToggleControl
+							className="block-editor-block-lock-modal__template-lock"
+							label={ __( 'Apply to all blocks inside' ) }
+							checked={ applyTemplateLock }
+							disabled={ lock.move && ! lock.remove }
+							onChange={ () =>
+								setApplyTemplateLock( ! applyTemplateLock )
+							}
+						/>
+					) }
 				</div>
 				<Flex
 					className="block-editor-block-lock-modal__actions"

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -10,29 +10,33 @@ import { PostStickyCheck } from '../check';
 
 describe( 'PostSticky', () => {
 	it( 'should not render anything if the post type is not "post"', () => {
-		const wrapper = shallow(
+		render(
 			<PostStickyCheck postType="page" hasStickyAction={ true }>
 				Can Toggle Sticky
 			</PostStickyCheck>
 		);
-		expect( wrapper.type() ).toBe( null );
+		expect(
+			screen.queryByText( 'Can Toggle Sticky' )
+		).not.toBeInTheDocument();
 	} );
 
 	it( "should not render anything if post doesn't support stickying", () => {
-		const wrapper = shallow(
+		render(
 			<PostStickyCheck postType="post" hasStickyAction={ false }>
 				Can Toggle Sticky
 			</PostStickyCheck>
 		);
-		expect( wrapper.type() ).toBe( null );
+		expect(
+			screen.queryByText( 'Can Toggle Sticky' )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'should render if the post supports stickying', () => {
-		const wrapper = shallow(
+		render(
 			<PostStickyCheck postType="post" hasStickyAction={ true }>
 				Can Toggle Sticky
 			</PostStickyCheck>
 		);
-		expect( wrapper.type() ).not.toBe( null );
+		expect( screen.getByText( 'Can Toggle Sticky' ) ).toBeVisible();
 	} );
 } );

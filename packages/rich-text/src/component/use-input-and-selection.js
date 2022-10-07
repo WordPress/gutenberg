@@ -27,6 +27,8 @@ const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
 
 const EMPTY_ACTIVE_FORMATS = [];
 
+const PLACEHOLDER_ATTR_NAME = 'data-rich-text-placeholder';
+
 /**
  * If the selection is set on the placeholder element, collapse the selection to
  * the start (before the placeholder).
@@ -46,7 +48,7 @@ function fixPlaceholderSelection( defaultView ) {
 	if (
 		! targetNode ||
 		targetNode.nodeType !== targetNode.ELEMENT_NODE ||
-		! targetNode.getAttribute( 'data-rich-text-placeholder' )
+		! targetNode.hasAttribute( PLACEHOLDER_ATTR_NAME )
 	) {
 		return;
 	}
@@ -80,12 +82,8 @@ export function useInputAndSelection( props ) {
 				inputType = event.inputType;
 			}
 
-			const {
-				record,
-				applyRecord,
-				createRecord,
-				handleChange,
-			} = propsRef.current;
+			const { record, applyRecord, createRecord, handleChange } =
+				propsRef.current;
 
 			// The browser formatted something or tried to insert HTML.
 			// Overwrite it. It will be handled later by the format library if
@@ -100,10 +98,8 @@ export function useInputAndSelection( props ) {
 			}
 
 			const currentValue = createRecord();
-			const {
-				start,
-				activeFormats: oldActiveFormats = [],
-			} = record.current;
+			const { start, activeFormats: oldActiveFormats = [] } =
+				record.current;
 
 			// Update the formats between the last and new caret position.
 			const change = updateFormats( {
@@ -132,11 +128,27 @@ export function useInputAndSelection( props ) {
 				onSelectionChange,
 			} = propsRef.current;
 
+			// Check if the implementor disabled editing. `contentEditable`
+			// does disable input, but not text selection, so we must ignore
+			// selection changes.
+			if ( element.contentEditable !== 'true' ) {
+				return;
+			}
+
 			// If the selection changes where the active element is a parent of
 			// the rich text instance (writing flow), call `onSelectionChange`
 			// for the rich text instance that contains the start or end of the
 			// selection.
 			if ( ownerDocument.activeElement !== element ) {
+				// Only process if the active elment is contentEditable, either
+				// this rich text instance or the writing flow parent. Fixes a
+				// bug in Firefox where it strangely selects the closest
+				// contentEditable element, even though the click was outside
+				// any contentEditable element.
+				if ( ownerDocument.activeElement.contentEditable !== 'true' ) {
+					return;
+				}
+
 				if ( ! ownerDocument.activeElement.contains( element ) ) {
 					return;
 				}
@@ -160,10 +172,7 @@ export function useInputAndSelection( props ) {
 					const { start, end: offset = start } = createRecord();
 					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
 					onSelectionChange( offset );
-				} else if (
-					element.contains( focusNode ) &&
-					element !== focusNode
-				) {
+				} else if ( element.contains( focusNode ) ) {
 					const { start, end: offset = start } = createRecord();
 					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
 					onSelectionChange( undefined, offset );
@@ -231,12 +240,17 @@ export function useInputAndSelection( props ) {
 		function onCompositionStart() {
 			isComposing = true;
 			// Do not update the selection when characters are being composed as
-			// this rerenders the component and might distroy internal browser
+			// this rerenders the component and might destroy internal browser
 			// editing state.
 			ownerDocument.removeEventListener(
 				'selectionchange',
 				handleSelectionChange
 			);
+			// Remove the placeholder. Since the rich text value doesn't update
+			// during composition, the placeholder doesn't get removed. There's
+			// no need to re-add it, when the value is updated on compositionend
+			// it will be re-added when the value is empty.
+			element.querySelector( `[${ PLACEHOLDER_ATTR_NAME }]` )?.remove();
 		}
 
 		function onCompositionEnd() {
@@ -252,12 +266,8 @@ export function useInputAndSelection( props ) {
 		}
 
 		function onFocus() {
-			const {
-				record,
-				isSelected,
-				onSelectionChange,
-				applyRecord,
-			} = propsRef.current;
+			const { record, isSelected, onSelectionChange, applyRecord } =
+				propsRef.current;
 
 			// When the whole editor is editable, let writing flow handle
 			// selection.

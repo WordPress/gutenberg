@@ -7,7 +7,10 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { __EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE } from '@wordpress/blocks';
+import {
+	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
+	hasBlockSupport,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -18,10 +21,8 @@ import { store as blockEditorStore } from '../../store';
 const blockedPaths = [ 'color', 'border', 'typography', 'spacing' ];
 
 const deprecatedFlags = {
-	'color.palette': ( settings ) =>
-		settings.colors === undefined ? undefined : settings.colors,
-	'color.gradients': ( settings ) =>
-		settings.gradients === undefined ? undefined : settings.gradients,
+	'color.palette': ( settings ) => settings.colors,
+	'color.gradients': ( settings ) => settings.gradients,
 	'color.custom': ( settings ) =>
 		settings.disableCustomColors === undefined
 			? undefined
@@ -30,8 +31,7 @@ const deprecatedFlags = {
 		settings.disableCustomGradients === undefined
 			? undefined
 			: ! settings.disableCustomGradients,
-	'typography.fontSizes': ( settings ) =>
-		settings.fontSizes === undefined ? undefined : settings.fontSizes,
+	'typography.fontSizes': ( settings ) => settings.fontSizes,
 	'typography.customFontSize': ( settings ) =>
 		settings.disableCustomFontSizes === undefined
 			? undefined
@@ -91,8 +91,10 @@ const removeCustomPrefixes = ( path ) => {
 };
 
 /**
- * Hook that retrieves the editor setting.
- * It works with nested objects using by finding the value at path.
+ * Hook that retrieves the given setting for the block instance in use.
+ *
+ * It looks up the settings first in the block instance hierarchy.
+ * If none is found, it'll look it up in the block editor store.
  *
  * @param {string} path The path to the setting.
  * @return {any} Returns the value defined for the setting.
@@ -102,9 +104,9 @@ const removeCustomPrefixes = ( path ) => {
  * ```
  */
 export default function useSetting( path ) {
-	const { name: blockName } = useBlockEditContext();
+	const { name: blockName, clientId } = useBlockEditContext();
 
-	const setting = useSelect(
+	return useSelect(
 		( select ) => {
 			if ( blockedPaths.includes( path ) ) {
 				// eslint-disable-next-line no-console
@@ -113,28 +115,68 @@ export default function useSetting( path ) {
 				);
 				return undefined;
 			}
-			const settings = select( blockEditorStore ).getSettings();
 
-			// 1 - Use __experimental features, if available.
-			// We cascade to the all value if the block one is not available.
+			let result;
+
 			const normalizedPath = removeCustomPrefixes( path );
-			const defaultsPath = `__experimentalFeatures.${ normalizedPath }`;
-			const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ normalizedPath }`;
-			const experimentalFeaturesResult =
-				get( settings, blockPath ) ?? get( settings, defaultsPath );
 
-			if ( experimentalFeaturesResult !== undefined ) {
-				if ( PATHS_WITH_MERGE[ normalizedPath ] ) {
-					return (
-						experimentalFeaturesResult.custom ??
-						experimentalFeaturesResult.theme ??
-						experimentalFeaturesResult.default
+			// 1. Take settings from the block instance or its ancestors.
+			// Start from the current block and work our way up the ancestors.
+			const candidates = [
+				clientId,
+				...select( blockEditorStore ).getBlockParents(
+					clientId,
+					/* ascending */ true
+				),
+			];
+
+			for ( const candidateClientId of candidates ) {
+				const candidateBlockName =
+					select( blockEditorStore ).getBlockName(
+						candidateClientId
 					);
+				if (
+					hasBlockSupport(
+						candidateBlockName,
+						'__experimentalSettings',
+						false
+					)
+				) {
+					const candidateAtts =
+						select( blockEditorStore ).getBlockAttributes(
+							candidateClientId
+						);
+					result =
+						get(
+							candidateAtts,
+							`settings.blocks.${ blockName }.${ normalizedPath }`
+						) ??
+						get( candidateAtts, `settings.${ normalizedPath }` );
+					if ( result !== undefined ) {
+						// Stop the search for more distant ancestors and move on.
+						break;
+					}
 				}
-				return experimentalFeaturesResult;
 			}
 
-			// 2 - Use deprecated settings, otherwise.
+			// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
+			const settings = select( blockEditorStore ).getSettings();
+			if ( result === undefined ) {
+				const defaultsPath = `__experimentalFeatures.${ normalizedPath }`;
+				const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ normalizedPath }`;
+				result =
+					get( settings, blockPath ) ?? get( settings, defaultsPath );
+			}
+
+			// Return if the setting was found in either the block instance or the store.
+			if ( result !== undefined ) {
+				if ( PATHS_WITH_MERGE[ normalizedPath ] ) {
+					return result.custom ?? result.theme ?? result.default;
+				}
+				return result;
+			}
+
+			// 3. Otherwise, use deprecated settings.
 			const deprecatedSettingsValue = deprecatedFlags[ normalizedPath ]
 				? deprecatedFlags[ normalizedPath ]( settings )
 				: undefined;
@@ -142,14 +184,12 @@ export default function useSetting( path ) {
 				return deprecatedSettingsValue;
 			}
 
-			// 3 - Fall back for typography.dropCap:
+			// 4. Fallback for typography.dropCap:
 			// This is only necessary to support typography.dropCap.
 			// when __experimentalFeatures are not present (core without plugin).
 			// To remove when __experimentalFeatures are ported to core.
 			return normalizedPath === 'typography.dropCap' ? true : undefined;
 		},
-		[ blockName, path ]
+		[ blockName, clientId, path ]
 	);
-
-	return setting;
 }

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalUseEntityRecords as useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 
 /**
  * @typedef {Object} NavigationEntitiesData
@@ -43,19 +43,17 @@ export default function useNavigationEntities( menuId ) {
 		context: 'view',
 	} );
 
-	const {
-		records: menuItems,
-		hasResolved: hasResolvedMenuItems,
-	} = useEntityRecords(
-		'root',
-		'menuItem',
-		{
-			menus: menuId,
-			per_page: -1,
-			context: 'view',
-		},
-		{ enabled: !! menuId }
-	);
+	const { records: menuItems, hasResolved: hasResolvedMenuItems } =
+		useEntityRecords(
+			'root',
+			'menuItem',
+			{
+				menus: menuId,
+				per_page: -1,
+				context: 'view',
+			},
+			{ enabled: !! menuId }
+		);
 
 	return {
 		pages,

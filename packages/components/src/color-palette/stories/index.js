@@ -43,7 +43,10 @@ const meta = {
 export default meta;
 
 const Template = ( args ) => {
-	const [ color, setColor ] = useState( '#f00' );
+	const firstColor =
+		args.colors[ 0 ].color || args.colors[ 0 ].colors[ 0 ].color;
+	const [ color, setColor ] = useState( firstColor );
+
 	return (
 		<SlotFillProvider>
 			<ColorPalette { ...args } value={ color } onChange={ setColor } />
@@ -79,12 +82,33 @@ MultipleOrigins.args = {
 			],
 		},
 		{
-			name: 'Primary colors',
+			name: 'Secondary colors',
 			colors: [
 				{ name: 'Orange', color: '#f60' },
 				{ name: 'Green', color: '#0f0' },
 				{ name: 'Purple', color: '#60f' },
 			],
 		},
+	],
+};
+
+export const CSSVariables = ( args ) => {
+	return (
+		<div
+			style={ {
+				'--red': '#f00',
+				'--yellow': '#ff0',
+				'--blue': '#00f',
+			} }
+		>
+			<Template { ...args } />
+		</div>
+	);
+};
+CSSVariables.args = {
+	colors: [
+		{ name: 'Red', color: 'var(--red)' },
+		{ name: 'Yellow', color: 'var(--yellow)' },
+		{ name: 'Blue', color: 'var(--blue)' },
 	],
 };

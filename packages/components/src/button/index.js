@@ -3,7 +3,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -93,6 +92,12 @@ export function Button( props, ref ) {
 		'components-button__description'
 	);
 
+	const hasChildren =
+		children?.[ 0 ] &&
+		children[ 0 ] !== null &&
+		// Tooltip should not considered as a child
+		children?.[ 0 ]?.props?.className !== 'components-tooltip';
+
 	const classes = classnames( 'components-button', className, {
 		'is-secondary': variant === 'secondary',
 		'is-primary': variant === 'primary',
@@ -102,7 +107,7 @@ export function Button( props, ref ) {
 		'is-busy': isBusy,
 		'is-link': variant === 'link',
 		'is-destructive': isDestructive,
-		'has-text': !! icon && !! children,
+		'has-text': !! icon && hasChildren,
 		'has-icon': !! icon,
 	} );
 
@@ -140,8 +145,7 @@ export function Button( props, ref ) {
 			// There's a label and...
 			( !! label &&
 				// The children are empty and...
-				( ! children ||
-					( isArray( children ) && ! children.length ) ) &&
+				! children?.length &&
 				// The tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
@@ -186,7 +190,7 @@ export function Button( props, ref ) {
 	return (
 		<>
 			<Tooltip
-				text={ describedBy ? describedBy : label }
+				text={ children?.length && describedBy ? describedBy : label }
 				shortcut={ shortcut }
 				position={ tooltipPosition }
 			>

@@ -22,9 +22,8 @@ export function useBlockCustomClassName( clientId ) {
 	// as much.
 	return useSelect(
 		( select ) => {
-			const { getBlockName, getBlockAttributes } = select(
-				blockEditorStore
-			);
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
 			const attributes = getBlockAttributes( clientId );
 
 			if ( ! attributes?.className ) {

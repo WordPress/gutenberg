@@ -2,6 +2,47 @@
 
 ## Unreleased
 
+## 7.16.0 (2022-10-05)
+
+## 7.15.0 (2022-09-21)
+
+## 7.14.0 (2022-09-13)
+
+### New Feature
+
+-   Made it possible to import individual blocks ([#42258](https://github.com/WordPress/gutenberg/pull/42258)). Check [README](./README.md#loading-individual-blocks) for more information.
+-   Paragraph block: You can now drop files/blocks/HTML on an empty Paragraph block to transform it into relevant blocks ([#42722](https://github.com/WordPress/gutenberg/pull/42722)).
+
+## 7.13.0 (2022-08-24)
+
+### Bug Fix
+
+-   Ensure all dependencies allow version ranges ([#43355](https://github.com/WordPress/gutenberg/pull/43355)).
+
+## 7.12.0 (2022-08-10)
+
+## 7.11.0 (2022-07-27)
+
+## 7.10.0 (2022-07-13)
+
+## 7.9.0 (2022-06-29)
+
+## 7.8.0 (2022-06-15)
+
+## 7.7.0 (2022-06-01)
+
+## 7.6.0 (2022-05-18)
+
+### Enhancement
+
+-   Declare blocks as \_\_experimental in block.json to automate syncing Gutenberg packages to WordPress ([#40655](https://github.com/WordPress/gutenberg/pull/40655)).
+
+## 7.5.0 (2022-05-04)
+
+## 7.4.0 (2022-04-21)
+
+## 7.3.0 (2022-04-08)
+
 ## 7.2.0 (2022-03-23)
 
 ### Bug Fix

@@ -83,9 +83,8 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 
 	const onFontSizeChange = ( fontSizeLabel, newValue ) => {
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const [ quantity, newUnit ] = parseQuantityAndUnitFromRawValue(
-			newValue
-		);
+		const [ quantity, newUnit ] =
+			parseQuantityAndUnitFromRawValue( newValue );
 		if ( ! Number.isFinite( quantity ) ) {
 			return;
 		}
@@ -96,10 +95,8 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 			smallestFontSize,
 			largestFontSize,
 		} ).forEach( ( [ attribute, currentValue ] ) => {
-			const [
-				currentQuantity,
-				currentUnit,
-			] = parseQuantityAndUnitFromRawValue( currentValue );
+			const [ currentQuantity, currentUnit ] =
+				parseQuantityAndUnitFromRawValue( currentValue );
 			// Only add an update if the other font size attribute has a different unit.
 			if ( attribute !== fontSizeLabel && currentUnit !== newUnit ) {
 				updateObj[ attribute ] = `${ currentQuantity }${ newUnit }`;
@@ -110,7 +107,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Tag Cloud settings' ) }>
+			<PanelBody title={ __( 'Settings' ) }>
 				<SelectControl
 					label={ __( 'Taxonomy' ) }
 					options={ getTaxonomyOptions() }

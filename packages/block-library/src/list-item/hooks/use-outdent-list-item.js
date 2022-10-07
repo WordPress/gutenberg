@@ -1,16 +1,23 @@
 /**
+ * External dependencies
+ */
+import { castArray } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { cloneBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { createListItem } from '../utils';
+import { name as listItemName } from '../block.json';
 
 export default function useOutdentListItem( clientId ) {
+	const registry = useRegistry();
 	const { canOutdent } = useSelect(
 		( innerSelect ) => {
 			const { getBlockRootClientId } = innerSelect( blockEditorStore );
@@ -23,73 +30,90 @@ export default function useOutdentListItem( clientId ) {
 		},
 		[ clientId ]
 	);
-	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
+	const {
+		moveBlocksToPosition,
+		removeBlock,
+		insertBlock,
+		updateBlockListSettings,
+	} = useDispatch( blockEditorStore );
 	const {
 		getBlockRootClientId,
-		getBlockAttributes,
-		getBlock,
+		getBlockName,
+		getBlockOrder,
 		getBlockIndex,
-		getSelectionStart,
-		getSelectionEnd,
+		getSelectedBlockClientIds,
+		getBlock,
+		getBlockListSettings,
 	} = useSelect( blockEditorStore );
+
+	function getParentListItemId( id ) {
+		const listId = getBlockRootClientId( id );
+		const parentListItemId = getBlockRootClientId( listId );
+		if ( ! parentListItemId ) return;
+		if ( getBlockName( parentListItemId ) !== listItemName ) return;
+		return parentListItemId;
+	}
 
 	return [
 		canOutdent,
-		useCallback( () => {
-			const selectionStart = getSelectionStart();
-			const selectionEnd = getSelectionEnd();
+		useCallback( ( clientIds = getSelectedBlockClientIds() ) => {
+			clientIds = castArray( clientIds );
 
-			const listParentId = getBlockRootClientId( clientId );
-			const listAttributes = getBlockAttributes( listParentId );
-			const listItemParentId = getBlockRootClientId( listParentId );
-			const listItemParentAttributes = getBlockAttributes(
-				listItemParentId
+			if ( ! clientIds.length ) return;
+
+			const firstClientId = clientIds[ 0 ];
+
+			// Can't outdent if it's not a list item.
+			if ( getBlockName( firstClientId ) !== listItemName ) return;
+
+			const parentListItemId = getParentListItemId( firstClientId );
+
+			// Can't outdent if it's at the top level.
+			if ( ! parentListItemId ) return;
+
+			const parentListId = getBlockRootClientId( firstClientId );
+			const lastClientId = clientIds[ clientIds.length - 1 ];
+			const order = getBlockOrder( parentListId );
+			const followingListItems = order.slice(
+				getBlockIndex( lastClientId ) + 1
 			);
 
-			const index = getBlockIndex( clientId );
-			const siblingBlocks = getBlock( listParentId ).innerBlocks;
-			const previousSiblings = siblingBlocks.slice( 0, index );
-			const afterSiblings = siblingBlocks.slice( index + 1 );
+			registry.batch( () => {
+				if ( followingListItems.length ) {
+					let nestedListId = getBlockOrder( firstClientId )[ 0 ];
 
-			// Create a new parent list item block with just the siblings
-			// that existed before the child item being outdent.
-			const newListItemParent = createListItem(
-				listItemParentAttributes,
-				listAttributes,
-				previousSiblings
-			);
+					if ( ! nestedListId ) {
+						const nestedListBlock = cloneBlock(
+							getBlock( parentListId ),
+							{},
+							[]
+						);
+						nestedListId = nestedListBlock.clientId;
+						insertBlock( nestedListBlock, 0, firstClientId, false );
+						// Immediately update the block list settings, otherwise
+						// blocks can't be moved here due to canInsert checks.
+						updateBlockListSettings(
+							nestedListId,
+							getBlockListSettings( parentListId )
+						);
+					}
 
-			const block = getBlock( clientId );
-			const childList = block.innerBlocks[ 0 ];
-			const childItems = childList?.innerBlocks || [];
-			const hasChildItems = !! childItems.length;
-
-			// Create a new list item block whose attributes are equal to the
-			// block being outdent and whose children are the children that it had (if any)
-			// followed by the siblings that existed after it.
-			const newItem = createListItem(
-				block.attributes,
-				hasChildItems ? childList.attributes : listAttributes,
-				[ ...childItems, ...afterSiblings ]
-			);
-
-			// Replace the parent list item block, with a new block containing
-			// the previous siblings, followed by another block containing after siblings
-			// in relation to the block being outdent.
-			replaceBlocks(
-				[ listItemParentId ],
-				[ newListItemParent, newItem ]
-			);
-
-			// Restore the selection state.
-			selectionChange(
-				newItem.clientId,
-				selectionEnd.attributeKey,
-				selectionEnd.clientId === selectionStart.clientId
-					? selectionStart.offset
-					: selectionEnd.offset,
-				selectionEnd.offset
-			);
-		}, [ clientId ] ),
+					moveBlocksToPosition(
+						followingListItems,
+						parentListId,
+						nestedListId
+					);
+				}
+				moveBlocksToPosition(
+					clientIds,
+					parentListId,
+					getBlockRootClientId( parentListItemId ),
+					getBlockIndex( parentListItemId ) + 1
+				);
+				if ( ! getBlockOrder( parentListId ).length ) {
+					removeBlock( parentListId );
+				}
+			} );
+		}, [] ),
 	];
 }

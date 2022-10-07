@@ -57,14 +57,13 @@ function ConfirmDialog(
 	}, [ isOpenProp ] );
 
 	const handleEvent = useCallback(
-		( callback?: ( event: DialogInputEvent ) => void ) => (
-			event: DialogInputEvent
-		) => {
-			callback?.( event );
-			if ( shouldSelfClose ) {
-				setIsOpen( false );
-			}
-		},
+		( callback?: ( event: DialogInputEvent ) => void ) =>
+			( event: DialogInputEvent ) => {
+				callback?.( event );
+				if ( shouldSelfClose ) {
+					setIsOpen( false );
+				}
+			},
 		[ shouldSelfClose, setIsOpen ]
 	);
 

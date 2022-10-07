@@ -2,9 +2,7 @@ name: Report Flaky Tests
 
 on:
     workflow_run:
-        # We should also add 'End-to-End Tests Playwright' here but that
-        # wil run this workflow whenever either one of them completes.
-        workflows: ['End-to-End Tests']
+        workflows: ['End-to-End Tests', 'End-to-End Tests Playwright']
         types:
             - completed
 
@@ -14,21 +12,27 @@ jobs:
         runs-on: ubuntu-latest
         if: ${{ github.event.workflow_run.conclusion == 'success' }}
         steps:
-            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+            # Checkout defaults to using the branch which triggered the event, which
+            # isn't necessarily `trunk` (e.g. in the case of a merge).
+            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              with:
+                  ref: trunk
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+              uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
               with:
-                  node-version: 14
+                  node-version-file: '.nvmrc'
                   cache: npm
 
-            - name: Npm install
+            - name: Npm install and build
+              # TODO: We don't have to build the entire project, just the action itself.
               run: |
                   npm ci
+                  npm run build:packages
 
             - name: Report flaky tests
-              uses: ./.github/report-flaky-tests
+              uses: ./packages/report-flaky-tests
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
                   label: '[Type] Flaky Test'
-                  artifact-name: flaky-tests-report
+                  artifact-name-prefix: flaky-tests-report

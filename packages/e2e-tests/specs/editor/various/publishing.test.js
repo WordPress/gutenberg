@@ -103,7 +103,8 @@ describe( 'Publishing', () => {
 
 			beforeEach( async () => {
 				await createNewPost( postType );
-				werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
+				werePrePublishChecksEnabled =
+					await arePrePublishChecksEnabled();
 				if ( werePrePublishChecksEnabled ) {
 					await disablePrePublishChecks();
 				}
@@ -143,7 +144,8 @@ describe( 'Publishing', () => {
 
 			beforeEach( async () => {
 				await createNewPost( postType );
-				werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
+				werePrePublishChecksEnabled =
+					await arePrePublishChecksEnabled();
 				if ( werePrePublishChecksEnabled ) {
 					await disablePrePublishChecks();
 				}

@@ -4,6 +4,7 @@
 		"incremental": false,
 		"composite": false,
 		"module": "CommonJS",
+		"types": [ "node" ],
 		"rootDir": "src",
 		"noEmit": false,
 		"outDir": "build",
@@ -13,9 +14,7 @@
 		"declarationDir": "build-types",
 		"emitDeclarationOnly": false,
 		"allowJs": true,
-		"checkJs": false,
+		"checkJs": false
 	},
-	"include": [
-		"src/**/*"
-	]
+	"include": [ "src/**/*" ]
 }

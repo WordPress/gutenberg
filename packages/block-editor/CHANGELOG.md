@@ -2,6 +2,47 @@
 
 ## Unreleased
 
+## 10.2.0 (2022-10-05)
+
+## 10.1.0 (2022-09-21)
+
+## 10.0.0 (2022-09-13)
+
+### Breaking change
+
+-   `FontSizePicker`: Deprecate bottom margin style. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4 ([#43870](https://github.com/WordPress/gutenberg/pull/43870)).
+
+## 9.8.0 (2022-08-24)
+
+## 9.7.0 (2022-08-10)
+
+## 9.6.0 (2022-07-27)
+
+## 9.5.0 (2022-07-13)
+
+## 9.4.0 (2022-06-29)
+
+## 9.3.0 (2022-06-15)
+
+### Bug fix
+
+-   Fix focus trap on certain `input` elements when navigating within a block with the left/right arrow keys ([#41538](https://github.com/WordPress/gutenberg/pull/41538)).
+
+## 9.2.0 (2022-06-01)
+
+## 9.1.0 (2022-05-18)
+
+## 9.0.0 (2022-05-04)
+
+### Breaking change
+
+-   `BlockNavigationDropdown` is now deprecated. Use the `Dropdown` component from the `@wordpress/components` package and the `ListView` component from this package ([#40777](https://github.com/WordPress/gutenberg/pull/40777)).
+-   `ListView` no longer accepts the `__experimentalFeatures`, `__experimentalPersistentListViewFeatures`, `__experimentalHideContainerBlockActions`, and `showNestedBlocks` props. Passing additional undocumented props through to `ListView` is also now disallowed. ([#40777](https://github.com/WordPress/gutenberg/pull/40777)).
+
+## 8.6.0 (2022-04-21)
+
+## 8.5.0 (2022-04-08)
+
 ## 8.4.0 (2022-03-23)
 
 ## 8.3.0 (2022-03-11)

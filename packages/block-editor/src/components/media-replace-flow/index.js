@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import { noop, uniqueId } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import {
@@ -16,10 +11,15 @@ import {
 	ToolbarButton,
 	Dropdown,
 	withFilters,
+	Tooltip,
 } from '@wordpress/components';
 import { useSelect, withDispatch } from '@wordpress/data';
 import { DOWN } from '@wordpress/keycodes';
-import { upload, media as mediaIcon } from '@wordpress/icons';
+import {
+	postFeaturedImage,
+	upload,
+	media as mediaIcon,
+} from '@wordpress/icons';
 import { compose } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
@@ -32,6 +32,9 @@ import MediaUploadCheck from '../media-upload/check';
 import LinkControl from '../link-control';
 import { store as blockEditorStore } from '../../store';
 
+const noop = () => {};
+let uniqueId = 0;
+
 const MediaReplaceFlow = ( {
 	mediaURL,
 	mediaId,
@@ -41,8 +44,9 @@ const MediaReplaceFlow = ( {
 	onError,
 	onSelect,
 	onSelectURL,
+	onToggleFeaturedImage,
+	useFeaturedImage,
 	onFilesUpload = noop,
-	onCloseModal = noop,
 	name = __( 'Replace' ),
 	createNotice,
 	removeNotice,
@@ -51,14 +55,11 @@ const MediaReplaceFlow = ( {
 	addToGallery,
 	handleUpload = true,
 } ) => {
-	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
 	const editMediaButtonRef = useRef();
-	const errorNoticeID = uniqueId(
-		'block-editor/media-replace-flow/error-notice/'
-	);
+	const errorNoticeID = `block-editor/media-replace-flow/error-notice/${ ++uniqueId }`;
 
 	const onUploadError = ( message ) => {
 		const safeMessage = stripHTML( message );
@@ -82,8 +83,10 @@ const MediaReplaceFlow = ( {
 	};
 
 	const selectMedia = ( media, closeMenu ) => {
+		if ( useFeaturedImage && onToggleFeaturedImage ) {
+			onToggleFeaturedImage();
+		}
 		closeMenu();
-		setMediaURLValue( media?.url );
 		// Calling `onSelect` after the state update since it might unmount the component.
 		onSelect( media );
 		speak( __( 'The media file has been replaced' ) );
@@ -149,43 +152,56 @@ const MediaReplaceFlow = ( {
 			renderContent={ ( { onClose } ) => (
 				<>
 					<NavigableMenu className="block-editor-media-replace-flow__media-upload-menu">
-						<MediaUpload
-							gallery={ gallery }
-							addToGallery={ addToGallery }
-							multiple={ multiple }
-							value={ multiple ? mediaIds : mediaId }
-							onSelect={ ( media ) =>
-								selectMedia( media, onClose )
-							}
-							allowedTypes={ allowedTypes }
-							onClose={ onCloseModal }
-							render={ ( { open } ) => (
-								<MenuItem icon={ mediaIcon } onClick={ open }>
-									{ __( 'Open Media Library' ) }
-								</MenuItem>
-							) }
-						/>
-						<MediaUploadCheck>
-							<FormFileUpload
-								onChange={ ( event ) => {
-									uploadFiles( event, onClose );
-								} }
-								accept={ accept }
+						<>
+							<MediaUpload
+								gallery={ gallery }
+								addToGallery={ addToGallery }
 								multiple={ multiple }
-								render={ ( { openFileDialog } ) => {
-									return (
-										<MenuItem
-											icon={ upload }
-											onClick={ () => {
-												openFileDialog();
-											} }
-										>
-											{ __( 'Upload' ) }
-										</MenuItem>
-									);
-								} }
+								value={ multiple ? mediaIds : mediaId }
+								onSelect={ ( media ) =>
+									selectMedia( media, onClose )
+								}
+								allowedTypes={ allowedTypes }
+								render={ ( { open } ) => (
+									<MenuItem
+										icon={ mediaIcon }
+										onClick={ open }
+									>
+										{ __( 'Open Media Library' ) }
+									</MenuItem>
+								) }
 							/>
-						</MediaUploadCheck>
+							<MediaUploadCheck>
+								<FormFileUpload
+									onChange={ ( event ) => {
+										uploadFiles( event, onClose );
+									} }
+									accept={ accept }
+									multiple={ multiple }
+									render={ ( { openFileDialog } ) => {
+										return (
+											<MenuItem
+												icon={ upload }
+												onClick={ () => {
+													openFileDialog();
+												} }
+											>
+												{ __( 'Upload' ) }
+											</MenuItem>
+										);
+									} }
+								/>
+							</MediaUploadCheck>
+						</>
+						{ onToggleFeaturedImage && (
+							<MenuItem
+								icon={ postFeaturedImage }
+								onClick={ onToggleFeaturedImage }
+								isPressed={ useFeaturedImage }
+							>
+								{ __( 'Use featured image' ) }
+							</MenuItem>
+						) }
 						{ children }
 					</NavigableMenu>
 					{ onSelectURL && (
@@ -194,16 +210,20 @@ const MediaReplaceFlow = ( {
 							<span className="block-editor-media-replace-flow__image-url-label">
 								{ __( 'Current media URL:' ) }
 							</span>
-							<LinkControl
-								value={ { url: mediaURLValue } }
-								settings={ [] }
-								showSuggestions={ false }
-								onChange={ ( { url } ) => {
-									setMediaURLValue( url );
-									onSelectURL( url );
-									editMediaButtonRef.current.focus();
-								} }
-							/>
+
+							<Tooltip text={ mediaURL } position="bottom">
+								<div>
+									<LinkControl
+										value={ { url: mediaURL } }
+										settings={ [] }
+										showSuggestions={ false }
+										onChange={ ( { url } ) => {
+											onSelectURL( url );
+											editMediaButtonRef.current.focus();
+										} }
+									/>
+								</div>
+							</Tooltip>
 						</form>
 					) }
 				</>
@@ -212,6 +232,9 @@ const MediaReplaceFlow = ( {
 	);
 };
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-replace-flow/README.md
+ */
 export default compose( [
 	withDispatch( ( dispatch ) => {
 		const { createNotice, removeNotice } = dispatch( noticesStore );

@@ -33,12 +33,10 @@ export function useBlockClassNames( clientId ) {
 				getSettings,
 				hasSelectedInnerBlock,
 				isTyping,
-				__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
+				__unstableIsFullySelected,
+				__unstableSelectionHasUnmergeableBlock,
 			} = select( blockEditorStore );
-			const {
-				__experimentalSpotlightEntityBlocks: spotlightEntityBlocks,
-				outlineMode,
-			} = getSettings();
+			const { outlineMode } = getSettings();
 			const isDragging = isBlockBeingDragged( clientId );
 			const isSelected = isBlockSelected( clientId );
 			const name = getBlockName( clientId );
@@ -48,19 +46,18 @@ export function useBlockClassNames( clientId ) {
 				clientId,
 				checkDeep
 			);
-			const activeEntityBlockId = getActiveBlockIdByBlockNames(
-				spotlightEntityBlocks
-			);
+			const isMultiSelected = isBlockMultiSelected( clientId );
 			return classnames( {
 				'is-selected': isSelected,
 				'is-highlighted': isBlockHighlighted( clientId ),
-				'is-multi-selected': isBlockMultiSelected( clientId ),
+				'is-multi-selected': isMultiSelected,
+				'is-partially-selected':
+					isMultiSelected &&
+					! __unstableIsFullySelected() &&
+					! __unstableSelectionHasUnmergeableBlock(),
 				'is-reusable': isReusableBlock( getBlockType( name ) ),
 				'is-dragging': isDragging,
 				'has-child-selected': isAncestorOfSelectedBlock,
-				'has-active-entity': activeEntityBlockId,
-				// Determine if there is an active entity area to spotlight.
-				'is-active-entity': activeEntityBlockId === clientId,
 				'remove-outline': isSelected && outlineMode && isTyping(),
 			} );
 		},

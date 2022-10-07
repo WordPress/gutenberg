@@ -1,20 +1,19 @@
 /**
- * External dependencies
- */
-import { compact } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { memo } from '@wordpress/element';
-import { AsyncModeProvider } from '@wordpress/data';
+import { AsyncModeProvider, useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
 /**
  * Internal dependencies
  */
 import ListViewBlock from './block';
 import { useListViewContext } from './context';
 import { isClientIdSelected } from './utils';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
@@ -56,52 +55,63 @@ function countBlocks(
 	}
 	return 1;
 }
-const countReducer = (
-	expandedState,
-	draggedClientIds,
-	isExpandedByDefault
-) => ( count, block ) => {
-	const isDragged = draggedClientIds?.includes( block.clientId );
-	if ( isDragged ) {
-		return count;
-	}
-	const isExpanded = expandedState[ block.clientId ] ?? isExpandedByDefault;
-	if ( isExpanded && block.innerBlocks.length > 0 ) {
-		return (
-			count +
-			countBlocks(
-				block,
-				expandedState,
-				draggedClientIds,
-				isExpandedByDefault
-			)
-		);
-	}
-	return count + 1;
-};
+const countReducer =
+	( expandedState, draggedClientIds, isExpandedByDefault ) =>
+	( count, block ) => {
+		const isDragged = draggedClientIds?.includes( block.clientId );
+		if ( isDragged ) {
+			return count;
+		}
+		const isExpanded =
+			expandedState[ block.clientId ] ?? isExpandedByDefault;
+		if ( isExpanded && block.innerBlocks.length > 0 ) {
+			return (
+				count +
+				countBlocks(
+					block,
+					expandedState,
+					draggedClientIds,
+					isExpandedByDefault
+				)
+			);
+		}
+		return count + 1;
+	};
 
 function ListViewBranch( props ) {
 	const {
 		blocks,
 		selectBlock,
 		showBlockMovers,
-		showNestedBlocks,
 		selectedClientIds,
 		level = 1,
 		path = '',
 		isBranchSelected = false,
 		listPosition = 0,
 		fixedListWindow,
-		expandNested,
+		isExpanded,
+		parentId,
+		shouldShowInnerBlocks = true,
 	} = props;
 
-	const {
-		expandedState,
-		draggedClientIds,
-		__experimentalPersistentListViewFeatures,
-	} = useListViewContext();
+	const isContentLocked = useSelect(
+		( select ) => {
+			return !! (
+				parentId &&
+				select( blockEditorStore ).getTemplateLock( parentId ) ===
+					'contentOnly'
+			);
+		},
+		[ parentId ]
+	);
 
-	const filteredBlocks = compact( blocks );
+	const { expandedState, draggedClientIds } = useListViewContext();
+
+	if ( isContentLocked ) {
+		return null;
+	}
+
+	const filteredBlocks = blocks.filter( Boolean );
 	const blockCount = filteredBlocks.length;
 	let nextPosition = listPosition;
 
@@ -115,27 +125,24 @@ function ListViewBranch( props ) {
 						filteredBlocks[ index - 1 ],
 						expandedState,
 						draggedClientIds,
-						expandNested
+						isExpanded
 					);
 				}
 
-				const usesWindowing = __experimentalPersistentListViewFeatures;
-
 				const { itemInView } = fixedListWindow;
-				const blockInView =
-					! usesWindowing || itemInView( nextPosition );
+				const blockInView = itemInView( nextPosition );
 
 				const position = index + 1;
 				const updatedPath =
 					path.length > 0
 						? `${ path }_${ position }`
 						: `${ position }`;
-				const hasNestedBlocks =
-					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
+				const hasNestedBlocks = !! innerBlocks?.length;
 
-				const isExpanded = hasNestedBlocks
-					? expandedState[ clientId ] ?? expandNested
-					: undefined;
+				const shouldExpand =
+					hasNestedBlocks && shouldShowInnerBlocks
+						? expandedState[ clientId ] ?? isExpanded
+						: undefined;
 
 				const isDragged = !! draggedClientIds?.includes( clientId );
 
@@ -164,7 +171,7 @@ function ListViewBranch( props ) {
 								siblingBlockCount={ blockCount }
 								showBlockMovers={ showBlockMovers }
 								path={ updatedPath }
-								isExpanded={ isExpanded }
+								isExpanded={ shouldExpand }
 								listPosition={ nextPosition }
 								selectedClientIds={ selectedClientIds }
 							/>
@@ -174,19 +181,19 @@ function ListViewBranch( props ) {
 								<td className="block-editor-list-view-placeholder" />
 							</tr>
 						) }
-						{ hasNestedBlocks && isExpanded && ! isDragged && (
+						{ hasNestedBlocks && shouldExpand && ! isDragged && (
 							<ListViewBranch
+								parentId={ clientId }
 								blocks={ innerBlocks }
 								selectBlock={ selectBlock }
 								showBlockMovers={ showBlockMovers }
-								showNestedBlocks={ showNestedBlocks }
 								level={ level + 1 }
 								path={ updatedPath }
 								listPosition={ nextPosition + 1 }
 								fixedListWindow={ fixedListWindow }
 								isBranchSelected={ isSelectedBranch }
 								selectedClientIds={ selectedClientIds }
-								expandNested={ expandNested }
+								isExpanded={ isExpanded }
 							/>
 						) }
 					</AsyncModeProvider>

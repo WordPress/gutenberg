@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import {
-	dateI18n,
-	__experimentalGetSettings as getDateSettings,
-} from '@wordpress/date';
+import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import {
 	InspectorControls,
 	useBlockProps,
@@ -33,7 +30,7 @@ export default function Edit( {
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps();
-	const [ date ] = useEntityProp( 'root', 'comment', 'date', commentId );
+	let [ date ] = useEntityProp( 'root', 'comment', 'date', commentId );
 	const [ siteFormat = getDateSettings().formats.date ] = useEntityProp(
 		'root',
 		'site',
@@ -60,21 +57,17 @@ export default function Edit( {
 	);
 
 	if ( ! commentId || ! date ) {
-		return (
-			<>
-				{ inspectorControls }
-				<div { ...blockProps }>
-					<p>{ _x( 'Comment Date', 'block title' ) }</p>
-				</div>
-			</>
-		);
+		date = _x( 'Comment Date', 'block title' );
 	}
 
-	let commentDate = (
-		<time dateTime={ dateI18n( 'c', date ) }>
-			{ dateI18n( format || siteFormat, date ) }
-		</time>
-	);
+	let commentDate =
+		date instanceof Date ? (
+			<time dateTime={ dateI18n( 'c', date ) }>
+				{ dateI18n( format || siteFormat, date ) }
+			</time>
+		) : (
+			<time>{ date }</time>
+		);
 
 	if ( isLink ) {
 		commentDate = (

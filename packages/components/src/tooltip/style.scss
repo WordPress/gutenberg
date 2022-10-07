@@ -2,7 +2,7 @@
 	z-index: z-index(".components-tooltip");
 
 	.components-popover__content {
-		min-width: 0;
+		min-width: min-content;
 	}
 }
 
@@ -10,16 +10,14 @@
 	background: $gray-900;
 	border-radius: $radius-block-ui;
 	border-width: 0;
+	outline: none;
 	color: $white;
 	white-space: nowrap;
 	text-align: center;
 	line-height: 1.4;
 	font-size: 12px;
 	box-shadow: none;
-
-	> div {
-		padding: $grid-unit-05 $grid-unit-10;
-	}
+	padding: $grid-unit-05 $grid-unit-10;
 }
 
 .components-tooltip__shortcut {

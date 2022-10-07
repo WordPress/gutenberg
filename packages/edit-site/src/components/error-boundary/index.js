@@ -3,6 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { doAction } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -18,6 +19,10 @@ export default class ErrorBoundary extends Component {
 		this.state = {
 			error: null,
 		};
+	}
+
+	componentDidCatch( error ) {
+		doAction( 'editor.ErrorBoundary.errorLogged', error );
 	}
 
 	static getDerivedStateFromError( error ) {

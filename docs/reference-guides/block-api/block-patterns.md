@@ -3,10 +3,16 @@
 Block Patterns are predefined block layouts, available from the patterns tab of the block inserter. Once inserted into content, the blocks are ready for additional or modified content and configuration.
 
 In this Document:
-* [`register_block_pattern`](#register_block_pattern)
-* [`unregister_block_pattern`](#unregister_block_pattern)
-* [`register_block_pattern_category`](#register_block_pattern_category)
-* [`unregister_block_pattern_category`](#unregister_block_pattern_category)
+- [Patterns](#patterns)
+	- [Block Patterns](#block-patterns)
+		- [register_block_pattern](#register_block_pattern)
+	- [Unregistering Block Patterns](#unregistering-block-patterns)
+		- [unregister_block_pattern](#unregister_block_pattern)
+	- [Block Pattern Categories](#block-pattern-categories)
+		- [register_block_pattern_category](#register_block_pattern_category)
+		- [unregister_block_pattern_category](#unregister_block_pattern_category)
+	- [Block patterns contextual to block types and pattern transformations](#block-patterns-contextual-to-block-types-and-pattern-transformations)
+	- [Semantic block patterns](#semantic-block-patterns)
 
 ## Block Patterns
 
@@ -27,6 +33,8 @@ The properties available for block patterns are:
 -   `keywords` (optional): An array of aliases or keywords that help users discover the pattern while searching.
 -   `viewportWidth` (optional): An integer specifying the intended width of the pattern to allow for a scaled preview of the pattern in the inserter.
 -   `blockTypes` (optional): An array of block types that the pattern is intended to be used with. Each value needs to be the declared block's `name`.
+-   `postTypes` (optional): An array of post types that the pattern is restricted to be used with. The pattern will only be available when editing one of the post types passed on the array, for all the other post types the pattern is not available at all.
+-   `inserter` (optional): By default, all patterns will appear in the inserter. To hide a pattern so that it can only be inserted programmatically, set the `inserter` to `false`.
 
 The following code sample registers a block pattern named 'my-plugin/my-awesome-pattern':
 

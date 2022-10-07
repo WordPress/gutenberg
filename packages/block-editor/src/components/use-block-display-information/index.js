@@ -19,6 +19,7 @@ import { store as blockEditorStore } from '../../store';
  * @property {string} title       Human-readable block type label.
  * @property {WPIcon} icon        Block type icon.
  * @property {string} description A detailed block type description.
+ * @property {string} anchor      HTML anchor.
  */
 
 /**
@@ -40,12 +41,10 @@ export default function useBlockDisplayInformation( clientId ) {
 	return useSelect(
 		( select ) => {
 			if ( ! clientId ) return null;
-			const { getBlockName, getBlockAttributes } = select(
-				blockEditorStore
-			);
-			const { getBlockType, getActiveBlockVariation } = select(
-				blocksStore
-			);
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
+			const { getBlockType, getActiveBlockVariation } =
+				select( blocksStore );
 			const blockName = getBlockName( clientId );
 			const blockType = getBlockType( blockName );
 			if ( ! blockType ) return null;
@@ -63,6 +62,7 @@ export default function useBlockDisplayInformation( clientId ) {
 				title: match.title || blockType.title,
 				icon: match.icon || blockType.icon,
 				description: match.description || blockType.description,
+				anchor: attributes?.anchor,
 			};
 		},
 		[ clientId ]

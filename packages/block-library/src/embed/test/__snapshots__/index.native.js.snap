@@ -186,6 +186,6 @@ exports[`Embed block sets block caption 1`] = `
 "<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
 <figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
 https://twitter.com/notnownikki
-</div><figcaption>Caption</figcaption></figure>
+</div><figcaption class=\\"wp-element-caption\\">Caption</figcaption></figure>
 <!-- /wp:embed -->"
 `;

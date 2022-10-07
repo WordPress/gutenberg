@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
 import memoize from 'memize';
 
 /**
@@ -67,8 +66,7 @@ class PluginArea extends Component {
 
 	getCurrentPluginsState() {
 		return {
-			plugins: map(
-				getPlugins( this.props.scope ),
+			plugins: getPlugins( this.props.scope ).map(
 				( { icon, name, render } ) => {
 					return {
 						Plugin: render,
@@ -110,7 +108,7 @@ class PluginArea extends Component {
 	render() {
 		return (
 			<div style={ { display: 'none' } }>
-				{ map( this.state.plugins, ( { context, Plugin } ) => (
+				{ this.state.plugins.map( ( { context, Plugin } ) => (
 					<PluginContextProvider
 						key={ context.name }
 						value={ context }

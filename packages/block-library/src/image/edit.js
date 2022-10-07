@@ -2,14 +2,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, has, omit, pick } from 'lodash';
+import { get, isEmpty, pick } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { withNotices } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { Placeholder } from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	BlockAlignmentControl,
 	BlockControls,
@@ -17,17 +17,34 @@ import {
 	MediaPlaceholder,
 	useBlockProps,
 	store as blockEditorStore,
+	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
-
-/* global wp */
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import Image from './image';
+
+// Much of this description is duplicated from MediaPlaceholder.
+const placeholder = ( content ) => {
+	return (
+		<Placeholder
+			className="block-editor-media-placeholder"
+			withIllustration={ true }
+			icon={ icon }
+			label={ __( 'Image' ) }
+			instructions={ __(
+				'Upload an image file, pick one from your media library, or add one with a URL.'
+			) }
+		>
+			{ content }
+		</Placeholder>
+	);
+};
 
 /**
  * Module constants
@@ -82,23 +99,9 @@ export const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
  */
 function hasDefaultSize( image, defaultSize ) {
 	return (
-		has( image, [ 'sizes', defaultSize, 'url' ] ) ||
-		has( image, [ 'media_details', 'sizes', defaultSize, 'source_url' ] )
+		'url' in ( image?.sizes?.[ defaultSize ] ?? {} ) ||
+		'source_url' in ( image?.media_details?.sizes?.[ defaultSize ] ?? {} )
 	);
-}
-
-/**
- * Checks if a media attachment object has been "destroyed",
- * that is, removed from the media library. The core Media Library
- * adds a `destroyed` property to a deleted attachment object in the media collection.
- *
- * @param {number} id The attachment id.
- *
- * @return {boolean} Whether the image has been destroyed.
- */
-export function isMediaDestroyed( id ) {
-	const attachment = wp?.media?.attachment( id ) || {};
-	return attachment.destroyed;
 }
 
 export function ImageEdit( {
@@ -106,9 +109,7 @@ export function ImageEdit( {
 	setAttributes,
 	isSelected,
 	className,
-	noticeUI,
 	insertBlocksAfter,
-	noticeOperations,
 	onReplace,
 	context,
 	clientId,
@@ -136,41 +137,24 @@ export function ImageEdit( {
 	}, [ caption ] );
 
 	const ref = useRef();
-	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return pick( getSettings(), [ 'imageDefaultSize', 'mediaUpload' ] );
-	}, [] );
+	const { imageDefaultSize, mediaUpload, isContentLocked } = useSelect(
+		( select ) => {
+			const { getSettings, __unstableGetContentLockingParent } =
+				select( blockEditorStore );
+			const settings = getSettings();
+			return {
+				imageDefaultSize: settings.imageDefaultSize,
+				mediaUpload: settings.mediaUpload,
+				isContentLocked:
+					!! __unstableGetContentLockingParent( clientId ),
+			};
+		},
+		[]
+	);
 
-	// A callback passed to MediaUpload,
-	// fired when the media modal closes.
-	function onCloseModal() {
-		if ( isMediaDestroyed( attributes?.id ) ) {
-			setAttributes( {
-				url: undefined,
-				id: undefined,
-			} );
-		}
-	}
-
-	/*
-		 Runs an error callback if the image does not load.
-		 If the error callback is triggered, we infer that that image
-		 has been deleted.
-	*/
-	function onImageError( isReplaced = false ) {
-		// If the image block was not replaced with an embed,
-		// clear the attributes and trigger the placeholder.
-		if ( ! isReplaced ) {
-			setAttributes( {
-				url: undefined,
-				id: undefined,
-			} );
-		}
-	}
-
+	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 		setAttributes( {
 			src: undefined,
 			id: undefined,
@@ -204,7 +188,9 @@ export function ImageEdit( {
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
 		if ( captionRef.current && ! get( mediaAttributes, [ 'caption' ] ) ) {
-			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
+			const { caption: omittedCaption, ...restMediaAttributes } =
+				mediaAttributes;
+			mediaAttributes = restMediaAttributes;
 		}
 
 		let additionalAttributes;
@@ -232,7 +218,7 @@ export function ImageEdit( {
 			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
 			// TODO: fix this in a follow up PR, requires updating media-text and ui component.
 			switch (
-				wp?.media?.view?.settings?.defaultProps?.link ||
+				window?.wp?.media?.view?.settings?.defaultProps?.link ||
 				LINK_DESTINATION_NONE
 			) {
 				case 'file':
@@ -339,10 +325,14 @@ export function ImageEdit( {
 		/>
 	);
 
+	const borderProps = useBorderProps( attributes );
+
 	const classes = classnames( className, {
 		'is-transient': temporaryURL,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
+		'has-custom-border':
+			!! borderProps.className || ! isEmpty( borderProps.style ),
 	} );
 
 	const blockProps = useBlockProps( {
@@ -366,11 +356,10 @@ export function ImageEdit( {
 					containerRef={ ref }
 					context={ context }
 					clientId={ clientId }
-					onCloseModal={ onCloseModal }
-					onImageLoadError={ onImageError }
+					isContentLocked={ isContentLocked }
 				/>
 			) }
-			{ ! url && (
+			{ ! url && ! isContentLocked && (
 				<BlockControls group="block">
 					<BlockAlignmentControl
 						value={ align }
@@ -382,9 +371,8 @@ export function ImageEdit( {
 				icon={ <BlockIcon icon={ icon } /> }
 				onSelect={ onSelectImage }
 				onSelectURL={ onSelectURL }
-				notices={ noticeUI }
 				onError={ onUploadError }
-				onClose={ onCloseModal }
+				placeholder={ placeholder }
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { id, src } }
@@ -395,4 +383,4 @@ export function ImageEdit( {
 	);
 }
 
-export default withNotices( ImageEdit );
+export default ImageEdit;

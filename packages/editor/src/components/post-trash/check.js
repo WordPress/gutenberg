@@ -18,9 +18,8 @@ function PostTrashCheck( { isNew, postId, canUserDelete, children } ) {
 }
 
 export default withSelect( ( select ) => {
-	const { isEditedPostNew, getCurrentPostId, getCurrentPostType } = select(
-		editorStore
-	);
+	const { isEditedPostNew, getCurrentPostId, getCurrentPostType } =
+		select( editorStore );
 	const { getPostType, canUser } = select( coreStore );
 	const postId = getCurrentPostId();
 	const postType = getPostType( getCurrentPostType() );

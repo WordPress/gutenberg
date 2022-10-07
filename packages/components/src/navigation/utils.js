@@ -1,11 +1,11 @@
 /**
  * External dependencies
  */
-import { deburr } from 'lodash';
+import removeAccents from 'remove-accents';
 
 // @see packages/block-editor/src/components/inserter/search-items.js
 export const normalizeInput = ( input ) =>
-	deburr( input ).replace( /^\//, '' ).toLowerCase();
+	removeAccents( input ).replace( /^\//, '' ).toLowerCase();
 
 export const normalizedSearch = ( title, search ) =>
 	-1 !== normalizeInput( title ).indexOf( normalizeInput( search ) );

@@ -7,7 +7,6 @@ import type { Comment } from './comment';
 import type { MenuLocation } from './menu-location';
 import type { NavMenu } from './nav-menu';
 import type { NavMenuItem } from './nav-menu-item';
-import type { NavigationArea } from './navigation-area';
 import type { Page } from './page';
 import type { Plugin } from './plugin';
 import type { Post } from './post';
@@ -31,7 +30,6 @@ export type {
 	MenuLocation,
 	NavMenu,
 	NavMenuItem,
-	NavigationArea,
 	Page,
 	Plugin,
 	Post,
@@ -48,25 +46,62 @@ export type {
 	WpTemplatePart,
 };
 
-export type EntityRecord< C extends Context > =
-	| Attachment< C >
-	| Comment< C >
-	| MenuLocation< C >
-	| NavMenu< C >
-	| NavMenuItem< C >
-	| NavigationArea< C >
-	| Page< C >
-	| Plugin< C >
-	| Post< C >
-	| Settings< C >
-	| Sidebar< C >
-	| Taxonomy< C >
-	| Theme< C >
-	| Type< C >
-	| User< C >
-	| Widget< C >
-	| WidgetType< C >
-	| WpTemplate< C >
-	| WpTemplatePart< C >;
+/**
+ * An interface that may be extended to add types for new entities. Each entry
+ * must be a union of entity definitions adhering to the EntityInterface type.
+ *
+ * Example:
+ *
+ * ```ts
+ * import type { Context } from '@wordpress/core-data';
+ * // ...
+ *
+ * interface Client {
+ *   id: number;
+ *   name: string;
+ *   // ...
+ * }
+ *
+ * interface Order< C extends Context > {
+ *   id: number;
+ *   name: string;
+ *   // ...
+ * }
+ *
+ * declare module '@wordpress/core-data' {
+ *     export interface PerPackageEntityRecords< C extends Context > {
+ *         myPlugin: Client | Order<C>>
+ *     }
+ * }
+ *
+ * const c = getEntityRecord<Order>( 'myPlugin', 'order', 15 );
+ * // c is of the type Order
+ * ```
+ */
+export interface PerPackageEntityRecords< C extends Context > {
+	core:
+		| Attachment< C >
+		| Comment< C >
+		| MenuLocation< C >
+		| NavMenu< C >
+		| NavMenuItem< C >
+		| Page< C >
+		| Plugin< C >
+		| Post< C >
+		| Settings< C >
+		| Sidebar< C >
+		| Taxonomy< C >
+		| Theme< C >
+		| User< C >
+		| Type< C >
+		| Widget< C >
+		| WidgetType< C >
+		| WpTemplate< C >
+		| WpTemplatePart< C >;
+}
 
-export type UpdatableEntityRecord = Updatable< EntityRecord< 'edit' > >;
+/**
+ * A union of all known record types.
+ */
+export type EntityRecord< C extends Context = 'edit' > =
+	PerPackageEntityRecords< C >[ keyof PerPackageEntityRecords< C > ];

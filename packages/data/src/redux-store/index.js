@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { createStore, applyMiddleware } from 'redux';
-import { flowRight, get, mapValues, omit } from 'lodash';
+import { get, mapValues } from 'lodash';
 import combineReducers from 'turbo-combine-reducers';
 import EquivalentKeyMap from 'equivalent-key-map';
 
@@ -10,6 +10,7 @@ import EquivalentKeyMap from 'equivalent-key-map';
  * WordPress dependencies
  */
 import createReduxRoutineMiddleware from '@wordpress/redux-routine';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -23,8 +24,14 @@ import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
 
 /** @typedef {import('../types').DataRegistry} DataRegistry */
-/** @typedef {import('../types').StoreDescriptor} StoreDescriptor */
-/** @typedef {import('../types').ReduxStoreConfig} ReduxStoreConfig */
+/**
+ * @typedef {import('../types').StoreDescriptor<C>} StoreDescriptor
+ * @template C
+ */
+/**
+ * @typedef {import('../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
+ * @template State,Actions,Selectors
+ */
 
 const trimUndefinedValues = ( array ) => {
 	const result = [ ...array ];
@@ -83,12 +90,13 @@ function createResolversCache() {
  * } );
  * ```
  *
- * @param {string}           key     Unique namespace identifier.
- * @param {ReduxStoreConfig} options Registered store options, with properties
- *                                   describing reducer, actions, selectors,
- *                                   and resolvers.
+ * @template State,Actions,Selectors
+ * @param {string}                                    key     Unique namespace identifier.
+ * @param {ReduxStoreConfig<State,Actions,Selectors>} options Registered store options, with properties
+ *                                                            describing reducer, actions, selectors,
+ *                                                            and resolvers.
  *
- * @return {StoreDescriptor} Store Object.
+ * @return   {StoreDescriptor<ReduxStoreConfig<State,Actions,Selectors>>} Store Object.
  */
 export default function createReduxStore( key, options ) {
 	return {
@@ -136,8 +144,9 @@ export default function createReduxStore( key, options ) {
 				{
 					...mapValues(
 						metadataSelectors,
-						( selector ) => ( state, ...args ) =>
-							selector( state.metadata, ...args )
+						( selector ) =>
+							( state, ...args ) =>
+								selector( state.metadata, ...args )
 					),
 					...mapValues( options.selectors, ( selector ) => {
 						if ( selector.isRegistrySelector ) {
@@ -162,10 +171,12 @@ export default function createReduxStore( key, options ) {
 			}
 
 			const resolveSelectors = mapResolveSelectors( selectors, store );
+			const suspendSelectors = mapSuspendSelectors( selectors, store );
 
 			const getSelectors = () => selectors;
 			const getActions = () => actions;
 			const getResolveSelectors = () => resolveSelectors;
+			const getSuspendSelectors = () => suspendSelectors;
 
 			// We have some modules monkey-patching the store object
 			// It's wrong to do so but until we refactor all of our effects to controls
@@ -200,6 +211,7 @@ export default function createReduxStore( key, options ) {
 				resolvers,
 				getSelectors,
 				getResolveSelectors,
+				getSuspendSelectors,
 				getActions,
 				subscribe,
 			};
@@ -257,7 +269,7 @@ function instantiateReduxStore( key, options, registry, thunkArgs ) {
 	return createStore(
 		enhancedReducer,
 		{ root: initialState },
-		flowRight( enhancers )
+		compose( enhancers )
 	);
 }
 
@@ -305,9 +317,11 @@ function mapSelectors( selectors, store ) {
  * @return {Object} Actions mapped to the redux store provided.
  */
 function mapActions( actions, store ) {
-	const createBoundAction = ( action ) => ( ...args ) => {
-		return Promise.resolve( store.dispatch( action( ...args ) ) );
-	};
+	const createBoundAction =
+		( action ) =>
+		( ...args ) => {
+			return Promise.resolve( store.dispatch( action( ...args ) ) );
+		};
 
 	return mapValues( actions, createBoundAction );
 }
@@ -321,16 +335,27 @@ function mapActions( actions, store ) {
  * @return {Object} Selectors mapped to their resolution functions.
  */
 function mapResolveSelectors( selectors, store ) {
-	return mapValues(
-		omit( selectors, [
-			'getIsResolving',
-			'hasStartedResolution',
-			'hasFinishedResolution',
-			'isResolving',
-			'getCachedResolvers',
-		] ),
-		( selector, selectorName ) => ( ...args ) =>
-			new Promise( ( resolve, reject ) => {
+	const {
+		getIsResolving,
+		hasStartedResolution,
+		hasFinishedResolution,
+		hasResolutionFailed,
+		isResolving,
+		getCachedResolvers,
+		getResolutionState,
+		getResolutionError,
+		...storeSelectors
+	} = selectors;
+
+	return mapValues( storeSelectors, ( selector, selectorName ) => {
+		// If the selector doesn't have a resolver, just convert the return value
+		// (including exceptions) to a Promise, no additional extra behavior is needed.
+		if ( ! selector.hasResolver ) {
+			return async ( ...args ) => selector.apply( null, args );
+		}
+
+		return ( ...args ) => {
+			return new Promise( ( resolve, reject ) => {
 				const hasFinished = () =>
 					selectors.hasFinishedResolution( selectorName, args );
 				const finalize = ( result ) => {
@@ -361,8 +386,49 @@ function mapResolveSelectors( selectors, store ) {
 						finalize( getResult() );
 					}
 				} );
-			} )
-	);
+			} );
+		};
+	} );
+}
+
+/**
+ * Maps selectors to functions that throw a suspense promise if not yet resolved.
+ *
+ * @param {Object} selectors Selectors to map.
+ * @param {Object} store     The redux store the selectors select from.
+ *
+ * @return {Object} Selectors mapped to their suspense functions.
+ */
+function mapSuspendSelectors( selectors, store ) {
+	return mapValues( selectors, ( selector, selectorName ) => {
+		// Selector without a resolver doesn't have any extra suspense behavior.
+		if ( ! selector.hasResolver ) {
+			return selector;
+		}
+
+		return ( ...args ) => {
+			const result = selector.apply( null, args );
+
+			if ( selectors.hasFinishedResolution( selectorName, args ) ) {
+				if ( selectors.hasResolutionFailed( selectorName, args ) ) {
+					throw selectors.getResolutionError( selectorName, args );
+				}
+
+				return result;
+			}
+
+			throw new Promise( ( resolve ) => {
+				const unsubscribe = store.subscribe( () => {
+					if (
+						selectors.hasFinishedResolution( selectorName, args )
+					) {
+						resolve();
+						unsubscribe();
+					}
+				} );
+			} );
+		};
+	} );
 }
 
 /**

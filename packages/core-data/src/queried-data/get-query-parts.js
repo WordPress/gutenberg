@@ -80,6 +80,9 @@ export function getQueryParts( query ) {
 
 				// Two requests with different include values cannot have same results.
 				if ( key === 'include' ) {
+					if ( typeof value === 'number' ) {
+						value = value.toString();
+					}
 					parts.include = (
 						getNormalizedCommaSeparable( value ) ?? []
 					).map( Number );

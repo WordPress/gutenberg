@@ -54,7 +54,7 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'disableComplementaryArea', () => {
-		it( 'removes any assignment to a complementary area', () => {
+		it( 'results in the complementary area being inactive', () => {
 			registry
 				.dispatch( interfaceStore )
 				.enableComplementaryArea( 'my-plugin', 'custom-sidebar' );

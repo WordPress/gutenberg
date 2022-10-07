@@ -1,6 +1,8 @@
 /**
  * Internal dependencies
  */
+import { WithGlobalCSS } from './decorators/with-global-css';
+import { WithMarginChecker } from './decorators/with-margin-checker';
 import { WithRTL } from './decorators/with-rtl';
 import './style.scss';
 
@@ -17,9 +19,39 @@ export const globalTypes = {
 			],
 		},
 	},
+	css: {
+		name: 'Global CSS',
+		description:
+			'Inject global CSS that may be loaded in certain contexts.',
+		defaultValue: 'basic',
+		toolbar: {
+			icon: 'document',
+			items: [
+				{ value: 'none', title: 'None' },
+				{ value: 'basic', title: 'Font only' },
+				{
+					value: 'wordpress',
+					title: 'WordPress (common, forms, dashicons)',
+				},
+			],
+		},
+	},
+	marginChecker: {
+		name: 'Margin Checker',
+		description:
+			'Show a div before and after the component to check for unwanted margins.',
+		defaultValue: 'hide',
+		toolbar: {
+			icon: 'collapse',
+			items: [
+				{ value: 'hide', title: 'Hide' },
+				{ value: 'show', title: 'Show' },
+			],
+		},
+	},
 };
 
-export const decorators = [ WithRTL ];
+export const decorators = [ WithGlobalCSS, WithMarginChecker, WithRTL ];
 
 export const parameters = {
 	controls: {

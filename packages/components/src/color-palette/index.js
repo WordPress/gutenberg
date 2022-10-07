@@ -2,11 +2,9 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -24,6 +22,7 @@ import { VStack } from '../v-stack';
 import { Flex, FlexItem } from '../flex';
 import { Truncate } from '../truncate';
 import { ColorHeading } from './styles';
+import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -36,15 +35,16 @@ function SinglePalette( {
 	actions,
 } ) {
 	const colorOptions = useMemo( () => {
-		return map( colors, ( { color, name } ) => {
+		return colors.map( ( { color, name }, index ) => {
 			const colordColor = colord( color );
+			const isSelected = value === color;
 
 			return (
 				<CircularOptionPicker.Option
-					key={ color }
-					isSelected={ value === color }
+					key={ `${ color }-${ index }` }
+					isSelected={ isSelected }
 					selectedIconProps={
-						value === color
+						isSelected
 							? {
 									fill:
 										colordColor.contrast() >
@@ -61,7 +61,7 @@ function SinglePalette( {
 					}
 					style={ { backgroundColor: color, color } }
 					onClick={
-						value === color ? clearColor : () => onChange( color )
+						isSelected ? clearColor : () => onChange( color )
 					}
 					aria-label={
 						name
@@ -113,21 +113,41 @@ function MultiplePalettes( {
 	);
 }
 
-export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
+export function CustomColorPickerDropdown( {
+	isRenderedInSidebar,
+	popoverProps: receivedPopoverProps,
+	...props
+} ) {
+	const popoverProps = useMemo(
+		() => ( {
+			shift: true,
+			...( isRenderedInSidebar
+				? {
+						// When in the sidebar: open to the left (stacking),
+						// leaving the same gap as the parent popover.
+						placement: 'left-start',
+						offset: 34,
+				  }
+				: {
+						// Default behavior: open below the anchor
+						placement: 'bottom',
+						offset: 8,
+				  } ),
+			...receivedPopoverProps,
+		} ),
+		[ isRenderedInSidebar, receivedPopoverProps ]
+	);
+
 	return (
 		<Dropdown
-			contentClassName={ classnames(
-				'components-color-palette__custom-color-dropdown-content',
-				{
-					'is-rendered-in-sidebar': isRenderedInSidebar,
-				}
-			) }
+			contentClassName="components-color-palette__custom-color-dropdown-content"
+			popoverProps={ popoverProps }
 			{ ...props }
 		/>
 	);
 }
 
-const extractColorNameFromCurrentValue = (
+export const extractColorNameFromCurrentValue = (
 	currentValue,
 	colors = [],
 	showMultiplePalettes = false
@@ -136,13 +156,20 @@ const extractColorNameFromCurrentValue = (
 		return '';
 	}
 
+	const currentValueIsCssVariable = /^var\(/.test( currentValue );
+	const normalizedCurrentValue = currentValueIsCssVariable
+		? currentValue
+		: colord( currentValue ).toHex();
+
 	// Normalize format of `colors` to simplify the following loop
 	const colorPalettes = showMultiplePalettes ? colors : [ { colors } ];
 	for ( const { colors: paletteColors } of colorPalettes ) {
 		for ( const { name: colorName, color: colorValue } of paletteColors ) {
-			if (
-				colord( currentValue ).toHex() === colord( colorValue ).toHex()
-			) {
+			const normalizedColorValue = currentValueIsCssVariable
+				? colorValue
+				: colord( colorValue ).toHex();
+
+			if ( normalizedCurrentValue === normalizedColorValue ) {
 				return colorName;
 			}
 		}
@@ -150,6 +177,13 @@ const extractColorNameFromCurrentValue = (
 
 	// translators: shown when the user has picked a custom color (i.e not in the palette of colors).
 	return __( 'Custom' );
+};
+
+export const showTransparentBackground = ( currentValue ) => {
+	if ( typeof currentValue === 'undefined' ) {
+		return true;
+	}
+	return colord( currentValue ).alpha() === 0;
 };
 
 export default function ColorPalette( {
@@ -169,17 +203,14 @@ export default function ColorPalette( {
 	const Component = showMultiplePalettes ? MultiplePalettes : SinglePalette;
 
 	const renderCustomColorPicker = () => (
-		<ColorPicker
-			color={ value }
-			onChange={ ( color ) => onChange( color ) }
-			enableAlpha={ enableAlpha }
-		/>
+		<DropdownContentWrapper paddingSize="none">
+			<ColorPicker
+				color={ value }
+				onChange={ ( color ) => onChange( color ) }
+				enableAlpha={ enableAlpha }
+			/>
+		</DropdownContentWrapper>
 	);
-
-	let dropdownPosition;
-	if ( __experimentalIsRenderedInSidebar ) {
-		dropdownPosition = 'bottom left';
-	}
 
 	const colordColor = colord( value );
 
@@ -211,7 +242,6 @@ export default function ColorPalette( {
 		<VStack spacing={ 3 } className={ className }>
 			{ ! disableCustomColors && (
 				<CustomColorPickerDropdown
-					position={ dropdownPosition }
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (
@@ -224,14 +254,18 @@ export default function ColorPalette( {
 							aria-haspopup="true"
 							onClick={ onToggle }
 							aria-label={ customColorAccessibleLabel }
-							style={ {
-								background: value,
-								color:
-									colordColor.contrast() >
-									colordColor.contrast( '#000' )
-										? '#fff'
-										: '#000',
-							} }
+							style={
+								showTransparentBackground( value )
+									? { color: '#000' }
+									: {
+											background: value,
+											color:
+												colordColor.contrast() >
+												colordColor.contrast( '#000' )
+													? '#fff'
+													: '#000',
+									  }
+							}
 						>
 							<FlexItem
 								isBlock

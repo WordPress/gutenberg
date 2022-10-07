@@ -3,33 +3,22 @@
  */
 import { render, screen } from '@testing-library/react';
 import { create, act } from 'react-test-renderer';
-import { noop } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import ColorGradientControl from '../control';
 
-const getButtonWithAriaLabelStartPredicate = ( ariaLabelStart ) => (
-	element
-) => {
-	return (
-		element.type === 'button' &&
-		element.props[ 'aria-label' ] &&
-		element.props[ 'aria-label' ].startsWith( ariaLabelStart )
-	);
-};
+const noop = () => {};
 
-const getTabWithTestPredicate = ( text ) => ( element ) => {
-	return (
-		element.type === 'button' &&
-		element.props[ 'aria-label' ] &&
-		element.props[ 'aria-label' ] === text
-	);
-};
-
-const colorTabButtonPredicate = getTabWithTestPredicate( 'Solid' );
-const gradientTabButtonPredicate = getTabWithTestPredicate( 'Gradient' );
+const getButtonWithAriaLabelStartPredicate =
+	( ariaLabelStart ) => ( element ) => {
+		return (
+			element.type === 'button' &&
+			element.props[ 'aria-label' ] &&
+			element.props[ 'aria-label' ].startsWith( ariaLabelStart )
+		);
+	};
 
 describe( 'ColorPaletteControl', () => {
 	it( 'renders tabs if it is possible to select a color and a gradient rendering a color picker at the start', async () => {
@@ -63,8 +52,12 @@ describe( 'ColorPaletteControl', () => {
 		);
 
 		// Is showing the two tab buttons.
-		expect( screen.queryByLabelText( 'Solid' ) ).toBeInTheDocument();
-		expect( screen.queryByLabelText( 'Gradient' ) ).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'tab', { name: 'Solid' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'tab', { name: 'Gradient' } )
+		).toBeInTheDocument();
 
 		// Is showing the two predefined Colors.
 		expect( screen.getAllByLabelText( /^Color:/ ) ).toHaveLength( 2 );
@@ -92,12 +85,12 @@ describe( 'ColorPaletteControl', () => {
 		} );
 
 		// Is not showing the two tab buttons.
-		expect( wrapper.root.findAll( colorTabButtonPredicate ) ).toHaveLength(
-			0
-		);
 		expect(
-			wrapper.root.findAll( gradientTabButtonPredicate )
-		).toHaveLength( 0 );
+			screen.queryByRole( 'tab', { name: 'Solid' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'tab', { name: 'Gradient' } )
+		).not.toBeInTheDocument();
 
 		// Is showing the two predefined Colors.
 		expect(
@@ -139,12 +132,12 @@ describe( 'ColorPaletteControl', () => {
 		} );
 
 		// Is not showing the two tab buttons.
-		expect( wrapper.root.findAll( colorTabButtonPredicate ) ).toHaveLength(
-			0
-		);
 		expect(
-			wrapper.root.findAll( gradientTabButtonPredicate )
-		).toHaveLength( 0 );
+			screen.queryByRole( 'tab', { name: 'Solid' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'tab', { name: 'Gradient' } )
+		).not.toBeInTheDocument();
 
 		// Is showing the two predefined Gradients.
 		expect(

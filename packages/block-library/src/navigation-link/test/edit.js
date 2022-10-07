@@ -160,8 +160,7 @@ describe( 'edit', () => {
 				opensInNewTab: false,
 				title: 'Portfolio Category',
 				type: 'portfolio_category',
-				url:
-					'http://wordpress.local/portfolio_category/Portfolio-category/',
+				url: 'http://wordpress.local/portfolio_category/Portfolio-category/',
 			};
 			updateNavigationLinkBlockAttributes(
 				linkSuggestion,
@@ -173,8 +172,7 @@ describe( 'edit', () => {
 				opensInNewTab: false,
 				label: 'Portfolio Category',
 				type: 'portfolio_category',
-				url:
-					'http://wordpress.local/portfolio_category/Portfolio-category/',
+				url: 'http://wordpress.local/portfolio_category/Portfolio-category/',
 			} );
 		} );
 
@@ -370,26 +368,6 @@ describe( 'edit', () => {
 					label: 'Custom Title',
 					kind: 'custom',
 					url: 'https://wordpress.org',
-				} );
-			} );
-			// https://github.com/WordPress/gutenberg/pull/18617
-			it( 'label is javascript escaped', () => {
-				const setAttributes = jest.fn();
-				const linkSuggestion = {
-					opensInNewTab: false,
-					title: '<Navigation />',
-					type: 'URL',
-					url: 'https://wordpress.local?p=1',
-				};
-				updateNavigationLinkBlockAttributes(
-					linkSuggestion,
-					setAttributes
-				);
-				expect( setAttributes ).toHaveBeenCalledWith( {
-					opensInNewTab: false,
-					label: '&lt;Navigation /&gt;',
-					kind: 'custom',
-					url: 'https://wordpress.local?p=1',
 				} );
 			} );
 			// https://github.com/WordPress/gutenberg/pull/19679

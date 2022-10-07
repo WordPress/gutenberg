@@ -79,6 +79,7 @@ All of this combined together, here's what the edit function looks like:
 ```jsx
 import { Placeholder, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useBlockProps } from "@wordpress/block-editor";
 
 export default function Edit( { attributes, isSelected, setAttributes } ) {
 	return (
@@ -115,7 +116,7 @@ Update `src/editor.scss` to:
 
 ```scss
 .wp-block-create-block-gutenpride input[type='text'] {
-	font-family: Gilbert;
+	font-family: Gilbert, sans-serif;
 	font-size: 64px;
 	color: inherit;
 	background: inherit;

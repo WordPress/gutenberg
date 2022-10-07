@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useMemo, useState } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -17,7 +19,10 @@ import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { useBorderBoxControl } from './hook';
 
 import type { BorderBoxControlProps } from '../types';
-import type { LabelProps } from '../../border-control/types';
+import type {
+	LabelProps,
+	BorderControlProps,
+} from '../../border-control/types';
 
 const BorderLabel = ( props: LabelProps ) => {
 	const { label, hideLabelFromVision } = props;
@@ -41,6 +46,7 @@ const BorderBoxControl = (
 		className,
 		colors,
 		disableCustomColors,
+		disableUnits,
 		enableAlpha,
 		enableStyle,
 		hasMixedBorders,
@@ -51,16 +57,41 @@ const BorderBoxControl = (
 		linkedValue,
 		onLinkedChange,
 		onSplitChange,
-		popoverClassNames,
+		popoverPlacement,
+		popoverOffset,
 		splitValue,
 		toggleLinked,
 		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
+		__next36pxDefaultSize = false,
 		...otherProps
 	} = useBorderBoxControl( props );
 
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState< Element | null >(
+		null
+	);
+
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps: BorderControlProps[ '__unstablePopoverProps' ] =
+		useMemo(
+			() =>
+				popoverPlacement
+					? {
+							placement: popoverPlacement,
+							offset: popoverOffset,
+							anchor: popoverAnchor,
+							shift: true,
+					  }
+					: undefined,
+			[ popoverPlacement, popoverOffset, popoverAnchor ]
+		);
+
+	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
+
 	return (
-		<View className={ className } { ...otherProps } ref={ forwardedRef }>
+		<View className={ className } { ...otherProps } ref={ mergedRef }>
 			<BorderLabel
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
@@ -70,6 +101,7 @@ const BorderBoxControl = (
 					<BorderControl
 						className={ linkedControlClassName }
 						colors={ colors }
+						disableUnits={ disableUnits }
 						disableCustomColors={ disableCustomColors }
 						enableAlpha={ enableAlpha }
 						enableStyle={ enableStyle }
@@ -77,7 +109,7 @@ const BorderBoxControl = (
 						placeholder={
 							hasMixedBorders ? __( 'Mixed' ) : undefined
 						}
-						popoverContentClassName={ popoverClassNames?.linked }
+						__unstablePopoverProps={ popoverProps }
 						shouldSanitizeBorder={ false } // This component will handle that.
 						value={ linkedValue }
 						withSlider={ true }
@@ -88,6 +120,7 @@ const BorderBoxControl = (
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
+						__next36pxDefaultSize={ __next36pxDefaultSize }
 					/>
 				) : (
 					<BorderBoxControlSplitControls
@@ -96,7 +129,8 @@ const BorderBoxControl = (
 						enableAlpha={ enableAlpha }
 						enableStyle={ enableStyle }
 						onChange={ onSplitChange }
-						popoverClassNames={ popoverClassNames }
+						popoverPlacement={ popoverPlacement }
+						popoverOffset={ popoverOffset }
 						value={ splitValue }
 						__experimentalHasMultipleOrigins={
 							__experimentalHasMultipleOrigins
@@ -104,11 +138,13 @@ const BorderBoxControl = (
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
+						__next36pxDefaultSize={ __next36pxDefaultSize }
 					/>
 				) }
 				<BorderBoxControlLinkedButton
 					onClick={ toggleLinked }
 					isLinked={ isLinked }
+					__next36pxDefaultSize={ __next36pxDefaultSize }
 				/>
 			</HStack>
 		</View>

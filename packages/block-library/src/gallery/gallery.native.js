@@ -49,10 +49,8 @@ export const Gallery = ( props ) => {
 		}
 	}, [ sizes ] );
 
-	const {
-		align,
-		columns = defaultColumnsNumber( images.length ),
-	} = attributes;
+	const { align, columns = defaultColumnsNumber( images.length ) } =
+		attributes;
 
 	const displayedColumns = Math.min(
 		columns,

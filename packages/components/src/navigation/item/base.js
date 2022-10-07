@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,10 +15,13 @@ import { useNavigationContext } from '../context';
 import { useNavigationTreeItem } from './use-navigation-tree-item';
 import { ItemBaseUI } from '../styles/navigation-styles';
 
-export default function NavigationItemBase( props ) {
-	const { children, className, ...restProps } = props;
+let uniqueId = 0;
 
-	const [ itemId ] = useState( uniqueId( 'item-' ) );
+export default function NavigationItemBase( props ) {
+	// Also avoid to pass the `title` and `href` props to the ItemBaseUI styled component.
+	const { children, className, title, href, ...restProps } = props;
+
+	const [ itemId ] = useState( `item-${ ++uniqueId }` );
 
 	useNavigationTreeItem( itemId, props );
 	const { navigationTree } = useNavigationContext();

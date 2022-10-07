@@ -96,7 +96,7 @@ exports.imageCompletehtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
 <!-- /wp:paragraph -->`;
 
 exports.imageShorteHtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
-<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/><figcaption>C'est la vie my friends</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground" class="wp-image-1"/><figcaption class="wp-element-caption">C'est la vie my friends</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
@@ -135,7 +135,7 @@ exports.coverHeightWithRemUnit = `<!-- wp:cover {"customOverlayColor":"#ffffff",
 <!-- /wp:cover -->`;
 
 exports.fileBlockPlaceholder = `<!-- wp:file {"id":3,"href":"https://wordpress.org/latest.zip"} -->
-<div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button" download>Download</a></div>
+<div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button wp-element-button" download>Download</a></div>
 <!-- /wp:file -->`;
 
 exports.audioBlockPlaceholder = `<!-- wp:audio {"id":5} -->
@@ -151,7 +151,9 @@ exports.separatorBlockEmpty = `<!-- wp:separator -->
 <!-- /wp:separator -->`;
 
 exports.listBlockEmpty = `<!-- wp:list -->
-<ul><li></li></ul>
+<ul><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->`;
 
 exports.imageBlockEmpty = `<!-- wp:image -->
@@ -165,3 +167,23 @@ exports.moreBlockEmpty = `<!-- wp:more -->
 exports.paragraphBlockEmpty = `<!-- wp:paragraph -->
 <p></p>
 <!-- /wp:paragraph -->`;
+
+exports.paragraphBlockShortText = `<!-- wp:paragraph -->
+<p>Rock music approaches at high velocity.</p>
+<!-- /wp:paragraph -->`;
+
+exports.multiLinesParagraphBlock = `<!-- wp:paragraph -->
+<p>multiple lines<br>multiple lines<br>multiple lines</p>
+<!-- /wp:paragraph -->`;
+
+exports.unknownElementParagraphBlock = `<!-- wp:paragraph -->
+<p><unknownhtmlelement>abc</unknownhtmlelement>D</p>
+<!-- /wp:paragraph -->`;
+
+exports.lettersInParagraphBlock = `<!-- wp:paragraph -->
+<p>ABCD</p>
+<!-- /wp:paragraph -->`;
+
+exports.spacerBlock = `<!-- wp:spacer -->
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->`;

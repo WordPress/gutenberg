@@ -6,9 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { useState } from '@wordpress/element';
 import { __, _x, isRTL } from '@wordpress/i18n';
 import {
-	ToolbarDropdownMenu,
+	ToolbarButton,
 	ToggleControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -20,30 +21,35 @@ import {
 	useBlockProps,
 	useSetting,
 } from '@wordpress/block-editor';
+import { useMergeRefs } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { useOnEnter } from './use-enter';
+import DropZone from './drop-zone';
 
 const name = 'core/paragraph';
 
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
 		isRTL() && (
-			<ToolbarDropdownMenu
-				controls={ [
-					{
-						icon: formatLtr,
-						title: _x( 'Left to right', 'editor button' ),
-						isActive: direction === 'ltr',
-						onClick() {
-							setDirection(
-								direction === 'ltr' ? undefined : 'ltr'
-							);
-						},
-					},
-				] }
+			<ToolbarButton
+				icon={ formatLtr }
+				title={ _x( 'Left to right', 'editor button' ) }
+				isActive={ direction === 'ltr' }
+				onClick={ () => {
+					setDirection( direction === 'ltr' ? undefined : 'ltr' );
+				} }
 			/>
 		)
 	);
+}
+
+function hasDropCapDisabled( align ) {
+	return align === ( isRTL() ? 'left' : 'right' ) || align === 'center';
 }
 
 function ParagraphBlock( {
@@ -56,13 +62,27 @@ function ParagraphBlock( {
 } ) {
 	const { align, content, direction, dropCap, placeholder } = attributes;
 	const isDropCapFeatureEnabled = useSetting( 'typography.dropCap' );
+	const [ paragraphElement, setParagraphElement ] = useState( null );
 	const blockProps = useBlockProps( {
+		ref: useMergeRefs( [
+			useOnEnter( { clientId, content } ),
+			setParagraphElement,
+		] ),
 		className: classnames( {
-			'has-drop-cap': dropCap,
+			'has-drop-cap': hasDropCapDisabled( align ) ? false : dropCap,
 			[ `has-text-align-${ align }` ]: align,
 		} ),
 		style: { direction },
 	} );
+
+	let helpText;
+	if ( hasDropCapDisabled( align ) ) {
+		helpText = __( 'Not available for aligned text.' );
+	} else if ( dropCap ) {
+		helpText = __( 'Showing large initial letter.' );
+	} else {
+		helpText = __( 'Toggle to show a large initial letter.' );
+	}
 
 	return (
 		<>
@@ -70,7 +90,12 @@ function ParagraphBlock( {
 				<AlignmentControl
 					value={ align }
 					onChange={ ( newAlign ) =>
-						setAttributes( { align: newAlign } )
+						setAttributes( {
+							align: newAlign,
+							dropCap: hasDropCapDisabled( newAlign )
+								? false
+								: dropCap,
+						} )
 					}
 				/>
 				<ParagraphRTLControl
@@ -97,16 +122,19 @@ function ParagraphBlock( {
 							onChange={ () =>
 								setAttributes( { dropCap: ! dropCap } )
 							}
-							help={
-								dropCap
-									? __( 'Showing large initial letter.' )
-									: __(
-											'Toggle to show a large initial letter.'
-									  )
+							help={ helpText }
+							disabled={
+								hasDropCapDisabled( align ) ? true : false
 							}
 						/>
 					</ToolsPanelItem>
 				</InspectorControls>
+			) }
+			{ ! content && (
+				<DropZone
+					clientId={ clientId }
+					paragraphElement={ paragraphElement }
+				/>
 			) }
 			<RichText
 				identifier="content"
@@ -146,6 +174,7 @@ function ParagraphBlock( {
 				}
 				data-empty={ content ? false : true }
 				placeholder={ placeholder || __( 'Type / to choose a block' ) }
+				data-custom-placeholder={ placeholder ? true : undefined }
 				__unstableEmbedURLOnPaste
 				__unstableAllowPrefixTransformations
 			/>

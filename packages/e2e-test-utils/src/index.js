@@ -67,6 +67,7 @@ export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 export { openPublishPanel } from './open-publish-panel';
 export { openTypographyToolsPanelMenu } from './open-typography-tools-panel-menu';
 export { trashAllPosts } from './posts';
+export { resetPreferences } from './preferences';
 export { pressKeyTimes } from './press-key-times';
 export {
 	pressKeyWithModifier,
@@ -117,5 +118,6 @@ export {
 	openGlobalStylesPanel,
 	openPreviousGlobalStylesPanel,
 } from './site-editor';
+export { createNewTemplate } from './create-new-template';
 
 export * from './mocks';

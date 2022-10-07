@@ -36,10 +36,8 @@ const ListViewBlockContents = forwardRef(
 
 		const { blockMovingClientId, selectedBlockInBlockEditor } = useSelect(
 			( select ) => {
-				const {
-					hasBlockMovingClientId,
-					getSelectedBlockClientId,
-				} = select( blockEditorStore );
+				const { hasBlockMovingClientId, getSelectedBlockClientId } =
+					select( blockEditorStore );
 				return {
 					blockMovingClientId: hasBlockMovingClientId(),
 					selectedBlockInBlockEditor: getSelectedBlockClientId(),

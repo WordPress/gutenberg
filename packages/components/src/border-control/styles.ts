@@ -2,19 +2,20 @@
  * External dependencies
  */
 import { css } from '@emotion/react';
-import type { CSSProperties } from 'react';
 
 /**
  * Internal dependencies
  */
-import { COLORS, CONFIG, rtl } from '../utils';
+import { COLORS, CONFIG, boxSizingReset, rtl } from '../utils';
 import { space } from '../ui/utils/space';
 import {
 	StyledField,
 	StyledLabel,
 } from '../base-control/styles/base-control-styles';
-import { BackdropUI } from '../input-control/styles/input-control-styles';
-import { Root as UnitControlWrapper } from '../unit-control/styles/unit-control-styles';
+import {
+	Root as UnitControlWrapper,
+	UnitSelect,
+} from '../unit-control/styles/unit-control-styles';
 
 import type { Border } from './types';
 
@@ -22,55 +23,72 @@ const labelStyles = css`
 	font-weight: 500;
 `;
 
+const focusBoxShadow = css`
+	box-shadow: inset 0 0 0 ${ CONFIG.borderWidth } ${ COLORS.ui.borderFocus };
+`;
+
 export const borderControl = css`
-	position: relative;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	${ boxSizingReset }
 `;
 
 export const innerWrapper = () => css`
-	border: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
-	border-radius: 2px;
-	flex: 1 0 40%;
-
-	/*
-	 * Needs more thought. Aim is to prevent the border for BorderBoxControl
-	 * showing through the control. Likely needs to take into account
-	 * light/dark themes etc.
-	 */
-	background: #fff;
-
-	/*
-	 * Forces the width control to fill available space given UnitControl
-	 * passes its className directly through to the input.
-	 */
 	${ UnitControlWrapper } {
-		flex: 1;
-		${ rtl( { marginLeft: 0 } )() }
+		flex: 1 1 40%;
+	}
+	&& ${ UnitSelect } {
+		/* Prevent unit select forcing min height larger than its UnitControl */
+		min-height: 0;
 	}
 `;
 
-export const wrapperWidth = ( width: CSSProperties[ 'width' ] ) => {
-	return css`
-		width: ${ width };
+/*
+ * This style is only applied to the UnitControl wrapper when the border width
+ * field should be a set width. Omitting this allows the UnitControl &
+ * RangeControl to share the available width in a 40/60 split respectively.
+ */
+export const wrapperWidth = css`
+	${ UnitControlWrapper } {
+		/* Force the UnitControl's set width. */
 		flex: 0 0 auto;
+	}
+`;
+
+/*
+ * When default control height is 36px the following should be removed.
+ * See: InputControl and __next36pxDefaultSize.
+ */
+export const wrapperHeight = ( __next36pxDefaultSize?: boolean ) => {
+	return css`
+		height: ${ __next36pxDefaultSize ? '36px' : '30px' };
 	`;
 };
 
 export const borderControlDropdown = () => css`
 	background: #fff;
-	${ rtl(
-		{
-			borderRadius: `1px 0 0 1px`,
-			borderRight: `${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] }`,
-		},
-		{
-			borderRadius: `0 1px 1px 0`,
-			borderLeft: `${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] }`,
-		}
-	)() }
 
 	&& > button {
-		padding: ${ space( 1 ) };
-		border-radius: inherit;
+		/*
+		 * Override button component height and padding to fit within
+		 * BorderControl regardless of size.
+		 */
+		height: 100%;
+		padding: ${ space( 0.75 ) };
+		${ rtl(
+			{ borderRadius: `2px 0 0 2px` },
+			{ borderRadius: `0 2px 2px 0` }
+		)() }
+		border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
+
+		&:focus,
+		&:hover:not( :disabled ) {
+			${ focusBoxShadow }
+			border-color: ${ COLORS.ui.borderFocus };
+			z-index: 1;
+			position: relative;
+		}
 	}
 `;
 
@@ -86,16 +104,19 @@ export const colorIndicatorBorder = ( border?: Border ) => {
 	`;
 };
 
-export const colorIndicatorWrapper = ( border?: Border ) => {
+export const colorIndicatorWrapper = (
+	border?: Border,
+	__next36pxDefaultSize?: boolean
+) => {
 	const { style } = border || {};
 
 	return css`
 		border-radius: 9999px;
 		border: 2px solid transparent;
 		${ style ? colorIndicatorBorder( border ) : undefined }
-		width: 28px;
-		height: 28px;
-		padding: 2px;
+		width: ${ __next36pxDefaultSize ? '28px' : '22px' };
+		height: ${ __next36pxDefaultSize ? '28px' : '22px' };
+		padding: ${ __next36pxDefaultSize ? '2px' : '1px' };
 
 		/*
 		 * ColorIndicator
@@ -104,6 +125,13 @@ export const colorIndicatorWrapper = ( border?: Border ) => {
 		 * over the active state of the border control dropdown's toggle button.
 		 */
 		& > span {
+			${ ! __next36pxDefaultSize
+				? css`
+						/* Dimensions fit in 30px overall control height. */
+						height: 16px;
+						width: 16px;
+				  `
+				: '' }
 			background: linear-gradient(
 				-45deg,
 				transparent 48%,
@@ -115,15 +143,13 @@ export const colorIndicatorWrapper = ( border?: Border ) => {
 	`;
 };
 
-export const borderControlPopover = css`
-	/* Remove padding from content, this will be re-added via inner elements*/
-	&& > div > div {
-		padding: 0;
-	}
-`;
+// Must equal $color-palette-circle-size from:
+// @wordpress/components/src/circular-option-picker/style.scss
+const swatchSize = 28;
+const swatchGap = 12;
 
 export const borderControlPopoverControls = css`
-	padding: ${ space( 2 ) };
+	width: ${ swatchSize * 6 + swatchGap * 5 }px;
 
 	> div:first-of-type > ${ StyledLabel } {
 		margin-bottom: 0;
@@ -146,20 +172,9 @@ export const resetButton = css`
 	/* Override button component styling */
 	&& {
 		border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
+		border-top-left-radius: 0;
+		border-top-right-radius: 0;
 		height: 46px;
-	}
-`;
-
-export const borderWidthControl = () => css`
-	/* Target the InputControl's backdrop */
-	&&& ${ BackdropUI } {
-		border: none;
-	}
-
-	/* Specificity required to overcome UnitControl padding */
-	/* See packages/components/src/unit-control/styles/unit-control-styles.ts */
-	&&& input {
-		${ rtl( { paddingRight: 0 } )() }
 	}
 `;
 

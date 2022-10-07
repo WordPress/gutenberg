@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-const { escapeRegExp } = require( 'lodash' );
 const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
 
@@ -17,7 +16,8 @@ const { version } = require( './package' );
  * @type {string}
  */
 const majorMinorRegExp =
-	escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.\\d+)?';
+	version.replace( /\.\d+$/, '' ).replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' ) +
+	'(\\.\\d+)?';
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -26,8 +26,8 @@ const majorMinorRegExp =
  */
 const developmentFiles = [
 	'**/benchmark/**/*.js',
-	'**/@(__mocks__|__tests__|test)/**/*.js',
-	'**/@(storybook|stories)/**/*.js',
+	'**/@(__mocks__|__tests__|test)/**/*.[tj]s?(x)',
+	'**/@(storybook|stories)/**/*.[tj]s?(x)',
 	'packages/babel-preset-default/bin/**/*.js',
 ];
 
@@ -78,8 +78,97 @@ module.exports = {
 					},
 					{
 						name: 'lodash',
-						importNames: [ 'memoize' ],
-						message: 'Please use `memize` instead.',
+						importNames: [
+							'camelCase',
+							'capitalize',
+							'chunk',
+							'clamp',
+							'cloneDeep',
+							'compact',
+							'concat',
+							'countBy',
+							'debounce',
+							'deburr',
+							'defaults',
+							'defaultTo',
+							'delay',
+							'difference',
+							'differenceWith',
+							'dropRight',
+							'each',
+							'escapeRegExp',
+							'extend',
+							'findIndex',
+							'findKey',
+							'findLast',
+							'first',
+							'flatMap',
+							'flatten',
+							'flattenDeep',
+							'flow',
+							'flowRight',
+							'forEach',
+							'fromPairs',
+							'has',
+							'identity',
+							'invoke',
+							'isArray',
+							'isBoolean',
+							'isFinite',
+							'isFunction',
+							'isMatch',
+							'isNil',
+							'isNumber',
+							'isObject',
+							'isObjectLike',
+							'isPlainObject',
+							'isString',
+							'isUndefined',
+							'keyBy',
+							'keys',
+							'last',
+							'lowerCase',
+							'mapKeys',
+							'maxBy',
+							'memoize',
+							'negate',
+							'noop',
+							'nth',
+							'once',
+							'overEvery',
+							'partial',
+							'partialRight',
+							'random',
+							'reject',
+							'repeat',
+							'reverse',
+							'size',
+							'snakeCase',
+							'sortBy',
+							'startCase',
+							'startsWith',
+							'stubFalse',
+							'stubTrue',
+							'sum',
+							'sumBy',
+							'take',
+							'throttle',
+							'times',
+							'toString',
+							'trim',
+							'truncate',
+							'unionBy',
+							'uniq',
+							'uniqBy',
+							'uniqueId',
+							'uniqWith',
+							'upperFirst',
+							'values',
+							'xor',
+							'zip',
+						],
+						message:
+							'This Lodash method is not recommended. Please use native functionality instead. If using `memoize`, please use `memize` instead.',
 					},
 					{
 						name: 'reakit',
@@ -249,20 +338,25 @@ module.exports = {
 				'no-restricted-syntax': [
 					'error',
 					{
-						selector: 'CallExpression[callee.name="$"]',
+						selector: 'CallExpression[callee.property.name="$"]',
 						message:
 							'`$` is discouraged, please use `locator` instead',
 					},
 					{
-						selector: 'CallExpression[callee.name="$$"]',
+						selector: 'CallExpression[callee.property.name="$$"]',
 						message:
 							'`$$` is discouraged, please use `locator` instead',
+					},
+					{
+						selector:
+							'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
+						message: 'Prefer page.locator instead.',
 					},
 				],
 			},
 		},
 		{
-			files: [ 'bin/**/*.js', 'packages/env/**' ],
+			files: [ 'bin/**/*.js', 'bin/**/*.mjs', 'packages/env/**' ],
 			rules: {
 				'no-console': 'off',
 			},
@@ -284,6 +378,12 @@ module.exports = {
 				// or in TypeScript files where params are likely already documented outside of the JSDoc.
 				'jsdoc/require-param': 'off',
 			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
+			plugins: [ 'ssr-friendly' ],
+			extends: [ 'plugin:ssr-friendly/recommended' ],
 		},
 	],
 };

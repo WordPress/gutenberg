@@ -109,7 +109,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 				<ToolbarGroup controls={ toolbarControls } />
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'RSS settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
 						label={ __( 'Number of items' ) }
 						value={ itemsToShow }

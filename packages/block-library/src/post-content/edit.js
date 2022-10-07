@@ -7,7 +7,8 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	useSetting,
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	__experimentalRecursionProvider as RecursionProvider,
+	__experimentalUseHasRecursion as useHasRecursion,
 	store as blockEditorStore,
 	Warning,
 } from '@wordpress/block-editor';
@@ -45,7 +46,9 @@ function EditableContent( { layout, context = {} } ) {
 		return getSettings()?.supportsLayout;
 	}, [] );
 	const defaultLayout = useSetting( 'layout' ) || {};
-	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const usedLayout = ! layout?.type
+		? { ...defaultLayout, ...layout, type: 'default' }
+		: { ...defaultLayout, ...layout };
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		postType,
@@ -85,7 +88,21 @@ function Placeholder() {
 	const blockProps = useBlockProps();
 	return (
 		<div { ...blockProps }>
-			<p>{ __( 'Post Content' ) }</p>
+			<p>
+				{ __(
+					'This is the Post Content block, it will display all the blocks in any single post or page.'
+				) }
+			</p>
+			<p>
+				{ __(
+					'That might be a simple arrangement like consecutive paragraphs in a blog post, or a more elaborate composition that includes image galleries, videos, tables, columns, and any other block types.'
+				) }
+			</p>
+			<p>
+				{ __(
+					'If there are any Custom Post Types registered at your site, the Post Content block can display the contents of those entries as well.'
+				) }
+			</p>
 		</div>
 	);
 }
@@ -104,16 +121,14 @@ function RecursionError() {
 export default function PostContentEdit( { context, attributes } ) {
 	const { postId: contextPostId, postType: contextPostType } = context;
 	const { layout = {} } = attributes;
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		contextPostId
-	);
+	const hasAlreadyRendered = useHasRecursion( contextPostId );
 
 	if ( contextPostId && contextPostType && hasAlreadyRendered ) {
 		return <RecursionError />;
 	}
 
 	return (
-		<RecursionProvider>
+		<RecursionProvider uniqueId={ contextPostId }>
 			{ contextPostId && contextPostType ? (
 				<Content context={ context } layout={ layout } />
 			) : (

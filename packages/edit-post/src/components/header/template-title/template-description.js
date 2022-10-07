@@ -23,8 +23,9 @@ export default function TemplateDescription() {
 	if ( ! description ) {
 		return null;
 	}
+
 	return (
-		<>
+		<div className="edit-site-template-details__group">
 			<Heading level={ 4 } weight={ 600 }>
 				{ title }
 			</Heading>
@@ -36,6 +37,6 @@ export default function TemplateDescription() {
 			>
 				{ description }
 			</Text>
-		</>
+		</div>
 	);
 }

@@ -6,8 +6,6 @@
 		"allowJs": true,
 		"checkJs": false
 	},
-	"include": [
-		"**/*"
-	],
+	"include": [ "**/*" ],
 	"exclude": []
 }

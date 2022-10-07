@@ -95,9 +95,8 @@ function ButtonEdit( props ) {
 	const { editorSidebarOpened, numOfButtons } = useSelect(
 		( select ) => {
 			const { isEditorSidebarOpened } = select( editPostStore );
-			const { getBlockCount, getBlockRootClientId } = select(
-				blockEditorStore
-			);
+			const { getBlockCount, getBlockRootClientId } =
+				select( blockEditorStore );
 			const parentId = getBlockRootClientId( clientId );
 			const blockCount = getBlockCount( parentId );
 			const currentIsEditorSidebarOpened = isEditorSidebarOpened();
@@ -134,10 +133,13 @@ function ButtonEdit( props ) {
 	useEffect( () => {
 		// Blur `RichText` on Android when link settings sheet or button settings sheet is opened,
 		// to avoid flashing caret after closing one of them
-		if ( editorSidebarOpened || isLinkSheetVisible ) {
-			if ( Platform.OS === 'android' && richTextRef?.current ) {
-				richTextRef.current.blur();
+		const richText = richTextRef?.current;
+		if ( Platform.OS === 'android' && richText ) {
+			if ( editorSidebarOpened || isLinkSheetVisible ) {
+				richText.blur();
 				onToggleButtonFocus( false );
+			} else {
+				onToggleButtonFocus( true );
 			}
 		}
 	}, [ editorSidebarOpened, isLinkSheetVisible ] );

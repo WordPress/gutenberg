@@ -5,7 +5,12 @@ import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Popover, Button, Notice } from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
-import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
+import {
+	BlockContextProvider,
+	BlockBreadcrumb,
+	BlockStyles,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import {
 	InterfaceSkeleton,
 	ComplementaryArea,
@@ -43,7 +48,17 @@ import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import useTitle from '../routes/use-title';
 
 const interfaceLabels = {
-	secondarySidebar: __( 'Block Library' ),
+	/* translators: accessibility text for the editor top bar landmark region. */
+	header: __( 'Editor top bar' ),
+	/* translators: accessibility text for the editor content landmark region. */
+	body: __( 'Editor content' ),
+	/* translators: accessibility text for the editor settings landmark region. */
+	sidebar: __( 'Editor settings' ),
+	/* translators: accessibility text for the editor publish landmark region. */
+	actions: __( 'Editor publish' ),
+	/* translators: accessibility text for the editor footer landmark region. */
+	footer: __( 'Editor footer' ),
+	/* translators: accessibility text for the navigation sidebar landmark region. */
 	drawer: __( 'Navigation Sidebar' ),
 };
 
@@ -63,6 +78,7 @@ function Editor( { onError } ) {
 		nextShortcut,
 		editorMode,
 		showIconLabels,
+		blockEditorMode,
 	} = useSelect( ( select ) => {
 		const {
 			isInserterOpened,
@@ -75,6 +91,7 @@ function Editor( { onError } ) {
 			getEditorMode,
 		} = select( editSiteStore );
 		const { hasFinishedResolution, getEntityRecord } = select( coreStore );
+		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
 
@@ -111,15 +128,14 @@ function Editor( { onError } ) {
 				'core/edit-site',
 				'showIconLabels'
 			),
+			blockEditorMode: __unstableGetEditorMode(),
 		};
 	}, [] );
 	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
-	const [
-		isEntitiesSavedStatesOpen,
-		setIsEntitiesSavedStatesOpen,
-	] = useState( false );
+	const [ isEntitiesSavedStatesOpen, setIsEntitiesSavedStatesOpen ] =
+		useState( false );
 	const openEntitiesSavedStates = useCallback(
 		() => setIsEntitiesSavedStatesOpen( true ),
 		[]
@@ -176,11 +192,15 @@ function Editor( { onError } ) {
 		templateType !== undefined &&
 		entityId !== undefined;
 
+	const secondarySidebarLabel = isListViewOpen
+		? __( 'List View' )
+		: __( 'Block Library' );
+
 	const secondarySidebar = () => {
-		if ( isInserterOpen ) {
+		if ( editorMode === 'visual' && isInserterOpen ) {
 			return <InserterSidebar />;
 		}
-		if ( isListViewOpen ) {
+		if ( editorMode === 'visual' && isListViewOpen ) {
 			return <ListViewSidebar />;
 		}
 		return null;
@@ -208,7 +228,11 @@ function Editor( { onError } ) {
 										<KeyboardShortcuts.Register />
 										<SidebarComplementaryAreaFills />
 										<InterfaceSkeleton
-											labels={ interfaceLabels }
+											labels={ {
+												...interfaceLabels,
+												secondarySidebar:
+													secondarySidebarLabel,
+											} }
 											className={
 												showIconLabels &&
 												'show-icon-labels'
@@ -236,6 +260,7 @@ function Editor( { onError } ) {
 											content={
 												<>
 													<EditorNotices />
+													<BlockStyles.Slot scope="core/block-inspector" />
 													{ editorMode === 'visual' &&
 														template && (
 															<BlockEditor
@@ -299,11 +324,14 @@ function Editor( { onError } ) {
 												</>
 											}
 											footer={
-												<BlockBreadcrumb
-													rootLabelText={ __(
-														'Template'
-													) }
-												/>
+												blockEditorMode !==
+												'zoom-out' ? (
+													<BlockBreadcrumb
+														rootLabelText={ __(
+															'Template'
+														) }
+													/>
+												) : undefined
 											}
 											shortcuts={ {
 												previous: previousShortcut,

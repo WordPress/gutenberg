@@ -192,7 +192,7 @@ describe( 'Reusable blocks', () => {
 
 		// Convert block to a reusable block.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Add to Reusable blocks' );
+		await clickMenuItem( 'Create Reusable block' );
 
 		// Set title.
 		const nameInput = await page.waitForSelector(
@@ -363,7 +363,8 @@ describe( 'Reusable blocks', () => {
 		const quoteBlock = await page.waitForSelector(
 			'.block-editor-block-list__block[aria-label="Block: Quote"]'
 		);
-		await quoteBlock.click();
+		// Select the quote block.
+		await quoteBlock.focus();
 		await openDocumentSettingsSidebar();
 		await page.waitForXPath(
 			'//*[@role="region"][@aria-label="Editor settings"]//button[.="Styles"]'
@@ -371,7 +372,7 @@ describe( 'Reusable blocks', () => {
 
 		// Convert to reusable.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Add to Reusable blocks' );
+		await clickMenuItem( 'Create Reusable block' );
 		const nameInput = await page.waitForSelector(
 			reusableBlockNameInputSelector
 		);

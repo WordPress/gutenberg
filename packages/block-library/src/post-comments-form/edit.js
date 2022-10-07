@@ -9,11 +9,13 @@ import classnames from 'classnames';
 import {
 	AlignmentControl,
 	BlockControls,
-	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { useEntityProp } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import CommentsForm from './form';
 
 export default function PostCommentsFormEdit( {
 	attributes,
@@ -22,12 +24,7 @@ export default function PostCommentsFormEdit( {
 } ) {
 	const { textAlign } = attributes;
 	const { postId, postType } = context;
-	const [ commentStatus ] = useEntityProp(
-		'postType',
-		postType,
-		'comment_status',
-		postId
-	);
+
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -45,27 +42,7 @@ export default function PostCommentsFormEdit( {
 				/>
 			</BlockControls>
 			<div { ...blockProps }>
-				{ ! commentStatus && (
-					<Warning>
-						{ __(
-							'Post Comments Form block: comments are not enabled for this post type.'
-						) }
-					</Warning>
-				) }
-
-				{ 'open' !== commentStatus && (
-					<Warning>
-						{ sprintf(
-							/* translators: 1: Post type (i.e. "post", "page") */
-							__(
-								'Post Comments Form block: comments to this %s are not allowed.'
-							),
-							postType
-						) }
-					</Warning>
-				) }
-
-				{ 'open' === commentStatus && __( 'Post Comments Form' ) }
+				<CommentsForm postId={ postId } postType={ postType } />
 			</div>
 		</>
 	);

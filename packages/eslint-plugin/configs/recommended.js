@@ -6,7 +6,6 @@ const { cosmiconfigSync } = require( 'cosmiconfig' );
 /**
  * WordPress dependencies
  */
-const defaultPrettierConfig = require( '@wordpress/prettier-config' );
 
 /**
  * Internal dependencies
@@ -22,6 +21,7 @@ if ( isPackageInstalled( 'prettier' ) ) {
 
 	const { config: localPrettierConfig } =
 		cosmiconfigSync( 'prettier' ).search() || {};
+	const defaultPrettierConfig = require( '@wordpress/prettier-config' );
 	const prettierConfig = { ...defaultPrettierConfig, ...localPrettierConfig };
 	config.rules = {
 		'prettier/prettier': [ 'error', prettierConfig ],

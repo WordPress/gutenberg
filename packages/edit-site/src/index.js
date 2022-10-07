@@ -13,10 +13,12 @@ import {
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { __ } from '@wordpress/i18n';
 import { store as viewportStore } from '@wordpress/viewport';
 import { getQueryArgs } from '@wordpress/url';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -50,6 +52,26 @@ export function reinitializeEditor( target, settings ) {
 		return;
 	}
 
+	/*
+	 * Prevent adding the Clasic block in the site editor.
+	 * Only add the filter when the site editor is initialized, not imported.
+	 * Also only add the filter(s) after registerCoreBlocks()
+	 * so that common filters in the block library are not overwritten.
+	 *
+	 * This usage here is inspired by previous usage of the filter in the post editor:
+	 * https://github.com/WordPress/gutenberg/pull/37157
+	 */
+	addFilter(
+		'blockEditor.__unstableCanInsertBlockType',
+		'removeClassicBlockFromInserter',
+		( canInsert, blockType ) => {
+			if ( blockType.name === 'core/freeform' ) {
+				return false;
+			}
+			return canInsert;
+		}
+	);
+
 	// This will be a no-op if the target doesn't have any React nodes.
 	unmountComponentAtNode( target );
 	const reboot = reinitializeEditor.bind( null, target, settings );
@@ -64,7 +86,23 @@ export function reinitializeEditor( target, settings ) {
 			keepCaretInsideBlock: false,
 			welcomeGuide: true,
 			welcomeGuideStyles: true,
+			showListViewByDefault: false,
 		} );
+
+		// Check if the block list view should be open by default.
+		if (
+			select( preferencesStore ).get(
+				'core/edit-site',
+				'showListViewByDefault'
+			)
+		) {
+			dispatch( editSiteStore ).setIsListViewOpened( true );
+		}
+
+		dispatch( interfaceStore ).setDefaultComplementaryArea(
+			'core/edit-site',
+			'edit-site/template'
+		);
 
 		dispatch( editSiteStore ).updateSettings( settings );
 
@@ -90,6 +128,10 @@ export function reinitializeEditor( target, settings ) {
 		}
 	}
 
+	// Prevent the default browser action for files dropped outside of dropzones.
+	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
+	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
+
 	render( <EditSiteApp reboot={ reboot } />, target );
 }
 
@@ -103,7 +145,6 @@ export function initializeEditor( id, settings ) {
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
 	settings.__experimentalFetchRichUrlData = fetchUrlData;
-	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
 
 	const target = document.getElementById( id );
 

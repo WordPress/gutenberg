@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty, isNumber } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -29,13 +24,6 @@ export const DEFAULT_VALUES = {
 	right: undefined,
 	bottom: undefined,
 	left: undefined,
-};
-
-export const DEFAULT_VISUALIZER_VALUES = {
-	top: false,
-	right: false,
-	bottom: false,
-	left: false,
 };
 
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
@@ -89,16 +77,16 @@ export function getAllValue(
 		: '';
 
 	/**
-	 * The isNumber check is important. On reset actions, the incoming value
+	 * The typeof === 'number' check is important. On reset actions, the incoming value
 	 * may be null or an empty string.
 	 *
 	 * Also, the value may also be zero (0), which is considered a valid unit value.
 	 *
-	 * isNumber() is more specific for these cases, rather than relying on a
+	 * typeof === 'number' is more specific for these cases, rather than relying on a
 	 * simple truthy check.
 	 */
 	let commonUnit;
-	if ( isNumber( commonQuantity ) ) {
+	if ( typeof commonQuantity === 'number' ) {
 		commonUnit = mode( allParsedUnits );
 	} else {
 		// Set meaningful unit selection if no commonQuantity and user has previously
@@ -152,14 +140,12 @@ export function isValuesMixed( values = {}, selectedUnits, sides = ALL_SIDES ) {
 export function isValuesDefined( values ) {
 	return (
 		values !== undefined &&
-		! isEmpty(
-			Object.values( values ).filter(
-				// Switching units when input is empty causes values only
-				// containing units. This gives false positive on mixed values
-				// unless filtered.
-				( value ) => !! value && /\d/.test( value )
-			)
-		)
+		Object.values( values ).filter(
+			// Switching units when input is empty causes values only
+			// containing units. This gives false positive on mixed values
+			// unless filtered.
+			( value ) => !! value && /\d/.test( value )
+		).length > 0
 	);
 }
 
@@ -207,4 +193,36 @@ export function normalizeSides( sides ) {
 	}
 
 	return filteredSides;
+}
+
+/**
+ * Applies a value to an object representing top, right, bottom and left sides
+ * while taking into account any custom side configuration.
+ *
+ * @param {Object}        currentValues The current values for each side.
+ * @param {string|number} newValue      The value to apply to the sides object.
+ * @param {string[]}      sides         Array defining valid sides.
+ *
+ * @return {Object} Object containing the updated values for each side.
+ */
+export function applyValueToSides( currentValues, newValue, sides ) {
+	const newValues = { ...currentValues };
+
+	if ( sides?.length ) {
+		sides.forEach( ( side ) => {
+			if ( side === 'vertical' ) {
+				newValues.top = newValue;
+				newValues.bottom = newValue;
+			} else if ( side === 'horizontal' ) {
+				newValues.left = newValue;
+				newValues.right = newValue;
+			} else {
+				newValues[ side ] = newValue;
+			}
+		} );
+	} else {
+		ALL_SIDES.forEach( ( side ) => ( newValues[ side ] = newValue ) );
+	}
+
+	return newValues;
 }

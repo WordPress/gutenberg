@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { has } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
@@ -42,7 +37,7 @@ const ANCHOR_SCHEMA = {
  */
 export function addAttribute( settings ) {
 	// Allow blocks to specify their own attribute definition with default values if needed.
-	if ( has( settings.attributes, [ 'anchor', 'type' ] ) ) {
+	if ( 'type' in ( settings.attributes?.anchor ?? {} ) ) {
 		return settings;
 	}
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
@@ -117,7 +112,7 @@ export const withInspectorControl = createHigherOrderComponent(
 						 * We plan to remove scoping anchors to 'core/heading' to support
 						 * anchors for all eligble blocks. Additionally we plan to explore
 						 * leveraging InspectorAdvancedControls instead of a custom
-						 * PanelBody title. https://git.io/Jtcov
+						 * PanelBody title. https://github.com/WordPress/gutenberg/issues/28363
 						 */ }
 						{ ! isWeb && props.name === 'core/heading' && (
 							<InspectorControls>

@@ -1,18 +1,16 @@
 /**
  * External dependencies
  */
-import { noop, debounce } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { useState, useLayoutEffect } from '@wordpress/element';
-import { useViewportMatch } from '@wordpress/compose';
-import { ENTER, SPACE } from '@wordpress/keycodes';
+import { debounce, useViewportMatch } from '@wordpress/compose';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalTruncate as Truncate,
 	Slot,
 	Fill,
 } from '@wordpress/components';
@@ -39,6 +37,8 @@ function BlockStylesPreviewPanelFill( { children, scope, ...props } ) {
 // relative to the editor pane.
 // The value is the equivalent of the container's right position.
 const DEFAULT_POSITION_TOP = 16;
+
+const noop = () => {};
 
 // Block Styles component for the Settings Sidebar.
 function BlockStyles( {
@@ -113,28 +113,15 @@ function BlockStyles( {
 							onFocus={ () => styleItemHandler( style ) }
 							onMouseLeave={ () => styleItemHandler( null ) }
 							onBlur={ () => styleItemHandler( null ) }
-							onKeyDown={ ( event ) => {
-								if (
-									ENTER === event.keyCode ||
-									SPACE === event.keyCode
-								) {
-									event.preventDefault();
-									onSelectStylePreview( style );
-								}
-							} }
 							onClick={ () => onSelectStylePreview( style ) }
-							role="button"
-							tabIndex="0"
+							aria-current={ activeStyle.name === style.name }
 						>
-							<Text
-								as="span"
-								limit={ 12 }
-								ellipsizeMode="tail"
+							<Truncate
+								numberOfLines={ 1 }
 								className="block-editor-block-styles__item-text"
-								truncate
 							>
 								{ buttonText }
-							</Text>
+							</Truncate>
 						</Button>
 					);
 				} ) }

@@ -1,21 +1,15 @@
 /**
  * External dependencies
  */
-import {
-	get,
-	unescape as unescapeString,
-	debounce,
-	repeat,
-	find,
-	flatten,
-	deburr,
-} from 'lodash';
+import { get, unescape as unescapeString, find } from 'lodash';
+import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { ComboboxControl } from '@wordpress/components';
+import { debounce } from '@wordpress/compose';
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -34,8 +28,8 @@ function getTitle( post ) {
 }
 
 export const getItemPriority = ( name, searchValue ) => {
-	const normalizedName = deburr( name ).toLowerCase();
-	const normalizedSearch = deburr( searchValue ).toLowerCase();
+	const normalizedName = removeAccents( name || '' ).toLowerCase();
+	const normalizedSearch = removeAccents( searchValue || '' ).toLowerCase();
 	if ( normalizedName === normalizedSearch ) {
 		return 0;
 	}
@@ -52,12 +46,10 @@ export function PageAttributesParent() {
 	const [ fieldValue, setFieldValue ] = useState( false );
 	const { parentPost, parentPostId, items, postType } = useSelect(
 		( select ) => {
-			const { getPostType, getEntityRecords, getEntityRecord } = select(
-				coreStore
-			);
-			const { getCurrentPostId, getEditedPostAttribute } = select(
-				editorStore
-			);
+			const { getPostType, getEntityRecords, getEntityRecord } =
+				select( coreStore );
+			const { getCurrentPostId, getEditedPostAttribute } =
+				select( editorStore );
 			const postTypeSlug = getEditedPostAttribute( 'type' );
 			const pageId = getEditedPostAttribute( 'parent' );
 			const pType = getPostType( postTypeSlug );
@@ -101,7 +93,7 @@ export function PageAttributesParent() {
 				{
 					value: treeNode.id,
 					label:
-						repeat( '— ', level ) + unescapeString( treeNode.name ),
+						'— '.repeat( level ) + unescapeString( treeNode.name ),
 					rawName: treeNode.name,
 				},
 				...getOptionsFromTree( treeNode.children || [], level + 1 ),
@@ -113,7 +105,7 @@ export function PageAttributesParent() {
 				return priorityA >= priorityB ? 1 : -1;
 			} );
 
-			return flatten( sortedNodes );
+			return sortedNodes.flat();
 		};
 
 		let tree = pageItems.map( ( item ) => ( {

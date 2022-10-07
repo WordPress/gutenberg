@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	test,
+	expect,
+	Admin,
+} = require( '@wordpress/e2e-test-utils-playwright' );
 
 /**
  * @typedef {import('@playwright/test').Page} Page
@@ -11,8 +15,8 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  */
 
 test.use( {
-	widgetsCustomizerPage: async ( { page, pageUtils }, use ) => {
-		await use( new WidgetsCustomizerPage( { page, pageUtils } ) );
+	widgetsCustomizerPage: async ( { admin, page, pageUtils }, use ) => {
+		await use( new WidgetsCustomizerPage( { admin, page, pageUtils } ) );
 	},
 } );
 
@@ -47,6 +51,11 @@ test.describe( 'Widgets Customizer', () => {
 				'css=.widget-content p >> text="First Paragraph"'
 			)
 		).toBeVisible();
+
+		// Clear block selection, so the block toolbar isn't visible.
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+		} );
 
 		await widgetsCustomizerPage.addBlock( 'Heading' );
 		await page.keyboard.type( 'My Heading' );
@@ -88,8 +97,8 @@ test.describe( 'Widgets Customizer', () => {
 	} );
 
 	test( 'should open the inspector panel', async ( {
+		editor,
 		page,
-		pageUtils,
 		requestUtils,
 		widgetsCustomizerPage,
 	} ) => {
@@ -115,8 +124,7 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
 		await page.focus( 'text=First Paragraph' );
-		await pageUtils.showBlockToolbar();
-		await pageUtils.clickBlockToolbarButton( 'Options' );
+		await editor.clickBlockToolbarButton( 'Options' );
 
 		await showMoreSettingsButton.click();
 
@@ -137,7 +145,7 @@ test.describe( 'Widgets Customizer', () => {
 		await expect( widgetsFooter1Heading ).toBeVisible();
 		await expect( inspectorHeading ).not.toBeVisible();
 
-		await pageUtils.clickBlockToolbarButton( 'Options' );
+		await editor.clickBlockToolbarButton( 'Options' );
 		await showMoreSettingsButton.click();
 
 		// Expect the inspector panel to be found.
@@ -273,8 +281,8 @@ test.describe( 'Widgets Customizer', () => {
 	} );
 
 	test( 'should clear block selection', async ( {
+		editor,
 		page,
-		pageUtils,
 		requestUtils,
 		widgetsCustomizerPage,
 	} ) => {
@@ -288,7 +296,7 @@ test.describe( 'Widgets Customizer', () => {
 
 		const paragraphBlock = page.locator( 'text="First Paragraph"' );
 		await paragraphBlock.focus();
-		await pageUtils.showBlockToolbar();
+		await editor.showBlockToolbar();
 
 		const blockToolbar = page.locator(
 			'role=toolbar[name="Block tools"i]'
@@ -302,7 +310,7 @@ test.describe( 'Widgets Customizer', () => {
 			await expect( blockToolbar ).not.toBeVisible();
 
 			await paragraphBlock.focus();
-			await pageUtils.showBlockToolbar();
+			await editor.showBlockToolbar();
 		}
 
 		// Expect clicking on the preview iframe should clear the selection.
@@ -311,7 +319,7 @@ test.describe( 'Widgets Customizer', () => {
 			await expect( blockToolbar ).not.toBeVisible();
 
 			await paragraphBlock.focus();
-			await pageUtils.showBlockToolbar();
+			await editor.showBlockToolbar();
 		}
 
 		// Expect clicking on the empty space at the end of the editor
@@ -328,8 +336,8 @@ test.describe( 'Widgets Customizer', () => {
 	} );
 
 	test( 'should handle legacy widgets', async ( {
+		editor,
 		page,
-		pageUtils,
 		widgetsCustomizerPage,
 	} ) => {
 		await widgetsCustomizerPage.visitCustomizerPage();
@@ -377,10 +385,10 @@ test.describe( 'Widgets Customizer', () => {
 		).toBeVisible();
 
 		await legacyWidgetBlock.focus();
-		await pageUtils.showBlockToolbar();
+		await editor.showBlockToolbar();
 
 		// Testing removing the block.
-		await pageUtils.clickBlockToolbarButton( 'Options' );
+		await editor.clickBlockToolbarButton( 'Options' );
 		await page.click( 'role=menuitem[name=/Remove Legacy Widget/]' );
 
 		// Add it back again using the variant.
@@ -419,8 +427,8 @@ test.describe( 'Widgets Customizer', () => {
 	} );
 
 	test( 'should handle esc key events', async ( {
+		editor,
 		page,
-		pageUtils,
 		requestUtils,
 		widgetsCustomizerPage,
 	} ) => {
@@ -434,12 +442,12 @@ test.describe( 'Widgets Customizer', () => {
 
 		const paragraphBlock = page.locator( 'text="First Paragraph"' );
 		await paragraphBlock.focus();
-		await pageUtils.showBlockToolbar();
+		await editor.showBlockToolbar();
 
 		const optionsMenu = page.locator( 'role=menu[name="Options"i]' );
 
 		// Open the more menu dropdown in block toolbar.
-		await pageUtils.clickBlockToolbarButton( 'Options' );
+		await editor.clickBlockToolbarButton( 'Options' );
 		await expect( optionsMenu ).toBeVisible();
 
 		// Expect pressing the Escape key to close the dropdown,
@@ -462,8 +470,8 @@ test.describe( 'Widgets Customizer', () => {
 	} );
 
 	test( 'should move (inner) blocks to another sidebar', async ( {
+		editor,
 		page,
-		pageUtils,
 		requestUtils,
 		widgetsCustomizerPage,
 	} ) => {
@@ -476,16 +484,14 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
 		await page.focus( 'text="First Paragraph"' );
-		await pageUtils.showBlockToolbar();
-		await pageUtils.clickBlockToolbarButton( 'Options' );
+		await editor.clickBlockToolbarButton( 'Options' );
 		await page.click( 'role=menuitem[name="Group"i]' );
 
 		// Refocus the paragraph block.
 		await page.focus(
 			'*role=document[name="Paragraph block"i] >> text="First Paragraph"'
 		);
-		await pageUtils.showBlockToolbar();
-		await pageUtils.clickBlockToolbarButton( 'Move to widget area' );
+		await editor.clickBlockToolbarButton( 'Move to widget area' );
 
 		await page.click( 'role=menuitemradio[name="Footer #2"i]' );
 
@@ -519,8 +525,8 @@ test.describe( 'Widgets Customizer', () => {
 	} );
 
 	test( 'should stay in block settings after making a change in that area', async ( {
+		editor,
 		page,
-		pageUtils,
 		widgetsCustomizerPage,
 	} ) => {
 		await widgetsCustomizerPage.visitCustomizerPage();
@@ -544,14 +550,11 @@ test.describe( 'Widgets Customizer', () => {
 		await page.focus( 'role=document[name="Paragraph block"i]' );
 
 		// Click the three dots button, then click "Show More Settings".
-		await pageUtils.showBlockToolbar();
-		await pageUtils.clickBlockToolbarButton( 'Options' );
+		await editor.clickBlockToolbarButton( 'Options' );
 		await page.click( 'role=menuitem[name="Show more settings"i]' );
 
 		// Change `drop cap` (Any change made in this section is sufficient; not required to be `drop cap`).
-		await page.click(
-			'css=.typography-block-support-panel >> role=button[name=/^View( and add)? options$/]'
-		);
+		await page.click( 'role=button[name="Typography options"i]' );
 		await page.click( 'role=menuitemcheckbox[name="Show Drop cap"i]' );
 
 		await page.click( 'role=checkbox[name="Drop cap"i]' );
@@ -571,15 +574,44 @@ test.describe( 'Widgets Customizer', () => {
 			)
 		).toBeVisible();
 	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/33832.
+	test( 'preserves content in the Custom HTML block', async ( {
+		page,
+		widgetsCustomizerPage,
+	} ) => {
+		await widgetsCustomizerPage.visitCustomizerPage();
+		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
+
+		await widgetsCustomizerPage.addBlock( 'Custom HTML' );
+		const HTMLBlockTextarea = page.locator(
+			'role=document[name="Block: Custom HTML"i] >> role=textbox[name="HTML"i]'
+		);
+		await HTMLBlockTextarea.type( 'hello' );
+
+		// Click Publish
+		await Promise.all( [
+			page.waitForResponse( '/wp-admin/admin-ajax.php' ),
+			page.click( 'role=button[name="Publish"i]' ),
+		] );
+
+		// reload
+		await widgetsCustomizerPage.visitCustomizerPage();
+		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
+
+		await expect( HTMLBlockTextarea ).toHaveText( 'hello' );
+	} );
 } );
 
 class WidgetsCustomizerPage {
 	/**
 	 * @param {Object}    config
+	 * @param {Admin}     config.admin
 	 * @param {Page}      config.page
 	 * @param {PageUtils} config.pageUtils
 	 */
-	constructor( { page, pageUtils } ) {
+	constructor( { admin, page, pageUtils } ) {
+		this.admin = admin;
 		this.page = page;
 		this.pageUtils = pageUtils;
 
@@ -592,7 +624,7 @@ class WidgetsCustomizerPage {
 	}
 
 	async visitCustomizerPage() {
-		await this.pageUtils.visitAdminPage( 'customize.php' );
+		await this.admin.visitAdminPage( 'customize.php' );
 
 		// Disable welcome guide.
 		await this.page.evaluate( () => {

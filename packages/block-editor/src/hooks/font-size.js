@@ -147,6 +147,8 @@ export function FontSizeEdit( props ) {
 			onChange={ onChange }
 			value={ fontSizeValue }
 			withReset={ false }
+			size="__unstable-large"
+			__nextHasNoMarginBottom
 		/>
 	);
 }

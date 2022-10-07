@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { MIN_SPACER_SIZE } from './edit';
+import { MIN_SPACER_SIZE } from './constants';
 import styles from './style.scss';
 
 const DEFAULT_VALUES = { px: 100, em: 10, rem: 10, vw: 10, vh: 25 };

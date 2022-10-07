@@ -1,5 +1,12 @@
 .block-editor-block-switcher {
 	position: relative;
+
+	// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
+	// This is best fixed by making the mover control area a proper single toolbar group.
+	// It needs specificity due to style inherited from .components-accessible-toolbar .components-button.has-icon.has-icon.
+	.components-button.components-dropdown-menu__toggle.has-icon.has-icon {
+		min-width: $button-size;
+	}
 }
 
 // Show an indicator triangle.
@@ -7,7 +14,6 @@
 .block-editor-block-switcher__toggle {
 	position: relative;
 }
-
 
 .components-button.block-editor-block-switcher__toggle,
 .components-button.block-editor-block-switcher__no-switcher-icon {
@@ -33,17 +39,13 @@
 	font-size: 14px;
 }
 
-// Indent the popover to match the button position.
-.block-editor-block-switcher__popover {
-	margin-left: 6px;
-}
-
 .components-button.block-editor-block-switcher__no-switcher-icon {
-	width: $block-toolbar-height;
+	display: flex;
 
-	.block-editor-blocks-icon {
+	.block-editor-block-icon {
 		margin-right: auto;
 		margin-left: auto;
+		min-width: $icon-size !important;
 	}
 }
 
@@ -86,43 +88,11 @@
 	min-width: 300px;
 }
 
-// We keep the min width the same for the border to work.
-.components-popover.block-editor-block-switcher__popover .components-popover__content > div {
-	min-width: auto;
-	display: flex;
-	background: $white;
-	padding: 0;
-
-	.components-menu-group {
-		margin: 0;
-	}
-}
-
-.block-editor-block-switcher__popover .components-popover__content {
-
-	.block-editor-block-styles {
-		margin: 0 -3px; // Remove the panel body padding while keeping it for the title.
-	}
-
-	// Hide the bottom border on the last panel so it stacks with the popover.
-	.components-panel__body {
-		border: 0;
-
-		// Elevate this so the hover style is visible.
-		position: relative;
-		z-index: 1;
-	}
-
-	.components-panel__body + .components-panel__body {
-		border-top: $border-width solid $gray-200;
-	}
-}
-
 .block-editor-block-switcher__popover__preview__parent {
 	.block-editor-block-switcher__popover__preview__container {
 		position: absolute;
 		top: -$grid-unit-15;
-		left: calc(100% + #{$grid-unit-40});
+		left: calc(100% + #{$grid-unit-20});
 	}
 }
 
@@ -131,7 +101,6 @@
 
 	// Position correctly. Needs specificity.
 	&.components-popover {
-		margin-left: $grid-unit-05;
 		margin-top: $grid-unit-15 - $border-width;
 	}
 
@@ -144,13 +113,16 @@
 		border: $border-width solid $gray-900;
 		background: $white;
 		border-radius: $radius-block-ui;
+		outline: none;
 	}
 
 	.block-editor-block-switcher__preview {
 		width: 300px;
 		height: auto;
-		max-height: 500px;
-		padding: $grid-unit-20;
+		// Subtract margin from max-height.
+		max-height: calc(500px - #{$grid-unit-40});
+		margin: $grid-unit-20;
+		overflow: hidden;
 	}
 }
 
@@ -165,7 +137,7 @@
 // The block switcher in the contextual toolbar should be bigger.
 .block-editor-block-contextual-toolbar {
 	.components-button.block-editor-block-switcher__no-switcher-icon {
-		width: $grid-unit-60;
+		min-width: $button-size;
 	}
 
 	.components-button.block-editor-block-switcher__no-switcher-icon,

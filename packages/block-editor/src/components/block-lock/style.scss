@@ -13,7 +13,6 @@
 }
 
 .block-editor-block-lock-modal__options-title {
-	border-bottom: 1px solid $gray-300;
 	padding: $grid-unit-15 0;
 
 	.components-checkbox-control__label {
@@ -27,9 +26,8 @@
 	}
 }
 .block-editor-block-lock-modal__checklist-item {
-	border-bottom: 1px solid $gray-300;
 	margin-bottom: 0;
-	padding: $grid-unit-15 0 $grid-unit-15 $grid-unit-15;
+	padding: $grid-unit-15 0 $grid-unit-15 $grid-unit-40;
 
 	.components-base-control__field {
 		align-items: center;
@@ -48,6 +46,21 @@
 			fill: $gray-900;
 		}
 	}
+
+	&:hover {
+		background-color: $gray-100;
+		border-radius: $radius-block-ui;
+	}
+}
+
+.block-editor-block-lock-modal__template-lock {
+	border-top: $border-width solid $gray-300;
+	margin-top: $grid-unit-20;
+	padding: $grid-unit-15 0;
+
+	.components-base-control__field {
+		margin: 0;
+	}
 }
 
 .block-editor-block-lock-modal__actions {
@@ -60,8 +73,7 @@
 		padding-left: 0 !important;
 
 		&:focus::before {
-			left: 0 !important;
-			right: $grid-unit-15 !important;
+			right: $grid-unit-10 !important;
 		}
 	}
 }

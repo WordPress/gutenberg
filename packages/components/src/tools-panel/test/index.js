@@ -161,7 +161,7 @@ const renderPanel = () => {
  */
 const getMenuButton = () => {
 	return screen.getByRole( 'button', {
-		name: /view([\w\s]+)options/i,
+		name: /Panel([\w\s]+)header([\w\s]+)options/i,
 	} );
 };
 
@@ -178,7 +178,6 @@ const openDropdownMenu = () => {
 
 // Opens dropdown then selects the menu item by label before simulating a click.
 const selectMenuItem = async ( label ) => {
-	openDropdownMenu();
 	const menuItem = await screen.findByText( label );
 	fireEvent.click( menuItem );
 };
@@ -289,18 +288,30 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should render panel item when corresponding menu item is selected', async () => {
 			renderPanel();
+			await openDropdownMenu();
 			await selectMenuItem( altControlProps.label );
 			const control = await screen.findByText( 'Alt control' );
 
 			expect( control ).toBeInTheDocument();
+
+			// Test the aria live announcement.
+			const announcement = await screen.getByText( 'Alt is now visible' );
+			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
 		it( 'should prevent optional panel item rendering when toggled off via menu item', async () => {
 			renderPanel();
+			await openDropdownMenu();
 			await selectMenuItem( controlProps.label );
 			const control = screen.queryByText( 'Example control' );
 
 			expect( control ).not.toBeInTheDocument();
+
+			// Test the aria live announcement.
+			const announcement = await screen.getByText(
+				'Example hidden and reset to default'
+			);
+			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
 		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
@@ -319,10 +330,17 @@ describe( 'ToolsPanel', () => {
 
 			expect( control ).toBeInTheDocument();
 
+			await openDropdownMenu();
 			await selectMenuItem( controlProps.label );
 			const resetControl = screen.getByText( 'Default control' );
 
 			expect( resetControl ).toBeInTheDocument();
+
+			// Test the aria live announcement.
+			const announcement = await screen.getByText(
+				'Example reset to default'
+			);
+			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
 		it( 'should render appropriate menu groups', async () => {
@@ -657,6 +675,8 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should call onDeselect callback when menu item is toggled off', async () => {
 			renderPanel();
+
+			await openDropdownMenu();
 			await selectMenuItem( controlProps.label );
 
 			expect( controlProps.onSelect ).not.toHaveBeenCalled();
@@ -665,6 +685,8 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should call onSelect callback when menu item is toggled on', async () => {
 			renderPanel();
+
+			await openDropdownMenu();
 			await selectMenuItem( altControlProps.label );
 
 			expect( altControlProps.onSelect ).toHaveBeenCalledTimes( 1 );
@@ -673,6 +695,8 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should call resetAll callback when its menu item is selected', async () => {
 			renderPanel();
+
+			await openDropdownMenu();
 			await selectMenuItem( 'Reset all' );
 
 			expect( resetAll ).toHaveBeenCalledTimes( 1 );
@@ -688,6 +712,7 @@ describe( 'ToolsPanel', () => {
 		it( 'should call onDeselect after previous reset all', async () => {
 			renderPanel();
 
+			await openDropdownMenu();
 			await selectMenuItem( 'Reset all' ); // Initial control is displayed by default.
 			await selectMenuItem( controlProps.label ); // Re-display control.
 
@@ -715,9 +740,8 @@ describe( 'ToolsPanel', () => {
 			openDropdownMenu();
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
-			const defaultMenuItem = screen.getByRole( 'menuitemcheckbox', {
+			const defaultMenuItem = screen.getByRole( 'menuitem', {
 				name: 'Reset Nested Control 1',
-				checked: true,
 			} );
 
 			const altItem = screen.getByText( 'Nested Control 2' );
@@ -754,9 +778,8 @@ describe( 'ToolsPanel', () => {
 			openDropdownMenu();
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
-			const defaultMenuItem = screen.getByRole( 'menuitemcheckbox', {
+			const defaultMenuItem = screen.getByRole( 'menuitem', {
 				name: 'Reset Nested Control 1',
-				checked: true,
 			} );
 
 			const altItem = screen.getByText( 'Nested Control 2' );
@@ -807,6 +830,7 @@ describe( 'ToolsPanel', () => {
 			expect( secondItem ).toBeInTheDocument();
 
 			// Toggle on the first item.
+			await openDropdownMenu();
 			await selectMenuItem( altControlProps.label );
 
 			// The order of items should be as per their original source order.
@@ -964,7 +988,7 @@ describe( 'ToolsPanel', () => {
 			isShownByDefault: false,
 		};
 
-		it( 'should render appropriate icon for the dropdown menu where there are default controls', async () => {
+		it( 'should render appropriate labels and descriptions for the dropdown menu where there are default controls', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...defaultControls }>
@@ -977,13 +1001,18 @@ describe( 'ToolsPanel', () => {
 			);
 
 			const optionsDisplayedIcon = screen.getByRole( 'button', {
-				name: 'View options',
+				name: 'Panel header options',
 			} );
 
 			expect( optionsDisplayedIcon ).toBeInTheDocument();
+
+			// The dropdown toggle doesn't have a description when an option is displayed.
+			// In this case the default control is displayed.
+			expect( optionsDisplayedIcon ).not.toHaveAccessibleDescription();
 		} );
 
-		it( 'should render appropriate icons for the dropdown menu where there are no default controls', async () => {
+		it( 'should render appropriate labels and descriptions for the dropdown menu where there are no default controls', async () => {
+			// All options are inactive.
 			render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...optionalControls }>
@@ -992,31 +1021,55 @@ describe( 'ToolsPanel', () => {
 				</ToolsPanel>
 			);
 
-			// There are unactivated, optional menu items in the Tools Panel dropdown.
 			const optionsHiddenIcon = screen.getByRole( 'button', {
-				name: 'View and add options',
+				name: 'Panel header options',
 			} );
 
+			// The dropdown toggle has a description indicating that all options are hidden.
 			expect( optionsHiddenIcon ).toBeInTheDocument();
+			expect( optionsHiddenIcon ).toHaveAccessibleDescription(
+				'All options are currently hidden'
+			);
 
+			// Activate one of the options.
+			await openDropdownMenu();
 			await selectMenuItem( optionalControls.label );
 
-			// There are now NO unactivated, optional menu items in the Tools Panel dropdown.
-			expect(
-				screen.queryByRole( 'button', { name: 'View and add options' } )
-			).not.toBeInTheDocument();
-
 			const optionsDisplayedIcon = screen.getByRole( 'button', {
-				name: 'View options',
+				name: 'Panel header options',
 			} );
 
-			expect( optionsDisplayedIcon ).toBeInTheDocument();
+			// The dropdown toggle no longer has a description.
+			expect( optionsDisplayedIcon ).not.toHaveAccessibleDescription();
+		} );
+	} );
+
+	describe( 'reset all button', () => {
+		it( "should disable the reset all button when there's nothing to reset", async () => {
+			await renderPanel();
+			await openDropdownMenu();
+
+			const resetAllItem = await screen.findByRole( 'menuitem', {
+				disabled: false,
+			} );
+			expect( resetAllItem ).toBeInTheDocument();
+
+			await selectMenuItem( 'Reset all' );
+
+			// Test the aria live announcement.
+			const announcement = await screen.getByText( 'All options reset' );
+			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
+
+			const disabledResetAllItem = await screen.findByRole( 'menuitem', {
+				disabled: true,
+			} );
+			expect( disabledResetAllItem ).toBeInTheDocument();
 		} );
 	} );
 
 	describe( 'first and last panel items', () => {
 		it( 'should apply first/last classes to appropriate items', () => {
-			const { container } = render(
+			render(
 				<SlotFillProvider>
 					<ToolsPanelItems>
 						<ToolsPanelItem { ...altControlProps }>
@@ -1060,7 +1113,8 @@ describe( 'ToolsPanel', () => {
 			expect( item3 ).toBeInTheDocument();
 			expect( screen.queryByText( 'Item 4' ) ).not.toBeInTheDocument();
 
-			expect( container ).toMatchSnapshot();
+			expect( item2.parentElement ).toHaveClass( 'first' );
+			expect( item3.parentElement ).toHaveClass( 'last' );
 		} );
 	} );
 } );

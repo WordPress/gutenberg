@@ -66,6 +66,12 @@ This toggles the ability to choose custom colors.
 
 - Required: No
 
+### `disableUnits`: `boolean`
+
+This controls whether unit selection should be disabled.
+
+- Required: No
+
 ### `enableAlpha`: `boolean`
 
 This controls whether the alpha channel will be offered when selecting
@@ -112,13 +118,6 @@ that selects or clears, border color, style, or width.
 _Note: the value may be `undefined` if a user clears all border properties._
 
 - Required: Yes
-
-### `popoverContentClassName`: `string`
-
-A custom CSS class name to be assigned to the `BorderControl`'s dropdown
-popover content.
-
-- Required: No
 
 ### `shouldSanitizeBorder`: `boolean`
 

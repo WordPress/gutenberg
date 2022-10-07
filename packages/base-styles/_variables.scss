@@ -84,7 +84,7 @@ $widget-area-width: 700px;
 $block-toolbar-height: $grid-unit-60;
 $border-width: 1px;
 $border-width-focus: 2px; // This exists as a fallback, and is ideally overridden by var(--wp-admin-border-width-focus) unless in some SASS math cases.
-$border-width-tab: 4px;
+$border-width-tab: 1.5px;
 $helptext-font-size: 12px;
 $radius-round: 50%;
 $radius-block-ui: 2px;
@@ -111,6 +111,7 @@ $block-bg-padding--h: 2.375em;
 
 // Dimensions.
 $mobile-header-toolbar-height: 44px;
+$mobile-header-toolbar-expanded-height: 52px;
 $mobile-floating-toolbar-height: 44px;
 $mobile-floating-toolbar-margin: 8px;
 $mobile-color-swatch: 48px;

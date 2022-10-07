@@ -8,12 +8,12 @@ import {
 	View,
 	Platform,
 } from 'react-native';
-import { isArray } from 'lodash';
+import { LongPressGestureHandler, State } from 'react-native-gesture-handler';
 
 /**
  * WordPress dependencies
  */
-import { Children, cloneElement } from '@wordpress/element';
+import { Children, cloneElement, useCallback } from '@wordpress/element';
 import {
 	usePreferredColorScheme,
 	usePreferredColorSchemeStyle,
@@ -152,7 +152,7 @@ export function Button( props ) {
 			( !! label &&
 				// The children are empty and...
 				( ! children ||
-					( isArray( children ) && ! children.length ) ) &&
+					( Array.isArray( children ) && ! children.length ) ) &&
 				// The tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
@@ -163,6 +163,15 @@ export function Button( props ) {
 		  } )
 		: null;
 
+	const longPressHandler = useCallback(
+		( { nativeEvent } ) => {
+			if ( nativeEvent.state === State.ACTIVE && onLongPress ) {
+				onLongPress();
+			}
+		},
+		[ onLongPress ]
+	);
+
 	const element = (
 		<TouchableOpacity
 			activeOpacity={ 0.7 }
@@ -172,28 +181,33 @@ export function Button( props ) {
 			accessibilityRole={ 'button' }
 			accessibilityHint={ hint }
 			onPress={ onClick }
-			onLongPress={ onLongPress }
 			style={ containerStyle }
 			disabled={ isDisabled }
 			testID={ testID }
 		>
-			<View style={ buttonViewStyle }>
-				<View style={ { flexDirection: 'row' } }>
-					{ newIcon }
-					{ newChildren }
-					{ subscript && (
-						<Text
-							style={
-								isPressed
-									? styles.subscriptActive
-									: subscriptInactive
-							}
-						>
-							{ subscript }
-						</Text>
-					) }
+			<LongPressGestureHandler
+				minDurationMs={ 500 }
+				maxDist={ 150 }
+				onHandlerStateChange={ longPressHandler }
+			>
+				<View style={ buttonViewStyle }>
+					<View style={ { flexDirection: 'row' } }>
+						{ newIcon }
+						{ newChildren }
+						{ subscript && (
+							<Text
+								style={
+									isPressed
+										? styles.subscriptActive
+										: subscriptInactive
+								}
+							>
+								{ subscript }
+							</Text>
+						) }
+					</View>
 				</View>
-			</View>
+			</LongPressGestureHandler>
 		</TouchableOpacity>
 	);
 

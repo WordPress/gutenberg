@@ -106,6 +106,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type NavMenuItem< C extends Context > = OmitNevers<
+export type NavMenuItem< C extends Context = 'edit' > = OmitNevers<
 	_BaseEntityRecords.NavMenuItem< C >
 >;

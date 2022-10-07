@@ -20,7 +20,8 @@ export default function NavigationPlaceholder( {
 	clientId,
 	canUserCreateNavigationMenu = false,
 	isResolvingCanUserCreateNavigationMenu,
-	onFinish,
+	onSelectNavigationMenu,
+	onSelectClassicMenu,
 	onCreateEmpty,
 } ) {
 	const { isResolvingMenus, hasResolvedMenus } = useNavigationEntities();
@@ -67,7 +68,8 @@ export default function NavigationPlaceholder( {
 						<NavigationMenuSelector
 							currentMenuId={ currentMenuId }
 							clientId={ clientId }
-							onSelect={ onFinish }
+							onSelectNavigationMenu={ onSelectNavigationMenu }
+							onSelectClassicMenu={ onSelectClassicMenu }
 							toggleProps={ {
 								variant: 'tertiary',
 								iconPosition: 'right',

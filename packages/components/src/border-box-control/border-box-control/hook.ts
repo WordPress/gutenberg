@@ -41,6 +41,9 @@ export function useBorderBoxControl(
 		? ( value as Borders )
 		: getSplitBorders( value as Border | undefined );
 
+	// If no numeric width value is set, the unit select will be disabled.
+	const hasWidthValue = ! isNaN( parseFloat( `${ linkedValue?.width }` ) );
+
 	const [ isLinked, setIsLinked ] = useState( ! mixedBorders );
 	const toggleLinked = () => setIsLinked( ! isLinked );
 
@@ -98,15 +101,16 @@ export function useBorderBoxControl(
 	const cx = useCx();
 	const classes = useMemo( () => {
 		return cx( styles.BorderBoxControl, className );
-	}, [ className ] );
+	}, [ cx, className ] );
 
 	const linkedControlClassName = useMemo( () => {
 		return cx( styles.LinkedBorderControl );
-	}, [] );
+	}, [ cx ] );
 
 	return {
 		...otherProps,
 		className: classes,
+		disableUnits: mixedBorders && ! hasWidthValue,
 		hasMixedBorders: mixedBorders,
 		isLinked,
 		linkedControlClassName,

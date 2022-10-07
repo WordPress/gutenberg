@@ -15,9 +15,7 @@ $z-layers: (
 	".edit-post-sidebar__panel-tab.is-active": 1,
 
 	// These next three share a stacking context
-	".block-editor-inserter__tabs .components-tab-panel__tab-content": 0, // lower scrolling content
-	".block-editor-inserter__tabs .components-tab-panel__tabs": 1, // higher sticky element
-	".block-editor-inserter__search": 1, // higher sticky element
+	".block-library-template-part__selection-search": 1, // higher sticky element
 
 	// These next two share a stacking context
 	".interface-complementary-area .components-panel" : 0, // lower scrolling content
@@ -81,11 +79,7 @@ $z-layers: (
 	".block-editor-block-contextual-toolbar": 61,
 
 	// Ensures content overlay appears higher than resize containers used for image/video/etc.
-	".block-editor-block-content-overlay__overlay": 10,
-
-	// The block mover, particularly in nested contexts,
-	// should overlap most block content.
-	".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover": 61,
+	".block-editor-block-list__block.has-block-overlay": 10,
 
 	// Query block setup state.
 	".block-editor-block-pattern-setup .pattern-slide": 100,
@@ -127,10 +121,7 @@ $z-layers: (
 	".edit-site-navigation-panel__preview": 32,
 
 	// Above the block list and the header.
-	".block-editor-block-list__block-popover": 31,
-
-	// Under the block popover (block toolbar).
-	".block-editor-block-list__insertion-point-popover": 28,
+	".block-editor-block-popover": 31,
 
 	// Show snackbars above everything (similar to popovers)
 	".components-snackbar-list": 100000,
@@ -146,6 +137,7 @@ $z-layers: (
 	".reusable-blocks-menu-items__convert-modal": 1000001,
 	".edit-site-create-template-part-modal": 1000001,
 	".block-editor-block-lock-modal": 1000001,
+	".block-editor-template-part__selection-modal": 1000001,
 
 	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
 	// because it uses emotion and not sass. We need it to render on top its parent popover.
@@ -168,6 +160,9 @@ $z-layers: (
 
 	// Show tooltips above NUX tips, wp-admin menus, submenus, and sidebar:
 	".components-tooltip": 1000002,
+
+	// Keep template popover underneath 'Create custom template' modal overlay.
+	".edit-post-post-template__dialog": 99999,
 
 	// Make sure corner handles are above side handles for ResizableBox component
 	".components-resizable-box__handle": 2,

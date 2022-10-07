@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -37,6 +42,7 @@ function InserterMenu(
 		showMostUsedBlocks,
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
+		prioritizePatterns,
 	},
 	ref
 ) {
@@ -44,33 +50,28 @@ function InserterMenu(
 		__experimentalFilterValue
 	);
 	const [ hoveredItem, setHoveredItem ] = useState( null );
-	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
-		null
-	);
+	const [ selectedPatternCategory, setSelectedPatternCategory ] =
+		useState( null );
 
-	const [
-		destinationRootClientId,
-		onInsertBlocks,
-		onToggleInsertionPoint,
-	] = useInsertionPoint( {
-		rootClientId,
-		clientId,
-		isAppender,
-		insertionIndex: __experimentalInsertionIndex,
-		shouldFocusBlock,
-	} );
+	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
+		useInsertionPoint( {
+			rootClientId,
+			clientId,
+			isAppender,
+			insertionIndex: __experimentalInsertionIndex,
+			shouldFocusBlock,
+		} );
 	const { showPatterns, hasReusableBlocks } = useSelect(
 		( select ) => {
-			const { __experimentalGetAllowedPatterns, getSettings } = select(
-				blockEditorStore
-			);
+			const { __experimentalGetAllowedPatterns, getSettings } =
+				select( blockEditorStore );
 
 			return {
 				showPatterns: !! __experimentalGetAllowedPatterns(
 					destinationRootClientId
 				).length,
-				hasReusableBlocks: !! getSettings().__experimentalReusableBlocks
-					?.length,
+				hasReusableBlocks:
+					!! getSettings().__experimentalReusableBlocks?.length,
 			};
 		},
 		[ destinationRootClientId ]
@@ -185,23 +186,28 @@ function InserterMenu(
 		},
 	} ) );
 
+	const showAsTabs = ! filterValue && ( showPatterns || hasReusableBlocks );
+
 	return (
 		<div className="block-editor-inserter__menu">
-			<div className="block-editor-inserter__main-area">
-				{ /* The following div is necessary to fix the sticky position of the search form. */ }
-				<div className="block-editor-inserter__content">
-					<SearchControl
-						className="block-editor-inserter__search"
-						onChange={ ( value ) => {
-							if ( hoveredItem ) setHoveredItem( null );
-							setFilterValue( value );
-						} }
-						value={ filterValue }
-						label={ __( 'Search for blocks and patterns' ) }
-						placeholder={ __( 'Search' ) }
-						ref={ searchRef }
-					/>
-					{ !! filterValue && (
+			<div
+				className={ classnames( 'block-editor-inserter__main-area', {
+					'show-as-tabs': showAsTabs,
+				} ) }
+			>
+				<SearchControl
+					className="block-editor-inserter__search"
+					onChange={ ( value ) => {
+						if ( hoveredItem ) setHoveredItem( null );
+						setFilterValue( value );
+					} }
+					value={ filterValue }
+					label={ __( 'Search for blocks and patterns' ) }
+					placeholder={ __( 'Search' ) }
+					ref={ searchRef }
+				/>
+				{ !! filterValue && (
+					<div className="block-editor-inserter__no-tab-container">
 						<InserterSearchResults
 							filterValue={ filterValue }
 							onSelect={ onSelect }
@@ -215,20 +221,22 @@ function InserterMenu(
 							showBlockDirectory
 							shouldFocusBlock={ shouldFocusBlock }
 						/>
-					) }
-					{ ! filterValue && ( showPatterns || hasReusableBlocks ) && (
-						<InserterTabs
-							showPatterns={ showPatterns }
-							showReusableBlocks={ hasReusableBlocks }
-						>
-							{ getCurrentTab }
-						</InserterTabs>
-					) }
-					{ ! filterValue &&
-						! showPatterns &&
-						! hasReusableBlocks &&
-						blocksTab }
-				</div>
+					</div>
+				) }
+				{ showAsTabs && (
+					<InserterTabs
+						showPatterns={ showPatterns }
+						showReusableBlocks={ hasReusableBlocks }
+						prioritizePatterns={ prioritizePatterns }
+					>
+						{ getCurrentTab }
+					</InserterTabs>
+				) }
+				{ ! filterValue && ! showAsTabs && (
+					<div className="block-editor-inserter__no-tab-container">
+						{ blocksTab }
+					</div>
+				) }
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
 				<InserterPreviewPanel item={ hoveredItem } />

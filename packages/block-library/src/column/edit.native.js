@@ -261,8 +261,8 @@ export default compose( [
 		const selectedColumnIndex = blockOrder.indexOf( clientId );
 		const columns = getBlocks( parentId );
 
-		const parentAlignment = getBlockAttributes( parentId )
-			?.verticalAlignment;
+		const parentAlignment =
+			getBlockAttributes( parentId )?.verticalAlignment;
 
 		return {
 			hasChildren,

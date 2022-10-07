@@ -5,6 +5,7 @@
 export * from './colors';
 export * from './gradients';
 export * from './font-sizes';
+export * from './duotone';
 export { AlignmentControl, AlignmentToolbar } from './alignment-control';
 export { default as Autocomplete } from './autocomplete';
 export {
@@ -14,7 +15,7 @@ export {
 export { default as __experimentalBlockFullHeightAligmentControl } from './block-full-height-alignment-control';
 export { default as __experimentalBlockAlignmentMatrixControl } from './block-alignment-matrix-control';
 export { default as BlockBreadcrumb } from './block-breadcrumb';
-export { default as __experimentalBlockContentOverlay } from './block-content-overlay';
+export { default as __experimentalUseBlockOverlayActive } from './block-content-overlay';
 export { BlockContextProvider } from './block-context';
 export {
 	default as BlockControls,
@@ -33,7 +34,6 @@ export {
 	BlockVerticalAlignmentControl,
 } from './block-vertical-alignment-control';
 export { default as __experimentalBorderRadiusControl } from './border-radius-control';
-export { default as __experimentalBorderStyleControl } from './border-style-control';
 export {
 	// This is a typo, but kept here for back-compat.
 	ButtonBlockerAppender,
@@ -52,7 +52,7 @@ export { default as __experimentalTextTransformControl } from './text-transform-
 export { default as __experimentalColorGradientControl } from './colors-gradients/control';
 export { default as __experimentalColorGradientSettingsDropdown } from './colors-gradients/dropdown';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
-export { default as __experimentalToolsPanelColorDropdown } from './colors-gradients/tools-panel-color-dropdown';
+export { default as __experimentalUseMultipleOriginColorsAndGradients } from './colors-gradients/use-multiple-origin-colors-and-gradients';
 export {
 	default as __experimentalImageEditor,
 	ImageEditingProvider as __experimentalImageEditingProvider,
@@ -93,6 +93,7 @@ export { default as URLInputButton } from './url-input/button';
 export { default as URLPopover } from './url-popover';
 export { __experimentalImageURLInputUI } from './url-popover/image-url-input-ui';
 export { default as withColorContext } from './color-palette/with-color-context';
+export { default as __experimentalSpacingSizesControl } from './spacing-sizes-control';
 
 /*
  * Content Related Components
@@ -147,8 +148,14 @@ export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
 export { default as useBlockDisplayInformation } from './use-block-display-information';
 export { default as __unstableIframe } from './iframe';
-export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
+export {
+	RecursionProvider as __experimentalRecursionProvider,
+	useHasRecursion as __experimentalUseHasRecursion,
+} from './recursion-provider';
 export { default as __experimentalBlockPatternsList } from './block-patterns-list';
+export { default as __experimentalPublishDateTimePicker } from './publish-date-time-picker';
+export { default as __experimentalInspectorPopoverHeader } from './inspector-popover-header';
+export { default as __experimentalUseOnBlockDrop } from './use-on-block-drop';
 
 /*
  * State Related Components

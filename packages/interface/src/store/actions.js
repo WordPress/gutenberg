@@ -5,32 +5,68 @@ import deprecated from '@wordpress/deprecated';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
+ * Set a default complementary area.
+ *
+ * @param {string} scope Complementary area scope.
+ * @param {string} area  Area identifier.
+ *
+ * @return {Object} Action object.
+ */
+export const setDefaultComplementaryArea = ( scope, area ) => ( {
+	type: 'SET_DEFAULT_COMPLEMENTARY_AREA',
+	scope,
+	area,
+} );
+
+/**
  * Enable the complementary area.
  *
  * @param {string} scope Complementary area scope.
  * @param {string} area  Area identifier.
  */
-export const enableComplementaryArea = ( scope, area ) => ( { registry } ) => {
-	// Return early if there's no area.
-	if ( ! area ) {
-		return;
-	}
+export const enableComplementaryArea =
+	( scope, area ) =>
+	( { registry, dispatch } ) => {
+		// Return early if there's no area.
+		if ( ! area ) {
+			return;
+		}
 
-	registry
-		.dispatch( preferencesStore )
-		.set( scope, 'complementaryArea', area );
-};
+		const isComplementaryAreaVisible = registry
+			.select( preferencesStore )
+			.get( scope, 'isComplementaryAreaVisible' );
+
+		if ( ! isComplementaryAreaVisible ) {
+			registry
+				.dispatch( preferencesStore )
+				.set( scope, 'isComplementaryAreaVisible', true );
+		}
+
+		dispatch( {
+			type: 'ENABLE_COMPLEMENTARY_AREA',
+			scope,
+			area,
+		} );
+	};
 
 /**
  * Disable the complementary area.
  *
  * @param {string} scope Complementary area scope.
  */
-export const disableComplementaryArea = ( scope ) => ( { registry } ) => {
-	registry
-		.dispatch( preferencesStore )
-		.set( scope, 'complementaryArea', null );
-};
+export const disableComplementaryArea =
+	( scope ) =>
+	( { registry } ) => {
+		const isComplementaryAreaVisible = registry
+			.select( preferencesStore )
+			.get( scope, 'isComplementaryAreaVisible' );
+
+		if ( isComplementaryAreaVisible ) {
+			registry
+				.dispatch( preferencesStore )
+				.set( scope, 'isComplementaryAreaVisible', false );
+		}
+	};
 
 /**
  * Pins an item.
@@ -40,26 +76,28 @@ export const disableComplementaryArea = ( scope ) => ( { registry } ) => {
  *
  * @return {Object} Action object.
  */
-export const pinItem = ( scope, item ) => ( { registry } ) => {
-	// Return early if there's no item.
-	if ( ! item ) {
-		return;
-	}
+export const pinItem =
+	( scope, item ) =>
+	( { registry } ) => {
+		// Return early if there's no item.
+		if ( ! item ) {
+			return;
+		}
 
-	const pinnedItems = registry
-		.select( preferencesStore )
-		.get( scope, 'pinnedItems' );
+		const pinnedItems = registry
+			.select( preferencesStore )
+			.get( scope, 'pinnedItems' );
 
-	// The item is already pinned, there's nothing to do.
-	if ( pinnedItems?.[ item ] === true ) {
-		return;
-	}
+		// The item is already pinned, there's nothing to do.
+		if ( pinnedItems?.[ item ] === true ) {
+			return;
+		}
 
-	registry.dispatch( preferencesStore ).set( scope, 'pinnedItems', {
-		...pinnedItems,
-		[ item ]: true,
-	} );
-};
+		registry.dispatch( preferencesStore ).set( scope, 'pinnedItems', {
+			...pinnedItems,
+			[ item ]: true,
+		} );
+	};
 
 /**
  * Unpins an item.
@@ -67,21 +105,23 @@ export const pinItem = ( scope, item ) => ( { registry } ) => {
  * @param {string} scope Item scope.
  * @param {string} item  Item identifier.
  */
-export const unpinItem = ( scope, item ) => ( { registry } ) => {
-	// Return early if there's no item.
-	if ( ! item ) {
-		return;
-	}
+export const unpinItem =
+	( scope, item ) =>
+	( { registry } ) => {
+		// Return early if there's no item.
+		if ( ! item ) {
+			return;
+		}
 
-	const pinnedItems = registry
-		.select( preferencesStore )
-		.get( scope, 'pinnedItems' );
+		const pinnedItems = registry
+			.select( preferencesStore )
+			.get( scope, 'pinnedItems' );
 
-	registry.dispatch( preferencesStore ).set( scope, 'pinnedItems', {
-		...pinnedItems,
-		[ item ]: false,
-	} );
-};
+		registry.dispatch( preferencesStore ).set( scope, 'pinnedItems', {
+			...pinnedItems,
+			[ item ]: false,
+		} );
+	};
 
 /**
  * Returns an action object used in signalling that a feature should be toggled.
@@ -91,9 +131,9 @@ export const unpinItem = ( scope, item ) => ( { registry } ) => {
  */
 export function toggleFeature( scope, featureName ) {
 	return function ( { registry } ) {
-		deprecated( `wp.dispatch( 'core/interface' ).toggleFeature`, {
+		deprecated( `dispatch( 'core/interface' ).toggleFeature`, {
 			since: '6.0',
-			alternative: `wp.dispatch( 'core/preferences' ).toggle`,
+			alternative: `dispatch( 'core/preferences' ).toggle`,
 		} );
 
 		registry.dispatch( preferencesStore ).toggle( scope, featureName );
@@ -112,9 +152,9 @@ export function toggleFeature( scope, featureName ) {
  */
 export function setFeatureValue( scope, featureName, value ) {
 	return function ( { registry } ) {
-		deprecated( `wp.dispatch( 'core/interface' ).setFeatureValue`, {
+		deprecated( `dispatch( 'core/interface' ).setFeatureValue`, {
 			since: '6.0',
-			alternative: `wp.dispatch( 'core/preferences' ).set`,
+			alternative: `dispatch( 'core/preferences' ).set`,
 		} );
 
 		registry
@@ -133,9 +173,9 @@ export function setFeatureValue( scope, featureName, value ) {
  */
 export function setFeatureDefaults( scope, defaults ) {
 	return function ( { registry } ) {
-		deprecated( `wp.dispatch( 'core/interface' ).setFeatureDefaults`, {
+		deprecated( `dispatch( 'core/interface' ).setFeatureDefaults`, {
 			since: '6.0',
-			alternative: `wp.dispatch( 'core/preferences' ).setDefaults`,
+			alternative: `dispatch( 'core/preferences' ).setDefaults`,
 		} );
 
 		registry.dispatch( preferencesStore ).setDefaults( scope, defaults );

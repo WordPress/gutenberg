@@ -13,9 +13,8 @@ export function useMarkPersistent( { html, value } ) {
 	const previousText = useRef();
 	const hasActiveFormats =
 		value.activeFormats && !! value.activeFormats.length;
-	const { __unstableMarkLastChangeAsPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const { __unstableMarkLastChangeAsPersistent } =
+		useDispatch( blockEditorStore );
 
 	// Must be set synchronously to make sure it applies to the last change.
 	useLayoutEffect( () => {

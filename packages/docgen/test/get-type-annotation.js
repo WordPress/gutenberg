@@ -1,23 +1,15 @@
 /**
  * Internal dependencies
  */
+const engine = require( '../lib/engine' );
 const getTypeAnnotation = require( '../lib/get-type-annotation' );
 
-const getSimpleTypeNode = require( './fixtures/type-annotations/simple-types/get-node' );
-const getArraysGenericTypesUnionsAndIntersctionsNode = require( './fixtures/type-annotations/arrays-generic-types-unions-intersections/get-node' );
-const getLiteralsNode = require( './fixtures/type-annotations/literal-values/get-node' );
-const getTypeLiteralNode = require( './fixtures/type-annotations/type-literals/get-node' );
-const getNamedExportNode = require( './fixtures/type-annotations/named-export/get-node' );
-const getExportedVariableDeclarationNode = require( './fixtures/type-annotations/exported-variable-declaration/get-node' );
-const getImportsParameterizedRestOperatorPredicateIndexerTypeNode = require( './fixtures/type-annotations/imports-parameterized-rest-operator-predicate-indexers/get-node' );
-const getMissingTypesNode = require( './fixtures/type-annotations/missing-types/get-node' );
-const getArrowFunctionNode = require( './fixtures/type-annotations/arrow-function/get-node' );
-const getArrayDestructuringArrayTypeNode = require( './fixtures/type-annotations/array-destructuring-array-type/get-node' );
-const getArrayDestructuringTupleTypeNode = require( './fixtures/type-annotations/array-destructuring-tuple-type/get-node' );
-const getArrayDestructuringAnyOtherTypeNode = require( './fixtures/type-annotations/array-destructuring-any-other-type/get-node' );
-const getObjectDestructuringTypeLiteralNode = require( './fixtures/type-annotations/object-destructuring-object-literal-type/get-node' );
-const getAssignmentPatternNode = require( './fixtures/type-annotations/assignment-pattern/get-node' );
-const getExportedVariableDeclarationStaticNode = require( './fixtures/type-annotations/exported-variable-declaration-statics/get-node' );
+/**
+ * Generate the AST necessary to assert inferred types.
+ *
+ * @param {string} code - Actual source code to parse.
+ */
+const parse = ( code ) => engine( 'test-code.ts', code ).ast.body[ 0 ];
 
 describe( 'Type annotations', () => {
 	it( 'are taken from JSDoc if any', () => {
@@ -46,237 +38,308 @@ describe( 'Type annotations', () => {
 		description: 'A foo parameter',
 	};
 
-	const returnTag = {
-		tag: 'return',
-		type: '',
-		name: 'My',
-		description: 'favorite return',
-	};
-
 	describe( 'simple types', () => {
 		const keywordTypes = [
-			[ 'TSAnyKeyword', 'any' ],
-			[ 'TSBigIntKeyword', 'BigInt' ],
-			[ 'TSBooleanKeyword', 'boolean' ],
-			[ 'TSNeverKeyword', 'never' ],
-			[ 'TSNullKeyword', 'null' ],
-			[ 'TSNumberKeyword', 'number' ],
-			[ 'TSObjectKeyword', 'object' ],
-			[ 'TSStringKeyword', 'string' ],
-			[ 'TSSymbolKeyword', 'symbol' ],
-			[ 'TSUndefinedKeyword', 'undefined' ],
-			[ 'TSUnknownKeyword', 'unknown' ],
-			[ 'TSVoidKeyword', 'void' ],
+			'any',
+			'BigInt',
+			'boolean',
+			'never',
+			'null',
+			'number',
+			'object',
+			'string',
+			'symbol',
+			'undefined',
+			'unknown',
+			'void',
 		];
 
 		it.each( keywordTypes )(
 			`should get the parameter type for an %s`,
-			( paramType, expected ) => {
-				const node = getSimpleTypeNode( { paramType } );
-				expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe(
-					expected
-				);
+			( typeName ) => {
+				expect(
+					getTypeAnnotation(
+						{ tag: 'param', name: 'foo' },
+						parse( `function fn(foo: ${ typeName }): any {}` ),
+						0
+					)
+				).toBe( typeName );
 			}
 		);
 
 		it.each( keywordTypes )(
 			`should get the return type for an %s`,
-			( returnType, expected ) => {
-				const node = getSimpleTypeNode( { returnType } );
-				expect( getTypeAnnotation( returnTag, node, 0 ) ).toBe(
-					expected
-				);
+			( typeName ) => {
+				expect(
+					getTypeAnnotation(
+						{ tag: 'return' },
+						parse( `function fn(foo: any): ${ typeName } {}` )
+					)
+				).toBe( typeName );
 			}
 		);
 	} );
 
 	describe( 'arrays, applied generic types, unions, intersections', () => {
-		const node = getArraysGenericTypesUnionsAndIntersctionsNode();
+		const node = parse( `
+			function fn( foo: MyType< string | number >[] ): MyType< string & number >[] {
+				return [];
+			}
+		` );
 
 		it( 'should get the param type', () => {
-			expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe(
-				'MyType< string | number >[]'
-			);
+			expect(
+				getTypeAnnotation( { tag: 'param', name: 'foo' }, node, 0 )
+			).toBe( 'MyType< string | number >[]' );
 		} );
 
 		it( 'should get the return type', () => {
-			expect( getTypeAnnotation( returnTag, node, 0 ) ).toBe(
+			expect( getTypeAnnotation( { tag: 'return' }, node ) ).toBe(
 				'MyType< string & number >[]'
 			);
 		} );
 	} );
 
 	describe( 'literal values', () => {
-		describe.each( [
-			[ 'param', paramTag ],
-			[ 'return', returnTag ],
-		] )( '%s', ( _, tag ) => {
-			it.each( [
-				[ 'StringLiteral', 'a-string-literal', "'a-string-literal'" ],
-				[ 'BigIntLiteral', 1000, '1000n' ],
-				[ 'BooleanLiteral', true, 'true' ],
-				[ 'NumericLiteral', 1000, '1000' ],
-			] )(
-				'should handle %s',
-				( literalType, literalValue, literalResult ) => {
-					const node = getLiteralsNode( {
-						literalType,
-						literalValue,
-					} );
-					expect( getTypeAnnotation( tag, node, 0 ) ).toBe(
-						literalResult
-					);
-				}
-			);
-		} );
+		it.each( [ "'a-string-literal'", '1000n', 'true', '1000' ] )(
+			'should handle %s',
+			( literal ) => {
+				const node = parse( `
+					function fn( foo: ${ literal } ): ${ literal } {
+						return BigInt( '1000' ) as ${ literal };
+					}
+				` );
+				expect(
+					getTypeAnnotation( { tag: 'param', name: 'foo' }, node, 0 )
+				).toBe( literal );
+			}
+		);
+
+		it.each( [ "'a-string-literal'", '1000n', 'true', '1000' ] )(
+			'should handle %s in the return',
+			( literal ) => {
+				const node = parse( `
+					function fn( foo: ${ literal } ): ${ literal } {
+						return BigInt( '1000' ) as ${ literal };
+					}
+				` );
+				expect( getTypeAnnotation( { tag: 'return' }, node ) ).toBe(
+					literal
+				);
+			}
+		);
 	} );
 
 	describe( 'type literals', () => {
-		const node = getTypeLiteralNode();
+		const node = parse( `
+			function fn( foo: {
+				( bar: string ): void;
+				bar: string;
+				optionalBar?: 'left' | 'right';
+				[ key: number ]: string;
+			} ): {
+				( bar: string ): void;
+				bar: string;
+				optionalBar?: 'left' | 'right';
+				[ key: number ]: string;
+			} {}
+		` );
 
 		it( 'should get the param type literal annotation', () => {
-			expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe(
+			expect(
+				getTypeAnnotation( { tag: 'param', name: 'foo' }, node, 0 )
+			).toBe(
 				"{ ( bar: string ): void; bar: string; optionalBar?: 'left' | 'right'; [ key: number ]: string; }"
 			);
 		} );
 
 		it( 'should get the return type literal annotation', () => {
-			expect( getTypeAnnotation( returnTag, node, 0 ) ).toBe(
+			expect( getTypeAnnotation( { tag: 'return' }, node ) ).toBe(
 				"{ ( bar: string ): void; bar: string; optionalBar?: 'left' | 'right'; [ key: number ]: string; }"
 			);
 		} );
 	} );
 
 	describe( 'named export', () => {
-		const node = getNamedExportNode();
+		const node = parse( `export function fn( foo: string ): string {}` );
 
 		it( 'should get the param type', () => {
-			expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe( 'string' );
+			expect(
+				getTypeAnnotation( { tag: 'param', name: 'foo' }, node, 0 )
+			).toBe( 'string' );
 		} );
 
 		it( 'should get the return type', () => {
-			expect( getTypeAnnotation( returnTag, node, 0 ) ).toBe( 'string' );
+			expect( getTypeAnnotation( { tag: 'return' }, node ) ).toBe(
+				'string'
+			);
 		} );
 	} );
 
 	describe( 'exported variable declaration', () => {
-		const node = getExportedVariableDeclarationNode();
-
+		const node = parse( `export const fn = ( foo: string ): void => {};` );
 		it( 'should get the param type', () => {
-			expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe( 'string' );
+			expect(
+				getTypeAnnotation( { tag: 'param', name: 'foo' }, node, 0 )
+			).toBe( 'string' );
 		} );
 
 		it( 'should get the return type', () => {
-			expect( getTypeAnnotation( returnTag, node, 0 ) ).toBe( 'void' );
+			expect( getTypeAnnotation( { tag: 'return' }, node ) ).toBe(
+				'void'
+			);
 		} );
 	} );
 
 	describe( 'imports, parameterized types, rest types, operator types, type predicates, index accessed types', () => {
-		const node = getImportsParameterizedRestOperatorPredicateIndexerTypeNode();
+		const node = parse( `
+			function fn(
+				foo: import('react').bar.baz.types.ComponentType[ 'displayName' ],
+				...rest: [ string | number, ...( keyof constant ) ]
+			): foo is string {}
+		` );
 
 		it( 'should get the index accessed import type', () => {
-			expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe(
+			expect(
+				getTypeAnnotation( { tag: 'param', name: 'foo' }, node, 0 )
+			).toBe(
 				"import( 'react' ).bar.baz.types.ComponentType[ 'displayName' ]"
 			);
 		} );
 
 		it( 'should get the parameterized tuple rest type', () => {
 			expect(
-				getTypeAnnotation( { ...paramTag, name: 'rest' }, node, 1 )
+				getTypeAnnotation( { tag: 'param', name: 'rest' }, node, 1 )
 			).toBe( '[ string | number, ...( keyof constant ) ]' );
 		} );
 
 		it( 'should get the type predicate return type', () => {
-			expect( getTypeAnnotation( returnTag, node, 1 ) ).toBe(
+			expect( getTypeAnnotation( { tag: 'return' }, node ) ).toBe(
 				'foo is string'
 			);
 		} );
 	} );
 
 	describe( 'missing types', () => {
-		const node = getMissingTypesNode();
+		const node = parse( `function fn( foo ) {}` );
 
 		it( 'should return empty value if there is no return type', () => {
-			expect( getTypeAnnotation( returnTag, node, 0 ) ).toBeFalsy();
+			expect( getTypeAnnotation( { tag: 'return' }, node ) ).toBeFalsy();
 		} );
 
 		it( 'should return empty value if there is no param type', () => {
-			expect( getTypeAnnotation( paramTag, node, 0 ) ).toBeFalsy();
+			expect(
+				getTypeAnnotation( { tag: 'param', name: 'foo' }, node, 0 )
+			).toBeFalsy();
 		} );
 	} );
 
 	describe( 'function argument array-destructuring', () => {
 		describe( 'array-type', () => {
-			const node = getArrayDestructuringArrayTypeNode();
+			const node = parse( `
+				function fn< T >( [ head ]: T[] ): T {
+					return head;
+				}
+			` );
 
 			it( 'should grab the whole type for the unqualified name', () => {
-				expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe( 'T[]' );
+				expect(
+					getTypeAnnotation( { tag: 'param', name: 'foo' }, node, 0 )
+				).toBe( 'T[]' );
 			} );
 
 			it( 'should get the individual type for the qualified name', () => {
 				expect(
-					getTypeAnnotation( { ...paramTag, name: 'foo.0' }, node, 0 )
+					getTypeAnnotation(
+						{ tag: 'param', name: 'foo.0' },
+						node,
+						0
+					)
 				).toBe( 'T' );
 			} );
 		} );
 
 		describe( 'tuple-type', () => {
-			const node = getArrayDestructuringTupleTypeNode();
+			const node = parse( `
+				function second< T, S = T >( [ head, sec ]: [ T, S ] ): S {
+					return sec;
+				}
+			` );
 
 			it( 'should grab the whole type for the unqualified name', () => {
-				expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe(
-					'[ T, S ]'
-				);
+				expect(
+					getTypeAnnotation( { tag: 'param', name: 'foo' }, node, 0 )
+				).toBe( '[ T, S ]' );
 			} );
 
 			it( 'should get the individual type for the qualified name', () => {
 				expect(
-					getTypeAnnotation( { ...paramTag, name: 'foo.1' }, node, 0 )
+					getTypeAnnotation(
+						{ tag: 'param', name: 'foo.1' },
+						node,
+						0
+					)
 				).toBe( 'S' );
 			} );
 		} );
 
 		describe( 'any-other-type', () => {
-			const node = getArrayDestructuringAnyOtherTypeNode();
+			const node = parse( `
+				function fn( [ first, second ]: ( T & S ) | V ): S {
+					return second;
+				}
+			` );
 
 			it( 'should get the full type name for the unqualified name', () => {
-				expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe(
-					'( T & S ) | V'
-				);
+				expect(
+					getTypeAnnotation( { tag: 'param', name: 'foo' }, node, 0 )
+				).toBe( '( T & S ) | V' );
 			} );
 
 			it( 'should get the full type with a qualification for the qualified name', () => {
 				expect(
-					getTypeAnnotation( { ...paramTag, name: 'foo.1' }, node, 0 )
+					getTypeAnnotation(
+						{ tag: 'param', name: 'foo.1' },
+						node,
+						0
+					)
 				).toBe( '( ( T & S ) | V )[ 1 ]' );
 			} );
 		} );
 	} );
 
 	describe( 'arrow function parameters', () => {
-		const node = getArrowFunctionNode();
+		const node = parse( `
+			export const fn = (
+				callback: ( foo: string, ...rest: any[] ) => GenericType< T >
+			): void => {};
+		` );
 
 		it( 'should correctly format the arrow function', () => {
 			expect(
-				getTypeAnnotation( { ...paramTag, name: 'callback' }, node, 0 )
+				getTypeAnnotation( { tag: 'param', name: 'callback' }, node, 0 )
 			).toBe( '( foo: string, ...rest: any[] ) => GenericType< T >' );
 		} );
 	} );
 
 	describe( 'function argument object destructuring', () => {
 		describe( 'type literal', () => {
-			const node = getObjectDestructuringTypeLiteralNode();
+			const node = parse( `
+				function fn( { foo, ...rest }: { foo: string } ): string {
+					return foo;
+				}
+			` );
 
 			it( 'should get the full type for the param', () => {
-				expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe(
-					'{ foo: string; }'
-				);
+				expect(
+					getTypeAnnotation( { tag: 'param', name: 'foo' }, node, 0 )
+				).toBe( '{ foo: string; }' );
 			} );
 
 			it( 'should get the member type for the param', () => {
 				expect(
 					getTypeAnnotation(
-						{ ...paramTag, name: 'props.foo' },
+						{ tag: 'param', name: 'props.foo' },
 						node,
 						0
 					)
@@ -296,26 +359,88 @@ describe( 'Type annotations', () => {
 	} );
 
 	describe( 'assignment pattern', () => {
-		const node = getAssignmentPatternNode();
+		const node = parse( `
+			function fn( [ foo ]: string = '' ): string {
+				return foo;
+			}
+		` );
 
 		it( 'should get the type of the assignment pattern', () => {
-			expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe( 'string' );
+			expect(
+				getTypeAnnotation( { tag: 'param', name: 'foo' }, node, 0 )
+			).toBe( 'string' );
 		} );
 
 		it( 'should get the type of the assignment pattern for array destructuring', () => {
 			expect(
-				getTypeAnnotation( { ...paramTag, name: 'props.0' }, node, 0 )
+				getTypeAnnotation( { tag: 'param', name: 'props.0' }, node, 0 )
 			).toBe( '( string )[ 0 ]' );
 		} );
 	} );
 
 	describe( 'static exported variable', () => {
-		const node = getExportedVariableDeclarationStaticNode();
+		const node = parse( `
+			/**
+			 * This is a description of the variable
+			*/
+			export const foo: ( string | number )[] = [];
+		` );
 
 		it( 'should get the type of the variable', () => {
 			expect( getTypeAnnotation( { tag: 'type' }, node, 0 ) ).toBe(
 				'( string | number )[]'
 			);
+		} );
+	} );
+
+	describe( 'statically-wrapped function exceptions', () => {
+		const getStateArgType = ( code ) => {
+			const { tokens } = engine( 'test.ts', code );
+			return getTypeAnnotation(
+				{ tag: 'param', name: 'state' },
+				tokens[ 0 ],
+				0
+			);
+		};
+
+		const docString = `/**
+			 * Returns the number of things
+			 *
+			 * @param state - stores all the things
+			 */`;
+		it( 'should find types for a typecasted function', () => {
+			const code = `${ docString }
+			 export const getCount = ( state: string[] ) => state.length;
+			 `;
+			expect( getStateArgType( code ) ).toBe( 'string[]' );
+		} );
+
+		it( 'should find types for a doubly typecasted function', () => {
+			const code = `${ docString }
+				 export const getCount = ( ( state: string[] ) => state.length ) as any as any;
+			 `;
+			expect( getStateArgType( code ) ).toBe( 'string[]' );
+		} );
+
+		it( 'should find types for inner function with `createSelector`', () => {
+			const code = `${ docString }
+				 export const getCount = createSelector( ( state: string[] ) => state.length );
+			 `;
+			expect( getStateArgType( code ) ).toBe( 'string[]' );
+		} );
+
+		it( 'should find types for inner typecasted function with `createSelector`', () => {
+			const code = `${ docString }
+				 export const getCount = createSelector( (( state: string[] ) => state.length) as any );
+			 `;
+			expect( getStateArgType( code ) ).toBe( 'string[]' );
+		} );
+
+		it( 'should find types for inner function with `createRegistrySelector`', () => {
+			const code = `${ docString }
+				 export const getCount = createRegistrySelector( ( select ) => ( state: number ) => state );
+			 `;
+			expect( getStateArgType( code ) ).toBe( 'number' );
 		} );
 	} );
 } );

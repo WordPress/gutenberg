@@ -10,7 +10,6 @@ import {
 	pressKeyTimes,
 	searchForBlock,
 	setBrowserViewport,
-	showBlockToolbar,
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
@@ -170,68 +169,6 @@ describe( 'Inserting blocks', () => {
 		).not.toBeNull();
 	} );
 
-	// Check for regression of https://github.com/WordPress/gutenberg/issues/9583
-	it( 'should not allow transfer of focus outside of the block-insertion menu once open', async () => {
-		// Enter the default block and click the inserter toggle button to the left of it.
-		await page.keyboard.press( 'Enter' );
-		await showBlockToolbar();
-		await page.click(
-			'.block-editor-block-list__empty-block-inserter .block-editor-inserter__toggle'
-		);
-
-		// Expect the inserter search input to be the active element.
-		let activeElementClassList = await page.evaluate(
-			() => document.activeElement.classList
-		);
-		expect( Object.values( activeElementClassList ) ).toContain(
-			'components-search-control__input'
-		);
-
-		// Try using the up arrow key (vertical navigation triggers the issue described in #9583).
-		await page.keyboard.press( 'ArrowUp' );
-
-		// Expect the inserter search input to still be the active element.
-		activeElementClassList = await page.evaluate(
-			() => document.activeElement.classList
-		);
-		expect( Object.values( activeElementClassList ) ).toContain(
-			'components-search-control__input'
-		);
-
-		// Tab to the block list.
-		await page.keyboard.press( 'Tab' );
-
-		// Expect the block list to be the active element.
-		activeElementClassList = await page.evaluate(
-			() => document.activeElement.classList
-		);
-		expect( Object.values( activeElementClassList ) ).toContain(
-			'block-editor-block-types-list__item'
-		);
-
-		// Try using the up arrow key.
-		await page.keyboard.press( 'ArrowUp' );
-
-		// Expect the block list to still be the active element.
-		activeElementClassList = await page.evaluate(
-			() => document.activeElement.classList
-		);
-		expect( Object.values( activeElementClassList ) ).toContain(
-			'block-editor-block-types-list__item'
-		);
-
-		// Press escape to close the block inserter.
-		await page.keyboard.press( 'Escape' );
-
-		// Expect focus to have transferred back to the inserter toggle button.
-		activeElementClassList = await page.evaluate(
-			() => document.activeElement.classList
-		);
-		expect( Object.values( activeElementClassList ) ).toContain(
-			'block-editor-inserter__toggle'
-		);
-	} );
-
 	// Check for regression of https://github.com/WordPress/gutenberg/issues/23263
 	it( 'inserts blocks at root level when using the root appender while selection is in an inner block', async () => {
 		await insertBlock( 'Buttons' );
@@ -310,12 +247,11 @@ describe( 'Inserting blocks', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'First paragraph' );
 		await insertBlock( 'Image' );
-		await showBlockToolbar();
 		const paragraphBlock = await page.$(
 			'p[aria-label="Paragraph block"]'
 		);
 		paragraphBlock.click();
-		await showBlockToolbar();
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 
 		// Open the global inserter and search for the Heading block.
 		await searchForBlock( 'Heading' );
@@ -323,7 +259,6 @@ describe( 'Inserting blocks', () => {
 		const headingButton = (
 			await page.$x( `//button//span[contains(text(), 'Heading')]` )
 		 )[ 0 ];
-
 		// Hover over the block should show the blue line indicator.
 		await headingButton.hover();
 
@@ -344,6 +279,8 @@ describe( 'Inserting blocks', () => {
 		await insertBlock( 'Group' );
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Paragraph after group' );
+		// Click the Group first to make the appender inside it clickable.
+		await page.click( '[data-type="core/group"]' );
 		await page.click( '[data-type="core/group"] [aria-label="Add block"]' );
 		const browseAll = await page.waitForXPath(
 			'//button[text()="Browse all"]'
@@ -360,11 +297,13 @@ describe( 'Inserting blocks', () => {
 		await insertBlock( 'Group' );
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Text' );
+		// Click the Group first to make the appender inside it clickable.
+		await page.click( '[data-type="core/group"]' );
 		await page.click( '[data-type="core/group"] [aria-label="Add block"]' );
 		await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
 		await page.focus( INSERTER_SEARCH_SELECTOR );
 		await pressKeyWithModifier( 'primary', 'a' );
-		const searchTerm = 'Heading';
+		const searchTerm = 'Verse';
 		await page.keyboard.type( searchTerm );
 		const browseAll = await page.waitForXPath(
 			'//button[text()="Browse all"]'

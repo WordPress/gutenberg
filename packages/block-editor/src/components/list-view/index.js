@@ -48,52 +48,36 @@ const expanded = ( state, action ) => {
 export const BLOCK_LIST_ITEM_HEIGHT = 36;
 
 /**
- * Wrap `ListViewRows` with `TreeGrid`. ListViewRows is a
- * recursive component (it renders itself), so this ensures TreeGrid is only
- * present at the very top of the navigation grid.
+ * Show a hierarchical list of blocks.
  *
- * @param {Object}  props                                          Components props.
- * @param {Array}   props.blocks                                   Custom subset of block client IDs to be used instead of the default hierarchy.
- * @param {boolean} props.showNestedBlocks                         Flag to enable displaying nested blocks.
- * @param {boolean} props.showBlockMovers                          Flag to enable block movers
- * @param {boolean} props.__experimentalFeatures                   Flag to enable experimental features.
- * @param {boolean} props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
- * @param {boolean} props.__experimentalHideContainerBlockActions  Flag to hide actions of top level blocks (like core/widget-area)
- * @param {string}  props.id                                       Unique identifier for the root list element (primarily for a11y purposes).
- * @param {boolean} props.expandNested                             Flag to determine whether nested levels are expanded by default.
- * @param {Object}  ref                                            Forwarded ref
+ * @param {Object}  props                 Components props.
+ * @param {string}  props.id              An HTML element id for the root element of ListView.
+ * @param {Array}   props.blocks          Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {boolean} props.showBlockMovers Flag to enable block movers
+ * @param {boolean} props.isExpanded      Flag to determine whether nested levels are expanded by default.
+ * @param {Object}  ref                   Forwarded ref
  */
 function ListView(
-	{
-		blocks,
-		__experimentalFeatures,
-		__experimentalPersistentListViewFeatures,
-		__experimentalHideContainerBlockActions,
-		showNestedBlocks,
-		showBlockMovers,
-		id,
-		expandNested = false,
-		...props
-	},
+	{ id, blocks, showBlockMovers = false, isExpanded = false },
 	ref
 ) {
-	const {
-		clientIdsTree,
-		draggedClientIds,
-		selectedClientIds,
-	} = useListViewClientIds( blocks );
+	const { clientIdsTree, draggedClientIds, selectedClientIds } =
+		useListViewClientIds( blocks );
 
-	const { visibleBlockCount } = useSelect(
+	const { visibleBlockCount, shouldShowInnerBlocks } = useSelect(
 		( select ) => {
-			const { getGlobalBlockCount, getClientIdsOfDescendants } = select(
-				blockEditorStore
-			);
+			const {
+				getGlobalBlockCount,
+				getClientIdsOfDescendants,
+				__unstableGetEditorMode,
+			} = select( blockEditorStore );
 			const draggedBlockCount =
 				draggedClientIds?.length > 0
 					? getClientIdsOfDescendants( draggedClientIds ).length + 1
 					: 0;
 			return {
 				visibleBlockCount: getGlobalBlockCount() - draggedBlockCount,
+				shouldShowInnerBlocks: __unstableGetEditorMode() !== 'zoom-out',
 			};
 		},
 		[ draggedClientIds ]
@@ -131,7 +115,7 @@ function ListView(
 		BLOCK_LIST_ITEM_HEIGHT,
 		visibleBlockCount,
 		{
-			useWindowing: __experimentalPersistentListViewFeatures,
+			useWindowing: true,
 			windowOverscan: 40,
 		}
 	);
@@ -181,25 +165,13 @@ function ListView(
 
 	const contextValue = useMemo(
 		() => ( {
-			__experimentalFeatures,
-			__experimentalPersistentListViewFeatures,
-			__experimentalHideContainerBlockActions,
 			isTreeGridMounted: isMounted.current,
 			draggedClientIds,
 			expandedState,
 			expand,
 			collapse,
 		} ),
-		[
-			__experimentalFeatures,
-			__experimentalPersistentListViewFeatures,
-			__experimentalHideContainerBlockActions,
-			isMounted.current,
-			draggedClientIds,
-			expandedState,
-			expand,
-			collapse,
-		]
+		[ isMounted.current, draggedClientIds, expandedState, expand, collapse ]
 	);
 
 	return (
@@ -216,17 +188,17 @@ function ListView(
 				onCollapseRow={ collapseRow }
 				onExpandRow={ expandRow }
 				onFocusRow={ focusRow }
+				applicationAriaLabel={ __( 'Block navigation structure' ) }
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch
 						blocks={ clientIdsTree }
 						selectBlock={ selectEditorBlock }
-						showNestedBlocks={ showNestedBlocks }
 						showBlockMovers={ showBlockMovers }
 						fixedListWindow={ fixedListWindow }
 						selectedClientIds={ selectedClientIds }
-						expandNested={ expandNested }
-						{ ...props }
+						isExpanded={ isExpanded }
+						shouldShowInnerBlocks={ shouldShowInnerBlocks }
 					/>
 				</ListViewContext.Provider>
 			</TreeGrid>

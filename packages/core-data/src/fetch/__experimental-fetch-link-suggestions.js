@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Filters the search by type
  *
- * @typedef { 'post' | 'term' | 'post-format' } WPLinkSearchType
+ * @typedef { 'attachment' | 'post' | 'term' | 'post-format' } WPLinkSearchType
  */
 
 /**
@@ -36,6 +36,17 @@ import { __ } from '@wordpress/i18n';
  * @property {string} title  Title of the link.
  * @property {string} type   The taxonomy or post type slug or type URL.
  * @property {WPKind} [kind] Link kind of post-type or taxonomy
+ */
+
+/**
+ * @typedef WPLinkSearchResultAugments
+ *
+ * @property {{kind: WPKind}} [meta]    Contains kind information.
+ * @property {WPKind}         [subtype] Optional subtype if it exists.
+ */
+
+/**
+ * @typedef {WPLinkSearchResult & WPLinkSearchResultAugments} WPLinkSearchResultAugmented
  */
 
 /**
@@ -82,6 +93,7 @@ const fetchLinkSuggestions = async (
 
 	const { disablePostFormats = false } = settings;
 
+	/** @type {Promise<WPLinkSearchResult>[]} */
 	const queries = [];
 
 	if ( ! type || type === 'post' ) {
@@ -177,7 +189,8 @@ const fetchLinkSuggestions = async (
 	return Promise.all( queries ).then( ( results ) => {
 		return results
 			.reduce(
-				( accumulator, current ) => accumulator.concat( current ), // Flatten list.
+				( /** @type {WPLinkSearchResult[]} */ accumulator, current ) =>
+					accumulator.concat( current ), // Flatten list.
 				[]
 			)
 			.filter(
@@ -189,27 +202,24 @@ const fetchLinkSuggestions = async (
 				}
 			)
 			.slice( 0, perPage )
-			.map(
-				/**
-				 * @param {{ id: number, meta?: object, url:string, title?:string, subtype?: string, type?: string }} result
-				 */
-				( result ) => {
-					const isMedia = result.type === 'attachment';
+			.map( ( /** @type {WPLinkSearchResultAugmented} */ result ) => {
+				const isMedia = result.type === 'attachment';
 
-					return {
-						id: result.id,
-						url: isMedia ? result.source_url : result.url,
-						title:
-							decodeEntities(
-								isMedia
-									? result.title.rendered
-									: result.title || ''
-							) || __( '(no title)' ),
-						type: result.subtype || result.type,
-						kind: result?.meta?.kind,
-					};
-				}
-			);
+				return {
+					id: result.id,
+					// @ts-ignore fix when we make this a TS file
+					url: isMedia ? result.source_url : result.url,
+					title:
+						decodeEntities(
+							isMedia
+								? // @ts-ignore fix when we make this a TS file
+								  result.title.rendered
+								: result.title || ''
+						) || __( '(no title)' ),
+					type: result.subtype || result.type,
+					kind: result?.meta?.kind,
+				};
+			} );
 	} );
 };
 

@@ -3,7 +3,7 @@
 		"name": "core/list-item",
 		"isValid": true,
 		"attributes": {
-			"content": ""
+			"content": "Text &amp; Headings"
 		},
 		"innerBlocks": []
 	}

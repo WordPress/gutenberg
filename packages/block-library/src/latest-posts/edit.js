@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, includes, invoke, isUndefined, pickBy } from 'lodash';
+import { get, includes, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -19,7 +19,7 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { dateI18n, format, __experimentalGetSettings } from '@wordpress/date';
+import { dateI18n, format, getSettings } from '@wordpress/date';
 import {
 	InspectorControls,
 	BlockAlignmentToolbar,
@@ -28,9 +28,11 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { pin, list, grid } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticeStore } from '@wordpress/notices';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -66,6 +68,7 @@ function getFeaturedImageDetails( post, size ) {
 }
 
 export default function LatestPostsEdit( { attributes, setAttributes } ) {
+	const instanceId = useInstanceId( LatestPostsEdit );
 	const {
 		postsToShow,
 		order,
@@ -110,7 +113,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					per_page: postsToShow,
 					_embed: 'wp:featuredmedia',
 				},
-				( value ) => ! isUndefined( value )
+				( value ) => typeof value !== 'undefined'
 			);
 
 			return {
@@ -147,6 +150,20 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			selectedAuthor,
 		]
 	);
+
+	// If a user clicks to a link prevent redirection and show a warning.
+	const { createWarningNotice, removeNotice } = useDispatch( noticeStore );
+	let noticeId;
+	const showRedirectionPreventedNotice = ( event ) => {
+		event.preventDefault();
+		// Remove previous warning if any, to show one at a time per block.
+		removeNotice( noticeId );
+		noticeId = `block-library/core/latest-posts/redirection-prevented/${ instanceId }`;
+		createWarningNotice( __( 'Links are disabled in the editor.' ), {
+			id: noticeId,
+			type: 'snackbar',
+		} );
+	};
 
 	const imageSizeOptions = imageSizes
 		.filter( ( { slug } ) => slug !== 'full' )
@@ -405,7 +422,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		},
 	];
 
-	const dateFormat = __experimentalGetSettings().formats.date;
+	const dateFormat = getSettings().formats.date;
 
 	return (
 		<div>
@@ -415,11 +432,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			</BlockControls>
 			<ul { ...blockProps }>
 				{ displayPosts.map( ( post, i ) => {
-					const titleTrimmed = invoke( post, [
-						'title',
-						'rendered',
-						'trim',
-					] );
+					const titleTrimmed = post.title.rendered.trim();
 					let excerpt = post.excerpt.rendered;
 					const currentAuthor = authorList?.find(
 						( author ) => author.id === post.author
@@ -433,13 +446,12 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 						excerptElement.innerText ||
 						'';
 
-					const {
-						url: imageSourceUrl,
-						alt: featuredImageAlt,
-					} = getFeaturedImageDetails( post, featuredImageSizeSlug );
+					const { url: imageSourceUrl, alt: featuredImageAlt } =
+						getFeaturedImageDetails( post, featuredImageSizeSlug );
 					const imageClasses = classnames( {
 						'wp-block-latest-posts__featured-image': true,
-						[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
+						[ `align${ featuredImageAlign }` ]:
+							!! featuredImageAlign,
 					} );
 					const renderFeaturedImage =
 						displayFeaturedImage && imageSourceUrl;
@@ -466,7 +478,11 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								.join( ' ' ) }
 							{ /* translators: excerpt truncation character, default …  */ }
 							{ __( ' … ' ) }
-							<a href={ post.link } rel="noopener noreferrer">
+							<a
+								href={ post.link }
+								rel="noopener noreferrer"
+								onClick={ showRedirectionPreventedNotice }
+							>
 								{ __( 'Read more' ) }
 							</a>
 						</>
@@ -483,6 +499,9 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 											className="wp-block-latest-posts__post-title"
 											href={ post.link }
 											rel="noreferrer noopener"
+											onClick={
+												showRedirectionPreventedNotice
+											}
 										>
 											{ featuredImage }
 										</a>
@@ -501,6 +520,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 										  }
 										: undefined
 								}
+								onClick={ showRedirectionPreventedNotice }
 							>
 								{ ! titleTrimmed ? __( '(no title)' ) : null }
 							</a>

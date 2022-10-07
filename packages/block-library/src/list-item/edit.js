@@ -8,7 +8,6 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 import { isRTL, __ } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
 import { ToolbarButton } from '@wordpress/components';
 import {
 	formatOutdent,
@@ -21,9 +20,18 @@ import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { useEnter, useIndentListItem, useOutdentListItem } from './hooks';
+import {
+	useEnter,
+	useSpace,
+	useIndentListItem,
+	useOutdentListItem,
+	useSplit,
+	useMerge,
+	useCopy,
+} from './hooks';
+import { convertToListItems } from './utils';
 
-function IndentUI( { clientId } ) {
+export function IndentUI( { clientId } ) {
 	const [ canIndent, indentListItem ] = useIndentListItem( clientId );
 	const [ canOutdent, outdentListItem ] = useOutdentListItem( clientId );
 
@@ -34,38 +42,40 @@ function IndentUI( { clientId } ) {
 				title={ __( 'Outdent' ) }
 				describedBy={ __( 'Outdent list item' ) }
 				disabled={ ! canOutdent }
-				onClick={ outdentListItem }
+				onClick={ () => outdentListItem() }
 			/>
 			<ToolbarButton
 				icon={ isRTL() ? formatIndentRTL : formatIndent }
 				title={ __( 'Indent' ) }
 				describedBy={ __( 'Indent list item' ) }
 				isDisabled={ ! canIndent }
-				onClick={ indentListItem }
+				onClick={ () => indentListItem() }
 			/>
 		</>
 	);
 }
 
 export default function ListItemEdit( {
-	name,
 	attributes,
 	setAttributes,
-	mergeBlocks,
 	onReplace,
 	clientId,
 } ) {
 	const { placeholder, content } = attributes;
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( { ref: useCopy( clientId ) } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list' ],
+		renderAppender: false,
 	} );
 	const useEnterRef = useEnter( { content, clientId } );
+	const useSpaceRef = useSpace( clientId );
+	const onSplit = useSplit( clientId );
+	const onMerge = useMerge( clientId );
 	return (
 		<>
 			<li { ...innerBlocksProps }>
 				<RichText
-					ref={ useMergeRefs( [ useEnterRef ] ) }
+					ref={ useMergeRefs( [ useEnterRef, useSpaceRef ] ) }
 					identifier="content"
 					tagName="div"
 					onChange={ ( nextContent ) =>
@@ -74,14 +84,11 @@ export default function ListItemEdit( {
 					value={ content }
 					aria-label={ __( 'List text' ) }
 					placeholder={ placeholder || __( 'List' ) }
-					onSplit={ ( value ) => {
-						return createBlock( name, {
-							...attributes,
-							content: value,
-						} );
+					onSplit={ onSplit }
+					onMerge={ onMerge }
+					onReplace={ ( blocks, ...args ) => {
+						onReplace( convertToListItems( blocks ), ...args );
 					} }
-					onMerge={ mergeBlocks }
-					onReplace={ onReplace }
 				/>
 				{ innerBlocksProps.children }
 			</li>

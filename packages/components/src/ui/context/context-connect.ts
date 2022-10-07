@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import { uniq } from 'lodash';
 import type { ForwardedRef, ReactChild, ReactNode } from 'react';
 
 /**
  * WordPress dependencies
  */
-import { forwardRef, memo } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import warn from '@wordpress/warning';
 
 /**
@@ -17,42 +16,74 @@ import { CONNECT_STATIC_NAMESPACE } from './constants';
 import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
 import type { WordPressComponentFromProps } from '.';
 
+type AcceptsTwoArgs<
+	F extends ( ...args: any ) => any,
+	ErrorMessage = never
+> = Parameters< F >[ 'length' ] extends 2 ? {} : ErrorMessage;
+
 type ContextConnectOptions = {
-	/** Defaults to `false`. */
-	memo?: boolean;
+	forwardsRef?: boolean;
 };
 
 /**
  * Forwards ref (React.ForwardRef) and "Connects" (or registers) a component
  * within the Context system under a specified namespace.
  *
- * This is an (experimental) evolution of the initial connect() HOC.
- * The hope is that we can improve render performance by removing functional
- * component wrappers.
+ * @param  Component The component to register into the Context system.
+ * @param  namespace The namespace to register the component under.
+ * @return The connected WordPressComponent
+ */
+export function contextConnect<
+	C extends ( props: any, ref: ForwardedRef< any > ) => JSX.Element | null
+>(
+	Component: C &
+		AcceptsTwoArgs<
+			C,
+			'Warning: Your component function does not take a ref as the second argument. Did you mean to use `contextConnectWithoutRef`?'
+		>,
+	namespace: string
+) {
+	return _contextConnect( Component, namespace, { forwardsRef: true } );
+}
+
+/**
+ * "Connects" (or registers) a component within the Context system under a specified namespace.
+ * Does not forward a ref.
  *
  * @param  Component The component to register into the Context system.
  * @param  namespace The namespace to register the component under.
- * @param  options
  * @return The connected WordPressComponent
  */
-export function contextConnect< P >(
-	Component: ( props: P, ref: ForwardedRef< any > ) => JSX.Element | null,
-	namespace: string,
-	options: ContextConnectOptions = {}
-): WordPressComponentFromProps< P > {
-	const { memo: memoProp = false } = options;
+export function contextConnectWithoutRef< P >(
+	Component: ( props: P ) => JSX.Element | null,
+	namespace: string
+) {
+	return _contextConnect( Component, namespace );
+}
 
-	let WrappedComponent = forwardRef( Component );
-	if ( memoProp ) {
-		// @ts-ignore
-		WrappedComponent = memo( WrappedComponent );
-	}
+// This is an (experimental) evolution of the initial connect() HOC.
+// The hope is that we can improve render performance by removing functional
+// component wrappers.
+function _contextConnect<
+	C extends ( props: any, ref: ForwardedRef< any > ) => JSX.Element | null,
+	O extends ContextConnectOptions
+>(
+	Component: C,
+	namespace: string,
+	options?: O
+): WordPressComponentFromProps<
+	Parameters< C >[ 0 ],
+	O[ 'forwardsRef' ] extends true ? true : false
+> {
+	const WrappedComponent = options?.forwardsRef
+		? forwardRef< any, Parameters< C >[ 0 ] >( Component )
+		: Component;
 
 	if ( typeof namespace === 'undefined' ) {
 		warn( 'contextConnect: Please provide a namespace' );
 	}
 
-	// @ts-ignore internal property
+	// @ts-expect-error internal property
 	let mergedNamespace = WrappedComponent[ CONNECT_STATIC_NAMESPACE ] || [
 		namespace,
 	];
@@ -67,16 +98,13 @@ export function contextConnect< P >(
 		mergedNamespace = [ ...mergedNamespace, namespace ];
 	}
 
-	WrappedComponent.displayName = namespace;
-
-	// @ts-ignore internal property
-	WrappedComponent[ CONNECT_STATIC_NAMESPACE ] = uniq( mergedNamespace );
-
-	// @ts-ignore WordPressComponent property
-	WrappedComponent.selector = `.${ getStyledClassNameFromKey( namespace ) }`;
-
-	// @ts-ignore
-	return WrappedComponent;
+	// @ts-expect-error We can't rely on inferred types here because of the
+	// `as` prop polymorphism we're handling in https://github.com/WordPress/gutenberg/blob/9620bae6fef4fde7cc2b7833f416e240207cda29/packages/components/src/ui/context/wordpress-component.ts#L32-L33
+	return Object.assign( WrappedComponent, {
+		[ CONNECT_STATIC_NAMESPACE ]: [ ...new Set( mergedNamespace ) ],
+		displayName: namespace,
+		selector: `.${ getStyledClassNameFromKey( namespace ) }`,
+	} );
 }
 
 /**

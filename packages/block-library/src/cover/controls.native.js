@@ -167,7 +167,6 @@ function Controls( {
 							styles.mediaPreview,
 							mediaBackground,
 						] }
-						onLongPress={ openMediaOptions }
 					>
 						<View style={ styles.mediaInner }>
 							{ IMAGE_BACKGROUND_TYPE === backgroundType && (
@@ -207,17 +206,15 @@ function Controls( {
 										setDisplayPlaceholder( true );
 									} }
 									onLoad={ ( event ) => {
-										const {
-											height,
-											width,
-										} = event.naturalSize;
+										const { height, width } =
+											event.naturalSize;
 										setVideoNaturalSize( {
 											height,
 											width,
 										} );
 										setDisplayPlaceholder( false );
 										// Avoid invisible, paused video on Android, presumably
-										// related to https://git.io/Jt6Dr
+										// related to https://github.com/react-native-video/react-native-video/issues/1979
 										videoRef?.current.seek( 0 );
 									} }
 									ref={ videoRef }

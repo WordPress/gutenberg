@@ -71,7 +71,7 @@ const Example = () => {
 
 ## Docs & examples
 
-You can browse the components docs and examples at https://wordpress.github.io/gutenberg/
+You can browse the components docs and examples at [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
 
 ## Contributing to this package
 

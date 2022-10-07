@@ -89,6 +89,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type WpTemplatePart< C extends Context > = OmitNevers<
+export type WpTemplatePart< C extends Context = 'edit' > = OmitNevers<
 	_BaseEntityRecords.WpTemplatePart< C >
 >;

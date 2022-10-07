@@ -16,9 +16,14 @@ $header-toolbar-min-width: 335px;
 		@include reduce-motion("transition");
 	}
 
-	.edit-site-header_start,
+	.edit-site-header_start {
+		display: flex;
+		border: none;
+	}
+
 	.edit-site-header_end {
 		display: flex;
+		justify-content: flex-end;
 	}
 
 	.edit-site-header_center {
@@ -32,10 +37,6 @@ $header-toolbar-min-width: 335px;
 		// subsequently truncate child text, we set an explicit min-width.
 		// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 		min-width: 0;
-	}
-
-	.edit-site-header_end {
-		justify-content: flex-end;
 	}
 }
 
@@ -104,8 +105,9 @@ body.is-navigation-sidebar-open {
 	margin: 0 -6px 0;
 }
 
+
 /**
- * Buttons in the Toolbar
+ * Buttons on the right side
  */
 
 .edit-site-header__actions {
@@ -113,6 +115,17 @@ body.is-navigation-sidebar-open {
 	align-items: center;
 	padding-right: $grid-unit-05;
 
+	@include break-small () {
+		padding-right: $grid-unit-20 - ($grid-unit-15 * 0.5);
+	}
+
+	gap: $grid-unit-05;
+
+	@include break-small() {
+		gap: $grid-unit-10;
+	}
+
+	// Pinned items.
 	.interface-pinned-items {
 		display: none;
 
@@ -120,29 +133,14 @@ body.is-navigation-sidebar-open {
 			display: inline-flex;
 		}
 	}
+}
 
-	// Adjust button paddings to scale better to mobile.
-	.editor-post-saved-state,
-	.components-button.components-button {
-		margin-right: $grid-unit-05;
+.edit-site-header__actions__preview-options {
+	opacity: 1;
+	transition: opacity 0.3s;
 
-		@include break-small() {
-			margin-right: $grid-unit-15;
-		}
-	}
-
-	.editor-post-saved-state,
-	.components-button.is-tertiary {
-		padding: 0 #{$grid-unit-15 * 0.5};
-	}
-
-	.edit-site-more-menu .components-button,
-	.interface-pinned-items .components-button {
-		margin-right: 0;
-	}
-
-	@include break-small() {
-		padding-right: $grid-unit-20;
+	&.is-zoomed-out {
+		opacity: 0;
 	}
 }
 
@@ -162,6 +160,49 @@ body.is-navigation-sidebar-open {
 			padding: 8px 4px;
 		}
 	}
+}
+
+.edit-site-header_start {
+	display: flex;
+	border: none;
+
+	// The Toolbar component adds different styles to buttons, so we reset them
+	// here to the original button styles
+	.edit-site-header__toolbar > .components-button.has-icon,
+	.edit-site-header__toolbar > .components-dropdown > .components-button.has-icon {
+		height: $button-size;
+		min-width: $button-size;
+		padding: 6px;
+
+		&.is-pressed {
+			background: $gray-900;
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 $border-width $white;
+			outline: 1px solid transparent;
+		}
+
+		&::before {
+			display: none;
+		}
+	}
+
+	.edit-site-header__toolbar > .edit-site-header-toolbar__inserter-toggle.has-icon {
+		margin-right: $grid-unit-10;
+		// Special dimensions for this button.
+		min-width: 32px;
+		width: 32px;
+		height: 32px;
+		padding: 0;
+	}
+
+	.edit-site-header__toolbar > .edit-site-header-toolbar__inserter-toggle.has-text.has-icon {
+		width: auto;
+		padding: 0 $grid-unit-10;
+	}
+
+
 }
 
 // Button text label styles
@@ -192,19 +233,22 @@ body.is-navigation-sidebar-open {
 	.edit-site-save-button__button {
 		padding-left: 6px;
 		padding-right: 6px;
-		margin-right: $grid-unit-05;
 	}
-	.block-editor-post-preview__button-toggle {
-		margin-right: $grid-unit-05;
-	}
-	// The inserter and the template details toggle have custom labels, different from their aria-label, so we don't want to display both.
-	.edit-site-header-toolbar__inserter-toggle.edit-site-header-toolbar__inserter-toggle,
+
+	// The template details toggle has a custom label, different from its aria-label, so we don't want to display both.
 	.edit-site-document-actions__get-info.edit-site-document-actions__get-info.edit-site-document-actions__get-info {
 		&::after {
 			content: none;
 		}
+	}
 
+	.edit-site-header-toolbar__inserter-toggle.edit-site-header-toolbar__inserter-toggle,
+	.edit-site-document-actions__get-info.edit-site-document-actions__get-info.edit-site-document-actions__get-info {
 		height: 36px;
-		padding: 0 6px;
+		padding: 0 $grid-unit-10;
+	}
+
+	.edit-site-header_start .edit-site-header__toolbar > * + * {
+		margin-left: $grid-unit-10;
 	}
 }

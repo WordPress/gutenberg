@@ -55,11 +55,16 @@ const attributes = {
 		default: 'some random value',
 	},
 };
+const supports = {
+	className: false,
+};
 
 registerBlockType( 'gutenberg/block-with-deprecated-version', {
 	// ... other block properties go here
 
 	attributes,
+	
+	supports,
 
 	save( props ) {
 		return <div>{ props.attributes.text }</div>;
@@ -68,6 +73,8 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 	deprecated: [
 		{
 			attributes,
+			
+			supports,
 
 			save( props ) {
 				return <p>{ props.attributes.text }</p>;
@@ -87,12 +94,17 @@ var el = wp.element.createElement,
 			type: 'string',
 			default: 'some random value',
 		},
+	},
+	supports = {
+		className: false,
 	};
 
 registerBlockType( 'gutenberg/block-with-deprecated-version', {
 	// ... other block properties go here
 
 	attributes: attributes,
+
+	supports: supports,
 
 	save: function ( props ) {
 		return el( 'div', {}, props.attributes.text );

@@ -30,9 +30,8 @@ export default function BlockInspectorButton( { onClick = () => {} } ) {
 		} ),
 		[]
 	);
-	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
-		interfaceStore
-	);
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
 
 	const label = isBlockInspectorOpen
 		? __( 'Hide more settings' )

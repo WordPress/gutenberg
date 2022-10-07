@@ -20,8 +20,7 @@ ruleTester.run( 'i18n-no-flanking-whitespace', rule, {
 			code: `__( 'Hello World…' )`,
 		},
 		{
-			code:
-				'__( `A long string ` +\n `spread over ` +\n  `multiple lines.` );',
+			code: '__( `A long string ` +\n `spread over ` +\n  `multiple lines.` );',
 		},
 		{
 			code: `__( 'Not concerned about   \t whitespace rules')`,

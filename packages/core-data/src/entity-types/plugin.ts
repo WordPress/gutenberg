@@ -74,6 +74,6 @@ declare module './base-entity-records' {
 }
 
 export type PluginStatus = 'active' | 'inactive';
-export type Plugin< C extends Context > = OmitNevers<
+export type Plugin< C extends Context = 'edit' > = OmitNevers<
 	_BaseEntityRecords.Plugin< C >
 >;

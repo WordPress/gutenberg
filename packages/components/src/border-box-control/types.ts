@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import type { Border, ColorProps, LabelProps } from '../border-control/types';
+import type { PopoverProps } from '../popover/types';
 
 export type Borders = {
 	top?: Border;
@@ -13,14 +14,6 @@ export type Borders = {
 export type AnyBorder = Border | Borders | undefined;
 export type BorderProp = keyof Border;
 export type BorderSide = keyof Borders;
-
-export type PopoverClassNames = {
-	linked?: string;
-	top?: string;
-	right?: string;
-	bottom?: string;
-	left?: string;
-};
 
 export type BorderBoxControlProps = ColorProps &
 	LabelProps & {
@@ -35,10 +28,13 @@ export type BorderBoxControlProps = ColorProps &
 		 */
 		onChange: ( value: AnyBorder ) => void;
 		/**
-		 * An object defining CSS classnames for all the inner `BorderControl`
-		 * popover content.
+		 * The position of the color popovers compared to the control wrapper.
 		 */
-		popoverClassNames?: PopoverClassNames;
+		popoverPlacement?: PopoverProps[ 'placement' ];
+		/**
+		 * The space between the popover and the control wrapper.
+		 */
+		popoverOffset?: PopoverProps[ 'offset' ];
 		/**
 		 * An object representing the current border configuration.
 		 *
@@ -47,6 +43,13 @@ export type BorderBoxControlProps = ColorProps &
 		 * properties but for each side; `top`, `right`, `bottom`, and `left`.
 		 */
 		value: AnyBorder;
+		/**
+		 * Start opting into the larger default height that will become the
+		 * default size in a future version.
+		 *
+		 * @default false
+		 */
+		__next36pxDefaultSize?: boolean;
 	};
 
 export type LinkedButtonProps = {
@@ -62,6 +65,13 @@ export type LinkedButtonProps = {
 	 * `BorderBoxControl`.
 	 */
 	onClick: () => void;
+	/**
+	 * Start opting into the larger default height that will become the
+	 * default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next36pxDefaultSize?: boolean;
 };
 
 export type VisualizerProps = {
@@ -71,6 +81,13 @@ export type VisualizerProps = {
 	 * color, style, and width.
 	 */
 	value?: Borders;
+	/**
+	 * Start opting into the larger default height that will become the
+	 * default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next36pxDefaultSize?: boolean;
 };
 
 export type SplitControlsProps = ColorProps & {
@@ -85,14 +102,24 @@ export type SplitControlsProps = ColorProps & {
 	 */
 	onChange: ( value: Border | undefined, side: BorderSide ) => void;
 	/**
-	 * An object defining CSS classnames for the split side `BorderControl`s'
-	 * popover content.
+	 * The position of the color popovers compared to the control wrapper.
 	 */
-	popoverClassNames?: PopoverClassNames;
+	popoverPlacement?: PopoverProps[ 'placement' ];
+	/**
+	 * The space between the popover and the control wrapper.
+	 */
+	popoverOffset?: PopoverProps[ 'offset' ];
 	/**
 	 * An object representing the current border configuration. It contains
 	 * properties for each side, with each side an object reflecting the border
 	 * color, style, and width.
 	 */
 	value?: Borders;
+	/**
+	 * Start opting into the larger default height that will become the
+	 * default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next36pxDefaultSize?: boolean;
 };

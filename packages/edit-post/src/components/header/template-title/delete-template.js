@@ -30,9 +30,8 @@ export default function DeleteTemplate() {
 	const { updateEditorSettings, editPost } = useDispatch( editorStore );
 	const { deleteEntityRecord } = useDispatch( coreStore );
 	const { template } = useSelect( ( select ) => {
-		const { isEditingTemplate, getEditedPostTemplate } = select(
-			editPostStore
-		);
+		const { isEditingTemplate, getEditedPostTemplate } =
+			select( editPostStore );
 		const _isEditing = isEditingTemplate();
 		return {
 			template: _isEditing ? getEditedPostTemplate() : null,
@@ -47,6 +46,8 @@ export default function DeleteTemplate() {
 	if ( template?.title ) {
 		templateTitle = template.title;
 	}
+
+	const isRevertable = template?.has_theme_file;
 
 	const onDelete = () => {
 		clearSelectedBlock();
@@ -77,14 +78,19 @@ export default function DeleteTemplate() {
 			<>
 				<MenuItem
 					className="edit-post-template-top-area__delete-template-button"
-					isDestructive
-					variant="secondary"
-					aria-label={ __( 'Delete template' ) }
+					isDestructive={ ! isRevertable }
 					onClick={ () => {
 						setShowConfirmDialog( true );
 					} }
+					info={
+						isRevertable
+							? __( 'Use the template as supplied by the theme.' )
+							: undefined
+					}
 				>
-					{ __( 'Delete template' ) }
+					{ isRevertable
+						? __( 'Clear customizations' )
+						: __( 'Delete template' ) }
 				</MenuItem>
 				<ConfirmDialog
 					isOpen={ showConfirmDialog }

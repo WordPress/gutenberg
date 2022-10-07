@@ -13,7 +13,6 @@ import {
 	SelectControl,
 	Spinner,
 	ToggleControl,
-	withNotices,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -24,12 +23,14 @@ import {
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -41,11 +42,9 @@ const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 function AudioEdit( {
 	attributes,
 	className,
-	noticeOperations,
 	setAttributes,
 	onReplace,
 	isSelected,
-	noticeUI,
 	insertBlocksAfter,
 } ) {
 	const { id, autoplay, caption, loop, preload, src } = attributes;
@@ -62,13 +61,8 @@ function AudioEdit( {
 			if ( file ) {
 				mediaUpload( {
 					filesList: [ file ],
-					onFileChange: ( [ { id: mediaId, url } ] ) => {
-						setAttributes( { id: mediaId, src: url } );
-					},
-					onError: ( e ) => {
-						setAttributes( { src: undefined, id: undefined } );
-						noticeOperations.createErrorNotice( e );
-					},
+					onFileChange: ( [ media ] ) => onSelectAudio( media ),
+					onError: ( e ) => onUploadError( e ),
 					allowedTypes: ALLOWED_MEDIA_TYPES,
 				} );
 			}
@@ -97,9 +91,9 @@ function AudioEdit( {
 		}
 	}
 
+	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
 	function getAutoplayHelp( checked ) {
@@ -138,7 +132,6 @@ function AudioEdit( {
 					accept="audio/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
-					notices={ noticeUI }
 					onError={ onUploadError }
 				/>
 			</div>
@@ -159,7 +152,7 @@ function AudioEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Audio settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						label={ __( 'Autoplay' ) }
 						onChange={ toggleAttribute( 'autoplay' ) }
@@ -186,7 +179,7 @@ function AudioEdit( {
 							{ value: 'metadata', label: __( 'Metadata' ) },
 							{
 								value: 'none',
-								label: _x( 'None', '"Preload" value' ),
+								label: _x( 'None', 'Preload value' ),
 							},
 						] }
 					/>
@@ -205,6 +198,9 @@ function AudioEdit( {
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
 						aria-label={ __( 'Audio caption text' ) }
 						placeholder={ __( 'Add caption' ) }
 						value={ caption }
@@ -213,7 +209,9 @@ function AudioEdit( {
 						}
 						inlineToolbar
 						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
 						}
 					/>
 				) }
@@ -221,4 +219,5 @@ function AudioEdit( {
 		</>
 	);
 }
-export default withNotices( AudioEdit );
+
+export default AudioEdit;

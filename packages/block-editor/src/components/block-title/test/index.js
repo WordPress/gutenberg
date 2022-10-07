@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -73,9 +73,9 @@ describe( 'BlockTitle', () => {
 			attributes: null,
 		} ) );
 
-		const wrapper = shallow( <BlockTitle /> );
+		const { container } = render( <BlockTitle /> );
 
-		expect( wrapper.type() ).toBe( null );
+		expect( container ).toBeEmptyDOMElement();
 	} );
 
 	it( 'renders nothing if block type does not exist', () => {
@@ -83,11 +83,12 @@ describe( 'BlockTitle', () => {
 			name: 'name-not-exists',
 			attributes: null,
 		} ) );
-		const wrapper = shallow(
+
+		const { container } = render(
 			<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
 		);
 
-		expect( wrapper.type() ).toBe( null );
+		expect( container ).toBeEmptyDOMElement();
 	} );
 
 	it( 'renders title if block type exists', () => {
@@ -96,9 +97,9 @@ describe( 'BlockTitle', () => {
 			attributes: null,
 		} ) );
 
-		const wrapper = shallow( <BlockTitle clientId="id-name-exists" /> );
+		render( <BlockTitle clientId="id-name-exists" /> );
 
-		expect( wrapper.text() ).toBe( 'Block Title' );
+		expect( screen.getByText( 'Block Title' ) ).toBeVisible();
 	} );
 
 	it( 'renders label if it is set', () => {
@@ -107,9 +108,9 @@ describe( 'BlockTitle', () => {
 			attributes: null,
 		} ) );
 
-		const wrapper = shallow( <BlockTitle clientId="id-name-with-label" /> );
+		render( <BlockTitle clientId="id-name-with-label" /> );
 
-		expect( wrapper.text() ).toBe( 'Test Label' );
+		expect( screen.getByText( 'Test Label' ) ).toBeVisible();
 	} );
 
 	it( 'should prioritize reusable block title over title', () => {
@@ -119,9 +120,10 @@ describe( 'BlockTitle', () => {
 			attributes: null,
 		} ) );
 
-		const wrapper = shallow( <BlockTitle clientId="id-name-with-label" /> );
+		render( <BlockTitle clientId="id-name-with-label" /> );
 
-		expect( wrapper.text() ).toBe( 'Reuse me!' );
+		expect( screen.queryByText( 'Test Label' ) ).not.toBeInTheDocument();
+		expect( screen.getByText( 'Reuse me!' ) ).toBeVisible();
 	} );
 
 	it( 'should prioritize block label over title', () => {
@@ -130,11 +132,12 @@ describe( 'BlockTitle', () => {
 			attributes: null,
 		} ) );
 
-		const wrapper = shallow( <BlockTitle clientId="id-name-with-label" /> );
+		render( <BlockTitle clientId="id-name-with-label" /> );
 
-		expect( wrapper.text() ).toBe(
-			'A Custom Label like a Block Variation Label'
-		);
+		expect( screen.queryByText( 'Test Label' ) ).not.toBeInTheDocument();
+		expect(
+			screen.getByText( 'A Custom Label like a Block Variation Label' )
+		).toBeVisible();
 	} );
 
 	it( 'should default to block information title if no reusable title or block name is available', () => {
@@ -143,9 +146,9 @@ describe( 'BlockTitle', () => {
 			attributes: null,
 		} ) );
 
-		const wrapper = shallow( <BlockTitle clientId="id-name-with-label" /> );
+		render( <BlockTitle clientId="id-name-with-label" /> );
 
-		expect( wrapper.text() ).toBe( 'Block With Label' );
+		expect( screen.getByText( 'Block With Label' ) ).toBeVisible();
 	} );
 
 	it( 'truncates the label with custom truncate length', () => {
@@ -154,14 +157,14 @@ describe( 'BlockTitle', () => {
 			attributes: null,
 		} ) );
 
-		const wrapper = shallow(
+		render(
 			<BlockTitle
 				clientId="id-name-with-long-label"
 				maximumLength={ 12 }
 			/>
 		);
 
-		expect( wrapper.text() ).toBe( 'This is a...' );
+		expect( screen.getByText( 'This is a...' ) ).toBeVisible();
 	} );
 
 	it( 'should not truncate the label if maximum length is undefined', () => {
@@ -170,12 +173,12 @@ describe( 'BlockTitle', () => {
 			attributes: null,
 		} ) );
 
-		const wrapper = shallow(
-			<BlockTitle clientId="id-name-with-long-label" />
-		);
+		render( <BlockTitle clientId="id-name-with-long-label" /> );
 
-		expect( wrapper.text() ).toBe(
-			'This is a longer label than typical for blocks to have.'
-		);
+		expect(
+			screen.getByText(
+				'This is a longer label than typical for blocks to have.'
+			)
+		).toBeVisible();
 	} );
 } );

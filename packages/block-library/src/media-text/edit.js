@@ -46,7 +46,6 @@ const TEMPLATE = [
 	[
 		'core/paragraph',
 		{
-			fontSize: 'large',
 			placeholder: _x( 'Content…', 'content placeholder' ),
 		},
 	],
@@ -138,7 +137,7 @@ function attributesFromMedia( {
 	};
 }
 
-function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
+function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const {
 		focalPoint,
 		href,
@@ -158,12 +157,24 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
-	const image = useSelect(
-		( select ) =>
-			mediaId && isSelected
-				? select( coreStore ).getMedia( mediaId, { context: 'view' } )
-				: null,
-		[ isSelected, mediaId ]
+	const { imageSizes, image, isContentLocked } = useSelect(
+		( select ) => {
+			const { __unstableGetContentLockingParent, getSettings } =
+				select( blockEditorStore );
+			return {
+				isContentLocked:
+					!! __unstableGetContentLockingParent( clientId ),
+				image:
+					mediaId && isSelected
+						? select( coreStore ).getMedia( mediaId, {
+								context: 'view',
+						  } )
+						: null,
+				imageSizes: getSettings()?.imageSizes,
+			};
+		},
+
+		[ isSelected, mediaId, clientId ]
 	);
 
 	const refMediaContainer = useRef();
@@ -214,10 +225,6 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		setAttributes( { verticalAlignment: alignment } );
 	};
 
-	const imageSizes = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
-		return settings?.imageSizes;
-	}, [] );
 	const imageSizeOptions = map(
 		filter( imageSizes, ( { slug } ) =>
 			getImageSourceUrlBySizeSlug( image, slug )
@@ -238,7 +245,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	};
 
 	const mediaTextGeneralSettings = (
-		<PanelBody title={ __( 'Media & Text settings' ) }>
+		<PanelBody title={ __( 'Settings' ) }>
 			<ToggleControl
 				label={ __( 'Stack on mobile' ) }
 				checked={ isStackedOnMobile }
@@ -294,6 +301,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					slug={ mediaSizeSlug }
 					imageSizeOptions={ imageSizeOptions }
 					isResizable={ false }
+					imageSizeHelp={ __( 'Select which image size to load.' ) }
 				/>
 			) }
 			{ mediaUrl && (
@@ -322,24 +330,31 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		<>
 			<InspectorControls>{ mediaTextGeneralSettings }</InspectorControls>
 			<BlockControls group="block">
-				<BlockVerticalAlignmentControl
-					onChange={ onVerticalAlignmentChange }
-					value={ verticalAlignment }
-				/>
-				<ToolbarButton
-					icon={ pullLeft }
-					title={ __( 'Show media on left' ) }
-					isActive={ mediaPosition === 'left' }
-					onClick={ () => setAttributes( { mediaPosition: 'left' } ) }
-				/>
-				<ToolbarButton
-					icon={ pullRight }
-					title={ __( 'Show media on right' ) }
-					isActive={ mediaPosition === 'right' }
-					onClick={ () =>
-						setAttributes( { mediaPosition: 'right' } )
-					}
-				/>
+				{ ! isContentLocked && (
+					<>
+						<BlockVerticalAlignmentControl
+							onChange={ onVerticalAlignmentChange }
+							value={ verticalAlignment }
+						/>
+						<ToolbarButton
+							icon={ pullLeft }
+							title={ __( 'Show media on left' ) }
+							isActive={ mediaPosition === 'left' }
+							onClick={ () =>
+								setAttributes( { mediaPosition: 'left' } )
+							}
+						/>
+						<ToolbarButton
+							icon={ pullRight }
+							title={ __( 'Show media on right' ) }
+							isActive={ mediaPosition === 'right' }
+							onClick={ () =>
+								setAttributes( { mediaPosition: 'right' } )
+							}
+						/>
+					</>
+				) }
+
 				{ mediaType === 'image' && (
 					<ImageURLInputUI
 						url={ href || '' }
@@ -355,6 +370,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 				) }
 			</BlockControls>
 			<div { ...blockProps }>
+				{ mediaPosition === 'right' && <div { ...innerBlocksProps } /> }
 				<MediaContainer
 					className="wp-block-media-text__media"
 					onSelectMedia={ onSelectMedia }
@@ -372,9 +388,10 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 						mediaType,
 						mediaUrl,
 						mediaWidth,
+						isContentLocked,
 					} }
 				/>
-				<div { ...innerBlocksProps } />
+				{ mediaPosition !== 'right' && <div { ...innerBlocksProps } /> }
 			</div>
 		</>
 	);

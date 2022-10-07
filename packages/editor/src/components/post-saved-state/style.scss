@@ -33,3 +33,12 @@
 		}
 	}
 }
+
+// Overwrite rules from Button component packages/components/src/button/style.scss
+.editor-post-save-draft.has-text.has-icon svg {
+	margin-right: 0;
+}
+
+:root[dir="rtl"] .editor-post-saved-state.has-text.has-icon {
+	justify-content: right;
+}

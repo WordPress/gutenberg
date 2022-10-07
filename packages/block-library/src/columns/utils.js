@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { sumBy, merge, mapValues } from 'lodash';
+import { merge, mapValues } from 'lodash';
 
 /**
  * Returns a column width attribute value rounded to standard precision.
@@ -44,8 +44,10 @@ export function getTotalColumnsWidth(
 	blocks,
 	totalBlockCount = blocks.length
 ) {
-	return sumBy( blocks, ( block ) =>
-		getEffectiveColumnWidth( block, totalBlockCount )
+	return blocks.reduce(
+		( sum, block ) =>
+			sum + getEffectiveColumnWidth( block, totalBlockCount ),
+		0
 	);
 }
 

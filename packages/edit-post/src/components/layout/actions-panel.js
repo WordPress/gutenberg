@@ -26,9 +26,8 @@ export default function ActionsPanel( {
 	closeEntitiesSavedStates,
 	isEntitiesSavedStatesOpen,
 } ) {
-	const { closePublishSidebar, togglePublishSidebar } = useDispatch(
-		editPostStore
-	);
+	const { closePublishSidebar, togglePublishSidebar } =
+		useDispatch( editPostStore );
 	const {
 		publishSidebarOpened,
 		hasActiveMetaboxes,
@@ -36,14 +35,12 @@ export default function ActionsPanel( {
 		hasNonPostEntityChanges,
 	} = useSelect( ( select ) => {
 		return {
-			publishSidebarOpened: select(
-				editPostStore
-			).isPublishSidebarOpened(),
+			publishSidebarOpened:
+				select( editPostStore ).isPublishSidebarOpened(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			isSavingMetaBoxes: select( editPostStore ).isSavingMetaBoxes(),
-			hasNonPostEntityChanges: select(
-				editorStore
-			).hasNonPostEntityChanges(),
+			hasNonPostEntityChanges:
+				select( editorStore ).hasNonPostEntityChanges(),
 		};
 	}, [] );
 

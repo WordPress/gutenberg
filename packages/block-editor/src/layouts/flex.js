@@ -15,10 +15,13 @@ import { Button, ToggleControl, Flex, FlexItem } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { appendSelectors } from './utils';
+import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
-import useSetting from '../components/use-setting';
-import { BlockControls, JustifyContentControl } from '../components';
+import {
+	BlockControls,
+	JustifyContentControl,
+	BlockVerticalAlignmentControl,
+} from '../components';
 import { shouldSkipSerialization } from '../hooks/utils';
 
 // Used with the default, horizontal flex orientation.
@@ -34,6 +37,12 @@ const alignItemsMap = {
 	left: 'flex-start',
 	right: 'flex-end',
 	center: 'center',
+};
+
+const verticalAlignmentMap = {
+	top: 'flex-start',
+	center: 'center',
+	bottom: 'flex-end',
 };
 
 const flexWrapOptions = [ 'wrap', 'nowrap' ];
@@ -77,6 +86,7 @@ export default {
 		if ( layoutBlockSupport?.allowSwitching ) {
 			return null;
 		}
+		const { allowVerticalAlignment = true } = layoutBlockSupport;
 		return (
 			<BlockControls group="block" __experimentalShareWithChildBlocks>
 				<FlexLayoutJustifyContentControl
@@ -84,52 +94,78 @@ export default {
 					onChange={ onChange }
 					isToolbar
 				/>
+				{ allowVerticalAlignment &&
+					layout?.orientation !== 'vertical' && (
+						<FlexLayoutVerticalAlignmentControl
+							layout={ layout }
+							onChange={ onChange }
+							isToolbar
+						/>
+					) }
 			</BlockControls>
 		);
 	},
-	save: function FlexLayoutStyle( { selector, layout, style, blockName } ) {
+	getLayoutStyle: function getLayoutStyle( {
+		selector,
+		layout,
+		style,
+		blockName,
+		hasBlockGapSupport,
+		layoutDefinitions,
+	} ) {
 		const { orientation = 'horizontal' } = layout;
-		const blockGapSupport = useSetting( 'spacing.blockGap' );
-		const hasBlockGapStylesSupport = blockGapSupport !== null;
+
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
 		const blockGapValue =
 			style?.spacing?.blockGap &&
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
 				? getGapCSSValue( style?.spacing?.blockGap, '0.5em' )
-				: 'var( --wp--style--block-gap, 0.5em )';
-		const justifyContent =
-			justifyContentMap[ layout.justifyContent ] ||
-			justifyContentMap.left;
+				: undefined;
+		const justifyContent = justifyContentMap[ layout.justifyContent ];
 		const flexWrap = flexWrapOptions.includes( layout.flexWrap )
 			? layout.flexWrap
 			: 'wrap';
-		const rowOrientation = `
-		flex-direction: row;
-		align-items: center;
-		justify-content: ${ justifyContent };
-		`;
+		const verticalAlignment =
+			verticalAlignmentMap[ layout.verticalAlignment ];
 		const alignItems =
 			alignItemsMap[ layout.justifyContent ] || alignItemsMap.left;
-		const columnOrientation = `
-		flex-direction: column;
-		align-items: ${ alignItems };
-		`;
 
-		return (
-			<style>{ `
-				${ appendSelectors( selector ) } {
-					display: flex;
-					flex-wrap: ${ flexWrap };
-					gap: ${ hasBlockGapStylesSupport ? blockGapValue : '0.5em' };
-					${ orientation === 'horizontal' ? rowOrientation : columnOrientation }
-				}
+		let output = '';
+		const rules = [];
 
-				${ appendSelectors( selector, '> *' ) } {
-					margin: 0;
-				}
-			` }</style>
-		);
+		if ( flexWrap && flexWrap !== 'wrap' ) {
+			rules.push( `flex-wrap: ${ flexWrap }` );
+		}
+
+		if ( orientation === 'horizontal' ) {
+			if ( verticalAlignment ) {
+				rules.push( `align-items: ${ verticalAlignment }` );
+			}
+			if ( justifyContent ) {
+				rules.push( `justify-content: ${ justifyContent }` );
+			}
+		} else {
+			rules.push( 'flex-direction: column' );
+			rules.push( `align-items: ${ alignItems }` );
+		}
+
+		if ( rules.length ) {
+			output = `${ appendSelectors( selector ) } {
+				${ rules.join( '; ' ) };
+			}`;
+		}
+
+		// Output blockGap styles based on rules contained in layout definitions in theme.json.
+		if ( hasBlockGapSupport && blockGapValue ) {
+			output += getBlockGapCSS(
+				selector,
+				layoutDefinitions,
+				'flex',
+				blockGapValue
+			);
+		}
+		return output;
 	},
 	getOrientation( layout ) {
 		const { orientation = 'horizontal' } = layout;
@@ -139,6 +175,63 @@ export default {
 		return [];
 	},
 };
+
+function FlexLayoutVerticalAlignmentControl( {
+	layout,
+	onChange,
+	isToolbar = false,
+} ) {
+	const { verticalAlignment = verticalAlignmentMap.center } = layout;
+
+	const onVerticalAlignmentChange = ( value ) => {
+		onChange( {
+			...layout,
+			verticalAlignment: value,
+		} );
+	};
+	if ( isToolbar ) {
+		return (
+			<BlockVerticalAlignmentControl
+				onChange={ onVerticalAlignmentChange }
+				value={ verticalAlignment }
+			/>
+		);
+	}
+
+	const verticalAlignmentOptions = [
+		{
+			value: 'flex-start',
+			label: __( 'Align items top' ),
+		},
+		{
+			value: 'center',
+			label: __( 'Align items center' ),
+		},
+		{
+			value: 'flex-end',
+			label: __( 'Align items bottom' ),
+		},
+	];
+
+	return (
+		<fieldset className="block-editor-hooks__flex-layout-vertical-alignment-control">
+			<legend>{ __( 'Vertical alignment' ) }</legend>
+			<div>
+				{ verticalAlignmentOptions.map( ( value, icon, label ) => {
+					return (
+						<Button
+							key={ value }
+							label={ label }
+							icon={ icon }
+							isPressed={ verticalAlignment === value }
+							onClick={ () => onVerticalAlignmentChange( value ) }
+						/>
+					);
+				} ) }
+			</div>
+		</fieldset>
+	);
+}
 
 function FlexLayoutJustifyContentControl( {
 	layout,
@@ -237,7 +330,7 @@ function OrientationControl( { layout, onChange } ) {
 		<fieldset className="block-editor-hooks__flex-layout-orientation-controls">
 			<legend>{ __( 'Orientation' ) }</legend>
 			<Button
-				label={ 'horizontal' }
+				label={ __( 'Horizontal' ) }
 				icon={ arrowRight }
 				isPressed={ orientation === 'horizontal' }
 				onClick={ () =>
@@ -248,7 +341,7 @@ function OrientationControl( { layout, onChange } ) {
 				}
 			/>
 			<Button
-				label={ 'vertical' }
+				label={ __( 'Vertical' ) }
 				icon={ arrowDown }
 				isPressed={ orientation === 'vertical' }
 				onClick={ () =>

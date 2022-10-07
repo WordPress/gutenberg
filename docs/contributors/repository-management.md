@@ -13,6 +13,7 @@ This document covers:
     -   [Design Review](#design-review)
     -   [Merging Pull Requests](#merging-pull-requests)
     -   [Closing Pull Requests](#closing-pull-requests)
+    -   [How To Get Your Pull Request Reviewed?](/docs/contributors/code/how-to-get-your-pull-request-reviewed.md)
 -   [Projects](#projects)
 
 ## Issues
@@ -102,6 +103,8 @@ _As a contributor_, your responsibility is to learn from suggestions and iterate
 Code reviews are encouraged by everyone who is willing to attempt one. If you review a pull request and are confident in the changes, approve it. If you don't feel totally confident it is ready for merging, add your review with a comment that says it should have another set of eyes on it before final approval. This can help filter out obvious bugs and simplify reviews for core members. Following the later reviews will also help improve your reviewing confidence in the future.
 
 If you are not yet comfortable leaving a full review, try commenting on a PR. Questions about functionality or the reasoning behind a change are helpful too. You could also comment on changes to parts of the code you understand, without leaving a full review.
+
+If you struggle with getting a review, see: [How To Get Your Pull Request Reviewed?](/docs/contributors/code/how-to-get-your-pull-request-reviewed.md)
 
 ### Design Review
 

@@ -4,7 +4,7 @@
 import { createSlotFill, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { cog } from '@wordpress/icons';
-import { useEffect } from '@wordpress/element';
+import { useEffect, Fragment } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -19,6 +19,7 @@ import { STORE_NAME } from '../../store/constants';
 import SettingsHeader from './settings-header';
 import TemplateCard from './template-card';
 import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
+import { store as editSiteStore } from '../../store';
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
@@ -26,26 +27,29 @@ const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 export const SidebarInspectorFill = InspectorFill;
 
 export function SidebarComplementaryAreaFills() {
-	const { sidebar, isEditorSidebarOpened, hasBlockSelection } = useSelect(
-		( select ) => {
-			const _sidebar = select(
-				interfaceStore
-			).getActiveComplementaryArea( STORE_NAME );
-			const _isEditorSidebarOpened = [
-				SIDEBAR_BLOCK,
-				SIDEBAR_TEMPLATE,
-			].includes( _sidebar );
-			return {
-				sidebar: _sidebar,
-				isEditorSidebarOpened: _isEditorSidebarOpened,
-				hasBlockSelection: !! select(
-					blockEditorStore
-				).getBlockSelectionStart(),
-			};
-		},
-		[]
-	);
+	const {
+		sidebar,
+		isEditorSidebarOpened,
+		hasBlockSelection,
+		supportsGlobalStyles,
+	} = useSelect( ( select ) => {
+		const _sidebar =
+			select( interfaceStore ).getActiveComplementaryArea( STORE_NAME );
+		const _isEditorSidebarOpened = [
+			SIDEBAR_BLOCK,
+			SIDEBAR_TEMPLATE,
+		].includes( _sidebar );
+		const settings = select( editSiteStore ).getSettings();
+		return {
+			sidebar: _sidebar,
+			isEditorSidebarOpened: _isEditorSidebarOpened,
+			hasBlockSelection:
+				!! select( blockEditorStore ).getBlockSelectionStart(),
+			supportsGlobalStyles: ! settings?.supportsTemplatePartsMode,
+		};
+	}, [] );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
+
 	useEffect( () => {
 		if ( ! isEditorSidebarOpened ) return;
 		if ( hasBlockSelection ) {
@@ -54,10 +58,21 @@ export function SidebarComplementaryAreaFills() {
 			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
 		}
 	}, [ hasBlockSelection, isEditorSidebarOpened ] );
+
 	let sidebarName = sidebar;
 	if ( ! isEditorSidebarOpened ) {
 		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
 	}
+
+	// Conditionally include NavMenu sidebar in Plugin only.
+	// Optimise for dead code elimination.
+	// See https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/feature-flags.md#dead-code-elimination.
+	let MaybeNavigationMenuSidebar = Fragment;
+
+	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+		MaybeNavigationMenuSidebar = NavigationMenuSidebar;
+	}
+
 	return (
 		<>
 			<DefaultSidebar
@@ -77,8 +92,8 @@ export function SidebarComplementaryAreaFills() {
 					<InspectorSlot bubblesVirtually />
 				) }
 			</DefaultSidebar>
-			<GlobalStylesSidebar />
-			<NavigationMenuSidebar />
+			{ supportsGlobalStyles && <GlobalStylesSidebar /> }
+			<MaybeNavigationMenuSidebar />
 		</>
 	);
 }

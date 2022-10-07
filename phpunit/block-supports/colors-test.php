@@ -7,10 +7,26 @@
  */
 
 class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
+	/**
+	 * @var string|null
+	 */
+	private $test_block_name;
 
-	function test_color_slugs_with_numbers_are_kebab_cased_properly() {
+	public function set_up() {
+		parent::set_up();
+		$this->test_block_name = null;
+	}
+
+	public function tear_down() {
+		unregister_block_type( $this->test_block_name );
+		$this->test_block_name = null;
+		parent::tear_down();
+	}
+
+	public function test_color_slugs_with_numbers_are_kebab_cased_properly() {
+		$this->test_block_name = 'test/color-slug-with-numbers';
 		register_block_type(
-			'test/color-slug-with-numbers',
+			$this->test_block_name,
 			array(
 				'api_version' => 2,
 				'attributes'  => array(
@@ -34,7 +50,7 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 			)
 		);
 		$registry   = WP_Block_Type_Registry::get_instance();
-		$block_type = $registry->get_registered( 'test/color-slug-with-numbers' );
+		$block_type = $registry->get_registered( $this->test_block_name );
 
 		$block_atts = array(
 			'textColor'       => 'fg1',
@@ -43,16 +59,15 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 		);
 
 		$actual   = gutenberg_apply_colors_support( $block_type, $block_atts );
-		$expected = array( 'class' => 'has-text-color has-fg-1-color has-background has-bg-2-background-color has-background has-gr-3-gradient-background' );
+		$expected = array( 'class' => 'has-text-color has-fg-1-color has-background has-bg-2-background-color has-gr-3-gradient-background' );
 
 		$this->assertSame( $expected, $actual );
-		unregister_block_type( 'test/color-slug-with-numbers' );
 	}
 
-	function test_color_with_skipped_serialization_block_supports() {
-		$block_name = 'test/color-with-skipped-serialization-block-supports';
+	public function test_color_with_skipped_serialization_block_supports() {
+		$this->test_block_name = 'test/color-with-skipped-serialization-block-supports';
 		register_block_type(
-			$block_name,
+			$this->test_block_name,
 			array(
 				'api_version' => 2,
 				'attributes'  => array(
@@ -71,7 +86,7 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 		);
 
 		$registry   = WP_Block_Type_Registry::get_instance();
-		$block_type = $registry->get_registered( $block_name );
+		$block_type = $registry->get_registered( $this->test_block_name );
 		$block_atts = array(
 			'style' => array(
 				'color' => array(
@@ -85,13 +100,12 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 		$expected = array();
 
 		$this->assertSame( $expected, $actual );
-		unregister_block_type( $block_name );
 	}
 
-	function test_gradient_with_individual_skipped_serialization_block_supports() {
-		$block_name = 'test/gradient-with-individual-skipped-serialization-block-support';
+	public function test_gradient_with_individual_skipped_serialization_block_supports() {
+		$this->test_block_name = 'test/gradient-with-individual-skipped-serialization-block-support';
 		register_block_type(
-			$block_name,
+			$this->test_block_name,
 			array(
 				'api_version' => 2,
 				'attributes'  => array(
@@ -110,7 +124,7 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 		);
 
 		$registry   = WP_Block_Type_Registry::get_instance();
-		$block_type = $registry->get_registered( $block_name );
+		$block_type = $registry->get_registered( $this->test_block_name );
 		$block_atts = array(
 			'style' => array(
 				'color' => array(
@@ -122,10 +136,9 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 		$actual   = gutenberg_apply_colors_support( $block_type, $block_atts );
 		$expected = array(
 			'class' => 'has-text-color',
-			'style' => 'color: #d92828;',
+			'style' => 'color:#d92828;',
 		);
 
 		$this->assertSame( $expected, $actual );
-		unregister_block_type( $block_name );
 	}
 }

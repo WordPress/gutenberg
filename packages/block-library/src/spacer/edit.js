@@ -15,8 +15,7 @@ import { View } from '@wordpress/primitives';
  * Internal dependencies
  */
 import SpacerControls from './controls';
-
-export const MIN_SPACER_SIZE = 0;
+import { MIN_SPACER_SIZE } from './constants';
 
 const ResizableSpacer = ( {
 	orientation,

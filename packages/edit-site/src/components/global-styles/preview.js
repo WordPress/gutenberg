@@ -11,7 +11,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useReducedMotion, useResizeObserver } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,29 +21,41 @@ import { useGlobalStylesOutput } from './use-global-styles-output';
 
 const firstFrame = {
 	start: {
+		scale: 1,
 		opacity: 1,
-		display: 'block',
 	},
 	hover: {
+		scale: 0,
 		opacity: 0,
-		display: 'none',
+	},
+};
+
+const midFrame = {
+	hover: {
+		opacity: 1,
+	},
+	start: {
+		opacity: 0.5,
 	},
 };
 
 const secondFrame = {
 	hover: {
+		scale: 1,
 		opacity: 1,
-		display: 'block',
 	},
 	start: {
+		scale: 0,
 		opacity: 0,
-		display: 'none',
 	},
 };
 
-const normalizedWidth = 250;
+const normalizedWidth = 248;
+const normalizedHeight = 152;
 
-const StylesPreview = ( { label, isFocused } ) => {
+const normalizedColorSwatchSize = 32;
+
+const StylesPreview = ( { label, isFocused, withHoverView } ) => {
 	const [ fontWeight ] = useStyle( 'typography.fontWeight' );
 	const [ fontFamily = 'serif' ] = useStyle( 'typography.fontFamily' );
 	const [ headingFontFamily = fontFamily ] = useStyle(
@@ -54,7 +66,6 @@ const StylesPreview = ( { label, isFocused } ) => {
 	);
 	const [ textColor = 'black' ] = useStyle( 'color.text' );
 	const [ headingColor = textColor ] = useStyle( 'elements.h1.color.text' );
-	const [ linkColor = 'blue' ] = useStyle( 'elements.link.color.text' );
 	const [ backgroundColor = 'white' ] = useStyle( 'color.background' );
 	const [ gradientValue ] = useStyle( 'color.gradient' );
 	const [ styles ] = useGlobalStylesOutput();
@@ -76,12 +87,27 @@ const StylesPreview = ( { label, isFocused } ) => {
 		)
 		.slice( 0, 2 );
 
+	// Reset leaked styles from WP common.css and remove main content layout padding and border.
+	const editorStyles = useMemo( () => {
+		if ( styles ) {
+			return [
+				...styles,
+				{
+					css: 'body{min-width: 0;padding: 0;border: none;}',
+					isGlobalStyles: true,
+				},
+			];
+		}
+
+		return styles;
+	}, [ styles ] );
+
 	return (
 		<Iframe
 			className="edit-site-global-styles-preview__iframe"
-			head={ <EditorStyles styles={ styles } /> }
+			head={ <EditorStyles styles={ editorStyles } /> }
 			style={ {
-				height: 150 * ratio,
+				height: normalizedHeight * ratio,
 				visibility: ! width ? 'hidden' : 'visible',
 			} }
 			onMouseEnter={ () => setIsHovered( true ) }
@@ -91,14 +117,14 @@ const StylesPreview = ( { label, isFocused } ) => {
 			{ containerResizeListener }
 			<motion.div
 				style={ {
-					height: 150 * ratio,
+					height: normalizedHeight * ratio,
 					width: '100%',
 					background: gradientValue ?? backgroundColor,
 					cursor: 'pointer',
 				} }
 				initial="start"
 				animate={
-					( isHovered || isFocused ) && ! disableMotion
+					( isHovered || isFocused ) && ! disableMotion && label
 						? 'hover'
 						: 'start'
 				}
@@ -118,36 +144,90 @@ const StylesPreview = ( { label, isFocused } ) => {
 							overflow: 'hidden',
 						} }
 					>
-						<div
+						<motion.div
 							style={ {
 								fontFamily: headingFontFamily,
 								fontSize: 65 * ratio,
 								color: headingColor,
 								fontWeight: headingFontWeight,
 							} }
+							animate={ { scale: 1, opacity: 1 } }
+							initial={ { scale: 0.1, opacity: 0 } }
+							transition={ { delay: 0.3, type: 'tween' } }
 						>
 							Aa
-						</div>
-						<VStack spacing={ 2 * ratio }>
-							{ highlightedColors.map( ( { slug, color } ) => (
+						</motion.div>
+						<VStack spacing={ 4 * ratio }>
+							{ highlightedColors.map(
+								( { slug, color }, index ) => (
+									<motion.div
+										key={ slug }
+										style={ {
+											height:
+												normalizedColorSwatchSize *
+												ratio,
+											width:
+												normalizedColorSwatchSize *
+												ratio,
+											background: color,
+											borderRadius:
+												( normalizedColorSwatchSize *
+													ratio ) /
+												2,
+										} }
+										animate={ { scale: 1, opacity: 1 } }
+										initial={ { scale: 0.1, opacity: 0 } }
+										transition={ {
+											delay: index === 1 ? 0.2 : 0.1,
+										} }
+									/>
+								)
+							) }
+						</VStack>
+					</HStack>
+				</motion.div>
+				<motion.div
+					variants={ withHoverView && midFrame }
+					style={ {
+						height: '100%',
+						width: '100%',
+						position: 'absolute',
+						top: 0,
+						overflow: 'hidden',
+						filter: 'blur(60px)',
+						opacity: 0.1,
+					} }
+				>
+					<HStack
+						spacing={ 0 }
+						justify="flex-start"
+						style={ {
+							height: '100%',
+							overflow: 'hidden',
+						} }
+					>
+						{ paletteColors
+							.slice( 0, 4 )
+							.map( ( { color }, index ) => (
 								<div
-									key={ slug }
+									key={ index }
 									style={ {
-										height: 30 * ratio,
-										width: 30 * ratio,
+										height: '100%',
 										background: color,
-										borderRadius: 15 * ratio,
+										flexGrow: 1,
 									} }
 								/>
 							) ) }
-						</VStack>
 					</HStack>
 				</motion.div>
 				<motion.div
 					variants={ secondFrame }
 					style={ {
 						height: '100%',
+						width: '100%',
 						overflow: 'hidden',
+						position: 'absolute',
+						top: 0,
 					} }
 				>
 					<VStack
@@ -163,52 +243,16 @@ const StylesPreview = ( { label, isFocused } ) => {
 						{ label && (
 							<div
 								style={ {
-									fontSize: 35 * ratio,
+									fontSize: 40 * ratio,
 									fontFamily: headingFontFamily,
 									color: headingColor,
 									fontWeight: headingFontWeight,
 									lineHeight: '1em',
+									textAlign: 'center',
 								} }
 							>
 								{ label }
 							</div>
-						) }
-						<HStack spacing={ 2 * ratio } justify="flex-start">
-							<div
-								style={ {
-									fontFamily,
-									fontSize: 24 * ratio,
-									color: textColor,
-								} }
-							>
-								Aa
-							</div>
-							<div
-								style={ {
-									fontFamily,
-									fontSize: 24 * ratio,
-									color: linkColor,
-								} }
-							>
-								Aa
-							</div>
-						</HStack>
-						{ paletteColors && (
-							<HStack spacing={ 0 }>
-								{ paletteColors
-									.slice( 0, 4 )
-									.map( ( { color }, index ) => (
-										<div
-											key={ index }
-											style={ {
-												height: 10 * ratio,
-												width: 30 * ratio,
-												background: color,
-												flexGrow: 1,
-											} }
-										/>
-									) ) }
-							</HStack>
 						) }
 					</VStack>
 				</motion.div>

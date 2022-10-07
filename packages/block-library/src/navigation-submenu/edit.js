@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, pull } from 'lodash';
+import { escape, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -39,9 +39,13 @@ import {
 } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	useResourcePermissions,
+	store as coreStore,
+} from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -54,8 +58,6 @@ const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
 const DEFAULT_BLOCK = {
 	name: 'core/navigation-link',
 };
-
-const MAX_NESTING = 5;
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -279,69 +281,59 @@ export default function NavigationSubmenuEdit( {
 	context,
 	clientId,
 } ) {
-	const {
-		label,
-		type,
-		opensInNewTab,
-		url,
-		description,
-		rel,
-		title,
-		kind,
-	} = attributes;
+	const { label, type, opensInNewTab, url, description, rel, title, kind } =
+		attributes;
 	const link = {
 		url,
 		opensInNewTab,
 	};
-	const { showSubmenuIcon, openSubmenusOnClick } = context;
+	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
 
-	const {
-		__unstableMarkNextChangeAsNotPersistent,
-		replaceBlock,
-	} = useDispatch( blockEditorStore );
+	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
+		useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	const listItemRef = useRef( null );
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add text…' );
 	const ref = useRef();
+
+	const pagesPermissions = useResourcePermissions( 'pages' );
+	const postsPermissions = useResourcePermissions( 'posts' );
 
 	const {
 		isAtMaxNesting,
 		isTopLevelItem,
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
-		hasDescendants,
-		selectedBlockHasDescendants,
-		userCanCreatePages,
-		userCanCreatePosts,
+		hasChildren,
+		selectedBlockHasChildren,
 		onlyDescendantIsEmptyLink,
 	} = useSelect(
 		( select ) => {
 			const {
-				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
 				getBlockParentsByBlockName,
 				getBlock,
+				getBlockCount,
+				getBlockOrder,
 			} = select( blockEditorStore );
 
 			let _onlyDescendantIsEmptyLink;
 
 			const selectedBlockId = getSelectedBlockClientId();
 
-			const descendants = getClientIdsOfDescendants( [ clientId ] )
-				.length;
-
-			const selectedBlockDescendants = getClientIdsOfDescendants( [
-				selectedBlockId,
-			] );
+			const selectedBlockChildren = getBlockOrder( selectedBlockId );
 
 			// Check for a single descendant in the submenu. If that block
 			// is a link block in a "placeholder" state with no label then
 			// we can consider as an "empty" link.
-			if ( selectedBlockDescendants?.length === 1 ) {
-				const singleBlock = getBlock( selectedBlockDescendants[ 0 ] );
+			if ( selectedBlockChildren?.length === 1 ) {
+				const singleBlock = getBlock( selectedBlockChildren[ 0 ] );
 
 				_onlyDescendantIsEmptyLink =
 					singleBlock?.name === 'core/navigation-link' &&
@@ -351,7 +343,7 @@ export default function NavigationSubmenuEdit( {
 			return {
 				isAtMaxNesting:
 					getBlockParentsByBlockName( clientId, name ).length >=
-					MAX_NESTING,
+					maxNestingLevel,
 				isTopLevelItem:
 					getBlockParentsByBlockName( clientId, name ).length === 0,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
@@ -362,16 +354,8 @@ export default function NavigationSubmenuEdit( {
 					clientId,
 					false
 				),
-				hasDescendants: !! descendants,
-				selectedBlockHasDescendants: !! selectedBlockDescendants?.length,
-				userCanCreatePages: select( coreStore ).canUser(
-					'create',
-					'pages'
-				),
-				userCanCreatePosts: select( coreStore ).canUser(
-					'create',
-					'posts'
-				),
+				hasChildren: !! getBlockCount( clientId ),
+				selectedBlockHasChildren: !! selectedBlockChildren?.length,
 				onlyDescendantIsEmptyLink: _onlyDescendantIsEmptyLink,
 			};
 		},
@@ -442,9 +426,9 @@ export default function NavigationSubmenuEdit( {
 
 	let userCanCreate = false;
 	if ( ! type || type === 'page' ) {
-		userCanCreate = userCanCreatePages;
+		userCanCreate = pagesPermissions.canCreate;
 	} else if ( type === 'post' ) {
-		userCanCreate = userCanCreatePosts;
+		userCanCreate = postsPermissions.canCreate;
 	}
 
 	async function handleCreate( pageTitle ) {
@@ -478,19 +462,17 @@ export default function NavigationSubmenuEdit( {
 	}
 
 	const blockProps = useBlockProps( {
-		ref: listItemRef,
+		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
 		className: classnames( 'wp-block-navigation-item', {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
-			'has-child': hasDescendants,
+			'has-child': hasChildren,
 			'has-text-color': !! textColor || !! customTextColor,
 			[ getColorClassName( 'color', textColor ) ]: !! textColor,
 			'has-background': !! backgroundColor || customBackgroundColor,
-			[ getColorClassName(
-				'background-color',
-				backgroundColor
-			) ]: !! backgroundColor,
+			[ getColorClassName( 'background-color', backgroundColor ) ]:
+				!! backgroundColor,
 			'open-on-click': openSubmenusOnClick,
 		} ),
 		style: {
@@ -503,9 +485,9 @@ export default function NavigationSubmenuEdit( {
 	// Always use overlay colors for submenus.
 	const innerBlocksColors = getColors( context, true );
 
-	if ( isAtMaxNesting ) {
-		pull( ALLOWED_BLOCKS, 'core/navigation-submenu' );
-	}
+	const allowedBlocks = isAtMaxNesting
+		? without( ALLOWED_BLOCKS, 'core/navigation-submenu' )
+		: ALLOWED_BLOCKS;
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
@@ -515,12 +497,14 @@ export default function NavigationSubmenuEdit( {
 					innerBlocksColors.textColor ||
 					innerBlocksColors.customTextColor
 				),
-				[ `has-${ innerBlocksColors.textColor }-color` ]: !! innerBlocksColors.textColor,
+				[ `has-${ innerBlocksColors.textColor }-color` ]:
+					!! innerBlocksColors.textColor,
 				'has-background': !! (
 					innerBlocksColors.backgroundColor ||
 					innerBlocksColors.customBackgroundColor
 				),
-				[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]: !! innerBlocksColors.backgroundColor,
+				[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]:
+					!! innerBlocksColors.backgroundColor,
 			} ),
 			style: {
 				color: innerBlocksColors.customTextColor,
@@ -528,7 +512,7 @@ export default function NavigationSubmenuEdit( {
 			},
 		},
 		{
-			allowedBlocks: ALLOWED_BLOCKS,
+			allowedBlocks,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: true,
 
@@ -540,9 +524,9 @@ export default function NavigationSubmenuEdit( {
 			renderAppender:
 				isSelected ||
 				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasDescendants ) ||
+					! selectedBlockHasChildren ) ||
 				// Show the appender while dragging to allow inserting element between item and the appender.
-				hasDescendants
+				hasChildren
 					? InnerBlocks.ButtonBlockAppender
 					: false,
 		}
@@ -556,7 +540,7 @@ export default function NavigationSubmenuEdit( {
 	}
 
 	const canConvertToLink =
-		! selectedBlockHasDescendants || onlyDescendantIsEmptyLink;
+		! selectedBlockHasChildren || onlyDescendantIsEmptyLink;
 
 	return (
 		<Fragment>
@@ -649,7 +633,8 @@ export default function NavigationSubmenuEdit( {
 						<Popover
 							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }
-							anchorRef={ listItemRef.current }
+							anchor={ popoverAnchor }
+							shift
 						>
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"

@@ -12,9 +12,8 @@ import { store as editPostStore } from '../../../store';
 
 export default compose(
 	withSelect( ( select, { panelName } ) => {
-		const { isEditorPanelEnabled, isEditorPanelRemoved } = select(
-			editPostStore
-		);
+		const { isEditorPanelEnabled, isEditorPanelRemoved } =
+			select( editPostStore );
 		return {
 			isRemoved: isEditorPanelRemoved( panelName ),
 			isChecked: isEditorPanelEnabled( panelName ),

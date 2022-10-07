@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,6 +17,8 @@ import { useNavigationContext } from '../context';
 import { ItemUI, ItemIconUI } from '../styles/navigation-styles';
 import NavigationItemBaseContent from './base-content';
 import NavigationItemBase from './base';
+
+const noop = () => {};
 
 export default function NavigationItem( props ) {
 	const {

@@ -26,13 +26,13 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node: ['12', '14']
+                node: ['14']
 
         steps:
-            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+              uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
               with:
                   node-version: ${{ matrix.node }}
                   cache: npm
@@ -46,10 +46,10 @@ jobs:
                   npx lerna run build
 
             - name: Running the tests
-              run: npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
             - name: Running the date tests
-              run: npm run test-unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     unit-php:
         name: PHP
@@ -57,12 +57,12 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
-            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+              uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
               with:
-                  node-version: 14
+                  node-version-file: '.nvmrc'
                   cache: npm
 
             - name: Npm install and build
@@ -75,14 +75,14 @@ jobs:
                   npm run wp-env start
 
             - name: Running lint check
-              run: npm run lint-php
+              run: npm run lint:php
 
             - name: Running single site unit tests
-              run: npm run test-unit-php
+              run: npm run test:unit:php
               if: ${{ success() || failure() }}
 
             - name: Running multisite unit tests
-              run: npm run test-unit-php-multisite
+              run: npm run test:unit:php:multisite
               if: ${{ success() || failure() }}
 
     mobile-unit-js:
@@ -91,12 +91,12 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
-            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+              uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
               with:
-                  node-version: 14
+                  node-version-file: '.nvmrc'
                   cache: npm
 
             - name: Npm install and build

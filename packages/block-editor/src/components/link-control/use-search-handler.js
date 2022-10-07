@@ -6,34 +6,35 @@ import { useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
- * External dependencies
- */
-import { startsWith } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import isURLLike from './is-url-like';
-import { CREATE_TYPE } from './constants';
+import {
+	CREATE_TYPE,
+	TEL_TYPE,
+	MAILTO_TYPE,
+	INTERNAL_TYPE,
+	URL_TYPE,
+} from './constants';
 import { store as blockEditorStore } from '../../store';
 
 export const handleNoop = () => Promise.resolve( [] );
 
 export const handleDirectEntry = ( val ) => {
-	let type = 'URL';
+	let type = URL_TYPE;
 
 	const protocol = getProtocol( val ) || '';
 
 	if ( protocol.includes( 'mailto' ) ) {
-		type = 'mailto';
+		type = MAILTO_TYPE;
 	}
 
 	if ( protocol.includes( 'tel' ) ) {
-		type = 'tel';
+		type = TEL_TYPE;
 	}
 
-	if ( startsWith( val, '#' ) ) {
-		type = 'internal';
+	if ( val?.startsWith( '#' ) ) {
+		type = INTERNAL_TYPE;
 	}
 
 	return Promise.resolve( [
@@ -132,8 +133,8 @@ export default function useSearchHandler(
 
 		return {
 			pageOnFront: getSettings().pageOnFront,
-			fetchSearchSuggestions: getSettings()
-				.__experimentalFetchLinkSuggestions,
+			fetchSearchSuggestions:
+				getSettings().__experimentalFetchLinkSuggestions,
 		};
 	}, [] );
 

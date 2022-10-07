@@ -29,7 +29,6 @@ import { requestPreview } from '@wordpress/react-native-bridge';
  */
 import * as paragraph from '../../paragraph';
 import * as embed from '..';
-import { registerBlock } from '../..';
 
 // Override modal mock to prevent unmounting it when is not visible.
 // This is required to be able to trigger onClose and onDismiss events when
@@ -40,8 +39,7 @@ jest.mock( 'react-native-modal', () => {
 } );
 
 // Mock debounce to prevent potentially belated state updates.
-jest.mock( 'lodash', () => ( {
-	...jest.requireActual( 'lodash' ),
+jest.mock( '@wordpress/compose/src/utils/debounce', () => ( {
 	debounce: ( fn ) => {
 		fn.cancel = jest.fn();
 		return fn;
@@ -130,6 +128,10 @@ const mockEmbedResponses = ( mockedResponses ) => {
 			] );
 		}
 
+		if ( path.startsWith( '/wp/v2/block-patterns/categories' ) ) {
+			return Promise.resolve( [] );
+		}
+
 		const matchedEmbedResponse = mockedResponses.find(
 			( mockedResponse ) =>
 				path ===
@@ -180,8 +182,8 @@ const initializeWithEmbedBlock = async ( initialHtml, selectBlock = true ) => {
 beforeAll( () => {
 	// Paragraph block needs to be registered because by default a paragraph
 	// block is added to empty posts.
-	registerBlock( paragraph );
-	registerBlock( embed );
+	paragraph.init();
+	embed.init();
 	setDefaultBlockName( paragraph.name );
 } );
 
@@ -246,10 +248,8 @@ describe( 'Embed block', () => {
 		it( 'sets a valid URL when dismissing edit URL modal', async () => {
 			const expectedURL = 'https://twitter.com/notnownikki';
 
-			const {
-				getByPlaceholderText,
-				getByTestId,
-			} = await insertEmbedBlock();
+			const { getByPlaceholderText, getByTestId } =
+				await insertEmbedBlock();
 
 			// Wait for edit URL modal to be visible.
 			const embedEditURLModal = getByTestId( 'embed-edit-url-modal' );
@@ -336,11 +336,8 @@ describe( 'Embed block', () => {
 		it( 'sets a valid URL when dismissing edit URL modal', async () => {
 			const expectedURL = 'https://twitter.com/notnownikki';
 
-			const {
-				getByPlaceholderText,
-				getByTestId,
-				getByText,
-			} = await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
+			const { getByPlaceholderText, getByTestId, getByText } =
+				await initializeWithEmbedBlock( EMPTY_EMBED_HTML );
 
 			// Edit URL.
 			fireEvent.press( getByText( 'ADD LINK' ) );
@@ -412,10 +409,8 @@ describe( 'Embed block', () => {
 
 	describe( 'edit URL', () => {
 		it( 'keeps the previous URL if no URL is set', async () => {
-			const {
-				getByA11yLabel,
-				getByTestId,
-			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+			const { getByA11yLabel, getByTestId } =
+				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press(
@@ -437,11 +432,8 @@ describe( 'Embed block', () => {
 			const initialURL = 'https://twitter.com/notnownikki';
 			const expectedURL = 'https://www.youtube.com/watch?v=lXMskKTw3Bc';
 
-			const {
-				getByA11yLabel,
-				getByDisplayValue,
-				getByTestId,
-			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+			const { getByA11yLabel, getByDisplayValue, getByTestId } =
+				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press(
@@ -673,10 +665,8 @@ describe( 'Embed block', () => {
 			'Full width',
 		].forEach( ( alignmentOption ) =>
 			it( `sets ${ alignmentOption } option`, async () => {
-				const {
-					getByA11yLabel,
-					getByText,
-				} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+				const { getByA11yLabel, getByText } =
+					await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 				// Open alignment options.
 				fireEvent.press(
@@ -711,6 +701,9 @@ describe( 'Embed block', () => {
 						response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
 					}
 				}
+				if ( path.startsWith( '/wp/v2/block-patterns/categories' ) ) {
+					response = [];
+				}
 				return Promise.resolve( response );
 			} );
 
@@ -737,16 +730,17 @@ describe( 'Embed block', () => {
 		it( 'converts to link if preview request failed', async () => {
 			// Return bad response for requests to oembed endpoint.
 			fetchRequest.mockImplementation( ( { path } ) => {
+				if ( path.startsWith( '/wp/v2/block-patterns/categories' ) ) {
+					return Promise.resolve( [] );
+				}
 				const isEmbedRequest = path.startsWith( '/oembed/1.0/proxy' );
 				return Promise.resolve(
 					isEmbedRequest ? MOCK_BAD_WORDPRESS_RESPONSE : {}
 				);
 			} );
 
-			const {
-				getByA11yLabel,
-				getByText,
-			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+			const { getByA11yLabel, getByText } =
+				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Convert embed to link.
 			fireEvent.press( getByText( 'More options' ) );
@@ -776,6 +770,10 @@ describe( 'Embed block', () => {
 					response = MOCK_BAD_WORDPRESS_RESPONSE;
 				} else if ( matchesPath( successURL ) ) {
 					response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
+				} else if (
+					path.startsWith( '/wp/v2/block-patterns/categories' )
+				) {
+					response = [];
 				}
 
 				return Promise.resolve( response );
@@ -955,11 +953,8 @@ describe( 'Embed block', () => {
 	describe( 'insert via slash inserter', () => {
 		it( 'insert generic embed block', async () => {
 			const embedBlockSlashInserter = '/Embed';
-			const {
-				getByPlaceholderText,
-				getByA11yLabel,
-				getByText,
-			} = await initializeEditor( { initialHtml: EMPTY_PARAGRAPH_HTML } );
+			const { getByPlaceholderText, getByA11yLabel, getByText } =
+				await initializeEditor( { initialHtml: EMPTY_PARAGRAPH_HTML } );
 
 			const paragraphText = getByPlaceholderText( 'Start writing…' );
 			fireEvent( paragraphText, 'focus' );
@@ -997,13 +992,10 @@ describe( 'Embed block', () => {
 		MOST_USED_PROVIDERS.forEach( ( { title } ) =>
 			it( `inserts ${ title } embed block`, async () => {
 				const embedBlockSlashInserter = `/${ title }`;
-				const {
-					getByPlaceholderText,
-					getByA11yLabel,
-					getByText,
-				} = await initializeEditor( {
-					initialHtml: EMPTY_PARAGRAPH_HTML,
-				} );
+				const { getByPlaceholderText, getByA11yLabel, getByText } =
+					await initializeEditor( {
+						initialHtml: EMPTY_PARAGRAPH_HTML,
+					} );
 
 				const paragraphText = getByPlaceholderText( 'Start writing…' );
 				fireEvent( paragraphText, 'focus' );
@@ -1043,10 +1035,8 @@ describe( 'Embed block', () => {
 	it( 'sets block caption', async () => {
 		const expectedCaption = 'Caption';
 
-		const {
-			getByPlaceholderText,
-			getByDisplayValue,
-		} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+		const { getByPlaceholderText, getByDisplayValue } =
+			await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 		// Set a caption.
 		const captionField = getByPlaceholderText( 'Add caption' );
@@ -1071,6 +1061,9 @@ describe( 'Embed block', () => {
 	it( 'displays cannot embed on the placeholder if preview data is null', async () => {
 		// Return null response for requests to oembed endpoint.
 		fetchRequest.mockImplementation( ( { path } ) => {
+			if ( path.startsWith( '/wp/v2/block-patterns/categories' ) ) {
+				return Promise.resolve( [] );
+			}
 			const isEmbedRequest = path.startsWith( '/oembed/1.0/proxy' );
 			return Promise.resolve( isEmbedRequest ? EMBED_NULL_RESPONSE : {} );
 		} );
@@ -1087,10 +1080,8 @@ describe( 'Embed block', () => {
 
 	describe( 'block settings', () => {
 		it( 'toggles resize for smaller devices media settings', async () => {
-			const {
-				getByA11yLabel,
-				getByText,
-			} = await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
+			const { getByA11yLabel, getByText } =
+				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press(
@@ -1106,10 +1097,8 @@ describe( 'Embed block', () => {
 		} );
 
 		it( 'does not show media settings panel if responsive is not supported', async () => {
-			const {
-				getByA11yLabel,
-				getByText,
-			} = await initializeWithEmbedBlock( WP_EMBED_HTML );
+			const { getByA11yLabel, getByText } =
+				await initializeWithEmbedBlock( WP_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press(

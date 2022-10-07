@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, get, some } from 'lodash';
+import { get, some } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -19,15 +19,16 @@ import { __ } from '@wordpress/i18n';
 import PublishButtonLabel from './label';
 import { store as editorStore } from '../../store';
 
+const noop = () => {};
+
 export class PostPublishButton extends Component {
 	constructor( props ) {
 		super( props );
 		this.buttonNode = createRef();
 
 		this.createOnClick = this.createOnClick.bind( this );
-		this.closeEntitiesSavedStates = this.closeEntitiesSavedStates.bind(
-			this
-		);
+		this.closeEntitiesSavedStates =
+			this.closeEntitiesSavedStates.bind( this );
 
 		this.state = {
 			entitiesSavedStatesCallback: false,
@@ -41,10 +42,8 @@ export class PostPublishButton extends Component {
 
 	createOnClick( callback ) {
 		return ( ...args ) => {
-			const {
-				hasNonPostEntityChanges,
-				setEntitiesSavedStatesCallback,
-			} = this.props;
+			const { hasNonPostEntityChanges, setEntitiesSavedStatesCallback } =
+				this.props;
 			// If a post with non-post entities is published, but the user
 			// elects to not save changes to the non-post entities, those
 			// entities will still be dirty when the Publish button is clicked.

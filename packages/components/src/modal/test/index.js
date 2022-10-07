@@ -26,25 +26,27 @@ describe( 'Modal', () => {
 		render(
 			<Modal aria={ { labelledby: 'title-id' } }>
 				{ /* eslint-disable-next-line no-restricted-syntax */ }
-				<h1 id="title-id">Test Title</h1>
+				<h1 id="title-id">Modal Title Text</h1>
 			</Modal>
 		);
-		expect( screen.getByRole( 'dialog' ) ).toHaveAttribute(
-			'aria-labelledby',
-			'title-id'
+		expect( screen.getByRole( 'dialog' ) ).toHaveAccessibleName(
+			'Modal Title Text'
 		);
 	} );
 
 	it( 'prefers the aria label of the title prop over the aria.labelledby prop', () => {
 		render(
-			<Modal title="Test Title" aria={ { labelledby: 'title-id' } }>
+			<Modal
+				title="Modal Title Attribute"
+				aria={ { labelledby: 'title-id' } }
+			>
 				{ /* eslint-disable-next-line no-restricted-syntax */ }
-				<h1 id="title-id">Wrong Title</h1>
+				<h1 id="title-id">Modal Title Text</h1>
 			</Modal>
 		);
-		const dialog = screen.getByRole( 'dialog' );
-		const titleId = within( dialog ).getByText( 'Test Title' ).id;
-		expect( dialog ).toHaveAttribute( 'aria-labelledby', titleId );
+		expect( screen.getByRole( 'dialog' ) ).toHaveAccessibleName(
+			'Modal Title Attribute'
+		);
 	} );
 
 	it( 'hides the header when the `__experimentalHideHeader` prop is used', () => {

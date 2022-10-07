@@ -1,13 +1,10 @@
 /**
- * External dependencies
- */
-import { isEmpty, noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { ButtonGroup, Button, Slot, Fill } from '@wordpress/components';
 import { Children } from '@wordpress/element';
+
+const noop = () => {};
 
 function ActionItemSlot( {
 	name,
@@ -23,7 +20,7 @@ function ActionItemSlot( {
 			fillProps={ fillProps }
 		>
 			{ ( fills ) => {
-				if ( isEmpty( Children.toArray( fills ) ) ) {
+				if ( ! Children.toArray( fills ).length ) {
 					return null;
 				}
 

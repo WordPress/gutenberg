@@ -156,6 +156,12 @@
 		"parent": "block-tutorial"
 	},
 	{
+		"title": "Extending the Query Loop block",
+		"slug": "extending-the-query-loop-block",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/extending-the-query-loop-block.md",
+		"parent": "block-tutorial"
+	},
+	{
 		"title": "Development Platform",
 		"slug": "platform",
 		"markdown_source": "../docs/how-to-guides/platform/README.md",
@@ -196,6 +202,24 @@
 		"slug": "3-building-an-edit-form",
 		"markdown_source": "../docs/how-to-guides/data-basics/3-building-an-edit-form.md",
 		"parent": "data-basics"
+	},
+	{
+		"title": "Part 4: Building a Create page form",
+		"slug": "4-building-a-create-page-form",
+		"markdown_source": "../docs/how-to-guides/data-basics/4-building-a-create-page-form.md",
+		"parent": "data-basics"
+	},
+	{
+		"title": "Adding a delete button",
+		"slug": "5-adding-a-delete-button",
+		"markdown_source": "../docs/how-to-guides/data-basics/5-adding-a-delete-button.md",
+		"parent": "data-basics"
+	},
+	{
+		"title": "Curating the Editor Experience",
+		"slug": "curating-the-editor-experience",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience.md",
+		"parent": "how-to-guides"
 	},
 	{
 		"title": "Feature Flags",
@@ -285,6 +309,12 @@
 		"title": "Plugin Sidebar",
 		"slug": "plugin-sidebar-0",
 		"markdown_source": "../docs/how-to-guides/plugin-sidebar-0.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Propagating updates for block types",
+		"slug": "propagating-updates",
+		"markdown_source": "../docs/how-to-guides/propagating-updates.md",
 		"parent": "how-to-guides"
 	},
 	{
@@ -390,7 +420,7 @@
 		"parent": "block-api"
 	},
 	{
-		"title": "Metadata",
+		"title": "Metadata in block.json",
 		"slug": "block-metadata",
 		"markdown_source": "../docs/reference-guides/block-api/block-metadata.md",
 		"parent": "block-api"
@@ -420,7 +450,7 @@
 		"parent": "block-api"
 	},
 	{
-		"title": "Templates",
+		"title": "Block Templates",
 		"slug": "block-templates",
 		"markdown_source": "../docs/reference-guides/block-api/block-templates.md",
 		"parent": "block-api"
@@ -444,19 +474,19 @@
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Filter Reference",
+		"title": "Hooks Reference",
 		"slug": "filters",
 		"markdown_source": "../docs/reference-guides/filters/README.md",
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Block Filters",
+		"title": "Block Hooks",
 		"slug": "block-filters",
 		"markdown_source": "../docs/reference-guides/filters/block-filters.md",
 		"parent": "filters"
 	},
 	{
-		"title": "Editor Filters",
+		"title": "Editor Hooks",
 		"slug": "editor-filters",
 		"markdown_source": "../docs/reference-guides/filters/editor-filters.md",
 		"parent": "filters"
@@ -477,6 +507,12 @@
 		"title": "Autocomplete",
 		"slug": "autocomplete-filters",
 		"markdown_source": "../docs/reference-guides/filters/autocomplete-filters.md",
+		"parent": "filters"
+	},
+	{
+		"title": "Global Styles Filters",
+		"slug": "global-styles-filters",
+		"markdown_source": "../docs/reference-guides/filters/global-styles-filters.md",
 		"parent": "filters"
 	},
 	{
@@ -813,12 +849,6 @@
 		"title": "Flex",
 		"slug": "flex",
 		"markdown_source": "../packages/components/src/flex/flex/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "Flyout",
-		"slug": "flyout",
-		"markdown_source": "../packages/components/src/flyout/flyout/README.md",
 		"parent": "components"
 	},
 	{
@@ -1206,6 +1236,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "ToggleGroupControlOptionBase",
+		"slug": "toggle-group-control-option-base",
+		"markdown_source": "../packages/components/src/toggle-group-control/toggle-group-control-option-base/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToggleGroupControlOptionIcon",
+		"slug": "toggle-group-control-option-icon",
+		"markdown_source": "../packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ToggleGroupControlOption",
 		"slug": "toggle-group-control-option",
 		"markdown_source": "../packages/components/src/toggle-group-control/toggle-group-control-option/README.md",
@@ -1446,6 +1488,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "External Project Templates",
+		"slug": "packages-create-block-external-template",
+		"markdown_source": "../packages/create-block/docs/external-template.md",
+		"parent": "packages-create-block"
+	},
+	{
 		"title": "@wordpress/custom-templated-path-webpack-plugin",
 		"slug": "packages-custom-templated-path-webpack-plugin",
 		"markdown_source": "../packages/custom-templated-path-webpack-plugin/README.md",
@@ -1563,6 +1611,12 @@
 		"title": "@wordpress/eslint-plugin",
 		"slug": "packages-eslint-plugin",
 		"markdown_source": "../packages/eslint-plugin/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/experiments",
+		"slug": "packages-experiments",
+		"markdown_source": "../packages/experiments/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1698,6 +1752,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/preferences-persistence",
+		"slug": "packages-preferences-persistence",
+		"markdown_source": "../packages/preferences-persistence/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/preferences",
 		"slug": "packages-preferences",
 		"markdown_source": "../packages/preferences/README.md",
@@ -1782,6 +1842,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/style-engine Using the Style Engine to generate block supports styles",
+		"slug": "using-the-style-engine-with-block-supports",
+		"markdown_source": "../packages/style-engine/docs/using-the-style-engine-with-block-supports.md",
+		"parent": "packages-style-engine"
+	},
+	{
 		"title": "@wordpress/stylelint-config",
 		"slug": "packages-stylelint-config",
 		"markdown_source": "../packages/stylelint-config/README.md",
@@ -1842,9 +1908,9 @@
 		"parent": "data"
 	},
 	{
-		"title": "Block Types Data",
-		"slug": "data-core-blocks",
-		"markdown_source": "../docs/reference-guides/data/data-core-blocks.md",
+		"title": "Block directory",
+		"slug": "data-core-block-directory",
+		"markdown_source": "../docs/reference-guides/data/data-core-block-directory.md",
 		"parent": "data"
 	},
 	{
@@ -1854,15 +1920,45 @@
 		"parent": "data"
 	},
 	{
-		"title": "The Post Editor’s Data",
-		"slug": "data-core-editor",
-		"markdown_source": "../docs/reference-guides/data/data-core-editor.md",
+		"title": "Block Types Data",
+		"slug": "data-core-blocks",
+		"markdown_source": "../docs/reference-guides/data/data-core-blocks.md",
+		"parent": "data"
+	},
+	{
+		"title": "Customize Widgets",
+		"slug": "data-core-customize-widgets",
+		"markdown_source": "../docs/reference-guides/data/data-core-customize-widgets.md",
 		"parent": "data"
 	},
 	{
 		"title": "The Editor’s UI Data",
 		"slug": "data-core-edit-post",
 		"markdown_source": "../docs/reference-guides/data/data-core-edit-post.md",
+		"parent": "data"
+	},
+	{
+		"title": "Edit Site",
+		"slug": "data-core-edit-site",
+		"markdown_source": "../docs/reference-guides/data/data-core-edit-site.md",
+		"parent": "data"
+	},
+	{
+		"title": "Edit Widgets",
+		"slug": "data-core-edit-widgets",
+		"markdown_source": "../docs/reference-guides/data/data-core-edit-widgets.md",
+		"parent": "data"
+	},
+	{
+		"title": "The Post Editor’s Data",
+		"slug": "data-core-editor",
+		"markdown_source": "../docs/reference-guides/data/data-core-editor.md",
+		"parent": "data"
+	},
+	{
+		"title": "The Keyboard Shortcuts Data",
+		"slug": "data-core-keyboard-shortcuts",
+		"markdown_source": "../docs/reference-guides/data/data-core-keyboard-shortcuts.md",
 		"parent": "data"
 	},
 	{
@@ -1875,6 +1971,24 @@
 		"title": "The NUX (New User Experience) Data",
 		"slug": "data-core-nux",
 		"markdown_source": "../docs/reference-guides/data/data-core-nux.md",
+		"parent": "data"
+	},
+	{
+		"title": "Preferences",
+		"slug": "data-core-preferences",
+		"markdown_source": "../docs/reference-guides/data/data-core-preferences.md",
+		"parent": "data"
+	},
+	{
+		"title": "Reusable blocks",
+		"slug": "data-core-reusable-blocks",
+		"markdown_source": "../docs/reference-guides/data/data-core-reusable-blocks.md",
+		"parent": "data"
+	},
+	{
+		"title": "Rich Text",
+		"slug": "data-core-rich-text",
+		"markdown_source": "../docs/reference-guides/data/data-core-rich-text.md",
 		"parent": "data"
 	},
 	{
@@ -2040,6 +2154,12 @@
 		"parent": "code"
 	},
 	{
+		"title": "Cherry-picking automation",
+		"slug": "auto-cherry-picking",
+		"markdown_source": "../docs/contributors/code/auto-cherry-picking.md",
+		"parent": "release"
+	},
+	{
 		"title": "React Native mobile editor",
 		"slug": "react-native",
 		"markdown_source": "../docs/contributors/code/react-native/README.md",
@@ -2079,6 +2199,12 @@
 		"title": "Deprecations",
 		"slug": "deprecations",
 		"markdown_source": "../docs/contributors/code/deprecations.md",
+		"parent": "code"
+	},
+	{
+		"title": "How To Get Your Pull Request Reviewed?",
+		"slug": "how-to-get-your-pull-request-reviewed",
+		"markdown_source": "../docs/contributors/code/how-to-get-your-pull-request-reviewed.md",
 		"parent": "code"
 	},
 	{

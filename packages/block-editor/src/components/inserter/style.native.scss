@@ -1,11 +1,33 @@
 /** @format */
 
-.addBlockButton {
-	color: $blue-wordpress;
+.inserter-menu__add-block-button-icon {
+	color: $blue-50;
 }
 
-.addBlockButtonDark {
+.inserter-menu__add-block-button-icon--dark {
 	color: $blue-30;
+}
+
+.inserter-menu__add-block-button-icon--expanded {
+	color: $white;
+}
+
+.inserter-menu__add-block-button {
+	border-radius: 22px;
+	background-color: $blue-50;
+	margin: 8px;
+	padding: 6px 16px 6px 12px;
+}
+
+.inserter-menu__add-block-button--dark {
+	background-color: $blue-30;
+}
+
+.inserter-menu__add-block-button-text {
+	color: $white;
+	font-weight: 500;
+	align-self: center;
+	text-transform: capitalize;
 }
 
 .inserter-menu__list-wrapper {

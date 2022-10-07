@@ -6,7 +6,8 @@
 			"showLabel": true,
 			"placeholder": "",
 			"buttonPosition": "button-outside",
-			"buttonUseIcon": false
+			"buttonUseIcon": false,
+			"query": {}
 		},
 		"innerBlocks": []
 	}

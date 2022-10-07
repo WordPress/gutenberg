@@ -58,6 +58,7 @@ class FlakyTestsReporter implements Reporter {
 				fs.writeFileSync(
 					`flaky-tests/${ filenamify( testTitle ) }.json`,
 					JSON.stringify( {
+						version: 1,
 						runner: '@playwright/test',
 						title: testTitle,
 						path: testPath,

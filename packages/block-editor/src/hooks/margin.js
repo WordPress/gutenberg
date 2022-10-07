@@ -2,12 +2,19 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Platform } from '@wordpress/element';
+import {
+	Platform,
+	useMemo,
+	useRef,
+	useState,
+	useEffect,
+} from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -20,6 +27,9 @@ import {
 	useIsDimensionsSupportValid,
 } from './dimensions';
 import { cleanEmptyObject } from './utils';
+import BlockPopover from '../components/block-popover';
+import SpacingSizesControl from '../components/spacing-sizes-control';
+import { getCustomValueFromPreset } from '../components/spacing-sizes-control/utils';
 
 /**
  * Determines if there is margin support.
@@ -93,6 +103,8 @@ export function MarginEdit( props ) {
 		setAttributes,
 	} = props;
 
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [
 			'%',
@@ -124,34 +136,103 @@ export function MarginEdit( props ) {
 		} );
 	};
 
-	const onChangeShowVisualizer = ( next ) => {
-		const newStyle = {
-			...style,
-			visualizers: {
-				margin: next,
-			},
-		};
-
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
-	};
-
 	return Platform.select( {
 		web: (
 			<>
-				<BoxControl
-					values={ style?.spacing?.margin }
-					onChange={ onChange }
-					onChangeShowVisualizer={ onChangeShowVisualizer }
-					label={ __( 'Margin' ) }
-					sides={ sides }
-					units={ units }
-					allowReset={ false }
-					splitOnAxis={ splitOnAxis }
-				/>
+				{ ( ! spacingSizes || spacingSizes?.length === 0 ) && (
+					<BoxControl
+						values={ style?.spacing?.margin }
+						onChange={ onChange }
+						label={ __( 'Margin' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+					/>
+				) }
+				{ spacingSizes?.length > 0 && (
+					<SpacingSizesControl
+						values={ style?.spacing?.margin }
+						onChange={ onChange }
+						label={ __( 'Margin' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ false }
+					/>
+				) }
 			</>
 		),
 		native: null,
 	} );
+}
+
+export function MarginVisualizer( { clientId, attributes } ) {
+	const margin = attributes?.style?.spacing?.margin;
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+
+	const style = useMemo( () => {
+		const marginTop = margin?.top
+			? getCustomValueFromPreset( margin?.top, spacingSizes )
+			: 0;
+		const marginRight = margin?.right
+			? getCustomValueFromPreset( margin?.right, spacingSizes )
+			: 0;
+		const marginBottom = margin?.bottom
+			? getCustomValueFromPreset( margin?.bottom, spacingSizes )
+			: 0;
+		const marginLeft = margin?.left
+			? getCustomValueFromPreset( margin?.left, spacingSizes )
+			: 0;
+
+		return {
+			borderTopWidth: marginTop,
+			borderRightWidth: marginRight,
+			borderBottomWidth: marginBottom,
+			borderLeftWidth: marginLeft,
+			top: marginTop !== 0 ? `calc(${ marginTop } * -1)` : 0,
+			right: marginRight !== 0 ? `calc(${ marginRight } * -1)` : 0,
+			bottom: marginBottom !== 0 ? `calc(${ marginBottom } * -1)` : 0,
+			left: marginLeft !== 0 ? `calc(${ marginLeft } * -1)` : 0,
+		};
+	}, [ margin ] );
+
+	const [ isActive, setIsActive ] = useState( false );
+	const valueRef = useRef( margin );
+	const timeoutRef = useRef();
+
+	const clearTimer = () => {
+		if ( timeoutRef.current ) {
+			window.clearTimeout( timeoutRef.current );
+		}
+	};
+
+	useEffect( () => {
+		if ( ! isShallowEqual( margin, valueRef.current ) ) {
+			setIsActive( true );
+			valueRef.current = margin;
+
+			clearTimer();
+
+			timeoutRef.current = setTimeout( () => {
+				setIsActive( false );
+			}, 400 );
+		}
+
+		return () => clearTimer();
+	}, [ margin ] );
+
+	if ( ! isActive ) {
+		return null;
+	}
+
+	return (
+		<BlockPopover
+			clientId={ clientId }
+			__unstableCoverTarget
+			__unstableRefreshSize={ margin }
+		>
+			<div className="block-editor__padding-visualizer" style={ style } />
+		</BlockPopover>
+	);
 }

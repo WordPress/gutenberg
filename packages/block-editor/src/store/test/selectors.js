@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -54,7 +49,6 @@ const {
 	getDraggedBlockClientIds,
 	isBlockBeingDragged,
 	isAncestorBeingDragged,
-	isCaretWithinFormattedText,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
 	isSelectionEnabled,
@@ -84,7 +78,9 @@ describe( 'selectors', () => {
 	let cachedSelectors;
 
 	beforeAll( () => {
-		cachedSelectors = filter( selectors, ( selector ) => selector.clear );
+		cachedSelectors = Object.entries( selectors )
+			.filter( ( [ , selector ] ) => selector.clear )
+			.map( ( [ , selector ] ) => selector );
 	} );
 
 	beforeEach( () => {
@@ -146,6 +142,41 @@ describe( 'selectors', () => {
 			parent: [ 'core/post-content' ],
 		} );
 
+		registerBlockType( 'core/test-block-ancestor', {
+			save: ( props ) => props.attributes.text,
+			category: 'text',
+			title: 'Test Block required as ancestor',
+			icon: 'test',
+			keywords: [ 'testing' ],
+		} );
+
+		registerBlockType( 'core/test-block-parent', {
+			save: ( props ) => props.attributes.text,
+			category: 'text',
+			title: 'Test Block required as parent',
+			icon: 'test',
+			keywords: [ 'testing' ],
+		} );
+
+		registerBlockType( 'core/test-block-requires-ancestor', {
+			save: ( props ) => props.attributes.text,
+			category: 'text',
+			title: 'Test Block that requires ancestor',
+			icon: 'test',
+			keywords: [ 'testing' ],
+			ancestor: [ 'core/test-block-ancestor' ],
+		} );
+
+		registerBlockType( 'core/test-block-requires-ancestor-parent', {
+			save: ( props ) => props.attributes.text,
+			category: 'text',
+			title: 'Test Block that requires both ancestor and parent',
+			icon: 'test',
+			keywords: [ 'testing' ],
+			parent: [ 'core/test-block-parent' ],
+			ancestor: [ 'core/test-block-ancestor' ],
+		} );
+
 		setFreeformContentHandlerName( 'core/test-freeform' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
@@ -158,6 +189,10 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-c' );
 		unregisterBlockType( 'core/test-freeform' );
 		unregisterBlockType( 'core/post-content-child' );
+		unregisterBlockType( 'core/test-block-ancestor' );
+		unregisterBlockType( 'core/test-block-parent' );
+		unregisterBlockType( 'core/test-block-requires-ancestor' );
+		unregisterBlockType( 'core/test-block-requires-ancestor-parent' );
 
 		setFreeformContentHandlerName( undefined );
 	} );
@@ -448,7 +483,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getClientIdsOfDescendants', () => {
-		it( 'should return the ids of any descendants, given an array of clientIds', () => {
+		it( 'should return the ids of any descendants in sequential order, given an array of clientIds', () => {
 			const state = {
 				blocks: {
 					byClientId: {
@@ -537,23 +572,23 @@ describe( 'selectors', () => {
 					controlledInnerBlocks: {},
 				},
 			};
-			expect(
-				getClientIdsOfDescendants( state, [ 'uuid-10' ] )
-			).toEqual( [
-				'uuid-12',
-				'uuid-14',
-				'uuid-16',
-				'uuid-18',
-				'uuid-24',
-				'uuid-26',
-				'uuid-28',
-				'uuid-30',
-			] );
+			expect( getClientIdsOfDescendants( state, [ 'uuid-10' ] ) ).toEqual(
+				[
+					'uuid-12',
+					'uuid-16',
+					'uuid-14',
+					'uuid-18',
+					'uuid-24',
+					'uuid-26',
+					'uuid-28',
+					'uuid-30',
+				]
+			);
 		} );
 	} );
 
 	describe( 'getClientIdsWithDescendants', () => {
-		it( 'should return the ids for top-level blocks and their descendants of any depth (for nested blocks).', () => {
+		it( 'should return the ids for top-level blocks and their descendants of any depth (for nested blocks) in sequential order.', () => {
 			const state = {
 				blocks: {
 					byClientId: {
@@ -645,15 +680,15 @@ describe( 'selectors', () => {
 				'uuid-6',
 				'uuid-8',
 				'uuid-10',
-				'uuid-22',
 				'uuid-12',
-				'uuid-14',
 				'uuid-16',
+				'uuid-14',
 				'uuid-18',
 				'uuid-24',
 				'uuid-26',
 				'uuid-28',
 				'uuid-30',
+				'uuid-22',
 			] );
 		} );
 	} );
@@ -1244,9 +1279,7 @@ describe( 'selectors', () => {
 			};
 
 			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [
-				4,
-				3,
-				2,
+				4, 3, 2,
 			] );
 		} );
 
@@ -1276,9 +1309,7 @@ describe( 'selectors', () => {
 			};
 
 			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [
-				9,
-				8,
-				7,
+				9, 8, 7,
 			] );
 		} );
 	} );
@@ -2017,24 +2048,6 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isCaretWithinFormattedText', () => {
-		it( 'returns true if the isCaretWithinFormattedText state is also true', () => {
-			const state = {
-				isCaretWithinFormattedText: true,
-			};
-
-			expect( isCaretWithinFormattedText( state ) ).toBe( true );
-		} );
-
-		it( 'returns false if the isCaretWithinFormattedText state is also false', () => {
-			const state = {
-				isCaretWithinFormattedText: false,
-			};
-
-			expect( isCaretWithinFormattedText( state ) ).toBe( false );
-		} );
-	} );
-
 	describe( 'isSelectionEnabled', () => {
 		it( 'should return true if selection is enable', () => {
 			const state = {
@@ -2475,6 +2488,198 @@ describe( 'selectors', () => {
 				canInsertBlockType( state, 'core/post-content-child' )
 			).toBe( true );
 		} );
+
+		it( 'should allow blocks to be inserted in a descendant of a required ancestor', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: { name: 'core/test-block-ancestor' },
+						block2: { name: 'core/block' },
+					},
+					attributes: {
+						block1: {},
+						block2: {},
+					},
+					parents: {
+						block2: 'block1',
+					},
+				},
+				blockListSettings: {
+					block1: {},
+					block2: {},
+				},
+				settings: {},
+			};
+			expect(
+				canInsertBlockType(
+					state,
+					'core/test-block-requires-ancestor',
+					'block2'
+				)
+			).toBe( true );
+		} );
+
+		it( 'should allow blocks to be inserted if both parent and ancestor restrictions are met', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: { name: 'core/test-block-ancestor' },
+						block2: { name: 'core/block' },
+						block3: { name: 'core/test-block-parent' },
+					},
+					attributes: {
+						block1: {},
+						block2: {},
+						block3: {},
+					},
+					parents: {
+						block2: 'block1',
+						block3: 'block2',
+					},
+				},
+				blockListSettings: {
+					block1: {},
+					block2: {},
+					block3: {},
+				},
+				settings: {},
+			};
+			expect(
+				canInsertBlockType(
+					state,
+					'core/test-block-requires-ancestor-parent',
+					'block3'
+				)
+			).toBe( true );
+		} );
+
+		it( 'should deny blocks from being inserted outside a required ancestor', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: { name: 'core/test-block-ancestor' },
+						block2: { name: 'core/block' },
+						block3: { name: 'core/block' },
+					},
+					attributes: {
+						block1: {},
+						block2: {},
+						block3: {},
+					},
+					parents: {
+						block3: 'block2',
+					},
+				},
+				blockListSettings: {
+					block1: {},
+					block2: {},
+					block3: {},
+				},
+				settings: {},
+			};
+			expect(
+				canInsertBlockType(
+					state,
+					'core/test-block-requires-ancestor',
+					'block3'
+				)
+			).toBe( false );
+		} );
+
+		it( 'should deny blocks from being inserted outside of a required ancestor, even if parent matches', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: { name: 'core/test-block-ancestor' },
+						block2: { name: 'core/block' },
+						block3: { name: 'core/test-block-parent' },
+					},
+					attributes: {
+						block1: {},
+						block2: {},
+						block3: {},
+					},
+					parents: {
+						block3: 'block2',
+					},
+				},
+				blockListSettings: {
+					block1: {},
+					block2: {},
+					block3: {},
+				},
+				settings: {},
+			};
+			expect(
+				canInsertBlockType(
+					state,
+					'core/test-block-requires-ancestor-parent',
+					'block3'
+				)
+			).toBe( false );
+		} );
+
+		it( 'should deny blocks from being inserted inside ancestor if parent restricts allowedBlocks', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: { name: 'core/test-block-ancestor' },
+						block2: { name: 'core/block' },
+					},
+					attributes: {
+						block1: {},
+						block2: {},
+					},
+					parents: {
+						block2: 'block1',
+					},
+				},
+				blockListSettings: {
+					block1: {},
+					block2: {
+						allowedBlocks: [],
+					},
+				},
+				settings: {},
+			};
+			expect(
+				canInsertBlockType(
+					state,
+					'core/test-block-requires-ancestor',
+					'block2'
+				)
+			).toBe( false );
+		} );
+
+		it( 'should deny blocks from being inserted inside ancestor if parent restriction is not met', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: { name: 'core/test-block-ancestor' },
+						block2: { name: 'core/block' },
+					},
+					attributes: {
+						block1: {},
+						block2: {},
+					},
+					parents: {
+						block2: 'block1',
+					},
+				},
+				blockListSettings: {
+					block1: {},
+					block2: {},
+				},
+				settings: {},
+			};
+			expect(
+				canInsertBlockType(
+					state,
+					'core/test-block-requires-ancestor-parent',
+					'block2'
+				)
+			).toBe( false );
+		} );
 	} );
 
 	describe( 'canInsertBlocks', () => {
@@ -2681,6 +2886,8 @@ describe( 'selectors', () => {
 				'core/test-block-a',
 				'core/test-block-b',
 				'core/test-freeform',
+				'core/test-block-ancestor',
+				'core/test-block-parent',
 				'core/block/1',
 				'core/block/2',
 			] );
@@ -2695,12 +2902,14 @@ describe( 'selectors', () => {
 				'core/test-block-a',
 				'core/test-block-b',
 				'core/test-freeform',
+				'core/test-block-ancestor',
+				'core/test-block-parent',
 				'core/block/1',
 				'core/block/2',
 			] );
-			expect(
-				secondBlockSecondCall.map( ( item ) => item.id )
-			).toEqual( [ 'core/test-block-b' ] );
+			expect( secondBlockSecondCall.map( ( item ) => item.id ) ).toEqual(
+				[ 'core/test-block-b' ]
+			);
 		} );
 
 		it( 'should set isDisabled when a block with `multiple: false` has been used', () => {
@@ -2727,6 +2936,7 @@ describe( 'selectors', () => {
 						},
 					},
 					controlledInnerBlocks: {},
+					parents: {},
 				},
 				preferences: {
 					insertUsage: {},
@@ -2876,6 +3086,23 @@ describe( 'selectors', () => {
 				] )
 			);
 		} );
+		it( 'should support single block object', () => {
+			const state = {
+				blocks: {
+					byClientId: {},
+					attributes: {},
+					order: {},
+					parents: {},
+					cache: {},
+				},
+				settings: {},
+				preferences: {},
+				blockListSettings: {},
+			};
+			const block = { name: 'core/with-tranforms-a' };
+			const items = getBlockTransformItems( state, block );
+			expect( items ).toHaveLength( 2 );
+		} );
 		it( 'should return only eligible blocks for transformation - `allowedBlocks`', () => {
 			const state = {
 				blocks: {
@@ -2935,6 +3162,7 @@ describe( 'selectors', () => {
 						},
 					},
 					controlledInnerBlocks: {},
+					parents: {},
 				},
 				preferences: {
 					insertUsage: {},
@@ -3025,7 +3253,7 @@ describe( 'selectors', () => {
 			expect( getTemplateLock( state ) ).toBe( 'all' );
 		} );
 
-		it( 'should return null if the specified clientId was not found', () => {
+		it( 'should return undefined if the specified clientId was not found', () => {
 			const state = {
 				settings: { templateLock: 'all' },
 				blockListSettings: {
@@ -3035,10 +3263,10 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getTemplateLock( state, 'ribs' ) ).toBe( null );
+			expect( getTemplateLock( state, 'ribs' ) ).toBe( undefined );
 		} );
 
-		it( 'should return null if template lock was not set on the specified block', () => {
+		it( 'should return undefined if template lock was not set on the specified block', () => {
 			const state = {
 				settings: { templateLock: 'all' },
 				blockListSettings: {
@@ -3048,7 +3276,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getTemplateLock( state, 'ribs' ) ).toBe( null );
+			expect( getTemplateLock( state, 'ribs' ) ).toBe( undefined );
 		} );
 
 		it( 'should return the template lock for the specified clientId', () => {

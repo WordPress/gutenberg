@@ -87,6 +87,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type Taxonomy< C extends Context > = OmitNevers<
+export type Taxonomy< C extends Context = 'edit' > = OmitNevers<
 	_BaseEntityRecords.Taxonomy< C >
 >;

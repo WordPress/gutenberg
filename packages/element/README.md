@@ -225,6 +225,15 @@ _Returns_
 
 A component which renders its children without any wrapping element.
 
+### hydrate
+
+Hydrates a given element into the target DOM node.
+
+_Parameters_
+
+-   _element_ `import('./react').WPElement`: Element to hydrate.
+-   _target_ `HTMLElement`: DOM node into which element should be hydrated.
+
 ### isEmptyElement
 
 Checks if the provided WP element is empty.

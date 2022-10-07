@@ -4,7 +4,6 @@
  * External dependencies
  */
 import { View, Platform, Dimensions } from 'react-native';
-import { get, pickBy, debounce } from 'lodash';
 import memize from 'memize';
 import { colord } from 'colord';
 
@@ -18,7 +17,11 @@ import {
 } from '@wordpress/react-native-bridge';
 import { BlockFormatControls, getPxFromCssUnit } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import {
+	compose,
+	debounce,
+	withPreferredColorScheme,
+} from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -50,6 +53,15 @@ import ToolbarButtonWithOptions from './toolbar-button-with-options';
 const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
 };
+
+// The flattened color palettes array is memoized to ensure that the same array instance is
+// returned for the colors palettes. This value might be used as a prop, so having the same
+// instance will prevent unnecessary re-renders of the RichText component.
+const flatColorPalettes = memize( ( colorsPalettes ) => [
+	...( colorsPalettes?.theme || [] ),
+	...( colorsPalettes?.custom || [] ),
+	...( colorsPalettes?.default || [] ),
+] );
 
 const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
@@ -100,9 +112,8 @@ export class RichText extends Component {
 		this.debounceCreateUndoLevel = debounce( this.onCreateUndoLevel, 1000 );
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change.
 		this.onSelectionChange = this.onSelectionChange.bind( this );
-		this.onSelectionChangeFromAztec = this.onSelectionChangeFromAztec.bind(
-			this
-		);
+		this.onSelectionChangeFromAztec =
+			this.onSelectionChangeFromAztec.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.getHtmlToRender = this.getHtmlToRender.bind( this );
 		this.handleSuggestionFunc = this.handleSuggestionFunc.bind( this );
@@ -116,12 +127,10 @@ export class RichText extends Component {
 		).bind( this );
 		this.suggestionOptions = this.suggestionOptions.bind( this );
 		this.insertString = this.insertString.bind( this );
-		this.manipulateEventCounterToForceNativeToRefresh = this.manipulateEventCounterToForceNativeToRefresh.bind(
-			this
-		);
-		this.shouldDropEventFromAztec = this.shouldDropEventFromAztec.bind(
-			this
-		);
+		this.manipulateEventCounterToForceNativeToRefresh =
+			this.manipulateEventCounterToForceNativeToRefresh.bind( this );
+		this.shouldDropEventFromAztec =
+			this.shouldDropEventFromAztec.bind( this );
 		this.state = {
 			activeFormats: [],
 			selectedFormat: null,
@@ -218,8 +227,10 @@ export class RichText extends Component {
 
 	onFormatChange( record ) {
 		const { start = 0, end = 0, activeFormats = [] } = record;
-		const changeHandlers = pickBy( this.props, ( v, key ) =>
-			key.startsWith( 'format_on_change_functions_' )
+		const changeHandlers = Object.fromEntries(
+			Object.entries( this.props ).filter( ( [ key ] ) =>
+				key.startsWith( 'format_on_change_functions_' )
+			)
 		);
 
 		Object.values( changeHandlers ).forEach( ( changeHandler ) => {
@@ -1039,6 +1050,10 @@ export class RichText extends Component {
 			accessibilityLabel,
 			disableEditingMenu = false,
 			baseGlobalStyles,
+			selectionStart,
+			selectionEnd,
+			disableSuggestions,
+			containerWidth,
 		} = this.props;
 		const { currentFontSize } = this.state;
 
@@ -1065,12 +1080,14 @@ export class RichText extends Component {
 			defaultTextDecorationColor
 		);
 
+		const currentSelectionStart = selectionStart ?? 0;
+		const currentSelectionEnd = selectionEnd ?? 0;
 		let selection = null;
 		if ( this.needsSelectionUpdate ) {
 			this.needsSelectionUpdate = false;
 			selection = {
-				start: this.props.selectionStart,
-				end: this.props.selectionEnd,
+				start: currentSelectionStart,
+				end: currentSelectionEnd,
 			};
 
 			// On AztecAndroid, setting the caret to an out-of-bounds position will crash the editor so, let's check for some cases.
@@ -1086,12 +1103,11 @@ export class RichText extends Component {
 						brBeforeParaMatches[ 0 ].match( /br/g ) || []
 					).length;
 					if ( count > 0 ) {
-						let newSelectionStart =
-							this.props.selectionStart - count;
+						let newSelectionStart = currentSelectionStart - count;
 						if ( newSelectionStart < 0 ) {
 							newSelectionStart = 0;
 						}
-						let newSelectionEnd = this.props.selectionEnd - count;
+						let newSelectionEnd = currentSelectionEnd - count;
 						if ( newSelectionEnd < 0 ) {
 							newSelectionEnd = 0;
 						}
@@ -1114,11 +1130,16 @@ export class RichText extends Component {
 			maxWidth && this.state.width && maxWidth - this.state.width < 10
 				? maxWidth
 				: this.state.width;
-		const containerStyles = style?.padding &&
-			style?.backgroundColor && {
-				padding: style.padding,
-				backgroundColor: style.backgroundColor,
-			};
+		const containerStyles = [
+			style?.padding &&
+				style?.backgroundColor && {
+					padding: style.padding,
+					backgroundColor: style.backgroundColor,
+				},
+			containerWidth && {
+				width: containerWidth,
+			},
+		];
 
 		const EditableView = ( props ) => {
 			this.customEditableOnKeyDown = props?.onKeyDown;
@@ -1208,6 +1229,7 @@ export class RichText extends Component {
 					minWidth={ minWidth }
 					id={ this.props.id }
 					selectionColor={ this.props.selectionColor }
+					disableAutocorrection={ this.props.disableAutocorrection }
 				/>
 				{ isSelected && (
 					<>
@@ -1218,11 +1240,13 @@ export class RichText extends Component {
 							onChange={ this.onFormatChange }
 							onFocus={ () => {} }
 						/>
-						<BlockFormatControls>
-							<ToolbarButtonWithOptions
-								options={ this.suggestionOptions() }
-							/>
-						</BlockFormatControls>
+						{ ! disableSuggestions && (
+							<BlockFormatControls>
+								<ToolbarButtonWithOptions
+									options={ this.suggestionOptions() }
+								/>
+							</BlockFormatControls>
+						) }
 					</>
 				) }
 			</View>
@@ -1237,10 +1261,17 @@ RichText.defaultProps = {
 };
 
 const withFormatTypes = ( WrappedComponent ) => ( props ) => {
+	const {
+		clientId,
+		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats,
+	} = props;
 	const { formatTypes } = useFormatTypes( {
-		clientId: props.clientId,
-		identifier: props.identifier,
-		withoutInteractiveFormatting: props.withoutInteractiveFormatting,
+		clientId,
+		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats,
 	} );
 
 	return <WrappedComponent { ...props } formatTypes={ formatTypes } />;
@@ -1248,26 +1279,18 @@ const withFormatTypes = ( WrappedComponent ) => ( props ) => {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockParents, getBlock, getSettings } = select(
-			'core/block-editor'
-		);
+		const { getBlockParents, getBlock, getSettings } =
+			select( 'core/block-editor' );
 		const parents = getBlockParents( clientId, true );
 		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;
-		const parentBlockStyles = get( parentBlock, [
-			'attributes',
-			'childrenStyles',
-		] );
+		const parentBlockStyles = parentBlock?.attributes?.childrenStyles;
 
 		const settings = getSettings();
 		const baseGlobalStyles = settings?.__experimentalGlobalStylesBaseStyles;
-		const colorsPalettes = settings?.__experimentalFeatures?.color?.palette;
-		const allColorsPalette = [
-			...( colorsPalettes?.theme || [] ),
-			...( colorsPalettes?.custom || [] ),
-			...( colorsPalettes?.default || [] ),
-		];
-		const colorPalette = colorsPalettes
-			? allColorsPalette
+
+		const colorPalettes = settings?.__experimentalFeatures?.color?.palette;
+		const colorPalette = colorPalettes
+			? flatColorPalettes( colorPalettes )
 			: settings?.colors;
 
 		return {

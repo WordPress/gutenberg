@@ -46,9 +46,8 @@ describe( 'Sandbox', () => {
 
 		const iframe = result.container.querySelector( '.components-sandbox' );
 
-		let sandboxedIframe = iframe.contentWindow.document.body.querySelector(
-			'.mock-iframe'
-		);
+		let sandboxedIframe =
+			iframe.contentWindow.document.body.querySelector( '.mock-iframe' );
 
 		expect( sandboxedIframe.getAttribute( 'src' ) ).toBe(
 			'https://super.embed'
@@ -58,9 +57,8 @@ describe( 'Sandbox', () => {
 			fireEvent.click( result.getByRole( 'button' ) );
 		} );
 
-		sandboxedIframe = iframe.contentWindow.document.body.querySelector(
-			'.mock-iframe'
-		);
+		sandboxedIframe =
+			iframe.contentWindow.document.body.querySelector( '.mock-iframe' );
 
 		expect( sandboxedIframe.getAttribute( 'src' ) ).toBe(
 			'https://another.super.embed'

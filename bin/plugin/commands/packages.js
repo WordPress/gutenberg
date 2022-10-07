@@ -40,12 +40,14 @@ const { join } = require( 'path' );
  * @property {boolean} [ci]             Disables interactive mode when executed in CI mode.
  * @property {string}  [repositoryPath] Relative path to the git repository.
  * @property {SemVer}  [semver]         The selected semantic versioning. Defaults to `patch`.
+ * @property {string}  [wpVersion]      The major WordPress version number, example: `6.0`.
  */
 
 /**
  * @typedef WPPackagesConfig
  *
  * @property {string}      abortMessage            Abort Message.
+ * @property {string}      distTag                 The dist-tag used for npm publishing.
  * @property {string}      gitWorkingDirectoryPath Git working directory path.
  * @property {boolean}     interactive             Whether to run in interactive mode.
  * @property {SemVer}      minimumVersionBump      The selected minimum version bump.
@@ -141,6 +143,14 @@ async function updatePackages( config ) {
 		minimumVersionBump,
 		releaseType,
 	} = config;
+
+	if ( releaseType === 'wp' ) {
+		log(
+			'>> Skipping CHANGELOG files processing when targeting WordPress core.'
+		);
+		return;
+	}
+
 	const changelogFiles = await glob(
 		path.resolve( gitWorkingDirectoryPath, 'packages/*/CHANGELOG.md' )
 	);
@@ -152,10 +162,6 @@ async function updatePackages( config ) {
 			) );
 			return pkg.private !== true;
 		}
-	);
-
-	const productionPackageNames = Object.keys(
-		require( '../../../package.json' ).dependencies
 	);
 
 	const processedPackages = await Promise.all(
@@ -177,13 +183,12 @@ async function updatePackages( config ) {
 			const packageName = `@wordpress/${
 				changelogPath.split( '/' ).reverse()[ 1 ]
 			}`;
-			// Enforce version bump for production packages when
+			// Enforce version bump for all packages when
 			// the stable minor or major version bump requested.
 			if (
 				! versionBump &&
 				releaseType !== 'next' &&
-				minimumVersionBump !== 'patch' &&
-				productionPackageNames.includes( packageName )
+				minimumVersionBump !== 'patch'
 			) {
 				versionBump = minimumVersionBump;
 			}
@@ -323,6 +328,7 @@ async function runPushGitChangesStep( {
  * @return {?string} The optional commit's hash when packages published to npm.
  */
 async function publishPackagesToNpm( {
+	distTag,
 	gitWorkingDirectoryPath,
 	interactive,
 	minimumVersionBump,
@@ -360,16 +366,16 @@ async function publishPackagesToNpm( {
 
 		log( '>> Publishing modified packages to npm.' );
 		await command(
-			`npx lerna publish from-package --dist-tag next ${ yesFlag } ${ noVerifyAccessFlag }`,
+			`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
 			}
 		);
-	} else if ( releaseType === 'bugfix' ) {
+	} else if ( [ 'bugfix', 'wp' ].includes( releaseType ) ) {
 		log( '>> Publishing modified packages to npm.' );
 		await command(
-			`npx lerna publish ${ minimumVersionBump } --no-private ${ yesFlag } ${ noVerifyAccessFlag }`,
+			`npx lerna publish ${ minimumVersionBump } --dist-tag ${ distTag } --no-private ${ yesFlag } ${ noVerifyAccessFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
@@ -528,54 +534,81 @@ async function runPackagesRelease( config, customMessages ) {
  *
  * @return {WPPackagesConfig} The config object.
  */
-function getConfig( releaseType, { ci, repositoryPath, semver } ) {
+function getConfig(
+	releaseType,
+	{ ci, repositoryPath, semver = 'patch', wpVersion }
+) {
+	let distTag = 'latest';
+	let npmReleaseBranch = 'wp/latest';
+	if ( releaseType === 'next' ) {
+		distTag = 'next';
+		npmReleaseBranch = 'wp/next';
+	} else if ( releaseType === 'wp' ) {
+		distTag = `wp-${ wpVersion }`;
+		npmReleaseBranch = `wp/${ wpVersion }`;
+	}
+
 	return {
 		abortMessage: 'Aborting!',
+		distTag,
 		gitWorkingDirectoryPath:
 			repositoryPath && join( process.cwd(), repositoryPath ),
 		interactive: ! ci,
 		minimumVersionBump: semver,
-		npmReleaseBranch: releaseType === 'next' ? 'wp/next' : 'wp/latest',
+		npmReleaseBranch,
 		releaseType,
 	};
 }
 
 /**
- * Publishes a new latest version of WordPress packages.
+ * Publishes to npm packages synced from the Gutenberg plugin (latest dist-tag, production version).
  *
  * @param {WPPackagesCommandOptions} options Command options.
  */
-async function publishNpmLatestDistTag( options ) {
+async function publishNpmGutenbergPlugin( options ) {
 	await runPackagesRelease( getConfig( 'latest', options ), [
-		'Welcome! This tool helps with publishing a new latest version of WordPress packages.\n',
+		'Welcome! This tool helps with npm publishing a new latest version of WordPress packages synced from the Gutenberg plugin.\n',
 	] );
 }
 
 /**
- * Publishes a new latest version of WordPress packages.
+ * Publishes to npm bugfixes for packages (latest dist-tag, production version).
  *
  * @param {WPPackagesCommandOptions} options Command options.
  */
-async function publishNpmBugfixLatestDistTag( options ) {
+async function publishNpmBugfixLatest( options ) {
 	await runPackagesRelease( getConfig( 'bugfix', options ), [
-		'Welcome! This tool is going to help you with publishing a new bugfix version of WordPress packages with the latest dist tag.\n',
-		'Make sure that all required changes have been already cherry-picked to the release branch.\n',
+		'Welcome! This tool helps with npm publishing a new bugfix version of WordPress packages.\n',
+		'Make sure that all required changes have been already cherry-picked to the `wp/latest` release branch.\n',
 	] );
 }
 
 /**
- * Publishes a new next version of WordPress packages.
+ * Publishes to npm bugfixes targeting WordPress core (wp-X.Y dist-tag, production version).
  *
  * @param {WPPackagesCommandOptions} options Command options.
  */
-async function publishNpmNextDistTag( options ) {
+async function publishNpmBugfixWordPressCore( options ) {
+	await runPackagesRelease( getConfig( 'wp', options ), [
+		'Welcome! This tool helps with npm publishing a new bugfix version of WordPress packages targeting WordPress core.\n',
+		'Make sure that all required changes have been already cherry-picked to the `wp/X.Y` release branch.\n',
+	] );
+}
+
+/**
+ * Publishes to npm development version of packages (next dist-tag, prerelease version).
+ *
+ * @param {WPPackagesCommandOptions} options Command options.
+ */
+async function publishNpmNext( options ) {
 	await runPackagesRelease( getConfig( 'next', options ), [
-		'Welcome! This tool helps with publishing a new next version of WordPress packages.\n',
+		'Welcome! This tool helps with npm publishing a development version of WordPress packages.\n',
 	] );
 }
 
 module.exports = {
-	publishNpmLatestDistTag,
-	publishNpmBugfixLatestDistTag,
-	publishNpmNextDistTag,
+	publishNpmGutenbergPlugin,
+	publishNpmBugfixLatest,
+	publishNpmBugfixWordPressCore,
+	publishNpmNext,
 };

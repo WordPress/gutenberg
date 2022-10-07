@@ -47,10 +47,10 @@ import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
+import StartPageOptions from '../start-page-options';
 import { store as editPostStore } from '../../store';
 
 const interfaceLabels = {
-	secondarySidebar: __( 'Block library' ),
 	/* translators: accessibility text for the editor top bar landmark region. */
 	header: __( 'Editor top bar' ),
 	/* translators: accessibility text for the editor content landmark region. */
@@ -66,11 +66,8 @@ const interfaceLabels = {
 function Layout( { styles } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
-	const {
-		openGeneralSidebar,
-		closeGeneralSidebar,
-		setIsInserterOpened,
-	} = useDispatch( editPostStore );
+	const { openGeneralSidebar, closeGeneralSidebar, setIsInserterOpened } =
+		useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
 		mode,
@@ -96,17 +93,15 @@ function Layout( { styles } ) {
 
 		return {
 			isTemplateMode: select( editPostStore ).isEditingTemplate(),
-			hasFixedToolbar: select( editPostStore ).isFeatureActive(
-				'fixedToolbar'
-			),
+			hasFixedToolbar:
+				select( editPostStore ).isFeatureActive( 'fixedToolbar' ),
 			sidebarIsOpened: !! (
 				select( interfaceStore ).getActiveComplementaryArea(
 					editPostStore.name
 				) || select( editPostStore ).isPublishSidebarOpened()
 			),
-			isFullscreenActive: select( editPostStore ).isFeatureActive(
-				'fullscreenMode'
-			),
+			isFullscreenActive:
+				select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
 			isInserterOpened: select( editPostStore ).isInserterOpened(),
 			isListViewOpened: select( editPostStore ).isListViewOpened(),
 			mode: select( editPostStore ).getEditorMode(),
@@ -118,12 +113,10 @@ function Layout( { styles } ) {
 			nextShortcut: select(
 				keyboardShortcutsStore
 			).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
-			showIconLabels: select( editPostStore ).isFeatureActive(
-				'showIconLabels'
-			),
-			hasReducedUI: select( editPostStore ).isFeatureActive(
-				'reducedUI'
-			),
+			showIconLabels:
+				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
+			hasReducedUI:
+				select( editPostStore ).isFeatureActive( 'reducedUI' ),
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
 			),
@@ -156,10 +149,8 @@ function Layout( { styles } ) {
 
 	// Local state for save panel.
 	// Note 'truthy' callback implies an open panel.
-	const [
-		entitiesSavedStatesCallback,
-		setEntitiesSavedStatesCallback,
-	] = useState( false );
+	const [ entitiesSavedStatesCallback, setEntitiesSavedStatesCallback ] =
+		useState( false );
 	const closeEntitiesSavedStates = useCallback(
 		( arg ) => {
 			if ( typeof entitiesSavedStatesCallback === 'function' ) {
@@ -170,6 +161,10 @@ function Layout( { styles } ) {
 		[ entitiesSavedStatesCallback ]
 	);
 
+	const secondarySidebarLabel = isListViewOpened
+		? __( 'List View' )
+		: __( 'Block Library' );
+
 	const secondarySidebar = () => {
 		if ( mode === 'visual' && isInserterOpened ) {
 			return <InserterSidebar />;
@@ -177,6 +172,7 @@ function Layout( { styles } ) {
 		if ( mode === 'visual' && isListViewOpened ) {
 			return <ListViewSidebar />;
 		}
+
 		return null;
 	};
 
@@ -204,7 +200,10 @@ function Layout( { styles } ) {
 			<SettingsSidebar />
 			<InterfaceSkeleton
 				className={ className }
-				labels={ interfaceLabels }
+				labels={ {
+					...interfaceLabels,
+					secondarySidebar: secondarySidebarLabel,
+				} }
 				header={
 					<Header
 						setEntitiesSavedStatesCallback={
@@ -286,6 +285,7 @@ function Layout( { styles } ) {
 			<EditPostPreferencesModal />
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
+			<StartPageOptions />
 			<Popover.Slot />
 			<PluginArea onError={ onPluginAreaError } />
 		</>

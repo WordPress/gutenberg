@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { get, find, isString } from 'lodash';
+import { get, find } from 'lodash';
+
+/**
+ * Internal dependencies
+ */
+import { getTypographyFontSizeValue } from './typography-utils';
 
 /* Supporting data. */
 export const ROOT_BLOCK_NAME = 'root';
@@ -11,6 +16,7 @@ export const ROOT_BLOCK_SUPPORTS = [
 	'backgroundColor',
 	'color',
 	'linkColor',
+	'buttonColor',
 	'fontFamily',
 	'fontSize',
 	'fontStyle',
@@ -50,7 +56,15 @@ export const PRESET_METADATA = [
 		],
 	},
 	{
+		path: [ 'color', 'duotone' ],
+		cssVarInfix: 'duotone',
+		valueFunc: ( { slug } ) => `url( '#wp-duotone-${ slug }' )`,
+		classes: [],
+	},
+	{
 		path: [ 'typography', 'fontSizes' ],
+		valueFunc: ( preset, { typography: typographySettings } ) =>
+			getTypographyFontSizeValue( preset, typographySettings ),
 		valueKey: 'size',
 		cssVarInfix: 'font-size',
 		classes: [ { classSuffix: 'font-size', propertyName: 'font-size' } ],
@@ -63,12 +77,24 @@ export const PRESET_METADATA = [
 			{ classSuffix: 'font-family', propertyName: 'font-family' },
 		],
 	},
+	{
+		path: [ 'spacing', 'spacingSizes' ],
+		valueKey: 'size',
+		cssVarInfix: 'spacing',
+		valueFunc: ( { size } ) => size,
+		classes: [],
+	},
 ];
 
 const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'color.background': 'color',
 	'color.text': 'color',
 	'elements.link.color.text': 'color',
+	'elements.button.color.text': 'color',
+	'elements.button.backgroundColor': 'background-color',
+	'elements.heading.color': 'color',
+	'elements.heading.backgroundColor': 'background-color',
+	'elements.heading.gradient': 'gradient',
 	'color.gradient': 'gradient',
 	'typography.fontSize': 'font-size',
 	'typography.fontFamily': 'font-family',
@@ -176,7 +202,7 @@ function getValueFromPresetVariable(
 	}
 
 	const presetObject = findInPresetsBy(
-		features,
+		features.settings,
 		blockName,
 		metadata.path,
 		'slug',
@@ -194,8 +220,8 @@ function getValueFromPresetVariable(
 
 function getValueFromCustomVariable( features, blockName, variable, path ) {
 	const result =
-		get( features, [ 'blocks', blockName, 'custom', ...path ] ) ??
-		get( features, [ 'custom', ...path ] );
+		get( features.settings, [ 'blocks', blockName, 'custom', ...path ] ) ??
+		get( features.settings, [ 'custom', ...path ] );
 	if ( ! result ) {
 		return variable;
 	}
@@ -203,9 +229,27 @@ function getValueFromCustomVariable( features, blockName, variable, path ) {
 	return getValueFromVariable( features, blockName, result );
 }
 
+/**
+ * Attempts to fetch the value of a theme.json CSS variable.
+ *
+ * @param {Object}   features  GlobalStylesContext config, e.g., user, base or merged. Represents the theme.json tree.
+ * @param {string}   blockName The name of a block as represented in the styles property. E.g., 'root' for root-level, and 'core/${blockName}' for blocks.
+ * @param {string|*} variable  An incoming style value. A CSS var value is expected, but it could be any value.
+ * @return {string|*|{ref}} The value of the CSS var, if found. If not found, the passed variable argument.
+ */
 export function getValueFromVariable( features, blockName, variable ) {
-	if ( ! variable || ! isString( variable ) ) {
-		return variable;
+	if ( ! variable || typeof variable !== 'string' ) {
+		if ( variable?.ref && typeof variable?.ref === 'string' ) {
+			const refPath = variable.ref.split( '.' );
+			variable = get( features, refPath );
+			// Presence of another ref indicates a reference to another dynamic value.
+			// Pointing to another dynamic value is not supported.
+			if ( ! variable || !! variable?.ref ) {
+				return variable;
+			}
+		} else {
+			return variable;
+		}
 	}
 	const USER_VALUE_PREFIX = 'var:';
 	const THEME_VALUE_PREFIX = 'var(--wp--';
@@ -245,4 +289,35 @@ export function getValueFromVariable( features, blockName, variable ) {
 		);
 	}
 	return variable;
+}
+
+/**
+ * Function that scopes a selector with another one. This works a bit like
+ * SCSS nesting except the `&` operator isn't supported.
+ *
+ * @example
+ * ```js
+ * const scope = '.a, .b .c';
+ * const selector = '> .x, .y';
+ * const merged = scopeSelector( scope, selector );
+ * // merged is '.a > .x, .a .y, .b .c > .x, .b .c .y'
+ * ```
+ *
+ * @param {string} scope    Selector to scope to.
+ * @param {string} selector Original selector.
+ *
+ * @return {string} Scoped selector.
+ */
+export function scopeSelector( scope, selector ) {
+	const scopes = scope.split( ',' );
+	const selectors = selector.split( ',' );
+
+	const selectorsScoped = [];
+	scopes.forEach( ( outer ) => {
+		selectors.forEach( ( inner ) => {
+			selectorsScoped.push( `${ outer.trim() } ${ inner.trim() }` );
+		} );
+	} );
+
+	return selectorsScoped.join( ', ' );
 }

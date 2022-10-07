@@ -8,14 +8,15 @@ Also, this tutorial will lean heavily on Redux concepts such as state, actions, 
 
 We'll do all the development inside of a WordPress plugin. Let's start by creating a `wp-content/plugins/my-first-gutenberg-app` directory in your local WordPress environment. We will need to create four files inside that directory:
 
-* my-first-gutenberg-app.php – to create a new admin page
-* src/index.js – for our JavaScript application
-* style.css – for the minimal stylesheet
-* package.json – for the build process
+-   my-first-gutenberg-app.php – to create a new admin page
+-   src/index.js – for our JavaScript application
+-   style.css – for the minimal stylesheet
+-   package.json – for the build process
 
 Go ahead and create these files using the following snippets:
 
 **src/index.js:**
+
 ```js
 import { render } from '@wordpress/element';
 
@@ -23,19 +24,47 @@ function MyFirstApp() {
 	return <span>Hello from JavaScript!</span>;
 }
 
-window.addEventListener( 'load', function() {
-	render(
-		<MyFirstApp />,
-		document.querySelector( '#my-first-gutenberg-app' )
-	);
-}, false );
+window.addEventListener(
+	'load',
+	function () {
+		render(
+			<MyFirstApp />,
+			document.querySelector( '#my-first-gutenberg-app' )
+		);
+	},
+	false
+);
 ```
 
 **style.css:**
+
 ```css
 .toplevel_page_my-first-gutenberg-app #wpcontent {
-	background: #FFF;
+	background: #fff;
 	height: 1000px;
+}
+button .components-spinner {
+	width: 15px;
+	height: 15px;
+	margin-top: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+}
+.form-buttons {
+	display: flex;
+}
+.my-gutenberg-form .form-buttons {
+	margin-top: 20px;
+	margin-left: 1px;
+}
+.form-error {
+	color: #cc1818;
+}
+.form-buttons button {
+	margin-right: 4px;
+}
+.form-buttons .components-spinner {
+	margin-top: 0;
 }
 #my-first-gutenberg-app {
 	max-width: 500px;
@@ -44,20 +73,6 @@ window.addEventListener( 'load', function() {
 #my-first-gutenberg-app ul li {
 	list-style-type: disc;
 }
-.my-gutenberg-form .form-buttons {
-	display: flex;
-	margin-top: 20px;
-	margin-left: 1px;
-}
-.my-gutenberg-form .form-error {
-	color: #cc1818;
-}
-.my-gutenberg-form .form-buttons button {
-	margin-right: 4px;
-}
-.my-gutenberg-form .form-buttons .components-spinner {
-	margin-top: 0;
-}
 #my-first-gutenberg-app ul {
 	padding-left: 20px;
 }
@@ -65,9 +80,20 @@ window.addEventListener( 'load', function() {
 	height: 36px;
 	margin-left: 0;
 }
+
+#my-first-gutenberg-app .list-controls {
+	display: flex;
+	width: 100%;
+}
+
+#my-first-gutenberg-app .list-controls .components-search-control {
+	flex-grow: 1;
+	margin-right: 8px;
+}
 ```
 
 **my-first-gutenberg-app.php:**
+
 ```php
 <?php
 /**
@@ -137,32 +163,32 @@ add_action( 'admin_enqueue_scripts', 'load_custom_wp_admin_scripts' );
 
 ```json
 {
-	"name": "05-recipe-card-esnext",
-	"version": "1.1.0",
-	"private": true,
-	"description": "Example: Recipe Card (ESNext).",
-	"author": "The WordPress Contributors",
-	"license": "GPL-2.0-or-later",
-	"keywords": [
-		"WordPress",
-		"block"
-	],
-	"homepage": "https://github.com/WordPress/gutenberg-examples/",
-	"repository": "git+https://github.com/WordPress/gutenberg-examples.git",
-	"bugs": {
-		"url": "https://github.com/WordPress/gutenberg-examples/issues"
-	},
-	"main": "build/index.js",
-	"devDependencies": {
-		"@wordpress/scripts": "^18.0.1"
-	},
-	"scripts": {
-		"build": "wp-scripts build",
-		"format:js": "wp-scripts format-js",
-		"lint:js": "wp-scripts lint-js",
-		"packages-update": "wp-scripts packages-update",
-		"start": "wp-scripts start"
-	}
+  "name": "09-code-data-basics-esnext",
+  "version": "1.1.0",
+  "private": true,
+  "description": "My first Gutenberg App",
+  "author": "The WordPress Contributors",
+  "license": "GPL-2.0-or-later",
+  "keywords": [
+    "WordPress",
+    "block"
+  ],
+  "homepage": "https://github.com/WordPress/gutenberg-examples/",
+  "repository": "git+https://github.com/WordPress/gutenberg-examples.git",
+  "bugs": {
+    "url": "https://github.com/WordPress/gutenberg-examples/issues"
+  },
+  "main": "build/index.js",
+  "devDependencies": {
+    "@wordpress/scripts": "^24.0.0"
+  },
+  "scripts": {
+    "build": "wp-scripts build",
+    "format": "wp-scripts format",
+    "lint:js": "wp-scripts lint-js",
+    "packages-update": "wp-scripts packages-update",
+    "start": "wp-scripts start"
+  }
 }
 ```
 
@@ -184,6 +210,6 @@ Congratulations! You are now ready to start building the app!
 
 ## What's next?
 
-* Previous part: [Introduction](/docs/how-to-guides/data-basics/README.md)
-* Next part: [Building a basic list of pages](/docs/how-to-guides/data-basics/2-building-a-list-of-pages.md)
-* (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/09-code-data-basics-esnext) in the gutenberg-examples repository
+-   Previous part: [Introduction](/docs/how-to-guides/data-basics/README.md)
+-   Next part: [Building a basic list of pages](/docs/how-to-guides/data-basics/2-building-a-list-of-pages.md)
+-   (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/non-block-examples/09-code-data-basics-esnext) in the gutenberg-examples repository

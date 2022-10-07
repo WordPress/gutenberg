@@ -21,7 +21,6 @@
 
 	// Let the menu scale to fit items.
 	@include break-mobile() {
-		width: auto;
 		max-width: $break-mobile;
 	}
 

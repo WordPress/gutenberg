@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -18,6 +17,8 @@ import { close } from '@wordpress/icons';
 import { Button } from '../';
 
 /** @typedef {import('@wordpress/element').WPElement} WPElement */
+
+const noop = () => {};
 
 /**
  * Custom hook which announces the message with the given politeness, if a

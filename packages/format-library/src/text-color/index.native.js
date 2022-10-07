@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
 import { View } from 'react-native';
 
 /**
@@ -72,12 +71,14 @@ function TextColorEdit( {
 	const allowCustomControl = useSetting( 'color.custom' );
 	const colors = useMobileGlobalStylesColors();
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
-	const enableIsAddingColor = useCallback( () => setIsAddingColor( true ), [
-		setIsAddingColor,
-	] );
-	const disableIsAddingColor = useCallback( () => setIsAddingColor( false ), [
-		setIsAddingColor,
-	] );
+	const enableIsAddingColor = useCallback(
+		() => setIsAddingColor( true ),
+		[ setIsAddingColor ]
+	);
+	const disableIsAddingColor = useCallback(
+		() => setIsAddingColor( false ),
+		[ setIsAddingColor ]
+	);
 	const colorIndicatorStyle = useMemo(
 		() =>
 			fillComputedColors(
@@ -87,7 +88,7 @@ function TextColorEdit( {
 		[ value, colors ]
 	);
 
-	const hasColorsToChoose = ! isEmpty( colors ) || ! allowCustomControl;
+	const hasColorsToChoose = colors.length || ! allowCustomControl;
 
 	const onPressButton = useCallback( () => {
 		if ( hasColorsToChoose ) {

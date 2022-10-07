@@ -39,7 +39,14 @@ export default function EditSitePreferencesModal( {
 					<EnableFeature
 						featureName="showIconLabels"
 						label={ __( 'Show button text labels' ) }
-						help={ __( 'Show text instead of icons on buttons' ) }
+						help={ __( 'Show text instead of icons on buttons.' ) }
+					/>
+					<EnableFeature
+						featureName="showListViewByDefault"
+						help={ __(
+							'Opens the block list view sidebar by default.'
+						) }
+						label={ __( 'Always open list view' ) }
 					/>
 				</PreferencesModalSection>
 			),

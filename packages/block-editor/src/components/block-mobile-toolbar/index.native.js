@@ -15,6 +15,7 @@ import { useState, useEffect } from '@wordpress/element';
  */
 import styles from './style.scss';
 import BlockMover from '../block-mover';
+import BlockDraggable from '../block-draggable';
 import BlockActionsMenu from './block-actions-menu';
 import { BlockSettingsButton } from '../block-settings';
 import { store as blockEditorStore } from '../../store';
@@ -33,6 +34,7 @@ const BlockMobileToolbar = ( {
 	blockWidth,
 	anchorNodeRef,
 	isFullWidth,
+	draggingClientId,
 } ) => {
 	const [ fillsLength, setFillsLength ] = useState( null );
 	const [ appenderWidth, setAppenderWidth ] = useState( 0 );
@@ -73,7 +75,13 @@ const BlockMobileToolbar = ( {
 				/>
 			) }
 
-			<View style={ styles.spacer } />
+			<BlockDraggable
+				clientId={ clientId }
+				draggingClientId={ draggingClientId }
+				testID="draggable-trigger-mobile-toolbar"
+			>
+				{ () => <View style={ styles.spacer } /> }
+			</BlockDraggable>
 
 			<BlockSettingsButton.Slot>
 				{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls. */ }

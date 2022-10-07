@@ -1,8 +1,13 @@
-// Utils.
-export { default as createHigherOrderComponent } from './utils/create-higher-order-component';
+// The `createHigherOrderComponent` helper and helper types.
+export * from './utils/create-higher-order-component';
+// The `debounce` helper and its types.
+export * from './utils/debounce';
+// The `throttle` helper and its types.
+export * from './utils/throttle';
 
-// Compose helper (aliased flowRight from Lodash)
+// The `compose` and `pipe` helpers (inspired by `flowRight` and `flow` from Lodash).
 export { default as compose } from './higher-order/compose';
+export { default as pipe } from './higher-order/pipe';
 
 // Higher-order components.
 export { default as ifCondition } from './higher-order/if-condition';
@@ -17,7 +22,7 @@ export { default as useConstrainedTabbing } from './hooks/use-constrained-tabbin
 export { default as useCopyOnClick } from './hooks/use-copy-on-click';
 export { default as useCopyToClipboard } from './hooks/use-copy-to-clipboard';
 export { default as __experimentalUseDialog } from './hooks/use-dialog';
-export { default as __experimentalUseDisabled } from './hooks/use-disabled';
+export { default as useDisabled } from './hooks/use-disabled';
 export { default as __experimentalUseDragging } from './hooks/use-dragging';
 export { default as useFocusOnMount } from './hooks/use-focus-on-mount';
 export { default as __experimentalUseFocusOutside } from './hooks/use-focus-outside';

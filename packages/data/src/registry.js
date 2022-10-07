@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mapValues, isObject, forEach } from 'lodash';
+import { mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -43,6 +43,10 @@ import { createEmitter } from './utils/emitter';
  * @property {Function} registerStore registers store.
  */
 
+function isObject( object ) {
+	return object !== null && typeof object === 'object';
+}
+
 /**
  * Creates a new store registry, given an optional object of initial store
  * configurations.
@@ -55,7 +59,7 @@ import { createEmitter } from './utils/emitter';
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
 	const emitter = createEmitter();
-	const __experimentalListeningStores = new Set();
+	const listeningStores = new Set();
 
 	/**
 	 * Global listener called for each store's update.
@@ -87,30 +91,32 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		const storeName = isObject( storeNameOrDescriptor )
 			? storeNameOrDescriptor.name
 			: storeNameOrDescriptor;
-		__experimentalListeningStores.add( storeName );
+		listeningStores.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getSelectors();
 		}
 
-		return parent && parent.select( storeName );
+		return parent?.select( storeName );
 	}
 
-	function __experimentalMarkListeningStores( callback, ref ) {
-		__experimentalListeningStores.clear();
-		const result = callback.call( this );
-		ref.current = Array.from( __experimentalListeningStores );
-		return result;
+	function __unstableMarkListeningStores( callback, ref ) {
+		listeningStores.clear();
+		try {
+			return callback.call( this );
+		} finally {
+			ref.current = Array.from( listeningStores );
+		}
 	}
 
 	/**
-	 * Given the name of a registered store, returns an object containing the store's
-	 * selectors pre-bound to state so that you only need to supply additional arguments,
-	 * and modified so that they return promises that resolve to their eventual values,
-	 * after any resolvers have ran.
+	 * Given a store descriptor, returns an object containing the store's selectors pre-bound to
+	 * state so that you only need to supply additional arguments, and modified so that they return
+	 * promises that resolve to their eventual values, after any resolvers have ran.
 	 *
-	 * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
-	 *                                                       or the store descriptor.
+	 * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
+	 *                                                       convention of passing the store name is
+	 *                                                       also supported.
 	 *
 	 * @return {Object} Each key of the object matches the name of a selector.
 	 */
@@ -118,13 +124,37 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		const storeName = isObject( storeNameOrDescriptor )
 			? storeNameOrDescriptor.name
 			: storeNameOrDescriptor;
-		__experimentalListeningStores.add( storeName );
+		listeningStores.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getResolveSelectors();
 		}
 
 		return parent && parent.resolveSelect( storeName );
+	}
+
+	/**
+	 * Given a store descriptor, returns an object containing the store's selectors pre-bound to
+	 * state so that you only need to supply additional arguments, and modified so that they throw
+	 * promises in case the selector is not resolved yet.
+	 *
+	 * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
+	 *                                                       convention of passing the store name is
+	 *                                                       also supported.
+	 *
+	 * @return {Object} Object containing the store's suspense-wrapped selectors.
+	 */
+	function suspendSelect( storeNameOrDescriptor ) {
+		const storeName = isObject( storeNameOrDescriptor )
+			? storeNameOrDescriptor.name
+			: storeNameOrDescriptor;
+		listeningStores.add( storeName );
+		const store = stores[ storeName ];
+		if ( store ) {
+			return store.getSuspendSelectors();
+		}
+
+		return parent && parent.suspendSelect( storeName );
 	}
 
 	/**
@@ -245,7 +275,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * @param {Function} handler   The function subscribed to the store.
 	 * @return {Function} A function to unsubscribe the handler.
 	 */
-	function __experimentalSubscribeStore( storeName, handler ) {
+	function __unstableSubscribeStore( storeName, handler ) {
 		if ( storeName in stores ) {
 			return stores[ storeName ].subscribe( handler );
 		}
@@ -258,15 +288,15 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			return subscribe( handler );
 		}
 
-		return parent.__experimentalSubscribeStore( storeName, handler );
+		return parent.__unstableSubscribeStore( storeName, handler );
 	}
 
 	function batch( callback ) {
 		emitter.pause();
-		forEach( stores, ( store ) => store.emitter.pause() );
+		Object.values( stores ).forEach( ( store ) => store.emitter.pause() );
 		callback();
 		emitter.resume();
-		forEach( stores, ( store ) => store.emitter.resume() );
+		Object.values( stores ).forEach( ( store ) => store.emitter.resume() );
 	}
 
 	let registry = {
@@ -276,13 +306,14 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		subscribe,
 		select,
 		resolveSelect,
+		suspendSelect,
 		dispatch,
 		use,
 		register,
 		registerGenericStore,
 		registerStore,
-		__experimentalMarkListeningStores,
-		__experimentalSubscribeStore,
+		__unstableMarkListeningStores,
+		__unstableSubscribeStore,
 	};
 
 	//

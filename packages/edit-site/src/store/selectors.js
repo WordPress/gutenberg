@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, keyBy } from 'lodash';
+import { map } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -82,8 +82,8 @@ export function __experimentalGetPreviewDeviceType( state ) {
  *
  * @return {Object} Whether the current user can create media or not.
  */
-export const getCanUserCreateMedia = createRegistrySelector( ( select ) => () =>
-	select( coreDataStore ).canUser( 'create', 'media' )
+export const getCanUserCreateMedia = createRegistrySelector(
+	( select ) => () => select( coreDataStore ).canUser( 'create', 'media' )
 );
 
 /**
@@ -304,11 +304,8 @@ export function isInserterOpened( state ) {
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
 export function __experimentalGetInsertionPoint( state ) {
-	const {
-		rootClientId,
-		insertionIndex,
-		filterValue,
-	} = state.blockInserterPanel;
+	const { rootClientId, insertionIndex, filterValue } =
+		state.blockInserterPanel;
 	return { rootClientId, insertionIndex, filterValue };
 }
 
@@ -339,13 +336,21 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 			templateId
 		);
 
-		const templateParts = select(
-			coreDataStore
-		).getEntityRecords( 'postType', 'wp_template_part', { per_page: -1 } );
-		const templatePartsById = keyBy(
-			templateParts,
-			( templatePart ) => templatePart.id
+		const templateParts = select( coreDataStore ).getEntityRecords(
+			'postType',
+			'wp_template_part',
+			{ per_page: -1 }
 		);
+		const templatePartsById = templateParts
+			? // Key template parts by their ID.
+			  templateParts.reduce(
+					( newTemplateParts, part ) => ( {
+						...newTemplateParts,
+						[ part.id ]: part,
+					} ),
+					{}
+			  )
+			: {};
 
 		return ( template.blocks ?? [] )
 			.filter( ( block ) => isTemplatePart( block ) )

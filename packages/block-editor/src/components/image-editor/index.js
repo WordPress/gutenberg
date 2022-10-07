@@ -20,10 +20,12 @@ export default function ImageEditor( {
 	clientWidth,
 	naturalHeight,
 	naturalWidth,
+	borderProps,
 } ) {
 	return (
 		<>
 			<Cropper
+				borderProps={ borderProps }
 				url={ url }
 				width={ width }
 				height={ height }

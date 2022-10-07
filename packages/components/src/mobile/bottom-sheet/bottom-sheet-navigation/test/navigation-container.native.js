@@ -27,7 +27,14 @@ const TestScreen = ( { fullScreen, name, navigateTo } ) => {
 	);
 };
 
-jest.useFakeTimers( 'legacy' );
+beforeAll( () => {
+	jest.useFakeTimers( 'legacy' );
+} );
+
+afterAll( () => {
+	jest.runOnlyPendingTimers();
+	jest.useRealTimers();
+} );
 
 it( 'animates height transitioning from non-full-screen to full-screen', async () => {
 	const screen = render(
@@ -101,7 +108,7 @@ it( 'animates height transitioning from full-screen to non-full-screen', async (
 	);
 	// Navigate to screen 1
 	fireEvent.press(
-		// Use custom waitFor due to https://git.io/JYYGE
+		// Use custom waitFor due to https://github.com/callstack/react-native-testing-library/issues/379
 		await waitFor( () => screen.getByText( /test-screen-2/ ) )
 	);
 	// Await navigation screen to allow async state updates to complete

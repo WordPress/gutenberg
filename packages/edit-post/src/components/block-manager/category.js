@@ -25,8 +25,8 @@ function BlockManagerCategory( { title, blockTypes } ) {
 			const { getEditorSettings } = select( editorStore );
 			const { getHiddenBlockTypes } = select( editPostStore );
 			return {
-				defaultAllowedBlockTypes: getEditorSettings()
-					.defaultAllowedBlockTypes,
+				defaultAllowedBlockTypes:
+					getEditorSettings().defaultAllowedBlockTypes,
 				hiddenBlockTypes: getHiddenBlockTypes(),
 			};
 		},

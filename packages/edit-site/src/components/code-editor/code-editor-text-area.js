@@ -6,14 +6,8 @@ import Textarea from 'react-autosize-textarea';
 /**
  * WordPress dependencies
  */
-/**
- * WordPress dependencies
- */
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/components';
 
@@ -21,6 +15,7 @@ export default function CodeEditorTextArea( { value, onChange, onInput } ) {
 	const [ stateValue, setStateValue ] = useState( value );
 	const [ isDirty, setIsDirty ] = useState( false );
 	const instanceId = useInstanceId( CodeEditorTextArea );
+	const valueRef = useRef();
 
 	if ( ! isDirty && stateValue !== value ) {
 		setStateValue( value );
@@ -42,6 +37,7 @@ export default function CodeEditorTextArea( { value, onChange, onInput } ) {
 		onInput( newValue );
 		setStateValue( newValue );
 		setIsDirty( true );
+		valueRef.current = newValue;
 	};
 
 	/**
@@ -55,6 +51,15 @@ export default function CodeEditorTextArea( { value, onChange, onInput } ) {
 			setIsDirty( false );
 		}
 	};
+
+	// Ensure changes aren't lost when component unmounts.
+	useEffect( () => {
+		return () => {
+			if ( valueRef.current ) {
+				onChange( valueRef.current );
+			}
+		};
+	}, [] );
 
 	return (
 		<>

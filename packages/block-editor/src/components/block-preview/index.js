@@ -7,10 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalUseDisabled as useDisabled,
-	useMergeRefs,
-} from '@wordpress/compose';
+import { useDisabled, useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { memo, useMemo } from '@wordpress/element';
 
@@ -29,6 +26,7 @@ export function BlockPreview( {
 	viewportWidth = 1200,
 	__experimentalLive = false,
 	__experimentalOnClick,
+	__experimentalMinHeight,
 } ) {
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
@@ -51,6 +49,7 @@ export function BlockPreview( {
 				<AutoHeightBlockPreview
 					viewportWidth={ viewportWidth }
 					__experimentalPadding={ __experimentalPadding }
+					__experimentalMinHeight={ __experimentalMinHeight }
 				/>
 			) }
 		</BlockEditorProvider>

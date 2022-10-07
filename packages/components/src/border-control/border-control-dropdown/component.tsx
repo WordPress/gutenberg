@@ -22,14 +22,9 @@ import { VStack } from '../../v-stack';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { useBorderControlDropdown } from './hook';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
+import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
 
-import type {
-	Color,
-	ColorOrigin,
-	Colors,
-	DropdownProps,
-	PopoverProps,
-} from '../types';
+import type { Color, ColorOrigin, Colors, DropdownProps } from '../types';
 
 const noop = () => undefined;
 const getColorObject = (
@@ -141,12 +136,12 @@ const BorderControlDropdown = (
 		onReset,
 		onColorChange,
 		onStyleChange,
-		popoverClassName,
 		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonClassName,
 		showDropdownHeader,
 		enableStyle = true,
+		__unstablePopoverProps,
 		...otherProps
 	} = useBorderControlDropdown( props );
 
@@ -164,6 +159,7 @@ const BorderControlDropdown = (
 		enableStyle
 	);
 
+	const showResetButton = color || ( style && style !== 'none' );
 	const dropdownPosition = __experimentalIsRenderedInSidebar
 		? 'bottom left'
 		: undefined;
@@ -174,6 +170,8 @@ const BorderControlDropdown = (
 			variant="tertiary"
 			aria-label={ toggleAriaLabel }
 			position={ dropdownPosition }
+			label={ __( 'Border color and style picker' ) }
+			showTooltip={ true }
 		>
 			<span className={ indicatorWrapperClassName }>
 				<ColorIndicator
@@ -184,52 +182,59 @@ const BorderControlDropdown = (
 		</Button>
 	);
 
-	const renderContent = ( { onClose }: PopoverProps ) => (
+	// TODO: update types once Dropdown component is refactored to TypeScript.
+	const renderContent = ( { onClose }: { onClose: () => void } ) => (
 		<>
-			<VStack className={ popoverControlsClassName } spacing={ 6 }>
-				{ showDropdownHeader ? (
-					<HStack>
-						<StyledLabel>{ __( 'Border color' ) }</StyledLabel>
-						<Button
-							isSmall
-							label={ __( 'Close border color' ) }
-							icon={ closeSmall }
-							onClick={ onClose }
-						/>
-					</HStack>
-				) : undefined }
-				<ColorPalette
-					className={ popoverContentClassName }
-					value={ color }
-					onChange={ onColorChange }
-					{ ...{ colors, disableCustomColors } }
-					__experimentalHasMultipleOrigins={
-						__experimentalHasMultipleOrigins
-					}
-					__experimentalIsRenderedInSidebar={
-						__experimentalIsRenderedInSidebar
-					}
-					clearable={ false }
-					enableAlpha={ enableAlpha }
-				/>
-				{ enableStyle && (
-					<BorderControlStylePicker
-						label={ __( 'Style' ) }
-						value={ style }
-						onChange={ onStyleChange }
+			<DropdownContentWrapper paddingSize="medium">
+				<VStack className={ popoverControlsClassName } spacing={ 6 }>
+					{ showDropdownHeader ? (
+						<HStack>
+							<StyledLabel>{ __( 'Border color' ) }</StyledLabel>
+							<Button
+								isSmall
+								label={ __( 'Close border color' ) }
+								icon={ closeSmall }
+								onClick={ onClose }
+							/>
+						</HStack>
+					) : undefined }
+					<ColorPalette
+						className={ popoverContentClassName }
+						value={ color }
+						onChange={ onColorChange }
+						{ ...{ colors, disableCustomColors } }
+						__experimentalHasMultipleOrigins={
+							__experimentalHasMultipleOrigins
+						}
+						__experimentalIsRenderedInSidebar={
+							__experimentalIsRenderedInSidebar
+						}
+						clearable={ false }
+						enableAlpha={ enableAlpha }
 					/>
-				) }
-			</VStack>
-			<Button
-				className={ resetButtonClassName }
-				variant="tertiary"
-				onClick={ () => {
-					onReset();
-					onClose();
-				} }
-			>
-				{ __( 'Reset to default' ) }
-			</Button>
+					{ enableStyle && (
+						<BorderControlStylePicker
+							label={ __( 'Style' ) }
+							value={ style }
+							onChange={ onStyleChange }
+						/>
+					) }
+				</VStack>
+			</DropdownContentWrapper>
+			{ showResetButton && (
+				<DropdownContentWrapper paddingSize="none">
+					<Button
+						className={ resetButtonClassName }
+						variant="tertiary"
+						onClick={ () => {
+							onReset();
+							onClose();
+						} }
+					>
+						{ __( 'Reset to default' ) }
+					</Button>
+				</DropdownContentWrapper>
+			) }
 		</>
 	);
 
@@ -237,7 +242,9 @@ const BorderControlDropdown = (
 		<Dropdown
 			renderToggle={ renderToggle }
 			renderContent={ renderContent }
-			contentClassName={ popoverClassName }
+			popoverProps={ {
+				...__unstablePopoverProps,
+			} }
 			{ ...otherProps }
 			ref={ forwardedRef }
 		/>
