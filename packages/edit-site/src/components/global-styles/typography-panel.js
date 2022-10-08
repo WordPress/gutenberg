@@ -155,6 +155,7 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 	const [ fluidTypography ] = useSetting( 'typography.fluid', name );
 	const [ fontSizes ] = useSetting( 'typography.fontSizes', name );
 
+	// Convert static font size values to fluid font sizes if fluidTypography is activated.
 	const fontSizesWithFluidValues = fontSizes.map( ( font ) => {
 		if ( !! fluidTypography ) {
 			font.size = getTypographyFontSizeValue( font, {

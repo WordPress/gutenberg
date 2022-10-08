@@ -22,15 +22,12 @@ export type FontSizePickerProps = {
 	 */
 	fontSizes?: FontSize[];
 	/**
-	 * A function that receives the new font size value and an optional selectedOption object,
+	 * A function that receives the new font size value.
 	 * If onChange is called without any parameter, it should reset the value,
 	 * attending to what reset means in that context, e.g., set the font size to
 	 * undefined or set the font size a starting value.
 	 */
-	onChange?: (
-		value: number | string | undefined,
-		selectedOption?: FontSizeSelectOption | FontSizeOption
-	) => void;
+	onChange?: ( value: number | string | undefined ) => void;
 	/**
 	 * The current font size value.
 	 */
@@ -84,26 +81,19 @@ export type FontSize = {
 	slug: string;
 };
 
-export type FontSizeFluidOptions = {
-	max?: string;
-	min?: string;
-};
-
 export type FontSizeOption = Omit< FontSize, 'size' > &
-	Partial< Pick< FontSize, 'size' > > & {
-		fluid?: FontSizeFluidOptions;
-	};
+	Partial< Pick< FontSize, 'size' > >;
 
 export type FontSizeSelectOption = Pick< FontSizeOption, 'size' > & {
 	key: string;
 	name?: string;
-	slug?: string;
-	__experimentalHint?: ReactNode;
+	__experimentalHint: ReactNode;
 };
 
-export type FontSizeToggleGroupOption = FontSize & {
+export type FontSizeToggleGroupOption = {
 	key: string;
 	value: number | string;
 	label: string;
 	name: string;
+	size?: number | string;
 };

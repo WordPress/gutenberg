@@ -136,10 +136,9 @@ export function getToggleGroupOptions(
 		return {
 			key: slug,
 			value: size,
+			size,
 			label: labelAliases[ index ],
 			name: name || labelAliases[ index ],
-			size,
-			slug,
 		};
 	} );
 }
@@ -148,8 +147,7 @@ export function getSelectedOption(
 	fontSizes: FontSize[],
 	value: FontSizePickerProps[ 'value' ],
 	useSelectControl: boolean,
-	disableCustomFontSizes: boolean = false,
-	slug: string | undefined
+	disableCustomFontSizes: boolean = false
 ): FontSizeOption {
 	if ( ! value ) {
 		return DEFAULT_FONT_SIZE_OPTION;
@@ -160,13 +158,12 @@ export function getSelectedOption(
 		fontSizes,
 		disableCustomFontSizes
 	);
-console.log( 'fontSizeOptions', fontSizeOptions, value, slug );
+
 	// @TODO fix types for fontSizeOptions.
 	const selectedOption = fontSizeOptions
 		? // @ts-ignore
 		  fontSizeOptions.find(
-				( option: FontSizeSelectOption ) =>
-					slug === option.slug || option.size === value
+				( option: FontSizeSelectOption ) => option.size === value
 		  ) // @ts-ignore
 		: null;
 
