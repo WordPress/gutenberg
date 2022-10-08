@@ -7,6 +7,10 @@
 	"description": "Display a post's comments form.",
 	"textdomain": "default",
 	"attributes": {
+		"headingLevel": {
+			"type": "number",
+			"default": 3
+		},
 		"textAlign": {
 			"type": "string"
 		}

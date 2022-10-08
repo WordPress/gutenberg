@@ -138,7 +138,9 @@
 			{
 				"name": "core/post-comments-form",
 				"isValid": true,
-				"attributes": {},
+				"attributes": {
+					"headingLevel": 3
+				},
 				"innerBlocks": []
 			}
 		]

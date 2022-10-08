@@ -17,13 +17,17 @@ import { useDisabled, useInstanceId } from '@wordpress/compose';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
-const CommentsFormPlaceholder = () => {
+const CommentsFormPlaceholder = ( { headingLevel } ) => {
+	const HeadingTagName = 'h' + headingLevel;
+
 	const disabledFormRef = useDisabled();
 	const instanceId = useInstanceId( CommentsFormPlaceholder );
 
 	return (
 		<div className="comment-respond">
-			<h3 className="comment-reply-title">{ __( 'Leave a Reply' ) }</h3>
+			<HeadingTagName className="comment-reply-title">
+				{ __( 'Leave a Reply' ) }
+			</HeadingTagName>
 			<form noValidate className="comment-form" ref={ disabledFormRef }>
 				<p>
 					<label htmlFor={ `comment-${ instanceId }` }>
@@ -53,7 +57,7 @@ const CommentsFormPlaceholder = () => {
 	);
 };
 
-const CommentsForm = ( { postId, postType } ) => {
+const CommentsForm = ( { headingLevel, postId, postType } ) => {
 	const [ commentStatus, setCommentStatus ] = useEntityProp(
 		'postType',
 		postType,
@@ -119,7 +123,7 @@ const CommentsForm = ( { postId, postType } ) => {
 		}
 	}
 
-	return <CommentsFormPlaceholder />;
+	return <CommentsFormPlaceholder headingLevel={ headingLevel } />;
 };
 
 export default CommentsForm;

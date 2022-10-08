@@ -27,12 +27,22 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 		$classes .= ' has-text-align-' . $attributes['textAlign'];
 	}
 
+	$heading = 'h3';
+	if ( isset( $attributes['headingLevel'] ) ) {
+		$heading = 'h' . $attributes['headingLevel'];
+	}
+
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
 	add_filter( 'comment_form_defaults', 'post_comments_form_block_form_defaults' );
 
 	ob_start();
-	comment_form( array(), $block->context['postId'] );
+	comment_form(
+		array(
+			'title_reply_before' => '<' . $heading . ' id="reply-title" class="comment-reply-title">',
+			'title_reply_after'  => "</$heading>",
+		)
+	);
 	$form = ob_get_clean();
 
 	remove_filter( 'comment_form_defaults', 'post_comments_form_block_form_defaults' );
