@@ -269,7 +269,7 @@
 							}
 						},
 						"spacingScale": {
-							"description": "Space size presets for the space size selector.\nGenerates a custom property (`--wp--preset--space-size--{slug}`) per preset value.",
+							"description": "Settings to auto-generate space size presets for the space size selector.\nGenerates a custom property (`--wp--preset--space-size--{slug}`) per preset value.",
 							"type": "object",
 							"properties": {
 								"operator": {
