@@ -4,8 +4,13 @@ on:
     release:
         types: [published]
 
+permissions:
+  contents: read
+
 jobs:
     get-release-branch:
+        permissions:
+          contents: none
         name: Get release branch name
         runs-on: ubuntu-latest
         if: github.event.release.assets[0]
@@ -23,6 +28,8 @@ jobs:
                   echo "::set-output name=release_branch::$(echo $RELEASE_BRANCH)"
 
     update-changelog:
+        permissions:
+          contents: write  # for Git to git push
         name: Update Changelog on ${{ matrix.branch }} branch
         runs-on: ubuntu-latest
         if: github.event.release.assets[0]
@@ -95,6 +102,8 @@ jobs:
                   path: ./changelog.txt
 
     upload:
+        permissions:
+          contents: none
         name: Upload Gutenberg Plugin
         runs-on: ubuntu-latest
         environment: wp.org plugin

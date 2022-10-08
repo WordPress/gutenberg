@@ -31,8 +31,16 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
     cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
     build:
+        permissions:
+          checks: write  # for preactjs/compressed-size-action to create and update the checks
+          contents: read  # for actions/checkout to fetch code
+          issues: write  # for preactjs/compressed-size-action to create comments
+          pull-requests: write  # for preactjs/compressed-size-action to write a PR review
         name: Check
         runs-on: ubuntu-latest
 
