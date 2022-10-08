@@ -159,9 +159,8 @@ export function getSelectedOption(
 		disableCustomFontSizes
 	);
 
-	// @TODO fix types for fontSizeOptions.
 	const selectedOption = fontSizeOptions
-		? // @ts-ignore
+		? // @ts-ignore @TODO fix types for fontSizeOptions. Array.find() works on the same type only.
 		  fontSizeOptions.find(
 				( option: FontSizeSelectOption ) => option.size === value
 		  ) // @ts-ignore
