@@ -9,10 +9,11 @@ import {
 	useInstanceId,
 	useMergeRefs,
 } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { ESCAPE } from '@wordpress/keycodes';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -46,7 +47,17 @@ export default function ListViewSidebar() {
 				className="edit-post-editor__list-view-panel-header"
 				ref={ headerFocusReturnRef }
 			>
-				<strong id={ labelId }>{ __( 'List View' ) }</strong>
+				<div>
+					<strong id={ labelId }>{ __( 'List View' ) }</strong>
+
+					<p>
+						{ 
+							__(
+								'Manage and reorder the blocks in this document.'
+							) 
+						}
+					</p>
+				</div>
 				<Button
 					icon={ closeSmall }
 					label={ __( 'Close List View Sidebar' ) }
