@@ -157,7 +157,7 @@ add_action( 'init', function() {
 
 ## Child InnerBlocks: Parent and Ancestors
 
-A common pattern for using InnerBlocks is to create a custom block that will be included only in the InnerBlocks. 
+A common pattern for using InnerBlocks is to create a custom block that will be included only in the InnerBlocks.
 
 An example of this is the Columns block, that creates a single parent block called `columns` and then creates an child block called `column`. The parent block is defined to only allow the child blocks. See [Column code for reference](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/column).
 

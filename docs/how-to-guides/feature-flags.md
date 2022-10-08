@@ -4,7 +4,7 @@
 
 ## Introducing `process.env.IS_GUTENBERG_PLUGIN`
 
-The `process.env.IS_GUTENBERG_PLUGIN` is an environment variable whose value 'flags' whether code is running within the Gutenberg plugin. 
+The `process.env.IS_GUTENBERG_PLUGIN` is an environment variable whose value 'flags' whether code is running within the Gutenberg plugin.
 
 When the codebase is built for the plugin, this variable will be set to `true`. When building for WordPress core, it will be set to `false` or `undefined`.
 
@@ -71,7 +71,7 @@ if ( undefined ) { // Wepack has replaced `process.env.IS_GUTENBERG_PLUGIN` with
 
 ### Dead Code Elimination
 
-For production builds, webpack ['minifies'](https://en.wikipedia.org/wiki/Minification_(programming)) the code, removing as much unnecessary JavaScript as it can. 
+For production builds, webpack ['minifies'](https://en.wikipedia.org/wiki/Minification_(programming)) the code, removing as much unnecessary JavaScript as it can.
 
 One of the steps involves something known as 'dead code elimination'. For example, when the following code is encountered, webpack determines that the surrounding `if` statement is unnecessary:
 

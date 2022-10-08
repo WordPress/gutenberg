@@ -167,10 +167,10 @@ Add the following code to the `myguten-meta-block.php` file:
 
 ```php
 function myguten_register_template() {
-    $post_type_object = get_post_type_object( 'post' );
-    $post_type_object->template = array(
-        array( 'myguten/meta-block' ),
-    );
+	$post_type_object = get_post_type_object( 'post' );
+	$post_type_object->template = array(
+			array( 'myguten/meta-block' ),
+	);
 }
 add_action( 'init', 'myguten_register_template' );
 ```

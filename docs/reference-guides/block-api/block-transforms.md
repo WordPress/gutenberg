@@ -52,17 +52,17 @@ To declare this transformation we add the following code into the heading block 
 
 ```js
 transforms: {
-    from: [
-        {
-            type: 'block',
-            blocks: [ 'core/paragraph' ],
-            transform: ( { content } ) => {
-                return createBlock( 'core/heading', {
-                    content,
-                } );
-            },
-        },
-    ]
+	from: [
+		{
+			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			transform: ( { content } ) => {
+				return createBlock( 'core/heading', {
+					content,
+				} );
+			},
+		},
+	]
 },
 ```
 
@@ -72,19 +72,19 @@ A block with InnerBlocks can also be transformed from and to another block with 
 
 ```js
 transforms: {
-    to: [
-        {
-            type: 'block',
-            blocks: [ 'some/block-with-innerblocks' ],
-            transform: ( attributes, innerBlocks ) => {
-                return createBlock(
-                    'some/other-block-with-innerblocks',
-                    attributes,
-                    innerBlocks
-                );
-            },
-        },
-    ],
+	to: [
+		{
+			type: 'block',
+			blocks: [ 'some/block-with-innerblocks' ],
+			transform: ( attributes, innerBlocks ) => {
+				return createBlock(
+					'some/other-block-with-innerblocks',
+					attributes,
+					innerBlocks
+				);
+			},
+		},
+	],
 },
 ```
 
@@ -205,19 +205,19 @@ If we want to create an Embed block when the user pastes some URL in the editor,
 
 ```js
 transforms: {
-    from: [
-        {
-            type: 'raw',
-            isMatch: ( node ) =>
-                node.nodeName === 'P' &&
-                /^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ),
-            transform: ( node ) => {
-                return createBlock( 'core/embed', {
-                    url: node.textContent.trim(),
-                } );
-            },
-        },
-    ],
+	from: [
+		{
+			type: 'raw',
+			isMatch: ( node ) =>
+				node.nodeName === 'P' &&
+				/^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ),
+			transform: ( node ) => {
+				return createBlock( 'core/embed', {
+					url: node.textContent.trim(),
+				} );
+			},
+		},
+	],
 }
 ```
 
@@ -246,8 +246,8 @@ Suppose we want to match the following HTML snippet and turn it into some kind o
 
 ```html
 <div data-post-id="13">
-    <h2>The Post Title</h2>
-    <p>Some <em>great</em> content.</p>
+	<h2>The Post Title</h2>
+	<p>Some <em>great</em> content.</p>
 </div>
 ```
 
@@ -260,14 +260,14 @@ conversion.
 
 ```js
 schema = ({ phrasingContentSchema }) => {
-    div: {
-        required: true,
-        attributes: [ 'data-post-id' ],
-        children: {
-            h2: { children: phrasingContentSchema },
-            p: { children: phrasingContentSchema }
-        }
-    }
+	div: {
+		required: true,
+		attributes: [ 'data-post-id' ],
+		children: {
+			h2: { children: phrasingContentSchema },
+			p: { children: phrasingContentSchema }
+		}
+	}
 }
 ```
 
@@ -298,21 +298,21 @@ An existing shortcode can be transformed into its block counterpart using the `t
 
 ```js
 transforms: {
-    from: [
-        {
-            type: 'shortcode',
-            tag: 'video',
-            transform( { named: { src } } ) {
-                return createBlock( 'core/video', { src } );
-            },
-            // Prevent the shortcode to be converted
-            // into this block when it doesn't
-            // have the proper ID.
-            isMatch( { named: { id } } ) {
-                return id === 'my-id';
-            },
-        },
-    ],
+	from: [
+		{
+			type: 'shortcode',
+			tag: 'video',
+			transform( { named: { src } } ) {
+				return createBlock( 'core/video', { src } );
+			},
+			// Prevent the shortcode to be converted
+			// into this block when it doesn't
+			// have the proper ID.
+			isMatch( { named: { id } } ) {
+				return id === 'my-id';
+			},
+		},
+	],
 },
 ```
 
@@ -322,34 +322,34 @@ An existing shortcode can be transformed into its block counterpart using the `a
 
 ```js
 transforms: {
-    from: [
-        {
-            type: 'shortcode',
-            tag: 'youtube',
-            attributes: {
-                url: {
-                    type: 'string',
-                    source: 'attribute',
-                    attribute: 'src',
-                    selector: 'img',
-                },
-                align: {
-                    type: 'string',
-                    // The shortcode function will extract
-                    // the shortcode atts into a value
-                    // to be sourced in the block's comment.
-                    shortcode: ( { named: { align = 'alignnone' } } ) => {
-                        return align.replace( 'align', '' );
-                    },
-                },
-            },
-            // Prevent the shortcode to be converted
-            // into this block when it doesn't
-            // have the proper ID.
-            isMatch( { named: { id } } ) {
-                return id === 'my-id';
-            },
-        },
-    ]
+	from: [
+		{
+			type: 'shortcode',
+			tag: 'youtube',
+			attributes: {
+				url: {
+					type: 'string',
+					source: 'attribute',
+					attribute: 'src',
+					selector: 'img',
+				},
+				align: {
+					type: 'string',
+					// The shortcode function will extract
+					// the shortcode atts into a value
+					// to be sourced in the block's comment.
+					shortcode: ( { named: { align = 'alignnone' } } ) => {
+						return align.replace( 'align', '' );
+					},
+				},
+			},
+			// Prevent the shortcode to be converted
+			// into this block when it doesn't
+			// have the proper ID.
+			isMatch( { named: { id } } ) {
+				return id === 'my-id';
+			},
+		},
+	]
 },
 ```

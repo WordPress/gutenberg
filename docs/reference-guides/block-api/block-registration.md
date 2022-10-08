@@ -35,7 +35,7 @@ A block requires a few properties to be specified before it can be registered su
 
 -   **Type:** `String`
 
-This is the display title for your block, which can be translated with our translation functions. The title will display in the Inserter and in other areas of the editor. 
+This is the display title for your block, which can be translated with our translation functions. The title will display in the Inserter and in other areas of the editor.
 
 ```js
 // Our data object

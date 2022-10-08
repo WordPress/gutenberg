@@ -36,20 +36,20 @@ To get the most accurate results, it's is important to use the exact same versio
 
 To achieve that the command first prepares the following folder structure:
 
-    │
-    ├── tests/packages/e2e-tests/specs/performance/*
-    |   The actual performance tests to run
-    │
-    ├── tests/test/emptytheme
-    |   The theme used for the tests environment. (site editor)
-    │
-    │── envs/branch1/.wp-env.json
-    │   The wp-env config file for branch1 (similar to all other branches except the plugin folder).
-    │── envs/branch1/plugin
-    │   A built clone of the Gutenberg plugin for branch1 (git checkout branch1)
-    │
-    └── envs/branchX
-        The structure of perf-envs/branch1 is duplicated for all other branches.
+	│
+	├── tests/packages/e2e-tests/specs/performance/*
+	│   The actual performance tests to run
+	│
+	├── tests/test/emptytheme
+	│   The theme used for the tests environment. (site editor)
+	│
+	│── envs/branch1/.wp-env.json
+	│   The wp-env config file for branch1 (similar to all other branches except the plugin folder).
+	│── envs/branch1/plugin
+	│   A built clone of the Gutenberg plugin for branch1 (git checkout branch1)
+	│
+	└── envs/branchX
+		 The structure of perf-envs/branch1 is duplicated for all other branches.
 
 Once the directory above is in place, the performance command loop over the performance test suites (post editor and site editor) and does the following:
 

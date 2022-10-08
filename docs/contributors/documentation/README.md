@@ -112,16 +112,16 @@ A unique feature to the Gutenberg documentation is the `codetabs` toggle, this a
 Here is an example `codetabs` section:
 
 ````md
-    \{\% codetabs \%\}
-    \{\% JSX \%\}
-    ```js
-    // JSX code here
-    ```
-    \{\% Plain \%\}
-    ```js
-    // Plain code here
-    ```
-    \{\% end \%\}
+\{\% codetabs \%\}
+\{\% JSX \%\}
+```js
+// JSX code here
+```
+\{\% Plain \%\}
+```js
+// Plain code here
+```
+\{\% end \%\}
 ````
 
 The preferred format for code examples is JSX, this should be the default view. The example placed first in source will be shown as the default.
@@ -164,8 +164,8 @@ An example config for using Visual Studio Code and the Prettier extensions:
 
 ```json
 "[[markdown]]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.formatOnSave": true
 },
 ```
 

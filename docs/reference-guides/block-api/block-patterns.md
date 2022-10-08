@@ -55,7 +55,7 @@ _Note:_
 
 ```php
 function my_plugin_register_my_patterns() {
-  register_block_pattern( ... );
+	register_block_pattern( ... );
 }
 
 add_action( 'init', 'my_plugin_register_my_patterns' );
@@ -80,7 +80,7 @@ _Note:_
 
 ```php
 function my_plugin_unregister_my_patterns() {
-  unregister_block_pattern( ... );
+	unregister_block_pattern( ... );
 }
 
 add_action( 'init', 'my_plugin_unregister_my_patterns' );
@@ -115,7 +115,7 @@ _Note:_
 
 ```php
 function my_plugin_register_my_pattern_categories() {
-  register_block_pattern_category( ... );
+	register_block_pattern_category( ... );
 }
 
 add_action( 'init', 'my_plugin_register_my_pattern_categories' );
@@ -140,7 +140,7 @@ _Note:_
 
 ```php
 function my_plugin_unregister_my_pattern_categories() {
-  unregister_block_pattern_category( ... );
+	unregister_block_pattern_category( ... );
 }
 
 add_action( 'init', 'my_plugin_unregister_my_pattern_categories' );

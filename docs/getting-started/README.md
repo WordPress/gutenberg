@@ -4,8 +4,8 @@ Welcome! Let's get started building with blocks. Blocks are at the core of exten
 
 - Learn more about where this work is going by [reviewing the long term roadmap](https://wordpress.org/about/roadmap/).
 - Explore the [GitHub repo](https://github.com/WordPress/gutenberg/) to see the latest issues and PRs folks are working on, especially [Good First Issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+label%3A%22Good+First+Issue%22).
-- Join the [Slack community](https://make.wordpress.org/chat/) to join meetings, ongoing conversations, and more. 
-- Take courses on how to use the block editor and more on [Learn WordPress](https://learn.wordpress.org/). 
+- Join the [Slack community](https://make.wordpress.org/chat/) to join meetings, ongoing conversations, and more.
+- Take courses on how to use the block editor and more on [Learn WordPress](https://learn.wordpress.org/).
 - Expand your knowledge by reviewing more developer docs at the overall [developer.wordpress.org resource](https://developer.wordpress.org/).
 - Subscribe to [updates on Make Core](https://make.wordpress.org/core/), the main site where ongoing project updates happen.
 
@@ -24,7 +24,7 @@ Welcome! Let's get started building with blocks. Blocks are at the core of exten
 
 ## Ways to Stay Informed
 
-New features and changes are important to keep up to date on as the Gutenberg project continues. Each person will have their own unique needs in keeping up with a project of this scale. What follows is more of a catalogue of ways to keep up rather than a recommendation for how to do so. 
+New features and changes are important to keep up to date on as the Gutenberg project continues. Each person will have their own unique needs in keeping up with a project of this scale. What follows is more of a catalogue of ways to keep up rather than a recommendation for how to do so.
 
 **Yearly:**
 
@@ -36,9 +36,9 @@ The [WordPress.org Roadmap](https://wordpress.org/about/roadmap/) with Four Phas
 
 **Monthly:**
 
-[“What’s Next In Gutenberg?” posts](https://make.wordpress.org/core/tag/gutenberg-next/). These updates are wrangled by the Core Editor team and highlight areas of work aligned with the Gutenberg roadmap for contributors to help, how to get involved, and more. 
+[“What’s Next In Gutenberg?” posts](https://make.wordpress.org/core/tag/gutenberg-next/). These updates are wrangled by the Core Editor team and highlight areas of work aligned with the Gutenberg roadmap for contributors to help, how to get involved, and more.
 
-[Block Based Themes Meeting](https://make.wordpress.org/themes/tags/block-based-meeting/). These meetings are currently wrangled in the #themereview Slack channel and are dedicated to sharing FSE changes that will specifically impact themes. Agendas and summaries are shared on the [Make Themes blog](https://make.wordpress.org/themes/). 
+[Block Based Themes Meeting](https://make.wordpress.org/themes/tags/block-based-meeting/). These meetings are currently wrangled in the #themereview Slack channel and are dedicated to sharing FSE changes that will specifically impact themes. Agendas and summaries are shared on the [Make Themes blog](https://make.wordpress.org/themes/).
 
 **Biweekly:**
 
@@ -48,11 +48,11 @@ The [WordPress.org Roadmap](https://wordpress.org/about/roadmap/) with Four Phas
 
 [Core Editor meetings](https://make.wordpress.org/core/tag/core-editor-summary/). These meetings are wrangled by volunteer members in the #core-editor Slack channel. [Agendas](https://make.wordpress.org/core/tag/core-editor-summary/) and [summaries](https://make.wordpress.org/core/tag/core-editor-summary/) are shared on the [Make Core blog](https://make.wordpress.org/core/). They focus on task coordination and relevant discussions around Gutenberg releases. There is an Open Floor period in each chat where people can suggest topics to discuss.
 
-[Weekly Theme Related Gutenberg Updates](https://make.wordpress.org/themes/tags/gutenberg-themes-roundup/). These posts are focused on themes, including everything from current discussions to recent changes, as well as helpful resources for theme authors. 
+[Weekly Theme Related Gutenberg Updates](https://make.wordpress.org/themes/tags/gutenberg-themes-roundup/). These posts are focused on themes, including everything from current discussions to recent changes, as well as helpful resources for theme authors.
 
 **Daily:**
 
-Checking in on [issues](https://github.com/WordPress/gutenberg/issues) and [PRs](https://github.com/WordPress/gutenberg/pulls) on GitHub. This will give you a nearly real-time understanding of what’s being worked on by the developers and designers. 
+Checking in on [issues](https://github.com/WordPress/gutenberg/issues) and [PRs](https://github.com/WordPress/gutenberg/pulls) on GitHub. This will give you a nearly real-time understanding of what’s being worked on by the developers and designers.
 
 -   [Glossary](/docs/explanations/glossary.md)
 -   [Frequently Asked Questions](/docs/explanations/faq.md)

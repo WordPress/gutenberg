@@ -353,10 +353,10 @@ The following presets can be defined via `theme.json`:
     - `steps`: the number of steps to generate in the spacing scale. The default is 7. To prevent the generation of the spacing presets, and to disable the related UI, this can be set to `0`.
     - `mediumStep`: the steps in the scale are generated descending and ascending from a medium step, so this should be the size value of the medium space, without the unit. The default medium step is `1.5rem` so the mediumStep value is `1.5`.
     - `unit`: the unit the scale uses, eg. `px, rem, em, %`. The default is `rem`.
-- `spacing.spacingSizes`: themes can choose to include a static `spacing.spacingSizes` array of spacing preset sizes if they have a sequence of sizes that can't be generated via an increment or mulitplier. 
+- `spacing.spacingSizes`: themes can choose to include a static `spacing.spacingSizes` array of spacing preset sizes if they have a sequence of sizes that can't be generated via an increment or mulitplier.
     - `name`: a human readable name for the size, eg. `Small, Medium, Large`.
     - `slug`: the machine readable name. In order to provide the best cross site/theme compatibility the slugs should be in the format, "10","20","30","40","50","60", with "50" representing the `Medium` size value.
-    - `size`: the size, including the unit, eg. `1.5rem`. It is possible to include fluid values like `clamp(2rem, 10vw, 20rem)`. 
+    - `size`: the size, including the unit, eg. `1.5rem`. It is possible to include fluid values like `clamp(2rem, 10vw, 20rem)`.
 - `typography.fontSizes`: generates a single class and custom property per preset value.
 - `typography.fontFamilies`: generates a single custom property per preset value.
 
@@ -1083,7 +1083,7 @@ Within this field themes can list the custom templates present in the `templates
 
 ```json
 {
-    "version": 2,
+	"version": 2,
 	"customTemplates": [
 		{
 			"name": "my-custom-template",
@@ -1112,7 +1112,7 @@ Currently block variations exist for "header" and "footer" values of the area te
 
 ```json
 {
-    "version": 2,
+	"version": 2,
 	"templateParts": [
 		{
 			"name": "my-template-part",
@@ -1241,10 +1241,10 @@ In WordPress 5.9 release, CSS of presets are consolidated into the global styles
 ```css
 /* CSS Custom Properties for the preset values */
 body {
-  --wp--preset--<PRESET_TYPE>--<PRESET_SLUG>: <DEFAULT_VALUE>;
-  --wp--preset--color--pale-pink: #f78da7;
-  --wp--preset--font-size--large: 36px;
-  /* etc. */
+	--wp--preset--<PRESET_TYPE>--<PRESET_SLUG>: <DEFAULT_VALUE>;
+	--wp--preset--color--pale-pink: #f78da7;
+	--wp--preset--font-size--large: 36px;
+	/* etc. */
 }
 
 /* CSS classes for the preset values */

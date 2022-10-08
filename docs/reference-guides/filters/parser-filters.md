@@ -20,14 +20,14 @@ _Example:_
 
 ```php
 class EmptyParser {
-  public function parse( $post_content ) {
-    // return an empty document
-    return array();
-  }
+	public function parse( $post_content ) {
+		// return an empty document
+		return array();
+	}
 }
 
 function my_plugin_select_empty_parser( $prev_parser_class ) {
-    return 'EmptyParser';
+	return 'EmptyParser';
 }
 
 add_filter( 'block_parser_class', 'my_plugin_select_empty_parser', 10, 1 );

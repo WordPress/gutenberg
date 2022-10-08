@@ -73,15 +73,15 @@ A package or file can also set a `default` export, this is imported without usin
 
 ```js
 const edit = ( { attributes, setAttributes } ) => {
-    return (
-        <div>
-            <TextControl
-                label="URL"
-                value={ attributes.url }
-                onChange={ ... }
-            />
-        </div>
-    );
+	return (
+		<div>
+			<TextControl
+				label="URL"
+				value={ attributes.url }
+				onChange={ ... }
+			/>
+		</div>
+	);
 };
 
 export default edit;

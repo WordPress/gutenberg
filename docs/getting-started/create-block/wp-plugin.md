@@ -74,10 +74,10 @@ A `package.json` file was created with the create script, this defines the depen
 In `package.json`, there is a `scripts` property that defines what command to run when using `npm run (cmd)`. In our generated `package.json` file, the two main scripts point to the commands in the `wp-scripts` package:
 
 ```json
-  "scripts": {
-    "build": "wp-scripts build",
-    "start": "wp-scripts start"
-  },
+"scripts": {
+	"build": "wp-scripts build",
+	"start": "wp-scripts start"
+},
 ```
 
 These scripts are run by using: `npm run build` or `npm run start`.

@@ -1,6 +1,6 @@
 # Block Templates
 
-A block template is defined as a list of block items. Such blocks can have predefined attributes, placeholder content, and be static or dynamic. Block templates allow specifying a default initial state for an editor session. 
+A block template is defined as a list of block items. Such blocks can have predefined attributes, placeholder content, and be static or dynamic. Block templates allow specifying a default initial state for an editor session.
 
 The scope of templates include:
 
@@ -24,10 +24,10 @@ PHP example:
 ```php
 <?php
 function myplugin_register_template() {
-    $post_type_object = get_post_type_object( 'post' );
-    $post_type_object->template = array(
-        array( 'core/image' ),
-    );
+	$post_type_object = get_post_type_object( 'post' );
+	$post_type_object->template = array(
+		array( 'core/image' ),
+	);
 }
 add_action( 'init', 'myplugin_register_template' );
 ```
@@ -127,11 +127,11 @@ Alongside template level locking, you can lock individual blocks; you can do thi
 
 ```js
 attributes: {
-  // Prevent a block from being moved or removed.
-  lock: {
-    remove: true,
-    move: true,
-  }
+	// Prevent a block from being moved or removed.
+	lock: {
+		remove: true,
+		move: true,
+	}
 }
 ```
 _Options:_

@@ -348,12 +348,12 @@ Here's how we can use it in `EditPageForm`:
 ```js
 function EditPageForm( { pageId, onSaveFinished } ) {
 	// ...
-    const { lastError, page } = useSelect(
-        select => ({
+	const { lastError, page } = useSelect(
+		select => ({
 			page: select( coreDataStore ).getEditedEntityRecord( 'postType', 'page', pageId ),
 			lastError: select( coreDataStore ).getLastEntitySaveError( 'postType', 'page', pageId )
 		}),
-        [ pageId ]
+		[ pageId ]
 	)
 	// ...
 	return (

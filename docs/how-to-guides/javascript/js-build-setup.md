@@ -66,15 +66,15 @@ license: (ISC) GPL-2.0-only
 About to write to /home/mkaz/src/wp/scratch/package.json:
 
 {
-  "name": "myguten-block",
-  "version": "1.0.0",
-  "description": "Test block",
-  "main": "block.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "mkaz",
-  "license": "GPL-2.0-only"
+	"name": "myguten-block",
+	"version": "1.0.0",
+	"description": "Test block",
+	"main": "block.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "mkaz",
+	"license": "GPL-2.0-only"
 }
 
 
@@ -93,7 +93,7 @@ Also, if you look at package.json file it will include a new section:
 
 ```json
 "devDependencies": {
-  "@wordpress/scripts": "6.0.0"
+	"@wordpress/scripts": "6.0.0"
 }
 ```
 
@@ -118,9 +118,9 @@ registerBlockType( 'myguten/test-block', {
 To configure npm to run a script, you use the scripts section in `package.json` webpack:
 
 ```json
-  "scripts": {
-    "build": "wp-scripts build"
-  },
+	"scripts": {
+		"build": "wp-scripts build"
+	},
 ```
 
 You can then run the build using: `npm run build`.
@@ -134,10 +134,10 @@ The **build** command in `@wordpress/scripts` runs in "production" mode. This sh
 The start command can be added to the same scripts section of `package.json`:
 
 ```json
-  "scripts": {
-    "start": "wp-scripts start",
-    "build": "wp-scripts build"
-  },
+	"scripts": {
+		"start": "wp-scripts start",
+		"build": "wp-scripts build"
+	},
 ```
 
 Now, when you run `npm start` a watcher will run in the terminal. You can then edit away in your text editor; after each save, it will automatically build. You can then use the familiar edit/save/reload development process.

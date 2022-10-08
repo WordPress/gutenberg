@@ -75,12 +75,12 @@ The following code sample registers a style for the quote block named "Blue Quot
 
 ```php
 register_block_style(
-    'core/quote',
-    array(
-        'name'         => 'blue-quote',
-        'label'        => __( 'Blue Quote', 'textdomain' ),
-        'inline_style' => '.wp-block-quote.is-style-blue-quote { color: blue; }',
-    )
+	'core/quote',
+	array(
+		'name'         => 'blue-quote',
+		'label'        => __( 'Blue Quote', 'textdomain' ),
+		'inline_style' => '.wp-block-quote.is-style-blue-quote { color: blue; }',
+	)
 );
 ```
 
@@ -94,12 +94,12 @@ wp_register_style( 'myguten-style', get_template_directory_uri() . '/custom-styl
 // ...
 
 register_block_style(
-    'core/quote',
-    array(
-        'name'         => 'fancy-quote',
-        'label'        => __( 'Fancy Quote', 'textdomain' ),
-        'style_handle' => 'myguten-style',
-    )
+	'core/quote',
+	array(
+		'name'         => 'fancy-quote',
+		'label'        => __( 'Fancy Quote', 'textdomain' ),
+		'style_handle' => 'myguten-style',
+	)
 );
 ```
 

@@ -84,10 +84,10 @@ When the block declares support for `align`, the attributes definition is extend
 
 ```js
 attributes: {
-    align: {
-        type: 'string',
-        default: 'right'
-    }
+	align: {
+		type: 'string',
+		default: 'right'
+	}
 }
 ```
 
@@ -147,10 +147,10 @@ It's possible to disable them individually:
 
 ```js
 supports: {
-    color: { // Text UI control is enabled.
-        background: false, // Disable background UI control.
-        gradients: true // Enable gradients UI control.
-    }
+	color: { // Text UI control is enabled.
+		background: false, // Disable background UI control.
+		gradients: true // Enable gradients UI control.
+	}
 }
 ```
 
@@ -162,7 +162,7 @@ When color support is declared, this property is enabled by default (along with 
 
 ```js
 supports: {
-    color: true // Enables background and text
+	color: true // Enables background and text
 }
 ```
 
@@ -170,10 +170,10 @@ To disable background support while keeping other color supports enabled, set to
 
 ```js
 supports: {
-    color: {
-        // Disable background support. Text color support is still enabled.
-        background: false
-    }
+	color: {
+		// Disable background support. Text color support is still enabled.
+		background: false
+	}
 }
 ```
 
@@ -189,12 +189,12 @@ When the block declares support for `color.background`, the attributes definitio
 
   ```js
   attributes: {
-      backgroundColor: {
-          type: 'string',
-          default: 'some-preset-background-slug',
-      }
+  	backgroundColor: {
+  		type: 'string',
+  		default: 'some-preset-background-slug',
+  	}
   }
-  ```
+	```
 
 - `style`: attribute of `object` type with no default assigned.
 
@@ -204,14 +204,14 @@ When the block declares support for `color.background`, the attributes definitio
 
   ```js
   attributes: {
-      style: {
-          type: 'object',
-          default: {
-              color: {
-                  background: '#aabbcc',
-              }
-          }
-      }
+  	style: {
+  		type: 'object',
+  		default: {
+  			color: {
+  				background: '#aabbcc',
+  			}
+  		}
+  	}
   }
   ```
 
@@ -223,14 +223,14 @@ The parent selector is automatically added much like nesting in Sass/SCSS (howev
 
 ```js
 supports: {
-    color: {
-        // Apply the filter to the same selector in both edit and save.
-        __experimentalDuotone: '> .duotone-img, > .duotone-video',
+	color: {
+		// Apply the filter to the same selector in both edit and save.
+		__experimentalDuotone: '> .duotone-img, > .duotone-video',
 
-        // Default values must be disabled if you don't want to use them with duotone.
-        background: false,
-        text: false
-    }
+		// Default values must be disabled if you don't want to use them with duotone.
+		background: false,
+		text: false
+	}
 }
 ```
 
@@ -244,17 +244,17 @@ When the block declares support for `color.__experimentalDuotone`, the attribute
 
   ```js
   attributes: {
-      style: {
-          type: 'object',
-          default: {
-              color: {
-                  duotone: [
-                      '#FFF',
-                      '#000'
-                  ]
-              }
-          }
-      }
+  	style: {
+  		type: 'object',
+  		default: {
+  			color: {
+  				duotone: [
+  					'#FFF',
+  					'#000'
+  				]
+  			}
+  		}
+  	}
   }
   ```
 
@@ -264,13 +264,13 @@ This property adds UI controls which allow the user to apply a gradient backgrou
 
 ```js
 supports: {
-    color: {
-        gradients: true,
+	color: {
+		gradients: true,
 
-        // Default values must be disabled if you don't want to use them with gradient.
-        background: false,
-        text: false
-    }
+		// Default values must be disabled if you don't want to use them with gradient.
+		background: false,
+		text: false
+	}
 }
 ```
 
@@ -287,10 +287,10 @@ When the block declares support for `color.gradient`, the attributes definition 
 
   ```js
   attributes: {
-      gradient: {
-          type: 'string',
-          default: 'some-preset-gradient-slug',
-      }
+  	gradient: {
+  		type: 'string',
+  		default: 'some-preset-gradient-slug',
+  	}
   }
   ```
 
@@ -302,14 +302,14 @@ When the block declares support for `color.gradient`, the attributes definition 
 
   ```js
   attributes: {
-      style: {
-          type: 'object',
-          default: {
-              color: {
-                  gradient: 'linear-gradient(135deg,rgb(170,187,204) 0%,rgb(17,34,51) 100%)',
-              }
-          }
-      }
+  	style: {
+  		type: 'object',
+  		default: {
+  			color: {
+  				gradient: 'linear-gradient(135deg,rgb(170,187,204) 0%,rgb(17,34,51) 100%)',
+  			}
+  		}
+  	}
   }
   ```
 
@@ -320,7 +320,7 @@ This property adds block controls which allow the user to set link color in a bl
 
 ```js
 supports: {
-    color: true // Enables only background and text
+	color: true // Enables only background and text
 }
 ```
 
@@ -328,9 +328,9 @@ To enable link color support, set to `true`.
 
 ```js
 supports: {
-    color: {
-        link: true
-    }
+	color: {
+		link: true
+	}
 }
 ```
 
@@ -347,10 +347,10 @@ When the block declares support for `color.link`, the attributes definition is e
 
   ```js
   attributes: {
-      linkColor: {
-          type: 'string',
-          default: 'some-preset-link-color-slug',
-      }
+  	linkColor: {
+  		type: 'string',
+  		default: 'some-preset-link-color-slug',
+  	}
   }
   ```
 
@@ -362,14 +362,14 @@ When the block declares support for `color.link`, the attributes definition is e
 
   ```js
   attributes: {
-      style: {
-          type: 'object',
-          default: {
-              color: {
-                  link: '#ff0000',
-              }
-          }
-      }
+  	style: {
+  		type: 'object',
+  		default: {
+  			color: {
+  				link: '#ff0000',
+  			}
+  		}
+  	}
   }
   ```
 
@@ -381,7 +381,7 @@ When color support is declared, this property is enabled by default (along with 
 
 ```js
 supports: {
-    color: true // Enables background and text, but not link.
+	color: true // Enables background and text, but not link.
 }
 ```
 
@@ -389,10 +389,10 @@ To disable text color support while keeping other color supports enabled, set to
 
 ```js
 supports: {
-    color: {
-        // Disable text color support.
-        text: false
-    }
+	color: {
+		// Disable text color support.
+		text: false
+	}
 }
 ```
 
@@ -409,10 +409,10 @@ When the block declares support for `color.text`, the attributes definition is e
 
   ```js
   attributes: {
-      textColor: {
-          type: 'string',
-          default: 'some-preset-text-color-slug',
-      }
+  	textColor: {
+  		type: 'string',
+  		default: 'some-preset-text-color-slug',
+  	}
   }
   ```
 
@@ -424,14 +424,14 @@ When the block declares support for `color.text`, the attributes definition is e
 
   ```js
   attributes: {
-      style: {
-          type: 'object',
-          default: {
-              color: {
-                  text: '#aabbcc',
-              }
-          }
-      }
+  	style: {
+  		type: 'object',
+  		default: {
+  			color: {
+  				text: '#aabbcc',
+  			}
+  		}
+  	}
   }
   ```
 
@@ -546,11 +546,11 @@ This value signals that a block supports some of the CSS style properties relate
 
 ```js
 supports: {
-    spacing: {
-        margin: true,  // Enable margin UI control.
-        padding: true, // Enable padding UI control.
-        blockGap: true,  // Enables block spacing UI control.
-    }
+	spacing: {
+		margin: true,  // Enable margin UI control.
+		padding: true, // Enable padding UI control.
+		blockGap: true,  // Enables block spacing UI control.
+	}
 }
 ```
 
@@ -560,16 +560,16 @@ When the block declares support for a specific spacing property, the attributes 
 
 ```js
 attributes: {
-    style: {
-        margin: 'value',
-        padding: {
-            top: 'value',
-        }
-    }
+	style: {
+		margin: 'value',
+		padding: {
+			top: 'value',
+		}
+	}
 }
 ```
 
-A spacing property may define an array of allowable sides – 'top', 'right', 'bottom', 'left' – that can be configured. When such arbitrary sides are defined, only UI controls for those sides are displayed. 
+A spacing property may define an array of allowable sides – 'top', 'right', 'bottom', 'left' – that can be configured. When such arbitrary sides are defined, only UI controls for those sides are displayed.
 
 Axial sides are defined with the `vertical` and `horizontal` terms, and display a single UI control for each axial pair (for example, `vertical` controls both the top and bottom sides). A spacing property may support arbitrary individual sides **or** axial sides, but not a mix of both.
 
@@ -577,11 +577,11 @@ Note: `blockGap` accepts `vertical` and `horizontal` axial sides, which adjust g
 
 ```js
 supports: {
-    spacing: {
-        margin: [ 'top', 'bottom' ],             // Enable margin for arbitrary sides.
-        padding: true,                           // Enable padding for all sides.
-        blockGap: [ 'horizontal', 'vertical' ],  // Enables axial (column/row) block spacing controls
-    }
+	spacing: {
+		margin: [ 'top', 'bottom' ],             // Enable margin for arbitrary sides.
+		padding: true,                           // Enable padding for all sides.
+		blockGap: [ 'horizontal', 'vertical' ],  // Enables axial (column/row) block spacing controls
+	}
 }
 ```
 
@@ -597,12 +597,12 @@ The presence of this object signals that a block supports some typography relate
 
 ```js
 supports: {
-    typography: {
-        // Enable support and UI control for font-size.
-        fontSize: true,
-        // Enable support and UI control for line-height.
-        lineHeight: true,
-    },
+	typography: {
+		// Enable support and UI control for font-size.
+		fontSize: true,
+		// Enable support and UI control for line-height.
+		lineHeight: true,
+	},
 }
 ```
 
@@ -616,10 +616,10 @@ The values shown in this control are the ones declared by the theme via the `edi
 
 ```js
 supports: {
-    typography: {
-        // Enable support and UI control for font-size.
-        fontSize: true,
-    },
+	typography: {
+		// Enable support and UI control for font-size.
+		fontSize: true,
+	},
 }
 ```
 
@@ -629,10 +629,10 @@ When the block declares support for `fontSize`, the attributes definition is ext
 
 ```js
 attributes: {
-    fontSize: {
-        type: 'string',
-        default: 'some-value',
-    }
+	fontSize: {
+		type: 'string',
+		default: 'some-value',
+	}
 }
 ```
 
@@ -640,14 +640,14 @@ attributes: {
 
 ```js
 attributes: {
-    style: {
-        type: 'object',
-        default: {
-            typography: {
-                fontSize: 'value'
-            }
-        }
-    }
+	style: {
+		type: 'object',
+		default: {
+			typography: {
+				fontSize: 'value'
+			}
+		}
+	}
 }
 ```
 
@@ -660,10 +660,10 @@ This value signals that a block supports the line-height CSS style property. Whe
 
 ```js
 supports: {
-    typography: {
-        // Enable support and UI control for line-height.
-        lineHeight: true,
-    },
+	typography: {
+		// Enable support and UI control for line-height.
+		lineHeight: true,
+	},
 }
 ```
 
@@ -671,13 +671,13 @@ When the block declares support for `lineHeight`, the attributes definition is e
 
 ```js
 attributes: {
-    style: {
-        type: 'object',
-        default: {
-            typography: {
-                lineHeight: 'value'
-            }
-        }
-    }
+	style: {
+		type: 'object',
+		default: {
+			typography: {
+				lineHeight: 'value'
+			}
+		}
+	}
 }
 ```

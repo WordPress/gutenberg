@@ -215,9 +215,9 @@ We recommend configuring your editor to automatically check for syntax and lint 
 With the extension installed, ESLint will use the [.eslintrc.js](https://github.com/WordPress/gutenberg/blob/HEAD/.eslintrc.js) file in the root of the Gutenberg repository for formatting rules. It will highlight issues as you develop, you can also set the following preference to fix lint rules on save.
 
 ```json
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
-    },
+"editor.codeActionsOnSave": {
+	"source.fixAll.eslint": true
+},
 ```
 
 ### Prettier
@@ -228,12 +228,12 @@ To use Prettier with Visual Studio Code, you should install the [Prettier - Code
 
 ```json
 "[[javascript]]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.formatOnSave": true
 },
 "[[markdown]]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.formatOnSave": true
 },
 ```
 

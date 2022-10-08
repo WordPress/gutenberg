@@ -21,16 +21,16 @@ First, add **wp-i18n** as a dependency when registering your script:
  * Text Domain: myguten
  */
 function myguten_block_init() {
-    wp_register_script(
-        'myguten-script',
-        plugins_url( 'block.js', __FILE__ ),
-        array( 'wp-blocks', 'wp-element', 'wp-i18n', 'wp-block-editor' )
-    );
+	wp_register_script(
+		'myguten-script',
+		plugins_url( 'block.js', __FILE__ ),
+		array( 'wp-blocks', 'wp-element', 'wp-i18n', 'wp-block-editor' )
+	);
 
-    register_block_type( 'myguten/simple', array(
-		'api_version' => 2,
-        'editor_script' => 'myguten-script',
-    ) );
+	register_block_type( 'myguten/simple', array(
+	'api_version' => 2,
+		'editor_script' => 'myguten-script',
+	) );
 }
 add_action( 'init', 'myguten_block_init' );
 ```

@@ -74,9 +74,9 @@ In test cases, try to describe in plain words the expected behaviour. For UI com
 
 ```javascript
 describe( 'CheckboxWithLabel', () => {
-    test( 'checking checkbox should disable the form submit button', () => {
-        ...
-    } );
+	test( 'checking checkbox should disable the form submit button', () => {
+		...
+	} );
 } );
 ```
 
@@ -84,9 +84,9 @@ describe( 'CheckboxWithLabel', () => {
 
 ```javascript
 describe( 'CheckboxWithLabel', () => {
-    test( 'checking checkbox should set this.state.disableButton to `true`', () => {
-        ...
-    } );
+	test( 'checking checkbox should set this.state.disableButton to `true`', () => {
+		...
+	} );
 } );
 ```
 
@@ -334,9 +334,9 @@ This is the produced snapshot:
 
 ```js
 exports[ `test foobar test 1` ] = `
-  Object {
-    "foo": "bar",
-  }
+Object {
+	"foo": "bar",
+}
 `;
 ```
 

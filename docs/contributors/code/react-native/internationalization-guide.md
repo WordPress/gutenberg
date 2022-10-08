@@ -10,21 +10,21 @@ Regarding the first type, these strings are translated following the same proces
 
 In order to identify these strings, you can use the script [`extract-used-strings`](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/bin/extract-used-strings.js) located in `packages/react-native-editor/bin/extract-used-strings.js` to generate a JSON object that contains all the strings referenced including the platforms where they are used, as well as the files that reference it. Here you can see the format:
 ```
- {
+{
 	"gutenberg": {
-	  "<string>": {
-	    "string": String value.
-		"stringPlural": String value with its plural form. [optional]
-		"comments": Comments for translators. [default value is an empty string]
-		"reference": Array containing the paths of the source files that reference the string.
-		"platforms": Array containing the platforms where the string is being used, values are "android" | "ios" | "web".
-	  },
-	  ...
+		"<string>": {
+			"string": String value.
+			"stringPlural": String value with its plural form. [optional]
+			"comments": Comments for translators. [default value is an empty string]
+			"reference": Array containing the paths of the source files that reference the string.
+			"platforms": Array containing the platforms where the string is being used, values are "android" | "ios" | "web".
+		},
+		...
 	},
 	"other-domain-plugin": {
-	  ...
+		...
 	},
-    ...
+	...
 }
 ```
 

@@ -163,32 +163,32 @@ add_action( 'admin_enqueue_scripts', 'load_custom_wp_admin_scripts' );
 
 ```json
 {
-  "name": "09-code-data-basics-esnext",
-  "version": "1.1.0",
-  "private": true,
-  "description": "My first Gutenberg App",
-  "author": "The WordPress Contributors",
-  "license": "GPL-2.0-or-later",
-  "keywords": [
-    "WordPress",
-    "block"
-  ],
-  "homepage": "https://github.com/WordPress/gutenberg-examples/",
-  "repository": "git+https://github.com/WordPress/gutenberg-examples.git",
-  "bugs": {
-    "url": "https://github.com/WordPress/gutenberg-examples/issues"
-  },
-  "main": "build/index.js",
-  "devDependencies": {
-    "@wordpress/scripts": "^24.0.0"
-  },
-  "scripts": {
-    "build": "wp-scripts build",
-    "format": "wp-scripts format",
-    "lint:js": "wp-scripts lint-js",
-    "packages-update": "wp-scripts packages-update",
-    "start": "wp-scripts start"
-  }
+	"name": "09-code-data-basics-esnext",
+	"version": "1.1.0",
+	"private": true,
+	"description": "My first Gutenberg App",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"WordPress",
+		"block"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg-examples/",
+	"repository": "git+https://github.com/WordPress/gutenberg-examples.git",
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg-examples/issues"
+	},
+	"main": "build/index.js",
+	"devDependencies": {
+		"@wordpress/scripts": "^24.0.0"
+	},
+	"scripts": {
+		"build": "wp-scripts build",
+		"format": "wp-scripts format",
+		"lint:js": "wp-scripts lint-js",
+		"packages-update": "wp-scripts packages-update",
+		"start": "wp-scripts start"
+	}
 }
 ```
 

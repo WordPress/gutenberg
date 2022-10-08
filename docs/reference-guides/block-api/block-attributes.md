@@ -499,7 +499,7 @@ _Example_: Example `default` values.
 	type: 'array',
 	default: [
 		{ "url": "https://lorempixel.com/1200/800/", "alt": "large image" },
-    	{ "url": "https://lorempixel.com/50/50/", "alt": "small image" }
+		{ "url": "https://lorempixel.com/50/50/", "alt": "small image" }
 	]
 }
 ```

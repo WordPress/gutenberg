@@ -88,12 +88,12 @@ To do this we [register our custom admin page](https://developer.wordpress.org/r
 // init.php
 
 add_menu_page(
-    'Standalone Block Editor', // visible page name
-    'Block Editor', // menu label
-    'edit_posts', // required capability
-    'getdavesbe', // hook/slug of page
-    'getdave_sbe_render_block_editor', // function to render the page
-    'dashicons-welcome-widgets-menus' // custom icon
+	'Standalone Block Editor', // visible page name
+	'Block Editor', // menu label
+	'edit_posts', // required capability
+	'getdavesbe', // hook/slug of page
+	'getdave_sbe_render_block_editor', // function to render the page
+	'dashicons-welcome-widgets-menus' // custom icon
 );
 ```
 
@@ -136,11 +136,10 @@ First, we need to make sure we only run our custom code on our own admin page, s
 // init.php
 
 function getdave_sbe_block_editor_init( $hook ) {
-
-    // Exit if not the correct page
+	// Exit if not the correct page
 	if ( 'toplevel_page_getdavesbe' !== $hook ) {
 		return;
-    }
+	}
 }
 
 add_action( 'admin_enqueue_scripts', 'getdave_sbe_block_editor_init' );
@@ -171,10 +170,10 @@ wp_enqueue_style( 'wp-format-library' );
 
 // Custom styles
 wp_enqueue_style(
-    'getdave-sbe-styles', // Handle.
-    plugins_url( 'build/index.css', __FILE__ ), // Block editor CSS.
-    array( 'wp-edit-blocks' ), // Dependency to include the CSS after it.
-    filemtime( __DIR__ . '/build/index.css' )
+	'getdave-sbe-styles', // Handle.
+	plugins_url( 'build/index.css', __FILE__ ), // Block editor CSS.
+	array( 'wp-edit-blocks' ), // Dependency to include the CSS after it.
+	filemtime( __DIR__ . '/build/index.css' )
 );
 ```
 
@@ -459,16 +458,16 @@ Also within the render of our `<BlockEditor>`, is our `<Sidebar>` component.
 // src/components/block-editor/index.js
 
 return (
-    <div className="getdavesbe-block-editor">
-        <BlockEditorProvider>
-            <Sidebar.InspectorFill> /* <-- SIDEBAR */
-                <BlockInspector />
-            </Sidebar.InspectorFill>
-            <div className="editor-styles-wrapper">
-                // snip
-            </div>
-        </BlockEditorProvider>
-    </div>
+	<div className="getdavesbe-block-editor">
+		<BlockEditorProvider>
+			<Sidebar.InspectorFill> /* <-- SIDEBAR */
+				<BlockInspector />
+			</Sidebar.InspectorFill>
+			<div className="editor-styles-wrapper">
+				// snip
+			</div>
+		</BlockEditorProvider>
+	</div>
 );
 ```
 
