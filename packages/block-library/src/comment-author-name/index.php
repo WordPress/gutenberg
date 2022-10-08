@@ -19,7 +19,7 @@ function render_block_core_comment_author_name( $attributes, $content, $block ) 
 	}
 
 	if ( 0 === $block->context['commentId'] ) {
-		$comment_author = '${ context.author }';
+		$comment_author = '${ clientAttributes.author }';
 	} else {
 		$comment            = get_comment( $block->context['commentId'] );
 		$commenter          = wp_get_current_commenter();

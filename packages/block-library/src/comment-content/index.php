@@ -21,7 +21,7 @@ function render_block_core_comment_content( $attributes, $content, $block ) {
 	$moderation_note = '';
 
 	if ( 0 === $block->context['commentId'] ) {
-		$comment_text = '${ context.content }';
+		$comment_text = '${ clientAttributes.content }';
 	} else {
 		$comment            = get_comment( $block->context['commentId'] );
 		$commenter          = wp_get_current_commenter();

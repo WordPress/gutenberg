@@ -21,12 +21,12 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 	if ( 0 === $block->context['commentId'] ) {
 		// TODO: Translate format to JS-style.
 		$formatted_date = <<<END
-		\${ context.timestamp.toLocaleString( "en", {
+		\${ clientAttributes.timestamp.toLocaleString( "en", {
 			year: 'numeric', month: 'long', day: 'numeric',
 			hour: 'numeric', minute: 'numeric'
 		} ) }
 		END;
-		$timestamp = '${ context.timestamp.toISOString() }';
+		$timestamp = '${ clientAttributes.timestamp.toISOString() }';
 		$wrapper_attributes = get_block_wrapper_attributes();
 	} else {
 		$comment = get_comment( $block->context['commentId'] );

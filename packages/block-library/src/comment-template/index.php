@@ -93,7 +93,7 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 	}
 
 	$block_content = '<script>';
-	$block_content .= 'function wpCommentTemplate( context ) {';
+	$block_content .= 'function wpCommentTemplate( clientAttributes ) {';
 	$block_content .= 'output = `';
 	$block_content .= ( new WP_Block(
 		$block->parsed_block,

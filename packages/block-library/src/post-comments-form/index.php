@@ -96,12 +96,12 @@ function add_post_comments_form_onsubmit_handler() {
 				//const author = document.querySelector( '#author' ).value;
 				const content = document.querySelector( '#comment' ).value;
 
-				const context = {
+				const commentTemplateAttributes = {
 					//author,
 					content,
 					timestamp: date
 				};
-				form.innerHTML = wpCommentTemplate( context );
+				form.innerHTML = wpCommentTemplate( commentTemplateAttributes );
 
 			}
 		</script>
