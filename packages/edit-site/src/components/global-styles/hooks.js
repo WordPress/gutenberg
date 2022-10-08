@@ -19,6 +19,7 @@ import {
  */
 import { getValueFromVariable, getPresetVariableFromValue } from './utils';
 import { GlobalStylesContext } from './context';
+import { getTypographyFontSizeValue } from './typography-utils';
 
 const EMPTY_CONFIG = { settings: {}, styles: {} };
 
@@ -108,10 +109,19 @@ export function useStyle( path, blockName, source = 'all' ) {
 		? `styles.${ path }`
 		: `styles.blocks.${ blockName }.${ path }`;
 
-	const setStyle = ( newValue ) => {
+	const setStyle = ( newValue, presetSettings = null ) => {
 		setUserConfig( ( currentConfig ) => {
 			// Deep clone `currentConfig` to avoid mutating it later.
 			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
+
+			// Convert font size styles to fluid if fluid is activated.
+			if ( finalPath.indexOf( 'typography.fontSize' ) !== -1 && presetSettings ) {
+				newValue = getTypographyFontSizeValue(
+			{ ...presetSettings, size: newValue },
+					mergedConfig?.settings?.typography
+				);
+			}
+
 			set(
 				newUserConfig,
 				finalPath,

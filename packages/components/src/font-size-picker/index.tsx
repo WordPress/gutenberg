@@ -111,11 +111,20 @@ const UnforwardedFontSizePicker = (
 			),
 		[ shouldUseSelectControl, fontSizes, disableCustomFontSizes ]
 	);
-	const selectedOption = getSelectedOption( fontSizes, value );
+	const [ selectedOptionSlug, setSelectedOptionSlug ] = useState();
+	const selectedOption = getSelectedOption(
+		fontSizes,
+		value,
+		shouldUseSelectControl,
+		disableCustomFontSizes,
+		selectedOptionSlug
+	);
+	console.log( 'selectedOption', selectedOption );
 	const isCustomValue = selectedOption.slug === CUSTOM_FONT_SIZE;
 	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
 		! disableCustomFontSizes && isCustomValue
 	);
+
 	const headerHint = useMemo( () => {
 		if ( showCustomValueControl ) {
 			return `(${ __( 'Custom' ) })`;
@@ -227,16 +236,26 @@ const UnforwardedFontSizePicker = (
 								}: {
 									selectedItem: FontSizeSelectOption;
 								} ) => {
+									const selectedSelectControlOption =
+										getSelectedOption(
+											fontSizes,
+											selectedItem.size,
+											shouldUseSelectControl,
+											disableCustomFontSizes,
+											selectedItem?.slug
+										);
 									onChange?.(
 										hasUnits
 											? selectedItem.size
-											: Number( selectedItem.size )
+											: Number( selectedItem.size ),
+										selectedSelectControlOption
 									);
 									if (
 										selectedItem.key === CUSTOM_FONT_SIZE
 									) {
 										setShowCustomValueControl( true );
 									}
+									setSelectedOptionSlug( selectedItem?.slug );
 								} }
 								size={ size }
 							/>
@@ -247,9 +266,17 @@ const UnforwardedFontSizePicker = (
 							label={ __( 'Font size' ) }
 							hideLabelFromVision
 							value={ value }
-							onChange={ ( newValue ) => {
+							onChange={ ( newValue, optionSlug ) => {
+								const groupSelectedOption = getSelectedOption(
+									fontSizes,
+									newValue,
+									shouldUseSelectControl,
+									disableCustomFontSizes,
+									optionSlug
+								);
 								onChange?.(
-									hasUnits ? newValue : Number( newValue )
+									hasUnits ? newValue : Number( newValue ),
+									groupSelectedOption
 								);
 							} }
 							isBlock
@@ -260,6 +287,7 @@ const UnforwardedFontSizePicker = (
 									<ToggleGroupControlOption
 										key={ option.key }
 										value={ option.value }
+										slug={ option.slug }
 										label={ option.label }
 										aria-label={ option.name }
 										showTooltip={ true }

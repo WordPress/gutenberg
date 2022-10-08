@@ -2,10 +2,63 @@
 	"version": 2,
 	"settings": {
 		"appearanceTools": true,
-		"layout": {
-			"contentSize": "840px",
-			"wideSize": "1100px"
+		"typography": {
+			"fluid": true,
+			"fontSizes": [
+				{
+					"fluid": {
+						"min": "0.875rem",
+						"max": "1rem"
+					},
+					"size": "1rem",
+					"slug": "small"
+				},
+				{
+					"fluid": {
+						"min": "1rem",
+						"max": "1.125rem"
+					},
+					"size": "1.125rem",
+					"slug": "medium"
+				},
+				{
+					"size": "1.9rem",
+					"slug": "not-so-large",
+					"fluid": {
+						"min": "1.9rem",
+						"max": "2rem"
+					}
+				},
+				{
+					"size": "3.5rem",
+					"slug": "large",
+					"fluid": {
+						"min": "3rem",
+						"max": "5rem"
+					}
+				},
+				{
+					"size": "2.25rem",
+					"slug": "x-large",
+					"fluid": false
+				},
+				{
+					"size": "10rem",
+					"slug": "xx-large",
+					"fluid": {
+						"min": "4rem",
+						"max": "20rem"
+					}
+				},
+				{
+					"size": "14rem",
+					"slug": "Colossal",
+					"fluid": {
+						"min": "8rem",
+						"max": "30rem"
+					}
+				}
+			]
 		}
-	},
-	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
+	}
 }

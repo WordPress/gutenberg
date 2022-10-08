@@ -112,7 +112,9 @@ function getSelectOptions(
 	];
 	return options.map( ( { slug, name, size } ) => ( {
 		key: slug,
-		name,
+		name: name || slug,
+		label: name || slug,
+		slug,
 		size,
 		__experimentalHint:
 			size && isSimpleCssValue( size ) && parseFloat( String( size ) ),
@@ -136,19 +138,37 @@ export function getToggleGroupOptions(
 			value: size,
 			label: labelAliases[ index ],
 			name: name || labelAliases[ index ],
+			size,
+			slug,
 		};
 	} );
 }
 
 export function getSelectedOption(
 	fontSizes: FontSize[],
-	value: FontSizePickerProps[ 'value' ]
+	value: FontSizePickerProps[ 'value' ],
+	useSelectControl: boolean,
+	disableCustomFontSizes: boolean = false,
+	slug: string | undefined
 ): FontSizeOption {
 	if ( ! value ) {
 		return DEFAULT_FONT_SIZE_OPTION;
 	}
-	return (
-		fontSizes.find( ( font ) => font.size === value ) ||
-		CUSTOM_FONT_SIZE_OPTION
+
+	const fontSizeOptions = getFontSizeOptions(
+		useSelectControl,
+		fontSizes,
+		disableCustomFontSizes
 	);
+console.log( 'fontSizeOptions', fontSizeOptions, value, slug );
+	// @TODO fix types for fontSizeOptions.
+	const selectedOption = fontSizeOptions
+		? // @ts-ignore
+		  fontSizeOptions.find(
+				( option: FontSizeSelectOption ) =>
+					slug === option.slug || option.size === value
+		  ) // @ts-ignore
+		: null;
+
+	return selectedOption || CUSTOM_FONT_SIZE_OPTION;
 }
