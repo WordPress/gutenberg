@@ -138,7 +138,9 @@ describe( 'useDispatch', () => {
 
 		await user.click( screen.getByRole( 'button' ) );
 		expect( firstRegistryAction ).toHaveBeenCalledTimes( 1 );
-		expect( secondRegistryAction ).toHaveBeenCalledTimes( 0 );
+		expect( secondRegistryAction ).not.toHaveBeenCalled();
+
+		firstRegistryAction.mockClear();
 
 		const secondRegistry = createRegistry();
 		secondRegistry.registerStore( 'demo', {
@@ -155,7 +157,7 @@ describe( 'useDispatch', () => {
 		);
 
 		await user.click( screen.getByRole( 'button' ) );
-		expect( firstRegistryAction ).toHaveBeenCalledTimes( 1 );
+		expect( firstRegistryAction ).not.toHaveBeenCalled();
 		expect( secondRegistryAction ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
