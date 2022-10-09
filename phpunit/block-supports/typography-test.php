@@ -340,6 +340,24 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output'             => '28px',
 			),
 
+			'default_return_value_when_value_is_already_clamped' => array(
+				'font_size_preset'            => array(
+					'size'  => 'clamp(21px, 1.3125rem + ((1vw - 7.68px) * 2.524), 42px)',
+					'fluid' => false,
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(21px, 1.3125rem + ((1vw - 7.68px) * 2.524), 42px)',
+			),
+
+			'default_return_value_with_unsupported_unit'   => array(
+				'font_size_preset'            => array(
+					'size'  => '1000%',
+					'fluid' => false,
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => '1000%',
+			),
+
 			'return_fluid_value'                           => array(
 				'font_size_preset'            => array(
 					'size' => '1.75rem',
