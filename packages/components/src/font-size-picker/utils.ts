@@ -160,7 +160,8 @@ export function getSelectedOption(
 	);
 
 	const selectedOption = fontSizeOptions
-		? // @ts-ignore @TODO fix types for fontSizeOptions. Array.find() works on the same type only.
+		? // @TODO Array.find() triggers error on array types unions. It's a bug. See: https://github.com/microsoft/TypeScript/issues/44373.
+		  // @ts-ignore
 		  fontSizeOptions.find(
 				( option: FontSizeSelectOption ) => option.size === value
 		  ) // @ts-ignore
