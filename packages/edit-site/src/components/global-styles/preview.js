@@ -121,6 +121,7 @@ const StylesPreview = ( { label, isFocused, withHoverView } ) => {
 					width: '100%',
 					background: gradientValue ?? backgroundColor,
 					cursor: 'pointer',
+					overflow: 'hidden',
 				} }
 				initial="start"
 				animate={
@@ -220,8 +221,7 @@ const StylesPreview = ( { label, isFocused, withHoverView } ) => {
 							) ) }
 					</HStack>
 				</motion.div>
-				<motion.div
-					variants={ secondFrame }
+				<div
 					style={ {
 						height: '100%',
 						width: '100%',
@@ -230,32 +230,39 @@ const StylesPreview = ( { label, isFocused, withHoverView } ) => {
 						top: 0,
 					} }
 				>
-					<VStack
-						spacing={ 3 * ratio }
-						justify="center"
+					<motion.div
+						variants={ secondFrame }
 						style={ {
 							height: '100%',
-							overflow: 'hidden',
-							padding: 10 * ratio,
-							boxSizing: 'border-box',
 						} }
 					>
-						{ label && (
-							<div
-								style={ {
-									fontSize: 40 * ratio,
-									fontFamily: headingFontFamily,
-									color: headingColor,
-									fontWeight: headingFontWeight,
-									lineHeight: '1em',
-									textAlign: 'center',
-								} }
-							>
-								{ label }
-							</div>
-						) }
-					</VStack>
-				</motion.div>
+						<VStack
+							spacing={ 3 * ratio }
+							justify="center"
+							style={ {
+								height: '100%',
+								overflow: 'hidden',
+								padding: 10 * ratio,
+								boxSizing: 'border-box',
+							} }
+						>
+							{ label && (
+								<div
+									style={ {
+										fontSize: 40 * ratio,
+										fontFamily: headingFontFamily,
+										color: headingColor,
+										fontWeight: headingFontWeight,
+										lineHeight: '1em',
+										textAlign: 'center',
+									} }
+								>
+									{ label }
+								</div>
+							) }
+						</VStack>
+					</motion.div>
+				</div>
 			</motion.div>
 		</Iframe>
 	);
