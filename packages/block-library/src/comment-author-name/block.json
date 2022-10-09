@@ -20,7 +20,7 @@
 			"type": "string"
 		}
 	},
-	"usesContext": [ "commentId" ],
+	"usesContext": [ "__client", "commentId" ],
 	"supports": {
 		"html": false,
 		"spacing": {

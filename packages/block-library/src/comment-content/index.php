@@ -14,15 +14,15 @@
  * @return string Return the post comment's content.
  */
 function render_block_core_comment_content( $attributes, $content, $block ) {
-	if ( ! isset( $block->context['commentId'] ) ) {
-		return '';
-	}
-
 	$moderation_note = '';
 
-	if ( 0 === $block->context['commentId'] ) {
+	if ( ! empty( $block->context['__client'] ) ) {
 		$comment_text = '${ clientAttributes.content }';
 	} else {
+		if ( ! isset( $block->context['commentId'] ) ) {
+			return '';
+		}
+
 		$comment            = get_comment( $block->context['commentId'] );
 		$commenter          = wp_get_current_commenter();
 		$show_pending_links = isset( $commenter['comment_author'] ) && $commenter['comment_author'];

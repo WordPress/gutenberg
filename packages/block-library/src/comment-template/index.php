@@ -98,6 +98,7 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 	$block_content .= ( new WP_Block(
 		$block->parsed_block,
 		array(
+			'__client'  => true,
 			'commentId' => 0,
 		)
 	) )->render( array( 'dynamic' => false ) );

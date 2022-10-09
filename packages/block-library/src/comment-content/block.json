@@ -7,7 +7,7 @@
 	"ancestor": [ "core/comment-template" ],
 	"description": "Displays the contents of a comment.",
 	"textdomain": "default",
-	"usesContext": [ "commentId" ],
+	"usesContext": [ "__client", "commentId" ],
 	"attributes": {
 		"textAlign": {
 			"type": "string"

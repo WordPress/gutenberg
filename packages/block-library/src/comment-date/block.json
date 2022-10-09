@@ -16,7 +16,7 @@
 			"default": true
 		}
 	},
-	"usesContext": [ "commentId" ],
+	"usesContext": [ "__client", "commentId" ],
 	"supports": {
 		"html": false,
 		"color": {

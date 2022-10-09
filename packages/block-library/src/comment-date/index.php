@@ -14,11 +14,7 @@
  * @return string Return the post comment's date.
  */
 function render_block_core_comment_date( $attributes, $content, $block ) {
-	if ( ! isset( $block->context['commentId'] ) ) {
-		return '';
-	}
-
-	if ( 0 === $block->context['commentId'] ) {
+	if ( ! empty( $block->context['__client'] ) ) {
 		// TODO: Translate format to JS-style.
 		$formatted_date = <<<END
 		\${ clientAttributes.timestamp.toLocaleString( "en", {
@@ -29,6 +25,10 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 		$timestamp = '${ clientAttributes.timestamp.toISOString() }';
 		$wrapper_attributes = get_block_wrapper_attributes();
 	} else {
+		if ( ! isset( $block->context['commentId'] ) ) {
+			return '';
+		}
+
 		$comment = get_comment( $block->context['commentId'] );
 		if ( empty( $comment ) ) {
 			return '';
