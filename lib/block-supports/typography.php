@@ -236,7 +236,11 @@ function gutenberg_typography_get_css_variable_inline_style( $attributes, $featu
  * @return string                Filtered block content.
  */
 function gutenberg_render_typography_support( $block_content, $block ) {
-	$custom_font_size = isset( $block['attrs']['style']['typography']['fontSize'] ) ? $block['attrs']['style']['typography']['fontSize'] : null;
+	if ( ! isset( $block['attrs']['style']['typography']['fontSize'] ) ) {
+		return $block_content;
+	}
+
+	$custom_font_size = $block['attrs']['style']['typography']['fontSize'];
 	$fluid_font_size  = gutenberg_get_typography_font_size_value( array( 'size' => $custom_font_size ) );
 
 	/*
