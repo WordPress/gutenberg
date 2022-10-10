@@ -507,6 +507,16 @@ On the development instance, `cwd` will be mapped as a plugin, `one-theme` will 
 
 On the tests instance, `cwd` is still mapped as a plugin, but no theme is mapped. Additionally, while KEY_2 is still set to false, KEY_1 is overridden and set to false. 3000 overrides the default port as well.
 
+Another example would be serving the development site over a different URL, like this:
+
+```
+  "config": {
+    "DOCKER_REQUEST_URL": "http://mycustom.test",
+    "WP_SITEURL": "http://mycustom.test",
+    "WP_HOME": "http://mycustom.test"
+  }
+```
+
 This gives you a lot of power to change the options applicable to each environment.
 
 ## .wp-env.override.json
