@@ -11,6 +11,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as editorStore } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -40,12 +41,13 @@ function KeyboardShortcuts() {
 		toggleFeature,
 		setIsListViewOpened,
 		setIsInserterOpened,
-		setFeature,
 	} = useDispatch( editPostStore );
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 
+	const { set: setPreference } = useDispatch( preferencesStore );
+
 	const toggleDistractionFree = () => {
-		setFeature( 'fixedToolbar', false );
+		setPreference( 'core/edit-post', 'fixedToolbar', false );
 		setIsInserterOpened( false );
 		setIsListViewOpened( false );
 		closeGeneralSidebar();

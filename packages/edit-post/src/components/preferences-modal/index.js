@@ -24,6 +24,7 @@ import {
 	PreferencesModalTabs,
 	PreferencesModalSection,
 } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -66,15 +67,13 @@ export default function EditPostPreferencesModal() {
 		[ isLargeViewport ]
 	);
 
-	const {
-		closeGeneralSidebar,
-		setIsListViewOpened,
-		setIsInserterOpened,
-		setFeature,
-	} = useDispatch( editPostStore );
+	const { closeGeneralSidebar, setIsListViewOpened, setIsInserterOpened } =
+		useDispatch( editPostStore );
+
+	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const toggleDistractionFree = () => {
-		setFeature( 'fixedToolbar', false );
+		setPreference( 'core/edit-post', 'fixedToolbar', false );
 		setIsInserterOpened( false );
 		setIsListViewOpened( false );
 		closeGeneralSidebar();
