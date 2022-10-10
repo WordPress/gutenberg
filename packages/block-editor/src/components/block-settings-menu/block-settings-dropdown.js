@@ -74,7 +74,7 @@ export function BlockSettingsDropdown( {
 			const {
 				getBlockCount,
 				getBlockName,
-				getBlockParents,
+				getBlockRootClientId,
 				getPreviousBlockClientId,
 				getNextBlockClientId,
 				getSelectedBlockClientIds,
@@ -84,19 +84,22 @@ export function BlockSettingsDropdown( {
 
 			const { getActiveBlockVariation } = select( blocksStore );
 
-			const parents = getBlockParents( firstBlockClientId );
-			const _firstParentClientId = parents[ parents.length - 1 ];
-			const parentBlockName = getBlockName( _firstParentClientId );
+			const _firstParentClientId =
+				getBlockRootClientId( firstBlockClientId );
+			const parentBlockName =
+				_firstParentClientId && getBlockName( _firstParentClientId );
 
 			return {
 				firstParentClientId: _firstParentClientId,
 				isDistractionFree: getSettings().isDistractionFree,
-				onlyBlock: 1 === getBlockCount(),
+				onlyBlock: 1 === getBlockCount( _firstParentClientId ),
 				parentBlockType:
-					getActiveBlockVariation(
+					_firstParentClientId &&
+					( getActiveBlockVariation(
 						parentBlockName,
 						getBlockAttributes( _firstParentClientId )
-					) || getBlockType( parentBlockName ),
+					) ||
+						getBlockType( parentBlockName ) ),
 				previousBlockClientId:
 					getPreviousBlockClientId( firstBlockClientId ),
 				nextBlockClientId: getNextBlockClientId( firstBlockClientId ),
@@ -221,7 +224,7 @@ export function BlockSettingsDropdown( {
 								<__unstableBlockSettingsMenuFirstItem.Slot
 									fillProps={ { onClose } }
 								/>
-								{ firstParentClientId !== undefined && (
+								{ !! firstParentClientId && (
 									<MenuItem
 										{ ...showParentOutlineGestures }
 										ref={ selectParentButtonRef }
