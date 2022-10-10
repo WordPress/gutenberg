@@ -44,78 +44,6 @@
 													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
 												},
 												"innerBlocks": []
-											},
-											{
-												"name": "core/list-item",
-												"isValid": true,
-												"attributes": {
-													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
-												},
-												"innerBlocks": []
-											},
-											{
-												"name": "core/list-item",
-												"isValid": true,
-												"attributes": {
-													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
-												},
-												"innerBlocks": []
-											},
-											{
-												"name": "core/list-item",
-												"isValid": true,
-												"attributes": {
-													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
-												},
-												"innerBlocks": []
-											},
-											{
-												"name": "core/list-item",
-												"isValid": true,
-												"attributes": {
-													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
-												},
-												"innerBlocks": []
-											},
-											{
-												"name": "core/list-item",
-												"isValid": true,
-												"attributes": {
-													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
-												},
-												"innerBlocks": []
-											},
-											{
-												"name": "core/list-item",
-												"isValid": true,
-												"attributes": {
-													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
-												},
-												"innerBlocks": []
-											},
-											{
-												"name": "core/list-item",
-												"isValid": true,
-												"attributes": {
-													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
-												},
-												"innerBlocks": []
-											},
-											{
-												"name": "core/list-item",
-												"isValid": true,
-												"attributes": {
-													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
-												},
-												"innerBlocks": []
-											},
-											{
-												"name": "core/list-item",
-												"isValid": true,
-												"attributes": {
-													"content": "<a href=\"#\" target=\"_blank\" rel=\"noreferrer noopener\">Item</a>"
-												},
-												"innerBlocks": []
 											}
 										]
 									}
@@ -143,46 +71,6 @@
 													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
 												},
 												"innerBlocks": []
-											},
-											{
-												"name": "core/list-item",
-												"isValid": true,
-												"attributes": {
-													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
-												},
-												"innerBlocks": []
-											},
-											{
-												"name": "core/list-item",
-												"isValid": true,
-												"attributes": {
-													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\"><strong>Item</strong></a>"
-												},
-												"innerBlocks": []
-											},
-											{
-												"name": "core/list-item",
-												"isValid": true,
-												"attributes": {
-													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
-												},
-												"innerBlocks": []
-											},
-											{
-												"name": "core/list-item",
-												"isValid": true,
-												"attributes": {
-													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
-												},
-												"innerBlocks": []
-											},
-											{
-												"name": "core/list-item",
-												"isValid": true,
-												"attributes": {
-													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
-												},
-												"innerBlocks": []
 											}
 										]
 									}
@@ -203,14 +91,6 @@
 											"values": ""
 										},
 										"innerBlocks": [
-											{
-												"name": "core/list-item",
-												"isValid": true,
-												"attributes": {
-													"content": "<a rel=\"noreferrer noopener\" href=\"#\" target=\"_blank\">Item</a>"
-												},
-												"innerBlocks": []
-											},
 											{
 												"name": "core/list-item",
 												"isValid": true,
