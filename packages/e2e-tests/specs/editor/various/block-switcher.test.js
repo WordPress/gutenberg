@@ -82,9 +82,9 @@ describe( 'Block Switcher', () => {
 		await pressKeyWithModifier( 'alt', 'F10' );
 
 		// Verify the block switcher exists.
-		expect( await hasBlockSwitcher() ).toBeFalsy();
+		expect( await hasBlockSwitcher() ).toBeTruthy();
 		// Verify the correct block transforms appear.
-		expect( await getAvailableBlockTransforms() ).toHaveLength( 0 );
+		expect( await getAvailableBlockTransforms() ).toHaveLength( 1 );
 	} );
 
 	describe( 'Conditional tranformation options', () => {
