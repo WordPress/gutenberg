@@ -95,6 +95,9 @@ require __DIR__ . '/compat/wordpress-6.1/edit-form-blocks.php';
 require __DIR__ . '/compat/wordpress-6.1/template-parts-screen.php';
 require __DIR__ . '/compat/wordpress-6.1/theme.php';
 
+// WordPress 6.2 compat.
+require __DIR__ . '/compat/wordpress-6.2/site-editor.php';
+
 // Experimental features.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
