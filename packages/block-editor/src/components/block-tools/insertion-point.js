@@ -24,7 +24,7 @@ function InsertionPointPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
 } ) {
-	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
 	const ref = useRef();
 	const {
@@ -85,14 +85,6 @@ function InsertionPointPopover( {
 		// bubbled from the inserter itself.
 		if ( event.target !== ref.current ) {
 			openRef.current = true;
-		}
-	}
-
-	function maybeHideInserterPoint( event ) {
-		// Only hide the inserter if it's triggered on the wrapper,
-		// and the inserter is not open.
-		if ( event.target === ref.current && ! openRef.current ) {
-			hideInsertionPoint();
 		}
 	}
 
@@ -195,7 +187,6 @@ function InsertionPointPopover( {
 				className={ classnames( className, {
 					'is-with-inserter': isInserterShown,
 				} ) }
-				onHoverEnd={ maybeHideInserterPoint }
 			>
 				<motion.div
 					variants={ lineVariants }

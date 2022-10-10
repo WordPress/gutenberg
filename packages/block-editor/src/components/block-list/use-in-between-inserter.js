@@ -93,6 +93,7 @@ export function useInBetweenInserter() {
 				} );
 
 				if ( ! element ) {
+					hideInsertionPoint();
 					return;
 				}
 
@@ -102,6 +103,7 @@ export function useInBetweenInserter() {
 					element = element.firstElementChild;
 
 					if ( ! element ) {
+						hideInsertionPoint();
 						return;
 					}
 				}
