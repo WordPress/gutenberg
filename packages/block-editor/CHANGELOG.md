@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `FontSizePicker`: Update fluid utils so that only string and integers are treated as valid font sizes for the purposes of fluid typography.
+
 ## 10.2.0 (2022-10-05)
 
 ## 10.1.0 (2022-09-21)

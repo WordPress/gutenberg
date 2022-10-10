@@ -15,6 +15,23 @@ describe( 'typography utils', () => {
 					typographySettings: undefined,
 					expected: '28px',
 				},
+				// Default return value where font size is 0.
+				{
+					preset: {
+						size: 0,
+					},
+					typographySettings: undefined,
+					expected: 0,
+				},
+				// Default return value where font size is '0'.
+				{
+					preset: {
+						size: '0',
+					},
+					typographySettings: undefined,
+					expected: '0',
+				},
+
 				// Default return non-fluid value where `size` is undefined.
 				{
 					preset: {

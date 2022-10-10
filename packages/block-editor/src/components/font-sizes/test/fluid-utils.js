@@ -6,7 +6,10 @@ import { logged } from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { getComputedFluidTypographyValue } from '../fluid-utils';
+import {
+	getComputedFluidTypographyValue,
+	getTypographyValueAndUnit,
+} from '../fluid-utils';
 
 describe( 'getComputedFluidTypographyValue()', () => {
 	afterEach( () => {
@@ -73,5 +76,34 @@ describe( 'getComputedFluidTypographyValue()', () => {
 		expect( fluidTypographyValues ).toBe(
 			'clamp(15px, 0.9375rem + ((1vw - 7.68px) * 5.409), 60px)'
 		);
+	} );
+
+	describe( 'getTypographyValueAndUnit', () => {
+		it( 'should return the expected return values', () => {
+			[
+				{
+					value: null,
+					expected: null,
+				},
+				{
+					value: false,
+					expected: null,
+				},
+				{
+					value: true,
+					expected: null,
+				},
+				{
+					value: 10.1234,
+					expected: null,
+				},
+				{
+					value: [ '10' ],
+					expected: null,
+				},
+			].forEach( ( { value, expected } ) => {
+				expect( getTypographyValueAndUnit( value ) ).toBe( expected );
+			} );
+		} );
 	} );
 } );

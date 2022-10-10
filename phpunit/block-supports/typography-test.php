@@ -323,6 +323,22 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output'             => '28px',
 			),
 
+			'size: int 0'                                  => array(
+				'font_size_preset'            => array(
+					'size' => 0,
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 0,
+			),
+
+			'size: string 0'                               => array(
+				'font_size_preset'            => array(
+					'size' => '0',
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => '0',
+			),
+
 			'default_return_value_when_size_is_undefined'  => array(
 				'font_size_preset'            => array(
 					'size' => null,
@@ -519,6 +535,37 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'should_use_fluid_typography' => true,
 				'expected_output'             => "<div class=\"wp-block-group\" style=\"font-size:clamp(0.75em, 0.75em + ((1vw - 0.48em) * 1.442), 1.5em);\"> \n \n<p style=\"font-size:1em\">A paragraph inside a group</p></div>",
 			),
+		);
+	}
+
+	/**
+	 * Tests generating font size values, including fluid formulae, from fontSizes preset.
+	 *
+	 * @ticket 56467
+	 *
+	 * @covers ::gutenberg_get_typography_value_and_unit
+	 *
+	 * @dataProvider data_invalid_size_wp_get_typography_value_and_unit
+	 * @expectedIncorrectUsage gutenberg_get_typography_value_and_unit
+	 *
+	 * @param mixed $raw_value Raw size value to test.
+	 */
+	public function test_invalid_size_wp_get_typography_value_and_unit( $raw_value ) {
+		$this->assertNull( gutenberg_get_typography_value_and_unit( $raw_value ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_invalid_size_wp_get_typography_value_and_unit() {
+		return array(
+			'size: null'  => array( null ),
+			'size: false' => array( false ),
+			'size: true'  => array( true ),
+			'size: float' => array( 10.1234 ),
+			'size: array' => array( array( '10' ) ),
 		);
 	}
 }
