@@ -20,6 +20,8 @@ import { RegistryProvider } from '../../registry-provider';
 const noop = () => ( { type: '__INERT__' } );
 const reducer = ( state ) => state;
 
+jest.useRealTimers();
+
 describe( 'useDispatch', () => {
 	let registry;
 	beforeEach( () => {
@@ -55,9 +57,7 @@ describe( 'useDispatch', () => {
 	} );
 
 	it( 'returns expected action creators from store for given storeName', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const testAction = jest.fn().mockImplementation( noop );
 		const store = createReduxStore( 'demoStore', {
 			reducer,
@@ -84,9 +84,7 @@ describe( 'useDispatch', () => {
 	} );
 
 	it( 'returns expected action creators from store for given store descriptor', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const testAction = jest.fn().mockImplementation( noop );
 		registry.registerStore( 'demoStore', {
 			reducer,
@@ -111,9 +109,7 @@ describe( 'useDispatch', () => {
 	} );
 
 	it( 'returns dispatch from correct registry if registries change', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const firstRegistryAction = jest.fn().mockImplementation( noop );
 		const secondRegistryAction = jest.fn().mockImplementation( noop );
 
