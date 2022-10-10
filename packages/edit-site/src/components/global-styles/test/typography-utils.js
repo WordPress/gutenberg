@@ -15,7 +15,7 @@ describe( 'typography utils', () => {
 					typographySettings: undefined,
 					expected: '28px',
 				},
-				// Default return non-fluid value where `size` is not a number | string.
+				// Default return non-fluid value where `size` is undefined.
 				{
 					preset: {
 						size: undefined,
