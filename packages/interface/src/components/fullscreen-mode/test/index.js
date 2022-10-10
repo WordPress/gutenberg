@@ -40,9 +40,7 @@ describe( 'FullscreenMode', () => {
 	} );
 
 	it( 'fullscreen mode to be removed from document body when component unmounted', () => {
-		const { baseElement, unmount } = render(
-			<FullscreenMode isActive />
-		);
+		const { baseElement, unmount } = render( <FullscreenMode isActive /> );
 
 		// Present after mounting with `isActive`
 		expect( baseElement ).toHaveClass( 'is-fullscreen-mode' );
