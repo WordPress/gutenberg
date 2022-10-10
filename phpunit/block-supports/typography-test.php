@@ -445,6 +445,79 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 * in inline block supports styles,
 	 * when "settings.typography.fluid" is set to `true`.
 	 *
+	 * @covers ::gutenberg_register_typography_support
+	 *
+	 * @dataProvider data_generate_block_supports_font_size_fixtures
+	 *
+	 * @param string $font_size_value             The block supports custom font size value.
+	 * @param bool   $should_use_fluid_typography An override to switch fluid typography "on". Can be used for unit testing.
+	 * @param string $expected_output             Expected value of style property from gutenberg_apply_typography_support().
+	 */
+	public function test_should_covert_font_sizes_to_fluid_values( $font_size_value, $should_use_fluid_typography, $expected_output ) {
+		if ( $should_use_fluid_typography ) {
+			switch_theme( 'block-theme-child-with-fluid-typography' );
+		} else {
+			switch_theme( 'default' );
+		}
+
+		$this->test_block_name = 'test/font-size-fluid-value';
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 2,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'typography' => array(
+						'fontSize' => true,
+					),
+				),
+			)
+		);
+		$registry         = WP_Block_Type_Registry::get_instance();
+		$block_type       = $registry->get_registered( $this->test_block_name );
+		$block_attributes = array(
+			'style' => array(
+				'typography' => array(
+					'fontSize' => $font_size_value,
+				),
+			),
+		);
+
+		$actual   = gutenberg_apply_typography_support( $block_type, $block_attributes );
+		$expected = array( 'style' => $expected_output );
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * Data provider for test_should_covert_font_sizes_to_fluid_values.
+	 *
+	 * @return array
+	 */
+	public function data_generate_block_supports_font_size_fixtures() {
+		return array(
+			'default_return_value'               => array(
+				'font_size_value'             => '50px',
+				'should_use_fluid_typography' => false,
+				'expected_output'             => 'font-size:50px;',
+			),
+			'return_value_with_fluid_typography' => array(
+				'font_size_value'             => '50px',
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'font-size:clamp(37.5px, 2.34375rem + ((1vw - 7.68px) * 4.507), 75px);',
+			),
+		);
+	}
+
+	/**
+	 * Tests that a block element's custom font size in the inline style attribute
+	 * is replaced with a fluid value when "settings.typography.fluid" is set to `true`,
+	 * and the correct block content is generated.
+	 *
 	 * @covers ::gutenberg_render_typography_support
 	 *
 	 * @dataProvider data_generate_replace_inline_font_styles_with_fluid_values_fixtures
