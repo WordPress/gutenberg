@@ -395,6 +395,45 @@ _Returns_
 
 -   `?Object`: Color object included in the colors array whose color property equals colorValue. Returns undefined if no color object matches this requirement.
 
+### getComputedFluidTypographyValue
+
+Computes a fluid font-size value that uses clamp(). A minimum and maxinmum
+font size OR a single font size can be specified.
+
+If a single font size is specified, it is scaled up and down by
+minimumFontSizeFactor and maximumFontSizeFactor to arrive at the minimum and
+maximum sizes.
+
+_Usage_
+
+```js
+// Calculate fluid font-size value from a minimum and maximum value.
+const fontSize = getComputedFluidTypographyValue( {
+	minimumFontSize: '20px',
+	maximumFontSize: '45px',
+} );
+// Calculate fluid font-size value from a single font size.
+const fontSize = getComputedFluidTypographyValue( {
+	fontSize: '30px',
+} );
+```
+
+_Parameters_
+
+-   _args_ `Object`:
+-   _args.minimumViewPortWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
+-   _args.maximumViewPortWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
+-   _args.fontSize_ `?string`: Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
+-   _args.maximumFontSize_ `?string`: Maximum font size for any clamp() calculation. Optional.
+-   _args.minimumFontSize_ `?string`: Minimum font size for any clamp() calculation. Optional.
+-   _args.scaleFactor_ `?number`: A scale factor to determine how fast a font scales within boundaries. Optional.
+-   _args.minimumFontSizeFactor_ `?number`: How much to scale defaultFontSize by to derive minimumFontSize. Optional.
+-   _args.maximumFontSizeFactor_ `?number`: How much to scale defaultFontSize by to derive maximumFontSize. Optional.
+
+_Returns_
+
+-   `string|null`: A font-size value using clamp().
+
 ### getFontSize
 
 Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
