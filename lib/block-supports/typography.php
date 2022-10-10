@@ -110,8 +110,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		$custom_font_size                    = isset( $block_attributes['style']['typography']['fontSize'] ) ? $block_attributes['style']['typography']['fontSize'] : null;
 		$typography_block_styles['fontSize'] = $preset_font_size ? $preset_font_size : gutenberg_get_typography_font_size_value(
 			array(
-				'size'  => $custom_font_size,
-				'fluid' => true,
+				'size' => $custom_font_size,
 			)
 		);
 	}

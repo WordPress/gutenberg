@@ -102,8 +102,7 @@ function block_core_navigation_submenu_build_css_font_sizes( $context ) {
 			'font-size: %s;',
 			gutenberg_get_typography_font_size_value(
 				array(
-					'size'  => $context['style']['typography']['fontSize'],
-					'fluid' => true,
+					'size' => $context['style']['typography']['fontSize'],
 				)
 			)
 		);

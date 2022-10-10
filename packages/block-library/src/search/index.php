@@ -446,8 +446,7 @@ function get_typography_styles_for_block_core_search( $attributes ) {
 			'font-size: %s;',
 			gutenberg_get_typography_font_size_value(
 				array(
-					'size'  => esc_attr( $attributes['style']['typography']['fontSize'] ),
-					'fluid' => true,
+					'size' => esc_attr( $attributes['style']['typography']['fontSize'] ),
 				)
 			)
 		);
