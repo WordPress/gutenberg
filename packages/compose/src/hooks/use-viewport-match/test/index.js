@@ -120,6 +120,7 @@ describe( 'useViewportMatch', () => {
 		expect( container ).toHaveTextContent( 'useViewportMatch: false' );
 
 		expect( useMediaQueryMock ).toHaveBeenCalledTimes( 4 );
+		// `useMediaQuery` is expected to receive `undefined` when simulating width.
 		expect( useMediaQueryMock ).toHaveBeenNthCalledWith( 1, undefined );
 		expect( useMediaQueryMock ).toHaveBeenNthCalledWith( 2, undefined );
 		expect( useMediaQueryMock ).toHaveBeenNthCalledWith( 3, undefined );
