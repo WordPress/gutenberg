@@ -34,6 +34,15 @@ describe( 'getComputedFluidTypographyValue()', () => {
 		);
 	} );
 
+	it( 'should return a fluid font size based on px when given a numerical font size', () => {
+		const fluidTypographyValues = getComputedFluidTypographyValue( {
+			fontSize: '30px',
+		} );
+		expect( fluidTypographyValues ).toBe(
+			'clamp(22.5px, 1.40625rem + ((1vw - 7.68px) * 2.704), 45px)'
+		);
+	} );
+
 	it( 'should return a fluid font size when given a min and max viewport width', () => {
 		const fluidTypographyValues = getComputedFluidTypographyValue( {
 			fontSize: '30px',

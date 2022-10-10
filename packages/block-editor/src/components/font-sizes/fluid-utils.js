@@ -158,6 +158,10 @@ export function getTypographyValueAndUnit( rawValue, options = {} ) {
 		return null;
 	}
 
+	if ( typeof rawValue === 'number' && ! Number.isNaN( rawValue ) ) {
+		rawValue = `${ rawValue }px`;
+	}
+
 	const { coerceTo, rootSizeValue, acceptableUnits } = {
 		coerceTo: '',
 		// Default browser font size. Later we could inject some JS to compute this `getComputedStyle( document.querySelector( "html" ) ).fontSize`.
