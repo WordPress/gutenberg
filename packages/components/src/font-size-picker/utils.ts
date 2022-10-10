@@ -12,6 +12,7 @@ import type {
 	FontSizeSelectOption,
 	FontSizeToggleGroupOption,
 	FontSizePickerProps,
+	FontSizeSelectedOption,
 } from './types';
 
 const DEFAULT_FONT_SIZE = 'default';
@@ -136,7 +137,6 @@ export function getToggleGroupOptions(
 		return {
 			key: slug,
 			value: size,
-			size,
 			label: labelAliases[ index ],
 			name: name || labelAliases[ index ],
 		};
@@ -148,7 +148,7 @@ export function getSelectedOption(
 	value: FontSizePickerProps[ 'value' ],
 	useSelectControl: boolean,
 	disableCustomFontSizes: boolean = false
-): FontSizeOption {
+): FontSizeSelectedOption {
 	if ( ! value ) {
 		return DEFAULT_FONT_SIZE_OPTION;
 	}
@@ -163,8 +163,9 @@ export function getSelectedOption(
 		? // @TODO Array.find() triggers error on array types unions. It's a bug. See: https://github.com/microsoft/TypeScript/issues/44373.
 		  // @ts-ignore
 		  fontSizeOptions.find(
-				( option: FontSizeSelectOption ) => option.size === value
-		  ) // @ts-ignore
+				( option: FontSizeSelectedOption ) =>
+					option.size === value || option.value === value
+		  )
 		: null;
 
 	return selectedOption || CUSTOM_FONT_SIZE_OPTION;

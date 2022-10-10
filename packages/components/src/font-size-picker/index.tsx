@@ -127,6 +127,9 @@ const UnforwardedFontSizePicker = (
 			return `(${ __( 'Custom' ) })`;
 		}
 
+		const selectedOptionSize =
+			selectedOption?.size || selectedOption?.value;
+
 		// If we have a custom value that is not available in the font sizes,
 		// show it as a hint as long as it's a simple CSS value.
 		if ( isCustomValue ) {
@@ -138,9 +141,9 @@ const UnforwardedFontSizePicker = (
 		}
 		if ( shouldUseSelectControl ) {
 			return (
-				selectedOption?.size !== undefined &&
-				isSimpleCssValue( selectedOption?.size ) &&
-				`(${ selectedOption?.size })`
+				selectedOptionSize !== undefined &&
+				isSimpleCssValue( selectedOptionSize ) &&
+				`(${ selectedOptionSize })`
 			);
 		}
 
@@ -148,9 +151,9 @@ const UnforwardedFontSizePicker = (
 		let hint = selectedOption.name;
 		if (
 			! fontSizesContainComplexValues &&
-			typeof selectedOption.size === 'string'
+			typeof selectedOptionSize === 'string'
 		) {
-			const [ , unit ] = splitValueAndUnitFromSize( selectedOption.size );
+			const [ , unit ] = splitValueAndUnitFromSize( selectedOptionSize );
 			hint += `(${ unit })`;
 		}
 		return hint;
@@ -158,6 +161,7 @@ const UnforwardedFontSizePicker = (
 		showCustomValueControl,
 		selectedOption?.name,
 		selectedOption?.size,
+		selectedOption?.value,
 		value,
 		isCustomValue,
 		shouldUseSelectControl,
@@ -175,6 +179,7 @@ const UnforwardedFontSizePicker = (
 		__( 'Currently selected font size: %s' ),
 		selectedOption.name
 	);
+
 	return (
 		<Container ref={ ref } className="components-font-size-picker">
 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>

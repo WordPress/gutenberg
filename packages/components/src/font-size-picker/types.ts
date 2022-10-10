@@ -95,5 +95,18 @@ export type FontSizeToggleGroupOption = {
 	value: number | string;
 	label: string;
 	name: string;
+};
+
+/*
+	This is a type describing whatever option is selected.
+	It could be FontSizeToggleGroupOption, FontSizeSelectOption,
+	CUSTOM_FONT_SIZE_OPTION or DEFAULT_FONT_SIZE_OPTION.
+ */
+export type FontSizeSelectedOption = {
+	key?: string;
+	value?: number | string;
 	size?: number | string;
+	label?: string;
+	name: string;
+	slug?: string;
 };
