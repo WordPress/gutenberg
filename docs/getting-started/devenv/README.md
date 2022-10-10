@@ -161,13 +161,15 @@ If you see the error: `Host is already in use by another container`
 -   The container is already running, or another one is. You can stop an existing container running use `wp-env stop` from the directory you started it.
 -   If you do not remember the directory you started wp-env in, you can stop all containers with `docker stop $(docker ps -q)`. Please note, this will stop all containers, use caution with this command.
 
-### Alternative to Docker
+### Alternative to WordPress environment tool
 
-Docker is just one method to run a local WordPress environment. Block development and extending WordPress is done using normal plugins, so any WordPress environment can be used. Here are some alternatives that you can consider which do not require installing Docker.
+WordPress environment tool is just one method to run a local WordPress environment. Block development and extending WordPress is done using normal plugins, so any WordPress environment can be used. Here are some alternatives that you can consider which do not require installing WordPress environment tool.
 
--   [Local](https://localwp.com/) - Local is a single application you download and install. You will need to know where the plugin directory is located after install. If you create a site called `mywp` typically the plugin directory is installed at `~\Local Sites\mywp\app\public\wp-content\plugins`
+-   [Local](https://localwp.com/) - Local is a single application you download and install. You will need to know where the plugin directory is located after install. If you create a site called `mywp` typically the plugin directory is installed at `~\Local Sites\mywp\app\public\wp-content\plugins`. Please note: LocalWP uses Docker under the hood.
 
 -   [WampServer](http://www.wampserver.com/en/) or [MAMP](https://www.mamp.info/) environments, both are quite similar to Local, combining a web server, PHP, and database. However these tools are not WordPress specific, so if you are not already using them, Local might be an easier option.
+
+-   [DDEV](http://ddev.com/) - DDEV is an open-source command line tool written in Go language that works on Mac/Windows/WSL2/Linux. You can run multiple projects, supports multiple PHP Environments, supports WordPress CLI, MailHog and various other WordPress developer friendly tools.
 
 -   Remote server - you can work on a remote server, most hosts provide a quick WordPress setup. However, this will require additional time thorughout development syncing to the server, or working directly on the remote server.
 
