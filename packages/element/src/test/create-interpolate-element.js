@@ -207,9 +207,7 @@ describe( 'createInterpolateElement', () => {
 				</div>
 			);
 		};
-		const { container, rerender } = render(
-			<TestComponent switchKey />
-		);
+		const { container, rerender } = render( <TestComponent switchKey /> );
 
 		expect( container.firstChild ).toContainHTML( '<em>string!</em>' );
 		expect( container.firstChild ).not.toContainHTML( '<strong>' );
