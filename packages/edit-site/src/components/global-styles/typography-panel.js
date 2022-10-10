@@ -21,6 +21,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
+import { getTypographyFontSizeValue } from './typography-utils';
 
 export function useHasTypographyPanel( name ) {
 	const hasLineHeight = useHasLineHeightControl( name );
@@ -87,7 +88,19 @@ export default function TypographyPanel( { name, element } ) {
 	} else if ( element && element !== 'text' ) {
 		prefix = `elements.${ element }.`;
 	}
+	const [ fluidTypography ] = useSetting( 'typography.fluid', name );
 	const [ fontSizes ] = useSetting( 'typography.fontSizes', name );
+
+	// Convert static font size values to fluid font sizes if fluidTypography is activated.
+	const fontSizesWithFluidValues = fontSizes.map( ( font ) => {
+		if ( !! fluidTypography ) {
+			font.size = getTypographyFontSizeValue( font, {
+				fluid: fluidTypography,
+			} );
+		}
+		return font;
+	} );
+
 	const disableCustomFontSizes = ! useSetting(
 		'typography.customFontSize',
 		name
@@ -180,7 +193,7 @@ export default function TypographyPanel( { name, element } ) {
 						>
 							<ToggleGroupControlOption
 								value="heading"
-								/* translators: 'All' refers to selecting all heading levels 
+								/* translators: 'All' refers to selecting all heading levels
 							and applying the same style to h1-h6. */
 								label={ __( 'All' ) }
 							/>
@@ -227,7 +240,7 @@ export default function TypographyPanel( { name, element } ) {
 						<FontSizePicker
 							value={ fontSize }
 							onChange={ setFontSize }
-							fontSizes={ fontSizes }
+							fontSizes={ fontSizesWithFluidValues }
 							disableCustomFontSizes={ disableCustomFontSizes }
 							size="__unstable-large"
 							__nextHasNoMarginBottom
