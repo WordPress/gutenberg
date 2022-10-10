@@ -1101,7 +1101,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 		}
 
-		if ( is_array( $value ) ) {
+		if ( ! $value || is_array( $value ) ) {
 			return $value;
 		}
 
