@@ -14,9 +14,9 @@ PODS:
   - fmt (6.2.1)
   - glog (0.3.5)
   - Gutenberg (1.83.0):
-    - React-Core (= 0.66.2)
-    - React-CoreModules (= 0.66.2)
-    - React-RCTImage (= 0.66.2)
+    - React-Core (= 0.69.4)
+    - React-CoreModules (= 0.69.4)
+    - React-RCTImage (= 0.69.4)
     - RNTAztecView
   - libwebp (1.2.1):
     - libwebp/demux (= 1.2.1)
@@ -329,7 +329,7 @@ PODS:
     - React-Core
     - SDWebImage (~> 5.11.1)
     - SDWebImageWebPCoder (~> 0.8.4)
-  - RNGestureHandler (2.3.2-wp-1):
+  - RNGestureHandler (2.5.0-wp-1):
     - React-Core
   - RNReanimated (2.9.1-wp-1):
     - DoubleConversion
@@ -381,7 +381,7 @@ DEPENDENCIES:
   - FBLazyVector (from `../../../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../../../node_modules/react-native/React/FBReactNativeSpec`)
   - glog (from `../../../node_modules/react-native/third-party-podspecs/glog.podspec`)
-  - Gutenberg (from `../../react-native-bridge`)
+  - "Gutenberg (from `../../../node_modules/@wordpress/react-native-bridge`)"
   - RCT-Folly (from `../../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../../../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../../../node_modules/react-native/Libraries/TypeSafety`)
@@ -424,7 +424,7 @@ DEPENDENCIES:
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
   - RNScreens (from `../../../node_modules/react-native-screens`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
-  - RNTAztecView (from `../../react-native-aztec`)
+  - "RNTAztecView (from `../../../node_modules/@wordpress/react-native-aztec`)"
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -449,7 +449,7 @@ EXTERNAL SOURCES:
   glog:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/glog.podspec"
   Gutenberg:
-    :path: "../../react-native-bridge"
+    :path: "../../../node_modules/@wordpress/react-native-bridge"
   RCT-Folly:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -533,7 +533,7 @@ EXTERNAL SOURCES:
   RNSVG:
     :path: "../../../node_modules/react-native-svg"
   RNTAztecView:
-    :path: "../../react-native-aztec"
+    :path: "../../../node_modules/@wordpress/react-native-aztec"
   Yoga:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
 
@@ -544,8 +544,8 @@ SPEC CHECKSUMS:
   FBLazyVector: c71b8c429a8af2aff1013934a7152e9d9d0c937d
   FBReactNativeSpec: 2ff441cbe6e58c1778d8a5cf3311831a6a8c0809
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
-  glog: 5337263514dd6f09803962437687240c5dc39aa4
-  Gutenberg: 031679fce5059a5f5c3ae7cc2e9952fbd1bf5d58
+  glog: 3d02b25ca00c2d456734d0bcff864cbc62f6ae1a
+  Gutenberg: 3de998fc2b6dd2a13b0dd75919fd5c92332b8901
   libwebp: 98a37e597e40bfdb4c911fc98f2c53d0b12d05fc
   RCT-Folly: b9d9fe1fc70114b751c076104e52f3b1b5e5a95a
   RCTRequired: bd9d2ab0fda10171fcbcf9ba61a7df4dc15a28f4
@@ -584,7 +584,7 @@ SPEC CHECKSUMS:
   RNCClipboard: 99fc8ad669a376b756fbc8098ae2fd05c0ed0668
   RNCMaskedView: c298b644a10c0c142055b3ae24d83879ecb13ccd
   RNFastImage: 1f2cab428712a4baaf78d6169eaec7f622556dd7
-  RNGestureHandler: 3b13cc25407d1cdbee33b6ae65790a55c032d2a9
+  RNGestureHandler: 225ee7ea87b1024ced46ec4705537c075ad33ba0
   RNReanimated: a0585584b89e6b5a5369ad98b3e4d5916ac67859
   RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
   RNSVG: 36a7359c428dcb7c6bce1cc546fbfebe069809b0
@@ -594,6 +594,6 @@ SPEC CHECKSUMS:
   WordPress-Aztec-iOS: 7d11d598f14c82c727c08b56bd35fbeb7dafb504
   Yoga: ff994563b2fd98c982ca58e8cd9db2cdaf4dda74
 
-PODFILE CHECKSUM: 71d73c846a7bcf52da8cb79c8e747adaff51d77d
+PODFILE CHECKSUM: f055801c456e71f1bac15cf4d0322dac12f6436a
 
 COCOAPODS: 1.11.3
