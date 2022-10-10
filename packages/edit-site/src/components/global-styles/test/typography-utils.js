@@ -26,6 +26,29 @@ describe( 'typography utils', () => {
 					},
 					expected: '28px',
 				},
+				// Should return incoming value when already clamped.
+				{
+					preset: {
+						size: 'clamp(21px, 1.3125rem + ((1vw - 7.68px) * 2.524), 42px)',
+						fluid: false,
+					},
+					typographySettings: {
+						fluid: true,
+					},
+					expected:
+						'clamp(21px, 1.3125rem + ((1vw - 7.68px) * 2.524), 42px)',
+				},
+				// Should return incoming value with unsupported unit.
+				{
+					preset: {
+						size: '1000%',
+						fluid: false,
+					},
+					typographySettings: {
+						fluid: true,
+					},
+					expected: '1000%',
+				},
 				// Should return fluid value.
 				{
 					preset: {
