@@ -147,8 +147,10 @@ export function getComputedFluidTypographyValue( {
 }
 
 /**
+ * Internal method that checks a string for a unit and value and returns an array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ].
+ * A raw font size of `value + unit` is expected. If the value is a number, it will convert to `value + 'px'`.
  *
- * @param {string}           rawValue Raw size value from theme.json.
+ * @param {string|number}    rawValue Raw size value from theme.json.
  * @param {Object|undefined} options  Calculation options.
  *
  * @return {{ unit: string, value: number }|null} An object consisting of `'value'` and `'unit'` properties.
@@ -158,7 +160,8 @@ export function getTypographyValueAndUnit( rawValue, options = {} ) {
 		return null;
 	}
 
-	if ( typeof rawValue === 'number' && ! Number.isNaN( rawValue ) ) {
+	// Converts numbers to pixel values by default.
+	if ( typeof rawValue === 'number' ) {
 		rawValue = `${ rawValue }px`;
 	}
 
