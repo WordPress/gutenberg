@@ -66,6 +66,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 				<Disabled>
 					<ServerSideRender
 						block="core/archives"
+						skipBlockSupportAttributes
 						attributes={ attributes }
 					/>
 				</Disabled>
