@@ -91,7 +91,7 @@ export function BlockSettingsDropdown( {
 			return {
 				firstParentClientId: _firstParentClientId,
 				isDistractionFree: getSettings().isDistractionFree,
-				onlyBlock: 1 === getBlockCount(),
+				onlyBlock: 1 === getBlockCount( _firstParentClientId ),
 				parentBlockType:
 					getActiveBlockVariation(
 						parentBlockName,
