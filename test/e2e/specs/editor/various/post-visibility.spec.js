@@ -91,6 +91,9 @@ test.describe( 'Post visibility', () => {
 			'.components-button.edit-post-post-schedule__toggle.is-tertiary'
 		);
 
+		await page.click(
+			'role=button[name="Move forward to switch to the next month."i]'
+		);
 		await page.click( 'text=15  >> nth=1' );
 
 		await page.click(
