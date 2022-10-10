@@ -82,7 +82,7 @@ function Layout( { styles } ) {
 		isInserterOpened,
 		isListViewOpened,
 		showIconLabels,
-		hasReducedUI,
+		isDistractionFree,
 		showBlockBreadcrumbs,
 		isTemplateMode,
 		documentLabel,
@@ -115,8 +115,8 @@ function Layout( { styles } ) {
 			).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
 			showIconLabels:
 				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
-			hasReducedUI:
-				select( editPostStore ).isFeatureActive( 'reducedUI' ),
+			isDistractionFree:
+				select( editPostStore ).isFeatureActive( 'distractionFree' ),
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
 			),
@@ -124,11 +124,19 @@ function Layout( { styles } ) {
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 		};
 	}, [] );
+	const [ distractionFree, setDistractionFree ] =
+		useState( isDistractionFree );
+
+	useEffect( () => {
+		setDistractionFree( isDistractionFree );
+	}, [ isDistractionFree ] );
+
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
 		'show-icon-labels': showIconLabels,
+		'is-distraction-free': isDistractionFree,
 	} );
 	const openSidebarPanel = () =>
 		openGeneralSidebar(
@@ -199,6 +207,7 @@ function Layout( { styles } ) {
 			<EditorKeyboardShortcutsRegister />
 			<SettingsSidebar />
 			<InterfaceSkeleton
+				isDistractionFree={ distractionFree }
 				className={ className }
 				labels={ {
 					...interfaceLabels,
@@ -206,11 +215,13 @@ function Layout( { styles } ) {
 				} }
 				header={
 					<Header
+						isDistractionFree={ distractionFree }
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}
 					/>
 				}
+				editorNotices={ <EditorNotices /> }
 				secondarySidebar={ secondarySidebar() }
 				sidebar={
 					( ! isMobileViewport || sidebarIsOpened ) && (
@@ -236,7 +247,7 @@ function Layout( { styles } ) {
 				notices={ <EditorSnackbars /> }
 				content={
 					<>
-						<EditorNotices />
+						{ ! isDistractionFree && <EditorNotices /> }
 						{ ( mode === 'text' || ! isRichEditingEnabled ) && (
 							<TextEditor />
 						) }
@@ -256,7 +267,7 @@ function Layout( { styles } ) {
 					</>
 				}
 				footer={
-					! hasReducedUI &&
+					! isDistractionFree &&
 					showBlockBreadcrumbs &&
 					! isMobileViewport &&
 					isRichEditingEnabled &&
