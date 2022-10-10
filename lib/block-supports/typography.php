@@ -262,6 +262,7 @@ function gutenberg_render_typography_support( $block_content, $block ) {
 
 /**
  * Internal method that checks a string for a unit and value and returns an array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ].
+ * A raw font size of `value + unit` is expected. If the value is a number, it will convert to `value + 'px'`.
  *
  * @access private
  *
@@ -278,6 +279,11 @@ function gutenberg_render_typography_support( $block_content, $block ) {
 function gutenberg_get_typography_value_and_unit( $raw_value, $options = array() ) {
 	if ( empty( $raw_value ) ) {
 		return null;
+	}
+
+	// Converts numbers to pixel values by default.
+	if ( is_numeric( $raw_value ) ) {
+		$raw_value = $raw_value . 'px';
 	}
 
 	$defaults = array(
