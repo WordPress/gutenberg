@@ -1153,4 +1153,50 @@ test.describe( 'List', () => {
 		// Verify no WSOD and content is proper.
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	test( 'should merge two list with same attributes', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( '* a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'b' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '* c' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>b</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->` );
+
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>b</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->` );
+	} );
 } );
