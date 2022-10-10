@@ -111,13 +111,7 @@ const UnforwardedFontSizePicker = (
 			),
 		[ shouldUseSelectControl, fontSizes, disableCustomFontSizes ]
 	);
-	const selectedOption = getSelectedOption(
-		fontSizes,
-		value,
-		shouldUseSelectControl,
-		disableCustomFontSizes
-	);
-
+	const selectedOption = getSelectedOption( fontSizes, value );
 	const isCustomValue = selectedOption.slug === CUSTOM_FONT_SIZE;
 	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
 		! disableCustomFontSizes && isCustomValue
@@ -126,9 +120,6 @@ const UnforwardedFontSizePicker = (
 		if ( showCustomValueControl ) {
 			return `(${ __( 'Custom' ) })`;
 		}
-
-		const selectedOptionSize =
-			selectedOption?.size || selectedOption?.value;
 
 		// If we have a custom value that is not available in the font sizes,
 		// show it as a hint as long as it's a simple CSS value.
@@ -141,9 +132,9 @@ const UnforwardedFontSizePicker = (
 		}
 		if ( shouldUseSelectControl ) {
 			return (
-				selectedOptionSize !== undefined &&
-				isSimpleCssValue( selectedOptionSize ) &&
-				`(${ selectedOptionSize })`
+				selectedOption?.size !== undefined &&
+				isSimpleCssValue( selectedOption?.size ) &&
+				`(${ selectedOption?.size })`
 			);
 		}
 
@@ -151,9 +142,9 @@ const UnforwardedFontSizePicker = (
 		let hint = selectedOption.name;
 		if (
 			! fontSizesContainComplexValues &&
-			typeof selectedOptionSize === 'string'
+			typeof selectedOption.size === 'string'
 		) {
-			const [ , unit ] = splitValueAndUnitFromSize( selectedOptionSize );
+			const [ , unit ] = splitValueAndUnitFromSize( selectedOption.size );
 			hint += `(${ unit })`;
 		}
 		return hint;
@@ -161,7 +152,6 @@ const UnforwardedFontSizePicker = (
 		showCustomValueControl,
 		selectedOption?.name,
 		selectedOption?.size,
-		selectedOption?.value,
 		value,
 		isCustomValue,
 		shouldUseSelectControl,
@@ -179,7 +169,6 @@ const UnforwardedFontSizePicker = (
 		__( 'Currently selected font size: %s' ),
 		selectedOption.name
 	);
-
 	return (
 		<Container ref={ ref } className="components-font-size-picker">
 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
