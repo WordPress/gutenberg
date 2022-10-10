@@ -131,4 +131,52 @@ describe( 'useDispatch', () => {
 		expect( firstRegistry.select( 'demo' ).get() ).toBe( 1 );
 		expect( secondRegistry.select( 'demo' ).get() ).toBe( 1 );
 	} );
+
+	it( 'dispatches returned actions correctly', async () => {
+		const user = userEvent.setup();
+		const fooAction = jest.fn( () => ( { type: '__INERT__' } ) );
+		const barAction = jest.fn( () => ( { type: '__INERT__' } ) );
+		const store = createReduxStore( 'demo', {
+			reducer: ( state ) => state,
+			actions: {
+				foo: fooAction,
+				bar: barAction,
+			},
+		} );
+		registry.register( store );
+
+		const TestComponent = () => {
+			const { foo, bar } = useDispatch( store );
+			return (
+				<>
+					<button onClick={ foo }>foo</button>
+					<button onClick={ bar }>bar</button>
+				</>
+			);
+		};
+
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'foo',
+			} )
+		);
+
+		expect( fooAction ).toBeCalledTimes( 1 );
+		expect( barAction ).toBeCalledTimes( 0 );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'bar',
+			} )
+		);
+
+		expect( fooAction ).toBeCalledTimes( 1 );
+		expect( barAction ).toBeCalledTimes( 1 );
+	} );
 } );
