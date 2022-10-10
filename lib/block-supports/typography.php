@@ -262,8 +262,8 @@ function gutenberg_render_typography_support( $block_content, $block ) {
  *
  * @access private
  *
- * @param string $raw_value Raw size value from theme.json.
- * @param array  $options   {
+ * @param string|number $raw_value Raw size value from theme.json.
+ * @param array         $options   {
  *     Optional. An associative array of options. Default is empty array.
  *
  *     @type string        $coerce_to        Coerce the value to rem or px. Default `'rem'`.
