@@ -24,7 +24,7 @@ function InsertionPointPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
 } ) {
-	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
 	const ref = useRef();
 	const {
@@ -88,14 +88,6 @@ function InsertionPointPopover( {
 		}
 	}
 
-	function maybeHideInserterPoint( event ) {
-		// Only hide the inserter if it's triggered on the wrapper,
-		// and the inserter is not open.
-		if ( event.target === ref.current && ! openRef.current ) {
-			hideInsertionPoint();
-		}
-	}
-
 	// Define animation variants for the line element.
 	const horizontalLine = {
 		start: {
@@ -149,13 +141,13 @@ function InsertionPointPopover( {
 			...( ! isVertical ? horizontalLine.rest : verticalLine.rest ),
 			opacity: 1,
 			borderRadius: '2px',
-			transition: { delay: isInserterShown ? 0.1 : 0, type: 'tween' },
+			transition: { delay: isInserterShown ? 0.5 : 0, type: 'tween' },
 		},
 		hover: {
 			...( ! isVertical ? horizontalLine.hover : verticalLine.hover ),
 			opacity: 1,
 			borderRadius: '2px',
-			transition: { delay: 0.1, type: 'tween' },
+			transition: { delay: 0.5, type: 'tween' },
 		},
 	};
 
@@ -165,7 +157,7 @@ function InsertionPointPopover( {
 		},
 		rest: {
 			scale: 1,
-			transition: { type: 'tween' },
+			transition: { delay: 0.4, type: 'tween' },
 		},
 	};
 
@@ -195,7 +187,6 @@ function InsertionPointPopover( {
 				className={ classnames( className, {
 					'is-with-inserter': isInserterShown,
 				} ) }
-				onHoverEnd={ maybeHideInserterPoint }
 			>
 				<motion.div
 					variants={ lineVariants }

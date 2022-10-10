@@ -55,7 +55,7 @@
  * no argument is provided then it will find the next HTML tag,
  * regardless of what kind it is.
  *
- * If you want to _find whatever the next tag is_
+ * If you want to _find whatever the next tag is_:
  * ```php
  *     $tags->next_tag();
  * ```
@@ -910,7 +910,8 @@ class WP_HTML_Tag_Processor {
 		$modified = false;
 
 		// Remove unwanted classes by only copying the new ones.
-		while ( $at < strlen( $existing_class ) ) {
+		$existing_class_length = strlen( $existing_class );
+		while ( $at < $existing_class_length ) {
 			// Skip to the first non-whitespace character.
 			$ws_at     = $at;
 			$ws_length = strspn( $existing_class, " \t\f\r\n", $ws_at );

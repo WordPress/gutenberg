@@ -6,30 +6,10 @@
  * @subpackage style-engine
  */
 
-// Check for the existence of Style Engine classes and methods.
-// Once the Style Engine has been migrated to Core we can remove the if statements and require imports.
-// Testing new features from the Gutenberg package may require
-// testing against `gutenberg_` and `_Gutenberg` functions and methods in the future.
-if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
-	require __DIR__ . '/../class-wp-style-engine-processor.php';
-}
-
-if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
-	require __DIR__ . '/../class-wp-style-engine-css-declarations.php';
-}
-
-if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
-	require __DIR__ . '/../class-wp-style-engine-css-rule.php';
-}
-
-if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
-	require __DIR__ . '/../class-wp-style-engine-css-rules-store.php';
-}
-
 /**
  * Tests for compiling and rendering styles from a store of CSS rules.
  *
- * @coversDefaultClass WP_Style_Engine_Processor
+ * @coversDefaultClass WP_Style_Engine_Processor_Gutenberg
  */
 class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	/**
@@ -39,14 +19,14 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	 * @covers ::get_css
 	 */
 	public function test_should_return_rules_as_compiled_css() {
-		$a_nice_css_rule = new WP_Style_Engine_CSS_Rule( '.a-nice-rule' );
+		$a_nice_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-nice-rule' );
 		$a_nice_css_rule->add_declarations(
 			array(
 				'color'            => 'var(--nice-color)',
 				'background-color' => 'purple',
 			)
 		);
-		$a_nicer_css_rule = new WP_Style_Engine_CSS_Rule( '.a-nicer-rule' );
+		$a_nicer_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-nicer-rule' );
 		$a_nicer_css_rule->add_declarations(
 			array(
 				'font-family'      => 'Nice sans',
@@ -54,7 +34,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 				'background-color' => 'purple',
 			)
 		);
-		$a_nice_processor = new WP_Style_Engine_Processor();
+		$a_nice_processor = new WP_Style_Engine_Processor_Gutenberg();
 		$a_nice_processor->add_rules( array( $a_nice_css_rule, $a_nicer_css_rule ) );
 
 		$this->assertSame(
@@ -69,21 +49,21 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	 * @covers ::get_css
 	 */
 	public function test_should_return_prettified_css_rules() {
-		$a_wonderful_css_rule = new WP_Style_Engine_CSS_Rule( '.a-wonderful-rule' );
+		$a_wonderful_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-wonderful-rule' );
 		$a_wonderful_css_rule->add_declarations(
 			array(
 				'color'            => 'var(--wonderful-color)',
 				'background-color' => 'orange',
 			)
 		);
-		$a_very_wonderful_css_rule = new WP_Style_Engine_CSS_Rule( '.a-very_wonderful-rule' );
+		$a_very_wonderful_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-very_wonderful-rule' );
 		$a_very_wonderful_css_rule->add_declarations(
 			array(
 				'color'            => 'var(--wonderful-color)',
 				'background-color' => 'orange',
 			)
 		);
-		$a_more_wonderful_css_rule = new WP_Style_Engine_CSS_Rule( '.a-more-wonderful-rule' );
+		$a_more_wonderful_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-more-wonderful-rule' );
 		$a_more_wonderful_css_rule->add_declarations(
 			array(
 				'font-family'      => 'Wonderful sans',
@@ -91,7 +71,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 				'background-color' => 'orange',
 			)
 		);
-		$a_wonderful_processor = new WP_Style_Engine_Processor();
+		$a_wonderful_processor = new WP_Style_Engine_Processor_Gutenberg();
 		$a_wonderful_processor->add_rules( array( $a_wonderful_css_rule, $a_very_wonderful_css_rule, $a_more_wonderful_css_rule ) );
 
 		$expected = '.a-more-wonderful-rule {
@@ -117,7 +97,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	 * @covers ::add_store
 	 */
 	public function test_should_return_store_rules_as_css() {
-		$a_nice_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'nice' );
+		$a_nice_store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'nice' );
 		$a_nice_store->add_rule( '.a-nice-rule' )->add_declarations(
 			array(
 				'color'            => 'var(--nice-color)',
@@ -131,7 +111,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 				'background-color' => 'purple',
 			)
 		);
-		$a_nice_renderer = new WP_Style_Engine_Processor();
+		$a_nice_renderer = new WP_Style_Engine_Processor_Gutenberg();
 		$a_nice_renderer->add_store( $a_nice_store );
 		$this->assertSame(
 			'.a-nice-rule{color:var(--nice-color);background-color:purple;}.a-nicer-rule{font-family:Nice sans;font-size:1em;background-color:purple;}',
@@ -146,8 +126,8 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	 * @covers ::get_css
 	 */
 	public function test_should_dedupe_and_merge_css_declarations() {
-		$an_excellent_rule      = new WP_Style_Engine_CSS_Rule( '.an-excellent-rule' );
-		$an_excellent_processor = new WP_Style_Engine_Processor();
+		$an_excellent_rule      = new WP_Style_Engine_CSS_Rule_Gutenberg( '.an-excellent-rule' );
+		$an_excellent_processor = new WP_Style_Engine_Processor_Gutenberg();
 		$an_excellent_rule->add_declarations(
 			array(
 				'color'        => 'var(--excellent-color)',
@@ -156,7 +136,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 		);
 		$an_excellent_processor->add_rules( $an_excellent_rule );
 
-		$another_excellent_rule = new WP_Style_Engine_CSS_Rule( '.an-excellent-rule' );
+		$another_excellent_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.an-excellent-rule' );
 		$another_excellent_rule->add_declarations(
 			array(
 				'color'        => 'var(--excellent-color)',
@@ -171,7 +151,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			'Return value of get_css() does not match expectations with new, deduped and merged declarations.'
 		);
 
-		$yet_another_excellent_rule = new WP_Style_Engine_CSS_Rule( '.an-excellent-rule' );
+		$yet_another_excellent_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.an-excellent-rule' );
 		$yet_another_excellent_rule->add_declarations(
 			array(
 				'color'        => 'var(--excellent-color)',
@@ -193,7 +173,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	 * @covers ::get_css
 	 */
 	public function test_should_not_optimize_css_output() {
-		$a_sweet_rule = new WP_Style_Engine_CSS_Rule(
+		$a_sweet_rule = new WP_Style_Engine_CSS_Rule_Gutenberg(
 			'.a-sweet-rule',
 			array(
 				'color'            => 'var(--sweet-color)',
@@ -201,7 +181,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$a_sweeter_rule = new WP_Style_Engine_CSS_Rule(
+		$a_sweeter_rule = new WP_Style_Engine_CSS_Rule_Gutenberg(
 			'#an-even-sweeter-rule > marquee',
 			array(
 				'color'            => 'var(--sweet-color)',
@@ -209,7 +189,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$the_sweetest_rule = new WP_Style_Engine_CSS_Rule(
+		$the_sweetest_rule = new WP_Style_Engine_CSS_Rule_Gutenberg(
 			'.the-sweetest-rule-of-all a',
 			array(
 				'color'            => 'var(--sweet-color)',
@@ -217,7 +197,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$a_sweet_processor = new WP_Style_Engine_Processor();
+		$a_sweet_processor = new WP_Style_Engine_Processor_Gutenberg();
 		$a_sweet_processor->add_rules( array( $a_sweet_rule, $a_sweeter_rule, $the_sweetest_rule ) );
 
 		$this->assertSame(
@@ -237,7 +217,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	 * @covers ::get_css
 	 */
 	public function test_should_optimize_css_output_by_default() {
-		$a_sweet_rule = new WP_Style_Engine_CSS_Rule(
+		$a_sweet_rule = new WP_Style_Engine_CSS_Rule_Gutenberg(
 			'.a-sweet-rule',
 			array(
 				'color'            => 'var(--sweet-color)',
@@ -245,7 +225,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$a_sweeter_rule = new WP_Style_Engine_CSS_Rule(
+		$a_sweeter_rule = new WP_Style_Engine_CSS_Rule_Gutenberg(
 			'#an-even-sweeter-rule > marquee',
 			array(
 				'color'            => 'var(--sweet-color)',
@@ -253,7 +233,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$a_sweet_processor = new WP_Style_Engine_Processor();
+		$a_sweet_processor = new WP_Style_Engine_Processor_Gutenberg();
 		$a_sweet_processor->add_rules( array( $a_sweet_rule, $a_sweeter_rule ) );
 
 		$this->assertSame(
@@ -268,15 +248,15 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	 * @covers ::add_rules
 	 */
 	public function test_should_combine_previously_added_css_rules() {
-		$a_lovely_processor = new WP_Style_Engine_Processor();
-		$a_lovely_rule      = new WP_Style_Engine_CSS_Rule(
+		$a_lovely_processor = new WP_Style_Engine_Processor_Gutenberg();
+		$a_lovely_rule      = new WP_Style_Engine_CSS_Rule_Gutenberg(
 			'.a-lovely-rule',
 			array(
 				'border-color' => 'purple',
 			)
 		);
 		$a_lovely_processor->add_rules( $a_lovely_rule );
-		$a_lovelier_rule = new WP_Style_Engine_CSS_Rule(
+		$a_lovelier_rule = new WP_Style_Engine_CSS_Rule_Gutenberg(
 			'.a-lovelier-rule',
 			array(
 				'border-color' => 'purple',
@@ -289,7 +269,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			'Return value of get_css() does not match expectations when combining 2 CSS rules'
 		);
 
-		$a_most_lovely_rule = new WP_Style_Engine_CSS_Rule(
+		$a_most_lovely_rule = new WP_Style_Engine_CSS_Rule_Gutenberg(
 			'.a-most-lovely-rule',
 			array(
 				'border-color' => 'purple',
@@ -297,7 +277,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 		);
 		$a_lovely_processor->add_rules( $a_most_lovely_rule );
 
-		$a_perfectly_lovely_rule = new WP_Style_Engine_CSS_Rule(
+		$a_perfectly_lovely_rule = new WP_Style_Engine_CSS_Rule_Gutenberg(
 			'.a-perfectly-lovely-rule',
 			array(
 				'border-color' => 'purple',

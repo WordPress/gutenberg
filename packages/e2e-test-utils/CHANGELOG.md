@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.3.0 (2022-10-05)
+
 ### Bug Fixes
 
 -   Don't use hardcoded login credentials when requesting nonce ([#44331](https://github.com/WordPress/gutenberg/pull/44331)).
