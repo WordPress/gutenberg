@@ -9,7 +9,7 @@ import FullscreenMode from '..';
 
 describe( 'FullscreenMode', () => {
 	it( 'fullscreen mode to be added to document body when active', () => {
-		const { baseElement } = render( <FullscreenMode isActive={ true } /> );
+		const { baseElement } = render( <FullscreenMode isActive /> );
 
 		expect( baseElement ).toHaveClass( 'is-fullscreen-mode' );
 	} );
