@@ -1047,8 +1047,15 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				continue;
 			}
 
-			// Calculate fluid typography rules where available.
+			// Calculates fluid typography rules where available.
 			if ( 'font-size' === $css_property ) {
+				/*
+				 * gutenberg_get_typography_font_size_value() will check
+				 * if fluid typography has been activated and also
+				 * whether the incoming value can be converted to a fluid value.
+				 * Values that already have a "clamp()" function will not pass the test,
+				 * and therefore the original $value will be returned.
+				 */
 				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ) );
 			}
 

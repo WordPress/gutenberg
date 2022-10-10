@@ -111,7 +111,13 @@ const UnforwardedFontSizePicker = (
 			),
 		[ shouldUseSelectControl, fontSizes, disableCustomFontSizes ]
 	);
-	const selectedOption = getSelectedOption( fontSizes, value );
+	const selectedOption = getSelectedOption(
+		fontSizes,
+		value,
+		shouldUseSelectControl,
+		disableCustomFontSizes
+	);
+
 	const isCustomValue = selectedOption.slug === CUSTOM_FONT_SIZE;
 	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
 		! disableCustomFontSizes && isCustomValue

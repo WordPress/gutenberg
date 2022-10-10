@@ -95,4 +95,5 @@ export type FontSizeToggleGroupOption = {
 	value: number | string;
 	label: string;
 	name: string;
+	size?: number | string;
 };

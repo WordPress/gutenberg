@@ -120,33 +120,38 @@ describe( 'getToggleGroupOptions', () => {
 		).toEqual( [
 			{
 				key: '1',
-				value: '1',
 				label: 'S',
 				name: '1',
+				size: '1',
+				value: '1',
 			},
 			{
 				key: '2',
-				value: '2',
 				label: 'M',
 				name: '2',
+				size: '2',
+				value: '2',
 			},
 			{
 				key: '3',
-				value: '3',
 				label: 'L',
 				name: '3',
+				size: '3',
+				value: '3',
 			},
 			{
 				key: '4',
-				value: '4',
 				label: 'XL',
 				name: '4',
+				size: '4',
+				value: '4',
 			},
 			{
 				key: '5',
-				value: '5',
 				label: 'XXL',
 				name: 'XXL',
+				value: '5',
+				size: '5',
 			},
 		] );
 	} );
