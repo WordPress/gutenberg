@@ -34,6 +34,10 @@ describe( 'Code', () => {
 		// Add block
 		await addBlock( screen, 'Code' );
 
+		// Get block
+		const codeBlock = await getBlock( screen, 'Code' );
+		expect( codeBlock ).toBeVisible();
+
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
