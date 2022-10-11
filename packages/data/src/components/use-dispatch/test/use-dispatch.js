@@ -56,7 +56,7 @@ describe( 'useDispatch', () => {
 		expect( registry.select( 'demo' ).get() ).toBe( 1 );
 	} );
 
-	it( 'returns expected action creators from store for given storeName', async () => {
+	it( 'returns expected action creators from store for given store descriptor', async () => {
 		const user = userEvent.setup();
 		const store = createReduxStore( 'demoStore', counterStore );
 		registry.register( store );
@@ -77,7 +77,7 @@ describe( 'useDispatch', () => {
 		expect( registry.select( store ).get() ).toBe( 1 );
 	} );
 
-	it( 'returns expected action creators from store for given store descriptor', async () => {
+	it( 'returns expected action creators from store for given storeName', async () => {
 		const user = userEvent.setup();
 		registry.registerStore( 'demoStore', counterStore );
 		const TestComponent = () => {
