@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import { debounce } from '../../utils/debounce';
 import useRefEffect from '../use-ref-effect';
 
 /**
@@ -37,9 +38,41 @@ export default function useDisabled( {
 				return;
 			}
 
-			node.setAttribute( 'inert', 'true' );
+			/** A variable keeping track of the previous updates in order to restore them. */
+			const updates: Function[] = [];
+			const disable = () => {
+				node.childNodes.forEach( ( child ) => {
+					if ( ! ( child instanceof HTMLElement ) ) {
+						return;
+					}
+					if ( child.getAttribute( 'inert' ) ) {
+						child.setAttribute( 'inert', 'true' );
+						updates.push( () => {
+							child.removeAttribute( 'inert' );
+						} );
+					}
+				} );
+			};
+
+			// Debounce re-disable since disabling process itself will incur
+			// additional mutations which should be ignored.
+			const debouncedDisable = debounce( disable, 0, {
+				leading: true,
+			} );
+			disable();
+
+			/** @type {MutationObserver | undefined} */
+			const observer = new window.MutationObserver( debouncedDisable );
+			observer.observe( node, {
+				childList: true,
+			} );
+
 			return () => {
-				node.removeAttribute( 'inert' );
+				if ( observer ) {
+					observer.disconnect();
+				}
+				debouncedDisable.cancel();
+				updates.forEach( ( update ) => update() );
 			};
 		},
 		[ isDisabledProp ]
