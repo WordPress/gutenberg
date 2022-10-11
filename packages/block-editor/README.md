@@ -521,6 +521,7 @@ attributes.
 _Parameters_
 
 -   _attributes_ `Object`: Block attributes.
+-   _isFluidFontSizeActive_ `boolean`: Whether the function should try to convert font sizes to fluid values.
 
 _Returns_
 
