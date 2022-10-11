@@ -16,7 +16,9 @@ import {
 
 const elements = {
 	text: {
-		description: __( '' ),
+		description: __(
+			'Set the default color used for text across the site.'
+		),
 		title: __( 'Text' ),
 	},
 	link: {
@@ -44,36 +46,56 @@ function ScreenColorElement( { name, element } ) {
 	const colorsPerOrigin = useColorsPerOrigin( name );
 	const [ solids ] = useSetting( 'color.palette', name );
 	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
-	const [ isBackgroundEnabled ] = useSetting( 'color.background', name );
+	let [ isBackgroundEnabled ] = useSetting( 'color.background', name );
+	const [ isTextEnabled ] = useSetting( 'color.text', name );
 
-	let hasElementColor =
-		supports.includes( 'color' ) &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+	let textColorElementSelector = 'elements.' + element + '.color.text';
+	const backgroundColorElementSelector =
+		'elements.' + element + '.color.background';
 
-	if ( supports.includes( 'buttonColor' ) ) {
-		hasElementColor =
-			supports.includes( 'buttonColor' ) &&
-			isBackgroundEnabled &&
-			( solids.length > 0 || areCustomSolidsEnabled );
+	let hasElementColor = false;
+
+	switch ( element ) {
+		case 'button':
+			hasElementColor =
+				supports.includes( 'buttonColor' ) &&
+				isBackgroundEnabled &&
+				( solids.length > 0 || areCustomSolidsEnabled );
+			break;
+		case 'text':
+			hasElementColor =
+				supports.includes( 'color' ) &&
+				isTextEnabled &&
+				( solids.length > 0 || areCustomSolidsEnabled );
+			textColorElementSelector = 'color.text';
+			isBackgroundEnabled = false;
+			break;
+
+		default:
+			hasElementColor =
+				supports.includes( 'color' ) &&
+				( solids.length > 0 || areCustomSolidsEnabled );
+			break;
 	}
 
 	const [ elementTextColor, setElementTextColor ] = useStyle(
-		'elements.' + element + '.color.text',
+		textColorElementSelector,
 		name
 	);
 
 	const [ userElementTextColor ] = useStyle(
-		'elements.' + element + '.color.text',
+		textColorElementSelector,
 		name,
 		'user'
 	);
 
 	const [ elementBgColor, setElementBgColor ] = useStyle(
-		'elements.' + element + '.color.background',
+		backgroundColorElementSelector,
 		name
 	);
+
 	const [ userElementBgColor ] = useStyle(
-		'elements.' + element + '.color.background',
+		backgroundColorElementSelector,
 		name,
 		'user'
 	);
@@ -103,22 +125,25 @@ function ScreenColorElement( { name, element } ) {
 					onColorChange={ setElementTextColor }
 					clearable={ elementTextColor === userElementTextColor }
 				/>
-
-				<h4>{ __( 'Background color' ) }</h4>
-
-				<ColorGradientControl
-					className="edit-site-screen-element-color__control"
-					colors={ colorsPerOrigin }
-					disableCustomColors={ ! areCustomSolidsEnabled }
-					__experimentalHasMultipleOrigins
-					showTitle={ false }
-					enableAlpha
-					__experimentalIsRenderedInSidebar
-					colorValue={ elementBgColor }
-					onColorChange={ setElementBgColor }
-					clearable={ elementBgColor === userElementBgColor }
-				/>
 			</div>
+			{ isBackgroundEnabled && (
+				<div className="edit-site-global-styles-screen-element-color">
+					<h4>{ __( 'Background color' ) }</h4>
+
+					<ColorGradientControl
+						className="edit-site-screen-element-color__control"
+						colors={ colorsPerOrigin }
+						disableCustomColors={ ! areCustomSolidsEnabled }
+						__experimentalHasMultipleOrigins
+						showTitle={ false }
+						enableAlpha
+						__experimentalIsRenderedInSidebar
+						colorValue={ elementBgColor }
+						onColorChange={ setElementBgColor }
+						clearable={ elementBgColor === userElementBgColor }
+					/>
+				</div>
+			) }
 		</>
 	);
 }
