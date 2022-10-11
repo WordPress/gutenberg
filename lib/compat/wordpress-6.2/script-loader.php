@@ -24,8 +24,7 @@ function gutenberg_register_vendor_scripts_62( $scripts ) {
 		$scripts->add( 'wp-inert-polyfill', gutenberg_url( 'build/vendors/inert-polyfill' . $extension ), array() );
 	}
 
-
-	$script = $scripts->query( 'wp-polyfill', 'registered' );
+	$script       = $scripts->query( 'wp-polyfill', 'registered' );
 	$script->deps = array_merge( $script->deps, array( 'wp-inert-polyfill' ) );
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts_62' );

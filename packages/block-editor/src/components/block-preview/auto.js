@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { Disabled } from '@wordpress/components';
 import { useResizeObserver, pure, useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -61,7 +60,8 @@ function ScaledBlockPreview( {
 
 	const scale = containerWidth / viewportWidth;
 	return (
-		<Disabled
+		<div
+			inert="true"
 			className="block-editor-block-preview__content"
 			style={ {
 				transform: `scale(${ scale })`,
@@ -118,7 +118,7 @@ function ScaledBlockPreview( {
 				}
 				<MemoizedBlockList renderAppender={ false } />
 			</Iframe>
-		</Disabled>
+		</div>
 	);
 }
 

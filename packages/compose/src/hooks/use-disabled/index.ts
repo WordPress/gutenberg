@@ -45,7 +45,7 @@ export default function useDisabled( {
 					if ( ! ( child instanceof HTMLElement ) ) {
 						return;
 					}
-					if ( child.getAttribute( 'inert' ) ) {
+					if ( ! child.getAttribute( 'inert' ) ) {
 						child.setAttribute( 'inert', 'true' );
 						updates.push( () => {
 							child.removeAttribute( 'inert' );
