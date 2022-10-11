@@ -97,8 +97,71 @@ describe( 'getComputedFluidTypographyValue()', () => {
 					value: [ '10' ],
 					expected: null,
 				},
+				{
+					value: '10vh',
+					expected: null,
+				},
+				{
+					value: 'calc(2 * 10px)',
+					expected: null,
+				},
+				{
+					value: 'clamp(15px, 0.9375rem + ((1vw - 7.68px) * 5.409), 60px)',
+					expected: null,
+				},
+				{
+					value: '10',
+					expected: {
+						value: 10,
+						unit: 'px',
+					},
+				},
+				{
+					value: 11,
+					expected: {
+						value: 11,
+						unit: 'px',
+					},
+				},
+				{
+					value: 11.234,
+					expected: {
+						value: 11.234,
+						unit: 'px',
+					},
+				},
+				{
+					value: '12rem',
+					expected: {
+						value: 12,
+						unit: 'rem',
+					},
+				},
+				{
+					value: '12px',
+					expected: {
+						value: 12,
+						unit: 'px',
+					},
+				},
+				{
+					value: '12em',
+					expected: {
+						value: 12,
+						unit: 'em',
+					},
+				},
+				{
+					value: '12.74em',
+					expected: {
+						value: 12.74,
+						unit: 'em',
+					},
+				},
 			].forEach( ( { value, expected } ) => {
-				expect( getTypographyValueAndUnit( value ) ).toBe( expected );
+				expect( getTypographyValueAndUnit( value ) ).toEqual(
+					expected
+				);
 			} );
 		} );
 	} );

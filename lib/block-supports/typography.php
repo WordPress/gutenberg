@@ -282,6 +282,7 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 		return null;
 	}
 
+	// Converts numeric values to pixel values by default.
 	if ( empty( $raw_value ) ) {
 		return null;
 	}

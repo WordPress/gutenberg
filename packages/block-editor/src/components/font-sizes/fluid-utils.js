@@ -160,8 +160,8 @@ export function getTypographyValueAndUnit( rawValue, options = {} ) {
 		return null;
 	}
 
-	// Converts numbers to pixel values by default.
-	if ( typeof rawValue === 'number' ) {
+	// Converts numeric values to pixel values by default.
+	if ( isFinite( rawValue ) ) {
 		rawValue = `${ rawValue }px`;
 	}
 

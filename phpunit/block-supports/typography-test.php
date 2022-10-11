@@ -555,7 +555,94 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that invalid font size values are not parsed.
+	 * Tests that valid font size values are parsed.
+	 *
+	 * @ticket 56467
+	 *
+	 * @covers ::gutenberg_get_typography_value_and_unit
+	 *
+	 * @dataProvider data_valid_size_wp_get_typography_value_and_unit
+	 *
+	 * @param mixed $raw_value Raw size value to test.
+	 * @param mixed $expected  An expected return value.
+	 */
+	public function test_valid_size_wp_get_typography_value_and_unit( $raw_value, $expected ) {
+		$this->assertEquals( $expected, gutenberg_get_typography_value_and_unit( $raw_value ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_valid_size_wp_get_typography_value_and_unit() {
+		return array(
+			'size: 10vh with default units do not match' => array(
+				'raw_value' => '10vh',
+				'expected'  => null,
+			),
+			'size: calc() values do not match'           => array(
+				'raw_value' => 'calc(2 * 10px)',
+				'expected'  => null,
+			),
+			'size: clamp() values do not match'          => array(
+				'raw_value' => 'clamp(15px, 0.9375rem + ((1vw - 7.68px) * 5.409), 60px)',
+				'expected'  => null,
+			),
+			'size: `"10"`'                               => array(
+				'raw_value' => '10',
+				'expected'  => array(
+					'value' => 10,
+					'unit'  => 'px',
+				),
+			),
+			'size: `11`'                                 => array(
+				'raw_value' => 11,
+				'expected'  => array(
+					'value' => 11,
+					'unit'  => 'px',
+				),
+			),
+			'size: `11.234`'                             => array(
+				'raw_value' => '11.234',
+				'expected'  => array(
+					'value' => 11.234,
+					'unit'  => 'px',
+				),
+			),
+			'size: `"12rem"`'                            => array(
+				'raw_value' => '12rem',
+				'expected'  => array(
+					'value' => 12,
+					'unit'  => 'rem',
+				),
+			),
+			'size: `"12px"`'                             => array(
+				'raw_value' => '12px',
+				'expected'  => array(
+					'value' => 12,
+					'unit'  => 'px',
+				),
+			),
+			'size: `"12em"`'                             => array(
+				'raw_value' => '12em',
+				'expected'  => array(
+					'value' => 12,
+					'unit'  => 'em',
+				),
+			),
+			'size: `"12.74em"`'                          => array(
+				'raw_value' => '12.74em',
+				'expected'  => array(
+					'value' => 12.74,
+					'unit'  => 'em',
+				),
+			),
+		);
+	}
+
+	/**
+	 * Tests that invalid font size values are not parsed and trigger incorrect usage.
 	 *
 	 * @ticket 56467
 	 *
