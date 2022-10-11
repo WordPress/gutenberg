@@ -382,6 +382,14 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output'             => 'clamp(1.3125rem, 1.3125rem + ((1vw - 0.48rem) * 2.524), 2.625rem)',
 			),
 
+			'return_fluid_value_with_floats_with_units'    => array(
+				'font_size_preset'            => array(
+					'size' => '100.175px',
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(75.13125px, 4.695703125rem + ((1vw - 7.68px) * 9.03), 150.2625px)',
+			),
+
 			'return_fluid_value_with_number_coerced_to_px' => array(
 				'font_size_preset'            => array(
 					'size' => 33,

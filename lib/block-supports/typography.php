@@ -276,7 +276,7 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 	if ( ! is_string( $raw_value ) && ! is_int( $raw_value ) ) {
 		_doing_it_wrong(
 			__FUNCTION__,
-			__( 'Raw size value must be a string or integer.' ),
+			__( 'Raw size value must be a string or integer.', 'gutenberg' ),
 			'6.1.0'
 		);
 		return null;

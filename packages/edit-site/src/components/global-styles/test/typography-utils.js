@@ -97,6 +97,17 @@ describe( 'typography utils', () => {
 					expected:
 						'clamp(1.3125rem, 1.3125rem + ((1vw - 0.48rem) * 2.524), 2.625rem)',
 				},
+				// Should return fluid value for floats with units.
+				{
+					preset: {
+						size: '100.175px',
+					},
+					typographySettings: {
+						fluid: true,
+					},
+					expected:
+						'clamp(75.13125px, 4.695703125rem + ((1vw - 7.68px) * 9.03), 150.2625px)',
+				},
 				// Should return default fluid values with empty fluid array.
 				{
 					preset: {
