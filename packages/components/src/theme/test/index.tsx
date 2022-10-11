@@ -79,5 +79,23 @@ describe( 'Theme', () => {
 				'--wp-components-color-accent-darker-20': '#091d5f',
 			} );
 		} );
+
+		describe( 'unsupported values', () => {
+			it.each( [
+				// Keywords
+				'currentcolor',
+				'initial',
+				'reset',
+				'inherit',
+				'revert',
+				'unset',
+				// CSS Custom properties
+				'var( --my-variable )',
+			] )( 'should warn when the value is "%s"', ( accentValue ) => {
+				render( <Theme accent={ accentValue } /> );
+
+				expect( console ).toHaveWarned();
+			} );
+		} );
 	} );
 } );

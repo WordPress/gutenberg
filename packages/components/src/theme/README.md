@@ -27,8 +27,16 @@ const Example = () => {
 
 ## Props
 
-### `accent`: `CSSProperties[ 'color' ]`
+### `accent`: `string`
 
 Used to set the accent color (used by components as the primary color). If an accent color is not defined, the default fallback value is the original WP Admin main theme color.
+
+Note: this property only supports some of the multiple syntaxes used to specify a CSS color. In particular, these are the known _unsupported_ values:
+
+- the `'currentcolor'` keyword;
+- global keyworks (like `'-moz-initial'`, `'inherit'`, `'initial'`, `'revert'` and `'unset'`;
+- CSS custom properties (e.g. `var(--my-custom-property)`)
+
+
 
 -   Required: No

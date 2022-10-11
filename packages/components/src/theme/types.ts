@@ -1,9 +1,9 @@
 /**
  * External dependencies
  */
-import type { ReactNode, CSSProperties } from 'react';
+import type { ReactNode } from 'react';
 
 export type ThemeProps = {
-	accent?: CSSProperties[ 'color' ];
+	accent?: string;
 	children?: ReactNode;
 };
