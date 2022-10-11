@@ -2,7 +2,7 @@ name: 'Stale Issue Gardening'
 
 on:
   schedule:
-    - cron: '30 1 * * *'
+    - cron: '0 0 * * *'
 
 jobs:
   issue-gardening:

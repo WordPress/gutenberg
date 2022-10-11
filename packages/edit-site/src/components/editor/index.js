@@ -8,7 +8,6 @@ import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import {
 	BlockContextProvider,
 	BlockBreadcrumb,
-	BlockStyles,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
@@ -260,7 +259,6 @@ function Editor( { onError } ) {
 											content={
 												<>
 													<EditorNotices />
-													<BlockStyles.Slot scope="core/block-inspector" />
 													{ editorMode === 'visual' &&
 														template && (
 															<BlockEditor

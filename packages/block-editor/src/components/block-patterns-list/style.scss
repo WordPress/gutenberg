@@ -2,6 +2,11 @@
 	cursor: pointer;
 	margin-bottom: $grid-unit-30;
 
+	// The list item contains absolutely positioned visually hidden text,
+	// so make this container relative. This prevents the bug experienced in
+	// https://github.com/WordPress/gutenberg/issues/44842.
+	position: relative;
+
 	&.is-placeholder {
 		min-height: 100px;
 	}

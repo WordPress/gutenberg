@@ -24,7 +24,7 @@ function InsertionPointPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
 } ) {
-	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
 	const ref = useRef();
 	const {
@@ -33,6 +33,8 @@ function InsertionPointPopover( {
 		nextClientId,
 		rootClientId,
 		isInserterShown,
+		isDistractionFree,
+		isNavigationMode,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockOrder,
@@ -41,6 +43,8 @@ function InsertionPointPopover( {
 			isBlockBeingDragged,
 			getPreviousBlockClientId,
 			getNextBlockClientId,
+			getSettings,
+			isNavigationMode: _isNavigationMode,
 		} = select( blockEditorStore );
 		const insertionPoint = getBlockInsertionPoint();
 		const order = getBlockOrder( insertionPoint.rootClientId );
@@ -60,6 +64,8 @@ function InsertionPointPopover( {
 			_nextClientId = getNextBlockClientId( _nextClientId );
 		}
 
+		const settings = getSettings();
+
 		return {
 			previousClientId: _previousClientId,
 			nextClientId: _nextClientId,
@@ -67,6 +73,8 @@ function InsertionPointPopover( {
 				getBlockListSettings( insertionPoint.rootClientId )
 					?.orientation || 'vertical',
 			rootClientId: insertionPoint.rootClientId,
+			isNavigationMode: _isNavigationMode(),
+			isDistractionFree: settings.isDistractionFree,
 			isInserterShown: insertionPoint?.__unstableWithInserter,
 		};
 	}, [] );
@@ -85,14 +93,6 @@ function InsertionPointPopover( {
 		// bubbled from the inserter itself.
 		if ( event.target !== ref.current ) {
 			openRef.current = true;
-		}
-	}
-
-	function maybeHideInserterPoint( event ) {
-		// Only hide the inserter if it's triggered on the wrapper,
-		// and the inserter is not open.
-		if ( event.target === ref.current && ! openRef.current ) {
-			hideInsertionPoint();
 		}
 	}
 
@@ -169,6 +169,10 @@ function InsertionPointPopover( {
 		},
 	};
 
+	if ( isDistractionFree && ! isNavigationMode ) {
+		return null;
+	}
+
 	const className = classnames(
 		'block-editor-block-list__insertion-point',
 		'is-' + orientation
@@ -195,7 +199,6 @@ function InsertionPointPopover( {
 				className={ classnames( className, {
 					'is-with-inserter': isInserterShown,
 				} ) }
-				onHoverEnd={ maybeHideInserterPoint }
 			>
 				<motion.div
 					variants={ lineVariants }
