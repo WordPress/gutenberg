@@ -2,7 +2,7 @@
 /**
  * New WordPress Formatting API.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 /**
@@ -31,7 +31,6 @@
  *                                                      are non-spaces.
  *     @type string $characters_including_spaces_regexp Optional. Regular expression to find characters
  *                                                      including spaces.
- *     @type string $shortcodes_regexp                  Optional. Regular expression to find shortcodes.
  *     @type array  $shortcodes                         Optional. Array of shortcodes that should be removed
  *                                                      from the text.
  * }
@@ -44,11 +43,12 @@ function gutenberg_word_count( $text, $type, $settings = array() ) {
 		'space_regexp'                       => '/&nbsp;|&#160;/i',
 		'html_entity_regexp'                 => '/&\S+?;/',
 		'connector_regexp'                   => "/--|\x{2014}/u",
-		'remove_regexp'                      => "/[\x{0021}\-\x{0040}\x{005B}\-\x{0060}\x{007B}\-\x{007E}\x{0080}\-\x{00BF}\x{00D7}\x{00F7}\x{2000}\-\x{2BFF}\x{2E00}\-\x{2E7F}]/u",
-		'astral_regexp'                      => "/[\x{D800}\-\x{DBFF}][\x{DC00}\-\x{DFFF}]/u",
+		'remove_regexp'                      => "/[\x{0021}-\x{0040}\x{005B}-\x{0060}\x{007B}-\x{007E}\x{0080}-\x{00BF}\x{00D7}\x{00F7}\x{2000}-\x{2BFF}\x{2E00}-\x{2E7F}]/u",
+		'astral_regexp'                      => '/\pCs/',
 		'words_regexp'                       => '/\S\s+/',
 		'characters_excluding_spaces_regexp' => '/\S/',
 		'characters_including_spaces_regexp' => "/[^\f\n\r\t\v\x{00AD}\x{2028}\x{2029}]/u",
+		'shortcodes'                         => array(),
 	);
 
 	$count = 0;
@@ -61,7 +61,7 @@ function gutenberg_word_count( $text, $type, $settings = array() ) {
 
 	// If there are any shortcodes, add this as a shortcode regular expression.
 	if ( isset( $settings['shortcodes'] ) && is_array( $settings['shortcodes'] ) ) {
-		$settings['shortcodes_regexp'] = '\\[\\/?(?:' . implode( '|', $settings['shortcodes'] ) . ')[^\\]]*?\\]';
+		$settings['shortcodes_regexp'] = '/\\[\\/?(?:' . implode( '|', $settings['shortcodes'] ) . ')[^\\]]*?\\]/';
 	}
 
 	// Sanitize type to one of three possibilities: 'words', 'characters_excluding_spaces' or 'characters_including_spaces'.
