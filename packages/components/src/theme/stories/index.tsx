@@ -29,16 +29,16 @@ const Template: ComponentStory< typeof Theme > = ( args ) => (
 );
 
 export const Default = Template.bind( {} );
-Default.args = {
-	// accent: '#00006b',
-};
+Default.args = {};
 
 export const Nested: ComponentStory< typeof Theme > = ( args ) => (
 	<Theme accent="tomato">
-		<Button variant="primary">Outer theme</Button>
+		<Button variant="primary">Outer theme (hardcoded)</Button>
 
 		<Theme { ...args }>
-			<Button variant="primary">Inner theme</Button>
+			<Button variant="primary">
+				Inner theme (set via Storybook controls)
+			</Button>
 		</Theme>
 	</Theme>
 );
