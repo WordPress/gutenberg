@@ -50,7 +50,15 @@ describe( 'withDispatch', () => {
 
 			return {
 				increment: () => {
-					dispatch( 'counter' ).increment( count );
+					const actionReturnedFromDispatch = Promise.resolve(
+						dispatch( 'counter' ).increment( count )
+					);
+					return expect(
+						actionReturnedFromDispatch
+					).resolves.toEqual( {
+						type: 'inc',
+						count,
+					} );
 				},
 			};
 		} )( ( props ) => <Button onClick={ props.increment } /> );
