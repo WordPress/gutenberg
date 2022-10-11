@@ -51,7 +51,7 @@ describe( 'typography utils', () => {
 					},
 					expected: '28px',
 				},
-				// Should coerce number to `px` and return fluid value.
+				// Should coerce integer to `px` and return fluid value.
 				{
 					preset: {
 						size: 33,
@@ -62,6 +62,19 @@ describe( 'typography utils', () => {
 					},
 					expected:
 						'clamp(24.75px, 1.546875rem + ((1vw - 7.68px) * 2.975), 49.5px)',
+				},
+
+				// Should coerce float to `px` and return fluid value.
+				{
+					preset: {
+						size: 100.23,
+						fluid: true,
+					},
+					typographySettings: {
+						fluid: true,
+					},
+					expected:
+						'clamp(75.1725px, 4.69828125rem + ((1vw - 7.68px) * 9.035), 150.345px)',
 				},
 				// Should return incoming value when already clamped.
 				{

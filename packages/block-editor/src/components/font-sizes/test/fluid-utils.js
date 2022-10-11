@@ -94,10 +94,6 @@ describe( 'getComputedFluidTypographyValue()', () => {
 					expected: null,
 				},
 				{
-					value: 10.1234,
-					expected: null,
-				},
-				{
 					value: [ '10' ],
 					expected: null,
 				},
