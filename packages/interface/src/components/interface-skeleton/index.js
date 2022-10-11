@@ -93,7 +93,6 @@ function InterfaceSkeleton(
 					className="interface-interface-skeleton__drawer"
 					role="region"
 					aria-label={ mergedLabels.drawer }
-					tabIndex="-1"
 				>
 					{ drawer }
 				</div>
@@ -108,7 +107,6 @@ function InterfaceSkeleton(
 						className="interface-interface-skeleton__header"
 						role="region"
 						aria-label={ mergedLabels.header }
-						tabIndex="-1"
 					>
 						{ header }
 					</motion.div>
@@ -118,7 +116,6 @@ function InterfaceSkeleton(
 						className="interface-interface-skeleton__header"
 						role="region"
 						aria-label={ mergedLabels.header }
-						tabIndex="-1"
 					>
 						{ header }
 					</div>
@@ -134,7 +131,6 @@ function InterfaceSkeleton(
 							className="interface-interface-skeleton__secondary-sidebar"
 							role="region"
 							aria-label={ mergedLabels.secondarySidebar }
-							tabIndex="-1"
 						>
 							{ secondarySidebar }
 						</div>
@@ -148,7 +144,6 @@ function InterfaceSkeleton(
 						className="interface-interface-skeleton__content"
 						role="region"
 						aria-label={ mergedLabels.body }
-						tabIndex="-1"
 					>
 						{ content }
 					</div>
@@ -157,7 +152,6 @@ function InterfaceSkeleton(
 							className="interface-interface-skeleton__sidebar"
 							role="region"
 							aria-label={ mergedLabels.sidebar }
-							tabIndex="-1"
 						>
 							{ sidebar }
 						</div>
@@ -167,7 +161,6 @@ function InterfaceSkeleton(
 							className="interface-interface-skeleton__actions"
 							role="region"
 							aria-label={ mergedLabels.actions }
-							tabIndex="-1"
 						>
 							{ actions }
 						</div>
@@ -179,7 +172,6 @@ function InterfaceSkeleton(
 					className="interface-interface-skeleton__footer"
 					role="region"
 					aria-label={ mergedLabels.footer }
-					tabIndex="-1"
 				>
 					{ footer }
 				</div>
