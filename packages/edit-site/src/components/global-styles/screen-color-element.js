@@ -44,15 +44,24 @@ function ScreenColorElement( { name, element } ) {
 	const colorsPerOrigin = useColorsPerOrigin( name );
 	const [ solids ] = useSetting( 'color.palette', name );
 	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
+	const [ isBackgroundEnabled ] = useSetting( 'color.background', name );
 
-	const hasElementColor =
+	let hasElementColor =
 		supports.includes( 'color' ) &&
 		( solids.length > 0 || areCustomSolidsEnabled );
+
+	if ( supports.includes( 'buttonColor' ) ) {
+		hasElementColor =
+			supports.includes( 'buttonColor' ) &&
+			isBackgroundEnabled &&
+			( solids.length > 0 || areCustomSolidsEnabled );
+	}
 
 	const [ elementTextColor, setElementTextColor ] = useStyle(
 		'elements.' + element + '.color.text',
 		name
 	);
+
 	const [ userElementTextColor ] = useStyle(
 		'elements.' + element + '.color.text',
 		name,
