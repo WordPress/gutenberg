@@ -242,10 +242,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 			{ hasBlockStyles && (
 				<div>
 					<PanelBody title={ __( 'Styles' ) }>
-						<BlockStyles
-							scope="core/block-inspector"
-							clientId={ clientId }
-						/>
+						<BlockStyles clientId={ clientId } />
 						{ hasBlockSupport(
 							blockName,
 							'defaultStylePicker',
