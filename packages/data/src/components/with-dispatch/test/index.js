@@ -5,6 +5,11 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
+ * WordPress dependencies
+ */
+import { memo } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import withDispatch from '../';
@@ -31,8 +36,14 @@ describe( 'withDispatch', () => {
 
 	it( 'passes the relevant data to the component', async () => {
 		const user = userEvent.setup();
+		const buttonSpy = jest.fn();
 		const registry = createRegistry();
 		registry.registerStore( 'counter', storeOptions );
+
+		const Button = memo( ( { onClick } ) => {
+			buttonSpy();
+			return <button onClick={ onClick } />;
+		} );
 
 		const Component = withDispatch( ( dispatch, ownProps ) => {
 			const { count } = ownProps;
@@ -42,7 +53,7 @@ describe( 'withDispatch', () => {
 					dispatch( 'counter' ).increment( count );
 				},
 			};
-		} )( ( props ) => <button onClick={ props.increment } /> );
+		} )( ( props ) => <Button onClick={ props.increment } /> );
 
 		const { rerender } = render(
 			<RegistryProvider value={ registry }>
@@ -57,6 +68,10 @@ describe( 'withDispatch', () => {
 				<Component count={ 2 } />
 			</RegistryProvider>
 		);
+
+		// Function value reference should not have changed in props update.
+		// The spy method is only called during inital render.
+		expect( buttonSpy ).toBeCalledTimes( 1 );
 
 		await user.click( screen.getByRole( 'button' ) );
 		expect( registry.select( 'counter' ).getCount() ).toBe( 2 );
