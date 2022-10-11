@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
 import BaseControl from '../base-control';
 import Button from '../button';
 import { space } from '../ui/utils/space';
-import { COLORS, rtl } from '../utils';
+import { COLORS } from '../utils';
 import type { FontSizePickerProps } from './types';
 
 export const Container = styled.fieldset`
@@ -19,14 +19,14 @@ export const Container = styled.fieldset`
 `;
 
 export const HeaderLabel = styled( BaseControl.VisualLabel )`
-	display: inline-block;
+	display: flex;
+	gap: ${ space( 1 ) };
+	justify-content: flex-start;
 	margin-bottom: 0;
 `;
 
 export const HeaderHint = styled.span`
 	color: ${ COLORS.gray[ 700 ] };
-	display: inline-block;
-	${ rtl( { marginLeft: space( 1 ) } )() }
 `;
 
 export const Controls = styled.div< {
