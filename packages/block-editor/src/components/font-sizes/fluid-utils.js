@@ -32,15 +32,15 @@ const DEFAULT_MAXIMUM_FONT_SIZE_FACTOR = 1.5;
  * } );
  * ```
  *
- * @param {Object}  args
- * @param {?string} args.minimumViewPortWidth  Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
- * @param {?string} args.maximumViewPortWidth  Maximum size up to which type will have fluidity. Optional if fontSize is specified.
- * @param {?string} args.fontSize              Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
- * @param {?string} args.maximumFontSize       Maximum font size for any clamp() calculation. Optional.
- * @param {?string} args.minimumFontSize       Minimum font size for any clamp() calculation. Optional.
- * @param {?number} args.scaleFactor           A scale factor to determine how fast a font scales within boundaries. Optional.
- * @param {?number} args.minimumFontSizeFactor How much to scale defaultFontSize by to derive minimumFontSize. Optional.
- * @param {?number} args.maximumFontSizeFactor How much to scale defaultFontSize by to derive maximumFontSize. Optional.
+ * @param {Object}        args
+ * @param {?string}       args.minimumViewPortWidth  Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
+ * @param {?string}       args.maximumViewPortWidth  Maximum size up to which type will have fluidity. Optional if fontSize is specified.
+ * @param {string|number} [args.fontSize]            Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
+ * @param {?string}       args.maximumFontSize       Maximum font size for any clamp() calculation. Optional.
+ * @param {?string}       args.minimumFontSize       Minimum font size for any clamp() calculation. Optional.
+ * @param {?number}       args.scaleFactor           A scale factor to determine how fast a font scales within boundaries. Optional.
+ * @param {?number}       args.minimumFontSizeFactor How much to scale defaultFontSize by to derive minimumFontSize. Optional.
+ * @param {?number}       args.maximumFontSizeFactor How much to scale defaultFontSize by to derive maximumFontSize. Optional.
  *
  * @return {string|null} A font-size value using clamp().
  */
@@ -148,7 +148,7 @@ export function getComputedFluidTypographyValue( {
 
 /**
  * Internal method that checks a string for a unit and value and returns an array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ].
- * A raw font size of `value + unit` is expected. If the value is a number, it will convert to `value + 'px'`.
+ * A raw font size of `value + unit` is expected. If the value is an integer, it will convert to `value + 'px'`.
  *
  * @param {string|number}    rawValue Raw size value from theme.json.
  * @param {Object|undefined} options  Calculation options.
@@ -156,12 +156,12 @@ export function getComputedFluidTypographyValue( {
  * @return {{ unit: string, value: number }|null} An object consisting of `'value'` and `'unit'` properties.
  */
 export function getTypographyValueAndUnit( rawValue, options = {} ) {
-	if ( ! rawValue ) {
+	if ( typeof rawValue !== 'string' && typeof rawValue !== 'number' ) {
 		return null;
 	}
 
-	// Converts numbers to pixel values by default.
-	if ( typeof rawValue === 'number' ) {
+	// Converts numeric values to pixel values by default.
+	if ( isFinite( rawValue ) ) {
 		rawValue = `${ rawValue }px`;
 	}
 
