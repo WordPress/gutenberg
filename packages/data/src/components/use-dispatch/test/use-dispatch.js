@@ -31,13 +31,9 @@ describe( 'useDispatch', () => {
 		},
 	};
 
-	let registry;
-	beforeEach( () => {
-		registry = createRegistry();
-	} );
-
 	it( 'returns dispatch function from store with no store name provided', async () => {
 		const user = userEvent.setup();
+		const registry = createRegistry();
 		registry.registerStore( 'demo', counterStore );
 
 		const TestComponent = () => {
@@ -56,9 +52,10 @@ describe( 'useDispatch', () => {
 		expect( registry.select( 'demo' ).get() ).toBe( 1 );
 	} );
 
-	it( 'returns expected action creators from store for given storeName', async () => {
+	it( 'returns expected action creators from store for given store descriptor', async () => {
 		const user = userEvent.setup();
 		const store = createReduxStore( 'demoStore', counterStore );
+		const registry = createRegistry();
 		registry.register( store );
 
 		const TestComponent = () => {
@@ -77,8 +74,9 @@ describe( 'useDispatch', () => {
 		expect( registry.select( store ).get() ).toBe( 1 );
 	} );
 
-	it( 'returns expected action creators from store for given store descriptor', async () => {
+	it( 'returns expected action creators from store for given storeName', async () => {
 		const user = userEvent.setup();
+		const registry = createRegistry();
 		registry.registerStore( 'demoStore', counterStore );
 		const TestComponent = () => {
 			const { inc } = useDispatch( 'demoStore' );
@@ -130,53 +128,5 @@ describe( 'useDispatch', () => {
 		await user.click( screen.getByRole( 'button' ) );
 		expect( firstRegistry.select( 'demo' ).get() ).toBe( 1 );
 		expect( secondRegistry.select( 'demo' ).get() ).toBe( 1 );
-	} );
-
-	it( 'dispatches returned actions correctly', async () => {
-		const user = userEvent.setup();
-		const fooAction = jest.fn( () => ( { type: '__INERT__' } ) );
-		const barAction = jest.fn( () => ( { type: '__INERT__' } ) );
-		const store = createReduxStore( 'demo', {
-			reducer: ( state ) => state,
-			actions: {
-				foo: fooAction,
-				bar: barAction,
-			},
-		} );
-		registry.register( store );
-
-		const TestComponent = () => {
-			const { foo, bar } = useDispatch( store );
-			return (
-				<>
-					<button onClick={ foo }>foo</button>
-					<button onClick={ bar }>bar</button>
-				</>
-			);
-		};
-
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
-		);
-
-		await user.click(
-			screen.getByRole( 'button', {
-				name: 'foo',
-			} )
-		);
-
-		expect( fooAction ).toBeCalledTimes( 1 );
-		expect( barAction ).toBeCalledTimes( 0 );
-
-		await user.click(
-			screen.getByRole( 'button', {
-				name: 'bar',
-			} )
-		);
-
-		expect( fooAction ).toBeCalledTimes( 1 );
-		expect( barAction ).toBeCalledTimes( 1 );
 	} );
 } );
