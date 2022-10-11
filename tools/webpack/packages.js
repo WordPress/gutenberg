@@ -100,8 +100,8 @@ const vendors = {
 		'react-dom/umd/react-dom.production.min.js',
 	],
 	'inert-polyfill': [
-		'inert-polyfill/inert-polyfill.js',
-		'inert-polyfill/inert-polyfill.min.js',
+		'wicg-inert/dist/inert.js',
+		'wicg-inert/dist/inert.min.js',
 	],
 };
 const vendorsCopyConfig = Object.entries( vendors ).flatMap(
