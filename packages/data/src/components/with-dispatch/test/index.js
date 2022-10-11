@@ -120,6 +120,7 @@ describe( 'withDispatch', () => {
 		);
 
 		await user.click( screen.getByRole( 'button' ) );
+		// expectedValue = 2 * currentValue + 1.
 		expect( registry.select( 'counter' ).getCount() ).toBe( 1 );
 
 		await user.click( screen.getByRole( 'button' ) );
