@@ -35,6 +35,7 @@ const defaultShortcuts = {
 export function useNavigateRegions( shortcuts = defaultShortcuts ) {
 	const ref = useRef();
 	const [ isFocusingRegions, setIsFocusingRegions ] = useState( false );
+	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
 
 	function focusRegion( offset ) {
 		const regions = Array.from(
@@ -44,13 +45,11 @@ export function useNavigateRegions( shortcuts = defaultShortcuts ) {
 			return;
 		}
 		let nextRegion = regions[ 0 ];
-		const selectedIndex = regions.indexOf(
-			ref.current.ownerDocument.activeElement
-		);
 		if ( selectedIndex !== -1 ) {
 			let nextIndex = selectedIndex + offset;
 			nextIndex = nextIndex === -1 ? regions.length - 1 : nextIndex;
 			nextIndex = nextIndex === regions.length ? 0 : nextIndex;
+			setSelectedIndex( nextIndex );
 			nextRegion = regions[ nextIndex ];
 		}
 
