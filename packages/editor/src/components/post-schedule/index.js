@@ -24,11 +24,6 @@ function getDayOfTheMonth( date = new Date(), firstDay = true ) {
 	).toISOString();
 }
 
-function getDaysInMonth( date = new Date() ) {
-	const d = new Date( date );
-	return new Date( d.getFullYear(), d.getMonth() + 1, 0 ).getDate();
-}
-
 export default function PostSchedule( { onClose } ) {
 	const { postDate, postType } = useSelect(
 		( select ) => ( {
@@ -53,7 +48,8 @@ export default function PostSchedule( { onClose } ) {
 				after: getDayOfTheMonth( previewedMonth ),
 				before: getDayOfTheMonth( previewedMonth, false ),
 				exclude: [ select( editorStore ).getCurrentPostId() ],
-				per_page: getDaysInMonth( previewedMonth ),
+				per_page: 100,
+				_fields: 'id,date',
 			} ),
 		[ previewedMonth, postType ]
 	);
