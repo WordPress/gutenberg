@@ -2,7 +2,7 @@
  * External dependencies
  */
 import memize from 'memize';
-import { map, without } from 'lodash';
+import { map } from 'lodash';
 import { I18nManager } from 'react-native';
 
 /**
@@ -76,9 +76,8 @@ class Editor extends Component {
 					? map( blockTypes, 'name' )
 					: settings.allowedBlockTypes || [];
 
-			settings.allowedBlockTypes = without(
-				defaultAllowedBlockTypes,
-				...hiddenBlockTypes
+			settings.allowedBlockTypes = defaultAllowedBlockTypes.filter(
+				( type ) => ! hiddenBlockTypes.includes( type )
 			);
 		}
 
