@@ -4,7 +4,8 @@
 
 ### Bug Fix
 
--   `FontSizePicker`: Update fluid utils so that only string, floats and integers are treated as valid font sizes for the purposes of fluid typography.([#44847](https://github.com/WordPress/gutenberg/pull/44847))
+-   `FontSizePicker`: Update fluid utils so that only string, floats and integers are treated as valid font sizes for the purposes of fluid typography ([#44847](https://github.com/WordPress/gutenberg/pull/44847))
+-   `getTypographyClassesAndStyles()`: Ensure that font sizes are transformed into fluid values if fluid typography is activated ([#44852](https://github.com/WordPress/gutenberg/pull/44852))
 
 ## 10.2.0 (2022-10-05)
 
