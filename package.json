@@ -84,7 +84,8 @@
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/widgets": "file:packages/widgets",
-		"@wordpress/wordcount": "file:packages/wordcount"
+		"@wordpress/wordcount": "file:packages/wordcount",
+		"inert-polyfill": "0.2.5"
 	},
 	"devDependencies": {
 		"@actions/core": "1.8.0",
