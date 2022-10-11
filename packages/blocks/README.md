@@ -501,19 +501,6 @@ _Returns_
 
 -   `boolean`: True if a block contains at least one child blocks with inserter support and false otherwise.
 
-### isNavigationBlock
-
-Determines whether or not the given block is a navigation block. This is a
-special block type that can used to point to a wp_navigation post type.
-
-_Parameters_
-
--   _blockOrType_ `Object`: Block or Block Type to test.
-
-_Returns_
-
--   `boolean`: Whether the given block is a navigation block.
-
 ### isReusableBlock
 
 Determines whether or not the given block is a reusable block. This is a
