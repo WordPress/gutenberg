@@ -18,7 +18,7 @@ import ScreenTypographyElement from './screen-typography-element';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenBackgroundColor from './screen-background-color';
-import ScreenCaptionColor from './screen-caption-color';
+import ScreenColorElement from './screen-color-element';
 import ScreenTextColor from './screen-text-color';
 import ScreenLinkColor from './screen-link-color';
 import ScreenHeadingColor from './screen-heading-color';
@@ -112,7 +112,7 @@ function ContextScreens( { name } ) {
 			<GlobalStylesNavigationScreen
 				path={ parentMenu + '/colors/caption' }
 			>
-				<ScreenCaptionColor name={ name } />
+				<ScreenColorElement name={ name } element="caption" />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen
