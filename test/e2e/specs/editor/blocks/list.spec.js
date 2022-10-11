@@ -600,6 +600,32 @@ test.describe( 'List', () => {
 		);
 	} );
 
+	test( 'should create paragraph on Enter in quote block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/quote' } );
+		await page.keyboard.type( '/list' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'aaa' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>aaa</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->`
+		);
+	} );
+
 	test( 'should indent and outdent level 1', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'a' );
