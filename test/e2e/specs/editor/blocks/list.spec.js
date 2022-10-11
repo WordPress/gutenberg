@@ -1196,4 +1196,13 @@ test.describe( 'List', () => {
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->` );
 	} );
+
+	test( 'can be exited to selected paragraph', async ( { editor, page } ) => {
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( '* ' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
