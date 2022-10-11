@@ -36,14 +36,13 @@ describe( 'withDispatch', () => {
 
 	it( 'passes the relevant data to the component', async () => {
 		const user = userEvent.setup();
-		const buttonSpy = jest.fn();
 		const registry = createRegistry();
 		registry.registerStore( 'counter', storeOptions );
 
-		const Button = memo( ( { onClick } ) => {
-			buttonSpy();
-			return <button onClick={ onClick } />;
-		} );
+		const ButtonSpy = jest.fn( ( { onClick } ) => (
+			<button onClick={ onClick } />
+		) );
+		const Button = memo( ButtonSpy );
 
 		const Component = withDispatch( ( dispatch, ownProps ) => {
 			const { count } = ownProps;
@@ -79,7 +78,7 @@ describe( 'withDispatch', () => {
 
 		// Function value reference should not have changed in props update.
 		// The spy method is only called during inital render.
-		expect( buttonSpy ).toBeCalledTimes( 1 );
+		expect( ButtonSpy ).toBeCalledTimes( 1 );
 
 		await user.click( screen.getByRole( 'button' ) );
 		expect( registry.select( 'counter' ).getCount() ).toBe( 2 );
