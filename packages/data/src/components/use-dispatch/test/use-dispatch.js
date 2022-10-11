@@ -31,13 +31,9 @@ describe( 'useDispatch', () => {
 		},
 	};
 
-	let registry;
-	beforeEach( () => {
-		registry = createRegistry();
-	} );
-
 	it( 'returns dispatch function from store with no store name provided', async () => {
 		const user = userEvent.setup();
+		const registry = createRegistry();
 		registry.registerStore( 'demo', counterStore );
 
 		const TestComponent = () => {
@@ -59,6 +55,7 @@ describe( 'useDispatch', () => {
 	it( 'returns expected action creators from store for given store descriptor', async () => {
 		const user = userEvent.setup();
 		const store = createReduxStore( 'demoStore', counterStore );
+		const registry = createRegistry();
 		registry.register( store );
 
 		const TestComponent = () => {
@@ -79,6 +76,7 @@ describe( 'useDispatch', () => {
 
 	it( 'returns expected action creators from store for given storeName', async () => {
 		const user = userEvent.setup();
+		const registry = createRegistry();
 		registry.registerStore( 'demoStore', counterStore );
 		const TestComponent = () => {
 			const { inc } = useDispatch( 'demoStore' );
@@ -143,6 +141,7 @@ describe( 'useDispatch', () => {
 				bar: barAction,
 			},
 		} );
+		const registry = createRegistry();
 		registry.register( store );
 
 		const TestComponent = () => {
