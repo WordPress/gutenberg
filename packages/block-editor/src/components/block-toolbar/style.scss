@@ -137,20 +137,6 @@
 		padding-right: 6px;
 	}
 
-	// Switcher overrides.
-	.block-editor-block-switcher {
-		border-right: 1px solid $gray-900;
-		padding-right: 6px;
-
-		.components-dropdown-menu__toggle {
-			margin-left: 0;
-		}
-	}
-
-	.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-switcher {
-		border-right-color: $gray-200;
-	}
-
 	.block-editor-block-switcher .components-dropdown-menu__toggle,
 	.block-editor-block-switcher__no-switcher-icon {
 		.block-editor-block-icon {
@@ -173,8 +159,14 @@
 
 	// Mover overrides.
 	.block-editor-block-toolbar__block-controls .block-editor-block-mover {
-		margin-left: 0;
+		border-left: 1px solid $gray-900;
+		margin-left: 6px;
+		margin-right: -6px;
 		white-space: nowrap;
+	}
+
+	.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-toolbar__block-controls .block-editor-block-mover {
+		border-left-color: $gray-200;
 	}
 
 	.block-editor-block-mover-button {
@@ -186,10 +178,6 @@
 	.block-editor-block-mover__drag-handle.has-icon {
 		padding-left: 12px !important;
 		padding-right: 12px !important;
-	}
-
-	.block-editor-block-mover__move-button-container {
-		padding-left: 6px;
 	}
 
 	.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-mover__move-button-container {
@@ -212,8 +200,6 @@
 				display: block;
 				height: 1px;
 				background: $gray-900;
-				width: calc(100% + 12px);
-				margin: 0 -6px;
 				order: 2;
 			}
 		}
