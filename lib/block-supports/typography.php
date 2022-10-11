@@ -266,8 +266,8 @@ function gutenberg_render_typography_support( $block_content, $block ) {
  *
  * @access private
  *
- * @param string|number $raw_value Raw size value from theme.json.
- * @param array         $options   {
+ * @param string|int|float $raw_value Raw size value from theme.json.
+ * @param array            $options   {
  *     Optional. An associative array of options. Default is empty array.
  *
  *     @type string        $coerce_to        Coerce the value to rem or px. Default `'rem'`.
@@ -277,6 +277,16 @@ function gutenberg_render_typography_support( $block_content, $block ) {
  * @return array An array consisting of `'value'` and `'unit'` properties.
  */
 function gutenberg_get_typography_value_and_unit( $raw_value, $options = array() ) {
+	if ( ! is_string( $raw_value ) && ! is_int( $raw_value ) && ! is_float( $raw_value ) ) {
+		_doing_it_wrong(
+			__FUNCTION__,
+			__( 'Raw size value must be a string, integer or a float.', 'gutenberg' ),
+			'6.1.0'
+		);
+		return null;
+	}
+
+	// Converts numeric values to pixel values by default.
 	if ( empty( $raw_value ) ) {
 		return null;
 	}
@@ -406,17 +416,25 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
  * @param array $preset                     {
  *     Required. fontSizes preset value as seen in theme.json.
  *
- *     @type string $name Name of the font size preset.
- *     @type string $slug Kebab-case unique identifier for the font size preset.
- *     @type string $size CSS font-size value, including units where applicable.
+ *     @type string           $name Name of the font size preset.
+ *     @type string           $slug Kebab-case unique identifier for the font size preset.
+ *     @type string|int|float $size CSS font-size value, including units where applicable.
  * }
  * @param bool  $should_use_fluid_typography An override to switch fluid typography "on". Can be used for unit testing. Default is `false`.
  *
  * @return string|null Font-size value or `null` if a size is not passed in $preset.
  */
 function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_typography = false ) {
-	if ( ! isset( $preset['size'] ) || empty( $preset['size'] ) ) {
+	if ( ! isset( $preset['size'] ) ) {
 		return null;
+	}
+
+	/*
+	 * Catches empty values and 0/'0'.
+	 * Fluid calculations cannot be performed on 0.
+	 */
+	if ( empty( $preset['size'] ) ) {
+		return $preset['size'];
 	}
 
 	// Check if fluid font sizes are activated.

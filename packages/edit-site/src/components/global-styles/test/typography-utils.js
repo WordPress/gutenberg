@@ -15,6 +15,23 @@ describe( 'typography utils', () => {
 					typographySettings: undefined,
 					expected: '28px',
 				},
+				// Default return value where font size is 0.
+				{
+					preset: {
+						size: 0,
+					},
+					typographySettings: undefined,
+					expected: 0,
+				},
+				// Default return value where font size is '0'.
+				{
+					preset: {
+						size: '0',
+					},
+					typographySettings: undefined,
+					expected: '0',
+				},
+
 				// Default return non-fluid value where `size` is undefined.
 				{
 					preset: {
@@ -34,7 +51,7 @@ describe( 'typography utils', () => {
 					},
 					expected: '28px',
 				},
-				// Should coerce number to `px` and return fluid value.
+				// Should coerce integer to `px` and return fluid value.
 				{
 					preset: {
 						size: 33,
@@ -45,6 +62,19 @@ describe( 'typography utils', () => {
 					},
 					expected:
 						'clamp(24.75px, 1.546875rem + ((1vw - 7.68px) * 2.975), 49.5px)',
+				},
+
+				// Should coerce float to `px` and return fluid value.
+				{
+					preset: {
+						size: 100.23,
+						fluid: true,
+					},
+					typographySettings: {
+						fluid: true,
+					},
+					expected:
+						'clamp(75.1725px, 4.69828125rem + ((1vw - 7.68px) * 9.035), 150.345px)',
 				},
 				// Should return incoming value when already clamped.
 				{
@@ -79,6 +109,17 @@ describe( 'typography utils', () => {
 					},
 					expected:
 						'clamp(1.3125rem, 1.3125rem + ((1vw - 0.48rem) * 2.524), 2.625rem)',
+				},
+				// Should return fluid value for floats with units.
+				{
+					preset: {
+						size: '100.175px',
+					},
+					typographySettings: {
+						fluid: true,
+					},
+					expected:
+						'clamp(75.13125px, 4.695703125rem + ((1vw - 7.68px) * 9.03), 150.2625px)',
 				},
 				// Should return default fluid values with empty fluid array.
 				{
