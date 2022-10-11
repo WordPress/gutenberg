@@ -6,34 +6,6 @@
  * @subpackage style-engine
  */
 
-// Check for the existence of Style Engine classes and methods.
-// Once the Style Engine has been migrated to Core we can remove the if statements and require imports.
-// Testing new features from the Gutenberg package may require
-// testing against `gutenberg_` and `_Gutenberg` functions and methods in the future.
-if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
-	require __DIR__ . '/../class-wp-style-engine-processor.php';
-}
-
-if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
-	require __DIR__ . '/../class-wp-style-engine-css-declarations.php';
-}
-
-if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
-	require __DIR__ . '/../class-wp-style-engine-css-rule.php';
-}
-
-if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
-	require __DIR__ . '/../class-wp-style-engine-css-rules-store.php';
-}
-
-if ( ! class_exists( 'WP_Style_Engine' ) ) {
-	require __DIR__ . '/../class-wp-style-engine.php';
-}
-
-if ( ! function_exists( 'wp_style_engine_get_styles' ) ) {
-	require __DIR__ . '/../style-engine.php';
-}
-
 /**
  * Tests for registering, storing and generating styles.
  */
@@ -42,22 +14,22 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 * Cleans up stores after each test.
 	 */
 	public function tear_down() {
-		WP_Style_Engine_CSS_Rules_Store::remove_all_stores();
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
 		parent::tear_down();
 	}
 
 	/**
 	 * Tests generating block styles and classnames based on various manifestations of the $block_styles argument.
 	 *
-	 * @covers ::wp_style_engine_get_styles
-	 * @covers WP_Style_Engine::parse_block_styles
-	 * @covers WP_Style_Engine::compile_css
+	 * @covers ::gutenberg_style_engine_get_styles
+	 * @covers WP_Style_Engine_Gutenberg::parse_block_styles
+	 * @covers WP_Style_Engine_Gutenberg::compile_css
 	 *
 	 * @dataProvider data_wp_style_engine_get_styles
 	 *
 	 * @param array  $block_styles    The incoming block styles object.
 	 * @param array  $options         {
-	 *     An array of options to pass to `wp_style_engine_get_styles()`.
+	 *     An array of options to pass to `gutenberg_style_engine_get_styles()`.
 	 *
 	 *     @type string|null $context                    An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is `null`.
 	 *                                                   When set, the Style Engine will attempt to store the CSS rules, where a selector is also passed.
@@ -68,7 +40,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 * @param string $expected_output The expected output.
 	 */
 	public function test_wp_style_engine_get_styles( $block_styles, $options, $expected_output ) {
-		$generated_styles = wp_style_engine_get_styles( $block_styles, $options );
+		$generated_styles = gutenberg_style_engine_get_styles( $block_styles, $options );
 
 		$this->assertSame( $expected_output, $generated_styles );
 	}
@@ -508,8 +480,8 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
 	 * Tests adding rules to a store and retrieving a generated stylesheet.
 	 *
-	 * @covers ::wp_style_engine_get_styles
-	 * @covers WP_Style_Engine::store_css_rule
+	 * @covers ::gutenberg_style_engine_get_styles
+	 * @covers WP_Style_Engine_Gutenberg::store_css_rule
 	 */
 	public function test_should_store_block_styles_using_context() {
 		$block_styles = array(
@@ -523,14 +495,14 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$generated_styles = wp_style_engine_get_styles(
+		$generated_styles = gutenberg_style_engine_get_styles(
 			$block_styles,
 			array(
 				'context'  => 'block-supports',
 				'selector' => 'article',
 			)
 		);
-		$store            = WP_Style_Engine::get_store( 'block-supports' );
+		$store            = WP_Style_Engine_Gutenberg::get_store( 'block-supports' );
 		$rule             = $store->get_all_rules()['article'];
 
 		$this->assertSame( $generated_styles['css'], $rule->get_css() );
@@ -548,14 +520,14 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			),
 		);
 
-		wp_style_engine_get_styles(
+		gutenberg_style_engine_get_styles(
 			$block_styles,
 			array(
 				'selector' => '#font-size-rulez',
 			)
 		);
 
-		$all_stores = WP_Style_Engine_CSS_Rules_Store::get_stores();
+		$all_stores = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_stores();
 
 		$this->assertEmpty( $all_stores );
 	}
@@ -586,21 +558,21 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 		);
-		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules(
+		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules(
 			$css_rules,
 			array(
 				'context' => 'test-store',
 			)
 		);
 
-		$this->assertSame( $compiled_stylesheet, wp_style_engine_get_stylesheet_from_context( 'test-store' ) );
+		$this->assertSame( $compiled_stylesheet, gutenberg_style_engine_get_stylesheet_from_context( 'test-store' ) );
 	}
 
 	/**
 	 * Tests returning a generated stylesheet from a set of rules.
 	 *
-	 * @covers ::wp_style_engine_get_stylesheet_from_css_rules
-	 * @covers WP_Style_Engine::compile_stylesheet_from_css_rules
+	 * @covers ::gutenberg_style_engine_get_stylesheet_from_css_rules
+	 * @covers WP_Style_Engine_Gutenberg::compile_stylesheet_from_css_rules
 	 */
 	public function test_should_return_stylesheet_from_css_rules() {
 		$css_rules = array(
@@ -633,7 +605,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
+		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
 
 		$this->assertSame( '.saruman{color:white;height:100px;border-style:solid;align-self:unset;}.gandalf{color:grey;height:90px;border-style:dotted;align-self:safe center;}.radagast{color:brown;height:60px;border-style:dashed;align-self:stretch;}', $compiled_stylesheet );
 	}
@@ -641,8 +613,8 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that incoming styles are deduped and merged.
 	 *
-	 * @covers ::wp_style_engine_get_stylesheet_from_css_rules
-	 * @covers WP_Style_Engine::compile_stylesheet_from_css_rules
+	 * @covers ::gutenberg_style_engine_get_stylesheet_from_css_rules
+	 * @covers WP_Style_Engine_Gutenberg::compile_stylesheet_from_css_rules
 	 */
 	public function test_should_dedupe_and_merge_css_rules() {
 		$css_rules = array(
@@ -681,7 +653,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
+		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
 
 		$this->assertSame( '.gandalf{color:white;height:190px;border-style:dotted;padding:10px;margin-bottom:100px;}.dumbledore,.rincewind{color:grey;height:90px;border-style:dotted;}', $compiled_stylesheet );
 	}

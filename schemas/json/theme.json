@@ -269,7 +269,7 @@
 							}
 						},
 						"spacingScale": {
-							"description": "Space size presets for the space size selector.\nGenerates a custom property (`--wp--preset--space-size--{slug}`) per preset value.",
+							"description": "Settings to auto-generate space size presets for the space size selector.\nGenerates a custom property (`--wp--preset--space-size--{slug}`) per preset value.",
 							"type": "object",
 							"properties": {
 								"operator": {
@@ -463,7 +463,8 @@
 														"auto",
 														"block",
 														"fallback",
-														"swap"
+														"swap",
+														"optional"
 													]
 												},
 												"src": {
@@ -1553,6 +1554,10 @@
 			"description": "Version of theme.json to use.",
 			"type": "integer",
 			"enum": [ 2 ]
+		},
+		"title": {
+			"type": "string",
+			"description": "Title of the global styles variation. If not defined, the file name will be used."
 		},
 		"settings": {
 			"description": "Settings for the block editor and individual blocks. These include things like:\n- Which customization options should be available to the user. \n- The default colors, font sizes... available to the user. \n- CSS custom properties and class names used in styles.\n- And the default layout of the editor (widths and available alignments).",

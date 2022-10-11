@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.18.0 (2022-10-05)
+
 ### Deprecations
 
 -   Deprecate non-string descriptions ([#44455](https://github.com/WordPress/gutenberg/pull/44455)).

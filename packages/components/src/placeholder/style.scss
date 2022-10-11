@@ -201,6 +201,7 @@
 	.components-placeholder__instructions,
 	.components-button {
 		opacity: 0;
+		pointer-events: none;
 		transition: opacity 0.1s linear;
 		@include reduce-motion("transition");
 	}
@@ -210,6 +211,7 @@
 		.components-placeholder__instructions,
 		.components-button {
 			opacity: 1;
+			pointer-events: auto;
 		}
 	}
 
