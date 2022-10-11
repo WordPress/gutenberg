@@ -309,7 +309,10 @@ const variations = [
 		icon: embedTumblrIcon,
 		keywords: [ __( 'social' ) ],
 		description: __( 'Embed a Tumblr post.' ),
-		patterns: [ /^https?:\/\/(www\.)?tumblr\.com\/.+/i ],
+		patterns: [
+			/^https?:\/\/(www\.)?tumblr\.com\/.+/i,
+			/^https?:\/\/(www\.)?tumblr\.com\/blog\/view\/[^\/]+\/.*/i,
+		],
 		attributes: { providerNameSlug: 'tumblr', responsive: true },
 	},
 	{
