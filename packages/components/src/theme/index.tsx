@@ -17,6 +17,7 @@ extend( [ namesPlugin, a11yPlugin ] );
 function Theme( props: WordPressComponentProps< ThemeProps, 'div', true > ) {
 	const { accent } = props;
 	if ( accent && ! colord( accent ).isValid() ) {
+		// eslint-disable-next-line no-console
 		console.warn(
 			`wp.components.Theme: "${ accent }" is not a valid color value for the 'accent' prop.`
 		);
