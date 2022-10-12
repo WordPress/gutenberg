@@ -45,8 +45,8 @@ function gutenberg_word_count( $text, $type, $settings = array() ) {
 		'connector_regexp'                   => "/--|\x{2014}/u",
 		'remove_regexp'                      => "/[\x{0021}-\x{0040}\x{005B}-\x{0060}\x{007B}-\x{007E}\x{0080}-\x{00BF}\x{00D7}\x{00F7}\x{2000}-\x{2BFF}\x{2E00}-\x{2E7F}]/u",
 		'astral_regexp'                      => '/\pCs/',
-		'words_regexp'                       => '/\S\s+/',
-		'characters_excluding_spaces_regexp' => '/\S/',
+		'words_regexp'                       => '/\S\s+/u',
+		'characters_excluding_spaces_regexp' => '/\S/u',
 		'characters_including_spaces_regexp' => "/[^\f\n\r\t\v\x{00AD}\x{2028}\x{2029}]/u",
 		'shortcodes'                         => array(),
 	);
@@ -60,7 +60,7 @@ function gutenberg_word_count( $text, $type, $settings = array() ) {
 	$settings = wp_parse_args( $settings, $defaults );
 
 	// If there are any shortcodes, add this as a shortcode regular expression.
-	if ( isset( $settings['shortcodes'] ) && is_array( $settings['shortcodes'] ) ) {
+	if ( is_array( $settings['shortcodes'] ) && ! empty( $settings['shortcodes'] ) ) {
 		$settings['shortcodes_regexp'] = '/\\[\\/?(?:' . implode( '|', $settings['shortcodes'] ) . ')[^\\]]*?\\]/';
 	}
 

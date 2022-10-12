@@ -7,6 +7,10 @@
 
 class Tests_Formatting_Wordcount extends WP_UnitTestCase {
 	public function test_word_count() {
+		$settings = array(
+			'shortcodes' => array( 'shortcode' ),
+		);
+
 		$expected_settings = array(
 			array(
 				'message'                     => 'Basic test.',
@@ -36,9 +40,6 @@ class Tests_Formatting_Wordcount extends WP_UnitTestCase {
 				'characters_excluding_spaces' => 11,
 				'characters_including_spaces' => 13,
 			),
-
-			/*
-			// phpcs:ignore Squiz.Commenting.BlockComment.NoCapital
 			array(
 				'message'                     => 'Punctuation.',
 				'string'                      => "It's two three " . json_decode( '"\u2026"' ) . ' 4?',
@@ -46,18 +47,13 @@ class Tests_Formatting_Wordcount extends WP_UnitTestCase {
 				'characters_excluding_spaces' => 15,
 				'characters_including_spaces' => 19,
 			),
-			*/
-
-			/*
-			// phpcs:ignore Squiz.Commenting.BlockComment.NoCapital
 			array(
-				'message'                       => 'Em dash.',
-				'string'                        => 'one' . json_decode( '"\u2014"' ) . '--three',
-				'words'                         => 3,
-				'characters_excluding_spaces'   => 14,
-				'characters_including_spaces'   => 14,
+				'message'                     => 'Em dash.',
+				'string'                      => 'one' . json_decode( '"\u2014"' ) . 'two--three',
+				'words'                       => 3,
+				'characters_excluding_spaces' => 14,
+				'characters_including_spaces' => 14,
 			),
-			*/
 			array(
 				'message'                     => 'Shortcodes.',
 				'string'                      => 'one [shortcode attribute="value"]two[/shortcode]three',
@@ -70,7 +66,7 @@ class Tests_Formatting_Wordcount extends WP_UnitTestCase {
 			// phpcs:ignore Squiz.Commenting.BlockComment.NoCapital
 			array(
 				'message'                     => 'Astrals.',
-				'string'                      => '\uD83D\uDCA9',
+				'string'                      => json_decode( '"\uD83D"' ) . json_decode( '"\uDCA9"' ),
 				'words'                       => 1,
 				'characters_excluding_spaces' => 1,
 				'characters_including_spaces' => 1,
@@ -95,7 +91,7 @@ class Tests_Formatting_Wordcount extends WP_UnitTestCase {
 		foreach ( $expected_settings as $expected_setting ) {
 			foreach ( array( 'words', 'characters_excluding_spaces', 'characters_including_spaces' ) as $type ) {
 				$this->assertEquals(
-					gutenberg_word_count( $expected_setting['string'], $type ),
+					gutenberg_word_count( $expected_setting['string'], $type, $settings ),
 					$expected_setting[ $type ],
 					$expected_setting['message'] . ' (' . $type . ')'
 				);
