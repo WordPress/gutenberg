@@ -188,34 +188,39 @@ function BlockPatternsTabs( {
 		<>
 			{ ! isMobile && (
 				<div className="block-editor-inserter__block-patterns-tabs-container">
-					<Composite
-						{ ...composite }
-						role="listbox"
-						className="block-editor-inserter__block-patterns-tabs"
-						as={ ItemGroup }
-						label={ __( 'Block pattern categories' ) }
-					>
-						{ categories.map( ( category ) => (
-							<CompositeItem
-								role="option"
-								as={ Item }
-								{ ...composite }
-								key={ category.name }
-								onClick={ () => onSelectCategory( category ) }
-								className={
-									category === selectedCategory
-										? 'block-editor-inserter__patterns-category block-editor-inserter__patterns-selected-category'
-										: 'block-editor-inserter__patterns-category'
-								}
-								aria-label={ category.label }
-							>
-								<HStack>
-									<FlexBlock>{ category.label }</FlexBlock>
-									<Icon icon={ chevronRight } />
-								</HStack>
-							</CompositeItem>
-						) ) }
-					</Composite>
+					<nav aria-label={ __( 'Block pattern categories' ) }>
+						<Composite
+							{ ...composite }
+							role="list"
+							className="block-editor-inserter__block-patterns-tabs"
+							as={ ItemGroup }
+						>
+							{ categories.map( ( category ) => (
+								<CompositeItem
+									role="listitem"
+									as={ Item }
+									{ ...composite }
+									key={ category.name }
+									onClick={ () =>
+										onSelectCategory( category )
+									}
+									className={
+										category === selectedCategory
+											? 'block-editor-inserter__patterns-category block-editor-inserter__patterns-selected-category'
+											: 'block-editor-inserter__patterns-category'
+									}
+									aria-label={ category.label }
+								>
+									<HStack>
+										<FlexBlock>
+											{ category.label }
+										</FlexBlock>
+										<Icon icon={ chevronRight } />
+									</HStack>
+								</CompositeItem>
+							) ) }
+						</Composite>
+					</nav>
 
 					<Button
 						onClick={ () => setShowPatternsExplorer( true ) }
