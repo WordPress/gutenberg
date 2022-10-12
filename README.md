@@ -57,6 +57,10 @@ You can join us in the `#core-editor` channel in Slack, see the [WordPress Slack
 
 **Weekly meetings** The Editor Team meets weekly on Wednesdays at 14:00 UTC in Slack. If you can not join the meeting, [agenda](https://make.wordpress.org/core/tag/core-editor-agenda/) and [notes](https://make.wordpress.org/core/tag/core-editor-summary/) are posted to the [Make WordPress Blog](https://make.wordpress.org/core/).
 
+## Be Creative
+
+That's why we're here, to express ourselves and share our ideas and creativity :heart:
+
 ## License
 
 WordPress is free software, and is released under the terms of the GNU General Public License version 2 or (at your option) any later version. See [LICENSE.md](LICENSE.md) for complete license.
