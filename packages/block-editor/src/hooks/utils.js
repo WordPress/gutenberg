@@ -44,7 +44,11 @@ export function transformStyles(
 	results
 ) {
 	// If there are no active supports return early.
-	if ( Object.values( activeSupports ).every( ( isActive ) => ! isActive ) ) {
+	if (
+		Object.values( activeSupports ?? {} ).every(
+			( isActive ) => ! isActive
+		)
+	) {
 		return result;
 	}
 	// If the condition verifies we are probably in the presence of a wrapping transform
