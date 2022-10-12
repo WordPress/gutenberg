@@ -1,7 +1,6 @@
 == Changelog ==
 
-= 14.3.0-rc.1 =
-
+= 14.3.0 =
 
 
 ## Changelog
@@ -10,9 +9,6 @@
 
 #### Post Editor
 - Optimize legacy post content layout. ([44506](https://github.com/WordPress/gutenberg/pull/44506))
-- Refactor `PluginPostPublishPanel` tests to use RTL render. ([44667](https://github.com/WordPress/gutenberg/pull/44667))
-- Refactor `AutosaveMonitor` tests to `@testing-library/react`. ([44492](https://github.com/WordPress/gutenberg/pull/44492))
-- Refactor `PostPreviewButton` tests to `@testing-library/react`. ([44470](https://github.com/WordPress/gutenberg/pull/44470))
 - Remove right border when sidebars are closed. ([44613](https://github.com/WordPress/gutenberg/pull/44613))
 
 #### Block Library
@@ -23,13 +19,11 @@
 - Query Loop: Hide instructions for FormTokenField. ([44641](https://github.com/WordPress/gutenberg/pull/44641))
 - Tag Cloud: Remove `strtolower` around taxonomy name. ([16112](https://github.com/WordPress/gutenberg/pull/16112))
 - Video: Update placeholder style. ([44215](https://github.com/WordPress/gutenberg/pull/44215))
-
  
 #### Components
 - FontSizePicker: Make control take up full width. ([44559](https://github.com/WordPress/gutenberg/pull/44559))
 - Placeholder: Remove unnecessary background color. ([44497](https://github.com/WordPress/gutenberg/pull/44497))
 - Placeholder: Update placeholder style. ([44190](https://github.com/WordPress/gutenberg/pull/44190))
-- Refactor `AlignmentMatrixControl` tests to use `@testing-library/react`. ([44670](https://github.com/WordPress/gutenberg/pull/44670))
 - ToggleGroupControl: Fix unselected icon color. ([44575](https://github.com/WordPress/gutenberg/pull/44575))
 - ToolsPanel: Add subheadings and reset text to tools panel menu. ([44260](https://github.com/WordPress/gutenberg/pull/44260))
 
@@ -46,8 +40,6 @@
 
 #### Block Editor
 - Allow dropping an image on an empty paragraph block to create an image block. ([42722](https://github.com/WordPress/gutenberg/pull/42722))
-- Refactor `BlockSwitcher` tests to `@testing-library/react`. ([44493](https://github.com/WordPress/gutenberg/pull/44493))
-- Refactor `ResponsiveBlockControl` tests to use `@testing-library/react`. ([44669](https://github.com/WordPress/gutenberg/pull/44669))
 - Writing flow: Implement Alt+Arrow. ([44081](https://github.com/WordPress/gutenberg/pull/44081))
 
 #### Site Editor
@@ -68,8 +60,6 @@
 - Add a correct TS signature for useEntityRecords. ([44448](https://github.com/WordPress/gutenberg/pull/44448))
 - BlockDraggable: Change prop name passed to children when dragging is disabled. ([44371](https://github.com/WordPress/gutenberg/pull/44371))
 - Fix Lint warning/errors in cherry-pick script. ([44662](https://github.com/WordPress/gutenberg/pull/44662))
-- Fix typo from in writing flow spec. ([44358](https://github.com/WordPress/gutenberg/pull/44358))
-- Fix typo in WP_Navigation_Page_Test. ([44685](https://github.com/WordPress/gutenberg/pull/44685))
 - Fix: Content blocks with nested blocks always appear as top level. ([44098](https://github.com/WordPress/gutenberg/pull/44098))
 - Hide the Classic block in the Site Editor. ([44554](https://github.com/WordPress/gutenberg/pull/44554))
 - PHP 8.2: Remove deprecated callable in Style Engine value functions. ([44561](https://github.com/WordPress/gutenberg/pull/44561))
@@ -127,6 +117,7 @@
 
 #### Block Editor
 - Fix block search for non-Latin characters. ([44652](https://github.com/WordPress/gutenberg/pull/44652))
+- Prevent empty block toolbars from showing empty slots. ([44704](https://github.com/WordPress/gutenberg/pull/44704))
 
 #### Widgets Editor
 - Add extra guarding against legacy widget preview errors. ([44635](https://github.com/WordPress/gutenberg/pull/44635))
@@ -141,9 +132,6 @@
 #### Patterns
 - Fix patterns drag and drop in Safari. ([44366](https://github.com/WordPress/gutenberg/pull/44366))
 
-#### Testing
-- End-to-end Test Utils: Don't use hardcoded login credentials. ([44331](https://github.com/WordPress/gutenberg/pull/44331))
-
 #### Post Editor
 - Add layout styles from Post Content block to post editor. ([44258](https://github.com/WordPress/gutenberg/pull/44258))
 
@@ -151,17 +139,7 @@
 ### Performance
 
 - Compose: Introduce an in-house `throttle()` utility, deprecate Lodash version. ([44225](https://github.com/WordPress/gutenberg/pull/44225))
-
-#### Components
 - Improve Slot/Fill performance. ([44642](https://github.com/WordPress/gutenberg/pull/44642))
-
-#### Lodash
-- Lodash: Remove completely from `@wordpress/compose` package. ([44568](https://github.com/WordPress/gutenberg/pull/44568))
-- Lodash: Remove completely from `@wordpress/library-export-default-webpack-plugin` package. ([44571](https://github.com/WordPress/gutenberg/pull/44571))
-- Lodash: Remove completely from `@wordpress/list-reusable-blocks` package. ([44567](https://github.com/WordPress/gutenberg/pull/44567))
-- Lodash: Refactor away from `_.flow()`. ([44500](https://github.com/WordPress/gutenberg/pull/44500))
-- Lodash: Remove completely from `@wordpress/block-directory` package. ([44206](https://github.com/WordPress/gutenberg/pull/44206))
-- Lodash: Remove completely from `@wordpress/rich-text` package. ([44204](https://github.com/WordPress/gutenberg/pull/44204))
 
 
 ### Documentation
@@ -191,14 +169,12 @@
 - PHP 8.2 | Fix for partially supported callback. ([44537](https://github.com/WordPress/gutenberg/pull/44537))
 - PHPCS: Use PHPCompatibilityWP. ([44542](https://github.com/WordPress/gutenberg/pull/44542))
 - QA: No control structures with empty body. ([44548](https://github.com/WordPress/gutenberg/pull/44548))
-- Style engine: Add JS unit tests for outline properties. ([44518](https://github.com/WordPress/gutenberg/pull/44518))
 - Script loader: Remove 6.1 wp actions. ([44519](https://github.com/WordPress/gutenberg/pull/44519))
 
 #### Components
 - Components refactor `Mobile` to ignore `exhaustive-deps`. ([44207](https://github.com/WordPress/gutenberg/pull/44207))
 - Convert FontSizePicker to TypeScript. ([44449](https://github.com/WordPress/gutenberg/pull/44449))
 - FontSizePicker: Replace SCSS with Emotion + components. ([44483](https://github.com/WordPress/gutenberg/pull/44483))
-- Popover: Convert unit tests to TypeScript and modern RTL assertions. ([44373](https://github.com/WordPress/gutenberg/pull/44373))
 - RangeControl: Remove unused UseDebouncedHoverInteractionArgs type. ([44411](https://github.com/WordPress/gutenberg/pull/44411))
 - Refactor `Notice` to pass `exhaustive-deps`. ([44157](https://github.com/WordPress/gutenberg/pull/44157))
 - Refactor `ResizableBox` to pass `exhaustive-deps`. ([44370](https://github.com/WordPress/gutenberg/pull/44370))
@@ -224,11 +200,19 @@
 #### Global Styles
 - Add `blocks` to the list of valid origins for `theme.json`. ([44363](https://github.com/WordPress/gutenberg/pull/44363))
 
+#### Lodash
+- Lodash: Remove completely from `@wordpress/compose` package. ([44568](https://github.com/WordPress/gutenberg/pull/44568))
+- Lodash: Remove completely from `@wordpress/library-export-default-webpack-plugin` package. ([44571](https://github.com/WordPress/gutenberg/pull/44571))
+- Lodash: Remove completely from `@wordpress/list-reusable-blocks` package. ([44567](https://github.com/WordPress/gutenberg/pull/44567))
+- Lodash: Refactor away from `_.flow()`. ([44500](https://github.com/WordPress/gutenberg/pull/44500))
+- Lodash: Remove completely from `@wordpress/block-directory` package. ([44206](https://github.com/WordPress/gutenberg/pull/44206))
+- Lodash: Remove completely from `@wordpress/rich-text` package. ([44204](https://github.com/WordPress/gutenberg/pull/44204))
 
 ### Tools
 
 - Scripts: Use default value for process.env.WP_SRC_DIRECTORY. ([44367](https://github.com/WordPress/gutenberg/pull/44367))
 - Limit access to experimental APIs to WordPress codebase. ([43386](https://github.com/WordPress/gutenberg/pull/43386))
+- Cherry Pick Script: Restore retrieval of merge_commit_sha. ([44890](https://github.com/WordPress/gutenberg/pull/44890))
 
 #### Testing
 - Autocomplete Component: Add end-to-end tests (take two). ([42905](https://github.com/WordPress/gutenberg/pull/42905))
@@ -237,9 +221,21 @@
 - Migrate iframed block test to Playwright. ([44164](https://github.com/WordPress/gutenberg/pull/44164))
 - Add theme.json schema tests. ([44252](https://github.com/WordPress/gutenberg/pull/44252))
 - Remove enzyme completely. ([44494](https://github.com/WordPress/gutenberg/pull/44494))
+- Fix typo from in writing flow spec. ([44358](https://github.com/WordPress/gutenberg/pull/44358))
+- Fix typo in WP_Navigation_Page_Test. ([44685](https://github.com/WordPress/gutenberg/pull/44685))
+- Popover: Convert unit tests to TypeScript and modern RTL assertions. ([44373](https://github.com/WordPress/gutenberg/pull/44373))
+- Refactor `AlignmentMatrixControl` tests to use `@testing-library/react`. ([44670](https://github.com/WordPress/gutenberg/pull/44670))
+- End-to-end Test Utils: Don't use hardcoded login credentials. ([44331](https://github.com/WordPress/gutenberg/pull/44331))
+- Refactor `PluginPostPublishPanel` tests to use RTL render. ([44667](https://github.com/WordPress/gutenberg/pull/44667))
+- Refactor `AutosaveMonitor` tests to `@testing-library/react`. ([44492](https://github.com/WordPress/gutenberg/pull/44492))
+- Refactor `PostPreviewButton` tests to `@testing-library/react`. ([44470](https://github.com/WordPress/gutenberg/pull/44470))
+- Refactor `BlockSwitcher` tests to `@testing-library/react`. ([44493](https://github.com/WordPress/gutenberg/pull/44493))
+- Refactor `ResponsiveBlockControl` tests to use `@testing-library/react`. ([44669](https://github.com/WordPress/gutenberg/pull/44669))
+- Style engine: Add JS unit tests for outline properties. ([44518](https://github.com/WordPress/gutenberg/pull/44518))
 
 #### Build Tooling
 - Upgrade Lerna to the latest version. ([44456](https://github.com/WordPress/gutenberg/pull/44456))
+- wp-env: Use case insensitive regex when checking WP version string. ([44887](https://github.com/WordPress/gutenberg/pull/44887))
 
 
 ## First time contributors
@@ -260,6 +256,8 @@ The following PRs were merged by first time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @adamziel @ajlende @alecgeatches @andrewserong @anton-vlasenko @BE-Webdesign @BenoitZugmeyer @blindingstars @carolinan @chad1008 @ciampo @derekblank @dmsnell @ellatrix @getdave @glendaviesnz @gziolo @imanish003 @inc2734 @jameskoster @jasmussen @javierarce @jorgefilipecosta @jrfnl @kevin940726 @loxK @Lucisu @luisherranz @Mamaduka @michalczaplinski @ndiego @noisysocks @ntsekouras @oandregal @pagelab @philwp @ramonjd @Rink9 @ryanwelcher @SantosGuillamot @scruffian @Soean @sunyatasattva @t-hamano @talldan @tellthemachines @tyxla @vcanales @youknowriad
+
+
 
 
 = 14.2.0 =
