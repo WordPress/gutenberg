@@ -3,97 +3,98 @@
  * Tests_Formatting_Wordcount class
  *
  * @package WordPress
- *
- * @covers ::wp_word_count
  */
 
 class Tests_Formatting_Wordcount extends WP_UnitTestCase {
-	public function test_word_count() {
+	/**
+	 * Tests that words are counted correctly based on the type
+	 *
+	 * @covers ::wp_word_count
+	 *
+	 * @dataProvider data_get_string_variations
+	 *
+	 * @param string $string                      String to count words.
+	 * @param int    $words                       Expected value if the count type is based on word.
+	 * @param int    $characters_excluding_spaces Expected value if the count type is based on single character excluding spaces.
+	 * @param int    $characters_including_spaces Expected value if the count type is based on single character including spaces.
+	 */
+	public function test_word_count( $string, $words, $characters_excluding_spaces, $characters_including_spaces ) {
 		$settings = array(
 			'shortcodes' => array( 'shortcode' ),
 		);
 
-		$expected_settings = array(
-			array(
-				'message'                     => 'Basic test.',
+		$this->assertEquals( wp_word_count( $string, 'words', $settings ), $words );
+		$this->assertEquals( wp_word_count( $string, 'characters_excluding_spaces', $settings ), $characters_excluding_spaces );
+		$this->assertEquals( wp_word_count( $string, 'characters_including_spaces', $settings ), $characters_including_spaces );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_get_string_variations() {
+		return array(
+			'Basic test'     => array(
 				'string'                      => 'one two three',
 				'words'                       => 3,
 				'characters_excluding_spaces' => 11,
 				'characters_including_spaces' => 13,
 			),
-			array(
-				'message'                     => 'HTML tags.',
+			'HTML tags'      => array(
 				'string'                      => 'one <em class="test">two</em><br />three',
 				'words'                       => 3,
 				'characters_excluding_spaces' => 11,
 				'characters_including_spaces' => 12,
 			),
-			array(
-				'message'                     => 'Line breaks.',
+			'Line breaks'    => array(
 				'string'                      => "one\ntwo\nthree",
 				'words'                       => 3,
 				'characters_excluding_spaces' => 11,
 				'characters_including_spaces' => 11,
 			),
-			array(
-				'message'                     => 'Encoded spaces.',
+			'Encoded spaces' => array(
 				'string'                      => 'one&nbsp;two&#160;three',
 				'words'                       => 3,
 				'characters_excluding_spaces' => 11,
 				'characters_including_spaces' => 13,
 			),
-			array(
-				'message'                     => 'Punctuation.',
+			'Punctuation'    => array(
 				'string'                      => "It's two three " . json_decode( '"\u2026"' ) . ' 4?',
 				'words'                       => 3,
 				'characters_excluding_spaces' => 15,
 				'characters_including_spaces' => 19,
 			),
-			array(
-				'message'                     => 'Em dash.',
+			'Em dash'        => array(
 				'string'                      => 'one' . json_decode( '"\u2014"' ) . 'two--three',
 				'words'                       => 3,
 				'characters_excluding_spaces' => 14,
 				'characters_including_spaces' => 14,
 			),
-			array(
-				'message'                     => 'Shortcodes.',
+			'Shortcodes'     => array(
 				'string'                      => 'one [shortcode attribute="value"]two[/shortcode]three',
 				'words'                       => 3,
 				'characters_excluding_spaces' => 11,
 				'characters_including_spaces' => 12,
 			),
-			array(
-				'message'                     => 'Astrals.',
+			'Astrals'        => array(
 				'string'                      => json_decode( '"\uD83D\uDCA9"' ),
 				'words'                       => 1,
 				'characters_excluding_spaces' => 1,
 				'characters_including_spaces' => 1,
 			),
-			array(
-				'message'                     => 'HTML comment.',
+			'HTML comment'   => array(
 				'string'                      => 'one<!-- comment -->two three',
 				'words'                       => 2,
 				'characters_excluding_spaces' => 11,
 				'characters_including_spaces' => 12,
 			),
-			array(
-				'message'                     => 'HTML entity.',
+			'HTML entity'    => array(
 				'string'                      => '&gt; test',
 				'words'                       => 1,
 				'characters_excluding_spaces' => 5,
 				'characters_including_spaces' => 6,
 			),
 		);
-
-		foreach ( $expected_settings as $expected_setting ) {
-			foreach ( array( 'words', 'characters_excluding_spaces', 'characters_including_spaces' ) as $type ) {
-				$this->assertEquals(
-					wp_word_count( $expected_setting['string'], $type, $settings ),
-					$expected_setting[ $type ],
-					$expected_setting['message'] . ' (' . $type . ')'
-				);
-			}
-		}
 	}
 }
