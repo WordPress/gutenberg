@@ -15,7 +15,7 @@ import { Button, ToggleControl, Flex, FlexItem } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { appendSelectors, getBlockGapCSS } from './utils';
+import { appendSelectors, getBlockGapCSS, getPositionCSS } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import {
 	BlockControls,
@@ -165,6 +165,10 @@ export default {
 				blockGapValue
 			);
 		}
+
+		// Add position CSS where applicable.
+		output += getPositionCSS( { selector, layout } );
+
 		return output;
 	},
 	getOrientation( layout ) {

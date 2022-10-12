@@ -22,7 +22,12 @@ import { getCSSRules } from '@wordpress/style-engine';
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
-import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
+import {
+	appendSelectors,
+	getAlignmentsInfo,
+	getBlockGapCSS,
+	getPositionCSS,
+} from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
 
@@ -229,6 +234,10 @@ export default {
 				blockGapValue
 			);
 		}
+
+		// Add position CSS where applicable.
+		output += getPositionCSS( { selector, layout } );
+
 		return output;
 	},
 	getOrientation() {

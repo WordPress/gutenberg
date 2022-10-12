@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getBlockGapCSS, getAlignmentsInfo } from './utils';
+import { getBlockGapCSS, getPositionCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
 
@@ -21,6 +21,7 @@ export default {
 	},
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
+		layout,
 		style,
 		blockName,
 		hasBlockGapSupport,
@@ -51,6 +52,10 @@ export default {
 				blockGapValue
 			);
 		}
+
+		// Add position CSS where applicable.
+		output += getPositionCSS( { selector, layout } );
+
 		return output;
 	},
 	getOrientation() {
