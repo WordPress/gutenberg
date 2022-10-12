@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { MouseEventHandler, ReactElement } from 'react';
+import type { MouseEventHandler, ReactNode } from 'react';
 
 type OnColorChange = ( newColor?: string ) => void;
 
@@ -20,7 +20,7 @@ type PaletteProps = {
 	clearColor: () => void;
 	onChange: OnColorChange;
 	value?: string;
-	actions: ( ReactElement | null ) | ( false | ReactElement );
+	actions: ReactNode;
 };
 
 export type SinglePaletteProps = PaletteProps & {
