@@ -8,6 +8,7 @@ import useRefEffect from '../use-ref-effect';
  * In some circumstances, such as block previews, all focusable DOM elements
  * (input fields, links, buttons, etc.) need to be disabled. This hook adds the
  * behavior to disable nested DOM elements to the returned ref.
+ *
  * If you can, prefer the use of the inert HTML attribute.
  *
  * @param {Object}   config            Configuration object.
