@@ -55,7 +55,7 @@ export type ColorPaletteProps = {
 	 *
 	 * @default []
 	 */
-	colors: ( PaletteObject | ColorObject )[];
+	colors?: ( PaletteObject | ColorObject )[];
 	/**
 	 * Whether to allow custom color or not.
 	 */
