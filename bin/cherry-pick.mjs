@@ -127,7 +127,7 @@ async function fetchPRs() {
 
 	const PRsWithMergeCommit = [];
 	for ( const PR of PRs ) {
-		const { mergeCommitHash } = await GitHubFetch(
+		const { merge_commit_sha: mergeCommitHash } = await GitHubFetch(
 			'/repos/WordPress/Gutenberg/pulls/' + PR.number
 		);
 		PRsWithMergeCommit.push( {
