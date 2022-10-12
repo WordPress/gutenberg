@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { create, act } from 'react-test-renderer';
+import { render, act } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -40,9 +40,11 @@ describe( 'useMediaQuery', () => {
 			matches: true,
 		} );
 
-		const root = create( <TestComponent query="(min-width: 782px)" /> );
+		const { container } = render(
+			<TestComponent query="(min-width: 782px)" />
+		);
 
-		expect( root.toJSON() ).toBe( 'useMediaQuery: true' );
+		expect( container ).toHaveTextContent( 'useMediaQuery: true' );
 	} );
 
 	it( 'should return true when query matches', async () => {
@@ -52,17 +54,14 @@ describe( 'useMediaQuery', () => {
 			matches: true,
 		} );
 
-		let root;
+		const { container, unmount } = render(
+			<TestComponent query="(min-width: 782px)" />
+		);
 
-		await act( async () => {
-			root = create( <TestComponent query="(min-width: 782px)" /> );
-		} );
+		expect( container ).toHaveTextContent( 'useMediaQuery: true' );
 
-		expect( root.toJSON() ).toBe( 'useMediaQuery: true' );
+		unmount();
 
-		await act( async () => {
-			root.unmount();
-		} );
 		expect( removeListener ).toHaveBeenCalled();
 	} );
 
@@ -90,24 +89,23 @@ describe( 'useMediaQuery', () => {
 			matches: false,
 		} );
 
-		let root, updateMatchFunction;
-		await act( async () => {
-			root = create( <TestComponent query="(min-width: 782px)" /> );
-		} );
-		expect( root.toJSON() ).toBe( 'useMediaQuery: true' );
+		const { container, unmount } = render(
+			<TestComponent query="(min-width: 782px)" />
+		);
 
+		expect( container ).toHaveTextContent( 'useMediaQuery: true' );
+
+		let updateMatchFunction;
 		await act( async () => {
 			updateMatchFunction = addListener.mock.calls[ 0 ][ 0 ];
 			updateMatchFunction();
 		} );
-		expect( root.toJSON() ).toBe( 'useMediaQuery: false' );
 
-		await act( async () => {
-			root.unmount();
-		} );
-		expect( removeListener.mock.calls ).toEqual( [
-			[ updateMatchFunction ],
-		] );
+		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
+
+		unmount();
+
+		expect( removeListener ).toHaveBeenCalledWith( updateMatchFunction );
 	} );
 
 	it( 'should return false when the query does not matches', async () => {
@@ -116,15 +114,15 @@ describe( 'useMediaQuery', () => {
 			removeListener,
 			matches: false,
 		} );
-		let root;
-		await act( async () => {
-			root = create( <TestComponent query="(min-width: 782px)" /> );
-		} );
-		expect( root.toJSON() ).toBe( 'useMediaQuery: false' );
 
-		await act( async () => {
-			root.unmount();
-		} );
+		const { container, unmount } = render(
+			<TestComponent query="(min-width: 782px)" />
+		);
+
+		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
+
+		unmount();
+
 		expect( removeListener ).toHaveBeenCalled();
 	} );
 
@@ -134,21 +132,17 @@ describe( 'useMediaQuery', () => {
 			removeListener,
 			matches: false,
 		} );
-		let root;
-		await act( async () => {
-			root = create( <TestComponent /> );
-		} );
+
+		const { container, rerender, unmount } = render( <TestComponent /> );
+
 		// Query will be case to a boolean to simplify the return type.
-		expect( root.toJSON() ).toBe( 'useMediaQuery: false' );
+		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
 
-		await act( async () => {
-			root.update( <TestComponent query={ false } /> );
-		} );
-		expect( root.toJSON() ).toBe( 'useMediaQuery: false' );
+		rerender( <TestComponent query={ false } /> );
 
-		await act( async () => {
-			root.unmount();
-		} );
+		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
+
+		unmount();
 		expect( global.matchMedia ).not.toHaveBeenCalled();
 		expect( addListener ).not.toHaveBeenCalled();
 		expect( removeListener ).not.toHaveBeenCalled();
