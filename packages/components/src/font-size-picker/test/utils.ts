@@ -1,11 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	isSimpleCssValue,
-	splitValueAndUnitFromSize,
-	getToggleGroupOptions,
-} from '../utils';
+import { isSimpleCssValue, splitValueAndUnitFromSize } from '../utils';
 
 const simpleCSSCases: [ number | string, boolean ][] = [
 	// Test integers and non-integers.
@@ -79,75 +75,4 @@ describe( 'splitValueAndUnitFromSize', () => {
 			expect( unit ).toBe( expectedUnit );
 		}
 	);
-} );
-
-describe( 'getToggleGroupOptions', () => {
-	test( 'should assign t-shirt sizes by default up until the aliases length', () => {
-		const optionsArray = [
-			{
-				slug: '1',
-				size: '1',
-				name: '1',
-			},
-			{
-				slug: '2',
-				size: '2',
-				name: '2',
-			},
-			{
-				slug: '3',
-				size: '3',
-				name: '3',
-			},
-			{
-				slug: '4',
-				size: '4',
-				name: '4',
-			},
-			{
-				slug: '5',
-				size: '5',
-			},
-		];
-		expect(
-			getToggleGroupOptions( optionsArray, [
-				'S',
-				'M',
-				'L',
-				'XL',
-				'XXL',
-			] )
-		).toEqual( [
-			{
-				key: '1',
-				label: 'S',
-				name: '1',
-				value: '1',
-			},
-			{
-				key: '2',
-				label: 'M',
-				name: '2',
-				value: '2',
-			},
-			{
-				key: '3',
-				label: 'L',
-				name: '3',
-				value: '3',
-			},
-			{
-				key: '4',
-				label: 'XL',
-				name: '4',
-				value: '4',
-			},
-			{
-				key: '5',
-				label: 'XXL',
-				name: 'XXL',
-				value: '5',
-			},
-		] );
-	} );
 } );

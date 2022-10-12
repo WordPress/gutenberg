@@ -7,7 +7,7 @@ import type { ReactNode, ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 import { useState, useMemo, forwardRef } from '@wordpress/element';
 
@@ -18,26 +18,11 @@ import Button from '../button';
 import RangeControl from '../range-control';
 import { Flex, FlexItem } from '../flex';
 import { default as UnitControl, useCustomUnits } from '../unit-control';
-import CustomSelectControl from '../custom-select-control';
 import { VisuallyHidden } from '../visually-hidden';
-import {
-	ToggleGroupControl,
-	ToggleGroupControlOption,
-} from '../toggle-group-control';
-import {
-	getFontSizeOptions,
-	getSelectedOption,
-	splitValueAndUnitFromSize,
-	isSimpleCssValue,
-	CUSTOM_FONT_SIZE,
-} from './utils';
+import { splitValueAndUnitFromSize, isSimpleCssValue } from './utils';
 import { VStack } from '../v-stack';
 import { HStack } from '../h-stack';
-import type {
-	FontSizePickerProps,
-	FontSizeSelectOption,
-	FontSizeToggleGroupOption,
-} from './types';
+import type { FontSizePickerProps } from './types';
 import {
 	Container,
 	HeaderHint,
@@ -46,6 +31,8 @@ import {
 	ResetButton,
 } from './styles';
 import { Spacer } from '../spacer';
+import FontSizePickerSelect from './select';
+import FontSizePickerToggleGroup from './toggle-group';
 
 // This conditional is needed to maintain the spacing before the slider in the `withSlider` case.
 const MaybeVStack = ( {
@@ -77,6 +64,7 @@ const UnforwardedFontSizePicker = (
 		withSlider = false,
 		withReset = true,
 	} = props;
+
 	if ( ! __nextHasNoMarginBottom ) {
 		deprecated( 'Bottom margin styles for wp.components.FontSizePicker', {
 			since: '6.1',
@@ -94,28 +82,16 @@ const UnforwardedFontSizePicker = (
 		availableUnits: [ 'px', 'em', 'rem' ],
 	} );
 
-	/**
-	 * The main font size UI displays a toggle group when the presets are less
-	 * than six and a select control when they are more.
-	 */
-	const fontSizesContainComplexValues = fontSizes.some(
-		( { size: sizeArg } ) => ! isSimpleCssValue( sizeArg )
-	);
 	const shouldUseSelectControl = fontSizes.length > 5;
-	const options = useMemo(
-		() =>
-			getFontSizeOptions(
-				shouldUseSelectControl,
-				fontSizes,
-				disableCustomFontSizes
-			),
-		[ shouldUseSelectControl, fontSizes, disableCustomFontSizes ]
+	const selectedFontSize = fontSizes.find(
+		( fontSize ) => fontSize.size === value
 	);
-	const selectedOption = getSelectedOption( fontSizes, value );
-	const isCustomValue = selectedOption.slug === CUSTOM_FONT_SIZE;
+	const isCustomValue = value !== undefined && ! selectedFontSize;
+
 	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
 		! disableCustomFontSizes && isCustomValue
 	);
+
 	const headerHint = useMemo( () => {
 		if ( showCustomValueControl ) {
 			return `(${ __( 'Custom' ) })`;
@@ -124,51 +100,49 @@ const UnforwardedFontSizePicker = (
 		// If we have a custom value that is not available in the font sizes,
 		// show it as a hint as long as it's a simple CSS value.
 		if ( isCustomValue ) {
-			return (
-				value !== undefined &&
-				isSimpleCssValue( value ) &&
-				`(${ value })`
-			);
+			return value !== undefined && isSimpleCssValue( value )
+				? `(${ value })`
+				: '';
 		}
+
+		if ( ! selectedFontSize ) {
+			return '';
+		}
+
 		if ( shouldUseSelectControl ) {
-			return (
-				selectedOption?.size !== undefined &&
-				isSimpleCssValue( selectedOption?.size ) &&
-				`(${ selectedOption?.size })`
-			);
+			return isSimpleCssValue( selectedFontSize.size )
+				? `(${ selectedFontSize.size })`
+				: '';
 		}
 
 		// Calculate the `hint` for toggle group control.
-		let hint = selectedOption.name;
+		let hint = selectedFontSize.name ?? '';
+		const fontSizesContainComplexValues = fontSizes.some(
+			( fontSize ) => ! isSimpleCssValue( fontSize.size )
+		);
 		if (
 			! fontSizesContainComplexValues &&
-			typeof selectedOption.size === 'string'
+			typeof selectedFontSize.size === 'string'
 		) {
-			const [ , unit ] = splitValueAndUnitFromSize( selectedOption.size );
+			const [ , unit ] = splitValueAndUnitFromSize(
+				selectedFontSize.size
+			);
 			hint += `(${ unit })`;
 		}
 		return hint;
 	}, [
 		showCustomValueControl,
-		selectedOption?.name,
-		selectedOption?.size,
-		value,
 		isCustomValue,
+		selectedFontSize,
+		value,
 		shouldUseSelectControl,
-		fontSizesContainComplexValues,
+		fontSizes,
 	] );
 
-	if ( ! options ) {
+	if ( fontSizes.length === 0 && disableCustomFontSizes ) {
 		return null;
 	}
 
-	// This is used for select control only. We need to add support
-	// for ToggleGroupControl.
-	const currentFontSizeSR = sprintf(
-		// translators: %s: Currently selected font size.
-		__( 'Currently selected font size: %s' ),
-		selectedOption.name
-	);
 	return (
 		<Container ref={ ref } className="components-font-size-picker">
 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
@@ -209,64 +183,32 @@ const UnforwardedFontSizePicker = (
 					{ !! fontSizes.length &&
 						shouldUseSelectControl &&
 						! showCustomValueControl && (
-							<CustomSelectControl
-								__nextUnconstrainedWidth
-								className="components-font-size-picker__select"
-								label={ __( 'Font size' ) }
-								hideLabelFromVision
-								describedBy={ currentFontSizeSR }
-								options={ options as FontSizeSelectOption[] }
-								value={ (
-									options as FontSizeSelectOption[]
-								 ).find(
-									( option ) =>
-										option.key === selectedOption.slug
-								) }
-								onChange={ ( {
-									selectedItem,
-								}: {
-									selectedItem: FontSizeSelectOption;
-								} ) => {
-									onChange?.(
-										hasUnits
-											? selectedItem.size
-											: Number( selectedItem.size )
-									);
-									if (
-										selectedItem.key === CUSTOM_FONT_SIZE
-									) {
-										setShowCustomValueControl( true );
-									}
-								} }
+							<FontSizePickerSelect
+								fontSizes={ fontSizes }
+								value={ value }
 								size={ size }
+								onChange={ ( newValue ) => {
+									onChange?.(
+										hasUnits ? newValue : Number( newValue )
+									);
+								} }
+								onSelectCustom={ () =>
+									setShowCustomValueControl( true )
+								}
 							/>
 						) }
 					{ ! shouldUseSelectControl && ! showCustomValueControl && (
-						<ToggleGroupControl
-							__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-							label={ __( 'Font size' ) }
-							hideLabelFromVision
+						<FontSizePickerToggleGroup
+							fontSizes={ fontSizes }
 							value={ value }
+							__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+							size={ size }
 							onChange={ ( newValue ) => {
 								onChange?.(
 									hasUnits ? newValue : Number( newValue )
 								);
 							} }
-							isBlock
-							size={ size }
-						>
-							{ ( options as FontSizeToggleGroupOption[] ).map(
-								( option ) => (
-									<ToggleGroupControlOption
-										key={ option.key }
-										value={ option.value }
-										label={ option.label }
-										aria-label={ option.name }
-										showTooltip={ true }
-									/>
-								)
-							) }
-						</ToggleGroupControl>
+						/>
 					) }
 					{ ! withSlider &&
 						! disableCustomFontSizes &&
