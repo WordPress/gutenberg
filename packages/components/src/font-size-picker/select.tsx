@@ -2,14 +2,11 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-/**
- * Internal dependencies
- */
-import CustomSelectControl from '../custom-select-control';
 
 /**
  * Internal dependencies
  */
+import CustomSelectControl from '../custom-select-control';
 import type {
 	FontSizePickerSelectProps,
 	FontSizePickerSelectOption,
