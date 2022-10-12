@@ -61,17 +61,13 @@ class Tests_Formatting_Wordcount extends WP_UnitTestCase {
 				'characters_excluding_spaces' => 11,
 				'characters_including_spaces' => 12,
 			),
-
-			/*
-			// phpcs:ignore Squiz.Commenting.BlockComment.NoCapital
 			array(
 				'message'                     => 'Astrals.',
-				'string'                      => json_decode( '"\uD83D"' ) . json_decode( '"\uDCA9"' ),
+				'string'                      => json_decode( '"\uD83D\uDCA9"' ),
 				'words'                       => 1,
 				'characters_excluding_spaces' => 1,
 				'characters_including_spaces' => 1,
 			),
-			*/
 			array(
 				'message'                     => 'HTML comment.',
 				'string'                      => 'one<!-- comment -->two three',
