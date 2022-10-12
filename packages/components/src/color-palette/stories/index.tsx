@@ -51,7 +51,7 @@ export default meta;
 const Template: ComponentStory< typeof ColorPalette > = ( args ) => {
 	const firstColor =
 		( args.colors as Color[] )[ 0 ].color ||
-		( args.colors as MultipleColors )[ 0 ].colors[ 0 ].color;
+		( args.colors as MultipleColors[] )[ 0 ].colors[ 0 ].color;
 	const [ color, setColor ] = useState< string | undefined >( firstColor );
 
 	return (

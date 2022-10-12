@@ -198,7 +198,6 @@ const BorderControlDropdown = (
 							/>
 						</HStack>
 					) : undefined }
-					{ /* @ts-ignore colors prop: Type 'Colors | undefined' is not assignable to type 'Color[] | MultipleColors' */ }
 					<ColorPalette
 						className={ popoverContentClassName }
 						value={ color }

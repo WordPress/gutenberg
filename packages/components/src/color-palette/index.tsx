@@ -81,6 +81,11 @@ function SinglePalette( {
 			);
 		} );
 	}, [ colors, value, onChange, clearColor ] );
+
+	if ( colors.length === 0 ) {
+		return null;
+	}
+
 	return (
 		<CircularOptionPicker
 			className={ className }
@@ -98,6 +103,10 @@ function MultiplePalettes( {
 	value,
 	actions,
 }: MultiplePalettesProps ) {
+	if ( colors.length === 0 ) {
+		return null;
+	}
+
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ colors.map( ( { name, colors: colorPalette }, index ) => {
@@ -155,9 +164,9 @@ export function CustomColorPickerDropdown( {
 }
 
 export const extractColorNameFromCurrentValue = (
-	currentValue?: string,
-	colors: Color[] | MultipleColors = [],
-	showMultiplePalettes: boolean = false
+	currentValue?: ColorPaletteProps[ 'value' ],
+	colors: ColorPaletteProps[ 'colors' ] = [],
+	showMultiplePalettes: ColorPaletteProps[ '__experimentalHasMultipleOrigins' ] = false
 ) => {
 	if ( ! currentValue ) {
 		return '';
@@ -169,8 +178,9 @@ export const extractColorNameFromCurrentValue = (
 		: colord( currentValue ).toHex();
 
 	// Normalize format of `colors` to simplify the following loop
-	const colorPalettes = showMultiplePalettes
-		? ( colors as MultipleColors )
+	type normalizedPaletteObject = { colors: Color[] };
+	const colorPalettes: normalizedPaletteObject[] = showMultiplePalettes
+		? ( colors as MultipleColors[] )
 		: [ { colors: colors as Color[] } ];
 	for ( const { colors: paletteColors } of colorPalettes ) {
 		for ( const { name: colorName, color: colorValue } of paletteColors ) {
@@ -195,10 +205,18 @@ export const showTransparentBackground = ( currentValue?: string ) => {
 	return colord( currentValue ).alpha() === 0;
 };
 
+const areColorsMultiplePalette = (
+	colors: NonNullable< ColorPaletteProps[ 'colors' ] >
+): colors is MultipleColors[] => {
+	return colors.every( ( colorObj ) =>
+		Array.isArray( ( colorObj as MultipleColors ).colors )
+	);
+};
+
 export default function ColorPalette( {
 	clearable = true,
 	className,
-	colors,
+	colors = [],
 	disableCustomColors = false,
 	enableAlpha,
 	onChange,
@@ -207,9 +225,31 @@ export default function ColorPalette( {
 	__experimentalIsRenderedInSidebar = false,
 }: ColorPaletteProps ) {
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
-	const showMultiplePalettes =
-		__experimentalHasMultipleOrigins && !! colors?.length;
-	const Component = showMultiplePalettes ? MultiplePalettes : SinglePalette;
+
+	const buttonLabelName = useMemo(
+		() =>
+			extractColorNameFromCurrentValue(
+				value,
+				colors,
+				__experimentalHasMultipleOrigins
+			),
+		[ value, colors, __experimentalHasMultipleOrigins ]
+	);
+
+	// Make sure that the `colors` array has a format (single/multiple) that is
+	// compatible with the `__experimentalHasMultipleOrigins` flag. This is true
+	// when __experimentalHasMultipleOrigins and areColorsMultiplePalette() are
+	// either both `true` or both `false`.
+	if (
+		colors.length > 0 &&
+		__experimentalHasMultipleOrigins !== areColorsMultiplePalette( colors )
+	) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			'wp.components.ColorPalette: please specify a format for the `colors` prop that is compatible with the `__experimentalHasMultipleOrigins` prop.'
+		);
+		return null;
+	}
 
 	const renderCustomColorPicker = () => (
 		<DropdownContentWrapper paddingSize="none">
@@ -226,15 +266,6 @@ export default function ColorPalette( {
 	const valueWithoutLeadingHash = value?.startsWith( '#' )
 		? value.substring( 1 )
 		: value ?? '';
-	const buttonLabelName = useMemo(
-		() =>
-			extractColorNameFromCurrentValue(
-				value,
-				colors,
-				showMultiplePalettes
-			),
-		[ value, colors, showMultiplePalettes ]
-	);
 
 	const customColorAccessibleLabel = !! valueWithoutLeadingHash
 		? sprintf(
@@ -246,6 +277,19 @@ export default function ColorPalette( {
 				valueWithoutLeadingHash
 		  )
 		: __( 'Custom color picker.' );
+
+	const paletteCommonProps = {
+		clearable,
+		clearColor,
+		onChange,
+		value,
+		actions: !! clearable && (
+			// @ts-ignore Required className property.
+			<CircularOptionPicker.ButtonAction onClick={ clearColor }>
+				{ __( 'Clear' ) }
+			</CircularOptionPicker.ButtonAction>
+		),
+	};
 
 	return (
 		<VStack spacing={ 3 } className={ className }>
@@ -293,24 +337,17 @@ export default function ColorPalette( {
 					) }
 				/>
 			) }
-			<Component
-				clearable={ clearable }
-				clearColor={ clearColor }
-				// @ts-ignore Component can be MultiplePalettes or SinglePalette, which have different colors prop types.
-				colors={ colors }
-				onChange={ onChange }
-				value={ value }
-				actions={
-					!! clearable && (
-						// @ts-ignore Required className property.
-						<CircularOptionPicker.ButtonAction
-							onClick={ clearColor }
-						>
-							{ __( 'Clear' ) }
-						</CircularOptionPicker.ButtonAction>
-					)
-				}
-			/>
+			{ __experimentalHasMultipleOrigins ? (
+				<MultiplePalettes
+					{ ...paletteCommonProps }
+					colors={ colors as MultipleColors[] }
+				/>
+			) : (
+				<SinglePalette
+					{ ...paletteCommonProps }
+					colors={ colors as Color[] }
+				/>
+			) }
 		</VStack>
 	);
 }
