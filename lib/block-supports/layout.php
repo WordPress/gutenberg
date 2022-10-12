@@ -433,20 +433,13 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$inner_content_classnames = gutenberg_identify_inner_block_wrapper_classnames( $block['innerContent'] );
 
+	$content = new WP_HTML_Tag_Processor( $block_content );
 	if ( $inner_content_classnames ) {
-		$content = preg_replace(
-			'/' . $inner_content_classnames . '/',
-			$inner_content_classnames . ' ' . esc_attr( implode( ' ', $class_names ) ),
-			$block_content,
-			1
-		);
+		$content->next_tag( array( 'class_name' => $inner_content_classnames ) );
+		$content->add_class( esc_attr( implode( ' ', $class_names ) ) );
 	} else {
-		$content = preg_replace(
-			'/' . preg_quote( 'class="', '/' ) . '/',
-			'class="' . esc_attr( implode( ' ', $class_names ) ) . ' ',
-			$block_content,
-			1
-		);
+		$content->next_tag();
+		$content->add_class( esc_attr( implode( ' ', $class_names ) ) );
 	}
 
 	return $content;
