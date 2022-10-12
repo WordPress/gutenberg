@@ -58,6 +58,26 @@ Previously in our Jest + Puppeteer E2E tests, `page` and `browser` are exposed a
 
 We can insert as many assertions in one test as needed. It's better to make explicit assertions whenever possible. For instance, if we want to assert that a button exists before clicking on it, we can do `expect( locator ).toBeVisible()` before performing `locator.click()`. This makes the tests flow better and easier to read.
 
+## Cross-browser testing
+
+By default, tests are only run in chromium. You can _tag_ tests to run them in different browsers. Use `@browser` anywhere in the test title to run it in that browser. Tests will always run in chromium by default, append `-chromium` to disable testing in chromium. Available browsers are `chromium`, `firefox`, and `webkit`.
+
+```js
+test( 'I will run in @firefox and @webkit (and chromium by default)', async ( { page } ) => {
+	// ...
+} );
+
+test( 'I will only run in @firefox but not -chromium', async ( { page } ) => {
+	// ...
+} );
+
+test.describe( 'Grouping tests (@webkit, -chromium)', () => {
+	test( 'I will only run in webkit', async ( { page } ) => {
+		// ...
+	} );
+} );
+```
+
 ## Commands
 
 ```bash
@@ -67,11 +87,24 @@ npm run test:e2e:playwright
 # Run in headed mode.
 npm run test:e2e:playwright -- --headed
 
+# Run tests with specific browsers (`chromium`, `firefox`, or `webkit`).
+npm run test:e2e:playwright -- --project=webkit --project=firefox
+
 # Run a single test file.
 npm run test:e2e:playwright -- <path_to_test_file> # E.g., npm run test:e2e:playwright -- site-editor/title.spec.js
 
-# Debugging
+# Debugging.
 npm run test:e2e:playwright -- --debug
+```
+
+If you're developing in Linux, it currently requires testing Webkit browsers in headed mode. If you don't want to or can't run it with the GUI (e.g. if you don't have a graphic interface), prepend the command with [`xvfb-run`](https://manpages.ubuntu.com/manpages/xenial/man1/xvfb-run.1.html) to run it in a virtual environment.
+
+```bash
+# Run all available tests.
+xvfb-run npm run test:e2e:playwright
+
+# Only run webkit tests.
+xvfb-run -- npm run test:e2e:playwright -- --project=webkit
 ```
 
 **Note**: This package requires Node.js 12.0.0 or later. It is not compatible with older versions.
