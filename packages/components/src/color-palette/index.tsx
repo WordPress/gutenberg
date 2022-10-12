@@ -24,10 +24,10 @@ import { ColorHeading } from './styles';
 import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
 import type {
 	ColorObject,
-	PaletteObject,
 	ColorPaletteProps,
 	CustomColorPickerDropdownProps,
 	MultiplePalettesProps,
+	PaletteObject,
 	SinglePaletteProps,
 } from './types';
 
