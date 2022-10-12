@@ -133,11 +133,13 @@ const transforms = {
 				// Init the align and size from the first item which may be either the placeholder or an image.
 				let { align, sizeSlug } = attributes[ 0 ];
 				// Loop through all the images and check if they have the same align and size.
-				align = attributes.every( ( att ) => att.align === align )
+				align = attributes.every(
+					( attribute ) => attribute.align === align
+				)
 					? align
 					: undefined;
 				sizeSlug = attributes.every(
-					( att ) => att.sizeSlug === sizeSlug
+					( attribute ) => attribute.sizeSlug === sizeSlug
 				)
 					? sizeSlug
 					: undefined;
