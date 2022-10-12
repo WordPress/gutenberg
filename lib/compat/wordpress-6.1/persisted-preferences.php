@@ -72,7 +72,6 @@ function gutenberg_configure_persisted_preferences() {
 		),
 		'after'
 	);
-
 }
 
 add_action( 'admin_init', 'gutenberg_configure_persisted_preferences' );

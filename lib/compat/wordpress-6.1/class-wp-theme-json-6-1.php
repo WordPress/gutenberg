@@ -132,6 +132,43 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	);
 
 	/**
+	 * Constructor.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param array  $theme_json A structure that follows the theme.json schema.
+	 * @param string $origin     Optional. What source of data this object represents.
+	 *                           One of 'default', 'theme', or 'custom'. Default 'theme'.
+	 */
+	public function __construct( $theme_json = array(), $origin = 'theme' ) {
+		if ( ! in_array( $origin, static::VALID_ORIGINS, true ) ) {
+			$origin = 'theme';
+		}
+
+		$this->theme_json    = WP_Theme_JSON_Schema::migrate( $theme_json );
+		$registry            = WP_Block_Type_Registry::get_instance();
+		$valid_block_names   = array_keys( $registry->get_all_registered() );
+		$valid_element_names = array_keys( static::ELEMENTS );
+		$theme_json          = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names );
+		$this->theme_json    = static::maybe_opt_in_into_settings( $theme_json );
+
+		// Internally, presets are keyed by origin.
+		$nodes = static::get_setting_nodes( $this->theme_json );
+		foreach ( $nodes as $node ) {
+			foreach ( static::PRESETS_METADATA as $preset_metadata ) {
+				$path   = array_merge( $node['path'], $preset_metadata['path'] );
+				$preset = _wp_array_get( $this->theme_json, $path, null );
+				if ( null !== $preset ) {
+					// If the preset is not already keyed by origin.
+					if ( isset( $preset[0] ) || empty( $preset ) ) {
+						_wp_array_set( $this->theme_json, $path, array( $origin => $preset ) );
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Given an element name, returns a class name.
 	 *
 	 * @param string $element The name of the element.
@@ -1010,6 +1047,18 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				continue;
 			}
 
+			// Calculates fluid typography rules where available.
+			if ( 'font-size' === $css_property ) {
+				/*
+				 * gutenberg_get_typography_font_size_value() will check
+				 * if fluid typography has been activated and also
+				 * whether the incoming value can be converted to a fluid value.
+				 * Values that already have a "clamp()" function will not pass the test,
+				 * and therefore the original $value will be returned.
+				 */
+				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ) );
+			}
+
 			$declarations[] = array(
 				'name'  => $css_property,
 				'value' => $value,
@@ -1060,7 +1109,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			if ( is_array( $ref_value ) && array_key_exists( 'ref', $ref_value ) ) {
 				$path_string      = json_encode( $path );
 				$ref_value_string = json_encode( $ref_value );
-				_doing_it_wrong( 'get_property_value', "Your theme.json file uses a dynamic value (${ref_value_string}) for the path at ${path_string}. However, the value at ${path_string} is also a dynamic value (pointing to ${ref_value['ref']}) and pointing to another dynamic value is not supported. Please update ${path_string} to point directly to ${ref_value['ref']}.", '6.1.0' );
+				_doing_it_wrong( 'get_property_value', "Your theme.json file uses a dynamic value ({$ref_value_string}) for the path at {$path_string}. However, the value at {$path_string} is also a dynamic value (pointing to {$ref_value['ref']}) and pointing to another dynamic value is not supported. Please update {$path_string} to point directly to {$ref_value['ref']}.", '6.1.0' );
 			}
 		}
 
@@ -1314,7 +1363,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 
 			if ( $below_midpoint_count < $steps_mid_point - 2 ) {
-				$x_small_count++;
+				++$x_small_count;
 			}
 
 			$slug -= 10;
@@ -1351,7 +1400,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 
 			if ( $above_midpoint_count > 1 ) {
-				$x_large_count++;
+				++$x_large_count;
 			}
 
 			$slug += 10;

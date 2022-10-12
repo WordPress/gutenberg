@@ -5,7 +5,6 @@ exports[`TreeGridCell uses a child render function to render children 1`] = `
   role="application"
 >
   <table
-    onKeyDown={[Function]}
     role="treegrid"
   >
     <tbody>
@@ -14,8 +13,7 @@ exports[`TreeGridCell uses a child render function to render children 1`] = `
           role="gridcell"
         >
           <button
-            className="my-button"
-            onFocus={[Function]}
+            class="my-button"
           >
             Click Me!
           </button>

@@ -97,7 +97,7 @@
 	}
 
 	&:focus .edit-site-global-styles-variations_item-preview {
-		border: var(--wp-admin-theme-color) $border-width solid;
+		border: var(--wp-admin-theme-color) var(--wp-admin-border-width-focus) solid;
 	}
 }
 
