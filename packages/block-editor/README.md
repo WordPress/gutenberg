@@ -423,7 +423,7 @@ _Parameters_
 -   _args_ `Object`:
 -   _args.minimumViewPortWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
 -   _args.maximumViewPortWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
--   _args.fontSize_ `?string`: Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
+-   _args.fontSize_ `[string|number]`: Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
 -   _args.maximumFontSize_ `?string`: Maximum font size for any clamp() calculation. Optional.
 -   _args.minimumFontSize_ `?string`: Minimum font size for any clamp() calculation. Optional.
 -   _args.scaleFactor_ `?number`: A scale factor to determine how fast a font scales within boundaries. Optional.
@@ -521,6 +521,7 @@ attributes.
 _Parameters_
 
 -   _attributes_ `Object`: Block attributes.
+-   _isFluidFontSizeActive_ `boolean`: Whether the function should try to convert font sizes to fluid values.
 
 _Returns_
 
