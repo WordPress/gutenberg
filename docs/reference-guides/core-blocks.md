@@ -584,9 +584,9 @@ Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages
 -	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** prefix, separator, suffix, term, textAlign
 
-## Post Time To Read
+## Time To Read
 
-Time to read the post. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-time-to-read))
+Show minutes required to finish reading the post. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-time-to-read))
 
 -	**Name:** core/post-time-to-read
 -	**Category:** theme
