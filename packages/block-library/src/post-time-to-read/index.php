@@ -14,11 +14,11 @@
  * @return string Returns the rendered post author name block.
  */
 function render_block_core_post_time_to_read( $attributes, $content, $block ) {
-	$content = get_the_content();
-
-	if ( ! isset( $block->context['postId'] ) || ! $content ) {
+	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
+
+	$content = get_the_content();
 
 	/*
 	 * Average reading rate - based on average taken from

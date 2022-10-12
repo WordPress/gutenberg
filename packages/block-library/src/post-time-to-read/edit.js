@@ -67,10 +67,6 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 			wordCount( content, wordCountType ) / AVERAGE_READING_RATE
 		);
 
-		if ( minutesToRead === undefined ) {
-			return __( 'There is no content.' );
-		}
-
 		if ( minutesToRead !== 0 ) {
 			return sprintf(
 				/* translators: %d is the number of minutes the post will take to read. */
