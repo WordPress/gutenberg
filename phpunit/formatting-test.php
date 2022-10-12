@@ -3,6 +3,8 @@
  * Tests_Formatting_Wordcount class
  *
  * @package WordPress
+ *
+ * @covers ::gutenberg_word_count
  */
 
 class Tests_Formatting_Wordcount extends WP_UnitTestCase {
