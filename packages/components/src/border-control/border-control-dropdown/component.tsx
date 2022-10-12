@@ -198,22 +198,20 @@ const BorderControlDropdown = (
 							/>
 						</HStack>
 					) : undefined }
-					{ colors ? (
-						<ColorPalette
-							className={ popoverContentClassName }
-							value={ color }
-							onChange={ onColorChange }
-							{ ...{ colors, disableCustomColors } }
-							__experimentalHasMultipleOrigins={
-								__experimentalHasMultipleOrigins
-							}
-							__experimentalIsRenderedInSidebar={
-								__experimentalIsRenderedInSidebar
-							}
-							clearable={ false }
-							enableAlpha={ enableAlpha }
-						/>
-					) : undefined }
+					<ColorPalette
+						className={ popoverContentClassName }
+						value={ color }
+						onChange={ onColorChange }
+						{ ...{ colors, disableCustomColors } }
+						__experimentalHasMultipleOrigins={
+							__experimentalHasMultipleOrigins
+						}
+						__experimentalIsRenderedInSidebar={
+							__experimentalIsRenderedInSidebar
+						}
+						clearable={ false }
+						enableAlpha={ enableAlpha }
+					/>
 					{ enableStyle && (
 						<BorderControlStylePicker
 							label={ __( 'Style' ) }
