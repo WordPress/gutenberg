@@ -303,12 +303,14 @@ function gutenberg_identify_inner_block_wrapper_classnames( $inner_content ) {
 		return false;
 	}
 
-	$matches = array();
+	$inner_content_chunk      = new WP_HTML_Tag_Processor( $inner_content[0] );
+	$inner_wrapper_classnames = '';
 
-	preg_match_all( '/class="([a-z0-9\-\_\s]*)/', $inner_content[0], $matches );
+	while ( true === $inner_content_chunk->next_tag() ) {
+		$inner_wrapper_classnames = $inner_content_chunk->get_attribute( 'class' );
+	}
 
-	return end( $matches[1] );
-
+	return $inner_wrapper_classnames;
 }
 
 /**
