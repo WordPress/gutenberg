@@ -183,11 +183,23 @@ function BlockPatternsTabs( {
 	const categories = usePatternsCategories();
 	const isMobile = useViewportMatch( 'medium', '<' );
 	const composite = useCompositeState();
+	const container = useRef();
+
+	useEffect( () => {
+		const timeout = setTimeout( () => {
+			const [ firstTabbable ] = focus.tabbable.find( container.current );
+			firstTabbable?.focus();
+		} );
+		return () => clearTimeout( timeout );
+	}, [] );
 
 	return (
 		<>
 			{ ! isMobile && (
-				<div className="block-editor-inserter__block-patterns-tabs-container">
+				<div
+					className="block-editor-inserter__block-patterns-tabs-container"
+					ref={ container }
+				>
 					<Composite
 						{ ...composite }
 						role="listbox"
