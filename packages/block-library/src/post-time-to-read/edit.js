@@ -12,13 +12,8 @@ import {
 	AlignmentControl,
 	BlockControls,
 	useBlockProps,
-	RichText,
 } from '@wordpress/block-editor';
-import {
-	createBlock,
-	getDefaultBlockName,
-	__unstableSerializeAndClean,
-} from '@wordpress/blocks';
+import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
 import { count as wordCount } from '@wordpress/wordcount';
 
@@ -29,24 +24,8 @@ import { count as wordCount } from '@wordpress/wordcount';
  */
 const AVERAGE_READING_RATE = 189;
 
-// Allowed formats for the prefix and suffix fields.
-const ALLOWED_FORMATS = [
-	'core/bold',
-	'core/image',
-	'core/italic',
-	'core/link',
-	'core/strikethrough',
-	'core/text-color',
-];
-
-function PostTimeToReadEdit( {
-	attributes,
-	setAttributes,
-	insertBlocksAfter,
-	isSelected,
-	context,
-} ) {
-	const { textAlign, prefix, suffix } = attributes;
+function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
+	const { textAlign } = attributes;
 	const { postId, postType } = context;
 
 	const [ contentStructure ] = useEntityProp(
@@ -95,12 +74,16 @@ function PostTimeToReadEdit( {
 		if ( minutesToRead !== 0 ) {
 			return sprintf(
 				/* translators: %d is the number of minutes the post will take to read. */
-				_n( '%d minute', '%d minutes', minutesToRead ),
+				_n(
+					'You can read this post in %d minute.',
+					'You can read this post in %d minutes.',
+					minutesToRead
+				),
 				minutesToRead
 			);
 		}
 
-		return prefix ? __( 'less than a minute' ) : __( 'Less than a minute' );
+		return __( 'You can read this post in less than a minute.' );
 	}, [ contentStructure, blocks ] );
 
 	const blockProps = useBlockProps( {
@@ -119,42 +102,7 @@ function PostTimeToReadEdit( {
 					} }
 				/>
 			</BlockControls>
-			<p { ...blockProps }>
-				{ ( isSelected || prefix ) && (
-					<RichText
-						allowedFormats={ ALLOWED_FORMATS }
-						className="wp-block-post-time-to-read__prefix"
-						multiline={ false }
-						aria-label={ __( 'Prefix' ) }
-						placeholder={ __( 'Prefix' ) + ' ' }
-						value={ prefix }
-						onChange={ ( value ) =>
-							setAttributes( { prefix: value } )
-						}
-						tagName="span"
-					/>
-				) }
-				{ minutesToReadString }
-				{ ( isSelected || suffix ) && (
-					<RichText
-						allowedFormats={ ALLOWED_FORMATS }
-						className="wp-block-post-time-to-read__suffix"
-						multiline={ false }
-						aria-label={ __( 'Suffix' ) }
-						placeholder={ ' ' + __( 'Suffix' ) }
-						value={ suffix }
-						onChange={ ( value ) =>
-							setAttributes( { suffix: value } )
-						}
-						tagName="span"
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( getDefaultBlockName() )
-							)
-						}
-					/>
-				) }
-			</p>
+			<p { ...blockProps }>{ minutesToReadString }</p>
 		</>
 	);
 }

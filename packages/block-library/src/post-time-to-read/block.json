@@ -10,14 +10,6 @@
 	"attributes": {
 		"textAlign": {
 			"type": "string"
-		},
-		"prefix": {
-			"type": "string",
-			"default": ""
-		},
-		"suffix": {
-			"type": "string",
-			"default": ""
 		}
 	},
 	"supports": {

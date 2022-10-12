@@ -2,10 +2,7 @@
 	{
 		"name": "core/post-time-to-read",
 		"isValid": true,
-		"attributes": {
-			"prefix": "",
-			"suffix": ""
-		},
+		"attributes": {},
 		"innerBlocks": []
 	}
 ]

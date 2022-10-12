@@ -36,39 +36,29 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 
 	$minutes_to_read = (int) round( gutenberg_word_count( $content, $word_count_type ) / $average_reading_rate );
 
-	$minutes_to_read_string = 0 !== $minutes_to_read
-		? sprintf(
-			/* translators: %d is the number of minutes the post will take to read. */
-			_n( '%d minute', '%d minutes', $minutes_to_read ),
-			$minutes_to_read
-		)
-		: __( 'less than a minute' );
+	$minutes_to_read_string = __( 'You can read this post in less than a minute.' );
 
 	if ( 0 !== $minutes_to_read ) {
 		$minutes_to_read_string = sprintf(
 			/* translators: %d is the number of minutes the post will take to read. */
-			_n( '%d minute', '%d minutes', $minutes_to_read ),
+			_n(
+				'You can read this post in %d minute.',
+				'You can read this post in %d minutes.',
+				$minutes_to_read
+			),
 			$minutes_to_read
 		);
-	} else {
-		$minutes_to_read_string = empty( $attributes['prefix'] ) ? __( 'Less than a minute' ) : __( 'less than a minute' );
 	}
 
 	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 
-	$prefix = "<div $wrapper_attributes>";
-	if ( isset( $attributes['prefix'] ) && $attributes['prefix'] ) {
-		$prefix .= '<span class="wp-block-post-time-to-read__prefix">' . $attributes['prefix'] . '</span>';
-	}
-
-	$suffix = '</div>';
-	if ( isset( $attributes['suffix'] ) && $attributes['suffix'] ) {
-		$suffix = '<span class="wp-block-post-time-to-read__suffix">' . $attributes['suffix'] . '</span>' . $suffix;
-	}
-
-	return wp_kses_post( $prefix ) . $minutes_to_read_string . wp_kses_post( $suffix );
+	return sprintf(
+		'<p %1$s>%2$s</p>',
+		$wrapper_attributes,
+		$minutes_to_read_string
+	);
 }
 
 /**
