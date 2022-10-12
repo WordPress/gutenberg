@@ -284,7 +284,6 @@ export default function ColorPalette( {
 		onChange,
 		value,
 		actions: !! clearable && (
-			// @ts-ignore Required className property.
 			<CircularOptionPicker.ButtonAction onClick={ clearColor }>
 				{ __( 'Clear' ) }
 			</CircularOptionPicker.ButtonAction>
