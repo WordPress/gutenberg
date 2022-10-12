@@ -5,14 +5,14 @@ import type { CSSProperties, MouseEventHandler, ReactNode } from 'react';
 
 type OnColorChange = ( newColor?: string ) => void;
 
-export type Color = {
+export type ColorObject = {
 	name: string;
 	color: NonNullable< CSSProperties[ 'color' ] >;
 };
 
-export type MultipleColors = {
+export type PaletteObject = {
 	name: string;
-	colors: Color[];
+	colors: ColorObject[];
 };
 
 type PaletteProps = {
@@ -24,11 +24,11 @@ type PaletteProps = {
 };
 
 export type SinglePaletteProps = PaletteProps & {
-	colors: Color[];
+	colors: ColorObject[];
 };
 
 export type MultiplePalettesProps = PaletteProps & {
-	colors: MultipleColors[];
+	colors: PaletteObject[];
 };
 
 export type CustomColorPickerDropdownProps = {
@@ -55,7 +55,7 @@ export type ColorPaletteProps = {
 	 *
 	 * @default []
 	 */
-	colors: ( MultipleColors | Color )[];
+	colors: ( PaletteObject | ColorObject )[];
 	/**
 	 * Whether to allow custom color or not.
 	 */

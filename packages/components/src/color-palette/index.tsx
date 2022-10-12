@@ -23,8 +23,8 @@ import { Truncate } from '../truncate';
 import { ColorHeading } from './styles';
 import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
 import type {
-	Color,
-	MultipleColors,
+	ColorObject,
+	PaletteObject,
 	ColorPaletteProps,
 	CustomColorPickerDropdownProps,
 	MultiplePalettesProps,
@@ -178,10 +178,10 @@ export const extractColorNameFromCurrentValue = (
 		: colord( currentValue ).toHex();
 
 	// Normalize format of `colors` to simplify the following loop
-	type normalizedPaletteObject = { colors: Color[] };
+	type normalizedPaletteObject = { colors: ColorObject[] };
 	const colorPalettes: normalizedPaletteObject[] = showMultiplePalettes
-		? ( colors as MultipleColors[] )
-		: [ { colors: colors as Color[] } ];
+		? ( colors as PaletteObject[] )
+		: [ { colors: colors as ColorObject[] } ];
 	for ( const { colors: paletteColors } of colorPalettes ) {
 		for ( const { name: colorName, color: colorValue } of paletteColors ) {
 			const normalizedColorValue = currentValueIsCssVariable
@@ -207,9 +207,9 @@ export const showTransparentBackground = ( currentValue?: string ) => {
 
 const areColorsMultiplePalette = (
 	colors: NonNullable< ColorPaletteProps[ 'colors' ] >
-): colors is MultipleColors[] => {
+): colors is PaletteObject[] => {
 	return colors.every( ( colorObj ) =>
-		Array.isArray( ( colorObj as MultipleColors ).colors )
+		Array.isArray( ( colorObj as PaletteObject ).colors )
 	);
 };
 
@@ -340,12 +340,12 @@ export default function ColorPalette( {
 			{ __experimentalHasMultipleOrigins ? (
 				<MultiplePalettes
 					{ ...paletteCommonProps }
-					colors={ colors as MultipleColors[] }
+					colors={ colors as PaletteObject[] }
 				/>
 			) : (
 				<SinglePalette
 					{ ...paletteCommonProps }
-					colors={ colors as Color[] }
+					colors={ colors as ColorObject[] }
 				/>
 			) }
 		</VStack>
