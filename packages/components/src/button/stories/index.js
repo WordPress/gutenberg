@@ -143,6 +143,7 @@ export default {
 		},
 		__experimentalIsFocusable: {
 			control: 'boolean',
+			description: 'Makes the button focusable even when disabled',
 			table: {
 				defaultValue: { summary: false },
 			},
