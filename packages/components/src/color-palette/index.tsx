@@ -47,7 +47,6 @@ function SinglePalette( {
 			const isSelected = value === color;
 
 			return (
-				// @ts-ignore Required className prop.
 				<CircularOptionPicker.Option
 					key={ `${ color }-${ index }` }
 					isSelected={ isSelected }
@@ -83,7 +82,6 @@ function SinglePalette( {
 		} );
 	}, [ colors, value, onChange, clearColor ] );
 	return (
-		// @ts-ignore Required children prop.
 		<CircularOptionPicker
 			className={ className }
 			options={ colorOptions }
