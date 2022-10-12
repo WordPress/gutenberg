@@ -4,7 +4,7 @@
  *
  * @package WordPress
  *
- * @covers ::gutenberg_word_count
+ * @covers ::wp_word_count
  */
 
 class Tests_Formatting_Wordcount extends WP_UnitTestCase {
@@ -89,7 +89,7 @@ class Tests_Formatting_Wordcount extends WP_UnitTestCase {
 		foreach ( $expected_settings as $expected_setting ) {
 			foreach ( array( 'words', 'characters_excluding_spaces', 'characters_including_spaces' ) as $type ) {
 				$this->assertEquals(
-					gutenberg_word_count( $expected_setting['string'], $type, $settings ),
+					wp_word_count( $expected_setting['string'], $type, $settings ),
 					$expected_setting[ $type ],
 					$expected_setting['message'] . ' (' . $type . ')'
 				);

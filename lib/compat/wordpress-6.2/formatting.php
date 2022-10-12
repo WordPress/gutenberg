@@ -36,7 +36,7 @@
  * }
  * @return int The word or character count.
  */
-function gutenberg_word_count( $text, $type, $settings = array() ) {
+function wp_word_count( $text, $type, $settings = array() ) {
 	$defaults = array(
 		'html_regexp'                        => '/<\/?[a-z][^>]*?>/i',
 		'html_comment_regexp'                => '/<!--[\s\S]*?-->/',

@@ -34,7 +34,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 	 */
 	$word_count_type = _x( 'words', 'Word count type. Do not translate!' );
 
-	$minutes_to_read = (int) round( gutenberg_word_count( $content, $word_count_type ) / $average_reading_rate );
+	$minutes_to_read = (int) round( wp_word_count( $content, $word_count_type ) / $average_reading_rate );
 
 	$minutes_to_read_string = __( 'You can read this post in less than a minute.' );
 
