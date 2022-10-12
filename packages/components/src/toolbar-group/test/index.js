@@ -13,13 +13,13 @@ describe( 'ToolbarGroup', () => {
 		it( 'should render an empty node, when controls are not passed', () => {
 			const { container } = render( <ToolbarGroup /> );
 
-			expect( container.innerHTML ).toBe( '' );
+			expect( container ).toBeEmptyDOMElement();
 		} );
 
 		it( 'should render an empty node, when controls are empty', () => {
 			const { container } = render( <ToolbarGroup controls={ [] } /> );
 
-			expect( container.innerHTML ).toBe( '' );
+			expect( container ).toBeEmptyDOMElement();
 		} );
 
 		it( 'should render a list of controls with buttons', () => {
