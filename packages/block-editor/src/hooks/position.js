@@ -13,6 +13,7 @@ import {
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
+import PositionAreaControl from '../components/position-area-control';
 import { LAYOUT_SUPPORT_KEY } from './layout';
 import { cleanEmptyObject } from './utils';
 
@@ -102,10 +103,27 @@ export function PositionEdit( props ) {
 		return null;
 	}
 
-	const onChange = ( next ) => {
+	const onChangeSide = ( next ) => {
 		const newLayout = {
 			...layout,
-			position: next,
+			position: {
+				...layout?.position,
+				side: next,
+			},
+		};
+
+		setAttributes( {
+			layout: cleanEmptyObject( newLayout ),
+		} );
+	};
+
+	const onChangeType = ( next ) => {
+		const newLayout = {
+			...layout,
+			position: {
+				...layout?.position,
+				type: next,
+			},
 		};
 
 		setAttributes( {
@@ -116,14 +134,21 @@ export function PositionEdit( props ) {
 	return Platform.select( {
 		web: (
 			<>
+				<PositionAreaControl
+					help={ __(
+						'The area of a page that this block should occupy'
+					) }
+					onChange={ onChangeSide }
+					value={ layout?.position?.side }
+				/>
 				<ToggleGroupControl
 					label={ __( 'Position' ) }
 					help={ __(
 						"Lock this block to an area of the page so it doesn't scroll with page content"
 					) }
-					value={ layout?.position || '' }
+					value={ layout?.position?.type || '' }
 					onChange={ ( newValue ) => {
-						onChange( newValue );
+						onChangeType( newValue );
 					} }
 					isBlock
 				>
