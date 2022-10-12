@@ -1020,29 +1020,6 @@
 					},
 					"additionalProperties": false
 				},
-				"outline": {
-					"description": "Outline styles.",
-					"type": "object",
-					"properties": {
-						"color": {
-							"description": "Sets the `outline-color` CSS property.",
-							"type": "string"
-						},
-						"offset": {
-							"description": "Sets the `outline-offset` CSS property.",
-							"type": "string"
-						},
-						"style": {
-							"description": "Sets the `outline-style` CSS property.",
-							"type": "string"
-						},
-						"width": {
-							"description": "Sets the `outline-width` CSS property.",
-							"type": "string"
-						}
-					},
-					"additionalProperties": false
-				},
 				"spacing": {
 					"description": "Spacing styles.",
 					"type": "object",
@@ -1153,6 +1130,29 @@
 				"shadow": {
 					"description": "Box shadow styles.",
 					"type": "string"
+				},
+				"outline": {
+					"description": "Outline styles.",
+					"type": "object",
+					"properties": {
+						"color": {
+							"description": "Sets the `outline-color` CSS property.",
+							"type": "string"
+						},
+						"offset": {
+							"description": "Sets the `outline-offset` CSS property.",
+							"type": "string"
+						},
+						"style": {
+							"description": "Sets the `outline-style` CSS property.",
+							"type": "string"
+						},
+						"width": {
+							"description": "Sets the `outline-width` CSS property.",
+							"type": "string"
+						}
+					},
+					"additionalProperties": false
 				}
 			}
 		},
@@ -1169,7 +1169,8 @@
 						"spacing": {},
 						"typography": {},
 						"filter": {},
-						"shadow": {}
+						"shadow": {},
+						"outline": {}
 					},
 					"additionalProperties": false
 				}
@@ -1189,8 +1190,8 @@
 								"border": {},
 								"color": {},
 								"filter": {},
-								"outline": {},
 								"shadow": {},
+								"outline": {},
 								"spacing": {},
 								"typography": {},
 								":hover": {
@@ -1535,6 +1536,9 @@
 						"color": {},
 						"spacing": {},
 						"typography": {},
+						"filter": {},
+						"shadow": {},
+						"outline": {},
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						}
@@ -1601,6 +1605,8 @@
 						"spacing": {},
 						"typography": {},
 						"filter": {},
+						"shadow": {},
+						"outline": {},
 						"elements": {
 							"description": "Styles defined on a per-element basis using the element's selector.",
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
