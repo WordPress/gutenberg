@@ -162,30 +162,12 @@ function Template( { children, ...props } ) {
 export const Default = Template.bind( {} );
 Default.args = {
 	children: 'Code is poetry',
-	disabled: false,
-	icon: null,
-	iconSize: 24,
-	iconPosition: 'left',
-	isBusy: false,
-	isDestructive: false,
-	isPressed: false,
-	isSmall: false,
-	label: '',
-	shortcut: undefined,
-	showTooltip: false,
-	tooltipPosition: 'top center',
-	text: '',
-	variant: undefined,
-	__experimentalIsFocusable: false,
 };
 
 export const Icon = Template.bind( {} );
 Icon.args = {
-	...Default.args,
-	children: undefined,
 	label: 'Code is poetry',
 	icon: 'wordpress',
-	iconSize: 24,
 };
 
 export const groupedIcons = () => {
