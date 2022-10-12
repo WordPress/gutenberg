@@ -32,6 +32,7 @@ import { close } from '@wordpress/icons';
  */
 import * as ariaHelper from './aria-helper';
 import Button from '../button';
+import { __unstableMotion as motion } from '../animation';
 import StyleProvider from '../style-provider';
 
 // Used to count the number of open modals.
@@ -121,8 +122,10 @@ function Modal( props, forwardedRef ) {
 	);
 
 	return createPortal(
-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div
+		<motion.div
+			initial={ { opacity: 0 } }
+			animate={ { opacity: 1 } }
+			exit={ { opacity: 0 } }
 			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
 			className={ classnames(
 				'components-modal__screen-overlay',
@@ -131,7 +134,11 @@ function Modal( props, forwardedRef ) {
 			onKeyDown={ handleEscapeKeyDown }
 		>
 			<StyleProvider document={ document }>
-				<div
+				<motion.div
+					initial={ { y: '-20px', opacity: 0 } }
+					animate={ { y: 0, opacity: 1 } }
+					exit={ { opacity: 0 } }
+					transition={ { type: 'tween' } }
 					className={ classnames(
 						'components-modal__frame',
 						className,
@@ -197,9 +204,9 @@ function Modal( props, forwardedRef ) {
 						) }
 						{ children }
 					</div>
-				</div>
+				</motion.div>
 			</StyleProvider>
-		</div>,
+		</motion.div>,
 		document.body
 	);
 }

@@ -130,11 +130,16 @@ export const placementToMotionAnimationProps = (
 		style: PLACEMENT_TO_ANIMATION_ORIGIN[ placement ],
 		initial: {
 			opacity: 0,
-			scale: 0,
-			[ translateProp ]: `${ 2 * translateDirection }em`,
+			scale: 0.45,
+			[ translateProp ]: `${ 0.6 * translateDirection }em`,
 		},
 		animate: { opacity: 1, scale: 1, [ translateProp ]: 0 },
-		transition: { duration: 0.1, ease: [ 0, 0, 0.2, 1 ] },
+		// exit: {
+		// 	opacity: 0,
+		// 	scale: 0,
+		// 	[ translateProp ]: `${ 0.6 * translateDirection }em`,
+		// },
+		transition: { type: 'tween', duration: 0.24 },
 	};
 };
 
