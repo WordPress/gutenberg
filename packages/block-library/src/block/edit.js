@@ -20,7 +20,6 @@ import {
 	useInnerBlocksProps,
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
-	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 	InnerBlocks,
 	BlockControls,
 	InspectorControls,
@@ -60,15 +59,9 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		ref
 	);
 
-	const hasBlockOverlay = useBlockOverlayActive( clientId );
-	const blockProps = useBlockProps(
-		{
-			className: hasBlockOverlay
-				? 'block-library-block__reusable-block-container block-editor-block-content-overlay'
-				: 'block-library-block__reusable-block-container',
-		},
-		{ __unstableIsDisabled: hasBlockOverlay }
-	);
+	const blockProps = useBlockProps( {
+		className: 'block-library-block__reusable-block-container',
+	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		value: blocks,

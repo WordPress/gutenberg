@@ -3,6 +3,11 @@
  */
 import type { CSSProperties } from 'react';
 
+/**
+ * Internal dependencies
+ */
+import type { PopoverProps } from '../popover/types';
+
 export type Border = {
 	color?: CSSProperties[ 'borderColor' ];
 	style?: CSSProperties[ 'borderStyle' ];
@@ -63,6 +68,10 @@ export type LabelProps = {
 export type BorderControlProps = ColorProps &
 	LabelProps & {
 		/**
+		 * This controls whether unit selection should be disabled.
+		 */
+		disableUnits?: boolean;
+		/**
 		 * This controls whether to include border style options within the
 		 * `BorderDropdown` sub-component.
 		 *
@@ -83,7 +92,7 @@ export type BorderControlProps = ColorProps &
 		/**
 		 * An internal prop used to control the visibility of the dropdown.
 		 */
-		__unstablePopoverProps?: Record< string, unknown >;
+		__unstablePopoverProps?: Omit< PopoverProps, 'children' >;
 		/**
 		 * If opted into, sanitizing the border means that if no width or color
 		 * have been selected, the border style is also cleared and `undefined`
@@ -132,7 +141,7 @@ export type DropdownProps = ColorProps & {
 	/**
 	 * An internal prop used to control the visibility of the dropdown.
 	 */
-	__unstablePopoverProps?: Record< string, unknown >;
+	__unstablePopoverProps?: Omit< PopoverProps, 'children' >;
 	/**
 	 * This controls whether to render border style options.
 	 *
@@ -175,11 +184,4 @@ export type StylePickerProps = LabelProps & {
 	 * to store other valid CSS values is maintained e.g. `none`, `inherit` etc.
 	 */
 	value?: string;
-};
-
-export type PopoverProps = {
-	/**
-	 * Callback function to invoke when closing the border dropdown's popover.
-	 */
-	onClose: () => void;
 };

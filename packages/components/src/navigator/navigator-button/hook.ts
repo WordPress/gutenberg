@@ -41,7 +41,7 @@ export function useNavigatorButton(
 				} );
 				onClick?.( e );
 			},
-			[ goTo, onClick ]
+			[ goTo, onClick, attributeName, escapedPath ]
 		);
 
 	return {

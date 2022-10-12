@@ -74,6 +74,20 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 }
 
 /**
+ * Determine if the element is an empty paragraph block.
+ *
+ * @param {?HTMLElement} element The element being tested.
+ * @return {boolean} True or False.
+ */
+function isEmptyParagraph( element ) {
+	return (
+		!! element &&
+		element.dataset.type === 'core/paragraph' &&
+		element.dataset.empty === 'true'
+	);
+}
+
+/**
  * @typedef  {Object} WPBlockDropZoneConfig
  * @property {string} rootClientId The root client id for the block list.
  */
@@ -92,12 +106,20 @@ export default function useBlockDropZone( {
 } = {} ) {
 	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
 
-	const isLocked = useSelect(
+	const isDisabled = useSelect(
 		( select ) => {
-			const { getTemplateLock } = select( blockEditorStore );
+			const {
+				getTemplateLock,
+				__unstableIsWithinBlockOverlay,
+				__unstableHasActiveBlockOverlayActive,
+			} = select( blockEditorStore );
 			const templateLock = getTemplateLock( targetRootClientId );
-			return [ 'all', 'noContent' ].some(
-				( lock ) => lock === templateLock
+			return (
+				[ 'all', 'contentOnly' ].some(
+					( lock ) => lock === templateLock
+				) ||
+				__unstableHasActiveBlockOverlayActive( targetRootClientId ) ||
+				__unstableIsWithinBlockOverlay( targetRootClientId )
 			);
 		},
 		[ targetRootClientId ]
@@ -122,7 +144,18 @@ export default function useBlockDropZone( {
 
 			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
 
-			if ( targetIndex !== null ) {
+			if ( targetIndex !== undefined ) {
+				const nextBlock = blockElements[ targetIndex ];
+				const previousBlock = blockElements[ targetIndex - 1 ];
+
+				// Don't show the insertion point when it's near an empty paragraph block.
+				if (
+					isEmptyParagraph( nextBlock ) ||
+					isEmptyParagraph( previousBlock )
+				) {
+					return;
+				}
+
 				showInsertionPoint( targetRootClientId, targetIndex );
 			}
 		}, [] ),
@@ -130,7 +163,7 @@ export default function useBlockDropZone( {
 	);
 
 	return useDropZone( {
-		isDisabled: isLocked,
+		isDisabled,
 		onDrop: onBlockDrop,
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being

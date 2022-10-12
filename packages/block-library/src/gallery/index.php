@@ -104,7 +104,7 @@ function block_core_gallery_render( $attributes, $content ) {
 	// Set the CSS variable to the column value, and the `gap` property to the combined gap value.
 	$style = '.wp-block-gallery.' . $class . '{ --wp--style--unstable-gallery-gap: ' . $gap_column . '; gap: ' . $gap_value . '}';
 
-	gutenberg_enqueue_block_support_styles( $style, 11 );
+	wp_enqueue_block_support_styles( $style, 11 );
 	return $content;
 }
 /**

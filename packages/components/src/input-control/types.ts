@@ -165,6 +165,9 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 * @default false
 	 */
 	disabled?: boolean;
+	/**
+	 * The class name to be added to the wrapper element.
+	 */
 	className?: string;
 	id?: string;
 	/**

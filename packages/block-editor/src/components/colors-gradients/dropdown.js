@@ -120,7 +120,7 @@ export default function ColorGradientSettingsDropdown( {
 		popoverProps = {
 			placement: 'left-start',
 			offset: 36,
-			__unstableShift: true,
+			shift: true,
 		};
 	}
 

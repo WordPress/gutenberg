@@ -71,6 +71,9 @@
 					},
 					{
 						"docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md": []
+					},
+					{
+						"docs/how-to-guides/block-tutorial/extending-the-query-loop-block.md": []
 					}
 				]
 			},
@@ -133,6 +136,7 @@
 			},
 			{ "docs/how-to-guides/notices/README.md": [] },
 			{ "docs/how-to-guides/plugin-sidebar-0.md": [] },
+			{ "docs/how-to-guides/propagating-updates.md": [] },
 			{
 				"docs/how-to-guides/themes/README.md": [
 					{ "docs/how-to-guides/themes/block-theme-overview.md": [] },
@@ -197,6 +201,9 @@
 					{ "docs/reference-guides/filters/parser-filters.md": [] },
 					{
 						"docs/reference-guides/filters/autocomplete-filters.md": []
+					},
+					{
+						"docs/reference-guides/filters/global-styles-filters.md": []
 					}
 				]
 			},

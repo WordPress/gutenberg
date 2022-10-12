@@ -1,5 +1,5 @@
 .block-editor-block-inspector {
-	p {
+	p:not(.components-base-control__help) {
 		margin-top: 0;
 	}
 
@@ -39,12 +39,4 @@
 .block-editor-block-inspector__block-buttons-container {
 	border-top: $border-width solid $gray-200;
 	padding: $grid-unit-20;
-}
-
-.block-editor-block-inspector__block-type-type {
-	font-weight: 500;
-	&.block-editor-block-inspector__block-type-type {
-		line-height: $button-size-small;
-		margin: 0 0 $grid-unit-05;
-	}
 }

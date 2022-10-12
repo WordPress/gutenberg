@@ -10,7 +10,7 @@ import {
 } from '@wordpress/blocks';
 import {
 	PanelBody,
-	__experimentalUseSlot as useSlot,
+	__experimentalUseSlotFills as useSlotFills,
 	FlexItem,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -40,6 +40,7 @@ function useContentBlocks( blockTypes, block ) {
 	const contenBlocksObjectAux = useMemo( () => {
 		return blockTypes.reduce( ( result, blockType ) => {
 			if (
+				blockType.name !== 'core/list-item' &&
 				Object.entries( blockType.attributes ).some(
 					( [ , { __experimentalRole } ] ) =>
 						__experimentalRole === 'content'
@@ -145,28 +146,23 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			__unstableGetContentLockingParent,
 			getTemplateLock,
 		} = select( blockEditorStore );
-		const { getBlockStyles } = select( blocksStore );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
 		const _selectedBlockName =
 			_selectedBlockClientId && getBlockName( _selectedBlockClientId );
 		const _blockType =
 			_selectedBlockName && getBlockType( _selectedBlockName );
-		const blockStyles =
-			_selectedBlockName && getBlockStyles( _selectedBlockName );
 
 		return {
 			count: getSelectedBlockCount(),
 			selectedBlockClientId: _selectedBlockClientId,
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
-			hasBlockStyles: blockStyles && blockStyles.length > 0,
 			topLevelLockedBlock:
-				getTemplateLock( _selectedBlockClientId ) === 'noContent'
+				__unstableGetContentLockingParent( _selectedBlockClientId ) ||
+				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly'
 					? _selectedBlockClientId
-					: __unstableGetContentLockingParent(
-							_selectedBlockClientId
-					  ),
+					: undefined ),
 		};
 	}, [] );
 
@@ -232,7 +228,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	);
 };
 
-const BlockInspectorSingleBlock = ( { clientId, blockName, backButton } ) => {
+const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 	const hasBlockStyles = useSelect(
 		( select ) => {
 			const { getBlockStyles } = select( blocksStore );
@@ -244,15 +240,12 @@ const BlockInspectorSingleBlock = ( { clientId, blockName, backButton } ) => {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	return (
 		<div className="block-editor-block-inspector">
-			<BlockCard backButton={ backButton } { ...blockInformation } />
+			<BlockCard { ...blockInformation } />
 			<BlockVariationTransforms blockClientId={ clientId } />
 			{ hasBlockStyles && (
 				<div>
 					<PanelBody title={ __( 'Styles' ) }>
-						<BlockStyles
-							scope="core/block-inspector"
-							clientId={ clientId }
-						/>
+						<BlockStyles clientId={ clientId } />
 						{ hasBlockSupport(
 							blockName,
 							'defaultStylePicker',
@@ -288,8 +281,8 @@ const BlockInspectorSingleBlock = ( { clientId, blockName, backButton } ) => {
 };
 
 const AdvancedControls = () => {
-	const slot = useSlot( InspectorAdvancedControls.slotName );
-	const hasFills = Boolean( slot.fills && slot.fills.length );
+	const fills = useSlotFills( InspectorAdvancedControls.slotName );
+	const hasFills = Boolean( fills && fills.length );
 
 	if ( ! hasFills ) {
 		return null;

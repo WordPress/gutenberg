@@ -47,6 +47,14 @@ $navigation-icon-size: 24px;
 		display: block;
 	}
 
+	// This rule needs extra specificity so that it inherits the correct color from its parent.
+	// Otherwise, a link color set by a parent group can override the value.
+	// This also fixes an issue where a navigation with an explicitly set color is overridden
+	// by link colors defined in Global Styles.
+	.wp-block-navigation-item__content.wp-block-navigation-item__content {
+		color: inherit;
+	}
+
 	// The following rules provide class based application of user selected text
 	// decoration via block supports.
 	&.has-text-decoration-underline .wp-block-navigation-item__content {
@@ -326,7 +334,6 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation__responsive-container,
 .wp-block-navigation__responsive-close,
 .wp-block-navigation__responsive-dialog,
-.wp-block-navigation,
 .wp-block-navigation .wp-block-page-list,
 .wp-block-navigation__container,
 .wp-block-navigation__responsive-container-content {
@@ -431,6 +438,16 @@ button.wp-block-navigation-item__content {
  * Mobile menu.
  */
 
+@keyframes overlay-menu__fade-in-animation {
+	from {
+		opacity: 0;
+		transform: translateY(0.5em);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
 .wp-block-navigation__responsive-container {
 	display: none;
 	position: fixed;
@@ -467,6 +484,11 @@ button.wp-block-navigation-item__content {
 		display: flex; // Needs to be set to override "none".
 		flex-direction: column;
 		background-color: inherit;
+
+		// Animation.
+		animation: overlay-menu__fade-in-animation 0.1s ease-out;
+		animation-fill-mode: forwards;
+		@include reduce-motion("animation");
 
 		// Try to inherit any root paddings set, so the X can align to a top-right aligned menu.
 		padding-top: var(--wp--style--root--padding-top, 2rem);
@@ -675,7 +697,8 @@ button.wp-block-navigation-item__content {
 }
 
 // Adjust open dialog top margin when admin-bar is visible.
-.has-modal-open .admin-bar .wp-block-navigation__responsive-dialog {
+// Needs to be scoped to .is-menu-open, or it will shift the position of any other navigations that may be present.
+.has-modal-open .admin-bar .is-menu-open .wp-block-navigation__responsive-dialog {
 	margin-top: $admin-bar-height-big;
 
 	// Handle smaller admin-bar.

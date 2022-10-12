@@ -1,16 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	first,
-	forEach,
-	get,
-	isEmpty,
-	kebabCase,
-	pickBy,
-	reduce,
-	set,
-} from 'lodash';
+import { get, isEmpty, kebabCase, pickBy, reduce, set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -33,6 +24,7 @@ import {
  * Internal dependencies
  */
 import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
+import { getTypographyFontSizeValue } from './typography-utils';
 import { GlobalStylesContext } from './context';
 import { useSetting } from './hooks';
 
@@ -208,7 +200,7 @@ export function getStylesDeclarations(
 				return declarations;
 			}
 			const pathToValue = value;
-			if ( first( pathToValue ) === 'elements' || useEngine ) {
+			if ( pathToValue[ 0 ] === 'elements' || useEngine ) {
 				return declarations;
 			}
 
@@ -285,6 +277,21 @@ export function getStylesDeclarations(
 			}
 		}
 
+		// Calculate fluid typography rules where available.
+		if ( cssProperty === 'font-size' ) {
+			/*
+			 * getTypographyFontSizeValue() will check
+			 * if fluid typography has been activated and also
+			 * whether the incoming value can be converted to a fluid value.
+			 * Values that already have a "clamp()" function will not pass the test,
+			 * and therefore the original $value will be returned.
+			 */
+			ruleValue = getTypographyFontSizeValue(
+				{ size: ruleValue },
+				tree?.settings?.typography
+			);
+		}
+
 		output.push( `${ cssProperty }: ${ ruleValue }` );
 	} );
 
@@ -330,8 +337,8 @@ export function getLayoutStyles( {
 	if ( gapValue && tree?.settings?.layout?.definitions ) {
 		Object.values( tree.settings.layout.definitions ).forEach(
 			( { className, name, spacingStyles } ) => {
-				// Allow skipping default layout for themes that opt-in to block styles, but opt-out of blockGap.
-				if ( ! hasBlockGapSupport && 'default' === name ) {
+				// Allow outputting fallback gap styles for flex layout type when block gap support isn't available.
+				if ( ! hasBlockGapSupport && 'flex' !== name ) {
 					return;
 				}
 
@@ -443,9 +450,15 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 
 	const pickStyleKeys = ( treeToPickFrom ) =>
 		pickBy( treeToPickFrom, ( value, key ) =>
-			[ 'border', 'color', 'spacing', 'typography', 'filter' ].includes(
-				key
-			)
+			[
+				'border',
+				'color',
+				'spacing',
+				'typography',
+				'filter',
+				'outline',
+				'shadow',
+			].includes( key )
 		);
 
 	// Top-level.
@@ -457,7 +470,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 		} );
 	}
 
-	forEach( ELEMENTS, ( selector, name ) => {
+	Object.entries( ELEMENTS ).forEach( ( [ name, selector ] ) => {
 		if ( !! tree.styles?.elements[ name ] ) {
 			nodes.push( {
 				styles: tree.styles?.elements[ name ],
@@ -467,42 +480,53 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	} );
 
 	// Iterate over blocks: they can have styles & elements.
-	forEach( tree.styles?.blocks, ( node, blockName ) => {
-		const blockStyles = pickStyleKeys( node );
-		if ( !! blockStyles && !! blockSelectors?.[ blockName ]?.selector ) {
-			nodes.push( {
-				duotoneSelector: blockSelectors[ blockName ].duotoneSelector,
-				fallbackGapValue: blockSelectors[ blockName ].fallbackGapValue,
-				hasLayoutSupport: blockSelectors[ blockName ].hasLayoutSupport,
-				selector: blockSelectors[ blockName ].selector,
-				styles: blockStyles,
-				featureSelectors: blockSelectors[ blockName ].featureSelectors,
-			} );
-		}
-
-		forEach( node?.elements, ( value, elementName ) => {
+	Object.entries( tree.styles?.blocks ?? {} ).forEach(
+		( [ blockName, node ] ) => {
+			const blockStyles = pickStyleKeys( node );
 			if (
-				!! value &&
-				!! blockSelectors?.[ blockName ] &&
-				!! ELEMENTS?.[ elementName ]
+				!! blockStyles &&
+				!! blockSelectors?.[ blockName ]?.selector
 			) {
 				nodes.push( {
-					styles: value,
-					selector: blockSelectors[ blockName ].selector
-						.split( ',' )
-						.map( ( sel ) => {
-							const elementSelectors =
-								ELEMENTS[ elementName ].split( ',' );
-							return elementSelectors.map(
-								( elementSelector ) =>
-									sel + ' ' + elementSelector
-							);
-						} )
-						.join( ',' ),
+					duotoneSelector:
+						blockSelectors[ blockName ].duotoneSelector,
+					fallbackGapValue:
+						blockSelectors[ blockName ].fallbackGapValue,
+					hasLayoutSupport:
+						blockSelectors[ blockName ].hasLayoutSupport,
+					selector: blockSelectors[ blockName ].selector,
+					styles: blockStyles,
+					featureSelectors:
+						blockSelectors[ blockName ].featureSelectors,
 				} );
 			}
-		} );
-	} );
+
+			Object.entries( node?.elements ?? {} ).forEach(
+				( [ elementName, value ] ) => {
+					if (
+						!! value &&
+						!! blockSelectors?.[ blockName ] &&
+						!! ELEMENTS?.[ elementName ]
+					) {
+						nodes.push( {
+							styles: value,
+							selector: blockSelectors[ blockName ].selector
+								.split( ',' )
+								.map( ( sel ) => {
+									const elementSelectors =
+										ELEMENTS[ elementName ].split( ',' );
+									return elementSelectors.map(
+										( elementSelector ) =>
+											sel + ' ' + elementSelector
+									);
+								} )
+								.join( ',' ),
+						} );
+					}
+				}
+			);
+		}
+	);
 
 	return nodes;
 };
@@ -537,17 +561,19 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	}
 
 	// Blocks.
-	forEach( tree.settings?.blocks, ( node, blockName ) => {
-		const blockPresets = pickPresets( node );
-		const blockCustom = node.custom;
-		if ( ! isEmpty( blockPresets ) || !! blockCustom ) {
-			nodes.push( {
-				presets: blockPresets,
-				custom: blockCustom,
-				selector: blockSelectors[ blockName ].selector,
-			} );
+	Object.entries( tree.settings?.blocks ?? {} ).forEach(
+		( [ blockName, node ] ) => {
+			const blockPresets = pickPresets( node );
+			const blockCustom = node.custom;
+			if ( ! isEmpty( blockPresets ) || !! blockCustom ) {
+				nodes.push( {
+					presets: blockPresets,
+					custom: blockCustom,
+					selector: blockSelectors[ blockName ].selector,
+				} );
+			}
 		}
-	} );
+	);
 
 	return nodes;
 };
@@ -601,8 +627,13 @@ export const toStyles = (
 	}
 
 	if ( useRootPaddingAlign ) {
-		ruleset +=
-			'padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) } .has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); } .has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); } .has-global-padding > .alignfull > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left);';
+		ruleset += `padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) }
+			.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
+			.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; }
+			.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }
+			.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }
+			.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
+			.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0;`;
 	}
 
 	ruleset += '}';

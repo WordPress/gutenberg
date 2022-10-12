@@ -1,20 +1,15 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { useDisabled } from '@wordpress/compose';
 import { createContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { StyledWrapper } from './styles/disabled-styles';
+import { disabledStyles } from './styles/disabled-styles';
 import type { DisabledProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
+import { useCx } from '../utils';
 
 const Context = createContext< boolean >( false );
 const { Consumer, Provider } = Context;
@@ -55,21 +50,22 @@ function Disabled( {
 	isDisabled = true,
 	...props
 }: WordPressComponentProps< DisabledProps, 'div' > ) {
-	const ref = useDisabled();
-
-	if ( ! isDisabled ) {
-		return <Provider value={ false }>{ children }</Provider>;
-	}
+	const cx = useCx();
 
 	return (
-		<Provider value={ true }>
-			<StyledWrapper
-				ref={ ref }
-				className={ classnames( className, 'components-disabled' ) }
+		<Provider value={ isDisabled }>
+			<div
+				// @ts-ignore Reason: inert is a recent HTML attribute
+				inert={ isDisabled ? 'true' : undefined }
+				className={
+					isDisabled
+						? cx( disabledStyles, className, 'components-disabled' )
+						: undefined
+				}
 				{ ...props }
 			>
 				{ children }
-			</StyledWrapper>
+			</div>
 		</Provider>
 	);
 }

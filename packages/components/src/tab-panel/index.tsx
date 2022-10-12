@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { partial, find } from 'lodash';
+import { find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -127,7 +127,7 @@ export function TabPanel( {
 						aria-controls={ `${ instanceId }-${ tab.name }-view` }
 						selected={ tab.name === selected }
 						key={ tab.name }
-						onClick={ partial( handleClick, tab.name ) }
+						onClick={ () => handleClick( tab.name ) }
 					>
 						{ tab.title }
 					</TabButton>

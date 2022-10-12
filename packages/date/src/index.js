@@ -5,6 +5,11 @@ import momentLib from 'moment';
 import 'moment-timezone/moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
+/**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
 /** @typedef {import('moment').Moment} Moment */
 /** @typedef {import('moment').LocaleSpecification} MomentLocaleSpecification */
 
@@ -202,8 +207,22 @@ export function setSettings( dateSettings ) {
  *
  * @return {DateSettings} Settings, including locale data.
  */
-export function __experimentalGetSettings() {
+export function getSettings() {
 	return settings;
+}
+
+/**
+ * Returns the currently defined date settings.
+ *
+ * @deprecated
+ * @return {DateSettings} Settings, including locale data.
+ */
+export function __experimentalGetSettings() {
+	deprecated( 'wp.date.__experimentalGetSettings', {
+		since: '6.1',
+		alternative: 'wp.date.getSettings',
+	} );
+	return getSettings();
 }
 
 function setupWPTimezone() {
