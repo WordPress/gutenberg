@@ -123,12 +123,11 @@ export type BorderControlProps = ColorProps &
 		 */
 		withSlider?: boolean;
 		/**
-		 * Start opting into the larger default height that will become the
-		 * default size in a future version.
+		 * Size of the control.
 		 *
-		 * @default false
+		 * @default default
 		 */
-		__next40pxDefaultSize?: boolean;
+		size?: 'default' | '__unstable-large';
 	};
 
 export type DropdownProps = ColorProps & {
@@ -165,12 +164,11 @@ export type DropdownProps = ColorProps & {
 	 */
 	showDropdownHeader?: boolean;
 	/**
-	 * Start opting into the larger default height that will become the
-	 * default size in a future version.
+	 * Size of the control.
 	 *
-	 * @default false
+	 * @default default
 	 */
-	__next40pxDefaultSize?: boolean;
+	size?: 'default' | '__unstable-large';
 };
 
 export type StylePickerProps = LabelProps & {

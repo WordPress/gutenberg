@@ -18,7 +18,7 @@ export function useBorderBoxControlVisualizer(
 	const {
 		className,
 		value,
-		__next40pxDefaultSize = false,
+		size = 'default',
 		...otherProps
 	} = useContextSystem( props, 'BorderBoxControlVisualizer' );
 
@@ -26,10 +26,10 @@ export function useBorderBoxControlVisualizer(
 	const cx = useCx();
 	const classes = useMemo( () => {
 		return cx(
-			styles.borderBoxControlVisualizer( value, __next40pxDefaultSize ),
+			styles.borderBoxControlVisualizer( value, size ),
 			className
 		);
-	}, [ cx, className, value, __next40pxDefaultSize ] );
+	}, [ cx, className, value, size ] );
 
 	return { ...otherProps, className: classes, value };
 }

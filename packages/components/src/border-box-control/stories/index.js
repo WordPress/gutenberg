@@ -84,7 +84,7 @@ Default.args = {
 		style: 'dashed',
 		width: '1px',
 	},
-	__next40pxDefaultSize: false,
+	size: 'default',
 	popoverPlacement: 'right-start',
 };
 
