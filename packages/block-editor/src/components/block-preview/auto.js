@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { Disabled } from '@wordpress/components';
 import { useResizeObserver, pure, useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import { Disabled } from '@wordpress/components';
 
 /**
  * Internal dependencies

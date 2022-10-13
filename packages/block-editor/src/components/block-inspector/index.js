@@ -144,6 +144,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			getSelectedBlockCount,
 			getBlockName,
 			__unstableGetContentLockingParent,
+			getTemplateLock,
 		} = select( blockEditorStore );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
@@ -157,9 +158,11 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			selectedBlockClientId: _selectedBlockClientId,
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
-			topLevelLockedBlock: __unstableGetContentLockingParent(
-				_selectedBlockClientId
-			),
+			topLevelLockedBlock:
+				__unstableGetContentLockingParent( _selectedBlockClientId ) ||
+				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly'
+					? _selectedBlockClientId
+					: undefined ),
 		};
 	}, [] );
 

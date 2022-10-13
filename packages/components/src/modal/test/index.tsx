@@ -8,10 +8,15 @@ import { render, screen, within } from '@testing-library/react';
  */
 import Modal from '../';
 
+const noop = () => {};
+
 describe( 'Modal', () => {
 	it( 'applies the aria-describedby attribute when provided', () => {
 		render(
-			<Modal aria={ { describedby: 'description-id' } }>
+			<Modal
+				aria={ { describedby: 'description-id' } }
+				onRequestClose={ noop }
+			>
 				{ /* eslint-disable-next-line no-restricted-syntax */ }
 				<p id="description-id">Description</p>
 			</Modal>
@@ -24,7 +29,7 @@ describe( 'Modal', () => {
 
 	it( 'applies the aria-labelledby attribute when provided', () => {
 		render(
-			<Modal aria={ { labelledby: 'title-id' } }>
+			<Modal aria={ { labelledby: 'title-id' } } onRequestClose={ noop }>
 				{ /* eslint-disable-next-line no-restricted-syntax */ }
 				<h1 id="title-id">Modal Title Text</h1>
 			</Modal>
@@ -39,6 +44,7 @@ describe( 'Modal', () => {
 			<Modal
 				title="Modal Title Attribute"
 				aria={ { labelledby: 'title-id' } }
+				onRequestClose={ noop }
 			>
 				{ /* eslint-disable-next-line no-restricted-syntax */ }
 				<h1 id="title-id">Modal Title Text</h1>
@@ -51,7 +57,11 @@ describe( 'Modal', () => {
 
 	it( 'hides the header when the `__experimentalHideHeader` prop is used', () => {
 		render(
-			<Modal title="Test Title" __experimentalHideHeader>
+			<Modal
+				title="Test Title"
+				__experimentalHideHeader
+				onRequestClose={ noop }
+			>
 				<p>Modal content</p>
 			</Modal>
 		);

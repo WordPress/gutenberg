@@ -78,11 +78,11 @@ describe( 'withFocusReturn()', () => {
 
 			// Change activeElement.
 			switchFocusTo.focus();
-			expect( document.activeElement ).toBe( switchFocusTo );
+			expect( switchFocusTo ).toHaveFocus();
 
 			// Should keep focus on switchFocusTo, because it is not within HOC.
 			unmount();
-			expect( document.activeElement ).toBe( switchFocusTo );
+			expect( switchFocusTo ).toHaveFocus();
 		} );
 
 		it( 'should switch focus back when unmounted while having focus', () => {
@@ -95,14 +95,14 @@ describe( 'withFocusReturn()', () => {
 			const textarea = container.querySelector( 'textarea' );
 			fireEvent.focusIn( textarea, { target: textarea } );
 			textarea.focus();
-			expect( document.activeElement ).toBe( textarea );
+			expect( textarea ).toHaveFocus();
 
 			// Should return to the activeElement saved with this component.
 			unmount();
 			render( <div></div>, {
 				container,
 			} );
-			expect( document.activeElement ).toBe( activeElement );
+			expect( activeElement ).toHaveFocus();
 		} );
 	} );
 } );

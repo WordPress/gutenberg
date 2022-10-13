@@ -97,6 +97,7 @@ module.exports = {
 							'dropRight',
 							'each',
 							'escapeRegExp',
+							'every',
 							'extend',
 							'findIndex',
 							'findKey',
