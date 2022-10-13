@@ -25,7 +25,7 @@ describe( 'Disabled', () => {
 		);
 
 		// @ts-ignore
-		expect( container.firstChild.hasAttribute( 'inert' ) ).toBe( true );
+		expect( container.firstChild ).toHaveAttribute( 'inert' );
 	} );
 
 	it( 'should cleanly un-disable via reconciliation', () => {
@@ -41,12 +41,12 @@ describe( 'Disabled', () => {
 		const { container, rerender } = render( <MaybeDisable /> );
 
 		// @ts-ignore
-		expect( container.firstChild.hasAttribute( 'inert' ) ).toBe( true );
+		expect( container.firstChild ).toHaveAttribute( 'inert' );
 
 		rerender( <MaybeDisable isDisabled={ false } /> );
 
 		// @ts-ignore
-		expect( container.firstChild.hasAttribute( 'inert' ) ).toBe( false );
+		expect( container.firstChild ).not.toHaveAttribute( 'inert' );
 	} );
 
 	it( 'will disable or enable descendant fields based on the isDisabled prop value', () => {
@@ -59,12 +59,12 @@ describe( 'Disabled', () => {
 		const { rerender, container } = render( <MaybeDisable /> );
 
 		// @ts-ignore
-		expect( container.firstChild.hasAttribute( 'inert' ) ).toBe( true );
+		expect( container.firstChild ).toHaveAttribute( 'inert' );
 
 		rerender( <MaybeDisable isDisabled={ false } /> );
 
 		// @ts-ignore
-		expect( container.firstChild.hasAttribute( 'inert' ) ).toBe( false );
+		expect( container.firstChild ).not.toHaveAttribute( 'inert' );
 	} );
 
 	it( 'should preserve input values when toggling the isDisabled prop', async () => {

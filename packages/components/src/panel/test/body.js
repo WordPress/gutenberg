@@ -67,7 +67,7 @@ describe( 'PanelBody', () => {
 			let panelContent = getPanelBodyContent( container );
 
 			expect( panelContent ).toBeTruthy();
-			expect( panelContent.getAttribute( 'hidden' ) ).toBe( '' );
+			expect( panelContent ).toHaveAttribute( 'hidden', '' );
 
 			rerender(
 				<PanelBody opened={ false }>
@@ -77,7 +77,7 @@ describe( 'PanelBody', () => {
 			panelContent = getPanelBodyContent( container );
 
 			expect( panelContent ).toBeTruthy();
-			expect( panelContent.getAttribute( 'hidden' ) ).toBeNull();
+			expect( panelContent ).not.toHaveAttribute( 'hidden' );
 		} );
 	} );
 
