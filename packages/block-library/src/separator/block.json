@@ -17,13 +17,12 @@
 		"anchor": true,
 		"align": [ "center", "wide", "full" ],
 		"color": {
-			"enableContrastChecker": false,
+			"background": false,
 			"__experimentalSkipSerialization": true,
-			"gradients": true,
-			"background": true,
-			"text": false,
+			"enableContrastChecker": true,
+			"text": true,
 			"__experimentalDefaultControls": {
-				"background": true
+				"text": true
 			}
 		},
 		"spacing": {
