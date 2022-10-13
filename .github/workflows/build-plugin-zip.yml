@@ -169,7 +169,7 @@ jobs:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@969bd2663942d722d85b6a8626225850c2f7be4b # v3.5.0
+              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.0
               with:
                   node-version-file: '.nvmrc'
                   cache: npm
@@ -327,7 +327,7 @@ jobs:
                   git config user.email gutenberg@wordpress.org
 
             - name: Setup Node (for CLI)
-              uses: actions/setup-node@969bd2663942d722d85b6a8626225850c2f7be4b # v3.5.0
+              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.0
               with:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
