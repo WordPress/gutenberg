@@ -242,16 +242,21 @@ export default function InsertionPoint( props ) {
 		};
 	}, [] );
 
-	return (
-		isVisible &&
-		( insertionPoint.operation === 'replace' ? (
-			<BlockDropZonePopover
-				// Force remount to trigger the animation.
-				key={ `${ insertionPoint.rootClientId }-${ insertionPoint.index }` }
-				{ ...props }
-			/>
-		) : (
-			<InbetweenInsertionPointPopover { ...props } />
-		) )
+	if ( ! isVisible ) {
+		return null;
+	}
+
+	/**
+	 * Render a popover that overlays the block when the desired operation is to replace it.
+	 * Otherwise, render a popover in between blocks for the indication of inserting between them.
+	 */
+	return insertionPoint.operation === 'replace' ? (
+		<BlockDropZonePopover
+			// Force remount to trigger the animation.
+			key={ `${ insertionPoint.rootClientId }-${ insertionPoint.index }` }
+			{ ...props }
+		/>
+	) : (
+		<InbetweenInsertionPointPopover { ...props } />
 	);
 }
