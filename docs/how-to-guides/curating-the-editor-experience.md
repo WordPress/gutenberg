@@ -25,7 +25,7 @@ This functionality was introduced in WordPress 6.1. In contrast to block locking
 - Non-content child blocks (containers, spacers, columns, etc) are hidden from list view, un-clickable on the canvas, and entirely un-editable.
 - The Inspector will display a list of all child 'content' blocks. Clicking a block in this list reveals its settings panel. 
 - The main List View only shows content blocks, all at the same level regardless of actual nesting.
-- Children are move / remove locked automatically.
+- Children blocks within the overall content locked container are automatically move / remove locked.
 - Additional child blocks cannot be inserted, further preserving the design and layout.
 - There is a link in the block toolbar to ‘Modify’ that can be toggled on/off to have access to the broader design tools. 
 
