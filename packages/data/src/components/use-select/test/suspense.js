@@ -158,7 +158,7 @@ describe( 'useSuspenseSelect', () => {
 
 		const rendered = render( <App /> );
 		const label = await waitFor( () => rendered.getByLabelText( 'error' ) );
-		expect( label.textContent ).toBe( 'resolution failed' );
+		expect( label ).toHaveTextContent( 'resolution failed' );
 		expect( console ).toHaveErrored();
 	} );
 } );

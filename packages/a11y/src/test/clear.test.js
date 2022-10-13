@@ -16,7 +16,7 @@ describe( 'clear', () => {
 		document.body.appendChild( container2 );
 
 		clear();
-		expect( container1.textContent ).toBe( '' );
-		expect( container2.textContent ).toBe( '' );
+		expect( container1 ).toHaveTextContent( '' );
+		expect( container2 ).toHaveTextContent( '' );
 	} );
 } );
