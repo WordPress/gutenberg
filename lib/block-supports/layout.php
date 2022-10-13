@@ -26,6 +26,65 @@ function gutenberg_register_layout_support( $block_type ) {
 }
 
 /**
+ * Generates the CSS for position support from the layout object.
+ *
+ * @param string               $selector CSS selector.
+ * @param array                $layout   Layout object. The one that is passed has already checked
+ *                                       the existence of default block layout.
+ * @return string CSS styles on success. Else, empty string.
+ */
+function gutenberg_get_layout_position_style( $selector, $layout ) {
+	$position_styles = array();
+
+	$position_type = _wp_array_get( $layout, array( 'position', 'type' ), '' );
+	$position_side = _wp_array_get( $layout, array( 'position', 'side' ), '' );
+
+	$offset_value  = '0';
+
+	if (
+		in_array( $position_type, array( 'fixed', 'sticky' ), true ) &&
+		in_array( $position_side, array( 'top', 'right', 'bottom', 'left'), true )
+	) {
+		/*
+		 * For fixed or sticky top positions,
+		 * ensure the value includes an offset for the logged in admin bar.
+		 */
+		if (
+			'top' === $position_side &&
+			'fixed' === $position_type ||
+			'sticky' === $position_type
+		) {
+			$offset_value = 'var(--wp-admin--admin-bar--height, 0px)';
+		}
+
+		$position_styles[] =
+			array(
+				'selector'     => "$selector",
+				'declarations' => array(
+					'position'     => $position_type,
+					$position_side => $offset_value,
+					'z-index'      => '250', // TODO: This hard-coded value should live somewhere else.
+				),
+			);
+	}
+
+	if ( ! empty( $position_styles ) ) {
+		/*
+		 * Add to the style engine store to enqueue and render layout styles.
+		 */
+		return gutenberg_style_engine_get_stylesheet_from_css_rules(
+			$position_styles,
+			array(
+				'context'  => 'block-supports',
+				'prettify' => false,
+			)
+		);
+	}
+
+	return '';
+}
+
+/**
  * Generates the CSS corresponding to the provided layout.
  *
  * @param string               $selector                      CSS selector.
@@ -421,6 +480,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$fallback_gap_value,
 			$block_spacing
 		);
+
+		$style .= gutenberg_get_layout_position_style( ".$block_classname.$container_class", $used_layout );
 
 		// Only add container class and enqueue block support styles if unique styles were generated.
 		if ( ! empty( $style ) ) {

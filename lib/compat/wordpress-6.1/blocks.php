@@ -20,6 +20,12 @@ function gutenberg_safe_style_attrs_6_1( $attrs ) {
 	$attrs[] = 'margin-block-end';
 	$attrs[] = 'margin-inline-start';
 	$attrs[] = 'margin-inline-end';
+	$attrs[] = 'position';
+	$attrs[] = 'top';
+	$attrs[] = 'right';
+	$attrs[] = 'bottom';
+	$attrs[] = 'left';
+	$attrs[] = 'z-index';
 
 	return $attrs;
 }
