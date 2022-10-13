@@ -152,13 +152,15 @@ const UnforwardedFontSizePicker = (
 		selectedOption.name
 	);
 
+	// If neither the value or first font size is a string, then FontSizePicker
+	// operates in a legacy "unitless" mode where UnitControl can only be used
+	// to select px values and onChange() is always called with number values.
+	const hasUnits =
+		typeof value === 'string' || typeof fontSizes[ 0 ].size === 'string';
+
 	const [ valueNumber, valueUnit ] = parseNumberAndUnitFromSize( value );
 	const isValueUnitRelative =
 		!! valueUnit && [ 'em', 'rem' ].includes( valueUnit );
-	const [ , firstFontSizeUnit ] = parseNumberAndUnitFromSize(
-		fontSizes[ 0 ]?.size
-	);
-	const hasUnits = !! valueUnit || !! firstFontSizeUnit;
 
 	return (
 		<Container ref={ ref } className="components-font-size-picker">
