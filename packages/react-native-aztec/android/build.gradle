@@ -9,7 +9,7 @@ buildscript {
         jSoupVersion = '1.10.3'
         wordpressUtilsVersion = '110-13b4f06680ed8c145cbd09d63c4998dfe8b3b9de'
         espressoVersion = '3.0.1'
-        aztecVersion = '1006-3fdbbc2086fb71d3750b01c013fa5cf6024c3142'
+        aztecVersion = 'v1.6.2'
     }
 }
 
