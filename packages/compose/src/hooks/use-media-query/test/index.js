@@ -33,20 +33,6 @@ describe( 'useMediaQuery', () => {
 		return `useMediaQuery: ${ queryResult }`;
 	};
 
-	it( 'should return true when query matches on the first render', async () => {
-		global.matchMedia.mockReturnValue( {
-			addListener,
-			removeListener,
-			matches: true,
-		} );
-
-		const { container } = render(
-			<TestComponent query="(min-width: 782px)" />
-		);
-
-		expect( container ).toHaveTextContent( 'useMediaQuery: true' );
-	} );
-
 	it( 'should return true when query matches', async () => {
 		global.matchMedia.mockReturnValue( {
 			addListener,
