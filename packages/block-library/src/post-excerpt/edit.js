@@ -16,7 +16,7 @@ import {
 	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import { PanelBody, ToggleControl, RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -25,7 +25,7 @@ import { __ } from '@wordpress/i18n';
 import { useCanEditEntity } from '../utils/hooks';
 
 export default function PostExcerptEditor( {
-	attributes: { textAlign, moreText, showMoreOnNewLine },
+	attributes: { textAlign, moreText, showMoreOnNewLine, excerptLength },
 	setAttributes,
 	isSelected,
 	context: { postId, postType, queryId },
@@ -99,13 +99,17 @@ export default function PostExcerptEditor( {
 	const excerptClassName = classnames( 'wp-block-post-excerpt__excerpt', {
 		'is-inline': ! showMoreOnNewLine,
 	} );
+
 	const excerptContent = isEditable ? (
 		<RichText
 			className={ excerptClassName }
 			aria-label={ __( 'Post excerpt text' ) }
 			value={
-				rawExcerpt ||
-				strippedRenderedExcerpt ||
+				rawExcerpt.trim().split( ' ', excerptLength ).join( ' ' ) ||
+				strippedRenderedExcerpt
+					.trim()
+					.split( ' ', excerptLength )
+					.join( ' ' ) ||
 				( isSelected ? '' : __( 'No post excerpt found' ) )
 			}
 			onChange={ setExcerpt }
@@ -113,7 +117,10 @@ export default function PostExcerptEditor( {
 		/>
 	) : (
 		<p className={ excerptClassName }>
-			{ strippedRenderedExcerpt || __( 'No post excerpt found' ) }
+			{ strippedRenderedExcerpt
+				.trim()
+				.split( ' ', excerptLength )
+				.join( ' ' ) || __( 'No post excerpt found' ) }
 		</p>
 	);
 	return (
@@ -136,6 +143,16 @@ export default function PostExcerptEditor( {
 								showMoreOnNewLine: newShowMoreOnNewLine,
 							} )
 						}
+					/>
+					<RangeControl
+						label={ __( 'Max number of words in excerpt' ) }
+						value={ excerptLength }
+						onChange={ ( value ) => {
+							setAttributes( { excerptLength: value } );
+							setExcerpt();
+						} }
+						min="10"
+						max="100"
 					/>
 				</PanelBody>
 			</InspectorControls>
