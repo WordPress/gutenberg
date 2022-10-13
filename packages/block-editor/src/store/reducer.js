@@ -1475,9 +1475,19 @@ export function blocksMode( state = {}, action ) {
  */
 export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
-		case 'SHOW_INSERTION_POINT':
-			const { rootClientId, index, __unstableWithInserter } = action;
-			return { rootClientId, index, __unstableWithInserter };
+		case 'SHOW_INSERTION_POINT': {
+			const { rootClientId, index, __unstableWithInserter, operation } =
+				action;
+			const nextState = {
+				rootClientId,
+				index,
+				__unstableWithInserter,
+				operation,
+			};
+
+			// Bail out updates if the states are the same.
+			return isEqual( state, nextState ) ? state : nextState;
+		}
 
 		case 'HIDE_INSERTION_POINT':
 			return null;
