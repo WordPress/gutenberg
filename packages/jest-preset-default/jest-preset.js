@@ -17,7 +17,6 @@ module.exports = {
 			'@wordpress/jest-preset-default/scripts/setup-test-framework.js'
 		),
 	],
-	snapshotSerializers: [ require.resolve( 'enzyme-to-json/serializer.js' ) ],
 	testEnvironment: 'jsdom',
 	testMatch: [
 		'**/__tests__/**/*.[jt]s?(x)',
@@ -29,5 +28,4 @@ module.exports = {
 	transform: {
 		'\\.[jt]sx?$': require.resolve( 'babel-jest' ),
 	},
-	transformIgnorePatterns: [ 'node_modules/(?!(is-plain-obj))' ],
 };

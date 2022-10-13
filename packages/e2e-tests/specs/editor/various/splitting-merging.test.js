@@ -235,7 +235,21 @@ describe( 'splitting and merging blocks', () => {
 			await page.keyboard.type( 'item 1' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( 'item 2' );
-			await pressKeyTimes( 'ArrowUp', 2 );
+			await pressKeyTimes( 'ArrowUp', 3 );
+			await page.keyboard.press( 'Delete' );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph -->
+			<p>hi</p>
+			<!-- /wp:paragraph -->
+
+			<!-- wp:paragraph -->
+			<p>item 1</p>
+			<!-- /wp:paragraph -->
+
+			<!-- wp:paragraph -->
+			<p>item 2</p>
+			<!-- /wp:paragraph -->"
+		` );
 			await page.keyboard.press( 'Delete' );
 			// Carret should be in the first block and at the proper position.
 			await page.keyboard.type( '-' );
@@ -258,6 +272,20 @@ describe( 'splitting and merging blocks', () => {
 			await page.keyboard.type( 'item 2' );
 			await page.keyboard.press( 'ArrowUp' );
 			await pressKeyTimes( 'ArrowLeft', 6 );
+			await page.keyboard.press( 'Backspace' );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph -->
+			<p>hi</p>
+			<!-- /wp:paragraph -->
+
+			<!-- wp:paragraph -->
+			<p>item 1</p>
+			<!-- /wp:paragraph -->
+
+			<!-- wp:paragraph -->
+			<p>item 2</p>
+			<!-- /wp:paragraph -->"
+		` );
 			await page.keyboard.press( 'Backspace' );
 			// Carret should be in the first block and at the proper position.
 			await page.keyboard.type( '-' );

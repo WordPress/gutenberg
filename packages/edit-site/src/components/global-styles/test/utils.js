@@ -4,7 +4,7 @@
 import { getPresetVariableFromValue, getValueFromVariable } from '../utils';
 
 describe( 'editor utils', () => {
-	const styles = {
+	const themeJson = {
 		version: 1,
 		settings: {
 			color: {
@@ -57,7 +57,7 @@ describe( 'editor utils', () => {
 		describe( 'when a provided global style (e.g. fontFamily, color,etc.) does not exist', () => {
 			it( 'returns the originally provided value', () => {
 				const actual = getPresetVariableFromValue(
-					styles.settings,
+					themeJson.settings,
 					context,
 					'fakePropertyName',
 					value
@@ -69,7 +69,7 @@ describe( 'editor utils', () => {
 		describe( 'when a global style is cleared by the user', () => {
 			it( 'returns an undefined preset variable', () => {
 				const actual = getPresetVariableFromValue(
-					styles.settings,
+					themeJson.settings,
 					context,
 					propertyName,
 					undefined
@@ -83,7 +83,7 @@ describe( 'editor utils', () => {
 				it( 'returns the originally provided value', () => {
 					const customValue = '#6e4545';
 					const actual = getPresetVariableFromValue(
-						styles.settings,
+						themeJson.settings,
 						context,
 						propertyName,
 						customValue
@@ -95,7 +95,7 @@ describe( 'editor utils', () => {
 			describe( 'and it is a preset value', () => {
 				it( 'returns the preset variable', () => {
 					const actual = getPresetVariableFromValue(
-						styles.settings,
+						themeJson.settings,
 						context,
 						propertyName,
 						value
@@ -110,7 +110,7 @@ describe( 'editor utils', () => {
 		describe( 'when provided an invalid variable', () => {
 			it( 'returns the originally provided value', () => {
 				const actual = getValueFromVariable(
-					styles,
+					themeJson,
 					'root',
 					undefined
 				);
@@ -122,7 +122,7 @@ describe( 'editor utils', () => {
 		describe( 'when provided a preset variable', () => {
 			it( 'retrieves the correct preset value', () => {
 				const actual = getValueFromVariable(
-					styles,
+					themeJson,
 					'root',
 					'var:preset|color|primary'
 				);
@@ -134,12 +134,72 @@ describe( 'editor utils', () => {
 		describe( 'when provided a custom variable', () => {
 			it( 'retrieves the correct custom value', () => {
 				const actual = getValueFromVariable(
-					styles,
+					themeJson,
 					'root',
 					'var(--wp--custom--color--secondary)'
 				);
 
 				expect( actual ).toBe( '#a65555' );
+			} );
+		} );
+
+		describe( 'when provided a dynamic reference', () => {
+			it( 'retrieves the referenced value', () => {
+				const stylesWithRefs = {
+					...themeJson,
+					styles: {
+						color: {
+							background: {
+								ref: 'styles.color.text',
+							},
+							text: 'purple-rain',
+						},
+					},
+				};
+				const actual = getValueFromVariable( stylesWithRefs, 'root', {
+					ref: 'styles.color.text',
+				} );
+
+				expect( actual ).toBe( stylesWithRefs.styles.color.text );
+			} );
+
+			it( 'returns the originally provided value where value is dynamic reference and reference does not exist', () => {
+				const stylesWithRefs = {
+					...themeJson,
+					styles: {
+						color: {
+							text: {
+								ref: 'styles.background.text',
+							},
+						},
+					},
+				};
+				const actual = getValueFromVariable( stylesWithRefs, 'root', {
+					ref: 'styles.color.text',
+				} );
+
+				expect( actual ).toBe( stylesWithRefs.styles.color.text );
+			} );
+
+			it( 'returns the originally provided value where value is dynamic reference', () => {
+				const stylesWithRefs = {
+					...themeJson,
+					styles: {
+						color: {
+							background: {
+								ref: 'styles.color.text',
+							},
+							text: {
+								ref: 'styles.background.text',
+							},
+						},
+					},
+				};
+				const actual = getValueFromVariable( stylesWithRefs, 'root', {
+					ref: 'styles.color.text',
+				} );
+
+				expect( actual ).toBe( stylesWithRefs.styles.color.text );
 			} );
 		} );
 	} );

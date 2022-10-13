@@ -27,7 +27,7 @@
 			"description": "The name for a block is a unique string that identifies a block. Names have to be structured as `namespace/block-name`, where namespace is the name of your plugin or theme."
 		},
 		"__experimental": {
-			"description": "The name of the experiment this block is a part of, or boolean true if there there is no specific experiment name.",
+			"description": "The name of the experiment this block is a part of, or boolean true if there is no specific experiment name.",
 			"anyOf": [
 				{
 					"type": "string"
@@ -278,6 +278,11 @@
 							"type": "boolean",
 							"description": "This property adds block controls which allow the user to set text color in a block.\n\nWhen color support is declared, this property is enabled by default (along with background), so simply setting color will enable text color.\n\nText color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.text, the attributes definition is extended to include two new attributes: textColor and style",
 							"default": true
+						},
+						"enableContrastChecker": {
+							"type": "boolean",
+							"description": "Determines whether the contrast checker widget displays in the block editor UI.\n\nThe contrast checker appears only if the block declares support for color. It tests the readability of color combinations and warns if there is a potential issue. The property is enabled by default.\n\nSet to `false` to explicitly disable.",
+							"default": true
 						}
 					}
 				},
@@ -434,12 +439,32 @@
 			}
 		},
 		"editorScript": {
-			"type": "string",
-			"description": "Block type editor script definition. It will only be enqueued in the context of the editor."
+			"description": "Block type editor script definition. It will only be enqueued in the context of the editor.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
 		},
 		"script": {
-			"type": "string",
-			"description": "Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site."
+			"description": "Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
 		},
 		"viewScript": {
 			"description": "Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.",
@@ -569,6 +594,10 @@
 					}
 				}
 			}
+		},
+		"render": {
+			"type": "string",
+			"description": "Template file loaded on the server when rendering a block."
 		}
 	},
 	"required": [ "name", "title" ],

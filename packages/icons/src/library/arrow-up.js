@@ -5,7 +5,7 @@ import { SVG, Path } from '@wordpress/primitives';
 
 const arrowUp = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path d="M12.5 3.9L6.7 9.7l1.1 1.1 4-4V20h1.4V6.7l4.5 4.1 1.1-1.1z" />
+		<Path d="M12 3.9 6.5 9.5l1 1 3.8-3.7V20h1.5V6.8l3.7 3.7 1-1z" />
 	</SVG>
 );
 

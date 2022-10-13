@@ -11,7 +11,7 @@ import {
 	Platform,
 	Text,
 } from 'react-native';
-import { map, uniq } from 'lodash';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -63,11 +63,15 @@ function ColorPalette( {
 	const scale = useRef( new Animated.Value( 1 ) ).current;
 	const opacity = useRef( new Animated.Value( 1 ) ).current;
 
-	const defaultColors = uniq( map( defaultSettings.colors, 'color' ) );
-	const mergedColors = uniq( map( defaultSettings.allColors, 'color' ) );
-	const defaultGradientColors = uniq(
-		map( defaultSettings.gradients, 'gradient' )
-	);
+	const defaultColors = [
+		...new Set( map( defaultSettings.colors, 'color' ) ),
+	];
+	const mergedColors = [
+		...new Set( map( defaultSettings.allColors, 'color' ) ),
+	];
+	const defaultGradientColors = [
+		...new Set( map( defaultSettings.gradients, 'gradient' ) ),
+	];
 	const colors = isGradientSegment ? defaultGradientColors : defaultColors;
 
 	const customIndicatorColor = isGradientSegment

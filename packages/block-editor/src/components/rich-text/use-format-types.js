@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { mapKeys } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -35,7 +30,12 @@ const interactiveContentTags = new Set( [
 
 function prefixSelectKeys( selected, prefix ) {
 	if ( typeof selected !== 'object' ) return { [ prefix ]: selected };
-	return mapKeys( selected, ( value, key ) => `${ prefix }.${ key }` );
+	return Object.fromEntries(
+		Object.entries( selected ).map( ( [ key, value ] ) => [
+			`${ prefix }.${ key }`,
+			value,
+		] )
+	);
 }
 
 function getPrefixedSelectKeys( selected, prefix ) {

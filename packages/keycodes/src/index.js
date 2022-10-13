@@ -13,7 +13,7 @@
  * External dependencies
  */
 import { capitalCase } from 'change-case';
-import { get, mapValues, includes, xor } from 'lodash';
+import { get, mapValues, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -237,7 +237,7 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 		// so override the rule to allow symbols used for shortcuts.
 		// see: https://github.com/blakeembrey/change-case#options
 		const capitalizedCharacter = capitalCase( character, {
-			stripRegexp: /[^A-Z0-9`,\.]/gi,
+			stripRegexp: /[^A-Z0-9`,\.\\]/gi,
 		} );
 
 		return [ ...modifierKeys, capitalizedCharacter ];
@@ -353,7 +353,12 @@ export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 		const mods = getModifiers( _isApple );
 		const eventMods = getEventModifiers( event );
 
-		if ( xor( mods, eventMods ).length ) {
+		const modsDiff = mods.filter( ( mod ) => ! eventMods.includes( mod ) );
+		const eventModsDiff = eventMods.filter(
+			( mod ) => ! mods.includes( mod )
+		);
+
+		if ( modsDiff.length > 0 || eventModsDiff.length > 0 ) {
 			return false;
 		}
 
@@ -365,6 +370,18 @@ export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 
 		if ( event.altKey && character.length === 1 ) {
 			key = String.fromCharCode( event.keyCode ).toLowerCase();
+		}
+
+		// Replace some characters to match the key indicated
+		// by the shortcut on Windows.
+		if ( ! _isApple() ) {
+			if (
+				event.shiftKey &&
+				character.length === 1 &&
+				event.code === 'Comma'
+			) {
+				key = ',';
+			}
 		}
 
 		// For backwards compatibility.

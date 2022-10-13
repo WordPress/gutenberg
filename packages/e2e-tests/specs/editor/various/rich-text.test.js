@@ -473,15 +473,18 @@ describe( 'RichText', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' 2' );
 
-		// Select all and copy.
+		// Select all text.
+		await pressKeyWithModifier( 'primary', 'a' );
+		// Select the nested list.
+		await pressKeyWithModifier( 'primary', 'a' );
+		// Select the parent list item.
+		await pressKeyWithModifier( 'primary', 'a' );
+		// Select all the parent list item text.
+		await pressKeyWithModifier( 'primary', 'a' );
+		// Select the entire list.
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'c' );
 
-		// Collapse the selection to the end.
-		await page.keyboard.press( 'ArrowRight' );
-
-		// Create a paragraph.
-		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
 
 		// Paste paragraph contents.

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { every, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -92,6 +92,7 @@ function ColorGradientControlInner( {
 		),
 		[ TAB_GRADIENT.value ]: (
 			<GradientPicker
+				__nextHasNoMargin
 				value={ gradientValue }
 				onChange={
 					canChooseAColor
@@ -179,7 +180,7 @@ function ColorGradientControlSelect( props ) {
 
 function ColorGradientControl( props ) {
 	if (
-		every( colorsAndGradientKeys, ( key ) => props.hasOwnProperty( key ) )
+		colorsAndGradientKeys.every( ( key ) => props.hasOwnProperty( key ) )
 	) {
 		return <ColorGradientControlInner { ...props } />;
 	}

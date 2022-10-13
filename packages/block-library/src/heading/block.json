@@ -39,7 +39,8 @@
 			}
 		},
 		"spacing": {
-			"margin": true
+			"margin": true,
+			"padding": true
 		},
 		"typography": {
 			"fontSize": true,
@@ -49,6 +50,7 @@
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true,
 				"fontAppearance": true,

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
@@ -18,6 +23,7 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 	store as blockEditorStore,
+	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
@@ -27,19 +33,9 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import DimensionControls from './dimension-controls';
+import Overlay from './overlay';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-
-const placeholder = ( content ) => {
-	return (
-		<Placeholder
-			className="block-editor-media-placeholder"
-			withIllustration={ true }
-		>
-			{ content }
-		</Placeholder>
-	);
-};
 
 function getMediaSourceUrlBySizeSlug( media, slug ) {
 	return (
@@ -95,6 +91,22 @@ function PostFeaturedImageDisplay( {
 	const blockProps = useBlockProps( {
 		style: { width, height },
 	} );
+	const borderProps = useBorderProps( attributes );
+
+	const placeholder = ( content ) => {
+		return (
+			<Placeholder
+				className={ classnames(
+					'block-editor-media-placeholder',
+					borderProps.className
+				) }
+				withIllustration={ true }
+				style={ borderProps.style }
+			>
+				{ content }
+			</Placeholder>
+		);
+	};
 
 	const onSelectImage = ( value ) => {
 		if ( value?.id ) {
@@ -159,12 +171,24 @@ function PostFeaturedImageDisplay( {
 		return (
 			<>
 				{ controls }
-				<div { ...blockProps }>{ placeholder() }</div>
+				<div { ...blockProps }>
+					{ placeholder() }
+					<Overlay
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						clientId={ clientId }
+					/>
+				</div>
 			</>
 		);
 	}
 
 	const label = __( 'Add a featured image' );
+	const imageStyles = {
+		...borderProps.style,
+		height,
+		objectFit: height && scale,
+	};
 
 	if ( ! featuredImage ) {
 		image = (
@@ -196,6 +220,7 @@ function PostFeaturedImageDisplay( {
 			placeholder()
 		) : (
 			<img
+				className={ borderProps.className }
 				src={ mediaUrl }
 				alt={
 					media.alt_text
@@ -206,7 +231,7 @@ function PostFeaturedImageDisplay( {
 						  )
 						: __( 'Featured image' )
 				}
-				style={ { height, objectFit: height && scale } }
+				style={ imageStyles }
 			/>
 		);
 	}
@@ -230,15 +255,40 @@ function PostFeaturedImageDisplay( {
 					</MediaReplaceFlow>
 				</BlockControls>
 			) }
-			<figure { ...blockProps }>{ image }</figure>
+			<figure { ...blockProps }>
+				{ image }
+				<Overlay
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					clientId={ clientId }
+				/>
+			</figure>
 		</>
 	);
 }
 
 export default function PostFeaturedImageEdit( props ) {
 	const blockProps = useBlockProps();
+	const borderProps = useBorderProps( props.attributes );
+
 	if ( ! props.context?.postId ) {
-		return <div { ...blockProps }>{ placeholder() }</div>;
+		return (
+			<div { ...blockProps }>
+				<Placeholder
+					className={ classnames(
+						'block-editor-media-placeholder',
+						borderProps.className
+					) }
+					withIllustration={ true }
+					style={ borderProps.style }
+				/>
+				<Overlay
+					attributes={ props.attributes }
+					setAttributes={ props.setAttributes }
+					clientId={ props.clientId }
+				/>
+			</div>
+		);
 	}
 	return <PostFeaturedImageDisplay { ...props } />;
 }

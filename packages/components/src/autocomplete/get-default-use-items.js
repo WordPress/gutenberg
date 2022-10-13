@@ -1,13 +1,18 @@
 /**
  * External dependencies
  */
-import { debounce, escapeRegExp } from 'lodash';
 import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
  */
+import { debounce } from '@wordpress/compose';
 import { useLayoutEffect, useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { escapeRegExp } from '../utils/strings';
 
 function filterOptions( search, options = [], maxResults = 10 ) {
 	const filtered = [];

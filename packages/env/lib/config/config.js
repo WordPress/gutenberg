@@ -15,7 +15,6 @@ const readRawConfigFile = require( './read-raw-config-file' );
 const parseConfig = require( './parse-config' );
 const { includeTestsPath, parseSourceString } = parseConfig;
 const md5 = require( '../md5' );
-const { getLatestWordPressVersion } = require( '../wordpress' );
 
 /**
  * wp-env configuration.
@@ -85,21 +84,9 @@ module.exports = async function readConfig( configPath ) {
 	const detectedLocalConfig =
 		Object.keys( { ...baseConfig, ...overrideConfig } ).length > 0;
 
-	// If there is no local WordPress version, use the latest stable version from GitHub.
-	let coreRef;
-	if ( ! overrideConfig.core && ! baseConfig.core ) {
-		const wpVersion = await getLatestWordPressVersion();
-		if ( ! wpVersion ) {
-			throw new ValidationError(
-				'Could not find the latest WordPress version. There may be a network issue.'
-			);
-		}
-		coreRef = `WordPress/WordPress#${ wpVersion }`;
-	}
-
 	// Default configuration which is overridden by .wp-env.json files.
 	const defaultConfiguration = {
-		core: coreRef,
+		core: null, // Indicates that the latest stable version should ultimately be used.
 		phpVersion: null,
 		plugins: [],
 		themes: [],
@@ -155,23 +142,21 @@ module.exports = async function readConfig( configPath ) {
 
 	// Merge each of the specified environment-level overrides.
 	const allPorts = new Set(); // Keep track of unique ports for validation.
-	const env = allEnvs.reduce( ( result, environment ) => {
-		result[ environment ] = parseConfig(
+	const env = {};
+	for ( const envName of allEnvs ) {
+		env[ envName ] = await parseConfig(
 			validateConfig(
 				mergeWpServiceConfigs( [
-					...getEnvConfig( defaultConfiguration, environment ),
-					...getEnvConfig( baseConfig, environment ),
-					...getEnvConfig( overrideConfig, environment ),
+					...getEnvConfig( defaultConfiguration, envName ),
+					...getEnvConfig( baseConfig, envName ),
+					...getEnvConfig( overrideConfig, envName ),
 				] ),
-				environment
+				envName
 			),
-			{
-				workDirectoryPath,
-			}
+			{ workDirectoryPath }
 		);
-		allPorts.add( result[ environment ].port );
-		return result;
-	}, {} );
+		allPorts.add( env[ envName ].port );
+	}
 
 	if ( allPorts.size !== allEnvs.length ) {
 		throw new ValidationError(
@@ -262,6 +247,7 @@ async function getDefaultBaseConfig( configPath ) {
  * @return {WPConfig} configuration object with overrides applied.
  */
 function withOverrides( config ) {
+	const workDirectoryPath = config.workDirectoryPath;
 	// Override port numbers with environment variables.
 	config.env.development.port =
 		getNumberFromEnvVariable( 'WP_ENV_PORT' ) ||
@@ -273,10 +259,8 @@ function withOverrides( config ) {
 	// Override WordPress core with environment variable.
 	if ( process.env.WP_ENV_CORE ) {
 		const coreSource = includeTestsPath(
-			parseSourceString( process.env.WP_ENV_CORE, {
-				workDirectoryPath: config.workDirectoryPath,
-			} ),
-			{ workDirectoryPath: config.workDirectoryPath }
+			parseSourceString( process.env.WP_ENV_CORE, { workDirectoryPath } ),
+			{ workDirectoryPath }
 		);
 		config.env.development.coreSource = coreSource;
 		config.env.tests.coreSource = coreSource;

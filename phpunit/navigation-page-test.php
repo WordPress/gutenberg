@@ -83,7 +83,7 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 		$this->callback
 			->expects( $this->once() )
 			->method( 'preload_menus_rest_pre_dispatch_callback' )
-			->willReturn( new $response );
+			->willReturn( $response );
 
 		gutenberg_navigation_editor_preload_menus();
 

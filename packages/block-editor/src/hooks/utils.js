@@ -1,16 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	pickBy,
-	isEmpty,
-	mapValues,
-	forEach,
-	get,
-	setWith,
-	clone,
-	every,
-} from 'lodash';
+import { pickBy, isEmpty, mapValues, get, setWith, clone } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -53,7 +44,11 @@ export function transformStyles(
 	results
 ) {
 	// If there are no active supports return early.
-	if ( every( activeSupports, ( isActive ) => ! isActive ) ) {
+	if (
+		Object.values( activeSupports ?? {} ).every(
+			( isActive ) => ! isActive
+		)
+	) {
 		return result;
 	}
 	// If the condition verifies we are probably in the presence of a wrapping transform
@@ -77,7 +72,7 @@ export function transformStyles(
 		}
 	}
 	let returnBlock = result;
-	forEach( activeSupports, ( isActive, support ) => {
+	Object.entries( activeSupports ).forEach( ( [ support, isActive ] ) => {
 		if ( isActive ) {
 			migrationPaths[ support ].forEach( ( path ) => {
 				const styleValue = get( referenceBlockAttributes, path );

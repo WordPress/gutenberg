@@ -2,9 +2,16 @@
 
 ## Unreleased
 
+## 13.3.0 (2022-10-05)
+
+## 13.2.0 (2022-09-21)
+
+## 13.0.0 (2022-08-24)
+
 ### Breaking Change
 
 -   Increase the minimum Node.js version to 14 and minimum npm version to 6.14.4 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+-   Remove all rules targeting test files from the `recommended` and `recommended-with-formatting` presets when Jest package is installed ([#43272](https://github.com/WordPress/gutenberg/pull/43272)).
 
 ## 12.8.0 (2022-07-27)
 

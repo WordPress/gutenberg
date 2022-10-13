@@ -273,34 +273,42 @@ export const getEmbedPreview =
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *
- * @param {string}  action   Action to check. One of: 'create', 'read', 'update',
- *                           'delete'.
- * @param {string}  resource REST resource to check, e.g. 'media' or 'posts'.
- * @param {?string} id       ID of the rest resource to check.
+ * @param {string}  requestedAction Action to check. One of: 'create', 'read', 'update',
+ *                                  'delete'.
+ * @param {string}  resource        REST resource to check, e.g. 'media' or 'posts'.
+ * @param {?string} id              ID of the rest resource to check.
  */
 export const canUser =
-	( action, resource, id ) =>
-	async ( { dispatch } ) => {
-		const methods = {
-			create: 'POST',
-			read: 'GET',
-			update: 'PUT',
-			delete: 'DELETE',
-		};
+	( requestedAction, resource, id ) =>
+	async ( { dispatch, registry } ) => {
+		const { hasStartedResolution } = registry.select( STORE_NAME );
 
-		const method = methods[ action ];
-		if ( ! method ) {
-			throw new Error( `'${ action }' is not a valid action.` );
+		const resourcePath = id ? `${ resource }/${ id }` : resource;
+		const retrievedActions = [ 'create', 'read', 'update', 'delete' ];
+
+		if ( ! retrievedActions.includes( requestedAction ) ) {
+			throw new Error( `'${ requestedAction }' is not a valid action.` );
 		}
 
-		const path = id
-			? `/wp/v2/${ resource }/${ id }`
-			: `/wp/v2/${ resource }`;
+		// Prevent resolving the same resource twice.
+		for ( const relatedAction of retrievedActions ) {
+			if ( relatedAction === requestedAction ) {
+				continue;
+			}
+			const isAlreadyResolving = hasStartedResolution( 'canUser', [
+				relatedAction,
+				resource,
+				id,
+			] );
+			if ( isAlreadyResolving ) {
+				return;
+			}
+		}
 
 		let response;
 		try {
 			response = await apiFetch( {
-				path,
+				path: `/wp/v2/${ resourcePath }`,
 				method: 'OPTIONS',
 				parse: false,
 			} );
@@ -314,10 +322,25 @@ export const canUser =
 		// return the expected result in the native version. Instead, API requests
 		// only return the result, without including response properties like the headers.
 		const allowHeader = response.headers?.get( 'allow' );
-		const key = [ action, resource, id ].filter( Boolean ).join( '/' );
-		const isAllowed =
-			allowHeader?.includes?.( method ) || allowHeader?.allow === method;
-		dispatch.receiveUserPermission( key, isAllowed );
+		const allowedMethods = allowHeader?.allow || allowHeader || '';
+
+		const permissions = {};
+		const methods = {
+			create: 'POST',
+			read: 'GET',
+			update: 'PUT',
+			delete: 'DELETE',
+		};
+		for ( const [ actionName, methodName ] of Object.entries( methods ) ) {
+			permissions[ actionName ] = allowedMethods.includes( methodName );
+		}
+
+		for ( const action of retrievedActions ) {
+			dispatch.receiveUserPermission(
+				`${ action }/${ resourcePath }`,
+				permissions[ action ]
+			);
+		}
 	};
 
 /**

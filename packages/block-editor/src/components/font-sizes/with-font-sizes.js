@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, pickBy, reduce, some, upperFirst } from 'lodash';
+import { find, pickBy, reduce, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,16 @@ import { getFontSize, getFontSizeClass } from './utils';
 import useSetting from '../use-setting';
 
 const DEFAULT_FONT_SIZES = [];
+
+/**
+ * Capitalizes the first letter in a string.
+ *
+ * @param {string} str The string whose first letter the function will capitalize.
+ *
+ * @return {string} Capitalized string.
+ */
+const upperFirst = ( [ firstLetter, ...rest ] ) =>
+	firstLetter.toUpperCase() + rest.join( '' );
 
 /**
  * Higher-order component, which handles font size logic for class generation,

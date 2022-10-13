@@ -2,7 +2,7 @@
 
 exports[`Quote can be converted to a pullquote 1`] = `
 "<!-- wp:pullquote -->
-<figure class=\\"wp-block-pullquote\\"><blockquote><p>one</p><p>two</p><cite>cite</cite></blockquote></figure>
+<figure class=\\"wp-block-pullquote\\"><blockquote><p>one<br>two</p><cite>cite</cite></blockquote></figure>
 <!-- /wp:pullquote -->"
 `;
 
@@ -117,7 +117,7 @@ exports[`Quote can be split at the end 2`] = `
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p></p>
+<p>2</p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->"
 `;

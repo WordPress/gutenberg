@@ -159,6 +159,13 @@ export interface FormTokenFieldProps
 	 */
 	__next36pxDefaultSize?: boolean;
 	/**
+	 * If true, the select the first matching suggestion when the user presses
+	 * the Enter key (or space when tokenizeOnSpace is true).
+	 *
+	 * @default false
+	 */
+	__experimentalAutoSelectFirstMatch?: boolean;
+	/**
 	 * Custom renderer for suggestions.
 	 */
 	__experimentalRenderItem?: ( args: { item: string } ) => ReactNode;

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { createStore, applyMiddleware } from 'redux';
-import { flowRight, get, mapValues, omit } from 'lodash';
+import { get, mapValues } from 'lodash';
 import combineReducers from 'turbo-combine-reducers';
 import EquivalentKeyMap from 'equivalent-key-map';
 
@@ -10,6 +10,7 @@ import EquivalentKeyMap from 'equivalent-key-map';
  * WordPress dependencies
  */
 import createReduxRoutineMiddleware from '@wordpress/redux-routine';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -268,7 +269,7 @@ function instantiateReduxStore( key, options, registry, thunkArgs ) {
 	return createStore(
 		enhancedReducer,
 		{ root: initialState },
-		flowRight( enhancers )
+		compose( enhancers )
 	);
 }
 
@@ -334,16 +335,17 @@ function mapActions( actions, store ) {
  * @return {Object} Selectors mapped to their resolution functions.
  */
 function mapResolveSelectors( selectors, store ) {
-	const storeSelectors = omit( selectors, [
-		'getIsResolving',
-		'hasStartedResolution',
-		'hasFinishedResolution',
-		'hasResolutionFailed',
-		'isResolving',
-		'getCachedResolvers',
-		'getResolutionState',
-		'getResolutionError',
-	] );
+	const {
+		getIsResolving,
+		hasStartedResolution,
+		hasFinishedResolution,
+		hasResolutionFailed,
+		isResolving,
+		getCachedResolvers,
+		getResolutionState,
+		getResolutionError,
+		...storeSelectors
+	} = selectors;
 
 	return mapValues( storeSelectors, ( selector, selectorName ) => {
 		// If the selector doesn't have a resolver, just convert the return value

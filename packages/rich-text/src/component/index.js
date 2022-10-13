@@ -16,7 +16,6 @@ import { useBoundaryStyle } from './use-boundary-style';
 import { useCopyHandler } from './use-copy-handler';
 import { useFormatBoundaries } from './use-format-boundaries';
 import { useSelectObject } from './use-select-object';
-import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 import { useInputAndSelection } from './use-input-and-selection';
 import { useDelete } from './use-delete';
 
@@ -232,11 +231,6 @@ export function useRichText( {
 			createRecord,
 			handleChange,
 			multilineTag,
-		} ),
-		useIndentListItemOnSpace( {
-			multilineTag,
-			createRecord,
-			handleChange,
 		} ),
 		useInputAndSelection( {
 			record,

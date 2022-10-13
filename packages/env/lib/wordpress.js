@@ -277,13 +277,20 @@ async function readWordPressVersion( coreSource, spinner, debug ) {
  *
  * @return {string} The latest stable version of WordPress, like "6.0.1"
  */
+let CACHED_WP_VERSION;
 async function getLatestWordPressVersion() {
+	// Avoid extra network requests.
+	if ( CACHED_WP_VERSION ) {
+		return CACHED_WP_VERSION;
+	}
+
 	const versions = await got(
 		'https://api.wordpress.org/core/stable-check/1.0/'
 	).json();
 
 	for ( const [ version, status ] of Object.entries( versions ) ) {
 		if ( status === 'latest' ) {
+			CACHED_WP_VERSION = version;
 			return version;
 		}
 	}

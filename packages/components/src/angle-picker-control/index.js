@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -27,6 +28,17 @@ export default function AnglePickerControl( {
 	onChange,
 	value,
 } ) {
+	if ( ! __nextHasNoMarginBottom ) {
+		deprecated(
+			'Bottom margin styles for wp.components.AnglePickerControl',
+			{
+				since: '6.1',
+				version: '6.4',
+				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
+			}
+		);
+	}
+
 	const handleOnNumberChange = ( unprocessedValue ) => {
 		const inputValue =
 			unprocessedValue !== '' ? parseInt( unprocessedValue, 10 ) : 0;

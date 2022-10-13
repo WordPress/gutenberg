@@ -31,12 +31,13 @@ import BaseControl from '../../base-control';
 import type { ToggleGroupControlProps } from '../types';
 import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
 import ToggleGroupControlContext from '../context';
+import { VisualLabelWrapper } from './styles';
 import * as styles from './styles';
 
 const noop = () => {};
 
-function ToggleGroupControl(
-	props: WordPressComponentProps< ToggleGroupControlProps, 'input' >,
+function UnconnectedToggleGroupControl(
+	props: WordPressComponentProps< ToggleGroupControlProps, 'input', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
@@ -44,7 +45,7 @@ function ToggleGroupControl(
 		className,
 		isAdaptiveWidth = false,
 		isBlock = false,
-		__experimentalIsIconGroup = false,
+		__experimentalIsBorderless = false,
 		label,
 		hideLabelFromVision = false,
 		help,
@@ -87,11 +88,11 @@ function ToggleGroupControl(
 		() =>
 			cx(
 				styles.ToggleGroupControl( { size } ),
-				! __experimentalIsIconGroup && styles.border,
+				! __experimentalIsBorderless && styles.border,
 				isBlock && styles.block,
 				className
 			),
-		[ className, cx, isBlock, __experimentalIsIconGroup, size ]
+		[ className, cx, isBlock, __experimentalIsBorderless, size ]
 	);
 	return (
 		<BaseControl
@@ -102,11 +103,11 @@ function ToggleGroupControl(
 				value={ { ...radio, isBlock: ! isAdaptiveWidth, size } }
 			>
 				{ ! hideLabelFromVision && (
-					<div>
+					<VisualLabelWrapper>
 						<BaseControl.VisualLabel>
 							{ label }
 						</BaseControl.VisualLabel>
-					</div>
+					</VisualLabelWrapper>
 				) }
 				<RadioGroup
 					{ ...radio }
@@ -135,11 +136,14 @@ function ToggleGroupControl(
  * represented in horizontal segments. To render options for this control use
  * `ToggleGroupControlOption` component.
  *
+ * This component is intended for selecting a single persistent value from a set of options,
+ * similar to a how a radio button group would work. If you simply want a toggle to switch between views,
+ * use a `TabPanel` instead.
+ *
  * Only use this control when you know for sure the labels of items inside won't
  * wrap. For items with longer labels, you can consider a `SelectControl` or a
  * `CustomSelectControl` component instead.
  *
- * @example
  * ```jsx
  * import {
  *   __experimentalToggleGroupControl as ToggleGroupControl,
@@ -156,9 +160,9 @@ function ToggleGroupControl(
  * }
  * ```
  */
-const ConnectedToggleGroupControl = contextConnect(
-	ToggleGroupControl,
+export const ToggleGroupControl = contextConnect(
+	UnconnectedToggleGroupControl,
 	'ToggleGroupControl'
 );
 
-export default ConnectedToggleGroupControl;
+export default ToggleGroupControl;

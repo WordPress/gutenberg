@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, cloneDeep, set, isEqual, has } from 'lodash';
+import { get, set, isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -48,7 +48,8 @@ export function useSetting( path, blockName, source = 'all' ) {
 
 	const setSetting = ( newValue ) => {
 		setUserConfig( ( currentConfig ) => {
-			const newUserConfig = cloneDeep( currentConfig );
+			// Deep clone `currentConfig` to avoid mutating it later.
+			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
 			const pathToSet = PATHS_WITH_MERGE[ path ]
 				? fullPath + '.custom'
 				: fullPath;
@@ -109,7 +110,8 @@ export function useStyle( path, blockName, source = 'all' ) {
 
 	const setStyle = ( newValue ) => {
 		setUserConfig( ( currentConfig ) => {
-			const newUserConfig = cloneDeep( currentConfig );
+			// Deep clone `currentConfig` to avoid mutating it later.
+			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
 			set(
 				newUserConfig,
 				finalPath,
@@ -166,7 +168,6 @@ const ROOT_BLOCK_SUPPORTS = [
 	'fontWeight',
 	'lineHeight',
 	'textDecoration',
-	'textTransform',
 	'padding',
 	'contentSize',
 	'wideSize',
@@ -210,10 +211,8 @@ export function getSupportedGlobalStylesPanels( name ) {
 		// unset, we still enable it.
 		if ( STYLE_PROPERTY[ styleName ].requiresOptOut ) {
 			if (
-				has(
-					blockType.supports,
-					STYLE_PROPERTY[ styleName ].support[ 0 ]
-				) &&
+				STYLE_PROPERTY[ styleName ].support[ 0 ] in
+					blockType.supports &&
 				get(
 					blockType.supports,
 					STYLE_PROPERTY[ styleName ].support

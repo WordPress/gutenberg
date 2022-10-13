@@ -100,11 +100,11 @@ export type ToggleGroupControlProps = Omit<
 		 */
 		isBlock?: boolean;
 		/**
-		 * Style for use with `ToggleGroupControlOptionIcon`s.
+		 * Borderless style that may be preferred in some contexts.
 		 *
 		 * @default false
 		 */
-		__experimentalIsIconGroup?: boolean; // TODO: Refactor so this can be private
+		__experimentalIsBorderless?: boolean;
 		/**
 		 * Callback when a segment is selected.
 		 */
@@ -114,7 +114,8 @@ export type ToggleGroupControlProps = Omit<
 		 */
 		value?: ReactText;
 		/**
-		 * React children
+		 * The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControlOption` or
+		 * `ToggleGroupControlOptionIcon` components.
 		 */
 		children: ReactNode;
 		/**
