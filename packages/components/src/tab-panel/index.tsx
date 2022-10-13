@@ -101,7 +101,7 @@ export function TabPanel( {
 		if ( ! newSelectedTab && tabs.length > 0 ) {
 			handleTabSelection( initialTabName || tabs[ 0 ].name );
 		}
-	}, [ tabs ] );
+	}, [ tabs, selected, initialTabName ] );
 
 	return (
 		<div className={ className }>
