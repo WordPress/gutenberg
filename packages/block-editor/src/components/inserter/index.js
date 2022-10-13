@@ -20,6 +20,7 @@ import { plus } from '@wordpress/icons';
  */
 import InserterMenu from './menu';
 import QuickInserter from './quick-inserter';
+import ModalInserter from './modal-inserter';
 import { store as blockEditorStore } from '../../store';
 
 const defaultRenderToggle = ( {
@@ -142,12 +143,27 @@ class Inserter extends Component {
 			// This prop is experimental to give some time for the quick inserter to mature
 			// Feel free to make them stable after a few releases.
 			__experimentalIsQuick: isQuick,
+			__experimentalIsModal: isModal,
 			prioritizePatterns,
 		} = this.props;
 
 		if ( isQuick ) {
 			return (
 				<QuickInserter
+					onSelect={ () => {
+						onClose();
+					} }
+					rootClientId={ rootClientId }
+					clientId={ clientId }
+					isAppender={ isAppender }
+					prioritizePatterns={ prioritizePatterns }
+				/>
+			);
+		}
+
+		if ( isModal ) {
+			return (
+				<ModalInserter
 					onSelect={ () => {
 						onClose();
 					} }
@@ -173,6 +189,21 @@ class Inserter extends Component {
 		);
 	}
 
+	renderModal() {
+		const { rootClientId, clientId, isAppender, prioritizePatterns } =
+			this.props;
+
+		return (
+			<ModalInserter
+				onSelect={ () => null }
+				rootClientId={ rootClientId }
+				clientId={ clientId }
+				isAppender={ isAppender }
+				prioritizePatterns={ prioritizePatterns }
+			/>
+		);
+	}
+
 	render() {
 		const {
 			position,
@@ -180,8 +211,13 @@ class Inserter extends Component {
 			directInsertBlock,
 			insertOnlyAllowedBlock,
 			__experimentalIsQuick: isQuick,
+			__experimentalIsModal: isModal,
 			onSelectOrClose,
 		} = this.props;
+
+		if ( isModal ) {
+			return this.renderModal();
+		}
 
 		if ( hasSingleBlockType || directInsertBlock ) {
 			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );

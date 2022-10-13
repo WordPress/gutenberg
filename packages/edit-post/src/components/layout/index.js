@@ -49,6 +49,7 @@ import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
 import StartPageOptions from '../start-page-options';
 import { store as editPostStore } from '../../store';
+import { ModalInserter } from './modal-inserter';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -174,8 +175,11 @@ function Layout( { styles } ) {
 		: __( 'Block Library' );
 
 	const secondarySidebar = () => {
-		if ( mode === 'visual' && isInserterOpened ) {
+		if ( mode === 'visual' && ! isDistractionFree && isInserterOpened ) {
 			return <InserterSidebar />;
+		}
+		if ( mode === 'visual' && isDistractionFree && isInserterOpened ) {
+			return <ModalInserter />;
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
 			return <ListViewSidebar />;
