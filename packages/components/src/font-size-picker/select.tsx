@@ -40,7 +40,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 			const [ parsedValue ] = splitValueAndUnitFromSize( fontSize.size );
 			return {
 				key: fontSize.slug,
-				name: fontSize.name ?? fontSize.slug,
+				name: fontSize.name || fontSize.slug,
 				value: fontSize.size,
 				__experimentalHint: parsedValue,
 			};
