@@ -28,12 +28,12 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 	const options: FontSizePickerSelectOption[] = [
 		defaultOption,
 		...fontSizes.map( ( fontSize ) => {
-			const [ number ] = splitValueAndUnitFromSize( fontSize.size );
+			const [ parsedValue ] = splitValueAndUnitFromSize( fontSize.size );
 			return {
 				key: fontSize.slug,
 				name: fontSize.name ?? fontSize.slug,
 				value: fontSize.size,
-				__experimentalHint: number,
+				__experimentalHint: parsedValue,
 			};
 		} ),
 		customOption,
