@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+## 5.17.0 (2022-10-05)
+
+## 5.16.0 (2022-09-21)
+
+### New Features
+
+-   Compose: Introduce an in-house `debounce()` utility, deprecate Lodash version ([#43943](https://github.com/WordPress/gutenberg/pull/43943)).
+-   Compose: Introduce in-house `compose` and `pipe` utils ([#44112](https://github.com/WordPress/gutenberg/pull/44112)).
+
+### Internal
+
+-   `useInstanceId`: refactor to TypeScript ([#43790](https://github.com/WordPress/gutenberg/pull/43790)).
+
+## 5.15.0 (2022-09-13)
+
+### Internal
+
+-   `useDialog`: refactor to TypeScript ([#43823](https://github.com/WordPress/gutenberg/pull/43823)).
+
+## 5.14.0 (2022-08-24)
+
+## 5.13.0 (2022-08-10)
+
 ## 5.12.0 (2022-07-27)
 
 ## 5.11.0 (2022-07-13)

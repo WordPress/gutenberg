@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -10,18 +10,29 @@ import { MenuGroup } from '../';
 
 describe( 'MenuGroup', () => {
 	test( 'should render null when no children provided', () => {
-		const wrapper = shallow( <MenuGroup /> );
+		render( <MenuGroup /> );
 
-		expect( wrapper.html() ).toBe( null );
+		expect( screen.queryByRole( 'group' ) ).not.toBeInTheDocument();
 	} );
 
-	test( 'should match snapshot', () => {
-		const wrapper = shallow(
-			<MenuGroup label="My group" instanceId="1">
+	test( 'should render children', () => {
+		render(
+			<MenuGroup>
 				<p>My item</p>
 			</MenuGroup>
 		);
 
-		expect( wrapper ).toMatchSnapshot();
+		expect( screen.queryByRole( 'group' ) ).toBeVisible();
+		expect( screen.queryByText( 'My item' ) ).toBeVisible();
+	} );
+
+	test( 'should render with an accessible label', () => {
+		render( <MenuGroup label="My group">Example</MenuGroup> );
+
+		expect(
+			screen.queryByRole( 'group', {
+				name: 'My group',
+			} )
+		).toBeVisible();
 	} );
 } );

@@ -161,6 +161,7 @@ export const SETTINGS_DEFAULTS = {
 	__experimentalBlockPatterns: [],
 	__experimentalBlockPatternCategories: [],
 	__unstableGalleryWithImageBlocks: false,
+	__unstableIsPreviewMode: false,
 
 	generateAnchors: false,
 	// gradients setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.

@@ -115,7 +115,7 @@ export default function ReusableBlockConvertButton( {
 							setIsModalOpen( true );
 						} }
 					>
-						{ __( 'Add to Reusable blocks' ) }
+						{ __( 'Create Reusable block' ) }
 					</MenuItem>
 					{ isModalOpen && (
 						<Modal

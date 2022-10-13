@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { deburr, find, words } from 'lodash';
+import removeAccents from 'remove-accents';
+import { find, words } from 'lodash';
 
 // Default search helpers.
 const defaultGetName = ( item ) => item.name || '';
@@ -21,7 +22,7 @@ const defaultGetCollection = () => null;
 function normalizeSearchInput( input = '' ) {
 	// Disregard diacritics.
 	//  Input: "média"
-	input = deburr( input );
+	input = removeAccents( input );
 
 	// Accommodate leading slash, matching autocomplete expectations.
 	//  Input: "/media"
@@ -42,7 +43,6 @@ function normalizeSearchInput( input = '' ) {
  * @return {string[]} The normalized list of search terms.
  */
 export const getNormalizedSearchTerms = ( input = '' ) => {
-	// Extract words.
 	return words( normalizeSearchInput( input ) );
 };
 

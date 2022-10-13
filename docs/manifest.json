@@ -156,6 +156,12 @@
 		"parent": "block-tutorial"
 	},
 	{
+		"title": "Extending the Query Loop block",
+		"slug": "extending-the-query-loop-block",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/extending-the-query-loop-block.md",
+		"parent": "block-tutorial"
+	},
+	{
 		"title": "Development Platform",
 		"slug": "platform",
 		"markdown_source": "../docs/how-to-guides/platform/README.md",
@@ -303,6 +309,12 @@
 		"title": "Plugin Sidebar",
 		"slug": "plugin-sidebar-0",
 		"markdown_source": "../docs/how-to-guides/plugin-sidebar-0.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Propagating updates for block types",
+		"slug": "propagating-updates",
+		"markdown_source": "../docs/how-to-guides/propagating-updates.md",
 		"parent": "how-to-guides"
 	},
 	{
@@ -495,6 +507,12 @@
 		"title": "Autocomplete",
 		"slug": "autocomplete-filters",
 		"markdown_source": "../docs/reference-guides/filters/autocomplete-filters.md",
+		"parent": "filters"
+	},
+	{
+		"title": "Global Styles Filters",
+		"slug": "global-styles-filters",
+		"markdown_source": "../docs/reference-guides/filters/global-styles-filters.md",
 		"parent": "filters"
 	},
 	{
@@ -1212,6 +1230,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Theme",
+		"slug": "theme",
+		"markdown_source": "../packages/components/src/theme/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ToggleControl",
 		"slug": "toggle-control",
 		"markdown_source": "../packages/components/src/toggle-control/README.md",
@@ -1470,6 +1494,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "External Project Templates",
+		"slug": "packages-create-block-external-template",
+		"markdown_source": "../packages/create-block/docs/external-template.md",
+		"parent": "packages-create-block"
+	},
+	{
 		"title": "@wordpress/custom-templated-path-webpack-plugin",
 		"slug": "packages-custom-templated-path-webpack-plugin",
 		"markdown_source": "../packages/custom-templated-path-webpack-plugin/README.md",
@@ -1587,6 +1617,12 @@
 		"title": "@wordpress/eslint-plugin",
 		"slug": "packages-eslint-plugin",
 		"markdown_source": "../packages/eslint-plugin/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/experiments",
+		"slug": "packages-experiments",
+		"markdown_source": "../packages/experiments/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1810,6 +1846,12 @@
 		"slug": "packages-style-engine",
 		"markdown_source": "../packages/style-engine/README.md",
 		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/style-engine Using the Style Engine to generate block supports styles",
+		"slug": "using-the-style-engine-with-block-supports",
+		"markdown_source": "../packages/style-engine/docs/using-the-style-engine-with-block-supports.md",
+		"parent": "packages-style-engine"
 	},
 	{
 		"title": "@wordpress/stylelint-config",

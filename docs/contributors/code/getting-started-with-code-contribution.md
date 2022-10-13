@@ -71,7 +71,7 @@ To stop the running environment:
 npm run wp-env stop
 ```
 
-If everyting went well, you should see the following message in your terminal:
+If everything went well, you should see the following message in your terminal:
 
 ```bash
 WordPress development site started at http://localhost:8888/
@@ -144,7 +144,7 @@ ln -s gutenberg/packages/e2e-tests/plugins/* .
 You'll need to run this again if new plugins are added. To run e2e tests:
 
 ```bash
-WP_BASE_URL=http://localhost:8888/gutenberg/ npm run test-e2e
+WP_BASE_URL=http://localhost:8888/gutenberg/ npm run test:e2e
 ```
 
 #### Caching of PHP files

@@ -70,5 +70,16 @@ function gutenberg_initialize_editor( $editor_name, $editor_script_handle, $sett
 		'wp-blocks',
 		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( get_block_editor_server_block_settings() ) . ');'
 	);
-
 }
+
+/**
+ * Sets a global JS variable used to trigger the availability of zoomed out view.
+ */
+function gutenberg_enable_zoomed_out_view() {
+	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-zoomed-out-view', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableZoomedOutView = true', 'before' );
+	}
+}
+
+add_action( 'admin_init', 'gutenberg_enable_zoomed_out_view' );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { text } from '@storybook/addon-knobs';
+import { text, boolean } from '@storybook/addon-knobs';
 
 /**
  * Internal dependencies
@@ -25,6 +25,10 @@ export const _default = () => {
 	const label = text( 'Label', 'Select a direction.' );
 	const firstMenuItemLabel = text( 'First Menu Item Label', 'Up' );
 	const secondMenuItemLabel = text( 'First Menu Item Label', 'Down' );
+	const toggleButtonTootip = boolean(
+		'Show tooltip on a toggle button',
+		true
+	);
 
 	const controls = [
 		{
@@ -37,5 +41,12 @@ export const _default = () => {
 		},
 	];
 
-	return <DropdownMenu icon={ menu } label={ label } controls={ controls } />;
+	return (
+		<DropdownMenu
+			icon={ menu }
+			label={ label }
+			controls={ controls }
+			toggleProps={ { showTooltip: toggleButtonTootip } }
+		/>
+	);
 };

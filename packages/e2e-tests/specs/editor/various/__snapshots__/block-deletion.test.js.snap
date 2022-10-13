@@ -24,7 +24,9 @@ exports[`block deletion - deleting the third and fourth blocks using backspace w
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul><li>caret was here</li></ul>
+<ul><!-- wp:list-item -->
+<li>caret was here</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->"
 `;
 

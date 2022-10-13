@@ -134,11 +134,11 @@ test.describe( 'Copy/cut/paste', () => {
 	} ) => {
 		// Add group block with paragraph.
 		await editor.insertBlock( {
-			name: 'core/group',
+			name: 'core/buttons',
 			innerBlocks: [
 				{
-					name: 'core/paragraph',
-					attributes: { content: 'P' },
+					name: 'core/button',
+					attributes: { text: 'Click' },
 				},
 			],
 		} );
@@ -188,11 +188,11 @@ test.describe( 'Copy/cut/paste', () => {
 	} ) => {
 		// Add group block with paragraph.
 		await editor.insertBlock( {
-			name: 'core/group',
+			name: 'core/buttons',
 			innerBlocks: [
 				{
-					name: 'core/paragraph',
-					attributes: { content: 'P' },
+					name: 'core/button',
+					attributes: { text: 'Click' },
 				},
 			],
 		} );
@@ -415,5 +415,22 @@ test.describe( 'Copy/cut/paste', () => {
 		expect(
 			await page.evaluate( () => document.activeElement.innerHTML )
 		).toMatchSnapshot();
+	} );
+
+	test( 'should paste single line in post title with existing content', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pageUtils.setClipboardData( {
+			html: '<span style="border: 1px solid black">x</span>',
+		} );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( 'y' );
+		expect(
+			await page.evaluate( () => document.activeElement.innerHTML )
+		).toBe( 'axyb' );
 	} );
 } );

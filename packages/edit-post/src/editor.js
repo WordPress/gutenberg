@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { forEach, map, without } from 'lodash';
+import { map, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,7 +38,7 @@ function Editor( {
 	const {
 		hasFixedToolbar,
 		focusMode,
-		hasReducedUI,
+		isDistractionFree,
 		hasInlineToolbar,
 		hasThemeStyles,
 		post,
@@ -85,7 +85,7 @@ function Editor( {
 					isFeatureActive( 'fixedToolbar' ) ||
 					__experimentalGetPreviewDeviceType() !== 'Desktop',
 				focusMode: isFeatureActive( 'focusMode' ),
-				hasReducedUI: isFeatureActive( 'reducedUI' ),
+				isDistractionFree: isFeatureActive( 'distractionFree' ),
 				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
 				hasThemeStyles: isFeatureActive( 'themeStyles' ),
 				preferredStyleVariations: select( preferencesStore ).get(
@@ -118,7 +118,7 @@ function Editor( {
 			},
 			hasFixedToolbar,
 			focusMode,
-			hasReducedUI,
+			isDistractionFree,
 			hasInlineToolbar,
 
 			// This is marked as experimental to give time for the quick inserter to mature.
@@ -150,7 +150,7 @@ function Editor( {
 		settings,
 		hasFixedToolbar,
 		focusMode,
-		hasReducedUI,
+		isDistractionFree,
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,
@@ -162,7 +162,7 @@ function Editor( {
 	const styles = useMemo( () => {
 		const themeStyles = [];
 		const presetStyles = [];
-		forEach( settings.styles, ( style ) => {
+		settings.styles?.forEach( ( style ) => {
 			if ( ! style.__unstableType || style.__unstableType === 'theme' ) {
 				themeStyles.push( style );
 			} else {

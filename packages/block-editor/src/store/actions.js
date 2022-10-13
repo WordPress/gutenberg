@@ -26,6 +26,8 @@ import {
 	START_OF_SELECTED_AREA,
 } from '../utils/selection';
 
+/** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
+
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
@@ -624,10 +626,13 @@ export const insertBlocks =
 /**
  * Action that shows the insertion point.
  *
- * @param {?string} rootClientId      Optional root client ID of block list on
- *                                    which to insert.
- * @param {?number} index             Index at which block should be inserted.
- * @param {Object}  __unstableOptions Whether or not to show an inserter button.
+ * @param    {?string}         rootClientId           Optional root client ID of block list on
+ *                                                    which to insert.
+ * @param    {?number}         index                  Index at which block should be inserted.
+ * @param    {?Object}         __unstableOptions      Additional options.
+ * @property {boolean}         __unstableWithInserter Whether or not to show an inserter button.
+ * @property {WPDropOperation} operation              The operation to perform when applied,
+ *                                                    either 'insert' or 'replace' for now.
  *
  * @return {Object} Action object.
  */
@@ -636,25 +641,28 @@ export function showInsertionPoint(
 	index,
 	__unstableOptions = {}
 ) {
-	const { __unstableWithInserter } = __unstableOptions;
+	const { __unstableWithInserter, operation } = __unstableOptions;
 	return {
 		type: 'SHOW_INSERTION_POINT',
 		rootClientId,
 		index,
 		__unstableWithInserter,
+		operation,
 	};
 }
-
 /**
  * Action that hides the insertion point.
- *
- * @return {Object} Action object.
  */
-export function hideInsertionPoint() {
-	return {
-		type: 'HIDE_INSERTION_POINT',
+export const hideInsertionPoint =
+	() =>
+	( { select, dispatch } ) => {
+		if ( ! select.isBlockInsertionPointVisible() ) {
+			return;
+		}
+		dispatch( {
+			type: 'HIDE_INSERTION_POINT',
+		} );
 	};
-}
 
 /**
  * Action that resets the template validity.
@@ -1002,7 +1010,7 @@ export const __unstableExpandSelection =
  */
 export const mergeBlocks =
 	( firstBlockClientId, secondBlockClientId ) =>
-	( { select, dispatch } ) => {
+	( { registry, select, dispatch } ) => {
 		const blocks = [ firstBlockClientId, secondBlockClientId ];
 		dispatch( { type: 'MERGE_BLOCKS', blocks } );
 
@@ -1010,13 +1018,41 @@ export const mergeBlocks =
 		const blockA = select.getBlock( clientIdA );
 		const blockAType = getBlockType( blockA.name );
 
-		// Only focus the previous block if it's not mergeable.
+		if ( ! blockAType ) return;
+
+		const blockB = select.getBlock( clientIdB );
+
 		if ( blockAType && ! blockAType.merge ) {
-			dispatch.selectBlock( blockA.clientId );
+			// If there's no merge function defined, attempt merging inner
+			// blocks.
+			const blocksWithTheSameType = switchToBlockType(
+				blockB,
+				blockAType.name
+			);
+			// Only focus the previous block if it's not mergeable.
+			if ( blocksWithTheSameType?.length !== 1 ) {
+				dispatch.selectBlock( blockA.clientId );
+				return;
+			}
+			const [ blockWithSameType ] = blocksWithTheSameType;
+			if ( blockWithSameType.innerBlocks.length < 1 ) {
+				dispatch.selectBlock( blockA.clientId );
+				return;
+			}
+			registry.batch( () => {
+				dispatch.insertBlocks(
+					blockWithSameType.innerBlocks,
+					undefined,
+					clientIdA
+				);
+				dispatch.removeBlock( clientIdB );
+				dispatch.selectBlock(
+					blockWithSameType.innerBlocks[ 0 ].clientId
+				);
+			} );
 			return;
 		}
 
-		const blockB = select.getBlock( clientIdB );
 		const blockBType = getBlockType( blockB.name );
 		const { clientId, attributeKey, offset } = select.getSelectionStart();
 		const selectedBlockType =
@@ -1446,25 +1482,52 @@ export const __unstableMarkAutomaticChange =
 /**
  * Action that enables or disables the navigation mode.
  *
- * @param {string} isNavigationMode Enable/Disable navigation mode.
+ * @param {boolean} isNavigationMode Enable/Disable navigation mode.
  */
 export const setNavigationMode =
 	( isNavigationMode = true ) =>
 	( { dispatch } ) => {
-		dispatch( { type: 'SET_NAVIGATION_MODE', isNavigationMode } );
+		dispatch.__unstableSetEditorMode(
+			isNavigationMode ? 'navigation' : 'edit'
+		);
+	};
 
-		if ( isNavigationMode ) {
+/**
+ * Action that sets the editor mode
+ *
+ * @param {string} mode Editor mode
+ */
+export const __unstableSetEditorMode =
+	( mode ) =>
+	( { dispatch, select } ) => {
+		// When switching to zoom-out mode, we need to select the root block
+		if ( mode === 'zoom-out' ) {
+			const firstSelectedClientId = select.getBlockSelectionStart();
+			if ( firstSelectedClientId ) {
+				dispatch.selectBlock(
+					select.getBlockHierarchyRootClientId(
+						firstSelectedClientId
+					)
+				);
+			}
+		}
+
+		dispatch( { type: 'SET_EDITOR_MODE', mode } );
+
+		if ( mode === 'navigation' ) {
 			speak(
 				__(
 					'You are currently in navigation mode. Navigate blocks using the Tab key and Arrow keys. Use Left and Right Arrow keys to move between nesting levels. To exit navigation mode and edit the selected block, press Enter.'
 				)
 			);
-		} else {
+		} else if ( mode === 'edit' ) {
 			speak(
 				__(
 					'You are currently in edit mode. To return to the navigation mode, press Escape.'
 				)
 			);
+		} else if ( mode === 'zoom-out' ) {
+			speak( __( 'You are currently in zoom-out mode.' ) );
 		}
 	};
 
@@ -1643,5 +1706,19 @@ export function setBlockVisibility( updates ) {
 	return {
 		type: 'SET_BLOCK_VISIBILITY',
 		updates,
+	};
+}
+
+/**
+ * Action that sets whether a block is being temporaritly edited as blocks.
+ *
+ * @param {?string} temporarilyEditingAsBlocks The block's clientId being temporaritly edited as blocks.
+ */
+export function __unstableSetTemporarilyEditingAsBlocks(
+	temporarilyEditingAsBlocks
+) {
+	return {
+		type: 'SET_TEMPORARILY_EDITING_AS_BLOCKS',
+		temporarilyEditingAsBlocks,
 	};
 }

@@ -146,6 +146,7 @@ export { Text as __experimentalText } from './text';
 export { default as TextControl } from './text-control';
 export { default as TextareaControl } from './textarea-control';
 export { default as TextHighlight } from './text-highlight';
+export { default as __experimentalTheme } from './theme';
 export { default as Tip } from './tip';
 export { default as ToggleControl } from './toggle-control';
 export {
@@ -188,6 +189,7 @@ export {
 	Fill,
 	Provider as SlotFillProvider,
 	useSlot as __experimentalUseSlot,
+	useSlotFills as __experimentalUseSlotFills,
 } from './slot-fill';
 export { default as __experimentalStyleProvider } from './style-provider';
 export { ZStack as __experimentalZStack } from './z-stack';

@@ -92,6 +92,12 @@ export function Button( props, ref ) {
 		'components-button__description'
 	);
 
+	const hasChildren =
+		children?.[ 0 ] &&
+		children[ 0 ] !== null &&
+		// Tooltip should not considered as a child
+		children?.[ 0 ]?.props?.className !== 'components-tooltip';
+
 	const classes = classnames( 'components-button', className, {
 		'is-secondary': variant === 'secondary',
 		'is-primary': variant === 'primary',
@@ -101,7 +107,7 @@ export function Button( props, ref ) {
 		'is-busy': isBusy,
 		'is-link': variant === 'link',
 		'is-destructive': isDestructive,
-		'has-text': !! icon && !! children,
+		'has-text': !! icon && hasChildren,
 		'has-icon': !! icon,
 	} );
 

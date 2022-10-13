@@ -6,6 +6,7 @@ import {
 	serialize,
 	pasteHandler,
 	store as blocksStore,
+	createBlock,
 } from '@wordpress/blocks';
 import {
 	documentHasSelection,
@@ -155,6 +156,23 @@ export function useClipboardHandler() {
 						);
 						blocks = [ head, ...inBetweenBlocks, tail ];
 					}
+
+					const wrapperBlockName = event.clipboardData.getData(
+						'__unstableWrapperBlockName'
+					);
+
+					if ( wrapperBlockName ) {
+						blocks = createBlock(
+							wrapperBlockName,
+							JSON.parse(
+								event.clipboardData.getData(
+									'__unstableWrapperBlockAttributes'
+								)
+							),
+							blocks
+						);
+					}
+
 					const serialized = serialize( blocks );
 
 					event.clipboardData.setData(

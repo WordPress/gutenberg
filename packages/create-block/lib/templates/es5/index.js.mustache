@@ -95,6 +95,7 @@
 				__( '{{title}} – hello from the editor!', '{{textdomain}}' )
 			);
 		},
+		{{#isStaticVariant}}
 
 		/**
 		 * The save function defines the way in which the different attributes should be combined
@@ -108,9 +109,10 @@
 			return el(
 				'p',
 				useBlockProps.save(),
-				__( '{{title}} – hello from the saved content!', '{{textdomain}}' )
+				'{{title}} – hello from the saved content!',
 			);
 		},
+		{{/isStaticVariant}}
 	} );
 }(
 	window.wp

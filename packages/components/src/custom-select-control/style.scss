@@ -7,18 +7,6 @@
 	position: relative;
 	text-align: left;
 	outline: 0; // focus ring is handled elsewhere
-
-	&:not(.is-next-unconstrained-width) {
-		min-width: 130px;
-	}
-
-	.components-custom-select-control__button-icon {
-		height: 100%;
-		padding: 0;
-		position: absolute;
-		right: $grid-unit-05;
-		top: 0;
-	}
 }
 
 .components-custom-select-control__menu {

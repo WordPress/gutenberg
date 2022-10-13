@@ -474,6 +474,24 @@ _Returns_
 
 -   `RichTextFormatType|undefined`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
 
+### useAnchor
+
+This hook, to be used in a format type's Edit component, returns the active
+element that is formatted, or a virtual element for the selection range if
+no format is active. The returned value is meant to be used for positioning
+UI, e.g. by passing it to the `Popover` component via the `anchor` prop.
+
+_Parameters_
+
+-   _$1_ `Object`: Named parameters.
+-   _$1.editableContentElement_ `HTMLElement|null`: The element containing the editable content.
+-   _$1.value_ `RichTextValue`: Value to check for selection.
+-   _$1.settings_ `RichTextFormatType`: The format type's settings.
+
+_Returns_
+
+-   `Element|VirtualAnchorElement|undefined|null`: The active element or selection range.
+
 ### useAnchorRef
 
 This hook, to be used in a format type's Edit component, returns the active

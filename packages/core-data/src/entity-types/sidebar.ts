@@ -4,7 +4,6 @@
 import type { Context, OmitNevers } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
-import type { DefaultContextOf } from './index';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
@@ -55,6 +54,6 @@ declare module './base-entity-records' {
 
 type SidebarStatus = 'active' | 'inactive';
 
-export type Sidebar<
-	C extends Context = DefaultContextOf< 'root', 'sidebar' >
-> = OmitNevers< _BaseEntityRecords.Sidebar< C > >;
+export type Sidebar< C extends Context = 'edit' > = OmitNevers<
+	_BaseEntityRecords.Sidebar< C >
+>;

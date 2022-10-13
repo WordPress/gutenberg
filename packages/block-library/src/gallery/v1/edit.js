@@ -1,17 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	every,
-	filter,
-	find,
-	forEach,
-	get,
-	isEmpty,
-	map,
-	reduce,
-	some,
-} from 'lodash';
+import { filter, find, get, isEmpty, map, reduce, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -343,10 +333,10 @@ function GalleryEdit( props ) {
 			Platform.OS === 'web' &&
 			images &&
 			images.length > 0 &&
-			every( images, ( { url } ) => isBlobURL( url ) )
+			images.every( ( { url } ) => isBlobURL( url ) )
 		) {
 			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
-			forEach( images, ( { url } ) => revokeBlobURL( url ) );
+			images.forEach( ( { url } ) => revokeBlobURL( url ) );
 			mediaUpload( {
 				filesList,
 				onFileChange: onSelectImages,

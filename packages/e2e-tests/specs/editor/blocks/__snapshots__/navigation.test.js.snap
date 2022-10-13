@@ -2,7 +2,7 @@
 
 exports[`Navigation Creating and restarting converts uncontrolled inner blocks to an entity when modifications are made to the blocks 1`] = `"<!-- wp:navigation-link {\\"label\\":\\"A Test Page\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\"} /-->"`;
 
-exports[`Navigation Placeholder placeholder actions allows a navigation block to be created from existing menus 1`] = `
+exports[`Navigation Placeholder menu selector actions allows a navigation block to be created from existing menus 1`] = `
 "<!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"type\\":\\"custom\\",\\"url\\":\\"http://localhost:8889/\\",\\"kind\\":\\"custom\\"} /-->
 
 <!-- wp:navigation-submenu {\\"label\\":\\"About\\",\\"type\\":\\"page\\",\\"id\\":[number],\\"url\\":\\"http://localhost:8889/?page_id=[number]\\",\\"kind\\":\\"post-type\\"} -->
@@ -30,7 +30,7 @@ exports[`Navigation Placeholder placeholder actions allows a navigation block to
 <!-- /wp:navigation-submenu -->"
 `;
 
-exports[`Navigation Placeholder placeholder actions creates an empty navigation block when the selected existing menu is also empty 1`] = `""`;
+exports[`Navigation Placeholder menu selector actions creates an empty navigation block when the selected existing menu is also empty 1`] = `""`;
 
 exports[`Navigation allows an empty navigation block to be created and manually populated using a mixture of internal and external links 1`] = `
 "<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"url\\":\\"https://wordpress.org\\",\\"kind\\":\\"custom\\",\\"isTopLevelLink\\":true} /-->

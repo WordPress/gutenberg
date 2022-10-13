@@ -18,24 +18,15 @@ const meta: ComponentMeta< typeof UnitControl > = {
 	component: UnitControl,
 	title: 'Components (Experimental)/UnitControl',
 	argTypes: {
-		__unstableInputWidth: {
-			control: { type: 'text' },
-		},
-		__unstableStateReducer: {
-			control: { type: null },
-		},
-		onChange: {
-			action: 'onChange',
-			control: { type: null },
-		},
-		onUnitChange: {
-			control: { type: null },
-		},
-		value: {
-			control: { type: null },
-		},
+		__unstableInputWidth: { control: { type: 'text' } },
+		__unstableStateReducer: { control: { type: null } },
+		onChange: { control: { type: null } },
+		onUnitChange: { control: { type: null } },
+		prefix: { control: { type: 'text' } },
+		value: { control: { type: null } },
 	},
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},

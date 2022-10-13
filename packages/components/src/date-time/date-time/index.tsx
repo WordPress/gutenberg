@@ -17,7 +17,7 @@ import Button from '../../button';
 import { default as DatePicker } from '../date';
 import { default as TimePicker } from '../time';
 import type { DateTimePickerProps } from '../types';
-import { CalendarHelp } from './styles';
+import { Wrapper, CalendarHelp } from './styles';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { Spacer } from '../../spacer';
@@ -63,7 +63,7 @@ function UnforwardedDateTimePicker(
 	}
 
 	return (
-		<div ref={ ref } className="components-datetime">
+		<Wrapper ref={ ref } className="components-datetime" spacing={ 4 }>
 			{ ! calendarHelpIsVisible && (
 				<>
 					<TimePicker
@@ -186,7 +186,7 @@ function UnforwardedDateTimePicker(
 					) }
 				</HStack>
 			) }
-		</div>
+		</Wrapper>
 	);
 }
 

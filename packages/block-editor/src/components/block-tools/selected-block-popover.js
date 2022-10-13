@@ -20,10 +20,11 @@ import BlockSelectionButton from './block-selection-button';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import { store as blockEditorStore } from '../../store';
 import BlockPopover from '../block-popover';
+import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 
 function selector( select ) {
 	const {
-		isNavigationMode,
+		__unstableGetEditorMode,
 		isMultiSelecting,
 		hasMultiSelection,
 		isTyping,
@@ -31,10 +32,11 @@ function selector( select ) {
 		getLastMultiSelectedBlockClientId,
 	} = select( blockEditorStore );
 	return {
-		isNavigationMode: isNavigationMode(),
+		editorMode: __unstableGetEditorMode(),
 		isMultiSelecting: isMultiSelecting(),
 		isTyping: isTyping(),
 		hasFixedToolbar: getSettings().hasFixedToolbar,
+		isDistractionFree: getSettings().isDistractionFree,
 		lastClientId: hasMultiSelection()
 			? getLastMultiSelectedBlockClientId()
 			: null,
@@ -45,15 +47,17 @@ function SelectedBlockPopover( {
 	clientId,
 	rootClientId,
 	isEmptyDefaultBlock,
+	showContents, // we may need to mount an empty popover because we reuse
 	capturingClientId,
 	__unstablePopoverSlot,
 	__unstableContentRef,
 } ) {
 	const {
-		isNavigationMode,
+		editorMode,
 		isMultiSelecting,
 		isTyping,
 		hasFixedToolbar,
+		isDistractionFree,
 		lastClientId,
 	} = useSelect( selector, [] );
 	const isInsertionPointVisible = useSelect(
@@ -79,19 +83,21 @@ function SelectedBlockPopover( {
 	const { stopTyping } = useDispatch( blockEditorStore );
 
 	const showEmptyBlockSideInserter =
-		! isTyping && ! isNavigationMode && isEmptyDefaultBlock;
-	const shouldShowBreadcrumb = isNavigationMode;
+		! isTyping && editorMode === 'edit' && isEmptyDefaultBlock;
+	const shouldShowBreadcrumb =
+		editorMode === 'navigation' || editorMode === 'zoom-out';
 	const shouldShowContextualToolbar =
-		! isNavigationMode &&
+		editorMode === 'edit' &&
 		! hasFixedToolbar &&
 		isLargeViewport &&
 		! isMultiSelecting &&
 		! showEmptyBlockSideInserter &&
 		! isTyping;
 	const canFocusHiddenToolbar =
-		! isNavigationMode &&
+		editorMode === 'edit' &&
 		! shouldShowContextualToolbar &&
 		! hasFixedToolbar &&
+		! isDistractionFree &&
 		! isEmptyDefaultBlock;
 
 	useShortcut(
@@ -113,6 +119,11 @@ function SelectedBlockPopover( {
 	// to it when re-mounting.
 	const initialToolbarItemIndexRef = useRef();
 
+	const popoverProps = useBlockToolbarPopoverProps( {
+		contentElement: __unstableContentRef?.current,
+		clientId,
+	} );
+
 	if ( ! shouldShowBreadcrumb && ! shouldShowContextualToolbar ) {
 		return null;
 	}
@@ -126,8 +137,10 @@ function SelectedBlockPopover( {
 			} ) }
 			__unstablePopoverSlot={ __unstablePopoverSlot }
 			__unstableContentRef={ __unstableContentRef }
+			resize={ false }
+			{ ...popoverProps }
 		>
-			{ shouldShowContextualToolbar && (
+			{ shouldShowContextualToolbar && showContents && (
 				<BlockContextualToolbar
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
@@ -160,6 +173,8 @@ function wrapperSelector( select ) {
 		getBlockRootClientId,
 		getBlock,
 		getBlockParents,
+		getSettings,
+		isNavigationMode: _isNavigationMode,
 		__experimentalGetBlockListSettingsForBlocks,
 	} = select( blockEditorStore );
 
@@ -186,10 +201,14 @@ function wrapperSelector( select ) {
 				?.__experimentalCaptureToolbars
 	);
 
+	const settings = getSettings();
+
 	return {
 		clientId,
 		rootClientId: getBlockRootClientId( clientId ),
 		name,
+		isDistractionFree: settings.isDistractionFree,
+		isNavigationMode: _isNavigationMode(),
 		isEmptyDefaultBlock:
 			name && isUnmodifiedDefaultBlock( { name, attributes } ),
 		capturingClientId,
@@ -212,6 +231,8 @@ export default function WrappedBlockPopover( {
 		name,
 		isEmptyDefaultBlock,
 		capturingClientId,
+		isDistractionFree,
+		isNavigationMode,
 	} = selected;
 
 	if ( ! name ) {
@@ -223,6 +244,7 @@ export default function WrappedBlockPopover( {
 			clientId={ clientId }
 			rootClientId={ rootClientId }
 			isEmptyDefaultBlock={ isEmptyDefaultBlock }
+			showContents={ ! isDistractionFree || isNavigationMode }
 			capturingClientId={ capturingClientId }
 			__unstablePopoverSlot={ __unstablePopoverSlot }
 			__unstableContentRef={ __unstableContentRef }

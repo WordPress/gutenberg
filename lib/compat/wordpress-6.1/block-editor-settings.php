@@ -154,7 +154,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 		unset( $settings['__experimentalFeatures']['spacing']['padding'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['spacing']['customSpacingSize'] ) ) {
-		$settings['disableCustomSpacingSize'] = ! $settings['__experimentalFeatures']['spacing']['customSpacingSize'];
+		$settings['disableCustomSpacingSizes'] = ! $settings['__experimentalFeatures']['spacing']['customSpacingSize'];
 		unset( $settings['__experimentalFeatures']['spacing']['customSpacingSize'] );
 	}
 

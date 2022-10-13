@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 /**
@@ -86,13 +85,21 @@ export const link = {
 					let startIndex = value.start;
 					let endIndex = value.end;
 
-					while ( find( value.formats[ startIndex ], startFormat ) ) {
+					while (
+						value.formats[ startIndex ]?.find(
+							( format ) => format?.type === startFormat.type
+						)
+					) {
 						startIndex--;
 					}
 
 					endIndex++;
 
-					while ( find( value.formats[ endIndex ], startFormat ) ) {
+					while (
+						value.formats[ endIndex ]?.find(
+							( format ) => format?.type === startFormat.type
+						)
+					) {
 						endIndex++;
 					}
 
