@@ -289,6 +289,26 @@ export const autosave =
 		}
 	};
 
+export const __unstableSaveForPreview =
+	( { forceIsAutosaveable, forcePreviewLink } ) =>
+	async ( { select, dispatch } ) => {
+		if (
+			( forceIsAutosaveable || select.isEditedPostAutosaveable() ) &&
+			! select.isPostLocked()
+		) {
+			const isDraft = [ 'draft', 'auto-draft' ].includes(
+				select.getEditedPostAttribute( 'status' )
+			);
+			if ( isDraft ) {
+				await dispatch.savePost( { isPreview: true } );
+			} else {
+				await dispatch.autosave( { isPreview: true } );
+			}
+		}
+
+		return forcePreviewLink ?? select.getEditedPostPreviewLink();
+	};
+
 /**
  * Action that restores last popped state in undo history.
  */
