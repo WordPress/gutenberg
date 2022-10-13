@@ -55,9 +55,9 @@ export const borderBoxControlVisualizer = (
 	return css`
 		position: absolute;
 		top: ${ __next40pxDefaultSize ? '20px' : '15px' };
-		right: ${ __next40pxDefaultSize ? '39px' : '30px' };
+		right: ${ __next40pxDefaultSize ? '39px' : '29px' };
 		bottom: ${ __next40pxDefaultSize ? '20px' : '15px' };
-		left: ${ __next40pxDefaultSize ? '39px' : '30px' };
+		left: ${ __next40pxDefaultSize ? '39px' : '29px' };
 		border-top: ${ BorderBoxStyleWithFallback( borders?.top ) };
 		border-bottom: ${ BorderBoxStyleWithFallback( borders?.bottom ) };
 		${ rtl( {
