@@ -47,6 +47,7 @@ export const Gallery = ( props ) => {
 					[ `align${ align }` ]: align,
 					[ `columns-${ columns }` ]: columns !== undefined,
 					[ `columns-default` ]: columns === undefined,
+					'has-caption': ! RichText.isEmpty( caption ),
 					'is-cropped': imageCrop,
 				}
 			) }

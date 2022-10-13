@@ -29,6 +29,7 @@ export default function saveWithInnerBlocks( { attributes } ) {
 	const className = classnames( 'has-nested-images', {
 		[ `columns-${ columns }` ]: columns !== undefined,
 		[ `columns-default` ]: columns === undefined,
+		'has-caption': ! RichText.isEmpty( caption ),
 		'is-cropped': imageCrop,
 	} );
 	const blockProps = useBlockProps.save( { className } );

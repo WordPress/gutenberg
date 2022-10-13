@@ -332,9 +332,9 @@ export function ImageEdit( {
 		'is-transient': temporaryURL,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
+		'has-caption': ! RichText.isEmpty( caption ),
 		'has-custom-border':
 			!! borderProps.className || ! isEmpty( borderProps.style ),
-		'has-caption': ! RichText.isEmpty( caption ),
 	} );
 
 	const blockProps = useBlockProps( {

@@ -38,9 +38,9 @@ export default function save( { attributes } ) {
 		[ `align${ align }` ]: align,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,
+		'has-caption': ! RichText.isEmpty( caption ),
 		'has-custom-border':
 			!! borderProps.className || ! isEmpty( borderProps.style ),
-		'has-caption': ! RichText.isEmpty( caption ),
 	} );
 
 	const imageClasses = classnames( borderProps.className, {
