@@ -244,6 +244,27 @@ describe( 'FontSizePicker', () => {
 					'XL'
 				);
 			} );
+			it( 'should use t-shirt labels if sizes have no names', () => {
+				const fontSizes = [];
+				for ( let i = 1; i <= 5; i++ ) {
+					fontSizes.push( {
+						slug: `size-${ i }`,
+						size: `${ i }em`,
+					} );
+				}
+				render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value={ fontSizes[ 0 ].size }
+						__nextHasNoMarginBottom
+					/>
+				);
+				for ( const label of [ 'S', 'M', 'L', 'XL', 'XXL' ] ) {
+					const element = screen.getByLabelText( label );
+					expect( element ).toBeInTheDocument();
+					expect( element.children[ 0 ].textContent ).toBe( label );
+				}
+			} );
 		} );
 	} );
 } );
