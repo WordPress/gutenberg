@@ -34,7 +34,6 @@ export function BorderRadiusEdit( props ) {
 		<BorderRadiusControl
 			values={ style?.border?.radius }
 			onChange={ onChange }
-			__next40pxDefaultSize={ true }
 		/>
 	);
 }
