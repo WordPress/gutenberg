@@ -129,8 +129,8 @@ export const colorIndicatorWrapper = (
 		 * over the active state of the border control dropdown's toggle button.
 		 */
 		& > span {
-			height: 16px;
-			width: 16px;
+			height: ${ space( 4 ) };
+			width: ${ space( 4 ) };
 			background: linear-gradient(
 				-45deg,
 				transparent 48%,
