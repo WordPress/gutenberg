@@ -19,25 +19,17 @@
 
 		.components-border-radius-control__range-control {
 			flex: 1;
-			margin-right: 12px;
+			margin-right: $grid-unit-15;
+
+			> div {
+				height: 40px;
+				display: flex;
+				align-items: center;
+			}
 		}
 
 		> span {
 			flex: 0 0 auto;
-		}
-
-		&.has-40px-default-size {
-			.components-border-radius-control__range-control {
-				> div {
-					height: 40px;
-					display: flex;
-					align-items: center;
-				}
-			}
-
-			.component-border-radius-control__linked-button {
-				margin-top: 8px;
-			}
 		}
 	}
 
@@ -51,7 +43,7 @@
 	.component-border-radius-control__linked-button {
 		display: flex;
 		justify-content: center;
-		margin-top: 3px;
+		margin-top: $grid-unit-10;
 
 		svg {
 			margin-right: 0;

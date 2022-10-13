@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -45,18 +40,13 @@ const MAX_BORDER_RADIUS_VALUES = {
 /**
  * Control to display border radius options.
  *
- * @param {Object}   props                       Component props.
- * @param {Function} props.onChange              Callback to handle onChange.
- * @param {Object}   props.values                Border radius values.
- * @param {boolean}  props.__next40pxDefaultSize Toggles default height to 40px.
+ * @param {Object}   props          Component props.
+ * @param {Function} props.onChange Callback to handle onChange.
+ * @param {Object}   props.values   Border radius values.
  *
  * @return {WPElement}              Custom border radius control.
  */
-export default function BorderRadiusControl( {
-	onChange,
-	values,
-	__next40pxDefaultSize = false,
-} ) {
+export default function BorderRadiusControl( { onChange, values } ) {
 	const [ isLinked, setIsLinked ] = useState(
 		! hasDefinedValues( values ) || ! hasMixedValues( values )
 	);
@@ -95,16 +85,12 @@ export default function BorderRadiusControl( {
 		onChange( next !== undefined ? `${ next }${ unit }` : undefined );
 	};
 
-	const classes = classnames( 'components-border-radius-control__wrapper', {
-		'has-40px-default-size': __next40pxDefaultSize,
-	} );
-
 	return (
 		<fieldset className="components-border-radius-control">
 			<BaseControl.VisualLabel as="legend">
 				{ __( 'Radius' ) }
 			</BaseControl.VisualLabel>
-			<div className={ classes }>
+			<div className="components-border-radius-control__wrapper">
 				{ isLinked ? (
 					<>
 						<AllInputControl
@@ -115,7 +101,6 @@ export default function BorderRadiusControl( {
 							selectedUnits={ selectedUnits }
 							setSelectedUnits={ setSelectedUnits }
 							units={ units }
-							__next40pxDefaultSize={ __next40pxDefaultSize }
 						/>
 						<RangeControl
 							label={ __( 'Border radius' ) }
@@ -139,7 +124,6 @@ export default function BorderRadiusControl( {
 						setSelectedUnits={ setSelectedUnits }
 						values={ values || DEFAULT_VALUES }
 						units={ units }
-						__next40pxDefaultSize={ __next40pxDefaultSize }
 					/>
 				) }
 				<LinkedButton onClick={ toggleLinked } isLinked={ isLinked } />
