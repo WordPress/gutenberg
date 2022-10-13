@@ -1,9 +1,8 @@
-// @ts-nocheck
-
 /**
  * External dependencies
  */
 import classnames from 'classnames';
+import type { ForwardedRef, KeyboardEvent, UIEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -33,11 +32,15 @@ import { close } from '@wordpress/icons';
 import * as ariaHelper from './aria-helper';
 import Button from '../button';
 import StyleProvider from '../style-provider';
+import type { ModalProps } from './types';
 
 // Used to count the number of open modals.
 let openModalCount = 0;
 
-function Modal( props, forwardedRef ) {
+function UnforwardedModal(
+	props: ModalProps,
+	forwardedRef: ForwardedRef< HTMLDivElement >
+) {
 	const {
 		bodyOpenClassName = 'modal-open',
 		role = 'dialog',
@@ -48,8 +51,8 @@ function Modal( props, forwardedRef ) {
 		isDismissible = true,
 		/* Accessibility. */
 		aria = {
-			labelledby: null,
-			describedby: null,
+			labelledby: undefined,
+			describedby: undefined,
 		},
 		onRequestClose,
 		icon,
@@ -64,7 +67,7 @@ function Modal( props, forwardedRef ) {
 		__experimentalHideHeader = false,
 	} = props;
 
-	const ref = useRef();
+	const ref = useRef< HTMLDivElement >();
 	const instanceId = useInstanceId( Modal );
 	const headingId = title
 		? `components-modal-header-${ instanceId }`
@@ -94,7 +97,7 @@ function Modal( props, forwardedRef ) {
 		};
 	}, [ bodyOpenClassName ] );
 
-	function handleEscapeKeyDown( event ) {
+	function handleEscapeKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
 		if (
 			shouldCloseOnEsc &&
 			event.code === 'Escape' &&
@@ -108,8 +111,8 @@ function Modal( props, forwardedRef ) {
 	}
 
 	const onContentContainerScroll = useCallback(
-		( e ) => {
-			const scrollY = e?.target?.scrollTop ?? -1;
+		( e: UIEvent< HTMLDivElement > ) => {
+			const scrollY = e?.currentTarget?.scrollTop ?? -1;
 
 			if ( ! hasScrolledContent && scrollY > 0 ) {
 				setHasScrolledContent( true );
@@ -147,9 +150,9 @@ function Modal( props, forwardedRef ) {
 					] ) }
 					role={ role }
 					aria-label={ contentLabel }
-					aria-labelledby={ contentLabel ? null : headingId }
+					aria-labelledby={ contentLabel ? undefined : headingId }
 					aria-describedby={ aria.describedby }
-					tabIndex="-1"
+					tabIndex={ -1 }
 					{ ...( shouldCloseOnClickOutside
 						? focusOutsideProps
 						: {} ) }
@@ -204,4 +207,37 @@ function Modal( props, forwardedRef ) {
 	);
 }
 
-export default forwardRef( Modal );
+/**
+ * Modals give users information and choices related to a task they’re trying to
+ * accomplish. They can contain critical information, require decisions, or
+ * involve multiple tasks.
+ *
+ * ```jsx
+ * import { Button, Modal } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyModal = () => {
+ *   const [ isOpen, setOpen ] = useState( false );
+ *   const openModal = () => setOpen( true );
+ *   const closeModal = () => setOpen( false );
+ *
+ *   return (
+ *     <>
+ *       <Button variant="secondary" onClick={ openModal }>
+ *         Open Modal
+ *       </Button>
+ *       { isOpen && (
+ *         <Modal title="This is my modal" onRequestClose={ closeModal }>
+ *           <Button variant="secondary" onClick={ closeModal }>
+ *             My custom close button
+ *           </Button>
+ *         </Modal>
+ *       ) }
+ *     </>
+ *   );
+ * };
+ * ```
+ */
+export const Modal = forwardRef( UnforwardedModal );
+
+export default Modal;
