@@ -231,13 +231,40 @@ class AztecView extends Component {
 		}
 	}
 
-	_onAztecFocus( event ) {
-		// IMPORTANT: the onFocus events from Aztec are thrown away on Android as these are handled by onPress() in the upper level.
-		// It's necessary to do this otherwise onFocus may be set by `{...otherProps}` and thus the onPress + onFocus
-		// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
-		// For iOS, this is necessary to let the system know when Aztec was focused programatically.
-		if ( Platform.OS === 'ios' ) {
-			this._onPress( event );
+	_onAztecFocus() {
+		// IMPORTANT: This function serves two purposes:
+		//
+		// Android: This intentional no-op function prevents focus loops originating
+		// when the native Aztec module programmatically focuses the instance. The
+		// no-op is explicitly passed as an `onFocus` prop to avoid future prop
+		// spreading from inadvertently introducing focus loops. The user-facing
+		// focus of the element is handled by `onPress` instead.
+		//
+		// See: https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
+		//
+		// iOS: Programmatic focus from the native Aztec module is required to
+		// ensure the React-based `TextStateInput` ref is properly set when focus
+		// is *returned* to an instance, e.g. dismissing a bottom sheet. If the ref
+		// is not updated, attempts to dismiss the keyboard via the `ToolbarButton`
+		// will fail.
+		//
+		// See: https://github.com/wordpress-mobile/gutenberg-mobile/issues/702
+		if (
+			// The Android keyboard is, likely erroneously, already dismissed in the
+			// contexts where programmatic focus may be required on iOS.
+			//
+			// - https://github.com/WordPress/gutenberg/issues/28748
+			// - https://github.com/WordPress/gutenberg/issues/29048
+			// - https://github.com/wordpress-mobile/WordPress-Android/issues/16167
+			Platform.OS === 'ios' &&
+			// Programmatic swaping focus from element to another often leads to focus
+			// loops, only delegate the programmatic focus if there are no elements
+			// focused.
+			//
+			// See: https://github.com/wordpress-mobile/WordPress-iOS/issues/18783
+			! AztecInputState.getCurrentFocusedElement()
+		) {
+			this._onPress(); // Call to move the focus in RN way (TextInputState)
 		}
 	}
 
@@ -269,9 +296,7 @@ class AztecView extends Component {
 					onBackspace={ this.props.onKeyDown && this._onBackspace }
 					onKeyDown={ this.props.onKeyDown && this._onKeyDown }
 					deleteEnter={ this.props.deleteEnter }
-					// IMPORTANT: the onFocus events are thrown away as these are handled by onPress() in the upper level.
-					// It's necessary to do this otherwise onFocus may be set by `{...otherProps}` and thus the onPress + onFocus
-					// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
+					// IMPORTANT: Do not remove the `onFocus` prop, see `_onAztecFocus`
 					onFocus={ this._onAztecFocus }
 					onBlur={ this._onBlur }
 					ref={ this.aztecViewRef }
