@@ -13,20 +13,22 @@ import type {
 } from './types';
 import { splitValueAndUnitFromSize } from './utils';
 
+const DEFAULT_OPTION: FontSizePickerSelectOption = {
+	key: 'default',
+	name: __( 'Default' ),
+	value: undefined,
+};
+
+const CUSTOM_OPTION: FontSizePickerSelectOption = {
+	key: 'custom',
+	name: __( 'Custom' ),
+};
+
 const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 	const { fontSizes = [], value, size, onChange, onSelectCustom } = props;
 
-	const defaultOption: FontSizePickerSelectOption = {
-		key: 'default',
-		name: __( 'Default' ),
-		value: undefined,
-	};
-	const customOption: FontSizePickerSelectOption = {
-		key: 'custom',
-		name: __( 'Custom' ),
-	};
 	const options: FontSizePickerSelectOption[] = [
-		defaultOption,
+		DEFAULT_OPTION,
 		...fontSizes.map( ( fontSize ) => {
 			const [ parsedValue ] = splitValueAndUnitFromSize( fontSize.size );
 			return {
@@ -36,11 +38,11 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 				__experimentalHint: parsedValue,
 			};
 		} ),
-		customOption,
+		CUSTOM_OPTION,
 	];
 
 	const selectedOption =
-		options.find( ( option ) => option.value === value ) ?? customOption;
+		options.find( ( option ) => option.value === value ) ?? CUSTOM_OPTION;
 
 	return (
 		<CustomSelectControl
@@ -60,7 +62,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 			}: {
 				selectedItem: FontSizePickerSelectOption;
 			} ) => {
-				if ( selectedItem === customOption ) {
+				if ( selectedItem === CUSTOM_OPTION ) {
 					onSelectCustom();
 				} else {
 					onChange( selectedItem.value );
