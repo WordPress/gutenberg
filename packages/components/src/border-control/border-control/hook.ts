@@ -119,6 +119,8 @@ export function useBorderControl(
 
 	let wrapperWidth = width;
 	if ( isCompact ) {
+		// Widths below represent the minimum usable width for compact controls.
+		// Taller controls contain greater internal padding, thus greater width.
 		wrapperWidth = __next40pxDefaultSize ? '116px' : '90px';
 	}
 	const innerWrapperClassName = useMemo( () => {
