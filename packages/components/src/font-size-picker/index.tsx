@@ -278,7 +278,7 @@ const UnforwardedFontSizePicker = (
 										onChange?.(
 											hasUnits
 												? newValue
-												: parseFloat( newValue )
+												: parseInt( newValue, 10 )
 										);
 									}
 								} }
