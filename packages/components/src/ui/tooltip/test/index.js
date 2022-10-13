@@ -70,7 +70,7 @@ describe( 'props', () => {
 				<Text>WordPress.org</Text>
 			</Tooltip>
 		);
-		const tooltips = screen.getAllByRole( /tooltip/ );
+		const tooltips = screen.getAllByRole( /tooltip/i );
 		// Assert only the base tooltip rendered.
 		expect( tooltips ).toHaveLength( 1 );
 		expect( tooltips[ 0 ].id ).toBe( baseTooltipId );

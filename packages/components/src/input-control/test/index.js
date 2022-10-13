@@ -48,7 +48,7 @@ describe( 'InputControl', () => {
 
 			const input = screen.getByText( 'Hello' );
 
-			expect( input ).toBeTruthy();
+			expect( input ).toBeInTheDocument();
 		} );
 	} );
 
