@@ -52,6 +52,7 @@ const UnconnectedBorderControl = (
 		__unstablePopoverProps,
 		previousStyleSelection,
 		showDropdownHeader,
+		size = 'default',
 		sliderClassName,
 		value: border,
 		widthUnit,
@@ -59,7 +60,6 @@ const UnconnectedBorderControl = (
 		withSlider,
 		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
-		__next40pxDefaultSize,
 		...otherProps
 	} = useBorderControl( props );
 
@@ -88,7 +88,7 @@ const UnconnectedBorderControl = (
 							__experimentalIsRenderedInSidebar={
 								__experimentalIsRenderedInSidebar
 							}
-							__next40pxDefaultSize={ __next40pxDefaultSize }
+							size={ size }
 						/>
 					}
 					label={ __( 'Border width' ) }
@@ -98,9 +98,7 @@ const UnconnectedBorderControl = (
 					value={ border?.width || '' }
 					placeholder={ placeholder }
 					__unstableInputWidth={ inputWidth }
-					size={
-						__next40pxDefaultSize ? '__unstable-large' : undefined
-					}
+					size={ size }
 				/>
 				{ withSlider && (
 					<RangeControl

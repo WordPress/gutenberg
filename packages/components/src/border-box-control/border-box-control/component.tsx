@@ -57,12 +57,12 @@ const BorderBoxControl = (
 		onSplitChange,
 		popoverPlacement,
 		popoverOffset,
+		size = 'default',
 		splitValue,
 		toggleLinked,
 		wrapperClassName,
 		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
-		__next40pxDefaultSize = false,
 		...otherProps
 	} = useBorderBoxControl( props );
 
@@ -111,14 +111,16 @@ const BorderBoxControl = (
 						shouldSanitizeBorder={ false } // This component will handle that.
 						value={ linkedValue }
 						withSlider={ true }
-						width={ __next40pxDefaultSize ? '116px' : '110px' }
+						width={
+							size === '__unstable-large' ? '116px' : '110px'
+						}
 						__experimentalHasMultipleOrigins={
 							__experimentalHasMultipleOrigins
 						}
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
-						__next40pxDefaultSize={ __next40pxDefaultSize }
+						size={ size }
 					/>
 				) : (
 					<BorderBoxControlSplitControls
@@ -136,13 +138,13 @@ const BorderBoxControl = (
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
-						__next40pxDefaultSize={ __next40pxDefaultSize }
+						size={ size }
 					/>
 				) }
 				<BorderBoxControlLinkedButton
 					onClick={ toggleLinked }
 					isLinked={ isLinked }
-					__next40pxDefaultSize={ __next40pxDefaultSize }
+					size={ size }
 				/>
 			</View>
 		</View>
