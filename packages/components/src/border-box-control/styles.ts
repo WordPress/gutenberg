@@ -29,8 +29,6 @@ export const BorderBoxControlLinkedButton = (
 		position: absolute;
 		top: ${ __next40pxDefaultSize ? '8px' : '3px' };
 		right: 0;
-		flex: 0;
-		flex-basis: 24px;
 		line-height: 0;
 	`;
 };
