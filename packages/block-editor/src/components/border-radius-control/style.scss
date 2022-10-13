@@ -10,25 +10,16 @@
 		justify-content: space-between;
 		align-items: flex-start;
 
-		> .components-unit-control-wrapper {
+		.components-border-radius-control__unit-control {
 			width: calc((100% - #{$grid-unit-20}) / 2);
 			margin-bottom: 0;
 			margin-right: $grid-unit-20;
 			flex-shrink: 0;
 		}
 
-		.components-range-control {
+		.components-border-radius-control__range-control {
 			flex: 1;
-			margin-bottom: 0;
-
-			.components-base-control__field {
-				margin-bottom: 0;
-				height: 30px;
-			}
-
-			.components-range-control__wrapper {
-				margin-right: 12px;
-			}
+			margin-right: 12px;
 		}
 
 		> span {
@@ -36,15 +27,15 @@
 		}
 
 		&.has-40px-default-size {
-			.components-range-control {
-				.components-base-control__field {
+			.components-border-radius-control__range-control {
+				> div {
 					height: 40px;
 					display: flex;
 					align-items: center;
 				}
 			}
 
-			.component-border-radius-control__linked-button.has-icon {
+			.component-border-radius-control__linked-button {
 				margin-top: 8px;
 			}
 		}
@@ -57,7 +48,7 @@
 		margin-right: $grid-unit-15;
 	}
 
-	.component-border-radius-control__linked-button.has-icon {
+	.component-border-radius-control__linked-button {
 		display: flex;
 		justify-content: center;
 		margin-top: 3px;

@@ -108,7 +108,7 @@ export default function BorderRadiusControl( {
 				{ isLinked ? (
 					<>
 						<AllInputControl
-							className="components-border-radius-control__unit-control"
+							wrapperClassName="components-border-radius-control__unit-control"
 							values={ values }
 							min={ MIN_BORDER_RADIUS_VALUE }
 							onChange={ onChange }
@@ -128,6 +128,7 @@ export default function BorderRadiusControl( {
 							withInputField={ false }
 							onChange={ handleSliderChange }
 							step={ step }
+							__nextHasNoMarginBottom
 						/>
 					</>
 				) : (

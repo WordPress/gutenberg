@@ -63,6 +63,7 @@ function UnforwardedUnitControl(
 		units: unitsProp = CSS_UNITS,
 		value: valueProp,
 		onBlur: onBlurProp,
+		wrapperClassName,
 		...props
 	} = unitControlProps;
 
@@ -106,6 +107,10 @@ function UnforwardedUnitControl(
 	const refParsedQuantity = useRef< number | undefined >( undefined );
 
 	const classes = classnames( 'components-unit-control', className );
+	const wrapperClasses = classnames(
+		'components-unit-control-wrapper',
+		wrapperClassName
+	);
 
 	const handleOnQuantityChange = (
 		nextQuantityValue: number | string | undefined,
@@ -258,7 +263,7 @@ function UnforwardedUnitControl(
 	}
 
 	return (
-		<Root className="components-unit-control-wrapper" style={ style }>
+		<Root className={ wrapperClasses } style={ style }>
 			<ValueInput
 				type={ isPressEnterToChange ? 'text' : 'number' }
 				{ ...props }
