@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { createBlock, parseWithAttributeSchema } from '@wordpress/blocks';
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import { InnerBlocks, RichText, useBlockProps } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 
 export const migrateToQuoteV2 = ( attributes ) => {
@@ -87,15 +87,15 @@ const v4 = {
 		},
 	},
 	save( { attributes } ) {
-		const { textAlign, value, citation } = attributes;
+		const { align, citation } = attributes;
 
 		const className = classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
+			[ `has-text-align-${ align }` ]: align,
 		} );
 
 		return (
 			<blockquote { ...useBlockProps.save( { className } ) }>
-				<RichText.Content multiline value={ value } />
+				<InnerBlocks.Content />
 				{ ! RichText.isEmpty( citation ) && (
 					<RichText.Content tagName="cite" value={ citation } />
 				) }
@@ -158,7 +158,7 @@ const v3 = {
 			</blockquote>
 		);
 	},
-	migrate: migrateToQuoteV2,
+	migrate: compose( migrateToQuoteV2, migrateTextAlign ),
 };
 
 const v2 = {
@@ -180,7 +180,7 @@ const v2 = {
 			type: 'string',
 		},
 	},
-	migrate: migrateToQuoteV2,
+	migrate: compose( migrateToQuoteV2, migrateTextAlign ),
 	save( { attributes } ) {
 		const { align, value, citation } = attributes;
 
