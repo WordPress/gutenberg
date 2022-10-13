@@ -19,7 +19,6 @@ export default function AllInputControl( {
 	selectedUnits,
 	setSelectedUnits,
 	values,
-	__next40pxDefaultSize,
 	...props
 } ) {
 	let allValue = getAllValue( values );
@@ -62,7 +61,7 @@ export default function AllInputControl( {
 			onChange={ handleOnChange }
 			onUnitChange={ handleOnUnitChange }
 			placeholder={ allPlaceholder }
-			size={ __next40pxDefaultSize ? '__unstable-large' : undefined }
+			size={ '__unstable-large' }
 		/>
 	);
 }
