@@ -40,7 +40,7 @@ describe( 'InputControl', () => {
 
 			const input = getInput();
 
-			expect( input.getAttribute( 'type' ) ).toBe( 'number' );
+			expect( input ).toHaveAttribute( 'type', 'number' );
 		} );
 
 		it( 'should render label', () => {
