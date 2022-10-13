@@ -11,29 +11,29 @@ import { COLORS, CONFIG, rtl } from '../utils';
 import type { Border } from '../border-control/types';
 import type { Borders } from './types';
 
-export const BorderBoxControl = css``;
+export const borderBoxControl = css``;
 
-export const LinkedBorderControl = css`
+export const linkedBorderControl = () => css`
 	flex: 1;
-	${ rtl( { marginRight: '24px' }, { marginLeft: '24px' } )() }
+	${ rtl( { marginRight: '24px' } )() }
 `;
 
-export const Wrapper = css`
+export const wrapper = css`
 	position: relative;
 `;
 
-export const BorderBoxControlLinkedButton = (
+export const borderBoxControlLinkedButton = (
 	__next40pxDefaultSize?: boolean
 ) => {
 	return css`
 		position: absolute;
 		top: ${ __next40pxDefaultSize ? '8px' : '3px' };
-		right: 0;
+		${ rtl( { right: 0 } )() }
 		line-height: 0;
 	`;
 };
 
-const BorderBoxStyleWithFallback = ( border?: Border ) => {
+const borderBoxStyleWithFallback = ( border?: Border ) => {
 	const {
 		color = COLORS.gray[ 200 ],
 		style = 'solid',
@@ -58,13 +58,13 @@ export const borderBoxControlVisualizer = (
 		right: ${ __next40pxDefaultSize ? '39px' : '29px' };
 		bottom: ${ __next40pxDefaultSize ? '20px' : '15px' };
 		left: ${ __next40pxDefaultSize ? '39px' : '29px' };
-		border-top: ${ BorderBoxStyleWithFallback( borders?.top ) };
-		border-bottom: ${ BorderBoxStyleWithFallback( borders?.bottom ) };
+		border-top: ${ borderBoxStyleWithFallback( borders?.top ) };
+		border-bottom: ${ borderBoxStyleWithFallback( borders?.bottom ) };
 		${ rtl( {
-			borderLeft: BorderBoxStyleWithFallback( borders?.left ),
+			borderLeft: borderBoxStyleWithFallback( borders?.left ),
 		} )() }
 		${ rtl( {
-			borderRight: BorderBoxStyleWithFallback( borders?.right ),
+			borderRight: borderBoxStyleWithFallback( borders?.right ),
 		} )() }
 	`;
 };
@@ -77,11 +77,11 @@ export const borderBoxControlSplitControls = (
 	width: ${ __next40pxDefaultSize ? undefined : '80%' };
 `;
 
-export const CenteredBorderControl = css`
+export const centeredBorderControl = css`
 	grid-column: span 2;
 	margin: 0 auto;
 `;
 
 export const rightBorderControl = () => css`
-	${ rtl( { marginLeft: 'auto' }, { marginRight: 'auto' } )() }
+	${ rtl( { marginLeft: 'auto' } )() }
 `;

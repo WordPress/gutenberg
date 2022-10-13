@@ -25,7 +25,7 @@ export function useBorderBoxControlLinkedButton(
 	const cx = useCx();
 	const classes = useMemo( () => {
 		return cx(
-			styles.BorderBoxControlLinkedButton( __next40pxDefaultSize ),
+			styles.borderBoxControlLinkedButton( __next40pxDefaultSize ),
 			className
 		);
 	}, [ className, cx, __next40pxDefaultSize ] );

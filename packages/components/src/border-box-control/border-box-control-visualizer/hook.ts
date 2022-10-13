@@ -8,7 +8,7 @@ import { useMemo } from '@wordpress/element';
  */
 import * as styles from '../styles';
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
-import { useCx, rtl } from '../../utils';
+import { useCx } from '../../utils';
 
 import type { VisualizerProps } from '../types';
 
@@ -24,15 +24,12 @@ export function useBorderBoxControlVisualizer(
 
 	// Generate class names.
 	const cx = useCx();
-	const rtlWatchResult = rtl.watch();
 	const classes = useMemo( () => {
 		return cx(
 			styles.borderBoxControlVisualizer( value, __next40pxDefaultSize ),
 			className
 		);
-		// rtlWatchResult is needed to refresh styles when the writing direction changes
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ cx, className, value, __next40pxDefaultSize, rtlWatchResult ] );
+	}, [ cx, className, value, __next40pxDefaultSize ] );
 
 	return { ...otherProps, className: classes, value };
 }
