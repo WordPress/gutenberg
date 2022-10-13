@@ -76,11 +76,12 @@ export type FontSize = {
 	slug: string;
 };
 
-export type FontSizePickerSelectProps = {
-	fontSizes: FontSize[];
-	value: FontSizePickerProps[ 'value' ];
-	size: FontSizePickerProps[ 'size' ];
-	onChange: ( value: number | string | undefined ) => void;
+export type FontSizePickerSelectProps = Pick<
+	FontSizePickerProps,
+	'value' | 'size'
+> & {
+	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
+	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;
 	onSelectCustom: () => void;
 };
 
@@ -91,10 +92,10 @@ export type FontSizePickerSelectOption = {
 	__experimentalHint?: string;
 };
 
-export type FontSizePickerToggleGroupProps = {
-	fontSizes: FontSize[];
-	value: FontSizePickerProps[ 'value' ];
-	__nextHasNoMarginBottom?: boolean;
-	size: FontSizePickerProps[ 'size' ];
-	onChange: ( value: number | string | undefined ) => void;
+export type FontSizePickerToggleGroupProps = Pick<
+	FontSizePickerProps,
+	'value' | 'size' | '__nextHasNoMarginBottom'
+> & {
+	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
+	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;
 };
