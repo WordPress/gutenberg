@@ -288,31 +288,34 @@ const UnforwardedFontSizePicker = (
 						</FlexItem>
 						{ withSlider && (
 							<FlexItem isBlock>
-								<RangeControl
-									__nextHasNoMarginBottom={
-										__nextHasNoMarginBottom
-									}
-									className="components-font-size-picker__custom-input"
-									label={ __( 'Custom Size' ) }
-									hideLabelFromVision
-									value={ valueNumber }
-									initialPosition={ fallbackFontSize }
-									withInputField={ false }
-									onChange={ ( newValue ) => {
-										if ( newValue === undefined ) {
-											onChange?.( undefined );
-										} else if ( hasUnits ) {
-											onChange?.(
-												newValue + ( valueUnit ?? 'px' )
-											);
-										} else {
-											onChange?.( newValue );
+								<Spacer marginX={ 2 } marginBottom={ 0 }>
+									<RangeControl
+										__nextHasNoMarginBottom={
+											__nextHasNoMarginBottom
 										}
-									} }
-									min={ isValueUnitRelative ? 0.75 : 12 }
-									max={ isValueUnitRelative ? 6.25 : 100 }
-									step={ isValueUnitRelative ? 0.05 : 1 }
-								/>
+										className="components-font-size-picker__custom-input"
+										label={ __( 'Custom Size' ) }
+										hideLabelFromVision
+										value={ valueNumber }
+										initialPosition={ fallbackFontSize }
+										withInputField={ false }
+										onChange={ ( newValue ) => {
+											if ( newValue === undefined ) {
+												onChange?.( undefined );
+											} else if ( hasUnits ) {
+												onChange?.(
+													newValue +
+														( valueUnit ?? 'px' )
+												);
+											} else {
+												onChange?.( newValue );
+											}
+										} }
+										min={ isValueUnitRelative ? 0.75 : 12 }
+										max={ isValueUnitRelative ? 6.25 : 100 }
+										step={ isValueUnitRelative ? 0.05 : 1 }
+									/>
+								</Spacer>
 							</FlexItem>
 						) }
 						{ withReset && (
