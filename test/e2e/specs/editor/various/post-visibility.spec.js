@@ -22,10 +22,10 @@ test.describe( 'Post visibility', () => {
 			await editor.openDocumentSettingsSidebar();
 
 			await page.click(
-				'.components-button.edit-post-post-visibility__toggle.is-tertiary'
+				'role=button[name="Select visibility: Public"i]'
 			);
 
-			await page.click( '#editor-post-private-0' );
+			await page.click( 'role=radio[name="Private"i]' );
 
 			await page.click( 'role=button[name="OK"i]' );
 
@@ -57,10 +57,10 @@ test.describe( 'Post visibility', () => {
 			} );
 
 			await page.click(
-				'.components-button.edit-post-post-visibility__toggle.is-tertiary'
+				'role=button[name="Select visibility: Public"i]'
 			);
 
-			await page.click( '#editor-post-private-0' );
+			await page.click( 'role=radio[name="Private"i]' );
 
 			await page.click( 'role=button[name="Cancel"i]' );
 
@@ -87,32 +87,16 @@ test.describe( 'Post visibility', () => {
 		await editor.openDocumentSettingsSidebar();
 
 		// Set a publish date for the next month.
-		await page.click(
-			'.components-button.edit-post-post-schedule__toggle.is-tertiary'
-		);
+		await page.click( 'role=button[name="Change date: Immediately"i]' );
 
-		await page.click(
-			'role=button[name="Move forward to switch to the next month."i]'
-		);
-		await page.click( 'text=15  >> nth=1' );
+		await page.click( 'role=button[name="View next month"i]' );
+		await page.click( 'text=15' );
 
-		await page.click(
-			'.components-button.edit-post-post-visibility__toggle.is-tertiary'
-		);
+		await page.click( 'role=button[name="Select visibility: Public"i]' );
 
-		await page.click( '#editor-post-private-0' );
+		await page.click( 'role=radio[name="Private"i]' );
 
 		await page.click( 'role=button[name="OK"i]' );
-
-		// Enter a title for this post.
-		await page.type( '.editor-post-title__input', ' Changed' );
-
-		// Wait for the button to be clickable before attempting to click.
-		// This could cause errors when we try to click before changes are registered.
-		await page.waitForSelector(
-			'.editor-post-publish-button[aria-disabled="false"]'
-		);
-		await page.click( '.editor-post-publish-button' );
 
 		const currentStatus = await page.evaluate( () => {
 			return wp.data
