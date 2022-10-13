@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.84.0
 -   [*] Upgrade compile and target sdk version to Android API 31 [#44610]
 
 ## 1.83.0
