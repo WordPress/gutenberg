@@ -22,7 +22,7 @@ export const globalTypes = {
 	},
 	componentsTheme: {
 		name: 'Theme',
-		description: 'Change the components theme.',
+		description: 'Change the components theme. (Work in progress)',
 		defaultValue: 'default',
 		toolbar: {
 			icon: 'paintbrush',

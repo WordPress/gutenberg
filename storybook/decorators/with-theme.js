@@ -14,6 +14,8 @@ export const WithTheme = ( Story, context ) => {
 			accent: '#3858e9',
 		},
 		sunrise: {
+			// This color was chosen intentionally, because for sufficient contrast,
+			// the foreground text should be black when this orange is used as a background color.
 			accent: '#dd823b',
 		},
 	};
