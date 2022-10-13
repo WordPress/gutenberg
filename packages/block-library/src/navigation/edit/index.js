@@ -496,7 +496,7 @@ function Navigation( {
 			);
 		} catch {
 			showMenuAutoPublishDraftNotice(
-				__( 'Error ocurred while publishing the navigation menu.' )
+				__( 'Error occurred while publishing the navigation menu.' )
 			);
 		}
 	}, [ isDraftNavigationMenu, navigationMenu ] );
