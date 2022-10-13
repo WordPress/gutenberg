@@ -200,15 +200,13 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		innerBlocksProps.value && innerBlocksProps.onChange
 			? ControlledInnerBlocks
 			: UncontrolledInnerBlocks;
-	//Dedupe layout classes
-	const allTheClassNames = `${ props.className } ${ layoutClassNames }`;
-	const classNameSet = new Set( allTheClassNames.split( ' ' ) );
-	const dedupedClassNames = Array.from( classNameSet ).join( ' ' );
+
 	return {
 		...props,
 		ref,
 		className: classnames(
-			dedupedClassNames,
+			props.className,
+			layoutClassNames,
 			'block-editor-block-list__layout',
 			{
 				'has-overlay': hasOverlay,

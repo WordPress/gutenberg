@@ -233,8 +233,7 @@ function BlockListBlock( {
 				'is-content-block': hasContentLockedParent && isContentBlock,
 			},
 			dataAlign && themeSupportsLayout && `align${ dataAlign }`,
-			className,
-			layoutClassNames
+			className
 		),
 		wrapperProps: restWrapperProps,
 		isAligned,
