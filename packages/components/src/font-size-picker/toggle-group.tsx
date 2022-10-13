@@ -47,7 +47,7 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
 					key={ fontSize.slug }
 					value={ fontSize.size }
 					label={ FONT_SIZES_ALIASES[ index ] }
-					aria-label={ fontSize.name }
+					aria-label={ fontSize.name || FONT_SIZES_ALIASES[ index ] }
 					showTooltip
 				/>
 			) ) }
