@@ -1,9 +1,11 @@
 <?php
+
 /**
  * Server-side rendering of the `core/navigation` block.
  *
  * @package WordPress
  */
+
 
 // These functions are used for the __unstableLocation feature and only active
 // when the gutenberg plugin is active.
@@ -14,32 +16,34 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 	 * @param string $location The menu location.
 	 * @return array Menu items for the location.
 	 */
-	function block_core_navigation_get_menu_items_at_location( $location ) {
-		if ( empty( $location ) ) {
-			return;
+	if ( ! function_exists( 'block_core_navigation_get_menu_items_at_location' ) ) {
+		function block_core_navigation_get_menu_items_at_location( $location ) {
+			if ( empty( $location ) ) {
+				return;
+			}
+
+			// Build menu data. The following approximates the code in
+			// `wp_nav_menu()` and `gutenberg_output_block_nav_menu`.
+
+			// Find the location in the list of locations, returning early if the
+			// location can't be found.
+			$locations = get_nav_menu_locations();
+			if ( ! isset( $locations[ $location ] ) ) {
+				return;
+			}
+
+			// Get the menu from the location, returning early if there is no
+			// menu or there was an error.
+			$menu = wp_get_nav_menu_object( $locations[ $location ] );
+			if ( ! $menu || is_wp_error( $menu ) ) {
+				return;
+			}
+
+			$menu_items = wp_get_nav_menu_items( $menu->term_id, array( 'update_post_term_cache' => false ) );
+			_wp_menu_item_classes_by_context( $menu_items );
+
+			return $menu_items;
 		}
-
-		// Build menu data. The following approximates the code in
-		// `wp_nav_menu()` and `gutenberg_output_block_nav_menu`.
-
-		// Find the location in the list of locations, returning early if the
-		// location can't be found.
-		$locations = get_nav_menu_locations();
-		if ( ! isset( $locations[ $location ] ) ) {
-			return;
-		}
-
-		// Get the menu from the location, returning early if there is no
-		// menu or there was an error.
-		$menu = wp_get_nav_menu_object( $locations[ $location ] );
-		if ( ! $menu || is_wp_error( $menu ) ) {
-			return;
-		}
-
-		$menu_items = wp_get_nav_menu_items( $menu->term_id, array( 'update_post_term_cache' => false ) );
-		_wp_menu_item_classes_by_context( $menu_items );
-
-		return $menu_items;
 	}
 
 
@@ -51,19 +55,21 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 	 * @return array An array keyed by the id of the parent menu where each element
 	 *               is an array of menu items that belong to that parent.
 	 */
-	function block_core_navigation_sort_menu_items_by_parent_id( $menu_items ) {
-		$sorted_menu_items = array();
-		foreach ( (array) $menu_items as $menu_item ) {
-			$sorted_menu_items[ $menu_item->menu_order ] = $menu_item;
-		}
-		unset( $menu_items, $menu_item );
+	if ( ! function_exists( 'block_core_navigation_sort_menu_items_by_parent_id' ) ) {
+		function block_core_navigation_sort_menu_items_by_parent_id( $menu_items ) {
+			$sorted_menu_items = array();
+			foreach ( (array) $menu_items as $menu_item ) {
+				$sorted_menu_items[ $menu_item->menu_order ] = $menu_item;
+			}
+			unset( $menu_items, $menu_item );
 
-		$menu_items_by_parent_id = array();
-		foreach ( $sorted_menu_items as $menu_item ) {
-			$menu_items_by_parent_id[ $menu_item->menu_item_parent ][] = $menu_item;
-		}
+			$menu_items_by_parent_id = array();
+			foreach ( $sorted_menu_items as $menu_item ) {
+				$menu_items_by_parent_id[ $menu_item->menu_item_parent ][] = $menu_item;
+			}
 
-		return $menu_items_by_parent_id;
+			return $menu_items_by_parent_id;
+		}
 	}
 
 	/**
@@ -77,45 +83,47 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 	 *                                        that parent.
 	 * @return array An array of parsed block data.
 	 */
-	function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
-		if ( empty( $menu_items ) ) {
-			return array();
+	if ( ! function_exists( 'block_core_navigation_parse_blocks_from_menu_items' ) ) {
+		function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
+			if ( empty( $menu_items ) ) {
+				return array();
+			}
+
+			$blocks = array();
+
+			foreach ( $menu_items as $menu_item ) {
+				$class_name       = ! empty( $menu_item->classes ) ? implode( ' ', (array) $menu_item->classes ) : null;
+				$id               = ( null !== $menu_item->object_id && 'custom' !== $menu_item->object ) ? $menu_item->object_id : null;
+				$opens_in_new_tab = null !== $menu_item->target && '_blank' === $menu_item->target;
+				$rel              = ( null !== $menu_item->xfn && '' !== $menu_item->xfn ) ? $menu_item->xfn : null;
+				$kind             = null !== $menu_item->type ? str_replace( '_', '-', $menu_item->type ) : 'custom';
+
+				$block = array(
+					'blockName' => isset( $menu_items_by_parent_id[ $menu_item->ID ] ) ? 'core/navigation-submenu' : 'core/navigation-link',
+					'attrs'     => array(
+						'className'     => $class_name,
+						'description'   => $menu_item->description,
+						'id'            => $id,
+						'kind'          => $kind,
+						'label'         => $menu_item->title,
+						'opensInNewTab' => $opens_in_new_tab,
+						'rel'           => $rel,
+						'title'         => $menu_item->attr_title,
+						'type'          => $menu_item->object,
+						'url'           => $menu_item->url,
+					),
+				);
+
+				$block['innerBlocks']  = isset( $menu_items_by_parent_id[ $menu_item->ID ] )
+					? block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[ $menu_item->ID ], $menu_items_by_parent_id )
+					: array();
+				$block['innerContent'] = array_map( 'serialize_block', $block['innerBlocks'] );
+
+				$blocks[] = $block;
+			}
+
+			return $blocks;
 		}
-
-		$blocks = array();
-
-		foreach ( $menu_items as $menu_item ) {
-			$class_name       = ! empty( $menu_item->classes ) ? implode( ' ', (array) $menu_item->classes ) : null;
-			$id               = ( null !== $menu_item->object_id && 'custom' !== $menu_item->object ) ? $menu_item->object_id : null;
-			$opens_in_new_tab = null !== $menu_item->target && '_blank' === $menu_item->target;
-			$rel              = ( null !== $menu_item->xfn && '' !== $menu_item->xfn ) ? $menu_item->xfn : null;
-			$kind             = null !== $menu_item->type ? str_replace( '_', '-', $menu_item->type ) : 'custom';
-
-			$block = array(
-				'blockName' => isset( $menu_items_by_parent_id[ $menu_item->ID ] ) ? 'core/navigation-submenu' : 'core/navigation-link',
-				'attrs'     => array(
-					'className'     => $class_name,
-					'description'   => $menu_item->description,
-					'id'            => $id,
-					'kind'          => $kind,
-					'label'         => $menu_item->title,
-					'opensInNewTab' => $opens_in_new_tab,
-					'rel'           => $rel,
-					'title'         => $menu_item->attr_title,
-					'type'          => $menu_item->object,
-					'url'           => $menu_item->url,
-				),
-			);
-
-			$block['innerBlocks']  = isset( $menu_items_by_parent_id[ $menu_item->ID ] )
-				? block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[ $menu_item->ID ], $menu_items_by_parent_id )
-				: array();
-			$block['innerContent'] = array_map( 'serialize_block', $block['innerBlocks'] );
-
-			$blocks[] = $block;
-		}
-
-		return $blocks;
 	}
 }
 
@@ -127,87 +135,89 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
  *
  * @return array Colors CSS classes and inline styles.
  */
-function block_core_navigation_build_css_colors( $attributes ) {
-	$colors = array(
-		'css_classes'           => array(),
-		'inline_styles'         => '',
-		'overlay_css_classes'   => array(),
-		'overlay_inline_styles' => '',
-	);
+if ( ! function_exists( 'block_core_navigation_build_css_colors' ) ) {
+	function block_core_navigation_build_css_colors( $attributes ) {
+		$colors = array(
+			'css_classes'           => array(),
+			'inline_styles'         => '',
+			'overlay_css_classes'   => array(),
+			'overlay_inline_styles' => '',
+		);
 
-	// Text color.
-	$has_named_text_color  = array_key_exists( 'textColor', $attributes );
-	$has_custom_text_color = array_key_exists( 'customTextColor', $attributes );
+		// Text color.
+		$has_named_text_color  = array_key_exists( 'textColor', $attributes );
+		$has_custom_text_color = array_key_exists( 'customTextColor', $attributes );
 
-	// If has text color.
-	if ( $has_custom_text_color || $has_named_text_color ) {
-		// Add has-text-color class.
-		$colors['css_classes'][] = 'has-text-color';
+		// If has text color.
+		if ( $has_custom_text_color || $has_named_text_color ) {
+			// Add has-text-color class.
+			$colors['css_classes'][] = 'has-text-color';
+		}
+
+		if ( $has_named_text_color ) {
+			// Add the color class.
+			$colors['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
+		} elseif ( $has_custom_text_color ) {
+			// Add the custom color inline style.
+			$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['customTextColor'] );
+		}
+
+		// Background color.
+		$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
+		$has_custom_background_color = array_key_exists( 'customBackgroundColor', $attributes );
+
+		// If has background color.
+		if ( $has_custom_background_color || $has_named_background_color ) {
+			// Add has-background class.
+			$colors['css_classes'][] = 'has-background';
+		}
+
+		if ( $has_named_background_color ) {
+			// Add the background-color class.
+			$colors['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
+		} elseif ( $has_custom_background_color ) {
+			// Add the custom background-color inline style.
+			$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customBackgroundColor'] );
+		}
+
+		// Overlay text color.
+		$has_named_overlay_text_color  = array_key_exists( 'overlayTextColor', $attributes );
+		$has_custom_overlay_text_color = array_key_exists( 'customOverlayTextColor', $attributes );
+
+		// If has overlay text color.
+		if ( $has_custom_overlay_text_color || $has_named_overlay_text_color ) {
+			// Add has-text-color class.
+			$colors['overlay_css_classes'][] = 'has-text-color';
+		}
+
+		if ( $has_named_overlay_text_color ) {
+			// Add the overlay color class.
+			$colors['overlay_css_classes'][] = sprintf( 'has-%s-color', $attributes['overlayTextColor'] );
+		} elseif ( $has_custom_overlay_text_color ) {
+			// Add the custom overlay color inline style.
+			$colors['overlay_inline_styles'] .= sprintf( 'color: %s;', $attributes['customOverlayTextColor'] );
+		}
+
+		// Overlay background color.
+		$has_named_overlay_background_color  = array_key_exists( 'overlayBackgroundColor', $attributes );
+		$has_custom_overlay_background_color = array_key_exists( 'customOverlayBackgroundColor', $attributes );
+
+		// If has overlay background color.
+		if ( $has_custom_overlay_background_color || $has_named_overlay_background_color ) {
+			// Add has-background class.
+			$colors['overlay_css_classes'][] = 'has-background';
+		}
+
+		if ( $has_named_overlay_background_color ) {
+			// Add the overlay background-color class.
+			$colors['overlay_css_classes'][] = sprintf( 'has-%s-background-color', $attributes['overlayBackgroundColor'] );
+		} elseif ( $has_custom_overlay_background_color ) {
+			// Add the custom overlay background-color inline style.
+			$colors['overlay_inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customOverlayBackgroundColor'] );
+		}
+
+		return $colors;
 	}
-
-	if ( $has_named_text_color ) {
-		// Add the color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
-	} elseif ( $has_custom_text_color ) {
-		// Add the custom color inline style.
-		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['customTextColor'] );
-	}
-
-	// Background color.
-	$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
-	$has_custom_background_color = array_key_exists( 'customBackgroundColor', $attributes );
-
-	// If has background color.
-	if ( $has_custom_background_color || $has_named_background_color ) {
-		// Add has-background class.
-		$colors['css_classes'][] = 'has-background';
-	}
-
-	if ( $has_named_background_color ) {
-		// Add the background-color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
-	} elseif ( $has_custom_background_color ) {
-		// Add the custom background-color inline style.
-		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customBackgroundColor'] );
-	}
-
-	// Overlay text color.
-	$has_named_overlay_text_color  = array_key_exists( 'overlayTextColor', $attributes );
-	$has_custom_overlay_text_color = array_key_exists( 'customOverlayTextColor', $attributes );
-
-	// If has overlay text color.
-	if ( $has_custom_overlay_text_color || $has_named_overlay_text_color ) {
-		// Add has-text-color class.
-		$colors['overlay_css_classes'][] = 'has-text-color';
-	}
-
-	if ( $has_named_overlay_text_color ) {
-		// Add the overlay color class.
-		$colors['overlay_css_classes'][] = sprintf( 'has-%s-color', $attributes['overlayTextColor'] );
-	} elseif ( $has_custom_overlay_text_color ) {
-		// Add the custom overlay color inline style.
-		$colors['overlay_inline_styles'] .= sprintf( 'color: %s;', $attributes['customOverlayTextColor'] );
-	}
-
-	// Overlay background color.
-	$has_named_overlay_background_color  = array_key_exists( 'overlayBackgroundColor', $attributes );
-	$has_custom_overlay_background_color = array_key_exists( 'customOverlayBackgroundColor', $attributes );
-
-	// If has overlay background color.
-	if ( $has_custom_overlay_background_color || $has_named_overlay_background_color ) {
-		// Add has-background class.
-		$colors['overlay_css_classes'][] = 'has-background';
-	}
-
-	if ( $has_named_overlay_background_color ) {
-		// Add the overlay background-color class.
-		$colors['overlay_css_classes'][] = sprintf( 'has-%s-background-color', $attributes['overlayBackgroundColor'] );
-	} elseif ( $has_custom_overlay_background_color ) {
-		// Add the custom overlay background-color inline style.
-		$colors['overlay_inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customOverlayBackgroundColor'] );
-	}
-
-	return $colors;
 }
 
 /**
@@ -218,25 +228,27 @@ function block_core_navigation_build_css_colors( $attributes ) {
  *
  * @return array Font size CSS classes and inline styles.
  */
-function block_core_navigation_build_css_font_sizes( $attributes ) {
-	// CSS classes.
-	$font_sizes = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
+if ( ! function_exists( 'block_core_navigation_build_css_font_sizes' ) ) {
+	function block_core_navigation_build_css_font_sizes( $attributes ) {
+		// CSS classes.
+		$font_sizes = array(
+			'css_classes'   => array(),
+			'inline_styles' => '',
+		);
 
-	$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
-	$has_custom_font_size = array_key_exists( 'customFontSize', $attributes );
+		$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
+		$has_custom_font_size = array_key_exists( 'customFontSize', $attributes );
 
-	if ( $has_named_font_size ) {
-		// Add the font size class.
-		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $attributes['fontSize'] );
-	} elseif ( $has_custom_font_size ) {
-		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $attributes['customFontSize'] );
+		if ( $has_named_font_size ) {
+			// Add the font size class.
+			$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $attributes['fontSize'] );
+		} elseif ( $has_custom_font_size ) {
+			// Add the custom font size inline style.
+			$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $attributes['customFontSize'] );
+		}
+
+		return $font_sizes;
 	}
-
-	return $font_sizes;
 }
 
 /**
@@ -244,8 +256,10 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
  *
  * @return string
  */
-function block_core_navigation_render_submenu_icon() {
-	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
+if ( ! function_exists( 'block_core_navigation_render_submenu_icon' ) ) {
+	function block_core_navigation_render_submenu_icon() {
+		return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
+	}
 }
 
 
@@ -254,23 +268,25 @@ function block_core_navigation_render_submenu_icon() {
  *
  * @return WP_Post|null the first non-empty Navigation or null.
  */
-function block_core_navigation_get_most_recently_published_navigation() {
-	// We default to the most recently created menu.
-	$parsed_args = array(
-		'post_type'      => 'wp_navigation',
-		'no_found_rows'  => true,
-		'order'          => 'DESC',
-		'orderby'        => 'date',
-		'post_status'    => 'publish',
-		'posts_per_page' => 1, // get only the most recent.
-	);
+if ( ! function_exists( 'block_core_navigation_get_most_recently_published_navigation' ) ) {
+	function block_core_navigation_get_most_recently_published_navigation() {
+		// We default to the most recently created menu.
+		$parsed_args = array(
+			'post_type'      => 'wp_navigation',
+			'no_found_rows'  => true,
+			'order'          => 'DESC',
+			'orderby'        => 'date',
+			'post_status'    => 'publish',
+			'posts_per_page' => 1, // get only the most recent.
+		);
 
-	$navigation_post = new WP_Query( $parsed_args );
-	if ( count( $navigation_post->posts ) > 0 ) {
-		return $navigation_post->posts[0];
+		$navigation_post = new WP_Query( $parsed_args );
+		if ( count( $navigation_post->posts ) > 0 ) {
+			return $navigation_post->posts[0];
+		}
+
+		return null;
 	}
-
-	return null;
 }
 
 /**
@@ -282,16 +298,18 @@ function block_core_navigation_get_most_recently_published_navigation() {
  * @param array $parsed_blocks the parsed blocks to be normalized.
  * @return array the normalized parsed blocks.
  */
-function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
-	$filtered = array_filter(
-		$parsed_blocks,
-		function( $block ) {
-			return isset( $block['blockName'] );
-		}
-	);
+if ( ! function_exists( 'block_core_navigation_filter_out_empty_blocks' ) ) {
+	function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
+		$filtered = array_filter(
+			$parsed_blocks,
+			function ( $block ) {
+				return isset( $block['blockName'] );
+			}
+		);
 
-	// Reset keys.
-	return array_values( $filtered );
+		// Reset keys.
+		return array_values( $filtered );
+	}
 }
 
 /**
@@ -303,46 +321,48 @@ function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
  *
  * @return array the array of blocks to be used as a fallback.
  */
-function block_core_navigation_get_fallback_blocks() {
-	$page_list_fallback = array(
-		array(
-			'blockName' => 'core/page-list',
-			'attrs'     => array(
-				'__unstableMaxPages' => 4,
+if ( ! function_exists( 'block_core_navigation_get_fallback_blocks' ) ) {
+	function block_core_navigation_get_fallback_blocks() {
+		$page_list_fallback = array(
+			array(
+				'blockName' => 'core/page-list',
+				'attrs'     => array(
+					'__unstableMaxPages' => 4,
+				),
 			),
-		),
-	);
+		);
 
-	$registry = WP_Block_Type_Registry::get_instance();
+		$registry = WP_Block_Type_Registry::get_instance();
 
-	// If `core/page-list` is not registered then return empty blocks.
-	$fallback_blocks = $registry->is_registered( 'core/page-list' ) ? $page_list_fallback : array();
+		// If `core/page-list` is not registered then return empty blocks.
+		$fallback_blocks = $registry->is_registered( 'core/page-list' ) ? $page_list_fallback : array();
 
-	// Default to a list of Pages.
+		// Default to a list of Pages.
 
-	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
+		$navigation_post = block_core_navigation_get_most_recently_published_navigation();
 
-	// Prefer using the first non-empty Navigation as fallback if available.
-	if ( $navigation_post ) {
-		$maybe_fallback = block_core_navigation_filter_out_empty_blocks( parse_blocks( $navigation_post->post_content ) );
+		// Prefer using the first non-empty Navigation as fallback if available.
+		if ( $navigation_post ) {
+			$maybe_fallback = block_core_navigation_filter_out_empty_blocks( parse_blocks( $navigation_post->post_content ) );
 
-		// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
-		// In this case default to the (Page List) fallback.
-		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
+			// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
+			// In this case default to the (Page List) fallback.
+			$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
+		}
+
+		/**
+		 * Filters the fallback experience for the Navigation block.
+		 *
+		 * Returning a falsey value will opt out of the fallback and cause the block not to render.
+		 * To customise the blocks provided return an array of blocks - these should be valid
+		 * children of the `core/navigation` block.
+		 *
+		 * @since 5.9.0
+		 *
+		 * @param array[] default fallback blocks provided by the default block mechanic.
+		 */
+		return apply_filters( 'block_core_navigation_render_fallback', $fallback_blocks );
 	}
-
-	/**
-	 * Filters the fallback experience for the Navigation block.
-	 *
-	 * Returning a falsey value will opt out of the fallback and cause the block not to render.
-	 * To customise the blocks provided return an array of blocks - these should be valid
-	 * children of the `core/navigation` block.
-	 *
-	 * @since 5.9.0
-	 *
-	 * @param array[] default fallback blocks provided by the default block mechanic.
-	 */
-	return apply_filters( 'block_core_navigation_render_fallback', $fallback_blocks );
 }
 
 /**
@@ -352,9 +372,11 @@ function block_core_navigation_get_fallback_blocks() {
  *
  * @return array Array of post IDs.
  */
-function block_core_navigation_get_post_ids( $inner_blocks ) {
-	$post_ids = array_map( 'block_core_navigation_from_block_get_post_ids', iterator_to_array( $inner_blocks ) );
-	return array_unique( array_merge( ...$post_ids ) );
+if ( ! function_exists( 'block_core_navigation_get_post_ids' ) ) {
+	function block_core_navigation_get_post_ids( $inner_blocks ) {
+		$post_ids = array_map( 'block_core_navigation_from_block_get_post_ids', iterator_to_array( $inner_blocks ) );
+		return array_unique( array_merge( ...$post_ids ) );
+	}
 }
 
 /**
@@ -364,20 +386,22 @@ function block_core_navigation_get_post_ids( $inner_blocks ) {
  *
  * @return array Array of post IDs.
  */
-function block_core_navigation_from_block_get_post_ids( $block ) {
-	$post_ids = array();
+if ( ! function_exists( 'block_core_navigation_from_block_get_post_ids' ) ) {
+	function block_core_navigation_from_block_get_post_ids( $block ) {
+		$post_ids = array();
 
-	if ( $block->inner_blocks ) {
-		$post_ids = block_core_navigation_get_post_ids( $block->inner_blocks );
-	}
-
-	if ( 'core/navigation-link' === $block->name || 'core/navigation-submenu' === $block->name ) {
-		if ( $block->attributes && isset( $block->attributes['kind'] ) && 'post-type' === $block->attributes['kind'] && isset( $block->attributes['id'] ) ) {
-			$post_ids[] = $block->attributes['id'];
+		if ( $block->inner_blocks ) {
+			$post_ids = block_core_navigation_get_post_ids( $block->inner_blocks );
 		}
-	}
 
-	return $post_ids;
+		if ( 'core/navigation-link' === $block->name || 'core/navigation-submenu' === $block->name ) {
+			if ( $block->attributes && isset( $block->attributes['kind'] ) && 'post-type' === $block->attributes['kind'] && isset( $block->attributes['id'] ) ) {
+				$post_ids[] = $block->attributes['id'];
+			}
+		}
+
+		return $post_ids;
+	}
 }
 
 /**
@@ -387,35 +411,37 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
  *
  * @return array The block being rendered without typographic presets.
  */
-function block_core_navigation_typographic_presets_backcompatibility( $parsed_block ) {
-	if ( 'core/navigation' === $parsed_block['blockName'] ) {
-		$attribute_to_prefix_map = array(
-			'fontStyle'      => 'var:preset|font-style|',
-			'fontWeight'     => 'var:preset|font-weight|',
-			'textDecoration' => 'var:preset|text-decoration|',
-			'textTransform'  => 'var:preset|text-transform|',
-		);
-		foreach ( $attribute_to_prefix_map as $style_attribute => $prefix ) {
-			if ( ! empty( $parsed_block['attrs']['style']['typography'][ $style_attribute ] ) ) {
-				$prefix_len      = strlen( $prefix );
-				$attribute_value = &$parsed_block['attrs']['style']['typography'][ $style_attribute ];
-				if ( 0 === strncmp( $attribute_value, $prefix, $prefix_len ) ) {
-					$attribute_value = substr( $attribute_value, $prefix_len );
-				}
-				if ( 'textDecoration' === $style_attribute && 'strikethrough' === $attribute_value ) {
-					$attribute_value = 'line-through';
+if ( ! function_exists( 'block_core_navigation_typographic_presets_backcompatibility' ) ) {
+	function block_core_navigation_typographic_presets_backcompatibility( $parsed_block ) {
+		if ( 'core/navigation' === $parsed_block['blockName'] ) {
+			$attribute_to_prefix_map = array(
+				'fontStyle'      => 'var:preset|font-style|',
+				'fontWeight'     => 'var:preset|font-weight|',
+				'textDecoration' => 'var:preset|text-decoration|',
+				'textTransform'  => 'var:preset|text-transform|',
+			);
+			foreach ( $attribute_to_prefix_map as $style_attribute => $prefix ) {
+				if ( ! empty( $parsed_block['attrs']['style']['typography'][ $style_attribute ] ) ) {
+					$prefix_len      = strlen( $prefix );
+					$attribute_value = &$parsed_block['attrs']['style']['typography'][ $style_attribute ];
+					if ( 0 === strncmp( $attribute_value, $prefix, $prefix_len ) ) {
+						$attribute_value = substr( $attribute_value, $prefix_len );
+					}
+					if ( 'textDecoration' === $style_attribute && 'strikethrough' === $attribute_value ) {
+						$attribute_value = 'line-through';
+					}
 				}
 			}
 		}
+
+		return $parsed_block;
 	}
 
-	return $parsed_block;
+	add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );
 }
 
-add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );
-
 /**
- * From here I included what was inside the `render_block_core_navigation` function
+ * From here it is included included what was supposed to go in the `render_block_core_navigation` function
  */
 
 static $seen_menu_names = array();
@@ -594,12 +620,12 @@ foreach ( $inner_blocks as $inner_block ) {
 		$inner_blocks_html .= '</ul>';
 	}
 	$inner_block_content = $inner_block->render();
-	if (!$is_first_item) {
-		$w = new WP_HTML_Tag_Processor($inner_block_content);
-		$w->next_tag('a');
-		$w->set_attribute('wp-effect', 'core.navigation.addFirstElementToContext');	
+	if ( ! $is_first_item ) {
+		$w = new WP_HTML_Tag_Processor( $inner_block_content );
+		$w->next_tag( 'a' );
+		$w->set_attribute( 'wp-effect', 'core.navigation.addFirstElementToContext' );
 		$inner_block_content = (string) $w;
-		$is_first_item = true;
+		$is_first_item       = true;
 	}
 	if ( 'core/site-title' === $inner_block->name || ( 'core/site-logo' === $inner_block->name && $inner_block_content ) ) {
 		$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
@@ -669,35 +695,18 @@ $toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __(
 ?>
 
 <wp-context data='{"navigation": {"open": false}}'>
-	<nav <?php echo( $wrapper_attributes ); ?>>
-		<button
-			wp-on:click="core.navigation.openMenu"
-			wp-effect:on-open="core.navigation.focusFirstElement"
-			wp-effect:on-close="core.navigation.focusLastFocusedElement"
-			aria-haspopup="true"
-			<?php echo( $toggle_aria_label_open ); ?>
-			class="<?php echo( esc_attr( implode( ' ', $open_button_classes ) ) ); ?>"
-		>
-			<?php echo( $toggle_button_content ); ?>
+	<nav <?php echo ( $wrapper_attributes ); ?>>
+		<button wp-on:click="core.navigation.openMenu" wp-effect:on-open="core.navigation.focusFirstElement" wp-effect:on-close="core.navigation.focusLastFocusedElement" aria-haspopup="true" <?php echo ( $toggle_aria_label_open ); ?> class="<?php echo ( esc_attr( implode( ' ', $open_button_classes ) ) ); ?>">
+			<?php echo ( $toggle_button_content ); ?>
 		</button>
-		<div 
-			class="<?php echo( esc_attr( implode( ' ', $responsive_container_classes ) ) ); ?>"
-			wp-class:is-menu-open="core.navigation.isMenuOpen"
-			wp-class:has-modal-open="core.navigation.isMenuOpen"
-			style="<?php echo( safecss_filter_attr( $colors['overlay_inline_styles'] ) ); ?>"
-			id="<?php echo( esc_attr( $modal_unique_id ) ); ?>"
-		>
+		<div class="<?php echo ( esc_attr( implode( ' ', $responsive_container_classes ) ) ); ?>" wp-class:is-menu-open="core.navigation.isMenuOpen" wp-class:has-modal-open="core.navigation.isMenuOpen" style="<?php echo ( safecss_filter_attr( $colors['overlay_inline_styles'] ) ); ?>" id="<?php echo ( esc_attr( $modal_unique_id ) ); ?>">
 			<div class="wp-block-navigation__responsive-close" tabindex="-1">
-				<div class="wp-block-navigation__responsive-dialog" aria-label="<?php echo( __( 'Menu' ) ); ?>" aria-modal="true" role="dialog">
-					<button 
-						wp-on:click="core.navigation.closeMenu"
-						<?php echo( $toggle_aria_label_close ); ?>
-						class="wp-block-navigation__responsive-container-close"
-					>
-						<?php echo( $toggle_close_button_content ); ?>
+				<div class="wp-block-navigation__responsive-dialog" aria-label="<?php echo ( __( 'Menu' ) ); ?>" aria-modal="true" role="dialog">
+					<button wp-on:click="core.navigation.closeMenu" <?php echo ( $toggle_aria_label_close ); ?> class="wp-block-navigation__responsive-container-close">
+						<?php echo ( $toggle_close_button_content ); ?>
 					</button>
-					<div class="wp-block-navigation__responsive-container-content" id="<?php echo( esc_attr( $modal_unique_id ) ); ?>-content">
-						<?php echo( $inner_blocks_html ); ?>
+					<div class="wp-block-navigation__responsive-container-content" id="<?php echo ( esc_attr( $modal_unique_id ) ); ?>-content">
+						<?php echo ( $inner_blocks_html ); ?>
 					</div>
 				</div>
 			</div>
