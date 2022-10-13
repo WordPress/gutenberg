@@ -28,9 +28,9 @@ function gutenberg_register_layout_support( $block_type ) {
 /**
  * Generates the CSS for position support from the layout object.
  *
- * @param string               $selector CSS selector.
- * @param array                $layout   Layout object. The one that is passed has already checked
- *                                       the existence of default block layout.
+ * @param string $selector CSS selector.
+ * @param array  $layout   Layout object. The one that is passed has already checked
+ *                         the existence of default block layout.
  * @return string CSS styles on success. Else, empty string.
  */
 function gutenberg_get_layout_position_style( $selector, $layout ) {
@@ -38,12 +38,11 @@ function gutenberg_get_layout_position_style( $selector, $layout ) {
 
 	$position_type = _wp_array_get( $layout, array( 'position', 'type' ), '' );
 	$position_side = _wp_array_get( $layout, array( 'position', 'side' ), '' );
-
 	$offset_value  = '0';
 
 	if (
 		in_array( $position_type, array( 'fixed', 'sticky' ), true ) &&
-		in_array( $position_side, array( 'top', 'right', 'bottom', 'left'), true )
+		in_array( $position_side, array( 'top', 'right', 'bottom', 'left' ), true )
 	) {
 		/*
 		 * For fixed or sticky top positions,
