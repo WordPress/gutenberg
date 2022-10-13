@@ -84,8 +84,8 @@ function Content( props ) {
 	);
 }
 
-function Placeholder() {
-	const blockProps = useBlockProps();
+function Placeholder( { layoutClassNames } ) {
+	const blockProps = useBlockProps( { className: layoutClassNames } );
 	return (
 		<div { ...blockProps }>
 			<p>
@@ -118,7 +118,11 @@ function RecursionError() {
 	);
 }
 
-export default function PostContentEdit( { context, attributes } ) {
+export default function PostContentEdit( {
+	context,
+	attributes,
+	layoutClassNames,
+} ) {
 	const { postId: contextPostId, postType: contextPostType } = context;
 	const { layout = {} } = attributes;
 	const hasAlreadyRendered = useHasRecursion( contextPostId );
@@ -132,7 +136,7 @@ export default function PostContentEdit( { context, attributes } ) {
 			{ contextPostId && contextPostType ? (
 				<Content context={ context } layout={ layout } />
 			) : (
-				<Placeholder />
+				<Placeholder layoutClassNames={ layoutClassNames } />
 			) }
 		</RecursionProvider>
 	);

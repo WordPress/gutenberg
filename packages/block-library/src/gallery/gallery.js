@@ -26,6 +26,7 @@ export const Gallery = ( props ) => {
 		mediaPlaceholder,
 		insertBlocksAfter,
 		blockProps,
+		layoutClassNames,
 	} = props;
 
 	const { align, columns, caption, imageCrop } = attributes;
@@ -42,6 +43,7 @@ export const Gallery = ( props ) => {
 			{ ...innerBlocksProps }
 			className={ classnames(
 				blockProps.className,
+				layoutClassNames,
 				'blocks-gallery-grid',
 				{
 					[ `align${ align }` ]: align,
