@@ -186,6 +186,9 @@ const UnforwardedFontSizePicker = (
 							<FontSizePickerSelect
 								fontSizes={ fontSizes }
 								value={ value }
+								disableCustomFontSizes={
+									disableCustomFontSizes
+								}
 								size={ size }
 								onChange={ ( newValue ) => {
 									onChange?.(

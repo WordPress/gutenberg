@@ -25,7 +25,14 @@ const CUSTOM_OPTION: FontSizePickerSelectOption = {
 };
 
 const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
-	const { fontSizes = [], value, size, onChange, onSelectCustom } = props;
+	const {
+		fontSizes,
+		value,
+		disableCustomFontSizes,
+		size,
+		onChange,
+		onSelectCustom,
+	} = props;
 
 	const options: FontSizePickerSelectOption[] = [
 		DEFAULT_OPTION,
@@ -38,7 +45,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 				__experimentalHint: parsedValue,
 			};
 		} ),
-		CUSTOM_OPTION,
+		...( disableCustomFontSizes ? [] : [ CUSTOM_OPTION ] ),
 	];
 
 	const selectedOption =
