@@ -79,7 +79,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 			);
 		}
 
-		return __( 'You can read this post in less than a minute.' );
+		return __( 'You can read this post in less than 1 minute.' );
 	}, [ contentStructure, blocks ] );
 
 	const blockProps = useBlockProps( {
