@@ -292,25 +292,20 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 }
 
 /**
- * Indentifies inner block wrapper classnames.
+ * Gets classname from last tag in a string of HTML.
  *
- * @param array $inner_content An array of strings.
+ * @param string $html markup to be processed.
  * @return string String of inner wrapper classnames.
  */
-function gutenberg_identify_inner_block_wrapper_classnames( $inner_content ) {
+function gutenberg_get_classnames_from_last_tag( $html ) {
+	$tags            = new WP_HTML_Tag_Processor( $html );
+	$last_classnames = '';
 
-	if ( ! isset( $inner_content[0] ) ) {
-		return false;
+	while ( $tags->next_tag() ) {
+		$last_classnames = $tags->get_attribute( 'class' );
 	}
 
-	$inner_content_chunk      = new WP_HTML_Tag_Processor( $inner_content[0] );
-	$inner_wrapper_classnames = '';
-
-	while ( true === $inner_content_chunk->next_tag() ) {
-		$inner_wrapper_classnames = $inner_content_chunk->get_attribute( 'class' );
-	}
-
-	return $inner_wrapper_classnames;
+	return $last_classnames;
 }
 
 /**
@@ -433,15 +428,15 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	}
 
-	$inner_content_classnames = gutenberg_identify_inner_block_wrapper_classnames( $block['innerContent'] );
+	$inner_content_classnames = isset( $block['innerContent'][0] ) && 'string' === gettype( $block['innerContent'][0] ) ? gutenberg_get_classnames_from_last_tag( $block['innerContent'][0] ) : '';
 
 	$content = new WP_HTML_Tag_Processor( $block_content );
 	if ( $inner_content_classnames ) {
 		$content->next_tag( array( 'class_name' => $inner_content_classnames ) );
-		$content->add_class( esc_attr( implode( ' ', $class_names ) ) );
+		$content->add_class( implode( ' ', $class_names ) );
 	} else {
 		$content->next_tag();
-		$content->add_class( esc_attr( implode( ' ', $class_names ) ) );
+		$content->add_class( implode( ' ', $class_names ) );
 	}
 
 	return $content;
