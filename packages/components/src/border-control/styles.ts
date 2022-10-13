@@ -56,17 +56,15 @@ export const wrapperWidth = css`
 	}
 `;
 
-/*
- * When default control height is 40px the following should be removed.
- * See: InputControl and __next40pxDefaultSize.
- */
-export const wrapperHeight = ( __next40pxDefaultSize?: boolean ) => {
+export const wrapperHeight = ( size?: 'default' | '__unstable-large' ) => {
 	return css`
-		height: ${ __next40pxDefaultSize ? '40px' : '30px' };
+		height: ${ size === '__unstable-large' ? '40px' : '30px' };
 	`;
 };
 
-export const borderControlDropdown = ( __next40pxDefaultSize?: boolean ) => css`
+export const borderControlDropdown = (
+	size?: 'default' | '__unstable-large'
+) => css`
 	background: #fff;
 
 	&& > button {
@@ -74,8 +72,8 @@ export const borderControlDropdown = ( __next40pxDefaultSize?: boolean ) => css`
 		 * Override button component styles to fit within BorderControl
 		 * regardless of size.
 		 */
-		height: ${ __next40pxDefaultSize ? '40px' : '30px' };
-		width: ${ __next40pxDefaultSize ? '40px' : '30px' };
+		height: ${ size === '__unstable-large' ? '40px' : '30px' };
+		width: ${ size === '__unstable-large' ? '40px' : '30px' };
 		padding: 0;
 		display: flex;
 		align-items: center;
@@ -110,7 +108,7 @@ export const colorIndicatorBorder = ( border?: Border ) => {
 
 export const colorIndicatorWrapper = (
 	border?: Border,
-	__next40pxDefaultSize?: boolean
+	size?: 'default' | '__unstable-large'
 ) => {
 	const { style } = border || {};
 
@@ -118,9 +116,9 @@ export const colorIndicatorWrapper = (
 		border-radius: 9999px;
 		border: 2px solid transparent;
 		${ style ? colorIndicatorBorder( border ) : undefined }
-		width: ${ __next40pxDefaultSize ? '24px' : '22px' };
-		height: ${ __next40pxDefaultSize ? '24px' : '22px' };
-		padding: ${ __next40pxDefaultSize ? '2px' : '1px' };
+		width: ${ size === '__unstable-large' ? '24px' : '22px' };
+		height: ${ size === '__unstable-large' ? '24px' : '22px' };
+		padding: ${ size === '__unstable-large' ? '2px' : '1px' };
 
 		/*
 		 * ColorIndicator

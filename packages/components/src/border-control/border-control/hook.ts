@@ -33,9 +33,9 @@ export function useBorderControl(
 		isCompact,
 		onChange,
 		shouldSanitizeBorder = true,
+		size = 'default',
 		value: border,
 		width,
-		__next40pxDefaultSize = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderControl' );
 
@@ -121,14 +121,14 @@ export function useBorderControl(
 	if ( isCompact ) {
 		// Widths below represent the minimum usable width for compact controls.
 		// Taller controls contain greater internal padding, thus greater width.
-		wrapperWidth = __next40pxDefaultSize ? '116px' : '90px';
+		wrapperWidth = size === '__unstable-large' ? '116px' : '90px';
 	}
 	const innerWrapperClassName = useMemo( () => {
 		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
-		const heightStyle = styles.wrapperHeight( __next40pxDefaultSize );
+		const heightStyle = styles.wrapperHeight( size );
 
 		return cx( styles.innerWrapper(), widthStyle, heightStyle );
-	}, [ wrapperWidth, cx, __next40pxDefaultSize ] );
+	}, [ wrapperWidth, cx, size ] );
 
 	const sliderClassName = useMemo( () => {
 		return cx( styles.borderSlider() );
@@ -147,6 +147,6 @@ export function useBorderControl(
 		value: border,
 		widthUnit,
 		widthValue,
-		__next40pxDefaultSize,
+		size,
 	};
 }

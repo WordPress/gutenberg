@@ -23,11 +23,11 @@ export const wrapper = css`
 `;
 
 export const borderBoxControlLinkedButton = (
-	__next40pxDefaultSize?: boolean
+	size?: 'default' | '__unstable-large'
 ) => {
 	return css`
 		position: absolute;
-		top: ${ __next40pxDefaultSize ? '8px' : '3px' };
+		top: ${ size === '__unstable-large' ? '8px' : '3px' };
 		${ rtl( { right: 0 } )() }
 		line-height: 0;
 	`;
@@ -50,14 +50,14 @@ const borderBoxStyleWithFallback = ( border?: Border ) => {
 
 export const borderBoxControlVisualizer = (
 	borders?: Borders,
-	__next40pxDefaultSize?: boolean
+	size?: 'default' | '__unstable-large'
 ) => {
 	return css`
 		position: absolute;
-		top: ${ __next40pxDefaultSize ? '20px' : '15px' };
-		right: ${ __next40pxDefaultSize ? '39px' : '29px' };
-		bottom: ${ __next40pxDefaultSize ? '20px' : '15px' };
-		left: ${ __next40pxDefaultSize ? '39px' : '29px' };
+		top: ${ size === '__unstable-large' ? '20px' : '15px' };
+		right: ${ size === '__unstable-large' ? '39px' : '29px' };
+		bottom: ${ size === '__unstable-large' ? '20px' : '15px' };
+		left: ${ size === '__unstable-large' ? '39px' : '29px' };
 		border-top: ${ borderBoxStyleWithFallback( borders?.top ) };
 		border-bottom: ${ borderBoxStyleWithFallback( borders?.bottom ) };
 		${ rtl( {
@@ -70,11 +70,11 @@ export const borderBoxControlVisualizer = (
 };
 
 export const borderBoxControlSplitControls = (
-	__next40pxDefaultSize?: boolean
+	size?: 'default' | '__unstable-large'
 ) => css`
 	position: relative;
 	flex: 1;
-	width: ${ __next40pxDefaultSize ? undefined : '80%' };
+	width: ${ size === '__unstable-large' ? undefined : '80%' };
 `;
 
 export const centeredBorderControl = css`

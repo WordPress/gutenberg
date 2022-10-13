@@ -44,12 +44,11 @@ export type BorderBoxControlProps = ColorProps &
 		 */
 		value: AnyBorder;
 		/**
-		 * Start opting into the larger default height that will become the
-		 * default size in a future version.
+		 * Size of the control.
 		 *
-		 * @default false
+		 * @default default
 		 */
-		__next40pxDefaultSize?: boolean;
+		size?: 'default' | '__unstable-large';
 	};
 
 export type LinkedButtonProps = {
@@ -66,12 +65,11 @@ export type LinkedButtonProps = {
 	 */
 	onClick: () => void;
 	/**
-	 * Start opting into the larger default height that will become the
-	 * default size in a future version.
+	 * Size of the control.
 	 *
-	 * @default false
+	 * @default default
 	 */
-	__next40pxDefaultSize?: boolean;
+	size?: 'default' | '__unstable-large';
 };
 
 export type VisualizerProps = {
@@ -82,12 +80,11 @@ export type VisualizerProps = {
 	 */
 	value?: Borders;
 	/**
-	 * Start opting into the larger default height that will become the
-	 * default size in a future version.
+	 * Size of the control.
 	 *
-	 * @default false
+	 * @default default
 	 */
-	__next40pxDefaultSize?: boolean;
+	size?: 'default' | '__unstable-large';
 };
 
 export type SplitControlsProps = ColorProps & {
@@ -116,10 +113,9 @@ export type SplitControlsProps = ColorProps & {
 	 */
 	value?: Borders;
 	/**
-	 * Start opting into the larger default height that will become the
-	 * default size in a future version.
+	 * Size of the control.
 	 *
-	 * @default false
+	 * @default default
 	 */
-	__next40pxDefaultSize?: boolean;
+	size?: 'default' | '__unstable-large';
 };
