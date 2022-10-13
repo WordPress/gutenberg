@@ -76,13 +76,10 @@ function block_core_gallery_render( $attributes, $content ) {
 		}
 	}
 
-	$class   = wp_unique_id( 'wp-block-gallery-' );
-	$content = preg_replace(
-		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="' . $class . ' ',
-		$content,
-		1
-	);
+	$unique_gallery_classname = wp_unique_id( 'wp-block-gallery-' );
+	$processed_content        = new WP_HTML_Tag_Processor( $content );
+	$processed_content->next_tag();
+	$processed_content->add_class( $unique_gallery_classname );
 
 	// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
 	// gap on the gallery.
@@ -104,7 +101,7 @@ function block_core_gallery_render( $attributes, $content ) {
 	// Set the CSS variable to the column value, and the `gap` property to the combined gap value.
 	$gallery_styles   = array();
 	$gallery_styles[] = array(
-		'selector'     => ".wp-block-gallery.{$class}",
+		'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
 		'declarations' => array(
 			'--wp--style--unstable-gallery-gap' => $gap_column,
 			'gap'                               => $gap_value,
@@ -117,7 +114,7 @@ function block_core_gallery_render( $attributes, $content ) {
 			'context' => 'block-supports',
 		)
 	);
-	return $content;
+	return (string) $processed_content;
 }
 /**
  * Registers the `core/gallery` block on server.
