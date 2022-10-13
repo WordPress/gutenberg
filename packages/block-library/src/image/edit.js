@@ -15,6 +15,7 @@ import {
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
+	RichText,
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
@@ -305,6 +306,7 @@ export function ImageEdit( {
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'has-custom-border':
 			!! borderProps.className || ! isEmpty( borderProps.style ),
+		'has-caption': ! RichText.isEmpty( caption ),
 	} );
 
 	const blockProps = useBlockProps( {

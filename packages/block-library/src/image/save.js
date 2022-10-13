@@ -40,6 +40,7 @@ export default function save( { attributes } ) {
 		'is-resized': width || height,
 		'has-custom-border':
 			!! borderProps.className || ! isEmpty( borderProps.style ),
+		'has-caption': ! RichText.isEmpty( caption ),
 	} );
 
 	const imageClasses = classnames( borderProps.className, {
