@@ -381,7 +381,7 @@ DEPENDENCIES:
   - FBLazyVector (from `../../../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../../../node_modules/react-native/React/FBReactNativeSpec`)
   - glog (from `../../../node_modules/react-native/third-party-podspecs/glog.podspec`)
-  - "Gutenberg (from `../../../node_modules/@wordpress/react-native-bridge`)"
+  - Gutenberg (from `../../react-native-bridge`)
   - RCT-Folly (from `../../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../../../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../../../node_modules/react-native/Libraries/TypeSafety`)
@@ -424,7 +424,7 @@ DEPENDENCIES:
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
   - RNScreens (from `../../../node_modules/react-native-screens`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
-  - "RNTAztecView (from `../../../node_modules/@wordpress/react-native-aztec`)"
+  - RNTAztecView (from `../../react-native-aztec`)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -449,7 +449,7 @@ EXTERNAL SOURCES:
   glog:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/glog.podspec"
   Gutenberg:
-    :path: "../../../node_modules/@wordpress/react-native-bridge"
+    :path: "../../react-native-bridge"
   RCT-Folly:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -533,7 +533,7 @@ EXTERNAL SOURCES:
   RNSVG:
     :path: "../../../node_modules/react-native-svg"
   RNTAztecView:
-    :path: "../../../node_modules/@wordpress/react-native-aztec"
+    :path: "../../react-native-aztec"
   Yoga:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
 
@@ -561,14 +561,14 @@ SPEC CHECKSUMS:
   React-jsiexecutor: a27badbbdbc0ff781813370736a2d1c7261181d4
   React-jsinspector: 8a3d3f5dcd23a91e8c80b1bf0e96902cd1dca999
   React-logger: 1088859f145b8f6dd0d3ed051a647ef0e3e80fad
-  react-native-blur: 3e9c8e8e9f7d17fa1b94e1a0ae9fd816675f5382
+  react-native-blur: 8cd9b4a8007166ad643f4dff914c3fddd2ff5b9a
   react-native-get-random-values: b6fb85e7169b9822976793e467458c151c3e8b69
-  react-native-keyboard-aware-scroll-view: 0bc6c2dfe9056935a40dc1a70e764b7a1bbf6568
+  react-native-keyboard-aware-scroll-view: 374b637c8684d7de50bd930df1a2d2b8fd49daa5
   react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
-  react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
+  react-native-safe-area-context: e471852c5ed67eea4b10c5d9d43c1cebae3b231d
   react-native-slider: d4c3367c5db5d2bec3ac0ab9d15ebb73d896034c
-  react-native-video: b15ae1cbd5b4f1d9a1003b334b71c344da7819a5
-  react-native-webview: 193d233c29eacce1f42ca2637dab7ba79c25a6de
+  react-native-video: b988496ef61f37797b43c8e45f33e7886383615f
+  react-native-webview: 1f56115845c98f0a59dfbbac685797c014a821be
   React-perflogger: cb386fd44c97ec7f8199c04c12b22066b0f2e1e0
   React-RCTActionSheet: f803a85e46cf5b4066c2ac5e122447f918e9c6e5
   React-RCTAnimation: 19c80fa950ccce7f4db76a2a7f2cf79baae07fc7
@@ -581,8 +581,8 @@ SPEC CHECKSUMS:
   React-RCTVibration: 9adb4a3cbb598d1bbd46a05256f445e4b8c70603
   React-runtimeexecutor: 61ee22a8cdf8b6bb2a7fb7b4ba2cc763e5285196
   ReactCommon: 8f67bd7e0a6afade0f20718f859dc8c2275f2e83
-  RNCClipboard: 99fc8ad669a376b756fbc8098ae2fd05c0ed0668
-  RNCMaskedView: c298b644a10c0c142055b3ae24d83879ecb13ccd
+  RNCClipboard: f49f3de56b40d0f4104680dabadc7a1f063f4fd4
+  RNCMaskedView: d367b2a8df3992114e31b32b091a0c00dc800827
   RNFastImage: 1f2cab428712a4baaf78d6169eaec7f622556dd7
   RNGestureHandler: 225ee7ea87b1024ced46ec4705537c075ad33ba0
   RNReanimated: a0585584b89e6b5a5369ad98b3e4d5916ac67859
