@@ -16,6 +16,7 @@ export default function AllInputControl( {
 	spacingSizes,
 	type,
 	minimumCustomValue,
+	setMouseOver,
 } ) {
 	const allValue = getAllRawValue( values );
 	const hasValues = isValuesDefined( values );
@@ -35,6 +36,7 @@ export default function AllInputControl( {
 			isMixed={ isMixed }
 			type={ type }
 			minimumCustomValue={ minimumCustomValue }
+			setMouseOver={ setMouseOver }
 		/>
 	);
 }

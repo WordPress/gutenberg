@@ -103,6 +103,7 @@ export function PaddingEdit( props ) {
 		name: blockName,
 		attributes: { style },
 		setAttributes,
+		setMouseOver,
 	} = props;
 
 	const spacingSizes = useSetting( 'spacing.spacingSizes' );
@@ -161,6 +162,7 @@ export function PaddingEdit( props ) {
 						units={ units }
 						allowReset={ false }
 						splitOnAxis={ splitOnAxis }
+						setMouseOver={ setMouseOver }
 					/>
 				) }
 			</>
@@ -169,7 +171,7 @@ export function PaddingEdit( props ) {
 	} );
 }
 
-export function PaddingVisualizer( { clientId, attributes } ) {
+export function PaddingVisualizer( { clientId, attributes, isMouseOver } ) {
 	const padding = attributes?.style?.spacing?.padding;
 	const style = useMemo( () => {
 		return {
@@ -199,7 +201,7 @@ export function PaddingVisualizer( { clientId, attributes } ) {
 	};
 
 	useEffect( () => {
-		if ( ! isShallowEqual( padding, valueRef.current ) ) {
+		if ( ! isShallowEqual( padding, valueRef.current ) && ! isMouseOver ) {
 			setIsActive( true );
 			valueRef.current = padding;
 
@@ -211,9 +213,9 @@ export function PaddingVisualizer( { clientId, attributes } ) {
 		}
 
 		return () => clearTimer();
-	}, [ padding ] );
+	}, [ padding, isMouseOver ] );
 
-	if ( ! isActive ) {
+	if ( ! isActive && ! isMouseOver ) {
 		return null;
 	}
 

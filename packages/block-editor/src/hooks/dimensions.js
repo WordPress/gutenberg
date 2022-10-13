@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
-import { Platform } from '@wordpress/element';
+import { Platform, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport } from '@wordpress/blocks';
 
@@ -44,6 +44,11 @@ export const SPACING_SUPPORT_KEY = 'spacing';
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
 export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
 
+function useVisualiserMouseOver() {
+	const [ isMouseOver, setIsMouseOver ] = useState( false );
+	return { isMouseOver, setIsMouseOver };
+}
+
 /**
  * Inspector controls for dimensions support.
  *
@@ -58,6 +63,8 @@ export function DimensionsPanel( props ) {
 	const isDisabled = useIsDimensionsDisabled( props );
 	const isSupported = hasDimensionsSupport( props.name );
 	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+	const paddingMouseOver = useVisualiserMouseOver();
+	const marginMouseOver = useVisualiserMouseOver();
 
 	if ( isDisabled || ! isSupported ) {
 		return null;
@@ -96,7 +103,10 @@ export function DimensionsPanel( props ) {
 						isShownByDefault={ defaultSpacingControls?.padding }
 						panelId={ props.clientId }
 					>
-						<PaddingEdit { ...props } />
+						<PaddingEdit
+							setMouseOver={ paddingMouseOver.setIsMouseOver }
+							{ ...props }
+						/>
 					</ToolsPanelItem>
 				) }
 				{ ! isMarginDisabled && (
@@ -109,7 +119,10 @@ export function DimensionsPanel( props ) {
 						isShownByDefault={ defaultSpacingControls?.margin }
 						panelId={ props.clientId }
 					>
-						<MarginEdit { ...props } />
+						<MarginEdit
+							setMouseOver={ marginMouseOver.setIsMouseOver }
+							{ ...props }
+						/>
 					</ToolsPanelItem>
 				) }
 				{ ! isGapDisabled && (
@@ -126,8 +139,18 @@ export function DimensionsPanel( props ) {
 					</ToolsPanelItem>
 				) }
 			</InspectorControls>
-			{ ! isPaddingDisabled && <PaddingVisualizer { ...props } /> }
-			{ ! isMarginDisabled && <MarginVisualizer { ...props } /> }
+			{ ! isPaddingDisabled && (
+				<PaddingVisualizer
+					isMouseOver={ paddingMouseOver.isMouseOver }
+					{ ...props }
+				/>
+			) }
+			{ ! isMarginDisabled && (
+				<MarginVisualizer
+					isMouseOver={ marginMouseOver.isMouseOver }
+					{ ...props }
+				/>
+			) }
 		</>
 	);
 }

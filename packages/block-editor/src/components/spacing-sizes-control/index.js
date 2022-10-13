@@ -20,6 +20,7 @@ import LinkedButton from './linked-button';
 import { DEFAULT_VALUES, isValuesMixed, isValuesDefined } from './utils';
 import useSetting from '../use-setting';
 
+const noop = () => {};
 export default function SpacingSizesControl( {
 	inputProps,
 	onChange,
@@ -29,6 +30,7 @@ export default function SpacingSizesControl( {
 	splitOnAxis = false,
 	useSelect,
 	minimumCustomValue = 0,
+	setMouseOver = noop,
 } ) {
 	const spacingSizes = [
 		{ name: 0, slug: '0', size: 0 },
@@ -70,6 +72,7 @@ export default function SpacingSizesControl( {
 		useSelect,
 		type: label,
 		minimumCustomValue,
+		setMouseOver,
 	};
 
 	return (

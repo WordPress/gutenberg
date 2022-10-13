@@ -13,6 +13,7 @@ export default function AxialInputControls( {
 	spacingSizes,
 	type,
 	minimumCustomValue,
+	setMouseOver,
 } ) {
 	const createHandleOnChange = ( side ) => ( next ) => {
 		if ( ! onChange ) {
@@ -54,6 +55,7 @@ export default function AxialInputControls( {
 						spacingSizes={ spacingSizes }
 						type={ type }
 						minimumCustomValue={ minimumCustomValue }
+						setMouseOver={ setMouseOver }
 					/>
 				);
 			} ) }
