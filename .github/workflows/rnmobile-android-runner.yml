@@ -32,7 +32,7 @@ jobs:
                   cache: 'gradle'
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.0
+              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
               with:
                   node-version-file: '.nvmrc'
                   cache: npm
