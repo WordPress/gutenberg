@@ -127,19 +127,15 @@ function render_block_core_template_part( $attributes ) {
 			'';
 	}
 
-	// Run through the actions that are typically taken on the_content.
 	$seen_ids[ $template_part_id ] = true;
-	$content                       = do_blocks( $content );
-	unset( $seen_ids[ $template_part_id ] );
-	$content = wptexturize( $content );
-	$content = convert_smilies( $content );
-	$content = shortcode_unautop( $content );
-	$content = wp_filter_content_tags( $content );
-	$content = do_shortcode( $content );
 
 	// Handle embeds for block template parts.
 	global $wp_embed;
+	$content = $wp_embed->run_shortcode( $content );
 	$content = $wp_embed->autoembed( $content );
+
+	$content = do_blocks( $content );
+	unset( $seen_ids[ $template_part_id ] );
 
 	if ( empty( $attributes['tagName'] ) ) {
 		$defined_areas = get_allowed_block_template_part_areas();

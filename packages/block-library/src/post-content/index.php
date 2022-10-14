@@ -51,6 +51,23 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 		$content .= wp_link_pages( array( 'echo' => 0 ) );
 	}
 
+	$hooks_to_remove = array(
+		'wptexturize',
+		'shortcode_unautop',
+		'wp_filter_content_tags',
+		'do_shortcode',
+		'convert_smilies',
+	);
+
+	// Temporarily remove some hooks that are not suitable for this block.
+	foreach ( $hooks_to_remove as $hook ) {
+		$priority = has_filter( 'the_content', $hook );
+		if ( false !== $priority ) {
+			_removed_hooks_from_the_content( $priority, $hook );
+			add_filter( 'the_content', '_restore_hooks_to_the_content', $priority + 1 );
+		}
+	}
+
 	/** This filter is documented in wp-includes/post-template.php */
 	$content = apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $content ) );
 	unset( $seen_ids[ $post_id ] );
