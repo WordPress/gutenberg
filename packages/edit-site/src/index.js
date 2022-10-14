@@ -16,8 +16,6 @@ import { store as editorStore } from '@wordpress/editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { __ } from '@wordpress/i18n';
-import { store as viewportStore } from '@wordpress/viewport';
-import { getQueryArgs } from '@wordpress/url';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -25,7 +23,6 @@ import { addFilter } from '@wordpress/hooks';
  */
 import './hooks';
 import { store as editSiteStore } from './store';
-import getIsListPage from './utils/get-is-list-page';
 import ErrorBoundaryWarning from './components/error-boundary/warning';
 import App from './components/app';
 
@@ -116,18 +113,6 @@ export function reinitializeEditor( target, settings ) {
 			defaultTemplateTypes: settings.defaultTemplateTypes,
 			defaultTemplatePartAreas: settings.defaultTemplatePartAreas,
 		} );
-
-		const isLandingOnListPage = getIsListPage(
-			getQueryArgs( window.location.href )
-		);
-
-		if ( isLandingOnListPage ) {
-			// Default the navigation panel to be opened when we're in a bigger
-			// screen and land in the list screen.
-			dispatch( editSiteStore ).setIsNavigationPanelOpened(
-				select( viewportStore ).isViewportMatch( 'medium' )
-			);
-		}
 	}
 
 	// Prevent the default browser action for files dropped outside of dropzones.

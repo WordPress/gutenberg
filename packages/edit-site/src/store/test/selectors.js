@@ -13,9 +13,7 @@ import {
 	getEditedPostType,
 	getEditedPostId,
 	getPage,
-	getNavigationPanelActiveMenu,
 	getReusableBlocks,
-	isNavigationOpened,
 	isInserterOpened,
 	isListViewOpened,
 	__unstableGetPreference,
@@ -140,26 +138,6 @@ describe( 'selectors', () => {
 			const page = {};
 			const state = { editedPost: { page } };
 			expect( getPage( state ) ).toBe( page );
-		} );
-	} );
-
-	describe( 'getNavigationPanelActiveMenu', () => {
-		it( 'returns the current navigation menu', () => {
-			const state = {
-				navigationPanel: { menu: 'test-menu', isOpen: false },
-			};
-			expect( getNavigationPanelActiveMenu( state ) ).toBe( 'test-menu' );
-		} );
-	} );
-
-	describe( 'isNavigationOpened', () => {
-		it( 'returns the navigation panel isOpened state', () => {
-			const state = {
-				navigationPanel: { menu: 'test-menu', isOpen: false },
-			};
-			expect( isNavigationOpened( state ) ).toBe( false );
-			state.navigationPanel.isOpen = true;
-			expect( isNavigationOpened( state ) ).toBe( true );
 		} );
 	} );
 

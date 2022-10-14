@@ -275,11 +275,9 @@ _Parameters_
 
 ### setIsNavigationPanelOpened
 
+> **Deprecated**
+
 Sets whether the navigation panel should be open.
-
-_Parameters_
-
--   _isOpen_ `boolean`: If true, opens the nav panel. If false, closes it. It does not toggle the state, but sets it directly.
 
 ### setIsSaveViewOpened
 
