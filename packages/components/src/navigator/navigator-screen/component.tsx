@@ -42,7 +42,10 @@ type Props = Omit<
 	keyof MotionProps
 >;
 
-function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
+function UnconnectedNavigatorScreen(
+	props: Props,
+	forwardedRef: ForwardedRef< any >
+) {
 	const { children, className, path, ...otherProps } = useContextSystem(
 		props,
 		'NavigatorScreen'
@@ -200,9 +203,9 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
  * );
  * ```
  */
-const ConnectedNavigatorScreen = contextConnect(
-	NavigatorScreen,
+export const NavigatorScreen = contextConnect(
+	UnconnectedNavigatorScreen,
 	'NavigatorScreen'
 );
 
-export default ConnectedNavigatorScreen;
+export default NavigatorScreen;
