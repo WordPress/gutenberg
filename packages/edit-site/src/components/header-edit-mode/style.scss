@@ -1,6 +1,6 @@
 $header-toolbar-min-width: 335px;
 
-.edit-site-header {
+.edit-site-header-edit-mode {
 	align-items: center;
 	background-color: $white;
 	display: flex;
@@ -16,17 +16,17 @@ $header-toolbar-min-width: 335px;
 		@include reduce-motion("transition");
 	}
 
-	.edit-site-header_start {
+	.edit-site-header-edit-mode__start {
 		display: flex;
 		border: none;
 	}
 
-	.edit-site-header_end {
+	.edit-site-header-edit-mode__end {
 		display: flex;
 		justify-content: flex-end;
 	}
 
-	.edit-site-header_center {
+	.edit-site-header-edit-mode__center {
 		display: flex;
 		align-items: center;
 		height: 100%;
@@ -42,7 +42,7 @@ $header-toolbar-min-width: 335px;
 
 // Keeps the document title centered when the sidebar is open
 body.is-navigation-sidebar-open {
-	.edit-site-header {
+	.edit-site-header-edit-mode {
 		padding-left: 0;
 		transition: padding-left 20ms linear;
 		transition-delay: 0ms;
@@ -52,9 +52,9 @@ body.is-navigation-sidebar-open {
 
 // Centred document title on small screens with sidebar open
 @media ( max-width: #{ ($break-large - 1) } ) {
-	body.is-navigation-sidebar-open .edit-site-header {
-		.edit-site-header-toolbar__inserter-toggle ~ .components-button,
-		.edit-site-header_end .components-button:not(.is-primary) {
+	body.is-navigation-sidebar-open .edit-site-header-edit-mode {
+		.edit-site-header-edit-mode__inserter-toggle ~ .components-button,
+		.edit-site-header-edit-mode__end .components-button:not(.is-primary) {
 			display: none;
 		}
 		.edit-site-save-button__button {
@@ -63,7 +63,7 @@ body.is-navigation-sidebar-open {
 	}
 }
 
-.edit-site-header__toolbar {
+.edit-site-header-edit-mode__toolbar {
 	display: flex;
 	align-items: center;
 	padding-left: $grid-unit-10;
@@ -76,7 +76,7 @@ body.is-navigation-sidebar-open {
 		padding-right: $grid-unit-10;
 	}
 
-	.edit-site-header-toolbar__inserter-toggle {
+	.edit-site-header-edit-mode__inserter-toggle {
 		margin-right: $grid-unit-10;
 		min-width: $grid-unit-40;
 		width: $grid-unit-40;
@@ -96,21 +96,11 @@ body.is-navigation-sidebar-open {
 	}
 }
 
-.edit-site-header__toolbar-switchers {
-	align-items: center;
-	display: flex;
-}
-
-.edit-site-header__toolbar-switchers-separator {
-	margin: 0 -6px 0;
-}
-
-
 /**
  * Buttons on the right side
  */
 
-.edit-site-header__actions {
+.edit-site-header-edit-mode__actions {
 	display: inline-flex;
 	align-items: center;
 	padding-right: $grid-unit-05;
@@ -135,7 +125,7 @@ body.is-navigation-sidebar-open {
 	}
 }
 
-.edit-site-header__actions__preview-options {
+.edit-site-header-edit-mode__preview-options {
 	opacity: 1;
 	transition: opacity 0.3s;
 
@@ -144,32 +134,14 @@ body.is-navigation-sidebar-open {
 	}
 }
 
-.edit-site-header__actions-more-menu {
-	margin-left: -4px;
-
-	// The padding and margin of the more menu is intentionally non-standard.
-	.components-icon-button {
-		padding: 8px 2px;
-		width: auto;
-	}
-
-	@include break-small() {
-		margin-left: 4px;
-
-		.components-icon-button {
-			padding: 8px 4px;
-		}
-	}
-}
-
-.edit-site-header_start {
+.edit-site-header-edit-mode__start {
 	display: flex;
 	border: none;
 
 	// The Toolbar component adds different styles to buttons, so we reset them
 	// here to the original button styles
-	.edit-site-header__toolbar > .components-button.has-icon,
-	.edit-site-header__toolbar > .components-dropdown > .components-button.has-icon {
+	.edit-site-header-edit-mode__toolbar > .components-button.has-icon,
+	.edit-site-header-edit-mode__toolbar > .components-dropdown > .components-button.has-icon {
 		height: $button-size;
 		min-width: $button-size;
 		padding: 6px;
@@ -188,7 +160,7 @@ body.is-navigation-sidebar-open {
 		}
 	}
 
-	.edit-site-header__toolbar > .edit-site-header-toolbar__inserter-toggle.has-icon {
+	.edit-site-header-edit-mode__toolbar > .edit-site-header-edit-mode__inserter-toggle.has-icon {
 		margin-right: $grid-unit-10;
 		// Special dimensions for this button.
 		min-width: 32px;
@@ -197,17 +169,15 @@ body.is-navigation-sidebar-open {
 		padding: 0;
 	}
 
-	.edit-site-header__toolbar > .edit-site-header-toolbar__inserter-toggle.has-text.has-icon {
+	.edit-site-header-edit-mode__toolbar > .edit-site-header-edit-mode__inserter-toggle.has-text.has-icon {
 		width: auto;
 		padding: 0 $grid-unit-10;
 	}
-
-
 }
 
 // Button text label styles
 
-.show-icon-labels .edit-site-header {
+.show-icon-labels .edit-site-header-edit-mode {
 	.components-button.has-icon {
 		width: auto;
 
@@ -242,13 +212,13 @@ body.is-navigation-sidebar-open {
 		}
 	}
 
-	.edit-site-header-toolbar__inserter-toggle.edit-site-header-toolbar__inserter-toggle,
+	.edit-site-header-edit-mode__inserter-toggle.edit-site-header-edit-mode__inserter-toggle,
 	.edit-site-document-actions__get-info.edit-site-document-actions__get-info.edit-site-document-actions__get-info {
 		height: 36px;
 		padding: 0 $grid-unit-10;
 	}
 
-	.edit-site-header_start .edit-site-header__toolbar > * + * {
+	.edit-site-header__start .edit-site-header__toolbar > * + * {
 		margin-left: $grid-unit-10;
 	}
 }
