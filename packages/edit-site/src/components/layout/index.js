@@ -7,7 +7,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { __unstableMotion as motion } from '@wordpress/components';
+import {
+	__unstableMotion as motion,
+	__unstableAnimatePresence as AnimatePresence,
+} from '@wordpress/components';
 import { useReducedMotion } from '@wordpress/compose';
 
 /**
@@ -42,10 +45,33 @@ export default function Layout() {
 				'is-full-canvas': isFullCanvas,
 			} ) }
 		>
-			<div className="edit-site-layout__sidebar">
-				<Sidebar />
-			</div>
-			<div className="edit-site-layout__canvas-container">
+			<AnimatePresence>
+				{ ! isFullCanvas && (
+					<motion.div
+						initial={ { opacity: 0, width: 280 } }
+						animate={ { opacity: 1, width: 280 } }
+						exit={ {
+							opacity: 0,
+							width: 0,
+						} }
+						transition={ {
+							type: 'tween',
+							duration: disableMotion ? 0 : 0.5,
+						} }
+						className="edit-site-layout__sidebar"
+					>
+						<Sidebar />
+					</motion.div>
+				) }
+			</AnimatePresence>
+			<motion.div
+				className="edit-site-layout__canvas-container"
+				animate={ { padding: isFullCanvas ? 0 : 24 } }
+				transition={ {
+					type: 'tween',
+					duration: disableMotion ? 0 : 0.5,
+				} }
+			>
 				<motion.div
 					className="edit-site-layout__canvas"
 					layout={ ! disableMotion }
@@ -55,7 +81,7 @@ export default function Layout() {
 						{ isListPage && <ListPage /> }
 					</ErrorBoundary>
 				</motion.div>
-			</div>
+			</motion.div>
 		</div>
 	);
 }

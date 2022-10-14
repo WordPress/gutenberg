@@ -50,7 +50,7 @@ export default function Header() {
 				{ canvasMode === 'view' && __( 'Edit' ) }
 			</Button>
 			<FlexBlock>
-				<AnimatePresence exitBeforeEnter>
+				<AnimatePresence>
 					{ canvasMode === 'edit' && (
 						<motion.div
 							initial={ { opacity: 0 } }
