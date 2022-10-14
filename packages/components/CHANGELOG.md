@@ -13,6 +13,7 @@
 ### Internal
 
 -   `Modal`: Convert to TypeScript ([#42949](https://github.com/WordPress/gutenberg/pull/42949)).
+-   `Navigator`: refactor unit tests to TypeScript and to `user-event` ([#44970](https://github.com/WordPress/gutenberg/pull/44970)).
 
 ## 21.2.0 (2022-10-05)
 
