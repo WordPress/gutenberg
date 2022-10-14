@@ -195,9 +195,11 @@ function CoverEdit( {
 		}
 	);
 
+	const mediaElement = useRef();
 	const currentSettings = {
 		isVideoBackground,
 		isImageBackground,
+		mediaElement,
 		hasInnerBlocks,
 		url,
 		isImgElement,
@@ -359,6 +361,7 @@ function CoverEdit( {
 					isImageBackground &&
 					( isImgElement ? (
 						<img
+							ref={ mediaElement }
 							className="wp-block-cover__image-background"
 							alt={ alt }
 							src={ url }
@@ -366,6 +369,7 @@ function CoverEdit( {
 						/>
 					) : (
 						<div
+							ref={ mediaElement }
 							role="img"
 							className={ classnames(
 								classes,
@@ -376,6 +380,7 @@ function CoverEdit( {
 					) ) }
 				{ url && isVideoBackground && (
 					<video
+						ref={ mediaElement }
 						className="wp-block-cover__video-background"
 						autoPlay
 						muted
