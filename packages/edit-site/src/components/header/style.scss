@@ -12,7 +12,7 @@
 	position: relative;
 	background: $gray-900;
 	color: $white;
-	height: 100%;
+	height: calc(100% + #{$border-width});
 	border-radius: 0;
 	margin-bottom: - $border-width;
 
