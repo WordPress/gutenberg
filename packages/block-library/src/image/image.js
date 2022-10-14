@@ -40,7 +40,12 @@ import {
 	getDefaultBlockName,
 	switchToBlockType,
 } from '@wordpress/blocks';
-import { crop, overlayText, upload } from '@wordpress/icons';
+import {
+	crop,
+	overlayText,
+	upload,
+	caption as captionIcon,
+} from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -89,7 +94,8 @@ export default function Image( {
 	} = attributes;
 	const imageRef = useRef();
 	const captionRef = useRef();
-	const prevUrl = usePrevious( url );
+	const prevCaption = usePrevious( caption );
+	const [ showCaption, setShowCaption ] = useState( !! caption );
 	const { allowResize = true } = context;
 	const { getBlock } = useSelect( blockEditorStore );
 
@@ -180,15 +186,20 @@ export default function Image( {
 			.catch( () => {} );
 	}, [ id, url, isSelected, externalBlob ] );
 
-	// Focus the caption after inserting an image from the placeholder. This is
-	// done to preserve the behaviour of focussing the first tabbable element
-	// when a block is mounted. Previously, the image block would remount when
-	// the placeholder is removed. Maybe this behaviour could be removed.
+	// We need to show the caption when changes come from
+	// history navigation(undo/redo).
 	useEffect( () => {
-		if ( url && ! prevUrl && isSelected ) {
-			captionRef.current.focus();
+		if ( caption && ! prevCaption ) {
+			setShowCaption( true );
 		}
-	}, [ url, prevUrl ] );
+	}, [ caption, prevCaption ] );
+
+	// Focus the caption when we click to add one.
+	useEffect( () => {
+		if ( showCaption && ! caption ) {
+			captionRef.current?.focus();
+		}
+	}, [ caption, showCaption ] );
 
 	// Get naturalWidth and naturalHeight from image ref, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
@@ -297,8 +308,11 @@ export default function Image( {
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsEditingImage( false );
+			if ( ! caption ) {
+				setShowCaption( false );
+			}
 		}
-	}, [ isSelected ] );
+	}, [ isSelected, caption ] );
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
 	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
@@ -317,6 +331,16 @@ export default function Image( {
 					<BlockAlignmentControl
 						value={ align }
 						onChange={ updateAlignment }
+					/>
+				) }
+				{ ! isContentLocked && ! caption && (
+					<ToolbarButton
+						onClick={ () => {
+							setShowCaption( ! showCaption );
+						} }
+						icon={ captionIcon }
+						disabled={ showCaption }
+						label={ __( 'Add caption' ) }
 					/>
 				) }
 				{ ! multiImageSelection && ! isEditingImage && (
@@ -591,25 +615,28 @@ export default function Image( {
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
 			{ img }
-			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-				<RichText
-					className={ __experimentalGetElementClassName( 'caption' ) }
-					ref={ captionRef }
-					tagName="figcaption"
-					aria-label={ __( 'Image caption text' ) }
-					placeholder={ __( 'Add caption' ) }
-					value={ caption }
-					onChange={ ( value ) =>
-						setAttributes( { caption: value } )
-					}
-					inlineToolbar
-					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter(
-							createBlock( getDefaultBlockName() )
-						)
-					}
-				/>
-			) }
+			{ showCaption &&
+				( ! RichText.isEmpty( caption ) || isSelected ) && (
+					<RichText
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
+						ref={ captionRef }
+						tagName="figcaption"
+						aria-label={ __( 'Image caption text' ) }
+						placeholder={ __( 'Add caption' ) }
+						value={ caption }
+						onChange={ ( value ) =>
+							setAttributes( { caption: value } )
+						}
+						inlineToolbar
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
+						}
+					/>
+				) }
 		</ImageEditingProvider>
 	);
 }
