@@ -19,7 +19,7 @@ if ( ! function_exists( '_removed_hooks_from_the_content' ) ) {
 	 * @return array All hooks removed from the specified priority.
 	 */
 	function _removed_hooks_from_the_content( $priority, $callback = false ) {
-		static $removed_hooks;
+		static $removed_hooks = array();
 
 		if ( is_callable( $callback ) && is_int( $priority ) && 0 <= $priority ) {
 			remove_filter( 'the_content', $callback, $priority );
@@ -28,7 +28,7 @@ if ( ! function_exists( '_removed_hooks_from_the_content' ) ) {
 				$removed_hooks[ $priority ] = array();
 			}
 
-			if ( ! in_array( $removed_hooks[ $priority ], $callback, true ) ) {
+			if ( ! in_array( $callback, $removed_hooks[ $priority ], true ) ) {
 				$removed_hooks[ $priority ][] = $callback;
 			}
 		}
