@@ -52,6 +52,17 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-zoomed-out-view',
 		)
 	);
+	add_settings_field(
+		'gutenberg-off-canvas-navigation-editor',
+		__( 'Off canvas navigation editor ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test a new off canvas editor for navigation block', 'gutenberg' ),
+			'id'    => 'gutenberg-off-canvas-navigation-editor',
+		)
+	);
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
