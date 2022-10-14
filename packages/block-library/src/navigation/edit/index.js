@@ -147,7 +147,7 @@ function Navigation( {
 	} = useCreateNavigationMenu( clientId );
 
 	const createUntitledEmptyNavigationMenu = () =>
-		void createNavigationMenu( '', [], generatedSlug );
+		void createNavigationMenu( '', [], null, generatedSlug );
 
 	useEffect( () => {
 		hideNavigationMenuStatusNotice();
