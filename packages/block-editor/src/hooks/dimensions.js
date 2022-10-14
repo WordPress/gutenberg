@@ -44,7 +44,7 @@ export const SPACING_SUPPORT_KEY = 'spacing';
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
 export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
 
-function useVisualiserMouseOver() {
+function useVisualizerMouseOver() {
 	const [ isMouseOver, setIsMouseOver ] = useState( false );
 	return { isMouseOver, setIsMouseOver };
 }
@@ -63,8 +63,8 @@ export function DimensionsPanel( props ) {
 	const isDisabled = useIsDimensionsDisabled( props );
 	const isSupported = hasDimensionsSupport( props.name );
 	const spacingSizes = useSetting( 'spacing.spacingSizes' );
-	const paddingMouseOver = useVisualiserMouseOver();
-	const marginMouseOver = useVisualiserMouseOver();
+	const paddingMouseOver = useVisualizerMouseOver();
+	const marginMouseOver = useVisualizerMouseOver();
 
 	if ( isDisabled || ! isSupported ) {
 		return null;
