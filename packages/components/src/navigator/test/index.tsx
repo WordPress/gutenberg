@@ -279,6 +279,8 @@ describe( 'Navigator', () => {
 	] );
 
 	beforeAll( () => {
+		// @ts-expect-error There's no need for an exact mock, this is just needed
+		// for the tests to pass (see `mockedGetClientRects` inline comments).
 		window.Element.prototype.getClientRects =
 			jest.fn( mockedGetClientRects );
 	} );
