@@ -202,6 +202,11 @@ function BlockPatternsTabs( {
 											: 'block-editor-inserter__patterns-category'
 									}
 									aria-label={ category.label }
+									aria-current={
+										category === selectedCategory
+											? 'true'
+											: undefined
+									}
 								>
 									<HStack>
 										<FlexBlock>
