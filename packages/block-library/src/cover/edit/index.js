@@ -131,13 +131,7 @@ function CoverEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
-	const mediaElement = useRef();
-	const isCoverDark = useCoverIsDark(
-		url,
-		dimRatio,
-		overlayColor.color,
-		mediaElement
-	);
+	const isCoverDark = useCoverIsDark( url, dimRatio, overlayColor.color );
 
 	useEffect( () => {
 		// This side-effect should not create an undo level.
@@ -204,7 +198,6 @@ function CoverEdit( {
 	const currentSettings = {
 		isVideoBackground,
 		isImageBackground,
-		mediaElement,
 		hasInnerBlocks,
 		url,
 		isImgElement,
@@ -366,7 +359,6 @@ function CoverEdit( {
 					isImageBackground &&
 					( isImgElement ? (
 						<img
-							ref={ mediaElement }
 							className="wp-block-cover__image-background"
 							alt={ alt }
 							src={ url }
@@ -374,7 +366,6 @@ function CoverEdit( {
 						/>
 					) : (
 						<div
-							ref={ mediaElement }
 							role="img"
 							className={ classnames(
 								classes,
@@ -385,7 +376,6 @@ function CoverEdit( {
 					) ) }
 				{ url && isVideoBackground && (
 					<video
-						ref={ mediaElement }
 						className="wp-block-cover__video-background"
 						autoPlay
 						muted
