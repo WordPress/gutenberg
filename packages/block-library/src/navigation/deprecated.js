@@ -13,6 +13,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import migrateFontFamily from '../utils/migrate-font-family';
+import { isNumeric } from './edit/utils';
 
 const TYPOGRAPHY_PRESET_DEPRECATION_MAP = {
 	fontStyle: 'var:preset|font-style|',
@@ -49,6 +50,130 @@ const migrateWithLayout = ( attributes ) => {
 	}
 
 	return updatedAttributes;
+};
+
+const v7 = {
+	attributes: {
+		ref: {
+			type: 'number',
+		},
+		textColor: {
+			type: 'string',
+		},
+		customTextColor: {
+			type: 'string',
+		},
+		rgbTextColor: {
+			type: 'string',
+		},
+		backgroundColor: {
+			type: 'string',
+		},
+		customBackgroundColor: {
+			type: 'string',
+		},
+		rgbBackgroundColor: {
+			type: 'string',
+		},
+		showSubmenuIcon: {
+			type: 'boolean',
+			default: true,
+		},
+		openSubmenusOnClick: {
+			type: 'boolean',
+			default: false,
+		},
+		overlayMenu: {
+			type: 'string',
+			default: 'mobile',
+		},
+		icon: {
+			type: 'string',
+			default: 'handle',
+		},
+		hasIcon: {
+			type: 'boolean',
+			default: true,
+		},
+		__unstableLocation: {
+			type: 'string',
+		},
+		overlayBackgroundColor: {
+			type: 'string',
+		},
+		customOverlayBackgroundColor: {
+			type: 'string',
+		},
+		overlayTextColor: {
+			type: 'string',
+		},
+		customOverlayTextColor: {
+			type: 'string',
+		},
+		maxNestingLevel: {
+			type: 'number',
+			default: 5,
+		},
+	},
+	supports: {
+		align: [ 'wide', 'full' ],
+		anchor: true,
+		html: false,
+		inserter: true,
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontStyle: true,
+			__experimentalFontWeight: true,
+			__experimentalTextTransform: true,
+			__experimentalFontFamily: true,
+			__experimentalLetterSpacing: true,
+			__experimentalTextDecoration: true,
+			__experimentalSkipSerialization: [ 'textDecoration' ],
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		spacing: {
+			blockGap: true,
+			units: [ 'px', 'em', 'rem', 'vh', 'vw' ],
+			__experimentalDefaultControls: {
+				blockGap: true,
+			},
+		},
+		__experimentalLayout: {
+			allowSwitching: false,
+			allowInheriting: false,
+			allowVerticalAlignment: false,
+			default: {
+				type: 'flex',
+			},
+		},
+		__experimentalStyle: {
+			elements: {
+				link: {
+					color: {
+						text: 'inherit',
+					},
+				},
+			},
+		},
+	},
+	save: ( { attributes } ) => {
+		if ( attributes.ref ) {
+			return;
+		}
+		return <InnerBlocks.Content />;
+	},
+	isEligible: ( { ref } ) => {
+		return isNumeric( ref );
+	},
+	migrate: ( { ref, ...attributes } ) => {
+		return {
+			...attributes,
+			ref: String( ref ),
+		};
+	},
 };
 
 const v6 = {
@@ -353,6 +478,7 @@ const migrateTypographyPresets = function ( attributes ) {
 };
 
 const deprecated = [
+	v7,
 	v6,
 	v5,
 	v4,

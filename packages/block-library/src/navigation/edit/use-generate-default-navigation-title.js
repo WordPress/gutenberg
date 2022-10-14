@@ -10,17 +10,18 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { DEFAULT_ENTITY_KIND, DEFAULT_ENTITY_TYPE } from '../constants';
 import useTemplatePartAreaLabel from '../use-template-part-area-label';
 
 const DRAFT_MENU_PARAMS = [
-	'postType',
-	'wp_navigation',
+	DEFAULT_ENTITY_KIND,
+	DEFAULT_ENTITY_TYPE,
 	{ status: 'draft', per_page: -1 },
 ];
 
 const PUBLISHED_MENU_PARAMS = [
-	'postType',
-	'wp_navigation',
+	DEFAULT_ENTITY_KIND,
+	DEFAULT_ENTITY_TYPE,
 	{ per_page: -1, status: 'publish' },
 ];
 

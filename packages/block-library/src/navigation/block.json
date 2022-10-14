@@ -9,7 +9,7 @@
 	"textdomain": "default",
 	"attributes": {
 		"ref": {
-			"type": "number"
+			"type": "string"
 		},
 		"textColor": {
 			"type": "string"

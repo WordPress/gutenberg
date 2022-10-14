@@ -28,3 +28,10 @@ export function detectColors(
 
 	setBackground( backgroundColor );
 }
+
+export function isNumeric( v ) {
+	if ( v === null || v === undefined || v === '' ) {
+		return false;
+	}
+	return ! isNaN( v ) && isFinite( v );
+}
