@@ -105,6 +105,7 @@ function PostPreviewButton( {
 	forceIsAutosaveable,
 	forcePreviewLink,
 	role,
+	onPreview,
 } ) {
 	const { postId, currentPostLink, previewLink, isSaveable, isViewable } =
 		useSelect(
@@ -162,6 +163,8 @@ function PostPreviewButton( {
 		} );
 
 		previewWindow.location = link;
+
+		onPreview?.();
 	};
 
 	// Link to the `?preview=true` URL if we have it, since this lets us see
