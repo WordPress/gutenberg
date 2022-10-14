@@ -234,6 +234,7 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20;
 	justify-content: center;
 	margin-top: $grid-unit-20;
+	width: 100%;
 }
 
 .block-editor-inserter__patterns-selected-category.block-editor-inserter__patterns-selected-category {
@@ -263,13 +264,20 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__block-patterns-tabs-container {
 	height: 100%;
+	nav {
+		height: 100%;
+	}
+}
+
+.block-editor-inserter__block-patterns-tabs {
 	display: flex;
 	flex-direction: column;
 	padding: $grid-unit-20;
 	overflow-y: auto;
+	height: 100%;
 }
 
-.block-editor-inserter__block-patterns-tabs {
+.block-editor-inserter__patterns-fill-space {
 	flex-grow: 1;
 }
 

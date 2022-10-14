@@ -19,11 +19,8 @@ import {
 	__experimentalNavigatorButton as NavigatorButton,
 	__experimentalNavigatorBackButton as NavigatorBackButton,
 	FlexBlock,
-	Button,
 	__experimentalHeading as Heading,
-	__unstableComposite as Composite,
-	__unstableUseCompositeState as useCompositeState,
-	__unstableCompositeItem as CompositeItem,
+	Button,
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 import { focus } from '@wordpress/dom';
@@ -182,24 +179,19 @@ function BlockPatternsTabs( {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
 	const categories = usePatternsCategories();
 	const isMobile = useViewportMatch( 'medium', '<' );
-	const composite = useCompositeState();
 
 	return (
 		<>
 			{ ! isMobile && (
 				<div className="block-editor-inserter__block-patterns-tabs-container">
 					<nav aria-label={ __( 'Block pattern categories' ) }>
-						<Composite
-							{ ...composite }
+						<ItemGroup
 							role="list"
 							className="block-editor-inserter__block-patterns-tabs"
-							as={ ItemGroup }
 						>
 							{ categories.map( ( category ) => (
-								<CompositeItem
+								<Item
 									role="listitem"
-									as={ Item }
-									{ ...composite }
 									key={ category.name }
 									onClick={ () =>
 										onSelectCategory( category )
@@ -217,18 +209,27 @@ function BlockPatternsTabs( {
 										</FlexBlock>
 										<Icon icon={ chevronRight } />
 									</HStack>
-								</CompositeItem>
+								</Item>
 							) ) }
-						</Composite>
-					</nav>
 
-					<Button
-						onClick={ () => setShowPatternsExplorer( true ) }
-						className="block-editor-inserter__patterns-explore-button"
-						variant="secondary"
-					>
-						{ __( 'Explore all patterns' ) }
-					</Button>
+							<div
+								role="presentation"
+								className="block-editor-inserter__patterns-fill-space"
+							/>
+
+							<div role="listitem">
+								<Button
+									className="block-editor-inserter__patterns-explore-button"
+									onClick={ () =>
+										setShowPatternsExplorer( true )
+									}
+									variant="secondary"
+								>
+									{ __( 'Explore all patterns' ) }
+								</Button>
+							</div>
+						</ItemGroup>
+					</nav>
 				</div>
 			) }
 			{ isMobile && (
