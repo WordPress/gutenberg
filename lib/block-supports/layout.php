@@ -428,6 +428,10 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	}
 
+	/**
+	* The first chunk of innerContent contains the block markup up until the inner blocks start.
+	* We want to target the opening tag of the inner blocks wrapper, which is the last tag in that chunk.
+	*/
 	$inner_content_classnames = isset( $block['innerContent'][0] ) && 'string' === gettype( $block['innerContent'][0] ) ? gutenberg_get_classnames_from_last_tag( $block['innerContent'][0] ) : '';
 
 	$content = new WP_HTML_Tag_Processor( $block_content );
