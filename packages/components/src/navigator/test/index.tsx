@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { ReactNode, ForwardedRef, ComponentPropsWithoutRef } from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -349,8 +349,12 @@ describe( 'Navigator', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'should navigate across screens', () => {
+	it( 'should navigate across screens', async () => {
 		const spy = jest.fn();
+
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 
 		render( <MyNavigation onNavigatorButtonClick={ spy } /> );
 
@@ -358,36 +362,36 @@ describe( 'Navigator', () => {
 		expect( getToChildScreenButton() ).toBeInTheDocument();
 
 		// Navigate to child screen.
-		fireEvent.click( getToChildScreenButton() );
+		await user.click( getToChildScreenButton() );
 
 		expect( getChildScreen() ).toBeInTheDocument();
 		expect( getBackButton() ).toBeInTheDocument();
 
 		// Navigate back to home screen.
-		fireEvent.click( getBackButton() );
+		await user.click( getBackButton() );
 		expect( getHomeScreen() ).toBeInTheDocument();
 		expect( getToChildScreenButton() ).toBeInTheDocument();
 
 		// Navigate again to child screen.
-		fireEvent.click( getToChildScreenButton() );
+		await user.click( getToChildScreenButton() );
 
 		expect( getChildScreen() ).toBeInTheDocument();
 		expect( getToNestedScreenButton() ).toBeInTheDocument();
 
 		// Navigate to nested screen.
-		fireEvent.click( getToNestedScreenButton() );
+		await user.click( getToNestedScreenButton() );
 
 		expect( getNestedScreen() ).toBeInTheDocument();
 		expect( getBackButton() ).toBeInTheDocument();
 
 		// Navigate back to child screen.
-		fireEvent.click( getBackButton() );
+		await user.click( getBackButton() );
 
 		expect( getChildScreen() ).toBeInTheDocument();
 		expect( getToNestedScreenButton() ).toBeInTheDocument();
 
 		// Navigate back to home screen.
-		fireEvent.click( getBackButton() );
+		await user.click( getBackButton() );
 
 		expect( getHomeScreen() ).toBeInTheDocument();
 		expect( getToChildScreenButton() ).toBeInTheDocument();
@@ -417,15 +421,19 @@ describe( 'Navigator', () => {
 		} );
 	} );
 
-	it( 'should not rended anything if the path does not match any available screen', () => {
+	it( 'should not rended anything if the path does not match any available screen', async () => {
 		const spy = jest.fn();
+
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 
 		render( <MyNavigation onNavigatorButtonClick={ spy } /> );
 
 		expect( getToNonExistingScreenButton() ).toBeInTheDocument();
 
 		// Attempt to navigate to non-existing screen. No screens get rendered.
-		fireEvent.click( getToNonExistingScreenButton() );
+		await user.click( getToNonExistingScreenButton() );
 
 		expect(
 			getHomeScreen( { throwIfNotFound: false } )
@@ -445,35 +453,43 @@ describe( 'Navigator', () => {
 		} );
 	} );
 
-	it( 'should restore focus correctly', () => {
+	it( 'should restore focus correctly', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
 		render( <MyNavigation /> );
 
 		expect( getHomeScreen() ).toBeInTheDocument();
 
 		// Navigate to child screen.
-		fireEvent.click( getToChildScreenButton() );
+		await user.click( getToChildScreenButton() );
 
 		expect( getChildScreen() ).toBeInTheDocument();
 
 		// Navigate to nested screen.
-		fireEvent.click( getToNestedScreenButton() );
+		await user.click( getToNestedScreenButton() );
 
 		expect( getNestedScreen() ).toBeInTheDocument();
 
 		// Navigate back to child screen, check that focus was correctly restored.
-		fireEvent.click( getBackButton() );
+		await user.click( getBackButton() );
 
 		expect( getChildScreen() ).toBeInTheDocument();
 		expect( getToNestedScreenButton() ).toHaveFocus();
 
 		// Navigate back to home screen, check that focus was correctly restored.
-		fireEvent.click( getBackButton() );
+		await user.click( getBackButton() );
 
 		expect( getHomeScreen() ).toBeInTheDocument();
 		expect( getToChildScreenButton() ).toHaveFocus();
 	} );
 
-	it( 'should escape the value of the `path` prop', () => {
+	it( 'should escape the value of the `path` prop', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
 		render( <MyNavigation /> );
 
 		expect( getHomeScreen() ).toBeInTheDocument();
@@ -487,14 +503,14 @@ describe( 'Navigator', () => {
 		);
 
 		// Navigate to screen with an invalid HTML value for its `path`.
-		fireEvent.click( getToInvalidHTMLPathScreenButton() );
+		await user.click( getToInvalidHTMLPathScreenButton() );
 
 		expect( getInvalidHTMLPathScreen() ).toBeInTheDocument();
 		expect( getBackButton() ).toBeInTheDocument();
 
 		// Navigate back to home screen, check that the focus restoration selector
 		// worked correctly despite the escaping.
-		fireEvent.click( getBackButton() );
+		await user.click( getBackButton() );
 
 		expect( getHomeScreen() ).toBeInTheDocument();
 		expect( getToInvalidHTMLPathScreenButton() ).toHaveFocus();
