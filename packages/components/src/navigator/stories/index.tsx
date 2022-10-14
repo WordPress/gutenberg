@@ -16,7 +16,7 @@ import {
 	NavigatorScreen,
 	NavigatorButton,
 	NavigatorBackButton,
-} from '../';
+} from '..';
 
 export default {
 	title: 'Components (Experimental)/Navigator',
