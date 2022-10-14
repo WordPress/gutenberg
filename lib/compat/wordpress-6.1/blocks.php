@@ -38,11 +38,12 @@ add_filter( 'safe_style_css', 'gutenberg_safe_style_attrs_6_1' );
  */
 function gutenberg_safecss_filter_attr_allow_css_6_1( $allow_css, $css_test_string ) {
 	if ( false === $allow_css ) {
-		// Allow some CSS functions.
-		$css_test_string = preg_replace( '/\b(?:calc|min|max|minmax|clamp)\(((?:\([^()]*\)?|[^()])*)\)/', '', $css_test_string );
-
-		// Allow CSS var.
-		$css_test_string = preg_replace( '/\(?var\(--[\w\-\()[\]\,\s]*\)/', '', $css_test_string );
+		// Allows some CSS functions and CSS vars.
+		$css_test_string = preg_replace(
+			'/\b(?:var|calc|min|max|minmax|clamp)(\((?:[^()]|(?1))*\))/',
+			'',
+			$css_test_string
+		);
 
 		// Check for any CSS containing \ ( & } = or comments,
 		// except for url(), calc(), or var() usage checked above.
