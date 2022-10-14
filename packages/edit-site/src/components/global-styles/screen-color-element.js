@@ -21,14 +21,6 @@ const elements = {
 		),
 		title: __( 'Text' ),
 	},
-	link: {
-		description: __( '' ),
-		title: __( 'Links' ),
-	},
-	heading: {
-		description: __( '' ),
-		title: __( 'Headings' ),
-	},
 	caption: {
 		description: __( 'Set the colors used for captions across the site' ),
 		title: __( 'Captions' ),
