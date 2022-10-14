@@ -23,10 +23,11 @@ function gutenberg_update_navigation_rest_controller( $args, $post_type ) {
 add_filter( 'register_post_type_args', 'gutenberg_update_navigation_rest_controller', 10, 2 );
 
 /**
- * Transform slug as recordId to postID.
+ * Sets the 'ID' field of the WP_REST_Request to be the Post retrieved by `slug` if
+ * one is present in the request URL.
  *
- * This allows Navigation Posts to be requested by slug. It then looks up the Post
- * by slug and uses the result postID of the record to set the 'ID' field of the
+ * Allows Navigation Posts to be requested by slug by looking up the Post
+ * by slug and using the resulting postID of the record to set the 'ID' field of the
  * request before it is handled.
  *
  * This ensures that the same handler logic can be reused whether the endpoint
