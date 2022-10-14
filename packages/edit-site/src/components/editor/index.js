@@ -30,8 +30,8 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import Header from '../header';
-import { SidebarComplementaryAreaFills } from '../sidebar';
+import Header from '../header-edit-mode';
+import { SidebarComplementaryAreaFills } from '../sidebar-edit-mode';
 import NavigationSidebar from '../navigation-sidebar';
 import BlockEditor from '../block-editor';
 import CodeEditor from '../code-editor';

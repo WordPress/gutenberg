@@ -4,13 +4,12 @@
 import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { motion, MotionProps } from 'framer-motion';
-import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
-import { useContext, useEffect, useMemo, useRef } from '@wordpress/element';
+import { useContext, useEffect, useRef } from '@wordpress/element';
 import {
 	useReducedMotion,
 	useMergeRefs,
@@ -27,7 +26,6 @@ import {
 	useContextSystem,
 	WordPressComponentProps,
 } from '../../ui/context';
-import { useCx } from '../../utils/hooks/use-cx';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';
 import type { NavigatorScreenProps } from '../types';
@@ -56,21 +54,6 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 	const wrapperRef = useRef< HTMLDivElement >( null );
 
 	const previousLocation = usePrevious( location );
-
-	const cx = useCx();
-	const classes = useMemo(
-		() =>
-			cx(
-				css( {
-					// Ensures horizontal overflow is visually accessible.
-					overflowX: 'auto',
-					// In case the root has a height, it should not be exceeded.
-					maxHeight: '100%',
-				} ),
-				className
-			),
-		[ className, cx ]
-	);
 
 	// Focus restoration
 	const isInitialLocation = location.isInitial && ! location.isBack;
@@ -128,7 +111,7 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 		return (
 			<View
 				ref={ mergedWrapperRef }
-				className={ classes }
+				className={ className }
 				{ ...otherProps }
 			>
 				{ children }
@@ -174,7 +157,7 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 	return (
 		<motion.div
 			ref={ mergedWrapperRef }
-			className={ classes }
+			className={ className }
 			{ ...otherProps }
 			{ ...animatedProps }
 		>

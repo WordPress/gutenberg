@@ -61,7 +61,7 @@ class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
 		 *
 		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
-		$theme_json   = apply_filters( 'theme_json_default', new WP_Theme_JSON_Data_Gutenberg( $config, 'default' ) );
+		$theme_json   = apply_filters( 'wp_theme_json_data_default', new WP_Theme_JSON_Data_Gutenberg( $config, 'default' ) );
 		$config       = $theme_json->get_data();
 		static::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
 
@@ -92,7 +92,7 @@ class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
 				 *
 				 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 				 */
-				$theme_json = apply_filters( 'theme_json_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
+				$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
 				$config     = $theme_json->get_data();
 				return new WP_Theme_JSON_Gutenberg( $config, 'custom' );
 			}
@@ -114,7 +114,7 @@ class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
 		 *
 		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
-		$theme_json   = apply_filters( 'theme_json_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
+		$theme_json   = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
 		$config       = $theme_json->get_data();
 		static::$user = new WP_Theme_JSON_Gutenberg( $config, 'custom' );
 

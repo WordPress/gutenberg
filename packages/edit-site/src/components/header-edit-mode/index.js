@@ -137,16 +137,16 @@ export default function Header( {
 	const isZoomedOutView = blockEditorMode === 'zoom-out';
 
 	return (
-		<div className="edit-site-header">
+		<div className="edit-site-header-edit-mode">
 			<NavigableToolbar
-				className="edit-site-header_start"
+				className="edit-site-header-edit-mode__start"
 				aria-label={ __( 'Document tools' ) }
 			>
-				<div className="edit-site-header__toolbar">
+				<div className="edit-site-header-edit-mode__toolbar">
 					<ToolbarItem
 						ref={ inserterButton }
 						as={ Button }
-						className="edit-site-header-toolbar__inserter-toggle"
+						className="edit-site-header-edit-mode__inserter-toggle"
 						variant="primary"
 						isPressed={ isInserterOpen }
 						onMouseDown={ preventDefault }
@@ -182,7 +182,7 @@ export default function Header( {
 							/>
 							<ToolbarItem
 								as={ Button }
-								className="edit-site-header-toolbar__list-view-toggle"
+								className="edit-site-header-edit-mode__list-view-toggle"
 								disabled={ ! isVisualMode && isZoomedOutView }
 								icon={ listView }
 								isPressed={ isListViewOpen }
@@ -198,7 +198,6 @@ export default function Header( {
 							{ isZoomedOutViewExperimentEnabled && (
 								<ToolbarItem
 									as={ Button }
-									className="edit-site-header-toolbar__zoom-out-view-toggle"
 									icon={ chevronUpDown }
 									isPressed={ isZoomedOutView }
 									/* translators: button label text should, if possible, be under 16 characters. */
@@ -218,7 +217,7 @@ export default function Header( {
 				</div>
 			</NavigableToolbar>
 
-			<div className="edit-site-header_center">
+			<div className="edit-site-header-edit-mode__center">
 				<DocumentActions
 					entityTitle={ entityTitle }
 					entityLabel={
@@ -238,12 +237,12 @@ export default function Header( {
 				</DocumentActions>
 			</div>
 
-			<div className="edit-site-header_end">
-				<div className="edit-site-header__actions">
+			<div className="edit-site-header-edit-mode__end">
+				<div className="edit-site-header-edit-mode__actions">
 					{ ! isFocusMode && (
 						<div
 							className={ classnames(
-								'edit-site-header__actions__preview-options',
+								'edit-site-header-edit-mode__preview-options',
 								{ 'is-zoomed-out': isZoomedOutView }
 							) }
 						>
