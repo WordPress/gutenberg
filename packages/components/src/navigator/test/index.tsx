@@ -17,7 +17,7 @@ import {
 	NavigatorScreen,
 	NavigatorButton,
 	NavigatorBackButton,
-} from '../';
+} from '..';
 
 jest.mock( 'framer-motion', () => {
 	const actual = jest.requireActual( 'framer-motion' );
