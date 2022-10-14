@@ -141,71 +141,91 @@ const MyNavigation = ( {
 	initialPath?: string;
 	onNavigatorButtonClick?: CustomTestOnClickHandler;
 } ) => {
-	const [ inputValue, setInputValue ] = useState( '' );
+	const [ innerInputValue, setInnerInputValue ] = useState( '' );
+	const [ outerInputValue, setOuterInputValue ] = useState( '' );
 	return (
-		<NavigatorProvider initialPath={ initialPath }>
-			<NavigatorScreen path={ PATHS.HOME }>
-				<p>{ SCREEN_TEXT.home }</p>
-				<CustomNavigatorButton
-					path={ PATHS.NOT_FOUND }
-					onClick={ onNavigatorButtonClick }
-				>
-					{ BUTTON_TEXT.toNonExistingScreen }
-				</CustomNavigatorButton>
-				<CustomNavigatorButton
-					path={ PATHS.CHILD }
-					onClick={ onNavigatorButtonClick }
-				>
-					{ BUTTON_TEXT.toChildScreen }
-				</CustomNavigatorButton>
-				<CustomNavigatorButton
-					path={ PATHS.INVALID_HTML_ATTRIBUTE }
-					onClick={ onNavigatorButtonClick }
-				>
-					{ BUTTON_TEXT.toInvalidHtmlPathScreen }
-				</CustomNavigatorButton>
-			</NavigatorScreen>
+		<>
+			<NavigatorProvider initialPath={ initialPath }>
+				<NavigatorScreen path={ PATHS.HOME }>
+					<p>{ SCREEN_TEXT.home }</p>
+					<CustomNavigatorButton
+						path={ PATHS.NOT_FOUND }
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.toNonExistingScreen }
+					</CustomNavigatorButton>
+					<CustomNavigatorButton
+						path={ PATHS.CHILD }
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.toChildScreen }
+					</CustomNavigatorButton>
+					<CustomNavigatorButton
+						path={ PATHS.INVALID_HTML_ATTRIBUTE }
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.toInvalidHtmlPathScreen }
+					</CustomNavigatorButton>
+				</NavigatorScreen>
 
-			<NavigatorScreen path={ PATHS.CHILD }>
-				<p>{ SCREEN_TEXT.child }</p>
-				<CustomNavigatorButtonWithFocusRestoration
-					path={ PATHS.NESTED }
-					onClick={ onNavigatorButtonClick }
-				>
-					{ BUTTON_TEXT.toNestedScreen }
-				</CustomNavigatorButtonWithFocusRestoration>
-				<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
-					{ BUTTON_TEXT.back }
-				</CustomNavigatorBackButton>
+				<NavigatorScreen path={ PATHS.CHILD }>
+					<p>{ SCREEN_TEXT.child }</p>
+					<CustomNavigatorButtonWithFocusRestoration
+						path={ PATHS.NESTED }
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.toNestedScreen }
+					</CustomNavigatorButtonWithFocusRestoration>
+					<CustomNavigatorBackButton
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.back }
+					</CustomNavigatorBackButton>
 
-				<label htmlFor="test-input">This is a test input</label>
-				<input
-					name="test-input"
-					// eslint-disable-next-line no-restricted-syntax
-					id="test-input"
-					onChange={ ( e ) => {
-						setInputValue( e.target.value );
-					} }
-					value={ inputValue }
-				/>
-			</NavigatorScreen>
+					<label htmlFor="test-input-inner">Inner input</label>
+					<input
+						name="test-input-inner"
+						// eslint-disable-next-line no-restricted-syntax
+						id="test-input-inner"
+						onChange={ ( e ) => {
+							setInnerInputValue( e.target.value );
+						} }
+						value={ innerInputValue }
+					/>
+				</NavigatorScreen>
 
-			<NavigatorScreen path={ PATHS.NESTED }>
-				<p>{ SCREEN_TEXT.nested }</p>
-				<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
-					{ BUTTON_TEXT.back }
-				</CustomNavigatorBackButton>
-			</NavigatorScreen>
+				<NavigatorScreen path={ PATHS.NESTED }>
+					<p>{ SCREEN_TEXT.nested }</p>
+					<CustomNavigatorBackButton
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.back }
+					</CustomNavigatorBackButton>
+				</NavigatorScreen>
 
-			<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
-				<p>{ SCREEN_TEXT.invalidHtmlPath }</p>
-				<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
-					{ BUTTON_TEXT.back }
-				</CustomNavigatorBackButton>
-			</NavigatorScreen>
+				<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
+					<p>{ SCREEN_TEXT.invalidHtmlPath }</p>
+					<CustomNavigatorBackButton
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.back }
+					</CustomNavigatorBackButton>
+				</NavigatorScreen>
 
-			{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
-		</NavigatorProvider>
+				{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
+			</NavigatorProvider>
+
+			<label htmlFor="test-input-outer">Outer input</label>
+			<input
+				name="test-input-outer"
+				// eslint-disable-next-line no-restricted-syntax
+				id="test-input-outer"
+				onChange={ ( e ) => {
+					setOuterInputValue( e.target.value );
+				} }
+				value={ outerInputValue }
+			/>
+		</>
 	);
 };
 
@@ -466,7 +486,7 @@ describe( 'Navigator', () => {
 			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
 
 			// Interact with the input, the focus should stay on the input element.
-			const input = screen.getByLabelText( 'This is a test input' );
+			const input = screen.getByLabelText( 'Inner input' );
 			await user.type( input, 'd' );
 			expect( input ).toHaveFocus();
 		} );
