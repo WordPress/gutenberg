@@ -485,5 +485,25 @@ describe( 'Navigator', () => {
 			await user.type( innerInput, 'd' );
 			expect( innerInput ).toHaveFocus();
 		} );
+
+		it( 'should keep focus on an active element outside navigator, while re-rendering', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			render( <MyNavigation /> );
+
+			// Navigate to child screen.
+			await user.click( getNavigationButton( 'toChildScreen' ) );
+
+			// The first tabbable element receives focus.
+			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
+
+			// Interact with the outer input.
+			// The focus should stay on the input element.
+			const outerInput = screen.getByLabelText( 'Outer input' );
+			await user.type( outerInput, 'd' );
+			expect( outerInput ).toHaveFocus();
+		} );
 	} );
 } );
