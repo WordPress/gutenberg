@@ -45,7 +45,7 @@ export function useNavigateRegions( shortcuts = defaultShortcuts ) {
 			return;
 		}
 		let nextRegion = regions[ 0 ];
-		// Based off the current element, find the next region.
+		// Based off the current element, use closest to determine the wrapping region since this operates up the DOM.
 		const selectedIndex = regions.indexOf(
 			ref.current.ownerDocument.activeElement.closest( '[role="region"]' )
 		);
