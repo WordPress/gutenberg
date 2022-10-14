@@ -60,7 +60,9 @@ export default function Layout() {
 						} }
 						className="edit-site-layout__sidebar"
 					>
-						<Sidebar />
+						<div style={ { width: 280, height: '100%' } }>
+							<Sidebar />
+						</div>
 					</motion.div>
 				) }
 			</AnimatePresence>
