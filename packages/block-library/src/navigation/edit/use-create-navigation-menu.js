@@ -27,7 +27,7 @@ export default function useCreateNavigationMenu( clientId ) {
 	// This callback uses data from the two placeholder steps and only creates
 	// a new navigation menu when the user completes the final step.
 	const create = useCallback(
-		async ( title = null, blocks = [], postStatus ) => {
+		async ( title = null, blocks = [], postStatus, slug = '' ) => {
 			// Guard against creating Navigations without a title.
 			// Note you can pass no title, but if one is passed it must be
 			// a string otherwise the title may end up being empty.
@@ -57,8 +57,12 @@ export default function useCreateNavigationMenu( clientId ) {
 					);
 				} );
 			}
+
+			const maybeSlug = slug || title;
+
 			const record = {
 				title,
+				slug: maybeSlug,
 				content: serialize( blocks ),
 				status: postStatus,
 			};

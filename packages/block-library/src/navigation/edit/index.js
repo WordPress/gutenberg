@@ -108,13 +108,18 @@ function Navigation( {
 		icon = 'handle',
 	} = attributes;
 
-	const ref = attributes.ref;
+	// Older versions of the block used an ID based ref attribute.
+	// Allow for this to continue to be used.
+	const ref = attributes.slug || attributes.ref;
+
+	const [ idRef, setIdRef ] = useState( attributes.ref );
 
 	const setRef = useCallback(
-		( postId ) => {
-			setAttributes( { ref: postId } );
+		( { id, slug } ) => {
+			setAttributes( { slug } );
+			setIdRef( id );
 		},
-		[ setAttributes ]
+		[ setAttributes, setIdRef ]
 	);
 
 	const recursionId = `navigationMenu/${ ref }`;
@@ -205,9 +210,9 @@ function Navigation( {
 		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
 
 	const handleUpdateMenu = useCallback(
-		( menuId, options = { focusNavigationBlock: false } ) => {
+		( menu, options = { focusNavigationBlock: false } ) => {
 			const { focusNavigationBlock } = options;
-			setRef( menuId );
+			setRef( menu );
 			if ( focusNavigationBlock ) {
 				selectBlock( clientId );
 			}
@@ -342,7 +347,16 @@ function Navigation( {
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
 	const onSelectClassicMenu = async ( classicMenu ) => {
-		return convertClassicMenu( classicMenu.id, classicMenu.name, 'draft' );
+		const navMenu = await convertClassicMenu(
+			classicMenu.id,
+			classicMenu.name,
+			'draft'
+		);
+		if ( navMenu ) {
+			handleUpdateMenu( navMenu, {
+				focusNavigationBlock: true,
+			} );
+		}
 	};
 
 	const onSelectNavigationMenu = ( menuId ) => {
@@ -357,7 +371,7 @@ function Navigation( {
 		}
 
 		if ( createNavigationMenuIsSuccess ) {
-			handleUpdateMenu( createNavigationMenuPost?.id, {
+			handleUpdateMenu( createNavigationMenuPost, {
 				focusNavigationBlock: true,
 			} );
 
