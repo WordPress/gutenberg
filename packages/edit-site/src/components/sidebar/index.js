@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalVStack as VStack,
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-	Button,
-} from '@wordpress/components';
+import { __experimentalVStack as VStack, Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -22,14 +17,9 @@ export function Sidebar() {
 					<SiteIconAndTitle />
 				</Button>
 			</div>
-			<NavigatorProvider
-				className="edit-site-sidebar__content"
-				initialPath="/"
-			>
-				<NavigatorScreen path="/">
-					<SidebarNavigationRoot />
-				</NavigatorScreen>
-			</NavigatorProvider>
+			<div className="edit-site-sidebar__content">
+				<SidebarNavigationRoot />
+			</div>
 		</VStack>
 	);
 }
