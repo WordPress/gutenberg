@@ -121,12 +121,12 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 
 
 	/**
-	 * Tests that calc, clamp, min, max, minmax CSS functions and --wp--* CSS custom properties are allowed.
+	 * Tests that calc, clamp, min, max, minmax CSS functions and CSS custom properties are allowed.
 	 *
 	 * @covers ::get_declarations_string
 	 * @covers ::filter_declaration
 	 */
-	public function test_should_allow_css_functions_and_strip_unsafe_css_values() {
+	public function test_should_allow_css_functions_and_custom_properties_and_strip_unsafe_css_values() {
 		$input_declarations                        = array(
 			'background'                        => 'var(--wp--preset--color--primary, 10px)', // Simple var().
 			'font-size'                         => 'clamp(36.00rem, calc(32.00rem + 10.00vw), 40.00rem)', // Nested clamp().
