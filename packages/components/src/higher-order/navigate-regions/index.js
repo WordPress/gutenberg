@@ -36,8 +36,6 @@ const defaultShortcuts = {
 export function useNavigateRegions( shortcuts = defaultShortcuts ) {
 	const ref = useRef();
 	const [ isFocusingRegions, setIsFocusingRegions ] = useState( false );
-	// Track the current region index since there is not a super reliable way to get it from DOM.
-	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
 
 	function focusRegion( offset ) {
 		const regions = Array.from(
@@ -47,12 +45,16 @@ export function useNavigateRegions( shortcuts = defaultShortcuts ) {
 			return;
 		}
 		let nextRegion = regions[ 0 ];
-		let nextIndex = selectedIndex + offset;
-		nextIndex = nextIndex === -1 ? regions.length - 1 : nextIndex;
-		nextIndex = nextIndex === regions.length ? 0 : nextIndex;
-		// Update the selected index for the current region.
-		setSelectedIndex( nextIndex );
-		nextRegion = regions[ nextIndex ];
+		// Based off the current element, find the next region.
+		const selectedIndex = regions.indexOf(
+			ref.current.ownerDocument.activeElement.closest( '[role="region"]' )
+		);
+		if ( selectedIndex !== -1 ) {
+			let nextIndex = selectedIndex + offset;
+			nextIndex = nextIndex === -1 ? regions.length - 1 : nextIndex;
+			nextIndex = nextIndex === regions.length ? 0 : nextIndex;
+			nextRegion = regions[ nextIndex ];
+		}
 
 		// Add the tabindex of -1 so tabbable elements can be located.
 		nextRegion.setAttribute( 'tabindex', '-1' );
