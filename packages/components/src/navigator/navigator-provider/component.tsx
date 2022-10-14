@@ -49,6 +49,7 @@ function NavigatorProvider(
 					...options,
 					path,
 					isBack: false,
+					hasRestoredFocus: false,
 				},
 			] );
 		},
@@ -62,6 +63,7 @@ function NavigatorProvider(
 				{
 					...locationHistory[ locationHistory.length - 2 ],
 					isBack: true,
+					hasRestoredFocus: false,
 				},
 			] );
 		}

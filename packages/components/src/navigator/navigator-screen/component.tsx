@@ -62,7 +62,13 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 		// - if the current location is not the initial one (to avoid moving focus on page load)
 		// - when the screen becomes visible
 		// - if the wrapper ref has been assigned
-		if ( isInitialLocation || ! isMatch || ! wrapperRef.current ) {
+		// - if focus hasn't already been restored for the current location
+		if (
+			isInitialLocation ||
+			! isMatch ||
+			! wrapperRef.current ||
+			location.hasRestoredFocus
+		) {
 			return;
 		}
 
@@ -93,10 +99,12 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 			elementToFocus = firstTabbable ?? wrapperRef.current;
 		}
 
+		location.hasRestoredFocus = true;
 		elementToFocus.focus();
 	}, [
 		isInitialLocation,
 		isMatch,
+		location.hasRestoredFocus,
 		location.isBack,
 		previousLocation?.focusTargetSelector,
 	] );
