@@ -108,19 +108,27 @@ export function useStyle( path, blockName, source = 'all' ) {
 		? `styles.${ path }`
 		: `styles.blocks.${ blockName }.${ path }`;
 
-	const setStyle = ( newValue ) => {
+	const setStyle = ( newValue, metadata ) => {
 		setUserConfig( ( currentConfig ) => {
 			// Deep clone `currentConfig` to avoid mutating it later.
 			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
-			set(
-				newUserConfig,
-				finalPath,
-				getPresetVariableFromValue(
+			let styleValue = getPresetVariableFromValue(
 					mergedConfig.settings,
 					blockName,
 					path,
 					newValue
-				)
+				);
+			// Convert font size styles to fluid if fluid is activated.
+			if ( finalPath.indexOf( 'typography.fontSize' ) !== -1 && !! metadata?.slug ) {
+				styleValue = `var:preset|font-size|${ metadata?.slug })`;
+			}
+
+
+
+			set(
+				newUserConfig,
+				finalPath,
+				styleValue
 			);
 			return newUserConfig;
 		} );

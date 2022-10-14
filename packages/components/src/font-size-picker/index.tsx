@@ -173,7 +173,8 @@ const UnforwardedFontSizePicker = (
 									onChange?.( undefined );
 								} else {
 									onChange?.(
-										hasUnits ? newValue : Number( newValue )
+										hasUnits ? newValue : Number( newValue ),
+										selectedFontSize
 									);
 								}
 							} }
@@ -193,7 +194,8 @@ const UnforwardedFontSizePicker = (
 								onChange?.( undefined );
 							} else {
 								onChange?.(
-									hasUnits ? newValue : Number( newValue )
+									hasUnits ? newValue : Number( newValue ),
+									selectedFontSize
 								);
 							}
 						} }
