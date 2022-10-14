@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactNode, ForwardedRef } from 'react';
+import type { ReactNode, ForwardedRef, ComponentPropsWithoutRef } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -54,7 +54,22 @@ const PATHS = {
 	NOT_FOUND: '/not-found',
 };
 
-function CustomNavigatorButton( { path, onClick, ...props } ) {
+type CustomTestOnClickHandler = (
+	args:
+		| {
+				type: 'goTo';
+				path: string;
+		  }
+		| { type: 'goBack' }
+) => void;
+
+function CustomNavigatorButton( {
+	path,
+	onClick,
+	...props
+}: Omit< ComponentPropsWithoutRef< typeof NavigatorButton >, 'onClick' > & {
+	onClick?: CustomTestOnClickHandler;
+} ) {
 	return (
 		<NavigatorButton
 			onClick={ () => {
@@ -71,6 +86,8 @@ function CustomNavigatorButtonWithFocusRestoration( {
 	path,
 	onClick,
 	...props
+}: Omit< ComponentPropsWithoutRef< typeof NavigatorButton >, 'onClick' > & {
+	onClick?: CustomTestOnClickHandler;
 } ) {
 	return (
 		<NavigatorButton
@@ -84,7 +101,12 @@ function CustomNavigatorButtonWithFocusRestoration( {
 	);
 }
 
-function CustomNavigatorBackButton( { onClick, ...props } ) {
+function CustomNavigatorBackButton( {
+	onClick,
+	...props
+}: Omit< ComponentPropsWithoutRef< typeof NavigatorBackButton >, 'onClick' > & {
+	onClick?: CustomTestOnClickHandler;
+} ) {
 	return (
 		<NavigatorBackButton
 			onClick={ () => {
@@ -99,6 +121,9 @@ function CustomNavigatorBackButton( { onClick, ...props } ) {
 const MyNavigation = ( {
 	initialPath = PATHS.HOME,
 	onNavigatorButtonClick,
+}: {
+	initialPath?: string;
+	onNavigatorButtonClick?: CustomTestOnClickHandler;
 } ) => {
 	const [ inputValue, setInputValue ] = useState( '' );
 	return (
