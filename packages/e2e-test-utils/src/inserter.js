@@ -66,7 +66,7 @@ export async function toggleGlobalBlockInserter() {
 			'.edit-site-header [aria-label="Toggle block inserter"],' +
 			'.edit-widgets-header [aria-label="Add block"],' +
 			'.edit-widgets-header [aria-label="Toggle block inserter"],' +
-			'.edit-site-header-edit-mode__inserter-toggle.is-pressed'
+			'.edit-site-header-edit-mode__inserter-toggle'
 	);
 }
 
