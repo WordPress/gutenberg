@@ -5,22 +5,9 @@
 	display: flex;
 }
 
-.edit-site-layout__sidebar {
-	width: $sidebar-width;
-
-	.edit-site-layout.is-full-canvas & {
-		display: none;
-	}
-}
-
 .edit-site-layout__canvas-container {
 	flex-grow: 1;
-	padding: $grid-unit-30;
 	position: relative;
-
-	.edit-site-layout.is-full-canvas & {
-		padding: 0;
-	}
 }
 
 .edit-site-layout__canvas {
