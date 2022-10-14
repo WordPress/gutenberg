@@ -91,7 +91,7 @@ describe( 'withNotices operations', () => {
 		act( () => {
 			handle.current.createNotice( { content: message } );
 		} );
-		expect( getByText( message ) ).not.toBeNull();
+		expect( getByText( message ) ).toBeInTheDocument();
 	} );
 
 	it( 'should create notices of error status with createErrorNotice', () => {
