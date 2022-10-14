@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import type { ReactNode } from 'react';
 import { css } from '@emotion/react';
 
 /**
@@ -55,7 +56,14 @@ const MyNavigation = () => {
 							</NavigatorButton>
 
 							<Dropdown
-								renderToggle={ ( { isOpen, onToggle } ) => (
+								renderToggle={ ( {
+									isOpen,
+									onToggle,
+								}: {
+									// TODO: remove once `Dropdown` is refactored to TypeScript
+									isOpen: boolean;
+									onToggle: () => void;
+								} ) => (
 									<Button
 										onClick={ onToggle }
 										aria-expanded={ isOpen }
@@ -119,19 +127,19 @@ const MyNavigation = () => {
 
 			<NavigatorScreen path="/stickies">
 				<Card>
-					<Sticky as={ CardHeader } z="2">
+					<Sticky as={ CardHeader } z={ 2 }>
 						<NavigatorBackButton variant="secondary">
 							Go back
 						</NavigatorBackButton>
 					</Sticky>
 					<CardBody>
-						<Sticky top="69px" colors="papayawhip/peachpuff">
+						<Sticky top={ 69 } colors="papayawhip/peachpuff">
 							<h2>A wild sticky element appears</h2>
 						</Sticky>
 						<MetaphorIpsum quantity={ 3 } />
 					</CardBody>
 					<CardBody>
-						<Sticky top="69px" colors="azure/paleturquoise">
+						<Sticky top={ 69 } colors="azure/paleturquoise">
 							<h2>Another wild sticky element appears</h2>
 						</Sticky>
 						<MetaphorIpsum quantity={ 3 } />
@@ -149,17 +157,27 @@ export const _default = () => {
 	return <MyNavigation />;
 };
 
+type StickyProps = {
+	as?: React.ElementType;
+	bottom?: number;
+	children: ReactNode;
+	className?: string;
+	colors?: string;
+	top?: number;
+	z?: number;
+};
 function Sticky( {
 	as: Tag = 'div',
 	bottom = 0,
+	children,
+	className,
 	colors = 'whitesmoke/lightgrey',
 	top = 0,
 	z: zIndex = 1,
-	...props
-} ) {
+}: StickyProps ) {
 	const cx = useCx();
 	const [ bgColor, dotColor ] = colors.split( '/' );
-	const className = cx(
+	const classes = cx(
 		css( {
 			top,
 			bottom,
@@ -168,13 +186,12 @@ function Sticky( {
 			position: 'sticky',
 			background: `radial-gradient(${ dotColor } 1px, ${ bgColor } 2px) 50%/1em 1em`,
 		} ),
-		props.className
+		className
 	);
-	const propsOut = { ...props, className };
-	return <Tag { ...propsOut } />;
+	return <Tag className={ classes }>{ children }</Tag>;
 }
 
-function MetaphorIpsum( { quantity } ) {
+function MetaphorIpsum( { quantity }: { quantity: number } ) {
 	const cx = useCx();
 	const list = [
 		'A loopy clarinet’s year comes with it the thought that the fenny step-son is an ophthalmologist. The literature would have us believe that a glabrate country is not but a rhythm. A beech is a rub from the right perspective. In ancient times few can name an unglossed walrus that isn’t an unspilt trial.',

@@ -47,6 +47,7 @@ export type NavigatorScreenProps = {
 type ButtonProps = {
 	// TODO: should also extend `Button` prop types once the `Button` component
 	// is refactored to TypeScript.
+	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
 };
 export type NavigatorBackButtonProps = Omit< ButtonProps, 'href' > & {
 	/**
