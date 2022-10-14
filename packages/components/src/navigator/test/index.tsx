@@ -379,38 +379,6 @@ describe( 'Navigator', () => {
 		} );
 	} );
 
-	it( 'should restore focus correctly', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
-
-		render( <MyNavigation /> );
-
-		expect( getScreen( 'home' ) ).toBeInTheDocument();
-
-		// Navigate to child screen.
-		await user.click( getNavigationButton( 'toChildScreen' ) );
-
-		expect( getScreen( 'child' ) ).toBeInTheDocument();
-
-		// Navigate to nested screen.
-		await user.click( getNavigationButton( 'toNestedScreen' ) );
-
-		expect( getScreen( 'nested' ) ).toBeInTheDocument();
-
-		// Navigate back to child screen, check that focus was correctly restored.
-		await user.click( getNavigationButton( 'back' ) );
-
-		expect( getScreen( 'child' ) ).toBeInTheDocument();
-		expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
-
-		// Navigate back to home screen, check that focus was correctly restored.
-		await user.click( getNavigationButton( 'back' ) );
-
-		expect( getScreen( 'home' ) ).toBeInTheDocument();
-		expect( getNavigationButton( 'toChildScreen' ) ).toHaveFocus();
-	} );
-
 	it( 'should escape the value of the `path` prop', async () => {
 		const user = userEvent.setup( {
 			advanceTimers: jest.advanceTimersByTime,
@@ -445,26 +413,62 @@ describe( 'Navigator', () => {
 		).toHaveFocus();
 	} );
 
-	it( 'should keep focus on the element that is being interacted with, while re-rendering', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
+	describe( 'focus management', () => {
+		it( 'should restore focus correctly', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			render( <MyNavigation /> );
+
+			expect( getScreen( 'home' ) ).toBeInTheDocument();
+
+			// Navigate to child screen.
+			await user.click( getNavigationButton( 'toChildScreen' ) );
+
+			expect( getScreen( 'child' ) ).toBeInTheDocument();
+
+			// Navigate to nested screen.
+			await user.click( getNavigationButton( 'toNestedScreen' ) );
+
+			expect( getScreen( 'nested' ) ).toBeInTheDocument();
+
+			// Navigate back to child screen, check that focus was correctly restored.
+			await user.click( getNavigationButton( 'back' ) );
+
+			expect( getScreen( 'child' ) ).toBeInTheDocument();
+			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
+
+			// Navigate back to home screen, check that focus was correctly restored.
+			await user.click( getNavigationButton( 'back' ) );
+
+			expect( getScreen( 'home' ) ).toBeInTheDocument();
+			expect( getNavigationButton( 'toChildScreen' ) ).toHaveFocus();
 		} );
 
-		render( <MyNavigation /> );
+		it( 'should keep focus on the element that is being interacted with, while re-rendering', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 
-		expect( getScreen( 'home' ) ).toBeInTheDocument();
-		expect( getNavigationButton( 'toChildScreen' ) ).toBeInTheDocument();
+			render( <MyNavigation /> );
 
-		// Navigate to child screen.
-		await user.click( getNavigationButton( 'toChildScreen' ) );
+			expect( getScreen( 'home' ) ).toBeInTheDocument();
+			expect(
+				getNavigationButton( 'toChildScreen' )
+			).toBeInTheDocument();
 
-		expect( getScreen( 'child' ) ).toBeInTheDocument();
-		expect( getNavigationButton( 'back' ) ).toBeInTheDocument();
-		expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
+			// Navigate to child screen.
+			await user.click( getNavigationButton( 'toChildScreen' ) );
 
-		// Interact with the input, the focus should stay on the input element.
-		const input = screen.getByLabelText( 'This is a test input' );
-		await user.type( input, 'd' );
-		expect( input ).toHaveFocus();
+			expect( getScreen( 'child' ) ).toBeInTheDocument();
+			expect( getNavigationButton( 'back' ) ).toBeInTheDocument();
+			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
+
+			// Interact with the input, the focus should stay on the input element.
+			const input = screen.getByLabelText( 'This is a test input' );
+			await user.type( input, 'd' );
+			expect( input ).toHaveFocus();
+		} );
 	} );
 } );
