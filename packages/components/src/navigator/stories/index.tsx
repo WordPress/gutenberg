@@ -3,6 +3,7 @@
  */
 import type { ReactNode } from 'react';
 import { css } from '@emotion/react';
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -19,17 +20,33 @@ import {
 	NavigatorBackButton,
 } from '..';
 
-export default {
-	title: 'Components (Experimental)/Navigator',
+const meta: ComponentMeta< typeof NavigatorProvider > = {
 	component: NavigatorProvider,
+	title: 'Components (Experimental)/Navigator',
+	subcomponents: { NavigatorScreen, NavigatorButton, NavigatorBackButton },
+	argTypes: {
+		as: { control: { type: null } },
+		children: { control: { type: null } },
+	},
+	parameters: {
+		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
+	},
 };
+export default meta;
 
-const MyNavigation = () => {
+const Template: ComponentStory< typeof NavigatorProvider > = ( {
+	className,
+	...props
+} ) => {
 	const cx = useCx();
 	return (
 		<NavigatorProvider
-			initialPath="/"
-			className={ cx( css( `height: 100vh; max-height: 450px;` ) ) }
+			className={ cx(
+				css( `height: 100vh; max-height: 450px;` ),
+				className
+			) }
+			{ ...props }
 		>
 			<NavigatorScreen path="/">
 				<Card>
@@ -153,8 +170,10 @@ const MyNavigation = () => {
 	);
 };
 
-export const _default = () => {
-	return <MyNavigation />;
+export const Default: ComponentStory< typeof NavigatorProvider > =
+	Template.bind( {} );
+Default.args = {
+	initialPath: '/',
 };
 
 type StickyProps = {
