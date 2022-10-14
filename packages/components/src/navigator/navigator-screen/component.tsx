@@ -75,7 +75,7 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 		const activeElement = wrapperRef.current.ownerDocument.activeElement;
 
 		// If an element is already focused within the wrapper do not focus the
-		// element. This prevents inputs or buttons from losing focus unecessarily.
+		// element. This prevents inputs or buttons from losing focus unnecessarily.
 		if ( wrapperRef.current.contains( activeElement ) ) {
 			return;
 		}
