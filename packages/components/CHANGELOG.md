@@ -13,6 +13,7 @@
 ### Internal
 
 -   `Modal`: Convert to TypeScript ([#42949](https://github.com/WordPress/gutenberg/pull/42949)).
+-   `Sandbox`: Use `toString` to create observe and resize script string ([#42872](https://github.com/WordPress/gutenberg/pull/42872)).
 -   `Navigator`: refactor unit tests to TypeScript and to `user-event` ([#44970](https://github.com/WordPress/gutenberg/pull/44970)).
 
 ## 21.2.0 (2022-10-05)
