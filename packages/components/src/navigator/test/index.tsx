@@ -441,54 +441,49 @@ describe( 'Navigator', () => {
 
 			render( <MyNavigation /> );
 
-			expect( getScreen( 'home' ) ).toBeInTheDocument();
-
 			// Navigate to child screen.
 			await user.click( getNavigationButton( 'toChildScreen' ) );
 
-			expect( getScreen( 'child' ) ).toBeInTheDocument();
+			// The first tabbable element receives focus.
+			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
 
 			// Navigate to nested screen.
 			await user.click( getNavigationButton( 'toNestedScreen' ) );
 
-			expect( getScreen( 'nested' ) ).toBeInTheDocument();
+			// The first tabbable element receives focus.
+			expect( getNavigationButton( 'back' ) ).toHaveFocus();
 
-			// Navigate back to child screen, check that focus was correctly restored.
+			// Navigate back to child screen.
 			await user.click( getNavigationButton( 'back' ) );
 
-			expect( getScreen( 'child' ) ).toBeInTheDocument();
+			// The first tabbable element receives focus.
 			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
 
 			// Navigate back to home screen, check that focus was correctly restored.
 			await user.click( getNavigationButton( 'back' ) );
 
-			expect( getScreen( 'home' ) ).toBeInTheDocument();
+			// The first tabbable element receives focus.
 			expect( getNavigationButton( 'toChildScreen' ) ).toHaveFocus();
 		} );
 
-		it( 'should keep focus on the element that is being interacted with, while re-rendering', async () => {
+		it( 'should keep on an active element inside navigator, while re-rendering', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
 
 			render( <MyNavigation /> );
 
-			expect( getScreen( 'home' ) ).toBeInTheDocument();
-			expect(
-				getNavigationButton( 'toChildScreen' )
-			).toBeInTheDocument();
-
 			// Navigate to child screen.
 			await user.click( getNavigationButton( 'toChildScreen' ) );
 
-			expect( getScreen( 'child' ) ).toBeInTheDocument();
-			expect( getNavigationButton( 'back' ) ).toBeInTheDocument();
+			// The first tabbable element receives focus.
 			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
 
-			// Interact with the input, the focus should stay on the input element.
-			const input = screen.getByLabelText( 'Inner input' );
-			await user.type( input, 'd' );
-			expect( input ).toHaveFocus();
+			// Interact with the inner input.
+			// The focus should stay on the input element.
+			const innerInput = screen.getByLabelText( 'Inner input' );
+			await user.type( innerInput, 'd' );
+			expect( innerInput ).toHaveFocus();
 		} );
 	} );
 } );
