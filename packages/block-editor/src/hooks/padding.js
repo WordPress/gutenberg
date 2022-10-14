@@ -34,8 +34,8 @@ export function PaddingVisualizer( { clientId, attributes, forceShow } ) {
 		// Leverage blend modes to ensure visibility
 		// over different sets of backgrounds.
 		const stripes = {
-			opacity: '0.8',
-			mixBlendMode: 'color-dodge',
+			opacity: '0.6',
+			mixBlendMode: 'difference',
 		};
 		let stripesColor = 'var(--wp-admin-theme-color)';
 
