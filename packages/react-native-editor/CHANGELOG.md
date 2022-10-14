@@ -11,6 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 -   [*] Upgrade compile and target sdk version to Android API 31 [#44610]
+-   [*] [iOS] Fix focus loop when quickly tapping the block appender [#44988]
 
 ## 1.83.0
 * No User facing changes *
