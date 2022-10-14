@@ -9,6 +9,9 @@
 	"textdomain": "default",
 	"attributes": {
 		"ref": {
+			"type": "number"
+		},
+		"slug": {
 			"type": "string"
 		},
 		"textColor": {
