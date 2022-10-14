@@ -8,7 +8,8 @@
 /**
  * Use custom REST API Controller for Navigation Posts
  *
- * @param array $args the post type arguments.
+ * @param array  $args the post type arguments.
+ * @param string $post_type Post type key.
  * @return array the filtered post type arguments with the new REST Controller set.
  */
 function gutenberg_update_navigation_rest_controller( $args, $post_type ) {
@@ -21,6 +22,21 @@ function gutenberg_update_navigation_rest_controller( $args, $post_type ) {
 }
 add_filter( 'register_post_type_args', 'gutenberg_update_navigation_rest_controller', 10, 2 );
 
+/**
+ * Transform slug as recordId to postID.
+ *
+ * This allows Navigation Posts to be requested by slug. It then looks up the Post
+ * by slug and uses the result postID of the record to set the 'ID' field of the
+ * request before it is handled.
+ *
+ * This ensures that the same handler logic can be reused whether the endpoint
+ * is dealing with slugs or IDs.
+ *
+ * @param WP_REST_Response|WP_HTTP_Response|WP_Error $response Result to send to the client.
+ * @param array                                      $handler Route handler used for the request.
+ * @param WP_REST_Request                            $request Request used to generate the response.
+ * @return WP_REST_Response the response.
+ */
 function gutenberg_transform_slug_to_post_id( $response, $handler, WP_REST_Request $request ) {
 
 	$route = rest_get_route_for_post_type_items( 'wp_navigation' );
@@ -37,7 +53,7 @@ function gutenberg_transform_slug_to_post_id( $response, $handler, WP_REST_Reque
 	// The `slug` within the body should be preserved "as is".
 	$slug = isset( $request->get_url_params()['slug'] ) ? $request->get_url_params()['slug'] : null;
 
-	// If no slug provided assume ID and continue as normal.
+	// If no slug provided assume ID and exit early.
 	if ( empty( $slug ) ) {
 		return $response;
 	}
@@ -62,13 +78,21 @@ function gutenberg_transform_slug_to_post_id( $response, $handler, WP_REST_Reque
 		);
 	}
 
-	// Set the post ID based on the slug.
+	// Set the post ID of the request based on the slug.
 	$request['id'] = $query->posts[0]->ID;
 
 	return $response;
 }
 add_filter( 'rest_request_before_callbacks', 'gutenberg_transform_slug_to_post_id', 10, 3 );
 
+/**
+ * Updates the REST route for Navigation posts to use the post slug
+ * instead of the postId.
+ *
+ * @param string  $route the route path.
+ * @param WP_Post $post the post object.
+ * @return string the updated route.
+ */
 function gutenberg_update_navigation_rest_route_for_post( $route, WP_Post $post ) {
 
 	if ( $post->post_type !== 'wp_navigation' ) {
@@ -84,6 +108,4 @@ function gutenberg_update_navigation_rest_route_for_post( $route, WP_Post $post 
 	// Replace Post ID in route with Post "Slug" (post_name).
 	return sprintf( '%s/%s', $post_type_route, $post->post_name );
 }
-
-
 add_filter( 'rest_route_for_post', 'gutenberg_update_navigation_rest_route_for_post', 10, 2 );
