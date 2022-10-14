@@ -193,23 +193,31 @@ const MyNavigation = ( {
 	);
 };
 
-const getNavigationScreenByText = ( text, { throwIfNotFound = true } = {} ) => {
+type HelperGetterOptions = {
+	throwIfNotFound?: boolean;
+};
+const getNavigationScreenByText = (
+	text: string,
+	{ throwIfNotFound = true }: HelperGetterOptions = {}
+) => {
 	const fnName = throwIfNotFound ? 'getByText' : 'queryByText';
 	return screen[ fnName ]( text );
 };
-const getHomeScreen = ( { throwIfNotFound } = {} ) =>
+const getHomeScreen = ( { throwIfNotFound }: HelperGetterOptions = {} ) =>
 	getNavigationScreenByText( 'This is the home screen.', {
 		throwIfNotFound,
 	} );
-const getChildScreen = ( { throwIfNotFound } = {} ) =>
+const getChildScreen = ( { throwIfNotFound }: HelperGetterOptions = {} ) =>
 	getNavigationScreenByText( 'This is the child screen.', {
 		throwIfNotFound,
 	} );
-const getNestedScreen = ( { throwIfNotFound } = {} ) =>
+const getNestedScreen = ( { throwIfNotFound }: HelperGetterOptions = {} ) =>
 	getNavigationScreenByText( 'This is the nested screen.', {
 		throwIfNotFound,
 	} );
-const getInvalidHTMLPathScreen = ( { throwIfNotFound } = {} ) =>
+const getInvalidHTMLPathScreen = ( {
+	throwIfNotFound,
+}: HelperGetterOptions = {} ) =>
 	getNavigationScreenByText(
 		'This is the screen with an invalid HTML value as a path.',
 		{
@@ -217,30 +225,41 @@ const getInvalidHTMLPathScreen = ( { throwIfNotFound } = {} ) =>
 		}
 	);
 
-const getNavigationButtonByText = ( text, { throwIfNotFound = true } = {} ) => {
+const getNavigationButtonByText = (
+	text: string,
+	{ throwIfNotFound = true }: HelperGetterOptions = {}
+) => {
 	const fnName = throwIfNotFound ? 'getByRole' : 'queryByRole';
 	return screen[ fnName ]( 'button', { name: text } );
 };
-const getToNonExistingScreenButton = ( { throwIfNotFound } = {} ) =>
+const getToNonExistingScreenButton = ( {
+	throwIfNotFound,
+}: HelperGetterOptions = {} ) =>
 	getNavigationButtonByText( 'Navigate to non-existing screen.', {
 		throwIfNotFound,
 	} );
-const getToChildScreenButton = ( { throwIfNotFound } = {} ) =>
+const getToChildScreenButton = ( {
+	throwIfNotFound,
+}: HelperGetterOptions = {} ) =>
 	getNavigationButtonByText( 'Navigate to child screen.', {
 		throwIfNotFound,
 	} );
-const getToNestedScreenButton = ( { throwIfNotFound } = {} ) =>
+const getToNestedScreenButton = ( {
+	throwIfNotFound,
+}: HelperGetterOptions = {} ) =>
 	getNavigationButtonByText( 'Navigate to nested screen.', {
 		throwIfNotFound,
 	} );
-const getToInvalidHTMLPathScreenButton = ( { throwIfNotFound } = {} ) =>
+const getToInvalidHTMLPathScreenButton = ( {
+	throwIfNotFound,
+}: HelperGetterOptions = {} ) =>
 	getNavigationButtonByText(
 		'Navigate to screen with an invalid HTML value as a path.',
 		{
 			throwIfNotFound,
 		}
 	);
-const getBackButton = ( { throwIfNotFound } = {} ) =>
+const getBackButton = ( { throwIfNotFound }: HelperGetterOptions = {} ) =>
 	getNavigationButtonByText( 'Go back', {
 		throwIfNotFound,
 	} );
