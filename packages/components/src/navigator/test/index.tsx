@@ -54,6 +54,22 @@ const PATHS = {
 	NOT_FOUND: '/not-found',
 };
 
+const SCREEN_TEXT = {
+	home: 'This is the home screen.',
+	child: 'This is the child screen.',
+	nested: 'This is the nested screen.',
+	invalidHtmlPath: 'This is the screen with an invalid HTML value as a path.',
+};
+
+const BUTTON_TEXT = {
+	toNonExistingScreen: 'Navigate to non-existing screen.',
+	toChildScreen: 'Navigate to child screen.',
+	toNestedScreen: 'Navigate to nested screen.',
+	toInvalidHtmlPathScreen:
+		'Navigate to screen with an invalid HTML value as a path.',
+	back: 'Go back',
+};
+
 type CustomTestOnClickHandler = (
 	args:
 		| {
@@ -129,37 +145,37 @@ const MyNavigation = ( {
 	return (
 		<NavigatorProvider initialPath={ initialPath }>
 			<NavigatorScreen path={ PATHS.HOME }>
-				<p>This is the home screen.</p>
+				<p>{ SCREEN_TEXT.home }</p>
 				<CustomNavigatorButton
 					path={ PATHS.NOT_FOUND }
 					onClick={ onNavigatorButtonClick }
 				>
-					Navigate to non-existing screen.
+					{ BUTTON_TEXT.toNonExistingScreen }
 				</CustomNavigatorButton>
 				<CustomNavigatorButton
 					path={ PATHS.CHILD }
 					onClick={ onNavigatorButtonClick }
 				>
-					Navigate to child screen.
+					{ BUTTON_TEXT.toChildScreen }
 				</CustomNavigatorButton>
 				<CustomNavigatorButton
 					path={ PATHS.INVALID_HTML_ATTRIBUTE }
 					onClick={ onNavigatorButtonClick }
 				>
-					Navigate to screen with an invalid HTML value as a path.
+					{ BUTTON_TEXT.toInvalidHtmlPathScreen }
 				</CustomNavigatorButton>
 			</NavigatorScreen>
 
 			<NavigatorScreen path={ PATHS.CHILD }>
-				<p>This is the child screen.</p>
+				<p>{ SCREEN_TEXT.child }</p>
 				<CustomNavigatorButtonWithFocusRestoration
 					path={ PATHS.NESTED }
 					onClick={ onNavigatorButtonClick }
 				>
-					Navigate to nested screen.
+					{ BUTTON_TEXT.toNestedScreen }
 				</CustomNavigatorButtonWithFocusRestoration>
 				<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
-					Go back
+					{ BUTTON_TEXT.back }
 				</CustomNavigatorBackButton>
 
 				<label htmlFor="test-input">This is a test input</label>
@@ -175,16 +191,16 @@ const MyNavigation = ( {
 			</NavigatorScreen>
 
 			<NavigatorScreen path={ PATHS.NESTED }>
-				<p>This is the nested screen.</p>
+				<p>{ SCREEN_TEXT.nested }</p>
 				<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
-					Go back
+					{ BUTTON_TEXT.back }
 				</CustomNavigatorBackButton>
 			</NavigatorScreen>
 
 			<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
-				<p>This is the screen with an invalid HTML value as a path.</p>
+				<p>{ SCREEN_TEXT.invalidHtmlPath }</p>
 				<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
-					Go back
+					{ BUTTON_TEXT.back }
 				</CustomNavigatorBackButton>
 			</NavigatorScreen>
 
