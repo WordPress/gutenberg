@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import type { ReactNode, ForwardedRef } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -24,12 +25,18 @@ jest.mock( 'framer-motion', () => {
 	return {
 		__esModule: true,
 		...actual,
-		AnimatePresence: ( { children } ) => <div>{ children }</div>,
+		AnimatePresence:
+			( { children }: { children?: ReactNode } ) =>
+			() =>
+				<div>{ children }</div>,
 		motion: {
 			...actual.motion,
-			div: require( 'react' ).forwardRef( ( { children }, ref ) => (
-				<div ref={ ref }>{ children }</div>
-			) ),
+			div: require( 'react' ).forwardRef(
+				(
+					{ children }: { children?: ReactNode },
+					ref: ForwardedRef< HTMLDivElement >
+				) => <div ref={ ref }>{ children }</div>
+			),
 		},
 	};
 } );
