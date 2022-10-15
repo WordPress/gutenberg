@@ -52,25 +52,31 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 	}
 
 	$hooks_to_remove = array(
-		'wptexturize',
-		'shortcode_unautop',
-		'wp_filter_content_tags',
-		'do_shortcode',
-		'convert_smilies',
+		'wptexturize' => false,
+		'shortcode_unautop' => false,
+		'wp_filter_content_tags' => false,
+		'do_shortcode' => false,
+		'convert_smilies' => false,
 	);
 
 	// Temporarily remove some hooks that are not suitable for this block.
-	foreach ( $hooks_to_remove as $hook ) {
+	foreach ( $hooks_to_remove as $hook => &$priority ) {
 		$priority = has_filter( 'the_content', $hook );
 		if ( false !== $priority ) {
-			_removed_hooks_from_the_content( $priority, $hook );
-			add_filter( 'the_content', '_restore_hooks_to_the_content', $priority + 1 );
+			remove_filter( 'the_content', $hook, $priority );
 		}
 	}
 
 	/** This filter is documented in wp-includes/post-template.php */
 	$content = apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $content ) );
 	unset( $seen_ids[ $post_id ] );
+
+	// Restore hooks.
+	foreach ( $hooks_to_remove as $hook => $priority ) {
+		if ( false !== $priority ) {
+			add_filter( 'the_content', $hook, $priority );
+		}
+	}
 
 	if ( empty( $content ) ) {
 		return '';
