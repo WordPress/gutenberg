@@ -470,7 +470,7 @@ button.wp-block-navigation-item__content {
 
 	// If the responsive wrapper is present but overlay is not open,
 	// overlay styles shouldn't apply.
-	&:not(.is-menu-open.is-menu-open) {
+	&:not(.is-menu-open) {
 		color: inherit !important;
 		background-color: inherit !important;
 	}
