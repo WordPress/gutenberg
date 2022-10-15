@@ -10,6 +10,7 @@ const DEFAULT_MINIMUM_VIEWPORT_WIDTH = '768px';
 const DEFAULT_SCALE_FACTOR = 1;
 const DEFAULT_MINIMUM_FONT_SIZE_FACTOR = 0.75;
 const DEFAULT_MAXIMUM_FONT_SIZE_FACTOR = 1.5;
+const DEFAULT_MINIMUM_FONT_SIZE_LIMIT = '14px';
 
 /**
  * Computes a fluid font-size value that uses clamp(). A minimum and maxinmum
@@ -53,11 +54,12 @@ export function getComputedFluidTypographyValue( {
 	scaleFactor = DEFAULT_SCALE_FACTOR,
 	minimumFontSizeFactor = DEFAULT_MINIMUM_FONT_SIZE_FACTOR,
 	maximumFontSizeFactor = DEFAULT_MAXIMUM_FONT_SIZE_FACTOR,
+	minimumFontSizeLimit = DEFAULT_MINIMUM_FONT_SIZE_LIMIT,
 } ) {
 	// Calculate missing minimumFontSize and maximumFontSize from
 	// defaultFontSize if provided.
-	if ( fontSize && ( ! minimumFontSize || ! maximumFontSize ) ) {
-		// Parse default font size.
+	if ( fontSize ) {
+		// Parses default font size.
 		const fontSizeParsed = getTypographyValueAndUnit( fontSize );
 
 		// Protect against invalid units.
@@ -68,15 +70,54 @@ export function getComputedFluidTypographyValue( {
 		// If no minimumFontSize is provided, derive using min scale factor.
 		if ( ! minimumFontSize ) {
 			minimumFontSize =
-				fontSizeParsed.value * minimumFontSizeFactor +
-				fontSizeParsed.unit;
+				roundToPrecision(
+					fontSizeParsed.value * minimumFontSizeFactor,
+					3
+				) + fontSizeParsed.unit;
+		}
+
+		// Parses the minimum font size limit, so we can perform checks using it.
+		const minimumFontSizeLimitParsed = getTypographyValueAndUnit(
+			minimumFontSizeLimit,
+			{
+				coerceTo: fontSizeParsed.unit,
+			}
+		);
+
+		/*
+		 * Checks if a user-defined font size is lower than $minimum_font_size_limit. If so than it should become the minimum font size.
+		 * Otherwise, if the minimum font size is lower than $minimum_font_size_limit
+		 * use $minimum_font_size_limit instead.
+		 */
+		if ( !! minimumFontSizeLimitParsed?.value ) {
+			// @TODO check if there was no min size value passed!
+			if ( fontSizeParsed.value < minimumFontSizeLimitParsed.value ) {
+				minimumFontSize = `${ fontSizeParsed.value }${ fontSizeParsed.unit }`;
+			} else {
+				const minimumFontSizeParsed = getTypographyValueAndUnit(
+					minimumFontSize,
+					{
+						coerceTo: fontSizeParsed.unit,
+					}
+				);
+
+				if (
+					!! minimumFontSizeParsed?.value &&
+					minimumFontSizeParsed.value <
+						minimumFontSizeLimitParsed.value
+				) {
+					minimumFontSize = `${ minimumFontSizeLimitParsed.value }${ minimumFontSizeLimitParsed.unit }`;
+				}
+			}
 		}
 
 		// If no maximumFontSize is provided, derive using max scale factor.
 		if ( ! maximumFontSize ) {
 			maximumFontSize =
-				fontSizeParsed.value * maximumFontSizeFactor +
-				fontSizeParsed.unit;
+				roundToPrecision(
+					fontSizeParsed.value * maximumFontSizeFactor,
+					3
+				) + fontSizeParsed.unit;
 		}
 	}
 
@@ -97,8 +138,13 @@ export function getComputedFluidTypographyValue( {
 		coerceTo: fontSizeUnit,
 	} );
 
-	// Protect against unsupported units.
+	// Checks for mandatory min and max sizes, and protects against unsupported units.
 	if ( ! minimumFontSizeParsed || ! maximumFontSizeParsed ) {
+		return null;
+	}
+
+	// Max font size should not be greater than min font size.
+	if ( minimumFontSizeParsed.value > maximumFontSizeParsed.value ) {
 		return null;
 	}
 
@@ -133,14 +179,17 @@ export function getComputedFluidTypographyValue( {
 		3
 	);
 
-	const viewPortWidthOffset = minViewPortWidthOffsetValue + fontSizeUnit;
-	let linearFactor =
+	const viewPortWidthOffset =
+		roundToPrecision( minViewPortWidthOffsetValue, 3 ) + fontSizeUnit;
+	const linearFactor =
 		100 *
 		( ( maximumFontSizeParsed.value - minimumFontSizeParsed.value ) /
 			( maximumViewPortWidthParsed.value -
 				minumumViewPortWidthParsed.value ) );
-	linearFactor = roundToPrecision( linearFactor, 3 ) || 1;
-	const linearFactorScaled = linearFactor * scaleFactor;
+	const linearFactorScaled = roundToPrecision(
+		linearFactor * scaleFactor,
+		3
+	);
 	const fluidTargetFontSize = `${ minimumFontSizeRem.value }${ minimumFontSizeRem.unit } + ((1vw - ${ viewPortWidthOffset }) * ${ linearFactorScaled })`;
 
 	return `clamp(${ minimumFontSize }, ${ fluidTargetFontSize }, ${ maximumFontSize })`;
@@ -200,7 +249,7 @@ export function getTypographyValueAndUnit( rawValue, options = {} ) {
 	}
 
 	return {
-		value: returnValue,
+		value: roundToPrecision( returnValue, 3 ),
 		unit,
 	};
 }

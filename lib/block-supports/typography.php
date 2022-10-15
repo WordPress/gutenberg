@@ -342,11 +342,11 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
  * @param array $args {
  *     Optional. An associative array of values to calculate a fluid formula for font size. Default is empty array.
  *
- *     @type string $maximum_viewport_width Maximum size up to which type will have fluidity.
- *     @type string $minimum_viewport_width Minimum viewport size from which type will have fluidity.
- *     @type string $maximum_font_size      Maximum font size for any clamp() calculation.
- *     @type string $minimum_font_size      Minimum font size for any clamp() calculation.
- *     @type int    $scale_factor           A scale factor to determine how fast a font scales within boundaries.
+ *     @type string $maximum_viewport_width  Maximum size up to which type will have fluidity.
+ *     @type string $minimum_viewport_width  Minimum viewport size from which type will have fluidity.
+ *     @type string $maximum_font_size       Maximum font size for any clamp() calculation.
+ *     @type string $minimum_font_size       Minimum font size for any clamp() calculation.
+ *     @type int    $scale_factor            A scale factor to determine how fast a font scales within boundaries.
  * }
  * @return string|null A font-size value using clamp().
  */
@@ -357,11 +357,13 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 	$minimum_font_size_raw      = isset( $args['minimum_font_size'] ) ? $args['minimum_font_size'] : null;
 	$scale_factor               = isset( $args['scale_factor'] ) ? $args['scale_factor'] : null;
 
-	// Grab the minimum font size and normalize it in order to use the value for calculations.
+	// Grabs the minimum font size and normalize it in order to use the value for calculations.
 	$minimum_font_size = gutenberg_get_typography_value_and_unit( $minimum_font_size_raw );
 
-	// We get a 'preferred' unit to keep units consistent when calculating,
-	// otherwise the result will not be accurate.
+	/*
+	 * We get a 'preferred' unit to keep units consistent when calculating,
+	 * otherwise the result will not be accurate.
+	 */
 	$font_size_unit = isset( $minimum_font_size['unit'] ) ? $minimum_font_size['unit'] : 'rem';
 
 	// Grab the maximum font size and normalize it in order to use the value for calculations.
@@ -372,12 +374,17 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 		)
 	);
 
-	// Protect against unsupported units.
+	// Checks for mandatory min and max sizes, and protects against unsupported units.
 	if ( ! $maximum_font_size || ! $minimum_font_size ) {
 		return null;
 	}
 
-	// Use rem for accessible fluid target font scaling.
+	// Min font size should not be greater than max font size.
+	if ( $minimum_font_size['value'] > $maximum_font_size['value'] ) {
+		return null;
+	}
+
+	// Uses rem for accessible fluid target font scaling.
 	$minimum_font_size_rem = gutenberg_get_typography_value_and_unit(
 		$minimum_font_size_raw,
 		array(
@@ -413,8 +420,8 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
  * Returns a font-size value based on a given font-size preset.
  * Takes into account fluid typography parameters and attempts to return a css formula depending on available, valid values.
  *
- * @param array $preset                     {
- *     Required. fontSizes preset value as seen in theme.json.
+ * @param array $font_size                     {
+ *     Required. fontSizes represented in the preset format as seen in theme.json.
  *
  *     @type string           $name Name of the font size preset.
  *     @type string           $slug Kebab-case unique identifier for the font size preset.
@@ -422,10 +429,10 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
  * }
  * @param bool  $should_use_fluid_typography An override to switch fluid typography "on". Can be used for unit testing. Default is `false`.
  *
- * @return string|null Font-size value or `null` if a size is not passed in $preset.
+ * @return string|null Font-size value or `null` if a size is not passed in $font_size.
  */
-function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_typography = false ) {
-	if ( ! isset( $preset['size'] ) ) {
+function gutenberg_get_typography_font_size_value( $font_size, $should_use_fluid_typography = false ) {
+	if ( ! isset( $font_size['size'] ) ) {
 		return null;
 	}
 
@@ -433,8 +440,8 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	 * Catches empty values and 0/'0'.
 	 * Fluid calculations cannot be performed on 0.
 	 */
-	if ( empty( $preset['size'] ) ) {
-		return $preset['size'];
+	if ( empty( $font_size['size'] ) ) {
+		return $font_size['size'];
 	}
 
 	// Check if fluid font sizes are activated.
@@ -442,7 +449,7 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	$should_use_fluid_typography = isset( $typography_settings['fluid'] ) && true === $typography_settings['fluid'] ? true : $should_use_fluid_typography;
 
 	if ( ! $should_use_fluid_typography ) {
-		return $preset['size'];
+		return $font_size['size'];
 	}
 
 	// Defaults.
@@ -451,43 +458,77 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	$default_minimum_font_size_factor = 0.75;
 	$default_maximum_font_size_factor = 1.5;
 	$default_scale_factor             = 1;
+	$default_minimum_font_size_limit  = '14px';
 
 	// Font sizes.
-	$fluid_font_size_settings = isset( $preset['fluid'] ) ? $preset['fluid'] : null;
+	$fluid_font_size_settings = isset( $font_size['fluid'] ) ? $font_size['fluid'] : null;
 
 	// A font size has explicitly bypassed fluid calculations.
 	if ( false === $fluid_font_size_settings ) {
-		return $preset['size'];
+		return $font_size['size'];
 	}
 
 	// Try to grab explicit min and max fluid font sizes.
 	$minimum_font_size_raw = isset( $fluid_font_size_settings['min'] ) ? $fluid_font_size_settings['min'] : null;
 	$maximum_font_size_raw = isset( $fluid_font_size_settings['max'] ) ? $fluid_font_size_settings['max'] : null;
 
-	// Font sizes.
-	$preferred_size = gutenberg_get_typography_value_and_unit( $preset['size'] );
+	// Parses default font size.
+	$preferred_size = gutenberg_get_typography_value_and_unit( $font_size['size'] );
 
 	// Protect against unsupported units.
 	if ( empty( $preferred_size['unit'] ) ) {
-		return $preset['size'];
+		return $font_size['size'];
 	}
 
-	// If no fluid min or max font sizes are available, create some using min/max font size factors.
+	// If no fluid min font size is available, create one using min font size factor.
 	if ( ! $minimum_font_size_raw ) {
-		$minimum_font_size_raw = ( $preferred_size['value'] * $default_minimum_font_size_factor ) . $preferred_size['unit'];
+		$minimum_font_size_raw = round( $preferred_size['value'] * $default_minimum_font_size_factor, 3 ) . $preferred_size['unit'];
 	}
 
+	// Parses the minimum font size limit, so we can perform checks using it.
+	$minimum_font_size_limit = gutenberg_get_typography_value_and_unit(
+		$default_minimum_font_size_limit,
+		array(
+			'coerce_to' => $preferred_size['unit'],
+		)
+	);
+
+	/*
+	 * Checks if a user-defined font size is lower than $minimum_font_size_limit. If so than it should become the minimum font size.
+	 * Otherwise, if the minimum font size is lower than $minimum_font_size_limit
+	 * use $minimum_font_size_limit instead.
+	 */
+	if ( ! empty( $minimum_font_size_limit ) ) {
+		// @TODO check if there was no min size value passed!
+		if ( $preferred_size['value'] < $minimum_font_size_limit['value'] ) {
+			$minimum_font_size_raw = implode( '', $preferred_size );
+		} else {
+			$minimum_font_size_parsed = gutenberg_get_typography_value_and_unit(
+				$minimum_font_size_raw,
+				array(
+					'coerce_to' => $preferred_size['unit'],
+				)
+			);
+
+			if ( ! empty( $minimum_font_size_parsed ) && $minimum_font_size_parsed['value'] < $minimum_font_size_limit['value'] ) {
+				$minimum_font_size_raw = implode( '', $minimum_font_size_limit );
+			}
+		}
+	}
+
+	// If no fluid max font size is available, create one using max font size factor.
 	if ( ! $maximum_font_size_raw ) {
-		$maximum_font_size_raw = ( $preferred_size['value'] * $default_maximum_font_size_factor ) . $preferred_size['unit'];
+		$maximum_font_size_raw = round( $preferred_size['value'] * $default_maximum_font_size_factor, 3 ) . $preferred_size['unit'];
 	}
 
 	$fluid_font_size_value = gutenberg_get_computed_fluid_typography_value(
 		array(
-			'minimum_viewport_width' => $default_minimum_viewport_width,
-			'maximum_viewport_width' => $default_maximum_viewport_width,
-			'minimum_font_size'      => $minimum_font_size_raw,
-			'maximum_font_size'      => $maximum_font_size_raw,
-			'scale_factor'           => $default_scale_factor,
+			'minimum_viewport_width'  => $default_minimum_viewport_width,
+			'maximum_viewport_width'  => $default_maximum_viewport_width,
+			'minimum_font_size'       => $minimum_font_size_raw,
+			'maximum_font_size'       => $maximum_font_size_raw,
+			'scale_factor'            => $default_scale_factor,
+			'minimum_font_size_limit' => $default_minimum_font_size_limit,
 		)
 	);
 
@@ -495,7 +536,7 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 		return $fluid_font_size_value;
 	}
 
-	return $preset['size'];
+	return $font_size['size'];
 }
 
 // Register the block support.
