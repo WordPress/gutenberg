@@ -52,11 +52,11 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 	}
 
 	$filters_to_remove = array(
-		'wptexturize' => false,
-		'shortcode_unautop' => false,
+		'wptexturize'            => false,
+		'shortcode_unautop'      => false,
 		'wp_filter_content_tags' => false,
-		'do_shortcode' => false,
-		'convert_smilies' => false,
+		'do_shortcode'           => false,
+		'convert_smilies'        => false,
 	);
 
 	// Temporarily remove some filters that are not suitable for this block.
