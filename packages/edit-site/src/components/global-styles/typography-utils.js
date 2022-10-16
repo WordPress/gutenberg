@@ -10,31 +10,32 @@
 import { getComputedFluidTypographyValue } from '@wordpress/block-editor';
 
 /**
- * @typedef {Object} FluidPreset
+ * @typedef {Object} FluidValues
  * @property {string|undefined} max A maximum font size value.
  * @property {?string|undefined} min A minimum font size value.
  */
 
 /**
- * @typedef {Object} Preset
+ * @typedef {Object} FontSize
  * @property {?string|?number}               size  A default font size.
  * @property {string}                        name  A font size name, displayed in the UI.
  * @property {string}                        slug  A font size slug
- * @property {boolean|FluidPreset|undefined} fluid A font size slug
+ * @property {boolean|FluidValues|undefined} fluid A font size slug
  */
 
 /**
- * Returns a font-size value based on a given font-size preset.
+ * Returns a font-size value based on a given fontSize.
+ * The fontSize is represented in the preset format as seen in theme.json.
  * Takes into account fluid typography parameters and attempts to return a css formula depending on available, valid values.
  *
- * @param {Preset}  preset
- * @param {Object}  typographySettings
- * @param {boolean} typographySettings.fluid Whether fluid typography is enabled.
+ * @param {FontSize} fontSize
+ * @param {Object}   typographySettings
+ * @param {boolean}  typographySettings.fluid Whether fluid typography is enabled.
  *
- * @return {string|*} A font-size value or the value of preset.size.
+ * @return {string|*} A font-size value or the value of fontSize.size.
  */
-export function getTypographyFontSizeValue( preset, typographySettings ) {
-	const { size: defaultSize } = preset;
+export function getTypographyFontSizeValue( fontSize, typographySettings ) {
+	const { size: defaultSize } = fontSize;
 
 	/*
 	 * Catches falsy values and 0/'0'.
@@ -49,13 +50,13 @@ export function getTypographyFontSizeValue( preset, typographySettings ) {
 	}
 
 	// A font size has explicitly bypassed fluid calculations.
-	if ( false === preset?.fluid ) {
+	if ( false === fontSize?.fluid ) {
 		return defaultSize;
 	}
 
 	const fluidFontSizeValue = getComputedFluidTypographyValue( {
-		minimumFontSize: preset?.fluid?.min,
-		maximumFontSize: preset?.fluid?.max,
+		minimumFontSize: fontSize?.fluid?.min,
+		maximumFontSize: fontSize?.fluid?.max,
 		fontSize: defaultSize,
 	} );
 
