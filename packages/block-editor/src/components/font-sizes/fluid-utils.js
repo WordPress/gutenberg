@@ -264,8 +264,8 @@ export function getTypographyValueAndUnit( rawValue, options = {} ) {
  * @return {number|undefined} Value rounded to standard precision.
  */
 export function roundToPrecision( value, digits = 3 ) {
-	const base = Math.pow( 10, Number( digits ) + 1 );
+	const base = Math.pow( 10, digits + 1 );
 	return Number.isFinite( value )
-		? parseFloat( ( Number( value ) + 1 / base ).toFixed( digits ) )
+		? parseFloat( ( value + 1 / base ).toFixed( digits ) )
 		: undefined;
 }
