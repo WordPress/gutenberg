@@ -231,6 +231,7 @@ export function MarginVisualizer( { clientId, attributes } ) {
 			clientId={ clientId }
 			__unstableCoverTarget
 			__unstableRefreshSize={ margin }
+			shift={ false }
 		>
 			<div className="block-editor__padding-visualizer" style={ style } />
 		</BlockPopover>
