@@ -57,12 +57,6 @@ export default function SpacingInputControl( {
 	// Treat value as a preset value if the passed in value matches the value of one of the spacingSizes.
 	value = getPresetValueFromCustomValue( value, spacingSizes );
 
-	// const handleMouseOver = () => {
-	// 	setMouseOver( true );
-	// };
-	// const handleMouseOut = () => {
-	// 	setMouseOver( false );
-	// };
 	let selectListSizes = spacingSizes;
 	const showRangeControl = spacingSizes.length <= 8;
 
