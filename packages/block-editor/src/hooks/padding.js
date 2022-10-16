@@ -103,7 +103,8 @@ export function PaddingEdit( props ) {
 		name: blockName,
 		attributes: { style },
 		setAttributes,
-		setMouseOver,
+		onMouseOver,
+		onMouseOut,
 	} = props;
 
 	const spacingSizes = useSetting( 'spacing.spacingSizes' );
@@ -151,6 +152,8 @@ export function PaddingEdit( props ) {
 						units={ units }
 						allowReset={ false }
 						splitOnAxis={ splitOnAxis }
+						onMouseOver={ onMouseOver }
+						onMouseOut={ onMouseOut }
 					/>
 				) }
 				{ spacingSizes?.length > 0 && (
@@ -162,7 +165,8 @@ export function PaddingEdit( props ) {
 						units={ units }
 						allowReset={ false }
 						splitOnAxis={ splitOnAxis }
-						setMouseOver={ setMouseOver }
+						onMouseOver={ onMouseOver }
+						onMouseOut={ onMouseOut }
 					/>
 				) }
 			</>

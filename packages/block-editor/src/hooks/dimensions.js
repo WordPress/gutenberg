@@ -46,7 +46,9 @@ export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
 
 function useVisualizerMouseOver() {
 	const [ isMouseOver, setIsMouseOver ] = useState( false );
-	return { isMouseOver, setIsMouseOver };
+	const onMouseOver = () => setIsMouseOver( true );
+	const onMouseOut = () => setIsMouseOver( false );
+	return { isMouseOver, onMouseOver, onMouseOut };
 }
 
 /**
@@ -104,7 +106,8 @@ export function DimensionsPanel( props ) {
 						panelId={ props.clientId }
 					>
 						<PaddingEdit
-							setMouseOver={ paddingMouseOver.setIsMouseOver }
+							onMouseOver={ paddingMouseOver.onMouseOver }
+							onMouseOut={ paddingMouseOver.onMouseOut }
 							{ ...props }
 						/>
 					</ToolsPanelItem>
@@ -120,7 +123,8 @@ export function DimensionsPanel( props ) {
 						panelId={ props.clientId }
 					>
 						<MarginEdit
-							setMouseOver={ marginMouseOver.setIsMouseOver }
+							onMouseOver={ marginMouseOver.onMouseOver }
+							onMouseOut={ marginMouseOver.onMouseOut }
 							{ ...props }
 						/>
 					</ToolsPanelItem>

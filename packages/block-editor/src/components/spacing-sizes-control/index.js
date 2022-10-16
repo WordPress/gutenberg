@@ -30,7 +30,8 @@ export default function SpacingSizesControl( {
 	splitOnAxis = false,
 	useSelect,
 	minimumCustomValue = 0,
-	setMouseOver = noop,
+	onMouseOver = noop,
+	onMouseOut = noop,
 } ) {
 	const spacingSizes = [
 		{ name: 0, slug: '0', size: 0 },
@@ -72,7 +73,8 @@ export default function SpacingSizesControl( {
 		useSelect,
 		type: label,
 		minimumCustomValue,
-		setMouseOver,
+		onMouseOver,
+		onMouseOut,
 	};
 
 	return (
