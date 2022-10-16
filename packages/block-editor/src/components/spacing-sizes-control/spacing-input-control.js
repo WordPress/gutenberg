@@ -227,7 +227,7 @@ export default function SpacingInputControl( {
 					<RangeControl
 						value={ customRangeValue }
 						min={ 0 }
-						max={ 100 }
+						max={ 300 }
 						withInputField={ false }
 						onChange={ handleCustomValueSliderChange }
 						className="components-spacing-sizes-control__custom-value-range"
