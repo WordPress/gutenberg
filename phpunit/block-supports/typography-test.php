@@ -379,7 +379,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'size' => '1.75rem',
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(1.313rem, 1.313rem + ((1vw - 0.48rem) * 2.524), 2.625rem)',
+				'expected_output'             => 'clamp(1.313rem, 1.313rem + ((1vw - 0.48rem) * 2.523), 2.625rem)',
 			),
 
 			'return_fluid_value_with_floats_with_units'   => array(
@@ -387,7 +387,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'size' => '100.175px',
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(75.13125px, 4.695703125rem + ((1vw - 7.68px) * 9.03), 150.2625px)',
+				'expected_output'             => 'clamp(75.131px, 4.696rem + ((1vw - 7.68px) * 9.03), 150.263px)',
 			),
 
 			'return_fluid_value_with_integer_coerced_to_px' => array(
@@ -403,7 +403,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'size' => 100.23,
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(75.1725px, 4.698rem + ((1vw - 7.68px) * 9.035), 150.345px)',
+				'expected_output'             => 'clamp(75.173px, 4.698rem + ((1vw - 7.68px) * 9.035), 150.345px)',
 			),
 
 			'return_default_fluid_values_with_empty_fluid_array' => array(
@@ -610,7 +610,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 			'return_value_with_fluid_typography' => array(
 				'font_size_value'             => '50px',
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'font-size:clamp(37.5px, 2.34375rem + ((1vw - 7.68px) * 4.507), 75px);',
+				'expected_output'             => 'font-size:clamp(37.5px, 2.344rem + ((1vw - 7.68px) * 4.507), 75px);',
 			),
 		);
 	}
@@ -686,7 +686,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'block_content'               => '<p class="has-medium-font-size" style="    font-size:   20px   ;    ">A paragraph inside a group</p>',
 				'font_size_value'             => '20px',
 				'should_use_fluid_typography' => true,
-				'expected_output'             => '<p class="has-medium-font-size" style="    font-size:clamp(15px, 0.9375rem + ((1vw - 7.68px) * 1.803), 30px);    ">A paragraph inside a group</p>',
+				'expected_output'             => '<p class="has-medium-font-size" style="    font-size:clamp(15px, 0.938rem + ((1vw - 7.68px) * 1.803), 30px);    ">A paragraph inside a group</p>',
 			),
 			'return_content_with_first_match_replace_only' => array(
 				'block_content'               => "<div class=\"wp-block-group\" style=\"font-size:1.5em\"> \n \n<p style=\"font-size:1.5em\">A paragraph inside a group</p></div>",

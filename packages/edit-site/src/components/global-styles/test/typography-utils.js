@@ -128,6 +128,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
+					// @TODO this is not the same as the PHP output: 150.263px
 					'clamp(75.131px, 4.696rem + ((1vw - 7.68px) * 9.03), 150.262px)',
 			},
 

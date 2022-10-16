@@ -329,7 +329,7 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 	}
 
 	return array(
-		'value' => $value,
+		'value' => round( $value, 3 ),
 		'unit'  => $unit,
 	);
 }
