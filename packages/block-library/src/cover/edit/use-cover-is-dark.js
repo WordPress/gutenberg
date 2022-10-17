@@ -17,7 +17,7 @@ import { applyFilters } from '@wordpress/hooks';
  *
  * @param {import('colord').RgbaColor} source Source color.
  * @param {import('colord').RgbaColor} dest Destination color.
- * @returns {import('colord').RgbaColor} Composite color.
+ * @return {import('colord').RgbaColor} Composite color.
  */
 function compositeOver( source, dest ) {
 	return {
