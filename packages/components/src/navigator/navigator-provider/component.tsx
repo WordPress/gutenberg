@@ -26,7 +26,7 @@ import type {
 	NavigatorContext as NavigatorContextType,
 } from '../types';
 
-function NavigatorProvider(
+function UnconnectedNavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
@@ -131,9 +131,9 @@ function NavigatorProvider(
  * );
  * ```
  */
-const ConnectedNavigatorProvider = contextConnect(
-	NavigatorProvider,
+export const NavigatorProvider = contextConnect(
+	UnconnectedNavigatorProvider,
 	'NavigatorProvider'
 );
 
-export default ConnectedNavigatorProvider;
+export default NavigatorProvider;
