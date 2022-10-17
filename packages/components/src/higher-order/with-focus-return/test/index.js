@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -22,7 +22,7 @@ class Test extends Component {
 				data-testid="test-element"
 				data-focus-history={ focusHistory }
 			>
-				<textarea />
+				<textarea aria-label="Textarea" />
 			</div>
 		);
 	}
@@ -89,10 +89,11 @@ describe( 'withFocusReturn()', () => {
 				),
 			} );
 
-			const textarea = container.querySelector( 'textarea' );
-			fireEvent.focusIn( textarea, { target: textarea } );
-			textarea.focus();
-			expect( textarea ).toHaveFocus();
+			screen
+				.getByRole( 'textbox', {
+					name: 'Textarea',
+				} )
+				.focus();
 
 			// Should return to the activeElement saved with this component.
 			unmount();
