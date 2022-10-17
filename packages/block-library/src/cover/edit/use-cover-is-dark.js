@@ -54,6 +54,9 @@ export default function useCoverIsDark(
 ) {
 	const [ isDark, setIsDark ] = useState( false );
 	useEffect( () => {
+		const overlay = colord( overlayColor )
+			.alpha( dimRatio / 100 )
+			.toRgb();
 		if ( url ) {
 			const imgCrossOrigin = applyFilters(
 				'media.crossOrigin',
@@ -71,17 +74,15 @@ export default function useCoverIsDark(
 					crossOrigin: imgCrossOrigin,
 				} )
 				.then( ( color ) => {
-					const overlay = colord( overlayColor ).alpha(
-						dimRatio / 100
-					);
-					const media = colord( color.hex );
-					const composite = colord(
-						compositeOver( overlay.toRgb(), media.toRgb() )
-					);
+					const media = colord( color.hex ).toRgb();
+					const composite = colord( compositeOver( overlay, media ) );
 					setIsDark( composite.isDark() );
 				} );
 		} else {
-			setIsDark( colord( overlayColor ).isDark() );
+			// Assume a white background because it isn't easy to get the actual site background color.
+			const background = { r: 255, g: 255, b: 255, a: 1 };
+			const composite = colord( compositeOver( overlay, background ) );
+			setIsDark( composite.isDark() );
 		}
 	}, [ overlayColor, dimRatio, url, setIsDark ] );
 	return isDark;
