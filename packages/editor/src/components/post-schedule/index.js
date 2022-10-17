@@ -11,17 +11,14 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+/**
+ * External dependencies
+ */
+import { endOfMonth, startOfMonth } from 'date-fns';
 
 function getDayOfTheMonth( date = new Date(), firstDay = true ) {
-	const d = new Date( date );
-	return new Date(
-		d.getFullYear(),
-		d.getMonth() + ( firstDay ? 0 : 1 ),
-		firstDay ? 1 : 0,
-		firstDay ? 0 : 23,
-		firstDay ? 0 : 59,
-		firstDay ? 0 : 59
-	).toISOString();
+	const dayOfMonth = firstDay ? startOfMonth( date ) : endOfMonth( date );
+	return dayOfMonth.toISOString();
 }
 
 export default function PostSchedule( { onClose } ) {
