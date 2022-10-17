@@ -4,7 +4,7 @@
 import classNames from 'classnames';
 
 export default function save( { attributes } ) {
-	const { type, name, label, inlineLabel } = attributes;
+	const { type, name, label, inlineLabel, required } = attributes;
 
 	return (
 		<>
@@ -21,6 +21,8 @@ export default function save( { attributes } ) {
 					<textarea
 						className="wp-block-input-field"
 						name={ name || label }
+						required={ required }
+						aria-required={ required }
 					/>
 				</label>
 				/* eslint-enable jsx-a11y/label-has-associated-control */
@@ -50,6 +52,8 @@ export default function save( { attributes } ) {
 						className="wp-block-input-field"
 						type={ type }
 						name={ name || label }
+						required={ required }
+						aria-required={ required }
 					/>
 				</label>
 				/* eslint-enable jsx-a11y/label-has-associated-control */

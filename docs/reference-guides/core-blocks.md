@@ -357,7 +357,7 @@ The basic building block for forms. ([Source](https://github.com/WordPress/guten
 -	**Name:** core/input-field
 -	**Category:** common
 -	**Supports:** 
--	**Attributes:** inlineLabel, label, name, type
+-	**Attributes:** inlineLabel, label, name, required, type
 
 ## Latest Comments
 

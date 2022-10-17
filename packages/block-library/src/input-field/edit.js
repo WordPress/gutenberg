@@ -26,7 +26,7 @@ import { useRef } from '@wordpress/element';
 import { INPUT_TYPES } from './utils';
 
 function InputFieldBlock( { attributes, setAttributes } ) {
-	const { type, name, label, inlineLabel } = attributes;
+	const { type, name, label, inlineLabel, required } = attributes;
 	const blockProps = useBlockProps();
 	const ref = useRef();
 
@@ -57,6 +57,17 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 							onChange={ ( newVal ) => {
 								setAttributes( {
 									inlineLabel: newVal,
+								} );
+							} }
+						/>
+					) }
+					{ type !== 'submit' && (
+						<CheckboxControl
+							label={ __( 'Required' ) }
+							checked={ attributes.required }
+							onChange={ ( newVal ) => {
+								setAttributes( {
+									required: newVal,
 								} );
 							} }
 						/>
@@ -110,6 +121,8 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 						className="wp-block-input-field"
 						disabled="true"
 						name={ name }
+						required={ required }
+						aria-required={ required }
 					/>
 				</label>
 				/* eslint-enable jsx-a11y/label-has-associated-control */
@@ -176,6 +189,8 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 						type={ type }
 						name={ name }
 						disabled="true"
+						required={ required }
+						aria-required={ required }
 					/>
 				</label>
 				/* eslint-enable jsx-a11y/label-has-associated-control */

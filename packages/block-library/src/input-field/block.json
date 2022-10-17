@@ -23,6 +23,10 @@
 		"inlineLabel": {
 			"type": "boolean",
 			"default": false
+		},
+		"required": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"style": [ "wp-block-input-field", "wp-block-buttons", "wp-block-button" ]
