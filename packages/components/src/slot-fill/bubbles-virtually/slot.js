@@ -25,15 +25,15 @@ function Slot(
 
 	// We want don't fillProps in the deps of the layout effect below because we don't want to
 	// unregister and register the slot whenever fillProps change. Doing so would
-	// cause the fill to be re-mounted, and we are only considering the initial value
-	// of fillProps. Instead, we store that initial value in a ref, but don't update it.
-	const fillPropsRef = useRef( fillProps );
-
+	// cause the fill to be re-mounted.
 	useLayoutEffect( () => {
-		registerSlot( name, ref, fillPropsRef.current );
+		registerSlot( name, ref, fillProps );
 		return () => {
 			unregisterSlot( name, ref );
 		};
+		// Ignore reason: see above.
+		// Also, please see: https://github.com/WordPress/gutenberg/pull/44403#discussion_r994415973
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ registerSlot, unregisterSlot, name ] );
 	// fillProps may be an update that interacts with the layout, so we
 	// useLayoutEffect.
