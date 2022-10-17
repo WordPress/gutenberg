@@ -38,15 +38,9 @@ function useConstrainedTabbing() {
 		function onKeyDown( /** @type {KeyboardEvent} */ event ) {
 			const { keyCode, shiftKey, target } = event;
 
-			// constrainedTabAlreadyHandled is a custom property added
-			// to event to support nested constrainted tabbing containers
-			// @ts-ignore
 			if ( keyCode !== TAB ) {
 				return;
 			}
-
-			// This let us support nested constrainted tabbing containers.
-			event.stopPropagation();
 
 			const action = shiftKey ? 'findPrevious' : 'findNext';
 			const nextElement =
