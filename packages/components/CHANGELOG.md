@@ -24,6 +24,7 @@
 -   `SlotFill`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44403](https://github.com/WordPress/gutenberg/pull/44403))
 -   `Context`: updated to ignore `react/exhaustive-deps` eslint rule ([#45044](https://github.com/WordPress/gutenberg/pull/45044))
 -   `Button`: Refactor Storybook to controls and align docs ([#44105](https://github.com/WordPress/gutenberg/pull/44105)).
+-   `BorderBoxControl`: Convert stories to TypeScript and use Controls ([#45002](https://github.com/WordPress/gutenberg/pull/45002)).
 
 ## 21.3.0 (2022-10-19)
 
