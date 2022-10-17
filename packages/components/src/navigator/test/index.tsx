@@ -466,7 +466,7 @@ describe( 'Navigator', () => {
 			expect( getNavigationButton( 'toChildScreen' ) ).toHaveFocus();
 		} );
 
-		it( 'should keep on an active element inside navigator, while re-rendering', async () => {
+		it( 'should keep focus on an active element inside navigator, while re-rendering', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
