@@ -10,6 +10,15 @@ import { colord } from 'colord';
 import { useEffect, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
+/**
+ * Performs a Porter Duff composite source over operation on two rgba colors.
+ *
+ * @see https://www.w3.org/TR/compositing-1/#porterduffcompositingoperators_srcover
+ *
+ * @param {import('colord').RgbaColor} source Source color.
+ * @param {import('colord').RgbaColor} dest Destination color.
+ * @returns {import('colord').RgbaColor} Composite color.
+ */
 function compositeOver( source, dest ) {
 	return {
 		r: source.r * source.a + dest.r * dest.a * ( 1 - source.a ),
