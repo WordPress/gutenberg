@@ -48,10 +48,10 @@ export default function Layout() {
 			<AnimatePresence>
 				{ ! isFullCanvas && (
 					<motion.div
-						initial={ { opacity: 0, width: 280 } }
+						initial={ { opacity: 0.25, width: 280 } }
 						animate={ { opacity: 1, width: 280 } }
 						exit={ {
-							opacity: 0,
+							opacity: 0.25,
 							width: 0,
 						} }
 						transition={ {
@@ -68,7 +68,11 @@ export default function Layout() {
 			</AnimatePresence>
 			<motion.div
 				className="edit-site-layout__canvas-container"
-				animate={ { padding: isFullCanvas ? 0 : 24 } }
+				animate={ { 
+					paddingTop: isFullCanvas ? 0 : 24,
+					paddingRight: isFullCanvas ? 0 : 24,
+					paddingBottom: isFullCanvas ? 0 : 24
+				 } }
 				transition={ {
 					type: 'tween',
 					duration: disableMotion ? 0 : 0.5,
