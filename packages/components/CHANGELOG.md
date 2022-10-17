@@ -18,6 +18,7 @@
 -   `Sandbox`: Use `toString` to create observe and resize script string ([#42872](https://github.com/WordPress/gutenberg/pull/42872)).
 -   `Navigator`: refactor unit tests to TypeScript and to `user-event` ([#44970](https://github.com/WordPress/gutenberg/pull/44970)).
 -   `Navigator`: Refactor Storybook code to TypeScript and controls ([#44979](https://github.com/WordPress/gutenberg/pull/44979)).
+-   `withFocusReturn`: Refactor tests to `@testing-library/react` ([#45012](https://github.com/WordPress/gutenberg/pull/45012)).
 
 ## 21.2.0 (2022-10-05)
 
