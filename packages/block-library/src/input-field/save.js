@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
 export default function save( { attributes } ) {
 	const { type, name, label, inlineLabel } = attributes;
 
@@ -5,9 +10,14 @@ export default function save( { attributes } ) {
 		<>
 			{ type === 'textarea' && (
 				/* eslint-disable jsx-a11y/label-has-associated-control */
-				<label className="wp-block-input-field-label">
-					{ inlineLabel && label && <span>{ label }</span> }
-					{ ! inlineLabel && label && <p>{ label }</p> }
+				<label
+					className={ classNames( 'wp-block-input-field-label', {
+						'is-label-inline': inlineLabel,
+					} ) }
+				>
+					<div className="wp-block-input-field-label__content">
+						{ label }
+					</div>
 					<textarea
 						className="wp-block-input-field"
 						name={ name || label }
@@ -28,9 +38,14 @@ export default function save( { attributes } ) {
 
 			{ type !== 'textarea' && type !== 'submit' && (
 				/* eslint-disable jsx-a11y/label-has-associated-control */
-				<label className="wp-block-input-field-label">
-					{ inlineLabel && label && <span>{ label }</span> }
-					{ ! inlineLabel && label && <p>{ label }</p> }
+				<label
+					className={ classNames( 'wp-block-input-field-label', {
+						'is-label-inline': inlineLabel,
+					} ) }
+				>
+					<div className="wp-block-input-field-label__content">
+						{ label }
+					</div>
 					<input
 						className="wp-block-input-field"
 						type={ type }

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -78,9 +83,29 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 
 			{ type === 'textarea' && (
 				/* eslint-disable jsx-a11y/label-has-associated-control */
-				<label className="wp-block-input-field-label">
-					{ inlineLabel && label && <span>{ label }</span> }
-					{ ! inlineLabel && label && <p>{ label }</p> }
+				<label
+					className={ classNames( 'wp-block-input-field-label', {
+						'is-label-inline': inlineLabel,
+					} ) }
+				>
+					<RichText
+						identifier="label"
+						tagName="div"
+						className="wp-block-input-field-label__content"
+						{ ...blockProps }
+						value={ label }
+						onChange={ ( newLabel ) =>
+							setAttributes( { label: newLabel } )
+						}
+						ref={ ref.current }
+						aria-label={
+							label ? __( 'Label' ) : __( 'Empty label' )
+						}
+						data-empty={ label ? false : true }
+						placeholder={ __( 'Type the label for this input' ) }
+						__unstableEmbedURLOnPaste
+						__unstableAllowPrefixTransformations
+					/>
 					<textarea
 						className="wp-block-input-field"
 						disabled="true"
@@ -99,7 +124,7 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 						>
 							<RichText
 								identifier="label"
-								tagName={ inlineLabel ? 'span' : 'p' }
+								tagName="div"
 								{ ...blockProps }
 								value={ label }
 								onChange={ ( newLabel ) =>
@@ -123,10 +148,15 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 
 			{ type !== 'textarea' && type !== 'submit' && (
 				/* eslint-disable jsx-a11y/label-has-associated-control */
-				<label className="wp-block-input-field-label">
+				<label
+					className={ classNames( 'wp-block-input-field-label', {
+						'is-label-inline': inlineLabel,
+					} ) }
+				>
 					<RichText
 						identifier="label"
-						tagName={ inlineLabel ? 'span' : 'p' }
+						tagName="span"
+						className="wp-block-input-field-label__content"
 						{ ...blockProps }
 						value={ label }
 						onChange={ ( newLabel ) =>
