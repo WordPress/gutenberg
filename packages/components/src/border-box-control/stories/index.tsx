@@ -1,0 +1,108 @@
+/**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { ComponentProps } from 'react';
+
+/**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import Button from '../../button';
+import Popover from '../../popover';
+import { BorderBoxControl } from '../';
+import { Provider as SlotFillProvider } from '../../slot-fill';
+
+import type { AnyBorder } from '../types';
+
+const meta: ComponentMeta< typeof BorderBoxControl > = {
+	title: 'Components (Experimental)/BorderBoxControl',
+	component: BorderBoxControl,
+	argTypes: {
+		onChange: { action: 'onChange' },
+		value: { control: { type: null } },
+	},
+	parameters: {
+		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
+	},
+};
+export default meta;
+
+// Available border colors.
+const colors = [
+	{ name: 'Gray 0', color: '#f6f7f7' },
+	{ name: 'Gray 5', color: '#dcdcde' },
+	{ name: 'Gray 20', color: '#a7aaad' },
+	{ name: 'Gray 70', color: '#3c434a' },
+	{ name: 'Gray 100', color: '#101517' },
+	{ name: 'Blue 20', color: '#72aee6' },
+	{ name: 'Blue 40', color: '#3582c4' },
+	{ name: 'Blue 70', color: '#0a4b78' },
+	{ name: 'Red 40', color: '#e65054' },
+	{ name: 'Red 70', color: '#8a2424' },
+	{ name: 'Green 10', color: '#68de7c' },
+	{ name: 'Green 40', color: '#00a32a' },
+	{ name: 'Green 60', color: '#007017' },
+	{ name: 'Yellow 10', color: '#f2d675' },
+	{ name: 'Yellow 40', color: '#bd8600' },
+];
+
+const Template: ComponentStory< typeof BorderBoxControl > = ( props ) => {
+	const { onChange, ...otherProps } = props;
+	const [ borders, setBorders ] = useState< AnyBorder >();
+
+	const onChangeMerged: ComponentProps<
+		typeof BorderBoxControl
+	>[ 'onChange' ] = ( newBorders ) => {
+		setBorders( newBorders );
+		onChange( newBorders );
+	};
+
+	return (
+		<SlotFillProvider>
+			<div style={ { maxWidth: '248px', padding: '16px' } }>
+				<BorderBoxControl
+					{ ...otherProps }
+					onChange={ onChangeMerged }
+					value={ borders }
+				/>
+			</div>
+			<hr
+				style={ {
+					marginTop: '100px',
+					borderColor: '#ddd',
+					borderStyle: 'solid',
+					borderBottom: 'none',
+				} }
+			/>
+			<p style={ { color: '#aaa', fontSize: '0.9em' } }>
+				The BorderBoxControl is intended to be used within a component
+				that will provide reset controls. The button below is only for
+				convenience.
+			</p>
+			<Button
+				variant="primary"
+				onClick={ () => onChangeMerged( undefined ) }
+			>
+				Reset
+			</Button>
+			{ /* @ts-expect-error Ignore until Popover is converted to TS */ }
+			<Popover.Slot />
+		</SlotFillProvider>
+	);
+};
+export const Default = Template.bind( {} );
+Default.args = {
+	colors,
+	label: 'Borders',
+	disableCustomColors: false,
+	enableAlpha: true,
+	enableStyle: true,
+	size: 'default',
+	popoverPlacement: 'right-start',
+};
