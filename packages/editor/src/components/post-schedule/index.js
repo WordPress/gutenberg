@@ -53,9 +53,13 @@ export default function PostSchedule( { onClose } ) {
 
 	const events = useMemo(
 		() =>
-			( eventsByPostType || [] ).map( ( { date: eventDate } ) => ( {
-				date: new Date( eventDate ),
-			} ) ),
+			( eventsByPostType || [] ).map(
+				( { title, type, date: eventDate } ) => ( {
+					title: title?.rendered,
+					type,
+					date: new Date( eventDate ),
+				} )
+			),
 		[ eventsByPostType ]
 	);
 
