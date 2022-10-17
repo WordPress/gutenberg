@@ -535,11 +535,11 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 
 	$fluid_font_size_value = gutenberg_get_computed_fluid_typography_value(
 		array(
-			'minimum_viewport_width'  => $default_minimum_viewport_width,
-			'maximum_viewport_width'  => $default_maximum_viewport_width,
-			'minimum_font_size'       => $minimum_font_size_raw,
-			'maximum_font_size'       => $maximum_font_size_raw,
-			'scale_factor'            => $default_scale_factor,
+			'minimum_viewport_width' => $default_minimum_viewport_width,
+			'maximum_viewport_width' => $default_maximum_viewport_width,
+			'minimum_font_size'      => $minimum_font_size_raw,
+			'maximum_font_size'      => $maximum_font_size_raw,
+			'scale_factor'           => $default_scale_factor,
 		)
 	);
 
