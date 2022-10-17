@@ -1,0 +1,88 @@
+[
+	{
+		"blockName": "core/form",
+		"attrs": {
+			"formId": "the-form-id"
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/input-field",
+				"attrs": {
+					"label": "Name - required, inline label",
+					"inlineLabel": true,
+					"required": true
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n<label class=\"wp-block-input-field-label is-label-inline\"><div class=\"wp-block-input-field-label__content\">Name - required, inline label</div><input class=\"wp-block-input-field\" type=\"text\" name=\"Name - required, inline label\" required aria-required=\"true\"/></label>\n",
+				"innerContent": [
+					"\n<label class=\"wp-block-input-field-label is-label-inline\"><div class=\"wp-block-input-field-label__content\">Name - required, inline label</div><input class=\"wp-block-input-field\" type=\"text\" name=\"Name - required, inline label\" required aria-required=\"true\"/></label>\n"
+				]
+			},
+			{
+				"blockName": "core/input-field",
+				"attrs": {
+					"type": "checkbox",
+					"label": "Checkbox - inline label",
+					"inlineLabel": true,
+					"required": true
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n<label class=\"wp-block-input-field-label is-label-inline\"><div class=\"wp-block-input-field-label__content\">Checkbox - inline label</div><input class=\"wp-block-input-field\" type=\"checkbox\" name=\"Checkbox - inline label\" required aria-required=\"true\"/></label>\n",
+				"innerContent": [
+					"\n<label class=\"wp-block-input-field-label is-label-inline\"><div class=\"wp-block-input-field-label__content\">Checkbox - inline label</div><input class=\"wp-block-input-field\" type=\"checkbox\" name=\"Checkbox - inline label\" required aria-required=\"true\"/></label>\n"
+				]
+			},
+			{
+				"blockName": "core/input-field",
+				"attrs": {
+					"type": "email",
+					"label": "Email - required",
+					"required": true
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Email - required</div><input class=\"wp-block-input-field\" type=\"email\" name=\"Email - required\" required aria-required=\"true\"/></label>\n",
+				"innerContent": [
+					"\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Email - required</div><input class=\"wp-block-input-field\" type=\"email\" name=\"Email - required\" required aria-required=\"true\"/></label>\n"
+				]
+			},
+			{
+				"blockName": "core/input-field",
+				"attrs": {
+					"type": "textarea",
+					"label": "Textarea input"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Textarea input</div><textarea class=\"wp-block-input-field\" name=\"Textarea input\" aria-required=\"false\"></textarea></label>\n",
+				"innerContent": [
+					"\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Textarea input</div><textarea class=\"wp-block-input-field\" name=\"Textarea input\" aria-required=\"false\"></textarea></label>\n"
+				]
+			},
+			{
+				"blockName": "core/input-field",
+				"attrs": {
+					"type": "submit",
+					"label": "Submit"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n<div class=\"wp-block-buttons\"><div class=\"wp-block-button\"><button class=\"wp-block-button__link wp-element-button\">Submit</button></div></div>\n",
+				"innerContent": [
+					"\n<div class=\"wp-block-buttons\"><div class=\"wp-block-button\"><button class=\"wp-block-button__link wp-element-button\">Submit</button></div></div>\n"
+				]
+			}
+		],
+		"innerHTML": "\n<form class=\"wp-block-form\">\n\n\n\n\n\n\n\n</form>\n",
+		"innerContent": [
+			"\n<form class=\"wp-block-form\">",
+			null,
+			"\n\n",
+			null,
+			"\n\n",
+			null,
+			"\n\n",
+			null,
+			"\n\n",
+			null,
+			"</form>\n"
+		]
+	}
+]
