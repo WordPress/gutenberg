@@ -185,6 +185,7 @@
 		"eslint-import-resolver-node": "0.3.4",
 		"eslint-plugin-eslint-comments": "3.1.2",
 		"eslint-plugin-import": "2.25.2",
+		"eslint-plugin-jest-dom": "4.0.2",
 		"eslint-plugin-playwright": "0.8.0",
 		"eslint-plugin-ssr-friendly": "1.0.6",
 		"execa": "4.0.2",
