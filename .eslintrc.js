@@ -135,6 +135,7 @@ module.exports = {
 							'negate',
 							'noop',
 							'nth',
+							'omitBy',
 							'once',
 							'overEvery',
 							'partial',
