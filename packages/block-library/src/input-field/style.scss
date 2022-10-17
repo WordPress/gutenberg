@@ -7,7 +7,8 @@
 	}
 }
 
-.wp-block-input-field {
+input.wp-block-input-field,
+textarea.wp-block-input-field {
 	padding: 0.5em;
 	border: 1px solid currentColor;
 	opacity: 0.75;
