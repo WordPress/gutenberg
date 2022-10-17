@@ -44,7 +44,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<form { ...innerBlocksProps } />;
+			<form { ...innerBlocksProps } />
 		</>
 	);
 };
