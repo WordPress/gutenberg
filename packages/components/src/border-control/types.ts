@@ -121,7 +121,7 @@ export type BorderControlProps = ColorProps &
 		/**
 		 * Size of the control.
 		 *
-		 * @default default
+		 * @default 'default'
 		 */
 		size?: 'default' | '__unstable-large';
 	};
@@ -162,7 +162,7 @@ export type DropdownProps = ColorProps & {
 	/**
 	 * Size of the control.
 	 *
-	 * @default default
+	 * @default 'default'
 	 */
 	size?: 'default' | '__unstable-large';
 };

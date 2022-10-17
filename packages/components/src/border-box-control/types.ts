@@ -46,7 +46,7 @@ export type BorderBoxControlProps = ColorProps &
 		/**
 		 * Size of the control.
 		 *
-		 * @default default
+		 * @default 'default'
 		 */
 		size?: 'default' | '__unstable-large';
 	};
@@ -67,7 +67,7 @@ export type LinkedButtonProps = {
 	/**
 	 * Size of the control.
 	 *
-	 * @default default
+	 * @default 'default'
 	 */
 	size?: 'default' | '__unstable-large';
 };
@@ -82,7 +82,7 @@ export type VisualizerProps = {
 	/**
 	 * Size of the control.
 	 *
-	 * @default default
+	 * @default 'default'
 	 */
 	size?: 'default' | '__unstable-large';
 };
@@ -115,7 +115,7 @@ export type SplitControlsProps = ColorProps & {
 	/**
 	 * Size of the control.
 	 *
-	 * @default default
+	 * @default 'default'
 	 */
 	size?: 'default' | '__unstable-large';
 };

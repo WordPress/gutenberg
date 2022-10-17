@@ -129,6 +129,14 @@ dropdown. The header includes a label for the color picker and a close button.
 
 - Required: No
 
+### `size`: `string`
+
+Size of the control.
+
+- Required: No
+- Default: `default`
+- Allowed values: `default`, `__unstable-large`
+
 ### `value`: `Object`
 
 An object representing a border or `undefined`. Used to set the current border
