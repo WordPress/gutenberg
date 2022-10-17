@@ -88,7 +88,7 @@ add_action( 'init', 'register_block_core_form' );
  * Then add your own action by creating a function and hooking it to the 'wp' action.
  */
 function submit_core_form_block() {
-	if ( ! isset( $_POST['block-form-hash'] ) ) {
+	if ( ! isset( $_POST['block-form-id'] ) ) {
 		return;
 	}
 	$content = sprintf(
@@ -97,7 +97,7 @@ function submit_core_form_block() {
 		esc_url( get_site_url() . $_SERVER['REQUEST_URI'] )
 	);
 	foreach ( $_POST as $key => $value ) {
-		if ( 'block-form-hash' === $key ) {
+		if ( 'block-form-id' === $key ) {
 			continue;
 		}
 		$content .= $key . ': ' . $value . '</br>';
