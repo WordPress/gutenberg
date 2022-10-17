@@ -139,3 +139,9 @@ Example:
 ```
 
 -   Required: No
+
+### `wrapperClassName`: `string`
+
+Custom CSS class to apply to the unit control's outer wrapper.
+
+-   Required: No
