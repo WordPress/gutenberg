@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { reduce, omit, mapValues, isEqual, isEmpty, omitBy } from 'lodash';
+import { reduce, omit, mapValues, isEqual, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -417,15 +417,15 @@ const withBlockTree =
 				break;
 			}
 			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
-				const updatedBlockUids = Object.keys(
-					omitBy( newState.attributes, ( attributes, clientId ) => {
+				const updatedBlockUids = Object.entries( newState.attributes )
+					.filter( ( [ clientId, attributes ] ) => {
 						return (
-							newState.byClientId[ clientId ].name !==
-								'core/block' ||
-							attributes.ref !== action.updatedId
+							newState.byClientId[ clientId ].name ===
+								'core/block' &&
+							attributes.ref === action.updatedId
 						);
 					} )
-				);
+					.map( ( [ clientId ] ) => clientId );
 
 				newState.tree = updateParentInnerBlocksInTree(
 					newState,
