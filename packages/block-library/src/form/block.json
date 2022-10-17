@@ -15,6 +15,10 @@
 		"method": {
 			"type": "string",
 			"default": "post"
+		},
+		"formId": {
+			"type": "string",
+			"default": ""
 		}
 	}
 }

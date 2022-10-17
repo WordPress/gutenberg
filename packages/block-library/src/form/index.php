@@ -47,7 +47,8 @@ function render_block_core_form( $attributes, $content, $block ) {
 	 */
 	$method = apply_filters( 'block_form_method', $method, $attributes, $content, $block );
 
-	$form_hash = md5( json_encode( array( $attributes, $block ) ) );
+	$form_id = empty( $attributes['formId'] ) ? md5( json_encode( array( $attributes, $block ) ) ) : $attributes['formId'];
+
 	return str_replace(
 		array(
 			'<form ',
@@ -59,7 +60,7 @@ function render_block_core_form( $attributes, $content, $block ) {
 				esc_attr( $action ),
 				esc_attr( $method )
 			),
-			'<input type="hidden" name="block-form-hash" value="' . $form_hash . '" /><form>',
+			'<input type="hidden" name="block-form-id" value="' . esc_attr( $form_id ) . '" /><form>',
 		),
 		$content
 	);
