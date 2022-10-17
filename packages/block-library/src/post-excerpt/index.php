@@ -29,11 +29,12 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 
 	$excerpt_length = $attributes['excerptLength'];
 
-	add_filter( 'excerpt_length', function() use (
-		$excerpt_length
-	) {
-		return $excerpt_length;
-	} );
+	add_filter(
+		'excerpt_length',
+		function() use ( $excerpt_length ) {
+			return $excerpt_length;
+		}
+	);
 
 	$excerpt = get_the_excerpt();
 
