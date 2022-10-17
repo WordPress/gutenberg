@@ -306,7 +306,7 @@ describe( 'useSelect', () => {
 			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
 			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 1 );
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 0 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			act( () => {
 				registry.dispatch( 'store-2' ).increment();
@@ -315,7 +315,7 @@ describe( 'useSelect', () => {
 			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
 			expect( selectCount2 ).toHaveBeenCalledTimes( 3 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 0 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			act( () => {
 				registry.dispatch( 'store-1' ).increment();
@@ -324,7 +324,7 @@ describe( 'useSelect', () => {
 			expect( selectCount1 ).toHaveBeenCalledTimes( 3 );
 			expect( selectCount2 ).toHaveBeenCalledTimes( 3 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 3 );
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 1 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
 
 			// Test if the unsubscribers get called correctly.
 			expect( () => unmount() ).not.toThrow();
@@ -720,7 +720,7 @@ describe( 'useSelect', () => {
 				registry.dispatch( 'not-yet-registered-store' ).increment();
 			} );
 
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 1 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
 
 			// Test if the unsubscribers get called correctly.
 			expect( () => unmount() ).not.toThrow();
@@ -822,13 +822,13 @@ describe( 'useSelect', () => {
 				</RegistryProvider>
 			);
 
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 0 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			act( () => {
 				registry.dispatch( customStore ).increment();
 			} );
 
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 1 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
 
 			expect( () => unmount() ).not.toThrow();
 		} );
@@ -879,7 +879,7 @@ describe( 'useSelect', () => {
 			expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
 			// Ensure expected state was rendered.
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 0 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			act( () => {
 				registry.dispatch( 'counter' ).inc();
@@ -887,7 +887,7 @@ describe( 'useSelect', () => {
 
 			// still not called right after increment
 			expect( selectSpy ).toHaveBeenCalledTimes( 2 );
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 0 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			expect( await screen.findByText( 1 ) ).toBeInTheDocument();
 
@@ -917,7 +917,7 @@ describe( 'useSelect', () => {
 			const { rerender } = render( <App async={ true } /> );
 
 			// Ensure expected state was rendered.
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 0 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			// Schedules an async update of the component.
 			act( () => {
@@ -925,13 +925,13 @@ describe( 'useSelect', () => {
 			} );
 
 			// Ensure the async update wasn't processed yet.
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 0 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			// Switch from async mode to sync.
 			rerender( <App async={ false } /> );
 
 			// Ensure the async update was flushed during the rerender.
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 1 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
 
 			// initial render + subscription check + rerender with isAsync=false
 			expect( selectSpy ).toHaveBeenCalledTimes( 3 );
@@ -1010,7 +1010,7 @@ describe( 'useSelect', () => {
 			const { unmount } = render( <App /> );
 
 			// Ensure expected state was rendered.
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 0 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			// Schedules an async update of the component.
 			act( () => {
@@ -1018,7 +1018,7 @@ describe( 'useSelect', () => {
 			} );
 
 			// Ensure the async update wasn't processed yet.
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 0 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			// Unmount
 			unmount();
@@ -1054,17 +1054,17 @@ describe( 'useSelect', () => {
 
 			const { rerender } = render( <App reg={ registry } /> );
 
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 0 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			act( () => {
 				registry.dispatch( 'counter' ).inc();
 			} );
 
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 0 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			rerender( <App reg={ registry2 } /> );
 
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 100 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '100' );
 
 			// Give the async update time to run in case it wasn't cancelled
 			await new Promise( setImmediate );
@@ -1101,12 +1101,12 @@ describe( 'useSelect', () => {
 			);
 
 			const { rerender } = render( <App multiple={ 1 } /> );
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 1 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
 
 			// Check that the most recent value of `multiple` is used to render:
 			// the old callback wasn't memoized and there is no stale closure problem.
 			rerender( <App multiple={ 2 } /> );
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 2 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '2' );
 		} );
 
 		it( 'subscribes only stores used by the initial callback', () => {
@@ -1126,23 +1126,23 @@ describe( 'useSelect', () => {
 
 			// initial render with counter-1
 			const { rerender } = render( <App store="counter-1" /> );
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 1 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
 
 			// update from counter-1
 			act( () => {
 				registry.dispatch( 'counter-1' ).inc();
 			} );
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 2 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '2' );
 
 			// rerender with counter-2
 			rerender( <App store="counter-2" /> );
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 10 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '10' );
 
 			// update from counter-2 is ignored because component is subcribed only to counter-1
 			act( () => {
 				registry.dispatch( 'counter-2' ).inc();
 			} );
-			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 10 );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '10' );
 		} );
 	} );
 } );
