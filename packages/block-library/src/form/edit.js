@@ -1,14 +1,23 @@
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+
+const ALLOWED_BLOCKS = [
+	'core/paragraph',
+	'core/heading',
+	'core/input-field',
+	'core/columns',
+	'core/group',
+];
 
 const Edit = () => {
 	const blockProps = useBlockProps();
-	return (
-		<form { ...blockProps }>
-			<InnerBlocks />
-		</form>
-	);
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: ALLOWED_BLOCKS,
+	} );
+
+	return <form { ...innerBlocksProps } />;
 };
 export default Edit;
