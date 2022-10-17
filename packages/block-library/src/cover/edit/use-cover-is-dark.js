@@ -10,6 +10,14 @@ import { colord } from 'colord';
 import { useEffect, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
+function compositeOver( source, dest ) {
+	const a = source.a + dest.a * ( 1 - source.a );
+	const r = source.r * source.a + dest.r * dest.a * ( 1 - source.a );
+	const g = source.g * source.a + dest.g * dest.a * ( 1 - source.a );
+	const b = source.b * source.a + dest.b * dest.a * ( 1 - source.a );
+	return { r, g, b, a };
+}
+
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
 		retrieveFastAverageColor.fastAverageColor = new FastAverageColor();
@@ -21,17 +29,6 @@ function retrieveFastAverageColor() {
  * useCoverIsDark is a hook that returns a boolean variable specifying if the cover
  * background is dark or not.
  *
- * If opacity is lower than 50, the dominant color is the media color, so the
- * average media color is used for the dark mode calculation.
- *
- * If opacity is greater than 50 the dominant color is the overlay color, so the
- * overlay color is used for the dark mode calculation.
- *
- * Additionally, if background media isn't present, the overlay color is used
- * for the dark mode calculation since the parent/body background color would
- * show through and we don't have access to the parent/body background color for
- * the calculation.
- *
  * @param {?string} url          Url of the media background.
  * @param {?number} dimRatio     Transparency of the overlay color. If an image and
  *                               color are set, dimRatio is used to decide what is used
@@ -40,21 +37,43 @@ function retrieveFastAverageColor() {
  *
  * @return {boolean} True if the cover background is considered "dark" and false otherwise.
  */
-export default function useCoverIsDark( url, dimRatio = 50, overlayColor ) {
+export default function useCoverIsDark(
+	url,
+	dimRatio = 50,
+	overlayColor = '#000'
+) {
 	const [ isDark, setIsDark ] = useState( false );
-	const isMediaCalculation = dimRatio <= 50 && url;
 	useEffect( () => {
-		if ( isMediaCalculation && elementRef.current ) {
-			retrieveFastAverageColor().getColorAsync(
-				elementRef.current,
-				( color ) => {
-					setIsDark( color.isDark );
-				}
+		if ( url ) {
+			const imgCrossOrigin = applyFilters(
+				'media.crossOrigin',
+				undefined,
+				url
 			);
+			retrieveFastAverageColor()
+				.getColorAsync( url, {
+					// Previously the default color was white, but that changed
+					// in v6.0.0 so it has to be manually set now.
+					defaultColor: [ 255, 255, 255, 255 ],
+					// Errors that come up don't reject the promise, so error
+					// logging has to be silenced with this option.
+					silent: process.env.NODE_ENV === 'production',
+					crossOrigin: imgCrossOrigin,
+				} )
+				.then( ( color ) => {
+					const overlay = colord( overlayColor ).alpha(
+						dimRatio / 100
+					);
+					const media = colord( color.hex );
+					const c = colord(
+						compositeOver( overlay.toRgb(), media.toRgb() )
+					);
+					console.log( c );
+					setIsDark( c.isDark() );
+				} );
 		} else {
-			// If no overlay color exists the overlay color is black (isDark).
-			setIsDark( ! overlayColor || colord( overlayColor ).isDark() );
+			setIsDark( colord( overlayColor ).isDark() );
 		}
-	}, [ isMediaCalculation, overlayColor, elementRef.current, setIsDark ] );
+	}, [ overlayColor, url, setIsDark ] );
 	return isDark;
 }
