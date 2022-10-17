@@ -18,9 +18,8 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 		return '';
 	}
 
-
 	/*
-	* If themes or plugins filter the excerpt_length, 
+	* If themes or plugins filter the excerpt_length,
 	* we need to reset the filter for the block's excerpt length control to work,
 	* and we need to restore their filter afterwards.
 	*/
@@ -30,13 +29,17 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 
 	$excerpt_length = $attributes['excerptLength'];
 
-	add_filter( 'excerpt_length', function() use ( $excerpt_length ) {
+	add_filter( 'excerpt_length', function() use (
+		$excerpt_length
+	) {
 		return $excerpt_length;
 	} );
 
 	$excerpt = get_the_excerpt();
 
-	add_filter( 'excerpt_length', function() use ( $original_excerpt_length ) {
+	add_filter( 'excerpt_length', function() use (
+		$original_excerpt_length
+	) {
 		return $original_excerpt_length;
 	} );
 
@@ -94,8 +97,14 @@ add_action( 'init', 'register_block_core_post_excerpt' );
  * the excerpt length block setting has no effect.
  * Returns 100 because 100 is the max length in the setting.
  */
-if ( is_admin() || defined( 'REST_REQUEST' ) || 'REST_REQUEST' ) {
-	add_filter( 'excerpt_length', function() {
-		return 100;
-	}, PHP_INT_MAX );
+if ( is_admin() ||
+	defined( 'REST_REQUEST' ) ||
+	'REST_REQUEST' ) {
+	add_filter(
+		'excerpt_length',
+		function() {
+			return 100;
+		},
+		PHP_INT_MAX
+	);
 }
