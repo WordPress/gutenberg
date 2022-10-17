@@ -61,6 +61,9 @@ const stateReducer = (
 			return changes;
 	}
 };
+
+const noop = () => {};
+
 export default function CustomSelectControl( {
 	/** Start opting into the larger default height that will become the default size in a future version. */
 	__next36pxDefaultSize = false,
@@ -75,6 +78,8 @@ export default function CustomSelectControl( {
 	/** @type {import('../select-control/types').SelectControlProps.size} */
 	size = 'default',
 	value: _selectedItem,
+	onMouseOver = noop,
+	onMouseOut = noop,
 } ) {
 	const {
 		getLabelProps,
@@ -173,6 +178,8 @@ export default function CustomSelectControl( {
 				suffix={ <SelectControlChevronDown /> }
 			>
 				<SelectControlSelect
+					onMouseOver={ onMouseOver }
+					onMouseOut={ onMouseOut }
 					as="button"
 					onFocus={ () => setIsFocused( true ) }
 					onBlur={ () => setIsFocused( false ) }
