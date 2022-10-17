@@ -36,6 +36,10 @@
 
 	// Block multi selection
 	.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected) {
+		// Apply a rounded radius to the entire block.
+		border-radius: $radius-block-ui;
+		overflow: hidden;
+
 		// Hide the native selection indicator, for the selection, and children.
 		&::selection,
 		& ::selection {
@@ -54,6 +58,7 @@
 			left: 0;
 			background: var(--wp-admin-theme-color);
 			opacity: 0.4;
+			border-radius: $radius-block-ui;
 
 			// Animate.
 			animation: selection-overlay__fade-in-animation 0.1s ease-out;
