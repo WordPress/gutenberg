@@ -109,14 +109,6 @@ _Parameters_
 
 -   _buttonLabel_ `string`: The label to search the button for.
 
-### clickSiteEditorMenuItem
-
-Searches for an item in the navigation panel with the label provided and clicks it.
-
-_Parameters_
-
--   _label_ `string`: The label to search the menu item for.
-
 ### closeGlobalBlockInserter
 
 Undocumented declaration.
@@ -124,10 +116,6 @@ Undocumented declaration.
 ### closeListView
 
 Closes list view
-
-### closeSiteEditorNavigationPanel
-
-Closes the site editor navigation panel if open
 
 ### createEmbeddingMatcher
 
@@ -453,18 +441,6 @@ _Returns_
 
 -   `Promise<?string>`: Promise resolving to a string or null, depending whether a page error is present.
 
-### getSiteEditorMenuItem
-
-Searches for an item in the site editor navigation menu with the provided label.
-
-_Parameters_
-
--   _label_ `string`: The label to search the menu item for.
-
-_Returns_
-
--   `Promise<?ElementHandle>`: The menu item handle or `null`
-
 ### hasBlockSwitcher
 
 Returns a boolean indicating if the current selected block has a block switcher or not.
@@ -555,17 +531,6 @@ _Returns_
 
 Undocumented declaration.
 
-### isSiteEditorRoot
-
-Returns `true` if in the site editor navigation root
-
-Checks whether the “Back to dashboard” button is visible. If
-not in the root, a “Back” button would be visible instead.
-
-_Returns_
-
--   `Promise<boolean>`: Whether it currently is the navigation root or not
-
 ### isThemeInstalled
 
 Checks whether a theme exists on the site.
@@ -601,14 +566,6 @@ _Parameters_
 _Returns_
 
 -   `Promise`: Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
-
-### navigateSiteEditorBack
-
-Navigates the site editor back
-
-### navigateSiteEditorBackToRoot
-
-Goes back until it gets to the root
 
 ### openDocumentSettingsSidebar
 
@@ -649,10 +606,6 @@ Opens the previous global styles panel.
 ### openPublishPanel
 
 Opens the publish panel.
-
-### openSiteEditorNavigationPanel
-
-Opens the site editor navigation panel if closed
 
 ### openTypographyToolsPanelMenu
 
@@ -820,14 +773,6 @@ _Parameters_
 The block toolbar is not always visible while typing.
 Call this function to reveal it.
 
-### siteEditorNavigateSequence
-
-Navigates through a sequence of links in the site editor navigation panel
-
-_Parameters_
-
--   _labels_ `string[] | string`: Labels to navigate through
-
 ### switchEditorModeTo
 
 Switches editor mode.
@@ -845,6 +790,10 @@ running the test is not already the admin user).
 
 Switches the current user to whichever user we should be
 running the tests as (if we're not already that user).
+
+### toggleCanvasMode
+
+Switch between edit and view mode.
 
 ### toggleGlobalBlockInserter
 
