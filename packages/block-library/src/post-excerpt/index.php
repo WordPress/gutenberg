@@ -38,11 +38,12 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 
 	$excerpt = get_the_excerpt();
 
-	add_filter( 'excerpt_length', function() use (
-		$original_excerpt_length
-	) {
-		return $original_excerpt_length;
-	} );
+	add_filter(
+		'excerpt_length',
+		function() use ( $original_excerpt_length ) {
+			return $original_excerpt_length;
+		}
+	);
 
 	if ( empty( $excerpt ) ) {
 		return '';
