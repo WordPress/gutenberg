@@ -1,5 +1,5 @@
 {
-	"core": "WordPress/WordPress",
+	"core": "WordPress/WordPress#6.0-branch",
 	"plugins": [ "." ],
 	"themes": [ "./test/emptytheme" ],
 	"env": {
