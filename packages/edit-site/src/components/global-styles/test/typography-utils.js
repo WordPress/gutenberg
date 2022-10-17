@@ -190,7 +190,20 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: 'return fluid clamp value.',
+				message:
+					'return size where no min is give and size is less than default min size.',
+				preset: {
+					size: '3px',
+				},
+				typographySettings: {
+					fluid: true,
+				},
+				expected: '3px',
+			},
+
+			{
+				message:
+					'return fluid clamp value with different min max units.',
 				preset: {
 					size: '28px',
 					fluid: {
@@ -259,6 +272,18 @@ describe( 'typography utils', () => {
 				},
 				expected:
 					'clamp(0.875rem, 0.875rem + ((1vw - 0.48rem) * 1.49), 1.65rem)',
+			},
+
+			{
+				message: 'adjust computed min in em to min limit.',
+				preset: {
+					size: '1.1em',
+				},
+				typographySettings: {
+					fluid: true,
+				},
+				expected:
+					'clamp(0.875em, 0.875rem + ((1vw - 0.48em) * 1.49), 1.65em)',
 			},
 
 			{

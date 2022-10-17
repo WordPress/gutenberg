@@ -293,7 +293,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 * @dataProvider data_generate_font_size_preset_fixtures
 	 *
 	 * @param array  $font_size                     {
-	 *     Required. fontSizes represented in the preset format as seen in theme.json.
+	 *     Required. A font size as represented in the fontSizes preset format as seen in theme.json.
 	 *
 	 *     @type string $name Name of the font size preset.
 	 *     @type string $slug Kebab-case unique identifier for the font size preset.
@@ -448,7 +448,15 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output'             => '10em',
 			),
 
-			'return_fluid_clamp_value'                    => array(
+			'return_size_where_no_min_is_given_and_less_than_default_min_size' => array(
+				'font_size'                   => array(
+					'size' => '3px',
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => '3px',
+			),
+
+			'return_fluid_clamp_value_with_different_min_max_units' => array(
 				'font_size'                   => array(
 					'size'  => '28px',
 					'fluid' => array(
@@ -497,14 +505,14 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'should_use_fluid_typography' => true,
 				'expected_output'             => 'clamp(0.875rem, 0.875rem + ((1vw - 0.48rem) * 1.49), 1.65rem)',
 			),
-// @TODO check that $fluid_target_font_size should use `rem` when `em` font size value is passed.
-//			'default_return_clamp_value_with_replaced_fluid_min_value_in_em' => array(
-//				'font_size'                   => array(
-//					'size' => '1.1em',
-//				),
-//				'should_use_fluid_typography' => true,
-//				'expected_output'             => 'clamp(0.875em, 0.875em + ((1vw - 0.48em) * 1.49), 1.65em)',
-//			),
+
+			'default_return_clamp_value_with_replaced_fluid_min_value_in_em' => array(
+				'font_size'                   => array(
+					'size' => '1.1em',
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(0.875em, 0.875rem + ((1vw - 0.48em) * 1.49), 1.65em)',
+			),
 
 			'should_adjust_fluid_min_value_in_px_to_min_limit' => array(
 				'font_size'                   => array(
@@ -692,7 +700,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'block_content'               => "<div class=\"wp-block-group\" style=\"font-size:1.5em\"> \n \n<p style=\"font-size:1.5em\">A paragraph inside a group</p></div>",
 				'font_size_value'             => '1.5em',
 				'should_use_fluid_typography' => true,
-				'expected_output'             => "<div class=\"wp-block-group\" style=\"font-size:clamp(1.125em, 1.125em + ((1vw - 0.48em) * 2.163), 2.25em);\"> \n \n<p style=\"font-size:1.5em\">A paragraph inside a group</p></div>",
+				'expected_output'             => "<div class=\"wp-block-group\" style=\"font-size:clamp(1.125em, 1.125rem + ((1vw - 0.48em) * 2.163), 2.25em);\"> \n \n<p style=\"font-size:1.5em\">A paragraph inside a group</p></div>",
 			),
 		);
 	}
