@@ -40,3 +40,11 @@
 	border-top: $border-width solid $gray-200;
 	padding: $grid-unit-20;
 }
+
+.block-editor-block-inspector__tabs [role="tablist"] {
+	display: flex;
+
+	> * {
+		flex: 1;
+	}
+}
