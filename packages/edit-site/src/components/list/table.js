@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -16,6 +16,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import Link from '../routes/link';
 import Actions from './actions';
 import AddedBy from './added-by';
+import { store as editSiteStore } from '../../store';
 
 export default function Table( { templateType } ) {
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
@@ -29,6 +30,7 @@ export default function Table( { templateType } ) {
 		( select ) => select( coreStore ).getPostType( templateType ),
 		[ templateType ]
 	);
+	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
 
 	if ( ! templates || isLoading ) {
 		return null;
@@ -87,6 +89,9 @@ export default function Table( { templateType } ) {
 										postId: template.id,
 										postType: template.type,
 									} }
+									onClick={ () =>
+										__unstableSetCanvasMode( 'edit' )
+									}
 								>
 									{ decodeEntities(
 										template.title?.rendered ||
