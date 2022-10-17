@@ -8,7 +8,6 @@ import {
 	useMergeRefs,
 } from '@wordpress/compose';
 import { isKeyboardEvent } from '@wordpress/keycodes';
-import { focus } from '@wordpress/dom';
 
 const defaultShortcuts = {
 	previous: [
@@ -56,17 +55,7 @@ export function useNavigateRegions( shortcuts = defaultShortcuts ) {
 			nextRegion = regions[ nextIndex ];
 		}
 
-		// Add the tabindex of -1 so tabbable elements can be located.
-		nextRegion.setAttribute( 'tabindex', '-1' );
-		// Find the next tabbable within the region.
-		const nextTabbable = focus.tabbable.findNext( nextRegion );
-		// Is there a next tabbable available? If not, focus the region instead.
-		const nextFocus = nextTabbable ? nextTabbable : nextRegion;
-		// Focus our chosen area, either the first tabbable within the region or the region itself.
-		nextFocus.focus();
-		// Remove the tabindex, no longer needed after focus.
-		nextRegion.removeAttribute( 'tabindex' );
-
+		nextRegion.focus();
 		setIsFocusingRegions( true );
 	}
 
