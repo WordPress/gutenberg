@@ -49,6 +49,7 @@ function UnconnectedNavigatorProvider(
 					...options,
 					path,
 					isBack: false,
+					hasRestoredFocus: false,
 				},
 			] );
 		},
@@ -62,6 +63,7 @@ function UnconnectedNavigatorProvider(
 				{
 					...locationHistory[ locationHistory.length - 2 ],
 					isBack: true,
+					hasRestoredFocus: false,
 				},
 			] );
 		}

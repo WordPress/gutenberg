@@ -37,14 +37,14 @@ describe( 'props', () => {
 				<Text>{ invisibleTooltipTriggerContent }</Text>
 			</Tooltip>
 		);
-		const tooltips = screen.getAllByRole( /tooltip/i );
+		const tooltip = screen.getByRole( /tooltip/i );
 		const invisibleTooltipTrigger = screen.getByText(
 			invisibleTooltipTriggerContent
 		);
-		// The invisible tooltip should not render.
-		expect( tooltips ).toHaveLength( 1 );
+		// The base tooltip should render only; invisible tooltip should not render.
+		expect( tooltip ).toBeInTheDocument();
 		// Assert that the rendered tooltip is indeed the base tooltip.
-		expect( tooltips[ 0 ].id ).toBe( baseTooltipId );
+		expect( tooltip.id ).toBe( baseTooltipId );
 		// But the invisible tooltip's trigger still should have rendered.
 		expect( invisibleTooltipTrigger ).not.toBeUndefined();
 	} );
@@ -70,9 +70,9 @@ describe( 'props', () => {
 				<Text>WordPress.org</Text>
 			</Tooltip>
 		);
-		const tooltips = screen.getAllByRole( /tooltip/i );
+		const tooltip = screen.getByRole( /tooltip/i );
 		// Assert only the base tooltip rendered.
-		expect( tooltips ).toHaveLength( 1 );
-		expect( tooltips[ 0 ].id ).toBe( baseTooltipId );
+		expect( tooltip ).toBeInTheDocument();
+		expect( tooltip.id ).toBe( baseTooltipId );
 	} );
 } );

@@ -153,7 +153,7 @@ export function listViewPanel( state = false, action ) {
 }
 
 /**
- * Reducer tracking whether the inserter is open.
+ * Reducer tracking whether template editing is on or off.
  *
  * @param {boolean} state
  * @param {Object}  action

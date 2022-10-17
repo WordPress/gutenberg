@@ -11,6 +11,7 @@ export type NavigatorLocation = NavigateOptions & {
 	isInitial?: boolean;
 	isBack?: boolean;
 	path?: string;
+	hasRestoredFocus?: boolean;
 };
 
 export type NavigatorContext = {
