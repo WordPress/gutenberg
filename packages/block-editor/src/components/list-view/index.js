@@ -55,7 +55,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {Array}   props.blocks          Custom subset of block client IDs to be used instead of the default hierarchy.
  * @param {boolean} props.showBlockMovers Flag to enable block movers
  * @param {boolean} props.isExpanded      Flag to determine whether nested levels are expanded by default.
- * @param {boolean} props.selectBlockInCanvas      Flag to determine whether the list view should be a block selection mechanism,.
+ * @param {boolean} props.__experimentalSelectBlockInCanvas       Flag to determine whether the list view should be a block selection mechanism,.
  * @param {Object}  ref                   Forwarded ref
  */
 function ListView(
@@ -64,7 +64,7 @@ function ListView(
 		blocks,
 		showBlockMovers = false,
 		isExpanded = false,
-		selectBlockInCanvas = true,
+		__experimentalSelectBlockInCanvas: selectBlockInCanvas = true,
 	},
 	ref
 ) {

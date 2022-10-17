@@ -684,7 +684,7 @@ function Navigation( {
 							<ListView
 								blocks={ innerBlocks }
 								isExpanded={ true }
-								selectBlockInCanvas={ false }
+								__experimentalSelectBlockInCanvas={ false }
 							/>
 						) }
 					</PanelBody>
@@ -868,7 +868,7 @@ function Navigation( {
 							<ListView
 								blocks={ innerBlocks }
 								isExpanded={ true }
-								selectBlockInCanvas={ false }
+								__experimentalSelectBlockInCanvas={ false }
 							/>
 						) }
 					</PanelBody>
