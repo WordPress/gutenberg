@@ -10,6 +10,7 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { SearchControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { useFocusOnMount } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,10 +26,14 @@ const SHOWN_BLOCK_TYPES = 6;
 const SHOWN_BLOCK_PATTERNS = 2;
 const SHOWN_BLOCK_PATTERNS_WITH_PRIORITIZATION = 4;
 
-export default function ModalInserter(
-	{ onSelect, rootClientId, clientId, isAppender, prioritizePatterns },
-	ref
-) {
+export default function ModalInserter( {
+	onSelect,
+	rootClientId,
+	clientId,
+	isAppender,
+	prioritizePatterns,
+} ) {
+	const ref = useFocusOnMount();
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		onSelect,

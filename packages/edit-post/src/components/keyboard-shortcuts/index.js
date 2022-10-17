@@ -24,6 +24,7 @@ function KeyboardShortcuts() {
 		getEditorMode,
 		isEditorSidebarOpened,
 		isListViewOpened,
+		isInserterOpened,
 		isFeatureActive,
 	} = useSelect( editPostStore );
 	const isModeToggleDisabled = useSelect( ( select ) => {
@@ -91,6 +92,16 @@ function KeyboardShortcuts() {
 			keyCombination: {
 				modifier: 'access',
 				character: 'o',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-post/toggle-modal-inserter',
+			category: 'global',
+			description: __( 'Open modal inserter.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'i',
 			},
 		} );
 
@@ -198,6 +209,10 @@ function KeyboardShortcuts() {
 
 	useShortcut( 'core/edit-post/toggle-list-view', () =>
 		setIsListViewOpened( ! isListViewOpened() )
+	);
+
+	useShortcut( 'core/edit-post/toggle-modal-inserter', () =>
+		setIsInserterOpened( ! isInserterOpened() )
 	);
 
 	return null;
