@@ -1,4 +1,4 @@
 {
-	"core": "WordPress/WordPress",
+	"core": "WordPress/WordPress#5.4-branch",
 	"plugins": [ "." ]
 }
