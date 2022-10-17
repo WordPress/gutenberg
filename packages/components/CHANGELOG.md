@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `BorderControl` & `BorderBoxControl`: Replace `__next36pxDefaultSize` with "default" and "large" size variants ([#41869](https://github.com/WordPress/gutenberg/pull/41860)).
+-   `UnitControl`: Add ability to apply custom classname to inner wrapper ([#41869](https://github.com/WordPress/gutenberg/pull/41860)).
+
 ### Bug Fix
 
 -   `Popover`: fix limitShift logic by adding iframe offset correctly [#42950](https://github.com/WordPress/gutenberg/pull/42950)).
