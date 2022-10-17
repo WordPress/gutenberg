@@ -74,6 +74,6 @@ export default function useCoverIsDark(
 		} else {
 			setIsDark( colord( overlayColor ).isDark() );
 		}
-	}, [ overlayColor, url, setIsDark ] );
+	}, [ overlayColor, dimRatio, url, setIsDark ] );
 	return isDark;
 }
