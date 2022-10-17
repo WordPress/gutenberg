@@ -163,6 +163,8 @@ export default function SpacingInputControl( {
 		! showCustomValueControl &&
 		currentValueHint !== undefined;
 
+	const maxCustomValues = { px: 300, '%': 100, vw: 100, vh: 100 };
+
 	return (
 		<>
 			{ side !== 'all' && (
@@ -227,9 +229,15 @@ export default function SpacingInputControl( {
 					<RangeControl
 						value={ customRangeValue }
 						min={ 0 }
-						max={ 300 }
+						max={
+							maxCustomValues[ selectedUnit ]
+								? maxCustomValues[ selectedUnit ]
+								: 10
+						}
 						step={
-							[ 'px', '%' ].includes( selectedUnit ) ? 1 : 0.1
+							[ 'px', '%', 'vh', 'vw' ].includes( selectedUnit )
+								? 1
+								: 0.1
 						}
 						withInputField={ false }
 						onChange={ handleCustomValueSliderChange }
