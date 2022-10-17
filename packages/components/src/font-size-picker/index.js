@@ -116,7 +116,7 @@ function FontSizePicker(
 		}
 
 		// Calculate the `hint` for toggle group control.
-		let hint = selectedOption.name;
+		let hint = selectedOption?.name || selectedOption.slug;
 		if (
 			! fontSizesContainComplexValues &&
 			typeof selectedOption.size === 'string'
