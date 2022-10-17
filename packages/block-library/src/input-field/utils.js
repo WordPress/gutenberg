@@ -32,10 +32,10 @@ export const INPUT_TYPES = [
 		key: 'number',
 		name: __( 'Number' ),
 	},
-	{
-		key: 'datetime-local',
-		name: __( 'Date and time' ),
-	},
+	// {
+	// 	key: 'datetime-local',
+	// 	name: __( 'Date and time' ),
+	// },
 	{
 		key: 'submit',
 		name: __( 'Submit' ),
