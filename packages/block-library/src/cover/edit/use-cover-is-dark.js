@@ -11,11 +11,12 @@ import { useEffect, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
 function compositeOver( source, dest ) {
-	const a = source.a + dest.a * ( 1 - source.a );
-	const r = source.r * source.a + dest.r * dest.a * ( 1 - source.a );
-	const g = source.g * source.a + dest.g * dest.a * ( 1 - source.a );
-	const b = source.b * source.a + dest.b * dest.a * ( 1 - source.a );
-	return { r, g, b, a };
+	return {
+		r: source.r * source.a + dest.r * dest.a * ( 1 - source.a ),
+		g: source.g * source.a + dest.g * dest.a * ( 1 - source.a ),
+		b: source.b * source.a + dest.b * dest.a * ( 1 - source.a ),
+		a: source.a + dest.a * ( 1 - source.a ),
+	};
 }
 
 function retrieveFastAverageColor() {
