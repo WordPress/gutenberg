@@ -2,10 +2,10 @@
 	height: $header-height;
 	display: flex;
 	align-items: center;
-}
 
-.edit-site-header__toggle.is-canvas-mode-view {
-	margin-left: $grid-unit-20;
+	&.is-canvas-mode-view {
+		padding: 0 $grid-unit-20;
+	}
 }
 
 .edit-site-header__toggle.is-canvas-mode-edit {
