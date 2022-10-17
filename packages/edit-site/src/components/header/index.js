@@ -3,14 +3,12 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	__unstableAnimatePresence as AnimatePresence,
 	__experimentalHStack as HStack,
-	__unstableMotion as motion,
 	Button,
 	FlexBlock,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useReducedMotion } from '@wordpress/compose';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -18,6 +16,7 @@ import { useReducedMotion } from '@wordpress/compose';
 import { store as editSiteStore } from '../../store';
 import HeaderEditMode from '../header-edit-mode';
 import SiteIconAndTitle from '../site-icon-and-title';
+import SaveButton from '../save-button';
 
 export default function Header() {
 	const { canvasMode } = useSelect(
@@ -27,18 +26,22 @@ export default function Header() {
 		[]
 	);
 	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
-	const disableMotion = useReducedMotion();
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
 	return (
-		<HStack className="edit-site-header-wrapper" spacing={ 0 }>
+		<HStack
+			className={ `edit-site-header-wrapper is-canvas-mode-${ canvasMode }` }
+			spacing={ 0 }
+		>
 			<Button
 				className={ `edit-site-header__toggle is-canvas-mode-${ canvasMode }` }
 				label={ __( 'Toggle Navigation Sidebar' ) }
-				onClick={ () =>
+				onClick={ () => {
+					clearSelectedBlock();
 					__unstableSetCanvasMode(
 						canvasMode === 'view' ? 'edit' : 'view'
-					)
-				}
+					);
+				} }
 				variant={ canvasMode === 'view' ? 'secondary' : undefined }
 			>
 				{ canvasMode === 'edit' && (
@@ -50,23 +53,12 @@ export default function Header() {
 				{ canvasMode === 'view' && __( 'Edit' ) }
 			</Button>
 			<FlexBlock>
-				<AnimatePresence>
-					{ canvasMode === 'edit' && (
-						<motion.div
-							initial={ { opacity: 0 } }
-							animate={ { opacity: 1 } }
-							exit={ {
-								opacity: 0,
-							} }
-							transition={ {
-								type: 'tween',
-								duration: disableMotion ? 0 : 0.5,
-							} }
-						>
-							<HeaderEditMode />
-						</motion.div>
-					) }
-				</AnimatePresence>
+				{ canvasMode === 'edit' && <HeaderEditMode /> }
+				{ canvasMode === 'view' && (
+					<HStack alignment="right">
+						<SaveButton />
+					</HStack>
+				) }
 			</FlexBlock>
 		</HStack>
 	);
