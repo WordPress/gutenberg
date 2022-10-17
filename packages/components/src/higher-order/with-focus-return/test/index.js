@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import renderer from 'react-test-renderer';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -16,8 +15,13 @@ import withFocusReturn from '../';
 
 class Test extends Component {
 	render() {
+		const { className, focusHistory } = this.props;
 		return (
-			<div className="test">
+			<div
+				className={ className }
+				data-testid="test-element"
+				data-focus-history={ focusHistory }
+			>
 				<textarea />
 			</div>
 		);
@@ -41,32 +45,25 @@ describe( 'withFocusReturn()', () => {
 		} );
 
 		it( 'should render a basic Test component inside the HOC', () => {
-			const renderedComposite = renderer.create( <Composite /> );
-			const wrappedElement = renderedComposite.root.findByType( Test );
-			const wrappedElementShallow = wrappedElement.children[ 0 ];
-			expect( wrappedElementShallow.props.className ).toBe( 'test' );
-			expect( wrappedElementShallow.type ).toBe( 'div' );
-			expect( wrappedElementShallow.children[ 0 ].type ).toBe(
-				'textarea'
-			);
+			render( <Composite /> );
+
+			expect( screen.getByTestId( 'test-element' ) ).toBeVisible();
 		} );
 
 		it( 'should pass own props through to the wrapped element', () => {
-			const renderedComposite = renderer.create(
-				<Composite test="test" />
+			render( <Composite className="test" /> );
+
+			expect( screen.getByTestId( 'test-element' ) ).toHaveClass(
+				'test'
 			);
-			const wrappedElement = renderedComposite.root.findByType( Test );
-			// Ensure that the wrapped Test element has the appropriate props.
-			expect( wrappedElement.props.test ).toBe( 'test' );
 		} );
 
 		it( 'should not pass any withFocusReturn context props through to the wrapped element', () => {
-			const renderedComposite = renderer.create(
-				<Composite test="test" />
+			render( <Composite className="test" /> );
+
+			expect( screen.getByTestId( 'test-element' ) ).not.toHaveAttribute(
+				'data-focus-history'
 			);
-			const wrappedElement = renderedComposite.root.findByType( Test );
-			// Ensure that the wrapped Test element has the appropriate props.
-			expect( wrappedElement.props.focusHistory ).toBeUndefined();
 		} );
 
 		it( 'should not switch focus back to the bound focus element', () => {
