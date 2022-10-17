@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { createSlotFill, PanelBody } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { cog } from '@wordpress/icons';
+import { isRTL, __ } from '@wordpress/i18n';
+import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { useEffect, Fragment } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -78,7 +78,7 @@ export function SidebarComplementaryAreaFills() {
 			<DefaultSidebar
 				identifier={ sidebarName }
 				title={ __( 'Settings' ) }
-				icon={ cog }
+				icon={ isRTL() ? drawerLeft : drawerRight }
 				closeLabel={ __( 'Close settings sidebar' ) }
 				header={ <SettingsHeader sidebarName={ sidebarName } /> }
 				headerClassName="edit-site-sidebar-edit-mode__panel-tabs"

@@ -127,8 +127,11 @@ export function TabPanel( {
 						selected={ tab.name === selected }
 						key={ tab.name }
 						onClick={ () => handleTabSelection( tab.name ) }
+						label={ tab.icon && tab.title }
+						icon={ tab.icon }
+						showTooltip={ !! tab.icon }
 					>
-						{ tab.title }
+						{ ! tab.icon && tab.title }
 					</TabButton>
 				) ) }
 			</NavigableMenu>
