@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -82,18 +83,23 @@ describe( 'withFocusReturn()', () => {
 			expect( switchFocusTo ).toHaveFocus();
 		} );
 
-		it( 'should switch focus back when unmounted while having focus', () => {
+		it( 'should switch focus back when unmounted while having focus', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
 			const { container, unmount } = render( <Composite />, {
 				container: document.body.appendChild(
 					document.createElement( 'div' )
 				),
 			} );
 
-			screen
-				.getByRole( 'textbox', {
+			// Click inside the textarea to focus it.
+			await user.click(
+				screen.getByRole( 'textbox', {
 					name: 'Textarea',
 				} )
-				.focus();
+			);
 
 			// Should return to the activeElement saved with this component.
 			unmount();
