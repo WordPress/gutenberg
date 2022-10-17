@@ -29,7 +29,7 @@ import PatternTransformationsMenu from './pattern-transformations-menu';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
 export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
-	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const { replaceBlocks, multiSelect } = useDispatch( blockEditorStore );
 	const blockInformation = useBlockDisplayInformation( blocks[ 0 ].clientId );
 	const {
 		possibleBlockTransformations,
@@ -90,11 +90,22 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
 
 	// Simple block tranformation based on the `Block Transforms` API.
-	const onBlockTransform = ( name ) =>
-		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
+	function onBlockTransform( name ) {
+		const newBlocks = switchToBlockType( blocks, name );
+		replaceBlocks( clientIds, newBlocks );
+		multiSelect(
+			newBlocks[ 0 ].clientId,
+			newBlocks[ newBlocks.length - 1 ].clientId
+		);
+	}
 	// Pattern transformation through the `Patterns` API.
-	const onPatternTransform = ( transformedBlocks ) =>
+	function onPatternTransform( transformedBlocks ) {
 		replaceBlocks( clientIds, transformedBlocks );
+		multiSelect(
+			transformedBlocks[ 0 ].clientId,
+			transformedBlocks[ transformedBlocks.length - 1 ].clientId
+		);
+	}
 
 	/**
 	 * The `isTemplate` check is a stopgap solution here.
