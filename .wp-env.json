@@ -1,5 +1,5 @@
 {
-	"core": "WordPress/WordPress",
+	"core": "WordPress/WordPress#5.9-branch",
 	"plugins": [ "." ],
 	"themes": [ "WordPress/theme-experiments/tt1-blocks#tt1-blocks@0.4.7" ],
 	"env": {
