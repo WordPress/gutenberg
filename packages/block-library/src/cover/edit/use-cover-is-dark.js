@@ -75,14 +75,15 @@ export default function useCoverIsDark(
 				} )
 				.then( ( color ) => {
 					const media = colord( color.hex ).toRgb();
-					const composite = colord( compositeOver( overlay, media ) );
-					setIsDark( composite.isDark() );
+					const composite = compositeOver( overlay, media );
+					setIsDark( colord( composite ).isDark() );
 				} );
 		} else {
-			// Assume a white background because it isn't easy to get the actual site background color.
+			// Assume a white background because it isn't easy to get the actual
+			// parent background color.
 			const background = { r: 255, g: 255, b: 255, a: 1 };
-			const composite = colord( compositeOver( overlay, background ) );
-			setIsDark( composite.isDark() );
+			const composite = compositeOver( overlay, background );
+			setIsDark( colord( composite ).isDark() );
 		}
 	}, [ overlayColor, dimRatio, url, setIsDark ] );
 	return isDark;
