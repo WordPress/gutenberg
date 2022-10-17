@@ -649,7 +649,7 @@ function Navigation( {
 	if ( hasUnsavedBlocks ) {
 		return (
 			<TagName { ...blockProps }>
-				<InspectorControls>
+				<InspectorControls __experimentalGroup="menu">
 					<PanelBody title={ __( 'Menu' ) }>
 						<NavigationMenuSelector
 							currentMenuId={ ref }
@@ -732,7 +732,7 @@ function Navigation( {
 	if ( ref && isNavigationMenuMissing ) {
 		return (
 			<TagName { ...blockProps }>
-				<InspectorControls>
+				<InspectorControls __experimentalGroup="menu">
 					<PanelBody title={ __( 'Menu' ) }>
 						<NavigationMenuSelector
 							currentMenuId={ null }
@@ -847,7 +847,7 @@ function Navigation( {
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider uniqueId={ recursionId }>
-				<InspectorControls>
+				<InspectorControls __experimentalGroup="menu">
 					<PanelBody title={ __( 'Menu' ) }>
 						<NavigationMenuSelector
 							currentMenuId={ ref }
