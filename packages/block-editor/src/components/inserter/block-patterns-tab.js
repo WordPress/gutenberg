@@ -19,7 +19,6 @@ import {
 	__experimentalNavigatorButton as NavigatorButton,
 	__experimentalNavigatorBackButton as NavigatorBackButton,
 	FlexBlock,
-	__experimentalHeading as Heading,
 	Button,
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
@@ -153,9 +152,9 @@ export function BlockPatternsCategoryPanel( {
 
 	return (
 		<div>
-			<Heading level="4" weight="400">
+			<div className="block-editor-inserter__patterns-category-panel-title">
 				{ category.label }
-			</Heading>
+			</div>
 			<p>{ category.description }</p>
 			<BlockPatternList
 				shownPatterns={ currentShownPatterns }
