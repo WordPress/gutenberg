@@ -133,6 +133,10 @@ function KeyboardShortcuts() {
 					modifier: 'access',
 					character: 'p',
 				},
+				{
+					modifier: 'ctrlShift',
+					character: '~',
+				},
 			],
 		} );
 
