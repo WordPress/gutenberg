@@ -65,11 +65,10 @@ export default function useCoverIsDark(
 						dimRatio / 100
 					);
 					const media = colord( color.hex );
-					const c = colord(
+					const composite = colord(
 						compositeOver( overlay.toRgb(), media.toRgb() )
 					);
-					console.log( c );
-					setIsDark( c.isDark() );
+					setIsDark( composite.isDark() );
 				} );
 		} else {
 			setIsDark( colord( overlayColor ).isDark() );
