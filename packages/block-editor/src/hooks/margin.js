@@ -29,7 +29,7 @@ import {
 import { cleanEmptyObject } from './utils';
 import BlockPopover from '../components/block-popover';
 import SpacingSizesControl from '../components/spacing-sizes-control';
-import { getCustomValueFromPreset } from '../components/spacing-sizes-control/utils';
+import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 
 /**
  * Determines if there is margin support.
@@ -175,31 +175,39 @@ export function MarginEdit( props ) {
 
 export function MarginVisualizer( { clientId, attributes, isMouseOver } ) {
 	const margin = attributes?.style?.spacing?.margin;
-	const spacingSizes = useSetting( 'spacing.spacingSizes' );
 
 	const style = useMemo( () => {
 		const marginTop = margin?.top
-			? getCustomValueFromPreset( margin?.top, spacingSizes )
+			? getSpacingPresetCssVar( margin?.top )
 			: 0;
 		const marginRight = margin?.right
-			? getCustomValueFromPreset( margin?.right, spacingSizes )
+			? getSpacingPresetCssVar( margin?.right )
 			: 0;
 		const marginBottom = margin?.bottom
-			? getCustomValueFromPreset( margin?.bottom, spacingSizes )
+			? getSpacingPresetCssVar( margin?.bottom )
 			: 0;
 		const marginLeft = margin?.left
-			? getCustomValueFromPreset( margin?.left, spacingSizes )
+			? getSpacingPresetCssVar( margin?.left )
 			: 0;
 
 		return {
-			borderTopWidth: marginTop,
-			borderRightWidth: marginRight,
-			borderBottomWidth: marginBottom,
-			borderLeftWidth: marginLeft,
-			top: marginTop !== 0 ? `calc(${ marginTop } * -1)` : 0,
-			right: marginRight !== 0 ? `calc(${ marginRight } * -1)` : 0,
-			bottom: marginBottom !== 0 ? `calc(${ marginBottom } * -1)` : 0,
-			left: marginLeft !== 0 ? `calc(${ marginLeft } * -1)` : 0,
+			borderTopWidth: marginTop ? marginTop : 0,
+			borderRightWidth: marginRight ? marginRight : 0,
+			borderBottomWidth: marginBottom ? marginBottom : 0,
+			borderLeftWidth: marginLeft ? marginLeft : 0,
+			top: marginTop && marginTop !== 0 ? `calc(${ marginTop } * -1)` : 0,
+			right:
+				marginRight && marginRight !== 0
+					? `calc(${ marginRight } * -1)`
+					: 0,
+			bottom:
+				marginBottom && marginBottom !== 0
+					? `calc(${ marginBottom } * -1)`
+					: 0,
+			left:
+				marginLeft && marginLeft !== 0
+					? `calc(${ marginLeft } * -1)`
+					: 0,
 		};
 	}, [ margin ] );
 

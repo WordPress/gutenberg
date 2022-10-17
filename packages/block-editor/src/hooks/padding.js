@@ -29,10 +29,7 @@ import {
 import { cleanEmptyObject } from './utils';
 import BlockPopover from '../components/block-popover';
 import SpacingSizesControl from '../components/spacing-sizes-control';
-import {
-	getSpacingPresetCssVar,
-	isValueSpacingPreset,
-} from '../components/spacing-sizes-control/utils';
+import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 /**
  * Determines if there is padding support.
  *
@@ -179,18 +176,18 @@ export function PaddingVisualizer( { clientId, attributes, isMouseOver } ) {
 	const padding = attributes?.style?.spacing?.padding;
 	const style = useMemo( () => {
 		return {
-			borderTopWidth: isValueSpacingPreset( padding?.top )
+			borderTopWidth: padding?.top
 				? getSpacingPresetCssVar( padding?.top )
-				: padding?.top,
-			borderRightWidth: isValueSpacingPreset( padding?.right )
+				: 0,
+			borderRightWidth: padding?.right
 				? getSpacingPresetCssVar( padding?.right )
-				: padding?.right,
-			borderBottomWidth: isValueSpacingPreset( padding?.bottom )
+				: 0,
+			borderBottomWidth: padding?.bottom
 				? getSpacingPresetCssVar( padding?.bottom )
-				: padding?.bottom,
-			borderLeftWidth: isValueSpacingPreset( padding?.left )
+				: 0,
+			borderLeftWidth: padding?.left
 				? getSpacingPresetCssVar( padding?.left )
-				: padding?.left,
+				: 0,
 		};
 	}, [ padding ] );
 
