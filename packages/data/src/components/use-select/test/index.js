@@ -327,7 +327,7 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 1 );
 
 			// Test if the unsubscribers get called correctly.
-			unmount();
+			expect( () => unmount() ).not.toThrow();
 		} );
 
 		it( 'can subscribe to multiple stores at once', () => {
@@ -683,7 +683,7 @@ describe( 'useSelect', () => {
 			);
 
 			// Test if the unsubscribers get called correctly.
-			unmount();
+			expect( () => unmount() ).not.toThrow();
 		} );
 
 		it( 'handles registration of a non-existing store during rendering', () => {
@@ -723,7 +723,7 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 1 );
 
 			// Test if the unsubscribers get called correctly.
-			unmount();
+			expect( () => unmount() ).not.toThrow();
 		} );
 
 		it( 'handles registration of a non-existing store of sub-registry during rendering', () => {
@@ -770,7 +770,7 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
 
 			// Test if the unsubscribers get called correctly.
-			unmount();
+			expect( () => unmount() ).not.toThrow();
 		} );
 
 		it( 'handles custom generic stores without a unsubscribe function', () => {
