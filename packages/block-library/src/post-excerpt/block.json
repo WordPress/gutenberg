@@ -20,6 +20,8 @@
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
 	"supports": {
+		"align": [ "wide", "full" ],
+		"__experimentalLayout": true,
 		"html": false,
 		"color": {
 			"gradients": true,
