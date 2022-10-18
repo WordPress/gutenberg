@@ -33,6 +33,7 @@ async function cloneAt( repositoryUrl, ref, sha ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
 	await simpleGit.init();
 	await simpleGit.addRemote( 'origin', repositoryUrl );
+	console.log(`>>> Fetching ${ ref } (${ sha })`);
 	await simpleGit.fetch( 'origin', ref, [ '--depth=1' ] );
 	await simpleGit.checkout( 'origin', sha );
 	return gitWorkingDirectoryPath;
