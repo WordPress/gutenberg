@@ -45,6 +45,7 @@ import * as commentsPaginationNext from './comments-pagination-next';
 import * as commentsPaginationNumbers from './comments-pagination-numbers';
 import * as commentsTitle from './comments-title';
 import * as cover from './cover';
+import * as details from './details';
 import * as embed from './embed';
 import * as file from './file';
 import * as gallery from './gallery';
@@ -144,6 +145,7 @@ const getAllBlocks = () =>
 		columns,
 		commentAuthorAvatar,
 		cover,
+		details,
 		embed,
 		file,
 		group,
