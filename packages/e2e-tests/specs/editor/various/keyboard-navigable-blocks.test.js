@@ -23,6 +23,9 @@ const navigateToContentEditorTop = async () => {
 	// Use 'Ctrl+`' to return to the top of the editor.
 	await pressKeyWithModifier( 'ctrl', '`' );
 	await pressKeyWithModifier( 'ctrl', '`' );
+	await pressKeyWithModifier( 'ctrl', '`' );
+	await pressKeyWithModifier( 'ctrl', '`' );
+	await pressKeyWithModifier( 'ctrl', '`' );
 };
 
 const tabThroughParagraphBlock = async ( paragraphText ) => {
