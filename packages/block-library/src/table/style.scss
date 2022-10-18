@@ -11,6 +11,12 @@
 		width: 100%;
 	}
 
+	// Match default border style to default style in editor
+	td,
+	th {
+		border: $border-width solid;
+	}
+
 	// Fixed layout toggle
 	.has-fixed-layout {
 		table-layout: fixed;
