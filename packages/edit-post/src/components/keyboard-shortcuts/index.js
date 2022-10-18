@@ -17,8 +17,11 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { store as editPostStore } from '../../store';
+import { useTextLevelShortcuts } from '../../hooks';
 
 function KeyboardShortcuts() {
+	const [ registerTextLevelShortcuts, handleTextLevelShortcut ] =
+		useTextLevelShortcuts();
 	const { getBlockSelectionStart } = useSelect( blockEditorStore );
 	const {
 		getEditorMode,
@@ -145,6 +148,8 @@ function KeyboardShortcuts() {
 				character: 'h',
 			},
 		} );
+
+		registerTextLevelShortcuts();
 	}, [] );
 
 	useShortcut(
@@ -198,6 +203,35 @@ function KeyboardShortcuts() {
 
 	useShortcut( 'core/edit-post/toggle-list-view', () =>
 		setIsListViewOpened( ! isListViewOpened() )
+	);
+
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-1',
+		( event ) => handleTextLevelShortcut( event, 1 )
+	);
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-2',
+		( event ) => handleTextLevelShortcut( event, 2 )
+	);
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-3',
+		( event ) => handleTextLevelShortcut( event, 3 )
+	);
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-4',
+		( event ) => handleTextLevelShortcut( event, 4 )
+	);
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-5',
+		( event ) => handleTextLevelShortcut( event, 5 )
+	);
+	useShortcut(
+		'core/block-editor/transform-paragraph-to-heading-6',
+		( event ) => handleTextLevelShortcut( event, 6 )
+	);
+	useShortcut(
+		'core/block-editor/transform-heading-to-paragraph',
+		( event ) => handleTextLevelShortcut( event, 0 )
 	);
 
 	return null;

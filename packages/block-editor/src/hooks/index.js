@@ -18,7 +18,6 @@ import './layout';
 import './content-lock-ui';
 import './metadata';
 import './metadata-name';
-import './useSemanticLevelShortcuts';
 
 export { useCustomSides } from './dimensions';
 export { useLayoutClasses, useLayoutStyles } from './layout';
@@ -28,4 +27,3 @@ export { getSpacingClassesAndStyles } from './use-spacing-props';
 export { getTypographyClassesAndStyles } from './use-typography-props';
 export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';
-export { default as useSemanticLevelShortcuts } from './useSemanticLevelShortcuts';

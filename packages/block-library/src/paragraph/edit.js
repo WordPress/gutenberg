@@ -19,7 +19,6 @@ import {
 	RichText,
 	useBlockProps,
 	useSetting,
-	useSemanticLevelShortcuts,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
@@ -60,7 +59,6 @@ function ParagraphBlock( {
 } ) {
 	const { align, content, direction, dropCap, placeholder } = attributes;
 	const isDropCapFeatureEnabled = useSetting( 'typography.dropCap' );
-	const semanticShorcutsHandler = useSemanticLevelShortcuts();
 	const blockProps = useBlockProps( {
 		ref: useOnEnter( { clientId, content } ),
 		className: classnames( {
@@ -161,7 +159,6 @@ function ParagraphBlock( {
 								'Empty block; start writing or type forward slash to choose a block'
 						  )
 				}
-				onKeyDown={ semanticShorcutsHandler }
 				data-empty={ content ? false : true }
 				placeholder={ placeholder || __( 'Type / to choose a block' ) }
 				data-custom-placeholder={ placeholder ? true : undefined }
