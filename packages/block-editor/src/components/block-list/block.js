@@ -19,6 +19,8 @@ import {
 	serializeRawBlock,
 	switchToBlockType,
 	store as blocksStore,
+	getDefaultBlockName,
+	isUnmodifiedBlock,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import {
@@ -311,7 +313,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 		__unstableMarkLastChangeAsPersistent,
 		moveBlocksToPosition,
 		removeBlock,
-		selectBlock,
 	} = dispatch( blockEditorStore );
 
 	// Do not add new properties here, use `useDispatch` instead to avoid
@@ -348,6 +349,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				getBlockAttributes,
 				getBlockName,
 				getBlockOrder,
+				getBlockIndex,
+				getBlockRootClientId,
+				canInsertBlockType,
 			} = registry.select( blockEditorStore );
 
 			// For `Delete` or forward merge, we should do the exact same thing
@@ -453,17 +457,46 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 						}
 					}
 
-					// Attempt to "unwrap" the block contents when there's no
-					// preceding block to merge with.
-					const replacement = switchToBlockType(
-						getBlock( rootClientId ),
-						'*'
-					);
-					if ( replacement && replacement.length ) {
-						registry.batch( () => {
-							replaceBlocks( rootClientId, replacement );
-							selectBlock( replacement[ 0 ].clientId, 0 );
-						} );
+					const targetRootClientId =
+						getBlockRootClientId( rootClientId );
+
+					if ( isUnmodifiedBlock( getBlock( clientId ) ) ) {
+						removeBlock( rootClientId );
+					} else {
+						if (
+							canInsertBlockType(
+								getBlockName( clientId ),
+								targetRootClientId
+							)
+						) {
+							moveBlocksToPosition(
+								[ clientId ],
+								rootClientId,
+								targetRootClientId,
+								getBlockIndex( rootClientId )
+							);
+						} else {
+							const replacement = switchToBlockType(
+								getBlock( clientId ),
+								getDefaultBlockName()
+							);
+
+							if ( replacement && replacement.length ) {
+								registry.batch( () => {
+									insertBlocks(
+										replacement,
+										getBlockIndex( rootClientId ),
+										targetRootClientId,
+										true
+									);
+									removeBlock( clientId, false );
+								} );
+							}
+						}
+
+						if ( ! getBlockOrder( rootClientId ).length ) {
+							removeBlock( rootClientId, false );
+						}
 					}
 				}
 			}

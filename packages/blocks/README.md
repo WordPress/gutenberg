@@ -529,10 +529,9 @@ _Returns_
 
 -   `boolean`: Whether the given block is a template part.
 
-### isUnmodifiedDefaultBlock
+### isUnmodifiedBlock
 
-Determines whether the block is a default block
-and its attributes are equal to the default attributes
+Determines whether the block's attributes are equal to the default attributes
 which means the block is unmodified.
 
 _Parameters_
@@ -541,7 +540,20 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether the block is an unmodified default block
+-   `boolean`: Whether the block is an unmodified block.
+
+### isUnmodifiedDefaultBlock
+
+Determines whether the block is a default block and its attributes are equal
+to the default attributes which means the block is unmodified.
+
+_Parameters_
+
+-   _block_ `WPBlock`: Block Object
+
+_Returns_
+
+-   `boolean`: Whether the block is an unmodified default block.
 
 ### isValidBlockContent
 
