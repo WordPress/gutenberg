@@ -11,15 +11,13 @@ import { Spinner } from '..';
 describe( 'props', () => {
 	let base;
 
-	beforeEach( () => {
-		base = render( <Spinner /> );
-	} );
-
 	test( 'should render correctly', () => {
+		base = render( <Spinner /> );
 		expect( base.container.firstChild ).toMatchSnapshot();
 	} );
 
 	test( 'should render color', () => {
+		base = render( <Spinner /> );
 		const { container } = render( <Spinner color="blue" /> );
 		expect( container.firstChild ).toMatchDiffSnapshot(
 			base.container.firstChild
@@ -27,6 +25,7 @@ describe( 'props', () => {
 	} );
 
 	test( 'should render size', () => {
+		base = render( <Spinner /> );
 		const { container } = render( <Spinner size={ 31 } /> );
 		expect( container.firstChild ).toMatchDiffSnapshot(
 			base.container.firstChild
