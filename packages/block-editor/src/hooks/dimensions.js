@@ -10,6 +10,7 @@ import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/compo
 import { Platform, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport } from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -39,15 +40,22 @@ import {
 	useIsPaddingDisabled,
 } from './padding';
 import useSetting from '../components/use-setting';
-
+import { store as blockEditorStore } from '../store';
 export const SPACING_SUPPORT_KEY = 'spacing';
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
 export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
 
 function useVisualizerMouseOver() {
 	const [ isMouseOver, setIsMouseOver ] = useState( false );
-	const onMouseOver = () => setIsMouseOver( true );
-	const onMouseOut = () => setIsMouseOver( false );
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	const onMouseOver = () => {
+		__unstableSetEditorMode( 'visualize' );
+		setIsMouseOver( true );
+	};
+	const onMouseOut = () => {
+		__unstableSetEditorMode( 'edit' );
+		setIsMouseOver( false );
+	};
 	return { isMouseOver, onMouseOver, onMouseOut };
 }
 
