@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, reduce } from 'lodash';
+import { reduce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -296,7 +296,10 @@ export const showBlockTypes =
 				.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
 
 		const newBlockNames = existingBlockNames.filter(
-			( type ) => ! castArray( blockNames ).includes( type )
+			( type ) =>
+				! (
+					Array.isArray( blockNames ) ? blockNames : [ blockNames ]
+				 ).includes( type )
 		);
 
 		registry
@@ -319,7 +322,7 @@ export const hideBlockTypes =
 
 		const mergedBlockNames = new Set( [
 			...existingBlockNames,
-			...castArray( blockNames ),
+			...( Array.isArray( blockNames ) ? blockNames : [ blockNames ] ),
 		] );
 
 		registry
