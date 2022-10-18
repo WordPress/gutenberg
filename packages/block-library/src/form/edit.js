@@ -17,12 +17,54 @@ const ALLOWED_BLOCKS = [
 	'core/group',
 ];
 
+const TEMPLATE = [
+	[
+		'core/input-field',
+		{
+			type: 'text',
+			label: __( 'Name' ),
+			required: true,
+		},
+	],
+	[
+		'core/input-field',
+		{
+			type: 'email',
+			label: __( 'Email' ),
+			required: true,
+		},
+	],
+	[
+		'core/input-field',
+		{
+			type: 'url',
+			label: __( 'Website' ),
+		},
+	],
+	[
+		'core/input-field',
+		{
+			type: 'textarea',
+			label: __( 'Comment' ),
+			required: true,
+		},
+	],
+	[
+		'core/input-field',
+		{
+			type: 'submit',
+			label: __( 'Submit' ),
+		},
+	],
+];
+
 const Edit = ( { attributes, setAttributes } ) => {
 	const { formId } = attributes;
 	const blockProps = useBlockProps();
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
+		template: TEMPLATE,
 	} );
 
 	return (
