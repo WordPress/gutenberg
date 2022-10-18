@@ -32,7 +32,7 @@ test.describe( 'new editor state', () => {
 
 		// Should display the View button.
 		await expect(
-			page.locator( 'role=button[name="View"i]' )
+			page.locator( 'role=button[name="Preview"i]' )
 		).toBeVisible();
 
 		// Should display the Post Formats UI.
