@@ -60,9 +60,8 @@ function DetailsBlock( { attributes, setAttributes } ) {
 					<RichText
 						tagName={ tagName }
 						aria-label={ __( 'Summary' ) }
-						placeholder={ __( 'Add summary' ) }
 						withoutInteractiveFormatting
-						value={ summary }
+						value={ !! summary ? summary : __( 'Show details' ) }
 						onChange={ ( newSummary ) =>
 							setAttributes( { summary: newSummary } )
 						}
