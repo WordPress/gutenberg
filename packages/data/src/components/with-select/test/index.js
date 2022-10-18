@@ -42,13 +42,13 @@ describe( 'withSelect', () => {
 		} ) );
 
 		const OriginalComponent = jest.fn( ( props ) => (
-			<div>{ props.data }</div>
+			<div role="status">{ props.data }</div>
 		) );
 
 		const DataBoundComponent =
 			withSelect( mapSelectToProps )( OriginalComponent );
 
-		const { container } = render(
+		render(
 			<RegistryProvider value={ registry }>
 				<DataBoundComponent keyName="reactKey" />
 			</RegistryProvider>
@@ -61,7 +61,9 @@ describe( 'withSelect', () => {
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
 		// Wrapper is the enhanced component.
-		expect( container ).toHaveTextContent( 'reactState' );
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent(
+			'reactState'
+		);
 	} );
 
 	it( 'should rerun selection on state changes', async () => {
@@ -167,7 +169,7 @@ describe( 'withSelect', () => {
 			}
 
 			render() {
-				return <div>{ this.props.count }</div>;
+				return <div role="status">{ this.props.count }</div>;
 			}
 		}
 
@@ -187,13 +189,13 @@ describe( 'withSelect', () => {
 		] )( OriginalComponent );
 
 		it( 'should rerun if had dispatched action during mount', () => {
-			const { container, unmount } = render(
+			const { unmount } = render(
 				<RegistryProvider value={ testRegistry }>
 					<DataBoundComponent />
 				</RegistryProvider>
 			);
 
-			expect( container ).toHaveTextContent( '2' );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '2' );
 			// Expected 3 times because:
 			// - 1 on initial render
 			// - 1 on effect before subscription set.
@@ -205,13 +207,13 @@ describe( 'withSelect', () => {
 		} );
 
 		it( 'should rerun on unmount and mount', () => {
-			const { container } = render(
+			render(
 				<RegistryProvider value={ testRegistry }>
 					<DataBoundComponent />
 				</RegistryProvider>
 			);
 
-			expect( container ).toHaveTextContent( '4' );
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '4' );
 			// Expected an additional 3 times because of the unmount and remount:
 			// - 1 on initial render
 			// - 1 on effect before subscription set.
@@ -241,13 +243,13 @@ describe( 'withSelect', () => {
 		} ) );
 
 		const OriginalComponent = jest.fn( ( props ) => (
-			<div>{ props.count }</div>
+			<div role="status">{ props.count }</div>
 		) );
 
 		const DataBoundComponent =
 			withSelect( mapSelectToProps )( OriginalComponent );
 
-		const { container, rerender } = render(
+		const { rerender } = render(
 			<RegistryProvider value={ registry }>
 				<DataBoundComponent offset={ 0 } />
 			</RegistryProvider>
@@ -265,7 +267,7 @@ describe( 'withSelect', () => {
 			</RegistryProvider>
 		);
 
-		expect( container ).toHaveTextContent( '10' );
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '10' );
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 3 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
@@ -439,13 +441,13 @@ describe( 'withSelect', () => {
 		} );
 
 		const OriginalComponent = jest.fn( ( props ) => (
-			<div>{ JSON.stringify( props ) }</div>
+			<div role="status">{ JSON.stringify( props ) }</div>
 		) );
 
 		const DataBoundComponent =
 			withSelect( mapSelectToProps )( OriginalComponent );
 
-		const { container, rerender } = render(
+		const { rerender } = render(
 			<RegistryProvider value={ registry }>
 				<DataBoundComponent propName="foo" />
 			</RegistryProvider>
@@ -457,7 +459,7 @@ describe( 'withSelect', () => {
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
-		expect( container ).toHaveTextContent(
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 			JSON.stringify( {
 				propName: 'foo',
 				foo: 'OK',
@@ -472,7 +474,7 @@ describe( 'withSelect', () => {
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 3 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
-		expect( container ).toHaveTextContent(
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 			JSON.stringify( {
 				propName: 'bar',
 				bar: 'OK',
@@ -498,13 +500,13 @@ describe( 'withSelect', () => {
 		} );
 
 		const OriginalComponent = jest.fn( ( props ) => (
-			<div>{ props.count || 'Unknown' }</div>
+			<div role="status">{ props.count || 'Unknown' }</div>
 		) );
 
 		const DataBoundComponent =
 			withSelect( mapSelectToProps )( OriginalComponent );
 
-		const { container, rerender } = render(
+		const { rerender } = render(
 			<RegistryProvider value={ registry }>
 				<DataBoundComponent pass={ false } />
 			</RegistryProvider>
@@ -515,7 +517,7 @@ describe( 'withSelect', () => {
 		// - 1 on effect before subscription set.
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
-		expect( container ).toHaveTextContent( 'Unknown' );
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'Unknown' );
 
 		rerender(
 			<RegistryProvider value={ registry }>
@@ -525,7 +527,7 @@ describe( 'withSelect', () => {
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 3 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
-		expect( container ).toHaveTextContent( 'OK' );
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'OK' );
 
 		rerender(
 			<RegistryProvider value={ registry }>
@@ -535,7 +537,7 @@ describe( 'withSelect', () => {
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 4 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 3 );
-		expect( container ).toHaveTextContent( 'Unknown' );
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'Unknown' );
 	} );
 
 	it( 'should limit unnecessary selections run on children', async () => {
@@ -606,13 +608,13 @@ describe( 'withSelect', () => {
 		} ) );
 
 		const OriginalComponent = jest.fn( ( props ) => (
-			<div>{ props.value }</div>
+			<div role="status">{ props.value }</div>
 		) );
 
 		const DataBoundComponent =
 			withSelect( mapSelectToProps )( OriginalComponent );
 
-		const { container, rerender } = render(
+		const { rerender } = render(
 			<RegistryProvider value={ firstRegistry }>
 				<DataBoundComponent />
 			</RegistryProvider>
@@ -624,7 +626,7 @@ describe( 'withSelect', () => {
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
-		expect( container ).toHaveTextContent( 'first' );
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'first' );
 
 		const secondRegistry = createRegistry();
 		secondRegistry.registerStore( 'demo', {
@@ -647,6 +649,6 @@ describe( 'withSelect', () => {
 		// - 1 on effect before new subscription set (because registry has changed)
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 4 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
-		expect( container ).toHaveTextContent( 'second' );
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'second' );
 	} );
 } );
