@@ -453,7 +453,7 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 		return $preset['size'];
 	}
 
-	// Check if fluid font sizes are activated.
+	// Checks if fluid font sizes are activated.
 	$typography_settings         = gutenberg_get_global_settings( array( 'typography' ) );
 	$should_use_fluid_typography = isset( $typography_settings['fluid'] ) && true === $typography_settings['fluid'] ? true : $should_use_fluid_typography;
 
@@ -506,10 +506,10 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 		/*
 		 * If a minimum size was not passed to this function
 		 * and the user-defined font size is lower than $minimum_font_size_limit,
-		 * then do not fluidify.
+		 * then uses the user-defined font size as the minimum font-size.
 		 */
 		if ( ! isset( $fluid_font_size_settings['min'] ) && $preferred_size['value'] < $minimum_font_size_limit['value'] ) {
-			return $preset['size'];
+			$minimum_font_size_raw = implode( '', $preferred_size );
 		} else {
 			$minimum_font_size_parsed = gutenberg_get_typography_value_and_unit(
 				$minimum_font_size_raw,

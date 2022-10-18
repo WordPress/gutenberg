@@ -93,27 +93,35 @@ export function getComputedFluidTypographyValue( {
 		);
 
 		if ( !! minimumFontSizeLimitParsed?.value ) {
+			/*
+			 * If a minimum size was not passed to this function
+			 * and the user-defined font size is lower than $minimum_font_size_limit,
+			 * then uses the user-defined font size as the minimum font-size.
+			 */
 			if (
 				! minimumFontSize &&
 				fontSizeParsed?.value < minimumFontSizeLimitParsed?.value
 			) {
-				return null;
-			}
-			const minimumFontSizeParsed = getTypographyValueAndUnit(
-				minimumFontSizeValue,
-				{
-					coerceTo: fontSizeParsed.unit,
+				minimumFontSizeValue = `${ fontSizeParsed.value }${ fontSizeParsed.unit }`;
+			} else {
+				const minimumFontSizeParsed = getTypographyValueAndUnit(
+					minimumFontSizeValue,
+					{
+						coerceTo: fontSizeParsed.unit,
+					}
+				);
+
+				/*
+				 * Otherwise, if the passed or calculated minimum font size is lower than $minimum_font_size_limit
+				 * use $minimum_font_size_limit instead.
+				 */
+				if (
+					!! minimumFontSizeParsed?.value &&
+					minimumFontSizeParsed.value <
+						minimumFontSizeLimitParsed.value
+				) {
+					minimumFontSizeValue = `${ minimumFontSizeLimitParsed.value }${ minimumFontSizeLimitParsed.unit }`;
 				}
-			);
-			/*
-			 * Otherwise, if the passed or calculated minimum font size is lower than $minimum_font_size_limit
-			 * use $minimum_font_size_limit instead.
-			 */
-			if (
-				!! minimumFontSizeParsed?.value &&
-				minimumFontSizeParsed.value < minimumFontSizeLimitParsed.value
-			) {
-				minimumFontSizeValue = `${ minimumFontSizeLimitParsed.value }${ minimumFontSizeLimitParsed.unit }`;
 			}
 		}
 

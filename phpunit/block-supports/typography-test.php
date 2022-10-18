@@ -448,12 +448,12 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output'             => '10em',
 			),
 
-			'return_size_where_no_min_is_given_and_less_than_default_min_size' => array(
+			'return_clamped_size_where_no_min_is_given_and_less_than_default_min_size' => array(
 				'font_size'                   => array(
 					'size' => '3px',
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => '3px',
+				'expected_output'             => 'clamp(3px, 0.188rem + ((1vw - 7.68px) * 0.18), 4.5px)',
 			),
 
 			'return_fluid_clamp_value_with_different_min_max_units' => array(

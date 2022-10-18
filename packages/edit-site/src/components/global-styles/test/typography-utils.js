@@ -191,14 +191,15 @@ describe( 'typography utils', () => {
 
 			{
 				message:
-					'return size where no min is give and size is less than default min size.',
+					'return clamped using font size where no min is given and size is less than default min size.',
 				preset: {
 					size: '3px',
 				},
 				typographySettings: {
 					fluid: true,
 				},
-				expected: '3px',
+				expected:
+					'clamp(3px, 0.188rem + ((1vw - 7.68px) * 0.18), 4.5px)',
 			},
 
 			{
