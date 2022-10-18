@@ -312,7 +312,7 @@ describe( 'withSelect', () => {
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'should not rerender if state has changed but merge props the same', () => {
+	it( 'should not rerender if state has changed but merge props the same', async () => {
 		const registry = createRegistry();
 		registry.registerStore( 'demo', {
 			reducer: () => ( {} ),
@@ -345,7 +345,7 @@ describe( 'withSelect', () => {
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
-		registry.dispatch( 'demo' ).update();
+		await act( async () => registry.dispatch( 'demo' ).update() );
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 3 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
@@ -389,7 +389,7 @@ describe( 'withSelect', () => {
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
 
-	it( 'should not rerun selection on unchanging state', () => {
+	it( 'should not rerun selection on unchanging state', async () => {
 		const registry = createRegistry();
 		const store = registry.registerStore( 'unchanging', {
 			reducer: ( state = {} ) => state,
@@ -417,7 +417,7 @@ describe( 'withSelect', () => {
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
-		store.dispatch( { type: 'dummy' } );
+		await act( async () => store.dispatch( { type: 'dummy' } ) );
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
@@ -538,7 +538,7 @@ describe( 'withSelect', () => {
 		expect( container ).toHaveTextContent( 'Unknown' );
 	} );
 
-	it( 'should limit unnecessary selections run on children', () => {
+	it( 'should limit unnecessary selections run on children', async () => {
 		const registry = createRegistry();
 		registry.registerStore( 'childRender', {
 			reducer: ( state = true, action ) =>
@@ -582,7 +582,7 @@ describe( 'withSelect', () => {
 		expect( ChildOriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( ParentOriginalComponent ).toHaveBeenCalledTimes( 1 );
 
-		act( () => {
+		await act( async () => {
 			registry.dispatch( 'childRender' ).toggleRender();
 		} );
 
