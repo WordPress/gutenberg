@@ -172,7 +172,7 @@ export function PaddingEdit( props ) {
 	} );
 }
 
-export function PaddingVisualizer( { clientId, attributes, isMouseOver } ) {
+export function PaddingVisualizer( { clientId, attributes, forceShow } ) {
 	const padding = attributes?.style?.spacing?.padding;
 	const style = useMemo( () => {
 		return {
@@ -202,7 +202,7 @@ export function PaddingVisualizer( { clientId, attributes, isMouseOver } ) {
 	};
 
 	useEffect( () => {
-		if ( ! isShallowEqual( padding, valueRef.current ) && ! isMouseOver ) {
+		if ( ! isShallowEqual( padding, valueRef.current ) && ! forceShow ) {
 			setIsActive( true );
 			valueRef.current = padding;
 
@@ -214,9 +214,9 @@ export function PaddingVisualizer( { clientId, attributes, isMouseOver } ) {
 		}
 
 		return () => clearTimer();
-	}, [ padding, isMouseOver ] );
+	}, [ padding, forceShow ] );
 
-	if ( ! isActive && ! isMouseOver ) {
+	if ( ! isActive && ! forceShow ) {
 		return null;
 	}
 

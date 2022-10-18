@@ -173,7 +173,7 @@ export function MarginEdit( props ) {
 	} );
 }
 
-export function MarginVisualizer( { clientId, attributes, isMouseOver } ) {
+export function MarginVisualizer( { clientId, attributes, forceShow } ) {
 	const margin = attributes?.style?.spacing?.margin;
 
 	const style = useMemo( () => {
@@ -213,7 +213,7 @@ export function MarginVisualizer( { clientId, attributes, isMouseOver } ) {
 	};
 
 	useEffect( () => {
-		if ( ! isShallowEqual( margin, valueRef.current ) && ! isMouseOver ) {
+		if ( ! isShallowEqual( margin, valueRef.current ) && ! forceShow ) {
 			setIsActive( true );
 			valueRef.current = margin;
 
@@ -225,9 +225,9 @@ export function MarginVisualizer( { clientId, attributes, isMouseOver } ) {
 		}
 
 		return () => clearTimer();
-	}, [ margin, isMouseOver ] );
+	}, [ margin, forceShow ] );
 
-	if ( ! isActive && ! isMouseOver ) {
+	if ( ! isActive && ! forceShow ) {
 		return null;
 	}
 

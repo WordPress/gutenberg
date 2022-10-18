@@ -145,13 +145,13 @@ export function DimensionsPanel( props ) {
 			</InspectorControls>
 			{ ! isPaddingDisabled && (
 				<PaddingVisualizer
-					isMouseOver={ paddingMouseOver.isMouseOver }
+					forceShow={ paddingMouseOver.isMouseOver }
 					{ ...props }
 				/>
 			) }
 			{ ! isMarginDisabled && (
 				<MarginVisualizer
-					isMouseOver={ marginMouseOver.isMouseOver }
+					forceShow={ marginMouseOver.isMouseOver }
 					{ ...props }
 				/>
 			) }
