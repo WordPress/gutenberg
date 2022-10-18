@@ -1,11 +1,6 @@
 .edit-site-sidebar-navigation-item.components-item {
 	color: $gray-200;
 
-	// Offset the hoziontal padding so that text aligns along the Y axis
-	margin-left: - $grid-unit-15;
-	margin-right: - $grid-unit-15;
-	width: calc(100% + calc(#{$grid-unit-15} * 2));
-
 	&:hover {
 		background: $gray-800;
 		color: $white;
