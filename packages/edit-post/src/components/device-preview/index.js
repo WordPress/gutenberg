@@ -49,6 +49,8 @@ export default function DevicePreview() {
 			className="edit-post-post-preview-dropdown"
 			deviceType={ deviceType }
 			setDeviceType={ setPreviewDeviceType }
+			/* translators: button label text should, if possible, be under 16 characters. */
+			viewLabel={ __( 'Preview' ) }
 		>
 			{ isViewable && (
 				<MenuGroup>
