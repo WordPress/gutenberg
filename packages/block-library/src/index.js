@@ -152,10 +152,8 @@ const getAllBlocks = () => {
 		details,
 		embed,
 		file,
-		form,
 		group,
 		html,
-		inputField,
 		latestComments,
 		latestPosts,
 		mediaText,
@@ -232,6 +230,10 @@ const getAllBlocks = () => {
 		queryTitle,
 		postAuthorBiography,
 	];
+	if ( window?.__experimentalEnableFormBlocks ) {
+		blocks.push( form );
+		blocks.push( inputField );
+	}
 
 	// When in a WordPress context, conditionally
 	// add the classic block and TinyMCE editor
