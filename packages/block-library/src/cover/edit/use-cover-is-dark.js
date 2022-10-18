@@ -74,6 +74,7 @@ export default function useCoverIsDark(
 					crossOrigin: imgCrossOrigin,
 				} )
 				.then( ( { value: [ r, g, b, a ] } ) => {
+					// FAC uses 0-255 for alpha, but colord expects 0-1.
 					const media = { r, g, b, a: a / 255 };
 					const composite = compositeSourceOver( overlay, media );
 					setIsDark( colord( composite ).isDark() );
