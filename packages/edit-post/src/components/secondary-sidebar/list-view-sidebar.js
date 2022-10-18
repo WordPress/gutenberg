@@ -35,6 +35,10 @@ export default function ListViewSidebar() {
 	const instanceId = useInstanceId( ListViewSidebar );
 	const labelId = `edit-post-editor__list-view-panel-label-${ instanceId }`;
 
+	const closeOnBlockSelect = () => {
+		setIsListViewOpened( false );
+	};
+
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
@@ -60,7 +64,7 @@ export default function ListViewSidebar() {
 					focusOnMountRef,
 				] ) }
 			>
-				<ListView />
+				<ListView closeOnBlockSelect={ closeOnBlockSelect } />
 			</div>
 		</div>
 	);

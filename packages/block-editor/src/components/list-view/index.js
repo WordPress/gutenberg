@@ -50,15 +50,22 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
 /**
  * Show a hierarchical list of blocks.
  *
- * @param {Object}  props                 Components props.
- * @param {string}  props.id              An HTML element id for the root element of ListView.
- * @param {Array}   props.blocks          Custom subset of block client IDs to be used instead of the default hierarchy.
- * @param {boolean} props.showBlockMovers Flag to enable block movers
- * @param {boolean} props.isExpanded      Flag to determine whether nested levels are expanded by default.
- * @param {Object}  ref                   Forwarded ref
+ * @param {Object}   props                    Components props.
+ * @param {string}   props.id                 An HTML element id for the root element of ListView.
+ * @param {Array}    props.blocks             Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {boolean}  props.showBlockMovers    Flag to enable block movers
+ * @param {boolean}  props.isExpanded         Flag to determine whether nested levels are expanded by default.
+ * @param {Function} props.closeOnBlockSelect Callback that fires when block is selected.
+ * @param {Object}   ref                      Forwarded ref
  */
 function ListView(
-	{ id, blocks, showBlockMovers = false, isExpanded = false },
+	{
+		id,
+		blocks,
+		showBlockMovers = false,
+		isExpanded = false,
+		closeOnBlockSelect,
+	},
 	ref
 ) {
 	const { clientIdsTree, draggedClientIds, selectedClientIds } =
@@ -100,6 +107,7 @@ function ListView(
 		( event, clientId ) => {
 			updateBlockSelection( event, clientId );
 			setSelectedTreeId( clientId );
+			closeOnBlockSelect();
 		},
 		[ setSelectedTreeId, updateBlockSelection ]
 	);
