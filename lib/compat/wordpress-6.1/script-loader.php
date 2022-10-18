@@ -113,12 +113,14 @@ function gutenberg_add_editor_classic_theme_styles( $editor_settings ) {
 	// This follows the pattern of get_block_editor_theme_styles,
 	// but we can't use get_block_editor_theme_styles directly as it
 	// only handles external files or theme files.
-	$editor_settings['styles'][] = array(
+	$classic_theme_styles_settings = array(
 		'css'            => file_get_contents( $classic_theme_styles ),
-		'baseURL'        => get_theme_file_uri( $classic_theme_styles ),
-		'__unstableType' => 'theme',
+		'__unstableType' => 'core',
 		'isGlobalStyles' => false,
 	);
+
+	// Add these settings to the start of the array so that themes can override them.
+	array_unshift( $editor_settings['styles'], $classic_theme_styles_settings );
 
 	return $editor_settings;
 }
