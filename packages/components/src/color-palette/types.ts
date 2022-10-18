@@ -20,7 +20,7 @@ type PaletteProps = {
 	clearColor: () => void;
 	onChange: OnColorChange;
 	value?: string;
-	actions: ReactNode;
+	actions?: ReactNode;
 };
 
 export type SinglePaletteProps = PaletteProps & {
