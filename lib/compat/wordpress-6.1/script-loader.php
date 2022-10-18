@@ -86,7 +86,7 @@ add_action( 'wp_footer', 'gutenberg_enqueue_global_styles', 1 );
  * This is needed for backwards compatibility for button blocks specifically.
  */
 function gutenberg_enqueue_classic_theme_styles() {
-	if ( ! wp_is_block_theme() ) {
+	if ( ! WP_Theme_JSON_Resolver::theme_has_support() ) {
 		wp_register_style( 'classic-theme-styles', gutenberg_url( 'build/block-library/classic.css' ), array(), true );
 		wp_enqueue_style( 'classic-theme-styles' );
 	}
@@ -104,7 +104,7 @@ add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_classic_theme_styles' );
  * @return array A filtered array of editor settings.
  */
 function gutenberg_add_editor_classic_theme_styles( $editor_settings ) {
-	if ( wp_is_block_theme() ) {
+	if ( WP_Theme_JSON_Resolver::theme_has_support() ) {
 		return $editor_settings;
 	}
 
