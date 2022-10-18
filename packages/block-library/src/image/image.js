@@ -343,11 +343,7 @@ export default function Image( {
 						} }
 						icon={ captionIcon }
 						isPressed={ showCaption }
-						label={
-							showCaption
-								? __( 'Remove caption' )
-								: __( 'Add caption' )
-						}
+						label={ __( 'Caption' ) }
 					/>
 				) }
 				{ ! multiImageSelection && ! isEditingImage && (
