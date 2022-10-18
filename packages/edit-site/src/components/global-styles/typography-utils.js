@@ -11,7 +11,7 @@ import { getComputedFluidTypographyValue } from '@wordpress/block-editor';
 
 /**
  * @typedef {Object} FluidPreset
- * @property {string|undefined} max A maximum font size value.
+ * @property {string|undefined}  max A maximum font size value.
  * @property {?string|undefined} min A minimum font size value.
  */
 

@@ -288,8 +288,8 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 					screen.getByRole( 'menu', {
 						name: 'Block Name',
 					} )
-				).getAllByRole( 'menuitem' )
-			).toHaveLength( 1 );
+				).getByRole( 'menuitem' )
+			).toBeInTheDocument();
 		} );
 	} );
 } );

@@ -39,9 +39,9 @@ describe( 'useDisabled', () => {
 		const link = screen.getByRole( 'link' );
 		const p = container.querySelector( 'p' );
 
-		expect( input.hasAttribute( 'inert' ) ).toBe( true );
-		expect( link.hasAttribute( 'inert' ) ).toBe( true );
-		expect( p.hasAttribute( 'inert' ) ).toBe( true );
+		expect( input ).toHaveAttribute( 'inert', 'true' );
+		expect( link ).toHaveAttribute( 'inert', 'true' );
+		expect( p ).toHaveAttribute( 'inert', 'true' );
 	} );
 
 	it( 'will disable an element rendered in an update to the component', async () => {
@@ -54,7 +54,7 @@ describe( 'useDisabled', () => {
 
 		const button = screen.getByText( 'Button' );
 		await waitFor( () => {
-			expect( button.hasAttribute( 'inert' ) ).toBe( true );
+			expect( button ).toHaveAttribute( 'inert', 'true' );
 		} );
 	} );
 } );

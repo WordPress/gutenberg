@@ -39,7 +39,7 @@ const SettingsHeader = ( { sidebarName } ) => {
 			<li>
 				<Button
 					onClick={ openTemplateSettings }
-					className={ `edit-site-sidebar__panel-tab ${ templateActiveClass }` }
+					className={ `edit-site-sidebar-edit-mode__panel-tab ${ templateActiveClass }` }
 					aria-label={ templateAriaLabel }
 					// translators: Data label for the Template Settings Sidebar tab.
 					data-label={ __( 'Template' ) }
@@ -53,7 +53,7 @@ const SettingsHeader = ( { sidebarName } ) => {
 			<li>
 				<Button
 					onClick={ openBlockSettings }
-					className={ `edit-site-sidebar__panel-tab ${ blockActiveClass }` }
+					className={ `edit-site-sidebar-edit-mode__panel-tab ${ blockActiveClass }` }
 					aria-label={ blockAriaLabel }
 					// translators: Data label for the Block Settings Sidebar tab.
 					data-label={ __( 'Block' ) }
