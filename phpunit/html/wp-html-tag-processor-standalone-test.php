@@ -728,7 +728,7 @@ HTML;
 			'Querying an existing tag did not return true'
 		);
 		$p->remove_attribute( 'class' );
-		$this->assertFalse( $p->next( 'non-existent' ), 'Querying a non-existing tag did not return false' );
+		$this->assertFalse( $p->next( array( 'tag' => 'non-existent' ) ), 'Querying a non-existing tag did not return false' );
 		$p->set_attribute( 'class', 'test' );
 		$this->assertSame( $expected_output, (string) $p, 'Calling __toString after updating the attributes did not return the expected HTML' );
 	}

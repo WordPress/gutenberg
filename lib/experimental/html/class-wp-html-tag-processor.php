@@ -1284,10 +1284,8 @@ class WP_HTML_Tag_Processor {
 	 * }
 	 */
 	private function parse_query( $query ) {
-		if ( null !== $query ) {
-			if ( ! is_array( $query ) || $query === $this->last_query ) {
-				return;
-			}
+		if ( null !== $query && $query === $this->last_query ) {
+			return;
 		}
 
 		$this->last_query          = $query;
