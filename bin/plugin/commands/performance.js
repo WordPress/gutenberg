@@ -216,7 +216,7 @@ async function runPerformanceTests( branches, options ) {
 	const baseDirectory = await git.cloneAt(
 		config.gitRepositoryURL,
 		options.mergeRef,
-		options.ci
+		options.testsBranch
 	);
 	const rootDirectory = getRandomTemporaryPath();
 	const performanceTestDirectory = rootDirectory + '/tests';

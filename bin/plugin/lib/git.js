@@ -30,12 +30,12 @@ async function clone( repositoryUrl ) {
 async function cloneAt( repositoryUrl, ref, sha ) {
 	const gitWorkingDirectoryPath = getRandomTemporaryPath();
 	fs.mkdirSync( gitWorkingDirectoryPath, { recursive: true } );
-	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.init();
-	await simpleGit.addRemote( 'origin', repositoryUrl );
-	console.log( `>>> Fetching ${ ref } (${ sha })` );
-	await simpleGit.raw( 'fetch', '--depth=1', 'origin', ref );
-	await simpleGit.raw( 'checkout', sha );
+	console.log( `>>> Fetching ${ ref } (${ sha }) at ${ repositoryUrl }` );
+	await SimpleGit( gitWorkingDirectoryPath )
+		.raw( 'init' )
+		.raw( 'remote', 'add', 'origin', repositoryUrl )
+		.raw( 'fetch', '--depth=1', 'origin', ref )
+		.raw( 'checkout', sha );
 	return gitWorkingDirectoryPath;
 }
 
