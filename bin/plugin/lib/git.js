@@ -3,6 +3,7 @@
  * External dependencies
  */
 const SimpleGit = require( 'simple-git' );
+const fs = require( 'fs' );
 
 /**
  * Internal dependencies
@@ -28,6 +29,7 @@ async function clone( repositoryUrl ) {
 
 async function cloneAt( repositoryUrl, ref ) {
 	const gitWorkingDirectoryPath = getRandomTemporaryPath();
+	fs.mkdirSync( gitWorkingDirectoryPath, { recursive: true } );
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
 	await simpleGit.init( false );
 	await simpleGit.addRemote( 'origin', repositoryUrl );
