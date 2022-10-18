@@ -283,7 +283,7 @@ A form. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/blo
 
 -	**Name:** core/form
 -	**Category:** common
--	**Supports:** 
+-	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** action, formId, method
 
 ## Classic
