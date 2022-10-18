@@ -337,14 +337,12 @@ export default function Image( {
 					<ToolbarButton
 						onClick={ () => {
 							setShowCaption( ! showCaption );
-							if (
-								showCaption &&
-								! RichText.isEmpty( caption )
-							) {
+							if ( showCaption && ! caption ) {
 								setAttributes( { caption: undefined } );
 							}
 						} }
 						icon={ captionIcon }
+						isPressed={ showCaption }
 						label={
 							showCaption
 								? __( 'Remove caption' )
