@@ -165,7 +165,7 @@ const renamedFeatures = { gradients: 'gradient' };
  * 				textTransform: 'uppercase',
  * 			}
  *		},
- *      [
+ *		[
  * 			'typography.textDecoration',
  * 			'typography.textTransform',
  *		]
@@ -183,7 +183,7 @@ const renamedFeatures = { gradients: 'gradient' };
  * 				textTransform: 'uppercase',
  * 			}
  *		},
- *      [
+ *		[
  * 			[ 'typography', 'textDecoration' ],
  * 			[ 'typography', 'textTransform' ],
  *		]
@@ -203,7 +203,7 @@ const renamedFeatures = { gradients: 'gradient' };
  * 				}
  * 			}
  *		},
- *      [
+ *		[
  * 			[ 'border', 'radius', 'topRight' ],
  *		]
  * );
