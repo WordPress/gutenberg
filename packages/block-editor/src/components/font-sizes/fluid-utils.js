@@ -200,7 +200,7 @@ export function getComputedFluidTypographyValue( {
 			( maximumViewPortWidthParsed.value -
 				minumumViewPortWidthParsed.value ) );
 	const linearFactorScaled = roundToPrecision(
-		linearFactor * scaleFactor,
+		( linearFactor || 1 ) * scaleFactor,
 		3
 	);
 	const fluidTargetFontSize = `${ minimumFontSizeRem.value }${ minimumFontSizeRem.unit } + ((1vw - ${ viewPortWidthOffset }) * ${ linearFactorScaled })`;
@@ -289,8 +289,8 @@ export function getTypographyValueAndUnit( rawValue, options = {} ) {
  * @return {number|undefined} Value rounded to standard precision.
  */
 export function roundToPrecision( value, digits = 3 ) {
-	const base = Math.pow( 10, digits + 1 );
+	const base = Math.pow( 10, digits );
 	return Number.isFinite( value )
-		? parseFloat( ( value + 1 / base ).toFixed( digits ) )
+		? parseFloat( Math.round( value * base ) / base )
 		: undefined;
 }

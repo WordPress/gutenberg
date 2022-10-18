@@ -333,6 +333,22 @@ describe( 'typography utils', () => {
 				expected:
 					'clamp(0.875rem, 0.875rem + ((1vw - 0.48rem) * 7.933), 5rem)',
 			},
+
+			{
+				message:
+					'return a fluid font size a min and max font sizes are equal.',
+				preset: {
+					size: '4rem',
+					fluid: {
+						min: '30px',
+						max: '30px',
+					},
+				},
+				typographySettings: {
+					fluid: true,
+				},
+				expected: 'clamp(30px, 1.875rem + ((1vw - 7.68px) * 1), 30px)',
+			},
 		].forEach( ( { message, preset, typographySettings, expected } ) => {
 			it( `should ${ message }`, () => {
 				expect(

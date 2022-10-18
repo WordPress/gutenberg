@@ -547,6 +547,18 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'should_use_fluid_typography' => true,
 				'expected_output'             => 'clamp(0.875rem, 0.875rem + ((1vw - 0.48rem) * 7.933), 5rem)',
 			),
+
+			'should_return_fluid_value_when_min_and_max_font_sizes_are_equal' => array(
+				'font_size'                   => array(
+					'size'  => '4rem',
+					'fluid' => array(
+						'min' => '30px',
+						'max' => '30px',
+					),
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(30px, 1.875rem + ((1vw - 7.68px) * 1), 30px)',
+			),
 		);
 	}
 
