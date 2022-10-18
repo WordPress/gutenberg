@@ -22,6 +22,7 @@ const config = require( '../config' );
  * @typedef WPPerformanceCommandOptions
  *
  * @property {boolean=} ci          Run on CI.
+ * @property {string=}  mergeRef    Name of ref merging test branch into base branch, e.g. refs/pull/44907/merge.
  * @property {string=}  testsBranch The branch whose performance test files will be used for testing.
  * @property {string=}  wpVersion   The WordPress version to be used as the base install for testing.
  */
@@ -212,7 +213,10 @@ async function runPerformanceTests( branches, options ) {
 	// 1- Preparing the tests directory.
 	log( '\n>> Preparing the tests directories' );
 	log( '    >> Cloning the repository' );
-	const baseDirectory = await git.clone( config.gitRepositoryURL );
+	const baseDirectory = await git.cloneAt(
+		config.gitRepositoryURL,
+		options.mergeRef
+	);
 	const rootDirectory = getRandomTemporaryPath();
 	const performanceTestDirectory = rootDirectory + '/tests';
 	await runShellScript( 'mkdir -p ' + rootDirectory );

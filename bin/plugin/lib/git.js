@@ -26,6 +26,16 @@ async function clone( repositoryUrl ) {
 	return gitWorkingDirectoryPath;
 }
 
+async function cloneAt( repositoryUrl, ref ) {
+	const gitWorkingDirectoryPath = getRandomTemporaryPath();
+	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
+	await simpleGit.init( false );
+	await simpleGit.addRemote( 'origin', repositoryUrl );
+	await simpleGit.fetch( 'origin', ref, [ '--depth=1' ] );
+	await simpleGit.checkout( 'origin', ref );
+	return gitWorkingDirectoryPath;
+}
+
 /**
  * Fetches changes from the repository.
  *
@@ -187,6 +197,7 @@ async function replaceContentFromRemoteBranch(
 
 module.exports = {
 	clone,
+	cloneAt,
 	commit,
 	checkoutRemoteBranch,
 	createLocalBranch,

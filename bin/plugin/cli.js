@@ -99,6 +99,10 @@ program
 		"Use this branch's performance test files"
 	)
 	.option(
+		'--merge-ref <branch>',
+		'Name of ref merging PR into base branch, e.g. refs/pull/44907/merge'
+	)
+	.option(
 		'--wp-version <version>',
 		'Specify a WordPress version on which to test all branches'
 	)
