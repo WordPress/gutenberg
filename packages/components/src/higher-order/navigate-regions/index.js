@@ -38,7 +38,7 @@ export function useNavigateRegions( shortcuts = defaultShortcuts ) {
 
 	function focusRegion( offset ) {
 		const regions = Array.from(
-			ref.current.querySelectorAll( '[role="region"]' )
+			ref.current.querySelectorAll( '[role="region"][tabindex="-1"]' )
 		);
 		if ( ! regions.length ) {
 			return;
