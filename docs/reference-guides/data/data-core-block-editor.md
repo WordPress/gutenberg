@@ -1510,11 +1510,16 @@ _Parameters_
 
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
 -   _index_ `?number`: Index at which block should be inserted.
--   _\_\_unstableOptions_ `Object`: Whether or not to show an inserter button.
+-   _\_\_unstableOptions_ `?Object`: Additional options.
 
 _Returns_
 
 -   `Object`: Action object.
+
+_Properties_
+
+-   _\_\_unstableWithInserter_ `boolean`: Whether or not to show an inserter button.
+-   _operation_ `WPDropOperation`: The operation to perform when applied, either 'insert' or 'replace' for now.
 
 ### startDraggingBlocks
 
