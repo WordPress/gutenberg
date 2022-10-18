@@ -62,7 +62,7 @@ function useSecondaryText() {
 	return {};
 }
 
-export default function DocumentActions() {
+export default function DocumentActions( { showDropdown = true } ) {
 	const { showIconLabels, entityTitle, template, templateType, isLoaded } =
 		useSelect( ( select ) => {
 			const { getEditedPostType, getEditedPostId } =
@@ -158,34 +158,38 @@ export default function DocumentActions() {
 					{ label ?? '' }
 				</Text>
 
-				<Dropdown
-					popoverProps={ popoverProps }
-					position="bottom center"
-					renderToggle={ ( { isOpen, onToggle } ) => (
-						<Button
-							className="edit-site-document-actions__get-info"
-							icon={ chevronDown }
-							aria-expanded={ isOpen }
-							aria-haspopup="true"
-							onClick={ onToggle }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-							label={ sprintf(
-								/* translators: %s: the entity to see details about, like "template"*/
-								__( 'Show %s details' ),
-								entityLabel
-							) }
-						>
-							{ showIconLabels && __( 'Details' ) }
-						</Button>
-					) }
-					contentClassName="edit-site-document-actions__info-dropdown"
-					renderContent={ ( { onClose } ) => (
-						<TemplateDetails
-							template={ template }
-							onClose={ onClose }
-						/>
-					) }
-				/>
+				{ showDropdown && (
+					<Dropdown
+						popoverProps={ popoverProps }
+						position="bottom center"
+						renderToggle={ ( { isOpen, onToggle } ) => (
+							<Button
+								className="edit-site-document-actions__get-info"
+								icon={ chevronDown }
+								aria-expanded={ isOpen }
+								aria-haspopup="true"
+								onClick={ onToggle }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
+								label={ sprintf(
+									/* translators: %s: the entity to see details about, like "template"*/
+									__( 'Show %s details' ),
+									entityLabel
+								) }
+							>
+								{ showIconLabels && __( 'Details' ) }
+							</Button>
+						) }
+						contentClassName="edit-site-document-actions__info-dropdown"
+						renderContent={ ( { onClose } ) => (
+							<TemplateDetails
+								template={ template }
+								onClose={ onClose }
+							/>
+						) }
+					/>
+				) }
 			</div>
 		</div>
 	);

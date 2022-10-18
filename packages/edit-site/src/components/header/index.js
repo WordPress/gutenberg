@@ -17,6 +17,7 @@ import { store as editSiteStore } from '../../store';
 import HeaderEditMode from '../header-edit-mode';
 import SiteIconAndTitle from '../site-icon-and-title';
 import SaveButton from '../save-button';
+import DocumentActions from '../header-edit-mode/document-actions';
 
 export default function Header() {
 	const { canvasMode } = useSelect(
@@ -55,7 +56,9 @@ export default function Header() {
 			<FlexBlock>
 				{ canvasMode === 'edit' && <HeaderEditMode /> }
 				{ canvasMode === 'view' && (
-					<HStack alignment="right">
+					<HStack justify="space-between">
+						<div></div>
+						<DocumentActions showDropdown={ false } />
 						<SaveButton />
 					</HStack>
 				) }
