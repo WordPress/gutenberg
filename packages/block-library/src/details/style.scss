@@ -1,5 +1,9 @@
 .wp-block-details {
+	::marker {
+		font-size: var(--wp--preset--font-size--medium, $default-font-size);
+	}
 	.wp-block-details__summary > * {
 		display: inline;
+		font-size: var(--wp--preset--font-size--medium, $default-font-size);
 	}
 }
