@@ -34,6 +34,15 @@ import {
 	isValueSpacingPreset,
 } from './utils';
 
+const CUSTOM_VALUE_SETTINGS = {
+	px: { max: 300, steps: 1 },
+	'%': { max: 100, steps: 1 },
+	vw: { max: 100, steps: 1 },
+	vh: { max: 100, steps: 1 },
+	em: { max: 10, steps: 0.1 },
+	rm: { max: 10, steps: 0.1 },
+};
+
 export default function SpacingInputControl( {
 	spacingSizes,
 	value,
@@ -163,8 +172,6 @@ export default function SpacingInputControl( {
 		! showCustomValueControl &&
 		currentValueHint !== undefined;
 
-	const maxCustomValues = { px: 300, '%': 100, vw: 100, vh: 100 };
-
 	return (
 		<>
 			{ side !== 'all' && (
@@ -229,15 +236,9 @@ export default function SpacingInputControl( {
 					<RangeControl
 						value={ customRangeValue }
 						min={ 0 }
-						max={
-							maxCustomValues[ selectedUnit ]
-								? maxCustomValues[ selectedUnit ]
-								: 10
-						}
+						max={ CUSTOM_VALUE_SETTINGS[ selectedUnit ]?.max ?? 10 }
 						step={
-							[ 'px', '%', 'vh', 'vw' ].includes( selectedUnit )
-								? 1
-								: 0.1
+							CUSTOM_VALUE_SETTINGS[ selectedUnit ]?.steps ?? 0.1
 						}
 						withInputField={ false }
 						onChange={ handleCustomValueSliderChange }
