@@ -1,56 +1,11 @@
 [
 	{
-		"name": "core/input-field",
+		"name": "core/missing",
 		"isValid": true,
 		"attributes": {
-			"type": "text",
-			"label": "Name - required, inline label",
-			"inlineLabel": true,
-			"required": true
-		},
-		"innerBlocks": []
-	},
-	{
-		"name": "core/input-field",
-		"isValid": true,
-		"attributes": {
-			"type": "checkbox",
-			"label": "Checkbox - inline label",
-			"inlineLabel": true,
-			"required": true
-		},
-		"innerBlocks": []
-	},
-	{
-		"name": "core/input-field",
-		"isValid": true,
-		"attributes": {
-			"type": "email",
-			"label": "Email - required",
-			"inlineLabel": false,
-			"required": true
-		},
-		"innerBlocks": []
-	},
-	{
-		"name": "core/input-field",
-		"isValid": true,
-		"attributes": {
-			"type": "textarea",
-			"label": "Textarea input",
-			"inlineLabel": false,
-			"required": false
-		},
-		"innerBlocks": []
-	},
-	{
-		"name": "core/input-field",
-		"isValid": true,
-		"attributes": {
-			"type": "submit",
-			"label": "Submit",
-			"inlineLabel": false,
-			"required": false
+			"originalName": "core/input-field",
+			"originalUndelimitedContent": "<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Name</div><input class=\"wp-block-input-field\" type=\"text\" name=\"Name\" required aria-required=\"true\"/></label>",
+			"originalContent": "<!-- wp:input-field {\"label\":\"Name\",\"required\":true} -->\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Name</div><input class=\"wp-block-input-field\" type=\"text\" name=\"Name\" required=\"\" aria-required=\"true\"></label>\n<!-- /wp:input-field -->"
 		},
 		"innerBlocks": []
 	}
