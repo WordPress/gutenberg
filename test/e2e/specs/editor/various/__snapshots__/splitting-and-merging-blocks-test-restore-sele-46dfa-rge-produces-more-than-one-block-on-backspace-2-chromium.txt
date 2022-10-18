@@ -1,9 +1,5 @@
 <!-- wp:paragraph -->
-<p>hi</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p>item 1</p>
+<p>hi-item 1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->

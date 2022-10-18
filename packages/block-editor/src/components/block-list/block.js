@@ -354,6 +354,57 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				canInsertBlockType,
 			} = registry.select( blockEditorStore );
 
+			function moveFirstItemUp( _clientId, changeSelection = true ) {
+				const targetRootClientId = getBlockRootClientId( _clientId );
+				const blockOrder = getBlockOrder( _clientId );
+				const [ firstClientId ] = blockOrder;
+
+				if (
+					blockOrder.length === 1 &&
+					isUnmodifiedBlock( getBlock( firstClientId ) )
+				) {
+					removeBlock( _clientId );
+				} else {
+					if (
+						canInsertBlockType(
+							getBlockName( firstClientId ),
+							targetRootClientId
+						)
+					) {
+						moveBlocksToPosition(
+							[ firstClientId ],
+							_clientId,
+							targetRootClientId,
+							getBlockIndex( _clientId )
+						);
+					} else {
+						const replacement = switchToBlockType(
+							getBlock( firstClientId ),
+							getDefaultBlockName()
+						);
+
+						if ( replacement && replacement.length ) {
+							registry.batch( () => {
+								insertBlocks(
+									replacement,
+									getBlockIndex( _clientId ),
+									targetRootClientId,
+									changeSelection
+								);
+								removeBlock( firstClientId, false );
+							} );
+						}
+					}
+
+					if (
+						! getBlockOrder( _clientId ).length &&
+						isUnmodifiedBlock( getBlock( _clientId ) )
+					) {
+						removeBlock( _clientId, false );
+					}
+				}
+			}
+
 			// For `Delete` or forward merge, we should do the exact same thing
 			// as `Backspace`, but from the other block.
 			if ( forward ) {
@@ -404,15 +455,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					return;
 				}
 
-				// Check if it's possibile to "unwrap" the following block
-				// before trying to merge.
-				const replacement = switchToBlockType(
-					getBlock( nextBlockClientId ),
-					'*'
-				);
-
-				if ( replacement && replacement.length ) {
-					replaceBlocks( nextBlockClientId, replacement );
+				if ( getBlockOrder( nextBlockClientId ).length ) {
+					moveFirstItemUp( nextBlockClientId, false );
 				} else {
 					mergeBlocks( clientId, nextBlockClientId );
 				}
@@ -457,47 +501,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 						}
 					}
 
-					const targetRootClientId =
-						getBlockRootClientId( rootClientId );
-
-					if ( isUnmodifiedBlock( getBlock( clientId ) ) ) {
-						removeBlock( rootClientId );
-					} else {
-						if (
-							canInsertBlockType(
-								getBlockName( clientId ),
-								targetRootClientId
-							)
-						) {
-							moveBlocksToPosition(
-								[ clientId ],
-								rootClientId,
-								targetRootClientId,
-								getBlockIndex( rootClientId )
-							);
-						} else {
-							const replacement = switchToBlockType(
-								getBlock( clientId ),
-								getDefaultBlockName()
-							);
-
-							if ( replacement && replacement.length ) {
-								registry.batch( () => {
-									insertBlocks(
-										replacement,
-										getBlockIndex( rootClientId ),
-										targetRootClientId,
-										true
-									);
-									removeBlock( clientId, false );
-								} );
-							}
-						}
-
-						if ( ! getBlockOrder( rootClientId ).length ) {
-							removeBlock( rootClientId, false );
-						}
-					}
+					moveFirstItemUp( rootClientId );
 				}
 			}
 		},
