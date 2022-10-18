@@ -13,6 +13,7 @@ import { isReusableBlock, getBlockType } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 /**
  * Returns the class names used for the different states of the block.
@@ -26,6 +27,7 @@ export function useBlockClassNames( clientId ) {
 		( select ) => {
 			const {
 				isBlockBeingDragged,
+				isBlockInterfaceHidden,
 				isBlockHighlighted,
 				isBlockSelected,
 				isBlockMultiSelected,
@@ -35,7 +37,7 @@ export function useBlockClassNames( clientId ) {
 				isTyping,
 				__unstableIsFullySelected,
 				__unstableSelectionHasUnmergeableBlock,
-			} = select( blockEditorStore );
+			} = unlock( select( blockEditorStore ) );
 			const { outlineMode } = getSettings();
 			const isDragging = isBlockBeingDragged( clientId );
 			const isSelected = isBlockSelected( clientId );
@@ -47,6 +49,7 @@ export function useBlockClassNames( clientId ) {
 				checkDeep
 			);
 			const isMultiSelected = isBlockMultiSelected( clientId );
+
 			return classnames( {
 				'is-selected': isSelected,
 				'is-highlighted': isBlockHighlighted( clientId ),
@@ -59,6 +62,7 @@ export function useBlockClassNames( clientId ) {
 				'is-dragging': isDragging,
 				'has-child-selected': isAncestorOfSelectedBlock,
 				'remove-outline': isSelected && outlineMode && isTyping(),
+				'hide-block-border': isBlockInterfaceHidden(),
 			} );
 		},
 		[ clientId ]

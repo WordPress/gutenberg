@@ -1,0 +1,28 @@
+
+.block-editor-alignment-visualizer {
+	z-index: 0;
+}
+.block-editor-alignment-visualizer__cover-element {
+	z-index: 0;
+
+	&::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background-color: var(--contrast-color);
+		opacity: 0.05;
+
+	}
+}
+
+.block-editor__alignment-visualizer-guide__label {
+	// Values match capitalized label style.
+	font-size: 11px;
+	font-weight: 500;
+	text-transform: uppercase;
+	white-space: nowrap;
+	margin: $grid-unit-05 0;
+}

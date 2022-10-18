@@ -3,6 +3,7 @@ export { default as documentHasTextSelection } from './document-has-text-selecti
 export { default as documentHasUncollapsedSelection } from './document-has-uncollapsed-selection';
 export { default as documentHasSelection } from './document-has-selection';
 export { default as getRectangleFromRange } from './get-rectangle-from-range';
+export { default as getScreenRect } from './get-screen-rect';
 export { default as getScrollContainer } from './get-scroll-container';
 export { default as getOffsetParent } from './get-offset-parent';
 export { default as isEntirelySelected } from './is-entirely-selected';

@@ -124,6 +124,20 @@ _Returns_
 
 -   `DOMRect?`: The rectangle.
 
+### getScreenRect
+
+Gets an element's true screen space rect, offsetting any intervening iFrames
+in the element's ancestry.
+
+_Parameters_
+
+-   _element_ `Element`: The dom element to return the rect.
+-   _rect_ `?DOMRect`: The rect to offset. Only use if you already have `element`'s rect, this will save a call to `getBoundingClientRect`.
+
+_Returns_
+
+-   `DOMRect|undefined`: The rect offset by any parent iFrames.
+
 ### getScrollContainer
 
 Given a DOM node, finds the closest scrollable container node or the node itself, if scrollable.
