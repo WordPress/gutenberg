@@ -290,7 +290,7 @@ describe( 'omitStyle', () => {
 		expect( omitStyle( style, path ) ).toEqual( expected );
 	} );
 
-	it( 'should paths with different nesting', () => {
+	it( 'should remove paths with different nesting', () => {
 		const style = {
 			color: {
 				text: '#d92828',
