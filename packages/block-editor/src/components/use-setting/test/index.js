@@ -17,7 +17,7 @@ let selectMock = {};
 const setupSelectMock = () => {
 	selectMock = {
 		getSettings: () => ( {} ),
-		// getBlockParents: () => [],
+		getBlockParents: () => [],
 		getBlockName: () => '',
 	};
 };
@@ -62,7 +62,7 @@ describe( 'useSetting', () => {
 		expect( useSetting( 'layout.contentSize' ) ).toBe( '840px' );
 	} );
 
-	it( 'uses hook override', () => {
+	it( 'uses blockEditor.useSetting.before hook override', () => {
 		mockSettings( {
 			blocks: {
 				'core/test-block': {
