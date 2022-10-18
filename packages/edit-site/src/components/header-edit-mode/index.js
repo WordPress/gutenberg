@@ -26,8 +26,6 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { store as editorStore } from '@wordpress/editor';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -37,7 +35,6 @@ import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
-import TemplateDetails from '../template-details';
 import { store as editSiteStore } from '../../store';
 
 const preventDefault = ( event ) => {
@@ -52,13 +49,10 @@ export default function Header( {
 	const inserterButton = useRef();
 	const {
 		deviceType,
-		entityTitle,
-		template,
 		templateType,
 		isInserterOpen,
 		isListViewOpen,
 		listViewShortcut,
-		isLoaded,
 		isVisualMode,
 		settings,
 		blockEditorMode,
@@ -66,28 +60,18 @@ export default function Header( {
 		const {
 			__experimentalGetPreviewDeviceType,
 			getEditedPostType,
-			getEditedPostId,
 			isInserterOpened,
 			isListViewOpened,
 			getEditorMode,
 			getSettings,
 		} = select( editSiteStore );
-		const { getEditedEntityRecord } = select( coreStore );
-		const { __experimentalGetTemplateInfo: getTemplateInfo } =
-			select( editorStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 
 		const postType = getEditedPostType();
-		const postId = getEditedPostId();
-		const record = getEditedEntityRecord( 'postType', postType, postId );
-		const _isLoaded = !! postId;
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
-			entityTitle: getTemplateInfo( record ).title,
-			isLoaded: _isLoaded,
-			template: record,
 			templateType: postType,
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
@@ -218,23 +202,7 @@ export default function Header( {
 			</NavigableToolbar>
 
 			<div className="edit-site-header-edit-mode__center">
-				<DocumentActions
-					entityTitle={ entityTitle }
-					entityLabel={
-						templateType === 'wp_template_part'
-							? 'template part'
-							: 'template'
-					}
-					isLoaded={ isLoaded }
-					showIconLabels={ showIconLabels }
-				>
-					{ ( { onClose } ) => (
-						<TemplateDetails
-							template={ template }
-							onClose={ onClose }
-						/>
-					) }
-				</DocumentActions>
+				<DocumentActions />
 			</div>
 
 			<div className="edit-site-header-edit-mode__end">
