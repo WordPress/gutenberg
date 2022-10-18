@@ -333,14 +333,23 @@ export default function Image( {
 						onChange={ updateAlignment }
 					/>
 				) }
-				{ ! isContentLocked && ! caption && (
+				{ ! isContentLocked && (
 					<ToolbarButton
 						onClick={ () => {
 							setShowCaption( ! showCaption );
+							if (
+								showCaption &&
+								! RichText.isEmpty( caption )
+							) {
+								setAttributes( { caption: undefined } );
+							}
 						} }
 						icon={ captionIcon }
-						disabled={ showCaption }
-						label={ __( 'Add caption' ) }
+						label={
+							showCaption
+								? __( 'Remove caption' )
+								: __( 'Add caption' )
+						}
 					/>
 				) }
 				{ ! multiImageSelection && ! isEditingImage && (
