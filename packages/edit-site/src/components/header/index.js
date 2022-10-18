@@ -18,6 +18,7 @@ import HeaderEditMode from '../header-edit-mode';
 import SiteIconAndTitle from '../site-icon-and-title';
 import SaveButton from '../save-button';
 import DocumentActions from '../header-edit-mode/document-actions';
+import HomeButton from '../home-button';
 
 export default function Header() {
 	const { canvasMode } = useSelect(
@@ -32,7 +33,6 @@ export default function Header() {
 	return (
 		<HStack
 			className={ `edit-site-header-wrapper is-canvas-mode-${ canvasMode }` }
-			spacing={ 0 }
 		>
 			<Button
 				className={ `edit-site-header__toggle is-canvas-mode-${ canvasMode }` }
@@ -57,7 +57,9 @@ export default function Header() {
 				{ canvasMode === 'edit' && <HeaderEditMode /> }
 				{ canvasMode === 'view' && (
 					<HStack justify="space-between">
-						<div></div>
+						<div>
+							<HomeButton />
+						</div>
 						<DocumentActions showDropdown={ false } />
 						<SaveButton />
 					</HStack>
