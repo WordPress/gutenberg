@@ -424,7 +424,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output'             => 'clamp(21px, 1.313rem + ((1vw - 7.68px) * 2.524), 42px)',
 			),
 
-			'return_default_value_if_min_font_size_is_greater_than_max' => array(
+			'return_clamped_value_if_min_font_size_is_greater_than_max' => array(
 				'font_size'                   => array(
 					'size'  => '3rem',
 					'fluid' => array(
@@ -433,7 +433,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					),
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => '3rem',
+				'expected_output'             => 'clamp(5rem, 5rem + ((1vw - 0.48rem) * -5.769), 32px)',
 			),
 
 			'return_size_with_invalid_fluid_units'        => array(

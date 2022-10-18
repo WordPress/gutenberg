@@ -375,7 +375,7 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 	 */
 	$font_size_unit = isset( $minimum_font_size['unit'] ) ? $minimum_font_size['unit'] : 'rem';
 
-	// Grab the maximum font size and normalize it in order to use the value for calculations.
+	// Grabs the maximum font size and normalize it in order to use the value for calculations.
 	$maximum_font_size = gutenberg_get_typography_value_and_unit(
 		$maximum_font_size_raw,
 		array(
@@ -385,11 +385,6 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 
 	// Checks for mandatory min and max sizes, and protects against unsupported units.
 	if ( ! $maximum_font_size || ! $minimum_font_size ) {
-		return null;
-	}
-
-	// Min font size should not be greater than max font size.
-	if ( $minimum_font_size['value'] > $maximum_font_size['value'] ) {
 		return null;
 	}
 
@@ -489,6 +484,11 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 		return $preset['size'];
 	}
 
+	// If no fluid max font size is available, create one using max font size factor.
+	if ( ! $maximum_font_size_raw ) {
+		$maximum_font_size_raw = round( $preferred_size['value'] * $default_maximum_font_size_factor, 3 ) . $preferred_size['unit'];
+	}
+
 	// If no fluid min font size is available, create one using min font size factor.
 	if ( ! $minimum_font_size_raw ) {
 		$minimum_font_size_raw = round( $preferred_size['value'] * $default_minimum_font_size_factor, 3 ) . $preferred_size['unit'];
@@ -519,18 +519,13 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 			);
 
 			/*
-			 * Otherwise, if the passed or calculated minimum font size is lower than $minimum_font_size_limit
+			 * If the passed or calculated minimum font size is lower than $minimum_font_size_limit
 			 * use $minimum_font_size_limit instead.
 			 */
 			if ( ! empty( $minimum_font_size_parsed ) && $minimum_font_size_parsed['value'] < $minimum_font_size_limit['value'] ) {
 				$minimum_font_size_raw = implode( '', $minimum_font_size_limit );
 			}
 		}
-	}
-
-	// If no fluid max font size is available, create one using max font size factor.
-	if ( ! $maximum_font_size_raw ) {
-		$maximum_font_size_raw = round( $preferred_size['value'] * $default_maximum_font_size_factor, 3 ) . $preferred_size['unit'];
 	}
 
 	$fluid_font_size_value = gutenberg_get_computed_fluid_typography_value(

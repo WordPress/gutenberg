@@ -160,7 +160,7 @@ describe( 'typography utils', () => {
 
 			{
 				message:
-					'Should return default value if min font size is greater than max.',
+					'return clamped value if min font size is greater than max.',
 				preset: {
 					size: '3rem',
 					fluid: {
@@ -171,7 +171,8 @@ describe( 'typography utils', () => {
 				typographySettings: {
 					fluid: true,
 				},
-				expected: '3rem',
+				expected:
+					'clamp(5rem, 5rem + ((1vw - 0.48rem) * -5.769), 32px)',
 			},
 
 			{

@@ -148,7 +148,7 @@ export function getComputedFluidTypographyValue( {
 	// otherwise the result will not be accurate.
 	const fontSizeUnit = minimumFontSizeParsed?.unit || 'rem';
 
-	// Grab the maximum font size and normalize it in order to use the value for calculations.
+	// Grabs the maximum font size and normalize it in order to use the value for calculations.
 	const maximumFontSizeParsed = getTypographyValueAndUnit( maximumFontSize, {
 		coerceTo: fontSizeUnit,
 	} );
@@ -158,12 +158,7 @@ export function getComputedFluidTypographyValue( {
 		return null;
 	}
 
-	// Max font size should not be greater than min font size.
-	if ( minimumFontSizeParsed.value > maximumFontSizeParsed.value ) {
-		return null;
-	}
-
-	// Use rem for accessible fluid target font scaling.
+	// Uses rem for accessible fluid target font scaling.
 	const minimumFontSizeRem = getTypographyValueAndUnit(
 		minimumFontSizeValue,
 		{
