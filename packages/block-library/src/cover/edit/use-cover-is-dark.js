@@ -19,7 +19,7 @@ import { applyFilters } from '@wordpress/hooks';
  * @param {import('colord').RgbaColor} dest Destination color.
  * @return {import('colord').RgbaColor} Composite color.
  */
-function compositeOver( source, dest ) {
+function compositeSourceOver( source, dest ) {
 	return {
 		r: source.r * source.a + dest.r * dest.a * ( 1 - source.a ),
 		g: source.g * source.a + dest.g * dest.a * ( 1 - source.a ),
@@ -75,14 +75,14 @@ export default function useCoverIsDark(
 				} )
 				.then( ( { value: [ r, g, b, a ] } ) => {
 					const media = { r, g, b, a: a / 255 };
-					const composite = compositeOver( overlay, media );
+					const composite = compositeSourceOver( overlay, media );
 					setIsDark( colord( composite ).isDark() );
 				} );
 		} else {
 			// Assume a white background because it isn't easy to get the actual
 			// parent background color.
 			const background = { r: 255, g: 255, b: 255, a: 1 };
-			const composite = compositeOver( overlay, background );
+			const composite = compositeSourceOver( overlay, background );
 			setIsDark( colord( composite ).isDark() );
 		}
 	}, [ overlayColor, dimRatio, url, setIsDark ] );
