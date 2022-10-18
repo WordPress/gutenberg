@@ -27,14 +27,14 @@ async function clone( repositoryUrl ) {
 	return gitWorkingDirectoryPath;
 }
 
-async function cloneAt( repositoryUrl, ref ) {
+async function cloneAt( repositoryUrl, ref, sha ) {
 	const gitWorkingDirectoryPath = getRandomTemporaryPath();
 	fs.mkdirSync( gitWorkingDirectoryPath, { recursive: true } );
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.init( false );
+	await simpleGit.init();
 	await simpleGit.addRemote( 'origin', repositoryUrl );
 	await simpleGit.fetch( 'origin', ref, [ '--depth=1' ] );
-	await simpleGit.checkout( 'origin', ref );
+	await simpleGit.checkout( 'origin', sha );
 	return gitWorkingDirectoryPath;
 }
 
