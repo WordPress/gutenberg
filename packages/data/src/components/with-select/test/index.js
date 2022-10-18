@@ -21,12 +21,8 @@ import { RegistryProvider } from '../../registry-provider';
 jest.useRealTimers();
 
 describe( 'withSelect', () => {
-	let registry;
-	beforeEach( () => {
-		registry = createRegistry();
-	} );
-
 	it( 'passes the relevant data to the component', () => {
+		const registry = createRegistry();
 		registry.registerStore( 'reactReducer', {
 			reducer: () => ( { reactKey: 'reactState' } ),
 			selectors: {
@@ -70,6 +66,7 @@ describe( 'withSelect', () => {
 
 	it( 'should rerun selection on state changes', async () => {
 		const user = userEvent.setup();
+		const registry = createRegistry();
 		registry.registerStore( 'counter', {
 			reducer: ( state = 0, action ) => {
 				if ( action.type === 'increment' ) {
@@ -225,6 +222,7 @@ describe( 'withSelect', () => {
 	} );
 
 	it( 'should rerun selection on props changes', () => {
+		const registry = createRegistry();
 		registry.registerStore( 'counter', {
 			reducer: ( state = 0, action ) => {
 				if ( action.type === 'increment' ) {
@@ -273,6 +271,7 @@ describe( 'withSelect', () => {
 	} );
 
 	it( 'should not run selection if props have not changed', () => {
+		const registry = createRegistry();
 		registry.registerStore( 'unchanging', {
 			reducer: ( state = {} ) => state,
 			selectors: {
@@ -314,6 +313,7 @@ describe( 'withSelect', () => {
 	} );
 
 	it( 'should not rerender if state has changed but merge props the same', () => {
+		const registry = createRegistry();
 		registry.registerStore( 'demo', {
 			reducer: () => ( {} ),
 			selectors: {
@@ -352,6 +352,7 @@ describe( 'withSelect', () => {
 	} );
 
 	it( 'should render if props have changed but not state', () => {
+		const registry = createRegistry();
 		registry.registerStore( 'unchanging', {
 			reducer: ( state = {} ) => state,
 			selectors: {
@@ -389,6 +390,7 @@ describe( 'withSelect', () => {
 	} );
 
 	it( 'should not rerun selection on unchanging state', () => {
+		const registry = createRegistry();
 		const store = registry.registerStore( 'unchanging', {
 			reducer: ( state = {} ) => state,
 			selectors: {
@@ -422,6 +424,7 @@ describe( 'withSelect', () => {
 	} );
 
 	it( 'omits props which are not returned on subsequent mappings', () => {
+		const registry = createRegistry();
 		registry.registerStore( 'demo', {
 			reducer: ( state = 'OK' ) => state,
 			selectors: {
@@ -478,6 +481,7 @@ describe( 'withSelect', () => {
 	} );
 
 	it( 'allows undefined return from mapSelectToProps', () => {
+		const registry = createRegistry();
 		registry.registerStore( 'demo', {
 			reducer: ( state = 'OK' ) => state,
 			selectors: {
@@ -535,6 +539,7 @@ describe( 'withSelect', () => {
 	} );
 
 	it( 'should limit unnecessary selections run on children', () => {
+		const registry = createRegistry();
 		registry.registerStore( 'childRender', {
 			reducer: ( state = true, action ) =>
 				action.type === 'TOGGLE_RENDER' ? ! state : state,
