@@ -1090,9 +1090,11 @@ test.describe( 'List', () => {
 <p></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p>2</p>
-<!-- /wp:paragraph -->`
+<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
 		);
 	} );
 

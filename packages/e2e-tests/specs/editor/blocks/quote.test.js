@@ -191,9 +191,9 @@ describe( 'Quote', () => {
 		<p>1</p>
 		<!-- /wp:paragraph -->
 
-		<!-- wp:paragraph -->
-		<p>2</p>
-		<!-- /wp:paragraph -->"
+		<!-- wp:quote -->
+		<blockquote class=\\"wp-block-quote\\"><cite>2</cite></blockquote>
+		<!-- /wp:quote -->"
 	` );
 	} );
 } );
