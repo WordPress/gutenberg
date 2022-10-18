@@ -191,23 +191,14 @@ export function MarginVisualizer( { clientId, attributes, isMouseOver } ) {
 			: 0;
 
 		return {
-			borderTopWidth: marginTop ? marginTop : 0,
-			borderRightWidth: marginRight ? marginRight : 0,
-			borderBottomWidth: marginBottom ? marginBottom : 0,
-			borderLeftWidth: marginLeft ? marginLeft : 0,
-			top: marginTop && marginTop !== 0 ? `calc(${ marginTop } * -1)` : 0,
-			right:
-				marginRight && marginRight !== 0
-					? `calc(${ marginRight } * -1)`
-					: 0,
-			bottom:
-				marginBottom && marginBottom !== 0
-					? `calc(${ marginBottom } * -1)`
-					: 0,
-			left:
-				marginLeft && marginLeft !== 0
-					? `calc(${ marginLeft } * -1)`
-					: 0,
+			borderTopWidth: marginTop,
+			borderRightWidth: marginRight,
+			borderBottomWidth: marginBottom,
+			borderLeftWidth: marginLeft,
+			top: marginTop ? `calc(${ marginTop } * -1)` : 0,
+			right: marginRight ? `calc(${ marginRight } * -1)` : 0,
+			bottom: marginBottom ? `calc(${ marginBottom } * -1)` : 0,
+			left: marginLeft ? `calc(${ marginLeft } * -1)` : 0,
 		};
 	}, [ margin ] );
 

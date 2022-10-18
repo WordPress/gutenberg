@@ -4,8 +4,7 @@
 
 ### New Feature
 
--   `CustomSelectControl`: Add `onMouseOver` and `onMouseOut` callback props to allow handling of these events by parent coomponents ([#44955](https://github.com/WordPress/gutenberg/pull/44955))
--   `BoxControl`: Add `onMouseOver` and `onMouseOut` callback props to allow handling of these events by parent coomponents ([#44955](https://github.com/WordPress/gutenberg/pull/44955))
+-   `BoxControl` & `CustomSelectControl`: Add `onMouseOver` and `onMouseOut` callback props to allow handling of these events by parent components ([#44955](https://github.com/WordPress/gutenberg/pull/44955))
 
 ## 21.3.0 (2022-10-19)
 
