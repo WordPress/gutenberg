@@ -44,9 +44,11 @@ export function useNavigateRegions( shortcuts = defaultShortcuts ) {
 			return;
 		}
 		let nextRegion = regions[ 0 ];
-		// Based off the current element, use closest to determine the wrapping region since this operates up the DOM.
+		// Based off the current element, use closest to determine the wrapping region since this operates up the DOM. Also, match tabindex to avoid edge cases with regions we do not want.
 		const selectedIndex = regions.indexOf(
-			ref.current.ownerDocument.activeElement.closest( '[role="region"]' )
+			ref.current.ownerDocument.activeElement.closest(
+				'[role="region"][tabindex="-1"]'
+			)
 		);
 		if ( selectedIndex !== -1 ) {
 			let nextIndex = selectedIndex + offset;
