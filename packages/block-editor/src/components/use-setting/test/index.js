@@ -17,7 +17,7 @@ let selectMock = {};
 const setupSelectMock = () => {
 	selectMock = {
 		getSettings: () => ( {} ),
-		getBlockParents: () => [],
+		// getBlockParents: () => [],
 		getBlockName: () => '',
 	};
 };
@@ -30,21 +30,9 @@ const mockSettings = ( settings ) => {
 	} );
 };
 
-const mockBlockName = ( blockClientId, blockName ) => {
-	selectMock.getBlockName = ( clientId ) => {
-		if ( clientId === blockClientId ) {
-			return blockName;
-		}
-	};
-};
-
 const mockCurrentBlockContext = (
 	blockContext = { name: '', isSelected: false }
 ) => {
-	if ( blockContext.name !== '' && blockContext.clientID !== undefined ) {
-		mockBlockName( blockContext.clientID, blockContext.name );
-	}
-
 	jest.spyOn( BlockEditContext, 'useBlockEditContext' ).mockReturnValue(
 		blockContext
 	);
@@ -53,7 +41,7 @@ const mockCurrentBlockContext = (
 describe( 'useSetting', () => {
 	beforeEach( () => {
 		setupSelectMock();
-		mockCurrentBlockContext( {} );
+		mockCurrentBlockContext();
 	} );
 
 	it( 'uses block setting', () => {
