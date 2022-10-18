@@ -95,7 +95,7 @@ export function getComputedFluidTypographyValue( {
 		if ( !! minimumFontSizeLimitParsed?.value ) {
 			/*
 			 * If a minimum size was not passed to this function
-			 * and the user-defined font size is lower than $minimum_font_size_limit,
+			 * and the user-defined font size is lower than `minimumFontSizeLimit`,
 			 * then uses the user-defined font size as the minimum font-size.
 			 */
 			if (
@@ -112,8 +112,8 @@ export function getComputedFluidTypographyValue( {
 				);
 
 				/*
-				 * Otherwise, if the passed or calculated minimum font size is lower than $minimum_font_size_limit
-				 * use $minimum_font_size_limit instead.
+				 * Otherwise, if the passed or calculated minimum font size is lower than `minimumFontSizeLimit`
+				 * use `minimumFontSizeLimit` instead.
 				 */
 				if (
 					!! minimumFontSizeParsed?.value &&
