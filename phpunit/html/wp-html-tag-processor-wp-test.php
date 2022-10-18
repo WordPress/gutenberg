@@ -62,7 +62,7 @@ class WP_HTML_Tag_Processor_Test_WP extends WP_UnitTestCase {
 		 * over the content and because we want to look at the raw values.
 		 */
 		$match = null;
-		preg_match( '~^<div test=(.*)></div>$~', (string) $p, $match );
+		preg_match( '~^<div test=(.*)></div>$~', $p->get_updated_html(), $match );
 		list( , $actual_value ) = $match;
 
 		$this->assertEquals( $actual_value, '"' . $expected_result . '"' );

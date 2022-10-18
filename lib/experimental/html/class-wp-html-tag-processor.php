@@ -55,7 +55,7 @@
  * no argument is provided then it will find the next HTML tag,
  * regardless of what kind it is.
  *
- * If you want to _find whatever the next tag is_
+ * If you want to _find whatever the next tag is_:
  * ```php
  *     $tags->next();
  * ```
@@ -411,7 +411,7 @@ class WP_HTML_Tag_Processor {
 			$this->parse_tag_opener_attributes();
 
 			if ( $this->matches() ) {
-				$already_found++;
+				++$already_found;
 			}
 
 			// Avoid copying the tag name string when possible.
@@ -490,7 +490,7 @@ class WP_HTML_Tag_Processor {
 			$at = $this->parsed_bytes;
 
 			if ( '>' === $html[ $at ] || '/' === $html[ $at ] ) {
-				$this->parsed_bytes++;
+				++$this->parsed_bytes;
 				return;
 			}
 		}
@@ -556,7 +556,7 @@ class WP_HTML_Tag_Processor {
 
 			if ( '/' === $html[ $at ] ) {
 				$is_closing = true;
-				$at++;
+				++$at;
 			} else {
 				$is_closing = false;
 			}
@@ -576,7 +576,7 @@ class WP_HTML_Tag_Processor {
 				( 'p' === $html[ $at + 4 ] || 'P' === $html[ $at + 4 ] ) &&
 				( 't' === $html[ $at + 5 ] || 'T' === $html[ $at + 5 ] )
 			) ) {
-				$at++;
+				++$at;
 				continue;
 			}
 
@@ -587,7 +587,7 @@ class WP_HTML_Tag_Processor {
 			$at += 6;
 			$c   = $html[ $at ];
 			if ( ' ' !== $c && "\t" !== $c && "\r" !== $c && "\n" !== $c && '/' !== $c && '>' !== $c ) {
-				$at++;
+				++$at;
 				continue;
 			}
 
@@ -606,12 +606,12 @@ class WP_HTML_Tag_Processor {
 				$this->skip_tag_closer_attributes();
 
 				if ( '>' === $html[ $this->parsed_bytes ] ) {
-					$this->parsed_bytes++;
+					++$this->parsed_bytes;
 					return;
 				}
 			}
 
-			$at++;
+			++$at;
 		}
 	}
 
@@ -646,7 +646,7 @@ class WP_HTML_Tag_Processor {
 			 */
 			$tag_name_prefix_length = strspn( $html, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', $at + 1 );
 			if ( $tag_name_prefix_length > 0 ) {
-				$at++;
+				++$at;
 				$this->tag_name_length    = $tag_name_prefix_length + strcspn( $html, " \t\f\r\n/>", $at + $tag_name_prefix_length );
 				$this->tag_name_starts_at = $at;
 				$this->parsed_bytes       = $at + $this->tag_name_length;
@@ -720,7 +720,7 @@ class WP_HTML_Tag_Processor {
 				continue;
 			}
 
-			$at++;
+			++$at;
 		}
 	}
 
@@ -731,7 +731,7 @@ class WP_HTML_Tag_Processor {
 	 */
 	private function parse_tag_opener_attributes() {
 		while ( $this->parse_next_attribute() ) {
-			// Twiddle our thumbs...
+			continue;
 		}
 	}
 
@@ -742,7 +742,7 @@ class WP_HTML_Tag_Processor {
 	 */
 	private function skip_tag_closer_attributes() {
 		while ( $this->parse_next_attribute( 'tag-closer' ) ) {
-			// Twiddle our thumbs...
+			continue;
 		}
 	}
 
@@ -778,7 +778,7 @@ class WP_HTML_Tag_Processor {
 
 		$has_value = '=' === $this->html[ $this->parsed_bytes ];
 		if ( $has_value ) {
-			$this->parsed_bytes++;
+			++$this->parsed_bytes;
 			$this->skip_whitespace();
 
 			switch ( $this->html[ $this->parsed_bytes ] ) {
@@ -910,7 +910,8 @@ class WP_HTML_Tag_Processor {
 		$modified = false;
 
 		// Remove unwanted classes by only copying the new ones.
-		while ( $at < strlen( $existing_class ) ) {
+		$existing_class_length = strlen( $existing_class );
+		while ( $at < $existing_class_length ) {
 			// Skip to the first non-whitespace character.
 			$ws_at     = $at;
 			$ws_length = strspn( $existing_class, " \t\f\r\n", $ws_at );
@@ -996,7 +997,7 @@ class WP_HTML_Tag_Processor {
 		 * out of order, which could otherwise lead to mangled output,
 		 * partially-duplicate attributes, and overwritten attributes.
 		 */
-		usort( $this->attribute_updates, array( 'self', 'sort_start_ascending' ) );
+		usort( $this->attribute_updates, array( self::class, 'sort_start_ascending' ) );
 
 		foreach ( $this->attribute_updates as $diff ) {
 			$this->updated_html .= substr( $this->html, $this->updated_bytes, $diff->start - $this->updated_bytes );
@@ -1102,9 +1103,54 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * @param string         $name  The attribute name to target.
 	 * @param string|boolean $value The new attribute value.
+	 * @throws Exception When WP_DEBUG is true and the attribute name is invalid.
 	 */
 	public function set_attribute( $name, $value ) {
 		if ( null === $this->tag_name_starts_at ) {
+			return;
+		}
+
+		/*
+		 * Verify that the attribute name is allowable. In WP_DEBUG
+		 * environments we want to crash quickly to alert developers
+		 * of typos and issues; but in production we don't want to
+		 * interrupt a normal page view, so we'll silently avoid
+		 * updating the attribute in those cases.
+		 *
+		 * Of note, we're disallowing more characters than are strictly
+		 * forbidden in HTML5. This is to prevent additional security
+		 * risks deeper in the WordPress and plugin stack. Specifically
+		 * we reject the less-than (<) greater-than (>) and ampersand (&).
+		 *
+		 * The use of a PCRE match allows us to look for specific Unicode
+		 * code points without writing a UTF-8 decoder. Whereas scanning
+		 * for one-byte characters is trivial (with `strcspn`), scanning
+		 * for the longer byte sequences would be more complicated, and
+		 * this shouldn't be in the hot path for execution so we can
+		 * compromise on the efficiency at this point.
+		 *
+		 * @see https://html.spec.whatwg.org/#attributes-2
+		 */
+		if ( preg_match(
+			'~[' .
+				// Syntax-like characters.
+				'"\'>&</ =' .
+				// Control characters.
+				'\x{00}-\x{1F}' .
+				// HTML noncharacters.
+				'\x{FDD0}-\x{FDEF}' .
+				'\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}' .
+				'\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}' .
+				'\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}' .
+				'\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}' .
+				'\x{10FFFE}\x{10FFFF}' .
+			']~Ssu',
+			$name
+		) ) {
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				throw new Exception( 'Invalid attribute name' );
+			}
+
 			return;
 		}
 
@@ -1221,13 +1267,24 @@ class WP_HTML_Tag_Processor {
 
 	/**
 	 * Returns the string representation of the HTML Tag Processor.
-	 * It closes the HTML Tag Processor and prevents further lookups and modifications.
+	 *
+	 * @since 6.2.0
+	 * @see get_updated_html
+	 *
+	 * @return string The processed HTML.
+	 */
+	public function __toString() {
+		return $this->get_updated_html();
+	}
+
+	/**
+	 * Returns the string representation of the HTML Tag Processor.
 	 *
 	 * @since 6.2.0
 	 *
 	 * @return string The processed HTML.
 	 */
-	public function __toString() {
+	public function get_updated_html() {
 		// Short-circuit if there are no updates to apply.
 		if ( ! count( $this->classname_updates ) && ! count( $this->attribute_updates ) ) {
 			return $this->updated_html . substr( $this->html, $this->updated_bytes );

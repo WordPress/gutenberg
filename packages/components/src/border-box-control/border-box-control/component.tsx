@@ -46,6 +46,7 @@ const BorderBoxControl = (
 		className,
 		colors,
 		disableCustomColors,
+		disableUnits,
 		enableAlpha,
 		enableStyle,
 		hasMixedBorders,
@@ -100,6 +101,7 @@ const BorderBoxControl = (
 					<BorderControl
 						className={ linkedControlClassName }
 						colors={ colors }
+						disableUnits={ disableUnits }
 						disableCustomColors={ disableCustomColors }
 						enableAlpha={ enableAlpha }
 						enableStyle={ enableStyle }

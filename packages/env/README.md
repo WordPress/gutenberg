@@ -123,7 +123,7 @@ You may also specify the port numbers in your `.wp-env.json` file, but the envir
 
 Restarting `wp-env` will restart the underlying Docker containers which can fix many issues.
 
-To restart `wp-env`, just run `wp-env start` again. It will automatically stop and start the container. If you also pass the `--update` argument, it will download updates and configure WordPress agian.
+To restart `wp-env`, just run `wp-env start` again. It will automatically stop and start the container. If you also pass the `--update` argument, it will download updates and configure WordPress again.
 
 ```sh
 $ wp-env start --update
@@ -312,7 +312,7 @@ Positionals:
 The run command can be used to open shell sessions or invoke WP-CLI commands.
 
 <div class="callout callout-alert">
-In some cases, `wp-env` may consume options that you are attempting to pass to 
+In some cases, `wp-env` may consume options that you are attempting to pass to
 the container. This happens with options that `wp-env` has already declared,
 such as `--debug`, `--help`, and `--version`. When this happens, you should fall
 back to using quotation marks; `wp-env` considers everything inside the

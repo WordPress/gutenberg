@@ -97,6 +97,7 @@ module.exports = {
 							'dropRight',
 							'each',
 							'escapeRegExp',
+							'every',
 							'extend',
 							'findIndex',
 							'findKey',
@@ -134,6 +135,7 @@ module.exports = {
 							'negate',
 							'noop',
 							'nth',
+							'omitBy',
 							'once',
 							'overEvery',
 							'partial',
@@ -164,7 +166,6 @@ module.exports = {
 							'uniqWith',
 							'upperFirst',
 							'values',
-							'words',
 							'xor',
 							'zip',
 						],
@@ -320,6 +321,11 @@ module.exports = {
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
+			files: [ '**/test/**/*.js' ],
+			excludedFiles: [ '**/*.@(android|ios|native).js' ],
+			extends: [ 'plugin:jest-dom/recommended' ],
+		},
+		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
 			excludedFiles: [ 'packages/e2e-test-utils-playwright/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-e2e' ],
@@ -357,7 +363,7 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'bin/**/*.js', 'packages/env/**' ],
+			files: [ 'bin/**/*.js', 'bin/**/*.mjs', 'packages/env/**' ],
 			rules: {
 				'no-console': 'off',
 			},
