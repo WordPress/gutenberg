@@ -114,5 +114,8 @@ function useOnClickOutside( ref, handler ) {
 			document.removeEventListener( 'mousedown', listener );
 			document.removeEventListener( 'touchstart', listener );
 		};
-	}, [ ref, handler ] );
+		// Disable reason: `ref` is a ref object and should not be included in a
+		// hook's dependency list.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ handler ] );
 }
