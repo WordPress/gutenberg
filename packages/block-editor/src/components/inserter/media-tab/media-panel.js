@@ -14,6 +14,7 @@ import MediaList from './media-list';
 import { useMediaResults, useDebouncedInput } from './hooks';
 import InserterNoResults from '../no-results';
 
+const INITIAL_MEDIA_ITEMS_PER_PAGE = 10;
 const EMPTY_ARRAY = [];
 
 export function MediaCategoryDialog( { rootClientId, onInsert, category } ) {
@@ -26,7 +27,7 @@ export function MediaCategoryDialog( { rootClientId, onInsert, category } ) {
 		return () => clearTimeout( timeout );
 	}, [ category ] );
 	return (
-		<div ref={ container }>
+		<div ref={ container } className="block-editor-inserter__media-dialog">
 			<MediaCategoryPanel
 				rootClientId={ rootClientId }
 				onInsert={ onInsert }
@@ -36,7 +37,6 @@ export function MediaCategoryDialog( { rootClientId, onInsert, category } ) {
 	);
 }
 
-const INITIAL_MEDIA_ITEMS_PER_PAGE = 10;
 export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput();
 	const results = useMediaResults( {
