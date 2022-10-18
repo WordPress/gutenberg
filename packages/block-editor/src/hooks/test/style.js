@@ -379,4 +379,24 @@ describe( 'omitStyle', () => {
 		expect( omitStyle( undefined, 'color' ) ).toEqual( undefined );
 		expect( omitStyle( null, 'color' ) ).toEqual( null );
 	} );
+
+	it( 'should ignore a missing object property', () => {
+		const style1 = { typography: {} };
+		expect( omitStyle( style1, 'color' ) ).toEqual( style1 );
+
+		const style2 = { color: { text: '#d92828' } };
+		expect( omitStyle( style2, 'color.something' ) ).toEqual( style2 );
+
+		const style3 = {
+			border: {
+				radius: {
+					topLeft: '10px',
+					topRight: '0.5rem',
+				},
+			},
+		};
+		expect(
+			omitStyle( style3, [ [ 'border', 'radius', 'bottomLeft' ] ] )
+		).toEqual( style3 );
+	} );
 } );
