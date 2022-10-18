@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -110,7 +110,7 @@ describe( 'useSuspenseSelect', () => {
 		);
 
 		const rendered = render( <App /> );
-		await waitFor( () => rendered.getByLabelText( 'loaded' ) );
+		await rendered.findByLabelText( 'loaded' );
 
 		// Verify there were 3 attempts to render. Suspended twice because of
 		// `getToken` and `getData` selectors not being resolved, and then finally
@@ -157,7 +157,7 @@ describe( 'useSuspenseSelect', () => {
 		);
 
 		const rendered = render( <App /> );
-		const label = await waitFor( () => rendered.getByLabelText( 'error' ) );
+		const label = await rendered.findByLabelText( 'error' );
 		expect( label ).toHaveTextContent( 'resolution failed' );
 		expect( console ).toHaveErrored();
 	} );
