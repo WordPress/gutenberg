@@ -111,7 +111,7 @@ describe( 'Gallery', () => {
 
 		const imageListLink = ( await getListViewBlocks( 'Image' ) )[ 0 ];
 		await imageListLink.click();
-		await clickBlockToolbarButton( 'Add caption' );
+		await clickBlockToolbarButton( 'Caption' );
 		const captionElement = await figureElement.$(
 			'.block-editor-rich-text__editable'
 		);
