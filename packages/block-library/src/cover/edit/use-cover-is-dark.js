@@ -73,8 +73,8 @@ export default function useCoverIsDark(
 					silent: process.env.NODE_ENV === 'production',
 					crossOrigin: imgCrossOrigin,
 				} )
-				.then( ( color ) => {
-					const media = colord( color.hex ).toRgb();
+				.then( ( { value: [ r, g, b, a ] } ) => {
+					const media = { r, g, b, a: a / 255 };
 					const composite = compositeOver( overlay, media );
 					setIsDark( colord( composite ).isDark() );
 				} );
