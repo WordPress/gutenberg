@@ -11,6 +11,7 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { applyFilters } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -177,15 +178,26 @@ export const savePost =
 				edits,
 				options
 			);
-		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 
-		const error = registry
+		let error = registry
 			.select( coreStore )
 			.getLastEntitySaveError(
 				'postType',
 				previousRecord.type,
 				previousRecord.id
 			);
+
+		if ( ! error ) {
+			await applyFilters(
+				'editor.SavePost',
+				Promise.resolve(),
+				options
+			).catch( ( err ) => {
+				error = err;
+			} );
+		}
+		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
+
 		if ( error ) {
 			const args = getNotificationArgumentsForSaveFail( {
 				post: previousRecord,
