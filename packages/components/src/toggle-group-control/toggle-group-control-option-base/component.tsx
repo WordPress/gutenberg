@@ -76,10 +76,8 @@ function ToggleGroupControlOptionBase(
 	const cx = useCx();
 	const labelViewClasses = cx( isBlock && styles.labelBlock );
 	const classes = cx(
-		styles.buttonView,
-		isIcon && styles.isIcon( { size } ),
-		className,
-		isPressed && styles.buttonPressed
+		styles.buttonView( { isDeselectable, isIcon, isPressed, size } ),
+		className
 	);
 
 	const buttonOnClick = () => {

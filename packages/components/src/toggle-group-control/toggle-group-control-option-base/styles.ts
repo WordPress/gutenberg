@@ -21,7 +21,17 @@ export const labelBlock = css`
 	flex: 1;
 `;
 
-export const buttonView = css`
+export const buttonView = ( {
+	isDeselectable,
+	isIcon,
+	isPressed,
+	size,
+}: {
+	isDeselectable?: boolean;
+	isIcon?: boolean;
+	isPressed?: boolean;
+	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
+} ) => css`
 	align-items: center;
 	appearance: none;
 	background: transparent;
@@ -53,6 +63,22 @@ export const buttonView = css`
 	&:active {
 		background: ${ CONFIG.toggleGroupControlBackgroundColor };
 	}
+
+	${ isDeselectable && deselectable }
+	${ isIcon && isIconStyles( { size } ) }
+	${ isPressed && pressed }
+`;
+
+const pressed = css`
+	color: ${ COLORS.white };
+
+	&:active {
+		background: transparent;
+	}
+`;
+
+const deselectable = css`
+	color: ${ COLORS.gray[ 900 ] };
 `;
 
 export const ButtonContentView = styled.div`
@@ -60,11 +86,7 @@ export const ButtonContentView = styled.div`
 	line-height: 1;
 `;
 
-export const separatorActive = css`
-	background: transparent;
-`;
-
-export const isIcon = ( {
+const isIconStyles = ( {
 	size,
 }: {
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
@@ -81,11 +103,3 @@ export const isIcon = ( {
 		padding-right: 0;
 	`;
 };
-
-export const buttonPressed = css`
-	color: ${ COLORS.white };
-
-	&:active {
-		background: transparent;
-	}
-`;
