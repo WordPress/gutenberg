@@ -220,7 +220,7 @@ describe( 'Navigation', () => {
 		render( <TestNavigation showBadge /> );
 
 		const menuItem = screen.getAllByRole( 'listitem' );
-		expect( menuItem[ 0 ].textContent ).toBe( 'Item 1' + '21' );
+		expect( menuItem[ 0 ] ).toHaveTextContent( 'Item 1' + '21' );
 	} );
 
 	it( 'should render menu titles when items exist', () => {

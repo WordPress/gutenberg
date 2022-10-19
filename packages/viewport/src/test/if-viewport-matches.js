@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import TestRenderer, { act } from 'react-test-renderer';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
  */
-import { useViewportMatch as useViewportMatchMock } from '@wordpress/compose';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -14,45 +14,32 @@ import { useViewportMatch as useViewportMatchMock } from '@wordpress/compose';
 import '../store';
 import ifViewportMatches from '../if-viewport-matches';
 
+jest.mock( '@wordpress/compose/src/hooks/use-viewport-match' );
+
 describe( 'ifViewportMatches()', () => {
 	const Component = () => <div>Hello</div>;
 
 	afterEach( () => {
-		useViewportMatchMock.mockClear();
+		useViewportMatch.mockClear();
 	} );
 
 	it( 'should not render if query does not match', () => {
-		useViewportMatchMock.mockReturnValueOnce( false );
+		useViewportMatch.mockReturnValueOnce( false );
 		const EnhancedComponent = ifViewportMatches( '< wide' )( Component );
+		render( <EnhancedComponent /> );
 
-		let testRenderer;
-		act( () => {
-			testRenderer = TestRenderer.create( <EnhancedComponent /> );
-		} );
+		expect( useViewportMatch ).toHaveBeenCalledWith( 'wide', '<' );
 
-		expect( useViewportMatchMock.mock.calls ).toEqual( [
-			[ 'wide', '<' ],
-		] );
-
-		expect( testRenderer.root.findAllByType( Component ) ).toHaveLength(
-			0
-		);
+		expect( screen.queryByText( 'Hello' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'should render if query does match', () => {
-		useViewportMatchMock.mockReturnValueOnce( true );
+		useViewportMatch.mockReturnValueOnce( true );
 		const EnhancedComponent = ifViewportMatches( '>= wide' )( Component );
-		let testRenderer;
-		act( () => {
-			testRenderer = TestRenderer.create( <EnhancedComponent /> );
-		} );
+		render( <EnhancedComponent /> );
 
-		expect( useViewportMatchMock.mock.calls ).toEqual( [
-			[ 'wide', '>=' ],
-		] );
+		expect( useViewportMatch ).toHaveBeenCalledWith( 'wide', '>=' );
 
-		expect( testRenderer.root.findAllByType( Component ) ).toHaveLength(
-			1
-		);
+		expect( screen.getByText( 'Hello' ) ).toBeInTheDocument();
 	} );
 } );

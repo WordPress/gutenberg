@@ -111,9 +111,12 @@ describe( 'UnitControl', () => {
 				<UnitControl className="hello" />
 			);
 
-			expect( withoutClassName.firstChild ).toMatchDiffSnapshot(
-				withClassName.firstChild
-			);
+			expect(
+				withoutClassName.querySelector( '.components-unit-control' )
+			).not.toHaveClass( 'hello' );
+			expect(
+				withClassName.querySelector( '.components-unit-control' )
+			).toHaveClass( 'hello' );
 		} );
 
 		it( 'should not render select, if units are disabled', () => {

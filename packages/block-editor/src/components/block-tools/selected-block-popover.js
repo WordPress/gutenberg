@@ -36,6 +36,7 @@ function selector( select ) {
 		isMultiSelecting: isMultiSelecting(),
 		isTyping: isTyping(),
 		hasFixedToolbar: getSettings().hasFixedToolbar,
+		isDistractionFree: getSettings().isDistractionFree,
 		lastClientId: hasMultiSelection()
 			? getLastMultiSelectedBlockClientId()
 			: null,
@@ -46,6 +47,7 @@ function SelectedBlockPopover( {
 	clientId,
 	rootClientId,
 	isEmptyDefaultBlock,
+	showContents, // we may need to mount an empty popover because we reuse
 	capturingClientId,
 	__unstablePopoverSlot,
 	__unstableContentRef,
@@ -55,6 +57,7 @@ function SelectedBlockPopover( {
 		isMultiSelecting,
 		isTyping,
 		hasFixedToolbar,
+		isDistractionFree,
 		lastClientId,
 	} = useSelect( selector, [] );
 	const isInsertionPointVisible = useSelect(
@@ -94,6 +97,7 @@ function SelectedBlockPopover( {
 		editorMode === 'edit' &&
 		! shouldShowContextualToolbar &&
 		! hasFixedToolbar &&
+		! isDistractionFree &&
 		! isEmptyDefaultBlock;
 
 	useShortcut(
@@ -136,7 +140,7 @@ function SelectedBlockPopover( {
 			resize={ false }
 			{ ...popoverProps }
 		>
-			{ shouldShowContextualToolbar && (
+			{ shouldShowContextualToolbar && showContents && (
 				<BlockContextualToolbar
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
@@ -169,6 +173,8 @@ function wrapperSelector( select ) {
 		getBlockRootClientId,
 		getBlock,
 		getBlockParents,
+		getSettings,
+		isNavigationMode: _isNavigationMode,
 		__experimentalGetBlockListSettingsForBlocks,
 	} = select( blockEditorStore );
 
@@ -195,10 +201,14 @@ function wrapperSelector( select ) {
 				?.__experimentalCaptureToolbars
 	);
 
+	const settings = getSettings();
+
 	return {
 		clientId,
 		rootClientId: getBlockRootClientId( clientId ),
 		name,
+		isDistractionFree: settings.isDistractionFree,
+		isNavigationMode: _isNavigationMode(),
 		isEmptyDefaultBlock:
 			name && isUnmodifiedDefaultBlock( { name, attributes } ),
 		capturingClientId,
@@ -221,6 +231,8 @@ export default function WrappedBlockPopover( {
 		name,
 		isEmptyDefaultBlock,
 		capturingClientId,
+		isDistractionFree,
+		isNavigationMode,
 	} = selected;
 
 	if ( ! name ) {
@@ -232,6 +244,7 @@ export default function WrappedBlockPopover( {
 			clientId={ clientId }
 			rootClientId={ rootClientId }
 			isEmptyDefaultBlock={ isEmptyDefaultBlock }
+			showContents={ ! isDistractionFree || isNavigationMode }
 			capturingClientId={ capturingClientId }
 			__unstablePopoverSlot={ __unstablePopoverSlot }
 			__unstableContentRef={ __unstableContentRef }

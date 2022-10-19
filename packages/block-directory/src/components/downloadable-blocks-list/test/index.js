@@ -31,7 +31,7 @@ describe( 'DownloadableBlocksList', () => {
 			isInstallable: true,
 		} ) );
 
-		it( 'should render and empty list', () => {
+		it( 'should render an empty list', () => {
 			const { container } = render(
 				<DownloadableBlocksList
 					items={ [] }
@@ -40,7 +40,7 @@ describe( 'DownloadableBlocksList', () => {
 				/>
 			);
 
-			expect( container.firstChild ).toBe( null );
+			expect( container ).toBeEmptyDOMElement();
 		} );
 
 		it( 'should render plugins items into the list', () => {

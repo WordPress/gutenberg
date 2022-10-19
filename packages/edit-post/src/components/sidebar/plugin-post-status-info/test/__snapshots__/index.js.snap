@@ -2,7 +2,7 @@
 
 exports[`PluginPostStatusInfo renders fill properly 1`] = `
 <div
-  className="components-panel__row my-plugin-post-status-info"
+  class="components-panel__row my-plugin-post-status-info"
 >
   My plugin post status info
 </div>

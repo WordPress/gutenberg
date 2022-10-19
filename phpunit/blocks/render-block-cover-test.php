@@ -42,7 +42,6 @@ class Tests_Blocks_Render_Cover extends WP_UnitTestCase {
 		);
 
 		set_post_thumbnail( self::$post, self::$attachment_id );
-
 	}
 
 	/**
@@ -128,6 +127,5 @@ class Tests_Blocks_Render_Cover extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'object-position', $rendered );
 		$this->assertStringNotContainsString( 'background-image', $rendered );
 		$this->assertStringNotContainsString( 'min-height', $rendered );
-
 	}
 }

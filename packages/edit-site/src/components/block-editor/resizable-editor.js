@@ -57,38 +57,14 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 
 	useEffect(
 		function autoResizeIframeHeight() {
-			const iframe = iframeRef.current;
-
-			if ( ! iframe || ! enableResizing ) {
+			if ( ! iframeRef.current || ! enableResizing ) {
 				return;
 			}
 
-			let timeoutId = null;
+			const iframe = iframeRef.current;
 
-			function resizeHeight() {
-				if ( ! timeoutId ) {
-					// Throttle the updates on timeout. This code previously
-					// used `requestAnimationFrame`, but that seems to not
-					// always work before an iframe is ready.
-					timeoutId = iframe.contentWindow.setTimeout( () => {
-						const { readyState } = iframe.contentDocument;
-
-						// Continue deferring the timeout until the document is ready.
-						// Only then will it have a height.
-						if (
-							readyState !== 'interactive' &&
-							readyState !== 'complete'
-						) {
-							resizeHeight();
-							return;
-						}
-
-						setHeight( iframe.contentDocument.body.scrollHeight );
-						timeoutId = null;
-
-						// 30 frames per second.
-					}, 1000 / 30 );
-				}
+			function setFrameHeight() {
+				setHeight( iframe.contentDocument.body.scrollHeight );
 			}
 
 			let resizeObserver;
@@ -97,28 +73,23 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 				resizeObserver?.disconnect();
 
 				resizeObserver = new iframe.contentWindow.ResizeObserver(
-					resizeHeight
+					setFrameHeight
 				);
 
 				// Observe the body, since the `html` element seems to always
 				// have a height of `100%`.
 				resizeObserver.observe( iframe.contentDocument.body );
-
-				resizeHeight();
+				setFrameHeight();
 			}
 
-			// This is only required in Firefox for some unknown reasons.
 			iframe.addEventListener( 'load', registerObserver );
-			// This is required in Chrome and Safari.
-			registerObserver();
 
 			return () => {
-				iframe.contentWindow?.clearTimeout( timeoutId );
 				resizeObserver?.disconnect();
 				iframe.removeEventListener( 'load', registerObserver );
 			};
 		},
-		[ enableResizing ]
+		[ enableResizing, iframeRef.current ]
 	);
 
 	const resizeWidthBy = useCallback( ( deltaPixels ) => {

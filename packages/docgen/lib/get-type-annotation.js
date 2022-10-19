@@ -405,18 +405,24 @@ function unwrapWrappedSelectors( token ) {
 		return token;
 	}
 
+	if ( babelTypes.isTSAsExpression( token ) ) {
+		// ( ( state, queryId ) => state.queries[ queryId ] ) as any;
+		// \------------------------------------------------/ CallExpression.expression
+		return unwrapWrappedSelectors( token.expression );
+	}
+
 	if ( babelTypes.isCallExpression( token ) ) {
 		// createSelector( ( state, queryId ) => state.queries[ queryId ] );
 		//                 \--------------------------------------------/ CallExpression.arguments[0]
 		if ( token.callee.name === 'createSelector' ) {
-			return token.arguments[ 0 ];
+			return unwrapWrappedSelectors( token.arguments[ 0 ] );
 		}
 
 		// createRegistrySelector( ( selector ) => ( state, queryId ) => select( 'core/queries' ).get( queryId ) );
 		//                                         \-----------------------------------------------------------/ CallExpression.arguments[0].body
 		//                         \---------------------------------------------------------------------------/ CallExpression.arguments[0]
 		if ( token.callee.name === 'createRegistrySelector' ) {
-			return token.arguments[ 0 ].body;
+			return unwrapWrappedSelectors( token.arguments[ 0 ].body );
 		}
 	}
 }

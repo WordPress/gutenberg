@@ -2057,7 +2057,12 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'Pine', 'Pistachio', 'Sage' ];
 
-			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+			render(
+				<>
+					<FormTokenFieldWithState suggestions={ suggestions } />
+					<button>Click me</button>
+				</>
+			);
 
 			// No suggestions visible
 			const input = screen.getByRole( 'combobox' );
@@ -2088,6 +2093,22 @@ describe( 'FormTokenField', () => {
 			);
 			expect( input ).toHaveAttribute( 'aria-expanded', 'true' );
 			expect( input ).toHaveAttribute( 'aria-owns', suggestionList.id );
+			expect( input ).toHaveAttribute(
+				'aria-activedescendant',
+				pineSuggestion.id
+			);
+
+			// Blur the input and make sure that the `aria-activedescendant`
+			// is removed
+			const button = screen.getByRole( 'button', { name: 'Click me' } );
+
+			await user.click( button );
+
+			expect( input ).not.toHaveAttribute( 'aria-activedescendant' );
+
+			// Focus the input again, `aria-activedescendant` should be added back.
+			await user.click( input );
+
 			expect( input ).toHaveAttribute(
 				'aria-activedescendant',
 				pineSuggestion.id

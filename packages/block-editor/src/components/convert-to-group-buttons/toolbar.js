@@ -14,7 +14,7 @@ import { useConvertToGroupButtonProps } from '../convert-to-group-buttons';
 import { store as blockEditorStore } from '../../store';
 
 const layouts = {
-	group: undefined,
+	group: { type: 'constrained' },
 	row: { type: 'flex', flexWrap: 'nowrap' },
 	stack: { type: 'flex', orientation: 'vertical' },
 };
@@ -40,11 +40,15 @@ function BlockGroupToolbar() {
 		[ clientIds, groupingBlockName ]
 	);
 
-	const onConvertToGroup = ( layout = 'group' ) => {
+	const onConvertToGroup = ( layout ) => {
 		const newBlocks = switchToBlockType(
 			blocksSelection,
 			groupingBlockName
 		);
+
+		if ( typeof layout !== 'string' ) {
+			layout = 'group';
+		}
 
 		if ( newBlocks && newBlocks.length > 0 ) {
 			// Because the block is not in the store yet we can't use

@@ -29,6 +29,7 @@ async function initBlockJSON( {
 	editorScript,
 	editorStyle,
 	style,
+	customBlockJSON,
 } ) {
 	info( '' );
 	info( 'Creating a "block.json" file.' );
@@ -56,6 +57,7 @@ async function initBlockJSON( {
 					editorScript,
 					editorStyle,
 					style,
+					...customBlockJSON,
 				} ).filter( ( [ , value ] ) => !! value )
 			),
 			null,

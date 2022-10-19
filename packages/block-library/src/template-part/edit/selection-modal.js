@@ -7,10 +7,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { useAsyncList } from '@wordpress/compose';
-import {
-	__experimentalBlockPatternsList as BlockPatternsList,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import {
 	SearchControl,
 	__experimentalHStack as HStack,
@@ -36,9 +33,6 @@ export default function TemplatePartSelectionModal( {
 } ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
 
-	// When the templatePartId is undefined,
-	// it means the user is creating a new one from the placeholder.
-	const isReplacingTemplatePartContent = !! templatePartId;
 	const { templateParts } = useAlternativeTemplateParts(
 		area,
 		templatePartId
@@ -62,7 +56,6 @@ export default function TemplatePartSelectionModal( {
 	const shownBlockPatterns = useAsyncList( filteredBlockPatterns );
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 
 	const onTemplatePartSelect = useCallback( ( templatePart ) => {
 		setAttributes( {
@@ -121,12 +114,7 @@ export default function TemplatePartSelectionModal( {
 						blockPatterns={ filteredBlockPatterns }
 						shownPatterns={ shownBlockPatterns }
 						onClickPattern={ ( pattern, blocks ) => {
-							if ( isReplacingTemplatePartContent ) {
-								replaceInnerBlocks( clientId, blocks );
-							} else {
-								createFromBlocks( blocks, pattern.title );
-							}
-
+							createFromBlocks( blocks, pattern.title );
 							onClose();
 						} }
 					/>

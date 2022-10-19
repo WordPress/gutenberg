@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalUseSlot as useSlot } from '@wordpress/components';
+import {
+	__experimentalUseSlot as useSlot,
+	__experimentalUseSlotFills as useSlotFills,
+} from '@wordpress/components';
 import warning from '@wordpress/warning';
 
 /**
@@ -18,12 +21,13 @@ export default function InspectorControlsSlot( {
 } ) {
 	const Slot = groups[ group ]?.Slot;
 	const slot = useSlot( Slot?.__unstableName );
+	const fills = useSlotFills( Slot?.__unstableName );
 	if ( ! Slot || ! slot ) {
 		warning( `Unknown InspectorControl group "${ group }" provided.` );
 		return null;
 	}
 
-	const hasFills = Boolean( slot.fills && slot.fills.length );
+	const hasFills = Boolean( fills && fills.length );
 	if ( ! hasFills ) {
 		return null;
 	}

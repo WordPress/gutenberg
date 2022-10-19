@@ -564,7 +564,7 @@ test.describe( 'Widgets Customizer', () => {
 		// (2) We should still be in the "Block Settings" area
 		await expect(
 			page.locator( 'role=button[name="Publish"i]' )
-		).not.toBeDisabled();
+		).toBeEnabled();
 
 		// This fails on 539cea09 and earlier; we get kicked back to the widgets area.
 		// We expect to stay in block settings.

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, reduce } from 'lodash';
+import { reduce } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -57,10 +57,8 @@ export function isUnmodifiedDefaultBlock( block ) {
 	const newDefaultBlock = isUnmodifiedDefaultBlock.block;
 	const blockType = getBlockType( defaultBlockName );
 
-	return every(
-		blockType?.attributes,
-		( value, key ) =>
-			newDefaultBlock.attributes[ key ] === block.attributes[ key ]
+	return Object.keys( blockType?.attributes ?? {} ).every(
+		( key ) => newDefaultBlock.attributes[ key ] === block.attributes[ key ]
 	);
 }
 

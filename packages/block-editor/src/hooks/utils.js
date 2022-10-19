@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pickBy, isEmpty, mapValues, get, setWith, clone, every } from 'lodash';
+import { pickBy, isEmpty, mapValues, get, setWith, clone } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -44,7 +44,11 @@ export function transformStyles(
 	results
 ) {
 	// If there are no active supports return early.
-	if ( every( activeSupports, ( isActive ) => ! isActive ) ) {
+	if (
+		Object.values( activeSupports ?? {} ).every(
+			( isActive ) => ! isActive
+		)
+	) {
 		return result;
 	}
 	// If the condition verifies we are probably in the presence of a wrapping transform

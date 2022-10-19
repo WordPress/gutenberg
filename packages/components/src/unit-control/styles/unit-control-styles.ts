@@ -18,10 +18,6 @@ type SelectProps = {
 	selectSize: SelectSize;
 };
 
-type InputProps = {
-	disableUnits?: boolean;
-};
-
 export const Root = styled.div`
 	box-sizing: border-box;
 	position: relative;
@@ -32,30 +28,14 @@ export const Root = styled.div`
 	}
 `;
 
-const arrowStyles = ( { disableUnits }: InputProps ) => {
-	if ( disableUnits ) return '';
-
-	return css`
-		&::-webkit-outer-spin-button,
-		&::-webkit-inner-spin-button {
-			-webkit-appearance: none;
-			margin: 0;
-		}
-	`;
-};
-
 // TODO: Resolve need to use &&& to increase specificity
 // https://github.com/WordPress/gutenberg/issues/18483
 
 export const ValueInput = styled( NumberControl )`
 	&&& {
 		input {
-			appearance: none;
-			-moz-appearance: textfield;
 			display: block;
 			width: 100%;
-
-			${ arrowStyles };
 		}
 	}
 `;

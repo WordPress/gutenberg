@@ -1,21 +1,26 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
+
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
-} from '@wordpress/components';
+import { BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
+	reset,
 	formatCapitalize,
 	formatLowercase,
 	formatUppercase,
 } from '@wordpress/icons';
 
 const TEXT_TRANSFORMS = [
+	{
+		name: __( 'None' ),
+		value: 'none',
+		icon: reset,
+	},
 	{
 		name: __( 'Uppercase' ),
 		value: 'uppercase',
@@ -36,32 +41,43 @@ const TEXT_TRANSFORMS = [
 /**
  * Control to facilitate text transform selections.
  *
- * @param {Object}   props          Component props.
- * @param {string}   props.value    Currently selected text transform.
- * @param {Function} props.onChange Handles change in text transform selection.
+ * @param {Object}   props           Component props.
+ * @param {string}   props.className Class name to add to the control.
+ * @param {string}   props.value     Currently selected text transform.
+ * @param {Function} props.onChange  Handles change in text transform selection.
  *
  * @return {WPElement} Text transform control.
  */
-export default function TextTransformControl( { value, onChange, ...props } ) {
+export default function TextTransformControl( { className, value, onChange } ) {
 	return (
-		<ToggleGroupControl
-			{ ...props }
-			className="block-editor-text-transform-control"
-			__experimentalIsBorderless
-			label={ __( 'Letter case' ) }
-			value={ value }
-			onChange={ onChange }
+		<fieldset
+			className={ classnames(
+				'block-editor-text-transform-control',
+				className
+			) }
 		>
-			{ TEXT_TRANSFORMS.map( ( textTransform ) => {
-				return (
-					<ToggleGroupControlOptionIcon
-						key={ textTransform.value }
-						value={ textTransform.value }
-						icon={ textTransform.icon }
-						label={ textTransform.name }
-					/>
-				);
-			} ) }
-		</ToggleGroupControl>
+			<BaseControl.VisualLabel as="legend">
+				{ __( 'Letter case' ) }
+			</BaseControl.VisualLabel>
+			<div className="block-editor-text-transform-control__buttons">
+				{ TEXT_TRANSFORMS.map( ( textTransform ) => {
+					return (
+						<Button
+							key={ textTransform.value }
+							icon={ textTransform.icon }
+							label={ textTransform.name }
+							isPressed={ textTransform.value === value }
+							onClick={ () => {
+								onChange(
+									textTransform.value === value
+										? undefined
+										: textTransform.value
+								);
+							} }
+						/>
+					);
+				} ) }
+			</div>
+		</fieldset>
 	);
 }

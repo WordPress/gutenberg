@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -45,10 +45,14 @@ export default ( mapNodeToProps ) =>
 						this.nodeRef,
 						this.props
 					);
+
 					if ( ! isEqual( newFallbackStyles, fallbackStyles ) ) {
 						this.setState( {
 							fallbackStyles: newFallbackStyles,
-							grabStylesCompleted: !! every( newFallbackStyles ),
+							grabStylesCompleted:
+								Object.values( newFallbackStyles ).every(
+									Boolean
+								),
 						} );
 					}
 				}

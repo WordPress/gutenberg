@@ -4,7 +4,7 @@ exports[`PostSavedState returns a disabled button if the post is not saveable 1`
 <button
   aria-disabled="true"
   aria-label="Save draft"
-  class="components-button has-text has-icon"
+  class="components-button has-icon"
   type="button"
 >
   <svg

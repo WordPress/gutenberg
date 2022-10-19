@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useCallback, useEffect, useRef } from '@wordpress/element';
@@ -42,8 +37,7 @@ function isFocusNormalizedButton( eventTarget ) {
 			return true;
 
 		case 'INPUT':
-			return includes(
-				INPUT_BUTTON_TYPES,
+			return INPUT_BUTTON_TYPES.includes(
 				/** @type {HTMLInputElement} */ ( eventTarget ).type
 			);
 	}
@@ -136,7 +130,7 @@ export default function useFocusOutside( onFocusOutside ) {
 	 */
 	const normalizeButtonFocus = useCallback( ( event ) => {
 		const { type, target } = event;
-		const isInteractionEnd = includes( [ 'mouseup', 'touchend' ], type );
+		const isInteractionEnd = [ 'mouseup', 'touchend' ].includes( type );
 
 		if ( isInteractionEnd ) {
 			preventBlurCheck.current = false;

@@ -1,13 +1,6 @@
 /**
- * External dependencies
- */
-
-import { find } from 'lodash';
-
-/**
  * Internal dependencies
  */
-
 import { getActiveFormats } from './get-active-formats';
 
 /** @typedef {import('./create').RichTextValue} RichTextValue */
@@ -26,5 +19,7 @@ import { getActiveFormats } from './get-active-formats';
  *                                    type, or undefined.
  */
 export function getActiveFormat( value, formatType ) {
-	return find( getActiveFormats( value ), { type: formatType } );
+	return getActiveFormats( value )?.find(
+		( { type } ) => type === formatType
+	);
 }

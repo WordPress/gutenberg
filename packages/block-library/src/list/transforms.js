@@ -114,6 +114,17 @@ const transforms = {
 				);
 			},
 		} ) ),
+		{
+			type: 'block',
+			blocks: [ '*' ],
+			transform: ( _attributes, childBlocks ) => {
+				return getListContentFlat( childBlocks ).map( ( content ) =>
+					createBlock( 'core/paragraph', {
+						content,
+					} )
+				);
+			},
+		},
 	],
 };
 

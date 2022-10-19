@@ -52,7 +52,7 @@ const BlockDraggable = ( {
 	}, [] );
 
 	if ( ! isDraggable ) {
-		return children( { isDraggable: false } );
+		return children( { draggable: false } );
 	}
 
 	const transferData = {

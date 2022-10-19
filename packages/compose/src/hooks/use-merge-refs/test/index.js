@@ -41,6 +41,7 @@ describe( 'useMergeRefs', () => {
 		tagName: TagName = 'div',
 		disable1,
 		disable2,
+		unused,
 	} ) {
 		function refCallback1( value ) {
 			refCallback1.history.push( value );
@@ -62,6 +63,10 @@ describe( 'useMergeRefs', () => {
 			! disable1 && ref1,
 			! disable2 && ref2,
 		] );
+
+		if ( unused ) {
+			return <TagName ref={ ref1 } />;
+		}
 
 		return <TagName ref={ mergedRefs } />;
 	}
@@ -325,6 +330,45 @@ describe( 'useMergeRefs', () => {
 			],
 			[ [], [] ],
 			[ [], [ originalElement, null ] ],
+		] );
+	} );
+
+	it( 'should allow the hook being unused', () => {
+		const rootElement = document.getElementById( 'root' );
+
+		ReactDOM.render( <MergedRefs unused />, rootElement );
+
+		const originalElement = rootElement.firstElementChild;
+
+		// Render 1: ref 1 should updated, ref 2 should not.
+		expect( renderCallback.history ).toEqual( [
+			[ [ originalElement ], [] ],
+		] );
+
+		ReactDOM.render( <MergedRefs />, rootElement );
+
+		// Render 2: ref 2 should be updated as well.
+		expect( renderCallback.history ).toEqual( [
+			[ [ originalElement, null, originalElement ], [ originalElement ] ],
+			[ [], [] ],
+		] );
+
+		ReactDOM.render( <MergedRefs unused />, rootElement );
+
+		// Render 3: ref 2 should be updated with null
+		expect( renderCallback.history ).toEqual( [
+			[
+				[
+					originalElement,
+					null,
+					originalElement,
+					null,
+					originalElement,
+				],
+				[ originalElement, null ],
+			],
+			[ [], [] ],
+			[ [], [] ],
 		] );
 	} );
 } );

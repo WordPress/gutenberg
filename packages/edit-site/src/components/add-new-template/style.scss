@@ -158,3 +158,22 @@
 .edit-site-custom-generic-template__modal-actions {
 	margin-top: $grid-unit-15;
 }
+
+.edit-site-template-actions-loading-screen-modal {
+	backdrop-filter: none;
+	background-color: transparent;
+
+	&.is-full-screen {
+		background-color: $white;
+		box-shadow: 0 0 0 transparent;
+		min-width: 100%;
+		min-height: 100%;
+	}
+
+	&__content {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+	}
+}

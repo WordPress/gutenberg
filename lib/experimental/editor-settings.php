@@ -70,7 +70,6 @@ function gutenberg_initialize_editor( $editor_name, $editor_script_handle, $sett
 		'wp-blocks',
 		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( get_block_editor_server_block_settings() ) . ');'
 	);
-
 }
 
 /**

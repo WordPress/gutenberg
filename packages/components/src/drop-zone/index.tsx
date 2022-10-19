@@ -119,7 +119,6 @@ export function DropZoneComponent( {
 	const disableMotion = useReducedMotion();
 
 	let children;
-
 	const backdrop = {
 		hidden: { scaleY: 0, opacity: 0 },
 		show: {
@@ -156,6 +155,10 @@ export function DropZoneComponent( {
 				animate="show"
 				exit={ disableMotion ? 'show' : 'exit' }
 				className="components-drop-zone__content"
+				// Without this, when this div is shown,
+				// Safari calls a onDropZoneLeave causing a loop because of this bug
+				// https://bugs.webkit.org/show_bug.cgi?id=66547
+				style={ { pointerEvents: 'none' } }
 			>
 				<motion.div variants={ foreground }>
 					<Icon

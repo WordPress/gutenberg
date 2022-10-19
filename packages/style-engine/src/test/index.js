@@ -73,13 +73,19 @@ describe( 'generate', () => {
 						letterSpacing: '12px',
 						textTransform: 'uppercase',
 					},
+					outline: {
+						offset: '2px',
+						width: '4px',
+						style: 'dashed',
+						color: 'red',
+					},
 				},
 				{
 					selector: '.some-selector',
 				}
 			)
 		).toEqual(
-			".some-selector { color: #cccccc; background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%); background-color: #111111; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; text-decoration: line-through; text-transform: uppercase; }"
+			".some-selector { color: #cccccc; background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%); background-color: #111111; outline-color: red; outline-style: dashed; outline-offset: 2px; outline-width: 4px; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; text-decoration: line-through; text-transform: uppercase; }"
 		);
 	} );
 
@@ -93,6 +99,19 @@ describe( 'generate', () => {
 			} )
 		).toEqual(
 			'color: var(--wp--preset--color--ham-sandwich); margin: 3px;'
+		);
+	} );
+
+	it( 'should parse preset values and kebab-case the slug', () => {
+		expect(
+			compileCSS( {
+				color: {
+					text: 'var:preset|font-size|h1',
+				},
+				spacing: { margin: { top: 'var:preset|spacing|3XL' } },
+			} )
+		).toEqual(
+			'color: var(--wp--preset--font-size--h-1); margin-top: var(--wp--preset--spacing--3-xl);'
 		);
 	} );
 
@@ -221,6 +240,13 @@ describe( 'getCSSRules', () => {
 						letterSpacing: '12px',
 						textTransform: 'uppercase',
 					},
+					outline: {
+						offset: '2px',
+						width: '4px',
+						style: 'dashed',
+						color: 'red',
+					},
+					shadow: '10px 10px red',
 				},
 				{
 					selector: '.some-selector',
@@ -244,6 +270,26 @@ describe( 'getCSSRules', () => {
 			},
 			{
 				selector: '.some-selector',
+				key: 'outlineColor',
+				value: 'red',
+			},
+			{
+				selector: '.some-selector',
+				key: 'outlineStyle',
+				value: 'dashed',
+			},
+			{
+				selector: '.some-selector',
+				key: 'outlineOffset',
+				value: '2px',
+			},
+			{
+				selector: '.some-selector',
+				key: 'outlineWidth',
+				value: '4px',
+			},
+			{
+				selector: '.some-selector',
 				key: 'marginRight',
 				value: '2em',
 			},
@@ -263,44 +309,49 @@ describe( 'getCSSRules', () => {
 				value: '5px',
 			},
 			{
-				key: 'fontFamily',
 				selector: '.some-selector',
+				key: 'fontFamily',
 				value: "'Helvetica Neue',sans-serif",
 			},
 			{
-				key: 'fontSize',
 				selector: '.some-selector',
+				key: 'fontSize',
 				value: '2.2rem',
 			},
 			{
-				key: 'fontStyle',
 				selector: '.some-selector',
+				key: 'fontStyle',
 				value: 'italic',
 			},
 			{
-				key: 'fontWeight',
 				selector: '.some-selector',
+				key: 'fontWeight',
 				value: '800',
 			},
 			{
-				key: 'letterSpacing',
 				selector: '.some-selector',
+				key: 'letterSpacing',
 				value: '12px',
 			},
 			{
-				key: 'lineHeight',
 				selector: '.some-selector',
+				key: 'lineHeight',
 				value: '3.3',
 			},
 			{
-				key: 'textDecoration',
 				selector: '.some-selector',
+				key: 'textDecoration',
 				value: 'line-through',
 			},
 			{
-				key: 'textTransform',
 				selector: '.some-selector',
+				key: 'textTransform',
 				value: 'uppercase',
+			},
+			{
+				selector: '.some-selector',
+				key: 'boxShadow',
+				value: '10px 10px red',
 			},
 		] );
 	} );

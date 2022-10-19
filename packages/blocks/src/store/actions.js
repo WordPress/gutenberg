@@ -7,6 +7,7 @@ import { castArray, pick, some } from 'lodash';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
@@ -62,6 +63,12 @@ const processBlockType = ( blockType, { select } ) => {
 		name,
 		null
 	);
+
+	if ( settings.description && typeof settings.description !== 'string' ) {
+		deprecated( 'Declaring non-string block descriptions', {
+			since: '6.2',
+		} );
+	}
 
 	if ( settings.deprecated ) {
 		settings.deprecated = settings.deprecated.map( ( deprecation ) =>

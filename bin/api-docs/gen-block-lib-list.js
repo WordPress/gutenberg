@@ -1,7 +1,7 @@
 /**
  * Generates core block documentation using block.json files.
  * Reads from  : packages/block-library/src
- * Publishes to: docs/reference-guides/core-blocks.ms
+ * Publishes to: docs/reference-guides/core-blocks.md
  */
 
 /**

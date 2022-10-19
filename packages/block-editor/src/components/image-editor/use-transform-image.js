@@ -41,7 +41,7 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 		if ( angle === 0 ) {
 			setEditedUrl();
 			setRotation( angle );
-			setAspect( 1 / aspect );
+			setAspect( naturalWidth / naturalHeight );
 			setPosition( {
 				x: -( position.y * naturalAspectRatio ),
 				y: position.x * naturalAspectRatio,
@@ -80,7 +80,7 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 			canvas.toBlob( ( blob ) => {
 				setEditedUrl( URL.createObjectURL( blob ) );
 				setRotation( angle );
-				setAspect( 1 / aspect );
+				setAspect( canvas.width / canvas.height );
 				setPosition( {
 					x: -( position.y * naturalAspectRatio ),
 					y: position.x * naturalAspectRatio,

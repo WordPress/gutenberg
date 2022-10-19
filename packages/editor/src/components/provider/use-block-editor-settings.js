@@ -159,7 +159,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'gradients',
 				'generateAnchors',
 				'hasFixedToolbar',
-				'hasReducedUI',
+				'isDistractionFree',
 				'hasInlineToolbar',
 				'imageDefaultSize',
 				'imageDimensions',

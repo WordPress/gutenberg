@@ -137,6 +137,11 @@ const test = base.extend<
 
 			await Promise.all( [
 				requestUtils.activateTheme( 'twentytwentyone' ),
+				// Disable this test plugin as it's conflicting with some of the tests.
+				// We already have reduced motion enabled and Playwright will wait for most of the animations anyway.
+				requestUtils.deactivatePlugin(
+					'gutenberg-test-plugin-disables-the-css-animations'
+				),
 				requestUtils.deleteAllPosts(),
 				requestUtils.deleteAllBlocks(),
 				requestUtils.resetPreferences(),

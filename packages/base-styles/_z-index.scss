@@ -32,7 +32,6 @@ $z-layers: (
 	".edit-post-layout__footer": 30,
 	".interface-interface-skeleton__header": 30,
 	".interface-interface-skeleton__content": 20,
-	".edit-site-header": 62,
 	".edit-widgets-header": 30,
 	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
 	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block
@@ -90,7 +89,6 @@ $z-layers: (
 	// #wpadminbar { z-index: 99999 }
 	".interface-interface-skeleton__sidebar": 100000,
 	".edit-post-layout__toggle-sidebar-panel": 100000,
-	".edit-site-sidebar": 100000,
 	".edit-widgets-sidebar": 100000,
 	".edit-post-layout .edit-post-post-publish-panel": 100001,
 	// For larger views, the wp-admin navbar dropdown should be at top of
@@ -106,7 +104,6 @@ $z-layers: (
 	// Show sidebar in greater than small viewports above editor related elements
 	// but below #adminmenuback { z-index: 100 }
 	".interface-interface-skeleton__sidebar {greater than small}": 90,
-	".edit-site-sidebar {greater than small}": 90,
 	".edit-widgets-sidebar {greater than small}": 90,
 
 	// Show interface skeleton footer above interface skeleton drawer

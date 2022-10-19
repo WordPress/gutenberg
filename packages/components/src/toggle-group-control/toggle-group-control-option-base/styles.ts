@@ -55,13 +55,6 @@ export const buttonView = css`
 	}
 `;
 
-export const buttonActive = css`
-	color: ${ COLORS.white };
-	&:active {
-		background: transparent;
-	}
-`;
-
 export const ButtonContentView = styled.div`
 	font-size: ${ CONFIG.fontSize };
 	line-height: 1;
@@ -82,8 +75,17 @@ export const isIcon = ( {
 	};
 
 	return css`
+		color: ${ COLORS.gray[ 900 ] };
 		width: ${ iconButtonSizes[ size ] };
 		padding-left: 0;
 		padding-right: 0;
 	`;
 };
+
+export const buttonActive = css`
+	color: ${ COLORS.white };
+
+	&:active {
+		background: transparent;
+	}
+`;

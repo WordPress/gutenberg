@@ -11,6 +11,7 @@ export type NavigatorLocation = NavigateOptions & {
 	isInitial?: boolean;
 	isBack?: boolean;
 	path?: string;
+	hasRestoredFocus?: boolean;
 };
 
 export type NavigatorContext = {
@@ -47,6 +48,7 @@ export type NavigatorScreenProps = {
 type ButtonProps = {
 	// TODO: should also extend `Button` prop types once the `Button` component
 	// is refactored to TypeScript.
+	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
 };
 export type NavigatorBackButtonProps = Omit< ButtonProps, 'href' > & {
 	/**

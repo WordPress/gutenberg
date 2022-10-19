@@ -175,7 +175,7 @@ export default {
 					) } {
 						max-width: ${ contentSize ?? wideSize };
 						margin-left: ${ marginLeft };
-						margin-right: ${ marginRight }t;
+						margin-right: ${ marginRight };
 					}
 					${ appendSelectors( selector, '> .alignwide' ) }  {
 						max-width: ${ wideSize ?? contentSize };

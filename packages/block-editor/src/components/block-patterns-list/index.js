@@ -22,14 +22,14 @@ function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
 
 	return (
-		<InserterDraggableBlocks isEnabled={ isDraggable } blocks={ blocks }>
+		<InserterDraggableBlocks
+			isEnabled={ isDraggable }
+			blocks={ blocks }
+			isPattern={ !! pattern }
+		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div
 					className="block-editor-block-patterns-list__list-item"
-					aria-label={ pattern.title }
-					aria-describedby={
-						pattern.description ? descriptionId : undefined
-					}
 					draggable={ draggable }
 					onDragStart={ onDragStart }
 					onDragEnd={ onDragEnd }
@@ -40,6 +40,10 @@ function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
 						{ ...composite }
 						className="block-editor-block-patterns-list__item"
 						onClick={ () => onClick( pattern, blocks ) }
+						aria-label={ pattern.title }
+						aria-describedby={
+							pattern.description ? descriptionId : undefined
+						}
 					>
 						<BlockPreview
 							blocks={ blocks }

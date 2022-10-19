@@ -28,10 +28,9 @@ const BorderBoxControlLinkedButton = (
 			<View className={ className }>
 				<Button
 					{ ...buttonProps }
-					variant={ isLinked ? 'primary' : 'secondary' }
 					isSmall
 					icon={ isLinked ? link : linkOff }
-					iconSize={ 16 }
+					iconSize={ 24 }
 					aria-label={ label }
 					ref={ forwardedRef }
 				/>

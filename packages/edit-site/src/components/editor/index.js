@@ -8,7 +8,6 @@ import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import {
 	BlockContextProvider,
 	BlockBreadcrumb,
-	BlockStyles,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
@@ -31,8 +30,8 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import Header from '../header';
-import { SidebarComplementaryAreaFills } from '../sidebar';
+import Header from '../header-edit-mode';
+import { SidebarComplementaryAreaFills } from '../sidebar-edit-mode';
 import NavigationSidebar from '../navigation-sidebar';
 import BlockEditor from '../block-editor';
 import CodeEditor from '../code-editor';
@@ -260,7 +259,6 @@ function Editor( { onError } ) {
 											content={
 												<>
 													<EditorNotices />
-													<BlockStyles.Slot scope="core/block-inspector" />
 													{ editorMode === 'visual' &&
 														template && (
 															<BlockEditor

@@ -1,13 +1,51 @@
 /**
  * WordPress dependencies
  */
+import { useSelect, useDispatch } from '@wordpress/data';
 import { MenuGroup } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { displayShortcut } from '@wordpress/keycodes';
-import { PreferenceToggleMenuItem } from '@wordpress/preferences';
+import {
+	PreferenceToggleMenuItem,
+	store as preferencesStore,
+} from '@wordpress/preferences';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
-function WritingMenu() {
+/**
+ * Internal dependencies
+ */
+import { store as postEditorStore } from '../../../store';
+
+function WritingMenu( { onClose } ) {
+	const isDistractionFree = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().isDistractionFree,
+		[]
+	);
+
+	const blocks = useSelect(
+		( select ) => select( blockEditorStore ).getBlocks(),
+		[]
+	);
+
+	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
+		useDispatch( postEditorStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
+
+	const { selectBlock } = useDispatch( blockEditorStore );
+
+	const toggleDistractionFree = () => {
+		setPreference( 'core/edit-post', 'fixedToolbar', false );
+		setIsInserterOpened( false );
+		setIsListViewOpened( false );
+		closeGeneralSidebar();
+		onClose();
+		if ( ! isDistractionFree ) {
+			selectBlock( blocks[ 0 ].clientId );
+		}
+	};
+
 	const isLargeViewport = useViewportMatch( 'medium' );
 	if ( ! isLargeViewport ) {
 		return null;
@@ -17,6 +55,7 @@ function WritingMenu() {
 		<MenuGroup label={ _x( 'View', 'noun' ) }>
 			<PreferenceToggleMenuItem
 				scope="core/edit-post"
+				disabled={ isDistractionFree }
 				name="fixedToolbar"
 				label={ __( 'Top toolbar' ) }
 				info={ __(
@@ -37,10 +76,20 @@ function WritingMenu() {
 				scope="core/edit-post"
 				name="fullscreenMode"
 				label={ __( 'Fullscreen mode' ) }
-				info={ __( 'Work without distraction' ) }
+				info={ __( 'Show and hide admin UI' ) }
 				messageActivated={ __( 'Fullscreen mode activated' ) }
 				messageDeactivated={ __( 'Fullscreen mode deactivated' ) }
 				shortcut={ displayShortcut.secondary( 'f' ) }
+			/>
+			<PreferenceToggleMenuItem
+				scope="core/edit-post"
+				name="distractionFree"
+				toggleHandler={ toggleDistractionFree }
+				label={ __( 'Distraction free' ) }
+				info={ __( 'Write with calmness' ) }
+				messageActivated={ __( 'Distraction free mode activated' ) }
+				messageDeactivated={ __( 'Distraction free mode deactivated' ) }
+				shortcut={ displayShortcut.primaryShift( '\\' ) }
 			/>
 		</MenuGroup>
 	);

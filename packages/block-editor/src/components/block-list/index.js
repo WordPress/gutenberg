@@ -6,9 +6,23 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
-import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
-import { createContext, useState, useMemo } from '@wordpress/element';
+import {
+	AsyncModeProvider,
+	useSelect,
+	useDispatch,
+	useRegistry,
+} from '@wordpress/data';
+import {
+	useViewportMatch,
+	useMergeRefs,
+	useDebounce,
+} from '@wordpress/compose';
+import {
+	createContext,
+	useState,
+	useMemo,
+	useCallback,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,6 +44,7 @@ import {
 const elementContext = createContext();
 
 export const IntersectionObserver = createContext();
+const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
 
 function Root( { className, ...settings } ) {
 	const [ element, setElement ] = useState();
@@ -47,7 +62,24 @@ function Root( { className, ...settings } ) {
 		},
 		[]
 	);
+	const registry = useRegistry();
 	const { setBlockVisibility } = useDispatch( blockEditorStore );
+
+	const delayedBlockVisibilityUpdates = useDebounce(
+		useCallback( () => {
+			const updates = {};
+			pendingBlockVisibilityUpdatesPerRegistry
+				.get( registry )
+				.forEach( ( [ id, isIntersecting ] ) => {
+					updates[ id ] = isIntersecting;
+				} );
+			setBlockVisibility( updates );
+		}, [ registry ] ),
+		300,
+		{
+			trailing: true,
+		}
+	);
 	const intersectionObserver = useMemo( () => {
 		const { IntersectionObserver: Observer } = window;
 
@@ -56,12 +88,16 @@ function Root( { className, ...settings } ) {
 		}
 
 		return new Observer( ( entries ) => {
-			const updates = {};
+			if ( ! pendingBlockVisibilityUpdatesPerRegistry.get( registry ) ) {
+				pendingBlockVisibilityUpdatesPerRegistry.set( registry, [] );
+			}
 			for ( const entry of entries ) {
 				const clientId = entry.target.getAttribute( 'data-block' );
-				updates[ clientId ] = entry.isIntersecting;
+				pendingBlockVisibilityUpdatesPerRegistry
+					.get( registry )
+					.push( [ clientId, entry.isIntersecting ] );
 			}
-			setBlockVisibility( updates );
+			delayedBlockVisibilityUpdates();
 		} );
 	}, [] );
 	const innerBlocksProps = useInnerBlocksProps(

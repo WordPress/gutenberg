@@ -14,6 +14,7 @@ import { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 import { openPreviewPage } from './preview';
 import { publishPost } from './publish-post';
 import { selectBlocks } from './select-blocks';
+import { setContent } from './set-content';
 import { showBlockToolbar } from './show-block-toolbar';
 import { saveSiteEditorEntities } from './site-editor';
 import { transformBlockTo } from './transform-block-to';
@@ -62,6 +63,7 @@ export class Editor {
 	publishPost = publishPost.bind( this );
 	saveSiteEditorEntities = saveSiteEditorEntities.bind( this );
 	selectBlocks = selectBlocks.bind( this );
+	setContent = setContent.bind( this );
 	showBlockToolbar = showBlockToolbar.bind( this );
 	transformBlockTo = transformBlockTo.bind( this );
 }

@@ -244,7 +244,7 @@ class WP_Webfonts {
 		}
 
 		// Check the font-display.
-		if ( ! in_array( $webfont['font-display'], array( 'auto', 'block', 'fallback', 'swap' ), true ) ) {
+		if ( ! in_array( $webfont['font-display'], array( 'auto', 'block', 'fallback', 'swap', 'optional' ), true ) ) {
 			$webfont['font-display'] = 'fallback';
 		}
 

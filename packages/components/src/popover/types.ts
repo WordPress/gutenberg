@@ -22,6 +22,10 @@ export type PopoverAnchorRefReference = MutableRefObject<
 >;
 export type PopoverAnchorRefTopBottom = { top: Element; bottom: Element };
 
+export type VirtualElement = Pick< Element, 'getBoundingClientRect' > & {
+	ownerDocument?: Document;
+};
+
 export type PopoverProps = {
 	/**
 	 * The name of the Slot in which the popover should be rendered. It should
@@ -31,20 +35,14 @@ export type PopoverProps = {
 	 */
 	__unstableSlotName?: string;
 	/**
-	 * An object extending a `DOMRect` with an additional optional `ownerDocument`
-	 * property, used to specify a fixed popover position.
+	 * The element that should be used by the popover as its anchor. It can either
+	 * be an `Element` or, alternatively, a `VirtualElement` — ie. an object with
+	 * the `getBoundingClientRect()` and the `ownerDocument` properties defined.
+	 *
+	 * **The anchor element should be stored in local state** rather than a
+	 * plain React ref to ensure reactive updating when it changes.
 	 */
-	anchorRect?: DomRectWithOwnerDocument;
-	/**
-	 * Used to specify a fixed popover position. It can be an `Element`, a React
-	 * reference to an `element`, an object with a `top` and a `bottom` properties
-	 * (both pointing to elements), or a `range`.
-	 */
-	anchorRef?:
-		| Element
-		| PopoverAnchorRefReference
-		| PopoverAnchorRefTopBottom
-		| Range;
+	anchor?: Element | VirtualElement | null;
 	/**
 	 * Whether the popover should animate when opening.
 	 *
@@ -90,13 +88,6 @@ export type PopoverProps = {
 	 */
 	onFocusOutside?: ( event: SyntheticEvent ) => void;
 	/**
-	 * A function returning the same value as the one expected by the `anchorRect`
-	 * prop, used to specify a dynamic popover position.
-	 */
-	getAnchorRect?: (
-		fallbackReferenceElement: Element | null
-	) => DomRectWithOwnerDocument;
-	/**
 	 * Used to customize the header text shown when the popover is toggled to
 	 * fullscreen on mobile viewports (see the `expandOnMobile` prop).
 	 */
@@ -130,6 +121,7 @@ export type PopoverProps = {
 	 * _Note: this prop is deprecated. Use the `placement` prop instead._
 	 */
 	position?:
+		| `${ PositionYAxis }`
 		| `${ PositionYAxis } ${ PositionXAxis }`
 		| `${ PositionYAxis } ${ PositionXAxis } ${ PositionCorner }`;
 	/**
@@ -164,6 +156,34 @@ export type PopoverProps = {
 	 * @deprecated
 	 */
 	__unstableShift?: boolean;
+	/**
+	 * An object extending a `DOMRect` with an additional optional `ownerDocument`
+	 * property, used to specify a fixed popover position.
+	 *
+	 * @deprecated
+	 */
+	anchorRect?: DomRectWithOwnerDocument;
+	/**
+	 * Used to specify a fixed popover position. It can be an `Element`, a React
+	 * reference to an `element`, an object with a `top` and a `bottom` properties
+	 * (both pointing to elements), or a `range`.
+	 *
+	 * @deprecated
+	 */
+	anchorRef?:
+		| Element
+		| PopoverAnchorRefReference
+		| PopoverAnchorRefTopBottom
+		| Range;
+	/**
+	 * A function returning the same value as the one expected by the `anchorRect`
+	 * prop, used to specify a dynamic popover position.
+	 *
+	 * @deprecated
+	 */
+	getAnchorRect?: (
+		fallbackReferenceElement: Element | null
+	) => DomRectWithOwnerDocument;
 	/**
 	 * _Note: this prop is deprecated and has no effect on the component._
 	 *

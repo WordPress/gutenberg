@@ -159,6 +159,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
 }
 
 .emotion-15 {
+  color: #1e1e1e;
   width: 30px;
   padding-left: 0;
   padding-right: 0;

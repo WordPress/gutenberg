@@ -11,11 +11,13 @@ import {
 	BlockControls,
 	useBlockProps,
 	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -39,9 +41,30 @@ export default function Edit( {
 		} ),
 	} );
 
+	const {
+		threadCommentsDepth,
+		threadComments,
+		commentsPerPage,
+		pageComments,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().__experimentalDiscussionSettings;
+	} );
+
 	useEffect( () => {
 		if ( isSiteEditor ) {
-			setCommentsCount( 3 );
+			// Match the number of comments that will be shown in the comment-template/edit.js placeholder
+
+			const nestedCommentsNumber = threadComments
+				? Math.min( threadCommentsDepth, 3 ) - 1
+				: 0;
+			const topLevelCommentsNumber = pageComments ? commentsPerPage : 3;
+
+			const commentsNumber =
+				parseInt( nestedCommentsNumber ) +
+				parseInt( topLevelCommentsNumber );
+
+			setCommentsCount( Math.min( commentsNumber, 3 ) );
 			return;
 		}
 		const currentPostId = postId;
@@ -104,7 +127,7 @@ export default function Edit( {
 		</InspectorControls>
 	);
 
-	const postTitle = isSiteEditor ? __( '"Post Title"' ) : `"${ rawTitle }"`;
+	const postTitle = isSiteEditor ? __( '“Post Title”' ) : `"${ rawTitle }"`;
 
 	let placeholder;
 	if ( showCommentsCount && commentsCount !== undefined ) {

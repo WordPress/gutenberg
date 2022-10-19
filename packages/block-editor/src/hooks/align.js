@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -74,7 +73,9 @@ export function getValidAlignments(
 		! hasWideEnabled ||
 		( blockAlign === true && ! hasWideBlockSupport )
 	) {
-		return without( validAlignments, ...WIDE_ALIGNMENTS );
+		return validAlignments.filter(
+			( alignment ) => ! WIDE_ALIGNMENTS.includes( alignment )
+		);
 	}
 
 	return validAlignments;

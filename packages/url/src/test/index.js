@@ -1004,6 +1004,11 @@ describe( 'cleanForSlug', () => {
 			'is-tht-deja_vu'
 		);
 	} );
+
+	it( 'Should replace multiple hyphens with a single one', () => {
+		expect( cleanForSlug( 'the long - cat' ) ).toBe( 'the-long-cat' );
+		expect( cleanForSlug( 'the----long---cat' ) ).toBe( 'the-long-cat' );
+	} );
 } );
 
 describe( 'normalizePath', () => {

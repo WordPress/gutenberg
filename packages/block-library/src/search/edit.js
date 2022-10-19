@@ -16,6 +16,7 @@ import {
 	getTypographyClassesAndStyles as useTypographyProps,
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
+	useSetting,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
@@ -113,7 +114,11 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
-	const typographyProps = useTypographyProps( attributes );
+	const fluidTypographyEnabled = useSetting( 'typography.fluid' );
+	const typographyProps = useTypographyProps(
+		attributes,
+		fluidTypographyEnabled
+	);
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 	const isButtonPositionInside = 'button-inside' === buttonPosition;

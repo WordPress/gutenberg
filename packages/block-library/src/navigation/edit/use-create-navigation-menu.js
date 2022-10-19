@@ -16,10 +16,7 @@ export const CREATE_NAVIGATION_MENU_ERROR = 'error';
 export const CREATE_NAVIGATION_MENU_PENDING = 'pending';
 export const CREATE_NAVIGATION_MENU_IDLE = 'idle';
 
-export default function useCreateNavigationMenu(
-	clientId,
-	postStatus = 'publish'
-) {
+export default function useCreateNavigationMenu( clientId ) {
 	const [ status, setStatus ] = useState( CREATE_NAVIGATION_MENU_IDLE );
 	const [ value, setValue ] = useState( null );
 	const [ error, setError ] = useState( null );
@@ -30,7 +27,7 @@ export default function useCreateNavigationMenu(
 	// This callback uses data from the two placeholder steps and only creates
 	// a new navigation menu when the user completes the final step.
 	const create = useCallback(
-		async ( title = null, blocks = [] ) => {
+		async ( title = null, blocks = [], postStatus ) => {
 			// Guard against creating Navigations without a title.
 			// Note you can pass no title, but if one is passed it must be
 			// a string otherwise the title may end up being empty.

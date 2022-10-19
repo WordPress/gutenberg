@@ -14,6 +14,62 @@ import type {
 	PopoverAnchorRefTopBottom,
 } from './types';
 
+const POSITION_TO_PLACEMENT: Record<
+	NonNullable< PopoverProps[ 'position' ] >,
+	NonNullable< PopoverProps[ 'placement' ] >
+> = {
+	bottom: 'bottom',
+	top: 'top',
+	'middle left': 'left',
+	'middle right': 'right',
+	'bottom left': 'bottom-end',
+	'bottom center': 'bottom',
+	'bottom right': 'bottom-start',
+	'top left': 'top-end',
+	'top center': 'top',
+	'top right': 'top-start',
+	'middle left left': 'left',
+	'middle left right': 'left',
+	'middle left bottom': 'left-end',
+	'middle left top': 'left-start',
+	'middle right left': 'right',
+	'middle right right': 'right',
+	'middle right bottom': 'right-end',
+	'middle right top': 'right-start',
+	'bottom left left': 'bottom-end',
+	'bottom left right': 'bottom-end',
+	'bottom left bottom': 'bottom-end',
+	'bottom left top': 'bottom-end',
+	'bottom center left': 'bottom',
+	'bottom center right': 'bottom',
+	'bottom center bottom': 'bottom',
+	'bottom center top': 'bottom',
+	'bottom right left': 'bottom-start',
+	'bottom right right': 'bottom-start',
+	'bottom right bottom': 'bottom-start',
+	'bottom right top': 'bottom-start',
+	'top left left': 'top-end',
+	'top left right': 'top-end',
+	'top left bottom': 'top-end',
+	'top left top': 'top-end',
+	'top center left': 'top',
+	'top center right': 'top',
+	'top center bottom': 'top',
+	'top center top': 'top',
+	'top right left': 'top-start',
+	'top right right': 'top-start',
+	'top right bottom': 'top-start',
+	'top right top': 'top-start',
+	// `middle`/`middle center [corner?]` positions are associated to a fallback
+	// `bottom` placement because there aren't any corresponding placement values.
+	middle: 'bottom',
+	'middle center': 'bottom',
+	'middle center bottom': 'bottom',
+	'middle center left': 'bottom',
+	'middle center right': 'bottom',
+	'middle center top': 'bottom',
+};
+
 /**
  * Converts the `Popover`'s legacy "position" prop to the new "placement" prop
  * (used by `floating-ui`).
@@ -23,22 +79,8 @@ import type {
  */
 export const positionToPlacement = (
 	position: NonNullable< PopoverProps[ 'position' ] >
-): NonNullable< PopoverProps[ 'placement' ] > => {
-	const [ x, y, z ] = position.split( ' ' );
-
-	if ( [ 'top', 'bottom' ].includes( x ) ) {
-		let suffix = '';
-		if ( ( !! z && z === 'left' ) || y === 'right' ) {
-			suffix = '-start';
-		} else if ( ( !! z && z === 'right' ) || y === 'left' ) {
-			suffix = '-end';
-		}
-
-		return ( x + suffix ) as NonNullable< PopoverProps[ 'placement' ] >;
-	}
-
-	return y as NonNullable< PopoverProps[ 'placement' ] >;
-};
+): NonNullable< PopoverProps[ 'placement' ] > =>
+	POSITION_TO_PLACEMENT[ position ] ?? 'bottom';
 
 /**
  * @typedef AnimationOrigin
@@ -116,12 +158,16 @@ export const getFrameOffset = (
 };
 
 export const getReferenceOwnerDocument = ( {
+	anchor,
 	anchorRef,
 	anchorRect,
 	getAnchorRect,
 	fallbackReferenceElement,
 	fallbackDocument,
-}: Pick< PopoverProps, 'anchorRef' | 'anchorRect' | 'getAnchorRect' > & {
+}: Pick<
+	PopoverProps,
+	'anchorRef' | 'anchorRect' | 'getAnchorRect' | 'anchor'
+> & {
 	fallbackReferenceElement: Element | null;
 	fallbackDocument: Document;
 } ): Document => {
@@ -133,7 +179,9 @@ export const getReferenceOwnerDocument = ( {
 	// with the `getBoundingClientRect()` function (like real elements).
 	// See https://floating-ui.com/docs/virtual-elements for more info.
 	let resultingReferenceOwnerDoc;
-	if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
+	if ( anchor ) {
+		resultingReferenceOwnerDoc = anchor.ownerDocument;
+	} else if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
 		resultingReferenceOwnerDoc = ( anchorRef as PopoverAnchorRefTopBottom )
 			?.top.ownerDocument;
 	} else if ( ( anchorRef as Range | undefined )?.startContainer ) {
@@ -160,16 +208,22 @@ export const getReferenceOwnerDocument = ( {
 };
 
 export const getReferenceElement = ( {
+	anchor,
 	anchorRef,
 	anchorRect,
 	getAnchorRect,
 	fallbackReferenceElement,
-}: Pick< PopoverProps, 'anchorRef' | 'anchorRect' | 'getAnchorRect' > & {
+}: Pick<
+	PopoverProps,
+	'anchorRef' | 'anchorRect' | 'getAnchorRect' | 'anchor'
+> & {
 	fallbackReferenceElement: Element | null;
 } ): ReferenceType | null => {
 	let referenceElement = null;
 
-	if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
+	if ( anchor ) {
+		referenceElement = anchor;
+	} else if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
 		// Create a virtual element for the ref. The expectation is that
 		// if anchorRef.top is defined, then anchorRef.bottom is defined too.
 		// Seems to be used by the block toolbar, when multiple blocks are selected

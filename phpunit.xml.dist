@@ -14,9 +14,6 @@
 		<testsuite name="default">
 			<directory suffix="-test.php">./phpunit/</directory>
 		</testsuite>
-		<testsuite name="packages">
-			<directory suffix="-test.php">./packages/**/phpunit/</directory>
-		</testsuite>
 	</testsuites>
 	<groups>
 		<exclude>

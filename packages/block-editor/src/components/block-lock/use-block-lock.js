@@ -38,7 +38,7 @@ export default function useBlockLock( clientId ) {
 				canMove,
 				canRemove,
 				canLock: canLockBlockType( getBlockName( clientId ) ),
-				isContentLocked: getTemplateLock( clientId ) === 'noContent',
+				isContentLocked: getTemplateLock( clientId ) === 'contentOnly',
 				isLocked: ! canEdit || ! canMove || ! canRemove,
 			};
 		},

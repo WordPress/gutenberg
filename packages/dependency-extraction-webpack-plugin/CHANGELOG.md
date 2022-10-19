@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 4.2.0 (2022-10-05)
+
+## 4.1.0 (2022-09-21)
+
 ### New Features
 
 -   Include `@wordpress/style-engine` on the list of external dependencies to allow using `wp.styleEngine` global with WordPress 6.1 and beyond ([#43840](https://github.com/WordPress/gutenberg/pull/43840)).

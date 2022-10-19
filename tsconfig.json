@@ -33,6 +33,7 @@
 		{ "path": "packages/project-management-automation" },
 		{ "path": "packages/react-i18n" },
 		{ "path": "packages/report-flaky-tests" },
+		{ "path": "packages/style-engine" },
 		{ "path": "packages/token-list" },
 		{ "path": "packages/url" },
 		{ "path": "packages/warning" },

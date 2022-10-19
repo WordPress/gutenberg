@@ -28,9 +28,10 @@ describe( 'Dropdown', () => {
 	it( 'should toggle the dropdown properly', () => {
 		const expectButtonExpanded = ( container, expanded ) => {
 			expect( container.querySelectorAll( 'button' ) ).toHaveLength( 1 );
-			expect(
-				getButtonElement( container ).getAttribute( 'aria-expanded' )
-			).toBe( expanded.toString() );
+			expect( getButtonElement( container ) ).toHaveAttribute(
+				'aria-expanded',
+				expanded.toString()
+			);
 		};
 
 		const {

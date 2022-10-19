@@ -85,6 +85,7 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 				title={ __( 'Select a layout' ) }
 				contentStyle={ styles.contentStyle }
 				leftButton={ leftButton }
+				testID="block-variation-modal"
 			>
 				<ScrollView
 					horizontal

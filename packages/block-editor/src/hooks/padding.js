@@ -222,6 +222,7 @@ export function PaddingVisualizer( { clientId, attributes } ) {
 			clientId={ clientId }
 			__unstableCoverTarget
 			__unstableRefreshSize={ padding }
+			shift={ false }
 		>
 			<div className="block-editor__padding-visualizer" style={ style } />
 		</BlockPopover>

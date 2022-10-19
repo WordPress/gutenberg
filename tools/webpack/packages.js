@@ -99,6 +99,10 @@ const vendors = {
 		'react-dom/umd/react-dom.development.js',
 		'react-dom/umd/react-dom.production.min.js',
 	],
+	'inert-polyfill': [
+		'wicg-inert/dist/inert.js',
+		'wicg-inert/dist/inert.min.js',
+	],
 };
 const vendorsCopyConfig = Object.entries( vendors ).flatMap(
 	( [ key, [ devFilename, prodFilename ] ] ) => {

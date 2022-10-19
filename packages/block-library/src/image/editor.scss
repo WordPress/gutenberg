@@ -22,6 +22,10 @@
 		.components-placeholder__illustration {
 			display: none;
 		}
+
+		&::before {
+			opacity: 0;
+		}
 	}
 
 	// Remove the transition while we still have a legacy placeholder style.

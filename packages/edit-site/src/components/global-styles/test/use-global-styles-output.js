@@ -711,10 +711,11 @@ describe( 'global styles renderer', () => {
 			},
 			typography: {
 				fontFamily: 'sans-serif',
+				fontSize: '14px',
 			},
 		};
 
-		it( 'Should output padding variables and other properties if useRootPaddingAwareAlignments is enabled', () => {
+		it( 'should output padding variables and other properties if useRootPaddingAwareAlignments is enabled', () => {
 			expect(
 				getStylesDeclarations( blockStyles, 'body', true )
 			).toEqual( [
@@ -724,10 +725,11 @@ describe( 'global styles renderer', () => {
 				'--wp--style--root--padding-left: 33px',
 				'background-color: var(--wp--preset--color--light-green-cyan)',
 				'font-family: sans-serif',
+				'font-size: 14px',
 			] );
 		} );
 
-		it( 'Should output padding and other properties if useRootPaddingAwareAlignments is disabled', () => {
+		it( 'should output padding and other properties if useRootPaddingAwareAlignments is disabled', () => {
 			expect(
 				getStylesDeclarations( blockStyles, 'body', false )
 			).toEqual( [
@@ -737,10 +739,11 @@ describe( 'global styles renderer', () => {
 				'padding-bottom: 33px',
 				'padding-left: 33px',
 				'font-family: sans-serif',
+				'font-size: 14px',
 			] );
 		} );
 
-		it( 'Should not output padding variables if selector is not root', () => {
+		it( 'should not output padding variables if selector is not root', () => {
 			expect(
 				getStylesDeclarations(
 					blockStyles,
@@ -754,6 +757,57 @@ describe( 'global styles renderer', () => {
 				'padding-bottom: 33px',
 				'padding-left: 33px',
 				'font-family: sans-serif',
+				'font-size: 14px',
+			] );
+		} );
+
+		it( 'should output clamp values for font-size when fluid typography is enabled', () => {
+			expect(
+				getStylesDeclarations(
+					blockStyles,
+					'.wp-block-site-title',
+					true,
+					{
+						settings: {
+							typography: {
+								fluid: true,
+							},
+						},
+					}
+				)
+			).toEqual( [
+				'background-color: var(--wp--preset--color--light-green-cyan)',
+				'padding-top: 33px',
+				'padding-right: 33px',
+				'padding-bottom: 33px',
+				'padding-left: 33px',
+				'font-family: sans-serif',
+				'font-size: clamp(14px, 0.875rem + ((1vw - 7.68px) * 0.841), 21px)',
+			] );
+		} );
+
+		it( 'should output direct values for font-size when fluid typography is disabled', () => {
+			expect(
+				getStylesDeclarations(
+					blockStyles,
+					'.wp-block-site-title',
+					true,
+					{
+						settings: {
+							typography: {
+								fluid: false,
+							},
+						},
+					}
+				)
+			).toEqual( [
+				'background-color: var(--wp--preset--color--light-green-cyan)',
+				'padding-top: 33px',
+				'padding-right: 33px',
+				'padding-bottom: 33px',
+				'padding-left: 33px',
+				'font-family: sans-serif',
+				'font-size: 14px',
 			] );
 		} );
 	} );

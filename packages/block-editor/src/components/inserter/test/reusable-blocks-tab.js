@@ -98,7 +98,7 @@ describe( 'InserterMenu', () => {
 		);
 
 		expect( blocks ).toHaveLength( 1 );
-		expect( blocks[ 0 ].textContent ).toBe( 'My reusable block' );
+		expect( blocks[ 0 ] ).toHaveTextContent( 'My reusable block' );
 	} );
 
 	it( 'should trim whitespace of search terms', () => {
@@ -111,6 +111,6 @@ describe( 'InserterMenu', () => {
 		);
 
 		expect( blocks ).toHaveLength( 1 );
-		expect( blocks[ 0 ].textContent ).toBe( 'My reusable block' );
+		expect( blocks[ 0 ] ).toHaveTextContent( 'My reusable block' );
 	} );
 } );

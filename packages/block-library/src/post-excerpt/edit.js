@@ -87,7 +87,7 @@ export default function PostExcerptEditor( {
 		<RichText
 			className="wp-block-post-excerpt__more-link"
 			tagName="a"
-			aria-label={ __( '"Read more" link text' ) }
+			aria-label={ __( '“Read more” link text' ) }
 			placeholder={ __( 'Add "read more" link text' ) }
 			value={ moreText }
 			onChange={ ( newMoreText ) =>

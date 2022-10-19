@@ -41,6 +41,7 @@ const transforms = {
 					'core/group',
 					{
 						align: widestAlignment,
+						layout: { type: 'constrained' },
 					},
 					groupInnerBlocks
 				);

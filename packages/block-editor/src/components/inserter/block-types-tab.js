@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { map, flow, groupBy, orderBy } from 'lodash';
+import { map, groupBy, orderBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
 import { useMemo, useEffect } from '@wordpress/element';
-import { useAsyncList } from '@wordpress/compose';
+import { pipe, useAsyncList } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -53,7 +53,7 @@ export function BlockTypesTab( {
 	}, [ items ] );
 
 	const itemsPerCategory = useMemo( () => {
-		return flow(
+		return pipe(
 			( itemList ) =>
 				itemList.filter(
 					( item ) => item.category && item.category !== 'reusable'

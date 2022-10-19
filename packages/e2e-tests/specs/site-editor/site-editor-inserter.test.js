@@ -21,11 +21,11 @@ describe( 'Site Editor Inserter', () => {
 	} );
 
 	it( 'inserter toggle button should toggle global inserter', async () => {
-		await page.click( '.edit-site-header-toolbar__inserter-toggle' );
+		await page.click( '.edit-site-header-edit-mode__inserter-toggle' );
 		await page.waitForSelector( '.edit-site-editor__inserter-panel', {
 			visible: true,
 		} );
-		await page.click( '.edit-site-header-toolbar__inserter-toggle' );
+		await page.click( '.edit-site-header-edit-mode__inserter-toggle' );
 		await page.waitForSelector( '.edit-site-editor__inserter-panel', {
 			hidden: true,
 		} );

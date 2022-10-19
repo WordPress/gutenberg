@@ -34,33 +34,26 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	}
 
 	public function test_get_template_fallback() {
-		$base_path = gutenberg_dir_path() . 'test/emptytheme/block-templates/';
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/templates/lookup' );
-		// Should match `category.html`.
+		// Should fallback to `category.html`.
 		$request->set_param( 'slug', 'category-fruits' );
 		$request->set_param( 'is_custom', false );
 		$request->set_param( 'template_prefix', 'category' );
 		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data()->content;
-		$expected = file_get_contents( $base_path . 'category.html' );
-		$this->assertEquals( $expected, $data );
-		// Should fallback to `index.html` .
-		$request->set_param( 'slug', 'tag-status' );
-		$request->set_param( 'is_custom', false );
-		$request->set_param( 'template_prefix', 'tag' );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data()->content;
-		$expected = file_get_contents( $base_path . 'index.html' );
-		$this->assertEquals( $expected, $data );
-		// Should fallback to `singular.html` .
+		$this->assertSame( 'category', $response->get_data()['slug'], 'Should fallback to `category.html`.' );
+		// Should fallback to `singular.html`.
 		$request->set_param( 'slug', 'page-hello' );
 		$request->set_param( 'is_custom', false );
 		$request->set_param( 'template_prefix', 'page' );
 		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data()->content;
-		$expected = file_get_contents( $base_path . 'singular.html' );
-		$this->assertEquals( $expected, $data );
+		$this->assertSame( 'singular', $response->get_data()['slug'], 'Should fallback to `singular.html`.' );
+		// Should fallback to `index.html`.
+		$request->set_param( 'slug', 'tag-rigas' );
+		$request->set_param( 'is_custom', false );
+		$request->set_param( 'template_prefix', 'tag' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 'index', $response->get_data()['slug'], 'Should fallback to `index.html`.' );
 	}
 
 	public function test_context_param() {

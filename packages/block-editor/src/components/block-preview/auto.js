@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { Disabled } from '@wordpress/components';
 import { useResizeObserver, pure, useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import { Disabled } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -20,13 +20,12 @@ let MemoizedBlockList;
 
 const MAX_HEIGHT = 2000;
 
-function AutoBlockPreview( {
+function ScaledBlockPreview( {
 	viewportWidth,
+	containerWidth,
 	__experimentalPadding,
 	__experimentalMinHeight,
 } ) {
-	const [ containerResizeListener, { width: containerWidth } ] =
-		useResizeObserver();
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
 	const { styles, assets, duotone } = useSelect( ( select ) => {
@@ -62,71 +61,84 @@ function AutoBlockPreview( {
 
 	const scale = containerWidth / viewportWidth;
 	return (
-		<div className="block-editor-block-preview__container">
-			{ containerResizeListener }
-			<Disabled
-				className="block-editor-block-preview__content"
+		<Disabled
+			className="block-editor-block-preview__content"
+			style={ {
+				transform: `scale(${ scale })`,
+				height: contentHeight * scale,
+				maxHeight:
+					contentHeight > MAX_HEIGHT ? MAX_HEIGHT * scale : undefined,
+				minHeight: __experimentalMinHeight,
+			} }
+		>
+			<Iframe
+				head={ <EditorStyles styles={ editorStyles } /> }
+				assets={ assets }
+				contentRef={ useRefEffect( ( bodyElement ) => {
+					const {
+						ownerDocument: { documentElement },
+					} = bodyElement;
+					documentElement.classList.add(
+						'block-editor-block-preview__content-iframe'
+					);
+					documentElement.style.position = 'absolute';
+					documentElement.style.width = '100%';
+					bodyElement.style.padding = __experimentalPadding + 'px';
+
+					// Necessary for contentResizeListener to work.
+					bodyElement.style.boxSizing = 'border-box';
+					bodyElement.style.position = 'absolute';
+					bodyElement.style.width = '100%';
+				}, [] ) }
+				aria-hidden
+				tabIndex={ -1 }
 				style={ {
-					transform: `scale(${ scale })`,
-					height: contentHeight * scale,
-					maxHeight:
-						contentHeight > MAX_HEIGHT
-							? MAX_HEIGHT * scale
-							: undefined,
-					minHeight: __experimentalMinHeight,
+					position: 'absolute',
+					width: viewportWidth,
+					height: contentHeight,
+					pointerEvents: 'none',
+					// This is a catch-all max-height for patterns.
+					// See: https://github.com/WordPress/gutenberg/pull/38175.
+					maxHeight: MAX_HEIGHT,
+					minHeight:
+						scale !== 0 && scale < 1 && __experimentalMinHeight
+							? __experimentalMinHeight / scale
+							: __experimentalMinHeight,
 				} }
 			>
-				<Iframe
-					head={ <EditorStyles styles={ editorStyles } /> }
-					assets={ assets }
-					contentRef={ useRefEffect( ( bodyElement ) => {
-						const {
-							ownerDocument: { documentElement },
-						} = bodyElement;
-						documentElement.classList.add(
-							'block-editor-block-preview__content-iframe'
-						);
-						documentElement.style.position = 'absolute';
-						documentElement.style.width = '100%';
-						bodyElement.style.padding =
-							__experimentalPadding + 'px';
-
-						// Necessary for contentResizeListener to work.
-						bodyElement.style.boxSizing = 'border-box';
-						bodyElement.style.position = 'absolute';
-						bodyElement.style.width = '100%';
-					}, [] ) }
-					aria-hidden
-					tabIndex={ -1 }
-					style={ {
-						position: 'absolute',
-						width: viewportWidth,
-						height: contentHeight,
-						pointerEvents: 'none',
-						// This is a catch-all max-height for patterns.
-						// See: https://github.com/WordPress/gutenberg/pull/38175.
-						maxHeight: MAX_HEIGHT,
-						minHeight:
-							scale !== 0 && scale < 1 && __experimentalMinHeight
-								? __experimentalMinHeight / scale
-								: __experimentalMinHeight,
-					} }
-				>
-					{ contentResizeListener }
-					{
-						/* Filters need to be rendered before children to avoid Safari rendering issues. */
-						svgFilters.map( ( preset ) => (
-							<PresetDuotoneFilter
-								preset={ preset }
-								key={ preset.slug }
-							/>
-						) )
-					}
-					<MemoizedBlockList renderAppender={ false } />
-				</Iframe>
-			</Disabled>
-		</div>
+				{ contentResizeListener }
+				{
+					/* Filters need to be rendered before children to avoid Safari rendering issues. */
+					svgFilters.map( ( preset ) => (
+						<PresetDuotoneFilter
+							preset={ preset }
+							key={ preset.slug }
+						/>
+					) )
+				}
+				<MemoizedBlockList renderAppender={ false } />
+			</Iframe>
+		</Disabled>
 	);
 }
 
-export default AutoBlockPreview;
+export default function AutoBlockPreview( props ) {
+	const [ containerResizeListener, { width: containerWidth } ] =
+		useResizeObserver();
+
+	return (
+		<>
+			<div style={ { position: 'relative', width: '100%', height: 0 } }>
+				{ containerResizeListener }
+			</div>
+			<div className="block-editor-block-preview__container">
+				{ !! containerWidth && (
+					<ScaledBlockPreview
+						{ ...props }
+						containerWidth={ containerWidth }
+					/>
+				) }
+			</div>
+		</>
+	);
+}

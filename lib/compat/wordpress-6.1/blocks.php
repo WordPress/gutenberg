@@ -38,11 +38,15 @@ add_filter( 'safe_style_css', 'gutenberg_safe_style_attrs_6_1' );
  */
 function gutenberg_safecss_filter_attr_allow_css_6_1( $allow_css, $css_test_string ) {
 	if ( false === $allow_css ) {
-		// Allow some CSS functions.
-		$css_test_string = preg_replace( '/\b(?:calc|min|max|minmax|clamp)\(((?:\([^()]*\)?|[^()])*)\)/', '', $css_test_string );
-
-		// Allow CSS var.
-		$css_test_string = preg_replace( '/\(?var\(--[\w\-\()[\]\,\s]*\)/', '', $css_test_string );
+		/*
+		 * Allow CSS functions like var(), calc(), etc. by removing them from the test string.
+		 * Nested functions and parentheses are also removed, so long as the parentheses are balanced.
+		 */
+		$css_test_string = preg_replace(
+			'/\b(?:var|calc|min|max|minmax|clamp)(\((?:[^()]|(?1))*\))/',
+			'',
+			$css_test_string
+		);
 
 		// Check for any CSS containing \ ( & } = or comments,
 		// except for url(), calc(), or var() usage checked above.
@@ -81,7 +85,7 @@ function gutenberg_block_type_metadata_view_script( $settings, $metadata ) {
 
 		// Replace suffix and extension with `.asset.php` to find the generated dependencies file.
 		$view_asset_file          = substr( $view_script_path, 0, -( strlen( '.js' ) ) ) . '.asset.php';
-		$view_asset               = file_exists( $view_asset_file ) ? require( $view_asset_file ) : null;
+		$view_asset               = file_exists( $view_asset_file ) ? require $view_asset_file : null;
 		$view_script_dependencies = isset( $view_asset['dependencies'] ) ? $view_asset['dependencies'] : array();
 		$view_script_version      = isset( $view_asset['version'] ) ? $view_asset['version'] : false;
 		$result                   = wp_register_script(
@@ -101,79 +105,6 @@ function gutenberg_block_type_metadata_view_script( $settings, $metadata ) {
 	return $settings;
 }
 add_filter( 'block_type_metadata_settings', 'gutenberg_block_type_metadata_view_script', 10, 2 );
-
-if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
-	/**
-	 * Enqueues a frontend script for a specific block.
-	 *
-	 * Scripts enqueued using this function will only get printed
-	 * when the block gets rendered on the frontend.
-	 *
-	 * @since 6.1.0
-	 *
-	 * @param string $block_name The block name, including namespace.
-	 * @param array  $args       An array of arguments [handle,src,deps,ver,media,textdomain].
-	 *
-	 * @return void
-	 */
-	function wp_enqueue_block_view_script( $block_name, $args ) {
-		$args = wp_parse_args(
-			$args,
-			array(
-				'handle'     => '',
-				'src'        => '',
-				'deps'       => array(),
-				'ver'        => false,
-				'in_footer'  => false,
-
-				// Additional args to allow translations for the script's textdomain.
-				'textdomain' => '',
-			)
-		);
-
-		/**
-		 * Callback function to register and enqueue scripts.
-		 *
-		 * @param string $content When the callback is used for the render_block filter,
-		 *                        the content needs to be returned so the function parameter
-		 *                        is to ensure the content exists.
-		 * @return string Block content.
-		 */
-		$callback = static function( $content, $block ) use ( $args, $block_name ) {
-
-			// Sanity check.
-			if ( empty( $block['blockName'] ) || $block_name !== $block['blockName'] ) {
-				return $content;
-			}
-
-			// Register the stylesheet.
-			if ( ! empty( $args['src'] ) ) {
-				wp_register_script( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['in_footer'] );
-			}
-
-			// Enqueue the stylesheet.
-			wp_enqueue_script( $args['handle'] );
-
-			// If a textdomain is defined, use it to set the script translations.
-			if ( ! empty( $args['textdomain'] ) && in_array( 'wp-i18n', $args['deps'], true ) ) {
-				wp_set_script_translations( $args['handle'], $args['textdomain'], $args['domainpath'] );
-			}
-
-			return $content;
-		};
-
-		/*
-		 * The filter's callback here is an anonymous function because
-		 * using a named function in this case is not possible.
-		 *
-		 * The function cannot be unhooked, however, users are still able
-		 * to dequeue the script registered/enqueued by the callback
-		 * which is why in this case, using an anonymous function
-		 * was deemed acceptable.
-		 */
-		add_filter( 'render_block', $callback, 10, 2 );
-	}
-}
 
 /**
  * Allow multiple view scripts per block.

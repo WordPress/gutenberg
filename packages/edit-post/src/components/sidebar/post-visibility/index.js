@@ -9,14 +9,29 @@ import {
 	PostVisibilityCheck,
 	usePostVisibilityLabel,
 } from '@wordpress/editor';
-import { useRef } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 
 export function PostVisibility() {
-	const rowRef = useRef();
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps = useMemo(
+		() => ( {
+			// Anchor the popover to the middle of the entire row so that it doesn't
+			// move around when the label changes.
+			anchor: popoverAnchor,
+		} ),
+		[ popoverAnchor ]
+	);
+
 	return (
 		<PostVisibilityCheck
 			render={ ( { canEdit } ) => (
-				<PanelRow ref={ rowRef } className="edit-post-post-visibility">
+				<PanelRow
+					ref={ setPopoverAnchor }
+					className="edit-post-post-visibility"
+				>
 					<span>{ __( 'Visibility' ) }</span>
 					{ ! canEdit && (
 						<span>
@@ -27,12 +42,7 @@ export function PostVisibility() {
 						<Dropdown
 							position="bottom left"
 							contentClassName="edit-post-post-visibility__dialog"
-							popoverProps={ {
-								// Anchor the popover to the middle of the
-								// entire row so that it doesn't move around
-								// when the label changes.
-								anchorRef: rowRef.current,
-							} }
+							popoverProps={ popoverProps }
 							focusOnMount
 							renderToggle={ ( { isOpen, onToggle } ) => (
 								<PostVisibilityToggle

@@ -25,4 +25,26 @@ describe( 'getTypographyClassesAndStyles', () => {
 			},
 		} );
 	} );
+
+	it( 'should return fluid font size styles', () => {
+		const attributes = {
+			fontFamily: 'tofu',
+			style: {
+				typography: {
+					letterSpacing: '22px',
+					fontSize: '2rem',
+					textTransform: 'uppercase',
+				},
+			},
+		};
+		expect( getTypographyClassesAndStyles( attributes, true ) ).toEqual( {
+			className: 'has-tofu-font-family',
+			style: {
+				letterSpacing: '22px',
+				fontSize:
+					'clamp(1.5rem, 1.5rem + ((1vw - 0.48rem) * 2.885), 3rem)',
+				textTransform: 'uppercase',
+			},
+		} );
+	} );
 } );

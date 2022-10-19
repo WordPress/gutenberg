@@ -30,7 +30,7 @@ describe( 'BlockBreadcrumb', () => {
 			const rootLabelText = screen.getByText( 'Tuhinga' );
 			const rootLabelTextDefault = screen.queryByText( 'Document' );
 
-			expect( rootLabelTextDefault ).toBeNull();
+			expect( rootLabelTextDefault ).not.toBeInTheDocument();
 			expect( rootLabelText ).toBeInTheDocument();
 		} );
 	} );

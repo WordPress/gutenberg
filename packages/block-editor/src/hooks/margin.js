@@ -190,10 +190,10 @@ export function MarginVisualizer( { clientId, attributes } ) {
 			borderRightWidth: marginRight,
 			borderBottomWidth: marginBottom,
 			borderLeftWidth: marginLeft,
-			top: marginTop !== 0 ? `-${ marginTop }` : 0,
-			right: marginRight !== 0 ? `-${ marginRight }` : 0,
-			bottom: marginBottom !== 0 ? `-${ marginBottom }` : 0,
-			left: marginLeft !== 0 ? `-${ marginLeft }` : 0,
+			top: marginTop !== 0 ? `calc(${ marginTop } * -1)` : 0,
+			right: marginRight !== 0 ? `calc(${ marginRight } * -1)` : 0,
+			bottom: marginBottom !== 0 ? `calc(${ marginBottom } * -1)` : 0,
+			left: marginLeft !== 0 ? `calc(${ marginLeft } * -1)` : 0,
 		};
 	}, [ margin ] );
 
@@ -231,6 +231,7 @@ export function MarginVisualizer( { clientId, attributes } ) {
 			clientId={ clientId }
 			__unstableCoverTarget
 			__unstableRefreshSize={ margin }
+			shift={ false }
 		>
 			<div className="block-editor__padding-visualizer" style={ style } />
 		</BlockPopover>

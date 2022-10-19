@@ -11,6 +11,13 @@
 	padding-left: 16px;
 	padding-right: 16px;
 }
+
+.is-distraction-free {
+	.components-editor-notices__snackbar {
+		bottom: 20px;
+	}
+}
+
 @include editor-left(".edit-post-layout .components-editor-notices__snackbar");
 
 .edit-post-layout .editor-post-publish-panel {

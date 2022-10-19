@@ -1,13 +1,13 @@
 async function toggleListView() {
 	await page.click(
-		'.edit-post-header-toolbar__list-view-toggle, .edit-site-header-toolbar__list-view-toggle, .edit-widgets-header-toolbar__list-view-toggle'
+		'.edit-post-header-toolbar__list-view-toggle, .edit-site-header-edit-mode__list-view-toggle, .edit-widgets-header-toolbar__list-view-toggle'
 	);
 }
 
 async function isListViewOpen() {
 	return await page.evaluate( () => {
 		return !! document.querySelector(
-			'.edit-post-header-toolbar__list-view-toggle.is-pressed, .edit-site-header-toolbar__list-view-toggle.is-pressed, .edit-widgets-header-toolbar__list-view-toggle.is-pressed'
+			'.edit-post-header-toolbar__list-view-toggle.is-pressed, .edit-site-header-edit-mode__list-view-toggle.is-pressed, .edit-widgets-header-toolbar__list-view-toggle.is-pressed'
 		);
 	} );
 }

@@ -4,7 +4,7 @@ The Style Engine aims to provide a consistent API for rendering styling for bloc
 
 Initially, it will offer a single, centralized agent responsible for generating block styles, and, in later phases, it will also assume the responsibility of processing and rendering optimized frontend CSS.
 
-## Important
+## Please note
 
 This package is new as of WordPress 6.1 and therefore in its infancy.
 
@@ -23,23 +23,17 @@ For more information about the roadmap, please refer to [Block editor styles: in
 
 ### wp_style_engine_get_styles()
 
-Global public function to generate styles from a single style object, e.g., the value of
-a [block's attributes.style object](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#styles)
-or
-the [top level styles in theme.json](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/).
+Global public function to generate styles from a single style object, e.g., the value of a [block's attributes.style object](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#styles) or the [top level styles in theme.json](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/).
 
-See also [Using the Style Engine to generate block supports styles](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/using-the-style-engine-with-block-supports).
+See also [Using the Style Engine to generate block supports styles](https://github.com/WordPress/gutenberg/tree/HEAD/packages/style-engine/docs/using-the-style-engine-with-block-supports.md).
 
 _Parameters_
 
 -   _$block_styles_ `array` A block's `attributes.style` object or the top level styles in theme.json
 -   _$options_ `array<string|boolean>` An array of options to determine the output.
-    -   _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or '
-        global-styles'. Default is 'block-supports'. When both `context` and `selector` are set, the style engine will store the CSS rules using the `context` as a key.
-    -   _convert_vars_to_classnames_ `boolean` Whether to skip converting CSS var:? values to var( --wp--preset--\* )
-        values. Default is `false`.
-    -   _selector_ `string` When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`,
-        otherwise a concatenated string of properties and values.
+    -   _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'. When both `context` and `selector` are set, the Style Engine will store the CSS rules using the `context` as a key.
+    -   _convert_vars_to_classnames_ `boolean` Whether to skip converting CSS var:? values to var( --wp--preset--\* ) values. Default is `false`.
+    -   _selector_ `string` When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 
 _Returns_
 `array<string|array>|null`
@@ -57,19 +51,25 @@ It will return compiled CSS declarations for inline styles, or, where a selector
 To enqueue a style for rendering in the site's frontend, the `$options` array requires the following:
 
 1.  **selector (string)** - this is the CSS selector for your block style CSS declarations.
-2.  **context (string)** - this tells the style engine where to store the styles. Styles in the same context will be
-    stored together.
+2.  **context (string)** - this tells the Style Engine where to store the styles. Styles in the same context will be stored together.
 
 `wp_style_engine_get_styles` will return the compiled CSS and CSS declarations array.
 
 #### Usage
 
+As mentioned, `wp_style_engine_get_styles()` is useful whenever you wish to generate CSS and/or classnames from a **block's style object**. A good example is [using the Style Engine to generate block supports styles](https://github.com/WordPress/gutenberg/tree/HEAD/packages/style-engine/docs/using-the-style-engine-with-block-supports.md).
+
+In the following snippet, we're taking the style object from a block's attributes and passing it to the Style Engine to get the styles. By passing a `context` in the options, the Style Engine will store the styles for later retrieval, for example, should you wish to batch enqueue a set of CSS rules.
+
 ```php
-$block_styles =  array(
-     'spacing' => array( 'padding' => '100px' )
+$block_attributes =  array(
+     'style' => array(
+        'spacing' => array( 'padding' => '100px' ),
+     ),
 );
+
 $styles = wp_style_engine_get_styles(
-    $block_styles,
+    $block_attributes['style'],
     array(
         'selector' => '.a-selector',
         'context'  => 'block-supports',
@@ -79,46 +79,53 @@ print_r( $styles );
 
 /*
 array(
-    'css'                 => '.a-selector{padding:100px}'
-    'declarations'  => array( 'padding' => '100px' )
+    'css'          => '.a-selector{padding:100px}'
+    'declarations' => array( 'padding' => '100px' )
 )
 */
 ```
 
 ### wp_style_engine_get_stylesheet_from_css_rules()
 
-Use this function to compile and return a stylesheet for any CSS rules. The style engine will automatically merge declarations and combine selectors.
+Use this function to compile and return a stylesheet for any CSS rules. The Style Engine will automatically merge declarations and combine selectors.
 
-This function acts as a CSS compiler, but will also enqueue styles for rendering where `enqueue` and `context` strings are passed in the options.
+This function acts as a CSS compiler, but will also register the styles in a store where a `context` string is passed in the options.
 
 _Parameters_
 
 -   _$css_rules_ `array<array>`
--   _$options_ `array<string|boolean>` An array of options to determine the output.
-    -   _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or '
-        global-styles'. When set, the style engine will store the CSS rules using the `context` value as a key.
+-   _$options_ `array<string|bool>` An array of options to determine the output.
+    -   _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'. When set, the Style Engine will attempt to store the CSS rules.
+    -   _prettify_ `bool` Whether to add new lines and indents to output. Default is to inherit the value of the global constant `SCRIPT_DEBUG`, if it is defined.
+    -   _optimize_ `bool` Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
 
 _Returns_
 `string` A compiled CSS string based on `$css_rules`.
 
 #### Usage
 
+Useful for when you wish to compile a bespoke set of CSS rules from a series of selector + declaration items.
+
+The Style Engine will return a sanitized and optimized stylesheet. By passing a `context` identifier in the options, the Style Engine will store the styles for later retrieval, for example, should you wish to batch enqueue a set of CSS rules.
+
+You can call `wp_style_engine_get_stylesheet_from_css_rules()` multiple times, and, so long as your styles use the same `context` identifier, they will be stored together.
+
 ```php
 $styles = array(
     array(
-        'selector'.       => '.wp-pumpkin',
+        'selector'     => '.wp-pumpkin',
         'declarations' => array( 'color' => 'orange' )
     ),
     array(
-        'selector'.       => '.wp-tomato',
+        'selector'     => '.wp-tomato',
         'declarations' => array( 'color' => 'red' )
     ),
     array(
-        'selector'.       => '.wp-tomato',
+        'selector'     => '.wp-tomato',
         'declarations' => array( 'padding' => '100px' )
     ),
     array(
-        'selector'.       => '.wp-kumquat',
+        'selector'     => '.wp-kumquat',
         'declarations' => array( 'color' => 'orange' )
     ),
 );
@@ -126,7 +133,7 @@ $styles = array(
 $stylesheet = wp_style_engine_get_stylesheet_from_css_rules(
     $styles,
     array(
-        'context'  => 'block-supports', // Indicates that these styles should be stored with block supports CSS.
+        'context' => 'block-supports', // Indicates that these styles should be stored with block supports CSS.
     )
 );
 print_r( $stylesheet ); // .wp-pumpkin,.wp-kumquat{color:orange}.wp-tomato{color:red;padding:100px}
@@ -139,34 +146,40 @@ Returns compiled CSS from a stored context, if found.
 _Parameters_
 
 -   _$store_name_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or ' global-styles'. Default is 'block-supports'.
+-   _$options_ `array<bool>` An array of options to determine the output.
+    -   _prettify_ `bool` Whether to add new lines and indents to output. Default is to inherit the value of the global constant `SCRIPT_DEBUG`, if it is defined.
+    -   _optimize_ `bool` Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
 
 _Returns_
 `string` A compiled CSS string from the stored CSS rules.
 
 #### Usage
 
-A use case would be to fetch the stylesheet, which contains all the compiled CSS rules from the store, and enqueue it for rendering on the frontend.
+Use this function to generate a stylesheet using all the styles stored under a specific context identifier.
+
+A use case would be when you wish to enqueue all stored styles for rendering to the frontend. The Style Engine will merge and deduplicate styles upon retrieval.
 
 ```php
-// First register some styles.
+// First, let's gather and register our styles.
 $styles = array(
     array(
-        'selector'.       => '.wp-apple',
+        'selector'     => '.wp-apple',
         'declarations' => array( 'color' => 'green' )
     ),
 );
 
-$stylesheet = wp_style_engine_get_stylesheet_from_css_rules(
+wp_style_engine_get_stylesheet_from_css_rules(
     $styles,
     array(
-        'context'  => 'fruit-styles',
-        'enqueue'  => true,
+        'context' => 'fruit-styles',
     )
 );
 
-// Later, fetch compiled rules from context store.
-$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'fruit-styles' );
+// Later, we fetch compiled rules from context store.
+$stylesheet = wp_style_engine_get_stylesheet_from_context( 'fruit-styles' );
+
 print_r( $stylesheet ); // .wp-apple{color:green;}
+
 if ( ! empty( $stylesheet ) ) {
     wp_register_style( 'my-stylesheet', false, array(), true, true );
     wp_add_inline_style( 'my-stylesheet', $stylesheet );
@@ -242,7 +255,7 @@ A guide to the terms and variable names referenced by the Style Engine package.
   <dt>CSS rule</dt>
   <dd>A CSS selector followed by a CSS declarations block inside a set of curly braces. Usually found in a CSS stylesheet.</dd>
   <dt>CSS selector (or CSS class selector)</dt>
-   <dd>The first component of a CSS rule, a CSS selector is a pattern of elements, classnames or other terms that define the element to which the rule&rsquo;s CSS definitions apply. E.g., <code>p.my-cool-classname > span</code>. A CSS selector matches HTML elements based on the contents of the "class" attribute. See <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors" target="_blank">MDN CSS selectors article</a>.</dd>
+  <dd>The first component of a CSS rule, a CSS selector is a pattern of elements, classnames or other terms that define the element to which the rule&rsquo;s CSS definitions apply. E.g., <code>p.my-cool-classname > span</code>. A CSS selector matches HTML elements based on the contents of the "class" attribute. See <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors" target="_blank">MDN CSS selectors article</a>.</dd>
   <dt>CSS stylesheet</dt>
   <dd>A collection of CSS rules contained within a file or within an <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style" target="_blank">HTML style tag</a>.</dd>
   <dt>CSS value</dt>

@@ -7,7 +7,7 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
-import { useRef } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -20,10 +20,21 @@ export default function MenuActions( { menus, isLoading } ) {
 	const [ selectedMenuId, setSelectedMenuId ] = useSelectedMenuId();
 	const [ menuName ] = useMenuEntityProp( 'name', selectedMenuId );
 
-	// The title ref is passed to the popover as the anchorRef so that the
-	// dropdown is centered over the whole title area rather than just one
-	// part of it.
-	const titleRef = useRef();
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps = useMemo(
+		() => ( {
+			className: 'edit-navigation-menu-actions__switcher-dropdown',
+			position: 'bottom center',
+			// Use the title ref as the popover's anchor so that the dropdown is
+			// centered over the whole title area rather than just on part of it.
+			anchor: popoverAnchor,
+		} ),
+		[ popoverAnchor ]
+	);
 
 	if ( isLoading ) {
 		return (
@@ -36,7 +47,7 @@ export default function MenuActions( { menus, isLoading } ) {
 	return (
 		<div className="edit-navigation-menu-actions">
 			<div
-				ref={ titleRef }
+				ref={ setPopoverAnchor }
 				className="edit-navigation-menu-actions__subtitle-wrapper"
 			>
 				<Text
@@ -59,12 +70,7 @@ export default function MenuActions( { menus, isLoading } ) {
 						showTooltip: false,
 						__experimentalIsFocusable: true,
 					} }
-					popoverProps={ {
-						className:
-							'edit-navigation-menu-actions__switcher-dropdown',
-						position: 'bottom center',
-						anchorRef: titleRef.current,
-					} }
+					popoverProps={ popoverProps }
 				>
 					{ ( { onClose } ) => (
 						<MenuSwitcher

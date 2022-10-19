@@ -40,6 +40,7 @@ export default function NavigationInnerBlocks( {
 	clientId,
 	hasCustomPlaceholder,
 	orientation,
+	templateLock,
 } ) {
 	const {
 		isImmediateParentOfSelectedBlock,
@@ -115,6 +116,7 @@ export default function NavigationInnerBlocks( {
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: shouldDirectInsert,
 			orientation,
+			templateLock,
 
 			// As an exception to other blocks which feature nesting, show
 			// the block appender even when a child block is selected.
@@ -129,11 +131,6 @@ export default function NavigationInnerBlocks( {
 				parentOrChildHasSelection
 					? InnerBlocks.ButtonBlockAppender
 					: false,
-
-			// Template lock set to false here so that the Nav
-			// Block on the experimental menus screen does not
-			// inherit templateLock={ 'all' }.
-			templateLock: false,
 			__experimentalLayout: LAYOUT,
 			placeholder: showPlaceholder ? placeholder : undefined,
 		}

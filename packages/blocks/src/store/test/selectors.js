@@ -605,6 +605,10 @@ describe( 'selectors', () => {
 			...blockTypeBase,
 			category,
 		};
+		const blockTypeWithNonStringDescription = {
+			...blockTypeBase,
+			description: <div>writing flow</div>,
+		};
 
 		const state = {
 			blockTypes: {
@@ -617,6 +621,10 @@ describe( 'selectors', () => {
 			[ 'block type', blockType ],
 			[ 'block type without category', blockTypeWithoutCategory ],
 			[ 'block type without description', blockTypeWithoutDescription ],
+			[
+				'block type with non-string description',
+				blockTypeWithNonStringDescription,
+			],
 		] )( 'by %s', ( label, nameOrType ) => {
 			it( 'should return false if not match', () => {
 				const result = isMatchingSearchTerm(
@@ -690,7 +698,10 @@ describe( 'selectors', () => {
 				} );
 			}
 
-			if ( nameOrType.description ) {
+			if (
+				nameOrType.description &&
+				typeof nameOrType.description === 'string'
+			) {
 				it( 'should return true if match using the description', () => {
 					const result = isMatchingSearchTerm(
 						state,

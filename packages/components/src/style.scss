@@ -1,3 +1,7 @@
+// Variables
+@import "./utils/theme-variables.scss";
+
+// Components
 @import "./animate/style.scss";
 @import "./autocomplete/style.scss";
 @import "./button-group/style.scss";
@@ -17,7 +21,6 @@
 @import "./dropdown/style.scss";
 @import "./dropdown-menu/style.scss";
 @import "./duotone-picker/style.scss";
-@import "./font-size-picker/style.scss";
 @import "./form-toggle/style.scss";
 @import "./form-token-field/style.scss";
 @import "./guide/style.scss";

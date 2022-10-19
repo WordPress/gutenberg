@@ -11,6 +11,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	__unstableGetBlockProps as getBlockProps,
 	getBlockType,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { useMergeRefs, useDisabled } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
@@ -77,6 +78,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	} = useSelect(
 		( select ) => {
 			const {
+				getBlockAttributes,
 				getBlockIndex,
 				getBlockMode,
 				getBlockName,
@@ -87,19 +89,22 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isAncestorMultiSelected,
 				isFirstMultiSelectedBlock,
 			} = select( blockEditorStore );
+			const { getActiveBlockVariation } = select( blocksStore );
 			const isSelected = isBlockSelected( clientId );
 			const isPartOfMultiSelection =
 				isBlockMultiSelected( clientId ) ||
 				isAncestorMultiSelected( clientId );
 			const blockName = getBlockName( clientId );
 			const blockType = getBlockType( blockName );
+			const attributes = getBlockAttributes( clientId );
+			const match = getActiveBlockVariation( blockName, attributes );
 
 			return {
 				index: getBlockIndex( clientId ),
 				mode: getBlockMode( clientId ),
 				name: blockName,
 				blockApiVersion: blockType?.apiVersion || 1,
-				blockTitle: blockType?.title,
+				blockTitle: match?.title || blockType?.title,
 				isPartOfSelection: isSelected || isPartOfMultiSelection,
 				adjustScrolling:
 					isSelected || isFirstMultiSelectedBlock( clientId ),

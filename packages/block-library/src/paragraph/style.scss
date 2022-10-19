@@ -28,6 +28,11 @@
 	font-style: normal;
 }
 
+body.rtl .has-drop-cap:not(:focus)::first-letter {
+	float: initial;
+	margin-left: 0.1em;
+}
+
 // Prevent the dropcap from breaking out of the box when a background is applied.
 p.has-drop-cap.has-background {
 	overflow: hidden;

@@ -31,3 +31,67 @@ exports[`color settings toggles between solid colors and gradients 1`] = `
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
 `;
+
+exports[`minimum height settings changes the height value between units 1`] = `
+"<!-- wp:cover {\\"url\\":\\"https://cldup.com/cXyG__fTLN.jpg\\",\\"id\\":10710,\\"dimRatio\\":50,\\"overlayColor\\":\\"foreground\\",\\"minHeight\\":50,\\"minHeightUnit\\":\\"px\\",\\"isDark\\":false} -->
+<div class=\\"wp-block-cover is-light\\" style=\\"min-height:50px\\"><span aria-hidden=\\"true\\" class=\\"wp-block-cover__background has-foreground-background-color has-background-dim\\"></span><img class=\\"wp-block-cover__image-background wp-image-10710\\" alt=\\"\\" src=\\"https://cldup.com/cXyG__fTLN.jpg\\" data-object-fit=\\"cover\\"/><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\",\\"fontSize\\":\\"large\\"} -->
+<p class=\\"has-text-align-center has-large-font-size\\"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;
+
+exports[`minimum height settings changes the height value to 20(vw) 1`] = `
+"<!-- wp:cover {\\"url\\":\\"https://cldup.com/cXyG__fTLN.jpg\\",\\"id\\":10710,\\"dimRatio\\":50,\\"overlayColor\\":\\"foreground\\",\\"minHeight\\":20,\\"minHeightUnit\\":\\"vw\\",\\"isDark\\":false} -->
+<div class=\\"wp-block-cover is-light\\" style=\\"min-height:20vw\\"><span aria-hidden=\\"true\\" class=\\"wp-block-cover__background has-foreground-background-color has-background-dim\\"></span><img class=\\"wp-block-cover__image-background wp-image-10710\\" alt=\\"\\" src=\\"https://cldup.com/cXyG__fTLN.jpg\\" data-object-fit=\\"cover\\"/><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\",\\"fontSize\\":\\"large\\"} -->
+<p class=\\"has-text-align-center has-large-font-size\\"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;
+
+exports[`minimum height settings disables the decrease button when reaching the minimum value for Pixels (px) 1`] = `
+"<!-- wp:cover {\\"url\\":\\"https://cldup.com/cXyG__fTLN.jpg\\",\\"id\\":10710,\\"dimRatio\\":50,\\"overlayColor\\":\\"foreground\\",\\"minHeight\\":50,\\"minHeightUnit\\":\\"px\\",\\"isDark\\":false} -->
+<div class=\\"wp-block-cover is-light\\" style=\\"min-height:50px\\"><span aria-hidden=\\"true\\" class=\\"wp-block-cover__background has-foreground-background-color has-background-dim\\"></span><img class=\\"wp-block-cover__image-background wp-image-10710\\" alt=\\"\\" src=\\"https://cldup.com/cXyG__fTLN.jpg\\" data-object-fit=\\"cover\\"/><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\",\\"fontSize\\":\\"large\\"} -->
+<p class=\\"has-text-align-center has-large-font-size\\"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;
+
+exports[`minimum height settings disables the decrease button when reaching the minimum value for Relative to parent font size (em) 1`] = `
+"<!-- wp:cover {\\"url\\":\\"https://cldup.com/cXyG__fTLN.jpg\\",\\"id\\":10710,\\"dimRatio\\":50,\\"overlayColor\\":\\"foreground\\",\\"minHeight\\":1,\\"minHeightUnit\\":\\"em\\",\\"isDark\\":false} -->
+<div class=\\"wp-block-cover is-light\\" style=\\"min-height:1em\\"><span aria-hidden=\\"true\\" class=\\"wp-block-cover__background has-foreground-background-color has-background-dim\\"></span><img class=\\"wp-block-cover__image-background wp-image-10710\\" alt=\\"\\" src=\\"https://cldup.com/cXyG__fTLN.jpg\\" data-object-fit=\\"cover\\"/><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\",\\"fontSize\\":\\"large\\"} -->
+<p class=\\"has-text-align-center has-large-font-size\\"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;
+
+exports[`minimum height settings disables the decrease button when reaching the minimum value for Relative to root font size (rem) 1`] = `
+"<!-- wp:cover {\\"url\\":\\"https://cldup.com/cXyG__fTLN.jpg\\",\\"id\\":10710,\\"dimRatio\\":50,\\"overlayColor\\":\\"foreground\\",\\"minHeight\\":1,\\"minHeightUnit\\":\\"rem\\",\\"isDark\\":false} -->
+<div class=\\"wp-block-cover is-light\\" style=\\"min-height:1rem\\"><span aria-hidden=\\"true\\" class=\\"wp-block-cover__background has-foreground-background-color has-background-dim\\"></span><img class=\\"wp-block-cover__image-background wp-image-10710\\" alt=\\"\\" src=\\"https://cldup.com/cXyG__fTLN.jpg\\" data-object-fit=\\"cover\\"/><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\",\\"fontSize\\":\\"large\\"} -->
+<p class=\\"has-text-align-center has-large-font-size\\"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;
+
+exports[`minimum height settings disables the decrease button when reaching the minimum value for Viewport height (vh) 1`] = `
+"<!-- wp:cover {\\"url\\":\\"https://cldup.com/cXyG__fTLN.jpg\\",\\"id\\":10710,\\"dimRatio\\":50,\\"overlayColor\\":\\"foreground\\",\\"minHeight\\":1,\\"minHeightUnit\\":\\"vh\\",\\"isDark\\":false} -->
+<div class=\\"wp-block-cover is-light\\" style=\\"min-height:1vh\\"><span aria-hidden=\\"true\\" class=\\"wp-block-cover__background has-foreground-background-color has-background-dim\\"></span><img class=\\"wp-block-cover__image-background wp-image-10710\\" alt=\\"\\" src=\\"https://cldup.com/cXyG__fTLN.jpg\\" data-object-fit=\\"cover\\"/><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\",\\"fontSize\\":\\"large\\"} -->
+<p class=\\"has-text-align-center has-large-font-size\\"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;
+
+exports[`minimum height settings disables the decrease button when reaching the minimum value for Viewport width (vw) 1`] = `
+"<!-- wp:cover {\\"url\\":\\"https://cldup.com/cXyG__fTLN.jpg\\",\\"id\\":10710,\\"dimRatio\\":50,\\"overlayColor\\":\\"foreground\\",\\"minHeight\\":1,\\"minHeightUnit\\":\\"vw\\",\\"isDark\\":false} -->
+<div class=\\"wp-block-cover is-light\\" style=\\"min-height:1vw\\"><span aria-hidden=\\"true\\" class=\\"wp-block-cover__background has-foreground-background-color has-background-dim\\"></span><img class=\\"wp-block-cover__image-background wp-image-10710\\" alt=\\"\\" src=\\"https://cldup.com/cXyG__fTLN.jpg\\" data-object-fit=\\"cover\\"/><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\",\\"fontSize\\":\\"large\\"} -->
+<p class=\\"has-text-align-center has-large-font-size\\"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;
+
+exports[`when an image is attached updates background opacity 1`] = `
+"<!-- wp:cover {\\"url\\":\\"https://cldup.com/cXyG__fTLN.jpg\\",\\"id\\":10710,\\"dimRatio\\":15,\\"overlayColor\\":\\"foreground\\",\\"isDark\\":false} -->
+<div class=\\"wp-block-cover is-light\\"><span aria-hidden=\\"true\\" class=\\"wp-block-cover__background has-foreground-background-color has-background-dim-20 has-background-dim\\"></span><img class=\\"wp-block-cover__image-background wp-image-10710\\" alt=\\"\\" src=\\"https://cldup.com/cXyG__fTLN.jpg\\" data-object-fit=\\"cover\\"/><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\",\\"fontSize\\":\\"large\\"} -->
+<p class=\\"has-text-align-center has-large-font-size\\"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;

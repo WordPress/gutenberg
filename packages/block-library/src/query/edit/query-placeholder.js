@@ -3,16 +3,100 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	useBlockProps,
-	__experimentalBlockVariationPicker,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import {
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { useState } from '@wordpress/element';
+import {
+	useBlockProps,
+	store as blockEditorStore,
+	__experimentalBlockVariationPicker,
+	__experimentalGetMatchingVariation as getMatchingVariation,
+} from '@wordpress/block-editor';
+import { Button, Placeholder } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
-function QueryPlaceholder( {
+export default function QueryPlaceholder( {
+	attributes,
+	clientId,
+	name,
+	openPatternSelectionModal,
+	setAttributes,
+} ) {
+	const [ isStartingBlank, setIsStartingBlank ] = useState( false );
+	const blockProps = useBlockProps();
+
+	const { blockType, allVariations, hasPatterns } = useSelect(
+		( select ) => {
+			const { getBlockVariations, getBlockType } = select( blocksStore );
+			const {
+				getBlockRootClientId,
+				__experimentalGetPatternsByBlockTypes,
+			} = select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+
+			return {
+				blockType: getBlockType( name ),
+				allVariations: getBlockVariations( name ),
+				hasPatterns: !! __experimentalGetPatternsByBlockTypes(
+					name,
+					rootClientId
+				).length,
+			};
+		},
+		[ name, clientId ]
+	);
+
+	const matchingVariation = getMatchingVariation( attributes, allVariations );
+	const icon =
+		matchingVariation?.icon?.src ||
+		matchingVariation?.icon ||
+		blockType?.icon?.src;
+	const label = matchingVariation?.title || blockType?.title;
+	if ( isStartingBlank ) {
+		return (
+			<QueryVariationPicker
+				clientId={ clientId }
+				name={ name }
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				icon={ icon }
+				label={ label }
+			/>
+		);
+	}
+	return (
+		<div { ...blockProps }>
+			<Placeholder
+				icon={ icon }
+				label={ label }
+				instructions={ __(
+					'Choose a pattern for the query loop or start blank.'
+				) }
+			>
+				{ !! hasPatterns && (
+					<Button
+						variant="primary"
+						onClick={ openPatternSelectionModal }
+					>
+						{ __( 'Choose' ) }
+					</Button>
+				) }
+
+				<Button
+					variant="secondary"
+					onClick={ () => {
+						setIsStartingBlank( true );
+					} }
+				>
+					{ __( 'Start blank' ) }
+				</Button>
+			</Placeholder>
+		</div>
+	);
+}
+
+function QueryVariationPicker( {
 	clientId,
 	name,
 	attributes,
@@ -70,5 +154,3 @@ function QueryPlaceholder( {
 		</div>
 	);
 }
-
-export default QueryPlaceholder;

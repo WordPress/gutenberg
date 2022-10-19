@@ -1,7 +1,7 @@
 /**
- * Generates core block documentation using block.json files.
- * Reads from  : packages/block-library/src
- * Publishes to: docs/reference-guides/core-blocks.ms
+ * Generates theme.json documentation using theme.json schema.
+ * Reads from  : schemas/json/theme.json
+ * Publishes to: docs/reference-guides/theme-json-reference/theme-json-living.md
  */
 
 /**

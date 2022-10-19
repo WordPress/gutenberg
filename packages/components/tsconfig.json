@@ -18,6 +18,7 @@
 		"strictNullChecks": true
 	},
 	"references": [
+		{ "path": "../a11y" },
 		{ "path": "../compose" },
 		{ "path": "../date" },
 		{ "path": "../deprecated" },
@@ -46,10 +47,8 @@
 		"src/color-list-picker",
 		"src/combobox-control",
 		"src/custom-gradient-picker",
-		"src/custom-select-control",
 		"src/dimension-control",
 		"src/duotone-picker",
-		"src/font-size-picker",
 		"src/gradient-picker",
 		"src/guide",
 		"src/higher-order/navigate-regions",

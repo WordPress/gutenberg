@@ -168,7 +168,6 @@ const ROOT_BLOCK_SUPPORTS = [
 	'fontWeight',
 	'lineHeight',
 	'textDecoration',
-	'textTransform',
 	'padding',
 	'contentSize',
 	'wideSize',

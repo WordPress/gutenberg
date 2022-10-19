@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { without } from 'lodash';
-
-/**
  * Class responsible for orchestrating event handling on the global window,
  * binding a single event to be shared across all handling instances, and
  * removing the handler when no instances are listening for the event.
@@ -27,9 +22,12 @@ class Listener {
 	}
 
 	remove( /** @type {any} */ eventType, /** @type {any} */ instance ) {
-		this.listeners[ eventType ] = without(
-			this.listeners[ eventType ],
-			instance
+		if ( ! this.listeners[ eventType ] ) {
+			return;
+		}
+
+		this.listeners[ eventType ] = this.listeners[ eventType ].filter(
+			( /** @type {any} */ listener ) => listener !== instance
 		);
 
 		if ( ! this.listeners[ eventType ].length ) {

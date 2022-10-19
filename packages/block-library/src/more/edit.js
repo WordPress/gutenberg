@@ -54,7 +54,7 @@ export default function MoreEdit( {
 			</InspectorControls>
 			<div { ...useBlockProps() }>
 				<input
-					aria-label={ __( 'Read more link text' ) }
+					aria-label={ __( '“Read more” link text' ) }
 					type="text"
 					value={ customText }
 					placeholder={ DEFAULT_TEXT }

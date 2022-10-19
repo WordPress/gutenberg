@@ -3253,7 +3253,7 @@ describe( 'selectors', () => {
 			expect( getTemplateLock( state ) ).toBe( 'all' );
 		} );
 
-		it( 'should return null if the specified clientId was not found', () => {
+		it( 'should return undefined if the specified clientId was not found', () => {
 			const state = {
 				settings: { templateLock: 'all' },
 				blockListSettings: {
@@ -3263,10 +3263,10 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getTemplateLock( state, 'ribs' ) ).toBe( null );
+			expect( getTemplateLock( state, 'ribs' ) ).toBe( undefined );
 		} );
 
-		it( 'should return null if template lock was not set on the specified block', () => {
+		it( 'should return undefined if template lock was not set on the specified block', () => {
 			const state = {
 				settings: { templateLock: 'all' },
 				blockListSettings: {
@@ -3276,7 +3276,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getTemplateLock( state, 'ribs' ) ).toBe( null );
+			expect( getTemplateLock( state, 'ribs' ) ).toBe( undefined );
 		} );
 
 		it( 'should return the template lock for the specified clientId', () => {

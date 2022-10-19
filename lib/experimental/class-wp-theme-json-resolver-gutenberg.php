@@ -44,7 +44,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 			 *
 			 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 			 */
-			$theme_json      = apply_filters( 'global_styles_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
+			$theme_json      = apply_filters( 'wp_theme_json_data_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
 			$theme_json_data = $theme_json->get_data();
 			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 
@@ -141,12 +141,10 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 		 *
 		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
-		$theme_json = apply_filters( 'global_styles_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'core' ) );
+		$theme_json = apply_filters( 'wp_theme_json_data_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'blocks' ) );
 		$config     = $theme_json->get_data();
 
-		// Core here means it's the lower level part of the styles chain.
-		// It can be a core or a third-party block.
-		return new WP_Theme_JSON_Gutenberg( $config, 'core' );
+		return new WP_Theme_JSON_Gutenberg( $config, 'blocks' );
 	}
 
 	/**

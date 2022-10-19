@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import { flow } from 'lodash';
-
-/**
  * WordPress dependencies
  */
+import { pipe } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
 
@@ -29,7 +25,7 @@ function ImportDropdown( { onUpload } ) {
 				</Button>
 			) }
 			renderContent={ ( { onClose } ) => (
-				<ImportForm onUpload={ flow( onClose, onUpload ) } />
+				<ImportForm onUpload={ pipe( onClose, onUpload ) } />
 			) }
 		/>
 	);

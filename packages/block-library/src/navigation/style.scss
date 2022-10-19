@@ -47,6 +47,14 @@ $navigation-icon-size: 24px;
 		display: block;
 	}
 
+	// This rule needs extra specificity so that it inherits the correct color from its parent.
+	// Otherwise, a link color set by a parent group can override the value.
+	// This also fixes an issue where a navigation with an explicitly set color is overridden
+	// by link colors defined in Global Styles.
+	.wp-block-navigation-item__content.wp-block-navigation-item__content {
+		color: inherit;
+	}
+
 	// The following rules provide class based application of user selected text
 	// decoration via block supports.
 	&.has-text-decoration-underline .wp-block-navigation-item__content {

@@ -24,8 +24,7 @@ import {
 } from './fixtures';
 
 // Mock debounce() so that it runs instantly.
-jest.mock( 'lodash', () => ( {
-	...jest.requireActual( 'lodash' ),
+jest.mock( '@wordpress/compose/src/utils/debounce', () => ( {
 	debounce: ( fn ) => {
 		fn.cancel = jest.fn();
 		return fn;
@@ -393,7 +392,7 @@ describe( 'Searching for a link', () => {
 			fauxEntitySuggestions.length
 		);
 
-		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
+		expect( searchInput ).toHaveAttribute( 'aria-expanded', 'true' );
 
 		// Sanity check that a search suggestion shows up corresponding to the data.
 		expect( searchResultElements[ 0 ] ).toHaveTextContent(

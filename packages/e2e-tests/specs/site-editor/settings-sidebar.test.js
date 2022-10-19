@@ -12,13 +12,13 @@ import {
 
 async function toggleSidebar() {
 	await page.click(
-		'.edit-site-header__actions button[aria-label="Settings"]'
+		'.edit-site-header-edit-mode__actions button[aria-label="Settings"]'
 	);
 }
 
 async function getActiveTabLabel() {
 	return await page.$eval(
-		'.edit-site-sidebar__panel-tab.is-active',
+		'.edit-site-sidebar-edit-mode__panel-tab.is-active',
 		( element ) => element.getAttribute( 'aria-label' )
 	);
 }

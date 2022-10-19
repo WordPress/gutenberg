@@ -14,6 +14,7 @@ import BubblesVirtuallySlot from './bubbles-virtually/slot';
 import BubblesVirtuallySlotFillProvider from './bubbles-virtually/slot-fill-provider';
 import SlotFillProvider from './provider';
 import useSlot from './bubbles-virtually/use-slot';
+export { default as useSlotFills } from './bubbles-virtually/use-slot-fills';
 
 export function Fill( props ) {
 	// We're adding both Fills here so they can register themselves before

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, reduce, without } from 'lodash';
+import { castArray, reduce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -295,9 +295,8 @@ export const showBlockTypes =
 				.select( preferencesStore )
 				.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
 
-		const newBlockNames = without(
-			existingBlockNames,
-			...castArray( blockNames )
+		const newBlockNames = existingBlockNames.filter(
+			( type ) => ! castArray( blockNames ).includes( type )
 		);
 
 		registry

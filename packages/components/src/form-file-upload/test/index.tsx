@@ -41,7 +41,7 @@ describe( 'FormFileUpload', () => {
 		const button = screen.getByText( 'My Upload Button' );
 		const input = screen.getByTestId( 'form-file-upload-input' );
 		expect( button ).toBeInTheDocument();
-		expect( input.style.display ).toBe( 'none' );
+		expect( input ).toHaveStyle( 'display: none' );
 	} );
 
 	it( 'should not fire a change event after selecting the same file', async () => {

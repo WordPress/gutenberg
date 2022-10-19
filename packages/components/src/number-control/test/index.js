@@ -90,9 +90,10 @@ describe( 'NumberControl', () => {
 			// After the blur, the `onChange` callback fires asynchronously.
 			await waitFor( () => {
 				expect( spy ).toHaveBeenCalledTimes( 2 );
-				expect( spy ).toHaveBeenNthCalledWith( 1, '1' );
-				expect( spy ).toHaveBeenNthCalledWith( 2, 4 );
 			} );
+
+			expect( spy ).toHaveBeenNthCalledWith( 1, '1' );
+			expect( spy ).toHaveBeenNthCalledWith( 2, 4 );
 		} );
 
 		it( 'should call onChange callback when value is not valid', () => {

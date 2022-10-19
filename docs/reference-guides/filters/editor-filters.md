@@ -44,7 +44,7 @@ wp.hooks.addFilter(
 
 ### `media.crossOrigin`
 
-Used to set or modify the `crossOrigin` attribute for foreign-origin media elements (i.e `<img>`, `<audio>` , `<img>` , `<link>` , `<script>`, `<video>`). See this [article](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) for more information the `crossOrigin` attribute, its values and how it applies to each element.
+Used to set or modify the `crossOrigin` attribute for foreign-origin media elements (i.e `<audio>` , `<img>` , `<link>` , `<script>`, `<video>`). See this [article](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) for more information the `crossOrigin` attribute, its values and how it applies to each element.
 
 One example of it in action is in the Image block's transform feature to allow cross-origin images to be used in a `<canvas>`.
 

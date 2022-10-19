@@ -26,7 +26,7 @@ import type {
 	NavigatorContext as NavigatorContextType,
 } from '../types';
 
-function NavigatorProvider(
+function UnconnectedNavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
@@ -49,6 +49,7 @@ function NavigatorProvider(
 					...options,
 					path,
 					isBack: false,
+					hasRestoredFocus: false,
 				},
 			] );
 		},
@@ -62,6 +63,7 @@ function NavigatorProvider(
 				{
 					...locationHistory[ locationHistory.length - 2 ],
 					isBack: true,
+					hasRestoredFocus: false,
 				},
 			] );
 		}
@@ -129,9 +131,9 @@ function NavigatorProvider(
  * );
  * ```
  */
-const ConnectedNavigatorProvider = contextConnect(
-	NavigatorProvider,
+export const NavigatorProvider = contextConnect(
+	UnconnectedNavigatorProvider,
 	'NavigatorProvider'
 );
 
-export default ConnectedNavigatorProvider;
+export default NavigatorProvider;

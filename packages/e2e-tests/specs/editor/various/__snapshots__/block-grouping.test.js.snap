@@ -79,7 +79,7 @@ exports[`Block Grouping Group creation groups and ungroups multiple blocks of di
 `;
 
 exports[`Block Grouping Preserving selected blocks attributes preserves width alignment settings of selected blocks 1`] = `
-"<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"},\\"align\\":\\"full\\"} -->
+"<!-- wp:group {\\"align\\":\\"full\\",\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
 <div class=\\"wp-block-group alignfull\\"><!-- wp:heading -->
 <h2>Group Heading</h2>
 <!-- /wp:heading -->

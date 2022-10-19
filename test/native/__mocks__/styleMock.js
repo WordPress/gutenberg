@@ -171,4 +171,7 @@ module.exports = {
 	'wp-block-list-item__list-item-placeholder': {
 		color: '#87a6bc',
 	},
+	innerAppender: {
+		marginLeft: 8,
+	},
 };

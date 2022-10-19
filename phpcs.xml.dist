@@ -2,8 +2,10 @@
 <ruleset name="WordPress Coding Standards for Gutenberg Plugin">
 	<description>Sniffs for WordPress plugins, with minor modifications for Gutenberg</description>
 
-	<rule ref="PHPCompatibility"/>
 	<config name="testVersion" value="5.6-"/>
+	<rule ref="PHPCompatibilityWP">
+		<include-pattern>*\.php$</include-pattern>
+	</rule>
 
 	<rule ref="WordPress-Core"/>
 	<rule ref="WordPress-Docs"/>

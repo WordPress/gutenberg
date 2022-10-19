@@ -11,7 +11,7 @@ import { View } from '../../view';
 import { useNavigatorButton } from './hook';
 import type { NavigatorButtonProps } from '../types';
 
-function NavigatorButton(
+function UnconnectedNavigatorButton(
 	props: WordPressComponentProps< NavigatorButtonProps, 'button' >,
 	forwardedRef: ForwardedRef< any >
 ) {
@@ -53,9 +53,9 @@ function NavigatorButton(
  * );
  * ```
  */
-const ConnectedNavigatorButton = contextConnect(
-	NavigatorButton,
+export const NavigatorButton = contextConnect(
+	UnconnectedNavigatorButton,
 	'NavigatorButton'
 );
 
-export default ConnectedNavigatorButton;
+export default NavigatorButton;

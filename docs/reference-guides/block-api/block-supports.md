@@ -105,6 +105,20 @@ supports: {
 }
 ```
 
+## ariaLabel
+
+- Type: `boolean`
+- Default value: `false`
+
+ARIA-labels let you define an accessible label for elements. This property allows enabling the definition of an aria-label for the block, without exposing a UI field.
+
+```js
+supports: {
+	// Add the support for aria label.
+	ariaLabel: true
+}
+```
+
 ## className
 
 -   Type: `boolean`

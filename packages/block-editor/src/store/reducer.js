@@ -1,20 +1,12 @@
 /**
  * External dependencies
  */
-import {
-	flow,
-	reduce,
-	omit,
-	without,
-	mapValues,
-	isEqual,
-	isEmpty,
-	omitBy,
-} from 'lodash';
+import { reduce, omit, mapValues, isEqual, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 /**
@@ -425,15 +417,15 @@ const withBlockTree =
 				break;
 			}
 			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
-				const updatedBlockUids = Object.keys(
-					omitBy( newState.attributes, ( attributes, clientId ) => {
+				const updatedBlockUids = Object.entries( newState.attributes )
+					.filter( ( [ clientId, attributes ] ) => {
 						return (
-							newState.byClientId[ clientId ].name !==
-								'core/block' ||
-							attributes.ref !== action.updatedId
+							newState.byClientId[ clientId ].name ===
+								'core/block' &&
+							attributes.ref === action.updatedId
 						);
 					} )
-				);
+					.map( ( [ clientId ] ) => clientId );
 
 				newState.tree = updateParentInnerBlocksInTree(
 					newState,
@@ -614,7 +606,6 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 			order: mapBlockOrder( action.blocks ),
 			parents: mapBlockParents( action.blocks ),
 			controlledInnerBlocks: {},
-			visibility: {},
 		};
 
 		const subTree = buildBlockTree( newState, action.blocks );
@@ -790,7 +781,7 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
  *
  * @return {Object} Updated state.
  */
-export const blocks = flow(
+export const blocks = pipe(
 	combineReducers,
 	withSaveReusableBlock, // Needs to be before withBlockCache.
 	withBlockTree, // Needs to be before withInnerBlocksRemoveCascade.
@@ -988,10 +979,10 @@ export const blocks = flow(
 				// Moving from a parent block to another.
 				return {
 					...state,
-					[ fromRootClientId ]: without(
-						state[ fromRootClientId ],
-						...clientIds
-					),
+					[ fromRootClientId ]:
+						state[ fromRootClientId ]?.filter(
+							( id ) => ! clientIds.includes( id )
+						) ?? [],
 					[ toRootClientId ]: insertAt(
 						state[ toRootClientId ],
 						clientIds,
@@ -1056,7 +1047,7 @@ export const blocks = flow(
 
 				const mappedBlocks = mapBlockOrder( action.blocks );
 
-				return flow( [
+				return pipe( [
 					( nextState ) =>
 						omit( nextState, action.replacedClientIds ),
 					( nextState ) => ( {
@@ -1090,14 +1081,19 @@ export const blocks = flow(
 			}
 
 			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
-				return flow( [
+				return pipe( [
 					// Remove inner block ordering for removed blocks.
 					( nextState ) => omit( nextState, action.removedClientIds ),
 
 					// Remove deleted blocks from other blocks' orderings.
 					( nextState ) =>
-						mapValues( nextState, ( subState ) =>
-							without( subState, ...action.removedClientIds )
+						mapValues(
+							nextState,
+							( subState ) =>
+								subState?.filter(
+									( id ) =>
+										! action.removedClientIds.includes( id )
+								) ?? []
 						),
 				] )( state );
 		}
@@ -1162,17 +1158,6 @@ export const blocks = flow(
 		}
 		return state;
 	},
-
-	visibility( state = {}, action ) {
-		if ( action.type === 'SET_BLOCK_VISIBILITY' ) {
-			return {
-				...state,
-				...action.updates,
-			};
-		}
-
-		return state;
-	},
 } );
 
 /**
@@ -1210,6 +1195,25 @@ export function draggedBlocks( state = [], action ) {
 
 		case 'STOP_DRAGGING_BLOCKS':
 			return [];
+	}
+
+	return state;
+}
+
+/**
+ * Reducer tracking the visible blocks.
+ *
+ * @param {Record<string,boolean>} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {Record<string,boolean>} Block visibility.
+ */
+export function blockVisibility( state = {}, action ) {
+	if ( action.type === 'SET_BLOCK_VISIBILITY' ) {
+		return {
+			...state,
+			...action.updates,
+		};
 	}
 
 	return state;
@@ -1468,9 +1472,19 @@ export function blocksMode( state = {}, action ) {
  */
 export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
-		case 'SHOW_INSERTION_POINT':
-			const { rootClientId, index, __unstableWithInserter } = action;
-			return { rootClientId, index, __unstableWithInserter };
+		case 'SHOW_INSERTION_POINT': {
+			const { rootClientId, index, __unstableWithInserter, operation } =
+				action;
+			const nextState = {
+				rootClientId,
+				index,
+				__unstableWithInserter,
+				operation,
+			};
+
+			// Bail out updates if the states are the same.
+			return isEqual( state, nextState ) ? state : nextState;
+		}
 
 		case 'HIDE_INSERTION_POINT':
 			return null;
@@ -1660,7 +1674,7 @@ export function hasBlockMovingClientId( state = null, action ) {
  *
  * @return {[string,Object]} Updated state.
  */
-export function lastBlockAttributesChange( state, action ) {
+export function lastBlockAttributesChange( state = null, action ) {
 	switch ( action.type ) {
 		case 'UPDATE_BLOCK':
 			if ( ! action.updates.attributes ) {
@@ -1681,7 +1695,7 @@ export function lastBlockAttributesChange( state, action ) {
 			);
 	}
 
-	return null;
+	return state;
 }
 
 /**
@@ -1714,9 +1728,12 @@ export function automaticChangeStatus( state, action ) {
 		case 'SET_BLOCK_VISIBILITY':
 		case 'START_TYPING':
 		case 'STOP_TYPING':
+		case 'UPDATE_BLOCK_LIST_SETTINGS':
 			return state;
 	}
 
+	// TODO: This is a source of bug, as each time there's a change in timing,
+	// or a new action is added, this could break.
 	// Reset the state by default (for any action not handled).
 }
 
@@ -1810,4 +1827,5 @@ export default combineReducers( {
 	highlightedBlock,
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
+	blockVisibility,
 } );

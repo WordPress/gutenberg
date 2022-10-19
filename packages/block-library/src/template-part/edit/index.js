@@ -133,64 +133,66 @@ export default function TemplatePartEdit( {
 	}
 
 	return (
-		<RecursionProvider uniqueId={ templatePartId }>
-			<TemplatePartAdvancedControls
-				tagName={ tagName }
-				setAttributes={ setAttributes }
-				isEntityAvailable={ isEntityAvailable }
-				templatePartId={ templatePartId }
-				defaultWrapper={ areaObject.tagName }
-			/>
-			{ isPlaceholder && (
-				<TagName { ...blockProps }>
-					<TemplatePartPlaceholder
-						area={ attributes.area }
-						templatePartId={ templatePartId }
-						clientId={ clientId }
-						setAttributes={ setAttributes }
-						onOpenSelectionModal={ () =>
-							setIsTemplatePartSelectionOpen( true )
-						}
-					/>
-				</TagName>
-			) }
-			{ canReplace && (
-				<BlockSettingsMenuControls>
-					{ () => (
-						<MenuItem
-							onClick={ () => {
-								setIsTemplatePartSelectionOpen( true );
-							} }
-						>
-							{ createInterpolateElement(
-								__( 'Replace <BlockTitle />' ),
-								{
-									BlockTitle: (
-										<BlockTitle
-											clientId={ clientId }
-											maximumLength={ 25 }
-										/>
-									),
-								}
-							) }
-						</MenuItem>
-					) }
-				</BlockSettingsMenuControls>
-			) }
-			{ isEntityAvailable && (
-				<TemplatePartInnerBlocks
-					tagName={ TagName }
-					blockProps={ blockProps }
-					postId={ templatePartId }
-					hasInnerBlocks={ innerBlocks.length > 0 }
-					layout={ layout }
+		<>
+			<RecursionProvider uniqueId={ templatePartId }>
+				<TemplatePartAdvancedControls
+					tagName={ tagName }
+					setAttributes={ setAttributes }
+					isEntityAvailable={ isEntityAvailable }
+					templatePartId={ templatePartId }
+					defaultWrapper={ areaObject.tagName }
 				/>
-			) }
-			{ ! isPlaceholder && ! isResolved && (
-				<TagName { ...blockProps }>
-					<Spinner />
-				</TagName>
-			) }
+				{ isPlaceholder && (
+					<TagName { ...blockProps }>
+						<TemplatePartPlaceholder
+							area={ attributes.area }
+							templatePartId={ templatePartId }
+							clientId={ clientId }
+							setAttributes={ setAttributes }
+							onOpenSelectionModal={ () =>
+								setIsTemplatePartSelectionOpen( true )
+							}
+						/>
+					</TagName>
+				) }
+				{ canReplace && (
+					<BlockSettingsMenuControls>
+						{ () => (
+							<MenuItem
+								onClick={ () => {
+									setIsTemplatePartSelectionOpen( true );
+								} }
+							>
+								{ createInterpolateElement(
+									__( 'Replace <BlockTitle />' ),
+									{
+										BlockTitle: (
+											<BlockTitle
+												clientId={ clientId }
+												maximumLength={ 25 }
+											/>
+										),
+									}
+								) }
+							</MenuItem>
+						) }
+					</BlockSettingsMenuControls>
+				) }
+				{ isEntityAvailable && (
+					<TemplatePartInnerBlocks
+						tagName={ TagName }
+						blockProps={ blockProps }
+						postId={ templatePartId }
+						hasInnerBlocks={ innerBlocks.length > 0 }
+						layout={ layout }
+					/>
+				) }
+				{ ! isPlaceholder && ! isResolved && (
+					<TagName { ...blockProps }>
+						<Spinner />
+					</TagName>
+				) }
+			</RecursionProvider>
 			{ isTemplatePartSelectionOpen && (
 				<Modal
 					overlayClassName="block-editor-template-part__selection-modal"
@@ -215,6 +217,6 @@ export default function TemplatePartEdit( {
 					/>
 				</Modal>
 			) }
-		</RecursionProvider>
+		</>
 	);
 }

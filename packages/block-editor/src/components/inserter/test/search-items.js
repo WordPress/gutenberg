@@ -42,6 +42,10 @@ describe( 'getNormalizedSearchTerms', () => {
 			getNormalizedSearchTerms( '  Média  &   Text Tag-Cloud > 123' )
 		).toEqual( [ 'media', 'text', 'tag', 'cloud', '123' ] );
 	} );
+
+	it( 'should support non-latin letters', () => {
+		expect( getNormalizedSearchTerms( 'მედია' ) ).toEqual( [ 'მედია' ] );
+	} );
 } );
 
 describe( 'getItemSearchRank', () => {

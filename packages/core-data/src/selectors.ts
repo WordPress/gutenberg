@@ -222,6 +222,55 @@ export function getEntityConfig(
 }
 
 /**
+ * GetEntityRecord is declared as a *callable interface* with
+ * two signatures to work around the fact that TypeScript doesn't
+ * allow currying generic functions:
+ *
+ * ```ts
+ * 		type CurriedState = F extends ( state: any, ...args: infer P ) => infer R
+ * 			? ( ...args: P ) => R
+ * 			: F;
+ * 		type Selector = <K extends string | number>(
+ *         state: any,
+ *         kind: K,
+ *         key: K extends string ? 'string value' : false
+ *    ) => K;
+ * 		type BadlyInferredSignature = CurriedState< Selector >
+ *    // BadlyInferredSignature evaluates to:
+ *    // (kind: string number, key: false | "string value") => string number
+ * ```
+ *
+ * The signature without the state parameter shipped as CurriedSignature
+ * is used in the return value of `select( coreStore )`.
+ *
+ * See https://github.com/WordPress/gutenberg/pull/41578 for more details.
+ */
+export interface GetEntityRecord {
+	<
+		EntityRecord extends
+			| ET.EntityRecord< any >
+			| Partial< ET.EntityRecord< any > >
+	>(
+		state: State,
+		kind: string,
+		name: string,
+		key: EntityRecordKey,
+		query?: GetRecordsHttpQuery
+	): EntityRecord | undefined;
+
+	CurriedSignature: <
+		EntityRecord extends
+			| ET.EntityRecord< any >
+			| Partial< ET.EntityRecord< any > >
+	>(
+		kind: string,
+		name: string,
+		key: EntityRecordKey,
+		query?: GetRecordsHttpQuery
+	) => EntityRecord | undefined;
+}
+
+/**
  * Returns the Entity's record object by key. Returns `null` if the value is not
  * yet received, undefined if the value entity is known to not exist, or the
  * entity object if it exists and is received.
@@ -236,7 +285,7 @@ export function getEntityConfig(
  * @return Record.
  */
 export const getEntityRecord = createSelector(
-	<
+	( <
 		EntityRecord extends
 			| ET.EntityRecord< any >
 			| Partial< ET.EntityRecord< any > >
@@ -279,7 +328,7 @@ export const getEntityRecord = createSelector(
 		}
 
 		return item;
-	},
+	} ) as GetEntityRecord,
 	( state: State, kind, name, recordId, query ) => {
 		const context = query?.context ?? 'default';
 		return [
@@ -301,7 +350,7 @@ export const getEntityRecord = createSelector(
 			] ),
 		];
 	}
-);
+) as GetEntityRecord;
 
 /**
  * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity records from the API if the entity record isn't available in the local state.
@@ -415,6 +464,37 @@ export function hasEntityRecords(
 }
 
 /**
+ * GetEntityRecord is declared as a *callable interface* with
+ * two signatures to work around the fact that TypeScript doesn't
+ * allow currying generic functions.
+ *
+ * @see GetEntityRecord
+ * @see https://github.com/WordPress/gutenberg/pull/41578
+ */
+export interface GetEntityRecords {
+	<
+		EntityRecord extends
+			| ET.EntityRecord< any >
+			| Partial< ET.EntityRecord< any > >
+	>(
+		state: State,
+		kind: string,
+		name: string,
+		query?: GetRecordsHttpQuery
+	): EntityRecord[] | null;
+
+	CurriedSignature: <
+		EntityRecord extends
+			| ET.EntityRecord< any >
+			| Partial< ET.EntityRecord< any > >
+	>(
+		kind: string,
+		name: string,
+		query?: GetRecordsHttpQuery
+	) => EntityRecord[] | null;
+}
+
+/**
  * Returns the Entity's records.
  *
  * @param  state State tree
@@ -425,7 +505,7 @@ export function hasEntityRecords(
  *
  * @return Records.
  */
-export const getEntityRecords = <
+export const getEntityRecords = ( <
 	EntityRecord extends
 		| ET.EntityRecord< any >
 		| Partial< ET.EntityRecord< any > >
@@ -433,7 +513,7 @@ export const getEntityRecords = <
 	state: State,
 	kind: string,
 	name: string,
-	query?: GetRecordsHttpQuery
+	query: GetRecordsHttpQuery
 ): EntityRecord[] | null => {
 	// Queried data state is prepopulated for all known entities. If this is not
 	// assigned for the given parameters, then it is known to not exist.
@@ -446,7 +526,7 @@ export const getEntityRecords = <
 		return null;
 	}
 	return getQueriedItems( queriedState, query );
-};
+} ) as GetEntityRecords;
 
 type DirtyEntityRecord = {
 	title: string;

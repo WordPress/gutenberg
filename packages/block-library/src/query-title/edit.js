@@ -85,7 +85,7 @@ export default function QueryTitleEdit( {
 
 				<TagName { ...blockProps }>
 					{ showSearchTerm
-						? __( 'Search results for: "search term"' )
+						? __( 'Search results for: “search term”' )
 						: __( 'Search results' ) }
 				</TagName>
 			</>

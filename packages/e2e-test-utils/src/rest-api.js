@@ -12,7 +12,7 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
-import { WP_BASE_URL } from './shared/config';
+import { WP_BASE_URL, WP_USERNAME, WP_PASSWORD } from './shared/config';
 import { createURL } from './create-url';
 
 // `apiFetch` expects `window.fetch` to be available in its default handler.
@@ -37,8 +37,8 @@ Link header: ${ links }` );
 
 async function login( retries = 3 ) {
 	const formData = new FormData();
-	formData.append( 'log', 'admin' );
-	formData.append( 'pwd', 'password' );
+	formData.append( 'log', WP_USERNAME );
+	formData.append( 'pwd', WP_PASSWORD );
 
 	// Login to admin using fetch.
 	const loginResponse = await fetch( createURL( 'wp-login.php' ), {

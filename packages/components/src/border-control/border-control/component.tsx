@@ -39,6 +39,7 @@ const UnconnectedBorderControl = (
 	const {
 		colors,
 		disableCustomColors,
+		disableUnits,
 		enableAlpha,
 		enableStyle = true,
 		hideLabelFromVision,
@@ -97,6 +98,7 @@ const UnconnectedBorderControl = (
 					onChange={ onWidthChange }
 					value={ border?.width || '' }
 					placeholder={ placeholder }
+					disableUnits={ disableUnits }
 					__unstableInputWidth={ inputWidth }
 				/>
 				{ withSlider && (
