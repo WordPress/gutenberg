@@ -103,5 +103,5 @@ export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
 		/**
 		 * Custom CSS class to apply to the unit control's outer wrapper.
 		 */
-		wrapperClassName?: string;
+		__unstableWrapperClassName?: string;
 	};

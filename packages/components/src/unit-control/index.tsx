@@ -63,7 +63,7 @@ function UnforwardedUnitControl(
 		units: unitsProp = CSS_UNITS,
 		value: valueProp,
 		onBlur: onBlurProp,
-		wrapperClassName,
+		__unstableWrapperClassName,
 		...props
 	} = unitControlProps;
 
@@ -109,7 +109,7 @@ function UnforwardedUnitControl(
 	const classes = classnames( 'components-unit-control', className );
 	const wrapperClasses = classnames(
 		'components-unit-control-wrapper',
-		wrapperClassName
+		__unstableWrapperClassName
 	);
 
 	const handleOnQuantityChange = (
