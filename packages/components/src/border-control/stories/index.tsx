@@ -36,12 +36,12 @@ export default meta;
 
 // Available border colors.
 const colors = [
-	{ name: 'Blue', color: '#72aee6' },
-	{ name: 'Red', color: '#e65054' },
-	{ name: 'Yellow', color: '#f2d675' },
-	{ name: 'Blue', color: '#72aee6' },
-	{ name: 'Red', color: '#e65054' },
-	{ name: 'Yellow', color: '#f2d675' },
+	{ name: 'Blue 20', color: '#72aee6' },
+	{ name: 'Blue 40', color: '#3582c4' },
+	{ name: 'Red 40', color: '#e65054' },
+	{ name: 'Red 70', color: '#8a2424' },
+	{ name: 'Yellow 10', color: '#f2d675' },
+	{ name: 'Yellow 40', color: '#bd8600' },
 ];
 
 // Multiple origin colors.
