@@ -14,32 +14,21 @@ import { useState } from '@wordpress/element';
 import ColorPalette from '..';
 import Popover from '../../popover';
 import { Provider as SlotFillProvider } from '../../slot-fill';
-import type { ColorObject, PaletteObject, ColorPaletteProps } from '../types';
+import type { ColorObject, PaletteObject } from '../types';
 
 const meta: ComponentMeta< typeof ColorPalette > = {
 	title: 'Components/ColorPalette',
 	component: ColorPalette,
 	argTypes: {
+		// Removing the control because setting this prop without changing the
+		// format of the `colors` prop can break the component.
 		__experimentalHasMultipleOrigins: {
 			control: {
 				type: null,
 			},
 		},
-		__experimentalIsRenderedInSidebar: {
-			control: {
-				type: 'boolean',
-			},
-		},
-		clearable: {
-			control: {
-				type: 'boolean',
-			},
-		},
-		disableCustomColors: {
-			control: {
-				type: 'boolean',
-			},
-		},
+		onChange: { action: 'onChange', control: { type: null } },
+		value: { control: { type: null } },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -48,7 +37,10 @@ const meta: ComponentMeta< typeof ColorPalette > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof ColorPalette > = ( args ) => {
+const Template: ComponentStory< typeof ColorPalette > = ( {
+		onChange,
+		...args
+	} ) => {
 	const firstColor =
 		( args.colors as ColorObject[] )[ 0 ].color ||
 		( args.colors as PaletteObject[] )[ 0 ].colors[ 0 ].color;
@@ -56,7 +48,14 @@ const Template: ComponentStory< typeof ColorPalette > = ( args ) => {
 
 	return (
 		<SlotFillProvider>
-			<ColorPalette { ...args } value={ color } onChange={ setColor } />
+			<ColorPalette
+				{ ...args }
+				value={ color }
+				onChange={ ( newColor ) => {
+					setColor( newColor );
+					onChange?.( newColor );
+				} }
+			/>
 			{ /* @ts-ignore Property 'Slot' does not exist on type. */ }
 			<Popover.Slot />
 		</SlotFillProvider>
@@ -100,7 +99,7 @@ MultipleOrigins.args = {
 	],
 };
 
-export const CSSVariables = ( args: ColorPaletteProps ) => {
+export const CSSVariables: ComponentStory< typeof ColorPalette > = ( args ) => {
 	return (
 		<div
 			style={ {

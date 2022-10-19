@@ -213,7 +213,7 @@ const areColorsMultiplePalette = (
 	);
 };
 
-export default function ColorPalette( {
+export function ColorPalette( {
 	clearable = true,
 	className,
 	colors = [],
@@ -350,3 +350,5 @@ export default function ColorPalette( {
 		</VStack>
 	);
 }
+
+export default ColorPalette;
