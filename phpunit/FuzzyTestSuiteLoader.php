@@ -17,12 +17,17 @@ use \ReflectionClass;
 use \ReflectionException;
 
 /*
- * The code in this file conforms to PHPUnit coding standards. Let's disable
- * the conflicting Gutenberg phpcs inspections.
+ * Let's disable the conflicting Gutenberg phpcs inspections.
+ *
+ * The code in this file conforms to PHPUnit coding standards.
+ * We need to preserve the original signatures with type annotations
+ * and the camel-cased arguments names, as renaming parameters is
+ * considered a breaking change in PHP8.
  */
 // phpcs:disable PHPCompatibility.FunctionDeclarations.NewParamTypeDeclarations.stringFound
 // phpcs:disable PHPCompatibility.FunctionDeclarations.NewReturnTypeDeclarations.stringFound
 // phpcs:disable PHPCompatibility.FunctionDeclarations.NewReturnTypeDeclarations.class_nameFound
+// phpcs:disable WordPress.NamingConventions.ValidVariableName.InterpolatedVariableNotSnakeCase
 // phpcs:disable WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
 
 /**
@@ -35,11 +40,11 @@ class FuzzyTestSuiteLoader implements TestSuiteLoader {
 	/**
 	 * @throws Exception When no test class is detected in the $suite_class_file.
 	 */
-	public function load( string $suite_class_file ): ReflectionClass {
-		$suite_class_name = $this->findTestClass( $suite_class_file );
+	public function load( string $suiteClassFile ): ReflectionClass {
+		$suiteClassName = $this->findTestClass( $suiteClassFile );
 
 		try {
-			$class = new ReflectionClass( $suite_class_name );
+			$class = new ReflectionClass( $suiteClassName );
 		} catch ( ReflectionException $e ) {
 			throw new Exception(
 				$e->getMessage(),
@@ -54,7 +59,7 @@ class FuzzyTestSuiteLoader implements TestSuiteLoader {
 
 		if ( ! $class->hasMethod( 'suite' ) ) {
 			throw new Exception(
-				"Class '$suite_class_name' could not be found in '$suite_class_file'."
+				"Class '$suiteClassName' could not be found in '$suiteClassFile'."
 			);
 		}
 
@@ -70,17 +75,17 @@ class FuzzyTestSuiteLoader implements TestSuiteLoader {
 
 		if ( $method->isAbstract() || ! $method->isPublic() || ! $method->isStatic() ) {
 			throw new Exception(
-				"Class '$suite_class_name' could not be found in '$suite_class_file'."
+				"Class '$suiteClassName' could not be found in '$suiteClassFile'."
 			);
 		}
 
 		return $class;
 	}
 
-	protected function findTestClass( $suite_class_file ): string {
-		$suite_class_name = basename( $suite_class_file, '.php' );
-		if ( class_exists( $suite_class_name, false ) ) {
-			return $suite_class_name;
+	protected function findTestClass( $suiteClassFile ): string {
+		$suiteClassName = basename( $suiteClassFile, '.php' );
+		if ( class_exists( $suiteClassName, false ) ) {
+			return $suiteClassName;
 		}
 
 		/*
@@ -93,26 +98,26 @@ class FuzzyTestSuiteLoader implements TestSuiteLoader {
 		 * the test file, so we can search through them to see if we have
 		 * a lexical variation of the class name that matches the filename.
 		 */
-		$classes_loaded_after = get_declared_classes();
-		FileLoader::checkAndLoad( $suite_class_file );
-		$classes_loaded_before = get_declared_classes();
+		$classesLoadedAfter = get_declared_classes();
+		FileLoader::checkAndLoad( $suiteClassFile );
+		$classesLoadedBefore = get_declared_classes();
 
-		$all_classes_from_loaded_files = array_values(
+		$allClassesFromLoadedFiles = array_values(
 			array_diff(
-				$classes_loaded_before,
-				$classes_loaded_after
+				$classesLoadedBefore,
+				$classesLoadedAfter
 			)
 		);
-		if ( ! empty( $all_classes_from_loaded_files ) ) {
-			$comparablesuite_class_name = $this->comparable_class_name( $suite_class_name );
-			foreach ( $all_classes_from_loaded_files as $class_name ) {
-				if ( $this->comparable_class_name( $class_name ) === $comparablesuite_class_name ) {
-					return $class_name;
+		if ( ! empty( $allClassesFromLoadedFiles ) ) {
+			$comparableSuiteClassName = $this->comparable_class_name( $suiteClassName );
+			foreach ( $allClassesFromLoadedFiles as $className ) {
+				if ( $this->comparable_class_name( $className ) === $comparableSuiteClassName ) {
+					return $className;
 				}
 			}
 		}
 		throw new Exception(
-			"Class '$suite_class_name' could not be found in '$suite_class_file'."
+			"Class '$suiteClassName' could not be found in '$suiteClassFile'."
 		);
 	}
 
@@ -120,18 +125,19 @@ class FuzzyTestSuiteLoader implements TestSuiteLoader {
 	 * Transforms a fully-qualified class name such as `\My\Custom\Class`
 	 * into a comparable string such as `class`.
 	 *
-	 * @param string $class_name Fully-qualified class name.
+	 * @param string $className Fully-qualified class name.
+	 *
 	 * @return string Comparable class name
 	 */
-	protected function comparable_class_name( string $class_name ): string {
+	protected function comparable_class_name( string $className ): string {
 		// Strip away any leading namespaces: "\My\Custom\Class" -> "Class".
-		$class_name = array_reverse( explode( '\\', $class_name ) )[0];
+		$className = array_reverse( explode( '\\', $className ) )[0];
 		// Normalize dashes to underscores: "Nifty-Class" -> "Nifty_Class".
-		$class_name = str_replace( '-', '_', $class_name );
+		$className = str_replace( '-', '_', $className );
 		// Case-fold for case-insensitive comparison.
-		$class_name = strtolower( $class_name );
+		$className = strtolower( $className );
 
-		return $class_name;
+		return $className;
 	}
 
 	public function reload( ReflectionClass $aClass ): ReflectionClass {
