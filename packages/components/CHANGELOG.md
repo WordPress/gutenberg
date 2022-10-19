@@ -54,6 +54,10 @@
 -   `Navigator`: prevent partially hiding focus ring styles, by removing unnecessary overflow rules on `NavigatorScreen` ([#44973](https://github.com/WordPress/gutenberg/pull/44973)).
 -   `Navigator`: restore focus only once per location  ([#44972](https://github.com/WordPress/gutenberg/pull/44972)).
 
+### Enhancements
+
+-   `ToggleGroupControl`: Add `isDeselectable` prop to allow deselecting the selected option ([#45123](https://github.com/WordPress/gutenberg/pull/45123)).
+
 ### Documentation
 
 -   `VisuallyHidden`: Add some notes on best practices around stacking contexts when using this component ([#44867](https://github.com/WordPress/gutenberg/pull/44867)).
