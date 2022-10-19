@@ -337,7 +337,7 @@ export default function Image( {
 					<ToolbarButton
 						onClick={ () => {
 							setShowCaption( ! showCaption );
-							if ( showCaption && ! caption ) {
+							if ( showCaption && caption ) {
 								setAttributes( { caption: undefined } );
 							}
 						} }
