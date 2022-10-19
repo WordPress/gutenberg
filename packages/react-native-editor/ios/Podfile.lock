@@ -1,6 +1,6 @@
 PODS:
   - boost (1.76.0)
-  - BVLinearGradient (2.5.6-wp-2):
+  - BVLinearGradient (2.5.6-wp-3):
     - React-Core
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.69.4)
@@ -13,7 +13,7 @@ PODS:
     - ReactCommon/turbomodule/core (= 0.69.4)
   - fmt (6.2.1)
   - glog (0.3.5)
-  - Gutenberg (1.83.0):
+  - Gutenberg (1.84.0):
     - React-Core (= 0.69.4)
     - React-CoreModules (= 0.69.4)
     - React-RCTImage (= 0.69.4)
@@ -246,12 +246,12 @@ PODS:
     - React-Core
   - react-native-safe-area-context (3.2.0):
     - React-Core
-  - react-native-slider (3.0.2-wp-2):
+  - react-native-slider (3.0.2-wp-3):
     - React-Core
-  - react-native-video (5.2.0-wp-3):
+  - react-native-video (5.2.0-wp-5):
     - React-Core
-    - react-native-video/Video (= 5.2.0-wp-3)
-  - react-native-video/Video (5.2.0-wp-3):
+    - react-native-video/Video (= 5.2.0-wp-5)
+  - react-native-video/Video (5.2.0-wp-5):
     - React-Core
   - react-native-webview (11.6.2):
     - React-Core
@@ -331,7 +331,7 @@ PODS:
     - SDWebImageWebPCoder (~> 0.8.4)
   - RNGestureHandler (2.5.0-wp-1):
     - React-Core
-  - RNReanimated (2.9.1-wp-1):
+  - RNReanimated (2.9.1-wp-2):
     - DoubleConversion
     - FBLazyVector
     - FBReactNativeSpec
@@ -362,7 +362,7 @@ PODS:
     - React-Core
   - RNSVG (9.13.6):
     - React-Core
-  - RNTAztecView (1.83.0):
+  - RNTAztecView (1.84.0):
     - React-Core
     - WordPress-Aztec-iOS (~> 1.19.8)
   - SDWebImage (5.11.1):
@@ -539,13 +539,13 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost: a7c83b31436843459a1961bfd74b96033dc77234
-  BVLinearGradient: f6eff3552b842aac99ff6f21197e57f87cfd956d
+  BVLinearGradient: ace34fab72158c068ae989a0ebdbf86cb4ef0e49
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   FBLazyVector: c71b8c429a8af2aff1013934a7152e9d9d0c937d
   FBReactNativeSpec: 2ff441cbe6e58c1778d8a5cf3311831a6a8c0809
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 3d02b25ca00c2d456734d0bcff864cbc62f6ae1a
-  Gutenberg: 3de998fc2b6dd2a13b0dd75919fd5c92332b8901
+  Gutenberg: 679ae7bc6f172bc514f619e4cad5a90b04cf5211
   libwebp: 60305b2e989864154bd9be3d772730f08fc6a59c
   RCT-Folly: b9d9fe1fc70114b751c076104e52f3b1b5e5a95a
   RCTRequired: bd9d2ab0fda10171fcbcf9ba61a7df4dc15a28f4
@@ -561,13 +561,13 @@ SPEC CHECKSUMS:
   React-jsiexecutor: a27badbbdbc0ff781813370736a2d1c7261181d4
   React-jsinspector: 8a3d3f5dcd23a91e8c80b1bf0e96902cd1dca999
   React-logger: 1088859f145b8f6dd0d3ed051a647ef0e3e80fad
-  react-native-blur: 3e9c8e8e9f7d17fa1b94e1a0ae9fd816675f5382
+  react-native-blur: 8cd9b4a8007166ad643f4dff914c3fddd2ff5b9a
   react-native-get-random-values: b6fb85e7169b9822976793e467458c151c3e8b69
   react-native-keyboard-aware-scroll-view: 0bc6c2dfe9056935a40dc1a70e764b7a1bbf6568
   react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
   react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
-  react-native-slider: d4c3367c5db5d2bec3ac0ab9d15ebb73d896034c
-  react-native-video: b15ae1cbd5b4f1d9a1003b334b71c344da7819a5
+  react-native-slider: a433f1c13c5da3c17a587351bff7371f65cc9a07
+  react-native-video: 9eb4495687cac8bd313b716d2c25062ca74b6013
   react-native-webview: 193d233c29eacce1f42ca2637dab7ba79c25a6de
   React-perflogger: cb386fd44c97ec7f8199c04c12b22066b0f2e1e0
   React-RCTActionSheet: f803a85e46cf5b4066c2ac5e122447f918e9c6e5
@@ -585,10 +585,10 @@ SPEC CHECKSUMS:
   RNCMaskedView: c298b644a10c0c142055b3ae24d83879ecb13ccd
   RNFastImage: 1f2cab428712a4baaf78d6169eaec7f622556dd7
   RNGestureHandler: 225ee7ea87b1024ced46ec4705537c075ad33ba0
-  RNReanimated: a0585584b89e6b5a5369ad98b3e4d5916ac67859
+  RNReanimated: 8b189a09da0345d84b33b8cde57a57f8ed847352
   RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
   RNSVG: 36a7359c428dcb7c6bce1cc546fbfebe069809b0
-  RNTAztecView: cd8b382fee06712786e5a80a85f7069f0bd42045
+  RNTAztecView: ac504754bc6b294a03324acca45d236ce68e5122
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   WordPress-Aztec-iOS: 7d11d598f14c82c727c08b56bd35fbeb7dafb504
