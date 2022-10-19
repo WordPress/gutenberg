@@ -13,7 +13,6 @@ import { useRef, useEffect } from '@wordpress/element';
  */
 function useUpdateEffect( effect, deps ) {
 	const mounted = useRef( false );
-
 	useEffect( () => {
 		if ( mounted.current ) {
 			return effect();
