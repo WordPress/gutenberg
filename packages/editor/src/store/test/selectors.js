@@ -1514,11 +1514,9 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocks: {
-							value: [],
-							isDirty: true,
+						edits: {
+							content: () => 'new-content',
 						},
-						edits: {},
 					},
 				},
 				currentPost: {
