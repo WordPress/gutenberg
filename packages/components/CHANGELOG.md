@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 21.3.0 (2022-10-19)
+
 ### Bug Fix
 
 -   `FontSizePicker`: Ensure that fluid font size presets appear correctly in the UI controls ([#44791](https://github.com/WordPress/gutenberg/pull/44791)).
