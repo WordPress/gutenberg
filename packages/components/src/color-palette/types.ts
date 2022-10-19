@@ -49,10 +49,6 @@ export type ColorPaletteProps = {
 	 */
 	clearable?: boolean;
 	/**
-	 * Classes to be applied to the container.
-	 */
-	className?: string;
-	/**
 	 * Array with the colors to be shown.
 	 *
 	 * @default []
@@ -82,12 +78,12 @@ export type ColorPaletteProps = {
 	 * rather than an array of color objects.
 	 *
 	 * @default false
-	*/
+	 */
 	__experimentalHasMultipleOrigins?: boolean;
 	/**
 	 * Whether this is rendered in the sidebar.
 	 *
 	 * @default false
-	*/
+	 */
 	__experimentalIsRenderedInSidebar?: boolean;
 };

@@ -39,9 +39,9 @@ const meta: ComponentMeta< typeof ColorPalette > = {
 export default meta;
 
 const Template: ComponentStory< typeof ColorPalette > = ( {
-		onChange,
-		...args
-	} ) => {
+	onChange,
+	...args
+} ) => {
 	const firstColor =
 		( args.colors as ColorObject[] )[ 0 ].color ||
 		( args.colors as PaletteObject[] )[ 0 ].colors[ 0 ].color;
