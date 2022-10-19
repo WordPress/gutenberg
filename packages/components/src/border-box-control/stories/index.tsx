@@ -17,8 +17,6 @@ import Popover from '../../popover';
 import { BorderBoxControl } from '../';
 import { Provider as SlotFillProvider } from '../../slot-fill';
 
-import type { AnyBorder } from '../types';
-
 const meta: ComponentMeta< typeof BorderBoxControl > = {
 	title: 'Components (Experimental)/BorderBoxControl',
 	component: BorderBoxControl,
@@ -45,7 +43,7 @@ const colors = [
 
 const Template: ComponentStory< typeof BorderBoxControl > = ( props ) => {
 	const { onChange, ...otherProps } = props;
-	const [ borders, setBorders ] = useState< AnyBorder >();
+	const [ borders, setBorders ] = useState< typeof props[ 'value' ] >();
 
 	const onChangeMerged: ComponentProps<
 		typeof BorderBoxControl
