@@ -27,6 +27,7 @@ export { default as button } from './library/button';
 export { default as buttons } from './library/buttons';
 export { default as calendar } from './library/calendar';
 export { default as cancelCircleFilled } from './library/cancel-circle-filled';
+export { default as caption } from './library/caption';
 export { default as capturePhoto } from './library/capture-photo';
 export { default as captureVideo } from './library/capture-video';
 export { default as category } from './library/category';
