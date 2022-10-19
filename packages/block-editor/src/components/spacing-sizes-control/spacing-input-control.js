@@ -34,6 +34,15 @@ import {
 	isValueSpacingPreset,
 } from './utils';
 
+const CUSTOM_VALUE_SETTINGS = {
+	px: { max: 300, steps: 1 },
+	'%': { max: 100, steps: 1 },
+	vw: { max: 100, steps: 1 },
+	vh: { max: 100, steps: 1 },
+	em: { max: 10, steps: 0.1 },
+	rm: { max: 10, steps: 0.1 },
+};
+
 export default function SpacingInputControl( {
 	spacingSizes,
 	value,
@@ -107,7 +116,7 @@ export default function SpacingInputControl( {
 	const customTooltipContent = ( newValue ) =>
 		value === undefined ? undefined : spacingSizes[ newValue ]?.name;
 
-	const customRangeValue = parseInt( currentValue, 10 );
+	const customRangeValue = parseFloat( currentValue, 10 );
 
 	const getNewCustomValue = ( newSize ) => {
 		const isNumeric = ! isNaN( parseFloat( newSize ) );
@@ -227,7 +236,10 @@ export default function SpacingInputControl( {
 					<RangeControl
 						value={ customRangeValue }
 						min={ 0 }
-						max={ 300 }
+						max={ CUSTOM_VALUE_SETTINGS[ selectedUnit ]?.max ?? 10 }
+						step={
+							CUSTOM_VALUE_SETTINGS[ selectedUnit ]?.steps ?? 0.1
+						}
 						withInputField={ false }
 						onChange={ handleCustomValueSliderChange }
 						className="components-spacing-sizes-control__custom-value-range"
