@@ -89,9 +89,4 @@ export const Default = Template.bind( {} );
 Default.args = {
 	colors,
 	label: 'Borders',
-	disableCustomColors: false,
-	enableAlpha: true,
-	enableStyle: true,
-	size: 'default',
-	popoverPlacement: 'right-start',
 };
