@@ -32,10 +32,10 @@ test.describe( 'Compatibility with classic editor', () => {
 		await page.click( 'role=link[name="View post"i]' );
 
 		// Check the content doesn't contain <p> tags.
-		await page.waitForSelector( '.entry-content' );
-		const content = await page.$eval( '.entry-content', ( element ) =>
-			element.innerHTML.trim()
-		);
-		expect( content ).toMatchSnapshot();
+		// No accessible selector for now.
+		const content = page.locator( '.entry-content' );
+		await expect.poll( () => content.innerHTML() ).toBe(`<a>
+Random Link
+</a>`);
 	} );
 } );
