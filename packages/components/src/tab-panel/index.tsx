@@ -7,7 +7,7 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -93,15 +93,20 @@ export function TabPanel( {
 	const onNavigate = ( _childIndex: number, child: HTMLButtonElement ) => {
 		child.click();
 	};
-	const selectedTab = find( tabs, { name: selected } );
+	const selectedTab = useMemo(
+		() => find( tabs, { name: selected } ),
+		[ tabs, selected ]
+	);
 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
 
 	useEffect( () => {
-		const newSelectedTab = find( tabs, { name: selected } );
-		if ( ! newSelectedTab && tabs.length > 0 ) {
-			handleTabSelection( initialTabName || tabs[ 0 ].name );
+		if ( ! selectedTab ) {
+			setSelected(
+				initialTabName ||
+					( tabs.length > 0 ? tabs[ 0 ].name : undefined )
+			);
 		}
-	}, [ tabs, selected, initialTabName ] );
+	}, [ tabs, selectedTab, initialTabName ] );
 
 	return (
 		<div className={ className }>
