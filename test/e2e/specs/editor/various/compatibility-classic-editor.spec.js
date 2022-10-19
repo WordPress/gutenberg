@@ -29,7 +29,7 @@ test.describe( 'Compatibility with classic editor', () => {
 		await editor.publishPost();
 
 		// View Post
-		await page.locator( 'a.components-button.is-primary' ).click();
+		await page.click( 'role=link[name="View post"i]' );
 
 		// Check the content doesn't contain <p> tags.
 		await page.waitForSelector( '.entry-content' );
