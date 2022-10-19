@@ -26,7 +26,7 @@ import {
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { audio as icon, caption as captionIcon } from '@wordpress/icons';
@@ -52,7 +52,6 @@ function AudioEdit( {
 	const { id, autoplay, caption, loop, preload, src } = attributes;
 	const prevCaption = usePrevious( caption );
 	const [ showCaption, setShowCaption ] = useState( !! caption );
-	const captionRef = useRef();
 	const isTemporaryAudio = ! id && isBlobURL( src );
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -83,11 +82,14 @@ function AudioEdit( {
 	}, [ caption, prevCaption ] );
 
 	// Focus the caption when we click to add one.
-	useEffect( () => {
-		if ( showCaption && ! caption ) {
-			captionRef.current?.focus();
-		}
-	}, [ caption, showCaption ] );
+	const captionRef = useCallback(
+		( node ) => {
+			if ( node && ! caption ) {
+				node.focus();
+			}
+		},
+		[ caption ]
+	);
 
 	useEffect( () => {
 		if ( ! isSelected && ! caption ) {
