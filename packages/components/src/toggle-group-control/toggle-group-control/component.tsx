@@ -26,7 +26,7 @@ import { ToggleGroupControlAsRadio } from './as-radio';
 const noop = () => {};
 
 function UnconnectedToggleGroupControl(
-	props: WordPressComponentProps< ToggleGroupControlProps, 'input', false >,
+	props: WordPressComponentProps< ToggleGroupControlProps, 'div', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
