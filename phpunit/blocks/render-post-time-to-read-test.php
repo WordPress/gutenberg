@@ -114,7 +114,7 @@ class Tests_Blocks_Render_Post_Time_To_Read extends WP_UnitTestCase {
 		$block         = new WP_Block( $parsed_block, $context );
 
 		$actual   = gutenberg_render_block_core_post_time_to_read( $attributes, '', $block );
-		$expected = '<p class="wp-block-post-time-to-read">You can read this post in less than 1 minute.</p>';
+		$expected = '<p class="wp-block-post-time-to-read">1 minute</p>';
 
 		$this->assertSame( $expected, $actual );
 	}
@@ -136,7 +136,7 @@ class Tests_Blocks_Render_Post_Time_To_Read extends WP_UnitTestCase {
 		$block         = new WP_Block( $parsed_block, $context );
 
 		$actual   = gutenberg_render_block_core_post_time_to_read( $attributes, '', $block );
-		$expected = '<p class="wp-block-post-time-to-read">You can read this post in less than 1 minute.</p>';
+		$expected = '<p class="wp-block-post-time-to-read">1 minute</p>';
 
 		$this->assertSame( $expected, $actual );
 	}
@@ -158,7 +158,7 @@ class Tests_Blocks_Render_Post_Time_To_Read extends WP_UnitTestCase {
 		$block         = new WP_Block( $parsed_block, $context );
 
 		$actual   = gutenberg_render_block_core_post_time_to_read( $attributes, '', $block );
-		$expected = '<p class="wp-block-post-time-to-read">You can read this post in 1 minute.</p>';
+		$expected = '<p class="wp-block-post-time-to-read">1 minute</p>';
 
 		$this->assertSame( $expected, $actual );
 	}
@@ -180,7 +180,7 @@ class Tests_Blocks_Render_Post_Time_To_Read extends WP_UnitTestCase {
 		$block         = new WP_Block( $parsed_block, $context );
 
 		$actual   = gutenberg_render_block_core_post_time_to_read( $attributes, '', $block );
-		$expected = '<p class="wp-block-post-time-to-read">You can read this post in 2 minutes.</p>';
+		$expected = '<p class="wp-block-post-time-to-read">2 minutes</p>';
 
 		$this->assertSame( $expected, $actual );
 	}
