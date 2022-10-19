@@ -60,20 +60,35 @@
 	justify-content: center;
 }
 
-
-.edit-post-layout__toggle-publish-panel,
-.edit-post-layout__toggle-sidebar-panel,
-.edit-post-layout__toggle-entities-saved-states-panel {
+.edit-post-layout__toggle-sidebar-panel {
 	z-index: z-index(".edit-post-layout__toggle-sidebar-panel");
 	position: fixed !important; // Need to override the default relative positionning
 	top: -9999em;
 	bottom: auto;
 	left: auto;
 	right: 0;
+	box-sizing: border-box;
 	width: $sidebar-width;
 	background-color: $white;
 	border: 1px dotted $gray-300;
 	height: auto !important; // Need to override the default sidebar positionnings
+	padding: $grid-unit-30;
+	display: flex;
+	justify-content: center;
+
+	.interface-interface-skeleton__actions:focus &,
+	.interface-interface-skeleton__actions:focus-within & {
+		top: auto;
+		bottom: 0;
+	}
+}
+
+.edit-post-layout__toggle-entities-saved-states-panel,
+.edit-post-layout__toggle-publish-panel {
+	box-sizing: border-box;
+	width: $sidebar-width;
+	background-color: $white;
+	border: 1px dotted $gray-300;
 	padding: $grid-unit-30;
 	display: flex;
 	justify-content: center;

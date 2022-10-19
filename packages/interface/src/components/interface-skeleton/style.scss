@@ -173,8 +173,13 @@ html.interface-interface-skeleton__html-container {
 	width: $sidebar-width;
 	color: $gray-900;
 
-	&:focus {
+	&:focus,
+	&:focus-within {
 		top: auto;
 		bottom: 0;
+
+		.is-sidebar-opened & {
+			top: 0;
+		}
 	}
 }
