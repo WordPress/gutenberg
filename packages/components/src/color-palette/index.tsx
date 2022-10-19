@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import type { ForwardedRef } from 'react';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -9,7 +10,7 @@ import a11yPlugin from 'colord/plugins/a11y';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,6 +31,7 @@ import type {
 	PaletteObject,
 	SinglePaletteProps,
 } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -213,17 +215,21 @@ const areColorsMultiplePalette = (
 	);
 };
 
-export function ColorPalette( {
-	clearable = true,
-	className,
-	colors = [],
-	disableCustomColors = false,
-	enableAlpha,
-	onChange,
-	value,
-	__experimentalHasMultipleOrigins = false,
-	__experimentalIsRenderedInSidebar = false,
-}: ColorPaletteProps ) {
+function UnforwardedColorPalette(
+	props: WordPressComponentProps< ColorPaletteProps, 'div' >,
+	forwardedRef: ForwardedRef< any >
+) {
+	const {
+		clearable = true,
+		colors = [],
+		disableCustomColors = false,
+		enableAlpha,
+		onChange,
+		value,
+		__experimentalHasMultipleOrigins = false,
+		__experimentalIsRenderedInSidebar = false,
+		...otherProps
+	} = props;
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
 
 	const buttonLabelName = useMemo(
@@ -291,7 +297,7 @@ export function ColorPalette( {
 	};
 
 	return (
-		<VStack spacing={ 3 } className={ className }>
+		<VStack spacing={ 3 } ref={ forwardedRef } { ...otherProps }>
 			{ ! disableCustomColors && (
 				<CustomColorPickerDropdown
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
@@ -350,5 +356,31 @@ export function ColorPalette( {
 		</VStack>
 	);
 }
+
+/**
+ * Allows selecting from given colors.
+ *
+ * ```jsx
+ * import { ColorPalette } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyColorPalette = () => {
+ *   const [ color, setColor ] = useState ( '#f00' )
+ *   const colors = [
+ *     { name: 'red', color: '#f00' },
+ *     { name: 'white', color: '#fff' },
+ *     { name: 'blue', color: '#00f' },
+ *   ];
+ *   return (
+ *     <ColorPalette
+ *       colors={ colors }
+ *       value={ color }
+ *       onChange={ ( color ) => setColor( color ) }
+ *     />
+ *   );
+ * } );
+ * ```
+ */
+export const ColorPalette = forwardRef( UnforwardedColorPalette );
 
 export default ColorPalette;
