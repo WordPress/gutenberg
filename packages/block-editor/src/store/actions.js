@@ -1264,6 +1264,28 @@ export function toggleBlockMode( clientId ) {
 }
 
 /**
+ * Returns an action object used in signalling that the user has begun to show spacing visualizer.
+ *
+ * @return {Object} Action object.
+ */
+export function startShowingVisualizer() {
+	return {
+		type: 'START_SHOWING_VISUALIZER',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user has stopped showing spacing visualizer.
+ *
+ * @return {Object} Action object.
+ */
+export function stopShowingVisualizer() {
+	return {
+		type: 'STOP_SHOWING_VISUALIZER',
+	};
+}
+
+/**
  * Returns an action object used in signalling that the user has begun to type.
  *
  * @return {Object} Action object.

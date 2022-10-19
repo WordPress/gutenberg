@@ -1161,6 +1161,26 @@ export const blocks = pipe(
 } );
 
 /**
+ * Reducer returning visualizer state.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isVisualizerShowing( state = false, action ) {
+	switch ( action.type ) {
+		case 'START_SHOWING_VISUALIZER':
+			return true;
+
+		case 'STOP_SHOWING_VISUALIZER':
+			return false;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning typing state.
  *
  * @param {boolean} state  Current state.
@@ -1809,6 +1829,7 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 export default combineReducers( {
 	blocks,
 	isTyping,
+	isVisualizerShowing,
 	draggedBlocks,
 	selection,
 	isMultiSelecting,

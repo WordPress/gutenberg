@@ -1277,6 +1277,17 @@ export function isTyping( state ) {
 }
 
 /**
+ * Returns true if the user is showing spacing visualizer, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether user is showing spacing visualizer.
+ */
+export function isVisualizerShowing( state ) {
+	return state.isVisualizerShowing;
+}
+
+/**
  * Returns true if the user is dragging blocks, or false otherwise.
  *
  * @param {Object} state Global application state.

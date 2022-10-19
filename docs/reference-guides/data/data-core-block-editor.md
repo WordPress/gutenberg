@@ -1122,6 +1122,18 @@ _Returns_
 
 -   `?boolean`: Whether the template is valid or not.
 
+### isVisualizerShowing
+
+Returns true if the user is showing spacing visualizer, or false otherwise.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether user is showing spacing visualizer.
+
 ### wasBlockJustInserted
 
 Tells if the block with the passed clientId was just inserted.
@@ -1541,6 +1553,14 @@ _Returns_
 
 -   `Object`: Action object.
 
+### startShowingVisualizer
+
+Returns an action object used in signalling that the user has begun to show spacing visualizer.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### startTyping
 
 Returns an action object used in signalling that the user has begun to type.
@@ -1560,6 +1580,14 @@ _Returns_
 ### stopMultiSelect
 
 Action that stops block multi-selection.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### stopShowingVisualizer
+
+Returns an action object used in signalling that the user has stopped showing spacing visualizer.
 
 _Returns_
 

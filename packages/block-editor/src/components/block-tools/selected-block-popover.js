@@ -28,13 +28,16 @@ function selector( select ) {
 		isMultiSelecting,
 		hasMultiSelection,
 		isTyping,
+		isVisualizerShowing,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
 	} = select( blockEditorStore );
+
 	return {
 		editorMode: __unstableGetEditorMode(),
 		isMultiSelecting: isMultiSelecting(),
 		isTyping: isTyping(),
+		isVisualizerShowing: isVisualizerShowing(),
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		isDistractionFree: getSettings().isDistractionFree,
 		lastClientId: hasMultiSelection()
@@ -56,6 +59,7 @@ function SelectedBlockPopover( {
 		editorMode,
 		isMultiSelecting,
 		isTyping,
+		isVisualizerShowing,
 		hasFixedToolbar,
 		isDistractionFree,
 		lastClientId,
@@ -92,7 +96,8 @@ function SelectedBlockPopover( {
 		isLargeViewport &&
 		! isMultiSelecting &&
 		! showEmptyBlockSideInserter &&
-		! isTyping;
+		! isTyping &&
+		! isVisualizerShowing;
 	const canFocusHiddenToolbar =
 		editorMode === 'edit' &&
 		! shouldShowContextualToolbar &&
