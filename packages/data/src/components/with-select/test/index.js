@@ -584,7 +584,7 @@ describe( 'withSelect', () => {
 		expect( ChildOriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( ParentOriginalComponent ).toHaveBeenCalledTimes( 1 );
 
-		await act( async () => {
+		await ( async () => {
 			registry.dispatch( 'childRender' ).toggleRender();
 		} );
 
