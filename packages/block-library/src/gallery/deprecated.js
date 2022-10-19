@@ -7,7 +7,12 @@ import { map, some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	useInnerBlocksProps,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
 
 import { createBlock } from '@wordpress/blocks';
 
@@ -126,6 +131,163 @@ export function getImageBlock( image, sizeSlug, linkTo ) {
 		...getHrefAndDestination( image, linkTo ),
 	} );
 }
+
+/**
+ * At creation, the only difference with v7 from the current gallery block is that it's missing the
+ * `has-caption` class, when the gallery has a caption.
+ */
+const v7 = {
+	attributes: {
+		images: {
+			type: 'array',
+			default: [],
+			source: 'query',
+			selector: '.blocks-gallery-item',
+			query: {
+				url: {
+					type: 'string',
+					source: 'attribute',
+					selector: 'img',
+					attribute: 'src',
+				},
+				fullUrl: {
+					type: 'string',
+					source: 'attribute',
+					selector: 'img',
+					attribute: 'data-full-url',
+				},
+				link: {
+					type: 'string',
+					source: 'attribute',
+					selector: 'img',
+					attribute: 'data-link',
+				},
+				alt: {
+					type: 'string',
+					source: 'attribute',
+					selector: 'img',
+					attribute: 'alt',
+					default: '',
+				},
+				id: {
+					type: 'string',
+					source: 'attribute',
+					selector: 'img',
+					attribute: 'data-id',
+				},
+				caption: {
+					type: 'string',
+					source: 'html',
+					selector: '.blocks-gallery-item__caption',
+				},
+			},
+		},
+		ids: {
+			type: 'array',
+			items: {
+				type: 'number',
+			},
+			default: [],
+		},
+		shortCodeTransforms: {
+			type: 'array',
+			default: [],
+			items: {
+				type: 'object',
+			},
+		},
+		columns: {
+			type: 'number',
+			minimum: 1,
+			maximum: 8,
+		},
+		caption: {
+			type: 'string',
+			source: 'html',
+			selector: '.blocks-gallery-caption',
+		},
+		imageCrop: {
+			type: 'boolean',
+			default: true,
+		},
+		fixedHeight: {
+			type: 'boolean',
+			default: true,
+		},
+		linkTarget: {
+			type: 'string',
+		},
+		linkTo: {
+			type: 'string',
+		},
+		sizeSlug: {
+			type: 'string',
+			default: 'large',
+		},
+		allowResize: {
+			type: 'boolean',
+			default: false,
+		},
+	},
+	supports: {
+		anchor: true,
+		align: true,
+		html: false,
+		units: [ 'px', 'em', 'rem', 'vh', 'vw' ],
+		spacing: {
+			margin: true,
+			padding: true,
+			blockGap: [ 'horizontal', 'vertical' ],
+			__experimentalSkipSerialization: [ 'blockGap' ],
+			__experimentalDefaultControls: {
+				blockGap: true,
+			},
+		},
+		color: {
+			text: false,
+			background: true,
+			gradients: true,
+		},
+		__experimentalLayout: {
+			allowSwitching: false,
+			allowInheriting: false,
+			allowEditing: false,
+			default: {
+				type: 'flex',
+			},
+		},
+	},
+	save( { attributes } ) {
+		const { caption, columns, imageCrop } = attributes;
+
+		const className = classnames( 'has-nested-images', {
+			[ `columns-${ columns }` ]: columns !== undefined,
+			[ `columns-default` ]: columns === undefined,
+			'is-cropped': imageCrop,
+		} );
+		const blockProps = useBlockProps.save( { className } );
+		const innerBlocksProps = useInnerBlocksProps.save( blockProps );
+
+		return (
+			<figure { ...innerBlocksProps }>
+				{ innerBlocksProps.children }
+				{ ! RichText.isEmpty( caption ) && (
+					<RichText.Content
+						tagName="figcaption"
+						className={ classnames(
+							'blocks-gallery-caption',
+							__experimentalGetElementClassName( 'caption' )
+						) }
+						value={ caption }
+					/>
+				) }
+			</figure>
+		);
+	},
+	isEligible( { caption } ) {
+		return !! caption;
+	},
+};
 
 const v6 = {
 	attributes: {
@@ -984,4 +1146,4 @@ const v1 = {
 	},
 };
 
-export default [ v6, v5, v4, v3, v2, v1 ];
+export default [ v7, v6, v5, v4, v3, v2, v1 ];
