@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -30,8 +35,13 @@ const DEFAULT_BLOCK = {
 	],
 };
 
-function ButtonsEdit( { attributes: { layout = {} } } ) {
-	const blockProps = useBlockProps();
+function ButtonsEdit( { attributes, className } ) {
+	const { fontSize, layout = {}, style } = attributes;
+	const blockProps = useBlockProps( {
+		className: classnames( className, {
+			'has-custom-font-size': fontSize || style?.typography?.fontSize,
+		} ),
+	} );
 	const preferredStyle = useSelect( ( select ) => {
 		const preferredStyleVariations =
 			select( blockEditorStore ).getSettings()
@@ -53,11 +63,7 @@ function ButtonsEdit( { attributes: { layout = {} } } ) {
 		templateInsertUpdatesSelection: true,
 	} );
 
-	return (
-		<>
-			<div { ...innerBlocksProps } />
-		</>
-	);
+	return <div { ...innerBlocksProps } />;
 }
 
 export default ButtonsEdit;

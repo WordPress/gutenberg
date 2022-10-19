@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from 'enzyme';
+import { render } from '@testing-library/react';
 
 /**
  * Internal dependencies

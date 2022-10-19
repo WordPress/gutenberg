@@ -1,23 +1,14 @@
 /**
  * External dependencies
  */
-import {
-	pickBy,
-	isEmpty,
-	isObject,
-	identity,
-	mapValues,
-	forEach,
-	get,
-	setWith,
-	clone,
-	every,
-} from 'lodash';
+import { pickBy, isEmpty, mapValues, get, setWith, clone } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
+
+const identity = ( x ) => x;
 
 /**
  * Removed falsy values from nested object.
@@ -26,7 +17,11 @@ import { getBlockSupport } from '@wordpress/blocks';
  * @return {*} Object cleaned from falsy values
  */
 export const cleanEmptyObject = ( object ) => {
-	if ( ! isObject( object ) || Array.isArray( object ) ) {
+	if (
+		object === null ||
+		typeof object !== 'object' ||
+		Array.isArray( object )
+	) {
 		return object;
 	}
 	const cleanedNestedObjects = pickBy(
@@ -49,7 +44,11 @@ export function transformStyles(
 	results
 ) {
 	// If there are no active supports return early.
-	if ( every( activeSupports, ( isActive ) => ! isActive ) ) {
+	if (
+		Object.values( activeSupports ?? {} ).every(
+			( isActive ) => ! isActive
+		)
+	) {
 		return result;
 	}
 	// If the condition verifies we are probably in the presence of a wrapping transform
@@ -73,7 +72,7 @@ export function transformStyles(
 		}
 	}
 	let returnBlock = result;
-	forEach( activeSupports, ( isActive, support ) => {
+	Object.entries( activeSupports ).forEach( ( [ support, isActive ] ) => {
 		if ( isActive ) {
 			migrationPaths[ support ].forEach( ( path ) => {
 				const styleValue = get( referenceBlockAttributes, path );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mount, shallow } from 'enzyme';
+import { render, screen, within } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -77,9 +77,9 @@ describe( 'DocumentOutline', () => {
 
 	describe( 'no header blocks present', () => {
 		it( 'should not render when no blocks provided', () => {
-			const wrapper = shallow( <DocumentOutline /> );
+			render( <DocumentOutline /> );
 
-			expect( wrapper.html() ).toBe( null );
+			expect( screen.queryByRole( 'list' ) ).not.toBeInTheDocument();
 		} );
 
 		it( 'should not render when no heading blocks provided', () => {
@@ -87,9 +87,9 @@ describe( 'DocumentOutline', () => {
 				// Set client IDs to a predictable value.
 				return { ...block, clientId: `clientId_${ index }` };
 			} );
-			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
+			render( <DocumentOutline blocks={ blocks } /> );
 
-			expect( wrapper.html() ).toBe( null );
+			expect( screen.queryByRole( 'list' ) ).not.toBeInTheDocument();
 		} );
 	} );
 
@@ -99,16 +99,20 @@ describe( 'DocumentOutline', () => {
 				// Set client IDs to a predictable value.
 				return { ...block, clientId: `clientId_${ index }` };
 			} );
-			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
+			render( <DocumentOutline blocks={ blocks } /> );
 
-			expect( wrapper ).toMatchSnapshot();
+			expect( screen.getByRole( 'list' ) ).toMatchSnapshot();
 		} );
 
 		it( 'should render an item when only one heading provided', () => {
 			const blocks = [ headingH2 ];
-			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
+			render( <DocumentOutline blocks={ blocks } /> );
 
-			expect( wrapper.find( 'TableOfContentsItem' ) ).toHaveLength( 1 );
+			const tableOfContentItem = within(
+				screen.getByRole( 'list' )
+			).getByRole( 'listitem' );
+			expect( tableOfContentItem ).toBeInTheDocument();
+			expect( tableOfContentItem ).toHaveTextContent( 'Heading 2' );
 		} );
 
 		it( 'should render two items when two headings and some paragraphs provided', () => {
@@ -119,9 +123,11 @@ describe( 'DocumentOutline', () => {
 				headingH3,
 				paragraph,
 			];
-			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
+			render( <DocumentOutline blocks={ blocks } /> );
 
-			expect( wrapper.find( 'TableOfContentsItem' ) ).toHaveLength( 2 );
+			expect(
+				within( screen.getByRole( 'list' ) ).getAllByRole( 'listitem' )
+			).toHaveLength( 2 );
 		} );
 
 		it( 'should render warnings for multiple h1 headings', () => {
@@ -131,53 +137,30 @@ describe( 'DocumentOutline', () => {
 					return { ...block, clientId: `clientId_${ index }` };
 				}
 			);
-			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
+			render( <DocumentOutline blocks={ blocks } /> );
 
-			expect( wrapper ).toMatchSnapshot();
+			expect( screen.getByRole( 'list' ) ).toMatchSnapshot();
 		} );
 	} );
 
 	describe( 'nested headings', () => {
 		it( 'should render even if the heading is nested', () => {
-			const tableOfContentItemsSelector = 'TableOfContentsItem';
-			const outlineLevelsSelector = '.document-outline__level';
-			const outlineItemContentSelector =
-				'.document-outline__item-content';
-
 			const blocks = [ headingH2, nestedHeading ];
-			const wrapper = mount( <DocumentOutline blocks={ blocks } /> );
+			render( <DocumentOutline blocks={ blocks } /> );
 
 			// Unnested heading and nested heading should appear as items.
-			const tableOfContentItems = wrapper.find(
-				tableOfContentItemsSelector
-			);
+			const tableOfContentItems = within(
+				screen.getByRole( 'list' )
+			).getAllByRole( 'listitem' );
 			expect( tableOfContentItems ).toHaveLength( 2 );
 
 			// Unnested heading test.
-			const firstItemLevels = tableOfContentItems
-				.at( 0 )
-				.find( outlineLevelsSelector );
-			expect( firstItemLevels ).toHaveLength( 1 );
-			expect( firstItemLevels.at( 0 ).text() ).toEqual( 'H2' );
-			expect(
-				tableOfContentItems
-					.at( 0 )
-					.find( outlineItemContentSelector )
-					.text()
-			).toEqual( 'Heading 2' );
+			expect( tableOfContentItems[ 0 ] ).toHaveTextContent( 'H2' );
+			expect( tableOfContentItems[ 0 ] ).toHaveTextContent( 'Heading 2' );
 
 			// Nested heading test.
-			const secondItemLevels = tableOfContentItems
-				.at( 1 )
-				.find( outlineLevelsSelector );
-			expect( secondItemLevels ).toHaveLength( 1 );
-			expect( secondItemLevels.at( 0 ).text() ).toEqual( 'H3' );
-			expect(
-				tableOfContentItems
-					.at( 1 )
-					.find( outlineItemContentSelector )
-					.text()
-			).toEqual( 'Heading 3' );
+			expect( tableOfContentItems[ 1 ] ).toHaveTextContent( 'H3' );
+			expect( tableOfContentItems[ 1 ] ).toHaveTextContent( 'Heading 3' );
 		} );
 	} );
 } );

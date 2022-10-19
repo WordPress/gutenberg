@@ -59,7 +59,10 @@ export { default as Caption } from './caption';
 export { default as PanelColorSettings } from './panel-color-settings';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 export { default as useSetting } from './use-setting';
-export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
+export {
+	RecursionProvider as __experimentalRecursionProvider,
+	useHasRecursion as __experimentalUseHasRecursion,
+} from './recursion-provider';
 export { default as Warning } from './warning';
 export { default as ContrastChecker } from './contrast-checker';
 export { default as useMultipleOriginColorsAndGradients } from './colors-gradients/use-multiple-origin-colors-and-gradients';

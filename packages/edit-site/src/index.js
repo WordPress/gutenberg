@@ -18,6 +18,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { __ } from '@wordpress/i18n';
 import { store as viewportStore } from '@wordpress/viewport';
 import { getQueryArgs } from '@wordpress/url';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -51,6 +52,26 @@ export function reinitializeEditor( target, settings ) {
 		return;
 	}
 
+	/*
+	 * Prevent adding the Clasic block in the site editor.
+	 * Only add the filter when the site editor is initialized, not imported.
+	 * Also only add the filter(s) after registerCoreBlocks()
+	 * so that common filters in the block library are not overwritten.
+	 *
+	 * This usage here is inspired by previous usage of the filter in the post editor:
+	 * https://github.com/WordPress/gutenberg/pull/37157
+	 */
+	addFilter(
+		'blockEditor.__unstableCanInsertBlockType',
+		'removeClassicBlockFromInserter',
+		( canInsert, blockType ) => {
+			if ( blockType.name === 'core/freeform' ) {
+				return false;
+			}
+			return canInsert;
+		}
+	);
+
 	// This will be a no-op if the target doesn't have any React nodes.
 	unmountComponentAtNode( target );
 	const reboot = reinitializeEditor.bind( null, target, settings );
@@ -65,7 +86,7 @@ export function reinitializeEditor( target, settings ) {
 			keepCaretInsideBlock: false,
 			welcomeGuide: true,
 			welcomeGuideStyles: true,
-			shouldListViewOpenByDefault: false,
+			showListViewByDefault: false,
 		} );
 
 		// Check if the block list view should be open by default.
@@ -107,6 +128,10 @@ export function reinitializeEditor( target, settings ) {
 		}
 	}
 
+	// Prevent the default browser action for files dropped outside of dropzones.
+	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
+	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
+
 	render( <EditSiteApp reboot={ reboot } />, target );
 }
 
@@ -136,6 +161,6 @@ export function initializeEditor( id, settings ) {
 
 export { default as __experimentalMainDashboardButton } from './components/main-dashboard-button';
 export { default as __experimentalNavigationToggle } from './components/navigation-sidebar/navigation-toggle';
-export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
-export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
-export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';
+export { default as PluginSidebar } from './components/sidebar-edit-mode/plugin-sidebar';
+export { default as PluginSidebarMoreMenuItem } from './components/header-edit-mode/plugin-sidebar-more-menu-item';
+export { default as PluginMoreMenuItem } from './components/header-edit-mode/plugin-more-menu-item';

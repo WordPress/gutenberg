@@ -162,24 +162,24 @@ describe( 'BoxControl', () => {
 		} );
 	} );
 
-	describe( 'Unlinked Sides', () => {
+	describe( 'Unlinked sides', () => {
 		it( 'should update a single side value when unlinked', async () => {
 			let state = {};
 			const setState = ( newState ) => ( state = newState );
 
-			const { getAllByLabelText, getByLabelText } = render(
+			render(
 				<BoxControl
 					values={ state }
 					onChange={ ( next ) => setState( next ) }
 				/>
 			);
 			const user = setupUser();
-			const unlink = getByLabelText( /Unlink Sides/ );
+			const unlink = screen.getByLabelText( /Unlink sides/ );
 
 			await user.click( unlink );
 
-			const input = getByLabelText( /Top/ );
-			const select = getAllByLabelText( /Select unit/ )[ 0 ];
+			const input = screen.getByLabelText( /Top/ );
+			const select = screen.getAllByLabelText( /Select unit/ )[ 0 ];
 
 			await user.type( input, '100px' );
 			await user.keyboard( '{Enter}' );
@@ -199,7 +199,7 @@ describe( 'BoxControl', () => {
 			let state = {};
 			const setState = ( newState ) => ( state = newState );
 
-			const { getAllByLabelText, getByLabelText } = render(
+			render(
 				<BoxControl
 					values={ state }
 					onChange={ ( next ) => setState( next ) }
@@ -207,12 +207,12 @@ describe( 'BoxControl', () => {
 				/>
 			);
 			const user = setupUser();
-			const unlink = getByLabelText( /Unlink Sides/ );
+			const unlink = screen.getByLabelText( /Unlink sides/ );
 
 			await user.click( unlink );
 
-			const input = getByLabelText( /Vertical/ );
-			const select = getAllByLabelText( /Select unit/ )[ 0 ];
+			const input = screen.getByLabelText( /Vertical/ );
+			const select = screen.getAllByLabelText( /Select unit/ )[ 0 ];
 
 			await user.type( input, '100px' );
 			await user.keyboard( '{Enter}' );
@@ -240,7 +240,7 @@ describe( 'BoxControl', () => {
 			await user.selectOptions( allUnitSelect, [ 'em' ] );
 
 			// Unlink the controls.
-			await user.click( screen.getByLabelText( /Unlink Sides/ ) );
+			await user.click( screen.getByLabelText( /Unlink sides/ ) );
 
 			// Confirm that each individual control has the selected unit
 			const unlinkedSelects = screen.getAllByDisplayValue( 'em' );
@@ -257,7 +257,7 @@ describe( 'BoxControl', () => {
 			await user.selectOptions( allUnitSelect, [ 'vw' ] );
 
 			// Unlink the controls.
-			await user.click( screen.getByLabelText( /Unlink Sides/ ) );
+			await user.click( screen.getByLabelText( /Unlink sides/ ) );
 
 			// Confirm that each individual control has the selected unit
 			const unlinkedSelects = screen.getAllByDisplayValue( 'vw' );

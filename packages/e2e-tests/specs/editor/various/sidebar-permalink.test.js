@@ -8,8 +8,7 @@ import {
 	publishPost,
 } from '@wordpress/e2e-test-utils';
 
-// TODO: Use a more accessible selector.
-const urlRowSelector = '.edit-post-post-url';
+const urlButtonSelector = '*[aria-label^="Change URL"]';
 
 // This tests are not together with the remaining sidebar tests,
 // because we need to publish/save a post, to correctly test the permalink row.
@@ -30,7 +29,7 @@ describe( 'Sidebar Permalink', () => {
 		await publishPost();
 		// Start editing again.
 		await page.type( '.editor-post-title__input', ' (Updated)' );
-		expect( await page.$( urlRowSelector ) ).toBeNull();
+		expect( await page.$( urlButtonSelector ) ).toBeNull();
 	} );
 
 	it( 'should not render URL when post is public but not publicly queryable', async () => {
@@ -39,7 +38,7 @@ describe( 'Sidebar Permalink', () => {
 		await publishPost();
 		// Start editing again.
 		await page.type( '.editor-post-title__input', ' (Updated)' );
-		expect( await page.$( urlRowSelector ) ).toBeNull();
+		expect( await page.$( urlButtonSelector ) ).toBeNull();
 	} );
 
 	it( 'should render URL when post is public and publicly queryable', async () => {
@@ -48,6 +47,6 @@ describe( 'Sidebar Permalink', () => {
 		await publishPost();
 		// Start editing again.
 		await page.type( '.editor-post-title__input', ' (Updated)' );
-		expect( await page.$( urlRowSelector ) ).not.toBeNull();
+		expect( await page.$( urlButtonSelector ) ).not.toBeNull();
 	} );
 } );

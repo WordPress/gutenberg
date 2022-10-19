@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -1120,8 +1119,10 @@ const v3 = {
 			dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
 		};
 
+		const { title, contentAlign, ...restAttributes } = newAttribs;
+
 		return [
-			omit( newAttribs, [ 'title', 'contentAlign' ] ),
+			restAttributes,
 			[
 				createBlock( 'core/paragraph', {
 					content: attributes.title,
@@ -1202,8 +1203,11 @@ const v2 = {
 			...attributes,
 			dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
 		};
+
+		const { title, contentAlign, align, ...restAttributes } = newAttribs;
+
 		return [
-			omit( newAttribs, [ 'title', 'contentAlign', 'align' ] ),
+			restAttributes,
 			[
 				createBlock( 'core/paragraph', {
 					content: attributes.title,
@@ -1259,8 +1263,11 @@ const v1 = {
 			...attributes,
 			dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
 		};
+
+		const { title, contentAlign, align, ...restAttributes } = newAttribs;
+
 		return [
-			omit( newAttribs, [ 'title', 'contentAlign', 'align' ] ),
+			restAttributes,
 			[
 				createBlock( 'core/paragraph', {
 					content: attributes.title,

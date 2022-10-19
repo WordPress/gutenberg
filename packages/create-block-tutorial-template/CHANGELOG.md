@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 2.7.0 (2022-10-05)
+
+## 2.6.0 (2022-09-21)
+
+## 2.5.0 (2022-08-24)
+
+### Enhancement
+
+-   Add support to the `dynamic` variant ([#41289](https://github.com/WordPress/gutenberg/pull/41289), [#43481](https://github.com/WordPress/gutenberg/pull/43481)).
+
 ## 2.3.0 (2022-06-01)
 
 ### Enhancement

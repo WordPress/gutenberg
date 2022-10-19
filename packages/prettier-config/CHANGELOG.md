@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+### Internal
+
+-   Fix doc for extending the prettier config in `.prettierrc` config file.
+-   Add step to extend the prettier config in `.prettierrc.js` config file.
+
+## 2.2.0 (2022-10-05)
+
+## 2.1.0 (2022-09-21)
+
+## 2.0.0 (2022-08-24)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
+### Bug Fix
+
+-   Packages: Replace `is-plain-obj` with native functionality ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
+
 ## 1.2.0 (2022-04-21)
 
 ### Enhancement

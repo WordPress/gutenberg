@@ -1,5 +1,5 @@
 #!/bin/bash
-# 
+#
 # Extract strings from source code and generates the following POT files:
 #   - {PATH}/{PLUGIN_NAME}-blocks.pot             [Contains strings referenced in block.json files]
 #   - {PATH}/{PLUGIN_NAME}-source.pot             [Contains strings referenced in all source code files]
@@ -91,7 +91,7 @@ function generate_bundles() {
 
   echo -e "\n\033[1mGenerate Android JS bundle\033[0m"
   $BUNDLE_CLI --platform android --dev false --entry-file "$entry_file" --bundle-output "$android_bundle_output" --sourcemap-output "$android_sourcemap_output"
-  
+
   echo -e "\n\033[1mGenerate iOS JS bundle\033[0m"
   $BUNDLE_CLI --platform ios --dev false --entry-file "$entry_file" --bundle-output "$ios_bundle_output" --sourcemap-output "$ios_sourcemap_output"
 }
@@ -154,7 +154,7 @@ function generate_pot_files() {
   if [ -n "$subtract_pot_files" ]; then
     echo "-- Strings from ${plugins_to_subtract[@]} plugins will be subtracted --"
   fi
-  
+
   echo -e "\nExtract used strings from Android source-map:"
   make_pot "$ANDROID_EXTRACT_SOURCE_FILES_PATH" "$subtract_param $domain_param $output_pot_used_android_file"
 
@@ -173,7 +173,7 @@ PLUGINS=( "$@" )
 
 # Validate parameters
 if [[ $((${#PLUGINS[@]}%2)) -ne 0 ]]; then
-  error "Plugin arguments must be be even."
+  error "Plugin arguments must be even."
 fi
 
 for (( index=0; index<${#PLUGINS[@]}; index+=2 )); do

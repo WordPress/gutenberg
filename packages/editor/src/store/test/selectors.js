@@ -1599,7 +1599,7 @@ describe( 'selectors', () => {
 
 			for ( const variantField of fields ) {
 				for ( const constantField of fields.filter(
-					( f ) => ! f === variantField
+					( f ) => f !== variantField
 				) ) {
 					const state = {
 						editor: {

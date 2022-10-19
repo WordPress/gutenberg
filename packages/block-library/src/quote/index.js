@@ -7,56 +7,36 @@ import { quote as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
-import settingsV2 from './v2';
 
 const { name } = metadata;
 
-export { metadata, name, settingsV2 };
+export { metadata, name };
 
-export const settingsV1 = {
+export const settings = {
 	icon,
 	example: {
 		attributes: {
-			value:
-				'<p>' + __( 'In quoting others, we cite ourselves.' ) + '</p>',
 			citation: 'Julio Cortázar',
 		},
+		innerBlocks: [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: __( 'In quoting others, we cite ourselves.' ),
+				},
+			},
+		],
 	},
 	transforms,
 	edit,
 	save,
-	merge( attributes, { value, citation } ) {
-		// Quote citations cannot be merged. Pick the second one unless it's
-		// empty.
-		if ( ! citation ) {
-			citation = attributes.citation;
-		}
-
-		if ( ! value || value === '<p></p>' ) {
-			return {
-				...attributes,
-				citation,
-			};
-		}
-
-		return {
-			...attributes,
-			value: attributes.value + value,
-			citation,
-		};
-	},
 	deprecated,
 };
 
-let settings = settingsV1;
-if ( process.env.IS_GUTENBERG_PLUGIN ) {
-	settings = window?.__experimentalEnableQuoteBlockV2
-		? settingsV2
-		: settingsV1;
-}
-export { settings };
+export const init = () => initBlock( { name, metadata, settings } );

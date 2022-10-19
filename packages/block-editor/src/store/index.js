@@ -15,8 +15,6 @@ import { STORE_NAME } from './constants';
  * Block editor data store configuration.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore
- *
- * @type {Object}
  */
 export const storeConfig = {
 	reducer,
@@ -28,8 +26,6 @@ export const storeConfig = {
  * Store definition for the block editor namespace.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
- *
- * @type {Object}
  */
 export const store = createReduxStore( STORE_NAME, {
 	...storeConfig,

@@ -1,10 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 
-const { clearTimeout, setTimeout } = window;
 const noop = () => {};
 
 export type Axis = 'x' | 'y';
@@ -85,23 +84,23 @@ export function useResizeLabel( {
 	 */
 	const moveTimeoutRef = useRef< number >();
 
-	const unsetMoveXY = () => {
-		/*
-		 * If axis is controlled, we will avoid resetting the moveX and moveY values.
-		 * This will allow for the preferred axis values to persist in the label.
-		 */
-		if ( isAxisControlled ) return;
-		setMoveX( false );
-		setMoveY( false );
-	};
+	const debounceUnsetMoveXY = useCallback( () => {
+		const unsetMoveXY = () => {
+			/*
+			 * If axis is controlled, we will avoid resetting the moveX and moveY values.
+			 * This will allow for the preferred axis values to persist in the label.
+			 */
+			if ( isAxisControlled ) return;
+			setMoveX( false );
+			setMoveY( false );
+		};
 
-	const debounceUnsetMoveXY = () => {
 		if ( moveTimeoutRef.current ) {
-			clearTimeout( moveTimeoutRef.current );
+			window.clearTimeout( moveTimeoutRef.current );
 		}
 
-		moveTimeoutRef.current = setTimeout( unsetMoveXY, fadeTimeout );
-	};
+		moveTimeoutRef.current = window.setTimeout( unsetMoveXY, fadeTimeout );
+	}, [ fadeTimeout, isAxisControlled ] );
 
 	useEffect( () => {
 		/*
@@ -144,7 +143,7 @@ export function useResizeLabel( {
 
 		onResize( { width, height } );
 		debounceUnsetMoveXY();
-	}, [ width, height ] );
+	}, [ width, height, onResize, debounceUnsetMoveXY ] );
 
 	const label = getSizeLabel( {
 		axis,

@@ -7,10 +7,13 @@ import { __EXPERIMENTAL_ELEMENTS as ELEMENTS } from '@wordpress/blocks';
  * Internal dependencies
  */
 import {
+	getLayoutStyles,
 	getNodesWithSettings,
 	getNodesWithStyles,
+	getBlockSelectors,
 	toCustomProperties,
 	toStyles,
+	getStylesDeclarations,
 } from '../use-global-styles-output';
 import { ROOT_BLOCK_SELECTOR } from '../utils';
 
@@ -56,6 +59,11 @@ describe( 'global styles renderer', () => {
 								},
 							},
 						},
+						'core/image': {
+							border: {
+								radius: '9999px',
+							},
+						},
 					},
 					elements: {
 						link: {
@@ -82,6 +90,10 @@ describe( 'global styles renderer', () => {
 			const blockSelectors = {
 				'core/heading': {
 					selector: '.my-heading1, .my-heading2',
+				},
+				'core/image': {
+					selector: '.my-image',
+					featureSelectors: '.my-image img, .my-image .crop-area',
 				},
 			};
 
@@ -157,6 +169,15 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: '.my-heading1 a, .my-heading2 a',
+				},
+				{
+					styles: {
+						border: {
+							radius: '9999px',
+						},
+					},
+					selector: '.my-image',
+					featureSelectors: '.my-image img, .my-image .crop-area',
 				},
 			] );
 		} );
@@ -429,6 +450,14 @@ describe( 'global styles renderer', () => {
 								},
 							},
 						},
+						'core/image': {
+							color: {
+								text: 'red',
+							},
+							border: {
+								radius: '9999px',
+							},
+						},
 					},
 				},
 			};
@@ -440,14 +469,346 @@ describe( 'global styles renderer', () => {
 				'core/heading': {
 					selector: 'h1,h2,h3,h4,h5,h6',
 				},
+				'core/image': {
+					selector: '.wp-block-image',
+					featureSelectors: {
+						border: '.wp-block-image img, .wp-block-image .wp-crop-area',
+					},
+				},
 			};
 
 			expect( toStyles( tree, blockSelectors ) ).toEqual(
 				'body {margin: 0;}' +
-					'body{background-color: red;margin: 10px;padding: 10px;}h1{font-size: 42px;}a{color: blue;}a:hover{color: orange;}a:focus{color: orange;}.wp-block-group{margin-top: 10px;margin-right: 20px;margin-bottom: 30px;margin-left: 40px;padding-top: 11px;padding-right: 22px;padding-bottom: 33px;padding-left: 44px;}h1,h2,h3,h4,h5,h6{color: orange;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{color: hotpink;}h1 a:hover,h2 a:hover,h3 a:hover,h4 a:hover,h5 a:hover,h6 a:hover{color: red;}h1 a:focus,h2 a:focus,h3 a:focus,h4 a:focus,h5 a:focus,h6 a:focus{color: red;}' +
-					'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }' +
+					'body{background-color: red;margin: 10px;padding: 10px;}a{color: blue;}a:hover{color: orange;}a:focus{color: orange;}h1{font-size: 42px;}.wp-block-group{margin-top: 10px;margin-right: 20px;margin-bottom: 30px;margin-left: 40px;padding-top: 11px;padding-right: 22px;padding-bottom: 33px;padding-left: 44px;}h1,h2,h3,h4,h5,h6{color: orange;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{color: hotpink;}h1 a:hover,h2 a:hover,h3 a:hover,h4 a:hover,h5 a:hover,h6 a:hover{color: red;}h1 a:focus,h2 a:focus,h3 a:focus,h4 a:focus,h5 a:focus,h6 a:focus{color: red;}' +
+					'.wp-block-image img, .wp-block-image .wp-crop-area{border-radius: 9999px }.wp-block-image{color: red;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }' +
 					'.has-white-color{color: var(--wp--preset--color--white) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}h1.has-blue-color,h2.has-blue-color,h3.has-blue-color,h4.has-blue-color,h5.has-blue-color,h6.has-blue-color{color: var(--wp--preset--color--blue) !important;}h1.has-blue-background-color,h2.has-blue-background-color,h3.has-blue-background-color,h4.has-blue-background-color,h5.has-blue-background-color,h6.has-blue-background-color{background-color: var(--wp--preset--color--blue) !important;}h1.has-blue-border-color,h2.has-blue-border-color,h3.has-blue-border-color,h4.has-blue-border-color,h5.has-blue-border-color,h6.has-blue-border-color{border-color: var(--wp--preset--color--blue) !important;}'
 			);
+		} );
+		it( 'should output content and wide size variables if values are specified', () => {
+			const tree = {
+				settings: {
+					layout: {
+						contentSize: '840px',
+						wideSize: '1100px',
+					},
+				},
+			};
+			expect( toStyles( tree, 'body' ) ).toEqual(
+				'body {margin: 0; --wp--style--global--content-size: 840px; --wp--style--global--wide-size: 1100px;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
+			);
+		} );
+	} );
+
+	describe( 'getLayoutStyles', () => {
+		const layoutDefinitionsTree = {
+			settings: {
+				layout: {
+					definitions: {
+						default: {
+							name: 'default',
+							slug: 'flow',
+							className: 'is-layout-flow',
+							baseStyles: [
+								{
+									selector: ' > .alignleft',
+									rules: {
+										float: 'left',
+										'margin-inline-start': '0',
+										'margin-inline-end': '2em',
+									},
+								},
+								{
+									selector: ' > .alignright',
+									rules: {
+										float: 'right',
+										'margin-inline-start': '2em',
+										'margin-inline-end': '0',
+									},
+								},
+								{
+									selector: ' > .aligncenter',
+									rules: {
+										'margin-left': 'auto !important',
+										'margin-right': 'auto !important',
+									},
+								},
+							],
+							spacingStyles: [
+								{
+									selector: ' > *',
+									rules: {
+										'margin-block-start': '0',
+										'margin-block-end': '0',
+									},
+								},
+								{
+									selector: ' > * + *',
+									rules: {
+										'margin-block-start': null,
+										'margin-block-end': '0',
+									},
+								},
+							],
+						},
+						flex: {
+							name: 'flex',
+							slug: 'flex',
+							className: 'is-layout-flex',
+							displayMode: 'flex',
+							baseStyles: [
+								{
+									selector: '',
+									rules: {
+										'flex-wrap': 'wrap',
+										'align-items': 'center',
+									},
+								},
+								{
+									selector: ' > *',
+									rules: {
+										margin: '0',
+									},
+								},
+							],
+							spacingStyles: [
+								{
+									selector: '',
+									rules: {
+										gap: null,
+									},
+								},
+							],
+						},
+					},
+				},
+			},
+		};
+
+		it( 'should return fallback gap flex layout style, and all base styles, if block styles are enabled and blockGap is disabled', () => {
+			const style = { spacing: { blockGap: '12px' } };
+
+			const layoutStyles = getLayoutStyles( {
+				tree: layoutDefinitionsTree,
+				style,
+				selector: 'body',
+				hasBlockGapSupport: false,
+				hasFallbackGapSupport: true,
+			} );
+
+			expect( layoutStyles ).toEqual(
+				':where(.is-layout-flex) { gap: 0.5em; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
+			);
+		} );
+
+		it( 'should return fallback gap layout styles, and base styles, if blockGap is enabled, but there is no blockGap value', () => {
+			const style = {};
+
+			const layoutStyles = getLayoutStyles( {
+				tree: layoutDefinitionsTree,
+				style,
+				selector: 'body',
+				hasBlockGapSupport: true,
+				hasFallbackGapSupport: true,
+			} );
+
+			expect( layoutStyles ).toEqual(
+				'body .is-layout-flow > * { margin-block-start: 0; margin-block-end: 0; }body .is-layout-flow > * + * { margin-block-start: 0.5em; margin-block-end: 0; }body .is-layout-flex { gap: 0.5em; }body { --wp--style--block-gap: 0.5em; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
+			);
+		} );
+
+		it( 'should return real gap layout style if blockGap is enabled, and base styles', () => {
+			const style = { spacing: { blockGap: '12px' } };
+
+			const layoutStyles = getLayoutStyles( {
+				tree: layoutDefinitionsTree,
+				style,
+				selector: 'body',
+				hasBlockGapSupport: true,
+				hasFallbackGapSupport: true,
+			} );
+
+			expect( layoutStyles ).toEqual(
+				'body .is-layout-flow > * { margin-block-start: 0; margin-block-end: 0; }body .is-layout-flow > * + * { margin-block-start: 12px; margin-block-end: 0; }body .is-layout-flex { gap: 12px; }body { --wp--style--block-gap: 12px; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
+			);
+		} );
+
+		it( 'should return real gap layout style if blockGap is enabled', () => {
+			const style = { spacing: { blockGap: '12px' } };
+
+			const layoutStyles = getLayoutStyles( {
+				tree: layoutDefinitionsTree,
+				style,
+				selector: '.wp-block-group',
+				hasBlockGapSupport: true,
+				hasFallbackGapSupport: true,
+			} );
+
+			expect( layoutStyles ).toEqual(
+				'.wp-block-group.is-layout-flow > * { margin-block-start: 0; margin-block-end: 0; }.wp-block-group.is-layout-flow > * + * { margin-block-start: 12px; margin-block-end: 0; }.wp-block-group.is-layout-flex { gap: 12px; }'
+			);
+		} );
+
+		it( 'should return fallback gap flex layout style for a block if blockGap is disabled, and a fallback value is provided', () => {
+			const style = { spacing: { blockGap: '12px' } };
+
+			const layoutStyles = getLayoutStyles( {
+				tree: layoutDefinitionsTree,
+				style,
+				selector: '.wp-block-group',
+				hasBlockGapSupport: false, // This means that the fallback value will be used instead of the "real" one.
+				hasFallbackGapSupport: true,
+				fallbackGapValue: '2em',
+			} );
+
+			expect( layoutStyles ).toEqual(
+				':where(.wp-block-group.is-layout-flex) { gap: 2em; }'
+			);
+		} );
+	} );
+
+	describe( 'getBlockSelectors', () => {
+		it( 'should return block selectors data', () => {
+			const imageSupports = {
+				__experimentalBorder: {
+					radius: true,
+					__experimentalSelector: 'img, .crop-area',
+				},
+				color: {
+					__experimentalDuotone: 'img',
+				},
+				__experimentalSelector: '.my-image',
+			};
+			const imageBlock = { name: 'core/image', supports: imageSupports };
+			const blockTypes = [ imageBlock ];
+
+			expect( getBlockSelectors( blockTypes ) ).toEqual( {
+				'core/image': {
+					name: imageBlock.name,
+					selector: imageSupports.__experimentalSelector,
+					duotoneSelector: imageSupports.color.__experimentalDuotone,
+					fallbackGapValue: undefined,
+					featureSelectors: {
+						border: '.my-image img, .my-image .crop-area',
+					},
+					hasLayoutSupport: false,
+				},
+			} );
+		} );
+	} );
+
+	describe( 'getStylesDeclarations', () => {
+		const blockStyles = {
+			spacing: {
+				padding: {
+					top: '33px',
+					right: '33px',
+					bottom: '33px',
+					left: '33px',
+				},
+			},
+			color: {
+				background: 'var:preset|color|light-green-cyan',
+			},
+			typography: {
+				fontFamily: 'sans-serif',
+				fontSize: '14px',
+			},
+		};
+
+		it( 'should output padding variables and other properties if useRootPaddingAwareAlignments is enabled', () => {
+			expect(
+				getStylesDeclarations( blockStyles, 'body', true )
+			).toEqual( [
+				'--wp--style--root--padding-top: 33px',
+				'--wp--style--root--padding-right: 33px',
+				'--wp--style--root--padding-bottom: 33px',
+				'--wp--style--root--padding-left: 33px',
+				'background-color: var(--wp--preset--color--light-green-cyan)',
+				'font-family: sans-serif',
+				'font-size: 14px',
+			] );
+		} );
+
+		it( 'should output padding and other properties if useRootPaddingAwareAlignments is disabled', () => {
+			expect(
+				getStylesDeclarations( blockStyles, 'body', false )
+			).toEqual( [
+				'background-color: var(--wp--preset--color--light-green-cyan)',
+				'padding-top: 33px',
+				'padding-right: 33px',
+				'padding-bottom: 33px',
+				'padding-left: 33px',
+				'font-family: sans-serif',
+				'font-size: 14px',
+			] );
+		} );
+
+		it( 'should not output padding variables if selector is not root', () => {
+			expect(
+				getStylesDeclarations(
+					blockStyles,
+					'.wp-block-button__link',
+					true
+				)
+			).toEqual( [
+				'background-color: var(--wp--preset--color--light-green-cyan)',
+				'padding-top: 33px',
+				'padding-right: 33px',
+				'padding-bottom: 33px',
+				'padding-left: 33px',
+				'font-family: sans-serif',
+				'font-size: 14px',
+			] );
+		} );
+
+		it( 'should output clamp values for font-size when fluid typography is enabled', () => {
+			expect(
+				getStylesDeclarations(
+					blockStyles,
+					'.wp-block-site-title',
+					true,
+					{
+						settings: {
+							typography: {
+								fluid: true,
+							},
+						},
+					}
+				)
+			).toEqual( [
+				'background-color: var(--wp--preset--color--light-green-cyan)',
+				'padding-top: 33px',
+				'padding-right: 33px',
+				'padding-bottom: 33px',
+				'padding-left: 33px',
+				'font-family: sans-serif',
+				'font-size: clamp(14px, 0.875rem + ((1vw - 7.68px) * 0.841), 21px)',
+			] );
+		} );
+
+		it( 'should output direct values for font-size when fluid typography is disabled', () => {
+			expect(
+				getStylesDeclarations(
+					blockStyles,
+					'.wp-block-site-title',
+					true,
+					{
+						settings: {
+							typography: {
+								fluid: false,
+							},
+						},
+					}
+				)
+			).toEqual( [
+				'background-color: var(--wp--preset--color--light-green-cyan)',
+				'padding-top: 33px',
+				'padding-right: 33px',
+				'padding-bottom: 33px',
+				'padding-left: 33px',
+				'font-family: sans-serif',
+				'font-size: 14px',
+			] );
 		} );
 	} );
 } );

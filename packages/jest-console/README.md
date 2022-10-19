@@ -18,7 +18,7 @@ Install the module:
 npm install @wordpress/jest-console --save-dev
 ```
 
-**Note**: This package requires Node.js 12.0.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js 14.0.0 or later. It is not compatible with older versions.
 
 ### Setup
 

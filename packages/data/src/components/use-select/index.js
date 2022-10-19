@@ -7,7 +7,13 @@ import { useMemoOne } from 'use-memo-one';
  * WordPress dependencies
  */
 import { createQueue } from '@wordpress/priority-queue';
-import { useRef, useCallback, useMemo, useReducer } from '@wordpress/element';
+import {
+	useRef,
+	useCallback,
+	useMemo,
+	useReducer,
+	useDebugValue,
+} from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 
@@ -147,6 +153,7 @@ export default function useSelect( mapSelect, deps ) {
 
 	let mapOutput;
 
+	let selectorRan = false;
 	if ( _mapSelect ) {
 		mapOutput = latestMapOutput.current;
 		const hasReplacedRegistry = latestRegistry.current !== registry;
@@ -162,6 +169,7 @@ export default function useSelect( mapSelect, deps ) {
 		) {
 			try {
 				mapOutput = wrapSelect( _mapSelect );
+				selectorRan = true;
 			} catch ( error ) {
 				let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
 
@@ -185,7 +193,9 @@ export default function useSelect( mapSelect, deps ) {
 		latestRegistry.current = registry;
 		latestMapSelect.current = _mapSelect;
 		latestIsAsync.current = isAsync;
-		latestMapOutput.current = mapOutput;
+		if ( selectorRan ) {
+			latestMapOutput.current = mapOutput;
+		}
 		latestMapOutputError.current = undefined;
 	} );
 
@@ -248,6 +258,8 @@ export default function useSelect( mapSelect, deps ) {
 		// examining every individual value inside the `deps` array.
 	}, [ registry, wrapSelect, hasMappingFunction, depsChangedFlag ] );
 
+	useDebugValue( mapOutput );
+
 	return hasMappingFunction ? mapOutput : registry.select( mapSelect );
 }
 
@@ -302,9 +314,11 @@ export function useSuspenseSelect( mapSelect, deps ) {
 	const hasReplacedMapSelect = latestMapSelect.current !== _mapSelect;
 	const hasLeftAsyncMode = latestIsAsync.current && ! isAsync;
 
+	let selectorRan = false;
 	if ( hasReplacedRegistry || hasReplacedMapSelect || hasLeftAsyncMode ) {
 		try {
 			mapOutput = wrapSelect( _mapSelect );
+			selectorRan = true;
 		} catch ( error ) {
 			mapOutputError = error;
 		}
@@ -314,7 +328,9 @@ export function useSuspenseSelect( mapSelect, deps ) {
 		latestRegistry.current = registry;
 		latestMapSelect.current = _mapSelect;
 		latestIsAsync.current = isAsync;
-		latestMapOutput.current = mapOutput;
+		if ( selectorRan ) {
+			latestMapOutput.current = mapOutput;
+		}
 		latestMapOutputError.current = mapOutputError;
 	} );
 

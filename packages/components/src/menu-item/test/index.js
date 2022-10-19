@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -11,23 +11,23 @@ import { more } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { MenuItem } from '../';
+import MenuItem from '../';
 
 const noop = () => {};
 
 describe( 'MenuItem', () => {
 	it( 'should match snapshot when only label provided', () => {
-		const wrapper = shallow( <MenuItem>My item</MenuItem> );
+		render( <MenuItem>My item</MenuItem> );
 
-		expect( wrapper ).toMatchSnapshot();
+		expect( screen.getByRole( 'menuitem' ) ).toMatchSnapshot();
 	} );
 
 	it( 'should match snapshot when all props provided', () => {
-		const wrapper = shallow(
+		render(
 			<MenuItem
 				className="my-class"
 				icon={ more }
-				isSelected={ true }
+				isSelected
 				role="menuitemcheckbox"
 				onClick={ noop }
 				shortcut="mod+shift+alt+w"
@@ -36,11 +36,11 @@ describe( 'MenuItem', () => {
 			</MenuItem>
 		);
 
-		expect( wrapper ).toMatchSnapshot();
+		expect( screen.getByRole( 'menuitemcheckbox' ) ).toMatchSnapshot();
 	} );
 
 	it( 'should match snapshot when isSelected and role are optionally provided', () => {
-		const wrapper = shallow(
+		render(
 			<MenuItem
 				className="my-class"
 				icon={ more }
@@ -51,52 +51,93 @@ describe( 'MenuItem', () => {
 			</MenuItem>
 		);
 
-		expect( wrapper ).toMatchSnapshot();
+		expect( screen.getByRole( 'menuitem' ) ).toMatchSnapshot();
 	} );
 
 	it( 'should match snapshot when info is provided', () => {
-		const wrapper = shallow(
+		render(
 			<MenuItem info="Extended description of My Item">My item</MenuItem>
 		);
 
-		expect( wrapper ).toMatchSnapshot();
+		expect( screen.getByRole( 'menuitem' ) ).toMatchSnapshot();
 	} );
 
 	it( 'should avoid using aria-label if only has non-string children', () => {
-		const wrapper = shallow(
+		render(
 			<MenuItem>
 				<div />
 			</MenuItem>
 		);
 
-		expect( wrapper.prop( 'aria-label' ) ).toBeUndefined();
+		expect( screen.getByRole( 'menuitem' ) ).not.toHaveAttribute(
+			'aria-label'
+		);
 	} );
 
 	it( 'should avoid using aria-checked if only menuitem is set as aria-role', () => {
-		const wrapper = shallow(
-			<MenuItem role="menuitem" isSelected={ true }>
+		render(
+			<MenuItem role="menuitem" isSelected>
 				<div />
 			</MenuItem>
 		);
 
-		expect( wrapper.prop( 'aria-checked' ) ).toBeUndefined();
+		const menuItem = screen.getByRole( 'menuitem' );
+		expect( menuItem ).not.toBeChecked();
 	} );
 
 	it( 'should use aria-checked if menuitemradio or menuitemcheckbox is set as aria-role', () => {
-		let wrapper = shallow(
-			<MenuItem role="menuitemradio" isSelected={ true }>
+		const { rerender } = render(
+			<MenuItem role="menuitemradio" isSelected>
 				<div />
 			</MenuItem>
 		);
 
-		expect( wrapper.prop( 'aria-checked' ) ).toBe( true );
+		const radioMenuItem = screen.getByRole( 'menuitemradio' );
+		expect( radioMenuItem ).toBeChecked();
 
-		wrapper = shallow(
-			<MenuItem role="menuitemcheckbox" isSelected={ true }>
+		rerender(
+			<MenuItem role="menuitemcheckbox" isSelected>
 				<div />
 			</MenuItem>
 		);
 
-		expect( wrapper.prop( 'aria-checked' ) ).toBe( true );
+		const checkboxMenuItem = screen.getByRole( 'menuitemcheckbox' );
+		expect( checkboxMenuItem ).toBeChecked();
+	} );
+
+	it( 'should not render shortcut or right icon if suffix provided', () => {
+		render(
+			<MenuItem
+				icon={ <span>Icon</span> }
+				iconPosition="right"
+				role="menuitemcheckbox"
+				shortcut="Shortcut"
+				suffix="Suffix"
+			>
+				My item
+			</MenuItem>
+		);
+
+		expect( screen.getByText( 'Suffix' ) ).toBeInTheDocument();
+		expect( screen.queryByText( 'Shortcut' ) ).not.toBeInTheDocument();
+		expect( screen.queryByText( 'Icon' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'should render left icon despite suffix being provided', () => {
+		render(
+			<MenuItem
+				icon={ <span>Icon</span> }
+				iconPosition="left"
+				role="menuitemcheckbox"
+				shortcut="Shortcut"
+				suffix="Suffix"
+			>
+				My item
+			</MenuItem>
+		);
+
+		expect( screen.getByText( 'Icon' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Suffix' ) ).toBeInTheDocument();
+		expect( screen.queryByText( 'Shortcut' ) ).not.toBeInTheDocument();
 	} );
 } );

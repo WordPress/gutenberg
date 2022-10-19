@@ -3,7 +3,6 @@
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
-import { TAB } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -12,8 +11,8 @@ import NavigableContainer from './container';
 
 export function TabbableContainer( { eventToOffset, ...props }, ref ) {
 	const innerEventToOffset = ( evt ) => {
-		const { keyCode, shiftKey } = evt;
-		if ( TAB === keyCode ) {
+		const { code, shiftKey } = evt;
+		if ( 'Tab' === code ) {
 			return shiftKey ? -1 : 1;
 		}
 

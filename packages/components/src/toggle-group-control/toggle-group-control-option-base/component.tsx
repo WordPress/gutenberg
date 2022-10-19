@@ -60,8 +60,10 @@ function ToggleGroupControlOptionBase(
 	const {
 		className,
 		isBlock = false,
+		isIcon = false,
 		value,
 		children,
+		size = 'default',
 		showTooltip = false,
 		...radioProps
 	} = {
@@ -74,6 +76,7 @@ function ToggleGroupControlOptionBase(
 	const labelViewClasses = cx( isBlock && styles.labelBlock );
 	const classes = cx(
 		styles.buttonView,
+		isIcon && styles.isIcon( { size } ),
 		className,
 		isActive && styles.buttonActive
 	);

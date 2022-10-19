@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import {
 	__unstableGetAnimateClassName as getAnimateClassName,
-	withNotices,
 	ResizableBox,
 	ToolbarButton,
 } from '@wordpress/components';
@@ -60,14 +59,7 @@ function ClipboardToolbarButton( { text, disabled } ) {
 	);
 }
 
-function FileEdit( {
-	attributes,
-	isSelected,
-	setAttributes,
-	noticeUI,
-	noticeOperations,
-	clientId,
-} ) {
+function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const {
 		id,
 		fileId,
@@ -91,6 +83,7 @@ function FileEdit( {
 		[ id ]
 	);
 
+	const { createErrorNotice } = useDispatch( noticesStore );
 	const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -137,8 +130,7 @@ function FileEdit( {
 
 	function onUploadError( message ) {
 		setAttributes( { href: undefined } );
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
 	function changeLinkDestinationOption( newHref ) {
@@ -207,7 +199,6 @@ function FileEdit( {
 						),
 					} }
 					onSelect={ onSelectFile }
-					notices={ noticeUI }
 					onError={ onUploadError }
 					accept="*"
 				/>
@@ -321,4 +312,4 @@ function FileEdit( {
 	);
 }
 
-export default withNotices( FileEdit );
+export default FileEdit;

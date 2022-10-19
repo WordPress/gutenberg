@@ -14,7 +14,7 @@ Install the module to your project using [npm](https://www.npmjs.com/).
 npm install @wordpress/babel-plugin-import-jsx-pragma
 ```
 
-**Note**: This package requires Node.js 12.0.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js 14.0.0 or later. It is not compatible with older versions.
 
 ## Usage
 

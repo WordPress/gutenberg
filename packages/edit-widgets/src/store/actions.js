@@ -406,7 +406,7 @@ export const moveBlockToWidgetArea =
 		);
 		const destinationRootClientId = destinationWidgetAreaBlock.clientId;
 
-		// Get the index for moving to the end of the the destination widget area.
+		// Get the index for moving to the end of the destination widget area.
 		const destinationInnerBlocksClientIds = registry
 			.select( blockEditorStore )
 			.getBlockOrder( destinationRootClientId );

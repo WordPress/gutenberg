@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, includes, invoke, pickBy } from 'lodash';
+import { get, includes, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -19,7 +19,7 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { dateI18n, format, __experimentalGetSettings } from '@wordpress/date';
+import { dateI18n, format, getSettings } from '@wordpress/date';
 import {
 	InspectorControls,
 	BlockAlignmentToolbar,
@@ -422,7 +422,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		},
 	];
 
-	const dateFormat = __experimentalGetSettings().formats.date;
+	const dateFormat = getSettings().formats.date;
 
 	return (
 		<div>
@@ -432,11 +432,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			</BlockControls>
 			<ul { ...blockProps }>
 				{ displayPosts.map( ( post, i ) => {
-					const titleTrimmed = invoke( post, [
-						'title',
-						'rendered',
-						'trim',
-					] );
+					const titleTrimmed = post.title.rendered.trim();
 					let excerpt = post.excerpt.rendered;
 					const currentAuthor = authorList?.find(
 						( author ) => author.id === post.author

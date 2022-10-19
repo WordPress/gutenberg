@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { Dimensions, Platform } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 /**
  * WordPress dependencies
  */
 import {
+	Platform,
 	renderToString,
 	memo,
 	useRef,
@@ -21,67 +22,85 @@ import { usePreferredColorScheme } from '@wordpress/compose';
  */
 import sandboxStyles from './style.scss';
 
-const observeAndResizeJS = `
-	( function() {
-		var observer;
+const observeAndResizeJS = function () {
+	// Hermes requires a special directive to preserve the original source code
+	// when using `Function.prototype.toString()` below.
+	// https://github.com/facebook/hermes/issues/114#issuecomment-887106990
+	'show source';
+	const { MutationObserver } = window;
 
-		if ( ! window.MutationObserver || ! document.body || ! window.parent ) {
-			return;
-		}
+	if ( ! MutationObserver || ! document.body || ! window.parent ) {
+		return;
+	}
 
-		function sendResize() {
-			var clientBoundingRect = document.body.getBoundingClientRect();
+	function sendResize() {
+		const clientBoundingRect = document.body.getBoundingClientRect();
 
-			// The function postMessage is exposed by the react-native-webview library
-			// to communicate between React Native and the WebView, in this case,
-			// we use it for notifying resize changes.
-            window.ReactNativeWebView.postMessage(JSON.stringify( {
-                action: 'resize',
+		// The function postMessage is exposed by the react-native-webview library
+		// to communicate between React Native and the WebView, in this case,
+		// we use it for notifying resize changes.
+		window.ReactNativeWebView.postMessage(
+			JSON.stringify( {
+				action: 'resize',
 				width: clientBoundingRect.width,
 				height: clientBoundingRect.height,
-            }));
+			} )
+		);
+	}
+
+	const observer = new MutationObserver( sendResize );
+	observer.observe( document.body, {
+		attributes: true,
+		attributeOldValue: false,
+		characterData: true,
+		characterDataOldValue: false,
+		childList: true,
+		subtree: true,
+	} );
+
+	window.addEventListener( 'load', sendResize, true );
+
+	// Hack: Remove viewport unit styles, as these are relative
+	// the iframe root and interfere with our mechanism for
+	// determining the unconstrained page bounds.
+	function removeViewportStyles( ruleOrNode ) {
+		if ( ruleOrNode.style ) {
+			[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function (
+				style
+			) {
+				if (
+					/^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] )
+				) {
+					ruleOrNode.style[ style ] = '';
+				}
+			} );
 		}
+	}
 
-		observer = new MutationObserver( sendResize );
-		observer.observe( document.body, {
-			attributes: true,
-			attributeOldValue: false,
-			characterData: true,
-			characterDataOldValue: false,
-			childList: true,
-			subtree: true
-		} );
-
-		window.addEventListener( 'load', sendResize, true );
-
-		// Hack: Remove viewport unit styles, as these are relative
-		// the iframe root and interfere with our mechanism for
-		// determining the unconstrained page bounds.
-		function removeViewportStyles( ruleOrNode ) {
-			if( ruleOrNode.style ) {
-				[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function( style ) {
-					if ( /^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] ) ) {
-						ruleOrNode.style[ style ] = '';
-					}
-				} );
-			}
+	Array.prototype.forEach.call(
+		document.querySelectorAll( '[style]' ),
+		removeViewportStyles
+	);
+	Array.prototype.forEach.call(
+		document.styleSheets,
+		function ( stylesheet ) {
+			Array.prototype.forEach.call(
+				stylesheet.cssRules || stylesheet.rules,
+				removeViewportStyles
+			);
 		}
+	);
 
-		Array.prototype.forEach.call( document.querySelectorAll( '[style]' ), removeViewportStyles );
-		Array.prototype.forEach.call( document.styleSheets, function( stylesheet ) {
-			Array.prototype.forEach.call( stylesheet.cssRules || stylesheet.rules, removeViewportStyles );
-		} );
+	document.body.style.position = 'absolute';
+	document.body.style.width = '100%';
+	document.body.setAttribute( 'data-resizable-iframe-connected', '' );
 
-		document.body.style.position = 'absolute';
-		document.body.style.width = '100%';
-		document.body.setAttribute( 'data-resizable-iframe-connected', '' );
+	sendResize();
 
-		sendResize();
-
-		// Resize events can change the width of elements with 100% width, but we don't
-		// get an DOM mutations for that, so do the resize when the window is resized, too.
-		window.addEventListener( 'resize', sendResize, true );
-} )();`;
+	// Resize events can change the width of elements with 100% width, but we don't
+	// get an DOM mutations for that, so do the resize when the window is resized, too.
+	window.addEventListener( 'resize', sendResize, true );
+};
 
 const style = `
 	body {
@@ -214,7 +233,9 @@ function Sandbox( {
 					<script
 						type="text/javascript"
 						dangerouslySetInnerHTML={ {
-							__html: customJS || observeAndResizeJS,
+							__html:
+								customJS ||
+								`(${ observeAndResizeJS.toString() })();`,
 						} }
 					/>
 					{ scripts.map( ( src ) => (
@@ -281,6 +302,9 @@ function Sandbox( {
 
 	useEffect( () => {
 		updateContentHtml();
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ html, title, type, styles, scripts ] );
 
 	useEffect( () => {
@@ -307,6 +331,7 @@ function Sandbox( {
 			style={ [
 				sandboxStyles[ 'sandbox-webview__content' ],
 				getSizeStyle(),
+				Platform.isAndroid && workaroundStyles.webView,
 			] }
 			onMessage={ checkMessageForResize }
 			scrollEnabled={ false }
@@ -316,5 +341,16 @@ function Sandbox( {
 		/>
 	);
 }
+
+const workaroundStyles = StyleSheet.create( {
+	webView: {
+		/**
+		 * The slight opacity below is a workaround for an Android crash caused from combining Android
+		 * 12's new scroll overflow behavior and webviews.
+		 * https://github.com/react-native-webview/react-native-webview/issues/1915#issuecomment-808869253
+		 */
+		opacity: 0.99,
+	},
+} );
 
 export default memo( Sandbox );

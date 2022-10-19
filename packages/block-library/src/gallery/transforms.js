@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, every } from 'lodash';
+import { filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -133,10 +133,14 @@ const transforms = {
 				// Init the align and size from the first item which may be either the placeholder or an image.
 				let { align, sizeSlug } = attributes[ 0 ];
 				// Loop through all the images and check if they have the same align and size.
-				align = every( attributes, [ 'align', align ] )
+				align = attributes.every(
+					( attribute ) => attribute.align === align
+				)
 					? align
 					: undefined;
-				sizeSlug = every( attributes, [ 'sizeSlug', sizeSlug ] )
+				sizeSlug = attributes.every(
+					( attribute ) => attribute.sizeSlug === sizeSlug
+				)
 					? sizeSlug
 					: undefined;
 
@@ -144,6 +148,9 @@ const transforms = {
 
 				if ( isGalleryV2Enabled() ) {
 					const innerBlocks = validImages.map( ( image ) => {
+						// Gallery images can't currently be resized so make sure height and width are undefined.
+						image.width = undefined;
+						image.height = undefined;
 						return createBlock( 'core/image', image );
 					} );
 
@@ -195,16 +202,6 @@ const transforms = {
 						}
 					},
 				},
-				shortCodeTransforms: {
-					type: 'array',
-					shortcode: ( { named: { ids } } ) => {
-						if ( isGalleryV2Enabled() ) {
-							return parseShortcodeIds( ids ).map( ( id ) => ( {
-								id: parseInt( id ),
-							} ) );
-						}
-					},
-				},
 				columns: {
 					type: 'number',
 					shortcode: ( { named: { columns = '3' } } ) => {
@@ -235,6 +232,31 @@ const transforms = {
 					},
 				},
 			},
+			transform( { named: { ids, columns = 3, link } } ) {
+				const imageIds = parseShortcodeIds( ids ).map( ( id ) =>
+					parseInt( id, 10 )
+				);
+
+				let linkTo = LINK_DESTINATION_NONE;
+				if ( link === 'post' ) {
+					linkTo = LINK_DESTINATION_ATTACHMENT;
+				} else if ( link === 'file' ) {
+					linkTo = LINK_DESTINATION_MEDIA;
+				}
+
+				const galleryBlock = createBlock(
+					'core/gallery',
+					{
+						columns: parseInt( columns, 10 ),
+						linkTo,
+					},
+					imageIds.map( ( imageId ) =>
+						createBlock( 'core/image', { id: imageId } )
+					)
+				);
+
+				return galleryBlock;
+			},
 			isMatch( { named } ) {
 				return undefined !== named.ids;
 			},
@@ -250,8 +272,7 @@ const transforms = {
 			isMatch( files ) {
 				return (
 					files.length !== 1 &&
-					every(
-						files,
+					files.every(
 						( file ) => file.type.indexOf( 'image/' ) === 0
 					)
 				);
@@ -287,26 +308,36 @@ const transforms = {
 						return innerBlocks.map(
 							( {
 								attributes: {
-									id,
 									url,
 									alt,
 									caption,
+									title,
+									href,
+									rel,
+									linkClass,
+									id,
 									sizeSlug: imageSizeSlug,
 									linkDestination,
-									href,
 									linkTarget,
+									anchor,
+									className,
 								},
 							} ) =>
 								createBlock( 'core/image', {
-									id,
+									align,
 									url,
 									alt,
 									caption,
-									sizeSlug: imageSizeSlug,
-									align,
-									linkDestination,
+									title,
 									href,
+									rel,
+									linkClass,
+									id,
+									sizeSlug: imageSizeSlug,
+									linkDestination,
 									linkTarget,
+									anchor,
+									className,
 								} )
 						);
 					}

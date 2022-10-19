@@ -295,7 +295,7 @@ describe( 'ToolsPanel', () => {
 			expect( control ).toBeInTheDocument();
 
 			// Test the aria live announcement.
-			const announcement = await screen.getByText( 'Alt is now visible' );
+			const announcement = screen.getByText( 'Alt is now visible' );
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
@@ -308,7 +308,7 @@ describe( 'ToolsPanel', () => {
 			expect( control ).not.toBeInTheDocument();
 
 			// Test the aria live announcement.
-			const announcement = await screen.getByText(
+			const announcement = screen.getByText(
 				'Example hidden and reset to default'
 			);
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
@@ -337,9 +337,7 @@ describe( 'ToolsPanel', () => {
 			expect( resetControl ).toBeInTheDocument();
 
 			// Test the aria live announcement.
-			const announcement = await screen.getByText(
-				'Example reset to default'
-			);
+			const announcement = screen.getByText( 'Example reset to default' );
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
@@ -1057,7 +1055,7 @@ describe( 'ToolsPanel', () => {
 			await selectMenuItem( 'Reset all' );
 
 			// Test the aria live announcement.
-			const announcement = await screen.getByText( 'All options reset' );
+			const announcement = screen.getByText( 'All options reset' );
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 
 			const disabledResetAllItem = await screen.findByRole( 'menuitem', {
@@ -1069,7 +1067,7 @@ describe( 'ToolsPanel', () => {
 
 	describe( 'first and last panel items', () => {
 		it( 'should apply first/last classes to appropriate items', () => {
-			const { container } = render(
+			render(
 				<SlotFillProvider>
 					<ToolsPanelItems>
 						<ToolsPanelItem { ...altControlProps }>
@@ -1113,7 +1111,8 @@ describe( 'ToolsPanel', () => {
 			expect( item3 ).toBeInTheDocument();
 			expect( screen.queryByText( 'Item 4' ) ).not.toBeInTheDocument();
 
-			expect( container ).toMatchSnapshot();
+			expect( item2.parentElement ).toHaveClass( 'first' );
+			expect( item3.parentElement ).toHaveClass( 'last' );
 		} );
 	} );
 } );

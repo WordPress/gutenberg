@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -9,20 +9,27 @@ import { shallow } from 'enzyme';
 import PanelRow from '../row';
 
 describe( 'PanelRow', () => {
-	it( 'should defined default class name', () => {
-		const wrapper = shallow( <PanelRow /> );
-		expect( wrapper.hasClass( 'components-panel__row' ) ).toBe( true );
+	it( 'should render with the default class name', () => {
+		const { container } = render( <PanelRow /> );
+
+		expect( container ).toMatchSnapshot();
 	} );
-	it( 'should defined custom class name', () => {
-		const wrapper = shallow( <PanelRow className="custom" /> );
-		expect( wrapper.hasClass( 'custom' ) ).toBe( true );
+
+	it( 'should render with the custom class name', () => {
+		const { container } = render( <PanelRow className="custom" /> );
+
+		expect( container ).toMatchSnapshot();
 	} );
-	it( 'should return child components', () => {
-		const wrapper = shallow(
+
+	it( 'should render child components', () => {
+		render(
 			<PanelRow>
-				<p>children</p>
+				<dfn>Some text</dfn>
 			</PanelRow>
 		);
-		expect( wrapper.find( 'p' ).text() ).toBe( 'children' );
+
+		const term = screen.getByRole( 'term' );
+		expect( term ).toBeVisible();
+		expect( term ).toHaveTextContent( 'Some text' );
 	} );
 } );

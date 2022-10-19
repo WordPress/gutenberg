@@ -25,6 +25,7 @@ import com.facebook.react.devsupport.interfaces.DevOptionHandler;
 import com.facebook.react.devsupport.interfaces.DevSupportManager;
 import com.horcrux.svg.SvgPackage;
 import org.linusu.RNGetRandomValuesPackage;
+import com.dylanvann.fastimage.FastImageViewPackage;
 
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeInterface;
@@ -305,6 +306,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         new RNPromptPackage(),
                         new RNCWebViewPackage(),
                         new ClipboardPackage(),
+                        new FastImageViewPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }
 

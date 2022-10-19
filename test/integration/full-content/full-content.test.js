@@ -2,7 +2,7 @@
  * External dependencies
  */
 import glob from 'fast-glob';
-import { fromPairs, startsWith, get } from 'lodash';
+import { get } from 'lodash';
 import { format } from 'util';
 
 /**
@@ -57,7 +57,7 @@ describe( 'full post content fixture', () => {
 		const blockMetadataFiles = glob.sync(
 			'packages/block-library/src/*/block.json'
 		);
-		const blockDefinitions = fromPairs(
+		const blockDefinitions = Object.fromEntries(
 			blockMetadataFiles.map( ( file ) => {
 				const { name, ...metadata } = require( file );
 				return [ name, metadata ];
@@ -237,7 +237,7 @@ describe( 'full post content fixture', () => {
 					.filter(
 						( basename ) =>
 							basename === nameToFilename ||
-							startsWith( basename, nameToFilename + '__' )
+							basename.startsWith( nameToFilename + '__' )
 					)
 					.map( ( basename ) => {
 						const { filename: htmlFixtureFileName } =

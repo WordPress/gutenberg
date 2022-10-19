@@ -1,6 +1,10 @@
-# Editor Filters
+# Editor Hooks
 
-To modify the behavior of the editor experience, the following Filters are exposed:
+To modify the behavior of the editor experience, WordPress exposes several APIs.
+
+## Editor features
+
+The following filters are available to extend the editor features.
 
 ### `editor.PostFeaturedImage.imageSize`
 
@@ -40,7 +44,7 @@ wp.hooks.addFilter(
 
 ### `media.crossOrigin`
 
-Used to set or modify the `crossOrigin` attribute for foreign-origin media elements (i.e `<img>`, `<audio>` , `<img>` , `<link>` , `<script>`, `<video>`). See this [article](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) for more information the `crossOrigin` attribute, its values and how it applies to each element.
+Used to set or modify the `crossOrigin` attribute for foreign-origin media elements (i.e `<audio>` , `<img>` , `<link>` , `<script>`, `<video>`). See this [article](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) for more information the `crossOrigin` attribute, its values and how it applies to each element.
 
 One example of it in action is in the Image block's transform feature to allow cross-origin images to be used in a `<canvas>`.
 
@@ -124,7 +128,32 @@ Default `true`. Indicates whether the user can access the code editor **in addit
 
 If set to false the user will not be able to switch between visual and code editor. The option in the settings menu will not be available and the keyboard shortcut for switching editor types will not fire.
 
-### Block Directory
+## Logging errors
+
+_**Note:** Since WordPress 6.1._
+
+A JavaScript error in a part of the UI shouldn’t break the whole app. To solve this problem for users, React library uses a concept of an [“error boundary”](https://reactjs.org/docs/error-boundaries.html). Error boundaries are React components that catch JavaScript errors anywhere in their child component tree, and display a fallback UI instead of the component tree that crashed.
+
+### `editor.ErrorBoundary.errorLogged`
+
+Allows you to hook into the [Error Boundaries](https://reactjs.org/docs/error-boundaries.html) and gives you access to the error object.
+
+You can use this action if you want to get hold of the error object that's handled by the boundaries, i.e to send them to an external error tracking tool.
+
+_Example_:
+
+```js
+addAction(
+	'editor.ErrorBoundary.errorLogged',
+	'mu-plugin/error-capture-setup',
+	( error ) => {
+		// error is the exception's error object
+		ErrorCaptureTool.captureError( error );
+	}
+);
+```
+
+## Block Directory
 
 The Block Directory enables installing new block plugins from [WordPress.org.](https://wordpress.org/plugins/browse/block/) It can be disabled by removing the actions that enqueue it. In WordPress core, the function is `wp_enqueue_editor_block_directory_assets`. To remove the feature, use [`remove_action`,](https://developer.wordpress.org/reference/functions/remove_action/) like this:
 
@@ -135,9 +164,9 @@ The Block Directory enables installing new block plugins from [WordPress.org.](h
 remove_action( 'enqueue_block_editor_assets', 'wp_enqueue_editor_block_directory_assets' );
 ```
 
-### Block Patterns
+## Block Patterns
 
-#### `should_load_remote_block_patterns`
+### `should_load_remote_block_patterns`
 
 Default `true`. The filter is checked when registering remote block patterns, set to false to disable.
 

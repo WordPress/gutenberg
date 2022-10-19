@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray, first, last, every } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -36,7 +31,7 @@ export default function BlockActions( {
 
 	const blocks = getBlocksByClientId( clientIds );
 	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-	const canDuplicate = every( blocks, ( block ) => {
+	const canDuplicate = blocks.every( ( block ) => {
 		return (
 			!! block &&
 			hasBlockSupport( block.name, 'multiple', true ) &&
@@ -80,10 +75,16 @@ export default function BlockActions( {
 			return removeBlocks( clientIds, updateSelection );
 		},
 		onInsertBefore() {
-			insertBeforeBlock( first( castArray( clientIds ) ) );
+			const clientId = Array.isArray( clientIds )
+				? clientIds[ 0 ]
+				: clientId;
+			insertBeforeBlock( clientId );
 		},
 		onInsertAfter() {
-			insertAfterBlock( last( castArray( clientIds ) ) );
+			const clientId = Array.isArray( clientIds )
+				? clientIds[ clientIds.length - 1 ]
+				: clientId;
+			insertAfterBlock( clientId );
 		},
 		onMoveTo() {
 			setNavigationMode( true );

@@ -92,11 +92,25 @@ class Gutenberg_REST_Block_Patterns_Controller_Test extends WP_Test_REST_Control
 	/**
 	 * Abstract methods that we must implement.
 	 */
-	public function test_context_param() {}
-	public function test_get_item() {}
-	public function test_create_item() {}
-	public function test_update_item() {}
-	public function test_delete_item() {}
-	public function test_prepare_item() {}
-	public function test_get_item_schema() {}
+	public function test_context_param() {
+		$this->markTestIncomplete();
+	}
+	public function test_get_item() {
+		$this->markTestIncomplete();
+	}
+	public function test_create_item() {
+		$this->markTestIncomplete();
+	}
+	public function test_update_item() {
+		$this->markTestIncomplete();
+	}
+	public function test_delete_item() {
+		$this->markTestIncomplete();
+	}
+	public function test_prepare_item() {
+		$this->markTestIncomplete();
+	}
+	public function test_get_item_schema() {
+		$this->markTestIncomplete();
+	}
 }

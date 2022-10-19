@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## 7.3.0 (2022-10-05)
+
+## 7.2.0 (2022-09-21)
+
+## 7.1.0 (2022-09-13)
+
+## 7.0.0 (2022-08-24)
+
+### Breaking Changes
+
+–   Add TypeScript types to the built package (via "types": "build-types" in the package.json)
+
+### Bug Fix
+
+-   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
+
+## 6.15.0 (2022-08-10)
+
+## 6.14.0 (2022-07-27)
+
+## 6.13.0 (2022-07-13)
+
+### Enhancements
+
+-   Use `useDebugValue` in `useSelect` to better display data in React DevTools ([#42225](https://github.com/WordPress/gutenberg/pull/42225)).
+
 ## 6.12.0 (2022-06-29)
 
 ## 6.11.0 (2022-06-15)

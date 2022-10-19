@@ -1,22 +1,21 @@
 /**
  * External dependencies
  */
-import { get, has, isEmpty, kebabCase, omit } from 'lodash';
+import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { useContext, createPortal } from '@wordpress/element';
+import { useContext, useMemo, createPortal } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
 	hasBlockSupport,
-	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
-import { getCSSRules } from '@wordpress/style-engine';
+import { getCSSRules, compileCSS } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
@@ -43,20 +42,6 @@ const styleSupportKeys = [
 const hasStyleSupport = ( blockType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
 
-const VARIABLE_REFERENCE_PREFIX = 'var:';
-const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
-const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
-function compileStyleValue( uncompiledValue ) {
-	if ( uncompiledValue?.startsWith?.( VARIABLE_REFERENCE_PREFIX ) ) {
-		const variable = uncompiledValue
-			.slice( VARIABLE_REFERENCE_PREFIX.length )
-			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
-			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
-		return `var(--wp--${ variable })`;
-	}
-	return uncompiledValue;
-}
-
 /**
  * Returns the inline styles to add depending on the style object
  *
@@ -65,66 +50,14 @@ function compileStyleValue( uncompiledValue ) {
  * @return {Object} Flattened CSS variables declaration.
  */
 export function getInlineStyles( styles = {} ) {
-	const ignoredStyles = [ 'spacing.blockGap' ];
 	const output = {};
-	Object.keys( STYLE_PROPERTY ).forEach( ( propKey ) => {
-		const path = STYLE_PROPERTY[ propKey ].value;
-		const subPaths = STYLE_PROPERTY[ propKey ].properties;
-		// Ignore styles on elements because they are handled on the server.
-		if ( has( styles, path ) && 'elements' !== path?.[ 0 ] ) {
-			// Checking if style value is a string allows for shorthand css
-			// option and backwards compatibility for border radius support.
-			const styleValue = get( styles, path );
-
-			if ( ! STYLE_PROPERTY[ propKey ].useEngine ) {
-				if ( !! subPaths && typeof styleValue !== 'string' ) {
-					Object.entries( subPaths ).forEach( ( entry ) => {
-						const [ name, subPath ] = entry;
-						const value = get( styleValue, [ subPath ] );
-
-						if ( value ) {
-							output[ name ] = compileStyleValue( value );
-						}
-					} );
-				} else if ( ! ignoredStyles.includes( path.join( '.' ) ) ) {
-					output[ propKey ] = compileStyleValue(
-						get( styles, path )
-					);
-				}
-			}
-		}
-	} );
-
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
-	const extraRules = getCSSRules( styles );
-	extraRules.forEach( ( rule ) => {
+	getCSSRules( styles ).forEach( ( rule ) => {
 		output[ rule.key ] = rule.value;
 	} );
 
 	return output;
-}
-
-function compileElementsStyles( selector, elements = {} ) {
-	return Object.entries( elements )
-		.map( ( [ element, styles ] ) => {
-			const elementStyles = getInlineStyles( styles );
-			if ( ! isEmpty( elementStyles ) ) {
-				// The .editor-styles-wrapper selector is required on elements styles. As it is
-				// added to all other editor styles, not providing it causes reset and global
-				// styles to override element styles because of higher specificity.
-				return [
-					`.editor-styles-wrapper .${ selector } ${ ELEMENTS[ element ] }{`,
-					...Object.entries( elementStyles ).map(
-						( [ cssProperty, value ] ) =>
-							`\t${ kebabCase( cssProperty ) }: ${ value };`
-					),
-					'}',
-				].join( '\n' );
-			}
-			return '';
-		} )
-		.join( '\n' );
 }
 
 /**
@@ -306,7 +239,7 @@ export const withBlockControls = createHigherOrderComponent(
 );
 
 /**
- * Override the default block element to include duotone styles.
+ * Override the default block element to include elements styles.
  *
  * @param {Function} BlockListBlock Original component
  * @return {Function}                Wrapped component
@@ -323,23 +256,46 @@ const withElementsStyles = createHigherOrderComponent(
 			'link'
 		);
 
-		// The Elements API only supports link colors for now,
-		// hence the specific omission of `link` in the elements styles.
-		// This might need to be refactored or removed if the Elements API
-		// changes or `link` supports styles beyond `color`.
-		const elements = skipLinkColorSerialization
-			? omit( props.attributes.style?.elements, [ 'link' ] )
-			: props.attributes.style?.elements;
+		const styles = useMemo( () => {
+			const rawElementsStyles = props.attributes.style?.elements;
+			const elementCssRules = [];
+			if (
+				rawElementsStyles &&
+				Object.keys( rawElementsStyles ).length > 0
+			) {
+				// Remove values based on whether serialization has been skipped for a specific style.
+				const filteredElementsStyles = {
+					...rawElementsStyles,
+					link: {
+						...rawElementsStyles.link,
+						color: ! skipLinkColorSerialization
+							? rawElementsStyles.link?.color
+							: undefined,
+					},
+				};
 
-		const styles = compileElementsStyles(
-			blockElementsContainerIdentifier,
-			elements
-		);
+				for ( const [ elementName, elementStyles ] of Object.entries(
+					filteredElementsStyles
+				) ) {
+					const cssRule = compileCSS( elementStyles, {
+						// The .editor-styles-wrapper selector is required on elements styles. As it is
+						// added to all other editor styles, not providing it causes reset and global
+						// styles to override element styles because of higher specificity.
+						selector: `.editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS[ elementName ] }`,
+					} );
+					if ( !! cssRule ) {
+						elementCssRules.push( cssRule );
+					}
+				}
+			}
+			return elementCssRules.length > 0 ? elementCssRules : undefined;
+		}, [ props.attributes.style?.elements ] );
+
 		const element = useContext( BlockList.__unstableElementContext );
 
 		return (
 			<>
-				{ elements &&
+				{ styles &&
 					element &&
 					createPortal(
 						<style
@@ -353,7 +309,7 @@ const withElementsStyles = createHigherOrderComponent(
 				<BlockListBlock
 					{ ...props }
 					className={
-						elements
+						props.attributes.style?.elements
 							? classnames(
 									props.className,
 									blockElementsContainerIdentifier

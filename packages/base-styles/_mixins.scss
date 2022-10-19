@@ -77,7 +77,7 @@
 	}
 
 	@if $direction == "bottom" {
-		background: linear-gradient(to top, rgba($color, 0), $color 90%);
+		background: linear-gradient(to top, transparent, $color 90%);
 		left: $edge;
 		right: $edge;
 		top: $edge;
@@ -86,7 +86,7 @@
 	}
 
 	@if $direction == "top" {
-		background: linear-gradient(to bottom, rgba($color, 0), $color 90%);
+		background: linear-gradient(to bottom, transparent, $color 90%);
 		top: calc(100% - $size);
 		left: $edge;
 		right: $edge;
@@ -95,7 +95,7 @@
 	}
 
 	@if $direction == "left" {
-		background: linear-gradient(to left, rgba($color, 0), $color 90%);
+		background: linear-gradient(to left, transparent, $color 90%);
 		top: $edge;
 		left: $edge;
 		bottom: $edge;
@@ -105,7 +105,7 @@
 	}
 
 	@if $direction == "right" {
-		background: linear-gradient(to right, rgba($color, 0), $color 90%);
+		background: linear-gradient(to right, transparent, $color 90%);
 		top: $edge;
 		bottom: $edge;
 		right: $edge;
@@ -202,6 +202,22 @@
 	}
 }
 
+@mixin placeholder-style() {
+	border-radius: $radius-block-ui;
+
+	&::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		pointer-events: none;
+		background: currentColor;
+		opacity: 0.1;
+	}
+}
+
 /**
  * Allows users to opt-out of animations via OS-level preferences.
  */
@@ -226,7 +242,6 @@
 			animation-delay: 0s;
 		}
 	}
-
 }
 
 @mixin input-control {
@@ -371,6 +386,7 @@
  * Reset default styles for JavaScript UI based pages.
  * This is a WP-admin agnostic reset
  */
+
 @mixin reset {
 	box-sizing: border-box;
 
@@ -384,6 +400,7 @@
 /**
  * Reset the WP Admin page styles for Gutenberg-like pages.
  */
+
 @mixin wp-admin-reset( $content-container ) {
 	background: $white;
 

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { escapeRegExp, find, deburr } from 'lodash';
+import { find } from 'lodash';
+import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
@@ -13,15 +14,6 @@ import {
 	useRef,
 	useMemo,
 } from '@wordpress/element';
-import {
-	ENTER,
-	ESCAPE,
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT,
-	BACKSPACE,
-} from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	useInstanceId,
@@ -42,6 +34,7 @@ import { speak } from '@wordpress/a11y';
  * Internal dependencies
  */
 import { getAutoCompleterUI } from './autocompleter-ui';
+import { escapeRegExp } from '../utils/strings';
 
 /**
  * A raw completer option.
@@ -219,7 +212,7 @@ function useAutocomplete( {
 	}
 
 	function handleKeyDown( event ) {
-		backspacing.current = event.keyCode === BACKSPACE;
+		backspacing.current = event.code === 'Backspace';
 
 		if ( ! autocompleter ) {
 			return;
@@ -230,8 +223,8 @@ function useAutocomplete( {
 		if ( event.defaultPrevented ) {
 			return;
 		}
-		switch ( event.keyCode ) {
-			case UP:
+		switch ( event.code ) {
+			case 'ArrowUp':
 				setSelectedIndex(
 					( selectedIndex === 0
 						? filteredOptions.length
@@ -239,24 +232,24 @@ function useAutocomplete( {
 				);
 				break;
 
-			case DOWN:
+			case 'ArrowDown':
 				setSelectedIndex(
 					( selectedIndex + 1 ) % filteredOptions.length
 				);
 				break;
 
-			case ESCAPE:
+			case 'Escape':
 				setAutocompleter( null );
 				setAutocompleterUI( null );
 				event.preventDefault();
 				break;
 
-			case ENTER:
+			case 'Enter':
 				select( filteredOptions[ selectedIndex ] );
 				break;
 
-			case LEFT:
-			case RIGHT:
+			case 'ArrowLeft':
+			case 'ArrowRight':
 				reset();
 				return;
 
@@ -264,7 +257,7 @@ function useAutocomplete( {
 				return;
 		}
 
-		// Any handled keycode should prevent original behavior. This relies on
+		// Any handled key should prevent original behavior. This relies on
 		// the early return in the default case.
 		event.preventDefault();
 	}
@@ -284,7 +277,7 @@ function useAutocomplete( {
 			return;
 		}
 
-		const text = deburr( textContent );
+		const text = removeAccents( textContent );
 		const textAfterSelection = getTextContent(
 			slice( record, undefined, getTextContent( record ).length )
 		);

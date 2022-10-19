@@ -14,8 +14,10 @@ import { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 import { openPreviewPage } from './preview';
 import { publishPost } from './publish-post';
 import { selectBlocks } from './select-blocks';
+import { setContent } from './set-content';
 import { showBlockToolbar } from './show-block-toolbar';
 import { saveSiteEditorEntities } from './site-editor';
+import { transformBlockTo } from './transform-block-to';
 
 type EditorConstructorProps = {
 	page: Page;
@@ -52,15 +54,16 @@ export class Editor {
 
 		return frame;
 	}
-
-	clickBlockOptionsMenuItem = clickBlockOptionsMenuItem;
-	clickBlockToolbarButton = clickBlockToolbarButton;
-	getEditedPostContent = getEditedPostContent;
-	insertBlock = insertBlock;
-	openDocumentSettingsSidebar = openDocumentSettingsSidebar;
-	openPreviewPage = openPreviewPage;
-	publishPost = publishPost;
-	saveSiteEditorEntities = saveSiteEditorEntities;
-	selectBlocks = selectBlocks;
-	showBlockToolbar = showBlockToolbar;
+	clickBlockOptionsMenuItem = clickBlockOptionsMenuItem.bind( this );
+	clickBlockToolbarButton = clickBlockToolbarButton.bind( this );
+	getEditedPostContent = getEditedPostContent.bind( this );
+	insertBlock = insertBlock.bind( this );
+	openDocumentSettingsSidebar = openDocumentSettingsSidebar.bind( this );
+	openPreviewPage = openPreviewPage.bind( this );
+	publishPost = publishPost.bind( this );
+	saveSiteEditorEntities = saveSiteEditorEntities.bind( this );
+	selectBlocks = selectBlocks.bind( this );
+	setContent = setContent.bind( this );
+	showBlockToolbar = showBlockToolbar.bind( this );
+	transformBlockTo = transformBlockTo.bind( this );
 }

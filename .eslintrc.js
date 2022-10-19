@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-const { escapeRegExp } = require( 'lodash' );
 const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
 
@@ -17,7 +16,8 @@ const { version } = require( './package' );
  * @type {string}
  */
 const majorMinorRegExp =
-	escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.\\d+)?';
+	version.replace( /\.\d+$/, '' ).replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' ) +
+	'(\\.\\d+)?';
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -79,51 +79,95 @@ module.exports = {
 					{
 						name: 'lodash',
 						importNames: [
+							'camelCase',
+							'capitalize',
 							'chunk',
 							'clamp',
+							'cloneDeep',
+							'compact',
 							'concat',
+							'countBy',
+							'debounce',
+							'deburr',
+							'defaults',
 							'defaultTo',
+							'delay',
+							'difference',
 							'differenceWith',
 							'dropRight',
 							'each',
+							'escapeRegExp',
+							'every',
 							'extend',
 							'findIndex',
 							'findKey',
 							'findLast',
+							'first',
+							'flatMap',
 							'flatten',
 							'flattenDeep',
+							'flow',
+							'flowRight',
+							'forEach',
+							'fromPairs',
+							'has',
+							'identity',
+							'invoke',
 							'isArray',
+							'isBoolean',
 							'isFinite',
 							'isFunction',
+							'isMatch',
 							'isNil',
 							'isNumber',
+							'isObject',
 							'isObjectLike',
+							'isPlainObject',
+							'isString',
 							'isUndefined',
+							'keyBy',
 							'keys',
+							'last',
 							'lowerCase',
+							'mapKeys',
+							'maxBy',
 							'memoize',
 							'negate',
 							'noop',
 							'nth',
+							'omitBy',
 							'once',
 							'overEvery',
+							'partial',
 							'partialRight',
 							'random',
 							'reject',
 							'repeat',
 							'reverse',
 							'size',
+							'snakeCase',
+							'sortBy',
+							'startCase',
+							'startsWith',
 							'stubFalse',
 							'stubTrue',
 							'sum',
 							'sumBy',
 							'take',
+							'throttle',
+							'times',
 							'toString',
 							'trim',
 							'truncate',
+							'unionBy',
+							'uniq',
+							'uniqBy',
 							'uniqueId',
 							'uniqWith',
+							'upperFirst',
 							'values',
+							'xor',
+							'zip',
 						],
 						message:
 							'This Lodash method is not recommended. Please use native functionality instead. If using `memoize`, please use `memize` instead.',
@@ -277,6 +321,11 @@ module.exports = {
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
+			files: [ '**/test/**/*.js' ],
+			excludedFiles: [ '**/*.@(android|ios|native).js' ],
+			extends: [ 'plugin:jest-dom/recommended' ],
+		},
+		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
 			excludedFiles: [ 'packages/e2e-test-utils-playwright/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-e2e' ],
@@ -314,7 +363,7 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'bin/**/*.js', 'packages/env/**' ],
+			files: [ 'bin/**/*.js', 'bin/**/*.mjs', 'packages/env/**' ],
 			rules: {
 				'no-console': 'off',
 			},
@@ -336,6 +385,12 @@ module.exports = {
 				// or in TypeScript files where params are likely already documented outside of the JSDoc.
 				'jsdoc/require-param': 'off',
 			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
+			plugins: [ 'ssr-friendly' ],
+			extends: [ 'plugin:ssr-friendly/recommended' ],
 		},
 	],
 };

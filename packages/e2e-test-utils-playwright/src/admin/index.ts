@@ -6,9 +6,6 @@ import type { Browser, Page, BrowserContext } from '@playwright/test';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import { createNewPost } from './create-new-post';
 import { getPageError } from './get-page-error';
 import { visitAdminPage } from './visit-admin-page';
@@ -33,8 +30,8 @@ export class Admin {
 		this.pageUtils = pageUtils;
 	}
 
-	createNewPost = createNewPost;
-	getPageError = getPageError;
-	visitAdminPage = visitAdminPage;
-	visitSiteEditor = visitSiteEditor;
+	createNewPost = createNewPost.bind( this );
+	getPageError = getPageError.bind( this );
+	visitAdminPage = visitAdminPage.bind( this );
+	visitSiteEditor = visitSiteEditor.bind( this );
 }

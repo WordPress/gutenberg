@@ -11,7 +11,6 @@ import {
 	SearchControl,
 	TextHighlight,
 	__experimentalText as Text,
-	__experimentalHeading as Heading,
 	__unstableComposite as Composite,
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
@@ -22,14 +21,10 @@ import { useEntityRecords } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 import { mapToIHasNameAndId } from './utils';
 
 const EMPTY_ARRAY = [];
-const BASE_QUERY = {
-	order: 'asc',
-	_fields: 'id,title,slug,link',
-	context: 'view',
-};
 
 function SuggestionListItem( {
 	suggestion,
@@ -46,23 +41,13 @@ function SuggestionListItem( {
 			as={ Button }
 			{ ...composite }
 			className={ baseCssClass }
-			onClick={ () => {
-				const title = sprintf(
-					// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the singular name of a post type and %2$s is the name of the post, e.g. "Post: Hello, WordPress"
-					__( '%1$s: %2$s' ),
-					entityForSuggestions.labels.singular_name,
-					suggestion.name
-				);
-				onSelect( {
-					title,
-					description: sprintf(
-						// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Post: Hello, WordPress"
-						__( 'Template for %1$s' ),
-						title
-					),
-					slug: `single-${ entityForSuggestions.slug }-${ suggestion.slug }`,
-				} );
-			} }
+			onClick={ () =>
+				onSelect(
+					entityForSuggestions.config.getSpecificTemplate(
+						suggestion
+					)
+				)
+			}
 		>
 			<span className={ `${ baseCssClass }__title` }>
 				<TextHighlight text={ suggestion.name } highlight={ search } />
@@ -76,60 +61,90 @@ function SuggestionListItem( {
 	);
 }
 
-function SuggestionList( { entityForSuggestions, onSelect } ) {
-	const composite = useCompositeState( { orientation: 'vertical' } );
-	const [ suggestions, setSuggestions ] = useState( EMPTY_ARRAY );
-	// We need to track two values, the search input's value(searchInputValue)
-	// and the one we want to debounce(search) and make REST API requests.
-	const [ searchInputValue, setSearchInputValue ] = useState( '' );
-	const [ search, setSearch ] = useState( '' );
-	const debouncedSearch = useDebounce( setSearch, 250 );
-	const query = {
-		...BASE_QUERY,
-		search,
-		orderby: search ? 'relevance' : 'modified',
-		exclude: entityForSuggestions.postsToExclude,
-		per_page: search ? 20 : 10,
-	};
+function useDebouncedInput() {
+	const [ input, setInput ] = useState( '' );
+	const [ debounced, setter ] = useState( '' );
+	const setDebounced = useDebounce( setter, 250 );
+	useEffect( () => {
+		if ( debounced !== input ) {
+			setDebounced( input );
+		}
+	}, [ debounced, input ] );
+	return [ input, setInput, debounced ];
+}
+
+function useSearchSuggestions( entityForSuggestions, search ) {
+	const { config } = entityForSuggestions;
+	const query = useMemo(
+		() => ( {
+			order: 'asc',
+			context: 'view',
+			search,
+			per_page: search ? 20 : 10,
+			...config.queryArgs( search ),
+		} ),
+		[ search, config ]
+	);
 	const { records: searchResults, hasResolved: searchHasResolved } =
 		useEntityRecords(
 			entityForSuggestions.type,
 			entityForSuggestions.slug,
 			query
 		);
-	useEffect( () => {
-		if ( search !== searchInputValue ) {
-			debouncedSearch( searchInputValue );
-		}
-	}, [ search, searchInputValue ] );
-	const entitiesInfo = useMemo( () => {
-		if ( ! searchResults?.length ) return EMPTY_ARRAY;
-		return mapToIHasNameAndId( searchResults, 'title.rendered' );
-	}, [ searchResults ] );
-	// Update suggestions only when the query has resolved.
+	const [ suggestions, setSuggestions ] = useState( EMPTY_ARRAY );
 	useEffect( () => {
 		if ( ! searchHasResolved ) return;
-		setSuggestions( entitiesInfo );
-	}, [ entitiesInfo, searchHasResolved ] );
+		let newSuggestions = EMPTY_ARRAY;
+		if ( searchResults?.length ) {
+			newSuggestions = searchResults;
+			if ( config.recordNamePath ) {
+				newSuggestions = mapToIHasNameAndId(
+					newSuggestions,
+					config.recordNamePath
+				);
+			}
+		}
+		// Update suggestions only when the query has resolved, so as to keep
+		// the previous results in the UI.
+		setSuggestions( newSuggestions );
+	}, [ searchResults, searchHasResolved ] );
+	return suggestions;
+}
+
+function SuggestionList( { entityForSuggestions, onSelect } ) {
+	const composite = useCompositeState( { orientation: 'vertical' } );
+	const [ search, setSearch, debouncedSearch ] = useDebouncedInput();
+	const suggestions = useSearchSuggestions(
+		entityForSuggestions,
+		debouncedSearch
+	);
+	const { labels } = entityForSuggestions;
+	const [ showSearchControl, setShowSearchControl ] = useState( false );
+	if ( ! showSearchControl && suggestions?.length > 9 ) {
+		setShowSearchControl( true );
+	}
 	return (
 		<>
-			<SearchControl
-				onChange={ setSearchInputValue }
-				value={ searchInputValue }
-				label={ entityForSuggestions.labels.search_items }
-				placeholder={ entityForSuggestions.labels.search_items }
-			/>
+			{ showSearchControl && (
+				<SearchControl
+					onChange={ setSearch }
+					value={ search }
+					label={ labels.search_items }
+					placeholder={ labels.search_items }
+				/>
+			) }
 			{ !! suggestions?.length && (
 				<Composite
 					{ ...composite }
 					role="listbox"
 					className="edit-site-custom-template-modal__suggestions_list"
+					aria-label={ __( 'Suggestions list' ) }
 				>
 					{ suggestions.map( ( suggestion ) => (
 						<SuggestionListItem
 							key={ suggestion.slug }
 							suggestion={ suggestion }
-							search={ search }
+							search={ debouncedSearch }
 							onSelect={ onSelect }
 							entityForSuggestions={ entityForSuggestions }
 							composite={ composite }
@@ -137,16 +152,21 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 					) ) }
 				</Composite>
 			) }
-			{ search && ! suggestions?.length && (
+			{ debouncedSearch && ! suggestions?.length && (
 				<p className="edit-site-custom-template-modal__no-results">
-					{ entityForSuggestions.labels.not_found }
+					{ labels.not_found }
 				</p>
 			) }
 		</>
 	);
 }
 
-function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
+function AddCustomTemplateModal( {
+	onClose,
+	onSelect,
+	entityForSuggestions,
+	isCreatingTemplate,
+} ) {
 	const [ showSearchEntities, setShowSearchEntities ] = useState(
 		entityForSuggestions.hasGeneralTemplate
 	);
@@ -162,6 +182,7 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
 		>
+			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
 			{ ! showSearchEntities && (
 				<>
 					<p>
@@ -176,34 +197,45 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 					>
 						<FlexItem
 							isBlock
+							as={ Button }
 							onClick={ () => {
-								const { slug, title, description } =
-									entityForSuggestions.template;
-								onSelect( { slug, title, description } );
+								const {
+									slug,
+									title,
+									description,
+									templatePrefix,
+								} = entityForSuggestions.template;
+								onSelect( {
+									slug,
+									title,
+									description,
+									templatePrefix,
+								} );
 							} }
 						>
-							<Heading level={ 5 }>
+							<Text as="span" weight={ 600 }>
 								{ entityForSuggestions.labels.all_items }
-							</Heading>
+							</Text>
 							<Text as="span">
 								{
-									// translators: The user is given the choice to set up a template for all items of a post type, or just a specific one.
+									// translators: The user is given the choice to set up a template for all items of a post type or taxonomy, or just a specific one.
 									__( 'For all items' )
 								}
 							</Text>
 						</FlexItem>
 						<FlexItem
 							isBlock
+							as={ Button }
 							onClick={ () => {
 								setShowSearchEntities( true );
 							} }
 						>
-							<Heading level={ 5 }>
+							<Text as="span" weight={ 600 }>
 								{ entityForSuggestions.labels.singular_name }
-							</Heading>
+							</Text>
 							<Text as="span">
 								{
-									// translators: The user is given the choice to set up a template for all items of a post type, or just a specific one.
+									// translators: The user is given the choice to set up a template for all items of a post type or taxonomy, or just a specific one.
 									__( 'For a specific item' )
 								}
 							</Text>

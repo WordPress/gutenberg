@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import {
@@ -55,7 +55,6 @@ const MediaReplaceFlow = ( {
 	addToGallery,
 	handleUpload = true,
 } ) => {
-	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
@@ -88,7 +87,6 @@ const MediaReplaceFlow = ( {
 			onToggleFeaturedImage();
 		}
 		closeMenu();
-		setMediaURLValue( media?.url );
 		// Calling `onSelect` after the state update since it might unmount the component.
 		onSelect( media );
 		speak( __( 'The media file has been replaced' ) );
@@ -213,14 +211,13 @@ const MediaReplaceFlow = ( {
 								{ __( 'Current media URL:' ) }
 							</span>
 
-							<Tooltip text={ mediaURLValue } position="bottom">
+							<Tooltip text={ mediaURL } position="bottom">
 								<div>
 									<LinkControl
-										value={ { url: mediaURLValue } }
+										value={ { url: mediaURL } }
 										settings={ [] }
 										showSuggestions={ false }
 										onChange={ ( { url } ) => {
-											setMediaURLValue( url );
 											onSelectURL( url );
 											editMediaButtonRef.current.focus();
 										} }

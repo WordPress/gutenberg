@@ -82,7 +82,7 @@ MultipleOrigins.args = {
 			],
 		},
 		{
-			name: 'Primary colors',
+			name: 'Secondary colors',
 			colors: [
 				{ name: 'Orange', color: '#f60' },
 				{ name: 'Green', color: '#0f0' },

@@ -30,6 +30,7 @@ import {
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
+import { useMergeRefs } from '@wordpress/compose';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 
@@ -114,12 +115,19 @@ function ButtonEdit( props ) {
 		}
 	}
 
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+
 	const borderProps = useBorderProps( attributes );
 	const colorProps = useColorProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
 	const ref = useRef();
 	const richTextRef = useRef();
-	const blockProps = useBlockProps( { ref, onKeyDown } );
+	const blockProps = useBlockProps( {
+		ref: useMergeRefs( [ setPopoverAnchor, ref ] ),
+		onKeyDown,
+	} );
 
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const isURLSet = !! url;
@@ -218,9 +226,10 @@ function ButtonEdit( props ) {
 						setIsEditingURL( false );
 						richTextRef.current?.focus();
 					} }
-					anchorRef={ ref?.current }
+					anchor={ popoverAnchor }
 					focusOnMount={ isEditingURL ? 'firstElement' : false }
 					__unstableSlotName={ '__unstable-block-tools-after' }
+					shift
 				>
 					<LinkControl
 						className="wp-block-navigation-link__inline-link-input"

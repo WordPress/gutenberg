@@ -54,6 +54,9 @@ export default function Navigation( {
 		if ( activeMenu !== menu ) {
 			setActiveMenu( activeMenu );
 		}
+		// Ignore exhaustive-deps here, as it would require either a larger refactor or some questionable workarounds.
+		// See https://github.com/WordPress/gutenberg/pull/41612 for context.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ activeMenu ] );
 
 	const context = {

@@ -17,10 +17,10 @@ class Block_Context_Test extends WP_UnitTestCase {
 	/**
 	 * Sets up each test method.
 	 */
-	public function setUp() {
+	public function set_up() {
 		global $post;
 
-		parent::setUp();
+		parent::set_up();
 
 		$args = array(
 			'post_content' => 'example',
@@ -34,8 +34,8 @@ class Block_Context_Test extends WP_UnitTestCase {
 	/**
 	 * Tear down each test method.
 	 */
-	public function tearDown() {
-		parent::tearDown();
+	public function tear_down() {
+		parent::tear_down();
 
 		while ( ! empty( $this->registered_block_names ) ) {
 			$block_name = array_pop( $this->registered_block_names );
@@ -66,7 +66,7 @@ class Block_Context_Test extends WP_UnitTestCase {
 	 * Tests that a block which provides context makes that context available to
 	 * its inner blocks.
 	 */
-	function test_provides_block_context() {
+	public function test_provides_block_context() {
 		$provided_context = array();
 
 		$this->register_block_type(
@@ -133,7 +133,7 @@ class Block_Context_Test extends WP_UnitTestCase {
 	 * Tests that a block can receive default-provided context through
 	 * render_block.
 	 */
-	function test_provides_default_context() {
+	public function test_provides_default_context() {
 		global $post;
 
 		$provided_context = array();
@@ -166,7 +166,7 @@ class Block_Context_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that default block context can be filtered.
 	 */
-	function test_default_context_is_filterable() {
+	public function test_default_context_is_filterable() {
 		$provided_context = array();
 
 		$this->register_block_type(

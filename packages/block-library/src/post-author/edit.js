@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { forEach } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -47,11 +46,12 @@ function PostAuthorEdit( {
 
 	const { editEntityRecord } = useDispatch( coreStore );
 
-	const { textAlign, showAvatar, showBio, byline } = attributes;
-
+	const { textAlign, showAvatar, showBio, byline, isLink, linkTarget } =
+		attributes;
 	const avatarSizes = [];
+	const authorName = authorDetails?.name || __( 'Post Author' );
 	if ( authorDetails ) {
-		forEach( authorDetails.avatar_urls, ( url, size ) => {
+		Object.keys( authorDetails.avatar_urls ).forEach( ( size ) => {
 			avatarSizes.push( {
 				value: size,
 				label: `${ size } x ${ size }`,
@@ -119,6 +119,22 @@ function PostAuthorEdit( {
 							setAttributes( { showBio: ! showBio } )
 						}
 					/>
+					<ToggleControl
+						label={ __( 'Link author name to author page' ) }
+						checked={ isLink }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+					/>
+					{ isLink && (
+						<ToggleControl
+							label={ __( 'Open in new tab' ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									linkTarget: value ? '_blank' : '_self',
+								} )
+							}
+							checked={ linkTarget === '_blank' }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 
@@ -159,12 +175,24 @@ function PostAuthorEdit( {
 						/>
 					) }
 					<p className="wp-block-post-author__name">
-						{ authorDetails?.name || __( 'Post Author' ) }
+						{ isLink ? (
+							<a
+								href="#post-author-pseudo-link"
+								onClick={ ( event ) => event.preventDefault() }
+							>
+								{ authorName }
+							</a>
+						) : (
+							authorName
+						) }
 					</p>
 					{ showBio && (
-						<p className="wp-block-post-author__bio">
-							{ authorDetails?.description }
-						</p>
+						<p
+							className="wp-block-post-author__bio"
+							dangerouslySetInnerHTML={ {
+								__html: authorDetails?.description,
+							} }
+						/>
 					) }
 				</div>
 			</div>

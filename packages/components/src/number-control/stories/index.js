@@ -12,13 +12,12 @@ export default {
 	title: 'Components (Experimental)/NumberControl',
 	component: NumberControl,
 	argTypes: {
-		size: {
-			control: {
-				type: 'select',
-				options: [ 'default', 'small', '__unstable-large' ],
-			},
-		},
 		onChange: { action: 'onChange' },
+		prefix: { control: { type: 'text' } },
+		step: { control: { type: 'text' } },
+		suffix: { control: { type: 'text' } },
+		type: { control: { type: 'text' } },
+		value: { control: null },
 	},
 };
 
@@ -44,16 +43,5 @@ function Template( { onChange, ...props } ) {
 
 export const Default = Template.bind( {} );
 Default.args = {
-	disabled: false,
-	hideLabelFromVision: false,
-	isPressEnterToChange: false,
-	isShiftStepEnabled: true,
-	label: 'Number',
-	min: 0,
-	max: 100,
-	placeholder: '0',
-	required: false,
-	shiftStep: 10,
-	size: 'default',
-	step: '1',
+	label: 'Value',
 };

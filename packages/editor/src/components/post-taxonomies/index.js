@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, identity, includes } from 'lodash';
+import { filter, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,6 +17,8 @@ import { store as coreStore } from '@wordpress/core-data';
 import HierarchicalTermSelector from './hierarchical-term-selector';
 import FlatTermSelector from './flat-term-selector';
 import { store as editorStore } from '../../store';
+
+const identity = ( x ) => x;
 
 export function PostTaxonomies( {
 	postType,

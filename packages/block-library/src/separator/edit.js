@@ -37,7 +37,7 @@ export default function SeparatorEdit( { attributes, setAttributes } ) {
 			'has-css-opacity': opacity === 'css',
 			'has-alpha-channel-opacity': opacity === 'alpha-channel',
 		},
-		colorProps.classname
+		colorProps.className
 	);
 
 	const styles = {

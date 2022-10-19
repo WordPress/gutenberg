@@ -2,12 +2,10 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap, isEmpty } from 'lodash';
 import { Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { DOWN } from '@wordpress/keycodes';
 import { BottomSheet, PanelBody } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { menu } from '@wordpress/icons';
@@ -53,13 +51,13 @@ function DropdownMenu( {
 	popoverProps,
 	toggleProps,
 } ) {
-	if ( isEmpty( controls ) && ! isFunction( children ) ) {
+	if ( ! controls?.length && ! isFunction( children ) ) {
 		return null;
 	}
 
 	// Normalize controls to nested array of objects (sets of controls)
 	let controlSets;
-	if ( ! isEmpty( controls ) ) {
+	if ( controls?.length ) {
 		controlSets = controls;
 		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
 			controlSets = [ controlSets ];
@@ -77,12 +75,6 @@ function DropdownMenu( {
 			className={ classnames( 'components-dropdown-menu', className ) }
 			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
-				const openOnArrowDown = ( event ) => {
-					if ( ! isOpen && event.keyCode === DOWN ) {
-						event.preventDefault();
-						onToggle();
-					}
-				};
 				const mergedToggleProps = mergeProps(
 					{
 						className: classnames(
@@ -105,12 +97,6 @@ function DropdownMenu( {
 								mergedToggleProps.onClick( event );
 							}
 						} }
-						onKeyDown={ ( event ) => {
-							openOnArrowDown( event );
-							if ( mergedToggleProps.onKeyDown ) {
-								mergedToggleProps.onKeyDown( event );
-							}
-						} }
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
@@ -131,8 +117,7 @@ function DropdownMenu( {
 							title={ label }
 							style={ { paddingLeft: 0, paddingRight: 0 } }
 						>
-							{ flatMap(
-								controlSets,
+							{ controlSets?.flatMap(
 								( controlSet, indexOfSet ) =>
 									controlSet.map(
 										( control, indexOfControl ) => (

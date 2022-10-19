@@ -52,10 +52,11 @@ const DEFAULT_NOTICES = [];
  * @example
  *
  *```js
- * // This example retrieves all notices and displays their messages in a unordered list.
+ * import { useSelect } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
  *
  * const ExampleComponent = () => {
- *     const notices = useSelect( ( select ) => select( 'core/notices' ).getNotices() );
+ *     const notices = useSelect( ( select ) => select( noticesStore ).getNotices() );
  *     return (
  *         <ul>
  *         { notices.map( ( notice ) => (

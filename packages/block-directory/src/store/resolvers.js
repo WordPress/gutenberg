@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { camelCase, mapKeys } from 'lodash';
+import { camelCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -26,7 +26,12 @@ export const getDownloadableBlocks =
 				path: `wp/v2/block-directory/search?term=${ filterValue }`,
 			} );
 			const blocks = results.map( ( result ) =>
-				mapKeys( result, ( value, key ) => camelCase( key ) )
+				Object.fromEntries(
+					Object.entries( result ).map( ( [ key, value ] ) => [
+						camelCase( key ),
+						value,
+					] )
+				)
 			);
 
 			dispatch( receiveDownloadableBlocks( blocks, filterValue ) );

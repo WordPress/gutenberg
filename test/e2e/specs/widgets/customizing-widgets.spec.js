@@ -564,7 +564,7 @@ test.describe( 'Widgets Customizer', () => {
 		// (2) We should still be in the "Block Settings" area
 		await expect(
 			page.locator( 'role=button[name="Publish"i]' )
-		).not.toBeDisabled();
+		).toBeEnabled();
 
 		// This fails on 539cea09 and earlier; we get kicked back to the widgets area.
 		// We expect to stay in block settings.
@@ -573,6 +573,33 @@ test.describe( 'Widgets Customizer', () => {
 				'role=heading[name="Customizing ▸ Widgets ▸ Footer #1 Block Settings"i][level=3]'
 			)
 		).toBeVisible();
+	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/33832.
+	test( 'preserves content in the Custom HTML block', async ( {
+		page,
+		widgetsCustomizerPage,
+	} ) => {
+		await widgetsCustomizerPage.visitCustomizerPage();
+		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
+
+		await widgetsCustomizerPage.addBlock( 'Custom HTML' );
+		const HTMLBlockTextarea = page.locator(
+			'role=document[name="Block: Custom HTML"i] >> role=textbox[name="HTML"i]'
+		);
+		await HTMLBlockTextarea.type( 'hello' );
+
+		// Click Publish
+		await Promise.all( [
+			page.waitForResponse( '/wp-admin/admin-ajax.php' ),
+			page.click( 'role=button[name="Publish"i]' ),
+		] );
+
+		// reload
+		await widgetsCustomizerPage.visitCustomizerPage();
+		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
+
+		await expect( HTMLBlockTextarea ).toHaveText( 'hello' );
 	} );
 } );
 

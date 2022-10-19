@@ -27,7 +27,8 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	__experimentalRecursionProvider as RecursionProvider,
+	__experimentalUseHasRecursion as useHasRecursion,
 	InnerBlocks,
 	Warning,
 	store as blockEditorStore,
@@ -48,8 +49,7 @@ export default function ReusableBlockEdit( {
 	clientId,
 	isSelected,
 } ) {
-	const [ hasAlreadyRendered, RecursionProvider ] =
-		useNoRecursiveRenders( ref );
+	const hasAlreadyRendered = useHasRecursion( ref );
 
 	const [ showHelp, setShowHelp ] = useState( false );
 	const infoTextStyle = usePreferredColorSchemeStyle(
@@ -163,7 +163,7 @@ export default function ReusableBlockEdit( {
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
 						{ __(
-							'Alternatively, you can detach and edit these blocks separately by tapping "Convert to regular blocks".'
+							'Alternatively, you can detach and edit these blocks separately by tapping “Convert to regular blocks”.'
 						) }
 					</Text>
 					<TextControl
@@ -214,7 +214,7 @@ export default function ReusableBlockEdit( {
 	}
 
 	return (
-		<RecursionProvider>
+		<RecursionProvider uniqueId={ ref }>
 			<TouchableWithoutFeedback
 				disabled={ ! isSelected }
 				accessibilityLabel={ __( 'Help button' ) }

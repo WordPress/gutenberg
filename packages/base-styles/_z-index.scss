@@ -15,9 +15,7 @@ $z-layers: (
 	".edit-post-sidebar__panel-tab.is-active": 1,
 
 	// These next three share a stacking context
-	".block-editor-inserter__tabs .components-tab-panel__tab-content": 0, // lower scrolling content
-	".block-editor-inserter__tabs .components-tab-panel__tabs": 1, // higher sticky element
-	".block-editor-inserter__search": 1, // higher sticky element
+	".block-library-template-part__selection-search": 1, // higher sticky element
 
 	// These next two share a stacking context
 	".interface-complementary-area .components-panel" : 0, // lower scrolling content
@@ -34,7 +32,6 @@ $z-layers: (
 	".edit-post-layout__footer": 30,
 	".interface-interface-skeleton__header": 30,
 	".interface-interface-skeleton__content": 20,
-	".edit-site-header": 62,
 	".edit-widgets-header": 30,
 	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
 	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block
@@ -81,7 +78,7 @@ $z-layers: (
 	".block-editor-block-contextual-toolbar": 61,
 
 	// Ensures content overlay appears higher than resize containers used for image/video/etc.
-	".block-editor-block-content-overlay__overlay": 10,
+	".block-editor-block-list__block.has-block-overlay": 10,
 
 	// Query block setup state.
 	".block-editor-block-pattern-setup .pattern-slide": 100,
@@ -92,7 +89,6 @@ $z-layers: (
 	// #wpadminbar { z-index: 99999 }
 	".interface-interface-skeleton__sidebar": 100000,
 	".edit-post-layout__toggle-sidebar-panel": 100000,
-	".edit-site-sidebar": 100000,
 	".edit-widgets-sidebar": 100000,
 	".edit-post-layout .edit-post-post-publish-panel": 100001,
 	// For larger views, the wp-admin navbar dropdown should be at top of
@@ -108,7 +104,6 @@ $z-layers: (
 	// Show sidebar in greater than small viewports above editor related elements
 	// but below #adminmenuback { z-index: 100 }
 	".interface-interface-skeleton__sidebar {greater than small}": 90,
-	".edit-site-sidebar {greater than small}": 90,
 	".edit-widgets-sidebar {greater than small}": 90,
 
 	// Show interface skeleton footer above interface skeleton drawer
@@ -139,6 +134,7 @@ $z-layers: (
 	".reusable-blocks-menu-items__convert-modal": 1000001,
 	".edit-site-create-template-part-modal": 1000001,
 	".block-editor-block-lock-modal": 1000001,
+	".block-editor-template-part__selection-modal": 1000001,
 
 	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
 	// because it uses emotion and not sass. We need it to render on top its parent popover.

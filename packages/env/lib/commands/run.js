@@ -9,7 +9,7 @@ const { spawn } = require( 'child_process' );
 const initConfig = require( '../init-config' );
 
 /**
- * @typedef {import('../config').Config} Config
+ * @typedef {import('../config').WPConfig} WPConfig
  */
 
 /**
@@ -42,11 +42,11 @@ module.exports = async function run( { container, command, spinner, debug } ) {
 /**
  * Runs an arbitrary command on the given Docker container.
  *
- * @param {Object} options
- * @param {string} options.container The Docker container to run the command on.
- * @param {string} options.command   The command to run.
- * @param {Config} options.config    The wp-env configuration.
- * @param {Object} options.spinner   A CLI spinner which indicates progress.
+ * @param {Object}   options
+ * @param {string}   options.container The Docker container to run the command on.
+ * @param {string}   options.command   The command to run.
+ * @param {WPConfig} options.config    The wp-env configuration.
+ * @param {Object}   options.spinner   A CLI spinner which indicates progress.
  */
 function spawnCommandDirectly( { container, command, config, spinner } ) {
 	const composeCommand = [

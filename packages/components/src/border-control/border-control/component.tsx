@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import BorderControlDropdown from '../border-control-dropdown';
@@ -21,9 +26,9 @@ const BorderLabel = ( props: LabelProps ) => {
 	}
 
 	return hideLabelFromVision ? (
-		<VisuallyHidden as="label">{ label }</VisuallyHidden>
+		<VisuallyHidden as="legend">{ label }</VisuallyHidden>
 	) : (
-		<StyledLabel>{ label }</StyledLabel>
+		<StyledLabel as="legend">{ label }</StyledLabel>
 	);
 };
 
@@ -34,10 +39,12 @@ const UnconnectedBorderControl = (
 	const {
 		colors,
 		disableCustomColors,
+		disableUnits,
 		enableAlpha,
 		enableStyle = true,
 		hideLabelFromVision,
 		innerWrapperClassName,
+		inputWidth,
 		label,
 		onBorderChange,
 		onSliderChange,
@@ -48,7 +55,6 @@ const UnconnectedBorderControl = (
 		showDropdownHeader,
 		sliderClassName,
 		value: border,
-		widthControlClassName,
 		widthUnit,
 		widthValue,
 		withSlider,
@@ -59,41 +65,46 @@ const UnconnectedBorderControl = (
 	} = useBorderControl( props );
 
 	return (
-		<View { ...otherProps } ref={ forwardedRef }>
+		<View as="fieldset" { ...otherProps } ref={ forwardedRef }>
 			<BorderLabel
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 			/>
-			<HStack spacing={ 3 }>
-				<HStack className={ innerWrapperClassName } alignment="stretch">
-					<BorderControlDropdown
-						border={ border }
-						colors={ colors }
-						__unstablePopoverProps={ __unstablePopoverProps }
-						disableCustomColors={ disableCustomColors }
-						enableAlpha={ enableAlpha }
-						enableStyle={ enableStyle }
-						onChange={ onBorderChange }
-						previousStyleSelection={ previousStyleSelection }
-						showDropdownHeader={ showDropdownHeader }
-						__experimentalHasMultipleOrigins={
-							__experimentalHasMultipleOrigins
-						}
-						__experimentalIsRenderedInSidebar={
-							__experimentalIsRenderedInSidebar
-						}
-						__next36pxDefaultSize={ __next36pxDefaultSize }
-					/>
-					<UnitControl
-						className={ widthControlClassName }
-						min={ 0 }
-						onChange={ onWidthChange }
-						value={ border?.width || '' }
-						placeholder={ placeholder }
-					/>
-				</HStack>
+			<HStack spacing={ 3 } className={ innerWrapperClassName }>
+				<UnitControl
+					prefix={
+						<BorderControlDropdown
+							border={ border }
+							colors={ colors }
+							__unstablePopoverProps={ __unstablePopoverProps }
+							disableCustomColors={ disableCustomColors }
+							enableAlpha={ enableAlpha }
+							enableStyle={ enableStyle }
+							onChange={ onBorderChange }
+							previousStyleSelection={ previousStyleSelection }
+							showDropdownHeader={ showDropdownHeader }
+							__experimentalHasMultipleOrigins={
+								__experimentalHasMultipleOrigins
+							}
+							__experimentalIsRenderedInSidebar={
+								__experimentalIsRenderedInSidebar
+							}
+							__next36pxDefaultSize={ __next36pxDefaultSize }
+						/>
+					}
+					label={ __( 'Border width' ) }
+					hideLabelFromVision
+					min={ 0 }
+					onChange={ onWidthChange }
+					value={ border?.width || '' }
+					placeholder={ placeholder }
+					disableUnits={ disableUnits }
+					__unstableInputWidth={ inputWidth }
+				/>
 				{ withSlider && (
 					<RangeControl
+						label={ __( 'Border width' ) }
+						hideLabelFromVision
 						className={ sliderClassName }
 						initialPosition={ 0 }
 						max={ 100 }

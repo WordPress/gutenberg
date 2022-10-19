@@ -51,8 +51,8 @@ export { default as PostSticky } from './post-sticky';
 export { default as PostStickyCheck } from './post-sticky/check';
 export { default as PostSwitchToDraftButton } from './post-switch-to-draft-button';
 export { default as PostTaxonomies } from './post-taxonomies';
-export { default as PostTaxonomiesFlatTermSelector } from './post-taxonomies/flat-term-selector';
-export { default as PostTaxonomiesHierarchicalTermSelector } from './post-taxonomies/hierarchical-term-selector';
+export { FlatTermSelector as PostTaxonomiesFlatTermSelector } from './post-taxonomies/flat-term-selector';
+export { HierarchicalTermSelector as PostTaxonomiesHierarchicalTermSelector } from './post-taxonomies/hierarchical-term-selector';
 export { default as PostTaxonomiesCheck } from './post-taxonomies/check';
 export { default as PostTextEditor } from './post-text-editor';
 export { default as PostTitle } from './post-title';
@@ -61,9 +61,12 @@ export { default as PostTrashCheck } from './post-trash/check';
 export { default as PostTypeSupportCheck } from './post-type-support-check';
 export { default as PostURL } from './post-url';
 export { default as PostURLCheck } from './post-url/check';
-export { default as PostURLLabel } from './post-url/label';
+export { default as PostURLLabel, usePostURLLabel } from './post-url/label';
 export { default as PostVisibility } from './post-visibility';
-export { default as PostVisibilityLabel } from './post-visibility/label';
+export {
+	default as PostVisibilityLabel,
+	usePostVisibilityLabel,
+} from './post-visibility/label';
 export { default as PostVisibilityCheck } from './post-visibility/check';
 export { default as TableOfContents } from './table-of-contents';
 export { default as ThemeSupportCheck } from './theme-support-check';

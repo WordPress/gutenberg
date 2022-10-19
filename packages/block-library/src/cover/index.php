@@ -8,8 +8,8 @@
 /**
  * Renders the `core/cover` block on server.
  *
- * @param array $attributes The block attributes.
- * @param array $content    The block rendered content.
+ * @param array  $attributes The block attributes.
+ * @param string $content    The block rendered content.
  *
  * @return string Returns the cover block markup, if useFeaturedImage is true.
  */
@@ -25,7 +25,7 @@ function render_block_core_cover( $attributes, $content ) {
 		);
 
 		if ( isset( $attributes['focalPoint'] ) ) {
-			$object_position              = round( $attributes['focalPoint']['x'] * 100 ) . '%' . ' ' . round( $attributes['focalPoint']['y'] * 100 ) . '%';
+			$object_position              = round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%';
 			$attr['data-object-position'] = $object_position;
 			$attr['style']                = 'object-position: ' . $object_position;
 		}

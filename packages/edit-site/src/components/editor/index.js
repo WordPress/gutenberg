@@ -8,7 +8,7 @@ import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import {
 	BlockContextProvider,
 	BlockBreadcrumb,
-	BlockStyles,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	InterfaceSkeleton,
@@ -30,8 +30,8 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import Header from '../header';
-import { SidebarComplementaryAreaFills } from '../sidebar';
+import Header from '../header-edit-mode';
+import { SidebarComplementaryAreaFills } from '../sidebar-edit-mode';
 import NavigationSidebar from '../navigation-sidebar';
 import BlockEditor from '../block-editor';
 import CodeEditor from '../code-editor';
@@ -47,6 +47,17 @@ import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import useTitle from '../routes/use-title';
 
 const interfaceLabels = {
+	/* translators: accessibility text for the editor top bar landmark region. */
+	header: __( 'Editor top bar' ),
+	/* translators: accessibility text for the editor content landmark region. */
+	body: __( 'Editor content' ),
+	/* translators: accessibility text for the editor settings landmark region. */
+	sidebar: __( 'Editor settings' ),
+	/* translators: accessibility text for the editor publish landmark region. */
+	actions: __( 'Editor publish' ),
+	/* translators: accessibility text for the editor footer landmark region. */
+	footer: __( 'Editor footer' ),
+	/* translators: accessibility text for the navigation sidebar landmark region. */
 	drawer: __( 'Navigation Sidebar' ),
 };
 
@@ -66,6 +77,7 @@ function Editor( { onError } ) {
 		nextShortcut,
 		editorMode,
 		showIconLabels,
+		blockEditorMode,
 	} = useSelect( ( select ) => {
 		const {
 			isInserterOpened,
@@ -78,6 +90,7 @@ function Editor( { onError } ) {
 			getEditorMode,
 		} = select( editSiteStore );
 		const { hasFinishedResolution, getEntityRecord } = select( coreStore );
+		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
 
@@ -114,6 +127,7 @@ function Editor( { onError } ) {
 				'core/edit-site',
 				'showIconLabels'
 			),
+			blockEditorMode: __unstableGetEditorMode(),
 		};
 	}, [] );
 	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
@@ -245,7 +259,6 @@ function Editor( { onError } ) {
 											content={
 												<>
 													<EditorNotices />
-													<BlockStyles.Slot scope="core/block-inspector" />
 													{ editorMode === 'visual' &&
 														template && (
 															<BlockEditor
@@ -309,11 +322,14 @@ function Editor( { onError } ) {
 												</>
 											}
 											footer={
-												<BlockBreadcrumb
-													rootLabelText={ __(
-														'Template'
-													) }
-												/>
+												blockEditorMode !==
+												'zoom-out' ? (
+													<BlockBreadcrumb
+														rootLabelText={ __(
+															'Template'
+														) }
+													/>
+												) : undefined
 											}
 											shortcuts={ {
 												previous: previousShortcut,

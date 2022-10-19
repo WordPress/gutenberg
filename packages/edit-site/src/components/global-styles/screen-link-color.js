@@ -75,7 +75,7 @@ function ScreenLinkColor( { name } ) {
 				) }
 			/>
 
-			<TabPanel className="my-tab-panel" tabs={ tabs }>
+			<TabPanel tabs={ tabs }>
 				{ ( tab ) => {
 					const pseudoSelectorConfig =
 						pseudoStates[ tab.name ] ?? null;

@@ -5,8 +5,8 @@ import type { Editor } from './index';
 
 interface BlockRepresentation {
 	name: string;
-	attributes: Object;
-	innerBlocks: BlockRepresentation[];
+	attributes?: Object;
+	innerBlocks?: BlockRepresentation[];
 }
 
 /**
@@ -41,4 +41,5 @@ async function insertBlock(
 	}, blockRepresentation );
 }
 
+export type { BlockRepresentation };
 export { insertBlock };

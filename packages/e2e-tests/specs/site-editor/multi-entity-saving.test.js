@@ -207,15 +207,15 @@ describe( 'Multi-entity save flow', () => {
 			await page.keyboard.type( '...' );
 
 			await insertBlock( 'Site Tagline' );
-			// Ensure tagline is retrieved before typing.
+			// Wait for the placeholder.
 			await page.waitForXPath(
-				'//p[contains(text(), "Just another WordPress site")]'
+				'//span[@data-rich-text-placeholder="Write site tagline…"]'
 			);
 			const editableSiteTagLineSelector =
 				'.wp-block-site-tagline[contenteditable="true"]';
 			await page.waitForSelector( editableSiteTagLineSelector );
 			await page.focus( editableSiteTagLineSelector );
-			await page.keyboard.type( '...' );
+			await page.keyboard.type( 'Just another WordPress site' );
 
 			await clickButton( 'Publish' );
 			await page.waitForSelector( savePanelSelector );
@@ -266,7 +266,7 @@ describe( 'Multi-entity save flow', () => {
 			} );
 
 			// Select the header template part via list view.
-			await page.click( '.edit-site-header-toolbar__list-view-toggle' );
+			await page.click( '.edit-site-header-edit-mode__list-view-toggle' );
 			const headerTemplatePartListViewButton = await page.waitForXPath(
 				'//a[contains(@class, "block-editor-list-view-block-select-button")][contains(., "header")]'
 			);

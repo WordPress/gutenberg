@@ -120,17 +120,20 @@ describe( 'BorderBoxControl', () => {
 			expect( widthInput.value ).toBe( '1' );
 		} );
 
-		it( 'should render placeholder when border values are mixed', () => {
+		it( 'should render placeholder and omit unit select when border values are mixed', () => {
 			renderBorderBoxControl( { value: mixedBorders } );
 
 			// First render of control with mixed values should show split view.
 			clickButton( 'Link sides' );
 
 			const widthInput = screen.getByRole( 'spinbutton' );
+			const unitSelect = screen.queryByRole( 'combobox' );
+
 			expect( widthInput ).toHaveAttribute( 'placeholder', 'Mixed' );
+			expect( unitSelect ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render shared border width when switching to linked view', async () => {
+		it( 'should render shared border width and unit select when switching to linked view', async () => {
 			// Render control with mixed border values but consistent widths.
 			renderBorderBoxControl( {
 				value: {
@@ -144,8 +147,10 @@ describe( 'BorderBoxControl', () => {
 			// First render of control with mixed values should show split view.
 			clickButton( 'Link sides' );
 			const linkedInput = screen.getByRole( 'spinbutton' );
+			const unitSelect = screen.getByRole( 'combobox' );
 
 			expect( linkedInput.value ).toBe( '5' );
+			expect( unitSelect ).toBeInTheDocument();
 		} );
 
 		it( 'should omit style options when requested', () => {

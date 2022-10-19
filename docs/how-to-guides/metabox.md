@@ -26,7 +26,7 @@ You will need:
 -   A minimal plugin activated and ready to edit
 -   JavaScript setup for building and enqueuing
 
-A [complete meta-block example](https://github.com/WordPress/gutenberg-examples/tree/trunk/meta-block) is available that you can use as a reference for your setup.
+A [complete meta-block example](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-jsx/meta-block) is available that you can use as a reference for your setup.
 
 ## Step-by-step guide
 

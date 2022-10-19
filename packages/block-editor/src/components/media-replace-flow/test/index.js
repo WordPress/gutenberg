@@ -4,25 +4,35 @@
 import { render, fireEvent } from '@testing-library/react';
 
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import MediaReplaceFlow from '../';
 
 const noop = () => {};
 
-function setUpMediaReplaceFlow() {
-	const { container } = render(
+function TestWrapper() {
+	const [ mediaURL, setMediaURL ] = useState( 'https://example.media' );
+	return (
 		<MediaReplaceFlow
 			mediaId={ 1 }
-			mediaURL={ 'https://example.media' }
+			mediaURL={ mediaURL }
 			allowedTypes={ [ 'png' ] }
 			accept="image/*"
 			onSelect={ noop }
-			onSelectURL={ noop }
+			onSelectURL={ setMediaURL }
 			onError={ noop }
 			onCloseModal={ noop }
 		/>
 	);
+}
+
+function setUpMediaReplaceFlow() {
+	const { container } = render( <TestWrapper /> );
 	return container;
 }
 
