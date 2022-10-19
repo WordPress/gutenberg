@@ -20,11 +20,9 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
 	} );
 
 	useLayoutEffect( () => {
-		registerFill( name, ref.current );
-		// Ignore reason: The ref.current value will likely change before the cleanup is run.
-		// This may be intentional, but could be impacted by future refactors of the other useLayoutEffects in this component.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		return () => unregisterFill( name, ref.current );
+		const refValue = ref.current;
+		registerFill( name, refValue );
+		return () => unregisterFill( name, refValue );
 		// Ignore reason: the useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
 		// We'll leave them as-is until a more detailed investigation/refactor can be performed.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
