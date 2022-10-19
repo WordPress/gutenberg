@@ -9,6 +9,7 @@ import { get } from 'lodash';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { cloneBlock, store as blocksStore } from '@wordpress/blocks';
 
@@ -161,7 +162,7 @@ export function useAllowedControls( attributes ) {
 			select( blocksStore ).getActiveBlockVariation(
 				queryLoopName,
 				attributes
-			)?.allowControls,
+			)?.allowedControls,
 
 		[ attributes ]
 	);
@@ -214,3 +215,48 @@ export const getTransformedBlocksFromPattern = (
 	}
 	return { newBlocks: clonedBlocks, queryClientIds };
 };
+
+/**
+ * Helper hook that determines if there is an active variation of the block
+ * and if there are available specific patterns for this variation.
+ * If there are, these patterns are going to be the only ones suggested to
+ * the user in setup and replace flow, without including the default ones
+ * for Query Loop.
+ *
+ * If there are no such patterns, the default ones for Query Loop are going
+ * to be suggested.
+ *
+ * @param {string} clientId   The block's client ID.
+ * @param {Object} attributes The block's attributes.
+ * @return {string} The block name to be used in the patterns suggestions.
+ */
+export function useBlockNameForPatterns( clientId, attributes ) {
+	const activeVariationName = useSelect(
+		( select ) =>
+			select( blocksStore ).getActiveBlockVariation(
+				queryLoopName,
+				attributes
+			)?.name,
+
+		[ attributes ]
+	);
+	const blockName = `${ queryLoopName }/${ activeVariationName }`;
+	const activeVariationPatterns = useSelect(
+		( select ) => {
+			if ( ! activeVariationName ) {
+				return;
+			}
+			const {
+				getBlockRootClientId,
+				__experimentalGetPatternsByBlockTypes,
+			} = select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+			return __experimentalGetPatternsByBlockTypes(
+				blockName,
+				rootClientId
+			);
+		},
+		[ clientId, activeVariationName ]
+	);
+	return activeVariationPatterns?.length ? blockName : queryLoopName;
+}

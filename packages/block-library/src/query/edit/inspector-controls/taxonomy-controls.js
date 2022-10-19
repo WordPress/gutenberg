@@ -8,14 +8,18 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { getEntitiesInfo, useTaxonomies } from '../../utils';
+import { useTaxonomies } from '../../utils';
 import { MAX_FETCHED_TERMS } from '../../constants';
 
 // Helper function to get the term id based on user input in terms `FormTokenField`.
-const getTermIdByTermValue = ( termsMappedByName, termValue ) => {
+const getTermIdByTermValue = ( terms, termValue ) => {
 	// First we check for exact match by `term.id` or case sensitive `term.name` match.
-	const termId = termValue?.id || termsMappedByName[ termValue ]?.id;
-	if ( termId ) return termId;
+	const termId =
+		termValue?.id || terms.find( ( term ) => term.name === termValue )?.id;
+	if ( termId ) {
+		return termId;
+	}
+
 	/**
 	 * Here we make an extra check for entered terms in a non case sensitive way,
 	 * to match user expectations, due to `FormTokenField` behaviour that shows
@@ -26,100 +30,92 @@ const getTermIdByTermValue = ( termsMappedByName, termValue ) => {
 	 * In this edge case we always apply the first match from the terms list.
 	 */
 	const termValueLower = termValue.toLocaleLowerCase();
-	for ( const term in termsMappedByName ) {
-		if ( term.toLocaleLowerCase() === termValueLower ) {
-			return termsMappedByName[ term ].id;
-		}
-	}
+	return terms.find(
+		( term ) => term.name.toLocaleLowerCase() === termValueLower
+	)?.id;
 };
 
-export const useTaxonomiesInfo = ( postType ) => {
-	const taxonomies = useTaxonomies( postType );
-	const taxonomiesInfo = useSelect(
+const useTaxonomyTerms = ( slug ) => {
+	return useSelect(
 		( select ) => {
-			const { getEntityRecords } = select( coreStore );
-			const termsQuery = { context: 'view', per_page: MAX_FETCHED_TERMS };
-			const _taxonomiesInfo = taxonomies?.map( ( { slug, name } ) => {
-				const _terms = getEntityRecords( 'taxonomy', slug, termsQuery );
-				return {
-					slug,
-					name,
-					terms: getEntitiesInfo( _terms ),
-				};
-			} );
-			return _taxonomiesInfo;
+			const terms = select( coreStore ).getEntityRecords(
+				'taxonomy',
+				slug,
+				{ context: 'view', per_page: MAX_FETCHED_TERMS }
+			);
+			return { terms };
 		},
-		[ taxonomies ]
+		[ slug ]
 	);
-	return taxonomiesInfo;
 };
 
 export function TaxonomyControls( { onChange, query } ) {
-	const taxonomiesInfo = useTaxonomiesInfo( query.postType );
-	const onTermsChange = ( taxonomySlug ) => ( newTermValues ) => {
-		const taxonomyInfo = taxonomiesInfo.find(
-			( { slug } ) => slug === taxonomySlug
-		);
-		if ( ! taxonomyInfo ) return;
-		const termIds = Array.from(
-			newTermValues.reduce( ( accumulator, termValue ) => {
-				const termId = getTermIdByTermValue(
-					taxonomyInfo.terms.mapByName,
-					termValue
-				);
-				if ( termId ) accumulator.add( termId );
-				return accumulator;
-			}, new Set() )
-		);
-		const newTaxQuery = {
-			...query.taxQuery,
-			[ taxonomySlug ]: termIds,
-		};
-		onChange( { taxQuery: newTaxQuery } );
-	};
-	// Returns only the existing term ids in proper format to be
-	// used in `FormTokenField`. This prevents the component from
-	// crashing in the editor, when non existing term ids were provided.
-	const getExistingTaxQueryValue = ( taxonomySlug ) => {
-		const taxonomyInfo = taxonomiesInfo.find(
-			( { slug } ) => slug === taxonomySlug
-		);
-		if ( ! taxonomyInfo ) return [];
-		return ( query.taxQuery?.[ taxonomySlug ] || [] ).reduce(
-			( accumulator, termId ) => {
-				const term = taxonomyInfo.terms.mapById[ termId ];
-				if ( term ) {
-					accumulator.push( {
-						id: termId,
-						value: term.name,
-					} );
-				}
-				return accumulator;
-			},
-			[]
-		);
-	};
+	const { postType, taxQuery } = query;
+
+	const taxonomies = useTaxonomies( postType );
+	if ( ! taxonomies || taxonomies.length === 0 ) {
+		return null;
+	}
+
 	return (
 		<>
-			{ !! taxonomiesInfo?.length &&
-				taxonomiesInfo.map( ( { slug, name, terms } ) => {
-					if ( ! terms?.names?.length ) {
-						return null;
-					}
-					return (
-						<div
-							key={ slug }
-							className="block-library-query-inspector__taxonomy-control"
-						>
-							<FormTokenField
-								label={ name }
-								value={ getExistingTaxQueryValue( slug ) }
-								suggestions={ terms.names }
-								onChange={ onTermsChange( slug ) }
-							/>
-						</div>
-					);
-				} ) }
+			{ taxonomies.map( ( taxonomy ) => {
+				const value = taxQuery?.[ taxonomy.slug ] || [];
+				const handleChange = ( newTermIds ) =>
+					onChange( {
+						taxQuery: {
+							...taxQuery,
+							[ taxonomy.slug ]: newTermIds,
+						},
+					} );
+
+				return (
+					<TaxonomyItem
+						key={ taxonomy.slug }
+						taxonomy={ taxonomy }
+						value={ value }
+						onChange={ handleChange }
+					/>
+				);
+			} ) }
 		</>
+	);
+}
+function TaxonomyItem( { taxonomy, value, onChange } ) {
+	const { terms } = useTaxonomyTerms( taxonomy.slug );
+	if ( ! terms?.length ) {
+		return null;
+	}
+
+	const onTermsChange = ( newTermValues ) => {
+		const termIds = new Set();
+		for ( const termValue of newTermValues ) {
+			const termId = getTermIdByTermValue( terms, termValue );
+			if ( termId ) {
+				termIds.add( termId );
+			}
+		}
+
+		onChange( Array.from( termIds ) );
+	};
+
+	// Selects only the existing term ids in proper format to be
+	// used in `FormTokenField`. This prevents the component from
+	// crashing in the editor, when non existing term ids were provided.
+	const taxQueryValue = value
+		.map( ( termId ) => terms.find( ( t ) => t.id === termId ) )
+		.filter( Boolean )
+		.map( ( term ) => ( { id: term.id, value: term.name } ) );
+
+	return (
+		<div className="block-library-query-inspector__taxonomy-control">
+			<FormTokenField
+				label={ taxonomy.name }
+				value={ taxQueryValue }
+				suggestions={ terms.map( ( t ) => t.name ) }
+				onChange={ onTermsChange }
+				__experimentalShowHowTo={ false }
+			/>
+		</div>
 	);
 }

@@ -68,6 +68,10 @@ export type LabelProps = {
 export type BorderControlProps = ColorProps &
 	LabelProps & {
 		/**
+		 * This controls whether unit selection should be disabled.
+		 */
+		disableUnits?: boolean;
+		/**
 		 * This controls whether to include border style options within the
 		 * `BorderDropdown` sub-component.
 		 *

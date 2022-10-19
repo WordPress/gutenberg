@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -27,6 +28,12 @@ import { getActiveFormat } from '../get-active-format';
  * @return {Element|Range} The active element or selection range.
  */
 export function useAnchorRef( { ref, value, settings = {} } ) {
+	deprecated( '`useAnchorRef` hook', {
+		since: '6.1',
+		version: '6.3',
+		alternative: '`useAnchor` hook',
+	} );
+
 	const { tagName, className, name } = settings;
 	const activeFormat = name ? getActiveFormat( value, name ) : undefined;
 

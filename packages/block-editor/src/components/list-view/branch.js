@@ -99,7 +99,7 @@ function ListViewBranch( props ) {
 			return !! (
 				parentId &&
 				select( blockEditorStore ).getTemplateLock( parentId ) ===
-					'noContent'
+					'contentOnly'
 			);
 		},
 		[ parentId ]

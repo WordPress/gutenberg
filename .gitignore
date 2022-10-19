@@ -17,6 +17,7 @@ yarn.lock
 /composer.lock
 
 .cache
+.eslintcache
 *.tsbuildinfo
 
 # Operating system specific files
@@ -32,3 +33,5 @@ phpcs.xml
 phpunit.xml
 phpunit-watcher.yml
 .tool-versions
+test/storybook-playwright/test-results
+test/storybook-playwright/specs/__snapshots__

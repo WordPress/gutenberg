@@ -5,7 +5,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
-import { useDisabled } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -22,13 +21,8 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
 				.__experimentalDiscussionSettings
 	);
 
-	const disabledRef = useDisabled();
-
 	return (
-		<div
-			className="wp-block-comments__legacy-placeholder"
-			ref={ disabledRef }
-		>
+		<div className="wp-block-comments__legacy-placeholder" inert="true">
 			<h3>
 				{
 					/* translators: %s: Post title. */

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -85,7 +85,7 @@ describe( 'ImageSizeControl', () => {
 	} );
 
 	describe( 'updating dimension inputs', () => {
-		it( 'updates height and calls onChange', async () => {
+		it( 'updates height and calls onChange', () => {
 			render( <ImageSizeControl onChange={ mockOnChange } /> );
 
 			const heightInput = getHeightInput();
@@ -96,16 +96,14 @@ describe( 'ImageSizeControl', () => {
 
 			fireEvent.change( heightInput, { target: { value: '500' } } );
 
-			await waitFor( () => {
-				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
-				expect( mockOnChange ).toHaveBeenCalledWith( { height: 500 } );
-			} );
+			expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnChange ).toHaveBeenCalledWith( { height: 500 } );
 
 			expect( heightInput.value ).toBe( '500' );
 			expect( widthInput.value ).toBe( '' );
 		} );
 
-		it( 'updates width and calls onChange', async () => {
+		it( 'updates width and calls onChange', () => {
 			render( <ImageSizeControl onChange={ mockOnChange } /> );
 
 			const heightInput = getHeightInput();
@@ -115,16 +113,15 @@ describe( 'ImageSizeControl', () => {
 			expect( widthInput.value ).toBe( '' );
 
 			fireEvent.change( widthInput, { target: { value: '500' } } );
-			await waitFor( () => {
-				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
-				expect( mockOnChange ).toHaveBeenCalledWith( { width: 500 } );
-			} );
+
+			expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnChange ).toHaveBeenCalledWith( { width: 500 } );
 
 			expect( heightInput.value ).toBe( '' );
 			expect( widthInput.value ).toBe( '500' );
 		} );
 
-		it( 'updates height and calls onChange for empty value', async () => {
+		it( 'updates height and calls onChange for empty value', () => {
 			render(
 				<ImageSizeControl
 					imageHeight="100"
@@ -141,20 +138,19 @@ describe( 'ImageSizeControl', () => {
 
 			fireEvent.change( heightInput, { target: { value: '' } } );
 
-			await waitFor( () => {
-				// onChange is called and sets the dimension to undefined rather than
-				// the empty string.
-				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
-				expect( mockOnChange ).toHaveBeenCalledWith( {
-					height: undefined,
-				} );
+			// onChange is called and sets the dimension to undefined rather than
+			// the empty string.
+			expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnChange ).toHaveBeenCalledWith( {
+				height: undefined,
 			} );
+
 			// Height is updated to empty value and does not reset to default.
 			expect( heightInput.value ).toBe( '' );
 			expect( widthInput.value ).toBe( '100' );
 		} );
 
-		it( 'updates width and calls onChange for empty value', async () => {
+		it( 'updates width and calls onChange for empty value', () => {
 			render(
 				<ImageSizeControl
 					imageHeight="100"
@@ -171,14 +167,13 @@ describe( 'ImageSizeControl', () => {
 
 			fireEvent.change( widthInput, { target: { value: '' } } );
 
-			await waitFor( () => {
-				// onChange is called and sets the dimension to undefined rather than
-				// the empty string.
-				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
-				expect( mockOnChange ).toHaveBeenCalledWith( {
-					width: undefined,
-				} );
+			// onChange is called and sets the dimension to undefined rather than
+			// the empty string.
+			expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnChange ).toHaveBeenCalledWith( {
+				width: undefined,
 			} );
+
 			// Width is updated to empty value and does not reset to default.
 			expect( heightInput.value ).toBe( '100' );
 			expect( widthInput.value ).toBe( '' );
@@ -186,7 +181,7 @@ describe( 'ImageSizeControl', () => {
 	} );
 
 	describe( 'reset button', () => {
-		it( 'resets both height and width to default values', async () => {
+		it( 'resets both height and width to default values', () => {
 			render(
 				<ImageSizeControl
 					imageHeight="100"
@@ -206,22 +201,20 @@ describe( 'ImageSizeControl', () => {
 
 			fireEvent.click( screen.getByText( 'Reset' ) );
 
-			await waitFor( () => {
-				// Both attributes are set to undefined to clear custom values.
-				expect( mockOnChange ).toHaveBeenCalledWith( {
-					height: undefined,
-					width: undefined,
-				} );
-
-				// The inputs display the default values once more.
-				expect( heightInput.value ).toBe( '100' );
-				expect( widthInput.value ).toBe( '200' );
+			// Both attributes are set to undefined to clear custom values.
+			expect( mockOnChange ).toHaveBeenCalledWith( {
+				height: undefined,
+				width: undefined,
 			} );
+
+			// The inputs display the default values once more.
+			expect( heightInput.value ).toBe( '100' );
+			expect( widthInput.value ).toBe( '200' );
 		} );
 	} );
 
 	describe( 'image size percentage presets', () => {
-		it( 'updates height and width attributes on selection', async () => {
+		it( 'updates height and width attributes on selection', () => {
 			render(
 				<ImageSizeControl
 					imageHeight="100"
@@ -232,18 +225,16 @@ describe( 'ImageSizeControl', () => {
 
 			fireEvent.click( screen.getByText( '50%' ) );
 
-			await waitFor( () => {
-				expect( screen.getByText( '50%' ) ).toHaveClass( 'is-pressed' );
+			expect( screen.getByText( '50%' ) ).toHaveClass( 'is-pressed' );
 
-				// Both attributes are set to the rounded scaled value.
-				expect( mockOnChange ).toHaveBeenCalledWith( {
-					height: 50,
-					width: 101,
-				} );
+			// Both attributes are set to the rounded scaled value.
+			expect( mockOnChange ).toHaveBeenCalledWith( {
+				height: 50,
+				width: 101,
 			} );
 		} );
 
-		it( 'updates height and width inputs on selection', async () => {
+		it( 'updates height and width inputs on selection', () => {
 			render(
 				<ImageSizeControl
 					imageHeight="100"
@@ -254,11 +245,9 @@ describe( 'ImageSizeControl', () => {
 
 			fireEvent.click( screen.getByText( '50%' ) );
 
-			await waitFor( () => {
-				// Both attributes are set to the rounded scaled value.
-				expect( getHeightInput().value ).toBe( '50' );
-				expect( getWidthInput().value ).toBe( '101' );
-			} );
+			// Both attributes are set to the rounded scaled value.
+			expect( getHeightInput().value ).toBe( '50' );
+			expect( getWidthInput().value ).toBe( '101' );
 		} );
 	} );
 
@@ -284,7 +273,7 @@ describe( 'ImageSizeControl', () => {
 			);
 		} );
 
-		it( 'calls onChangeImage with selected slug on selection', async () => {
+		it( 'calls onChangeImage with selected slug on selection', () => {
 			render(
 				<ImageSizeControl
 					imageSizeOptions={ IMAGE_SIZE_OPTIONS }
@@ -298,13 +287,11 @@ describe( 'ImageSizeControl', () => {
 				target: { value: 'thumbnail' },
 			} );
 
-			await waitFor( () => {
-				// onChangeImage is called with the slug and the event.
-				expect( mockOnChangeImage ).toHaveBeenCalledWith(
-					'thumbnail',
-					expect.any( Object )
-				);
-			} );
+			// onChangeImage is called with the slug and the event.
+			expect( mockOnChangeImage ).toHaveBeenCalledWith(
+				'thumbnail',
+				expect.any( Object )
+			);
 		} );
 	} );
 } );

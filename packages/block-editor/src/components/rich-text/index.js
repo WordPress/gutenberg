@@ -159,6 +159,8 @@ function RichTextWrapper(
 	// retreived from the store on merge.
 	// To do: fix this somehow.
 	const { selectionStart, selectionEnd, isSelected } = useSelect( selector );
+	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
+		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
@@ -173,6 +175,13 @@ function RichTextWrapper(
 
 	// Handle deprecated format.
 	if ( Array.isArray( originalValue ) ) {
+		deprecated( 'wp.blockEditor.RichText value prop as children type', {
+			since: '6.1',
+			version: '6.3',
+			alternative: 'value prop as string',
+			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
+		} );
+
 		adjustedValue = childrenSource.toHTML( originalValue );
 		adjustedOnChange = ( newValue ) =>
 			originalOnChange(
@@ -188,6 +197,18 @@ function RichTextWrapper(
 			const unset = start === undefined && end === undefined;
 
 			if ( typeof start === 'number' || unset ) {
+				// If we are only setting the start (or the end below), which
+				// means a partial selection, and we're not updating a selection
+				// with the same client ID, abort. This means the selected block
+				// is a parent block.
+				if (
+					end === undefined &&
+					getBlockRootClientId( clientId ) !==
+						getBlockRootClientId( getSelectionEnd().clientId )
+				) {
+					return;
+				}
+
 				selection.start = {
 					clientId,
 					attributeKey: identifier,
@@ -196,6 +217,14 @@ function RichTextWrapper(
 			}
 
 			if ( typeof end === 'number' || unset ) {
+				if (
+					start === undefined &&
+					getBlockRootClientId( clientId ) !==
+						getBlockRootClientId( getSelectionStart().clientId )
+				) {
+					return;
+				}
+
 				selection.end = {
 					clientId,
 					attributeKey: identifier,
@@ -328,7 +357,7 @@ function RichTextWrapper(
 	}
 
 	function onFocus() {
-		anchorRef.current.focus();
+		anchorRef.current?.focus();
 	}
 
 	const TagName = tagName;
@@ -354,7 +383,7 @@ function RichTextWrapper(
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
-					anchorRef={ anchorRef }
+					editableContentElement={ anchorRef.current }
 					value={ value }
 				/>
 			) }
@@ -436,6 +465,13 @@ ForwardedRichTextContainer.Content = ( {
 } ) => {
 	// Handle deprecated `children` and `node` sources.
 	if ( Array.isArray( value ) ) {
+		deprecated( 'wp.blockEditor.RichText value prop as children type', {
+			since: '6.1',
+			version: '6.3',
+			alternative: 'value prop as string',
+			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
+		} );
+
 		value = childrenSource.toHTML( value );
 	}
 
