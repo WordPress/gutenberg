@@ -167,7 +167,7 @@ Contains the block elements used to display a comment, like the title, date, aut
 
 -	**Name:** core/comment-template
 -	**Category:** design
--	**Supports:** align, typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** align, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
 ## Comments
