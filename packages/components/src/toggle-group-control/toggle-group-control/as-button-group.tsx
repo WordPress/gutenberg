@@ -22,7 +22,7 @@ import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
 import ToggleGroupControlContext from '../context';
 import { useUpdateEffect } from '../../utils/hooks';
 import type { WordPressComponentProps } from '../../ui/context';
-import type { ToggleGroupControlAsRadioGroupProps } from '../types';
+import type { ToggleGroupControlMainControlProps } from '../types';
 
 function UnforwardedToggleGroupControlAsButtonGroup(
 	{
@@ -34,7 +34,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		value,
 		...otherProps
 	}: WordPressComponentProps<
-		ToggleGroupControlAsRadioGroupProps,
+		ToggleGroupControlMainControlProps,
 		'div',
 		false
 	>,

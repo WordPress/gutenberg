@@ -56,6 +56,11 @@ function UnconnectedToggleGroupControl(
 			),
 		[ className, cx, isBlock, isDeselectable, size ]
 	);
+
+	const MainControl = isDeselectable
+		? ToggleGroupControlAsButtonGroup
+		: ToggleGroupControlAsRadioGroup;
+
 	return (
 		<BaseControl
 			help={ help }
@@ -66,31 +71,17 @@ function UnconnectedToggleGroupControl(
 					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
 				</VisualLabelWrapper>
 			) }
-			{ isDeselectable ? (
-				<ToggleGroupControlAsButtonGroup
-					{ ...otherProps }
-					children={ children }
-					className={ classes }
-					isAdaptiveWidth={ isAdaptiveWidth }
-					label={ label }
-					onChange={ onChange }
-					ref={ forwardedRef }
-					size={ size }
-					value={ value }
-				/>
-			) : (
-				<ToggleGroupControlAsRadioGroup
-					{ ...otherProps }
-					children={ children }
-					className={ classes }
-					isAdaptiveWidth={ isAdaptiveWidth }
-					label={ label }
-					onChange={ onChange }
-					ref={ forwardedRef }
-					size={ size }
-					value={ value }
-				/>
-			) }
+			<MainControl
+				{ ...otherProps }
+				children={ children }
+				className={ classes }
+				isAdaptiveWidth={ isAdaptiveWidth }
+				label={ label }
+				onChange={ onChange }
+				ref={ forwardedRef }
+				size={ size }
+				value={ value }
+			/>
 		</BaseControl>
 	);
 }
