@@ -53,7 +53,9 @@ class FuzzyTestSuiteLoader implements TestSuiteLoader {
 		}
 
 		if ( ! $class->hasMethod( 'suite' ) ) {
-			throw $this->exception_for( $suite_class_name, $suite_class_file );
+			throw new Exception(
+				"Class '$suite_class_name' could not be found in '$suite_class_file'."
+			);
 		}
 
 		try {
@@ -67,7 +69,9 @@ class FuzzyTestSuiteLoader implements TestSuiteLoader {
 		}
 
 		if ( $method->isAbstract() || ! $method->isPublic() || ! $method->isStatic() ) {
-			throw $this->exception_for( $suite_class_name, $suite_class_file );
+			throw new Exception(
+				"Class '$suite_class_name' could not be found in '$suite_class_file'."
+			);
 		}
 
 		return $class;
@@ -99,18 +103,17 @@ class FuzzyTestSuiteLoader implements TestSuiteLoader {
 				$classes_loaded_after
 			)
 		);
-		if ( empty( $all_classes_from_loaded_files ) ) {
-			throw $this->exception_for( $suite_class_name, $suite_class_file );
-		}
-
-		$comparablesuite_class_name = $this->comparable_class_name( $suite_class_name );
-		foreach ( $all_classes_from_loaded_files as $class_name ) {
-			if ( $this->comparable_class_name( $class_name ) === $comparablesuite_class_name ) {
-				return $class_name;
+		if ( ! empty( $all_classes_from_loaded_files ) ) {
+			$comparablesuite_class_name = $this->comparable_class_name( $suite_class_name );
+			foreach ( $all_classes_from_loaded_files as $class_name ) {
+				if ( $this->comparable_class_name( $class_name ) === $comparablesuite_class_name ) {
+					return $class_name;
+				}
 			}
 		}
-
-		throw $this->exception_for( $suite_class_name, $suite_class_file );
+		throw new Exception(
+			"Class '$suite_class_name' could not be found in '$suite_class_file'."
+		);
 	}
 
 	/**
@@ -133,15 +136,5 @@ class FuzzyTestSuiteLoader implements TestSuiteLoader {
 
 	public function reload( ReflectionClass $aClass ): ReflectionClass {
 		return $aClass;
-	}
-
-	private function exception_for( string $class_name, string $filename ) {
-		return new Exception(
-			sprintf(
-				"Class '%s' could not be found in '%s'.",
-				$class_name,
-				$filename
-			)
-		);
 	}
 }
