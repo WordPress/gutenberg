@@ -10,7 +10,7 @@ import {
 /**
  * External dependencies
  */
-import { act, render } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -52,7 +52,7 @@ describe( 'useQuerySelect', () => {
 		const TestComponent = jest
 			.fn()
 			.mockImplementation( getTestComponent( selectSpy, 'keyName' ) );
-		const testInstance = render(
+		render(
 			<RegistryProvider value={ registry }>
 				<TestComponent keyName="foo" />
 			</RegistryProvider>
@@ -64,7 +64,7 @@ describe( 'useQuerySelect', () => {
 		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 
 		// ensure expected state was rendered
-		expect( testInstance.findByText( 'bar' ) ).toBeTruthy();
+		expect( screen.getByText( 'bar' ) ).toBeInTheDocument();
 	} );
 
 	it( 'uses memoized selectors', () => {

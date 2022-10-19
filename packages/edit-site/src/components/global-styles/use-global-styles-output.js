@@ -24,6 +24,7 @@ import {
  * Internal dependencies
  */
 import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
+import { getTypographyFontSizeValue } from './typography-utils';
 import { GlobalStylesContext } from './context';
 import { useSetting } from './hooks';
 
@@ -274,6 +275,21 @@ export function getStylesDeclarations(
 			if ( ! ruleValue || !! ruleValue?.ref ) {
 				return;
 			}
+		}
+
+		// Calculate fluid typography rules where available.
+		if ( cssProperty === 'font-size' ) {
+			/*
+			 * getTypographyFontSizeValue() will check
+			 * if fluid typography has been activated and also
+			 * whether the incoming value can be converted to a fluid value.
+			 * Values that already have a "clamp()" function will not pass the test,
+			 * and therefore the original $value will be returned.
+			 */
+			ruleValue = getTypographyFontSizeValue(
+				{ size: ruleValue },
+				tree?.settings?.typography
+			);
 		}
 
 		output.push( `${ cssProperty }: ${ ruleValue }` );

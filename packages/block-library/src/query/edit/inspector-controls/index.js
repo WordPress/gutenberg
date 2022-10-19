@@ -22,13 +22,14 @@ import { useEffect, useState, useCallback } from '@wordpress/element';
 import OrderControl from './order-control';
 import AuthorControl from './author-control';
 import ParentControl from './parent-control';
-import { TaxonomyControls, useTaxonomiesInfo } from './taxonomy-controls';
+import { TaxonomyControls } from './taxonomy-controls';
 import StickyControl from './sticky-control';
 import {
 	usePostTypes,
 	useIsPostTypeHierarchical,
 	useAllowedControls,
 	isControlAllowed,
+	useTaxonomies,
 } from '../../utils';
 
 export default function QueryInspectorControls( {
@@ -50,7 +51,7 @@ export default function QueryInspectorControls( {
 	const allowedControls = useAllowedControls( attributes );
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
 	const { postTypesTaxonomiesMap, postTypesSelectOptions } = usePostTypes();
-	const taxonomiesInfo = useTaxonomiesInfo( postType );
+	const taxonomies = useTaxonomies( postType );
 	const isPostTypeHierarchical = useIsPostTypeHierarchical( postType );
 	useEffect( () => {
 		setShowSticky( postType === 'post' );
@@ -192,7 +193,7 @@ export default function QueryInspectorControls( {
 							setQuerySearch( '' );
 						} }
 					>
-						{ !! taxonomiesInfo?.length &&
+						{ !! taxonomies?.length &&
 							isControlAllowed( allowedControls, 'taxQuery' ) && (
 								<ToolsPanelItem
 									label={ __( 'Taxonomies' ) }

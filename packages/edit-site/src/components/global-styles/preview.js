@@ -93,7 +93,7 @@ const StylesPreview = ( { label, isFocused, withHoverView } ) => {
 			return [
 				...styles,
 				{
-					css: 'body{min-width: 0;padding: 0;border: none;}',
+					css: 'html{overflow:hidden}body{min-width: 0;padding: 0;border: none;}',
 					isGlobalStyles: true,
 				},
 			];

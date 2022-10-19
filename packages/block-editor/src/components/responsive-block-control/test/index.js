@@ -90,7 +90,7 @@ describe( 'Basic rendering', () => {
 			'.block-editor-responsive-block-control__group.is-responsive'
 		);
 
-		expect( container.innerHTML ).not.toBe( '' );
+		expect( container ).not.toBeEmptyDOMElement();
 
 		expect( defaultControlGroup ).not.toBeNull();
 		expect( responsiveControlGroup ).toBeNull();
@@ -110,7 +110,7 @@ describe( 'Basic rendering', () => {
 			/>
 		);
 
-		expect( container.innerHTML ).toBe( '' );
+		expect( container ).toBeEmptyDOMElement();
 	} );
 
 	it( 'should not render without valid property', () => {
@@ -121,7 +121,7 @@ describe( 'Basic rendering', () => {
 			/>
 		);
 
-		expect( container.innerHTML ).toBe( '' );
+		expect( container ).toBeEmptyDOMElement();
 	} );
 
 	it( 'should not render without valid default control render prop', () => {
@@ -129,7 +129,7 @@ describe( 'Basic rendering', () => {
 			<ResponsiveBlockControl title="Padding" property="padding" />
 		);
 
-		expect( container.innerHTML ).toBe( '' );
+		expect( container ).toBeEmptyDOMElement();
 	} );
 
 	it( 'should render with custom label for toggle control when provided', () => {

@@ -34,7 +34,7 @@ import { store as interfaceStore } from '@wordpress/interface';
  */
 import TemplatePartConverter from '../template-part-converter';
 import NavigateToLink from '../navigate-to-link';
-import { SidebarInspectorFill } from '../sidebar';
+import { SidebarInspectorFill } from '../sidebar-edit-mode';
 import { store as editSiteStore } from '../../store';
 import BlockInspectorButton from './block-inspector-button';
 import BackButton from './back-button';
@@ -46,8 +46,16 @@ const LAYOUT = {
 	alignments: [],
 };
 
+const NAVIGATION_SIDEBAR_NAME = 'edit-site/navigation-menu';
+
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const { storedSettings, templateType, templateId, page } = useSelect(
+	const {
+		storedSettings,
+		templateType,
+		templateId,
+		page,
+		isNavigationSidebarOpen,
+	} = useSelect(
 		( select ) => {
 			const { getSettings, getEditedPostType, getEditedPostId, getPage } =
 				select( editSiteStore );
@@ -57,6 +65,10 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				templateType: getEditedPostType(),
 				templateId: getEditedPostId(),
 				page: getPage(),
+				isNavigationSidebarOpen:
+					select( interfaceStore ).getActiveComplementaryArea(
+						editSiteStore.name
+					) === NAVIGATION_SIDEBAR_NAME,
 			};
 		},
 		[ setIsInserterOpen ]
@@ -129,13 +141,14 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		templateType
 	);
 	const { setPage } = useDispatch( editSiteStore );
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	const openNavigationSidebar = useCallback( () => {
-		enableComplementaryArea(
-			'core/edit-site',
-			'edit-site/navigation-menu'
-		);
-	}, [ enableComplementaryArea ] );
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
+	const toggleNavigationSidebar = useCallback( () => {
+		const toggleComplementaryArea = isNavigationSidebarOpen
+			? disableComplementaryArea
+			: enableComplementaryArea;
+		toggleComplementaryArea( editSiteStore.name, NAVIGATION_SIDEBAR_NAME );
+	}, [ isNavigationSidebarOpen ] );
 	const contentRef = useRef();
 	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
@@ -148,9 +161,14 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		<ToolbarGroup>
 			<ToolbarButton
 				className="components-toolbar__control"
-				label={ __( 'Open list view' ) }
-				onClick={ openNavigationSidebar }
+				label={
+					isNavigationSidebarOpen
+						? __( 'Close list view' )
+						: __( 'Open list view' )
+				}
+				onClick={ toggleNavigationSidebar }
 				icon={ listView }
+				isActive={ isNavigationSidebarOpen }
 			/>
 		</ToolbarGroup>
 	);

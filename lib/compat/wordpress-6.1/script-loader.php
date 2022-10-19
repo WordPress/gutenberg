@@ -89,7 +89,7 @@ function gutenberg_enqueue_global_styles() {
 	 * This removes the CSS from the global-styles stylesheet and adds it to the inline CSS for each block.
 	 * This filter has to be registered before we call gutenberg_get_global_stylesheet();
 	 */
-	add_filter( 'gutenberg_theme_json_get_style_nodes', 'gutenberg_filter_out_block_nodes', 10, 1 );
+	add_filter( 'wp_theme_json_get_style_nodes', 'gutenberg_filter_out_block_nodes', 10, 1 );
 
 	$stylesheet = gutenberg_get_global_stylesheet();
 	if ( empty( $stylesheet ) ) {
@@ -114,7 +114,7 @@ add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_global_styles', 1 );
 
 /**
- * Loads classic theme styles on classic themes.
+ * Loads classic theme styles on classic themes in the frontend.
  *
  * This is needed for backwards compatibility for button blocks specifically.
  */
@@ -124,7 +124,35 @@ function gutenberg_enqueue_classic_theme_styles() {
 		wp_enqueue_style( 'classic-theme-styles' );
 	}
 }
-// To load classic theme styles on the frontend.
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_classic_theme_styles' );
-// To load classic theme styles in the the editor.
-add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_classic_theme_styles' );
+
+/**
+ * Loads classic theme styles on classic themes in the editor.
+ *
+ * This is needed for backwards compatibility for button blocks specifically.
+ *
+ * @since 6.1
+ *
+ * @param array $editor_settings The array of editor settings.
+ * @return array A filtered array of editor settings.
+ */
+function gutenberg_add_editor_classic_theme_styles( $editor_settings ) {
+	if ( wp_is_block_theme() ) {
+		return $editor_settings;
+	}
+
+	$classic_theme_styles = gutenberg_dir_path() . '/build/block-library/classic.css';
+
+	// This follows the pattern of get_block_editor_theme_styles,
+	// but we can't use get_block_editor_theme_styles directly as it
+	// only handles external files or theme files.
+	$editor_settings['styles'][] = array(
+		'css'            => file_get_contents( $classic_theme_styles ),
+		'baseURL'        => get_theme_file_uri( $classic_theme_styles ),
+		'__unstableType' => 'theme',
+		'isGlobalStyles' => false,
+	);
+
+	return $editor_settings;
+}
+add_filter( 'block_editor_settings_all', 'gutenberg_add_editor_classic_theme_styles' );

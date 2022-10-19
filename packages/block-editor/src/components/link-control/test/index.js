@@ -392,7 +392,7 @@ describe( 'Searching for a link', () => {
 			fauxEntitySuggestions.length
 		);
 
-		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
+		expect( searchInput ).toHaveAttribute( 'aria-expanded', 'true' );
 
 		// Sanity check that a search suggestion shows up corresponding to the data.
 		expect( searchResultElements[ 0 ] ).toHaveTextContent(

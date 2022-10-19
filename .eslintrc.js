@@ -97,6 +97,7 @@ module.exports = {
 							'dropRight',
 							'each',
 							'escapeRegExp',
+							'every',
 							'extend',
 							'findIndex',
 							'findKey',
@@ -134,6 +135,7 @@ module.exports = {
 							'negate',
 							'noop',
 							'nth',
+							'omitBy',
 							'once',
 							'overEvery',
 							'partial',
@@ -317,6 +319,11 @@ module.exports = {
 			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
 			excludedFiles: [ 'test/e2e/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
+		},
+		{
+			files: [ '**/test/**/*.js' ],
+			excludedFiles: [ '**/*.@(android|ios|native).js' ],
+			extends: [ 'plugin:jest-dom/recommended' ],
 		},
 		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
