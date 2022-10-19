@@ -62,3 +62,9 @@
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
 	}
 }
+
+.components-tab-panel__tab-content {
+	&:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+}

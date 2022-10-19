@@ -7,8 +7,9 @@ import { partial, noop, find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
+import { DOWN } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -49,6 +50,14 @@ export default function TabPanel( {
 	const onNavigate = ( childIndex, child ) => {
 		child.click();
 	};
+	const onKeyDown = ( evt ) => {
+		// TODO: check orientation
+		if ( evt.keyCode === DOWN ) {
+			panelRef.current?.focus();
+		}
+	};
+
+	const panelRef = useRef();
 	const selectedTab = find( tabs, { name: selected } );
 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
 
@@ -68,6 +77,7 @@ export default function TabPanel( {
 				orientation={ orientation }
 				onNavigate={ onNavigate }
 				className="components-tab-panel__tabs"
+				onKeyDown={ onKeyDown }
 			>
 				{ tabs.map( ( tab ) => (
 					<TabButton
@@ -95,6 +105,8 @@ export default function TabPanel( {
 					role="tabpanel"
 					id={ `${ selectedId }-view` }
 					className="components-tab-panel__tab-content"
+					tabIndex="-1"
+					ref={ panelRef }
 				>
 					{ children( selectedTab ) }
 				</div>
