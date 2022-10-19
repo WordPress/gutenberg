@@ -13,6 +13,7 @@ import { plusCircle } from '@wordpress/icons';
  * Internal dependencies
  */
 import Button from '../';
+import { Tooltip } from '../../';
 
 jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
 
@@ -26,7 +27,7 @@ describe( 'Button', () => {
 			expect( button ).not.toHaveClass( 'is-large' );
 			expect( button ).not.toHaveClass( 'is-primary' );
 			expect( button ).not.toHaveClass( 'is-pressed' );
-			expect( button ).not.toHaveAttribute( 'disabled' );
+			expect( button ).toBeEnabled();
 			expect( button ).not.toHaveAttribute( 'aria-disabled' );
 			expect( button ).toHaveAttribute( 'type', 'button' );
 		} );
@@ -75,19 +76,52 @@ describe( 'Button', () => {
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-pressed' );
 		} );
 
+		it( 'should render a button element with has-text when children are passed', async () => {
+			render( <Button icon={ plusCircle }>Children</Button> );
+			await screen.getByRole( 'button' ).focus();
+			expect( screen.getByRole( 'button' ) ).toHaveClass( 'has-text' );
+		} );
+
+		it( 'should render a button element without has-text when children are not passed', async () => {
+			render( <Button icon={ plusCircle }></Button> );
+			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+				'has-text'
+			);
+		} );
+
+		it( 'should render a button element without has-text when children are empty fragment', async () => {
+			render(
+				<Button icon={ plusCircle }>
+					<></>
+				</Button>
+			);
+			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+				'has-text'
+			);
+		} );
+
+		it( 'should render a button element without has-text when a button wrapped in Tooltip', async () => {
+			render(
+				<Tooltip text="Help text">
+					<Button icon={ plusCircle } />
+				</Tooltip>
+			);
+			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+				'has-text'
+			);
+		} );
+
 		it( 'should add a disabled prop to the button', () => {
 			render( <Button disabled /> );
 
-			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
-				'disabled'
-			);
+			expect( screen.getByRole( 'button' ) ).toBeDisabled();
 		} );
 
 		it( 'should add only aria-disabled attribute when disabled and isFocusable are true', () => {
 			render( <Button disabled __experimentalIsFocusable /> );
 			const button = screen.getByRole( 'button' );
 
-			expect( button ).not.toHaveAttribute( 'disabled' );
+			expect( button ).toBeEnabled();
 			expect( button ).toHaveAttribute( 'aria-disabled' );
 		} );
 

@@ -23,6 +23,7 @@
 -   [i18n Hooks](/docs/reference-guides/filters/i18n-filters.md)
 -   [Parser Hooks](/docs/reference-guides/filters/parser-filters.md)
 -   [Autocomplete](/docs/reference-guides/filters/autocomplete-filters.md)
+-   [Global Styles Hooks](/docs/reference-guides/filters/global-styles-filters.md)
 
 ## [SlotFills Reference](/docs/reference-guides/slotfills/README.md)
 

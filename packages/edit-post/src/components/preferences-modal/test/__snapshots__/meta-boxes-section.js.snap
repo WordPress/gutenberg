@@ -29,15 +29,12 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 3);
   -webkit-box-pack: start;
   -ms-flex-pack: start;
   -webkit-justify-content: flex-start;
   justify-content: flex-start;
   width: 100%;
-}
-
-.emotion-4>*+*:not( marquee ) {
-  margin-left: calc(4px * 3);
 }
 
 .emotion-4>* {
@@ -127,15 +124,12 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 3);
   -webkit-box-pack: start;
   -ms-flex-pack: start;
   -webkit-justify-content: flex-start;
   justify-content: flex-start;
   width: 100%;
-}
-
-.emotion-4>*+*:not( marquee ) {
-  margin-left: calc(4px * 3);
 }
 
 .emotion-4>* {
@@ -305,15 +299,12 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 3);
   -webkit-box-pack: start;
   -ms-flex-pack: start;
   -webkit-justify-content: flex-start;
   justify-content: flex-start;
   width: 100%;
-}
-
-.emotion-4>*+*:not( marquee ) {
-  margin-left: calc(4px * 3);
 }
 
 .emotion-4>* {

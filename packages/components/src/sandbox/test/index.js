@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { act, fireEvent, render } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -49,18 +49,20 @@ describe( 'Sandbox', () => {
 		let sandboxedIframe =
 			iframe.contentWindow.document.body.querySelector( '.mock-iframe' );
 
-		expect( sandboxedIframe.getAttribute( 'src' ) ).toBe(
+		expect( sandboxedIframe ).toHaveAttribute(
+			'src',
 			'https://super.embed'
 		);
 
 		act( () => {
-			fireEvent.click( result.getByRole( 'button' ) );
+			fireEvent.click( screen.getByRole( 'button' ) );
 		} );
 
 		sandboxedIframe =
 			iframe.contentWindow.document.body.querySelector( '.mock-iframe' );
 
-		expect( sandboxedIframe.getAttribute( 'src' ) ).toBe(
+		expect( sandboxedIframe ).toHaveAttribute(
+			'src',
 			'https://another.super.embed'
 		);
 	} );

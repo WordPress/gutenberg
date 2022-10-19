@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
 /**
@@ -9,6 +10,7 @@ import styled from '@emotion/styled';
 import { Flex } from '../../flex';
 import UnitControl from '../../unit-control';
 import { COLORS } from '../../utils';
+import type { FocalPointPickerControlsProps } from '../types';
 import { INITIAL_BOUNDS } from '../utils';
 
 export const MediaWrapper = styled.div`
@@ -42,7 +44,7 @@ export const MediaContainer = styled.div`
 `;
 
 export const MediaPlaceholder = styled.div`
-	background: ${ COLORS.lightGray[ 300 ] };
+	background: ${ COLORS.gray[ 100 ] };
 	box-sizing: border-box;
 	height: ${ INITIAL_BOUNDS.height }px;
 	max-width: 280px;
@@ -54,9 +56,32 @@ export const StyledUnitControl = styled( UnitControl )`
 	width: 100px;
 `;
 
+const deprecatedBottomMargin = ( {
+	__nextHasNoMarginBottom,
+}: FocalPointPickerControlsProps ) => {
+	return ! __nextHasNoMarginBottom
+		? css`
+				padding-bottom: 1em;
+		  `
+		: undefined;
+};
+
+const extraHelpTextMargin = ( {
+	hasHelpText = false,
+}: FocalPointPickerControlsProps ) => {
+	return hasHelpText
+		? css`
+				padding-bottom: 1em;
+		  `
+		: undefined;
+};
+
 export const ControlWrapper = styled( Flex )`
 	max-width: 320px;
-	padding: 1em 0;
+	padding-top: 1em;
+
+	${ extraHelpTextMargin }
+	${ deprecatedBottomMargin }
 `;
 
 export const GridView = styled.div`

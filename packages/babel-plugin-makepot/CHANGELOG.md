@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 5.3.0 (2022-10-05)
+
+## 5.2.0 (2022-09-21)
+
+## 5.1.0 (2022-09-13)
+
 ### Bug Fix
 
 -   Makepot: Fix translations object handling ([#43797](https://github.com/WordPress/gutenberg/pull/43797)).

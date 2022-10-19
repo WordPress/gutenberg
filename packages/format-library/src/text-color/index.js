@@ -4,7 +4,11 @@
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { RichTextToolbarButton, useSetting } from '@wordpress/block-editor';
-import { Icon, textColor as textColorIcon } from '@wordpress/icons';
+import {
+	Icon,
+	color as colorIcon,
+	textColor as textColorIcon,
+} from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
 
 /**
@@ -89,7 +93,11 @@ function TextColorEdit( {
 				isActive={ isActive }
 				icon={
 					<Icon
-						icon={ textColorIcon }
+						icon={
+							Object.keys( activeAttributes ).length
+								? textColorIcon
+								: colorIcon
+						}
 						style={ colorIndicatorStyle }
 					/>
 				}

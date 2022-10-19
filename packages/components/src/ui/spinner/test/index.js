@@ -9,17 +9,13 @@ import { render } from '@testing-library/react';
 import { Spinner } from '..';
 
 describe( 'props', () => {
-	let base;
-
-	beforeEach( () => {
-		base = render( <Spinner /> );
-	} );
-
 	test( 'should render correctly', () => {
+		const base = render( <Spinner /> );
 		expect( base.container.firstChild ).toMatchSnapshot();
 	} );
 
 	test( 'should render color', () => {
+		const base = render( <Spinner /> );
 		const { container } = render( <Spinner color="blue" /> );
 		expect( container.firstChild ).toMatchDiffSnapshot(
 			base.container.firstChild
@@ -27,6 +23,7 @@ describe( 'props', () => {
 	} );
 
 	test( 'should render size', () => {
+		const base = render( <Spinner /> );
 		const { container } = render( <Spinner size={ 31 } /> );
 		expect( container.firstChild ).toMatchDiffSnapshot(
 			base.container.firstChild

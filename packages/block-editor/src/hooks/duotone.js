@@ -12,6 +12,7 @@ import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useContext, createPortal } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -27,6 +28,7 @@ import {
 	__unstableDuotoneStylesheet as DuotoneStylesheet,
 	__unstableDuotoneUnsetStylesheet as DuotoneUnsetStylesheet,
 } from '../components/duotone';
+import { store as blockEditorStore } from '../store';
 
 const EMPTY_ARRAY = [];
 
@@ -157,11 +159,21 @@ const withDuotoneControls = createHigherOrderComponent(
 			props.name,
 			'color.__experimentalDuotone'
 		);
+		const isContentLocked = useSelect(
+			( select ) => {
+				return select(
+					blockEditorStore
+				).__unstableGetContentLockingParent( props.clientId );
+			},
+			[ props.clientId ]
+		);
 
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ hasDuotoneSupport && <DuotonePanel { ...props } /> }
+				{ hasDuotoneSupport && ! isContentLocked && (
+					<DuotonePanel { ...props } />
+				) }
 			</>
 		);
 	},

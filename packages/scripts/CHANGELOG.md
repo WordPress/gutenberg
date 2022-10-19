@@ -2,9 +2,16 @@
 
 ## Unreleased
 
-### New Feature
+## 24.3.0 (2022-10-05)
+
+## 24.2.0 (2022-09-21)
+
+## 24.1.0 (2022-09-13)
+
+### New Features
 
 -   Update the default webpack config to allow `webp` image format ([#43880](https://github.com/WordPress/gutenberg/pull/43880)).
+-   Update webpack configuration for the `build` and `start` commands to automatically copy PHP files listed in the `render` field of `block.json` files from the source to the build folder ([#43917](https://github.com/WordPress/gutenberg/pull/43917)).
 
 ## 24.0.0 (2022-08-24)
 
