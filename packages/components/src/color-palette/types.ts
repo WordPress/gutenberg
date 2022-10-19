@@ -44,6 +44,8 @@ export type CustomColorPickerDropdownProps = {
 export type ColorPaletteProps = {
 	/**
 	 * Whether the palette should have a clearing button.
+	 *
+	 * @default true
 	 */
 	clearable?: boolean;
 	/**
@@ -58,6 +60,8 @@ export type ColorPaletteProps = {
 	colors?: ( PaletteObject | ColorObject )[];
 	/**
 	 * Whether to allow custom color or not.
+	 *
+	 * @default false
 	 */
 	disableCustomColors?: boolean;
 	/**
@@ -76,10 +80,14 @@ export type ColorPaletteProps = {
 	/**
 	 * Whether the colors prop is an array of color palettes,
 	 * rather than an array of color objects.
-	 */
+	 *
+	 * @default false
+	*/
 	__experimentalHasMultipleOrigins?: boolean;
 	/**
 	 * Whether this is rendered in the sidebar.
-	 */
+	 *
+	 * @default false
+	*/
 	__experimentalIsRenderedInSidebar?: boolean;
 };
