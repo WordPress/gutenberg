@@ -6,10 +6,18 @@
 	background: $gray-900;
 	border-radius: 0;
 	display: flex;
-	position: absolute;
-	z-index: z-index(".edit-site-navigation-toggle");
+	// !important to override position relative set by navigateRegions when focusing the region.
+	position: absolute !important;
+	// !important to override the z-index set by navigateRegions when focusing the region.
+	z-index: z-index(".edit-site-navigation-toggle") !important;
 	height: $header-height;
 	width: $header-height;
+
+	&.is-open,
+	&.is-open .edit-site-navigation-toggle__button.components-button {
+		// Allow navigateRegions focus style to be drawn correctly.
+		background: transparent;
+	}
 }
 
 .edit-site-navigation-toggle__button.components-button {

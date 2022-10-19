@@ -183,3 +183,10 @@ html.interface-interface-skeleton__html-container {
 		}
 	}
 }
+
+// Footer is visible from medium so we subtract footer's height
+.interface-interface-skeleton.has-footer .interface-interface-skeleton__drawer {
+	@include break-medium() {
+		height: calc(100% - #{$button-size-small + $border-width});
+	}
+}
