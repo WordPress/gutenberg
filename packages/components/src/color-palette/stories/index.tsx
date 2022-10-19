@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import type { CSSProperties } from 'react';
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 /**
@@ -102,12 +103,13 @@ MultipleOrigins.args = {
 export const CSSVariables: ComponentStory< typeof ColorPalette > = ( args ) => {
 	return (
 		<div
-			style={ {
-				// @ts-ignore
-				'--red': '#f00',
-				'--yellow': '#ff0',
-				'--blue': '#00f',
-			} }
+			style={
+				{
+					'--red': '#f00',
+					'--yellow': '#ff0',
+					'--blue': '#00f',
+				} as CSSProperties
+			}
 		>
 			<Template { ...args } />
 		</div>
