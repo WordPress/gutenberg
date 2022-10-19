@@ -82,7 +82,7 @@ export const isIcon = ( {
 	`;
 };
 
-export const buttonActive = css`
+export const buttonPressed = css`
 	color: ${ COLORS.white };
 
 	&:active {

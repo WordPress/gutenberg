@@ -72,18 +72,18 @@ function ToggleGroupControlOptionBase(
 		...otherButtonProps
 	} = buttonProps;
 
-	const isActive = otherContextProps.state === value;
+	const isPressed = otherContextProps.state === value;
 	const cx = useCx();
 	const labelViewClasses = cx( isBlock && styles.labelBlock );
 	const classes = cx(
 		styles.buttonView,
 		isIcon && styles.isIcon( { size } ),
 		className,
-		isActive && styles.buttonActive
+		isPressed && styles.buttonPressed
 	);
 
 	const buttonOnClick = () => {
-		if ( isDeselectable && isActive ) {
+		if ( isDeselectable && isPressed ) {
 			otherContextProps.setState( undefined );
 		} else {
 			otherContextProps.setState( value );
