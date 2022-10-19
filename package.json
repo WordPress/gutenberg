@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "14.3.0-rc.1",
+	"version": "14.3.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -84,7 +84,8 @@
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/widgets": "file:packages/widgets",
-		"@wordpress/wordcount": "file:packages/wordcount"
+		"@wordpress/wordcount": "file:packages/wordcount",
+		"wicg-inert": "3.1.2"
 	},
 	"devDependencies": {
 		"@actions/core": "1.8.0",
@@ -161,7 +162,7 @@
 		"@wordpress/stylelint-config": "file:packages/stylelint-config",
 		"ajv": "8.7.1",
 		"ajv-draft-04": "1.0.0",
-		"appium": "1.22.0",
+		"appium": "1.22.3",
 		"babel-jest": "27.4.5",
 		"babel-loader": "8.2.3",
 		"babel-plugin-inline-json-import": "0.3.2",
@@ -184,6 +185,7 @@
 		"eslint-import-resolver-node": "0.3.4",
 		"eslint-plugin-eslint-comments": "3.1.2",
 		"eslint-plugin-import": "2.25.2",
+		"eslint-plugin-jest-dom": "4.0.2",
 		"eslint-plugin-playwright": "0.8.0",
 		"eslint-plugin-ssr-friendly": "1.0.6",
 		"execa": "4.0.2",

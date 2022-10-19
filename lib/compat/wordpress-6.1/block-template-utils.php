@@ -290,7 +290,7 @@ function _gutenberg_build_title_and_description_for_single_post_type_block_templ
 	);
 	$template->description = sprintf(
 		// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Page: Hello".
-		__( 'Template for %$s', 'gutenberg' ),
+		__( 'Template for %s', 'gutenberg' ),
 		$post_title
 	);
 

@@ -11,7 +11,7 @@ import { Truncate } from '..';
 describe( 'props', () => {
 	test( 'should render correctly', () => {
 		const { container } = render( <Truncate>Lorem ipsum.</Truncate> );
-		expect( container.firstChild?.textContent ).toEqual( 'Lorem ipsum.' );
+		expect( container.firstChild ).toHaveTextContent( 'Lorem ipsum.' );
 	} );
 
 	test( 'should render limit', () => {
@@ -20,7 +20,7 @@ describe( 'props', () => {
 				Lorem ipsum.
 			</Truncate>
 		);
-		expect( container.firstChild?.textContent ).toEqual( 'L…' );
+		expect( container.firstChild ).toHaveTextContent( 'L…' );
 	} );
 
 	test( 'should render custom ellipsis', () => {
@@ -29,7 +29,7 @@ describe( 'props', () => {
 				Lorem ipsum.
 			</Truncate>
 		);
-		expect( container.firstChild?.textContent ).toEqual( 'Lorem!!!' );
+		expect( container.firstChild ).toHaveTextContent( 'Lorem!!!' );
 	} );
 
 	test( 'should render custom ellipsizeMode', () => {
@@ -38,6 +38,6 @@ describe( 'props', () => {
 				Lorem ipsum.
 			</Truncate>
 		);
-		expect( container.firstChild?.textContent ).toEqual( 'Lo!!!m.' );
+		expect( container.firstChild ).toHaveTextContent( 'Lo!!!m.' );
 	} );
 } );

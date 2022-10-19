@@ -32,7 +32,7 @@ jobs:
                   cache: 'gradle'
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
+              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
               with:
                   node-version-file: '.nvmrc'
                   cache: npm
@@ -40,7 +40,7 @@ jobs:
             - run: npm ci
 
             - name: Restore Gradle cache
-              uses: actions/cache@56461b9eb0f8438fd15c7a9968e3c9ebb18ceff1 # v3.0.10
+              uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 # v3.0.11
               with:
                   path: ~/.gradle/caches
                   key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}

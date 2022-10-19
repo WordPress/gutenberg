@@ -583,7 +583,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$nodes = array_merge( $nodes, static::get_block_nodes( $theme_json, $selectors ) );
 
 		// This filter allows us to modify the output of WP_Theme_JSON so that we can do things like loading block CSS independently.
-		return apply_filters( 'gutenberg_theme_json_get_style_nodes', $nodes );
+		return apply_filters( 'wp_theme_json_get_style_nodes', $nodes );
 	}
 
 	/**
@@ -1045,6 +1045,18 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$has_missing_value = empty( $value ) && ! is_numeric( $value );
 			if ( $has_missing_value || is_array( $value ) ) {
 				continue;
+			}
+
+			// Calculates fluid typography rules where available.
+			if ( 'font-size' === $css_property ) {
+				/*
+				 * gutenberg_get_typography_font_size_value() will check
+				 * if fluid typography has been activated and also
+				 * whether the incoming value can be converted to a fluid value.
+				 * Values that already have a "clamp()" function will not pass the test,
+				 * and therefore the original $value will be returned.
+				 */
+				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ) );
 			}
 
 			$declarations[] = array(

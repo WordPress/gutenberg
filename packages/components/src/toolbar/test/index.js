@@ -21,10 +21,10 @@ describe( 'Toolbar', () => {
 
 			expect(
 				screen.getByLabelText( 'control1', { selector: 'button' } )
-			).toBeTruthy();
+			).toBeInTheDocument();
 			expect(
 				screen.getByLabelText( 'control2', { selector: 'button' } )
-			).toBeTruthy();
+			).toBeInTheDocument();
 		} );
 	} );
 } );
