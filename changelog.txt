@@ -1,5 +1,30 @@
 == Changelog ==
 
+= 14.3.1 =
+
+
+
+## Changelog
+
+### Code Quality
+
+#### Block Library
+- Add: Missing output escaping on some blocks. ([45045](https://github.com/WordPress/gutenberg/pull/45045))
+
+
+## First time contributors
+
+The following PRs were merged by first time contributors:
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@jorgefilipecosta
+
+
 = 14.3.0 =
 
 

@@ -14,18 +14,14 @@ const TestField = ( props ) => {
 };
 
 describe( 'base field', () => {
-	let base;
-
-	beforeEach( () => {
-		base = render( <TestField /> ).container;
-	} );
-
 	it( 'should render correctly', () => {
+		const base = render( <TestField /> ).container;
 		expect( base.firstChild ).toMatchSnapshot();
 	} );
 
 	describe( 'props', () => {
 		it( 'should render error styles', () => {
+			const base = render( <TestField /> ).container;
 			const { container } = render( <TestField hasError /> );
 			expect( container.firstChild ).toMatchStyleDiffSnapshot(
 				base.firstChild
@@ -33,6 +29,7 @@ describe( 'base field', () => {
 		} );
 
 		it( 'should render inline styles', () => {
+			const base = render( <TestField /> ).container;
 			const { container } = render( <TestField isInline /> );
 			expect( container.firstChild ).toMatchStyleDiffSnapshot(
 				base.firstChild
@@ -40,6 +37,7 @@ describe( 'base field', () => {
 		} );
 
 		it( 'should render subtle styles', () => {
+			const base = render( <TestField /> ).container;
 			const { container } = render( <TestField isSubtle /> );
 			expect( container.firstChild ).toMatchStyleDiffSnapshot(
 				base.firstChild

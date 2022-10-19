@@ -83,7 +83,7 @@ export default function PluginSidebarEditSite( { className, ...props } ) {
 	return (
 		<ComplementaryArea
 			panelClassName={ className }
-			className="edit-site-sidebar"
+			className="edit-site-sidebar-edit-mode"
 			scope="core/edit-site"
 			showIconLabels={ showIconLabels }
 			{ ...props }

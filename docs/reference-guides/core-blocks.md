@@ -176,7 +176,7 @@ An advanced block that allows displaying post comments using different visual co
 
 -	**Name:** core/comments
 -	**Category:** theme
--	**Supports:** align (full, wide), color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** legacy, tagName
 
 ## Comments Pagination
@@ -347,7 +347,7 @@ Create a list item. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/
 
 -	**Name:** core/list-item
 -	**Category:** text
--	**Supports:** ~~className~~
+-	**Supports:** typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** content, placeholder
 
 ## Login/out

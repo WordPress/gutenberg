@@ -1,15 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	reduce,
-	omit,
-	without,
-	mapValues,
-	isEqual,
-	isEmpty,
-	omitBy,
-} from 'lodash';
+import { reduce, omit, mapValues, isEqual, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -425,15 +417,15 @@ const withBlockTree =
 				break;
 			}
 			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
-				const updatedBlockUids = Object.keys(
-					omitBy( newState.attributes, ( attributes, clientId ) => {
+				const updatedBlockUids = Object.entries( newState.attributes )
+					.filter( ( [ clientId, attributes ] ) => {
 						return (
-							newState.byClientId[ clientId ].name !==
-								'core/block' ||
-							attributes.ref !== action.updatedId
+							newState.byClientId[ clientId ].name ===
+								'core/block' &&
+							attributes.ref === action.updatedId
 						);
 					} )
-				);
+					.map( ( [ clientId ] ) => clientId );
 
 				newState.tree = updateParentInnerBlocksInTree(
 					newState,
@@ -987,10 +979,10 @@ export const blocks = pipe(
 				// Moving from a parent block to another.
 				return {
 					...state,
-					[ fromRootClientId ]: without(
-						state[ fromRootClientId ],
-						...clientIds
-					),
+					[ fromRootClientId ]:
+						state[ fromRootClientId ]?.filter(
+							( id ) => ! clientIds.includes( id )
+						) ?? [],
 					[ toRootClientId ]: insertAt(
 						state[ toRootClientId ],
 						clientIds,
@@ -1095,8 +1087,13 @@ export const blocks = pipe(
 
 					// Remove deleted blocks from other blocks' orderings.
 					( nextState ) =>
-						mapValues( nextState, ( subState ) =>
-							without( subState, ...action.removedClientIds )
+						mapValues(
+							nextState,
+							( subState ) =>
+								subState?.filter(
+									( id ) =>
+										! action.removedClientIds.includes( id )
+								) ?? []
 						),
 				] )( state );
 		}

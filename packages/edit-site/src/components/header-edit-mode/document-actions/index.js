@@ -21,6 +21,15 @@ import {
 import { chevronDown } from '@wordpress/icons';
 import { useState, useMemo } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
+import { store as preferencesStore } from '@wordpress/preferences';
+
+/**
+ * Internal dependencies
+ */
+import TemplateDetails from '../../template-details';
+import { store as editSiteStore } from '../../../store';
 
 function getBlockDisplayText( block ) {
 	if ( block ) {
@@ -52,25 +61,36 @@ function useSecondaryText() {
 	return {};
 }
 
-/**
- * @param {Object}   props                Props for the DocumentActions component.
- * @param {string}   props.entityTitle    The title to display.
- * @param {string}   props.entityLabel    A label to use for entity-related options.
- *                                        E.g. "template" would be used for "edit
- *                                        template" and "show template details".
- * @param {boolean}  props.isLoaded       Whether the data is available.
- * @param {Function} props.children       React component to use for the
- *                                        information dropdown area. Should be a
- *                                        function which accepts dropdown props.
- * @param {boolean}  props.showIconLabels Whether buttons display icons or text labels.
- */
-export default function DocumentActions( {
-	entityTitle,
-	entityLabel,
-	isLoaded,
-	children: dropdownContent,
-	showIconLabels,
-} ) {
+export default function DocumentActions() {
+	const { showIconLabels, entityTitle, template, templateType, isLoaded } =
+		useSelect( ( select ) => {
+			const { getEditedPostType, getEditedPostId } =
+				select( editSiteStore );
+			const { getEditedEntityRecord } = select( coreStore );
+			const { __experimentalGetTemplateInfo: getTemplateInfo } =
+				select( editorStore );
+			const postType = getEditedPostType();
+			const postId = getEditedPostId();
+			const record = getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+			const _isLoaded = !! postId;
+
+			return {
+				showIconLabels: select( preferencesStore ).get(
+					'core/edit-site',
+					'showIconLabels'
+				),
+				entityTitle: getTemplateInfo( record ).title,
+				isLoaded: _isLoaded,
+				template: record,
+				templateType: postType,
+			};
+		}, [] );
+	const entityLabel =
+		templateType === 'wp_template_part' ? 'template part' : 'template';
 	const { label } = useSecondaryText();
 
 	// Use internal state instead of a ref to make sure that the component
@@ -137,33 +157,34 @@ export default function DocumentActions( {
 					{ label ?? '' }
 				</Text>
 
-				{ dropdownContent && (
-					<Dropdown
-						popoverProps={ popoverProps }
-						position="bottom center"
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<Button
-								className="edit-site-document-actions__get-info"
-								icon={ chevronDown }
-								aria-expanded={ isOpen }
-								aria-haspopup="true"
-								onClick={ onToggle }
-								variant={
-									showIconLabels ? 'tertiary' : undefined
-								}
-								label={ sprintf(
-									/* translators: %s: the entity to see details about, like "template"*/
-									__( 'Show %s details' ),
-									entityLabel
-								) }
-							>
-								{ showIconLabels && __( 'Details' ) }
-							</Button>
-						) }
-						contentClassName="edit-site-document-actions__info-dropdown"
-						renderContent={ dropdownContent }
-					/>
-				) }
+				<Dropdown
+					popoverProps={ popoverProps }
+					position="bottom center"
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<Button
+							className="edit-site-document-actions__get-info"
+							icon={ chevronDown }
+							aria-expanded={ isOpen }
+							aria-haspopup="true"
+							onClick={ onToggle }
+							variant={ showIconLabels ? 'tertiary' : undefined }
+							label={ sprintf(
+								/* translators: %s: the entity to see details about, like "template"*/
+								__( 'Show %s details' ),
+								entityLabel
+							) }
+						>
+							{ showIconLabels && __( 'Details' ) }
+						</Button>
+					) }
+					contentClassName="edit-site-document-actions__info-dropdown"
+					renderContent={ ( { onClose } ) => (
+						<TemplateDetails
+							template={ template }
+							onClose={ onClose }
+						/>
+					) }
+				/>
 			</div>
 		</div>
 	);
