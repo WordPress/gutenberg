@@ -1,12 +1,7 @@
 /**
  * External dependencies
  */
-import ShallowRenderer from 'react-test-renderer/shallow';
-
-/**
- * WordPress dependencies
- */
-import TokenList from '@wordpress/token-list';
+import { render } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -15,14 +10,11 @@ import NoticeList from '../list';
 
 describe( 'NoticeList', () => {
 	it( 'should merge className', () => {
-		const renderer = new ShallowRenderer();
-
-		renderer.render( <NoticeList notices={ [] } className="is-ok" /> );
-
-		const classes = new TokenList(
-			renderer.getRenderOutput().props.className
+		const { container } = render(
+			<NoticeList notices={ [] } className="is-ok" />
 		);
-		expect( classes.contains( 'is-ok' ) ).toBe( true );
-		expect( classes.contains( 'components-notice-list' ) ).toBe( true );
+
+		expect( container.firstChild ).toHaveClass( 'is-ok' );
+		expect( container.firstChild ).toHaveClass( 'components-notice-list' );
 	} );
 } );

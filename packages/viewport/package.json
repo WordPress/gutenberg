@@ -27,8 +27,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/compose": "file:../compose",
-		"@wordpress/data": "file:../data",
-		"lodash": "^4.17.21"
+		"@wordpress/data": "file:../data"
 	},
 	"peerDependencies": {
 		"react": "^17.0.0"

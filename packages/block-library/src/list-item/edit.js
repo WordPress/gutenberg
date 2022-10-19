@@ -60,6 +60,7 @@ export default function ListItemEdit( {
 	setAttributes,
 	onReplace,
 	clientId,
+	mergeBlocks,
 } ) {
 	const { placeholder, content } = attributes;
 	const blockProps = useBlockProps( { ref: useCopy( clientId ) } );
@@ -70,7 +71,7 @@ export default function ListItemEdit( {
 	const useEnterRef = useEnter( { content, clientId } );
 	const useSpaceRef = useSpace( clientId );
 	const onSplit = useSplit( clientId );
-	const onMerge = useMerge( clientId );
+	const onMerge = useMerge( clientId, mergeBlocks );
 	return (
 		<>
 			<li { ...innerBlocksProps }>

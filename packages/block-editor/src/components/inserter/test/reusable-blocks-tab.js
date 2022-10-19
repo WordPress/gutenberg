@@ -41,14 +41,14 @@ function InserterBlockList( props ) {
 }
 
 const initializeAllClosedMenuState = ( propOverrides ) => {
-	const result = render( <InserterBlockList { ...propOverrides } /> );
-	const activeTabs = result.container.querySelectorAll(
+	const { container } = render( <InserterBlockList { ...propOverrides } /> );
+	const activeTabs = container.querySelectorAll(
 		'.components-panel__body.is-opened button.components-panel__body-toggle'
 	);
 	activeTabs.forEach( ( tab ) => {
 		fireEvent.click( tab );
 	} );
-	return result;
+	return container;
 };
 
 describe( 'InserterMenu', () => {
@@ -92,13 +92,13 @@ describe( 'InserterMenu', () => {
 	} );
 
 	it( 'should list reusable blocks', () => {
-		const { container } = initializeAllClosedMenuState();
+		const container = initializeAllClosedMenuState();
 		const blocks = container.querySelectorAll(
 			'.block-editor-block-types-list__item-title'
 		);
 
 		expect( blocks ).toHaveLength( 1 );
-		expect( blocks[ 0 ].textContent ).toBe( 'My reusable block' );
+		expect( blocks[ 0 ] ).toHaveTextContent( 'My reusable block' );
 	} );
 
 	it( 'should trim whitespace of search terms', () => {
@@ -111,6 +111,6 @@ describe( 'InserterMenu', () => {
 		);
 
 		expect( blocks ).toHaveLength( 1 );
-		expect( blocks[ 0 ].textContent ).toBe( 'My reusable block' );
+		expect( blocks[ 0 ] ).toHaveTextContent( 'My reusable block' );
 	} );
 } );

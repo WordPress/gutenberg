@@ -11,12 +11,12 @@ import { Item, ItemGroup } from '..';
 describe( 'ItemGroup', () => {
 	describe( 'ItemGroup component', () => {
 		it( 'should render correctly', () => {
-			const wrapper = render(
+			const { container } = render(
 				<ItemGroup>
 					<Item>Code is poetry</Item>
 				</ItemGroup>
 			);
-			expect( wrapper.container.firstChild ).toMatchSnapshot();
+			expect( container.firstChild ).toMatchSnapshot();
 		} );
 
 		it( 'should show borders when the isBordered prop is true', () => {

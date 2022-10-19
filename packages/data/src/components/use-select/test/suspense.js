@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -109,8 +109,8 @@ describe( 'useSuspenseSelect', () => {
 			</RegistryProvider>
 		);
 
-		const rendered = render( <App /> );
-		await waitFor( () => rendered.getByLabelText( 'loaded' ) );
+		render( <App /> );
+		await screen.findByLabelText( 'loaded' );
 
 		// Verify there were 3 attempts to render. Suspended twice because of
 		// `getToken` and `getData` selectors not being resolved, and then finally
@@ -156,9 +156,9 @@ describe( 'useSuspenseSelect', () => {
 			</RegistryProvider>
 		);
 
-		const rendered = render( <App /> );
-		const label = await waitFor( () => rendered.getByLabelText( 'error' ) );
-		expect( label.textContent ).toBe( 'resolution failed' );
+		render( <App /> );
+		const label = await screen.findByLabelText( 'error' );
+		expect( label ).toHaveTextContent( 'resolution failed' );
 		expect( console ).toHaveErrored();
 	} );
 } );

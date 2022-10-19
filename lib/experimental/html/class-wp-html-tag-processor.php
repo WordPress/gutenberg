@@ -910,7 +910,8 @@ class WP_HTML_Tag_Processor {
 		$modified = false;
 
 		// Remove unwanted classes by only copying the new ones.
-		while ( $at < strlen( $existing_class ) ) {
+		$existing_class_length = strlen( $existing_class );
+		while ( $at < $existing_class_length ) {
 			// Skip to the first non-whitespace character.
 			$ws_at     = $at;
 			$ws_length = strspn( $existing_class, " \t\f\r\n", $ws_at );
@@ -1266,13 +1267,24 @@ class WP_HTML_Tag_Processor {
 
 	/**
 	 * Returns the string representation of the HTML Tag Processor.
-	 * It closes the HTML Tag Processor and prevents further lookups and modifications.
+	 *
+	 * @since 6.2.0
+	 * @see get_updated_html
+	 *
+	 * @return string The processed HTML.
+	 */
+	public function __toString() {
+		return $this->get_updated_html();
+	}
+
+	/**
+	 * Returns the string representation of the HTML Tag Processor.
 	 *
 	 * @since 6.2.0
 	 *
 	 * @return string The processed HTML.
 	 */
-	public function __toString() {
+	public function get_updated_html() {
 		// Short-circuit if there are no updates to apply.
 		if ( ! count( $this->classname_updates ) && ! count( $this->attribute_updates ) ) {
 			return $this->updated_html . substr( $this->html, $this->updated_bytes );
