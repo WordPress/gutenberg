@@ -34,21 +34,13 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 	 */
 	$word_count_type = _x( 'words', 'Word count type. Do not translate!' );
 
-	$minutes_to_read = (int) round( wp_word_count( $content, $word_count_type ) / $average_reading_rate );
+	$minutes_to_read = max( 1, (int) round( wp_word_count( $content, $word_count_type ) / $average_reading_rate ) );
 
-	$minutes_to_read_string = __( 'You can read this post in less than 1 minute.' );
-
-	if ( 0 !== $minutes_to_read ) {
-		$minutes_to_read_string = sprintf(
-			/* translators: %d is the number of minutes the post will take to read. */
-			_n(
-				'You can read this post in %d minute.',
-				'You can read this post in %d minutes.',
-				$minutes_to_read
-			),
-			$minutes_to_read
-		);
-	}
+	$minutes_to_read_string = sprintf(
+		/* translators: %d is the number of minutes the post will take to read. */
+		_n( '%d minute', '%d minutes', $minutes_to_read ),
+		$minutes_to_read
+	);
 
 	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 

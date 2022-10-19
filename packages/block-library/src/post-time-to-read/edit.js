@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { _x, _n, __, sprintf } from '@wordpress/i18n';
+import { _x, _n, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import {
 	AlignmentControl,
@@ -63,23 +63,18 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 			'Word count type. Do not translate!'
 		);
 
-		const minutesToRead = Math.round(
-			wordCount( content, wordCountType ) / AVERAGE_READING_RATE
+		const minutesToRead = Math.max(
+			1,
+			Math.round(
+				wordCount( content, wordCountType ) / AVERAGE_READING_RATE
+			)
 		);
 
-		if ( minutesToRead !== 0 ) {
-			return sprintf(
-				/* translators: %d is the number of minutes the post will take to read. */
-				_n(
-					'You can read this post in %d minute.',
-					'You can read this post in %d minutes.',
-					minutesToRead
-				),
-				minutesToRead
-			);
-		}
-
-		return __( 'You can read this post in less than 1 minute.' );
+		return sprintf(
+			/* translators: %d is the number of minutes the post will take to read. */
+			_n( '%d minute', '%d minutes', minutesToRead ),
+			minutesToRead
+		);
 	}, [ contentStructure, blocks ] );
 
 	const blockProps = useBlockProps( {
