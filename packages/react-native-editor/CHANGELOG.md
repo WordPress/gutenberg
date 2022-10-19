@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.84.1
+-   [**] Native inner blocks merge where appropriate [#45048]
+
 ## 1.84.0
 -   [*] Upgrade compile and target sdk version to Android API 31 [#44610]
 
