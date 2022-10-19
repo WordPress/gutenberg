@@ -15,26 +15,22 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editPostStore } from '../../store';
 
 export default function DevicePreview() {
-	const {
-		hasActiveMetaboxes,
-		isPostSaveable,
-		isSaving,
-		isViewable,
-		deviceType,
-	} = useSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( editorStore );
-		const { getPostType } = select( coreStore );
-		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+	const { hasActiveMetaboxes, isPostSaveable, isViewable, deviceType } =
+		useSelect( ( select ) => {
+			const { getEditedPostAttribute } = select( editorStore );
+			const { getPostType } = select( coreStore );
+			const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
-		return {
-			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			isSaving: select( editPostStore ).isSavingMetaBoxes(),
-			isPostSaveable: select( editorStore ).isEditedPostSaveable(),
-			isViewable: postType?.viewable ?? false,
-			deviceType:
-				select( editPostStore ).__experimentalGetPreviewDeviceType(),
-		};
-	}, [] );
+			return {
+				hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+				isPostSaveable: select( editorStore ).isEditedPostSaveable(),
+				isViewable: postType?.viewable ?? false,
+				deviceType:
+					select(
+						editPostStore
+					).__experimentalGetPreviewDeviceType(),
+			};
+		}, [] );
 	const { __experimentalSetPreviewDeviceType: setPreviewDeviceType } =
 		useDispatch( editPostStore );
 
@@ -54,7 +50,6 @@ export default function DevicePreview() {
 								className="edit-post-header-preview__button-external"
 								role="menuitem"
 								forceIsAutosaveable={ hasActiveMetaboxes }
-								forcePreviewLink={ isSaving ? null : undefined }
 								textContent={
 									<>
 										{ __( 'Preview in new tab' ) }

@@ -12,7 +12,6 @@ import { store as editPostStore } from '../../store';
 
 export function PostPublishButtonOrToggle( {
 	forceIsDirty,
-	forceIsSaving,
 	hasPublishAction,
 	isBeingScheduled,
 	isPending,
@@ -67,7 +66,6 @@ export function PostPublishButtonOrToggle( {
 	return (
 		<PostPublishButton
 			forceIsDirty={ forceIsDirty }
-			forceIsSaving={ forceIsSaving }
 			isOpen={ isPublishSidebarOpened }
 			isToggle={ component === IS_TOGGLE }
 			onToggle={ togglePublishSidebar }

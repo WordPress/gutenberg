@@ -302,7 +302,7 @@ export const autosave =
 	};
 
 export const __unstableSaveForPreview =
-	( { forceIsAutosaveable, forcePreviewLink } ) =>
+	( { forceIsAutosaveable } ) =>
 	async ( { select, dispatch } ) => {
 		if (
 			( forceIsAutosaveable || select.isEditedPostAutosaveable() ) &&
@@ -318,7 +318,7 @@ export const __unstableSaveForPreview =
 			}
 		}
 
-		return forcePreviewLink ?? select.getEditedPostPreviewLink();
+		return select.getEditedPostPreviewLink();
 	};
 
 /**

@@ -103,33 +103,26 @@ function PostPreviewButton( {
 	className,
 	textContent,
 	forceIsAutosaveable,
-	forcePreviewLink,
 	role,
 	onPreview,
 } ) {
 	const { postId, currentPostLink, previewLink, isSaveable, isViewable } =
-		useSelect(
-			( select ) => {
-				const editor = select( editorStore );
-				const core = select( coreStore );
+		useSelect( ( select ) => {
+			const editor = select( editorStore );
+			const core = select( coreStore );
 
-				const postType = core.getPostType(
-					editor.getEditedPostAttribute( 'type' )
-				);
+			const postType = core.getPostType(
+				editor.getEditedPostAttribute( 'type' )
+			);
 
-				return {
-					postId: editor.getCurrentPostId(),
-					currentPostLink: editor.getCurrentPostAttribute( 'link' ),
-					previewLink:
-						forcePreviewLink !== undefined
-							? forcePreviewLink
-							: editor.getEditedPostPreviewLink(),
-					isSaveable: editor.isEditedPostSaveable(),
-					isViewable: postType?.viewable ?? false,
-				};
-			},
-			[ forcePreviewLink ]
-		);
+			return {
+				postId: editor.getCurrentPostId(),
+				currentPostLink: editor.getCurrentPostAttribute( 'link' ),
+				previewLink: editor.getEditedPostPreviewLink(),
+				isSaveable: editor.isEditedPostSaveable(),
+				isViewable: postType?.viewable ?? false,
+			};
+		}, [] );
 
 	const { __unstableSaveForPreview } = useDispatch( editorStore );
 
@@ -157,10 +150,7 @@ function PostPreviewButton( {
 
 		writeInterstitialMessage( previewWindow.document );
 
-		const link = await __unstableSaveForPreview( {
-			forcePreviewLink,
-			forceIsAutosaveable,
-		} );
+		const link = await __unstableSaveForPreview( { forceIsAutosaveable } );
 
 		previewWindow.location = link;
 

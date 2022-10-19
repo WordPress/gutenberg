@@ -35,7 +35,6 @@ const MyPreviewOptions = () => (
 						className="edit-post-header-preview__button-external"
 						role="menuitem"
 						forceIsAutosaveable={ hasActiveMetaboxes }
-						forcePreviewLink={ isSaving ? null : undefined }
 						textContent={
 							<>
 								{ __( 'Preview in new tab' ) }
