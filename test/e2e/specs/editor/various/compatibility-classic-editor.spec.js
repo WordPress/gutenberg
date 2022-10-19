@@ -16,12 +16,8 @@ test.describe( 'Compatibility with classic editor', () => {
 		page,
 		editor,
 	} ) => {
-		// Insert Html
-		await page.click( 'role=button[name="Add default block"i]' );
-		await page.keyboard.type( '/html' );
-		await expect(
-			page.locator( 'role=option[name="Custom HTML"i][selected]' )
-		).toBeVisible();
+		await editor.insertBlock( { name: 'core/html' } );
+		await page.focus( 'role=textbox[name="HTML"i]' );
 
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '<a>' );
