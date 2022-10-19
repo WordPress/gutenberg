@@ -34,7 +34,7 @@ async function cloneAt( repositoryUrl, ref, sha ) {
 	await SimpleGit( gitWorkingDirectoryPath )
 		.raw( 'init' )
 		.raw( 'remote', 'add', 'origin', repositoryUrl )
-		.raw( 'fetch', '--depth=1', 'origin', ref )
+		.raw( 'fetch', '--depth=2', 'origin', ref )
 		.raw( 'checkout', sha );
 	return gitWorkingDirectoryPath;
 }
