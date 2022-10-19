@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { act, fireEvent, render } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -55,7 +55,7 @@ describe( 'Sandbox', () => {
 		);
 
 		act( () => {
-			fireEvent.click( result.getByRole( 'button' ) );
+			fireEvent.click( screen.getByRole( 'button' ) );
 		} );
 
 		sandboxedIframe =
