@@ -14,6 +14,11 @@ import type {
 } from '../types';
 import { BACKDROP_BG_COLOR } from '../toggle-group-control/styles';
 
+const BUTTON_SIZES = {
+	default: '30px',
+	'__unstable-large': '34px',
+};
+
 export const LabelView = styled.div`
 	display: inline-flex;
 	max-width: 100%;
@@ -31,9 +36,10 @@ export const buttonView = ( {
 	isMultiple,
 	isPressed,
 	size,
-}: Pick< ToggleGroupControlProps, 'isDeselectable' | 'size' > &
+}: Pick< ToggleGroupControlProps, 'isDeselectable' > &
 	Pick< ToggleGroupControlOptionBaseProps, 'isIcon' | 'isMultiple' > & {
 		isPressed?: boolean;
+		size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
 	} ) => css`
 	align-items: center;
 	appearance: none;
@@ -45,7 +51,6 @@ export const buttonView = ( {
 	cursor: pointer;
 	display: flex;
 	font-family: inherit;
-	height: 100%;
 	justify-content: center;
 	line-height: 100%;
 	outline: none;
@@ -67,6 +72,7 @@ export const buttonView = ( {
 		background: ${ CONFIG.toggleGroupControlBackgroundColor };
 	}
 
+	${ buttonHeight( { size } ) }
 	${ isDeselectable && deselectable }
 	${ isIcon && isIconStyles( { size } ) }
 	${ isMultiple && isPressed && staticBackground }
@@ -95,6 +101,16 @@ const deselectable = css`
 	}
 `;
 
+const buttonHeight = ( {
+	size,
+}: {
+	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
+} ) => {
+	return css`
+		height: ${ BUTTON_SIZES[ size ] };
+	`;
+};
+
 export const ButtonContentView = styled.div`
 	display: flex;
 	font-size: ${ CONFIG.fontSize };
@@ -102,17 +118,13 @@ export const ButtonContentView = styled.div`
 `;
 
 const isIconStyles = ( {
-	size = 'default',
-}: Pick< ToggleGroupControlProps, 'size' > ) => {
-	const iconButtonSizes = {
-		default: '30px',
-		'__unstable-large': '34px',
-	};
-
+	size,
+}: {
+	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
+} ) => {
 	return css`
 		color: ${ COLORS.gray[ 900 ] };
-		width: ${ iconButtonSizes[ size ] };
-		height: ${ iconButtonSizes[ size ] };
+		width: ${ BUTTON_SIZES[ size ] };
 		padding-left: 0;
 		padding-right: 0;
 	`;
