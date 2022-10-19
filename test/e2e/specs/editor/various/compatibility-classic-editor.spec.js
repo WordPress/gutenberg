@@ -12,30 +12,25 @@ test.describe( 'Compatibility with classic editor', () => {
 		await requestUtils.deleteAllPosts();
 	} );
 
-	test( 'Should not apply autop when rendering blocks', async ( {
+	test( 'Should not apply auto when rendering blocks', async ( {
 		page,
 		editor,
 	} ) => {
 		await editor.insertBlock( { name: 'core/html' } );
 		await page.focus( 'role=textbox[name="HTML"i]' );
-
-		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '<a>' );
-		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Random Link' );
-		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '</a> ' );
 		// Publish Post
 		await editor.publishPost();
-
 		// View Post
-		await page.click( 'role=link[name="View post"i]' );
+		await page.locator( 'role=link[name="View post"i]' ).first().click();
 
 		// Check the content doesn't contain <p> tags.
 		// No accessible selector for now.
 		const content = page.locator( '.entry-content' );
-		await expect.poll( () => content.innerHTML() ).toBe(`<a>
-Random Link
-</a>`);
+		await expect
+			.poll( () => content.innerHTML() )
+			.toContain( `<a>Random Link</a>` );
 	} );
 } );
