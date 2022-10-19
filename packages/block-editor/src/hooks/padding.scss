@@ -1,17 +1,16 @@
-.block-editor__padding-visualizer {
+.block-editor__padding-visualizer,
+.block-editor__margin-visualizer {
 	z-index: -1;
 	position: absolute;
 	top: 0;
 	bottom: 0;
 	left: 0;
 	right: 0;
-	opacity: 0.5;
 	border-color: transparent;
 	border-style: solid;
 	pointer-events: none;
 	box-sizing: border-box;
-	background-size: 11px 11px;
-	background-image: linear-gradient(135deg, rgba(var(--wp-admin-theme-color--rgb), 0.8) 9.09%, transparent 9.09%, transparent 50%, rgba(var(--wp-admin-theme-color--rgb), 0.8) 50%, rgba(var(--wp-admin-theme-color--rgb), 0.8) 59.09%, transparent 59.09%, transparent 100%);
+	background-size: 7px 7px;
 	background-position: left top;
 	background-origin: border-box;
 	background-clip: border-box, content-box;
@@ -20,8 +19,8 @@
 	mask-composite: exclude;
 }
 
-.block-editor__padding-visualizer-label-top,
-.block-editor__padding-visualizer-label-bottom {
+.block-editor__margin-visualizer-label-top,
+.block-editor__margin-visualizer-label-bottom {
 	background-color: rgba(var(--wp-admin-theme-color--rgb), 1);
 	color: #fff;
 	padding: 3px 10px;
@@ -29,4 +28,5 @@
 	font-size: 13px;
 	position: absolute;
 	margin: 8px;
+	border: 1px solid #fff;
 }
