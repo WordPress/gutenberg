@@ -81,12 +81,12 @@ const SiteLogo = ( {
 	} );
 	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const siteEntities = select( coreStore ).getEditedEntityRecord(
+		const siteEntities = select( coreStore ).getEntityRecord(
 			'root',
-			'site'
+			'__unstableBase'
 		);
 		return {
-			title: siteEntities.title,
+			title: siteEntities?.name,
 			...pick( getSettings(), [ 'imageEditing', 'maxWidth' ] ),
 		};
 	}, [] );
