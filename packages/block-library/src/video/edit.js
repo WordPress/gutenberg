@@ -29,7 +29,7 @@ import {
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useRef, useEffect, useState, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId, usePrevious } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -79,7 +79,6 @@ function VideoEdit( {
 	const { id, caption, controls, poster, src, tracks } = attributes;
 	const prevCaption = usePrevious( caption );
 	const [ showCaption, setShowCaption ] = useState( !! caption );
-	const captionRef = useRef();
 	const isTemporaryVideo = ! id && isBlobURL( src );
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
@@ -116,11 +115,14 @@ function VideoEdit( {
 	}, [ caption, prevCaption ] );
 
 	// Focus the caption when we click to add one.
-	useEffect( () => {
-		if ( showCaption && ! caption ) {
-			captionRef.current?.focus();
-		}
-	}, [ caption, showCaption ] );
+	const captionRef = useCallback(
+		( node ) => {
+			if ( node && ! caption ) {
+				node.focus();
+			}
+		},
+		[ caption ]
+	);
 
 	useEffect( () => {
 		if ( ! isSelected && ! caption ) {
