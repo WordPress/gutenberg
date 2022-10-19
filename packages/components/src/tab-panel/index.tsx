@@ -85,7 +85,7 @@ export function TabPanel( {
 	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
 	const [ selected, setSelected ] = useState< string >();
 
-	const handleClick = ( tabKey: string ) => {
+	const handleTabSelection = ( tabKey: string ) => {
 		setSelected( tabKey );
 		onSelect?.( tabKey );
 	};
@@ -98,11 +98,8 @@ export function TabPanel( {
 
 	useEffect( () => {
 		const newSelectedTab = find( tabs, { name: selected } );
-		if ( ! newSelectedTab ) {
-			setSelected(
-				initialTabName ||
-					( tabs.length > 0 ? tabs[ 0 ].name : undefined )
-			);
+		if ( ! newSelectedTab && tabs.length > 0 ) {
+			handleTabSelection( initialTabName || tabs[ 0 ].name );
 		}
 	}, [ tabs ] );
 
@@ -127,7 +124,7 @@ export function TabPanel( {
 						aria-controls={ `${ instanceId }-${ tab.name }-view` }
 						selected={ tab.name === selected }
 						key={ tab.name }
-						onClick={ () => handleClick( tab.name ) }
+						onClick={ () => handleTabSelection( tab.name ) }
 					>
 						{ tab.title }
 					</TabButton>

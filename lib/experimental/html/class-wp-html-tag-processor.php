@@ -1267,13 +1267,24 @@ class WP_HTML_Tag_Processor {
 
 	/**
 	 * Returns the string representation of the HTML Tag Processor.
-	 * It closes the HTML Tag Processor and prevents further lookups and modifications.
+	 *
+	 * @since 6.2.0
+	 * @see get_updated_html
+	 *
+	 * @return string The processed HTML.
+	 */
+	public function __toString() {
+		return $this->get_updated_html();
+	}
+
+	/**
+	 * Returns the string representation of the HTML Tag Processor.
 	 *
 	 * @since 6.2.0
 	 *
 	 * @return string The processed HTML.
 	 */
-	public function __toString() {
+	public function get_updated_html() {
 		// Short-circuit if there are no updates to apply.
 		if ( ! count( $this->classname_updates ) && ! count( $this->attribute_updates ) ) {
 			return $this->updated_html . substr( $this->html, $this->updated_bytes );

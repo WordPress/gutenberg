@@ -576,7 +576,7 @@
 						"items": {
 							"enum": [ "inserter", "block", "transform" ]
 						},
-						"default": [ "inseter", "block" ]
+						"default": [ "inserter", "block" ]
 					},
 					"keywords": {
 						"type": "array",

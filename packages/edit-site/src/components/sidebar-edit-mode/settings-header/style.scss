@@ -1,4 +1,4 @@
-.components-panel__header.edit-site-sidebar__panel-tabs {
+.components-panel__header.edit-site-sidebar-edit-mode__panel-tabs {
 	justify-content: flex-start;
 	padding-left: 0;
 	padding-right: $grid-unit-20;
@@ -25,7 +25,7 @@
 	}
 }
 
-.components-button.edit-site-sidebar__panel-tab {
+.components-button.edit-site-sidebar-edit-mode__panel-tab {
 	border-radius: 0;
 	height: $grid-unit-60;
 	background: transparent;

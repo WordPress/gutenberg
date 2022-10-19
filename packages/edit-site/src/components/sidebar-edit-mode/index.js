@@ -81,7 +81,7 @@ export function SidebarComplementaryAreaFills() {
 				icon={ cog }
 				closeLabel={ __( 'Close settings sidebar' ) }
 				header={ <SettingsHeader sidebarName={ sidebarName } /> }
-				headerClassName="edit-site-sidebar__panel-tabs"
+				headerClassName="edit-site-sidebar-edit-mode__panel-tabs"
 			>
 				{ sidebarName === SIDEBAR_TEMPLATE && (
 					<PanelBody>
