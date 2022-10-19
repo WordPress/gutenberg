@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { debounce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -18,6 +13,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
+import { debounce } from '@wordpress/compose';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 
 /**
@@ -26,13 +22,14 @@ import { useEffect, useState, useCallback } from '@wordpress/element';
 import OrderControl from './order-control';
 import AuthorControl from './author-control';
 import ParentControl from './parent-control';
-import { TaxonomyControls, useTaxonomiesInfo } from './taxonomy-controls';
+import { TaxonomyControls } from './taxonomy-controls';
 import StickyControl from './sticky-control';
 import {
 	usePostTypes,
 	useIsPostTypeHierarchical,
 	useAllowedControls,
 	isControlAllowed,
+	useTaxonomies,
 } from '../../utils';
 
 export default function QueryInspectorControls( {
@@ -54,7 +51,7 @@ export default function QueryInspectorControls( {
 	const allowedControls = useAllowedControls( attributes );
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
 	const { postTypesTaxonomiesMap, postTypesSelectOptions } = usePostTypes();
-	const taxonomiesInfo = useTaxonomiesInfo( postType );
+	const taxonomies = useTaxonomies( postType );
 	const isPostTypeHierarchical = useIsPostTypeHierarchical( postType );
 	useEffect( () => {
 		setShowSticky( postType === 'post' );
@@ -137,7 +134,7 @@ export default function QueryInspectorControls( {
 								label={ __( 'Post type' ) }
 								onChange={ onPostTypeChange }
 								help={ __(
-									'WordPress contains different types of content and they are divided into collections called "Post types". By default there are a few different ones such as blog posts and pages, but plugins could add more.'
+									'WordPress contains different types of content and they are divided into collections called “Post types”. By default there are a few different ones such as blog posts and pages, but plugins could add more.'
 								) }
 							/>
 						) }
@@ -196,7 +193,7 @@ export default function QueryInspectorControls( {
 							setQuerySearch( '' );
 						} }
 					>
-						{ !! taxonomiesInfo?.length &&
+						{ !! taxonomies?.length &&
 							isControlAllowed( allowedControls, 'taxQuery' ) && (
 								<ToolsPanelItem
 									label={ __( 'Taxonomies' ) }
@@ -241,10 +238,7 @@ export default function QueryInspectorControls( {
 							</ToolsPanelItem>
 						) }
 						{ isPostTypeHierarchical &&
-							! isControlAllowed(
-								allowedControls,
-								'parents'
-							) && (
+							isControlAllowed( allowedControls, 'parents' ) && (
 								<ToolsPanelItem
 									hasValue={ () => !! parents?.length }
 									label={ __( 'Parents' ) }

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { pick } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -119,7 +114,11 @@ export const installBlockType =
 						return;
 					}
 					unstable__bootstrapServerSideBlockDefinitions( {
-						[ name ]: pick( response, metadataFields ),
+						[ name ]: Object.fromEntries(
+							Object.entries( response ).filter( ( [ key ] ) =>
+								metadataFields.includes( key )
+							)
+						),
 					} );
 				} );
 

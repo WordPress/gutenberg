@@ -64,7 +64,7 @@ describe( 'useQuerySelect', () => {
 		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 
 		// ensure expected state was rendered
-		expect( testInstance.findByText( 'bar' ) ).toBeTruthy();
+		expect( testInstance.getByText( 'bar' ) ).toBeInTheDocument();
 	} );
 
 	it( 'uses memoized selectors', () => {

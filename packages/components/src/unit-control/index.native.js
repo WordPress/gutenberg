@@ -47,6 +47,10 @@ function UnitControl( {
 		if ( pickerRef?.current ) {
 			pickerRef.current.presentPicker();
 		}
+		// Disable reason: this should be fixed by the native team.
+		// It would be great if this could be done in the context of
+		// https://github.com/WordPress/gutenberg/pull/39218
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ pickerRef?.current ] );
 
 	const currentInputValue = currentInput === null ? value : currentInput;
@@ -102,6 +106,10 @@ function UnitControl( {
 			anchorNodeRef?.current
 				? findNodeHandle( anchorNodeRef?.current )
 				: undefined,
+		// Disable reason: this should be fixed by the native team.
+		// It would be great if this could be done in the context of
+		// https://github.com/WordPress/gutenberg/pull/39218
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ anchorNodeRef?.current ]
 	);
 

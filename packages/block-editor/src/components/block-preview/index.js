@@ -32,11 +32,10 @@ export function BlockPreview( {
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
 	);
-	const settings = useMemo( () => {
-		const _settings = { ...originalSettings };
-		_settings.__experimentalBlockPatterns = [];
-		return _settings;
-	}, [ originalSettings ] );
+	const settings = useMemo(
+		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		[ originalSettings ]
+	);
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 	if ( ! blocks || blocks.length === 0 ) {
 		return null;
@@ -94,12 +93,12 @@ export function useBlockPreview( {
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
 	);
-	const disabledRef = useDisabled();
-	const ref = useMergeRefs( [ props.ref, disabledRef ] );
 	const settings = useMemo(
-		() => ( { ...originalSettings, __experimentalBlockPatterns: [] } ),
+		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
 		[ originalSettings ]
 	);
+	const disabledRef = useDisabled();
+	const ref = useMergeRefs( [ props.ref, disabledRef ] );
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 
 	const children = (

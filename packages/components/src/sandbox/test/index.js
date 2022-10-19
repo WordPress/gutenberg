@@ -49,7 +49,8 @@ describe( 'Sandbox', () => {
 		let sandboxedIframe =
 			iframe.contentWindow.document.body.querySelector( '.mock-iframe' );
 
-		expect( sandboxedIframe.getAttribute( 'src' ) ).toBe(
+		expect( sandboxedIframe ).toHaveAttribute(
+			'src',
 			'https://super.embed'
 		);
 
@@ -60,7 +61,8 @@ describe( 'Sandbox', () => {
 		sandboxedIframe =
 			iframe.contentWindow.document.body.querySelector( '.mock-iframe' );
 
-		expect( sandboxedIframe.getAttribute( 'src' ) ).toBe(
+		expect( sandboxedIframe ).toHaveAttribute(
+			'src',
 			'https://another.super.embed'
 		);
 	} );

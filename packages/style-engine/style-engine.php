@@ -26,7 +26,7 @@
  *     Optional. An array of options. Default empty array.
  *
  *     @type string|null $context                    An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is `null`.
- *                                                   When set, the style engine will attempt to store the CSS rules, where a selector is also passed.
+ *                                                   When set, the Style Engine will attempt to store the CSS rules, where a selector is also passed.
  *     @type bool        $convert_vars_to_classnames Whether to skip converting incoming CSS var patterns, e.g., `var:preset|<PRESET_TYPE>|<PRESET_SLUG>`, to var( --wp--preset--* ) values. Default `false`.
  *     @type string      $selector                   Optional. When a selector is passed, the value of `$css` in the return value will comprise a full CSS rule `$selector { ...$css_declarations }`,
  *                                                   otherwise, the value will be a concatenated string of CSS declarations.
@@ -91,9 +91,9 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
  *     Optional. An array of options. Default empty array.
  *
  *     @type string|null $context  An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.
- *                                 When set, the style engine will attempt to store the CSS rules.
+ *                                 When set, the Style Engine will attempt to store the CSS rules.
  *     @type bool        $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
- *     @type bool        $prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
+ *     @type bool        $prettify Whether to add new lines and indents to output. Default is to inherit the value of the global constant `SCRIPT_DEBUG`, if it is defined.
  * }
  *
  * @return string A string of compiled CSS declarations, or empty string.
@@ -140,7 +140,7 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
  *     Optional. An array of options. Default empty array.
  *
  *     @type bool $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
- *     @type bool $prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
+ *     @type bool $prettify Whether to add new lines and indents to output. Default is to inherit the value of the global constant `SCRIPT_DEBUG`, if it is defined.
  * }
  *
  * @return string A compiled CSS string.
