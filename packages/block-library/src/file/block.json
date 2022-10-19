@@ -56,7 +56,18 @@
 	},
 	"supports": {
 		"anchor": true,
-		"align": true
+		"align": true,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"__experimentalStyle": {
+			"spacing": {
+				"margin": {
+					"bottom": "1.5em"
+				}
+			}
+		}
 	},
 	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-file-editor",
