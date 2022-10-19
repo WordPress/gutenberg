@@ -112,7 +112,7 @@ function getSelectOptions(
 	];
 	return options.map( ( { slug, name, size } ) => ( {
 		key: slug,
-		name,
+		name: name || slug,
 		size,
 		__experimentalHint:
 			size && isSimpleCssValue( size ) && parseFloat( String( size ) ),

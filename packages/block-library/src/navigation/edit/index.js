@@ -86,6 +86,7 @@ function Navigation( {
 		openSubmenusOnClick,
 		overlayMenu,
 		showSubmenuIcon,
+		templateLock,
 		layout: {
 			justifyContent,
 			orientation = 'horizontal',
@@ -107,7 +108,7 @@ function Navigation( {
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
-	useNavigationEntities();
+	const { menus: classicMenus } = useNavigationEntities();
 
 	const [ showNavigationMenuStatusNotice, hideNavigationMenuStatusNotice ] =
 		useNavigationNotice( {
@@ -216,6 +217,20 @@ function Navigation( {
 	const navMenuResolvedButMissing =
 		hasResolvedNavigationMenus && isNavigationMenuMissing;
 
+	const {
+		convert: convertClassicMenu,
+		status: classicMenuConversionStatus,
+		error: classicMenuConversionError,
+	} = useConvertClassicToBlockMenu( clientId );
+
+	const isConvertingClassicMenu =
+		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
+
+	// Only autofallback to published menus.
+	const fallbackNavigationMenus = navigationMenus?.filter(
+		( menu ) => menu.status === 'publish'
+	);
+
 	// Attempt to retrieve and prioritize any existing navigation menu unless:
 	// - the are uncontrolled inner blocks already present in the block.
 	// - the user is creating a new menu.
@@ -228,22 +243,16 @@ function Navigation( {
 			hasUncontrolledInnerBlocks ||
 			isCreatingNavigationMenu ||
 			ref ||
-			! navigationMenus?.length
+			! fallbackNavigationMenus?.length
 		) {
 			return;
 		}
 
-		navigationMenus.sort( ( menuA, menuB ) => {
+		fallbackNavigationMenus.sort( ( menuA, menuB ) => {
 			const menuADate = new Date( menuA.date );
 			const menuBDate = new Date( menuB.date );
 			return menuADate.getTime() < menuBDate.getTime();
 		} );
-
-		// Only autofallback to published menus.
-		const fallbackNavigationMenus = navigationMenus.filter(
-			( menu ) => menu.status === 'publish'
-		);
-		if ( fallbackNavigationMenus.length === 0 ) return;
 
 		/**
 		 *  This fallback displays (both in editor and on front)
@@ -256,16 +265,26 @@ function Navigation( {
 		setRef( fallbackNavigationMenus[ 0 ].id );
 	}, [ navigationMenus ] );
 
+	useEffect( () => {
+		if (
+			! hasResolvedNavigationMenus ||
+			isConvertingClassicMenu ||
+			fallbackNavigationMenus?.length > 0 ||
+			classicMenus?.length !== 1
+		) {
+			return false;
+		}
+
+		// If there's non fallback navigation menus and
+		// only one classic menu then create a new navigation menu based on it.
+		convertClassicMenu(
+			classicMenus[ 0 ].id,
+			classicMenus[ 0 ].name,
+			'publish'
+		);
+	}, [ hasResolvedNavigationMenus ] );
+
 	const navRef = useRef();
-
-	const {
-		convert: convertClassicMenu,
-		status: classicMenuConversionStatus,
-		error: classicMenuConversionError,
-	} = useConvertClassicToBlockMenu( clientId );
-
-	const isConvertingClassicMenu =
-		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
 
 	// The standard HTML5 tag for the block wrapper.
 	const TagName = 'nav';
@@ -280,10 +299,11 @@ function Navigation( {
 		! isCreatingNavigationMenu &&
 		! isConvertingClassicMenu &&
 		hasResolvedNavigationMenus &&
+		classicMenus?.length === 0 &&
 		! hasUncontrolledInnerBlocks;
 
 	useEffect( () => {
-		if ( isPlaceholder && ! ref ) {
+		if ( isPlaceholder ) {
 			/**
 			 *  this fallback only displays (both in editor and on front)
 			 *  the list of pages block if no menu is available as a fallback.
@@ -476,7 +496,7 @@ function Navigation( {
 			);
 		} catch {
 			showMenuAutoPublishDraftNotice(
-				__( 'Error ocurred while publishing the navigation menu.' )
+				__( 'Error occurred while publishing the navigation menu.' )
 			);
 		}
 	}, [ isDraftNavigationMenu, navigationMenu ] );
@@ -642,7 +662,8 @@ function Navigation( {
 							onSelectClassicMenu={ async ( classicMenu ) => {
 								const navMenu = await convertClassicMenu(
 									classicMenu.id,
-									classicMenu.name
+									classicMenu.name,
+									'draft'
 								);
 								if ( navMenu ) {
 									handleUpdateMenu( navMenu.id, {
@@ -686,6 +707,7 @@ function Navigation( {
 					<UnsavedInnerBlocks
 						blocks={ uncontrolledInnerBlocks }
 						clientId={ clientId }
+						templateLock={ templateLock }
 						navigationMenus={ navigationMenus }
 						hasSelection={ isSelected || isInnerBlockSelected }
 						hasSavedUnsavedInnerBlocks={
@@ -723,7 +745,8 @@ function Navigation( {
 							onSelectClassicMenu={ async ( classicMenu ) => {
 								const navMenu = await convertClassicMenu(
 									classicMenu.id,
-									classicMenu.name
+									classicMenu.name,
+									'draft'
 								);
 								if ( navMenu ) {
 									handleUpdateMenu( navMenu.id, {
@@ -808,7 +831,8 @@ function Navigation( {
 					onSelectClassicMenu={ async ( classicMenu ) => {
 						const navMenu = await convertClassicMenu(
 							classicMenu.id,
-							classicMenu.name
+							classicMenu.name,
+							'draft'
 						);
 						if ( navMenu ) {
 							handleUpdateMenu( navMenu.id, {
@@ -836,7 +860,8 @@ function Navigation( {
 							onSelectClassicMenu={ async ( classicMenu ) => {
 								const navMenu = await convertClassicMenu(
 									classicMenu.id,
-									classicMenu.name
+									classicMenu.name,
+									'draft'
 								);
 								if ( navMenu ) {
 									handleUpdateMenu( navMenu.id, {
@@ -921,6 +946,7 @@ function Navigation( {
 									hasCustomPlaceholder={
 										!! CustomPlaceholder
 									}
+									templateLock={ templateLock }
 									orientation={ orientation }
 								/>
 							) }

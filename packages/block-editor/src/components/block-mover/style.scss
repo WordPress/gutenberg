@@ -6,7 +6,6 @@
 	@include break-small() {
 		.block-editor-block-mover:not(.is-horizontal) & {
 			flex-direction: column;
-			width: $block-toolbar-height - $grid-unit-15;
 
 			> * {
 				height: $block-toolbar-height * 0.5;

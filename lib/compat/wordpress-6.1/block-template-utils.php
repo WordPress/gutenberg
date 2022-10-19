@@ -249,16 +249,16 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 }
 
 /**
- * Builds the title and description of a post specific template based on the underlying referenced post.
+ * Builds the title and description of a post-specific template based on the underlying referenced post.
  * Mutates the underlying template object.
  *
+ * @since 6.1.0
  * @access private
  * @internal
  *
  * @param string            $post_type Post type e.g.: page, post, product.
  * @param string            $slug      Slug of the post e.g.: a-story-about-shoes.
  * @param WP_Block_Template $template  Template to mutate adding the description and title computed.
- *
  * @return boolean Returns true if the referenced post was found and false otherwise.
  */
 function _gutenberg_build_title_and_description_for_single_post_type_block_template( $post_type, $slug, WP_Block_Template $template ) {
@@ -290,7 +290,7 @@ function _gutenberg_build_title_and_description_for_single_post_type_block_templ
 	);
 	$template->description = sprintf(
 		// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Page: Hello".
-		__( 'Template for %1$s', 'gutenberg' ),
+		__( 'Template for %s', 'gutenberg' ),
 		$post_title
 	);
 
@@ -313,7 +313,7 @@ function _gutenberg_build_title_and_description_for_single_post_type_block_templ
 }
 
 /**
- * Builds the title and description of a taxonomy specific template based on the underlying entity referenced.
+ * Builds the title and description of a taxonomy-specific template based on the underlying entity referenced.
  * Mutates the underlying template object.
  *
  * @access private
@@ -323,7 +323,7 @@ function _gutenberg_build_title_and_description_for_single_post_type_block_templ
  * @param string            $slug     Slug of the term, e.g.: shoes.
  * @param WP_Block_Template $template Template to mutate adding the description and title computed.
  *
- * @return boolean True if an term referenced was found and false otherwise.
+ * @return boolean True if the term referenced was found and false otherwise.
  */
 function _gutenberg_build_title_and_description_for_taxonomy_block_template( $taxonomy, $slug, WP_Block_Template $template ) {
 	$taxonomy_object = get_taxonomy( $taxonomy );
@@ -484,7 +484,7 @@ function gutenberg_build_block_template_result_from_post( $post ) {
 						);
 						if ( count( $users_with_same_name ) > 1 ) {
 							$template->title = sprintf(
-								// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the template title of an author template and %2$s is the nicename of the author, e.g. "Author: Jorge (jorge-costa)".
+								// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the template title of an author template and %2$s is the nicename of the author, e.g. "Author: Jane Doe (jane-doe)".
 								__( '%1$s (%2$s)', 'gutenberg' ),
 								$template->title,
 								$nice_name

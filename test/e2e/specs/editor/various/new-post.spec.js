@@ -30,9 +30,9 @@ test.describe( 'new editor state', () => {
 		await expect( title ).toBeEditable();
 		await expect( title ).toHaveText( '' );
 
-		// Should display the View button.
+		// Should display the Preview button.
 		await expect(
-			page.locator( 'role=button[name="View"i]' )
+			page.locator( 'role=button[name="Preview"i]' )
 		).toBeVisible();
 
 		// Should display the Post Formats UI.

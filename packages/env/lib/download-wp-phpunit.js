@@ -122,7 +122,7 @@ async function downloadTestSuite(
 	// Alpha, Beta, and RC versions are bleeding edge and should pull from trunk.
 	let ref;
 	const fetchRaw = [];
-	if ( ! wpVersion || wpVersion.match( /-(?:alpha|beta|rc)/ ) ) {
+	if ( ! wpVersion || wpVersion.match( /-(?:alpha|beta|rc)/i ) ) {
 		ref = 'trunk';
 		fetchRaw.push( 'fetch', 'origin', ref, '--depth', '1' );
 	} else {
