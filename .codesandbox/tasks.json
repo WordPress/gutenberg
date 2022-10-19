@@ -1,0 +1,18 @@
+{
+	"setupTasks": [ "npm install", "npm run dev" ],
+	"tasks": {
+		"install-dependencies": {
+			"name": "Install Dependencies",
+			"command": "npm install"
+		},
+		"start-app": {
+			"name": "Run Dev Server",
+			"command": "npm run wp-env start",
+			"runAtStart": true,
+			"preview": {
+				"port": 8888,
+				"prLink": "direct"
+			}
+		}
+	}
+}
