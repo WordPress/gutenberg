@@ -399,4 +399,11 @@ describe( 'omitStyle', () => {
 			omitStyle( style3, [ [ 'border', 'radius', 'bottomLeft' ] ] )
 		).toEqual( style3 );
 	} );
+
+	it( 'should ignore an empty array path', () => {
+		const style = { typography: {}, '': 'test' };
+
+		expect( omitStyle( style, [] ) ).toEqual( style );
+		expect( omitStyle( style, [ [] ] ) ).toEqual( style );
+	} );
 } );

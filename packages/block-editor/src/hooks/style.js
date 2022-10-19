@@ -245,8 +245,8 @@ export function omitStyle( style, paths, preserveReference = false ) {
 		if ( path.length > 1 ) {
 			const [ firstSubpath, ...restPath ] = path;
 			omitStyle( newStyle[ firstSubpath ], [ restPath ], true );
-		} else {
-			delete newStyle[ path ];
+		} else if ( path.length === 1 ) {
+			delete newStyle[ path[ 0 ] ];
 		}
 	} );
 
