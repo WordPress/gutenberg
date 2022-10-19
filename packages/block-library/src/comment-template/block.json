@@ -9,12 +9,12 @@
 	"textdomain": "default",
 	"usesContext": [ "postId" ],
 	"supports": {
-		"reusable": false,
-		"html": false,
 		"align": true,
+		"html": false,
+		"reusable": false,
 		"spacing": {
-			"padding": true,
-			"margin": true
+			"margin": true,
+			"padding": true
 		},
 		"typography": {
 			"fontSize": true,
