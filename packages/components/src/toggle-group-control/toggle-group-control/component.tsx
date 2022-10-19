@@ -21,7 +21,7 @@ import BaseControl from '../../base-control';
 import type { ToggleGroupControlProps } from '../types';
 import { VisualLabelWrapper } from './styles';
 import * as styles from './styles';
-import { ToggleGroupControlAsRadio } from './as-radio-group';
+import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
 import { ToggleGroupControlAsButtonGroup } from './as-button-group';
 
 const noop = () => {};
@@ -79,7 +79,7 @@ function UnconnectedToggleGroupControl(
 					value={ value }
 				/>
 			) : (
-				<ToggleGroupControlAsRadio
+				<ToggleGroupControlAsRadioGroup
 					{ ...otherProps }
 					children={ children }
 					className={ classes }

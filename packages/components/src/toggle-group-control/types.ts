@@ -137,7 +137,7 @@ export type ToggleGroupControlBackdropProps = {
 	state?: any;
 };
 
-export type ToggleGroupControlAsRadioProps = Pick<
+export type ToggleGroupControlAsRadioGroupProps = Pick<
 	ToggleGroupControlProps,
 	'children' | 'isAdaptiveWidth' | 'label' | 'size'
 > & {

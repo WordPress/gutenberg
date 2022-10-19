@@ -24,9 +24,9 @@ import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
 import ToggleGroupControlContext from '../context';
 import { useUpdateEffect } from '../../utils/hooks';
 import type { WordPressComponentProps } from '../../ui/context';
-import type { ToggleGroupControlAsRadioProps } from '../types';
+import type { ToggleGroupControlAsRadioGroupProps } from '../types';
 
-function UnforwardedToggleGroupControlAsRadio(
+function UnforwardedToggleGroupControlAsRadioGroup(
 	{
 		children,
 		isAdaptiveWidth,
@@ -35,14 +35,18 @@ function UnforwardedToggleGroupControlAsRadio(
 		size,
 		value,
 		...otherProps
-	}: WordPressComponentProps< ToggleGroupControlAsRadioProps, 'div', false >,
+	}: WordPressComponentProps<
+		ToggleGroupControlAsRadioGroupProps,
+		'div',
+		false
+	>,
 	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
 	const containerRef = useRef();
 	const [ resizeListener, sizes ] = useResizeObserver();
 	const baseId = useInstanceId(
-		ToggleGroupControlAsRadio,
-		'toggle-group-control-as-radio'
+		ToggleGroupControlAsRadioGroup,
+		'toggle-group-control-as-radio-group'
 	).toString();
 	const radio = useRadioState( {
 		baseId,
@@ -90,6 +94,6 @@ function UnforwardedToggleGroupControlAsRadio(
 	);
 }
 
-export const ToggleGroupControlAsRadio = forwardRef(
-	UnforwardedToggleGroupControlAsRadio
+export const ToggleGroupControlAsRadioGroup = forwardRef(
+	UnforwardedToggleGroupControlAsRadioGroup
 );
