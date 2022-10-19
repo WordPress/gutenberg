@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
-import { Platform } from '@wordpress/element';
+import { Platform, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport } from '@wordpress/blocks';
 
@@ -44,6 +44,13 @@ export const SPACING_SUPPORT_KEY = 'spacing';
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
 export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
 
+function useVisualizerMouseOver() {
+	const [ isMouseOver, setIsMouseOver ] = useState( false );
+	const onMouseOver = () => setIsMouseOver( true );
+	const onMouseOut = () => setIsMouseOver( false );
+	return { isMouseOver, onMouseOver, onMouseOut };
+}
+
 /**
  * Inspector controls for dimensions support.
  *
@@ -58,6 +65,8 @@ export function DimensionsPanel( props ) {
 	const isDisabled = useIsDimensionsDisabled( props );
 	const isSupported = hasDimensionsSupport( props.name );
 	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+	const paddingMouseOver = useVisualizerMouseOver();
+	const marginMouseOver = useVisualizerMouseOver();
 
 	if ( isDisabled || ! isSupported ) {
 		return null;
@@ -96,7 +105,11 @@ export function DimensionsPanel( props ) {
 						isShownByDefault={ defaultSpacingControls?.padding }
 						panelId={ props.clientId }
 					>
-						<PaddingEdit { ...props } />
+						<PaddingEdit
+							onMouseOver={ paddingMouseOver.onMouseOver }
+							onMouseOut={ paddingMouseOver.onMouseOut }
+							{ ...props }
+						/>
 					</ToolsPanelItem>
 				) }
 				{ ! isMarginDisabled && (
@@ -109,7 +122,11 @@ export function DimensionsPanel( props ) {
 						isShownByDefault={ defaultSpacingControls?.margin }
 						panelId={ props.clientId }
 					>
-						<MarginEdit { ...props } />
+						<MarginEdit
+							onMouseOver={ marginMouseOver.onMouseOver }
+							onMouseOut={ marginMouseOver.onMouseOut }
+							{ ...props }
+						/>
 					</ToolsPanelItem>
 				) }
 				{ ! isGapDisabled && (
@@ -126,8 +143,18 @@ export function DimensionsPanel( props ) {
 					</ToolsPanelItem>
 				) }
 			</InspectorControls>
-			{ ! isPaddingDisabled && <PaddingVisualizer { ...props } /> }
-			{ ! isMarginDisabled && <MarginVisualizer { ...props } /> }
+			{ ! isPaddingDisabled && (
+				<PaddingVisualizer
+					forceShow={ paddingMouseOver.isMouseOver }
+					{ ...props }
+				/>
+			) }
+			{ ! isMarginDisabled && (
+				<MarginVisualizer
+					forceShow={ marginMouseOver.isMouseOver }
+					{ ...props }
+				/>
+			) }
 		</>
 	);
 }
