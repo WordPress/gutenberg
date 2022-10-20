@@ -10,6 +10,7 @@ import {
 	loginUser,
 	pressKeyWithModifier,
 	setOption,
+	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
 const saveEntities = async () => {
@@ -66,11 +67,18 @@ describe( 'Site Title block', () => {
 		await createNewPost();
 		await insertBlock( 'Site Title' );
 
-		const editableSiteTitleSelector = '[aria-label="Block: Site Title"] a';
-		await page.waitForSelector( editableSiteTitleSelector );
+		await openDocumentSettingsSidebar();
+
+		const [ disableLink ] = await page.$x(
+			"//label[contains(text(), 'Make title link to home')]"
+		);
+		await disableLink.click();
+
+		const siteTitleSelector = '[aria-label="Block: Site Title"] span';
+		await page.waitForSelector( siteTitleSelector );
 
 		const editable = await page.$eval(
-			editableSiteTitleSelector,
+			siteTitleSelector,
 			( element ) => element.contentEditable
 		);
 		expect( editable ).toBe( 'inherit' );
