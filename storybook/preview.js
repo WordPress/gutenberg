@@ -3,9 +3,9 @@
  */
 import { WithGlobalCSS } from './decorators/with-global-css';
 import { WithMarginChecker } from './decorators/with-margin-checker';
+import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
 import { WithTheme } from './decorators/with-theme';
-import { WithWrapper } from './decorators/with-wrapper';
 import './style.scss';
 
 export const globalTypes = {
@@ -64,8 +64,8 @@ export const globalTypes = {
 			],
 		},
 	},
-	wrapper: {
-		name: 'Wrapper',
+	maxWidthWrapper: {
+		name: 'Max-Width Wrapper',
 		description: 'Wrap the component in a div with a max-width.',
 		defaultValue: 'none',
 		toolbar: {
@@ -83,7 +83,7 @@ export const decorators = [
 	WithGlobalCSS,
 	WithMarginChecker,
 	WithRTL,
-	WithWrapper,
+	WithMaxWidthWrapper,
 ];
 
 export const parameters = {
