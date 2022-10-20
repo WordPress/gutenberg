@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, reduce } from 'lodash';
+import { reduce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -296,7 +296,10 @@ export const showBlockTypes =
 				.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
 
 		const newBlockNames = existingBlockNames.filter(
-			( type ) => ! castArray( blockNames ).includes( type )
+			( type ) =>
+				! (
+					Array.isArray( blockNames ) ? blockNames : [ blockNames ]
+				 ).includes( type )
 		);
 
 		registry
@@ -319,7 +322,7 @@ export const hideBlockTypes =
 
 		const mergedBlockNames = new Set( [
 			...existingBlockNames,
-			...castArray( blockNames ),
+			...( Array.isArray( blockNames ) ? blockNames : [ blockNames ] ),
 		] );
 
 		registry
@@ -566,7 +569,6 @@ export const initializeMetaBoxes =
 		let wasAutosavingPost = registry
 			.select( editorStore )
 			.isAutosavingPost();
-		const hasMetaBoxes = select.hasMetaBoxes();
 
 		// Save metaboxes when performing a full save on the post.
 		registry.subscribe( async () => {
@@ -575,17 +577,12 @@ export const initializeMetaBoxes =
 				.select( editorStore )
 				.isAutosavingPost();
 
-			// Save metaboxes on save completion, except for autosaves that are not a post preview.
-			//
-			// Meta boxes are initialized once at page load. It is not necessary to
-			// account for updates on each state change.
-			//
-			// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309.
+			// Save metaboxes on save completion, except for autosaves.
 			const shouldTriggerMetaboxesSave =
-				hasMetaBoxes &&
 				wasSavingPost &&
+				! wasAutosavingPost &&
 				! isSavingPost &&
-				! wasAutosavingPost;
+				select.hasMetaBoxes();
 
 			// Save current state for next inspection.
 			wasSavingPost = isSavingPost;

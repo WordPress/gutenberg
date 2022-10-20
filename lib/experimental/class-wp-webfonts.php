@@ -249,8 +249,8 @@ class WP_Webfonts {
 		}
 
 		$valid_props = array(
-			'ascend-override',
-			'descend-override',
+			'ascent-override',
+			'descent-override',
 			'font-display',
 			'font-family',
 			'font-stretch',

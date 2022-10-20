@@ -81,6 +81,7 @@ module.exports = {
 						importNames: [
 							'camelCase',
 							'capitalize',
+							'castArray',
 							'chunk',
 							'clamp',
 							'cloneDeep',
@@ -166,6 +167,7 @@ module.exports = {
 							'uniqWith',
 							'upperFirst',
 							'values',
+							'without',
 							'xor',
 							'zip',
 						],
