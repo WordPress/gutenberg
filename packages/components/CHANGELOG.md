@@ -6,6 +6,10 @@
 
 -   `BoxControl` & `CustomSelectControl`: Add `onMouseOver` and `onMouseOut` callback props to allow handling of these events by parent components ([#44955](https://github.com/WordPress/gutenberg/pull/44955))
 
+### Bug Fix
+
+-   `Button`: Fix RTL alignment for buttons containing an icon and text ([#44787](https://github.com/WordPress/gutenberg/pull/44787)).
+
 ## 21.3.0 (2022-10-19)
 
 ### Bug Fix
