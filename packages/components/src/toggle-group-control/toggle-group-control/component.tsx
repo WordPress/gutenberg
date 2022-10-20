@@ -36,7 +36,6 @@ function UnconnectedToggleGroupControl(
 		isBlock = false,
 		isDeselectable = false,
 		label,
-		multiple = false,
 		hideLabelFromVision = false,
 		help,
 		onChange = noop,
@@ -67,7 +66,7 @@ function UnconnectedToggleGroupControl(
 					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
 				</VisualLabelWrapper>
 			) }
-			{ ! multiple && ! isDeselectable && (
+			{ ! isDeselectable && (
 				<ToggleGroupControlAsRadio
 					{ ...otherProps }
 					children={ children }
