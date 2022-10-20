@@ -566,7 +566,6 @@ export const initializeMetaBoxes =
 		let wasAutosavingPost = registry
 			.select( editorStore )
 			.isAutosavingPost();
-		const hasMetaBoxes = select.hasMetaBoxes();
 
 		// Save metaboxes when performing a full save on the post.
 		registry.subscribe( async () => {
@@ -575,23 +574,15 @@ export const initializeMetaBoxes =
 				.select( editorStore )
 				.isAutosavingPost();
 
-			// Save metaboxes on save completion, except for autosaves that are not a post preview.
-			//
-			// Meta boxes are initialized once at page load. It is not necessary to
-			// account for updates on each state change.
-			//
-			// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309.
+			// Save metaboxes on save completion, except for autosaves.
 			const shouldTriggerMetaboxesSave =
-				hasMetaBoxes &&
-				wasSavingPost &&
-				! isSavingPost &&
-				! wasAutosavingPost;
+				wasSavingPost && ! wasAutosavingPost && ! isSavingPost;
 
 			// Save current state for next inspection.
 			wasSavingPost = isSavingPost;
 			wasAutosavingPost = isAutosavingPost;
 
-			if ( shouldTriggerMetaboxesSave ) {
+			if ( shouldTriggerMetaboxesSave && select.hasMetaBoxes() ) {
 				await dispatch.requestMetaBoxUpdates();
 			}
 		} );
