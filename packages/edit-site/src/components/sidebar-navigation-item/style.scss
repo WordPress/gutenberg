@@ -10,7 +10,7 @@
 		color: $gray-200;
 	}
 
-	&[aria-pressed="true"] {
+	&[aria-current] {
 		background: var(--wp-admin-theme-color);
 		color: $white;
 	}
