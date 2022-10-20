@@ -85,7 +85,10 @@ export default function SiteTitleEdit( {
 						__( 'Site Title placeholder' ) }
 				</a>
 			) : (
-				<span>{ decodeEntities( title ) }</span>
+				<span>
+					{ decodeEntities( title ) ||
+						__( 'Site Title placeholder' ) }
+				</span>
 			) }
 		</TagName>
 	);
