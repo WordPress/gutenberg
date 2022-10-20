@@ -21,6 +21,10 @@
 	&.is-focus-mode {
 		padding: $grid-unit-60;
 
+		// In focus mode, we have to show the scrollbars if the edited template
+		// part overlows the container.
+		overflow: auto;
+
 		.edit-site-visual-editor__editor-canvas {
 			border-radius: $radius-block-ui;
 		}
