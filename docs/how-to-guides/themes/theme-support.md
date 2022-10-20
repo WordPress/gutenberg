@@ -79,7 +79,7 @@ The block editor adds additional markup to floated images to make styling them e
 Here's the markup for an `Image` with a caption:
 
 ```html
-<figure class="wp-block-image">
+<figure class="wp-block-image has-caption">
 	<img src="..." alt="" width="200px" />
 	<figcaption>Short image caption.</figcaption>
 </figure>
@@ -88,7 +88,7 @@ Here's the markup for an `Image` with a caption:
 Here's the markup for a left-floated image:
 
 ```html
-<div class="wp-block-image">
+<div class="wp-block-image has-caption">
 	<figure class="alignleft">
 		<img src="..." alt="" width="200px" />
 		<figcaption>Short image caption.</figcaption>
