@@ -112,7 +112,7 @@ exports[`Gallery block rearranges gallery items 1`] = `
 
 exports[`Gallery block sets caption to gallery 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
-<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":2000} -->
+<figure class=\\"wp-block-gallery has-nested-images columns-default has-caption is-cropped\\"><!-- wp:image {\\"id\\":2000} -->
 <figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-2000\\"/></figure>
 <!-- /wp:image --><figcaption class=\\"blocks-gallery-caption wp-element-caption\\"><strong>Bold</strong> <em>italic</em> <s>strikethrough</s> gallery caption</figcaption></figure>
 <!-- /wp:gallery -->"
@@ -121,7 +121,7 @@ exports[`Gallery block sets caption to gallery 1`] = `
 exports[`Gallery block sets caption to gallery items 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":2000} -->
-<figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-2000\\"/><figcaption class=\\"wp-element-caption\\"><strong>Bold</strong> <em>italic</em> <s>strikethrough</s> image caption</figcaption></figure>
+<figure class=\\"wp-block-image has-caption\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" class=\\"wp-image-2000\\"/><figcaption class=\\"wp-element-caption\\"><strong>Bold</strong> <em>italic</em> <s>strikethrough</s> image caption</figcaption></figure>
 <!-- /wp:image --></figure>
 <!-- /wp:gallery -->"
 `;

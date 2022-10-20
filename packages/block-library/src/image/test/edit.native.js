@@ -71,7 +71,7 @@ describe( 'Image Block', () => {
 	it( 'sets link to None', async () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
-		<figure class="wp-block-image size-large is-style-default">
+		<figure class="wp-block-image size-large has-caption is-style-default">
 			<a href="https://cldup.com/cXyG__fTLN.jpg">
 				<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
 			</a>
@@ -91,7 +91,7 @@ describe( 'Image Block', () => {
 		fireEvent.press( screen.getByText( 'None' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
-<figure class="wp-block-image size-large is-style-default"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/><figcaption class="wp-element-caption">Mountain</figcaption></figure>
+<figure class="wp-block-image size-large has-caption is-style-default"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/><figcaption class="wp-element-caption">Mountain</figcaption></figure>
 <!-- /wp:image -->`;
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
@@ -99,7 +99,7 @@ describe( 'Image Block', () => {
 	it( 'sets link to Media File', async () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
-		<figure class="wp-block-image size-large is-style-default">
+		<figure class="wp-block-image size-large has-caption is-style-default">
 			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
 		<figcaption class="wp-element-caption">Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
@@ -117,7 +117,7 @@ describe( 'Image Block', () => {
 		fireEvent.press( screen.getByText( 'Media File' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
-<figure class="wp-block-image size-large is-style-default"><a href="https://cldup.com/cXyG__fTLN.jpg"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
+<figure class="wp-block-image size-large has-caption is-style-default"><a href="https://cldup.com/cXyG__fTLN.jpg"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
 <!-- /wp:image -->`;
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
@@ -125,7 +125,7 @@ describe( 'Image Block', () => {
 	it( 'sets link to Custom URL', async () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
-		<figure class="wp-block-image size-large is-style-default">
+		<figure class="wp-block-image size-large has-caption is-style-default">
 			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
 		<figcaption class="wp-element-caption">Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
@@ -153,7 +153,7 @@ describe( 'Image Block', () => {
 		);
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
-<figure class="wp-block-image size-large is-style-default"><a href="http://wordpress.org"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
+<figure class="wp-block-image size-large has-caption is-style-default"><a href="http://wordpress.org"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
 <!-- /wp:image -->`;
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
@@ -161,7 +161,7 @@ describe( 'Image Block', () => {
 	it( 'swaps the link between destinations', async () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
-		<figure class="wp-block-image size-large is-style-default">
+		<figure class="wp-block-image size-large has-caption is-style-default">
 			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
 		<figcaption class="wp-element-caption">Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
@@ -193,7 +193,7 @@ describe( 'Image Block', () => {
 		fireEvent.press( screen.getByText( 'Media File' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
-<figure class="wp-block-image size-large is-style-default"><a href="https://cldup.com/cXyG__fTLN.jpg"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
+<figure class="wp-block-image size-large has-caption is-style-default"><a href="https://cldup.com/cXyG__fTLN.jpg"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
 <!-- /wp:image -->`;
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
@@ -201,7 +201,7 @@ describe( 'Image Block', () => {
 	it( 'does not display the Link To URL within the Custom URL input when set to Media File and query parameters are present', async () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
-		<figure class="wp-block-image size-large is-style-default">
+		<figure class="wp-block-image size-large has-caption is-style-default">
 			<a href="https://cldup.com/cXyG__fTLN.jpg">
 				<img src="https://cldup.com/cXyG__fTLN.jpg?w=683" alt="" class="wp-image-1"/>
 			</a>
@@ -225,7 +225,7 @@ describe( 'Image Block', () => {
 	it( 'sets link target', async () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
-		<figure class="wp-block-image size-large is-style-default">
+		<figure class="wp-block-image size-large has-caption is-style-default">
 			<a href="https://wordpress.org">
 				<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
 			</a>
@@ -247,7 +247,7 @@ describe( 'Image Block', () => {
 		fireEvent.press( linkTargetButton );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
-<figure class="wp-block-image size-large is-style-default"><a href="https://wordpress.org" target="_blank" rel="noreferrer noopener"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
+<figure class="wp-block-image size-large has-caption is-style-default"><a href="https://wordpress.org" target="_blank" rel="noreferrer noopener"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
 <!-- /wp:image -->`;
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
@@ -255,7 +255,7 @@ describe( 'Image Block', () => {
 	it( 'unset link target', async () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
-		<figure class="wp-block-image size-large is-style-default">
+		<figure class="wp-block-image size-large has-caption is-style-default">
 			<a href="https://wordpress.org" target="_blank" rel="noreferrer noopener">
 				<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
 			</a>
@@ -278,7 +278,7 @@ describe( 'Image Block', () => {
 		fireEvent.press( linkTargetButton );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
-<figure class="wp-block-image size-large is-style-default"><a href="https://wordpress.org"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
+<figure class="wp-block-image size-large has-caption is-style-default"><a href="https://wordpress.org"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
 <!-- /wp:image -->`;
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
