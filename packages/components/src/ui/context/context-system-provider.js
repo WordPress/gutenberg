@@ -14,6 +14,7 @@ import {
 	memo,
 } from '@wordpress/element';
 import warn from '@wordpress/warning';
+
 /**
  * Internal dependencies
  */
