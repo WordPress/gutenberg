@@ -66,13 +66,8 @@
 			}
 		}
 
-		// Focus style for toolbar buttons, except block movers.
-		&:not(.block-editor-block-mover-button):focus::before {
-			@include block-toolbar-button-style__focus();
-		}
-
-		// Focus style for block mover buttons (using :focus-visible instead of :focus)
-		&.block-editor-block-mover-button:focus-visible::before {
+		// Focus style
+		&:focus::before {
 			@include block-toolbar-button-style__focus();
 		}
 

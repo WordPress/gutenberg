@@ -134,7 +134,7 @@ function ListViewBlock( {
 	const { isTreeGridMounted, expand, collapse } = useListViewContext();
 
 	const hasSiblings = siblingBlockCount > 0;
-	const hasRenderedMovers = showBlockMovers && hasSiblings;
+	const hasRenderedMovers = true && hasSiblings;
 	const moverCellClassName = classnames(
 		'block-editor-list-view-block__mover-cell',
 		{ 'is-visible': isHovered || isSelected }
