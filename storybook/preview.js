@@ -5,6 +5,7 @@ import { WithGlobalCSS } from './decorators/with-global-css';
 import { WithMarginChecker } from './decorators/with-margin-checker';
 import { WithRTL } from './decorators/with-rtl';
 import { WithTheme } from './decorators/with-theme';
+import { WithWrapper } from './decorators/with-wrapper';
 import './style.scss';
 
 export const globalTypes = {
@@ -63,6 +64,18 @@ export const globalTypes = {
 			],
 		},
 	},
+	wrapper: {
+		name: 'Wrapper',
+		description: 'Wrap the component in a div with a max-width.',
+		defaultValue: 'none',
+		toolbar: {
+			icon: 'outline',
+			items: [
+				{ value: 'none', title: 'None' },
+				{ value: 'wordpress-sidebar', title: 'WP Sidebar' },
+			],
+		},
+	},
 };
 
 export const decorators = [
@@ -70,6 +83,7 @@ export const decorators = [
 	WithGlobalCSS,
 	WithMarginChecker,
 	WithRTL,
+	WithWrapper,
 ];
 
 export const parameters = {
