@@ -15,6 +15,7 @@ import {
 	default as InsertionPoint,
 } from './insertion-point';
 import SelectedBlockPopover from './selected-block-popover';
+import NavBlockPopover from './nav-block-popover';
 import { store as blockEditorStore } from '../../store';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
@@ -58,7 +59,6 @@ export default function BlockTools( {
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
-		clearSelectedBlock,
 		moveBlocksUp,
 		moveBlocksDown,
 	} = useDispatch( blockEditorStore );
@@ -104,16 +104,6 @@ export default function BlockTools( {
 				event.preventDefault();
 				insertBeforeBlock( clientIds[ 0 ] );
 			}
-		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
-			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
-				event.preventDefault();
-				clearSelectedBlock();
-				event.target.ownerDocument.defaultView
-					.getSelection()
-					.removeAllRanges();
-				__unstableContentRef?.current.focus();
-			}
 		}
 	}
 
@@ -145,6 +135,9 @@ export default function BlockTools( {
 				<Popover.Slot
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
+				/>
+				<NavBlockPopover
+					__unstableContentRef={ __unstableContentRef }
 				/>
 				{ isZoomOutMode && (
 					<ZoomOutModeInserters

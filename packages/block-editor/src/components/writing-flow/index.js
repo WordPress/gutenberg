@@ -46,6 +46,7 @@ export function useWritingFlow() {
 				( node ) => {
 					node.tabIndex = -1;
 					node.contentEditable = hasMultiSelection;
+					node.role = 'region';
 
 					if ( ! hasMultiSelection ) {
 						return;

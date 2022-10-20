@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { focus, isFormElement } from '@wordpress/dom';
-import { TAB, ESCAPE } from '@wordpress/keycodes';
+import { TAB } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect, useMergeRefs } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
@@ -72,12 +72,6 @@ export default function useTabNav() {
 	const ref = useRefEffect( ( node ) => {
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented ) {
-				return;
-			}
-
-			if ( event.keyCode === ESCAPE ) {
-				event.preventDefault();
-				setNavigationMode( true );
 				return;
 			}
 
@@ -183,15 +177,26 @@ export default function useTabNav() {
 			}
 		}
 
+		function onFocus() {
+			setNavigationMode( false );
+
+			const clientId = getSelectedBlockClientId();
+
+			if ( clientId ) {
+				node.querySelector( `[data-block="${ clientId }"]` ).focus();
+			}
+		}
+
 		const { ownerDocument } = node;
 		const { defaultView } = ownerDocument;
 		defaultView.addEventListener( 'keydown', preventScrollOnTab );
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'focusout', onFocusOut );
+		node.addEventListener( 'focus', onFocus );
 		return () => {
 			defaultView.removeEventListener( 'keydown', preventScrollOnTab );
 			node.removeEventListener( 'keydown', onKeyDown );
-			node.removeEventListener( 'focusout', onFocusOut );
+			node.removeEventListener( 'focus', onFocus );
 		};
 	}, [] );
 

@@ -23,6 +23,9 @@ export default function useRegisterShortcuts() {
 					modifier: 'access',
 					character: 'n',
 				},
+				{
+					character: 'escape',
+				},
 			],
 		} );
 
@@ -38,6 +41,10 @@ export default function useRegisterShortcuts() {
 				{
 					modifier: 'access',
 					character: 'p',
+				},
+				{
+					modifier: 'shift',
+					character: 'escape',
 				},
 			],
 		} );

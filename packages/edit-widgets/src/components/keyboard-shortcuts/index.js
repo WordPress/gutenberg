@@ -94,6 +94,9 @@ function KeyboardShortcutsRegister() {
 					modifier: 'access',
 					character: 'n',
 				},
+				{
+					character: 'escape',
+				},
 			],
 		} );
 
@@ -109,6 +112,10 @@ function KeyboardShortcutsRegister() {
 				{
 					modifier: 'access',
 					character: 'p',
+				},
+				{
+					modifier: 'shift',
+					character: 'escape',
 				},
 			],
 		} );

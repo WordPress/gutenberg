@@ -29,17 +29,10 @@ import { store as blockEditorStore } from '../../../store';
 function useInitialPosition( clientId ) {
 	return useSelect(
 		( select ) => {
-			const {
-				getSelectedBlocksInitialCaretPosition,
-				__unstableGetEditorMode,
-				isBlockSelected,
-			} = select( blockEditorStore );
+			const { getSelectedBlocksInitialCaretPosition, isBlockSelected } =
+				select( blockEditorStore );
 
 			if ( ! isBlockSelected( clientId ) ) {
-				return;
-			}
-
-			if ( __unstableGetEditorMode() !== 'edit' ) {
 				return;
 			}
 
@@ -61,11 +54,16 @@ function useInitialPosition( clientId ) {
 export function useFocusFirstElement( clientId ) {
 	const ref = useRef();
 	const initialPosition = useInitialPosition( clientId );
-	const { isBlockSelected, isMultiSelecting } = useSelect( blockEditorStore );
+	const { isBlockSelected, isMultiSelecting, __unstableGetEditorMode } =
+		useSelect( blockEditorStore );
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
 		if ( ! isBlockSelected( clientId ) || isMultiSelecting() ) {
+			return;
+		}
+
+		if ( __unstableGetEditorMode() !== 'edit' ) {
 			return;
 		}
 

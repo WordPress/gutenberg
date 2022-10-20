@@ -117,6 +117,9 @@ function KeyboardShortcuts() {
 					modifier: 'access',
 					character: 'n',
 				},
+				{
+					character: 'escape',
+				},
 			],
 		} );
 
@@ -132,6 +135,10 @@ function KeyboardShortcuts() {
 				{
 					modifier: 'access',
 					character: 'p',
+				},
+				{
+					modifier: 'shift',
+					character: 'escape',
 				},
 			],
 		} );

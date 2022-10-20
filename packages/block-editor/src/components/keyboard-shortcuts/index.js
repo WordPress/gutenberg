@@ -85,15 +85,6 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
-			name: 'core/block-editor/unselect',
-			category: 'selection',
-			description: __( 'Clear selection.' ),
-			keyCombination: {
-				character: 'escape',
-			},
-		} );
-
-		registerShortcut( {
 			name: 'core/block-editor/focus-toolbar',
 			category: 'global',
 			description: __( 'Navigate to the nearest toolbar.' ),
