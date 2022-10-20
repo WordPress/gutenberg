@@ -100,8 +100,4 @@ export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
 		 * Callback when either the quantity or the unit inputs lose focus.
 		 */
 		onBlur?: FocusEventHandler< HTMLInputElement | HTMLSelectElement >;
-		/**
-		 * Custom CSS class to apply to the unit control's outer wrapper.
-		 */
-		__unstableWrapperClassName?: string;
 	};

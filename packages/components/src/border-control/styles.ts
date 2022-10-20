@@ -13,7 +13,7 @@ import {
 	StyledLabel,
 } from '../base-control/styles/base-control-styles';
 import {
-	Root as UnitControlWrapper,
+	ValueInput as UnitControlWrapper,
 	UnitSelect,
 } from '../unit-control/styles/unit-control-styles';
 

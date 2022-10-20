@@ -23,7 +23,7 @@ import { __ } from '@wordpress/i18n';
  */
 import type { WordPressComponentProps } from '../ui/context';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
-import { Root, ValueInput } from './styles/unit-control-styles';
+import { ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import {
 	CSS_UNITS,
@@ -58,12 +58,10 @@ function UnforwardedUnitControl(
 		onChange: onChangeProp,
 		onUnitChange,
 		size = 'default',
-		style,
 		unit: unitProp,
 		units: unitsProp = CSS_UNITS,
 		value: valueProp,
 		onBlur: onBlurProp,
-		__unstableWrapperClassName,
 		...props
 	} = unitControlProps;
 
@@ -107,10 +105,6 @@ function UnforwardedUnitControl(
 	const refParsedQuantity = useRef< number | undefined >( undefined );
 
 	const classes = classnames( 'components-unit-control', className );
-	const wrapperClasses = classnames(
-		'components-unit-control-wrapper',
-		__unstableWrapperClassName
-	);
 
 	const handleOnQuantityChange = (
 		nextQuantityValue: number | string | undefined,
@@ -182,7 +176,7 @@ function UnforwardedUnitControl(
 				: undefined;
 			const changeProps = { event, data };
 
-			// The `onChange` callback already gets called, no need to call it explicitely.
+			// The `onChange` callback already gets called, no need to call it explicitly.
 			onUnitChange?.( validParsedUnit, changeProps );
 
 			setUnit( validParsedUnit );
@@ -263,27 +257,25 @@ function UnforwardedUnitControl(
 	}
 
 	return (
-		<Root className={ wrapperClasses } style={ style }>
-			<ValueInput
-				type={ isPressEnterToChange ? 'text' : 'number' }
-				{ ...props }
-				autoComplete={ autoComplete }
-				className={ classes }
-				disabled={ disabled }
-				hideHTMLArrows
-				isPressEnterToChange={ isPressEnterToChange }
-				label={ label }
-				onBlur={ handleOnBlur }
-				onKeyDown={ handleOnKeyDown }
-				onChange={ handleOnQuantityChange }
-				ref={ forwardedRef }
-				size={ size }
-				suffix={ inputSuffix }
-				value={ parsedQuantity ?? '' }
-				step={ step }
-				__unstableStateReducer={ stateReducer }
-			/>
-		</Root>
+		<ValueInput
+			type={ isPressEnterToChange ? 'text' : 'number' }
+			{ ...props }
+			autoComplete={ autoComplete }
+			className={ classes }
+			disabled={ disabled }
+			hideHTMLArrows
+			isPressEnterToChange={ isPressEnterToChange }
+			label={ label }
+			onBlur={ handleOnBlur }
+			onKeyDown={ handleOnKeyDown }
+			onChange={ handleOnQuantityChange }
+			ref={ forwardedRef }
+			size={ size }
+			suffix={ inputSuffix }
+			value={ parsedQuantity ?? '' }
+			step={ step }
+			__unstableStateReducer={ stateReducer }
+		/>
 	);
 }
 
