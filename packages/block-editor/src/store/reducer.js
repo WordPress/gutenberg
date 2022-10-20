@@ -1161,19 +1161,19 @@ export const blocks = pipe(
 } );
 
 /**
- * Reducer returning visualizer state.
+ * Reducer returning visibility status of block toolbar.
  *
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
  *
  * @return {boolean} Updated state.
  */
-export function isVisualizerShowing( state = false, action ) {
+export function isBlockToolbarHidden( state = false, action ) {
 	switch ( action.type ) {
-		case 'START_SHOWING_VISUALIZER':
+		case 'HIDE_BLOCK_TOOLBAR':
 			return true;
 
-		case 'STOP_SHOWING_VISUALIZER':
+		case 'SHOW_BLOCK_TOOLBAR':
 			return false;
 	}
 
@@ -1829,7 +1829,7 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 export default combineReducers( {
 	blocks,
 	isTyping,
-	isVisualizerShowing,
+	isBlockToolbarHidden,
 	draggedBlocks,
 	selection,
 	isMultiSelecting,

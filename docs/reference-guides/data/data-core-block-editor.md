@@ -963,6 +963,18 @@ _Returns_
 
 -   `boolean`: Whether block is selected and multi-selection exists.
 
+### isBlockToolbarHidden
+
+Returns true if the the block toolbar should be hidden, or false otherwise.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether the block toolbar is hidden.
+
 ### isBlockValid
 
 Returns whether a block is valid or not.
@@ -1122,18 +1134,6 @@ _Returns_
 
 -   `?boolean`: Whether the template is valid or not.
 
-### isVisualizerShowing
-
-Returns true if the user is showing spacing visualizer, or false otherwise.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `boolean`: Whether user is showing spacing visualizer.
-
 ### wasBlockJustInserted
 
 Tells if the block with the passed clientId was just inserted.
@@ -1198,6 +1198,14 @@ Action that "flashes" the block with a given `clientId` by rhythmically highligh
 _Parameters_
 
 -   _clientId_ `string`: Target block client ID.
+
+### hideBlockToolbar
+
+Returns an action object used in signalling that the user has begun to show spacing visualizer.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### hideInsertionPoint
 
@@ -1514,6 +1522,14 @@ _Returns_
 
 -   `Object`: Action object.
 
+### showBlockToolbar
+
+Returns an action object used in signalling that the user has stopped showing spacing visualizer.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### showInsertionPoint
 
 Action that shows the insertion point.
@@ -1553,14 +1569,6 @@ _Returns_
 
 -   `Object`: Action object.
 
-### startShowingVisualizer
-
-Returns an action object used in signalling that the user has begun to show spacing visualizer.
-
-_Returns_
-
--   `Object`: Action object.
-
 ### startTyping
 
 Returns an action object used in signalling that the user has begun to type.
@@ -1580,14 +1588,6 @@ _Returns_
 ### stopMultiSelect
 
 Action that stops block multi-selection.
-
-_Returns_
-
--   `Object`: Action object.
-
-### stopShowingVisualizer
-
-Returns an action object used in signalling that the user has stopped showing spacing visualizer.
 
 _Returns_
 

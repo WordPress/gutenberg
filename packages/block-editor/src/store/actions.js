@@ -1268,9 +1268,9 @@ export function toggleBlockMode( clientId ) {
  *
  * @return {Object} Action object.
  */
-export function startShowingVisualizer() {
+export function hideBlockToolbar() {
 	return {
-		type: 'START_SHOWING_VISUALIZER',
+		type: 'HIDE_BLOCK_TOOLBAR',
 	};
 }
 
@@ -1279,9 +1279,9 @@ export function startShowingVisualizer() {
  *
  * @return {Object} Action object.
  */
-export function stopShowingVisualizer() {
+export function showBlockToolbar() {
 	return {
-		type: 'STOP_SHOWING_VISUALIZER',
+		type: 'SHOW_BLOCK_TOOLBAR',
 	};
 }
 
