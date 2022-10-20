@@ -2,8 +2,18 @@
 	::marker {
 		font-size: var(--wp--preset--font-size--medium, $default-font-size);
 	}
-	.wp-block-details__summary > * {
-		display: inline;
-		font-size: var(--wp--preset--font-size--medium, $default-font-size);
+	.wp-block-details__summary {
+		padding: 0.25em;
+		> * {
+			display: inline;
+			font-size: var(--wp--preset--font-size--medium, $default-font-size);
+		}
 	}
+	.wp-block-details__content {
+		padding: 0.25em;
+	}
+}
+
+.wp-block-details[open] .wp-block-details__summary {
+	border-bottom: 1px solid;
 }

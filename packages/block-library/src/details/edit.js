@@ -53,15 +53,17 @@ function DetailsBlock( { attributes, setAttributes } ) {
 					}
 				/>
 			</BlockControls>
-			<details { ...blockProps }>
+			<details { ...blockProps } open>
 				<summary
 					className={ classnames( 'wp-block-details__summary' ) }
+					onClick={ ( event ) => event.preventDefault() }
 				>
 					<RichText
 						tagName={ tagName }
-						aria-label={ __( 'Summary' ) }
+						aria-label={ __( 'Add summary' ) }
+						placeholder={ __( 'Add summary' ) }
 						withoutInteractiveFormatting
-						value={ !! summary ? summary : __( 'Show details' ) }
+						value={ summary }
 						onChange={ ( newSummary ) =>
 							setAttributes( { summary: newSummary } )
 						}

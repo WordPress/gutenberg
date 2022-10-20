@@ -35,6 +35,13 @@
 			"width": true,
 			"style": true
 		},
+		"__experimentalStyle": {
+			"border": {
+				"color": "#000",
+				"width": "1px",
+				"style": "solid"
+			}
+		},
 		"html": false,
 		"spacing": {
 			"margin": true,

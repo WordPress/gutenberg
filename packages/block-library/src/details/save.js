@@ -11,7 +11,6 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
 
 export default function save( { attributes } ) {
 	const { level, summary } = attributes;
@@ -22,9 +21,7 @@ export default function save( { attributes } ) {
 		<details { ...blockProps }>
 			<summary className={ classnames( 'wp-block-details__summary' ) }>
 				<TagName>
-					<RichText.Content
-						value={ !! summary ? summary : __( 'Show details' ) }
-					/>
+					<RichText.Content value={ summary } />
 				</TagName>
 			</summary>
 			<div
