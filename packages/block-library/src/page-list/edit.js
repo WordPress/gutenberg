@@ -67,6 +67,7 @@ export default function PageListEdit( { context, clientId } ) {
 					clientId={ clientId }
 				/>
 			) }
+
 			{ ! hasResolvedPages && (
 				<div { ...blockProps }>
 					<Spinner />
@@ -81,14 +82,14 @@ export default function PageListEdit( { context, clientId } ) {
 				</div>
 			) }
 
-			{ totalPages === 0 && (
+			{ hasResolvedPages && totalPages === 0 && (
 				<div { ...blockProps }>
 					<Notice status={ 'info' } isDismissible={ false }>
 						{ __( 'Page List: Cannot retrieve Pages.' ) }
 					</Notice>
 				</div>
 			) }
-			{ totalPages > 0 && (
+			{ hasResolvedPages && totalPages > 0 && (
 				<ul { ...blockProps }>
 					<PageItems
 						context={ context }
