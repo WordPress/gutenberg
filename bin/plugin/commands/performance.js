@@ -161,7 +161,10 @@ async function setUpGitBranch( branch, environmentDirectory ) {
 	await git.checkoutRemoteBranch( environmentDirectory, branch );
 
 	log( '        >> Building the ' + formats.success( branch ) + ' branch' );
-	await runShellScript( 'npm ci && npm run build', environmentDirectory );
+	await runShellScript(
+		'npm install && npm run build',
+		environmentDirectory
+	);
 }
 
 /**
@@ -234,7 +237,7 @@ async function runPerformanceTests( branches, options ) {
 	}
 	log( '    >> Installing dependencies and building packages' );
 	await runShellScript(
-		'npm ci && npm run build:packages',
+		'npm install && npm run build:packages',
 		performanceTestDirectory
 	);
 	log( '    >> Creating the environment folders' );
