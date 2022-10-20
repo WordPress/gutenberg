@@ -103,7 +103,7 @@ export function deleteBlockLayoutByClientId( data, clientId ) {
  */
 function getBlockLayoutsOrderedByYCoord( data ) {
 	// Only enabled for root level blocks.
-	return orderBy( data, 'y' );
+	return orderBy( Object.values( data ), 'y' );
 }
 
 /**
