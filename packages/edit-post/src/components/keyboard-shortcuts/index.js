@@ -63,10 +63,11 @@ function KeyboardShortcuts() {
 		const destinationBlockName =
 			level === 0 ? 'core/paragraph' : 'core/heading';
 		const currentClientId = getSelectedBlockClientId();
-		if (
-			getBlockName( currentClientId ) !== 'core/paragraph' &&
-			getBlockName( currentClientId ) !== 'core/heading'
-		) {
+		if ( currentClientId === null ) {
+			return;
+		}
+		const blockName = getBlockName( currentClientId );
+		if ( blockName !== 'core/paragraph' && blockName !== 'core/heading' ) {
 			return;
 		}
 		const currentAttributes = getBlockAttributes( currentClientId );
