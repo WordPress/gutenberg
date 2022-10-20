@@ -80,6 +80,12 @@ export type ToggleGroupControlProps = Pick<
 	 */
 	label: string;
 	/**
+	 * Whether multiple options can be selected at once.
+	 *
+	 * @default false
+	 */
+	multiple?: boolean;
+	/**
 	 * If true, the label will only be visible to screen readers.
 	 *
 	 * @default false
@@ -98,6 +104,12 @@ export type ToggleGroupControlProps = Pick<
 	 */
 	isBlock?: boolean;
 	/**
+	 * Whether an option can be deselected by clicking it again.
+	 *
+	 * @default false
+	 */
+	isDeselectable?: boolean;
+	/**
 	 * Borderless style that may be preferred in some contexts.
 	 *
 	 * @default false
@@ -108,9 +120,9 @@ export type ToggleGroupControlProps = Pick<
 	 */
 	onChange?: ( value: ReactText | undefined ) => void;
 	/**
-	 * The value of `ToggleGroupControl`
+	 * The selected value(s).
 	 */
-	value?: ReactText;
+	value?: ReactText | ReactText[];
 	/**
 	 * The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControlOption` or
 	 * `ToggleGroupControlOptionIcon` components.
@@ -139,4 +151,12 @@ export type ToggleGroupControlBackdropProps = {
 	containerWidth?: number | null;
 	isAdaptiveWidth?: boolean;
 	state?: any;
+};
+
+export type ToggleGroupControlAsRadioProps = Pick<
+	ToggleGroupControlProps,
+	'children' | 'isAdaptiveWidth' | 'label' | 'size'
+> & {
+	onChange: ( value: ReactText | undefined ) => void;
+	value?: ReactText;
 };

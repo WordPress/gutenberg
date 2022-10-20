@@ -2,20 +2,11 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-// eslint-disable-next-line no-restricted-imports
-import { RadioGroup, useRadioState } from 'reakit';
-
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useMemo } from '@wordpress/element';
-import {
-	useMergeRefs,
-	useInstanceId,
-	usePrevious,
-	useResizeObserver,
-} from '@wordpress/compose';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,14 +16,12 @@ import {
 	useContextSystem,
 	WordPressComponentProps,
 } from '../../ui/context';
-import { useUpdateEffect, useCx } from '../../utils/hooks';
-import { View } from '../../view';
+import { useCx } from '../../utils/hooks';
 import BaseControl from '../../base-control';
 import type { ToggleGroupControlProps } from '../types';
-import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
-import ToggleGroupControlContext from '../context';
 import { VisualLabelWrapper } from './styles';
 import * as styles from './styles';
+import { ToggleGroupControlAsRadio } from './as-radio';
 
 const noop = () => {};
 
@@ -45,8 +34,10 @@ function UnconnectedToggleGroupControl(
 		className,
 		isAdaptiveWidth = false,
 		isBlock = false,
+		isDeselectable = false,
 		__experimentalIsBorderless = false,
 		label,
+		multiple = false,
 		hideLabelFromVision = false,
 		help,
 		onChange = noop,
@@ -56,33 +47,6 @@ function UnconnectedToggleGroupControl(
 		...otherProps
 	} = useContextSystem( props, 'ToggleGroupControl' );
 	const cx = useCx();
-	const containerRef = useRef();
-	const [ resizeListener, sizes ] = useResizeObserver();
-	const baseId = useInstanceId(
-		ToggleGroupControl,
-		'toggle-group-control'
-	).toString();
-	const radio = useRadioState( {
-		baseId,
-		state: value,
-	} );
-	const previousValue = usePrevious( value );
-
-	// Propagate radio.state change.
-	useUpdateEffect( () => {
-		// Avoid calling onChange if radio state changed
-		// from incoming value.
-		if ( previousValue !== radio.state ) {
-			onChange( radio.state );
-		}
-	}, [ radio.state ] );
-
-	// Sync incoming value with radio.state.
-	useUpdateEffect( () => {
-		if ( value !== radio.state ) {
-			radio.setState( value );
-		}
-	}, [ value ] );
 
 	const classes = useMemo(
 		() =>
@@ -99,34 +63,24 @@ function UnconnectedToggleGroupControl(
 			help={ help }
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 		>
-			<ToggleGroupControlContext.Provider
-				value={ { ...radio, isBlock: ! isAdaptiveWidth, size } }
-			>
-				{ ! hideLabelFromVision && (
-					<VisualLabelWrapper>
-						<BaseControl.VisualLabel>
-							{ label }
-						</BaseControl.VisualLabel>
-					</VisualLabelWrapper>
-				) }
-				<RadioGroup
-					{ ...radio }
-					aria-label={ label }
-					as={ View }
-					className={ classes }
+			{ ! hideLabelFromVision && (
+				<VisualLabelWrapper>
+					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
+				</VisualLabelWrapper>
+			) }
+			{ ! multiple && ! isDeselectable && (
+				<ToggleGroupControlAsRadio
 					{ ...otherProps }
-					ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
-				>
-					{ resizeListener }
-					<ToggleGroupControlBackdrop
-						{ ...radio }
-						containerRef={ containerRef }
-						containerWidth={ sizes.width }
-						isAdaptiveWidth={ isAdaptiveWidth }
-					/>
-					{ children }
-				</RadioGroup>
-			</ToggleGroupControlContext.Provider>
+					children={ children }
+					className={ classes }
+					isAdaptiveWidth={ isAdaptiveWidth }
+					label={ label }
+					onChange={ onChange }
+					ref={ forwardedRef }
+					size={ size }
+					value={ Array.isArray( value ) ? value[ 0 ] : value }
+				/>
+			) }
 		</BaseControl>
 	);
 }
