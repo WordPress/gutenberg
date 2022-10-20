@@ -7,7 +7,11 @@ import { map, some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	useInnerBlocksProps,
+} from '@wordpress/block-editor';
 
 import { createBlock } from '@wordpress/blocks';
 
@@ -221,68 +225,19 @@ const v7 = {
 		},
 	},
 	save( { attributes } ) {
-		const {
-			images,
-			columns = defaultColumnsNumberV1( attributes ),
-			imageCrop,
-			caption,
-			linkTo,
-		} = attributes;
-		const className = `columns-${ columns } ${
-			imageCrop ? 'is-cropped' : ''
-		}`;
+		const { caption, columns, imageCrop } = attributes;
+
+		const className = classnames( 'has-nested-images', {
+			[ `columns-${ columns }` ]: columns !== undefined,
+			[ `columns-default` ]: columns === undefined,
+			'is-cropped': imageCrop,
+		} );
+		const blockProps = useBlockProps.save( { className } );
+		const innerBlocksProps = useInnerBlocksProps.save( blockProps );
 
 		return (
-			<figure { ...useBlockProps.save( { className } ) }>
-				<ul className="blocks-gallery-grid">
-					{ images.map( ( image ) => {
-						let href;
-
-						switch ( linkTo ) {
-							case LINK_DESTINATION_MEDIA:
-								href = image.fullUrl || image.url;
-								break;
-							case LINK_DESTINATION_ATTACHMENT:
-								href = image.link;
-								break;
-						}
-
-						const img = (
-							<img
-								src={ image.url }
-								alt={ image.alt }
-								data-id={ image.id }
-								data-full-url={ image.fullUrl }
-								data-link={ image.link }
-								className={
-									image.id ? `wp-image-${ image.id }` : null
-								}
-							/>
-						);
-
-						return (
-							<li
-								key={ image.id || image.url }
-								className="blocks-gallery-item"
-							>
-								<figure>
-									{ href ? (
-										<a href={ href }>{ img }</a>
-									) : (
-										img
-									) }
-									{ ! RichText.isEmpty( image.caption ) && (
-										<RichText.Content
-											tagName="figcaption"
-											className="blocks-gallery-item"
-											value={ image.caption }
-										/>
-									) }
-								</figure>
-							</li>
-						);
-					} ) }
-				</ul>
+			<figure { ...innerBlocksProps }>
+				{ innerBlocksProps.children }
 				{ ! RichText.isEmpty( caption ) && (
 					<RichText.Content
 						tagName="figcaption"
