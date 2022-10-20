@@ -23,15 +23,9 @@ export default {
 			control: { type: 'text' },
 			description:
 				'Sets the `aria-label` of the component, if none is provided. Sets the Tooltip content if `showTooltip` is provided.',
-			table: {
-				defaultValue: { summary: '' },
-			},
 		},
 		children: {
 			control: { type: 'text' },
-			table: {
-				defaultValue: { summary: undefined },
-			},
 		},
 		icon: {
 			control: { type: 'select' },
@@ -43,16 +37,10 @@ export default {
 				link,
 				more,
 			},
-			table: {
-				defaultValue: { summary: `null` },
-			},
 		},
 		iconSize: {
 			control: { type: 'number' },
 			description: 'If provided with `icon`, sets the icon size.',
-			table: {
-				defaultValue: { summary: 24 },
-			},
 		},
 		iconPosition: {
 			control: { type: 'select' },
@@ -67,79 +55,49 @@ export default {
 			control: 'boolean',
 			description:
 				'Indicates activity while a action is being performed.',
-			table: {
-				defaultValue: { summary: false },
-			},
 		},
 		isDestructive: {
 			control: 'boolean',
 			description:
 				'Renders a red text-based button style to indicate destructive behavior.',
-			table: {
-				defaultValue: { summary: false },
-			},
 		},
 		isPressed: {
 			control: 'boolean',
 			description: 'Renders a pressed button style.',
-			table: {
-				defaultValue: { summary: false },
-			},
 		},
 		isSmall: {
 			control: 'boolean',
 			description: 'Decreases the size of the button.',
-			table: {
-				defaultValue: { summary: false },
-			},
 		},
 		disabled: {
 			control: 'boolean',
 			description:
 				'Whether the button is disabled. If `true`, this will force a `button` element to be rendered.',
-			table: {
-				defaultValue: { summary: false },
-			},
 		},
 		shortcut: {
 			control: { type: 'text' },
 			description:
 				'If provided with `showTooltip`, appends the Shortcut label to the tooltip content. If an `Object` is provided, it should contain `display` and `ariaLabel` keys.',
-			table: {
-				defaultValue: { summary: 'undefined' },
-			},
 		},
 		showTooltip: {
 			control: 'boolean',
 			description:
 				'If provided, renders a `Tooltip` component for the button.',
-			table: {
-				defaultValue: { summary: false },
-			},
 		},
 		tooltipPosition: {
 			control: { type: 'text' },
 			description:
 				'If provided with `showTooltip`, sets the position of the tooltip.',
-			table: {
-				defaultValue: { summary: 'top center' },
-			},
 		},
 		text: {
 			control: { type: 'text' },
 			description:
 				'If provided, displays the given text inside the button. If the button contains `children` elements, the text is displayed before them.',
-			table: {
-				defaultValue: { summary: '' },
-			},
 		},
 		variant: {
 			control: { type: 'select' },
 			description: "Specifies the button's style.",
 			options: [ 'primary', 'secondary', 'tertiary', 'link' ],
-			table: {
-				defaultValue: { summary: `undefined` },
-			},
 		},
 		__experimentalIsFocusable: {
 			control: 'boolean',
