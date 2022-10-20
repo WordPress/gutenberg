@@ -10,6 +10,9 @@ import metadata from './block.json';
 import Tracks from './tracks';
 
 const { attributes: blockAttributes } = metadata;
+
+// In #41140 support was added to global styles for caption elements which added a `wp-element-caption` classname
+// to the video figcaption element.
 const v1 = {
 	attributes: blockAttributes,
 	save( { attributes } ) {
