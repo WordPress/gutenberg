@@ -9,7 +9,8 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  */
 import BlockPopover from '../components/block-popover';
 import { __unstableUseBlockElement as useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
-import { getSpacingPresetSlug } from '../components/spacing-sizes-control/utils';
+import { getNameFromPresetVar } from '../components/spacing-sizes-control/utils';
+import useSetting from '../components/use-setting';
 
 function getComputedCSS( element, property ) {
 	return element.ownerDocument.defaultView
@@ -20,6 +21,7 @@ function getComputedCSS( element, property ) {
 export function MarginVisualizer( { clientId, attributes, forceShow } ) {
 	const blockElement = useBlockElement( clientId );
 	const [ style, setStyle ] = useState();
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
 
 	const margin = attributes?.style?.spacing?.margin;
 
@@ -95,18 +97,24 @@ export function MarginVisualizer( { clientId, attributes, forceShow } ) {
 			shift={ false }
 		>
 			<div className="block-editor__margin-visualizer" style={ style } />
-			<span
-				className="block-editor__margin-visualizer-label-top"
-				style={ { top: style.top, right: '0' } }
-			>
-				{ getSpacingPresetSlug( margin?.top ) || margin?.top }
-			</span>
-			<span
-				className="block-editor__margin-visualizer-label-bottom"
-				style={ { bottom: style.bottom, right: '0' } }
-			>
-				{ getSpacingPresetSlug( margin?.bottom ) || margin?.bottom }
-			</span>
+			{ margin?.top && (
+				<span
+					className="block-editor__margin-visualizer-label-top"
+					style={ { top: style.top, right: '0' } }
+				>
+					{ getNameFromPresetVar( margin?.top, spacingSizes ) ||
+						margin?.top }
+				</span>
+			) }
+			{ margin?.bottom && (
+				<span
+					className="block-editor__margin-visualizer-label-bottom"
+					style={ { bottom: style.bottom, right: '0' } }
+				>
+					{ getNameFromPresetVar( margin?.bottom, spacingSizes ) ||
+						margin?.bottom }
+				</span>
+			) }
 		</BlockPopover>
 	);
 }

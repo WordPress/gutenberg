@@ -208,3 +208,16 @@ export function isValuesDefined( values ) {
 	}
 	return Object.values( values ).filter( ( value ) => !! value ).length > 0;
 }
+
+/**
+ * Finds the name label for a given preset var value.
+ *
+ * @param {string} presetVar The preset var string to find the name of.
+ * @param {Array}  spacingSizes The array of spacing sizes for current theme.
+ *
+ * @return {boolean} Whether values are defined.
+ */
+export function getNameFromPresetVar( presetVar, spacingSizes ) {
+	const slug = getSpacingPresetSlug( presetVar );
+	return spacingSizes.find( ( size ) => size.slug === slug )?.name;
+}
