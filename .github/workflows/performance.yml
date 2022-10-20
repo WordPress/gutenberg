@@ -17,7 +17,7 @@ concurrency:
 jobs:
     performance:
         name: Run performance tests
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-latest-16-cores
         if: ${{ github.repository == 'WordPress/gutenberg' }}
 
         steps:
