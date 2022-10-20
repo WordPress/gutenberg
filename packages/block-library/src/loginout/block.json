@@ -19,6 +19,10 @@
 	},
 	"supports": {
 		"className": true,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
 		"typography": {
 			"fontSize": false
 		}
