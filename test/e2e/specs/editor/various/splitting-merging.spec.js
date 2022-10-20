@@ -8,6 +8,10 @@ test.describe( 'splitting and merging blocks', () => {
 		await admin.createNewPost();
 	} );
 
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
 	test( 'should split and merge paragraph blocks using Enter and Backspace', async ( {
 		editor,
 		page,
@@ -301,9 +305,13 @@ test.describe( 'splitting and merging blocks', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		// There is a default block and post title:
-		expect(
-			await page.locator( '.block-editor-block-list__block' )
-		).toBeDefined();
+		await expect(
+			page.locator( 'role=document[name=/Empty block/i]' )
+		).toBeVisible();
+
+		await expect(
+			page.locator( 'role=textbox[name="Add title"i]' )
+		).toBeVisible();
 
 		// But the effective saved content is still empty:
 		expect( await editor.getEditedPostContent() ).toBe( '' );
@@ -326,12 +334,7 @@ test.describe( 'splitting and merging blocks', () => {
 		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
 
 		// Check the content.
-		const content = await editor.getEditedPostContent();
-		expect( content ).toBe(
-			`<!-- wp:paragraph -->
-<p>12</p>
-<!-- /wp:paragraph -->`
-		);
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	test( 'should not split with line break in front', async ( {
