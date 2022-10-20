@@ -14,8 +14,11 @@ import {
 	useMergeRefs,
 } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
+import { focus } from '@wordpress/dom';
+import { useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
 import { useState } from '@wordpress/element';
 
@@ -31,6 +34,7 @@ export default function ListViewSidebar() {
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const headerFocusReturnRef = useFocusReturn();
 	const contentFocusReturnRef = useFocusReturn();
+
 	function closeOnEscape( event ) {
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
 			event.preventDefault();
@@ -40,12 +44,30 @@ export default function ListViewSidebar() {
 
 	const [ tab, setTab ] = useState( 'list-view' );
 
+	// This ref helps us focus the list view.
+	const listViewRef = useRef();
+	// This tracks if the list view has focus and when focus loss happens.
+	const [ listViewHasFocus, setListViewHasFocus ] = useState( false );
+	// This only fires when the list view is open because of the conditional rendering. It is the same shortcut to open but that is defined as a global shortcut and only fires when the list view is closed.
+	useShortcut( 'core/edit-post/toggle-list-view', () => {
+		// If the list view has focus, we know it is safe to close.
+		if ( listViewHasFocus ) {
+			setIsListViewOpened( false );
+			// If the list view does not have focus, we should move focus to it.
+		} else {
+			// Find the first tabbable based on the attached ref.
+			focus.tabbable.find( listViewRef.current )[ 0 ].focus();
+		}
+	} );
+
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			aria-label={ __( 'Document Overview' ) }
 			className="edit-post-editor__document-overview-panel"
 			onKeyDown={ closeOnEscape }
+			onFocus={ () => setListViewHasFocus( true ) }
+			onBlur={ () => setListViewHasFocus( false ) }
 		>
 			<div
 				className="edit-post-editor__document-overview-panel-header components-panel__header edit-post-sidebar__panel-tabs"
@@ -91,6 +113,7 @@ export default function ListViewSidebar() {
 				ref={ useMergeRefs( [
 					contentFocusReturnRef,
 					focusOnMountRef,
+					listViewRef,
 				] ) }
 				className="edit-post-editor__list-view-container"
 			>

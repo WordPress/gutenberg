@@ -250,9 +250,12 @@ function KeyboardShortcuts() {
 		}
 	} );
 
-	useShortcut( 'core/edit-post/toggle-list-view', () =>
-		setIsListViewOpened( ! isListViewOpened() )
-	);
+	// Only opens the list view. Other functionality for this shortcut happens in the rendered sidebar.
+	useShortcut( 'core/edit-post/toggle-list-view', () => {
+		if ( ! isListViewOpened() ) {
+			setIsListViewOpened( true );
+		}
+	} );
 
 	useShortcut(
 		'core/block-editor/transform-heading-to-paragraph',
