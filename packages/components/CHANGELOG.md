@@ -11,6 +11,7 @@
 ### Bug Fix
 
 -   `FontSizePicker`: Ensure that fluid font size presets appear correctly in the UI controls ([#44791](https://github.com/WordPress/gutenberg/pull/44791)).
+-   `ToggleGroupControl`: Remove unsupported `disabled` prop from types, and correctly mark `label` prop as required ([#45114](https://github.com/WordPress/gutenberg/pull/45114)).
 -   `Navigator`: prevent partially hiding focus ring styles, by removing unnecessary overflow rules on `NavigatorScreen` ([#44973](https://github.com/WordPress/gutenberg/pull/44973)).
 -   `Navigator`: restore focus only once per location  ([#44972](https://github.com/WordPress/gutenberg/pull/44972)).
 
