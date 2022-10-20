@@ -30,6 +30,13 @@ export default function SidebarNavigationRoot() {
 		postType: 'wp_template_part',
 		postId: undefined,
 	} );
+	const isEditorPage =
+		( ! params.postType && ! params.postId ) ||
+		( !! params.postType && !! params.postId );
+	const isTemplatesPage =
+		params.postType === 'wp_template' && ! params.postId;
+	const isTemplatePartsPage =
+		params.postType === 'wp_template_part' && ! params.postId;
 
 	return (
 		<VStack spacing={ 6 }>
@@ -40,37 +47,33 @@ export default function SidebarNavigationRoot() {
 					parentHref="index.php"
 				/>
 			</div>
-			<ItemGroup>
-				<SidebarNavigationItem
-					{ ...browseLink }
-					icon={ globe }
-					aria-pressed={
-						( ! params.postType && ! params.postId ) ||
-						( !! params.postType && !! params.postId )
-					}
-				>
-					{ __( 'Browse' ) }
-				</SidebarNavigationItem>
-				<SidebarNavigationItem
-					{ ...templatesLink }
-					icon={ layout }
-					aria-pressed={
-						params.postType === 'wp_template' && ! params.postId
-					}
-				>
-					{ __( 'Templates' ) }
-				</SidebarNavigationItem>
-				<SidebarNavigationItem
-					{ ...templatePartsLink }
-					icon={ symbolFilled }
-					aria-pressed={
-						params.postType === 'wp_template_part' &&
-						! params.postId
-					}
-				>
-					{ __( 'Template Parts' ) }
-				</SidebarNavigationItem>
-			</ItemGroup>
+			<nav>
+				<ItemGroup>
+					<SidebarNavigationItem
+						{ ...browseLink }
+						icon={ globe }
+						aria-current={ isEditorPage ? 'page' : undefined }
+					>
+						{ __( 'Editor' ) }
+					</SidebarNavigationItem>
+					<SidebarNavigationItem
+						{ ...templatesLink }
+						icon={ layout }
+						aria-current={ isTemplatesPage ? 'page' : undefined }
+					>
+						{ __( 'Templates' ) }
+					</SidebarNavigationItem>
+					<SidebarNavigationItem
+						{ ...templatePartsLink }
+						icon={ symbolFilled }
+						aria-current={
+							isTemplatePartsPage ? 'page' : undefined
+						}
+					>
+						{ __( 'Template Parts' ) }
+					</SidebarNavigationItem>
+				</ItemGroup>
+			</nav>
 		</VStack>
 	);
 }

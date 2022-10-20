@@ -68,11 +68,11 @@ export default function Layout() {
 			</AnimatePresence>
 			<motion.div
 				className="edit-site-layout__canvas-container"
-				animate={ { 
+				animate={ {
 					paddingTop: isFullCanvas ? 0 : 24,
 					paddingRight: isFullCanvas ? 0 : 24,
-					paddingBottom: isFullCanvas ? 0 : 24
-				 } }
+					paddingBottom: isFullCanvas ? 0 : 24,
+				} }
 				transition={ {
 					type: 'tween',
 					duration: disableMotion ? 0 : 0.5,
