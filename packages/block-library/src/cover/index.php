@@ -20,8 +20,7 @@ function render_block_core_cover( $attributes, $content ) {
 
 	if ( ! ( $attributes['hasParallax'] || $attributes['isRepeated'] ) ) {
 		$attr = array(
-			'class'           => 'wp-block-cover__image-background',
-			'data-object-fit' => 'cover',
+			'class' => 'wp-block-cover__image-background',
 		);
 
 		if ( isset( $attributes['focalPoint'] ) ) {

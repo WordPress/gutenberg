@@ -21,7 +21,7 @@ return array(
 					<!-- /wp:group -->
 
 					<!-- wp:cover {"url":"https://s.w.org/patterns/files/2022/08/5eca6-header-mountains-scaled-1.jpg","dimRatio":0,"isDark":false,"align":"full"} -->
-					<div class="wp-block-cover alignfull is-light"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-0 has-background-dim"></span><img class="wp-block-cover__image-background" alt="" src="https://s.w.org/patterns/files/2022/08/5eca6-header-mountains-scaled-1.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"' . __( 'Write title…', 'gutenberg' ) . '","fontSize":"large"} -->
+					<div class="wp-block-cover alignfull is-light"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-0 has-background-dim"></span><img class="wp-block-cover__image-background" alt="" src="https://s.w.org/patterns/files/2022/08/5eca6-header-mountains-scaled-1.jpg"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"' . __( 'Write title…', 'gutenberg' ) . '","fontSize":"large"} -->
 					<p class="has-text-align-center has-large-font-size"></p>
 					<!-- /wp:paragraph --></div></div>
 					<!-- /wp:cover --></div>

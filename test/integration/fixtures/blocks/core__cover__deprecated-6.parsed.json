@@ -93,9 +93,9 @@
 				]
 			}
 		],
-		"innerHTML": "\n<div class=\"wp-block-cover has-background-dim has-custom-content-position is-position-bottom-right\"><img class=\"wp-block-cover__image-background wp-image-134\" alt=\"\" src=\"http://localhost:8888/wp-content/uploads/2021/02/percy.jpg\" data-object-fit=\"cover\"/>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>\n",
+		"innerHTML": "\n<div class=\"wp-block-cover has-background-dim has-custom-content-position is-position-bottom-right\"><img class=\"wp-block-cover__image-background wp-image-134\" alt=\"\" src=\"http://localhost:8888/wp-content/uploads/2021/02/percy.jpg\"/>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>\n",
 		"innerContent": [
-			"\n<div class=\"wp-block-cover has-background-dim has-custom-content-position is-position-bottom-right\"><img class=\"wp-block-cover__image-background wp-image-134\" alt=\"\" src=\"http://localhost:8888/wp-content/uploads/2021/02/percy.jpg\" data-object-fit=\"cover\"/>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t",
+			"\n<div class=\"wp-block-cover has-background-dim has-custom-content-position is-position-bottom-right\"><img class=\"wp-block-cover__image-background wp-image-134\" alt=\"\" src=\"http://localhost:8888/wp-content/uploads/2021/02/percy.jpg\"/>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t",
 			null,
 			"\n\t</div>\n</div>\n"
 		]

@@ -132,7 +132,6 @@ export default function save( { attributes } ) {
 						alt={ alt }
 						src={ url }
 						style={ { objectPosition } }
-						data-object-fit="cover"
 						data-object-position={ objectPosition }
 					/>
 				) : (
@@ -154,7 +153,6 @@ export default function save( { attributes } ) {
 					playsInline
 					src={ url }
 					style={ { objectPosition } }
-					data-object-fit="cover"
 					data-object-position={ objectPosition }
 				/>
 			) }
