@@ -897,25 +897,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				)
 			);
 			if ( ! empty( $background_matches && isset( $background_matches[0]['value'] ) ) && empty( $border_color_matches ) ) {
-				add_filter(
-					'theme_json_blocks',
-					function( $theme_json ) {
-						$new_data = array(
-							'version' => 2,
-							'styles'  => array(
-								'blocks' => array(
-									'core/separator' => array(
-										'border' => array(
-											'color' => $this->theme_json['styles']['blocks']['core/separator']['color']['background'],
-										),
-									),
-								),
-							),
-						);
-						$theme_json->update_with( $new_data );
-						return $theme_json;
-					}
-				);
 				$declarations[] = array(
 					'name'  => 'border-color',
 					'value' => $background_matches[0]['value'],

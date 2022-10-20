@@ -846,7 +846,8 @@ export const getBlockSelectors = ( blockTypes ) => {
 };
 
 export function useGlobalStylesOutput() {
-	const { merged: mergedConfig } = useContext( GlobalStylesContext );
+	let { merged: mergedConfig } = useContext( GlobalStylesContext );
+
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
@@ -865,6 +866,29 @@ export function useGlobalStylesOutput() {
 			mergedConfig,
 			blockSelectors
 		);
+		// TODO: refactor this.
+		if (
+			mergedConfig.styles?.blocks[ 'core/separator' ] &&
+			mergedConfig.styles?.blocks[ 'core/separator' ].color?.background
+		) {
+			mergedConfig = {
+				...mergedConfig,
+				styles: {
+					...mergedConfig.styles,
+					blocks: {
+						...mergedConfig.styles.blocks,
+						'core/separator': {
+							...mergedConfig.styles.blocks[ 'core/separator' ],
+							border: {
+								color: mergedConfig.styles?.blocks[
+									'core/separator'
+								].color.background,
+							},
+						},
+					},
+				},
+			};
+		}
 		const globalStyles = toStyles(
 			mergedConfig,
 			blockSelectors,
