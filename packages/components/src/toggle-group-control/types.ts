@@ -108,7 +108,7 @@ export type ToggleGroupControlProps = Pick<
 	 */
 	onChange?: ( value: ReactText | undefined ) => void;
 	/**
-	 * The selected value(s).
+	 * The selected value.
 	 */
 	value?: ReactText;
 	/**
