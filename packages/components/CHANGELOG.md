@@ -10,6 +10,10 @@
 
 -   `Button`: Fix RTL alignment for buttons containing an icon and text ([#44787](https://github.com/WordPress/gutenberg/pull/44787)).
 
+### Internal
+
+-   `AnglePickerControl`: Set Storybook Label control type to 'text' ([#45122](https://github.com/WordPress/gutenberg/pull/45122)).
+
 ## 21.3.0 (2022-10-19)
 
 ### Bug Fix
