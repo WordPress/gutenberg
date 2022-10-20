@@ -576,13 +576,16 @@ export const initializeMetaBoxes =
 
 			// Save metaboxes on save completion, except for autosaves.
 			const shouldTriggerMetaboxesSave =
-				wasSavingPost && ! wasAutosavingPost && ! isSavingPost;
+				wasSavingPost &&
+				! wasAutosavingPost &&
+				! isSavingPost &&
+				select.hasMetaBoxes();
 
 			// Save current state for next inspection.
 			wasSavingPost = isSavingPost;
 			wasAutosavingPost = isAutosavingPost;
 
-			if ( shouldTriggerMetaboxesSave && select.hasMetaBoxes() ) {
+			if ( shouldTriggerMetaboxesSave ) {
 				await dispatch.requestMetaBoxUpdates();
 			}
 		} );
