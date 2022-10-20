@@ -264,12 +264,6 @@
 		&:focus-visible::before {
 			@include block-toolbar-button-style__focus();
 		}
-		/* Fallback for browsers without :focus-visible support */
-		@supports not selector(:focus-visible) {
-			&:focus::before {
-				@include block-toolbar-button-style__focus();
-			}
-		}
 
 		// Focus and toggle pseudo elements.
 		&::before {
