@@ -35,7 +35,6 @@ function UnconnectedToggleGroupControl(
 		isAdaptiveWidth = false,
 		isBlock = false,
 		isDeselectable = false,
-		__experimentalIsBorderless = false,
 		label,
 		multiple = false,
 		hideLabelFromVision = false,
@@ -52,11 +51,11 @@ function UnconnectedToggleGroupControl(
 		() =>
 			cx(
 				styles.ToggleGroupControl( { size } ),
-				! __experimentalIsBorderless && styles.border,
+				! isDeselectable && styles.border,
 				isBlock && styles.block,
 				className
 			),
-		[ className, cx, isBlock, __experimentalIsBorderless, size ]
+		[ className, cx, isBlock, isDeselectable, size ]
 	);
 	return (
 		<BaseControl

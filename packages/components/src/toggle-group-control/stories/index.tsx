@@ -122,13 +122,3 @@ WithIcons.args = {
 		{ value: 'lowercase', label: 'Lowercase', icon: formatLowercase },
 	].map( mapPropsToOptionIconComponent ),
 };
-
-/**
- * A borderless style may be preferred in some contexts.
- */
-export const Borderless: ComponentStory< typeof ToggleGroupControl > =
-	Template.bind( {} );
-Borderless.args = {
-	...WithIcons.args,
-	__experimentalIsBorderless: true,
-};
