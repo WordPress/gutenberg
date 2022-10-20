@@ -167,6 +167,7 @@ module.exports = {
 							'uniqWith',
 							'upperFirst',
 							'values',
+							'without',
 							'xor',
 							'zip',
 						],
