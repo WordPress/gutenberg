@@ -24,6 +24,24 @@ function gutenberg_template_parts_screen_menu() {
 		return;
 	}
 
+	global $submenu;
+	if ( ! isset( $submenu['themes.php'] ) ) {
+		return;
+	}
+
+	$needs_custom_page = true;
+	foreach ( $submenu['themes.php'] as $menu_item ) {
+		if ( str_contains( $menu_item[2], 'site-editor.php?postType=wp_template_part' ) ) {
+			$needs_custom_page = false;
+			break;
+		}
+	}
+
+	// Don't use the custom 'Template Parts' page with WP 6.1 and above.
+	if ( ! $needs_custom_page ) {
+		return;
+	}
+
 	add_theme_page(
 		__( 'Template Parts', 'gutenberg' ),
 		__( 'Template Parts', 'gutenberg' ),
