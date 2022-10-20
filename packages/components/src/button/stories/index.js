@@ -27,6 +27,10 @@ export default {
 		children: {
 			control: { type: 'text' },
 		},
+		href: {
+			control: { type: 'text' },
+			description: 'If provided, renders `a` instead of `button`.',
+		},
 		icon: {
 			control: { type: 'select' },
 			description:
@@ -93,6 +97,11 @@ export default {
 			control: { type: 'text' },
 			description:
 				'If provided, displays the given text inside the button. If the button contains `children` elements, the text is displayed before them.',
+		},
+		target: {
+			control: { type: 'text' },
+			description:
+				'If provided with `href`, sets the `target` attribute to the `a`.',
 		},
 		variant: {
 			control: { type: 'select' },
