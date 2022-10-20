@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { useState, useEffect, useRef, Platform } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import {
-	__experimentalListView as ListView,
+	__experimentalOffCanvasEditor as OffCanvasEditor,
 	InspectorControls,
 	useBlockProps,
 	__experimentalRecursionProvider as RecursionProvider,
@@ -681,10 +681,10 @@ function Navigation( {
 							actionLabel={ __( "Switch to '%s'" ) }
 						/>
 						{ isOffCanvasNavigationEditorEnabled && (
-							<ListView
+							<OffCanvasEditor
 								blocks={ innerBlocks }
 								isExpanded={ true }
-								__experimentalSelectBlockInCanvas={ false }
+								selectBlockInCanvas={ false }
 							/>
 						) }
 					</PanelBody>
@@ -865,10 +865,10 @@ function Navigation( {
 							actionLabel={ __( "Switch to '%s'" ) }
 						/>
 						{ isOffCanvasNavigationEditorEnabled && (
-							<ListView
+							<OffCanvasEditor
 								blocks={ innerBlocks }
 								isExpanded={ true }
-								__experimentalSelectBlockInCanvas={ false }
+								selectBlockInCanvas={ false }
 							/>
 						) }
 					</PanelBody>
