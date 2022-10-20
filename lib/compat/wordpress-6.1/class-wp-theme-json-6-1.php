@@ -878,6 +878,33 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$block_rules .= static::to_ruleset( $feature_selector, $individual_feature_declarations );
 		}
 
+		// Add border color if we have a separator with a bg color defined.
+		if ( '.wp-block-separator' === $selector ) {
+			$border_color_matches = array_values(
+				array_filter(
+					$declarations,
+					function( $declaration ) {
+						return str_contains( $declaration['name'], 'border-color' );
+					}
+				)
+			);
+			$background_matches   = array_values(
+				array_filter(
+					$declarations,
+					function( $declaration ) {
+						return str_contains( $declaration['name'], 'background-color' );
+					}
+				)
+			);
+			if ( ! empty( $background_matches && isset( $background_matches[0]['value'] ) ) && empty( $border_color_matches ) ) {
+				$declarations[] = array(
+					'name'  => 'border-color',
+					'value' => $background_matches[0]['value'],
+				);
+				$block_rules    = static::to_ruleset( $selector, $declarations );
+			}
+		}
+
 		return $block_rules;
 	}
 
