@@ -131,6 +131,8 @@ export function getImageBlock( image, sizeSlug, linkTo ) {
 	} );
 }
 
+// In #41140 support was added to global styles for caption elements which added a `wp-element-caption` classname
+// to the gallery figcaption element.
 const v7 = {
 	attributes: {
 		images: {
