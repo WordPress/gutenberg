@@ -24,9 +24,6 @@ test.describe( 'Site Editor Inserter', () => {
 		page,
 	} ) => {
 		await page.click( 'role=button[name="Toggle block inserter"i]' );
-		await page
-			.locator( '.edit-site-editor__inserter-panel' )
-			.waitFor( { state: 'visible' } );
 		await expect(
 			page.locator( 'role=region[name="Block Library"i]' )
 		).toBeVisible();
