@@ -13,6 +13,7 @@
 
 ### Internal
 
+-   `Snackbar`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44934](https://github.com/WordPress/gutenberg/pull/44934))
 -   `AnglePickerControl`: Set Storybook Label control type to 'text' ([#45122](https://github.com/WordPress/gutenberg/pull/45122)).
 -   `Button`: Refactor Storybook to controls and align docs ([#44105](https://github.com/WordPress/gutenberg/pull/44105)).
 
