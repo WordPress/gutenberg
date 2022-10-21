@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { get, isEmpty, kebabCase, pickBy, reduce, set } from 'lodash';
+import { paramCase as kebabCase } from 'change-case';
+import { get, isEmpty, pickBy, reduce, set } from 'lodash';
 
 /**
  * WordPress dependencies
