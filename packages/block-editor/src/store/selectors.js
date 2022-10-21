@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, map, reduce, some, find, filter, orderBy } from 'lodash';
+import { map, reduce, some, find, filter, orderBy } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -319,12 +319,13 @@ export const __experimentalGetGlobalBlocksByName = createSelector(
  */
 export const getBlocksByClientId = createSelector(
 	( state, clientIds ) =>
-		map( castArray( clientIds ), ( clientId ) =>
-			getBlock( state, clientId )
+		map(
+			Array.isArray( clientIds ) ? clientIds : [ clientIds ],
+			( clientId ) => getBlock( state, clientId )
 		),
 	( state, clientIds ) =>
 		map(
-			castArray( clientIds ),
+			Array.isArray( clientIds ) ? clientIds : [ clientIds ],
 			( clientId ) => state.blocks.tree[ clientId ]
 		)
 );
@@ -2065,7 +2066,7 @@ export const getInserterItems = createSelector(
  */
 export const getBlockTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
-		const normalizedBlocks = castArray( blocks );
+		const normalizedBlocks = Array.isArray( blocks ) ? blocks : [ blocks ];
 		const [ sourceBlock ] = normalizedBlocks;
 		const buildBlockTypeTransformItem = buildBlockTypeItem( state, {
 			buildScope: 'transform',

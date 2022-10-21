@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, some, unescape as unescapeString, without } from 'lodash';
+import { find, get, some, unescape as unescapeString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -258,7 +258,7 @@ export function HierarchicalTermSelector( { slug } ) {
 	const onChange = ( termId ) => {
 		const hasTerm = terms.includes( termId );
 		const newTerms = hasTerm
-			? without( terms, termId )
+			? terms.filter( ( id ) => id !== termId )
 			: [ ...terms, termId ];
 		onUpdateTerms( newTerms );
 	};
