@@ -1,20 +1,12 @@
 /**
  * External dependencies
  */
-import {
-	flow,
-	reduce,
-	omit,
-	without,
-	mapValues,
-	isEqual,
-	isEmpty,
-	omitBy,
-} from 'lodash';
+import { reduce, omit, mapValues, isEqual, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 /**
@@ -425,15 +417,15 @@ const withBlockTree =
 				break;
 			}
 			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
-				const updatedBlockUids = Object.keys(
-					omitBy( newState.attributes, ( attributes, clientId ) => {
+				const updatedBlockUids = Object.entries( newState.attributes )
+					.filter( ( [ clientId, attributes ] ) => {
 						return (
-							newState.byClientId[ clientId ].name !==
-								'core/block' ||
-							attributes.ref !== action.updatedId
+							newState.byClientId[ clientId ].name ===
+								'core/block' &&
+							attributes.ref === action.updatedId
 						);
 					} )
-				);
+					.map( ( [ clientId ] ) => clientId );
 
 				newState.tree = updateParentInnerBlocksInTree(
 					newState,
@@ -789,7 +781,7 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
  *
  * @return {Object} Updated state.
  */
-export const blocks = flow(
+export const blocks = pipe(
 	combineReducers,
 	withSaveReusableBlock, // Needs to be before withBlockCache.
 	withBlockTree, // Needs to be before withInnerBlocksRemoveCascade.
@@ -987,10 +979,10 @@ export const blocks = flow(
 				// Moving from a parent block to another.
 				return {
 					...state,
-					[ fromRootClientId ]: without(
-						state[ fromRootClientId ],
-						...clientIds
-					),
+					[ fromRootClientId ]:
+						state[ fromRootClientId ]?.filter(
+							( id ) => ! clientIds.includes( id )
+						) ?? [],
 					[ toRootClientId ]: insertAt(
 						state[ toRootClientId ],
 						clientIds,
@@ -1055,7 +1047,7 @@ export const blocks = flow(
 
 				const mappedBlocks = mapBlockOrder( action.blocks );
 
-				return flow( [
+				return pipe( [
 					( nextState ) =>
 						omit( nextState, action.replacedClientIds ),
 					( nextState ) => ( {
@@ -1089,14 +1081,19 @@ export const blocks = flow(
 			}
 
 			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
-				return flow( [
+				return pipe( [
 					// Remove inner block ordering for removed blocks.
 					( nextState ) => omit( nextState, action.removedClientIds ),
 
 					// Remove deleted blocks from other blocks' orderings.
 					( nextState ) =>
-						mapValues( nextState, ( subState ) =>
-							without( subState, ...action.removedClientIds )
+						mapValues(
+							nextState,
+							( subState ) =>
+								subState?.filter(
+									( id ) =>
+										! action.removedClientIds.includes( id )
+								) ?? []
 						),
 				] )( state );
 		}
@@ -1475,9 +1472,19 @@ export function blocksMode( state = {}, action ) {
  */
 export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
-		case 'SHOW_INSERTION_POINT':
-			const { rootClientId, index, __unstableWithInserter } = action;
-			return { rootClientId, index, __unstableWithInserter };
+		case 'SHOW_INSERTION_POINT': {
+			const { rootClientId, index, __unstableWithInserter, operation } =
+				action;
+			const nextState = {
+				rootClientId,
+				index,
+				__unstableWithInserter,
+				operation,
+			};
+
+			// Bail out updates if the states are the same.
+			return isEqual( state, nextState ) ? state : nextState;
+		}
 
 		case 'HIDE_INSERTION_POINT':
 			return null;

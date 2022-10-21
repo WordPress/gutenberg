@@ -15,10 +15,10 @@ import { store as interfaceStore } from '@wordpress/interface';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { SIDEBAR_BLOCK } from '../sidebar/constants';
+import { SIDEBAR_BLOCK } from '../sidebar-edit-mode/constants';
 import { STORE_NAME } from '../../store/constants';
 
-function KeyboardShortcuts( { openEntitiesSavedStates } ) {
+function KeyboardShortcuts() {
 	const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
 		useSelect( coreStore );
 	const { getEditorMode } = useSelect( editSiteStore );
@@ -38,6 +38,7 @@ function KeyboardShortcuts( { openEntitiesSavedStates } ) {
 		useDispatch( editSiteStore );
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
+	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
 
 	useShortcut( 'core/edit-site/save', ( event ) => {
 		event.preventDefault();
@@ -49,7 +50,7 @@ function KeyboardShortcuts( { openEntitiesSavedStates } ) {
 		);
 
 		if ( ! isSaving && isDirty ) {
-			openEntitiesSavedStates();
+			setIsSaveViewOpened( true );
 		}
 	} );
 

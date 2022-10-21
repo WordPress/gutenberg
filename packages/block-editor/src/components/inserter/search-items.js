@@ -1,9 +1,8 @@
 /**
  * External dependencies
  */
-import { noCase } from 'change-case';
 import removeAccents from 'remove-accents';
-import { find } from 'lodash';
+import { find, words } from 'lodash';
 
 // Default search helpers.
 const defaultGetName = ( item ) => item.name || '';
@@ -37,17 +36,6 @@ function normalizeSearchInput( input = '' ) {
 }
 
 /**
- * Extracts words from an input string.
- *
- * @param {string} input The input string.
- *
- * @return {Array} Words, extracted from the input string.
- */
-function extractWords( input = '' ) {
-	return noCase( input ).split( ' ' ).filter( Boolean );
-}
-
-/**
  * Converts the search term into a list of normalized terms.
  *
  * @param {string} input The search term to normalize.
@@ -55,7 +43,7 @@ function extractWords( input = '' ) {
  * @return {string[]} The normalized list of search terms.
  */
 export const getNormalizedSearchTerms = ( input = '' ) => {
-	return extractWords( normalizeSearchInput( input ) );
+	return words( normalizeSearchInput( input ) );
 };
 
 const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
@@ -162,7 +150,7 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 			category,
 			collection,
 		].join( ' ' );
-		const normalizedSearchTerms = extractWords( normalizedSearchInput );
+		const normalizedSearchTerms = words( normalizedSearchInput );
 		const unmatchedTerms = removeMatchingTerms(
 			normalizedSearchTerms,
 			terms

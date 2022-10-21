@@ -158,19 +158,6 @@ Color styles.
 
 ---
 
-### outline
-
-Outline styles.
-
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
-| color | string |  |
-| offset | string |  |
-| style | string |  |
-| width | string |  |
-
----
-
 ### spacing
 
 Spacing styles.
@@ -214,6 +201,19 @@ CSS and SVG filter styles.
 
 Box shadow styles.
 
+
+---
+
+### outline
+
+Outline styles.
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| color | string |  |
+| offset | string |  |
+| style | string |  |
+| width | string |  |
 
 ---
 

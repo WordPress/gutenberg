@@ -13,6 +13,7 @@ const {
 const {
 	getJestOverrideConfigFile,
 	getWebpackArgs,
+	getWordPressSrcDirectory,
 	getWebpackEntryPoints,
 	getRenderPropPaths,
 	hasBabelConfig,
@@ -34,6 +35,7 @@ module.exports = {
 	getNodeArgsFromCLI,
 	getPackageProp,
 	getWebpackArgs,
+	getWordPressSrcDirectory,
 	getWebpackEntryPoints,
 	getRenderPropPaths,
 	hasArgInCLI,

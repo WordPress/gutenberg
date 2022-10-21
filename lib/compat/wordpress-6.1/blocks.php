@@ -38,11 +38,15 @@ add_filter( 'safe_style_css', 'gutenberg_safe_style_attrs_6_1' );
  */
 function gutenberg_safecss_filter_attr_allow_css_6_1( $allow_css, $css_test_string ) {
 	if ( false === $allow_css ) {
-		// Allow some CSS functions.
-		$css_test_string = preg_replace( '/\b(?:calc|min|max|minmax|clamp)\(((?:\([^()]*\)?|[^()])*)\)/', '', $css_test_string );
-
-		// Allow CSS var.
-		$css_test_string = preg_replace( '/\(?var\(--[\w\-\()[\]\,\s]*\)/', '', $css_test_string );
+		/*
+		 * Allow CSS functions like var(), calc(), etc. by removing them from the test string.
+		 * Nested functions and parentheses are also removed, so long as the parentheses are balanced.
+		 */
+		$css_test_string = preg_replace(
+			'/\b(?:var|calc|min|max|minmax|clamp)(\((?:[^()]|(?1))*\))/',
+			'',
+			$css_test_string
+		);
 
 		// Check for any CSS containing \ ( & } = or comments,
 		// except for url(), calc(), or var() usage checked above.
@@ -81,7 +85,7 @@ function gutenberg_block_type_metadata_view_script( $settings, $metadata ) {
 
 		// Replace suffix and extension with `.asset.php` to find the generated dependencies file.
 		$view_asset_file          = substr( $view_script_path, 0, -( strlen( '.js' ) ) ) . '.asset.php';
-		$view_asset               = file_exists( $view_asset_file ) ? require( $view_asset_file ) : null;
+		$view_asset               = file_exists( $view_asset_file ) ? require $view_asset_file : null;
 		$view_script_dependencies = isset( $view_asset['dependencies'] ) ? $view_asset['dependencies'] : array();
 		$view_script_version      = isset( $view_asset['version'] ) ? $view_asset['version'] : false;
 		$result                   = wp_register_script(

@@ -81,6 +81,7 @@ module.exports = {
 						importNames: [
 							'camelCase',
 							'capitalize',
+							'castArray',
 							'chunk',
 							'clamp',
 							'cloneDeep',
@@ -97,6 +98,7 @@ module.exports = {
 							'dropRight',
 							'each',
 							'escapeRegExp',
+							'every',
 							'extend',
 							'findIndex',
 							'findKey',
@@ -105,6 +107,7 @@ module.exports = {
 							'flatMap',
 							'flatten',
 							'flattenDeep',
+							'flow',
 							'flowRight',
 							'forEach',
 							'fromPairs',
@@ -133,6 +136,7 @@ module.exports = {
 							'negate',
 							'noop',
 							'nth',
+							'omitBy',
 							'once',
 							'overEvery',
 							'partial',
@@ -151,6 +155,7 @@ module.exports = {
 							'sum',
 							'sumBy',
 							'take',
+							'throttle',
 							'times',
 							'toString',
 							'trim',
@@ -162,7 +167,7 @@ module.exports = {
 							'uniqWith',
 							'upperFirst',
 							'values',
-							'words',
+							'without',
 							'xor',
 							'zip',
 						],
@@ -318,6 +323,22 @@ module.exports = {
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
+			files: [ '**/test/**/*.js' ],
+			excludedFiles: [
+				'**/*.@(android|ios|native).js',
+				'packages/react-native-*/**/*.js',
+				'test/native/**/*.js',
+			],
+			extends: [
+				'plugin:jest-dom/recommended',
+				'plugin:testing-library/react',
+			],
+			rules: {
+				'testing-library/no-container': 'off',
+				'testing-library/no-node-access': 'off',
+			},
+		},
+		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
 			excludedFiles: [ 'packages/e2e-test-utils-playwright/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-e2e' ],
@@ -355,7 +376,7 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'bin/**/*.js', 'packages/env/**' ],
+			files: [ 'bin/**/*.js', 'bin/**/*.mjs', 'packages/env/**' ],
 			rules: {
 				'no-console': 'off',
 			},

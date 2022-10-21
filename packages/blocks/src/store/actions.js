@@ -2,11 +2,12 @@
  * External dependencies
  */
 import { isPlainObject } from 'is-plain-object';
-import { castArray, pick, some } from 'lodash';
+import { pick, some } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
@@ -62,6 +63,12 @@ const processBlockType = ( blockType, { select } ) => {
 		name,
 		null
 	);
+
+	if ( settings.description && typeof settings.description !== 'string' ) {
+		deprecated( 'Declaring non-string block descriptions', {
+			since: '6.2',
+		} );
+	}
 
 	if ( settings.deprecated ) {
 		settings.deprecated = settings.deprecated.map( ( deprecation ) =>
@@ -156,7 +163,7 @@ const processBlockType = ( blockType, { select } ) => {
 export function addBlockTypes( blockTypes ) {
 	return {
 		type: 'ADD_BLOCK_TYPES',
-		blockTypes: castArray( blockTypes ),
+		blockTypes: Array.isArray( blockTypes ) ? blockTypes : [ blockTypes ],
 	};
 }
 
@@ -235,7 +242,7 @@ export const __experimentalReapplyBlockTypeFilters =
 export function removeBlockTypes( names ) {
 	return {
 		type: 'REMOVE_BLOCK_TYPES',
-		names: castArray( names ),
+		names: Array.isArray( names ) ? names : [ names ],
 	};
 }
 
@@ -253,7 +260,7 @@ export function removeBlockTypes( names ) {
 export function addBlockStyles( blockName, styles ) {
 	return {
 		type: 'ADD_BLOCK_STYLES',
-		styles: castArray( styles ),
+		styles: Array.isArray( styles ) ? styles : [ styles ],
 		blockName,
 	};
 }
@@ -272,7 +279,7 @@ export function addBlockStyles( blockName, styles ) {
 export function removeBlockStyles( blockName, styleNames ) {
 	return {
 		type: 'REMOVE_BLOCK_STYLES',
-		styleNames: castArray( styleNames ),
+		styleNames: Array.isArray( styleNames ) ? styleNames : [ styleNames ],
 		blockName,
 	};
 }
@@ -291,7 +298,7 @@ export function removeBlockStyles( blockName, styleNames ) {
 export function addBlockVariations( blockName, variations ) {
 	return {
 		type: 'ADD_BLOCK_VARIATIONS',
-		variations: castArray( variations ),
+		variations: Array.isArray( variations ) ? variations : [ variations ],
 		blockName,
 	};
 }
@@ -310,7 +317,9 @@ export function addBlockVariations( blockName, variations ) {
 export function removeBlockVariations( blockName, variationNames ) {
 	return {
 		type: 'REMOVE_BLOCK_VARIATIONS',
-		variationNames: castArray( variationNames ),
+		variationNames: Array.isArray( variationNames )
+			? variationNames
+			: [ variationNames ],
 		blockName,
 	};
 }

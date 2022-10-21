@@ -467,7 +467,7 @@ export default function NavigationLinkEdit( {
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	const listItemRef = useRef( null );
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
-	const itemLabelPlaceholder = __( 'Add link…' );
+	const itemLabelPlaceholder = __( 'Add label…' );
 	const ref = useRef();
 
 	const pagesPermissions = useResourcePermissions( 'pages' );

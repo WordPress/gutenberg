@@ -432,7 +432,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $variables, $theme_json->get_stylesheet( array( 'variables' ) ) );
 	}
 
-	function test_get_stylesheet_handles_whitelisted_element_pseudo_selectors() {
+	public function test_get_stylesheet_handles_whitelisted_element_pseudo_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -475,7 +475,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
-	function test_get_stylesheet_handles_only_pseudo_selector_rules_for_given_property() {
+	public function test_get_stylesheet_handles_only_pseudo_selector_rules_for_given_property() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -514,7 +514,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
-	function test_get_stylesheet_ignores_pseudo_selectors_on_non_whitelisted_elements() {
+	public function test_get_stylesheet_ignores_pseudo_selectors_on_non_whitelisted_elements() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -553,7 +553,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
-	function test_get_stylesheet_ignores_non_whitelisted_pseudo_selectors() {
+	public function test_get_stylesheet_ignores_non_whitelisted_pseudo_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -593,7 +593,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'a:levitate{', $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
-	function test_get_stylesheet_handles_priority_of_elements_vs_block_elements_pseudo_selectors() {
+	public function test_get_stylesheet_handles_priority_of_elements_vs_block_elements_pseudo_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -640,7 +640,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
-	function test_get_stylesheet_handles_whitelisted_block_level_element_pseudo_selectors() {
+	public function test_get_stylesheet_handles_whitelisted_block_level_element_pseudo_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -695,7 +695,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * bootstrap. After a core block adopts feature level selectors we could
 	 * remove that filter and instead use the core block for the following test.
 	 */
-	function test_get_stylesheet_with_block_support_feature_level_selectors() {
+	public function test_get_stylesheet_with_block_support_feature_level_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -748,7 +748,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
 	}
 
-	function test_remove_invalid_element_pseudo_selectors() {
+	public function test_remove_invalid_element_pseudo_selectors() {
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -795,14 +795,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
-	function test_get_element_class_name_button() {
+	public function test_get_element_class_name_button() {
 		$expected = 'wp-element-button';
 		$actual   = WP_Theme_JSON_Gutenberg::get_element_class_name( 'button' );
 
 		$this->assertEquals( $expected, $actual );
 	}
 
-	function test_get_element_class_name_invalid() {
+	public function test_get_element_class_name_invalid() {
 		$expected = '';
 		$actual   = WP_Theme_JSON_Gutenberg::get_element_class_name( 'unknown-element' );
 
@@ -813,7 +813,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * Testing that dynamic properties in theme.json return the value they reference, e.g.
 	 * array( 'ref' => 'styles.color.background' ) => "#ffffff".
 	 */
-	function test_get_property_value_valid() {
+	public function test_get_property_value_valid() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => 2,
@@ -845,7 +845,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 *
 	 * @expectedIncorrectUsage get_property_value
 	 */
-	function test_get_property_value_loop() {
+	public function test_get_property_value_loop() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => 2,
@@ -876,7 +876,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 *
 	 * @expectedIncorrectUsage get_property_value
 	 */
-	function test_get_property_value_recursion() {
+	public function test_get_property_value_recursion() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => 2,
@@ -907,7 +907,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 *
 	 * @expectedIncorrectUsage get_property_value
 	 */
-	function test_get_property_value_self() {
+	public function test_get_property_value_self() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => 2,
@@ -929,7 +929,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_generate_spacing_scale_fixtures
 	 */
-	function test_set_spacing_sizes( $spacing_scale, $expected_output ) {
+	public function test_set_spacing_sizes( $spacing_scale, $expected_output ) {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => 2,
@@ -950,7 +950,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 *
 	 * @return array
 	 */
-	function data_generate_spacing_scale_fixtures() {
+	public function data_generate_spacing_scale_fixtures() {
 		return array(
 			'one_step_spacing_scale' => array(
 				'spacingScale'    => array(
@@ -1192,7 +1192,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 *
 	 * @return array
 	 */
-	function data_set_spacing_sizes_when_invalid() {
+	public function data_set_spacing_sizes_when_invalid() {
 		return array(
 
 			'invalid_spacing_scale_values_missing_operator' => array(
@@ -1251,7 +1251,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	function test_get_styles_for_block_with_padding_aware_alignments() {
+	public function test_get_styles_for_block_with_padding_aware_alignments() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => 2,
@@ -1284,7 +1284,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $root_rules . $style_rules );
 	}
 
-	function test_get_styles_for_block_without_padding_aware_alignments() {
+	public function test_get_styles_for_block_without_padding_aware_alignments() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => 2,
@@ -1314,7 +1314,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $root_rules . $style_rules );
 	}
 
-	function test_get_styles_for_block_with_content_width() {
+	public function test_get_styles_for_block_with_content_width() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => 2,

@@ -161,6 +161,39 @@ _Related_
 Given a component returns the enhanced component augmented with a component
 only re-rendering when its props/state change
 
+### throttle
+
+A simplified and properly typed version of lodash's `throttle`, that
+always uses timers instead of sometimes using rAF.
+
+Creates a throttled function that only invokes `func` at most once per
+every `wait` milliseconds. The throttled function comes with a `cancel`
+method to cancel delayed `func` invocations and a `flush` method to
+immediately invoke them. Provide `options` to indicate whether `func`
+should be invoked on the leading and/or trailing edge of the `wait`
+timeout. The `func` is invoked with the last arguments provided to the
+throttled function. Subsequent calls to the throttled function return
+the result of the last `func` invocation.
+
+**Note:** If `leading` and `trailing` options are `true`, `func` is
+invoked on the trailing edge of the timeout only if the throttled function
+is invoked more than once during the `wait` timeout.
+
+If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+until the next tick, similar to `setTimeout` with a timeout of `0`.
+
+_Parameters_
+
+-   _func_ `Function`: The function to throttle.
+-   _wait_ `number`: The number of milliseconds to throttle invocations to.
+-   _options_ `Partial< ThrottleOptions >`: The options object.
+-   _options.leading_ `boolean`: Specify invoking on the leading edge of the timeout.
+-   _options.trailing_ `boolean`: Specify invoking on the trailing edge of the timeout.
+
+_Returns_
+
+-   Returns the new throttled function.
+
 ### useAsyncList
 
 React hook returns an array which items get asynchronously appended from a source array.
@@ -256,10 +289,13 @@ In some circumstances, such as block previews, all focusable DOM elements
 (input fields, links, buttons, etc.) need to be disabled. This hook adds the
 behavior to disable nested DOM elements to the returned ref.
 
+If you can, prefer the use of the inert HTML attribute.
+
 _Usage_
 
 ```js
 import { useDisabled } from '@wordpress/compose';
+
 const DisabledExample = () => {
 	const disabledRef = useDisabled();
 	return (
@@ -511,7 +547,7 @@ const App = () => {
 
 ### useThrottle
 
-Throttles a function with Lodash's `throttle`. A new throttled function will
+Throttles a function similar to Lodash's `throttle`. A new throttled function will
 be returned and any scheduled calls cancelled if any of the arguments change,
 including the function to throttle, so please wrap functions created on
 render in components in `useCallback`.
@@ -524,11 +560,11 @@ _Parameters_
 
 -   _fn_ `TFunc`: The function to throttle.
 -   _wait_ `[number]`: The number of milliseconds to throttle invocations to.
--   _options_ `[import('lodash').ThrottleSettings]`: The options object. See linked documentation for details.
+-   _options_ `[import('../../utils/throttle').ThrottleOptions]`: The options object. See linked documentation for details.
 
 _Returns_
 
--   `import('lodash').DebouncedFunc<TFunc>`: Throttled function.
+-   `import('../../utils/debounce').DebouncedFunc<TFunc>`: Throttled function.
 
 ### useViewportMatch
 

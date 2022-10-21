@@ -6,6 +6,7 @@ import type { CSSProperties } from 'react';
 /**
  * Internal dependencies
  */
+import { parseCSSUnitValue } from '../utils/unit-values';
 import type { Border } from '../border-control/types';
 import type { AnyBorder, Borders, BorderProp, BorderSide } from './types';
 
@@ -123,7 +124,7 @@ export const getCommonBorder = ( borders?: Borders ) => {
 	return {
 		color: allColorsMatch ? colors[ 0 ] : undefined,
 		style: allStylesMatch ? styles[ 0 ] : undefined,
-		width: allWidthsMatch ? widths[ 0 ] : undefined,
+		width: allWidthsMatch ? widths[ 0 ] : getMostCommonUnit( widths ),
 	};
 };
 
@@ -152,3 +153,45 @@ export const getShorthandBorderStyle = (
 
 	return [ width, borderStyle, color ].filter( Boolean ).join( ' ' );
 };
+
+export const getMostCommonUnit = (
+	values: Array< string | number | undefined >
+): string | undefined => {
+	// Collect all the CSS units.
+	const units = values.map( ( value ) =>
+		value === undefined ? undefined : parseCSSUnitValue( `${ value }` )[ 1 ]
+	);
+
+	// Return the most common unit out of only the defined CSS units.
+	const filteredUnits = units.filter( ( value ) => value !== undefined );
+	return mode( filteredUnits as string[] );
+};
+
+/**
+ * Finds the mode value out of the array passed favouring the first value
+ * as a tiebreaker.
+ *
+ * @param  values Values to determine the mode from.
+ *
+ * @return The mode value.
+ */
+function mode( values: Array< string > ): string | undefined {
+	if ( values.length === 0 ) {
+		return undefined;
+	}
+
+	const map: { [ index: string ]: number } = {};
+	let maxCount = 0;
+	let currentMode;
+
+	values.forEach( ( value ) => {
+		map[ value ] = map[ value ] === undefined ? 1 : map[ value ] + 1;
+
+		if ( map[ value ] > maxCount ) {
+			currentMode = value;
+			maxCount = map[ value ];
+		}
+	} );
+
+	return currentMode;
+}

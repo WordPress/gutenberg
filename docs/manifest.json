@@ -156,6 +156,12 @@
 		"parent": "block-tutorial"
 	},
 	{
+		"title": "Extending the Query Loop block",
+		"slug": "extending-the-query-loop-block",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/extending-the-query-loop-block.md",
+		"parent": "block-tutorial"
+	},
+	{
 		"title": "Development Platform",
 		"slug": "platform",
 		"markdown_source": "../docs/how-to-guides/platform/README.md",
@@ -306,7 +312,7 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Propagating updates for block types ",
+		"title": "Propagating updates for block types",
 		"slug": "propagating-updates",
 		"markdown_source": "../docs/how-to-guides/propagating-updates.md",
 		"parent": "how-to-guides"
@@ -1224,6 +1230,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Theme",
+		"slug": "theme",
+		"markdown_source": "../packages/components/src/theme/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ToggleControl",
 		"slug": "toggle-control",
 		"markdown_source": "../packages/components/src/toggle-control/README.md",
@@ -1482,7 +1494,7 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/create-block External Template",
+		"title": "External Project Templates",
 		"slug": "packages-create-block-external-template",
 		"markdown_source": "../packages/create-block/docs/external-template.md",
 		"parent": "packages-create-block"
@@ -1605,6 +1617,12 @@
 		"title": "@wordpress/eslint-plugin",
 		"slug": "packages-eslint-plugin",
 		"markdown_source": "../packages/eslint-plugin/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/experiments",
+		"slug": "packages-experiments",
+		"markdown_source": "../packages/experiments/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1828,6 +1846,12 @@
 		"slug": "packages-style-engine",
 		"markdown_source": "../packages/style-engine/README.md",
 		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/style-engine Using the Style Engine to generate block supports styles",
+		"slug": "using-the-style-engine-with-block-supports",
+		"markdown_source": "../packages/style-engine/docs/using-the-style-engine-with-block-supports.md",
+		"parent": "packages-style-engine"
 	},
 	{
 		"title": "@wordpress/stylelint-config",

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -64,10 +59,10 @@ export default function withFilters( hookName ) {
 			}
 
 			componentWillUnmount() {
-				FilteredComponentRenderer.instances = without(
-					FilteredComponentRenderer.instances,
-					this
-				);
+				FilteredComponentRenderer.instances =
+					FilteredComponentRenderer.instances.filter(
+						( instance ) => instance !== this
+					);
 
 				// If this was the last of the mounted components filtered on
 				// this hook, remove the hook handler.

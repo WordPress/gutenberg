@@ -24,10 +24,10 @@ jobs:
             fail-fast: false
 
         steps:
-            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
+              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
               with:
                   node-version-file: '.nvmrc'
                   cache: npm
@@ -39,7 +39,7 @@ jobs:
 
             - name: Install Playwright dependencies
               run: |
-                  npx playwright install chromium --with-deps
+                  npx playwright install chromium firefox webkit --with-deps
 
             - name: Install WordPress and start the server
               run: |
@@ -47,18 +47,18 @@ jobs:
 
             - name: Run the tests
               run: |
-                  npm run test:e2e:playwright
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e:playwright
 
             - name: Archive debug artifacts (screenshots, traces)
-              uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
               if: always()
               with:
                   name: failures-artifacts
-                  path: artifacts
+                  path: artifacts/test-results
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
-              uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
               if: always()
               with:
                   name: flaky-tests-report-playwright

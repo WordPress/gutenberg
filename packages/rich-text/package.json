@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/rich-text",
-	"version": "5.16.0",
+	"version": "5.18.0",
 	"description": "Rich text value and manipulation API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -38,7 +38,6 @@
 		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/keycodes": "file:../keycodes",
-		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"rememo": "^4.0.0"
 	},

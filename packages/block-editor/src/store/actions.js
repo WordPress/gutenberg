@@ -26,6 +26,8 @@ import {
 	START_OF_SELECTED_AREA,
 } from '../utils/selection';
 
+/** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
+
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
@@ -624,10 +626,13 @@ export const insertBlocks =
 /**
  * Action that shows the insertion point.
  *
- * @param {?string} rootClientId      Optional root client ID of block list on
- *                                    which to insert.
- * @param {?number} index             Index at which block should be inserted.
- * @param {Object}  __unstableOptions Whether or not to show an inserter button.
+ * @param    {?string}         rootClientId           Optional root client ID of block list on
+ *                                                    which to insert.
+ * @param    {?number}         index                  Index at which block should be inserted.
+ * @param    {?Object}         __unstableOptions      Additional options.
+ * @property {boolean}         __unstableWithInserter Whether or not to show an inserter button.
+ * @property {WPDropOperation} operation              The operation to perform when applied,
+ *                                                    either 'insert' or 'replace' for now.
  *
  * @return {Object} Action object.
  */
@@ -636,25 +641,28 @@ export function showInsertionPoint(
 	index,
 	__unstableOptions = {}
 ) {
-	const { __unstableWithInserter } = __unstableOptions;
+	const { __unstableWithInserter, operation } = __unstableOptions;
 	return {
 		type: 'SHOW_INSERTION_POINT',
 		rootClientId,
 		index,
 		__unstableWithInserter,
+		operation,
 	};
 }
-
 /**
  * Action that hides the insertion point.
- *
- * @return {Object} Action object.
  */
-export function hideInsertionPoint() {
-	return {
-		type: 'HIDE_INSERTION_POINT',
+export const hideInsertionPoint =
+	() =>
+	( { select, dispatch } ) => {
+		if ( ! select.isBlockInsertionPointVisible() ) {
+			return;
+		}
+		dispatch( {
+			type: 'HIDE_INSERTION_POINT',
+		} );
 	};
-}
 
 /**
  * Action that resets the template validity.

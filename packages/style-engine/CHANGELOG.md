@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 1.3.0 (2022-10-19)
+
+### Internal
+-   Style Engine: move PHP unit tests to Gutenberg [#44722](https://github.com/WordPress/gutenberg/pull/44722)
+
+## 1.2.0 (2022-10-05)
+
+### Internal
+-   Script loader: remove 6.1 wp actions ([#44519](https://github.com/WordPress/gutenberg/pull/44519))
+
 ## 1.1.0 (2022-09-21)
 
 ### Enhancement

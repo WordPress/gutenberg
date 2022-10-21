@@ -23,7 +23,13 @@ Add this to your `package.json` file:
 Alternatively, add this to `.prettierrc` file:
 
 ```
-extends: ['@wordpress/prettier-config']
+"@wordpress/prettier-config"
+```
+
+Or add this to `.prettierrc.js` file:
+
+```js
+module.exports = require( '@wordpress/prettier-config' );
 ```
 
 ## Contributing to this package

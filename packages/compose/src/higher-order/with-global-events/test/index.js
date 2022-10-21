@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import TestRenderer from 'react-test-renderer';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -30,8 +30,6 @@ jest.mock( '../listener', () => {
 } );
 
 describe( 'withGlobalEvents', () => {
-	let wrapper;
-
 	class OriginalComponent extends Component {
 		handleResize( event ) {
 			this.props.onResize( event );
@@ -50,51 +48,42 @@ describe( 'withGlobalEvents', () => {
 		jest.clearAllMocks();
 	} );
 
-	afterEach( () => {
-		if ( wrapper ) {
-			wrapper.unmount();
-			wrapper = null;
-		}
-	} );
-
-	function mountEnhancedComponent( props = {} ) {
+	it( 'renders with original component', () => {
 		const EnhancedComponent = withGlobalEvents( {
 			resize: 'handleResize',
 		} )( OriginalComponent );
 
-		props.ref = () => {};
-
-		wrapper = TestRenderer.create(
-			<EnhancedComponent { ...props }>Hello</EnhancedComponent>
-		);
-	}
-
-	it( 'renders with original component', () => {
-		mountEnhancedComponent();
+		render( <EnhancedComponent ref={ () => {} }>Hello</EnhancedComponent> );
 
 		expect( console ).toHaveWarned();
-		expect( wrapper.root.findByType( 'div' ).children[ 0 ] ).toBe(
-			'Hello'
-		);
+		expect( screen.getByText( 'Hello' ) ).toBeVisible();
 	} );
 
 	it( 'binds events from passed object', () => {
-		mountEnhancedComponent();
+		const EnhancedComponent = withGlobalEvents( {
+			resize: 'handleResize',
+		} )( OriginalComponent );
 
-		// Get the HOC wrapper instance.
-		const hocInstance =
-			wrapper.root.findByType( OriginalComponent ).parent.instance;
+		render( <EnhancedComponent ref={ () => {} }>Hello</EnhancedComponent> );
 
 		expect( Listener._instance.add ).toHaveBeenCalledWith(
 			'resize',
-			hocInstance
+			// If not `undefined`, then we consider handlers were properly bound to the wrapper component.
+			expect.any( Object )
 		);
 	} );
 
 	it( 'handles events', () => {
+		const EnhancedComponent = withGlobalEvents( {
+			resize: 'handleResize',
+		} )( OriginalComponent );
 		const onResize = jest.fn();
 
-		mountEnhancedComponent( { onResize } );
+		render(
+			<EnhancedComponent ref={ () => {} } onResize={ onResize }>
+				Hello
+			</EnhancedComponent>
+		);
 
 		const event = { type: 'resize' };
 

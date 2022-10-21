@@ -24,6 +24,7 @@ import {
  * Internal dependencies
  */
 import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
+import { getTypographyFontSizeValue } from './typography-utils';
 import { GlobalStylesContext } from './context';
 import { useSetting } from './hooks';
 
@@ -276,6 +277,21 @@ export function getStylesDeclarations(
 			}
 		}
 
+		// Calculate fluid typography rules where available.
+		if ( cssProperty === 'font-size' ) {
+			/*
+			 * getTypographyFontSizeValue() will check
+			 * if fluid typography has been activated and also
+			 * whether the incoming value can be converted to a fluid value.
+			 * Values that already have a "clamp()" function will not pass the test,
+			 * and therefore the original $value will be returned.
+			 */
+			ruleValue = getTypographyFontSizeValue(
+				{ size: ruleValue },
+				tree?.settings?.typography
+			);
+		}
+
 		output.push( `${ cssProperty }: ${ ruleValue }` );
 	} );
 
@@ -434,9 +450,15 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 
 	const pickStyleKeys = ( treeToPickFrom ) =>
 		pickBy( treeToPickFrom, ( value, key ) =>
-			[ 'border', 'color', 'spacing', 'typography', 'filter' ].includes(
-				key
-			)
+			[
+				'border',
+				'color',
+				'spacing',
+				'typography',
+				'filter',
+				'outline',
+				'shadow',
+			].includes( key )
 		);
 
 	// Top-level.
@@ -605,12 +627,12 @@ export const toStyles = (
 	}
 
 	if ( useRootPaddingAlign ) {
-		ruleset += `padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) } 
-			.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); } 
-			.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; } 
-			.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); } 
-			.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; } 
-			.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); } 
+		ruleset += `padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) }
+			.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
+			.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; }
+			.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }
+			.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }
+			.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
 			.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0;`;
 	}
 

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { devices } from '@playwright/test';
@@ -54,6 +55,30 @@ const config: PlaywrightTestConfig = {
 		{
 			name: 'chromium',
 			use: { ...devices[ 'Desktop Chrome' ] },
+			grepInvert: /-chromium/,
+		},
+		{
+			name: 'webkit',
+			use: {
+				...devices[ 'Desktop Safari' ],
+				/**
+				 * Headless webkit won't receive dataTransfer with custom types in the
+				 * drop event on Linux. The solution is to use `xvfb-run` to run the tests.
+				 * ```sh
+				 * xvfb-run npm run test:e2e:playwright
+				 * ```
+				 * See `.github/workflows/end2end-test-playwright.yml` for advanced usages.
+				 */
+				headless: os.type() !== 'Linux',
+			},
+			grep: /@webkit/,
+			grepInvert: /-webkit/,
+		},
+		{
+			name: 'firefox',
+			use: { ...devices[ 'Desktop Firefox' ] },
+			grep: /@firefox/,
+			grepInvert: /-firefox/,
 		},
 	],
 };

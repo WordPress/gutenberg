@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 4.4.0 (2022-10-19)
+
+### New Feature
+
+-   Add new `customPackageJSON` and `customBlockJSON` keys to allow templates to define custom keys for the resulting `package.json` and `block.json` files respectively.[#44649](https://github.com/WordPress/gutenberg/pull/44649)
+
+## 4.3.0 (2022-10-05)
+
 ## 4.2.0 (2022-09-21)
 
 ## 4.0.0 (2022-08-24)
