@@ -55,7 +55,8 @@ export type ColorPaletteProps = {
 	 */
 	colors?: ( PaletteObject | ColorObject )[];
 	/**
-	 * Whether to allow custom color or not.
+	 * Whether to allow the user to pick a custom color on top of the predefined
+	 * choices (defined via the `colors` prop).
 	 *
 	 * @default false
 	 */
