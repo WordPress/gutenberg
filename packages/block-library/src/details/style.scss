@@ -3,13 +3,10 @@
 		font-size: var(--wp--preset--font-size--medium, $default-font-size);
 	}
 	.wp-block-details__summary {
-		padding: 0.25em;
+		font-size: var(--wp--preset--font-size--medium, $default-font-size);
 		> * {
 			display: inline;
-			font-size: var(--wp--preset--font-size--medium, $default-font-size);
+			margin-left: 8px;
 		}
-	}
-	.wp-block-details__content {
-		padding: 0.25em;
 	}
 }
