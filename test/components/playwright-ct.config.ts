@@ -36,6 +36,21 @@ const config: PlaywrightTestConfig = {
 
 		/* Port to use for Playwright component endpoint. */
 		ctPort: 3100,
+
+		ctViteConfig: {
+			// @ts-ignore: A hack to prevent playwright from overriding the config.
+			get esbuild() {
+				return {
+					loader: 'tsx',
+					include: /.*\.[tj]sx?$/,
+					exclude: [],
+				};
+			},
+			// @ts-ignore: A hack to prevent playwright from overriding the config.
+			set esbuild( _options ) {
+				// Ignore setter.
+			},
+		},
 	},
 
 	/* Configure projects for major browsers */
