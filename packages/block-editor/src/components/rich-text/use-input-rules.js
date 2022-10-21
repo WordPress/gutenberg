@@ -108,10 +108,12 @@ export function useInputRules( props ) {
 
 			const transformed = formatTypes.reduce(
 				( accumlator, { __unstableInputRule } ) => {
-					if ( __unstableInputRule ) {
+					if (
+						__unstableInputRule &&
+						event.target.tagName !== 'CODE'
+					) {
 						accumlator = __unstableInputRule( accumlator );
 					}
-
 					return accumlator;
 				},
 				preventEventDiscovery( value )
