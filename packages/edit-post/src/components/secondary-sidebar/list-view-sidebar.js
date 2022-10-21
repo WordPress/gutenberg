@@ -51,7 +51,7 @@ export default function ListViewSidebar() {
 		// If the list view has focus, we know it is safe to close.
 		if (
 			listViewRef.current
-				.closest( '[role="region"]' )
+				.closest( '[role="region"][tabindex="-1"]' )
 				.contains( listViewRef.current.ownerDocument.activeElement )
 		) {
 			setIsListViewOpened( false );
