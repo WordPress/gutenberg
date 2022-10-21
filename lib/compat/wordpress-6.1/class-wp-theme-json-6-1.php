@@ -884,7 +884,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				array_filter(
 					$declarations,
 					function( $declaration ) {
-						return str_contains( $declaration['name'], 'border-color' );
+						return 'border-color' === $declaration['name'];
 					}
 				)
 			);
@@ -892,7 +892,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				array_filter(
 					$declarations,
 					function( $declaration ) {
-						return str_contains( $declaration['name'], 'color' );
+						return 'color' === $declaration['name'];
 					}
 				)
 			);
@@ -900,7 +900,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				array_filter(
 					$declarations,
 					function( $declaration ) {
-						return str_contains( $declaration['name'], 'background-color' );
+						return 'background-color' === $declaration['name'];
 					}
 				)
 			);
