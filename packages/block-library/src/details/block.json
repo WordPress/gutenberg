@@ -16,6 +16,10 @@
 			"type": "string",
 			"source": "html",
 			"selector": "h1,h2,h3,h4,h5,h6"
+		},
+		"showContent": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {
@@ -34,13 +38,6 @@
 			"color": true,
 			"width": true,
 			"style": true
-		},
-		"__experimentalStyle": {
-			"border": {
-				"color": "#000",
-				"width": "1px",
-				"style": "solid"
-			}
 		},
 		"html": false,
 		"spacing": {

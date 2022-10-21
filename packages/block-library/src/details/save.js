@@ -13,12 +13,12 @@ import {
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { level, summary } = attributes;
+	const { level, summary, showContent } = attributes;
 	const TagName = 'h' + level;
 	const blockProps = useBlockProps.save();
 
 	return (
-		<details { ...blockProps }>
+		<details { ...blockProps } open={ showContent }>
 			<summary className={ classnames( 'wp-block-details__summary' ) }>
 				<TagName>
 					<RichText.Content value={ summary } />

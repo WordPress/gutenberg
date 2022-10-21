@@ -240,7 +240,7 @@ An advanced block that allows displaying a summary and hiding and displaying det
 -	**Name:** core/details
 -	**Category:** theme
 -	**Supports:** align, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** level, summary
+-	**Attributes:** level, showContent, summary
 
 ## Embed
 

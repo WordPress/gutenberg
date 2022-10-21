@@ -12,6 +12,7 @@ import {
 	useInnerBlocksProps,
 	BlockControls,
 } from '@wordpress/block-editor';
+import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -31,7 +32,7 @@ const DETAILS = [
 ];
 
 function DetailsBlock( { attributes, setAttributes } ) {
-	const { level, summary } = attributes;
+	const { level, summary, showContent } = attributes;
 	const tagName = 'h' + level;
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps(
@@ -46,6 +47,18 @@ function DetailsBlock( { attributes, setAttributes } ) {
 	return (
 		<>
 			<BlockControls group="block">
+				<ToolbarButton
+					title={ __( 'Show content' ) }
+					// Add icon once an icon has been created icon={ }
+					onClick={ () => {
+						setAttributes( {
+							showContent: ! showContent,
+						} );
+					} }
+					className={ showContent ? 'is-pressed' : undefined }
+				>
+					{ __( 'Show content' ) }
+				</ToolbarButton>
 				<HeadingLevelDropdown
 					selectedLevel={ level }
 					onChange={ ( newLevel ) =>
@@ -53,7 +66,7 @@ function DetailsBlock( { attributes, setAttributes } ) {
 					}
 				/>
 			</BlockControls>
-			<details { ...blockProps } open>
+			<details { ...blockProps } open={ showContent }>
 				<summary
 					className={ classnames( 'wp-block-details__summary' ) }
 					onClick={ ( event ) => event.preventDefault() }
