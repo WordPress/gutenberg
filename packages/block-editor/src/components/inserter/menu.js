@@ -170,28 +170,81 @@ function InserterMenu(
 		[ destinationRootClientId, onInsert, onHover ]
 	);
 
-	const getCurrentTab = useCallback(
-		( tab ) => {
-			if ( tab.name === 'blocks' ) {
-				return blocksTab;
-			} else if ( tab.name === 'patterns' ) {
-				return patternsTab;
-			}
-			return reusableBlocksTab;
-		},
-		[ blocksTab, patternsTab, reusableBlocksTab ]
-	);
-
 	const searchRef = useRef();
+	// TODO: this doesn't work now..
 	useImperativeHandle( ref, () => ( {
 		focusSearch: () => {
-			searchRef.current.focus();
+			searchRef.current?.focus();
 		},
 	} ) );
 
+	const getCurrentTab = useCallback(
+		( tab ) => {
+			const searchControlProps = {};
+			let searchResultsProps;
+			let tabContent;
+			if ( tab.name === 'blocks' ) {
+				searchControlProps.label = __( 'Search for blocks' );
+				searchResultsProps = {
+					showBlockDirectory: true,
+					maxBlockPatterns: 0,
+				};
+				tabContent = blocksTab;
+			} else if ( tab.name === 'patterns' ) {
+				searchControlProps.label = __( 'Search for patterns' );
+				searchResultsProps = {
+					maxBlockTypes: 0,
+				};
+				tabContent = patternsTab;
+			} else if ( tab.name === 'reusable' ) {
+				searchControlProps.label = __( 'Search for blocks' );
+				searchResultsProps = {
+					showBlockDirectory: true,
+					maxBlockPatterns: 0,
+				};
+				tabContent = reusableBlocksTab;
+			}
+
+			return (
+				<>
+					<SearchControl
+						className="block-editor-inserter__search"
+						onChange={ ( value ) => {
+							if ( hoveredItem ) setHoveredItem( null );
+							setFilterValue( value );
+						} }
+						value={ filterValue }
+						placeholder={ __( 'Search' ) }
+						ref={ searchRef }
+						{ ...searchControlProps }
+					/>
+					{ ! filterValue && tabContent }
+					{ !! filterValue && (
+						<div className="block-editor-inserter__no-tab-container">
+							<InserterSearchResults
+								filterValue={ filterValue }
+								onSelect={ onSelect }
+								onHover={ onHover }
+								rootClientId={ rootClientId }
+								clientId={ clientId }
+								isAppender={ isAppender }
+								__experimentalInsertionIndex={
+									__experimentalInsertionIndex
+								}
+								shouldFocusBlock={ shouldFocusBlock }
+								{ ...searchResultsProps }
+							/>
+						</div>
+					) }
+				</>
+			);
+		},
+		[ blocksTab, patternsTab, reusableBlocksTab, filterValue ]
+	);
+
 	const showPatternPanel =
 		selectedTab === 'patterns' && ! filterValue && selectedPatternCategory;
-	const showAsTabs = ! filterValue && ( showPatterns || hasReusableBlocks );
+	const showAsTabs = showPatterns || hasReusableBlocks;
 
 	return (
 		<div className="block-editor-inserter__menu">
@@ -200,34 +253,6 @@ function InserterMenu(
 					'show-as-tabs': showAsTabs,
 				} ) }
 			>
-				<SearchControl
-					className="block-editor-inserter__search"
-					onChange={ ( value ) => {
-						if ( hoveredItem ) setHoveredItem( null );
-						setFilterValue( value );
-					} }
-					value={ filterValue }
-					label={ __( 'Search for blocks and patterns' ) }
-					placeholder={ __( 'Search' ) }
-					ref={ searchRef }
-				/>
-				{ !! filterValue && (
-					<div className="block-editor-inserter__no-tab-container">
-						<InserterSearchResults
-							filterValue={ filterValue }
-							onSelect={ onSelect }
-							onHover={ onHover }
-							rootClientId={ rootClientId }
-							clientId={ clientId }
-							isAppender={ isAppender }
-							__experimentalInsertionIndex={
-								__experimentalInsertionIndex
-							}
-							showBlockDirectory
-							shouldFocusBlock={ shouldFocusBlock }
-						/>
-					</div>
-				) }
 				{ showAsTabs && (
 					<InserterTabs
 						showPatterns={ showPatterns }
