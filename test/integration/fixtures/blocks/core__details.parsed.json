@@ -9,13 +9,13 @@
 					"placeholder": "Add text or blocks that will display when the details block is opened."
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n\t\t<p></p>\n\t\t",
-				"innerContent": [ "\n\t\t<p></p>\n\t\t" ]
+				"innerHTML": "\n\t<p></p>\n\t",
+				"innerContent": [ "\n\t<p></p>\n\t" ]
 			}
 		],
-		"innerHTML": "\n<details class=\"wp-block-details\">\n\t<summary class=\"wp-block-details__summary\"><h2></h2></summary>\n\t<div class=\"wp-block-details__content\">\n\t\t\n\t</div>\n</details>\n",
+		"innerHTML": "\n<details class=\"wp-block-details\" open>\n\t<summary class=\"wp-block-details__summary\"><h2></h2></summary>\n\t<div class=\"wp-block-details__content\">\n\t\t\n\t</div>\n</details>\n",
 		"innerContent": [
-			"\n<details class=\"wp-block-details\">\n\t<summary class=\"wp-block-details__summary\"><h2></h2></summary>\n\t<div class=\"wp-block-details__content\">\n\t\t",
+			"\n<details class=\"wp-block-details\" open>\n\t<summary class=\"wp-block-details__summary\"><h2></h2></summary>\n\t<div class=\"wp-block-details__content\">\n\t\t",
 			null,
 			"\n\t</div>\n</details>\n"
 		]
