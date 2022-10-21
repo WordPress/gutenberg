@@ -584,6 +584,8 @@ describe( 'withSelect', () => {
 		expect( ChildOriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( ParentOriginalComponent ).toHaveBeenCalledTimes( 1 );
 
+		// This is intentionally wrapped in an `act()` call.
+		// eslint-disable-next-line testing-library/no-unnecessary-act
 		await act( async () => {
 			registry.dispatch( 'childRender' ).toggleRender();
 		} );
