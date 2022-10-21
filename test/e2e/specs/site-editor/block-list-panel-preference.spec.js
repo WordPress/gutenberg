@@ -12,11 +12,13 @@ test.describe( 'Block list view', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'Should open by default', async ( { admin, page } ) => {
+	test( 'Should open by default', async ( { admin, page, siteEditor } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 		} );
+
+		await siteEditor.toggleCanvasMode();
 
 		// Should display the Preview button.
 		await expect(
@@ -31,6 +33,8 @@ test.describe( 'Block list view', () => {
 		} );
 
 		await page.reload();
+
+		await siteEditor.toggleCanvasMode();
 
 		// Should display the Preview button.
 		await expect(

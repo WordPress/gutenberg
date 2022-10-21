@@ -520,9 +520,20 @@ export const switchEditorMode =
  *
  * @param {?string} mode Canvas mode.
  */
-export function __unstableSetCanvasMode( mode ) {
-	return {
-		type: 'SET_CANVAS_MODE',
-		mode,
+export const __unstableSetCanvasMode =
+	( mode ) =>
+	( { registry, dispatch } ) => {
+		dispatch( {
+			type: 'SET_CANVAS_MODE',
+			mode,
+		} );
+		// Check if the block list view should be open by default.
+		if (
+			mode === 'edit' &&
+			registry
+				.select( preferencesStore )
+				.get( 'core/edit-site', 'showListViewByDefault' )
+		) {
+			dispatch.setIsListViewOpened( true );
+		}
 	};
-}
