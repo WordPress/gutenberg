@@ -104,7 +104,13 @@ function UnforwardedUnitControl(
 	// Stores parsed value for hand-off in state reducer.
 	const refParsedQuantity = useRef< number | undefined >( undefined );
 
-	const classes = classnames( 'components-unit-control', className );
+	const classes = classnames(
+		'components-unit-control',
+		// This class is added for legacy purposes to maintain it on the outer
+		// wrapper. See: https://github.com/WordPress/gutenberg/pull/45139
+		'components-unit-control-wrapper',
+		className
+	);
 
 	const handleOnQuantityChange = (
 		nextQuantityValue: number | string | undefined,
