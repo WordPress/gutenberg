@@ -7,6 +7,7 @@
 		> * {
 			display: inline;
 			margin-left: 8px;
+			font-size: var(--wp--preset--font-size--medium, $default-font-size);
 		}
 	}
 }
