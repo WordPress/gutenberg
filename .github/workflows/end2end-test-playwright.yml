@@ -54,7 +54,7 @@ jobs:
               if: always()
               with:
                   name: failures-artifacts
-                  path: artifacts/test-results
+                  path: artifacts
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
